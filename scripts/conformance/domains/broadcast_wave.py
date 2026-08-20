@@ -262,7 +262,7 @@ def _loudness_examples_outcome(
         "MaxMomentaryLoudness": "max_momentary_loudness",
         "MaxShortTermLoudness": "max_short_term_loudness",
     }
-    for (value, _dec, _hexa), field in zip(examples, fields):
+    for (value, _dec, _hexa), field in zip(examples, fields, strict=True):
         overrides[attribute[field]] = value
     payload, _ = _write_and_capture(_metadata(**overrides))
     stored = [_int16_at(payload, field) for field in fields]
@@ -270,7 +270,9 @@ def _loudness_examples_outcome(
         f"{value} -> {hexa:04X}h ({dec})" for value, dec, hexa in examples
     )
     computed_txt = ", ".join(f"{got & 0xFFFF:04X}h ({got})" for got in stored)
-    passed = all(got == dec for got, (_v, dec, _h) in zip(stored, examples))
+    passed = all(
+        got == dec for got, (_v, dec, _h) in zip(stored, examples, strict=True)
+    )
     return Outcome(
         expected=expected_txt, computed=computed_txt, delta="-", passed=passed
     )

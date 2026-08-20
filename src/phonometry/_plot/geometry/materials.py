@@ -200,7 +200,7 @@ def plot_absorber_stack(
     height = 0.9 * total
     thin = 0.14 * total
     x = 0.0
-    for index, (layer, dispatched) in enumerate(zip(stack, kinds)):
+    for index, (layer, dispatched) in enumerate(zip(stack, kinds, strict=True)):
         kind, drawn, label_key = dispatched
         extra = dict(kwargs) if index == 0 else {}
         _material_rect(ax, x, 0.0, drawn, height, kind, **extra)

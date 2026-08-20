@@ -202,7 +202,9 @@ def _chk_gum_h2_correlated() -> Outcome:
     means = obs.mean(axis=0)
     u_means = obs.std(axis=0, ddof=1) / math.sqrt(obs.shape[0])
     r = np.corrcoef(obs.T)
-    quantities = [ph.metrology.Quantity(m, s) for m, s in zip(means, u_means)]
+    quantities = [
+        ph.metrology.Quantity(m, s) for m, s in zip(means, u_means, strict=True)
+    ]
     result = ph.metrology.combine_uncertainty(
         lambda v, i, p: v / i * math.cos(p), quantities, correlation=r
     )

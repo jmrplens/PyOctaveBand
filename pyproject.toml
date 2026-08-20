@@ -153,6 +153,9 @@ select = [
     "ICN",                  # the conventional alias for a well-known package
     "N812",                 # an alias must not disguise a function as a class
     "INP", "T20",           # both already clean in `src`, and kept that way
+    "B905",                 # every `zip()` says whether its inputs must be
+                            # the same length. Read one at a time: `strict=`
+                            # is a judgement about the data, not a formality
     "PLR2004",              # a number in a comparison carries a name or a
                             # reasoned noqa; every site was censused one by
                             # one before this went on (str/bytes stay exempt:
@@ -166,7 +169,6 @@ select = [
                             # no rule here rewords prose.
 ]
 ignore = [
-    "B905",  # selected by "B"; see the note below
     # TC006 quotes the first argument of `typing.cast`, which that function
     # ignores entirely at run time. It is inert, and it moved the recorded
     # fingerprint of two clips through `figures.media._save_animation`. The
@@ -207,11 +209,6 @@ ignore = [
 #               stragglers, not a style.
 #   PTH   (158) pathlib over os.path.
 #   PERF   (34) manual loops that build a list.
-#   B905  (162) `zip()` without `strict=`. 47 are in `src/`, where a silent
-#               truncation drops a band or a curve without saying so. Ruff's
-#               own fix writes `strict=False`, which only makes the truncation
-#               explicit; the value is in deciding, per site, where the lengths
-#               are equal by construction and `strict=True` is the truth.
 
 [tool.ruff.lint.per-file-ignores]
 # `matplotlib.use("Agg")` has to run between `import matplotlib` and the first

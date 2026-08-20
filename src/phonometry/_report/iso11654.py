@@ -181,7 +181,7 @@ def _value_table(
         col_widths = [28 * mm, 28 * mm]
 
     rows: list[list[Any]] = [header]
-    for fk, m, r_, d in zip(centers, measured, shifted, deviations):
+    for fk, m, r_, d in zip(centers, measured, shifted, deviations, strict=True):
         if verbose:
             rows.append(
                 [
@@ -243,7 +243,7 @@ def _third_octave_table(
     col_widths = [24 * mm, 16 * mm, 16 * mm]
 
     rows: list[list[Any]] = [header]
-    for j, (fk, a_s) in enumerate(zip(bands, alpha_s)):
+    for j, (fk, a_s) in enumerate(zip(bands, alpha_s, strict=True)):
         # The middle of each triple is the octave centre carrying alpha_p.
         octave_cell = _d2(measured[j // 3], language) if j % 3 == 1 else ""
         rows.append([f"{round(fk)}", _d2(a_s, language), octave_cell])
@@ -378,9 +378,17 @@ def render_iso11654_report(
     alpha_s = result.third_octave_alpha_s
     bands = result.third_octave_bands
     if not verbose and alpha_s is not None and bands is not None:
+        third_octave_bands = np.asarray(bands, dtype=np.float64)
+        third_octave_alpha_s = np.asarray(alpha_s, dtype=np.float64)
+        if third_octave_bands.shape != third_octave_alpha_s.shape:
+            msg = (
+                "render_iso11654_report() needs 'third_octave_bands' and "
+                "'third_octave_alpha_s' of equal length."
+            )
+            raise ValueError(msg)
         value_table = _third_octave_table(
-            np.asarray(bands, dtype=np.float64),
-            np.asarray(alpha_s, dtype=np.float64),
+            third_octave_bands,
+            third_octave_alpha_s,
             measured,
             language,
         )

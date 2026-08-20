@@ -640,7 +640,7 @@ def plot_multiple_shock(
         color=_C_PRIMARY,
         label=r"$\Pi(R) = 1 - e^{-(R/\alpha)^{\beta}}$",
     )
-    for level, r_val in zip((10, 50, 90), (r10, r50, r90)):
+    for level, r_val in zip((10, 50, 90), (r10, r50, r90), strict=True):
         ax.axhline(level, color=_C_MUTED, ls=":", lw=0.8)
         ax.plot([r_val, r_val], [0.0, level], color=_C_MUTED, ls=":", lw=0.8)
 

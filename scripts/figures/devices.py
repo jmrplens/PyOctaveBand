@@ -206,7 +206,7 @@ def generate_distortion(output_dir: str) -> None:
         zorder=6,
         label="Harmonics $n f_1$",
     )
-    for k, (fk, lk) in enumerate(zip(hz, hdb), start=1):
+    for k, (fk, lk) in enumerate(zip(hz, hdb, strict=True), start=1):
         ax.annotate(
             f"$n$ = {k}",
             xy=(fk, lk),
@@ -1352,7 +1352,7 @@ def generate_intensity_scan_power(output_dir: str) -> None:
         linewidth=0.7,
         zorder=3,
     )
-    for pos, is_neg in zip(positions, neg):
+    for pos, is_neg in zip(positions, neg, strict=True):
         if is_neg:
             ax.axvspan(
                 pos - 0.35,
@@ -1402,7 +1402,7 @@ def generate_silencer_expansion_chamber(output_dir: str) -> None:
     colors = (COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TERTIARY, "#9467bd")
 
     _fig, ax = plt.subplots(figsize=(9.0, 5.2))
-    for m, color in zip(ratios, colors):
+    for m, color in zip(ratios, colors, strict=True):
         res = noise_control.expansion_chamber(freqs, length, m * pipe_area, pipe_area)
         peak = 10.0 * np.log10(1.0 + 0.25 * (m - 1.0 / m) ** 2)
         ax.plot(
@@ -3062,7 +3062,7 @@ def generate_duct_sheet_verification(output_dir: str) -> None:
     )
 
     _fig, axes = plt.subplots(2, 3, figsize=(13.0, 7.6))
-    for ax, (title, sheet_row, model_row) in zip(axes.ravel(), panels):
+    for ax, (title, sheet_row, model_row) in zip(axes.ravel(), panels, strict=True):
         printed = np.asarray(sheet_row, dtype=float)
         computed = np.asarray(model_row, dtype=float)
         n = min(printed.size, computed.size)

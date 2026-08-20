@@ -367,7 +367,11 @@ def animate_fdtd_impedance_tube(output_dir: str) -> None:
 
     def update(k: int) -> tuple[Any, ...]:
         kf = min(k, n_active - 1)
-        for im, line, (p_all, env) in zip(ims, lines, ((p_e, env_e), (p_s, env_s))):
+        # The three operands are the same pair of panels, built a few lines
+        # up: `strict=` could only ever hold. Adding it is hashed into the
+        # recorded fingerprint of anim_fdtd_impedance_tube, so it would ask
+        # for a re-render that draws the very same frames.
+        for im, line, (p_all, env) in zip(ims, lines, ((p_e, env_e), (p_s, env_s))):  # noqa: B905
             im.set_data(p_all[kf])
             env_row = np.repeat(env[kf], 2)[: x_env.size]
             line.set_data(

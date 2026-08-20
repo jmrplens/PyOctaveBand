@@ -206,7 +206,7 @@ def test_noninteger_period_samples_on_fs_grid_not_angular_grid() -> None:
     def wave(tv: np.ndarray) -> np.ndarray:
         return sum(
             a * np.cos(2.0 * np.pi * k / period * tv + p)
-            for k, a, p in zip(orders, amps, phases)
+            for k, a, p in zip(orders, amps, phases, strict=True)
         )
 
     result = ph.signals.time_synchronous_average(

@@ -578,13 +578,16 @@ def task_based_exposure(
     levels, durations = _task_levels(tasks)
 
     # Daily level: energy sum of contributions (Eq 9 == Eq 10).
-    energy = sum((t_m / _T0) * 10.0 ** (0.1 * lp) for lp, t_m in zip(levels, durations))
+    energy = sum(
+        (t_m / _T0) * 10.0 ** (0.1 * lp)
+        for lp, t_m in zip(levels, durations, strict=True)
+    )
     lex_8h = float(10.0 * log10(energy))
 
     # Second pass: sensitivity coefficients and uncertainty terms.
     options = _BudgetOptions(instrument, u3, include_duration_uncertainty, warn)
     contributions: list[TaskContribution] = []
-    for idx, (task, lp, t_m) in enumerate(zip(tasks, levels, durations)):
+    for idx, (task, lp, t_m) in enumerate(zip(tasks, levels, durations, strict=True)):
         contributions.append(_task_contribution(task, idx, lp, t_m, lex_8h, options))
 
     variance = sum(c.variance_contribution for c in contributions)

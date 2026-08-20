@@ -68,11 +68,11 @@ def _response_db(
 def test_b_masks_match_reference_data() -> None:
     """The module's ANSI S1.4-1983 tables equal the reference_data copies."""
     assert len(_ANSI_S14_TABLE4_B) == len(ANSIS14_TABLE4_B) == 34
-    for row, ref_row in zip(_ANSI_S14_TABLE4_B, ANSIS14_TABLE4_B):
+    for row, ref_row in zip(_ANSI_S14_TABLE4_B, ANSIS14_TABLE4_B, strict=True):
         assert row == pytest.approx(ref_row), f"Table IV mismatch at {ref_row[0]} Hz"
     # Table V Types 1/2 (columns 3-6 of the reference table).
     assert len(_ANSI_S14_TABLE5_12) == len(ANSIS14_TABLE5) == 34
-    for row, ref_row in zip(_ANSI_S14_TABLE5_12, ANSIS14_TABLE5):
+    for row, ref_row in zip(_ANSI_S14_TABLE5_12, ANSIS14_TABLE5, strict=True):
         assert row[0] == ref_row[0]
         assert row[1:] == pytest.approx(ref_row[3:]), (
             f"Table V mismatch at {ref_row[0]} Hz"
@@ -82,7 +82,7 @@ def test_b_masks_match_reference_data() -> None:
 def test_au_masks_match_reference_data() -> None:
     """The module's IEC 61012:1990 tables equal the reference_data copies."""
     assert len(_IEC61012_TABLE1) == len(IEC61012_TABLE1) == 37
-    for row, ref_row in zip(_IEC61012_TABLE1, IEC61012_TABLE1):
+    for row, ref_row in zip(_IEC61012_TABLE1, IEC61012_TABLE1, strict=True):
         assert row == pytest.approx(ref_row), f"Table 1 mismatch at {ref_row[0]} Hz"
     assert _IEC61012_AU_HF == pytest.approx(IEC61012_AU_HF)
     poles = [(p.real, p.imag) for p in _U_POLES_HZ]
@@ -109,7 +109,7 @@ def test_b_realized_within_type0_at_every_table4_row() -> None:
     freqs = [_exact(row[0]) for row in ANSIS14_TABLE4_B]
     resp = _response_db(wf, freqs)
     for (freq, goal), (_, up0, lo0, *_), got in zip(
-        ANSIS14_TABLE4_B, ANSIS14_TABLE5, resp
+        ANSIS14_TABLE4_B, ANSIS14_TABLE5, resp, strict=True
     ):
         dev = got - goal
         assert lo0 <= dev <= up0, f"B outside Type 0 at {freq} Hz: {dev:+.3f} dB"
@@ -125,7 +125,7 @@ def test_b_appendix_c_analytic_reproduces_table4() -> None:
     """
     freqs = np.array([_exact(row[0]) for row in ANSIS14_TABLE4_B])
     analytic = _analytic_weighting_db("B", freqs)
-    for (freq, goal), got in zip(ANSIS14_TABLE4_B, analytic):
+    for (freq, goal), got in zip(ANSIS14_TABLE4_B, analytic, strict=True):
         assert got == pytest.approx(goal, abs=0.05), f"{freq} Hz"
 
 
@@ -196,7 +196,7 @@ def test_au_realized_within_table1_tolerances() -> None:
     wf = filters.WeightingFilter(96000, "AU")
     rows = [r for r in IEC61012_TABLE1 if _exact(r[0]) < 48000.0 and r[0] != 1000]
     resp = _response_db(wf, [_exact(r[0]) for r in rows])
-    for (freq, u_nom, up, lo), got in zip(rows, resp):
+    for (freq, u_nom, up, lo), got in zip(rows, resp, strict=True):
         goal = IEC61012_AU_HF.get(freq, a_nom.get(freq, 0.0) + u_nom)
         assert lo <= got - goal <= up, f"AU outside Table 1 at {freq} Hz"
 
@@ -288,7 +288,7 @@ def test_d_pins_published_table_values() -> None:
     freqs = [float(row[0]) for row in IEC537_NASA_TABLE_SLD1]
     resp = _response_db(wf, freqs)
     table = {row[0]: row[1] for row in IEC537_NASA_TABLE_SLD1}
-    got = dict(zip(table, resp))
+    got = dict(zip(table, resp, strict=True))
     assert got[50] == pytest.approx(-12.8, abs=0.1)
     assert got[1000] == 0.0
     assert got[8000] == pytest.approx(5.5, abs=0.2)

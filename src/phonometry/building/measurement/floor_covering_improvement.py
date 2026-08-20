@@ -411,7 +411,7 @@ def improvement_octave_bands(
         raise ValueError(msg)
     octave_freqs: list[float] = []
     octave_values: list[float] = []
-    by_freq = {round(float(f), 3): float(d) for f, d in zip(freqs, dl)}
+    by_freq = {round(float(f), 3): float(d) for f, d in zip(freqs, dl, strict=True)}
     for centre in _octave_centres(freqs):
         thirds = [centre * 2.0 ** (k / 3.0) for k in (-1, 0, 1)]
         try:

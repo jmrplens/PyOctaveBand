@@ -358,7 +358,7 @@ def test_dynamic_intermodulation_distortion() -> None:
     # though it sits 750 Hz from the k=4 (2400) and k=6 (3900) products.
     # DIM = sqrt(sum products^2) / sine_amp, excluding the 3150 tone.
     x = _tone(fsine) + _tone(fsq, 0.8)
-    for c, a in zip(comps, amps):
+    for c, a in zip(comps, amps, strict=True):
         x = x + _tone(c, a)
     expected = math.sqrt(sum(a**2 for a in amps))
     assert electroacoustics.dynamic_intermodulation_distortion(x, FS) == pytest.approx(

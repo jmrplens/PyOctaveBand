@@ -250,7 +250,7 @@ def plot_facade_elements(
 
     x = 0.0
     fills = ("rigid", "cavity", "plate", "porous")
-    for index, (element, area) in enumerate(zip(tiles, areas)):
+    for index, (element, area) in enumerate(zip(tiles, areas, strict=True)):
         width = area / height
         _material_rect(
             ax,

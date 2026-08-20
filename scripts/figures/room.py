@@ -604,7 +604,7 @@ def generate_modal_count_per_band(output_dir: str) -> None:
         color=COLOR_PRIMARY,
         label="Above it",
     )
-    for centre, count in zip(bands, counts):
+    for centre, count in zip(bands, counts, strict=True):
         ax.annotate(
             f"{count:,.0f}",
             xy=(centre, count * 1.25),
@@ -1429,7 +1429,7 @@ def generate_room_noise_criteria(output_dir: str) -> None:
     _fig, (ax_nc, ax_rc) = plt.subplots(1, 2, figsize=(12.5, 5.6))
 
     # --- Left: NC curves + tangency rating. ---
-    for row, idx in zip(NC_CURVES, NC_INDICES):
+    for row, idx in zip(NC_CURVES, NC_INDICES, strict=True):
         ax_nc.plot(OCTAVE_BANDS, row, color=COLOR_GRID, lw=0.8, zorder=1)
         ax_nc.annotate(
             f"{idx:.0f}",
@@ -1550,7 +1550,7 @@ def generate_nc_blind_spot(output_dir: str) -> None:
     _fig, (ax_nc, ax_rc) = plt.subplots(1, 2, figsize=(12.5, 5.6))
 
     # --- Left: one NC label for two spectra. ---
-    for row, idx in zip(NC_CURVES, NC_INDICES):
+    for row, idx in zip(NC_CURVES, NC_INDICES, strict=True):
         ax_nc.plot(OCTAVE_BANDS, row, color=COLOR_GRID, lw=0.8, zorder=1)
         ax_nc.annotate(
             f"{idx:.0f}",
@@ -1829,7 +1829,7 @@ def generate_enclosed_space_air_term(output_dir: str) -> None:
 
     still = room.enclosed_space_reverberation([(hall_area, soft)], hall_volume)
     colours = series_colors(len(AIR_ATTENUATION))
-    for colour, name in zip(colours, AIR_ATTENUATION):
+    for colour, name in zip(colours, AIR_ATTENUATION, strict=True):
         humid = room.enclosed_space_reverberation(
             [(hall_area, soft)], hall_volume, air_condition=name
         )
@@ -2237,7 +2237,7 @@ def generate_image_source_anisotropy(output_dir: str) -> None:
         label="specular (image source)",
         zorder=6,
     )
-    for ratio, value, reference in zip(ratios, specular, eyring):
+    for ratio, value, reference in zip(ratios, specular, eyring, strict=True):
         if ratio in (1.0, 3.0, 6.0):
             offset = -0.16 if ratio >= 5.0 else 0.11
             ax.annotate(
@@ -2306,7 +2306,7 @@ def generate_image_source_bands(output_dir: str) -> None:
             frequencies=freqs,
             air_attenuation=attenuation,
         )
-        for row, freq, colour in zip(banded.ir, freqs, colours):
+        for row, freq, colour in zip(banded.ir, freqs, colours, strict=True):
             time, level = room.decay_curve(row, banded.fs)
             label = f"{freq:g} Hz{tag}" if not tag else None
             ax.plot(
@@ -2377,7 +2377,7 @@ def generate_room_proportion_modes(output_dir: str) -> None:
         sharex=True,
         gridspec_kw={"height_ratios": [1, 1, 1, 1.5]},
     )
-    for ax, (name, dims) in zip(axes[:3], shapes):
+    for ax, (name, dims) in zip(axes[:3], shapes, strict=True):
         modes = room.room_modes(dims, max_frequency=200.0)
         freqs = np.asarray(modes.frequencies)
         kinds = np.asarray(modes.kinds)
@@ -2413,7 +2413,7 @@ def generate_room_proportion_modes(output_dir: str) -> None:
         )
 
     spacing = axes[3]
-    for (name, dims), style in zip(shapes, ("-", "--", ":")):
+    for (name, dims), style in zip(shapes, ("-", "--", ":"), strict=True):
         modes = room.room_modes(dims, max_frequency=200.0)
         unique = np.unique(np.round(np.asarray(modes.frequencies), 1))
         spacing.step(
@@ -2452,7 +2452,7 @@ def generate_steady_state_directivity(output_dir: str) -> None:
     _fig, (left, right) = plt.subplots(1, 2, figsize=(12.6, 5.6), sharey=True)
 
     colours = series_colors(4)
-    for colour, q in zip(colours, (1.0, 2.0, 4.0, 8.0)):
+    for colour, q in zip(colours, (1.0, 2.0, 4.0, 8.0), strict=True):
         field = room.steady_state_field(
             sound_power_level=90.0,
             surface_area=352.0,
@@ -2480,7 +2480,7 @@ def generate_steady_state_directivity(output_dir: str) -> None:
     left.legend(loc="upper right", fontsize=9)
 
     for colour, absorption in zip(
-        colours[::2].tolist() + [colours[3]], (0.05, 0.15, 0.35)
+        colours[::2].tolist() + [colours[3]], (0.05, 0.15, 0.35), strict=True
     ):
         field = room.steady_state_field(
             sound_power_level=90.0,
@@ -2570,7 +2570,7 @@ def generate_decay_signatures(output_dir: str) -> None:
     )
 
     _fig, axes = plt.subplots(1, 3, figsize=(13.2, 4.8), sharey=True)
-    for ax, (name, signal, verdict) in zip(axes, cases):
+    for ax, (name, signal, verdict) in zip(axes, cases, strict=True):
         res = room.room_parameters(signal, fs, limits=None)
         time, level = room.decay_curve(signal, fs)
         ax.plot(time, level, color=COLOR_PRIMARY, linewidth=1.8, zorder=5)

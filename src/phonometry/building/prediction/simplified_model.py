@@ -880,7 +880,7 @@ def predicted_airborne_insulation(
             r_w=p.r_ij_w,
             fraction=tau / tau_total,
         )
-        for p, tau in zip(flanking_paths, tau_paths)
+        for p, tau in zip(flanking_paths, tau_paths, strict=True)
     ]
     dominant = max(contributions, key=lambda c: c.fraction)
     return AirbornePredictionResult(

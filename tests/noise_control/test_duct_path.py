@@ -202,9 +202,9 @@ def _assert_path(
     *Sum* and *Combined* rows check the cascade arithmetic itself.
     """
     assert len(result.stages) == len(level_rows)
-    printed = zip(elements, self_noise_rows, level_rows)
+    printed = zip(elements, self_noise_rows, level_rows, strict=True)
     for stage, ((_, loss, _), self_noise, (row_sum, combined)) in zip(
-        result.stages, printed
+        result.stages, printed, strict=True
     ):
         where = f"{what} {stage.code}"
         _assert_sheet(stage.attenuation, _row(loss), f"{where} attenuation")

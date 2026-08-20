@@ -419,7 +419,7 @@ def _align_levels(levels: ArrayLike, frequencies: ArrayLike | None) -> np.ndarra
         msg = "levels and frequencies must have the same shape."
         raise ValueError(msg)
     aligned = np.full(_N_BANDS, np.nan)
-    for f, level in zip(fr, lv):
+    for f, level in zip(fr, lv, strict=True):
         matches = np.isclose(OCTAVE_BANDS, f, rtol=0.03)
         if not matches.any():
             msg = (

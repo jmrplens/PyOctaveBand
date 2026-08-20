@@ -150,7 +150,7 @@ def _chk_iso20065_uncertainty() -> Outcome:
         ref.ISO20065_E1_LEVELS, ref.ISO20065_E1_FREQUENCIES, ref.ISO20065_LINE_SPACING
     )
     assert res.extended_uncertainties is not None
-    by_freq = dict(zip(res.tone_frequencies, res.extended_uncertainties))
+    by_freq = dict(zip(res.tone_frequencies, res.extended_uncertainties, strict=True))
     # Table E.2, run index k = 2: U = 2.79 dB (90 % bilateral coverage).
     return numeric(
         ref.ISO20065_E2_U[1], float(by_freq[137.3]), 0.02, unit="dB", places=2

@@ -39,7 +39,7 @@ def _room_acoustics_example() -> tuple[object, ReportMetadata, str]:
     t60 = (1.40, 1.30, 1.20, 1.10, 1.00, 0.85)
     time = np.arange(round(5.0 * fs)) / fs
     ir = np.zeros_like(time)
-    for freq, decay in zip(bands, t60):
+    for freq, decay in zip(bands, t60, strict=True):
         ir += np.sin(2.0 * np.pi * freq * time) * np.exp(-0.5 * a60 * time / decay)
     result = ph.room.room_parameters(ir, fs)
     metadata = ReportMetadata(

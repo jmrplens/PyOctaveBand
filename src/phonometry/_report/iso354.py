@@ -142,7 +142,7 @@ def _alpha_table(freqs: np.ndarray, alpha_s: np.ndarray, language: str = "en") -
         fiche_paragraph("&#945;<sub>s</sub>", head_style),
     ]
     rows: list[list[Any]] = [header]
-    for fk, a_s in zip(freqs, alpha_s):
+    for fk, a_s in zip(freqs, alpha_s, strict=True):
         rows.append([f"{round(fk)}", _a2(a_s, language)])
     return band_table(rows, [28 * mm, 28 * mm], len(freqs))
 
@@ -169,7 +169,7 @@ def _detail_table(result: SoundAbsorptionMeasurement, language: str = "en") -> A
     a2 = np.asarray(result.absorption_area_with_specimen, dtype=np.float64)
     alpha_s = np.asarray(result.alpha_s, dtype=np.float64)
     rows: list[list[Any]] = [header]
-    for fk, t1k, t2k, a1k, a2k, ask in zip(freqs, t1, t2, a1, a2, alpha_s):
+    for fk, t1k, t2k, a1k, a2k, ask in zip(freqs, t1, t2, a1, a2, alpha_s, strict=True):
         rows.append(
             [
                 f"{round(fk)}",
@@ -237,6 +237,23 @@ def render_iso354_report(
             "render_iso354_report() needs 'frequencies' and 'alpha_s' of equal length."
         )
         raise ValueError(msg)
+    # SoundAbsorptionMeasurement is a plain frozen dataclass, so a hand-built
+    # result can carry per-band arrays of differing lengths. The four columns
+    # only the verbose detail table reads are checked here too; the guard above
+    # covers 'alpha_s' alone.
+    if verbose:
+        t1 = np.asarray(result.t_empty, dtype=np.float64)
+        t2 = np.asarray(result.t_specimen, dtype=np.float64)
+        a1 = np.asarray(result.absorption_area_empty, dtype=np.float64)
+        a2 = np.asarray(result.absorption_area_with_specimen, dtype=np.float64)
+        if not freqs.shape == t1.shape == t2.shape == a1.shape == a2.shape:
+            msg = (
+                "render_iso354_report(verbose=True) needs 't_empty', "
+                "'t_specimen', 'absorption_area_empty' and "
+                "'absorption_area_with_specimen' of the same length as "
+                "'frequencies'."
+            )
+            raise ValueError(msg)
 
     styles, title_style, basis_style, caption_style = document_styles(accent)
     title = t("Sound absorption measurement", language)

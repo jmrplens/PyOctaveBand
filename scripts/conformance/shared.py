@@ -154,7 +154,7 @@ def _weighting_deviation(curve: str, fs: int) -> WeightingDeviation:
         # strictest Table V mask (Type 0, laboratory grade).
         rows_b = [
             (t4, t5)
-            for t4, t5 in zip(ref.ANSIS14_TABLE4_B, ref.ANSIS14_TABLE5)
+            for t4, t5 in zip(ref.ANSIS14_TABLE4_B, ref.ANSIS14_TABLE5, strict=True)
             if t4[0] < fs / 2
         ]
         freqs = np.array(

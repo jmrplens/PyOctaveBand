@@ -102,7 +102,7 @@ def _design_sos_filter(
     """
     sos = [np.array([]) for _ in range(len(freq))]
 
-    for idx, (lower, upper) in enumerate(zip(freq_d, freq_u)):
+    for idx, (lower, upper) in enumerate(zip(freq_d, freq_u, strict=True)):
         fsd = fs / factor[idx]
         wn = np.array([lower, upper]) / (fsd / 2)
 

@@ -351,7 +351,7 @@ def _apparent_reduction(
     taus = [el.tau(total_area, n) for el in elements]
     tau_total = np.sum(taus, axis=0)
     r_prime = -10.0 * np.log10(tau_total)
-    element_r = {name: -10.0 * np.log10(t) for name, t in zip(names, taus)}
+    element_r = {name: -10.0 * np.log10(t) for name, t in zip(names, taus, strict=True)}
     return r_prime, element_r
 
 

@@ -356,7 +356,7 @@ def _chk_dim() -> Outcome:
     amps = [0.01 * (i + 1) for i in range(len(comps))]
     # 15 kHz sine + the strong 3.15 kHz fundamental + the nine products.
     x = _electro_tone(t, fsine, 1.0) + _electro_tone(t, fsq, 0.8)
-    for c, a in zip(comps, amps):
+    for c, a in zip(comps, amps, strict=True):
         x = x + _electro_tone(t, c, a)
     expected = math.sqrt(sum(a**2 for a in amps))
     return numeric(

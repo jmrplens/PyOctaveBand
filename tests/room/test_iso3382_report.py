@@ -46,7 +46,7 @@ def _synthetic_ir(seconds: float = 5.0) -> np.ndarray:
     """One sine carrier per octave band, each with its own exponential decay."""
     time = np.arange(round(seconds * _FS)) / _FS
     ir = np.zeros_like(time)
-    for freq, decay in zip(_BANDS, _T60):
+    for freq, decay in zip(_BANDS, _T60, strict=True):
         ir += np.sin(2.0 * np.pi * freq * time) * np.exp(-0.5 * _A60 * time / decay)
     return ir
 

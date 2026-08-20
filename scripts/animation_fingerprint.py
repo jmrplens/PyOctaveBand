@@ -298,7 +298,7 @@ class Sources:
             )
             if "_ANIMATIONS" not in targets or not isinstance(node.value, ast.Dict):
                 continue
-            for key, value in zip(node.value.keys, node.value.values):
+            for key, value in zip(node.value.keys, node.value.values, strict=True):
                 if (
                     isinstance(key, ast.Constant)
                     and isinstance(key.value, str)
@@ -441,7 +441,7 @@ def _table_entries(
     patterns: list[tuple[str, str]] = []
     node = i18n.symbols.get("_ES_EXACT")
     if isinstance(node, ast.Assign) and isinstance(node.value, ast.Dict):
-        for key, value in zip(node.value.keys, node.value.values):
+        for key, value in zip(node.value.keys, node.value.values, strict=True):
             pair = _literal_pair(key, value)
             if pair is not None:
                 exact.append(pair)

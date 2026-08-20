@@ -457,7 +457,7 @@ def _smooth(pattern: np.ndarray) -> np.ndarray:
     """Broadly tuned across-frequency smoothing (clause 7.7, Formulae 14/15)."""
     smoothed = np.zeros_like(pattern)
     n = pattern.size
-    for offset, weight in zip(_INH_TAPS, _INH_KERNEL):
+    for offset, weight in zip(_INH_TAPS, _INH_KERNEL, strict=True):
         src_lo = max(0, offset)
         src_hi = min(n, n + offset)
         dst_lo = max(0, -offset)

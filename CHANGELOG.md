@@ -99,6 +99,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Every `zip()` says whether its inputs must be the same length. `B905` is
+  selected, and the 162 calls it found were read one at a time: 157 pair
+  arrays that are equal by construction and now say `strict=True`, and five
+  consume the shorter input on purpose and say `strict=False` with a line
+  saying what ends the loop. The five are worth naming, because they are the
+  cases a blanket fix would have got wrong: two walk a palette against fewer
+  paths than it holds, one walks the fixed seven-band STI table against
+  whatever the result carries, one pairs `T20`/`T30` against however many fit
+  the plot, and one reads a mapping's keys against its values in an AST node.
+
+  `strict=True` is not a formality: it turns a silent truncation into a
+  `ValueError`, so it is only the truth where something upstream guarantees
+  the lengths. Checking that guarantee, site by site, is what this change was
+  for, and it found seven places where nothing guaranteed it. Six accredited
+  report fiches and one plot take their per-band arrays straight off a frozen
+  dataclass that has no `__post_init__`, is exported from a public package,
+  and has its constructor signature in the generated reference, so a result
+  built by hand reaches the table with arrays of any lengths at all. The
+  guards that existed covered some of the arrays and not the others: ISO 354
+  compared the frequencies against the absorption coefficient and left the
+  two reverberation times and both absorption areas unchecked, ISO 11654
+  checked three of five, and the scattering fiche two of four. Each now
+  raises a named `ValueError` before the table is built, the way the sibling
+  fiches already did, and the `strict=` behind it is the backstop it should
+  have been. Before this, a short array printed a table that quietly listed
+  fewer bands than the daily total above it was summing.
+
+  One call stays as it was, with a `noqa` that says so: it sits in the code
+  that draws `anim_fdtd_impedance_tube`, where its three operands are the
+  same pair of panels built a few lines above, so the argument could only
+  ever hold, and adding it would move the clip's recorded fingerprint and
+  ask for a re-render of the very same frames.
+
 - A number in a comparison carries a name. `PLR2004` is selected for `src`,
   and the 487 magic values it found there were read one at a time before it
   went on: 380 became named constants, 29 reach an existing symbol that

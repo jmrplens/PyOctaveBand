@@ -2216,7 +2216,7 @@ def generate_exposure_uncertainty(output_dir: str) -> None:
         zorder=3,
         label="Measurement task",
     )
-    for xi, c in zip(x, contribs):
+    for xi, c in zip(x, contribs, strict=True):
         ax.text(
             float(xi),
             c - 2.5,
@@ -2418,7 +2418,7 @@ def generate_sii_vocal_efforts(output_dir: str) -> None:
     positions = np.arange(len(VOCAL_EFFORTS))
     bar_colours = [colours[e] for e in VOCAL_EFFORTS]
     ax_i.bar(positions, indices, width=0.6, color=bar_colours, zorder=2)
-    for x, v in zip(positions, indices):
+    for x, v in zip(positions, indices, strict=True):
         ax_i.text(x, v + 0.01, f"{v:.2f}", ha="center", va="bottom", fontweight="bold")
     ax_i.set_xticks(positions)
     ax_i.set_xticklabels([e.capitalize() for e in VOCAL_EFFORTS])
@@ -2694,7 +2694,7 @@ def generate_nipts_level_growth(output_dir: str) -> None:
         COLOR_SECONDARY,
         COLOR_PRIMARY,
     ]
-    for k, (f, color) in enumerate(zip(freqs, colors)):
+    for k, (f, color) in enumerate(zip(freqs, colors, strict=True)):
         ax_f.plot(levels, med[:, k], "-", color=color, linewidth=2.0, label=f"{f:g} Hz")
         # The cut-off L0 is where the curve leaves zero.
         lift = int(np.argmax(med[:, k] > 0.0))

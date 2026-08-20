@@ -1151,7 +1151,7 @@ def daily_vibration_exposure(
             msg = "'labels' must match the number of operations."
             raise ValueError(msg)
     partials = np.array(
-        [daily_exposure(float(a), float(dt)) for a, dt in zip(ahv, t)],
+        [daily_exposure(float(a), float(dt)) for a, dt in zip(ahv, t, strict=True)],
         dtype=np.float64,
     )
     a8 = combine_partial_exposures(partials)

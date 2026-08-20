@@ -130,7 +130,9 @@ def main() -> int:
             if key in seen:
                 continue
             seen.add(key)
-            blended = tuple(alpha * c + (1 - alpha) * p for c, p in zip(rgb, PAGE))
+            blended = tuple(
+                alpha * c + (1 - alpha) * p for c, p in zip(rgb, PAGE, strict=True)
+            )
             ratio = _ratio(blended, PAGE)  # type: ignore[arg-type]
             # A hairline has to work harder: below 0.6 pt demand 3:1, else 2:1.
             floor = 3.0 if width < 0.6 else 2.0

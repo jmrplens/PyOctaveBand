@@ -127,7 +127,10 @@ def _band_table(result: STIResult, language: str = "en") -> Any:
         fiche_paragraph("MTI", head_style),
     ]
     rows: list[list[Any]] = [header]
-    for fk, m in zip(_STI_BAND_CENTERS, mti):
+    # Fixed seven-centre table against an 'mti' the frozen dataclass does not
+    # validate: a directly built result with fewer bands ends the table early
+    # rather than being rejected, and one with more is cut after the seventh.
+    for fk, m in zip(_STI_BAND_CENTERS, mti, strict=False):
         rows.append([f"{fk}", format_number(float(m), language, decimals=2)])
 
     table = Table(rows, colWidths=[28 * mm, 28 * mm], repeatRows=1)

@@ -51,9 +51,9 @@ def test_long_table_8_1_orders_and_frequencies() -> None:
     """
     result = room.room_modes(LONG_ROOM, max_frequency=61.0, speed_of_sound=LONG_C0)
     assert len(result.frequencies) == len(LONG_TABLE_8_1)
-    for row, (orders, _) in zip(result.orders, LONG_TABLE_8_1):
+    for row, (orders, _) in zip(result.orders, LONG_TABLE_8_1, strict=True):
         assert tuple(int(v) for v in row) == orders
-    for computed, (_, printed) in zip(result.frequencies, LONG_TABLE_8_1):
+    for computed, (_, printed) in zip(result.frequencies, LONG_TABLE_8_1, strict=True):
         assert float(computed) == pytest.approx(printed, abs=0.13)
 
 
@@ -88,7 +88,7 @@ def test_mode_frequency_accepts_an_array_of_triples() -> None:
 
 def test_classification_counts_non_zero_orders() -> None:
     result = room.room_modes(LONG_ROOM, max_frequency=200.0, speed_of_sound=LONG_C0)
-    for orders, kind in zip(result.orders, result.kinds):
+    for orders, kind in zip(result.orders, result.kinds, strict=True):
         assert kind == room.MODE_KINDS[int(np.count_nonzero(orders)) - 1]
     counts = result.count_by_kind()
     assert sum(counts.values()) == len(result.frequencies)

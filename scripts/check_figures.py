@@ -102,7 +102,7 @@ def _svg_within_tolerance(old: bytes, new: bytes) -> bool:
     new_nums = _TOKEN.findall(new)
     if len(old_nums) != len(new_nums):
         return False
-    for o_tok, n_tok in zip(old_nums, new_nums):
+    for o_tok, n_tok in zip(old_nums, new_nums, strict=True):
         o_val = float(o_tok)
         n_val = float(n_tok)
         limit = max(SVG_ABS_TOL, SVG_REL_TOL * max(abs(o_val), abs(n_val)))

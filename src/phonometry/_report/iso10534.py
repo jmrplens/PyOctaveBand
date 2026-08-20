@@ -185,7 +185,7 @@ def _value_table(
             fiche_paragraph("Im z", head_style),
         ]
         rows: list[list[Any]] = [header]
-        for fk, ak, rk, zk in zip(freqs, alpha, r_mag, z):
+        for fk, ak, rk, zk in zip(freqs, alpha, r_mag, z, strict=True):
             rows.append(
                 [
                     f"{round(fk)}",
@@ -204,7 +204,7 @@ def _value_table(
             fiche_paragraph("Im z", head_style),
         ]
         rows = [header]
-        for fk, ak, zk in zip(freqs, alpha, z):
+        for fk, ak, zk in zip(freqs, alpha, z, strict=True):
             rows.append(
                 [
                     f"{round(fk)}",
@@ -321,12 +321,18 @@ def render_iso10534_report(
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
 
+    # Guard a manually constructed result: ImpedanceTubeResult is a plain
+    # frozen dataclass, so every per-frequency array the table and the figure
+    # consume has to be checked here (a short one would otherwise cut the
+    # fiche table).
     freqs = np.asarray(result.frequency, dtype=np.float64)
     alpha = np.asarray(result.absorption, dtype=np.float64)
-    if freqs.shape != alpha.shape:
+    reflection = np.asarray(result.reflection, dtype=np.complex128)
+    z = np.asarray(result.normalized_impedance, dtype=np.complex128)
+    if not freqs.shape == alpha.shape == reflection.shape == z.shape:
         msg = (
-            "render_iso10534_report() needs 'frequency' and 'absorption' of "
-            "equal length."
+            "render_iso10534_report() needs 'frequency', 'absorption', "
+            "'reflection' and 'normalized_impedance' of equal length."
         )
         raise ValueError(msg)
 

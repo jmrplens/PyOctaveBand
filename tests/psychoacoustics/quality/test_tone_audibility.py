@@ -654,7 +654,7 @@ def test_table_e2_lg_and_av_columns() -> None:
     from the printed LS and fT to <= 0.03 dB (2-decimal print rounding).
     """
     for (ft, ls, _lt, _dl), lg_p, av_p in zip(
-        ref.ISO20065_ANNEX_E_TONES, ref.ISO20065_E2_LG, ref.ISO20065_E2_AV
+        ref.ISO20065_ANNEX_E_TONES, ref.ISO20065_E2_LG, ref.ISO20065_E2_AV, strict=True
     ):
         assert psychoacoustics.critical_band_level(
             ls, ft, ref.ISO20065_LINE_SPACING
@@ -669,7 +669,7 @@ def test_table_e2_band_limits_are_line_snapped() -> None:
     """
     df = ref.ISO20065_LINE_SPACING
     for (ft, _ls, _lt, _dl), (f1_p, f2_p) in zip(
-        ref.ISO20065_ANNEX_E_TONES, ref.ISO20065_E2_BAND_LIMITS
+        ref.ISO20065_ANNEX_E_TONES, ref.ISO20065_E2_BAND_LIMITS, strict=True
     ):
         f1_a, f2_a = psychoacoustics.critical_band_corners(ft)
         assert f1_a < f1_p <= f1_a + df + 0.01, f"{ft} Hz lower limit"
@@ -689,7 +689,11 @@ def test_table_e2_uncertainty_of_the_137hz_tone() -> None:
     assert res.group_sizes is not None
     singles = res.group_sizes == 1
     by_freq = dict(
-        zip(res.tone_frequencies[singles], res.extended_uncertainties[singles])
+        zip(
+            res.tone_frequencies[singles],
+            res.extended_uncertainties[singles],
+            strict=True,
+        )
     )
     assert by_freq[137.3] == pytest.approx(2.79, abs=0.02)
     assert by_freq[118.4] == pytest.approx(3.66, abs=0.1)

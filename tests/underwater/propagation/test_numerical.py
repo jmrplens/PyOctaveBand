@@ -659,7 +659,9 @@ def test_normal_modes_match_image_source_oracle() -> None:
         ranges_m=ranges,
         n_depth_points=3000,
     )
-    for (rng, pl_ref), pl_mod in zip(_IMAGE_SOURCE_PL, res.propagation_loss):
+    for (rng, pl_ref), pl_mod in zip(
+        _IMAGE_SOURCE_PL, res.propagation_loss, strict=True
+    ):
         assert pl_mod == pytest.approx(pl_ref, abs=0.02), rng
 
 

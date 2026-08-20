@@ -572,7 +572,7 @@ def _split_fluid_run(
         raise ValueError(msg)
 
     parts: list[tuple[str, Complex, Complex, float]] = []
-    for (kind, a, b), loss in zip(terms, losses):
+    for (kind, a, b), loss in zip(terms, losses, strict=True):
         pieces = max(1, int(np.ceil(loss / budget)))
         if pieces == 1:
             parts.append((kind, a, b, loss))
@@ -850,7 +850,7 @@ def diffuse_field_absorption(
     theta = 0.5 * lim * (nodes + 1.0)
     w = 0.5 * lim * weights
     total = np.zeros_like(f, dtype=np.float64)
-    for th, wt in zip(theta, w):
+    for th, wt in zip(theta, w, strict=True):
         res = layered_absorber(
             f,
             layers,

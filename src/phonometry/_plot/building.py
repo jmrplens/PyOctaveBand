@@ -1093,7 +1093,7 @@ def _plot_path_shares(
         _C_SECONDARY_LIGHT,
     )
     bottom = np.zeros(positions.size, dtype=np.float64)
-    for colour, k in zip(palette, named):
+    for colour, k in zip(palette, named, strict=False):  # fewer paths than colours
         share = 100.0 * fractions[k]
         # A copy per bar, not one `setdefault` before the loop: this renderer
         # draws one bar per transmission path and each carries its own name,

@@ -359,7 +359,8 @@ def _shape_indicator(measured_units: list[int], reference_units: list[int]) -> s
     H (2000/4000 Hz).
     """
     excess = [
-        m - r >= _SHAPE_THRESHOLD_UNITS for m, r in zip(measured_units, reference_units)
+        m - r >= _SHAPE_THRESHOLD_UNITS
+        for m, r in zip(measured_units, reference_units, strict=True)
     ]
     indicator = ""
     if excess[0]:
@@ -412,7 +413,9 @@ def _rate(
     shift_units = 0
     while shift_units <= _FULL_SCALE_UNITS:
         shifted_units = [r - shift_units for r in _REFERENCE_UNITS]
-        unfav_units = sum(max(0, s - m) for s, m in zip(shifted_units, measured_units))
+        unfav_units = sum(
+            max(0, s - m) for s, m in zip(shifted_units, measured_units, strict=True)
+        )
         if unfav_units <= _UNFAVOURABLE_BUDGET_UNITS:
             break
         shift_units += 1

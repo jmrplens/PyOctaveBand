@@ -137,7 +137,9 @@ def pdf_problem(old: bytes, new: bytes) -> str | None:
         return f"could not extract text ({exc})"
     if len(old_pages) != len(new_pages):
         return f"page count changed {len(old_pages)} != {len(new_pages)}"
-    for number, (old_text, new_text) in enumerate(zip(old_pages, new_pages), start=1):
+    for number, (old_text, new_text) in enumerate(
+        zip(old_pages, new_pages, strict=True), start=1
+    ):
         if old_text != new_text:
             return f"text of page {number} changed"
     return None

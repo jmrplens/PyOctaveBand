@@ -108,7 +108,7 @@ def _chk_cnossos_rail_workbook() -> Outcome:
     for case in ref.cnossos_rail_workbook_cases():
         result = _cnossos_rail_case(case)
         row = result.line_power[0 if case["source_height"] == "A" else 1]
-        for got, band in zip(row, bands):
+        for got, band in zip(row, bands, strict=True):
             worst = max(worst, abs(float(got) - float(case[f"lw_{band}"])))
     return numeric(
         0.0,
@@ -133,10 +133,10 @@ def _chk_cnossos_rail_roughness_tables() -> Outcome:
         ("n", ref.CNOSSOS_RAIL_G1A_NON_TREAD),
     ):
         _, levels = ph.environment.wheel_roughness(brake)
-        bad += sum(1 for a, b in zip(levels, expected) if a != b)
+        bad += sum(1 for a, b in zip(levels, expected, strict=True) if a != b)
     for cls, expected in (("E", ref.CNOSSOS_RAIL_G1B_E), ("M", ref.CNOSSOS_RAIL_G1B_M)):
         _, levels = ph.environment.rail_roughness(cls)
-        bad += sum(1 for a, b in zip(levels, expected) if a != b)
+        bad += sum(1 for a, b in zip(levels, expected, strict=True) if a != b)
     return numeric(
         0.0,
         float(bad),
@@ -156,7 +156,7 @@ def _chk_cnossos_rail_table_g2() -> Outcome:
     bad = 0
     for key, expected in ref.CNOSSOS_RAIL_G2.items():
         _, levels = ph.environment.contact_filter(key)
-        bad += sum(1 for a, b in zip(levels, expected) if a != b)
+        bad += sum(1 for a, b in zip(levels, expected, strict=True) if a != b)
     return numeric(
         0.0,
         float(bad),
@@ -176,17 +176,25 @@ def _chk_cnossos_rail_table_g3() -> Outcome:
     bad = 0
     for key, expected in ref.CNOSSOS_RAIL_G3A.items():
         bad += sum(
-            1 for a, b in zip(ph.environment.track_transfer(key), expected) if a != b
+            1
+            for a, b in zip(ph.environment.track_transfer(key), expected, strict=True)
+            if a != b
         )
     for diameter, expected in ref.CNOSSOS_RAIL_G3B.items():
         bad += sum(
             1
-            for a, b in zip(ph.environment.wheel_transfer(diameter), expected)
+            for a, b in zip(
+                ph.environment.wheel_transfer(diameter), expected, strict=True
+            )
             if a != b
         )
     bad += sum(
         1
-        for a, b in zip(ph.environment.superstructure_transfer(), ref.CNOSSOS_RAIL_G3C)
+        for a, b in zip(
+            ph.environment.superstructure_transfer(),
+            ref.CNOSSOS_RAIL_G3C,
+            strict=True,
+        )
         if a != b
     )
     return numeric(
@@ -207,17 +215,21 @@ def _chk_cnossos_rail_table_g3() -> Outcome:
 def _chk_cnossos_rail_source_tables() -> Outcome:
     bad = 0
     _, impact = ph.environment.impact_roughness_single()
-    bad += sum(1 for a, b in zip(impact, ref.CNOSSOS_RAIL_G4) if a != b)
+    bad += sum(1 for a, b in zip(impact, ref.CNOSSOS_RAIL_G4, strict=True) if a != b)
     for key, (low, high) in ref.CNOSSOS_RAIL_G5.items():
         got_low, got_high = ph.environment.traction_sound_power(key)
-        bad += sum(1 for a, b in zip(got_low, low) if a != b)
-        bad += sum(1 for a, b in zip(got_high, high) if a != b)
+        bad += sum(1 for a, b in zip(got_low, low, strict=True) if a != b)
+        bad += sum(1 for a, b in zip(got_high, high, strict=True) if a != b)
     got_low, got_high = ph.environment.aerodynamic_sound_power()
-    bad += sum(1 for a, b in zip(got_low, ref.CNOSSOS_RAIL_G6_A) if a != b)
-    bad += sum(1 for a, b in zip(got_high, ref.CNOSSOS_RAIL_G6_B) if a != b)
+    bad += sum(1 for a, b in zip(got_low, ref.CNOSSOS_RAIL_G6_A, strict=True) if a != b)
+    bad += sum(
+        1 for a, b in zip(got_high, ref.CNOSSOS_RAIL_G6_B, strict=True) if a != b
+    )
     for key, expected in ref.CNOSSOS_RAIL_G7.items():
         bad += sum(
-            1 for a, b in zip(ph.environment.bridge_transfer(key), expected) if a != b
+            1
+            for a, b in zip(ph.environment.bridge_transfer(key), expected, strict=True)
+            if a != b
         )
     return numeric(
         0.0,
@@ -248,8 +260,14 @@ def _chk_cnossos_rail_aerodynamic_law() -> Outcome:
     low, high = ph.environment.aerodynamic_sound_power(600.0)
     step = ref.CNOSSOS_RAIL_G6_ALPHA * math.log10(2.0)
     worst = max(
-        max(abs(float(a) - b - step) for a, b in zip(low, ref.CNOSSOS_RAIL_G6_A)),
-        max(abs(float(a) - b - step) for a, b in zip(high, ref.CNOSSOS_RAIL_G6_B)),
+        max(
+            abs(float(a) - b - step)
+            for a, b in zip(low, ref.CNOSSOS_RAIL_G6_A, strict=True)
+        ),
+        max(
+            abs(float(a) - b - step)
+            for a, b in zip(high, ref.CNOSSOS_RAIL_G6_B, strict=True)
+        ),
     )
     return numeric(
         0.0,

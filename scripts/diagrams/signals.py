@@ -2642,7 +2642,7 @@ def _d_multichannel_capture(s: SVG, th: Theme) -> None:
     xs = (66.0, 132.0, 198.0, 264.0)
     sens = ("11,8", "12,3", "11,9", "12,1")
     cap_y = gy - 120.0  # capsule height, 1,2 m to scale
-    for i, (x, mv) in enumerate(zip(xs, sens)):
+    for i, (x, mv) in enumerate(zip(xs, sens, strict=True)):
         s.mic(x, cap_y, gy, 0.95)
         s.text(x, gy + 24, f"P{i + 1}", 15, th.fg, bold=True)
         s.text(x, gy + 44, mv, 12, th.muted, mono=True)

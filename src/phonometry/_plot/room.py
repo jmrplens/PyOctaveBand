@@ -403,7 +403,7 @@ def plot_noise_criterion(
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     levels = np.asarray(result.levels, dtype=np.float64)
-    for row, idx in zip(NC_CURVES, NC_INDICES):
+    for row, idx in zip(NC_CURVES, NC_INDICES, strict=True):
         ax.plot(OCTAVE_BANDS, row, color=_C_MUTED, lw=0.8, zorder=1)
         ax.annotate(
             f"{idx:.0f}",
@@ -1174,8 +1174,15 @@ def plot_crowd_noise(
     ax = ax if ax is not None else _new_axes()
     n = np.asarray(result.talkers, dtype=np.float64)
     levels = np.asarray(result.levels, dtype=np.float64)
+    areas = np.asarray(result.absorption_areas, dtype=np.float64)
+    if areas.shape != levels.shape[:1]:
+        msg = (
+            "'levels' must carry one row per absorption area; got "
+            f"absorption_areas{areas.shape} against levels{levels.shape}."
+        )
+        raise ValueError(msg)
     palette = (_C_PRIMARY, _C_SECONDARY, _C_TERTIARY, _C_QUATERNARY, _C_MUTED)
-    for row, (area, curve) in enumerate(zip(result.absorption_areas, levels)):
+    for row, (area, curve) in enumerate(zip(areas, levels, strict=True)):
         area_kwargs = dict(kwargs)
         area_kwargs.setdefault(
             "label",
