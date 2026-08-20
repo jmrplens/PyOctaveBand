@@ -15,16 +15,15 @@ documentation figures via ``scripts/check_figures.py``.
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pytest
 
 pytest.importorskip("matplotlib")
-import matplotlib
+import matplotlib as mpl
 
-matplotlib.use("Agg")
+mpl.use("Agg")
 import matplotlib.pyplot as plt
 from result_factories import _airborne_insulation, _impact_insulation
 
@@ -37,6 +36,9 @@ from phonometry._plot.common import (
     _plot_rating,
     _time_axis,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 def _axes():

@@ -334,9 +334,9 @@ def test_result_is_frozen() -> None:
 
 
 def test_plot_returns_axes_with_dnt_curve() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     res = building.facade_insulation(
@@ -354,9 +354,9 @@ def test_plot_returns_axes_with_dnt_curve() -> None:
 
 
 def test_plot_forwards_kwargs() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     res = building.facade_insulation(_flat(16, 70.0), _flat(16, 30.0), _flat(16, 0.5))

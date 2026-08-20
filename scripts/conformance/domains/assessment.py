@@ -52,15 +52,14 @@ _ISO1996_3 = "Impulsive-sound prominence (ISO/PAS 1996-3)"
 
 def _iso1996_3_ramp_onset() -> Any:
     """Detected onset of a 30 dB LpAF ramp over 0.30 s (dt = 20 ms)."""
-    import numpy as _np
 
     from phonometry.environment.assessment.impulsive_sound import detect_onsets
 
     dt = 0.02
-    pre = _np.full(round(0.2 / dt), 40.0)
-    rise = 40.0 + 30.0 * (_np.arange(1, round(0.3 / dt) + 1) / round(0.3 / dt))
-    post = _np.full(round(0.3 / dt), 70.0)
-    return detect_onsets(_np.concatenate([pre, rise, post]), dt)[0]
+    pre = np.full(round(0.2 / dt), 40.0)
+    rise = 40.0 + 30.0 * (np.arange(1, round(0.3 / dt) + 1) / round(0.3 / dt))
+    post = np.full(round(0.3 / dt), 70.0)
+    return detect_onsets(np.concatenate([pre, rise, post]), dt)[0]
 
 
 @register(

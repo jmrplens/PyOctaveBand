@@ -81,13 +81,13 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 from scipy import special
 
 from .._internal.validation import require_positive
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike, NDArray
 
 #: First zero of the Bessel function ``J1``; the first directivity null of the
 #: baffled piston sits at ``ka sin theta = J1_FIRST_ZERO`` (Beranek & Mellow).

@@ -46,10 +46,10 @@ from ._layout import (
     two_panel_body,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..filters.compliance import FilterComplianceResult
+    from .metadata import ReportMetadata
 
 
 def _binding_margin(result: FilterComplianceResult, cls: int) -> float:
@@ -218,7 +218,7 @@ def render_iec61260_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -227,8 +227,8 @@ def render_iec61260_report(
     title = t("Filter class compliance", language)
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(_basis(metadata, result.edition, language), basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(_basis(metadata, result.edition, language), basis_style),
     ]
 
     if metadata is not None and not metadata.is_empty():
@@ -253,7 +253,7 @@ def render_iec61260_report(
         else "{fraction} bank, sampling rate f<sub>s</sub> = {fs} Hz; relative attenuation referenced to the mid-band level (IEC 61260:1995, 3.13 Note)."
     )
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(basis_strip_key, language).format(
                 fraction=_fraction_label(result.fraction, language),
                 fs=format_number(result.fs, language, decimals=0),
@@ -266,7 +266,7 @@ def render_iec61260_report(
     # Two-panel body: the per-band classification table on the left, the
     # mask-overlay plot (self-scaling dB axis) on the right.
     left_cell = [
-        Paragraph(t("Per-band classification", language), caption_style),
+        fiche_paragraph(t("Per-band classification", language), caption_style),
         metrics_table(_metric_rows(result, language)),
     ]
     plot_drawing = render_figure_drawing(
@@ -281,7 +281,7 @@ def render_iec61260_report(
         # band's processing Nyquist (no decimated signal energy exists there),
         # so the stated class attests the verified range and says so.
         flow.append(
-            Paragraph(
+            fiche_paragraph(
                 t(
                     "Stop-band limits verified up to each band's processing Nyquist frequency; the multirate anti-aliasing leaves no signal energy beyond it, but the Table 1 limits there are not demonstrated, so the stated class attests the verified frequency range.",
                     language,

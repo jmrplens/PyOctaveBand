@@ -58,7 +58,6 @@ from ._layout import (
     verdict_flow,
 )
 from .iso717 import _metadata_pairs
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..building.prediction.detailed_model import (
@@ -70,6 +69,7 @@ if TYPE_CHECKING:
         AirbornePredictionResult,
         ImpactPredictionResult,
     )
+    from .metadata import ReportMetadata
 
 #: Model standard deviation of the simplified single-number prediction, stated
 #: for reference in the method statement (EN 12354-1:2000 Clause 5, EN 12354-2
@@ -171,7 +171,7 @@ def _render_prediction_fiche(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -182,8 +182,8 @@ def _render_prediction_fiche(
     if basis_values is not None:
         basis_text = basis_text.format(**basis_values)
     flow: list[Any] = [
-        Paragraph(title_text, title_style),
-        Paragraph(basis_text, basis_style),
+        fiche_paragraph(title_text, title_style),
+        fiche_paragraph(basis_text, basis_style),
     ]
 
     # Metadata header grid (the same room/element grid the insulation fiches
@@ -199,7 +199,7 @@ def _render_prediction_fiche(
     # Two-panel body: the model-term metrics table on the left, the result's own
     # vector plot (self-scaling bar chart) on the right.
     left_cell = [
-        Paragraph(t(left_caption_key, language), caption_style),
+        fiche_paragraph(t(left_caption_key, language), caption_style),
         metrics_table(metric_rows, col_widths=[34 * mm, 22 * mm]),
     ]
     plot_drawing = render_figure_drawing(
@@ -223,7 +223,9 @@ def _render_prediction_fiche(
     )
     statement_key, statement_values = statement
     values = statement_values or {"sd": _MODEL_SD_DB}
-    flow.append(Paragraph(t(statement_key, language).format(**values), statement_style))
+    flow.append(
+        fiche_paragraph(t(statement_key, language).format(**values), statement_style)
+    )
 
     if metadata is not None and metadata.requirement is not None:
         text, passed = _prediction_verdict(

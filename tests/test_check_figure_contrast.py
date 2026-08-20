@@ -18,9 +18,9 @@ import sys
 import pytest
 
 pytest.importorskip("matplotlib")
-import matplotlib
+import matplotlib as mpl
 
-matplotlib.use("Agg")
+mpl.use("Agg")
 import matplotlib.pyplot as plt
 
 _SCRIPTS = str(pathlib.Path(__file__).resolve().parent.parent / "scripts")

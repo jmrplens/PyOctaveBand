@@ -50,10 +50,10 @@ from ._layout import (
     fmt_num,
     footer_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..emission.declaration import NoiseEmissionDeclaration
+    from .metadata import ReportMetadata
 
 #: En dash printed wherever the declaration carries no value for a cell.
 _NOT_DECLARED = "&#8211;"
@@ -223,7 +223,7 @@ def _declaration_table(
     from reportlab.lib.units import mm
     from reportlab.platypus import Table, TableStyle
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     styles = getSampleStyleSheet()
     accent = colors.HexColor(_ACCENT_HEX)
@@ -295,7 +295,7 @@ def _declaration_table(
     span_cols = 1 + n_modes
     data: list[list[Any]] = [
         [
-            Paragraph(
+            fiche_paragraph(
                 t(
                     "Machine model number, operating conditions, and other "
                     "identifying information:",
@@ -305,28 +305,31 @@ def _declaration_table(
             )
         ]
         + [""] * n_modes,
-        [Paragraph(identity_text, ident_value_style)] + [""] * n_modes,
+        [fiche_paragraph(identity_text, ident_value_style)] + [""] * n_modes,
         [
-            Paragraph(
+            fiche_paragraph(
                 f"<b>{banner_text}</b><br/>"
                 f"{t('in accordance with ISO 4871:1996', language)}",
                 banner_style,
             )
         ]
         + [""] * n_modes,
-        [Paragraph("", col_header_style)]
-        + [Paragraph(f"<b>{html.escape(m.mode)}</b>", col_header_style) for m in modes],
+        [fiche_paragraph("", col_header_style)]
+        + [
+            fiche_paragraph(f"<b>{html.escape(m.mode)}</b>", col_header_style)
+            for m in modes
+        ],
     ]
     first_value_row = len(data)
     for label, cells in value_rows:
         data.append(
-            [Paragraph(label, label_style)]
-            + [Paragraph(cell, value_style) for cell in cells]
+            [fiche_paragraph(label, label_style)]
+            + [fiche_paragraph(cell, value_style) for cell in cells]
         )
     footnote_row = len(data)
     data.append(
         [
-            Paragraph(
+            fiche_paragraph(
                 f"{_footnote(declaration, language)}<br/><br/>"
                 f"{_note(declaration, language)}",
                 ident_label_style,
@@ -462,7 +465,7 @@ def render_iso4871_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -471,8 +474,8 @@ def render_iso4871_report(
     title = t("Noise emission declaration", language)
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(_basis(declaration, metadata, language), basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(_basis(declaration, metadata, language), basis_style),
         Spacer(1, 8),
         _declaration_table(declaration, language),
     ]
@@ -481,7 +484,9 @@ def render_iso4871_report(
     if verification_rows:
         flow.append(Spacer(1, 8))
         flow.append(
-            Paragraph(t("Verification (ISO 4871 clause 6.2)", language), caption_style)
+            fiche_paragraph(
+                t("Verification (ISO 4871 clause 6.2)", language), caption_style
+            )
         )
         flow.append(
             compliance_table(

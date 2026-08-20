@@ -31,8 +31,8 @@ import numpy as np
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
-from numpy.typing import ArrayLike
 
 # ---------------------------------------------------------------------------
 # Normative constants.

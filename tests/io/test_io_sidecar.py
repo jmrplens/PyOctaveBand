@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -19,6 +19,9 @@ from phonometry.io import (
     write_sidecar,
 )
 from phonometry.io._sidecar import SIDECAR_SCHEMA, SIDECAR_VERSION
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 FS = 48000
 

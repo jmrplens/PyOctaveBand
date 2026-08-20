@@ -423,9 +423,9 @@ def test_scalar_input_accepted() -> None:
 # ---------------------------------------------------------------------------
 def test_plot_returns_axes() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
 
     dv = np.full(len(THIRD_OCTAVE), 6.0)
     res = building.vibration_reduction_index(dv, 2.0, 4.0, 4.0, frequency=THIRD_OCTAVE)

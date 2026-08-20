@@ -69,7 +69,6 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from ..._internal.types import Real
 from ..._internal.warnings import PhonometryWarning
 from ...io._resolve import (
     SignalInput,
@@ -80,6 +79,8 @@ from ...io._resolve import (
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from matplotlib.axes import Axes
+
+    from ..._internal.types import Real
 
 Complex = NDArray[np.complex128]
 

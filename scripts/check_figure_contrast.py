@@ -67,7 +67,7 @@ import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from xml.etree import ElementTree
+from xml.etree import ElementTree as ET
 
 import numpy as np
 
@@ -216,7 +216,7 @@ def _polygon_area(path_d: str) -> float:
     return float(abs(np.dot(x, np.roll(y, -1)) - np.dot(y, np.roll(x, -1))) / 2.0)
 
 
-def _parse_style(element: ElementTree.Element) -> dict[str, str]:
+def _parse_style(element: ET.Element) -> dict[str, str]:
     """Declarations of an element's ``style`` attribute plus its presentation
     attributes, lowercased keys, presentation attributes taking lower priority.
     """
@@ -233,12 +233,12 @@ def _parse_style(element: ElementTree.Element) -> dict[str, str]:
     return declarations
 
 
-def _tag(element: ElementTree.Element) -> str:
+def _tag(element: ET.Element) -> str:
     """Local name of an element's tag."""
     return element.tag.removeprefix(_SVG_NS)
 
 
-def _element_area(element: ElementTree.Element, defs: dict[str, str]) -> float:
+def _element_area(element: ET.Element, defs: dict[str, str]) -> float:
     """Area of a drawable element in SVG user units (0 when not an area shape)."""
     tag = _tag(element)
     if tag == "path":
@@ -253,7 +253,7 @@ def _element_area(element: ElementTree.Element, defs: dict[str, str]) -> float:
     return 0.0
 
 
-def _collect_defs(root: ElementTree.Element) -> dict[str, str]:
+def _collect_defs(root: ET.Element) -> dict[str, str]:
     """Map every ``id`` in the document to the path data it carries."""
     return {
         element.get("id", ""): element.get("d", "")
@@ -262,7 +262,7 @@ def _collect_defs(root: ElementTree.Element) -> dict[str, str]:
     }
 
 
-def _collect_clip_areas(root: ElementTree.Element) -> dict[str, float]:
+def _collect_clip_areas(root: ET.Element) -> dict[str, float]:
     """Map every ``clipPath`` id to the area of the rectangle it encloses.
 
     matplotlib clips the artists of an axes to the axes rectangle, so this is
@@ -279,14 +279,14 @@ def _collect_clip_areas(root: ElementTree.Element) -> dict[str, float]:
     return areas
 
 
-def _clip_id(element: ElementTree.Element) -> str:
+def _clip_id(element: ET.Element) -> str:
     """Referenced ``clipPath`` id of an element, or ``""`` when unclipped."""
     match = re.fullmatch(r"url\(#(.+)\)", element.get("clip-path", "").strip())
     return match.group(1) if match else ""
 
 
 def _axes_geometry(
-    group: ElementTree.Element,
+    group: ET.Element,
     clip_areas: dict[str, float],
     fallback: tuple[float, float, float],
 ) -> tuple[tuple[float, float, float], float, str]:
@@ -331,7 +331,7 @@ def _axes_geometry(
 
 
 def _walk(
-    node: ElementTree.Element,
+    node: ET.Element,
     *,
     figure: str,
     defs: dict[str, str],
@@ -400,7 +400,7 @@ def _walk(
 
 def measure(path: Path) -> list[Region]:
     """Every filled area region of one SVG figure, measured against its page."""
-    root = ElementTree.parse(path).getroot()
+    root = ET.parse(path).getroot()
     defs = _collect_defs(root)
     regions: list[Region] = []
     _walk(

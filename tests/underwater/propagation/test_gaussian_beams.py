@@ -137,9 +137,9 @@ from __future__ import annotations
 
 import warnings
 
-import matplotlib
+import matplotlib as mpl
 
-matplotlib.use("Agg")
+mpl.use("Agg")
 import numpy as np
 import pytest
 

@@ -53,11 +53,12 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ...io._resolve import apply_calibration, resolve_fs
-from ...io._signal import Signal
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
+
+    from ...io._signal import Signal
 
 # --------------------------------------------------------------------------- #
 # Closed form: AM broadband noise (Fastl & Zwicker Eq. 10.2)

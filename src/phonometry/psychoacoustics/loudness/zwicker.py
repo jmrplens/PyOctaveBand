@@ -27,12 +27,12 @@ from typing import TYPE_CHECKING, Any, Literal
 import numpy as np
 
 from ...io._resolve import resolve_calibration, resolve_fs
-from ...io._signal import Signal
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
     from ..._report.metadata import ReportMetadata
+    from ...io._signal import Signal
 from scipy import signal
 
 from ..._internal.utils import _typesignal

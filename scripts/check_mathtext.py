@@ -90,9 +90,9 @@ def is_label(run: str) -> bool:
 
 
 def check(paths: list[pathlib.Path]) -> tuple[int, list[tuple[str, int, str, str]]]:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     from matplotlib import mathtext
 
     parser = mathtext.MathTextParser("agg")

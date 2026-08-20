@@ -27,9 +27,9 @@ from __future__ import annotations
 import importlib
 import math
 
-import matplotlib
+import matplotlib as mpl
 
-matplotlib.use("Agg")
+mpl.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
@@ -344,9 +344,9 @@ def test_the_level_history_still_unpacks_as_the_pair_it_replaced() -> None:
 
 def test_the_level_history_draws_its_own_trace() -> None:
     """The thing a bare tuple could not do, and every other result here can."""
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     rng = np.random.default_rng(0)
     signal = 0.01 * rng.standard_normal(FS * 2)
     axes = iso.sound_pressure_level_history(signal, FS, dt=0.02).plot()

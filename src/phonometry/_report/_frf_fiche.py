@@ -40,10 +40,11 @@ from ._layout import (
     result_box,
     two_panel_body,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     import numpy as np
+
+    from .metadata import ReportMetadata
 
 
 def frequency_range(frequencies: np.ndarray, language: str = "en") -> str:
@@ -123,7 +124,7 @@ def render_frf_fiche(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -131,8 +132,8 @@ def render_frf_fiche(
     styles, title_style, basis_style, caption_style = document_styles(accent)
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(basis, basis_style),
     ]
 
     if header_pairs:
@@ -141,7 +142,7 @@ def render_frf_fiche(
     flow.append(Spacer(1, 8))
 
     left_cell = [
-        Paragraph(caption, caption_style),
+        fiche_paragraph(caption, caption_style),
         metrics_table(metric_rows),
     ]
     # The FRF is a continuous spectrum, not a band quantity: the plot self-scales

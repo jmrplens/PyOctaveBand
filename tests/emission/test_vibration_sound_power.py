@@ -163,9 +163,9 @@ def test_result_scalar_radiation_factor_broadcasts() -> None:
 
 def test_plot_returns_axes() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     res = emission.sound_power_from_vibration(
         np.array([70.0, 75.0, 72.0]), 1.5, frequencies=np.array([250.0, 500.0, 1000.0])
     )

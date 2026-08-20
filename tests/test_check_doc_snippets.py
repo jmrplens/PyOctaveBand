@@ -14,8 +14,10 @@ from __future__ import annotations
 import importlib.util
 import pathlib
 import sys
+from typing import TYPE_CHECKING
 
-import pytest
+if TYPE_CHECKING:
+    import pytest
 
 _SCRIPT = (
     pathlib.Path(__file__).resolve().parent.parent / "scripts" / "check_doc_snippets.py"

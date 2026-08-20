@@ -62,10 +62,10 @@ import numpy as np
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike, NDArray
 
     from ..._report.metadata import ReportMetadata
 
-from numpy.typing import ArrayLike, NDArray
 
 from ..._internal.validation import require_non_negative, require_positive
 from ..._internal.warnings import PhonometryWarning

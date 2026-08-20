@@ -165,9 +165,9 @@ def test_empty_signal() -> None:
 
 @pytest.mark.xdist_group("ecma-loudness-ref")
 def test_plot_smoke(ref_1k_40: psychoacoustics.EcmaLoudness) -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     axes = ref_1k_40.plot()
     assert axes.shape == (2,)
 

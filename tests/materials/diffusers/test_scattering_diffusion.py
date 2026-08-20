@@ -582,9 +582,9 @@ def test_scattering_spectrum_rejects_2d_input() -> None:
 
 
 def test_scattering_spectrum_plot_returns_axes() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     result = scattering_coefficient_spectrum(
@@ -621,9 +621,9 @@ def test_directional_diffusion_length_mismatch_raises() -> None:
 
 
 def test_directional_diffusion_plot_returns_axes() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     result = directional_diffusion([-30.0, 0.0, 30.0], [70.0, 72.0, 69.0])
@@ -659,9 +659,9 @@ def test_diffusion_spectrum_normalized_mismatch_raises() -> None:
 
 
 def test_diffusion_spectrum_plot_returns_axes() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     result = diffusion_spectrum(

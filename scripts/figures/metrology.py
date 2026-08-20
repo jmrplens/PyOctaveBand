@@ -9,8 +9,7 @@ against, and the GUM budget that puts an uncertainty on the number finally
 reported. Everything here is embedded by a page under ``signals/metrology/``.
 """
 
-from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -27,6 +26,9 @@ from .theme import (
     COLOR_TERTIARY,
     save_figure,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 def generate_calibration_stability(output_dir: str) -> None:

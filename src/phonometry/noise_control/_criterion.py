@@ -19,11 +19,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Protocol
 
 import numpy as np
-from numpy.typing import NDArray
 
 from .._internal.validation import require_choice
 
 if TYPE_CHECKING:
+    from numpy.typing import NDArray
+
     from ..room.noise_criteria import NCResult, RCResult
 
 #: The room-criterion families a composed workflow can be rated against:

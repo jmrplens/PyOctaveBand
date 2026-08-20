@@ -148,7 +148,7 @@ def _phase_table(
     """
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("rd1367phase")
 
@@ -167,25 +167,25 @@ def _phase_table(
         headers.insert(7, "K [dB]")
         widths = [20.0, 34.0, 15.0, 25.0, 13.0, 13.0, 13.0, 16.0, 25.0]
 
-    data: list[list[Any]] = [[Paragraph(h, header_style) for h in headers]]
+    data: list[list[Any]] = [[fiche_paragraph(h, header_style) for h in headers]]
     for period in result.periods:
         period_label = t(_PERIOD_LABELS[period.period], language)
         for index, phase in enumerate(period.phases, start=1):
             name = phase.label or t("Phase {n}", language).format(n=index)
             row = [
-                Paragraph(period_label if index == 1 else "", label_style),
-                Paragraph(html.escape(name), label_style),
-                Paragraph(_fmt(phase.hours, language), value_style),
-                Paragraph(_fmt(phase.laeq, language), value_style),
-                Paragraph(_fmt(phase.kt, language, decimals=0), value_style),
-                Paragraph(_fmt(phase.kf, language, decimals=0), value_style),
-                Paragraph(_fmt(phase.ki, language, decimals=0), value_style),
-                Paragraph(f"<b>{_fmt(phase.lkeq, language)}</b>", value_style),
+                fiche_paragraph(period_label if index == 1 else "", label_style),
+                fiche_paragraph(html.escape(name), label_style),
+                fiche_paragraph(_fmt(phase.hours, language), value_style),
+                fiche_paragraph(_fmt(phase.laeq, language), value_style),
+                fiche_paragraph(_fmt(phase.kt, language, decimals=0), value_style),
+                fiche_paragraph(_fmt(phase.kf, language, decimals=0), value_style),
+                fiche_paragraph(_fmt(phase.ki, language, decimals=0), value_style),
+                fiche_paragraph(f"<b>{_fmt(phase.lkeq, language)}</b>", value_style),
             ]
             if verbose:
                 row.insert(
                     7,
-                    Paragraph(
+                    fiche_paragraph(
                         _fmt(phase.correction, language, decimals=0), value_style
                     ),
                 )
@@ -225,7 +225,7 @@ def _results_table(result: ActivityAssessment, language: str = "en") -> Any:
     """
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("rd1367result")
 
@@ -238,13 +238,15 @@ def _results_table(result: ActivityAssessment, language: str = "en") -> Any:
         t("Result", language),
     ]
     widths = [24.0, 24.0, 32.0, 32.0, 32.0, 30.0]
-    data: list[list[Any]] = [[Paragraph(h, header_style) for h in headers]]
+    data: list[list[Any]] = [[fiche_paragraph(h, header_style) for h in headers]]
     for period in result.periods:
         data.append(
             [
-                Paragraph(t(_PERIOD_LABELS[period.period], language), label_style),
-                Paragraph(_fmt(period.limit, language, decimals=0), value_style),
-                Paragraph(
+                fiche_paragraph(
+                    t(_PERIOD_LABELS[period.period], language), label_style
+                ),
+                fiche_paragraph(_fmt(period.limit, language, decimals=0), value_style),
+                fiche_paragraph(
                     _criterion_cell(
                         period.max_phase_level,
                         period.phase_limit,
@@ -253,7 +255,7 @@ def _results_table(result: ActivityAssessment, language: str = "en") -> Any:
                     ),
                     value_style,
                 ),
-                Paragraph(
+                fiche_paragraph(
                     _criterion_cell(
                         float(period.reported_level),
                         period.daily_limit,
@@ -262,7 +264,7 @@ def _results_table(result: ActivityAssessment, language: str = "en") -> Any:
                     ),
                     value_style,
                 ),
-                Paragraph(
+                fiche_paragraph(
                     _criterion_cell(
                         None
                         if period.reported_long_term is None
@@ -273,7 +275,7 @@ def _results_table(result: ActivityAssessment, language: str = "en") -> Any:
                     ),
                     value_style,
                 ),
-                Paragraph(_status_markup(period.complies, language), value_style),
+                fiche_paragraph(_status_markup(period.complies, language), value_style),
             ]
         )
     return stacked_table(data, [w * mm for w in widths])
@@ -374,7 +376,7 @@ def render_activity_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -392,8 +394,8 @@ def render_activity_report(
     ).format(article=t(article, language))
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(basis, basis_style),
     ]
 
     header_pairs = _metadata_pairs(result, metadata, language)
@@ -402,11 +404,11 @@ def render_activity_report(
         flow.append(grid_table(header_pairs))
     flow.append(Spacer(1, 6))
 
-    flow.append(Paragraph(t("Noise phases", language), caption_style))
+    flow.append(fiche_paragraph(t("Noise phases", language), caption_style))
     flow.append(_phase_table(result, verbose, language))
     flow.append(Spacer(1, 6))
 
-    flow.append(Paragraph(t("Assessment by period", language), caption_style))
+    flow.append(fiche_paragraph(t("Assessment by period", language), caption_style))
     flow.append(_results_table(result, language))
     flow.append(Spacer(1, 6))
 
@@ -440,7 +442,7 @@ def render_activity_report(
 
     basis_strip_style = measurement_basis_style()
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "K<sub>t</sub> follows from the one-third-octave difference "
                 "L<sub>t</sub> = L<sub>f</sub> &#8722; L<sub>s</sub> against "
@@ -455,7 +457,7 @@ def render_activity_report(
         )
     )
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "The period level is the duration-weighted energy mean of the "
                 "phase levels, rounded by adding 0,5 dB and taking the integer "

@@ -78,12 +78,13 @@ import numpy as np
 from scipy import special
 
 from ..io._resolve import resolve_fs
-from ..io._signal import Signal
 from ..signals.spectra import _positive, _validate_signal, power_spectral_density
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
+
+    from ..io._signal import Signal
 
 __all__ = [
     "LevelCrossingResult",

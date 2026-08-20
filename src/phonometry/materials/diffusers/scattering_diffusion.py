@@ -32,14 +32,14 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike
 
-from ..._internal.types import Real
 from .reverberation_room_scattering import _positive_scalar
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
+    from ..._internal.types import Real
     from ..._report.metadata import ReportMetadata
 
 

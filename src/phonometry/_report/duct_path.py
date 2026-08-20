@@ -54,10 +54,10 @@ from ._layout import (
 )
 from ._noise_control_fiche import PREDICTION_DISCLAIMER
 from ._sound_power_fiche import metadata_pairs
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..noise_control.duct_path import DuctPathResult
+    from .metadata import ReportMetadata
 
 #: Rows whose values are a level rather than a correction, shaded to separate
 #: them from the attenuation rows exactly as the published sheets do.
@@ -384,7 +384,7 @@ def render_duct_path_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
 
@@ -397,8 +397,8 @@ def render_duct_path_report(
     styles, title_style, basis_style, caption_style = document_styles(accent)
 
     flow: list[Any] = [
-        Paragraph(t("Duct-borne noise path calculation", language), title_style),
-        Paragraph(
+        fiche_paragraph(t("Duct-borne noise path calculation", language), title_style),
+        fiche_paragraph(
             t(
                 "Octave-band sound level in an occupied space from an air "
                 "distribution system, estimated element by element along the "
@@ -421,7 +421,7 @@ def render_duct_path_report(
     rows = _visible_rows(result.table(), verbose)
     table, _count = _sheet_table(result, verbose, language, rows)
     flow.append(
-        Paragraph(t("Octave-band path calculation, dB", language), caption_style)
+        fiche_paragraph(t("Octave-band path calculation, dB", language), caption_style)
     )
     table_index = len(flow)
     flow.append(table)
@@ -451,7 +451,7 @@ def render_duct_path_report(
         )
     )
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "Predicted (estimated) result computed from the declared duct "
                 "geometry, element data and room condition; it is not a "
@@ -472,7 +472,7 @@ def render_duct_path_report(
 
     basis_style_strip = measurement_basis_style()
     for strip in _basis_strips(result, language):
-        flow.append(Paragraph(strip, basis_style_strip))
+        flow.append(fiche_paragraph(strip, basis_style_strip))
     flow.extend(footer_flow(metadata, language, disclaimer=PREDICTION_DISCLAIMER))
 
     _fit_to_one_page(flow, table_index, result, rows, verbose, language)

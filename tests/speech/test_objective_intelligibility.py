@@ -12,9 +12,9 @@ clean-room implementation from the two papers.
 
 from __future__ import annotations
 
-import matplotlib
+import matplotlib as mpl
 
-matplotlib.use("Agg")
+mpl.use("Agg")
 import itertools
 
 import numpy as np

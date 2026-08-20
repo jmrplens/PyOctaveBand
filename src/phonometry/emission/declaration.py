@@ -38,11 +38,12 @@ declaration is most often built from a measured sound power via
 from __future__ import annotations
 
 import math
-from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from .._report.metadata import ReportMetadata
 
 #: The two alternative forms of a noise emission declaration (ISO 4871 clause 4).

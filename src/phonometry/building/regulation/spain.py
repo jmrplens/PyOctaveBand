@@ -79,7 +79,6 @@ about 1,8 m2 specimens; larger windows insulate less, and the CEC corrects
 from __future__ import annotations
 
 import math
-from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any
@@ -87,6 +86,8 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
     from matplotlib.axes import Axes
 
 __all__ = [

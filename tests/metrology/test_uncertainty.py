@@ -194,9 +194,9 @@ def test_invalid_inputs_raise() -> None:
 
 
 def test_result_fields_and_plot() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     qs = [u.Quantity(3.0, 0.1, name="a"), u.Quantity(4.0, 0.2, name="b")]

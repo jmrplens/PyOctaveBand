@@ -72,16 +72,17 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike
 from scipy.optimize import root
 
-from ..._internal.types import Real
 from ..._internal.validation import require_positive, require_positive_array
 from ..._internal.warnings import PhonometryWarning
 from .porous import DEFAULT_AIR, AirProperties, Complex
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
+
+    from ..._internal.types import Real
 
 #: Default number of transverse modes kept per axis in the duct series.
 _DUCT_TERMS = 40

@@ -73,10 +73,10 @@ from ...io._resolve import SignalInput, resolve_fs, resolve_samples
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
     from ..._report.metadata import ReportMetadata
 
-from numpy.typing import ArrayLike
 
 # ---------------------------------------------------------------------------
 # Normative constants (Clause 5).

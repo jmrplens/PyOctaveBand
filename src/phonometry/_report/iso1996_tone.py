@@ -64,10 +64,10 @@ from ._layout import (
     stacked_table,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..psychoacoustics.quality.tone_audibility import ToneAudibilityResult
+    from .metadata import ReportMetadata
 
 
 def _fmt(value: float, language: str, decimals: int = 1) -> str:
@@ -160,7 +160,7 @@ def _key_quantity_table(
     from reportlab.lib import colors
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("iso1996tone")
 
@@ -189,22 +189,24 @@ def _key_quantity_table(
         headers.insert(6, "U [dB]")
         widths = [23.0, 20.0, 22.0, 22.0, 24.0, 25.0, 18.0, 20.0]
 
-    data: list[list[Any]] = [[Paragraph(h, header_style) for h in headers]]
+    data: list[list[Any]] = [[fiche_paragraph(h, header_style) for h in headers]]
     for i in order.tolist():
         emph = "<b>{}</b>".format if i == decisive else str
         present = bool(delta[i] > 0.0)
         gs = int(groups[i]) if groups is not None else None
         row = [
-            Paragraph(emph(_fmt(freqs[i], language)), label_style),
-            Paragraph(_type_label(gs, language), value_style),
-            Paragraph(_fmt(lt[i], language), value_style),
-            Paragraph(_fmt(lpn[i], language), value_style),
-            Paragraph(_fmt(dfc[i], language, decimals=0), value_style),
-            Paragraph(emph(_fmt(delta[i], language)), value_style),
-            Paragraph(_present_markup(present, language), value_style),
+            fiche_paragraph(emph(_fmt(freqs[i], language)), label_style),
+            fiche_paragraph(_type_label(gs, language), value_style),
+            fiche_paragraph(_fmt(lt[i], language), value_style),
+            fiche_paragraph(_fmt(lpn[i], language), value_style),
+            fiche_paragraph(_fmt(dfc[i], language, decimals=0), value_style),
+            fiche_paragraph(emph(_fmt(delta[i], language)), value_style),
+            fiche_paragraph(_present_markup(present, language), value_style),
         ]
         if show_u and uncertainties is not None:
-            row.insert(6, Paragraph(_fmt(uncertainties[i], language), value_style))
+            row.insert(
+                6, fiche_paragraph(_fmt(uncertainties[i], language), value_style)
+            )
         data.append(row)
 
     table = stacked_table(data, [w * mm for w in widths])
@@ -317,7 +319,7 @@ def render_tone_audibility_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -343,8 +345,8 @@ def render_tone_audibility_report(
         )
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(basis, basis_style),
     ]
 
     header_pairs = _metadata_pairs(result, metadata, language)
@@ -353,7 +355,7 @@ def render_tone_audibility_report(
         flow.append(grid_table(header_pairs))
     flow.append(Spacer(1, 8))
 
-    flow.append(Paragraph(t("Detected tones", language), caption_style))
+    flow.append(fiche_paragraph(t("Detected tones", language), caption_style))
     flow.append(_key_quantity_table(result, verbose, language))
     flow.append(Spacer(1, 8))
 
@@ -399,9 +401,9 @@ def render_tone_audibility_report(
             "{dl} dB &#8804; 0); no tonal adjustment applies (K = 0 dB).",
             language,
         ).format(dl=_fmt(delta, language))
-    flow.append(Paragraph(prominence, basis_strip_style))
+    flow.append(fiche_paragraph(prominence, basis_strip_style))
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "The tonal audibility &#916;L<sub>ta</sub> = L<sub>pt</sub> "
                 "&#8722; L<sub>pn</sub> &#8722; a<sub>v</sub> is the amount by "
@@ -415,7 +417,7 @@ def render_tone_audibility_report(
         )
     )
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "L<sub>pn</sub> is the critical-band masking-noise level "
                 "(Formula (12)), &#916;f<sub>c</sub> the critical bandwidth "
@@ -430,7 +432,7 @@ def render_tone_audibility_report(
     # ISO/PAS 20065 Clause 5.3.9; this fiche assesses the one spectrum supplied,
     # whose decisive audibility is that mean only for J = 1.
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "Table J.1 assigns K from the mean audibility &#916;L, the "
                 "energy mean of the decisive audibilities of the J assessed "

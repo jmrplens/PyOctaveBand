@@ -76,7 +76,6 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal, overload
 
 import numpy as np
-from numpy.typing import ArrayLike
 
 from ..._internal.validation import (
     require_choice,
@@ -86,6 +85,7 @@ from ..._internal.validation import (
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
 # The ISO 12354-1 Annex D lining machinery now lives in :mod:`.linings`. Until
 # every caller in the tree reads it from there, the names this module used to

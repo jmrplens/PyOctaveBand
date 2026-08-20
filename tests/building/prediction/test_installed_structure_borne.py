@@ -216,9 +216,9 @@ def test_coupling_elastic_support_hand_value() -> None:
 
 def test_plot_returns_axes() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     bands = np.array([250.0, 500.0, 1000.0])
     paths = [
         {

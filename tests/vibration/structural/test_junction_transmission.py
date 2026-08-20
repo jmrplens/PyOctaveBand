@@ -430,9 +430,9 @@ def test_result_accepts_custom_angles() -> None:
 
 
 def test_plot_returns_axes() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
 
     res = vibration.junction_transmission("X", 0.1, 3200.0, 240.0, 0.15, 3000.0, 360.0)
     ax = res.plot()

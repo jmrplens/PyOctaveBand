@@ -19,15 +19,19 @@ import reference_data as ref
 
 pytest.importorskip("reportlab")
 
+from typing import TYPE_CHECKING
+
 from phonometry import ReportMetadata, building
 from phonometry._i18n import fmt_minus
-from phonometry.building.prediction.facade import (
-    FacadePredictionResult,
-)
-from phonometry.building.prediction.simplified_model import (
-    AirbornePredictionResult,
-    ImpactPredictionResult,
-)
+
+if TYPE_CHECKING:
+    from phonometry.building.prediction.facade import (
+        FacadePredictionResult,
+    )
+    from phonometry.building.prediction.simplified_model import (
+        AirbornePredictionResult,
+        ImpactPredictionResult,
+    )
 
 _PDF_MAGIC = b"%PDF"
 

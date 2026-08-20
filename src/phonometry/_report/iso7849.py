@@ -58,10 +58,10 @@ from ._sound_power_fiche import (
     power_value_table,
     render_sound_power_fiche,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..emission.vibration_sound_power import VibrationSoundPowerResult
+    from .metadata import ReportMetadata
 
 
 def _is_survey(result: Any) -> bool:

@@ -80,7 +80,6 @@ operation (Article 25.2) only the last two apply.
 from __future__ import annotations
 
 import math
-from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any
@@ -88,6 +87,8 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
     from matplotlib.axes import Axes
 
     from ..._report.metadata import ReportMetadata

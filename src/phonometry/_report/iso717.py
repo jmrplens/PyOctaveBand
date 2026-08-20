@@ -56,13 +56,13 @@ from ._layout import (
     two_panel_body,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..building.measurement.insulation import (
         ImpactRatingResult,
         WeightedRatingResult,
     )
+    from .metadata import ReportMetadata
 
 #: Threshold below which an unfavourable deviation is shown as an em dash.
 _DEVIATION_EPS = 0.05
@@ -258,25 +258,27 @@ def _value_table(
     """
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     head_style = band_table_header_style()
 
     if verbose:
         header = [
-            Paragraph(t("f [Hz]", language), head_style),
-            Paragraph(
+            fiche_paragraph(t("f [Hz]", language), head_style),
+            fiche_paragraph(
                 t("Measured {vh} [dB]", language).format(vh=value_header),
                 head_style,
             ),
-            Paragraph(t("Shifted ref. [dB]", language), head_style),
-            Paragraph(t("Unfav. dev. [dB]", language), head_style),
+            fiche_paragraph(t("Shifted ref. [dB]", language), head_style),
+            fiche_paragraph(t("Unfav. dev. [dB]", language), head_style),
         ]
         col_widths = [15 * mm, 19 * mm, 18 * mm, 18 * mm]
     else:
         header = [
-            Paragraph(t("Frequency f [Hz]", language), head_style),
-            Paragraph(t("{vh} [dB]", language).format(vh=value_header), head_style),
+            fiche_paragraph(t("Frequency f [Hz]", language), head_style),
+            fiche_paragraph(
+                t("{vh} [dB]", language).format(vh=value_header), head_style
+            ),
         ]
         col_widths = [28 * mm, 28 * mm]
 
@@ -470,7 +472,7 @@ def render_iso717_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -484,8 +486,8 @@ def render_iso717_report(
     basis = _basis_line(metadata, rating_part, language)
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(basis, basis_style),
     ]
 
     # Metadata header block (only the supplied fields).
@@ -509,7 +511,7 @@ def render_iso717_report(
         "Octave-band {vh} [dB]" if centers.size == 5 else "One-third-octave {vh} [dB]"
     )
     left_cell = [
-        Paragraph(
+        fiche_paragraph(
             t(caption_key, language).format(vh=value_header),
             caption_style,
         ),

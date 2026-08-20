@@ -513,9 +513,9 @@ def test_result_types_and_shapes() -> None:
 @pytest.mark.filterwarnings("ignore::phonometry.PhonometryWarning")
 def test_plots_smoke() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     prof = log_linear_sound_speed_profile(1.0, max_height=100.0)
     prof.plot()
     atmospheric_ray_paths(

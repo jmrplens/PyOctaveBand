@@ -50,7 +50,6 @@ levels and event metrics).
 from __future__ import annotations
 
 import math
-from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Final
@@ -72,6 +71,8 @@ from .rotorcraft_propagation import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
 

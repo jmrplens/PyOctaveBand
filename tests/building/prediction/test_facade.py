@@ -18,9 +18,9 @@ assert that the implementation stays self-consistent with the standard's own
 per-element values at the noisy bands.
 """
 
-import matplotlib
+import matplotlib as mpl
 
-matplotlib.use("Agg")
+mpl.use("Agg")
 
 import numpy as np
 import pytest

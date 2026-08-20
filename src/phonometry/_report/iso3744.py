@@ -58,11 +58,11 @@ from ._sound_power_fiche import (
     range_str,
     render_sound_power_fiche,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..emission.sound_power import SoundPowerResult
     from ..emission.sound_power_anechoic import PrecisionSoundPowerResult
+    from .metadata import ReportMetadata
 
 #: Band-frequency column heading of the per-band table (translated by ``t``).
 _COL_FREQUENCY = "f [Hz]"

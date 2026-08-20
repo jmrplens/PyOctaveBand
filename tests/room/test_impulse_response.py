@@ -489,9 +489,9 @@ def test_mls_result_metadata() -> None:
 # Plotting (Agg backend): impulse response and excitation signals
 # --------------------------------------------------------------------------
 def test_impulse_response_plot_returns_axes() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     from matplotlib.axes import Axes
 
     rec, sweep = _synthetic_recording()
@@ -501,16 +501,16 @@ def test_impulse_response_plot_returns_axes() -> None:
     assert axes.size == 2
     assert all(isinstance(a, Axes) for a in axes)
 
-    _, single = matplotlib.pyplot.subplots()
+    _, single = mpl.pyplot.subplots()
     returned = ir.plot(ax=single)
     assert returned is single
-    matplotlib.pyplot.close("all")
+    mpl.pyplot.close("all")
 
 
 def test_plot_excitation_returns_axes() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     from matplotlib.axes import Axes
 
     sweep = room.sweep_signal(FS, 20.0, 20000.0, 0.5)
@@ -523,13 +523,13 @@ def test_plot_excitation_returns_axes() -> None:
     assert isinstance(axes_m, np.ndarray)
     assert axes_m.size == 2
     assert all(isinstance(a, Axes) for a in axes_m)
-    matplotlib.pyplot.close("all")
+    mpl.pyplot.close("all")
 
 
 def test_plot_excitation_short_and_empty_guards() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     # A short sweep must not crash the spectrogram (nperseg capped by length).

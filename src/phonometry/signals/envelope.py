@@ -54,12 +54,13 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ..io._resolve import resolve_fs
-from ..io._signal import Signal
 from .spectra import _positive, _validate_signal
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
+
+    from ..io._signal import Signal
 
 __all__ = [
     "EnvelopeResult",

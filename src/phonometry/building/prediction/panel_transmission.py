@@ -91,7 +91,6 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, overload
 
 import numpy as np
-from numpy.typing import ArrayLike
 from scipy.integrate import quad
 from scipy.special import ellipe
 
@@ -104,6 +103,7 @@ from ...vibration.structural.radiation_efficiency import coincidence_frequency
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
     from ...materials.absorbers.porous import PorousMediumResult
     from ..measurement.insulation import WeightedRatingResult

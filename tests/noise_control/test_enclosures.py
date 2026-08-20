@@ -120,9 +120,9 @@ def test_result_type_and_plot() -> None:
         frequencies=[125.0, 250.0, 500.0],
     )
     assert isinstance(res, EnclosureResult)
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     assert res.plot().get_ylabel()
     # No-frequency plot uses band indices.
     assert (
@@ -175,9 +175,9 @@ def test_required_transmission_loss_callable_and_result_shape() -> None:
     assert isinstance(res, EnclosureResult)
     assert res.frequencies is not None
     assert res.panel_transmission_loss.shape == (3,)
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     assert res.plot().get_ylabel()
     with pytest.raises(ValueError, match="frequencies"):
         noise_control.enclosure_required_transmission_loss(lambda f: f, 6.0, 5.0, 0.3)

@@ -51,10 +51,10 @@ from ._layout import (
     two_panel_body,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..speech.sii import SIIResult
+    from .metadata import ReportMetadata
 
 #: The band procedure the fiche describes when the result carries no other.
 _DEFAULT_METHOD = "one-third-octave"
@@ -112,7 +112,7 @@ def _band_table(result: SIIResult, verbose: bool, language: str = "en") -> Any:
     from reportlab.lib.units import mm
     from reportlab.platypus import Table, TableStyle
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     accent = colors.HexColor(_ACCENT_HEX)
     light = colors.HexColor(_LIGHT_HEX)
@@ -132,14 +132,14 @@ def _band_table(result: SIIResult, verbose: bool, language: str = "en") -> Any:
     disturbance = np.asarray(result.disturbance, dtype=np.float64)
 
     header = [
-        Paragraph(t("f [Hz]", language), head_style),
-        Paragraph("E&#8242;<sub>i</sub> [dB]", head_style),
-        Paragraph("I<sub>i</sub>", head_style),
-        Paragraph("A<sub>i</sub>", head_style),
+        fiche_paragraph(t("f [Hz]", language), head_style),
+        fiche_paragraph("E&#8242;<sub>i</sub> [dB]", head_style),
+        fiche_paragraph("I<sub>i</sub>", head_style),
+        fiche_paragraph("A<sub>i</sub>", head_style),
     ]
     col_widths = [16 * mm, 20 * mm, 19 * mm, 15 * mm]
     if verbose:
-        header.insert(3, Paragraph("D<sub>i</sub> [dB]", head_style))
+        header.insert(3, fiche_paragraph("D<sub>i</sub> [dB]", head_style))
         col_widths = [15 * mm, 18 * mm, 17 * mm, 18 * mm, 14 * mm]
 
     def d1(value: float) -> str:
@@ -234,7 +234,7 @@ def render_sii_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -258,8 +258,8 @@ def render_sii_report(
         ).format(method=method)
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(basis, basis_style),
     ]
 
     if metadata is not None and not metadata.is_empty():
@@ -270,7 +270,7 @@ def render_sii_report(
     flow.append(Spacer(1, 8))
 
     left_cell = [
-        Paragraph(
+        fiche_paragraph(
             t(
                 _TABLE_CAPTIONS.get(result.method, _TABLE_CAPTIONS[_DEFAULT_METHOD]),
                 language,

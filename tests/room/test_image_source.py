@@ -423,9 +423,9 @@ def test_bad_dimension_and_fs() -> None:
 
 
 def test_reflectogram_plot_smoke() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     res = room.image_source_rir(
         (5.0, 4.0, 3.0),
         (1.2, 1.1, 1.3),
@@ -441,9 +441,9 @@ def test_reflectogram_plot_smoke() -> None:
 def test_reflectogram_plot_direct_only() -> None:
     # max_order=0 has no reflections; the reflectogram must not crash on the
     # empty scatter / colorbar.
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     res = room.image_source_rir(
         (5.0, 4.0, 3.0),
         (1.2, 1.1, 1.3),

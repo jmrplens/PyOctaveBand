@@ -41,12 +41,11 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from scipy import signal
 
-from .core import OctaveFilterBank
-
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
     from .._report.metadata import ReportMetadata
+    from .core import OctaveFilterBank
 
 __all__ = [
     "FilterComplianceResult",

@@ -156,9 +156,9 @@ def test_rectangular_validation(kwargs: dict[str, float], match: str) -> None:
 
 def test_plot_draws_both_ladders_and_shades_the_plane_wave_band() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     from matplotlib.axes import Axes
 
     res = duct_modes.circular_duct_cut_on(
@@ -172,7 +172,7 @@ def test_plot_draws_both_ladders_and_shades_the_plane_wave_band() -> None:
     assert [t.get_text() for t in ax.get_xticklabels()] == [
         f"({p}, {q})" for p, q in res.modes
     ]
-    matplotlib.pyplot.close(ax.figure)
+    mpl.pyplot.close(ax.figure)
 
 
 def test_plot_language_is_validated() -> None:

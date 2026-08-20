@@ -67,12 +67,12 @@ from ._layout import (
     two_panel_body,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..emission.intensity_compliance import (
         IntensityInstrumentComplianceResult,
     )
+    from .metadata import ReportMetadata
 
 #: Fiche prose for the ``"instrument"`` column of Table 2, and the fallback
 #: for an unrecognised device kind.

@@ -38,7 +38,6 @@ from __future__ import annotations
 
 import html
 import math
-from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -59,11 +58,13 @@ from ._layout import (
     result_box,
     two_panel_body,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from ..room.enclosed_space_absorption import ReverberationResult
     from ..room.reverberation_prediction import ReverberationModelResult
+    from .metadata import ReportMetadata
 
 #: Octave centres whose mean is the mid-frequency reverberation-time descriptor
 #: quoted for rooms (the 500 Hz and 1000 Hz octave bands).
@@ -179,7 +180,7 @@ def _target_line(requirement: float, styles: Any, language: str) -> list[Any]:
     from reportlab.lib import colors
     from reportlab.lib.styles import ParagraphStyle
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     style = ParagraphStyle(
         "reverb_target",
@@ -192,7 +193,9 @@ def _target_line(requirement: float, styles: Any, language: str) -> list[Any]:
     text = t("Target reverberation time T = {req} s", language).format(
         req=format_number(requirement, language, decimals=2)
     )
-    return [Paragraph(f"<font color='{_ACCENT_HEX}'>&#9632;</font> {text}", style)]
+    return [
+        fiche_paragraph(f"<font color='{_ACCENT_HEX}'>&#9632;</font> {text}", style)
+    ]
 
 
 def _header_grid(
@@ -252,11 +255,11 @@ def _models_table(result: ReverberationModelResult, language: str) -> Any:
     """Build the per-band table with one reverberation-time column per model."""
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     head = _band_header_style()
-    header = [Paragraph(t("f [Hz]", language), head)]
-    header += [Paragraph(name, head) for name in _MODEL_NAMES]
+    header = [fiche_paragraph(t("f [Hz]", language), head)]
+    header += [fiche_paragraph(name, head) for name in _MODEL_NAMES]
 
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     curves = [
@@ -323,15 +326,15 @@ def render_reverberation_models_report(
         from reportlab.lib import colors
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
 
     styles, title_style, basis_style, caption_style = document_styles(accent)
     flow: list[Any] = [
-        Paragraph(t("Reverberation-time prediction", language), title_style),
-        Paragraph(
+        fiche_paragraph(t("Reverberation-time prediction", language), title_style),
+        fiche_paragraph(
             t(
                 "Design-stage prediction of the reverberation time by five "
                 "statistical-acoustics models (Sabine, Eyring, "
@@ -354,7 +357,7 @@ def render_reverberation_models_report(
     from reportlab.lib.units import mm
 
     left_cell = [
-        Paragraph(t("Reverberation time by model [s]", language), caption_style),
+        fiche_paragraph(t("Reverberation time by model [s]", language), caption_style),
         _models_table(result, language),
     ]
     plot_drawing = render_figure_drawing(
@@ -372,7 +375,7 @@ def render_reverberation_models_report(
 
     basis_strip = measurement_basis_style()
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "Design-stage prediction from the room geometry and surface "
                 "absorption by the classical statistical-acoustics models; it "
@@ -386,7 +389,7 @@ def render_reverberation_models_report(
         )
     )
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "Sabine T = 24 ln10/c0 * V/(A + 4mV); Eyring replaces A by "
                 "-S ln(1 - alpha_bar); Millington-Sette sums -S_i ln(1 - "
@@ -411,13 +414,13 @@ def _enclosed_table(result: ReverberationResult, language: str) -> Any:
     """Build the per-band ``f | A | T`` table of the enclosed-space fiche."""
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     head = _band_header_style()
     header = [
-        Paragraph(t("f [Hz]", language), head),
-        Paragraph("A [m<super>2</super>]", head),
-        Paragraph("T [s]", head),
+        fiche_paragraph(t("f [Hz]", language), head),
+        fiche_paragraph("A [m<super>2</super>]", head),
+        fiche_paragraph("T [s]", head),
     ]
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     area = np.asarray(result.absorption_area, dtype=np.float64)
@@ -489,7 +492,7 @@ def render_enclosed_space_report(
         from reportlab.lib import colors
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -511,8 +514,10 @@ def render_enclosed_space_report(
             language,
         )
     flow: list[Any] = [
-        Paragraph(t("Sound absorption in an enclosed space", language), title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(
+            t("Sound absorption in an enclosed space", language), title_style
+        ),
+        fiche_paragraph(basis, basis_style),
     ]
 
     extra = [
@@ -527,7 +532,7 @@ def render_enclosed_space_report(
     from reportlab.lib.units import mm
 
     left_cell = [
-        Paragraph(
+        fiche_paragraph(
             t("Absorption area A and reverberation time T", language), caption_style
         ),
         _enclosed_table(result, language),
@@ -545,7 +550,7 @@ def render_enclosed_space_report(
 
     basis_strip = measurement_basis_style()
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "Estimate of the equivalent sound absorption area A and the "
                 "reverberation time T of an enclosed space from its surface, "

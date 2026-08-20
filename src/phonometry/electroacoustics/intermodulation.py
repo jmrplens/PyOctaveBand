@@ -34,7 +34,6 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ..io._resolve import resolve_fs
-from ..io._signal import Signal
 from .distortion import (
     _amplitude_spectrum,
     _positive,
@@ -45,6 +44,8 @@ from .distortion import (
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
+
+    from ..io._signal import Signal
 
 #: Intermodulation product search half-width, in FFT bins. Wide enough to catch
 #: a product under mild window leakage, narrow enough (together with the

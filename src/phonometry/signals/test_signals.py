@@ -60,12 +60,13 @@ import numpy as np
 
 from .._internal.warnings import PhonometryWarning
 from ..io._resolve import apply_calibration, like_input, resolve_fs
-from ..io._signal import Signal
 from .spectra import _positive
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
+
+    from ..io._signal import Signal
 
 __all__ = [
     "ResampledSignalResult",

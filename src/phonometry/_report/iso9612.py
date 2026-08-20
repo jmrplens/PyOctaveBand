@@ -66,10 +66,10 @@ from ._layout import (
     stacked_table,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..hearing.occupational_exposure import ExposureResult
+    from .metadata import ReportMetadata
 
 #: Directive 2003/10/EC Article 3 daily exposure values, dB(A) re LEX,8h.
 _LOWER_ACTION_DBA = 80.0
@@ -174,7 +174,7 @@ def _task_table(
     from reportlab.lib import colors
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("iso9612")
 
@@ -194,34 +194,34 @@ def _task_table(
         ]
         widths = [42.0, 16.0, 16.0, 26.0, 28.0, 16.0, 16.0, 14.0]
 
-    data: list[list[Any]] = [[Paragraph(h, header_style) for h in headers]]
+    data: list[list[Any]] = [[fiche_paragraph(h, header_style) for h in headers]]
     total_hours = 0.0
     for task in result.tasks:
         total_hours += task.duration_hours
         row = [
-            Paragraph(html.escape(task.label), label_style),
-            Paragraph(_fmt_hours(task.duration_hours, language), value_style),
-            Paragraph(str(task.n_samples), value_style),
-            Paragraph(_fmt_db(task.lp_aeqt, language), value_style),
-            Paragraph(_fmt_db(task.lex_8h_contribution, language), value_style),
+            fiche_paragraph(html.escape(task.label), label_style),
+            fiche_paragraph(_fmt_hours(task.duration_hours, language), value_style),
+            fiche_paragraph(str(task.n_samples), value_style),
+            fiche_paragraph(_fmt_db(task.lp_aeqt, language), value_style),
+            fiche_paragraph(_fmt_db(task.lex_8h_contribution, language), value_style),
         ]
         if verbose:
             row += [
-                Paragraph(_fmt_db(task.u1a, language), value_style),
-                Paragraph(_fmt_hours(task.u1b, language), value_style),
-                Paragraph(_fmt_db(task.u2, language), value_style),
+                fiche_paragraph(_fmt_db(task.u1a, language), value_style),
+                fiche_paragraph(_fmt_hours(task.u1b, language), value_style),
+                fiche_paragraph(_fmt_db(task.u2, language), value_style),
             ]
         data.append(row)
 
     total_row = [
-        Paragraph(f"<b>{t('Nominal day', language)}</b>", label_style),
-        Paragraph(f"<b>{_fmt_hours(total_hours, language)}</b>", value_style),
-        Paragraph("", value_style),
-        Paragraph("", value_style),
-        Paragraph(f"<b>{_fmt_db(result.lex_8h, language)}</b>", value_style),
+        fiche_paragraph(f"<b>{t('Nominal day', language)}</b>", label_style),
+        fiche_paragraph(f"<b>{_fmt_hours(total_hours, language)}</b>", value_style),
+        fiche_paragraph("", value_style),
+        fiche_paragraph("", value_style),
+        fiche_paragraph(f"<b>{_fmt_db(result.lex_8h, language)}</b>", value_style),
     ]
     if verbose:
-        total_row += [Paragraph("", value_style)] * 3
+        total_row += [fiche_paragraph("", value_style)] * 3
     data.append(total_row)
 
     table = stacked_table(data, [w * mm for w in widths])
@@ -250,7 +250,7 @@ def _sampling_table(result: ExposureResult, language: str = "en") -> Any:
     """The sampling summary of a job-based/full-day result (Formula (C.9) budget)."""
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("iso9612")
 
@@ -286,12 +286,14 @@ def _sampling_table(result: ExposureResult, language: str = "en") -> Any:
     ]
     data: list[list[Any]] = [
         [
-            Paragraph(t("Metric", language), header_style),
-            Paragraph(t("Measured", language), header_style),
+            fiche_paragraph(t("Metric", language), header_style),
+            fiche_paragraph(t("Measured", language), header_style),
         ]
     ]
     for label, value in rows:
-        data.append([Paragraph(label, label_style), Paragraph(value, value_style)])
+        data.append(
+            [fiche_paragraph(label, label_style), fiche_paragraph(value, value_style)]
+        )
     return stacked_table(data, [120 * mm, 54 * mm])
 
 
@@ -341,25 +343,25 @@ def _assessment_table(result: ExposureResult, language: str = "en") -> Any:
     """The Directive 2003/10/EC assessment table (exceeded / not exceeded)."""
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("iso9612")
 
     data: list[list[Any]] = [
         [
-            Paragraph(t("Directive 2003/10/EC value", language), header_style),
-            Paragraph(t("Threshold", language), header_style),
-            Paragraph(t("Measured", language), header_style),
-            Paragraph(t("Result", language), header_style),
+            fiche_paragraph(t("Directive 2003/10/EC value", language), header_style),
+            fiche_paragraph(t("Threshold", language), header_style),
+            fiche_paragraph(t("Measured", language), header_style),
+            fiche_paragraph(t("Result", language), header_style),
         ]
     ]
     for label, threshold, measured, exceeded in _assessment_rows(result, language):
         data.append(
             [
-                Paragraph(label, label_style),
-                Paragraph(threshold, value_style),
-                Paragraph(measured, value_style),
-                Paragraph(exceedance_markup(exceeded, language), label_style),
+                fiche_paragraph(label, label_style),
+                fiche_paragraph(threshold, value_style),
+                fiche_paragraph(measured, value_style),
+                fiche_paragraph(exceedance_markup(exceeded, language), label_style),
             ]
         )
     return stacked_table(data, [74 * mm, 24 * mm, 42 * mm, 34 * mm])
@@ -440,7 +442,7 @@ def render_iso9612_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -449,8 +451,8 @@ def render_iso9612_report(
     title = t("Occupational noise exposure determination", language)
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(_basis(result, language), basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(_basis(result, language), basis_style),
     ]
 
     header_pairs = _metadata_pairs(result, metadata, language)
@@ -460,7 +462,7 @@ def render_iso9612_report(
     flow.append(Spacer(1, 8))
 
     if result.tasks:
-        flow.append(Paragraph(t("Work analysis", language), caption_style))
+        flow.append(fiche_paragraph(t("Work analysis", language), caption_style))
         flow.append(_task_table(result, verbose, language))
         flow.append(Spacer(1, 6))
         # Full-width, landscape per-task contribution chart (self-scaling axis).
@@ -474,7 +476,7 @@ def render_iso9612_report(
             )
         )
     else:
-        flow.append(Paragraph(t("Sampling summary", language), caption_style))
+        flow.append(fiche_paragraph(t("Sampling summary", language), caption_style))
         flow.append(_sampling_table(result, language))
     flow.append(Spacer(1, 8))
 
@@ -483,7 +485,7 @@ def render_iso9612_report(
     flow.append(Spacer(1, 6))
 
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t("Assessment against Directive 2003/10/EC exposure values", language),
             caption_style,
         )
@@ -507,7 +509,7 @@ def render_iso9612_report(
             textColor=colors.HexColor(_VERDICT_BAD_HEX),
         )
         flow.append(
-            Paragraph(
+            fiche_paragraph(
                 t(
                     "The ISO 9612 sampling rules recommend additional "
                     "measurements (3 dB spread rule of Clauses 9.3/11.3, "
@@ -519,7 +521,7 @@ def render_iso9612_report(
             )
         )
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "Noise exposure level and measurement uncertainty are stated "
                 "as separate values (ISO 9612:2009 Clause 15); U = k&#183;u "
@@ -531,7 +533,7 @@ def render_iso9612_report(
         )
     )
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "When applying the exposure limit value, Directive 2003/10/EC "
                 "(Article 3) takes account of the attenuation of the "

@@ -53,14 +53,13 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
-from numpy.typing import ArrayLike
 
 from ..._internal.rays import march_rays
 from ..._internal.validation import require_positive
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
-    from numpy.typing import NDArray
+    from numpy.typing import ArrayLike, NDArray
 
     from ...materials.absorbers.porous import PorousMediumResult
 

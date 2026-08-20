@@ -10,7 +10,7 @@ geometries (blocks that do not divide the length, overlap) are covered.
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -18,6 +18,9 @@ from wav_forge import chunk, float_wav, fmt_payload, pcm_wav, rf64_wav, riff_wav
 
 from phonometry import filters, signals
 from phonometry.io import LossyCompressionWarning, read, read_blocks, write
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 try:
     import soundfile as sf

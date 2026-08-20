@@ -98,9 +98,9 @@ def test_invalid_inputs_raise() -> None:
 
 
 def test_plot_returns_axes() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     result = nt.impulse_prominence([1000.0, 200.0], [30.0, 15.0])

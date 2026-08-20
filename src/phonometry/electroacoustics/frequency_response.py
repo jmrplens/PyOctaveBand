@@ -32,7 +32,6 @@ import numpy as np
 # Shared Welch-core defaults and helpers (single source of truth for the
 # segment policy across the spectral estimators).
 from ..io._resolve import apply_calibration, resolve_pair_fs
-from ..io._signal import Signal
 from ..signals.spectra import (
     _DEFAULT_OVERLAP,
     _MIN_SAMPLES,
@@ -45,6 +44,8 @@ from ..signals.spectra import (
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
+
+    from ..io._signal import Signal
 
 
 def _validate_pair(

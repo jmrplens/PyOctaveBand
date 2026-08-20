@@ -10,7 +10,7 @@ either side surfaces as a field-level mismatch instead of cancelling out.
 from __future__ import annotations
 
 import struct
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -26,6 +26,9 @@ from wav_forge import (
 
 from phonometry.io import _chunks
 from phonometry.io._chunks import WAVE_FORMAT_IMA_ADPCM, parse_wav_chunks
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 TONE = np.array([0, 8000, -8000, 32000], dtype=np.int64)
 

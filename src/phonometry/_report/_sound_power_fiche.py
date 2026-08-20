@@ -21,9 +21,8 @@ reportlab, matplotlib and svglib are soft dependencies imported lazily
 from __future__ import annotations
 
 import math
-from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -44,7 +43,11 @@ from ._layout import (
     result_box,
     verdict_flow,
 )
-from .metadata import ReportMetadata
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from .metadata import ReportMetadata
 
 #: Reference sound power for the sound power level, 1 pW = 10^-12 W.
 POWER_REFERENCE = "1 pW"
@@ -315,7 +318,7 @@ def power_value_table(
     from reportlab.lib.units import mm
     from reportlab.platypus import Table, TableStyle
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     accent = colors.HexColor(_ACCENT_HEX)
     light = colors.HexColor(_LIGHT_HEX)
@@ -331,7 +334,7 @@ def power_value_table(
     )
 
     n = len(rows_data)
-    rows: list[list[Any]] = [[Paragraph(h, head_style) for h in header]]
+    rows: list[list[Any]] = [[fiche_paragraph(h, head_style) for h in header]]
     rows.extend([list(row) for row in rows_data])
 
     style_cmds: list[Any] = [
@@ -429,7 +432,7 @@ def render_sound_power_fiche(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -437,8 +440,8 @@ def render_sound_power_fiche(
     styles, title_style, basis_style, caption_style = document_styles(accent)
 
     flow: list[Any] = [
-        Paragraph(copy.title, title_style),
-        Paragraph(copy.basis, basis_style),
+        fiche_paragraph(copy.title, title_style),
+        fiche_paragraph(copy.basis, basis_style),
     ]
 
     if metadata is not None and not metadata.is_empty():
@@ -448,7 +451,7 @@ def render_sound_power_fiche(
             flow.append(grid_table(header_pairs))
     flow.append(Spacer(1, 8))
 
-    flow.append(Paragraph(copy.caption, caption_style))
+    flow.append(fiche_paragraph(copy.caption, caption_style))
     flow.append(value_table)
     flow.append(Spacer(1, 8))
 
@@ -478,7 +481,7 @@ def render_sound_power_fiche(
 
     basis_style_strip = measurement_basis_style()
     for strip in copy.basis_strips:
-        flow.append(Paragraph(strip, basis_style_strip))
+        flow.append(fiche_paragraph(strip, basis_style_strip))
     flow.extend(footer_flow(metadata, language, disclaimer=disclaimer))
 
     return build_document(path, flow, copy.title)

@@ -497,9 +497,8 @@ def _chk_iso717_2_reference_floor() -> Outcome:
     "Floor-covering ΔLw: zero improvement gives ΔLw = 0",
 )
 def _chk_iso16251_zero_improvement() -> Outcome:
-    import numpy as _np
 
-    dlw = ph.building.weighted_impact_improvement(_np.zeros(16))
+    dlw = ph.building.weighted_impact_improvement(np.zeros(16))
     return Outcome(
         expected="ΔLw = 0 dB (ΔL = 0 -> Ln,r = Ln,r,0)",
         computed=f"ΔLw = {dlw} dB",

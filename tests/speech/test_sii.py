@@ -330,9 +330,9 @@ def test_result_fields_present() -> None:
 
 
 def test_plot_returns_axes() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     ax = sii.speech_intelligibility_index("normal").plot()
@@ -373,9 +373,9 @@ def test_standard_speech_spectra_rejects_unknown_and_empty() -> None:
 
 def test_standard_speech_spectra_plot_returns_axes() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
     from matplotlib.axes import Axes
 
@@ -400,9 +400,9 @@ def test_standard_speech_spectra_plot_returns_axes() -> None:
 
 def test_standard_speech_spectra_plot_forwards_kwargs_and_rejects_language() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     res = sii.standard_speech_spectra("normal")
@@ -813,9 +813,9 @@ def test_sii_procedure_returns_copies() -> None:
 
 def test_sii_procedure_plot_returns_axes() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
     from matplotlib.axes import Axes
 
@@ -844,9 +844,9 @@ def test_sii_procedure_plot_returns_axes() -> None:
 
 def test_sii_result_plot_for_every_procedure() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     for method in sii.SII_METHODS:

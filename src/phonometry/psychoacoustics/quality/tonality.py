@@ -25,11 +25,12 @@ import numpy as np
 from ..._internal.utils import _typesignal
 from ..._internal.warnings import PhonometryWarning
 from ...io._resolve import apply_calibration, resolve_fs
-from ...io._signal import Signal
 from ...signals.spectra import _welch_autospectrum
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+
+    from ...io._signal import Signal
 
 
 class TonalityWarning(PhonometryWarning):

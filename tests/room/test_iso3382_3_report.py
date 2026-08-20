@@ -29,13 +29,17 @@ pytest.importorskip("reportlab")
 pytest.importorskip("svglib")
 pytest.importorskip("pypdf")
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 from phonometry import (
     ReportMetadata,
     room,
 )
-from phonometry.room import OpenPlanResult
+
+if TYPE_CHECKING:
+    from phonometry.room import OpenPlanResult
 
 _PDF_MAGIC = b"%PDF"
 

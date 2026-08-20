@@ -29,18 +29,19 @@ distribution is out of scope.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
     from .._report.metadata import ReportMetadata
 
-from numpy.typing import ArrayLike
 
 from .._internal.types import as_float_or_array
 from .._internal.validation import require_fraction, require_positive

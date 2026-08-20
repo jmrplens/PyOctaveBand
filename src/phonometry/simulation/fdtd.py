@@ -40,7 +40,6 @@ edge, and second-order convergence under grid refinement.
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Protocol
@@ -51,6 +50,8 @@ from numpy.typing import ArrayLike, NDArray
 from .ntff import ContourPhasors
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable, Mapping, Sequence
+
     from matplotlib.axes import Axes
 
 Field2D = NDArray[np.float64]

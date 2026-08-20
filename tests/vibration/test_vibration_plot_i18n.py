@@ -15,9 +15,9 @@ def _result():
 
 def test_spanish_labels() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     res = _result()
 
     ax_en = res.plot(language="en")
@@ -31,9 +31,9 @@ def test_spanish_labels() -> None:
 
 def test_rigid_mass_spanish_labels() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     f = np.array([20.0, 100.0, 500.0])
     res = vibration.rigid_mass_calibration_check([0.100, 0.102, 0.097], f, mass=10.0)
 
@@ -51,9 +51,9 @@ def test_rigid_mass_spanish_labels() -> None:
 
 def test_multiple_shock_spanish_title_translates_sex() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     from phonometry.vibration.human.multiple_shock import (
         MZ_MALE,
         RISK_THRESHOLDS_MALE,
@@ -89,9 +89,9 @@ def test_multiple_shock_spanish_title_translates_sex() -> None:
 
 def test_unknown_language_raises() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     result = _result()
     with pytest.raises(ValueError, match="Unknown language"):
         result.plot(language="xx")
@@ -100,9 +100,9 @@ def test_unknown_language_raises() -> None:
 def test_fault_frequency_overlay_labels() -> None:
     """The fault-line overlay localises its axes, title and family legend."""
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
 
     res = vibration.bearing_fault_frequencies(
         2000.0, 15, 6.0, 34.0, contact_angle_deg=12.96
@@ -128,9 +128,9 @@ def test_fault_frequency_overlay_labels() -> None:
 def test_fault_frequency_overlay_on_a_measured_spectrum() -> None:
     """With a spectrum the curve is drawn underneath and named."""
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     from phonometry import signals
 
     res = vibration.bearing_fault_frequencies(
@@ -162,9 +162,9 @@ def test_crowded_fault_labels_do_not_overlap() -> None:
     their rotated labels used to be drawn on top of one another.
     """
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     from phonometry._plot.vibration import _LABEL_WIDTH_PT, _label_offsets
 
     res = vibration.bearing_fault_frequencies(
@@ -186,9 +186,9 @@ def test_crowded_fault_labels_do_not_overlap() -> None:
 def test_power_injection_labels() -> None:
     """The SEA loss-factor budget localises its axes and title."""
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
 
     f = np.array([250.0, 500.0, 1000.0])
     res = vibration.power_injection_clf(f, 0.087, 0.013, 4.4e-3, 2.4e-3, 0.557, 0.606)

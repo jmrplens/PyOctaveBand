@@ -18,9 +18,9 @@ def _result():
 
 def test_spanish_labels_and_comma_decimals() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     res = _result()
 
     ax_en = res.plot(language="en")
@@ -37,9 +37,9 @@ def test_spanish_labels_and_comma_decimals() -> None:
 
 def test_unknown_language_raises() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     result = _result()
     with pytest.raises(ValueError, match="Unknown language"):
         result.plot(language="xx")

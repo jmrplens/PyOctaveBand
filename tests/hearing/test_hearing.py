@@ -105,9 +105,9 @@ def test_invalid_inputs_raise() -> None:
 
 
 def test_result_fields_and_plot() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     result = h.age_threshold(55, "female", 0.75)

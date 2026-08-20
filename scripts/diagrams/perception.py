@@ -10,7 +10,10 @@ and annoyance.
 
 from __future__ import annotations
 
-from .canvas import SVG, Theme
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .canvas import SVG, Theme
 
 # ---------------------------------------------------------------------------
 # d3 - Operator / bystander microphone positions (ECMA-74, clause 8.6)

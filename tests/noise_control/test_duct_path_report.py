@@ -274,9 +274,9 @@ def test_unknown_language_rejected(tmp_path) -> None:
 
 def test_plot_returns_axes() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     from matplotlib.axes import Axes
 
     res = _supply()

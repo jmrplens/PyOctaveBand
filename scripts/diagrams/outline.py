@@ -46,7 +46,7 @@ from functools import cache
 from pathlib import Path
 from typing import TYPE_CHECKING, NamedTuple
 
-import matplotlib
+import matplotlib as mpl
 from matplotlib import (
     _text_helpers,
     ft2font,
@@ -63,7 +63,7 @@ if TYPE_CHECKING:
 #: acute, grave, breve and dot below.
 _COMBINING = "\u0302\u0304\u0305\u0307\u0303\u0301\u0300\u0306\u0323"
 
-_MPL_TTF = Path(matplotlib.get_data_path()) / "fonts" / "ttf"
+_MPL_TTF = Path(mpl.get_data_path()) / "fonts" / "ttf"
 
 #: A face request: ``(mono, bold, italic)``.
 FaceKey = tuple[bool, bool, bool]

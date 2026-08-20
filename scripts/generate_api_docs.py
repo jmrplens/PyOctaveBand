@@ -39,8 +39,7 @@ import shutil
 import sys
 from collections.abc import Mapping
 from pathlib import Path
-from types import ModuleType
-from typing import Any, get_overloads
+from typing import TYPE_CHECKING, Any, get_overloads
 
 from api_taxonomy import (
     OBJECT_MODULE_OVERRIDES,
@@ -49,6 +48,9 @@ from api_taxonomy import (
     module_section,
     public_names,
 )
+
+if TYPE_CHECKING:
+    from types import ModuleType
 
 ROOT = Path(__file__).resolve().parent.parent
 CONTENT_DIR = ROOT / "site" / "src" / "content" / "docs" / "reference" / "api"

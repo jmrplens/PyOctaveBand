@@ -13,7 +13,6 @@ leaf never imports domain code at module level.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, overload
 
 import numpy as np
@@ -33,6 +32,8 @@ from ._draft import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from matplotlib.axes import Axes
 
     from ...building.prediction.aperture_transmission import (

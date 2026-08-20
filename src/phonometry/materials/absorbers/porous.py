@@ -67,7 +67,6 @@ stack of them and solving it with the transfer matrix is the subject of
 from __future__ import annotations
 
 import warnings
-from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -75,7 +74,6 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from scipy import special
 
-from ..._internal.types import Real
 from ..._internal.validation import (
     require_choice,
     require_non_negative,
@@ -85,7 +83,11 @@ from ..._internal.validation import (
 from ..._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from matplotlib.axes import Axes
+
+    from ..._internal.types import Real
 
 Complex = NDArray[np.complex128]
 

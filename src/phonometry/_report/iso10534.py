@@ -54,10 +54,10 @@ from ._layout import (
     result_box,
     two_panel_body,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..materials.absorbers.impedance_tube import ImpedanceTubeResult
+    from .metadata import ReportMetadata
 
 #: Printable label for each accepted ``ReportMetadata.tube_shape`` value.
 _SHAPE_LABELS = {
@@ -168,7 +168,7 @@ def _value_table(
     """
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     head_style = band_table_header_style()
     freqs = np.asarray(result.frequency, dtype=np.float64)
@@ -178,11 +178,11 @@ def _value_table(
 
     if verbose:
         header = [
-            Paragraph(t("f [Hz]", language), head_style),
-            Paragraph("&#945;", head_style),
-            Paragraph("|r|", head_style),
-            Paragraph("Re z", head_style),
-            Paragraph("Im z", head_style),
+            fiche_paragraph(t("f [Hz]", language), head_style),
+            fiche_paragraph("&#945;", head_style),
+            fiche_paragraph("|r|", head_style),
+            fiche_paragraph("Re z", head_style),
+            fiche_paragraph("Im z", head_style),
         ]
         rows: list[list[Any]] = [header]
         for fk, ak, rk, zk in zip(freqs, alpha, r_mag, z):
@@ -198,10 +198,10 @@ def _value_table(
         col_widths = [16 * mm, 18 * mm, 18 * mm, 18 * mm, 18 * mm]
     else:
         header = [
-            Paragraph(t("f [Hz]", language), head_style),
-            Paragraph("&#945;", head_style),
-            Paragraph("Re z", head_style),
-            Paragraph("Im z", head_style),
+            fiche_paragraph(t("f [Hz]", language), head_style),
+            fiche_paragraph("&#945;", head_style),
+            fiche_paragraph("Re z", head_style),
+            fiche_paragraph("Im z", head_style),
         ]
         rows = [header]
         for fk, ak, zk in zip(freqs, alpha, z):
@@ -271,10 +271,10 @@ def _body(
     """
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     left_cell = [
-        Paragraph(_caption(verbose, language), caption_style),
+        fiche_paragraph(_caption(verbose, language), caption_style),
         _value_table(result, verbose, language),
     ]
     plot_drawing = render_figure_drawing(
@@ -316,7 +316,7 @@ def render_iso10534_report(
         from reportlab.lib import colors
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -333,8 +333,8 @@ def render_iso10534_report(
     title = t("Impedance-tube sound absorption and impedance", language)
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(_basis_line(metadata, language), basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(_basis_line(metadata, language), basis_style),
     ]
 
     header_pairs = _metadata_pairs(result, metadata, language)

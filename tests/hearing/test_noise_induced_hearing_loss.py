@@ -232,9 +232,9 @@ def test_inside_validated_domain_is_silent() -> None:
 
 
 def test_plots_return_axes() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     assert isinstance(m.nipts(95.0, 20.0, 0.9).plot(), plt.Axes)

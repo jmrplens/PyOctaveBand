@@ -38,17 +38,19 @@ the exact sinusoidal-component method.
 from __future__ import annotations
 
 import math
-from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
 from ...io._resolve import apply_calibration, resolve_fs
-from ...io._signal import Signal
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from matplotlib.axes import Axes
+
+    from ...io._signal import Signal
 
 from ..._internal.utils import _typesignal
 from ..._internal.validation import require_1d_signal

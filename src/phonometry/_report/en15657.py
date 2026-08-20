@@ -53,10 +53,10 @@ from ._sound_power_fiche import (
     power_value_table,
     render_sound_power_fiche,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..building.measurement.structure_borne_power import StructureBornePowerResult
+    from .metadata import ReportMetadata
 
 
 def _basis(language: str = "en") -> str:

@@ -44,13 +44,14 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import NDArray
 
 from ..io._resolve import apply_calibration, resolve_pair_fs
-from ..io._signal import Signal
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import NDArray
+
+    from ..io._signal import Signal
 
 # ---------------------------------------------------------------------------
 # Algorithm constants (Taal et al. 2011 Section II; Jensen & Taal 2016 II-A).

@@ -53,7 +53,6 @@ The random errors follow Bendat & Piersol Section 9.3: conditioning on the
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -73,6 +72,8 @@ from .spectra import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
 

@@ -10,10 +10,12 @@ as they are touched.
 
 from __future__ import annotations
 
-from typing import overload
+from typing import TYPE_CHECKING, overload
 
 import numpy as np
-from numpy.typing import ArrayLike
+
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike
 
 
 @overload

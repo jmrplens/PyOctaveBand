@@ -99,6 +99,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Imports say what they are for, and names say what they are. An import that
+  only a type checker needs sits under `if TYPE_CHECKING` now, 313 of them; a
+  well-known package is imported under the alias everyone writes, 190 of them;
+  and the 83 places that wrote `from ._layout import fiche_paragraph as
+  Paragraph` call it `fiche_paragraph`, because the alias made a helper of this
+  package look like the class reportlab publishes under that name. Four
+  functions in the conformance domains imported numpy a second time, inside the
+  function, where the module already had it.
+
+  `INP` and `T20` are selected but find nothing: both are already clean in
+  `src`, and they are here to keep it that way. A print is what the scripts are
+  for, so they are exempt, and so are the tests.
+
+  The clip freshness gate needed a repair first. It hashes the AST of the code
+  that draws each clip, and its own preamble says an alarm nobody believes
+  would be worse than no alarm, because a false positive costs a re-render.
+  It hashed the whole of each module it reached, so moving an import under
+  `if TYPE_CHECKING` looked like a change to the drawing even though nothing
+  in that block exists while a frame is rendered: it marked most of the
+  forty-two clips stale. It now skips those blocks, and hashes the remaining
+  imports as a sorted set, so sorting them is not a change either. The
+  imports are still hashed, because the walk stops at the package boundary
+  and for `import numpy as np` the statement is the only record it has.
+
+  `TC006`, which quotes the first argument of `typing.cast`, is not selected.
+  That argument is never evaluated for its value, so the rewrite is inert, and
+  it moved two clips through `figures.media._save_animation`.
+
 - Ruff is the formatter, and there is a configuration to say so. The tree had
   none: no `[tool.ruff]`, no `ruff.toml`, no pre-commit, no `.editorconfig`, and
   CI ran `ruff check .` on ruff's default rules alone, which are four families

@@ -252,9 +252,9 @@ def test_result_fields_and_copy() -> None:
 
 
 def test_nc_plot_returns_axes() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     ax = rn.noise_criterion(rn.nc_curve(40.0)).plot()
@@ -263,9 +263,9 @@ def test_nc_plot_returns_axes() -> None:
 
 
 def test_rc_plot_returns_axes() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     ax = rn.room_criterion(rn.rc_curve(35.0)).plot()

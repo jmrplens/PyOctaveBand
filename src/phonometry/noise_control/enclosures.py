@@ -63,12 +63,10 @@ interior room constant reuses :func:`phonometry.room.room_constant`.
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Protocol, cast
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 
 from .._internal.validation import require_choice, require_positive
 from ..room.steady_field import room_constant
@@ -81,7 +79,10 @@ from ..room.steady_field import room_constant
 ENCLOSURE_MODELS: dict[str, float] = {"bies": 0.3, "norton": 0.0}
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike, NDArray
 
     from .._report.metadata import ReportMetadata
 

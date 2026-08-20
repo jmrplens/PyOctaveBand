@@ -118,9 +118,9 @@ def test_result_shapes_and_plot() -> None:
     assert res.directivity is not None
     assert res.directivity.shape == (2, 3)
     assert res.ka.shape == (2,)
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     ax = res.plot()
     assert ax.get_ylabel()
 
@@ -157,9 +157,9 @@ def test_directivity_pattern_first_null() -> None:
 
 
 def test_directivity_pattern_plot() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     res = electroacoustics.piston_directivity_pattern([2.0, 5.0, 10.0])
     ax = res.plot()
     # A polar axes carrying one curve per ka value.
@@ -173,9 +173,9 @@ def test_directivity_pattern_plot() -> None:
 def test_directivity_pattern_plot_kwargs_single_ka_only() -> None:
     # User plot kwargs restyle a single-ka curve, but are ignored for a
     # multi-ka family: one color/label would collapse the per-curve styling.
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     single = electroacoustics.piston_directivity_pattern(5.0)
     ax = single.plot(color="crimson", label="mine")
     assert ax.lines[0].get_color() == "crimson"

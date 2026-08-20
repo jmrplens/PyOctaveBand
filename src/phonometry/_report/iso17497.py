@@ -61,7 +61,6 @@ from ._layout import (
     result_box,
     two_panel_body,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..materials.diffusers.reverberation_room_scattering import ScatteringResult
@@ -69,6 +68,7 @@ if TYPE_CHECKING:
         DiffusionResult,
         DiffusionSpectrum,
     )
+    from .metadata import ReportMetadata
 
 #: Header of the band centre-frequency column of every ISO 17497 table.
 _FREQUENCY_COLUMN = "f [Hz]"
@@ -190,11 +190,11 @@ def _header_flow(
     """The shared title/basis/metadata-grid opening of an ISO 17497 fiche."""
     from reportlab.platypus import Spacer
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(basis, basis_style),
     ]
     if header_pairs:
         flow.append(Spacer(1, 3))
@@ -212,7 +212,7 @@ def _scattering_table(
     """Build the per-band ``f | alpha_s | s`` table (``alpha_spec`` if verbose)."""
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     head_style = band_table_header_style()
     freqs = np.asarray(result.frequencies, dtype=np.float64)
@@ -221,10 +221,10 @@ def _scattering_table(
     if verbose:
         spec = np.asarray(result.specular, dtype=np.float64)
         header = [
-            Paragraph(t(_FREQUENCY_COLUMN, language), head_style),
-            Paragraph("&#945;<sub>s</sub>", head_style),
-            Paragraph("&#945;<sub>spec</sub>", head_style),
-            Paragraph("s", head_style),
+            fiche_paragraph(t(_FREQUENCY_COLUMN, language), head_style),
+            fiche_paragraph("&#945;<sub>s</sub>", head_style),
+            fiche_paragraph("&#945;<sub>spec</sub>", head_style),
+            fiche_paragraph("s", head_style),
         ]
         rows: list[list[Any]] = [header]
         for fk, ak, spk, sk in zip(freqs, a_s, spec, s):
@@ -239,9 +239,9 @@ def _scattering_table(
         col_widths = [22 * mm, 22 * mm, 24 * mm, 20 * mm]
     else:
         header = [
-            Paragraph(t(_FREQUENCY_COLUMN, language), head_style),
-            Paragraph("&#945;<sub>s</sub>", head_style),
-            Paragraph("s", head_style),
+            fiche_paragraph(t(_FREQUENCY_COLUMN, language), head_style),
+            fiche_paragraph("&#945;<sub>s</sub>", head_style),
+            fiche_paragraph("s", head_style),
         ]
         rows = [header]
         for fk, ak, sk in zip(freqs, a_s, s):
@@ -284,7 +284,7 @@ def render_scattering_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -326,7 +326,7 @@ def render_scattering_report(
         )
     )
     left_cell = [
-        Paragraph(caption, caption_style),
+        fiche_paragraph(caption, caption_style),
         _scattering_table(result, verbose, language),
     ]
     plot_fn = functools.partial(plot_scattering_report, result)
@@ -366,7 +366,7 @@ def _diffusion_table(
     """Build the per-band ``f | d`` table (adds ``d_n`` when requested)."""
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     head_style = band_table_header_style()
     freqs = np.asarray(result.frequencies, dtype=np.float64)
@@ -374,9 +374,9 @@ def _diffusion_table(
     if show_normalized and result.normalized is not None:
         d_n = np.asarray(result.normalized, dtype=np.float64)
         header = [
-            Paragraph(t(_FREQUENCY_COLUMN, language), head_style),
-            Paragraph("d", head_style),
-            Paragraph("d<sub>n</sub>", head_style),
+            fiche_paragraph(t(_FREQUENCY_COLUMN, language), head_style),
+            fiche_paragraph("d", head_style),
+            fiche_paragraph("d<sub>n</sub>", head_style),
         ]
         rows: list[list[Any]] = [header]
         for fk, dk, dnk in zip(freqs, d, d_n):
@@ -390,8 +390,8 @@ def _diffusion_table(
         col_widths = [20 * mm, 18 * mm, 18 * mm]
     else:
         header = [
-            Paragraph(t(_FREQUENCY_COLUMN, language), head_style),
-            Paragraph("d", head_style),
+            fiche_paragraph(t(_FREQUENCY_COLUMN, language), head_style),
+            fiche_paragraph("d", head_style),
         ]
         rows = [header]
         for fk, dk in zip(freqs, d):
@@ -428,7 +428,7 @@ def render_diffusion_spectrum_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -471,7 +471,7 @@ def render_diffusion_spectrum_report(
         else t("One-third-octave diffusion coefficient d", language)
     )
     left_cell = [
-        Paragraph(caption, caption_style),
+        fiche_paragraph(caption, caption_style),
         _diffusion_table(result, show_normalized, language),
     ]
     plot_fn = functools.partial(plot_diffusion_report, result)
@@ -498,14 +498,14 @@ def _polar_table(result: DiffusionResult, language: str = "en") -> Any:
     """Build the corrected ``angle | reflected level`` polar-response table."""
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     head_style = band_table_header_style()
     angles = np.asarray(result.angles, dtype=np.float64)
     levels = np.asarray(result.levels, dtype=np.float64)
     header = [
-        Paragraph(t("Angle &#952; [&#176;]", language), head_style),
-        Paragraph("L [dB]", head_style),
+        fiche_paragraph(t("Angle &#952; [&#176;]", language), head_style),
+        fiche_paragraph("L [dB]", head_style),
     ]
     rows: list[list[Any]] = [header]
     for ang, lev in zip(angles, levels):
@@ -542,7 +542,7 @@ def render_diffusion_polar_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -573,7 +573,10 @@ def render_diffusion_polar_report(
     from .._plot.materials import plot_diffusion_polar_report
 
     caption = t("Corrected polar response L per receiver angle", language)
-    left_cell = [Paragraph(caption, caption_style), _polar_table(result, language)]
+    left_cell = [
+        fiche_paragraph(caption, caption_style),
+        _polar_table(result, language),
+    ]
     plot_fn = functools.partial(plot_diffusion_polar_report, result)
     plot_drawing = render_figure_drawing(
         plot_fn,

@@ -25,7 +25,7 @@ reportlab, matplotlib and svglib are soft dependencies imported lazily
 from __future__ import annotations
 
 import math
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -46,7 +46,9 @@ from ._layout import (
     verdict_flow,
 )
 from ._sound_power_fiche import band_labels, d1, metadata_pairs, power_value_table
-from .metadata import ReportMetadata
+
+if TYPE_CHECKING:
+    from .metadata import ReportMetadata
 
 __all__ = [
     "PREDICTION_DISCLAIMER",
@@ -174,7 +176,7 @@ def render_noise_control_fiche(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -182,8 +184,8 @@ def render_noise_control_fiche(
     styles, title_style, basis_style, caption_style = document_styles(accent)
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(basis, basis_style),
     ]
 
     if metadata is not None and not metadata.is_empty():
@@ -193,7 +195,7 @@ def render_noise_control_fiche(
             flow.append(grid_table(header_pairs))
     flow.append(Spacer(1, 8))
 
-    left_cell = [Paragraph(caption, caption_style), value_table]
+    left_cell = [fiche_paragraph(caption, caption_style), value_table]
     plot_drawing = render_figure_drawing(
         result.plot, figure_width_mm * mm, y_top=None, language=language
     )
@@ -209,7 +211,7 @@ def render_noise_control_fiche(
 
     flow.append(result_box(statement, styles, accent, extended))
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             prediction_statement,
             ParagraphStyle(
                 "noise_control_prediction",
@@ -226,7 +228,7 @@ def render_noise_control_fiche(
 
     basis_style_strip = measurement_basis_style()
     for strip in basis_strips:
-        flow.append(Paragraph(strip, basis_style_strip))
+        flow.append(fiche_paragraph(strip, basis_style_strip))
     flow.extend(footer_flow(metadata, language, disclaimer=PREDICTION_DISCLAIMER))
 
     return build_document(path, flow, title)

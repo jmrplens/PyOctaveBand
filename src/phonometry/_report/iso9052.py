@@ -48,10 +48,10 @@ from ._material_fiche import (
     render_material_fiche,
     standard_basis_line,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..materials.resilient.dynamic_stiffness import DynamicStiffnessResult
+    from .metadata import ReportMetadata
 
 
 def _mn(value: float, language: str = "en") -> str:

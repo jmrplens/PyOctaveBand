@@ -29,7 +29,6 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from ..io._resolve import resolve_fs
-from ..io._signal import Signal
 from .distortion import (
     _AES17_BANDWIDTH_HZ,
     _AES17_HIGHPASS_HZ,
@@ -46,6 +45,8 @@ from .distortion import (
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
+
+    from ..io._signal import Signal
 
 #: AES17-2015 5.2.7: the CCIR-RMS weighting is the ITU-R BS.468-4 curve with an
 #: additional flat gain of -5,63 dB, which places unity gain at 2 kHz. Table 1

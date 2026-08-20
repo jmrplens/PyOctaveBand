@@ -12,9 +12,9 @@ Equations 1.2 to 1.4, printed p. 20).
 
 from __future__ import annotations
 
-import matplotlib
+import matplotlib as mpl
 
-matplotlib.use("Agg")
+mpl.use("Agg")
 import numpy as np
 import pytest
 

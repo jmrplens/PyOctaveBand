@@ -19,13 +19,16 @@ actionable :class:`ImportError`.
 from __future__ import annotations
 
 import html
-from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from ._i18n import t
 from ._layout import escaped_pairs, fmt_meta
-from .metadata import ReportMetadata
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from .metadata import ReportMetadata
 
 
 @dataclass(frozen=True)
@@ -134,7 +137,7 @@ def render_material_fiche(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         from ._layout import _REPORTLAB_HINT
 
@@ -155,8 +158,8 @@ def render_material_fiche(
     styles, title_style, basis_style, caption_style = document_styles(accent)
 
     flow: list[Any] = [
-        Paragraph(content.title, title_style),
-        Paragraph(content.basis_line, basis_style),
+        fiche_paragraph(content.title, title_style),
+        fiche_paragraph(content.basis_line, basis_style),
     ]
 
     if content.metadata_pairs:
@@ -165,7 +168,7 @@ def render_material_fiche(
     flow.append(Spacer(1, 8))
 
     left_cell = [
-        Paragraph(content.caption, caption_style),
+        fiche_paragraph(content.caption, caption_style),
         metrics_table(content.metric_rows),
     ]
     # Non-band plot (a self-scaling design curve): no fixed top on the y-axis.

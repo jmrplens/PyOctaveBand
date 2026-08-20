@@ -52,10 +52,10 @@ from ._layout import (
     two_panel_body,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..electroacoustics.loudspeaker import LoudspeakerCharacteristics
+    from .metadata import ReportMetadata
 
 #: IEC 60263 clause 2 scale proportion: one frequency decade equals this many
 #: decibels on the ordinate (the "square" 25 dB-per-decade grid).
@@ -196,7 +196,7 @@ def _drawing_from_figure(fig: Any, target_width: float, language: str = "en") ->
     proportions set on each axes survive.
     """
     try:
-        import matplotlib
+        import matplotlib as mpl
     except ImportError as exc:  # pragma: no cover - exercised via monkeypatch
         raise ImportError(_MATPLOTLIB_HINT) from exc
     try:
@@ -210,7 +210,7 @@ def _drawing_from_figure(fig: Any, target_width: float, language: str = "en") ->
     svg_fd, svg_path = tempfile.mkstemp(suffix=".svg")
     os.close(svg_fd)
     try:
-        with matplotlib.rc_context({"svg.fonttype": "path"}):
+        with mpl.rc_context({"svg.fonttype": "path"}):
             fig.savefig(svg_path, format="svg", bbox_inches="tight")
         drawing = svg2rlg(svg_path)
     finally:
@@ -378,7 +378,7 @@ def render_iec60268_5_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -387,8 +387,8 @@ def render_iec60268_5_report(
     title = t("Loudspeaker characteristics", language)
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(_basis(metadata, language), basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(_basis(metadata, language), basis_style),
     ]
 
     if metadata is not None and not metadata.is_empty():
@@ -399,7 +399,7 @@ def render_iec60268_5_report(
     flow.append(Spacer(1, 8))
 
     left_cell = [
-        Paragraph(t("Rated characteristics", language), caption_style),
+        fiche_paragraph(t("Rated characteristics", language), caption_style),
         metrics_table(_rated_rows(result, language), col_widths=[33 * mm, 23 * mm]),
     ]
     response = _response_drawing(result, 116 * mm, language)

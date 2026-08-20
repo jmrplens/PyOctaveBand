@@ -26,14 +26,11 @@ reduced to the ISO 17497-2 directional diffusion coefficient.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike
 
-from ..._internal.types import Real
 from ..._internal.validation import require_positive, require_positive_array
 from ..absorbers.porous import DEFAULT_AIR, AirProperties, Complex
 from ..absorbers.slow_sound import HelmholtzResonator, slit_helmholtz_absorber
@@ -49,7 +46,12 @@ from .scattering_diffusion import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
+
+    from ..._internal.types import Real
 
 __all__ = [
     "MetadiffuserResult",

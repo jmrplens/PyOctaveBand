@@ -381,9 +381,9 @@ def test_result_octave_bands_method() -> None:
 
 def test_plot_returns_axes() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     freqs = ref.ISO717_2_REFERENCE_FLOOR_FREQ
     bare = np.full(16, 75.0)
     res = building.impact_improvement(bare, bare - 8.0, freqs)

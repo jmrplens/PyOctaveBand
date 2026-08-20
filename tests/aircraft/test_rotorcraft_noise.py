@@ -13,9 +13,9 @@ heterogeneous event chain, is tested in ``test_rotorcraft_terrain.py``.
 
 from __future__ import annotations
 
-import matplotlib
+import matplotlib as mpl
 
-matplotlib.use("Agg")
+mpl.use("Agg")
 import numpy as np
 import pytest
 

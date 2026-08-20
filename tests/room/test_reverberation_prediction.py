@@ -405,9 +405,9 @@ def test_mismatched_air_band_count_raises() -> None:
 # ---------------------------------------------------------------------------
 def test_plot_returns_axes() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     res = room.reverberation_time_models(
         DIMS, (0.2, 0.15, 0.3), frequencies=[125.0, 250.0]
     )

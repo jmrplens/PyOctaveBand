@@ -72,7 +72,6 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import NDArray
 from scipy.optimize import brentq
 
 from .fdtd import (
@@ -92,6 +91,7 @@ from .fdtd import (
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import NDArray
 
 #: Boundary-condition names accepted by :func:`elastic_fdtd_simulation`.
 _BOUNDARY_NAMES = ("rigid", "absorbing", "free")

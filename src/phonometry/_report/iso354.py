@@ -54,10 +54,10 @@ from ._layout import (
     result_box,
     two_panel_body,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..materials.absorbers.sound_absorption import SoundAbsorptionMeasurement
+    from .metadata import ReportMetadata
 
 
 def _a2(value: float, language: str = "en") -> str:
@@ -134,12 +134,12 @@ def _alpha_table(freqs: np.ndarray, alpha_s: np.ndarray, language: str = "en") -
     """Build the compact two-column ``f | alpha_s`` table (accredited default)."""
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     head_style = band_table_header_style()
     header = [
-        Paragraph(t("Frequency f [Hz]", language), head_style),
-        Paragraph("&#945;<sub>s</sub>", head_style),
+        fiche_paragraph(t("Frequency f [Hz]", language), head_style),
+        fiche_paragraph("&#945;<sub>s</sub>", head_style),
     ]
     rows: list[list[Any]] = [header]
     for fk, a_s in zip(freqs, alpha_s):
@@ -151,16 +151,16 @@ def _detail_table(result: SoundAbsorptionMeasurement, language: str = "en") -> A
     """Build the verbose table ``f | T1 | T2 | A1 | A2 | alpha_s`` (~102 mm wide)."""
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     head_style = band_table_header_style()
     header = [
-        Paragraph(t("f [Hz]", language), head_style),
-        Paragraph("T<sub>1</sub> [s]", head_style),
-        Paragraph("T<sub>2</sub> [s]", head_style),
-        Paragraph("A<sub>1</sub> [m<super>2</super>]", head_style),
-        Paragraph("A<sub>2</sub> [m<super>2</super>]", head_style),
-        Paragraph("&#945;<sub>s</sub>", head_style),
+        fiche_paragraph(t("f [Hz]", language), head_style),
+        fiche_paragraph("T<sub>1</sub> [s]", head_style),
+        fiche_paragraph("T<sub>2</sub> [s]", head_style),
+        fiche_paragraph("A<sub>1</sub> [m<super>2</super>]", head_style),
+        fiche_paragraph("A<sub>2</sub> [m<super>2</super>]", head_style),
+        fiche_paragraph("&#945;<sub>s</sub>", head_style),
     ]
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     t1 = np.asarray(result.t_empty, dtype=np.float64)
@@ -225,7 +225,7 @@ def render_iso354_report(
         from reportlab.lib import colors
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -256,8 +256,8 @@ def render_iso354_report(
         )
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(basis, basis_style),
     ]
 
     header_pairs = _metadata_pairs(result, metadata, language)
@@ -276,7 +276,10 @@ def render_iso354_report(
             "and absorption areas",
             language,
         )
-        left_cell = [Paragraph(caption, caption_style), _detail_table(result, language)]
+        left_cell = [
+            fiche_paragraph(caption, caption_style),
+            _detail_table(result, language),
+        ]
         plot_drawing = render_figure_drawing(
             result.plot, 70 * mm, y_top=None, language=language
         )
@@ -288,7 +291,7 @@ def render_iso354_report(
     else:
         caption = t("One-third-octave &#945;<sub>s</sub>", language)
         left_cell = [
-            Paragraph(caption, caption_style),
+            fiche_paragraph(caption, caption_style),
             _alpha_table(freqs, alpha_s, language),
         ]
         plot_drawing = render_figure_drawing(

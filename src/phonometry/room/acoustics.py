@@ -39,7 +39,6 @@ from a straight line.
 
 from __future__ import annotations
 
-from collections.abc import Iterator
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -48,12 +47,14 @@ import numpy as np
 from .._internal.utils import _typesignal
 from ..filters.core import OctaveFilterBank
 from ..io._resolve import apply_calibration, resolve_fs
-from ..io._signal import Signal
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+
     from matplotlib.axes import Axes
 
     from .._report.metadata import ReportMetadata
+    from ..io._signal import Signal
 
 #: Default octave-band analysis range (ISO 3382-1:2009, 5.1: engineering
 #: and precision methods cover at least 125 Hz to 4 kHz in octave bands).

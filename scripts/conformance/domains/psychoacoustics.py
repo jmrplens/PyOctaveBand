@@ -125,7 +125,7 @@ def _iso532_b5_signal(
         signal,
         int(fs),
         float(entry["Nmax"]),
-        cast(Literal["free", "diffuse"], field),
+        cast("Literal['free', 'diffuse']", field),
     )
 
 

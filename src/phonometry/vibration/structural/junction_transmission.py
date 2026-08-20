@@ -171,13 +171,13 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 from scipy.integrate import quad
 
 from ..._internal.validation import require_choice, require_positive
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike, NDArray
 
 #: Reference frequency ``f_ref`` of Hopkins Eq. 5.116, in Hz.
 _REFERENCE_FREQUENCY: float = 1000.0

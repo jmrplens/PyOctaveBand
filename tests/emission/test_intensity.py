@@ -332,9 +332,9 @@ def test_field_indicators_per_band_matches_per_column_scalars() -> None:
 
 
 def test_field_indicators_plot_draws_indicators_and_ld() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     rng = np.random.default_rng(1)
@@ -550,9 +550,9 @@ def test_field_is_stationary_against_the_table_b3_limit() -> None:
 
 
 def test_field_indicators_plot_draws_f1_and_its_limit() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     rng = np.random.default_rng(43)

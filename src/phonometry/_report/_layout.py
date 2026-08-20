@@ -22,13 +22,16 @@ import math
 import os
 import re
 import tempfile
-from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 from ._i18n import format_number, t
-from .metadata import ReportMetadata
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from .metadata import ReportMetadata
 
 #: Installation hints for the three soft dependencies of the report.
 _REPORTLAB_HINT = (
@@ -206,7 +209,7 @@ def render_figure_drawing(
         decimal separator.
     """
     try:
-        import matplotlib
+        import matplotlib as mpl
         from matplotlib.backends.backend_agg import FigureCanvasAgg
         from matplotlib.figure import Figure
     except ImportError as exc:  # pragma: no cover - exercised via monkeypatch
@@ -265,7 +268,7 @@ def render_figure_drawing(
 
         localize_axes(ax, language)
         fig.tight_layout()
-        with matplotlib.rc_context({"svg.fonttype": "path"}):
+        with mpl.rc_context({"svg.fonttype": "path"}):
             fig.savefig(svg_path, format="svg")
         drawing = svg2rlg(svg_path)
     finally:

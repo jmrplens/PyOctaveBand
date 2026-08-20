@@ -47,10 +47,10 @@ from ._layout import (
     two_panel_body,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..speech.sti import STIResult
+    from .metadata import ReportMetadata
 
 #: Nominal octave-band centre frequencies of the seven STI bands, in hertz
 #: (IEC 60268-16 A.5.1: 125 Hz to 8 kHz).
@@ -108,7 +108,7 @@ def _band_table(result: STIResult, language: str = "en") -> Any:
     from reportlab.lib.units import mm
     from reportlab.platypus import Table, TableStyle
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     accent = colors.HexColor(_ACCENT_HEX)
     light = colors.HexColor(_LIGHT_HEX)
@@ -123,8 +123,8 @@ def _band_table(result: STIResult, language: str = "en") -> Any:
 
     mti = np.asarray(result.mti, dtype=np.float64)
     header = [
-        Paragraph(t("f [Hz]", language), head_style),
-        Paragraph("MTI", head_style),
+        fiche_paragraph(t("f [Hz]", language), head_style),
+        fiche_paragraph("MTI", head_style),
     ]
     rows: list[list[Any]] = [header]
     for fk, m in zip(_STI_BAND_CENTERS, mti):
@@ -236,7 +236,7 @@ def render_sti_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -246,8 +246,8 @@ def render_sti_report(
     basis = _basis_line(result, metadata, language)
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(basis, basis_style),
     ]
 
     if metadata is not None and not metadata.is_empty():
@@ -258,7 +258,7 @@ def render_sti_report(
     flow.append(Spacer(1, 8))
 
     left_cell = [
-        Paragraph(
+        fiche_paragraph(
             t("Octave-band modulation transfer index MTI", language), caption_style
         ),
         _band_table(result, language),

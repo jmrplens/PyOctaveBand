@@ -398,11 +398,10 @@ def _chk_uww_flux_vs_modes() -> Outcome:
     # the incoherent modal sum, whose many-mode limit is exactly F = π/(r·H) --
     # Equation (9.42) with ψc = π/2. Averaged over receiver depth to remove the
     # sin² sampling bias of a single depth.
-    import numpy as _np
 
-    ranges = _np.linspace(20_000.0, 30_000.0, 1001)
+    ranges = np.linspace(20_000.0, 30_000.0, 1001)
     energies = [
-        _np.mean(
+        np.mean(
             10.0
             ** (
                 -ph.underwater.normal_modes(
@@ -416,9 +415,9 @@ def _chk_uww_flux_vs_modes() -> Outcome:
                 / 10.0
             )
         )
-        for zr in _np.linspace(10.0, 90.0, 9)
+        for zr in np.linspace(10.0, 90.0, 9)
     ]
-    numeric_pl = -10.0 * math.log10(float(_np.mean(energies)))
+    numeric_pl = -10.0 * math.log10(float(np.mean(energies)))
     flux = ph.underwater.weston_propagation_loss(
         ranges,
         100.0,
@@ -427,7 +426,7 @@ def _chk_uww_flux_vs_modes() -> Outcome:
         reflection_loss_gradient_value=0.0,
     )
     expected = -10.0 * math.log10(
-        float(_np.mean(10.0 ** (-flux.propagation_loss / 10.0)))
+        float(np.mean(10.0 ** (-flux.propagation_loss / 10.0)))
     )
     return numeric(expected, numeric_pl, 1.0, unit="dB", places=3)
 
@@ -459,15 +458,14 @@ def _chk_uwf_appendix_d() -> Outcome:
 def _chk_uwf_otariid_c() -> Outcome:
     # NMFS's own footnote states the printed 1.37 should read 1.36; recomputing
     # C = -max W(f) from the same row's a/b/f1/f2 gives 1.3643 dB.
-    import numpy as _np
 
     params = ph.underwater.weighting_parameters("OW", guidance="nmfs-2024")
-    freqs = _np.logspace(0.0, 6.0, 400_001)
+    freqs = np.logspace(0.0, 6.0, 400_001)
     shape = (
         ph.underwater.auditory_weighting(freqs, "OW", guidance="nmfs-2024").weighting
         - params.c_db
     )
-    return numeric(1.3643, -float(_np.max(shape)), 5e-4, unit="dB", places=4)
+    return numeric(1.3643, -float(np.max(shape)), 5e-4, unit="dB", places=4)
 
 
 @register(

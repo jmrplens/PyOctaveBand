@@ -63,10 +63,10 @@ from ._layout import (
     stacked_table,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..environment.assessment.impulsive_sound import ImpulseProminenceResult
+    from .metadata import ReportMetadata
 
 #: Minimum onset rate, in dB/s, for a level rise to qualify as an impulse
 #: (NT ACOU 112:2002, clause 4.5). Kept here so the renderer does not import
@@ -186,7 +186,7 @@ def _per_impulse_table(result: ImpulseProminenceResult, language: str = "en") ->
     from reportlab.lib import colors
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("iso1996imp")
 
@@ -206,23 +206,25 @@ def _per_impulse_table(result: ImpulseProminenceResult, language: str = "en") ->
     ]
     widths = [22.0, 34.0, 34.0, 34.0, 50.0]
 
-    data: list[list[Any]] = [[Paragraph(h, header_style) for h in headers]]
+    data: list[list[Any]] = [[fiche_paragraph(h, header_style) for h in headers]]
     for i in shown:
         emph = "<b>{}</b>".format if i == governing else str
         data.append(
             [
-                Paragraph(emph(str(i + 1)), label_style),
-                Paragraph(_fmt(orate[i], language, decimals=0), value_style),
-                Paragraph(_fmt(ld[i], language), value_style),
-                Paragraph(emph(_fmt(per[i], language, decimals=2)), value_style),
-                Paragraph(_qualifies_markup(bool(qualifies[i]), language), value_style),
+                fiche_paragraph(emph(str(i + 1)), label_style),
+                fiche_paragraph(_fmt(orate[i], language, decimals=0), value_style),
+                fiche_paragraph(_fmt(ld[i], language), value_style),
+                fiche_paragraph(emph(_fmt(per[i], language, decimals=2)), value_style),
+                fiche_paragraph(
+                    _qualifies_markup(bool(qualifies[i]), language), value_style
+                ),
             ]
         )
     if dropped:
         note = t("&#8230; plus {n} more impulses of lower prominence", language).format(
             n=dropped
         )
-        data.append([Paragraph(note, label_style), "", "", "", ""])
+        data.append([fiche_paragraph(note, label_style), "", "", "", ""])
 
     table = stacked_table(data, [w * mm for w in widths])
     dec_row = shown.index(governing) + 1  # +1 for the header row
@@ -374,7 +376,7 @@ def render_impulse_prominence_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -386,8 +388,8 @@ def render_impulse_prominence_report(
     )
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(_basis_line(measurement_standard, language), basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(_basis_line(measurement_standard, language), basis_style),
     ]
 
     header_pairs = _metadata_pairs(result, metadata, language)
@@ -396,7 +398,7 @@ def render_impulse_prominence_report(
         flow.append(grid_table(header_pairs))
     flow.append(Spacer(1, 8))
 
-    flow.append(Paragraph(t("Candidate impulses", language), caption_style))
+    flow.append(fiche_paragraph(t("Candidate impulses", language), caption_style))
     flow.append(_per_impulse_table(result, language))
     flow.append(Spacer(1, 8))
 
@@ -421,9 +423,9 @@ def render_impulse_prominence_report(
         flow.extend(verdict_flow(text, passed, styles, language))
 
     basis_strip_style = measurement_basis_style()
-    flow.append(Paragraph(_prominence_note(result, language), basis_strip_style))
+    flow.append(fiche_paragraph(_prominence_note(result, language), basis_strip_style))
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "The predicted prominence P = 3 lg(OR) + 2 lg(LD) combines the "
                 "onset rate OR (dB/s) and the level difference LD (dB) of each "
@@ -436,7 +438,7 @@ def render_impulse_prominence_report(
         )
     )
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "The L<sub>Aeq</sub> adjustment K<sub>I</sub> = 1.8 (P &#8722; "
                 "5) dB for P &gt; 5, else 0 dB, is applied to the "

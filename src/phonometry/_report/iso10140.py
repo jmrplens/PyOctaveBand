@@ -23,16 +23,16 @@ extra, matplotlib in ``phonometry[plot]``); each is guarded with an actionable
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 from ._i18n import t
 from ._insulation_fiche import Column, render_insulation_fiche
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from ..building.measurement.insulation import (
         ImpactRatingResult,
         WeightedRatingResult,
@@ -41,6 +41,7 @@ if TYPE_CHECKING:
         LabAirborneInsulationResult,
         LabImpactInsulationResult,
     )
+    from .metadata import ReportMetadata
 
 #: Per-quantity fixed labels: title, basis line, the quantity symbol used in
 #: the table header, the rating symbol of the boxed result, the plot y-axis

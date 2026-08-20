@@ -46,7 +46,6 @@ refer to ISO 9612:2009(E).
 from __future__ import annotations
 
 import warnings
-from collections.abc import Sequence
 from dataclasses import dataclass, field, replace
 from math import log10, sqrt
 from typing import TYPE_CHECKING, Any, Literal
@@ -57,6 +56,8 @@ from .._internal.levels_math import energy_mean
 from .._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from matplotlib.axes import Axes
 
     from .._report.metadata import ReportMetadata

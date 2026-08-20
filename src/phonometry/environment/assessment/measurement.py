@@ -48,7 +48,6 @@ repeated-measurement standard uncertainty (Formulae (17)–(20)) are provided.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, overload
 
@@ -57,6 +56,8 @@ import numpy as np
 from ..._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from matplotlib.axes import Axes
 
 #: Masking-threshold reference frequency in Formula (C.3), in Hz.

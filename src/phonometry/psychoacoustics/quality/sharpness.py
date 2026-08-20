@@ -15,12 +15,14 @@ at, 1.00 acum (~0.96 Aures / ~1.02 von Bismarck through this front-end).
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 import numpy as np
 
-from ...io._signal import Signal
 from ..loudness.zwicker import ZwickerLoudness, loudness_zwicker
+
+if TYPE_CHECKING:
+    from ...io._signal import Signal
 
 _DZ = 0.1  # Bark step of the ISO 532-1 specific-loudness pattern
 _Z = np.arange(1, 241) * _DZ  # Bark bin centers (0.1 .. 24.0), reference convention

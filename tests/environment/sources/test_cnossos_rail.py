@@ -881,9 +881,9 @@ def test_invalid_inputs() -> None:
 
 
 def test_result_plot_draws_both_heights() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
 
     result = railway_source_power(
         RailwayVehicle(_reference_stock(), flow_rate=10.0, speed=100.0),

@@ -13,8 +13,11 @@ a full accredited fiche and a lightweight prediction fiche.
 from __future__ import annotations
 
 import math
-from collections.abc import Callable
 from dataclasses import dataclass, fields
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 @dataclass(frozen=True)

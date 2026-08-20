@@ -8,9 +8,12 @@ and composite whole-day rating levels (6.5, Formulae 5-6).
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from typing import TYPE_CHECKING
 
 import numpy as np
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 def composite_rating_level(periods: Iterable[tuple[float, float, float]]) -> float:

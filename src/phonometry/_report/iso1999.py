@@ -56,10 +56,10 @@ from ._layout import (
     two_panel_body,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..hearing.noise_induced_hearing_loss import HtlanResult, NiptsResult
+    from .metadata import ReportMetadata
 
 #: The 2/3/4 kHz hearing-handicap audiometric set, in hertz. The mean threshold
 #: shift over these three frequencies is the descriptor most occupational
@@ -172,7 +172,7 @@ def _nipts_table(
     """The per-audiometric-frequency NIPTS table (median and fractile value)."""
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("iso1999n")
 
@@ -186,19 +186,19 @@ def _nipts_table(
         headers += ["d<sub>u</sub> [dB]", "d<sub>l</sub> [dB]"]
         widths = [22.0, 18.0, 18.0, 19.0, 19.0]
 
-    data: list[list[Any]] = [[Paragraph(h, header_style) for h in headers]]
+    data: list[list[Any]] = [[fiche_paragraph(h, header_style) for h in headers]]
     for i, freq in enumerate(result.frequencies):
         row = [
-            Paragraph(_fmt_freq(float(freq), language), label_style),
-            Paragraph(_fmt_db(float(result.median[i]), language), value_style),
-            Paragraph(_fmt_db(float(result.value[i]), language), value_style),
+            fiche_paragraph(_fmt_freq(float(freq), language), label_style),
+            fiche_paragraph(_fmt_db(float(result.median[i]), language), value_style),
+            fiche_paragraph(_fmt_db(float(result.value[i]), language), value_style),
         ]
         if verbose:
             row += [
-                Paragraph(
+                fiche_paragraph(
                     _fmt_db(float(result.spread_upper[i]), language), value_style
                 ),
-                Paragraph(
+                fiche_paragraph(
                     _fmt_db(float(result.spread_lower[i]), language), value_style
                 ),
             ]
@@ -279,7 +279,7 @@ def render_nipts_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -293,8 +293,8 @@ def render_nipts_report(
     )
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(basis, basis_style),
     ]
 
     header_pairs = _nipts_metadata_pairs(metadata, language)
@@ -304,7 +304,7 @@ def render_nipts_report(
     flow.append(Spacer(1, 8))
 
     left_cell = [
-        Paragraph(t("Threshold shift by frequency", language), caption_style),
+        fiche_paragraph(t("Threshold shift by frequency", language), caption_style),
         _nipts_table(result, verbose, language),
     ]
     left_width = 96.0 if verbose else 66.0
@@ -355,7 +355,7 @@ def _htlan_table(
     """The per-audiometric-frequency HTLAN table (age, noise and combined)."""
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("iso1999h")
 
@@ -370,19 +370,21 @@ def _htlan_table(
         headers.insert(3, "H&#183;N/120 [dB]")
         widths = [20.0, 16.0, 16.0, 20.0, 20.0]
 
-    data: list[list[Any]] = [[Paragraph(h, header_style) for h in headers]]
+    data: list[list[Any]] = [[fiche_paragraph(h, header_style) for h in headers]]
     for i, freq in enumerate(result.frequencies):
         h = float(result.htla[i])
         n = float(result.nipts[i])
         row = [
-            Paragraph(_fmt_freq(float(freq), language), label_style),
-            Paragraph(_fmt_db(h, language), value_style),
-            Paragraph(_fmt_db(n, language), value_style),
+            fiche_paragraph(_fmt_freq(float(freq), language), label_style),
+            fiche_paragraph(_fmt_db(h, language), value_style),
+            fiche_paragraph(_fmt_db(n, language), value_style),
         ]
         if verbose:
-            row.append(Paragraph(_fmt_db(h * n / _HTLAN_DENOM, language), value_style))
+            row.append(
+                fiche_paragraph(_fmt_db(h * n / _HTLAN_DENOM, language), value_style)
+            )
         row.append(
-            Paragraph(_fmt_db(float(result.threshold[i]), language), value_style)
+            fiche_paragraph(_fmt_db(float(result.threshold[i]), language), value_style)
         )
         data.append(row)
 
@@ -461,7 +463,7 @@ def render_htlan_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -475,8 +477,8 @@ def render_htlan_report(
     )
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(basis, basis_style),
     ]
 
     header_pairs = _nipts_metadata_pairs(metadata, language)
@@ -486,7 +488,7 @@ def render_htlan_report(
     flow.append(Spacer(1, 8))
 
     left_cell = [
-        Paragraph(t("Threshold level by frequency", language), caption_style),
+        fiche_paragraph(t("Threshold level by frequency", language), caption_style),
         _htlan_table(result, verbose, language),
     ]
     left_width = 92.0 if verbose else 74.0
@@ -572,8 +574,7 @@ def _prediction_notes(
     from reportlab.lib import colors
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 
-    from ._layout import _MUTED_HEX
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import _MUTED_HEX, fiche_paragraph
 
     note_style = ParagraphStyle(
         "iso1999_notes",
@@ -584,7 +585,7 @@ def _prediction_notes(
         spaceBefore=6,
     )
     notes: list[Any] = [
-        Paragraph(
+        fiche_paragraph(
             t(
                 "These values are a statistical prediction for a noise-exposed "
                 "population (ISO 1999:2013), not a clinical diagnosis or a "
@@ -593,7 +594,7 @@ def _prediction_notes(
             ),
             note_style,
         ),
-        Paragraph(
+        fiche_paragraph(
             t(
                 "Q is the percentage of the noise-exposed population predicted "
                 "to show a larger (worse) value than the one stated, as "
@@ -606,7 +607,7 @@ def _prediction_notes(
     ]
     if with_age_component:
         notes.append(
-            Paragraph(
+            fiche_paragraph(
                 t(
                     "The age component H (database A) is evaluated from "
                     "ISO 7029:2017, the edition ISO 1999:2013 references "
@@ -620,7 +621,7 @@ def _prediction_notes(
         )
     if handicap_mean:
         notes.append(
-            Paragraph(
+            fiche_paragraph(
                 t(
                     "ISO 1999:2013 does not specify frequencies or frequency "
                     "combinations for evaluating hearing disability (Scope, "
@@ -633,7 +634,7 @@ def _prediction_notes(
         )
     if _outside_validated_domain(l_ex, years, fractile):
         notes.append(
-            Paragraph(
+            fiche_paragraph(
                 t(
                     "The stated conditions lie outside the validated domain of "
                     "ISO 1999:2013 (exposure durations of 1 year to 40 years, "

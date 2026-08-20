@@ -46,7 +46,6 @@ Clause/table numbers refer to ISO 12999-1:2020(E).
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from math import sqrt
 from types import MappingProxyType
@@ -55,6 +54,8 @@ from typing import TYPE_CHECKING, Any, Literal
 import numpy as np
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
     from matplotlib.axes import Axes
 
 Situation = Literal["A", "B", "C"]

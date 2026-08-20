@@ -55,10 +55,10 @@ import numpy as np
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
     from .._report.metadata import ReportMetadata
 
-from numpy.typing import ArrayLike
 
 from .._internal.validation import require_positive
 

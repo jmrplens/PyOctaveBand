@@ -77,7 +77,6 @@ from ..io._resolve import (
     apply_calibration,
     resolve_optional_pair_fs,
 )
-from ..io._signal import Signal
 
 
 class ImpulseResponseWarning(PhonometryWarning):
@@ -86,6 +85,8 @@ class ImpulseResponseWarning(PhonometryWarning):
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+
+    from ..io._signal import Signal
 
 #: Warn from mls_impulse_response when the recovered IR still carries more than
 #: this level (dB re its peak) in the last 10 % of the MLS period: an IR longer

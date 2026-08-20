@@ -49,7 +49,6 @@ results (Clause 8 e)) also carries the spectrum adaptation term ``CI,Δ`` (ISO
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -61,6 +60,8 @@ from .insulation import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from matplotlib.axes import Axes
 
     from ..._report.metadata import ReportMetadata

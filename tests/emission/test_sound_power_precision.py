@@ -670,9 +670,9 @@ def test_field_indicators_shape_mismatch_raises() -> None:
 
 
 def test_anechoic_result_plot_returns_axes() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     freqs = np.array([250.0, 500.0, 1000.0, 2000.0])
@@ -685,9 +685,9 @@ def test_anechoic_result_plot_returns_axes() -> None:
 
 
 def test_intensity_result_plot_returns_axes() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     freqs = np.array([250.0, 500.0, 1000.0])

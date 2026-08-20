@@ -175,9 +175,9 @@ def test_contours_rejects_out_of_range_phon() -> None:
 
 def test_contours_plot_returns_axes() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     from matplotlib.axes import Axes
 
     res = psychoacoustics.equal_loudness_contours()
@@ -196,9 +196,9 @@ def test_contours_plot_phon_labels_skipped_without_1khz() -> None:
     # subset that excludes 1 kHz they must be skipped (they would render
     # outside the axes), while a range including 1 kHz keeps them.
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     from matplotlib.text import Annotation
 
     subset = psychoacoustics.equal_loudness_contours(
@@ -215,9 +215,9 @@ def test_contours_plot_phon_labels_skipped_without_1khz() -> None:
 
 def test_contours_plot_rejects_unknown_language() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     res = psychoacoustics.equal_loudness_contours()
     with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")

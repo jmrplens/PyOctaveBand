@@ -77,7 +77,6 @@ from ._sound_power_fiche import (
     range_str,
     render_sound_power_fiche,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -88,6 +87,7 @@ if TYPE_CHECKING:
         PrecisionIntensityResult,
         SoundPowerIntensityResult,
     )
+    from .metadata import ReportMetadata
 
 #: Bias-error factor K of ISO 9614-2:1996 Table 1, in dB, by measurement grade.
 _K = {"engineering": 10.0, "survey": 7.0}

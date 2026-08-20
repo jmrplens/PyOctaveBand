@@ -22,10 +22,13 @@ measured one frequency at a time; see
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from ..._internal.types import Real
+if TYPE_CHECKING:
+    from ..._internal.types import Real
 
 Complex = NDArray[np.complex128]
 

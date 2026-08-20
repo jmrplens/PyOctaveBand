@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -32,6 +31,8 @@ from .common import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from matplotlib.axes import Axes
 
     from ..building.measurement.flanking_transmission import VibrationReductionResult

@@ -46,7 +46,10 @@ import dataclasses
 import pathlib
 import re
 import sys
-from collections.abc import Mapping, Sequence
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 

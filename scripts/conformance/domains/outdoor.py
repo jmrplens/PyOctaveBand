@@ -18,7 +18,7 @@ methods of ISO 3745 and ISO 9614-3.
 from __future__ import annotations
 
 import math
-from collections.abc import Callable
+from typing import TYPE_CHECKING
 
 import numpy as np
 import reference_data as ref
@@ -26,6 +26,9 @@ import reference_data as ref
 import phonometry as ph
 
 from ..registry import Outcome, numeric, register
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 def _iso9613_table1(point: tuple[float, float, float, float]) -> Outcome:

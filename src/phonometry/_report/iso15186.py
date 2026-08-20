@@ -37,7 +37,6 @@ extra, matplotlib in ``phonometry[plot]``); each is guarded with an actionable
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -49,14 +48,16 @@ from ._insulation_fiche import (
     render_insulation_fiche,
 )
 from ._layout import fmt_num
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from ..building.measurement.insulation import WeightedRatingResult
     from ..building.measurement.intensity_insulation import (
         IntensityElementNormalizedResult,
         IntensityReductionResult,
     )
+    from .metadata import ReportMetadata
 
 #: Fixed labels for the intensity sound reduction index fiche: title, basis
 #: line, the quantity symbol used in the table header, the rating symbol of the

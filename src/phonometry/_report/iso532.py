@@ -52,10 +52,10 @@ from ._layout import (
     two_panel_body,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..psychoacoustics.loudness.zwicker import ZwickerLoudness
+    from .metadata import ReportMetadata
 
 
 def _metadata_pairs(
@@ -226,7 +226,7 @@ def render_iso532_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -236,8 +236,8 @@ def render_iso532_report(
     basis = _basis_line(result, metadata, language)
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(basis, basis_style),
     ]
 
     if metadata is not None and not metadata.is_empty():
@@ -248,7 +248,7 @@ def render_iso532_report(
     flow.append(Spacer(1, 8))
 
     left_cell = [
-        Paragraph(t("Loudness results", language), caption_style),
+        fiche_paragraph(t("Loudness results", language), caption_style),
         metrics_table(_metric_rows(result, language)),
     ]
     # Non-band plot (specific loudness N' over Bark): self-scaling axis. The
@@ -276,7 +276,7 @@ def render_iso532_report(
             )
 
         flow.append(
-            Paragraph(
+            fiche_paragraph(
                 t("Loudness versus time N(t) (clause 6.5)", language),
                 caption_style,
             )

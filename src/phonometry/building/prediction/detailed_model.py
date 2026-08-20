@@ -95,12 +95,10 @@ tables are recorded in ``docs/ERRATA.md``.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
-from numpy.typing import ArrayLike
 
 from ..._internal.validation import (
     require_choice,
@@ -109,7 +107,10 @@ from ..._internal.validation import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
     from ..._report.metadata import ReportMetadata
     from ..measurement.insulation import ImpactRatingResult, WeightedRatingResult

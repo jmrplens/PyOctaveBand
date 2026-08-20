@@ -63,10 +63,10 @@ from ._layout import (
     two_panel_body,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..environment.sources.wind_turbine import WindTurbineTonalityResult
+    from .metadata import ReportMetadata
 
 
 def _fmt(value: float, language: str, decimals: int = 1) -> str:
@@ -291,7 +291,7 @@ def render_wind_turbine_tonality_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -303,8 +303,8 @@ def render_wind_turbine_tonality_report(
     )
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(_basis_line(measurement_standard, language), basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(_basis_line(measurement_standard, language), basis_style),
     ]
 
     header_pairs = _metadata_pairs(metadata, language)
@@ -314,7 +314,7 @@ def render_wind_turbine_tonality_report(
     flow.append(Spacer(1, 8))
 
     left_cell = [
-        Paragraph(t("Critical-band analysis", language), caption_style),
+        fiche_paragraph(t("Critical-band analysis", language), caption_style),
         metrics_table(_metric_rows(result, language), col_widths=[38 * mm, 18 * mm]),
     ]
     # Non-band plot (the narrowband spectrum with the critical band, masking
@@ -333,9 +333,9 @@ def render_wind_turbine_tonality_report(
         flow.extend(verdict_flow(text, passed, styles, language))
 
     basis_strip_style = measurement_basis_style()
-    flow.append(Paragraph(_decision_note(result, language), basis_strip_style))
+    flow.append(fiche_paragraph(_decision_note(result, language), basis_strip_style))
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "The tonal audibility &#916;L<sub>a</sub> = &#916;L<sub>tn</sub> "
                 "&#8722; L<sub>a</sub> is the amount by which the tonality rises "

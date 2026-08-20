@@ -80,13 +80,13 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 
 from .._internal.types import as_float_or_array
 from .._internal.validation import require_choice, require_positive
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike, NDArray
 
 
 def _require_fraction_below_one(value: ArrayLike, name: str) -> NDArray[np.float64]:

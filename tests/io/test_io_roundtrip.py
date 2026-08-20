@@ -12,12 +12,15 @@ depth the files were stored at.
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 from phonometry import metrology, signals
 from phonometry.io import Signal, read, write
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 FS = 48000
 
