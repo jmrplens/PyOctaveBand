@@ -105,10 +105,11 @@ def _iter_wav_blocks(
             fh.seek(chunks.data_offset + start * fmt.block_align)
             raw = fh.read(n * fmt.block_align)
             if len(raw) < n * fmt.block_align:
-                raise ValueError(
+                msg = (
                     f"{path}: data chunk ends {n * fmt.block_align - len(raw)} "
                     f"bytes short of frame {start + n}"
                 )
+                raise ValueError(msg)
             yield _squeeze(_decode_linear_frames(raw, fmt))
             start += step
 
@@ -161,12 +162,14 @@ def read_blocks(
     block_size = int(block_size)
     overlap = int(overlap)
     if block_size < 1:
-        raise ValueError(f"block_size must be at least 1; got {block_size}")
+        msg = f"block_size must be at least 1; got {block_size}"
+        raise ValueError(msg)
     if not 0 <= overlap < block_size:
-        raise ValueError(
+        msg = (
             f"overlap must satisfy 0 <= overlap < block_size; got "
             f"{overlap} against {block_size}"
         )
+        raise ValueError(msg)
     format_name = _sniff(path)
     if format_name is None:
         fmt = parse_wav_chunks(path).fmt

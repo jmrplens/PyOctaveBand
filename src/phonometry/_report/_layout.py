@@ -275,7 +275,8 @@ def render_figure_drawing(
         if os.path.exists(svg_path):
             os.remove(svg_path)
     if drawing is None or not drawing.width:
-        raise ValueError("Could not convert the report plot to vector graphics.")
+        msg = "Could not convert the report plot to vector graphics."
+        raise ValueError(msg)
     scale = target_width / drawing.width
     drawing.scale(scale, scale)
     drawing.width = drawing.width * scale

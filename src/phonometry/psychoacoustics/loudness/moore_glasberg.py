@@ -756,11 +756,11 @@ def _result_from_components(
 
 def _validate_conditions(field: str, presentation: str) -> None:
     if field not in _FIELDS:
-        raise ValueError(f"field must be one of {_FIELDS}, got {field!r}.")
+        msg = f"field must be one of {_FIELDS}, got {field!r}."
+        raise ValueError(msg)
     if presentation not in _PRESENTATIONS:
-        raise ValueError(
-            f"presentation must be one of {_PRESENTATIONS}, got {presentation!r}."
-        )
+        msg = f"presentation must be one of {_PRESENTATIONS}, got {presentation!r}."
+        raise ValueError(msg)
 
 
 def _as_components(
@@ -771,16 +771,19 @@ def _as_components(
     if array.size == 0:
         return np.empty(0, dtype=np.float64), np.empty(0, dtype=np.float64)
     if array.ndim != 2 or array.shape[1] != 2:
-        raise ValueError(
+        msg = (
             "components must be a sequence of (frequency_Hz, level_dB) pairs, "
             f"got array of shape {array.shape}."
         )
+        raise ValueError(msg)
     freqs = array[:, 0]
     levels = array[:, 1]
     if not np.all(np.isfinite(array)):
-        raise ValueError("components must contain only finite values.")
+        msg = "components must contain only finite values."
+        raise ValueError(msg)
     if np.any(freqs <= 0.0):
-        raise ValueError("component frequencies must be positive.")
+        msg = "component frequencies must be positive."
+        raise ValueError(msg)
     return freqs, levels
 
 
@@ -870,12 +873,14 @@ def loudness_moore_glasberg_from_third_octave(
     _validate_conditions(field, presentation)
     levels = np.asarray(band_levels, dtype=np.float64)
     if levels.ndim != 1 or levels.size != _N_THIRD_OCTAVE:
-        raise ValueError(
+        msg = (
             f"band_levels must contain exactly {_N_THIRD_OCTAVE} one-third-"
             f"octave band levels (25 Hz to 16 kHz), got shape {levels.shape}."
         )
+        raise ValueError(msg)
     if not np.all(np.isfinite(levels)):
-        raise ValueError("band_levels must contain only finite values.")
+        msg = "band_levels must contain only finite values."
+        raise ValueError(msg)
     freqs, comp_levels = _third_octave_components(levels)
     return _result_from_components(freqs, comp_levels, field, presentation)
 
@@ -958,11 +963,14 @@ def loudness_moore_glasberg(
         x, require_1d_signal(_typesignal(np.asarray(x)), name="'x'")
     )
     if pressure.size == 0:
-        raise ValueError("Input signal 'x' cannot be empty.")
+        msg = "Input signal 'x' cannot be empty."
+        raise ValueError(msg)
     if not np.all(np.isfinite(pressure)):
-        raise ValueError("Input signal 'x' must contain only finite values.")
+        msg = "Input signal 'x' must contain only finite values."
+        raise ValueError(msg)
     if fs <= 0.0:
-        raise ValueError(f"'fs' must be a positive sampling rate, got {fs!r}.")
+        msg = f"'fs' must be a positive sampling rate, got {fs!r}."
+        raise ValueError(msg)
     components = _signal_components(pressure, float(fs))
     return loudness_moore_glasberg_from_spectrum(
         components, field=field, presentation=presentation

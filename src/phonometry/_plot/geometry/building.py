@@ -113,12 +113,15 @@ def plot_aperture_geometry(
 
     _check_language(language)
     if depth <= 0.0:
-        raise ValueError("'depth' must be positive.")
+        msg = "'depth' must be positive."
+        raise ValueError(msg)
     if (width is None) == (radius is None):
-        raise ValueError("Give exactly one of 'width' or 'radius'.")
+        msg = "Give exactly one of 'width' or 'radius'."
+        raise ValueError(msg)
     opening = float(width) if width is not None else 2.0 * float(radius or 0.0)
     if opening <= 0.0:
-        raise ValueError("The aperture size must be positive.")
+        msg = "The aperture size must be positive."
+        raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
     wall_h = max(4.0 * opening, 1.1 * depth)
@@ -194,10 +197,11 @@ def plot_aperture_result_geometry(
                 language=language,
                 **kwargs,
             )
-    raise ValueError(
+    msg = (
         "This result does not retain its geometry; call "
         "plot_aperture_geometry(depth, ...) with the original arguments."
     )
+    raise ValueError(msg)
 
 
 # ---------------------------------------------------------------------------
@@ -226,14 +230,16 @@ def plot_facade_elements(
     _check_language(language)
     tiles = list(elements)
     if not tiles:
-        raise ValueError("'elements' must contain at least one element.")
+        msg = "'elements' must contain at least one element."
+        raise ValueError(msg)
     areas: list[float] = []
     for element in tiles:
         area = getattr(element, "area", None)
         if area is None:
             areas.append(0.1)  # nominal tile for dn_e-rated elements
         elif float(area) <= 0.0:
-            raise ValueError("Element areas must be positive.")
+            msg = "Element areas must be positive."
+            raise ValueError(msg)
         else:
             areas.append(float(area))
     if ax is None:
@@ -291,10 +297,11 @@ def plot_facade_result_geometry(
 ) -> Axes:
     """Facade elevation for a prediction that retained its ``elements``."""
     if getattr(result, "elements", None) is None:
-        raise ValueError(
+        msg = (
             "This result does not retain its elements; call "
             "plot_facade_elements(elements) with the original sequence."
         )
+        raise ValueError(msg)
     return plot_facade_elements(result.elements, ax=ax, language=language, **kwargs)
 
 
@@ -333,7 +340,8 @@ def plot_double_wall_geometry(
     """
     _check_language(language)
     if mass1 <= 0.0 or mass2 <= 0.0 or gap <= 0.0:
-        raise ValueError("'mass1', 'mass2' and 'gap' must be positive.")
+        msg = "'mass1', 'mass2' and 'gap' must be positive."
+        raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
     t1 = mass1 / _LEAF_DENSITY
@@ -383,10 +391,11 @@ def plot_double_wall_result_geometry(
 ) -> Axes:
     """Double-wall drawing for a result that retained its geometry."""
     if result.mass1 is None or result.mass2 is None or result.gap is None:
-        raise ValueError(
+        msg = (
             "This result does not retain its double-wall geometry; call "
             "plot_double_wall_geometry(mass1, mass2, gap)."
         )
+        raise ValueError(msg)
     return plot_double_wall_geometry(
         result.mass1,
         result.mass2,

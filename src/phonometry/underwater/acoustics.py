@@ -50,7 +50,8 @@ _NO_ENERGY_MSG = "'pressure' has no energy."
 def _positive(value: float, name: str) -> float:
     scalar = float(value)
     if not np.isfinite(scalar) or scalar <= 0.0:
-        raise ValueError(f"'{name}' must be a positive, finite number.")
+        msg = f"'{name}' must be a positive, finite number."
+        raise ValueError(msg)
     return scalar
 
 
@@ -59,12 +60,15 @@ def _validate_pressure(
 ) -> NDArray[np.float64]:
     sig = np.asarray(pressure, dtype=np.float64)
     if sig.ndim != 1:
-        raise ValueError("'pressure' must be one-dimensional.")
+        msg = "'pressure' must be one-dimensional."
+        raise ValueError(msg)
     if sig.size < min_samples:
         plural = "sample" if min_samples == 1 else "samples"
-        raise ValueError(f"'pressure' must contain at least {min_samples} {plural}.")
+        msg = f"'pressure' must contain at least {min_samples} {plural}."
+        raise ValueError(msg)
     if not np.all(np.isfinite(sig)):
-        raise ValueError("'pressure' must be finite.")
+        msg = "'pressure' must be finite."
+        raise ValueError(msg)
     return apply_calibration(pressure, sig)
 
 

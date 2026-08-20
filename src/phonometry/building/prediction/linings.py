@@ -214,10 +214,11 @@ def lining_resonance_frequency(
     m1 = require_positive(base_mass_per_area, "base_mass_per_area")
     m2 = require_positive(lining_mass_per_area, "lining_mass_per_area")
     if (dynamic_stiffness is None) == (cavity_depth is None):
-        raise ValueError(
+        msg = (
             "Give exactly one of 'dynamic_stiffness' (Formula D.1) or "
             "'cavity_depth' (Formula D.2)."
         )
+        raise ValueError(msg)
     if dynamic_stiffness is not None:
         stiffness = require_positive(dynamic_stiffness, "dynamic_stiffness")
     else:
@@ -281,13 +282,15 @@ def weighted_lining_improvement(
     f0 = require_positive(resonance_frequency, "resonance_frequency")
     rw = float(base_rating)
     if not np.isfinite(rw):
-        raise ValueError("'base_rating' must be finite.")
+        msg = "'base_rating' must be finite."
+        raise ValueError(msg)
     low, high = _TABLE_D1_RANGE
     if not low <= f0 <= high:
-        raise ValueError(
+        msg = (
             f"'resonance_frequency' must lie in [{low:g}, {high:g}] Hz; "
             "ISO 12354-1 Table D.1 is not tabulated outside it."
         )
+        raise ValueError(msg)
     rw_low, rw_high = _TABLE_D1_RW_RANGE
     if not rw_low <= rw <= rw_high:
         warnings.warn(
@@ -433,13 +436,15 @@ def lining_improvement(
         ]
     if glued_area is not None:
         if system == "studs":
-            raise ValueError(
+            msg = (
                 "'glued_area' applies to the glued exterior systems of "
                 "Formulae (D.3)/(D.4); Formula (D.7) has no glued area."
             )
+            raise ValueError(msg)
         area = require_positive(glued_area, "glued_area")
         if area > 100.0:
-            raise ValueError("'glued_area' is a percentage and cannot exceed 100.")
+            msg = "'glued_area' is a percentage and cannot exceed 100."
+            raise ValueError(msg)
         slope, offset = _ANNEX_D_GLUE
         ratings = [value + slope * area + offset for value in ratings]
     return LiningImprovementResult(
@@ -481,9 +486,8 @@ def lining_improvement_in_situ(
     delta_lab = float(laboratory_improvement)
     rw = float(base_rating_in_situ)
     if not np.isfinite(delta_lab) or not np.isfinite(rw):
-        raise ValueError(
-            "'laboratory_improvement' and 'base_rating_in_situ' must be finite."
-        )
+        msg = "'laboratory_improvement' and 'base_rating_in_situ' must be finite."
+        raise ValueError(msg)
     f0 = require_positive(resonance_frequency, "resonance_frequency")
     slope, offset = _ANNEX_D8_A
     a = min(0.0, slope * float(np.log10(f0)) + offset)

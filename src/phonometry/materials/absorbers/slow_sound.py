@@ -233,7 +233,8 @@ def rectangular_duct_properties(
     p0 = air.atmospheric_pressure
     n = int(sum_terms)
     if n < 1:
-        raise ValueError("'sum_terms' must be at least 1.")
+        msg = "'sum_terms' must be at least 1."
+        raise ValueError(msg)
 
     kappa0 = gamma * p0
     omega = 2.0 * np.pi * np.atleast_1d(f).astype(np.float64)
@@ -312,9 +313,8 @@ def _slit_resonator_ducts(
 ) -> tuple[Complex, Complex, Complex, Complex, Complex, Complex, float]:
     """Duct parameters of the 2-D resonator (Sci. Rep. Eqs. (8)-(12))."""
     if slit_height is None or lattice_step is None:
-        raise ValueError(
-            "The 'slit' resonator geometry requires 'slit_height' and 'lattice_step'."
-        )
+        msg = "The 'slit' resonator geometry requires 'slit_height' and 'lattice_step'."
+        raise ValueError(msg)
     h = require_positive(slit_height, "slit_height")
     a = require_positive(lattice_step, "lattice_step")
     rho_n, kap_n = slit_effective_properties(f, slit_height=wn, air=air)
@@ -426,7 +426,8 @@ def helmholtz_resonator_impedance(
     lc = require_positive(resonator.cavity_length, "cavity_length")
     wc = require_positive(resonator.cavity_side, "cavity_side")
     if geometry not in ("square", "slit"):
-        raise ValueError("'geometry' must be 'square' or 'slit'.")
+        msg = "'geometry' must be 'square' or 'slit'."
+        raise ValueError(msg)
     omega = 2.0 * np.pi * f
     if geometry == "slit":
         rho_n, kap_n, rho_c, kap_c, z_n, z_c, dl = _slit_resonator_ducts(
@@ -666,17 +667,20 @@ def slit_helmholtz_absorber(
         resonators = (resonators,)
     res = tuple(resonators)
     if not res:
-        raise ValueError("'resonators' must contain at least one resonator.")
+        msg = "'resonators' must contain at least one resonator."
+        raise ValueError(msg)
     h = require_positive(slit_height, "slit_height")
     a = require_positive(lattice_step, "lattice_step")
     d = require_positive(period, "period")
     if h > d:
-        raise ValueError("'slit_height' must not exceed 'period'.")
+        msg = "'slit_height' must not exceed 'period'."
+        raise ValueError(msg)
     c0 = air.speed_of_sound
     rho0 = air.density
     theta = float(angle)
     if not 0.0 <= theta < np.pi / 2.0 - 1e-6:
-        raise ValueError("'angle' must satisfy 0 <= angle < pi/2 - 1e-6.")
+        msg = "'angle' must satisfy 0 <= angle < pi/2 - 1e-6."
+        raise ValueError(msg)
 
     omega = 2.0 * np.pi * f
     tm = _panel_transfer_matrix(
@@ -819,7 +823,8 @@ def critical_coupling_design(
     rho0 = air.density
     theta = float(angle)
     if not 0.0 <= theta < np.pi / 2.0 - 1e-6:
-        raise ValueError("'angle' must satisfy 0 <= angle < pi/2 - 1e-6.")
+        msg = "'angle' must satisfy 0 <= angle < pi/2 - 1e-6."
+        raise ValueError(msg)
     h_lo, h_hi = slit_height_bounds
     lc_lo, lc_hi = cavity_length_bounds
     cos_t = float(np.cos(theta))

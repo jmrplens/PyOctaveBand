@@ -206,10 +206,11 @@ def plot_zwicker_loudness_time(
     from .._i18n import format_number, localize_axes
 
     if result.time is None or result.loudness_vs_time is None:
-        raise ValueError(
+        msg = (
             "plot_zwicker_loudness_time() needs a time-varying result with "
             "'time' and 'loudness_vs_time'."
         )
+        raise ValueError(msg)
     ax_time = ax if ax is not None else _new_axes()
     time = np.asarray(result.time, dtype=np.float64)
     lvt = np.asarray(result.loudness_vs_time, dtype=np.float64)

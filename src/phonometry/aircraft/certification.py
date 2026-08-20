@@ -105,9 +105,11 @@ _PNL_FACTOR = 10.0 / np.log10(2.0)
 def _validate_spectrum(spl: NDArray[np.float64] | list[float]) -> NDArray[np.float64]:
     sig = np.asarray(spl, dtype=np.float64)
     if sig.shape != (24,):
-        raise ValueError("'spl' must contain the 24 one-third-octave-band levels.")
+        msg = "'spl' must contain the 24 one-third-octave-band levels."
+        raise ValueError(msg)
     if not np.all(np.isfinite(sig)):
-        raise ValueError("'spl' must be finite.")
+        msg = "'spl' must be finite."
+        raise ValueError(msg)
     return sig
 
 
@@ -345,7 +347,8 @@ def tone_correction(
     :raises ValueError: If the spectrum is not 24 finite levels.
     """
     if not 0 <= int(start_band) <= 3:
-        raise ValueError("'start_band' must be between 0 (50 Hz) and 3 (100 Hz).")
+        msg = "'start_band' must be between 0 (50 Hz) and 3 (100 Hz)."
+        raise ValueError(msg)
     _, excess = _tone_background(spl, start=int(start_band))
     factors = [_tone_factor(float(excess[i]), float(NOY_BANDS[i])) for i in range(24)]
     return float(max(factors))
@@ -428,7 +431,8 @@ def epnl_from_pnlt(
     """
     p = np.atleast_1d(np.asarray(pnlt, dtype=np.float64))
     if p.ndim != 1 or p.size < 1 or not np.all(np.isfinite(p)):
-        raise ValueError("'pnlt' must be a non-empty finite 1-D sequence.")
+        msg = "'pnlt' must be a non-empty finite 1-D sequence."
+        raise ValueError(msg)
     dt_raw = np.asarray(dt, dtype=np.float64)
     dt_arr = (
         np.full(p.shape, float(dt_raw.reshape(-1)[0])) if dt_raw.size == 1 else dt_raw
@@ -438,18 +442,19 @@ def epnl_from_pnlt(
         or np.any(dt_arr <= 0.0)
         or not np.all(np.isfinite(dt_arr))
     ):
-        raise ValueError("'dt' must be positive and match 'pnlt' in length.")
+        msg = "'dt' must be positive and match 'pnlt' in length."
+        raise ValueError(msg)
     if reference_time <= 0.0 or not np.isfinite(reference_time):
-        raise ValueError("'reference_time' must be a positive, finite number.")
+        msg = "'reference_time' must be a positive, finite number."
+        raise ValueError(msg)
 
     km = int(np.argmax(p))
     delta_b = 0.0
     if tone_corrections is not None:
         c = np.atleast_1d(np.asarray(tone_corrections, dtype=np.float64))
         if c.shape != p.shape or not np.all(np.isfinite(c)):
-            raise ValueError(
-                "'tone_corrections' must match 'pnlt' in length and be finite."
-            )
+            msg = "'tone_corrections' must match 'pnlt' in length and be finite."
+            raise ValueError(msg)
         t_mid = np.cumsum(dt_arr) - 0.5 * dt_arr
         window = c[np.abs(t_mid - t_mid[km]) <= 1.0 + 1e-9]
         delta_b = max(0.0, float(np.mean(window)) - float(c[km]))
@@ -542,9 +547,8 @@ class EPNLResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.annex16_epnl import render_annex16_epnl_report
 
         return render_annex16_epnl_report(
@@ -586,16 +590,19 @@ def effective_perceived_noise_level(
     """
     arr = np.asarray(spectra, dtype=np.float64)
     if arr.ndim != 2 or arr.shape[1] != 24 or arr.shape[0] < 1:
-        raise ValueError("'spectra' must have shape (K, 24).")
+        msg = "'spectra' must have shape (K, 24)."
+        raise ValueError(msg)
     if not np.all(np.isfinite(arr)):
-        raise ValueError("'spectra' must be finite.")
+        msg = "'spectra' must be finite."
+        raise ValueError(msg)
     start_band = _PROCEDURE_START_BAND.get(procedure)
     if start_band is None:
-        raise ValueError(
+        msg = (
             f"Unknown procedure {procedure!r}; use 'aeroplane' (tone "
             "correction from 80 Hz) or 'helicopter' (from 50 Hz, ICAO "
             "Annex 16 Vol I App. 2 4.3.1 Step 1)."
         )
+        raise ValueError(msg)
 
     pnl = np.array([perceived_noise_level(row) for row in arr])
     corr = np.array([tone_correction(row, start_band=start_band) for row in arr])

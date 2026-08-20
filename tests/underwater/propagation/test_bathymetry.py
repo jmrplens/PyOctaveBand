@@ -108,7 +108,8 @@ def _fold_wedge_ray(
     i = n_surf = n_bot = 0
     for _ in range(10_000):
         if abs(th) >= np.pi / 2:
-            raise AssertionError("the sampled grid must end before a reversal")
+            msg = "the sampled grid must end before a reversal"
+            raise AssertionError(msg)
         if th > 0:
             r_hit = (depth0 - z_seg + np.tan(th) * r0) / (np.tan(th) + tanb)
         elif th < 0:
@@ -130,7 +131,8 @@ def _fold_wedge_ray(
         else:
             th = -th
             n_surf += 1
-    raise AssertionError("the fold did not close")
+    msg = "the fold did not close"
+    raise AssertionError(msg)
 
 
 def test_the_wedge_trace_is_the_exact_folded_geometry() -> None:

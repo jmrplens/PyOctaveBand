@@ -71,7 +71,8 @@ def _moment(specific: np.ndarray, method: str) -> float:
     if method == "aures":
         num = float(np.sum(specific * _g_aures(_Z, n_total) * _Z) * _DZ)
         return num / n_total
-    raise ValueError("method must be 'din', 'aures' or 'bismarck'")
+    msg = "method must be 'din', 'aures' or 'bismarck'"
+    raise ValueError(msg)
 
 
 def reference_sound(
@@ -116,7 +117,8 @@ def _k_din() -> float:
     if _K_DIN is None:
         _K_DIN = 1.0 / _moment(_reference_specific(), "din")
         if not 0.105 <= _K_DIN < 0.115:  # pragma: no cover - sanity guard
-            raise RuntimeError(f"k={_K_DIN} outside the DIN 45692 range")
+            msg = f"k={_K_DIN} outside the DIN 45692 range"
+            raise RuntimeError(msg)
     return _K_DIN
 
 
@@ -133,14 +135,16 @@ def sharpness_din_from_specific(
     """
     specific = np.asarray(specific, dtype=np.float64)
     if specific.shape != (240,):
-        raise ValueError("specific must be the 240-bin ISO 532-1 pattern.")
+        msg = "specific must be the 240-bin ISO 532-1 pattern."
+        raise ValueError(msg)
     if method == "din":
         return _k_din() * _moment(specific, "din")
     if method in ("bismarck", "aures"):
         # Annex B (B.1)/(B.2): the published literal 0.11, NOT a derived
         # per-variant anchor -- see the _K_ANNEX_B note.
         return _K_ANNEX_B * _moment(specific, method)
-    raise ValueError("method must be 'din', 'aures' or 'bismarck'")
+    msg = "method must be 'din', 'aures' or 'bismarck'"
+    raise ValueError(msg)
 
 
 def sharpness_din(

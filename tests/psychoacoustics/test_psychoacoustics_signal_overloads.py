@@ -164,7 +164,8 @@ def _scalar(result: object) -> float:
     ):
         if hasattr(result, name):
             return float(np.asarray(getattr(result, name)).ravel()[0])
-    raise AssertionError(f"no scalar on {type(result).__name__}")
+    msg = f"no scalar on {type(result).__name__}"
+    raise AssertionError(msg)
 
 
 # ---------------------------------------------------------------------------

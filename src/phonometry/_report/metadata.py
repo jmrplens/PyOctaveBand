@@ -207,10 +207,11 @@ class ReportMetadata:
         if value is None:
             return
         if not ok(float(value)):
-            raise ValueError(
+            msg = (
                 f"ReportMetadata.{name} must be {description} when given; "
                 f"got {value!r}."
             )
+            raise ValueError(msg)
 
     def __post_init__(self) -> None:
         """Validate the supplied numeric fields by physical range."""
@@ -236,24 +237,27 @@ class ReportMetadata:
             # (a bool is an int in Python, so it is excluded explicitly) and
             # anything not strictly positive.
             if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
-                raise ValueError(
+                msg = (
                     f"ReportMetadata.{name} must be a positive integer when "
                     f"given; got {value!r}."
                 )
+                raise ValueError(msg)
         if self.required_class is not None and self.required_class not in (0, 1, 2):
-            raise ValueError(
+            msg = (
                 "ReportMetadata.required_class must be 0, 1 or 2 when given; "
                 f"got {self.required_class!r}."
             )
+            raise ValueError(msg)
         if self.tube_shape is not None and self.tube_shape not in (
             "circular",
             "rectangular",
             "square",
         ):
-            raise ValueError(
+            msg = (
                 "ReportMetadata.tube_shape must be 'circular', 'rectangular' "
                 f"or 'square' when given; got {self.tube_shape!r}."
             )
+            raise ValueError(msg)
 
     def is_empty(self) -> bool:
         """Return ``True`` when no field is set (an all-``None`` instance)."""

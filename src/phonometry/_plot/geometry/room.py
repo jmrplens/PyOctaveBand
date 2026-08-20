@@ -103,7 +103,8 @@ def plot_image_source_geometry(
 
     order_cap = min(int(result.max_order), 3) if max_order is None else int(max_order)
     if order_cap < 1:
-        raise ValueError("'max_order' must be >= 1.")
+        msg = "'max_order' must be >= 1."
+        raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
     lx, ly = float(result.dimensions[0]), float(result.dimensions[1])
@@ -212,7 +213,8 @@ def plot_open_plan_geometry(
     _check_language(language)
     pos = np.sort(np.asarray(positions, dtype=np.float64).ravel())
     if pos.size < 2 or np.any(pos <= 0.0):
-        raise ValueError("'positions' needs at least two positive distances.")
+        msg = "'positions' needs at least two positive distances."
+        raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
     span = float(pos.max())
@@ -293,10 +295,11 @@ def plot_open_plan_result_geometry(
 ) -> Axes:
     """Measurement-line drawing for a result that retained its positions."""
     if result.positions_m is None:
-        raise ValueError(
+        msg = (
             "This result does not retain its microphone positions; call "
             "plot_open_plan_geometry(positions)."
         )
+        raise ValueError(msg)
     return plot_open_plan_geometry(
         result.positions_m,
         ax=ax,

@@ -57,9 +57,11 @@ def _level_db(
 def _validate_level_input(x_proc: np.ndarray, calibration_factor: float) -> None:
     """Shared validation for the public level functions."""
     if x_proc.shape[-1] == 0:
-        raise ValueError("Input signal 'x' cannot be empty.")
+        msg = "Input signal 'x' cannot be empty."
+        raise ValueError(msg)
     if calibration_factor <= 0:
-        raise ValueError("'calibration_factor' must be positive.")
+        msg = "'calibration_factor' must be positive."
+        raise ValueError(msg)
 
 
 def leq(
@@ -154,7 +156,8 @@ def ln_levels(
     _validate_level_input(x_proc, calibration_factor)
     for value in n:
         if not 0 < value < 100:
-            raise ValueError("Percentile values in 'n' must be between 0 and 100.")
+            msg = "Percentile values in 'n' must be between 0 and 100."
+            raise ValueError(msg)
     if weighting is not None and weighting.upper() != "Z":
         x_proc = weighting_filter(x_proc, fs, weighting)
 
@@ -214,7 +217,8 @@ def lc_peak(
     :return: Scalar for 1D input, array of shape (channels,) for 2D input.
     """
     if not isinstance(oversample, (int, np.integer)) or oversample < 1:
-        raise ValueError("oversample must be an integer >= 1.")
+        msg = "oversample must be an integer >= 1."
+        raise ValueError(msg)
     fs = _resolve_fs(x, fs)
     calibration_factor = _resolve_calibration(x, calibration_factor)
     x_proc = _resolve_samples_raw(x, calibrate=False)
@@ -260,7 +264,8 @@ def sel(
     x_proc = _resolve_samples_raw(x, calibrate=False)
     _validate_level_input(x_proc, calibration_factor)
     if fs <= 0:
-        raise ValueError("Sample rate 'fs' must be positive.")
+        msg = "Sample rate 'fs' must be positive."
+        raise ValueError(msg)
     if weighting is not None and weighting.upper() != "Z":
         x_proc = weighting_filter(x_proc, fs, weighting)
     duration_s = x_proc.shape[-1] / fs
@@ -300,7 +305,8 @@ def sound_exposure(
     x_proc = _resolve_samples_raw(x, calibrate=False)
     _validate_level_input(x_proc, calibration)
     if duration_hours is not None and duration_hours <= 0:
-        raise ValueError("'duration_hours' must be positive.")
+        msg = "'duration_hours' must be positive."
+        raise ValueError(msg)
     p_a = weighting_filter(x_proc, fs, "A") * calibration
     mean_square = np.mean(p_a**2, axis=-1)
     hours = (

@@ -320,9 +320,8 @@ def _params(name: str) -> _WParams:
     try:
         return _WEIGHTINGS[name]
     except KeyError:
-        raise ValueError(
-            f"Unknown weighting {name!r}; choose from {', '.join(WEIGHTING_NAMES)}."
-        ) from None
+        msg = f"Unknown weighting {name!r}; choose from {', '.join(WEIGHTING_NAMES)}."
+        raise ValueError(msg) from None
 
 
 def _weighting_response(name: str, freq: Real) -> Complex:
@@ -420,7 +419,8 @@ def frequency_weighting(name: str, frequencies: ArrayLike) -> WeightingResponse:
     """
     freq = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if freq.ndim != 1 or freq.size == 0:
-        raise ValueError("'frequencies' must be a non-empty 1-D array.")
+        msg = "'frequencies' must be a non-empty 1-D array."
+        raise ValueError(msg)
     resp = _weighting_response(name, freq)
     mag = np.abs(resp)
     with np.errstate(divide="ignore"):
@@ -551,10 +551,11 @@ def weighted_acceleration(
     accel = np.atleast_1d(np.asarray(band_accelerations, dtype=np.float64))
     freq = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if accel.ndim != 1 or accel.size == 0 or accel.shape != freq.shape:
-        raise ValueError(
+        msg = (
             "'band_accelerations' and 'frequencies' must be non-empty, 1-D and "
             "equal-length."
         )
+        raise ValueError(msg)
     factors = weighting_factors(weighting, freq)
     weighted = factors * accel
     overall = float(np.sqrt(np.sum(weighted**2)))
@@ -581,7 +582,8 @@ def _weighted_signal(signal: SignalInput) -> Real:
     """
     x = np.asarray(resolve_samples(signal, calibrate=False), dtype=np.float64)
     if x.ndim != 1 or x.size == 0:
-        raise ValueError("'signal' must be a non-empty 1-D array.")
+        msg = "'signal' must be a non-empty 1-D array."
+        raise ValueError(msg)
     return x
 
 
@@ -589,7 +591,8 @@ def _positive_fs(fs: float) -> float:
     """Return ``fs`` as a positive, finite float or raise ``ValueError``."""
     fs = float(fs)
     if not math.isfinite(fs) or fs <= 0.0:
-        raise ValueError("'fs' must be a positive, finite sampling frequency.")
+        msg = "'fs' must be a positive, finite sampling frequency."
+        raise ValueError(msg)
     return fs
 
 
@@ -622,7 +625,8 @@ def running_rms(
     fs = _positive_fs(fs)
     tau = float(integration_time)
     if not math.isfinite(tau) or tau <= 0.0:
-        raise ValueError("'integration_time' must be positive and finite.")
+        msg = "'integration_time' must be positive and finite."
+        raise ValueError(msg)
     power = x**2
     if method == "linear":
         window = max(1, round(tau * fs))
@@ -639,7 +643,8 @@ def running_rms(
         alpha = 1.0 - math.exp(-1.0 / (tau * fs))
         mean_power = sig.lfilter([alpha], [1.0, -(1.0 - alpha)], power)
     else:
-        raise ValueError("'method' must be 'linear' or 'exponential'.")
+        msg = "'method' must be 'linear' or 'exponential'."
+        raise ValueError(msg)
     return np.sqrt(mean_power)
 
 
@@ -770,13 +775,15 @@ def vibration_total_value(
     """
     comp = np.atleast_1d(np.asarray(components, dtype=np.float64))
     if comp.ndim != 1 or comp.size == 0:
-        raise ValueError("'components' must be a non-empty 1-D array.")
+        msg = "'components' must be a non-empty 1-D array."
+        raise ValueError(msg)
     if k is None:
         factors = np.ones_like(comp)
     else:
         factors = np.atleast_1d(np.asarray(k, dtype=np.float64))
         if factors.shape != comp.shape:
-            raise ValueError("'k' must have the same length as 'components'.")
+            msg = "'k' must have the same length as 'components'."
+            raise ValueError(msg)
     return float(np.sqrt(np.sum((factors * comp) ** 2)))
 
 
@@ -803,7 +810,8 @@ def wbv_exposure_basis(a_wx: float, a_wy: float, a_wz: float) -> float:
     """
     values = (float(a_wx), float(a_wy), float(a_wz))
     if any(not math.isfinite(v) or v < 0.0 for v in values):
-        raise ValueError("The axis r.m.s. accelerations must be non-negative.")
+        msg = "The axis r.m.s. accelerations must be non-negative."
+        raise ValueError(msg)
     return max(1.4 * values[0], 1.4 * values[1], values[2])
 
 
@@ -823,7 +831,8 @@ def daily_exposure(total_value: float, duration_s: float) -> float:
     a = float(total_value)
     t = float(duration_s)
     if a < 0.0 or t < 0.0:
-        raise ValueError("'total_value' and 'duration_s' must be non-negative.")
+        msg = "'total_value' and 'duration_s' must be non-negative."
+        raise ValueError(msg)
     return a * math.sqrt(t / REFERENCE_DURATION_S)
 
 
@@ -842,7 +851,8 @@ def combine_partial_exposures(partials: ArrayLike) -> float:
     """
     parts = np.atleast_1d(np.asarray(partials, dtype=np.float64))
     if parts.ndim != 1 or parts.size == 0:
-        raise ValueError("'partials' must be a non-empty 1-D array.")
+        msg = "'partials' must be a non-empty 1-D array."
+        raise ValueError(msg)
     return float(np.sqrt(np.sum(parts**2)))
 
 
@@ -863,11 +873,13 @@ def hav_daily_exposure(
     ahv = np.atleast_1d(np.asarray(total_values, dtype=np.float64))
     t = np.atleast_1d(np.asarray(durations_s, dtype=np.float64))
     if ahv.ndim != 1 or ahv.size == 0 or ahv.shape != t.shape:
-        raise ValueError(
+        msg = (
             "'total_values' and 'durations_s' must be non-empty, 1-D and equal-length."
         )
+        raise ValueError(msg)
     if np.any(ahv < 0.0) or np.any(t < 0.0):
-        raise ValueError("'total_values' and 'durations_s' must be non-negative.")
+        msg = "'total_values' and 'durations_s' must be non-negative."
+        raise ValueError(msg)
     return float(np.sqrt(np.sum(ahv**2 * t) / REFERENCE_DURATION_S))
 
 
@@ -888,14 +900,15 @@ def energy_equivalent_acceleration(
     a = np.atleast_1d(np.asarray(magnitudes, dtype=np.float64))
     t = np.atleast_1d(np.asarray(durations_s, dtype=np.float64))
     if a.ndim != 1 or a.size == 0 or a.shape != t.shape:
-        raise ValueError(
-            "'magnitudes' and 'durations_s' must be non-empty, 1-D and equal-length."
-        )
+        msg = "'magnitudes' and 'durations_s' must be non-empty, 1-D and equal-length."
+        raise ValueError(msg)
     if np.any(t < 0.0):
-        raise ValueError("'durations_s' must be non-negative.")
+        msg = "'durations_s' must be non-negative."
+        raise ValueError(msg)
     total = float(np.sum(t))
     if total <= 0.0:
-        raise ValueError("The total duration must be positive.")
+        msg = "The total duration must be positive."
+        raise ValueError(msg)
     return float(np.sqrt(np.sum(a**2 * t) / total))
 
 
@@ -913,7 +926,8 @@ def hav_vwf_lifetime_years(a8: float) -> float:
     """
     a = float(a8)
     if not math.isfinite(a) or a <= 0.0:
-        raise ValueError("'a8' must be a positive daily exposure.")
+        msg = "'a8' must be a positive daily exposure."
+        raise ValueError(msg)
     return float(31.8 * a**-1.06)
 
 
@@ -963,7 +977,8 @@ def exposure_assessment(
     """
     v = float(value)
     if v < 0.0:
-        raise ValueError("'value' must be non-negative.")
+        msg = "'value' must be non-negative."
+        raise ValueError(msg)
     if kind == "hav" and metric == "a8":
         eav, elv = HAV_EAV_A8, HAV_ELV_A8
     elif kind == "wbv" and metric == "a8":
@@ -971,9 +986,8 @@ def exposure_assessment(
     elif kind == "wbv" and metric == "vdv":
         eav, elv = WBV_EAV_VDV, WBV_ELV_VDV
     else:
-        raise ValueError(
-            "kind must be 'hav' or 'wbv'; metric 'a8' (both) or 'vdv' (wbv only)."
-        )
+        msg = "kind must be 'hav' or 'wbv'; metric 'a8' (both) or 'vdv' (wbv only)."
+        raise ValueError(msg)
     exceeds_action = v >= eav
     exceeds_limit = v >= elv
     if exceeds_limit:
@@ -1078,9 +1092,8 @@ class DailyVibrationExposure:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.human_vibration import render_human_vibration_report
 
         return render_human_vibration_report(
@@ -1121,15 +1134,17 @@ def daily_vibration_exposure(
     ahv = np.atleast_1d(np.asarray(total_values, dtype=np.float64))
     t = np.atleast_1d(np.asarray(durations_s, dtype=np.float64))
     if ahv.ndim != 1 or ahv.size == 0 or ahv.shape != t.shape:
-        raise ValueError(
+        msg = (
             "'total_values' and 'durations_s' must be non-empty, 1-D and equal-length."
         )
+        raise ValueError(msg)
     if labels is None:
         labels = tuple(f"op {i + 1}" for i in range(ahv.size))
     else:
         labels = tuple(labels)
         if len(labels) != ahv.size:
-            raise ValueError("'labels' must match the number of operations.")
+            msg = "'labels' must match the number of operations."
+            raise ValueError(msg)
     partials = np.array(
         [daily_exposure(float(a), float(dt)) for a, dt in zip(ahv, t)],
         dtype=np.float64,

@@ -108,7 +108,8 @@ def open_microphone_correction(open_microphones: int) -> float:
     """
     n = int(open_microphones)
     if n != open_microphones or n < 1:
-        raise ValueError("'open_microphones' must be an integer of at least 1.")
+        msg = "'open_microphones' must be an integer of at least 1."
+        raise ValueError(msg)
     return 10.0 * math.log10(n)
 
 
@@ -140,7 +141,8 @@ def feedback_loop_gain(
         float(microphone_directivity),
     )
     if not all(math.isfinite(v) for v in values):
-        raise ValueError("Levels and the directivity index must be finite.")
+        msg = "Levels and the directivity index must be finite."
+        raise ValueError(msg)
     l_hm, l_hl, d_m = values
     return l_hm - l_hl + d_m
 
@@ -246,10 +248,12 @@ def feedback_stability(
     """
     z_s = float(open_loop_gain)
     if not math.isfinite(z_s):
-        raise ValueError("'open_loop_gain' must be finite.")
+        msg = "'open_loop_gain' must be finite."
+        raise ValueError(msg)
     margin_required = float(stability_margin)
     if not math.isfinite(margin_required) or margin_required < 0.0:
-        raise ValueError("'stability_margin' must be finite and non-negative.")
+        msg = "'stability_margin' must be finite and non-negative."
+        raise ValueError(msg)
 
     g_s = feedback_loop_gain(
         level_loudspeaker_at_microphone,

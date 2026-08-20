@@ -114,20 +114,23 @@ def noise_signal(
     """
     fs_v = float(fs)
     if not np.isfinite(fs_v) or fs_v <= 0.0:
-        raise ValueError("'fs' must be a positive, finite number.")
+        msg = "'fs' must be a positive, finite number."
+        raise ValueError(msg)
     seconds_v = float(seconds)
     if not np.isfinite(seconds_v) or seconds_v <= 0.0:
-        raise ValueError("'seconds' must be a positive, finite number.")
+        msg = "'seconds' must be a positive, finite number."
+        raise ValueError(msg)
     n = round(fs_v * seconds_v)
     if n < 16:
-        raise ValueError(f"'fs'*'seconds' must give at least 16 samples, got {n}.")
+        msg = f"'fs'*'seconds' must give at least 16 samples, got {n}."
+        raise ValueError(msg)
     if color not in _COLOR_EXPONENTS:
-        raise ValueError(
-            "'color' must be one of 'white', 'pink', 'red', 'blue', 'violet'."
-        )
+        msg = "'color' must be one of 'white', 'pink', 'red', 'blue', 'violet'."
+        raise ValueError(msg)
     rms_v = float(rms)
     if not np.isfinite(rms_v) or rms_v <= 0.0:
-        raise ValueError("'rms' must be a positive, finite number.")
+        msg = "'rms' must be a positive, finite number."
+        raise ValueError(msg)
 
     rng = np.random.default_rng(seed)
     x = rng.standard_normal(n)
@@ -144,7 +147,8 @@ def noise_signal(
     x = x - float(np.mean(x))
     scale = float(np.sqrt(np.mean(x * x)))
     if scale <= 0.0:  # pragma: no cover - white Gaussian is never all-zero
-        raise ValueError("Degenerate all-zero record; use another seed.")
+        msg = "Degenerate all-zero record; use another seed."
+        raise ValueError(msg)
     return np.asarray(x * (rms_v / scale), dtype=np.float64)
 
 
@@ -165,11 +169,14 @@ def _validate_1d_finite(
     """
     xa = np.asarray(x, dtype=np.float64)
     if xa.ndim != 1:
-        raise ValueError(f"'{name}' must be one-dimensional.")
+        msg = f"'{name}' must be one-dimensional."
+        raise ValueError(msg)
     if xa.size < 2:
-        raise ValueError(f"'{name}' must have at least 2 samples.")
+        msg = f"'{name}' must have at least 2 samples."
+        raise ValueError(msg)
     if not np.all(np.isfinite(xa)):
-        raise ValueError(f"'{name}' must be finite.")
+        msg = f"'{name}' must be finite."
+        raise ValueError(msg)
     return apply_calibration(x, xa)
 
 
@@ -247,17 +254,21 @@ def _tone_burst_scalars(
     fs_v = _positive(fs, "fs")
     f_v = _positive(frequency, "frequency")
     if f_v >= fs_v / 2.0:
-        raise ValueError("'frequency' must be below the Nyquist rate fs/2.")
+        msg = "'frequency' must be below the Nyquist rate fs/2."
+        raise ValueError(msg)
     cycles_v = int(cycles)
     if cycles_v != cycles or cycles_v < 1:
-        raise ValueError("'cycles' must be a positive integer.")
+        msg = "'cycles' must be a positive integer."
+        raise ValueError(msg)
     amplitude_v = _positive(amplitude, "amplitude")
     repetitions_v = int(repetitions)
     if repetitions_v != repetitions or repetitions_v < 1:
-        raise ValueError("'repetitions' must be a positive integer.")
+        msg = "'repetitions' must be a positive integer."
+        raise ValueError(msg)
     for name, value in (("pre_silence", pre_silence), ("post_silence", post_silence)):
         if not np.isfinite(float(value)) or float(value) < 0.0:
-            raise ValueError(f"'{name}' must be a non-negative, finite number.")
+            msg = f"'{name}' must be a non-negative, finite number."
+            raise ValueError(msg)
     return fs_v, f_v, cycles_v, amplitude_v, repetitions_v
 
 
@@ -273,15 +284,17 @@ def _tone_burst_period(
     """
     if repetition_rate is None:
         if repetitions_v > 1:
-            raise ValueError("'repetition_rate' is required when 'repetitions' > 1.")
+            msg = "'repetition_rate' is required when 'repetitions' > 1."
+            raise ValueError(msg)
         return None, None, None
     rate_v = _positive(repetition_rate, "repetition_rate")
     period = round(fs_v / rate_v)
     if period < n_on:
-        raise ValueError(
+        msg = (
             "The burst does not fit in one repetition period: "
             f"{n_on} samples per burst, {period} per period."
         )
+        raise ValueError(msg)
     return rate_v, period, n_on / period
 
 
@@ -347,9 +360,8 @@ def tone_burst(
     exact_samples = fs_v * burst_seconds
     n_on = round(exact_samples)
     if n_on < 2:
-        raise ValueError(
-            "The burst is shorter than 2 samples; increase 'cycles' or 'fs'."
-        )
+        msg = "The burst is shorter than 2 samples; increase 'cycles' or 'fs'."
+        raise ValueError(msg)
     rate_v, period, duty = _tone_burst_period(
         fs_v, n_on, repetitions_v, repetition_rate
     )
@@ -526,21 +538,25 @@ def resample_signal(
     fs_new_v = _positive(fs_new, "fs_new")
     atten = float(stopband_attenuation_db)
     if not np.isfinite(atten) or atten < 30.0:
-        raise ValueError("'stopband_attenuation_db' must be at least 30 dB.")
+        msg = "'stopband_attenuation_db' must be at least 30 dB."
+        raise ValueError(msg)
     tw = float(transition_width)
     if not np.isfinite(tw) or not 0.0 < tw <= 0.5:
-        raise ValueError("'transition_width' must be in (0, 0.5].")
+        msg = "'transition_width' must be in (0, 0.5]."
+        raise ValueError(msg)
     max_den = int(max_denominator)
     if max_den < 1:
-        raise ValueError("'max_denominator' must be a positive integer.")
+        msg = "'max_denominator' must be a positive integer."
+        raise ValueError(msg)
 
     ratio = Fraction(fs_new_v / fs_v).limit_denominator(max_den)
     up, down = ratio.numerator, ratio.denominator
     if up == 0 or abs(up / down - fs_new_v / fs_v) > 1e-9 * (fs_new_v / fs_v):
-        raise ValueError(
+        msg = (
             f"'fs_new'/'fs' = {fs_new_v / fs_v!r} is not a rational ratio "
             f"with denominator <= {max_den}."
         )
+        raise ValueError(msg)
 
     if up == down:  # Same rate: nothing to do, and nothing to filter.
         return ResampledSignalResult(
@@ -678,14 +694,17 @@ def fractional_delay(
     xa = _validate_1d_finite(x, "x")
     delay_v = float(delay)
     if not np.isfinite(delay_v):
-        raise ValueError("'delay' must be a finite number.")
+        msg = "'delay' must be a finite number."
+        raise ValueError(msg)
     if abs(delay_v) >= xa.size:
-        raise ValueError(
+        msg = (
             "'delay' magnitude must be smaller than the record length "
             f"({xa.size} samples)."
         )
+        raise ValueError(msg)
     if mode not in ("linear", "circular"):
-        raise ValueError("'mode' must be 'linear' or 'circular'.")
+        msg = "'mode' must be 'linear' or 'circular'."
+        raise ValueError(msg)
     if mode == "linear":
         # A delay is a negative advance; float negation is exact, so the
         # phase ramp is bit-identical to the alignment kernel's.

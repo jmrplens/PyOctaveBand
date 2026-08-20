@@ -90,7 +90,8 @@ def _as_array(value: float | Sequence[float] | np.ndarray, name: str) -> np.ndar
     """Return *value* as a 1-D float array, raising on non-finite entries."""
     arr = np.atleast_1d(np.asarray(value, dtype=np.float64))
     if not np.all(np.isfinite(arr)):
-        raise ValueError(f"'{name}' must contain only finite numbers.")
+        msg = f"'{name}' must contain only finite numbers."
+        raise ValueError(msg)
     return arr
 
 
@@ -124,15 +125,17 @@ class FacadeElement:
             k for k in ("r", "dn_e", "insertion_loss") if getattr(self, k) is not None
         ]
         if len(given) != 1:
-            raise ValueError(
+            msg = (
                 f"Element '{self.name}': give exactly one of r / dn_e / insertion_loss."
             )
+            raise ValueError(msg)
         return given[0]
 
     def tau(self, total_area: float, n_bands: int) -> np.ndarray:
         """Transmission factor ``τ`` of this element for the whole façade area."""
         if total_area <= 0:
-            raise ValueError("'total_area' (façade area S) must be positive.")
+            msg = "'total_area' (façade area S) must be positive."
+            raise ValueError(msg)
         kind = self._kind()
         raw = getattr(self, kind)  # the one non-None quantity, per _kind()
         label = f"{self.name} ({kind})"
@@ -141,13 +144,15 @@ class FacadeElement:
             weight = _A0 / total_area
         else:
             if self.area is None or self.area <= 0:
-                raise ValueError(f"Element '{self.name}': 'area' must be positive.")
+                msg = f"Element '{self.name}': 'area' must be positive."
+                raise ValueError(msg)
             level = _as_array(raw, label)
             weight = self.area / total_area
         if level.size == 1:
             level = np.full(n_bands, float(level[0]))
         if level.size != n_bands:
-            raise ValueError(f"Element '{self.name}': expected {n_bands} bands.")
+            msg = f"Element '{self.name}': expected {n_bands} bands."
+            raise ValueError(msg)
         return weight * 10.0 ** (-level / 10.0)
 
 
@@ -159,7 +164,8 @@ def _band_count(elements: Sequence[FacadeElement]) -> int:
         sizes.add(_as_array(getattr(el, kind), f"{el.name} ({kind})").size)
     sizes.discard(1)
     if len(sizes) > 1:
-        raise ValueError("Elements have inconsistent band counts.")
+        msg = "Elements have inconsistent band counts."
+        raise ValueError(msg)
     return sizes.pop() if sizes else 1
 
 
@@ -275,9 +281,8 @@ class FacadePredictionResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iso12354 import render_iso12354_facade_report
 
         return render_iso12354_facade_report(
@@ -334,14 +339,15 @@ def _apparent_reduction(
 ) -> tuple[np.ndarray, dict[str, np.ndarray]]:
     r""":math:`R' = -10 \log_{10}(\sum \tau)` (F. 10 / Part 4 F. 3), plus ``Rp``."""
     if not elements:
-        raise ValueError("At least one façade element is required.")
+        msg = "At least one façade element is required."
+        raise ValueError(msg)
     if total_area <= 0:
-        raise ValueError("'area' (total façade area S) must be positive.")
+        msg = "'area' (total façade area S) must be positive."
+        raise ValueError(msg)
     names = [el.name for el in elements]
     if len(set(names)) != len(names):
-        raise ValueError(
-            "Façade element names must be unique (they key the per-element results)."
-        )
+        msg = "Façade element names must be unique (they key the per-element results)."
+        raise ValueError(msg)
     n = _band_count(elements)
     # Sum over the element list (not a name-keyed dict), so no element is ever
     # silently dropped, then key the per-element index by the unique names.
@@ -393,13 +399,15 @@ def facade_sound_reduction(
     delta = float(delta_l_fs)
     v = float(volume)
     if v <= 0:
-        raise ValueError("'volume' must be positive.")
+        msg = "'volume' must be positive."
+        raise ValueError(msg)
     r_prime, element_r = _apparent_reduction(elements, float(area))
     if frequencies is not None and len(frequencies) != r_prime.size:
-        raise ValueError(
+        msg = (
             f"'frequencies' has {len(frequencies)} entries but the elements imply "
             f"{r_prime.size} bands."
         )
+        raise ValueError(msg)
     r_45 = r_prime + 1.0
     r_tr_s = r_prime.copy()
     d_2m_nt = r_prime + delta + 10.0 * log10(v / (6.0 * _T0 * float(area)))
@@ -461,12 +469,14 @@ def radiated_sound_power(
     if lp.size == 1:
         lp = np.full(r_prime.size, float(lp[0]))
     if lp.size != r_prime.size:
-        raise ValueError("'lp_in' must match the element band count.")
+        msg = "'lp_in' must match the element band count."
+        raise ValueError(msg)
     if octave_bands is not None and len(octave_bands) != r_prime.size:
-        raise ValueError(
+        msg = (
             f"'octave_bands' has {len(octave_bands)} entries but the elements imply "
             f"{r_prime.size} bands."
         )
+        raise ValueError(msg)
     l_w = lp + float(c_d) - r_prime + 10.0 * log10(float(area) / _S0)
 
     l_w_dba: float | None = None
@@ -503,7 +513,8 @@ def outdoor_attenuation(width: float, height: float, distance: float) -> float:
     """
     w, h, d = float(width), float(height), float(distance)
     if min(w, h, d) <= 0:
-        raise ValueError("width, height and distance must be positive.")
+        msg = "width, height and distance must be positive."
+        raise ValueError(msg)
     area = w * h
     if d > max(w, h):
         return float(-10.0 * log10(_S0 / (pi * d * d)))  # (E.2b)
@@ -569,13 +580,16 @@ def facade_shape_level_difference(
         rows = _DELTA_LFS[shape]
     except KeyError:
         valid = ", ".join(sorted(_DELTA_LFS))
-        raise ValueError(f"Unknown facade shape {shape!r}. Valid: {valid}.") from None
+        msg = f"Unknown facade shape {shape!r}. Valid: {valid}."
+        raise ValueError(msg) from None
     h = float(line_of_sight)
     aw = float(absorption)
     if not (np.isfinite(h) and h >= 0.0):
-        raise ValueError("'line_of_sight' must be a non-negative height in m.")
+        msg = "'line_of_sight' must be a non-negative height in m."
+        raise ValueError(msg)
     if not (np.isfinite(aw) and 0.0 <= aw <= 1.0):
-        raise ValueError("'absorption' must be an αw between 0 and 1.")
+        msg = "'absorption' must be an αw between 0 and 1."
+        raise ValueError(msg)
     if h < 1.5:
         row_index = 0
     elif h <= 2.5:
@@ -584,10 +598,11 @@ def facade_shape_level_difference(
         row_index = 2
     row = rows[row_index]
     if row is None:
-        raise ValueError(
+        msg = (
             f"Figure C.2 marks shape {shape!r} as 'does not apply' for a "
             f"line-of-sight height of {h:g} m."
         )
+        raise ValueError(msg)
     return float(np.interp(aw, _DLFS_ALPHAS, row))
 
 
@@ -612,7 +627,6 @@ def outdoor_level(
     try:
         diff = lw - at  # NumPy broadcasting (scalar vs array is allowed)
     except ValueError as exc:
-        raise ValueError(
-            "'l_w' and 'attenuation' must have broadcast-compatible shapes."
-        ) from exc
+        msg = "'l_w' and 'attenuation' must have broadcast-compatible shapes."
+        raise ValueError(msg) from exc
     return float(10.0 * np.log10(np.sum(10.0 ** (diff / 10.0))))

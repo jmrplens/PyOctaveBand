@@ -109,16 +109,18 @@ def _a_weighting_corrections(frequencies: np.ndarray) -> np.ndarray:
     ck = []
     for freq in nominal:
         if freq not in table:
-            raise ValueError(
+            msg = (
                 f"No ISO 3744 Annex E A-weighting value for {freq} Hz; "
                 "expected a nominal octave or one-third-octave mid-band "
                 "frequency (50 Hz to 10 kHz)."
             )
+            raise ValueError(msg)
         ck.append(table[freq])
     return np.asarray(ck, dtype=np.float64)
 
 
 def _check_grade(grade: str) -> Grade:
     if grade not in ("engineering", "survey"):
-        raise ValueError("'grade' must be 'engineering' or 'survey'.")
+        msg = "'grade' must be 'engineering' or 'survey'."
+        raise ValueError(msg)
     return cast(Grade, grade)

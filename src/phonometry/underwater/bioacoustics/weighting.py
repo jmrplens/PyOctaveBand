@@ -506,9 +506,8 @@ def check_guidance(guidance: str) -> str:
     """
     key = str(guidance).strip().lower().replace("_", "-")
     if key not in _PARAMETERS:
-        raise ValueError(
-            f"'guidance' must be one of {WEIGHTING_GUIDANCE}, got {guidance!r}."
-        )
+        msg = f"'guidance' must be one of {WEIGHTING_GUIDANCE}, got {guidance!r}."
+        raise ValueError(msg)
     return key
 
 
@@ -536,10 +535,11 @@ def weighting_parameters(
     table = _PARAMETERS[key]
     name = str(group).strip().upper()
     if name not in table:
-        raise ValueError(
+        msg = (
             f"'group' must be one of {tuple(table)} for guidance {key!r}, got {group!r}."
             " Group codes are not portable between guidance versions."
         )
+        raise ValueError(msg)
     return table[name]
 
 
@@ -597,9 +597,11 @@ def _positive_frequencies(
 ) -> NDArray[np.float64]:
     f = np.array(frequency_hz, dtype=np.float64, copy=True, ndmin=1)
     if f.size == 0 or not np.all(np.isfinite(f)):
-        raise ValueError("'frequency_hz' must be finite and non-empty.")
+        msg = "'frequency_hz' must be finite and non-empty."
+        raise ValueError(msg)
     if np.any(f <= 0.0):
-        raise ValueError("'frequency_hz' must be strictly positive.")
+        msg = "'frequency_hz' must be strictly positive."
+        raise ValueError(msg)
     return f
 
 
@@ -785,16 +787,17 @@ def weighted_exposure(
     f = _positive_frequencies(frequency_hz)
     sel = np.array(band_sel, dtype=np.float64, copy=True, ndmin=1)
     if sel.shape != f.shape:
-        raise ValueError("'band_sel' must have the same length as 'frequency_hz'.")
+        msg = "'band_sel' must have the same length as 'frequency_hz'."
+        raise ValueError(msg)
     # -inf is admitted as the level of a band that carries no energy (see
     # StrikeSelSpectrum.band_sel); it is the neutral element of the energy sum.
     if np.any(np.isnan(sel)) or np.any(sel == np.inf):
-        raise ValueError(
-            "'band_sel' must be finite, or -inf for a band with no energy."
-        )
+        msg = "'band_sel' must be finite, or -inf for a band with no energy."
+        raise ValueError(msg)
     n_float = float(n_events)
     if not n_float.is_integer() or int(n_float) < 1:
-        raise ValueError("'n_events' must be a whole number of events, at least 1.")
+        msg = "'n_events' must be a whole number of events, at least 1."
+        raise ValueError(msg)
     n = int(n_float)
 
     weights = auditory_weighting(f, group, guidance=guidance)
@@ -807,7 +810,8 @@ def weighted_exposure(
     if peak_spl is not None:
         peak = float(peak_spl)
         if not np.isfinite(peak):
-            raise ValueError("'peak_spl' must be finite.")
+            msg = "'peak_spl' must be finite."
+            raise ValueError(msg)
 
     sel_margin = _margin(cumulative, criteria.injury_sel)
     tts_margin = _margin(cumulative, criteria.tts_sel)

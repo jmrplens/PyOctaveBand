@@ -135,9 +135,11 @@ def _write(source: pathlib.Path, destination: pathlib.Path) -> None:
             path = source / relative
             fs, samples = wavfile.read(path)
             if fs != _FS:
-                raise SystemExit(f"{relative}: expected {_FS} Hz, got {fs}")
+                msg = f"{relative}: expected {_FS} Hz, got {fs}"
+                raise SystemExit(msg)
             if samples.dtype != np.int16 or samples.ndim != 1:
-                raise SystemExit(f"{relative}: expected 16-bit mono PCM")
+                msg = f"{relative}: expected 16-bit mono PCM"
+                raise SystemExit(msg)
             order = best_order(samples)
             member = f"{relative}.i4"
             archive.writestr(_member(member), encode(samples, order))
@@ -175,7 +177,8 @@ def _write(source: pathlib.Path, destination: pathlib.Path) -> None:
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        raise SystemExit(f"usage: {sys.argv[0]} <stipa-verification-directory>")
+        msg = f"usage: {sys.argv[0]} <stipa-verification-directory>"
+        raise SystemExit(msg)
     build(
         pathlib.Path(sys.argv[1]),
         pathlib.Path(__file__).with_name("stipa_certified_extract.zip"),

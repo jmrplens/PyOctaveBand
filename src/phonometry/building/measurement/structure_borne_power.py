@@ -179,11 +179,13 @@ def structure_borne_power_level(
     reference_velocity = require_positive(reference_velocity, "reference_velocity")
     f = np.asarray(frequency, dtype=np.float64)
     if np.any(f <= 0.0):
-        raise ValueError("'frequency' must be positive.")
+        msg = "'frequency' must be positive."
+        raise ValueError(msg)
     lv = np.asarray(velocity_level, dtype=np.float64)
     eta = np.asarray(loss_factor, dtype=np.float64)
     if not np.all(np.isfinite(eta)) or np.any(eta <= 0.0):
-        raise ValueError("'loss_factor' must contain positive, finite values.")
+        msg = "'loss_factor' must contain positive, finite values."
+        raise ValueError(msg)
     offset = 10.0 * np.log10(reference_velocity**2 / REFERENCE_SOUND_POWER)
     lw = 10.0 * np.log10(2.0 * np.pi * f * eta * mass_per_area * area) + lv + offset
     return np.asarray(lw, dtype=np.float64)
@@ -283,9 +285,8 @@ class StructureBornePowerResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.en15657 import render_structure_borne_power_report
 
         return render_structure_borne_power_report(
@@ -335,7 +336,8 @@ def reception_plate_power(
     elif reverberation_time is not None:
         eta = np.asarray(plate_loss_factor(freq, reverberation_time), dtype=np.float64)
     else:
-        raise ValueError("provide either 'loss_factor' or 'reverberation_time'.")
+        msg = "provide either 'loss_factor' or 'reverberation_time'."
+        raise ValueError(msg)
     lw = structure_borne_power_level(lv, freq, mass_per_area, area, eta)
     return StructureBornePowerResult(
         power_level=np.asarray(lw, dtype=np.float64),
@@ -375,7 +377,8 @@ def equivalent_blocked_force_level(
         or not np.all(np.isfinite(y.imag))
         or np.any(y_re <= 0.0)
     ):
-        raise ValueError("'plate_mobility' must be finite with a positive real part.")
+        msg = "'plate_mobility' must be finite with a positive real part."
+        raise ValueError(msg)
     return np.asarray(lw - 10.0 * np.log10(y_re / REFERENCE_MOBILITY), dtype=np.float64)
 
 
@@ -442,7 +445,8 @@ def equivalent_free_velocity_level(
         or not np.all(np.isfinite(y.imag))
         or np.any(y_re <= 0.0)
     ):
-        raise ValueError("'plate_mobility' must be finite with a positive real part.")
+        msg = "'plate_mobility' must be finite with a positive real part."
+        raise ValueError(msg)
     term = np.abs(y) ** 2 / (y_re * REFERENCE_MOBILITY)
     return np.asarray(lw + 10.0 * np.log10(term) + 60.0, dtype=np.float64)
 

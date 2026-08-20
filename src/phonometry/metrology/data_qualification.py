@@ -393,18 +393,18 @@ def _trend_test_runs(values: NDArray[np.float64], alpha: float) -> TrendTestResu
     keep = np.abs(values - median) > 0.0
     kept = values[keep]
     if kept.size < _MIN_OBSERVATIONS:
-        raise ValueError(
+        msg = (
             "The runs test needs at least "
             f"{_MIN_OBSERVATIONS} observations distinct from the median; "
             f"got {kept.size}."
         )
+        raise ValueError(msg)
     above = kept > median
     n1 = int(np.count_nonzero(above))
     n2 = int(above.size - n1)
     if n1 == 0 or n2 == 0:
-        raise ValueError(
-            "The runs test needs observations on both sides of the median."
-        )
+        msg = "The runs test needs observations on both sides of the median."
+        raise ValueError(msg)
     statistic = _count_runs(above)
     mean, std = _runs_moments(n1, n2)
     bounds = _runs_bounds(n1, n2, alpha)
@@ -428,18 +428,23 @@ def _validate_trend_inputs(
 ) -> NDArray[np.float64]:
     seq = np.asarray(values, dtype=np.float64)
     if seq.ndim != 1:
-        raise ValueError("'values' must be one-dimensional.")
+        msg = "'values' must be one-dimensional."
+        raise ValueError(msg)
     if seq.size < _MIN_OBSERVATIONS:
-        raise ValueError(
+        msg = (
             f"'values' must hold at least {_MIN_OBSERVATIONS} observations "
             f"(B&P Table A.6 starts at N = 10); got {seq.size}."
         )
+        raise ValueError(msg)
     if not np.all(np.isfinite(seq)):
-        raise ValueError("'values' must be finite.")
+        msg = "'values' must be finite."
+        raise ValueError(msg)
     if method not in _METHODS:
-        raise ValueError(f"'method' must be one of {_METHODS}, got {method!r}.")
+        msg = f"'method' must be one of {_METHODS}, got {method!r}."
+        raise ValueError(msg)
     if not 0.0 < alpha < 1.0:
-        raise ValueError(f"'alpha' must be inside (0, 1), got {alpha!r}.")
+        msg = f"'alpha' must be inside (0, 1), got {alpha!r}."
+        raise ValueError(msg)
     return seq
 
 
@@ -603,15 +608,15 @@ def stationarity_test(
     xa = _validate_signal(x, "x", context="a stationarity test")
     fs_v = _positive(resolve_fs(x, fs), "fs")
     if statistic not in _STATISTICS:
-        raise ValueError(
-            f"'statistic' must be one of {_STATISTICS}, got {statistic!r}."
-        )
+        msg = f"'statistic' must be one of {_STATISTICS}, got {statistic!r}."
+        raise ValueError(msg)
     segments = int(n_segments)
     if not _MIN_OBSERVATIONS <= segments <= xa.size:
-        raise ValueError(
+        msg = (
             f"'n_segments' must be between {_MIN_OBSERVATIONS} and the "
             f"record length ({xa.size} samples), got {n_segments!r}."
         )
+        raise ValueError(msg)
 
     per_segment = xa.size // segments
     trimmed = xa[: per_segment * segments].reshape(segments, per_segment)
@@ -771,16 +776,19 @@ def level_crossing_rate(
     xa = xa - float(np.mean(xa))
     sigma = float(np.sqrt(np.mean(xa**2)))
     if sigma <= 0.0:  # RMS is non-negative: <= 0 means a constant record
-        raise ValueError("'x' must not be constant.")
+        msg = "'x' must not be constant."
+        raise ValueError(msg)
 
     if levels is None:
         level_arr = np.linspace(-3.0, 3.0, 13) * sigma
     else:
         level_arr = np.asarray(levels, dtype=np.float64)
         if level_arr.ndim != 1 or level_arr.size == 0:
-            raise ValueError("'levels' must be a non-empty 1-D array.")
+            msg = "'levels' must be a non-empty 1-D array."
+            raise ValueError(msg)
         if not np.all(np.isfinite(level_arr)):
-            raise ValueError("'levels' must be finite.")
+            msg = "'levels' must be finite."
+            raise ValueError(msg)
 
     duration = (xa.size - 1) / fs_v
     counts = _count_level_crossings(xa, level_arr)
@@ -967,7 +975,8 @@ def peak_statistics(
     xa = xa - float(np.mean(xa))
     sigma = float(np.sqrt(np.mean(xa**2)))
     if sigma <= 0.0:  # RMS is non-negative: <= 0 means a constant record
-        raise ValueError("'x' must not be constant.")
+        msg = "'x' must not be constant."
+        raise ValueError(msg)
 
     interior = xa[1:-1]
     maxima = (interior > xa[:-2]) & (interior > xa[2:])

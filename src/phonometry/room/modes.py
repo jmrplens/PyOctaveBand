@@ -93,11 +93,11 @@ def _require_dimensions(dimensions: ArrayLike) -> NDArray[np.float64]:
     """Validate the three room dimensions and return them as an array."""
     dims = np.asarray(dimensions, dtype=np.float64).ravel()
     if dims.size != 3:
-        raise ValueError(
-            "'dimensions' must hold the three room dimensions (lx, ly, lz) in m."
-        )
+        msg = "'dimensions' must hold the three room dimensions (lx, ly, lz) in m."
+        raise ValueError(msg)
     if not np.all(np.isfinite(dims)) or np.any(dims <= 0.0):
-        raise ValueError("'dimensions' must be positive and finite.")
+        msg = "'dimensions' must be positive and finite."
+        raise ValueError(msg)
     return dims
 
 
@@ -142,9 +142,11 @@ def room_mode_frequency(
     else:
         single = False
     if n.ndim != 2 or n.shape[1] != 3:
-        raise ValueError("'orders' must be a triple (nx, ny, nz) or an (N, 3) array.")
+        msg = "'orders' must be a triple (nx, ny, nz) or an (N, 3) array."
+        raise ValueError(msg)
     if np.any(n < 0.0) or np.any(n != np.floor(n)):
-        raise ValueError("'orders' must be non-negative integers.")
+        msg = "'orders' must be non-negative integers."
+        raise ValueError(msg)
     freqs = 0.5 * c0 * np.sqrt(np.sum((n / dims) ** 2, axis=1))
     return float(freqs[0]) if single else freqs
 
@@ -177,7 +179,8 @@ def room_mode_count(
     c0 = require_positive(speed_of_sound, "speed_of_sound")
     f = np.asarray(frequency, dtype=np.float64)
     if np.any(f < 0.0) or not np.all(np.isfinite(f)):
-        raise ValueError("'frequency' must be non-negative and finite.")
+        msg = "'frequency' must be non-negative and finite."
+        raise ValueError(msg)
     volume, surface, edges = _room_geometry(dims)
     x = f / c0
     n = (
@@ -214,7 +217,8 @@ def room_modal_density(
     c0 = require_positive(speed_of_sound, "speed_of_sound")
     f = np.asarray(frequency, dtype=np.float64)
     if np.any(f < 0.0) or not np.all(np.isfinite(f)):
-        raise ValueError("'frequency' must be non-negative and finite.")
+        msg = "'frequency' must be non-negative and finite."
+        raise ValueError(msg)
     volume, surface, edges = _room_geometry(dims)
     density = (
         4.0 * np.pi * volume * f**2 / c0**3
@@ -327,7 +331,7 @@ def room_modes(
     n_max = np.floor(2.0 * f_max * dims / c0).astype(int)
     lattice = float(np.prod(n_max + 1, dtype=np.float64))
     if lattice > MAX_ENUMERATED_LATTICE:
-        raise ValueError(
+        msg = (
             f"Enumerating the modes of a "
             f"{dims[0]:g} x {dims[1]:g} x {dims[2]:g} m room up to "
             f"{f_max:g} Hz needs {lattice:.3g} order triples, above the "
@@ -335,6 +339,7 @@ def room_modes(
             f"room_mode_count / room_modal_density, which are accurate "
             f"wherever the count is this large."
         )
+        raise ValueError(msg)
     grids = np.meshgrid(*(np.arange(n + 1) for n in n_max), indexing="ij")
     orders = np.stack([g.ravel() for g in grids], axis=1)
     orders = orders[np.any(orders > 0, axis=1)]  # drop (0, 0, 0)

@@ -225,5 +225,6 @@ def normalized_frequencies(fraction: int) -> list[float]:
         ],
     }
     if fraction not in predefined:
-        raise ValueError("Normalized frequencies only available for fraction=1 or 3")
+        msg = "Normalized frequencies only available for fraction=1 or 3"
+        raise ValueError(msg)
     return predefined[fraction]

@@ -66,11 +66,12 @@ def _params(frequency: float) -> tuple[float, float, float]:
     for f, params in _TABLE1.items():
         if abs(frequency - f) <= 1e-6 * f:
             return params
-    raise ValueError(
+    msg = (
         f"ISO 226:2023 Table 1 defines parameters only at the 29 preferred "
         f"third-octave frequencies (20 Hz to 12.5 kHz); got frequency "
         f"{frequency!r} Hz. The standard specifies no interpolation."
     )
+    raise ValueError(msg)
 
 
 def _spl_from_phon(frequency: float, phon: float) -> float:
@@ -97,10 +98,11 @@ def equal_loudness_contour(phon: float) -> tuple[np.ndarray, np.ndarray]:
     :return: Tuple ``(frequencies, spl)`` in Hz and dB re 20 uPa.
     """
     if not 20.0 <= phon <= 90.0:
-        raise ValueError(
+        msg = (
             "ISO 226:2023 Formula (1) is specified for 20 phon to 90 phon "
             f"(80 phon above 4 kHz); got {phon!r}."
         )
+        raise ValueError(msg)
     freqs = _FREQUENCIES if phon <= 80.0 else _FREQUENCIES[_FREQUENCIES <= 4000.0]
     spl = np.array([_spl_from_phon(f, phon) for f in freqs])
     return freqs.copy(), spl

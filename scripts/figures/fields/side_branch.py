@@ -159,8 +159,12 @@ def _side_branch_fields() -> tuple[Any, ...]:
     resonances = noise_control.quarter_wave_resonator(
         f_grid, duct_area=0.01, length=0.3, branch_area=2e-3
     ).resonances
+    # The message stays inline: this function is hashed into the recorded
+    # fingerprint of anim_fdtd_side_branch, and moving a literal that a
+    # closed stub can never raise would mark the committed clip stale and
+    # demand a re-render that draws the same frames.
     if resonances is None:  # never for a closed stub; narrows the type
-        raise RuntimeError("quarter_wave_resonator returned no resonances")
+        raise RuntimeError("quarter_wave_resonator returned no resonances")  # noqa: EM101
     f0 = float(resonances[0])
     f_sim = _sbr_ring_down()
 

@@ -280,7 +280,8 @@ def _fake_batch(monkeypatch: pytest.MonkeyPatch, fails: str | None) -> list[list
 
     def render(clip: str, output_dir: str) -> None:
         if clip == fails:
-            raise RuntimeError("the encoder died")
+            msg = "the encoder died"
+            raise RuntimeError(msg)
 
     monkeypatch.setattr(shutil, "which", lambda name: "/usr/bin/ffmpeg")
     monkeypatch.setattr(

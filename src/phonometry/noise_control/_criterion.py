@@ -45,7 +45,8 @@ def validate_target(criterion: str, target: float | None) -> tuple[str, float | 
         return family, None
     value = float(target)
     if not np.isfinite(value):
-        raise ValueError("'target' must be a finite criterion value.")
+        msg = "'target' must be a finite criterion value."
+        raise ValueError(msg)
     return family, value
 
 
@@ -71,12 +72,14 @@ def as_band_spectrum(
     if arr.size == 1:
         arr = np.full(n, float(arr[0]), dtype=np.float64)
     if arr.shape != (n,):
-        raise ValueError(
+        msg = (
             f"'{name}' must be a scalar or have one value per band ({n}); "
             f"got shape {arr.shape}."
         )
+        raise ValueError(msg)
     if not np.all(np.isfinite(arr)):
-        raise ValueError(f"'{name}' must be finite.")
+        msg = f"'{name}' must be finite."
+        raise ValueError(msg)
     return arr
 
 

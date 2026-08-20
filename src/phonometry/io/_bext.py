@@ -128,20 +128,21 @@ def serialize_bext(meta: BroadcastMetadata) -> bytes:
     for attribute, name, size in _STRING_FIELDS:
         raw = str(getattr(meta, attribute)).encode("latin-1")
         if len(raw) > size:
-            raise ValueError(
-                f"bext {name} is {len(raw)} bytes; the Tech 3285 field holds {size}"
-            )
+            msg = f"bext {name} is {len(raw)} bytes; the Tech 3285 field holds {size}"
+            raise ValueError(msg)
         encoded.append(raw)
     if not 0 <= meta.time_reference < 2**64:
-        raise ValueError(
+        msg = (
             "bext TimeReference is an unsigned 64-bit sample count; got "
             f"{meta.time_reference}"
         )
+        raise ValueError(msg)
     if meta.umid is not None and meta.version < 1:
-        raise ValueError(
+        msg = (
             f"bext version {meta.version} has no UMID field (version >= 1); "
             "raise the version instead of losing the UMID"
         )
+        raise ValueError(msg)
     loudness = (
         meta.loudness_value,
         meta.loudness_range,
@@ -150,13 +151,15 @@ def serialize_bext(meta: BroadcastMetadata) -> bytes:
         meta.max_short_term_loudness,
     )
     if meta.version < 2 and any(value is not None for value in loudness):
-        raise ValueError(
+        msg = (
             f"bext version {meta.version} has no loudness fields "
             "(version >= 2); raise the version instead of losing them"
         )
+        raise ValueError(msg)
     umid = meta.umid or b""
     if len(umid) > 64:
-        raise ValueError(f"bext UMID is {len(umid)} bytes; the field holds 64")
+        msg = f"bext UMID is {len(umid)} bytes; the field holds 64"
+        raise ValueError(msg)
     history = meta.coding_history.encode("latin-1")
     return (
         _BEXT_FIXED.pack(

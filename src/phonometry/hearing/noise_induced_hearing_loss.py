@@ -219,9 +219,8 @@ class NiptsResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.iso1999 import render_nipts_report
 
         return render_nipts_report(
@@ -313,9 +312,8 @@ class HtlanResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.iso1999 import render_htlan_report
 
         return render_htlan_report(
@@ -332,10 +330,11 @@ def _select(values: np.ndarray, frequencies: ArrayLike | None) -> np.ndarray:
     for f in fr:
         matches = np.isclose(NIPTS_FREQUENCIES, f, rtol=1e-3)
         if not matches.any():
-            raise ValueError(
+            msg = (
                 f"frequency {f} Hz is not an ISO 1999 audiometric frequency "
                 f"(500 Hz - 6000 Hz)."
             )
+            raise ValueError(msg)
         idx.append(int(np.argmax(matches)))
     return values[idx]
 
@@ -407,9 +406,11 @@ def nipts(
     extrapolation, and the ``.report()`` fiche prints the matching caveat.
     """
     if years <= 0.0:
-        raise ValueError(f"years must be positive; got {years}.")
+        msg = f"years must be positive; got {years}."
+        raise ValueError(msg)
     if not 0.0 < fractile < 1.0:
-        raise ValueError(f"fractile must be in (0, 1); got {fractile}.")
+        msg = f"fractile must be in (0, 1); got {fractile}."
+        raise ValueError(msg)
     _warn_outside_domain(float(l_ex), float(years), float(fractile))
 
     from scipy.special import ndtri  # standard-normal quantile

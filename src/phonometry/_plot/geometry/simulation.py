@@ -143,7 +143,8 @@ def plot_fdtd_domain(
     if probes is not None:
         pts = np.asarray(probes, dtype=np.float64)
         if pts.ndim != 2 or pts.shape[1] != 2:
-            raise ValueError("'probes' must have shape (N, 2).")
+            msg = "'probes' must have shape (N, 2)."
+            raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
     ny, nx = sim.p.shape

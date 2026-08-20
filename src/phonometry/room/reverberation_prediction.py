@@ -119,11 +119,12 @@ def _broadcast_or_raise(
     try:
         return np.broadcast_shapes(*shapes)
     except ValueError:
-        raise ValueError(
+        msg = (
             f"the per-band {name} have incompatible shapes "
             f"{[tuple(s) for s in shapes]}; each must be a scalar or share a "
             "common band count."
-        ) from None
+        )
+        raise ValueError(msg) from None
 
 
 def _accumulate_surfaces(
@@ -148,29 +149,34 @@ def _accumulate_surfaces(
         not broadcast together.
     """
     if not surfaces:
-        raise ValueError("at least one surface is required.")
+        msg = "at least one surface is required."
+        raise ValueError(msg)
     areas: list[float] = []
     alphas: list[NDArray[np.float64]] = []
     for area, alpha in surfaces:
         areas.append(require_non_negative(area, "surface area"))
         alpha_arr = np.asarray(alpha, dtype=np.float64)
         if not np.all(np.isfinite(alpha_arr)):
-            raise ValueError("absorption coefficients must be finite.")
+            msg = "absorption coefficients must be finite."
+            raise ValueError(msg)
         if np.any(alpha_arr < 0.0):
-            raise ValueError("absorption coefficients must be non-negative.")
+            msg = "absorption coefficients must be non-negative."
+            raise ValueError(msg)
         if np.any(alpha_arr > _MAX_ABSORPTION):
-            raise ValueError(
+            msg = (
                 f"absorption coefficients above {_MAX_ABSORPTION} look like a "
                 "unit error (a percentage passed instead of a fraction); "
                 "measured ISO 354 coefficients do not exceed about 1.2."
             )
+            raise ValueError(msg)
         alphas.append(alpha_arr)
     shape = _broadcast_or_raise(
         [a.shape for a in alphas], "surface absorption coefficients"
     )
     total_area = float(sum(areas))
     if total_area <= 0.0:
-        raise ValueError("the total surface area must be positive.")
+        msg = "the total surface area must be positive."
+        raise ValueError(msg)
     absorption_area = np.zeros(shape, dtype=np.float64)
     for area, alpha_arr in zip(areas, alphas):
         absorption_area = absorption_area + area * alpha_arr
@@ -181,7 +187,8 @@ def _air_term(air_attenuation: ArrayLike, volume: float) -> NDArray[np.float64]:
     """Air absorption area ``4 m V`` (m2), validated finite and non-negative."""
     m = np.asarray(air_attenuation, dtype=np.float64)
     if not np.all(np.isfinite(m)) or np.any(m < 0.0):
-        raise ValueError("'air_attenuation' must be finite and non-negative.")
+        msg = "'air_attenuation' must be finite and non-negative."
+        raise ValueError(msg)
     return np.asarray(4.0 * m * volume, dtype=np.float64)
 
 
@@ -210,12 +217,13 @@ def _millington_absorption(
     total = np.asarray(0.0, dtype=np.float64)
     for area, alpha_arr in pairs:
         if np.any(alpha_arr >= 1.0):
-            raise ValueError(
+            msg = (
                 "Millington-Sette requires every absorption coefficient below "
                 "1: its per-surface ln(1 - alpha) diverges at alpha = 1. For "
                 "measured ISO 354 coefficients at or above 1 use Sabine, or "
                 "Eyring if the mean absorption stays below 1."
             )
+            raise ValueError(msg)
         total = total - area * np.log1p(-alpha_arr)
     return np.asarray(total, dtype=np.float64)
 
@@ -227,13 +235,14 @@ def _eyring_absorption(
     # A mean of exactly 1 (fully absorbing on average) has no finite Eyring
     # time: ln(1 - mean) diverges, so fail with a clear message instead.
     if np.any(mean_absorption >= 1.0):
-        raise ValueError(
+        msg = (
             "the mean absorption coefficient must be below 1 for the "
             "Eyring-family models: ln(1 - mean) diverges at a mean of 1. "
             "Individual coefficients at or above 1 are accepted (up to the "
             "shared unit-error ceiling of 2) as long as the mean stays "
             "below 1; Sabine does not constrain the mean."
         )
+        raise ValueError(msg)
     return np.asarray(-total_area * np.log1p(-mean_absorption), dtype=np.float64)
 
 
@@ -244,10 +253,11 @@ def _reverberation_time(
     positive-absorption guard.
     """
     if np.any(absorption <= 0.0):
-        raise ValueError(
+        msg = (
             "the total absorption is non-positive; a perfectly reflecting room "
             "has no finite reverberation time."
         )
+        raise ValueError(msg)
     t = _SABINE_NUMERATOR / speed_of_sound * volume / absorption
     return as_float_or_array(t)
 
@@ -393,7 +403,8 @@ def _axial_geometry(
     :math:`S_z = 2 L_x L_y`.
     """
     if len(dimensions) != 3:
-        raise ValueError("'dimensions' must be the three room lengths (Lx, Ly, Lz).")
+        msg = "'dimensions' must be the three room lengths (Lx, Ly, Lz)."
+        raise ValueError(msg)
     lx, ly, lz = (require_positive(float(d), "dimension") for d in dimensions)
     volume = lx * ly * lz
     pair_areas = np.array(
@@ -416,10 +427,11 @@ def _axial_eyring_times(
     construction), plus the shared air term ``4 m V``.
     """
     if len(absorptions) != 3:
-        raise ValueError(
+        msg = (
             "'absorptions' must give the mean absorption of the three wall pairs "
             "(perpendicular to x, y and z)."
         )
+        raise ValueError(msg)
     volume, total_area, pair_areas = _axial_geometry(dimensions)
     speed_of_sound = require_positive(speed_of_sound, "speed_of_sound")
     air = _air_term(air_attenuation, volume)
@@ -427,16 +439,19 @@ def _axial_eyring_times(
     for alpha in absorptions:
         mean = np.asarray(alpha, dtype=np.float64)
         if not np.all(np.isfinite(mean)):
-            raise ValueError("absorption coefficients must be finite.")
+            msg = "absorption coefficients must be finite."
+            raise ValueError(msg)
         if np.any(mean < 0.0):
-            raise ValueError("absorption coefficients must be non-negative.")
+            msg = "absorption coefficients must be non-negative."
+            raise ValueError(msg)
         if np.any(mean >= 1.0):
-            raise ValueError(
+            msg = (
                 "each wall-pair mean absorption must be below 1: the axial "
                 "Eyring term ln(1 - alpha_i) diverges at alpha_i = 1. The "
                 "inputs of the Fitzroy and Arau-Puchades models are "
                 "themselves the means entering the logarithm."
             )
+            raise ValueError(msg)
         means.append(mean)
     # The three axial times are combined (arithmetic/geometric mean), so their
     # band counts -- and the shared air term -- must broadcast together.
@@ -617,9 +632,8 @@ class ReverberationModelResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.reverberation import render_reverberation_models_report
 
         return render_reverberation_models_report(
@@ -658,9 +672,8 @@ def reverberation_time_models(
     """
     volume, total_area, pair_areas = _axial_geometry(dimensions)
     if len(absorptions) != 3:
-        raise ValueError(
-            "'absorptions' must give the mean absorption of the three wall pairs."
-        )
+        msg = "'absorptions' must give the mean absorption of the three wall pairs."
+        raise ValueError(msg)
     # Two equal-area opposing walls per axis share the axis mean absorption.
     surfaces: list[Surface] = []
     for area, alpha in zip(pair_areas, absorptions):
@@ -715,10 +728,11 @@ def reverberation_time_models(
     else:
         freq = np.asarray(frequencies, dtype=np.float64)
         if curve_bands not in (1, freq.size):
-            raise ValueError(
+            msg = (
                 f"'frequencies' has {freq.size} bands but the per-band "
                 f"absorption has {curve_bands}; they must match."
             )
+            raise ValueError(msg)
         n_bands = freq.size
 
     def _fit(arr: np.ndarray) -> np.ndarray:

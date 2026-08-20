@@ -126,7 +126,8 @@ def velocity_level_from_acceleration(
     a = np.asarray(peak_acceleration, dtype=np.float64)
     f = np.asarray(frequency, dtype=np.float64)
     if np.any(f <= 0.0):
-        raise ValueError("'frequency' must be positive.")
+        msg = "'frequency' must be positive."
+        raise ValueError(msg)
     v_rms = np.abs(a) / (2.0 * np.pi * f * np.sqrt(2.0))
     return np.asarray(20.0 * np.log10(v_rms / reference), dtype=np.float64)
 
@@ -150,7 +151,8 @@ def mean_velocity_level(levels: ArrayLike, areas: ArrayLike | None = None) -> fl
     else:
         s = np.asarray(areas, dtype=np.float64)
         if s.shape != lv.shape:
-            raise ValueError("'areas' must match the shape of 'levels'.")
+            msg = "'areas' must match the shape of 'levels'."
+            raise ValueError(msg)
         mean_energy = float(np.sum(s * energy) / np.sum(s))
     return float(10.0 * np.log10(mean_energy))
 
@@ -359,9 +361,8 @@ class VibrationSoundPowerResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.iso7849 import render_vibration_power_report
 
         return render_vibration_power_report(
@@ -394,7 +395,8 @@ def sound_power_from_vibration(
     if frequencies is not None:
         freq = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
         if freq.shape != lv.shape:
-            raise ValueError("'frequencies' must match the shape of 'velocity_level'.")
+            msg = "'frequencies' must match the shape of 'velocity_level'."
+            raise ValueError(msg)
     return VibrationSoundPowerResult(
         velocity_level=lv,
         sound_power_level=np.asarray(lw, dtype=np.float64),

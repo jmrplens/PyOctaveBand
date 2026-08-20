@@ -132,23 +132,24 @@ def _validate_intensity_report(
 
     check_language(language)
     if engine != "reportlab":
-        raise ValueError(
-            f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-        )
+        msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+        raise ValueError(msg)
     if rating is None:
-        raise ValueError(
+        msg = (
             f"The {label} report needs the ISO 717-1 single-number rating; it "
             "is formed only for exactly 16 one-third-octave (100 Hz to "
             "3150 Hz) or 5 octave (125 Hz to 2000 Hz) bands. Build the result "
             "with that band count."
         )
+        raise ValueError(msg)
     n_bands = int(np.asarray(curve).size)
     if n_bands not in (16, 5):
-        raise ValueError(
+        msg = (
             f"The {label} report supports only 16 one-third-octave (100 Hz to "
             "3150 Hz) or 5 octave (125 Hz to 2000 Hz) bands; the result "
             f"carries {n_bands}."
         )
+        raise ValueError(msg)
     return rating
 
 
@@ -191,10 +192,11 @@ class IntensityReductionResult:
         :class:`~matplotlib.axes.Axes`.
         """
         if self.rating is None:
-            raise ValueError(
+            msg = (
                 "No single-number rating is available to plot (need 16 "
                 "one-third-octave or 5 octave bands)."
             )
+            raise ValueError(msg)
         return self.rating.plot(ax=ax, **kwargs)
 
     def report(
@@ -315,10 +317,11 @@ class IntensityElementNormalizedResult:
         :class:`~matplotlib.axes.Axes`.
         """
         if self.rating is None:
-            raise ValueError(
+            msg = (
                 "No single-number rating is available to plot (need 16 "
                 "one-third-octave or 5 octave bands)."
             )
+            raise ValueError(msg)
         return self.rating.plot(ax=ax, **kwargs)
 
     def report(
@@ -415,7 +418,8 @@ def _positive_area(value: float, name: str) -> float:
     """Return ``value`` as a positive, finite area, or raise."""
     v = float(value)
     if not np.isfinite(v) or v <= 0.0:
-        raise ValueError(f"'{name}' must be positive.")
+        msg = f"'{name}' must be positive."
+        raise ValueError(msg)
     return v
 
 
@@ -464,9 +468,11 @@ def adaptation_term_kc(
     """
     f = np.asarray(freq, dtype=np.float64)
     if f.ndim != 1:
-        raise ValueError("'freq' must be one-dimensional.")
+        msg = "'freq' must be one-dimensional."
+        raise ValueError(msg)
     if not np.all(np.isfinite(f)) or np.any(f <= 0.0):
-        raise ValueError("'freq' must contain positive, finite values.")
+        msg = "'freq' must contain positive, finite values."
+        raise ValueError(msg)
 
     if boundary_area is None and volume is None:
         ratio = _KC_APPROX_COEFF / f
@@ -476,10 +482,11 @@ def adaptation_term_kc(
         wavelength = _SPEED_OF_SOUND / f
         ratio = sb2 * wavelength / (8.0 * v2)
     else:
-        raise ValueError(
+        msg = (
             "Supply both 'boundary_area' and 'volume' for Formula (B.1), or "
             "neither for the Formula (B.2) approximation."
         )
+        raise ValueError(msg)
     return 10.0 * np.log10(1.0 + ratio)
 
 
@@ -508,9 +515,11 @@ def surface_pressure_intensity_indicator(
     p = np.asarray(lp, dtype=np.float64)
     i = np.asarray(l_in, dtype=np.float64)
     if p.shape != i.shape:
-        raise ValueError("'lp' and 'l_in' must share their shape.")
+        msg = "'lp' and 'l_in' must share their shape."
+        raise ValueError(msg)
     if not (np.all(np.isfinite(p)) and np.all(np.isfinite(i))):
-        raise ValueError("Levels must contain only finite values.")
+        msg = "Levels must contain only finite values."
+        raise ValueError(msg)
     return p - i
 
 
@@ -554,28 +563,31 @@ def combine_subareas(
     """
     levels = np.asarray(l_in, dtype=np.float64)
     if levels.ndim != 2:
-        raise ValueError("'l_in' must be a two-dimensional (subareas, bands) array.")
+        msg = "'l_in' must be a two-dimensional (subareas, bands) array."
+        raise ValueError(msg)
     areas = np.asarray(measurement_area, dtype=np.float64)
     if areas.ndim != 1 or areas.size != levels.shape[0]:
-        raise ValueError(
-            "'measurement_area' must give one area per subarea (row of 'l_in')."
-        )
+        msg = "'measurement_area' must give one area per subarea (row of 'l_in')."
+        raise ValueError(msg)
     if not np.all(np.isfinite(levels)):
-        raise ValueError("'l_in' must contain only finite values.")
+        msg = "'l_in' must contain only finite values."
+        raise ValueError(msg)
     if not np.all(np.isfinite(areas)) or not np.all(np.abs(areas) > 0.0):
-        raise ValueError(
+        msg = (
             "'measurement_area' must contain non-zero, finite areas (negative "
             "marks a reverse-flow subarea, Clause 6.4.6)."
         )
+        raise ValueError(msg)
 
     sm = float(np.sum(np.abs(areas)))
     energy = np.sum(areas[:, None] * 10.0 ** (0.1 * levels), axis=0)
     if np.any(energy <= 0.0):
-        raise ValueError(
+        msg = (
             "The signed subarea energy sum of Formula (11) is not positive in "
             "at least one band: the negative-direction subareas cancel or "
             "exceed the forward flow, so no combined intensity level exists."
         )
+        raise ValueError(msg)
     l_in_total = 10.0 * np.log10(energy / sm)
     return l_in_total, sm
 
@@ -627,7 +639,8 @@ def intensity_sound_reduction(
     lp1_bands = _as_band_levels(lp1, "lp1")
     l_in_bands = _as_band_levels(l_in, "l_in")
     if lp1_bands.shape != l_in_bands.shape:
-        raise ValueError("'lp1' and 'l_in' must share the same band count.")
+        msg = "'lp1' and 'l_in' must share the same band count."
+        raise ValueError(msg)
     sm = _positive_area(measurement_area, "measurement_area")
     s = _positive_area(area, "area")
 
@@ -637,9 +650,11 @@ def intensity_sound_reduction(
     if kc is not None:
         kc_bands = np.asarray(kc, dtype=np.float64)
         if kc_bands.shape != r_i.shape:
-            raise ValueError("'kc' must share the band count of the levels.")
+            msg = "'kc' must share the band count of the levels."
+            raise ValueError(msg)
         if not np.all(np.isfinite(kc_bands)):
-            raise ValueError("'kc' must contain only finite values.")
+            msg = "'kc' must contain only finite values."
+            raise ValueError(msg)
         r_i_modified = r_i + kc_bands
 
     rating = weighted_rating(r_i) if r_i.size in (16, 5) else None
@@ -707,10 +722,12 @@ def intensity_element_normalized_difference(
     lp1_bands = _as_band_levels(lp1, "lp1")
     l_in_bands = _as_band_levels(l_in, "l_in")
     if lp1_bands.shape != l_in_bands.shape:
-        raise ValueError("'lp1' and 'l_in' must share the same band count.")
+        msg = "'lp1' and 'l_in' must share the same band count."
+        raise ValueError(msg)
     sm = _positive_area(measurement_area, "measurement_area")
     if int(n) != n or n < 1:
-        raise ValueError("'n' must be a positive integer.")
+        msg = "'n' must be a positive integer."
+        raise ValueError(msg)
     if n > 1:
         warnings.warn(
             "ISO 15186-1:2000 Formula (8) as printed subtracts 10 lg(N); "

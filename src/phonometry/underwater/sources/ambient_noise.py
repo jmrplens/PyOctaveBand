@@ -111,7 +111,8 @@ def thermal_noise_spectrum(
     f = require_positive_array(frequency_hz, "frequency_hz")
     t_kelvin = float(temperature) + 273.15
     if not np.isfinite(t_kelvin) or t_kelvin <= 0.0:
-        raise ValueError("'temperature' must be above absolute zero.")
+        msg = "'temperature' must be above absolute zero."
+        raise ValueError(msg)
     rho = require_positive(density, "density")
     c = require_positive(sound_speed, "sound_speed")
     p2 = 4.0 * np.pi * _BOLTZMANN * t_kelvin * rho * f**2 / c
@@ -184,9 +185,8 @@ def ocean_ambient_noise(
     if shipping is not None:
         ship_arr = np.asarray(shipping, dtype=np.float64)
         if ship_arr.shape != f.shape or not np.all(np.isfinite(ship_arr)):
-            raise ValueError(
-                "'shipping' must be finite and match 'frequency_hz' in length."
-            )
+            msg = "'shipping' must be finite and match 'frequency_hz' in length."
+            raise ValueError(msg)
         energies = energies + 10.0 ** (ship_arr / 10.0)
     spectrum = 10.0 * np.log10(energies)
     return AmbientNoiseResult(

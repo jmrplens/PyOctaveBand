@@ -87,17 +87,23 @@ def _clean_profile(
     z = np.asarray(depths, dtype=np.float64)
     c = np.asarray(sound_speeds, dtype=np.float64)
     if z.ndim != 1 or z.size < 2:
-        raise ValueError("'depths' must be a 1-D array of at least two points.")
+        msg = "'depths' must be a 1-D array of at least two points."
+        raise ValueError(msg)
     if c.shape != z.shape:
-        raise ValueError("'sound_speeds' must match 'depths' in length.")
+        msg = "'sound_speeds' must match 'depths' in length."
+        raise ValueError(msg)
     if not (np.all(np.isfinite(z)) and np.all(np.isfinite(c))):
-        raise ValueError("'depths' and 'sound_speeds' must be finite.")
+        msg = "'depths' and 'sound_speeds' must be finite."
+        raise ValueError(msg)
     if np.any(np.diff(z) <= 0.0):
-        raise ValueError("'depths' must be strictly increasing.")
+        msg = "'depths' must be strictly increasing."
+        raise ValueError(msg)
     if abs(float(z[0])) > 1e-9:
-        raise ValueError("'depths' must start at the surface z = 0.")
+        msg = "'depths' must start at the surface z = 0."
+        raise ValueError(msg)
     if np.any(c <= 0.0):
-        raise ValueError("'sound_speeds' must be strictly positive.")
+        msg = "'sound_speeds' must be strictly positive."
+        raise ValueError(msg)
     return z, c
 
 
@@ -121,31 +127,38 @@ def _clean_bathymetry(
         return None
     pair = tuple(bathymetry)
     if len(pair) != 2 or pair[0] is None or pair[1] is None:
-        raise ValueError("'bathymetry' must be a (ranges_m, depths_m) pair of arrays.")
+        msg = "'bathymetry' must be a (ranges_m, depths_m) pair of arrays."
+        raise ValueError(msg)
     br = np.asarray(pair[0], dtype=np.float64).ravel()
     bd = np.asarray(pair[1], dtype=np.float64).ravel()
     if br.size < 2 or bd.shape != br.shape:
-        raise ValueError(
+        msg = (
             "the two halves of 'bathymetry' must be 1-D"
             " arrays of equal length, at least two points."
         )
+        raise ValueError(msg)
     if not (np.all(np.isfinite(br)) and np.all(np.isfinite(bd))):
-        raise ValueError("the bathymetry must be finite.")
+        msg = "the bathymetry must be finite."
+        raise ValueError(msg)
     if np.any(np.diff(br) <= 0.0):
-        raise ValueError("the bathymetry ranges must be strictly increasing.")
+        msg = "the bathymetry ranges must be strictly increasing."
+        raise ValueError(msg)
     if abs(float(br[0])) > 1e-9:
-        raise ValueError("the bathymetry must start at the source, r = 0.")
+        msg = "the bathymetry must start at the source, r = 0."
+        raise ValueError(msg)
     if np.any(bd <= 0.0):
-        raise ValueError(
+        msg = (
             "the bathymetry depths must be strictly positive: the wedge apex"
             " itself, where the water ends, cannot carry a water column."
         )
+        raise ValueError(msg)
     if float(bd.max()) > float(z_prof[-1]) + 1e-9:
-        raise ValueError(
+        msg = (
             "the bathymetry depths must not run below the sound-speed"
             " profile: the profile is the medium, so it must reach the"
             " deepest point of the bottom."
         )
+        raise ValueError(msg)
     return br, bd
 
 
@@ -199,7 +212,8 @@ def _resolve_boundary(
         )
     key = bottom.strip().lower()
     if key not in _BOTTOM_TYPES:
-        raise ValueError(f"'bottom' must be one of {_BOTTOM_TYPES}, got {bottom!r}.")
+        msg = f"'bottom' must be one of {_BOTTOM_TYPES}, got {bottom!r}."
+        raise ValueError(msg)
     return key, None
 
 
@@ -420,19 +434,20 @@ def normal_modes(
     zs = float(source_depth)
     zr = float(receiver_depth)
     if not (0.0 < zs < water_depth) or not (0.0 < zr < water_depth):
-        raise ValueError(
-            "'source_depth'/'receiver_depth' must lie within the water column."
-        )
+        msg = "'source_depth'/'receiver_depth' must lie within the water column."
+        raise ValueError(msg)
     key = bottom.strip().lower()
     if key not in _BOTTOM_TYPES:
-        raise ValueError(f"'bottom' must be one of {_BOTTOM_TYPES}, got {bottom!r}.")
+        msg = f"'bottom' must be one of {_BOTTOM_TYPES}, got {bottom!r}."
+        raise ValueError(msg)
     if n_depth_points is None:
         n_depth_points = min(
             20_000,
             max(400, int(np.ceil(60.0 * water_depth * f / float(np.min(c_prof))))),
         )
     if int(n_depth_points) < 8:
-        raise ValueError("'n_depth_points' must be at least 8.")
+        msg = "'n_depth_points' must be at least 8."
+        raise ValueError(msg)
 
     ranges = (
         np.linspace(100.0, 10_000.0, 400)
@@ -440,7 +455,8 @@ def normal_modes(
         else np.asarray(ranges_m, dtype=np.float64).ravel()
     )
     if np.any(ranges <= 0.0) or not np.all(np.isfinite(ranges)):
-        raise ValueError("'ranges_m' must be finite and positive.")
+        msg = "'ranges_m' must be finite and positive."
+        raise ValueError(msg)
 
     omega = 2.0 * np.pi * f
     n = int(n_depth_points)
@@ -718,14 +734,15 @@ def ray_trace(
         raise ValueError(_SOURCE_OUTSIDE)
     rmax = require_positive(max_range, "max_range")
     if int(n_steps) < 2:
-        raise ValueError("'n_steps' must be at least 2.")
+        msg = "'n_steps' must be at least 2."
+        raise ValueError(msg)
     angles = np.asarray(launch_angles_deg, dtype=np.float64).ravel()
     if angles.size == 0 or not np.all(np.isfinite(angles)):
-        raise ValueError("'launch_angles_deg' must be finite and non-empty.")
+        msg = "'launch_angles_deg' must be finite and non-empty."
+        raise ValueError(msg)
     if np.any(np.abs(angles) >= 90.0):
-        raise ValueError(
-            "'launch_angles_deg' must be within (-90, 90) degrees (forward rays)."
-        )
+        msg = "'launch_angles_deg' must be within (-90, 90) degrees (forward rays)."
+        raise ValueError(msg)
 
     ns = int(n_steps)
     ranges = np.linspace(0.0, rmax, ns)
@@ -1245,7 +1262,7 @@ def eigenrays(
     """
     key, seabed = _resolve_boundary(bottom)
     if trace.bathymetry_ranges is not None:
-        raise ValueError(
+        msg = (
             "'trace' was made over a sloping bottom, which this search does"
             " not price: each slope bounce rotates Snell's invariant, so an"
             " arrival's bottom touches no longer share one grazing angle and"
@@ -1253,6 +1270,7 @@ def eigenrays(
             " to the touch count) stops holding. Trace over a level bottom to"
             " list eigenrays."
         )
+        raise ValueError(msg)
     z_prof = np.asarray(trace.profile_depths, dtype=np.float64)
     c_prof = np.asarray(trace.profile_speeds, dtype=np.float64)
     water_depth = float(trace.water_depth)
@@ -1260,24 +1278,29 @@ def eigenrays(
     r_rec = require_positive(receiver_range, "receiver_range")
     r_grid = np.asarray(trace.ranges[0], dtype=np.float64)
     if r_rec > float(r_grid[-1]):
-        raise ValueError("'receiver_range' must not run past the traced fan.")
+        msg = "'receiver_range' must not run past the traced fan."
+        raise ValueError(msg)
     z_rec = float(receiver_depth)
     if not (0.0 < z_rec < water_depth):
-        raise ValueError(
+        msg = (
             "'receiver_depth' must lie strictly inside the water column: a"
             " folded ray only ever grazes the boundaries, so a receiver on"
             " one is touched tangentially and never crossed."
         )
+        raise ValueError(msg)
     if int(max_arrivals) < 1:
-        raise ValueError("'max_arrivals' must be at least 1.")
+        msg = "'max_arrivals' must be at least 1."
+        raise ValueError(msg)
     if trace.launch_angles.size < 2:
-        raise ValueError("'trace' must carry at least two rays to bracket between.")
+        msg = "'trace' must carry at least two rays to bracket between."
+        raise ValueError(msg)
     if n_steps is None:
         ns = max(2, int(np.ceil(r_rec / float(r_grid[1] - r_grid[0]))) + 1)
     else:
         ns = int(n_steps)
         if ns < 2:
-            raise ValueError("'n_steps' must be at least 2.")
+            msg = "'n_steps' must be at least 2."
+            raise ValueError(msg)
 
     launch, crossing = _bracket_launches(trace, r_grid, r_rec, z_rec)
     refined = _refine_brackets(
@@ -1309,7 +1332,8 @@ def eigenrays(
         n_steps=ns,
     )
     if final.spreadings is None:  # pragma: no cover
-        raise ValueError("the march must carry the dynamic ray states.")
+        msg = "the march must carry the dynamic ray states."
+        raise ValueError(msg)
     c0 = float(np.interp(zs, z_prof, c_prof))
     z_end = final.positions[:, -1]
     c_end = np.asarray(np.interp(z_end, z_prof, c_prof))
@@ -2504,9 +2528,11 @@ def _beam_range_grid(
         np.arange(n_steps) * dr if ranges_m is None else ranges_m, dtype=np.float64
     ).ravel()
     if ranges.size == 0 or not np.all(np.isfinite(ranges)) or np.any(ranges < 0.0):
-        raise ValueError("'ranges_m' must be finite, non-negative and non-empty.")
+        msg = "'ranges_m' must be finite, non-negative and non-empty."
+        raise ValueError(msg)
     if np.any(ranges > rmax + 0.5 * dr):
-        raise ValueError("'ranges_m' must not run past 'max_range'.")
+        msg = "'ranges_m' must not run past 'max_range'."
+        raise ValueError(msg)
     return ranges
 
 
@@ -2526,14 +2552,17 @@ def _beam_receiver_grid(
     if receiver_depths_m is None:
         n_z = int(n_depth_points)
         if n_z < 2:
-            raise ValueError("'n_depth_points' must be at least 2.")
+            msg = "'n_depth_points' must be at least 2."
+            raise ValueError(msg)
         dz = water_depth / (n_z + 1)
         return np.asarray(dz * np.arange(1, n_z + 1), dtype=np.float64)
     receivers = np.asarray(receiver_depths_m, dtype=np.float64).ravel()
     if receivers.size == 0 or not np.all(np.isfinite(receivers)):
-        raise ValueError("'receiver_depths_m' must be finite and non-empty.")
+        msg = "'receiver_depths_m' must be finite and non-empty."
+        raise ValueError(msg)
     if np.any(receivers < 0.0) or np.any(receivers > water_depth):
-        raise ValueError("'receiver_depths_m' must lie within the water column.")
+        msg = "'receiver_depths_m' must lie within the water column."
+        raise ValueError(msg)
     return receivers
 
 
@@ -2625,10 +2654,11 @@ def _resolve_absorption(
     spec = VolumeAbsorption(absorption) if isinstance(absorption, str) else absorption
     key = spec.model.strip().lower()
     if key not in _ABSORPTION_MODELS:
-        raise ValueError(
+        msg = (
             f"'absorption' must name one of {_ABSORPTION_MODELS} or be None,"
             f" got {spec.model!r}."
         )
+        raise ValueError(msg)
     return key, float(
         seawater_absorption(
             frequency_hz,
@@ -2651,7 +2681,8 @@ def _resolve_fan(
     """The concrete fan a :class:`BeamFan` asks for, widths resolved."""
     theta_max = float(fan.max_angle_deg)
     if not (0.0 < theta_max < 90.0):
-        raise ValueError("'max_angle_deg' must lie in (0, 90) degrees.")
+        msg = "'max_angle_deg' must lie in (0, 90) degrees."
+        raise ValueError(msg)
     # The width the fan's density is sized for has to exist before the fan
     # does, and the overlap condition below must hold for every beam, so it
     # is the *widest* width of the run: an explicit one applies everywhere,
@@ -2670,7 +2701,8 @@ def _resolve_fan(
         else int(fan.n_beams)
     )
     if n_fan < 2:
-        raise ValueError("'n_beams' must be at least 2.")
+        msg = "'n_beams' must be at least 2."
+        raise ValueError(msg)
     launch = np.linspace(-np.radians(theta_max), np.radians(theta_max), n_fan)
     w0 = (
         np.full(n_fan, float(w_fan))
@@ -3002,10 +3034,11 @@ def gaussian_beams(
     rmax = require_positive(max_range, "max_range")
     dr_step = require_positive(range_step, "range_step")
     if dr_step > rmax:
-        raise ValueError("'range_step' must not exceed 'max_range'.")
+        msg = "'range_step' must not exceed 'max_range'."
+        raise ValueError(msg)
     key, seabed = _resolve_boundary(bottom)
     if seabed is not None and bathy is not None:
-        raise ValueError(
+        msg = (
             "a lossy fluid seabed and a sloping bottom cannot be combined:"
             " the one-coefficient-per-beam collapse (and the image ladder's"
             " powers of R) rests on Snell's invariant fixing a single grazing"
@@ -3013,6 +3046,7 @@ def gaussian_beams(
             " invariant at every touch. Sloping runs take the perfect"
             " reflectors of 'bottom'."
         )
+        raise ValueError(msg)
     absorption_key, alpha = _resolve_absorption(absorption, f, zs)
     # dB/km to nepers/m: N dB is e^(N ln 10 / 20) in amplitude.
     attenuation = alpha * np.log(10.0) / (20.0 * _M_PER_KM)
@@ -3196,7 +3230,8 @@ def _assemble_beam_field(
         or march.horizontals is None
         or march.stopped_columns is None
     ):  # pragma: no cover
-        raise ValueError("the march must carry the dynamic ray states.")
+        msg = "the march must carry the dynamic ray states."
+        raise ValueError(msg)
     q = np.asarray(march.spreadings, dtype=np.complex128)
     p = np.asarray(march.spreading_slopes, dtype=np.complex128)
     speed = np.interp(march.positions, z_prof, c_prof)
@@ -3342,10 +3377,12 @@ def parabolic_equation(
     rmax = require_positive(max_range, "max_range")
     dr = require_positive(range_step, "range_step")
     if dr > rmax:
-        raise ValueError("'range_step' must not exceed 'max_range'.")
+        msg = "'range_step' must not exceed 'max_range'."
+        raise ValueError(msg)
     n = int(n_depth_points)
     if n < 16:
-        raise ValueError("'n_depth_points' must be at least 16.")
+        msg = "'n_depth_points' must be at least 16."
+        raise ValueError(msg)
 
     # Interior depth grid z_j = j·Δz, j = 1..n (pressure-release at 0 and D).
     dz = water_depth / (n + 1)

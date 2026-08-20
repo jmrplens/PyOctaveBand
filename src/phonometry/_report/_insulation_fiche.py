@@ -258,18 +258,18 @@ def render_insulation_fiche(
     # result, and it must carry the per-band arrays the table and plot consume
     # (np.asarray(None) would otherwise yield a 0-d array and crash the table).
     if rating.quantity != ("impact" if is_impact else "airborne"):
-        raise ValueError(
-            "The ISO 717 rating quantity does not match the reported result."
-        )
+        msg = "The ISO 717 rating quantity does not match the reported result."
+        raise ValueError(msg)
     if (
         rating.band_centers is None
         or rating.measured is None
         or rating.shifted_reference is None
     ):
-        raise ValueError(
+        msg = (
             "The report needs the ISO 717 per-band rating data ('band_centers', "
             "'measured' and 'shifted_reference') on the rating."
         )
+        raise ValueError(msg)
 
     rating_symbol = spec["rating_symbol"]
     curve = np.asarray(getattr(result, curve_attr), dtype=np.float64)
@@ -277,11 +277,12 @@ def render_insulation_fiche(
     measured = np.asarray(rating.measured, dtype=np.float64)
     shifted = np.asarray(rating.shifted_reference, dtype=np.float64)
     if not (curve.shape == centers.shape == measured.shape == shifted.shape):
-        raise ValueError(
+        msg = (
             "The report needs matching per-band lengths: the rating's "
             "'band_centers', 'measured' and 'shifted_reference' and the "
             "result's per-band curve must all have the same length."
         )
+        raise ValueError(msg)
 
     styles, title_style, basis_style, caption_style = document_styles(accent)
     title_text = t(spec["title"], language)

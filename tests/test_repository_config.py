@@ -61,7 +61,8 @@ def _glob_to_regex(pattern: str) -> re.Pattern[str]:
         elif re.fullmatch(r"[\w.*-]+", segment):
             out += re.escape(segment).replace(r"\*", "[^/]*")
         else:
-            raise AssertionError(f"unsupported glob segment {segment!r} in {pattern!r}")
+            msg = f"unsupported glob segment {segment!r} in {pattern!r}"
+            raise AssertionError(msg)
         if not last:
             out += "/"
     return re.compile(out)

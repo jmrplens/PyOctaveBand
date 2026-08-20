@@ -88,9 +88,8 @@ def _jomopans_echo(
 ) -> NDArray[np.float64]:
     key = vessel_class.strip().lower()
     if key not in _VESSEL_CLASSES:
-        raise ValueError(
-            f"'vessel_class' must be one of {VESSEL_CLASSES}, got {vessel_class!r}."
-        )
+        msg = f"'vessel_class' must be one of {VESSEL_CLASSES}, got {vessel_class!r}."
+        raise ValueError(msg)
     v_c, cargo, d_lo, d_hi = _VESSEL_CLASSES[key]
     v = require_positive(speed_knots, "speed_knots")
     length = require_positive(length_m, "length_m")
@@ -220,7 +219,8 @@ def ship_source_spectrum(
     elif key == "wales-heitmeyer":
         psd = _wales_heitmeyer(f)
     else:
-        raise ValueError(f"'model' must be one of {_MODELS}, got {model!r}.")
+        msg = f"'model' must be one of {_MODELS}, got {model!r}."
+        raise ValueError(msg)
     band = psd + 10.0 * np.log10(0.231 * f)
     return ShipTrafficSpectrum(
         frequency=f,

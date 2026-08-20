@@ -173,12 +173,13 @@ def headline_level(result: Any, level_a: float | None = None) -> float:
     """
     if level_a is not None:
         if not math.isfinite(float(level_a)):
-            raise ValueError(
+            msg = (
                 "the screened A-weighted level is not defined: no band "
                 "survived the qualification, so there is no determination to "
                 "report. Re-run the measurement rather than reporting the "
                 "total over the bands the criteria rejected."
             )
+            raise ValueError(msg)
         return float(level_a)
     lwa = float(result.sound_power_level_a)
     return lwa if math.isfinite(lwa) else total_power_level(result)

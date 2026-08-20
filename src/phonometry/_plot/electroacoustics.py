@@ -242,10 +242,11 @@ def plot_modulation_distortion(
         or result.carrier_amplitude is None
         or result.f_high is None
     ):
-        raise ValueError(
+        msg = (
             "this result carries no sideband spectrum data to plot; obtain it "
             "from modulation_distortion()."
         )
+        raise ValueError(msg)
     ax = ax if ax is not None else _new_axes()
     tiny = np.finfo(np.float64).tiny
     carrier = float(result.carrier_amplitude)
@@ -879,7 +880,8 @@ def _plot_one_quantity(
 
     if quantity not in table:
         allowed = ", ".join(repr(q) for q in table)
-        raise ValueError(f"unknown quantity {quantity!r}; choose one of {allowed}.")
+        msg = f"unknown quantity {quantity!r}; choose one of {allowed}."
+        raise ValueError(msg)
     drawer, polar, attr = table[quantity]
     if attr is not None and getattr(result, attr) is None:
         raise ValueError(missing[quantity])

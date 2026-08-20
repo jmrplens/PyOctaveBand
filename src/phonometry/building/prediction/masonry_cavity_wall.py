@@ -128,9 +128,8 @@ def wall_tie_stiffness(tie: str) -> tuple[float, float]:
     try:
         return WALL_TIE_STIFFNESS[tie]
     except KeyError:
-        raise ValueError(
-            f"Unknown wall tie {tie!r}; choose one of {sorted(WALL_TIE_STIFFNESS)}."
-        ) from None
+        msg = f"Unknown wall tie {tie!r}; choose one of {sorted(WALL_TIE_STIFFNESS)}."
+        raise ValueError(msg) from None
 
 
 def wall_tie_stiffness_per_area(ties_per_area: float, tie: str | float) -> float:
@@ -242,7 +241,8 @@ def wall_tie_coupling_loss_factor(
     """
     f = require_finite_array(frequency, "frequency")
     if np.any(f <= 0.0):
-        raise ValueError("'frequency' must be positive and finite.")
+        msg = "'frequency' must be positive and finite."
+        raise ValueError(msg)
     m1 = require_positive(mass1, "mass1")
     require_positive(mass2, "mass2")
     n = require_positive(ties_per_area, "ties_per_area")

@@ -81,15 +81,17 @@ def _as_curve(
     f = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     v = np.atleast_1d(np.asarray(values, dtype=np.float64))
     if f.ndim != 1 or v.ndim != 1 or f.shape != v.shape:
-        raise ValueError(
-            f"'{name}' frequencies and values must be 1-D and equal length."
-        )
+        msg = f"'{name}' frequencies and values must be 1-D and equal length."
+        raise ValueError(msg)
     if f.size < 2:
-        raise ValueError(f"'{name}' needs at least two frequency points.")
+        msg = f"'{name}' needs at least two frequency points."
+        raise ValueError(msg)
     if np.any(f <= 0.0) or not np.all(np.isfinite(f)):
-        raise ValueError(f"'{name}' frequencies must be positive and finite.")
+        msg = f"'{name}' frequencies must be positive and finite."
+        raise ValueError(msg)
     if not np.all(np.isfinite(v)):
-        raise ValueError(f"'{name}' values must be finite.")
+        msg = f"'{name}' values must be finite."
+        raise ValueError(msg)
     order = np.argsort(f)
     return f[order], v[order]
 
@@ -435,9 +437,8 @@ class LoudspeakerCharacteristics:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         del verbose  # uniform signature; the fiche has a single layout
         from .._report.iec60268_5 import render_iec60268_5_report
 
@@ -486,10 +487,11 @@ def _polar_from_piston(
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], float, float | None]:
     """Derive (angles_deg, relative_db, frequency, DI) from a piston result."""
     if piston.angles is None or piston.directivity is None:
-        raise ValueError(
+        msg = (
             "'directivity.piston' must be a radiating-piston result computed with "
             "'angles' so it carries a directivity pattern."
         )
+        raise ValueError(msg)
     freqs = np.asarray(piston.frequencies, dtype=np.float64)
     target = (
         float(polar_frequency)
@@ -522,7 +524,8 @@ def _resolve_sensitivity_band(
         return (f_peak / _OCTAVE_HALF, f_peak * _OCTAVE_HALF)
     lo, hi = float(sensitivity_band[0]), float(sensitivity_band[1])
     if not 0.0 < lo < hi:
-        raise ValueError("'sensitivity_band' must be a positive (lo, hi) with lo < hi.")
+        msg = "'sensitivity_band' must be a positive (lo, hi) with lo < hi."
+        raise ValueError(msg)
     return (lo, hi)
 
 
@@ -537,7 +540,8 @@ def _characteristic_sensitivity_level(
     """Band-mean on-axis level referred to 1 W into ``R`` at 1 m (20.3/20.4)."""
     in_band = (f >= band[0]) & (f <= band[1])
     if not np.any(in_band):
-        raise ValueError("'sensitivity_band' selects no on-axis response samples.")
+        msg = "'sensitivity_band' selects no on-axis response samples."
+        raise ValueError(msg)
     band_level = _energetic_mean_db(spl[in_band])
     # The drive-voltage and distance corrections; U_p = sqrt(R) drives 1 W into R.
     return float(
@@ -553,7 +557,8 @@ def _resolve_impedance(
         return None, None
     imp_f, imp_z = _as_curve(impedance[0], impedance[1], "impedance")
     if np.any(imp_z <= 0.0):
-        raise ValueError("'impedance' modulus must be positive.")
+        msg = "'impedance' modulus must be positive."
+        raise ValueError(msg)
     return imp_f, imp_z
 
 
@@ -569,7 +574,8 @@ def _resolve_distortion(
         thd_f = np.asarray(distortion.thd_frequencies, dtype=np.float64)
         thd_p = np.asarray(distortion.thd, dtype=np.float64) * 100.0
     if np.any(thd_p < 0.0):
-        raise ValueError("'distortion' THD values must be non-negative.")
+        msg = "'distortion' THD values must be non-negative."
+        raise ValueError(msg)
     return thd_f, thd_p
 
 
@@ -588,9 +594,11 @@ def _resolve_polar(
     p_ang = np.atleast_1d(np.asarray(polar[0], dtype=np.float64))
     p_db = np.atleast_1d(np.asarray(polar[1], dtype=np.float64))
     if p_ang.ndim != 1 or p_ang.shape != p_db.shape:
-        raise ValueError("'polar' angles and levels must be 1-D and equal length.")
+        msg = "'polar' angles and levels must be 1-D and equal length."
+        raise ValueError(msg)
     if not (np.all(np.isfinite(p_ang)) and np.all(np.isfinite(p_db))):
-        raise ValueError("'polar' angles and levels must be finite.")
+        msg = "'polar' angles and levels must be finite."
+        raise ValueError(msg)
     return p_ang, p_db, polar_frequency, directivity.index_db
 
 

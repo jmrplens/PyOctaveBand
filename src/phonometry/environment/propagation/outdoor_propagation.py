@@ -128,13 +128,14 @@ class Barrier:
     def __post_init__(self) -> None:
         """Reject negative ``dss``/``dsr``/``a`` and a non-positive spacing ``e``."""
         if self.source_to_edge < 0.0 or self.edge_to_receiver < 0.0:
-            raise ValueError("Barrier edge distances must be non-negative.")
+            msg = "Barrier edge distances must be non-negative."
+            raise ValueError(msg)
         if self.parallel_distance < 0.0:
-            raise ValueError("'parallel_distance' must be non-negative.")
+            msg = "'parallel_distance' must be non-negative."
+            raise ValueError(msg)
         if self.edge_separation is not None and self.edge_separation <= 0.0:
-            raise ValueError(
-                "'edge_separation' must be positive; use None for single diffraction."
-            )
+            msg = "'edge_separation' must be positive; use None for single diffraction."
+            raise ValueError(msg)
 
     @property
     def is_double(self) -> bool:
@@ -352,9 +353,8 @@ class OutdoorAttenuation:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iso9613 import render_outdoor_attenuation_report
 
         return render_outdoor_attenuation_report(
@@ -527,14 +527,17 @@ def ground_attenuation(
         ("ground_receiver", ground_receiver),
     ):
         if not 0.0 <= g <= 1.0:
-            raise ValueError(f"'{name}' must be within [0, 1].")
+            msg = f"'{name}' must be within [0, 1]."
+            raise ValueError(msg)
     if distance <= 0.0:
         raise ValueError(_DISTANCE_NOT_POSITIVE)
     if source_height < 0.0 or receiver_height < 0.0:
-        raise ValueError("Source and receiver heights must be non-negative.")
+        msg = "Source and receiver heights must be non-negative."
+        raise ValueError(msg)
     freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if np.any(freqs <= 0.0):
-        raise ValueError("'frequencies' must be positive.")
+        msg = "'frequencies' must be positive."
+        raise ValueError(msg)
     dp = _projected_distance(
         distance, source_height, receiver_height, projected_distance
     )
@@ -652,7 +655,8 @@ def barrier_attenuation(
         raise ValueError(_DISTANCE_NOT_POSITIVE)
     freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if np.any(freqs <= 0.0):
-        raise ValueError("'frequencies' must be positive.")
+        msg = "'frequencies' must be positive."
+        raise ValueError(msg)
     dss = barrier.source_to_edge
     dsr = barrier.edge_to_receiver
     a = barrier.parallel_distance

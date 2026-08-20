@@ -72,7 +72,8 @@ _WFR_ROUGHNESS_WEIGHT = 0.6
 def _nonnegative(value: float, name: str) -> float:
     scalar = float(value)
     if not np.isfinite(scalar) or scalar < 0.0:
-        raise ValueError(f"'{name}' must be a non-negative, finite number.")
+        msg = f"'{name}' must be a non-negative, finite number."
+        raise ValueError(msg)
     return scalar
 
 

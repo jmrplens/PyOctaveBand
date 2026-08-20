@@ -382,10 +382,11 @@ class FacadeInsulationResult:
     def __post_init__(self) -> None:
         """Reject a ``method`` other than ``"loudspeaker"`` or ``"road_traffic"``."""
         if self.method not in _FACADE_CORRECTION:
-            raise ValueError(
+            msg = (
                 "'method' must be 'loudspeaker' or 'road_traffic', got "
                 f"{self.method!r}."
             )
+            raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -496,37 +497,40 @@ def _render_iso16283(
 
     check_language(language)
     if engine != "reportlab":
-        raise ValueError(
-            f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-        )
+        msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+        raise ValueError(msg)
     kind = type(result).__name__
     quantities, chain_attrs = _FIELD_QUANTITIES[kind]
     if quantity not in quantities:
         expected = " or ".join(repr(q) for q in quantities)
-        raise ValueError(f"Unknown field quantity {quantity!r}; expected {expected}.")
+        msg = f"Unknown field quantity {quantity!r}; expected {expected}."
+        raise ValueError(msg)
     curve = getattr(result, quantity)
     if curve is None:
-        raise ValueError(
+        msg = (
             f"The result carries no {quantity!r} curve; build it with the "
             "'area'/'volume' arguments so the normalized quantity is "
             "computed."
         )
+        raise ValueError(msg)
     curve = np.asarray(curve, dtype=np.float64)
     if curve.shape != (len(_FREQ_THIRD_OCTAVE),):
-        raise ValueError(
+        msg = (
             "The field report rates the 16 core one-third-octave bands "
             f"(100 Hz to 3150 Hz, ISO 16283 Clause 5); got {curve.shape} "
             "band values."
         )
+        raise ValueError(msg)
     if verbose:
         missing = [a for a in chain_attrs if getattr(result, a) is None]
         if missing:
-            raise ValueError(
+            msg = (
                 "verbose=True needs the per-band measurement chain "
                 f"({', '.join(chain_attrs)}); {', '.join(missing)} "
                 "missing. Build the result with airborne_insulation() / "
                 "impact_insulation() so they are populated."
             )
+            raise ValueError(msg)
     if kind == "ImpactInsulationResult":
         rating: WeightedRatingResult | ImpactRatingResult = weighted_impact_rating(
             curve
@@ -574,26 +578,28 @@ def _render_iso16283_facade(
 
     check_language(language)
     if engine != "reportlab":
-        raise ValueError(
-            f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-        )
+        msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+        raise ValueError(msg)
     if quantity not in _FACADE_FIELD_QUANTITIES:
         expected = " or ".join(repr(q) for q in _FACADE_FIELD_QUANTITIES)
-        raise ValueError(f"Unknown facade quantity {quantity!r}; expected {expected}.")
+        msg = f"Unknown facade quantity {quantity!r}; expected {expected}."
+        raise ValueError(msg)
     curve = getattr(result, quantity)
     if curve is None:
-        raise ValueError(
+        msg = (
             f"The result carries no {quantity!r} curve; build it with the "
             "'volume' (and, for R', 'surface_level'/'area') arguments so the "
             "quantity is computed."
         )
+        raise ValueError(msg)
     curve = np.asarray(curve, dtype=np.float64)
     if curve.shape != (len(_FREQ_THIRD_OCTAVE),):
-        raise ValueError(
+        msg = (
             "The facade field report rates the 16 core one-third-octave bands "
             f"(100 Hz to 3150 Hz, ISO 16283-3 Clause 5); got {curve.shape} "
             "band values."
         )
+        raise ValueError(msg)
     rating = weighted_rating(curve)
 
     from ..._report.iso16283 import render_iso16283_facade_report
@@ -628,9 +634,11 @@ def energy_average_level(
     """
     data = np.asarray(levels, dtype=np.float64)
     if data.size == 0:
-        raise ValueError("'levels' must not be empty.")
+        msg = "'levels' must not be empty."
+        raise ValueError(msg)
     if not np.all(np.isfinite(data)):
-        raise ValueError("'levels' must contain only finite values.")
+        msg = "'levels' must contain only finite values."
+        raise ValueError(msg)
     return as_float_or_array(energy_mean(data, axis=axis))
 
 
@@ -647,11 +655,14 @@ def _as_band_levels(levels: Sequence[float] | np.ndarray, name: str) -> np.ndarr
     elif data.ndim == 2:
         out = np.asarray(energy_average_level(data, axis=0), dtype=np.float64)
     else:
-        raise ValueError(f"'{name}' must be 1-D or 2-D (positions x bands).")
+        msg = f"'{name}' must be 1-D or 2-D (positions x bands)."
+        raise ValueError(msg)
     if out.size == 0:
-        raise ValueError(f"'{name}' must not be empty.")
+        msg = f"'{name}' must not be empty."
+        raise ValueError(msg)
     if not np.all(np.isfinite(out)):
-        raise ValueError(f"'{name}' must contain only finite values.")
+        msg = f"'{name}' must contain only finite values."
+        raise ValueError(msg)
     return out
 
 
@@ -663,11 +674,14 @@ def _validate_reverberation(t: np.ndarray, t0: float) -> None:
     ISO 16283 part.
     """
     if t.ndim != 1:
-        raise ValueError("'t2' must be one-dimensional (one value per band).")
+        msg = "'t2' must be one-dimensional (one value per band)."
+        raise ValueError(msg)
     if not np.all(np.isfinite(t)) or np.any(t <= 0.0):
-        raise ValueError("'t2' must contain positive, finite values.")
+        msg = "'t2' must contain positive, finite values."
+        raise ValueError(msg)
     if t0 <= 0.0:
-        raise ValueError("'t0' must be positive.")
+        msg = "'t0' must be positive."
+        raise ValueError(msg)
 
 
 @overload
@@ -738,18 +752,21 @@ def airborne_insulation(
     t = np.asarray(t2, dtype=np.float64)
 
     if not (l1_bands.shape == l2_bands.shape == t.shape):
-        raise ValueError("'l1', 'l2' and 't2' must share the same band count.")
+        msg = "'l1', 'l2' and 't2' must share the same band count."
+        raise ValueError(msg)
     _validate_reverberation(t, t0)
 
     d = l1_bands - l2_bands
     dnt = d + 10.0 * np.log10(t / t0)
 
     if (area is None) != (volume is None):
-        raise ValueError("'area' and 'volume' must be given together to compute R'.")
+        msg = "'area' and 'volume' must be given together to compute R'."
+        raise ValueError(msg)
     r_prime: np.ndarray | None = None
     if area is not None and volume is not None:
         if area <= 0.0 or volume <= 0.0:
-            raise ValueError("'area' and 'volume' must be positive.")
+            msg = "'area' and 'volume' must be positive."
+            raise ValueError(msg)
         absorption = 0.16 * volume / t
         r_prime = d + 10.0 * np.log10(area / absorption)
 
@@ -806,7 +823,8 @@ def impact_insulation(
     t = np.asarray(t2, dtype=np.float64)
 
     if li_bands.shape != t.shape:
-        raise ValueError("'li' and 't2' must share the same band count.")
+        msg = "'li' and 't2' must share the same band count."
+        raise ValueError(msg)
     _validate_reverberation(t, t0)
 
     l_n_t = li_bands - 10.0 * np.log10(t / t0)
@@ -814,7 +832,8 @@ def impact_insulation(
     l_n: np.ndarray | None = None
     if volume is not None:
         if volume <= 0.0:
-            raise ValueError("'volume' must be positive.")
+            msg = "'volume' must be positive."
+            raise ValueError(msg)
         absorption = 0.16 * volume / t
         l_n = li_bands + 10.0 * np.log10(absorption / _A0_IMPACT)
 
@@ -839,19 +858,23 @@ def _validate_facade_geometry(
     receiving-room volume together.
     """
     if volume is not None and volume <= 0.0:
-        raise ValueError("'volume' must be positive.")
+        msg = "'volume' must be positive."
+        raise ValueError(msg)
     if area is not None and area <= 0.0:
-        raise ValueError("'area' must be positive.")
+        msg = "'area' must be positive."
+        raise ValueError(msg)
     if area is not None and surface_level is None:
-        raise ValueError(
+        msg = (
             "'area' requires 'surface_level' to compute the apparent sound "
             "reduction index R'."
         )
+        raise ValueError(msg)
     if surface_level is not None and area is not None and volume is None:
-        raise ValueError(
+        msg = (
             "'volume' is required with 'surface_level' and 'area' to compute "
             "the apparent sound reduction index R'."
         )
+        raise ValueError(msg)
 
 
 def facade_insulation(
@@ -926,16 +949,16 @@ def facade_insulation(
         stays ``None``.
     """
     if method not in _FACADE_CORRECTION:
-        raise ValueError(
-            f"'method' must be 'loudspeaker' or 'road_traffic', got {method!r}."
-        )
+        msg = f"'method' must be 'loudspeaker' or 'road_traffic', got {method!r}."
+        raise ValueError(msg)
 
     l1_bands = _as_band_levels(l1_2m, "l1_2m")
     l2_bands = _as_band_levels(l2, "l2")
     t = np.asarray(t2, dtype=np.float64)
 
     if not (l1_bands.shape == l2_bands.shape == t.shape):
-        raise ValueError("'l1_2m', 'l2' and 't2' must share the same band count.")
+        msg = "'l1_2m', 'l2' and 't2' must share the same band count."
+        raise ValueError(msg)
     _validate_reverberation(t, t0)
 
     d_2m = l1_bands - l2_bands
@@ -954,7 +977,8 @@ def facade_insulation(
     if surface_level is not None and area is not None and absorption is not None:
         surf_bands = _as_band_levels(surface_level, "surface_level")
         if surf_bands.shape != l2_bands.shape:
-            raise ValueError("'surface_level' must share the band count of 'l2'.")
+            msg = "'surface_level' must share the band count of 'l2'."
+            raise ValueError(msg)
         r_prime = (
             surf_bands
             - l2_bands
@@ -966,10 +990,11 @@ def facade_insulation(
         np.asarray(frequencies, dtype=np.float64) if frequencies is not None else None
     )
     if freqs is not None and freqs.shape != d_2m.shape:
-        raise ValueError(
+        msg = (
             "'frequencies' must have one value per band; got "
             f"{freqs.size} for {d_2m.size} bands."
         )
+        raise ValueError(msg)
     return FacadeInsulationResult(
         d_2m=d_2m,
         d_2m_nt=d_2m_nt,

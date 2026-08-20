@@ -171,9 +171,8 @@ class EnclosureResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.enclosure import render_enclosure_report
 
         return render_enclosure_report(
@@ -205,9 +204,11 @@ def _resolve_frequencies(
         return None
     freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if freqs.ndim != 1 or freqs.size == 0:
-        raise ValueError("'frequencies' must be a non-empty 1-D array.")
+        msg = "'frequencies' must be a non-empty 1-D array."
+        raise ValueError(msg)
     if np.any(freqs <= 0.0) or not np.all(np.isfinite(freqs)):
-        raise ValueError("'frequencies' must be positive and finite.")
+        msg = "'frequencies' must be positive and finite."
+        raise ValueError(msg)
     return freqs
 
 
@@ -219,14 +220,17 @@ def _resolve_panel_r(
     """Resolve a per-band decibel spectrum into a validated 1-D array."""
     if callable(values):
         if freqs is None:
-            raise ValueError(f"'frequencies' is required when '{name}' is a callable.")
+            msg = f"'frequencies' is required when '{name}' is a callable."
+            raise ValueError(msg)
         r = np.atleast_1d(np.asarray(values(freqs), dtype=np.float64))
     else:
         r = np.atleast_1d(np.asarray(values, dtype=np.float64))
     if r.ndim != 1 or r.size == 0:
-        raise ValueError(f"'{name}' must be a non-empty 1-D array.")
+        msg = f"'{name}' must be a non-empty 1-D array."
+        raise ValueError(msg)
     if not np.all(np.isfinite(r)):
-        raise ValueError(f"'{name}' must be finite.")
+        msg = f"'{name}' must be finite."
+        raise ValueError(msg)
     return r
 
 
@@ -262,16 +266,17 @@ def _resolve_interior(
 
     alpha = np.asarray(internal_absorption, dtype=np.float64)
     if alpha.ndim > 1:
-        raise ValueError("'internal_absorption' must be a scalar or a 1-D array.")
+        msg = "'internal_absorption' must be a scalar or a 1-D array."
+        raise ValueError(msg)
     if np.any(alpha <= 0.0) or np.any(alpha >= 1.0) or not np.all(np.isfinite(alpha)):
-        raise ValueError("'internal_absorption' must lie strictly in (0, 1).")
+        msg = "'internal_absorption' must lie strictly in (0, 1)."
+        raise ValueError(msg)
 
     r_i = np.atleast_1d(np.asarray(room_constant(s_i, alpha), dtype=np.float64))
     r_i_b, v_b = np.broadcast_arrays(r_i, v)
     if freqs is not None and freqs.shape != v_b.shape:
-        raise ValueError(
-            f"'frequencies' must match the number of {name} / absorption bands."
-        )
+        msg = f"'frequencies' must match the number of {name} / absorption bands."
+        raise ValueError(msg)
     correction = 10.0 * np.log10(floor + s_e / r_i_b)
     return (
         freqs,

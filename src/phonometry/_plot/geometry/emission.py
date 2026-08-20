@@ -158,9 +158,11 @@ def plot_microphone_positions(
     _check_language(language)
     pts = np.asarray(positions, dtype=np.float64)
     if pts.ndim != 2 or pts.shape[1] != 3 or pts.shape[0] == 0:
-        raise ValueError("'positions' must have shape (N, 3) with N >= 1.")
+        msg = "'positions' must have shape (N, 3) with N >= 1."
+        raise ValueError(msg)
     if radius is not None and radius <= 0.0:
-        raise ValueError("'radius' must be positive when given.")
+        msg = "'radius' must be positive when given."
+        raise ValueError(msg)
     r = (
         float(radius)
         if radius is not None
@@ -261,7 +263,8 @@ def plot_pp_probe_geometry(
 
     _check_language(language)
     if spacing <= 0.0:
-        raise ValueError("'spacing' must be positive.")
+        msg = "'spacing' must be positive."
+        raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
     dr = float(spacing)
@@ -340,8 +343,9 @@ def plot_intensity_result_geometry(
 ) -> Axes:
     """Probe drawing for a result that retained its spacer."""
     if result.spacing is None:
-        raise ValueError(
+        msg = (
             "This result does not retain its microphone spacing; call "
             "plot_pp_probe_geometry(spacing)."
         )
+        raise ValueError(msg)
     return plot_pp_probe_geometry(result.spacing, ax=ax, language=language, **kwargs)

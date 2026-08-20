@@ -82,7 +82,8 @@ class MetadiffuserWell:
         """Reject a non-positive ``slit_height`` and a well with no resonators."""
         require_positive(self.slit_height, "slit_height")
         if not self.resonators:
-            raise ValueError("'resonators' must contain at least one resonator.")
+            msg = "'resonators' must contain at least one resonator."
+            raise ValueError(msg)
 
 
 @dataclass(frozen=True)
@@ -147,17 +148,20 @@ def _check_panel(
     require_positive(period, "period")
     cells = tuple(wells)
     if len(cells) < 2:
-        raise ValueError("'wells' must contain at least two wells.")
+        msg = "'wells' must contain at least two wells."
+        raise ValueError(msg)
     for i, well in enumerate(cells):
         if well is None:
             continue
         if not isinstance(well, MetadiffuserWell):
-            raise TypeError(
+            msg = (
                 f"wells[{i}] must be a MetadiffuserWell or None, "
                 f"got {type(well).__name__}."
             )
+            raise TypeError(msg)
         if well.slit_height >= period:
-            raise ValueError(f"wells[{i}].slit_height must be smaller than the period.")
+            msg = f"wells[{i}].slit_height must be smaller than the period."
+            raise ValueError(msg)
     return cells
 
 
@@ -339,7 +343,8 @@ def metadiffuser_diffusion_spectrum(
     """
     freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if freqs.ndim != 1 or freqs.size == 0:
-        raise ValueError("'frequencies' must be a non-empty 1-D sequence.")
+        msg = "'frequencies' must be a non-empty 1-D sequence."
+        raise ValueError(msg)
     cells = _check_panel(wells, depth, period)
     flat = np.ones(len(cells), dtype=np.complex128)
     result = metadiffuser_reflection(

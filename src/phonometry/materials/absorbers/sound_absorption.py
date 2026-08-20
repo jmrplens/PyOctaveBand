@@ -142,7 +142,8 @@ def _resolve_speed(temperature: float, speed_of_sound: float | None) -> float:
     """
     if speed_of_sound is not None:
         if speed_of_sound <= 0.0:
-            raise ValueError("'speed_of_sound' must be positive.")
+            msg = "'speed_of_sound' must be positive."
+            raise ValueError(msg)
         return float(speed_of_sound)
     lo, hi = _EQ6_TEMPERATURE_RANGE
     if not lo <= temperature <= hi:
@@ -171,7 +172,8 @@ def attenuation_from_alpha(alpha: ArrayLike) -> NDArray[np.float64]:
     """
     a = np.asarray(alpha, dtype=np.float64)
     if np.any(a < 0.0):
-        raise ValueError("'alpha' must be non-negative.")
+        msg = "'alpha' must be non-negative."
+        raise ValueError(msg)
     return a / _TEN_LG_E
 
 
@@ -179,15 +181,17 @@ def _validate_area_inputs(
     t: NDArray[np.float64], volume: float, m: NDArray[np.float64]
 ) -> None:
     if volume <= 0.0:
-        raise ValueError("'volume' must be positive.")
+        msg = "'volume' must be positive."
+        raise ValueError(msg)
     if np.any(t <= 0.0):
-        raise ValueError("Reverberation times must be positive.")
+        msg = "Reverberation times must be positive."
+        raise ValueError(msg)
     if np.any(m < 0.0):
-        raise ValueError("Air attenuation coefficient 'm' must be non-negative.")
+        msg = "Air attenuation coefficient 'm' must be non-negative."
+        raise ValueError(msg)
     if m.ndim != 0 and m.shape != t.shape:
-        raise ValueError(
-            "'m' must be a scalar or an array matching the shape of 't60'."
-        )
+        msg = "'m' must be a scalar or an array matching the shape of 't60'."
+        raise ValueError(msg)
 
 
 def _absorption_area(
@@ -309,9 +313,11 @@ def absorption_coefficient(
         ``t1`` and ``t2``.
     """
     if sample_area <= 0.0:
-        raise ValueError("'sample_area' must be positive.")
+        msg = "'sample_area' must be positive."
+        raise ValueError(msg)
     if volume <= 0.0:
-        raise ValueError("'volume' must be positive.")
+        msg = "'volume' must be positive."
+        raise ValueError(msg)
     if temperature2 is None:
         temperature2 = temperature1
     if speed_of_sound2 is None:
@@ -475,9 +481,8 @@ class SoundAbsorptionMeasurement:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iso354 import render_iso354_report
 
         return render_iso354_report(
@@ -548,10 +553,11 @@ def measure_sound_absorption(
     t1 = np.asarray(t_empty, dtype=np.float64)
     t2 = np.asarray(t_specimen, dtype=np.float64)
     if not (freqs.shape == t1.shape == t2.shape):
-        raise ValueError(
+        msg = (
             "'frequencies', 't_empty' and 't_specimen' must share one shape; "
             f"got {freqs.shape}, {t1.shape} and {t2.shape}."
         )
+        raise ValueError(msg)
     m_arr = np.broadcast_to(np.asarray(m, dtype=np.float64), freqs.shape).astype(
         np.float64, copy=True
     )

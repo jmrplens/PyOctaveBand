@@ -136,11 +136,12 @@ def expected_counts(root: pathlib.Path = ROOT) -> dict[str, int]:
     report = report_path(root)
     match = HEADLINE.search(_read(report))
     if match is None:
-        raise ValueError(
+        msg = (
             f"{_label(report, root)}: headline not found. The report format "
             "changed; update HEADLINE here and in "
             "site/src/data/conformance-stats.mjs."
         )
+        raise ValueError(msg)
     return {name: int(value) for name, value in match.groupdict().items()}
 
 
@@ -209,12 +210,13 @@ def claims_in(line: str) -> list[Claim]:
             if previous is None:
                 seen[(start, end)] = claim
             elif previous.field != field:
-                raise ValueError(
+                msg = (
                     f"ambiguous conformance claim {line[start:end]!r}: "
                     f"read as {previous.field!r} by {previous.phrase!r} and as "
                     f"{field!r} by {match.group(0)!r}. Tighten one of the "
                     "patterns in CLAIMS."
                 )
+                raise ValueError(msg)
     return [seen[key] for key in sorted(seen)]
 
 
@@ -236,10 +238,11 @@ def rewrite_line(line: str, expected: Mapping[str, int]) -> tuple[str, list[Clai
     reach = len(body)
     for claim in reversed(stale):
         if claim.end > reach:
-            raise ValueError(
+            msg = (
                 f"overlapping conformance claims in {body!r}; the writer cannot "
                 "rewrite spans that intersect."
             )
+            raise ValueError(msg)
         reach = claim.start
         body = body[: claim.start] + str(expected[claim.field]) + body[claim.end :]
     return body + ending, stale

@@ -421,7 +421,8 @@ def test_missing_audio_extra_is_named_in_the_error(
 
     def blocked(name: str, *args: object, **kwargs: object) -> object:
         if name == "soundfile" or name.startswith("soundfile."):
-            raise ImportError("No module named 'soundfile'")
+            msg = "No module named 'soundfile'"
+            raise ImportError(msg)
         return real_import(name, *args, **kwargs)  # type: ignore[arg-type]
 
     monkeypatch.setattr(builtins, "__import__", blocked)

@@ -373,9 +373,8 @@ class DuctPathResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.duct_path import render_duct_path_report
 
         return render_duct_path_report(
@@ -440,7 +439,8 @@ def duct_path(
     """
     f = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if f.ndim != 1 or f.size == 0:
-        raise ValueError("'frequencies' must be a non-empty 1-D array.")
+        msg = "'frequencies' must be a non-empty 1-D array."
+        raise ValueError(msg)
     n = f.size
     level = as_band_spectrum(source_level, n, "source_level")
     family, goal = validate_target(criterion, target)
@@ -456,10 +456,11 @@ def duct_path(
     stages: list[DuctPathStage] = []
     for position, element in enumerate(elements, start=1):
         if not isinstance(element, DuctElement):
-            raise TypeError(
+            msg = (
                 "'elements' must hold DuctElement entries; got "
                 f"{type(element).__name__} at position {position}."
             )
+            raise TypeError(msg)
         attenuation = as_band_spectrum(
             element.attenuation, n, f"elements[{position - 1}].attenuation"
         )
@@ -528,11 +529,13 @@ def combine_duct_paths(
     """
     items = list(paths)
     if not items:
-        raise ValueError("'paths' must hold at least one DuctPathResult.")
+        msg = "'paths' must hold at least one DuctPathResult."
+        raise ValueError(msg)
     f = np.asarray(items[0].frequencies, dtype=np.float64)
     for other in items[1:]:
         if not np.array_equal(np.asarray(other.frequencies, dtype=np.float64), f):
-            raise ValueError("all paths must share the same analysis bands.")
+            msg = "all paths must share the same analysis bands."
+            raise ValueError(msg)
     family, goal = validate_target(
         items[0].criterion if criterion is None else criterion,
         next((p.target for p in items if p.target is not None), None)

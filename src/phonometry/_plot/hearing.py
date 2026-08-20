@@ -261,10 +261,11 @@ def plot_occupational_exposure(
     from .._i18n import format_number, localize_axes
 
     if not result.tasks:
-        raise ValueError(
+        msg = (
             "plot() needs per-task contributions; only task_based_exposure() "
             "results carry them (the job/full-day strategies do not)."
         )
+        raise ValueError(msg)
     ax = ax if ax is not None else _new_axes()
     contributions = [t.lex_8h_contribution for t in result.tasks]
     labels = [t.label for t in result.tasks]

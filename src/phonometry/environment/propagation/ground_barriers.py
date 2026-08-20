@@ -165,7 +165,8 @@ def _normalized_ground_impedance(
     from ...materials.absorbers.porous import PorousMediumResult
 
     if (impedance is None) == (flow_resistivity is None):
-        raise ValueError("provide exactly one of 'impedance' or 'flow_resistivity'.")
+        msg = "provide exactly one of 'impedance' or 'flow_resistivity'."
+        raise ValueError(msg)
     if flow_resistivity is not None:
         sigma = require_positive(flow_resistivity, "flow_resistivity")
         if model == "delany_bazley":
@@ -177,9 +178,8 @@ def _normalized_ground_impedance(
                 frequency, sigma, speed_of_sound=speed_of_sound, air_density=air_density
             )
         else:
-            raise ValueError(
-                f"unknown ground model {model!r}; options: 'delany_bazley', 'miki'."
-            )
+            msg = f"unknown ground model {model!r}; options: 'delany_bazley', 'miki'."
+            raise ValueError(msg)
         # Materials e^{+j omega t} -> Salomons e^{-i omega t}: conjugate.
         return np.asarray(np.conj(medium.normalized_impedance), dtype=np.complex128)
     if isinstance(impedance, PorousMediumResult):
@@ -201,14 +201,17 @@ def _resolve_impedance_array(impedance: ArrayLike | None, frequency: Real) -> Co
     if z.size == 1:
         z = np.full(frequency.shape, z[0], dtype=np.complex128)
     if z.shape != frequency.shape:
-        raise ValueError(
+        msg = (
             "'impedance' must be a scalar or match the frequency vector "
             f"(got {z.shape}, expected {frequency.shape})."
         )
+        raise ValueError(msg)
     if not np.all(np.isfinite(z)):
-        raise ValueError("'impedance' must be finite.")
+        msg = "'impedance' must be finite."
+        raise ValueError(msg)
     if not np.all(np.abs(z) > 0.0):
-        raise ValueError("'impedance' must be non-zero.")
+        msg = "'impedance' must be non-zero."
+        raise ValueError(msg)
     return z
 
 
@@ -292,9 +295,11 @@ def spherical_reflection_coefficient(
         the impedance is zero, or its shape does not match the frequencies.
     """
     if source_height < 0.0 or receiver_height < 0.0:
-        raise ValueError("Source and receiver heights must be non-negative.")
+        msg = "Source and receiver heights must be non-negative."
+        raise ValueError(msg)
     if distance <= 0.0:
-        raise ValueError("'distance' must be positive.")
+        msg = "'distance' must be positive."
+        raise ValueError(msg)
     speed_of_sound = require_positive(speed_of_sound, "speed_of_sound")
     f = require_positive_array(frequencies, "frequencies")
     z = _resolve_impedance_array(normalized_impedance, f)
@@ -387,9 +392,11 @@ def ground_effect(
         are given, a height is negative, or the distance is not positive.
     """
     if source_height < 0.0 or receiver_height < 0.0:
-        raise ValueError("Source and receiver heights must be non-negative.")
+        msg = "Source and receiver heights must be non-negative."
+        raise ValueError(msg)
     if distance <= 0.0:
-        raise ValueError("'distance' must be positive.")
+        msg = "'distance' must be positive."
+        raise ValueError(msg)
     speed_of_sound = require_positive(speed_of_sound, "speed_of_sound")
     f = require_positive_array(frequencies, "frequencies")
     z = _normalized_ground_impedance(
@@ -448,7 +455,8 @@ def fresnel_number(
         ("direct_distance", direct_distance),
     ):
         if value <= 0.0:
-            raise ValueError(f"'{name}' must be positive.")
+            msg = f"'{name}' must be positive."
+            raise ValueError(msg)
     speed_of_sound = require_positive(speed_of_sound, "speed_of_sound")
     f = require_positive_array(frequencies, "frequencies")
     lam = speed_of_sound / f
@@ -696,9 +704,8 @@ class BarrierInsertionLoss:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iso9613 import render_barrier_insertion_loss_report
 
         return render_barrier_insertion_loss_report(
@@ -722,23 +729,27 @@ def _validate_barrier_geometry(
         line of sight, or a thick barrier whose far edge reaches the receiver.
     """
     if barrier_distance <= 0.0 or receiver_distance <= 0.0:
-        raise ValueError("Barrier and receiver distances must be positive.")
+        msg = "Barrier and receiver distances must be positive."
+        raise ValueError(msg)
     if receiver_distance <= barrier_distance:
-        raise ValueError("'receiver_distance' must exceed 'barrier_distance'.")
+        msg = "'receiver_distance' must exceed 'barrier_distance'."
+        raise ValueError(msg)
     if barrier_height <= max(source_height, receiver_height):
-        raise ValueError(
+        msg = (
             "'barrier_height' must exceed the source and receiver heights "
             "(the receiver must be in the geometric shadow)."
         )
+        raise ValueError(msg)
     if thickness is None:
         return None
     # require_positive rejects NaN/inf as well as non-positive widths.
     thickness = require_positive(thickness, "thickness")
     if barrier_distance + thickness >= receiver_distance:
-        raise ValueError(
+        msg = (
             "'receiver_distance' must exceed 'barrier_distance + thickness' "
             "(the receiver must lie beyond the barrier's far edge)."
         )
+        raise ValueError(msg)
     return thickness
 
 
@@ -835,7 +846,8 @@ def barrier_insertion_loss(
 
     if method == "kurze_anderson":
         if has_ground:
-            raise ValueError("the coherent ground model requires method='exact'.")
+            msg = "the coherent ground model requires method='exact'."
+            raise ValueError(msg)
         il = kurze_anderson_attenuation(n)
     elif method == "exact":
         il = _exact_barrier_il(
@@ -856,9 +868,8 @@ def barrier_insertion_loss(
             )
         )
     else:
-        raise ValueError(
-            f"unknown method {method!r}; options: 'kurze_anderson', 'exact'."
-        )
+        msg = f"unknown method {method!r}; options: 'kurze_anderson', 'exact'."
+        raise ValueError(msg)
     return BarrierInsertionLoss(
         frequencies=f,
         insertion_loss=np.asarray(il, dtype=np.float64),

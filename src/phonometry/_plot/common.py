@@ -465,7 +465,8 @@ def theme_line(
     from matplotlib.colors import to_rgb
 
     if not 0.0 <= quiet <= 1.0:
-        raise ValueError("'quiet' must be in 0-1.")
+        msg = "'quiet' must be in 0-1."
+        raise ValueError(msg)
     hue = to_rgb(color)
     page = _page_color(ax, background)
     weight = max(quiet, _line_weight(hue, page, ratio))
@@ -959,10 +960,11 @@ def _require_rating_curve(
         or result.measured is None
         or result.shifted_reference is None
     ):
-        raise ValueError(
+        msg = (
             "This rating result carries no band curve to plot (it was "
             "constructed without measured/reference data)."
         )
+        raise ValueError(msg)
 
 
 def _facade_x_axis(

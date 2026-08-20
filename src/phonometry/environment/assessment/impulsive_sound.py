@@ -189,9 +189,8 @@ class ImpulseProminenceResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iso1996_impulse import render_impulse_prominence_report
 
         return render_impulse_prominence_report(
@@ -224,9 +223,11 @@ def predicted_prominence(
     orate = np.asarray(onset_rate, dtype=np.float64)
     ld = np.asarray(level_difference, dtype=np.float64)
     if not (np.all(np.isfinite(orate)) and np.all(np.isfinite(ld))):
-        raise ValueError("onset_rate and level_difference must be finite.")
+        msg = "onset_rate and level_difference must be finite."
+        raise ValueError(msg)
     if np.any(orate <= 0.0) or np.any(ld <= 0.0):
-        raise ValueError("onset_rate and level_difference must be positive.")
+        msg = "onset_rate and level_difference must be positive."
+        raise ValueError(msg)
     k1, k2 = PROMINENCE_COEFFS
     return k1 * np.log10(orate) + k2 * np.log10(ld)
 
@@ -277,19 +278,22 @@ def impulse_prominence(
         positive and finite.
     """
     if not math.isfinite(assessment_period_min) or assessment_period_min <= 0.0:
-        raise ValueError(
+        msg = (
             f"assessment_period_min must be positive and finite; got "
             f"{assessment_period_min}."
         )
+        raise ValueError(msg)
     orate = np.asarray(onset_rates, dtype=np.float64).ravel()
     ld = np.asarray(level_differences, dtype=np.float64).ravel()
     if orate.size == 0:
-        raise ValueError("at least one impulse is required.")
+        msg = "at least one impulse is required."
+        raise ValueError(msg)
     if orate.shape != ld.shape:
-        raise ValueError(
+        msg = (
             f"onset_rates and level_differences must have the same shape; "
             f"got {orate.shape} and {ld.shape}."
         )
+        raise ValueError(msg)
     per_impulse = predicted_prominence(orate, ld)
     qualifies = orate > ONSET_RATE_LIMIT
     if not np.all(qualifies):
@@ -346,15 +350,19 @@ def rating_level(
     ki = np.atleast_1d(np.asarray(adjustment, dtype=np.float64))
     dt = np.atleast_1d(np.asarray(durations, dtype=np.float64))
     if not le.shape == ki.shape == dt.shape:
-        raise ValueError("laeq, adjustment and durations must have equal length.")
+        msg = "laeq, adjustment and durations must have equal length."
+        raise ValueError(msg)
     if le.size == 0:
-        raise ValueError("at least one sub-interval is required.")
+        msg = "at least one sub-interval is required."
+        raise ValueError(msg)
     if not (
         np.all(np.isfinite(le)) and np.all(np.isfinite(ki)) and np.all(np.isfinite(dt))
     ):
-        raise ValueError("laeq, adjustment and durations must be finite.")
+        msg = "laeq, adjustment and durations must be finite."
+        raise ValueError(msg)
     if not math.isfinite(reference_time) or reference_time <= 0.0 or np.any(dt <= 0.0):
-        raise ValueError("reference_time and durations must be positive.")
+        msg = "reference_time and durations must be positive."
+        raise ValueError(msg)
     energy = np.sum(dt * 10.0 ** ((le + ki) / 10.0))
     return float(10.0 * np.log10(energy / reference_time))
 
@@ -565,14 +573,15 @@ def sound_pressure_level_history(
     fs = resolve_fs(signal, fs, name="signal")
     x = np.asarray(resolve_samples(signal), dtype=np.float64).ravel()
     if not math.isfinite(fs) or fs <= 0.0:
-        raise ValueError("fs must be positive.")
+        msg = "fs must be positive."
+        raise ValueError(msg)
     lo, hi = SAMPLE_INTERVAL_RANGE
     if not lo <= dt <= hi:
-        raise ValueError(
-            f"dt must be within {lo * 1e3:g}-{hi * 1e3:g} ms (Clause 4); got {dt * 1e3:g} ms."
-        )
+        msg = f"dt must be within {lo * 1e3:g}-{hi * 1e3:g} ms (Clause 4); got {dt * 1e3:g} ms."
+        raise ValueError(msg)
     if x.size == 0:
-        raise ValueError("signal must not be empty.")
+        msg = "signal must not be empty."
+        raise ValueError(msg)
 
     weighted = np.asarray(weighting_filter(x, round(fs), curve="A"), dtype=np.float64)
     # Warm-start the F integrator at the first window's mean square so a steady
@@ -719,9 +728,11 @@ def detect_onsets(
     """
     lev = np.asarray(levels, dtype=np.float64).ravel()
     if not math.isfinite(dt) or dt <= 0.0:
-        raise ValueError("dt must be positive.")
+        msg = "dt must be positive."
+        raise ValueError(msg)
     if lev.size < 2:
-        raise ValueError("at least two level samples are required.")
+        msg = "at least two level samples are required."
+        raise ValueError(msg)
     times = np.arange(lev.size) * dt
     gradient = np.diff(lev) / dt
 

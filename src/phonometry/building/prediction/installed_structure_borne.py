@@ -108,10 +108,11 @@ def _positive_real_part(values: ArrayLike, name: str) -> np.ndarray:
         or not np.all(np.isfinite(arr.imag))
         or np.any(re <= 0.0)
     ):
-        raise ValueError(
+        msg = (
             f"'{name}' must be finite with a positive real part (a passive "
             "receiver dissipates power)."
         )
+        raise ValueError(msg)
     return arr
 
 
@@ -127,7 +128,8 @@ def _positive_values(values: ArrayLike, name: str) -> np.ndarray:
     """
     arr = np.asarray(values, dtype=np.float64)
     if not np.all(np.isfinite(arr)) or np.any(arr <= 0.0):
-        raise ValueError(f"'{name}' must be finite and strictly positive.")
+        msg = f"'{name}' must be finite and strictly positive."
+        raise ValueError(msg)
     return arr
 
 
@@ -136,7 +138,8 @@ def _nonzero_magnitude(values: ArrayLike, name: str) -> np.ndarray:
     arr = np.asarray(values, dtype=np.complex128)
     mag = np.abs(arr)
     if not np.all(np.isfinite(mag)) or not np.all(mag > 0.0):
-        raise ValueError(f"'{name}' must be finite and non-zero.")
+        msg = f"'{name}' must be finite and non-zero."
+        raise ValueError(msg)
     return arr
 
 
@@ -462,14 +465,14 @@ def _table_d1_arguments(
         )
     needs_frequency = structure in _TABLE_D1_FREQUENCY_DEPENDENT
     if needs_frequency and frequency is None:
-        raise ValueError(
-            f"Table D.1 row {structure!r} depends on frequency; pass 'frequency'."
-        )
+        msg = f"Table D.1 row {structure!r} depends on frequency; pass 'frequency'."
+        raise ValueError(msg)
     if not needs_frequency and frequency is not None:
-        raise ValueError(
+        msg = (
             f"Table D.1 row {structure!r} is frequency-independent; do not "
             "pass 'frequency'."
         )
+        raise ValueError(msg)
     return {k: float(supplied[k]) for k in required}  # type: ignore[arg-type]
 
 
@@ -810,7 +813,8 @@ def multi_junction_adjustment(junctions: int) -> float:
     :raises ValueError: for fewer than one junction.
     """
     if junctions < 1:
-        raise ValueError("'junctions' must be at least 1.")
+        msg = "'junctions' must be at least 1."
+        raise ValueError(msg)
     return _MULTI_JUNCTION_ADJUSTMENT[min(junctions, 3)]
 
 
@@ -899,7 +903,8 @@ def installed_power_from_reception_plate(
     lw = np.asarray(reception_plate_level, dtype=np.float64)
     y_i = np.abs(np.asarray(receiver_mobility, dtype=np.complex128))
     if not np.all(np.isfinite(y_i)) or np.any(y_i <= 0.0):
-        raise ValueError("'receiver_mobility' must be finite and non-zero.")
+        msg = "'receiver_mobility' must be finite and non-zero."
+        raise ValueError(msg)
     return np.asarray(lw + 10.0 * np.log10(y_i / plate_mobility), dtype=np.float64)
 
 
@@ -1064,9 +1069,8 @@ class InstalledSourceResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.en12354_5 import render_installed_structure_borne_report
 
         return render_installed_structure_borne_report(
@@ -1096,9 +1100,8 @@ def _widest_band_count(n_bands: int, paths: list[dict[str, Any]]) -> int:
     for k, p in enumerate(paths):
         missing = [key for key in _REQUIRED_PATH_KEYS if key not in p]
         if missing:
-            raise ValueError(
-                f"path {k} is missing required key(s): {', '.join(missing)}."
-            )
+            msg = f"path {k} is missing required key(s): {', '.join(missing)}."
+            raise ValueError(msg)
         for key in _PER_BAND_PATH_KEYS:
             n_bands = max(
                 n_bands, np.atleast_1d(np.asarray(p[key], dtype=np.float64)).size
@@ -1119,10 +1122,11 @@ def _path_pressure_levels(
         for key in _PER_BAND_PATH_KEYS:
             values = np.atleast_1d(np.asarray(p[key], dtype=np.float64))
             if values.size not in (1, n_bands):
-                raise ValueError(
+                msg = (
                     f"path {k}: {key!r} has {values.size} bands, expected 1 "
                     f"or {n_bands} to match the other per-band inputs."
                 )
+                raise ValueError(msg)
         rows.append(
             np.broadcast_to(
                 structure_borne_pressure_level_path(
@@ -1168,7 +1172,8 @@ def installed_source_prediction(
         count.
     """
     if not paths:
-        raise ValueError("'paths' must contain at least one transmission path.")
+        msg = "'paths' must contain at least one transmission path."
+        raise ValueError(msg)
     lw_inst = np.atleast_1d(
         np.asarray(
             installed_structure_borne_power_level(
@@ -1183,10 +1188,11 @@ def installed_source_prediction(
     # broadcast across the bands.
     n_bands = _widest_band_count(lw_inst.size, paths)
     if lw_inst.size not in (1, n_bands):
-        raise ValueError(
+        msg = (
             f"the source levels carry {lw_inst.size} bands, expected 1 or "
             f"{n_bands} to match the transmission paths."
         )
+        raise ValueError(msg)
     path_levels = _path_pressure_levels(lw_inst, paths, n_bands)
     total = total_structure_borne_pressure_level(path_levels)
     freq = (
@@ -1195,10 +1201,11 @@ def installed_source_prediction(
         else np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     )
     if freq is not None and freq.size != n_bands:
-        raise ValueError(
+        msg = (
             f"frequencies carries {freq.size} values, expected {n_bands} to "
             "match the per-band inputs."
         )
+        raise ValueError(msg)
     return InstalledSourceResult(
         path_levels=path_levels,
         total_level=np.asarray(total, dtype=np.float64),

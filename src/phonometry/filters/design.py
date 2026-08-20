@@ -13,7 +13,8 @@ def _cheby2_transition_ratio(order: int, attenuation: float) -> float:
     """Ratio between stopband-edge and -3 dB frequencies for a Chebyshev II prototype."""
     # Below ~3.01 dB the -3 dB point does not exist (arccosh argument < 1).
     if attenuation <= 10 * np.log10(2):
-        raise ValueError("cheby2 'attenuation' must be greater than 3.01 dB.")
+        msg = "cheby2 'attenuation' must be greater than 3.01 dB."
+        raise ValueError(msg)
     eps_term = np.sqrt(10 ** (attenuation / 10) - 1)
     return float(np.cosh(np.arccosh(eps_term) / order))
 
@@ -169,9 +170,8 @@ def _showfilter(
     try:
         import matplotlib.pyplot as plt
     except ImportError as exc:
-        raise ImportError(
-            "Plotting requires matplotlib. Install it with: pip install phonometry[plot]"
-        ) from exc
+        msg = "Plotting requires matplotlib. Install it with: pip install phonometry[plot]"
+        raise ImportError(msg) from exc
 
     wn = 8192
     w = np.zeros([wn, len(freq)])

@@ -107,7 +107,8 @@ def _require_distance(value: ArrayLike, name: str) -> NDArray[np.float64]:
     """Validate a positive, finite distance (scalar or array)."""
     r = np.asarray(value, dtype=np.float64)
     if not np.all(np.isfinite(r)) or np.any(r <= 0.0):
-        raise ValueError(f"'{name}' must be positive and finite.")
+        msg = f"'{name}' must be positive and finite."
+        raise ValueError(msg)
     return r
 
 
@@ -158,10 +159,12 @@ def crowd_noise_level(
     """
     n = np.asarray(talkers, dtype=np.float64)
     if not np.all(np.isfinite(n)) or np.any(n < 1.0):
-        raise ValueError("'talkers' must be at least 1 and finite.")
+        msg = "'talkers' must be at least 1 and finite."
+        raise ValueError(msg)
     a = np.asarray(absorption_area, dtype=np.float64)
     if not np.all(np.isfinite(a)) or np.any(a <= 0.0):
-        raise ValueError("'absorption_area' must be positive and finite.")
+        msg = "'absorption_area' must be positive and finite."
+        raise ValueError(msg)
     lw = float(sound_power_level)
     return as_float_or_array(lw + 10.0 * np.log10(n) + 10.0 * np.log10(4.0 / a))
 
@@ -188,7 +191,8 @@ def speech_to_noise_ratio(
     r = _require_distance(distance, "distance")
     a_tab = np.asarray(absorption_per_table, dtype=np.float64)
     if not np.all(np.isfinite(a_tab)) or np.any(a_tab <= 0.0):
-        raise ValueError("'absorption_per_table' must be positive and finite.")
+        msg = "'absorption_per_table' must be positive and finite."
+        raise ValueError(msg)
     q = require_positive(directivity, "directivity")
     return as_float_or_array(
         10.0 * np.log10(q / (4.0 * np.pi * r**2)) + 10.0 * np.log10(a_tab / 4.0)
@@ -219,7 +223,8 @@ def absorption_per_table(
     q = require_positive(directivity, "directivity")
     snr = float(speech_to_noise)
     if not np.isfinite(snr):
-        raise ValueError("'speech_to_noise' must be finite.")
+        msg = "'speech_to_noise' must be finite."
+        raise ValueError(msg)
     return as_float_or_array(16.0 * np.pi * r**2 * 10.0 ** (snr / 10.0) / q)
 
 
@@ -300,18 +305,22 @@ def crowd_noise(
     """
     areas = np.atleast_1d(np.asarray(absorption_areas, dtype=np.float64))
     if areas.ndim != 1 or areas.size == 0:
-        raise ValueError("'absorption_areas' must be a non-empty 1-D array.")
+        msg = "'absorption_areas' must be a non-empty 1-D array."
+        raise ValueError(msg)
     if not np.all(np.isfinite(areas)) or np.any(areas <= 0.0):
-        raise ValueError("'absorption_areas' must be positive and finite.")
+        msg = "'absorption_areas' must be positive and finite."
+        raise ValueError(msg)
     n = (
         np.arange(1.0, 21.0)
         if talkers is None
         else np.atleast_1d(np.asarray(talkers, dtype=np.float64))
     )
     if n.ndim != 1 or n.size == 0:
-        raise ValueError("'talkers' must be a non-empty 1-D array.")
+        msg = "'talkers' must be a non-empty 1-D array."
+        raise ValueError(msg)
     if not np.all(np.isfinite(n)) or np.any(n < 1.0):
-        raise ValueError("'talkers' must be at least 1 and finite.")
+        msg = "'talkers' must be at least 1 and finite."
+        raise ValueError(msg)
 
     r = require_positive(distance, "distance")
     q = require_positive(directivity, "directivity")

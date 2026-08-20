@@ -206,19 +206,21 @@ def read_wav(
     parsed = parse_wav_chunks(path) if chunks is None else chunks
     fmt = parsed.fmt
     if fmt.resolved_tag not in (WAVE_FORMAT_PCM, WAVE_FORMAT_IEEE_FLOAT):
-        raise ValueError(
+        msg = (
             f"{path}: {fmt.format_name} is not linear PCM/float; "
             "read it through the [audio] backend"
         )
+        raise ValueError(msg)
     payload_end = parsed.data_offset + parsed.data_size
     actual = Path(path).stat().st_size
     if actual < payload_end:
-        raise ValueError(
+        msg = (
             f"{path}: data chunk claims {parsed.data_size} bytes "
             f"({parsed.frames} frames) but the file ends "
             f"{payload_end - actual} bytes short; refusing to read a "
             "truncated recording as if it were complete"
         )
+        raise ValueError(msg)
     if parsed.container == "BW64":
         # scipy honours ds64 for the RF64 fourcc but rejects BW64 (ITU-R
         # BS.2088), which differs from RF64 in that four-byte tag alone;

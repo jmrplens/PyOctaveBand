@@ -132,11 +132,14 @@ def _band_range(f_low: float | None, f_high: float | None) -> tuple[int, int]:
     f_L < f_H.
     """
     if f_low is not None and f_low <= 16.0:
-        raise ValueError("'f_low' must exceed 16 Hz (Formula 56).")
+        msg = "'f_low' must exceed 16 Hz (Formula 56)."
+        raise ValueError(msg)
     if f_high is not None and f_high >= 20000.0:
-        raise ValueError("'f_high' must be below 20 kHz (Formula 57).")
+        msg = "'f_high' must be below 20 kHz (Formula 57)."
+        raise ValueError(msg)
     if f_low is not None and f_high is not None and f_low >= f_high:
-        raise ValueError("'f_low' must be below 'f_high'.")
+        msg = "'f_low' must be below 'f_high'."
+        raise ValueError(msg)
     z_lo = 0
     z_hi = _CBF - 1
     mid = (_F_CENTRE[:-1] + _F_CENTRE[1:]) / 2.0  # inter-band boundaries
@@ -233,16 +236,19 @@ def tonality_ecma(
     calibration factor of Formula (51).
     """
     if field not in ("free", "diffuse"):
-        raise ValueError("field must be 'free' or 'diffuse'")
+        msg = "field must be 'free' or 'diffuse'"
+        raise ValueError(msg)
     fs = resolve_fs(signal_in, fs, name="signal_in")
     x = apply_calibration(
         signal_in, require_1d_signal(_typesignal(np.asarray(signal_in)))
     )
     if x.size == 0:
-        raise ValueError("signal must not be empty")
+        msg = "signal must not be empty"
+        raise ValueError(msg)
     fs = float(fs)
     if fs <= 0.0:
-        raise ValueError("fs must be positive")
+        msg = "fs must be positive"
+        raise ValueError(msg)
     if fs != _FS:
         x = signal.resample(x, round(x.size * _FS / fs))
 

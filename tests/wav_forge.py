@@ -100,7 +100,8 @@ def pcm_data(samples: np.ndarray, bits: int) -> bytes:
         return b"".join(int(v).to_bytes(4, "little", signed=True)[:3] for v in flat)
     if bits == 32:
         return flat.astype("<i4").tobytes()
-    raise ValueError(f"unsupported PCM depth {bits}")
+    msg = f"unsupported PCM depth {bits}"
+    raise ValueError(msg)
 
 
 def pcm_wav(

@@ -64,7 +64,8 @@ def lateral_attenuation(elevation_deg: float, lateral_m: float) -> float:
     ell = float(lateral_m)
     beta = float(elevation_deg)
     if not np.isfinite(ell) or ell < 0.0 or not np.isfinite(beta):
-        raise ValueError("'lateral_m' must be non-negative and inputs finite.")
+        msg = "'lateral_m' must be non-negative and inputs finite."
+        raise ValueError(msg)
     gamma = 1.089 * (1.0 - np.exp(-0.00274 * ell)) if ell <= 914.0 else 1.0
     if beta < 0.0:
         lam = 10.857
@@ -87,14 +88,14 @@ def engine_installation_correction(
     """
     phi = float(depression_deg)
     if not np.isfinite(phi):
-        raise ValueError("'depression_deg' must be finite.")
+        msg = "'depression_deg' must be finite."
+        raise ValueError(msg)
     key = mounting.strip().lower()
     if key in ("propeller", "prop"):
         return 0.0
     if key not in _INSTALLATION:
-        raise ValueError(
-            f"'mounting' must be 'wing', 'fuselage' or 'propeller', got {mounting!r}."
-        )
+        msg = f"'mounting' must be 'wing', 'fuselage' or 'propeller', got {mounting!r}."
+        raise ValueError(msg)
     a, b, c = _INSTALLATION[key]
     phi_eff = np.radians(max(phi, 0.0))  # for φ<0, ΔI(φ)=ΔI(0)
     num = (a * np.cos(phi_eff) ** 2 + np.sin(phi_eff) ** 2) ** b
@@ -115,7 +116,8 @@ def duration_correction(reference_speed: float, segment_speed: float) -> float:
     vref = float(reference_speed)
     vseg = float(segment_speed)
     if not (np.isfinite(vref) and vref > 0.0 and np.isfinite(vseg) and vseg > 0.0):
-        raise ValueError("'reference_speed' and 'segment_speed' must be positive.")
+        msg = "'reference_speed' and 'segment_speed' must be positive."
+        raise ValueError(msg)
     return float(10.0 * np.log10(vref / vseg))
 
 
@@ -135,7 +137,8 @@ def noise_fraction(q: float, segment_length: float, scaled_distance: float) -> f
     lam = float(segment_length)
     dl = float(scaled_distance)
     if not (np.isfinite(lam) and lam > 0.0 and np.isfinite(dl) and dl > 0.0):
-        raise ValueError("'segment_length' and 'scaled_distance' must be positive.")
+        msg = "'segment_length' and 'scaled_distance' must be positive."
+        raise ValueError(msg)
     # Relative distances from the perpendicular foot Sp to the segment ends,
     # scaled by dλ: to the start S1 (−q) and to the end S2 (λ−q). The full
     # infinite path (α1→−∞, α2→+∞) then gives F=1, i.e. ΔF=0.
@@ -179,9 +182,11 @@ def impedance_adjustment(
     t = float(temperature)
     p = float(pressure)
     if not (np.isfinite(t) and np.isfinite(p) and p > 0.0):
-        raise ValueError("'pressure' must be positive and inputs finite.")
+        msg = "'pressure' must be positive and inputs finite."
+        raise ValueError(msg)
     if t <= -273.15:
-        raise ValueError("'temperature' must be above absolute zero (−273.15 °C).")
+        msg = "'temperature' must be above absolute zero (−273.15 °C)."
+        raise ValueError(msg)
     delta = p / _P0_KPA
     theta = (t + 273.15) / (_T0_C + 273.15)
     zc = _ZC_STD * delta / np.sqrt(theta)
@@ -247,10 +252,12 @@ def start_of_roll_directivity(
     psi = float(azimuth_deg)
     dsor = float(distance_m)
     if not (np.isfinite(psi) and np.isfinite(dsor) and dsor > 0.0):
-        raise ValueError("'distance_m' must be positive and inputs finite.")
+        msg = "'distance_m' must be positive and inputs finite."
+        raise ValueError(msg)
     key = engine.strip().lower()
     if key not in ("jet", "turbofan", "turboprop", "prop", "propeller"):
-        raise ValueError(f"'engine' must be 'jet' or 'turboprop', got {engine!r}.")
+        msg = f"'engine' must be 'jet' or 'turboprop', got {engine!r}."
+        raise ValueError(msg)
     if psi < 90.0:  # ahead of / abeam the aircraft: no rearward directivity
         return 0.0
     psi = min(psi, 180.0)
@@ -288,19 +295,25 @@ def _clean_table(
     d = np.asarray(distances, dtype=np.float64).ravel()
     lv = np.asarray(levels, dtype=np.float64)
     if p.size < 2 or d.size < 2:
-        raise ValueError("'powers' and 'distances' must each have at least two values.")
+        msg = "'powers' and 'distances' must each have at least two values."
+        raise ValueError(msg)
     if lv.shape != (p.size, d.size):
-        raise ValueError("'levels' must have shape (len(powers), len(distances)).")
+        msg = "'levels' must have shape (len(powers), len(distances))."
+        raise ValueError(msg)
     if not (
         np.all(np.isfinite(p)) and np.all(np.isfinite(d)) and np.all(np.isfinite(lv))
     ):
-        raise ValueError("'powers', 'distances' and 'levels' must be finite.")
+        msg = "'powers', 'distances' and 'levels' must be finite."
+        raise ValueError(msg)
     if np.any(d <= 0.0):
-        raise ValueError("'distances' must be strictly positive (slant range in m).")
+        msg = "'distances' must be strictly positive (slant range in m)."
+        raise ValueError(msg)
     if np.any(np.diff(p) <= 0.0):
-        raise ValueError("'powers' must be strictly increasing.")
+        msg = "'powers' must be strictly increasing."
+        raise ValueError(msg)
     if np.any(np.diff(d) <= 0.0):
-        raise ValueError("'distances' must be strictly increasing.")
+        msg = "'distances' must be strictly increasing."
+        raise ValueError(msg)
     return p, d, lv
 
 
@@ -369,10 +382,12 @@ def npd_level(
     p, d, lv = _clean_table(powers, distances, levels)
     dq = np.atleast_1d(np.asarray(distance, dtype=np.float64))
     if dq.size == 0 or not np.all(np.isfinite(dq)) or np.any(dq <= 0.0):
-        raise ValueError("'distance' must be finite and strictly positive.")
+        msg = "'distance' must be finite and strictly positive."
+        raise ValueError(msg)
     pq = float(power)
     if not np.isfinite(pq):
-        raise ValueError("'power' must be finite.")
+        msg = "'power' must be finite."
+        raise ValueError(msg)
 
     logd_tab = np.log10(d)
     logdq = np.log10(dq)
@@ -601,15 +616,17 @@ def _validate_path(
     """Coerce and validate a flight path to a finite ``(N, 5)`` array."""
     pts = np.asarray(path, dtype=np.float64)
     if pts.ndim != 2 or pts.shape[1] != 5 or pts.shape[0] < 2:
-        raise ValueError(
-            "'path' must have shape (N, 5) with N >= 2 (x,y,z,power,speed)."
-        )
+        msg = "'path' must have shape (N, 5) with N >= 2 (x,y,z,power,speed)."
+        raise ValueError(msg)
     if not np.all(np.isfinite(pts)):
-        raise ValueError("'path' must contain only finite values.")
+        msg = "'path' must contain only finite values."
+        raise ValueError(msg)
     if np.any(pts[:, 3] < 0.0):
-        raise ValueError("'path' power settings (column 4) must be non-negative.")
+        msg = "'path' power settings (column 4) must be non-negative."
+        raise ValueError(msg)
     if np.any(pts[:, 4] < 0.0):
-        raise ValueError("'path' speeds (column 5) must be non-negative.")
+        msg = "'path' speeds (column 5) must be non-negative."
+        raise ValueError(msg)
     return pts
 
 
@@ -622,9 +639,8 @@ def _validate_ground_roll(
         return None
     gr = np.asarray(ground_roll, dtype=bool).ravel()
     if gr.shape != (n_points - 1,):
-        raise ValueError(
-            f"'ground_roll' must have length {n_points - 1} (one per segment)."
-        )
+        msg = f"'ground_roll' must have length {n_points - 1} (one per segment)."
+        raise ValueError(msg)
     return gr
 
 
@@ -637,7 +653,8 @@ def _validate_bank(
         return None
     bk = np.asarray(bank, dtype=np.float64).ravel()
     if bk.shape != (n_points - 1,):
-        raise ValueError(f"'bank' must have length {n_points - 1} (one per segment).")
+        msg = f"'bank' must have length {n_points - 1} (one per segment)."
+        raise ValueError(msg)
     return bk
 
 
@@ -720,7 +737,8 @@ def _segment_speed(v1: float, v2: float, frac: float, on_roll: bool) -> float:
     else:
         v_seg = float(np.sqrt(max(v1**2 + frac * (v2**2 - v1**2), 0.0)))
     if v_seg <= 0.0:
-        raise ValueError("segment with zero mean speed (stationary segment in 'path').")
+        msg = "segment with zero mean speed (stationary segment in 'path')."
+        raise ValueError(msg)
     return v_seg
 
 
@@ -1102,7 +1120,8 @@ def _grid_segment_level(
     else:
         v_seg = np.sqrt(np.maximum(v1**2 + frac * (v2**2 - v1**2), 0.0))
     if np.any(v_seg <= 0.0):
-        raise ValueError("segment with zero mean speed (stationary segment in 'path').")
+        msg = "segment with zero mean speed (stationary segment in 'path')."
+        raise ValueError(msg)
     dv = 10.0 * np.log10(ctx.vref / v_seg)
     d_lambda = _D0_M * 10.0 ** ((le_d - lm_d) / 10.0)
     df = _grid_noise_fraction(q, length, d_lambda, roll_behind, roll_ahead)
@@ -1136,7 +1155,8 @@ def _grid_event_levels(
     mount_key = mounting.strip().lower()
     engine_installation_correction(0.0, mounting)  # validate 'mounting' once
     if not (np.isfinite(vref) and vref > 0.0):
-        raise ValueError("'reference_speed' must be positive.")
+        msg = "'reference_speed' must be positive."
+        raise ValueError(msg)
     ctx = _GridContext(
         obs,
         p,
@@ -1223,10 +1243,12 @@ def event_level(
     pts = _validate_path(path)
     obs = np.asarray(observer, dtype=np.float64).ravel()
     if obs.shape != (3,) or not np.all(np.isfinite(obs)):
-        raise ValueError("'observer' must be a finite (x, y, z) point.")
+        msg = "'observer' must be a finite (x, y, z) point."
+        raise ValueError(msg)
     key = metric.strip().lower()
     if key not in ("exposure", "maximum"):
-        raise ValueError("'metric' must be 'exposure' or 'maximum'.")
+        msg = "'metric' must be 'exposure' or 'maximum'."
+        raise ValueError(msg)
     gr = _validate_ground_roll(segments.ground_roll, pts.shape[0])
     lr = _validate_ground_roll(segments.landing_roll, pts.shape[0])
     bk = _validate_bank(segments.bank, pts.shape[0])
@@ -1305,12 +1327,14 @@ def noise_contour(
     gx = np.asarray(x, dtype=np.float64).ravel()
     gy = np.asarray(y, dtype=np.float64).ravel()
     if gx.size < 2 or gy.size < 2:
-        raise ValueError("'x' and 'y' must each have at least two grid points.")
+        msg = "'x' and 'y' must each have at least two grid points."
+        raise ValueError(msg)
     # Validate and clean the shared inputs once, not per grid point.
     pts = _validate_path(path)
     key = metric.strip().lower()
     if key not in ("exposure", "maximum"):
-        raise ValueError("'metric' must be 'exposure' or 'maximum'.")
+        msg = "'metric' must be 'exposure' or 'maximum'."
+        raise ValueError(msg)
     gr = _validate_ground_roll(segments.ground_roll, pts.shape[0])
     lr = _validate_ground_roll(segments.landing_roll, pts.shape[0])
     bk = _validate_bank(segments.bank, pts.shape[0])

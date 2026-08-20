@@ -209,9 +209,8 @@ class NCResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.ansi_s12_2 import render_nc_report
 
         return render_nc_report(
@@ -320,9 +319,8 @@ class RCResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.ansi_s12_2 import render_rc_report
 
         return render_rc_report(
@@ -340,10 +338,11 @@ def nc_curve(index: float) -> np.ndarray:
     :raises ValueError: if ``index`` is outside the tabulated range.
     """
     if index < NC_INDICES[0] or index > NC_INDICES[-1]:
-        raise ValueError(
+        msg = (
             f"NC index {index} is outside the tabulated range "
             f"[{NC_INDICES[0]:.0f}, {NC_INDICES[-1]:.0f}]."
         )
+        raise ValueError(msg)
     return np.array(
         [np.interp(index, NC_INDICES, NC_CURVES[:, k]) for k in range(_N_BANDS)]
     )
@@ -392,25 +391,29 @@ def _align_levels(levels: ArrayLike, frequencies: ArrayLike | None) -> np.ndarra
     """Validate levels and align them to :data:`OCTAVE_BANDS`."""
     lv = np.atleast_1d(np.asarray(levels, dtype=np.float64))
     if lv.ndim != 1:
-        raise ValueError("levels must be a 1-D vector of octave-band levels.")
+        msg = "levels must be a 1-D vector of octave-band levels."
+        raise ValueError(msg)
     if frequencies is None:
         if lv.size != _N_BANDS:
-            raise ValueError(
+            msg = (
                 f"levels must have {_N_BANDS} octave-band values (16 Hz - "
                 f"8000 Hz) when frequencies are not given; got {lv.size}."
             )
+            raise ValueError(msg)
         return lv
     fr = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if fr.shape != lv.shape:
-        raise ValueError("levels and frequencies must have the same shape.")
+        msg = "levels and frequencies must have the same shape."
+        raise ValueError(msg)
     aligned = np.full(_N_BANDS, np.nan)
     for f, level in zip(fr, lv):
         matches = np.isclose(OCTAVE_BANDS, f, rtol=0.03)
         if not matches.any():
-            raise ValueError(
+            msg = (
                 f"frequency {f} Hz is not one of the ANSI S12.2 octave bands "
                 f"(16 Hz - 8000 Hz)."
             )
+            raise ValueError(msg)
         aligned[np.argmax(matches)] = level
     return aligned
 
@@ -448,7 +451,8 @@ def noise_criterion(
     aligned = _align_levels(levels, frequencies)
     valid = ~np.isnan(aligned)
     if not valid.any():
-        raise ValueError("no valid octave-band levels were supplied.")
+        msg = "no valid octave-band levels were supplied."
+        raise ValueError(msg)
 
     sil_levels = aligned[_SIL_BANDS]
     sil = float(np.mean(sil_levels)) if not np.isnan(sil_levels).any() else float("nan")
@@ -540,10 +544,11 @@ def room_criterion(levels: ArrayLike, frequencies: ArrayLike | None = None) -> R
     aligned = _align_levels(levels, frequencies)
     mid = aligned[5:8]  # 500, 1000, 2000 Hz.
     if np.isnan(mid).any():
-        raise ValueError(
+        msg = (
             "the 500, 1000 and 2000 Hz octave bands are required to compute "
             "the mid-frequency average (RC rating)."
         )
+        raise ValueError(msg)
     required = aligned[_RC_REQUIRED_BANDS]
     if np.isnan(required).any():
         missing = OCTAVE_BANDS[_RC_REQUIRED_BANDS][np.isnan(required)]

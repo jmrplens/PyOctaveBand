@@ -196,7 +196,8 @@ def modulation_distortion(
     half = min(_IMD_SEARCH_BINS * df, fl / 4.0)
     carrier = _tone_amplitude(freqs, amp, fh, half)
     if carrier <= 0.0:
-        raise ValueError("No carrier component found at 'f_high'.")
+        msg = "No carrier component found at 'f_high'."
+        raise ValueError(msg)
     sidebands = {
         n: tuple(
             _imd_component(freqs, amp, fh + sign * (n - 1) * fl, half, exclude=(fl, fh))
@@ -275,15 +276,18 @@ def difference_frequency_distortion(
     fa = _positive(f1, "f1")
     fb = _positive(f2, "f2")
     if fa >= fb:
-        raise ValueError("'f1' must be lower than 'f2'.")
+        msg = "'f1' must be lower than 'f2'."
+        raise ValueError(msg)
     if order not in (2, 3):
-        raise ValueError("'order' must be 2 or 3.")
+        msg = "'order' must be 2 or 3."
+        raise ValueError(msg)
     freqs, amp = _amplitude_spectrum(sig, fs_v, window)
     df = float(freqs[1] - freqs[0]) if freqs.size > 1 else 0.0
     half = min(_IMD_SEARCH_BINS * df, (fb - fa) / 4.0)
     ref = _tone_amplitude(freqs, amp, fa, half) + _tone_amplitude(freqs, amp, fb, half)
     if ref <= 0.0:
-        raise ValueError("No primary tones found at 'f1'/'f2'.")
+        msg = "No primary tones found at 'f1'/'f2'."
+        raise ValueError(msg)
     if order == 2:
         value = _imd_component(freqs, amp, fb - fa, half, exclude=(fa, fb))
     else:
@@ -340,7 +344,8 @@ def total_difference_frequency_distortion(
     fa = _positive(f1, "f1")
     fb = _positive(f2, "f2")
     if fa >= fb:
-        raise ValueError("'f1' must be lower than 'f2'.")
+        msg = "'f1' must be lower than 'f2'."
+        raise ValueError(msg)
     freqs, amp = _amplitude_spectrum(sig, fs_v, window)
     df = float(freqs[1] - freqs[0]) if freqs.size > 1 else 0.0
     p_lo, p_hi = fb - fa, 2 * fa - fb  # f0 - delta and f0 + delta
@@ -352,7 +357,8 @@ def total_difference_frequency_distortion(
         half = min(half, spacing / 4.0)
     ref = _tone_amplitude(freqs, amp, fa, half) + _tone_amplitude(freqs, amp, fb, half)
     if ref <= 0.0:
-        raise ValueError("No primary tones found at 'f1'/'f2'.")
+        msg = "No primary tones found at 'f1'/'f2'."
+        raise ValueError(msg)
     a_lo = _imd_component(freqs, amp, p_lo, half, exclude=(fa, fb))
     a_hi = _imd_component(freqs, amp, p_hi, half, exclude=(fa, fb))
     return float(np.sqrt(a_lo**2 + a_hi**2) / ref)
@@ -431,7 +437,8 @@ def dynamic_intermodulation_distortion(
     # here follows the 14.12.9.1 definition.
     ref = _tone_amplitude(freqs, amp, fsine, search)
     if ref <= 0.0:
-        raise ValueError("No 15 kHz sine component found.")
+        msg = "No 15 kHz sine component found."
+        raise ValueError(msg)
     power = 0.0
     for f in _dim_components(fsine, fsq, fs_v / 2.0):
         power += _tone_amplitude(freqs, amp, f, search) ** 2

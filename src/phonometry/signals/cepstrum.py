@@ -127,9 +127,11 @@ def _validate_nfft(n: int, nfft: int | None) -> int:
         return n if n % 2 == 0 else n + 1
     out = int(nfft)
     if out < n:
-        raise ValueError(f"'nfft' must be at least the record length ({n} samples).")
+        msg = f"'nfft' must be at least the record length ({n} samples)."
+        raise ValueError(msg)
     if out % 2 != 0:
-        raise ValueError("'nfft' must be even.")
+        msg = "'nfft' must be even."
+        raise ValueError(msg)
     return out
 
 
@@ -138,7 +140,8 @@ def _log_magnitude(x: NDArray[np.float64], nfft: int) -> NDArray[np.float64]:
     magnitude = np.abs(np.fft.rfft(x, nfft))
     peak = float(np.max(magnitude))
     if peak <= 0.0:  # max of |X| is non-negative: <= 0 means all-zero
-        raise ValueError("'x' must not be identically zero.")
+        msg = "'x' must not be identically zero."
+        raise ValueError(msg)
     return np.asarray(
         np.log(np.maximum(magnitude, peak * _MAGNITUDE_FLOOR)),
         dtype=np.float64,
@@ -160,7 +163,8 @@ def _complex_cepstrum(
     magnitude = np.abs(spectrum)
     peak = float(np.max(magnitude))
     if peak <= 0.0:  # max of |X| is non-negative: <= 0 means all-zero
-        raise ValueError("'x' must not be identically zero.")
+        msg = "'x' must not be identically zero."
+        raise ValueError(msg)
     log_mag = np.log(np.maximum(magnitude, peak * _MAGNITUDE_FLOOR))
     phase = np.unwrap(np.angle(spectrum))
     half = nfft // 2
@@ -213,10 +217,11 @@ class CepstrumResult:
         :raises ValueError: If :attr:`kind` is not ``"complex"``.
         """
         if self.kind != "complex":
-            raise ValueError(
+            msg = (
                 "Only the complex cepstrum is invertible; the power and "
                 "real cepstra discard the phase."
             )
+            raise ValueError(msg)
         log_spectrum = np.fft.fft(self.cepstrum)
         ramp = (
             np.pi * self.linear_phase_samples * np.arange(self.nfft) / (self.nfft // 2)
@@ -279,7 +284,8 @@ def cepstrum(
     xa = _validate_signal(x, "x", context="a cepstrum")
     fs_v = _positive(resolve_fs(x, fs), "fs")
     if kind not in _KINDS:
-        raise ValueError(f"'kind' must be one of {_KINDS}, got {kind!r}.")
+        msg = f"'kind' must be one of {_KINDS}, got {kind!r}."
+        raise ValueError(msg)
     n = _validate_nfft(xa.size, nfft)
 
     delay = 0
@@ -384,15 +390,17 @@ def lifter(
     xa = _validate_signal(x, "x", context="liftering")
     fs_v = _positive(resolve_fs(x, fs), "fs")
     if mode not in ("lowpass", "highpass"):
-        raise ValueError(f"'mode' must be 'lowpass' or 'highpass', got {mode!r}.")
+        msg = f"'mode' must be 'lowpass' or 'highpass', got {mode!r}."
+        raise ValueError(msg)
     n = _validate_nfft(xa.size, nfft)
     cut = round(_positive(cutoff, "cutoff") * fs_v)
     if not 1 <= cut <= n // 2:
-        raise ValueError(
+        msg = (
             "'cutoff' must resolve to between 1 sample and nfft/2 samples "
             f"({1.0 / fs_v:.3g} s to {n // 2 / fs_v:.3g} s), got "
             f"{cutoff:.3g} s."
         )
+        raise ValueError(msg)
 
     log_mag = _log_magnitude(xa, n)
     values = np.asarray(np.fft.irfft(log_mag, n), dtype=np.float64)
@@ -544,11 +552,12 @@ def echo_detection(
     lo = 16 if min_quefrency is None else round(min_quefrency * fs_v)
     hi = n // 2 if max_quefrency is None else round(max_quefrency * fs_v)
     if not 1 <= lo < hi <= n // 2:
-        raise ValueError(
+        msg = (
             "The quefrency search band must satisfy "
             f"1 sample <= min < max <= nfft/2 samples; got [{lo}, {hi}] "
             f"samples of nfft = {n}."
         )
+        raise ValueError(msg)
 
     # Peak-pick on the magnitude so a negative (inverting) reflection is
     # found at its true delay; the signed value at the peak is reported.

@@ -229,10 +229,11 @@ def _select(values: np.ndarray, frequencies: ArrayLike | None) -> np.ndarray:
     for f in fr:
         matches = np.isclose(AUDIOMETRIC_FREQUENCIES, f, rtol=1e-3)
         if not matches.any():
-            raise ValueError(
+            msg = (
                 f"frequency {f} Hz is not an ISO 7029 audiometric frequency "
                 f"(125 Hz - 8000 Hz)."
             )
+            raise ValueError(msg)
         idx.append(int(np.argmax(matches)))
     return values[idx]
 
@@ -271,14 +272,17 @@ def age_threshold(
         (0, 1), or an unknown frequency.
     """
     if age < _REFERENCE_AGE:
-        raise ValueError(
+        msg = (
             f"age must be at least {_REFERENCE_AGE:.0f} years (the ISO 7029 "
             f"lower limit); got {age}."
         )
+        raise ValueError(msg)
     if sex not in _MEDIAN:
-        raise ValueError(f"sex must be one of {SEXES}; got {sex!r}.")
+        msg = f"sex must be one of {SEXES}; got {sex!r}."
+        raise ValueError(msg)
     if not 0.0 < fractile < 1.0:
-        raise ValueError(f"fractile must be in (0, 1); got {fractile}.")
+        msg = f"fractile must be in (0, 1); got {fractile}."
+        raise ValueError(msg)
 
     from scipy.special import ndtri  # standard-normal quantile
 
@@ -319,5 +323,6 @@ def reference_threshold(
     :raises ValueError: for an unknown field or frequency.
     """
     if field not in _REFERENCE:
-        raise ValueError(f"field must be one of {FIELDS}; got {field!r}.")
+        msg = f"field must be one of {FIELDS}; got {field!r}."
+        raise ValueError(msg)
     return _select(_REFERENCE[field], frequencies)

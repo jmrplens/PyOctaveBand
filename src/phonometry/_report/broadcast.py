@@ -255,10 +255,11 @@ def render_program_loudness_report(
     """
     del verbose  # uniform signature; the fiche has one stacked body layout
     if tolerance not in _TOLERANCES_LU:
-        raise ValueError(
+        msg = (
             f"Unknown tolerance rule {tolerance!r}; use 'qc' (+-0.2 LU, EBU "
             "R 128 item i) or 'live' (+-1.0 LU, item h)."
         )
+        raise ValueError(msg)
     tolerance_lu = _TOLERANCES_LU[tolerance]
     try:
         from reportlab.lib import colors

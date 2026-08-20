@@ -226,7 +226,8 @@ def _resolve_field_correction(band: str, override: float | None) -> float:
         return field_incidence_correction(band)
     value = float(override)
     if not np.isfinite(value) or value < 0.0:
-        raise ValueError("'field_correction' must be finite and non-negative.")
+        msg = "'field_correction' must be finite and non-negative."
+        raise ValueError(msg)
     return value
 
 
@@ -418,10 +419,11 @@ def single_panel_transmission_loss(
     elif bending_stiffness is not None:
         fc = coincidence_frequency(m2, bending_stiffness, speed_of_sound=c0)
     else:
-        raise ValueError(
+        msg = (
             "provide 'critical_frequency' or 'bending_stiffness' to locate the "
             "coincidence frequency."
         )
+        raise ValueError(msg)
 
     def _tl_normal(freq: np.ndarray) -> np.ndarray:
         return mass_law_transmission_loss(
@@ -503,24 +505,27 @@ def _resolve_plateau_panel(
         density_per_mm, table_height, table_ratio = PLATEAU_MATERIALS[key]
         if mass_per_area is None:
             if thickness_mm is None:
-                raise ValueError(
+                msg = (
                     "give 'thickness_mm' with 'material', or pass "
                     "'mass_per_area' directly."
                 )
+                raise ValueError(msg)
             mass_per_area = density_per_mm * require_positive(
                 thickness_mm, "thickness_mm"
             )
         plateau_height = table_height if plateau_height is None else plateau_height
         frequency_ratio = table_ratio if frequency_ratio is None else frequency_ratio
     if mass_per_area is None or plateau_height is None or frequency_ratio is None:
-        raise ValueError(
+        msg = (
             "the plateau construction needs 'mass_per_area', 'plateau_height' "
             "and 'frequency_ratio'; give a tabulated 'material' (with "
             "'thickness_mm') or all three explicitly."
         )
+        raise ValueError(msg)
     ratio = require_positive(frequency_ratio, "frequency_ratio")
     if ratio <= 1.0:
-        raise ValueError("'frequency_ratio' must be greater than 1.")
+        msg = "'frequency_ratio' must be greater than 1."
+        raise ValueError(msg)
     return (
         require_positive(mass_per_area, "mass_per_area"),
         require_positive(plateau_height, "plateau_height"),
@@ -639,10 +644,11 @@ def plateau_transmission_loss(
     # 10 lg(1 + (pi f m''/rho0 c0)^2) = height + correction.
     target = 10.0 ** ((height + correction) / 10.0) - 1.0
     if target <= 0.0:
-        raise ValueError(
+        msg = (
             "the plateau height sits below the mass law at every frequency; "
             "check 'plateau_height' and 'field_correction'."
         )
+        raise ValueError(msg)
     f_a = rho0 * c0 * math.sqrt(target) / (math.pi * m2)
     f_b = ratio * f_a
 
@@ -758,7 +764,8 @@ def corrugated_plate_stiffness(
     wavelength = require_positive(corrugation_wavelength, "corrugation_wavelength")
     e = require_positive(youngs_modulus, "youngs_modulus")
     if not -1.0 < poisson_ratio < 1.0:
-        raise ValueError("'poisson_ratio' must lie in (-1, 1).")
+        msg = "'poisson_ratio' must lie in (-1, 1)."
+        raise ValueError(msg)
     nu = float(poisson_ratio)
     shape = (math.pi * amplitude / wavelength) ** 2
     flat = e * h**3 / 12.0
@@ -818,7 +825,8 @@ def orthotropic_plate_resonance(
     i = int(mode_x)
     n = int(mode_z)
     if i < 1 or n < 1:
-        raise ValueError("'mode_x' and 'mode_z' must be integers >= 1.")
+        msg = "'mode_x' and 'mode_z' must be integers >= 1."
+        raise ValueError(msg)
     a = require_positive(length_x, "length_x")
     b = require_positive(length_z, "length_z")
     m2 = require_positive(mass_per_area, "mass_per_area")
@@ -1107,9 +1115,8 @@ def orthotropic_transmission_loss(
     fc1 = require_positive(critical_frequency_lower, "critical_frequency_lower")
     fc2 = require_positive(critical_frequency_upper, "critical_frequency_upper")
     if fc2 <= fc1:
-        raise ValueError(
-            "'critical_frequency_upper' must exceed 'critical_frequency_lower'."
-        )
+        msg = "'critical_frequency_upper' must exceed 'critical_frequency_lower'."
+        raise ValueError(msg)
     eta = require_positive(loss_factor, "loss_factor")
     c0 = require_positive(speed_of_sound, "speed_of_sound")
     rho0 = require_positive(air_density, "air_density")
@@ -1118,17 +1125,19 @@ def orthotropic_transmission_loss(
     if area is not None:
         require_positive(area, "area")
     elif not 0.0 < limiting_angle < 90.0:
-        raise ValueError("'limiting_angle' must lie in (0, 90) degrees.")
+        msg = "'limiting_angle' must lie in (0, 90) degrees."
+        raise ValueError(msg)
     f = _band_axis(frequency)
     z0 = rho0 * c0
 
     if chosen == "heckl":
         if fc2 <= 4.0 * fc1:
-            raise ValueError(
+            msg = (
                 "the Heckl construction needs 'critical_frequency_upper' above "
                 "four times 'critical_frequency_lower' so its points stay "
                 "ordered; use method='integral' for a narrow coincidence range."
             )
+            raise ValueError(msg)
         tl = _heckl_transmission_loss(
             f,
             m2,
@@ -1223,7 +1232,8 @@ def mass_spring_mass_resonance(
         )
         stiffness = float(np.real(bulk.flat[0])) / d
         if stiffness <= 0.0:
-            raise ValueError("'cavity_medium' bulk modulus must be positive.")
+            msg = "'cavity_medium' bulk modulus must be positive."
+            raise ValueError(msg)
     reduced = (m1 + m2) / (m1 * m2)
     return float(np.sqrt((stiffness + ties) * reduced) / (2.0 * np.pi))
 

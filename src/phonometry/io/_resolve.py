@@ -93,10 +93,11 @@ def resolve_optional_fs[Rate: (int, float)](
     """
     if isinstance(x, Signal):
         if fs is not None and fs != x.fs:
-            raise ValueError(
+            msg = (
                 f"{rate}={fs} conflicts with the Signal's own fs={x.fs}; "
                 "pass one or the other, not a disagreement"
             )
+            raise ValueError(msg)
         return x.fs
     return fs
 
@@ -120,7 +121,8 @@ def resolve_fs[Rate: (int, float)](
     """
     resolved = resolve_optional_fs(x, fs, rate=rate)
     if resolved is None:
-        raise ValueError(f"{rate} is required when '{name}' is a bare array")
+        msg = f"{rate} is required when '{name}' is a bare array"
+        raise ValueError(msg)
     return resolved
 
 
@@ -139,11 +141,12 @@ def refuse_foreign_rate(x: SignalInput, fs: float, what: str) -> None:
     :raises ValueError: If *x* is a Signal at a different rate.
     """
     if isinstance(x, Signal) and x.fs != fs:
-        raise ValueError(
+        msg = (
             f"the Signal was recorded at {x.fs} Hz but this {what} was "
             f"designed for {fs:g} Hz; resample the Signal, or build a "
             f"{what} for its own rate"
         )
+        raise ValueError(msg)
 
 
 def resolve_calibration(x: SignalInput, calibration_factor: float | None) -> float:
@@ -270,11 +273,12 @@ def _agreed_pair(x: SignalInput, y: SignalInput, names: tuple[str, str]) -> Sign
     :raises ValueError: If both are Signals recorded at different rates.
     """
     if isinstance(x, Signal) and isinstance(y, Signal) and x.fs != y.fs:
-        raise ValueError(
+        msg = (
             f"'{names[0]}' and '{names[1]}' are Signals recorded at "
             f"different rates ({x.fs} Hz and {y.fs} Hz); resample one of "
             "them before comparing them"
         )
+        raise ValueError(msg)
     return x if isinstance(x, Signal) else y
 
 

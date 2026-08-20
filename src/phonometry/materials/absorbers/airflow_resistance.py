@@ -225,9 +225,8 @@ class StaticAirflowResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iso9053 import render_static_airflow_report
 
         return render_static_airflow_report(
@@ -242,7 +241,8 @@ def linear_airflow_velocity(volume_flow_rate: float, area: float) -> float:
     ``u`` in m/s.
     """
     if volume_flow_rate < 0.0:
-        raise ValueError("'volume_flow_rate' must be non-negative.")
+        msg = "'volume_flow_rate' must be non-negative."
+        raise ValueError(msg)
     if area <= 0.0:
         raise ValueError(_AREA_POSITIVE_MSG)
     return volume_flow_rate / area
@@ -256,9 +256,11 @@ def airflow_resistance(pressure_drop: float, volume_flow_rate: float) -> float:
     ``q_v`` (m3/s). Returns ``R`` in Pa*s/m3.
     """
     if pressure_drop < 0.0:
-        raise ValueError("'pressure_drop' must be non-negative.")
+        msg = "'pressure_drop' must be non-negative."
+        raise ValueError(msg)
     if volume_flow_rate <= 0.0:
-        raise ValueError("'volume_flow_rate' must be positive.")
+        msg = "'volume_flow_rate' must be positive."
+        raise ValueError(msg)
     return pressure_drop / volume_flow_rate
 
 
@@ -284,25 +286,32 @@ def specific_airflow_resistance(
     from_resistance = resistance is not None and area is not None
     from_pressure = pressure_drop is not None and velocity is not None
     if from_resistance == from_pressure:
-        raise ValueError(
+        msg = (
             "Provide exactly one route: ('resistance' and 'area') or "
             "('pressure_drop' and 'velocity')."
         )
+        raise ValueError(msg)
     if resistance is not None and area is not None:
         if resistance < 0.0:
-            raise ValueError("'resistance' must be non-negative.")
+            msg = "'resistance' must be non-negative."
+            raise ValueError(msg)
         if area <= 0.0:
             raise ValueError(_AREA_POSITIVE_MSG)
         return resistance * area
     if pressure_drop is not None and velocity is not None:
         if pressure_drop < 0.0:
-            raise ValueError("'pressure_drop' must be non-negative.")
+            msg = "'pressure_drop' must be non-negative."
+            raise ValueError(msg)
         if velocity <= 0.0:
-            raise ValueError("'velocity' must be positive.")
+            msg = "'velocity' must be positive."
+            raise ValueError(msg)
         return pressure_drop / velocity
-    raise ValueError(  # pragma: no cover - unreachable, guarded above
+    msg = (
         "Provide exactly one route: ('resistance' and 'area') or "
         "('pressure_drop' and 'velocity')."
+    )
+    raise ValueError(  # pragma: no cover - unreachable, guarded above
+        msg
     )
 
 
@@ -313,9 +322,11 @@ def airflow_resistivity(specific_resistance: float, thickness: float) -> float:
     the specimen thickness in the flow direction. Returns ``sigma`` in Pa*s/m2.
     """
     if specific_resistance < 0.0:
-        raise ValueError("'specific_resistance' must be non-negative.")
+        msg = "'specific_resistance' must be non-negative."
+        raise ValueError(msg)
     if thickness <= 0.0:
-        raise ValueError("'thickness' must be positive.")
+        msg = "'thickness' must be positive."
+        raise ValueError(msg)
     return specific_resistance / thickness
 
 
@@ -363,21 +374,28 @@ def static_airflow_resistance(
     u = np.asarray(velocities, dtype=np.float64)
     dp = np.asarray(pressure_drops, dtype=np.float64)
     if u.ndim != 1 or dp.ndim != 1:
-        raise ValueError("'velocities' and 'pressure_drops' must be 1-D.")
+        msg = "'velocities' and 'pressure_drops' must be 1-D."
+        raise ValueError(msg)
     if u.shape != dp.shape:
-        raise ValueError("'velocities' and 'pressure_drops' must have equal length.")
+        msg = "'velocities' and 'pressure_drops' must have equal length."
+        raise ValueError(msg)
     if u.size < 2:
-        raise ValueError("At least two measurement steps are required.")
+        msg = "At least two measurement steps are required."
+        raise ValueError(msg)
     if bool(np.any(u <= 0.0)):
-        raise ValueError("All velocities must be positive.")
+        msg = "All velocities must be positive."
+        raise ValueError(msg)
     if bool(np.any(dp < 0.0)):
-        raise ValueError("All pressure drops must be non-negative.")
+        msg = "All pressure drops must be non-negative."
+        raise ValueError(msg)
     if area <= 0.0:
         raise ValueError(_AREA_POSITIVE_MSG)
     if thickness is not None and thickness <= 0.0:
-        raise ValueError("'thickness' must be positive.")
+        msg = "'thickness' must be positive."
+        raise ValueError(msg)
     if evaluation_velocity <= 0.0:
-        raise ValueError("'evaluation_velocity' must be positive.")
+        msg = "'evaluation_velocity' must be positive."
+        raise ValueError(msg)
 
     _warn_static_velocity_range(u, stacklevel=2)
 
@@ -417,9 +435,11 @@ def piston_volume_flow_rate(
     if frequency <= 0.0:
         raise ValueError(_FREQUENCY_POSITIVE_MSG)
     if stroke_amplitude < 0.0:
-        raise ValueError("'stroke_amplitude' must be non-negative.")
+        msg = "'stroke_amplitude' must be non-negative."
+        raise ValueError(msg)
     if piston_area <= 0.0:
-        raise ValueError("'piston_area' must be positive.")
+        msg = "'piston_area' must be positive."
+        raise ValueError(msg)
     # Normative clause 6.2 form q_v = 2*pi*f*h*A_P verbatim; Annex A.2 prints
     # the rms variant j*omega*A_P*h/sqrt(2) (internal tension in the standard,
     # the normative text wins).
@@ -451,13 +471,17 @@ def thermal_boundary_layer_thickness(
     if frequency <= 0.0:
         raise ValueError(_FREQUENCY_POSITIVE_MSG)
     if speed_of_sound <= 0.0:
-        raise ValueError("'speed_of_sound' must be positive.")
+        msg = "'speed_of_sound' must be positive."
+        raise ValueError(msg)
     if air_density <= 0.0:
-        raise ValueError("'air_density' must be positive.")
+        msg = "'air_density' must be positive."
+        raise ValueError(msg)
     if specific_heat_cp <= 0.0:
-        raise ValueError("'specific_heat_cp' must be positive.")
+        msg = "'specific_heat_cp' must be positive."
+        raise ValueError(msg)
     if thermal_conductivity <= 0.0:
-        raise ValueError("'thermal_conductivity' must be positive.")
+        msg = "'thermal_conductivity' must be positive."
+        raise ValueError(msg)
     omega = 2.0 * math.pi * frequency
     diffusion_length = thermal_conductivity / (
         air_density * speed_of_sound * specific_heat_cp
@@ -499,11 +523,14 @@ def effective_kappa(
     :math:`f = 2` Hz) yields :math:`\kappa' = 1.370`.
     """
     if cavity_surface <= 0.0:
-        raise ValueError("'cavity_surface' must be positive.")
+        msg = "'cavity_surface' must be positive."
+        raise ValueError(msg)
     if cavity_volume <= 0.0:
-        raise ValueError("'cavity_volume' must be positive.")
+        msg = "'cavity_volume' must be positive."
+        raise ValueError(msg)
     if specific_heat_ratio <= 0.0:
-        raise ValueError("'specific_heat_ratio' must be positive.")
+        msg = "'specific_heat_ratio' must be positive."
+        raise ValueError(msg)
     boundary_thickness = thermal_boundary_layer_thickness(
         frequency,
         speed_of_sound=speed_of_sound,
@@ -588,15 +615,20 @@ def alternating_airflow_resistance(
     if frequency <= 0.0:
         raise ValueError(_FREQUENCY_POSITIVE_MSG)
     if cavity_volume <= 0.0:
-        raise ValueError("'cavity_volume' must be positive.")
+        msg = "'cavity_volume' must be positive."
+        raise ValueError(msg)
     if piston_stroke_specimen <= 0.0:
-        raise ValueError("'piston_stroke_specimen' must be positive.")
+        msg = "'piston_stroke_specimen' must be positive."
+        raise ValueError(msg)
     if piston_stroke_termination <= 0.0:
-        raise ValueError("'piston_stroke_termination' must be positive.")
+        msg = "'piston_stroke_termination' must be positive."
+        raise ValueError(msg)
     if static_pressure <= 0.0:
-        raise ValueError("'static_pressure' must be positive.")
+        msg = "'static_pressure' must be positive."
+        raise ValueError(msg)
     if kappa_prime <= 0.0:
-        raise ValueError("'kappa_prime' must be positive.")
+        msg = "'kappa_prime' must be positive."
+        raise ValueError(msg)
 
     low, high = _ALT_FREQUENCY_RANGE
     if not low <= frequency <= high:

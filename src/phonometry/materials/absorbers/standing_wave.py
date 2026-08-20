@@ -52,13 +52,15 @@ def standing_wave_ratio_from_level(level_difference: ArrayLike) -> Real:
     """
     dl = np.asarray(level_difference, dtype=np.float64)
     if np.any(dl < 0.0):
-        raise ValueError("'level_difference' must be non-negative.")
+        msg = "'level_difference' must be non-negative."
+        raise ValueError(msg)
     return np.asarray(10.0 ** (dl / 20.0), dtype=np.float64)
 
 
 def _check_swr(swr: NDArray[np.float64]) -> None:
     if np.any(swr < 1.0):
-        raise ValueError("Standing-wave ratio 's' must be >= 1.")
+        msg = "Standing-wave ratio 's' must be >= 1."
+        raise ValueError(msg)
 
 
 def standing_wave_reflection_magnitude(swr: ArrayLike) -> Real:
@@ -94,9 +96,11 @@ def _standing_wave_phase(
 ) -> NDArray[np.float64]:
     """Reflection phase from the first minimum (ISO 10534-1, Eq. (20))."""
     if np.any(wavelength <= 0.0):
-        raise ValueError("'wavelength' must be positive.")
+        msg = "'wavelength' must be positive."
+        raise ValueError(msg)
     if np.any(first_min_distance < 0.0):
-        raise ValueError("'first_min_distance' must be non-negative.")
+        msg = "'first_min_distance' must be non-negative."
+        raise ValueError(msg)
     return np.asarray(
         np.pi * (4.0 * first_min_distance / wavelength - 1.0), dtype=np.float64
     )

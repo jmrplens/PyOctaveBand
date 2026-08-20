@@ -169,9 +169,8 @@ class STIResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.sti import render_sti_report
 
         return render_sti_report(
@@ -216,10 +215,11 @@ def _octave_bank(fs: int) -> OctaveFilterBank:
     """Octave filter bank for the 7 STI bands (IEC 61260-1 class 0/1)."""
     bank = OctaveFilterBank(fs=fs, fraction=1, order=6, limits=list(_BAND_LIMITS))
     if bank.num_bands != _NUM_BANDS:
-        raise ValueError(
+        msg = (
             f"Expected {_NUM_BANDS} octave bands between 125 Hz and 8 kHz, "
             f"got {bank.num_bands} at fs={fs}."
         )
+        raise ValueError(msg)
     return bank
 
 
@@ -228,10 +228,11 @@ def _validate_band_vector(
 ) -> np.ndarray:
     arr = np.asarray(values, dtype=np.float64)
     if arr.shape != (_NUM_BANDS,):
-        raise ValueError(
+        msg = (
             f"'{name}' must contain exactly {_NUM_BANDS} octave-band values "
             f"(125 Hz - 8 kHz), got shape {arr.shape}."
         )
+        raise ValueError(msg)
     return arr
 
 
@@ -243,12 +244,14 @@ def _truncated_mtf(mtf: np.ndarray) -> np.ndarray:
     """
     m = np.array(mtf, dtype=np.float64)
     if m.ndim != 2 or m.shape[0] != _NUM_BANDS:
-        raise ValueError(
+        msg = (
             f"'mtf' must have shape ({_NUM_BANDS}, n_modulation_frequencies), "
             f"got {m.shape}."
         )
+        raise ValueError(msg)
     if np.any(m < 0.0) or not np.all(np.isfinite(m)):
-        raise ValueError("Modulation transfer values must be finite and >= 0.")
+        msg = "Modulation transfer values must be finite and >= 0."
+        raise ValueError(msg)
     if np.any(m > 1.3):
         warnings.warn(
             "Modulation transfer values above 1.3 detected: the measurement "
@@ -269,10 +272,11 @@ def _snr_vector(
     if snr_arr.ndim == 0:
         return np.full(_NUM_BANDS, float(snr_arr))
     if snr_arr.shape != (_NUM_BANDS,):
-        raise ValueError(
+        msg = (
             f"'snr' must be a scalar or a vector of {_NUM_BANDS} "
             f"octave-band values, got shape {snr_arr.shape}."
         )
+        raise ValueError(msg)
     return snr_arr
 
 
@@ -291,10 +295,11 @@ def _corrected_mtf(
     """
     if level is None:
         if ambient is not None:
-            raise ValueError(
+            msg = (
                 "'ambient' requires the speech octave-band levels 'level' to "
                 "form the intensity-domain correction; pass 'snr' instead."
             )
+            raise ValueError(msg)
         if snr_arr is not None:
             # I_k / (I_k + I_n,k) with I_n,k = I_k * 10^(-SNR/10).
             m = m / (1.0 + 10.0 ** (-snr_arr[:, np.newaxis] / 10.0))
@@ -351,7 +356,8 @@ def _sti_from_mtf(
     m = _truncated_mtf(mtf)
 
     if snr is not None and ambient is not None:
-        raise ValueError("Provide either 'snr' or 'ambient' noise levels, not both.")
+        msg = "Provide either 'snr' or 'ambient' noise levels, not both."
+        raise ValueError(msg)
 
     snr_arr = _snr_vector(snr)
     m, band_levels = _corrected_mtf(m, snr_arr, level, ambient)
@@ -471,16 +477,19 @@ def sti_from_impulse_response(
     fs = resolve_fs(ir, fs, name="ir")
     ir_proc = apply_calibration(ir, _typesignal(np.asarray(ir)))
     if ir_proc.ndim != 1:
-        raise ValueError("sti_from_impulse_response expects a 1D impulse response.")
+        msg = "sti_from_impulse_response expects a 1D impulse response."
+        raise ValueError(msg)
     if fs <= 0:
         raise ValueError(_FS_NOT_POSITIVE_MSG)
     if fs < _MIN_FS:
-        raise ValueError(
+        msg = (
             f"Sample rate 'fs' must be >= {_MIN_FS} Hz: the 8 kHz octave band "
             "extends to 11,2 kHz (IEC 61260-1)."
         )
+        raise ValueError(msg)
     if not np.any(ir_proc):
-        raise ValueError("Impulse response 'ir' is silent.")
+        msg = "Impulse response 'ir' is silent."
+        raise ValueError(msg)
 
     bank = _octave_bank(fs)
     _, _, bands = bank.filter(
@@ -489,7 +498,8 @@ def sti_from_impulse_response(
     p_bands = np.asarray(bands) ** 2  # h_k^2(t), shape (7, n)
     denom = p_bands.sum(axis=1)
     if np.any(denom <= 0.0):
-        raise ValueError("An octave band of the impulse response has no energy.")
+        msg = "An octave band of the impulse response has no energy."
+        raise ValueError(msg)
 
     t = np.arange(ir_proc.shape[-1]) / fs
     mtf = np.empty((_NUM_BANDS, _MOD_FREQS.size))
@@ -539,11 +549,12 @@ def _stipa_modulation_depths(env: np.ndarray, fs: int) -> np.ndarray:
         for j, fm in enumerate((float(_STIPA_F1[k]), float(_STIPA_F2[k]))):
             periods = int(np.floor(duration * fm))
             if periods < 1:
-                raise ValueError(
+                msg = (
                     f"Signal too short for STIPA: it must contain at least one "
                     f"full period of the {fm} Hz modulation (>= {1.0 / fm:.2f} s; "
                     "the standard recommends 15 s to 25 s)."
                 )
+                raise ValueError(msg)
             n_use = round(periods / fm * fs)
             seg = env[k, :n_use]
             total = float(np.sum(seg))
@@ -667,14 +678,16 @@ def stipa(
     )
     x_proc = apply_calibration(x, _typesignal(np.asarray(x)))
     if x_proc.ndim != 1:
-        raise ValueError("stipa expects a 1D signal.")
+        msg = "stipa expects a 1D signal."
+        raise ValueError(msg)
     if fs <= 0:
         raise ValueError(_FS_NOT_POSITIVE_MSG)
     if fs < _MIN_FS:
-        raise ValueError(
+        msg = (
             f"Sample rate 'fs' must be >= {_MIN_FS} Hz: the 8 kHz octave band "
             "extends to 11,2 kHz (IEC 61260-1)."
         )
+        raise ValueError(msg)
 
     if x_proc.size / fs < _STIPA_MIN_SECONDS:
         warnings.warn(
@@ -690,10 +703,12 @@ def stipa(
     if reference is not None:
         ref_proc = apply_calibration(reference, _typesignal(np.asarray(reference)))
         if ref_proc.ndim != 1:
-            raise ValueError("'reference' must be a 1D signal.")
+            msg = "'reference' must be a 1D signal."
+            raise ValueError(msg)
         mdt = _stipa_modulation_depths(_intensity_envelopes(ref_proc, fs), fs)
         if np.any(mdt <= 0.0):
-            raise ValueError("'reference' has zero modulation depth in a band.")
+            msg = "'reference' has zero modulation depth in a band."
+            raise ValueError(msg)
         mtf = mdr / mdt
     else:
         mtf = mdr / _STIPA_MOD_INDEX
@@ -739,12 +754,14 @@ def stipa_signal(
     if fs <= 0:
         raise ValueError(_FS_NOT_POSITIVE_MSG)
     if fs < _MIN_FS:
-        raise ValueError(
+        msg = (
             f"Sample rate 'fs' must be >= {_MIN_FS} Hz: the 8 kHz half-octave "
             "carrier extends beyond 9,4 kHz."
         )
+        raise ValueError(msg)
     if seconds <= 0:
-        raise ValueError("'seconds' must be positive.")
+        msg = "'seconds' must be positive."
+        raise ValueError(msg)
 
     n = round(seconds * fs)
     rng = np.random.default_rng(seed)

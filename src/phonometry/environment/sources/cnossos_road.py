@@ -496,7 +496,8 @@ class RoadTraffic:
 def _finite(value: float, name: str) -> float:
     scalar = float(value)
     if not np.isfinite(scalar):
-        raise ValueError(f"'{name}' must be a finite number.")
+        msg = f"'{name}' must be a finite number."
+        raise ValueError(msg)
     return scalar
 
 
@@ -574,11 +575,12 @@ def _surface_of(
         else (road_surface_coefficients(surface))
     )
     if key not in row.alpha or key not in row.beta:
-        raise ValueError(
+        msg = (
             f"The road surface {row.name!r} has no coefficients for category "
             f"{key!r}; a substituted Table F-4 row must cover every category "
             "of the modelled traffic."
         )
+        raise ValueError(msg)
     return row
 
 
@@ -598,9 +600,11 @@ def _studded_correction(
 ) -> NDArray[np.float64]:
     """``dL_studdedtyres,i,m`` of (2.2.6) to (2.2.9), in dB per octave band."""
     if not 0.0 <= studded_fraction <= 1.0:
-        raise ValueError("'studded_fraction' must be a fraction in [0, 1].")
+        msg = "'studded_fraction' must be a fraction in [0, 1]."
+        raise ValueError(msg)
     if not 0.0 <= studded_months <= 12.0:
-        raise ValueError("'studded_months' must be a number of months in [0, 12].")
+        msg = "'studded_months' must be a number of months in [0, 12]."
+        raise ValueError(msg)
     if key != "1" or studded_months <= 0.0 or studded_fraction <= 0.0:
         return np.zeros(len(ROAD_OCTAVE_BANDS))
     # (2.2.6): the speed dependence saturates below 50 km/h and above 90 km/h.
@@ -767,7 +771,8 @@ def road_propulsion_noise(
 def _positive_speed(speed: float) -> float:
     v = _finite(speed, "speed")
     if v <= 0.0:
-        raise ValueError("'speed' must be a positive number of km/h.")
+        msg = "'speed' must be a positive number of km/h."
+        raise ValueError(msg)
     return v
 
 
@@ -923,16 +928,19 @@ def road_source_power(
     """
     flows = [traffic] if isinstance(traffic, RoadTraffic) else list(traffic)
     if not flows:
-        raise ValueError("'traffic' must carry at least one vehicle category.")
+        msg = "'traffic' must carry at least one vehicle category."
+        raise ValueError(msg)
     keys = [_category_key(flow.category) for flow in flows]
     if len(set(keys)) != len(keys):
-        raise ValueError("'traffic' must carry at most one flow per vehicle category.")
+        msg = "'traffic' must carry at most one flow per vehicle category."
+        raise ValueError(msg)
 
     rolling, propulsion, vehicle, line = [], [], [], []
     for flow, key in zip(flows, keys, strict=True):
         q = _finite(flow.flow_rate, "flow_rate")
         if q < 0.0:
-            raise ValueError("'flow_rate' must be a non-negative number of vehicles/h.")
+            msg = "'flow_rate' must be a non-negative number of vehicles/h."
+            raise ValueError(msg)
         v = _positive_speed(flow.speed)
         lwr = road_rolling_noise(
             key,
@@ -997,7 +1005,8 @@ def line_source_segment_power(
     """
     dl = _finite(length, "length")
     if dl <= 0.0:
-        raise ValueError("'length' must be a positive number of metres.")
+        msg = "'length' must be a positive number of metres."
+        raise ValueError(msg)
     return np.asarray(
         np.atleast_1d(np.asarray(line_power, dtype=np.float64)) + 10.0 * np.log10(dl),
         dtype=np.float64,

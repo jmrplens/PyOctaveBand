@@ -617,22 +617,22 @@ def _as_two_channels(
         elif array.shape[0] == 2:
             left, right = array[0], array[1]
         else:
-            raise ValueError(
-                f"signal must be mono (1-D) or two-channel; got shape {array.shape}."
-            )
+            msg = f"signal must be mono (1-D) or two-channel; got shape {array.shape}."
+            raise ValueError(msg)
     elif array.ndim == 1:
         left = array
         right = None  # mono: diotic (both ears) or single ear (monaural)
     else:
-        raise ValueError(
-            f"signal must be mono (1-D) or two-channel; got shape {array.shape}."
-        )
+        msg = f"signal must be mono (1-D) or two-channel; got shape {array.shape}."
+        raise ValueError(msg)
     if left.size == 0:
-        raise ValueError("Input signal cannot be empty.")
+        msg = "Input signal cannot be empty."
+        raise ValueError(msg)
     if not np.all(np.isfinite(left)) or (
         right is not None and not np.all(np.isfinite(right))
     ):
-        raise ValueError("Input signal must contain only finite values.")
+        msg = "Input signal must contain only finite values."
+        raise ValueError(msg)
     if presentation == "monaural":
         right = None
     return left, right
@@ -687,7 +687,8 @@ def loudness_moore_glasberg_time(
     _validate_conditions(field, presentation)
     fs = resolve_fs(signal, fs, name="signal")
     if fs <= 0.0:
-        raise ValueError(f"'fs' must be a positive sampling rate, got {fs!r}.")
+        msg = f"'fs' must be a positive sampling rate, got {fs!r}."
+        raise ValueError(msg)
     left, right = _as_two_channels(signal, presentation)
 
     comp_f, plans, perm = _spectral_plan(float(fs))

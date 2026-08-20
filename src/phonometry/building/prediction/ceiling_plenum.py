@@ -179,12 +179,13 @@ def _require_transmission_factor(tau: np.ndarray) -> None:
     """
     worst = float(np.max(tau))
     if worst > 1.0:
-        raise ValueError(
+        msg = (
             f"the ceiling/plenum transmission factor reaches {worst:.3g}, above "
             "unity: the one-dimensional model is outside its validity range. "
             "Check that 'reduction_index_source' and 'reduction_index_receiving' "
             "exceed the geometry term 10 lg(eps^2 LR/(4h))."
         )
+        raise ValueError(msg)
 
 
 def _require_split(value: float, name: str) -> float:
@@ -196,7 +197,8 @@ def _require_split(value: float, name: str) -> float:
     """
     ratio = require_positive(value, name)
     if ratio > 1.0:
-        raise ValueError(f"'{name}' must be a power split in (0, 1].")
+        msg = f"'{name}' must be a power split in (0, 1]."
+        raise ValueError(msg)
     return ratio
 
 
@@ -226,14 +228,17 @@ def normalized_ceiling_attenuation(
     l1 = require_finite_array(level_source, "level_source")
     l2 = require_finite_array(level_receiving, "level_receiving")
     if l1.shape != l2.shape:
-        raise ValueError("'level_source' and 'level_receiving' must share their shape.")
+        msg = "'level_source' and 'level_receiving' must share their shape."
+        raise ValueError(msg)
     area = require_finite_array(absorption_area, "absorption_area")
     if area.size == 1:
         area = np.full(l1.shape, float(area[0]))
     if area.shape != l1.shape:
-        raise ValueError("'absorption_area' must be a scalar or match the levels.")
+        msg = "'absorption_area' must be a scalar or match the levels."
+        raise ValueError(msg)
     if np.any(area <= 0.0):
-        raise ValueError("'absorption_area' must be positive.")
+        msg = "'absorption_area' must be positive."
+        raise ValueError(msg)
     a0 = require_positive(reference_area, "reference_area")
     return np.asarray(l1 - l2 - 10.0 * np.log10(area / a0), dtype=np.float64)
 
@@ -304,16 +309,18 @@ def ceiling_attenuation_class(
     )
     values = require_finite_array(attenuation, "attenuation")
     if values.shape != bands.shape:
-        raise ValueError(
+        msg = (
             f"'attenuation' must hold {bands.size} one-third-octave values "
             f"(125 Hz to 4000 Hz)."
         )
+        raise ValueError(msg)
     if frequency is not None:
         given = require_finite_array(frequency, "frequency")
         if given.shape != bands.shape or not np.allclose(given, bands):
-            raise ValueError(
+            msg = (
                 "'frequency' must be the 16 ASTM E413 contour bands 125 Hz to 4000 Hz."
             )
+            raise ValueError(msg)
     # Clause 5.2: the contour is fitted to integer-rounded data.
     rounded = np.asarray(np.floor(values + 0.5), dtype=np.float64)
 
@@ -484,10 +491,11 @@ def plenum_flanking_reduction_index(
     rs = require_finite_array(reduction_index_source, "reduction_index_source")
     rr = require_finite_array(reduction_index_receiving, "reduction_index_receiving")
     if rs.shape != rr.shape:
-        raise ValueError(
+        msg = (
             "'reduction_index_source' and 'reduction_index_receiving' must "
             "share their shape."
         )
+        raise ValueError(msg)
     lr = require_positive(ceiling_length, "ceiling_length")
     h = require_positive(plenum_height, "plenum_height")
     ls = (
@@ -503,14 +511,14 @@ def plenum_flanking_reduction_index(
     if frequency is not None:
         freqs = require_finite_array(frequency, "frequency")
         if freqs.shape != rs.shape:
-            raise ValueError("'frequency' must match the reduction indices.")
+            msg = "'frequency' must match the reduction indices."
+            raise ValueError(msg)
 
     tau_s = 10.0 ** (-rs / 10.0)
     tau_r = 10.0 ** (-rr / 10.0)
     if (attenuation_source is None) != (attenuation_receiving is None):
-        raise ValueError(
-            "'attenuation_source' and 'attenuation_receiving' must be given together."
-        )
+        msg = "'attenuation_source' and 'attenuation_receiving' must be given together."
+        raise ValueError(msg)
     if attenuation_source is None or attenuation_receiving is None:
         geometry = float(10.0 * np.log10(eps**2 * lr / (4.0 * h)))
         tau = eps**2 * tau_s * tau_r * lr / (4.0 * h)
@@ -533,11 +541,11 @@ def plenum_flanking_reduction_index(
     ms = require_finite_array(attenuation_source, "attenuation_source")
     mr = require_finite_array(attenuation_receiving, "attenuation_receiving")
     if ms.shape != rs.shape or mr.shape != rs.shape:
-        raise ValueError(
-            "the attenuation coefficients must match the reduction indices."
-        )
+        msg = "the attenuation coefficients must match the reduction indices."
+        raise ValueError(msg)
     if np.any(ms <= 0.0) or np.any(mr <= 0.0):
-        raise ValueError("the attenuation coefficients must be positive.")
+        msg = "the attenuation coefficients must be positive."
+        raise ValueError(msg)
     # Eq. (9.17): the receiving side also loses power back into the room.
     mr_eff = mr + sr * tau_r / h
     # Vigran's Eq. (9.18) prints the *unprimed* mR in this denominator while

@@ -187,9 +187,11 @@ def spinal_response(acceleration: SignalInput, fs: float | None = None) -> np.nd
     # this is an acceleration in m/s2. See phonometry.io._resolve.
     az = np.asarray(resolve_samples(acceleration, calibrate=False), dtype=np.float64)
     if az.ndim != 1:
-        raise ValueError("acceleration must be a 1-D time series.")
+        msg = "acceleration must be a 1-D time series."
+        raise ValueError(msg)
     if az.size == 0:
-        raise ValueError("acceleration must not be empty.")
+        msg = "acceleration must not be empty."
+        raise ValueError(msg)
     spectrum = np.fft.rfft(az)
     freq = np.fft.rfftfreq(az.size, d=1.0 / fs)
     response = np.fft.irfft(spectrum * seat_to_spine_transfer(freq), n=az.size)
@@ -290,11 +292,14 @@ def daily_dose_multi(
     td = np.asarray(exposure_times, dtype=np.float64).ravel()
     tm = np.asarray(measurement_times, dtype=np.float64).ravel()
     if not dz.shape == td.shape == tm.shape:
-        raise ValueError("doses, exposure_times and measurement_times must match.")
+        msg = "doses, exposure_times and measurement_times must match."
+        raise ValueError(msg)
     if dz.size == 0:
-        raise ValueError("at least one condition is required.")
+        msg = "at least one condition is required."
+        raise ValueError(msg)
     if not np.all(tm > 0.0) or not np.all(td > 0.0):
-        raise ValueError("exposure_times and measurement_times must be positive.")
+        msg = "exposure_times and measurement_times must be positive."
+        raise ValueError(msg)
     total = float(np.sum(dz**DOSE_EXPONENT * (td / tm)))
     return float(total ** (1.0 / DOSE_EXPONENT))
 
@@ -372,17 +377,19 @@ def injury_risk(
     """
     require_choice(sex, "sex", _SEXES)
     if years <= 0:
-        raise ValueError("years must be a positive integer.")
+        msg = "years must be a positive integer."
+        raise ValueError(msg)
     days_per_year = require_positive(days_per_year, "days_per_year")
     mz = _mz_for_sex(sex) if mz is None else mz
     s_stat = static_stress(mz)
     ages = start_age + np.arange(years, dtype=np.float64)
     strength = ultimate_strength(ages, sex=sex) - s_stat
     if np.any(strength <= 0.0):
-        raise ValueError(
+        msg = (
             "ultimate strength minus static stress is non-positive within the "
             "exposure period; the age range exceeds the model's validity."
         )
+        raise ValueError(msg)
     numerator = daily_compression * days_per_year ** (1.0 / DOSE_EXPONENT)
     total = float(np.sum((numerator / strength) ** DOSE_EXPONENT))
     return float(total ** (1.0 / DOSE_EXPONENT))
@@ -516,9 +523,8 @@ class MultipleShockResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iso2631_5 import render_iso2631_5_report
 
         return render_iso2631_5_report(
@@ -605,10 +611,11 @@ def multiple_shock_assessment(
     """
     require_choice(sex, "sex", _SEXES)
     if (exposure_time is None) != (measurement_time is None):
-        raise ValueError(
+        msg = (
             "provide both exposure_time and measurement_time to scale to a "
             "daily dose, or neither."
         )
+        raise ValueError(msg)
     mz = _mz_for_sex(sex) if mz is None else mz
     peaks = response_peaks(spinal_response(acceleration, fs))
     dz = dose_from_peaks(peaks)

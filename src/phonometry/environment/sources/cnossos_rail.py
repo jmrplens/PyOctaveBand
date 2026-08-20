@@ -411,10 +411,11 @@ class VehicleDescriptor:
         """
         text = str(code).strip()
         if len(text) < 4 or not text[1:-2].isdigit():
-            raise ValueError(
+            msg = (
                 f"{code!r} is not a Table [2.3.a] vehicle descriptor: it must "
                 "read <type><axles><brake><measure>, for example 'a4cn'."
             )
+            raise ValueError(msg)
         try:
             return cls(
                 vehicle_type=VehicleType(text[0]),
@@ -423,9 +424,8 @@ class VehicleDescriptor:
                 measure=WheelMeasure(text[-1]),
             )
         except ValueError as exc:  # pragma: no cover - message pass-through
-            raise ValueError(
-                f"{code!r} is not a Table [2.3.a] vehicle descriptor: {exc}"
-            ) from exc
+            msg = f"{code!r} is not a Table [2.3.a] vehicle descriptor: {exc}"
+            raise ValueError(msg) from exc
 
     @property
     def code(self) -> str:
@@ -465,10 +465,11 @@ class TrackDescriptor:
         """
         text = str(code).strip()
         if len(text) != 6:
-            raise ValueError(
+            msg = (
                 f"{code!r} is not a Table [2.3.b] track descriptor: it must "
                 "have exactly six digits, for example 'BMSNNN'."
             )
+            raise ValueError(msg)
         try:
             return cls(
                 base=TrackBase(text[0]),
@@ -479,9 +480,8 @@ class TrackDescriptor:
                 curvature=TrackCurvature(text[5]),
             )
         except ValueError as exc:  # pragma: no cover - message pass-through
-            raise ValueError(
-                f"{code!r} is not a Table [2.3.b] track descriptor: {exc}"
-            ) from exc
+            msg = f"{code!r} is not a Table [2.3.b] track descriptor: {exc}"
+            raise ValueError(msg) from exc
 
     @property
     def code(self) -> str:
@@ -1698,24 +1698,27 @@ _SQUEAL_MINIMUM_TRACK_LENGTH = 50.0
 def _finite(value: float, name: str) -> float:
     scalar = float(value)
     if not np.isfinite(scalar):
-        raise ValueError(f"'{name}' must be a finite number.")
+        msg = f"'{name}' must be a finite number."
+        raise ValueError(msg)
     return scalar
 
 
 def _speed(value: float, name: str = "speed") -> float:
     v = _finite(value, name)
     if v <= 0.0:
-        raise ValueError(f"'{name}' must be a positive number of km/h.")
+        msg = f"'{name}' must be a positive number of km/h."
+        raise ValueError(msg)
     return v
 
 
 def _spectrum(values: Any, name: str, size: int = 24) -> NDArray[np.float64]:
     array = np.asarray(values, dtype=np.float64)
     if array.shape != (size,):
-        raise ValueError(
+        msg = (
             f"'{name}' must hold {size} values, one per band; got "
             f"{array.shape[0] if array.ndim == 1 else array.shape}."
         )
+        raise ValueError(msg)
     return array
 
 
@@ -2007,15 +2010,18 @@ def roughness_to_frequency(
     y = np.asarray(levels, dtype=np.float64)
     lam = np.asarray(wavelengths, dtype=np.float64) / 1000.0
     if y.ndim != 1 or y.shape != lam.shape:
-        raise ValueError(
+        msg = (
             "'levels' and 'wavelengths' must be one-dimensional and of the "
             f"same length; got {y.shape} and {lam.shape}."
         )
+        raise ValueError(msg)
     if np.any(lam <= 0.0):
-        raise ValueError("'wavelengths' must all be positive.")
+        msg = "'wavelengths' must all be positive."
+        raise ValueError(msg)
     freqs = np.asarray(frequencies, dtype=np.float64)
     if np.any(freqs <= 0.0):
-        raise ValueError("'frequencies' must all be positive.")
+        msg = "'frequencies' must all be positive."
+        raise ValueError(msg)
     order = np.argsort(lam)
     lam, y = lam[order], y[order]
     wanted = _speed(speed) / 3.6 / freqs
@@ -2062,7 +2068,8 @@ def impact_roughness(single: Any, joint_density: float) -> NDArray[np.float64]:
     """
     density = _finite(joint_density, "joint_density")
     if density < 0.0:
-        raise ValueError("'joint_density' must be a non-negative number of m^-1.")
+        msg = "'joint_density' must be a non-negative number of m^-1."
+        raise ValueError(msg)
     spectrum = _spectrum(single, "single")
     # The guard above already rejects a negative density, so this is the
     # zero case: no joint at all, and no impact roughness to add.
@@ -2092,7 +2099,8 @@ def rolling_sound_power(
     """
     n_a = _finite(axles, "axles")
     if n_a <= 0.0:
-        raise ValueError("'axles' must be a positive number of axles per vehicle.")
+        msg = "'axles' must be a positive number of axles per vehicle."
+        raise ValueError(msg)
     return np.asarray(
         _spectrum(roughness, "roughness")
         + _spectrum(transfer, "transfer")
@@ -2129,10 +2137,12 @@ def curve_squeal_excess(
     """
     r = _finite(radius, "radius")
     if r <= 0.0:
-        raise ValueError("'radius' must be a positive number of metres.")
+        msg = "'radius' must be a positive number of metres."
+        raise ValueError(msg)
     length = _finite(track_length, "track_length")
     if length < 0.0:
-        raise ValueError("'track_length' must be a non-negative number of metres.")
+        msg = "'track_length' must be a non-negative number of metres."
+        raise ValueError(msg)
     if tram:
         return _SQUEAL_TRAM if r <= _SQUEAL_TRAM_RADIUS else 0.0
     if turnout:
@@ -2201,7 +2211,8 @@ def vertical_directivity(
     angle = np.radians(_finite(psi, "psi"))
     freqs = np.asarray(frequencies, dtype=np.float64)
     if height not in (1, 2):
-        raise ValueError("'height' must be 1 (source A) or 2 (source B).")
+        msg = "'height' must be 1 (source A) or 2 (source B)."
+        raise ValueError(msg)
     if height == 2:
         if aerodynamic and angle < 0.0:
             return np.full(len(freqs), 10.0 * np.log10(np.cos(angle) ** 2))
@@ -2422,7 +2433,8 @@ def _flow_term(vehicle: RailwayVehicle, reference_time: float, length: float) ->
     if vehicle.condition is RunningCondition.IDLING:
         idle = _finite(vehicle.idling_time, "idling_time")
         if idle < 0.0:
-            raise ValueError("'idling_time' must be a non-negative period.")
+            msg = "'idling_time' must be a non-negative period."
+            raise ValueError(msg)
         # The guard above leaves only the zero case: a vehicle that never
         # idles contributes no energy at all.
         if idle <= 0.0:
@@ -2430,7 +2442,8 @@ def _flow_term(vehicle: RailwayVehicle, reference_time: float, length: float) ->
         return float(10.0 * np.log10(idle / (reference_time * length)))
     q = _finite(vehicle.flow_rate, "flow_rate")
     if q < 0.0:
-        raise ValueError("'flow_rate' must be a non-negative number per hour.")
+        msg = "'flow_rate' must be a non-negative number per hour."
+        raise ValueError(msg)
     # As above: an empty track is a legitimate input and carries -inf.
     if q <= 0.0:
         return -np.inf
@@ -2568,11 +2581,14 @@ def railway_source_power(
     """
     vehicles = [traffic] if isinstance(traffic, RailwayVehicle) else list(traffic)
     if not vehicles:
-        raise ValueError("'traffic' must carry at least one vehicle.")
+        msg = "'traffic' must carry at least one vehicle."
+        raise ValueError(msg)
     if _finite(reference_time, "reference_time") <= 0.0:
-        raise ValueError("'reference_time' must be a positive period.")
+        msg = "'reference_time' must be a positive period."
+        raise ValueError(msg)
     if _finite(track.length, "length") <= 0.0:
-        raise ValueError("'length' must be a positive number of metres.")
+        msg = "'length' must be a positive number of metres."
+        raise ValueError(msg)
 
     n_bands = len(RAILWAY_THIRD_OCTAVE_BANDS)
     per_height: list[list[NDArray[np.float64]]] = [[], []]

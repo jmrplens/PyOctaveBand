@@ -347,15 +347,15 @@ def delany_bazley(
             coeffs = DELANY_BAZLEY_COEFFICIENTS[coefficients]
         except KeyError:
             options = ", ".join(sorted(DELANY_BAZLEY_COEFFICIENTS))
-            raise ValueError(
-                f"unknown coefficient preset {coefficients!r}; options: {options}."
-            ) from None
+            msg = f"unknown coefficient preset {coefficients!r}; options: {options}."
+            raise ValueError(msg) from None
         model = f"delany_bazley[{coefficients}]"
     else:
         coeffs = tuple(float(v) for v in coefficients)
         model = "delany_bazley[custom]"
     if len(coeffs) != 8:
-        raise ValueError("'coefficients' must provide exactly 8 values C1..C8.")
+        msg = "'coefficients' must provide exactly 8 values C1..C8."
+        raise ValueError(msg)
     c1, c2, c3, c4, c5, c6, c7, c8 = coeffs
     x = np.asarray(rho0 * f / sigma, dtype=np.float64)
     _warn_fit_range(x, DELANY_BAZLEY_VALIDITY, "X = rho f / sigma", "Delany-Bazley")
@@ -484,7 +484,8 @@ def johnson_champoux_allard(
         raise ValueError(_POROSITY_MESSAGE)
     t_inf = require_positive(tortuosity, "tortuosity")
     if t_inf < 1.0:
-        raise ValueError("'tortuosity' must be >= 1.")
+        msg = "'tortuosity' must be >= 1."
+        raise ValueError(msg)
     lam_v = require_positive(viscous_length, "viscous_length")
     lam_t = require_positive(thermal_length, "thermal_length")
     c0 = require_positive(speed_of_sound, "speed_of_sound")

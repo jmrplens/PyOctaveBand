@@ -114,7 +114,8 @@ _SILENCER_KINDS = (
 def _duct_diameter(area: float) -> float:
     """Equivalent circular diameter of a duct cross-section."""
     if area <= 0.0:
-        raise ValueError("Cross-section areas must be positive.")
+        msg = "Cross-section areas must be positive."
+        raise ValueError(msg)
     return float(2.0 * np.sqrt(area / np.pi))
 
 
@@ -153,11 +154,11 @@ def _draw_chamber(
     d_p = _duct_diameter(pipe_area)
     d_c = _duct_diameter(chamber_area)
     if chamber_area <= pipe_area:
-        raise ValueError("'chamber_area' must exceed 'pipe_area'.")
+        msg = "'chamber_area' must exceed 'pipe_area'."
+        raise ValueError(msg)
     if inlet_extension + outlet_extension > length:
-        raise ValueError(
-            "'inlet_extension' + 'outlet_extension' must not exceed 'length'."
-        )
+        msg = "'inlet_extension' + 'outlet_extension' must not exceed 'length'."
+        raise ValueError(msg)
     stub = max(0.5 * length, 1.5 * d_c)
     # Chamber shell.
     from matplotlib.patches import Rectangle
@@ -261,19 +262,22 @@ def _branch_dimensions(
     """Resolve (branch diameter, branch length, cavity side) per kind."""
     if kind == _KIND_HELMHOLTZ:
         if neck_area is None or neck_length is None or cavity_volume is None:
-            raise ValueError(
+            msg = (
                 "A Helmholtz resonator drawing needs 'neck_area', "
                 "'neck_length' and 'cavity_volume'."
             )
+            raise ValueError(msg)
         if cavity_volume <= 0.0 or neck_length <= 0.0:
-            raise ValueError("'cavity_volume' and 'neck_length' must be positive.")
+            msg = "'cavity_volume' and 'neck_length' must be positive."
+            raise ValueError(msg)
         return (
             _duct_diameter(neck_area),
             neck_length,
             float(cavity_volume ** (1.0 / 3.0)),
         )
     if length is None or branch_area is None:
-        raise ValueError("A quarter-wave drawing needs 'length' and 'branch_area'.")
+        msg = "A quarter-wave drawing needs 'length' and 'branch_area'."
+        raise ValueError(msg)
     if length <= 0.0:
         raise ValueError(_LENGTH_POSITIVE)
     return _duct_diameter(branch_area), length, 0.0
@@ -383,19 +387,18 @@ def _validate_chamber_geometry(
 ) -> None:
     """Chamber parameter validation, before any figure exists."""
     if length is None or chamber_area is None or pipe_area is None:
-        raise ValueError(
-            "A chamber drawing needs 'length', 'chamber_area' and 'pipe_area'."
-        )
+        msg = "A chamber drawing needs 'length', 'chamber_area' and 'pipe_area'."
+        raise ValueError(msg)
     if length <= 0.0:
         raise ValueError(_LENGTH_POSITIVE)
     _duct_diameter(pipe_area)
     _duct_diameter(chamber_area)
     if chamber_area <= pipe_area:
-        raise ValueError("'chamber_area' must exceed 'pipe_area'.")
+        msg = "'chamber_area' must exceed 'pipe_area'."
+        raise ValueError(msg)
     if inlet_extension + outlet_extension > length:
-        raise ValueError(
-            "'inlet_extension' + 'outlet_extension' must not exceed 'length'."
-        )
+        msg = "'inlet_extension' + 'outlet_extension' must not exceed 'length'."
+        raise ValueError(msg)
 
 
 def _validate_branch_geometry(
@@ -409,20 +412,24 @@ def _validate_branch_geometry(
 ) -> None:
     """Side-branch parameter validation, before any figure exists."""
     if duct_area is None:
-        raise ValueError("A side-branch drawing needs 'duct_area'.")
+        msg = "A side-branch drawing needs 'duct_area'."
+        raise ValueError(msg)
     _duct_diameter(duct_area)
     if kind == _KIND_HELMHOLTZ:
         if neck_area is None or neck_length is None or cavity_volume is None:
-            raise ValueError(
+            msg = (
                 "A Helmholtz resonator drawing needs 'neck_area', "
                 "'neck_length' and 'cavity_volume'."
             )
+            raise ValueError(msg)
         if neck_length <= 0.0 or cavity_volume <= 0.0:
-            raise ValueError("'cavity_volume' and 'neck_length' must be positive.")
+            msg = "'cavity_volume' and 'neck_length' must be positive."
+            raise ValueError(msg)
         _duct_diameter(neck_area)
         return
     if length is None or branch_area is None:
-        raise ValueError("A quarter-wave drawing needs 'length' and 'branch_area'.")
+        msg = "A quarter-wave drawing needs 'length' and 'branch_area'."
+        raise ValueError(msg)
     if length <= 0.0:
         raise ValueError(_LENGTH_POSITIVE)
     _duct_diameter(branch_area)
@@ -471,9 +478,8 @@ def plot_silencer_geometry(
     """
     _check_language(language)
     if kind not in _SILENCER_KINDS:
-        raise ValueError(
-            f"Unknown silencer kind {kind!r}; expected one of {_SILENCER_KINDS}."
-        )
+        msg = f"Unknown silencer kind {kind!r}; expected one of {_SILENCER_KINDS}."
+        raise ValueError(msg)
     chamber = kind in (_KIND_EXPANSION, _KIND_EXTENDED)
     if chamber:
         _validate_chamber_geometry(
@@ -539,10 +545,11 @@ def plot_silencer_result_geometry(
     if result.chain is not None:
         return plot_silencer_chain_geometry(result.chain, ax=ax, language=language)
     if result.geometry is None:
-        raise ValueError(
+        msg = (
             "This result does not retain its geometry; call "
             "plot_silencer_geometry(kind, ...) with the original arguments."
         )
+        raise ValueError(msg)
     return plot_silencer_geometry(
         result.kind,
         ax=ax,
@@ -801,11 +808,12 @@ def plot_silencer_chain_geometry(
     _check_language(language)
     segments, branches, total = _chain_layout(chain.elements)
     if not segments:
-        raise ValueError(
+        msg = (
             "This chain has no duct of positive length, so it declares no "
             "geometry to draw: a shunt element holds an impedance and no "
             "shape. Add the duct runs its branches sit on."
         )
+        raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
     d_max = max(_duct_diameter(area) for _, _, area in segments)
@@ -858,11 +866,11 @@ def plot_plenum_geometry(
 
     _check_language(language)
     if exit_area <= 0.0 or line_of_sight <= 0.0 or wall_area <= 0.0:
-        raise ValueError(
-            "'exit_area', 'line_of_sight' and 'wall_area' must be positive."
-        )
+        msg = "'exit_area', 'line_of_sight' and 'wall_area' must be positive."
+        raise ValueError(msg)
     if not 0.0 <= angle < 0.5 * np.pi:
-        raise ValueError("'angle' must be in [0, pi/2).")
+        msg = "'angle' must be in [0, pi/2)."
+        raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
     r = float(line_of_sight)

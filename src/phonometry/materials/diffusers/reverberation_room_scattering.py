@@ -141,7 +141,8 @@ def _positive_scalar(value: float, name: str) -> float:
     """Return ``value`` as a positive float or raise ``ValueError``."""
     v = float(value)
     if not math.isfinite(v) or v <= 0.0:
-        raise ValueError(f"'{name}' must be a positive, finite number.")
+        msg = f"'{name}' must be a positive, finite number."
+        raise ValueError(msg)
     return v
 
 
@@ -149,9 +150,11 @@ def _positive_array(value: ArrayLike, name: str) -> Real:
     """Return ``value`` as a positive float array or raise ``ValueError``."""
     arr = np.asarray(value, dtype=np.float64)
     if not np.all(np.isfinite(arr)):
-        raise ValueError(f"'{name}' values must be finite.")
+        msg = f"'{name}' values must be finite."
+        raise ValueError(msg)
     if np.any(arr <= 0.0):
-        raise ValueError(f"'{name}' values must be positive.")
+        msg = f"'{name}' values must be positive."
+        raise ValueError(msg)
     return arr
 
 
@@ -159,9 +162,11 @@ def _nonneg_array(value: ArrayLike, name: str) -> Real:
     """Return ``value`` as a non-negative float array or raise ``ValueError``."""
     arr = np.asarray(value, dtype=np.float64)
     if not np.all(np.isfinite(arr)):
-        raise ValueError(f"'{name}' values must be finite.")
+        msg = f"'{name}' values must be finite."
+        raise ValueError(msg)
     if np.any(arr < 0.0):
-        raise ValueError(f"'{name}' values must be non-negative.")
+        msg = f"'{name}' values must be non-negative."
+        raise ValueError(msg)
     return arr
 
 
@@ -181,7 +186,8 @@ def speed_of_sound(temperature: ArrayLike) -> Real:
     t = np.asarray(temperature, dtype=np.float64)
     kelvin = _T0 + t
     if np.any(kelvin <= 0.0):
-        raise ValueError("'temperature' must exceed -273,15 degC.")
+        msg = "'temperature' must exceed -273,15 degC."
+        raise ValueError(msg)
     return np.asarray(_C_REF * np.sqrt(kelvin / _T_REF_K), dtype=np.float64)
 
 
@@ -347,7 +353,8 @@ def scattering_coefficient(
     diff = np.asarray(alpha_s, dtype=np.float64)
     denom = 1.0 - diff
     if np.any(np.isclose(denom, 0.0)):
-        raise ValueError("'alpha_s' must not equal 1 (division by zero).")
+        msg = "'alpha_s' must not equal 1 (division by zero)."
+        raise ValueError(msg)
     s = (spec - diff) / denom
     if truncate_negative:
         s = np.maximum(s, 0.0)
@@ -428,9 +435,8 @@ class ScatteringResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iso17497 import render_scattering_report
 
         return render_scattering_report(
@@ -469,10 +475,11 @@ def scattering_coefficient_spectrum(
         or freq.shape != spec.shape
         or freq.shape != rand.shape
     ):
-        raise ValueError(
+        msg = (
             "'frequencies', 'specular_absorption' and 'random_absorption' must "
             "be non-empty, 1-D and equal-length."
         )
+        raise ValueError(msg)
     s = scattering_coefficient(spec, rand, truncate_negative=truncate_negative)
     return ScatteringResult(
         frequencies=freq,
@@ -547,17 +554,19 @@ def check_base_plate_scattering(
             elif float(band) in scattering:
                 values[band] = float(scattering[float(band)])
             else:
-                raise ValueError(
+                msg = (
                     f"scattering mapping is missing band {band} Hz; "
                     f"expected keys {BASE_PLATE_BANDS}"
                 )
+                raise ValueError(msg)
     else:
         arr = np.asarray(scattering, dtype=np.float64)
         if arr.ndim != 1 or arr.size != len(BASE_PLATE_BANDS):
-            raise ValueError(
+            msg = (
                 f"scattering must have {len(BASE_PLATE_BANDS)} values for "
                 f"bands {BASE_PLATE_BANDS}, got shape {arr.shape}"
             )
+            raise ValueError(msg)
         values = dict(zip(BASE_PLATE_BANDS, arr.tolist()))
     exceeded = tuple(
         band
@@ -596,10 +605,12 @@ def reverberation_time_uncertainty(times: ArrayLike) -> Real:
     """
     arr = _positive_array(times, "times")
     if arr.ndim != 1:
-        raise ValueError("'times' must be a 1-D sequence of measurements.")
+        msg = "'times' must be a 1-D sequence of measurements."
+        raise ValueError(msg)
     n = arr.size
     if n < 2:
-        raise ValueError("'times' needs at least two measurements (N >= 2).")
+        msg = "'times' needs at least two measurements (N >= 2)."
+        raise ValueError(msg)
     mean = arr.mean()
     variance_of_mean = np.sum((arr - mean) ** 2) / (n * (n - 1))
     return np.asarray(np.sqrt(variance_of_mean), dtype=np.float64)
@@ -695,9 +706,11 @@ def scattering_coefficient_uncertainty(
     spec_term = spec - 1.0
     diff_term = 1.0 - diff
     if np.any(np.isclose(diff_term, 0.0)):
-        raise ValueError("'alpha_s' must not equal 1 (division by zero).")
+        msg = "'alpha_s' must not equal 1 (division by zero)."
+        raise ValueError(msg)
     if np.any(np.isclose(spec_term, 0.0)):
-        raise ValueError("'alpha_spec' must not equal 1 (division by zero).")
+        msg = "'alpha_spec' must not equal 1 (division by zero)."
+        raise ValueError(msg)
     u_s = np.abs(spec_term / diff_term) * np.sqrt(
         (u_spec / spec_term) ** 2 + (u_diff / diff_term) ** 2
     )

@@ -318,50 +318,55 @@ def _math_tokens(run: str, s: str, script: bool = False) -> list[tuple[str, str]
         ch = run[i]
         if ch in "_^":
             if script:
-                raise ValueError(
+                msg = (
                     f"nested script {run[i:]!r} inside a script of {s!r}: "
                     "the composer sets a single script level"
                 )
+                raise ValueError(msg)
             kind = "sub" if ch == "_" else "sup"
             if i + 1 == len(run):
-                raise ValueError(
-                    f"empty script {ch!r} at the end of a math run in {s!r}"
-                )
+                msg = f"empty script {ch!r} at the end of a math run in {s!r}"
+                raise ValueError(msg)
             if run[i + 1] == "{":
                 end = run.find("}", i + 2)
                 if end < 0:
-                    raise ValueError(f"unclosed script brace {run[i:]!r} in {s!r}")
+                    msg = f"unclosed script brace {run[i:]!r} in {s!r}"
+                    raise ValueError(msg)
                 if end == i + 2:
-                    raise ValueError(f"empty script {run[i : end + 1]!r} in {s!r}")
+                    msg = f"empty script {run[i : end + 1]!r} in {s!r}"
+                    raise ValueError(msg)
                 out.append((kind, run[i + 2 : end]))
                 i = end + 1
             else:
                 nxt = run[i + 2 : i + 3]
                 if nxt == "(":
-                    raise ValueError(
+                    msg = (
                         f"ambiguous script {run[i : i + 2]!r} before '(' in "
                         f"{s!r}: brace the script and keep the argument "
                         f"outside, as {ch}{{{run[i + 1]}}}(...)"
                     )
+                    raise ValueError(msg)
                 if nxt.isalnum():
                     j = i + 2
                     while j < len(run) and run[j].isalnum():
                         j += 1
-                    raise ValueError(
+                    msg = (
                         f"ambiguous script {run[i:j]!r} in {s!r}: only "
                         f"{run[i + 1]!r} would attach to {ch!r}, brace the "
                         f"whole script as {ch}{{...}}"
                     )
+                    raise ValueError(msg)
                 if nxt == "," and i + 3 < len(run) and run[i + 3].isalnum():
                     j = i + 3
                     while j < len(run) and (run[j].isalnum() or run[j] == ","):
                         j += 1
-                    raise ValueError(
+                    msg = (
                         f"ambiguous comma {run[i:j]!r} in {s!r}: glued to "
                         f"the script it reads as part of the subscript, "
                         f"write {ch}{{{run[i + 1]},...}} or space the "
                         "comma off"
                     )
+                    raise ValueError(msg)
                 out.append((kind, run[i + 1 : i + 2]))
                 i += 2
         elif ch.isalpha():
@@ -437,7 +442,8 @@ def _math_runs(s: str) -> list[tuple[str, bool, float, float]]:
     """
     segments = s.split("$")
     if len(segments) % 2 == 0:
-        raise ValueError(f"unbalanced $ markup in {s!r}")
+        msg = f"unbalanced $ markup in {s!r}"
+        raise ValueError(msg)
     chunks: list[tuple[str, bool, float, float]] = []
 
     def add(
@@ -455,10 +461,11 @@ def _math_runs(s: str) -> list[tuple[str, bool, float, float]]:
             add(segment)
             continue
         if "\\" in segment:
-            raise ValueError(
+            msg = (
                 f"backslash in math run {segment!r} of {s!r}: there are no "
                 "commands here, write the glyph itself (θ, √, ·, …)"
             )
+            raise ValueError(msg)
         for kind, payload in _math_tokens(segment, s):
             if kind in ("var", "up"):
                 add(payload, italic=kind == "var")
@@ -496,17 +503,19 @@ def _label_runs(
     """
     if "$" in s:
         if mono:
-            raise ValueError(
+            msg = (
                 f"mono cannot carry composed mathematics: {s!r} would "
                 "drop its $...$ styling; write the label without mono "
                 "or without markup"
             )
+            raise ValueError(msg)
         if italic:
-            raise ValueError(
+            msg = (
                 f"whole-string italic cannot carry composed mathematics: "
                 f"{s!r} styles its own italics run by run; drop the italic "
                 "or the markup"
             )
+            raise ValueError(msg)
         return [
             Run(text, (False, bold, run_italic), shift, scale)
             for text, run_italic, shift, scale in _math_runs(s)

@@ -471,9 +471,8 @@ def _canonical(quantity: str) -> str:
     key = _ALIASES.get(key, key)
     if key not in _SINGLE:
         valid = ", ".join(sorted(set(_SINGLE) | set(_ALIASES)))
-        raise ValueError(
-            f"Unknown single-number quantity {quantity!r}. Valid: {valid}."
-        )
+        msg = f"Unknown single-number quantity {quantity!r}. Valid: {valid}."
+        raise ValueError(msg)
     return key
 
 
@@ -498,17 +497,20 @@ def band_uncertainty(
         frequencies, columns = _BAND_TABLES[(measurand, upper_limit)]
     except KeyError:
         if upper_limit:
-            raise ValueError(
+            msg = (
                 f"No σR95 upper limit tabulated for measurand {measurand!r} "
                 "(only airborne, Annex D)."
-            ) from None
+            )
+            raise ValueError(msg) from None
         valid = ", ".join(sorted({m for m, _ in _BAND_TABLES}))
-        raise ValueError(f"Unknown measurand {measurand!r}. Valid: {valid}.") from None
+        msg = f"Unknown measurand {measurand!r}. Valid: {valid}."
+        raise ValueError(msg) from None
     if situation not in columns:
-        raise ValueError(
+        msg = (
             f"Situation {situation!r} is not tabulated for measurand {measurand!r} "
             f"(available: {', '.join(sorted(columns))})."
         )
+        raise ValueError(msg)
     return BandUncertainty(
         measurand=measurand,
         situation=situation,
@@ -547,17 +549,19 @@ def single_number_uncertainty(
     situations, sigma_r95 = _SINGLE[key]
     if upper_limit:
         if situation != "A":
-            raise ValueError("σR95 upper limit is defined for situation A only.")
+            msg = "σR95 upper limit is defined for situation A only."
+            raise ValueError(msg)
         if sigma_r95 is None:
-            raise ValueError(f"No σR95 upper limit tabulated for {quantity!r}.")
+            msg = f"No σR95 upper limit tabulated for {quantity!r}."
+            raise ValueError(msg)
         return sigma_r95
     if situation not in _SITUATION_INDEX:
-        raise ValueError(f"Unknown situation {situation!r}. Valid: A, B, C.")
+        msg = f"Unknown situation {situation!r}. Valid: A, B, C."
+        raise ValueError(msg)
     value = situations[_SITUATION_INDEX[situation]]
     if value is None:
-        raise ValueError(
-            f"Situation {situation!r} is not tabulated for descriptor {quantity!r}."
-        )
+        msg = f"Situation {situation!r} is not tabulated for descriptor {quantity!r}."
+        raise ValueError(msg)
     return value
 
 
@@ -595,10 +599,11 @@ def insulation_coverage_factor(
             return k
     kind = "one-sided" if one_sided else "two-sided"
     valid = ", ".join(f"{level:g}" for level in table)
-    raise ValueError(
+    msg = (
         f"Confidence level {confidence!r} is not tabulated for the {kind} test. "
         f"Valid: {valid}."
     )
+    raise ValueError(msg)
 
 
 def insulation_expanded_uncertainty(
@@ -617,7 +622,8 @@ def insulation_expanded_uncertainty(
     :raises ValueError: Negative ``u`` or an untabulated confidence level.
     """
     if u < 0:
-        raise ValueError("Standard uncertainty u must be non-negative.")
+        msg = "Standard uncertainty u must be non-negative."
+        raise ValueError(msg)
     k = max(insulation_coverage_factor(coverage, one_sided), 1.0)
     return k * u
 
@@ -672,9 +678,11 @@ def combine_uncertainties(*components: float) -> float:
     :raises ValueError: No components, or a negative component.
     """
     if not components:
-        raise ValueError("At least one uncertainty component is required.")
+        msg = "At least one uncertainty component is required."
+        raise ValueError(msg)
     if any(c < 0 for c in components):
-        raise ValueError("Uncertainty components must be non-negative.")
+        msg = "Uncertainty components must be non-negative."
+        raise ValueError(msg)
     return sqrt(sum(c * c for c in components))
 
 
@@ -701,9 +709,11 @@ def prediction_input_uncertainty(
     :raises ValueError: Non-positive ``n`` or a negative standard deviation.
     """
     if n < 1:
-        raise ValueError("n must be a positive integer.")
+        msg = "n must be a positive integer."
+        raise ValueError(msg)
     if sigma_reproducibility < 0 or sigma_product < 0:
-        raise ValueError("Standard deviations must be non-negative.")
+        msg = "Standard deviations must be non-negative."
+        raise ValueError(msg)
     return sqrt((sigma_reproducibility**2 + sigma_product**2) / n + sigma_product**2)
 
 
@@ -719,9 +729,11 @@ def reduce_by_independent_measurements(u: float, m: int) -> float:
     :raises ValueError: Non-positive ``m`` or negative ``u``.
     """
     if m < 1:
-        raise ValueError("m must be a positive integer.")
+        msg = "m must be a positive integer."
+        raise ValueError(msg)
     if u < 0:
-        raise ValueError("Standard uncertainty u must be non-negative.")
+        msg = "Standard uncertainty u must be non-negative."
+        raise ValueError(msg)
     return u / sqrt(m)
 
 
@@ -754,20 +766,23 @@ def single_number_uncertainty_uncorrelated(
     u_arr = np.asarray(band_uncertainties, dtype=float)
     d_arr = np.asarray(reference_differences, dtype=float)
     if u_arr.ndim != 1 or d_arr.ndim != 1:
-        raise ValueError("Inputs must be one-dimensional sequences.")
+        msg = "Inputs must be one-dimensional sequences."
+        raise ValueError(msg)
     if u_arr.size == 0:
-        raise ValueError("At least one band is required.")
+        msg = "At least one band is required."
+        raise ValueError(msg)
     if u_arr.shape != d_arr.shape:
-        raise ValueError(
-            "band_uncertainties and reference_differences differ in length."
-        )
+        msg = "band_uncertainties and reference_differences differ in length."
+        raise ValueError(msg)
     if np.any(u_arr < 0):
-        raise ValueError("Band uncertainties must be non-negative.")
+        msg = "Band uncertainties must be non-negative."
+        raise ValueError(msg)
     if not np.all(np.isfinite(u_arr)) or not np.all(np.isfinite(d_arr)):
-        raise ValueError(
+        msg = (
             "band_uncertainties and reference_differences must contain only "
             "finite values."
         )
+        raise ValueError(msg)
     energies = np.power(10.0, d_arr / 10.0)
     weights = energies / energies.sum()
     return float(sqrt(np.sum((weights * u_arr) ** 2)))

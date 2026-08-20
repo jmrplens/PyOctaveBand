@@ -147,10 +147,11 @@ def _effective_range(
     within = np.abs(rel_db) <= tolerance
     anchor = int(np.argmin(np.abs(np.log2(f / f_ref))))
     if not within[anchor]:
-        raise ValueError(
+        msg = (
             "the response deviates beyond 'tolerance_db' at the reference "
             "frequency, so no effective frequency range contains it."
         )
+        raise ValueError(msg)
     lo_idx = anchor
     while lo_idx > 0 and within[lo_idx - 1]:
         lo_idx -= 1
@@ -488,9 +489,8 @@ class MicrophoneCharacteristics:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         del verbose  # uniform signature; the fiche has a single layout
         from .._report.iec60268_4 import render_iec60268_4_report
 
@@ -546,16 +546,16 @@ def _resolve_noise_level(
 ) -> float | None:
     """Resolve the equivalent noise level, computing it from a voltage (17.2)."""
     if noise.voltage is not None and noise.equivalent_level_db is not None:
-        raise ValueError(
-            "give either 'noise.voltage' or 'noise.equivalent_level_db', not both."
-        )
+        msg = "give either 'noise.voltage' or 'noise.equivalent_level_db', not both."
+        raise ValueError(msg)
     if noise.voltage is not None:
         u_n = require_positive(noise.voltage, "noise.voltage")
         return float(20.0 * np.log10((u_n / sensitivity_v_per_pa) / _P_REF))
     if noise.equivalent_level_db is not None and not np.isfinite(
         noise.equivalent_level_db
     ):
-        raise ValueError("'noise.equivalent_level_db' must be finite.")
+        msg = "'noise.equivalent_level_db' must be finite."
+        raise ValueError(msg)
     return noise.equivalent_level_db
 
 
@@ -567,7 +567,8 @@ def _resolve_distortion(
         return None, None
     spl, thd = _as_curve(distortion[0], distortion[1], "distortion")
     if np.any(thd < 0.0):
-        raise ValueError("'distortion' THD values must be non-negative.")
+        msg = "'distortion' THD values must be non-negative."
+        raise ValueError(msg)
     return spl, thd
 
 
@@ -583,20 +584,25 @@ def _resolve_polar(
     """
     index_db = directivity.index_db
     if index_db is not None and not np.isfinite(index_db):
-        raise ValueError("'directivity.index_db' must be finite.")
+        msg = "'directivity.index_db' must be finite."
+        raise ValueError(msg)
     polar = directivity.polar
     if polar is None:
         return None, None, index_db
     p_ang = np.atleast_1d(np.asarray(polar[0], dtype=np.float64))
     p_db = np.atleast_1d(np.asarray(polar[1], dtype=np.float64))
     if p_ang.ndim != 1 or p_ang.shape != p_db.shape:
-        raise ValueError("'polar' angles and levels must be 1-D and equal length.")
+        msg = "'polar' angles and levels must be 1-D and equal length."
+        raise ValueError(msg)
     if p_ang.size < 2:
-        raise ValueError("'polar' needs at least two angle points.")
+        msg = "'polar' needs at least two angle points."
+        raise ValueError(msg)
     if not (np.all(np.isfinite(p_ang)) and np.all(np.isfinite(p_db))):
-        raise ValueError("'polar' angles and levels must be finite.")
+        msg = "'polar' angles and levels must be finite."
+        raise ValueError(msg)
     if np.any(p_ang < 0.0) or np.any(p_ang > 360.0):
-        raise ValueError("'polar' angles must lie within 0..360 degrees.")
+        msg = "'polar' angles must lie within 0..360 degrees."
+        raise ValueError(msg)
     order = np.argsort(p_ang)
     p_ang, p_db = p_ang[order], p_db[order]
     di = index_db
@@ -656,9 +662,8 @@ def microphone_characteristics(
     f_ref = require_positive(reference_frequency, "reference_frequency")
     tol = require_positive(tolerance_db, "tolerance_db")
     if not float(f[0]) <= f_ref <= float(f[-1]):
-        raise ValueError(
-            "'reference_frequency' must lie within the measured frequency band."
-        )
+        msg = "'reference_frequency' must lie within the measured frequency band."
+        raise ValueError(msg)
     rel = _normalized_response(f, resp, f_ref)
     effective = _effective_range(f, rel, tol, f_ref)
     level = _sensitivity_level_db(m_mv / 1000.0)
@@ -668,7 +673,8 @@ def microphone_characteristics(
     max_spl: float | None = None
     if overload.spl_db is not None:
         if not np.isfinite(overload.spl_db):
-            raise ValueError("'overload.spl_db' must be finite.")
+            msg = "'overload.spl_db' must be finite."
+            raise ValueError(msg)
         max_spl = float(overload.spl_db)
     elif d_spl is not None and d_thd is not None:
         max_spl = _overload_spl(d_spl, d_thd, thd_limit)

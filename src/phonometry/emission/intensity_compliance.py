@@ -155,13 +155,15 @@ def _match_band(frequency: float) -> float:
         :data:`_BAND_MATCH_TOLERANCE` of ``frequency``.
     """
     if not np.isfinite(frequency) or frequency <= 0.0:
-        raise ValueError("Band centre frequencies must be finite and positive.")
+        msg = "Band centre frequencies must be finite and positive."
+        raise ValueError(msg)
     nearest = min(_THIRD_OCTAVE_BANDS, key=lambda f: abs(np.log(f / frequency)))
     if abs(nearest / frequency - 1.0) > _BAND_MATCH_TOLERANCE:
-        raise ValueError(
+        msg = (
             f"{frequency:g} Hz is not an IEC 61043 Table 2 band; the table "
             "covers the one-third-octave bands from 50 Hz to 6.3 kHz."
         )
+        raise ValueError(msg)
     return nearest
 
 
@@ -170,7 +172,8 @@ def _spacing_offset(spacing: float) -> float:
     mm.
     """
     if not np.isfinite(spacing) or spacing <= 0.0:
-        raise ValueError("'spacing' must be a positive, finite distance in metres.")
+        msg = "'spacing' must be a positive, finite distance in metres."
+        raise ValueError(msg)
     return float(10.0 * np.log10(spacing / REFERENCE_SPACING))
 
 
@@ -178,10 +181,11 @@ def _check_device(device: str) -> tuple[int, int]:
     """Validate a device kind and return its Table 2 column indices."""
     columns = _DEVICE_COLUMNS.get(device)
     if columns is None:
-        raise ValueError(
+        msg = (
             "'device' must be 'probe', 'processor' or 'instrument' "
             f"(IEC 61043 Table 2 columns), got {device!r}."
         )
+        raise ValueError(msg)
     return columns
 
 
@@ -244,10 +248,11 @@ def instrument_class_from_components(probe_class: int, processor_class: int) -> 
         class 2X of clause 4 is not modelled here.
     """
     if probe_class not in (1, 2) or processor_class not in (1, 2):
-        raise ValueError(
+        msg = (
             "'probe_class' and 'processor_class' must be 1 or 2; the "
             "non-real-time class 2X of IEC 61043 clause 4 is not modelled."
         )
+        raise ValueError(msg)
     return max(int(probe_class), int(processor_class))
 
 
@@ -330,23 +335,28 @@ def verify_intensity_class(
     measured = np.atleast_1d(np.asarray(residual_index, dtype=np.float64))
     supplied = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if measured.ndim != 1 or supplied.ndim != 1:
-        raise ValueError("verify_intensity_class expects 1D per-band arrays.")
+        msg = "verify_intensity_class expects 1D per-band arrays."
+        raise ValueError(msg)
     if measured.size != supplied.size:
-        raise ValueError(
+        msg = (
             f"'residual_index' and 'frequencies' must have the same length, "
             f"got {measured.size} and {supplied.size}."
         )
+        raise ValueError(msg)
     if measured.size == 0:
-        raise ValueError("At least one measurement band is required.")
+        msg = "At least one measurement band is required."
+        raise ValueError(msg)
     if not np.all(np.isfinite(measured)):
-        raise ValueError("'residual_index' must be finite.")
+        msg = "'residual_index' must be finite."
+        raise ValueError(msg)
 
     freqs = np.asarray([_match_band(float(f)) for f in supplied], dtype=np.float64)
     if np.unique(freqs).size != freqs.size:
-        raise ValueError(
+        msg = (
             "'frequencies' repeats an IEC 61043 Table 2 band; supply one "
             "measured value per band."
         )
+        raise ValueError(msg)
 
     _, class1, class2 = residual_index_limits(
         device, spacing=spacing, frequencies=freqs
@@ -431,7 +441,8 @@ class IntensityInstrumentComplianceResult:
         """
         cls = self.reference_class() if device_class is None else int(device_class)
         if cls not in (1, 2):
-            raise ValueError("'device_class' must be 1 or 2.")
+            msg = "'device_class' must be 1 or 2."
+            raise ValueError(msg)
         return min(float(band[f"margin_class{cls}_db"]) for band in self.bands)
 
     def failing_bands(self, device_class: int | None = None) -> list[float]:
@@ -442,7 +453,8 @@ class IntensityInstrumentComplianceResult:
         """
         cls = self.reference_class() if device_class is None else int(device_class)
         if cls not in (1, 2):
-            raise ValueError("'device_class' must be 1 or 2.")
+            msg = "'device_class' must be 1 or 2."
+            raise ValueError(msg)
         key = f"margin_class{cls}_db"
         return [float(b["freq"]) for b in self.bands if float(b[key]) < 0.0]
 
@@ -512,9 +524,8 @@ class IntensityInstrumentComplianceResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.iec61043 import render_iec61043_report
 
         return render_iec61043_report(
@@ -577,12 +588,15 @@ def _plane_wave_phase_deg(
     degrees.
     """
     if not np.isfinite(spacing) or spacing <= 0.0:
-        raise ValueError("'spacing' must be a positive, finite distance in metres.")
+        msg = "'spacing' must be a positive, finite distance in metres."
+        raise ValueError(msg)
     if not np.isfinite(c) or c <= 0.0:
-        raise ValueError("'c' must be a positive, finite speed of sound.")
+        msg = "'c' must be a positive, finite speed of sound."
+        raise ValueError(msg)
     freq = np.asarray(frequency, dtype=np.float64)
     if np.any(~np.isfinite(freq)) or np.any(freq <= 0.0):
-        raise ValueError("'frequency' must be finite and positive.")
+        msg = "'frequency' must be finite and positive."
+        raise ValueError(msg)
     return np.asarray(360.0 * freq * spacing / c, dtype=np.float64)
 
 
@@ -620,7 +634,8 @@ def phase_mismatch_from_residual_index(
     """
     index = np.asarray(residual_index, dtype=np.float64)
     if np.any(~np.isfinite(index)):
-        raise ValueError("'residual_index' must be finite.")
+        msg = "'residual_index' must be finite."
+        raise ValueError(msg)
     kd_deg = _plane_wave_phase_deg(np.asarray(frequency, dtype=np.float64), spacing, c)
     return np.asarray(kd_deg * 10.0 ** (-index / 10.0), dtype=np.float64)
 
@@ -662,6 +677,7 @@ def residual_index_from_phase_mismatch(
     """
     phi = np.asarray(phase_mismatch, dtype=np.float64)
     if np.any(~np.isfinite(phi)) or np.any(phi <= 0.0):
-        raise ValueError("'phase_mismatch' must be finite and positive, in degrees.")
+        msg = "'phase_mismatch' must be finite and positive, in degrees."
+        raise ValueError(msg)
     kd_deg = _plane_wave_phase_deg(np.asarray(frequency, dtype=np.float64), spacing, c)
     return np.asarray(10.0 * np.log10(kd_deg / phi), dtype=np.float64)

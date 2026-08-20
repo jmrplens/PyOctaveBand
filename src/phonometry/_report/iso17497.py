@@ -292,10 +292,11 @@ def render_scattering_report(
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     s = np.asarray(result.scattering, dtype=np.float64)
     if freqs.shape != s.shape:
-        raise ValueError(
+        msg = (
             "render_scattering_report() needs 'frequencies' and 'scattering' "
             "of equal length."
         )
+        raise ValueError(msg)
 
     styles, title_style, basis_style, caption_style = document_styles(accent)
     title = t("Surface scattering measurement", language)
@@ -436,10 +437,11 @@ def render_diffusion_spectrum_report(
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     d = np.asarray(result.diffusion, dtype=np.float64)
     if freqs.shape != d.shape:
-        raise ValueError(
+        msg = (
             "render_diffusion_spectrum_report() needs 'frequencies' and "
             "'diffusion' of equal length."
         )
+        raise ValueError(msg)
 
     styles, title_style, basis_style, caption_style = document_styles(accent)
     title = t("Surface diffusion measurement", language)
@@ -550,10 +552,11 @@ def render_diffusion_polar_report(
     angles = np.asarray(result.angles, dtype=np.float64)
     levels = np.asarray(result.levels, dtype=np.float64)
     if angles.shape != levels.shape:
-        raise ValueError(
+        msg = (
             "render_diffusion_polar_report() needs 'angles' and 'levels' of "
             "equal length."
         )
+        raise ValueError(msg)
 
     styles, title_style, basis_style, caption_style = document_styles(accent)
     title = t("Surface diffusion measurement", language)

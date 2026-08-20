@@ -92,13 +92,15 @@ def _require_fraction_below_one(value: ArrayLike, name: str) -> NDArray[np.float
     """Validate a mean absorption in ``(0, 1)`` (scalar or per-band)."""
     arr = np.asarray(value, dtype=np.float64)
     if not np.all(np.isfinite(arr)):
-        raise ValueError(f"'{name}' must be finite.")
+        msg = f"'{name}' must be finite."
+        raise ValueError(msg)
     if np.any(arr <= 0.0) or np.any(arr >= 1.0):
-        raise ValueError(
+        msg = (
             f"'{name}' must lie strictly in (0, 1): the room constant "
             "R = S*alpha/(1 - alpha) diverges as the mean absorption tends "
             "to 1 (a perfectly absorbing room has no reverberant field)."
         )
+        raise ValueError(msg)
     return arr
 
 
@@ -141,7 +143,8 @@ def critical_distance(
     directivity = require_positive(directivity, "directivity")
     r = np.asarray(room_constant, dtype=np.float64)
     if np.any(r <= 0.0) or not np.all(np.isfinite(r)):
-        raise ValueError("'room_constant' must be positive and finite.")
+        msg = "'room_constant' must be positive and finite."
+        raise ValueError(msg)
     return as_float_or_array(np.sqrt(directivity * r / (16.0 * np.pi)))
 
 
@@ -163,7 +166,8 @@ def schroeder_frequency(
     volume = require_positive(volume, "volume")
     t = np.asarray(reverberation_time, dtype=np.float64)
     if np.any(t <= 0.0) or not np.all(np.isfinite(t)):
-        raise ValueError("'reverberation_time' must be positive and finite.")
+        msg = "'reverberation_time' must be positive and finite."
+        raise ValueError(msg)
     return as_float_or_array(2000.0 * np.sqrt(t / volume))
 
 
@@ -237,12 +241,14 @@ def steady_state_spl(
     directivity = require_positive(directivity, "directivity")
     model = require_choice(source_model, "source_model", tuple(SOURCE_POWER_MODELS))
     if np.any(r_const <= 0.0) or not np.all(np.isfinite(r_const)):
-        raise ValueError("'room_constant' must be positive and finite.")
+        msg = "'room_constant' must be positive and finite."
+        raise ValueError(msg)
     bracket = 4.0 / r_const
     if distance is not None:
         r = np.asarray(distance, dtype=np.float64)
         if np.any(r <= 0.0) or not np.all(np.isfinite(r)):
-            raise ValueError("'distance' must be positive and finite.")
+            msg = "'distance' must be positive and finite."
+            raise ValueError(msg)
         bracket = directivity / (4.0 * np.pi * r**2) + bracket
     lp = (
         lw
@@ -334,9 +340,11 @@ def steady_state_field(
     else:
         r = np.asarray(distances, dtype=np.float64)
         if r.ndim != 1 or r.size == 0:
-            raise ValueError("'distances' must be a non-empty 1D array.")
+            msg = "'distances' must be a non-empty 1D array."
+            raise ValueError(msg)
         if np.any(r <= 0.0) or not np.all(np.isfinite(r)):
-            raise ValueError("'distances' must be positive and finite.")
+            msg = "'distances' must be positive and finite."
+            raise ValueError(msg)
 
     offset = (
         10.0

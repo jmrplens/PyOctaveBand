@@ -93,10 +93,11 @@ def _part_designation(part: int) -> str:
     try:
         return _PART_DESIGNATIONS[int(part)]
     except (KeyError, ValueError) as exc:
-        raise ValueError(
+        msg = (
             "'part' must be 2, 3 or 4 (the ISO 10848 part governing the "
             f"tested construction); got {part!r}."
-        ) from exc
+        )
+        raise ValueError(msg) from exc
 
 
 def _dnf_spec(standard: str, language: str) -> dict[str, str]:
@@ -158,10 +159,11 @@ def _require_rating(
     renderer.
     """
     if rating is None:
-        raise ValueError(
+        msg = (
             "The flanking-descriptor report needs its ISO 717 single-number "
             "rating (16 one-third-octave or 5 octave bands)."
         )
+        raise ValueError(msg)
     return rating
 
 
@@ -411,10 +413,11 @@ def render_vibration_reduction_report(
         installed.
     """
     if result.frequencies is None:
-        raise ValueError(
+        msg = (
             "The Kij report needs the band centre frequencies; build the result "
             "with vibration_reduction_index(..., frequency=...)."
         )
+        raise ValueError(msg)
     try:
         from reportlab.lib import colors
         from reportlab.lib.styles import ParagraphStyle

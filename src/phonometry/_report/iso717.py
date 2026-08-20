@@ -89,11 +89,12 @@ def _symbol_markup(symbol: str) -> str:
     """
     match = _SYMBOL_RE.match(symbol)
     if match is None:
-        raise ValueError(
+        msg = (
             f"Invalid ISO 717 quantity symbol {symbol!r}; expected a leading "
             "capital letter (optionally primed) followed by its subscript, "
             "e.g. 'Rw', 'R'w', 'DnT,w', 'L'nT,w'."
         )
+        raise ValueError(msg)
     stem, subscript = match.groups()
     return f"{stem}<sub>{subscript}</sub>"
 
@@ -394,18 +395,20 @@ def _validated_curves(
     measured = result.measured
     shifted = result.shifted_reference
     if centers is None or measured is None or shifted is None:
-        raise ValueError(
+        msg = (
             "render_iso717_report() needs 'band_centers', 'measured' and "
             "'shifted_reference' on the result."
         )
+        raise ValueError(msg)
     centers = np.asarray(centers, dtype=np.float64)
     measured = np.asarray(measured, dtype=np.float64)
     shifted = np.asarray(shifted, dtype=np.float64)
     if not centers.shape == measured.shape == shifted.shape:
-        raise ValueError(
+        msg = (
             "render_iso717_report() needs 'band_centers', 'measured' and "
             "'shifted_reference' of equal length."
         )
+        raise ValueError(msg)
 
     # Unfavourable deviation: reference above measurement (airborne) or
     # measurement above the reference (impact, the opposite sign).

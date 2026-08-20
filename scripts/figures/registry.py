@@ -1164,9 +1164,8 @@ def generate_posters(output_dir: str) -> None:
 
     webms = sorted(glob.glob(os.path.join(output_dir, "anim_*.webm")))
     if not webms:
-        raise RuntimeError(
-            f"no anim_*.webm files found in {output_dir}; run `make animations` first"
-        )
+        msg = f"no anim_*.webm files found in {output_dir}; run `make animations` first"
+        raise RuntimeError(msg)
     for webm in webms:
         poster = _extract_poster(webm, _poster_ss_for(webm))
         print(f"  {os.path.basename(webm)} -> {os.path.basename(poster)}")
@@ -1252,7 +1251,8 @@ _ANIM_FIELDS: dict[str, Callable[[], Any]] = {
 # A clip rename must not silently drop its field builder; fail fast.
 if not _ANIM_FIELDS.keys() <= _ANIMATIONS.keys():
     _unknown_field = sorted(_ANIM_FIELDS.keys() - _ANIMATIONS.keys())
-    raise RuntimeError(f"animation names not in _ANIMATIONS: {_unknown_field}")
+    msg = f"animation names not in _ANIMATIONS: {_unknown_field}"
+    raise RuntimeError(msg)
 
 
 def _render_anim_variant(clip: str, output_dir: str, lang: str, dark: bool) -> None:
@@ -1295,9 +1295,8 @@ def _render_anim_variants(clip: str, output_dir: str) -> None:
         proc.join()
     failed = [p.exitcode for p in procs if p.exitcode]
     if failed:
-        raise RuntimeError(
-            f"{clip}: {len(failed)} variant(s) failed (exit codes {failed})"
-        )
+        msg = f"{clip}: {len(failed)} variant(s) failed (exit codes {failed})"
+        raise RuntimeError(msg)
 
 
 def _stamp_clips(clips: list[str], output_dir: str) -> None:
@@ -1353,15 +1352,17 @@ def generate_animations(
     import shutil
 
     if shutil.which("ffmpeg") is None:
-        raise RuntimeError(
+        msg = (
             "ffmpeg was not found on PATH; it is required to encode the "
             "animation WebM/GIF outputs. Install ffmpeg and retry."
         )
+        raise RuntimeError(msg)
     if names:
         unknown = sorted(set(names) - _ANIMATIONS.keys())
         if unknown:
             available = ", ".join(sorted(_ANIMATIONS))
-            raise SystemExit(f"unknown animation(s) {unknown}; available: {available}")
+            msg = f"unknown animation(s) {unknown}; available: {available}"
+            raise SystemExit(msg)
         clips = list(names)
     else:
         clips = list(_ANIMATIONS)
@@ -1443,7 +1444,8 @@ _FIGURE_WEIGHTS: dict[str, float] = {
 _REGISTRY_NAMES = frozenset(f.__name__.removeprefix("generate_") for f in _FIGURE_FUNCS)
 if not (_GROUPED_FIGURES | _FIGURE_WEIGHTS.keys()) <= _REGISTRY_NAMES:
     _unknown = sorted((_GROUPED_FIGURES | _FIGURE_WEIGHTS.keys()) - _REGISTRY_NAMES)
-    raise RuntimeError(f"figure names not in _FIGURE_FUNCS: {_unknown}")
+    msg = f"figure names not in _FIGURE_FUNCS: {_unknown}"
+    raise RuntimeError(msg)
 
 
 def _run_figure_task(
@@ -1600,7 +1602,8 @@ _ANIM_WEIGHTS: dict[str, float] = {
 # A clip rename must not silently drop its scheduling weight; fail fast.
 if not _ANIM_WEIGHTS.keys() <= _ANIMATIONS.keys():
     _unknown_anim = sorted(_ANIM_WEIGHTS.keys() - _ANIMATIONS.keys())
-    raise RuntimeError(f"animation names not in _ANIMATIONS: {_unknown_anim}")
+    msg = f"animation names not in _ANIMATIONS: {_unknown_anim}"
+    raise RuntimeError(msg)
 
 
 def _run_anim_task(clip: str, img_dir: str) -> str:
@@ -1686,7 +1689,8 @@ def _select_figures(names: list[str] | None) -> list[Callable[[str], None]]:
         name = raw.removeprefix("generate_")
         if name not in by_name:
             available = ", ".join(sorted(by_name))
-            raise SystemExit(f"unknown figure {raw!r}; available: {available}")
+            msg = f"unknown figure {raw!r}; available: {available}"
+            raise SystemExit(msg)
         selected.append(by_name[name])
     return selected
 
@@ -1786,10 +1790,11 @@ def main(argv: list[str] | None = None) -> None:
             import shutil
 
             if shutil.which("ffmpeg") is None:
-                raise RuntimeError(
+                msg = (
                     "ffmpeg was not found on PATH; it is required to encode "
                     "the animation WebM/GIF outputs. Install ffmpeg and retry."
                 )
+                raise RuntimeError(msg)
             clips = list(_ANIMATIONS)
             print(
                 f"--- Generating animations ({len(clips)} clips "

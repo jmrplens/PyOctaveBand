@@ -304,7 +304,8 @@ def _finite(value: float, name: str) -> float:
     """Return ``value`` as a float, rejecting non-finite input."""
     scalar = float(value)
     if not math.isfinite(scalar):
-        raise ValueError(f"'{name}' must be finite.")
+        msg = f"'{name}' must be finite."
+        raise ValueError(msg)
     return scalar
 
 
@@ -312,7 +313,8 @@ def _positive(value: float, name: str) -> float:
     """Return ``value`` as a float, rejecting non-positive or non-finite input."""
     scalar = float(value)
     if not math.isfinite(scalar) or scalar <= 0.0:
-        raise ValueError(f"'{name}' must be a positive, finite number.")
+        msg = f"'{name}' must be a positive, finite number."
+        raise ValueError(msg)
     return scalar
 
 
@@ -325,7 +327,8 @@ def _round_half_up(value: float, decimals: int = 0) -> float:
 def _normalise(value: str, aliases: Mapping[str, str], name: str) -> str:
     """Lower-case ``value``, normalise separators and resolve aliases."""
     if not isinstance(value, str):
-        raise ValueError(f"'{name}' must be a string; got {value!r}.")  # noqa: TRY004 - ValueError keeps the module validation errors uniform
+        msg = f"'{name}' must be a string; got {value!r}."
+        raise ValueError(msg)  # noqa: TRY004 - ValueError keeps the module validation errors uniform
     key = value.strip().lower().replace(" ", "_").replace("-", "_")
     return aliases.get(key, key)
 
@@ -382,11 +385,12 @@ def _match_bands(frequencies: np.ndarray) -> np.ndarray:
     for target in DB_HR_FREQUENCIES:
         hits = np.nonzero(np.abs(frequencies - target) <= _BAND_TOLERANCE * target)[0]
         if hits.size != 1:
-            raise ValueError(
+            msg = (
                 "The input must contain exactly one band at each of the "
                 "eighteen DB-HR one-third-octave centre frequencies "
                 f"100 Hz to 5 kHz; {target:g} Hz matched {hits.size} bands."
             )
+            raise ValueError(msg)
         indices.append(int(hits[0]))
     return np.asarray(indices, dtype=np.intp)
 
@@ -420,23 +424,27 @@ def db_hr_global_index(
     """
     key = str(spectrum).strip().lower()
     if key not in DB_HR_NORMALISED_SPECTRA:
-        raise ValueError(
+        msg = (
             "'spectrum' must be one of "
             f"{sorted(DB_HR_NORMALISED_SPECTRA)}; got {spectrum!r}."
         )
+        raise ValueError(msg)
     values = np.asarray(band_values, dtype=np.float64)
     if values.ndim != 1:
-        raise ValueError("'band_values' must be one-dimensional.")
+        msg = "'band_values' must be one-dimensional."
+        raise ValueError(msg)
     if not np.all(np.isfinite(values)):
-        raise ValueError("'band_values' must contain finite values.")
+        msg = "'band_values' must contain finite values."
+        raise ValueError(msg)
 
     if frequencies is None:
         if values.size != len(DB_HR_FREQUENCIES):
-            raise ValueError(
+            msg = (
                 "Without 'frequencies' the input must be the eighteen DB-HR "
                 "one-third-octave bands 100 Hz to 5 kHz; got "
                 f"{values.size} values."
             )
+            raise ValueError(msg)
         freqs = np.asarray(DB_HR_FREQUENCIES, dtype=np.float64)
         # Copy so a later mutation of the caller's array cannot rewrite the
         # values this result reports.
@@ -444,11 +452,11 @@ def db_hr_global_index(
     else:
         given = np.asarray(frequencies, dtype=np.float64)
         if given.shape != values.shape:
-            raise ValueError(
-                "'frequencies' must have one value per band of 'band_values'."
-            )
+            msg = "'frequencies' must have one value per band of 'band_values'."
+            raise ValueError(msg)
         if not np.all(np.isfinite(given)) or np.any(given <= 0.0):
-            raise ValueError("'frequencies' must contain positive values.")
+            msg = "'frequencies' must contain positive values."
+            raise ValueError(msg)
         index = _match_bands(given)
         freqs = given[index]
         selected = values[index]
@@ -545,12 +553,13 @@ def d2m_nt_a(
     """
     key = str(spectrum).strip().lower()
     if key not in ("pink", "railway"):
-        raise ValueError(
+        msg = (
             "Formula (A.5) evaluates 'D2m,nT,A' for pink noise or, on a "
             "railway-dominant site, the Table A.4 railway spectrum; "
             f"got {spectrum!r}. Road-traffic and aircraft noise are assessed "
             "as 'D2m,nT,Atr' through Formula (A.6): use d2m_nt_atr()."
         )
+        raise ValueError(msg)
     return db_hr_global_index(
         level_difference, key, frequencies=frequencies, name="D2m,nT,A"
     )
@@ -586,12 +595,13 @@ def d2m_nt_atr(
     """
     key = str(spectrum).strip().lower()
     if key not in ("traffic", "aircraft"):
-        raise ValueError(
+        msg = (
             "Formula (A.6) evaluates 'D2m,nT,Atr' for road-traffic noise or, "
             "on an aircraft-dominant site, the Table A.2 aircraft spectrum; "
             f"got {spectrum!r}. Railway noise is assessed as 'D2m,nT,A' "
             "through Formula (A.5): use d2m_nt_a()."
         )
+        raise ValueError(msg)
     return db_hr_global_index(
         level_difference, key, frequencies=frequencies, name=_D2M_NT_ATR
     )
@@ -653,11 +663,12 @@ class DbHrRequirement:
         confident, inverted verdict.
         """
         if self.direction not in ("min", "max"):
-            raise ValueError(
+            msg = (
                 "'direction' must be 'min' (the quantity must reach the "
                 "limit) or 'max' (it must not exceed it); got "
                 f"{self.direction!r}."
             )
+            raise ValueError(msg)
 
 
 @dataclass(frozen=True)
@@ -745,17 +756,19 @@ def db_hr_facade_requirement(
     use = _normalise(building_use, _USE_ALIASES, "building_use")
     room = _normalise(room_type, _ROOM_ALIASES, "room_type")
     if (use, room) not in _FACADE_ROWS:
-        raise ValueError(
+        msg = (
             "Unknown (building_use, room_type) combination "
             f"{(building_use, room_type)!r}; Table 2.1 holds "
             f"{sorted(_FACADE_ROWS)}."
         )
+        raise ValueError(msg)
     noise = str(dominant_noise).strip().lower()
     if noise not in ("road", "railway", "aircraft"):
-        raise ValueError(
+        msg = (
             "'dominant_noise' must be 'road', 'railway' or 'aircraft'; got "
             f"{dominant_noise!r}."
         )
+        raise ValueError(msg)
     if quiet_facade:
         value -= _QUIET_FACADE_REDUCTION
 
@@ -890,11 +903,12 @@ def db_hr_airborne_requirement(
     source = str(source_room).strip().lower()
     key = (receiving, source)
     if key not in _AIRBORNE_ROWS:
-        raise ValueError(
+        msg = (
             "Unknown (receiving_room, source_room) combination "
             f"{(receiving_room, source_room)!r}; DB-HR 2.1.1 covers "
             f"{sorted(_AIRBORNE_ROWS)}."
         )
+        raise ValueError(msg)
     if not shared_opening:
         quantity, limit, reference, description = _AIRBORNE_ROWS[key]
         requirements = [
@@ -910,10 +924,11 @@ def db_hr_airborne_requirement(
         ]
         return tuple(requirements)
     if key not in _SHARED_OPENING_ROWS:
-        raise ValueError(
+        msg = (
             "DB-HR 2.1.1 states no shared-opening variant for "
             f"{(receiving_room, source_room)!r}."
         )
+        raise ValueError(msg)
     opening_limit, enclosure_limit, reference = _SHARED_OPENING_ROWS[key]
     opening_note = (
         "shared door or window"
@@ -970,10 +985,11 @@ def db_hr_party_wall_requirement(quantity: str = "D2m,nT,Atr") -> DbHrRequiremen
     """
     key = str(quantity).strip()
     if key not in _PARTY_WALL_ROUTES:
-        raise ValueError(
+        msg = (
             "'quantity' must be 'D2m,nT,Atr' (per leaf, 40 dBA) or 'DnT,A' "
             f"(both leaves together, 50 dBA); got {quantity!r}."
         )
+        raise ValueError(msg)
     limit, description = _PARTY_WALL_ROUTES[key]
     return DbHrRequirement(
         quantity=key,
@@ -1013,11 +1029,12 @@ def db_hr_impact_requirement(receiving_room: str, source_room: str) -> DbHrRequi
     """
     key = (str(receiving_room).strip().lower(), str(source_room).strip().lower())
     if key not in _IMPACT_ROWS:
-        raise ValueError(
+        msg = (
             "DB-HR 2.1.2 states no impact requirement for "
             f"{(receiving_room, source_room)!r}; it covers "
             f"{sorted(_IMPACT_ROWS)}."
         )
+        raise ValueError(msg)
     limit, reference = _IMPACT_ROWS[key]
     return DbHrRequirement(
         quantity="L'nT,w",
@@ -1096,10 +1113,11 @@ def db_hr_reverberation_requirement(
     if key == "classroom" and furnished:
         key = "classroom_seated"
     if key not in _REVERBERATION_ROWS:
-        raise ValueError(
+        msg = (
             "'room_use' must be 'classroom', 'restaurant' or 'common_area' "
             f"(or a documented alias); got {room_use!r}."
         )
+        raise ValueError(msg)
     limit, reference, description = _REVERBERATION_ROWS[key]
     return DbHrRequirement(
         quantity="T",
@@ -1150,7 +1168,8 @@ def assess_db_hr(
     """
     pairs = list(items)
     if not pairs:
-        raise ValueError("At least one (value, requirement) pair is required.")
+        msg = "At least one (value, requirement) pair is required."
+        raise ValueError(msg)
     return DbHrAssessment(
         checks=tuple(check_db_hr_requirement(value, req) for value, req in pairs)
     )

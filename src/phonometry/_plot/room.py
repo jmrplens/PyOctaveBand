@@ -321,7 +321,8 @@ def plot_impulse_response(
     h = np.asarray(result.ir, dtype=np.float64)
     n = h.shape[-1]
     if n == 0:
-        raise ValueError("impulse response is empty; nothing to plot.")
+        msg = "impulse response is empty; nothing to plot."
+        raise ValueError(msg)
     time, xlabel = _time_axis(n, result.fs, language=language)
     peak = float(np.max(np.abs(h)))
     tiny = np.finfo(np.float64).tiny
@@ -600,11 +601,12 @@ def plot_open_plan(
         (``d2s`` / ``lp_as_4m`` are NaN).
     """
     if not (np.isfinite(result.d2s) and np.isfinite(result.lp_as_4m)):
-        raise ValueError(
+        msg = (
             "plot() needs the spatial-decay regression; this result's d2s / "
             "lp_as_4m are NaN (fewer than two positions in the 2 m to 16 m "
             "range)."
         )
+        raise ValueError(msg)
     ax = ax if ax is not None else _new_axes()
     import matplotlib.ticker as mticker
 
@@ -696,7 +698,8 @@ def plot_excitation(
     x = np.asarray(signal, dtype=np.float64)
     n = x.shape[-1]
     if n == 0:
-        raise ValueError("excitation signal is empty; nothing to plot.")
+        msg = "excitation signal is empty; nothing to plot."
+        raise ValueError(msg)
     t = np.arange(n) / float(fs)
     color = kwargs.pop("color", _C_PRIMARY)
 

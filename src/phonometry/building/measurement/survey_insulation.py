@@ -99,9 +99,8 @@ def _validate_report_request(engine: str, language: str) -> None:
 
     check_language(language)
     if engine != "reportlab":
-        raise ValueError(
-            f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-        )
+        msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+        raise ValueError(msg)
 
 
 #: Refusal raised by every survey-result ``plot()`` when the measured band set
@@ -210,7 +209,8 @@ def _finite_bands(
     """Return ``values`` as a finite float array, or raise."""
     a = np.asarray(values, dtype=np.float64)
     if not np.all(np.isfinite(a)):
-        raise ValueError(f"'{name}' must contain only finite values.")
+        msg = f"'{name}' must contain only finite values."
+        raise ValueError(msg)
     return a
 
 
@@ -218,7 +218,8 @@ def _positive(value: float, name: str) -> float:
     """Return ``value`` as a positive, finite float, or raise."""
     v = float(value)
     if not np.isfinite(v) or v <= 0.0:
-        raise ValueError(f"'{name}' must be positive.")
+        msg = f"'{name}' must be positive."
+        raise ValueError(msg)
     return v
 
 
@@ -249,7 +250,8 @@ def reverberation_index(
     """
     tt = _finite_bands(t, "t")
     if np.any(tt <= 0.0):
-        raise ValueError("'t' must contain positive values.")
+        msg = "'t' must contain positive values."
+        raise ValueError(msg)
     return 10.0 * np.log10(tt / _positive(t0, "t0"))
 
 
@@ -294,10 +296,11 @@ def estimate_reverberation_index(
     """
     v = _positive(volume, "volume")
     if v > _TABLE3_VOLUME_LIMITS[-1]:
-        raise ValueError(
+        msg = (
             f"'volume' must be at most {_TABLE3_VOLUME_LIMITS[-1]:g} m³ "
             "(the Table 4 range)."
         )
+        raise ValueError(msg)
     # V < 15, 15 <= V < 35, 35 <= V < 60, 60 <= V <= 150 (last is inclusive).
     idx = next(
         (i for i, hi in enumerate(_TABLE3_VOLUME_LIMITS) if v < hi),
@@ -316,10 +319,11 @@ def estimate_reverberation_index(
             rng = f"{limits[idx - 1]:g} <= V <= {limits[idx]:g}"
         else:
             rng = f"{limits[idx - 1]:g} <= V < {limits[idx]:g}"
-        raise ValueError(
+        msg = (
             f"'room' {room!r} is not tabulated for the volume range "
             f"{rng} (m³); available: {available}."
         )
+        raise ValueError(msg)
     row = entries[key]
     return float(row[5]) if weighted else np.asarray(row[:5], dtype=np.float64)
 
@@ -404,16 +408,16 @@ class SurveyAirborneResult:
         """
         _validate_report_request(engine, language)
         if quantity not in ("dnt", "r_prime"):
-            raise ValueError(
-                f"Unknown survey quantity {quantity!r}; expected 'dnt' or 'r_prime'."
-            )
+            msg = f"Unknown survey quantity {quantity!r}; expected 'dnt' or 'r_prime'."
+            raise ValueError(msg)
         rating = self.rating if quantity == "dnt" else self.r_prime_rating
         if rating is None:
-            raise ValueError(
+            msg = (
                 "The survey airborne report needs the ISO 717-1 single-number "
                 "rating; supply 5 octave or 16 one-third-octave bands "
                 "(and, for R', the 'area' and 'volume' arguments)."
             )
+            raise ValueError(msg)
         from ..._report.iso10052 import render_survey_airborne_report
 
         return render_survey_airborne_report(
@@ -489,10 +493,11 @@ class SurveyImpactResult:
         """
         _validate_report_request(engine, language)
         if self.rating is None:
-            raise ValueError(
+            msg = (
                 "The survey impact report needs the ISO 717-2 single-number "
                 "rating; supply 5 octave or 16 one-third-octave bands."
             )
+            raise ValueError(msg)
         from ..._report.iso10052 import render_survey_impact_report
 
         return render_survey_impact_report(
@@ -568,10 +573,11 @@ class SurveyFacadeResult:
         """
         _validate_report_request(engine, language)
         if self.rating is None:
-            raise ValueError(
+            msg = (
                 "The survey facade report needs the ISO 717-1 single-number "
                 "rating; supply 5 octave or 16 one-third-octave bands."
             )
+            raise ValueError(msg)
         from ..._report.iso10052 import render_survey_facade_report
 
         return render_survey_facade_report(
@@ -605,10 +611,11 @@ def _validate_index(k: Sequence[float] | np.ndarray, n_bands: int) -> np.ndarray
     """Coerce the reverberation index to a finite per-band array."""
     kk = _finite_bands(k, "reverberation_index")
     if kk.shape != (n_bands,):
-        raise ValueError(
+        msg = (
             "'reverberation_index' must give one value per band, matching the "
             "level inputs."
         )
+        raise ValueError(msg)
     return kk
 
 
@@ -673,14 +680,16 @@ def survey_airborne_insulation(
     l1_bands = _as_band_levels(l1, "l1")
     l2_bands = _as_band_levels(l2, "l2")
     if l1_bands.shape != l2_bands.shape:
-        raise ValueError("'l1' and 'l2' must share the same band count.")
+        msg = "'l1' and 'l2' must share the same band count."
+        raise ValueError(msg)
     k = _validate_index(reverberation_index, int(l1_bands.size))
 
     d = l1_bands - l2_bands
     d_nt = d + k
 
     if area is not None and volume is None:
-        raise ValueError("'area' requires 'volume' to compute R'.")
+        msg = "'area' requires 'volume' to compute R'."
+        raise ValueError(msg)
 
     d_n: np.ndarray | None = None
     r_prime: np.ndarray | None = None
@@ -765,7 +774,8 @@ def survey_facade_insulation(
     out = _as_band_levels(l1_2m, "l1_2m")
     l2_bands = _as_band_levels(l2, "l2")
     if out.shape != l2_bands.shape:
-        raise ValueError("'l1_2m' and 'l2' must share the same band count.")
+        msg = "'l1_2m' and 'l2' must share the same band count."
+        raise ValueError(msg)
     k = _validate_index(reverberation_index, int(out.size))
 
     d_2m = out - l2_bands
@@ -811,18 +821,20 @@ def survey_service_equipment_level(
     """
     m = _finite_bands(measurements, "measurements")
     if m.ndim not in (1, 2) or m.shape[0] != 3:
-        raise ValueError(
+        msg = (
             "'measurements' must give exactly three measurement positions "
             "(three scalars, or a (3, bands) array)."
         )
+        raise ValueError(msg)
     l_xy = np.asarray(energy_average_level(m, axis=0), dtype=np.float64)
 
     k = _finite_bands(reverberation_index, "reverberation_index")
     if k.shape != l_xy.shape:
-        raise ValueError(
+        msg = (
             "'reverberation_index' must match the shape of the per-position "
             "average (scalar, or one value per band)."
         )
+        raise ValueError(msg)
 
     l_xy_nt = l_xy - k
     l_xy_n: np.ndarray | None = None

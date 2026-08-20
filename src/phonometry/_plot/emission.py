@@ -200,10 +200,11 @@ def plot_intensity(
     from .._i18n import format_number, localize_axes
 
     if result.frequency is None:
-        raise ValueError(
+        msg = (
             "plot() needs per-band intensity data; call sound_intensity(...) "
             "with a 'fraction' to obtain it."
         )
+        raise ValueError(msg)
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(result.frequency, dtype=np.float64)
     lp = np.asarray(result.pressure_level, dtype=np.float64)
@@ -281,10 +282,11 @@ def plot_field_indicators(
 
     f2 = np.atleast_1d(np.asarray(result.f2, dtype=np.float64))
     if result.frequency is None or f2.size < 2:
-        raise ValueError(
+        msg = (
             "plot() needs per-band indicators; call field_indicators(...) with "
             "2D (positions, bands) arrays and 'frequencies'."
         )
+        raise ValueError(msg)
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(result.frequency, dtype=np.float64)
     f3 = np.atleast_1d(np.asarray(result.f3, dtype=np.float64))

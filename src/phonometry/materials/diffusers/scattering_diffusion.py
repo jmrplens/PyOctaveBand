@@ -131,9 +131,8 @@ class DiffusionResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iso17497 import render_diffusion_polar_report
 
         return render_diffusion_polar_report(
@@ -225,9 +224,8 @@ class DiffusionSpectrum:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iso17497 import render_diffusion_spectrum_report
 
         return render_diffusion_spectrum_report(
@@ -262,14 +260,14 @@ def diffusion_spectrum(
     freq = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     d = np.atleast_1d(np.asarray(diffusion, dtype=np.float64))
     if freq.ndim != 1 or freq.size == 0 or freq.shape != d.shape:
-        raise ValueError(
-            "'frequencies' and 'diffusion' must be non-empty, 1-D and equal-length."
-        )
+        msg = "'frequencies' and 'diffusion' must be non-empty, 1-D and equal-length."
+        raise ValueError(msg)
     d_n: Real | None = None
     if normalized is not None:
         d_n = np.atleast_1d(np.asarray(normalized, dtype=np.float64))
         if d_n.shape != freq.shape:
-            raise ValueError("'normalized' must match 'frequencies' in length.")
+            msg = "'normalized' must match 'frequencies' in length."
+            raise ValueError(msg)
     return DiffusionSpectrum(
         frequencies=freq,
         diffusion=d,
@@ -300,7 +298,8 @@ def directional_diffusion(
     ang = np.atleast_1d(np.asarray(angles, dtype=np.float64))
     lev = np.atleast_1d(np.asarray(levels, dtype=np.float64))
     if ang.shape != lev.shape:
-        raise ValueError("'angles' and 'levels' must have the same length.")
+        msg = "'angles' and 'levels' must have the same length."
+        raise ValueError(msg)
     d = float(directional_diffusion_coefficient(lev, area_weights=weights))
     return DiffusionResult(angles=ang, levels=lev, coefficient=d)
 
@@ -349,32 +348,38 @@ def directional_diffusion_coefficient(
     """
     lvl = np.asarray(levels, dtype=np.float64)
     if lvl.ndim != 1:
-        raise ValueError("'levels' must be a 1-D sequence of receiver SPLs.")
+        msg = "'levels' must be a 1-D sequence of receiver SPLs."
+        raise ValueError(msg)
     n = lvl.size
     if n < 2:
-        raise ValueError("'levels' needs at least two receivers (n >= 2).")
+        msg = "'levels' needs at least two receivers (n >= 2)."
+        raise ValueError(msg)
     p = np.power(10.0, lvl / 10.0)
     if area_weights is None:
         weights = np.ones(n, dtype=np.float64)
     else:
         weights = np.asarray(area_weights, dtype=np.float64)
         if weights.ndim != 1 or weights.size != n:
-            raise ValueError(
+            msg = (
                 "'area_weights' must match the number of receivers "
                 f"({n}), got shape {weights.shape}."
             )
+            raise ValueError(msg)
         if np.any(weights <= 0.0):
-            raise ValueError("'area_weights' values must be positive.")
+            msg = "'area_weights' values must be positive."
+            raise ValueError(msg)
     weight_sum = float(np.sum(weights))
     if weight_sum <= 1.0:
-        raise ValueError("The total area weight must exceed 1.")
+        msg = "The total area weight must exceed 1."
+        raise ValueError(msg)
     weighted_energy = np.sum(p * weights)
     weighted_energy_sq = np.sum(weights * p**2)
     if weighted_energy_sq <= 0.0:
-        raise ValueError(
+        msg = (
             "The polar response carries no energy (all levels -inf); the "
             "diffusion coefficient is undefined."
         )
+        raise ValueError(msg)
     numerator = weighted_energy**2 - weighted_energy_sq
     denominator = (weight_sum - 1.0) * weighted_energy_sq
     return float(numerator / denominator)
@@ -403,7 +408,8 @@ def normalized_diffusion_coefficient(
     d_ref = np.asarray(d_theta_reference, dtype=np.float64)
     denom = 1.0 - d_ref
     if np.any(np.isclose(denom, 0.0)):
-        raise ValueError("'d_theta_reference' must not equal 1 (division by zero).")
+        msg = "'d_theta_reference' must not equal 1 (division by zero)."
+        raise ValueError(msg)
     return np.asarray((d - d_ref) / denom, dtype=np.float64)
 
 
@@ -453,7 +459,8 @@ def area_factors(
     """
     theta_deg = np.asarray(elevations, dtype=np.float64)
     if theta_deg.ndim != 1 or theta_deg.size == 0:
-        raise ValueError("'elevations' must be a non-empty 1-D sequence of angles.")
+        msg = "'elevations' must be a non-empty 1-D sequence of angles."
+        raise ValueError(msg)
     d_theta = _positive_scalar(delta_theta, "delta_theta")
     d_phi = d_theta if delta_phi is None else _positive_scalar(delta_phi, "delta_phi")
     theta = np.radians(theta_deg)
@@ -470,7 +477,8 @@ def area_factors(
     areas[general] = 2.0 * np.sin(theta[general]) * np.sin(d_theta_rad / 2.0)
     a_min = np.min(areas)
     if a_min <= 0.0:
-        raise ValueError("Area factors must be positive; check the angles.")
+        msg = "Area factors must be positive; check the angles."
+        raise ValueError(msg)
     return np.asarray(areas / a_min, dtype=np.float64)
 
 
@@ -498,21 +506,26 @@ def random_incidence_diffusion(
     """
     d = np.asarray(directional_coefficients, dtype=np.float64)
     if d.ndim != 1:
-        raise ValueError("'directional_coefficients' must be a 1-D sequence.")
+        msg = "'directional_coefficients' must be a 1-D sequence."
+        raise ValueError(msg)
     if d.size == 0:
-        raise ValueError("'directional_coefficients' must not be empty.")
+        msg = "'directional_coefficients' must not be empty."
+        raise ValueError(msg)
     if weights is None:
         w = np.ones(d.size, dtype=np.float64)
     else:
         w = np.asarray(weights, dtype=np.float64)
         if w.ndim != 1 or w.size != d.size:
-            raise ValueError(
+            msg = (
                 "'weights' must match the number of source positions "
                 f"({d.size}), got shape {w.shape}."
             )
+            raise ValueError(msg)
         if np.any(w < 0.0):
-            raise ValueError("'weights' values must be non-negative.")
+            msg = "'weights' values must be non-negative."
+            raise ValueError(msg)
     total = float(np.sum(w))
     if total <= 0.0:
-        raise ValueError("The total source weight must be positive.")
+        msg = "The total source weight must be positive."
+        raise ValueError(msg)
     return float(np.sum(w * d) / total)

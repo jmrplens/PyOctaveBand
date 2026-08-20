@@ -135,13 +135,17 @@ def _validate(
 ) -> None:
     """Raise on non-physical inputs; warn on out-of-tabulated-range inputs."""
     if np.any(freqs <= 0.0):
-        raise ValueError("'frequencies' must be positive.")
+        msg = "'frequencies' must be positive."
+        raise ValueError(msg)
     if temperature <= -_KELVIN:
-        raise ValueError("'temperature' must be above absolute zero (-273,15 degC).")
+        msg = "'temperature' must be above absolute zero (-273,15 degC)."
+        raise ValueError(msg)
     if not 0.0 <= relative_humidity <= 100.0:
-        raise ValueError("'relative_humidity' must be within [0, 100] %.")
+        msg = "'relative_humidity' must be within [0, 100] %."
+        raise ValueError(msg)
     if pressure <= 0.0:
-        raise ValueError("'pressure' must be positive.")
+        msg = "'pressure' must be positive."
+        raise ValueError(msg)
 
     lo_t, hi_t = _TEMPERATURE_RANGE
     if not lo_t <= temperature <= hi_t:
@@ -332,9 +336,8 @@ class AtmosphericAttenuation:
         if self.distance is not None and (
             not np.isfinite(self.distance) or self.distance < 0.0
         ):
-            raise ValueError(
-                "'distance' must be a finite, non-negative number of metres."
-            )
+            msg = "'distance' must be a finite, non-negative number of metres."
+            raise ValueError(msg)
 
     @property
     def total_attenuation(self) -> NDArray[np.float64] | None:

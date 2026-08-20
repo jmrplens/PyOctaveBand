@@ -120,9 +120,11 @@ def plot_piston_geometry(
     """
     _check_language(language)
     if radius <= 0.0:
-        raise ValueError("'radius' must be positive.")
+        msg = "'radius' must be positive."
+        raise ValueError(msg)
     if (angles is None) != (directivity is None):
-        raise ValueError("Give 'angles' and 'directivity' together.")
+        msg = "Give 'angles' and 'directivity' together."
+        raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
     a = float(radius)
@@ -149,7 +151,8 @@ def plot_piston_geometry(
         ang = np.asarray(angles, dtype=np.float64)
         d_lin = np.abs(np.asarray(directivity, dtype=np.float64))
         if ang.shape != d_lin.shape:
-            raise ValueError("'angles' and 'directivity' must match.")
+            msg = "'angles' and 'directivity' must match."
+            raise ValueError(msg)
         peak = float(d_lin.max())
         if peak > 0.0:
             scale = 2.8 * a / peak
@@ -188,9 +191,8 @@ def plot_piston_result_geometry(
         ka = np.atleast_1d(np.asarray(result.ka, dtype=np.float64))
         n_rows = int(directivity.shape[0])
         if not -n_rows <= frequency_index < n_rows or ka.size < n_rows:
-            raise ValueError(
-                f"'frequency_index' must index the {n_rows} computed frequencies."
-            )
+            msg = f"'frequency_index' must index the {n_rows} computed frequencies."
+            raise ValueError(msg)
         row = directivity[frequency_index]
         angles = np.asarray(result.angles, dtype=np.float64)
         lobe = row
@@ -250,7 +252,8 @@ def plot_sound_reinforcement_geometry(
         float(listener_distance),
     )
     if not all(np.isfinite(v) and v > 0.0 for v in lengths):
-        raise ValueError("The three distances must be positive and finite.")
+        msg = "The three distances must be positive and finite."
+        raise ValueError(msg)
     d_tm, d_hm, d_hl = lengths
     if ax is None:
         ax = _new_axes()

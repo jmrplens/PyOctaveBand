@@ -394,10 +394,11 @@ def _loudness(raw: int) -> float | None:
 def _parse_bext(payload: bytes) -> BroadcastMetadata:
     """Decode a ``bext`` payload laid out per the class docstring's table."""
     if len(payload) < _BEXT_FIXED.size:
-        raise ValueError(
+        msg = (
             f"bext chunk is {len(payload)} bytes; the EBU Tech 3285 fixed "
             f"part is {_BEXT_FIXED.size}"
         )
+        raise ValueError(msg)
     (
         description,
         originator,
@@ -440,7 +441,8 @@ def _parse_bext(payload: bytes) -> BroadcastMetadata:
 def _parse_fmt(payload: bytes) -> FormatChunk:
     """Decode ``fmt``, including the EXTENSIBLE extension when present."""
     if len(payload) < 16:
-        raise ValueError(f"fmt chunk is {len(payload)} bytes; at least 16 required")
+        msg = f"fmt chunk is {len(payload)} bytes; at least 16 required"
+        raise ValueError(msg)
     tag, channels, fs, byte_rate, block_align, bits = struct.unpack_from(
         "<HHIIHH", payload
     )
@@ -449,10 +451,11 @@ def _parse_fmt(payload: bytes) -> FormatChunk:
     subformat: bytes | None = None
     if tag == WAVE_FORMAT_EXTENSIBLE:
         if len(payload) < 40:
-            raise ValueError(
+            msg = (
                 f"WAVE_FORMAT_EXTENSIBLE fmt chunk is {len(payload)} bytes; "
                 "the 22-byte extension requires 40"
             )
+            raise ValueError(msg)
         # cbSize (uint16 at offset 16) precedes the extension proper.
         valid_bits, channel_mask = struct.unpack_from("<HI", payload, 18)
         subformat = payload[24:40]
@@ -480,16 +483,16 @@ def _parse_cue(payload: bytes) -> tuple[CuePoint, ...]:
     type every other malformed-chunk path here raises, would not catch).
     """
     if len(payload) < 4:
-        raise ValueError(
-            f"cue chunk is {len(payload)} bytes; its uint32 record count requires 4"
-        )
+        msg = f"cue chunk is {len(payload)} bytes; its uint32 record count requires 4"
+        raise ValueError(msg)
     (count,) = struct.unpack_from("<I", payload)
     needed = 4 + 24 * count
     if len(payload) < needed:
-        raise ValueError(
+        msg = (
             f"cue chunk declares {count} points but is {len(payload)} "
             f"bytes; the 24-byte records require {needed}"
         )
+        raise ValueError(msg)
     points = []
     for i in range(count):
         cue_id, position, chunk_id, chunk_start, block_start, sample_offset = (
@@ -511,10 +514,11 @@ def _parse_cue(payload: bytes) -> tuple[CuePoint, ...]:
 def _parse_ds64(payload: bytes, path: str | Path) -> Ds64Chunk:
     """Decode the three mandatory 64-bit sizes of a ``ds64`` chunk."""
     if len(payload) < 24:
-        raise ValueError(
+        msg = (
             f"{path}: ds64 chunk is {len(payload)} bytes; the "
             "riffSize, dataSize and sampleCount fields require 24"
         )
+        raise ValueError(msg)
     riff_size, chunk_data_size, sample_count = struct.unpack_from("<QQQ", payload)
     return Ds64Chunk(
         riff_size=riff_size,
@@ -526,10 +530,11 @@ def _parse_ds64(payload: bytes, path: str | Path) -> Ds64Chunk:
 def _parse_fact(payload: bytes, path: str | Path) -> int:
     """Decode the ``fact`` chunk's single uint32 frame count."""
     if len(payload) < 4:
-        raise ValueError(
+        msg = (
             f"{path}: fact chunk is {len(payload)} bytes; its "
             "uint32 frame count requires 4"
         )
+        raise ValueError(msg)
     (fact_frames,) = struct.unpack_from("<I", payload)
     return int(fact_frames)
 
@@ -538,13 +543,15 @@ def _read_wave_header(fh: BinaryIO, path: str | Path) -> str:
     """Check the 12-byte RIFF prelude and name the container it declares."""
     header = fh.read(12)
     if len(header) < 12 or header[8:12] != b"WAVE":
-        raise ValueError(f"{path}: not a WAVE file")
+        msg = f"{path}: not a WAVE file"
+        raise ValueError(msg)
     fourcc = header[:4]
     containers = {b"RIFF": "WAV", b"RF64": "RF64", b"BW64": "BW64"}
     if fourcc not in containers:
-        raise ValueError(
+        msg = (
             f"{path}: unknown container fourcc {fourcc!r} (expected RIFF, RF64 or BW64)"
         )
+        raise ValueError(msg)
     return containers[fourcc]
 
 
@@ -561,10 +568,11 @@ def _check_chunk_extent(
     of an odd last chunk, and the payload itself is whole either way.
     """
     if offset + size > file_size:
-        raise ValueError(
+        msg = (
             f"{path}: chunk {chunk_id!r} claims {size} bytes but only "
             f"{file_size - offset} remain in the file"
         )
+        raise ValueError(msg)
 
 
 def _read_chunk_payload(
@@ -577,10 +585,11 @@ def _read_chunk_payload(
     """
     payload = fh.read(size)
     if len(payload) < size:
-        raise ValueError(
+        msg = (
             f"{path}: chunk {chunk_id!r} claims {size} bytes but the "
             f"file ends after {len(payload)}"
         )
+        raise ValueError(msg)
     if size % 2:
         fh.seek(1, 1)  # chunks are word-aligned; the pad byte is not counted
     return payload
@@ -593,10 +602,11 @@ def _true_data_size(
     if size != 0xFFFFFFFF or container == "WAV":
         return size
     if ds64 is None:
-        raise ValueError(
+        msg = (
             f"{path}: RF64 data chunk defers its size to a "
             "ds64 chunk that never appeared"
         )
+        raise ValueError(msg)
     return ds64.data_size
 
 
@@ -696,9 +706,11 @@ def parse_wav_chunks(path: str | Path) -> WavChunks:
             fh.seek(size + size % 2, 1)
 
     if seen.fmt is None:
-        raise ValueError(f"{path}: no fmt chunk found")
+        msg = f"{path}: no fmt chunk found"
+        raise ValueError(msg)
     if data_offset is None or data_size is None:
-        raise ValueError(f"{path}: no data chunk found")
+        msg = f"{path}: no data chunk found"
+        raise ValueError(msg)
     return WavChunks(
         container=container,
         fmt=seen.fmt,

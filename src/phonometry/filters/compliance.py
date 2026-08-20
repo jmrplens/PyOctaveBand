@@ -173,20 +173,22 @@ def class_limits(
     """
     spec = _FILTER_EDITIONS.get(edition)
     if spec is None:
-        raise ValueError("edition must be '2014' or '1995'.")
+        msg = "edition must be '2014' or '1995'."
+        raise ValueError(msg)
     if filter_class not in spec["classes"]:
-        raise ValueError(
-            f"filter_class must be one of {spec['classes']} for edition '{edition}'."
-        )
+        msg = f"filter_class must be one of {spec['classes']} for edition '{edition}'."
+        raise ValueError(msg)
     if fraction <= 0:
-        raise ValueError("'fraction' must be positive.")
+        msg = "'fraction' must be positive."
+        raise ValueError(msg)
     col = spec["col"][filter_class]
     passband_max = spec["passband_max"]
     stopband_min = spec["stopband_min"]
 
     omega_arr = np.asarray(omega, dtype=np.float64)
     if np.any(omega_arr <= 0):
-        raise ValueError("Normalized frequencies must be positive.")
+        msg = "Normalized frequencies must be positive."
+        raise ValueError(msg)
     # Formula (10): low side mirrors the high side.
     omega_h = np.where(omega_arr < 1.0, 1.0 / omega_arr, omega_arr)
 
@@ -312,10 +314,12 @@ def verify_filter_class(
         over ``f_m``).
     """
     if num_points < 16:
-        raise ValueError("'num_points' must be at least 16.")
+        msg = "'num_points' must be at least 16."
+        raise ValueError(msg)
     spec = _FILTER_EDITIONS.get(edition)
     if spec is None:
-        raise ValueError("edition must be '2014' or '1995'.")
+        msg = "edition must be '2014' or '1995'."
+        raise ValueError(msg)
     classes_ordered: tuple[int, ...] = spec["classes"]  # best -> worst
 
     bands: list[dict[str, Any]] = []
@@ -433,10 +437,11 @@ class FilterComplianceResult:
             return self.overall_class
         classes = self.available_classes()
         if not classes:
-            raise ValueError(
+            msg = (
                 "This filter-compliance result has no bands, so it has no "
                 "reference class; check the bank's frequency limits."
             )
+            raise ValueError(msg)
         return max(classes)
 
     def plot(
@@ -495,9 +500,8 @@ class FilterComplianceResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.iec61260 import render_iec61260_report
 
         return render_iec61260_report(
@@ -560,4 +564,5 @@ def __getattr__(name: str) -> Any:
         from . import weighting_compliance
 
         return getattr(weighting_compliance, name)
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    msg = f"module {__name__!r} has no attribute {name!r}"
+    raise AttributeError(msg)

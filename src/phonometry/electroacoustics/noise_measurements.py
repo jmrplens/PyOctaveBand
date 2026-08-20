@@ -167,7 +167,8 @@ def dynamic_range(
     sl = _steady_slice(sig.size, fs_v, f0, float(notch_q))
     weighted = _ccir_rms_weighted_rms(np.asarray(residual[sl]), fs_v, bandwidth)
     if weighted <= 0.0:
-        raise ValueError("Residual has no energy; cannot form a dynamic range.")
+        msg = "Residual has no energy; cannot form a dynamic range."
+        raise ValueError(msg)
     return float(20.0 * np.log10(reference / weighted))
 
 

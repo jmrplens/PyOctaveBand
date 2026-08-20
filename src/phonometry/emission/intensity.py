@@ -236,10 +236,11 @@ class FieldIndicators:
             :func:`temporal_variability_indicator` directly).
         """
         if self.f1 is None:
-            raise ValueError(
+            msg = (
                 "This result carries no F1; call field_indicators(..., "
                 "temporal_intensity=...) or temporal_variability_indicator()."
             )
+            raise ValueError(msg)
         f1 = np.asarray(self.f1, dtype=np.float64)
         ok = f1 <= float(limit)
         return bool(ok) if ok.ndim == 0 else ok
@@ -334,33 +335,39 @@ def _band_integrals(
 def _validate_probe_signals(x1: np.ndarray, x2: np.ndarray) -> None:
     """Reject microphone signals that are not a matched pair of 1D pressures."""
     if x1.ndim != 1 or x2.ndim != 1:
-        raise ValueError("sound_intensity expects 1D pressure signals.")
+        msg = "sound_intensity expects 1D pressure signals."
+        raise ValueError(msg)
     if x1.size != x2.size:
-        raise ValueError(
-            f"Microphone signals must have the same length, got {x1.size} and {x2.size}."
-        )
+        msg = f"Microphone signals must have the same length, got {x1.size} and {x2.size}."
+        raise ValueError(msg)
 
 
 def _validate_probe_medium(fs: int, spacing: float, rho: float, c: float) -> None:
     """Reject a non-physical sample rate, probe spacing or medium."""
     if fs <= 0:
-        raise ValueError("Sample rate 'fs' must be positive.")
+        msg = "Sample rate 'fs' must be positive."
+        raise ValueError(msg)
     if spacing <= 0:
-        raise ValueError("Microphone 'spacing' must be positive.")
+        msg = "Microphone 'spacing' must be positive."
+        raise ValueError(msg)
     if rho <= 0:
-        raise ValueError("Air density 'rho' must be positive.")
+        msg = "Air density 'rho' must be positive."
+        raise ValueError(msg)
     if c <= 0:
-        raise ValueError("Speed of sound 'c' must be positive.")
+        msg = "Speed of sound 'c' must be positive."
+        raise ValueError(msg)
 
 
 def _validate_band_options(fraction: int | None, limits: list[float] | None) -> None:
     """Reject an unsupported band fraction or an ill-ordered frequency range."""
     if fraction is not None and fraction not in (1, 3):
-        raise ValueError("'fraction' must be None, 1 (octave) or 3 (one-third octave).")
+        msg = "'fraction' must be None, 1 (octave) or 3 (one-third octave)."
+        raise ValueError(msg)
     if limits is not None and (
         len(limits) != 2 or limits[0] <= 0 or limits[1] <= limits[0]
     ):
-        raise ValueError("'limits' must be [f_min, f_max] with 0 < f_min < f_max.")
+        msg = "'limits' must be [f_min, f_max] with 0 < f_min < f_max."
+        raise ValueError(msg)
 
 
 def sound_intensity(
@@ -452,9 +459,8 @@ def sound_intensity(
     _validate_probe_medium(fs, spacing, rho, c)
     _validate_band_options(fraction, limits)
     if x1.size < 32:
-        raise ValueError(
-            f"Signals too short for a spectral estimate: {x1.size} samples."
-        )
+        msg = f"Signals too short for a spectral estimate: {x1.size} samples."
+        raise ValueError(msg)
 
     # Hann-windowed Welch/CSD averaging through the shared spectral core
     # (50% overlap, detrend off); the shared default segment length targets
@@ -567,7 +573,8 @@ def _coefficient_of_variation(
     # A NaN or infinite sample slips past the positivity test below and turns
     # the whole indicator into a silent NaN, so it is rejected up front.
     if not np.all(np.isfinite(samples)):
-        raise ValueError("The normal intensity samples must all be finite.")
+        msg = "The normal intensity samples must all be finite."
+        raise ValueError(msg)
     mean = float(np.mean(samples))
     if mean <= 0.0:
         raise ValueError(non_positive_message)
@@ -615,15 +622,17 @@ def temporal_variability_indicator(
     """
     samples = np.atleast_1d(np.asarray(short_time_intensity, dtype=np.float64))
     if samples.ndim not in (1, 2):
-        raise ValueError(
+        msg = (
             "temporal_variability_indicator expects 1D (samples,) or 2D "
             "(samples, bands) arrays."
         )
+        raise ValueError(msg)
     if samples.shape[0] < 2:
-        raise ValueError(
+        msg = (
             "At least two short-time samples are required for F1 "
             "(ISO 9614-1 Annex A Note 9 recommends M = 10)."
         )
+        raise ValueError(msg)
     if samples.ndim == 1:
         return _coefficient_of_variation(samples, non_positive_message=_F1_NON_POSITIVE)
     return np.asarray(
@@ -679,10 +688,11 @@ def _temporal_indicator_for(
     f1 = temporal_variability_indicator(temporal_intensity)
     f1_size = 1 if np.ndim(f1) == 0 else np.size(f1)
     if f1_size != n_bands:
-        raise ValueError(
+        msg = (
             f"'temporal_intensity' must carry one column per band, got "
             f"{f1_size} for {n_bands} band(s)."
         )
+        raise ValueError(msg)
     if scalar_surface and np.ndim(f1) != 0:
         return float(np.asarray(f1).reshape(()))
     if not scalar_surface and np.ndim(f1) == 0:
@@ -743,26 +753,30 @@ def field_indicators(
     lp = np.atleast_1d(np.asarray(pressure_levels, dtype=np.float64))
     i_n = np.atleast_1d(np.asarray(normal_intensity, dtype=np.float64))
     if lp.ndim not in (1, 2) or i_n.ndim not in (1, 2):
-        raise ValueError(
+        msg = (
             "field_indicators expects 1D (positions,) or 2D (positions, bands) arrays."
         )
+        raise ValueError(msg)
     if lp.shape != i_n.shape:
-        raise ValueError(
+        msg = (
             f"'pressure_levels' and 'normal_intensity' must have the same "
             f"shape, got {lp.shape} and {i_n.shape}."
         )
+        raise ValueError(msg)
     if lp.shape[0] < 2:
-        raise ValueError("At least two measurement positions are required.")
+        msg = "At least two measurement positions are required."
+        raise ValueError(msg)
 
     n_bands = lp.shape[1] if lp.ndim == 2 else 1
     freqs: np.ndarray | None = None
     if frequencies is not None:
         freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
         if freqs.size != n_bands:
-            raise ValueError(
+            msg = (
                 f"'frequencies' must have one entry per band, got {freqs.size} "
                 f"for {n_bands} band(s)."
             )
+            raise ValueError(msg)
 
     f1 = _temporal_indicator_for(
         temporal_intensity, n_bands, scalar_surface=lp.ndim == 1
@@ -799,5 +813,6 @@ def dynamic_capability_index(
     :return: Ld in decibels.
     """
     if bias_error_factor <= 0:
-        raise ValueError("'bias_error_factor' must be positive.")
+        msg = "'bias_error_factor' must be positive."
+        raise ValueError(msg)
     return float(pressure_residual_intensity_index - bias_error_factor)

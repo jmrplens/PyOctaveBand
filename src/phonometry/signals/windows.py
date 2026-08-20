@@ -125,7 +125,8 @@ def _mainlobe_edge(level_db: NDArray[np.float64]) -> int:
     falling = np.diff(level_db) < 0.0
     edges = np.flatnonzero(~falling[1:] & falling[:-1]) + 1
     if edges.size == 0:  # pragma: no cover - every proper taper has a null
-        raise ValueError("The window spectrum has no sidelobe structure.")
+        msg = "The window spectrum has no sidelobe structure."
+        raise ValueError(msg)
     return int(edges[0])
 
 
@@ -165,15 +166,18 @@ def window_metrics(
 
     n_v = int(n)
     if n_v < 16:
-        raise ValueError("'n' must be at least 16 samples.")
+        msg = "'n' must be at least 16 samples."
+        raise ValueError(msg)
     try:
         w = np.asarray(
             sp_signal.get_window(window, n_v, fftbins=True), dtype=np.float64
         )
     except (ValueError, TypeError) as exc:
-        raise ValueError(f"Unknown window specification: {window!r}") from exc
+        msg = f"Unknown window specification: {window!r}"
+        raise ValueError(msg) from exc
     if np.any(~np.isfinite(w)) or float(np.sum(w)) <= 0.0:
-        raise ValueError(f"Degenerate window: {window!r}")
+        msg = f"Degenerate window: {window!r}"
+        raise ValueError(msg)
 
     wsum = float(np.sum(w))
     coherent_gain = wsum / n_v

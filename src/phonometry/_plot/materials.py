@@ -642,10 +642,11 @@ def plot_absorption_uncertainty(
     :raises ValueError: The result is a single-number quantity (no bands).
     """
     if result.frequencies.size == 0:
-        raise ValueError(
+        msg = (
             "plot() needs a per-band result; single-number quantities "
             "(alpha_w, DLalpha) have no spectrum to plot."
         )
+        raise ValueError(msg)
     from .._i18n import decimal_comma, localize_axes
 
     ax = ax if ax is not None else _new_axes()

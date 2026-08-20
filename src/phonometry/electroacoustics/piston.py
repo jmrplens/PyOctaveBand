@@ -110,7 +110,8 @@ def piston_resistance(x: ArrayLike) -> np.ndarray | float:
     """
     arr = np.asarray(x, dtype=np.float64)
     if np.any(arr < 0.0) or not np.all(np.isfinite(arr)):
-        raise ValueError("'x' must be non-negative and finite.")
+        msg = "'x' must be non-negative and finite."
+        raise ValueError(msg)
     with np.errstate(invalid="ignore", divide="ignore"):
         out = 1.0 - 2.0 * special.j1(arr) / arr
     # J1(x)/x -> 1/2 as x -> 0, so R1 -> 0; the input is validated finite, so
@@ -133,7 +134,8 @@ def piston_reactance(x: ArrayLike) -> np.ndarray | float:
     """
     arr = np.asarray(x, dtype=np.float64)
     if np.any(arr < 0.0) or not np.all(np.isfinite(arr)):
-        raise ValueError("'x' must be non-negative and finite.")
+        msg = "'x' must be non-negative and finite."
+        raise ValueError(msg)
     with np.errstate(invalid="ignore", divide="ignore"):
         out = 2.0 * special.struve(1, arr) / arr
     # H1(x)/x -> 0 as x -> 0 (H1 ~ 2 x^2 / 3 pi), so X1 -> 0; the 0/0 at x = 0
@@ -157,9 +159,11 @@ def piston_directivity(ka: ArrayLike, theta: ArrayLike) -> np.ndarray | float:
     ka_arr = np.asarray(ka, dtype=np.float64)
     theta_arr = np.asarray(theta, dtype=np.float64)
     if np.any(ka_arr < 0.0) or not np.all(np.isfinite(ka_arr)):
-        raise ValueError("'ka' must be non-negative and finite.")
+        msg = "'ka' must be non-negative and finite."
+        raise ValueError(msg)
     if not np.all(np.isfinite(theta_arr)):
-        raise ValueError("'theta' must be finite.")
+        msg = "'theta' must be finite."
+        raise ValueError(msg)
     u = ka_arr * np.sin(theta_arr)
     with np.errstate(invalid="ignore", divide="ignore"):
         out = 2.0 * special.j1(u) / u
@@ -250,18 +254,22 @@ def piston_directivity_pattern(
     """
     ka_arr = np.atleast_1d(np.asarray(ka, dtype=np.float64))
     if ka_arr.ndim != 1 or ka_arr.size == 0:
-        raise ValueError("'ka' must be a non-empty scalar or 1-D array.")
+        msg = "'ka' must be a non-empty scalar or 1-D array."
+        raise ValueError(msg)
     if np.any(ka_arr < 0.0) or not np.all(np.isfinite(ka_arr)):
-        raise ValueError("'ka' must be non-negative and finite.")
+        msg = "'ka' must be non-negative and finite."
+        raise ValueError(msg)
 
     if angles is None:
         angle_arr = _DEFAULT_DIRECTIVITY_ANGLES.copy()
     else:
         angle_arr = np.atleast_1d(np.asarray(angles, dtype=np.float64))
         if angle_arr.ndim != 1 or angle_arr.size == 0:
-            raise ValueError("'angles' must be a non-empty 1-D array.")
+            msg = "'angles' must be a non-empty 1-D array."
+            raise ValueError(msg)
         if not np.all(np.isfinite(angle_arr)):
-            raise ValueError("'angles' must be finite.")
+            msg = "'angles' must be finite."
+            raise ValueError(msg)
 
     directivity = np.asarray(
         piston_directivity(ka_arr[:, None], angle_arr[None, :]),
@@ -418,9 +426,11 @@ def radiating_piston(
     rho = require_positive(density, "density")
     f = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if f.ndim != 1 or f.size == 0:
-        raise ValueError("'frequencies' must be a non-empty 1-D array.")
+        msg = "'frequencies' must be a non-empty 1-D array."
+        raise ValueError(msg)
     if np.any(f <= 0.0) or not np.all(np.isfinite(f)):
-        raise ValueError("'frequencies' must be positive and finite.")
+        msg = "'frequencies' must be positive and finite."
+        raise ValueError(msg)
 
     omega = 2.0 * np.pi * f
     k = omega / c
@@ -437,9 +447,11 @@ def radiating_piston(
     if angles is not None:
         angle_arr = np.atleast_1d(np.asarray(angles, dtype=np.float64))
         if angle_arr.ndim != 1 or angle_arr.size == 0:
-            raise ValueError("'angles' must be a non-empty 1-D array.")
+            msg = "'angles' must be a non-empty 1-D array."
+            raise ValueError(msg)
         if not np.all(np.isfinite(angle_arr)):
-            raise ValueError("'angles' must be finite.")
+            msg = "'angles' must be finite."
+            raise ValueError(msg)
         directivity = np.asarray(
             piston_directivity(ka[:, None], angle_arr[None, :]),
             dtype=np.float64,

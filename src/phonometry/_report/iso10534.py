@@ -324,10 +324,11 @@ def render_iso10534_report(
     freqs = np.asarray(result.frequency, dtype=np.float64)
     alpha = np.asarray(result.absorption, dtype=np.float64)
     if freqs.shape != alpha.shape:
-        raise ValueError(
+        msg = (
             "render_iso10534_report() needs 'frequency' and 'absorption' of "
             "equal length."
         )
+        raise ValueError(msg)
 
     styles, title_style, basis_style, caption_style = document_styles(accent)
     title = t("Impedance-tube sound absorption and impedance", language)

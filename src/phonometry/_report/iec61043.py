@@ -357,10 +357,11 @@ def render_iec61043_report(
         flow.append(fiche_paragraph(t(strip, language), strip_style))
     if metadata is not None and metadata.required_class is not None:
         if metadata.required_class not in (1, 2):
-            raise ValueError(
+            msg = (
                 f"required_class={metadata.required_class} is not an IEC 61043 "
                 "residual-index class; the standard defines classes 1 and 2."
             )
+            raise ValueError(msg)
         text, passed = _verdict(result, metadata.required_class, language)
         flow.extend(verdict_flow(text, passed, styles, language))
     flow.extend(footer_flow(metadata, language))

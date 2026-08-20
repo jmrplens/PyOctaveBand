@@ -54,7 +54,8 @@ if TYPE_CHECKING:
 def _finite(value: float, name: str) -> float:
     scalar = float(value)
     if not np.isfinite(scalar):
-        raise ValueError(f"'{name}' must be a finite number.")
+        msg = f"'{name}' must be a finite number."
+        raise ValueError(msg)
     return scalar
 
 
@@ -63,7 +64,8 @@ def _finite_array(
 ) -> NDArray[np.float64]:
     arr = np.atleast_1d(np.asarray(values, dtype=np.float64))
     if arr.size == 0 or not np.all(np.isfinite(arr)):
-        raise ValueError(f"'{name}' must be finite and non-empty.")
+        msg = f"'{name}' must be finite and non-empty."
+        raise ValueError(msg)
     return arr
 
 
@@ -303,9 +305,11 @@ def detection_range(
     fom = _finite(figure_of_merit, "figure_of_merit")
     rmax = _finite(max_range, "max_range")
     if rmax <= 1.0:
-        raise ValueError("'max_range' must exceed 1 m.")
+        msg = "'max_range' must exceed 1 m."
+        raise ValueError(msg)
     if int(n_points) < 2:
-        raise ValueError("'n_points' must be at least 2.")
+        msg = "'n_points' must be at least 2."
+        raise ValueError(msg)
     options = {
         "law": law,
         "temperature": temperature,
@@ -372,14 +376,15 @@ def detection_range_from_curve(
     r = _finite_array(range_m, "range_m")
     pl = _finite_array(propagation_loss, "propagation_loss")
     if r.shape != pl.shape:
-        raise ValueError("'propagation_loss' must have the same length as 'range_m'.")
+        msg = "'propagation_loss' must have the same length as 'range_m'."
+        raise ValueError(msg)
     if r.size < 2 or np.any(np.diff(r) <= 0.0):
-        raise ValueError(
-            "'range_m' must be strictly increasing with at least two samples."
-        )
+        msg = "'range_m' must be strictly increasing with at least two samples."
+        raise ValueError(msg)
     key = crossing.strip().lower()
     if key not in ("first", "last"):
-        raise ValueError(f"'crossing' must be 'first' or 'last', got {crossing!r}.")
+        msg = f"'crossing' must be 'first' or 'last', got {crossing!r}."
+        raise ValueError(msg)
     below = pl <= fom
     up = np.flatnonzero(below[:-1] & ~below[1:])
     if up.size == 0:

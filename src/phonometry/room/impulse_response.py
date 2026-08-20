@@ -235,17 +235,22 @@ def sweep_signal(
     :return: The sweep samples, length ``round(seconds*fs)``.
     """
     if f1 <= 0.0:
-        raise ValueError("f1 must be positive")
+        msg = "f1 must be positive"
+        raise ValueError(msg)
     if f2 <= f1:
-        raise ValueError("f2 must be greater than f1")
+        msg = "f2 must be greater than f1"
+        raise ValueError(msg)
     if f2 > fs / 2.0:
-        raise ValueError("f2 must not exceed the Nyquist frequency fs/2")
+        msg = "f2 must not exceed the Nyquist frequency fs/2"
+        raise ValueError(msg)
     if not 0.0 <= fade < 0.5:
-        raise ValueError("fade must be in [0, 0.5)")
+        msg = "fade must be in [0, 0.5)"
+        raise ValueError(msg)
 
     n = round(seconds * fs)
     if n < 2:
-        raise ValueError("seconds*fs must yield at least 2 samples")
+        msg = "seconds*fs must yield at least 2 samples"
+        raise ValueError(msg)
 
     t = np.arange(n) / fs
     ts = n / fs
@@ -324,11 +329,12 @@ def inverse_filter(
     freqs = np.fft.rfftfreq(comp.size, d=1.0 / fs)
     band = (freqs >= f1) & (freqs <= f2)
     if not np.any(band):
-        raise ValueError(
+        msg = (
             "no frequency bin falls within the sweep band [f1, f2]; the "
             "sweep is too short for this frequency resolution; increase "
             "'seconds' or widen the (f1, f2) range."
         )
+        raise ValueError(msg)
     gain = float(np.median(np.abs(np.fft.rfft(comp)[band])))
     if gain > 0.0:
         inv = inv / gain
@@ -350,7 +356,8 @@ def _farina_deconvolve(
     the spectral method, which would silently produce a wrong inverse filter).
     """
     if f_range is None:
-        raise ValueError("method='farina' requires f_range=(f1, f2)")
+        msg = "method='farina' requires f_range=(f1, f2)"
+        raise ValueError(msg)
     # A reference that was zero-padded to the recording length - the correct
     # input for method="spectral" - makes the rebuilt sweep longer than the
     # real excitation, silently producing a wrong inverse filter (the IR peak
@@ -361,13 +368,14 @@ def _farina_deconvolve(
     last_nonzero = int(nonzero[-1]) if nonzero.size else -1
     n_trailing = ref.size - 1 - last_nonzero
     if n_trailing > _FARINA_MAX_TRAILING_ZEROS:
-        raise ValueError(
+        msg = (
             f"method='farina' requires the unpadded excitation sweep as "
             f"'reference', but it ends in {n_trailing} zero samples "
             "(zero-padding to the recording length is only correct for "
             "method='spectral'). Pass the exact-length sweep from "
             "sweep_signal(), or use method='spectral'."
         )
+        raise ValueError(msg)
     inv = inverse_filter(fs, f_range[0], f_range[1], ref.size / fs)
     conv = signal.fftconvolve(rec, inv)
     # The linear IR peaks where the inverse aligns with the sweep, at index
@@ -476,9 +484,11 @@ def impulse_response(
     rec = apply_calibration(recorded, _typesignal(np.asarray(recorded)))
     ref = _typesignal(np.asarray(reference))
     if rec.ndim != 1 or ref.ndim != 1:
-        raise ValueError("'recorded' and 'reference' must be one-dimensional.")
+        msg = "'recorded' and 'reference' must be one-dimensional."
+        raise ValueError(msg)
     if rec.size == 0 or ref.size == 0:
-        raise ValueError("'recorded' and 'reference' must be non-empty.")
+        msg = "'recorded' and 'reference' must be non-empty."
+        raise ValueError(msg)
     out_len = length if length is not None else rec.size
     n = rec.size + ref.size - 1
 
@@ -491,14 +501,16 @@ def impulse_response(
         full = np.fft.irfft(h_spec, n=n)
     elif method == "farina":
         if fs is None:
-            raise ValueError(
+            msg = (
                 "method='farina' requires fs: unlike the spectral division, "
                 "it rebuilds the analytic inverse filter, which is defined "
                 "in hertz. Pass fs, or hand a Signal that carries it"
             )
+            raise ValueError(msg)
         full = _farina_deconvolve(rec, ref, fs, f_range)
     else:
-        raise ValueError(f"unknown method {method!r}")
+        msg = f"unknown method {method!r}"
+        raise ValueError(msg)
 
     ir = full if return_full else full[:out_len]
     return ImpulseResponseResult(ir=np.asarray(ir), fs=fs, method=method)
@@ -517,7 +529,8 @@ def mls_signal(order: int) -> np.ndarray:
     :return: The bipolar MLS samples (values in ``{-1.0, +1.0}``).
     """
     if order not in _MLS_TAPS:
-        raise ValueError(f"order must be one of {sorted(_MLS_TAPS)} (got {order})")
+        msg = f"order must be one of {sorted(_MLS_TAPS)} (got {order})"
+        raise ValueError(msg)
     taps = _MLS_TAPS[order]
     length = (1 << order) - 1
     # LFSR state as a boolean register, seeded with all ones (any non-zero
@@ -587,14 +600,15 @@ def mls_impulse_response(
     rec = apply_calibration(recorded, _typesignal(np.asarray(recorded)))
     seq = _typesignal(np.asarray(mls))
     if rec.ndim != 1 or seq.ndim != 1:
-        raise ValueError("'recorded' and 'mls' must be one-dimensional.")
+        msg = "'recorded' and 'mls' must be one-dimensional."
+        raise ValueError(msg)
     if rec.size == 0 or seq.size == 0:
-        raise ValueError("'recorded' and 'mls' must be non-empty.")
+        msg = "'recorded' and 'mls' must be non-empty."
+        raise ValueError(msg)
     period = seq.size
     if rec.size % period != 0:
-        raise ValueError(
-            "recorded length must be a positive multiple of the MLS length"
-        )
+        msg = "recorded length must be a positive multiple of the MLS length"
+        raise ValueError(msg)
     # Average the recorded periods (synchronous averaging, ISO 18233 6.3.6).
     averaged = rec.reshape(-1, period).mean(axis=0)
     # Circular cross-correlation: DFT{corr} = conj(SEQ) * REC.
@@ -677,9 +691,8 @@ def golay_pair(order: int) -> tuple[np.ndarray, np.ndarray]:
     :return: The pair ``(a, b)`` as bipolar float arrays (values ``+1/-1``).
     """
     if not 1 <= order <= _GOLAY_MAX_ORDER:
-        raise ValueError(
-            f"order must be between 1 and {_GOLAY_MAX_ORDER} (got {order})"
-        )
+        msg = f"order must be between 1 and {_GOLAY_MAX_ORDER} (got {order})"
+        raise ValueError(msg)
     a = np.array([1.0, 1.0])
     b = np.array([1.0, -1.0])
     for _ in range(order - 1):
@@ -752,13 +765,15 @@ def golay_impulse_response(
     )
     code_a, code_b = (_typesignal(c) for c in pair)
     if code_a.ndim != 1 or code_b.ndim != 1:
-        raise ValueError("both Golay codes must be one-dimensional.")
+        msg = "both Golay codes must be one-dimensional."
+        raise ValueError(msg)
     period = code_a.size
     if period < 2 or code_b.size != period:
-        raise ValueError(
+        msg = (
             "'pair' must hold two equal-length codes of at least 2 samples "
             "(use golay_pair())."
         )
+        raise ValueError(msg)
     responses = []
     for name, rec_in, code in (
         ("recorded_a", recorded_a, code_a),
@@ -766,12 +781,14 @@ def golay_impulse_response(
     ):
         rec = apply_calibration(rec_in, _typesignal(np.asarray(rec_in)))
         if rec.ndim != 1:
-            raise ValueError(f"'{name}' must be one-dimensional.")
+            msg = f"'{name}' must be one-dimensional."
+            raise ValueError(msg)
         if rec.size == 0 or rec.size % period != 0:
-            raise ValueError(
+            msg = (
                 f"'{name}' length must be a positive multiple of the "
                 f"{period}-sample code length"
             )
+            raise ValueError(msg)
         # Synchronous averaging of the recorded periods (as with the MLS).
         averaged = rec.reshape(-1, period).mean(axis=0)
         # Circular cross-correlation: DFT{corr} = conj(CODE) * REC.
@@ -879,21 +896,25 @@ def _shaped_target_db(
             return np.zeros_like(freqs)
         if target == "pink":
             return np.asarray(-10.0 * np.log10(safe / f_range[0]))
-        raise ValueError(
+        msg = (
             f"unknown named target {target!r}; use 'white', 'pink' or a "
             "(frequencies_hz, magnitude_db) pair"
         )
+        raise ValueError(msg)
     t_freq = np.asarray(target[0], dtype=np.float64)
     t_db = np.asarray(target[1], dtype=np.float64)
     if t_freq.ndim != 1 or t_freq.size < 2 or t_db.shape != t_freq.shape:
-        raise ValueError(
+        msg = (
             "an array target must be a (frequencies_hz, magnitude_db) pair "
             "of equal-length 1-D arrays with at least 2 points"
         )
+        raise ValueError(msg)
     if np.any(t_freq <= 0.0) or np.any(np.diff(t_freq) <= 0.0):
-        raise ValueError("target frequencies must be positive and increasing")
+        msg = "target frequencies must be positive and increasing"
+        raise ValueError(msg)
     if not np.all(np.isfinite(t_db)):
-        raise ValueError("target magnitudes must be finite")
+        msg = "target magnitudes must be finite"
+        raise ValueError(msg)
     return np.asarray(np.interp(np.log10(safe), np.log10(t_freq), t_db))
 
 
@@ -1002,22 +1023,30 @@ def shaped_sweep_signal(
     """
     fs_v = float(fs)
     if fs_v <= 0.0:
-        raise ValueError("fs must be positive")
+        msg = "fs must be positive"
+        raise ValueError(msg)
     if f1 <= 0.0:
-        raise ValueError("f1 must be positive")
+        msg = "f1 must be positive"
+        raise ValueError(msg)
     if f2 <= f1:
-        raise ValueError("f2 must be greater than f1")
+        msg = "f2 must be greater than f1"
+        raise ValueError(msg)
     if f2 > fs_v / 2.0:
-        raise ValueError("f2 must not exceed the Nyquist frequency fs/2")
+        msg = "f2 must not exceed the Nyquist frequency fs/2"
+        raise ValueError(msg)
     if seconds <= 0.0:
-        raise ValueError("seconds must be positive")
+        msg = "seconds must be positive"
+        raise ValueError(msg)
     if amplitude <= 0.0:
-        raise ValueError("amplitude must be positive")
+        msg = "amplitude must be positive"
+        raise ValueError(msg)
     if not 0.0 <= fade < 0.5:
-        raise ValueError("fade must be in [0, 0.5)")
+        msg = "fade must be in [0, 0.5)"
+        raise ValueError(msg)
     lead = 0.05 * seconds if start_delay is None else float(start_delay)
     if lead <= 0.0:
-        raise ValueError("start_delay must be positive")
+        msg = "start_delay must be positive"
+        raise ValueError(msg)
 
     # FFT block at least double the total signal so low-frequency
     # pre-ringing folding to "negative times" stays clear of the tail
@@ -1025,14 +1054,16 @@ def shaped_sweep_signal(
     total = seconds + 2.0 * lead
     n_keep = round(total * fs_v)
     if n_keep < 16:
-        raise ValueError("seconds*fs must yield at least 16 samples")
+        msg = "seconds*fs must yield at least 16 samples"
+        raise ValueError(msg)
     n_fft = int(2 ** np.ceil(np.log2(2 * n_keep)))
     freqs = np.asarray(np.fft.rfftfreq(n_fft, 1.0 / fs_v), dtype=np.float64)
     if not np.any((freqs >= f1) & (freqs <= f2)):
-        raise ValueError(
+        msg = (
             "no frequency bin falls within [f1, f2]; lengthen 'seconds' or "
             "widen the (f1, f2) range."
         )
+        raise ValueError(msg)
 
     # Band-limited target magnitude (linear, normalised to peak 1).
     target_db = _shaped_target_db(target, freqs, (float(f1), float(f2)))

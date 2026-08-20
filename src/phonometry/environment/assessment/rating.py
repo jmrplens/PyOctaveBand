@@ -35,13 +35,16 @@ def composite_rating_level(periods: Iterable[tuple[float, float, float]]) -> flo
     """
     periods = list(periods)
     if not periods:
-        raise ValueError("At least one period is required.")
+        msg = "At least one period is required."
+        raise ValueError(msg)
     hours = np.array([h for _, h, _ in periods], dtype=np.float64)
     if not np.all(np.isfinite(hours)) or np.any(hours <= 0):
-        raise ValueError("Every period duration must be a positive, finite number.")
+        msg = "Every period duration must be a positive, finite number."
+        raise ValueError(msg)
     total = float(np.sum(hours))
     if abs(total - 24.0) > 1e-9:
-        raise ValueError(f"Period durations must sum to 24 h; got {total!r}.")
+        msg = f"Period durations must sum to 24 h; got {total!r}."
+        raise ValueError(msg)
     acc = sum(h / 24.0 * 10 ** (0.1 * (level + k)) for level, h, k in periods)
     return float(10 * np.log10(acc))
 

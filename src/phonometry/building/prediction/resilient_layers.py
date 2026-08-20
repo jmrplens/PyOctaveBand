@@ -244,7 +244,8 @@ def plate_contact_stiffness(
     e = require_positive(youngs_modulus, "youngs_modulus")
     r = require_positive(radius, "radius")
     if not -1.0 < poisson_ratio < 1.0:
-        raise ValueError("'poisson_ratio' must lie in (-1, 1).")
+        msg = "'poisson_ratio' must lie in (-1, 1)."
+        raise ValueError(msg)
     return float(2.0 * r * e / (1.0 - poisson_ratio**2))
 
 
@@ -391,7 +392,8 @@ def force_pulse(
     )
     t = np.asarray(time, dtype=np.float64)
     if not np.all(np.isfinite(t)) or np.any(t < 0.0):
-        raise ValueError("'time' must contain only finite, non-negative values.")
+        msg = "'time' must contain only finite, non-negative values."
+        raise ValueError(msg)
     decay = k / (2.0 * z)
     omega0_sq = k / m
     if _is_over_critical(k, z, m):
@@ -1031,20 +1033,20 @@ def floating_floor_improvement_spectrum(
     f_limit: float | None = None
     if model == "cremer_hammer":
         if limiting_frequency is None:
-            raise ValueError(
-                "'limiting_frequency' is required by model='cremer_hammer'."
-            )
+            msg = "'limiting_frequency' is required by model='cremer_hammer'."
+            raise ValueError(msg)
         f_limit = require_positive(limiting_frequency, "limiting_frequency")
         improvement = improvement + np.where(
             above, 10.0 * np.log10(1.0 + (f / f_limit) ** 2), 0.0
         )
     delta_lw: float | None = None
     if (mass_per_area is None) != (dynamic_stiffness is None):
-        raise ValueError(
+        msg = (
             "'mass_per_area' and 'dynamic_stiffness' are the two halves of the "
             "weighted improvement 'delta_lw'; give both or neither, since one "
             "alone would return it as None without saying why"
         )
+        raise ValueError(msg)
     if mass_per_area is not None and dynamic_stiffness is not None:
         # The weighted fit follows the construction the law belongs to:
         # Formula (C.4) for the sand-cement screeds of the 30 lg law, and

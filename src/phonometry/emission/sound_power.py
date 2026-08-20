@@ -300,9 +300,8 @@ class SoundPowerResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.iso3744 import render_sound_power_report
 
         return render_sound_power_report(
@@ -355,10 +354,11 @@ class SoundPowerResult:
 
         lwa = float(self.sound_power_level_a)
         if not np.isfinite(lwa):
-            raise ValueError(
+            msg = (
                 "declare() needs a finite A-weighted sound power level; supply "
                 "'frequencies' to sound_power_pressure(...) so LWA is defined."
             )
+            raise ValueError(msg)
         k = float(self.uncertainty if uncertainty is None else uncertainty)
         return NoiseEmissionDeclaration(
             modes=(
@@ -439,10 +439,11 @@ def _require_room_pair(
     if (first is None) == (second is None):
         return
     missing = second_name if second is None else first_name
-    raise ValueError(
+    msg = (
         f"{first_name} and {second_name} must be given together "
         f"({equation}); '{missing}' is missing."
     )
+    raise ValueError(msg)
 
 
 def _room_absorption_area(
@@ -476,14 +477,14 @@ def _room_absorption_area(
     if reverberation_time is not None and volume is not None:
         t = np.asarray(reverberation_time, dtype=np.float64)
         if volume <= 0 or np.any(t <= 0.0):
-            raise ValueError("reverberation_time and volume must be > 0.")
+            msg = "reverberation_time and volume must be > 0."
+            raise ValueError(msg)
         return 0.16 * volume / t
     if mean_absorption_coefficient is not None and room_surface is not None:
         alpha = np.asarray(mean_absorption_coefficient, dtype=np.float64)
         if room_surface <= 0 or np.any(alpha <= 0.0) or np.any(alpha > 1.0):
-            raise ValueError(
-                "mean_absorption_coefficient must be in (0, 1] and room_surface > 0."
-            )
+            msg = "mean_absorption_coefficient must be in (0, 1] and room_surface > 0."
+            raise ValueError(msg)
         return alpha * room_surface
     return None
 
@@ -535,7 +536,8 @@ def environmental_correction(
             return 0.0  # no room data at all: the field is treated as free
     a = np.asarray(absorption_area, dtype=np.float64)
     if np.any(a <= 0.0):
-        raise ValueError("absorption_area must be positive.")
+        msg = "absorption_area must be positive."
+        raise ValueError(msg)
     k2 = 10.0 * np.log10(1.0 + 4.0 * surface_area / a)
     return as_float_or_array(k2)
 
@@ -563,11 +565,12 @@ def _hemisphere_position_table(
     if reflecting_planes == 2:  # positions 14,15,18 of Table B.2
         return _TABLE_B2, (13, 14, 17)
     # positions 14,21,22 of Table B.2 (extended array not transcribed)
-    raise NotImplementedError(
+    msg = (
         "Survey coordinates for a source adjacent to three reflecting "
         "planes require the extended ISO 3746:2010 Table B.2 positions "
         "21 and 22 (see Figure B.4)."
     )
+    raise NotImplementedError(msg)
 
 
 def measurement_positions(
@@ -596,15 +599,18 @@ def measurement_positions(
     :return: ``(N, 3)`` microphone coordinates, in metres.
     """
     if surface != "hemisphere":
-        raise ValueError(
+        msg = (
             "measurement_positions provides coordinates for 'hemisphere' only; "
             "parallelepiped positions are defined by area subdivision "
             "(ISO 3744:2010 Annex C)."
         )
+        raise ValueError(msg)
     if radius <= 0:
-        raise ValueError("A positive 'radius' is required for a hemisphere.")
+        msg = "A positive 'radius' is required for a hemisphere."
+        raise ValueError(msg)
     if reflecting_planes not in (1, 2, 3):
-        raise ValueError("'reflecting_planes' must be 1, 2 or 3.")
+        msg = "'reflecting_planes' must be 1, 2 or 3."
+        raise ValueError(msg)
     grade = _check_grade(grade)
     table, index = _hemisphere_position_table(grade, reflecting_planes, tones)
     return np.asarray(table[list(index)] * radius, dtype=np.float64)
@@ -654,23 +660,25 @@ def _measurement_surface(
     """
     if surface == "hemisphere":
         if radius is None or radius <= 0:
-            raise ValueError("A positive 'radius' is required for a hemisphere.")
+            msg = "A positive 'radius' is required for a hemisphere."
+            raise ValueError(msg)
         return (
             _hemisphere_area(radius, reflecting_planes),
             _MIN_HEMI_POSITIONS[grade][reflecting_planes],
         )
     if surface == "box":
         if dimensions is None or distance is None:
-            raise ValueError("'dimensions' and 'distance' are required for a box.")
+            msg = "'dimensions' and 'distance' are required for a box."
+            raise ValueError(msg)
         if len(dimensions) != 3 or any(v <= 0 for v in dimensions) or distance <= 0:
-            raise ValueError(
-                "'dimensions' must be 3 positive values and 'distance' > 0."
-            )
+            msg = "'dimensions' must be 3 positive values and 'distance' > 0."
+            raise ValueError(msg)
         return (
             _box_area(dimensions, distance, reflecting_planes),
             _MIN_BOX_POSITIONS[grade],
         )
-    raise ValueError("'surface' must be 'hemisphere' or 'box'.")
+    msg = "'surface' must be 'hemisphere' or 'box'."
+    raise ValueError(msg)
 
 
 def _surface_background_correction(
@@ -699,11 +707,12 @@ def _surface_background_correction(
     if bg.shape == (1, n_bands) and n_positions != 1:
         bg = np.broadcast_to(bg, (n_positions, n_bands))
     if bg.shape != levels.shape:
-        raise ValueError(
+        msg = (
             "'background_levels' must match 'levels_positions' shape, or be "
             "a single spectrum of shape (NB,) or (1, NB) broadcast to all "
             "positions."
         )
+        raise ValueError(msg)
     return background_noise_correction(mean_level, energy_mean(bg, axis=0), grade)
 
 
@@ -732,10 +741,11 @@ def _surface_environmental_correction(
     )
     k2_arr = np.atleast_1d(np.asarray(k2_value, dtype=np.float64))
     if k2_arr.shape not in ((1,), (n_bands,)):
-        raise ValueError(
+        msg = (
             "per-band environmental inputs (absorption_area / reverberation_time"
             " / mean_absorption_coefficient) must match the number of bands."
         )
+        raise ValueError(msg)
     if np.any(k2_arr > _K2_LIMIT[grade]):
         warnings.warn(
             f"K2 up to {float(np.max(k2_arr)):.1f} dB exceeds the {grade} "
@@ -767,7 +777,8 @@ def _a_weighted_total(
         return None, (float(lw[0]) if n_bands == 1 else float("nan"))
     freqs = np.asarray(frequencies, dtype=np.float64)
     if freqs.shape[0] != n_bands:
-        raise ValueError("'frequencies' length must match the number of bands.")
+        msg = "'frequencies' length must match the number of bands."
+        raise ValueError(msg)
     return freqs, energy_sum(lw + _a_weighting_corrections(freqs))
 
 
@@ -823,22 +834,25 @@ def sound_power_pressure(
     grade = _check_grade(grade)
     levels = np.atleast_2d(np.asarray(levels_positions, dtype=np.float64))
     if levels.ndim != 2:
-        raise ValueError("'levels_positions' must be a 2D (positions, bands) array.")
+        msg = "'levels_positions' must be a 2D (positions, bands) array."
+        raise ValueError(msg)
     n_positions = levels.shape[0]
 
     # --- measurement surface area -----------------------------------------
     if reflecting_planes not in (1, 2, 3):
-        raise ValueError("'reflecting_planes' must be 1, 2 or 3.")
+        msg = "'reflecting_planes' must be 1, 2 or 3."
+        raise ValueError(msg)
     area, min_positions = _measurement_surface(
         surface, radius, dimensions, distance, reflecting_planes, grade
     )
 
     if n_positions < min_positions:
-        raise ValueError(
+        msg = (
             f"{grade} {surface} with {reflecting_planes} reflecting plane(s) "
             f"requires at least {min_positions} microphone positions, got "
             f"{n_positions} (ISO 3744/3746:2010 clause 8)."
         )
+        raise ValueError(msg)
 
     # --- energy average and background correction K1 ----------------------
     mean_level = energy_mean(levels, axis=0)

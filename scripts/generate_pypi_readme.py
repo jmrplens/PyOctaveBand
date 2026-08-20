@@ -124,10 +124,11 @@ def pypi_readme(readme: str, tag: str) -> str:
     def collapse(match: re.Match[str]) -> str:
         imgs = _IMG.findall(match.group(0))
         if len(imgs) != 1:
-            raise ValueError(
+            msg = (
                 "expected exactly one <img> fallback inside each <picture> "
                 "element of README.md"
             )
+            raise ValueError(msg)
         img = imgs[0].replace(' loading="lazy"', "")
         swapped = re.sub(r'(src="[^"]+)\.gif"', r'\1_poster.jpg"', img)
         if swapped != img:

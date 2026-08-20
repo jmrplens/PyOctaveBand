@@ -138,9 +138,8 @@ def audiogram_parameters(
             if key == "LF"
             else ""
         )
-        raise ValueError(
-            f"'group' must be one of {AUDIOGRAM_GROUPS}, got {group!r}.{extra}"
-        )
+        msg = f"'group' must be one of {AUDIOGRAM_GROUPS}, got {group!r}.{extra}"
+        raise ValueError(msg)
     return table[key]
 
 
@@ -184,9 +183,11 @@ def _frequency_khz(
 ) -> NDArray[np.float64]:
     f = np.atleast_1d(np.asarray(frequency_hz, dtype=np.float64))
     if f.size == 0 or not np.all(np.isfinite(f)):
-        raise ValueError("'frequency_hz' must be finite and non-empty.")
+        msg = "'frequency_hz' must be finite and non-empty."
+        raise ValueError(msg)
     if np.any(f <= 0.0):
-        raise ValueError("'frequency_hz' must be strictly positive.")
+        msg = "'frequency_hz' must be strictly positive."
+        raise ValueError(msg)
     return f / 1000.0
 
 
@@ -271,10 +272,11 @@ def orca_audiogram(
     # A relative slack of 1e-9 keeps a grid built on the exact end points (e.g.
     # np.logspace) from tripping on floating-point representation error.
     if np.any(f_khz < lo * (1.0 - 1e-9)) or np.any(f_khz > hi * (1.0 + 1e-9)):
-        raise ValueError(
+        msg = (
             f"'frequency_hz' must lie within {lo * 1e3:g}-{hi * 1e3:g} Hz,"
             " the range over which Equation (11.159) is fitted."
         )
+        raise ValueError(msg)
     b1, b2 = _ORCA_BREAKS
     threshold = np.where(
         f_khz < b1,
