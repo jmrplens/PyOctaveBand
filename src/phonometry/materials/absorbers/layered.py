@@ -69,6 +69,23 @@ if TYPE_CHECKING:
 
     from ..._internal.types import Real
 
+#: Discriminator tag of the term tuples built by :func:`_layer_terms`: a
+#: fluid term carries ``(Zx, kx d)`` and takes the fluid-layer branch of the
+#: admittance recursion and of the chain matrix; any other tag is a series
+#: sheet transfer impedance.
+_FLUID = "fluid"
+
+#: Minimum accepted Gauss-Legendre quadrature order for the Paris-integral
+#: evaluation of :func:`diffuse_field_absorption`.
+_MIN_QUADRATURE_POINTS = 2
+
+#: ``|Im(1/z)| = |g2|`` below which :func:`statistical_absorption` replaces
+#: Mechel's arctan term, which cancels catastrophically as ``g2 -> 0``, with
+#: its exact ``g2 -> 0`` series limit: the limit's ``O(g2^2)`` truncation
+#: error is far below double precision at this threshold, while the direct
+#: form is stable for every larger ``|g2|`` (see the comment at the use site).
+_NEAR_REAL_EPS = 1e-30
+
 __all__ = [
     "AirLayer",
     "DiffuseFieldAbsorptionResult",
@@ -390,11 +407,11 @@ def _layer_terms(
             if d > 0.0:
                 zc = np.full(f.shape, rc, dtype=np.complex128)
                 k = np.asarray(k0, dtype=np.complex128)
-                terms.append(("fluid", *_fluid_layer_terms(zc, k, d, k0_sin2)))
+                terms.append((_FLUID, *_fluid_layer_terms(zc, k, d, k0_sin2)))
         elif isinstance(layer, PorousLayer):
             term = _porous_layer_term(layer, f, k0_sin2)
             if term is not None:
-                terms.append(("fluid", *term))
+                terms.append((_FLUID, *term))
         else:
             z = _sheet_impedance(
                 layer,
@@ -472,7 +489,7 @@ def _surface_admittance(
     Stable: ``tan`` saturates where the chain-matrix entries would overflow.
     """
     for kind, a, b in reversed(terms):
-        if kind == "fluid":
+        if kind == _FLUID:
             zx, kxd = a, b
             t = np.tan(kxd)
             g = (g + 1j * t / zx) / (1.0 + 1j * zx * t * g)
@@ -492,7 +509,7 @@ def _chain_matrix(terms: list[tuple[str, Complex, Complex]], f: Real) -> Complex
     t11, t12, t21, t22 = ones, zeros, zeros, ones
     with np.errstate(over="ignore", invalid="ignore"):
         for kind, a, b in terms:
-            if kind == "fluid":
+            if kind == _FLUID:
                 zx, kxd = a, b
                 cos_l, sin_l = np.cos(kxd), np.sin(kxd)
                 m = (cos_l, 1j * zx * sin_l, 1j * sin_l / zx, cos_l)
@@ -539,7 +556,7 @@ def _split_fluid_run(
     :raises ValueError: when the run would need more than *limit* blocks.
     """
     losses = [
-        float(np.max(np.abs(np.imag(b)))) if kind == "fluid" else 0.0
+        float(np.max(np.abs(np.imag(b)))) if kind == _FLUID else 0.0
         for kind, _, b in terms
     ]
     attenuation = sum(losses)
@@ -826,7 +843,7 @@ def diffuse_field_absorption(
         msg = "'angle_limit' must satisfy 0 < angle_limit <= pi/2."
         raise ValueError(msg)
     n = int(quadrature_points)
-    if n < 2:
+    if n < _MIN_QUADRATURE_POINTS:
         msg = "'quadrature_points' must be at least 2."
         raise ValueError(msg)
     nodes, weights = np.polynomial.legendre.leggauss(n)
@@ -913,7 +930,7 @@ def statistical_absorption(
     # threshold, while the direct form is stable for every larger |g2|.
     a = 1.0 + g1
     b = g1 + cos_t
-    near_real = np.abs(g2) < 1e-30
+    near_real = np.abs(g2) < _NEAR_REAL_EPS
     g2_safe = np.where(near_real, 1.0, g2)
     atan_term = np.where(
         near_real,

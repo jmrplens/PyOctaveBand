@@ -198,6 +198,8 @@ class ReportMetadata:
         "source_relative_humidity",
         "receiving_relative_humidity",
     )
+    #: Upper bound of the relative-humidity percentage scale (saturation).
+    _MAX_RELATIVE_HUMIDITY_PERCENT = 100.0
 
     def _require(
         self, name: str, ok: Callable[[float], bool], description: str
@@ -226,7 +228,9 @@ class ReportMetadata:
         for name in self._HUMIDITY_FIELDS:
             self._require(
                 name,
-                lambda x: math.isfinite(x) and 0.0 <= x <= 100.0,
+                lambda x: (
+                    math.isfinite(x) and 0.0 <= x <= self._MAX_RELATIVE_HUMIDITY_PERCENT
+                ),
                 "a relative humidity in 0..100 %",
             )
         for name in self._POSITIVE_INT_FIELDS:

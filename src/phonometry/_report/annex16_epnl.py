@@ -59,6 +59,12 @@ if TYPE_CHECKING:
     from ..aircraft.certification import EPNLResult
     from .metadata import ReportMetadata
 
+#: Floating-point slack in dB for quantities Annex 16 reads "to one decimal
+#: place": eight orders of magnitude below the 0.1 display step. Below it a
+#: bandsharing adjustment is display-zero (its row is omitted), and an EPNL
+#: exactly at the certification limit still passes despite binary round-off.
+_DB_EPS = 1e-9
+
 
 def _metadata_pairs(
     metadata: ReportMetadata, language: str = "en"
@@ -101,7 +107,7 @@ def _metric_rows(result: EPNLResult, language: str = "en") -> list[tuple[str, st
             f"{k_first + 1}&#8211;{k_last + 1}",
         ),
     ]
-    if abs(result.bandsharing_adjustment) > 1e-9:
+    if abs(result.bandsharing_adjustment) > _DB_EPS:
         rows.append(
             (
                 t("Bandsharing adjustment [dB]", language),
@@ -136,7 +142,7 @@ def _verdict_rows(
     """
     epnl = display_round(result.epnl)
     margin = limit - epnl
-    status = "pass" if epnl <= limit + 1e-9 else "fail"
+    status = "pass" if epnl <= limit + _DB_EPS else "fail"
     return [
         (
             t("EPNL [EPNdB]", language),

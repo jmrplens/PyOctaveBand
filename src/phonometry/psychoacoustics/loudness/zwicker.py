@@ -66,6 +66,11 @@ _FS_REF = 48000
 _SR_LEVEL = 2000
 # Output sampling rate of the total loudness vs. time (clause 6.5).
 _SR_LOUDNESS = 500
+# Cap on the reduced polyphase resampling factors (up and down) accepted
+# when converting the caller's sampling rate to _FS_REF; above it the
+# ratio is declared impractical and the caller is told to resample to a
+# standard rate first (a guard of this implementation, not of the standard).
+_MAX_RESAMPLE_FACTOR = 1000
 
 _N_BANDS = 28  # one-third-octave bands, 25 Hz .. 12.5 kHz
 _N_LCB_BANDS = 11  # bands 25 Hz .. 250 Hz grouped into critical bands
@@ -81,6 +86,11 @@ _LP_ITER = 24
 _T_SHORT = 0.005
 _T_LONG = 0.015
 _T_VAR = 0.075
+# Equality tolerance of the nonlinear decay state machine (clause 6.3):
+# once a decaying input has been ruled out, an input exceeding the
+# previous output by less than this is treated as equal, selecting the
+# "steady input" branch, as in the Annex A.4 reference implementation.
+_STEADY_INPUT_TOLERANCE = 1e-5
 
 # Python-list copies of the Table A.8/A.9 data for the sequential slope
 # state machine (scalar float access is much faster than numpy indexing).
@@ -410,7 +420,7 @@ def _nl_lp_step(
             uo = uo_last * b[4]
             uo = max(uo, ui)
             u2 = uo
-    elif abs(ui - uo_last) < 1e-5:  # steady input
+    elif abs(ui - uo_last) < _STEADY_INPUT_TOLERANCE:  # steady input
         uo = ui
         u2 = (u2_last - ui) * b[5] + ui if uo > u2_last else ui
     else:  # rising input: output follows immediately
@@ -685,7 +695,7 @@ def _percentile(values: np.ndarray, percentile: int) -> float:
     n = ordered.size
     if percentile == 0:
         return float(ordered[-1])
-    if percentile == 100:
+    if percentile == 100:  # noqa: PLR2004
         return float(ordered[0])
     k = int((1.0 - percentile / 100.0) * n)
     k = min(max(k, 1), n - 1)
@@ -856,7 +866,7 @@ def loudness_zwicker(
     if fs_int != _FS_REF:
         gcd = math.gcd(_FS_REF, fs_int)
         up, down = _FS_REF // gcd, fs_int // gcd
-        if max(up, down) > 1000:
+        if max(up, down) > _MAX_RESAMPLE_FACTOR:
             msg = (
                 f"Sampling rate {fs_int} Hz needs an impractical resampling "
                 f"ratio ({up}/{down}) to reach 48000 Hz; resample the signal "

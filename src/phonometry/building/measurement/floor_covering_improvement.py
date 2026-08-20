@@ -372,7 +372,7 @@ def impact_improvement(
         limited_pos = lim0 | lim1
 
     delta_per_position = l0 - l1  # Formula (3)
-    if delta_per_position.ndim == 2:
+    if delta_per_position.ndim == 2:  # noqa: PLR2004
         improvement = delta_per_position.mean(axis=0)  # Formula (4)
         limited = np.any(limited_pos, axis=0)
     else:

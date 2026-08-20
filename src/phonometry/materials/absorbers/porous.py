@@ -122,6 +122,11 @@ DELANY_BAZLEY_COEFFICIENTS: Mapping[str, tuple[float, ...]] = {
     "wu": (0.212, 0.455, 0.105, 0.607, 0.163, 0.592, 0.188, 0.544),
 }
 
+#: Count of Delany-Bazley power-law coefficients ``C1..C8`` an explicit
+#: ``coefficients`` tuple must supply: four for ``Zc`` and four for ``k``
+#: (Mechel 2e Sect. G.11 Eqs. (1)-(2)), the length of the preset tuples above.
+_DELANY_BAZLEY_COEFFICIENT_COUNT = 8
+
 #: Stated validity range of the Delany-Bazley regression in ``X = rho f/sigma``
 #: (Hopkins Eq. (1.174); Cox & D'Antonio Sect. 6.5.1).
 DELANY_BAZLEY_VALIDITY = (0.01, 1.0)
@@ -353,7 +358,7 @@ def delany_bazley(
     else:
         coeffs = tuple(float(v) for v in coefficients)
         model = "delany_bazley[custom]"
-    if len(coeffs) != 8:
+    if len(coeffs) != _DELANY_BAZLEY_COEFFICIENT_COUNT:
         msg = "'coefficients' must provide exactly 8 values C1..C8."
         raise ValueError(msg)
     c1, c2, c3, c4, c5, c6, c7, c8 = coeffs

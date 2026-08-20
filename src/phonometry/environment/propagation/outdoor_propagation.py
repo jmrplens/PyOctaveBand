@@ -79,6 +79,10 @@ DEFAULT_FREQUENCIES: tuple[float, ...] = (
 _DZ_LIMIT_SINGLE = 20.0
 #: Barrier attenuation limit for double diffraction (clause 7.4), in dB.
 _DZ_LIMIT_DOUBLE = 25.0
+#: The nominal 63 Hz octave band, lowest row of ISO 9613-2:1996 Table 3: at (or
+#: below, after nominal snapping) it As/Ar is the constant -1.5 dB (Table 3,
+#: col. 2) and the middle-region term is Am = -3q (Table 3, note 2), in hertz.
+_LOWEST_NOMINAL_BAND = 63.0
 
 _NOMINAL_BANDS = np.array(DEFAULT_FREQUENCIES, dtype=np.float64)
 
@@ -469,7 +473,7 @@ def _nearest_nominal(freq: float) -> float:
 
 def _region_attenuation(nominal: float, g: float, h: float, dp: float) -> float:
     """As or Ar contribution for one band (ISO 9613-2:1996, Table 3, col. 2)."""
-    if nominal <= 63.0:
+    if nominal <= _LOWEST_NOMINAL_BAND:
         return -1.5
     if nominal in _PRIME_BY_BAND:
         return -1.5 + g * _PRIME_BY_BAND[nominal](h, dp)
@@ -550,7 +554,11 @@ def ground_attenuation(
         nominal = _nearest_nominal(float(f))
         a_s = _region_attenuation(nominal, ground_source, source_height, dp)
         a_r = _region_attenuation(nominal, ground_receiver, receiver_height, dp)
-        a_m = -3.0 * q if nominal <= 63.0 else -3.0 * q * (1.0 - ground_middle)
+        a_m = (
+            -3.0 * q
+            if nominal <= _LOWEST_NOMINAL_BAND
+            else -3.0 * q * (1.0 - ground_middle)
+        )
         out[i] = a_s + a_r + a_m
     return out
 

@@ -25,21 +25,27 @@ if TYPE_CHECKING:
 
 _DZ = 0.1  # Bark step of the ISO 532-1 specific-loudness pattern
 _Z = np.arange(1, 241) * _DZ  # Bark bin centers (0.1 .. 24.0), reference convention
+_G_DIN_KNEE_BARK = 15.8  # DIN 45692 Eq. (1) g(z) knee: unity below it
+_G_BISMARCK_KNEE_BARK = 15.0  # Annex B von Bismarck g(z) knee: unity below it
+# DIN 45692 clause 5.2 range for the derived normalization constant k:
+# _K_DIN_MIN inclusive, _K_DIN_MAX exclusive.
+_K_DIN_MIN = 0.105
+_K_DIN_MAX = 0.115
 
 
 def _g_din(z: np.ndarray) -> np.ndarray:
     """DIN 45692 Eq. (1) weighting: 1 up to 15.8 Bark, rising beyond."""
     g = np.ones_like(z)
-    high = z > 15.8
-    g[high] = 0.15 * np.exp(0.42 * (z[high] - 15.8)) + 0.85
+    high = z > _G_DIN_KNEE_BARK
+    g[high] = 0.15 * np.exp(0.42 * (z[high] - _G_DIN_KNEE_BARK)) + 0.85
     return g
 
 
 def _g_bismarck(z: np.ndarray) -> np.ndarray:
     """DIN 45692 Annex B (informative), von Bismarck weighting."""
     g = np.ones_like(z)
-    high = z > 15.0
-    g[high] = 0.2 * np.exp(0.308 * (z[high] - 15.0)) + 0.8
+    high = z > _G_BISMARCK_KNEE_BARK
+    g[high] = 0.2 * np.exp(0.308 * (z[high] - _G_BISMARCK_KNEE_BARK)) + 0.8
     return g
 
 
@@ -116,7 +122,7 @@ def _k_din() -> float:
     global _K_DIN
     if _K_DIN is None:
         _K_DIN = 1.0 / _moment(_reference_specific(), "din")
-        if not 0.105 <= _K_DIN < 0.115:  # pragma: no cover - sanity guard
+        if not _K_DIN_MIN <= _K_DIN < _K_DIN_MAX:  # pragma: no cover - sanity guard
             msg = f"k={_K_DIN} outside the DIN 45692 range"
             raise RuntimeError(msg)
     return _K_DIN

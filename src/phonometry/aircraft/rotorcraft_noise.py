@@ -78,6 +78,25 @@ if TYPE_CHECKING:
 #: Standard acceleration of gravity, in m/s² (Eq. 20).
 _G0 = 9.80665
 
+#: Slack, in fractions of one grid cell, by which ``(stop - start) / step`` may
+#: miss a whole number and the step still count as dividing the hemisphere span
+#: evenly in ``_grid_axis``.
+_GRID_DIVISIBILITY_TOL = 1e-9
+
+#: Distance in the normalised (V̄, γ̄) plane below which the query lies on a
+#: database flight condition and adopts that hemisphere alone, keeping the
+#: 1/δ inverse-distance weights of Eq. 7/8 away from a zero divisor.
+_CONDITION_MATCH_TOL = 1e-12
+
+#: Slack on the barycentric coordinates so a query lying on a lookup-table
+#: triangle's edge or vertex still counts as enveloped by that triangle.
+_BARYCENTRIC_TOL = -1e-9
+
+#: Horizontal source-receiver span, in metres, at or below which the vertical
+#: terrain section degenerates (receiver under the source) and the plain
+#: flat-ground effect replaces the sampled section and screening chain.
+_MIN_SECTION_SPAN = 1e-6
+
 
 @dataclass(frozen=True)
 class RotorcraftHemisphere:
@@ -312,7 +331,7 @@ def _grid_axis(
     """A regular node axis from ``start`` to ``stop``; ``step`` must divide it."""
     s = require_positive(step, name)
     n = round((stop - start) / s)
-    if n < 1 or abs((stop - start) / s - n) > 1e-9:
+    if n < 1 or abs((stop - start) / s - n) > _GRID_DIVISIBILITY_TOL:
         msg = f"'{name}' must divide the {stop - start:g} degree span evenly."
         raise ValueError(msg)
     return np.linspace(start, stop, n + 1)
@@ -401,13 +420,13 @@ def hover_ring_hemisphere(
     freqs = require_positive_array(frequencies, "frequencies")
     brg = np.atleast_1d(np.asarray(bearings, dtype=np.float64))
     lv = np.asarray(levels, dtype=np.float64)
-    if brg.ndim != 1 or brg.size < 2:
+    if brg.ndim != 1 or brg.size < 2:  # noqa: PLR2004
         msg = "'bearings' must be 1-D with at least two ring directions."
         raise ValueError(msg)
     if not np.all(np.isfinite(brg)) or np.any(np.diff(brg) <= 0.0):
         msg = "'bearings' must be finite and strictly increasing."
         raise ValueError(msg)
-    if brg[0] < -180.0 or brg[-1] > 180.0:
+    if brg[0] < -180.0 or brg[-1] > 180.0:  # noqa: PLR2004
         msg = "'bearings' must lie within [-180, 180] degrees."
         raise ValueError(msg)
     if lv.shape != (brg.size, freqs.size):
@@ -585,7 +604,7 @@ def flight_condition_weights(
     delta = np.hypot(vn - qv, gn - qg)
 
     exact = int(np.argmin(delta))
-    if delta[exact] < 1e-12:  # on a database condition
+    if delta[exact] < _CONDITION_MATCH_TOL:  # on a database condition
         return [(exact, 1.0)]
 
     simplex = _enveloping_simplex(pts, q, v.size, triangles)
@@ -626,7 +645,7 @@ def _simplex_from_table(
 ) -> NDArray[np.intp] | None:
     """The first triangle of a lookup table enveloping ``q``, or ``None``."""
     tri = np.asarray(triangles, dtype=np.intp)
-    if tri.ndim != 2 or tri.shape[1] != 3 or tri.size == 0:
+    if tri.ndim != 2 or tri.shape[1] != 3 or tri.size == 0:  # noqa: PLR2004
         msg = "'triangles' must have shape (T, 3)."
         raise ValueError(msg)
     if tri.min() < 0 or tri.max() >= n:
@@ -639,7 +658,11 @@ def _simplex_from_table(
             lam = np.linalg.solve(m, q - p0)
         except np.linalg.LinAlgError:  # degenerate triangle
             continue
-        if lam[0] >= -1e-9 and lam[1] >= -1e-9 and lam.sum() <= 1.0 + 1e-9:
+        if (
+            lam[0] >= _BARYCENTRIC_TOL
+            and lam[1] >= _BARYCENTRIC_TOL
+            and lam.sum() <= 1.0 + 1e-9
+        ):
             return np.asarray(row, dtype=np.intp)
     return None
 
@@ -1001,7 +1024,7 @@ def _validated_track(
     """The validated ``(times, positions)`` track arrays."""
     t = np.asarray(times, dtype=np.float64)
     p = np.asarray(positions, dtype=np.float64)
-    if t.ndim != 1 or t.size < 2:
+    if t.ndim != 1 or t.size < 2:  # noqa: PLR2004
         msg = "'times' must be 1-D with at least two points."
         raise ValueError(msg)
     if p.shape != (t.size, 3):
@@ -1350,15 +1373,15 @@ def _validated_terrain(
     """The validated ``(x, y, z)`` digital elevation model, or ``None``."""
     if terrain is None:
         return None
-    if len(terrain) != 3:
+    if len(terrain) != 3:  # noqa: PLR2004
         msg = "'terrain' must be an (x, y, z) elevation model."
         raise ValueError(msg)
     tx = np.asarray(terrain[0], dtype=np.float64).ravel()
     ty = np.asarray(terrain[1], dtype=np.float64).ravel()
     tz = np.asarray(terrain[2], dtype=np.float64)
     if (
-        tx.size < 2
-        or ty.size < 2
+        tx.size < 2  # noqa: PLR2004
+        or ty.size < 2  # noqa: PLR2004
         or np.any(np.diff(tx) <= 0)
         or np.any(np.diff(ty) <= 0)
     ):
@@ -1505,7 +1528,7 @@ def _terrain_adjustments(
         py = sy + (receivers[i, 1] - sy) * t
         pz = _dem_height(dem, px, py)
         d = span * t
-        if span <= 1e-6:  # receiver under the source
+        if span <= _MIN_SECTION_SPAN:  # receiver under the source
             hs = sz - float(pz[0])
             out[i] = _ground_effect(
                 freqs, hs, setup.receiver_height, np.asarray([0.0]), sigma
@@ -1695,7 +1718,7 @@ def rotorcraft_event_level(
         interpolation=interpolation,
     )
     rx = np.asarray(receiver, dtype=np.float64).ravel()
-    if rx.size != 2 or not np.all(np.isfinite(rx)):
+    if rx.size != 2 or not np.all(np.isfinite(rx)):  # noqa: PLR2004
         msg = "'receiver' must be a finite (x, y) ground position."
         raise ValueError(msg)
     if not (np.isscalar(setup.sigma) and np.isscalar(setup.ground_elevation)):
@@ -1816,8 +1839,8 @@ def rotorcraft_noise_contour(
     gx = np.asarray(x, dtype=np.float64).ravel()
     gy = np.asarray(y, dtype=np.float64).ravel()
     if (
-        gx.size < 2
-        or gy.size < 2
+        gx.size < 2  # noqa: PLR2004
+        or gy.size < 2  # noqa: PLR2004
         or not (np.all(np.isfinite(gx)) and np.all(np.isfinite(gy)))
     ):
         msg = "'x' and 'y' must each be finite with at least two grid points."

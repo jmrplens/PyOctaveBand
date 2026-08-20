@@ -91,6 +91,9 @@ __all__ = [
 _DEFAULT_OVERLAP = 0.5
 #: Minimum samples for a spectral estimate.
 _MIN_SAMPLES = 32
+#: Minimum frequency points for fractional-octave smoothing: the
+#: arithmetic-midpoint bin edges need at least two points.
+_MIN_SMOOTHING_POINTS = 2
 
 
 # ---------------------------------------------------------------------------
@@ -876,7 +879,7 @@ def _smoothing_validate(f: NDArray[np.float64], v: NDArray[np.float64]) -> None:
     if f.size != v.size:
         msg = "'frequencies' and 'values' must have the same length."
         raise ValueError(msg)
-    if f.size < 2:
+    if f.size < _MIN_SMOOTHING_POINTS:
         msg = "At least two frequency points are required."
         raise ValueError(msg)
     if not np.all(np.isfinite(f)) or not np.all(np.isfinite(v)):
@@ -984,6 +987,6 @@ def fractional_octave_smoothing(
     pos = f > 0.0
     fp = f[pos]
     out_power = power.copy()
-    if fp.size >= 2:
+    if fp.size >= _MIN_SMOOTHING_POINTS:
         out_power[pos] = _smoothing_window_average(fp, power[pos], frac)
     return _smoothing_from_power(out_power, domain)

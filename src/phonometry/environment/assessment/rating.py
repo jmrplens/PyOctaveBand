@@ -14,6 +14,11 @@ import numpy as np
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+# Absolute tolerance, in hours, on the periods-sum-to-24-h check
+# (ISO 1996-1:2016, 6.5): pure FP-accumulation slack, not a quantity
+# from the standard.
+_HOURS_SUM_TOL = 1e-9
+
 
 def composite_rating_level(periods: Iterable[tuple[float, float, float]]) -> float:
     r"""Composite whole-day rating level (ISO 1996-1:2016, 6.5).
@@ -42,7 +47,7 @@ def composite_rating_level(periods: Iterable[tuple[float, float, float]]) -> flo
         msg = "Every period duration must be a positive, finite number."
         raise ValueError(msg)
     total = float(np.sum(hours))
-    if abs(total - 24.0) > 1e-9:
+    if abs(total - 24.0) > _HOURS_SUM_TOL:
         msg = f"Period durations must sum to 24 h; got {total!r}."
         raise ValueError(msg)
     acc = sum(h / 24.0 * 10 ** (0.1 * (level + k)) for level, h, k in periods)

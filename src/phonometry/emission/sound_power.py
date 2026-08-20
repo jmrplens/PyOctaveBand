@@ -556,13 +556,13 @@ def _hemisphere_position_table(
     if grade == "engineering":  # ISO 3744 clause 8.1.1
         if reflecting_planes == 1:  # positions 1-10, Table B.1 (or B.2 broadband)
             return (_TABLE_B1 if tones else _TABLE_B2), tuple(range(10))
-        if reflecting_planes == 2:  # positions 2,3,6,7,9 of Table B.2
+        if reflecting_planes == 2:  # positions 2,3,6,7,9 of Table B.2  # noqa: PLR2004
             return _TABLE_B2, (1, 2, 5, 6, 8)
         return _TABLE_B3, (0, 1, 2)  # positions 1,2,3 of Table B.3
     # survey, ISO 3746 clause 8.2.1
     if reflecting_planes == 1:  # positions 4,5,6,10 of Table B.1
         return _TABLE_B1, (3, 4, 5, 9)
-    if reflecting_planes == 2:  # positions 14,15,18 of Table B.2
+    if reflecting_planes == 2:  # positions 14,15,18 of Table B.2  # noqa: PLR2004
         return _TABLE_B2, (13, 14, 17)
     # positions 14,21,22 of Table B.2 (extended array not transcribed)
     msg = (
@@ -631,7 +631,7 @@ def _box_area(
     if reflecting_planes == 1:  # Eq. 9
         a, b, c = 0.5 * l1 + d, 0.5 * l2 + d, l3 + d
         return 4.0 * (a * b + b * c + c * a)
-    if reflecting_planes == 2:  # Eq. 10 (against a wall)
+    if reflecting_planes == 2:  # Eq. 10 (against a wall)  # noqa: PLR2004
         a, b, c = 0.5 * l2 + 0.5 * d, 0.5 * l1 + d, l3 + d
         return 2.0 * (2.0 * a * b + b * c + 2.0 * c * a)
     # Eq. 11 (in a corner)
@@ -670,7 +670,7 @@ def _measurement_surface(
         if dimensions is None or distance is None:
             msg = "'dimensions' and 'distance' are required for a box."
             raise ValueError(msg)
-        if len(dimensions) != 3 or any(v <= 0 for v in dimensions) or distance <= 0:
+        if len(dimensions) != 3 or any(v <= 0 for v in dimensions) or distance <= 0:  # noqa: PLR2004
             msg = "'dimensions' must be 3 positive values and 'distance' > 0."
             raise ValueError(msg)
         return (
@@ -833,7 +833,7 @@ def sound_power_pressure(
     """
     grade = _check_grade(grade)
     levels = np.atleast_2d(np.asarray(levels_positions, dtype=np.float64))
-    if levels.ndim != 2:
+    if levels.ndim != 2:  # noqa: PLR2004
         msg = "'levels_positions' must be a 2D (positions, bands) array."
         raise ValueError(msg)
     n_positions = levels.shape[0]

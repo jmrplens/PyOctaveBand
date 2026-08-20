@@ -135,6 +135,7 @@ _N_K = 49  # DFT bins k = 0..48 used for the HSA (Clause 9.1.4)
 _R_S50 = 50.0  # interpolated rate r_s50 (Clause 9.1.11)
 _DZ = 0.5  # critical-band overlap dz (Clause 9.1.13)
 _TRANSIENT = 36  # discard l50 in [0, 35] (Clause 9.1.12/9.1.14)
+_MIN_INTERP_BLOCKS = 2  # fewest block-time knots pchip can interpolate (9.1.11)
 _TAU = 0.75  # smoothing time constant tau (Formula 168) [s]
 
 # Calibration constant c_F (Formula 163, tabulated; adjustable +/- 0.25 %).
@@ -357,7 +358,7 @@ def _analysis_window(env: np.ndarray) -> tuple[int, int] | None:
     if n2 - n_zb + 1 < _MIN_RUN or n2 < _MIN_N2:
         return None
     seg = smoothed[n_zb + _REG_MARGIN : n2 - _REG_MARGIN + 1]
-    if seg.size < 2:  # pragma: no cover - implied by the length checks
+    if seg.size < 2:  # pragma: no cover - implied by the length checks  # noqa: PLR2004
         return None
     # Closed-form least-squares line fit over the uniform grid 0..n-1
     # (equivalent to a first-order polyfit, without the general-purpose
@@ -815,7 +816,7 @@ def _time_dependent(
     t_end = float(block_times[-1])
     n50 = int(np.floor(t_end * _R_S50)) + 1
     grid = np.arange(n50) / _R_S50
-    if block_times.size >= 2:
+    if block_times.size >= _MIN_INTERP_BLOCKS:
         f_est = PchipInterpolator(block_times, a_lz, axis=0)(grid)
     else:  # pragma: no cover - two blocks minimum for nonzero signals
         f_est = np.zeros((n50, _CBF))

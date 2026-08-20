@@ -86,6 +86,10 @@ if TYPE_CHECKING:
 #: Default number of transverse modes kept per axis in the duct series.
 _DUCT_TERMS = 40
 
+#: Minimum modelled absorption coefficient accepted as perfect absorption
+#: at the design point in :func:`critical_coupling_design`.
+_PERFECT_ABSORPTION_THRESHOLD = 0.999
+
 __all__ = [
     "CriticalCouplingResult",
     "HelmholtzResonator",
@@ -874,7 +878,7 @@ def critical_coupling_design(
         sol.success
         and lc_lo <= lc_opt <= lc_hi
         and h_lo <= h_opt <= h_hi
-        and alpha > 0.999
+        and alpha > _PERFECT_ABSORPTION_THRESHOLD
     )
     if not converged:
         warnings.warn(

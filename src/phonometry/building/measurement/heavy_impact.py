@@ -188,6 +188,10 @@ HEAVY_IMPACT_A_WEIGHTING: dict[str, dict[float, float]] = {
 _FORCE_REFERENCE = 1.0
 #: Reference time interval ``Tref`` of Formula (A.1), in seconds.
 _TIME_REFERENCE = 1.0
+#: Minimum force-record length, in samples, for the trapezoidal rule that
+#: evaluates the Formula (A.1) integral: two samples define the first time
+#: interval.
+_MIN_TRAPEZOID_SAMPLES = 2
 #: Reference reverberation time ``T0`` of Formula (5), in seconds.
 _T0 = 0.5
 #: Reference receiving-room volume ``V0`` of Formula (4), in m3 (dwellings).
@@ -369,7 +373,7 @@ def impact_force_exposure_level(
     # calibrate=False: a Signal may carry a digital-to-pascal factor and
     # this record is a force in newtons. See phonometry.io._resolve.
     f = require_finite_array(resolve_samples(force, calibrate=False), "force")
-    if f.size < 2:
+    if f.size < _MIN_TRAPEZOID_SAMPLES:
         msg = "'force' must be a 1-D record of at least two samples."
         raise ValueError(msg)
     fs = require_positive(sample_rate, "sample_rate")

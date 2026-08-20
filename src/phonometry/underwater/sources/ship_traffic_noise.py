@@ -46,6 +46,27 @@ _L_REF_M = 300.0 / 3.28084
 
 _MODELS = ("jomopans-echo", "randi", "wales-heitmeyer")
 
+#: Upper frequency bound, in Hz, of the cargo low-frequency hump in the
+#: JOMOPANS-ECHO reference spectrum: below it, cargo vessel classes switch to
+#: the hump parameter set (K=208, J=2, D_lo, f1=600/V_C).
+_CARGO_HUMP_MAX_HZ = 100.0
+
+#: Crossover frequency, in Hz, between the two branches of the RANDI 3.1
+#: average-ship baseline spectrum: the two-term log10 formula below it, the
+#: 173.2 - 18*log10(f) line at and above it.
+_RANDI_BASELINE_SPLIT_HZ = 500.0
+
+#: Upper edge, in Hz, of the flat region of the RANDI 3.1 frequency-dependent
+#: length-scaling factor d_f, which holds the constant value 8.1 up to this
+#: frequency (the sloped branch 22.3 - 9.77*log10(f) also evaluates to 8.1
+#: here, keeping the piecewise factor continuous).
+_RANDI_DF_PLATEAU_MAX_HZ = 28.4
+
+#: Frequency, in Hz, above which the RANDI 3.1 length-scaling factor d_f is
+#: zero; the point where its sloped branch 22.3 - 9.77*log10(f) reaches 0, so
+#: the factor again stays continuous.
+_RANDI_DF_CUTOFF_HZ = 191.6
+
 #: JOMOPANS-ECHO per-class parameters: ``class -> (V_C [kn], cargo, D_lo, D_hi)``
 #: (Table 1 and sheet *Parameters* of File S1). ``D_lo`` is the damping of the
 #: cargo low-frequency hump; ``D_hi`` the damping of the main spectrum.
@@ -93,7 +114,7 @@ def _jomopans_echo(
     v_c, cargo, d_lo, d_hi = _VESSEL_CLASSES[key]
     v = require_positive(speed_knots, "speed_knots")
     length = require_positive(length_m, "length_m")
-    hump = cargo & (f < 100.0)
+    hump = cargo & (f < _CARGO_HUMP_MAX_HZ)
     k = np.where(hump, 208.0, 191.0)
     j = np.where(hump, 2.0, 0.0)
     d = np.where(hump, d_lo, d_hi)
@@ -117,12 +138,12 @@ def _randi(
     lf = -10.0 * np.log10(
         10.0 ** (-1.06 * np.log10(f) - 14.34) + 10.0 ** (3.32 * np.log10(f) - 21.425)
     )
-    base = np.where(f < 500.0, lf, 173.2 - 18.0 * np.log10(f))
+    base = np.where(f < _RANDI_BASELINE_SPLIT_HZ, lf, 173.2 - 18.0 * np.log10(f))
     d_l = length_ft**1.15 / 3643.0
     d_f = np.where(
-        f <= 28.4,
+        f <= _RANDI_DF_PLATEAU_MAX_HZ,
         8.1,
-        np.where(f <= 191.6, 22.3 - 9.77 * np.log10(f), 0.0),
+        np.where(f <= _RANDI_DF_CUTOFF_HZ, 22.3 - 9.77 * np.log10(f), 0.0),
     )
     psd = (
         base

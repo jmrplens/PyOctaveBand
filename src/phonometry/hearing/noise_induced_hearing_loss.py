@@ -76,6 +76,10 @@ _XY: np.ndarray = np.array(
 
 _HTLAN_DENOM = 120.0  # the compression term denominator of Formula (1).
 
+# Formula (2) covers 10 to 40 years directly; below 10 years Formula (3)
+# extrapolates the median NIPTS from the 10-year value (clause 6.3.1).
+_FORMULA_2_MIN_YEARS = 10.0
+
 #: Exposure durations, in years, the standard validates: Formula (2) covers
 #: 10 to 40 years and Formula (3) is "valid for exposure durations between
 #: 1 year and 10 years"; below 1 year its results "represent an extrapolation"
@@ -348,8 +352,8 @@ def _nipts_components(
     excess2 = np.maximum(l_ex - l0, 0.0) ** 2
     lg_t = math.log10(years)  # lg(t / t0), t0 = 1 year
 
-    n50_10 = (u + v * math.log10(10.0)) * excess2
-    if years >= 10.0:
+    n50_10 = (u + v * math.log10(_FORMULA_2_MIN_YEARS)) * excess2
+    if years >= _FORMULA_2_MIN_YEARS:
         n50 = (u + v * lg_t) * excess2
     else:
         # Formula (3): extrapolate below 10 years from the 10-year value.

@@ -46,6 +46,10 @@ _SPREADING_LAWS = ("spherical", "cylindrical", "practical")
 _ABSORPTION_MODELS = ("francois-garrison", "ainslie-mccolm", "thorp")
 #: Metres per kilometre.
 _M_PER_KM = 1000.0
+#: Francois-Garrison pure-water (A3) coefficient boundary, in degrees Celsius:
+#: the "20 C switch" between the two published A3 cubics (see the note in
+#: _francois_garrison -- they do not meet exactly there).
+_FG_A3_SWITCH_T_C = 20.0
 
 
 def _positive(value: float, name: str) -> float:
@@ -134,7 +138,7 @@ def _francois_garrison(
     # The two published A3 cubics do not meet exactly at the 20 C switch
     # (step of 1e-7*f^2 dB/km, i.e. 0.1 dB/km at 1 MHz, 0.03 % of alpha there);
     # inherent in the Francois-Garrison coefficients -- do not "fix" it.
-    if t <= 20.0:
+    if t <= _FG_A3_SWITCH_T_C:
         a3 = 4.937e-4 - 2.59e-5 * t + 9.11e-7 * t**2 - 1.50e-8 * t**3
     else:
         a3 = 3.964e-4 - 1.146e-5 * t + 1.45e-7 * t**2 - 6.50e-10 * t**3

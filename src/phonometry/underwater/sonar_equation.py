@@ -50,6 +50,10 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
 
+#: Fewest points a range grid may have: two, the least that define a curve
+#: segment between two bracketing samples.
+_MIN_CURVE_POINTS = 2
+
 
 def _finite(value: float, name: str) -> float:
     scalar = float(value)
@@ -307,7 +311,7 @@ def detection_range(
     if rmax <= 1.0:
         msg = "'max_range' must exceed 1 m."
         raise ValueError(msg)
-    if int(n_points) < 2:
+    if int(n_points) < _MIN_CURVE_POINTS:
         msg = "'n_points' must be at least 2."
         raise ValueError(msg)
     options = {
@@ -378,7 +382,7 @@ def detection_range_from_curve(
     if r.shape != pl.shape:
         msg = "'propagation_loss' must have the same length as 'range_m'."
         raise ValueError(msg)
-    if r.size < 2 or np.any(np.diff(r) <= 0.0):
+    if r.size < _MIN_CURVE_POINTS or np.any(np.diff(r) <= 0.0):
         msg = "'range_m' must be strictly increasing with at least two samples."
         raise ValueError(msg)
     key = crossing.strip().lower()

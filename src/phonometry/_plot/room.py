@@ -61,6 +61,14 @@ _REVERBERATION_TIME_LABEL = "Reverberation time $T$ [s]"
 #: Shared legend entry naming the equivalent absorption area of a curve.
 _ABSORPTION_AREA_LABEL = "$A$ = {value} m²"
 
+#: Highest octave band shaded with the +5 dB rumble tolerance in the RC Mark II
+#: plot (ANSI/ASA S12.2 Annex D, clause D.3: at and below 500 Hz).
+_RC_RUMBLE_MAX_HZ = 500.0
+
+#: Lowest octave band shaded with the +3 dB hiss tolerance in the RC Mark II
+#: plot (ANSI/ASA S12.2 Annex D, clause D.3: at and above 1000 Hz).
+_RC_HISS_MIN_HZ = 1000.0
+
 #: Spanish translations of the fixed strings rendered by the room ``.plot()``
 #: renderers, keyed by their verbatim English text.  ``_t`` returns the English
 #: key unchanged for any language other than ``"es"``, so the English output is
@@ -467,8 +475,8 @@ def plot_room_criterion(
         color=_C_MUTED,
         label=f"{_t('Reference RC-', language)}{result.rating}",
     )
-    low = freqs <= 500.0
-    high = freqs >= 1000.0
+    low = freqs <= _RC_RUMBLE_MAX_HZ
+    high = freqs >= _RC_HISS_MIN_HZ
     ax.fill_between(
         freqs[low],
         reference[low],
@@ -787,7 +795,7 @@ def plot_image_source_reflectogram(
     ax = ax if ax is not None else _new_axes()
     times = np.asarray(result.times, dtype=np.float64)
     amp = np.asarray(result.amplitudes, dtype=np.float64)
-    if amp.ndim == 2:
+    if amp.ndim == 2:  # noqa: PLR2004
         amp = amp[0]
     orders = np.asarray(result.orders, dtype=np.int_)
     tiny = np.finfo(np.float64).tiny

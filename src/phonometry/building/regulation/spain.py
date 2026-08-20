@@ -112,6 +112,14 @@ __all__ = [
     "window_size_correction",
 ]
 
+# Floating-point slack on the compliance margin (the signed distance from the
+# DB-HR limit, in the requirement's unit: ``reported - limit`` for a minimum,
+# ``limit - reported`` for a maximum): a margin that is mathematically zero,
+# i.e. the value exactly at the limit after DB-HR's prescribed rounding,
+# counts as compliant and must not be turned into a failure by binary
+# representation error in that subtraction.
+_COMPLIANCE_SLACK = -1e-9
+
 #: The eighteen one-third-octave band centre frequencies of DB-HR Annex A.
 DB_HR_FREQUENCIES: tuple[float, ...] = (
     100.0,
@@ -1153,7 +1161,7 @@ def check_db_hr_requirement(value: float, requirement: DbHrRequirement) -> DbHrC
         value=achieved,
         reported=reported,
         margin=margin,
-        complies=bool(margin >= -1e-9),
+        complies=bool(margin >= _COMPLIANCE_SLACK),
     )
 
 

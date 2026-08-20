@@ -99,6 +99,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- A number in a comparison carries a name. `PLR2004` is selected for `src`,
+  and the 487 magic values it found there were read one at a time before it
+  went on: 380 became named constants, 29 reach an existing symbol that
+  already said it, and 85 lines keep their literal under a `noqa` that says
+  why. The names state the concept rather than the number, so `if
+  len(header) < 4` is `< _BLOCK_HEADER_BYTES` (a FLAC metadata block header
+  is one type byte and three length bytes) and `if nominal >= 1000.0` is
+  `>= _HZ_PER_KHZ`. Where a name would say less than the expression already
+  does, the literal stays: `order == 2` sits under a docstring that says
+  "Product order (2 or 3)", and the transcribed CIEDE2000 formula keeps the
+  180 and 360 degrees its published equations are written with.
+
+  Reading every site found things a rule never would. Absolute zero is in
+  the tree twice, as the exact -273.15 and as the -273.0 that ISO 3741
+  writes into its own `273 + theta` arithmetic; they are now
+  `_ABS_ZERO_C` and `_ROUNDED_ABS_ZERO_C`, deliberately unmergeable. Four
+  modules already spelled the 1 kHz reference `_REFERENCE_FREQUENCY`, so
+  the new ones join them instead of inventing a fifth spelling. The RIFF
+  wire magics now live once in `io/_chunks.py` and are read from there,
+  which closed a duplicate spelling of the bext chunk identifier and a
+  sniffer table that had drifted from the name it was meant to match. A
+  fiche's private frequency-label helper turned out to be byte-identical to
+  `filters.frequencies._format_nominal_freq` and now calls it.
+
+  The strings are not part of this: `PLR2004` exempts `str` and `bytes` by
+  default and stays that way, because a comparison against `"cremer"` or
+  `"es"` is the API's own vocabulary and the literal is the name. Only the
+  format magics among them were named. `tests` and `scripts` are exempt
+  too: the tests compare against printed oracle values, and the figure
+  scripts lay out halves and angles, where a name for every number is noise.
+
 - Every exception message is assigned to a variable and raised by name:
   2148 sites, `msg = ...` then `raise SomethingError(msg)`. What it buys is
   the traceback: the line the interpreter prints for the raise is

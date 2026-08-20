@@ -43,6 +43,9 @@ if TYPE_CHECKING:
 _BAR_PER_MPA = 10.0
 #: kg/cm² per bar (100 kPa = 1.019716 kg/cm²; 1 bar = 100 kPa).
 _KGCM2_PER_BAR = 1.019716
+#: Minimum depth samples in a profile: two points are the floor for a
+#: piecewise-linear profile and for ``np.gradient``'s finite differences.
+_MIN_POLYLINE_NODES = 2
 
 _MODELS = ("unesco", "del_grosso", "mackenzie", "medwin")
 #: Models that take a depth directly instead of a pressure.
@@ -328,7 +331,7 @@ def sound_speed_profile(
     :raises ValueError: If the inputs are invalid.
     """
     z = np.asarray(depths, dtype=np.float64)
-    if z.ndim != 1 or z.size < 2:
+    if z.ndim != 1 or z.size < _MIN_POLYLINE_NODES:
         msg = "'depths' must be a 1-D array of at least two depths."
         raise ValueError(msg)
     if np.any(z < 0.0) or not np.all(np.isfinite(z)):

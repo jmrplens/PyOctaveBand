@@ -72,6 +72,9 @@ _OCTAVE_HALF = float(np.sqrt(2.0))
 _MIN_TROUGH_OCTAVES = 1.0 / 9.0
 #: Level drop, in decibels, defining the effective frequency range (21.2).
 _EFFECTIVE_DROP_DB = 10.0
+#: Minimum number of frequency points a paired (frequencies, values) response
+#: curve must have to constitute a curve at all.
+_MIN_CURVE_POINTS = 2
 
 
 def _as_curve(
@@ -83,7 +86,7 @@ def _as_curve(
     if f.ndim != 1 or v.ndim != 1 or f.shape != v.shape:
         msg = f"'{name}' frequencies and values must be 1-D and equal length."
         raise ValueError(msg)
-    if f.size < 2:
+    if f.size < _MIN_CURVE_POINTS:
         msg = f"'{name}' needs at least two frequency points."
         raise ValueError(msg)
     if np.any(f <= 0.0) or not np.all(np.isfinite(f)):

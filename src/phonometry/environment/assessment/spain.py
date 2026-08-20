@@ -286,6 +286,16 @@ _LEVEL_DIFFERENCE_HIGH = 15.0
 #: Band-centre matching tolerance (fractional) for the ``Kt`` band ranges.
 _BAND_TOLERANCE = 0.06
 
+#: Fewest one-third-octave bands the ``Kt`` procedure (Annex IV A.3.3) can
+#: read: each candidate band is compared against the arithmetic mean of its
+#: two neighbours, so the minimum spectrum is a centre band plus both.
+_MIN_KT_BANDS = 3
+
+#: Absolute floating-point tolerance, in hours, on the Annex IV A.3.4.2 b
+#: requirement that the noise-phase durations sum to the evaluation-period
+#: duration (sum Ti = T).
+_HOURS_SUM_TOL = 1e-9
+
 
 def _finite(value: float, name: str) -> float:
     """Return ``value`` as a float, rejecting non-finite input."""
@@ -405,7 +415,7 @@ def _validate_kt_spectrum(band_levels: np.ndarray, freqs: np.ndarray) -> None:
             f"{band_levels.size} and {freqs.size}."
         )
         raise ValueError(msg)
-    if band_levels.size < 3:
+    if band_levels.size < _MIN_KT_BANDS:
         msg = (
             "At least three one-third-octave bands are needed: the procedure "
             "compares a band against its two neighbours."
@@ -703,7 +713,7 @@ def evaluation_period_level(
         period = total
     else:
         period = _positive(hours, "hours")
-        if abs(total - period) > 1e-9:
+        if abs(total - period) > _HOURS_SUM_TOL:
             msg = (
                 "The phase durations must sum to the period duration "
                 f"(sum Ti = T); got {total!r} h for T = {period!r} h."

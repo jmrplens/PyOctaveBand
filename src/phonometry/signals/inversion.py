@@ -58,6 +58,9 @@ __all__ = [
     "regularized_inverse_filter",
 ]
 
+#: Fewest samples a measured impulse response must have to be inverted.
+_MIN_RESPONSE_SAMPLES = 2
+
 
 @dataclass(frozen=True)
 class InverseFilterResult:
@@ -200,8 +203,8 @@ def _validated_response(response: Any) -> np.ndarray:
     if h.ndim != 1:
         msg = "'response' must be one-dimensional."
         raise ValueError(msg)
-    if h.size < 2:
-        msg = "'response' must have at least 2 samples."
+    if h.size < _MIN_RESPONSE_SAMPLES:
+        msg = f"'response' must have at least {_MIN_RESPONSE_SAMPLES} samples."
         raise ValueError(msg)
     if not np.all(np.isfinite(h)):
         msg = "'response' must be finite."

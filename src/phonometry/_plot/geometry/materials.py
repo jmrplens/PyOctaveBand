@@ -1052,7 +1052,7 @@ def plot_metadiffuser_panel_geometry(
         msg = "'depth' and 'period' must be positive."
         raise ValueError(msg)
     cells = list(wells)
-    if len(cells) < 2:
+    if len(cells) < 2:  # noqa: PLR2004
         msg = "'wells' must contain at least two wells."
         raise ValueError(msg)
     for well in cells:
@@ -1468,6 +1468,13 @@ def plot_dynamic_stiffness_rig(
 # ---------------------------------------------------------------------------
 # Free-field diffusion goniometer (plan view).
 # ---------------------------------------------------------------------------
+#: Half-span of the semicircular receiver arc, in degrees, and so the upper
+#: bound on the receiver angular spacing: the microphones run from -90 to
+#: +90 degrees off the sample normal, and a step within the half-span always
+#: places a receiver on each side of the normal.
+_RECEIVER_ARC_HALF_SPAN_DEG = 90.0
+
+
 def plot_goniometer_geometry(
     ax: Axes | None = None,
     *,
@@ -1498,7 +1505,7 @@ def plot_goniometer_geometry(
     if source_distance <= 0.0 or receiver_radius <= 0.0:
         msg = "'source_distance' and 'receiver_radius' must be positive."
         raise ValueError(msg)
-    if not 0.0 < angular_step <= 90.0:
+    if not 0.0 < angular_step <= _RECEIVER_ARC_HALF_SPAN_DEG:
         msg = "'angular_step' must be in (0, 90] degrees."
         raise ValueError(msg)
     if sample_width <= 0.0:

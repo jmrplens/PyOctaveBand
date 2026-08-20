@@ -83,6 +83,11 @@ _SPEC: dict[str, str] = {
 #: the shared two-panel insulation skeleton).
 _LEFT_CELL_MM = 56.0
 
+#: The band count identifying an octave-band ISO 717-1 rating:
+#: ``band_centers`` carries 5 centres for octave bands versus 16 for
+#: one-third octaves (ISO 717-1:2020 Clause 5.3).
+_N_OCTAVE_BANDS = 5
+
 
 def _qualification_columns(
     fpi: Sequence[float] | np.ndarray | None,
@@ -203,7 +208,7 @@ def render_iso15186_report(
         # from one-third-octave or octave bands; both the plain and the
         # verbose caption declare the set (the verbose one also names the
         # RI,M column).
-        is_octave = np.asarray(rating.band_centers).size == 5
+        is_octave = np.asarray(rating.band_centers).size == _N_OCTAVE_BANDS
         if verbose and modified is not None:
             columns: list[Column] = [
                 (value_header, curve, 1),
@@ -336,7 +341,7 @@ def render_iso15186_element_report(
     # octaves.
     band_set = (
         "Octave-band"
-        if np.asarray(rating.band_centers).size == 5
+        if np.asarray(rating.band_centers).size == _N_OCTAVE_BANDS
         else "One-third-octave"
     )
     extra = _qualification_columns(

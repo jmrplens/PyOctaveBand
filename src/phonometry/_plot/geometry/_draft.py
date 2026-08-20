@@ -40,6 +40,14 @@ _AXIS_Y = "y [m]"
 _AXIS_Z = "z [m]"
 #: Shared legend placement of the geometry drawings.
 _LEGEND_LOC: Final = "upper right"
+#: Tolerance below which a span, offset or label shift counts as zero: a
+#: degenerate dimension is skipped before its unit normal would divide by
+#: zero, and only an offset that actually moves a line or label changes it.
+_EPS: Final = 1e-12
+#: Upper edge (degrees, inclusive) of the half-open band (-90, 90] of label
+#: rotations that read left-to-right; past it a label would render
+#: upside-down, so its rotation is folded back by a half turn.
+_MAX_READABLE_ROTATION: Final = 90.0
 
 
 #: Spanish translations of the fixed strings rendered here, keyed by their
@@ -121,12 +129,12 @@ def _dim(
     b = np.asarray(p2, dtype=np.float64)
     direction = b - a
     length = float(np.hypot(*direction))
-    if length < 1e-12:
+    if length < _EPS:
         return
     normal = np.array([-direction[1], direction[0]]) / length
     ao = a + normal * offset
     bo = b + normal * offset
-    if abs(offset) > 1e-12:
+    if abs(offset) > _EPS:
         _dim_extension_lines(ax, ((a, ao), (b, bo)))
     style = "|-|, widthA=0.4, widthB=0.4" if tight else "<->"
     ax.annotate(
@@ -138,7 +146,7 @@ def _dim(
     )
     mid = (ao + bo) / 2.0
     angle = float(np.degrees(np.arctan2(direction[1], direction[0])))
-    if angle > 90.0 or angle <= -90.0:
+    if angle > _MAX_READABLE_ROTATION or angle <= -_MAX_READABLE_ROTATION:
         angle += 180.0
     shift = normal * (9.0 * label_side)
     ha, va, rotation = _dim_label_anchor(shift, angle, label_upright)
@@ -182,9 +190,9 @@ def _dim_label_anchor(
     if not upright:
         return "center", "center", angle
     ha, va = "center", "center"
-    if abs(shift[0]) > 1e-12:
+    if abs(shift[0]) > _EPS:
         ha = "left" if shift[0] > 0.0 else "right"
-    if abs(shift[1]) > 1e-12:
+    if abs(shift[1]) > _EPS:
         va = "bottom" if shift[1] > 0.0 else "top"
     return ha, va, 0.0
 

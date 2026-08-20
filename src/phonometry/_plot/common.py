@@ -80,6 +80,19 @@ _C_EDGE: Final = "#555555"
 #: Standard-normal quantile of 0.9 (the 10 % / 90 % fractile offset).
 _Z90: Final = 1.2816
 
+#: One kilohertz in hertz: a band centre at or above it is labelled with the
+#: short "k" suffix (1k, 2k) after being scaled down by the same value.
+_HZ_PER_KHZ: Final = 1000.0
+
+#: Half the 1 dB quantum of an integer ISO 717 rating: a gap of at least this
+#: between the rating and the 500 Hz read value means the octave-band -5 dB
+#: reduction (ISO 717-2 Clause 4.3.2) applied, not mere integer rounding.
+_RATING_ROUNDING_HALF_DB: Final = 0.5
+
+#: Minimum in-corridor samples before ``np.polyfit`` degree 1 can define the
+#: least-squares straight line of a Schroeder decay (two points make a line).
+_MIN_LINE_FIT_POINTS: Final = 2
+
 # ---------------------------------------------------------------------------
 # Signed wave-field colormaps: the zero of a diverging field should blend
 # into the page, so the default is picked from the axes background at draw
@@ -91,6 +104,10 @@ _Z90: Final = 1.2816
 _FIELD_CMAP_LIGHT: Final = "RdBu_r"
 #: Diverging wave-field colormap of a dark axes background (black centre).
 _FIELD_CMAP_DARK: Final = "phonometry_field_dark"
+
+#: Midpoint of the 0-1 luminance scale: an axes facecolor whose luminance
+#: falls below it counts as a dark background and gets the dark-centre map.
+_DARK_BACKGROUND_LUMINANCE_MAX: Final = 0.5
 
 
 def _register_field_dark_cmap() -> None:
@@ -135,7 +152,11 @@ def _field_cmap(ax: Axes) -> str:
     _register_field_dark_cmap()
     r, g, b = to_rgb(ax.get_facecolor())
     luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
-    return _FIELD_CMAP_DARK if luminance < 0.5 else _FIELD_CMAP_LIGHT
+    return (
+        _FIELD_CMAP_DARK
+        if luminance < _DARK_BACKGROUND_LUMINANCE_MAX
+        else _FIELD_CMAP_LIGHT
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -155,6 +176,10 @@ _SRGB_TO_XYZ: Final = np.array(
         [0.0193339, 0.1191920, 0.9503041],
     ]
 )
+
+#: sRGB transfer-function threshold (IEC 61966-2-1): encoded channel values at
+#: or below it decode through the linear segment (/ 12.92), not the power law.
+_SRGB_LINEAR_THRESHOLD: Final = 0.04045
 
 #: CIE D65 reference white in XYZ, the sRGB adopted white point.
 _D65_WHITE: Final = np.array([0.95047, 1.00000, 1.08883])
@@ -191,7 +216,9 @@ def _srgb_to_lab(rgb: tuple[float, float, float]) -> tuple[float, float, float]:
     """CIE L*a*b* (D65, 2 degree observer) of a 0-1 sRGB triple."""
     channels = np.asarray(rgb, dtype=np.float64)
     linear = np.where(
-        channels <= 0.04045, channels / 12.92, ((channels + 0.055) / 1.055) ** 2.4
+        channels <= _SRGB_LINEAR_THRESHOLD,
+        channels / 12.92,
+        ((channels + 0.055) / 1.055) ** 2.4,
     )
     ratio = (_SRGB_TO_XYZ @ linear) / _D65_WHITE
     f = np.where(
@@ -242,7 +269,7 @@ def delta_e_2000(
     d_c = cp_2 - cp_1
     if neutral_pair:
         d_h = 0.0
-    elif abs(hp_2 - hp_1) <= 180.0:
+    elif abs(hp_2 - hp_1) <= 180.0:  # noqa: PLR2004
         d_h = hp_2 - hp_1
     else:
         d_h = hp_2 - hp_1 - 360.0 * float(np.sign(hp_2 - hp_1))
@@ -252,9 +279,9 @@ def delta_e_2000(
     c_bar = 0.5 * (cp_1 + cp_2)
     if neutral_pair:
         h_bar = hp_1 + hp_2
-    elif abs(hp_1 - hp_2) <= 180.0:
+    elif abs(hp_1 - hp_2) <= 180.0:  # noqa: PLR2004
         h_bar = 0.5 * (hp_1 + hp_2)
-    elif hp_1 + hp_2 < 360.0:
+    elif hp_1 + hp_2 < 360.0:  # noqa: PLR2004
         h_bar = 0.5 * (hp_1 + hp_2 + 360.0)
     else:
         h_bar = 0.5 * (hp_1 + hp_2 - 360.0)
@@ -402,7 +429,8 @@ def _fill_weight(
 def relative_luminance(color: tuple[float, float, float]) -> float:
     """WCAG 2.2 relative luminance of a 0-1 sRGB triple."""
     linear = [
-        c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in color
+        c / 12.92 if c <= _SRGB_LINEAR_THRESHOLD else ((c + 0.055) / 1.055) ** 2.4
+        for c in color
     ]
     return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
 
@@ -580,7 +608,7 @@ def _format_freq(f: float, language: str = "en") -> str:
     """
     from .._i18n import decimal_comma
 
-    text = f"{f / 1000.0:g}k" if f >= 1000.0 else f"{f:g}"
+    text = f"{f / _HZ_PER_KHZ:g}k" if f >= _HZ_PER_KHZ else f"{f:g}"
     return decimal_comma(text, language)
 
 
@@ -931,7 +959,7 @@ def _annotate_impact_500(
         label=read_label,
     )
     offset = rating - read_value
-    if abs(offset) >= 0.5:  # octave-band -5 dB rule (Clause 4.3.2)
+    if abs(offset) >= _RATING_ROUNDING_HALF_DB:  # octave-band -5 dB rule (Clause 4.3.2)
         rating_str = format_number(rating, language, decimals=0)
         # The sign between the read value and "5 dB" is a subtraction operator,
         # so it is set with the typographic minus, not the ASCII hyphen.
@@ -1068,7 +1096,7 @@ def _fit_segment(
 ) -> np.ndarray | None:
     """Least-squares straight line over ``hi <= level <= lo``, over full time."""
     mask = (level <= lo) & (level >= hi) & np.isfinite(level)
-    if int(np.count_nonzero(mask)) < 2:
+    if int(np.count_nonzero(mask)) < _MIN_LINE_FIT_POINTS:
         return None
     slope, intercept = np.polyfit(time[mask], level[mask], 1)
     return np.asarray(slope * time + intercept, dtype=np.float64)

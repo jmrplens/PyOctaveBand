@@ -285,6 +285,17 @@ _OCTAVE_SLICES: tuple[tuple[int, int], ...] = (
     (21, 24),
 )
 
+#: Minimum character length of the four-digit vehicle descriptor of
+#: Table [2.3.a]: at least one character per digit, since the axle-count
+#: digit may run to more than one character.
+_VEHICLE_DESCRIPTOR_MIN_LENGTH = 4
+#: Exact character length of the six-digit track descriptor of Table [2.3.b],
+#: each digit being exactly one character.
+_TRACK_DESCRIPTOR_LENGTH = 6
+#: The ``height`` selector value meaning source B at 4.0 m, whose vertical
+#: directivity follows (2.3.17); 1 selects source A at 0.5 m per (2.3.16).
+_SOURCE_B = 2
+
 
 # ---------------------------------------------------------------------------
 # Vehicle and track descriptors, Tables [2.3.a] and [2.3.b]
@@ -410,7 +421,7 @@ class VehicleDescriptor:
         :raises ValueError: If the code is not a valid four-digit descriptor.
         """
         text = str(code).strip()
-        if len(text) < 4 or not text[1:-2].isdigit():
+        if len(text) < _VEHICLE_DESCRIPTOR_MIN_LENGTH or not text[1:-2].isdigit():
             msg = (
                 f"{code!r} is not a Table [2.3.a] vehicle descriptor: it must "
                 "read <type><axles><brake><measure>, for example 'a4cn'."
@@ -464,7 +475,7 @@ class TrackDescriptor:
         :raises ValueError: If the code is not a valid six-digit descriptor.
         """
         text = str(code).strip()
-        if len(text) != 6:
+        if len(text) != _TRACK_DESCRIPTOR_LENGTH:
             msg = (
                 f"{code!r} is not a Table [2.3.b] track descriptor: it must "
                 "have exactly six digits, for example 'BMSNNN'."
@@ -2213,7 +2224,7 @@ def vertical_directivity(
     if height not in (1, 2):
         msg = "'height' must be 1 (source A) or 2 (source B)."
         raise ValueError(msg)
-    if height == 2:
+    if height == _SOURCE_B:
         if aerodynamic and angle < 0.0:
             return np.full(len(freqs), 10.0 * np.log10(np.cos(angle) ** 2))
         return np.zeros(len(freqs))

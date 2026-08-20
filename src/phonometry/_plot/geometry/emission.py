@@ -48,6 +48,17 @@ if TYPE_CHECKING:
 
     from ...emission.intensity import IntensityResult
 
+#: Luma threshold above which a point-index chip is light enough to carry
+#: black ink; compared against the chip's BT.601 luma
+#: (0.299 R + 0.587 G + 0.114 B).
+_BLACK_INK_LUMA_MIN = 0.6
+
+#: A position counts as dipping below the reflecting plane at z = 0 (drawing
+#: the full sphere instead of the hemisphere) only when its z is more negative
+#: than this, so floating-point noise on the z = 0 ring of a hemispherical
+#: array does not flip the surface.
+_BELOW_PLANE_Z_EPS = -1e-9
+
 #: Spanish translations of the fixed strings rendered here, keyed by their
 #: verbatim English text. ``_t`` returns the English key unchanged for any
 #: language other than ``"es"``.
@@ -110,7 +121,11 @@ def _number_points(ax: Any, pts: np.ndarray, colours: Any) -> None:
         colours = [colours] * len(pts)
     for index, ((x, y, z), chip) in enumerate(zip(pts, colours, strict=True), start=1):
         red, green, blue = to_rgb(chip)
-        ink = "black" if 0.299 * red + 0.587 * green + 0.114 * blue > 0.6 else "white"
+        ink = (
+            "black"
+            if 0.299 * red + 0.587 * green + 0.114 * blue > _BLACK_INK_LUMA_MIN
+            else "white"
+        )
         # Explicit and above the markers: matplotlib orders 3-D artists by
         # depth, so without this a point in front of its own label clips the
         # digits, which is what the numbers looked like before.
@@ -157,7 +172,7 @@ def plot_microphone_positions(
     """
     _check_language(language)
     pts = np.asarray(positions, dtype=np.float64)
-    if pts.ndim != 2 or pts.shape[1] != 3 or pts.shape[0] == 0:
+    if pts.ndim != 2 or pts.shape[1] != 3 or pts.shape[0] == 0:  # noqa: PLR2004
         msg = "'positions' must have shape (N, 3) with N >= 1."
         raise ValueError(msg)
     if radius is not None and radius <= 0.0:
@@ -171,7 +186,7 @@ def plot_microphone_positions(
     if ax is None:
         plt = _import_pyplot()
         _fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-    full_sphere = bool(np.any(pts[:, 2] < -1e-9))
+    full_sphere = bool(np.any(pts[:, 2] < _BELOW_PLANE_Z_EPS))
     # The page's own ink, so the mesh is the brightest line on either theme.
     # Read off the axes rather than the rcParams: pyplot is only imported
     # here when this function creates the axes, and callers pass their own.

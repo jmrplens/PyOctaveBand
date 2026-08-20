@@ -155,7 +155,7 @@ def ln_levels(
     x_proc = _resolve_samples_raw(x, calibrate=False)
     _validate_level_input(x_proc, calibration_factor)
     for value in n:
-        if not 0 < value < 100:
+        if not 0 < value < 100:  # noqa: PLR2004
             msg = "Percentile values in 'n' must be between 0 and 100."
             raise ValueError(msg)
     if weighting is not None and weighting.upper() != "Z":

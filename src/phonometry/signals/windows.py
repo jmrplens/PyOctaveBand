@@ -39,6 +39,13 @@ __all__ = [
 #: Oversampling factor of the window spectrum (samples per DFT bin).
 _WINDOW_OVERSAMPLE = 256
 
+#: Half-power level in decibels, 10·log10(1/2) ≈ -3.0103: the threshold
+#: the two-sided -3 dB main-lobe width is measured at.
+_HALF_POWER_DB = -3.0103
+
+#: Minimum window length accepted by :func:`window_metrics`, in samples.
+_MIN_WINDOW_LENGTH = 16
+
 
 @dataclass(frozen=True)
 class WindowMetricsResult:
@@ -132,10 +139,10 @@ def _mainlobe_edge(level_db: NDArray[np.float64]) -> int:
 
 def _width_3db_bins(level_db: NDArray[np.float64], oversample: int) -> float:
     """Two-sided -3 dB main-lobe width in bins (linear dB interpolation)."""
-    below = np.flatnonzero(level_db <= -3.0103)
+    below = np.flatnonzero(level_db <= _HALF_POWER_DB)
     i = int(below[0])
     d0, d1 = float(level_db[i - 1]), float(level_db[i])
-    frac = ((-3.0103) - d0) / (d1 - d0)
+    frac = (_HALF_POWER_DB - d0) / (d1 - d0)
     return 2.0 * (i - 1 + frac) / oversample
 
 
@@ -165,8 +172,8 @@ def window_metrics(
     from scipy import signal as sp_signal
 
     n_v = int(n)
-    if n_v < 16:
-        msg = "'n' must be at least 16 samples."
+    if n_v < _MIN_WINDOW_LENGTH:
+        msg = f"'n' must be at least {_MIN_WINDOW_LENGTH} samples."
         raise ValueError(msg)
     try:
         w = np.asarray(

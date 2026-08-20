@@ -105,7 +105,7 @@ class Signal:
 
     def __post_init__(self) -> None:
         data = np.atleast_2d(np.asarray(self.data, dtype=np.float64))
-        if data.ndim != 2:
+        if data.ndim != 2:  # noqa: PLR2004
             msg = f"data must be 1-D or (channels, samples); got {data.ndim}-D"
             raise ValueError(msg)
         object.__setattr__(self, "data", np.ascontiguousarray(data))

@@ -50,6 +50,12 @@ if TYPE_CHECKING:
     )
     from .metadata import ReportMetadata
 
+#: Band count of the octave-band survey set (5 values, 125 Hz to 2000 Hz, vs
+#: 16 one-third-octave values, 100 Hz to 3150 Hz); it picks the caption and the
+#: standard-basis wording ISO 717-1:2020 Clause 5.3 / ISO 717-2:2020 Clause 4.4
+#: require stating.
+_N_OCTAVE_BANDS = 5
+
 #: The survey-method field statement each report prints verbatim; it names the
 #: control (survey) method so it is never conflated with the ISO 16283
 #: engineering method.
@@ -142,7 +148,7 @@ def _render_survey(
     from ._i18n import t
 
     curve = np.atleast_1d(np.asarray(getattr(result, curve_attr), dtype=np.float64))
-    is_octave = curve.size <= 5
+    is_octave = curve.size <= _N_OCTAVE_BANDS
     band_set = "Octave-band" if is_octave else "One-third-octave"
     bands_wording = t(
         "octave bands" if is_octave else "one-third-octave bands", language

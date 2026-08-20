@@ -50,6 +50,17 @@ _AXIS_BARK_HMS = r"Critical-band rate $z$ [$\mathrm{Bark}_{\mathrm{HMS}}$]"
 _AXIS_TIME = "Time [s]"
 #: Frequency axis label shared by the spectral psychoacoustic renderers.
 _AXIS_FREQUENCY = "Frequency [Hz]"
+#: Fewest time samples the HMS specific-value heatmap needs: with fewer than
+#: two time coordinates ``pcolormesh`` cannot span a mesh cell, so the
+#: heatmap panel of the two-panel figure is left empty.
+_MIN_HEATMAP_TIME_SAMPLES = 2
+#: The 1 kHz corner frequency of the ECMA-418-1 prominence criteria (TNR,
+#: clause 11; PR, clause 12): below it the limits rise with their
+#: low-frequency slopes, from 1 kHz up they are flat (8 dB TNR, 9 dB PR).
+_CRITERION_PLATEAU_HZ = 1000.0
+#: The 1 kHz reference frequency of the phon scale, where each ISO 226:2023
+#: equal-loudness contour crosses SPL = phon by definition.
+_REFERENCE_FREQUENCY = 1000.0
 
 #: Spanish translations of the fixed strings rendered by the
 #: psychoacoustics ``.plot()`` renderers, keyed by their verbatim English
@@ -524,7 +535,7 @@ def _plot_hms_time_and_heatmap(
         return ax_time
 
     ax_heat = cast("Axes", axes[1])
-    if time.size >= 2 and spec_vs_time.size:
+    if time.size >= _MIN_HEATMAP_TIME_SAMPLES and spec_vs_time.size:
         mesh = ax_heat.pcolormesh(
             time, bark, spec_vs_time.T, cmap="magma", shading="auto"
         )
@@ -753,10 +764,18 @@ def plot_tone_assessment(
     criterion = float(result.criterion_db)
 
     def _tnr(f: np.ndarray) -> np.ndarray:
-        return np.where(f < 1000.0, 8.0 + 8.33 * np.log10(1000.0 / f), 8.0)
+        return np.where(
+            f < _CRITERION_PLATEAU_HZ,
+            8.0 + 8.33 * np.log10(_CRITERION_PLATEAU_HZ / f),
+            8.0,
+        )
 
     def _pr(f: np.ndarray) -> np.ndarray:
-        return np.where(f < 1000.0, 9.0 + 10.0 * np.log10(1000.0 / f), 9.0)
+        return np.where(
+            f < _CRITERION_PLATEAU_HZ,
+            9.0 + 10.0 * np.log10(_CRITERION_PLATEAU_HZ / f),
+            9.0,
+        )
 
     ft_arr = np.array([max(ft, _TONE_RANGE_HZ[0])])
     is_tnr = abs(criterion - float(_tnr(ft_arr)[0])) <= abs(
@@ -1015,7 +1034,7 @@ def plot_equal_loudness_contours(
     # The per-contour labels sit at the 1 kHz crossing (SPL = phon by
     # definition); when a frequency subset excludes 1 kHz they would land
     # outside the axes, so they are skipped.
-    annotate_phons = fmin <= 1000.0 <= fmax
+    annotate_phons = fmin <= _REFERENCE_FREQUENCY <= fmax
     for phon, spl in zip(result.phons, contours, strict=True):
         ax.plot(freqs, spl, **kwargs)
         if annotate_phons:

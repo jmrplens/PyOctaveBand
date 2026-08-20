@@ -74,6 +74,23 @@ _TMID_BANDS = (500.0, 1000.0)
 #: Tolerance (Hz, relative) for matching a band centre to a nominal frequency.
 _BAND_MATCH_REL = 0.06
 
+#: Fewest band centres from which adjacent-centre ratios can classify the band
+#: set as octave vs one-third octave (the same pair guard
+#: ``filters.frequencies._infer_band_fraction`` applies); below it the caption
+#: falls back to "Single-band parameters".
+_MIN_BANDS_TO_INFER_FRACTION = 2
+
+#: Largest per-band row count still laid out with the roomier octave spacing
+#: (an octave range has at most 6 rows, a one-third-octave range up to 18);
+#: above it the table and plot switch to the compact layout so table plus
+#: plot fit one A4 page.
+_MAX_ROOMY_ROWS = 8
+
+#: The one-third-octave bandwidth fraction as returned by
+#: ``filters.frequencies._infer_band_fraction`` (3 bands per octave, vs 1 for
+#: octaves).
+_THIRD_OCTAVE_FRACTION = 3
+
 
 def _cell(value: float, decimals: int, language: str, *, scale: float = 1.0) -> str:
     """Format one table value, or an em dash when it is not finite.
@@ -99,7 +116,7 @@ def _fraction_label(frequency: np.ndarray | None, language: str) -> str:
     """
     if frequency is None:
         return t("Broadband analysis", language)
-    if frequency.size < 2:
+    if frequency.size < _MIN_BANDS_TO_INFER_FRACTION:
         return t("Single-band parameters", language)
     from ..filters.frequencies import _infer_band_fraction
 
@@ -206,7 +223,7 @@ def _parameter_table(result: RoomAcousticsResult, language: str = "en") -> Any:
     # A one-third-octave range carries up to 18 rows; tighten the padding and
     # cell font so the stacked table plus the landscape plot still fit one A4
     # page (an octave range has at most 6 rows and uses the roomier spacing).
-    compact = n > 8
+    compact = n > _MAX_ROOMY_ROWS
     pad = 1.0 if compact else 2.6
     body_font = 6.8 if compact else 8.0
 
@@ -261,7 +278,7 @@ def _parameter_table(result: RoomAcousticsResult, language: str = "en") -> Any:
     # broadband single row has no one-third-octave triplets to group, so the
     # grouping rule is gated on the band structure actually being one-third
     # octave rather than merely on the row count.
-    if freq is not None and fraction == 3:
+    if freq is not None and fraction == _THIRD_OCTAVE_FRACTION:
         for triplet_end in range(3, n, 3):
             style_cmds.append(
                 ("LINEBELOW", (0, triplet_end), (-1, triplet_end), 0.4, thin)
@@ -382,7 +399,7 @@ def _statement(
             value=_cell(t_value, 2, language)
         )
     extended: list[str] = []
-    if (t_is_mid or edt_is_mid) and fraction == 3:
+    if (t_is_mid or edt_is_mid) and fraction == _THIRD_OCTAVE_FRACTION:
         extended.append(
             t(
                 "Mid-frequency mean over the 500 Hz and 1 kHz one-third-octave bands.",
@@ -508,7 +525,7 @@ def render_iso3382_report(
     # inter-element gaps and the landscape plot so the table + plot still fit
     # one A4 page (an octave range keeps the roomier spacing and a taller plot).
     n_bands = np.asarray(result.t30, dtype=np.float64).size
-    compact = n_bands > 8
+    compact = n_bands > _MAX_ROOMY_ROWS
     gap = 3 if compact else 8
     fig_height = 2.0 if compact else 3.9
 

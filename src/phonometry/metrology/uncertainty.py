@@ -47,6 +47,15 @@ from .._internal.warnings import PhonometryWarning
 
 Model = Callable[..., float]
 
+# Eigenvalues of a caller-supplied correlation matrix down to minus this
+# tolerance are accepted as zero within floating point; anything more
+# negative marks the matrix indefinite (see _validated_correlation).
+_PSD_EIGENVALUE_TOLERANCE = 1e-8
+
+# Minimum number of Monte Carlo trials: the reported standard uncertainty
+# is np.std(output, ddof=1), undefined for fewer than two samples.
+_MIN_TRIALS = 2
+
 
 class UncertaintyWarning(PhonometryWarning):
     """A GUM propagation fell back outside its nominal assumptions."""
@@ -298,7 +307,7 @@ def _validated_correlation(correlation: ArrayLike | None, n: int) -> np.ndarray 
     # A symmetric, unit-diagonal matrix can still be indefinite, which would
     # make the variance negative and be silently masked by the clamp that
     # follows the propagation; reject it.
-    if float(np.min(np.linalg.eigvalsh(r))) < -1e-8:
+    if float(np.min(np.linalg.eigvalsh(r))) < -_PSD_EIGENVALUE_TOLERANCE:
         msg = "correlation matrix must be positive semi-definite."
         raise ValueError(msg)
     return r
@@ -494,8 +503,8 @@ def monte_carlo(
     if len(quantities) == 0:
         msg = "at least one input quantity is required."
         raise ValueError(msg)
-    if trials < 2:
-        msg = "trials must be at least 2."
+    if trials < _MIN_TRIALS:
+        msg = f"trials must be at least {_MIN_TRIALS}."
         raise ValueError(msg)
     if not 0.0 < coverage < 1.0:
         msg = f"coverage must be in (0, 1); got {coverage}."

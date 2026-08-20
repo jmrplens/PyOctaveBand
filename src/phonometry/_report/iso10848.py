@@ -87,6 +87,16 @@ _PART_DESIGNATIONS: dict[int, str] = {
     4: "ISO 10848-4:2010",
 }
 
+#: The fewest band centres from which a consecutive-pair step ratio exists;
+#: with fewer, the ``Kij`` band-type detector cannot measure a step and
+#: defaults to third-octave.
+_MIN_BANDS_TO_INFER_FRACTION = 2
+
+#: Discriminant on the median ratio of consecutive band centres: octave
+#: centres step by ~2, one-third-octave centres by ~1.26 (2^(1/3)), and 1.6
+#: sits between the two.
+_OCTAVE_STEP_THRESHOLD = 1.6
+
 
 def _part_designation(part: int) -> str:
     """The designation of ISO 10848 part ``part``, or raise."""
@@ -273,10 +283,10 @@ _KIJ_STATEMENT = (
 
 def _kij_band_type(frequencies: np.ndarray) -> str:
     """``"octave"`` when consecutive centres step by ~2, else third-octave."""
-    if frequencies.size < 2:
+    if frequencies.size < _MIN_BANDS_TO_INFER_FRACTION:
         return "third-octave"
     ratio = float(np.median(frequencies[1:] / frequencies[:-1]))
-    return "octave" if ratio > 1.6 else "third-octave"
+    return "octave" if ratio > _OCTAVE_STEP_THRESHOLD else "third-octave"
 
 
 def _kij_mean_membership(

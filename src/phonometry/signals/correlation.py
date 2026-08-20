@@ -87,6 +87,11 @@ __all__ = [
 #: upsampling extracts around the coarse correlation peak.
 _UPSAMPLE_HALF_WINDOW = 32
 
+#: Minimum number of averaged Welch segments the 'ml' GCC weighting
+#: requires: a single-segment coherence estimate is identically one, and
+#: Knapp & Carter's Eq. 45b weight exists only for |γ|² < 1.
+_MIN_COHERENCE_SEGMENTS = 2
+
 #: Validation context of the impulse-response delay utilities.
 _DELAY_CONTEXT = "a delay estimate"
 
@@ -644,7 +649,7 @@ def _gcc_curve(
     """Weighted GCC over the shared Welch core, fftshifted to ±seg/2."""
     seg, ovl = _validate_welch_params(xa.size, fs, nperseg, overlap)
     nov = _noverlap_samples(seg, ovl)
-    if weighting == "ml" and (xa.size - nov) // (seg - nov) < 2:
+    if weighting == "ml" and (xa.size - nov) // (seg - nov) < _MIN_COHERENCE_SEGMENTS:
         # Knapp & Carter's Eq. 45b weight exists only for |γ|² < 1; a
         # single-segment coherence estimate is identically one, so the
         # weight would be floating-point rounding noise.

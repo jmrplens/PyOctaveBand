@@ -61,6 +61,11 @@ _STI_PRIVACY = 0.20
 #: Minimum number of measurement positions (ISO 3382-3:2012, 5.2.2).
 _MIN_POSITIONS = 4
 
+#: Minimum number of positions inside the 2 m to 16 m decay range to fit
+#: the D2,S regression line (ISO 3382-3:2012, 6.2): a degree-1 fit needs
+#: two points; below it, d2s and lp_as_4m are reported as nan.
+_MIN_DECAY_FIT_POSITIONS = 2
+
 
 @dataclass(frozen=True)
 class OpenPlanResult:
@@ -271,7 +276,7 @@ def open_plan_metrics(
     d2s = float("nan")
     lp_as_4m = float("nan")
     in_range = (r >= _DECAY_RANGE_M[0]) & (r <= _DECAY_RANGE_M[1])
-    if int(in_range.sum()) >= 2:
+    if int(in_range.sum()) >= _MIN_DECAY_FIT_POSITIONS:
         x = np.log10(r[in_range] / _R0)
         slope, intercept = _linear_fit(x, lp[in_range])
         # D2,S is the decay per distance doubling: slope is dB per unit of

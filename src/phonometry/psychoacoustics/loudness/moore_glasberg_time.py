@@ -97,6 +97,7 @@ _FC_GRID = _fc_from_cam(_I_GRID)
 _ERB_GRID = _erb_bandwidth(_FC_GRID)
 _P_REF = 4.0 * _FC_GRID / _ERB_GRID  # p_u and p_l(51 dB, fc) per filter
 _PL51_1K = 4.0 * 1000.0 / _erb_bandwidth(np.array([1000.0]))[0]  # p_l(51 dB, 1 kHz)
+_ROEX_G_MAX = 4.0  # Formula (4): drop upper-side components g > 4 (clause 7.4)
 
 # ---------------------------------------------------------------------------
 # Reference threshold, cochlear gain and specific-loudness parameters
@@ -210,9 +211,11 @@ _C_SONE = 0.063  # calibration constant C of Formula (7) [sone/Cam]
 _ALPHA_HF = 0.2  # exponent alpha for fc >= 500 Hz (clause 7.5.4)
 _E_THRQ_HF = 2.307  # E_THRQ/E0 for fc >= 500 Hz (L_E = 3.63 dB, clause 7.5.2)
 _A_HF = 2.0 * _E_THRQ_HF  # A = 2 * E_THRQ/E0 for fc >= 500 Hz (clause 7.5.4)
+_E_HIGH_LEVEL = 1e10  # E/E0 bound of the high-level Formula (9) (clause 7.5)
+_HF_MIN_FC_HZ = 500.0  # _HF parameters apply for fc >= this (clauses 7.5.2/7.5.4)
 
 # Precomputed per-filter specific-loudness parameters (fixed by the grid).
-_HIGH = _FC_GRID >= 500.0
+_HIGH = _FC_GRID >= _HF_MIN_FC_HZ
 _G_LIN = np.ones(_FC_GRID.size)
 _ALPHA = np.full(_FC_GRID.size, _ALPHA_HF)
 _A_PAR = np.full(_FC_GRID.size, _A_HF)
@@ -271,6 +274,7 @@ _WINDOWS: tuple[tuple[float, float, float], ...] = (
 _SPECTRAL_CAL_DB = -0.9252
 _P0 = 2e-5  # reference sound pressure [Pa]
 _PRUNE_DB = 80.0  # drop components > 80 dB below the frame's loudest component
+_N_EARS = 2  # ear channels of a two-channel (left, right) input
 
 # ---------------------------------------------------------------------------
 # Loudness-level relationship (clause 7.10, Table 5) - DIFFERS from ISO 532-2.
@@ -419,7 +423,7 @@ def _excitation(comp_f: np.ndarray, comp_pow: np.ndarray) -> np.ndarray:
     np.clip(p_lower, 0.1, 1e4, out=p_lower)
     p = np.where(upper, p_ref, p_lower)
     weight = (1.0 + p * g) * np.exp(-p * g)
-    weight[upper & (g > 4.0)] = 0.0
+    weight[upper & (g > _ROEX_G_MAX)] = 0.0
     return np.asarray(weight @ comp_pow, dtype=np.float64)
 
 
@@ -443,7 +447,7 @@ def _specific_loudness(excitation: np.ndarray) -> np.ndarray:
     below = e < _E_THR[active]
     factor = np.power(2.0 * e / (e + _E_THR[active]), 1.5)
     values = np.where(below, _C_SONE * factor * core, values)
-    very_high = e > 1e10
+    very_high = e > _E_HIGH_LEVEL
     values = np.where(very_high, _C_SONE * np.power(e / 1.0707, 0.2), values)
     n_spec[active] = values
     return n_spec
@@ -611,10 +615,10 @@ def _as_two_channels(
 ) -> tuple[np.ndarray, np.ndarray | None]:
     """Split the input into left and (optional) right calibrated pressure signals."""
     array = apply_calibration(signal, np.asarray(signal, dtype=np.float64))
-    if array.ndim == 2:
-        if array.shape[1] == 2 and array.shape[0] != 2:
+    if array.ndim == 2:  # noqa: PLR2004
+        if array.shape[1] == _N_EARS and array.shape[0] != _N_EARS:
             left, right = array[:, 0], array[:, 1]
-        elif array.shape[0] == 2:
+        elif array.shape[0] == _N_EARS:
             left, right = array[0], array[1]
         else:
             msg = f"signal must be mono (1-D) or two-channel; got shape {array.shape}."

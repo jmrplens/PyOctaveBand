@@ -68,6 +68,10 @@ _EQUIV_AREA_REFERENCE_S = 10.0
 #: Repeatability factor ``σr = 0,6·σR`` (Formulae (3)/(5)).
 _REPEATABILITY_FACTOR = 0.6
 
+#: Condition selecting the between-laboratory σR as-is (u = σR); the other
+#: condition, "repeatability", takes σr = 0,6·σR (``_REPEATABILITY_FACTOR``).
+_REPRODUCIBILITY = "reproducibility"
+
 #: Measurement conditions selecting σR (reproducibility) or σr (repeatability).
 _CONDITIONS = ("reproducibility", "repeatability")
 
@@ -112,6 +116,10 @@ _ALPHA_W_SIGMA: dict[str, float] = {"reproducibility": 0.035, "repeatability": 0
 
 #: Single-number rating ``DLα,NRD`` scale factors (Clause 7, Formulae (8)/(9)).
 _DLALPHA_FACTOR: dict[str, float] = {"reproducibility": 0.10, "repeatability": 0.02}
+
+#: Float-key match tolerance for the Table 3 confidence-level lookup; far below
+#: the 0.009 minimum gap between tabulated levels.
+_CONFIDENCE_MATCH_TOL = 1e-9
 
 #: Table 3 (Clause 8): coverage factors ``k`` for a Gaussian measurand, keyed by
 #: confidence level as a fraction. Values are the standard's rounded factors
@@ -164,7 +172,7 @@ def absorption_coverage_factor(confidence: float = 0.95) -> float:
     :raises ValueError: Confidence level not tabulated in Table 3.
     """
     for level, k in _COVERAGE_FACTORS.items():
-        if abs(level - confidence) < 1e-9:
+        if abs(level - confidence) < _CONFIDENCE_MATCH_TOL:
             return k
     valid = ", ".join(f"{level:g}" for level in _COVERAGE_FACTORS)
     msg = (
@@ -270,7 +278,7 @@ def _band_uncertainty(
         raise ValueError(msg)
     m, n = _table_constants(frequencies, table, band_kind)
     sigma_r = m * values + n
-    u = sigma_r if condition == "reproducibility" else _REPEATABILITY_FACTOR * sigma_r
+    u = sigma_r if condition == _REPRODUCIBILITY else _REPEATABILITY_FACTOR * sigma_r
     k = absorption_coverage_factor(confidence)
     return AbsorptionUncertaintyResult(
         quantity=quantity,
@@ -347,7 +355,7 @@ def equivalent_area_uncertainty(
     m, n = _table_constants(f, _TABLE1, "one-third-octave")
     cond = _condition(condition)
     sigma_r = m * a + n * _EQUIV_AREA_REFERENCE_S
-    u = sigma_r if cond == "reproducibility" else _REPEATABILITY_FACTOR * sigma_r
+    u = sigma_r if cond == _REPRODUCIBILITY else _REPEATABILITY_FACTOR * sigma_r
     k = absorption_coverage_factor(confidence)
     return AbsorptionUncertaintyResult(
         quantity="equivalent_area",

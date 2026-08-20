@@ -97,6 +97,19 @@ _SIL_BANDS = slice(5, 9)
 #: (at least the bands from 31.5 Hz through 4000 Hz).
 _RC_REQUIRED_BANDS = slice(1, 9)
 
+#: Bounds of the tabulated RC Mark II family: Table D.1 tabulates RC-25
+#: through RC-50 and clause D.3.5 defines the RC-NN(A) label only for
+#: integer ratings in that range; outside it the reference curve extrapolates.
+_RC_FAMILY_MIN = 25
+_RC_FAMILY_MAX = 50
+
+#: Clause D.3 deviation limits, in dB, over the reference RC Mark II curve:
+#: rumble ("R") when a band at or below 500 Hz exceeds it by more than
+#: _RC_RUMBLE_LIMIT_DB, hiss ("H") when a band at or above 1000 Hz exceeds
+#: it by more than _RC_HISS_LIMIT_DB.
+_RC_RUMBLE_LIMIT_DB = 5.0
+_RC_HISS_LIMIT_DB = 3.0
+
 
 @dataclass(frozen=True)
 class NCResult:
@@ -263,7 +276,7 @@ class RCResult:
         -5 dB/octave rule of Annex D, but the designation extrapolates beyond
         the standard's tabulated family.
         """
-        return not 25 <= self.rating <= 50
+        return not _RC_FAMILY_MIN <= self.rating <= _RC_FAMILY_MAX
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -568,8 +581,8 @@ def room_criterion(levels: ArrayLike, frequencies: ArrayLike | None = None) -> R
     high = slice(6, _N_BANDS)  # 1000 - 8000 Hz (at and above 1000 Hz).
     low_dev = deviation[low][~np.isnan(deviation[low])]
     high_dev = deviation[high][~np.isnan(deviation[high])]
-    rumble = low_dev.size > 0 and np.max(low_dev) > 5.0
-    hiss = high_dev.size > 0 and np.max(high_dev) > 3.0
+    rumble = low_dev.size > 0 and np.max(low_dev) > _RC_RUMBLE_LIMIT_DB
+    hiss = high_dev.size > 0 and np.max(high_dev) > _RC_HISS_LIMIT_DB
     tag = ("R" if rumble else "") + ("H" if hiss else "")
     classification = tag or "N"
 

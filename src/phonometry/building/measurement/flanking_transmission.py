@@ -146,6 +146,11 @@ _MODAL_OVERLAP_EXCLUSION = 0.25
 #: Nominal octave-band centre frequencies used to validate octave grouping.
 _OCTAVE_CENTRES = (31.5, 63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0)
 
+#: Median consecutive-centre-frequency ratio above which a band set is classed
+#: as octave-spaced (nominal step 2) rather than one-third-octave-spaced
+#: (step 2^(1/3) ≈ 1.26); the threshold sits between the two nominal steps.
+_OCTAVE_STEP_THRESHOLD = 1.6
+
 
 def _as_1d(values: float | Sequence[float] | np.ndarray, name: str) -> np.ndarray:
     """Coerce to a finite 1-D float array."""
@@ -450,10 +455,10 @@ def _validate_octave_triples(freq_groups: np.ndarray) -> None:
 
 def _detect_band_type(frequencies: np.ndarray | None) -> str:
     """``"octave"`` when consecutive centres step by ~2, else third-octave."""
-    if frequencies is None or frequencies.size < 2:
+    if frequencies is None or frequencies.size < 2:  # noqa: PLR2004
         return "third-octave"
     ratio = float(np.median(frequencies[1:] / frequencies[:-1]))
-    return "octave" if ratio > 1.6 else "third-octave"
+    return "octave" if ratio > _OCTAVE_STEP_THRESHOLD else "third-octave"
 
 
 def _single_number_kij(
@@ -551,7 +556,7 @@ def vibration_reduction_index(
         msg = "Supply both structural reverberation times (i and j) or neither."
         raise ValueError(msg)
 
-    if ts_given == 2:
+    if ts_given == 2:  # noqa: PLR2004
         if freq is None:
             msg = (
                 "'frequency' is required when structural reverberation times are "

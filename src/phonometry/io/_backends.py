@@ -40,7 +40,12 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from .._internal.warnings import PhonometryWarning
-from ._chunks import WAVE_FORMAT_IEEE_FLOAT, WAVE_FORMAT_PCM, parse_wav_chunks
+from ._chunks import (
+    _WAVE_FORM_TYPE,
+    WAVE_FORMAT_IEEE_FLOAT,
+    WAVE_FORMAT_PCM,
+    parse_wav_chunks,
+)
 from ._flac import read_flac_bext
 from ._sidecar import read_sidecar
 from ._signal import Signal, SignalOrigin
@@ -54,11 +59,16 @@ class LossyCompressionWarning(PhonometryWarning):
     """Warns that samples came through a lossy codec: levels are not defensible."""
 
 
+#: The sniffer's name for FLAC: the display name interpolated into errors
+#: and warnings, and the dispatch key that gates ``bext`` recovery. One
+#: spelling for the _MAGIC row and every comparison, so they cannot drift.
+_FLAC_NAME = "FLAC"
+
 #: Leading magic bytes -> format name, for dispatch and for error messages
 #: that name what the file actually is. The WAV family is recognised
 #: separately (fourcc + ``WAVE`` form type).
 _MAGIC: tuple[tuple[bytes, str], ...] = (
-    (b"fLaC", "FLAC"),
+    (b"fLaC", _FLAC_NAME),
     (b"OggS", "Ogg (Vorbis/Opus)"),
     (b"ID3", "MPEG audio (MP3)"),
     (b"FORM", "AIFF"),
@@ -67,6 +77,12 @@ _MAGIC: tuple[tuple[bytes, str], ...] = (
 )
 
 _WAV_FOURCC = (b"RIFF", b"RF64", b"BW64")
+
+#: MPEG audio frame sync: the 11 set bits that open every MP3 frame,
+#: recognised as a full first byte plus the top three bits of the second.
+_MPEG_SYNC_BYTES = 2  # least header length the sync test needs
+_MPEG_SYNC_BYTE_1 = 0xFF  # first 8 of the 11 set sync bits
+_MPEG_SYNC_BYTE_2_MASK = 0xE0  # remaining 3 sync bits: mask and expected value
 
 #: soundfile subtype substrings that mark a lossy or companded codec.
 #: libsndfile subtypes are stable identifiers ('VORBIS', 'OPUS',
@@ -108,14 +124,18 @@ def _sniff(path: str | Path) -> str | None:
     """
     with Path(path).open("rb") as fh:
         head = fh.read(12)
-    if head[:4] in _WAV_FOURCC and head[8:12] == b"WAVE":
+    if head[:4] in _WAV_FOURCC and head[8:12] == _WAVE_FORM_TYPE:
         return None
     for magic, name in _MAGIC:
         if head.startswith(magic):
             return name
     # An MP3 without an ID3 tag starts straight at a frame sync
     # (11 set bits: 0xFF 0xE0).
-    if len(head) >= 2 and head[0] == 0xFF and head[1] & 0xE0 == 0xE0:
+    if (
+        len(head) >= _MPEG_SYNC_BYTES
+        and head[0] == _MPEG_SYNC_BYTE_1
+        and head[1] & _MPEG_SYNC_BYTE_2_MASK == _MPEG_SYNC_BYTE_2_MASK
+    ):
         return "MPEG audio (MP3)"
     msg = f"{path}: not a recognised audio file"
     raise ValueError(msg)
@@ -172,7 +192,7 @@ def _read_soundfile(
     data, fs = sf.read(str(path), dtype="float64", always_2d=True)
     if chunks is not None:
         provenance = chunks.bext
-    elif format_name == "FLAC":
+    elif format_name == _FLAC_NAME:
         # A FLAC written by phonometry (or by flac --keep-foreign-metadata)
         # carries the bext chunk in an APPLICATION 'riff' block.
         provenance = read_flac_bext(path)
@@ -296,5 +316,5 @@ def info(path: str | Path) -> AudioFileInfo:
         duration=frames / float(fs) if fs else 0.0,
         bit_depth=_SUBTYPE_BITS.get(str(file_info.subtype)),
         lossy=_soundfile_lossy(str(file_info.subtype)),
-        bext=read_flac_bext(path) if format_name == "FLAC" else None,
+        bext=read_flac_bext(path) if format_name == _FLAC_NAME else None,
     )

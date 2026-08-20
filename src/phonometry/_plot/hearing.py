@@ -25,6 +25,11 @@ if TYPE_CHECKING:
     from ..hearing.occupational_exposure import ExposureResult
     from ..hearing.threshold import AgeThresholdResult
 
+# Tolerance under which the requested population fractile counts as the
+# median (0.5), so the separate fractile curve, which would duplicate the
+# median line, is skipped.
+_MEDIAN_FRACTILE_EPS = 1e-9
+
 #: Spanish translations of the fixed strings rendered by the hearing
 #: ``.plot()`` renderers, keyed by their verbatim English text. ``_t``
 #: returns the English key unchanged for any language other than ``"es"``,
@@ -90,7 +95,7 @@ def plot_age_threshold(
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", _t("Median", language))
     ax.plot(freqs, median, "o-", **kwargs)
-    if abs(result.fractile - 0.5) > 1e-9:
+    if abs(result.fractile - 0.5) > _MEDIAN_FRACTILE_EPS:
         ax.plot(
             freqs,
             np.asarray(result.threshold, dtype=np.float64),
@@ -151,7 +156,7 @@ def plot_nipts(
     kwargs.setdefault("color", _C_SECONDARY)
     kwargs.setdefault("label", _t("Median $N_{50}$", language))
     ax.plot(freqs, median, "o-", **kwargs)
-    if abs(result.fractile - 0.5) > 1e-9:
+    if abs(result.fractile - 0.5) > _MEDIAN_FRACTILE_EPS:
         ax.plot(
             freqs,
             np.asarray(result.value, dtype=np.float64),

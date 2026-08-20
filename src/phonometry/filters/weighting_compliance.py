@@ -41,6 +41,12 @@ __all__ = [
 
 _INF = float("inf")
 
+# Floor on the `sweep_points` parameter of `verify_weighting_class` (default
+# 4096): fewer grid frequencies would make the geometric grid of the
+# between-nominals sweep too coarse for its verdict to mean anything. The
+# floor is the function's own guard, not a value from the standard.
+_MIN_SWEEP_POINTS = 64
+
 # BS EN 61672-1:2013 Table 3 (standard page 22): design-goal frequency
 # weightings and class 1 / class 2 acceptance limits at the 34 nominal
 # frequencies. Columns: (nominal Hz, A dB, C dB, class1 upper, class1 lower,
@@ -566,7 +572,7 @@ def verify_weighting_class(
     if wf.curve not in _WEIGHTING_COL and wf.curve not in ("B", "AU"):
         msg = "Weighting curve must be 'A', 'B', 'C', 'AU' or 'Z'."
         raise ValueError(msg)
-    if sweep_points < 64:
+    if sweep_points < _MIN_SWEEP_POINTS:
         msg = "'sweep_points' must be at least 64."
         raise ValueError(msg)
 

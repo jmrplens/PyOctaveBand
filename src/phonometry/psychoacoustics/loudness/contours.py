@@ -55,6 +55,15 @@ _TABLE1: dict[float, tuple[float, float, float]] = {
 
 _FREQUENCIES = np.array(sorted(_TABLE1))
 
+# Validity range of ISO 226:2023 Formula (1), clause 4.1: contours are
+# specified from 20 phon to 90 phon between 20 Hz and 4 kHz, and only up to
+# 80 phon between 5 kHz and 12.5 kHz - above that level a returned contour
+# is truncated to the grid rows at or below 4 kHz.
+_PHON_MIN = 20.0
+_PHON_MAX = 90.0
+_PHON_MAX_ABOVE_4KHZ = 80.0
+_F_MAX_ABOVE_80_PHON = 4000.0  # Hz
+
 
 def _params(frequency: float) -> tuple[float, float, float]:
     """Table 1 parameters for a preferred third-octave frequency.
@@ -97,13 +106,17 @@ def equal_loudness_contour(phon: float) -> tuple[np.ndarray, np.ndarray]:
     :param phon: Loudness level in phons (20 to 90).
     :return: Tuple ``(frequencies, spl)`` in Hz and dB re 20 uPa.
     """
-    if not 20.0 <= phon <= 90.0:
+    if not _PHON_MIN <= phon <= _PHON_MAX:
         msg = (
             "ISO 226:2023 Formula (1) is specified for 20 phon to 90 phon "
             f"(80 phon above 4 kHz); got {phon!r}."
         )
         raise ValueError(msg)
-    freqs = _FREQUENCIES if phon <= 80.0 else _FREQUENCIES[_FREQUENCIES <= 4000.0]
+    freqs = (
+        _FREQUENCIES
+        if phon <= _PHON_MAX_ABOVE_4KHZ
+        else _FREQUENCIES[_FREQUENCIES <= _F_MAX_ABOVE_80_PHON]
+    )
     spl = np.array([_spl_from_phon(f, phon) for f in freqs])
     return freqs.copy(), spl
 

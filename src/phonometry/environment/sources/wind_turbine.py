@@ -52,6 +52,10 @@ _HANNING_ENBW_FACTOR = 1.5
 #: Low-frequency band where the critical band is fixed to 20-120 Hz.
 _LOW_FREQ_MIN, _LOW_FREQ_MAX = 20.0, 70.0
 _LOW_FREQ_BANDWIDTH = 100.0
+#: Minimum lines of a valid narrowband spectrum (the error message's ">= 3"):
+#: the smallest size with more than one np.diff spacing to compare and
+#: adjacent lines about the candidate peak for the 9.5.2 screen.
+_MIN_SPECTRUM_LINES = 3
 
 
 def _positive(value: float, name: str) -> float:
@@ -287,7 +291,7 @@ def _validate_narrowband(
     """Coerce and validate a uniformly-spaced narrowband spectrum."""
     lv = np.asarray(levels, dtype=np.float64)
     fr = np.asarray(frequencies, dtype=np.float64)
-    if lv.ndim != 1 or lv.shape != fr.shape or lv.size < 3:
+    if lv.ndim != 1 or lv.shape != fr.shape or lv.size < _MIN_SPECTRUM_LINES:
         msg = "'levels' and 'frequencies' must be 1-D and the same length (>= 3)."
         raise ValueError(msg)
     if not (np.all(np.isfinite(lv)) and np.all(np.isfinite(fr))):
@@ -444,7 +448,7 @@ def wind_turbine_tonality(
     tone_energy = 0.0
     for run in runs:
         run_energy = float(np.sum(10.0 ** (lv[run] / 10.0)))
-        if run.size >= 2:
+        if run.size >= 2:  # noqa: PLR2004
             run_energy /= _HANNING_ENBW_FACTOR
         tone_energy += run_energy
     l_pt = 10.0 * np.log10(tone_energy)

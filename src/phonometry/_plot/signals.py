@@ -48,6 +48,11 @@ from .common import (
     format_frequency_axis,
 )
 
+#: The two edge bins (DC and Nyquist) trimmed from a per-frequency array
+#: before averaging; with no more bins than these, the ``[1:-1]`` interior
+#: slice would be empty, so callers fall back to the full array.
+_DC_NYQUIST_BINS = 2
+
 #: Spanish translations of the fixed strings rendered by the signal
 #: ``.plot()`` renderers, keyed by their verbatim English text. ``_t``
 #: returns the English key unchanged for any language other than ``"es"``,
@@ -311,7 +316,7 @@ def plot_multitaper_spectral_density(
     # the array can have <=2 bins, where trimming the DC/Nyquist edges would
     # leave an empty slice, so fall back to the full array there.
     dof = result.degrees_of_freedom
-    interior = dof[1:-1] if dof.size > 2 else dof
+    interior = dof[1:-1] if dof.size > _DC_NYQUIST_BINS else dof
     nu_mean = float(np.mean(interior))
     nu = format_number(nu_mean, language, decimals=1)
     nw = decimal_comma(f"{result.time_half_bandwidth:g}", language)

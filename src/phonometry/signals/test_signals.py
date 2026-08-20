@@ -85,6 +85,29 @@ _COLOR_EXPONENTS: dict[str, float] = {
     "violet": 2.0,
 }
 
+#: Fewest samples ``round(fs * seconds)`` may give: the frequency-domain
+#: color shaping needs bins to work with.
+_MIN_NOISE_SAMPLES = 16
+
+#: Fewest samples of a processable one-dimensional record. Deliberately
+#: weaker than ``spectra._MIN_SAMPLES`` (the spectral-estimate floor these
+#: consumers do not need), so that constant is not reused here.
+_MIN_RECORD_SAMPLES = 2
+
+#: Gate-close offset (in samples) below which ``fs`` and ``frequency``
+#: count as commensurate (the gate closes sample-exactly on the tone's
+#: final zero crossing) and the incommensurate-frequency warning is
+#: suppressed. Same value as ``synchronous_average._ALIGN_TOL``, which
+#: cannot be imported here (that module imports this one).
+_GATE_ALIGN_TOL = 1e-9
+
+#: Smallest accepted anti-alias stopband attenuation, in dB.
+_MIN_STOPBAND_ATTENUATION_DB = 30.0
+
+#: Widest accepted transition band, as a fraction of the smaller Nyquist
+#: frequency.
+_MAX_TRANSITION_WIDTH = 0.5
+
 
 def noise_signal(
     fs: float,
@@ -121,7 +144,7 @@ def noise_signal(
         msg = "'seconds' must be a positive, finite number."
         raise ValueError(msg)
     n = round(fs_v * seconds_v)
-    if n < 16:
+    if n < _MIN_NOISE_SAMPLES:
         msg = f"'fs'*'seconds' must give at least 16 samples, got {n}."
         raise ValueError(msg)
     if color not in _COLOR_EXPONENTS:
@@ -171,7 +194,7 @@ def _validate_1d_finite(
     if xa.ndim != 1:
         msg = f"'{name}' must be one-dimensional."
         raise ValueError(msg)
-    if xa.size < 2:
+    if xa.size < _MIN_RECORD_SAMPLES:
         msg = f"'{name}' must have at least 2 samples."
         raise ValueError(msg)
     if not np.all(np.isfinite(xa)):
@@ -359,7 +382,7 @@ def tone_burst(
     burst_seconds = cycles_v / f_v
     exact_samples = fs_v * burst_seconds
     n_on = round(exact_samples)
-    if n_on < 2:
+    if n_on < _MIN_RECORD_SAMPLES:
         msg = "The burst is shorter than 2 samples; increase 'cycles' or 'fs'."
         raise ValueError(msg)
     rate_v, period, duty = _tone_burst_period(
@@ -370,7 +393,7 @@ def tone_burst(
     # repetition setup raises instead of warning first (which would mask
     # the error under a warnings-as-errors filter).
     delta = n_on - exact_samples  # gate-close offset from the zero crossing
-    if abs(delta) > 1e-9:
+    if abs(delta) > _GATE_ALIGN_TOL:
         residual = amplitude_v * math.sin(2.0 * math.pi * f_v * delta / fs_v)
         warnings.warn(
             f"'frequency' = {f_v:g} Hz is incommensurate with fs = "
@@ -537,11 +560,11 @@ def resample_signal(
     fs_v = _positive(resolve_fs(x, fs), "fs")
     fs_new_v = _positive(fs_new, "fs_new")
     atten = float(stopband_attenuation_db)
-    if not np.isfinite(atten) or atten < 30.0:
+    if not np.isfinite(atten) or atten < _MIN_STOPBAND_ATTENUATION_DB:
         msg = "'stopband_attenuation_db' must be at least 30 dB."
         raise ValueError(msg)
     tw = float(transition_width)
-    if not np.isfinite(tw) or not 0.0 < tw <= 0.5:
+    if not np.isfinite(tw) or not 0.0 < tw <= _MAX_TRANSITION_WIDTH:
         msg = "'transition_width' must be in (0, 0.5]."
         raise ValueError(msg)
     max_den = int(max_denominator)

@@ -65,6 +65,10 @@ if TYPE_CHECKING:
 #: Regime labels, in order of increasing range.
 WESTON_REGIMES = ("spherical", "cylindrical", "mode-stripping", "single-mode")
 
+# Normal incidence, the largest grazing angle a ray can have: the upper edge
+# of the (0, 90] degree validity range for a 'critical_angle' override.
+_NORMAL_INCIDENCE_DEG = 90.0
+
 
 @dataclass(frozen=True)
 class WestonSeabed:
@@ -404,7 +408,7 @@ def _angle_and_gradient(
             raise ValueError(msg)
     else:
         deg = float(critical_angle)
-        if not np.isfinite(deg) or not (0.0 < deg <= 90.0):
+        if not np.isfinite(deg) or not (0.0 < deg <= _NORMAL_INCIDENCE_DEG):
             msg = "'critical_angle' must lie in (0, 90] degrees."
             raise ValueError(msg)
         psi_c = np.radians(deg)

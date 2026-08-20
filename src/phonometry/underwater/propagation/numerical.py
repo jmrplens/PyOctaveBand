@@ -78,6 +78,50 @@ _SOURCE_OUTSIDE = "'source_depth' must lie within the water column."
 #: always pressure-release, so its own coefficient is the -1 below.
 _BOTTOM_REFLECTION = {"pressure-release": -1.0, "rigid": 1.0}
 _SURFACE_REFLECTION = -1.0
+#: The fewest nodes a piecewise-linear polyline can carry, be it the
+#: sound-speed profile in depth or the bathymetry in range: two nodes define
+#: the single segment :func:`numpy.interp` needs.
+_MIN_POLYLINE_NODES = 2
+#: Floating-point slack, in metres, within which a polyline's first node
+#: counts as sitting exactly at its origin: the pressure-release surface
+#: z = 0 for the profile, the source r = 0 for the bathymetry.
+_ORIGIN_SLACK_M = 1e-9
+#: Floor on 'n_depth_points', the finite-difference depth grid the
+#: normal-mode Sturm-Liouville eigenvalue problem is discretised on; below
+#: this the tridiagonal discretisation is not meaningfully a grid.
+_MIN_MODE_GRID_POINTS = 8
+#: Floor on the integration steps per traced ray: a marched ray needs at
+#: least its two end range samples.
+_MIN_RAY_STEPS = 2
+#: The vertical, in degrees from the horizontal. Launch angles and the beam
+#: fan's half-angle must stay strictly inside it, so that every ray is a
+#: forward ray with a positive Snell invariant.
+_VERTICAL_DEG = 90.0
+#: Angular slack, in radians, for deciding a wedge image-fan rung lands
+#: exactly on the seam at pi, where the fan of images closes on itself and
+#: only the positive wrap keeps the rung.
+_SEAM_SLACK_RAD = 1e-9
+#: The shortest sound-speed profile that can hold a gradient discontinuity:
+#: a kink lives on an interior node between two segments, so fewer points
+#: leave nothing for the source-on-kink jet check (Jensen Sect. 3.7.4) to
+#: find.
+_MIN_KINK_PROFILE_POINTS = 3
+#: Depth-coincidence tolerance, in metres, deciding the source sits on a
+#: listed gradient-discontinuity depth of the profile and so provokes the
+#: spurious-jet warning of Jensen Sect. 3.7.4.
+_KINK_PROXIMITY_M = 1e-6
+#: Floor on the default beam receiver grid, which mirrors the interior
+#: depth grid of :func:`parabolic_equation` so the two fields land on the
+#: same depths: it must hold at least two receiver depths.
+_MIN_RECEIVER_DEPTHS = 2
+#: Floor on 'n_beams': the fan spacing ``launch[1] - launch[0]``, and the
+#: per-beam overlap condition, need at least two beams to exist.
+_MIN_FAN_BEAMS = 2
+#: Floor on 'n_depth_points', the interior sine-transform depth grid the
+#: split-step Fourier parabolic equation marches on; fewer points cannot
+#: resolve the vertical wavenumbers kz_m = m*pi/D the transform is built
+#: from.
+_MIN_PE_DEPTH_POINTS = 16
 
 
 def _clean_profile(
@@ -86,7 +130,7 @@ def _clean_profile(
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     z = np.asarray(depths, dtype=np.float64)
     c = np.asarray(sound_speeds, dtype=np.float64)
-    if z.ndim != 1 or z.size < 2:
+    if z.ndim != 1 or z.size < _MIN_POLYLINE_NODES:
         msg = "'depths' must be a 1-D array of at least two points."
         raise ValueError(msg)
     if c.shape != z.shape:
@@ -98,7 +142,7 @@ def _clean_profile(
     if np.any(np.diff(z) <= 0.0):
         msg = "'depths' must be strictly increasing."
         raise ValueError(msg)
-    if abs(float(z[0])) > 1e-9:
+    if abs(float(z[0])) > _ORIGIN_SLACK_M:
         msg = "'depths' must start at the surface z = 0."
         raise ValueError(msg)
     if np.any(c <= 0.0):
@@ -126,12 +170,12 @@ def _clean_bathymetry(
     if bathymetry is None:
         return None
     pair = tuple(bathymetry)
-    if len(pair) != 2 or pair[0] is None or pair[1] is None:
+    if len(pair) != 2 or pair[0] is None or pair[1] is None:  # noqa: PLR2004
         msg = "'bathymetry' must be a (ranges_m, depths_m) pair of arrays."
         raise ValueError(msg)
     br = np.asarray(pair[0], dtype=np.float64).ravel()
     bd = np.asarray(pair[1], dtype=np.float64).ravel()
-    if br.size < 2 or bd.shape != br.shape:
+    if br.size < _MIN_POLYLINE_NODES or bd.shape != br.shape:
         msg = (
             "the two halves of 'bathymetry' must be 1-D"
             " arrays of equal length, at least two points."
@@ -143,7 +187,7 @@ def _clean_bathymetry(
     if np.any(np.diff(br) <= 0.0):
         msg = "the bathymetry ranges must be strictly increasing."
         raise ValueError(msg)
-    if abs(float(br[0])) > 1e-9:
+    if abs(float(br[0])) > _ORIGIN_SLACK_M:
         msg = "the bathymetry must start at the source, r = 0."
         raise ValueError(msg)
     if np.any(bd <= 0.0):
@@ -445,7 +489,7 @@ def normal_modes(
             20_000,
             max(400, int(np.ceil(60.0 * water_depth * f / float(np.min(c_prof))))),
         )
-    if int(n_depth_points) < 8:
+    if int(n_depth_points) < _MIN_MODE_GRID_POINTS:
         msg = "'n_depth_points' must be at least 8."
         raise ValueError(msg)
 
@@ -733,14 +777,14 @@ def ray_trace(
     if not (0.0 <= zs <= depth_at_source):
         raise ValueError(_SOURCE_OUTSIDE)
     rmax = require_positive(max_range, "max_range")
-    if int(n_steps) < 2:
+    if int(n_steps) < _MIN_RAY_STEPS:
         msg = "'n_steps' must be at least 2."
         raise ValueError(msg)
     angles = np.asarray(launch_angles_deg, dtype=np.float64).ravel()
     if angles.size == 0 or not np.all(np.isfinite(angles)):
         msg = "'launch_angles_deg' must be finite and non-empty."
         raise ValueError(msg)
-    if np.any(np.abs(angles) >= 90.0):
+    if np.any(np.abs(angles) >= _VERTICAL_DEG):
         msg = "'launch_angles_deg' must be within (-90, 90) degrees (forward rays)."
         raise ValueError(msg)
 
@@ -1291,14 +1335,14 @@ def eigenrays(
     if int(max_arrivals) < 1:
         msg = "'max_arrivals' must be at least 1."
         raise ValueError(msg)
-    if trace.launch_angles.size < 2:
+    if trace.launch_angles.size < 2:  # noqa: PLR2004
         msg = "'trace' must carry at least two rays to bracket between."
         raise ValueError(msg)
     if n_steps is None:
         ns = max(2, int(np.ceil(r_rec / float(r_grid[1] - r_grid[0]))) + 1)
     else:
         ns = int(n_steps)
-        if ns < 2:
+        if ns < _MIN_RAY_STEPS:
             msg = "'n_steps' must be at least 2."
             raise ValueError(msg)
 
@@ -1949,7 +1993,7 @@ def _fold_margins(
     valid = (
         ~sloped
         | (turned < np.pi - 1e-9)
-        | ((np.abs(turned - np.pi) <= 1e-9) & (wrap > 0))
+        | ((np.abs(turned - np.pi) <= _SEAM_SLACK_RAD) & (wrap > 0))
     )
     return margin, valid
 
@@ -2492,14 +2536,14 @@ def _check_source_on_kink(
     rather than a corner one, so it is worth saying out loud; moving the source
     by a metre, or handing in a profile without the kink, removes it.
     """
-    if z_prof.size < 3:
+    if z_prof.size < _MIN_KINK_PROFILE_POINTS:
         return
     grad = np.diff(c_prof) / np.diff(z_prof)
     # A jump of exactly zero is a node the profile runs straight through; any
     # jump at all is a kink, so the test is deliberately exact and carries no
     # tolerance (see :func:`phonometry._internal.rays._prepare_impulses`).
     kinked = z_prof[1:-1][np.diff(grad).astype(bool)]
-    if kinked.size and np.min(np.abs(kinked - source_depth)) <= 1e-6:
+    if kinked.size and np.min(np.abs(kinked - source_depth)) <= _KINK_PROXIMITY_M:
         _warn_beams(
             "'source_depth' sits on a gradient discontinuity of the profile,"
             " which concentrates the near-horizontal beams into a spurious jet;"
@@ -2551,7 +2595,7 @@ def _beam_receiver_grid(
     """
     if receiver_depths_m is None:
         n_z = int(n_depth_points)
-        if n_z < 2:
+        if n_z < _MIN_RECEIVER_DEPTHS:
             msg = "'n_depth_points' must be at least 2."
             raise ValueError(msg)
         dz = water_depth / (n_z + 1)
@@ -2680,7 +2724,7 @@ def _resolve_fan(
 ) -> _Fan:
     """The concrete fan a :class:`BeamFan` asks for, widths resolved."""
     theta_max = float(fan.max_angle_deg)
-    if not (0.0 < theta_max < 90.0):
+    if not (0.0 < theta_max < _VERTICAL_DEG):
         msg = "'max_angle_deg' must lie in (0, 90) degrees."
         raise ValueError(msg)
     # The width the fan's density is sized for has to exist before the fan
@@ -2700,7 +2744,7 @@ def _resolve_fan(
         if fan.n_beams is None
         else int(fan.n_beams)
     )
-    if n_fan < 2:
+    if n_fan < _MIN_FAN_BEAMS:
         msg = "'n_beams' must be at least 2."
         raise ValueError(msg)
     launch = np.linspace(-np.radians(theta_max), np.radians(theta_max), n_fan)
@@ -3380,7 +3424,7 @@ def parabolic_equation(
         msg = "'range_step' must not exceed 'max_range'."
         raise ValueError(msg)
     n = int(n_depth_points)
-    if n < 16:
+    if n < _MIN_PE_DEPTH_POINTS:
         msg = "'n_depth_points' must be at least 16."
         raise ValueError(msg)
 

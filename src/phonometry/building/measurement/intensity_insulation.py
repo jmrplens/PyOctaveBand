@@ -562,7 +562,7 @@ def combine_subareas(
         or exceed the forward flow, so no level exists).
     """
     levels = np.asarray(l_in, dtype=np.float64)
-    if levels.ndim != 2:
+    if levels.ndim != 2:  # noqa: PLR2004
         msg = "'l_in' must be a two-dimensional (subareas, bands) array."
         raise ValueError(msg)
     areas = np.asarray(measurement_area, dtype=np.float64)

@@ -107,6 +107,10 @@ _BANDWIDTH_TYPES = ("peaking", "bandpass", "bandpass_skirt", "notch")
 #: the Butterworth alignment of the second-order prototypes.
 _DEFAULT_Q = 1.0 / math.sqrt(2.0)
 
+#: Smallest usable ``n_points`` for :meth:`ParametricEQ.response`: a
+#: log-spaced evaluation grid needs at least its two endpoints.
+_MIN_RESPONSE_POINTS = 2
+
 
 @dataclass(frozen=True)
 class EQSection:
@@ -201,7 +205,7 @@ def _validate_shelf_slope(section: EQSection) -> None:
         return
     big_a = _gain_amplitude(section.gain_db)
     a_sum = big_a + 1.0 / big_a
-    if a_sum <= 2.0:  # A = 1 (gain 0 dB): every positive slope is fine
+    if a_sum <= 2.0:  # A = 1 (gain 0 dB): every positive slope is fine  # noqa: PLR2004
         return
     bound = a_sum / (a_sum - 2.0)
     if section.slope >= bound:
@@ -553,7 +557,7 @@ class ParametricEQ:
         :return: An :class:`EQResponseResult` (carries the SOS cascade and
             plots the magnitude/phase response).
         """
-        if n_points < 2:
+        if n_points < _MIN_RESPONSE_POINTS:
             msg = "'n_points' must be at least 2."
             raise ValueError(msg)
         nyquist = self.fs / 2

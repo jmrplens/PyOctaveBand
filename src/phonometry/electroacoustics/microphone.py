@@ -85,6 +85,16 @@ _REFERENCE_FREQUENCY = 1000.0
 #: Smallest polar-pattern angular span, in degrees, accepted for the 11.2.2 a)
 #: diffuse-field integral (the pattern must essentially reach the rear).
 _MIN_POLAR_SPAN_DEG = 150.0
+#: Degrees in the full circle: the upper bound of the accepted 0..360-degree
+#: polar-angle domain, and the angle :func:`_fold_angles_deg` subtracts from.
+_FULL_CIRCLE_DEG = 360.0
+#: The 180-degree edge of the 0..180 half plane: a full-circle angle beyond it
+#: re-measures the polar angle ``360 - angle``, folding the rear half onto the
+#: front for the 11.2.2 a) diffuse-field integral.
+_HALF_CIRCLE_DEG = 180.0
+#: Fewest angle points a polar pattern may supply: two, the least that forms a
+#: curve segment.
+_MIN_CURVE_POINTS = 2
 
 
 def _sensitivity_level_db(sensitivity_v_per_pa: float) -> float:
@@ -172,7 +182,9 @@ def _fold_angles_deg(angles_deg: NDArray[np.float64]) -> NDArray[np.float64]:
     folds onto the front half.
     """
     return np.asarray(
-        np.where(angles_deg > 180.0, 360.0 - angles_deg, angles_deg),
+        np.where(
+            angles_deg > _HALF_CIRCLE_DEG, _FULL_CIRCLE_DEG - angles_deg, angles_deg
+        ),
         dtype=np.float64,
     )
 
@@ -594,13 +606,13 @@ def _resolve_polar(
     if p_ang.ndim != 1 or p_ang.shape != p_db.shape:
         msg = "'polar' angles and levels must be 1-D and equal length."
         raise ValueError(msg)
-    if p_ang.size < 2:
+    if p_ang.size < _MIN_CURVE_POINTS:
         msg = "'polar' needs at least two angle points."
         raise ValueError(msg)
     if not (np.all(np.isfinite(p_ang)) and np.all(np.isfinite(p_db))):
         msg = "'polar' angles and levels must be finite."
         raise ValueError(msg)
-    if np.any(p_ang < 0.0) or np.any(p_ang > 360.0):
+    if np.any(p_ang < 0.0) or np.any(p_ang > _FULL_CIRCLE_DEG):
         msg = "'polar' angles must lie within 0..360 degrees."
         raise ValueError(msg)
     order = np.argsort(p_ang)

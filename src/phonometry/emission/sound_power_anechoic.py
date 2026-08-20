@@ -214,12 +214,19 @@ _PS0_KPA = 101.325  #: Reference static pressure, in kilopascals.
 _THETA0_K = 314.0  #: C1 reference temperature theta0, in kelvin.
 _THETA1_K = 296.0  #: C2 reference temperature theta1, in kelvin.
 
+#: Validity floor for the Celsius air temperature: absolute zero as implied by
+#: the standard's own rounded kelvin conversion (the Eq. 14 block writes
+#: 273 + theta), hence -273.0 rather than -273.15.
+_ROUNDED_ABS_ZERO_C = -273.0
+
 #: Background-noise correction floor criteria, in dB (clause 9.4.2). The lower
 #: criterion is 10 dB for one-third-octave mid-bands 250 Hz to 5000 Hz and
 #: 6 dB for bands <= 200 Hz and >= 6300 Hz; the upper criterion is 15 dB.
 _K1_UPPER_3745 = 15.0
 _K1_LOW_MID = 10.0  #: 250-5000 Hz
 _K1_LOW_EDGE = 6.0  #: <= 200 Hz and >= 6300 Hz
+_K1_MID_BAND_MIN_HZ = 250.0  #: Lowest mid-band of the 10 dB criterion range (9.4.2).
+_K1_MID_BAND_MAX_HZ = 5000.0  #: Highest mid-band of the 10 dB criterion range (9.4.2).
 
 #: A-weighted reproducibility standard deviation sigma_R0, in dB (Tables 2/3).
 _SIGMA_R0_3745_A = 0.5
@@ -403,7 +410,9 @@ def _k1_lower_criterion(frequencies: np.ndarray) -> np.ndarray:
     """Frequency-dependent lower K1 criterion, in dB (clause 9.4.2)."""
     freqs = np.asarray(frequencies, dtype=np.float64)
     return np.where(
-        (freqs >= 250.0) & (freqs <= 5000.0), _K1_LOW_MID, _K1_LOW_EDGE
+        (freqs >= _K1_MID_BAND_MIN_HZ) & (freqs <= _K1_MID_BAND_MAX_HZ),
+        _K1_LOW_MID,
+        _K1_LOW_EDGE,
     ).astype(np.float64)
 
 
@@ -504,7 +513,7 @@ def meteorological_corrections(
     if static_pressure <= 0.0:
         msg = "'static_pressure' must be positive (kPa)."
         raise ValueError(msg)
-    if temperature <= -273.0:
+    if temperature <= _ROUNDED_ABS_ZERO_C:
         msg = "'temperature' must be above -273 degrees Celsius."
         raise ValueError(msg)
     if radius <= 0.0:
@@ -528,15 +537,15 @@ def meteorological_corrections(
 
 def _sigma_r0_3745(nominal: int, room: PrecisionRoom) -> float:
     """Per-band sigma_R0 (ISO 3745:2012 Table 2 hemi / Table 3 anechoic), dB."""
-    if 50 <= nominal <= 80:
+    if 50 <= nominal <= 80:  # noqa: PLR2004
         return 2.0
-    if 100 <= nominal <= 630:
+    if 100 <= nominal <= 630:  # noqa: PLR2004
         return 1.5 if room == "hemi-anechoic" else 1.0
-    if 800 <= nominal <= 5000:
+    if 800 <= nominal <= 5000:  # noqa: PLR2004
         return 1.0 if room == "hemi-anechoic" else 0.5
-    if 6300 <= nominal <= 10000:
+    if 6300 <= nominal <= 10000:  # noqa: PLR2004
         return 1.5 if room == "hemi-anechoic" else 1.0
-    if 12500 <= nominal <= 20000:
+    if 12500 <= nominal <= 20000:  # noqa: PLR2004
         return 2.0
     msg = (
         f"No ISO 3745:2012 sigma_R0 for {nominal} Hz; expected a nominal "
@@ -752,7 +761,7 @@ def sound_power_anechoic(
         msg = "A positive 'radius' is required."
         raise ValueError(msg)
     levels = np.atleast_2d(np.asarray(levels_positions, dtype=np.float64))
-    if levels.ndim != 2:
+    if levels.ndim != 2:  # noqa: PLR2004
         msg = "'levels_positions' must be a 2D (positions, bands) array."
         raise ValueError(msg)
     n_positions, n_bands = levels.shape

@@ -88,6 +88,10 @@ _DEFAULT_OVERLAP = 0.5
 #: zero power (an empty or perfectly collinear input): its conditioning step
 #: is skipped and its coherence contribution is zero.
 _PIVOT_FLOOR_REL = 1e-12
+#: Minimum number of input records for a multiple-input (MISO) estimate
+#: (``q >= 2``): with one input the model is not multiple-input and the
+#: conditioning has nothing to order.
+_MIN_INPUT_RECORDS = 2
 
 
 # ---------------------------------------------------------------------------
@@ -156,13 +160,13 @@ def _validate_inputs(
         # are bare arrays and would otherwise reach the estimate in digital
         # units.
         rows = list(np.atleast_2d(resolve_samples(inputs)))
-    elif isinstance(inputs, np.ndarray) and inputs.ndim == 2:
+    elif isinstance(inputs, np.ndarray) and inputs.ndim == 2:  # noqa: PLR2004
         rows = [np.ascontiguousarray(row, dtype=np.float64) for row in inputs]
     else:
         # A sequence may hold Signals of its own; each element keeps its own
         # calibration, applied by _validate_signal below.
         rows = list(inputs)
-    if len(rows) < 2:
+    if len(rows) < _MIN_INPUT_RECORDS:
         msg = "'inputs' must hold at least two input records."
         raise ValueError(msg)
     xs = [_validate_signal(x, f"inputs[{i}]") for i, x in enumerate(rows)]

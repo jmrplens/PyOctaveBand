@@ -84,6 +84,11 @@ _K1A_TABLE: dict[int, float] = {
     9: 1.0,
     10: 0.0,
 }
+#: Table 2 top edge: Delta L_v (dB) at or above which the correction K1A is 0 dB.
+_K1A_ZERO_ABOVE_DB: float = 10.0
+#: Table 2 bottom edge: below this Delta L_v (dB) the table bottoms out, K1A is
+#: clamped to the 3 dB floor value and the result becomes an upper boundary.
+_K1A_CLAMPED_BELOW_DB: float = 3.0
 
 
 def velocity_level(
@@ -245,9 +250,9 @@ def extraneous_velocity_correction(level_difference: float) -> float:
     :param level_difference: Level difference :math:`\Delta L_v`, in dB.
     :return: The correction ``K1A`` to subtract, in dB.
     """
-    if level_difference >= 10.0:
+    if level_difference >= _K1A_ZERO_ABOVE_DB:
         return 0.0
-    if level_difference < 3.0:
+    if level_difference < _K1A_CLAMPED_BELOW_DB:
         return 3.0
     return _K1A_TABLE[round(level_difference)]
 

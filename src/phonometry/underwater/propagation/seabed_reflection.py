@@ -43,6 +43,9 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
 
+# Upper edge of the grazing-angle domain: 90° is normal incidence.
+_NORMAL_INCIDENCE_DEG = 90.0
+
 
 def critical_angle(c1: float, c2: float) -> float:
     r"""Critical grazing angle :math:`\varphi_\mathrm{c} = \arccos(c_1/c_2)`, in
@@ -88,7 +91,7 @@ def reflection_coefficient(
     if phi.size == 0 or not np.all(np.isfinite(phi)):
         msg = "'grazing_angle' must be finite and non-empty."
         raise ValueError(msg)
-    if np.any(phi < 0.0) or np.any(phi > 90.0):
+    if np.any(phi < 0.0) or np.any(phi > _NORMAL_INCIDENCE_DEG):
         msg = "'grazing_angle' must be within [0, 90] degrees."
         raise ValueError(msg)
     r1 = require_positive(rho1, "rho1")

@@ -113,6 +113,15 @@ _COVERAGE_FACTOR = 2.0
 #: The Table 1 standard deviation of reproducibility of the A-weighted sound
 #: power level, in dB (footnote b: a relatively flat 50 Hz to 6,3 kHz spectrum).
 _SIGMA_A_WEIGHTED = 1.0
+#: Band fraction returned by ``band_labels`` for a one-third-octave band set
+#: (1 = octave, 3 = one-third octave, 0 = unlabelled); ISO 9614-3:2002 Table 1
+#: tabulates sigma_R0 for one-third-octave bands only, so any other fraction
+#: reports NaN uncertainty.
+_THIRD_OCTAVE_FRACTION = 3
+#: Minimum band count for the caption to state the determined frequency range
+#: as "lo Hz to hi Hz" (ISO 9614-3:2002 clause 4.3 requires a restricted
+#: determination to state its range); a single band has no first-and-last pair.
+_MIN_BANDS_FOR_RANGE = 2
 #: The two column headings every band table on these sheets opens with: the
 #: band centre, which is translated, and the sound power level, which is a
 #: quantity symbol and therefore is not.
@@ -365,7 +374,7 @@ def _band_uncertainty(result: Any) -> np.ndarray:
     if frequencies is None:
         return uncertainty
     labels, fraction = band_labels(frequencies, n)
-    if fraction != 3:
+    if fraction != _THIRD_OCTAVE_FRACTION:
         return uncertainty
     from ..emission.sound_power_intensity import _sigma_r0_9614_3
 
@@ -521,7 +530,7 @@ def _precision_caption(result: Any, language: str = "en") -> str:
     caption = fraction_caption(result, language)
     frequencies = getattr(result, "frequencies", None)
     n = np.asarray(result.sound_power_level, dtype=np.float64).size
-    if frequencies is None or n < 2:
+    if frequencies is None or n < _MIN_BANDS_FOR_RANGE:
         return caption
     labels, _fraction = band_labels(frequencies, n)
     return t("{caption}, {lo} Hz to {hi} Hz", language).format(

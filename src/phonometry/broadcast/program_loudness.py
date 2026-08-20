@@ -83,6 +83,10 @@ BLOCK_OVERLAP = 0.75
 #: Short-term window length (EBU Tech 3341 section 2.2), in seconds.
 SHORT_TERM_DURATION = 3.0
 
+#: Largest allowed hop of the momentary and short-term loudness series, in
+#: seconds: the 10 Hz minimum meter update rate that EBU Tech 3341 requires.
+MAX_METER_STEP = 0.1
+
 #: Relative gating offset of the loudness range (EBU Tech 3342), in LU.
 LRA_RELATIVE_GATE = -20.0
 
@@ -94,6 +98,11 @@ _TRUE_PEAK_RATE = 192_000.0
 
 #: Sample rate the Annex 1 coefficient tables are given for, in Hz.
 _TABLE_RATE = 48_000.0
+
+#: The lowest sample rate the K-weighting redesign accepts, in Hz: below it
+#: the bilinear warping no longer preserves the specified 48 kHz response
+#: within the +/-0.1 LU metering tolerance.
+_MIN_REDESIGN_RATE = 16000.0
 
 #: Stage 1 of the K-weighting pre-filter (spherical-head shelf): the
 #: (b, a) coefficients of Table 1, valid at 48 kHz.
@@ -114,6 +123,19 @@ DEFAULT_CHANNEL_WEIGHTS: dict[int, tuple[float, ...]] = {
     5: (1.0, 1.0, 1.0, 1.41, 1.41),
     6: (1.0, 1.0, 1.0, 0.0, 1.41, 1.41),
 }
+
+#: Validation bounds of channel_weight, in degrees: input azimuths may span
+#: a full signed turn (+/-360 deg) before being folded, and a loudspeaker
+#: elevation is physically limited to +/-90 deg (straight up/down).
+_MAX_AZIMUTH_DEG = 360.0
+_MAX_ELEVATION_DEG = 90.0
+
+#: The "to the side of the listener" region of Annex 3 Table 4, in degrees:
+#: a mid-layer loudspeaker (|elevation| < 30) placed at 60 <= |azimuth| <= 120
+#: weighs 1.41 (+1.5 dB).
+_SIDE_AZIMUTH_MIN_DEG = 60.0
+_SIDE_AZIMUTH_MAX_DEG = 120.0
+_MID_LAYER_ELEVATION_DEG = 30.0
 
 
 # ---------------------------------------------------------------------------
@@ -180,7 +202,7 @@ def k_weighting_coefficients(
         spherical-head shelving filter and the RLB high-pass filter.
     """
     fs = require_positive(float(fs), "fs")
-    if fs < 16000.0:
+    if fs < _MIN_REDESIGN_RATE:
         msg = (
             "the K-weighting redesign requires fs >= 16000 Hz; below that "
             "the bilinear warping no longer preserves the specified response "
@@ -368,11 +390,15 @@ def channel_weight(
     if not (np.all(np.isfinite(theta)) and np.all(np.isfinite(phi))):
         msg = "azimuth and elevation must be finite."
         raise ValueError(msg)
-    if np.any(theta > 360.0) or np.any(phi > 90.0):
+    if np.any(theta > _MAX_AZIMUTH_DEG) or np.any(phi > _MAX_ELEVATION_DEG):
         msg = "azimuth must be within +/-360 deg and elevation within +/-90 deg."
         raise ValueError(msg)
-    theta = np.where(theta > 180.0, 360.0 - theta, theta)
-    side = (theta >= 60.0) & (theta <= 120.0) & (phi < 30.0)
+    theta = np.where(theta > 180.0, 360.0 - theta, theta)  # noqa: PLR2004
+    side = (
+        (theta >= _SIDE_AZIMUTH_MIN_DEG)
+        & (theta <= _SIDE_AZIMUTH_MAX_DEG)
+        & (phi < _MID_LAYER_ELEVATION_DEG)
+    )
     return as_float_or_array(np.where(side, 1.41, 1.0))
 
 
@@ -817,7 +843,7 @@ def program_loudness(
     fs = require_positive(float(fs), "fs")
     momentary_step = require_positive(float(momentary_step), "momentary_step")
     short_term_step = require_positive(float(short_term_step), "short_term_step")
-    if momentary_step > 0.1 or short_term_step > 0.1:
+    if momentary_step > MAX_METER_STEP or short_term_step > MAX_METER_STEP:
         msg = (
             "momentary_step and short_term_step must be <= 0.1 s: EBU Tech "
             "3341 requires a meter update rate of at least 10 Hz, and Tech "

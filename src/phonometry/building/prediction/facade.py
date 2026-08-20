@@ -277,12 +277,9 @@ class FacadePredictionResult:
             (``pip install phonometry[report]``), or matplotlib is missing for
             the embedded figure (``pip install phonometry[plot]``).
         """
-        from ..._i18n import check_language
+        from .detailed_model import _check_report_request
 
-        check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        _check_report_request(engine, language)
         from ..._report.iso12354 import render_iso12354_facade_report
 
         return render_iso12354_facade_report(
@@ -543,6 +540,10 @@ _DELTA_LFS: dict[str, tuple[tuple[float, float, float] | None, ...]] = {
 #: αw grid of the Figure C.2 columns (≤ 0,3; 0,6; ≥ 0,9).
 _DLFS_ALPHAS = (0.3, 0.6, 0.9)
 
+#: Line-of-sight height bin edges of the Figure C.2 rows, in m
+#: (below 1,5 m; 1,5 m to 2,5 m; above 2,5 m).
+_DLFS_HEIGHT_EDGES = (1.5, 2.5)
+
 
 def facade_shape_level_difference(
     shape: str,
@@ -590,9 +591,10 @@ def facade_shape_level_difference(
     if not (np.isfinite(aw) and 0.0 <= aw <= 1.0):
         msg = "'absorption' must be an αw between 0 and 1."
         raise ValueError(msg)
-    if h < 1.5:
+    low, high = _DLFS_HEIGHT_EDGES
+    if h < low:
         row_index = 0
-    elif h <= 2.5:
+    elif h <= high:
         row_index = 1
     else:
         row_index = 2

@@ -77,6 +77,10 @@ __all__ = [
     "zoom_fft",
 ]
 
+#: Minimum zoom-FFT grid points: the inclusive linspace over
+#: [f_min, f_max] needs at least its two band edges.
+_MIN_ZOOM_GRID_POINTS = 2
+
 
 def _taper(window: str, nperseg: int) -> NDArray[np.float64]:
     """The (periodic) analysis taper, as the Welch core uses it."""
@@ -366,7 +370,7 @@ def zoom_fft(
         m = int(np.ceil((hi - lo) * xa.size / fs_v)) + 1
     else:
         m = int(n_points)
-    if m < 2:
+    if m < _MIN_ZOOM_GRID_POINTS:
         msg = "'n_points' must be at least 2."
         raise ValueError(msg)
 

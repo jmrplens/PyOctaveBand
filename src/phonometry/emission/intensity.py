@@ -70,6 +70,7 @@ from .._internal.levels_math import energy_mean
 from .._internal.utils import _typesignal
 from ..filters.frequencies import _genfreqs
 from ..signals.spectra import (
+    _MIN_SAMPLES,
     _default_nperseg,
     _welch_autospectrum,
     _welch_cross_spectrum,
@@ -92,6 +93,12 @@ _P0 = 2.0e-5
 #: the totals bounded while leaving the low-frequency region (where the bias
 #: matters and is trustworthy) exact.
 _BIAS_CORRECTION_MAX_KDR = np.pi / 2.0
+
+#: Fewest observations the ISO 9614-1:1993 coefficient of variation is
+#: defined from (M short-time samples for F1, N surface positions for F4):
+#: the sample standard deviation divides by (n - 1), equations (A.1) and
+#: (A.8).
+_MIN_VARIATION_OBSERVATIONS = 2
 
 
 def _finite_difference_correction(k_dr: np.ndarray) -> np.ndarray:
@@ -364,7 +371,7 @@ def _validate_band_options(fraction: int | None, limits: list[float] | None) -> 
         msg = "'fraction' must be None, 1 (octave) or 3 (one-third octave)."
         raise ValueError(msg)
     if limits is not None and (
-        len(limits) != 2 or limits[0] <= 0 or limits[1] <= limits[0]
+        len(limits) != 2 or limits[0] <= 0 or limits[1] <= limits[0]  # noqa: PLR2004
     ):
         msg = "'limits' must be [f_min, f_max] with 0 < f_min < f_max."
         raise ValueError(msg)
@@ -458,7 +465,7 @@ def sound_intensity(
     _validate_probe_signals(x1, x2)
     _validate_probe_medium(fs, spacing, rho, c)
     _validate_band_options(fraction, limits)
-    if x1.size < 32:
+    if x1.size < _MIN_SAMPLES:
         msg = f"Signals too short for a spectral estimate: {x1.size} samples."
         raise ValueError(msg)
 
@@ -627,7 +634,7 @@ def temporal_variability_indicator(
             "(samples, bands) arrays."
         )
         raise ValueError(msg)
-    if samples.shape[0] < 2:
+    if samples.shape[0] < _MIN_VARIATION_OBSERVATIONS:
         msg = (
             "At least two short-time samples are required for F1 "
             "(ISO 9614-1 Annex A Note 9 recommends M = 10)."
@@ -763,11 +770,11 @@ def field_indicators(
             f"shape, got {lp.shape} and {i_n.shape}."
         )
         raise ValueError(msg)
-    if lp.shape[0] < 2:
+    if lp.shape[0] < _MIN_VARIATION_OBSERVATIONS:
         msg = "At least two measurement positions are required."
         raise ValueError(msg)
 
-    n_bands = lp.shape[1] if lp.ndim == 2 else 1
+    n_bands = lp.shape[1] if lp.ndim == 2 else 1  # noqa: PLR2004
     freqs: np.ndarray | None = None
     if frequencies is not None:
         freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))

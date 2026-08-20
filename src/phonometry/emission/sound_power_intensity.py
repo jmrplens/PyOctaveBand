@@ -120,6 +120,9 @@ _F_PLUS_MINUS_LIMIT = 3.0
 #: (4 dB), reused here as a per-band survey limit (extrapolated -- the
 #: per-band grade-3 use of the A-weighted 4 dB is non-normative).
 _S_SURVEY = 4.0
+#: Minimum measurement segments of a scan (ISO 9614-2:1996 clause 8.2); fewer
+#: segments only warns, it does not reject.
+_MIN_SEGMENTS = 4
 
 
 def _table2_s(nominal: int, band_type: BandType) -> float:
@@ -350,7 +353,7 @@ def _validate_scan(
     if np.any(seg <= 0.0):
         msg = "All segment 'areas' must be positive."
         raise ValueError(msg)
-    if n_seg < 4:
+    if n_seg < _MIN_SEGMENTS:
         warnings.warn(
             f"Only {n_seg} segment(s); ISO 9614-2:1996 clause 8.2 requires at "
             "least 4 measurement segments.",
@@ -680,6 +683,10 @@ _FS_LIMIT = 2.0  #: Criterion 4 field-non-uniformity limit (Eq. C.4).
 _F_PI_DIFF_LIMIT = 3.0  #: Criterion 3 signed-minus-unsigned limit, dB (Eq. C.3).
 _FS_RATIO_LOW = 0.83  #: Criterion 5 lower bound on FS(1)/FS(2) (Eq. C.5).
 _FS_RATIO_HIGH = 1.2  #: Criterion 5 upper bound on FS(1)/FS(2) (Eq. C.5).
+#: Fewest samples a Bessel-corrected (N-1) sample standard deviation needs:
+#: segments for FS (Eq. B.8) and time windows for FT (Eq. B.1).
+_MIN_STDDEV_SAMPLES = 2
+_ABS_ZERO_C = -273.15  #: Absolute zero, deg C: validity floor for theta (Eq. 10).
 
 
 @dataclass(frozen=True)
@@ -968,7 +975,7 @@ def precision_field_indicators(
         )
         raise ValueError(msg)
     n_seg = i_n.shape[0]
-    if n_seg < 2:
+    if n_seg < _MIN_STDDEV_SAMPLES:
         msg = "At least two segments are required for the indicators."
         raise ValueError(msg)
 
@@ -997,7 +1004,7 @@ def precision_field_indicators(
             msg = "'time_window_intensity' last axis must match the number of bands."
             raise ValueError(msg)
         m = win.shape[0]
-        if m < 2:
+        if m < _MIN_STDDEV_SAMPLES:
             msg = "At least two time windows are required for FT."
             raise ValueError(msg)
         mean_t = np.mean(win, axis=0)
@@ -1015,13 +1022,13 @@ def precision_field_indicators(
 
 def _sigma_r0_9614_3(nominal: int) -> float:
     """Per-band sigma_R0 (ISO 9614-3:2002 Table 1), in dB; also criterion-1 s."""
-    if 50 <= nominal <= 160:
+    if 50 <= nominal <= 160:  # noqa: PLR2004
         return 2.0
-    if 200 <= nominal <= 315:
+    if 200 <= nominal <= 315:  # noqa: PLR2004
         return 1.5
-    if 400 <= nominal <= 5000:
+    if 400 <= nominal <= 5000:  # noqa: PLR2004
         return 1.0
-    if nominal == 6300:
+    if nominal == 6300:  # noqa: PLR2004
         return 2.0
     msg = (
         f"No ISO 9614-3:2002 Table 1 sigma_R0 for {nominal} Hz; expected a "
@@ -1203,7 +1210,7 @@ def sound_power_intensity_precision(
     if np.any(seg <= 0.0):
         msg = "All 'areas' must be positive."
         raise ValueError(msg)
-    if temperature <= -273.15:
+    if temperature <= _ABS_ZERO_C:
         msg = "'temperature' must be above -273,15 degrees Celsius."
         raise ValueError(msg)
     if barometric_pressure <= 0.0:

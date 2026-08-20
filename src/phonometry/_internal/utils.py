@@ -11,6 +11,11 @@ from scipy import signal
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+# Rank of the cached SOS filter state ``zi`` as ``_sos_initial_state`` lays
+# it out: (n_sections, 2) for 1-D input, (n_sections, n_channels, 2) for 2-D.
+_ZI_NDIM_MONO = 2
+_ZI_NDIM_MULTICHANNEL = 3
+
 
 def _typesignal(x: Sequence[float] | np.ndarray) -> np.ndarray:
     """Ensure signal is a float64 numpy array.
@@ -97,5 +102,5 @@ def _sos_state_mismatch(zi: np.ndarray, x_proc: np.ndarray) -> bool:
     if zi.size == 0:
         return True
     if x_proc.ndim == 1:
-        return zi.ndim != 2
-    return zi.ndim != 3 or zi.shape[1] != x_proc.shape[0]
+        return zi.ndim != _ZI_NDIM_MONO
+    return zi.ndim != _ZI_NDIM_MULTICHANNEL or zi.shape[1] != x_proc.shape[0]

@@ -41,6 +41,11 @@ _FREQ_LABEL = "Frequency [Hz]"
 #: Y-axis label of the residual-index plots (identical in both languages,
 #: the symbol carries the meaning).
 _LABEL_RESIDUAL_INDEX = r"$\delta_{pI0}$ [dB]"
+#: Fewest frequency bands that make a per-band ISO 9614-1 indicators result
+#: drawable as a curve: a size-1 array after ``atleast_1d`` is the
+#: scalar/overall form of ``field_indicators`` (1D per-position input), which
+#: ``plot()`` rejects as carrying no per-band data.
+_MIN_BANDS = 2
 
 #: Spanish translations of the fixed labels/titles/legends rendered by the
 #: emission-domain ``.plot()`` renderers, keyed by their verbatim English
@@ -281,7 +286,7 @@ def plot_field_indicators(
     from .._i18n import localize_axes
 
     f2 = np.atleast_1d(np.asarray(result.f2, dtype=np.float64))
-    if result.frequency is None or f2.size < 2:
+    if result.frequency is None or f2.size < _MIN_BANDS:
         msg = (
             "plot() needs per-band indicators; call field_indicators(...) with "
             "2D (positions, bands) arrays and 'frequencies'."
@@ -483,7 +488,7 @@ def plot_intensity_class(
 
     # Ring the bands that block the next class up: class 1 for a class 2 chain,
     # class 2 for a chain that meets neither. A class 1 chain has none.
-    marked_cls = 1 if result.overall_class == 2 else 2
+    marked_cls = 1 if result.overall_class == 2 else 2  # noqa: PLR2004
     marked_mask = class1 if marked_cls == 1 else class2
     failing = (
         np.zeros(freqs.shape, dtype=bool)

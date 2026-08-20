@@ -104,6 +104,25 @@ _ROAD_MINIMUM_SPEED = 20.0
 _JUNCTION_RANGE = 100.0
 #: Largest gradient magnitude the gradient correction accounts for (2.2.13), %.
 _MAX_GRADIENT = 12.0
+#: Calendar months in a year: bounds ``T_s`` of (2.2.7), the months per year
+#: over which studded tyres are in use, and annualizes it in (2.2.7).
+_MONTHS_PER_YEAR = 12.0
+#: Road slope, in %, below which the downhill branch of the gradient
+#: correction (2.2.13)-(2.2.16) engages for light vehicles (category 1). That
+#: branch subtracts this threshold's magnitude, 6.0, from the capped downhill
+#: gradient, so the formula keeps that literal rather than this signed value.
+_LIGHT_DOWNHILL_SLOPE = -6.0
+#: Road slope, in %, above which the uphill branch of the gradient correction
+#: (2.2.13)-(2.2.16) engages for light vehicles (category 1). Being positive,
+#: this value is also, unchanged, the offset that branch subtracts from the
+#: capped uphill gradient.
+_LIGHT_UPHILL_SLOPE = 2.0
+#: Road slope, in %, below which the downhill branch of the gradient
+#: correction (2.2.13)-(2.2.16) engages for medium heavy and heavy vehicles
+#: (categories 2 and 3 share the one threshold). Both branch formulae
+#: subtract its magnitude, 4.0, from the capped downhill gradient, not this
+#: signed value.
+_HEAVY_DOWNHILL_SLOPE = -4.0
 
 #: Octave-band A-weighting ``AWC_f,i`` prescribed by 2.5.5 as amended by
 #: Commission Delegated Directive (EU) 2021/1226 Annex point (8)(b), in dB.
@@ -602,17 +621,21 @@ def _studded_correction(
     if not 0.0 <= studded_fraction <= 1.0:
         msg = "'studded_fraction' must be a fraction in [0, 1]."
         raise ValueError(msg)
-    if not 0.0 <= studded_months <= 12.0:
+    if not 0.0 <= studded_months <= _MONTHS_PER_YEAR:
         msg = "'studded_months' must be a number of months in [0, 12]."
         raise ValueError(msg)
-    if key != "1" or studded_months <= 0.0 or studded_fraction <= 0.0:
+    if (
+        key != RoadVehicleCategory.LIGHT.value
+        or studded_months <= 0.0
+        or studded_fraction <= 0.0
+    ):
         return np.zeros(len(ROAD_OCTAVE_BANDS))
     # (2.2.6): the speed dependence saturates below 50 km/h and above 90 km/h.
     clipped = min(max(speed, 50.0), 90.0)
     d_stud = _bands(coefficients.studded_a) + _bands(coefficients.studded_b) * np.log10(
         clipped / ROAD_REFERENCE_SPEED
     )
-    p_s = studded_fraction * studded_months / 12.0  # (2.2.7)
+    p_s = studded_fraction * studded_months / _MONTHS_PER_YEAR  # (2.2.7)
     return np.asarray(
         10.0 * np.log10((1.0 - p_s) + p_s * 10.0 ** (d_stud / 10.0)), dtype=np.float64
     )  # (2.2.8)
@@ -627,19 +650,19 @@ def _gradient_correction(key: str, slope: float, speed: float) -> float:
     """
     if key in ("4a", "4b"):
         return 0.0
-    if key == "1":
-        if slope < -6.0:
+    if key == RoadVehicleCategory.LIGHT.value:
+        if slope < _LIGHT_DOWNHILL_SLOPE:
             return (min(_MAX_GRADIENT, -slope) - 6.0) / 1.0
-        if slope > 2.0:
+        if slope > _LIGHT_UPHILL_SLOPE:
             return (min(_MAX_GRADIENT, slope) - 2.0) / 1.5 * speed / 100.0
         return 0.0
-    if key == "2":
-        if slope < -4.0:
+    if key == RoadVehicleCategory.MEDIUM_HEAVY.value:
+        if slope < _HEAVY_DOWNHILL_SLOPE:
             return (min(_MAX_GRADIENT, -slope) - 4.0) / 0.7 * (speed - 20.0) / 100.0
         if slope > 0.0:
             return min(_MAX_GRADIENT, slope) / 1.0 * speed / 100.0
         return 0.0
-    if slope < -4.0:
+    if slope < _HEAVY_DOWNHILL_SLOPE:
         return (min(_MAX_GRADIENT, -slope) - 4.0) / 0.5 * (speed - 10.0) / 100.0
     if slope > 0.0:
         return min(_MAX_GRADIENT, slope) / 0.8 * speed / 100.0

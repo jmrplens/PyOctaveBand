@@ -136,6 +136,11 @@ PLATEAU_MATERIALS: dict[str, tuple[float, float, float]] = {
 #: Field-incidence correction of Norton Eq. (3.106): a flat 5 dB below the
 #: normal-incidence mass law (a diffuse field limited to 78 degrees).
 _NORTON_FIELD_CORRECTION: float = 5.0
+#: Grazing incidence, degrees: the open upper bound of the fixed limiting
+#: angle ``theta_L`` of the field-incidence diffuse integral (at 90 degrees
+#: the upper limit :math:`\sin^{2}\theta_\mathrm{L}` of Bies Eq. (7.38)
+#: reaches 1).
+_GRAZING_INCIDENCE_DEG: float = 90.0
 
 
 def _band_axis(frequency: ArrayLike) -> np.ndarray:
@@ -1124,7 +1129,7 @@ def orthotropic_transmission_loss(
     # whichever method it was passed with, even where the method ignores it.
     if area is not None:
         require_positive(area, "area")
-    elif not 0.0 < limiting_angle < 90.0:
+    elif not 0.0 < limiting_angle < _GRAZING_INCIDENCE_DEG:
         msg = "'limiting_angle' must lie in (0, 90) degrees."
         raise ValueError(msg)
     f = _band_axis(frequency)

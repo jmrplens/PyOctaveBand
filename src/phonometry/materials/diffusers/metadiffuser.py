@@ -61,6 +61,10 @@ __all__ = [
     "metadiffuser_reflection",
 ]
 
+# A diffuser needs at least two wells per period to present a spatially
+# varying reflection profile along the panel face; one well cannot diffuse.
+_MIN_WELLS = 2
+
 
 @dataclass(frozen=True)
 class MetadiffuserWell:
@@ -147,7 +151,7 @@ def _check_panel(
     require_positive(depth, "depth")
     require_positive(period, "period")
     cells = tuple(wells)
-    if len(cells) < 2:
+    if len(cells) < _MIN_WELLS:
         msg = "'wells' must contain at least two wells."
         raise ValueError(msg)
     for i, well in enumerate(cells):

@@ -112,6 +112,11 @@ _INDEX_500 = 1
 #: float-safe grid arithmetic: 0.80, 1.00, 1.00, 1.00, 0.90.
 _REFERENCE_UNITS: tuple[int, ...] = (16, 20, 20, 20, 18)
 
+#: Full scale of the absorption coefficient (alpha = 1,00) in the twentieths
+#: (units of 0,05) of Clause 4.1; the Clause 4.2 shift loop never needs to
+#: lower the reference curve by more than one whole unit of alpha.
+_FULL_SCALE_UNITS = 20
+
 #: Unfavourable-deviation budget of Clause 4.2, in twentieths (0,10).
 _UNFAVOURABLE_BUDGET_UNITS = 2
 
@@ -405,7 +410,7 @@ def _rate(
     # The unfavourable sum is non-increasing in the shift, so the first
     # (smallest) qualifying shift is the answer.
     shift_units = 0
-    while shift_units <= 20:
+    while shift_units <= _FULL_SCALE_UNITS:
         shifted_units = [r - shift_units for r in _REFERENCE_UNITS]
         unfav_units = sum(max(0, s - m) for s, m in zip(shifted_units, measured_units))
         if unfav_units <= _UNFAVOURABLE_BUDGET_UNITS:

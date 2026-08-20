@@ -84,6 +84,14 @@ _E_K5 = np.array([0.0, 1.0, 11.0, 11.0, 1.0])  # e_i for k = 5 (below Formula 15
 _Z = np.arange(0.5, 26.5 + 0.25, 0.5)  # critical-band-rate scale, 0.5..26.5
 _CBF = _Z.size  # number of critical band filters = 53
 
+# Band-dependent segmentation (Clause 5.1.5, Table 4): breakpoints on the
+# auditory-filter bandwidth df(z) selecting the block size s_b -- below each
+# limit the named block size applies; at or above the last one the smallest
+# 1024-sample block does.
+_DF_LIMIT_SB_8192 = 85.0
+_DF_LIMIT_SB_4096 = 170.0
+_DF_LIMIT_SB_2048 = 340.0
+
 # Outer and middle/inner ear filter, free field (Table 1): [b0,b1,b2,a1,a2].
 _EAR_FREE = np.array(
     [
@@ -171,6 +179,10 @@ _E_B = 0.5459  # exponent-function parameter b (Table 12)
 _TRANSIENT_BLOCKS = 56  # discard l in [0, 56] (~300 ms) (Clause 8.1.2)
 _R_SD = _FS / 256.0  # common-grid rate 187.5 Hz (Clause 6.2.6)
 
+# Width in time blocks of the Clause 6.2.3 neighbouring-block ACF average
+# (previous + current + next).
+_TIME_AVG_BLOCKS = 3
+
 # Noise-reduction sigmoid (Table 7) and g(z) parameters (Table 8).
 _NR_ALPHA = 20.0
 _NR_BETA = 0.07
@@ -190,11 +202,11 @@ def _block_sizes() -> tuple[np.ndarray, np.ndarray]:
     """Band-dependent block size s_b(z) and hop size s_h(z) (Table 4)."""
     s_b = np.empty(_CBF, dtype=np.int64)
     for i, df in enumerate(_DF):
-        if df < 85.0:
+        if df < _DF_LIMIT_SB_8192:
             s_b[i] = 8192
-        elif df < 170.0:
+        elif df < _DF_LIMIT_SB_4096:
             s_b[i] = 4096
-        elif df < 340.0:
+        elif df < _DF_LIMIT_SB_2048:
             s_b[i] = 2048
         else:
             s_b[i] = 1024
@@ -204,6 +216,7 @@ def _block_sizes() -> tuple[np.ndarray, np.ndarray]:
 
 _S_B, _S_H = _block_sizes()
 _S_B_MAX = int(_S_B.max())  # 8192
+_S_B_MIN = int(_S_B.min())  # 1024
 _S_H_MAX = int(_S_H.max())  # 2048
 # Interpolation factor to the common time grid (Table 6): s_h / 256.
 _INTERP = (_S_H // 256).astype(np.int64)
@@ -497,9 +510,9 @@ def _average_blocks(averaged: list[np.ndarray]) -> list[np.ndarray]:
     out: list[np.ndarray] = []
     for band in range(_CBF):
         acf = averaged[band]
-        if int(_S_B[band]) in (8192, 4096) and acf.shape[0] >= 3:
+        if int(_S_B[band]) in (8192, 4096) and acf.shape[0] >= _TIME_AVG_BLOCKS:
             smoothed = acf.copy()
-            smoothed[1:-1] = (acf[:-2] + acf[1:-1] + acf[2:]) / 3.0
+            smoothed[1:-1] = (acf[:-2] + acf[1:-1] + acf[2:]) / _TIME_AVG_BLOCKS
             out.append(smoothed)
         else:
             out.append(acf)
@@ -587,7 +600,7 @@ def _tonal_noise_split(
     # smallest (1024-sample) stage. The larger stages segment up to 7 blocks
     # past it (their i_start reaches further back into the start padding);
     # sizing from their count would only append edge-held interpolations.
-    n_common = int(averaged[int(np.argmax(_S_B == 1024))].shape[0])
+    n_common = int(averaged[int(np.argmax(_S_B == _S_B_MIN))].shape[0])
     n_tonal = np.zeros((n_common, _CBF))
     n_signal = np.zeros((n_common, _CBF))
     f_ton = np.zeros((n_common, _CBF))

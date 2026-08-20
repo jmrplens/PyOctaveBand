@@ -52,6 +52,14 @@ if TYPE_CHECKING:
 #: Reference sound power for the sound power level, 1 pW = 10^-12 W.
 POWER_REFERENCE = "1 pW"
 
+#: The fewest band centres from which an adjacent-centre ratio exists so the
+#: band fraction can be inferred; below it the conventional octave default 1
+#: is used, the same guard ``_infer_band_fraction`` documents and applies.
+_MIN_BANDS_TO_INFER_FRACTION = 2
+
+#: The IEC 61260 band-fraction designator for a one-third-octave set.
+_THIRD_OCTAVE_FRACTION = 3
+
 
 def _num(value: float | None, language: str = "en") -> str | None:
     """Round-trip a client-supplied metadata number, or ``None`` when unset."""
@@ -107,7 +115,9 @@ def band_labels(frequencies: np.ndarray | None, n: int) -> tuple[list[str], int]
     from ..filters.frequencies import _infer_band_fraction, _nominal_freq_for_band
 
     freqs = np.asarray(frequencies, dtype=np.float64)
-    fraction = _infer_band_fraction(freqs) if freqs.size >= 2 else 1
+    fraction = (
+        _infer_band_fraction(freqs) if freqs.size >= _MIN_BANDS_TO_INFER_FRACTION else 1
+    )
     labels = [f"{_nominal_freq_for_band(f, float(fraction)):g}" for f in freqs]
     return labels, fraction
 
@@ -351,7 +361,7 @@ def power_value_table(
     ]
     # A one-third-octave set groups by octave (a thin rule after every triplet),
     # as accredited sound-power tables print it; an octave set has no triplets.
-    if fraction == 3:
+    if fraction == _THIRD_OCTAVE_FRACTION:
         for triplet_end in range(3, n, 3):
             style_cmds.append(
                 ("LINEBELOW", (0, triplet_end), (-1, triplet_end), 0.4, thin)

@@ -288,7 +288,7 @@ def difference_frequency_distortion(
     if ref <= 0.0:
         msg = "No primary tones found at 'f1'/'f2'."
         raise ValueError(msg)
-    if order == 2:
+    if order == 2:  # noqa: PLR2004
         value = _imd_component(freqs, amp, fb - fa, half, exclude=(fa, fb))
     else:
         value = _imd_component(

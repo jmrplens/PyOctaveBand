@@ -11,7 +11,11 @@ from typing import Literal, cast, overload
 import numpy as np
 from scipy import signal
 
-from .._internal.utils import _downsamplingfactor, _resample_to_length
+from .._internal.utils import (
+    _ZI_NDIM_MULTICHANNEL,
+    _downsamplingfactor,
+    _resample_to_length,
+)
 from .._internal.warnings import PhonometryWarning
 from ..io._resolve import (
     like_input,
@@ -137,7 +141,7 @@ def _validate_bank_design(
         raise ValueError(msg)
     if limits is None:
         limits = [12, 20000]
-    if len(limits) != 2:
+    if len(limits) != 2:  # noqa: PLR2004
         msg = "Limits must be a list of two frequencies [f_min, f_max]."
         raise ValueError(msg)
     if limits[0] <= 0 or limits[1] <= 0:
@@ -632,7 +636,10 @@ class OctaveFilterBank:
         elif self.stateful:
             n_channels = sd.shape[0]
             # Lazy init: allocate zi with correct channel count on first use
-            if self.zi[idx].ndim < 3 or self.zi[idx].shape[1] != n_channels:
+            if (
+                self.zi[idx].ndim < _ZI_NDIM_MULTICHANNEL
+                or self.zi[idx].shape[1] != n_channels
+            ):
                 n_sections = self.sos[idx].shape[0]
                 if not self._steady_ic:
                     self.zi[idx] = np.zeros((n_sections, n_channels, 2))

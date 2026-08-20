@@ -54,6 +54,10 @@ if TYPE_CHECKING:
 #: Reference sound power for a regenerated-noise sound power level, 1 pW.
 _POWER_REFERENCE = "1 pW"
 
+#: Band fraction returned by ``band_labels`` for a one-third-octave band set
+#: (1 = octave, 3 = one-third-octave, 0 = no octave grouping).
+_THIRD_OCTAVE_FRACTION = 3
+
 
 def _is_power(result: Any) -> bool:
     """Return ``True`` for a regenerated sound power spectrum, else attenuation."""
@@ -170,7 +174,7 @@ def _caption(result: Any, language: str = "en") -> str:
             if power
             else t("Octave-band attenuation", language)
         )
-    if fraction == 3:
+    if fraction == _THIRD_OCTAVE_FRACTION:
         return (
             t("One-third-octave-band regenerated sound power levels", language)
             if power

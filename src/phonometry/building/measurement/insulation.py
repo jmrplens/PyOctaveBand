@@ -652,7 +652,7 @@ def _as_band_levels(levels: Sequence[float] | np.ndarray, name: str) -> np.ndarr
     data = np.asarray(levels, dtype=np.float64)
     if data.ndim == 1:
         out = data
-    elif data.ndim == 2:
+    elif data.ndim == 2:  # noqa: PLR2004
         out = np.asarray(energy_average_level(data, axis=0), dtype=np.float64)
     else:
         msg = f"'{name}' must be 1-D or 2-D (positions x bands)."

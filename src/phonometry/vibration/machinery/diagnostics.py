@@ -108,6 +108,13 @@ if TYPE_CHECKING:
 #: Description of the shaft-rate line, shared by every family.
 _SHAFT_DESCRIPTION = "shaft rotational frequency"
 
+#: Exclusive upper bound of the bearing contact angle phi, in degrees: the
+#: rolling-contact factor g = (d/D) cos(phi) degenerates at a right angle.
+_MAX_CONTACT_ANGLE_DEG = 90.0
+
+#: Minimum magnetic pole count of an induction motor: one pole pair.
+_MIN_POLES = 2
+
 
 def _require_count(value: int, name: str, minimum: int = 1) -> int:
     """An integer parameter that must be at least *minimum*."""
@@ -386,7 +393,7 @@ def bearing_fault_frequencies(
         msg = "'element_diameter' must be smaller than 'pitch_diameter'."
         raise ValueError(msg)
     phi = require_non_negative(contact_angle_deg, "contact_angle_deg")
-    if phi >= 90.0:
+    if phi >= _MAX_CONTACT_ANGLE_DEG:
         msg = "'contact_angle_deg' must be below 90 degrees."
         raise ValueError(msg)
     race = require_choice(rotating_race, "rotating_race", ("inner", "outer"))
@@ -615,7 +622,7 @@ def induction_motor_frequencies(
     """
     fs = shaft_rate(speed_rpm)
     p = int(poles)
-    if p < 2 or p % 2:
+    if p < _MIN_POLES or p % 2:
         msg = "'poles' must be an even integer of at least 2."
         raise ValueError(msg)
     bars = _require_count(rotor_bars, "rotor_bars")

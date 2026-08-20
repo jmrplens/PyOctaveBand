@@ -333,7 +333,7 @@ def _validate_sponge_damping(
     if not np.all(np.isfinite(damping_map)) or np.any(damping_map < 0.0):
         msg = "damping must be non-negative and finite"
         raise ValueError(msg)
-    if damping_map.ndim == 2 and damping_map.shape != (ny, nx):
+    if damping_map.ndim == 2 and damping_map.shape != (ny, nx):  # noqa: PLR2004
         msg = (
             f"damping map shape {damping_map.shape} does not match the grid {(ny, nx)}"
         )
@@ -412,7 +412,7 @@ def _resolve_c_map(c: float | Field2D, shape: tuple[int, int] | None) -> Field2D
         c_map = np.full(shape, float(np.real(c)), dtype=np.float64)
     else:
         c_map = np.asarray(c, dtype=np.float64)
-    if c_map.ndim != 2:
+    if c_map.ndim != 2:  # noqa: PLR2004
         msg = "c must be a 2D (ny, nx) map"
         raise ValueError(msg)
     _positive_map("c", c_map)

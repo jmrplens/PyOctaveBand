@@ -134,6 +134,10 @@ _RHO_AIR = 1.206
 #: last bits of a sum like 0.1 + 0.2. Nine orders of magnitude below the length
 #: is far above the arithmetic and far below any dimension anyone draws.
 _MEETING_SLACK = 1e-9
+#: Smallest frequency grid on which an interior minimum of |Z_b| can exist:
+#: two endpoints plus at least one interior candidate, since a least value
+#: sitting on either end is a property of the grid rather than of the branch.
+_MIN_GRID_FOR_INTERIOR_MINIMUM = 3
 
 _Complex = NDArray[np.complex128]
 
@@ -216,7 +220,7 @@ def _shorting_frequency(
     end of the grid is a property of the grid rather than of the branch, and
     is not reported.
     """
-    if f.size < 3:
+    if f.size < _MIN_GRID_FOR_INTERIOR_MINIMUM:
         return None
     magnitude = np.abs(branch_impedance)
     magnitude = np.where(np.isfinite(magnitude), magnitude, np.inf)

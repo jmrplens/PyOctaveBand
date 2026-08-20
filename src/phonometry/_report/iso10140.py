@@ -43,6 +43,11 @@ if TYPE_CHECKING:
     )
     from .metadata import ReportMetadata
 
+#: Band-centre count that identifies an ISO 717 rating computed from octave
+#: bands (5 centres, 125 Hz to 2000 Hz); it selects the "Octave-band" caption
+#: ISO 717-1:2020 Clause 5.3 / ISO 717-2:2020 Clause 4.4 require.
+_N_OCTAVE_BANDS = 5
+
 #: Per-quantity fixed labels: title, basis line, the quantity symbol used in
 #: the table header, the rating symbol of the boxed result, the plot y-axis
 #: label (mathtext) and the laboratory-method statement.
@@ -134,7 +139,7 @@ def render_iso10140_report(
         # bands; the caption declares the set.
         caption_key = (
             "Octave-band {vh} [dB]"
-            if np.asarray(rating.band_centers).size == 5
+            if np.asarray(rating.band_centers).size == _N_OCTAVE_BANDS
             else "One-third-octave {vh} [dB]"
         )
         caption = t(caption_key, language).format(vh=spec["symbol"])

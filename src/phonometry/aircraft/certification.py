@@ -187,6 +187,30 @@ _TONE_START = 2
 #: Bands the tone-correction routine works over (Appendix 2 §4.3).
 _TONE_BANDS = 24
 
+#: Step 2 of the slope ("encircling") method: a slope is encircled where it
+#: changes from the previous one by more than 5 dB (Appendix 2 §4.3).
+_ENCIRCLE_SLOPE_CHANGE_DB = 5.0
+
+#: Table A2-2: minimum tone excess ``F`` (dB); below it the correction is zero.
+_MIN_TONE_EXCESS_DB = 1.5
+
+#: Table A2-2: edges (Hz) of the middle frequency class, where the tone
+#: penalty is doubled.
+_TONE_MID_BAND_LOW_HZ = 500.0
+_TONE_MID_BAND_HIGH_HZ = 5000.0
+
+#: Table A2-2: the ``F`` breakpoint where the ramp-in segment of the
+#: tone-correction law ends and the proportional segment begins.
+_TONE_EXCESS_KNEE_DB = 3.0
+
+#: Table A2-2: the ``F`` excess beyond which the tone correction saturates
+#: at its cap.
+_TONE_EXCESS_SATURATION_DB = 20.0
+
+#: Highest 0-based band index accepted as the slope-analysis start band
+#: (band index 3 = 100 Hz).
+_MAX_TONE_START_BAND = 3
+
 
 def _tone_background(
     spl: NDArray[np.float64] | list[float],
@@ -229,7 +253,11 @@ def _tone_marked_slopes(
     # Step 2: encircle a slope where |s(i) - s(i-1)| > 5.
     s_enc = np.zeros(n, dtype=bool)
     for i in range(start + 1, n):
-        if not np.isnan(s[i]) and not np.isnan(s[i - 1]) and abs(s[i] - s[i - 1]) > 5.0:
+        if (
+            not np.isnan(s[i])
+            and not np.isnan(s[i - 1])
+            and abs(s[i] - s[i - 1]) > _ENCIRCLE_SLOPE_CHANGE_DB
+        ):
             s_enc[i] = True
 
     # Step 3: mark which SPL value to adjust.
@@ -315,17 +343,17 @@ def _tone_background_levels(
 
 def _tone_factor(excess: float, frequency: float) -> float:
     """Tone-correction factor ``C`` from the excess ``F`` (App. 2 Table A2-2)."""
-    if not np.isfinite(excess) or excess < 1.5:
+    if not np.isfinite(excess) or excess < _MIN_TONE_EXCESS_DB:
         return 0.0
-    if 500.0 <= frequency <= 5000.0:
-        if excess < 3.0:
+    if _TONE_MID_BAND_LOW_HZ <= frequency <= _TONE_MID_BAND_HIGH_HZ:
+        if excess < _TONE_EXCESS_KNEE_DB:
             return 2.0 * excess / 3.0 - 1.0
-        if excess < 20.0:
+        if excess < _TONE_EXCESS_SATURATION_DB:
             return excess / 3.0
         return 20.0 / 3.0
-    if excess < 3.0:
+    if excess < _TONE_EXCESS_KNEE_DB:
         return excess / 3.0 - 0.5
-    if excess < 20.0:
+    if excess < _TONE_EXCESS_SATURATION_DB:
         return excess / 6.0
     return 10.0 / 3.0
 
@@ -346,7 +374,7 @@ def tone_correction(
     :return: The tone-correction factor ``C``, in dB (0 if no tones qualify).
     :raises ValueError: If the spectrum is not 24 finite levels.
     """
-    if not 0 <= int(start_band) <= 3:
+    if not 0 <= int(start_band) <= _MAX_TONE_START_BAND:
         msg = "'start_band' must be between 0 (50 Hz) and 3 (100 Hz)."
         raise ValueError(msg)
     _, excess = _tone_background(spl, start=int(start_band))
@@ -589,7 +617,7 @@ def effective_perceived_noise_level(
         ``procedure`` is not ``"aeroplane"`` or ``"helicopter"``.
     """
     arr = np.asarray(spectra, dtype=np.float64)
-    if arr.ndim != 2 or arr.shape[1] != 24 or arr.shape[0] < 1:
+    if arr.ndim != 2 or arr.shape[1] != NOY_BANDS.size or arr.shape[0] < 1:  # noqa: PLR2004
         msg = "'spectra' must have shape (K, 24)."
         raise ValueError(msg)
     if not np.all(np.isfinite(arr)):
