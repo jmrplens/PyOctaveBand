@@ -106,8 +106,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   saying what ends the loop. The five are worth naming, because they are the
   cases a blanket fix would have got wrong: two walk a palette against fewer
   paths than it holds, one walks the fixed seven-band STI table against
-  whatever the result carries, one pairs `T20`/`T30` against however many fit
-  the plot, and one reads a mapping's keys against its values in an AST node.
+  whatever the result carries, one walks a list of title sizes against the
+  same list offset by one, where the smallest size has no step below it, and
+  one names the leading columns of a rotorcraft `.his` header, leaving any
+  further column of a variant file unnamed.
 
   `strict=True` is not a formality: it turns a silent truncation into a
   `ValueError`, so it is only the truth where something upstream guarantees

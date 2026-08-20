@@ -298,6 +298,54 @@ def _verdict(
     return text, passed
 
 
+def _left_table(
+    result: AbsorptionRatingResult,
+    centers: np.ndarray,
+    measured: np.ndarray,
+    shifted: np.ndarray,
+    deviations: np.ndarray,
+    verbose: bool,
+    language: str,
+) -> tuple[Any, str]:
+    """Pick the left-hand table of the fiche, and the caption that names it.
+
+    The accredited default (Fellert et al.) shows the full one-third-octave
+    ``alpha_s`` table with ``alpha_p`` on the octave rows when the input
+    ``alpha_s`` was retained; verbose keeps the octave evaluation columns, and
+    without ``alpha_s`` the plain octave ``alpha_p`` table is used.
+
+    :param result: The rating whose per-band arrays the table reads.
+    :param centers: Octave-band centre frequencies, Hz.
+    :param measured: Practical absorption coefficient per octave band.
+    :param shifted: The shifted reference curve.
+    :param deviations: Unfavourable deviations from that curve.
+    :param verbose: Keep the octave evaluation columns.
+    :param language: Label language.
+    :return: The table flowable and its caption.
+    :raises ValueError: If the one-third-octave arrays differ in length.
+    """
+    alpha_s = result.third_octave_alpha_s
+    bands = result.third_octave_bands
+    if verbose or alpha_s is None or bands is None:
+        table = _value_table(centers, measured, shifted, deviations, verbose, language)
+        return table, t("Octave-band &#945;<sub>p</sub>", language)
+    third_octave_bands = np.asarray(bands, dtype=np.float64)
+    third_octave_alpha_s = np.asarray(alpha_s, dtype=np.float64)
+    if third_octave_bands.shape != third_octave_alpha_s.shape:
+        msg = (
+            "render_iso11654_report() needs 'third_octave_bands' and "
+            "'third_octave_alpha_s' of equal length."
+        )
+        raise ValueError(msg)
+    table = _third_octave_table(
+        third_octave_bands, third_octave_alpha_s, measured, language
+    )
+    caption = t(
+        "One-third-octave &#945;<sub>s</sub>, octave &#945;<sub>p</sub>", language
+    )
+    return table, caption
+
+
 def render_iso11654_report(
     result: AbsorptionRatingResult,
     path: str,
@@ -371,35 +419,9 @@ def render_iso11654_report(
             flow.append(grid_table(header_pairs))
     flow.append(Spacer(1, 8))
 
-    # The accredited default (Fellert et al.) shows the full one-third-octave
-    # alpha_s table with alpha_p on the octave rows when the input alpha_s was
-    # retained; verbose keeps the octave evaluation columns, and without alpha_s
-    # the plain octave alpha_p table is used.
-    alpha_s = result.third_octave_alpha_s
-    bands = result.third_octave_bands
-    if not verbose and alpha_s is not None and bands is not None:
-        third_octave_bands = np.asarray(bands, dtype=np.float64)
-        third_octave_alpha_s = np.asarray(alpha_s, dtype=np.float64)
-        if third_octave_bands.shape != third_octave_alpha_s.shape:
-            msg = (
-                "render_iso11654_report() needs 'third_octave_bands' and "
-                "'third_octave_alpha_s' of equal length."
-            )
-            raise ValueError(msg)
-        value_table = _third_octave_table(
-            third_octave_bands,
-            third_octave_alpha_s,
-            measured,
-            language,
-        )
-        caption = t(
-            "One-third-octave &#945;<sub>s</sub>, octave &#945;<sub>p</sub>", language
-        )
-    else:
-        value_table = _value_table(
-            centers, measured, shifted, deviations, verbose, language
-        )
-        caption = t("Octave-band &#945;<sub>p</sub>", language)
+    value_table, caption = _left_table(
+        result, centers, measured, shifted, deviations, verbose, language
+    )
     left_cell = [
         fiche_paragraph(caption, caption_style),
         value_table,
