@@ -5,11 +5,13 @@ Signal processing utilities for phonometry.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 from scipy import signal
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 def _typesignal(x: Sequence[float] | np.ndarray) -> np.ndarray:

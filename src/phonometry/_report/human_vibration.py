@@ -67,10 +67,10 @@ from ._layout import (
     stacked_table,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..vibration.human.exposure import DailyVibrationExposure
+    from .metadata import ReportMetadata
 
 #: Number of decimal places the fiche displays vibration magnitudes at. Two
 #: decimals resolve the whole-body ELV (1.15 m/s2) and the small whole-body
@@ -173,7 +173,7 @@ def _operations_table(
     from reportlab.lib import colors
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("humanvib")
     kind = str(result.assessment.kind)
@@ -192,22 +192,22 @@ def _operations_table(
         widths = [66.0, 30.0, 24.0, 30.0, 24.0]
 
     a8_energy = float(result.a8) ** 2
-    data: list[list[Any]] = [[Paragraph(h, header_style) for h in headers]]
+    data: list[list[Any]] = [[fiche_paragraph(h, header_style) for h in headers]]
     for label, total_value, duration_s, partial in zip(
         result.labels, result.total_values, result.durations_s, result.partials
     ):
         row = [
-            Paragraph(html.escape(str(label)), label_style),
-            Paragraph(_fmt_acc(float(total_value), language), value_style),
-            Paragraph(_fmt_hours(float(duration_s), language), value_style),
-            Paragraph(_fmt_acc(float(partial), language), value_style),
+            fiche_paragraph(html.escape(str(label)), label_style),
+            fiche_paragraph(_fmt_acc(float(total_value), language), value_style),
+            fiche_paragraph(_fmt_hours(float(duration_s), language), value_style),
+            fiche_paragraph(_fmt_acc(float(partial), language), value_style),
         ]
         if verbose:
             from ._i18n import format_number
 
             share = 100.0 * float(partial) ** 2 / a8_energy if a8_energy > 0.0 else 0.0
             row.append(
-                Paragraph(
+                fiche_paragraph(
                     format_number(share, language, decimals=0) + " %", value_style
                 )
             )
@@ -215,13 +215,13 @@ def _operations_table(
 
     total_hours = float(sum(float(d) for d in result.durations_s))
     total_row = [
-        Paragraph(f"<b>{t('Daily total', language)}</b>", label_style),
-        Paragraph("", value_style),
-        Paragraph(f"<b>{_fmt_hours(total_hours, language)}</b>", value_style),
-        Paragraph(f"<b>{_fmt_acc(float(result.a8), language)}</b>", value_style),
+        fiche_paragraph(f"<b>{t('Daily total', language)}</b>", label_style),
+        fiche_paragraph("", value_style),
+        fiche_paragraph(f"<b>{_fmt_hours(total_hours, language)}</b>", value_style),
+        fiche_paragraph(f"<b>{_fmt_acc(float(result.a8), language)}</b>", value_style),
     ]
     if verbose:
-        total_row.append(Paragraph("", value_style))
+        total_row.append(fiche_paragraph("", value_style))
     data.append(total_row)
 
     table = stacked_table(data, [w * mm for w in widths])
@@ -282,25 +282,25 @@ def _assessment_table(result: DailyVibrationExposure, language: str = "en") -> A
     """The Directive 2002/44/EC assessment table (exceeded / not exceeded)."""
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("humanvib")
 
     data: list[list[Any]] = [
         [
-            Paragraph(t("Directive 2002/44/EC value", language), header_style),
-            Paragraph(t("Threshold", language), header_style),
-            Paragraph(t("Measured", language), header_style),
-            Paragraph(t("Result", language), header_style),
+            fiche_paragraph(t("Directive 2002/44/EC value", language), header_style),
+            fiche_paragraph(t("Threshold", language), header_style),
+            fiche_paragraph(t("Measured", language), header_style),
+            fiche_paragraph(t("Result", language), header_style),
         ]
     ]
     for label, threshold, measured, exceeded in _assessment_rows(result, language):
         data.append(
             [
-                Paragraph(label, label_style),
-                Paragraph(threshold, value_style),
-                Paragraph(measured, value_style),
-                Paragraph(exceedance_markup(exceeded, language), label_style),
+                fiche_paragraph(label, label_style),
+                fiche_paragraph(threshold, value_style),
+                fiche_paragraph(measured, value_style),
+                fiche_paragraph(exceedance_markup(exceeded, language), label_style),
             ]
         )
     return stacked_table(data, [66 * mm, 32 * mm, 42 * mm, 34 * mm])
@@ -408,7 +408,7 @@ def render_human_vibration_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -417,8 +417,8 @@ def render_human_vibration_report(
     title = t("Daily vibration exposure assessment", language)
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(_basis(result, language), basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(_basis(result, language), basis_style),
     ]
 
     header_pairs = _metadata_pairs(metadata, language)
@@ -427,7 +427,7 @@ def render_human_vibration_report(
         flow.append(grid_table(header_pairs))
     flow.append(Spacer(1, 8))
 
-    flow.append(Paragraph(t("Exposure analysis", language), caption_style))
+    flow.append(fiche_paragraph(t("Exposure analysis", language), caption_style))
     flow.append(_operations_table(result, verbose, language))
     flow.append(Spacer(1, 10))
     # Full-width, landscape per-operation contribution chart (self-scaling).
@@ -446,7 +446,7 @@ def render_human_vibration_report(
     flow.append(Spacer(1, 6))
 
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t("Assessment against Directive 2002/44/EC exposure values", language),
             caption_style,
         )
@@ -464,7 +464,7 @@ def render_human_vibration_report(
         spaceBefore=6,
     )
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "The exposure action value (EAV) and exposure limit value (ELV) "
                 "are daily exposures A(8) (Directive 2002/44/EC, Article 3). "
@@ -486,7 +486,7 @@ def render_human_vibration_report(
         )
     else:
         flow.append(
-            Paragraph(
+            fiche_paragraph(
                 t(
                     "The whole-body exposure basis a<sub>w,max</sub> is the "
                     "highest frequency-weighted axis value "
@@ -504,7 +504,7 @@ def render_human_vibration_report(
             "Annexes B and C give the health-guidance caution zone as the range "
             "of magnitudes for which health effects are potentially present."
         )
-    flow.append(Paragraph(t(exposure_note, language), note_style))
+    flow.append(fiche_paragraph(t(exposure_note, language), note_style))
     flow.extend(footer_flow(metadata, language))
 
     return build_document(path, flow, title)

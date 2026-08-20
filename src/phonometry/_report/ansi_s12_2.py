@@ -64,10 +64,10 @@ from ._layout import (
     two_panel_body,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..room.noise_criteria import NCResult, RCResult
+    from .metadata import ReportMetadata
 
 #: Shared title for both room-noise rating fiches.
 _TITLE = "Room noise rating"
@@ -146,14 +146,14 @@ def _value_table(
     from reportlab.lib import colors
     from reportlab.platypus import Table, TableStyle
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     accent = colors.HexColor(_ACCENT_HEX)
     light = colors.HexColor(_LIGHT_HEX)
     head = _thead_style()
 
     n_data = len(columns[0][1])
-    rows: list[list[Any]] = [[Paragraph(header, head) for header, _ in columns]]
+    rows: list[list[Any]] = [[fiche_paragraph(header, head) for header, _ in columns]]
     for i in range(n_data):
         rows.append([cells[i] for _, cells in columns])
 
@@ -218,11 +218,11 @@ def _assemble_left(
     language: str,
 ) -> tuple[list[Any], list[Any]]:
     """Wrap the caption and value table into a two-panel left cell."""
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     caption = t("Octave-band sound pressure levels", language)
     left_cell = [
-        Paragraph(caption, caption_style),
+        fiche_paragraph(caption, caption_style),
         _value_table(columns, col_widths),
     ]
     return left_cell, [widths[0], widths[1]]
@@ -455,7 +455,7 @@ def _render_room_noise(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -475,8 +475,8 @@ def _render_room_noise(
         basis = t(basis_template, language)
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(basis, basis_style),
     ]
 
     if metadata is not None and not metadata.is_empty():

@@ -67,12 +67,12 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 
 from ..._internal.validation import require_choice, require_positive
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike, NDArray
 
 #: Default speed of sound in air ``c0``, m/s (20 degC).
 _SPEED_OF_SOUND: float = 343.0

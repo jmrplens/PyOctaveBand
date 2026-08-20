@@ -35,10 +35,10 @@ from .threshold import age_threshold
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
     from .._report.metadata import ReportMetadata
 
-from numpy.typing import ArrayLike
 
 # ---------------------------------------------------------------------------
 # Normative constants.

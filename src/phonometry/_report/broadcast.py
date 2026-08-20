@@ -49,10 +49,10 @@ from ._layout import (
     result_box,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..broadcast.program_loudness import ProgramLoudnessResult
+    from .metadata import ReportMetadata
 
 #: EBU R 128 target programme loudness, LUFS.
 _DEFAULT_TARGET_LUFS = -23.0
@@ -266,7 +266,7 @@ def render_program_loudness_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -295,8 +295,8 @@ def render_program_loudness_report(
     )
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(basis, basis_style),
     ]
 
     if metadata is not None and not metadata.is_empty():
@@ -306,7 +306,7 @@ def render_program_loudness_report(
             flow.append(grid_table(header_pairs))
     flow.append(Spacer(1, 8))
 
-    flow.append(Paragraph(t("Compliance summary", language), caption_style))
+    flow.append(fiche_paragraph(t("Compliance summary", language), caption_style))
     flow.append(
         compliance_table(
             _compliance_rows(result, target, tolerance_lu, language),
@@ -345,9 +345,9 @@ def render_program_loudness_report(
             language,
         )
     )
-    flow.append(Paragraph(tolerance_note, basis_strip_style))
+    flow.append(fiche_paragraph(tolerance_note, basis_strip_style))
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "Gating -70 LUFS absolute / -10 LU relative (ITU-R BS.1770); 1 LU = 1 dB; true peak per EBU Tech 3341; LRA per EBU Tech 3342 (not recommended for programmes under 60 s).",
                 language,

@@ -42,18 +42,19 @@ applied (see ``docs/ERRATA.md``).
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
     from .._report.metadata import ReportMetadata
 
-from numpy.typing import ArrayLike
 
 #: The four band procedures of ANSI S3.5-1997, in the order of its Tables 1
 #: to 4: the critical-band procedure (21 bands), the equally-contributing

@@ -221,9 +221,9 @@ def test_numeric_noise_power_warns() -> None:
 def test_plot_draws_criterion_curve_and_the_assessed_tone() -> None:
     """The TNR plot marks the tone against the clause 11.5 criterion curve."""
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     res = psychoacoustics.tone_to_noise_ratio(_tone_in_noise(1000.0, 0.1, 0.02), FS)
@@ -246,9 +246,9 @@ def test_plot_draws_criterion_curve_and_the_assessed_tone() -> None:
 def test_plot_labels_the_prominence_ratio_family() -> None:
     """A PR result selects the clause 12.6 criterion and its own label."""
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     res = psychoacoustics.prominence_ratio(

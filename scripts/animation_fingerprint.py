@@ -69,7 +69,10 @@ from __future__ import annotations
 import ast
 import hashlib
 import pathlib
-from collections.abc import Iterable, Iterator
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
 
 _SCRIPTS = pathlib.Path(__file__).resolve().parent
 
@@ -340,6 +343,41 @@ def _dump(node: ast.AST) -> str:
     )
 
 
+def _is_type_checking(test: ast.expr) -> bool:
+    """Is *test* the ``TYPE_CHECKING`` guard, however it was imported?"""
+    if isinstance(test, ast.Name):
+        return test.id == "TYPE_CHECKING"
+    return isinstance(test, ast.Attribute) and test.attr == "TYPE_CHECKING"
+
+
+def _module_level(body: list[ast.stmt]) -> str:
+    """The part of a module body that can reach a frame, hashed stably.
+
+    Two things are taken out, both because leaving them in makes a change
+    that cannot move a pixel look like one, which is the false alarm this
+    module says it would rather not raise than raise wrongly.
+
+    A block guarded by ``if TYPE_CHECKING:`` is read by a type checker and by
+    nothing else. No name it binds exists while the clip renders, so moving
+    an import under that guard changes what mypy sees and nothing else.
+
+    Import *order* goes too, but the imports themselves stay: they are
+    hashed as a sorted set. Sorting them is what an import sorter does, and
+    it cannot change which name ends up bound to which module. Dropping them
+    would not be safe, because the walk stops at the package boundary, so for
+    ``import numpy as np`` the statement is the only record the fingerprint
+    has that the name points where it did.
+    """
+    live = [
+        s for s in body if not (isinstance(s, ast.If) and _is_type_checking(s.test))
+    ]
+    imports = sorted(
+        _dump(s) for s in live if isinstance(s, (ast.Import, ast.ImportFrom))
+    )
+    rest = [s for s in live if not isinstance(s, (ast.Import, ast.ImportFrom))]
+    return "\x00".join([*imports, _dump(ast.Module(body=rest, type_ignores=[]))])
+
+
 def _literals(sources: Sources, symbols: Iterable[Symbol]) -> set[str]:
     """Every string literal in *symbols*, f-string fragments included."""
     out: set[str] = set()
@@ -512,9 +550,7 @@ def fingerprint_parts(
     for module in sorted({module for module, _ in symbols}):
         body = sources.modules[module].body
         if body:
-            code.append(
-                f"{module}.<module>\x00" + _dump(ast.Module(body=body, type_ignores=[]))
-            )
+            code.append(f"{module}.<module>\x00" + _module_level(body))
     code.sort()
     exact, patterns = _table_entries(sources)
     text = _selected_translations(_literals(sources, symbols), exact, patterns)

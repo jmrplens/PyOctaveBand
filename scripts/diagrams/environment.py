@@ -10,7 +10,10 @@ draw what happens to the level once it has arrived.
 
 from __future__ import annotations
 
-from .canvas import SVG, Theme
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .canvas import SVG, Theme
 
 # ---------------------------------------------------------------------------
 # d2 - Environmental noise microphone positions (ISO 1996-2)

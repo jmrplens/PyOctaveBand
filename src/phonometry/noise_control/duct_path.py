@@ -53,7 +53,6 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 
 from ._criterion import (
     as_band_spectrum,
@@ -66,6 +65,7 @@ from ._criterion import (
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike, NDArray
 
     from .._report.metadata import ReportMetadata
     from ..room.noise_criteria import NCResult, RCResult

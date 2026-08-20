@@ -35,8 +35,7 @@ from __future__ import annotations
 import argparse
 import os
 import sys
-from collections.abc import Callable, Sequence
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 # The fiche builders live in the ``reports`` package beside this file. Running
 # this script puts ``scripts/`` on the import path for free, but loading the
@@ -140,6 +139,9 @@ from reports.vibration import (
 )
 
 from phonometry import ReportMetadata
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
 
 #: Committed output directory for the example fiches.
 _DEFAULT_DIR = os.path.normpath(

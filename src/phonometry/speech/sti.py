@@ -18,16 +18,18 @@ the male test-signal spectrum (A.6.1).
 from __future__ import annotations
 
 import warnings
-from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, overload
 
 import numpy as np
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from matplotlib.axes import Axes
 
     from .._report.metadata import ReportMetadata
+    from ..io._signal import Signal
 from scipy import signal
 
 from .._internal.utils import _typesignal
@@ -35,7 +37,6 @@ from .._internal.warnings import PhonometryWarning
 from ..filters.core import OctaveFilterBank
 from ..filters.frequencies import nominal_frequencies
 from ..io._resolve import apply_calibration, resolve_fs, resolve_pair_fs
-from ..io._signal import Signal
 
 
 class STIWarning(PhonometryWarning):

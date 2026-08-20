@@ -61,7 +61,6 @@ rubber-ball heavy/soft impactor, out of scope here).
 from __future__ import annotations
 
 import math
-from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -70,6 +69,8 @@ import numpy as np
 from ..._internal.levels_math import energy_sum
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from matplotlib.axes import Axes
 
     from ..._report.metadata import ReportMetadata

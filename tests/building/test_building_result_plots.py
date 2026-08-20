@@ -22,9 +22,9 @@ dependency, the kwarg-forwarding table, external axes) lives in
 
 from __future__ import annotations
 
-import matplotlib
+import matplotlib as mpl
 
-matplotlib.use("Agg")
+mpl.use("Agg")
 
 import matplotlib.pyplot as plt
 import numpy as np

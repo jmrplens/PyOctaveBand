@@ -103,10 +103,11 @@ from scipy import signal
 from scipy.interpolate import PchipInterpolator
 
 from ...io._resolve import apply_calibration, resolve_fs
-from ...io._signal import Signal
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+
+    from ...io._signal import Signal
 
 from ..._internal.utils import _typesignal
 from ..._internal.validation import require_1d_signal, require_positive

@@ -62,7 +62,6 @@ from ._layout import (
     two_panel_body,
 )
 from .iso717 import _metadata_pairs
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..building.measurement.flanking_transmission import (
@@ -74,6 +73,7 @@ if TYPE_CHECKING:
         ImpactRatingResult,
         WeightedRatingResult,
     )
+    from .metadata import ReportMetadata
 
 #: Designation of each applicable ISO 10848 part. The overall flanking
 #: descriptors ``Dn,f`` / ``Ln,f`` are defined in the Part 1 frame document
@@ -314,16 +314,16 @@ def _kij_value_table(
     """
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     head_style = band_table_header_style()
     header: list[Any] = [
-        Paragraph(t("f [Hz]", language), head_style),
-        Paragraph("K<sub>ij</sub> [dB]", head_style),
+        fiche_paragraph(t("f [Hz]", language), head_style),
+        fiche_paragraph("K<sub>ij</sub> [dB]", head_style),
     ]
     widths = [24 * mm, 30 * mm]
     if verbose:
-        header.append(Paragraph(t("In mean", language), head_style))
+        header.append(fiche_paragraph(t("In mean", language), head_style))
         widths = [16 * mm, 22 * mm, 18 * mm]
 
     rows: list[list[Any]] = [header]
@@ -421,7 +421,7 @@ def render_vibration_reduction_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -437,8 +437,8 @@ def render_vibration_reduction_report(
     styles, title_style, basis_style, caption_style = document_styles(accent)
     title_text = t(_KIJ_TITLE, language)
     flow: list[Any] = [
-        Paragraph(title_text, title_style),
-        Paragraph(t(_KIJ_BASIS, language), basis_style),
+        fiche_paragraph(title_text, title_style),
+        fiche_paragraph(t(_KIJ_BASIS, language), basis_style),
     ]
 
     if metadata is not None and not metadata.is_empty():
@@ -452,7 +452,7 @@ def render_vibration_reduction_report(
     in_mean, low, high = _kij_mean_membership(frequencies, bracketed)
     caption = t("Vibration reduction index per band", language)
     left_cell = [
-        Paragraph(caption, caption_style),
+        fiche_paragraph(caption, caption_style),
         _kij_value_table(frequencies, k_ij, bracketed, in_mean, verbose, language),
     ]
     plot_drawing = render_figure_drawing(
@@ -475,7 +475,7 @@ def render_vibration_reduction_report(
         textColor=colors.HexColor(_MUTED_HEX),
         spaceBefore=4,
     )
-    flow.append(Paragraph(t(_KIJ_STATEMENT, language), statement_style))
+    flow.append(fiche_paragraph(t(_KIJ_STATEMENT, language), statement_style))
     if bracketed is not None and bool(np.any(bracketed)):
         note_style = ParagraphStyle(
             "kij_note",
@@ -485,7 +485,7 @@ def render_vibration_reduction_report(
             spaceBefore=2,
         )
         flow.append(
-            Paragraph(
+            fiche_paragraph(
                 t(
                     "Values in brackets are bracketed bands, excluded from the "
                     "single number.",

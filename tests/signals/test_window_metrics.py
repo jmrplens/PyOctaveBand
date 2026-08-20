@@ -19,9 +19,9 @@ Clean-room oracles:
 
 from __future__ import annotations
 
-import matplotlib
+import matplotlib as mpl
 
-matplotlib.use("Agg")
+mpl.use("Agg")
 
 import dataclasses
 

@@ -15,7 +15,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 
 from ..common import (
     _C_EDGE,
@@ -34,6 +33,7 @@ from ._draft import (
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike, NDArray
 
     from ...simulation.fdtd import FDTD2D
 

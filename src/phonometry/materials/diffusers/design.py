@@ -66,7 +66,6 @@ from typing import TYPE_CHECKING, Any, overload
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from ..._internal.types import Real
 from .scattering_diffusion import (
     DiffusionSpectrum,
     diffusion_spectrum,
@@ -76,6 +75,8 @@ from .scattering_diffusion import (
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from matplotlib.axes import Axes
+
+    from ..._internal.types import Real
 
 #: Complex-valued complex128 array alias (per-well reflection coefficients).
 Complex = NDArray[np.complex128]

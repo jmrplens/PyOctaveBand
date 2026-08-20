@@ -13,7 +13,7 @@ approximately right is wrong.
 from __future__ import annotations
 
 import struct
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -22,6 +22,9 @@ from wav_forge import pcm_data
 from phonometry.io import ClippingWarning, Signal, info, read, write
 from phonometry.io._chunks import parse_wav_chunks
 from phonometry.io._write import build_wav_header, write_wav_stream
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 FS = 48000
 

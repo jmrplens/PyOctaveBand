@@ -41,10 +41,10 @@ import numpy as np
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
     from .._report.metadata import ReportMetadata
 
-from numpy.typing import ArrayLike
 
 # ---------------------------------------------------------------------------
 # Normative constants - ANSI/ASA S12.2-2019.

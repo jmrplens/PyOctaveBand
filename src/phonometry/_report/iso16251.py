@@ -62,12 +62,12 @@ from ._layout import (
     two_panel_body,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..building.measurement.floor_covering_improvement import (
         FloorCoveringImprovementResult,
     )
+    from .metadata import ReportMetadata
 
 
 def _metadata_pairs(
@@ -173,7 +173,7 @@ def _value_table(
     """
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     head_style = band_table_header_style()
     freqs = np.asarray(result.frequencies, dtype=np.float64)
@@ -181,11 +181,11 @@ def _value_table(
     limited = np.asarray(result.limited, dtype=bool)
 
     header = [
-        Paragraph(t("Frequency f [Hz]", language), head_style),
-        Paragraph(t("&#916;L [dB]", language), head_style),
+        fiche_paragraph(t("Frequency f [Hz]", language), head_style),
+        fiche_paragraph(t("&#916;L [dB]", language), head_style),
     ]
     if ln_r is not None:
-        header.append(Paragraph(t("L<sub>n,r</sub> [dB]", language), head_style))
+        header.append(fiche_paragraph(t("L<sub>n,r</sub> [dB]", language), head_style))
         widths = [21 * mm, 20 * mm, 20 * mm]
     else:
         widths = [28 * mm, 28 * mm]
@@ -266,7 +266,7 @@ def _body(
     """
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     ln_r = _reference_floor_with_covering(result) if verbose else None
     caption = (
@@ -278,7 +278,7 @@ def _body(
         else t("One-third-octave improvement &#916;L [dB]", language)
     )
     left_cell: list[Any] = [
-        Paragraph(caption, caption_style),
+        fiche_paragraph(caption, caption_style),
         _value_table(result, ln_r, language),
     ]
 
@@ -341,7 +341,7 @@ def render_iso16251_report(
         from reportlab.lib.styles import ParagraphStyle
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -358,8 +358,8 @@ def render_iso16251_report(
     title = t("Floor-covering impact sound improvement", language)
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(_basis_line(metadata, language), basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(_basis_line(metadata, language), basis_style),
     ]
 
     header_pairs = _metadata_pairs(result, metadata, language)
@@ -380,7 +380,7 @@ def render_iso16251_report(
         spaceBefore=4,
     )
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "Weighted reduction of impact sound pressure level "
                 "&#916;L<sub>w</sub> rated on the 100 Hz to 3150 Hz "
@@ -395,7 +395,7 @@ def render_iso16251_report(
     )
     if _is_background_limited(result):
         flow.append(
-            Paragraph(
+            fiche_paragraph(
                 t(
                     "One or more bands are at the 1,3 dB limit of measurement "
                     "(ISO 16251-1:2014 Formula (2), reported as &gt; &#916;L); "

@@ -254,8 +254,8 @@ def test_repeated_measurements_needs_two() -> None:
 # ---------------------------------------------------------------------------
 def test_plot_returns_axes() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     res = environment.assess_tonal_audibility(54.1, 45.2, 430.0)
     assert res.plot() is not None

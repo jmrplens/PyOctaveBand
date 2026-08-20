@@ -47,9 +47,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
-from numpy.typing import ArrayLike
 
-from ..._internal.types import Real
 from ..._internal.validation import (
     require_non_negative,
     require_positive,
@@ -68,6 +66,9 @@ from .porous import (
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
+
+    from ..._internal.types import Real
 
 __all__ = [
     "AirLayer",

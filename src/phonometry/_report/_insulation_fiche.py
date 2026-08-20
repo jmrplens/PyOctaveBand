@@ -42,13 +42,13 @@ from ._layout import (
     verdict_flow,
 )
 from .iso717 import _Y_TOP_AIRBORNE, _Y_TOP_IMPACT, _metadata_pairs
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..building.measurement.insulation import (
         ImpactRatingResult,
         WeightedRatingResult,
     )
+    from .metadata import ReportMetadata
 
 #: A per-band table column: header markup, values and decimal places.
 Column = tuple[str, np.ndarray, int]
@@ -127,19 +127,19 @@ def band_value_table(
     """
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     head_style = band_table_header_style()
 
     if len(columns) == 1:
         header = [
-            Paragraph(t("Frequency f [Hz]", language), head_style),
-            Paragraph(columns[0][0], head_style),
+            fiche_paragraph(t("Frequency f [Hz]", language), head_style),
+            fiche_paragraph(columns[0][0], head_style),
         ]
         widths = [28 * mm, 28 * mm]
     else:
-        header = [Paragraph(t("f [Hz]", language), head_style)] + [
-            Paragraph(markup, head_style) for markup, _, _ in columns
+        header = [fiche_paragraph(t("f [Hz]", language), head_style)] + [
+            fiche_paragraph(markup, head_style) for markup, _, _ in columns
         ]
         widths = col_widths
 
@@ -249,7 +249,7 @@ def render_insulation_fiche(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -286,8 +286,8 @@ def render_insulation_fiche(
     styles, title_style, basis_style, caption_style = document_styles(accent)
     title_text = t(spec["title"], language)
     flow: list[Any] = [
-        Paragraph(title_text, title_style),
-        Paragraph(t(spec["basis"], language), basis_style),
+        fiche_paragraph(title_text, title_style),
+        fiche_paragraph(t(spec["basis"], language), basis_style),
     ]
 
     # Metadata header block (only the supplied fields; the same grid the two
@@ -305,7 +305,7 @@ def render_insulation_fiche(
     value_header = t("{vh} [dB]", language).format(vh=spec["symbol"])
     columns, caption, col_widths = build_columns(value_header, curve, verbose, language)
     value_table = band_value_table(centers, columns, language, col_widths)
-    left_cell = [Paragraph(caption, caption_style), value_table]
+    left_cell = [fiche_paragraph(caption, caption_style), value_table]
 
     def _plot(ax: Any = None, language: str = language) -> Any:
         axes = rating.plot(ax=ax, language=language)
@@ -331,7 +331,7 @@ def render_insulation_fiche(
         textColor=colors.HexColor(_MUTED_HEX),
         spaceBefore=4,
     )
-    flow.append(Paragraph(t(spec["statement"], language), statement_style))
+    flow.append(fiche_paragraph(t(spec["statement"], language), statement_style))
     if metadata is not None and metadata.requirement is not None:
         text, passed = requirement_verdict(
             rating, rating_symbol, metadata.requirement, language

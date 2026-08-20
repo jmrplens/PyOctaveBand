@@ -12,7 +12,7 @@ the boundaries are exercised, not avoided.
 from __future__ import annotations
 
 from dataclasses import replace
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -31,6 +31,9 @@ from phonometry.io import (
     write_sidecar,
 )
 from phonometry.io._bext import fresh_metadata
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 try:
     import soundfile as sf

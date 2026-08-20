@@ -53,10 +53,14 @@ filter shapes from notched-noise data", *Hearing Research* 47, 103-138.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
-from numpy.typing import ArrayLike
 
 from .._internal.types import as_float_or_array
+
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike
 
 #: Slope-and-offset constant of ``ERB_N = C1 (C2 f + 1)``, Hz.
 ERB_C1 = 24.673

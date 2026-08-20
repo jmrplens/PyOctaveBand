@@ -23,13 +23,14 @@ figures) so the plot can be composed into a larger layout.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from functools import lru_cache
 from typing import TYPE_CHECKING, Any, Final, cast
 
 import numpy as np
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from matplotlib.axes import Axes
     from matplotlib.container import BarContainer
     from matplotlib.typing import ColorType

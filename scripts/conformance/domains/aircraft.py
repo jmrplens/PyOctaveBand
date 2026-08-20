@@ -58,16 +58,15 @@ def _chk_ecac_event_level() -> Outcome:
         [98.0, 92.0, 86.0, 80.0, 74.0, 68.0, 62.0],
     ]
     vref = 160.0 * 0.514444
-    import numpy as _np
 
-    xs = _np.linspace(-40000.0, 40000.0, 801)
-    path = _np.column_stack(
+    xs = np.linspace(-40000.0, 40000.0, 801)
+    path = np.column_stack(
         [
             xs,
-            _np.zeros_like(xs),
-            _np.full_like(xs, 300.0),
-            _np.full_like(xs, 10000.0),
-            _np.full_like(xs, vref),
+            np.zeros_like(xs),
+            np.full_like(xs, 300.0),
+            np.full_like(xs, 10000.0),
+            np.full_like(xs, vref),
         ]
     )
     got = ph.aircraft.event_level(

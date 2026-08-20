@@ -79,13 +79,13 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 
 from .._internal.types import as_float_or_array
 from .._internal.validation import require_positive
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike, NDArray
 
 #: Sound power level of one talker in normal conversation, dB re 1 pW
 #: (Long, Chapter 17, "a normal conversational level").

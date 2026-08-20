@@ -116,9 +116,9 @@ def test_the_two_narrowings_compose() -> None:
 
 def test_the_decibel_scale_needs_a_calibration_to_mean_anything() -> None:
     """Without a factor the samples are full-scale units, not pressures."""
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     one = _stereo().pick(0)
     axes = one.plot(scale="db")
     assert "dB" in axes.get_ylabel()
@@ -129,9 +129,9 @@ def test_the_decibel_scale_needs_a_calibration_to_mean_anything() -> None:
 
 def test_an_unknown_scale_is_refused_by_name() -> None:
     """A misspelt scale names the two that exist rather than drawing one."""
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     one = _stereo().pick(0)
     with pytest.raises(ValueError, match="scale must be"):
         one.plot(scale="log")
@@ -162,9 +162,9 @@ def test_the_decibel_waveform_is_not_called_a_level() -> None:
     axis says sound pressure in decibels, and the level trace lives on
     :class:`~phonometry.filters.TimeWeightedEnvelope` instead.
     """
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     axes = _stereo().pick(0).plot(scale="db")
     assert axes.get_ylabel() == "Sound pressure [dB re 20 uPa]"
     assert "level" not in axes.get_ylabel().lower()
@@ -172,9 +172,9 @@ def test_the_decibel_waveform_is_not_called_a_level() -> None:
 
 def test_the_decibel_axis_is_translated() -> None:
     """Every fixed string this package draws has a Spanish counterpart."""
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     axes = _stereo().pick(0).plot(scale="db", language="es")
     assert axes.get_ylabel() == "Presión sonora [dB re 20 uPa]"
 
@@ -215,9 +215,9 @@ def test_a_caller_supplied_label_reaches_the_lines_instead_of_crashing() -> None
     the caller's. The caller's wins now, and the generated one is still
     there when they say nothing.
     """
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     theirs = _stereo().plot(label="mine")
     assert [line.get_label() for line in theirs.get_lines()] == ["mine", "mine"]
     ours = _stereo().plot()

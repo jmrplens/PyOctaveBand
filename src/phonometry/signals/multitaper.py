@@ -32,7 +32,6 @@ from typing import TYPE_CHECKING, Any, Literal
 import numpy as np
 
 from ..io._resolve import resolve_fs
-from ..io._signal import Signal
 from .spectra import (
     _positive,
     _validate_confidence,
@@ -43,6 +42,8 @@ from .spectra import (
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
+
+    from ..io._signal import Signal
 
 __all__ = [
     "MultitaperSpectralDensityResult",

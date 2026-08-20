@@ -356,9 +356,9 @@ def test_band_plot_uses_nominal_frequency_labels() -> None:
     report prints, not the exact base-ten filter centres (125.89..., 1.99526k).
     """
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     ir = multitone_ir(1.0, 3.0, [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])

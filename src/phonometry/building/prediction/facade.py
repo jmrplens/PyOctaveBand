@@ -66,7 +66,6 @@ Clause/formula citations refer to EN 12354-3:2000 or EN 12354-4:2000.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from dataclasses import dataclass
 from math import atan, log10, pi
 from typing import TYPE_CHECKING, Any
@@ -74,6 +73,8 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from matplotlib.axes import Axes
 
     from ..._report.metadata import ReportMetadata

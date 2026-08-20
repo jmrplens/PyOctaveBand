@@ -39,10 +39,10 @@ import numpy as np
 
 from ._frf_fiche import frequency_range, frf_metadata_pairs, render_frf_fiche
 from ._i18n import format_number, t
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..vibration.structural.mechanical_mobility import MobilityResult
+    from .metadata import ReportMetadata
 
 #: The mobility unit, m/(N.s), as reportlab markup (a middle dot, not a hyphen).
 _MOBILITY_UNIT = "m/(N&#183;s)"

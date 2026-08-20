@@ -64,10 +64,13 @@ of meshed Schroeder-type diffusers against the library's Fraunhofer model
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 from scipy.special import hankel2
+
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike, NDArray
 
 __all__ = [
     "ContourPhasors",

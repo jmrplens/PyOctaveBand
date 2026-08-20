@@ -59,11 +59,15 @@ bending wavenumber.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 
 from ..._internal.validation import require_positive
 from .mechanical_mobility import MobilityResult
+
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike, NDArray
 
 __all__ = [
     "beam_bending_wave_speed",

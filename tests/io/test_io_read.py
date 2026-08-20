@@ -17,7 +17,7 @@ from __future__ import annotations
 import builtins
 import struct
 import warnings
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -34,6 +34,9 @@ from wav_forge import (
 
 from phonometry import signals
 from phonometry.io import LossyCompressionWarning, Signal, info, read
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 try:
     import soundfile as sf

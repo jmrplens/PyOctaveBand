@@ -245,9 +245,9 @@ def test_limp_layer_drops_the_low_frequency_absorption_of_the_table_11_2_layer()
 
 
 def test_limp_frame_plot_smoke() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     limp = materials.limp_frame(
         _rigid(np.array([100.0, 400.0, 1600.0])),
         TABLE_11_2_FRAME_DENSITY,

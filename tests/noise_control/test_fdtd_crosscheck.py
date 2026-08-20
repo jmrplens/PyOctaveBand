@@ -31,13 +31,16 @@ source really does present the anechoic internal impedance that identity needs.
 from __future__ import annotations
 
 import math
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
-from numpy.typing import NDArray
 
 from phonometry.noise_control import silencers as sl
 from phonometry.simulation.fdtd import CWSource, GaussianPulse, fdtd_simulation
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 _C = 343.0
 #: FFT zero-padding factor for the pulse runs; the underlying spectrum is

@@ -17,9 +17,9 @@ def _legend_labels(ax) -> list[str]:
 def test_fractile_band_legend_follows_the_language() -> None:
     """The shaded fractile band's legend entry is localised like the rest."""
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     for result in (
         hearing.age_threshold(60.0, "male", fractile=0.9),
         hearing.nipts(95.0, 20.0, 0.9),
@@ -32,9 +32,9 @@ def test_fractile_band_legend_follows_the_language() -> None:
 
 def test_spanish_labels() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     res = hearing.age_threshold(60.0, "male", fractile=0.9)
 
     ax_en = res.plot(language="en")
@@ -47,9 +47,9 @@ def test_spanish_labels() -> None:
 
 def test_unknown_language_raises() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     result = hearing.age_threshold(60.0, "male")
     with pytest.raises(ValueError, match="Unknown language"):
         result.plot(language="xx")
@@ -58,9 +58,9 @@ def test_unknown_language_raises() -> None:
 def test_exposure_plot_needs_per_task_contributions() -> None:
     """The job and full-day strategies carry no tasks, so plot() says so."""
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
 
     result = hearing.full_day_exposure([85.0, 86.0, 84.0], 8.0)
     assert result.tasks == ()

@@ -43,7 +43,6 @@ matplotlib in ``phonometry[plot]``); each is guarded with an actionable
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
@@ -54,9 +53,10 @@ from ._insulation_fiche import (
     iso717_columns_builder,
     render_insulation_fiche,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from ..building.measurement.insulation import (
         AirborneInsulationResult,
         FacadeInsulationResult,
@@ -64,6 +64,7 @@ if TYPE_CHECKING:
         ImpactRatingResult,
         WeightedRatingResult,
     )
+    from .metadata import ReportMetadata
 
 #: The field engineering-method statement the airborne (ISO 16283-1) and facade
 #: (ISO 16283-3) reports print verbatim.

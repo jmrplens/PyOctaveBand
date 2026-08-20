@@ -60,10 +60,10 @@ from ._layout import (
     result_box,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..room.acoustics import RoomAcousticsResult
+    from .metadata import ReportMetadata
 
 #: Band centres whose T30 mean is the mid-frequency reverberation-time
 #: descriptor T_mid quoted for rooms: the 500 Hz and 1000 Hz bands at the
@@ -170,7 +170,7 @@ def _parameter_table(result: RoomAcousticsResult, language: str = "en") -> Any:
     from reportlab.lib.units import mm
     from reportlab.platypus import Table, TableStyle
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     accent = colors.HexColor(_ACCENT_HEX)
     light = colors.HexColor(_LIGHT_HEX)
@@ -211,14 +211,14 @@ def _parameter_table(result: RoomAcousticsResult, language: str = "en") -> Any:
     body_font = 6.8 if compact else 8.0
 
     header = [
-        Paragraph(t("f [Hz]", language), head_style),
-        Paragraph("T<sub>20</sub> [s]", head_style),
-        Paragraph("T<sub>30</sub> [s]", head_style),
-        Paragraph("EDT [s]", head_style),
-        Paragraph("C<sub>50</sub> [dB]", head_style),
-        Paragraph("C<sub>80</sub> [dB]", head_style),
-        Paragraph("D<sub>50</sub>", head_style),
-        Paragraph("T<sub>s</sub> [ms]", head_style),
+        fiche_paragraph(t("f [Hz]", language), head_style),
+        fiche_paragraph("T<sub>20</sub> [s]", head_style),
+        fiche_paragraph("T<sub>30</sub> [s]", head_style),
+        fiche_paragraph("EDT [s]", head_style),
+        fiche_paragraph("C<sub>50</sub> [dB]", head_style),
+        fiche_paragraph("C<sub>80</sub> [dB]", head_style),
+        fiche_paragraph("D<sub>50</sub>", head_style),
+        fiche_paragraph("T<sub>s</sub> [ms]", head_style),
     ]
     rows: list[list[Any]] = [header]
     for i in range(n):
@@ -474,7 +474,7 @@ def render_iso3382_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -500,8 +500,8 @@ def render_iso3382_report(
         )
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(basis, basis_style),
     ]
 
     # A one-third-octave range makes the stacked table tall; shrink the
@@ -521,7 +521,9 @@ def render_iso3382_report(
 
     # Full-width per-band parameter table, then the landscape decay-time plot
     # drawn by the result's own single-panel plot(ax=...).
-    flow.append(Paragraph(_fraction_label(result.frequency, language), caption_style))
+    flow.append(
+        fiche_paragraph(_fraction_label(result.frequency, language), caption_style)
+    )
     flow.append(_parameter_table(result, language))
     flow.append(Spacer(1, gap))
     plot_drawing = render_figure_drawing(
@@ -542,7 +544,7 @@ def render_iso3382_report(
 
     basis_strip_style = measurement_basis_style()
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "Decay curves by Schroeder backward integration with noise "
                 "truncation and tail compensation (ISO 3382-1:2009, 5.3.3); "
@@ -555,7 +557,7 @@ def render_iso3382_report(
         )
     )
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "C50/C80, D50 and Ts follow ISO 3382-1:2009 Equations (A.10), "
                 "(A.11) and (A.13). The just-noticeable differences (Table A.1) "

@@ -57,12 +57,13 @@ Clause citations refer to EN 12354-1:2000 (airborne) or EN 12354-2:2000 (impact)
 from __future__ import annotations
 
 import warnings
-from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from math import isfinite, log10
 from typing import TYPE_CHECKING, Any, Literal
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+
     from matplotlib.axes import Axes
 
     from ..._report.metadata import ReportMetadata

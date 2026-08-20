@@ -60,18 +60,19 @@ from __future__ import annotations
 
 import math
 import warnings
-from collections.abc import Iterator
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
-from numpy.typing import ArrayLike
 
 from ..._internal.warnings import PhonometryWarning
 from ...io._resolve import SignalInput, resolve_fs, resolve_samples
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
     from ..._report.metadata import ReportMetadata
 

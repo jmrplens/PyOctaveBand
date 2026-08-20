@@ -169,9 +169,9 @@ def test_non_positive_inputs_raise() -> None:
 # ---------------------------------------------------------------------------
 def test_plot_returns_axes() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     res = materials.floating_floor_resonance(25.0, 200.0, 100.0)
     assert res.plot() is not None
 

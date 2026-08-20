@@ -37,7 +37,6 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ._insulation_fiche import iso717_columns_builder, render_insulation_fiche
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..building.measurement.insulation import (
@@ -49,6 +48,7 @@ if TYPE_CHECKING:
         SurveyFacadeResult,
         SurveyImpactResult,
     )
+    from .metadata import ReportMetadata
 
 #: The survey-method field statement each report prints verbatim; it names the
 #: control (survey) method so it is never conflated with the ISO 16283

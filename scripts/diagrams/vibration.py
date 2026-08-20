@@ -10,7 +10,8 @@ exposed to.
 
 from __future__ import annotations
 
-from .canvas import SVG, Theme
+from typing import TYPE_CHECKING
+
 from .parts import (
     _accel,
     _accel_wall,
@@ -21,6 +22,9 @@ from .parts import (
     _rot_arrow,
     _spring_v,
 )
+
+if TYPE_CHECKING:
+    from .canvas import SVG, Theme
 
 
 def _d_human_vibration(s: SVG, th: Theme) -> None:

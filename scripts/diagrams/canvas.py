@@ -33,8 +33,8 @@ from __future__ import annotations
 import os
 import re
 import sys
-from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from .i18n import lookup, visit
 from .outline import (
@@ -45,6 +45,9 @@ from .outline import (
     emit_runs,
     measure,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
 
 
 @dataclass(frozen=True)

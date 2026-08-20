@@ -16,7 +16,7 @@ signatures are unchanged -- a plain array with an explicit ``fs`` and
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -32,7 +32,11 @@ from ..io._resolve import (
 from ..io._resolve import (
     resolve_samples as _resolve_samples_raw,
 )
-from ..io._signal import Signal
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from ..io._signal import Signal
 
 _REF_PRESSURE = 2e-5
 

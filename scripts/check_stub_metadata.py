@@ -29,10 +29,13 @@ import sys
 import tarfile
 import zipfile
 from email import message_from_string
-from email.message import Message
+from typing import TYPE_CHECKING
 
 from packaging.requirements import Requirement
 from packaging.version import Version
+
+if TYPE_CHECKING:
+    from email.message import Message
 
 _ROOT = pathlib.Path(__file__).resolve().parent.parent
 _DIST = _ROOT / "stub" / "dist"

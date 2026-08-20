@@ -19,7 +19,6 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike
 
 from ..common import (
     _C_EDGE,
@@ -45,6 +44,7 @@ from ._draft import (
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
     from ...emission.intensity import IntensityResult
 

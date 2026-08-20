@@ -26,8 +26,11 @@ import functools
 import math
 import pathlib
 import sys
-from collections.abc import Callable
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 # The checks do not re-type their expected values: they read the test suite's
 # shared tables (``reference_data``) and its worked-example helpers

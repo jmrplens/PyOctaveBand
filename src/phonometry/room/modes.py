@@ -65,7 +65,6 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 
 from .._internal.types import as_float_or_array
 from .._internal.validation import require_positive
@@ -73,6 +72,7 @@ from .steady_field import schroeder_frequency
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike, NDArray
 
 #: Speed of sound in air used when none is given, in m/s (20 degC).
 DEFAULT_SPEED_OF_SOUND = 343.0

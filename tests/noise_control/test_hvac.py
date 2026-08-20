@@ -151,9 +151,9 @@ def test_flow_noise_bend_formula() -> None:
 
 
 def test_plot_and_validation() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     hvac.end_reflection_loss([125.0, 250.0], 0.3).plot()
     hvac.flow_noise_straight_duct([250.0, 500.0], 10.0, 0.04).plot()
     with pytest.raises(ValueError):

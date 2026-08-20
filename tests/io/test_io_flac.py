@@ -14,7 +14,7 @@ from __future__ import annotations
 import builtins
 import struct
 from dataclasses import replace
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -22,6 +22,9 @@ import pytest
 from phonometry import __version__
 from phonometry.io import ClippingWarning, info, read, write
 from phonometry.io._bext import fresh_metadata
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 try:
     import soundfile as sf

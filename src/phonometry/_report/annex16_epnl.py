@@ -54,10 +54,10 @@ from ._layout import (
     render_figure_drawing,
     result_box,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..aircraft.certification import EPNLResult
+    from .metadata import ReportMetadata
 
 
 def _metadata_pairs(
@@ -182,7 +182,7 @@ def render_annex16_epnl_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -214,8 +214,8 @@ def render_annex16_epnl_report(
     )
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(basis, basis_style),
     ]
 
     if metadata is not None and not metadata.is_empty():
@@ -224,7 +224,7 @@ def render_annex16_epnl_report(
             flow.append(Spacer(1, 3))
             flow.append(grid_table(header_pairs))
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "Reference conditions: 25 &#176;C (ISA + 10 &#176;C), 70% relative humidity, 1013.25 hPa sea-level pressure, zero wind (ICAO Annex 16 Vol I Part II, 3.6.1.5).",
                 language,
@@ -234,7 +234,7 @@ def render_annex16_epnl_report(
     )
     flow.append(Spacer(1, 8))
 
-    flow.append(Paragraph(t("Intermediate quantities", language), caption_style))
+    flow.append(fiche_paragraph(t("Intermediate quantities", language), caption_style))
     flow.append(
         metrics_table(_metric_rows(result, language), col_widths=[48 * mm, 26 * mm])
     )
@@ -256,7 +256,7 @@ def render_annex16_epnl_report(
     )
     if limit is not None:
         flow.append(Spacer(1, 6))
-        flow.append(Paragraph(t("Certification limit", language), caption_style))
+        flow.append(fiche_paragraph(t("Certification limit", language), caption_style))
         flow.append(
             compliance_table(_verdict_rows(result, limit, language), language=language)
         )
@@ -272,7 +272,7 @@ def render_annex16_epnl_report(
         spaceBefore=2,
     )
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "This is a computational EPNL result per ICAO Annex 16 Vol I Appendix 2; it is not an official State noise certificate (e.g. EASA Form 45).",
                 language,

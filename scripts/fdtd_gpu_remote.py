@@ -48,10 +48,9 @@ import tempfile
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import NDArray
 
 _SCRIPTS = Path(__file__).resolve().parent
 if str(_SCRIPTS) not in sys.path:
@@ -59,6 +58,9 @@ if str(_SCRIPTS) not in sys.path:
 
 import fdtd_gpu
 import job_runner
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 _REPO_ROOT = _SCRIPTS.parent
 

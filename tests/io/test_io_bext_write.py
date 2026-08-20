@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import replace
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -29,6 +29,9 @@ from phonometry.io._bext import (
     fresh_metadata,
 )
 from phonometry.io._chunks import parse_wav_chunks
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 FS = 48000
 

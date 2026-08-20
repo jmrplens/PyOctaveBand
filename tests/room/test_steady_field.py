@@ -169,9 +169,9 @@ def test_steady_field_validation() -> None:
 
 
 def test_steady_field_plot_smoke() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     res = room.steady_state_field(90.0, 100.0, 0.2)
     ax = res.plot()
     assert ax.get_xlabel() == "Distance from source [m]"

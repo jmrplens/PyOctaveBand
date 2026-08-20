@@ -12,8 +12,10 @@ aircraft glyph that marks the aircraft along a path.
 from __future__ import annotations
 
 import math
+from typing import TYPE_CHECKING
 
-from .canvas import SVG, Theme
+if TYPE_CHECKING:
+    from .canvas import SVG, Theme
 
 
 def _arc(

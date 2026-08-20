@@ -354,9 +354,9 @@ def test_weighted_absorption_rejects_non_finite() -> None:
 
 def test_plot_smoke() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     res = weighted_absorption(_ANNEX_A2_ALPHA_P)
     ax = res.plot()
     assert ax.get_ylabel() == "Sound absorption coefficient"

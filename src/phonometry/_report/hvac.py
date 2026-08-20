@@ -46,10 +46,10 @@ from ._noise_control_fiche import (
     power_value_table,
     render_noise_control_fiche,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..noise_control.hvac import HvacSpectrumResult
+    from .metadata import ReportMetadata
 
 #: Reference sound power for a regenerated-noise sound power level, 1 pW.
 _POWER_REFERENCE = "1 pW"

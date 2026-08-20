@@ -9,7 +9,7 @@ embedded by a page under ``vibration/``.
 """
 
 import math
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 
 def _sci_math(value: float, digits: int = 2) -> str:
@@ -26,7 +26,6 @@ def _sci_math(value: float, digits: int = 2) -> str:
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.artist import Artist
 from matplotlib.axes import Axes
 
 from phonometry._plot.common import format_frequency_axis, theme_fill
@@ -44,6 +43,9 @@ from .theme import (
     _band_index_axis,
     save_figure,
 )
+
+if TYPE_CHECKING:
+    from matplotlib.artist import Artist
 
 
 def generate_junction_transmission(output_dir: str) -> None:

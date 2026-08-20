@@ -255,18 +255,18 @@ def test_mobility_result_bundle() -> None:
 
 def test_plot_returns_axes() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     res = vibration.sdof_mobility_result(np.linspace(1.0, 50.0, 200), M, K, C)
     assert res.plot() is not None
 
 
 def test_rigid_mass_plot_two_panels_and_external_ax() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     f = np.logspace(np.log10(20.0), np.log10(2000.0), 40)
@@ -282,9 +282,9 @@ def test_rigid_mass_plot_two_panels_and_external_ax() -> None:
 
 def test_rigid_mass_plot_rejects_unknown_language() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     res = vibration.rigid_mass_calibration_check([0.1], [100.0], 10.0)
     with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")

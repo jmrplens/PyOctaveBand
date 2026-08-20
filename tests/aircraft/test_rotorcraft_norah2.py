@@ -53,15 +53,15 @@ Measured deviations on which the tolerances rest (see the module docstring of
 
 from __future__ import annotations
 
-import pathlib
 import re
 import warnings
 import zipfile
 
-import matplotlib
+import matplotlib as mpl
 
-matplotlib.use("Agg")
+mpl.use("Agg")
 import contextlib
+from typing import TYPE_CHECKING
 
 import numpy as np
 import oracle_data
@@ -79,6 +79,9 @@ from phonometry.aircraft.rotorcraft_noise import (
     rotorcraft_event_level,
     rotorcraft_noise_contour,
 )
+
+if TYPE_CHECKING:
+    import pathlib
 
 # Resolution order (tests/oracle_data.py): NORAH2_DATA pointing at an existing
 # extraction root, then the full archive in the gitignored tests/data-local/,

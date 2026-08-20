@@ -28,15 +28,19 @@ import re
 import shutil
 import subprocess
 import tomllib
-import types
 import warnings
+from typing import TYPE_CHECKING
 
 import pytest
 from packaging.requirements import Requirement
-from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 
 import phonometry
+
+if TYPE_CHECKING:
+    import types
+
+    from packaging.specifiers import SpecifierSet
 
 _ROOT = pathlib.Path(__file__).resolve().parent.parent
 _STUB = _ROOT / "stub"

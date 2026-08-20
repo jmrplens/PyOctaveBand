@@ -186,9 +186,9 @@ def test_spectrum_without_normalization() -> None:
 
 # --- Plot smoke test ----------------------------------------------------------
 def test_polar_response_plot_returns_polar_axes() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     surface = predict_diffuser_polar_response(

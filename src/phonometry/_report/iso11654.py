@@ -56,10 +56,10 @@ from ._layout import (
     two_panel_body,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..materials.absorbers.rating import AbsorptionRatingResult
+    from .metadata import ReportMetadata
 
 #: Threshold below which an unfavourable deviation is shown as an em dash.
 _DEVIATION_EPS = 0.005
@@ -159,7 +159,7 @@ def _value_table(
     from reportlab.lib.units import mm
     from reportlab.platypus import Table, TableStyle
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     accent = colors.HexColor(_ACCENT_HEX)
     light = colors.HexColor(_LIGHT_HEX)
@@ -167,16 +167,16 @@ def _value_table(
 
     if verbose:
         header = [
-            Paragraph(t("f [Hz]", language), head_style),
-            Paragraph(t("Practical &#945;<sub>p</sub>", language), head_style),
-            Paragraph(t("Shifted ref.", language), head_style),
-            Paragraph(t("Unfav. dev.", language), head_style),
+            fiche_paragraph(t("f [Hz]", language), head_style),
+            fiche_paragraph(t("Practical &#945;<sub>p</sub>", language), head_style),
+            fiche_paragraph(t("Shifted ref.", language), head_style),
+            fiche_paragraph(t("Unfav. dev.", language), head_style),
         ]
         col_widths = [15 * mm, 20 * mm, 17 * mm, 18 * mm]
     else:
         header = [
-            Paragraph(t("Frequency f [Hz]", language), head_style),
-            Paragraph("&#945;<sub>p</sub>", head_style),
+            fiche_paragraph(t("Frequency f [Hz]", language), head_style),
+            fiche_paragraph("&#945;<sub>p</sub>", head_style),
         ]
         col_widths = [28 * mm, 28 * mm]
 
@@ -229,16 +229,16 @@ def _third_octave_table(
     from reportlab.lib.units import mm
     from reportlab.platypus import Table, TableStyle
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     accent = colors.HexColor(_ACCENT_HEX)
     light = colors.HexColor(_LIGHT_HEX)
     head_style = _thead_style()
 
     header = [
-        Paragraph(t("Frequency f [Hz]", language), head_style),
-        Paragraph("&#945;<sub>s</sub>", head_style),
-        Paragraph("&#945;<sub>p</sub>", head_style),
+        fiche_paragraph(t("Frequency f [Hz]", language), head_style),
+        fiche_paragraph("&#945;<sub>s</sub>", head_style),
+        fiche_paragraph("&#945;<sub>p</sub>", head_style),
     ]
     col_widths = [24 * mm, 16 * mm, 16 * mm]
 
@@ -328,7 +328,7 @@ def render_iso11654_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -359,8 +359,8 @@ def render_iso11654_report(
         basis = t("Sound absorption rating per ISO 11654:1997.", language)
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(basis, basis_style),
     ]
 
     if metadata is not None and not metadata.is_empty():
@@ -392,7 +392,7 @@ def render_iso11654_report(
         )
         caption = t("Octave-band &#945;<sub>p</sub>", language)
     left_cell = [
-        Paragraph(caption, caption_style),
+        fiche_paragraph(caption, caption_style),
         value_table,
     ]
     plot_drawing = render_figure_drawing(
@@ -424,7 +424,7 @@ def render_iso11654_report(
             spaceBefore=4,
         )
         flow.append(
-            Paragraph(
+            fiche_paragraph(
                 t(
                     "A shape indicator applies: ISO 11654 (5.3 NOTE) recommends using &#945;<sub>w</sub> in combination with the complete sound absorption coefficient curve, shown above.",
                     language,

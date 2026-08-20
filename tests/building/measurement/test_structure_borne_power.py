@@ -148,9 +148,9 @@ def test_reception_plate_velocity_shape_mismatch() -> None:
 
 def test_plot_returns_axes() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     res = building.reception_plate_power(
         np.array([80.0, 82.0, 79.0]),
         np.array([500.0, 1000.0, 2000.0]),

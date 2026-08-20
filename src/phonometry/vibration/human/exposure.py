@@ -62,13 +62,13 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from scipy import signal as sig
 
-from ..._internal.types import Real
 from ..._internal.warnings import PhonometryWarning
 from ...io._resolve import SignalInput, resolve_fs, resolve_samples
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from matplotlib.axes import Axes
 
+    from ..._internal.types import Real
     from ..._report.metadata import ReportMetadata
 
 Complex = NDArray[np.complex128]

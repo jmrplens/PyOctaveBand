@@ -10,8 +10,12 @@ put the two together before anything is built.
 
 from __future__ import annotations
 
-from .canvas import SVG, Theme
+from typing import TYPE_CHECKING
+
 from .parts import _accel, _accel_wall, _rot_arrow, _spring_v
+
+if TYPE_CHECKING:
+    from .canvas import SVG, Theme
 
 #: Width, in px, a stage-box title has to leave inside the box at the larger
 #: size to keep it. It is the threshold the size decision is taken on, not a

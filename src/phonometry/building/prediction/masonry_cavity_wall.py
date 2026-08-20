@@ -82,13 +82,13 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike
 
 from ..._internal.validation import require_finite_array, require_positive
 from ...vibration.structural.point_mobility import infinite_plate_mobility
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
 __all__ = [
     "WALL_TIE_STIFFNESS",

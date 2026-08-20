@@ -33,13 +33,13 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pytest
 import reference_data
-from numpy.typing import ArrayLike
 from scipy.integrate import quad
 
 from phonometry import building, vibration
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
 #: ISO 717-1 one-third-octave band centres, 100 Hz to 3150 Hz.
 BANDS = np.array(
@@ -583,9 +583,9 @@ def test_orthotropic_plot_shades_the_coincidence_range() -> None:
     has to label the pair ``f_c1`` and ``f_c2`` and shade what lies between,
     in either language.
     """
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     def _legend(axes: Axes) -> list[str]:

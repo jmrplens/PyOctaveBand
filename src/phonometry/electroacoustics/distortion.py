@@ -37,11 +37,12 @@ from typing import TYPE_CHECKING, Any, Literal
 import numpy as np
 
 from ..io._resolve import apply_calibration, resolve_fs
-from ..io._signal import Signal
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import ArrayLike, NDArray
+
+    from ..io._signal import Signal
 
 #: Default number of harmonics summed for the THD (IEC 60268-3).
 _DEFAULT_N_HARMONICS = 10

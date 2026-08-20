@@ -107,7 +107,6 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, overload
 
 import numpy as np
-from numpy.typing import ArrayLike
 
 from ..._internal.validation import (
     require_choice,
@@ -117,6 +116,7 @@ from ..._internal.validation import (
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
 __all__ = [
     "CEILING_ATTENUATION_CONTOUR",

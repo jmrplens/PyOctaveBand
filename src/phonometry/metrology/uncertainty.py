@@ -41,8 +41,8 @@ import numpy as np
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
-from numpy.typing import ArrayLike
 
 from .._internal.warnings import PhonometryWarning
 

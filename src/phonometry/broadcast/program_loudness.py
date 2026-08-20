@@ -45,13 +45,13 @@ from math import ceil
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike
 from scipy import signal
 
 from ..io._resolve import SignalInput, resolve_fs, resolve_samples
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
     from .._report.metadata import ReportMetadata
 

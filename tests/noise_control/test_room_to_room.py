@@ -12,12 +12,15 @@ Table 4.5. The published worked answers live in
 from __future__ import annotations
 
 import math
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 
 from phonometry import noise_control
-from phonometry.noise_control.room_to_room import RoomToRoomResult
+
+if TYPE_CHECKING:
+    from phonometry.noise_control.room_to_room import RoomToRoomResult
 
 _BANDS = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
 _SOURCE = np.array([90.0, 88.0, 86.0, 84.0, 82.0, 80.0])
@@ -226,9 +229,9 @@ def test_validation() -> None:
 
 def test_plot_smoke() -> None:
     """``.plot()`` draws the two spectra, the criterion curve and the NR axis."""
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     result = _chain(
         criterion=noise_control.DesignCriterion(target=45.0, flanking_penalty=2.0)
     )

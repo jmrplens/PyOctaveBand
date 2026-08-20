@@ -12,11 +12,11 @@ from __future__ import annotations
 import csv
 from importlib.resources import files
 
-import matplotlib
+import matplotlib as mpl
 import numpy as np
 import pytest
 
-matplotlib.use("Agg")
+mpl.use("Agg")
 import matplotlib.pyplot as plt
 
 from phonometry.aircraft import (

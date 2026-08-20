@@ -261,9 +261,9 @@ def test_result_bundle() -> None:
 
 def test_plot_returns_axes() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     f = np.logspace(1, 3, 50)
     t = vibration.base_transmissibility(f, 5.0, 1e6, 200.0)
     # The synthetic curve exceeds |T| = 0.1 near resonance, so the

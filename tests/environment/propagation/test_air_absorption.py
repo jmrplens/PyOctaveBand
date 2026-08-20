@@ -313,9 +313,9 @@ def test_atmospheric_attenuation_direct_construction_guards_distance(
 
 def test_atmospheric_attenuation_plot_returns_axes() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     from matplotlib.axes import Axes
 
     res = environment.atmospheric_attenuation([63.0, 250.0, 1000.0, 4000.0], 20.0, 50.0)
@@ -335,9 +335,9 @@ def test_atmospheric_attenuation_plot_returns_axes() -> None:
 
 def test_atmospheric_attenuation_plot_rejects_unknown_language() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     res = environment.atmospheric_attenuation([1000.0], 20.0, 50.0)
     with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")

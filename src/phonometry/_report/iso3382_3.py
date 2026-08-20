@@ -57,10 +57,10 @@ from ._layout import (
     result_box,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..room.open_plan import OpenPlanResult
+    from .metadata import ReportMetadata
 
 
 def _num(value: float, language: str, *, decimals: int = 1) -> str:
@@ -217,7 +217,7 @@ def render_iso3382_3_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -242,8 +242,8 @@ def render_iso3382_3_report(
         )
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(basis, basis_style),
     ]
 
     if metadata is not None and not metadata.is_empty():
@@ -253,7 +253,7 @@ def render_iso3382_3_report(
             flow.append(grid_table(header_pairs))
     flow.append(Spacer(1, 8))
 
-    flow.append(Paragraph(t("Single-number quantities", language), caption_style))
+    flow.append(fiche_paragraph(t("Single-number quantities", language), caption_style))
     flow.append(
         metrics_table(_metric_rows(result, language), col_widths=[62 * mm, 26 * mm])
     )
@@ -283,7 +283,7 @@ def render_iso3382_3_report(
 
     basis_strip_style = measurement_basis_style()
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "Spatial decay rate D<sub>2,S</sub> and the nominal 4 m speech "
                 "level L<sub>p,A,S,4m</sub> from a least-squares fit of the "
@@ -297,7 +297,7 @@ def render_iso3382_3_report(
         )
     )
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "Distraction distance r<sub>D</sub> (STI = 0.50) and privacy "
                 "distance r<sub>P</sub> (STI = 0.20) from a linear regression "

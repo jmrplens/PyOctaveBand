@@ -54,7 +54,6 @@ from ._layout import (
     two_panel_body,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -64,6 +63,7 @@ if TYPE_CHECKING:
         OutdoorAttenuation,
         SourceEmission,
     )
+    from .metadata import ReportMetadata
 
     NDArrayF = NDArray[np.float64]
 else:  # pragma: no cover - runtime alias only
@@ -193,7 +193,7 @@ def _attenuation_table(
     """
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     header_style, _, value_style = analysis_cell_styles("iso9613atten")
     freqs = np.asarray(result.frequencies, dtype=np.float64)
@@ -220,25 +220,29 @@ def _attenuation_table(
             headers.append("L<sub>A</sub> [dB(A)]")
             widths = [20.0, 18.0, 17.0, 17.0, 17.0, 17.0, 18.0, 20.0, 22.0]
 
-    data: list[list[Any]] = [[Paragraph(h, header_style) for h in headers]]
+    data: list[list[Any]] = [[fiche_paragraph(h, header_style) for h in headers]]
     for i in range(freqs.size):
-        row = [Paragraph(_fmt(freqs[i], language, 0), value_style)]
+        row = [fiche_paragraph(_fmt(freqs[i], language, 0), value_style)]
         if levels is not None:
             row.append(
-                Paragraph(_fmt(levels.sound_power_level[i], language), value_style)
+                fiche_paragraph(
+                    _fmt(levels.sound_power_level[i], language), value_style
+                )
             )
         row += [
-            Paragraph(_fmt(result.a_div[i], language), value_style),
-            Paragraph(_fmt(result.a_atm[i], language), value_style),
-            Paragraph(_fmt(result.a_gr[i], language), value_style),
-            Paragraph(_fmt(result.a_bar[i], language), value_style),
-            Paragraph(_fmt(result.a_total[i], language), value_style),
+            fiche_paragraph(_fmt(result.a_div[i], language), value_style),
+            fiche_paragraph(_fmt(result.a_atm[i], language), value_style),
+            fiche_paragraph(_fmt(result.a_gr[i], language), value_style),
+            fiche_paragraph(_fmt(result.a_bar[i], language), value_style),
+            fiche_paragraph(_fmt(result.a_total[i], language), value_style),
         ]
         if levels is not None:
-            row.append(Paragraph(_fmt(levels.receiver_level[i], language), value_style))
+            row.append(
+                fiche_paragraph(_fmt(levels.receiver_level[i], language), value_style)
+            )
             if verbose:
                 row.append(
-                    Paragraph(
+                    fiche_paragraph(
                         _fmt(levels.receiver_level[i] + levels.ck[i], language),
                         value_style,
                     )
@@ -358,7 +362,7 @@ def render_outdoor_attenuation_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -380,8 +384,8 @@ def render_outdoor_attenuation_report(
         language,
     )
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(basis, basis_style),
     ]
 
     header_pairs = _attenuation_metadata_pairs(result, metadata, language)
@@ -390,7 +394,7 @@ def render_outdoor_attenuation_report(
         flow.append(grid_table(header_pairs))
     flow.append(Spacer(1, 8))
 
-    flow.append(Paragraph(t("Attenuation breakdown", language), caption_style))
+    flow.append(fiche_paragraph(t("Attenuation breakdown", language), caption_style))
     flow.append(_attenuation_table(result, levels, verbose, language))
     flow.append(Spacer(1, 8))
     flow.append(
@@ -417,7 +421,7 @@ def render_outdoor_attenuation_report(
 
     basis_strip_style = measurement_basis_style()
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "The attenuation A = A<sub>div</sub> + A<sub>atm</sub> + "
                 "A<sub>gr</sub> + A<sub>bar</sub> (Eq. (4)); a negative "
@@ -429,7 +433,7 @@ def render_outdoor_attenuation_report(
     )
     if levels is not None:
         flow.append(
-            Paragraph(
+            fiche_paragraph(
                 t(
                     "The downwind level L<sub>fT</sub>(DW) = L<sub>w</sub> + "
                     "D<sub>c</sub> &#8722; A (Eq. (3)); L<sub>AT</sub>(DW) is its "
@@ -440,7 +444,7 @@ def render_outdoor_attenuation_report(
             )
         )
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "A<sub>misc</sub> (foliage, industrial sites, housing; Annex A) "
                 "and reflections from vertical surfaces (clause 7.5) are not "
@@ -499,7 +503,7 @@ def _barrier_table(result: BarrierInsertionLoss, verbose: bool, language: str) -
     """The per-band barrier insertion-loss table (``IL`` and, verbose, ``N``)."""
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     header_style, _, value_style = analysis_cell_styles("iso9613bar")
     freqs = np.asarray(result.frequencies, dtype=np.float64)
@@ -512,14 +516,14 @@ def _barrier_table(result: BarrierInsertionLoss, verbose: bool, language: str) -
         headers.insert(1, "N")
         widths = [18.0, 16.0, 20.0]
 
-    data: list[list[Any]] = [[Paragraph(h, header_style) for h in headers]]
+    data: list[list[Any]] = [[fiche_paragraph(h, header_style) for h in headers]]
     for i in range(freqs.size):
         row = [
-            Paragraph(_fmt(freqs[i], language, 0), value_style),
-            Paragraph(_fmt(il[i], language), value_style),
+            fiche_paragraph(_fmt(freqs[i], language, 0), value_style),
+            fiche_paragraph(_fmt(il[i], language), value_style),
         ]
         if verbose:
-            row.insert(1, Paragraph(_fmt(n[i], language, 2), value_style))
+            row.insert(1, fiche_paragraph(_fmt(n[i], language, 2), value_style))
         data.append(row)
     return stacked_table(data, [w * mm for w in widths])
 
@@ -574,7 +578,7 @@ def render_barrier_insertion_loss_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -589,8 +593,8 @@ def render_barrier_insertion_loss_report(
         language,
     ).format(model=model)
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(basis, basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(basis, basis_style),
     ]
 
     header_pairs = _barrier_metadata_pairs(result, metadata, language)
@@ -600,7 +604,7 @@ def render_barrier_insertion_loss_report(
     flow.append(Spacer(1, 8))
 
     left_cell = [
-        Paragraph(t("Insertion loss per band", language), caption_style),
+        fiche_paragraph(t("Insertion loss per band", language), caption_style),
         _barrier_table(result, verbose, language),
     ]
     plot_drawing = render_figure_drawing(
@@ -618,7 +622,7 @@ def render_barrier_insertion_loss_report(
 
     basis_strip_style = measurement_basis_style()
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "The insertion loss IL = 20 lg|p<sub>free</sub> / "
                 "p<sub>barrier</sub>| is the level reduction the screen adds "

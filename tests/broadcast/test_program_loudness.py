@@ -190,9 +190,9 @@ def test_k_weighting_response_rejects_bad_input() -> None:
 
 
 def test_k_weighting_response_plot() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     res = k_weighting_response()
@@ -656,9 +656,9 @@ def test_chunked_inter_sample_peak_matches_direct(
 
 
 def test_plot_smoke() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     res = program_loudness(_steps(((-30.0, 4.0), (-23.0, 4.0))), FS)

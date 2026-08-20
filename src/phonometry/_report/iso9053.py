@@ -47,10 +47,10 @@ from ._material_fiche import (
     render_material_fiche,
     standard_basis_line,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..materials.absorbers.airflow_resistance import StaticAirflowResult
+    from .metadata import ReportMetadata
 
 
 def _pas(value: float, language: str = "en") -> str:

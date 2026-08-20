@@ -539,9 +539,9 @@ def test_daily_vibration_exposure_rejects_length_mismatch() -> None:
 
 
 def test_weighting_response_plot_returns_axes() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     ax = hv.frequency_weighting("Wk", [1.0, 10.0, 100.0]).plot()
@@ -550,9 +550,9 @@ def test_weighting_response_plot_returns_axes() -> None:
 
 
 def test_weighted_spectrum_plot_returns_axes() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     result = hv.weighted_acceleration([0.5, 0.8, 0.3], [16.0, 31.5, 63.0], "Wk")
@@ -562,9 +562,9 @@ def test_weighted_spectrum_plot_returns_axes() -> None:
 
 
 def test_daily_vibration_exposure_plot_returns_axes() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     result = hv.daily_vibration_exposure([2.5, 3.0], [3600.0, 1800.0], kind="hav")

@@ -72,11 +72,12 @@ from ..io._resolve import (
     resolve_fs,
     resolve_samples,
 )
-from ..io._signal import Signal
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
+
+    from ..io._signal import Signal
 
 __all__ = [
     "EQFilterType",

@@ -41,10 +41,10 @@ import numpy as np
 
 from ._frf_fiche import frequency_range, frf_metadata_pairs, render_frf_fiche
 from ._i18n import format_number, t
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..vibration.structural.transfer_stiffness import TransferStiffnessResult
+    from .metadata import ReportMetadata
 
 
 def _is_indirect(result: TransferStiffnessResult) -> bool:

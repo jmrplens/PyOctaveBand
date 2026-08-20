@@ -11,9 +11,12 @@ diagram draws what is done to a device once it has been graded.
 from __future__ import annotations
 
 import itertools
+from typing import TYPE_CHECKING
 
-from .canvas import SVG, Theme
 from .parts import _accel, _box_solid, _box_wire, _motion_arrows, _rot_arrow
+
+if TYPE_CHECKING:
+    from .canvas import SVG, Theme
 
 # ---------------------------------------------------------------------------
 # d6 - Two-microphone (p-p) intensity probe (IEC 61043)

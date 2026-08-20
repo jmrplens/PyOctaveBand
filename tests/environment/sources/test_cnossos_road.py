@@ -30,9 +30,9 @@ import functools
 import math
 import warnings
 
-import matplotlib
+import matplotlib as mpl
 
-matplotlib.use("Agg")
+mpl.use("Agg")
 import numpy as np
 import pytest
 import reference_data as ref

@@ -354,9 +354,9 @@ def test_free_and_diffuse_differ() -> None:
 def test_plot_smoke(
     ref_calibration: psychoacoustics.EcmaFluctuationStrength,
 ) -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     axes = ref_calibration.plot()
     assert axes.shape == (2,)
     single = ref_calibration.plot(ax=axes[0])
@@ -369,8 +369,8 @@ def test_plot_accepts_matplotlib_color_alias(
 ) -> None:
     # ``c=`` is matplotlib's alias for ``color=``; the renderer must not
     # inject the canonical name alongside it (that raises a TypeError).
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     axes = ref_calibration.plot(c="#123456")
     assert axes[0].lines[0].get_color() == "#123456"

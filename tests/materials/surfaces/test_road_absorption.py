@@ -389,9 +389,9 @@ def test_the_functions_that_took_a_deprecated_fs_alias_still_require_fs() -> Non
 
 
 def test_insitu_absorption_spectrum_plot_returns_axes() -> None:
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     import matplotlib.pyplot as plt
 
     hi = _incident_ir()

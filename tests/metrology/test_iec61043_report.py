@@ -15,10 +15,10 @@ from __future__ import annotations
 
 import os
 
-import matplotlib
+import matplotlib as mpl
 import pytest
 
-matplotlib.use("Agg")
+mpl.use("Agg")
 
 pytest.importorskip("reportlab")
 pytest.importorskip("svglib")

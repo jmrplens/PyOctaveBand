@@ -12,9 +12,12 @@ whether the record was fit to analyse at all.
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from typing import TYPE_CHECKING
 
-from .canvas import SVG, Theme
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from .canvas import SVG, Theme
 
 # ---------------------------------------------------------------------------
 # d1 - Calibration chain (IEC 60942)

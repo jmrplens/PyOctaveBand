@@ -60,10 +60,10 @@ from ._layout import (
     result_box,
     stacked_table,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..vibration.human.multiple_shock import MultipleShockResult
+    from .metadata import ReportMetadata
 
 #: Display precision of the acceleration dose and compressive stress (two
 #: decimals resolve the Annex C worked example Dz = 55.97 m/s2 and Sd = 1.62
@@ -192,7 +192,7 @@ def _analysis_table(result: MultipleShockResult, language: str = "en") -> Any:
     """
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("iso26315")
     ms2 = _unit_ms2()
@@ -235,19 +235,19 @@ def _analysis_table(result: MultipleShockResult, language: str = "en") -> Any:
 
     data: list[list[Any]] = [
         [
-            Paragraph(t("Quantity", language), header_style),
-            Paragraph(t("Symbol", language), header_style),
-            Paragraph(t("Value", language), header_style),
-            Paragraph(t("Reference", language), header_style),
+            fiche_paragraph(t("Quantity", language), header_style),
+            fiche_paragraph(t("Symbol", language), header_style),
+            fiche_paragraph(t("Value", language), header_style),
+            fiche_paragraph(t("Reference", language), header_style),
         ]
     ]
     for quantity, symbol, value, reference in rows:
         data.append(
             [
-                Paragraph(quantity, label_style),
-                Paragraph(symbol, value_style),
-                Paragraph(value, value_style),
-                Paragraph(reference, value_style),
+                fiche_paragraph(quantity, label_style),
+                fiche_paragraph(symbol, value_style),
+                fiche_paragraph(value, value_style),
+                fiche_paragraph(reference, value_style),
             ]
         )
     table = stacked_table(data, [70 * mm, 26 * mm, 42 * mm, 36 * mm])
@@ -270,7 +270,7 @@ def _classification_table(result: MultipleShockResult, language: str = "en") -> 
     from reportlab.lib import colors
     from reportlab.lib.units import mm
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("iso26315cls")
     r10, r50, r90 = (_fmt(x, _R_DECIMALS, language) for x in result.risk_thresholds)
@@ -309,19 +309,19 @@ def _classification_table(result: MultipleShockResult, language: str = "en") -> 
 
     data: list[list[Any]] = [
         [
-            Paragraph(t("Risk band", language), header_style),
-            Paragraph(t("Risk of lumbar injury", language), header_style),
-            Paragraph(t("Stress variable R (Table C.2)", language), header_style),
-            Paragraph(t("Classification", language), header_style),
+            fiche_paragraph(t("Risk band", language), header_style),
+            fiche_paragraph(t("Risk of lumbar injury", language), header_style),
+            fiche_paragraph(t("Stress variable R (Table C.2)", language), header_style),
+            fiche_paragraph(t("Classification", language), header_style),
         ]
     ]
     for index, (band, probability, r_range) in enumerate(bands):
         data.append(
             [
-                Paragraph(band, label_style),
-                Paragraph(probability, value_style),
-                Paragraph(r_range, value_style),
-                Paragraph(_mark(index == active), label_style),
+                fiche_paragraph(band, label_style),
+                fiche_paragraph(probability, value_style),
+                fiche_paragraph(r_range, value_style),
+                fiche_paragraph(_mark(index == active), label_style),
             ]
         )
     table = stacked_table(data, [40 * mm, 36 * mm, 62 * mm, 36 * mm])
@@ -356,7 +356,7 @@ def _zone_row(result: MultipleShockResult, language: str = "en") -> Any:
     """The classification zone row stating the Annex C risk band for ``R``."""
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 
-    from ._layout import fiche_paragraph as Paragraph
+    from ._layout import fiche_paragraph
 
     band = t(_BAND_LABELS[_band_index(result)], language)
     zone_style = ParagraphStyle(
@@ -367,7 +367,7 @@ def _zone_row(result: MultipleShockResult, language: str = "en") -> Any:
         spaceBefore=4,
     )
     lead = t("Health-risk classification", language)
-    return Paragraph(
+    return fiche_paragraph(
         f"{lead}: {t('stress variable R = {r} &#8594; {band}', language).format(r=_fmt(result.risk, _R_DECIMALS, language), band=band)}",
         zone_style,
     )
@@ -407,7 +407,7 @@ def render_iso2631_5_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -416,8 +416,8 @@ def render_iso2631_5_report(
     title = t("Whole-body multiple-shock health risk", language)
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(
             t(
                 "Assessment of adverse health effects from whole-body vibration "
                 "containing multiple shocks per ISO 2631-5:2018 (Clause 5 spinal "
@@ -437,7 +437,7 @@ def render_iso2631_5_report(
     flow.append(grid_table(header_pairs))
     flow.append(Spacer(1, 6))
 
-    flow.append(Paragraph(t("Dose and stress analysis", language), caption_style))
+    flow.append(fiche_paragraph(t("Dose and stress analysis", language), caption_style))
     flow.append(_analysis_table(result, language))
     flow.append(Spacer(1, 4))
     # Full-width, landscape injury-probability curve (self-scaling 0-100 % axis).
@@ -456,7 +456,9 @@ def render_iso2631_5_report(
     flow.append(Spacer(1, 4))
 
     flow.append(
-        Paragraph(t("Annex C risk classification (Table C.2)", language), caption_style)
+        fiche_paragraph(
+            t("Annex C risk classification (Table C.2)", language), caption_style
+        )
     )
     flow.append(_classification_table(result, language))
     flow.append(_zone_row(result, language))
@@ -470,7 +472,7 @@ def render_iso2631_5_report(
         spaceBefore=5,
     )
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             t(
                 "ISO 2631-5:2018 defines no exposure limit; the stress variable "
                 "R and the probability of lumbar injury P are the informative "

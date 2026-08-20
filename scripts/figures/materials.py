@@ -8,7 +8,7 @@ alike) that scatter rather than absorb. Everything here is embedded by a page
 under ``materials/``.
 """
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -33,6 +33,9 @@ from .theme import (
     LABEL_FREQ_HZ,
     save_figure,
 )
+
+if TYPE_CHECKING:
+    from phonometry.materials.absorbers.layered import Layer
 
 
 def generate_dynamic_stiffness(output_dir: str) -> None:
@@ -770,7 +773,6 @@ def generate_porous_absorber_designs(output_dir: str) -> None:
     import warnings as _warnings
 
     from phonometry import materials
-    from phonometry.materials.absorbers.layered import Layer
 
     f = np.logspace(np.log10(50.0), np.log10(5000.0), 500)
     with _warnings.catch_warnings():

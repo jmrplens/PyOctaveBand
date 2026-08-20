@@ -252,9 +252,9 @@ def test_the_envelope_plot_says_which_quantity_it_drew() -> None:
     when the record was A-weighted first, and an uncalibrated record has no
     reference to count decibels from at all.
     """
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     from phonometry.filters import time_weighting
 
     calibrated = time_weighting(
@@ -270,9 +270,9 @@ def test_the_envelope_plot_says_which_quantity_it_drew() -> None:
 
 def test_the_envelope_plot_labels_each_channel() -> None:
     """The multichannel branch, which the single-channel cases never reach."""
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     from phonometry.filters import time_weighting
 
     stereo = Signal(np.stack([_RECORD, 2.0 * _RECORD]), FS, calibration_factor=CAL)
@@ -283,9 +283,9 @@ def test_the_envelope_plot_labels_each_channel() -> None:
 
 def test_the_envelope_plot_is_translated() -> None:
     """Every fixed string this renderer draws has a Spanish counterpart."""
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     from phonometry.filters import time_weighting
 
     axes = time_weighting(
@@ -364,9 +364,9 @@ def test_an_empty_block_keeps_the_carried_state_and_the_wrapper() -> None:
 
 def test_the_envelope_plot_takes_a_caller_supplied_label() -> None:
     """The same keyword collision as the waveform renderer, same resolution."""
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     from phonometry.filters import time_weighting
 
     stereo = Signal(np.stack([_RECORD, 2.0 * _RECORD]), FS, calibration_factor=CAL)

@@ -9,7 +9,10 @@ the deep ocean into a waveguide.
 
 from __future__ import annotations
 
-from .canvas import SVG, Theme
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .canvas import SVG, Theme
 
 # ---------------------------------------------------------------------------
 # Ship radiated-noise measurement geometry (ISO 17208-1)

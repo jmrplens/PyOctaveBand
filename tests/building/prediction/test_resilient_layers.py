@@ -1172,9 +1172,9 @@ def test_mount_model_is_zero_at_and_below_its_own_resonance() -> None:
 # ===========================================================================
 def test_plots_return_axes(monkeypatch: pytest.MonkeyPatch) -> None:
     """Every public result exposes a working ``.plot()`` in both languages."""
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     plate_stiffness, impedance = _plate("concrete", 0.14)
     covering = building.covering_contact_stiffness(2.8e8 * 0.005, 0.005)
     freqs = np.array([100.0, 200.0, 400.0, 800.0, 1600.0])

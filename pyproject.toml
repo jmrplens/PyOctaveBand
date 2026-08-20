@@ -149,9 +149,19 @@ select = [
     "UP", "B", "SIM", "C4", "RET", "A",
     "PIE", "DTZ", "G",      # zero findings today: these only guard the future
     "FURB",                 # long-hand forms of builtins
+    "TC",                   # imports only a type checker needs
+    "ICN",                  # the conventional alias for a well-known package
+    "N812",                 # an alias must not disguise a function as a class
+    "INP", "T20",           # both already clean in `src`, and kept that way
 ]
 ignore = [
     "B905",  # selected by "B"; see the note below
+    # TC006 quotes the first argument of `typing.cast`, which that function
+    # ignores entirely at run time. It is inert, and it moved the recorded
+    # fingerprint of two clips through `figures.media._save_animation`. The
+    # clip gate says plainly that an alarm nobody believes is worse than no
+    # alarm, so an inert rewrite is not worth one.
+    "TC006",
     # SIM300 calls anything with an upper-case name a literal, and gets three
     # idioms in this tree backwards for it. `spectrum[OCTAVE_BANDS == f]` is a
     # numpy mask, not a condition, and `res.transmission_loss[BANDS <= f0]`
@@ -163,14 +173,6 @@ ignore = [
 ]
 # Selected next, in their own review, because each is a change to code rather
 # than to its shape and the diff has to be readable to be checked:
-#   TC    (313) moves imports that only a type checker needs under
-#               `if TYPE_CHECKING`. Measured here, it costs more than it is
-#               worth in this pass: it reorders imports, which makes `I` fire
-#               where it was at zero, and the clip freshness fingerprint hashes
-#               the AST of the drawing closure, imports included. Both together
-#               moved the recorded fingerprint of most of the 42 committed
-#               clips, for drawings that are provably identical. The top-level
-#               import is already lazy, so the runtime gain is small.
 #   PT    (295) pytest idiom. 241 of them are `pytest.raises` without `match=`,
 #               and the habit here is already the other way: 1755 of the 2065
 #               `pytest.raises` in the suite do pass `match=`. These are the
@@ -188,8 +190,12 @@ ignore = [
 # `import matplotlib.pyplot`, and the scripts put the repository on `sys.path`
 # before importing from it. Both are imports that cannot be at the top of the
 # file. `src/` raises no E402 at all, which is where it would matter.
-"tests/**" = ["E402"]
-"scripts/**" = ["E402"]
+# A print is what a command line tool is for, and neither the scripts nor the
+# tests are packages anyone imports by name. Both rules are here to hold `src`,
+# where they already find nothing.
+"scripts/**" = ["E402", "T201", "INP001"]
+"tests/**" = ["E402", "T201", "INP001"]
+".github/**" = ["T201", "INP001"]
 # The PyOctaveBand transition shim exists to re-export the whole package under
 # the old name; the star import is the point of the file.
 "stub/src/pyoctaveband/__init__.py" = ["F403"]

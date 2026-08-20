@@ -61,10 +61,10 @@ from .iec60268_5 import (
     _range_text,
     _thin_freq_ticklabels,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..electroacoustics.microphone import MicrophoneCharacteristics
+    from .metadata import ReportMetadata
 
 
 def _basis(metadata: ReportMetadata | None, language: str = "en") -> str:
@@ -321,7 +321,7 @@ def render_iec60268_4_report(
         from reportlab.lib.units import mm
         from reportlab.platypus import Spacer
 
-        from ._layout import fiche_paragraph as Paragraph
+        from ._layout import fiche_paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -330,8 +330,8 @@ def render_iec60268_4_report(
     title = t("Microphone characteristics", language)
 
     flow: list[Any] = [
-        Paragraph(title, title_style),
-        Paragraph(_basis(metadata, language), basis_style),
+        fiche_paragraph(title, title_style),
+        fiche_paragraph(_basis(metadata, language), basis_style),
     ]
 
     if metadata is not None and not metadata.is_empty():
@@ -342,7 +342,7 @@ def render_iec60268_4_report(
     flow.append(Spacer(1, 8))
 
     left_cell = [
-        Paragraph(t("Rated characteristics", language), caption_style),
+        fiche_paragraph(t("Rated characteristics", language), caption_style),
         metrics_table(_rated_rows(result, language), col_widths=[35 * mm, 21 * mm]),
     ]
     response = _response_drawing(result, 116 * mm, language)

@@ -28,7 +28,7 @@ from __future__ import annotations
 
 import pathlib
 import re
-from xml.etree import ElementTree
+from xml.etree import ElementTree as ET
 
 #: The dark documentation page, from scripts/figures/theme.py.
 PAGE = (0x1C, 0x21, 0x28)
@@ -81,14 +81,14 @@ def _parse(style: str) -> tuple[tuple[int, int, int] | None, float, float]:
     )
 
 
-def _group_id(element: ElementTree.Element) -> str:
+def _group_id(element: ET.Element) -> str:
     """The ``id`` of a group element, without matplotlib's trailing counter."""
     if element.tag != f"{SVG_NS}g":
         return ""
     return element.get("id", "").rsplit("_", 1)[0]
 
 
-def _is_field(element: ElementTree.Element) -> bool:
+def _is_field(element: ET.Element) -> bool:
     """Whether this subtree paints an opaque field over the axes it is in."""
     if element.tag == f"{SVG_NS}image":
         return True
@@ -100,7 +100,7 @@ def _is_field(element: ElementTree.Element) -> bool:
 
 
 def _strokes(
-    element: ElementTree.Element, on_field: bool = False
+    element: ET.Element, on_field: bool = False
 ) -> list[tuple[tuple[int, int, int], float, float]]:
     """Every measurable stroke in a subtree, as ``(rgb, opacity, width)``."""
     group = _group_id(element)
@@ -124,7 +124,7 @@ def main() -> int:
     rows: list[tuple[float, str, str]] = []
     for svg in sorted(images.glob("*_dark.svg")):
         seen: set[tuple[tuple[int, int, int], float, float]] = set()
-        root = ElementTree.parse(svg).getroot()
+        root = ET.parse(svg).getroot()
         for rgb, alpha, width in _strokes(root):
             key = (rgb, alpha, width)
             if key in seen:

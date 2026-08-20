@@ -196,9 +196,9 @@ def test_plot_single_number_raises() -> None:
 
 def test_plot_band_returns_axes() -> None:
     pytest.importorskip("matplotlib")
-    import matplotlib
+    import matplotlib as mpl
 
-    matplotlib.use("Agg")
+    mpl.use("Agg")
     res = materials.sound_absorption_coefficient_uncertainty(
         ref.ISO12999_2_TABLE4_ALPHA_S, ref.ISO12999_2_TABLE4_FREQ
     )

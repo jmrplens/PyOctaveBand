@@ -25,11 +25,13 @@ import argparse
 import sys
 import time
 import timeit
-from collections.abc import Callable
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 _ROOT = Path(__file__).resolve().parent.parent
 if str(_ROOT) not in sys.path:  # allow `python scripts/bench.py` from anywhere
