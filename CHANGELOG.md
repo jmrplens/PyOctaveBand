@@ -171,6 +171,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   returns, not on each rectangle, so reading `ax.patches` would have missed it
   on every bar renderer and let this back in.
 
+- The `io` guide says how to write the type it talks about. It names `Signal`
+  sixteen times in prose and never once said the spelling, so a reader looking
+  for it found the private module the library imports it from and wrote
+  `pm.io._signal.Signal`, which is what happened. It is `io.Signal` after
+  `from phonometry import io`, or `phonometry.Signal`, and the class docstring
+  and both index pages say so too, in English and in Spanish.
+
+  `SignalOrigin` carried a reason that stopped being true: it was named that
+  way rather than `SignalSource` partly because the top level could not hold
+  two classes of one spelling. It can hold neither now, each being reached
+  through its own package, and the reason that survives is the better one, that
+  this is a passive record and not a source of sound.
+
 - `plot_excitation` is exported by `phonometry.room`, the package that owns it.
   It was the one of the twenty-four plotting helpers that no domain published:
   it is defined in the private `_plot.room`, the top level re-exported it, and

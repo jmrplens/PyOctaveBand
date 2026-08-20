@@ -29,7 +29,8 @@ se señalan, a las claras: un nivel calculado sobre la aproximación ADPCM o
 MP3 de la forma de onda no es defendible, y el aviso más la marca `lossy`
 mantienen ese hecho pegado a los datos.
 
-Lo que vuelve de un archivo es un `Signal`: las muestras con su frecuencia,
+Lo que vuelve de un archivo es un `Signal` (`io.Signal`, o
+`phonometry.Signal`; el módulo donde está definido es privado): las muestras con su frecuencia,
 su calibración, sus etiquetas de canal y su procedencia `bext` en un único
 objeto inmutable que se comporta como el array desnudo en todas partes
 (`np.asarray` entrega las muestras a cualquier función existente), se
