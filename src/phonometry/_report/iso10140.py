@@ -140,7 +140,9 @@ def render_iso10140_report(
         return [(value_header, curve, 1)], caption, None
 
     return render_insulation_fiche(
-        result, rating, path,
+        result,
+        rating,
+        path,
         spec=spec,
         is_impact=is_impact,
         curve_attr=quantity,

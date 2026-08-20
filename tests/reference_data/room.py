@@ -35,8 +35,8 @@ EN12354_6_ANNEX_E_BARE_SURFACES: list[tuple[float, float]] = [
     (12.39, 0.02),  # ceiling
     (10.90, 0.04),  # long wall
     (10.90, 0.04),  # side wall
-    (6.55, 0.04),   # side wall
-    (6.55, 0.04),   # glass facade
+    (6.55, 0.04),  # side wall
+    (6.55, 0.04),  # glass facade
 ]
 EN12354_6_A_BARE = 2.26  # equivalent absorption area, bare room (m2)
 EN12354_6_T_BARE = 2.1  # reverberation time, bare room (s)
@@ -52,12 +52,12 @@ EN12354_6_A_OBJECTS = 5.03  # equivalent absorption area, with objects (m2)
 # printed reverberation times to <= 0.012 s (the residual is the book rounding
 # the imperial 0.049 constant). This anchors the whole family on measured
 # material data, not only on the closed-form identities.
-_FT2 = 0.3048 ** 2   # square foot -> m2
-_FT3 = 0.3048 ** 3   # cubic foot -> m3
-EVEREST_EX1_VOLUME = 3728.0 * _FT3            # 105.565 m3
-EVEREST_EX1_FLOOR_AREA = 373.0 * _FT2         # concrete floor, 34.653 m2
-EVEREST_EX1_SHELL_AREA = 1159.0 * _FT2        # gypsum walls+ceiling, 107.675 m2
+_FT2 = 0.3048**2  # square foot -> m2
+_FT3 = 0.3048**3  # cubic foot -> m3
+EVEREST_EX1_VOLUME = 3728.0 * _FT3  # 105.565 m3
+EVEREST_EX1_FLOOR_AREA = 373.0 * _FT2  # concrete floor, 34.653 m2
+EVEREST_EX1_SHELL_AREA = 1159.0 * _FT2  # gypsum walls+ceiling, 107.675 m2
 EVEREST_EX1_BANDS = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
-EVEREST_EX1_FLOOR_ALPHA = [0.01, 0.01, 0.015, 0.02, 0.02, 0.02]   # concrete
-EVEREST_EX1_SHELL_ALPHA = [0.29, 0.10, 0.05, 0.04, 0.07, 0.09]    # gypsum board
-EVEREST_EX1_RT = [0.54, 1.53, 2.87, 3.39, 2.06, 1.63]             # printed RT60, s
+EVEREST_EX1_FLOOR_ALPHA = [0.01, 0.01, 0.015, 0.02, 0.02, 0.02]  # concrete
+EVEREST_EX1_SHELL_ALPHA = [0.29, 0.10, 0.05, 0.04, 0.07, 0.09]  # gypsum board
+EVEREST_EX1_RT = [0.54, 1.53, 2.87, 3.39, 2.06, 1.63]  # printed RT60, s

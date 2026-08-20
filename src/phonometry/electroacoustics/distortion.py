@@ -163,7 +163,11 @@ def _harmonic_amplitudes(
 ) -> tuple[float, NDArray[np.float64]]:
     """Return ``(f0, amplitudes)`` with ``amplitudes[k]`` the (k+1)-th harmonic."""
     freqs, amp = _amplitude_spectrum(signal, fs, window)
-    f0 = _fundamental_frequency(freqs, amp) if fundamental is None else float(fundamental)
+    f0 = (
+        _fundamental_frequency(freqs, amp)
+        if fundamental is None
+        else float(fundamental)
+    )
     if f0 <= 0.0:
         raise ValueError("Could not determine a positive fundamental frequency.")
     search = f0 * _HARMONIC_SEARCH_FACTOR
@@ -302,9 +306,7 @@ def _notched_residual(
     from scipy import signal as sp_signal
 
     if f0 >= fs / 2.0:
-        raise ValueError(
-            "'fundamental' must be below the Nyquist frequency (fs / 2)."
-        )
+        raise ValueError("'fundamental' must be below the Nyquist frequency (fs / 2).")
     b, a = sp_signal.iirnotch(f0, notch_q * _FILTFILT_NOTCH_Q_FACTOR, fs)
     return np.asarray(sp_signal.filtfilt(b, a, signal), dtype=np.float64)
 
@@ -487,11 +489,26 @@ def sinad(
 #: interpolates between the mask frequencies linearly in dB on a logarithmic
 #: frequency axis, which is the interpolation used here.
 _ITU_R_468_TABLE: tuple[tuple[float, float], ...] = (
-    (31.5, -29.9), (63.0, -23.9), (100.0, -19.8), (200.0, -13.8),
-    (400.0, -7.8), (800.0, -1.9), (1000.0, 0.0), (2000.0, 5.6),
-    (3150.0, 9.0), (4000.0, 10.5), (5000.0, 11.7), (6300.0, 12.2),
-    (7100.0, 12.0), (8000.0, 11.4), (9000.0, 10.1), (10000.0, 8.1),
-    (12500.0, 0.0), (14000.0, -5.3), (16000.0, -11.7), (20000.0, -22.2),
+    (31.5, -29.9),
+    (63.0, -23.9),
+    (100.0, -19.8),
+    (200.0, -13.8),
+    (400.0, -7.8),
+    (800.0, -1.9),
+    (1000.0, 0.0),
+    (2000.0, 5.6),
+    (3150.0, 9.0),
+    (4000.0, 10.5),
+    (5000.0, 11.7),
+    (6300.0, 12.2),
+    (7100.0, 12.0),
+    (8000.0, 11.4),
+    (9000.0, 10.1),
+    (10000.0, 8.1),
+    (12500.0, 0.0),
+    (14000.0, -5.3),
+    (16000.0, -11.7),
+    (20000.0, -22.2),
     (31500.0, -42.7),
 )
 
@@ -640,8 +657,9 @@ class HarmonicDistortionResult:
     thd_plus_noise: float
     sinad_db: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en",
-             **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the magnitude spectrum with the harmonics marked.
 
         :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -698,9 +716,7 @@ def harmonic_analysis(
     thdn = thd_plus_noise(
         sig, fs_v, f0, notch_q=notch_q, bandwidth=bandwidth, window=window
     )
-    sinad_db = sinad(
-        sig, fs_v, f0, notch_q=notch_q, bandwidth=bandwidth, window=window
-    )
+    sinad_db = sinad(sig, fs_v, f0, notch_q=notch_q, bandwidth=bandwidth, window=window)
     return HarmonicDistortionResult(
         fundamental=f0,
         harmonic_frequencies=freqs,

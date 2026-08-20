@@ -29,9 +29,9 @@ def _d_human_vibration(s: SVG, th: Theme) -> None:
     # --- Left: a seated person on a vibrating seat, triaxial accelerometer ---
     s.ground(gy, 40, 350)
     # Seat: cushion, backrest and support leg.
-    s.rect(118, 424, 132, 18, th.panel, th.fg, rx=4, sw=2)      # cushion
-    s.rect(118, 336, 16, 90, th.panel, th.fg, rx=3, sw=2)       # backrest
-    s.line(184, 442, 184, gy, th.fg, 2.4)                       # pedestal
+    s.rect(118, 424, 132, 18, th.panel, th.fg, rx=4, sw=2)  # cushion
+    s.rect(118, 336, 16, 90, th.panel, th.fg, rx=3, sw=2)  # backrest
+    s.line(184, 442, 184, gy, th.fg, 2.4)  # pedestal
     # A wavy "vibration" arrow rising into the seat base.
     s.arrow(184, gy - 4, 184, 452, th.secondary, 2.4)
     s.text(184, gy - 12, "vibration input", 15, th.secondary, "middle", italic=True)
@@ -39,11 +39,11 @@ def _d_human_vibration(s: SVG, th: Theme) -> None:
     # Triaxial accelerometer at the seat/body interface with its x, y, z axes.
     ox, oy = 176.0, 420.0
     s.rect(ox - 9, oy - 8, 18, 16, th.secondary, th.fg, rx=2, sw=1.5)
-    s.arrow(ox, oy - 8, ox, oy - 58, th.accent, 2.0)            # z (vertical)
+    s.arrow(ox, oy - 8, ox, oy - 58, th.accent, 2.0)  # z (vertical)
     s.text(ox + 8, oy - 54, "$z$", 15, th.accent, "start", bold=True)
-    s.arrow(ox + 9, oy, ox + 62, oy, th.accent, 2.0)            # x (fore-aft)
+    s.arrow(ox + 9, oy, ox + 62, oy, th.accent, 2.0)  # x (fore-aft)
     s.text(ox + 66, oy + 5, "$x$", 15, th.accent, "start", bold=True)
-    s.arrow(ox - 7, oy + 6, ox - 44, oy + 34, th.accent, 2.0)   # y (lateral)
+    s.arrow(ox - 7, oy + 6, ox - 44, oy + 34, th.accent, 2.0)  # y (lateral)
     s.text(ox - 52, oy + 44, "$y$", 15, th.accent, "end", bold=True)
     s.text(150, gy + 34, "Seat/body interface", 15, th.fg, "middle")
 
@@ -72,10 +72,23 @@ def _d_human_vibration(s: SVG, th: Theme) -> None:
     # not on the ISO 2631-1 Eq. (10) vector total a_v.
     s.arrow(cx, 388, cx, 424, th.fg, 2.0)
     s.rect(400, 424, 470, 78, "none", th.secondary, rx=12, sw=2, dash="6,5")
-    s.text(635, 452, "$A(8) = max(1.4·a_{wx} , 1.4·a_{wy} , a_{wz})·√(T/T_0)$",
-           17, th.fg, "middle", bold=True)
-    s.text(635, 480, "assessed vs EAV / ELV (Directive 2002/44/EC)",
-           15, th.secondary, "middle")
+    s.text(
+        635,
+        452,
+        "$A(8) = max(1.4·a_{wx} , 1.4·a_{wy} , a_{wz})·√(T/T_0)$",
+        17,
+        th.fg,
+        "middle",
+        bold=True,
+    )
+    s.text(
+        635,
+        480,
+        "assessed vs EAV / ELV (Directive 2002/44/EC)",
+        15,
+        th.secondary,
+        "middle",
+    )
 
 
 def _d_multiple_shock(s: SVG, th: Theme) -> None:
@@ -86,48 +99,84 @@ def _d_multiple_shock(s: SVG, th: Theme) -> None:
 
     # --- Input --------------------------------------------------------------
     s.rect(x0, 48, bw, bh, th.panel, th.fg, rx=10, sw=2)
-    s.text(cx, 72, "Vertical seat acceleration  $a_{z}(t)$", 16, th.fg,
-           "middle", bold=True)
-    s.text(cx, 92,
-           "conditioned per 5.1.3:  HP 0.01 Hz (2nd order) / LP 80 Hz "
-           "(4th order)", 11, th.muted, "middle")
+    s.text(
+        cx, 72, "Vertical seat acceleration  $a_{z}(t)$", 16, th.fg, "middle", bold=True
+    )
+    s.text(
+        cx,
+        92,
+        "conditioned per 5.1.3:  HP 0.01 Hz (2nd order) / LP 80 Hz (4th order)",
+        11,
+        th.muted,
+        "middle",
+    )
     s.arrow(cx, 106, cx, 136, th.fg, 1.8)
-    s.text(cx - 26, 128, "not the ISO 2631-1 0.4 Hz / 100 Hz filters", 10,
-           th.secondary, "end")
+    s.text(
+        cx - 26,
+        128,
+        "not the ISO 2631-1 0.4 Hz / 100 Hz filters",
+        10,
+        th.secondary,
+        "end",
+    )
 
     def _step(y: float, l1: str, l2: str, color: str) -> None:
         s.rect(x0, y, bw, bh, th.panel, color, rx=10, sw=2)
         s.text(cx, y + 25, l1, 15, th.fg, "middle", bold=True)
         s.text(cx, y + 45, l2, 11, th.muted, "middle")
 
-    _step(136, "Spinal response  $A_{z}(t)$  (clause 5.2, Formula 1/2)",
-          "seat-to-spine transfer function $H(f)$: 1 zero, 6 poles",
-          th.primary)
-    _step(224, "Acceleration dose  $D_z = 1.07·(Σ A_{z,i}^6)^{1/6}$  "
-          "(Formula 3)",
-          "$A_{z,i}$ = positive peaks;   daily dose "
-          "$D_{zd} = D_z·(t_d/t_m)^{1/6}$", th.fg)
-    _step(312, "Compressive stress  $S_d = m_z·D_{zd}$  (Annex C, "
-          "Formula C.1)",
-          "$m_z$ = 0.029 (male) / 0.025 (female) MPa per m/s²", th.fg)
+    _step(
+        136,
+        "Spinal response  $A_{z}(t)$  (clause 5.2, Formula 1/2)",
+        "seat-to-spine transfer function $H(f)$: 1 zero, 6 poles",
+        th.primary,
+    )
+    _step(
+        224,
+        "Acceleration dose  $D_z = 1.07·(Σ A_{z,i}^6)^{1/6}$  (Formula 3)",
+        "$A_{z,i}$ = positive peaks;   daily dose $D_{zd} = D_z·(t_d/t_m)^{1/6}$",
+        th.fg,
+    )
+    _step(
+        312,
+        "Compressive stress  $S_d = m_z·D_{zd}$  (Annex C, Formula C.1)",
+        "$m_z$ = 0.029 (male) / 0.025 (female) MPa per m/s²",
+        th.fg,
+    )
     # PARKED (controller adjudication): ISO 2631-5:2018(E) prints the
     # descriptive subscripts of S_stat and S_age in roman (PDF page 24,
     # folio 18: S_stat,i and S_age beside italic indices), but "stat" and
     # "age" are not in _ROMAN_SCRIPTS and the sibling descriptors u/d of
     # S_u/S_d are single letters the list cannot take; composing part of
     # the pair would split one formula into two subscript styles.
-    _step(400, "Stress variable  R = [Σ (Sd·N^(1/6) / (Su − Sstat))^6]^(1/6)",
-          "Su = 6.75 − Sage·(b+i) MPa, cumulated over exposure years (C.3/C.4)",
-          th.secondary)
+    _step(
+        400,
+        "Stress variable  R = [Σ (Sd·N^(1/6) / (Su − Sstat))^6]^(1/6)",
+        "Su = 6.75 − Sage·(b+i) MPa, cumulated over exposure years (C.3/C.4)",
+        th.secondary,
+    )
     for y0, y1 in ((196, 224), (284, 312), (372, 400), (460, 488)):
         s.arrow(cx, y0, cx, y1, th.fg, 1.8)
 
     # --- Output -------------------------------------------------------------
     s.rect(x0, 488, bw, 58, "none", th.primary, rx=10, sw=2.4)
-    s.text(cx, 513, "Injury probability  $P(R) = 1 − exp(−(R/α)^β)$  "
-           "(Formula C.5)", 15, th.fg, "middle", bold=True)
-    s.text(cx, 533, "Weibull risk of lumbar injury, by sex (Table C.1/C.2)", 11,
-           th.muted, "middle")
+    s.text(
+        cx,
+        513,
+        "Injury probability  $P(R) = 1 − exp(−(R/α)^β)$  (Formula C.5)",
+        15,
+        th.fg,
+        "middle",
+        bold=True,
+    )
+    s.text(
+        cx,
+        533,
+        "Weibull risk of lumbar injury, by sex (Table C.1/C.2)",
+        11,
+        th.muted,
+        "middle",
+    )
 
 
 def _d_hand_arm_vibration(s: SVG, th: Theme) -> None:
@@ -138,16 +187,14 @@ def _d_hand_arm_vibration(s: SVG, th: Theme) -> None:
     handle the guide's worked example is measured at.
     """
     # --- Left: the tool handle, the hand and the transducer positions -------
-    s.text(258, 74, "On the tool (ISO 5349-2, 6.1.3)", 15, th.fg, "middle",
-           bold=True)
-    bar_y, bar_h = 200.0, 26.0                  # a Ø 30 mm handle tube
+    s.text(258, 74, "On the tool (ISO 5349-2, 6.1.3)", 15, th.fg, "middle", bold=True)
+    bar_y, bar_h = 200.0, 26.0  # a Ø 30 mm handle tube
     bar_top, bar_bot = bar_y - bar_h / 2, bar_y + bar_h / 2
     s.rect(60, bar_top, 400, bar_h, th.panel, th.fg, rx=13, sw=2)
 
     # The hand: palm above the tube, four fingers curling under it.
     hand_x0, hand_x1 = 230.0, 330.0
-    s.rect(hand_x0, 148, hand_x1 - hand_x0, bar_y - 148, th.muted, th.fg,
-           rx=14, sw=1.6)
+    s.rect(hand_x0, 148, hand_x1 - hand_x0, bar_y - 148, th.muted, th.fg, rx=14, sw=1.6)
     for fx in (236.0, 259.0, 282.0, 305.0):
         s.rect(fx, bar_bot + 4, 19, 34, th.muted, th.fg, rx=9, sw=1.4)
     s.line(254, 156, 188, 92, th.muted, 15)
@@ -170,32 +217,79 @@ def _d_hand_arm_vibration(s: SVG, th: Theme) -> None:
     s.line(455, 126, 455, bar_top - 4, th.muted, 1.2, dash="4,4")
 
     # The cable, taped to the vibrating surface near the transducer (6.2.3).
-    s.path(f"M 378 {bar_bot + 19} L 432 246 L 432 306 L 110 306",
-           stroke=th.primary, sw=2.0)
+    s.path(
+        f"M 378 {bar_bot + 19} L 432 246 L 432 306 L 110 306", stroke=th.primary, sw=2.0
+    )
     for tx in (170.0, 250.0):
         s.rect(tx, 300, 12, 12, th.primary, th.fg, rx=2, sw=1.0)
-    s.text(110, 330, "cable taped to the handle near the transducer (6.2.3)",
-           12, th.primary, "start")
+    s.text(
+        110,
+        330,
+        "cable taped to the handle near the transducer (6.2.3)",
+        12,
+        th.primary,
+        "start",
+    )
 
     # Grip force: one of the two applied forces clause 9 asks the report for.
     s.arrow(306, 110, 306, 146, th.accent, 2.2)
     s.arrow(210, 250, 210, 218, th.accent, 2.2)
     s.text(306, 102, "grip force", 13, th.accent, "middle")
 
-    s.text(45, 366, "1  middle of the gripping zone, under the hand",
-           13, th.fg, "start", bold=True)
-    s.text(62, 385, "the most representative location; needs an adaptor",
-           13, th.muted, "start")
-    s.text(45, 410, "2  either side of the hand — usual practice", 13, th.fg,
-           "start", bold=True)
-    s.text(62, 429, "on a side handle, average the two positions", 13,
-           th.muted, "start")
-    s.text(45, 454, "3  underside of the handle, next to the hand", 13, th.fg,
-           "start", bold=True)
-    s.text(45, 480, "grip and push force change the reading: report the",
-           12, th.muted, "start")
-    s.text(45, 497, "posture and the applied forces (7.1, clause 9 g))", 12,
-           th.muted, "start")
+    s.text(
+        45,
+        366,
+        "1  middle of the gripping zone, under the hand",
+        13,
+        th.fg,
+        "start",
+        bold=True,
+    )
+    s.text(
+        62,
+        385,
+        "the most representative location; needs an adaptor",
+        13,
+        th.muted,
+        "start",
+    )
+    s.text(
+        45,
+        410,
+        "2  either side of the hand — usual practice",
+        13,
+        th.fg,
+        "start",
+        bold=True,
+    )
+    s.text(
+        62, 429, "on a side handle, average the two positions", 13, th.muted, "start"
+    )
+    s.text(
+        45,
+        454,
+        "3  underside of the handle, next to the hand",
+        13,
+        th.fg,
+        "start",
+        bold=True,
+    )
+    s.text(
+        45,
+        480,
+        "grip and push force change the reading: report the",
+        12,
+        th.muted,
+        "start",
+    )
+    s.text(
+        45,
+        497,
+        "posture and the applied forces (7.1, clause 9 g))",
+        12,
+        th.muted,
+        "start",
+    )
 
     # The basicentric frame the three axes are reported in.
     # PARKED (controller adjudication): ISO 5349-1:2001(E) prints the h
@@ -212,26 +306,39 @@ def _d_hand_arm_vibration(s: SVG, th: Theme) -> None:
     s.text(ox, oy - 54, "z_h", 15, th.primary, "middle", bold=True)
     s.arrow(ox, oy, ox - 40, oy + 28, th.primary, 2.2)
     s.text(ox - 46, oy + 40, "x_h", 15, th.primary, "end", bold=True)
-    s.text(236, 534, "basicentric frame (ISO 5349-1 Fig. 1):",
-           12, th.fg, "start")
-    s.text(236, 552, "rotated so that y_h lies along the",
-           12, th.fg, "start")
-    s.text(236, 570, "handle axis. All three axes are",
-           12, th.fg, "start")
+    s.text(236, 534, "basicentric frame (ISO 5349-1 Fig. 1):", 12, th.fg, "start")
+    s.text(236, 552, "rotated so that y_h lies along the", 12, th.fg, "start")
+    s.text(236, 570, "handle axis. All three axes are", 12, th.fg, "start")
     s.text(236, 588, "measured, and every $k = 1$.", 12, th.fg, "start")
 
     # --- Right: what the three axis magnitudes become -----------------------
     cx, bw, bh = 705.0, 320.0, 66.0
     x0 = cx - bw / 2
     chain = (
-        (90.0, "$a_{hwx} , a_{hwy} , a_{hwz}$",
-         "Wh-weighted, one per axis (ISO 5349-1 A.1)", th.primary),
-        (176.0, "$a_{hv} = √(a_{hwx}^2 + a_{hwy}^2 + a_{hwz}^2)$",
-         "vibration total value (Eq. (1))", th.fg),
-        (262.0, "$A_{i}(8) = a_{hv,i} · √(T_i / T_0)$",
-         "$T_i$ is total contact time per day (5.5)", th.fg),
-        (348.0, "$A(8) = √(Σ A_{i}(8)^2)$",
-         "one per hand, two significant figures (clause 8)", th.secondary),
+        (
+            90.0,
+            "$a_{hwx} , a_{hwy} , a_{hwz}$",
+            "Wh-weighted, one per axis (ISO 5349-1 A.1)",
+            th.primary,
+        ),
+        (
+            176.0,
+            "$a_{hv} = √(a_{hwx}^2 + a_{hwy}^2 + a_{hwz}^2)$",
+            "vibration total value (Eq. (1))",
+            th.fg,
+        ),
+        (
+            262.0,
+            "$A_{i}(8) = a_{hv,i} · √(T_i / T_0)$",
+            "$T_i$ is total contact time per day (5.5)",
+            th.fg,
+        ),
+        (
+            348.0,
+            "$A(8) = √(Σ A_{i}(8)^2)$",
+            "one per hand, two significant figures (clause 8)",
+            th.secondary,
+        ),
     )
     for by, l1, l2, colour in chain:
         s.rect(x0, by, bw, bh, th.panel, colour, rx=12, sw=2)
@@ -240,8 +347,7 @@ def _d_hand_arm_vibration(s: SVG, th: Theme) -> None:
     for y0, y1 in ((156, 176), (242, 262), (328, 348), (414, 438)):
         s.arrow(cx, y0, cx, y1, th.fg, 1.8)
     s.rect(x0, 438, bw, 62, "none", th.secondary, rx=12, sw=2.4, dash="6,5")
-    s.text(cx, 464, "EAV 2.5 m/s²   ·   ELV 5 m/s²", 16, th.fg, "middle",
-           bold=True)
+    s.text(cx, 464, "EAV 2.5 m/s²   ·   ELV 5 m/s²", 16, th.fg, "middle", bold=True)
     s.text(cx, 486, "Directive 2002/44/EC, Article 3", 12, th.muted, "middle")
 
     # --- Bottom: the four acquisition rules that decide the reading ---------
@@ -268,12 +374,12 @@ def _d_iso2631_5_setup(s: SVG, th: Theme) -> None:
 
     # --- Left: the seat pan in section, with the ISO 10326-1 disc on it -----
     s.text(250, 78, "The seat pan, in section", 15, th.fg, "middle", bold=True)
-    s.rect(200, 105, 92, 76, th.muted, th.fg, rx=26, sw=1.6)      # pelvis
-    s.ellipse(224, 188, 24, 13, th.muted, th.fg, 1.6)             # tuberosity
-    s.ellipse(268, 188, 24, 13, th.muted, th.fg, 1.6)             # tuberosity
-    s.rect(150, 200, 220, 40, th.panel, th.fg, rx=9, sw=2)        # cushion
-    s.rect(150, 240, 220, 12, th.panel, th.fg, sw=2)              # seat pan
-    s.rect(150, 116, 16, 84, th.panel, th.fg, rx=4, sw=2)         # backrest
+    s.rect(200, 105, 92, 76, th.muted, th.fg, rx=26, sw=1.6)  # pelvis
+    s.ellipse(224, 188, 24, 13, th.muted, th.fg, 1.6)  # tuberosity
+    s.ellipse(268, 188, 24, 13, th.muted, th.fg, 1.6)  # tuberosity
+    s.rect(150, 200, 220, 40, th.panel, th.fg, rx=9, sw=2)  # cushion
+    s.rect(150, 240, 220, 12, th.panel, th.fg, sw=2)  # seat pan
+    s.rect(150, 116, 16, 84, th.panel, th.fg, rx=4, sw=2)  # backrest
     _spring_v(s, 262, 252, 300, th.fg)
     s.ground(300, 130, 396)
     s.text(262, 322, "suspension travel", 12, th.muted, "middle")
@@ -306,22 +412,41 @@ def _d_iso2631_5_setup(s: SVG, th: Theme) -> None:
 
     # --- Right: what the record then looks like -----------------------------
     ax0, ax1, base = 500.0, 862.0, 306.0
-    s.text(681, 78, "The record, split where contact is lost", 15, th.fg,
-           "middle", bold=True)
-    for i, line in enumerate((
+    s.text(
+        681,
+        78,
+        "The record, split where contact is lost",
+        15,
+        th.fg,
+        "middle",
+        bold=True,
+    )
+    for i, line in enumerate(
+        (
             "accelerations recorded while contact is lost",
             "shall not be counted as exposure, and the",
-            "landing impact after a free fall shall be (5.1.2)")):
+            "landing impact after a free fall shall be (5.1.2)",
+        )
+    ):
         s.text(681, 110 + 18 * i, line, 12, th.secondary, "middle")
     gaps = ((0.30, 0.40), (0.66, 0.72))
     for lo, hi in gaps:
-        s.rect(ax0 + lo * (ax1 - ax0), base - 92, (hi - lo) * (ax1 - ax0),
-               184, th.panel, th.secondary, sw=1.4, dash="5,4")
+        s.rect(
+            ax0 + lo * (ax1 - ax0),
+            base - 92,
+            (hi - lo) * (ax1 - ax0),
+            184,
+            th.panel,
+            th.secondary,
+            sw=1.4,
+            dash="5,4",
+        )
     pts = []
     for i in range(0, 363, 2):
         u = i / 362.0
-        v = 16.0 * math.sin(2.0 * math.pi * 5.0 * u) \
-            + 6.0 * math.sin(2.0 * math.pi * 13.0 * u + 1.0)
+        v = 16.0 * math.sin(2.0 * math.pi * 5.0 * u) + 6.0 * math.sin(
+            2.0 * math.pi * 13.0 * u + 1.0
+        )
         for centre, amp in ((0.17, 62.0), (0.52, 44.0), (0.88, 78.0)):
             d = u - centre
             if 0.0 <= d < 0.2:
@@ -334,29 +459,48 @@ def _d_iso2631_5_setup(s: SVG, th: Theme) -> None:
     s.line(ax0, base, ax1, base, th.fg, 1.4)
     s.text(ax0 - 8, base + 5, "0", 13, th.muted, "end")
     for lo, hi in gaps:
-        s.text(ax0 + 0.5 * (lo + hi) * (ax1 - ax0), base - 100,
-               "no contact", 12, th.secondary, "middle")
-    s.text(ax0, base + 118, "$a_{z}(t)$, conditioned per 5.1.3", 12, th.muted,
-           "start")
-    segments = ((0.0, 0.30, "segment 1"), (0.40, 0.66, "segment 2"),
-                (0.72, 1.0, "segment 3"))
+        s.text(
+            ax0 + 0.5 * (lo + hi) * (ax1 - ax0),
+            base - 100,
+            "no contact",
+            12,
+            th.secondary,
+            "middle",
+        )
+    s.text(ax0, base + 118, "$a_{z}(t)$, conditioned per 5.1.3", 12, th.muted, "start")
+    segments = (
+        (0.0, 0.30, "segment 1"),
+        (0.40, 0.66, "segment 2"),
+        (0.72, 1.0, "segment 3"),
+    )
     for lo, hi, label in segments:
         xa, xb = ax0 + lo * (ax1 - ax0), ax0 + hi * (ax1 - ax0)
         s.line(xa, base + 138, xb, base + 138, th.accent, 3.0)
         s.text(0.5 * (xa + xb), base + 160, label, 12, th.accent, "middle")
-    s.text(681, base + 186,
-           "each segment is conditioned separately (5.1.3, second step)", 12,
-           th.fg, "middle")
+    s.text(
+        681,
+        base + 186,
+        "each segment is conditioned separately (5.1.3, second step)",
+        12,
+        th.fg,
+        "middle",
+    )
 
     # --- Bottom: the hardware and duration requirements ---------------------
     s.rect(40, 518, 820, 74, th.panel, th.muted, rx=12, sw=1.6)
     rules = (
-        ("flat acceleration response from 0.01 Hz to at least 80 Hz, and "
-         "256 samples per second or more (5.1.2)"),
-        ("equipment adequate for the highest amplitude anticipated; "
-         "equipment and calibration method reported (5.1.2)"),
-        ("long enough to be representative: a complete work cycle for a "
-         "repeatable task, longer where terrain varies (5.1.4)"),
+        (
+            "flat acceleration response from 0.01 Hz to at least 80 Hz, and "
+            "256 samples per second or more (5.1.2)"
+        ),
+        (
+            "equipment adequate for the highest amplitude anticipated; "
+            "equipment and calibration method reported (5.1.2)"
+        ),
+        (
+            "long enough to be representative: a complete work cycle for a "
+            "repeatable task, longer where terrain varies (5.1.4)"
+        ),
     )
     for i, rule in enumerate(rules):
         s.circle(62, 542 + 21 * i - 5, 3.4, th.secondary)
@@ -367,6 +511,7 @@ def _d_iso2631_5_setup(s: SVG, th: Theme) -> None:
 # Machine fault kinematics and the condition-monitoring rig (Norton 8.4)
 # ---------------------------------------------------------------------------
 
+
 def _d_fault_kinematics(s: SVG, th: Theme) -> None:
     """Where the fault frequencies come from: the bearing in end section and
     in axial half-section (where the contact angle lives), the gear pair and
@@ -375,8 +520,8 @@ def _d_fault_kinematics(s: SVG, th: Theme) -> None:
 
     # ===== Panel 1: rolling-contact bearing, end section ====================
     cx, cy = 200.0, 262.0
-    mm = 4.4                                    # 1 mm of the real bearing
-    r_pitch, r_ball = 17.0 * mm, 3.0 * mm       # D = 34 mm, d = 6 mm
+    mm = 4.4  # 1 mm of the real bearing
+    r_pitch, r_ball = 17.0 * mm, 3.0 * mm  # D = 34 mm, d = 6 mm
     r_out_i, r_out_o = r_pitch + r_ball, r_pitch + r_ball + 17.0
     r_in_o, r_in_bore = r_pitch - r_ball, r_pitch - r_ball - 26.0
     s.text(cx, 74, "1. Bearing: end section", 18, th.fg, bold=True)
@@ -385,10 +530,16 @@ def _d_fault_kinematics(s: SVG, th: Theme) -> None:
     s.circle(cx, cy, r_in_o, th.panel, th.fg, 2.0)
     s.circle(cx, cy, r_in_bore, th.bg, th.fg, 2.0)
     s.circle(cx, cy, r_pitch, "none", th.muted, 1.1)
-    for k in range(15):                          # Z = 15 rolling elements
+    for k in range(15):  # Z = 15 rolling elements
         a = math.radians(k * 24.0 - 90.0)
-        s.circle(cx + r_pitch * math.cos(a), cy + r_pitch * math.sin(a),
-                 r_ball, th.bg, th.primary, 1.8)
+        s.circle(
+            cx + r_pitch * math.cos(a),
+            cy + r_pitch * math.sin(a),
+            r_ball,
+            th.bg,
+            th.primary,
+            1.8,
+        )
     # The pitch diameter, dimensioned between two opposite element centres.
     s.arrow(cx - 6, cy, cx - r_pitch, cy, th.muted, 1.3)
     s.arrow(cx + 6, cy, cx + r_pitch, cy, th.muted, 1.3)
@@ -400,24 +551,26 @@ def _d_fault_kinematics(s: SVG, th: Theme) -> None:
     # One element dimensioned, with a leader out of the drawing.
     bax = cx + r_pitch * math.cos(math.radians(38.0))
     bay = cy + r_pitch * math.sin(math.radians(38.0))
-    s.line(bax + r_ball * 0.7, bay + r_ball * 0.7, 352, 352, th.muted, 1.0,
-           dash="3,3")
+    s.line(bax + r_ball * 0.7, bay + r_ball * 0.7, 352, 352, th.muted, 1.0, dash="3,3")
     s.text(358, 358, "$d$ = 6 mm", 14, th.fg, anchor="start")
     # The spall on the stationary outer race, at the top of the load zone.
     for da in (-26.0, -13.0, 0.0, 13.0, 26.0):
         a = math.radians(-90.0 + da)
-        s.line(cx + r_out_i * math.cos(a), cy + r_out_i * math.sin(a),
-               cx + (r_out_i - 14.0) * math.cos(a),
-               cy + (r_out_i - 14.0) * math.sin(a), th.secondary, 2.2)
+        s.line(
+            cx + r_out_i * math.cos(a),
+            cy + r_out_i * math.sin(a),
+            cx + (r_out_i - 14.0) * math.cos(a),
+            cy + (r_out_i - 14.0) * math.sin(a),
+            th.secondary,
+            2.2,
+        )
     s.text(cx, 116, "spall on the outer race", 14, th.secondary)
     s.text(cx, 136, "BPFO = 207.0 Hz: one impact per pass", 12, th.secondary)
     # Which race turns, and the cage rate that follows from it.
     _rot_arrow(s, cx, cy, r_in_bore - 9.0, 20.0, 160.0, th.accent, 2.0)
-    s.text(cx, cy + r_out_o + 34, "inner race turns at $f_s$ = 33.33 Hz,", 13,
-           th.fg)
+    s.text(cx, cy + r_out_o + 34, "inner race turns at $f_s$ = 33.33 Hz,", 13, th.fg)
     s.text(cx, cy + r_out_o + 56, "outer race stationary", 13, th.fg)
-    s.text(cx, cy + r_out_o + 82, "cage FTF = 13.8 Hz = 0.41 $f_s$", 13,
-           th.accent)
+    s.text(cx, cy + r_out_o + 82, "cage FTF = 13.8 Hz = 0.41 $f_s$", 13, th.accent)
 
     # ===== Panel 2: axial half-section, where the contact angle lives =======
     ax0, axy = 560.0, 250.0
@@ -438,18 +591,33 @@ def _d_fault_kinematics(s: SVG, th: Theme) -> None:
     dx, dy = 74.0 * math.sin(phi), 74.0 * math.cos(phi)
     s.line(bx - dx, by + dy, bx + dx, by - dy, th.secondary, 2.4)
     s.text(690, 136, "contact line,  $φ$ = 12.96°", 14, th.secondary)
-    s.path(f"M {bx:.1f} {by - 50:.1f} A 50 50 0 0 0 "
-           f"{bx + 50 * math.sin(phi):.1f} {by - 50 * math.cos(phi):.1f}",
-           stroke=th.secondary, sw=1.6)
-    s.text(690, axy + 186,
-           "the contact angle exists only in this view: measured",
-           13, th.muted)
-    s.text(690, axy + 206,
-           "from the radial plane: $φ = 0$ for a deep-groove bearing",
-           13, th.muted)
-    s.text(690, axy + 226,
-           "and $φ > 0$ for angular-contact and tapered-roller types", 13,
-           th.muted)
+    s.path(
+        f"M {bx:.1f} {by - 50:.1f} A 50 50 0 0 0 "
+        f"{bx + 50 * math.sin(phi):.1f} {by - 50 * math.cos(phi):.1f}",
+        stroke=th.secondary,
+        sw=1.6,
+    )
+    s.text(
+        690,
+        axy + 186,
+        "the contact angle exists only in this view: measured",
+        13,
+        th.muted,
+    )
+    s.text(
+        690,
+        axy + 206,
+        "from the radial plane: $φ = 0$ for a deep-groove bearing",
+        13,
+        th.muted,
+    )
+    s.text(
+        690,
+        axy + 226,
+        "and $φ > 0$ for angular-contact and tapered-roller types",
+        13,
+        th.muted,
+    )
 
     # ===== Panel 3: gear pair in elevation ==================================
     gy = 596.0
@@ -459,9 +627,14 @@ def _d_fault_kinematics(s: SVG, th: Theme) -> None:
         s.circle(gcx, gy, gr * 0.22, th.bg, th.fg, 1.6)
         for k in range(teeth):
             a = 2.0 * math.pi * k / teeth
-            s.line(gcx + gr * math.cos(a), gy + gr * math.sin(a),
-                   gcx + (gr + 8) * math.cos(a), gy + (gr + 8) * math.sin(a),
-                   th.fg, 1.6)
+            s.line(
+                gcx + gr * math.cos(a),
+                gy + gr * math.sin(a),
+                gcx + (gr + 8) * math.cos(a),
+                gy + (gr + 8) * math.sin(a),
+                th.fg,
+                1.6,
+            )
     # The chipped tooth, on the pinion, at the mesh line.
     s.circle(162.0, gy, 9.0, "none", th.secondary, 2.4)
     s.line(160, gy + 9, 108, 672, th.muted, 1.0, dash="3,3")
@@ -475,33 +648,55 @@ def _d_fault_kinematics(s: SVG, th: Theme) -> None:
     s.text(690, 500, "4. Ducted axial fan", 18, th.fg, bold=True)
     s.circle(fcx, fcy, fr, "none", th.fg, 2.4)
     s.circle(fcx, fcy, 20, th.panel, th.fg, 2.0)
-    for k in range(4):                            # V = 4 stator vanes, behind
+    for k in range(4):  # V = 4 stator vanes, behind
         a = math.radians(45.0 + k * 90.0)
-        s.line(fcx + 22 * math.cos(a), fcy + 22 * math.sin(a),
-               fcx + fr * math.cos(a), fcy + fr * math.sin(a),
-               th.muted, 3.0, dash="7,5")
-    for k in range(6):                            # N = 6 rotor blades, solid
+        s.line(
+            fcx + 22 * math.cos(a),
+            fcy + 22 * math.sin(a),
+            fcx + fr * math.cos(a),
+            fcy + fr * math.sin(a),
+            th.muted,
+            3.0,
+            dash="7,5",
+        )
+    for k in range(6):  # N = 6 rotor blades, solid
         a = math.radians(k * 60.0)
-        s.line(fcx + 20 * math.cos(a), fcy + 20 * math.sin(a),
-               fcx + (fr - 6) * math.cos(a), fcy + (fr - 6) * math.sin(a),
-               th.primary, 4.4)
+        s.line(
+            fcx + 20 * math.cos(a),
+            fcy + 20 * math.sin(a),
+            fcx + (fr - 6) * math.cos(a),
+            fcy + (fr - 6) * math.sin(a),
+            th.primary,
+            4.4,
+        )
     _rot_arrow(s, fcx, fcy, fr + 15.0, -62.0, 28.0, th.accent, 2.0)
     s.text(fcx + fr + 24, fcy + 6, "$N f_s$", 13, th.accent, anchor="start")
     s.text(690, fcy + 104, "6 blades (solid), 4 vanes (dashed)", 13, th.fg)
 
     # ===== What the two lower panels are for ================================
-    s.text(450, 730, "$GMF = N f_s = 28 × 25$ = 700 Hz, and a chipped tooth "
-           "modulates it once per revolution: sidebands at $± f_s$", 14,
-           th.fg)
-    s.text(450, 758, "$m_L = n·N ± k·V = 6 ± 4$ → 2 or 10 lobes, turning at "
-                     "$n·N·f_s/m_L$ = 175 or 35 Hz: the faster radiates much "
-                     "more", 14, th.fg)
+    s.text(
+        450,
+        730,
+        "$GMF = N f_s = 28 × 25$ = 700 Hz, and a chipped tooth "
+        "modulates it once per revolution: sidebands at $± f_s$",
+        14,
+        th.fg,
+    )
+    s.text(
+        450,
+        758,
+        "$m_L = n·N ± k·V = 6 ± 4$ → 2 or 10 lobes, turning at "
+        "$n·N·f_s/m_L$ = 175 or 35 Hz: the faster radiates much "
+        "more",
+        14,
+        th.fg,
+    )
 
 
 def _d_machine_diagnostics(s: SVG, th: Theme) -> None:
     """Condition-monitoring measurement on a motor-gearbox train: where the
     accelerometers go, how they are mounted, and what the analyser records."""
-    gy = 262.0                                   # top of the baseplate
+    gy = 262.0  # top of the baseplate
     shaft_y = 222.0
 
     # --- The machine train on its baseplate ---------------------------------
@@ -511,11 +706,11 @@ def _d_machine_diagnostics(s: SVG, th: Theme) -> None:
     s.text(198, 228, "motor", 16, th.fg, bold=True)
     s.rect(390, 172, 148, 90, th.panel, th.fg, rx=6, sw=2.2)
     s.text(464, 224, "gearbox", 16, th.fg, bold=True)
-    s.line(60, shaft_y, 130, shaft_y, th.fg, 3.0)          # non-drive end
-    s.line(266, shaft_y, 390, shaft_y, th.fg, 3.0)         # drive shaft
+    s.line(60, shaft_y, 130, shaft_y, th.fg, 3.0)  # non-drive end
+    s.line(266, shaft_y, 390, shaft_y, th.fg, 3.0)  # drive shaft
     s.rect(316, shaft_y - 12, 26, 24, th.panel, th.fg, rx=3, sw=1.8)
     s.text(329, shaft_y + 34, "coupling", 12, th.muted)
-    for hx in (282.0, 374.0):                              # bearing housings
+    for hx in (282.0, 374.0):  # bearing housings
         s.rect(hx - 16, shaft_y - 18, 32, 36, th.bg, th.fg, rx=4, sw=1.8)
 
     # --- Where the accelerometers go ---------------------------------------
@@ -524,8 +719,14 @@ def _d_machine_diagnostics(s: SVG, th: Theme) -> None:
     s.rect(538, 196, 15, 16, th.secondary, th.fg, rx=2.5, sw=1.3)
     s.line(553, 204, 566, 204, th.fg, 1.3)
     s.text(572, 209, "axial", 13, th.secondary, anchor="start")
-    s.text(328, 322, "radial, in the load zone, on the housing itself: no "
-                     "joint between bearing and sensor", 13, th.muted)
+    s.text(
+        328,
+        322,
+        "radial, in the load zone, on the housing itself: no "
+        "joint between bearing and sensor",
+        13,
+        th.muted,
+    )
     s.line(282, 300, 276, 262, th.muted, 1.0, dash="3,3")
     s.line(374, 300, 380, 262, th.muted, 1.0, dash="3,3")
 
@@ -551,8 +752,15 @@ def _d_machine_diagnostics(s: SVG, th: Theme) -> None:
 
     # --- Mounting: the usable upper frequency -------------------------------
     s.rect(48, 356, 396, 244, "none", th.fg, rx=10, sw=1.6)
-    s.text(70, 386, "Mounting sets the usable upper frequency", 15, th.fg,
-           anchor="start", bold=True)
+    s.text(
+        70,
+        386,
+        "Mounting sets the usable upper frequency",
+        15,
+        th.fg,
+        anchor="start",
+        bold=True,
+    )
     rows = (
         (420.0, "stud into a prepared flat", "tens of kHz"),
         (450.0, "adhesive / thin cyanoacrylate", "~10 kHz"),
@@ -562,30 +770,68 @@ def _d_machine_diagnostics(s: SVG, th: Theme) -> None:
     for ry, what, limit in rows:
         s.text(70, ry, what, 14, th.fg, anchor="start")
         s.text(422, ry, limit, 14, th.muted, anchor="end")
-    s.text(70, 552, "this page band-passes 2-4 kHz, so a magnet base is",
-           12, th.secondary, anchor="start")
-    s.text(70, 572, "marginal there and a hand-held probe is useless",
-           12, th.secondary, anchor="start")
+    s.text(
+        70,
+        552,
+        "this page band-passes 2-4 kHz, so a magnet base is",
+        12,
+        th.secondary,
+        anchor="start",
+    )
+    s.text(
+        70,
+        572,
+        "marginal there and a hand-held probe is useless",
+        12,
+        th.secondary,
+        anchor="start",
+    )
 
     # --- Acquisition: why 20 kHz and why 2 s --------------------------------
     s.rect(470, 356, 382, 244, "none", th.primary, rx=10, sw=1.6)
     s.text(492, 386, "Acquisition", 15, th.fg, anchor="start", bold=True)
-    s.text(492, 420, "20 kHz sample rate clears the 3 kHz resonance", 14,
-           th.fg, anchor="start")
-    s.text(492, 450, "$T$ = 2 s at 2000 r/min = 67 revolutions", 14, th.fg,
-           anchor="start")
-    s.text(492, 480, "$Δf = 1/T$ = 0.5 Hz, against $f_s$ = 33.3 Hz", 14,
-           th.fg, anchor="start")
-    s.text(492, 522, "enough to resolve the $± f_s$ sidebands, which are", 12,
-           th.muted, anchor="start")
-    s.text(492, 542, "what separates an inner-race defect from an", 12,
-           th.muted, anchor="start")
+    s.text(
+        492,
+        420,
+        "20 kHz sample rate clears the 3 kHz resonance",
+        14,
+        th.fg,
+        anchor="start",
+    )
+    s.text(
+        492, 450, "$T$ = 2 s at 2000 r/min = 67 revolutions", 14, th.fg, anchor="start"
+    )
+    s.text(
+        492,
+        480,
+        "$Δf = 1/T$ = 0.5 Hz, against $f_s$ = 33.3 Hz",
+        14,
+        th.fg,
+        anchor="start",
+    )
+    s.text(
+        492,
+        522,
+        "enough to resolve the $± f_s$ sidebands, which are",
+        12,
+        th.muted,
+        anchor="start",
+    )
+    s.text(
+        492,
+        542,
+        "what separates an inner-race defect from an",
+        12,
+        th.muted,
+        anchor="start",
+    )
     s.text(492, 562, "outer-race one", 12, th.muted, anchor="start")
 
 
 # ---------------------------------------------------------------------------
 # Mechanical-mobility rig (ISO 7626)
 # ---------------------------------------------------------------------------
+
 
 def _d_mobility_rig(s: SVG, th: Theme) -> None:
     """ISO 7626 rig: free-free beam, exciter + impedance head at the driving
@@ -597,14 +843,19 @@ def _d_mobility_rig(s: SVG, th: Theme) -> None:
     for hx in range(162, 730, 26):
         s.line(hx, cy_top, hx - 9, cy_top - 9, th.muted, 1.1)
     for sx in (168.0, 712.0):
-        _spring_v(s, sx, cy_top, beam_top, th.muted, coils=3, width=8.0,
-                  sw=1.6)
+        _spring_v(s, sx, cy_top, beam_top, th.muted, coils=3, width=8.0, sw=1.6)
     s.text(196, 142, "soft elastic suspension", 13, th.muted, anchor="start")
 
     # Beam under test.
     s.rect(150, beam_top, 580, beam_h, th.panel, th.fg, sw=2.2)
-    s.text(470, beam_bot + 32, "Structure under test (free-free beam)", 16,
-           th.fg, bold=True)
+    s.text(
+        470,
+        beam_bot + 32,
+        "Structure under test (free-free beam)",
+        16,
+        th.fg,
+        bold=True,
+    )
 
     # Driving point: exciter below the beam through an impedance head and a
     # drive rod (axially stiff, flexible in every other direction).
@@ -617,23 +868,20 @@ def _d_mobility_rig(s: SVG, th: Theme) -> None:
     # box, which is drawn over it; its leader leaves above the box's top
     # corner rather than through it, and joins the rod under the
     # impedance-head caption.
-    s.text(44, 440, "drive rod: stiff axially,", 12, th.accent,
-           anchor="start")
+    s.text(44, 440, "drive rod: stiff axially,", 12, th.accent, anchor="start")
     s.text(44, 458, "flexible in every other", 12, th.accent, anchor="start")
     s.text(44, 476, "direction (6.4.4)", 12, th.accent, anchor="start")
     s.line(200, 416, dx - 8, 392, th.muted, 1.0, dash="3,3")
     s.rect(dx - 37, 412, 74, 48, th.panel, th.primary, rx=9, sw=2)
     s.text(dx, 486, "Exciter", 15, th.fg, bold=True)
     s.text(60, 380, "Impedance head", 14, th.fg, anchor="start", bold=True)
-    s.text(60, 402, "$F$ and $a$ at the drive point", 12, th.muted,
-           anchor="start")
+    s.text(60, 402, "$F$ and $a$ at the drive point", 12, th.muted, anchor="start")
     s.line(dx - 16, beam_bot + 8, 154, 362, th.muted, 1.1, dash="3,3")
     s.arrow(dx + 18, 396, dx + 18, 340, th.secondary, 2.2)
     s.text(dx + 28, 372, "$F_i$", 14, th.secondary, anchor="start")
     s.arrow(dx, beam_top - 4, dx, beam_top - 46, th.accent, 2.2)
     s.text(dx - 14, beam_top - 34, "$v_i$", 14, th.accent, anchor="end")
-    s.text(210, 218, "driving point:  $Y_{ii} = v_i / F_i$", 14, th.fg,
-           anchor="start")
+    s.text(210, 218, "driving point:  $Y_{ii} = v_i / F_i$", 14, th.fg, anchor="start")
 
     # Transfer point: accelerometer further along the beam.
     tx = 430.0
@@ -649,56 +897,84 @@ def _d_mobility_rig(s: SVG, th: Theme) -> None:
     s.arrow(hx2, 262, hx2, beam_top - 6, th.secondary, 1.8)
 
     # FRF family footer.
-    s.text(450, 520,
-           "$Y(f) = v/F$  [m/(N·s)] · attached exciter (Part 2) · "
-           "impact hammer (Part 5)", 15, th.fg)
-    s.text(450, 546,
-           "same measurement, three FRFs: $x/F$ receptance · $v/F$ mobility "
-           "· $a/F$ accelerance", 13, th.muted)
+    s.text(
+        450,
+        520,
+        "$Y(f) = v/F$  [m/(N·s)] · attached exciter (Part 2) · impact hammer (Part 5)",
+        15,
+        th.fg,
+    )
+    s.text(
+        450,
+        546,
+        "same measurement, three FRFs: $x/F$ receptance · $v/F$ mobility "
+        "· $a/F$ accelerance",
+        13,
+        th.muted,
+    )
 
     # ----- Where the two transducers go: the ISO 7626-2 Figure 4 decision ---
-    s.text(450, 600, "Where the accelerometer and the force transducer go "
-           "(clause 6.4.4)", 16, th.fg, bold=True)
+    s.text(
+        450,
+        600,
+        "Where the accelerometer and the force transducer go (clause 6.4.4)",
+        16,
+        th.fg,
+        bold=True,
+    )
     verdicts = (
         (72.0, "a)", "accelerometer through the rod", "INVALID", th.secondary),
         (356.0, "b)", "force transducer at the structure", "VALID", th.accent),
-        (640.0, "c)", "force transducer at the exciter", "WITH CAUTION",
-         th.muted),
+        (640.0, "c)", "force transducer at the exciter", "WITH CAUTION", th.muted),
     )
     for px, tag, what, verdict, colour in verdicts:
         s.rect(px, 626, 224, 158, "none", colour, rx=10, sw=1.8)
         s.text(px + 14, 652, tag, 15, th.fg, anchor="start", bold=True)
-        s.rect(px + 40, 668, 148, 12, th.panel, th.fg, sw=1.6)   # structure
-        s.line(px + 114, 680, px + 114, 748, th.fg, 2.0)         # drive rod
+        s.rect(px + 40, 668, 148, 12, th.panel, th.fg, sw=1.6)  # structure
+        s.line(px + 114, 680, px + 114, 748, th.fg, 2.0)  # drive rod
         s.line(px + 108, 700, px + 120, 700, th.accent, 2.6)
         s.line(px + 108, 730, px + 120, 730, th.accent, 2.6)
-        if tag == "a)":                       # accelerometer on the rod
+        if tag == "a)":  # accelerometer on the rod
             s.rect(px + 122, 706, 16, 14, th.secondary, th.fg, rx=2, sw=1.2)
             s.rect(px + 100, 748, 28, 12, th.primary, th.fg, rx=2, sw=1.2)
-        elif tag == "b)":                     # both at the structure
+        elif tag == "b)":  # both at the structure
             s.rect(px + 130, 656, 16, 14, th.secondary, th.fg, rx=2, sw=1.2)
             s.rect(px + 100, 680, 28, 12, th.primary, th.fg, rx=2, sw=1.2)
-        else:                                 # force transducer at the exciter
+        else:  # force transducer at the exciter
             s.rect(px + 130, 656, 16, 14, th.secondary, th.fg, rx=2, sw=1.2)
             s.rect(px + 100, 736, 28, 12, th.primary, th.fg, rx=2, sw=1.2)
         s.text(px + 112, 776, what, 12, th.fg)
         s.text(px + 112, 646, verdict, 14, colour, bold=True)
-    s.text(450, 806, "the exciter attachment must be at least 10× more "
-           "mobile, laterally and rotationally, than the structure (6.4.4)",
-           14, th.fg)
-    s.text(450, 830, "and the suspension at least 10× more mobile than the "
-           "structure at each attachment point (5.3)", 13, th.muted)
+    s.text(
+        450,
+        806,
+        "the exciter attachment must be at least 10× more "
+        "mobile, laterally and rotationally, than the structure (6.4.4)",
+        14,
+        th.fg,
+    )
+    s.text(
+        450,
+        830,
+        "and the suspension at least 10× more mobile than the "
+        "structure at each attachment point (5.3)",
+        13,
+        th.muted,
+    )
 
 
 # ---------------------------------------------------------------------------
 # Dynamic transfer stiffness of resilient elements (ISO 10846)
 # ---------------------------------------------------------------------------
 
+
 def _d_transfer_stiffness_rig(s: SVG, th: Theme) -> None:
     """ISO 10846: isolator between the driven input mass and a blocked output
     (direct, force transducer) or a blocking mass (indirect)."""
-    for cx, head in ((250.0, "Direct method (Part 2)"),
-                     (650.0, "Indirect method (Part 3)")):
+    for cx, head in (
+        (250.0, "Direct method (Part 2)"),
+        (650.0, "Indirect method (Part 3)"),
+    ):
         s.text(cx, 78, head, 19, th.fg, bold=True)
         _exciter(s, cx, 158.0, stinger=18.0)
         # Driven input mass with its input displacement u1.
@@ -713,12 +989,13 @@ def _d_transfer_stiffness_rig(s: SVG, th: Theme) -> None:
         s.arrow(cx + 78, 197, cx + 104, 197, th.secondary, 1.6)
         # Isolator under test.
         _spring_v(s, cx, 202, 310, th.accent, coils=4)
-        s.text(cx + 28, 260, "isolator under test", 14, th.accent,
-               anchor="start")
-    s.text(48, 296, "$a′_1$: unwanted transverse input,", 12, th.secondary,
-           anchor="start")
-    s.text(48, 314, "≥ 15 dB below $a_1$ (Inequality 3)", 12, th.secondary,
-           anchor="start")
+        s.text(cx + 28, 260, "isolator under test", 14, th.accent, anchor="start")
+    s.text(
+        48, 296, "$a′_1$: unwanted transverse input,", 12, th.secondary, anchor="start"
+    )
+    s.text(
+        48, 314, "≥ 15 dB below $a_1$ (Inequality 3)", 12, th.secondary, anchor="start"
+    )
     s.line(150, 286, 310, 202, th.muted, 1.0, dash="3,3")
 
     # ===== Direct output: blocked, force transducer on a rigid foundation ===
@@ -728,8 +1005,7 @@ def _d_transfer_stiffness_rig(s: SVG, th: Theme) -> None:
     s.rect(cx - 105, 328, 210, 26, th.panel, th.fg, sw=2)
     s.ground(354, cx - 125, cx + 125)
     s.text(cx, 388, "Rigid foundation", 13, th.muted)
-    s.text(cx, 470, "output blocked:  $u_2 ≈ 0$ → measure $F_{2,b}$", 14,
-           th.fg)
+    s.text(cx, 470, "output blocked:  $u_2 ≈ 0$ → measure $F_{2,b}$", 14, th.fg)
     s.text(cx, 500, "$k_{2,1} = F_{2,b} / u_1$", 17, th.primary, bold=True)
 
     # ===== Indirect output: blocking mass on soft supports ==================
@@ -743,25 +1019,47 @@ def _d_transfer_stiffness_rig(s: SVG, th: Theme) -> None:
     s.ground(430, cx - 115, cx + 115)
     s.text(cx + 70, 408, "soft support", 12, th.muted, anchor="start")
     s.text(cx, 470, "measure $T = u_2 / u_1$  (small)", 14, th.fg)
-    s.text(cx, 500, "$k_{2,1} = −(2πf)^2·(m_2+m_f)·T$", 17, th.primary,
-           bold=True)
+    s.text(cx, 500, "$k_{2,1} = −(2πf)^2·(m_2+m_f)·T$", 17, th.primary, bold=True)
 
     # Validity footer (Part 3 clause 6, Part 1 Eq. 7).
-    s.text(450, 556,
-           "valid where $ΔL_{1,2} = L_{a1} − L_{a2} ≥ 20$ dB, i.e. "
-           "$|T| ≤ 0.1$   (Part 3, Inequality 2)", 15, th.muted)
-    s.text(450, 582,
-           "the blocking force approximates the force delivered to a stiff receiver (Part 1, Eq. 7)",
-           13, th.muted, italic=True)
+    s.text(
+        450,
+        556,
+        "valid where $ΔL_{1,2} = L_{a1} − L_{a2} ≥ 20$ dB, i.e. "
+        "$|T| ≤ 0.1$   (Part 3, Inequality 2)",
+        15,
+        th.muted,
+    )
+    s.text(
+        450,
+        582,
+        "the blocking force approximates the force delivered to a stiff receiver (Part 1, Eq. 7)",
+        13,
+        th.muted,
+        italic=True,
+    )
 
     # ===== How the static preload is applied (Part 1, clause 6.3.3.1) =======
-    s.text(450, 640, "The two ways the static preload is applied "
-           "(ISO 10846-1, 6.3.3.1)", 18, th.fg, bold=True)
+    s.text(
+        450,
+        640,
+        "The two ways the static preload is applied (ISO 10846-1, 6.3.3.1)",
+        18,
+        th.fg,
+        bold=True,
+    )
     # a) gravity loading. Both panels are sized on their own headings,
     # which are the widest lines they carry in either language.
     s.rect(44, 664, 400, 196, "none", th.fg, rx=10, sw=1.6)
-    s.text(62, 692, "a) gravity: the output-side mass is the preload", 14,
-           th.fg, anchor="start", bold=True)
+    s.text(
+        62,
+        692,
+        "a) gravity: the output-side mass is the preload",
+        14,
+        th.fg,
+        anchor="start",
+        bold=True,
+    )
     s.rect(150, 712, 130, 30, th.panel, th.fg, rx=4, sw=2.0)
     _spring_v(s, 215, 742, 786, th.accent, coils=3, width=10.0, sw=2.0)
     s.rect(140, 786, 150, 34, th.panel, th.fg, rx=4, sw=2.2)
@@ -769,62 +1067,91 @@ def _d_transfer_stiffness_rig(s: SVG, th: Theme) -> None:
     s.ground(820, 120, 310)
     s.arrow(330, 760, 330, 800, th.secondary, 2.2)
     s.text(340, 784, "$W$ = load", 13, th.secondary, anchor="start")
-    s.text(70, 848, "simple, but unstable for large isolators at high loads",
-           12, th.muted, anchor="start")
+    s.text(
+        70,
+        848,
+        "simple, but unstable for large isolators at high loads",
+        12,
+        th.muted,
+        anchor="start",
+    )
     # b) frame + actuator + decoupling springs
     s.rect(456, 664, 400, 196, "none", th.primary, rx=10, sw=1.6)
-    s.text(474, 692, "b) frame, actuator and decoupling springs", 14,
-           th.fg, anchor="start", bold=True)
-    s.line(500, 706, 820, 706, th.fg, 2.6)                    # frame traverse
+    s.text(
+        474,
+        692,
+        "b) frame, actuator and decoupling springs",
+        14,
+        th.fg,
+        anchor="start",
+        bold=True,
+    )
+    s.line(500, 706, 820, 706, th.fg, 2.6)  # frame traverse
     s.line(500, 706, 500, 822, th.fg, 2.2)
     s.line(820, 706, 820, 822, th.fg, 2.2)
     s.rect(628, 712, 64, 34, th.panel, th.secondary, rx=4, sw=2.0)
     s.arrow(660, 748, 660, 768, th.secondary, 2.2)
     # Right-aligned on the frame's own leg: set from the left, the Spanish
     # second line runs through it.
-    s.text(812, 734, "actuator: 100 % of the", 12, th.secondary,
-           anchor="end")
-    s.text(812, 752, "permissible static load", 12, th.secondary,
-           anchor="end")
+    s.text(812, 734, "actuator: 100 % of the", 12, th.secondary, anchor="end")
+    s.text(812, 752, "permissible static load", 12, th.secondary, anchor="end")
     _spring_v(s, 660, 768, 800, th.accent, coils=3, width=10.0, sw=2.0)
     s.rect(600, 800, 120, 26, th.panel, th.fg, rx=4, sw=2.2)
     s.text(660, 818, "$m_2$", 13, th.fg)
     for sx in (556.0, 764.0):
         _spring_v(s, sx, 800, 840, th.muted, coils=2, width=7.0, sw=1.5)
-    s.text(500, 856, "auxiliary springs decouple $m_2$ from the frame", 12,
-           th.muted, anchor="start")
+    s.text(
+        500,
+        856,
+        "auxiliary springs decouple $m_2$ from the frame",
+        12,
+        th.muted,
+        anchor="start",
+    )
 
     # ===== Transverse translations (Part 2, clause 5.2) =====================
-    s.text(450, 900, "Transverse translations are standardised too "
-           "(ISO 10846-2, 5.2)", 18, th.fg, bold=True)
+    s.text(
+        450,
+        900,
+        "Transverse translations are standardised too (ISO 10846-2, 5.2)",
+        18,
+        th.fg,
+        bold=True,
+    )
     s.rect(48, 924, 804, 132, "none", th.muted, rx=10, sw=1.4)
     s.rect(300, 950, 190, 30, th.panel, th.fg, rx=4, sw=2.2)
     s.text(395, 971, "force-distribution plate", 12, th.fg)
     _motion_arrows(s, 268, 965, 22, th.secondary)
     s.text(255, 940, "$a_{1x}$", 14, th.secondary, anchor="end")
-    for rx in (330.0, 460.0):                      # guiding roller bearings
+    for rx in (330.0, 460.0):  # guiding roller bearings
         s.circle(rx, 940, 9, th.bg, th.fg, 1.6)
-    s.text(508, 942, "roller bearings, or two symmetrical", 12, th.muted,
-           anchor="start")
-    s.text(508, 962, "elements, suppress the unwanted input", 12, th.muted,
-           anchor="start")
+    s.text(
+        508, 942, "roller bearings, or two symmetrical", 12, th.muted, anchor="start"
+    )
+    s.text(
+        508, 962, "elements, suppress the unwanted input", 12, th.muted, anchor="start"
+    )
     s.rect(320, 980, 150, 26, th.accent, th.fg, rx=4, sw=1.8)
     s.text(395, 999, "test element in shear", 11, th.bg)
     for fx in (348.0, 442.0):
         s.rect(fx - 22, 1006, 44, 16, th.panel, th.secondary, rx=3, sw=1.6)
-    s.text(508, 1000, "output shear force summed from two", 12, th.fg,
-           anchor="start")
-    s.text(508, 1020, "transducers,  $F_2 = F_2′ + F_2″$", 12, th.fg,
-           anchor="start")
+    s.text(508, 1000, "output shear force summed from two", 12, th.fg, anchor="start")
+    s.text(508, 1020, "transducers,  $F_2 = F_2′ + F_2″$", 12, th.fg, anchor="start")
     s.ground(1022, 300, 490)
-    s.text(450, 1082, "a mount is loaded in shear as well as in compression, "
-           "and the transverse stiffness is usually the smaller of the two",
-           13, th.muted)
+    s.text(
+        450,
+        1082,
+        "a mount is loaded in shear as well as in compression, "
+        "and the transverse stiffness is usually the smaller of the two",
+        13,
+        th.muted,
+    )
 
 
 # ---------------------------------------------------------------------------
 # Junction vibration measurement, L- and T-junctions (ISO 10848)
 # ---------------------------------------------------------------------------
+
 
 def _d_junction_rig(s: SVG, th: Theme) -> None:
     """ISO 10848 junction rig: an L- and a T-junction of concrete plates,
@@ -884,18 +1211,39 @@ def _d_junction_rig(s: SVG, th: Theme) -> None:
     s.line(578, 477, 600, 442, th.muted, 1.0)
 
     # Normative relations.
-    s.text(80, 536, "$l_{ij} ≥ 2.3$ m along the junction; element sizes "
-           "3.0 m $≤ l_i <$ 6.0 m", 15, th.fg, anchor="start")
-    s.text(80, 564, "≥ 4 excitation positions on $i$; accelerometers "
-           "≥ 0.25 m from edges, ≥ 0.5 m apart", 15, th.fg, anchor="start")
-    s.text(80, 596, "$K_{ij} = D̄_{v,ij} + 10 log_{10}( l_{ij} / √(a_i·a_j) "
-           ")$,   $a_i$ = equivalent absorption length",
-           15, th.primary, anchor="start", bold=True)
+    s.text(
+        80,
+        536,
+        "$l_{ij} ≥ 2.3$ m along the junction; element sizes 3.0 m $≤ l_i <$ 6.0 m",
+        15,
+        th.fg,
+        anchor="start",
+    )
+    s.text(
+        80,
+        564,
+        "≥ 4 excitation positions on $i$; accelerometers "
+        "≥ 0.25 m from edges, ≥ 0.5 m apart",
+        15,
+        th.fg,
+        anchor="start",
+    )
+    s.text(
+        80,
+        596,
+        "$K_{ij} = D̄_{v,ij} + 10 log_{10}( l_{ij} / √(a_i·a_j) "
+        ")$,   $a_i$ = equivalent absorption length",
+        15,
+        th.primary,
+        anchor="start",
+        bold=True,
+    )
 
 
 # ---------------------------------------------------------------------------
 # Power injection: coupling loss factors from measured energies (Norton 6.6.4)
 # ---------------------------------------------------------------------------
+
 
 def _d_power_injection_rig(s: SVG, th: Theme) -> None:
     """The experimental-SEA rig: two plates joined along an edge, a shaker
@@ -912,8 +1260,7 @@ def _d_power_injection_rig(s: SVG, th: Theme) -> None:
         _plate_up(s, th, x0 + 40, gy, 12, 168, dp)
         s.line(x0 + 52, gy, x0 + 52 + dxo, gy - dyo, th.accent, 2.6)
         s.line(x0 + 100, 250, x0 + 156, 156, th.muted, 1.0, dash="3,3")
-        s.text(x0 + 160, 150, "subsystem 2", 15, th.secondary,
-               anchor="start")
+        s.text(x0 + 160, 150, "subsystem 2", 15, th.secondary, anchor="start")
         s.text(x0 + 248, gy + 44, "subsystem 1", 15, th.primary)
         # Accelerometer positions: several per subsystem, off the edges and
         # off the drive point, because the band energy uses a space average.
@@ -927,33 +1274,68 @@ def _d_power_injection_rig(s: SVG, th: Theme) -> None:
             s.rect(x0 + 120, gy + 2, 26, 13, th.secondary, th.fg, rx=3, sw=1.4)
             s.line(x0 + 133, gy + 15, x0 + 133, gy + 40, th.fg, 2.2)
             s.rect(x0 + 96, gy + 40, 74, 42, th.panel, th.primary, rx=9, sw=2)
-            s.text(x0 + 176, gy + 20, "impedance head", 13, th.secondary,
-                   anchor="start")
+            s.text(
+                x0 + 176, gy + 20, "impedance head", 13, th.secondary, anchor="start"
+            )
             s.text(x0 + 180, gy + 68, "shaker", 14, th.fg, anchor="start")
         else:
             s.rect(x0 + 58, 196, 26, 13, th.secondary, th.fg, rx=3, sw=1.4)
             s.line(x0 + 84, 202, x0 + 176, 202, th.fg, 2.2)
             s.rect(x0 + 176, 179, 74, 46, th.panel, th.primary, rx=9, sw=2)
             s.text(x0 + 213, 248, "shaker", 14, th.fg)
-        s.text(x0 + 40, gy + 96,
-               f"$Π_{'1' if driven == 1 else '2'}$ measured,  "
-               f"$Π_{'2' if driven == 1 else '1'} = 0$", 14, th.fg,
-               anchor="start")
-        s.text(x0 + 40, gy + 122, "$E_1 = M_1⟨v_1^2⟩,   E_2 = M_2⟨v_2^2⟩$",
-               14, th.fg, anchor="start")
+        s.text(
+            x0 + 40,
+            gy + 96,
+            f"$Π_{'1' if driven == 1 else '2'}$ measured,  "
+            f"$Π_{'2' if driven == 1 else '1'} = 0$",
+            14,
+            th.fg,
+            anchor="start",
+        )
+        s.text(
+            x0 + 40,
+            gy + 122,
+            "$E_1 = M_1⟨v_1^2⟩,   E_2 = M_2⟨v_2^2⟩$",
+            14,
+            th.fg,
+            anchor="start",
+        )
 
     _pair(10.0, 1, "Run 1: drive subsystem 1")
     _pair(460.0, 2, "Run 2: drive subsystem 2")
     s.line(450, 70, 450, 528, th.muted, 1.0, dash="6,6")
 
     # What is measured, and what each run buys.
-    s.text(450, 566, "$Π_{in} = ½ Re{F v*}$ at the drive point, from an "
-           "impedance head — not the amplifier setting", 15, th.fg)
-    s.text(450, 592, "$⟨v^2⟩$ space-averaged over several positions per "
-           "subsystem, away from the edges and from the drive point", 15,
-           th.fg)
-    s.text(450, 618, "one run gives $η_{12}$ only if $η_1$ and $η_2$ come "
-                     "from a decay measurement; two runs solve all four", 15,
-           th.primary, bold=True)
-    s.text(450, 644, "bands wide enough to hold several modes of each "
-           "subsystem: the modal densities decide how wide", 13, th.muted)
+    s.text(
+        450,
+        566,
+        "$Π_{in} = ½ Re{F v*}$ at the drive point, from an "
+        "impedance head — not the amplifier setting",
+        15,
+        th.fg,
+    )
+    s.text(
+        450,
+        592,
+        "$⟨v^2⟩$ space-averaged over several positions per "
+        "subsystem, away from the edges and from the drive point",
+        15,
+        th.fg,
+    )
+    s.text(
+        450,
+        618,
+        "one run gives $η_{12}$ only if $η_1$ and $η_2$ come "
+        "from a decay measurement; two runs solve all four",
+        15,
+        th.primary,
+        bold=True,
+    )
+    s.text(
+        450,
+        644,
+        "bands wide enough to hold several modes of each "
+        "subsystem: the modal densities decide how wide",
+        13,
+        th.muted,
+    )

@@ -80,12 +80,17 @@ def test_fan_sound_power_places_the_blade_increment_by_frequency() -> None:
 
 @pytest.mark.parametrize(
     ("efficiency", "correction"),
-    [(95.0, 0.0), (87.0, 3.0), (80.0, 6.0), (70.0, 9.0), (60.0, 12.0),
-     (52.0, 15.0), (40.0, 16.0)],
+    [
+        (95.0, 0.0),
+        (87.0, 3.0),
+        (80.0, 6.0),
+        (70.0, 9.0),
+        (60.0, 12.0),
+        (52.0, 15.0),
+        (40.0, 16.0),
+    ],
 )
-def test_efficiency_correction_table_13_6(
-    efficiency: float, correction: float
-) -> None:
+def test_efficiency_correction_table_13_6(efficiency: float, correction: float) -> None:
     assert hvac.fan_efficiency_correction(efficiency) == correction
 
 
@@ -136,8 +141,7 @@ def test_unlined_rectangular_duct_eqs_14_9_and_14_11() -> None:
     )
     ps, length = 10.0 / 3.0, 6.0
     expected = [
-        17.0 * ps**0.25 * f**-0.85 * length if f <= 250.0
-        else 0.02 * ps**0.8 * length
+        17.0 * ps**0.25 * f**-0.85 * length if f <= 250.0 else 0.02 * ps**0.8 * length
         for f in bands
     ]
     assert np.allclose(res.values, expected)
@@ -235,9 +239,7 @@ def test_lined_circular_duct_clips_negative_regression_values() -> None:
 def test_flexible_duct_table_14_4_nodes(
     diameter_in: float, length_ft: float, expected: list[int]
 ) -> None:
-    res = hvac.flexible_duct_insertion_loss(
-        None, diameter_in * _IN, length_ft * _FT
-    )
+    res = hvac.flexible_duct_insertion_loss(None, diameter_in * _IN, length_ft * _FT)
     assert np.allclose(res.values, expected, atol=1e-9)
     assert np.allclose(res.frequencies, [63, 125, 250, 500, 1000, 2000, 4000])
 
@@ -265,8 +267,7 @@ def test_flexible_duct_stops_at_4_khz() -> None:
         ({"bend_type": "square", "lined": True}, [0, 1, 6, 11, 10, 10]),
         # Table 14.6, with turning vanes.
         ({"bend_type": "square", "vanes": True}, [0, 1, 4, 6, 4, 4]),
-        ({"bend_type": "square", "vanes": True, "lined": True},
-         [0, 1, 4, 7, 7, 7]),
+        ({"bend_type": "square", "vanes": True, "lined": True}, [0, 1, 4, 7, 7, 7]),
         # Table 14.7, round elbows.
         ({"bend_type": "round"}, [0, 1, 2, 3, 3, 3]),
     ],
@@ -298,9 +299,7 @@ def test_end_reflection_closed_form_eqs_14_14_and_14_15() -> None:
         [125.0], diameter, termination="flush", speed_of_sound=c
     )
     ratio = c / (math.pi * 125.0 * diameter)
-    assert free.values[0] == pytest.approx(
-        10.0 * math.log10(1.0 + ratio**1.88)
-    )
+    assert free.values[0] == pytest.approx(10.0 * math.log10(1.0 + ratio**1.88))
     assert flush.values[0] == pytest.approx(
         10.0 * math.log10(1.0 + (0.8 * ratio) ** 1.88)
     )
@@ -387,9 +386,7 @@ def test_silencer_self_noise_velocity_exponent() -> None:
     """55 lg V: doubling the airway velocity adds 55 lg 2 = 16.6 dB."""
     slow = hvac.silencer_self_noise([63.0], 5.0, 4, 0.9)
     fast = hvac.silencer_self_noise([63.0], 10.0, 4, 0.9)
-    assert fast.values[0] - slow.values[0] == pytest.approx(
-        55.0 * math.log10(2.0)
-    )
+    assert fast.values[0] - slow.values[0] == pytest.approx(55.0 * math.log10(2.0))
 
 
 def test_silencer_self_noise_requires_passages() -> None:
@@ -438,9 +435,7 @@ def test_splitter_silencer_combines_by_eq_8_241() -> None:
         ((None, 0.6, 1.5, 0.1, 0.0), "splitter_thickness"),
     ],
 )
-def test_splitter_silencer_validation(
-    args: tuple[object, ...], match: str
-) -> None:
+def test_splitter_silencer_validation(args: tuple[object, ...], match: str) -> None:
     with pytest.raises(ValueError, match=match):
         hvac.splitter_silencer_insertion_loss(*args)  # type: ignore[arg-type]
 
@@ -524,17 +519,13 @@ def test_diffuser_sound_power_velocity_and_area_exponents() -> None:
     base = hvac.diffuser_sound_power([250.0], area, 1248.0 * _CFM, drop)
     # Twice the velocity through the same face: four times the pressure drop,
     # peak in the 500 Hz octave.
-    faster = hvac.diffuser_sound_power(
-        [500.0], area, 2496.0 * _CFM, 4.0 * drop
-    )
+    faster = hvac.diffuser_sound_power([500.0], area, 2496.0 * _CFM, 4.0 * drop)
     assert faster.values[0] - base.values[0] == pytest.approx(
         60.0 * math.log10(2.0), abs=1e-9
     )
     # Twice the face area at the same flow: half the velocity, a quarter of
     # the pressure drop, peak in the 125 Hz octave.
-    wider = hvac.diffuser_sound_power(
-        [125.0], 2.0 * area, 1248.0 * _CFM, 0.25 * drop
-    )
+    wider = hvac.diffuser_sound_power([125.0], 2.0 * area, 1248.0 * _CFM, 0.25 * drop)
     assert wider.values[0] - base.values[0] == pytest.approx(
         10.0 * math.log10(2.0) - 60.0 * math.log10(2.0), abs=1e-9
     )
@@ -557,9 +548,7 @@ def test_diffuser_sound_power_counts_identical_devices() -> None:
         ({"count": 0}, "count"),
     ],
 )
-def test_diffuser_sound_power_validation(
-    kwargs: dict[str, object], match: str
-) -> None:
+def test_diffuser_sound_power_validation(kwargs: dict[str, object], match: str) -> None:
     call: dict[str, object] = {
         "frequencies": None,
         "face_area": 0.37,
@@ -573,8 +562,14 @@ def test_diffuser_sound_power_validation(
 
 @pytest.mark.parametrize(
     ("criterion", "opening", "expected"),
-    [(45, "supply", 3.2), (30, "supply", 2.2), (25, "supply", 1.8),
-     (45, "return", 3.8), (30, "return", 2.5), (25, "return", 2.2)],
+    [
+        (45, "supply", 3.2),
+        (30, "supply", 2.2),
+        (25, "supply", 1.8),
+        (45, "return", 3.8),
+        (30, "return", 2.5),
+        (25, "return", 2.2),
+    ],
 )
 def test_air_terminal_velocity_limit_ashrae_table_9(
     criterion: int, opening: str, expected: float
@@ -592,9 +587,12 @@ def test_air_terminal_velocity_limit_validation() -> None:
 @pytest.mark.parametrize(
     ("ratio", "location", "expected"),
     [
-        (1.5, "diffuser_neck", 5.0), (3.0, "diffuser_neck", 15.0),
-        (6.0, "diffuser_neck", 24.0), (2.0, "plenum_inlet", 3.0),
-        (6.0, "plenum_inlet", 9.0), (2.5, "supply_duct", 0.0),
+        (1.5, "diffuser_neck", 5.0),
+        (3.0, "diffuser_neck", 15.0),
+        (6.0, "diffuser_neck", 24.0),
+        (2.0, "plenum_inlet", 3.0),
+        (6.0, "plenum_inlet", 9.0),
+        (2.5, "supply_duct", 0.0),
         (4.0, "supply_duct", 3.0),
     ],
 )

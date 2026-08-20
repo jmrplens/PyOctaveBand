@@ -77,8 +77,10 @@ def _t(text: str, language: str = "en") -> str:
 
 
 def plot_reactive_silencer(
-    result: ReactiveSilencerResult, ax: Axes | None = None,
-    language: str = "en", **kwargs: Any
+    result: ReactiveSilencerResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Transmission (and insertion) loss of a reactive silencer over frequency.
 
@@ -98,14 +100,25 @@ def plot_reactive_silencer(
     kwargs.setdefault("lw", 1.8)
     ax.plot(f, np.asarray(result.transmission_loss), **kwargs)
     if result.insertion_loss is not None:
-        ax.plot(f, np.asarray(result.insertion_loss), color=_C_SECONDARY,
-                lw=1.4, ls="--", label=_t("Insertion loss", language))
+        ax.plot(
+            f,
+            np.asarray(result.insertion_loss),
+            color=_C_SECONDARY,
+            lw=1.4,
+            ls="--",
+            label=_t("Insertion loss", language),
+        )
     if result.resonances is not None:
         labeled = False
         for fr in np.atleast_1d(np.asarray(result.resonances)):
             if f.min() <= fr <= f.max():
-                ax.axvline(fr, color=_C_TERTIARY, ls=":", lw=1.0,
-                           label=_t("Resonance", language) if not labeled else None)
+                ax.axvline(
+                    fr,
+                    color=_C_TERTIARY,
+                    ls=":",
+                    lw=1.0,
+                    label=_t("Resonance", language) if not labeled else None,
+                )
                 labeled = True
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Loss [dB]", language))
@@ -118,8 +131,10 @@ def plot_reactive_silencer(
 
 
 def plot_hvac_spectrum(
-    result: HvacSpectrumResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: HvacSpectrumResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Per-frequency HVAC attenuation or regenerated sound power level.
 
@@ -142,7 +157,8 @@ def plot_hvac_spectrum(
     ax.plot(f, np.asarray(result.values), **kwargs)
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(
-        _t("Sound power level [dB re 1 pW]", language) if is_power
+        _t("Sound power level [dB re 1 pW]", language)
+        if is_power
         else _t("Attenuation [dB]", language)
     )
     ax.set_title(result.label)
@@ -159,7 +175,11 @@ def plot_hvac_spectrum(
 #: these lines are supporting detail behind the received level and the criterion
 #: curve, so they have to stay legible in both.
 _CASCADE_COLOURS: tuple[str, ...] = (
-    _C_SECONDARY, _C_TERTIARY, _C_QUATERNARY, _C_MUTED, "#17becf",
+    _C_SECONDARY,
+    _C_TERTIARY,
+    _C_QUATERNARY,
+    _C_MUTED,
+    "#17becf",
     _C_SECONDARY_LIGHT,
 )
 
@@ -184,8 +204,7 @@ def _cascade_series(result: DuctPathResult) -> list[tuple[str, np.ndarray]]:
 
 
 def plot_duct_path(
-    result: DuctPathResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: DuctPathResult, ax: Axes | None = None, language: str = "en", **kwargs: Any
 ) -> Axes:
     """Cascade of a duct-borne noise path against the room-criterion curve.
 
@@ -211,14 +230,29 @@ def plot_duct_path(
         style = _CASCADE_STYLES[
             (position // len(_CASCADE_COLOURS)) % len(_CASCADE_STYLES)
         ]
-        label = name if len(name) <= _LEGEND_CHARS else name[:_LEGEND_CHARS - 1] + "\u2026"
-        ax.semilogx(f, values, ls=style, color=colour, lw=1.1, alpha=0.85,
-                    label=label if len(series) <= 10 else None)
+        label = (
+            name if len(name) <= _LEGEND_CHARS else name[: _LEGEND_CHARS - 1] + "\u2026"
+        )
+        ax.semilogx(
+            f,
+            values,
+            ls=style,
+            color=colour,
+            lw=1.1,
+            alpha=0.85,
+            label=label if len(series) <= 10 else None,
+        )
     curve = result.criterion_curve
     if curve is not None and result.target is not None:
         target = decimal_comma(fmt_minus(result.target, "g"), language)
-        ax.semilogx(f, curve, ls="--", color=_C_REFERENCE, lw=1.5,
-                    label=f"{result.criterion} {target}")
+        ax.semilogx(
+            f,
+            curve,
+            ls="--",
+            color=_C_REFERENCE,
+            lw=1.5,
+            label=f"{result.criterion} {target}",
+        )
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", _t("Received level", language))
     kwargs.setdefault("lw", 2.4)
@@ -231,16 +265,20 @@ def plot_duct_path(
     ax.grid(True, which="both", alpha=0.3)
     format_frequency_axis(ax)
     ax.legend(
-        loc="upper right", fontsize="xx-small",
-        ncol=2 if len(series) > 4 else 1, framealpha=0.85,
+        loc="upper right",
+        fontsize="xx-small",
+        ncol=2 if len(series) > 4 else 1,
+        framealpha=0.85,
     )
     localize_axes(ax, language)
     return ax
 
 
 def plot_room_to_room(
-    result: RoomToRoomResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: RoomToRoomResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Source-room level, received level and criterion curve of a partition.
 
@@ -260,13 +298,27 @@ def plot_room_to_room(
 
     ax = ax if ax is not None else _new_axes()
     f = np.asarray(result.frequencies, dtype=np.float64)
-    ax.semilogx(f, np.asarray(result.source_level), color=_C_SECONDARY, lw=1.6,
-                ls="--", marker="s", ms=4, label=_t("Source room", language))
+    ax.semilogx(
+        f,
+        np.asarray(result.source_level),
+        color=_C_SECONDARY,
+        lw=1.6,
+        ls="--",
+        marker="s",
+        ms=4,
+        label=_t("Source room", language),
+    )
     curve = result.criterion_curve
     if curve is not None and result.target is not None:
         target = decimal_comma(fmt_minus(result.target, "g"), language)
-        ax.semilogx(f, curve, ls=":", color=_C_REFERENCE, lw=1.5,
-                    label=f"{result.criterion} {target}")
+        ax.semilogx(
+            f,
+            curve,
+            ls=":",
+            color=_C_REFERENCE,
+            lw=1.5,
+            label=f"{result.criterion} {target}",
+        )
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", _t("Receiving room", language))
     kwargs.setdefault("lw", 2.4)
@@ -278,19 +330,37 @@ def plot_room_to_room(
     ax.grid(True, which="both", alpha=0.3)
 
     twin = ax.twinx()
-    twin.plot(f, np.asarray(result.transmission_loss), color=_C_MUTED, lw=1.2,
-              ls="--", label=_t(_TL_LABEL, language))
-    twin.plot(f, np.asarray(result.noise_reduction), color=_C_TERTIARY,
-              lw=1.5, ls="-.", marker="^", ms=3,
-              label=_t("Noise reduction", language))
-    twin.set_ylabel(_t("Loss and noise reduction [dB]", language),
-                    color=_C_TERTIARY)
+    twin.plot(
+        f,
+        np.asarray(result.transmission_loss),
+        color=_C_MUTED,
+        lw=1.2,
+        ls="--",
+        label=_t(_TL_LABEL, language),
+    )
+    twin.plot(
+        f,
+        np.asarray(result.noise_reduction),
+        color=_C_TERTIARY,
+        lw=1.5,
+        ls="-.",
+        marker="^",
+        ms=3,
+        label=_t("Noise reduction", language),
+    )
+    twin.set_ylabel(_t("Loss and noise reduction [dB]", language), color=_C_TERTIARY)
     twin.tick_params(axis="y", labelcolor=_C_TERTIARY)
     twin.grid(False)
     handles, labels = ax.get_legend_handles_labels()
     extra_handles, extra_labels = twin.get_legend_handles_labels()
-    ax.legend(handles + extra_handles, labels + extra_labels, loc="best",
-              fontsize="small", framealpha=0.85, ncol=2)
+    ax.legend(
+        handles + extra_handles,
+        labels + extra_labels,
+        loc="best",
+        fontsize="small",
+        framealpha=0.85,
+        ncol=2,
+    )
     # The twin axis resets the shared log-frequency formatting, so the ticks are
     # set last and on both axes.
     ax.set_xlabel(_t(_FREQ_LABEL, language))
@@ -302,8 +372,7 @@ def plot_room_to_room(
 
 
 def plot_duct_modes(
-    result: DuctModeResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: DuctModeResult, ax: Axes | None = None, language: str = "en", **kwargs: Any
 ) -> Axes:
     """Cut-on frequency of each higher-order duct mode, with and without flow.
 
@@ -323,10 +392,23 @@ def plot_duct_modes(
 
     ax = ax if ax is not None else _new_axes()
     x = np.arange(len(result.modes), dtype=np.float64)
-    ax.axhspan(0.0, result.plane_wave_limit, color=theme_fill(_C_PRIMARY, ax),
-               zorder=0, label=_t("Plane waves only", language))
-    ax.plot(x, np.asarray(result.cut_on_no_flow), ls="--", color=_C_MUTED,
-            marker="s", ms=4, lw=1.3, label=_t("No flow", language))
+    ax.axhspan(
+        0.0,
+        result.plane_wave_limit,
+        color=theme_fill(_C_PRIMARY, ax),
+        zorder=0,
+        label=_t("Plane waves only", language),
+    )
+    ax.plot(
+        x,
+        np.asarray(result.cut_on_no_flow),
+        ls="--",
+        color=_C_MUTED,
+        marker="s",
+        ms=4,
+        lw=1.3,
+        label=_t("No flow", language),
+    )
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault(
         "label", f"$M$ = {format_number(result.mach, language, decimals=3)}"
@@ -347,8 +429,7 @@ def plot_duct_modes(
 
 
 def plot_enclosure(
-    result: EnclosureResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: EnclosureResult, ax: Axes | None = None, language: str = "en", **kwargs: Any
 ) -> Axes:
     """Panel R, interior correction C and net insertion loss of an enclosure.
 
@@ -369,11 +450,26 @@ def plot_enclosure(
     else:
         x = np.arange(n, dtype=np.float64)
         continuous = False
-    ax.plot(x, np.asarray(result.panel_transmission_loss), color=_C_REFERENCE,
-            lw=1.3, ls="--", marker="s", ms=3, label=_t("Panel $R$", language))
-    ax.plot(x, np.asarray(result.correction), color=_C_TERTIARY, lw=1.3,
-            ls=":", marker="^", ms=3,
-            label=_t("Interior correction $C$", language))
+    ax.plot(
+        x,
+        np.asarray(result.panel_transmission_loss),
+        color=_C_REFERENCE,
+        lw=1.3,
+        ls="--",
+        marker="s",
+        ms=3,
+        label=_t("Panel $R$", language),
+    )
+    ax.plot(
+        x,
+        np.asarray(result.correction),
+        color=_C_TERTIARY,
+        lw=1.3,
+        ls=":",
+        marker="^",
+        ms=3,
+        label=_t("Interior correction $C$", language),
+    )
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", _t("Insertion loss ($R - C$)", language))
     kwargs.setdefault("lw", 1.9)

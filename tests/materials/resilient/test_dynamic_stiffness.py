@@ -31,16 +31,14 @@ def test_apparent_stiffness_hand_value() -> None:
 def test_apparent_stiffness_inverts_the_resonance() -> None:
     """Recovering fr from s't via Formula 3 returns the input frequency."""
     st = materials.apparent_dynamic_stiffness(25.0, 200.0)
-    assert materials.natural_frequency(st, 200.0) == pytest.approx(
-        25.0, rel=1e-12
-    )
+    assert materials.natural_frequency(st, 200.0) == pytest.approx(25.0, rel=1e-12)
 
 
 def test_apparent_stiffness_vectorised() -> None:
     st = materials.apparent_dynamic_stiffness([20.0, 25.0, 30.0], 200.0)
     assert isinstance(st, np.ndarray)
     assert st.shape == (3,)
-    assert np.all(np.diff(st) > 0.0)   # rises with fr^2
+    assert np.all(np.diff(st) > 0.0)  # rises with fr^2
 
 
 # ---------------------------------------------------------------------------
@@ -53,9 +51,7 @@ def test_enclosed_gas_matches_standard_note() -> None:
     standard rounds the printed coefficient to 111.
     """
     for d_mm in (10.0, 20.0, 50.0):
-        sa = materials.enclosed_gas_stiffness(
-            d_mm / 1000.0, 0.9
-        )  # thickness in metres
+        sa = materials.enclosed_gas_stiffness(d_mm / 1000.0, 0.9)  # thickness in metres
         assert sa == pytest.approx(1.0e5 / ((d_mm / 1000.0) * 0.9), rel=1e-12)
         # cross-check against the standard's printed 111/d relationship
         assert sa / 1e6 == pytest.approx(111.0 / d_mm, rel=2e-3)
@@ -63,9 +59,7 @@ def test_enclosed_gas_matches_standard_note() -> None:
 
 def test_enclosed_gas_true_atmosphere() -> None:
     """A real 101 325 Pa can be passed instead of the standard's 0,1 MPa."""
-    sa = materials.enclosed_gas_stiffness(
-        0.02, 0.9, atmospheric_pressure=101_325.0
-    )
+    sa = materials.enclosed_gas_stiffness(0.02, 0.9, atmospheric_pressure=101_325.0)
     assert sa == pytest.approx(101_325.0 / (0.02 * 0.9), rel=1e-12)
 
 
@@ -101,22 +95,13 @@ def test_natural_frequency_scales() -> None:
 # Airflow-resistivity combination (clause 8.2)
 # ---------------------------------------------------------------------------
 def test_high_resistivity_uses_apparent_only() -> None:
-    assert (
-        materials.installed_dynamic_stiffness(20e6, 150.0, gas_stiffness=3e6)
-        == 20e6
-    )
+    assert materials.installed_dynamic_stiffness(20e6, 150.0, gas_stiffness=3e6) == 20e6
 
 
 def test_intermediate_resistivity_adds_gas() -> None:
-    assert (
-        materials.installed_dynamic_stiffness(20e6, 50.0, gas_stiffness=3e6)
-        == 23e6
-    )
+    assert materials.installed_dynamic_stiffness(20e6, 50.0, gas_stiffness=3e6) == 23e6
     # boundary at 10 kPa.s/m2 is inclusive of the intermediate branch
-    assert (
-        materials.installed_dynamic_stiffness(20e6, 10.0, gas_stiffness=3e6)
-        == 23e6
-    )
+    assert materials.installed_dynamic_stiffness(20e6, 10.0, gas_stiffness=3e6) == 23e6
 
 
 def test_low_resistivity_negligible_gas_warns_and_uses_apparent() -> None:
@@ -155,18 +140,14 @@ def test_floating_floor_resonance_chain() -> None:
 
 def test_chain_high_resistivity_ignores_gas() -> None:
     """With r >= 100 kPa.s/m2 the gas term is not needed."""
-    res = materials.floating_floor_resonance(
-        25.0, 200.0, 100.0
-    )  # default r = inf
+    res = materials.floating_floor_resonance(25.0, 200.0, 100.0)  # default r = inf
     assert res.gas_stiffness == 0.0
     assert res.dynamic_stiffness == res.apparent_stiffness
 
 
 def test_chain_requires_gas_inputs_below_100() -> None:
     with pytest.raises(ValueError, match="thickness.*porosity"):
-        materials.floating_floor_resonance(
-            25.0, 200.0, 100.0, airflow_resistivity=50.0
-        )
+        materials.floating_floor_resonance(25.0, 200.0, 100.0, airflow_resistivity=50.0)
 
 
 # ---------------------------------------------------------------------------
@@ -213,9 +194,7 @@ def test_natural_frequency_vigran_concrete_floating_floor() -> None:
     # s' = 8.0 MPa/m layer: the book publishes f0 ~= 40 Hz, rounded to the
     # nearest 10 Hz (the reconstruction gives 42.0 Hz exactly), so 3 Hz
     # covers the rounding plus the nominal slab mass.
-    assert materials.natural_frequency(8.0e6, 115.0) == pytest.approx(
-        40.0, abs=3.0
-    )
+    assert materials.natural_frequency(8.0e6, 115.0) == pytest.approx(40.0, abs=3.0)
 
 
 def test_natural_frequency_vigran_lightweight_floating_floor() -> None:
@@ -223,6 +202,4 @@ def test_natural_frequency_vigran_lightweight_floating_floor() -> None:
     # plasterboard (nominal m' ~ 16.7 + 11.2 ~ 28 kg/m2): the book publishes
     # f0 ~= 90 Hz, rounded to the nearest 10 Hz (the reconstruction gives
     # 85.1 Hz), so 5.5 Hz covers the rounding plus the nominal plate masses.
-    assert materials.natural_frequency(8.0e6, 28.0) == pytest.approx(
-        90.0, abs=5.5
-    )
+    assert materials.natural_frequency(8.0e6, 28.0) == pytest.approx(90.0, abs=5.5)

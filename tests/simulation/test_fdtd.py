@@ -34,7 +34,9 @@ RHO0 = 1.2
 
 
 def _spectrum_peak_near(
-    pressure: np.ndarray, dt: float, f_expected: float,
+    pressure: np.ndarray,
+    dt: float,
+    f_expected: float,
 ) -> float:
     """Frequency of the highest zero-padded FFT peak within +/-7 %."""
     window = np.hanning(pressure.size)
@@ -52,7 +54,10 @@ def test_rigid_box_modes_match_analytic_eigenfrequencies() -> None:
     lx, ly, dx = 1.0, 0.7, 0.02
     nx, ny = round(lx / dx), round(ly / dx)
     res = fdtd_simulation(
-        C0, dx, 0.35, shape=(ny, nx),
+        C0,
+        dx,
+        0.35,
+        shape=(ny, nx),
         sources=[GaussianPulse(ix=7, iy=5, width=2.0e-4)],
         probes=[(nx - 4, ny - 3)],
     )
@@ -69,7 +74,10 @@ def test_tube_resonances_match_analytic_harmonics() -> None:
     length, dx = 2.0, 0.01
     nx = round(length / dx)
     res = fdtd_simulation(
-        C0, dx, 0.5, shape=(3, nx),
+        C0,
+        dx,
+        0.5,
+        shape=(3, nx),
         sources=[GaussianPulse(ix=30, iy=1, width=1.5e-4)],
         probes=[(nx - 5, 1)],
     )
@@ -86,10 +94,14 @@ def test_tube_resonances_match_analytic_harmonics() -> None:
 def free_field() -> FDTDResult:
     """A resolved Gaussian pulse radiating into absorbing boundaries."""
     return fdtd_simulation(
-        C0, 0.01, 8.6e-3, shape=(320, 420),
+        C0,
+        0.01,
+        8.6e-3,
+        shape=(320, 420),
         sources=[GaussianPulse(ix=60, iy=160, width=3.0e-4)],
         probes=[(180, 160), (300, 160)],
-        boundaries="absorbing", absorbing_layer_cells=40,
+        boundaries="absorbing",
+        absorbing_layer_cells=40,
     )
 
 
@@ -108,7 +120,7 @@ def test_free_field_pulse_decays_cylindrically(free_field: FDTDResult) -> None:
     r1, r2 = 120 * free_field.dx, 240 * free_field.dx
     assert peak2 / peak1 == pytest.approx(np.sqrt(r1 / r2), rel=0.03)
     alpha = float(np.log(peak1 / peak2) / np.log(r2 / r1))
-    assert 0.45 < alpha < 0.57            # 3D spreading would give ~1.0
+    assert 0.45 < alpha < 0.57  # 3D spreading would give ~1.0
 
 
 def test_rigid_wall_reflection_matches_image_source() -> None:
@@ -117,11 +129,13 @@ def test_rigid_wall_reflection_matches_image_source() -> None:
     # arriving (d_image - d_direct)/c after the direct pulse, same sign.
     dx = 0.01
     res = fdtd_simulation(
-        C0, dx, 7.5e-3, shape=(300, 300),
+        C0,
+        dx,
+        7.5e-3,
+        shape=(300, 300),
         sources=[GaussianPulse(ix=50, iy=150, width=1.0e-4)],
         probes=[(100, 150)],
-        boundaries={"right": "absorbing", "top": "absorbing",
-                    "bottom": "absorbing"},
+        boundaries={"right": "absorbing", "top": "absorbing", "bottom": "absorbing"},
         absorbing_layer_cells=30,
     )
     p = res.pressures[0]
@@ -132,7 +146,7 @@ def test_rigid_wall_reflection_matches_image_source() -> None:
     delay_exact = (150 - 50) * dx / C0
     delay = res.times[i_echo] - res.times[i_direct]
     assert delay == pytest.approx(delay_exact, rel=0.03)
-    assert p[i_echo] > 0.0                # rigid wall: R = +1, no sign flip
+    assert p[i_echo] > 0.0  # rigid wall: R = +1, no sign flip
 
 
 # --- Impedance boundary: normal-incidence reflection coefficient -----------
@@ -141,8 +155,13 @@ def test_rigid_wall_reflection_matches_image_source() -> None:
 def _measure_edge_reflection(z_over_rhoc: float) -> float:
     """Plane-pulse reflection coefficient of the right impedance edge."""
     nx, dx = 1200, 0.01
-    sim = FDTD2D(C0, dx, rho=RHO0, shape=(3, nx),
-                 edge_impedance={"right": z_over_rhoc * RHO0 * C0})
+    sim = FDTD2D(
+        C0,
+        dx,
+        rho=RHO0,
+        shape=(3, nx),
+        edge_impedance={"right": z_over_rhoc * RHO0 * C0},
+    )
     x = (np.arange(nx) + 0.5) * dx
     # A y-uniform initial pressure splits into two plane pulses; the
     # right-going half reflects off the impedance edge. The run stops
@@ -166,8 +185,7 @@ def test_impedance_edge_reflection_coefficient(z_over_rhoc: float) -> None:
     # Normal incidence: R = (Z - rho c)/(Z + rho c), including the sign
     # flip for Z < rho c. Measured within 0.002 of theory.
     r_theory = (z_over_rhoc - 1.0) / (z_over_rhoc + 1.0)
-    assert _measure_edge_reflection(z_over_rhoc) == pytest.approx(
-        r_theory, abs=0.01)
+    assert _measure_edge_reflection(z_over_rhoc) == pytest.approx(r_theory, abs=0.01)
 
 
 def test_matched_impedance_edge_is_anechoic() -> None:
@@ -176,8 +194,13 @@ def test_matched_impedance_edge_is_anechoic() -> None:
 
 
 def test_impedance_edge_dissipates_energy() -> None:
-    sim = FDTD2D(C0, 0.02, rho=RHO0, shape=(60, 60),
-                 edge_impedance={"left": RHO0 * C0, "top": 2.0 * RHO0 * C0})
+    sim = FDTD2D(
+        C0,
+        0.02,
+        rho=RHO0,
+        shape=(60, 60),
+        edge_impedance={"left": RHO0 * C0, "top": 2.0 * RHO0 * C0},
+    )
     sim.add_source(GaussianPulse(ix=30, iy=30, width=10 * sim.dt))
     sim.run(200)
     e_ref = sim.energy()
@@ -188,8 +211,7 @@ def test_impedance_edge_dissipates_energy() -> None:
 # --- Numerical dispersion and convergence ----------------------------------
 
 
-def _measured_mode_frequency(nx: int, length: float = 1.0) -> tuple[float,
-                                                                    float]:
+def _measured_mode_frequency(nx: int, length: float = 1.0) -> tuple[float, float]:
     """Fundamental frequency of a 1D rigid tube started on the exact mode.
 
     Returns the zero-crossing estimate and the analytic prediction of the
@@ -215,8 +237,8 @@ def _measured_mode_frequency(nx: int, length: float = 1.0) -> tuple[float,
     f_measured = (t_zero.size - 1) / (2.0 * (t_zero[-1] - t_zero[0]))
     courant = C0 * sim.dt / dx
     f_dispersion = float(
-        2.0 * np.arcsin(courant * np.sin(k * dx / 2.0)) / sim.dt
-        / (2.0 * np.pi))
+        2.0 * np.arcsin(courant * np.sin(k * dx / 2.0)) / sim.dt / (2.0 * np.pi)
+    )
     return float(f_measured), f_dispersion
 
 
@@ -230,8 +252,9 @@ def test_mode_frequency_follows_discrete_dispersion_relation() -> None:
 
 def test_grid_refinement_converges_at_second_order() -> None:
     f_exact = C0 / 2.0
-    errors = [abs(_measured_mode_frequency(nx)[0] - f_exact) / f_exact
-              for nx in (25, 50, 100)]
+    errors = [
+        abs(_measured_mode_frequency(nx)[0] - f_exact) / f_exact for nx in (25, 50, 100)
+    ]
     orders = [float(np.log2(errors[i] / errors[i + 1])) for i in range(2)]
     for order in orders:
         assert 1.7 < order < 2.3
@@ -250,40 +273,51 @@ def test_signal_source_reproduces_gaussian_pulse() -> None:
 
     sim_b = FDTD2D(C0, 0.05, shape=(40, 50))
     t = np.arange(1, 202) * sim_b.dt
-    sim_b.add_source(SignalSource(
-        ix=20, iy=20, samples=np.array([0.0, *(pulse.value(ti) for ti in t)]),
-        sample_rate=1.0 / sim_b.dt))
+    sim_b.add_source(
+        SignalSource(
+            ix=20,
+            iy=20,
+            samples=np.array([0.0, *(pulse.value(ti) for ti in t)]),
+            sample_rate=1.0 / sim_b.dt,
+        )
+    )
     sim_b.run(200)
     np.testing.assert_allclose(sim_b.p, sim_a.p, atol=1e-12)
 
 
 def test_signal_source_is_zero_outside_its_span() -> None:
-    src = SignalSource(ix=0, iy=0, samples=np.array([1.0, 2.0, 3.0]),
-                       sample_rate=10.0, amplitude=2.0)
+    src = SignalSource(
+        ix=0, iy=0, samples=np.array([1.0, 2.0, 3.0]), sample_rate=10.0, amplitude=2.0
+    )
     assert src.value(-0.01) == 0.0
     assert src.value(0.0) == 2.0
-    assert src.value(0.05) == pytest.approx(3.0)   # linear interpolation
-    assert src.value(0.2) == pytest.approx(6.0)    # last sample
+    assert src.value(0.05) == pytest.approx(3.0)  # linear interpolation
+    assert src.value(0.2) == pytest.approx(6.0)  # last sample
     assert src.value(0.21) == 0.0
 
 
 @pytest.mark.parametrize(
     ("kwargs", "match"),
     [
-        ({"samples": np.zeros((2, 3)), "sample_rate": 8000.0},
-         "samples must be a 1D array"),
-        ({"samples": np.zeros(0), "sample_rate": 8000.0},
-         "samples must not be empty"),
-        ({"samples": np.array([np.nan]), "sample_rate": 8000.0},
-         "samples must be finite"),
-        ({"samples": np.zeros(4), "sample_rate": 0.0},
-         "sample_rate must be positive"),
-        ({"samples": np.zeros(4), "sample_rate": 8000.0,
-          "amplitude": np.inf}, "amplitude must be finite"),
+        (
+            {"samples": np.zeros((2, 3)), "sample_rate": 8000.0},
+            "samples must be a 1D array",
+        ),
+        ({"samples": np.zeros(0), "sample_rate": 8000.0}, "samples must not be empty"),
+        (
+            {"samples": np.array([np.nan]), "sample_rate": 8000.0},
+            "samples must be finite",
+        ),
+        ({"samples": np.zeros(4), "sample_rate": 0.0}, "sample_rate must be positive"),
+        (
+            {"samples": np.zeros(4), "sample_rate": 8000.0, "amplitude": np.inf},
+            "amplitude must be finite",
+        ),
     ],
 )
 def test_signal_source_rejects_invalid_parameters(
-    kwargs: dict[str, object], match: str,
+    kwargs: dict[str, object],
+    match: str,
 ) -> None:
     with pytest.raises(ValueError, match=match):
         SignalSource(ix=0, iy=0, **kwargs)
@@ -297,14 +331,21 @@ def _slab_run(
 ) -> tuple[float, float, np.ndarray | None]:
     """Amplitude behind / beside the slab and the snapshots of one run."""
     res = fdtd_simulation(
-        C0, 0.02, 7.0e-3, shape=(100, 150),
+        C0,
+        0.02,
+        7.0e-3,
+        shape=(100, 150),
         sources=[GaussianPulse(ix=30, iy=50, width=5e-5)],
-        probes=[(110, 50), (30, 90)],      # behind the slab / open path
-        obstacle_mask=obstacle, boundaries="absorbing",
+        probes=[(110, 50), (30, 90)],  # behind the slab / open path
+        obstacle_mask=obstacle,
+        boundaries="absorbing",
         snapshot_every=50,
     )
-    return (float(np.abs(res.pressures[0]).max()),
-            float(np.abs(res.pressures[1]).max()), res.snapshots)
+    return (
+        float(np.abs(res.pressures[0]).max()),
+        float(np.abs(res.pressures[1]).max()),
+        res.snapshots,
+    )
 
 
 def test_obstacle_casts_a_shadow_and_stays_silent_inside() -> None:
@@ -313,7 +354,7 @@ def test_obstacle_casts_a_shadow_and_stays_silent_inside() -> None:
     # field inside the slab stays exactly zero. The 7 ms duration covers
     # both the 4.7 ms direct and the ~4.8 ms diffracted arrivals.
     mask = np.zeros((100, 150), dtype=bool)
-    mask[40:60, 70:74] = True              # a vertical rigid slab
+    mask[40:60, 70:74] = True  # a vertical rigid slab
     shadowed, open_path, snapshots = _slab_run(mask)
     unblocked, _, _ = _slab_run(None)
     # Diffraction reaches the probe (nonzero) but the slab attenuates it
@@ -342,8 +383,15 @@ def test_obstacle_mask_validation() -> None:
     with pytest.raises(ValueError, match="inside an obstacle"):
         sim.add_source(masked_source)
     with pytest.raises(ValueError, match="inside an obstacle"):
-        fdtd_simulation(C0, 0.05, 1e-3, shape=(10, 10), obstacle_mask=mask,
-                        sources=[open_source], probes=[(5, 5)])
+        fdtd_simulation(
+            C0,
+            0.05,
+            1e-3,
+            shape=(10, 10),
+            obstacle_mask=mask,
+            sources=[open_source],
+            probes=[(5, 5)],
+        )
 
 
 # --- Boundary specification and CFL stability ------------------------------
@@ -358,12 +406,14 @@ def test_obstacle_mask_validation() -> None:
     ],
 )
 def test_boundary_spec_rejects_unknown_values(
-    boundaries: object, match: str,
+    boundaries: object,
+    match: str,
 ) -> None:
     sources = [GaussianPulse(ix=5, iy=5, width=1e-4)]
     with pytest.raises(ValueError, match=match):
-        fdtd_simulation(C0, 0.05, 1e-3, shape=(30, 30),
-                        sources=sources, boundaries=boundaries)
+        fdtd_simulation(
+            C0, 0.05, 1e-3, shape=(30, 30), sources=sources, boundaries=boundaries
+        )
 
 
 @pytest.mark.parametrize(
@@ -376,17 +426,23 @@ def test_boundary_spec_rejects_unknown_values(
     ],
 )
 def test_edge_impedance_validation(
-    impedance: dict[str, object], match: str,
+    impedance: dict[str, object],
+    match: str,
 ) -> None:
     with pytest.raises(ValueError, match=match):
-        FDTD2D(C0, 0.05, shape=(30, 30),
-               edge_impedance=impedance)
+        FDTD2D(C0, 0.05, shape=(30, 30), edge_impedance=impedance)
 
 
 def test_side_cannot_be_absorbing_and_impedance() -> None:
     with pytest.raises(ValueError, match="both absorbing"):
-        FDTD2D(C0, 0.05, shape=(30, 30), sponge_width=5,
-               sponge_sides="left", edge_impedance={"left": 400.0})
+        FDTD2D(
+            C0,
+            0.05,
+            shape=(30, 30),
+            sponge_width=5,
+            sponge_sides="left",
+            edge_impedance={"left": 400.0},
+        )
 
 
 def _duct_echo(
@@ -400,9 +456,15 @@ def _duct_echo(
     echo (~44 ms) arrives.
     """
     res = fdtd_simulation(
-        C0, 0.01, 0.030, rho=RHO0, shape=(3, 1200),
+        C0,
+        0.01,
+        0.030,
+        rho=RHO0,
+        shape=(3, 1200),
         sources=[GaussianPulse(ix=900, iy=1, width=2e-4)],
-        probes=[(600, 1)], boundaries=boundaries)
+        probes=[(600, 1)],
+        boundaries=boundaries,
+    )
     p, t = res.pressures[0], res.times
     t_inc = 8e-4 + 3.0 / C0
     t_echo = 8e-4 + 9.0 / C0
@@ -435,13 +497,18 @@ def test_per_cell_impedance_array_matches_the_scalar() -> None:
 def test_damping_through_the_public_api() -> None:
     def peak(damping: float) -> float:
         res = fdtd_simulation(
-            C0, 0.05, 5e-3, shape=(40, 60), damping=damping,
+            C0,
+            0.05,
+            5e-3,
+            shape=(40, 60),
+            damping=damping,
             sources=[GaussianPulse(ix=10, iy=10, width=1e-4)],
-            probes=[(40, 20)])
+            probes=[(40, 20)],
+        )
         return float(np.abs(res.pressures).max())
 
     undamped, damped = peak(0.0), peak(800.0)
-    assert 0.0 < damped < 0.1 * undamped   # measured: 0.019 * undamped
+    assert 0.0 < damped < 0.1 * undamped  # measured: 0.019 * undamped
 
 
 @pytest.mark.parametrize("cfl", [0.0, -0.5, 1.0, 1.5, np.nan])
@@ -450,15 +517,20 @@ def test_unstable_or_invalid_cfl_is_rejected(cfl: float) -> None:
     # Eq. (4.13) and the explicit scheme requires CN <= 1 (Eq. 4.14).
     sources = [GaussianPulse(ix=5, iy=5, width=1e-4)]
     with pytest.raises(ValueError, match="cfl"):
-        fdtd_simulation(C0, 0.05, 1e-3, shape=(20, 20), cfl=cfl,
-                        sources=sources)
+        fdtd_simulation(C0, 0.05, 1e-3, shape=(20, 20), cfl=cfl, sources=sources)
 
 
 def test_stable_cfl_values_are_accepted() -> None:
     for cfl in (0.1, 0.6, 0.99):
-        res = fdtd_simulation(C0, 0.05, 2e-3, shape=(20, 20), cfl=cfl,
-                              sources=[GaussianPulse(ix=5, iy=5, width=1e-4)],
-                              probes=[(10, 10)])
+        res = fdtd_simulation(
+            C0,
+            0.05,
+            2e-3,
+            shape=(20, 20),
+            cfl=cfl,
+            sources=[GaussianPulse(ix=5, iy=5, width=1e-4)],
+            probes=[(10, 10)],
+        )
         assert np.all(np.isfinite(res.pressures))
 
 
@@ -467,9 +539,13 @@ def test_stable_cfl_values_are_accepted() -> None:
 
 def test_result_records_probes_and_snapshots() -> None:
     res = fdtd_simulation(
-        C0, 0.05, 5e-3, shape=(40, 60),
+        C0,
+        0.05,
+        5e-3,
+        shape=(40, 60),
         sources=[CWSource(ix=10, iy=10, frequency=800.0)],
-        probes=[(30, 20), (50, 35)], snapshot_every=25,
+        probes=[(30, 20), (50, 35)],
+        snapshot_every=25,
     )
     n_steps = round(5e-3 / res.dt)
     assert res.times.shape == (n_steps + 1,)
@@ -478,23 +554,30 @@ def test_result_records_probes_and_snapshots() -> None:
     assert np.all(res.pressures[:, 0] == 0.0)
     assert res.shape == (40, 60)
     assert res.size == (60 * 0.05, 40 * 0.05)
-    np.testing.assert_allclose(res.probe_positions[0],
-                               [(30 + 0.5) * 0.05, (20 + 0.5) * 0.05])
+    np.testing.assert_allclose(
+        res.probe_positions[0], [(30 + 0.5) * 0.05, (20 + 0.5) * 0.05]
+    )
     assert res.snapshots is not None
     assert res.snapshot_times is not None
     assert res.snapshots.shape == (n_steps // 25 + 1, 40, 60)
     np.testing.assert_allclose(
-        res.snapshot_times, np.arange(n_steps // 25 + 1) * 25 * res.dt)
+        res.snapshot_times, np.arange(n_steps // 25 + 1) * 25 * res.dt
+    )
     assert float(np.abs(res.pressures).max()) > 0.0
 
 
 def test_two_runs_are_bit_identical() -> None:
     def run() -> FDTDResult:
         return fdtd_simulation(
-            C0, 0.02, 3e-3, shape=(80, 100),
+            C0,
+            0.02,
+            3e-3,
+            shape=(80, 100),
             sources=[GaussianPulse(ix=50, iy=40, width=1e-4)],
-            probes=[(70, 40)], boundaries="absorbing",
-            absorbing_layer_cells=15, snapshot_every=40,
+            probes=[(70, 40)],
+            boundaries="absorbing",
+            absorbing_layer_cells=15,
+            snapshot_every=40,
         )
 
     a, b = run(), run()
@@ -515,14 +598,19 @@ def test_two_runs_are_bit_identical() -> None:
         ({"probes": [(99, 0)]}, "outside the grid"),
         ({"probes": [(2.5, 3)]}, "probe ix must be an integer"),
         ({"probes": [(2, 3.5)]}, "probe iy must be an integer"),
-        ({"boundaries": "absorbing", "absorbing_layer_cells": 0},
-         "absorbing_layer_cells"),
-        ({"boundaries": "absorbing", "absorbing_layer_cells": 2.5},
-         "absorbing_layer_cells must be an integer"),
+        (
+            {"boundaries": "absorbing", "absorbing_layer_cells": 0},
+            "absorbing_layer_cells",
+        ),
+        (
+            {"boundaries": "absorbing", "absorbing_layer_cells": 2.5},
+            "absorbing_layer_cells must be an integer",
+        ),
     ],
 )
 def test_simulation_rejects_invalid_arguments(
-    kwargs: dict[str, object], match: str,
+    kwargs: dict[str, object],
+    match: str,
 ) -> None:
     full: dict[str, object] = {
         "duration": 1e-3,
@@ -531,8 +619,7 @@ def test_simulation_rejects_invalid_arguments(
     }
     duration = full.pop("duration")
     with pytest.raises(ValueError, match=match):
-        fdtd_simulation(C0, 0.05, duration,
-                        shape=(30, 30), **full)
+        fdtd_simulation(C0, 0.05, duration, shape=(30, 30), **full)
 
 
 def test_non_integral_counts_and_coordinates_are_rejected() -> None:
@@ -551,7 +638,7 @@ def test_non_integral_counts_and_coordinates_are_rejected() -> None:
         sim.run(10, record_every=1.5)  # type: ignore[arg-type]
     with pytest.raises(ValueError, match="decimate must be an integer"):
         sim.run(10, decimate=1.5)  # type: ignore[arg-type]
-    assert sim.n == 0                  # nothing ran on the rejected calls
+    assert sim.n == 0  # nothing ran on the rejected calls
 
 
 # --- Plotting ---------------------------------------------------------------
@@ -562,9 +649,14 @@ def small_result() -> FDTDResult:
     mask = np.zeros((30, 40), dtype=bool)
     mask[12:18, 20:22] = True
     return fdtd_simulation(
-        C0, 0.05, 3e-3, shape=(30, 40),
+        C0,
+        0.05,
+        3e-3,
+        shape=(30, 40),
         sources=[GaussianPulse(ix=8, iy=15, width=1e-4)],
-        probes=[(30, 15)], obstacle_mask=mask, snapshot_every=20,
+        probes=[(30, 15)],
+        obstacle_mask=mask,
+        snapshot_every=20,
     )
 
 
@@ -581,9 +673,10 @@ def test_plot_snapshot(small_result: FDTDResult) -> None:
     ax = small_result.plot(kind="snapshot", frame=-1)
     assert small_result.snapshots is not None
     images = ax.get_images()
-    assert len(images) == 2                 # field + obstacle overlay
-    np.testing.assert_allclose(np.asarray(images[0].get_array()),
-                               small_result.snapshots[-1])
+    assert len(images) == 2  # field + obstacle overlay
+    np.testing.assert_allclose(
+        np.asarray(images[0].get_array()), small_result.snapshots[-1]
+    )
     assert "ms" in ax.get_title()
     plt.close(ax.figure)
 
@@ -608,9 +701,14 @@ def test_plot_snapshot_cmap_follows_background(small_result: FDTDResult) -> None
 
 
 def test_plot_rejects_unknown_kind_and_missing_snapshots() -> None:
-    res = fdtd_simulation(C0, 0.05, 1e-3, shape=(20, 20),
-                          sources=[GaussianPulse(ix=5, iy=5, width=1e-4)],
-                          probes=[(10, 10)])
+    res = fdtd_simulation(
+        C0,
+        0.05,
+        1e-3,
+        shape=(20, 20),
+        sources=[GaussianPulse(ix=5, iy=5, width=1e-4)],
+        probes=[(10, 10)],
+    )
     with pytest.raises(ValueError, match="kind"):
         res.plot(kind="field")
     with pytest.raises(ValueError, match="no snapshots"):

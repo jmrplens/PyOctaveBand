@@ -213,14 +213,16 @@ class ReportMetadata:
         """Validate the supplied numeric fields by physical range."""
         for name in self._POSITIVE_FIELDS:
             self._require(
-                name, lambda x: math.isfinite(x) and x > 0.0,
+                name,
+                lambda x: math.isfinite(x) and x > 0.0,
                 "a finite, positive number",
             )
         for name in self._FINITE_FIELDS:
             self._require(name, math.isfinite, "finite")
         for name in self._HUMIDITY_FIELDS:
             self._require(
-                name, lambda x: math.isfinite(x) and 0.0 <= x <= 100.0,
+                name,
+                lambda x: math.isfinite(x) and 0.0 <= x <= 100.0,
                 "a relative humidity in 0..100 %",
             )
         for name in self._POSITIVE_INT_FIELDS:
@@ -241,7 +243,9 @@ class ReportMetadata:
                 f"got {self.required_class!r}."
             )
         if self.tube_shape is not None and self.tube_shape not in (
-            "circular", "rectangular", "square"
+            "circular",
+            "rectangular",
+            "square",
         ):
             raise ValueError(
                 "ReportMetadata.tube_shape must be 'circular', 'rectangular' "

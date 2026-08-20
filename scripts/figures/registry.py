@@ -1164,8 +1164,9 @@ def generate_posters(output_dir: str) -> None:
 
     webms = sorted(glob.glob(os.path.join(output_dir, "anim_*.webm")))
     if not webms:
-        raise RuntimeError(f"no anim_*.webm files found in {output_dir}; "
-                           "run `make animations` first")
+        raise RuntimeError(
+            f"no anim_*.webm files found in {output_dir}; run `make animations` first"
+        )
     for webm in webms:
         poster = _extract_poster(webm, _poster_ss_for(webm))
         print(f"  {os.path.basename(webm)} -> {os.path.basename(poster)}")
@@ -1254,8 +1255,7 @@ if not _ANIM_FIELDS.keys() <= _ANIMATIONS.keys():
     raise RuntimeError(f"animation names not in _ANIMATIONS: {_unknown_field}")
 
 
-def _render_anim_variant(clip: str, output_dir: str, lang: str,
-                         dark: bool) -> None:
+def _render_anim_variant(clip: str, output_dir: str, lang: str, dark: bool) -> None:
     """Render one language/theme variant of *clip* (fork child entry)."""
     set_lang(lang)
     set_theme(dark)
@@ -1286,8 +1286,7 @@ def _render_anim_variants(clip: str, output_dir: str) -> None:
     builder()
     ctx = mp.get_context("fork")
     procs = [
-        ctx.Process(target=_render_anim_variant,
-                    args=(clip, output_dir, lang, dark))
+        ctx.Process(target=_render_anim_variant, args=(clip, output_dir, lang, dark))
         for lang, dark in _VARIANTS
     ]
     for proc in procs:
@@ -1296,8 +1295,9 @@ def _render_anim_variants(clip: str, output_dir: str) -> None:
         proc.join()
     failed = [p.exitcode for p in procs if p.exitcode]
     if failed:
-        raise RuntimeError(f"{clip}: {len(failed)} variant(s) failed "
-                           f"(exit codes {failed})")
+        raise RuntimeError(
+            f"{clip}: {len(failed)} variant(s) failed (exit codes {failed})"
+        )
 
 
 def _stamp_clips(clips: list[str], output_dir: str) -> None:
@@ -1322,8 +1322,9 @@ def _stamp_clips(clips: list[str], output_dir: str) -> None:
     animation_fingerprint.stamp(clips)
 
 
-def generate_animations(output_dir: str, names: list[str] | None = None,
-                        *, variants: bool = False) -> None:
+def generate_animations(
+    output_dir: str, names: list[str] | None = None, *, variants: bool = False
+) -> None:
     """Render the Tier-1 animations, by default in the active language/theme.
 
     ``names`` (clip stems, e.g. ``anim_schroeder``) restricts the run to a
@@ -1360,8 +1361,7 @@ def generate_animations(output_dir: str, names: list[str] | None = None,
         unknown = sorted(set(names) - _ANIMATIONS.keys())
         if unknown:
             available = ", ".join(sorted(_ANIMATIONS))
-            raise SystemExit(
-                f"unknown animation(s) {unknown}; available: {available}")
+            raise SystemExit(f"unknown animation(s) {unknown}; available: {available}")
         clips = list(names)
     else:
         clips = list(_ANIMATIONS)
@@ -1440,9 +1440,7 @@ _FIGURE_WEIGHTS: dict[str, float] = {
 
 # A registry rename must not silently degroup a cached figure (a 4x
 # recompute) or drop its scheduling weight; fail fast on import instead.
-_REGISTRY_NAMES = frozenset(
-    f.__name__.removeprefix("generate_") for f in _FIGURE_FUNCS
-)
+_REGISTRY_NAMES = frozenset(f.__name__.removeprefix("generate_") for f in _FIGURE_FUNCS)
 if not (_GROUPED_FIGURES | _FIGURE_WEIGHTS.keys()) <= _REGISTRY_NAMES:
     _unknown = sorted((_GROUPED_FIGURES | _FIGURE_WEIGHTS.keys()) - _REGISTRY_NAMES)
     raise RuntimeError(f"figure names not in _FIGURE_FUNCS: {_unknown}")
@@ -1502,9 +1500,7 @@ def _generate_figures_parallel(
             tasks.extend((func.__name__, (variant,)) for variant in _VARIANTS)
     # Heaviest tasks first: they hit idle workers immediately instead of
     # serialising the tail of the run.
-    tasks.sort(
-        key=lambda t: -_FIGURE_WEIGHTS.get(t[0].removeprefix("generate_"), 0.0)
-    )
+    tasks.sort(key=lambda t: -_FIGURE_WEIGHTS.get(t[0].removeprefix("generate_"), 0.0))
 
     ctx = mp.get_context("spawn")
     with ProcessPoolExecutor(max_workers=jobs, mp_context=ctx) as pool:
@@ -1538,7 +1534,9 @@ def _generate_figures_parallel(
             failures.append(f"{name} [{labels}]: {detail}")
     if failures:
         skipped = (
-            f"\n  ({cancelled} queued tasks cancelled, not attempted)" if cancelled else ""
+            f"\n  ({cancelled} queued tasks cancelled, not attempted)"
+            if cancelled
+            else ""
         )
         raise RuntimeError(
             "figure generation failed:\n  " + "\n  ".join(sorted(failures)) + skipped
@@ -1630,9 +1628,7 @@ def _run_anim_task(clip: str, img_dir: str) -> str:
     return clip
 
 
-def _generate_animations_parallel(
-    img_dir: str, clips: list[str], jobs: int
-) -> None:
+def _generate_animations_parallel(img_dir: str, clips: list[str], jobs: int) -> None:
     """Render ``clips`` (all four variants each) on a ``jobs``-wide pool.
 
     Mirrors :func:`_generate_figures_parallel`: spawned workers each import a
@@ -1646,9 +1642,7 @@ def _generate_animations_parallel(
     tasks = sorted(clips, key=lambda c: -_ANIM_WEIGHTS.get(c, 0.0))
     ctx = mp.get_context("spawn")
     with ProcessPoolExecutor(max_workers=jobs, mp_context=ctx) as pool:
-        futures = {
-            pool.submit(_run_anim_task, clip, img_dir): clip for clip in tasks
-        }
+        futures = {pool.submit(_run_anim_task, clip, img_dir): clip for clip in tasks}
         _done, not_done = wait(futures, return_when=FIRST_EXCEPTION)
         for future in not_done:
             future.cancel()
@@ -1663,18 +1657,22 @@ def _generate_animations_parallel(
             if exc.__cause__ is not None:
                 detail += f"\n{exc.__cause__}"
             failures.append(f"{clip}: {detail}")
-    _stamp_clips([
-        clip for future, clip in futures.items()
-        if not future.cancelled() and future.exception() is None
-    ], img_dir)
+    _stamp_clips(
+        [
+            clip
+            for future, clip in futures.items()
+            if not future.cancelled() and future.exception() is None
+        ],
+        img_dir,
+    )
     if failures:
         skipped = (
             f"\n  ({cancelled} queued clips cancelled, not attempted)"
-            if cancelled else ""
+            if cancelled
+            else ""
         )
         raise RuntimeError(
-            "animation generation failed:\n  "
-            + "\n  ".join(sorted(failures)) + skipped
+            "animation generation failed:\n  " + "\n  ".join(sorted(failures)) + skipped
         )
 
 
@@ -1702,31 +1700,44 @@ def main(argv: list[str] | None = None) -> None:
         "in all four language x theme variants."
     )
     parser.add_argument(
-        "--animations", action="store_true",
+        "--animations",
+        action="store_true",
         help="render only the Tier-1 animation clips (slow ffmpeg encoding, "
         "kept out of the default figure run)",
     )
     parser.add_argument(
-        "--posters", action="store_true",
+        "--posters",
+        action="store_true",
         help="re-extract only the animation poster stills from the "
         "already-rendered WebM files (no clip re-encoding)",
     )
     parser.add_argument(
-        "--anim", action="append", default=None, metavar="NAME",
+        "--anim",
+        action="append",
+        default=None,
+        metavar="NAME",
         help="with --animations, render only this clip (repeatable; use "
         "the output stem, e.g. --anim anim_schroeder)",
     )
     parser.add_argument(
-        "--all", dest="do_all", action="store_true",
+        "--all",
+        dest="do_all",
+        action="store_true",
         help="render both the figures and the animations",
     )
     parser.add_argument(
-        "--jobs", type=int, default=None, metavar="N",
+        "--jobs",
+        type=int,
+        default=None,
+        metavar="N",
         help="worker processes for the figures (default: cores minus two, "
         "capped at 8; 1 renders sequentially in-process)",
     )
     parser.add_argument(
-        "--figure", action="append", default=None, metavar="NAME",
+        "--figure",
+        action="append",
+        default=None,
+        metavar="NAME",
         help="render only this figure (repeatable; the generate_ prefix is "
         "optional, e.g. --figure loudness_models_comparison)",
     )
@@ -1753,11 +1764,15 @@ def main(argv: list[str] | None = None) -> None:
             for lang, dark in _VARIANTS:
                 set_lang(lang)
                 set_theme(dark)
-                print(f"--- Generating {lang} {'dark' if dark else 'light'} theme figures ---")
+                print(
+                    f"--- Generating {lang} {'dark' if dark else 'light'} theme figures ---"
+                )
                 for func in funcs:
                     func(img_dir)
         else:
-            print(f"--- Generating figures ({len(funcs)} x 4 variants, {jobs} jobs) ---")
+            print(
+                f"--- Generating figures ({len(funcs)} x 4 variants, {jobs} jobs) ---"
+            )
             _generate_figures_parallel(img_dir, funcs, jobs)
 
     if do_anim:
@@ -1769,14 +1784,17 @@ def main(argv: list[str] | None = None) -> None:
             generate_animations(img_dir, args.anim, variants=True)
         else:
             import shutil
+
             if shutil.which("ffmpeg") is None:
                 raise RuntimeError(
                     "ffmpeg was not found on PATH; it is required to encode "
                     "the animation WebM/GIF outputs. Install ffmpeg and retry."
                 )
             clips = list(_ANIMATIONS)
-            print(f"--- Generating animations ({len(clips)} clips "
-                  f"x 4 variants, {jobs} jobs) ---")
+            print(
+                f"--- Generating animations ({len(clips)} clips "
+                f"x 4 variants, {jobs} jobs) ---"
+            )
             _generate_animations_parallel(img_dir, clips, jobs)
 
     print("Graphics generated successfully.")

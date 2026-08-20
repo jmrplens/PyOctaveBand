@@ -60,8 +60,7 @@ if TYPE_CHECKING:
 #: verbatim English text. ``_t`` returns the English key unchanged for any
 #: language other than ``"es"``.
 _STRINGS: dict[str, str] = {
-    "Metadiffuser cross-section (one period)":
-        "Sección del metadifusor (un periodo)",
+    "Metadiffuser cross-section (one period)": "Sección del metadifusor (un periodo)",
     "Air": "Aire",
     "Porous": "Poroso",
     "Poroelastic": "Poroelástico",
@@ -71,13 +70,10 @@ _STRINGS: dict[str, str] = {
     "Rigid backing": "Respaldo rígido",
     "Layered absorber cross-section": "Sección del absorbente multicapa",
     "Helmholtz resonator cross-section": "Sección del resonador de Helmholtz",
-    "Slit metamaterial absorber cross-section (one period)":
-        "Sección del absorbente metamaterial de rendija (un periodo)",
+    "Slit metamaterial absorber cross-section (one period)": "Sección del absorbente metamaterial de rendija (un periodo)",
     "QRD well profile": "Perfil de pozos del difusor QRD",
-    "Impedance tube (ISO 10534-2), to scale":
-        "Tubo de impedancia (ISO 10534-2), a escala",
-    "Transmission tube (ASTM E2611), to scale":
-        "Tubo de transmisión (ASTM E2611), a escala",
+    "Impedance tube (ISO 10534-2), to scale": "Tubo de impedancia (ISO 10534-2), a escala",
+    "Transmission tube (ASTM E2611), to scale": "Tubo de transmisión (ASTM E2611), a escala",
     "Termination": "Terminación",
     "Cross-section": "Sección transversal",
     "Plane-wave range {fl} to {fu} Hz": "Rango de onda plana {fl} a {fu} Hz",
@@ -91,8 +87,7 @@ _STRINGS: dict[str, str] = {
     "Load plate {mass} kg": "Placa de carga de {mass} kg",
     "Specimen": "Probeta",
     "Exciter": "Excitador",
-    "Free-field diffusion goniometer (plan)":
-        "Goniómetro de difusión en campo libre (planta)",
+    "Free-field diffusion goniometer (plan)": "Goniómetro de difusión en campo libre (planta)",
     "Sample": "Muestra",
     "Source": "Fuente",
 }
@@ -157,7 +152,12 @@ def _draw_plate_holes(
     y0 = 0.5 * (height - (n - 1) * pitch)
     for i in range(n):
         _material_rect(
-            ax, x, y0 + i * pitch - radius, thickness, 2.0 * radius, "cavity",
+            ax,
+            x,
+            y0 + i * pitch - radius,
+            thickness,
+            2.0 * radius,
+            "cavity",
             edgecolor="none",
         )
 
@@ -208,7 +208,10 @@ def plot_absorber_stack(
         physical = float(getattr(layer, "thickness", 0.0))
         if physical > 0.0 and drawn >= thin:
             _dim(
-                ax, (x, 0.0), (x + drawn, 0.0), _mm(physical, language),
+                ax,
+                (x, 0.0),
+                (x + drawn, 0.0),
+                _mm(physical, language),
                 offset=-(0.10 * height + 0.14 * height * (index % 2)),
             )
         elif physical > 0.0:
@@ -219,15 +222,23 @@ def plot_absorber_stack(
         ax.text(centre, y_label, label, fontsize=8, ha="center", va="bottom")
         if drawn < thin:
             ax.plot(
-                [centre, centre], [height, y_label],
-                linestyle=":", linewidth=0.7, color=_C_EDGE, zorder=4,
+                [centre, centre],
+                [height, y_label],
+                linestyle=":",
+                linewidth=0.7,
+                color=_C_EDGE,
+                zorder=4,
             )
         x += drawn
     backing = 0.10 * total
     _material_rect(ax, x, -0.05 * height, backing, 1.1 * height, "rigid")
     ax.text(
-        x + 0.5 * backing, height * 1.11, _t("Rigid backing", language),
-        fontsize=8, ha="center", va="bottom",
+        x + 0.5 * backing,
+        height * 1.11,
+        _t("Rigid backing", language),
+        fontsize=8,
+        ha="center",
+        va="bottom",
     )
     _incidence_arrow(ax, -0.55 * total, 0.5 * height, 0.35 * total, language)
     _finish_geometry_axes(ax, _t("Layered absorber cross-section", language))
@@ -259,16 +270,31 @@ def _draw_resonator(
     body_w = w_c + 2.0 * wall
     body_d = l_n + l_c + wall
     _material_rect(
-        ax, x_mouth - 0.5 * body_w, y_mouth - body_d, body_w, body_d, "rigid",
+        ax,
+        x_mouth - 0.5 * body_w,
+        y_mouth - body_d,
+        body_w,
+        body_d,
+        "rigid",
         linewidth=0.7,
     )
     # Air volume: neck then cavity.
     _material_rect(
-        ax, x_mouth - 0.5 * w_n, y_mouth - l_n, w_n, l_n, "cavity",
+        ax,
+        x_mouth - 0.5 * w_n,
+        y_mouth - l_n,
+        w_n,
+        l_n,
+        "cavity",
         edgecolor=_C_EDGE,
     )
     _material_rect(
-        ax, x_mouth - 0.5 * w_c, y_mouth - l_n - l_c, w_c, l_c, "cavity",
+        ax,
+        x_mouth - 0.5 * w_c,
+        y_mouth - l_n - l_c,
+        w_c,
+        l_c,
+        "cavity",
         edgecolor=_C_EDGE,
     )
     return body_w, body_d
@@ -303,21 +329,31 @@ def plot_helmholtz_resonator_geometry(
     wall = 0.06 * max(w_c, l_n + l_c)
     _draw_resonator(ax, 0.0, 0.0, resonator, wall=wall)
     if kwargs:
-        _material_rect(
-            ax, -0.5 * w_c, -l_n - l_c, w_c, l_c, "cavity", **kwargs
-        )
+        _material_rect(ax, -0.5 * w_c, -l_n - l_c, w_c, l_c, "cavity", **kwargs)
     off = 0.12 * max(w_c, l_n + l_c)
-    _dim(ax, (-0.5 * w_n, 0.0), (0.5 * w_n, 0.0), _mm(w_n, language),
-         offset=2.0 * off)
-    _dim(ax, (0.5 * w_c + wall, 0.0), (0.5 * w_c + wall, -l_n),
-         _mm(l_n, language), offset=-2.0 * off)
-    _dim(ax, (0.5 * w_c + wall, -l_n), (0.5 * w_c + wall, -l_n - l_c),
-         _mm(l_c, language), offset=-off)
-    _dim(ax, (-0.5 * w_c, -l_n - l_c - wall), (0.5 * w_c, -l_n - l_c - wall),
-         _mm(w_c, language), offset=-off)
-    _finish_geometry_axes(
-        ax, _t("Helmholtz resonator cross-section", language)
+    _dim(ax, (-0.5 * w_n, 0.0), (0.5 * w_n, 0.0), _mm(w_n, language), offset=2.0 * off)
+    _dim(
+        ax,
+        (0.5 * w_c + wall, 0.0),
+        (0.5 * w_c + wall, -l_n),
+        _mm(l_n, language),
+        offset=-2.0 * off,
     )
+    _dim(
+        ax,
+        (0.5 * w_c + wall, -l_n),
+        (0.5 * w_c + wall, -l_n - l_c),
+        _mm(l_c, language),
+        offset=-off,
+    )
+    _dim(
+        ax,
+        (-0.5 * w_c, -l_n - l_c - wall),
+        (0.5 * w_c, -l_n - l_c - wall),
+        _mm(w_c, language),
+        offset=-off,
+    )
+    _finish_geometry_axes(ax, _t("Helmholtz resonator cross-section", language))
     return ax
 
 
@@ -351,14 +387,8 @@ def plot_slit_absorber_geometry(
     """
     _check_language(language)
     if slit_height <= 0.0 or lattice_step <= 0.0 or period <= 0.0:
-        raise ValueError(
-            "'slit_height', 'lattice_step' and 'period' must be positive."
-        )
-    chain = (
-        list(resonators)
-        if isinstance(resonators, Sequence)
-        else [resonators]
-    )
+        raise ValueError("'slit_height', 'lattice_step' and 'period' must be positive.")
+    chain = list(resonators) if isinstance(resonators, Sequence) else [resonators]
     if not chain:
         raise ValueError("'resonators' must contain at least one resonator.")
     if ax is None:
@@ -376,12 +406,20 @@ def plot_slit_absorber_geometry(
     # dotted leader instead of squeezing text inside it.
     x_label = 0.3 * depth
     ax.text(
-        x_label, d + 0.10 * d, _t("Slit", language), fontsize=8,
-        ha="center", va="bottom",
+        x_label,
+        d + 0.10 * d,
+        _t("Slit", language),
+        fontsize=8,
+        ha="center",
+        va="bottom",
     )
     ax.plot(
-        [x_label, x_label], [y_slit + h, d + 0.10 * d],
-        linestyle=":", linewidth=0.7, color=_C_EDGE, zorder=4,
+        [x_label, x_label],
+        [y_slit + h, d + 0.10 * d],
+        linestyle=":",
+        linewidth=0.7,
+        color=_C_EDGE,
+        zorder=4,
     )
     for index, resonator in enumerate(chain):
         x_mouth = (index + 0.5) * lattice_step
@@ -389,18 +427,25 @@ def plot_slit_absorber_geometry(
     # Rigid back wall.
     back = 0.08 * depth
     _material_rect(ax, depth, -0.05 * d, back, 1.1 * d, "rigid")
-    _incidence_arrow(
-        ax, -0.75 * depth, y_slit + 0.5 * h, 0.45 * depth, language
-    )
+    _incidence_arrow(ax, -0.75 * depth, y_slit + 0.5 * h, 0.45 * depth, language)
     off = 0.08 * d
     _dim(ax, (0.0, d), (depth, d), _mm(depth, language), offset=2.0 * off)
-    _dim(ax, (0.72 * depth, y_slit), (0.72 * depth, y_slit + h),
-         _mm(h, language), tight=True)
-    _dim(ax, (depth + back, 0.0), (depth + back, d), _mm(d, language),
-         offset=-off)
+    _dim(
+        ax,
+        (0.72 * depth, y_slit),
+        (0.72 * depth, y_slit + h),
+        _mm(h, language),
+        tight=True,
+    )
+    _dim(ax, (depth + back, 0.0), (depth + back, d), _mm(d, language), offset=-off)
     if n > 1:
-        _dim(ax, (0.0, 0.0), (lattice_step, 0.0), _mm(lattice_step, language),
-             offset=-off)
+        _dim(
+            ax,
+            (0.0, 0.0),
+            (lattice_step, 0.0),
+            _mm(lattice_step, language),
+            offset=-off,
+        )
     _finish_geometry_axes(
         ax,
         _t("Slit metamaterial absorber cross-section (one period)", language),
@@ -459,43 +504,55 @@ def plot_qrd_geometry(
     pitch = well_width + fin
     total_width = periods * n * pitch + fin
     # Base slab behind the deepest well.
-    _material_rect(
-        ax, 0.0, -d_max - base, total_width, base, "rigid", **kwargs
-    )
+    _material_rect(ax, 0.0, -d_max - base, total_width, base, "rigid", **kwargs)
     # Fins and well bottoms: the solid between the carved wells.
     x = 0.0
     for _period in range(periods):
         for depth in d:
-            _material_rect(ax, x, -d_max, fin, d_max, "plate",
-                           linewidth=0.6)
+            _material_rect(ax, x, -d_max, fin, d_max, "plate", linewidth=0.6)
             x += fin
             if d_max - depth > 0.0:
                 _material_rect(
-                    ax, x, -d_max, well_width, d_max - float(depth), "plate",
+                    ax,
+                    x,
+                    -d_max,
+                    well_width,
+                    d_max - float(depth),
+                    "plate",
                     linewidth=0.6,
                 )
             x += well_width
     _material_rect(ax, x, -d_max, fin, d_max, "plate", linewidth=0.6)
     _incidence_arrow(
-        ax, 0.5 * total_width, 1.1 * d_max, 0.55 * d_max, language,
+        ax,
+        0.5 * total_width,
+        1.1 * d_max,
+        0.55 * d_max,
+        language,
         downward=True,
     )
     off = 0.12 * d_max
-    _dim(ax, (fin, 0.0), (fin + well_width, 0.0), _mm(well_width, language),
-         offset=1.5 * off)
-    _dim(ax, (0.0, 0.0), (0.0, -d_max), _mm(d_max, language),
-         offset=-3.0 * off)
+    _dim(
+        ax,
+        (fin, 0.0),
+        (fin + well_width, 0.0),
+        _mm(well_width, language),
+        offset=1.5 * off,
+    )
+    _dim(ax, (0.0, 0.0), (0.0, -d_max), _mm(d_max, language), offset=-3.0 * off)
     from ..._i18n import format_number
 
     seq = ", ".join(
-        format_number(float(v * 1e3), language, decimals=1, trim=True)
-        for v in d
+        format_number(float(v * 1e3), language, decimals=1, trim=True) for v in d
     )
     ax.text(
-        0.5 * total_width, -d_max - 1.6 * base,
-        _t("depth sequence {seq}", language).format(seq=seq) + " "
-        + _t("mm", language),
-        fontsize=8, ha="center", va="top", color=_C_EDGE,
+        0.5 * total_width,
+        -d_max - 1.6 * base,
+        _t("depth sequence {seq}", language).format(seq=seq) + " " + _t("mm", language),
+        fontsize=8,
+        ha="center",
+        va="top",
+        color=_C_EDGE,
     )
     _finish_geometry_axes(ax, _t("QRD well profile", language))
     return ax
@@ -525,12 +582,15 @@ def _tube_frequency_note(
 
     fl, fu = f_range
     ax.text(
-        x, y,
+        x,
+        y,
         _t("Plane-wave range {fl} to {fu} Hz", language).format(
             fl=format_number(fl, language, decimals=0, trim=True),
             fu=format_number(fu, language, decimals=0, trim=True),
         ),
-        fontsize=8, ha="center", va="top",
+        fontsize=8,
+        ha="center",
+        va="top",
     )
 
 
@@ -557,36 +617,50 @@ def _tube_bore(
     kwargs.setdefault("facecolor", "none")
     kwargs.setdefault("edgecolor", _C_EDGE)
     kwargs.setdefault("linewidth", 1.6)
-    primary = Rectangle(
-        (x_left, 0.0), x_right - x_left, bore, **kwargs
-    )
+    primary = Rectangle((x_left, 0.0), x_right - x_left, bore, **kwargs)
     ax.add_patch(primary)
     for y_wall in (-wall, bore):
         ax.add_patch(
-            Rectangle((x_left, y_wall), x_right - x_left, wall,
-                      facecolor=_C_MUTED, edgecolor=_C_EDGE, linewidth=0.6,
-                      alpha=0.5)
+            Rectangle(
+                (x_left, y_wall),
+                x_right - x_left,
+                wall,
+                facecolor=_C_MUTED,
+                edgecolor=_C_EDGE,
+                linewidth=0.6,
+                alpha=0.5,
+            )
         )
     # Cross-section emblem, same scale, centred on the bore axis.
     cx = x_left - 2.4 * bore
     cy = 0.5 * bore
     if shape == "circular":
         ax.add_patch(
-            Circle((cx, cy), 0.5 * bore, facecolor="none",
-                   edgecolor=_C_EDGE, linewidth=1.2)
+            Circle(
+                (cx, cy), 0.5 * bore, facecolor="none", edgecolor=_C_EDGE, linewidth=1.2
+            )
         )
     else:
         ax.add_patch(
-            Rectangle((cx - 0.5 * bore, cy - 0.5 * bore), bore, bore,
-                      facecolor="none", edgecolor=_C_EDGE, linewidth=1.2)
+            Rectangle(
+                (cx - 0.5 * bore, cy - 0.5 * bore),
+                bore,
+                bore,
+                facecolor="none",
+                edgecolor=_C_EDGE,
+                linewidth=1.2,
+            )
         )
     ax.text(
-        cx, cy - 0.72 * bore, _t("Cross-section", language), fontsize=8,
-        ha="center", va="top",
+        cx,
+        cy - 0.72 * bore,
+        _t("Cross-section", language),
+        fontsize=8,
+        ha="center",
+        va="top",
     )
     if diameter_known:
-        _dim(ax, (cx - 0.5 * bore, cy), (cx + 0.5 * bore, cy),
-             _mm(bore, language))
+        _dim(ax, (cx - 0.5 * bore, cy), (cx + 0.5 * bore, cy), _mm(bore, language))
     return primary
 
 
@@ -644,42 +718,63 @@ def plot_impedance_tube_geometry(
     bore = _nominal_bore(diameter, 1.5 * spacing)
     thickness = (
         _NOMINAL_SAMPLE_THICKNESS
-        if sample_thickness is None else float(sample_thickness)
+        if sample_thickness is None
+        else float(sample_thickness)
     )
     lead_in = _SOURCE_MARGIN_DIAMETERS * bore
     x_left = -(x1 + lead_in)
     x_right = thickness + 0.35 * bore
     emblem = "circular" if shape in (None, "circular") else "rectangular"
     _tube_bore(
-        ax, x_left, x_right, bore, language, shape=emblem,
-        diameter_known=diameter is not None, **kwargs,
+        ax,
+        x_left,
+        x_right,
+        bore,
+        language,
+        shape=emblem,
+        diameter_known=diameter is not None,
+        **kwargs,
     )
     # Sample against the rigid backing plug: front face at x = 0.
     _material_rect(ax, 0.0, 0.0, thickness, bore, "porous")
     _material_rect(ax, thickness, 0.0, x_right - thickness, bore, "rigid")
-    ax.text(0.5 * thickness, -0.16 * bore, _t("Sample", language),
-            fontsize=8, ha="center", va="top")
+    ax.text(
+        0.5 * thickness,
+        -0.16 * bore,
+        _t("Sample", language),
+        fontsize=8,
+        ha="center",
+        va="top",
+    )
     _loudspeaker(ax, x_left + 0.1 * bore, 0.5 * bore, bore, language)
     wall = max(0.06 * bore, 0.004)
     _microphone(ax, -x1, bore + wall, 0.5 * bore, "1")
     _microphone(ax, -(x1 - spacing), bore + wall, 0.5 * bore, "2")
     off = 0.3 * bore
     y_dim = -0.5 * bore
-    _dim(ax, (-x1, y_dim), (-(x1 - spacing), y_dim),
-         "s = " + _mm(spacing, language),
-         tight=spacing < 0.12 * (x_right - x_left))
-    _dim(ax, (-x1, y_dim - 2.0 * off), (0.0, y_dim - 2.0 * off),
-         "x1 = " + _mm(x1, language))
+    _dim(
+        ax,
+        (-x1, y_dim),
+        (-(x1 - spacing), y_dim),
+        "s = " + _mm(spacing, language),
+        tight=spacing < 0.12 * (x_right - x_left),
+    )
+    _dim(
+        ax,
+        (-x1, y_dim - 2.0 * off),
+        (0.0, y_dim - 2.0 * off),
+        "x1 = " + _mm(x1, language),
+    )
     f_range = plane_wave_frequency_range(
-        spacing, speed_of_sound, diameter=diameter,
+        spacing,
+        speed_of_sound,
+        diameter=diameter,
         shape=shape if shape is not None else "circular",
     )
     _tube_frequency_note(
         ax, 0.5 * (x_left + x_right), y_dim - 3.6 * off, f_range, language
     )
-    _finish_geometry_axes(
-        ax, _t("Impedance tube (ISO 10534-2), to scale", language)
-    )
+    _finish_geometry_axes(ax, _t("Impedance tube (ISO 10534-2), to scale", language))
     return ax
 
 
@@ -727,15 +822,12 @@ def plot_transmission_tube_geometry(
 
     _check_language(language)
     if min(l1, s1, l2, s2, thickness) <= 0.0:
-        raise ValueError(
-            "'l1', 's1', 'l2', 's2' and 'thickness' must be positive."
-        )
+        raise ValueError("'l1', 's1', 'l2', 's2' and 'thickness' must be positive.")
     if diameter is not None and diameter <= 0.0:
         raise ValueError("'diameter' must be positive when given.")
     if l2 <= thickness:
         raise ValueError(
-            "'l2' is measured from the front face and must exceed "
-            "'thickness'."
+            "'l2' is measured from the front face and must exceed 'thickness'."
         )
     if ax is None:
         ax = _new_axes()
@@ -746,45 +838,83 @@ def plot_transmission_tube_geometry(
     x_right = x_term + 0.6 * bore
     emblem = "circular" if shape in (None, "circular") else "rectangular"
     _tube_bore(
-        ax, x_left, x_right, bore, language, shape=emblem,
-        diameter_known=diameter is not None, **kwargs,
+        ax,
+        x_left,
+        x_right,
+        bore,
+        language,
+        shape=emblem,
+        diameter_known=diameter is not None,
+        **kwargs,
     )
     _material_rect(ax, 0.0, 0.0, thickness, bore, "porous")
-    ax.text(0.5 * thickness, bore + 0.22 * bore, _t("Sample", language),
-            fontsize=8, ha="center", va="bottom")
+    ax.text(
+        0.5 * thickness,
+        bore + 0.22 * bore,
+        _t("Sample", language),
+        fontsize=8,
+        ha="center",
+        va="bottom",
+    )
     _loudspeaker(ax, x_left + 0.1 * bore, 0.5 * bore, bore, language)
     # Changeable termination of the two-load method.
-    _material_rect(ax, x_term, -0.1 * bore, x_right - x_term, 1.2 * bore,
-                   "plate")
-    ax.text(0.5 * (x_term + x_right), -0.28 * bore,
-            _t("Termination", language), fontsize=8, ha="center", va="top")
+    _material_rect(ax, x_term, -0.1 * bore, x_right - x_term, 1.2 * bore, "plate")
+    ax.text(
+        0.5 * (x_term + x_right),
+        -0.28 * bore,
+        _t("Termination", language),
+        fontsize=8,
+        ha="center",
+        va="top",
+    )
     wall = max(0.06 * bore, 0.004)
     positions = (
-        (-(l1 + s1), "1"), (-l1, "2"), (l2, "3"), (l2 + s2, "4"),
+        (-(l1 + s1), "1"),
+        (-l1, "2"),
+        (l2, "3"),
+        (l2 + s2, "4"),
     )
     for x_mic, label in positions:
         _microphone(ax, x_mic, bore + wall, 0.5 * bore, label)
     y_dim = -0.62 * bore
     off = 0.3 * bore
     width = x_right - x_left
-    _dim(ax, (-(l1 + s1), y_dim), (-l1, y_dim),
-         "s1 = " + _mm(s1, language), tight=s1 < 0.12 * width)
-    _dim(ax, (l2, y_dim), (l2 + s2, y_dim), "s2 = " + _mm(s2, language),
-         tight=s2 < 0.12 * width)
-    _dim(ax, (-l1, y_dim - 2.0 * off), (0.0, y_dim - 2.0 * off),
-         "l1 = " + _mm(l1, language))
-    _dim(ax, (0.0, y_dim - 4.0 * off), (l2, y_dim - 4.0 * off),
-         "l2 = " + _mm(l2, language))
+    _dim(
+        ax,
+        (-(l1 + s1), y_dim),
+        (-l1, y_dim),
+        "s1 = " + _mm(s1, language),
+        tight=s1 < 0.12 * width,
+    )
+    _dim(
+        ax,
+        (l2, y_dim),
+        (l2 + s2, y_dim),
+        "s2 = " + _mm(s2, language),
+        tight=s2 < 0.12 * width,
+    )
+    _dim(
+        ax,
+        (-l1, y_dim - 2.0 * off),
+        (0.0, y_dim - 2.0 * off),
+        "l1 = " + _mm(l1, language),
+    )
+    _dim(
+        ax,
+        (0.0, y_dim - 4.0 * off),
+        (l2, y_dim - 4.0 * off),
+        "l2 = " + _mm(l2, language),
+    )
     f_range = plane_wave_frequency_range_astm(
-        max(s1, s2), speed_of_sound, diameter=diameter,
+        max(s1, s2),
+        speed_of_sound,
+        diameter=diameter,
         shape=shape if shape is not None else "circular",
     )
     _tube_frequency_note(
         ax, 0.5 * (x_left + x_right), y_dim - 5.6 * off, f_range, language
     )
-    _finish_geometry_axes(
-        ax, _t("Transmission tube (ASTM E2611), to scale", language)
-    )
+    _finish_geometry_axes(ax, _t("Transmission tube (ASTM E2611), to scale", language))
     return ax
 
 
@@ -804,9 +934,7 @@ def plot_layered_absorber_geometry(
             "This result does not retain its layers; call "
             "plot_absorber_stack(layers) with the original layer sequence."
         )
-    return plot_absorber_stack(
-        result.layers, ax=ax, language=language, **kwargs
-    )
+    return plot_absorber_stack(result.layers, ax=ax, language=language, **kwargs)
 
 
 def plot_slit_absorber_result_geometry(
@@ -828,14 +956,19 @@ def plot_slit_absorber_result_geometry(
             "plot_slit_absorber_geometry(...) with the original arguments."
         )
     return plot_slit_absorber_geometry(
-        result.resonators, ax=ax, slit_height=result.slit_height,
-        lattice_step=result.lattice_step, period=result.period,
-        language=language, **kwargs,
+        result.resonators,
+        ax=ax,
+        slit_height=result.slit_height,
+        lattice_step=result.lattice_step,
+        period=result.period,
+        language=language,
+        **kwargs,
     )
 
 
-def _draw_metadiffuser_well(ax: Axes, well: Any, x_slit: float,
-                            depth: float, kwargs: dict[str, Any]) -> None:
+def _draw_metadiffuser_well(
+    ax: Axes, well: Any, x_slit: float, depth: float, kwargs: dict[str, Any]
+) -> None:
     """One slit with its sideways resonator shelves, panel coordinates."""
     h = float(well.slit_height)
     _material_rect(ax, x_slit, 0.0, h, depth, "cavity", **kwargs)
@@ -849,12 +982,24 @@ def _draw_metadiffuser_well(ax: Axes, well: Any, x_slit: float,
         y_m = depth - (m + 0.5) * step
         x_neck = x_slit + h
         _material_rect(
-            ax, x_neck, y_m - 0.5 * w_n, l_n, w_n, "cavity",
-            edgecolor=_C_EDGE, linewidth=0.5,
+            ax,
+            x_neck,
+            y_m - 0.5 * w_n,
+            l_n,
+            w_n,
+            "cavity",
+            edgecolor=_C_EDGE,
+            linewidth=0.5,
         )
         _material_rect(
-            ax, x_neck + l_n, y_m - 0.5 * w_c, l_c, w_c, "cavity",
-            edgecolor=_C_EDGE, linewidth=0.5,
+            ax,
+            x_neck + l_n,
+            y_m - 0.5 * w_c,
+            l_c,
+            w_c,
+            "cavity",
+            edgecolor=_C_EDGE,
+            linewidth=0.5,
         )
 
 
@@ -895,9 +1040,7 @@ def plot_metadiffuser_panel_geometry(
         raise ValueError("'wells' must contain at least two wells.")
     for well in cells:
         if well is not None and well.slit_height >= period:
-            raise ValueError(
-                "every slit height must be smaller than the period."
-            )
+            raise ValueError("every slit height must be smaller than the period.")
     if ax is None:
         ax = _new_axes()
     n_wells = len(cells)
@@ -908,46 +1051,76 @@ def plot_metadiffuser_panel_geometry(
     # the left, with the resonator necks and cavities branching sideways
     # into the solid septum between slits.
     _material_rect(
-        ax, 0.0, 0.0, total, depth, "plate", linewidth=0.7, alpha=0.45,
+        ax,
+        0.0,
+        0.0,
+        total,
+        depth,
+        "plate",
+        linewidth=0.7,
+        alpha=0.45,
     )
     back = 0.4 * depth
     _material_rect(ax, -0.01 * total, -back, 1.02 * total, back, "rigid")
     kwargs.setdefault("linewidth", 0.5)
     for index, well in enumerate(cells):
         if well is not None:
-            _draw_metadiffuser_well(ax, well, index * d + 0.12 * d, depth,
-                                    kwargs)
+            _draw_metadiffuser_well(ax, well, index * d + 0.12 * d, depth, kwargs)
     for index, well in enumerate(cells):
         if well is None:
             continue
         x_mark = index * d + 0.12 * d + 0.5 * float(well.slit_height)
         ax.text(
-            x_mark, depth - 0.012 * total, str(index + 1),
-            fontsize=6, ha="center", va="top", color=_C_EDGE,
+            x_mark,
+            depth - 0.012 * total,
+            str(index + 1),
+            fontsize=6,
+            ha="center",
+            va="top",
+            color=_C_EDGE,
         )
     _incidence_arrow(
-        ax, 1.5 * d, depth + 0.5 * total * 0.16, 0.4 * total * 0.16,
-        language, downward=True,
+        ax,
+        1.5 * d,
+        depth + 0.5 * total * 0.16,
+        0.4 * total * 0.16,
+        language,
+        downward=True,
     )
     off = 0.045 * total
-    _dim(ax, (0.0, -back), (total, -back), _mm(total, language),
-         offset=-off)
-    _dim(ax, (total, 0.0), (total, depth), _mm(depth, language),
-         offset=-1.3 * off, tight=True)
-    _dim(ax, ((n_wells - 1) * d, depth), (total, depth),
-         _mm(d, language), offset=0.6 * off)
+    _dim(ax, (0.0, -back), (total, -back), _mm(total, language), offset=-off)
+    _dim(
+        ax,
+        (total, 0.0),
+        (total, depth),
+        _mm(depth, language),
+        offset=-1.3 * off,
+        tight=True,
+    )
+    _dim(
+        ax,
+        ((n_wells - 1) * d, depth),
+        (total, depth),
+        _mm(d, language),
+        offset=0.6 * off,
+    )
     first = next(
-        (well for well in cells if well is not None), None,
+        (well for well in cells if well is not None),
+        None,
     )
     if first is not None:
         index = cells.index(first)
         x_slit = index * d + 0.12 * d
         h = float(first.slit_height)
-        _dim(ax, (x_slit, depth), (x_slit + h, depth), _mm(h, language),
-             offset=0.6 * off, tight=True)
-    _finish_geometry_axes(
-        ax, _t("Metadiffuser cross-section (one period)", language)
-    )
+        _dim(
+            ax,
+            (x_slit, depth),
+            (x_slit + h, depth),
+            _mm(h, language),
+            offset=0.6 * off,
+            tight=True,
+        )
+    _finish_geometry_axes(ax, _t("Metadiffuser cross-section (one period)", language))
     return ax
 
 
@@ -966,8 +1139,12 @@ def plot_metadiffuser_geometry(
             "arguments."
         )
     return plot_metadiffuser_panel_geometry(
-        result.wells, ax=ax, depth=result.depth, period=result.period,
-        language=language, **kwargs,
+        result.wells,
+        ax=ax,
+        depth=result.depth,
+        period=result.period,
+        language=language,
+        **kwargs,
     )
 
 
@@ -985,9 +1162,12 @@ def plot_diffuser_geometry(
             "plot_qrd_geometry(depths, well_width) instead."
         )
     return plot_qrd_geometry(
-        result.depths, result.well_width, ax=ax,
+        result.depths,
+        result.well_width,
+        ax=ax,
         periods=result.periods if result.periods is not None else 1,
-        language=language, **kwargs,
+        language=language,
+        **kwargs,
     )
 
 
@@ -1005,8 +1185,12 @@ def plot_impedance_tube_result_geometry(
             "plot_impedance_tube_geometry(...) with the original arguments."
         )
     return plot_impedance_tube_geometry(
-        ax=ax, spacing=result.spacing, x1=result.x1,
-        diameter=result.diameter, shape=result.shape, language=language,
+        ax=ax,
+        spacing=result.spacing,
+        x1=result.x1,
+        diameter=result.diameter,
+        shape=result.shape,
+        language=language,
         **kwargs,
     )
 
@@ -1020,8 +1204,11 @@ def plot_transfer_matrix_geometry(
 ) -> Axes:
     """Tube drawing for an ASTM E2611 matrix that retained its context."""
     if (
-        result.l1 is None or result.s1 is None or result.l2 is None
-        or result.s2 is None or result.thickness is None
+        result.l1 is None
+        or result.s1 is None
+        or result.l2 is None
+        or result.s2 is None
+        or result.thickness is None
     ):
         raise ValueError(
             "This matrix does not retain its tube geometry; call "
@@ -1029,9 +1216,16 @@ def plot_transfer_matrix_geometry(
             "arguments."
         )
     return plot_transmission_tube_geometry(
-        ax=ax, l1=result.l1, s1=result.s1, l2=result.l2, s2=result.s2,
-        thickness=result.thickness, diameter=result.diameter,
-        shape=result.shape, language=language, **kwargs,
+        ax=ax,
+        l1=result.l1,
+        s1=result.s1,
+        l2=result.l2,
+        s2=result.s2,
+        thickness=result.thickness,
+        diameter=result.diameter,
+        shape=result.shape,
+        language=language,
+        **kwargs,
     )
 
 
@@ -1074,43 +1268,69 @@ def plot_insitu_geometry(
         ax = _new_axes()
     half = max(source_height, sampled_radius or 0.0) * 1.2
     _material_rect(
-        ax, -half, -0.06 * source_height, 2.0 * half, 0.06 * source_height,
-        "rigid", **kwargs,
+        ax,
+        -half,
+        -0.06 * source_height,
+        2.0 * half,
+        0.06 * source_height,
+        "rigid",
+        **kwargs,
     )
     ax.text(
-        half * 1.02, -0.03 * source_height, _t("Road surface", language),
-        fontsize=8, ha="left", va="center",
+        half * 1.02,
+        -0.03 * source_height,
+        _t("Road surface", language),
+        fontsize=8,
+        ha="left",
+        va="center",
     )
     # Mast, source and microphone on the same vertical.
-    ax.plot([0.0, 0.0], [0.0, source_height], color=_C_MUTED,
-            linewidth=1.0, linestyle=":")
-    _loudspeaker(
-        ax, 0.0, source_height, 0.28 * source_height, language
+    ax.plot(
+        [0.0, 0.0], [0.0, source_height], color=_C_MUTED, linewidth=1.0, linestyle=":"
     )
+    _loudspeaker(ax, 0.0, source_height, 0.28 * source_height, language)
     _microphone(ax, 0.0, mic_height, 0.22 * source_height, "")
     # Direct and reflected paths to the microphone.
-    ax.plot([0.0, 0.0], [source_height, mic_height], color=_C_PRIMARY,
-            linewidth=1.6)
-    ax.plot([0.0, 0.0], [mic_height, 0.0], color=_C_SECONDARY,
-            linewidth=1.4, linestyle="--")
+    ax.plot([0.0, 0.0], [source_height, mic_height], color=_C_PRIMARY, linewidth=1.6)
+    ax.plot(
+        [0.0, 0.0], [mic_height, 0.0], color=_C_SECONDARY, linewidth=1.4, linestyle="--"
+    )
     if sampled_radius is not None:
         ax.plot(
             [-sampled_radius, sampled_radius],
             [0.012 * source_height] * 2,
-            color=_C_PRIMARY, linewidth=3.0, solid_capstyle="butt",
+            color=_C_PRIMARY,
+            linewidth=3.0,
+            solid_capstyle="butt",
         )
-        _dim(ax, (0.0, -0.12 * source_height),
-             (sampled_radius, -0.12 * source_height),
-             _metres(sampled_radius, language))
+        _dim(
+            ax,
+            (0.0, -0.12 * source_height),
+            (sampled_radius, -0.12 * source_height),
+            _metres(sampled_radius, language),
+        )
         ax.text(
-            -0.5 * sampled_radius, -0.14 * source_height,
-            _t("Sampled area", language), fontsize=8, ha="center", va="top",
+            -0.5 * sampled_radius,
+            -0.14 * source_height,
+            _t("Sampled area", language),
+            fontsize=8,
+            ha="center",
+            va="top",
         )
     off = 0.12 * source_height
-    _dim(ax, (-2.0 * off, 0.0), (-2.0 * off, mic_height),
-         _metres(mic_height, language), tight=True)
-    _dim(ax, (-4.0 * off, 0.0), (-4.0 * off, source_height),
-         _metres(source_height, language))
+    _dim(
+        ax,
+        (-2.0 * off, 0.0),
+        (-2.0 * off, mic_height),
+        _metres(mic_height, language),
+        tight=True,
+    )
+    _dim(
+        ax,
+        (-4.0 * off, 0.0),
+        (-4.0 * off, source_height),
+        _metres(source_height, language),
+    )
     _finish_geometry_axes(ax, _t("In-situ absorption set-up", language))
     return ax
 
@@ -1129,8 +1349,11 @@ def plot_insitu_result_geometry(
             "plot_insitu_geometry(source_height=..., mic_height=...)."
         )
     return plot_insitu_geometry(
-        ax=ax, source_height=result.source_height,
-        mic_height=result.mic_height, language=language, **kwargs,
+        ax=ax,
+        source_height=result.source_height,
+        mic_height=result.mic_height,
+        language=language,
+        **kwargs,
     )
 
 
@@ -1164,8 +1387,7 @@ def plot_dynamic_stiffness_rig(
     _check_language(language)
     if specimen_side <= 0.0 or specimen_thickness <= 0.0 or load_mass <= 0.0:
         raise ValueError(
-            "'specimen_side', 'specimen_thickness' and 'load_mass' must be "
-            "positive."
+            "'specimen_side', 'specimen_thickness' and 'load_mass' must be positive."
         )
     if ax is None:
         ax = _new_axes()
@@ -1175,34 +1397,48 @@ def plot_dynamic_stiffness_rig(
     from ..._i18n import format_number
 
     # Rigid base, specimen, load plate.
-    _material_rect(ax, -0.75 * side, -0.15 * side, 1.5 * side, 0.15 * side,
-                   "rigid")
+    _material_rect(ax, -0.75 * side, -0.15 * side, 1.5 * side, 0.15 * side, "rigid")
     _material_rect(ax, -0.5 * side, 0.0, side, t, "porous", **kwargs)
-    ax.text(0.55 * side, 0.5 * t, _t("Specimen", language), fontsize=8,
-            ha="left", va="center")
+    ax.text(
+        0.55 * side,
+        0.5 * t,
+        _t("Specimen", language),
+        fontsize=8,
+        ha="left",
+        va="center",
+    )
     _material_rect(ax, -0.5 * side, t, side, plate_t, "plate")
     ax.text(
-        0.0, t + 0.5 * plate_t,
+        0.0,
+        t + 0.5 * plate_t,
         _t("Load plate {mass} kg", language).format(
             mass=format_number(load_mass, language, decimals=0, trim=True)
         ),
-        fontsize=8, ha="center", va="center",
+        fontsize=8,
+        ha="center",
+        va="center",
     )
     # Exciter above, accelerometer on the plate.
-    _material_rect(ax, -0.1 * side, t + plate_t + 0.25 * side, 0.2 * side,
-                   0.25 * side, "plate")
-    ax.annotate(
-        "", xy=(0.0, t + plate_t), xytext=(0.0, t + plate_t + 0.25 * side),
-        arrowprops={"arrowstyle": "-|>", "color": _C_REFERENCE,
-                    "linewidth": 1.6},
+    _material_rect(
+        ax, -0.1 * side, t + plate_t + 0.25 * side, 0.2 * side, 0.25 * side, "plate"
     )
-    ax.text(0.14 * side, t + plate_t + 0.32 * side, _t("Exciter", language),
-            fontsize=8, ha="left", va="center")
+    ax.annotate(
+        "",
+        xy=(0.0, t + plate_t),
+        xytext=(0.0, t + plate_t + 0.25 * side),
+        arrowprops={"arrowstyle": "-|>", "color": _C_REFERENCE, "linewidth": 1.6},
+    )
+    ax.text(
+        0.14 * side,
+        t + plate_t + 0.32 * side,
+        _t("Exciter", language),
+        fontsize=8,
+        ha="left",
+        va="center",
+    )
     _microphone(ax, 0.35 * side, t + plate_t, 0.18 * side, "")
-    _dim(ax, (-0.5 * side, -0.2 * side), (0.5 * side, -0.2 * side),
-         _mm(side, language))
-    _dim(ax, (-0.62 * side, 0.0), (-0.62 * side, t), _mm(t, language),
-         tight=True)
+    _dim(ax, (-0.5 * side, -0.2 * side), (0.5 * side, -0.2 * side), _mm(side, language))
+    _dim(ax, (-0.62 * side, 0.0), (-0.62 * side, t), _mm(t, language), tight=True)
     _finish_geometry_axes(ax, _t("Dynamic stiffness rig", language))
     return ax
 
@@ -1238,17 +1474,14 @@ def plot_goniometer_geometry(
     """
     _check_language(language)
     if source_distance <= 0.0 or receiver_radius <= 0.0:
-        raise ValueError(
-            "'source_distance' and 'receiver_radius' must be positive."
-        )
+        raise ValueError("'source_distance' and 'receiver_radius' must be positive.")
     if not 0.0 < angular_step <= 90.0:
         raise ValueError("'angular_step' must be in (0, 90] degrees.")
     if sample_width <= 0.0:
         raise ValueError("'sample_width' must be positive.")
     if ax is None:
         ax = _new_axes()
-    angles = np.radians(np.arange(-90.0, 90.0 + 0.5 * angular_step,
-                                  angular_step))
+    angles = np.radians(np.arange(-90.0, 90.0 + 0.5 * angular_step, angular_step))
     xs = receiver_radius * np.sin(angles)
     ys = receiver_radius * np.cos(angles)
     kwargs.setdefault("color", _C_PRIMARY)
@@ -1257,25 +1490,61 @@ def plot_goniometer_geometry(
     ax.plot(xs, ys, color=_C_MUTED, linewidth=0.6, linestyle=":", zorder=2)
     # Sample slab at the origin on the baseline.
     _material_rect(
-        ax, -0.5 * sample_width, -0.03 * receiver_radius, sample_width,
-        0.03 * receiver_radius, "porous",
+        ax,
+        -0.5 * sample_width,
+        -0.03 * receiver_radius,
+        sample_width,
+        0.03 * receiver_radius,
+        "porous",
     )
-    ax.text(-0.6 * sample_width, -0.015 * receiver_radius,
-            _t("Sample", language), fontsize=8, ha="right", va="center")
-    ax.plot([0.0], [source_distance], marker="*", markersize=13,
-            color=_C_REFERENCE, linestyle="none", zorder=6)
-    ax.text(0.0, 1.03 * source_distance, _t("Source", language), fontsize=8,
-            ha="center", va="bottom")
-    ax.plot([0.0, 0.0], [0.0, source_distance], color=_C_MUTED,
-            linewidth=0.8, linestyle="--", zorder=2)
-    _dim(ax, (0.0, 0.0), (receiver_radius, 0.0),
-         _metres(receiver_radius, language), offset=-0.06 * receiver_radius)
     ax.text(
-        0.02 * source_distance, 0.5 * (receiver_radius + source_distance),
-        _metres(source_distance, language), fontsize=8, ha="left",
-        va="center", rotation=90,
+        -0.6 * sample_width,
+        -0.015 * receiver_radius,
+        _t("Sample", language),
+        fontsize=8,
+        ha="right",
+        va="center",
     )
-    _finish_geometry_axes(
-        ax, _t("Free-field diffusion goniometer (plan)", language)
+    ax.plot(
+        [0.0],
+        [source_distance],
+        marker="*",
+        markersize=13,
+        color=_C_REFERENCE,
+        linestyle="none",
+        zorder=6,
     )
+    ax.text(
+        0.0,
+        1.03 * source_distance,
+        _t("Source", language),
+        fontsize=8,
+        ha="center",
+        va="bottom",
+    )
+    ax.plot(
+        [0.0, 0.0],
+        [0.0, source_distance],
+        color=_C_MUTED,
+        linewidth=0.8,
+        linestyle="--",
+        zorder=2,
+    )
+    _dim(
+        ax,
+        (0.0, 0.0),
+        (receiver_radius, 0.0),
+        _metres(receiver_radius, language),
+        offset=-0.06 * receiver_radius,
+    )
+    ax.text(
+        0.02 * source_distance,
+        0.5 * (receiver_radius + source_distance),
+        _metres(source_distance, language),
+        fontsize=8,
+        ha="left",
+        va="center",
+        rotation=90,
+    )
+    _finish_geometry_axes(ax, _t("Free-field diffusion goniometer (plan)", language))
     return ax

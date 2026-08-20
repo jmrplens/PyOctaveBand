@@ -158,8 +158,22 @@ _RECIPROCITY_CONSTANT: dict[str, float] = {"third": 38.0, "octave": 43.0}
 #: Band sets ISO 717-1/-2 rate over, in hertz.
 _RATING_BANDS: dict[str, tuple[float, ...]] = {
     "third": (
-        100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0, 630.0, 800.0,
-        1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0,
+        100.0,
+        125.0,
+        160.0,
+        200.0,
+        250.0,
+        315.0,
+        400.0,
+        500.0,
+        630.0,
+        800.0,
+        1000.0,
+        1250.0,
+        1600.0,
+        2000.0,
+        2500.0,
+        3150.0,
     ),
     "octave": (125.0, 250.0, 500.0, 1000.0, 2000.0),
 }
@@ -295,9 +309,7 @@ def bending_radiation_factor(
     # sigma1 diverges as f approaches fc from above, so it is evaluated only
     # where it applies and pinned to the cap exactly at fc.
     safe = np.where(above, f, 2.0 * fc)
-    sigma1 = np.where(
-        above, 1.0 / np.sqrt(1.0 - fc / safe), MAX_RADIATION_FACTOR
-    )
+    sigma1 = np.where(above, 1.0 / np.sqrt(1.0 - fc / safe), MAX_RADIATION_FACTOR)
 
     if f11 <= fc / 2.0:
         sigma = _mode_dense_radiation_factor(f, fc, l1, l2, c0, sigma1)
@@ -466,9 +478,7 @@ def calculated_sound_reduction_index(
     rho0 = require_positive(air_density, "air_density")
     eta = _band_array(total_loss_factor, f.size, "total_loss_factor", positive=True)
     sigma = _band_array(radiation_factor, f.size, "radiation_factor", positive=True)
-    sigma_f = _band_array(
-        forced_radiation_factor, f.size, "forced_radiation_factor"
-    )
+    sigma_f = _band_array(forced_radiation_factor, f.size, "forced_radiation_factor")
     half = _HALF_BAND[require_choice(bands, "bands", _BAND_CHOICES)]
 
     mass_term = (2.0 * rho0 * c0 / (2.0 * np.pi * f * m)) ** 2
@@ -482,9 +492,7 @@ def calculated_sound_reduction_index(
     if not resonant_only:
         ratio = np.where(below, f / fc, 0.0)
         forced = np.where(below, 2.0 * sigma_f / (1.0 - ratio**2) ** 2, 0.0)
-    tau = mass_term * np.where(
-        at_fc, np.pi * sigma**2 / (2.0 * eta), resonant + forced
-    )
+    tau = mass_term * np.where(at_fc, np.pi * sigma**2 / (2.0 * eta), resonant + forced)
     if density is not None and longitudinal_velocity is not None:
         rho = require_positive(density, "density")
         c_l = require_positive(longitudinal_velocity, "longitudinal_velocity")
@@ -663,9 +671,7 @@ def laboratory_total_loss_factor(
     f = require_positive_array(frequencies, "frequencies")
     m = require_positive(mass_per_area, "mass_per_area")
     eta_int = require_positive(internal_loss_factor, "internal_loss_factor")
-    return np.asarray(
-        eta_int + m / (_LAB_LOSS_CONSTANT * np.sqrt(f)), dtype=np.float64
-    )
+    return np.asarray(eta_int + m / (_LAB_LOSS_CONSTANT * np.sqrt(f)), dtype=np.float64)
 
 
 def structural_reverberation_time(
@@ -1213,9 +1219,7 @@ def flanking_impact_level_from_flanking_level(
     si_lab = require_positive(laboratory_area, "laboratory_area")
     lij = require_positive(coupling_length, "coupling_length")
     llab = require_positive(laboratory_coupling_length, "laboratory_coupling_length")
-    ln = np.atleast_1d(
-        np.asarray(normalized_flanking_impact_level, dtype=np.float64)
-    )
+    ln = np.atleast_1d(np.asarray(normalized_flanking_impact_level, dtype=np.float64))
     return np.asarray(
         ln - 10.0 * np.log10(si * llab / (si_lab * lij)), dtype=np.float64
     )
@@ -1248,9 +1252,7 @@ def floating_floor_improvement(
     f = require_positive_array(frequencies, "frequencies")
     f0 = require_positive(resonance_frequency, "resonance_frequency")
     require_positive(slope, "slope")
-    return np.asarray(
-        np.where(f > f0, slope * np.log10(f / f0), 0.0), dtype=np.float64
-    )
+    return np.asarray(np.where(f > f0, slope * np.log10(f / f0), 0.0), dtype=np.float64)
 
 
 # --------------------------------------------------------------------------- #
@@ -1454,10 +1456,7 @@ class BandPath:
 def _path_matrix(paths: Sequence[BandPath], n_bands: int) -> np.ndarray:
     """Stack the paths' per-band values into a ``paths x bands`` matrix."""
     return np.vstack(
-        [
-            _band_array(p.values, n_bands, f"path {p.label!r}")
-            for p in paths
-        ]
+        [_band_array(p.values, n_bands, f"path {p.label!r}") for p in paths]
     )
 
 
@@ -1669,9 +1668,7 @@ class DetailedImpactResult:
         from ..._plot.building import plot_detailed_impact_prediction
 
         check_language(language)
-        return plot_detailed_impact_prediction(
-            self, ax=ax, language=language, **kwargs
-        )
+        return plot_detailed_impact_prediction(self, ax=ax, language=language, **kwargs)
 
     def report(
         self,

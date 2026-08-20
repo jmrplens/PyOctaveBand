@@ -42,15 +42,41 @@ _PDF_MAGIC = b"%PDF"
 # Standard one-third-octave A-weighting corrections Ck (dB), IEC 61672 /
 # ISO 3744 Annex E Table E.1, at the example band centres.
 _CK_THIRD = {
-    100: -19.1, 125: -16.1, 160: -13.4, 200: -10.9, 250: -8.6, 315: -6.6,
-    400: -4.8, 500: -3.2, 630: -1.9, 800: -0.8, 1000: 0.0, 1250: 0.6,
-    1600: 1.0, 2000: 1.2, 2500: 1.3, 3150: 1.2,
+    100: -19.1,
+    125: -16.1,
+    160: -13.4,
+    200: -10.9,
+    250: -8.6,
+    315: -6.6,
+    400: -4.8,
+    500: -3.2,
+    630: -1.9,
+    800: -0.8,
+    1000: 0.0,
+    1250: 0.6,
+    1600: 1.0,
+    2000: 1.2,
+    2500: 1.3,
+    3150: 1.2,
 }
 # ISO 9614-3:2002 Table 1 standard deviations of reproducibility (dB).
 _SIGMA_R0 = {
-    100: 2.0, 125: 2.0, 160: 2.0, 200: 1.5, 250: 1.5, 315: 1.5, 400: 1.0,
-    500: 1.0, 630: 1.0, 800: 1.0, 1000: 1.0, 1250: 1.0, 1600: 1.0, 2000: 1.0,
-    2500: 1.0, 3150: 1.0,
+    100: 2.0,
+    125: 2.0,
+    160: 2.0,
+    200: 1.5,
+    250: 1.5,
+    315: 1.5,
+    400: 1.0,
+    500: 1.0,
+    630: 1.0,
+    800: 1.0,
+    1000: 1.0,
+    1250: 1.0,
+    1600: 1.0,
+    2000: 1.0,
+    2500: 1.0,
+    3150: 1.0,
 }
 
 _FREQS = np.array([200, 250, 315, 400, 500], dtype=float)
@@ -153,9 +179,7 @@ def _oracle_normalization() -> float:
     )
 
 
-def _oracle_lwa(
-    keep: np.ndarray | None = None, freqs: np.ndarray = _FREQS
-) -> float:
+def _oracle_lwa(keep: np.ndarray | None = None, freqs: np.ndarray = _FREQS) -> float:
     """Closed-form LWA over the kept bands, via the Table E.1 corrections."""
     lw = _oracle_lw(_INTENSITY[: freqs.size])
     ck = np.array([_CK_THIRD[int(f)] for f in freqs])
@@ -190,24 +214,25 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     text = _extract_text(str(out))
 
     # The A-weighted total heads the boxed statement.
-    assert (
-        f"Sound power level LWA = {_oracle_lwa():.1f} dB(A) re 1 pW" in text
-    )
+    assert f"Sound power level LWA = {_oracle_lwa():.1f} dB(A) re 1 pW" in text
     # Every band row: nominal label, LW, its normalized counterpart and the
     # Table 1 expanded uncertainty of that band.
     lw = _oracle_lw()
     lw0 = lw - _oracle_normalization()
     for index, freq in enumerate(_FREQS):
-        assert _row(
-            f"{freq:g}",
-            f"{lw[index]:.1f}",
-            f"{lw0[index]:.1f}",
-            f"{2.0 * _SIGMA_R0[int(freq)]:.1f}",
-        ) in text
+        assert (
+            _row(
+                f"{freq:g}",
+                f"{lw[index]:.1f}",
+                f"{lw0[index]:.1f}",
+                f"{2.0 * _SIGMA_R0[int(freq)]:.1f}",
+            )
+            in text
+        )
     # The Eq. 10 normalization is stated in the basis strip, to two decimals.
     assert (
-        "applied normalization "
-        f"{_oracle_normalization():.2f}".replace("-", "−") + " dB" in text
+        f"applied normalization {_oracle_normalization():.2f}".replace("-", "−") + " dB"
+        in text
     )
     # The band-set caption names the range the determination covers.
     assert "One-third-octave-band sound power levels, 200 Hz to 500 Hz" in text
@@ -231,12 +256,15 @@ def test_uncertainty_column_follows_table_1(tmp_path) -> None:
     lw = _oracle_lw(intensity)
     lw0 = lw - _oracle_normalization()
     for index, freq in enumerate(freqs):
-        assert _row(
-            f"{freq:g}",
-            f"{lw[index]:.1f}",
-            f"{lw0[index]:.1f}",
-            f"{2.0 * _SIGMA_R0[int(freq)]:.1f}",
-        ) in text
+        assert (
+            _row(
+                f"{freq:g}",
+                f"{lw[index]:.1f}",
+                f"{lw0[index]:.1f}",
+                f"{2.0 * _SIGMA_R0[int(freq)]:.1f}",
+            )
+            in text
+        )
     assert "Table 1 standard deviation of reproducibility" in text
 
 
@@ -279,17 +307,20 @@ def test_verbose_tabulates_annex_b_indicators(tmp_path) -> None:
     lw = _oracle_lw()
     lw0 = lw - _oracle_normalization()
     for index, freq in enumerate(_FREQS):
-        assert _row(
-            f"{freq:g}",
-            f"{lw[index]:.1f}",
-            f"{lw0[index]:.1f}",
-            f"{2.0 * _SIGMA_R0[int(freq)]:.1f}",
-            "—",          # FT: no time-window intensity was supplied
-            "2.0",        # Fp|In|: the margin the pressure levels were built with
-            "2.0",        # FpIn: equal to it, every segment radiating outward
-            "0.00",       # FS: a uniform field has no non-uniformity
-            "yes",
-        ) in text
+        assert (
+            _row(
+                f"{freq:g}",
+                f"{lw[index]:.1f}",
+                f"{lw0[index]:.1f}",
+                f"{2.0 * _SIGMA_R0[int(freq)]:.1f}",
+                "—",  # FT: no time-window intensity was supplied
+                "2.0",  # Fp|In|: the margin the pressure levels were built with
+                "2.0",  # FpIn: equal to it, every segment radiating outward
+                "0.00",  # FS: a uniform field has no non-uniformity
+                "yes",
+            )
+            in text
+        )
 
 
 def test_qualification_cell_separates_the_rejected_band(tmp_path) -> None:
@@ -302,16 +333,36 @@ def test_qualification_cell_separates_the_rejected_band(tmp_path) -> None:
     lw = _oracle_lw()
     lw0 = lw - _oracle_normalization()
     # The 200 Hz row carries its 8 dB indicators and closes with the rejection.
-    assert _row(
-        "200", f"{lw[0]:.1f}", f"{lw0[0]:.1f}", "3.0", "—", "8.0", "8.0",
-        "0.00", "no",
-    ) in text
+    assert (
+        _row(
+            "200",
+            f"{lw[0]:.1f}",
+            f"{lw0[0]:.1f}",
+            "3.0",
+            "—",
+            "8.0",
+            "8.0",
+            "0.00",
+            "no",
+        )
+        in text
+    )
     # The 250 Hz row qualifies on its 2 dB indicator against Ld, not on a
     # different Table 1 row: both bands assert the same U above.
-    assert _row(
-        "250", f"{lw[1]:.1f}", f"{lw0[1]:.1f}", "3.0", "—", "2.0", "2.0",
-        "0.00", "yes",
-    ) in text
+    assert (
+        _row(
+            "250",
+            f"{lw[1]:.1f}",
+            f"{lw0[1]:.1f}",
+            "3.0",
+            "—",
+            "2.0",
+            "2.0",
+            "0.00",
+            "yes",
+        )
+        in text
+    )
 
 
 # --- clause 10 f) 2) omission -------------------------------------------------
@@ -646,12 +697,15 @@ def test_odd_band_count_pairs_with_a_blank_row(tmp_path) -> None:
     lw = _oracle_lw(intensity)
     lw0 = lw - _oracle_normalization()
     for index, freq in enumerate(freqs):
-        assert _row(
-            f"{freq:g}",
-            f"{lw[index]:.1f}",
-            f"{lw0[index]:.1f}",
-            f"{2.0 * _SIGMA_R0[int(freq)]:.1f}",
-        ) in text
+        assert (
+            _row(
+                f"{freq:g}",
+                f"{lw[index]:.1f}",
+                f"{lw0[index]:.1f}",
+                f"{2.0 * _SIGMA_R0[int(freq)]:.1f}",
+            )
+            in text
+        )
 
 
 def test_per_band_residual_index_is_ranged_in_the_strip(tmp_path) -> None:

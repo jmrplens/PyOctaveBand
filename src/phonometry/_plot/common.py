@@ -118,8 +118,7 @@ def _register_field_dark_cmap() -> None:
     c0 = np.asarray(base(0.5)[:3])
     w = np.clip(1.0 - np.abs(2.0 * xs - 1.0) / 0.6, 0.0, 1.0)
     out = np.clip(cols - w[:, None] * c0, 0.0, 1.0)
-    mpl.colormaps.register(
-        LinearSegmentedColormap.from_list(_FIELD_CMAP_DARK, out))
+    mpl.colormaps.register(LinearSegmentedColormap.from_list(_FIELD_CMAP_DARK, out))
 
 
 def _field_cmap(ax: Axes) -> str:
@@ -270,8 +269,10 @@ def delta_e_2000(
     s_c = 1.0 + 0.045 * c_bar
     s_h = 1.0 + 0.015 * c_bar * t
     d_theta = 30.0 * np.exp(-(((h_bar - 275.0) / 25.0) ** 2))
-    r_t = -2.0 * np.sqrt(c_bar**7 / (c_bar**7 + 25.0**7)) * np.sin(
-        np.radians(2.0 * d_theta)
+    r_t = (
+        -2.0
+        * np.sqrt(c_bar**7 / (c_bar**7 + 25.0**7))
+        * np.sin(np.radians(2.0 * d_theta))
     )
 
     return float(
@@ -343,9 +344,7 @@ def theme_fill(
     hue = to_rgb(color)
     page = _page_color(ax, background)
     weight = _fill_weight(hue, page, delta_e)
-    red, green, blue = (
-        p + weight * (h - p) for p, h in zip(page, hue, strict=True)
-    )
+    red, green, blue = (p + weight * (h - p) for p, h in zip(page, hue, strict=True))
     return (red, green, blue)
 
 
@@ -402,8 +401,7 @@ def _fill_weight(
 def relative_luminance(color: tuple[float, float, float]) -> float:
     """WCAG 2.2 relative luminance of a 0-1 sRGB triple."""
     linear = [
-        c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
-        for c in color
+        c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in color
     ]
     return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
 
@@ -470,9 +468,7 @@ def theme_line(
     hue = to_rgb(color)
     page = _page_color(ax, background)
     weight = max(quiet, _line_weight(hue, page, ratio))
-    red, green, blue = (
-        p + weight * (h - p) for p, h in zip(page, hue, strict=True)
-    )
+    red, green, blue = (p + weight * (h - p) for p, h in zip(page, hue, strict=True))
     return (red, green, blue)
 
 
@@ -582,28 +578,87 @@ def _format_freq(f: float, language: str = "en") -> str:
     """
     from .._i18n import decimal_comma
 
-    if f >= 1000.0:
-        text = f"{f / 1000.0:g}k"
-    else:
-        text = f"{f:g}"
+    text = f"{f / 1000.0:g}k" if f >= 1000.0 else f"{f:g}"
     return decimal_comma(text, language)
 
 
 #: Nominal octave-band centres (IEC 61672 / ISO 266) spanning the acoustic
 #: range, used to label *continuous* logarithmic frequency axes.
 _OCTAVE_NOMINAL: Final = (
-    1.0, 2.0, 4.0, 8.0, 16.0, 31.5, 63.0, 125.0, 250.0, 500.0,
-    1000.0, 2000.0, 4000.0, 8000.0, 16000.0, 31500.0, 63000.0, 125000.0,
+    1.0,
+    2.0,
+    4.0,
+    8.0,
+    16.0,
+    31.5,
+    63.0,
+    125.0,
+    250.0,
+    500.0,
+    1000.0,
+    2000.0,
+    4000.0,
+    8000.0,
+    16000.0,
+    31500.0,
+    63000.0,
+    125000.0,
 )
 
 #: Nominal one-third-octave centres for optional unlabelled minor ticks.
 _THIRD_NOMINAL: Final = (
-    1.0, 1.25, 1.6, 2.0, 2.5, 3.15, 4.0, 5.0, 6.3, 8.0, 10.0, 12.5, 16.0,
-    20.0, 25.0, 31.5, 40.0, 50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0,
-    250.0, 315.0, 400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0, 1600.0,
-    2000.0, 2500.0, 3150.0, 4000.0, 5000.0, 6300.0, 8000.0, 10000.0,
-    12500.0, 16000.0, 20000.0, 25000.0, 31500.0, 40000.0, 50000.0,
-    63000.0, 80000.0, 100000.0, 125000.0,
+    1.0,
+    1.25,
+    1.6,
+    2.0,
+    2.5,
+    3.15,
+    4.0,
+    5.0,
+    6.3,
+    8.0,
+    10.0,
+    12.5,
+    16.0,
+    20.0,
+    25.0,
+    31.5,
+    40.0,
+    50.0,
+    63.0,
+    80.0,
+    100.0,
+    125.0,
+    160.0,
+    200.0,
+    250.0,
+    315.0,
+    400.0,
+    500.0,
+    630.0,
+    800.0,
+    1000.0,
+    1250.0,
+    1600.0,
+    2000.0,
+    2500.0,
+    3150.0,
+    4000.0,
+    5000.0,
+    6300.0,
+    8000.0,
+    10000.0,
+    12500.0,
+    16000.0,
+    20000.0,
+    25000.0,
+    31500.0,
+    40000.0,
+    50000.0,
+    63000.0,
+    80000.0,
+    100000.0,
+    125000.0,
 )
 
 
@@ -651,19 +706,16 @@ def format_frequency_axis(
     # Past four decades, label every third octave instead and let the rest
     # stand as unlabelled ticks; three octaves is close enough to a decade that
     # the axis still reads as one.
-    stride = 3 if hi > lo * 10 ** 4 else 1
+    stride = 3 if hi > lo * 10**4 else 1
     labelled = majors[::stride]
     ax.xaxis.set_major_locator(mticker.FixedLocator(majors))
     ax.xaxis.set_major_formatter(
-        mticker.FixedFormatter([
-            _format_freq(f, language) if f in labelled else ""
-            for f in majors
-        ])
+        mticker.FixedFormatter(
+            [_format_freq(f, language) if f in labelled else "" for f in majors]
+        )
     )
     if minor == "thirds":
-        minors = [
-            f for f in _THIRD_NOMINAL if lo <= f <= hi and f not in majors
-        ]
+        minors = [f for f in _THIRD_NOMINAL if lo <= f <= hi and f not in majors]
         ax.xaxis.set_minor_locator(mticker.FixedLocator(minors))
     else:
         ax.xaxis.set_minor_locator(mticker.NullLocator())
@@ -719,9 +771,14 @@ def _fractile_band(
     lower = median - _Z90 * spread_lower
     if floor is not None:
         lower = np.maximum(lower, floor)
-    ax.fill_between(freqs, lower, median + _Z90 * spread_upper, zorder=0,
-                    color=theme_fill(color, ax),
-                    label=_t("10-90 % fractile band", language))
+    ax.fill_between(
+        freqs,
+        lower,
+        median + _Z90 * spread_upper,
+        zorder=0,
+        color=theme_fill(color, ax),
+        label=_t("10-90 % fractile band", language),
+    )
 
 
 def _hatch_invalid(bars: BarContainer, mask: np.ndarray) -> None:
@@ -737,13 +794,9 @@ def _hatch_invalid(bars: BarContainer, mask: np.ndarray) -> None:
 # ---------------------------------------------------------------------------
 
 
-
-
 # ---------------------------------------------------------------------------
 # ECMA-418-2 Sottek loudness
 # ---------------------------------------------------------------------------
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -751,25 +804,9 @@ def _hatch_invalid(bars: BarContainer, mask: np.ndarray) -> None:
 # ---------------------------------------------------------------------------
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 # ---------------------------------------------------------------------------
 # Electroacoustics: distortion & frequency response (IEC 60268-3 / Bendat)
 # ---------------------------------------------------------------------------
-
-
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -777,49 +814,9 @@ def _hatch_invalid(bars: BarContainer, mask: np.ndarray) -> None:
 # ---------------------------------------------------------------------------
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # ---------------------------------------------------------------------------
 # Speech transmission index (IEC 60268-16)
 # ---------------------------------------------------------------------------
-
-
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -853,8 +850,13 @@ def _plot_rating(
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", _t(measured_label, language))
     ax.plot(band_centers, measured, "o-", **kwargs)
-    ax.plot(band_centers, reference, "s--", color=_C_REFERENCE,
-            label=_t("Shifted reference", language))
+    ax.plot(
+        band_centers,
+        reference,
+        "s--",
+        color=_C_REFERENCE,
+        label=_t("Shifted reference", language),
+    )
     unfavourable = _unfavourable_mask(measured, reference, impact)
     ax.fill_between(
         band_centers,
@@ -890,12 +892,6 @@ def _unfavourable_mask(
     return np.asarray(measured < reference)
 
 
-
-
-
-
-
-
 def _annotate_impact_500(
     ax: Axes,
     band_centers: np.ndarray,
@@ -916,7 +912,8 @@ def _annotate_impact_500(
     read_value = float(reference[idx])
     read_str = format_number(read_value, language, decimals=0)
     read_label = (
-        f"lectura 500 Hz = {read_str} dB" if language == "es"
+        f"lectura 500 Hz = {read_str} dB"
+        if language == "es"
         else f"500 Hz read = {read_str} dB"
     )
     ax.plot(
@@ -967,8 +964,6 @@ def _require_rating_curve(
         )
 
 
-
-
 def _facade_x_axis(
     ax: Axes, freqs: np.ndarray | None, n: int, *, language: str = "en"
 ) -> np.ndarray:
@@ -987,15 +982,9 @@ def _facade_x_axis(
     return x
 
 
-
-
-
-
 # ---------------------------------------------------------------------------
 # Room acoustics (ISO 3382)
 # ---------------------------------------------------------------------------
-
-
 
 
 def _draw_decay_times(
@@ -1028,8 +1017,6 @@ def _draw_decay_times(
 # ---------------------------------------------------------------------------
 # Sound power (ISO 3744 / ISO 3741 / ISO 9614-2)
 # ---------------------------------------------------------------------------
-
-
 
 
 def _sound_power_designation(result: Any) -> str:
@@ -1068,13 +1055,9 @@ def _bar_width(positions: np.ndarray, k: float = 0.2) -> np.ndarray:
     return k * np.asarray(positions, dtype=np.float64)
 
 
-
-
 # ---------------------------------------------------------------------------
 # Schroeder decay curve (ISO 3382)
 # ---------------------------------------------------------------------------
-
-
 
 
 def _fit_segment(
@@ -1102,21 +1085,9 @@ def _time_axis(
     return np.arange(n, dtype=np.float64), _t("Sample", language)
 
 
-
-
-
-
 # ---------------------------------------------------------------------------
 # Surface scattering & diffusion (ISO 17497)
 # ---------------------------------------------------------------------------
-
-
-
-
-
-
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -1124,19 +1095,9 @@ def _time_axis(
 # ---------------------------------------------------------------------------
 
 
-
-
-
-
-
-
 # ---------------------------------------------------------------------------
 # Room-noise criteria (ANSI/ASA S12.2-2019)
 # ---------------------------------------------------------------------------
-
-
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -1144,36 +1105,14 @@ def _time_axis(
 # ---------------------------------------------------------------------------
 
 
-
-
 # ---------------------------------------------------------------------------
 # Noise-induced hearing loss (ISO 1999)
 # ---------------------------------------------------------------------------
 
 
-
-
-
-
 # ---------------------------------------------------------------------------
 # Impulsive-sound prominence (NT ACOU 112)
 # ---------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 def _plot_band_level_bars(
@@ -1205,7 +1144,10 @@ def _plot_band_level_bars(
     ax.set_xticks(positions)
     ax.set_xticklabels(labels)
     ax.axhline(
-        total_level, color=_C_REFERENCE, ls="--", lw=1.2,
+        total_level,
+        color=_C_REFERENCE,
+        ls="--",
+        lw=1.2,
         label=f"total {format_number(total_level, language, decimals=1)} dB",
     )
     ax.set_ylabel(ylabel)
@@ -1215,21 +1157,9 @@ def _plot_band_level_bars(
     return ax
 
 
-
-
-
-
-
-
-
-
 # ---------------------------------------------------------------------------
 # Measurement uncertainty budget (GUM)
 # ---------------------------------------------------------------------------
-
-
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -1237,13 +1167,9 @@ def _plot_band_level_bars(
 # ---------------------------------------------------------------------------
 
 
-
-
 # ---------------------------------------------------------------------------
 # Outdoor sound propagation (ISO 9613-2)
 # ---------------------------------------------------------------------------
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -1251,13 +1177,9 @@ def _plot_band_level_bars(
 # ---------------------------------------------------------------------------
 
 
-
-
 # ---------------------------------------------------------------------------
 # Occupational noise exposure (ISO 9612)
 # ---------------------------------------------------------------------------
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -1265,24 +1187,14 @@ def _plot_band_level_bars(
 # ---------------------------------------------------------------------------
 
 
-
-
 # ---------------------------------------------------------------------------
 # Building performance prediction (EN 12354-1 / EN 12354-2)
 # ---------------------------------------------------------------------------
 
 
-
-
-
-
 # ---------------------------------------------------------------------------
 # Field sound insulation spectra (ISO 16283-1 / ISO 16283-2)
 # ---------------------------------------------------------------------------
-
-
-
-
 
 
 def _plot_insulation_bands(
@@ -1307,8 +1219,9 @@ def _plot_insulation_bands(
     x = np.arange(n, dtype=np.float64)
     band_word = _t("Band", language)
     ax.set_xticks(x)
-    ax.set_xticklabels([f"{band_word} {i + 1}" for i in range(n)],
-                       rotation=45, ha="right")
+    ax.set_xticklabels(
+        [f"{band_word} {i + 1}" for i in range(n)], rotation=45, ha="right"
+    )
     ax.set_xlabel(band_word)
     for index, (label, y) in enumerate(curves):
         opts: dict[str, Any] = {"label": label}
@@ -1327,8 +1240,6 @@ def _plot_insulation_bands(
 # ---------------------------------------------------------------------------
 
 
-
-
 #: Y-axis label of each ISO 12999-2 absorption-uncertainty quantity, drawn by
 #: ``_plot/materials.py``.  The subscripts of ``alpha_s`` (ISO 354), ``A_T``
 #: (ISO 354) and ``alpha_p`` (ISO 11654) name what the quantity is *of*, so
@@ -1338,7 +1249,3 @@ _ABSORPTION_QUANTITY_LABELS: Final = {
     "equivalent_area": r"Equivalent absorption area $A_\mathrm{T}$ [m²]",
     "practical_coefficient": r"Practical absorption coefficient $\alpha_\mathrm{p}$",
 }
-
-
-
-

@@ -96,35 +96,41 @@ def _metadata_pairs(
         (t("Client", language), client),
         (t("Manufacturer", language), manufacturer),
         (t("Description", language), specimen),
-        (t("Sample area S [m<super>2</super>]", language),
-         fmt_meta(result.area, language)),
-        (t("Room volume V [m<super>3</super>]", language),
-         fmt_meta(result.volume, language)),
-        (t("Speed of sound c [m/s]", language),
-         fmt_meta(result.speed_of_sound, language)),
+        (
+            t("Sample area S [m<super>2</super>]", language),
+            fmt_meta(result.area, language),
+        ),
+        (
+            t("Room volume V [m<super>3</super>]", language),
+            fmt_meta(result.volume, language),
+        ),
+        (
+            t("Speed of sound c [m/s]", language),
+            fmt_meta(result.speed_of_sound, language),
+        ),
         (t("Mounting", language), mounting),
         (t("Test room", language), test_room),
         (t("Date of test", language), test_date),
-        (t("Temperature [&#176;C]", language),
-         fmt_meta(result.temperature, language)),
-        (t("Relative humidity [%]", language),
-         fmt_meta(result.humidity, language)
-         if result.humidity is not None else None),
-        (t("Ambient pressure [kPa]", language),
-         fmt_meta(pressure, language) if pressure is not None else None),
+        (t("Temperature [&#176;C]", language), fmt_meta(result.temperature, language)),
+        (
+            t("Relative humidity [%]", language),
+            fmt_meta(result.humidity, language)
+            if result.humidity is not None
+            else None,
+        ),
+        (
+            t("Ambient pressure [kPa]", language),
+            fmt_meta(pressure, language) if pressure is not None else None,
+        ),
     ]
     # Values are user-supplied free text; escape XML specials so a '&' or '<'
     # cannot break reportlab's Paragraph parser. Labels carry intentional markup.
     return [
-        (label, html.escape(str(value)))
-        for label, value in specs
-        if value is not None
+        (label, html.escape(str(value))) for label, value in specs if value is not None
     ]
 
 
-def _alpha_table(
-    freqs: np.ndarray, alpha_s: np.ndarray, language: str = "en"
-) -> Any:
+def _alpha_table(freqs: np.ndarray, alpha_s: np.ndarray, language: str = "en") -> Any:
     """Build the compact two-column ``f | alpha_s`` table (accredited default)."""
     from reportlab.lib.units import mm
 
@@ -141,9 +147,7 @@ def _alpha_table(
     return band_table(rows, [28 * mm, 28 * mm], len(freqs))
 
 
-def _detail_table(
-    result: SoundAbsorptionMeasurement, language: str = "en"
-) -> Any:
+def _detail_table(result: SoundAbsorptionMeasurement, language: str = "en") -> Any:
     """Build the verbose table ``f | T1 | T2 | A1 | A2 | alpha_s`` (~102 mm wide)."""
     from reportlab.lib.units import mm
 
@@ -186,8 +190,7 @@ def _statement(result: SoundAbsorptionMeasurement, language: str = "en") -> str:
     lo = round(float(freqs.min())) if freqs.size else 0
     hi = round(float(freqs.max())) if freqs.size else 0
     return t(
-        "Sound absorption coefficient <b>&#945;<sub>s</sub></b>, "
-        "{lo} Hz to {hi} Hz",
+        "Sound absorption coefficient <b>&#945;<sub>s</sub></b>, {lo} Hz to {hi} Hz",
         language,
     ).format(lo=lo, hi=hi)
 
@@ -231,8 +234,7 @@ def render_iso354_report(
     alpha_s = np.asarray(result.alpha_s, dtype=np.float64)
     if freqs.shape != alpha_s.shape:
         raise ValueError(
-            "render_iso354_report() needs 'frequencies' and 'alpha_s' of "
-            "equal length."
+            "render_iso354_report() needs 'frequencies' and 'alpha_s' of equal length."
         )
 
     styles, title_style, basis_style, caption_style = document_styles(accent)
@@ -249,8 +251,7 @@ def render_iso354_report(
         ).format(standard=html.escape(measurement_standard))
     else:
         basis = t(
-            "Reverberation-room measurement of sound absorption per "
-            "ISO 354:2003.",
+            "Reverberation-room measurement of sound absorption per ISO 354:2003.",
             language,
         )
 
@@ -275,9 +276,7 @@ def render_iso354_report(
             "and absorption areas",
             language,
         )
-        left_cell = [Paragraph(caption, caption_style), _detail_table(
-            result, language
-        )]
+        left_cell = [Paragraph(caption, caption_style), _detail_table(result, language)]
         plot_drawing = render_figure_drawing(
             result.plot, 70 * mm, y_top=None, language=language
         )
@@ -288,9 +287,10 @@ def render_iso354_report(
         )
     else:
         caption = t("One-third-octave &#945;<sub>s</sub>", language)
-        left_cell = [Paragraph(caption, caption_style), _alpha_table(
-            freqs, alpha_s, language
-        )]
+        left_cell = [
+            Paragraph(caption, caption_style),
+            _alpha_table(freqs, alpha_s, language),
+        ]
         plot_drawing = render_figure_drawing(
             result.plot, 116 * mm, y_top=None, language=language
         )

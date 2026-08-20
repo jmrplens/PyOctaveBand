@@ -143,7 +143,9 @@ class _Module:
         elif isinstance(node, ast.Import):
             for alias in node.names:
                 self.imports[alias.asname or alias.name.split(".")[0]] = (
-                    alias.name, "")
+                    alias.name,
+                    "",
+                )
         elif isinstance(node, ast.ImportFrom):
             module = self._resolve_import(node)
             for alias in node.names:
@@ -202,8 +204,9 @@ class Sources:
             name = ".".join([_PKG_NAME, *parts])
             if path.name == "__init__.py":
                 self.packages.add(name)
-            parsed[name] = ast.parse(path.read_text(encoding="utf-8"),
-                                     filename=str(path))
+            parsed[name] = ast.parse(
+                path.read_text(encoding="utf-8"), filename=str(path)
+            )
         # Every module name has to be known before the imports are resolved:
         # ``from . import media`` reads as a module reference or as a symbol
         # depending on whether ``figures.media`` exists.
@@ -215,8 +218,9 @@ class Sources:
 
     # -- name resolution ---------------------------------------------------
 
-    def resolve(self, module: str, name: str,
-                _seen: frozenset[Symbol] = frozenset()) -> Symbol | None:
+    def resolve(
+        self, module: str, name: str, _seen: frozenset[Symbol] = frozenset()
+    ) -> Symbol | None:
         """The defining ``(module, name)`` of *name* as seen from *module*."""
         mod = self.modules.get(module)
         if mod is None or (module, name) in _seen:
@@ -268,8 +272,7 @@ class Sources:
                 found = self.resolve(module, child.id)
                 if found is not None:
                     yield found
-            elif isinstance(child, ast.Attribute) and isinstance(
-                    child.value, ast.Name):
+            elif isinstance(child, ast.Attribute) and isinstance(child.value, ast.Name):
                 target = self.module_of(module, child.value.id)
                 if target is not None:
                     found = self.resolve(target, child.attr)
@@ -290,12 +293,14 @@ class Sources:
                 if isinstance(node, ast.AnnAssign)
                 else [n for t in node.targets for n in _target_names(t)]
             )
-            if "_ANIMATIONS" not in targets or not isinstance(
-                    node.value, ast.Dict):
+            if "_ANIMATIONS" not in targets or not isinstance(node.value, ast.Dict):
                 continue
             for key, value in zip(node.value.keys, node.value.values):
-                if (isinstance(key, ast.Constant) and isinstance(key.value, str)
-                        and isinstance(value, ast.Name)):
+                if (
+                    isinstance(key, ast.Constant)
+                    and isinstance(key.value, str)
+                    and isinstance(value, ast.Name)
+                ):
                     found = self.resolve(_REGISTRY, value.id)
                     if found is not None:
                         mapping[key.value] = found
@@ -315,19 +320,24 @@ def _strip_docstrings(node: ast.AST) -> ast.AST:
 
     clone = copy.deepcopy(node)
     for child in ast.walk(clone):
-        if isinstance(child, ast.FunctionDef | ast.AsyncFunctionDef
-                      | ast.ClassDef | ast.Module):
+        if isinstance(
+            child, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef | ast.Module
+        ):
             body = child.body
-            if (body and isinstance(body[0], ast.Expr)
-                    and isinstance(body[0].value, ast.Constant)
-                    and isinstance(body[0].value.value, str)):
+            if (
+                body
+                and isinstance(body[0], ast.Expr)
+                and isinstance(body[0].value, ast.Constant)
+                and isinstance(body[0].value.value, str)
+            ):
                 child.body = body[1:] or [ast.Pass()]
     return clone
 
 
 def _dump(node: ast.AST) -> str:
-    return ast.dump(_strip_docstrings(node), annotate_fields=True,
-                    include_attributes=False)
+    return ast.dump(
+        _strip_docstrings(node), annotate_fields=True, include_attributes=False
+    )
 
 
 def _literals(sources: Sources, symbols: Iterable[Symbol]) -> set[str]:
@@ -384,8 +394,9 @@ def _pattern_runs(pattern: str) -> list[str]:
     return [run for run in runs if len(run) >= _MIN_PATTERN_RUN]
 
 
-def _table_entries(sources: Sources) -> tuple[
-        list[tuple[str, str]], list[tuple[str, str]]]:
+def _table_entries(
+    sources: Sources,
+) -> tuple[list[tuple[str, str]], list[tuple[str, str]]]:
     """``(_ES_EXACT items, _ES_PATTERNS items)`` read straight from the AST."""
     i18n = sources.modules["figures.i18n"]
     exact: list[tuple[str, str]] = []
@@ -406,9 +417,8 @@ def _table_entries(sources: Sources) -> tuple[
     return exact, patterns
 
 
-def _literal_pair(key: ast.expr | None,
-                  value: ast.expr) -> tuple[str, str] | None:
-    if key is None:   # ``{**other}`` inside the table literal
+def _literal_pair(key: ast.expr | None, value: ast.expr) -> tuple[str, str] | None:
+    if key is None:  # ``{**other}`` inside the table literal
         return None
     try:
         left = ast.literal_eval(key)
@@ -420,9 +430,9 @@ def _literal_pair(key: ast.expr | None,
     return None
 
 
-def _selected_translations(literals: set[str],
-                           exact: list[tuple[str, str]],
-                           patterns: list[tuple[str, str]]) -> list[str]:
+def _selected_translations(
+    literals: set[str], exact: list[tuple[str, str]], patterns: list[tuple[str, str]]
+) -> list[str]:
     """The table entries the clip's own strings reach.
 
     An exact entry is selected when the clip writes its key verbatim. A
@@ -456,10 +466,12 @@ def _key_is_written(key: str, literals: set[str]) -> bool:
     """
     import re as _re
 
-    pieces = [piece for piece in _re.split(r"[\d]+", key)
-              if len(piece.strip()) >= _MIN_SPLIT]
+    pieces = [
+        piece for piece in _re.split(r"[\d]+", key) if len(piece.strip()) >= _MIN_SPLIT
+    ]
     return bool(pieces) and all(
-        any(piece in literal for literal in literals) for piece in pieces)
+        any(piece in literal for literal in literals) for piece in pieces
+    )
 
 
 def _run_is_written(run: str, literals: set[str]) -> bool:
@@ -476,14 +488,16 @@ def _run_is_written(run: str, literals: set[str]) -> bool:
         return True
     for cut in range(_MIN_SPLIT, len(run) - _MIN_SPLIT + 1):
         head, tail = run[:cut], run[cut:]
-        if (any(head in literal for literal in literals)
-                and any(tail in literal for literal in literals)):
+        if any(head in literal for literal in literals) and any(
+            tail in literal for literal in literals
+        ):
             return True
     return False
 
 
-def fingerprint_parts(sources: Sources, clip: str,
-                      entry: Symbol) -> tuple[list[str], list[str]]:
+def fingerprint_parts(
+    sources: Sources, clip: str, entry: Symbol
+) -> tuple[list[str], list[str]]:
     """``(code lines, translation lines)`` a clip's fingerprint is taken over."""
     roots = [entry, *_EXTRA_ROOTS]
     symbols = sources.closure(roots)
@@ -498,8 +512,9 @@ def fingerprint_parts(sources: Sources, clip: str,
     for module in sorted({module for module, _ in symbols}):
         body = sources.modules[module].body
         if body:
-            code.append(f"{module}.<module>\x00"
-                        + _dump(ast.Module(body=body, type_ignores=[])))
+            code.append(
+                f"{module}.<module>\x00" + _dump(ast.Module(body=body, type_ignores=[]))
+            )
     code.sort()
     exact, patterns = _table_entries(sources)
     text = _selected_translations(_literals(sources, symbols), exact, patterns)
@@ -594,4 +609,3 @@ def stamp(clips: Iterable[str], root: pathlib.Path | None = None) -> None:
             write_manifest(stamps)
         finally:
             fcntl.flock(handle, fcntl.LOCK_UN)
-

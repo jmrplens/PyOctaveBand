@@ -151,7 +151,10 @@ def test_filter_binding_detail_matches_library_margin() -> None:
     for arch in cr._FILTER_ARCHS:
         fc = cr._filter_class(arch, 3)
         bank = filters.OctaveFilterBank(
-            48000, fraction=3, order=6, limits=[100, 10000],
+            48000,
+            fraction=3,
+            order=6,
+            limits=[100, 10000],
             design=filters.FilterDesign(filter_type=arch),
         )
         bands = verify_filter_class(bank)["bands"]
@@ -193,7 +196,9 @@ def test_human_vibration_reference_data_matches_oracles() -> None:
     assert ref.DIRECTIVE_2002_44_WBV_ELV == 1.15
 
 
-@pytest.mark.parametrize("check", cr.CHECKS, ids=lambda c: f"{c.standard} :: {c.quantity}")
+@pytest.mark.parametrize(
+    "check", cr.CHECKS, ids=lambda c: f"{c.standard} :: {c.quantity}"
+)
 def test_every_check_passes(check: cr.Check) -> None:
     outcome = check.run()
     assert outcome.passed, (

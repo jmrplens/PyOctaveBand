@@ -220,7 +220,7 @@ the result can be passed straight to array consumers such as
 [`phonometry.room.decay_curve`](/phonometry/reference/api/rooms/acoustics/#decay_curve) and
 [`phonometry.speech.sti_from_impulse_response`](/phonometry/reference/api/speech/sti/#sti_from_impulse_response). Indexing,
 `len(result)` and the `size`/`ndim`/`shape`/`dtype` attributes
-forward to `ir`. 
+forward to `ir`.
 
 ### ImpulseResponseResult.dtype
 

@@ -27,9 +27,9 @@ TOOLBOX: frozenset[str] = frozenset({"filters", "signals", "metrology"})
 #: `* -> _internal` and `* -> TOOLBOX`. "root" = modules still at the top
 #: level of the package (shrinks to the facade set as the migration proceeds).
 ALLOWED_EDGES: set[tuple[str, str]] = {
-    ("environment", "materials"),     # air_absorption -> ISO 354 helpers
-    ("aircraft", "environment"),      # atmospheric absorption reuse
-    ("vibration", "hearing"),         # multiple-shock SEXES tables
+    ("environment", "materials"),  # air_absorption -> ISO 354 helpers
+    ("aircraft", "environment"),  # atmospheric absorption reuse
+    ("vibration", "hearing"),  # multiple-shock SEXES tables
     # swept-sine distortion reuses the ISO 18233 sweep / Farina
     # inverse-filter machinery of room.impulse_response
     ("electroacoustics", "room"),
@@ -101,10 +101,13 @@ def _edges() -> set[tuple[str, str, str]]:
                 continue
             if node.level == 0:
                 # Absolute self-imports would bypass the relative-import rules.
-                if node.module and (node.module == "phonometry"
-                                    or node.module.startswith("phonometry.")):
-                    pytest.fail(f"{path.relative_to(SRC)}: absolute self-import "
-                                f"'{node.module}' (use relative imports)")
+                if node.module and (
+                    node.module == "phonometry" or node.module.startswith("phonometry.")
+                ):
+                    pytest.fail(
+                        f"{path.relative_to(SRC)}: absolute self-import "
+                        f"'{node.module}' (use relative imports)"
+                    )
                 continue
             target = node.module or ""
             head = target.split(".")[0] if target else ""
@@ -156,8 +159,8 @@ def test_family_edges_are_whitelisted() -> None:
         for domain, frm, to, where in _family_edges()
         if (domain, frm, to) not in ALLOWED_FAMILY_EDGES
     ]
-    assert not violations, (
-        "unlisted family-to-family imports:\n" + "\n".join(violations)
+    assert not violations, "unlisted family-to-family imports:\n" + "\n".join(
+        violations
     )
 
 
@@ -170,8 +173,10 @@ def test_internal_imports_no_domain_code() -> None:
 def test_cross_package_edges_are_whitelisted() -> None:
     violations = []
     for frm, to, where in _edges():
-        if frm == to or to in ("_internal", "root") or frm in (
-            "root", "_plot", "_report"
+        if (
+            frm == to
+            or to in ("_internal", "root")
+            or frm in ("root", "_plot", "_report")
         ):
             # root modules are unrestricted during the migration; the facade
             # (__init__) legitimately imports everything. _plot and
@@ -223,13 +228,16 @@ def test_render_modules_only_type_check_domain_imports() -> None:
         pytest.skip("neither _plot nor _report created yet")
 
 
-@pytest.mark.parametrize("pkg", sorted(
-    p.name for p in SRC.iterdir() if p.is_dir() and not p.name.startswith("__")
-))
+@pytest.mark.parametrize(
+    "pkg",
+    sorted(p.name for p in SRC.iterdir() if p.is_dir() and not p.name.startswith("__")),
+)
 def test_subpackage_imports_in_fresh_interpreter(pkg: str) -> None:
     subprocess.run(
         [sys.executable, "-c", f"import phonometry.{pkg}"],
-        check=True, capture_output=True, timeout=120,
+        check=True,
+        capture_output=True,
+        timeout=120,
     )
 
 
@@ -258,7 +266,10 @@ def test_subpackage_reexports_cover_facade_imports() -> None:
         for alias in node.names:
             if not hasattr(pkg, alias.name):
                 missing.append(f"phonometry.{parts[0]}.{alias.name}")
-    assert not missing, "facade imports not re-exported by their subpackage:\n" + "\n".join(missing)
+    assert not missing, (
+        "facade imports not re-exported by their subpackage:\n" + "\n".join(missing)
+    )
+
 
 def test_collected_test_modules_have_unique_import_names() -> None:
     """Two test modules that import under one name break the whole collection.
@@ -298,6 +309,7 @@ def test_collected_test_modules_have_unique_import_names() -> None:
     counts = collections.Counter(import_name(path) for path in collected)
     duplicates = {name: count for name, count in counts.items() if count > 1}
     assert not duplicates, f"test modules sharing an import name: {duplicates}"
+
 
 def test_sonar_configuration_names_files_that_exist() -> None:
     """A path-keyed analyzer exemption is silently lost when the file moves.
@@ -353,17 +365,14 @@ def test_every_public_name_is_reachable_from_its_domain() -> None:
     domains = {
         name
         for name in dir(phonometry)
-        if not name.startswith("_")
-        and inspect.ismodule(getattr(phonometry, name))
+        if not name.startswith("_") and inspect.ismodule(getattr(phonometry, name))
     }
     published: dict[str, list[str]] = {}
     for domain in sorted(domains):
         for name in getattr(getattr(phonometry, domain), "__all__", ()):
             published.setdefault(name, []).append(domain)
 
-    orphans = sorted(
-        set(phonometry.__all__) - set(published) - ROOT_ONLY - domains
-    )
+    orphans = sorted(set(phonometry.__all__) - set(published) - ROOT_ONLY - domains)
     assert not orphans, (
         "public names the root publishes and no domain package does: "
         f"{orphans}. Export each from the package that owns it, or add it to "
@@ -387,8 +396,7 @@ def test_no_public_name_is_published_by_two_domains() -> None:
     for domain in sorted(
         name
         for name in dir(phonometry)
-        if not name.startswith("_")
-        and inspect.ismodule(getattr(phonometry, name))
+        if not name.startswith("_") and inspect.ismodule(getattr(phonometry, name))
     ):
         for name in getattr(getattr(phonometry, domain), "__all__", ()):
             published.setdefault(name, []).append(domain)

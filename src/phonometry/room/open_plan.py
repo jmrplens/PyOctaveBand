@@ -91,7 +91,9 @@ class OpenPlanResult:
     rp: float
     positions_m: np.ndarray | None = None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the spatial decay of speech with ``rD``/``rP`` marked.
 
         Redraws the Clause 6.2 regression line from ``d2s`` and
@@ -201,9 +203,7 @@ def _linear_fit(x: np.ndarray, y: np.ndarray) -> tuple[float, float]:
     return float(slope), float(intercept)
 
 
-def _sti_crossing(
-    slope: float, intercept: float, threshold: float
-) -> float:
+def _sti_crossing(slope: float, intercept: float, threshold: float) -> float:
     r"""Distance where the STI regression line reaches ``threshold``.
 
     Solves :math:`\text{slope} \cdot r + \text{intercept} = \text{threshold}`
@@ -255,24 +255,19 @@ def open_plan_metrics(
 
     if not (r.shape == lp.shape == sti.shape):
         raise ValueError(
-            "positions_m, spl_a_speech and sti_values must have the same "
-            "length."
+            "positions_m, spl_a_speech and sti_values must have the same length."
         )
     if r.ndim != 1:
         raise ValueError("Inputs must be one-dimensional.")
     if r.size < _MIN_POSITIONS:
         raise ValueError(
-            "ISO 3382-3 requires at least 4 measurement positions "
-            f"(got {r.size})."
+            f"ISO 3382-3 requires at least 4 measurement positions (got {r.size})."
         )
     if not (
-        np.all(np.isfinite(r))
-        and np.all(np.isfinite(lp))
-        and np.all(np.isfinite(sti))
+        np.all(np.isfinite(r)) and np.all(np.isfinite(lp)) and np.all(np.isfinite(sti))
     ):
         raise ValueError(
-            "positions_m, spl_a_speech and sti_values must be finite "
-            "(no NaN or Inf)."
+            "positions_m, spl_a_speech and sti_values must be finite (no NaN or Inf)."
         )
     if np.any(r <= 0.0):
         raise ValueError("Distances 'positions_m' must be positive.")
@@ -293,7 +288,9 @@ def open_plan_metrics(
     rp = _sti_crossing(sti_slope, sti_intercept, _STI_PRIVACY)
 
     return OpenPlanResult(
-        d2s=d2s, lp_as_4m=lp_as_4m, rd=rd, rp=rp,
+        d2s=d2s,
+        lp_as_4m=lp_as_4m,
+        rd=rd,
+        rp=rp,
         positions_m=np.asarray(positions_m, dtype=np.float64),
     )
-

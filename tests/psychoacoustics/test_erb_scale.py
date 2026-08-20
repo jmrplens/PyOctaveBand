@@ -65,9 +65,7 @@ def test_935_to_1065_hz_spans_one_erb() -> None:
     assert erb == pytest.approx(span, abs=3.0)
     lo, hi = (
         float(v)
-        for v in np.asarray(
-            psychoacoustics.cam_from_frequency([935.0, 1065.0])
-        )
+        for v in np.asarray(psychoacoustics.cam_from_frequency([935.0, 1065.0]))
     )
     assert hi - lo == pytest.approx(1.0, abs=0.03)
 
@@ -83,8 +81,9 @@ def test_cam_of_1000_hz_is_15_59() -> None:
     assert round(_published_cam(1000.0), 2) == 15.62
 
 
-@pytest.mark.parametrize("frequency", [50.0, 100.0, 250.0, 500.0, 1000.0,
-                                       2000.0, 4000.0, 8000.0, 15000.0])
+@pytest.mark.parametrize(
+    "frequency", [50.0, 100.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0, 15000.0]
+)
 def test_matches_the_published_closed_form(frequency: float) -> None:
     """The extended constants agree with Moore's printed formulas to 0.3 %."""
     erb = float(np.asarray(psychoacoustics.erb_bandwidth(frequency))[()])
@@ -95,9 +94,9 @@ def test_matches_the_published_closed_form(frequency: float) -> None:
 
 def test_erb_bandwidth_is_the_stated_straight_line() -> None:
     """ERB_N = C1 (C2 f + 1): the intercept at 0 Hz is C1, the slope C1 C2."""
-    assert float(
-        np.asarray(psychoacoustics.erb_bandwidth(0.0))[()]
-    ) == pytest.approx(psychoacoustics.ERB_C1)
+    assert float(np.asarray(psychoacoustics.erb_bandwidth(0.0))[()]) == pytest.approx(
+        psychoacoustics.ERB_C1
+    )
     lo = float(np.asarray(psychoacoustics.erb_bandwidth(1000.0))[()])
     hi = float(np.asarray(psychoacoustics.erb_bandwidth(2000.0))[()])
     assert hi - lo == pytest.approx(
@@ -139,18 +138,14 @@ def test_cam_frequency_round_trip(frequency: float) -> None:
 def test_round_trip_from_the_cam_side() -> None:
     cams = np.linspace(1.8, 38.9, 373)
     freqs = psychoacoustics.frequency_from_cam(cams)
-    assert np.allclose(
-        np.asarray(psychoacoustics.cam_from_frequency(freqs)), cams
-    )
+    assert np.allclose(np.asarray(psychoacoustics.cam_from_frequency(freqs)), cams)
 
 
 def test_scalar_in_scalar_out_array_in_array_out() -> None:
     assert isinstance(psychoacoustics.erb_bandwidth(1000.0), float)
     assert isinstance(psychoacoustics.cam_from_frequency(1000.0), float)
     assert isinstance(psychoacoustics.frequency_from_cam(15.0), float)
-    assert np.asarray(psychoacoustics.erb_bandwidth([100.0, 200.0])).shape == (
-        2,
-    )
+    assert np.asarray(psychoacoustics.erb_bandwidth([100.0, 200.0])).shape == (2,)
 
 
 def test_loudness_model_shares_these_constants() -> None:
@@ -164,8 +159,9 @@ def test_loudness_model_shares_these_constants() -> None:
         np.asarray(psychoacoustics.erb_bandwidth(grid)),
     )
     cams = np.array([5.0, 20.0, 35.0])
-    assert np.allclose(mg._fc_from_cam(cams),
-                       np.asarray(psychoacoustics.frequency_from_cam(cams)))
+    assert np.allclose(
+        mg._fc_from_cam(cams), np.asarray(psychoacoustics.frequency_from_cam(cams))
+    )
 
 
 @pytest.mark.parametrize(

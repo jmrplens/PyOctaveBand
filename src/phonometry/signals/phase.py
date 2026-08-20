@@ -81,9 +81,7 @@ def _validate_response(
     if arr.ndim != 1:
         raise ValueError(f"'{name}' must be one-dimensional.")
     if arr.size < _MIN_BINS:
-        raise ValueError(
-            f"'{name}' must have at least {_MIN_BINS} frequency bins."
-        )
+        raise ValueError(f"'{name}' must have at least {_MIN_BINS} frequency bins.")
     if not np.all(np.isfinite(arr)):
         raise ValueError(f"'{name}' must be finite.")
     out = arr.astype(np.complex128, copy=False)
@@ -234,9 +232,7 @@ def excess_phase(
     reconstructed = minimum_phase(resp, oversample=oversample)
     measured = np.unwrap(np.angle(resp))
     measured = measured - measured[0]  # reference the branch at DC
-    return np.asarray(
-        measured - np.unwrap(np.angle(reconstructed)), dtype=np.float64
-    )
+    return np.asarray(measured - np.unwrap(np.angle(reconstructed)), dtype=np.float64)
 
 
 @dataclass(frozen=True)

@@ -125,32 +125,62 @@ class RoomEnvironment:
 #: Table B.1 - preferred positions for all sources (including tones).
 _TABLE_B1: np.ndarray = np.array(
     [
-        [0.16, -0.96, 0.22], [0.78, -0.60, 0.20], [0.78, 0.55, 0.31],
-        [0.16, 0.90, 0.41], [-0.83, 0.32, 0.45], [-0.83, -0.40, 0.38],
-        [-0.26, -0.65, 0.71], [0.74, -0.07, 0.67], [-0.26, 0.50, 0.83],
-        [0.10, -0.10, 0.99], [0.91, -0.34, 0.22], [0.91, 0.38, 0.20],
-        [-0.09, 0.95, 0.31], [-0.70, 0.59, 0.41], [-0.69, -0.56, 0.45],
-        [-0.07, -0.92, 0.38], [0.43, -0.55, 0.71], [0.43, 0.61, 0.67],
-        [-0.56, 0.02, 0.83], [0.14, 0.04, 0.99],
+        [0.16, -0.96, 0.22],
+        [0.78, -0.60, 0.20],
+        [0.78, 0.55, 0.31],
+        [0.16, 0.90, 0.41],
+        [-0.83, 0.32, 0.45],
+        [-0.83, -0.40, 0.38],
+        [-0.26, -0.65, 0.71],
+        [0.74, -0.07, 0.67],
+        [-0.26, 0.50, 0.83],
+        [0.10, -0.10, 0.99],
+        [0.91, -0.34, 0.22],
+        [0.91, 0.38, 0.20],
+        [-0.09, 0.95, 0.31],
+        [-0.70, 0.59, 0.41],
+        [-0.69, -0.56, 0.45],
+        [-0.07, -0.92, 0.38],
+        [0.43, -0.55, 0.71],
+        [0.43, 0.61, 0.67],
+        [-0.56, 0.02, 0.83],
+        [0.14, 0.04, 0.99],
     ]
 )
 #: Table B.2 - positions for a broadband (tone-free) source.
 _TABLE_B2: np.ndarray = np.array(
     [
-        [-0.99, 0.0, 0.15], [0.50, -0.86, 0.15], [0.50, 0.86, 0.15],
-        [-0.45, 0.77, 0.45], [-0.45, -0.77, 0.45], [0.89, 0.0, 0.45],
-        [0.33, 0.57, 0.75], [-0.66, 0.0, 0.75], [0.33, -0.57, 0.75],
-        [0.0, 0.0, 1.00], [0.99, 0.0, 0.15], [-0.50, 0.86, 0.15],
-        [-0.50, -0.86, 0.15], [0.45, -0.77, 0.45], [0.45, 0.77, 0.45],
-        [-0.89, 0.0, 0.45], [-0.33, -0.57, 0.75], [0.66, 0.0, 0.75],
-        [-0.33, 0.57, 0.75], [0.0, 0.0, 1.00],
+        [-0.99, 0.0, 0.15],
+        [0.50, -0.86, 0.15],
+        [0.50, 0.86, 0.15],
+        [-0.45, 0.77, 0.45],
+        [-0.45, -0.77, 0.45],
+        [0.89, 0.0, 0.45],
+        [0.33, 0.57, 0.75],
+        [-0.66, 0.0, 0.75],
+        [0.33, -0.57, 0.75],
+        [0.0, 0.0, 1.00],
+        [0.99, 0.0, 0.15],
+        [-0.50, 0.86, 0.15],
+        [-0.50, -0.86, 0.15],
+        [0.45, -0.77, 0.45],
+        [0.45, 0.77, 0.45],
+        [-0.89, 0.0, 0.45],
+        [-0.33, -0.57, 0.75],
+        [0.66, 0.0, 0.75],
+        [-0.33, 0.57, 0.75],
+        [0.0, 0.0, 1.00],
     ]
 )
 #: Table B.3 - source adjacent to three reflecting planes.
 _TABLE_B3: np.ndarray = np.array(
     [
-        [0.86, -0.50, 0.15], [0.45, -0.77, 0.45], [0.47, -0.47, 0.75],
-        [0.50, -0.86, 0.15], [0.77, -0.45, 0.45], [0.47, -0.47, 0.75],
+        [0.86, -0.50, 0.15],
+        [0.45, -0.77, 0.45],
+        [0.47, -0.47, 0.75],
+        [0.50, -0.86, 0.15],
+        [0.77, -0.45, 0.45],
+        [0.47, -0.47, 0.75],
     ]
 )
 
@@ -210,7 +240,9 @@ class SoundPowerResult:
     uncertainty: float
     grade: str
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the LW spectrum with the A-weighted total annotated.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -450,8 +482,7 @@ def _room_absorption_area(
         alpha = np.asarray(mean_absorption_coefficient, dtype=np.float64)
         if room_surface <= 0 or np.any(alpha <= 0.0) or np.any(alpha > 1.0):
             raise ValueError(
-                "mean_absorption_coefficient must be in (0, 1] and "
-                "room_surface > 0."
+                "mean_absorption_coefficient must be in (0, 1] and room_surface > 0."
             )
         return alpha * room_surface
     return None
@@ -632,7 +663,9 @@ def _measurement_surface(
         if dimensions is None or distance is None:
             raise ValueError("'dimensions' and 'distance' are required for a box.")
         if len(dimensions) != 3 or any(v <= 0 for v in dimensions) or distance <= 0:
-            raise ValueError("'dimensions' must be 3 positive values and 'distance' > 0.")
+            raise ValueError(
+                "'dimensions' must be 3 positive values and 'distance' > 0."
+            )
         return (
             _box_area(dimensions, distance, reflecting_planes),
             _MIN_BOX_POSITIONS[grade],

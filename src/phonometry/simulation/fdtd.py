@@ -89,8 +89,7 @@ def _integer(name: str, value: int) -> int:
 def _positive_map(name: str, field: Field2D) -> None:
     """Validate that every cell of *field* is strictly positive and finite."""
     if not np.all(np.isfinite(field)) or bool(np.any(field <= 0.0)):
-        raise ValueError(f"{name} must be strictly positive and finite "
-                         "everywhere")
+        raise ValueError(f"{name} must be strictly positive and finite everywhere")
 
 
 @dataclass(frozen=True)
@@ -160,8 +159,9 @@ class CWSource:
             envelope = 0.5 * (1.0 - float(np.cos(np.pi * t / ramp_time)))
         else:
             envelope = 1.0
-        return (self.amplitude * envelope
-                * float(np.sin(2.0 * np.pi * self.frequency * t)))
+        return (
+            self.amplitude * envelope * float(np.sin(2.0 * np.pi * self.frequency * t))
+        )
 
 
 @dataclass(frozen=True)
@@ -211,8 +211,9 @@ class SignalSource:
         if i >= last:
             return self.amplitude * float(self.samples[last])
         w = pos - i
-        return self.amplitude * float((1.0 - w) * self.samples[i]
-                                      + w * self.samples[i + 1])
+        return self.amplitude * float(
+            (1.0 - w) * self.samples[i] + w * self.samples[i + 1]
+        )
 
 
 @dataclass(frozen=True)
@@ -250,8 +251,9 @@ Source = GaussianPulse | CWSource | SignalSource
 AnySource = Source | PlaneWaveSource
 
 
-def _sponge_profile(n: int, width: int, sides: tuple[bool, bool],
-                    sigma_max: float) -> Field2D:
+def _sponge_profile(
+    n: int, width: int, sides: tuple[bool, bool], sigma_max: float
+) -> Field2D:
     """1D absorption rate sigma(i) [1/s]: quadratic ramp into each sponge side.
 
     ``sides`` selects (low-index side, high-index side).
@@ -264,26 +266,34 @@ def _sponge_profile(n: int, width: int, sides: tuple[bool, bool],
     if sides[0]:
         sigma[:width] = np.maximum(sigma[:width], ramp)
     if sides[1]:
-        sigma[n - width:] = np.maximum(sigma[n - width:], ramp[::-1])
+        sigma[n - width :] = np.maximum(sigma[n - width :], ramp[::-1])
     return sigma
 
 
-def _sigma_map(shape: tuple[int, int], sides: tuple[str, ...],
-               sponge_width: int, sponge_reflection: float,
-               damping: NDArray[np.float64], c_max: float,
-               dx: float) -> Field2D:
+def _sigma_map(
+    shape: tuple[int, int],
+    sides: tuple[str, ...],
+    sponge_width: int,
+    sponge_reflection: float,
+    damping: NDArray[np.float64],
+    c_max: float,
+    dx: float,
+) -> Field2D:
     """Absorption-rate map sigma(x, y) [1/s]: sponge ramps plus damping."""
     ny, nx = shape
     sigma_max = 0.0
     if sponge_width > 0:
         # Quadratic-profile PML-style rate for a target reflection R:
         # exp(-2 * sigma_max * (w dx) / (3 c)) = R  (two-way transit).
-        sigma_max = (-3.0 * c_max * float(np.log(sponge_reflection))
-                     / (2.0 * sponge_width * dx))
-    sig_x = _sponge_profile(nx, sponge_width,
-                            ("left" in sides, "right" in sides), sigma_max)
-    sig_y = _sponge_profile(ny, sponge_width,
-                            ("top" in sides, "bottom" in sides), sigma_max)
+        sigma_max = (
+            -3.0 * c_max * float(np.log(sponge_reflection)) / (2.0 * sponge_width * dx)
+        )
+    sig_x = _sponge_profile(
+        nx, sponge_width, ("left" in sides, "right" in sides), sigma_max
+    )
+    sig_y = _sponge_profile(
+        ny, sponge_width, ("top" in sides, "bottom" in sides), sigma_max
+    )
     return sig_x[np.newaxis, :] + sig_y[:, np.newaxis] + damping
 
 
@@ -299,11 +309,9 @@ def _validate_sponge_damping(
     if sponge_width < 0:
         raise ValueError("sponge_width must be non-negative")
     if sponge_width >= min(nx, ny):
-        raise ValueError("sponge_width must be narrower than the "
-                         "smallest grid side")
+        raise ValueError("sponge_width must be narrower than the smallest grid side")
     if not 0.0 < sponge_reflection < 1.0:
-        raise ValueError("sponge_reflection must lie strictly between "
-                         "0 and 1")
+        raise ValueError("sponge_reflection must lie strictly between 0 and 1")
     damping_map = np.asarray(damping, dtype=np.float64)
     if damping_map.ndim not in (0, 2):
         raise ValueError("damping must be a scalar or an (ny, nx) map")
@@ -311,8 +319,7 @@ def _validate_sponge_damping(
         raise ValueError("damping must be non-negative and finite")
     if damping_map.ndim == 2 and damping_map.shape != (ny, nx):
         raise ValueError(
-            f"damping map shape {damping_map.shape} does not match the "
-            f"grid {(ny, nx)}"
+            f"damping map shape {damping_map.shape} does not match the grid {(ny, nx)}"
         )
     return sponge_width, damping_map
 
@@ -357,8 +364,9 @@ def _run_recording(
     return np.stack(frames)
 
 
-def _validated_obstacle(obstacle_mask: NDArray[np.bool_] | None,
-                        ny: int, nx: int) -> NDArray[np.bool_] | None:
+def _validated_obstacle(
+    obstacle_mask: NDArray[np.bool_] | None, ny: int, nx: int
+) -> NDArray[np.bool_] | None:
     """Validate the obstacle mask; ``None`` when absent or all open."""
     if obstacle_mask is None:
         return None
@@ -372,8 +380,7 @@ def _validated_obstacle(obstacle_mask: NDArray[np.bool_] | None,
     return mask.copy() if bool(mask.any()) else None
 
 
-def _resolve_c_map(c: float | Field2D,
-                   shape: tuple[int, int] | None) -> Field2D:
+def _resolve_c_map(c: float | Field2D, shape: tuple[int, int] | None) -> Field2D:
     """Broadcast/validate the sound-speed spec into a positive 2D map."""
     if np.isscalar(c):
         if shape is None:
@@ -389,8 +396,11 @@ def _resolve_c_map(c: float | Field2D,
 
 def _resolve_rho_map(rho: float | Field2D, ny: int, nx: int) -> Field2D:
     """Broadcast/validate the density spec into a positive ``(ny, nx)`` map."""
-    rho_map = (np.full((ny, nx), float(np.real(rho)), dtype=np.float64)
-               if np.isscalar(rho) else np.asarray(rho, dtype=np.float64))
+    rho_map = (
+        np.full((ny, nx), float(np.real(rho)), dtype=np.float64)
+        if np.isscalar(rho)
+        else np.asarray(rho, dtype=np.float64)
+    )
     if rho_map.shape != (ny, nx):
         raise ValueError("rho map must match the shape of c")
     _positive_map("rho", rho_map)
@@ -414,8 +424,9 @@ def _resolve_sponge_sides(
     return sides
 
 
-def _edge_impedance_profile(side: str, value: float | NDArray[np.float64],
-                            n_edge: int) -> Field2D:
+def _edge_impedance_profile(
+    side: str, value: float | NDArray[np.float64], n_edge: int
+) -> Field2D:
     """Broadcast/validate one side's impedance into a positive 1D profile."""
     z = np.asarray(value, dtype=np.float64)
     if z.ndim == 0:
@@ -423,10 +434,12 @@ def _edge_impedance_profile(side: str, value: float | NDArray[np.float64],
     if z.shape != (n_edge,):
         raise ValueError(
             f"impedance for side {side!r} must be a scalar or a 1D "
-            f"array of length {n_edge}")
+            f"array of length {n_edge}"
+        )
     if not np.all(np.isfinite(z)) or bool(np.any(z <= 0.0)):
-        raise ValueError(f"impedance for side {side!r} must be "
-                         "strictly positive and finite")
+        raise ValueError(
+            f"impedance for side {side!r} must be strictly positive and finite"
+        )
     return z
 
 
@@ -444,8 +457,9 @@ class _ImpedanceEdge:
 
     __slots__ = ("c1", "c2", "side", "vb")
 
-    def __init__(self, side: str, impedance: Field2D, rho_edge: Field2D,
-                 dt: float, dx: float) -> None:
+    def __init__(
+        self, side: str, impedance: Field2D, rho_edge: Field2D, dt: float, dx: float
+    ) -> None:
         self.side = side
         # a = dt Z / (rho dx): the dimensionless boundary Courant product.
         a = dt * impedance / (rho_edge * dx)
@@ -461,7 +475,7 @@ class _ImpedanceEdge:
             self.vb = self.c1 * self.vb + self.c2 * p[:, -1]
         elif self.side == "top":
             self.vb = self.c1 * self.vb - self.c2 * p[0, :]
-        else:                                          # bottom
+        else:  # bottom
             self.vb = self.c1 * self.vb + self.c2 * p[-1, :]
 
     def add_flux(self, div: Field2D) -> None:
@@ -472,7 +486,7 @@ class _ImpedanceEdge:
             div[:, -1] += self.vb
         elif self.side == "top":
             div[0, :] -= self.vb
-        else:                                          # bottom
+        else:  # bottom
             div[-1, :] += self.vb
 
 
@@ -505,8 +519,15 @@ class ContourProbe:
     :ivar samples: Number of steps accumulated since the last reset.
     """
 
-    def __init__(self, sim: FDTD2D, ix0: int, ix1: int, iy0: int, iy1: int,
-                 frequencies: ArrayLike) -> None:
+    def __init__(
+        self,
+        sim: FDTD2D,
+        ix0: int,
+        ix1: int,
+        iy0: int,
+        iy1: int,
+        frequencies: ArrayLike,
+    ) -> None:
         ny, nx = sim.p.shape
         ix0 = _integer("ix0", ix0)
         ix1 = _integer("ix1", ix1)
@@ -516,26 +537,32 @@ class ContourProbe:
             raise ValueError(
                 "the contour block needs 1 <= ix0 <= ix1 <= nx - 2 and "
                 "1 <= iy0 <= iy1 <= ny - 2, so every sampled face has an "
-                "open cell on both sides")
+                "open cell on both sides"
+            )
         freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
-        if freqs.ndim != 1 or freqs.size == 0 or not np.all(
-                np.isfinite(freqs)) or bool(np.any(freqs <= 0.0)):
-            raise ValueError("frequencies must be a non-empty 1D sequence "
-                             "of positive finite values")
+        if (
+            freqs.ndim != 1
+            or freqs.size == 0
+            or not np.all(np.isfinite(freqs))
+            or bool(np.any(freqs <= 0.0))
+        ):
+            raise ValueError(
+                "frequencies must be a non-empty 1D sequence of positive finite values"
+            )
         if sim._obstacle is not None:
             # Every sampled face needs open cells on both of its sides:
             # the two cell columns flanking the vertical faces and the two
             # cell rows flanking the horizontal ones.
             blocked = bool(
-                sim._obstacle[iy0:iy1 + 1,
-                              [ix0 - 1, ix0, ix1, ix1 + 1]].any()
-                or sim._obstacle[[iy0 - 1, iy0, iy1, iy1 + 1],
-                                 ix0:ix1 + 1].any())
+                sim._obstacle[iy0 : iy1 + 1, [ix0 - 1, ix0, ix1, ix1 + 1]].any()
+                or sim._obstacle[[iy0 - 1, iy0, iy1, iy1 + 1], ix0 : ix1 + 1].any()
+            )
             if blocked:
                 raise ValueError(
                     "the contour faces touch obstacle cells; the closed "
                     "rectangle must run through open air with the whole "
-                    "scatterer strictly inside")
+                    "scatterer strictly inside"
+                )
         self._ix0, self._ix1 = ix0, ix1
         self._iy0, self._iy1 = iy0, iy1
         self._ys = slice(iy0, iy1 + 1)
@@ -565,8 +592,7 @@ class ContourProbe:
         self._omega = 2.0 * np.pi * freqs
         self._dt = sim.dt
         self._dx = dx
-        self._acc_p = np.zeros((freqs.size, pos.shape[0]),
-                               dtype=np.complex128)
+        self._acc_p = np.zeros((freqs.size, pos.shape[0]), dtype=np.complex128)
         self._acc_v = np.zeros_like(self._acc_p)
         self.samples = 0
 
@@ -576,22 +602,27 @@ class ContourProbe:
         self._acc_v.fill(0.0)
         self.samples = 0
 
-    def _accumulate(self, p: Field2D, vx: Field2D, vy: Field2D,
-                    n: int) -> None:
+    def _accumulate(self, p: Field2D, vx: Field2D, vy: Field2D, n: int) -> None:
         """Fold the current fields into the running DFT sums."""
         ys, xs = self._ys, self._xs
         ix0, ix1 = self._ix0, self._ix1
         iy0, iy1 = self._iy0, self._iy1
-        p_now = np.concatenate((
-            0.5 * (p[ys, ix0 - 1] + p[ys, ix0]),
-            0.5 * (p[ys, ix1] + p[ys, ix1 + 1]),
-            0.5 * (p[iy0 - 1, xs] + p[iy0, xs]),
-            0.5 * (p[iy1, xs] + p[iy1 + 1, xs]),
-        ))
-        v_now = np.concatenate((
-            -vx[ys, ix0 - 1], vx[ys, ix1],
-            -vy[iy0 - 1, xs], vy[iy1, xs],
-        ))
+        p_now = np.concatenate(
+            (
+                0.5 * (p[ys, ix0 - 1] + p[ys, ix0]),
+                0.5 * (p[ys, ix1] + p[ys, ix1 + 1]),
+                0.5 * (p[iy0 - 1, xs] + p[iy0, xs]),
+                0.5 * (p[iy1, xs] + p[iy1 + 1, xs]),
+            )
+        )
+        v_now = np.concatenate(
+            (
+                -vx[ys, ix0 - 1],
+                vx[ys, ix1],
+                -vy[iy0 - 1, xs],
+                vy[iy1, xs],
+            )
+        )
         # Leapfrog time stamps: p sits at n dt, v half a step earlier.
         phase_p = np.exp(self._omega * (-1j * (n * self._dt)))
         phase_v = np.exp(self._omega * (-1j * ((n - 0.5) * self._dt)))
@@ -610,15 +641,16 @@ class ContourProbe:
         :raises ValueError: If the frequency is not tracked or nothing has
             been accumulated yet.
         """
-        matches = [i for i, f in enumerate(self.frequencies)
-                   if np.isclose(f, float(frequency))]
+        matches = [
+            i for i, f in enumerate(self.frequencies) if np.isclose(f, float(frequency))
+        ]
         if not matches:
             raise ValueError(
                 f"frequency {frequency!r} Hz is not tracked by this probe "
-                f"(tracked: {self.frequencies})")
+                f"(tracked: {self.frequencies})"
+            )
         if self.samples == 0:
-            raise ValueError("no samples accumulated yet; step the "
-                             "simulation first")
+            raise ValueError("no samples accumulated yet; step the simulation first")
         scale = 2.0 / self.samples
         i = matches[0]
         return ContourPhasors(
@@ -696,18 +728,20 @@ class FDTD2D:
         sponge_reflection: float = 1e-4,
         damping: float | NDArray[np.float64] = 0.0,
         shape: tuple[int, int] | None = None,
-        edge_impedance: Mapping[str, float | NDArray[np.float64]]
-        | None = None,
+        edge_impedance: Mapping[str, float | NDArray[np.float64]] | None = None,
         obstacle_mask: NDArray[np.bool_] | None = None,
     ) -> None:
         c_map = _resolve_c_map(c, shape)
         if not np.isfinite(cfl) or not 0.0 < cfl < 1.0:
-            raise ValueError("cfl must lie in (0, 1): the leapfrog scheme "
-                             "is unstable beyond the Courant bound CN = 1")
+            raise ValueError(
+                "cfl must lie in (0, 1): the leapfrog scheme "
+                "is unstable beyond the Courant bound CN = 1"
+            )
         ny, nx = c_map.shape
         rho_map = _resolve_rho_map(rho, ny, nx)
         sponge_width, damping_map = _validate_sponge_damping(
-            sponge_width, sponge_reflection, damping, ny, nx)
+            sponge_width, sponge_reflection, damping, ny, nx
+        )
 
         self.dx = _positive_finite("dx", dx)
         self.c = c_map
@@ -716,7 +750,7 @@ class FDTD2D:
         self.dt = cfl * self.dx / (c_max * float(np.sqrt(2.0)))
         #: Mean sound speed, cached for the plane-wave machinery.
         self._c_ref = float(c_map.mean())
-        self.kappa = rho_map * c_map**2          # bulk modulus at centres
+        self.kappa = rho_map * c_map**2  # bulk modulus at centres
         # Density averaged onto the faces where each velocity lives.
         self._rho_x = 0.5 * (rho_map[:, 1:] + rho_map[:, :-1])
         self._rho_y = 0.5 * (rho_map[1:, :] + rho_map[:-1, :])
@@ -728,53 +762,62 @@ class FDTD2D:
         self._sources: list[Source] = []
         self._plane_sources: list[PlaneWaveSource] = []
         self._contour_probes: list[ContourProbe] = []
-        self.n = 0                                # completed steps
+        self.n = 0  # completed steps
 
         sides = _resolve_sponge_sides(sponge_sides)
         #: Sponge-layer width in cells (read-only configuration record).
         self.sponge_width = int(sponge_width)
         #: Sides carrying a sponge layer when ``sponge_width > 0``.
-        self.sponge_sides: tuple[str, ...] = (
-            sides if sponge_width > 0 else ()
-        )
+        self.sponge_sides: tuple[str, ...] = sides if sponge_width > 0 else ()
         #: Per-side impedance boundaries as supplied (immutable record).
         self.edge_impedance: Mapping[str, float | NDArray[np.float64]] = (
             MappingProxyType(dict(edge_impedance) if edge_impedance else {})
         )
-        self._init_decay(sides, sponge_width, sponge_reflection, damping_map,
-                         c_max)
-        self._edges = self._build_edges(edge_impedance, sponge_width, sides,
-                                        ny, nx)
+        self._init_decay(sides, sponge_width, sponge_reflection, damping_map, c_max)
+        self._edges = self._build_edges(edge_impedance, sponge_width, sides, ny, nx)
         self._init_obstacle(obstacle_mask, ny, nx)
 
-    def _init_decay(self, sides: tuple[str, ...], sponge_width: int,
-                    sponge_reflection: float,
-                    damping: NDArray[np.float64],
-                    c_max: float) -> None:
+    def _init_decay(
+        self,
+        sides: tuple[str, ...],
+        sponge_width: int,
+        sponge_reflection: float,
+        damping: NDArray[np.float64],
+        c_max: float,
+    ) -> None:
         """Precompute the sponge/damping decay factors of every field."""
-        sigma = _sigma_map(self.p.shape, sides, sponge_width,
-                           sponge_reflection, damping, c_max, self.dx)
+        sigma = _sigma_map(
+            self.p.shape,
+            sides,
+            sponge_width,
+            sponge_reflection,
+            damping,
+            c_max,
+            self.dx,
+        )
         self._decay_p: Field2D = np.exp(-sigma * self.dt)
         self._decay_vx: Field2D = np.exp(
-            -(0.5 * (sigma[:, 1:] + sigma[:, :-1])) * self.dt)
+            -(0.5 * (sigma[:, 1:] + sigma[:, :-1])) * self.dt
+        )
         self._decay_vy: Field2D = np.exp(
-            -(0.5 * (sigma[1:, :] + sigma[:-1, :])) * self.dt)
+            -(0.5 * (sigma[1:, :] + sigma[:-1, :])) * self.dt
+        )
 
-    def _init_obstacle(self, obstacle_mask: NDArray[np.bool_] | None,
-                       ny: int, nx: int) -> None:
+    def _init_obstacle(
+        self, obstacle_mask: NDArray[np.bool_] | None, ny: int, nx: int
+    ) -> None:
         """Validate the obstacle mask into closed-face velocity factors."""
         self._obstacle: NDArray[np.bool_] | None = _validated_obstacle(
-            obstacle_mask, ny, nx)
+            obstacle_mask, ny, nx
+        )
         self._vx_open: Field2D | None = None
         self._vy_open: Field2D | None = None
         if self._obstacle is not None:
             mask = self._obstacle
             # A face between two cells is open only when both are open
             # (rigid obstacle boundary: zero normal velocity, Eq. 4.32).
-            self._vx_open = (
-                ~(mask[:, 1:] | mask[:, :-1])).astype(np.float64)
-            self._vy_open = (
-                ~(mask[1:, :] | mask[:-1, :])).astype(np.float64)
+            self._vx_open = (~(mask[:, 1:] | mask[:, :-1])).astype(np.float64)
+            self._vy_open = (~(mask[1:, :] | mask[:-1, :])).astype(np.float64)
 
     def _build_edges(
         self,
@@ -792,18 +835,22 @@ class FDTD2D:
         if unknown:
             raise ValueError(f"unknown impedance sides: {sorted(unknown)}")
         absorbing = set(sponge_sides) if sponge_width > 0 else set()
-        rho_edges = {"left": self.rho[:, 0], "right": self.rho[:, -1],
-                     "top": self.rho[0, :], "bottom": self.rho[-1, :]}
-        for side in _SIDES:                      # deterministic order
+        rho_edges = {
+            "left": self.rho[:, 0],
+            "right": self.rho[:, -1],
+            "top": self.rho[0, :],
+            "bottom": self.rho[-1, :],
+        }
+        for side in _SIDES:  # deterministic order
             if side not in edge_impedance:
                 continue
             if side in absorbing:
-                raise ValueError(f"side {side!r} cannot be both absorbing "
-                                 "and an impedance boundary")
+                raise ValueError(
+                    f"side {side!r} cannot be both absorbing and an impedance boundary"
+                )
             n_edge = ny if side in ("left", "right") else nx
             z = _edge_impedance_profile(side, edge_impedance[side], n_edge)
-            edges.append(_ImpedanceEdge(side, z, rho_edges[side],
-                                        self.dt, self.dx))
+            edges.append(_ImpedanceEdge(side, z, rho_edges[side], self.dt, self.dx))
         return edges
 
     @property
@@ -846,9 +893,7 @@ class FDTD2D:
             ``width``/``wavelength``.
         """
         if direction not in _SIDE_TRAVEL:
-            raise ValueError(
-                "'direction' must be 'down', 'up', 'left' or 'right'."
-            )
+            raise ValueError("'direction' must be 'down', 'up', 'left' or 'right'.")
         if width <= 0.0:
             raise ValueError("'width' must be positive.")
         if wavelength is not None and wavelength <= 0.0:
@@ -909,9 +954,7 @@ class FDTD2D:
         from .._plot.geometry import plot_fdtd_domain
 
         check_language(language)
-        return plot_fdtd_domain(
-            self, ax=ax, probes=probes, language=language, **kwargs
-        )
+        return plot_fdtd_domain(self, ax=ax, probes=probes, language=language, **kwargs)
 
     def add_source(self, source: AnySource) -> None:
         """Register a source: a point injection or a plane-wave line.
@@ -933,8 +976,9 @@ class FDTD2D:
             raise ValueError("source position lies inside an obstacle")
         self._sources.append(source)
 
-    def add_contour_probe(self, ix0: int, ix1: int, iy0: int, iy1: int, *,
-                          frequencies: ArrayLike) -> ContourProbe:
+    def add_contour_probe(
+        self, ix0: int, ix1: int, iy0: int, iy1: int, *, frequencies: ArrayLike
+    ) -> ContourProbe:
         r"""Record ``p`` and ``v_n`` phasors on a closed rectangular contour.
 
         The contour is the rectangle of cell faces enclosing the cell
@@ -971,9 +1015,7 @@ class FDTD2D:
     def _add_plane_source(self, source: PlaneWaveSource) -> None:
         """Validate and register a plane-wave injection line."""
         if source.direction not in _SIDE_TRAVEL:
-            raise ValueError(
-                "'direction' must be 'down', 'up', 'left' or 'right'."
-            )
+            raise ValueError("'direction' must be 'down', 'up', 'left' or 'right'.")
         offset = _integer("plane-wave offset", source.offset)
         ny, nx = self.p.shape
         limit = ny if source.direction in ("down", "up") else nx
@@ -989,9 +1031,7 @@ class FDTD2D:
             else:
                 line = self._obstacle[:, nx - 1 - offset]
             if bool(np.any(line)):
-                raise ValueError(
-                    "plane-wave injection line crosses an obstacle"
-                )
+                raise ValueError("plane-wave injection line crosses an obstacle")
         self._plane_sources.append(source)
 
     def step(self) -> None:
@@ -1048,24 +1088,22 @@ class FDTD2D:
         elif direction == "up":
             row = self.p.shape[0] - 1 - k
             self.p[row, :] += gain * value_p
-            self.vy[row - 1, :] -= gain * value_v / (
-                self._rho_y[row - 1, :] * c_ref
-            )
+            self.vy[row - 1, :] -= gain * value_v / (self._rho_y[row - 1, :] * c_ref)
         elif direction == "right":
             self.p[:, k] += gain * value_p
             self.vx[:, k] += gain * value_v / (self._rho_x[:, k] * c_ref)
         else:
             col = self.p.shape[1] - 1 - k
             self.p[:, col] += gain * value_p
-            self.vx[:, col - 1] -= gain * value_v / (
-                self._rho_x[:, col - 1] * c_ref
-            )
+            self.vx[:, col - 1] -= gain * value_v / (self._rho_x[:, col - 1] * c_ref)
 
     def energy(self) -> float:
         """Total acoustic field energy [J per metre of depth]."""
         e_p = float(np.sum(self.p**2 / (2.0 * self.kappa)))
-        e_v = 0.5 * (float(np.sum(self._rho_x * self.vx**2))
-                     + float(np.sum(self._rho_y * self.vy**2)))
+        e_v = 0.5 * (
+            float(np.sum(self._rho_x * self.vx**2))
+            + float(np.sum(self._rho_y * self.vy**2))
+        )
         return (e_p + e_v) * self.dx**2
 
     def run(
@@ -1125,8 +1163,15 @@ class FDTDResult:
         ny, nx = self.shape
         return nx * self.dx, ny * self.dx
 
-    def plot(self, ax: Axes | None = None, *, kind: str = "probes",
-             frame: int = -1, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self,
+        ax: Axes | None = None,
+        *,
+        kind: str = "probes",
+        frame: int = -1,
+        language: str = "en",
+        **kwargs: Any,
+    ) -> Axes:
         """Plot the probe histories or one recorded field snapshot.
 
         :param ax: Existing axes, or ``None`` to create a figure.
@@ -1149,15 +1194,15 @@ class FDTDResult:
         if kind == "snapshot":
             from .._plot.simulation import plot_fdtd_snapshot
 
-            return plot_fdtd_snapshot(self, ax=ax, frame=frame,
-                                      language=language, **kwargs)
+            return plot_fdtd_snapshot(
+                self, ax=ax, frame=frame, language=language, **kwargs
+            )
         raise ValueError("kind must be 'probes' or 'snapshot'")
 
 
 def _parse_boundaries(
     boundaries: str | Mapping[str, str | float | NDArray[np.float64]],
-) -> tuple[tuple[str, ...],
-           dict[str, float | NDArray[np.float64]]]:
+) -> tuple[tuple[str, ...], dict[str, float | NDArray[np.float64]]]:
     """Split the boundary spec into sponge sides and impedance sides."""
     spec: dict[str, str | float | NDArray[np.float64]]
     if isinstance(boundaries, str):
@@ -1175,7 +1220,8 @@ def _parse_boundaries(
             if value not in _BOUNDARY_NAMES:
                 raise ValueError(
                     f"boundary for side {side!r} must be one of "
-                    f"{_BOUNDARY_NAMES} or a real impedance, got {value!r}")
+                    f"{_BOUNDARY_NAMES} or a real impedance, got {value!r}"
+                )
             if value == "absorbing":
                 absorbing.append(side)
         else:
@@ -1183,9 +1229,11 @@ def _parse_boundaries(
     return tuple(absorbing), impedance
 
 
-def _probe_indices(probes: Sequence[tuple[int, int]],
-                   shape: tuple[int, int],
-                   obstacle: NDArray[np.bool_] | None) -> NDArray[np.int_]:
+def _probe_indices(
+    probes: Sequence[tuple[int, int]],
+    shape: tuple[int, int],
+    obstacle: NDArray[np.bool_] | None,
+) -> NDArray[np.int_]:
     """Validate the probe cells into an ``(n_probes, 2)`` index array."""
     ny, nx = shape
     probe_ix = np.zeros((len(probes), 2), dtype=np.int_)
@@ -1235,8 +1283,7 @@ def fdtd_simulation(
     rho: float | Field2D = 1.2,
     cfl: float = 0.6,
     probes: Sequence[tuple[int, int]] = (),
-    boundaries: str | Mapping[str, str | float | NDArray[np.float64]]
-    = "rigid",
+    boundaries: str | Mapping[str, str | float | NDArray[np.float64]] = "rigid",
     absorbing_layer_cells: int = 20,
     obstacle_mask: NDArray[np.bool_] | None = None,
     damping: float = 0.0,
@@ -1301,20 +1348,20 @@ def fdtd_simulation(
             raise ValueError("snapshot_every must be >= 1")
     absorbing_sides, edge_impedance = _parse_boundaries(boundaries)
     if absorbing_sides:
-        absorbing_layer_cells = _integer("absorbing_layer_cells",
-                                         absorbing_layer_cells)
+        absorbing_layer_cells = _integer("absorbing_layer_cells", absorbing_layer_cells)
         if absorbing_layer_cells < 1:
             raise ValueError("absorbing_layer_cells must be >= 1")
 
     sim = FDTD2D(
-        c, dx,
+        c,
+        dx,
         rho=rho,
         cfl=cfl,
         sponge_width=absorbing_layer_cells if absorbing_sides else 0,
-        sponge_sides=absorbing_sides if absorbing_sides else None,
+        sponge_sides=absorbing_sides or None,
         damping=damping,
         shape=shape,
-        edge_impedance=edge_impedance if edge_impedance else None,
+        edge_impedance=edge_impedance or None,
         obstacle_mask=obstacle_mask,
     )
     for source in sources:
@@ -1325,11 +1372,11 @@ def fdtd_simulation(
 
     steps = round(duration / sim.dt)
     if steps < 1:
-        raise ValueError("duration must cover at least one time step "
-                         f"(dt = {sim.dt:.3e} s)")
+        raise ValueError(
+            f"duration must cover at least one time step (dt = {sim.dt:.3e} s)"
+        )
     times = np.arange(steps + 1, dtype=np.float64) * sim.dt
-    pressures, frames, frame_steps = _record_run(sim, steps, probe_ix,
-                                                 snapshot_every)
+    pressures, frames, frame_steps = _record_run(sim, steps, probe_ix, snapshot_every)
 
     positions = (probe_ix.astype(np.float64) + 0.5) * sim.dx
     return FDTDResult(
@@ -1342,8 +1389,8 @@ def fdtd_simulation(
         shape=(ny, nx),
         sources=tuple(sources),
         snapshots=np.stack(frames) if frames else None,
-        snapshot_times=(np.asarray(frame_steps, dtype=np.float64) * sim.dt
-                        if frame_steps else None),
-        obstacle_mask=(sim._obstacle.copy()
-                       if sim._obstacle is not None else None),
+        snapshot_times=(
+            np.asarray(frame_steps, dtype=np.float64) * sim.dt if frame_steps else None
+        ),
+        obstacle_mask=(sim._obstacle.copy() if sim._obstacle is not None else None),
     )

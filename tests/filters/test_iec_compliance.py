@@ -30,11 +30,13 @@ def _burst_response_db(duration: float, mode: str, total: float) -> float:
     x = np.sin(2 * np.pi * F0 * t)
 
     steady = filters.time_weighting(x, FS, mode=mode)
-    ref = steady[int((total - 0.5) * FS):].mean()
+    ref = steady[int((total - 0.5) * FS) :].mean()
 
     burst = np.zeros_like(t)
     start = int(1.0 * FS)
-    burst[start:start + round(duration * FS)] = x[start:start + round(duration * FS)]
+    burst[start : start + round(duration * FS)] = x[
+        start : start + round(duration * FS)
+    ]
     env = filters.time_weighting(burst, FS, mode=mode)
     return float(10 * np.log10(env.max() / ref))
 
@@ -69,7 +71,9 @@ SLOW_CASES = [
 
 
 @pytest.mark.parametrize("duration,ref,upper,lower", FAST_CASES)
-def test_fast_tone_burst_iec_table4(duration: float, ref: float, upper: float, lower: float) -> None:
+def test_fast_tone_burst_iec_table4(
+    duration: float, ref: float, upper: float, lower: float
+) -> None:
     measured = _burst_response_db(duration, "fast", total=3.0)
     assert lower <= measured - ref <= upper, (
         f"FAST {duration * 1000:g} ms burst: {measured:.2f} dB vs delta_ref {ref} dB "
@@ -78,7 +82,9 @@ def test_fast_tone_burst_iec_table4(duration: float, ref: float, upper: float, l
 
 
 @pytest.mark.parametrize("duration,ref,upper,lower", SLOW_CASES)
-def test_slow_tone_burst_iec_table4(duration: float, ref: float, upper: float, lower: float) -> None:
+def test_slow_tone_burst_iec_table4(
+    duration: float, ref: float, upper: float, lower: float
+) -> None:
     measured = _burst_response_db(duration, "slow", total=8.0)
     assert lower <= measured - ref <= upper, (
         f"SLOW {duration * 1000:g} ms burst: {measured:.2f} dB vs delta_ref {ref} dB "
@@ -108,11 +114,13 @@ def _burst_sel_response_db(duration: float) -> float:
     total = 3.0
     t = np.arange(int(FS * total)) / FS
     x = np.sin(2 * np.pi * F0 * t)
-    la_steady = signals.leq(weighting_filter(x, FS, "A")[int(0.5 * FS):])
+    la_steady = signals.leq(weighting_filter(x, FS, "A")[int(0.5 * FS) :])
 
     burst = np.zeros_like(t)
     start = int(1.0 * FS)
-    burst[start:start + round(duration * FS)] = x[start:start + round(duration * FS)]
+    burst[start : start + round(duration * FS)] = x[
+        start : start + round(duration * FS)
+    ]
     return float(signals.sel(burst, FS, weighting="A")) - float(la_steady)
 
 
@@ -133,7 +141,9 @@ SEL_CASES = [
 
 
 @pytest.mark.parametrize("duration,ref,upper,lower", SEL_CASES)
-def test_sel_tone_burst_iec_table4(duration: float, ref: float, upper: float, lower: float) -> None:
+def test_sel_tone_burst_iec_table4(
+    duration: float, ref: float, upper: float, lower: float
+) -> None:
     measured = _burst_sel_response_db(duration)
     assert lower <= measured - ref <= upper, (
         f"LAE {duration * 1000:g} ms burst: {measured:.2f} dB vs delta_ref {ref} dB "

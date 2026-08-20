@@ -138,9 +138,9 @@ def _statement(result: Any, language: str = "en") -> tuple[float, str, list[str]
     """The boxed mean insertion loss and its extended enclosure terms."""
     mean_il = mean_finite(result.insertion_loss)
     mean_r = mean_finite(result.panel_transmission_loss)
-    statement = t(
-        "Mean insertion loss IL = <b>{value} dB</b>", language
-    ).format(value=d1(mean_il, language))
+    statement = t("Mean insertion loss IL = <b>{value} dB</b>", language).format(
+        value=d1(mean_il, language)
+    )
     extended = [
         t("Mean panel transmission loss R = {value} dB", language).format(
             value=d1(mean_r, language)
@@ -148,11 +148,15 @@ def _statement(result: Any, language: str = "en") -> tuple[float, str, list[str]
         t(
             "External surface area S<sub>E</sub> = {value} m<super>2</super>",
             language,
-        ).format(value=format_number(float(result.external_area), language, decimals=2)),
+        ).format(
+            value=format_number(float(result.external_area), language, decimals=2)
+        ),
         t(
             "Internal surface area S<sub>i</sub> = {value} m<super>2</super>",
             language,
-        ).format(value=format_number(float(result.internal_area), language, decimals=2)),
+        ).format(
+            value=format_number(float(result.internal_area), language, decimals=2)
+        ),
     ]
     return mean_il, statement, extended
 
@@ -200,8 +204,11 @@ def render_enclosure_report(
     verdict = None
     if metadata is not None and metadata.requirement is not None:
         verdict = performance_verdict(
-            mean_il, metadata.requirement, "IL",
-            higher_is_better=True, language=language,
+            mean_il,
+            metadata.requirement,
+            "IL",
+            higher_is_better=True,
+            language=language,
         )
     return render_noise_control_fiche(
         result,

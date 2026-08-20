@@ -452,11 +452,7 @@ def noise_criterion(
         raise ValueError("no valid octave-band levels were supplied.")
 
     sil_levels = aligned[_SIL_BANDS]
-    sil = (
-        float(np.mean(sil_levels))
-        if not np.isnan(sil_levels).any()
-        else float("nan")
-    )
+    sil = float(np.mean(sil_levels)) if not np.isnan(sil_levels).any() else float("nan")
 
     per_band = np.full(_N_BANDS, np.nan)
     above = np.zeros(_N_BANDS, dtype=bool)
@@ -491,14 +487,15 @@ def noise_criterion(
         exceedance = np.where(above, aligned - NC_CURVES[-1], -np.inf)
         governing = int(np.argmax(exceedance))
         return build(
-            float("nan"), float(OCTAVE_BANDS[governing]), float("nan"),
-            "tangency", "above",
+            float("nan"),
+            float(OCTAVE_BANDS[governing]),
+            float("nan"),
+            "tangency",
+            "above",
         )
     if not np.isfinite(per_band).any():
         # Every measured band lies below the NC-15 curve.
-        return build(
-            float("nan"), float("nan"), float("nan"), "tangency", "below"
-        )
+        return build(float("nan"), float("nan"), float("nan"), "tangency", "below")
 
     governing = int(np.nanargmax(per_band))
     tangency = float(per_band[governing])
@@ -511,9 +508,7 @@ def noise_criterion(
                 # Clause 5.2.2: no band exceeds the NC-(SIL) curve, so the
                 # spectrum is designated NC-(SIL) with no governing band.
                 return build(nc_sil, float("nan"), tangency, "SIL", None)
-    return build(
-        tangency, float(OCTAVE_BANDS[governing]), tangency, "tangency", None
-    )
+    return build(tangency, float(OCTAVE_BANDS[governing]), tangency, "tangency", None)
 
 
 def room_criterion(levels: ArrayLike, frequencies: ArrayLike | None = None) -> RCResult:
@@ -572,7 +567,7 @@ def room_criterion(levels: ArrayLike, frequencies: ArrayLike | None = None) -> R
     rumble = low_dev.size > 0 and np.max(low_dev) > 5.0
     hiss = high_dev.size > 0 and np.max(high_dev) > 3.0
     tag = ("R" if rumble else "") + ("H" if hiss else "")
-    classification = tag if tag else "N"
+    classification = tag or "N"
 
     return RCResult(
         rating=rating,

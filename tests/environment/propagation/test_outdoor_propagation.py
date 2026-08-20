@@ -45,9 +45,7 @@ class TestGeometricDivergence:
         [(1.0, 11.0), (10.0, 31.0), (100.0, 51.0), (1000.0, 71.0)],
     )
     def test_exact_points(self, distance: float, expected: float) -> None:
-        assert environment.geometric_divergence(distance) == pytest.approx(
-            expected
-        )
+        assert environment.geometric_divergence(distance) == pytest.approx(expected)
 
     def test_doubling_adds_6db(self) -> None:
         delta = environment.geometric_divergence(
@@ -78,9 +76,7 @@ class TestAtmosphericAbsorption:
     def test_exact_midband_convention_at_8khz(self) -> None:
         # At 8 kHz / 20 C / 70 % the nominal-frequency alpha runs ~1.3 % high
         # (77.6 vs 76.6 dB/km); Aatm must follow the exact-midband value.
-        got = environment.atmospheric_absorption(
-            1000.0, [8000.0], 20.0, 70.0, 101.325
-        )
+        got = environment.atmospheric_absorption(1000.0, [8000.0], 20.0, 70.0, 101.325)
         exact = environment.air_attenuation(
             [8000.0], 20.0, 70.0, 101.325, exact_midband=True
         )
@@ -104,9 +100,7 @@ class TestAtmosphericAbsorption:
 class TestGroundGeneral:
     def test_hard_ground_no_middle_region(self) -> None:
         # G = 0 everywhere and dp <= 30(hs+hr) (q=0): As=Ar=-1,5, Am=0 => -3 dB.
-        agr = environment.ground_attenuation(
-            50.0, 1.0, 1.0, BANDS, 0.0, 0.0, 0.0
-        )
+        agr = environment.ground_attenuation(50.0, 1.0, 1.0, BANDS, 0.0, 0.0, 0.0)
         assert np.allclose(agr, -3.0)
 
     def test_hard_ground_far_still_minus_three_low_band(self) -> None:
@@ -159,25 +153,17 @@ class TestGroundGeneral:
         assert agr[0] == pytest.approx(2.0 * (-1.5 + a_prime), abs=1e-6)
 
     def test_porous_more_attenuation_than_hard(self) -> None:
-        hard = environment.ground_attenuation(
-            500.0, 2.0, 2.0, BANDS, 0.0, 0.0, 0.0
-        )
-        porous = environment.ground_attenuation(
-            500.0, 2.0, 2.0, BANDS, 1.0, 1.0, 1.0
-        )
+        hard = environment.ground_attenuation(500.0, 2.0, 2.0, BANDS, 0.0, 0.0, 0.0)
+        porous = environment.ground_attenuation(500.0, 2.0, 2.0, BANDS, 1.0, 1.0, 1.0)
         # Porous yields larger (more positive) Agr at mid/high bands.
         assert np.all(porous[1:] >= hard[1:] - 1e-9)
         assert porous[3] > hard[3]
 
     def test_invalid_ground_factor_raises(self) -> None:
         with pytest.raises(ValueError, match=r"ground_source"):
-            environment.ground_attenuation(
-                100.0, 1.0, 1.0, BANDS, 1.5, 0.0, 0.0
-            )
+            environment.ground_attenuation(100.0, 1.0, 1.0, BANDS, 1.5, 0.0, 0.0)
         with pytest.raises(ValueError, match=r"ground_middle"):
-            environment.ground_attenuation(
-                100.0, 1.0, 1.0, BANDS, 0.0, -0.1, 0.0
-            )
+            environment.ground_attenuation(100.0, 1.0, 1.0, BANDS, 0.0, -0.1, 0.0)
 
     def test_default_projected_distance(self) -> None:
         # dp = sqrt(d^2 - (hs-hr)^2); with hs=hr it equals d.
@@ -196,9 +182,9 @@ class TestGroundGeneral:
 class TestGroundAlternative:
     def test_eq10_closed_form(self) -> None:
         # 4,8 - (2*2/100)(17 + 300/100) = 4,8 - 0,04*20 = 4,0.
-        assert environment.ground_attenuation_alternative(
-            100.0, 2.0
-        ) == pytest.approx(4.0)
+        assert environment.ground_attenuation_alternative(100.0, 2.0) == pytest.approx(
+            4.0
+        )
 
     def test_negative_clamped_to_zero(self) -> None:
         # Large hm, short d -> strongly negative -> replaced by 0 (7.3.2).
@@ -239,16 +225,15 @@ class TestBarrier:
         assert np.all(dz <= 20.0 + 1e-9)
 
     def test_double_cap_25db(self) -> None:
-        b = environment.Barrier(source_to_edge=50.0, edge_to_receiver=50.0,
-                                edge_separation=5.0)
+        b = environment.Barrier(
+            source_to_edge=50.0, edge_to_receiver=50.0, edge_separation=5.0
+        )
         dz = environment.barrier_attenuation(b, 60.0, BANDS)
         assert np.max(dz) == pytest.approx(25.0)
         assert np.all(dz <= 25.0 + 1e-9)
 
     def test_double_exceeds_single(self) -> None:
-        single = environment.Barrier(
-            source_to_edge=10.0, edge_to_receiver=10.0
-        )
+        single = environment.Barrier(source_to_edge=10.0, edge_to_receiver=10.0)
         double = environment.Barrier(
             source_to_edge=10.0, edge_to_receiver=10.0, edge_separation=2.0
         )
@@ -270,12 +255,15 @@ class TestBarrier:
         # 4.55 dB at 500 Hz, 2.61 dB at 4 kHz -- decaying with frequency
         # instead of accruing screening credit.
         edge = math.hypot(50.0, 0.5)
-        b = environment.Barrier(source_to_edge=edge, edge_to_receiver=edge,
-                                line_of_sight_clear=True)
+        b = environment.Barrier(
+            source_to_edge=edge, edge_to_receiver=edge, line_of_sight_clear=True
+        )
         dz = environment.barrier_attenuation(b, 100.0, [63.0, 500.0, 4000.0])
         z = 2.0 * edge - 100.0
-        expected = [10.0 * math.log10(3.0 - (20.0 * f / 340.0) * z)
-                    for f in (63.0, 500.0, 4000.0)]
+        expected = [
+            10.0 * math.log10(3.0 - (20.0 * f / 340.0) * z)
+            for f in (63.0, 500.0, 4000.0)
+        ]
         assert dz == pytest.approx(expected, abs=1e-9)
         assert dz[0] == pytest.approx(4.744, abs=0.005)
         assert dz[1] == pytest.approx(4.553, abs=0.005)
@@ -287,8 +275,9 @@ class TestBarrier:
         # Top edge 3 m below the sight line: no screening effect remains at
         # mid/high frequency (Dz clamped at 0; z ~ -lambda/10 boundary).
         edge = math.hypot(50.0, 3.0)
-        b = environment.Barrier(source_to_edge=edge, edge_to_receiver=edge,
-                                line_of_sight_clear=True)
+        b = environment.Barrier(
+            source_to_edge=edge, edge_to_receiver=edge, line_of_sight_clear=True
+        )
         dz = environment.barrier_attenuation(b, 100.0, BANDS)
         assert np.all(dz >= 0.0)
         assert np.all(np.diff(dz) <= 1e-12)
@@ -304,11 +293,10 @@ class TestBarrier:
 
     def test_c2_image_source_variant(self) -> None:
         # C2 = 40 (image sources) gives more attenuation than C2 = 20.
-        normal = environment.Barrier(
-            source_to_edge=10.0, edge_to_receiver=10.0
+        normal = environment.Barrier(source_to_edge=10.0, edge_to_receiver=10.0)
+        image = environment.Barrier(
+            source_to_edge=10.0, edge_to_receiver=10.0, ground_reflections_by_image=True
         )
-        image = environment.Barrier(source_to_edge=10.0, edge_to_receiver=10.0,
-                                    ground_reflections_by_image=True)
         dz_n = environment.barrier_attenuation(normal, 19.0, BANDS)
         dz_i = environment.barrier_attenuation(image, 19.0, BANDS)
         assert np.all(dz_i[dz_n < 20.0 - 1e-6] > dz_n[dz_n < 20.0 - 1e-6])
@@ -336,9 +324,7 @@ class TestBarrier:
 class TestMeteorologicalCorrection:
     def test_zero_below_threshold(self) -> None:
         # dp <= 10(hs+hr) => Cmet = 0.
-        assert (
-            environment.meteorological_correction(20.0, 1.0, 1.0, 2.0) == 0.0
-        )
+        assert environment.meteorological_correction(20.0, 1.0, 1.0, 2.0) == 0.0
 
     def test_eq22_closed_form(self) -> None:
         # dp=200, hs+hr=2 => 2*(1 - 20/200) = 1,8.
@@ -359,18 +345,15 @@ class TestMeteorologicalCorrection:
 # --------------------------------------------------------------------------- #
 class TestOutdoorPropagation:
     def test_breakdown_sums_to_total(self) -> None:
-        r = environment.outdoor_propagation_attenuation(200.0, 2.0, 2.0, BANDS,
-                                                        1.0, 1.0, 1.0)
+        r = environment.outdoor_propagation_attenuation(
+            200.0, 2.0, 2.0, BANDS, 1.0, 1.0, 1.0
+        )
         assert isinstance(r, environment.OutdoorAttenuation)
         assert np.allclose(r.a_total, r.a_div + r.a_atm + r.a_gr + r.a_bar)
 
     def test_total_grows_with_distance(self) -> None:
-        near = environment.outdoor_propagation_attenuation(
-            100.0, 2.0, 2.0, BANDS
-        )
-        far = environment.outdoor_propagation_attenuation(
-            400.0, 2.0, 2.0, BANDS
-        )
+        near = environment.outdoor_propagation_attenuation(100.0, 2.0, 2.0, BANDS)
+        far = environment.outdoor_propagation_attenuation(400.0, 2.0, 2.0, BANDS)
         assert np.all(far.a_total > near.a_total)
 
     def test_barrier_increases_attenuation(self) -> None:
@@ -412,8 +395,9 @@ class TestOutdoorPropagation:
 class TestPredictedReceiverLevel:
     def test_composition_eq3(self) -> None:
         lw = np.full(len(BANDS), 100.0)
-        r = environment.outdoor_propagation_attenuation(200.0, 2.0, 2.0, BANDS,
-                                                        1.0, 1.0, 1.0)
+        r = environment.outdoor_propagation_attenuation(
+            200.0, 2.0, 2.0, BANDS, 1.0, 1.0, 1.0
+        )
         level = environment.predicted_receiver_level(
             lw,
             environment.PropagationGeometry(200.0, 2.0, 2.0),
@@ -425,16 +409,12 @@ class TestPredictedReceiverLevel:
     def test_directivity_and_omega_add(self) -> None:
         lw = np.full(len(BANDS), 90.0)
         geometry = environment.PropagationGeometry(200.0, 2.0, 2.0)
-        base = environment.predicted_receiver_level(
-            lw, geometry, frequencies=BANDS
-        )
+        base = environment.predicted_receiver_level(lw, geometry, frequencies=BANDS)
         boosted = environment.predicted_receiver_level(
             lw,
             geometry,
             frequencies=BANDS,
-            directivity=environment.DirectivityCorrection(
-                index=2.0, d_omega=3.0
-            ),
+            directivity=environment.DirectivityCorrection(index=2.0, d_omega=3.0),
         )
         assert np.allclose(boosted - base, 5.0)
 
@@ -481,18 +461,14 @@ class TestInputValidation:
     def test_ground_attenuation_rejects_nonpositive_frequency(self) -> None:
         with_zero = np.array([0.0, 500.0])
         with pytest.raises(ValueError, match="frequencies"):
-            environment.ground_attenuation(
-                200.0, 2.0, 2.0, with_zero, 1.0, 1.0, 1.0
-            )
+            environment.ground_attenuation(200.0, 2.0, 2.0, with_zero, 1.0, 1.0, 1.0)
 
     def test_ground_attenuation_rejects_nonpositive_distance(self) -> None:
         with pytest.raises(ValueError, match="distance"):
             environment.ground_attenuation(0.0, 2.0, 2.0, BANDS, 1.0, 1.0, 1.0)
 
     def test_barrier_attenuation_rejects_nonpositive_frequency(self) -> None:
-        barrier = environment.Barrier(
-            source_to_edge=50.0, edge_to_receiver=50.0
-        )
+        barrier = environment.Barrier(source_to_edge=50.0, edge_to_receiver=50.0)
         with_negative = np.array([-1.0, 500.0])
         with pytest.raises(ValueError, match="frequencies"):
             environment.barrier_attenuation(barrier, 90.0, with_negative)
@@ -502,12 +478,21 @@ def test_public_exports() -> None:
     from phonometry import environment
 
     for name in (
-        "Barrier", "OutdoorAttenuation", "outdoor_propagation_attenuation",
-        "predicted_receiver_level", "geometric_divergence",
-        "atmospheric_absorption", "ground_attenuation",
-        "ground_attenuation_alternative", "barrier_attenuation",
-        "meteorological_correction", "directivity_omega", "DEFAULT_FREQUENCIES",
-        "PropagationGeometry", "GroundFactors", "AtmosphericConditions",
+        "Barrier",
+        "OutdoorAttenuation",
+        "outdoor_propagation_attenuation",
+        "predicted_receiver_level",
+        "geometric_divergence",
+        "atmospheric_absorption",
+        "ground_attenuation",
+        "ground_attenuation_alternative",
+        "barrier_attenuation",
+        "meteorological_correction",
+        "directivity_omega",
+        "DEFAULT_FREQUENCIES",
+        "PropagationGeometry",
+        "GroundFactors",
+        "AtmosphericConditions",
         "DirectivityCorrection",
     ):
         assert hasattr(environment, name), name

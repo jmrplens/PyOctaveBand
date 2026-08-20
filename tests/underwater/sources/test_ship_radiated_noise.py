@@ -32,9 +32,13 @@ def _delta_l(u: float) -> float:
         (2.0, -3.646990755),
     ],
 )
-def test_surface_correction_independent_anchors(u: float, expected_delta_l: float) -> None:
+def test_surface_correction_independent_anchors(
+    u: float, expected_delta_l: float
+) -> None:
     # With c = 2π and d_s = 1 m, u = k·d_s = (2πf/c)·1 = f, so f = u sets u exactly.
-    delta_l = _surface_correction(np.array([u]), source_depth=1.0, sound_speed=2.0 * np.pi)
+    delta_l = _surface_correction(
+        np.array([u]), source_depth=1.0, sound_speed=2.0 * np.pi
+    )
     assert float(delta_l[0]) == pytest.approx(expected_delta_l, abs=1e-7)
 
 
@@ -124,6 +128,4 @@ def test_rejects_shape_mismatch() -> None:
     levels_2_bands = np.array([1.0, 2.0])
     frequencies_3_bands = np.array([100.0, 200.0, 300.0])
     with pytest.raises(ValueError):
-        underwater.monopole_source_level(
-            levels_2_bands, frequencies_3_bands, 8.0
-        )
+        underwater.monopole_source_level(levels_2_bands, frequencies_3_bands, 8.0)

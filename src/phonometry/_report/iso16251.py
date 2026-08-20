@@ -82,6 +82,7 @@ def _metadata_pairs(
     climate ...) come from the :class:`ReportMetadata` when one is supplied.
     Only fields that are set are returned, so empty rows never appear.
     """
+
     def _md(name: str) -> Any:
         return getattr(metadata, name) if metadata is not None else None
 
@@ -102,15 +103,21 @@ def _metadata_pairs(
         (t("Manufacturer", language), _md("manufacturer")),
         (t("Floor covering", language), _md("specimen")),
         (t("Mounting", language), _md("mounting")),
-        (t("Mass per unit area [kg/m<super>2</super>]", language),
-         fmt_meta(mass_per_area, language) if mass_per_area is not None else None),
+        (
+            t("Mass per unit area [kg/m<super>2</super>]", language),
+            fmt_meta(mass_per_area, language) if mass_per_area is not None else None,
+        ),
         (range_label, freq_range),
         (t("Test facility", language), _md("test_room")),
         (t("Date of test", language), _md("test_date")),
-        (t("Temperature [&#176;C]", language),
-         fmt_meta(temperature, language) if temperature is not None else None),
-        (t("Ambient pressure [kPa]", language),
-         fmt_meta(pressure, language) if pressure is not None else None),
+        (
+            t("Temperature [&#176;C]", language),
+            fmt_meta(temperature, language) if temperature is not None else None,
+        ),
+        (
+            t("Ambient pressure [kPa]", language),
+            fmt_meta(pressure, language) if pressure is not None else None,
+        ),
     ]
     # The frequency range is a formatted (label-safe) string; the remaining
     # values are user-supplied free text, so escape XML specials so a stray '&'
@@ -188,9 +195,7 @@ def _value_table(
         value = format_number(float(delta_l[k]), language, decimals=1)
         # band_table receives plain strings drawn literally (not Paragraph
         # markup), so the limit marker is a literal ">", not the XML entity.
-        row: list[Any] = [
-            f"{round(fk)}", f"> {value}" if limited[k] else value
-        ]
+        row: list[Any] = [f"{round(fk)}", f"> {value}" if limited[k] else value]
         if ln_r is not None:
             row.append(format_number(float(ln_r[k]), language, decimals=1))
         rows.append(row)
@@ -221,9 +226,7 @@ def _is_background_limited(result: FloorCoveringImprovementResult) -> bool:
     return bool(np.any(np.asarray(result.limited, dtype=bool)))
 
 
-def _box_statement(
-    result: FloorCoveringImprovementResult, language: str = "en"
-) -> str:
+def _box_statement(result: FloorCoveringImprovementResult, language: str = "en") -> str:
     """The boxed single-number statement, or a characterisation headline.
 
     With the 16 rating bands present the box carries the ISO 16251-1 Clause 8 e)
@@ -246,8 +249,7 @@ def _box_statement(
     lo = round(float(freqs.min())) if freqs.size else 0
     hi = round(float(freqs.max())) if freqs.size else 0
     return t(
-        "Reduction of impact sound pressure level <b>&#916;L</b>, "
-        "{lo} Hz to {hi} Hz",
+        "Reduction of impact sound pressure level <b>&#916;L</b>, {lo} Hz to {hi} Hz",
         language,
     ).format(lo=lo, hi=hi)
 
@@ -267,10 +269,14 @@ def _body(
     from ._layout import fiche_paragraph as Paragraph
 
     ln_r = _reference_floor_with_covering(result) if verbose else None
-    caption = t(
-        "One-third-octave &#916;L with the reference floor L<sub>n,r</sub>",
-        language,
-    ) if ln_r is not None else t("One-third-octave improvement &#916;L [dB]", language)
+    caption = (
+        t(
+            "One-third-octave &#916;L with the reference floor L<sub>n,r</sub>",
+            language,
+        )
+        if ln_r is not None
+        else t("One-third-octave improvement &#916;L [dB]", language)
+    )
     left_cell: list[Any] = [
         Paragraph(caption, caption_style),
         _value_table(result, ln_r, language),
@@ -367,8 +373,11 @@ def render_iso16251_report(
 
     flow.append(result_box(_box_statement(result, language), styles, accent))
     statement_style = ParagraphStyle(
-        "iso16251_statement", parent=styles["Normal"], fontSize=8.5,
-        textColor=colors.HexColor(_MUTED_HEX), spaceBefore=4,
+        "iso16251_statement",
+        parent=styles["Normal"],
+        fontSize=8.5,
+        textColor=colors.HexColor(_MUTED_HEX),
+        spaceBefore=4,
     )
     flow.append(
         Paragraph(

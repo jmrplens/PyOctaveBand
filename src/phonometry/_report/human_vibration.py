@@ -228,10 +228,19 @@ def _operations_table(
     # The totals row keeps the light fill regardless of the zebra parity.
     table.setStyle(
         [
-            ("BACKGROUND", (0, len(data) - 1), (-1, len(data) - 1),
-             colors.HexColor(_LIGHT_HEX)),
-            ("LINEABOVE", (0, len(data) - 1), (-1, len(data) - 1),
-             0.5, colors.HexColor(_ACCENT_HEX)),
+            (
+                "BACKGROUND",
+                (0, len(data) - 1),
+                (-1, len(data) - 1),
+                colors.HexColor(_LIGHT_HEX),
+            ),
+            (
+                "LINEABOVE",
+                (0, len(data) - 1),
+                (-1, len(data) - 1),
+                0.5,
+                colors.HexColor(_ACCENT_HEX),
+            ),
         ]
     )
     return table
@@ -424,7 +433,10 @@ def render_human_vibration_report(
     # Full-width, landscape per-operation contribution chart (self-scaling).
     flow.append(
         render_figure_drawing(
-            result.plot, 174 * mm, y_top=None, figsize=(9.2, 3.3),
+            result.plot,
+            174 * mm,
+            y_top=None,
+            figsize=(9.2, 3.3),
             language=language,
         )
     )
@@ -444,8 +456,11 @@ def render_human_vibration_report(
     flow.extend(verdict_flow(text, passed, styles, language))
 
     note_style = ParagraphStyle(
-        "humanvib_notes", parent=getSampleStyleSheet()["Normal"],
-        fontSize=7.5, leading=10, textColor=colors.HexColor(_MUTED_HEX),
+        "humanvib_notes",
+        parent=getSampleStyleSheet()["Normal"],
+        fontSize=7.5,
+        leading=10,
+        textColor=colors.HexColor(_MUTED_HEX),
         spaceBefore=6,
     )
     flow.append(

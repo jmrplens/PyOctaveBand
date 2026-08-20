@@ -48,9 +48,7 @@ from phonometry.noise_control.room_to_room import SourceRoom
 from phonometry.speech.sti import sti_from_impulse_response, stipa
 from phonometry.vibration.human.multiple_shock import multiple_shock_assessment
 
-BANDS = np.array(
-    [50.0, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000]
-)
+BANDS = np.array([50.0, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000])
 OCTAVES = np.array([125.0, 250.0, 500.0, 1000.0])
 
 
@@ -195,7 +193,11 @@ def test_shock_exposure_and_measurement_times_travel_together() -> None:
     a = np.random.default_rng(0).standard_normal(4096)
     with pytest.raises(ValueError, match="both"):
         multiple_shock_assessment(  # type: ignore[call-overload]
-            a, 1000.0, start_age=20.0, years=10, days_per_year=200.0,
+            a,
+            1000.0,
+            start_age=20.0,
+            years=10,
+            days_per_year=200.0,
             exposure_time=1.0,
         )
 

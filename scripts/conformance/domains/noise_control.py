@@ -112,8 +112,7 @@ def _chk_insertion_loss_equals_tl() -> Outcome:
     t = _sl.expansion_chamber(f, 0.3, 0.04, s).transfer_matrix
     tl = float(_sl.transmission_loss(t, inlet_area=s, outlet_area=s)[0])
     il = float(_sl.insertion_loss(t, source_impedance=z, radiation_impedance=z)[0])
-    return numeric(tl, il, 1e-9, unit="dB",
-                   expected_label=f"{tl:.4f} dB (= TL)")
+    return numeric(tl, il, 1e-9, unit="dB", expected_label=f"{tl:.4f} dB (= TL)")
 
 
 @register(
@@ -135,9 +134,7 @@ def _chk_plenum_wells() -> Outcome:
     "Duct end reflection D = 200 mm at 125 Hz = 10 dB (table node)",
 )
 def _chk_end_reflection_table() -> Outcome:
-    res = ph.noise_control.end_reflection_loss(
-        [125.0], 0.200, termination="flush"
-    )
+    res = ph.noise_control.end_reflection_loss([125.0], 0.200, termination="flush")
     return numeric(10.0, float(res.values[0]), 1e-6, unit="dB")
 
 
@@ -179,8 +176,9 @@ def _chk_flexible_duct_table() -> Outcome:
     )
     printed = np.array([6, 8, 16, 25, 28, 28, 18], dtype=float)
     worst = float(np.max(np.abs(res.values - printed)))
-    return numeric(0.0, worst, 1e-9, unit="dB",
-                   expected_label="0 dB (max |diff| over the 7 bands)")
+    return numeric(
+        0.0, worst, 1e-9, unit="dB", expected_label="0 dB (max |diff| over the 7 bands)"
+    )
 
 
 @register(
@@ -206,10 +204,14 @@ def _chk_duct_path_table_14_9() -> Outcome:
         OCTAVE_BANDS,
         [90.0, 86.0, 82.0, 79.0, 77.0, 75.0, 71.0, 61.0],
         [
-            DuctElement("Elbow", [0, 1, 2, 3, 3, 3, 3, 3],
-                        [41, 39, 36, 29, 20, 6, 0, 0]),
-            DuctElement("Silencer", [7, 12, 16, 28, 35, 35, 28, 17],
-                        [49, 43, 44, 42, 42, 45, 35, 24]),
+            DuctElement(
+                "Elbow", [0, 1, 2, 3, 3, 3, 3, 3], [41, 39, 36, 29, 20, 6, 0, 0]
+            ),
+            DuctElement(
+                "Silencer",
+                [7, 12, 16, 28, 35, 35, 28, 17],
+                [49, 43, 44, 42, 42, 45, 35, 24],
+            ),
             DuctElement("Lined duct 36x24", [2, 2, 3, 7, 15, 12, 11, 9]),
             DuctElement("Split 25%", 6.0),
             DuctElement("Lined duct 18x12", [3, 3, 5, 11, 25, 22, 16, 13]),
@@ -222,8 +224,13 @@ def _chk_duct_path_table_14_9() -> Outcome:
     worst = float(np.max(np.abs(np.round(res.received_level) - printed)))
     # The printed sheet carries whole decibels and its own rounding is not
     # always self-consistent, so 1 dB is the published resolution.
-    return numeric(0.0, worst, 1.0, unit="dB",
-                   expected_label="0 dB +/-1 (max |diff| over the 8 bands)")
+    return numeric(
+        0.0,
+        worst,
+        1.0,
+        unit="dB",
+        expected_label="0 dB +/-1 (max |diff| over the 8 bands)",
+    )
 
 
 @register(
@@ -238,8 +245,13 @@ def _chk_diffuser_sound_power() -> Outcome:
     )
     printed = np.array([33.0, 32.0, 29.0, 23.0, 15.0])
     worst = float(np.max(np.abs(res.values[:5] - printed)))
-    return numeric(0.0, worst, 1.0, unit="dB",
-                   expected_label="0 dB +/-1 (max |diff| over the five bands)")
+    return numeric(
+        0.0,
+        worst,
+        1.0,
+        unit="dB",
+        expected_label="0 dB +/-1 (max |diff| over the five bands)",
+    )
 
 
 @register(
@@ -266,8 +278,7 @@ def _chk_duct_cut_on_with_flow() -> Outcome:
         abs(float(res.cut_on[0]) - 812.0),
         abs(float(res.axial_wavenumber[0]) + 8.23) * 100.0,
     )
-    return numeric(0.0, worst, 1.0,
-                   expected_label="0 +/-1 (Hz, and 1/m x100)")
+    return numeric(0.0, worst, 1.0, expected_label="0 +/-1 (Hz, and 1/m x100)")
 
 
 @register(
@@ -281,8 +292,9 @@ def _chk_rectangular_duct_cut_on() -> Outcome:
     )
     printed = np.array([264.0, 428.0, 503.0])
     worst = float(np.max(np.abs(np.round(res.cut_on) - printed)))
-    return numeric(0.0, worst, 1e-9, unit="Hz",
-                   expected_label="0 Hz (max |diff| over the 3 modes)")
+    return numeric(
+        0.0, worst, 1e-9, unit="Hz", expected_label="0 Hz (max |diff| over the 3 modes)"
+    )
 
 
 @register(
@@ -292,8 +304,7 @@ def _chk_rectangular_duct_cut_on() -> Outcome:
 )
 def _chk_enclosure_floor() -> Outcome:
     res = ph.noise_control.enclosure_insertion_loss([40.0], 6.0, 5.0, 0.999999)
-    return numeric(10.0 * math.log10(0.3), float(res.correction[0]), 1e-3,
-                   unit="dB")
+    return numeric(10.0 * math.log10(0.3), float(res.correction[0]), 1e-3, unit="dB")
 
 
 # --- Room-to-room chain (Norton & Karczub 2e, Chapter 4 problems) ---------
@@ -302,8 +313,10 @@ def _chk_enclosure_floor() -> Outcome:
 #: coefficients of the walls, floor and ceiling over 125 Hz to 4 kHz.
 _N421_BANDS = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
 _N421_SURFACES = (
-    (2.0 * (8.0 * 3.0) + 2.0 * (9.0 * 3.0),
-     np.array([0.04, 0.04, 0.09, 0.15, 0.17, 0.23])),
+    (
+        2.0 * (8.0 * 3.0) + 2.0 * (9.0 * 3.0),
+        np.array([0.04, 0.04, 0.09, 0.15, 0.17, 0.23]),
+    ),
     (72.0, np.array([0.02, 0.06, 0.14, 0.37, 0.60, 0.66])),
     (72.0, np.array([0.30, 0.20, 0.15, 0.05, 0.05, 0.05])),
 )
@@ -324,15 +337,19 @@ def _chk_room_to_room_noise_reduction() -> Outcome:
     )
     printed = np.array([37.5, 40.8, 49.0, 62.8, 65.3, 65.9])
     worst = float(np.max(np.abs(np.asarray(res.noise_reduction) - printed)))
-    return numeric(0.0, worst, 0.05, unit="dB",
-                   expected_label="0 dB +/-0.05 (max |diff| over the 6 bands)")
+    return numeric(
+        0.0,
+        worst,
+        0.05,
+        unit="dB",
+        expected_label="0 dB +/-0.05 (max |diff| over the 6 bands)",
+    )
 
 
 @register(
     _NOISE_CONTROL,
     "Norton & Karczub 2e 4.6/4.9 (problem 4.18 answer)",
-    "Blower in a plant room to the operator room -> "
-    "72.3/60.4/41.4/41.0/33.8/30.7 dB",
+    "Blower in a plant room to the operator room -> 72.3/60.4/41.4/41.0/33.8/30.7 dB",
 )
 def _chk_room_to_room_chain() -> Outcome:
     ceiling = np.array([0.07, 0.20, 0.40, 0.52, 0.60, 0.67])
@@ -354,17 +371,20 @@ def _chk_room_to_room_chain() -> Outcome:
         ph.room.equivalent_absorption_area(operator),
         source=ph.noise_control.SourceRoom(
             power_level=[105.0, 103.0, 98.0, 108.0, 107.0, 109.0],
-            room_constant=ph.room.room_constant(
-                268.0, ph.room.mean_absorption(plant)
-            ),
+            room_constant=ph.room.room_constant(268.0, ph.room.mean_absorption(plant)),
             directivity=4.0,
             model="constant_volume",
         ),
     )
     printed = np.array([72.3, 60.4, 41.4, 41.0, 33.8, 30.7])
     worst = float(np.max(np.abs(np.asarray(res.received_level) - printed)))
-    return numeric(0.0, worst, 0.1, unit="dB",
-                   expected_label="0 dB +/-0.1 (max |diff| over the 6 bands)")
+    return numeric(
+        0.0,
+        worst,
+        0.1,
+        unit="dB",
+        expected_label="0 dB +/-0.1 (max |diff| over the 6 bands)",
+    )
 
 
 @register(
@@ -385,16 +405,19 @@ def _chk_enclosure_required_transmission_loss() -> Outcome:
         lp1 - lp2,
         external,
         external + bare_floor + machine,
-        ph.room.mean_absorption(
-            ((external, wool), (bare_floor + machine, concrete))
-        ),
+        ph.room.mean_absorption(((external, wool), (bare_floor + machine, concrete))),
         frequencies=[63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0],
         model="norton",
     )
     printed = np.array([14.4, 25.2, 28.9, 34.4, 35.2, 34.7, 34.7, 31.6])
     worst = float(np.max(np.abs(res.panel_transmission_loss - printed)))
-    return numeric(0.0, worst, 0.15, unit="dB",
-                   expected_label="0 dB +/-0.15 (max |diff| over the 8 bands)")
+    return numeric(
+        0.0,
+        worst,
+        0.15,
+        unit="dB",
+        expected_label="0 dB +/-0.15 (max |diff| over the 8 bands)",
+    )
 
 
 @register(

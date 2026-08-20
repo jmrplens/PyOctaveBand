@@ -44,16 +44,23 @@ def _cnossos_rail_case(case: dict[str, str]) -> Any:
     traction = "traction_idling" if idling else "traction_constant"
     stock = ph.environment.RollingStock(
         axles=int(vehicle["axles"]),
-        wheel_roughness=(lam, wavelength[("wheel_roughness", vehicle["wheel_roughness"])]),
+        wheel_roughness=(
+            lam,
+            wavelength[("wheel_roughness", vehicle["wheel_roughness"])],
+        ),
         contact_filter=(lam, wavelength[("contact_filter", vehicle["contact_filter"])]),
         wheel_transfer=frequency[("wheel_transfer", vehicle["wheel_transfer"], "")],
         superstructure_transfer=frequency[
             ("superstructure_transfer", case["superstructure_transfer"], "")
         ],
-        traction=(frequency[(traction, vehicle["traction"], "A")],
-                  frequency[(traction, vehicle["traction"], "B")]),
-        aerodynamic=(frequency[("aerodynamic", vehicle["aerodynamic"], "A")],
-                     frequency[("aerodynamic", vehicle["aerodynamic"], "B")]),
+        traction=(
+            frequency[(traction, vehicle["traction"], "A")],
+            frequency[(traction, vehicle["traction"], "B")],
+        ),
+        aerodynamic=(
+            frequency[("aerodynamic", vehicle["aerodynamic"], "A")],
+            frequency[("aerodynamic", vehicle["aerodynamic"], "B")],
+        ),
         aerodynamic_alpha=float(case["aero_alpha"]),
     )
     track = ph.environment.RailwayTrack(
@@ -61,21 +68,30 @@ def _cnossos_rail_case(case: dict[str, str]) -> Any:
         track_transfer=frequency[("track_transfer", case["track_transfer"], "")],
         impact_roughness=(
             (lam, wavelength[("impact_roughness", case["impact_roughness"])])
-            if case["impact_roughness"] else None
+            if case["impact_roughness"]
+            else None
         ),
         joint_density=float(case["joint_density_per_m"]),
-        squeal_excess=float(case["squeal_excess_db"]) + float(case["bridge_constant_db"]),
+        squeal_excess=float(case["squeal_excess_db"])
+        + float(case["bridge_constant_db"]),
     )
     return ph.environment.railway_source_power(
         ph.environment.RailwayVehicle(
-            stock=stock, flow_rate=float(case["flow_veh_per_h"]),
+            stock=stock,
+            flow_rate=float(case["flow_veh_per_h"]),
             speed=float(case["speed_kmh"]),
-            condition=(ph.environment.RunningCondition.IDLING if idling
-                       else ph.environment.RunningCondition.CONSTANT),
+            condition=(
+                ph.environment.RunningCondition.IDLING
+                if idling
+                else ph.environment.RunningCondition.CONSTANT
+            ),
             idling_time=float(case["idling_time_h"]),
         ),
-        track, psi=float(case["psi_deg"]), phi=float(case["phi_deg"]),
-        reference_time=12.0, minimum_speed=0.0,
+        track,
+        psi=float(case["psi_deg"]),
+        phi=float(case["phi_deg"]),
+        reference_time=12.0,
+        minimum_speed=0.0,
         directivity_edition=ph.environment.DirectivityEdition.ORIGINAL_2015,
     )
 
@@ -94,8 +110,14 @@ def _chk_cnossos_rail_workbook() -> Outcome:
         row = result.line_power[0 if case["source_height"] == "A" else 1]
         for got, band in zip(row, bands):
             worst = max(worst, abs(float(got) - float(case[f"lw_{band}"])))
-    return numeric(0.0, worst, 0.01, unit="dB", places=4,
-                   expected_label="<= 0.01 dB on 984 published band levels (123 cases)")
+    return numeric(
+        0.0,
+        worst,
+        0.01,
+        unit="dB",
+        places=4,
+        expected_label="<= 0.01 dB on 984 published band levels (123 cases)",
+    )
 
 
 @register(
@@ -105,16 +127,24 @@ def _chk_cnossos_rail_workbook() -> Outcome:
 )
 def _chk_cnossos_rail_roughness_tables() -> Outcome:
     bad = 0
-    for brake, expected in (("c", ref.CNOSSOS_RAIL_G1A_CAST_IRON),
-                            ("k", ref.CNOSSOS_RAIL_G1A_COMPOSITE),
-                            ("n", ref.CNOSSOS_RAIL_G1A_NON_TREAD)):
+    for brake, expected in (
+        ("c", ref.CNOSSOS_RAIL_G1A_CAST_IRON),
+        ("k", ref.CNOSSOS_RAIL_G1A_COMPOSITE),
+        ("n", ref.CNOSSOS_RAIL_G1A_NON_TREAD),
+    ):
         _, levels = ph.environment.wheel_roughness(brake)
         bad += sum(1 for a, b in zip(levels, expected) if a != b)
     for cls, expected in (("E", ref.CNOSSOS_RAIL_G1B_E), ("M", ref.CNOSSOS_RAIL_G1B_M)):
         _, levels = ph.environment.rail_roughness(cls)
         bad += sum(1 for a, b in zip(levels, expected) if a != b)
-    return numeric(0.0, float(bad), 0.0, unit="mismatches", places=0,
-                   expected_label="166 coefficients identical")
+    return numeric(
+        0.0,
+        float(bad),
+        0.0,
+        unit="mismatches",
+        places=0,
+        expected_label="166 coefficients identical",
+    )
 
 
 @register(
@@ -127,8 +157,14 @@ def _chk_cnossos_rail_table_g2() -> Outcome:
     for key, expected in ref.CNOSSOS_RAIL_G2.items():
         _, levels = ph.environment.contact_filter(key)
         bad += sum(1 for a, b in zip(levels, expected) if a != b)
-    return numeric(0.0, float(bad), 0.0, unit="mismatches", places=0,
-                   expected_label="175 coefficients identical")
+    return numeric(
+        0.0,
+        float(bad),
+        0.0,
+        unit="mismatches",
+        places=0,
+        expected_label="175 coefficients identical",
+    )
 
 
 @register(
@@ -140,9 +176,7 @@ def _chk_cnossos_rail_table_g3() -> Outcome:
     bad = 0
     for key, expected in ref.CNOSSOS_RAIL_G3A.items():
         bad += sum(
-            1
-            for a, b in zip(ph.environment.track_transfer(key), expected)
-            if a != b
+            1 for a, b in zip(ph.environment.track_transfer(key), expected) if a != b
         )
     for diameter, expected in ref.CNOSSOS_RAIL_G3B.items():
         bad += sum(
@@ -152,13 +186,17 @@ def _chk_cnossos_rail_table_g3() -> Outcome:
         )
     bad += sum(
         1
-        for a, b in zip(
-            ph.environment.superstructure_transfer(), ref.CNOSSOS_RAIL_G3C
-        )
+        for a, b in zip(ph.environment.superstructure_transfer(), ref.CNOSSOS_RAIL_G3C)
         if a != b
     )
-    return numeric(0.0, float(bad), 0.0, unit="mismatches", places=0,
-                   expected_label="312 coefficients identical")
+    return numeric(
+        0.0,
+        float(bad),
+        0.0,
+        unit="mismatches",
+        places=0,
+        expected_label="312 coefficients identical",
+    )
 
 
 @register(
@@ -179,12 +217,16 @@ def _chk_cnossos_rail_source_tables() -> Outcome:
     bad += sum(1 for a, b in zip(got_high, ref.CNOSSOS_RAIL_G6_B) if a != b)
     for key, expected in ref.CNOSSOS_RAIL_G7.items():
         bad += sum(
-            1
-            for a, b in zip(ph.environment.bridge_transfer(key), expected)
-            if a != b
+            1 for a, b in zip(ph.environment.bridge_transfer(key), expected) if a != b
         )
-    return numeric(0.0, float(bad), 0.0, unit="mismatches", places=0,
-                   expected_label="371 coefficients identical")
+    return numeric(
+        0.0,
+        float(bad),
+        0.0,
+        unit="mismatches",
+        places=0,
+        expected_label="371 coefficients identical",
+    )
 
 
 @register(
@@ -209,8 +251,14 @@ def _chk_cnossos_rail_aerodynamic_law() -> Outcome:
         max(abs(float(a) - b - step) for a, b in zip(low, ref.CNOSSOS_RAIL_G6_A)),
         max(abs(float(a) - b - step) for a, b in zip(high, ref.CNOSSOS_RAIL_G6_B)),
     )
-    return numeric(0.0, worst, 1e-12, unit="dB", places=6,
-                   expected_label="50 lg 2 = 15.051 dB on every band")
+    return numeric(
+        0.0,
+        worst,
+        1e-12,
+        unit="dB",
+        places=6,
+        expected_label="50 lg 2 = 15.051 dB on every band",
+    )
 
 
 @register(
@@ -223,5 +271,6 @@ def _chk_cnossos_rail_joint_density() -> Outcome:
     frequency_grid = np.asarray(single[:24])
     got = ph.environment.impact_roughness(frequency_grid, 0.01)
     worst = float(np.max(np.abs(got - frequency_grid)))
-    return numeric(0.0, worst, 1e-12, unit="dB", places=6,
-                   expected_label="Table G-4 verbatim")
+    return numeric(
+        0.0, worst, 1e-12, unit="dB", places=6, expected_label="Table G-4 verbatim"
+    )

@@ -109,7 +109,9 @@ def test_daily_dose_equal_times_is_identity() -> None:
 
 
 def test_daily_dose_scaling() -> None:
-    assert v.daily_dose(50.0, 8.0, 2.0) == pytest.approx(50.0 * (8.0 / 2.0) ** (1.0 / 6.0))
+    assert v.daily_dose(50.0, 8.0, 2.0) == pytest.approx(
+        50.0 * (8.0 / 2.0) ** (1.0 / 6.0)
+    )
 
 
 def test_daily_dose_multi_matches_single() -> None:
@@ -127,8 +129,12 @@ def test_daily_dose_multi_matches_single() -> None:
 
 def test_ultimate_strength_formula_c4() -> None:
     # Su = 6.75 - Sage*(b+i); male Sage = 0.052.
-    assert float(v.ultimate_strength(20.0, sex="male")) == pytest.approx(6.75 - 0.052 * 20.0)
-    assert float(v.ultimate_strength(20.0, sex="female")) == pytest.approx(6.75 - 0.039 * 20.0)
+    assert float(v.ultimate_strength(20.0, sex="male")) == pytest.approx(
+        6.75 - 0.052 * 20.0
+    )
+    assert float(v.ultimate_strength(20.0, sex="female")) == pytest.approx(
+        6.75 - 0.039 * 20.0
+    )
 
 
 def test_annex_c_male_worked_example() -> None:
@@ -178,7 +184,9 @@ def test_injury_probability_accepts_arrays() -> None:
 def test_injury_probability_at_thresholds() -> None:
     # Table C.2: the R for 10 / 50 / 90 % risk should map back to those risks.
     for r_val, expected in zip(v.RISK_THRESHOLDS_MALE, (0.10, 0.50, 0.90), strict=True):
-        assert v.injury_probability(r_val, sex="male") == pytest.approx(expected, abs=0.02)
+        assert v.injury_probability(r_val, sex="male") == pytest.approx(
+            expected, abs=0.02
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -214,7 +222,11 @@ def test_invalid_inputs_raise() -> None:
         v.injury_probability(1.0, sex="other")
     with pytest.raises(ValueError, match="both exposure_time and measurement_time"):
         v.multiple_shock_assessment(
-            [1.0, 2.0], 256.0, start_age=20, years=20, days_per_year=120,
+            [1.0, 2.0],
+            256.0,
+            start_age=20,
+            years=20,
+            days_per_year=120,
             exposure_time=8.0,
         )
 
@@ -230,6 +242,7 @@ def test_response_peaks_rejects_2d() -> None:
     two_channels = np.zeros((2, 100))
     with pytest.raises(ValueError, match="1-D time series"):
         v.response_peaks(two_channels)
+
 
 def test_the_time_guards_reject_nan_and_infinity() -> None:
     """The guards go through require_positive, which rejects both."""

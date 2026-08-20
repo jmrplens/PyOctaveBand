@@ -118,9 +118,7 @@ def _duct_diameter(area: float) -> float:
     return float(2.0 * np.sqrt(area / np.pi))
 
 
-def _duct_walls(
-    ax: Axes, x0: float, x1: float, d: float, wall: float
-) -> None:
+def _duct_walls(ax: Axes, x0: float, x1: float, d: float, wall: float) -> None:
     """The two wall plates of a duct run, lying just outside its bore."""
     for y in (-0.5 * d - wall, 0.5 * d):
         _material_rect(ax, x0, y, x1 - x0, wall, "plate", linewidth=0.5)
@@ -186,21 +184,40 @@ def _draw_chamber(
             for y in (-0.5 * d_p, 0.5 * d_p):
                 ax.plot([x0, x1], [y, y], color=_C_EDGE, linewidth=1.2)
     off = 0.18 * d_c
-    _dim(ax, (0.0, -0.5 * d_c - 2.0 * off), (length, -0.5 * d_c - 2.0 * off),
-         "L = " + _mm(length, language))
-    _dim(ax, (-stub, -0.5 * d_p), (-stub, 0.5 * d_p),
-         _mm(d_p, language), offset=2.0 * off, tight=True)
-    x_dim = inlet_extension + 0.5 * (
-        length - inlet_extension - outlet_extension
+    _dim(
+        ax,
+        (0.0, -0.5 * d_c - 2.0 * off),
+        (length, -0.5 * d_c - 2.0 * off),
+        "L = " + _mm(length, language),
     )
-    _dim(ax, (x_dim, -0.5 * d_c), (x_dim, 0.5 * d_c),
-         _mm(d_c, language), offset=0.0)
+    _dim(
+        ax,
+        (-stub, -0.5 * d_p),
+        (-stub, 0.5 * d_p),
+        _mm(d_p, language),
+        offset=2.0 * off,
+        tight=True,
+    )
+    x_dim = inlet_extension + 0.5 * (length - inlet_extension - outlet_extension)
+    _dim(ax, (x_dim, -0.5 * d_c), (x_dim, 0.5 * d_c), _mm(d_c, language), offset=0.0)
     if inlet_extension > 0.0:
-        _dim(ax, (0.0, 0.5 * d_p), (inlet_extension, 0.5 * d_p),
-             _mm(inlet_extension, language), offset=-2.0 * off, tight=True)
+        _dim(
+            ax,
+            (0.0, 0.5 * d_p),
+            (inlet_extension, 0.5 * d_p),
+            _mm(inlet_extension, language),
+            offset=-2.0 * off,
+            tight=True,
+        )
     if outlet_extension > 0.0:
-        _dim(ax, (length - outlet_extension, 0.5 * d_p), (length, 0.5 * d_p),
-             _mm(outlet_extension, language), offset=-2.0 * off, tight=True)
+        _dim(
+            ax,
+            (length - outlet_extension, 0.5 * d_p),
+            (length, 0.5 * d_p),
+            _mm(outlet_extension, language),
+            offset=-2.0 * off,
+            tight=True,
+        )
 
 
 def _draw_hr_cavity(
@@ -215,17 +232,20 @@ def _draw_hr_cavity(
     from ..._i18n import format_number
 
     _material_rect(
-        ax, -0.5 * cavity_side, y0 + branch_len, cavity_side,
-        cavity_side, "cavity",
+        ax,
+        -0.5 * cavity_side,
+        y0 + branch_len,
+        cavity_side,
+        cavity_side,
+        "cavity",
     )
     ax.text(
-        0.0, y0 + branch_len + 0.5 * cavity_side,
-        "V = {volume} L".format(
-            volume=format_number(
-                cavity_volume * 1e3, language, decimals=1, trim=True
-            )
-        ),
-        fontsize=8, ha="center", va="center",
+        0.0,
+        y0 + branch_len + 0.5 * cavity_side,
+        f"V = {format_number(cavity_volume * 1e3, language, decimals=1, trim=True)} L",
+        fontsize=8,
+        ha="center",
+        va="center",
     )
 
 
@@ -246,17 +266,14 @@ def _branch_dimensions(
                 "'neck_length' and 'cavity_volume'."
             )
         if cavity_volume <= 0.0 or neck_length <= 0.0:
-            raise ValueError(
-                "'cavity_volume' and 'neck_length' must be positive."
-            )
+            raise ValueError("'cavity_volume' and 'neck_length' must be positive.")
         return (
-            _duct_diameter(neck_area), neck_length,
+            _duct_diameter(neck_area),
+            neck_length,
             float(cavity_volume ** (1.0 / 3.0)),
         )
     if length is None or branch_area is None:
-        raise ValueError(
-            "A quarter-wave drawing needs 'length' and 'branch_area'."
-        )
+        raise ValueError("A quarter-wave drawing needs 'length' and 'branch_area'.")
     if length <= 0.0:
         raise ValueError(_LENGTH_POSITIVE)
     return _duct_diameter(branch_area), length, 0.0
@@ -281,8 +298,12 @@ def _draw_branch_silencer(
     """
     d_d = _duct_diameter(duct_area)
     d_b, branch_len, cavity_side = _branch_dimensions(
-        kind, neck_area=neck_area, neck_length=neck_length,
-        cavity_volume=cavity_volume, length=length, branch_area=branch_area,
+        kind,
+        neck_area=neck_area,
+        neck_length=neck_length,
+        cavity_volume=cavity_volume,
+        length=length,
+        branch_area=branch_area,
     )
     run = max(4.0 * d_d, 2.0 * d_b + 2.0 * d_d, 2.0 * cavity_side)
     _draw_duct(ax, -0.5 * run, 0.5 * run, d_d, **kwargs)
@@ -290,9 +311,16 @@ def _draw_branch_silencer(
     from matplotlib.patches import Rectangle
 
     y0 = 0.5 * d_d
-    ax.add_patch(Rectangle((-0.5 * d_b, y0), d_b, branch_len,
-                           facecolor="none", edgecolor=_C_EDGE,
-                           linewidth=1.2))
+    ax.add_patch(
+        Rectangle(
+            (-0.5 * d_b, y0),
+            d_b,
+            branch_len,
+            facecolor="none",
+            edgecolor=_C_EDGE,
+            linewidth=1.2,
+        )
+    )
     off = 0.25 * d_d
     # A Helmholtz neck is a slot a couple of centimetres long and a few
     # millimetres wide: both of its dimensions are shorter than the text that
@@ -301,23 +329,49 @@ def _draw_branch_silencer(
     # lettered upright so that it fits between the duct wall and the cavity.
     neck = kind == _KIND_HELMHOLTZ
     if neck and cavity_volume is not None:
-        _draw_hr_cavity(
-            ax, y0, branch_len, cavity_side, cavity_volume, language
+        _draw_hr_cavity(ax, y0, branch_len, cavity_side, cavity_volume, language)
+        _dim(
+            ax,
+            (0.5 * d_b, y0),
+            (0.5 * d_b, y0 + branch_len),
+            _mm(branch_len, language),
+            offset=-2.0 * off,
+            tight=True,
+            label_side=-1.0,
+            label_upright=True,
         )
-        _dim(ax, (0.5 * d_b, y0), (0.5 * d_b, y0 + branch_len),
-             _mm(branch_len, language), offset=-2.0 * off, tight=True,
-             label_side=-1.0, label_upright=True)
     else:
         # Closed end of the quarter-wave tube.
-        ax.plot([-0.5 * d_b, 0.5 * d_b],
-                [y0 + branch_len, y0 + branch_len],
-                color=_C_EDGE, linewidth=2.2)
-        _dim(ax, (0.5 * d_b, y0), (0.5 * d_b, y0 + branch_len),
-             _mm(branch_len, language), offset=-2.0 * off)
-    _dim(ax, (-0.5 * d_b, y0), (0.5 * d_b, y0), _mm(d_b, language),
-         offset=-1.5 * off, tight=True, label_side=-1.0 if neck else 1.0)
-    _dim(ax, (-0.5 * run, -0.5 * d_d), (-0.5 * run, 0.5 * d_d),
-         _mm(d_d, language), offset=2.0 * off, tight=True)
+        ax.plot(
+            [-0.5 * d_b, 0.5 * d_b],
+            [y0 + branch_len, y0 + branch_len],
+            color=_C_EDGE,
+            linewidth=2.2,
+        )
+        _dim(
+            ax,
+            (0.5 * d_b, y0),
+            (0.5 * d_b, y0 + branch_len),
+            _mm(branch_len, language),
+            offset=-2.0 * off,
+        )
+    _dim(
+        ax,
+        (-0.5 * d_b, y0),
+        (0.5 * d_b, y0),
+        _mm(d_b, language),
+        offset=-1.5 * off,
+        tight=True,
+        label_side=-1.0 if neck else 1.0,
+    )
+    _dim(
+        ax,
+        (-0.5 * run, -0.5 * d_d),
+        (-0.5 * run, 0.5 * d_d),
+        _mm(d_d, language),
+        offset=2.0 * off,
+        tight=True,
+    )
 
 
 def _validate_chamber_geometry(
@@ -330,8 +384,7 @@ def _validate_chamber_geometry(
     """Chamber parameter validation, before any figure exists."""
     if length is None or chamber_area is None or pipe_area is None:
         raise ValueError(
-            "A chamber drawing needs 'length', 'chamber_area' and "
-            "'pipe_area'."
+            "A chamber drawing needs 'length', 'chamber_area' and 'pipe_area'."
         )
     if length <= 0.0:
         raise ValueError(_LENGTH_POSITIVE)
@@ -341,8 +394,7 @@ def _validate_chamber_geometry(
         raise ValueError("'chamber_area' must exceed 'pipe_area'.")
     if inlet_extension + outlet_extension > length:
         raise ValueError(
-            "'inlet_extension' + 'outlet_extension' must not exceed "
-            "'length'."
+            "'inlet_extension' + 'outlet_extension' must not exceed 'length'."
         )
 
 
@@ -366,15 +418,11 @@ def _validate_branch_geometry(
                 "'neck_length' and 'cavity_volume'."
             )
         if neck_length <= 0.0 or cavity_volume <= 0.0:
-            raise ValueError(
-                "'cavity_volume' and 'neck_length' must be positive."
-            )
+            raise ValueError("'cavity_volume' and 'neck_length' must be positive.")
         _duct_diameter(neck_area)
         return
     if length is None or branch_area is None:
-        raise ValueError(
-            "A quarter-wave drawing needs 'length' and 'branch_area'."
-        )
+        raise ValueError("A quarter-wave drawing needs 'length' and 'branch_area'.")
     if length <= 0.0:
         raise ValueError(_LENGTH_POSITIVE)
     _duct_diameter(branch_area)
@@ -424,40 +472,54 @@ def plot_silencer_geometry(
     _check_language(language)
     if kind not in _SILENCER_KINDS:
         raise ValueError(
-            f"Unknown silencer kind {kind!r}; expected one of "
-            f"{_SILENCER_KINDS}."
+            f"Unknown silencer kind {kind!r}; expected one of {_SILENCER_KINDS}."
         )
     chamber = kind in (_KIND_EXPANSION, _KIND_EXTENDED)
     if chamber:
         _validate_chamber_geometry(
-            length, chamber_area, pipe_area, inlet_extension,
+            length,
+            chamber_area,
+            pipe_area,
+            inlet_extension,
             outlet_extension,
         )
     else:
         _validate_branch_geometry(
-            kind, duct_area, neck_area, neck_length, cavity_volume,
-            length, branch_area,
+            kind,
+            duct_area,
+            neck_area,
+            neck_length,
+            cavity_volume,
+            length,
+            branch_area,
         )
     if ax is None:
         ax = _new_axes()
     if chamber:
         _draw_chamber(
-            ax, length or 0.0, chamber_area or 0.0, pipe_area or 0.0,
+            ax,
+            length or 0.0,
+            chamber_area or 0.0,
+            pipe_area or 0.0,
             language,
             inlet_extension=inlet_extension,
             outlet_extension=outlet_extension,
         )
     else:
         _draw_branch_silencer(
-            ax, kind, duct_area or 0.0, language,
-            neck_area=neck_area, neck_length=neck_length,
-            cavity_volume=cavity_volume, length=length,
+            ax,
+            kind,
+            duct_area or 0.0,
+            language,
+            neck_area=neck_area,
+            neck_length=neck_length,
+            cavity_volume=cavity_volume,
+            length=length,
             branch_area=branch_area,
         )
     _finish_geometry_axes(
         ax,
-        _t(_CROSS_SECTION, language)
-        + f" ({_t(kind, language)})",
+        _t(_CROSS_SECTION, language) + f" ({_t(kind, language)})",
     )
     return ax
 
@@ -475,16 +537,17 @@ def plot_silencer_result_geometry(
     which carries the geometry of each element separately.
     """
     if result.chain is not None:
-        return plot_silencer_chain_geometry(
-            result.chain, ax=ax, language=language
-        )
+        return plot_silencer_chain_geometry(result.chain, ax=ax, language=language)
     if result.geometry is None:
         raise ValueError(
             "This result does not retain its geometry; call "
             "plot_silencer_geometry(kind, ...) with the original arguments."
         )
     return plot_silencer_geometry(
-        result.kind, ax=ax, language=language, **dict(result.geometry),
+        result.kind,
+        ax=ax,
+        language=language,
+        **dict(result.geometry),
     )
 
 
@@ -511,9 +574,7 @@ def _chain_layout(
     x = 0.0
     for element in elements:
         if element.area is None:
-            branches.append(
-                (x, element.label, element.shorting_frequency)
-            )
+            branches.append((x, element.label, element.shorting_frequency))
             continue
         length = element.length or 0.0
         if length > 0.0:
@@ -539,15 +600,11 @@ def _diameter_at(segments: Sequence[_Segment], x: float) -> float:
     A branch landing on the joint between two runs is drawn on the wider of
     the two, which is the shell its mouth would open through.
     """
-    touching = [
-        _duct_diameter(area) for x0, x1, area in segments if x0 <= x <= x1
-    ]
+    touching = [_duct_diameter(area) for x0, x1, area in segments if x0 <= x <= x1]
     return max(touching) if touching else _duct_diameter(segments[0][2])
 
 
-def _draw_chain_ducts(
-    ax: Axes, segments: Sequence[_Segment], wall: float
-) -> None:
+def _draw_chain_ducts(ax: Axes, segments: Sequence[_Segment], wall: float) -> None:
     """The bores, the wall plates and the annular faces of the area steps.
 
     The two ends of the whole run are left open: a chain declares its elements
@@ -566,26 +623,24 @@ def _draw_chain_ducts(
         near, far = sorted((d_before, d_after))
         for sign in (-1.0, 1.0):
             ax.plot(
-                [x, x], [sign * 0.5 * near, sign * (0.5 * far + wall)],
-                color=_C_EDGE, linewidth=1.4,
+                [x, x],
+                [sign * 0.5 * near, sign * (0.5 * far + wall)],
+                color=_C_EDGE,
+                linewidth=1.4,
             )
 
 
-def _branch_label(
-    branch: _Branch, index: int, total: int, language: str
-) -> str:
+def _branch_label(branch: _Branch, index: int, total: int, language: str) -> str:
     """The callout text of a branch point: what it is, and where it bites."""
     from ..._i18n import format_number
 
     _station, label, frequency = branch
-    text = label if label else _t("Side branch", language)
+    text = label or _t("Side branch", language)
     if not label and total > 1:
         text = f"{text} {index + 1}"
     if frequency is not None:
         text += "\n" + _t("min |Z| at {frequency} Hz", language).format(
-            frequency=format_number(
-                frequency, language, decimals=1, trim=True
-            )
+            frequency=format_number(frequency, language, decimals=1, trim=True)
         )
     return text
 
@@ -612,17 +667,27 @@ def _draw_branch_points(
         ax.plot(
             [x, x + run, x + run + 0.10 * d_max],
             [y0, y0 + rise, y0 + rise],
-            color=_C_SECONDARY, linewidth=0.9, zorder=4,
+            color=_C_SECONDARY,
+            linewidth=0.9,
+            zorder=4,
         )
         ax.plot(
-            [x], [y0], marker="o", markersize=5.0,
-            markerfacecolor=_C_SECONDARY, markeredgecolor=_C_EDGE,
-            markeredgewidth=0.6, zorder=6,
+            [x],
+            [y0],
+            marker="o",
+            markersize=5.0,
+            markerfacecolor=_C_SECONDARY,
+            markeredgecolor=_C_EDGE,
+            markeredgewidth=0.6,
+            zorder=6,
         )
         ax.text(
-            x + run + 0.14 * d_max, y0 + rise,
+            x + run + 0.14 * d_max,
+            y0 + rise,
             _branch_label(branch, index, len(branches), language),
-            fontsize=8, ha="left", va="center",
+            fontsize=8,
+            ha="left",
+            va="center",
         )
 
 
@@ -647,15 +712,22 @@ def _dimension_chain(
     for x0, x1, area in segments:
         y_wall = -0.5 * _duct_diameter(area) - wall
         _dim(
-            ax, (x0, y_wall), (x1, y_wall), _mm(x1 - x0, language),
-            offset=y_lengths - y_wall, tight=(x1 - x0) < 0.25 * total,
+            ax,
+            (x0, y_wall),
+            (x1, y_wall),
+            _mm(x1 - x0, language),
+            offset=y_lengths - y_wall,
+            tight=(x1 - x0) < 0.25 * total,
         )
     # A single segment is its own overall run, so the second line would repeat
     # the first; the overall run is dimensioned only when there is more than one.
     if len(segments) > 1:
         _dim(
-            ax, (0.0, y_lengths), (total, y_lengths),
-            "L = " + _mm(total, language), offset=-1.6 * off,
+            ax,
+            (0.0, y_lengths),
+            (total, y_lengths),
+            "L = " + _mm(total, language),
+            offset=-1.6 * off,
         )
     drawn: set[float] = set()
     for x0, x1, area in _equal_area_runs(segments):
@@ -665,7 +737,10 @@ def _dimension_chain(
         d = _duct_diameter(area)
         x_mid = 0.5 * (x0 + x1)
         _dim(
-            ax, (x_mid, -0.5 * d), (x_mid, 0.5 * d), _mm(d, language),
+            ax,
+            (x_mid, -0.5 * d),
+            (x_mid, 0.5 * d),
+            _mm(d, language),
             offset=0.0,
         )
 
@@ -683,7 +758,12 @@ def _note_under(ax: Axes, width: float, note: str) -> None:
     y_note = float(bounds.y0) - 0.06 * span
     ax.update_datalim(((0.0, y_note - 0.16 * span), (width, y_note)))
     ax.text(
-        0.5 * width, y_note, note, fontsize=8, ha="center", va="top",
+        0.5 * width,
+        y_note,
+        note,
+        fontsize=8,
+        ha="center",
+        va="top",
     )
 
 
@@ -737,8 +817,7 @@ def plot_silencer_chain_geometry(
         _note_under(ax, total, _t(_CHAIN_NOTE, language))
     _finish_geometry_axes(
         ax,
-        _t(_CROSS_SECTION, language)
-        + f" ({_t(_KIND_CHAIN, language)})",
+        _t(_CROSS_SECTION, language) + f" ({_t(_KIND_CHAIN, language)})",
     )
     return ax
 
@@ -807,42 +886,74 @@ def plot_plenum_geometry(
         ((box_w, box_w), (0.0, y_out - 0.5 * mouth)),
         ((box_w, box_w), (y_out + 0.5 * mouth, box_h)),
     ]
-    for (x_pair, y_pair) in walls:
+    for x_pair, y_pair in walls:
         ax.plot(x_pair, y_pair, color=colour, linewidth=lw, **kwargs)
     stub = 0.35 * r
     wall_t = max(0.05 * duct, 0.002)
-    ax.add_patch(Rectangle((-stub, y_in - 0.5 * duct), stub, duct,
-                           facecolor="none", edgecolor=_C_EDGE,
-                           linewidth=1.2))
+    ax.add_patch(
+        Rectangle(
+            (-stub, y_in - 0.5 * duct),
+            stub,
+            duct,
+            facecolor="none",
+            edgecolor=_C_EDGE,
+            linewidth=1.2,
+        )
+    )
     for y_wall in (y_in - 0.5 * duct - wall_t, y_in + 0.5 * duct):
-        _material_rect(ax, -stub, y_wall, stub, wall_t, "plate",
-                       linewidth=0.5)
-    ax.text(-0.5 * stub, y_in + 0.85 * duct, _t("Inlet", language),
-            fontsize=8, ha="center", va="bottom")
+        _material_rect(ax, -stub, y_wall, stub, wall_t, "plate", linewidth=0.5)
+    ax.text(
+        -0.5 * stub,
+        y_in + 0.85 * duct,
+        _t("Inlet", language),
+        fontsize=8,
+        ha="center",
+        va="bottom",
+    )
     # Outlet mouth on the right wall.
-    ax.plot([box_w, box_w], [y_out - 0.5 * mouth, y_out + 0.5 * mouth],
-            color=_C_PRIMARY, linewidth=3.0)
-    ax.text(box_w * 1.02, y_out + 0.7 * mouth, _t("Outlet", language),
-            fontsize=8, ha="left", va="bottom")
+    ax.plot(
+        [box_w, box_w],
+        [y_out - 0.5 * mouth, y_out + 0.5 * mouth],
+        color=_C_PRIMARY,
+        linewidth=3.0,
+    )
+    ax.text(
+        box_w * 1.02,
+        y_out + 0.7 * mouth,
+        _t("Outlet", language),
+        fontsize=8,
+        ha="left",
+        va="bottom",
+    )
     # Line of sight, labelled along its own slope.
-    ax.plot([0.0, box_w], [y_in, y_out], linestyle="--", linewidth=1.2,
-            color=_C_SECONDARY)
+    ax.plot(
+        [0.0, box_w], [y_in, y_out], linestyle="--", linewidth=1.2, color=_C_SECONDARY
+    )
     slope = float(np.degrees(angle))
     ax.text(
-        0.5 * box_w, 0.5 * (y_in + y_out) + 0.03 * r,
-        "r = " + _metres(r, language), fontsize=8, ha="center",
-        va="bottom", rotation=slope, rotation_mode="anchor",
+        0.5 * box_w,
+        0.5 * (y_in + y_out) + 0.03 * r,
+        "r = " + _metres(r, language),
+        fontsize=8,
+        ha="center",
+        va="bottom",
+        rotation=slope,
+        rotation_mode="anchor",
         color=_C_SECONDARY,
     )
     from ..._i18n import format_number
 
     ax.text(
-        0.5 * box_w, -0.08 * r,
-        "S_w = " + format_number(wall_area, language, decimals=1, trim=True)
+        0.5 * box_w,
+        -0.08 * r,
+        "S_w = "
+        + format_number(wall_area, language, decimals=1, trim=True)
         + " m$^2$, S_out = "
         + format_number(exit_area, language, decimals=2, trim=True)
         + " m$^2$",
-        fontsize=8, ha="center", va="top",
+        fontsize=8,
+        ha="center",
+        va="top",
     )
     _finish_geometry_axes(ax, _t("Plenum chamber section", language))
     return ax

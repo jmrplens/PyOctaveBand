@@ -211,8 +211,11 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     ("method", "basis", "caption"),
     [
         ("critical-band", "critical-band method", "Critical band audibility"),
-        ("equally-contributing", "equally-contributing critical-band method",
-         "Equally-contributing critical band audibility"),
+        (
+            "equally-contributing",
+            "equally-contributing critical-band method",
+            "Equally-contributing critical band audibility",
+        ),
         ("octave", "octave-band method", "Octave band audibility"),
     ],
 )
@@ -230,9 +233,7 @@ def test_non_default_procedure_fiche_names_its_procedure(
 
     proc = sii_procedure(method)
     n = proc.frequencies.size
-    res = speech_intelligibility_index(
-        "normal", np.full(n, 25.0), method=method
-    )
+    res = speech_intelligibility_index("normal", np.full(n, 25.0), method=method)
     out = tmp_path / f"sii_{method}.pdf"
     res.report(str(out))
     _assert_one_page(str(out))
@@ -250,9 +251,7 @@ def test_non_default_procedure_fiche_renders_in_spanish(tmp_path) -> None:
     """The Spanish fiche translates the procedure name in the basis line."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
-    res = speech_intelligibility_index(
-        "normal", np.full(6, 25.0), method="octave"
-    )
+    res = speech_intelligibility_index("normal", np.full(6, 25.0), method="octave")
     out = tmp_path / "sii_octave_es.pdf"
     res.report(str(out), language="es")
     _assert_one_page(str(out))

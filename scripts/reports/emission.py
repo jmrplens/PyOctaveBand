@@ -205,7 +205,9 @@ def _intensity_sound_power_example() -> tuple[object, ReportMetadata, str]:
     return result, metadata, "iso9614_sound_power_intensity_example.pdf"
 
 
-def _precision_intensity_example() -> tuple[object, ReportMetadata, str, dict[str, Any]]:
+def _precision_intensity_example() -> tuple[
+    object, ReportMetadata, str, dict[str, Any]
+]:
     """Precision sound-power-by-intensity fiche: an ISO 9614-3 scan.
 
     The same machine as the ISO 9614-2 example, measured the way part 3 asks:
@@ -248,14 +250,47 @@ def _precision_intensity_example() -> tuple[object, ReportMetadata, str, dict[st
     98 dB(A), so the verdict passes.
     """
     freqs = np.array(
-        [100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600,
-         2000, 2500, 3150], dtype=float
+        [
+            100,
+            125,
+            160,
+            200,
+            250,
+            315,
+            400,
+            500,
+            630,
+            800,
+            1000,
+            1250,
+            1600,
+            2000,
+            2500,
+            3150,
+        ],
+        dtype=float,
     )
     # Pressure-intensity margin per band: a reverberant machine hall, worst at
     # the low bands where the probe's dynamic capability is also tightest.
     margin = np.array(
-        [11.0, 7.0, 6.0, 5.0, 4.5, 4.0, 3.5, 3.0, 2.5, 2.2, 2.0, 1.8, 1.6,
-         1.5, 1.5, 1.5]
+        [
+            11.0,
+            7.0,
+            6.0,
+            5.0,
+            4.5,
+            4.0,
+            3.5,
+            3.0,
+            2.5,
+            2.2,
+            2.0,
+            1.8,
+            1.6,
+            1.5,
+            1.5,
+            1.5,
+        ]
     )
     areas = np.array([1.65, 1.575, 1.575, 1.155, 1.155])
     surface = float(np.sum(areas))

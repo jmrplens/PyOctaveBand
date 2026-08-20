@@ -77,9 +77,9 @@ def test_hopkins_mass_air_mass_lining_resonances(
     base: float, lining: float, gap: float, printed: float
 ) -> None:
     """The adiabatic cavity stiffness ``rho0 c0^2/d`` of H Eq. (4.72)."""
-    assert building.mass_spring_mass_resonance(
-        base, lining, gap
-    ) == pytest.approx(printed, rel=0.01)
+    assert building.mass_spring_mass_resonance(base, lining, gap) == pytest.approx(
+        printed, rel=0.01
+    )
 
 
 def test_formula_d2_is_formula_d1_with_the_filled_cavity_stiffness() -> None:
@@ -94,9 +94,7 @@ def test_formula_d2_is_formula_d1_with_the_filled_cavity_stiffness() -> None:
     Formula (D.1) can be pinned.
     """
     base, lining, depth = 51.0, 10.8, 0.037
-    filled = building.lining_resonance_frequency(
-        base, lining, cavity_depth=depth
-    )
+    filled = building.lining_resonance_frequency(base, lining, cavity_depth=depth)
     assert filled == pytest.approx(
         building.lining_resonance_frequency(
             base, lining, dynamic_stiffness=0.111e6 / depth
@@ -135,9 +133,18 @@ def test_table_d1_low_frequency_branch() -> None:
 
 @pytest.mark.parametrize(
     ("resonance", "printed"),
-    [(200.0, -1.0), (250.0, -3.0), (315.0, -5.0), (400.0, -7.0), (500.0, -9.0),
-     (630.0, -10.0), (1000.0, -10.0), (1250.0, -10.0), (2000.0, -5.0),
-     (5000.0, -5.0)],
+    [
+        (200.0, -1.0),
+        (250.0, -3.0),
+        (315.0, -5.0),
+        (400.0, -7.0),
+        (500.0, -9.0),
+        (630.0, -10.0),
+        (1000.0, -10.0),
+        (1250.0, -10.0),
+        (2000.0, -5.0),
+        (5000.0, -5.0),
+    ],
 )
 def test_table_d1_fixed_rows(resonance: float, printed: float) -> None:
     """ISO 12354-1:2017 Table D.1, the rows above 160 Hz (printed p. 39).
@@ -174,19 +181,11 @@ def test_table_d1_reads_the_band_containing_fo_not_the_nearest_label(
     """
     index = int(np.round(10.0 * np.log10(lower_band)))
     edge = 10.0 ** ((index + 0.5) / 10.0)
-    assert (
-        building.weighted_lining_improvement(edge * 0.999, 45.0) == lower_value
-    )
-    assert (
-        building.weighted_lining_improvement(edge * 1.001, 45.0) == upper_value
-    )
+    assert building.weighted_lining_improvement(edge * 0.999, 45.0) == lower_value
+    assert building.weighted_lining_improvement(edge * 1.001, 45.0) == upper_value
     # Every nominal centre must read its own row.
-    assert (
-        building.weighted_lining_improvement(lower_band, 45.0) == lower_value
-    )
-    assert (
-        building.weighted_lining_improvement(upper_band, 45.0) == upper_value
-    )
+    assert building.weighted_lining_improvement(lower_band, 45.0) == lower_value
+    assert building.weighted_lining_improvement(upper_band, 45.0) == upper_value
 
 
 def test_table_d1_low_branch_evaluates_at_the_rounded_nominal_not_raw_fo() -> None:
@@ -236,9 +235,9 @@ def test_table_d1_63_to_80_boundary() -> None:
     guide's worked stud lining produces, therefore reads off the 80 Hz row.
     """
     assert 10.0**1.85 < 70.8115 < np.sqrt(63.0 * 80.0)
-    assert building.weighted_lining_improvement(
-        70.8115, 45.0
-    ) == pytest.approx(74.4 - 20.0 * np.log10(80.0) - 22.5, abs=1e-9)
+    assert building.weighted_lining_improvement(70.8115, 45.0) == pytest.approx(
+        74.4 - 20.0 * np.log10(80.0) - 22.5, abs=1e-9
+    )
     difference = 20.0 * np.log10(80.0 / 63.0)
     assert difference == pytest.approx(2.08, abs=0.01)
 
@@ -318,9 +317,7 @@ def test_stacked_d5_and_d6_corrections_can_fall_below_the_reference_floor() -> N
     """
     reference = building.lining_improvement(5000.0)
     assert reference.ratings == (-4.0, -4.0, -4.0)
-    corrected = building.lining_improvement(
-        5000.0, anchors=True, glued_area=100.0
-    )
+    corrected = building.lining_improvement(5000.0, anchors=True, glued_area=100.0)
     assert corrected.delta_rw == pytest.approx(0.66 * -4.0 - 1.2 - 5.0 + 2.0, abs=1e-9)
     assert corrected.delta_rw < -4.0
     assert corrected.delta_rw == pytest.approx(-6.84, abs=0.01)
@@ -341,9 +338,9 @@ def test_exterior_lining_formulae_d3_and_d4() -> None:
     assert building.lining_improvement(1000.0).ratings == pytest.approx(
         (-4.0, -4.0, -4.0)
     )
-    assert building.lining_improvement(
-        1000.0, system="foam"
-    ).ratings == pytest.approx((-3.0, -3.0, -3.0))
+    assert building.lining_improvement(1000.0, system="foam").ratings == pytest.approx(
+        (-3.0, -3.0, -3.0)
+    )
 
 
 def test_anchor_and_glued_area_corrections_d5_and_d6() -> None:
@@ -420,23 +417,19 @@ def test_in_situ_transfer_formula_d8() -> None:
     ``fo = 10^(3,5/1,35) = 392 Hz``, where the transfer becomes the identity.
     """
     a = 1.35 * np.log10(100.0) - 3.5
-    assert building.lining_improvement_in_situ(
-        10.0, 100.0, 60.0
-    ) == pytest.approx(10.0 + a * 7.0)
-    assert building.lining_improvement_in_situ(
-        10.0, 100.0, 53.0
-    ) == pytest.approx(10.0)
+    assert building.lining_improvement_in_situ(10.0, 100.0, 60.0) == pytest.approx(
+        10.0 + a * 7.0
+    )
+    assert building.lining_improvement_in_situ(10.0, 100.0, 53.0) == pytest.approx(10.0)
     # X clamps at -10 and +7.
-    assert building.lining_improvement_in_situ(
-        10.0, 100.0, 20.0
-    ) == pytest.approx(10.0 + a * -10.0)
-    assert building.lining_improvement_in_situ(
-        10.0, 100.0, 70.0
-    ) == pytest.approx(10.0 + a * 7.0)
+    assert building.lining_improvement_in_situ(10.0, 100.0, 20.0) == pytest.approx(
+        10.0 + a * -10.0
+    )
+    assert building.lining_improvement_in_situ(10.0, 100.0, 70.0) == pytest.approx(
+        10.0 + a * 7.0
+    )
     # a is capped at 0 above about 392 Hz.
-    assert building.lining_improvement_in_situ(
-        10.0, 500.0, 30.0
-    ) == pytest.approx(10.0)
+    assert building.lining_improvement_in_situ(10.0, 500.0, 30.0) == pytest.approx(10.0)
 
 
 @pytest.mark.parametrize(

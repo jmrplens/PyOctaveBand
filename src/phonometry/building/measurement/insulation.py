@@ -178,7 +178,9 @@ class AirborneInsulationResult:
     t2: np.ndarray | None = None
     t0: float | None = None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the per-band insulation quantities (``DnT``, ``D``, ``R'``).
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -237,8 +239,13 @@ class AirborneInsulationResult:
             the embedded figure (``pip install phonometry[plot]``).
         """
         return _render_iso16283(
-            self, path, quantity=quantity, metadata=metadata, engine=engine,
-            verbose=verbose, language=language,
+            self,
+            path,
+            quantity=quantity,
+            metadata=metadata,
+            engine=engine,
+            verbose=verbose,
+            language=language,
         )
 
 
@@ -269,7 +276,9 @@ class ImpactInsulationResult:
     t2: np.ndarray | None = None
     t0: float | None = None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the per-band impact levels (``L'nT`` and, if present, ``L'n``).
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -328,8 +337,13 @@ class ImpactInsulationResult:
             the embedded figure (``pip install phonometry[plot]``).
         """
         return _render_iso16283(
-            self, path, quantity=quantity, metadata=metadata, engine=engine,
-            verbose=verbose, language=language,
+            self,
+            path,
+            quantity=quantity,
+            metadata=metadata,
+            engine=engine,
+            verbose=verbose,
+            language=language,
         )
 
 
@@ -372,7 +386,9 @@ class FacadeInsulationResult:
                 f"{self.method!r}."
             )
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the per-band façade insulation profile (ISO 16283-3).
 
         Draws the standardized level difference and any other available
@@ -437,8 +453,13 @@ class FacadeInsulationResult:
             the embedded figure (``pip install phonometry[plot]``).
         """
         return _render_iso16283_facade(
-            self, path, quantity=quantity, metadata=metadata, engine=engine,
-            verbose=verbose, language=language,
+            self,
+            path,
+            quantity=quantity,
+            metadata=metadata,
+            engine=engine,
+            verbose=verbose,
+            language=language,
         )
 
 
@@ -481,9 +502,7 @@ def _render_iso16283(
     quantities, chain_attrs = _FIELD_QUANTITIES[kind]
     if quantity not in quantities:
         expected = " or ".join(repr(q) for q in quantities)
-        raise ValueError(
-            f"Unknown field quantity {quantity!r}; expected {expected}."
-        )
+        raise ValueError(f"Unknown field quantity {quantity!r}; expected {expected}.")
     curve = getattr(result, quantity)
     if curve is None:
         raise ValueError(
@@ -508,8 +527,8 @@ def _render_iso16283(
                 "impact_insulation() so they are populated."
             )
     if kind == "ImpactInsulationResult":
-        rating: WeightedRatingResult | ImpactRatingResult = (
-            weighted_impact_rating(curve)
+        rating: WeightedRatingResult | ImpactRatingResult = weighted_impact_rating(
+            curve
         )
     else:
         rating = weighted_rating(curve)
@@ -517,8 +536,13 @@ def _render_iso16283(
     from ..._report.iso16283 import render_iso16283_report
 
     return render_iso16283_report(
-        result, rating, path, quantity=quantity, metadata=metadata,
-        verbose=verbose, language=language,
+        result,
+        rating,
+        path,
+        quantity=quantity,
+        metadata=metadata,
+        verbose=verbose,
+        language=language,
     )
 
 
@@ -554,9 +578,7 @@ def _render_iso16283_facade(
         )
     if quantity not in _FACADE_FIELD_QUANTITIES:
         expected = " or ".join(repr(q) for q in _FACADE_FIELD_QUANTITIES)
-        raise ValueError(
-            f"Unknown facade quantity {quantity!r}; expected {expected}."
-        )
+        raise ValueError(f"Unknown facade quantity {quantity!r}; expected {expected}.")
     curve = getattr(result, quantity)
     if curve is None:
         raise ValueError(
@@ -576,8 +598,13 @@ def _render_iso16283_facade(
     from ..._report.iso16283 import render_iso16283_facade_report
 
     return render_iso16283_facade_report(
-        result, rating, path, quantity=quantity, metadata=metadata,
-        verbose=verbose, language=language,
+        result,
+        rating,
+        path,
+        quantity=quantity,
+        metadata=metadata,
+        verbose=verbose,
+        language=language,
     )
 
 
@@ -607,9 +634,7 @@ def energy_average_level(
     return as_float_or_array(energy_mean(data, axis=axis))
 
 
-def _as_band_levels(
-    levels: Sequence[float] | np.ndarray, name: str
-) -> np.ndarray:
+def _as_band_levels(levels: Sequence[float] | np.ndarray, name: str) -> np.ndarray:
     """Coerce room levels to per-band values, energy-averaging positions.
 
     A one-dimensional input is taken as one already-averaged level per
@@ -721,9 +746,7 @@ def airborne_insulation(
     dnt = d + 10.0 * np.log10(t / t0)
 
     if (area is None) != (volume is None):
-        raise ValueError(
-            "'area' and 'volume' must be given together to compute R'."
-        )
+        raise ValueError("'area' and 'volume' must be given together to compute R'.")
     r_prime: np.ndarray | None = None
     if area is not None and volume is not None:
         if area <= 0.0 or volume <= 0.0:
@@ -732,8 +755,13 @@ def airborne_insulation(
         r_prime = d + 10.0 * np.log10(area / absorption)
 
     return AirborneInsulationResult(
-        d=d, dnt=dnt, r_prime=r_prime,
-        l1=l1_bands, l2=l2_bands, t2=t, t0=t0,
+        d=d,
+        dnt=dnt,
+        r_prime=r_prime,
+        l1=l1_bands,
+        l2=l2_bands,
+        t2=t,
+        t0=t0,
     )
 
 
@@ -793,7 +821,11 @@ def impact_insulation(
         l_n = li_bands + 10.0 * np.log10(absorption / _A0_IMPACT)
 
     return ImpactInsulationResult(
-        l_n_t=l_n_t, l_n=l_n, li=li_bands, t2=t, t0=t0,
+        l_n_t=l_n_t,
+        l_n=l_n,
+        li=li_bands,
+        t2=t,
+        t0=t0,
     )
 
 
@@ -898,8 +930,7 @@ def facade_insulation(
     """
     if method not in _FACADE_CORRECTION:
         raise ValueError(
-            "'method' must be 'loudspeaker' or 'road_traffic', got "
-            f"{method!r}."
+            f"'method' must be 'loudspeaker' or 'road_traffic', got {method!r}."
         )
 
     l1_bands = _as_band_levels(l1_2m, "l1_2m")
@@ -907,9 +938,7 @@ def facade_insulation(
     t = np.asarray(t2, dtype=np.float64)
 
     if not (l1_bands.shape == l2_bands.shape == t.shape):
-        raise ValueError(
-            "'l1_2m', 'l2' and 't2' must share the same band count."
-        )
+        raise ValueError("'l1_2m', 'l2' and 't2' must share the same band count.")
     _validate_reverberation(t, t0)
 
     d_2m = l1_bands - l2_bands
@@ -928,9 +957,7 @@ def facade_insulation(
     if surface_level is not None and area is not None and absorption is not None:
         surf_bands = _as_band_levels(surface_level, "surface_level")
         if surf_bands.shape != l2_bands.shape:
-            raise ValueError(
-                "'surface_level' must share the band count of 'l2'."
-            )
+            raise ValueError("'surface_level' must share the band count of 'l2'.")
         r_prime = (
             surf_bands
             - l2_bands
@@ -939,9 +966,7 @@ def facade_insulation(
         )
 
     freqs = (
-        np.asarray(frequencies, dtype=np.float64)
-        if frequencies is not None
-        else None
+        np.asarray(frequencies, dtype=np.float64) if frequencies is not None else None
     )
     if freqs is not None and freqs.shape != d_2m.shape:
         raise ValueError(

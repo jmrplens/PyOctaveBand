@@ -128,9 +128,7 @@ def _validate_signal(
     if xa.ndim != 1:
         raise ValueError(f"'{name}' must be one-dimensional.")
     if xa.size < _MIN_SAMPLES:
-        raise ValueError(
-            f"Signal too short for {context}: {xa.size} samples."
-        )
+        raise ValueError(f"Signal too short for {context}: {xa.size} samples.")
     if not np.all(np.isfinite(xa)):
         raise ValueError(f"'{name}' must be finite.")
     return apply_calibration(x, xa)
@@ -335,9 +333,7 @@ def _coherence_from_spectra(
     r"""Coherence :math:`\gamma^2 = \lvert G_{xy} \rvert^2 /
     (G_{xx} G_{yy})` clipped to [0, 1]."""
     denom = gxx * gyy
-    coh = np.divide(
-        np.abs(gxy) ** 2, denom, out=np.zeros_like(gxx), where=denom > 0.0
-    )
+    coh = np.divide(np.abs(gxy) ** 2, denom, out=np.zeros_like(gxx), where=denom > 0.0)
     return np.asarray(np.clip(coh, 0.0, 1.0), dtype=np.float64)
 
 
@@ -407,8 +403,9 @@ class SpectralDensityResult:
     overlap: float
     scaling: str
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en",
-             **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the spectral density in dB with its confidence band.
 
         :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -584,8 +581,7 @@ class CrossSpectralDensityResult:
         from .._plot.signals import plot_cross_spectral_density
 
         check_language(language)
-        return plot_cross_spectral_density(self, ax=ax, language=language,
-                                           **kwargs)
+        return plot_cross_spectral_density(self, ax=ax, language=language, **kwargs)
 
 
 def cross_spectral_density(
@@ -753,8 +749,7 @@ class CoherentOutputSpectrumResult:
         from .._plot.signals import plot_coherent_output_spectrum
 
         check_language(language)
-        return plot_coherent_output_spectrum(self, ax=ax, language=language,
-                                             **kwargs)
+        return plot_coherent_output_spectrum(self, ax=ax, language=language, **kwargs)
 
 
 def coherent_output_spectrum(
@@ -864,9 +859,7 @@ def coherent_output_spectrum(
 # ---------------------------------------------------------------------------
 
 
-def _smoothing_validate(
-    f: NDArray[np.float64], v: NDArray[np.float64]
-) -> None:
+def _smoothing_validate(f: NDArray[np.float64], v: NDArray[np.float64]) -> None:
     """Validate the frequency axis / spectrum pair of the smoother."""
     if f.ndim != 1 or v.ndim != 1:
         raise ValueError("'frequencies' and 'values' must be one-dimensional.")
@@ -880,9 +873,7 @@ def _smoothing_validate(
         raise ValueError("'frequencies' must be strictly increasing.")
 
 
-def _smoothing_to_power(
-    v: NDArray[np.float64], domain: str
-) -> NDArray[np.float64]:
+def _smoothing_to_power(v: NDArray[np.float64], domain: str) -> NDArray[np.float64]:
     """Map the input spectrum onto power-like values per ``domain``."""
     if domain not in ("power", "amplitude", "db"):
         raise ValueError("'domain' must be 'power', 'amplitude' or 'db'.")

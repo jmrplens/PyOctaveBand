@@ -180,7 +180,10 @@ def test_stated_directivity_index_is_kept() -> None:
     f, rel = _flat_response()
     angles = np.linspace(0.0, 180.0, 721)
     result = electroacoustics.microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL,
+        f,
+        rel,
+        _M_MV,
+        tolerance_db=_TOL,
         directivity=electroacoustics.MicrophoneDirectivity(
             polar=(angles, np.zeros_like(angles)), index_db=4.5
         ),
@@ -215,9 +218,7 @@ def test_full_circle_cardioid_gives_same_directivity_index() -> None:
         rel,
         _M_MV,
         tolerance_db=_TOL,
-        directivity=electroacoustics.MicrophoneDirectivity(
-            polar=(angles, pattern)
-        ),
+        directivity=electroacoustics.MicrophoneDirectivity(polar=(angles, pattern)),
     )
     assert result.directivity_index_db == pytest.approx(
         10.0 * math.log10(3.0), abs=5e-3
@@ -283,7 +284,10 @@ def test_stated_max_spl_is_kept() -> None:
     spl = np.linspace(100.0, 140.0, 81)
     thd = 0.5 * 10.0 ** ((spl - 130.0) * 0.08)
     result = electroacoustics.microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL,
+        f,
+        rel,
+        _M_MV,
+        tolerance_db=_TOL,
         overload=electroacoustics.MicrophoneOverload(
             distortion=(spl, thd), thd_percent=0.5, spl_db=132.0
         ),
@@ -297,7 +301,10 @@ def test_distortion_below_limit_gives_no_max_spl() -> None:
     spl = np.linspace(100.0, 120.0, 41)
     thd = np.full_like(spl, 0.05)
     result = electroacoustics.microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL,
+        f,
+        rel,
+        _M_MV,
+        tolerance_db=_TOL,
         overload=electroacoustics.MicrophoneOverload(distortion=(spl, thd)),
     )
     assert result.max_spl_db is None
@@ -358,9 +365,7 @@ def test_empty_noise_spectrum_rejected() -> None:
     f, rel = _flat_response()
     empty_spectrum = electroacoustics.MicrophoneNoise(spectrum=([], []))
     with pytest.raises(ValueError, match="at least two"):
-        electroacoustics.microphone_characteristics(
-            f, rel, _M_MV, noise=empty_spectrum
-        )
+        electroacoustics.microphone_characteristics(f, rel, _M_MV, noise=empty_spectrum)
 
 
 def test_empty_polar_rejected() -> None:
@@ -419,9 +424,7 @@ def _example_result():
         directivity=electroacoustics.MicrophoneDirectivity(
             polar=(angles, pattern), frequency=1000.0
         ),
-        noise=electroacoustics.MicrophoneNoise(
-            voltage=1.25e-6, spectrum=(nf, nl)
-        ),
+        noise=electroacoustics.MicrophoneNoise(voltage=1.25e-6, spectrum=(nf, nl)),
         overload=electroacoustics.MicrophoneOverload(
             distortion=(spl, thd), thd_percent=0.5
         ),
@@ -440,8 +443,10 @@ def test_report_renders_one_page_with_rated_table(tmp_path) -> None:
     pytest.importorskip("matplotlib")
     result = _example_result()
     md = ReportMetadata(
-        manufacturer="Example audio", specimen="Cardioid condenser microphone",
-        measurement_standard="IEC 60268-4", report_id="PHN-60268-4",
+        manufacturer="Example audio",
+        specimen="Cardioid condenser microphone",
+        measurement_standard="IEC 60268-4",
+        report_id="PHN-60268-4",
         requirement=16.0,
     )
     out = tmp_path / "microphone.pdf"
@@ -523,9 +528,7 @@ def test_plot_rejects_unknown_quantity_and_missing_data() -> None:
     with pytest.raises(ValueError, match="unknown quantity"):
         result.plot(quantity="bogus")
     f, rel = _flat_response()
-    bare = electroacoustics.microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL
-    )
+    bare = electroacoustics.microphone_characteristics(f, rel, _M_MV, tolerance_db=_TOL)
     with pytest.raises(ValueError, match="no directional pattern"):
         bare.plot(quantity="directivity")
 

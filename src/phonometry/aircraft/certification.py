@@ -37,9 +37,30 @@ if TYPE_CHECKING:
 #: The 24 one-third-octave band centre frequencies (Hz) used by PNL/EPNL.
 NOY_BANDS: NDArray[np.float64] = np.array(
     [
-        50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0, 250.0,
-        315.0, 400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0, 1600.0,
-        2000.0, 2500.0, 3150.0, 4000.0, 5000.0, 6300.0, 8000.0, 10000.0,
+        50.0,
+        63.0,
+        80.0,
+        100.0,
+        125.0,
+        160.0,
+        200.0,
+        250.0,
+        315.0,
+        400.0,
+        500.0,
+        630.0,
+        800.0,
+        1000.0,
+        1250.0,
+        1600.0,
+        2000.0,
+        2500.0,
+        3150.0,
+        4000.0,
+        5000.0,
+        6300.0,
+        8000.0,
+        10000.0,
     ],
     dtype=np.float64,
 )
@@ -112,7 +133,13 @@ def perceived_noisiness(spl: NDArray[np.float64] | list[float]) -> NDArray[np.fl
     :raises ValueError: If the spectrum is not 24 finite levels.
     """
     sig = _validate_spectrum(spl)
-    spl_a, spl_b, spl_c, spl_d, spl_e = _A2_3[:, 0], _A2_3[:, 1], _A2_3[:, 2], _A2_3[:, 3], _A2_3[:, 4]
+    spl_a, spl_b, spl_c, spl_d, spl_e = (
+        _A2_3[:, 0],
+        _A2_3[:, 1],
+        _A2_3[:, 2],
+        _A2_3[:, 3],
+        _A2_3[:, 4],
+    )
     m_b, m_c, m_d, m_e = _A2_3[:, 5], _A2_3[:, 6], _A2_3[:, 7], _A2_3[:, 8]
 
     # Guard the "not applicable" M(c) (NaN) so it never feeds a live branch:
@@ -302,8 +329,9 @@ def _tone_factor(excess: float, frequency: float) -> float:
     return 10.0 / 3.0
 
 
-def tone_correction(spl: NDArray[np.float64] | list[float], *,
-                    start_band: int = _TONE_START) -> float:
+def tone_correction(
+    spl: NDArray[np.float64] | list[float], *, start_band: int = _TONE_START
+) -> float:
     """Tone-correction factor ``C`` for a spectrum (ICAO Annex 16 App. 2 §4.3).
 
     The maximum over bands of the tone-correction factor derived from the tone
@@ -403,8 +431,14 @@ def epnl_from_pnlt(
     if p.ndim != 1 or p.size < 1 or not np.all(np.isfinite(p)):
         raise ValueError("'pnlt' must be a non-empty finite 1-D sequence.")
     dt_raw = np.asarray(dt, dtype=np.float64)
-    dt_arr = np.full(p.shape, float(dt_raw.reshape(-1)[0])) if dt_raw.size == 1 else dt_raw
-    if dt_arr.shape != p.shape or np.any(dt_arr <= 0.0) or not np.all(np.isfinite(dt_arr)):
+    dt_arr = (
+        np.full(p.shape, float(dt_raw.reshape(-1)[0])) if dt_raw.size == 1 else dt_raw
+    )
+    if (
+        dt_arr.shape != p.shape
+        or np.any(dt_arr <= 0.0)
+        or not np.all(np.isfinite(dt_arr))
+    ):
         raise ValueError("'dt' must be positive and match 'pnlt' in length.")
     if reference_time <= 0.0 or not np.isfinite(reference_time):
         raise ValueError("'reference_time' must be a positive, finite number.")
@@ -414,7 +448,9 @@ def epnl_from_pnlt(
     if tone_corrections is not None:
         c = np.atleast_1d(np.asarray(tone_corrections, dtype=np.float64))
         if c.shape != p.shape or not np.all(np.isfinite(c)):
-            raise ValueError("'tone_corrections' must match 'pnlt' in length and be finite.")
+            raise ValueError(
+                "'tone_corrections' must match 'pnlt' in length and be finite."
+            )
         t_mid = np.cumsum(dt_arr) - 0.5 * dt_arr
         window = c[np.abs(t_mid - t_mid[km]) <= 1.0 + 1e-9]
         delta_b = max(0.0, float(np.mean(window)) - float(c[km]))
@@ -455,7 +491,9 @@ class EPNLResult:
     epnl: float
     band_limits: tuple[int, int]
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the PNL and PNLT time histories with PNLTM and the 10 dB-down band."""
         from .._i18n import check_language
         from .._plot.aircraft import plot_epnl
@@ -565,7 +603,8 @@ def effective_perceived_noise_level(
     pnlt = pnl + corr
 
     epnl, pnltm, kf, kl = epnl_from_pnlt(
-        pnlt, dt, reference_time=reference_time, tone_corrections=corr)
+        pnlt, dt, reference_time=reference_time, tone_corrections=corr
+    )
 
     k = arr.shape[0]
     dt_raw = np.asarray(dt, dtype=np.float64)

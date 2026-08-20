@@ -31,9 +31,10 @@ from ..registry import Outcome, numeric, register
 def _iso9613_table1(point: tuple[float, float, float, float]) -> Outcome:
     """Compare air_attenuation against an ISO 9613-1 Table 1 grid point (dB/km)."""
     temp, rh, freq, alpha_km = point
-    computed = float(
-        ph.environment.air_attenuation(freq, temp, rh, exact_midband=True)[()]
-    ) * 1000.0  # dB/m -> dB/km
+    computed = (
+        float(ph.environment.air_attenuation(freq, temp, rh, exact_midband=True)[()])
+        * 1000.0
+    )  # dB/m -> dB/km
     # Tolerance = 1 in the last printed (3-significant-figure) digit.
     tol = 10.0 ** (math.floor(math.log10(alpha_km)) - 2)
     return numeric(alpha_km, computed, tol, unit="dB/km", places=3)
@@ -71,18 +72,24 @@ def _chk_iso9613_2_table2_grid() -> Outcome:
     """
     worst = 0.0
     for (temp, rh), row in ref.ISO9613_2_TABLE2.items():
-        alpha = ph.environment.air_attenuation(
-            ref.ISO9613_2_TABLE2_BANDS, temp, rh, 101.325, exact_midband=True
-        ) * 1000.0
+        alpha = (
+            ph.environment.air_attenuation(
+                ref.ISO9613_2_TABLE2_BANDS, temp, rh, 101.325, exact_midband=True
+            )
+            * 1000.0
+        )
         for got, printed, band in zip(alpha, row, ref.ISO9613_2_TABLE2_BANDS):
             tol = 0.5 if printed >= 100.0 else 0.05
             if (temp, rh, band) == (15.0, 80.0, 1000.0):
                 tol = 0.06
             residual = abs(float(got) - printed) / tol
             if not math.isfinite(residual):
-                return Outcome(expected="finite Table 2 residuals",
-                               computed=f"non-finite at {band} Hz", delta="inf",
-                               passed=False)
+                return Outcome(
+                    expected="finite Table 2 residuals",
+                    computed=f"non-finite at {band} Hz",
+                    delta="inf",
+                    passed=False,
+                )
             worst = max(worst, residual)
     return Outcome(
         expected="all 48 cells within half a printed digit",
@@ -90,7 +97,6 @@ def _chk_iso9613_2_table2_grid() -> Outcome:
         delta=f"{worst:.3f} x",
         passed=worst <= 1.0,
     )
-
 
 
 @register(
@@ -117,7 +123,10 @@ def _chk_iso9613_2_ground_limit() -> Outcome:
         big, 0.0, 0.0, [250.0], 1.0, 1.0, 1.0, projected_distance=big
     )
     return numeric(
-        ref.ISO9613_2_GROUND_AGR_250_POROUS, float(agr[0]), 1e-6, unit="dB",
+        ref.ISO9613_2_GROUND_AGR_250_POROUS,
+        float(agr[0]),
+        1e-6,
+        unit="dB",
         places=4,
     )
 
@@ -129,11 +138,12 @@ def _chk_iso9613_2_ground_limit() -> Outcome:
 )
 def _chk_iso9613_2_barrier_single_cap() -> Outcome:
     b = ph.environment.Barrier(source_to_edge=50.0, edge_to_receiver=50.0)
-    dz = ph.environment.barrier_attenuation(
-        b, 60.0, ph.environment.DEFAULT_FREQUENCIES
-    )
+    dz = ph.environment.barrier_attenuation(b, 60.0, ph.environment.DEFAULT_FREQUENCIES)
     return numeric(
-        ref.ISO9613_2_BARRIER_CAP_SINGLE, float(np.max(dz)), 1e-9, unit="dB",
+        ref.ISO9613_2_BARRIER_CAP_SINGLE,
+        float(np.max(dz)),
+        1e-9,
+        unit="dB",
         places=6,
     )
 
@@ -147,11 +157,12 @@ def _chk_iso9613_2_barrier_double_cap() -> Outcome:
     b = ph.environment.Barrier(
         source_to_edge=50.0, edge_to_receiver=50.0, edge_separation=5.0
     )
-    dz = ph.environment.barrier_attenuation(
-        b, 60.0, ph.environment.DEFAULT_FREQUENCIES
-    )
+    dz = ph.environment.barrier_attenuation(b, 60.0, ph.environment.DEFAULT_FREQUENCIES)
     return numeric(
-        ref.ISO9613_2_BARRIER_CAP_DOUBLE, float(np.max(dz)), 1e-9, unit="dB",
+        ref.ISO9613_2_BARRIER_CAP_DOUBLE,
+        float(np.max(dz)),
+        1e-9,
+        unit="dB",
         places=6,
     )
 
@@ -162,13 +173,15 @@ def _iso9612_annex_d_tasks() -> list[ph.hearing.Task]:
 
     tasks = []
     for samples, duration, drange in ref.ISO9612_ANNEX_D_TASKS:
-        tasks.append(Task(samples=samples, duration_hours=duration,
-                          duration_range=drange))
+        tasks.append(
+            Task(samples=samples, duration_hours=duration, duration_range=drange)
+        )
     return tasks
 
 
-def _lex_and_u(lex: float, u: float, exp_lex: float, exp_u: float,
-               tol_lex: float, tol_u: float) -> Outcome:
+def _lex_and_u(
+    lex: float, u: float, exp_lex: float, exp_u: float, tol_lex: float, tol_u: float
+) -> Outcome:
     """Combined LEX,8h + expanded-uncertainty outcome for one ISO 9612 example."""
     ok = abs(lex - exp_lex) <= tol_lex and abs(u - exp_u) <= tol_u
     return Outcome(
@@ -189,8 +202,12 @@ def _chk_iso9612_annex_d() -> Outcome:
         _iso9612_annex_d_tasks(), include_duration_uncertainty=False, warn=False
     )
     return _lex_and_u(
-        res.lex_8h, res.expanded_uncertainty,
-        ref.ISO9612_ANNEX_D_LEX_8H, ref.ISO9612_ANNEX_D_U, 0.05, 0.1,
+        res.lex_8h,
+        res.expanded_uncertainty,
+        ref.ISO9612_ANNEX_D_LEX_8H,
+        ref.ISO9612_ANNEX_D_U,
+        0.05,
+        0.1,
     )
 
 
@@ -204,8 +221,12 @@ def _chk_iso9612_annex_e() -> Outcome:
         list(ref.ISO9612_ANNEX_E_SAMPLES), ref.ISO9612_ANNEX_E_TE_HOURS
     )
     return _lex_and_u(
-        res.lex_8h, res.expanded_uncertainty,
-        ref.ISO9612_ANNEX_E_LEX_8H, ref.ISO9612_ANNEX_E_U, 0.1, 0.05,
+        res.lex_8h,
+        res.expanded_uncertainty,
+        ref.ISO9612_ANNEX_E_LEX_8H,
+        ref.ISO9612_ANNEX_E_U,
+        0.1,
+        0.05,
     )
 
 
@@ -219,8 +240,12 @@ def _chk_iso9612_annex_f() -> Outcome:
         list(ref.ISO9612_ANNEX_F_SAMPLES), ref.ISO9612_ANNEX_F_TE_HOURS
     )
     return _lex_and_u(
-        res.lex_8h, res.expanded_uncertainty,
-        ref.ISO9612_ANNEX_F_LEX_8H, ref.ISO9612_ANNEX_F_U, 0.05, 0.05,
+        res.lex_8h,
+        res.expanded_uncertainty,
+        ref.ISO9612_ANNEX_F_LEX_8H,
+        ref.ISO9612_ANNEX_F_U,
+        0.05,
+        0.05,
     )
 
 
@@ -230,7 +255,9 @@ def _chk_iso9612_annex_f() -> Outcome:
 _MATERIALS = "Materials: absorption, airflow & impedance"
 
 
-@register(_MATERIALS, "ISO 11654:1997 Annex A.1", "Weighted absorption alpha_w (no indicator)")
+@register(
+    _MATERIALS, "ISO 11654:1997 Annex A.1", "Weighted absorption alpha_w (no indicator)"
+)
 def _chk_iso11654_a1() -> Outcome:
     res = ph.materials.weighted_absorption(list(ref.ISO11654_ANNEX_A1_ALPHA_P))
     out = numeric(ref.ISO11654_ANNEX_A1_ALPHA_W, res.alpha_w, 5e-4, places=2)
@@ -248,7 +275,11 @@ def _chk_iso11654_a1() -> Outcome:
     )
 
 
-@register(_MATERIALS, "ISO 11654:1997 Annex A.2", "Weighted absorption alpha_w with M indicator")
+@register(
+    _MATERIALS,
+    "ISO 11654:1997 Annex A.2",
+    "Weighted absorption alpha_w with M indicator",
+)
 def _chk_iso11654_a2() -> Outcome:
     res = ph.materials.weighted_absorption(list(ref.ISO11654_ANNEX_A2_ALPHA_P))
     out = numeric(ref.ISO11654_ANNEX_A2_ALPHA_W, res.alpha_w, 5e-4, places=2)
@@ -267,11 +298,17 @@ def _chk_iso9053_2_boundary() -> Outcome:
         frequency=ref.ISO9053_2_ANNEX_A_FREQUENCY
     )
     return numeric(
-        ref.ISO9053_2_ANNEX_A_BOUNDARY_LAYER, b, 5e-6, unit="m", places=5,
+        ref.ISO9053_2_ANNEX_A_BOUNDARY_LAYER,
+        b,
+        5e-6,
+        unit="m",
+        places=5,
     )
 
 
-@register(_MATERIALS, "ISO 9053-2:2020 Annex A.3", "Effective ratio of specific heats kappa'")
+@register(
+    _MATERIALS, "ISO 9053-2:2020 Annex A.3", "Effective ratio of specific heats kappa'"
+)
 def _chk_iso9053_2_kappa() -> Outcome:
     kp = ph.materials.effective_kappa(
         cavity_surface=ref.ISO9053_2_ANNEX_A_SURFACE,
@@ -281,7 +318,11 @@ def _chk_iso9053_2_kappa() -> Outcome:
     return numeric(ref.ISO9053_2_ANNEX_A_KAPPA_PRIME, kp, 5e-4, places=3)
 
 
-@register(_MATERIALS, "ISO 10534-1:1996 Eqs (9)/(13)/(14)", "Absorption from standing-wave ratio s=3")
+@register(
+    _MATERIALS,
+    "ISO 10534-1:1996 Eqs (9)/(13)/(14)",
+    "Absorption from standing-wave ratio s=3",
+)
 def _chk_iso10534_1_swr() -> Outcome:
     alpha = float(ph.materials.standing_wave_absorption(ref.ISO10534_1_SWR))
     # The intermediate |r| = (s-1)/(s+1) (Eq. (13)) must match its shared
@@ -294,9 +335,7 @@ def _chk_iso10534_1_swr() -> Outcome:
     out = numeric(ref.ISO10534_1_ABSORPTION, alpha, 1e-9, places=4)
     r_ok = abs(r_mag - ref.ISO10534_1_REFLECTION_MAGNITUDE) <= 1e-9
     # Show both chained values so a |r| failure is visible in the report.
-    expected = (
-        f"alpha {out.expected}, |r| {ref.ISO10534_1_REFLECTION_MAGNITUDE:g}"
-    )
+    expected = f"alpha {out.expected}, |r| {ref.ISO10534_1_REFLECTION_MAGNITUDE:g}"
     computed = f"alpha {out.computed}, |r| {r_mag:.4f}"
     return Outcome(expected, computed, out.delta, out.passed and r_ok)
 
@@ -322,15 +361,19 @@ def _chk_iso10534_2_roundtrip() -> Outcome:
     r_true = 0.3 - 0.4j
     k0 = np.asarray(tube_wavenumber(f, c0))
     x2 = x1 - spacing
-    h12 = (
-        (np.exp(1j * k0 * x2) + r_true * np.exp(-1j * k0 * x2))
-        / (np.exp(1j * k0 * x1) + r_true * np.exp(-1j * k0 * x1))
+    h12 = (np.exp(1j * k0 * x2) + r_true * np.exp(-1j * k0 * x2)) / (
+        np.exp(1j * k0 * x1) + r_true * np.exp(-1j * k0 * x1)
     )
     r = reflection_factor(h12, spacing=spacing, x1=x1, wavenumber=k0)
     err = float(np.max(np.abs(np.asarray(r) - r_true)))
     # NOTE: no pipe characters in the label (it lands in a Markdown table cell).
-    return numeric(0.0, err, 1e-9, places=9,
-                   expected_label="abs(r - (0.3-0.4j)) = 0 (identity, +/-1e-9)")
+    return numeric(
+        0.0,
+        err,
+        1e-9,
+        places=9,
+        expected_label="abs(r - (0.3-0.4j)) = 0 (identity, +/-1e-9)",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -345,7 +388,11 @@ def _chk_iso17497_1_speed() -> Outcome:
     return numeric(ref.ISO17497_1_SPEED_OF_SOUND_20C, c, 1e-6, unit="m/s", places=4)
 
 
-@register(_SCATTERING, "ISO 17497-1:2004 Eqs (1)/(4)/(5)", "Scattering coefficient (synthetic chain)")
+@register(
+    _SCATTERING,
+    "ISO 17497-1:2004 Eqs (1)/(4)/(5)",
+    "Scattering coefficient (synthetic chain)",
+)
 def _chk_iso17497_1_scattering() -> Outcome:
     t1, t2, t3, t4 = ref.ISO17497_1_CHAIN_T
     c = ref.ISO17497_1_CHAIN_C
@@ -359,14 +406,20 @@ def _chk_iso17497_1_scattering() -> Outcome:
     return numeric(ref.ISO17497_1_CHAIN_SCATTERING, s, 1e-9, places=4)
 
 
-@register(_SCATTERING, "ISO 17497-1:2004 Annex A.5", "Expanded uncertainty of scattering coefficient")
+@register(
+    _SCATTERING,
+    "ISO 17497-1:2004 Annex A.5",
+    "Expanded uncertainty of scattering coefficient",
+)
 def _chk_iso17497_1_uncertainty() -> Outcome:
-    u = float(ph.materials.scattering_coefficient_uncertainty(
-        ref.ISO17497_1_A5_ALPHA_SPEC,
-        ref.ISO17497_1_A5_ALPHA_S,
-        ref.ISO17497_1_A5_U_ALPHA_SPEC,
-        ref.ISO17497_1_A5_U_ALPHA_S,
-    ).u_scattering)
+    u = float(
+        ph.materials.scattering_coefficient_uncertainty(
+            ref.ISO17497_1_A5_ALPHA_SPEC,
+            ref.ISO17497_1_A5_ALPHA_S,
+            ref.ISO17497_1_A5_U_ALPHA_SPEC,
+            ref.ISO17497_1_A5_U_ALPHA_S,
+        ).u_scattering
+    )
     return numeric(ref.ISO17497_1_A5_U_SCATTERING, u, 1e-6, places=5)
 
 
@@ -376,27 +429,35 @@ def _chk_iso17497_1_uncertainty() -> Outcome:
 # commercial QRD of Hargreaves et al. 2000, Table I), so these three rows are
 # arithmetic oracles for Formulas (5)/(7) on committed levels - the external
 # anchor against published third-party BEM data is the Appendix B rows below.
-@register(_SCATTERING, "ISO 17497-2:2012 Formula (5)", "Directional diffusion coefficient (QRD, model arc)")
+@register(
+    _SCATTERING,
+    "ISO 17497-2:2012 Formula (5)",
+    "Directional diffusion coefficient (QRD, model arc)",
+)
 def _chk_iso17497_2_diffusion_qrd() -> Outcome:
     d = float(
-        ph.materials.directional_diffusion_coefficient(
-            list(ref.ISO17497_2_QRD_LEVELS)
-        )
+        ph.materials.directional_diffusion_coefficient(list(ref.ISO17497_2_QRD_LEVELS))
     )
     return numeric(ref.ISO17497_2_QRD_DIFFUSION, d, 1e-6, places=4)
 
 
-@register(_SCATTERING, "ISO 17497-2:2012 Formula (5)", "Directional diffusion coefficient (flat reference)")
+@register(
+    _SCATTERING,
+    "ISO 17497-2:2012 Formula (5)",
+    "Directional diffusion coefficient (flat reference)",
+)
 def _chk_iso17497_2_diffusion_flat() -> Outcome:
     d = float(
-        ph.materials.directional_diffusion_coefficient(
-            list(ref.ISO17497_2_FLAT_LEVELS)
-        )
+        ph.materials.directional_diffusion_coefficient(list(ref.ISO17497_2_FLAT_LEVELS))
     )
     return numeric(ref.ISO17497_2_FLAT_DIFFUSION, d, 1e-6, places=4)
 
 
-@register(_SCATTERING, "ISO 17497-2:2012 Formula (7)", "Normalised diffusion coefficient (QRD, model arc)")
+@register(
+    _SCATTERING,
+    "ISO 17497-2:2012 Formula (7)",
+    "Normalised diffusion coefficient (QRD, model arc)",
+)
 def _chk_iso17497_2_diffusion_normalized() -> Outcome:
     d_qrd = ph.materials.directional_diffusion_coefficient(
         list(ref.ISO17497_2_QRD_LEVELS)
@@ -423,6 +484,7 @@ def _make_cox_appendix_b_check(band: float, published: float) -> Callable[[], Ou
 
         d_n = predicted_band_normalized_diffusion(band)
         return numeric(published, d_n, ref.COX3E_APPENDIX_B_TOLERANCE, places=3)
+
     return check
 
 
@@ -437,20 +499,31 @@ for _band, _published in zip(
     )(_make_cox_appendix_b_check(_band, _published))
 
 
-@register(_SCATTERING, "ISO 17497-2:2012 Formula (8)", "Zenith area factor (radians convention)")
+@register(
+    _SCATTERING,
+    "ISO 17497-2:2012 Formula (8)",
+    "Zenith area factor (radians convention)",
+)
 def _chk_iso17497_2_area_factor() -> Outcome:
     n = ph.materials.area_factors([0.0, 30.0, 60.0, 90.0], delta_theta=5.0)
     return numeric(ref.ISO17497_2_AREA_FACTOR_ZENITH, float(n[0]), 1e-6, places=5)
 
 
-@register(_SCATTERING, "Cox & D'Antonio Eq (10.3)", "QRD deepest well depth (N=7, f0=500 Hz)")
+@register(
+    _SCATTERING, "Cox & D'Antonio Eq (10.3)", "QRD deepest well depth (N=7, f0=500 Hz)"
+)
 def _chk_diffuser_qrd_depth() -> Outcome:
     d = ph.materials.qrd_well_depths(7, 500.0, speed_of_sound=343.0)
-    return numeric(ref.DIFFUSER_QRD7_MAX_DEPTH, float(d.max()), 1e-12, unit="m", places=4)
+    return numeric(
+        ref.DIFFUSER_QRD7_MAX_DEPTH, float(d.max()), 1e-12, unit="m", places=4
+    )
 
 
-@register(_SCATTERING, "Cox & D'Antonio Eq (5.8) + ISO 17497-2 Formula (7)",
-          "Flat-panel predicted normalised diffusion (self-reference zero)")
+@register(
+    _SCATTERING,
+    "Cox & D'Antonio Eq (5.8) + ISO 17497-2 Formula (7)",
+    "Flat-panel predicted normalised diffusion (self-reference zero)",
+)
 def _chk_diffuser_flat_normalized() -> Outcome:
     spectrum = ph.materials.predicted_diffusion_spectrum(
         0.10, [2000.0], depths=[0.0] * 7, periods=5
@@ -458,12 +531,17 @@ def _chk_diffuser_flat_normalized() -> Outcome:
     assert spectrum.normalized is not None
     return numeric(
         ref.DIFFUSER_FLAT_NORMALIZED_DIFFUSION,
-        float(spectrum.normalized[0]), 1e-12, places=6,
+        float(spectrum.normalized[0]),
+        1e-12,
+        places=6,
     )
 
 
-@register(_SCATTERING, "Cox & D'Antonio Eq (5.8) + ISO 17497-2 Formula (7)",
-          "QRD predicted normalised diffusion at 2 kHz (above flat panel)")
+@register(
+    _SCATTERING,
+    "Cox & D'Antonio Eq (5.8) + ISO 17497-2 Formula (7)",
+    "QRD predicted normalised diffusion at 2 kHz (above flat panel)",
+)
 def _chk_diffuser_qrd_normalized() -> Outcome:
     depths = ph.materials.qrd_well_depths(7, 500.0, speed_of_sound=343.0)
     spectrum = ph.materials.predicted_diffusion_spectrum(
@@ -472,7 +550,9 @@ def _chk_diffuser_qrd_normalized() -> Outcome:
     assert spectrum.normalized is not None
     return numeric(
         ref.DIFFUSER_QRD7_NORMALIZED_DIFFUSION_2K,
-        float(spectrum.normalized[0]), 1e-9, places=4,
+        float(spectrum.normalized[0]),
+        1e-9,
+        places=4,
     )
 
 
@@ -494,7 +574,9 @@ def _chk_iso13472_1_msa() -> Outcome:
     return numeric(ref.ISO13472_1_MSA_RADIUS, r, 1e-6, unit="m", places=4)
 
 
-@register(_ROAD, "ISO 13472-2:2010 Clause 5.4.1", "Spot-tube upper usable frequency f_u")
+@register(
+    _ROAD, "ISO 13472-2:2010 Clause 5.4.1", "Spot-tube upper usable frequency f_u"
+)
 def _chk_iso13472_2_fu() -> Outcome:
     fu = ph.materials.spot_tube_upper_frequency(
         ref.ISO13472_2_SPOT_DIAMETER, ref.ISO13472_2_SPOT_SPEED
@@ -508,33 +590,53 @@ def _chk_iso13472_2_fu() -> Outcome:
 _PRECISION_POWER = "Precision sound power (ISO 3745 / 9614-3)"
 
 
-@register(_PRECISION_POWER, "ISO 3745:2012 Clause 10.5 EXAMPLE", "Expanded uncertainty U (k=2)")
+@register(
+    _PRECISION_POWER,
+    "ISO 3745:2012 Clause 10.5 EXAMPLE",
+    "Expanded uncertainty U (k=2)",
+)
 def _chk_iso3745_uncertainty() -> Outcome:
-    u = float(ph.emission.precision_uncertainty(
-        ref.ISO3745_U_SIGMA_R0, ref.ISO3745_U_SIGMA_OMC, ref.ISO3745_U_COVERAGE
-    ))
+    u = float(
+        ph.emission.precision_uncertainty(
+            ref.ISO3745_U_SIGMA_R0, ref.ISO3745_U_SIGMA_OMC, ref.ISO3745_U_COVERAGE
+        )
+    )
     return numeric(ref.ISO3745_U_EXPANDED, u, 1e-3, unit="dB", places=3)
 
 
-@register(_PRECISION_POWER, "ISO 3745:2012 Eq (11)", "K1 background floor (6 dB edge band)")
+@register(
+    _PRECISION_POWER, "ISO 3745:2012 Eq (11)", "K1 background floor (6 dB edge band)"
+)
 def _chk_iso3745_k1_floor() -> Outcome:
     k1 = ph.emission.precision_background_correction(
         np.array([[ref.ISO3745_K1_EDGE_LEVEL]]),
         np.array([[ref.ISO3745_K1_EDGE_BACKGROUND]]),
         np.array([ref.ISO3745_K1_EDGE_FREQUENCY]),
     )
-    return numeric(ref.ISO3745_K1_EDGE_FLOOR, float(k1[0, 0]), 1e-4, unit="dB", places=4)
+    return numeric(
+        ref.ISO3745_K1_EDGE_FLOOR, float(k1[0, 0]), 1e-4, unit="dB", places=4
+    )
 
 
-@register(_PRECISION_POWER, "ISO 3745:2012 Eq (16)", "Meteorological C1 at 23 C reference")
+@register(
+    _PRECISION_POWER, "ISO 3745:2012 Eq (16)", "Meteorological C1 at 23 C reference"
+)
 def _chk_iso3745_c1() -> Outcome:
     c1 = ph.emission.meteorological_corrections(23.0, 101.325).c1
     return numeric(ref.ISO3745_C1_REFERENCE, c1, 1e-4, unit="dB", places=4)
 
 
-@register(_PRECISION_POWER, "ISO 9614-3:2002 Eqs (5)/(8)/(9)", "Uniform-intensity LW recovery")
+@register(
+    _PRECISION_POWER, "ISO 9614-3:2002 Eqs (5)/(8)/(9)", "Uniform-intensity LW recovery"
+)
 def _chk_iso9614_3_uniform() -> Outcome:
     areas = np.array(ref.ISO9614_3_UNIFORM_AREAS, dtype=float)
     i_n = np.full(areas.shape, ref.ISO9614_3_UNIFORM_POWER / float(areas.sum()))
     res = ph.emission.sound_power_intensity_precision(i_n, areas)
-    return numeric(ref.ISO9614_3_UNIFORM_LW, float(res.sound_power_level[0]), 1e-9, unit="dB", places=4)
+    return numeric(
+        ref.ISO9614_3_UNIFORM_LW,
+        float(res.sound_power_level[0]),
+        1e-9,
+        unit="dB",
+        places=4,
+    )

@@ -100,7 +100,9 @@ def _metadata_pairs(
         (t("Relative humidity [%]", language), num(metadata.relative_humidity)),
         (t("Ambient pressure [kPa]", language), num(metadata.pressure)),
     ]
-    return [(label, html.escape(str(value))) for label, value in specs if value is not None]
+    return [
+        (label, html.escape(str(value))) for label, value in specs if value is not None
+    ]
 
 
 def _freq(value: float, language: str = "en") -> str:
@@ -174,7 +176,10 @@ def _rated_rows(
                 freq=_freq(result.polar_frequency, language)
             )
         rows.append(
-            (label, f"{format_number(result.directivity_index_db, language, decimals=1)} dB")
+            (
+                label,
+                f"{format_number(result.directivity_index_db, language, decimals=1)} dB",
+            )
         )
     return rows
 
@@ -243,6 +248,7 @@ def _response_drawing(
     _draw_loudspeaker_response(result, ax, language=language)
     decades = np.log10(float(np.max(f)) / float(np.min(f)))
     from .._plot.electroacoustics import _RESPONSE_SPAN_LSP
+
     ax.set_box_aspect(_RESPONSE_SPAN_LSP / (_DB_PER_DECADE * decades))
     fig.tight_layout()
     return _drawing_from_figure(fig, target_width, language)
@@ -288,7 +294,8 @@ def _secondary_drawing(
         idx += 1
     if has_polar:
         _draw_datasheet_polar(
-            result, fig.add_subplot(1, panels, idx, projection="polar"),
+            result,
+            fig.add_subplot(1, panels, idx, projection="polar"),
             language=language,
         )
         idx += 1
@@ -312,7 +319,9 @@ def _thin_freq_ticklabels(ax: Any, keep_every: int = 2) -> None:
     if len(labels) <= 6:
         return
     ax.xaxis.set_major_formatter(
-        FixedFormatter([lab if i % keep_every == 0 else "" for i, lab in enumerate(labels)])
+        FixedFormatter(
+            [lab if i % keep_every == 0 else "" for i, lab in enumerate(labels)]
+        )
     )
 
 

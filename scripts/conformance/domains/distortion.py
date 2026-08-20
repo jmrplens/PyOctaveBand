@@ -80,7 +80,9 @@ def _loudspeaker_flat_response() -> tuple[np.ndarray, np.ndarray]:
     below = f < 80.0
     spl[below] = 90.0 - 10.0 * (np.log2(80.0 / f[below]) / np.log2(80.0 / 50.0))
     above = f > 15000.0
-    spl[above] = 90.0 - 10.0 * (np.log2(f[above] / 15000.0) / np.log2(18000.0 / 15000.0))
+    spl[above] = 90.0 - 10.0 * (
+        np.log2(f[above] / 15000.0) / np.log2(18000.0 / 15000.0)
+    )
     return f, spl
 
 
@@ -190,9 +192,7 @@ def _chk_microphone_cardioid_di() -> Outcome:
         rel,
         12.5,
         tolerance_db=3.0,
-        directivity=ph.electroacoustics.MicrophoneDirectivity(
-            polar=(angles, pattern)
-        ),
+        directivity=ph.electroacoustics.MicrophoneDirectivity(polar=(angles, pattern)),
     )
     di = result.directivity_index_db
     if di is None:
@@ -219,9 +219,7 @@ def _chk_microphone_equivalent_noise() -> Outcome:
     )
     noise = result.equivalent_noise_level_db
     if noise is None:
-        return Outcome(
-            expected="20 dB SPL", computed="None", delta="n/a", passed=False
-        )
+        return Outcome(expected="20 dB SPL", computed="None", delta="n/a", passed=False)
     return numeric(20.0, noise, 1e-9, unit="dB SPL", places=6)
 
 
@@ -351,7 +349,9 @@ def _chk_dim() -> Outcome:
     t = np.arange(fs) / fs
     fsine, fsq = 15000.0, 3150.0
     comps = sorted(
-        round(abs(k * fsq - fsine), 6) for k in range(1, 10) if abs(k * fsq - fsine) < fsine
+        round(abs(k * fsq - fsine), 6)
+        for k in range(1, 10)
+        if abs(k * fsq - fsine) < fsine
     )
     amps = [0.01 * (i + 1) for i in range(len(comps))]
     # 15 kHz sine + the strong 3.15 kHz fundamental + the nine products.
@@ -382,7 +382,11 @@ def _chk_h1_gain() -> Outcome:
     _, h = sg.freqz(b, a, worN=res.frequencies, fs=fs)
     idx = int(np.argmin(np.abs(res.frequencies - 1000.0)))
     return numeric(
-        float(np.abs(h[idx])), float(np.abs(res.response[idx])), 0.02, rel=True, places=4
+        float(np.abs(h[idx])),
+        float(np.abs(res.response[idx])),
+        0.02,
+        rel=True,
+        places=4,
     )
 
 

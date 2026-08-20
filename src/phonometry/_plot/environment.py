@@ -115,15 +115,13 @@ _STRINGS: dict[str, str] = {
     "Source": "Fuente",
     "Atmospheric ray paths": "Trayectorias de rayos atmosféricos",
     "GFPE relative sound level": "Nivel sonoro relativo GFPE",
-    r"Attenuation coefficient $\alpha$ [dB/km]":
-        r"Coeficiente de atenuación $\alpha$ [dB/km]",
+    r"Attenuation coefficient $\alpha$ [dB/km]": r"Coeficiente de atenuación $\alpha$ [dB/km]",
     "ISO 9613-1 atmospheric attenuation": "Atenuación atmosférica ISO 9613-1",
     "Band level": "Nivel de banda",
     "$L_\\mathrm{t}$ vs neighbour mean": "$L_\\mathrm{t}$ frente a la media de contiguas",
     "Band level [dB]": "Nivel de banda [dB]",
     _LT_LABEL: _LT_LABEL,
-    "RD 1367/2007 tonal correction $K_\\mathrm{{t}}$ = {kt} dB":
-        "Corrección tonal $K_\\mathrm{{t}}$ = {kt} dB (RD 1367/2007)",
+    "RD 1367/2007 tonal correction $K_\\mathrm{{t}}$ = {kt} dB": "Corrección tonal $K_\\mathrm{{t}}$ = {kt} dB (RD 1367/2007)",
     "max $L_{Keq,Ti}$": "máx. $L_{Keq,Ti}$",
     "$L_{Keq,x}$ (daily)": "$L_{Keq,x}$ (diario)",
     "$L_{K,x}$ (annual)": "$L_{K,x}$ (anual)",
@@ -134,8 +132,7 @@ _STRINGS: dict[str, str] = {
     "Evening": "Tarde",
     "Night": "Noche",
     "Corrected level [dB]": "Nivel corregido [dB]",
-    "RD 1367/2007 assessment vs limit values":
-        "Evaluación RD 1367/2007 frente a los valores límite",
+    "RD 1367/2007 assessment vs limit values": "Evaluación RD 1367/2007 frente a los valores límite",
     "Total line": "Línea total",
     "Light vehicles (1)": "Vehículos ligeros (1)",
     "Medium heavy vehicles (2)": "Vehículos pesados medios (2)",
@@ -152,8 +149,11 @@ def _t(text: str, language: str = "en") -> str:
 
 
 def plot_atmospheric_attenuation(
-    result: AtmosphericAttenuation, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: AtmosphericAttenuation,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Pure-tone atmospheric attenuation coefficient vs frequency (ISO 9613-1).
 
@@ -183,8 +183,9 @@ def plot_atmospheric_attenuation(
     label = f"{t_str} °C, {rh_str} {rh_unit}"
     # dB/km is already a logarithmic quantity, so the ordinate stays linear;
     # only the frequency axis is logarithmic (semilogx + format_frequency_axis).
-    ax.semilogx(freqs, alpha_km, **{"color": _C_PRIMARY, "lw": 1.8,
-                                    "label": label, **kwargs})
+    ax.semilogx(
+        freqs, alpha_km, **{"color": _C_PRIMARY, "lw": 1.8, "label": label, **kwargs}
+    )
     fmin, fmax = float(freqs.min()), float(freqs.max())
     ax.set_xlim(fmin, fmax)
     format_frequency_axis(ax, fmin, fmax)
@@ -198,8 +199,11 @@ def plot_atmospheric_attenuation(
 
 
 def plot_wind_turbine_tonality(
-    result: WindTurbineTonalityResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: WindTurbineTonalityResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Narrowband spectrum with the critical band, masking level and the tone.
 
@@ -217,23 +221,50 @@ def plot_wind_turbine_tonality(
     levels = np.asarray(result.levels, dtype=np.float64)
     fc = result.tone_frequency
     lo, hi = _critical_band_edges(fc)
-    ax.plot(freqs, levels, **{"color": _C_PRIMARY, "lw": 1.0, "label": _t("Narrowband spectrum", language), **kwargs})
-    ax.axvspan(lo, hi, color=_C_TERTIARY, alpha=0.12, label=_t("Critical band", language))
-    ax.axhline(result.masking_level, color=_C_MUTED, ls="--", lw=1.0,
-               label=f"{_t('Masking level', language)} ({format_number(result.masking_level, language)} dB)")
-    ax.plot([fc], [result.tone_level], "o", color=_C_REFERENCE,
-            label=f"{_t('Tone', language)} ({format_number(result.tone_level, language)} dB)")
+    ax.plot(
+        freqs,
+        levels,
+        **{
+            "color": _C_PRIMARY,
+            "lw": 1.0,
+            "label": _t("Narrowband spectrum", language),
+            **kwargs,
+        },
+    )
+    ax.axvspan(
+        lo, hi, color=_C_TERTIARY, alpha=0.12, label=_t("Critical band", language)
+    )
+    ax.axhline(
+        result.masking_level,
+        color=_C_MUTED,
+        ls="--",
+        lw=1.0,
+        label=f"{_t('Masking level', language)} ({format_number(result.masking_level, language)} dB)",
+    )
+    ax.plot(
+        [fc],
+        [result.tone_level],
+        "o",
+        color=_C_REFERENCE,
+        label=f"{_t('Tone', language)} ({format_number(result.tone_level, language)} dB)",
+    )
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Level [dB]", language))
-    ax.set_title(f"{_t('IEC 61400-11 tonal audibility', language)} $\\Delta L_\\mathrm{{a}}$ = {format_number(result.tonal_audibility, language)} dB")
+    ax.set_title(
+        f"{_t('IEC 61400-11 tonal audibility', language)} $\\Delta L_\\mathrm{{a}}$ = {format_number(result.tonal_audibility, language)} dB"
+    )
     ax.grid(True, alpha=0.3)
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     localize_axes(ax, language)
     return ax
 
+
 def plot_impulse_prominence(
-    result: ImpulseProminenceResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: ImpulseProminenceResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Adjustment curve ``KI(P)`` with the candidate impulses marked.
 
@@ -254,19 +285,33 @@ def plot_impulse_prominence(
     per_max = float(per.max()) if per.size else 0.0
     p_max = max(per_max, result.prominence, 15.0) + 1.0
     grid = np.linspace(0.0, p_max, 200)
-    ax.plot(grid, impulse_adjustment(grid), color=_C_PRIMARY,
-            label=_t(r"$K_\mathrm{I} = 1.8\,(P-5)$", language))
-    ax.axvline(ADJUSTMENT_THRESHOLD, color=_C_MUTED, ls=":",
-               label=f"{_t('threshold', language)} $P = {decimal_comma(f'{ADJUSTMENT_THRESHOLD:g}', language)}$")
+    ax.plot(
+        grid,
+        impulse_adjustment(grid),
+        color=_C_PRIMARY,
+        label=_t(r"$K_\mathrm{I} = 1.8\,(P-5)$", language),
+    )
+    ax.axvline(
+        ADJUSTMENT_THRESHOLD,
+        color=_C_MUTED,
+        ls=":",
+        label=f"{_t('threshold', language)} $P = {decimal_comma(f'{ADJUSTMENT_THRESHOLD:g}', language)}$",
+    )
 
     kwargs.setdefault("color", _C_PRIMARY_LIGHT)
     kwargs.setdefault("zorder", 3)
     kwargs.setdefault("label", _t("Impulses", language))
     ax.scatter(per, impulse_adjustment(per), **kwargs)
-    ax.scatter([result.prominence], [result.adjustment], color=_C_REFERENCE,
-               zorder=4, s=90, marker="*",
-               label=f"{_t('Governing', language)}  $P$ = {format_number(result.prominence, language, decimals=2)},  "
-                     f"$K_\\mathrm{{I}}$ = {format_number(result.adjustment, language)} dB")
+    ax.scatter(
+        [result.prominence],
+        [result.adjustment],
+        color=_C_REFERENCE,
+        zorder=4,
+        s=90,
+        marker="*",
+        label=f"{_t('Governing', language)}  $P$ = {format_number(result.prominence, language, decimals=2)},  "
+        f"$K_\\mathrm{{I}}$ = {format_number(result.adjustment, language)} dB",
+    )
     ax.set_xlabel(_t("Predicted prominence $P$", language))
     ax.set_ylabel(_t("Adjustment $K_\\mathrm{I}$ [dB]", language))
     ax.set_title(_t("NT ACOU 112 — impulse adjustment to $L_\\mathrm{Aeq}$", language))
@@ -276,9 +321,13 @@ def plot_impulse_prominence(
     localize_axes(ax, language)
     return ax
 
+
 def plot_tonal_adjustment(
-    result: TonalAssessmentResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: TonalAssessmentResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Tonal adjustment curve ``Kt(ΔLta)`` with the assessed tone marked.
 
@@ -296,18 +345,27 @@ def plot_tonal_adjustment(
     top = max(result.audibility, 12.0) + 1.0
     grid = np.linspace(0.0, top, 200)
     curve = np.array([tonal_adjustment(d) for d in grid], dtype=np.float64)
-    ax.plot(grid, curve, color=_C_PRIMARY, label=r"$K_\mathrm{t}(\Delta L_\mathrm{ta})$")
-    ax.axvline(4.0, color=_C_MUTED, ls=":", label=_t("knees $\\Delta L_\\mathrm{ta}=4,\\,10$ dB", language))
+    ax.plot(
+        grid, curve, color=_C_PRIMARY, label=r"$K_\mathrm{t}(\Delta L_\mathrm{ta})$"
+    )
+    ax.axvline(
+        4.0,
+        color=_C_MUTED,
+        ls=":",
+        label=_t("knees $\\Delta L_\\mathrm{ta}=4,\\,10$ dB", language),
+    )
     ax.axvline(10.0, color=_C_MUTED, ls=":")
 
     kwargs.setdefault("color", _C_REFERENCE)
     kwargs.setdefault("zorder", 4)
     kwargs.setdefault("s", 90)
     kwargs.setdefault("marker", "*")
-    kwargs.setdefault("label", rf"$\Delta L_\mathrm{{ta}}$ = {format_number(result.audibility, language)} dB,  "
-                     rf"$K_\mathrm{{t}}$ = {format_number(result.adjustment, language)} dB")
-    ax.scatter([result.audibility], [result.adjustment],
-               **kwargs)
+    kwargs.setdefault(
+        "label",
+        rf"$\Delta L_\mathrm{{ta}}$ = {format_number(result.audibility, language)} dB,  "
+        rf"$K_\mathrm{{t}}$ = {format_number(result.adjustment, language)} dB",
+    )
+    ax.scatter([result.audibility], [result.adjustment], **kwargs)
     ax.set_xlabel(_t("Tonal audibility $\\Delta L_\\mathrm{ta}$ [dB]", language))
     ax.set_ylabel(_t("Tonal adjustment $K_\\mathrm{t}$ [dB]", language))
     ax.set_title(_t("ISO 1996-2 tonal adjustment", language))
@@ -317,9 +375,13 @@ def plot_tonal_adjustment(
     localize_axes(ax, language)
     return ax
 
+
 def plot_outdoor_attenuation(
-    result: OutdoorAttenuation, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: OutdoorAttenuation,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Stacked per-band attenuation terms with the total overlaid (ISO 9613-2).
 
@@ -363,8 +425,7 @@ def plot_outdoor_attenuation(
     kwargs.setdefault("color", _C_REFERENCE)
     kwargs.setdefault("marker", "D")
     kwargs.setdefault("label", _t(_TOTAL_A_LABEL, language))
-    ax.plot(positions, np.asarray(result.a_total, dtype=np.float64),
-            zorder=4, **kwargs)
+    ax.plot(positions, np.asarray(result.a_total, dtype=np.float64), zorder=4, **kwargs)
     ax.axhline(0.0, color=_C_MUTED, lw=0.8)
     ax.set_ylabel(_t("Attenuation $A$ [dB]", language))
     ax.set_title(_t("ISO 9613-2 attenuation breakdown", language))
@@ -375,8 +436,11 @@ def plot_outdoor_attenuation(
 
 
 def plot_cnossos_rail_emission(
-    result: RailwayEmissionResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: RailwayEmissionResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Per-metre railway source-line power of the two equivalent source heights.
 
@@ -413,8 +477,14 @@ def plot_cnossos_rail_emission(
         np.asarray(result.line_power, dtype=np.float64), styles, strict=True
     ):
         ax.plot(
-            positions, np.where(np.isfinite(row), row, np.nan), color=color,
-            marker=marker, lw=1.2, ms=4, zorder=4, label=_t(label, language),
+            positions,
+            np.where(np.isfinite(row), row, np.nan),
+            color=color,
+            marker=marker,
+            lw=1.2,
+            ms=4,
+            zorder=4,
+            label=_t(label, language),
         )
     # Pure symbol notation, identical in every language, so it is set directly
     # rather than routed through the translation table.
@@ -427,8 +497,11 @@ def plot_cnossos_rail_emission(
 
 
 def plot_spherical_ground(
-    result: SphericalGroundResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: SphericalGroundResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Excess attenuation (level re free field) of the spherical-wave ground effect.
 
@@ -448,12 +521,26 @@ def plot_spherical_ground(
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     d_l = np.asarray(result.excess_attenuation, dtype=np.float64)
-    ax.plot(freqs, d_l, **{"color": _C_PRIMARY, "lw": 1.4, "marker": "o",
-                           "ms": 3.0, "label": _t("Excess attenuation $\\Delta L$", language),
-                           **kwargs})
+    ax.plot(
+        freqs,
+        d_l,
+        **{
+            "color": _C_PRIMARY,
+            "lw": 1.4,
+            "marker": "o",
+            "ms": 3.0,
+            "label": _t("Excess attenuation $\\Delta L$", language),
+            **kwargs,
+        },
+    )
     ax.axhline(0.0, color=_C_MUTED, lw=0.8, label=_t("Free field (0 dB)", language))
-    ax.axhline(6.0, color=_C_REFERENCE, ls="--", lw=0.9,
-               label=_t("Hard-ground limit (+6 dB)", language))
+    ax.axhline(
+        6.0,
+        color=_C_REFERENCE,
+        ls="--",
+        lw=0.9,
+        label=_t("Hard-ground limit (+6 dB)", language),
+    )
     _freq_axis(ax, freqs, language=language)
     ax.set_ylabel(_t(_FREE_FIELD_LABEL, language))
     ax.set_title(_t("Spherical-wave ground effect (Weyl-Van der Pol)", language))
@@ -474,8 +561,11 @@ _BARRIER_METHOD_LABELS: dict[str, str] = {
 
 
 def plot_barrier_insertion_loss(
-    result: BarrierInsertionLoss, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: BarrierInsertionLoss,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Barrier insertion loss versus frequency.
 
@@ -496,11 +586,22 @@ def plot_barrier_insertion_loss(
         _BARRIER_METHOD_LABELS.get(result.method, result.method), language
     )
     label = f"{_t('Insertion loss', language)} ({method_label}{ground_frag})"
-    ax.plot(freqs, il, **{"color": _C_SECONDARY, "lw": 1.4, "marker": "s",
-                          "ms": 3.0, "label": label, **kwargs})
+    ax.plot(
+        freqs,
+        il,
+        **{
+            "color": _C_SECONDARY,
+            "lw": 1.4,
+            "marker": "s",
+            "ms": 3.0,
+            "label": label,
+            **kwargs,
+        },
+    )
     ax.axhline(0.0, color=_C_MUTED, lw=0.8)
-    ax.axhline(5.0, color=_C_MUTED, ls=":", lw=0.9,
-               label=_t("Grazing limit (5 dB)", language))
+    ax.axhline(
+        5.0, color=_C_MUTED, ls=":", lw=0.9, label=_t("Grazing limit (5 dB)", language)
+    )
     _freq_axis(ax, freqs, language=language)
     ax.set_ylabel(_t("Insertion loss [dB]", language))
     ax.set_title(_t("Barrier insertion loss", language))
@@ -511,8 +612,11 @@ def plot_barrier_insertion_loss(
 
 
 def plot_sound_speed_profile(
-    profile: EffectiveSoundSpeedProfile, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    profile: EffectiveSoundSpeedProfile,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Effective sound-speed profile ``c_eff(z)`` (height on the vertical axis).
 
@@ -540,8 +644,11 @@ def plot_sound_speed_profile(
 
 
 def plot_atmospheric_rays(
-    result: AtmosphericRayResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: AtmosphericRayResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Curved sound-ray paths over the ground (height on the vertical axis).
 
@@ -559,7 +666,13 @@ def plot_atmospheric_rays(
     z = np.asarray(result.heights, dtype=np.float64)
     for i in range(r.shape[0]):
         ax.plot(r[i], z[i], **{"color": _C_PRIMARY, "lw": 0.7, "alpha": 0.7, **kwargs})
-    ax.plot([0.0], [result.source_height], "o", color=_C_REFERENCE, label=_t("Source", language))
+    ax.plot(
+        [0.0],
+        [result.source_height],
+        "o",
+        color=_C_REFERENCE,
+        label=_t("Source", language),
+    )
     ax.axhline(0.0, color=_C_MUTED, lw=1.0)
     ax.set_xlabel(_t(_RANGE_LABEL, language))
     ax.set_ylabel(_t(_HEIGHT_LABEL, language))
@@ -572,8 +685,11 @@ def plot_atmospheric_rays(
 
 
 def plot_atmospheric_pe(
-    result: AtmosphericPEResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: AtmosphericPEResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Parabolic-equation relative-level field over the range-height plane.
 
@@ -615,18 +731,30 @@ def plot_atmospheric_pe(
         },
     )
     ax.figure.colorbar(img, ax=ax, label=_t(_FREE_FIELD_LABEL, language))
-    ax.plot([0.0], [result.source_height], "o", color="k", ms=4.0, label=_t("Source", language))
+    ax.plot(
+        [0.0],
+        [result.source_height],
+        "o",
+        color="k",
+        ms=4.0,
+        label=_t("Source", language),
+    )
     ax.set_xlabel(_t(_RANGE_LABEL, language))
     ax.set_ylabel(_t(_HEIGHT_LABEL, language))
-    ax.set_title(f"{_t('GFPE relative sound level', language)} ({format_number(result.frequency, language, decimals=0)} Hz)")
+    ax.set_title(
+        f"{_t('GFPE relative sound level', language)} ({format_number(result.frequency, language, decimals=0)} Hz)"
+    )
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     localize_axes(ax, language)
     return ax
 
 
 def plot_tonal_correction_rd1367(
-    result: TonalCorrectionResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: TonalCorrectionResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """One-third-octave spectrum with the RD 1367/2007 emergence ``Lt`` per band.
 
@@ -656,24 +784,35 @@ def plot_tonal_correction_rd1367(
     ax.set_ylabel(_t("Band level [dB]", language))
 
     twin = ax.twinx()
-    twin.plot(positions, lt, "o-", color=_C_SECONDARY, ms=4.0,
-              label=_t("$L_\\mathrm{t}$ vs neighbour mean", language))
+    twin.plot(
+        positions,
+        lt,
+        "o-",
+        color=_C_SECONDARY,
+        ms=4.0,
+        label=_t("$L_\\mathrm{t}$ vs neighbour mean", language),
+    )
     if result.governing_frequency is not None:
         index = int(np.argmin(np.abs(freqs - result.governing_frequency)))
-        twin.plot([positions[index]], [lt[index]], "*", color=_C_REFERENCE,
-                  ms=14.0, zorder=5)
+        twin.plot(
+            [positions[index]], [lt[index]], "*", color=_C_REFERENCE, ms=14.0, zorder=5
+        )
     twin.set_ylabel(_t(_LT_LABEL, language))
     twin.axhline(0.0, color=_C_MUTED, lw=0.8)
 
     ax.set_title(
-        _t("RD 1367/2007 tonal correction $K_\\mathrm{{t}}$ = {kt} dB", language).format(
-            kt=format_number(result.correction, language, decimals=0)
-        )
+        _t(
+            "RD 1367/2007 tonal correction $K_\\mathrm{{t}}$ = {kt} dB", language
+        ).format(kt=format_number(result.correction, language, decimals=0))
     )
     handles, labels = ax.get_legend_handles_labels()
     extra_handles, extra_labels = twin.get_legend_handles_labels()
-    ax.legend(handles + extra_handles, labels + extra_labels,
-              loc=_LEGEND_UPPER_LEFT, fontsize="small")
+    ax.legend(
+        handles + extra_handles,
+        labels + extra_labels,
+        loc=_LEGEND_UPPER_LEFT,
+        fontsize="small",
+    )
     ax.grid(True, axis="y", alpha=0.3)
     localize_axes(ax, language)
     localize_axes(twin, language)
@@ -681,8 +820,11 @@ def plot_tonal_correction_rd1367(
 
 
 def plot_activity_assessment(
-    result: ActivityAssessment, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: ActivityAssessment,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Per-period RD 1367/2007 indices against their limit values.
 
@@ -749,7 +891,15 @@ def plot_activity_assessment(
         ),
     )
     for (
-        values, limits, verdicts, colour, label, limit_label, offset, dash, styled
+        values,
+        limits,
+        verdicts,
+        colour,
+        label,
+        limit_label,
+        offset,
+        dash,
+        styled,
     ) in series:
         # matplotlib types the dash style as a Literal; the series table above
         # carries it as a plain str, so narrow it back for the hlines call.
@@ -769,7 +919,9 @@ def plot_activity_assessment(
                 limit,
                 positions[index] + offset - 0.62 * width,
                 positions[index] + offset + 0.62 * width,
-                colors=_C_REFERENCE, linestyles=style, linewidth=1.5,
+                colors=_C_REFERENCE,
+                linestyles=style,
+                linewidth=1.5,
                 label=limit_label if index == 0 else "_nolegend_",
                 zorder=4,
             )
@@ -811,8 +963,11 @@ _ROAD_CATEGORY_STYLE: dict[str, tuple[str, str]] = {
 
 
 def plot_cnossos_road_emission(
-    result: RoadEmissionResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: RoadEmissionResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Per-metre road source-line power with its vehicle-category breakdown.
 
@@ -846,8 +1001,13 @@ def plot_cnossos_road_emission(
     ):
         color, marker = _ROAD_CATEGORY_STYLE[category.value]
         ax.plot(
-            positions, np.where(np.isfinite(row), row, np.nan), color=color,
-            marker=marker, lw=1.2, ms=4, zorder=4,
+            positions,
+            np.where(np.isfinite(row), row, np.nan),
+            color=color,
+            marker=marker,
+            lw=1.2,
+            ms=4,
+            zorder=4,
             label=_t(_ROAD_CATEGORY_LABELS[category.value], language),
         )
     # Pure symbol notation, identical in every language, so it is set directly

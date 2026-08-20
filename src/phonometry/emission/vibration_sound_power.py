@@ -75,8 +75,16 @@ REFERENCE_AREA: float = 1.0
 
 #: ISO/TS 7849-1 Table 2: correction K1A (dB) for extraneous vibratory velocity
 #: keyed by the integer level difference dLv (dB). dLv >= 10 -> 0; dLv < 3 -> 3.
-_K1A_TABLE: dict[int, float] = {3: 3.0, 4: 2.0, 5: 2.0, 6: 1.0,
-                                7: 1.0, 8: 1.0, 9: 1.0, 10: 0.0}
+_K1A_TABLE: dict[int, float] = {
+    3: 3.0,
+    4: 2.0,
+    5: 2.0,
+    6: 1.0,
+    7: 1.0,
+    8: 1.0,
+    9: 1.0,
+    10: 0.0,
+}
 
 
 def velocity_level(
@@ -124,9 +132,7 @@ def velocity_level_from_acceleration(
     return np.asarray(20.0 * np.log10(v_rms / reference), dtype=np.float64)
 
 
-def mean_velocity_level(
-    levels: ArrayLike, areas: ArrayLike | None = None
-) -> float:
+def mean_velocity_level(levels: ArrayLike, areas: ArrayLike | None = None) -> float:
     """Mean vibratory velocity level over the surface (ISO/TS 7849-1, Eq. 10/11).
 
     With uniformly distributed positions (``areas`` is ``None``) this is the
@@ -210,10 +216,10 @@ def radiated_sound_power_level(
     """
     area = require_positive(area, "area")
     reference_area = require_positive(reference_area, "reference_area")
-    normalized_impedance = require_positive(normalized_impedance,
-                                            "normalized_impedance")
-    reference_impedance = require_positive(reference_impedance,
-                                           "reference_impedance")
+    normalized_impedance = require_positive(
+        normalized_impedance, "normalized_impedance"
+    )
+    reference_impedance = require_positive(reference_impedance, "reference_impedance")
     lv = np.asarray(velocity_level, dtype=np.float64)
     eps = np.asarray(radiation_factor, dtype=np.float64)
     lw = (
@@ -287,12 +293,12 @@ class VibrationSoundPowerResult:
         from ._shared import _a_weighting_corrections
 
         lw = np.asarray(self.sound_power_level, dtype=np.float64)
-        ck = _a_weighting_corrections(
-            np.asarray(self.frequencies, dtype=np.float64)
-        )
+        ck = _a_weighting_corrections(np.asarray(self.frequencies, dtype=np.float64))
         return float(10.0 * np.log10(np.sum(10.0 ** (0.1 * (lw + ck)))))
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the radiated sound power level per band.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -388,9 +394,7 @@ def sound_power_from_vibration(
     if frequencies is not None:
         freq = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
         if freq.shape != lv.shape:
-            raise ValueError(
-                "'frequencies' must match the shape of 'velocity_level'."
-            )
+            raise ValueError("'frequencies' must match the shape of 'velocity_level'.")
     return VibrationSoundPowerResult(
         velocity_level=lv,
         sound_power_level=np.asarray(lw, dtype=np.float64),

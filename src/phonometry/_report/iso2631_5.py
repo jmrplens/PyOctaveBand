@@ -252,15 +252,15 @@ def _analysis_table(result: MultipleShockResult, language: str = "en") -> Any:
         )
     table = stacked_table(data, [70 * mm, 26 * mm, 42 * mm, 36 * mm])
     table.setStyle(
-        [("TOPPADDING", (0, 0), (-1, -1), 2.0),
-         ("BOTTOMPADDING", (0, 0), (-1, -1), 2.0)]
+        [
+            ("TOPPADDING", (0, 0), (-1, -1), 2.0),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 2.0),
+        ]
     )
     return table
 
 
-def _classification_table(
-    result: MultipleShockResult, language: str = "en"
-) -> Any:
+def _classification_table(result: MultipleShockResult, language: str = "en") -> Any:
     """The Annex C risk-classification table against the Table C.2 levels.
 
     Four rows partition the stress variable ``R`` by the Table C.2 risk levels
@@ -273,13 +273,15 @@ def _classification_table(
     from ._layout import fiche_paragraph as Paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("iso26315cls")
-    r10, r50, r90 = (
-        _fmt(x, _R_DECIMALS, language) for x in result.risk_thresholds
-    )
+    r10, r50, r90 = (_fmt(x, _R_DECIMALS, language) for x in result.risk_thresholds)
     active = _band_index(result)
 
     bands: list[tuple[str, str, str]] = [
-        (t("Low", language), t("&lt; 10 %", language), t("R &lt; {r10}", language).format(r10=r10)),
+        (
+            t("Low", language),
+            t("&lt; 10 %", language),
+            t("R &lt; {r10}", language).format(r10=r10),
+        ),
         (
             t("Moderate", language),
             t("10 % to 50 %", language),
@@ -327,8 +329,12 @@ def _classification_table(
     # and tighten the row padding so the sheet stays on one page.
     table.setStyle(
         [
-            ("BACKGROUND", (0, active + 1), (-1, active + 1),
-             colors.HexColor("#dfe8f2")),
+            (
+                "BACKGROUND",
+                (0, active + 1),
+                (-1, active + 1),
+                colors.HexColor("#dfe8f2"),
+            ),
             ("TOPPADDING", (0, 0), (-1, -1), 2.0),
             ("BOTTOMPADDING", (0, 0), (-1, -1), 2.0),
         ]
@@ -339,9 +345,7 @@ def _classification_table(
 def _statement(result: MultipleShockResult, language: str = "en") -> str:
     """The boxed result statement: R, the injury probability and the risk band."""
     band = t(_BAND_LABELS[_band_index(result)], language)
-    return t(
-        "R = <b>{r}</b>, &#928; = <b>{p}</b> &nbsp; ({band})", language
-    ).format(
+    return t("R = <b>{r}</b>, &#928; = <b>{p}</b> &nbsp; ({band})", language).format(
         r=_fmt(result.risk, _R_DECIMALS, language),
         p=_fmt_percent(result.probability, language),
         band=band,
@@ -356,8 +360,11 @@ def _zone_row(result: MultipleShockResult, language: str = "en") -> Any:
 
     band = t(_BAND_LABELS[_band_index(result)], language)
     zone_style = ParagraphStyle(
-        "iso26315_zone", parent=getSampleStyleSheet()["Normal"], fontSize=10,
-        leading=14, spaceBefore=4,
+        "iso26315_zone",
+        parent=getSampleStyleSheet()["Normal"],
+        fontSize=10,
+        leading=14,
+        spaceBefore=4,
     )
     lead = t("Health-risk classification", language)
     return Paragraph(
@@ -436,7 +443,10 @@ def render_iso2631_5_report(
     # Full-width, landscape injury-probability curve (self-scaling 0-100 % axis).
     flow.append(
         render_figure_drawing(
-            result.plot, 174 * mm, y_top=None, figsize=(9.2, 2.5),
+            result.plot,
+            174 * mm,
+            y_top=None,
+            figsize=(9.2, 2.5),
             language=language,
         )
     )
@@ -446,16 +456,17 @@ def render_iso2631_5_report(
     flow.append(Spacer(1, 4))
 
     flow.append(
-        Paragraph(
-            t("Annex C risk classification (Table C.2)", language), caption_style
-        )
+        Paragraph(t("Annex C risk classification (Table C.2)", language), caption_style)
     )
     flow.append(_classification_table(result, language))
     flow.append(_zone_row(result, language))
 
     note_style = ParagraphStyle(
-        "iso26315_notes", parent=getSampleStyleSheet()["Normal"],
-        fontSize=7, leading=9, textColor=colors.HexColor(_MUTED_HEX),
+        "iso26315_notes",
+        parent=getSampleStyleSheet()["Normal"],
+        fontSize=7,
+        leading=9,
+        textColor=colors.HexColor(_MUTED_HEX),
         spaceBefore=5,
     )
     flow.append(

@@ -258,8 +258,9 @@ class KWeightingResponse:
     highpass_db: np.ndarray
     fs: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en",
-             **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the K-weighting magnitude response versus frequency.
 
         Draws the combined K-weighting magnitude (dB) on a logarithmic
@@ -673,8 +674,9 @@ class ProgramLoudnessResult:
     channel_weights: np.ndarray
     fs: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en",
-             **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot momentary and short-term loudness over time, with the
         integrated loudness and the loudness range annotated.
 
@@ -744,7 +746,11 @@ class ProgramLoudnessResult:
         from .._report.broadcast import render_program_loudness_report
 
         return render_program_loudness_report(
-            self, path, metadata=metadata, verbose=verbose, language=language,
+            self,
+            path,
+            metadata=metadata,
+            verbose=verbose,
+            language=language,
             tolerance=tolerance,
         )
 

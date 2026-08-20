@@ -321,20 +321,14 @@ def insertion_loss(
     :return: The insertion loss per frequency, dB.
     """
     n = transfer_matrix.shape[0]
-    zs = np.broadcast_to(
-        np.asarray(source_impedance, dtype=np.complex128), (n,)
-    )
-    zr = np.broadcast_to(
-        np.asarray(radiation_impedance, dtype=np.complex128), (n,)
-    )
+    zs = np.broadcast_to(np.asarray(source_impedance, dtype=np.complex128), (n,))
+    zr = np.broadcast_to(np.asarray(radiation_impedance, dtype=np.complex128), (n,))
     t11 = transfer_matrix[:, 0, 0]
     t12 = transfer_matrix[:, 0, 1]
     t21 = transfer_matrix[:, 1, 0]
     t22 = transfer_matrix[:, 1, 1]
     num = t11 * zr + t12 + zs * zr * t21 + zs * t22
-    return np.asarray(
-        20.0 * np.log10(np.abs(num / (zs + zr))), dtype=np.float64
-    )
+    return np.asarray(20.0 * np.log10(np.abs(num / (zs + zr))), dtype=np.float64)
 
 
 def helmholtz_impedance(
@@ -459,7 +453,9 @@ class ReactiveSilencerResult:
     plane_wave_limit: float | None = None
     chain: SilencerChain | None = None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the transmission (and insertion) loss against frequency.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -471,9 +467,7 @@ class ReactiveSilencerResult:
         check_language(language)
         return plot_reactive_silencer(self, ax=ax, language=language, **kwargs)
 
-    def plot_geometry(
-        self, ax: Axes | None = None, *, language: str = "en"
-    ) -> Axes:
+    def plot_geometry(self, ax: Axes | None = None, *, language: str = "en") -> Axes:
         """Draw the silencer cross-section to scale (dimensioned side cut).
 
         A named device is drawn from its ``geometry``; a result assembled by a
@@ -588,13 +582,17 @@ def _result(
         limit = _plane_wave_limit(area=max(areas), speed_of_sound=c)
         warn_above_plane_wave_limit(f, limit, kind, stacklevel=4)
     tl = transmission_loss(
-        t, inlet_area=inlet_area, outlet_area=outlet_area,
-        speed_of_sound=c, density=rho,
+        t,
+        inlet_area=inlet_area,
+        outlet_area=outlet_area,
+        speed_of_sound=c,
+        density=rho,
     )
     il: NDArray[np.float64] | None = None
     if source_impedance is not None and radiation_impedance is not None:
         il = insertion_loss(
-            t, source_impedance=source_impedance,
+            t,
+            source_impedance=source_impedance,
             radiation_impedance=radiation_impedance,
         )
     return ReactiveSilencerResult(
@@ -644,11 +642,18 @@ def expansion_chamber(
     require_positive(pipe_area, "pipe_area")
     t = duct_matrix(f, length, chamber_area, speed_of_sound=c, density=rho)
     return _result(
-        f, t, inlet_area=pipe_area, outlet_area=pipe_area, c=c, rho=rho,
+        f,
+        t,
+        inlet_area=pipe_area,
+        outlet_area=pipe_area,
+        c=c,
+        rho=rho,
         source_impedance=source_impedance,
-        radiation_impedance=radiation_impedance, kind="expansion chamber",
+        radiation_impedance=radiation_impedance,
+        kind="expansion chamber",
         geometry={
-            "length": float(length), "chamber_area": float(chamber_area),
+            "length": float(length),
+            "chamber_area": float(chamber_area),
             "pipe_area": float(pipe_area),
         },
     )
@@ -687,19 +692,30 @@ def helmholtz_resonator(
     rho = require_positive(density, "density")
     s_d = require_positive(duct_area, "duct_area")
     zb = helmholtz_impedance(
-        f, neck_area, neck_length, cavity_volume, resistance=resistance,
-        speed_of_sound=c, density=rho,
+        f,
+        neck_area,
+        neck_length,
+        cavity_volume,
+        resistance=resistance,
+        speed_of_sound=c,
+        density=rho,
     )
     t = shunt_matrix(zb)
     f0 = c / (2.0 * np.pi) * np.sqrt(neck_area / (neck_length * cavity_volume))
     return _result(
-        f, t, inlet_area=s_d, outlet_area=s_d, c=c, rho=rho,
+        f,
+        t,
+        inlet_area=s_d,
+        outlet_area=s_d,
+        c=c,
+        rho=rho,
         source_impedance=source_impedance,
         radiation_impedance=radiation_impedance,
         kind="Helmholtz resonator",
         resonances=np.array([f0], dtype=np.float64),
         geometry={
-            "duct_area": float(s_d), "neck_area": float(neck_area),
+            "duct_area": float(s_d),
+            "neck_area": float(neck_area),
             "neck_length": float(neck_length),
             "cavity_volume": float(cavity_volume),
         },
@@ -735,9 +751,7 @@ def quarter_wave_resonator(
     rho = require_positive(density, "density")
     s_d = require_positive(duct_area, "duct_area")
     le = require_positive(length, "length")
-    zb = quarter_wave_impedance(
-        f, le, branch_area, speed_of_sound=c, density=rho
-    )
+    zb = quarter_wave_impedance(f, le, branch_area, speed_of_sound=c, density=rho)
     t = shunt_matrix(zb)
     f_fundamental = c / (4.0 * le)
     odds = np.arange(1, int(2.0 * f.max() / f_fundamental) + 2, 2)
@@ -746,13 +760,19 @@ def quarter_wave_resonator(
     if res.size == 0:
         res = np.array([f_fundamental], dtype=np.float64)
     return _result(
-        f, t, inlet_area=s_d, outlet_area=s_d, c=c, rho=rho,
+        f,
+        t,
+        inlet_area=s_d,
+        outlet_area=s_d,
+        c=c,
+        rho=rho,
         source_impedance=source_impedance,
         radiation_impedance=radiation_impedance,
         kind="quarter-wave resonator",
         resonances=res,
         geometry={
-            "duct_area": float(s_d), "length": float(length),
+            "duct_area": float(s_d),
+            "length": float(length),
             "branch_area": float(branch_area),
         },
     )
@@ -834,27 +854,36 @@ def extended_tube_chamber(
     elements = []
     resonances = []
     if la > 0.0:
-        elements.append(shunt_matrix(
-            quarter_wave_impedance(f, la, annulus, speed_of_sound=c, density=rho)
-        ))
+        elements.append(
+            shunt_matrix(
+                quarter_wave_impedance(f, la, annulus, speed_of_sound=c, density=rho)
+            )
+        )
         resonances.append(c / (4.0 * la))
-    elements.append(
-        duct_matrix(f, straight, s_exp, speed_of_sound=c, density=rho)
-    )
+    elements.append(duct_matrix(f, straight, s_exp, speed_of_sound=c, density=rho))
     if lb > 0.0:
-        elements.append(shunt_matrix(
-            quarter_wave_impedance(f, lb, annulus, speed_of_sound=c, density=rho)
-        ))
+        elements.append(
+            shunt_matrix(
+                quarter_wave_impedance(f, lb, annulus, speed_of_sound=c, density=rho)
+            )
+        )
         resonances.append(c / (4.0 * lb))
     t = cascade(*elements)
     res = np.array(resonances, dtype=np.float64) if resonances else None
     return _result(
-        f, t, inlet_area=s_duct, outlet_area=s_duct, c=c, rho=rho,
+        f,
+        t,
+        inlet_area=s_duct,
+        outlet_area=s_duct,
+        c=c,
+        rho=rho,
         source_impedance=source_impedance,
         radiation_impedance=radiation_impedance,
-        kind="extended-tube chamber", resonances=res,
+        kind="extended-tube chamber",
+        resonances=res,
         geometry={
-            "length": float(length), "chamber_area": float(chamber_area),
+            "length": float(length),
+            "chamber_area": float(chamber_area),
             "pipe_area": float(pipe_area),
             "inlet_extension": float(inlet_extension),
             "outlet_extension": float(outlet_extension),
@@ -976,9 +1005,7 @@ class SilencerChain:
         """
         return cascade(*(element.matrix for element in self._elements))
 
-    def duct(
-        self, length: float, area: float
-    ) -> SilencerChain:
+    def duct(self, length: float, area: float) -> SilencerChain:
         """Append a straight duct of length ``L`` and area ``S``.
 
         :param length: Duct length ``L``, m. A zero-length duct is the
@@ -991,8 +1018,11 @@ class SilencerChain:
         self._elements.append(
             SilencerChainElement(
                 matrix=duct_matrix(
-                    self._frequencies, length, area,
-                    speed_of_sound=self._c, density=self._rho,
+                    self._frequencies,
+                    length,
+                    area,
+                    speed_of_sound=self._c,
+                    density=self._rho,
                 ),
                 length=length,
                 area=area,
@@ -1031,9 +1061,7 @@ class SilencerChain:
             SilencerChainElement(
                 matrix=shunt_matrix(zb),
                 label=label,
-                shorting_frequency=_shorting_frequency(
-                    self._frequencies, zb
-                ),
+                shorting_frequency=_shorting_frequency(self._frequencies, zb),
             )
         )
         return self
@@ -1064,23 +1092,23 @@ class SilencerChain:
         """
         areas = [inlet_area, outlet_area]
         areas += [
-            element.area
-            for element in self._elements
-            if element.area is not None
+            element.area for element in self._elements if element.area is not None
         ]
-        computed = _result(
-            self._frequencies, self.transfer_matrix,
-            inlet_area=inlet_area, outlet_area=outlet_area,
-            c=self._c, rho=self._rho,
+        return _result(
+            self._frequencies,
+            self.transfer_matrix,
+            inlet_area=inlet_area,
+            outlet_area=outlet_area,
+            c=self._c,
+            rho=self._rho,
             source_impedance=source_impedance,
             radiation_impedance=radiation_impedance,
-            kind=_KIND_CHAIN, areas=areas, chain=self._snapshot(),
+            kind=_KIND_CHAIN,
+            areas=areas,
+            chain=self._snapshot(),
         )
-        return computed
 
-    def plot_geometry(
-        self, ax: Axes | None = None, *, language: str = "en"
-    ) -> Axes:
+    def plot_geometry(self, ax: Axes | None = None, *, language: str = "en") -> Axes:
         """Draw the chain: its ducts to scale, its branch points marked.
 
         Every duct is drawn at its declared length and equivalent circular

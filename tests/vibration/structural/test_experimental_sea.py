@@ -89,9 +89,7 @@ def _problem_610_inputs() -> tuple[float, float, float, float]:
     e_2 = _RHO * _T2 * _S2 * 0.0132**2
     n_1 = flat_plate_modal_density(_S1, _T1, _CL)
     n_2 = float(
-        cylindrical_shell_modal_density(
-            _BAND, _S2, _T2, _RADIUS, _CL, band="octave"
-        )[0]
+        cylindrical_shell_modal_density(_BAND, _S2, _T2, _RADIUS, _CL, band="octave")[0]
     )
     return e_1, e_2, n_1, n_2
 
@@ -106,11 +104,15 @@ class TestNortonProblem610:
 
     def test_coupling_loss_factor_12(self, result) -> None:  # type: ignore[no-untyped-def]
         """Printed answer eta_12 = 4,26e-4."""
-        assert float(result.coupling_loss_factor12[0]) == pytest.approx(4.26e-4, rel=0.005)
+        assert float(result.coupling_loss_factor12[0]) == pytest.approx(
+            4.26e-4, rel=0.005
+        )
 
     def test_coupling_loss_factor_21(self, result) -> None:  # type: ignore[no-untyped-def]
         """Printed answer eta_21 = 3,92e-4."""
-        assert float(result.coupling_loss_factor21[0]) == pytest.approx(3.92e-4, rel=0.005)
+        assert float(result.coupling_loss_factor21[0]) == pytest.approx(
+            3.92e-4, rel=0.005
+        )
 
     def test_input_power(self, result) -> None:  # type: ignore[no-untyped-def]
         """Printed answer Pi_in = 1,31 W."""
@@ -126,7 +128,8 @@ class TestNortonProblem610:
         """Eq. (6.8): ``n_1 eta_12 = n_2 eta_21``."""
         assert float((result.modal_density1 * result.coupling_loss_factor12)[0]) == (
             pytest.approx(
-                float((result.modal_density2 * result.coupling_loss_factor21)[0]), rel=1e-12
+                float((result.modal_density2 * result.coupling_loss_factor21)[0]),
+                rel=1e-12,
             )
         )
 
@@ -301,9 +304,7 @@ class TestModalDensities:
         f = np.array([0.5, 0.8]) * f_r
         n = cylindrical_shell_modal_density(f, _S2, _T2, _RADIUS, _CL)
         assert n[1] / n[0] == pytest.approx(0.8 / 0.5, rel=1e-12)
-        assert n[0] == pytest.approx(
-            7.2 * _S2 / (math.pi * _CL * _T2) * 0.5, rel=1e-12
-        )
+        assert n[0] == pytest.approx(7.2 * _S2 / (math.pi * _CL * _T2) * 0.5, rel=1e-12)
 
     def test_cylinder_tends_to_the_flat_plate_far_above_the_ring(self) -> None:
         """Eq. (6.29) approaches the flat-plate value within 10 % at ``f >> fr``.
@@ -313,16 +314,13 @@ class TestModalDensities:
         flat plate's ``sqrt(12)/2 = 5,441 S/(pi cL t)``.
         """
         f_r = ring_frequency(_RADIUS, _CL)
-        n = float(
-            cylindrical_shell_modal_density(2e4 * f_r, _S2, _T2, _RADIUS, _CL)[0]
-        )
+        n = float(cylindrical_shell_modal_density(2e4 * f_r, _S2, _T2, _RADIUS, _CL)[0])
         plate = flat_plate_modal_density(_S2, _T2, _CL)
         assert n == pytest.approx(plate, rel=0.10)
         assert n == pytest.approx(
             2.0 * _S2 / (math.pi * _CL * _T2) * (2.0 + 0.596 * math.pi / 2.0),
             rel=1e-6,
         )
-
 
     @pytest.mark.parametrize(("band", "factor"), [("octave", 1.414), ("third", 1.122)])
     def test_bandwidth_factor_enters_only_above_the_ring(
@@ -337,9 +335,9 @@ class TestModalDensities:
         )
         x = 2.0
         high = float(
-            cylindrical_shell_modal_density(
-                x * f_r, _S2, _T2, _RADIUS, _CL, band=band
-            )[0]
+            cylindrical_shell_modal_density(x * f_r, _S2, _T2, _RADIUS, _CL, band=band)[
+                0
+            ]
         )
         shape = 0.596 / (factor - 1.0 / factor)
         expected = (

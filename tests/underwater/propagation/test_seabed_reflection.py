@@ -82,7 +82,9 @@ def test_zero_grazing_equal_speeds_no_nan() -> None:
     z1, z2 = 1000.0 * 1500.0, 1900.0 * 1500.0
     expected_r = (z2 - z1) / (z2 + z1)
     assert np.isfinite(res.reflection_coefficient[0])
-    assert float(np.real(res.reflection_coefficient[0])) == pytest.approx(expected_r, abs=1e-9)
+    assert float(np.real(res.reflection_coefficient[0])) == pytest.approx(
+        expected_r, abs=1e-9
+    )
     assert float(res.reflection_loss[0]) == pytest.approx(
         -20.0 * np.log10(abs(expected_r)), abs=1e-9
     )
@@ -112,8 +114,12 @@ def test_exact_intromission_zero_gives_inf_loss_without_warning() -> None:
     # exactly at every angle).
     with warnings.catch_warnings():
         warnings.simplefilter("error")
-        res = bottom_reflection_loss(30.0, rho1=1000.0, c1=1500.0, rho2=1000.0, c2=1500.0)
-        wrapped = seabed_reflection(30.0, rho1=1000.0, c1=1500.0, rho2=1000.0, c2=1500.0)
+        res = bottom_reflection_loss(
+            30.0, rho1=1000.0, c1=1500.0, rho2=1000.0, c2=1500.0
+        )
+        wrapped = seabed_reflection(
+            30.0, rho1=1000.0, c1=1500.0, rho2=1000.0, c2=1500.0
+        )
     assert res.reflection_loss[0] == np.inf
     assert wrapped.magnitude[0] == 0.0
     assert wrapped.bottom_loss[0] == np.inf

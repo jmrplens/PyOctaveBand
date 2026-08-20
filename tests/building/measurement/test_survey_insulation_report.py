@@ -57,9 +57,7 @@ def _airborne() -> building.survey_airborne_insulation:  # type: ignore[valid-ty
     """A survey airborne result whose DnT equals a known octave curve."""
     l1 = np.full(_OCTAVE, 80.0)
     d = np.array([33.0, 36.0, 40.0, 44.0, 48.0])
-    return building.survey_airborne_insulation(
-        l1, l1 - d, _K0, volume=50.0, area=12.0
-    )
+    return building.survey_airborne_insulation(l1, l1 - d, _K0, volume=50.0, area=12.0)
 
 
 def _impact() -> building.survey_impact_insulation:  # type: ignore[valid-type]
@@ -72,9 +70,7 @@ def _facade() -> building.survey_facade_insulation:  # type: ignore[valid-type]
     """A survey facade result whose D2m,nT equals a known octave curve."""
     l1_2m = np.full(_OCTAVE, 75.0)
     d2m = np.array([31.0, 34.0, 37.0, 40.0, 43.0])
-    return building.survey_facade_insulation(
-        l1_2m, l1_2m - d2m, _K0, volume=40.0
-    )
+    return building.survey_facade_insulation(l1_2m, l1_2m - d2m, _K0, volume=40.0)
 
 
 # --------------------------------------------------------------------------- #
@@ -156,8 +152,10 @@ def test_airborne_spanish(tmp_path) -> None:
 
     out = tmp_path / "es.pdf"
     _airborne().report(
-        str(out), metadata=ReportMetadata(requirement=40.0, laboratory="Ejemplo"),
-        verbose=True, language="es",
+        str(out),
+        metadata=ReportMetadata(requirement=40.0, laboratory="Ejemplo"),
+        verbose=True,
+        language="es",
     )
     _assert_one_page(str(out))
     text = _extract_text(str(out))

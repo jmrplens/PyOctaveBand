@@ -9,10 +9,13 @@ import pytest
 from phonometry import filters
 
 
-@pytest.mark.parametrize("fraction, expected_bands", [
-    (1, 11),  # Standard 1 octave bands in [12, 20000] approx
-    (3, 33),  # Standard 1/3 octave
-])
+@pytest.mark.parametrize(
+    "fraction, expected_bands",
+    [
+        (1, 11),  # Standard 1 octave bands in [12, 20000] approx
+        (3, 33),  # Standard 1/3 octave
+    ],
+)
 def test_band_count_estimates(fraction: float, expected_bands: int) -> None:
     """
     Verify that the filter bank generates the expected number of frequency bands.
@@ -33,11 +36,13 @@ def test_band_count_estimates(fraction: float, expected_bands: int) -> None:
     # Generate dummy signal
     x = np.zeros(fs)
     limits = [12.0, 20000.0]
-    
+
     _, freq = filters.octave_filter(x, fs, fraction=fraction, limits=limits)
-    
+
     # We allow some flexibility as exact count depends on limits implementation details
-    assert abs(len(freq) - expected_bands) <= 2, f"Expected approx {expected_bands} bands, got {len(freq)}"
+    assert abs(len(freq) - expected_bands) <= 2, (
+        f"Expected approx {expected_bands} bands, got {len(freq)}"
+    )
 
 
 @pytest.mark.parametrize("dtype", [np.float32, np.float64])
@@ -61,10 +66,10 @@ def test_input_dtypes(dtype: np.dtype) -> None:
     fs = 48000
     rng = np.random.default_rng(42)
     x = rng.standard_normal(fs).astype(dtype)
-    
+
     spl, _ = filters.octave_filter(x, fs)
     assert not np.isnan(spl).any()
-    assert spl.dtype == np.float64 # Internal processing is likely float64
+    assert spl.dtype == np.float64  # Internal processing is likely float64
 
 
 @pytest.mark.parametrize("channels", [1, 2, 4])
@@ -88,14 +93,14 @@ def test_multichannel_shapes(channels: int) -> None:
     duration = 0.1
     samples = int(fs * duration)
     rng = np.random.default_rng(42)
-    
+
     if channels == 1:
         x = rng.standard_normal(samples)
     else:
         x = rng.standard_normal((channels, samples))
-        
+
     spl, freq = filters.octave_filter(x, fs)
-    
+
     if channels == 1:
         assert spl.ndim == 1
     else:
@@ -103,7 +108,9 @@ def test_multichannel_shapes(channels: int) -> None:
     assert spl.shape[-1] == len(freq)
 
 
-@pytest.mark.parametrize("filter_type", ["butter", "cheby1", "cheby2", "ellip", "bessel"])
+@pytest.mark.parametrize(
+    "filter_type", ["butter", "cheby1", "cheby2", "ellip", "bessel"]
+)
 @pytest.mark.parametrize("target_freq", [63, 1000, 8000])
 def test_frequency_isolation(target_freq: float, filter_type: str) -> None:
     """
@@ -125,7 +132,7 @@ def test_frequency_isolation(target_freq: float, filter_type: str) -> None:
     fs = 48000
     duration = 1.0
     t = np.linspace(0, duration, int(fs * duration), endpoint=False)
-    
+
     # Generate pure tone
     x = np.sin(2 * np.pi * target_freq * t)
 
@@ -136,32 +143,38 @@ def test_frequency_isolation(target_freq: float, filter_type: str) -> None:
         limits=[20.0, 16000.0],
         design=filters.FilterDesign(filter_type=filter_type),
     )
-    
+
     # Find the band closest to target_freq
     freq_arr = np.array(freq)
     closest_idx = np.argmin(np.abs(freq_arr - target_freq))
-    
+
     # The SPL should be highest at this index
     max_spl_idx = np.argmax(spl)
-    
+
     assert closest_idx == max_spl_idx, (
         f"Tone at {target_freq}Hz peaked at {freq[max_spl_idx]}Hz band "
         f"instead of {freq[closest_idx]}Hz for {filter_type}"
     )
-    
+
     # Check attenuation of distant bands (e.g., 2 octaves away)
     peak_val = spl[closest_idx]
-    
+
     if closest_idx - 2 >= 0:
         lower_val = spl[closest_idx - 2]
-        assert peak_val - lower_val > 20, f"Lower band not sufficiently attenuated (>20dB) for {filter_type}"
-        
+        assert peak_val - lower_val > 20, (
+            f"Lower band not sufficiently attenuated (>20dB) for {filter_type}"
+        )
+
     if closest_idx + 2 < len(spl):
         upper_val = spl[closest_idx + 2]
-        assert peak_val - upper_val > 20, f"Upper band not sufficiently attenuated (>20dB) for {filter_type}"
+        assert peak_val - upper_val > 20, (
+            f"Upper band not sufficiently attenuated (>20dB) for {filter_type}"
+        )
 
 
-@pytest.mark.parametrize("filter_type", ["butter", "cheby1", "cheby2", "ellip", "bessel"])
+@pytest.mark.parametrize(
+    "filter_type", ["butter", "cheby1", "cheby2", "ellip", "bessel"]
+)
 def test_impulse_response_decay(filter_type: str) -> None:
     """
     Verify filter stability using the Impulse Response (IR).
@@ -180,8 +193,8 @@ def test_impulse_response_decay(filter_type: str) -> None:
     """
     fs = 48000
     x = np.zeros(fs)
-    x[0] = 1.0 # Impulse
-    
+    x[0] = 1.0  # Impulse
+
     # Use sigbands=True to get time domain signals
     _, _, signals = filters.octave_filter(
         x,
@@ -190,11 +203,11 @@ def test_impulse_response_decay(filter_type: str) -> None:
         sigbands=True,
         design=filters.FilterDesign(filter_type=filter_type),
     )
-    
+
     for band_sig in signals:
         # Check that the end of the signal is close to zero (decayed)
         # We check the last 10% of samples
-        tail = band_sig[-int(fs*0.1):]
+        tail = band_sig[-int(fs * 0.1) :]
         energy = np.sum(tail**2)
         assert energy < 1e-5, f"Filter {filter_type} unstable or ringing too long"
 
@@ -219,11 +232,11 @@ def test_filterbank_class_direct() -> None:
     rng = np.random.default_rng(42)
     bank = filters.OctaveFilterBank(fs, fraction=3)
     x = rng.standard_normal(fs)
-    
+
     spl, freq = bank.filter(x)
     assert len(freq) > 0
     assert spl.shape == (len(freq),)
-    
+
     # Test reuse
     spl2, _ = bank.filter(x * 0.5)
     assert np.all(spl2 < spl)
@@ -280,7 +293,7 @@ def test_time_weighting_class_multichannel_state() -> None:
     x = rng.standard_normal((2, fs))
     continuous = filters.time_weighting(x, fs, mode="slow")
     tw = filters.TimeWeighting(fs, mode="slow")
-    blocks = [tw.process(x[:, i * 12000:(i + 1) * 12000]) for i in range(4)]
+    blocks = [tw.process(x[:, i * 12000 : (i + 1) * 12000]) for i in range(4)]
     np.testing.assert_allclose(np.concatenate(blocks, axis=-1), continuous, rtol=1e-10)
 
 
@@ -301,7 +314,7 @@ def test_time_weighting_class_impulse_blocks_match_continuous() -> None:
 
     continuous = filters.time_weighting(x, fs, mode="impulse")
     tw = filters.TimeWeighting(fs, mode="impulse")
-    blocks = [tw.process(x[:, i * 12000:(i + 1) * 12000]) for i in range(4)]
+    blocks = [tw.process(x[:, i * 12000 : (i + 1) * 12000]) for i in range(4)]
     np.testing.assert_allclose(np.concatenate(blocks, axis=-1), continuous, rtol=1e-10)
 
 

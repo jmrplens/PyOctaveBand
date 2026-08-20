@@ -322,9 +322,7 @@ def crowd_noise(
         dtype=np.float64,
     )
     signal = float(
-        np.asarray(
-            speech_direct_level(r, sound_power_level=lw, directivity=q)
-        )[()]
+        np.asarray(speech_direct_level(r, sound_power_level=lw, directivity=q))[()]
     )
     return CrowdNoiseResult(
         talkers=n,

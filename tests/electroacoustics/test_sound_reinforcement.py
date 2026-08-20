@@ -48,9 +48,7 @@ def test_stability_margin_default_is_10_db() -> None:
 
 def test_feedback_loop_gain_is_equation_18_18() -> None:
     """G_S = L_H-M - L_H-L + D_M(theta)."""
-    assert electroacoustics.feedback_loop_gain(74.0, 80.0) == pytest.approx(
-        -6.0
-    )
+    assert electroacoustics.feedback_loop_gain(74.0, 80.0) == pytest.approx(-6.0)
     assert electroacoustics.feedback_loop_gain(
         74.0, 80.0, microphone_directivity=-2.0
     ) == (pytest.approx(-8.0))
@@ -90,9 +88,7 @@ def test_equation_18_21_omnidirectional_microphone_4_db_below() -> None:
     result = electroacoustics.feedback_stability(
         LONG_OPEN_LOOP_GAIN, LEVEL_AT_LISTENER - 4.0, LEVEL_AT_LISTENER
     )
-    assert result.maximum_level_at_microphone == pytest.approx(
-        LEVEL_AT_LISTENER - 4.0
-    )
+    assert result.maximum_level_at_microphone == pytest.approx(LEVEL_AT_LISTENER - 4.0)
     assert result.is_stable
     assert result.headroom == pytest.approx(0.0)
     # One decibel more at the microphone and the criterion fails.
@@ -111,9 +107,7 @@ def test_equation_18_22_cardioid_microphone_2_db_below() -> None:
         LEVEL_AT_LISTENER,
         microphone_directivity=electroacoustics.CARDIOID_RELATIVE_DIRECTIVITY,
     )
-    assert result.maximum_level_at_microphone == pytest.approx(
-        LEVEL_AT_LISTENER - 2.0
-    )
+    assert result.maximum_level_at_microphone == pytest.approx(LEVEL_AT_LISTENER - 2.0)
     assert result.is_stable
     assert result.headroom == pytest.approx(0.0)
 
@@ -124,7 +118,9 @@ def test_cardioid_buys_exactly_its_directivity_index() -> None:
         LONG_OPEN_LOOP_GAIN, 74.0, LEVEL_AT_LISTENER
     )
     cardioid = electroacoustics.feedback_stability(
-        LONG_OPEN_LOOP_GAIN, 74.0, LEVEL_AT_LISTENER,
+        LONG_OPEN_LOOP_GAIN,
+        74.0,
+        LEVEL_AT_LISTENER,
         microphone_directivity=-3.0,
     )
     assert cardioid.headroom - omni.headroom == pytest.approx(3.0)
@@ -139,9 +135,7 @@ def test_equation_18_23_number_of_open_microphones() -> None:
     assert electroacoustics.open_microphone_correction(4) == pytest.approx(
         6.0206, abs=1e-4
     )
-    assert electroacoustics.open_microphone_correction(10) == pytest.approx(
-        10.0
-    )
+    assert electroacoustics.open_microphone_correction(10) == pytest.approx(10.0)
 
 
 def test_open_microphones_eat_the_headroom() -> None:
@@ -165,7 +159,9 @@ def test_maximum_open_loop_gain_is_the_stability_edge() -> None:
         0.0, 74.0, LEVEL_AT_LISTENER, open_microphones=3
     )
     at_limit = electroacoustics.feedback_stability(
-        probe.maximum_open_loop_gain, 74.0, LEVEL_AT_LISTENER,
+        probe.maximum_open_loop_gain,
+        74.0,
+        LEVEL_AT_LISTENER,
         open_microphones=3,
     )
     assert at_limit.loop_gain == pytest.approx(-at_limit.stability_margin)
@@ -181,9 +177,7 @@ def test_loop_gain_is_the_sum_of_its_parts() -> None:
         result.open_loop_gain + result.feedback_loop_gain + result.nom_correction
     )
     assert result.margin == pytest.approx(-result.loop_gain)
-    assert result.headroom == pytest.approx(
-        -result.stability_margin - result.loop_gain
-    )
+    assert result.headroom == pytest.approx(-result.stability_margin - result.loop_gain)
     assert isinstance(result, electroacoustics.FeedbackStabilityResult)
 
 
@@ -198,9 +192,7 @@ def test_plot_bars_echo_the_gain_structure() -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    result = electroacoustics.feedback_stability(
-        -6.0, 74.0, 80.0, open_microphones=2
-    )
+    result = electroacoustics.feedback_stability(-6.0, 74.0, 80.0, open_microphones=2)
     ax = result.plot()
     heights = [patch.get_height() for patch in ax.patches]
     assert heights == pytest.approx(
@@ -230,15 +222,13 @@ def test_geometry_drawing_annotates_every_path() -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-
     ax = electroacoustics.plot_sound_reinforcement_geometry(0.3, 4.0, 12.0)
     texts = [t.get_text() for t in ax.texts]
     assert "0.3 m" in texts
     assert "4 m" in texts
     assert "12 m" in texts
     # The talker, microphone, loudspeaker and listener are all named.
-    for name in ("Talker (T)", "Microphone (M)", "Loudspeaker (H)",
-                 "Listener (L)"):
+    for name in ("Talker (T)", "Microphone (M)", "Loudspeaker (H)", "Listener (L)"):
         assert name in texts
     labels = [t.get_text() for t in ax.get_legend().get_texts()]
     assert {"Signal path", "Feedback path"} <= set(labels)
@@ -263,10 +253,6 @@ def test_validation_errors() -> None:
     with pytest.raises(ValueError, match="finite"):
         electroacoustics.feedback_stability(-6.0, math.inf, 80.0)
     with pytest.raises(ValueError, match="non-negative"):
-        electroacoustics.feedback_stability(
-            -6.0, 74.0, 80.0, stability_margin=-1.0
-        )
+        electroacoustics.feedback_stability(-6.0, 74.0, 80.0, stability_margin=-1.0)
     with pytest.raises(ValueError, match="integer of at least 1"):
-        electroacoustics.feedback_stability(
-            -6.0, 74.0, 80.0, open_microphones=0
-        )
+        electroacoustics.feedback_stability(-6.0, 74.0, 80.0, open_microphones=0)

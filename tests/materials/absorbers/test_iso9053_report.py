@@ -41,9 +41,9 @@ _THICKNESS = 0.05
 _U_EVAL = 0.5e-3
 
 # Clean-room oracle, independent of the library implementation.
-_RS = _A_COEFF + _B_COEFF * _U_EVAL          # 16200 Pa*s/m
-_R = _RS / _AREA                             # ~2062645 Pa*s/m^3
-_SIGMA = _RS / _THICKNESS                     # 324000 Pa*s/m^2
+_RS = _A_COEFF + _B_COEFF * _U_EVAL  # 16200 Pa*s/m
+_R = _RS / _AREA  # ~2062645 Pa*s/m^3
+_SIGMA = _RS / _THICKNESS  # 324000 Pa*s/m^2
 
 
 def _result():
@@ -115,11 +115,11 @@ def test_displayed_values_match_oracle(tmp_path) -> None:
     # Each value is bound to its own row/box statement so it cannot pass on a
     # coincidental chart tick or another number.
     assert "Specific airflow resistance" in text
-    assert f"= {round(_RS)} Pa" in text            # boxed R_s
+    assert f"= {round(_RS)} Pa" in text  # boxed R_s
     assert f"Airflow resistance R = {round(_R)} Pa" in text
-    assert f"= {round(_SIGMA)} Pa" in text          # resistivity sigma
+    assert f"= {round(_SIGMA)} Pa" in text  # resistivity sigma
     assert "Evaluated at u = 0.5 mm/s" in text
-    assert "Acoustic Test Client Ltd." in text      # metadata
+    assert "Acoustic Test Client Ltd." in text  # metadata
 
 
 def test_metadata_and_fit_rows_appear(tmp_path) -> None:
@@ -130,15 +130,15 @@ def test_metadata_and_fit_rows_appear(tmp_path) -> None:
     # Thickness d = 0.050 m shown in millimetres.
     assert "50" in text
     assert "Zero-velocity resistance" in text
-    assert "16000" in text                          # linear coefficient a
-    assert "400000" in text                         # quadratic coefficient b
+    assert "16000" in text  # linear coefficient a
+    assert "400000" in text  # quadratic coefficient b
 
 
 def test_no_metadata_still_renders(tmp_path) -> None:
     out = tmp_path / "airflow_bare.pdf"
     _result().report(str(out))
     _assert_one_page(str(out))
-    assert "ISO 9053-1:2018" in _text(str(out))     # standard-basis line
+    assert "ISO 9053-1:2018" in _text(str(out))  # standard-basis line
 
 
 def test_no_thickness_omits_resistivity(tmp_path) -> None:
@@ -168,9 +168,7 @@ def test_unknown_language_rejected(tmp_path) -> None:
 
 def test_metadata_xml_specials_do_not_break(tmp_path) -> None:
     out = tmp_path / "airflow_xml.pdf"
-    _result().report(
-        str(out), metadata=_metadata(specimen='Foam <A> & <B> "edge"')
-    )
+    _result().report(str(out), metadata=_metadata(specimen='Foam <A> & <B> "edge"'))
     _assert_one_page(str(out))
 
 

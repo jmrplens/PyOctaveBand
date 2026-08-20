@@ -53,8 +53,12 @@ def test_every_field_round_trips_through_the_json(tmp_path: Path) -> None:
     assert payload["schema"] == SIDECAR_SCHEMA
     assert payload["schema_version"] == SIDECAR_VERSION
     assert set(payload) == {
-        "schema", "schema_version", "phonometry_version",
-        "calibration_factor", "reference_spl", "calibrator",
+        "schema",
+        "schema_version",
+        "phonometry_version",
+        "calibration_factor",
+        "reference_spl",
+        "calibrator",
         "channel_labels",
     }
 
@@ -112,9 +116,13 @@ def test_malformed_fields_are_refused(tmp_path: Path) -> None:
     audio = tmp_path / "meas.wav"
     target = sidecar_path(audio)
     base = {
-        "schema": SIDECAR_SCHEMA, "schema_version": 1,
-        "phonometry_version": None, "calibration_factor": 1.0,
-        "reference_spl": None, "calibrator": None, "channel_labels": None,
+        "schema": SIDECAR_SCHEMA,
+        "schema_version": 1,
+        "phonometry_version": None,
+        "calibration_factor": 1.0,
+        "reference_spl": None,
+        "calibrator": None,
+        "channel_labels": None,
     }
     for corruption, message in (
         ({"calibration_factor": "loud"}, "must be a number"),
@@ -149,7 +157,9 @@ def test_write_sidecar_true_writes_the_signals_calibration(
     tmp_path: Path,
 ) -> None:
     sig = Signal(
-        data=np.full(16, 0.125), fs=FS, calibration_factor=3.5,
+        data=np.full(16, 0.125),
+        fs=FS,
+        calibration_factor=3.5,
         channel_labels=("courtyard",),
     )
     audio = tmp_path / "cal.wav"

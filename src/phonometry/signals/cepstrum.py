@@ -127,17 +127,13 @@ def _validate_nfft(n: int, nfft: int | None) -> int:
         return n if n % 2 == 0 else n + 1
     out = int(nfft)
     if out < n:
-        raise ValueError(
-            f"'nfft' must be at least the record length ({n} samples)."
-        )
+        raise ValueError(f"'nfft' must be at least the record length ({n} samples).")
     if out % 2 != 0:
         raise ValueError("'nfft' must be even.")
     return out
 
 
-def _log_magnitude(
-    x: NDArray[np.float64], nfft: int
-) -> NDArray[np.float64]:
+def _log_magnitude(x: NDArray[np.float64], nfft: int) -> NDArray[np.float64]:
     """One-sided ``ln|X|`` of the zero-padded record, floored like phase.py."""
     magnitude = np.abs(np.fft.rfft(x, nfft))
     peak = float(np.max(magnitude))
@@ -223,10 +219,7 @@ class CepstrumResult:
             )
         log_spectrum = np.fft.fft(self.cepstrum)
         ramp = (
-            np.pi
-            * self.linear_phase_samples
-            * np.arange(self.nfft)
-            / (self.nfft // 2)
+            np.pi * self.linear_phase_samples * np.arange(self.nfft) / (self.nfft // 2)
         )
         spectrum = np.exp(log_spectrum) * np.exp(1j * ramp)
         return np.asarray(np.fft.ifft(spectrum).real, dtype=np.float64)
@@ -393,9 +386,7 @@ def lifter(
     xa = _validate_signal(x, "x", context="liftering")
     fs_v = _positive(resolve_fs(x, fs), "fs")
     if mode not in ("lowpass", "highpass"):
-        raise ValueError(
-            f"'mode' must be 'lowpass' or 'highpass', got {mode!r}."
-        )
+        raise ValueError(f"'mode' must be 'lowpass' or 'highpass', got {mode!r}.")
     n = _validate_nfft(xa.size, nfft)
     cut = round(_positive(cutoff, "cutoff") * fs_v)
     if not 1 <= cut <= n // 2:

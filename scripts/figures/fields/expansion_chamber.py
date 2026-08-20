@@ -16,9 +16,9 @@ from ..media import (
 from ..theme import CMAP_FIELD, COLOR_FG, COLOR_GRID, COLOR_PRIMARY
 from ._core import _anim_speaker
 
-_CHAMBER_L = 0.30                        # chamber length of the TL example
-_CHAMBER_M = 4.0                         # expansion area ratio
-_CHAMBER_PIPE_A = 0.01                   # pipe area of the TL example [m2]
+_CHAMBER_L = 0.30  # chamber length of the TL example
+_CHAMBER_M = 4.0  # expansion area ratio
+_CHAMBER_PIPE_A = 0.01  # pipe area of the TL example [m2]
 # 2D pipe height. The four-pole TL depends only on m and L, but the 2D
 # junction end correction grows with the bore; a 50 mm pipe (a small
 # muffler with a 200 x 300 mm chamber) keeps the sudden-area-change
@@ -59,20 +59,23 @@ def _expansion_chamber_fields(
     from phonometry import noise_control
 
     dx = _CHAMBER_DX
-    pipe_cells = round(_CHAMBER_BORE / dx)               # 20 cells
-    ny = round(_CHAMBER_M * _CHAMBER_BORE / dx)          # 80 cells
+    pipe_cells = round(_CHAMBER_BORE / dx)  # 20 cells
+    ny = round(_CHAMBER_M * _CHAMBER_BORE / dx)  # 80 cells
     nx = round(1.4 / dx)
     c0 = round(0.55 / dx)
     c1 = c0 + round(_CHAMBER_L / dx)
     p0 = (ny - pipe_cells) // 2
     air = np.zeros((ny, nx), dtype=bool)
-    air[p0:p0 + pipe_cells, :] = True
+    air[p0 : p0 + pipe_cells, :] = True
     air[:, c0:c1] = True
     rho_map = np.where(air, 1.2, 1.2e6)
     f_pass, f_peak = _expansion_chamber_freqs()
     tls = noise_control.expansion_chamber(
-        np.array([f_pass, f_peak]), _CHAMBER_L,
-        _CHAMBER_M * _CHAMBER_PIPE_A, _CHAMBER_PIPE_A).transmission_loss
+        np.array([f_pass, f_peak]),
+        _CHAMBER_L,
+        _CHAMBER_M * _CHAMBER_PIPE_A,
+        _CHAMBER_PIPE_A,
+    ).transmission_loss
     # Clip duration per the deepest-reflector rule: d(source -> chamber
     # outlet plate, the deepest reflecting feature) = 0.85 m, plus 0.85 m
     # back to the farthest visible field point (the duct inlet at x = 0):
@@ -84,12 +87,15 @@ def _expansion_chamber_fields(
     runs = []
     times = np.zeros(0)
     for f in (f_pass, f_peak):
-        sim = fdtd2d.FDTD2D(343.0, dx, shape=(ny, nx), rho=rho_map,
-                            edge_impedance={"left": 1.2 * 343.0,
-                                            "right": 1.2 * 343.0})
+        sim = fdtd2d.FDTD2D(
+            343.0,
+            dx,
+            shape=(ny, nx),
+            rho=rho_map,
+            edge_impedance={"left": 1.2 * 343.0, "right": 1.2 * 343.0},
+        )
         tone = fdtd2d.CWSource(0, 0, frequency=f)
-        sim.add_source(fdtd2d.PlaneWaveSource("right", tone.value,
-                                              offset=2))
+        sim.add_source(fdtd2d.PlaneWaveSource("right", tone.value, offset=2))
         mid = ny // 2
         period = round(1.0 / (f * sim.dt))
         settle = round(0.030 / sim.dt)
@@ -106,8 +112,7 @@ def _expansion_chamber_fields(
                 # The dense wall cells ring with the injection line;
                 # blank them to NaN (transparent under imshow) so the
                 # display and its color scale only see the air path.
-                ps.append(np.where(air, sim.p, np.nan)[::2, ::2]
-                          .astype(np.float32))
+                ps.append(np.where(air, sim.p, np.nan)[::2, ::2].astype(np.float32))
                 ts.append(sim.time)
         runs.append((np.stack(ps), env))
         times = np.asarray(ts)
@@ -124,49 +129,70 @@ def animate_fdtd_expansion_chamber(output_dir: str) -> None:
     outlet at less than half amplitude (the 6.5 dB four-pole TL peak).
     No absorption anywhere: a purely reactive silencer."""
     T = _translate_str
-    (p_pass, e_pass), (p_stop, e_stop), times, tls = (
-        _expansion_chamber_fields())
+    (p_pass, e_pass), (p_stop, e_stop), times, tls = _expansion_chamber_fields()
     f_pass, f_peak = _expansion_chamber_freqs()
     dx = _CHAMBER_DX
     ny = round(_CHAMBER_M * _CHAMBER_BORE / dx)
     nx = round(1.4 / dx)
     length, height = nx * dx, ny * dx
-    pipe_y = ((height - _CHAMBER_BORE) / 2.0,
-              (height + _CHAMBER_BORE) / 2.0)
+    pipe_y = ((height - _CHAMBER_BORE) / 2.0, (height + _CHAMBER_BORE) / 2.0)
     env_base, env_h, env_max = 0.245, 0.105, 2.1
     x_env = (np.arange(p_pass.shape[2]) + 0.5) * 2.0 * dx
-    env_from = 8                           # hide the injection-line step
-    vmaxes = [float(np.nanquantile(np.abs(p[p.shape[0] // 2:]), 0.999))
-              for p in (p_pass, p_stop)]
+    env_from = 8  # hide the injection-line step
+    vmaxes = [
+        float(np.nanquantile(np.abs(p[p.shape[0] // 2 :]), 0.999))
+        for p in (p_pass, p_stop)
+    ]
 
     fig = _anim_figure()
-    fig.suptitle(T("Expansion-chamber silencer: pass band vs stop band "
-                   "(2D FDTD)"))
+    fig.suptitle(T("Expansion-chamber silencer: pass band vs stop band (2D FDTD)"))
     axes = fig.subplots(2, 1, sharex=True)
-    titles = [T(f"Pass band: {f_pass:.0f} Hz, $kL = \\pi$"),
-              T(f"Stop band peak: {f_peak:.0f} Hz, $kL = \\pi/2$")]
-    verdicts = [T("the chamber is acoustically invisible"),
-                T("the mismatch reflects the wave back up the pipe")]
+    titles = [
+        T(f"Pass band: {f_pass:.0f} Hz, $kL = \\pi$"),
+        T(f"Stop band peak: {f_peak:.0f} Hz, $kL = \\pi/2$"),
+    ]
+    verdicts = [
+        T("the chamber is acoustically invisible"),
+        T("the mismatch reflects the wave back up the pipe"),
+    ]
     ims: list[Any] = []
     tl_txts: list[Any] = []
     v_txts: list[Any] = []
     for (ax, title, vmax), env in zip(
-            zip(axes, titles, vmaxes, strict=True), (e_pass, e_stop),
-            strict=True):
+        zip(axes, titles, vmaxes, strict=True), (e_pass, e_stop), strict=True
+    ):
         ax.grid(False)
-        im = ax.imshow(np.zeros((2, 2)), origin="lower",
-                       extent=(0.0, length, 0.0, height), cmap=CMAP_FIELD,
-                       vmin=-vmax, vmax=vmax, aspect="auto",
-                       interpolation="bilinear", zorder=2)
-        _anim_chamber_hardware(ax, length, height, pipe_y,
-                               (0.55, 0.55 + _CHAMBER_L))
+        im = ax.imshow(
+            np.zeros((2, 2)),
+            origin="lower",
+            extent=(0.0, length, 0.0, height),
+            cmap=CMAP_FIELD,
+            vmin=-vmax,
+            vmax=vmax,
+            aspect="auto",
+            interpolation="bilinear",
+            zorder=2,
+        )
+        _anim_chamber_hardware(ax, length, height, pipe_y, (0.55, 0.55 + _CHAMBER_L))
         ax.axhline(env_base, color=COLOR_GRID, lw=0.8, zorder=1)
-        ax.text(0.005, env_base - 0.008, "$|p|$ envelope", fontsize=7.5,
-                ha="left", va="top", color=COLOR_FG, alpha=0.8)
+        ax.text(
+            0.005,
+            env_base - 0.008,
+            "$|p|$ envelope",
+            fontsize=7.5,
+            ha="left",
+            va="top",
+            color=COLOR_FG,
+            alpha=0.8,
+        )
         # The settled envelope, static: the clip captures steady state.
-        ax.plot(x_env[env_from:],
-                env_base + env[env_from:] / env_max * env_h,
-                color=COLOR_PRIMARY, lw=1.8, zorder=6)
+        ax.plot(
+            x_env[env_from:],
+            env_base + env[env_from:] / env_max * env_h,
+            color=COLOR_PRIMARY,
+            lw=1.8,
+            zorder=6,
+        )
         ax.set_xlim(-0.115, length + 0.065)
         # The verdict/TL line sits above the tallest envelope hump
         # (1.85 of 2.1 full scale), so neither text strikes the curve.
@@ -175,40 +201,79 @@ def animate_fdtd_expansion_chamber(output_dir: str) -> None:
         ax.set_title(title, fontsize=10)
         ax.tick_params(labelsize=7)
         tl_txts.append(
-            ax.text(length + 0.055, env_base + env_h + 0.050, "",
-                    ha="right", va="top", fontsize=9, color="white",
-                    zorder=7,
-                    bbox={"boxstyle": _ANIM_PILL_BOX,
-                          "facecolor": "black", "alpha": 0.55,
-                          "edgecolor": "none"}))
+            ax.text(
+                length + 0.055,
+                env_base + env_h + 0.050,
+                "",
+                ha="right",
+                va="top",
+                fontsize=9,
+                color="white",
+                zorder=7,
+                bbox={
+                    "boxstyle": _ANIM_PILL_BOX,
+                    "facecolor": "black",
+                    "alpha": 0.55,
+                    "edgecolor": "none",
+                },
+            )
+        )
         v_txts.append(
-            ax.text(0.02, env_base + env_h + 0.046, "", ha="left",
-                    va="top", fontsize=8, color=COLOR_FG, zorder=6))
+            ax.text(
+                0.02,
+                env_base + env_h + 0.046,
+                "",
+                ha="left",
+                va="top",
+                fontsize=8,
+                color=COLOR_FG,
+                zorder=6,
+            )
+        )
         ims.append(im)
     axes[1].set_xlabel(T("Position along the duct [m]"), fontsize=9)
-    t_txt = fig.text(0.988, 0.93, "", ha="right", va="top",
-                     family="monospace", fontsize=10, color=COLOR_FG)
+    t_txt = fig.text(
+        0.988,
+        0.93,
+        "",
+        ha="right",
+        va="top",
+        family="monospace",
+        fontsize=10,
+        color=COLOR_FG,
+    )
     # The captured field is already steady, so the verdict can come early.
     reveal = int(0.30 * len(times))
 
     def update(k: int) -> tuple[Any, ...]:
         for i, (p_all, tl, f) in enumerate(
-                ((p_pass, tls[0], f_pass), (p_stop, tls[1], f_peak))):
+            ((p_pass, tls[0], f_pass), (p_stop, tls[1], f_peak))
+        ):
             ims[i].set_data(p_all[k])
             tl_txts[i].set_text(
-                T(f"TL = {tl:.1f} dB at {f:.0f} Hz")
-                if k >= reveal else "")
+                T(f"TL = {tl:.1f} dB at {f:.0f} Hz") if k >= reveal else ""
+            )
             v_txts[i].set_text(verdicts[i] if k >= reveal else "")
         t_txt.set_text(T(f"$t$ = {times[k] * 1e3:5.1f} ms"))
         return (*ims, *tl_txts, *v_txts, t_txt)
 
-    _render_clip(fig, update, output_dir, "anim_fdtd_expansion_chamber",
-                 frames=len(times), gif_fps=8)
+    _render_clip(
+        fig,
+        update,
+        output_dir,
+        "anim_fdtd_expansion_chamber",
+        frames=len(times),
+        gif_fps=8,
+    )
 
 
-def _anim_chamber_hardware(ax: Any, length: float, height: float,
-                           pipe_y: tuple[float, float],
-                           chamber_x: tuple[float, float]) -> None:
+def _anim_chamber_hardware(
+    ax: Any,
+    length: float,
+    height: float,
+    pipe_y: tuple[float, float],
+    chamber_x: tuple[float, float],
+) -> None:
     """Draw the silencer as hardware: inlet/outlet pipe walls, the chamber
     shell with its end plates, the drive loudspeaker and the anechoic
     termination, all to scale (metres)."""
@@ -220,27 +285,78 @@ def _anim_chamber_hardware(ax: Any, length: float, height: float,
     for y_pipe in pipe_y:
         y0 = y_pipe - (wall if y_pipe == pipe_y[0] else 0.0)
         for xa, xb in ((0.0, x0), (x1, length)):
-            ax.add_patch(Rectangle((xa, y0), xb - xa, wall,
-                                   facecolor=grey, edgecolor=COLOR_FG,
-                                   linewidth=0.7, zorder=3))
-    for y0 in (-wall, height):             # chamber shell
-        ax.add_patch(Rectangle((x0 - wall, y0), x1 - x0 + 2 * wall, wall,
-                               facecolor=grey, edgecolor=COLOR_FG,
-                               linewidth=0.7, zorder=3))
-    for xe in (x0 - wall, x1):             # end plates (annular in 3D)
+            ax.add_patch(
+                Rectangle(
+                    (xa, y0),
+                    xb - xa,
+                    wall,
+                    facecolor=grey,
+                    edgecolor=COLOR_FG,
+                    linewidth=0.7,
+                    zorder=3,
+                )
+            )
+    for y0 in (-wall, height):  # chamber shell
+        ax.add_patch(
+            Rectangle(
+                (x0 - wall, y0),
+                x1 - x0 + 2 * wall,
+                wall,
+                facecolor=grey,
+                edgecolor=COLOR_FG,
+                linewidth=0.7,
+                zorder=3,
+            )
+        )
+    for xe in (x0 - wall, x1):  # end plates (annular in 3D)
         for ya, yb in ((0.0, pipe_y[0]), (pipe_y[1], height)):
-            ax.add_patch(Rectangle((xe, ya), wall, yb - ya,
-                                   facecolor=grey, edgecolor=COLOR_FG,
-                                   linewidth=0.7, zorder=3))
+            ax.add_patch(
+                Rectangle(
+                    (xe, ya),
+                    wall,
+                    yb - ya,
+                    facecolor=grey,
+                    edgecolor=COLOR_FG,
+                    linewidth=0.7,
+                    zorder=3,
+                )
+            )
     # Loudspeaker into the inlet.
     bore = pipe_y[1] - pipe_y[0]
-    _anim_speaker(ax, 0.0, 0.5 * (pipe_y[0] + pipe_y[1]), bore,
-                  tip_inset=0.003, label_y=pipe_y[0] - 0.02)
-    ax.add_patch(Rectangle((length, pipe_y[0] - wall), 0.045,
-                           bore + 2 * wall, facecolor=grey, hatch="////",
-                           edgecolor=COLOR_FG, linewidth=0.8, zorder=3))
-    ax.text(length + 0.045, pipe_y[0] - 0.02, "anechoic termination",
-            ha="right", va="top", fontsize=7.5)
-    ax.text(0.5 * (x0 + x1), height + wall + 0.006,
-            f"$L$ = {_CHAMBER_L:.2f} m · $m$ = {_CHAMBER_M:.0f}",
-            ha="center", va="bottom", fontsize=7.5, color=COLOR_FG)
+    _anim_speaker(
+        ax,
+        0.0,
+        0.5 * (pipe_y[0] + pipe_y[1]),
+        bore,
+        tip_inset=0.003,
+        label_y=pipe_y[0] - 0.02,
+    )
+    ax.add_patch(
+        Rectangle(
+            (length, pipe_y[0] - wall),
+            0.045,
+            bore + 2 * wall,
+            facecolor=grey,
+            hatch="////",
+            edgecolor=COLOR_FG,
+            linewidth=0.8,
+            zorder=3,
+        )
+    )
+    ax.text(
+        length + 0.045,
+        pipe_y[0] - 0.02,
+        "anechoic termination",
+        ha="right",
+        va="top",
+        fontsize=7.5,
+    )
+    ax.text(
+        0.5 * (x0 + x1),
+        height + wall + 0.006,
+        f"$L$ = {_CHAMBER_L:.2f} m · $m$ = {_CHAMBER_M:.0f}",
+        ha="center",
+        va="bottom",
+        fontsize=7.5,
+        color=COLOR_FG,
+    )

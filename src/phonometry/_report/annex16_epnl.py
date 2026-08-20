@@ -78,15 +78,11 @@ def _metadata_pairs(
         (t("Date of test", language), metadata.test_date),
     ]
     return [
-        (label, html.escape(str(value)))
-        for label, value in specs
-        if value is not None
+        (label, html.escape(str(value))) for label, value in specs if value is not None
     ]
 
 
-def _metric_rows(
-    result: EPNLResult, language: str = "en"
-) -> list[tuple[str, str]]:
+def _metric_rows(result: EPNLResult, language: str = "en") -> list[tuple[str, str]]:
     """The intermediate EPNL quantities shown in the left-hand metrics table.
 
     These are informational: PNLTM, the duration correction ``D``, the 10
@@ -198,15 +194,22 @@ def render_annex16_epnl_report(
         metadata.measurement_standard if metadata is not None else None
     )
     if measurement_standard:
-        basis = t("{standard}. Effective Perceived Noise Level per ICAO Annex 16, Volume I, Appendix 2.", language).format(
-            standard=html.escape(measurement_standard)
-        )
+        basis = t(
+            "{standard}. Effective Perceived Noise Level per ICAO Annex 16, Volume I, Appendix 2.",
+            language,
+        ).format(standard=html.escape(measurement_standard))
     else:
-        basis = t("Effective Perceived Noise Level (EPNL) per ICAO Annex 16, Volume I, Appendix 2.", language)
+        basis = t(
+            "Effective Perceived Noise Level (EPNL) per ICAO Annex 16, Volume I, Appendix 2.",
+            language,
+        )
 
     muted_strip_style = ParagraphStyle(
-        "fiche_reference_conditions", parent=getSampleStyleSheet()["Normal"],
-        fontSize=7.5, leading=10, textColor=colors.HexColor(_MUTED_HEX),
+        "fiche_reference_conditions",
+        parent=getSampleStyleSheet()["Normal"],
+        fontSize=7.5,
+        leading=10,
+        textColor=colors.HexColor(_MUTED_HEX),
         spaceBefore=2,
     )
 
@@ -221,17 +224,19 @@ def render_annex16_epnl_report(
             flow.append(Spacer(1, 3))
             flow.append(grid_table(header_pairs))
     flow.append(
-        Paragraph(t("Reference conditions: 25 &#176;C (ISA + 10 &#176;C), 70% relative humidity, 1013.25 hPa sea-level pressure, zero wind (ICAO Annex 16 Vol I Part II, 3.6.1.5).", language), muted_strip_style)
+        Paragraph(
+            t(
+                "Reference conditions: 25 &#176;C (ISA + 10 &#176;C), 70% relative humidity, 1013.25 hPa sea-level pressure, zero wind (ICAO Annex 16 Vol I Part II, 3.6.1.5).",
+                language,
+            ),
+            muted_strip_style,
+        )
     )
     flow.append(Spacer(1, 8))
 
+    flow.append(Paragraph(t("Intermediate quantities", language), caption_style))
     flow.append(
-        Paragraph(t("Intermediate quantities", language), caption_style)
-    )
-    flow.append(
-        metrics_table(
-            _metric_rows(result, language), col_widths=[48 * mm, 26 * mm]
-        )
+        metrics_table(_metric_rows(result, language), col_widths=[48 * mm, 26 * mm])
     )
     flow.append(Spacer(1, 8))
 
@@ -251,24 +256,29 @@ def render_annex16_epnl_report(
     )
     if limit is not None:
         flow.append(Spacer(1, 6))
+        flow.append(Paragraph(t("Certification limit", language), caption_style))
         flow.append(
-            Paragraph(t("Certification limit", language), caption_style)
-        )
-        flow.append(
-            compliance_table(
-                _verdict_rows(result, limit, language), language=language
-            )
+            compliance_table(_verdict_rows(result, limit, language), language=language)
         )
 
     flow.extend(footer_flow(metadata, language))
 
     disclaimer_style = ParagraphStyle(
-        "fiche_certificate_disclaimer", parent=getSampleStyleSheet()["Normal"],
-        fontSize=7.5, leading=10, textColor=colors.HexColor(_MUTED_HEX),
+        "fiche_certificate_disclaimer",
+        parent=getSampleStyleSheet()["Normal"],
+        fontSize=7.5,
+        leading=10,
+        textColor=colors.HexColor(_MUTED_HEX),
         spaceBefore=2,
     )
     flow.append(
-        Paragraph(t("This is a computational EPNL result per ICAO Annex 16 Vol I Appendix 2; it is not an official State noise certificate (e.g. EASA Form 45).", language), disclaimer_style)
+        Paragraph(
+            t(
+                "This is a computational EPNL result per ICAO Annex 16 Vol I Appendix 2; it is not an official State noise certificate (e.g. EASA Form 45).",
+                language,
+            ),
+            disclaimer_style,
+        )
     )
 
     return build_document(path, flow, title)

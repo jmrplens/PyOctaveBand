@@ -55,8 +55,7 @@ _STRINGS: dict[str, str] = {
     "Pressure level $L_p$": "Nivel de presión $L_p$",
     "Intensity level $L_I$": "Nivel de intensidad $L_I$",
     "Level [dB]": "Nivel [dB]",
-    r"Pressure-intensity index $\delta_{pI}$ [dB]":
-        r"Índice presión-intensidad $\delta_{pI}$ [dB]",
+    r"Pressure-intensity index $\delta_{pI}$ [dB]": r"Índice presión-intensidad $\delta_{pI}$ [dB]",
     "Sound power level $L_W$ [dB re 1 pW]": "Nivel de potencia acústica $L_W$ [dB re 1 pW]",
     "ISO/TS 7849 sound power from surface vibration": "Potencia acústica por vibración superficial ISO/TS 7849",
     "$F_2$ (surface pressure-intensity)": "$F_2$ (presión-intensidad superficial)",
@@ -75,8 +74,7 @@ _STRINGS: dict[str, str] = {
     r"Measured $\delta_{pI0}$": r"$\delta_{pI0}$ medido",
     "Below the class {cls} minimum": "Bajo el mínimo de clase {cls}",
     _LABEL_RESIDUAL_INDEX: _LABEL_RESIDUAL_INDEX,
-    "IEC 61043 Table 2 — {device}, {spacing} mm separation":
-        "Tabla 2 de IEC 61043 — {device}, separación de {spacing} mm",
+    "IEC 61043 Table 2 — {device}, {spacing} mm separation": "Tabla 2 de IEC 61043 — {device}, separación de {spacing} mm",
     "probe": "sonda",
     "processor": "procesador",
     "complete instrument": "instrumento completo",
@@ -92,7 +90,10 @@ def _t(text: str, language: str = "en", **fmt: Any) -> str:
 
 def plot_sound_power(
     result: (
-        SoundPowerResult | ReverberationSoundPowerResult | SoundPowerIntensityResult | Any
+        SoundPowerResult
+        | ReverberationSoundPowerResult
+        | SoundPowerIntensityResult
+        | Any
     ),
     ax: Axes | None = None,
     language: str = "en",
@@ -127,8 +128,10 @@ def plot_sound_power(
     freqs = getattr(result, "frequencies", None)
     if freqs is None:
         positions = _band_axis(
-            ax, [f"{_t('Band', language)} {i + 1}" for i in range(n)],
-            xlabel=_t("Band", language), language=language,
+            ax,
+            [f"{_t('Band', language)} {i + 1}" for i in range(n)],
+            xlabel=_t("Band", language),
+            language=language,
         )
     else:
         positions = _band_axis(
@@ -162,8 +165,14 @@ def plot_sound_power(
     else:
         ax.set_title(f"{designation} {_t('sound power spectrum', language)}")
     if np.any(neg):
-        ax.plot([], [], color=_C_MUTED, marker="s", ls="",
-                label=_t("Non-positive band", language))
+        ax.plot(
+            [],
+            [],
+            color=_C_MUTED,
+            marker="s",
+            ls="",
+            label=_t("Non-positive band", language),
+        )
     if np.any(neg) or "label" in kwargs:
         ax.legend(loc="best", fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)
@@ -172,8 +181,7 @@ def plot_sound_power(
 
 
 def plot_intensity(
-    result: IntensityResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: IntensityResult, ax: Axes | None = None, language: str = "en", **kwargs: Any
 ) -> Axes:
     """Pressure vs intensity level per band with the pressure-intensity index.
 
@@ -205,8 +213,13 @@ def plot_intensity(
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", _t("Pressure level $L_p$", language))
     ax.plot(freqs, lp, "o-", **kwargs)
-    ax.plot(freqs, li, "s--", color=_C_REFERENCE,
-            label=_t("Intensity level $L_I$", language))
+    ax.plot(
+        freqs,
+        li,
+        "s--",
+        color=_C_REFERENCE,
+        label=_t("Intensity level $L_I$", language),
+    )
     _freq_axis(ax, freqs, language=language)
     ax.set_ylabel(_t("Level [dB]", language))
     ax.grid(True, which="both", alpha=0.3)
@@ -280,15 +293,26 @@ def plot_field_indicators(
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", _t("$F_2$ (surface pressure-intensity)", language))
     ax.plot(freqs, f2, "o-", **kwargs)
-    ax.plot(freqs, f3, "s--", color=_C_REFERENCE,
-            label=_t("$F_3$ (negative partial power)", language))
+    ax.plot(
+        freqs,
+        f3,
+        "s--",
+        color=_C_REFERENCE,
+        label=_t("$F_3$ (negative partial power)", language),
+    )
     if dynamic_capability is not None:
         ld = np.broadcast_to(
             np.asarray(dynamic_capability, dtype=np.float64), freqs.shape
         )
-        ax.plot(freqs, ld, ls=":", lw=1.8, color=_C_MUTED,
-                drawstyle="steps-mid",
-                label=_t(r"Dynamic capability $L_\mathrm{d}$", language))
+        ax.plot(
+            freqs,
+            ld,
+            ls=":",
+            lw=1.8,
+            color=_C_MUTED,
+            drawstyle="steps-mid",
+            label=_t(r"Dynamic capability $L_\mathrm{d}$", language),
+        )
     _freq_axis(ax, freqs, language=language)
     ax.set_ylabel(_t("Indicator [dB]", language))
     ax.grid(True, which="both", alpha=0.3)
@@ -309,14 +333,22 @@ def plot_field_indicators(
         # is drawn alongside it.
         from ..emission.intensity import TEMPORAL_VARIABILITY_LIMIT
 
-        f1 = np.broadcast_to(
-            np.asarray(result.f1, dtype=np.float64), freqs.shape
+        f1 = np.broadcast_to(np.asarray(result.f1, dtype=np.float64), freqs.shape)
+        twin.plot(
+            freqs,
+            f1,
+            "^-",
+            color=_C_SECONDARY,
+            lw=1.4,
+            label=_t("$F_1$ (temporal variability)", language),
         )
-        twin.plot(freqs, f1, "^-", color=_C_SECONDARY, lw=1.4,
-                  label=_t("$F_1$ (temporal variability)", language))
-        twin.axhline(TEMPORAL_VARIABILITY_LIMIT, ls="-.", lw=1.0,
-                     color=_C_SECONDARY,
-                     label=_t("$F_1$ limit (Table B.3)", language))
+        twin.axhline(
+            TEMPORAL_VARIABILITY_LIMIT,
+            ls="-.",
+            lw=1.0,
+            color=_C_SECONDARY,
+            label=_t("$F_1$ limit (Table B.3)", language),
+        )
         twin.set_ylabel(_t("Dimensionless indicators $F_1$, $F_4$", language))
 
     lines, labels = ax.get_legend_handles_labels()
@@ -328,8 +360,10 @@ def plot_field_indicators(
 
 
 def plot_vibration_sound_power(
-    result: VibrationSoundPowerResult, ax: Axes | None = None,
-    language: str = "en", **kwargs: Any
+    result: VibrationSoundPowerResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Radiated sound power level per band (ISO/TS 7849).
 
@@ -342,7 +376,10 @@ def plot_vibration_sound_power(
     from .._i18n import localize_axes
 
     ax = _plot_band_level_bars(
-        ax, result.sound_power_level, result.frequencies, result.total_level,
+        ax,
+        result.sound_power_level,
+        result.frequencies,
+        result.total_level,
         ylabel=_t(r"Sound power level $L_W$ [dB re 1 pW]", language),
         title=_t("ISO/TS 7849 sound power from surface vibration", language),
         language=language,
@@ -360,8 +397,11 @@ _DEVICE_LABELS = {
 
 
 def plot_intensity_class(
-    result: IntensityInstrumentComplianceResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: IntensityInstrumentComplianceResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Measured pressure-residual intensity index over the IEC 61043 masks.
 
@@ -402,16 +442,34 @@ def plot_intensity_class(
     # measured curve. theme_fill mixes the page towards the hue instead, so the
     # region reads the same way on either background.
     ax.fill_between(
-        freqs, mask, y_top, step="mid", facecolor=theme_fill(_C_TERTIARY, ax),
-        edgecolor="none", zorder=0,
+        freqs,
+        mask,
+        y_top,
+        step="mid",
+        facecolor=theme_fill(_C_TERTIARY, ax),
+        edgecolor="none",
+        zorder=0,
         label=_t("Class {cls} pass region", language, cls=cls),
     )
     # Both Table 2 masks in the same amber, class 1 solid and class 2 dashed,
     # as the published intensity-analyser displays draw them.
-    ax.plot(freqs, class1, drawstyle="steps-mid", color=_C_SECONDARY, lw=1.3,
-            label=_t("Class 1 minimum", language))
-    ax.plot(freqs, class2, drawstyle="steps-mid", color=_C_SECONDARY, lw=1.3,
-            ls="--", label=_t("Class 2 minimum", language))
+    ax.plot(
+        freqs,
+        class1,
+        drawstyle="steps-mid",
+        color=_C_SECONDARY,
+        lw=1.3,
+        label=_t("Class 1 minimum", language),
+    )
+    ax.plot(
+        freqs,
+        class2,
+        drawstyle="steps-mid",
+        color=_C_SECONDARY,
+        lw=1.3,
+        ls="--",
+        label=_t("Class 2 minimum", language),
+    )
 
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("lw", 1.6)
@@ -432,8 +490,14 @@ def plot_intensity_class(
     )
     if np.any(failing):
         ax.plot(
-            freqs[failing], measured[failing], ls="", marker="o", ms=6.0,
-            mfc="none", mew=1.6, color=_C_REFERENCE,
+            freqs[failing],
+            measured[failing],
+            ls="",
+            marker="o",
+            ms=6.0,
+            mfc="none",
+            mew=1.6,
+            color=_C_REFERENCE,
             label=_t("Below the class {cls} minimum", language, cls=marked_cls),
         )
 
@@ -443,14 +507,17 @@ def plot_intensity_class(
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t(_LABEL_RESIDUAL_INDEX, language))
     ax.set_title(
-        _t("IEC 61043 Table 2 — {device}, {spacing} mm separation", language,
-           device=_t(_DEVICE_LABELS[result.device], language),
-           # ``:g`` prints the separation exactly as the chain was verified
-           # with (a 6.35 mm quarter-inch spacer stays 6.35, which a fixed
-           # one-decimal format would round away); only its decimal separator
-           # needs localising, and ``spacing`` is validated positive, so the
-           # sign never enters.
-           spacing=decimal_comma(f"{result.spacing * 1000.0:g}", language))
+        _t(
+            "IEC 61043 Table 2 — {device}, {spacing} mm separation",
+            language,
+            device=_t(_DEVICE_LABELS[result.device], language),
+            # ``:g`` prints the separation exactly as the chain was verified
+            # with (a 6.35 mm quarter-inch spacer stays 6.35, which a fixed
+            # one-decimal format would round away); only its decimal separator
+            # needs localising, and ``spacing`` is validated positive, so the
+            # sign never enters.
+            spacing=decimal_comma(f"{result.spacing * 1000.0:g}", language),
+        )
     )
     ax.legend(loc="lower right", fontsize="small")
     ax.grid(True, which="both", alpha=0.3)

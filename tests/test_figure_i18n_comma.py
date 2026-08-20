@@ -97,9 +97,7 @@ def test_reference_numbers_keep_their_dots(text: str) -> None:
         ("1000", "1000"),
     ],
 )
-def test_legitimate_decimals_still_take_the_comma(
-    text: str, expected: str
-) -> None:
+def test_legitimate_decimals_still_take_the_comma(text: str, expected: str) -> None:
     assert _decimal_comma(text) == expected
 
 
@@ -128,4 +126,5 @@ def test_every_replacement_template_of_the_pattern_table_compiles() -> None:
 def test_a_string_the_tables_do_not_know_comes_back_unchanged() -> None:
     """The same guard, from the caller's side: no row may raise."""
     assert lookup("zzz not a label anybody wrote 123") == (
-        "zzz not a label anybody wrote 123")
+        "zzz not a label anybody wrote 123"
+    )

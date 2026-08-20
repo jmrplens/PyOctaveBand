@@ -1,0 +1,33 @@
+# Editor defaults that match the formatter, so a file does not change shape
+# depending on who opened it. Ruff owns Python (see `[tool.ruff]` in
+# pyproject.toml); this file carries the same numbers to editors that do not
+# read that section, and covers the file types Ruff never sees.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{py,pyi}]
+max_line_length = 88
+
+# Markdown is deliberately outside the formatter: its fenced snippets are
+# mirrored by hand into the site in English and Spanish, and they align
+# trailing comments to show expected output. Trailing whitespace is still
+# trimmed everywhere except here, where two spaces mean a line break.
+[*.{md,mdx}]
+trim_trailing_whitespace = false
+indent_size = 2
+
+[*.{yml,yaml,json,toml}]
+indent_size = 2
+
+[*.{js,mjs,ts,tsx,astro,css}]
+indent_size = 2
+
+[Makefile]
+indent_style = tab

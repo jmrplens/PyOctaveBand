@@ -24,13 +24,14 @@ from phonometry import room
 from phonometry.room.impulse_response import ImpulseResponseWarning
 
 
-def _periodic_response(code: np.ndarray, b: np.ndarray, a: np.ndarray,
-                       periods: int = 3) -> np.ndarray:
+def _periodic_response(
+    code: np.ndarray, b: np.ndarray, a: np.ndarray, periods: int = 3
+) -> np.ndarray:
     """Steady-state periodic system response: keep the last ``periods``."""
     warmup = 2
     x = np.tile(code, periods + warmup)
     y = signal.lfilter(b, a, x)
-    return y[warmup * code.size:]
+    return y[warmup * code.size :]
 
 
 # --------------------------------------------------------------------------
@@ -116,9 +117,7 @@ def test_multi_period_recordings_average_noise_down() -> None:
     rec_a = np.tile(np.roll(pair[0], delay), periods) + noise_a
     rec_b = np.tile(np.roll(pair[1], delay), periods) + noise_b
     res = room.golay_impulse_response(rec_a, rec_b, pair)
-    single = room.golay_impulse_response(
-        rec_a[:length], rec_b[:length], pair
-    )
+    single = room.golay_impulse_response(rec_a[:length], rec_b[:length], pair)
     expected = np.zeros(length)
     expected[delay] = 1.0
     err_avg = float(np.sqrt(np.mean((res.ir - expected) ** 2)))

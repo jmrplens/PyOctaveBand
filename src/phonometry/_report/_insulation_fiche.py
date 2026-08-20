@@ -303,9 +303,7 @@ def render_insulation_fiche(
     # Left panel: the report-specific table content; right panel: the rating's
     # own measured-versus-shifted-reference curve.
     value_header = t("{vh} [dB]", language).format(vh=spec["symbol"])
-    columns, caption, col_widths = build_columns(
-        value_header, curve, verbose, language
-    )
+    columns, caption, col_widths = build_columns(value_header, curve, verbose, language)
     value_table = band_value_table(centers, columns, language, col_widths)
     left_cell = [Paragraph(caption, caption_style), value_table]
 
@@ -327,8 +325,11 @@ def render_insulation_fiche(
         result_box(single_number_statement(rating, rating_symbol), styles, accent)
     )
     statement_style = ParagraphStyle(
-        "insulation_statement", parent=styles["Normal"], fontSize=8.5,
-        textColor=colors.HexColor(_MUTED_HEX), spaceBefore=4,
+        "insulation_statement",
+        parent=styles["Normal"],
+        fontSize=8.5,
+        textColor=colors.HexColor(_MUTED_HEX),
+        spaceBefore=4,
     )
     flow.append(Paragraph(t(spec["statement"], language), statement_style))
     if metadata is not None and metadata.requirement is not None:

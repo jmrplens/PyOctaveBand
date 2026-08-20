@@ -122,7 +122,8 @@ def test_wales_heitmeyer_printed_asymptotes() -> None:
     at = ship_source_spectrum(model="wales-heitmeyer", frequency_hz=[340.0])
     power_law_only = 230.0 - 10.0 * 3.594 * np.log10(340.0)
     assert float(at.source_psd[0]) - power_law_only == pytest.approx(
-        10.0 * np.log10(2.0**0.917), abs=1e-9)
+        10.0 * np.log10(2.0**0.917), abs=1e-9
+    )
 
 
 def test_wales_heitmeyer_ignores_speed_and_length() -> None:
@@ -159,18 +160,26 @@ def test_ship_traffic_plot_smoke() -> None:
 # row, whose assumed average is not reproducible, are excluded).
 _RANDI_TABLE2 = [
     # (length ft, speed kn, {frequency: level})
-    (337.5, 12.5, {10.0: 160.9, 50.0: 162.6, 100.0: 153.5, 300.0: 137.1}),   # Merchant
-    (450.0, 14.0, {10.0: 167.0, 25.0: 170.8, 50.0: 168.6, 100.0: 159.2}),    # Tanker
-    (600.0, 16.5, {10.0: 174.8, 25.0: 178.6, 50.0: 176.0, 100.0: 166.3,
-                   300.0: 149.3}),                                           # Large Tanker
-    (1000.0, 18.5, {10.0: 185.0, 25.0: 188.8, 50.0: 185.4, 100.0: 174.6,
-                    300.0: 156.8}),                                          # Super Tanker
+    (337.5, 12.5, {10.0: 160.9, 50.0: 162.6, 100.0: 153.5, 300.0: 137.1}),  # Merchant
+    (450.0, 14.0, {10.0: 167.0, 25.0: 170.8, 50.0: 168.6, 100.0: 159.2}),  # Tanker
+    (
+        600.0,
+        16.5,
+        {10.0: 174.8, 25.0: 178.6, 50.0: 176.0, 100.0: 166.3, 300.0: 149.3},
+    ),  # Large Tanker
+    (
+        1000.0,
+        18.5,
+        {10.0: 185.0, 25.0: 188.8, 50.0: 185.4, 100.0: 174.6, 300.0: 156.8},
+    ),  # Super Tanker
 ]
 
 
 @pytest.mark.parametrize(("length_ft", "speed_kn", "levels"), _RANDI_TABLE2)
 def test_randi_reproduces_report_table_2(
-    length_ft: float, speed_kn: float, levels: dict[float, float],
+    length_ft: float,
+    speed_kn: float,
+    levels: dict[float, float],
 ) -> None:
     from phonometry.underwater.sources.ship_traffic_noise import _randi
 
@@ -209,7 +218,9 @@ def test_jomopans_echo_tracks_overseas_harriette_at_speed(
     # anchor for the speed/length scaling and band conversion, not a digit
     # oracle.
     res = ship_source_spectrum(
-        speed_kn, 173.0, vessel_class="bulker",
+        speed_kn,
+        173.0,
+        vessel_class="bulker",
         frequency_hz=_HARRIETTE_FREQS,
     )
     diff = res.band_level - np.asarray(_HARRIETTE_LEVELS[speed_kn])
@@ -224,7 +235,10 @@ def test_jomopans_echo_overseas_harriette_low_speed_mean() -> None:
     # six-band mean deviation is constrained, at 6 dB (about one class
     # standard deviation).
     res = ship_source_spectrum(
-        8.0, 173.0, vessel_class="bulker", frequency_hz=_HARRIETTE_FREQS,
+        8.0,
+        173.0,
+        vessel_class="bulker",
+        frequency_hz=_HARRIETTE_FREQS,
     )
     diff = res.band_level - np.asarray(_HARRIETTE_LEVELS[8.0])
     assert float(np.mean(np.abs(diff))) <= 6.0

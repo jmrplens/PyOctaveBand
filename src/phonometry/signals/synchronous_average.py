@@ -235,9 +235,7 @@ def _resolve_n_averages(
     """Number of whole periods to average, validated against the record."""
     available = int(np.floor((length - m_int) / samples)) + 1
     if available < 1:
-        raise ValueError(
-            "The record is shorter than one period; nothing to average."
-        )
+        raise ValueError("The record is shorter than one period; nothing to average.")
     if n_averages is None:
         return available
     requested = int(n_averages)

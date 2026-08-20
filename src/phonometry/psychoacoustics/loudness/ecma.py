@@ -107,12 +107,59 @@ _C_N = 0.0211964  # calibration factor c_N (Clause 5.1.8)
 # Specific loudness threshold in quiet LTQ(z) (Table 3), one per band.
 _LTQ = np.array(
     [
-        0.3310, 0.1625, 0.1051, 0.0757, 0.0576, 0.0453, 0.0365, 0.0298, 0.0247,
-        0.0207, 0.0176, 0.0151, 0.0131, 0.0115, 0.0103, 0.0093, 0.0086, 0.0081,
-        0.0077, 0.0074, 0.0073, 0.0072, 0.0071, 0.0072, 0.0073, 0.0074, 0.0076,
-        0.0079, 0.0082, 0.0086, 0.0092, 0.0100, 0.0109, 0.0122, 0.0138, 0.0157,
-        0.0172, 0.0180, 0.0180, 0.0177, 0.0176, 0.0177, 0.0182, 0.0190, 0.0202,
-        0.0217, 0.0237, 0.0263, 0.0296, 0.0339, 0.0398, 0.0485, 0.0622,
+        0.3310,
+        0.1625,
+        0.1051,
+        0.0757,
+        0.0576,
+        0.0453,
+        0.0365,
+        0.0298,
+        0.0247,
+        0.0207,
+        0.0176,
+        0.0151,
+        0.0131,
+        0.0115,
+        0.0103,
+        0.0093,
+        0.0086,
+        0.0081,
+        0.0077,
+        0.0074,
+        0.0073,
+        0.0072,
+        0.0071,
+        0.0072,
+        0.0073,
+        0.0074,
+        0.0076,
+        0.0079,
+        0.0082,
+        0.0086,
+        0.0092,
+        0.0100,
+        0.0109,
+        0.0122,
+        0.0138,
+        0.0157,
+        0.0172,
+        0.0180,
+        0.0180,
+        0.0177,
+        0.0176,
+        0.0177,
+        0.0182,
+        0.0190,
+        0.0202,
+        0.0217,
+        0.0237,
+        0.0263,
+        0.0296,
+        0.0339,
+        0.0398,
+        0.0485,
+        0.0622,
     ]
 )
 
@@ -163,7 +210,12 @@ _INTERP = (_S_H // 256).astype(np.int64)
 # Number of bands to average N_B by block size (Table 5).
 _N_B_BY_SB = {8192: 2, 4096: 2, 2048: 1, 1024: 0}
 # g(z) parameters c, d by block size (Table 8).
-_G_CD = {8192: (18.21, 0.36), 4096: (12.14, 0.36), 2048: (417.54, 0.71), 1024: (962.68, 0.69)}
+_G_CD = {
+    8192: (18.21, 0.36),
+    4096: (12.14, 0.36),
+    2048: (417.54, 0.71),
+    1024: (962.68, 0.69),
+}
 
 
 def _g_of_z() -> np.ndarray:
@@ -199,7 +251,9 @@ class EcmaLoudness:
     loudness_vs_time: np.ndarray
     field: str
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes | np.ndarray:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes | np.ndarray:
         """Plot the average specific loudness N'(z) (see :mod:`phonometry._plot.psychoacoustics`).
 
         Adds a loudness-vs-time panel.  Requires matplotlib
@@ -208,7 +262,9 @@ class EcmaLoudness:
         from ..._i18n import check_language
         from ..._plot.psychoacoustics import plot_ecma_loudness
 
-        return plot_ecma_loudness(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_ecma_loudness(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 # --------------------------------------------------------------------------
@@ -288,9 +344,7 @@ def _preprocess(x: np.ndarray) -> tuple[np.ndarray, int, int]:
     x = _fade_in(x)
     n_new = _S_H_MAX * (math.ceil((n_samples + _S_H_MAX + _S_B_MAX) / _S_H_MAX) - 1)
     n_zeros_end = n_new - n_samples
-    padded = np.concatenate(
-        [np.zeros(_S_B_MAX), x, np.zeros(max(n_zeros_end, 0))]
-    )
+    padded = np.concatenate([np.zeros(_S_B_MAX), x, np.zeros(max(n_zeros_end, 0))])
     return padded, n_samples, n_new
 
 
@@ -330,7 +384,9 @@ def _specific_basis_loudness(rms: np.ndarray, band: int) -> np.ndarray:
 # --------------------------------------------------------------------------
 
 
-def _band_acf(rect: np.ndarray, s_b: int, energy: np.ndarray | None = None) -> np.ndarray:
+def _band_acf(
+    rect: np.ndarray, s_b: int, energy: np.ndarray | None = None
+) -> np.ndarray:
     """Unbiased, normalized ACF of the rectified blocks (Formulae 27-29).
 
     ``rect`` is (n_blocks, s_b). Returns phi_z(m) of shape
@@ -391,9 +447,7 @@ def _scaled_acf_at(
     return scaled
 
 
-def _average_bands_full(
-    p_bands: list[np.ndarray], n_new: int
-) -> list[np.ndarray]:
+def _average_bands_full(p_bands: list[np.ndarray], n_new: int) -> list[np.ndarray]:
     """Full Clause 6.2.3 band averaging with cross-group recomputation.
 
     For each target band z (block size B = s_b(z), reach = min(N_B, z, 52-z)),
@@ -489,7 +543,9 @@ def _resample_common(values: np.ndarray, band: int, n_common: int) -> np.ndarray
     """Linearly resample a band time series onto the common grid (Formula 40)."""
     factor = int(_INTERP[band])
     positions = np.arange(values.size) * factor
-    return np.asarray(np.interp(np.arange(n_common), positions, values), dtype=np.float64)
+    return np.asarray(
+        np.interp(np.arange(n_common), positions, values), dtype=np.float64
+    )
 
 
 def _lowpass_time(x: np.ndarray) -> np.ndarray:
@@ -573,9 +629,9 @@ def _assemble_loudness(
     max_band = np.max(n_tonal + n_noise, axis=1)  # per block l
     e_block = _E_A / (max_band + _EPS) + _E_B
     e_block = e_block[:, None]
-    spec = (
-        n_tonal**e_block + (_W_N * n_noise) ** e_block
-    ) ** (1.0 / e_block)  # Formula 113
+    spec = (n_tonal**e_block + (_W_N * n_noise) ** e_block) ** (
+        1.0 / e_block
+    )  # Formula 113
     spec = np.nan_to_num(spec, nan=0.0)
 
     n_blocks = spec.shape[0]
@@ -627,7 +683,9 @@ def loudness_ecma(
     if field not in ("free", "diffuse"):
         raise ValueError("field must be 'free' or 'diffuse'")
     fs = resolve_fs(signal_in, fs, name="signal_in")
-    x = apply_calibration(signal_in, require_1d_signal(_typesignal(np.asarray(signal_in))))
+    x = apply_calibration(
+        signal_in, require_1d_signal(_typesignal(np.asarray(signal_in)))
+    )
     if x.size == 0:
         raise ValueError("signal must not be empty")
     fs = float(fs)
@@ -638,9 +696,7 @@ def loudness_ecma(
         x = signal.resample(x, n_target)
 
     n_tonal, n_noise, _, _, n_samples = _tonal_noise_split(x, field)
-    n_single, n_spec, n_time, time = _assemble_loudness(
-        n_tonal, n_noise, n_samples
-    )
+    n_single, n_spec, n_time, time = _assemble_loudness(n_tonal, n_noise, n_samples)
     return EcmaLoudness(
         loudness=n_single,
         specific_loudness=n_spec,

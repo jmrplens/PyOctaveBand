@@ -114,9 +114,7 @@ def test_apply_equalizes_the_designed_response_to_a_pulse() -> None:
     full = signal.fftconvolve(h, res.inverse)
     assert int(np.argmax(np.abs(full))) == res.delay
     window = slice(res.delay - 128, res.delay + 128)
-    concentration = float(
-        np.sum(full[window] ** 2) / np.sum(full ** 2)
-    )
+    concentration = float(np.sum(full[window] ** 2) / np.sum(full**2))
     assert concentration > 0.95
     # apply() removes the delay: same pulse, aligned at sample 0.
     pulse = res.apply(h)
@@ -140,8 +138,9 @@ def test_delay_defaults_to_half_the_block_and_is_stored() -> None:
 def test_fs_is_taken_from_a_result_object() -> None:
     sweep = room.sweep_signal(int(FS), 50.0, 20000.0, 0.5)
     rec = np.concatenate([sweep, np.zeros(2048)])
-    ir = room.impulse_response(rec, np.concatenate([sweep, np.zeros(2048)]),
-                               int(FS), length=2048)
+    ir = room.impulse_response(
+        rec, np.concatenate([sweep, np.zeros(2048)]), int(FS), length=2048
+    )
     res = signals.regularized_inverse_filter(ir, f_range=(200.0, 10000.0))
     assert isinstance(res, signals.InverseFilterResult)
     assert res.fs == FS
@@ -170,28 +169,18 @@ def test_rejects_bad_inputs() -> None:
             h, FS, f_range=(200.0, 4000.0), transition_octaves=-1.0
         )
     with pytest.raises(ValueError, match="n_fft"):
-        signals.regularized_inverse_filter(
-            h, FS, f_range=(200.0, 4000.0), n_fft=16
-        )
+        signals.regularized_inverse_filter(h, FS, f_range=(200.0, 4000.0), n_fft=16)
     with pytest.raises(ValueError, match="delay"):
-        signals.regularized_inverse_filter(
-            h, FS, f_range=(200.0, 4000.0), delay=-1
-        )
+        signals.regularized_inverse_filter(h, FS, f_range=(200.0, 4000.0), delay=-1)
     two_dim = np.zeros((2, 8))
     with pytest.raises(ValueError, match="one-dimensional"):
-        signals.regularized_inverse_filter(
-            two_dim, FS, f_range=(200.0, 4000.0)
-        )
+        signals.regularized_inverse_filter(two_dim, FS, f_range=(200.0, 4000.0))
     with_nan = np.array([1.0, np.nan])
     with pytest.raises(ValueError, match="finite"):
-        signals.regularized_inverse_filter(
-            with_nan, FS, f_range=(200.0, 4000.0)
-        )
+        signals.regularized_inverse_filter(with_nan, FS, f_range=(200.0, 4000.0))
     all_zero = np.zeros(64)
     with pytest.raises(ValueError, match="zero"):
-        signals.regularized_inverse_filter(
-            all_zero, FS, f_range=(200.0, 4000.0)
-        )
+        signals.regularized_inverse_filter(all_zero, FS, f_range=(200.0, 4000.0))
 
 
 def test_apply_rejects_non_1d() -> None:

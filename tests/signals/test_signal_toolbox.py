@@ -43,8 +43,14 @@ FS = 48000.0
 #: of 5 kHz: (duration in ms, full periods). Samples at 48 kHz follow as
 #: 48·ms by hand.
 _TABLE_AII_BURSTS = [
-    (1, 5), (2, 10), (5, 25), (10, 50),
-    (20, 100), (50, 250), (100, 500), (200, 1000),
+    (1, 5),
+    (2, 10),
+    (5, 25),
+    (10, 50),
+    (20, 100),
+    (50, 250),
+    (100, 500),
+    (200, 1000),
 ]
 
 
@@ -82,10 +88,10 @@ def test_envelope_is_rectangular_gate() -> None:
     n_pre, n_on = round(0.01 * FS), res.burst_samples
     assert res.onset_sample == n_pre
     assert np.all(res.envelope[:n_pre] == 0.0)
-    assert np.all(res.envelope[n_pre:n_pre + n_on] == 2.0)
-    assert np.all(res.envelope[n_pre + n_on:] == 0.0)
+    assert np.all(res.envelope[n_pre : n_pre + n_on] == 2.0)
+    assert np.all(res.envelope[n_pre + n_on :] == 0.0)
     assert np.all(res.signal[:n_pre] == 0.0)
-    assert np.all(res.signal[n_pre + n_on:] == 0.0)
+    assert np.all(res.signal[n_pre + n_on :] == 0.0)
     assert np.all(np.abs(res.signal) <= res.envelope)
     assert res.signal.size == n_pre + n_on + round(0.02 * FS)
 
@@ -93,9 +99,7 @@ def test_envelope_is_rectangular_gate() -> None:
 def test_repetitive_burst_train_clause_a22() -> None:
     # Clause A2.2: 5 ms bursts of 5 kHz tone; 10 bursts per second gives a
     # 4800-sample period at 48 kHz and a 5 % duty cycle.
-    res = ph.signals.tone_burst(
-        FS, 5000.0, 25, repetitions=3, repetition_rate=10.0
-    )
+    res = ph.signals.tone_burst(FS, 5000.0, 25, repetitions=3, repetition_rate=10.0)
     assert res.burst_samples == 240
     assert res.period_samples == 4800
     assert res.duty_cycle == pytest.approx(0.05)
@@ -103,17 +107,13 @@ def test_repetitive_burst_train_clause_a22() -> None:
     period, n_on = 4800, 240
     first = res.signal[:period]
     for k in range(1, 3):
-        np.testing.assert_array_equal(
-            res.signal[k * period:(k + 1) * period], first
-        )
+        np.testing.assert_array_equal(res.signal[k * period : (k + 1) * period], first)
     assert np.all(first[n_on:] == 0.0)
 
 
 @pytest.mark.parametrize("rate", [2.0, 10.0, 100.0])
 def test_table_aiii_repetition_rates_fit(rate: float) -> None:
-    res = ph.signals.tone_burst(
-        FS, 5000.0, 25, repetitions=2, repetition_rate=rate
-    )
+    res = ph.signals.tone_burst(FS, 5000.0, 25, repetitions=2, repetition_rate=rate)
     assert res.period_samples == round(FS / rate)
 
 
@@ -180,9 +180,7 @@ def test_tone_burst_invalid_inputs() -> None:
 
 
 def test_tone_burst_plot_waveform_and_envelope() -> None:
-    res = ph.signals.tone_burst(
-        FS, 5000.0, 25, repetitions=2, repetition_rate=10.0
-    )
+    res = ph.signals.tone_burst(FS, 5000.0, 25, repetitions=2, repetition_rate=10.0)
     ax = res.plot(linewidth=2)
     assert any(line.get_linewidth() == 2.0 for line in ax.lines)
     assert "IEC 60268-1" in ax.get_title()
@@ -191,8 +189,7 @@ def test_tone_burst_plot_waveform_and_envelope() -> None:
     ax = ph.signals.tone_burst(FS, 5000.0, 25).plot(color="red")
     red = plt.matplotlib.colors.to_rgba("red")
     assert any(
-        plt.matplotlib.colors.to_rgba(line.get_color()) == red
-        for line in ax.lines
+        plt.matplotlib.colors.to_rgba(line.get_color()) == red for line in ax.lines
     )
     plt.close("all")
 
@@ -277,9 +274,7 @@ def test_resample_invalid_parameters() -> None:
     x = ph.signals.noise_signal(FS, 0.05, seed=4)
     two_dimensional = np.zeros((4, 4))
     with pytest.raises(ValueError, match="at least 30"):
-        ph.signals.resample_signal(
-            x, FS, fs_new=32000.0, stopband_attenuation_db=10.0
-        )
+        ph.signals.resample_signal(x, FS, fs_new=32000.0, stopband_attenuation_db=10.0)
     with pytest.raises(ValueError, match="transition_width"):
         ph.signals.resample_signal(x, FS, fs_new=32000.0, transition_width=0.9)
     with pytest.raises(ValueError, match="one-dimensional"):

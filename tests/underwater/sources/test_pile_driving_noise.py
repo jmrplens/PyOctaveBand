@@ -41,9 +41,7 @@ def test_cumulative_sel_identical_strikes() -> None:
     assert underwater.cumulative_sel_identical(sel_ss, 100) == pytest.approx(
         sel_ss + 20.0
     )
-    assert underwater.cumulative_sel_identical(sel_ss, 1) == pytest.approx(
-        sel_ss
-    )
+    assert underwater.cumulative_sel_identical(sel_ss, 1) == pytest.approx(sel_ss)
 
 
 def test_cumulative_sel_energy_sum_matches_identical() -> None:
@@ -83,9 +81,7 @@ def test_pile_strike_metrics_bundle_and_plot() -> None:
     assert res.single_strike_sel == pytest.approx(
         underwater.sound_exposure_level(x, FS)
     )
-    assert res.peak_spl == pytest.approx(
-        underwater.peak_sound_pressure_level(x)
-    )
+    assert res.peak_spl == pytest.approx(underwater.peak_sound_pressure_level(x))
     assert 0.0 < res.pulse_duration < 0.25
     axes = res.plot()
     assert len(axes) == 2
@@ -105,9 +101,7 @@ def test_pile_strike_metrics_rejects_short_signal() -> None:
 def test_band_sel_energy_sum_reproduces_the_broadband_sel() -> None:
     """Parseval: the band energies sum to the total sound exposure of the record."""
     x = _pulse(50.0, 0.2)
-    spec = underwater.strike_sel_spectrum(
-        x, FS, fraction=3, limits=(10.0, 20_000.0)
-    )
+    spec = underwater.strike_sel_spectrum(x, FS, fraction=3, limits=(10.0, 20_000.0))
     assert spec.total_sel == pytest.approx(spec.broadband_sel, abs=0.05)
     assert spec.total_sel == pytest.approx(
         underwater.single_strike_sel(x, FS), abs=0.05
@@ -138,10 +132,12 @@ def test_weighted_exposure_of_a_pile_driving_campaign() -> None:
     """
     spec = underwater.strike_sel_spectrum(_pulse(50.0, 0.2), FS, fraction=3)
     # No masking: the spectrum goes into the assessment exactly as returned.
-    lf = underwater.weighted_exposure(spec.frequencies, spec.band_sel, "LF",
-                                      n_events=1000, impulsive=True)
-    vhf = underwater.weighted_exposure(spec.frequencies, spec.band_sel, "VHF",
-                                       n_events=1000, impulsive=True)
+    lf = underwater.weighted_exposure(
+        spec.frequencies, spec.band_sel, "LF", n_events=1000, impulsive=True
+    )
+    vhf = underwater.weighted_exposure(
+        spec.frequencies, spec.band_sel, "VHF", n_events=1000, impulsive=True
+    )
     assert lf.weighted_sel > vhf.weighted_sel + 20.0
     assert lf.cumulative_sel == pytest.approx(lf.weighted_sel + 30.0, abs=1e-9)
     assert lf.criteria.injury_label == "AUD INJ"
@@ -150,7 +146,9 @@ def test_weighted_exposure_of_a_pile_driving_campaign() -> None:
 @pytest.mark.parametrize(
     ("seconds", "fs"), [(1.0, 48000), (0.2, 48000), (0.1, 48000), (0.5, 10000)]
 )
-def test_the_advertised_chain_runs_unaided_on_short_records(seconds: float, fs: int) -> None:
+def test_the_advertised_chain_runs_unaided_on_short_records(
+    seconds: float, fs: int
+) -> None:
     """Bands narrower than the bin spacing fs/n are empty; the chain must still run.
 
     A one-third-octave band below about ``fs/n`` contains no discrete-spectrum

@@ -133,10 +133,7 @@ def _labels(
         title = t("Impact sound insulation rating", language)
         rating_part = "ISO 717-2"
         sym = _symbol_markup(symbol if symbol is not None else "Ln,w")
-        statement = (
-            f"{sym} (C<sub>I</sub>) = "
-            f"<b>{impact.rating} ({impact.ci:d}) dB</b>"
-        )
+        statement = f"{sym} (C<sub>I</sub>) = <b>{impact.rating} ({impact.ci:d}) dB</b>"
         value_header = _band_symbol_markup(symbol) if symbol else "L<sub>n</sub>"
     else:
         airborne = cast("WeightedRatingResult", result)
@@ -177,7 +174,8 @@ def _metadata_pairs(
             (
                 t("Sample area S [m<super>2</super>]", language),
                 fmt_meta(metadata.area, language)
-                if metadata.area is not None else None,
+                if metadata.area is not None
+                else None,
             ),
             (t("Manufacturer", language), metadata.manufacturer),
             (t("Description", language), metadata.specimen),
@@ -202,8 +200,14 @@ def _metadata_pairs(
     )
     conditions = group(
         [
-            (t("Source room volume [m<super>3</super>]", language), num(metadata.source_volume)),
-            (t("Source room temp. [&#176;C]", language), num(metadata.source_temperature)),
+            (
+                t("Source room volume [m<super>3</super>]", language),
+                num(metadata.source_volume),
+            ),
+            (
+                t("Source room temp. [&#176;C]", language),
+                num(metadata.source_temperature),
+            ),
             (
                 t("Source room humidity [%]", language),
                 num(metadata.source_relative_humidity),
@@ -272,9 +276,7 @@ def _value_table(
     else:
         header = [
             Paragraph(t("Frequency f [Hz]", language), head_style),
-            Paragraph(
-                t("{vh} [dB]", language).format(vh=value_header), head_style
-            ),
+            Paragraph(t("{vh} [dB]", language).format(vh=value_header), head_style),
         ]
         col_widths = [28 * mm, 28 * mm]
 
@@ -302,9 +304,7 @@ def _value_table(
     if verbose:
         from reportlab.lib import colors
 
-        rows.append(
-            ["", "", t("sum", language), d1(float(deviations.sum()))]
-        )
+        rows.append(["", "", t("sum", language), d1(float(deviations.sum()))])
         extra_styles = [
             ("LINEABOVE", (0, -1), (-1, -1), 0.6, colors.HexColor(_ACCENT_HEX)),
             ("FONTNAME", (2, -1), (-1, -1), "Helvetica-Bold"),
@@ -422,10 +422,13 @@ def _basis_line(
         metadata.measurement_standard if metadata is not None else None
     )
     if measurement_standard:
-        return t("{standard} laboratory measurement of sound insulation. Rating per {part}:2020.", language).format(
-            standard=html.escape(measurement_standard), part=rating_part
-        )
-    return t("Sound insulation rating per {part}:2020.", language).format(part=rating_part)
+        return t(
+            "{standard} laboratory measurement of sound insulation. Rating per {part}:2020.",
+            language,
+        ).format(standard=html.escape(measurement_standard), part=rating_part)
+    return t("Sound insulation rating per {part}:2020.", language).format(
+        part=rating_part
+    )
 
 
 def render_iso717_report(
@@ -503,9 +506,7 @@ def render_iso717_report(
     # whether the rating came from one-third-octave or octave bands; the
     # caption declares the actual set.
     caption_key = (
-        "Octave-band {vh} [dB]"
-        if centers.size == 5
-        else "One-third-octave {vh} [dB]"
+        "Octave-band {vh} [dB]" if centers.size == 5 else "One-third-octave {vh} [dB]"
     )
     left_cell = [
         Paragraph(

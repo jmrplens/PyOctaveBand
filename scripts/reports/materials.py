@@ -527,9 +527,7 @@ def _airflow_resistance_example() -> tuple[object, ReportMetadata, str]:
     area = np.pi * 0.05**2
     u = np.array([0.5, 1.0, 2.0, 4.0, 8.0, 12.0]) * 1e-3
     dp = 1.6e4 * u + 4.0e5 * u**2
-    result = ph.materials.static_airflow_resistance(
-        u, dp, area=area, thickness=0.05
-    )
+    result = ph.materials.static_airflow_resistance(u, dp, area=area, thickness=0.05)
     metadata = ReportMetadata(
         specimen="50 mm porous absorber (open-cell)",
         client="Example client",

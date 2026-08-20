@@ -27,9 +27,7 @@ from phonometry import psychoacoustics
 def test_critical_bandwidth_closed_form() -> None:
     ft = 137.3
     expected = 25.0 + 75.0 * (1.0 + 1.4 * (ft / 1000.0) ** 2) ** 0.69
-    assert psychoacoustics.critical_bandwidth_engineering(ft) == pytest.approx(
-        expected
-    )
+    assert psychoacoustics.critical_bandwidth_engineering(ft) == pytest.approx(expected)
 
 
 def test_critical_bandwidth_grows_with_frequency() -> None:
@@ -76,9 +74,7 @@ def test_masking_index_decreases_with_frequency() -> None:
 
 
 def test_critical_band_level_matches_annex_e() -> None:
-    value = psychoacoustics.critical_band_level(
-        49.22, 137.3, ref.ISO20065_LINE_SPACING
-    )
+    value = psychoacoustics.critical_band_level(49.22, 137.3, ref.ISO20065_LINE_SPACING)
     assert value == pytest.approx(ref.ISO20065_LG_137, abs=0.05)
 
 
@@ -94,16 +90,14 @@ def test_critical_band_level_bandwidth_ratio() -> None:
 # Audibility (Formula (14))
 # ---------------------------------------------------------------------------
 def test_audibility_from_levels_identity() -> None:
-    assert psychoacoustics.audibility_from_levels(
-        67.96, 64.98, -2.02
-    ) == pytest.approx(5.0)
+    assert psychoacoustics.audibility_from_levels(67.96, 64.98, -2.02) == pytest.approx(
+        5.0
+    )
 
 
 def test_tone_audibility_matches_annex_e() -> None:
     for ft, ls, lt, expected in ref.ISO20065_ANNEX_E_TONES:
-        value = psychoacoustics.tone_audibility(
-            lt, ls, ft, ref.ISO20065_LINE_SPACING
-        )
+        value = psychoacoustics.tone_audibility(lt, ls, ft, ref.ISO20065_LINE_SPACING)
         assert value == pytest.approx(expected, abs=0.03)
 
 
@@ -156,9 +150,9 @@ def test_from_spectrum_full_chain_matches_annex_e() -> None:
     lt = psychoacoustics.tone_level(
         ref.ISO20065_E1_LEVELS, ref.ISO20065_E1_FREQUENCIES, 137.3, ls
     )
-    assert psychoacoustics.tone_audibility(
-        lt, ls, 137.3, 2.7
-    ) == pytest.approx(4.99, abs=0.03)
+    assert psychoacoustics.tone_audibility(lt, ls, 137.3, 2.7) == pytest.approx(
+        4.99, abs=0.03
+    )
 
 
 def test_mean_narrowband_level_rectangular_higher() -> None:
@@ -190,12 +184,10 @@ def test_tone_level_single_line_when_isolated() -> None:
 
 def test_energy_sum_single_line_has_no_bandwidth_correction() -> None:
     # Formula (7): LT = L1 for K = 1; the Hanning correction is K > 1 only.
-    assert psychoacoustics.energy_sum_level([53.0]) == pytest.approx(
-        53.0, abs=1e-12
+    assert psychoacoustics.energy_sum_level([53.0]) == pytest.approx(53.0, abs=1e-12)
+    assert psychoacoustics.energy_sum_level([53.0], effective_bandwidth_factor=1.0) == (
+        pytest.approx(53.0, abs=1e-12)
     )
-    assert psychoacoustics.energy_sum_level(
-        [53.0], effective_bandwidth_factor=1.0
-    ) == (pytest.approx(53.0, abs=1e-12))
 
 
 def test_single_line_tone_audibility_flip_regression() -> None:
@@ -205,7 +197,7 @@ def test_single_line_tone_audibility_flip_regression() -> None:
     # applying the K > 1 Hanning correction (-1.76 dB) flips the verdict to
     # "no audible tone".
     df = 2.6917
-    freqs = df * np.arange(20, 201)          # 53.8 Hz .. 538.3 Hz
+    freqs = df * np.arange(20, 201)  # 53.8 Hz .. 538.3 Hz
     levels = np.full(freqs.size, 40.0)
     tone_index = int(np.argmin(np.abs(freqs - 301.5)))
     levels[tone_index] = 53.0
@@ -283,9 +275,7 @@ def test_analyze_spectrum_step3_combines_annex_e_band() -> None:
     fg = result.group_sizes > 1
     assert int(np.sum(fg)) == 1
     assert int(result.group_sizes[fg][0]) == 3
-    assert result.tone_levels[fg][0] == pytest.approx(
-        ref.ISO20065_E1_LT_FG, abs=0.02
-    )
+    assert result.tone_levels[fg][0] == pytest.approx(ref.ISO20065_E1_LT_FG, abs=0.02)
     # Step 4: the decisive audibility is the FG entry (Table E.2 rates the
     # group at the most audible member; on the *truncated* E.1 spectrum the
     # 158.8 Hz tone's masking level is underestimated, so the anchor differs
@@ -312,8 +302,8 @@ def test_detect_tone_at_first_line_not_dropped() -> None:
 
     freqs = np.arange(100.0, 100.0 + 2.7 * 40, 2.7)
     levels = np.full(freqs.size, 50.0)
-    levels[0] = 90.0     # strong peak on the first line
-    levels[-1] = 95.0    # even stronger last line (would trigger the wrap bug)
+    levels[0] = 90.0  # strong peak on the first line
+    levels[-1] = 95.0  # even stronger last line (would trigger the wrap bug)
     detected = _detect_tones(levels, freqs, 2.7, 1.5)
     assert 0 in [peak for peak, _lo, _hi, _ls in detected]
 
@@ -381,9 +371,7 @@ def test_combined_tone_level_counts_a_shared_line_once() -> None:
     # the combined level must equal the single-tone level of Formula (8)
     # exactly -- not approximately, since the same lines are summed.
     same_run = _e1_line_energy([12, 13, 14, 15, 16])
-    fg_same = psychoacoustics.combined_tone_level(
-        lev, freq, [134.6, 137.3], [ls, ls]
-    )
+    fg_same = psychoacoustics.combined_tone_level(lev, freq, [134.6, 137.3], [ls, ls])
     assert fg_same == pytest.approx(same_run, abs=1e-12)
     assert fg_same == psychoacoustics.tone_level(lev, freq, 137.3, ls)
     # An implementation that summed the two tone levels instead would land
@@ -401,9 +389,7 @@ def test_combined_tone_level_counts_a_shared_line_once() -> None:
     # and at 158.8 Hz it is 156.1-161.5 Hz (indices 22-24), the second strictly
     # inside the first, so the union is the wider run alone.
     nested = _e1_line_energy([22, 23, 24, 25])
-    fg_nested = psychoacoustics.combined_tone_level(
-        lev, freq, [156.1, 158.8], [ls, ls]
-    )
+    fg_nested = psychoacoustics.combined_tone_level(lev, freq, [156.1, 158.8], [ls, ls])
     assert fg_nested == pytest.approx(nested, abs=1e-12)
     assert fg_nested == psychoacoustics.tone_level(lev, freq, 156.1, ls)
     naive_nested = psychoacoustics.energy_sum_level(
@@ -434,8 +420,10 @@ def test_combined_tone_level_no_double_counting() -> None:
         for f in (134.6, 137.3)
     ]
     assert np.isfinite(fg)
-    assert max(singles) <= fg <= psychoacoustics.energy_sum_level(
-        singles, effective_bandwidth_factor=1.0
+    assert (
+        max(singles)
+        <= fg
+        <= psychoacoustics.energy_sum_level(singles, effective_bandwidth_factor=1.0)
     )
 
 
@@ -457,9 +445,7 @@ def test_combined_tone_level_rejects_length_mismatch() -> None:
 def test_separation_frequency_minimum_at_reference() -> None:
     # fD = 21·10^(1.2·|lg(fT/212)|^1.8): the |lg| makes fT = 212 Hz the minimum,
     # where the exponent vanishes and fD = 21 Hz exactly.
-    assert psychoacoustics.two_tone_separation_frequency(
-        212.0
-    ) == pytest.approx(21.0)
+    assert psychoacoustics.two_tone_separation_frequency(212.0) == pytest.approx(21.0)
 
 
 def test_separation_frequency_matches_reference_program() -> None:
@@ -467,9 +453,9 @@ def test_separation_frequency_matches_reference_program() -> None:
     #   fD = 21 * 10 ^ (1.2 * Abs(Log(fT / 212) / Log(10)) ^ 1.8)
     for ft in (88.0, 137.3, 300.0, 500.0, 999.0):
         expected = 21.0 * 10.0 ** (1.2 * abs(math.log10(ft / 212.0)) ** 1.8)
-        assert psychoacoustics.two_tone_separation_frequency(
-            ft
-        ) == pytest.approx(expected)
+        assert psychoacoustics.two_tone_separation_frequency(ft) == pytest.approx(
+            expected
+        )
 
 
 def test_separation_frequency_grows_either_side_of_reference() -> None:
@@ -486,31 +472,19 @@ def test_separation_frequency_rejects_bad_frequency() -> None:
 
 def test_resolve_separately_true_when_far_apart() -> None:
     # 200/260 Hz, both < 1000 Hz, |Δf| = 60 Hz ≫ fD(200) ≈ 21 Hz → separate.
-    assert (
-        psychoacoustics.resolve_tones_separately(200.0, 260.0, 3.0, 2.0)
-        is True
-    )
+    assert psychoacoustics.resolve_tones_separately(200.0, 260.0, 3.0, 2.0) is True
 
 
 def test_resolve_separately_false_when_close() -> None:
     # Annex E tones 118.4/137.3 Hz: |Δf| = 18.9 Hz < fD(137.3) ≈ 24.1 Hz →
     # combined. This is consistent with the Annex E FG grouping.
-    assert (
-        psychoacoustics.resolve_tones_separately(118.4, 137.3, 4.0, 5.0)
-        is False
-    )
+    assert psychoacoustics.resolve_tones_separately(118.4, 137.3, 4.0, 5.0) is False
 
 
 def test_resolve_separately_false_at_or_above_1000hz() -> None:
     # The rule only applies when BOTH tones lie below 1000 Hz.
-    assert (
-        psychoacoustics.resolve_tones_separately(1200.0, 1400.0, 3.0, 2.0)
-        is False
-    )
-    assert (
-        psychoacoustics.resolve_tones_separately(900.0, 1100.0, 3.0, 2.0)
-        is False
-    )
+    assert psychoacoustics.resolve_tones_separately(1200.0, 1400.0, 3.0, 2.0) is False
+    assert psychoacoustics.resolve_tones_separately(900.0, 1100.0, 3.0, 2.0) is False
 
 
 def test_resolve_separately_uses_more_prominent_tone() -> None:
@@ -562,9 +536,7 @@ def _annex_e_result() -> psychoacoustics.ToneAudibilityResult:
     freqs = [t[0] for t in ref.ISO20065_ANNEX_E_TONES]
     ls = [t[1] for t in ref.ISO20065_ANNEX_E_TONES]
     lt = [t[2] for t in ref.ISO20065_ANNEX_E_TONES]
-    return psychoacoustics.assess_tones(
-        freqs, lt, ls, ref.ISO20065_LINE_SPACING
-    )
+    return psychoacoustics.assess_tones(freqs, lt, ls, ref.ISO20065_LINE_SPACING)
 
 
 def test_assess_tones_reproduces_annex_e_column() -> None:
@@ -617,7 +589,7 @@ def test_plot_levels_view_draws_tone_levels_over_frequency() -> None:
 
     result = _annex_e_result()
     ax = result.plot(view="levels")
-    assert ax.get_xscale() == "log"          # continuous frequency axis
+    assert ax.get_xscale() == "log"  # continuous frequency axis
     assert "level" in ax.get_ylabel().lower()
     labels = [t.get_text() for t in ax.get_legend().get_texts()]
     assert any("L_{p\\mathrm{t}}" in label for label in labels)
@@ -686,9 +658,7 @@ def test_table_e2_lg_and_av_columns() -> None:
         assert psychoacoustics.critical_band_level(
             ls, ft, ref.ISO20065_LINE_SPACING
         ) == pytest.approx(lg_p, abs=0.03)
-        assert psychoacoustics.masking_index(ft) == pytest.approx(
-            av_p, abs=0.01
-        )
+        assert psychoacoustics.masking_index(ft) == pytest.approx(av_p, abs=0.01)
 
 
 def test_table_e2_band_limits_are_line_snapped() -> None:
@@ -753,9 +723,7 @@ def test_uncertainty_constants_and_validation() -> None:
     with pytest.raises(ValueError, match="at least one line"):
         psychoacoustics.audibility_uncertainty([], [50.0], 137.3, 2.7)
     with pytest.raises(ValueError, match="finite"):
-        psychoacoustics.audibility_uncertainty(
-            [60.0, np.nan], [50.0], 137.3, 2.7
-        )
+        psychoacoustics.audibility_uncertainty([60.0, np.nan], [50.0], 137.3, 2.7)
     with pytest.raises(ValueError, match="share their length"):
         psychoacoustics.mean_audibility_uncertainty([9.18, 6.04], [3.21])
 
@@ -770,9 +738,7 @@ def test_table_e4_decisive_chain() -> None:
         assert psychoacoustics.critical_band_level(
             ls, ft, ref.ISO20065_LINE_SPACING
         ) == pytest.approx(lg_p, abs=0.03)
-        assert psychoacoustics.masking_index(ft) == pytest.approx(
-            av_p, abs=0.01
-        )
+        assert psychoacoustics.masking_index(ft) == pytest.approx(av_p, abs=0.01)
         assert psychoacoustics.tone_audibility(
             lt, ls, ft, ref.ISO20065_LINE_SPACING
         ) == pytest.approx(dl_p, abs=0.03)
@@ -886,9 +852,7 @@ def test_din_anhang_i_two_tone_rule_matches_5fg_row() -> None:
     combined LT = 55.95 dB at the more audible member (732.1 Hz)."""
     ft4, dl4, _ls4, _lt4 = ref.DIN45681_I10_K4
     ft5, dl5, ls5, _lt5 = ref.DIN45681_I10_K5
-    assert (
-        psychoacoustics.resolve_tones_separately(ft4, ft5, dl4, dl5) is False
-    )
+    assert psychoacoustics.resolve_tones_separately(ft4, ft5, dl4, dl5) is False
     ft, dl_p, ls_p, lt_fg, lg_p, av_p, _u = ref.DIN45681_I10_5FG
     assert ls_p == ls5
     df = ref.DIN45681_LINE_SPACING
@@ -896,9 +860,9 @@ def test_din_anhang_i_two_tone_rule_matches_5fg_row() -> None:
         lg_p, abs=0.02
     )
     assert psychoacoustics.masking_index(ft) == pytest.approx(av_p, abs=0.01)
-    assert psychoacoustics.tone_audibility(
-        lt_fg, ls_p, ft, df
-    ) == pytest.approx(dl_p, abs=0.03)
+    assert psychoacoustics.tone_audibility(lt_fg, ls_p, ft, df) == pytest.approx(
+        dl_p, abs=0.03
+    )
 
 
 def test_din_anhang_i11_rows_j45_j48_chain() -> None:
@@ -909,15 +873,13 @@ def test_din_anhang_i11_rows_j45_j48_chain() -> None:
         ref.DIN45681_I11_J45,
         ref.DIN45681_I11_J48,
     ):
-        assert psychoacoustics.critical_band_level(
-            ls_p, ft, df
-        ) == pytest.approx(lg_p, abs=0.02)
-        assert psychoacoustics.masking_index(ft) == pytest.approx(
-            av_p, abs=0.01
+        assert psychoacoustics.critical_band_level(ls_p, ft, df) == pytest.approx(
+            lg_p, abs=0.02
         )
-        assert psychoacoustics.tone_audibility(
-            lt_p, ls_p, ft, df
-        ) == pytest.approx(dl_p, abs=0.03)
+        assert psychoacoustics.masking_index(ft) == pytest.approx(av_p, abs=0.01)
+        assert psychoacoustics.tone_audibility(lt_p, ls_p, ft, df) == pytest.approx(
+            dl_p, abs=0.03
+        )
 
 
 def test_din_tabelle_i6_6fg_plain_sum_reproduces_printed_audibility() -> None:
@@ -931,9 +893,9 @@ def test_din_tabelle_i6_6fg_plain_sum_reproduces_printed_audibility() -> None:
         ref.DIN45681_I6_6FG_TONE_LEVELS, effective_bandwidth_factor=1.0
     )
     assert lt == pytest.approx(82.87, abs=0.01)
-    assert psychoacoustics.tone_audibility(
-        lt, ls_p, ft, ref.DIN45681_LINE_SPACING
-    ) == (pytest.approx(dl_p, abs=0.03))
+    assert psychoacoustics.tone_audibility(lt, ls_p, ft, ref.DIN45681_LINE_SPACING) == (
+        pytest.approx(dl_p, abs=0.03)
+    )
 
 
 def test_din_anhang_i3_mean_audibility_maps_to_kt_4() -> None:
@@ -941,9 +903,12 @@ def test_din_anhang_i3_mean_audibility_maps_to_kt_4() -> None:
     KT = 4 dB (DIN Abschnitt 6 Tabelle 1 == ISO 1996-2:2017 Table J.1)."""
     from phonometry import environment
 
-    assert environment.tonal_adjustment_from_mean_audibility(
-        ref.DIN45681_I3_MEAN_AUDIBILITY
-    ) == ref.DIN45681_I3_KT
+    assert (
+        environment.tonal_adjustment_from_mean_audibility(
+            ref.DIN45681_I3_MEAN_AUDIBILITY
+        )
+        == ref.DIN45681_I3_KT
+    )
 
 
 def test_din_tabelle_a1_critical_bandwidths() -> None:

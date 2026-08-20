@@ -252,9 +252,7 @@ def test_three_period_fiche_stays_one_page(tmp_path) -> None:
     for language in ("es", "en"):
         for verbose in (False, True):
             out = tmp_path / f"three_{language}_{verbose}.pdf"
-            result.report(
-                str(out), metadata=md, language=language, verbose=verbose
-            )
+            result.report(str(out), metadata=md, language=language, verbose=verbose)
             _assert_one_page(str(out))
 
 

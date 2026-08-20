@@ -180,9 +180,7 @@ def _phase_table(
                 Paragraph(_fmt(phase.kt, language, decimals=0), value_style),
                 Paragraph(_fmt(phase.kf, language, decimals=0), value_style),
                 Paragraph(_fmt(phase.ki, language, decimals=0), value_style),
-                Paragraph(
-                    f"<b>{_fmt(phase.lkeq, language)}</b>", value_style
-                ),
+                Paragraph(f"<b>{_fmt(phase.lkeq, language)}</b>", value_style),
             ]
             if verbose:
                 row.insert(
@@ -275,16 +273,17 @@ def _results_table(result: ActivityAssessment, language: str = "en") -> Any:
                     ),
                     value_style,
                 ),
-                Paragraph(
-                    _status_markup(period.complies, language), value_style
-                ),
+                Paragraph(_status_markup(period.complies, language), value_style),
             ]
         )
     return stacked_table(data, [w * mm for w in widths])
 
 
-def _statement(result: ActivityAssessment, language: str = "en") -> tuple[str, list[str]]:
+def _statement(
+    result: ActivityAssessment, language: str = "en"
+) -> tuple[str, list[str]]:
     """The boxed conclusion: the governing period and the overall verdict."""
+
     def _worst_margin(period: PeriodAssessment) -> float:
         """How far the period is over its worst-breached Article 25 criterion.
 
@@ -303,14 +302,12 @@ def _statement(result: ActivityAssessment, language: str = "en") -> tuple[str, l
     governing: PeriodAssessment = max(result.periods, key=_worst_margin)
     if result.complies:
         statement = t(
-            "The activity <b>meets</b> the immission limit values of "
-            "RD 1367/2007",
+            "The activity <b>meets</b> the immission limit values of RD 1367/2007",
             language,
         )
     else:
         statement = t(
-            "The activity <b>exceeds</b> the immission limit values of "
-            "RD 1367/2007",
+            "The activity <b>exceeds</b> the immission limit values of RD 1367/2007",
             language,
         )
     extended = [
@@ -325,9 +322,7 @@ def _statement(result: ActivityAssessment, language: str = "en") -> tuple[str, l
     if governing.reported_long_term is not None:
         extended.append(
             t("L<sub>K,x</sub> = {value} dB", language).format(
-                value=_fmt(
-                    float(governing.reported_long_term), language, decimals=0
-                )
+                value=_fmt(float(governing.reported_long_term), language, decimals=0)
             )
         )
     return statement, extended
@@ -343,9 +338,7 @@ def _verdict(result: ActivityAssessment, language: str = "en") -> tuple[str, boo
             language,
         )
     else:
-        names = ", ".join(
-            t(_PERIOD_LABELS[p.period], language) for p in failed
-        )
+        names = ", ".join(t(_PERIOD_LABELS[p.period], language) for p in failed)
         text = t(
             "the applicable limit values are exceeded in: {periods}", language
         ).format(periods=names)
@@ -389,9 +382,7 @@ def render_activity_report(
     styles, title_style, basis_style, caption_style = document_styles(accent)
     title = t("Activity noise assessment (RD 1367/2007)", language)
 
-    article = (
-        "Article 25.1 b" if result.new_activity else "Article 25.2"
-    )
+    article = "Article 25.1 b" if result.new_activity else "Article 25.2"
     basis = t(
         "Corrected equivalent continuous level L<sub>Keq,T</sub> = "
         "L<sub>Aeq,T</sub> + K<sub>t</sub> + K<sub>f</sub> + K<sub>i</sub> "
@@ -432,8 +423,11 @@ def render_activity_report(
     figure_height = 2.7 if rows <= 5 else max(1.7, 2.7 - 0.22 * (rows - 5))
     flow.append(
         render_figure_drawing(
-            _assessment_plot, 174 * mm, y_top=None,
-            figsize=(9.2, figure_height), language=language,
+            _assessment_plot,
+            174 * mm,
+            y_top=None,
+            figsize=(9.2, figure_height),
+            language=language,
         )
     )
     flow.append(Spacer(1, 5))

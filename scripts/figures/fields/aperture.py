@@ -21,9 +21,9 @@ from ._core import (
     _weak_field_gain,
 )
 
-_APERTURE_F = 686.0                      # lambda = 0.50 m exactly
-_APERTURE_WIDTHS = (0.025, 0.50)         # sub-lambda slit / lambda-sized gap
-_APERTURE_DEPTH = 0.10                   # wall thickness across the opening
+_APERTURE_F = 686.0  # lambda = 0.50 m exactly
+_APERTURE_WIDTHS = (0.025, 0.50)  # sub-lambda slit / lambda-sized gap
+_APERTURE_DEPTH = 0.10  # wall thickness across the opening
 # Mesh rule: dx = min(smallest scene dimension / 4, lambda/8 at the carrier)
 # = min(25 mm / 4 = 6.25 mm, 0.5 m / 8 = 62.5 mm) -> the narrow slit governs
 # (lambda/80, 4 cells across it).
@@ -61,7 +61,7 @@ def _aperture_fields(
     from phonometry import building
 
     dx = _APERTURE_DX
-    ny, nx = 800, 960                      # 5 m x 6 m
+    ny, nx = 800, 960  # 5 m x 6 m
     wall_c = (round(2.0 / dx), round((2.0 + _APERTURE_DEPTH) / dx))
     # Clip duration per the deepest-reflector rule: d(source -> far wall
     # face through the opening) = 2.1 m, plus d(slit exit -> farthest
@@ -80,17 +80,20 @@ def _aperture_fields(
     for width in _APERTURE_WIDTHS:
         gap = round(width / dx)
         mask = np.zeros((ny, nx), dtype=bool)
-        mask[:, wall_c[0]:wall_c[1]] = True
-        mask[(ny - gap) // 2:(ny + gap) // 2, wall_c[0]:wall_c[1]] = False
-        sim = fdtd2d.FDTD2D(343.0, dx, shape=(ny, nx), sponge_width=40,
-                            sponge_sides=("top", "bottom", "right"),
-                            obstacle_mask=mask,
-                            edge_impedance={"left": 1.2 * 343.0})
+        mask[:, wall_c[0] : wall_c[1]] = True
+        mask[(ny - gap) // 2 : (ny + gap) // 2, wall_c[0] : wall_c[1]] = False
+        sim = fdtd2d.FDTD2D(
+            343.0,
+            dx,
+            shape=(ny, nx),
+            sponge_width=40,
+            sponge_sides=("top", "bottom", "right"),
+            obstacle_mask=mask,
+            edge_impedance={"left": 1.2 * 343.0},
+        )
         tone = fdtd2d.CWSource(0, 0, frequency=_APERTURE_F)
-        sim.add_source(fdtd2d.PlaneWaveSource("right", tone.value,
-                                              offset=2))
-        ps, rs, times, _ = _fdtd_cw_capture(sim, _APERTURE_F, every,
-                                            n_frames)
+        sim.add_source(fdtd2d.PlaneWaveSource("right", tone.value, offset=2))
+        ps, rs, times, _ = _fdtd_cw_capture(sim, _APERTURE_F, every, n_frames)
         p_all.append(ps)
         r_all.append(rs)
     rms = np.stack(r_all)
@@ -99,8 +102,8 @@ def _aperture_fields(
         db = 20.0 * np.log10(rms / ref)
     db_all = np.clip(db, -40.0, 0.0).astype(np.float32)
     res = building.slit_transmission_coefficient(
-        np.array([_APERTURE_F]), _APERTURE_WIDTHS[0], _APERTURE_DEPTH,
-        field="normal")
+        np.array([_APERTURE_F]), _APERTURE_WIDTHS[0], _APERTURE_DEPTH, field="normal"
+    )
     tau = float(res.transmission_coefficient[0])
     return np.stack(p_all), db_all, times, tau
 
@@ -119,8 +122,7 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
     from matplotlib.patches import Rectangle
 
     T = _translate_str
-    outline = [patheffects.withStroke(linewidth=2.0,
-                                      foreground=FIELD_STROKE)]
+    outline = [patheffects.withStroke(linewidth=2.0, foreground=FIELD_STROKE)]
     p_all, db_all, times, tau = _aperture_fields()
     lam = 343.0 / _APERTURE_F
     half = p_all.shape[1] // 2
@@ -134,18 +136,24 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
     # panel because the wavelength-sized opening needs none, and the RMS row
     # below keeps the single shared scale that compares the two.
     past = round((wall_x[1] / 6.0) * p_all.shape[3])
-    gains = [_weak_field_gain(p_all[col][half::4, :, past:], vmax)
-             for col in range(2)]
+    gains = [_weak_field_gain(p_all[col][half::4, :, past:], vmax) for col in range(2)]
 
     fig = _anim_figure()
-    fig.suptitle(T("Sound through a wall aperture (2D FDTD)"),
-                 )
+    fig.suptitle(
+        T("Sound through a wall aperture (2D FDTD)"),
+    )
     gs = fig.add_gridspec(2, 2)
-    titles = [T(rf"Slit $w$ = {_APERTURE_WIDTHS[0] * 1e3:.0f} mm "
-                rf"($\lambda/20$)"),
-              T(rf"Opening $w$ = {_APERTURE_WIDTHS[1]:.2f} m (= $\lambda$)")]
-    verdicts = [T("cylindrical re-radiation from the slit"),
-                T("the front passes: sharp-edged shadow")]
+    titles = [
+        T(
+            rf"Slit $w$ = {_APERTURE_WIDTHS[0] * 1e3:.0f} mm "
+            rf"($\lambda/20$)"
+        ),
+        T(rf"Opening $w$ = {_APERTURE_WIDTHS[1]:.2f} m (= $\lambda$)"),
+    ]
+    verdicts = [
+        T("cylindrical re-radiation from the slit"),
+        T("the front passes: sharp-edged shadow"),
+    ]
     ims: list[Any] = []
     v_txts: list[Any] = []
     tau_txt: Any = None
@@ -153,20 +161,38 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
         gap = _APERTURE_WIDTHS[col]
         ax_p = fig.add_subplot(gs[0, col])
         ax_r = fig.add_subplot(gs[1, col])
-        im_p = ax_p.imshow(p_all[col][0], origin="lower",
-                           extent=(0.0, 6.0, 0.0, 5.0), cmap=CMAP_FIELD,
-                           vmin=-vmax, vmax=vmax, interpolation="bilinear")
-        im_r = ax_r.imshow(db_all[col][0], origin="lower",
-                           extent=(0.0, 6.0, 0.0, 5.0), cmap="magma",
-                           vmin=-40.0, vmax=0.0, interpolation="bilinear")
+        im_p = ax_p.imshow(
+            p_all[col][0],
+            origin="lower",
+            extent=(0.0, 6.0, 0.0, 5.0),
+            cmap=CMAP_FIELD,
+            vmin=-vmax,
+            vmax=vmax,
+            interpolation="bilinear",
+        )
+        im_r = ax_r.imshow(
+            db_all[col][0],
+            origin="lower",
+            extent=(0.0, 6.0, 0.0, 5.0),
+            cmap="magma",
+            vmin=-40.0,
+            vmax=0.0,
+            interpolation="bilinear",
+        )
         ax_p.set_title(titles[col], fontsize=10)
         for ax in (ax_p, ax_r):
             ax.grid(False)
             for y0, y1 in ((0.0, 2.5 - gap / 2.0), (2.5 + gap / 2.0, 5.0)):
-                ax.add_patch(Rectangle((wall_x[0], y0),
-                                       _APERTURE_DEPTH, y1 - y0,
-                                       facecolor="#707070",
-                                       edgecolor="white", lw=0.5))
+                ax.add_patch(
+                    Rectangle(
+                        (wall_x[0], y0),
+                        _APERTURE_DEPTH,
+                        y1 - y0,
+                        facecolor="#707070",
+                        edgecolor="white",
+                        lw=0.5,
+                    )
+                )
             # Crop the sponge layers (and the injection seam) out of view,
             # so the frame edge is physical field.
             ax.set_xlim(0.08, 5.72)
@@ -177,56 +203,127 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
         # The arrow and its caption ride 0.1 m lower than the free field
         # would need them to: the gain note is the other tenant of this
         # strip, and its halo was rubbing out the caption's ascenders.
-        ax_p.annotate("", xy=(1.15, 3.65), xytext=(0.55, 3.65),
-                      arrowprops={"arrowstyle": "-|>", "color": FIELD_INK,
-                                  "lw": 1.2})
-        ax_p.text(0.85, 3.75, T("incident plane wavefront"), ha="left",
-                  va="bottom", color=FIELD_INK, fontsize=7.5,
-                  path_effects=outline)
-        ax_p.text(2.24, 1.45, T("rigid wall"), ha="left", va="center",
-                  color=FIELD_INK, fontsize=7, path_effects=outline)
-        if (note := _gain_note("past the wall", gains[col])):
+        ax_p.annotate(
+            "",
+            xy=(1.15, 3.65),
+            xytext=(0.55, 3.65),
+            arrowprops={"arrowstyle": "-|>", "color": FIELD_INK, "lw": 1.2},
+        )
+        ax_p.text(
+            0.85,
+            3.75,
+            T("incident plane wavefront"),
+            ha="left",
+            va="bottom",
+            color=FIELD_INK,
+            fontsize=7.5,
+            path_effects=outline,
+        )
+        ax_p.text(
+            2.24,
+            1.45,
+            T("rigid wall"),
+            ha="left",
+            va="center",
+            color=FIELD_INK,
+            fontsize=7,
+            path_effects=outline,
+        )
+        if note := _gain_note("past the wall", gains[col]):
             # The note keeps the band right under the incident-wavefront
             # label; the air over its ascenders (which used to break the top
             # spine into pieces from 3 px away) comes from the framing.
-            ax_p.text(5.62, 4.28, T(note), ha="right", va="top",
-                      color=FIELD_INK, fontsize=6.5, path_effects=outline)
-        v_txts.append(ax_r.text(
-            3.85, 0.85, verdicts[col], ha="center", va="bottom",
-            color="white", fontsize=7.5, zorder=6,
-            bbox={"boxstyle": _ANIM_PILL_BOX,
-                  "facecolor": "black", "alpha": 0.45,
-                  "edgecolor": "none"}))
+            ax_p.text(
+                5.62,
+                4.28,
+                T(note),
+                ha="right",
+                va="top",
+                color=FIELD_INK,
+                fontsize=6.5,
+                path_effects=outline,
+            )
+        v_txts.append(
+            ax_r.text(
+                3.85,
+                0.85,
+                verdicts[col],
+                ha="center",
+                va="bottom",
+                color="white",
+                fontsize=7.5,
+                zorder=6,
+                bbox={
+                    "boxstyle": _ANIM_PILL_BOX,
+                    "facecolor": "black",
+                    "alpha": 0.45,
+                    "edgecolor": "none",
+                },
+            )
+        )
         if col == 0:
             ax_p.set_ylabel(T("instantaneous $p(x, y)$"), fontsize=9)
             ax_r.set_ylabel(T("RMS level [dB]"), fontsize=9)
-            ax_p.text(0.2, 0.85,
-                      T(rf"$f$ = {_APERTURE_F:.0f} Hz "
-                        rf"($\lambda$ = {lam:.2f} m)"),
-                      ha="left", va="bottom", color=FIELD_INK, fontsize=7.5,
-                      path_effects=outline)
-            tau_txt = ax_r.text(5.55, _APERTURE_YTOP - 0.2, "", ha="right",
-                                va="top",
-                                fontsize=8.5, color="white", zorder=7,
-                                bbox={"boxstyle": _ANIM_PILL_BOX,
-                                      "facecolor": "black", "alpha": 0.55,
-                                      "edgecolor": "none"})
+            ax_p.text(
+                0.2,
+                0.85,
+                T(
+                    rf"$f$ = {_APERTURE_F:.0f} Hz "
+                    rf"($\lambda$ = {lam:.2f} m)"
+                ),
+                ha="left",
+                va="bottom",
+                color=FIELD_INK,
+                fontsize=7.5,
+                path_effects=outline,
+            )
+            tau_txt = ax_r.text(
+                5.55,
+                _APERTURE_YTOP - 0.2,
+                "",
+                ha="right",
+                va="top",
+                fontsize=8.5,
+                color="white",
+                zorder=7,
+                bbox={
+                    "boxstyle": _ANIM_PILL_BOX,
+                    "facecolor": "black",
+                    "alpha": 0.55,
+                    "edgecolor": "none",
+                },
+            )
         else:
             ax_p.tick_params(labelleft=False)
             ax_r.tick_params(labelleft=False)
-            ax_r.text(5.55, _APERTURE_YTOP - 0.2, T("same color scale"),
-                      color="white", fontsize=7, ha="right", va="top")
+            ax_r.text(
+                5.55,
+                _APERTURE_YTOP - 0.2,
+                T("same color scale"),
+                color="white",
+                fontsize=7,
+                ha="right",
+                va="top",
+            )
         ims += [im_p, im_r]
-    t_txt = fig.text(0.012, 0.985, "", ha="left", va="top",
-                     family="monospace", fontsize=10, color=COLOR_FG)
+    t_txt = fig.text(
+        0.012,
+        0.985,
+        "",
+        ha="left",
+        va="top",
+        family="monospace",
+        fontsize=10,
+        color=COLOR_FG,
+    )
+
     # The verdict pills are centred on the aperture, near the right of each
     # RMS panel: in Spanish they carry their last letters -- and the whole
     # translucent pill, which then composes against the white page instead
     # of the field -- past the spine. Measure and slide them back in.
     def fit_verdicts() -> None:
         for v_txt in v_txts:
-            _fit_text_x(fig, v_txt.axes, v_txt, *v_txt.axes.get_xlim(),
-                        margin=0.12)
+            _fit_text_x(fig, v_txt.axes, v_txt, *v_txt.axes.get_xlim(), margin=0.12)
 
     reveal = int(0.5 * p_all.shape[1])
 
@@ -249,10 +346,18 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
             ims[2 * col].set_data(shadow_gained(col, k))
             ims[2 * col + 1].set_data(db_all[col][k])
         tau_txt.set_text(
-            T(rf"slit $\tau$ = {tau:.2f} (Gomperts)") if k >= reveal else "")
+            T(rf"slit $\tau$ = {tau:.2f} (Gomperts)") if k >= reveal else ""
+        )
         t_txt.set_text(T(f"$t$ = {times[k] * 1e3:4.1f} ms"))
         return (*ims, tau_txt, t_txt)
 
-    _render_clip(fig, update, output_dir, "anim_fdtd_aperture_slit",
-                 frames=int(p_all.shape[1]), fps=_APERTURE_FPS, gif_fps=8,
-                 measure=fit_verdicts)
+    _render_clip(
+        fig,
+        update,
+        output_dir,
+        "anim_fdtd_aperture_slit",
+        frames=int(p_all.shape[1]),
+        fps=_APERTURE_FPS,
+        gif_fps=8,
+        measure=fit_verdicts,
+    )

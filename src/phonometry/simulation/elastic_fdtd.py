@@ -215,8 +215,7 @@ class Material:
             raise ValueError("c_s must be non-negative (0 marks a fluid)")
         rho = _positive_finite("rho", self.rho)
         if c_p**2 < 2.0 * c_s**2 * (1.0 - 1e-9):
-            raise ValueError("c_p**2 must be at least 2 * c_s**2 "
-                             "(non-negative lambda)")
+            raise ValueError("c_p**2 must be at least 2 * c_s**2 (non-negative lambda)")
         object.__setattr__(self, "c_p", c_p)
         object.__setattr__(self, "c_s", c_s)
         object.__setattr__(self, "rho", rho)
@@ -247,12 +246,10 @@ def _as_material(name: str, value: object) -> Material:
     """Coerce a :class:`Material` or a ``(c_p, c_s, rho)`` triple."""
     if isinstance(value, Material):
         return value
-    if isinstance(value, Sequence) and not isinstance(value, str) \
-            and len(value) == 3:
+    if isinstance(value, Sequence) and not isinstance(value, str) and len(value) == 3:
         c_p, c_s, rho = (float(np.real(v)) for v in value)
         return Material(c_p=c_p, c_s=c_s, rho=rho)
-    raise ValueError(f"{name} must be a Material or a (c_p, c_s, rho) "
-                     "triple")
+    raise ValueError(f"{name} must be a Material or a (c_p, c_s, rho) triple")
 
 
 def scholte_speed(
@@ -304,9 +301,11 @@ def scholte_speed(
     def characteristic(s: float) -> float:
         # B&G Eq. 4.4.20 rearranged to LHS - RHS; real and single-signed
         # branches over 0 < s < min(1, 1/r), where v < min(c, c_S).
-        return float(4.0 * np.sqrt(1.0 - s) * np.sqrt(1.0 - q * s)
-                     - (2.0 - s) ** 2
-                     - (s**2 / m) * np.sqrt((1.0 - s * q) / (1.0 - s * r)))
+        return float(
+            4.0 * np.sqrt(1.0 - s) * np.sqrt(1.0 - q * s)
+            - (2.0 - s) ** 2
+            - (s**2 / m) * np.sqrt((1.0 - s * q) / (1.0 - s * r))
+        )
 
     # The function is positive as s -> 0+ (expansion 2 s (1 - q) + O(s^2))
     # and diverges to -inf at the upper end, so a sign sweep brackets every
@@ -316,16 +315,16 @@ def scholte_speed(
     values = np.array([characteristic(s) for s in grid])
     signs = np.sign(values)
     crossings = np.nonzero(np.diff(signs) != 0)[0]
-    if crossings.size == 0:     # pragma: no cover - a root always exists
+    if crossings.size == 0:  # pragma: no cover - a root always exists
         raise ValueError("no Scholte root found; check the material pair")
     k = int(crossings[-1])
-    root = float(brentq(characteristic, grid[k], grid[k + 1], xtol=1e-15,
-                        rtol=8.9e-16))
+    root = float(brentq(characteristic, grid[k], grid[k + 1], xtol=1e-15, rtol=8.9e-16))
     return sol.c_s * float(np.sqrt(root))
 
 
-def _resolve_speed_map(name: str, value: float | Field2D,
-                       shape: tuple[int, int] | None) -> Field2D:
+def _resolve_speed_map(
+    name: str, value: float | Field2D, shape: tuple[int, int] | None
+) -> Field2D:
     """Broadcast/validate a wave-speed spec into a finite 2D map."""
     if np.isscalar(value):
         if shape is None:
@@ -440,24 +439,31 @@ class ElasticFDTD2D:
         if cs_map.shape != (ny, nx):
             raise ValueError("c_s map must match the shape of c_p")
         if not np.all(np.isfinite(cs_map)) or bool(np.any(cs_map < 0.0)):
-            raise ValueError("c_s must be non-negative and finite "
-                             "everywhere")
+            raise ValueError("c_s must be non-negative and finite everywhere")
         # lambda >= 0 <=> c_p**2 >= 2 c_s**2 (a small relative tolerance
         # admits c_s = c_p / sqrt(2) given in rounded floats).
         if bool(np.any(cp_map**2 < 2.0 * cs_map**2 * (1.0 - 1e-9))):
-            raise ValueError("c_p**2 must be at least 2 * c_s**2 in every "
-                             "cell (non-negative lambda); c_s = 0 marks a "
-                             "fluid cell")
+            raise ValueError(
+                "c_p**2 must be at least 2 * c_s**2 in every "
+                "cell (non-negative lambda); c_s = 0 marks a "
+                "fluid cell"
+            )
         if not np.isfinite(cfl) or not 0.0 < cfl < 1.0:
-            raise ValueError("cfl must lie in (0, 1): the leapfrog scheme "
-                             "is unstable beyond the Courant bound CN = 1")
-        rho_map = (np.full((ny, nx), float(np.real(rho)), dtype=np.float64)
-                   if np.isscalar(rho) else np.asarray(rho, dtype=np.float64))
+            raise ValueError(
+                "cfl must lie in (0, 1): the leapfrog scheme "
+                "is unstable beyond the Courant bound CN = 1"
+            )
+        rho_map = (
+            np.full((ny, nx), float(np.real(rho)), dtype=np.float64)
+            if np.isscalar(rho)
+            else np.asarray(rho, dtype=np.float64)
+        )
         if rho_map.shape != (ny, nx):
             raise ValueError("rho map must match the shape of c_p")
         _positive_map("rho", rho_map)
         sponge_width, damping_map = _validate_sponge_damping(
-            sponge_width, sponge_reflection, damping, ny, nx)
+            sponge_width, sponge_reflection, damping, ny, nx
+        )
 
         self.dx = _positive_finite("dx", dx)
         self.c_p = cp_map
@@ -468,8 +474,7 @@ class ElasticFDTD2D:
         #: Shear modulus ``mu = rho c_s**2`` at cell centres.
         self.mu: Field2D = rho_map * cs_map**2
         #: First Lame parameter ``lambda = rho (c_p**2 - 2 c_s**2)``.
-        self.lam: Field2D = np.maximum(
-            rho_map * (cp_map**2 - 2.0 * cs_map**2), 0.0)
+        self.lam: Field2D = np.maximum(rho_map * (cp_map**2 - 2.0 * cs_map**2), 0.0)
         self._mu2 = 2.0 * self.mu
         # Plane-strain surface modulus E' = 4 mu (lambda + mu) /
         # (lambda + 2 mu): on a free surface the zero normal stress ties
@@ -479,7 +484,8 @@ class ElasticFDTD2D:
             4.0 * self.mu * (self.lam + self.mu),
             self.lam + self._mu2,
             out=np.zeros_like(self.mu),
-            where=(self.lam + self._mu2) > 0.0)
+            where=(self.lam + self._mu2) > 0.0,
+        )
         # Density averaged onto the faces where each velocity lives
         # (arithmetic mean, Moczo et al. Eq. 7.39).
         self._rho_x = 0.5 * (rho_map[:, 1:] + rho_map[:, :-1])
@@ -497,23 +503,21 @@ class ElasticFDTD2D:
         self._dty: Field2D = np.zeros((ny, nx - 1), dtype=np.float64)
         self._dtx: Field2D = np.zeros((ny - 1, nx), dtype=np.float64)
         self._sources: list[ElasticSource] = []
-        self.n = 0                                # completed steps
+        self.n = 0  # completed steps
 
         sides = _resolve_sponge_sides(sponge_sides)
         #: Sponge-layer width in cells (read-only configuration record).
         self.sponge_width = int(sponge_width)
         #: Sides carrying a sponge layer when ``sponge_width > 0``.
-        self.sponge_sides: tuple[str, ...] = (
-            sides if sponge_width > 0 else ()
-        )
+        self.sponge_sides: tuple[str, ...] = sides if sponge_width > 0 else ()
         #: Sides carrying a traction-free surface (immutable record).
         self.free_sides: tuple[str, ...] = _resolve_free_sides(free_sides)
         overlap = set(self.free_sides) & set(self.sponge_sides)
         if overlap:
-            raise ValueError(f"sides {sorted(overlap)} cannot be both free "
-                             "and absorbing")
-        self._init_decay(sides, sponge_width, sponge_reflection, damping_map,
-                         c_max)
+            raise ValueError(
+                f"sides {sorted(overlap)} cannot be both free and absorbing"
+            )
+        self._init_decay(sides, sponge_width, sponge_reflection, damping_map, c_max)
         self._init_obstacle(obstacle_mask, ny, nx)
 
     @classmethod
@@ -523,9 +527,7 @@ class ElasticFDTD2D:
         dx: float,
         *,
         background: Material | tuple[float, float, float],
-        regions: Iterable[
-            tuple[Any, Material | tuple[float, float, float]]
-        ] = (),
+        regions: Iterable[tuple[Any, Material | tuple[float, float, float]]] = (),
         **kwargs: Any,
     ) -> ElasticFDTD2D:
         """Build the engine from named materials painted over a background.
@@ -571,10 +573,11 @@ class ElasticFDTD2D:
             mat = _as_material(f"regions[{k}]", material)
             index = where
             if isinstance(index, np.ndarray) and (
-                    index.dtype != np.bool_ or index.shape != (ny, nx)):
+                index.dtype != np.bool_ or index.shape != (ny, nx)
+            ):
                 raise ValueError(
-                    f"regions[{k}] mask must be a boolean array of "
-                    f"shape {(ny, nx)}")
+                    f"regions[{k}] mask must be a boolean array of shape {(ny, nx)}"
+                )
             c_p[index] = mat.c_p
             c_s[index] = mat.c_s
             rho[index] = mat.rho
@@ -594,32 +597,49 @@ class ElasticFDTD2D:
         all_solid = np.logical_and.reduce([q > 0.0 for q in quads])
         inv_sum = np.zeros_like(quads[0])
         for q in quads:
-            inv_sum += np.divide(1.0, q, out=np.zeros_like(q),
-                                 where=q > 0.0)
-        return np.where(all_solid, 4.0 / np.where(inv_sum > 0.0, inv_sum,
-                                                  1.0), 0.0)
+            inv_sum += np.divide(1.0, q, out=np.zeros_like(q), where=q > 0.0)
+        return np.where(all_solid, 4.0 / np.where(inv_sum > 0.0, inv_sum, 1.0), 0.0)
 
-    def _init_decay(self, sides: tuple[str, ...], sponge_width: int,
-                    sponge_reflection: float,
-                    damping: NDArray[np.float64],
-                    c_max: float) -> None:
+    def _init_decay(
+        self,
+        sides: tuple[str, ...],
+        sponge_width: int,
+        sponge_reflection: float,
+        damping: NDArray[np.float64],
+        c_max: float,
+    ) -> None:
         """Precompute the sponge/damping decay factors of every field."""
-        sigma = _sigma_map(self.txx.shape, sides, sponge_width,
-                           sponge_reflection, damping, c_max, self.dx)
+        sigma = _sigma_map(
+            self.txx.shape,
+            sides,
+            sponge_width,
+            sponge_reflection,
+            damping,
+            c_max,
+            self.dx,
+        )
         self._decay_c: Field2D = np.exp(-sigma * self.dt)
         self._decay_vx: Field2D = np.exp(
-            -(0.5 * (sigma[:, 1:] + sigma[:, :-1])) * self.dt)
+            -(0.5 * (sigma[:, 1:] + sigma[:, :-1])) * self.dt
+        )
         self._decay_vy: Field2D = np.exp(
-            -(0.5 * (sigma[1:, :] + sigma[:-1, :])) * self.dt)
+            -(0.5 * (sigma[1:, :] + sigma[:-1, :])) * self.dt
+        )
         self._decay_xy: Field2D = np.exp(
-            -(0.25 * (sigma[1:, 1:] + sigma[1:, :-1]
-                      + sigma[:-1, 1:] + sigma[:-1, :-1])) * self.dt)
+            -(
+                0.25
+                * (sigma[1:, 1:] + sigma[1:, :-1] + sigma[:-1, 1:] + sigma[:-1, :-1])
+            )
+            * self.dt
+        )
 
-    def _init_obstacle(self, obstacle_mask: NDArray[np.bool_] | None,
-                       ny: int, nx: int) -> None:
+    def _init_obstacle(
+        self, obstacle_mask: NDArray[np.bool_] | None, ny: int, nx: int
+    ) -> None:
         """Validate the obstacle mask into closed-face velocity factors."""
         self._obstacle: NDArray[np.bool_] | None = _validated_obstacle(
-            obstacle_mask, ny, nx)
+            obstacle_mask, ny, nx
+        )
         self._vx_open: Field2D | None = None
         self._vy_open: Field2D | None = None
         self._txy_open: Field2D | None = None
@@ -629,13 +649,11 @@ class ElasticFDTD2D:
             # (rigid obstacle boundary: zero normal velocity), and a corner
             # shear stress survives only when all four cells are open
             # (shear-free rigid inclusion, matching the domain edges).
-            self._vx_open = (
-                ~(mask[:, 1:] | mask[:, :-1])).astype(np.float64)
-            self._vy_open = (
-                ~(mask[1:, :] | mask[:-1, :])).astype(np.float64)
+            self._vx_open = (~(mask[:, 1:] | mask[:, :-1])).astype(np.float64)
+            self._vy_open = (~(mask[1:, :] | mask[:-1, :])).astype(np.float64)
             self._txy_open = (
-                ~(mask[1:, 1:] | mask[1:, :-1]
-                  | mask[:-1, 1:] | mask[:-1, :-1])).astype(np.float64)
+                ~(mask[1:, 1:] | mask[1:, :-1] | mask[:-1, 1:] | mask[:-1, :-1])
+            ).astype(np.float64)
 
     @property
     def time(self) -> float:
@@ -675,12 +693,10 @@ class ElasticFDTD2D:
         if self._obstacle is not None and self._obstacle[iy, ix]:
             raise ValueError("source position lies inside an obstacle")
 
-    def _validate_force_position(self, source: ForceSource, ix: int,
-                                 iy: int) -> None:
+    def _validate_force_position(self, source: ForceSource, ix: int, iy: int) -> None:
         """Check a force velocity node against the grid and the obstacle."""
         ny, nx = self.txx.shape
-        open_map = (self._vx_open if source.direction == "x"
-                    else self._vy_open)
+        open_map = self._vx_open if source.direction == "x" else self._vy_open
         limit = (ny, nx - 1) if source.direction == "x" else (ny - 1, nx)
         if not (0 <= ix < limit[1] and 0 <= iy < limit[0]):
             raise ValueError("source position lies outside the grid")
@@ -697,10 +713,12 @@ class ElasticFDTD2D:
         # Velocity half-step from the stress gradients; the one-sided txy
         # differences fold in the shear-free rigid edges and the imaged
         # free surfaces.
-        self.vx += dt_dx / self._rho_x * ((txx[:, 1:] - txx[:, :-1])
-                                          + self._shear_dty())
-        self.vy += dt_dx / self._rho_y * ((tyy[1:, :] - tyy[:-1, :])
-                                          + self._shear_dtx())
+        self.vx += (
+            dt_dx / self._rho_x * ((txx[:, 1:] - txx[:, :-1]) + self._shear_dty())
+        )
+        self.vy += (
+            dt_dx / self._rho_y * ((tyy[1:, :] - tyy[:-1, :]) + self._shear_dtx())
+        )
         if self._vx_open is not None and self._vy_open is not None:
             self.vx *= self._vx_open
             self.vy *= self._vy_open
@@ -720,9 +738,11 @@ class ElasticFDTD2D:
         txx_surf, tyy_surf = self._stash_surface_stress(dt_dx, dvx, dvy)
         self.txx += self.lam * dt_dx * div + self._mu2 * dt_dx * dvx
         self.tyy += self.lam * dt_dx * div + self._mu2 * dt_dx * dvy
-        self.txy += self._mu_c * dt_dx * (
-            (self.vx[1:, :] - self.vx[:-1, :])
-            + (self.vy[:, 1:] - self.vy[:, :-1]))
+        self.txy += (
+            self._mu_c
+            * dt_dx
+            * ((self.vx[1:, :] - self.vx[:-1, :]) + (self.vy[:, 1:] - self.vy[:, :-1]))
+        )
         if self._txy_open is not None:
             self.txy *= self._txy_open
         # Pin the free surfaces before the sources, so a stress source on
@@ -787,8 +807,9 @@ class ElasticFDTD2D:
         dvy[-1, :] = -self.vy[-1, :]
         return div, dvx, dvy
 
-    def _surface_lines(self) -> tuple[tuple[tuple[bool, int], ...],
-                                      tuple[tuple[bool, int], ...]]:
+    def _surface_lines(
+        self,
+    ) -> tuple[tuple[tuple[bool, int], ...], tuple[tuple[bool, int], ...]]:
         """Free-surface (active, index) pairs for the rows and columns."""
         free = self.free_sides
         rows = (("top" in free, 0), ("bottom" in free, -1))
@@ -796,7 +817,10 @@ class ElasticFDTD2D:
         return rows, cols
 
     def _stash_surface_stress(
-        self, dt_dx: float, dvx: Field2D, dvy: Field2D,
+        self,
+        dt_dx: float,
+        dvx: Field2D,
+        dvy: Field2D,
     ) -> tuple[list[Field2D], list[Field2D]]:
         """E'-updated in-plane stress of each free surface, pre-bulk-update.
 
@@ -807,14 +831,21 @@ class ElasticFDTD2D:
         edge).
         """
         surf_rows, surf_cols = self._surface_lines()
-        txx_surf = [self.txx[k, :] + self._e_surf[k, :] * dt_dx * dvx[k, :]
-                    for on, k in surf_rows if on]
-        tyy_surf = [self.tyy[:, k] + self._e_surf[:, k] * dt_dx * dvy[:, k]
-                    for on, k in surf_cols if on]
+        txx_surf = [
+            self.txx[k, :] + self._e_surf[k, :] * dt_dx * dvx[k, :]
+            for on, k in surf_rows
+            if on
+        ]
+        tyy_surf = [
+            self.tyy[:, k] + self._e_surf[:, k] * dt_dx * dvy[:, k]
+            for on, k in surf_cols
+            if on
+        ]
         return txx_surf, tyy_surf
 
-    def _apply_free_surfaces(self, txx_surf: list[Field2D],
-                             tyy_surf: list[Field2D]) -> None:
+    def _apply_free_surfaces(
+        self, txx_surf: list[Field2D], tyy_surf: list[Field2D]
+    ) -> None:
         """Pin the surface normal stress to zero and restore the E' update.
 
         Where two orthogonal free sides meet, the corner cell lies on both
@@ -844,10 +875,12 @@ class ElasticFDTD2D:
         f = src.amplitude * src.waveform(t)
         if src.direction == "x":
             self.vx[src.iy, src.ix] += (
-                self.dt * f / (self._rho_x[src.iy, src.ix] * self.dx**2))
+                self.dt * f / (self._rho_x[src.iy, src.ix] * self.dx**2)
+            )
         else:
             self.vy[src.iy, src.ix] += (
-                self.dt * f / (self._rho_y[src.iy, src.ix] * self.dx**2))
+                self.dt * f / (self._rho_y[src.iy, src.ix] * self.dx**2)
+            )
 
     def energy(self) -> float:
         r"""Total elastic field energy [J per metre of depth].
@@ -858,22 +891,29 @@ class ElasticFDTD2D:
         to the acoustic :math:`p^2 / (2 \lambda)` and shear-free corners
         contribute nothing.
         """
-        e_v = 0.5 * (float(np.sum(self._rho_x * self.vx**2))
-                     + float(np.sum(self._rho_y * self.vy**2)))
+        e_v = 0.5 * (
+            float(np.sum(self._rho_x * self.vx**2))
+            + float(np.sum(self._rho_y * self.vy**2))
+        )
         lam, mu = self.lam, self.mu
         solid = mu > 0.0
         den = np.where(solid, 8.0 * mu * (lam + mu), 1.0)
-        e_solid = ((lam + 2.0 * mu) * (self.txx**2 + self.tyy**2)
-                   - 2.0 * lam * self.txx * self.tyy) / den
+        e_solid = (
+            (lam + 2.0 * mu) * (self.txx**2 + self.tyy**2)
+            - 2.0 * lam * self.txx * self.tyy
+        ) / den
         # Fluid cells always have lam = rho c_p**2 > 0; guard the division
         # anyway so a lambda = 0 solid does not raise a spurious warning.
-        e_fluid = np.divide(self.p**2, 2.0 * lam,
-                            out=np.zeros_like(lam), where=~solid)
+        e_fluid = np.divide(self.p**2, 2.0 * lam, out=np.zeros_like(lam), where=~solid)
         e_n = float(np.sum(np.where(solid, e_solid, e_fluid)))
         mu_c = self._mu_c
-        e_s = float(np.sum(np.where(
-            mu_c > 0.0, self.txy**2 / np.where(mu_c > 0.0, 2.0 * mu_c, 1.0),
-            0.0)))
+        e_s = float(
+            np.sum(
+                np.where(
+                    mu_c > 0.0, self.txy**2 / np.where(mu_c > 0.0, 2.0 * mu_c, 1.0), 0.0
+                )
+            )
+        )
         return (e_v + e_n + e_s) * self.dx**2
 
     def collocated(self, field: str) -> Field2D:
@@ -966,8 +1006,15 @@ class ElasticFDTDResult:
         ny, nx = self.shape
         return nx * self.dx, ny * self.dx
 
-    def plot(self, ax: Axes | None = None, *, kind: str = "probes",
-             frame: int = -1, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self,
+        ax: Axes | None = None,
+        *,
+        kind: str = "probes",
+        frame: int = -1,
+        language: str = "en",
+        **kwargs: Any,
+    ) -> Axes:
         """Plot the probe histories or one recorded field snapshot.
 
         :param ax: Existing axes, or ``None`` to create a figure.
@@ -986,13 +1033,13 @@ class ElasticFDTDResult:
         if kind == "probes":
             from .._plot.simulation import plot_elastic_probes
 
-            return plot_elastic_probes(self, ax=ax, language=language,
-                                       **kwargs)
+            return plot_elastic_probes(self, ax=ax, language=language, **kwargs)
         if kind == "snapshot":
             from .._plot.simulation import plot_elastic_snapshot
 
-            return plot_elastic_snapshot(self, ax=ax, frame=frame,
-                                         language=language, **kwargs)
+            return plot_elastic_snapshot(
+                self, ax=ax, frame=frame, language=language, **kwargs
+            )
         raise ValueError("kind must be 'probes' or 'snapshot'")
 
 
@@ -1058,7 +1105,8 @@ def _parse_elastic_boundaries(
         if value not in _BOUNDARY_NAMES:
             raise ValueError(
                 f"boundary for side {side!r} must be one of "
-                f"{_BOUNDARY_NAMES}, got {value!r}")
+                f"{_BOUNDARY_NAMES}, got {value!r}"
+            )
         if value == "absorbing":
             absorbing.append(side)
         elif value == "free":
@@ -1079,22 +1127,20 @@ def _resolve_probe_fields(probe_fields: Sequence[str]) -> tuple[str, ...]:
     return fields
 
 
-def _sample_probes(sim: ElasticFDTD2D, field: str,
-                   rows: NDArray[np.int_],
-                   cols: NDArray[np.int_]) -> NDArray[np.float64]:
+def _sample_probes(
+    sim: ElasticFDTD2D, field: str, rows: NDArray[np.int_], cols: NDArray[np.int_]
+) -> NDArray[np.float64]:
     """Sample one field at the probe cell centres (velocities averaged)."""
     if field == "p":
         return -0.5 * (sim.txx[rows, cols] + sim.tyy[rows, cols])
     if field == "vx":
         nx = sim.txx.shape[1]
         left = np.where(cols > 0, sim.vx[rows, np.maximum(cols - 1, 0)], 0.0)
-        right = np.where(cols < nx - 1,
-                         sim.vx[rows, np.minimum(cols, nx - 2)], 0.0)
+        right = np.where(cols < nx - 1, sim.vx[rows, np.minimum(cols, nx - 2)], 0.0)
         return np.asarray(0.5 * (left + right), dtype=np.float64)
     ny = sim.txx.shape[0]
     above = np.where(rows > 0, sim.vy[np.maximum(rows - 1, 0), cols], 0.0)
-    below = np.where(rows < ny - 1,
-                     sim.vy[np.minimum(rows, ny - 2), cols], 0.0)
+    below = np.where(rows < ny - 1, sim.vy[np.minimum(rows, ny - 2), cols], 0.0)
     return np.asarray(0.5 * (above + below), dtype=np.float64)
 
 
@@ -1107,8 +1153,9 @@ def _record_elastic_run(
     snapshot_field: str,
 ) -> tuple[NDArray[np.float64], list[Field2D], list[int]]:
     """Step the engine, recording probe histories and field snapshots."""
-    signals = np.zeros((probe_ix.shape[0], len(probe_fields), steps + 1),
-                       dtype=np.float64)
+    signals = np.zeros(
+        (probe_ix.shape[0], len(probe_fields), steps + 1), dtype=np.float64
+    )
     frames: list[Field2D] = []
     frame_steps: list[int] = []
     if snapshot_every is not None:
@@ -1143,7 +1190,8 @@ def _validated_snapshot_options(
 
 
 def _validated_absorbing_layer(
-    boundaries: ElasticBoundaries, absorbing_sides: tuple[str, ...],
+    boundaries: ElasticBoundaries,
+    absorbing_sides: tuple[str, ...],
 ) -> int:
     """Validate the absorbing-layer thickness; 0 when no side absorbs."""
     if not absorbing_sides:
@@ -1221,15 +1269,16 @@ def elastic_fdtd_simulation(
     fields = _resolve_probe_fields(recording.probe_fields)
     snapshot_every, snapshot_field = _validated_snapshot_options(recording)
     absorbing_sides, free_sides = _parse_elastic_boundaries(boundaries.sides)
-    absorbing_layer_cells = _validated_absorbing_layer(
-        boundaries, absorbing_sides)
+    absorbing_layer_cells = _validated_absorbing_layer(boundaries, absorbing_sides)
 
     sim = ElasticFDTD2D(
-        c_p, c_s, dx,
+        c_p,
+        c_s,
+        dx,
         rho=rho,
         cfl=cfl,
         sponge_width=absorbing_layer_cells,
-        sponge_sides=absorbing_sides if absorbing_sides else None,
+        sponge_sides=absorbing_sides or None,
         damping=damping,
         shape=shape,
         free_sides=free_sides,
@@ -1243,11 +1292,13 @@ def elastic_fdtd_simulation(
 
     steps = round(duration / sim.dt)
     if steps < 1:
-        raise ValueError("duration must cover at least one time step "
-                         f"(dt = {sim.dt:.3e} s)")
+        raise ValueError(
+            f"duration must cover at least one time step (dt = {sim.dt:.3e} s)"
+        )
     times = np.arange(steps + 1, dtype=np.float64) * sim.dt
     signals, frames, frame_steps = _record_elastic_run(
-        sim, steps, probe_ix, fields, snapshot_every, snapshot_field)
+        sim, steps, probe_ix, fields, snapshot_every, snapshot_field
+    )
 
     positions = (probe_ix.astype(np.float64) + 0.5) * sim.dx
     return ElasticFDTDResult(
@@ -1261,10 +1312,10 @@ def elastic_fdtd_simulation(
         shape=(ny, nx),
         sources=tuple(sources),
         snapshots=np.stack(frames) if frames else None,
-        snapshot_times=(np.asarray(frame_steps, dtype=np.float64) * sim.dt
-                        if frame_steps else None),
+        snapshot_times=(
+            np.asarray(frame_steps, dtype=np.float64) * sim.dt if frame_steps else None
+        ),
         snapshot_field=snapshot_field,
-        obstacle_mask=(sim._obstacle.copy()
-                       if sim._obstacle is not None else None),
+        obstacle_mask=(sim._obstacle.copy() if sim._obstacle is not None else None),
         free_sides=sim.free_sides,
     )

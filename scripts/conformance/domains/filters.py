@@ -64,7 +64,10 @@ def _chk_butter_third() -> Outcome:
 )
 def _chk_butter_class0_1995() -> Outcome:
     bank = filters.OctaveFilterBank(
-        48000, fraction=1, order=6, limits=[100, 10000],
+        48000,
+        fraction=1,
+        order=6,
+        limits=[100, 10000],
         design=filters.FilterDesign(filter_type="butter"),
     )
     result = ph.filters.verify_filter_class(bank, edition="1995")
@@ -72,8 +75,12 @@ def _chk_butter_class0_1995() -> Outcome:
     ok = result["overall_class"] == 0
     return Outcome(
         expected="class 0",
-        computed=(f"class {result['overall_class']}" if result["overall_class"] is not None
-                  else "none") + f" (margin {margin:+.3f} dB)",
+        computed=(
+            f"class {result['overall_class']}"
+            if result["overall_class"] is not None
+            else "none"
+        )
+        + f" (margin {margin:+.3f} dB)",
         delta=f"{margin:+.3f} dB",
         passed=ok,
     )

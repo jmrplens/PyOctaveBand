@@ -132,8 +132,11 @@ def math_regions(text: str, suffix: str) -> list[tuple[int, str]]:
     if suffix == ".py":
         for m in re.finditer(r":math:`(.+?)`", text, re.DOTALL):
             out.append((m.start(1), m.group(1)))
-        for m in re.finditer(r"^([ \t]*)\.\. math::[ \t]*\n(.*?)(?=\n\s*\n|\Z)",
-                             text, re.DOTALL | re.MULTILINE):
+        for m in re.finditer(
+            r"^([ \t]*)\.\. math::[ \t]*\n(.*?)(?=\n\s*\n|\Z)",
+            text,
+            re.DOTALL | re.MULTILINE,
+        ):
             out.append((m.start(2), m.group(2)))
     return out
 
@@ -203,8 +206,11 @@ def collect(roots: list[str]) -> list[pathlib.Path]:
         if target.is_file():
             paths.append(target)
             continue
-        paths.extend(p for p in sorted(target.rglob("*"))
-                     if p.suffix in _SUFFIXES and p.is_file())
+        paths.extend(
+            p
+            for p in sorted(target.rglob("*"))
+            if p.suffix in _SUFFIXES and p.is_file()
+        )
     # Matched on the posix spelling, not on ``str(p)``: the pattern writes its
     # directory anchors with forward slashes, and on Windows ``str`` hands back
     # backslashes, so every exclusion silently stopped matching there and the
@@ -246,8 +252,12 @@ def check(paths: list[pathlib.Path]) -> tuple[int, list[str]]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("roots", nargs="*", default=list(DEFAULT_ROOTS),
-                        help="files or directories to scan (default: the prose)")
+    parser.add_argument(
+        "roots",
+        nargs="*",
+        default=list(DEFAULT_ROOTS),
+        help="files or directories to scan (default: the prose)",
+    )
     args = parser.parse_args(argv)
 
     paths = collect(args.roots)
@@ -256,13 +266,17 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Every subscript is single-valued in each of {read} files.")
         return 0
 
-    print(f"{len(failures)} subscripts carry both slopes inside one file:\n",
-          file=sys.stderr)
+    print(
+        f"{len(failures)} subscripts carry both slopes inside one file:\n",
+        file=sys.stderr,
+    )
     for failure in failures:
         print(failure, file=sys.stderr)
-    print("\nRe-letter the index, set the lagging one the way its neighbours "
-          "are set, or\ndeclare the page in DECLARED naming both meanings.",
-          file=sys.stderr)
+    print(
+        "\nRe-letter the index, set the lagging one the way its neighbours "
+        "are set, or\ndeclare the page in DECLARED naming both meanings.",
+        file=sys.stderr,
+    )
     return 1
 
 

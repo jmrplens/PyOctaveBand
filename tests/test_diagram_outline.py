@@ -135,13 +135,19 @@ def test_whitespace_only_run_advances_the_pen_and_draws_nothing() -> None:
     store = GlyphStore()
     markup = emit_runs(
         store,
-        [Run("a", _SANS, 0.0, 1.0), Run("  ", _SANS, 0.0, 1.0),
-         Run("b", _SANS, 0.0, 1.0)],
-        10.0, 20.0, 20, "#1a1a1a",
+        [
+            Run("a", _SANS, 0.0, 1.0),
+            Run("  ", _SANS, 0.0, 1.0),
+            Run("b", _SANS, 0.0, 1.0),
+        ],
+        10.0,
+        20.0,
+        20,
+        "#1a1a1a",
     )
     assert store.defs()
     assert '<path d=""' not in store.defs()
-    groups = re.findall(r'translate\(([-\d.]+) ', markup)
+    groups = re.findall(r"translate\(([-\d.]+) ", markup)
     assert len(groups) == 2  # the whitespace run emitted no group at all
     gap = float(groups[1]) - float(groups[0])
     expected = advance("a", _SANS_FACE, 20) + advance("  ", _SANS_FACE, 20)
@@ -211,9 +217,9 @@ def test_script_runs_scale_and_shift_as_element_fractions() -> None:
     markup = emit_runs(GlyphStore(), runs, 0.0, 100.0, 20, "#000")
     # The subscript drops by 0.22 of the *element* size (4.4 px at 20 px)
     # and scales to 0.70 of it: the confusable pair, pinned.
-    assert 'translate(0 100) scale(0.2 -0.2)' in markup
-    assert 'translate(' in markup
-    assert '104.4) scale(0.14 -0.14)' in markup
+    assert "translate(0 100) scale(0.2 -0.2)" in markup
+    assert "translate(" in markup
+    assert "104.4) scale(0.14 -0.14)" in markup
 
 
 def test_emission_carries_fill_and_no_style_attribute() -> None:
@@ -243,8 +249,7 @@ def test_collision_census_names_each_way_a_label_can_land_wrong(
         s.text(400, 400, "covered", 16, th.fg)
         s.rect(340, 380, 120, 40, th.panel, "none")
 
-    monkeypatch.setattr(registry, "DIAGRAMS",
-                        {"plate": (build, "Title", 560)})
+    monkeypatch.setattr(registry, "DIAGRAMS", {"plate": (build, "Title", 560)})
     kinds = {hit.kind for hit in outline._collisions()}
     assert kinds == {"overprint", "escapes", "struck", "painted over"}
 
@@ -266,11 +271,15 @@ def test_a_panel_over_the_title_is_reported(monkeypatch) -> None:
         svg.rect(100, 10, 700, 60, fill=th.fg)
 
     monkeypatch.setitem(
-        registry.DIAGRAMS, "diagram_title_under_a_panel",
+        registry.DIAGRAMS,
+        "diagram_title_under_a_panel",
         (build, "A title a panel covers", 200),
     )
-    hits = [h for h in outline._collisions()
-            if h.plate.startswith("diagram_title_under_a_panel")]
+    hits = [
+        h
+        for h in outline._collisions()
+        if h.plate.startswith("diagram_title_under_a_panel")
+    ]
     assert any(h.kind == "painted over" for h in hits), (
         "a filled panel drawn over the title was not reported: "
         f"{[(h.kind, h.label) for h in hits]}"

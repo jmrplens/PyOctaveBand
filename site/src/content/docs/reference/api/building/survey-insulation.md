@@ -68,7 +68,7 @@ heavy/soft impact source uses 63 Hz to 500 Hz. The single-number weighted
 ratings reuse the verified [`phonometry.building.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) (ISO
 717-1) and [`phonometry.building.weighted_impact_rating`](/phonometry/reference/api/building/ratings/#weighted_impact_rating) (ISO 717-2)
 engines, formed only when exactly 5 octave (or 16 one-third-octave) values are
-supplied. No background correction is applied (Clause 6.2). 
+supplied. No background correction is applied (Clause 6.2).
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 

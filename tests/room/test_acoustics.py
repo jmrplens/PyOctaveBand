@@ -37,8 +37,9 @@ def exponential_ir(t60: float, seconds: float, fs: int = FS) -> np.ndarray:
     return np.asarray(np.exp(-0.5 * A60 * t / t60))
 
 
-def multitone_ir(t60: float, seconds: float, freqs: list[float],
-                 fs: int = FS) -> np.ndarray:
+def multitone_ir(
+    t60: float, seconds: float, freqs: list[float], fs: int = FS
+) -> np.ndarray:
     """One sine carrier per octave band, all sharing the same exponential
     energy envelope, so every band-filtered envelope is exp(-A60*t/t60)."""
     t = np.arange(round(seconds * fs)) / fs
@@ -173,8 +174,7 @@ def test_c50_d50_exact_relation() -> None:
     ir = exponential_ir(1.2, 3.5)
     res = room.room_parameters(ir, FS, limits=None)
     d50 = float(res.d50[0])
-    assert res.c50[0] == pytest.approx(10.0 * np.log10(d50 / (1.0 - d50)),
-                                       abs=1e-9)
+    assert res.c50[0] == pytest.approx(10.0 * np.log10(d50 / (1.0 - d50)), abs=1e-9)
 
 
 def test_energy_parameters_shift_invariant() -> None:
@@ -302,8 +302,14 @@ def test_default_bands_are_octaves_125_to_4k() -> None:
     assert res.frequency is not None
     np.testing.assert_allclose(
         res.frequency,
-        [125.89254117941672, 251.188643150958, 501.18723362727235,
-         1000.0, 1995.2623149688795, 3981.0717055349724],
+        [
+            125.89254117941672,
+            251.188643150958,
+            501.18723362727235,
+            1000.0,
+            1995.2623149688795,
+            3981.0717055349724,
+        ],
     )
 
 

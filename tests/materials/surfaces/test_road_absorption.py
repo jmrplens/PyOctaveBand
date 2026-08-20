@@ -120,9 +120,7 @@ def test_geometry_guards() -> None:
         ValueError, match="'source_height' and 'mic_height' must be positive"
     ):
         geometric_spreading_factor(0.0, 0.25)
-    with pytest.raises(
-        ValueError, match="'source_height' must exceed 'mic_height'"
-    ):
+    with pytest.raises(ValueError, match="'source_height' must exceed 'mic_height'"):
         geometric_spreading_factor(0.25, 1.25)  # source must exceed mic
 
 
@@ -200,7 +198,9 @@ def test_oblique_incidence_uses_kr_theta() -> None:
     np.testing.assert_allclose(alpha[1:], 1.0 - 0.3**2, atol=1e-9)
 
 
-def test_reference_correction_cancels_kr_and_chain(recwarn: pytest.WarningsRecorder) -> None:
+def test_reference_correction_cancels_kr_and_chain(
+    recwarn: pytest.WarningsRecorder,
+) -> None:
     # Road measured reflection = chain error e(f) * Kr-scaled road reflection;
     # reference measured = same e(f). Ratio recovers |Qp,road|^2.
     freq = np.linspace(250.0, 1600.0, 64)
@@ -231,7 +231,7 @@ def test_adrienne_window_length_and_flat_top() -> None:
     n_trail = round(5e-3 * FS)
     assert w.shape == (n_lead + n_flat + n_trail,)
     # Flat portion is exactly unity.
-    np.testing.assert_allclose(w[n_lead:n_lead + n_flat], 1.0, atol=1e-12)
+    np.testing.assert_allclose(w[n_lead : n_lead + n_flat], 1.0, atol=1e-12)
 
 
 def test_adrienne_window_endpoints_and_sharp_leading_edge() -> None:
@@ -257,7 +257,7 @@ def test_adrienne_window_energy_in_flat_region() -> None:
     w = adrienne_window(FS)
     n_lead = round(0.5e-3 * FS)
     n_flat = round(5e-3 * FS)
-    flat_energy = np.sum(w[n_lead:n_lead + n_flat] ** 2)
+    flat_energy = np.sum(w[n_lead : n_lead + n_flat] ** 2)
     assert flat_energy > 0.5 * np.sum(w**2)
 
 
@@ -324,9 +324,7 @@ def test_one_third_octave_band_count_part1() -> None:
 def test_one_third_octave_band_count_spot() -> None:
     freq = np.linspace(100.0, 3000.0, 6000)
     alpha = np.full_like(freq, 0.05)
-    centres, _ = one_third_octave_absorption(
-        freq, alpha, f_max=SPOT_FREQUENCY_RANGE[1]
-    )
+    centres, _ = one_third_octave_absorption(freq, alpha, f_max=SPOT_FREQUENCY_RANGE[1])
     assert centres.shape == (9,)  # 250..1600 Hz (Annex D of Part 2)
 
 
@@ -340,13 +338,9 @@ def test_one_third_octave_clipping() -> None:
 
 
 def test_one_third_octave_guards() -> None:
-    with pytest.raises(
-        ValueError, match="must be non-empty and equal-length"
-    ):
+    with pytest.raises(ValueError, match="must be non-empty and equal-length"):
         one_third_octave_absorption([250.0, 500.0], [0.1])
-    with pytest.raises(
-        ValueError, match="must be non-empty and equal-length"
-    ):
+    with pytest.raises(ValueError, match="must be non-empty and equal-length"):
         one_third_octave_absorption([], [])
 
 
@@ -432,9 +426,7 @@ def test_msa_major_axis_reduces_to_normal_at_zero_projection() -> None:
 def test_msa_guards() -> None:
     with pytest.raises(ValueError, match="'window_width' must be positive"):
         max_sampled_area_radius(0.0)
-    with pytest.raises(
-        ValueError, match="'projected_distance' must be non-negative"
-    ):
+    with pytest.raises(ValueError, match="'projected_distance' must be non-negative"):
         msa_major_axis(5e-3, -1.0)
 
 
@@ -447,9 +439,7 @@ def test_spot_upper_frequency_100mm_tube() -> None:
 
 
 def test_spot_spacing_bounds() -> None:
-    s_min, s_max = spot_microphone_spacing_bounds(
-        340.0, f_min=220.0, f_max=1800.0
-    )
+    s_min, s_max = spot_microphone_spacing_bounds(340.0, f_min=220.0, f_max=1800.0)
     assert s_max == pytest.approx(0.085, abs=1e-4)  # 85 mm
     assert s_min == pytest.approx(0.07727, abs=1e-4)  # 77 mm
     assert s_min < 0.081 < s_max  # brackets nominal 81 mm spacing
@@ -458,9 +448,7 @@ def test_spot_spacing_bounds() -> None:
 def test_spot_spacing_bounds_warns_when_interval_empty() -> None:
     # A range far wider than the narrow band leaves no valid spacing (s_min>=s_max).
     with pytest.warns(RoadAbsorptionWarning):
-        s_min, s_max = spot_microphone_spacing_bounds(
-            340.0, f_min=220.0, f_max=4000.0
-        )
+        s_min, s_max = spot_microphone_spacing_bounds(340.0, f_min=220.0, f_max=4000.0)
     assert s_min >= s_max
 
 
@@ -500,9 +488,7 @@ def test_spot_internal_loss_clips_negative() -> None:
 def test_spot_guards() -> None:
     with pytest.raises(ValueError, match="'diameter' must be positive"):
         spot_tube_upper_frequency(0.0)
-    with pytest.raises(
-        ValueError, match="'f_min' must be less than 'f_max'"
-    ):
+    with pytest.raises(ValueError, match="'f_min' must be less than 'f_max'"):
         spot_microphone_spacing_bounds(340.0, f_min=1800.0, f_max=220.0)
     with pytest.raises(ValueError, match="must share a shape"):
         spot_internal_loss_correction([0.1, 0.2], [0.1])
@@ -512,13 +498,22 @@ def test_public_exports() -> None:
     from phonometry import materials
 
     for name in (
-        "adrienne_window", "geometric_spreading_factor",
-        "geometric_spreading_factor_angle", "reflected_path_delay",
-        "insitu_reflection_factor", "insitu_absorption_from_reflection",
-        "power_reflection_coefficient", "insitu_absorption_coefficient",
-        "absorption_reference_corrected", "one_third_octave_absorption",
-        "max_sampled_area_radius", "msa_major_axis", "spot_tube_upper_frequency",
-        "spot_microphone_spacing_bounds", "check_spot_frequency_range",
-        "spot_internal_loss_correction", "RoadAbsorptionWarning",
+        "adrienne_window",
+        "geometric_spreading_factor",
+        "geometric_spreading_factor_angle",
+        "reflected_path_delay",
+        "insitu_reflection_factor",
+        "insitu_absorption_from_reflection",
+        "power_reflection_coefficient",
+        "insitu_absorption_coefficient",
+        "absorption_reference_corrected",
+        "one_third_octave_absorption",
+        "max_sampled_area_radius",
+        "msa_major_axis",
+        "spot_tube_upper_frequency",
+        "spot_microphone_spacing_bounds",
+        "check_spot_frequency_range",
+        "spot_internal_loss_correction",
+        "RoadAbsorptionWarning",
     ):
         assert hasattr(materials, name), name

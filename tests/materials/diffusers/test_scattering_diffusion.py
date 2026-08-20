@@ -130,9 +130,7 @@ def test_scattering_end_to_end_synthetic() -> None:
     T1, T2, T3, T4 = 8.0, 6.0, 7.5, 5.0
     expected_alpha_s = K * (V / S) * (1 / (C * T2) - 1 / (C * T1))
     expected_alpha_spec = K * (V / S) * (1 / (C * T4) - 1 / (C * T3))
-    expected_s = (expected_alpha_spec - expected_alpha_s) / (
-        1.0 - expected_alpha_s
-    )
+    expected_s = (expected_alpha_spec - expected_alpha_s) / (1.0 - expected_alpha_s)
 
     alpha_s = random_incidence_absorption(V, S, c1=C, t1=T1, c2=C, t2=T2)
     alpha_spec = specular_absorption_coefficient(V, S, c3=C, t3=T3, c4=C, t4=T4)
@@ -167,9 +165,7 @@ def test_air_attenuation_term_reduces_absorption() -> None:
         V, S, c1=C, t1=8.0, c2=C, t2=6.0, m1=0.001, m2=0.002
     )
     assert float(with_air) < float(base)
-    assert float(base) - float(with_air) == pytest.approx(
-        4.0 * V / S * (0.002 - 0.001)
-    )
+    assert float(base) - float(with_air) == pytest.approx(4.0 * V / S * (0.002 - 0.001))
 
 
 def test_base_plate_scattering_zero_when_t1_equals_t3() -> None:
@@ -183,8 +179,24 @@ def test_base_plate_scattering_zero_when_t1_equals_t3() -> None:
 # ---------------------------------------------------------------------------
 def test_table1_exact_values_spot_bands() -> None:
     assert BASE_PLATE_BANDS == (
-        100, 125, 160, 200, 250, 315, 400, 500, 630,
-        800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000,
+        100,
+        125,
+        160,
+        200,
+        250,
+        315,
+        400,
+        500,
+        630,
+        800,
+        1000,
+        1250,
+        1600,
+        2000,
+        2500,
+        3150,
+        4000,
+        5000,
     )
     assert BASE_PLATE_BANDS == tuple(BASE_PLATE_MAX_SCATTERING)
     assert BASE_PLATE_MAX_SCATTERING[100] == 0.05
@@ -207,7 +219,7 @@ def test_base_plate_within_limits_no_warning() -> None:
 
 
 def test_base_plate_over_limit_warns_and_lists_bands() -> None:
-    values = {b: 0.0 for b in BASE_PLATE_BANDS}
+    values = dict.fromkeys(BASE_PLATE_BANDS, 0.0)
     values[100] = 0.06  # limit 0.05
     values[5000] = 0.30  # limit 0.25
     with pytest.warns(ScatteringDiffusionWarning):
@@ -235,13 +247,8 @@ def test_reverberation_time_uncertainty_a1() -> None:
 
 def test_absorption_uncertainty_a3() -> None:
     ua, ub, Ta, Tb = 0.02, 0.03, 8.0, 6.0
-    expected = (
-        K * V / (C * S)
-        * math.sqrt((ub / Tb**2) ** 2 + (ua / Ta**2) ** 2)
-    )
-    u = absorption_coefficient_uncertainty(
-        V, S, c=C, t_a=Ta, u_a=ua, t_b=Tb, u_b=ub
-    )
+    expected = K * V / (C * S) * math.sqrt((ub / Tb**2) ** 2 + (ua / Ta**2) ** 2)
+    u = absorption_coefficient_uncertainty(V, S, c=C, t_a=Ta, u_a=ua, t_b=Tb, u_b=ub)
     assert float(u) == pytest.approx(expected)
     assert float(u) == pytest.approx(0.0028681248003840053)
 
@@ -250,8 +257,7 @@ def test_scattering_uncertainty_a5_and_expansion() -> None:
     alpha_s, alpha_spec = 0.3, 0.6
     u_alpha_s, u_alpha_spec = 0.01, 0.02
     expected = abs((alpha_spec - 1) / (1 - alpha_s)) * math.sqrt(
-        (u_alpha_spec / (alpha_spec - 1)) ** 2
-        + (u_alpha_s / (1 - alpha_s)) ** 2
+        (u_alpha_spec / (alpha_spec - 1)) ** 2 + (u_alpha_s / (1 - alpha_s)) ** 2
     )
     result = scattering_coefficient_uncertainty(
         alpha_spec, alpha_s, u_alpha_spec, u_alpha_s
@@ -367,9 +373,9 @@ def test_predicted_band_dn_matches_cox_appendix_b() -> None:
         COX3E_APPENDIX_B_QRD_BANDS, COX3E_APPENDIX_B_QRD_DN, strict=True
     ):
         predicted = predicted_band_normalized_diffusion(band)
-        assert predicted == pytest.approx(
-            published, abs=COX3E_APPENDIX_B_TOLERANCE
-        ), f"{band} Hz band"
+        assert predicted == pytest.approx(published, abs=COX3E_APPENDIX_B_TOLERANCE), (
+            f"{band} Hz band"
+        )
 
 
 def test_diffusion_qrd_arc_independent_energy_recompute() -> None:
@@ -385,9 +391,7 @@ def test_diffusion_qrd_arc_independent_energy_recompute() -> None:
 def test_diffusion_formula_6_reduces_to_5_for_uniform_weights() -> None:
     levels = [70.0, 74.0, 68.0, 72.0]
     d5 = directional_diffusion_coefficient(levels)
-    d6 = directional_diffusion_coefficient(
-        levels, area_weights=[1.0, 1.0, 1.0, 1.0]
-    )
+    d6 = directional_diffusion_coefficient(levels, area_weights=[1.0, 1.0, 1.0, 1.0])
     assert d5 == pytest.approx(d6)
 
 
@@ -459,9 +463,7 @@ def test_random_incidence_two_dimensional_weighting() -> None:
     # 0 deg weight 1, four other sources weight 3 each; total weight 13.
     d = [0.5, 0.2, 0.2, 0.2, 0.2]
     expected = (1 * 0.5 + 3 * (0.2 + 0.2 + 0.2 + 0.2)) / 13.0
-    got = random_incidence_diffusion(
-        d, weights=TWO_DIMENSIONAL_SOURCE_WEIGHTS
-    )
+    got = random_incidence_diffusion(d, weights=TWO_DIMENSIONAL_SOURCE_WEIGHTS)
     assert got == pytest.approx(expected)
     assert sum(TWO_DIMENSIONAL_SOURCE_WEIGHTS) == 13
 
@@ -470,9 +472,7 @@ def test_random_incidence_two_dimensional_weighting() -> None:
 # Input-validation guards.
 # ---------------------------------------------------------------------------
 def test_diffusion_requires_two_receivers() -> None:
-    with pytest.raises(
-        ValueError, match="'levels' needs at least two receivers"
-    ):
+    with pytest.raises(ValueError, match="'levels' needs at least two receivers"):
         directional_diffusion_coefficient([80.0])
 
 
@@ -484,20 +484,14 @@ def test_diffusion_weight_length_mismatch() -> None:
 
 
 def test_reverberation_uncertainty_requires_two() -> None:
-    with pytest.raises(
-        ValueError, match="'times' needs at least two measurements"
-    ):
+    with pytest.raises(ValueError, match="'times' needs at least two measurements"):
         reverberation_time_uncertainty([6.0])
 
 
 def test_absorption_rejects_nonpositive_geometry() -> None:
-    with pytest.raises(
-        ValueError, match="'volume' must be a positive, finite number"
-    ):
+    with pytest.raises(ValueError, match="'volume' must be a positive, finite number"):
         random_incidence_absorption(0.0, S, c1=C, t1=8.0, c2=C, t2=6.0)
-    with pytest.raises(
-        ValueError, match="'area' must be a positive, finite number"
-    ):
+    with pytest.raises(ValueError, match="'area' must be a positive, finite number"):
         random_incidence_absorption(V, -1.0, c1=C, t1=8.0, c2=C, t2=6.0)
 
 
@@ -514,9 +508,7 @@ def test_scattering_rejects_alpha_s_equal_one() -> None:
 
 
 def test_normalization_rejects_reference_one() -> None:
-    with pytest.raises(
-        ValueError, match="'d_theta_reference' must not equal 1"
-    ):
+    with pytest.raises(ValueError, match="'d_theta_reference' must not equal 1"):
         normalized_diffusion_coefficient(0.5, 1.0)
 
 
@@ -536,9 +528,7 @@ def test_area_factors_rejects_empty_elevations() -> None:
 
 def test_diffusion_coefficient_rejects_zero_energy() -> None:
     # All -inf levels means zero energy everywhere; the coefficient is undefined.
-    with pytest.raises(
-        ValueError, match="The polar response carries no energy"
-    ):
+    with pytest.raises(ValueError, match="The polar response carries no energy"):
         directional_diffusion_coefficient([float("-inf"), float("-inf")])
 
 
@@ -575,25 +565,19 @@ def test_scattering_spectrum_recomputes_s_per_band() -> None:
 
 
 def test_scattering_spectrum_length_mismatch_raises() -> None:
-    with pytest.raises(
-        ValueError, match="non-empty, 1-D and equal-length"
-    ):
+    with pytest.raises(ValueError, match="non-empty, 1-D and equal-length"):
         scattering_coefficient_spectrum([250.0, 500.0], [0.2], [0.1])
 
 
 def test_scattering_spectrum_empty_raises() -> None:
-    with pytest.raises(
-        ValueError, match="non-empty, 1-D and equal-length"
-    ):
+    with pytest.raises(ValueError, match="non-empty, 1-D and equal-length"):
         scattering_coefficient_spectrum([], [], [])
 
 
 def test_scattering_spectrum_rejects_2d_input() -> None:
     # frequencies is documented 1-D; equal-shaped 2-D arrays must be rejected.
     two_d = [[250.0, 500.0], [1000.0, 2000.0]]
-    with pytest.raises(
-        ValueError, match="non-empty, 1-D and equal-length"
-    ):
+    with pytest.raises(ValueError, match="non-empty, 1-D and equal-length"):
         scattering_coefficient_spectrum(two_d, two_d, two_d)
 
 
@@ -614,8 +598,10 @@ def test_scattering_spectrum_plot_returns_axes() -> None:
 def test_directional_diffusion_coefficient_matches_scalar() -> None:
     angles = np.arange(-90.0, 90.5, 5.0)
     rng = np.random.default_rng(3)
-    levels = 70.0 + 2.0 * np.sin(np.radians(angles) * 3.0) + rng.normal(
-        0.0, 1.0, angles.size
+    levels = (
+        70.0
+        + 2.0 * np.sin(np.radians(angles) * 3.0)
+        + rng.normal(0.0, 1.0, angles.size)
     )
     result = directional_diffusion(angles, levels)
 
@@ -669,9 +655,7 @@ def test_diffusion_spectrum_length_mismatch_raises() -> None:
 
 def test_diffusion_spectrum_normalized_mismatch_raises() -> None:
     with pytest.raises(ValueError, match="'normalized' must match"):
-        diffusion_spectrum(
-            [250.0, 500.0], [0.3, 0.5], normalized=[0.2]
-        )
+        diffusion_spectrum([250.0, 500.0], [0.3, 0.5], normalized=[0.2])
 
 
 def test_diffusion_spectrum_plot_returns_axes() -> None:

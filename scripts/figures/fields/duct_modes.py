@@ -21,14 +21,14 @@ from ..theme import (
 # where the (1, 0) mode is exactly the same wave: its cut-on is c / (2 a) =
 # 263.8 Hz, the number rectangular_duct_cut_on prints for the real duct, so
 # the clip and the guide's cut-on ladder annotate one frequency.
-_DUCT_A = 0.65                     # simulated (wider) duct dimension [m]
-_DUCT_B = 0.40                     # the other one, quoted for the library call
+_DUCT_A = 0.65  # simulated (wider) duct dimension [m]
+_DUCT_B = 0.40  # the other one, quoted for the library call
 # Mesh rule dx = min(smallest dimension / 4, shortest wavelength / 8) =
 # min(0.65 / 4 = 163 mm, 343 / 400 / 8 = 107 mm). The grid runs 21 times
 # finer than that bound so the cross-section profile is a smooth curve
 # rather than a staircase, at a cost the domain's thinness makes trivial.
 _DUCT_DX = 0.005
-_DUCT_VIEW = 8.0                   # duct length shown [m]
+_DUCT_VIEW = 8.0  # duct length shown [m]
 # Simulated length. Whatever comes back off the far end has crossed the
 # 0.625 m sponge twice, and it can first re-enter the shown 8 m at
 # (12.5 - 0.15 + 12.5 - 8) / 343 = 49.1 ms of the 66.5 ms captured; what
@@ -38,12 +38,12 @@ _DUCT_VIEW = 8.0                   # duct length shown [m]
 # arrives at an angle (k_x / k = 0.752 at 400 Hz), which a locally reacting
 # termination reflects at -17 dB.
 _DUCT_LEN = 12.5
-_DUCT_SPONGE = 125                 # 0.625 m, the widest this section allows
-_DUCT_SRC_X = 0.15                 # source 0.15 m off the closed end
-_DUCT_SRC_YF = 0.20                # and 0.20 a off the wall, so it is not
+_DUCT_SPONGE = 125  # 0.625 m, the widest this section allows
+_DUCT_SRC_X = 0.15  # source 0.15 m off the closed end
+_DUCT_SRC_YF = 0.20  # and 0.20 a off the wall, so it is not
 #                                    on a node of either mode
-_DUCT_STATION = 5.0                # cross-section station [m]
-_DUCT_FREQS = (180.0, 400.0)       # below and above the 263.8 Hz cut-on
+_DUCT_STATION = 5.0  # cross-section station [m]
+_DUCT_FREQS = (180.0, 400.0)  # below and above the 263.8 Hz cut-on
 # Source onset [s], the same in both panels rather than the same number of
 # periods. A short ramp is a broadband event: with the 1.5-period default
 # the 180 Hz onset splashes energy above 263.8 Hz, that content propagates
@@ -58,7 +58,7 @@ _DUCT_RAMP_S = 0.030
 # 0.65 m across, so drawn to scale each strip would be a hairline; every
 # panel says the factor out loud.
 _DUCT_ASPECT = 3.0
-_DUCT_EVERY = 16                   # capture stride [solver steps]
+_DUCT_EVERY = 16  # capture stride [solver steps]
 _DUCT_FPS = 50
 
 
@@ -111,11 +111,12 @@ def _duct_cut_on_fields() -> tuple[Any, Any, Any, Any, Any, tuple[float, float]]
     sigmas: list[float] = []
     times = np.zeros(0)
     for f in _DUCT_FREQS:
-        sim = fdtd2d.FDTD2D(c0, dx, shape=(ny, nx),
-                            sponge_width=_DUCT_SPONGE,
-                            sponge_sides=("right",))
-        sim.add_source(fdtd2d.CWSource(src_ix, src_iy, frequency=f,
-                                       ramp_cycles=_DUCT_RAMP_S * f))
+        sim = fdtd2d.FDTD2D(
+            c0, dx, shape=(ny, nx), sponge_width=_DUCT_SPONGE, sponge_sides=("right",)
+        )
+        sim.add_source(
+            fdtd2d.CWSource(src_ix, src_iy, frequency=f, ramp_cycles=_DUCT_RAMP_S * f)
+        )
         frames: list[Any] = []
         column: list[Any] = []
         ts: list[float] = []
@@ -133,7 +134,7 @@ def _duct_cut_on_fields() -> tuple[Any, Any, Any, Any, Any, tuple[float, float]]
         # radiates them differently, and the clip compares shapes, not
         # levels. The plane-mode part is the section average, which is
         # exactly the single pressure a one-dimensional model carries.
-        tail = col[3 * n_active // 4:]
+        tail = col[3 * n_active // 4 :]
         mean = tail.mean(axis=1)
         p_ref = float(np.sqrt(2.0 * np.mean(mean**2)))
         rest = tail - mean[:, None]
@@ -141,8 +142,14 @@ def _duct_cut_on_fields() -> tuple[Any, Any, Any, Any, Any, tuple[float, float]]
         stacks.append(stack / p_ref)
         stations.append(col / p_ref)
         times = np.asarray(ts)
-    return (stacks[0], stacks[1], stations[0], stations[1], times,
-            (sigmas[0], sigmas[1]))
+    return (
+        stacks[0],
+        stacks[1],
+        stations[0],
+        stations[1],
+        times,
+        (sigmas[0], sigmas[1]),
+    )
 
 
 def animate_fdtd_duct_cut_on(output_dir: str) -> None:
@@ -178,65 +185,114 @@ def animate_fdtd_duct_cut_on(output_dir: str) -> None:
     # panels beside them do carry one shared scale, and that is where the
     # comparison is quantitative.
     skip = round(0.75 / (4.0 * _DUCT_DX))
-    vmaxes = [1.12 * float(np.quantile(np.abs(p[:, :, skip:]), 0.999))
-              for p in (p_lo, p_hi)]
+    vmaxes = [
+        1.12 * float(np.quantile(np.abs(p[:, :, skip:]), 0.999)) for p in (p_lo, p_hi)
+    ]
     p_lim = 1.05 * max(vmaxes)
 
     fig = _anim_figure()
     # Reserve the bottom strip for the two-line footer: fig.text does not
     # claim space from the constrained layout on its own.
     fig.get_layout_engine().set(rect=(0.0, 0.075, 1.0, 0.925))
-    fig.suptitle(T("Duct cut-on: is one pressure enough? (2D FDTD)"),
-                 )
+    fig.suptitle(
+        T("Duct cut-on: is one pressure enough? (2D FDTD)"),
+    )
     grid = fig.add_gridspec(2, 2, width_ratios=(6.4, 1.15))
-    titles = [T(f"{_DUCT_FREQS[0]:.0f} Hz: below the {f_co:.1f} Hz cut-on"),
-              T(f"{_DUCT_FREQS[1]:.0f} Hz: above it")]
+    titles = [
+        T(f"{_DUCT_FREQS[0]:.0f} Hz: below the {f_co:.1f} Hz cut-on"),
+        T(f"{_DUCT_FREQS[1]:.0f} Hz: above it"),
+    ]
     verdicts = [
         T(f"one pressure, to within {100 * sigmas[0]:.1f} %"),
-        T(f"{100 * sigmas[1]:.0f} % of the section's energy is not "
-          f"the plane mode"),
+        T(f"{100 * sigmas[1]:.0f} % of the section's energy is not the plane mode"),
     ]
     ims: list[Any] = []
     profs: list[Any] = []
     means: list[Any] = []
     v_txts: list[Any] = []
     for row, (data, title, vmax) in enumerate(
-            ((p_lo, titles[0], vmaxes[0]), (p_hi, titles[1], vmaxes[1]))):
+        ((p_lo, titles[0], vmaxes[0]), (p_hi, titles[1], vmaxes[1]))
+    ):
         ax = fig.add_subplot(grid[row, 0])
         ax.grid(False)
-        im = ax.imshow(data[0], origin="lower",
-                       extent=(0.0, _DUCT_VIEW, 0.0, _DUCT_A),
-                       cmap=CMAP_FIELD, vmin=-vmax, vmax=vmax,
-                       aspect=_DUCT_ASPECT, interpolation="bilinear")
+        im = ax.imshow(
+            data[0],
+            origin="lower",
+            extent=(0.0, _DUCT_VIEW, 0.0, _DUCT_A),
+            cmap=CMAP_FIELD,
+            vmin=-vmax,
+            vmax=vmax,
+            aspect=_DUCT_ASPECT,
+            interpolation="bilinear",
+        )
         ax.set_title(title, fontsize=10)
         ax.axvline(_DUCT_STATION, color=COLOR_FG, lw=1.0, ls=":", zorder=4)
-        ax.plot([_DUCT_SRC_X], [_DUCT_SRC_YF * _DUCT_A], marker="o", ms=4,
-                color=COLOR_TERTIARY, markeredgecolor="white",
-                markeredgewidth=0.6, zorder=5)
+        ax.plot(
+            [_DUCT_SRC_X],
+            [_DUCT_SRC_YF * _DUCT_A],
+            marker="o",
+            ms=4,
+            color=COLOR_TERTIARY,
+            markeredgecolor="white",
+            markeredgewidth=0.6,
+            zorder=5,
+        )
         ax.set_yticks([0.0, _DUCT_A])
         ax.tick_params(labelsize=7)
         if row == 0:
-            ax.text(_DUCT_SRC_X + 0.08, _DUCT_SRC_YF * _DUCT_A,
-                    T("source"), fontsize=7, ha="left", va="center",
-                    color="white", zorder=5,
-                    bbox={"boxstyle": _ANIM_PILL_BOX, "facecolor": "black",
-                          "alpha": 0.5, "edgecolor": "none"})
+            ax.text(
+                _DUCT_SRC_X + 0.08,
+                _DUCT_SRC_YF * _DUCT_A,
+                T("source"),
+                fontsize=7,
+                ha="left",
+                va="center",
+                color="white",
+                zorder=5,
+                bbox={
+                    "boxstyle": _ANIM_PILL_BOX,
+                    "facecolor": "black",
+                    "alpha": 0.5,
+                    "edgecolor": "none",
+                },
+            )
             # Above the station line, not beside its foot: the verdict
             # pill lives at the foot and the Spanish of it is long.
-            ax.text(_DUCT_STATION - 0.08, _DUCT_A - 0.03,
-                    T(f"section at $x$ = {_DUCT_STATION:.0f} m"),
-                    fontsize=7, ha="right", va="top", color="white",
-                    zorder=5,
-                    bbox={"boxstyle": _ANIM_PILL_BOX, "facecolor": "black",
-                          "alpha": 0.5, "edgecolor": "none"})
+            ax.text(
+                _DUCT_STATION - 0.08,
+                _DUCT_A - 0.03,
+                T(f"section at $x$ = {_DUCT_STATION:.0f} m"),
+                fontsize=7,
+                ha="right",
+                va="top",
+                color="white",
+                zorder=5,
+                bbox={
+                    "boxstyle": _ANIM_PILL_BOX,
+                    "facecolor": "black",
+                    "alpha": 0.5,
+                    "edgecolor": "none",
+                },
+            )
             ax.set_xticklabels([])
         else:
             ax.set_xlabel(T("Distance along the duct [m]"), fontsize=9)
-        v_txt = ax.text(_DUCT_VIEW - 0.06, 0.04, "", ha="right", va="bottom",
-                        color="white", fontsize=8, zorder=5,
-                        bbox={"boxstyle": _ANIM_PILL_BOX,
-                              "facecolor": "black", "alpha": 0.55,
-                              "edgecolor": "none"})
+        v_txt = ax.text(
+            _DUCT_VIEW - 0.06,
+            0.04,
+            "",
+            ha="right",
+            va="bottom",
+            color="white",
+            fontsize=8,
+            zorder=5,
+            bbox={
+                "boxstyle": _ANIM_PILL_BOX,
+                "facecolor": "black",
+                "alpha": 0.55,
+                "edgecolor": "none",
+            },
+        )
         ims.append(im)
         v_txts.append(v_txt)
 
@@ -248,10 +304,8 @@ def animate_fdtd_duct_cut_on(output_dir: str) -> None:
         pax.set_xticks([-4.0, -2.0, 0.0, 2.0, 4.0])
         pax.tick_params(labelsize=7)
         pax.axvline(0.0, color=COLOR_GRID, lw=0.8, zorder=1)
-        mean_ln = pax.axvline(0.0, color=COLOR_SECONDARY, lw=2.6, ls="--",
-                              zorder=2)
-        (prof,) = pax.plot(np.zeros(ny), y_col, color=COLOR_FG, lw=1.3,
-                           zorder=3)
+        mean_ln = pax.axvline(0.0, color=COLOR_SECONDARY, lw=2.6, ls="--", zorder=2)
+        (prof,) = pax.plot(np.zeros(ny), y_col, color=COLOR_FG, lw=1.3, zorder=3)
         if row == 0:
             pax.set_title(T("$p$ across the section"), fontsize=7.5)
             pax.set_xticklabels([])
@@ -259,17 +313,42 @@ def animate_fdtd_duct_cut_on(output_dir: str) -> None:
             pax.set_xlabel(T("$p$ / plane mode"), fontsize=7)
         profs.append(prof)
         means.append(mean_ln)
-    fc_txt = fig.text(0.5, 0.038,
-                      T(f"rectangular_duct_cut_on: first cut-on {f_co:.1f} Hz "
-                        f"({_DUCT_A:.2f} × {_DUCT_B:.2f} m duct)"),
-                      ha="center", va="bottom", fontsize=7.5, color=COLOR_FG)
-    scale_txt = fig.text(0.5, 0.008,
-                         T(f"dashed: the section average · vertical scale "
-                           f"×{_DUCT_ASPECT:.0f} · each strip on its own "
-                           f"colour scale"), ha="center",
-                         va="bottom", fontsize=7, color=COLOR_FG, alpha=0.85)
-    t_txt = fig.text(0.012, 0.982, "", ha="left", va="top",
-                     family="monospace", fontsize=9, color=COLOR_FG)
+    fc_txt = fig.text(
+        0.5,
+        0.038,
+        T(
+            f"rectangular_duct_cut_on: first cut-on {f_co:.1f} Hz "
+            f"({_DUCT_A:.2f} × {_DUCT_B:.2f} m duct)"
+        ),
+        ha="center",
+        va="bottom",
+        fontsize=7.5,
+        color=COLOR_FG,
+    )
+    scale_txt = fig.text(
+        0.5,
+        0.008,
+        T(
+            f"dashed: the section average · vertical scale "
+            f"×{_DUCT_ASPECT:.0f} · each strip on its own "
+            f"colour scale"
+        ),
+        ha="center",
+        va="bottom",
+        fontsize=7,
+        color=COLOR_FG,
+        alpha=0.85,
+    )
+    t_txt = fig.text(
+        0.012,
+        0.982,
+        "",
+        ha="left",
+        va="top",
+        family="monospace",
+        fontsize=9,
+        color=COLOR_FG,
+    )
     reveal = int(0.80 * n_active)
 
     def update(k: int) -> tuple[Any, ...]:
@@ -282,5 +361,12 @@ def animate_fdtd_duct_cut_on(output_dir: str) -> None:
         t_txt.set_text(T(f"$t$ = {times[kf] * 1e3:5.1f} ms"))
         return (*ims, *profs, *means, *v_txts, fc_txt, scale_txt, t_txt)
 
-    _render_clip(fig, update, output_dir, "anim_fdtd_duct_cut_on",
-                 frames=n_active + 2 * _DUCT_FPS, fps=_DUCT_FPS, gif_fps=6)
+    _render_clip(
+        fig,
+        update,
+        output_dir,
+        "anim_fdtd_duct_cut_on",
+        frames=n_active + 2 * _DUCT_FPS,
+        fps=_DUCT_FPS,
+        gif_fps=6,
+    )

@@ -61,8 +61,9 @@ def _x_span(ax: Any, artist: Any) -> tuple[float, float]:
     return min(x0, x1), max(x0, x1)
 
 
-def _slide_below(rotation: float) -> tuple[Any, Any, Any, Any, float,
-                                           tuple[float, float]]:
+def _slide_below(
+    rotation: float,
+) -> tuple[Any, Any, Any, Any, float, tuple[float, float]]:
     """Run ``_fit_text_below`` on a label tilted *rotation* degrees.
 
     The label is anchored on top of the one it has to clear, so the pass
@@ -71,13 +72,20 @@ def _slide_below(rotation: float) -> tuple[Any, Any, Any, Any, float,
     """
     fig, ax = _panel()
     other = ax.text(5.0, 5.0, "receiver arc", ha="center", va="center")
-    label = ax.text(5.0, 5.0, "insertion loss 8 dB", rotation=rotation,
-                    ha="center", va="center")
+    label = ax.text(
+        5.0, 5.0, "insertion loss 8 dB", rotation=rotation, ha="center", va="center"
+    )
     before = ax.transData.transform(label.get_position())
     shift = _fit_text_below(fig, ax, label, other, gap=GAP)
     after = ax.transData.transform(label.get_position())
-    return fig, ax, label, other, shift, (float(after[0] - before[0]),
-                                          float(after[1] - before[1]))
+    return (
+        fig,
+        ax,
+        label,
+        other,
+        shift,
+        (float(after[0] - before[0]), float(after[1] - before[1])),
+    )
 
 
 @pytest.mark.parametrize("rotation", [-30.0, -12.0, -60.0])
@@ -94,11 +102,10 @@ def test_a_label_tilted_the_other_way_slides_the_other_way(
     _fig, _ax, _label, _other, shift, (dx, dy) = _slide_below(rotation)
 
     assert shift > 0.0
-    assert dy < 0.0                      # it went down
-    assert dx > 0.0                      # and forward, along its own line
+    assert dy < 0.0  # it went down
+    assert dx > 0.0  # and forward, along its own line
     # Along its own baseline: the displacement lies on the rotated line.
-    assert dx == pytest.approx(dy / math.tan(math.radians(rotation)),
-                               rel=1e-6)
+    assert dx == pytest.approx(dy / math.tan(math.radians(rotation)), rel=1e-6)
     assert shift == pytest.approx(math.hypot(dx, dy), rel=1e-9)
 
 
@@ -135,8 +142,9 @@ def test_the_label_ends_up_clear_of_what_it_grew_into(
 def test_a_label_that_already_clears_is_left_alone() -> None:
     fig, ax = _panel()
     other = ax.text(5.0, 5.0, "receiver arc", ha="center", va="center")
-    label = ax.text(5.0, 2.0, "insertion loss 8 dB", rotation=-30.0,
-                    ha="center", va="center")
+    label = ax.text(
+        5.0, 2.0, "insertion loss 8 dB", rotation=-30.0, ha="center", va="center"
+    )
     before = label.get_position()
 
     assert _fit_text_below(fig, ax, label, other, gap=GAP) == 0.0
@@ -154,11 +162,16 @@ def test_a_label_too_wide_to_fit_is_anchored_in_reading_order(
     going -- and the pass says so on stderr.
     """
     fig, ax = _panel()
-    label = ax.text(5.0, 5.0, "a caption far wider than the room it is given",
-                    ha="left", va="center")
+    label = ax.text(
+        5.0,
+        5.0,
+        "a caption far wider than the room it is given",
+        ha="left",
+        va="center",
+    )
     fig.canvas.draw()
     lo_before, hi_before = _x_span(ax, label)
-    assert hi_before - lo_before > 2.0 - 2 * 0.2      # wider than the room
+    assert hi_before - lo_before > 2.0 - 2 * 0.2  # wider than the room
 
     shift = _fit_text_x(fig, ax, label, 1.0, 3.0, margin=0.2)
 
@@ -166,8 +179,8 @@ def test_a_label_too_wide_to_fit_is_anchored_in_reading_order(
     assert shift == pytest.approx(1.2 - lo_before, rel=1e-6)
     fig.canvas.draw()
     lo_after, hi_after = _x_span(ax, label)
-    assert lo_after == pytest.approx(1.2, abs=1e-6)   # flush against x_lo
-    assert hi_after > 2.8                            # and over the far edge
+    assert lo_after == pytest.approx(1.2, abs=1e-6)  # flush against x_lo
+    assert hi_after > 2.8  # and over the far edge
 
 
 def test_a_label_that_fits_is_slid_in_silently(

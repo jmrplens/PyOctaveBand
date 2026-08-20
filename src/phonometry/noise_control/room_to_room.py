@@ -362,7 +362,9 @@ class RoomToRoomResult:
         return rows
 
     # -- presentation -----------------------------------------------------
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the source-room level, the noise reduction and what arrives.
 
         The source-room and receiving-room spectra are drawn against the design

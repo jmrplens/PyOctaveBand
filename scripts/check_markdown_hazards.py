@@ -134,7 +134,7 @@ def _check(path: pathlib.Path) -> list[str]:
                     f"{rel}:{number}: the same-page link "
                     f"'#{target}' will be percent-encoded in the href, and the accessibility "
                     f"audit compares the raw attribute against the ids, so it reads as a "
-                    f"dangling anchor. Put <span id=\"ascii-slug\"></span> above the heading "
+                    f'dangling anchor. Put <span id="ascii-slug"></span> above the heading '
                     f"and link to that, as the pages that already hit this do."
                 )
 
@@ -178,7 +178,9 @@ def main() -> int:
             problems.extend(_check(path))
 
     if problems:
-        print("::error::markdown that does not render the way it reads", file=sys.stderr)
+        print(
+            "::error::markdown that does not render the way it reads", file=sys.stderr
+        )
         for problem in problems:
             print(f"  - {problem}", file=sys.stderr)
         return 1

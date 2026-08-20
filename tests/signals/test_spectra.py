@@ -33,9 +33,7 @@ N = 32768
 
 
 def _white(seed: int, rms: float = 1.0, n: int = N) -> np.ndarray:
-    return ph.signals.noise_signal(
-        FS, n / FS, color="white", rms=rms, seed=seed
-    )
+    return ph.signals.noise_signal(FS, n / FS, color="white", rms=rms, seed=seed)
 
 
 def _known_snr_pair(seed: int, n: int = N) -> tuple[np.ndarray, np.ndarray, float]:
@@ -80,9 +78,7 @@ def test_spectrum_scaling_recovers_sine_power() -> None:
     t = np.arange(N) / FS
     amp = 3.0
     x = amp * np.sin(2.0 * np.pi * 400.0 * t)  # 400 Hz = bin 50 of 1024
-    res = ph.signals.power_spectral_density(
-        x, FS, nperseg=1024, scaling="spectrum"
-    )
+    res = ph.signals.power_spectral_density(x, FS, nperseg=1024, scaling="spectrum")
     peak = int(np.argmax(res.psd))
     assert res.frequencies[peak] == pytest.approx(400.0)
     assert float(res.psd[peak]) == pytest.approx(amp**2 / 2.0, rel=1e-6)
@@ -90,12 +86,8 @@ def test_spectrum_scaling_recovers_sine_power() -> None:
 
 def test_density_and_spectrum_scalings_differ_by_enbw() -> None:
     x = _white(3)
-    dens = ph.signals.power_spectral_density(
-        x, FS, nperseg=1024, scaling="density"
-    )
-    spec = ph.signals.power_spectral_density(
-        x, FS, nperseg=1024, scaling="spectrum"
-    )
+    dens = ph.signals.power_spectral_density(x, FS, nperseg=1024, scaling="density")
+    spec = ph.signals.power_spectral_density(x, FS, nperseg=1024, scaling="spectrum")
     ratio = spec.psd[10:-10] / dens.psd[10:-10]
     assert np.allclose(ratio, dens.resolution_bandwidth, rtol=1e-9)
 
@@ -106,9 +98,7 @@ def test_density_and_spectrum_scalings_differ_by_enbw() -> None:
 
 
 def test_no_overlap_averages_equal_segment_count() -> None:
-    res = ph.signals.power_spectral_density(
-        _white(4), FS, nperseg=1024, overlap=0.0
-    )
+    res = ph.signals.power_spectral_density(_white(4), FS, nperseg=1024, overlap=0.0)
     assert res.n_segments == N // 1024
     assert res.n_averages == pytest.approx(res.n_segments)
     assert res.degrees_of_freedom == pytest.approx(2.0 * res.n_segments)
@@ -116,12 +106,8 @@ def test_no_overlap_averages_equal_segment_count() -> None:
 
 
 def test_overlap_increases_segments_but_effective_averages_grow_less() -> None:
-    plain = ph.signals.power_spectral_density(
-        _white(5), FS, nperseg=1024, overlap=0.0
-    )
-    lapped = ph.signals.power_spectral_density(
-        _white(5), FS, nperseg=1024, overlap=0.5
-    )
+    plain = ph.signals.power_spectral_density(_white(5), FS, nperseg=1024, overlap=0.0)
+    lapped = ph.signals.power_spectral_density(_white(5), FS, nperseg=1024, overlap=0.5)
     assert lapped.n_segments == 2 * plain.n_segments - 1
     # Correlated segments: nd grows, but stays below the raw count.
     assert plain.n_averages < lapped.n_averages < lapped.n_segments
@@ -154,9 +140,7 @@ def test_chi_square_interval_covers_true_psd_at_stated_confidence() -> None:
     true_psd = 1.0 / (FS / 2.0)
     hits, total = 0, 0
     for seed in range(200):
-        res = ph.signals.power_spectral_density(
-            _white(300 + seed), FS, nperseg=1024
-        )
+        res = ph.signals.power_spectral_density(_white(300 + seed), FS, nperseg=1024)
         for b in (60, 120, 240):
             hits += int(res.ci_lower[b] <= true_psd <= res.ci_upper[b])
             total += 1
@@ -180,12 +164,8 @@ def test_dc_and_nyquist_bins_get_wider_single_component_intervals() -> None:
 
 def test_confidence_interval_widens_at_higher_confidence() -> None:
     x = _white(7)
-    r90 = ph.signals.power_spectral_density(
-        x, FS, nperseg=1024, confidence=0.90
-    )
-    r99 = ph.signals.power_spectral_density(
-        x, FS, nperseg=1024, confidence=0.99
-    )
+    r90 = ph.signals.power_spectral_density(x, FS, nperseg=1024, confidence=0.90)
+    r99 = ph.signals.power_spectral_density(x, FS, nperseg=1024, confidence=0.99)
     assert np.all(r99.ci_lower <= r90.ci_lower)
     assert np.all(r90.ci_upper <= r99.ci_upper)
     assert np.all(r90.ci_lower < r90.psd)
@@ -194,9 +174,7 @@ def test_confidence_interval_widens_at_higher_confidence() -> None:
 
 def test_resolution_bias_error_closed_form() -> None:
     # Eq. 8.141: εb = -(Be/Br)²/3; quarter-bandwidth analysis -> -1/48.
-    assert ph.signals.resolution_bias_error(1.0, 4.0) == pytest.approx(
-        -1.0 / 48.0
-    )
+    assert ph.signals.resolution_bias_error(1.0, 4.0) == pytest.approx(-1.0 / 48.0)
     with pytest.raises(ValueError, match="resolution_bandwidth"):
         ph.signals.resolution_bias_error(0.0, 4.0)
     with pytest.raises(ValueError, match="half_power_bandwidth"):
@@ -228,9 +206,7 @@ def test_cross_spectrum_error_formulas_match_monte_carlo() -> None:
     b = 100
     for seed in range(150):
         x, y, snr = _known_snr_pair(seed)
-        res = ph.signals.cross_spectral_density(
-            x, y, FS, nperseg=1024, overlap=0.0
-        )
+        res = ph.signals.cross_spectral_density(x, y, FS, nperseg=1024, overlap=0.0)
         mags.append(res.magnitude[b])
         phases.append(res.phase[b])
         nd = res.n_averages
@@ -245,9 +221,7 @@ def test_cross_spectrum_error_formulas_match_monte_carlo() -> None:
     assert float(np.std(mags_arr) / np.mean(mags_arr)) == pytest.approx(
         expected_mag, rel=0.15
     )
-    assert float(np.std(np.asarray(phases))) == pytest.approx(
-        expected_phase, rel=0.15
-    )
+    assert float(np.std(np.asarray(phases))) == pytest.approx(expected_phase, rel=0.15)
     # The result reports the same formulas with the estimated coherence.
     assert reported_mag_err == pytest.approx(expected_mag, rel=0.10)
     assert reported_phase_std == pytest.approx(expected_phase, rel=0.10)
@@ -332,9 +306,7 @@ def test_coherent_output_random_error_matches_monte_carlo() -> None:
     b = 100
     for seed in range(150):
         x, y, snr = _known_snr_pair(seed)
-        res = ph.signals.coherent_output_spectrum(
-            x, y, FS, nperseg=1024, overlap=0.0
-        )
+        res = ph.signals.coherent_output_spectrum(x, y, FS, nperseg=1024, overlap=0.0)
         values.append(res.coherent_psd[b])
         nd = res.n_averages
         if seed == 0:
@@ -386,7 +358,10 @@ def test_smoothing_flat_invariance_in_db_and_amplitude_domains() -> None:
     f = np.linspace(1.0, 4000.0, 512)
     for domain, level in (("db", -12.0), ("amplitude", 0.5)):
         out = ph.signals.fractional_octave_smoothing(
-            f, np.full(512, level), 6.0, domain=domain  # type: ignore[arg-type]
+            f,
+            np.full(512, level),
+            6.0,
+            domain=domain,  # type: ignore[arg-type]
         )
         np.testing.assert_allclose(out, np.full(512, level), atol=1e-12)
 
@@ -412,9 +387,7 @@ def test_smoothed_line_has_third_octave_width_and_conserved_level() -> None:
 def test_smoothing_narrows_variance_of_noisy_spectrum() -> None:
     res = ph.signals.power_spectral_density(_white(11), FS, nperseg=4096)
     band = (res.frequencies > 200.0) & (res.frequencies < 3800.0)
-    smooth = ph.signals.fractional_octave_smoothing(
-        res.frequencies, res.psd, 3.0
-    )
+    smooth = ph.signals.fractional_octave_smoothing(res.frequencies, res.psd, 3.0)
     assert float(np.std(smooth[band])) < 0.35 * float(np.std(res.psd[band]))
     # Same mean level: smoothing is power-preserving on average.
     assert float(np.mean(smooth[band])) == pytest.approx(

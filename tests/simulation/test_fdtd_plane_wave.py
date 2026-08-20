@@ -94,7 +94,10 @@ def test_rigid_wall_doubles_incident_pressure() -> None:
 
 def test_plane_source_steady_state_is_plane_and_one_way() -> None:
     sim = FDTD2D(
-        C0, DX, shape=(160, 80), sponge_width=20,
+        C0,
+        DX,
+        shape=(160, 80),
+        sponge_width=20,
         sponge_sides=("top", "bottom"),
     )
     waveform = CWSource(0, 0, frequency=1000.0)

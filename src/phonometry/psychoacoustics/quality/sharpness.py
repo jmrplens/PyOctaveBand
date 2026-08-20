@@ -44,7 +44,9 @@ def _g_bismarck(z: np.ndarray) -> np.ndarray:
 
 def _g_aures(z: np.ndarray, total_n: float) -> np.ndarray:
     """DIN 45692 Annex B (informative), Aures loudness-dependent weighting."""
-    g: np.ndarray = 0.078 * np.exp(0.171 * z) / z * (total_n / np.log(total_n * 0.05 + 1.0))
+    g: np.ndarray = (
+        0.078 * np.exp(0.171 * z) / z * (total_n / np.log(total_n * 0.05 + 1.0))
+    )
     return g
 
 
@@ -71,7 +73,9 @@ def _moment(specific: np.ndarray, method: str) -> float:
     raise ValueError("method must be 'din', 'aures' or 'bismarck'")
 
 
-def reference_sound(fs: int = 48000, seconds: float = 2.0, seed: int = 45692) -> np.ndarray:
+def reference_sound(
+    fs: int = 48000, seconds: float = 2.0, seed: int = 45692
+) -> np.ndarray:
     """The DIN 45692 clause 6 standard test signal.
 
     Critical-band-wide narrowband noise: 920 Hz to 1080 Hz, 60 dB overall

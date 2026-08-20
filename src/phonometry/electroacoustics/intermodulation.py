@@ -115,8 +115,9 @@ class ModulationDistortionResult:
     sideband_frequencies: NDArray[np.float64] | None = None
     sideband_amplitudes: NDArray[np.float64] | None = None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en",
-             **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         r"""Plot the carrier and its modulation sidebands, with d2/d3
         annotated.
 

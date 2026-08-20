@@ -88,15 +88,21 @@ _TABLE_D1_RW_RANGE = (20.0, 60.0)
 _ANNEX_D_SYSTEMS: dict[str, tuple[tuple[float, float, float], ...]] = {
     # Formula (D.3): exterior system glued to the wall, mineral wool.
     "mineral_wool": (
-        (-36.0, 82.5, -4.0), (-42.0, 92.0, -4.0), (-39.0, 87.7, -4.0),
+        (-36.0, 82.5, -4.0),
+        (-42.0, 92.0, -4.0),
+        (-39.0, 87.7, -4.0),
     ),
     # Formula (D.4): the same, foams (PS, EPS, EEPS).
     "foam": (
-        (-33.0, 76.0, -3.0), (-33.0, 74.0, -3.0), (-36.0, 77.0, -3.0),
+        (-33.0, 76.0, -3.0),
+        (-33.0, 74.0, -3.0),
+        (-36.0, 77.0, -3.0),
     ),
     # Formula (D.7): system on studs, not directly fixed to the basic wall.
     "studs": (
-        (-20.0, 48.0, -4.0), (-22.0, 51.0, -4.0), (-24.0, 54.0, -4.0),
+        (-20.0, 48.0, -4.0),
+        (-22.0, 51.0, -4.0),
+        (-24.0, 54.0, -4.0),
     ),
 }
 
@@ -117,9 +123,36 @@ _ANNEX_D8_X = (53.0, -10.0, 7.0)
 #: Nominal one-third-octave centre frequencies (ISO 266) used to round ``fo``
 #: before reading Table D.1 (Clause D.2.2), in ascending band order.
 _THIRD_OCTAVE_CENTRES: tuple[float, ...] = (
-    12.5, 16.0, 20.0, 25.0, 31.5, 40.0, 50.0, 63.0, 80.0, 100.0, 125.0,
-    160.0, 200.0, 250.0, 315.0, 400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0,
-    1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0, 6300.0, 8000.0, 10000.0,
+    12.5,
+    16.0,
+    20.0,
+    25.0,
+    31.5,
+    40.0,
+    50.0,
+    63.0,
+    80.0,
+    100.0,
+    125.0,
+    160.0,
+    200.0,
+    250.0,
+    315.0,
+    400.0,
+    500.0,
+    630.0,
+    800.0,
+    1000.0,
+    1250.0,
+    1600.0,
+    2000.0,
+    2500.0,
+    3150.0,
+    4000.0,
+    5000.0,
+    6300.0,
+    8000.0,
+    10000.0,
 )
 
 #: Base-ten band index ``n`` of the first entry of ``_THIRD_OCTAVE_CENTRES``:
@@ -307,7 +340,9 @@ class LiningImprovementResult:
         """``(ΔRw, ΔRA, ΔRA,tr)`` as a tuple, in dB."""
         return self.delta_rw, self.delta_ra, self.delta_ratr
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the Annex D ratings against the resonance frequency.
 
         Draws the three Annex D curves over the tabulated range with this
@@ -456,4 +491,3 @@ def lining_improvement_in_situ(
     reference, low, high = _ANNEX_D8_X
     x = min(high, max(low, rw - reference))
     return float(delta_lab + a * x)
-

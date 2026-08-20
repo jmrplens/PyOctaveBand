@@ -129,7 +129,9 @@ class ApertureTransmissionResult:
         band, dB."""
         return transmission_loss_from_coefficient(self.transmission_coefficient)
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the aperture sound reduction index ``R(f)``.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -155,17 +157,13 @@ class ApertureTransmissionResult:
         from ..._plot.geometry import plot_aperture_result_geometry
 
         check_language(language)
-        return plot_aperture_result_geometry(
-            self, ax=ax, language=language, **kwargs
-        )
+        return plot_aperture_result_geometry(self, ax=ax, language=language, **kwargs)
 
 
 def _slit_end_correction(k_big: np.ndarray) -> np.ndarray:
     r"""End correction :math:`e = (1/\pi)(\ln(8/K) - \gamma)` (Hopkins
     Eq. 4.100)."""
-    return np.asarray(
-        (np.log(8.0 / k_big) - _EULER_GAMMA) / np.pi, dtype=np.float64
-    )
+    return np.asarray((np.log(8.0 / k_big) - _EULER_GAMMA) / np.pi, dtype=np.float64)
 
 
 def slit_transmission_coefficient(
@@ -214,10 +212,15 @@ def slit_transmission_coefficient(
     # the printed Eq. 4.99, an identity that removes the division by cos(Ke)
     # (which vanishes at Ke = pi/2 + n*pi) and keeps tau finite there.
     numerator = m * k_big * cos_ke**4
-    denominator = 2.0 * n**2 * (
-        np.sin(kx_2ke) ** 2
-        + (k_big**2 / (2.0 * n**2)) * cos_ke**2
-        * (1.0 + np.cos(kx) * np.cos(kx_2ke))
+    denominator = (
+        2.0
+        * n**2
+        * (
+            np.sin(kx_2ke) ** 2
+            + (k_big**2 / (2.0 * n**2))
+            * cos_ke**2
+            * (1.0 + np.cos(kx) * np.cos(kx_2ke))
+        )
     )
     tau = numerator / denominator
     return ApertureTransmissionResult(
@@ -313,9 +316,7 @@ def circular_aperture_transmission_coefficient(
     x0 = 2.0 * struve(1, x) / x
     kd = k * d
     term_a = 4.0 * r0**2 * (np.cos(kd) - x0 * np.sin(kd)) ** 2
-    term_b = (
-        (r0**2 - x0**2 + 1.0) * np.sin(kd) + 2.0 * x0 * np.cos(kd)
-    ) ** 2
+    term_b = ((r0**2 - x0**2 + 1.0) * np.sin(kd) + 2.0 * x0 * np.cos(kd)) ** 2
     tau = 4.0 * r0 / (term_a + term_b)
     return ApertureTransmissionResult(
         frequencies=f,
@@ -365,9 +366,7 @@ def composite_transmission_loss(
         return np.asarray(-10.0 * np.log10(total_1d), dtype=np.float64)
     if r.ndim == 2:
         if r.shape[0] != s.shape[0]:
-            raise ValueError(
-                "'reduction_indices' first axis must match 'areas'."
-            )
+            raise ValueError("'reduction_indices' first axis must match 'areas'.")
         tau = 10.0 ** (-r / 10.0)
         total_2d = np.sum(s[:, None] * tau, axis=0) / np.sum(s)
         return np.asarray(-10.0 * np.log10(total_2d), dtype=np.float64)

@@ -117,6 +117,7 @@ def test_g_weighting_consistent_at_low_sample_rates() -> None:
     recorders) 315 Hz approaches Nyquist and the un-prewarped bilinear
     design would otherwise warp; the fs-aware oversampling keeps every
     rate within a few hundredths of a dB of the 48 kHz design."""
+
     def gain_at(fs: int, freq: float) -> float:
         t = np.arange(int(fs * 8)) / fs
         x = np.sin(2 * np.pi * freq * t)

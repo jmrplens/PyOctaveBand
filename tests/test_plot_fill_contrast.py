@@ -94,9 +94,7 @@ def test_delta_e_2000_matches_cie_reference_data(
     The reference data is tabulated in L*a*b*, so the sRGB conversion is
     bypassed and the colour-difference core is exercised directly.
     """
-    monkeypatch.setattr(
-        "phonometry._plot.common._srgb_to_lab", lambda colour: colour
-    )
+    monkeypatch.setattr("phonometry._plot.common._srgb_to_lab", lambda colour: colour)
     assert delta_e_2000(lab_1, lab_2) == pytest.approx(expected, abs=5e-5)
 
 

@@ -208,8 +208,8 @@ def test_rc_out_of_family_annotation() -> None:
 def test_rc_within_tolerance_stays_neutral() -> None:
     # Deviations of exactly the 5 dB / 3 dB tolerances are not exceedances.
     levels = rn.rc_curve(35.0).copy()
-    levels[4] += 5.0   # low band, +5 dB (not > 5).
-    levels[8] += 3.0   # high band, +3 dB (not > 3).
+    levels[4] += 5.0  # low band, +5 dB (not > 5).
+    levels[8] += 3.0  # high band, +3 dB (not > 3).
     assert rn.room_criterion(levels).classification == "N"
 
 

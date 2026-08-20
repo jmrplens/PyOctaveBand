@@ -117,11 +117,11 @@ def test_verbose_adds_energy_share_column(tmp_path) -> None:
 @pytest.mark.parametrize(
     ("a_hv", "n_exceeded", "verdict"),
     [
-        (2.5, 1, "PASS"),    # at the EAV: reaches it -> action exceeded
-        (2.49, 0, "PASS"),   # displays 2.49: below the action value
-        (5.0, 2, "FAIL"),    # at the ELV: reaches it -> limit exceeded, FAIL
+        (2.5, 1, "PASS"),  # at the EAV: reaches it -> action exceeded
+        (2.49, 0, "PASS"),  # displays 2.49: below the action value
+        (5.0, 2, "FAIL"),  # at the ELV: reaches it -> limit exceeded, FAIL
         (4.996, 2, "FAIL"),  # displays 5.00: at the limit on the shown value
-        (1.0, 0, "PASS"),    # well below the action value
+        (1.0, 0, "PASS"),  # well below the action value
     ],
 )
 def test_hav_directive_boundaries_on_displayed_value(

@@ -110,10 +110,18 @@ def test_annex_d_example_renders_pinned_numbers(tmp_path) -> None:
     pytest.importorskip("matplotlib")
     tasks = [
         Task(samples=(70.0,), duration_hours=1.5, label="planning"),
-        Task(samples=(80.1, 82.2, 79.6), duration_hours=5.0,
-             duration_range=(4.0, 6.0), label="welding"),
-        Task(samples=(86.5, 92.4, 89.3, 93.2, 87.8, 86.2), duration_hours=1.5,
-             duration_range=(1.0, 2.0), label="grinding"),
+        Task(
+            samples=(80.1, 82.2, 79.6),
+            duration_hours=5.0,
+            duration_range=(4.0, 6.0),
+            label="welding",
+        ),
+        Task(
+            samples=(86.5, 92.4, 89.3, 93.2, 87.8, 86.2),
+            duration_hours=1.5,
+            duration_range=(1.0, 2.0),
+            label="grinding",
+        ),
     ]
     res = task_based_exposure(tasks, warn=False)
     out = tmp_path / "annex_d.pdf"
@@ -130,11 +138,11 @@ def test_annex_d_example_renders_pinned_numbers(tmp_path) -> None:
 @pytest.mark.parametrize(
     ("level", "n_exceeded", "verdict"),
     [
-        (80.0, 0, "PASS"),   # at the lower action value: not exceeded
+        (80.0, 0, "PASS"),  # at the lower action value: not exceeded
         (80.06, 1, "PASS"),  # displays 80.1: lower action value exceeded
-        (85.0, 1, "PASS"),   # at the upper action value: not exceeded
+        (85.0, 1, "PASS"),  # at the upper action value: not exceeded
         (85.06, 2, "PASS"),  # displays 85.1: both action values exceeded
-        (87.0, 2, "PASS"),   # at the limit value: verdict passes
+        (87.0, 2, "PASS"),  # at the limit value: verdict passes
         (87.06, 3, "FAIL"),  # displays 87.1: limit value exceeded
     ],
 )

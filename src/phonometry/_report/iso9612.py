@@ -146,7 +146,10 @@ def _metadata_pairs(
             (t("Date of test", language), _esc(metadata.test_date)),
         ]
     specs.append(
-        (t("Instrumentation", language), _instrumentation_text(result, metadata, language))
+        (
+            t("Instrumentation", language),
+            _instrumentation_text(result, metadata, language),
+        )
     )
     if metadata is not None:
         specs.append((t("Calibration", language), _esc(metadata.calibration)))
@@ -184,7 +187,11 @@ def _task_table(
     ]
     widths = [62.0, 22.0, 18.0, 34.0, 38.0]
     if verbose:
-        headers += ["u<sub>1a,m</sub> [dB]", "u<sub>1b,m</sub> [h]", "u<sub>2,m</sub> [dB]"]
+        headers += [
+            "u<sub>1a,m</sub> [dB]",
+            "u<sub>1b,m</sub> [h]",
+            "u<sub>2,m</sub> [dB]",
+        ]
         widths = [42.0, 16.0, 16.0, 26.0, 28.0, 16.0, 16.0, 14.0]
 
     data: list[list[Any]] = [[Paragraph(h, header_style) for h in headers]]
@@ -219,10 +226,23 @@ def _task_table(
 
     table = stacked_table(data, [w * mm for w in widths])
     # The totals row keeps the light fill regardless of the zebra parity.
-    table.setStyle([("BACKGROUND", (0, len(data) - 1), (-1, len(data) - 1),
-                     colors.HexColor(_LIGHT_HEX)),
-                    ("LINEABOVE", (0, len(data) - 1), (-1, len(data) - 1),
-                     0.5, colors.HexColor(_ACCENT_HEX))])
+    table.setStyle(
+        [
+            (
+                "BACKGROUND",
+                (0, len(data) - 1),
+                (-1, len(data) - 1),
+                colors.HexColor(_LIGHT_HEX),
+            ),
+            (
+                "LINEABOVE",
+                (0, len(data) - 1),
+                (-1, len(data) - 1),
+                0.5,
+                colors.HexColor(_ACCENT_HEX),
+            ),
+        ]
+    )
     return table
 
 
@@ -249,7 +269,10 @@ def _sampling_table(result: ExposureResult, language: str = "en") -> Any:
             _fmt_db(result.u1 or 0.0, language),
         ),
         (
-            t("Sampling contribution c<sub>1</sub>u<sub>1</sub> (Table C.4) [dB]", language),
+            t(
+                "Sampling contribution c<sub>1</sub>u<sub>1</sub> (Table C.4) [dB]",
+                language,
+            ),
             _fmt_db(result.c1u1 or 0.0, language),
         ),
         (
@@ -443,7 +466,10 @@ def render_iso9612_report(
         # Full-width, landscape per-task contribution chart (self-scaling axis).
         flow.append(
             render_figure_drawing(
-                result.plot, 174 * mm, y_top=None, figsize=(9.2, 2.55),
+                result.plot,
+                174 * mm,
+                y_top=None,
+                figsize=(9.2, 2.55),
                 language=language,
             )
         )
@@ -467,13 +493,17 @@ def render_iso9612_report(
     flow.extend(verdict_flow(text, passed, styles, language))
 
     note_style = ParagraphStyle(
-        "iso9612_notes", parent=getSampleStyleSheet()["Normal"],
-        fontSize=7.5, leading=10, textColor=colors.HexColor(_MUTED_HEX),
+        "iso9612_notes",
+        parent=getSampleStyleSheet()["Normal"],
+        fontSize=7.5,
+        leading=10,
+        textColor=colors.HexColor(_MUTED_HEX),
         spaceBefore=6,
     )
     if result.sampling_advisory:
         advisory_style = ParagraphStyle(
-            "iso9612_advisory", parent=note_style,
+            "iso9612_advisory",
+            parent=note_style,
             textColor=colors.HexColor(_VERDICT_BAD_HEX),
         )
         flow.append(

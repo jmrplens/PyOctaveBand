@@ -71,7 +71,7 @@ to 50 Hz. The single-number weighted rating uses the ISO 717-1 core range, so
 the automatic rating (`RI,w`, `RI,M,w`, `DI,n,e,w`) is formed via the
 verified [`phonometry.building.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) engine only when exactly
 16 one-third-octave (100-3150 Hz) or 5 octave (125-2000 Hz) values are
-supplied. 
+supplied.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 

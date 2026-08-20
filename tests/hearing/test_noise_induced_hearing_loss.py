@@ -38,10 +38,30 @@ from phonometry.hearing import noise_induced_hearing_loss as m
 # row is ever added, allow that +/-1 dB ambiguity.
 _ANNEX_D = {
     (85.0, 40.0): [(0, 0, 0), (0, 0, 0), (1, 2, 2), (3, 5, 7), (5, 7, 9), (2, 4, 6)],
-    (90.0, 20.0): [(0, 0, 0), (0, 0, 0), (2, 4, 8), (7, 10, 16), (9, 13, 18), (4, 8, 14)],
-    (95.0, 10.0): [(0, 0, 1), (1, 2, 4), (0, 5, 13), (8, 16, 25), (13, 20, 27), (5, 14, 23)],
-    (100.0, 40.0): [(5, 7, 11), (8, 11, 19), (16, 24, 39), (29, 38, 60),
-                    (30, 41, 56), (19, 30, 48)],
+    (90.0, 20.0): [
+        (0, 0, 0),
+        (0, 0, 0),
+        (2, 4, 8),
+        (7, 10, 16),
+        (9, 13, 18),
+        (4, 8, 14),
+    ],
+    (95.0, 10.0): [
+        (0, 0, 1),
+        (1, 2, 4),
+        (0, 5, 13),
+        (8, 16, 25),
+        (13, 20, 27),
+        (5, 14, 23),
+    ],
+    (100.0, 40.0): [
+        (5, 7, 11),
+        (8, 11, 19),
+        (16, 24, 39),
+        (29, 38, 60),
+        (30, 41, 56),
+        (19, 30, 48),
+    ],
 }
 
 
@@ -59,10 +79,12 @@ def test_annex_d_table_pins_shared_reference_data() -> None:
 @pytest.mark.parametrize(("key", "expected"), _ANNEX_D.items())
 def test_nipts_matches_annex_d(key: tuple[float, float], expected: list) -> None:
     l_ex, years = key
-    got = np.column_stack([
-        np.round(m.nipts(l_ex, years, frac).value).astype(int)
-        for frac in (0.10, 0.50, 0.90)
-    ])
+    got = np.column_stack(
+        [
+            np.round(m.nipts(l_ex, years, frac).value).astype(int)
+            for frac in (0.10, 0.50, 0.90)
+        ]
+    )
     np.testing.assert_array_equal(got, np.array(expected))
 
 
@@ -132,8 +154,7 @@ def test_htlan_formula_1() -> None:
 
 def test_htlan_matches_components() -> None:
     r = m.htlan(50, "female", 100.0, 20.0, 0.9)
-    np.testing.assert_allclose(
-        r.nipts, m.nipts(100.0, 20.0, 0.9).value)
+    np.testing.assert_allclose(r.nipts, m.nipts(100.0, 20.0, 0.9).value)
 
 
 def test_frequency_subset() -> None:
@@ -184,9 +205,7 @@ def test_annex_c_worked_example() -> None:
 def test_combine_age_and_noise_matches_htlan() -> None:
     """Formula (1) exposed on its own agrees with the ``htlan`` composition."""
     r = m.htlan(55, "female", 92.0, 25.0, 0.75)
-    np.testing.assert_allclose(
-        m.combine_age_and_noise(r.htla, r.nipts), r.threshold
-    )
+    np.testing.assert_allclose(m.combine_age_and_noise(r.htla, r.nipts), r.threshold)
 
 
 def test_outside_validated_domain_warns() -> None:

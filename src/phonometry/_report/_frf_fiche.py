@@ -83,9 +83,7 @@ def frf_metadata_pairs(
         ),
     ]
     return [
-        (label, html.escape(str(value)))
-        for label, value in specs
-        if value is not None
+        (label, html.escape(str(value))) for label, value in specs if value is not None
     ]
 
 

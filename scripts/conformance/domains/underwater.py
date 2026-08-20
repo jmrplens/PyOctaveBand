@@ -40,9 +40,7 @@ def _chk_uw_spl() -> Outcome:
     amp = 2.0  # Pa
     x = amp * np.sin(2.0 * np.pi * 500.0 * t)
     expected = 20.0 * math.log10((amp / math.sqrt(2.0)) / 1e-6)
-    return numeric(
-        expected, ph.underwater.sound_pressure_level(x), 1e-4, places=4
-    )
+    return numeric(expected, ph.underwater.sound_pressure_level(x), 1e-4, places=4)
 
 
 @register(
@@ -57,9 +55,7 @@ def _chk_uw_sel() -> Outcome:
     x = amp * np.sin(2.0 * np.pi * 500.0 * t)
     spl = 20.0 * math.log10((amp / math.sqrt(2.0)) / 1e-6)
     expected = spl + 10.0 * math.log10(2.0)
-    return numeric(
-        expected, ph.underwater.sound_exposure_level(x, fs), 1e-3, places=4
-    )
+    return numeric(expected, ph.underwater.sound_exposure_level(x, fs), 1e-3, places=4)
 
 
 @register(
@@ -73,9 +69,7 @@ def _chk_uw_peak() -> Outcome:
     amp = 3.0
     x = amp * np.sin(2.0 * np.pi * 500.0 * t)
     expected = 20.0 * math.log10(amp / 1e-6)
-    return numeric(
-        expected, ph.underwater.peak_sound_pressure_level(x), 1e-4, places=4
-    )
+    return numeric(expected, ph.underwater.peak_sound_pressure_level(x), 1e-4, places=4)
 
 
 @register(
@@ -135,9 +129,7 @@ _UW_PROP = "Underwater sound propagation (propagation loss)"
 def _chk_uwp_mackenzie() -> Outcome:
     return numeric(
         1550.744,
-        ph.underwater.sea_water_sound_speed(
-            25.0, 35.0, 1000.0, model="mackenzie"
-        ),
+        ph.underwater.sea_water_sound_speed(25.0, 35.0, 1000.0, model="mackenzie"),
         1e-2,
         unit="m/s",
         places=3,
@@ -153,9 +145,7 @@ def _chk_uwp_unesco() -> Outcome:
     expected = ph.underwater.sea_water_sound_speed(
         10.0, 35.0, 1000.0, model="mackenzie"
     )
-    got = ph.underwater.sea_water_sound_speed(
-        10.0, 35.0, 1000.0, model="unesco"
-    )
+    got = ph.underwater.sea_water_sound_speed(10.0, 35.0, 1000.0, model="unesco")
     return numeric(expected, got, 1.0, unit="m/s", places=3)
 
 
@@ -168,9 +158,7 @@ def _chk_uwp_del_grosso() -> Outcome:
     expected = ph.underwater.sea_water_sound_speed(
         10.0, 35.0, 1000.0, model="mackenzie"
     )
-    got = ph.underwater.sea_water_sound_speed(
-        10.0, 35.0, 1000.0, model="del_grosso"
-    )
+    got = ph.underwater.sea_water_sound_speed(10.0, 35.0, 1000.0, model="del_grosso")
     return numeric(expected, got, 1.0, unit="m/s", places=3)
 
 
@@ -209,14 +197,10 @@ def _chk_uwp_thorp() -> Outcome:
 def _chk_uwp_absorption_agreement() -> Outcome:
     kw = {"temperature": 10.0, "salinity": 35.0, "depth": 0.0, "ph": 8.0}
     fg = float(
-        ph.underwater.seawater_absorption(
-            10_000.0, model="francois-garrison", **kw
-        )[0]
+        ph.underwater.seawater_absorption(10_000.0, model="francois-garrison", **kw)[0]
     )
     am = float(
-        ph.underwater.seawater_absorption(
-            10_000.0, model="ainslie-mccolm", **kw
-        )[0]
+        ph.underwater.seawater_absorption(10_000.0, model="ainslie-mccolm", **kw)[0]
     )
     return numeric(fg, am, 0.1 * fg, unit="dB/km", places=4)
 
@@ -232,9 +216,7 @@ def _chk_uwp_fg_printed_table() -> Outcome:
     # digit, i.e. the print's own rounding.
     kw = {"temperature": 10.0, "salinity": 35.0, "depth": 0.0, "ph": 8.0}
     got = float(
-        ph.underwater.seawater_absorption(
-            100_000.0, model="francois-garrison", **kw
-        )[0]
+        ph.underwater.seawater_absorption(100_000.0, model="francois-garrison", **kw)[0]
     )
     return numeric(33.6, got, 0.05, unit="dB/km", places=3)
 
@@ -369,8 +351,10 @@ def _chk_uwp_medwin_derivative() -> Outcome:
     from phonometry.underwater.propagation.sound_speed import sea_water_sound_speed
 
     h = 1e-5
-    grad = (sea_water_sound_speed(10.0 + h, 35.0, 0.0, model="medwin")
-            - sea_water_sound_speed(10.0 - h, 35.0, 0.0, model="medwin")) / (2.0 * h)
+    grad = (
+        sea_water_sound_speed(10.0 + h, 35.0, 0.0, model="medwin")
+        - sea_water_sound_speed(10.0 - h, 35.0, 0.0, model="medwin")
+    ) / (2.0 * h)
     return numeric(3.5, grad - 3.0 * 2.9e-4 * 100.0, 1e-3, unit="m/s per °C", places=4)
 
 
@@ -400,9 +384,7 @@ def _chk_uww_eta_sand() -> Outcome:
 )
 def _chk_uww_eta_mud() -> Outcome:
     # Oracle: Table 9.1 prints η_mud = 0.021·f̂ Np/rad.
-    got = float(
-        ph.underwater.reflection_loss_gradient("mud", frequency_hz=1.0)
-    )
+    got = float(ph.underwater.reflection_loss_gradient("mud", frequency_hz=1.0))
     return numeric(0.021, got, 5e-4, unit="Np/rad", places=5)
 
 
@@ -420,9 +402,20 @@ def _chk_uww_flux_vs_modes() -> Outcome:
 
     ranges = _np.linspace(20_000.0, 30_000.0, 1001)
     energies = [
-        _np.mean(10.0 ** (-ph.underwater.normal_modes(
-            100.0, [0.0, 100.0], [1500.0, 1500.0], source_depth=41.0,
-            receiver_depth=float(zr), ranges_m=ranges).propagation_loss / 10.0))
+        _np.mean(
+            10.0
+            ** (
+                -ph.underwater.normal_modes(
+                    100.0,
+                    [0.0, 100.0],
+                    [1500.0, 1500.0],
+                    source_depth=41.0,
+                    receiver_depth=float(zr),
+                    ranges_m=ranges,
+                ).propagation_loss
+                / 10.0
+            )
+        )
         for zr in _np.linspace(10.0, 90.0, 9)
     ]
     numeric_pl = -10.0 * math.log10(float(_np.mean(energies)))
@@ -434,7 +427,8 @@ def _chk_uww_flux_vs_modes() -> Outcome:
         reflection_loss_gradient_value=0.0,
     )
     expected = -10.0 * math.log10(
-        float(_np.mean(10.0 ** (-flux.propagation_loss / 10.0))))
+        float(_np.mean(10.0 ** (-flux.propagation_loss / 10.0)))
+    )
     return numeric(expected, numeric_pl, 1.0, unit="dB", places=3)
 
 
@@ -450,9 +444,9 @@ def _chk_uwf_appendix_d() -> Outcome:
     # Oracle: the published worked example (printed p. 130) lists W(1 kHz) for
     # the five hearing groups; the HF value is -37.55 dB.
     got = float(
-        ph.underwater.auditory_weighting(
-            1000.0, "HF", guidance="nmfs-2018"
-        ).weighting[0]
+        ph.underwater.auditory_weighting(1000.0, "HF", guidance="nmfs-2018").weighting[
+            0
+        ]
     )
     return numeric(-37.55, got, 0.01, unit="dB", places=3)
 
@@ -470,9 +464,7 @@ def _chk_uwf_otariid_c() -> Outcome:
     params = ph.underwater.weighting_parameters("OW", guidance="nmfs-2024")
     freqs = _np.logspace(0.0, 6.0, 400_001)
     shape = (
-        ph.underwater.auditory_weighting(
-            freqs, "OW", guidance="nmfs-2024"
-        ).weighting
+        ph.underwater.auditory_weighting(freqs, "OW", guidance="nmfs-2024").weighting
         - params.c_db
     )
     return numeric(1.3643, -float(_np.max(shape)), 5e-4, unit="dB", places=4)
@@ -621,5 +613,10 @@ def _chk_uwn_pe() -> Outcome:
     )
     zi = int(min(range(res.depths.size), key=lambda i: abs(res.depths[i] - 10_000.0)))
     ri = int(min(range(res.ranges.size), key=lambda i: abs(res.ranges[i] - 2000.0)))
-    return numeric(20.0 * math.log10(2000.0), float(res.propagation_loss[zi][ri]),
-                   0.1, unit="dB", places=3)
+    return numeric(
+        20.0 * math.log10(2000.0),
+        float(res.propagation_loss[zi][ri]),
+        0.1,
+        unit="dB",
+        places=3,
+    )

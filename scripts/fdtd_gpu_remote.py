@@ -38,6 +38,7 @@ image ``cupy/cupy:v13.6.0`` runs as-is on an NVIDIA driver 570 machine.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 import shlex
@@ -139,10 +140,8 @@ class RemoteConfig:
             host=os.environ.get("PHONO_GPU_HOST", ""),
             user=os.environ.get("PHONO_GPU_USER", "root"),
             name=os.environ.get("PHONO_GPU_NAME", "remote GPU"),
-            image=os.environ.get("PHONO_GPU_DOCKER_IMAGE",
-                                 "cupy/cupy:v13.6.0"),
-            workdir=os.environ.get("PHONO_GPU_WORKDIR",
-                                   "/tmp/phonometry-gpu"),
+            image=os.environ.get("PHONO_GPU_DOCKER_IMAGE", "cupy/cupy:v13.6.0"),
+            workdir=os.environ.get("PHONO_GPU_WORKDIR", "/tmp/phonometry-gpu"),
         )
 
     @property
@@ -203,27 +202,29 @@ def build_job(
     cfl = fdtd_gpu._resolve_cfl(cfl)
     steps = fdtd_gpu._integer("steps", steps)
     sponge_width, sponge_reflection = fdtd_gpu._resolve_sponge(
-        sponge_width, sponge_reflection, ny, nx)
+        sponge_width, sponge_reflection, ny, nx
+    )
     sample_stride = fdtd_gpu._integer("sample_stride", sample_stride)
     if sample_stride < 1:
         raise ValueError("sample_stride must be >= 1")
     if sample_dtype not in ("float64", "float32"):
         raise ValueError("sample_dtype must be 'float64' or 'float32'")
     sample_arr = np.unique(np.asarray(sample_steps, dtype=np.int64))
-    if sample_arr.size and (int(sample_arr.min()) < 0
-                            or int(sample_arr.max()) > steps):
+    if sample_arr.size and (int(sample_arr.min()) < 0 or int(sample_arr.max()) > steps):
         raise ValueError("sample_steps must lie within [0, steps]")
     # None is the "not given" sentinel (all four sides when a sponge is
     # active, as the library); an explicit iterable, including the empty
     # tuple, is resolved and stored literally.
     if sponge_sides is None:
-        sides: tuple[str, ...] = (fdtd_gpu._resolve_sponge_sides(None)
-                                  if sponge_width > 0 else ())
+        sides: tuple[str, ...] = (
+            fdtd_gpu._resolve_sponge_sides(None) if sponge_width > 0 else ()
+        )
     else:
         sides = fdtd_gpu._resolve_sponge_sides(sponge_sides)
     damping_map = fdtd_gpu._resolve_damping(damping, ny, nx)
     edge_profiles = fdtd_gpu._resolve_edge_impedance(
-        edge_impedance, sponge_width, sides, ny, nx)
+        edge_impedance, sponge_width, sides, ny, nx
+    )
     mask = fdtd_gpu._resolve_obstacle_mask(obstacle_mask, ny, nx)
     obstacle = np.zeros((ny, nx), dtype=np.bool_) if mask is None else mask
     job: dict[str, Any] = {
@@ -248,31 +249,53 @@ def build_job(
     if init_scale_x is not None:
         w = np.asarray(init_scale_x, dtype=np.float64)
         if w.ndim != 1 or w.shape[0] != nx:
-            raise ValueError(
-                f"init_scale_x must be a 1D array of length nx = {nx}")
+            raise ValueError(f"init_scale_x must be a 1D array of length nx = {nx}")
         if not np.all(np.isfinite(w)):
             raise ValueError("init_scale_x must be finite everywhere")
         job["init_scale_x"] = w
     return job
 
 
-def _ssh(config: RemoteConfig, command: str,
-         timeout: float) -> subprocess.CompletedProcess[str]:
+def _ssh(
+    config: RemoteConfig, command: str, timeout: float
+) -> subprocess.CompletedProcess[str]:
     """Run one remote command over SSH (BatchMode, no prompts)."""
     return subprocess.run(
-        ["ssh", "-o", "BatchMode=yes",
-         "-o", f"ConnectTimeout={_CONNECT_TIMEOUT_S}",
-         "--", config.target, command],
-        capture_output=True, text=True, timeout=timeout, check=False,
+        [
+            "ssh",
+            "-o",
+            "BatchMode=yes",
+            "-o",
+            f"ConnectTimeout={_CONNECT_TIMEOUT_S}",
+            "--",
+            config.target,
+            command,
+        ],
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+        check=False,
     )
 
 
 def _scp(sources: list[str], dest: str, timeout: float) -> None:
     """Copy files with scp; raise :class:`RemoteRunError` on failure."""
     proc = subprocess.run(
-        ["scp", "-q", "-o", "BatchMode=yes",
-         "-o", f"ConnectTimeout={_CONNECT_TIMEOUT_S}", "--", *sources, dest],
-        capture_output=True, text=True, timeout=timeout, check=False,
+        [
+            "scp",
+            "-q",
+            "-o",
+            "BatchMode=yes",
+            "-o",
+            f"ConnectTimeout={_CONNECT_TIMEOUT_S}",
+            "--",
+            *sources,
+            dest,
+        ],
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+        check=False,
     )
     if proc.returncode != 0:
         raise RemoteRunError(f"scp failed: {proc.stderr.strip()}")
@@ -289,8 +312,9 @@ def remote_available(config: RemoteConfig) -> bool:
     return proc.returncode == 0
 
 
-def run_remote(job: dict[str, Any], config: RemoteConfig,
-               timeout: float = _DEFAULT_JOB_TIMEOUT_S) -> dict[str, Any]:
+def run_remote(
+    job: dict[str, Any], config: RemoteConfig, timeout: float = _DEFAULT_JOB_TIMEOUT_S
+) -> dict[str, Any]:
     """Execute one job on the remote GPU and return the result payload.
 
     Creates a unique job directory under ``config.workdir``, ships the
@@ -309,13 +333,18 @@ def run_remote(job: dict[str, Any], config: RemoteConfig,
         mkdir = _ssh(config, f"mkdir -p {q_dir}", timeout=30.0)
         if mkdir.returncode != 0:
             raise RemoteRunError(
-                f"cannot create {job_dir} on {config.target}: "
-                f"{mkdir.stderr.strip()}")
+                f"cannot create {job_dir} on {config.target}: {mkdir.stderr.strip()}"
+            )
         try:
-            _scp([str(_SCRIPTS / "fdtd_gpu.py"),
-                  str(_SCRIPTS / "job_runner.py"),
-                  str(job_path)],
-                 f"{config.target}:{q_dir}/", timeout=120.0)
+            _scp(
+                [
+                    str(_SCRIPTS / "fdtd_gpu.py"),
+                    str(_SCRIPTS / "job_runner.py"),
+                    str(job_path),
+                ],
+                f"{config.target}:{q_dir}/",
+                timeout=120.0,
+            )
             docker_cmd = (
                 f"docker run --rm --gpus all -v {q_dir}:/work "
                 f"{shlex.quote(config.image)} "
@@ -324,27 +353,32 @@ def run_remote(job: dict[str, Any], config: RemoteConfig,
             try:
                 run = _ssh(config, docker_cmd, timeout=timeout)
             except subprocess.TimeoutExpired as exc:
-                raise RemoteRunError(
-                    f"remote job exceeded {timeout:.0f} s") from exc
+                raise RemoteRunError(f"remote job exceeded {timeout:.0f} s") from exc
             if run.returncode != 0:
                 raise RemoteRunError(
-                    f"remote docker run failed: {run.stderr.strip()[-800:]}")
+                    f"remote docker run failed: {run.stderr.strip()[-800:]}"
+                )
             frames_path = Path(tmp) / "frames.npz"
-            _scp([f"{config.target}:{q_dir}/frames.npz"],
-                 str(frames_path), timeout=300.0)
+            _scp(
+                [f"{config.target}:{q_dir}/frames.npz"], str(frames_path), timeout=300.0
+            )
             with np.load(frames_path, allow_pickle=False) as data:
-                return {key: (data[key].copy() if data[key].ndim
-                              else data[key][()])
-                        for key in data.files}
+                return {
+                    key: (data[key].copy() if data[key].ndim else data[key][()])
+                    for key in data.files
+                }
         finally:
-            try:
+            # Best-effort cleanup: the run already produced its result, so a
+            # remote that has gone away must not turn that into a failure.
+            with contextlib.suppress(OSError, subprocess.TimeoutExpired):
                 _ssh(config, f"rm -rf {q_dir}", timeout=30.0)
-            except (OSError, subprocess.TimeoutExpired):
-                pass                             # best-effort cleanup
 
 
-def submit(job: dict[str, Any], config: RemoteConfig | None = None,
-           timeout: float = _DEFAULT_JOB_TIMEOUT_S) -> dict[str, Any]:
+def submit(
+    job: dict[str, Any],
+    config: RemoteConfig | None = None,
+    timeout: float = _DEFAULT_JOB_TIMEOUT_S,
+) -> dict[str, Any]:
     """Run one job remotely when possible, locally (NumPy) otherwise.
 
     The local fallback is a message, not an exception: a missing .env, an
@@ -358,18 +392,24 @@ def submit(job: dict[str, Any], config: RemoteConfig | None = None,
         if remote_available(config):
             try:
                 return run_remote(job, config, timeout=timeout)
-            except (RemoteRunError, subprocess.TimeoutExpired,
-                    OSError) as exc:
-                print(f"[fdtd-gpu] remote run on {config.name} "
-                      f"({config.target}) failed: {exc}", file=sys.stderr)
-                print("[fdtd-gpu] falling back to a local NumPy run",
-                      file=sys.stderr)
+            except (RemoteRunError, subprocess.TimeoutExpired, OSError) as exc:
+                print(
+                    f"[fdtd-gpu] remote run on {config.name} "
+                    f"({config.target}) failed: {exc}",
+                    file=sys.stderr,
+                )
+                print("[fdtd-gpu] falling back to a local NumPy run", file=sys.stderr)
         else:
-            print(f"[fdtd-gpu] {config.name} ({config.target}) does not "
-                  "answer; running locally on NumPy", file=sys.stderr)
+            print(
+                f"[fdtd-gpu] {config.name} ({config.target}) does not "
+                "answer; running locally on NumPy",
+                file=sys.stderr,
+            )
     else:
-        print("[fdtd-gpu] no PHONO_GPU_HOST configured; running locally "
-              "on NumPy", file=sys.stderr)
+        print(
+            "[fdtd-gpu] no PHONO_GPU_HOST configured; running locally on NumPy",
+            file=sys.stderr,
+        )
     return job_runner.run_job(job)
 
 
@@ -379,18 +419,25 @@ def _benchmark_job(ny: int, nx: int, steps: int) -> dict[str, Any]:
     c_map = np.full((ny, nx), 343.0)
     rho_map = np.full((ny, nx), 1.2)
     # Dense rigid-like block (a 1000:1 density contrast scatterer).
-    rho_map[ny // 2:ny // 2 + ny // 10, nx // 3:nx // 3 + nx // 5] = 1200.0
+    rho_map[ny // 2 : ny // 2 + ny // 10, nx // 3 : nx // 3 + nx // 5] = 1200.0
     damping = np.zeros((ny, nx))
-    damping[:, -nx // 8:] = 40.0                 # lossy sample at the right
+    damping[:, -nx // 8 :] = 40.0  # lossy sample at the right
     return build_job(
-        c_map, dx,
+        c_map,
+        dx,
         rho=rho_map,
         sponge_width=40,
         sponge_sides=("left", "right", "bottom"),
         damping=damping,
         edge_impedance={"top": 413.0},
-        plane_waves=[{"direction": "down", "center": (ny // 4) * dx,
-                      "width": (ny // 12) * dx, "wavelength": 30 * dx}],
+        plane_waves=[
+            {
+                "direction": "down",
+                "center": (ny // 4) * dx,
+                "width": (ny // 12) * dx,
+                "wavelength": 30 * dx,
+            }
+        ],
         steps=steps,
         sample_steps=[0, steps // 2, steps],
     )
@@ -402,9 +449,11 @@ def _report(label: str, result: dict[str, Any], wall: float) -> float:
     steps = int(result["steps"])
     elapsed = float(result["elapsed"])
     rate = cells * steps / elapsed
-    print(f"  {label:24s} backend={result['backend']!s:6s} "
-          f"stepping={elapsed:7.2f} s  wall={wall:7.2f} s  "
-          f"rate={rate / 1e6:8.1f} Mcells/s")
+    print(
+        f"  {label:24s} backend={result['backend']!s:6s} "
+        f"stepping={elapsed:7.2f} s  wall={wall:7.2f} s  "
+        f"rate={rate / 1e6:8.1f} Mcells/s"
+    )
     return rate
 
 
@@ -413,8 +462,10 @@ def _run_benchmark(args: argparse.Namespace) -> int:
     load_env()
     config = RemoteConfig.from_env()
     ny, nx, steps = args.ny, args.nx, args.steps
-    print(f"FDTD GPU benchmark: {ny} x {nx} cells, {steps} steps "
-          f"({ny * nx * steps / 1e9:.1f} Gcell-updates)")
+    print(
+        f"FDTD GPU benchmark: {ny} x {nx} cells, {steps} steps "
+        f"({ny * nx * steps / 1e9:.1f} Gcell-updates)"
+    )
     job = _benchmark_job(ny, nx, steps)
 
     t0 = time.perf_counter()
@@ -424,8 +475,10 @@ def _run_benchmark(args: argparse.Namespace) -> int:
     if args.local_only:
         return 0
     if not config.host or not remote_available(config):
-        print(f"  remote {config.name} ({config.target or 'unset'}) is not "
-              "reachable; no GPU numbers")
+        print(
+            f"  remote {config.name} ({config.target or 'unset'}) is not "
+            "reachable; no GPU numbers"
+        )
         return 1
     t0 = time.perf_counter()
     try:
@@ -433,14 +486,15 @@ def _run_benchmark(args: argparse.Namespace) -> int:
     except RemoteRunError as exc:
         print(f"  remote run failed: {exc}")
         return 1
-    remote_rate = _report(f"remote ({config.name})", remote,
-                          time.perf_counter() - t0)
+    remote_rate = _report(f"remote ({config.name})", remote, time.perf_counter() - t0)
     print(f"  speedup (stepping): {remote_rate / local_rate:.1f}x")
     ref = np.asarray(local["frames"][-1])
     got = np.asarray(remote["frames"][-1])
     peak = float(np.max(np.abs(ref))) or 1.0
-    print(f"  max frame deviation: {np.max(np.abs(got - ref)) / peak:.2e} "
-          "(relative to peak)")
+    print(
+        f"  max frame deviation: {np.max(np.abs(got - ref)) / peak:.2e} "
+        "(relative to peak)"
+    )
     return 0
 
 
@@ -448,21 +502,32 @@ def main(argv: list[str] | None = None) -> int:
     """CLI entry point."""
     parser = argparse.ArgumentParser(
         description="Run animation FDTD fields on a remote GPU over "
-                    "SSH + Docker, with a local NumPy fallback.")
-    parser.add_argument("--benchmark", action="store_true",
-                        help="time a medium case locally and remotely and "
-                             "report cell updates per second")
-    parser.add_argument("--ny", type=int, default=1200,
-                        help="benchmark grid rows (default 1200)")
-    parser.add_argument("--nx", type=int, default=1600,
-                        help="benchmark grid columns (default 1600)")
-    parser.add_argument("--steps", type=int, default=500,
-                        help="benchmark time steps (default 500)")
-    parser.add_argument("--local-only", action="store_true",
-                        help="benchmark only the local NumPy path")
-    parser.add_argument("--timeout", type=float,
-                        default=_DEFAULT_JOB_TIMEOUT_S,
-                        help="remote job timeout in seconds")
+        "SSH + Docker, with a local NumPy fallback."
+    )
+    parser.add_argument(
+        "--benchmark",
+        action="store_true",
+        help="time a medium case locally and remotely and "
+        "report cell updates per second",
+    )
+    parser.add_argument(
+        "--ny", type=int, default=1200, help="benchmark grid rows (default 1200)"
+    )
+    parser.add_argument(
+        "--nx", type=int, default=1600, help="benchmark grid columns (default 1600)"
+    )
+    parser.add_argument(
+        "--steps", type=int, default=500, help="benchmark time steps (default 500)"
+    )
+    parser.add_argument(
+        "--local-only", action="store_true", help="benchmark only the local NumPy path"
+    )
+    parser.add_argument(
+        "--timeout",
+        type=float,
+        default=_DEFAULT_JOB_TIMEOUT_S,
+        help="remote job timeout in seconds",
+    )
     args = parser.parse_args(argv)
     if args.benchmark:
         return _run_benchmark(args)

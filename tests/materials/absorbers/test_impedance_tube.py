@@ -232,9 +232,7 @@ def test_plane_wave_range_bounds() -> None:
         0.03, C0, diameter=0.05, shape="circular"
     )
     # Upper is min(spacing bound 0.45 c/s, tube bound 0.58 c/d).
-    assert f_upper == pytest.approx(
-        min(0.45 * C0 / 0.03, 0.58 * C0 / 0.05)
-    )
+    assert f_upper == pytest.approx(min(0.45 * C0 / 0.03, 0.58 * C0 / 0.05))
     assert f_lower == pytest.approx(C0 / (20.0 * 0.03))
 
 
@@ -310,8 +308,14 @@ def test_result_retains_tube_geometry() -> None:
     f = np.array([800.0, 1200.0])
     h12 = _synth_h12(0.3 + 0.1j, np.asarray(tube_wavenumber(f, C0)), 0.12, 0.03)
     res = two_microphone_impedance(
-        h12, frequency=f, spacing=0.03, x1=0.12, speed_of_sound=C0,
-        characteristic_impedance=RC, diameter=0.05, shape="square",
+        h12,
+        frequency=f,
+        spacing=0.03,
+        x1=0.12,
+        speed_of_sound=C0,
+        characteristic_impedance=RC,
+        diameter=0.05,
+        shape="square",
     )
     assert res.spacing == pytest.approx(0.03)
     assert res.x1 == pytest.approx(0.12)
@@ -320,7 +324,11 @@ def test_result_retains_tube_geometry() -> None:
     assert res.shape == "rectangular"
     # Without a diameter no cross-section claim is retained.
     res_no_d = two_microphone_impedance(
-        h12, frequency=f, spacing=0.03, x1=0.12, speed_of_sound=C0,
+        h12,
+        frequency=f,
+        spacing=0.03,
+        x1=0.12,
+        speed_of_sound=C0,
         characteristic_impedance=RC,
     )
     assert res_no_d.diameter is None
@@ -507,7 +515,12 @@ def test_face_quantities_progressive_wave_impedance() -> None:
     f = np.array([500.0, 1500.0])
     k = np.asarray(tube_wavenumber(f, C0)).real.astype(np.complex128)
     p0, pd, u0, ud = face_quantities(
-        1.0, 0.0, 1.0, 0.0, wavenumber=k, thickness=THICKNESS,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        wavenumber=k,
+        thickness=THICKNESS,
         characteristic_impedance=RC,
     )
     assert np.allclose(p0 / u0, RC, atol=1e-9)
@@ -519,7 +532,12 @@ def test_face_quantities_backward_wave_impedance() -> None:
     f = np.array([500.0, 1500.0])
     k = np.asarray(tube_wavenumber(f, C0)).real.astype(np.complex128)
     p0, pd, u0, ud = face_quantities(
-        0.0, 1.0, 0.0, 1.0, wavenumber=k, thickness=THICKNESS,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        wavenumber=k,
+        thickness=THICKNESS,
         characteristic_impedance=RC,
     )
     assert np.allclose(p0 / u0, -RC, atol=1e-9)
@@ -534,8 +552,12 @@ def test_two_load_warns_on_singular_load_pair() -> None:
     load = (1.0 + 0j, 0.9 + 0j, 0.8 + 0j, 0.7 + 0j)
     with pytest.warns(ImpedanceTubeWarning, match="near-singular"):
         transfer_matrix_two_load(
-            load, load, thickness=THICKNESS, wavenumber=k,
-            characteristic_impedance=RC, **GEOM,
+            load,
+            load,
+            thickness=THICKNESS,
+            wavenumber=k,
+            characteristic_impedance=RC,
+            **GEOM,
         )
 
 
@@ -551,8 +573,12 @@ def test_two_load_no_warning_when_well_conditioned() -> None:
     with _w.catch_warnings():
         _w.simplefilter("error", ImpedanceTubeWarning)
         transfer_matrix_two_load(
-            h_a, h_b, thickness=THICKNESS, wavenumber=k,
-            characteristic_impedance=RC, **GEOM,
+            h_a,
+            h_b,
+            thickness=THICKNESS,
+            wavenumber=k,
+            characteristic_impedance=RC,
+            **GEOM,
         )
 
 
@@ -564,8 +590,12 @@ def test_two_load_recovers_air_layer_matrix() -> None:
     load_a = _synth_four_mics(tm, np.asarray(k), 1.0 + 0.0j, 0.3 + 0.0j)
     load_b = _synth_four_mics(tm, np.asarray(k), 1.0 + 0.0j, -0.5 + 0.2j)
     rec = transfer_matrix_two_load(
-        load_a, load_b, thickness=THICKNESS, wavenumber=k,
-        characteristic_impedance=RC, **GEOM,
+        load_a,
+        load_b,
+        thickness=THICKNESS,
+        wavenumber=k,
+        characteristic_impedance=RC,
+        **GEOM,
     )
     assert np.allclose(rec.t11, tm.t11, atol=1e-9)
     assert np.allclose(rec.t12, tm.t12, atol=1e-9)
@@ -589,8 +619,12 @@ def test_two_load_recovers_asymmetric_specimen() -> None:
     load_a = _synth_four_mics(tm, np.asarray(k), 1.0 + 0.0j, 0.2 + 0.0j)
     load_b = _synth_four_mics(tm, np.asarray(k), 1.0 + 0.0j, -0.4 + 0.1j)
     rec = transfer_matrix_two_load(
-        load_a, load_b, thickness=THICKNESS, wavenumber=k,
-        characteristic_impedance=RC, **GEOM,
+        load_a,
+        load_b,
+        thickness=THICKNESS,
+        wavenumber=k,
+        characteristic_impedance=RC,
+        **GEOM,
     )
     assert np.allclose(rec.determinant(), 1.0 + 0.0j, atol=1e-9)
     assert np.allclose(rec.t11, tm.t11, atol=1e-9)
@@ -606,8 +640,11 @@ def test_one_load_recovers_symmetric_specimen() -> None:
     tm = air_layer_transfer_matrix(k, THICKNESS, RC)
     load = _synth_four_mics(tm, np.asarray(k), 1.0 + 0.0j, 0.25 + 0.1j)
     rec = transfer_matrix_one_load(
-        load, thickness=THICKNESS, wavenumber=k,
-        characteristic_impedance=RC, **GEOM,
+        load,
+        thickness=THICKNESS,
+        wavenumber=k,
+        characteristic_impedance=RC,
+        **GEOM,
     )
     assert np.allclose(rec.t11, tm.t11, atol=1e-9)
     assert np.allclose(rec.t12, tm.t12, atol=1e-9)
@@ -626,17 +663,29 @@ def test_astm_solvers_warn_outside_plane_wave_range() -> None:
     load_b = _synth_four_mics(tm, np.asarray(k), 1.0 + 0.0j, -0.5 + 0.2j)
     with pytest.warns(ImpedanceTubeWarning, match="ASTM E2611-19"):
         transfer_matrix_two_load(
-            load_a, load_b, thickness=THICKNESS, wavenumber=k,
-            characteristic_impedance=RC, diameter=0.10, **GEOM,
+            load_a,
+            load_b,
+            thickness=THICKNESS,
+            wavenumber=k,
+            characteristic_impedance=RC,
+            diameter=0.10,
+            **GEOM,
         )
     with pytest.warns(ImpedanceTubeWarning, match="ASTM E2611-19"):
         transfer_matrix_one_load(
-            load_a, thickness=THICKNESS, wavenumber=k,
-            characteristic_impedance=RC, diameter=0.10, **GEOM,
+            load_a,
+            thickness=THICKNESS,
+            wavenumber=k,
+            characteristic_impedance=RC,
+            diameter=0.10,
+            **GEOM,
         )
     with pytest.warns(ImpedanceTubeWarning, match="ASTM E2611-19"):
         wave_decomposition(
-            *load_a, wavenumber=k, diameter=0.10, **GEOM,
+            *load_a,
+            wavenumber=k,
+            diameter=0.10,
+            **GEOM,
         )
 
 
@@ -663,19 +712,28 @@ def test_astm_solvers_silent_in_band_and_without_diameter() -> None:
         _w.simplefilter("error", ImpedanceTubeWarning)
         # In band with the diameter given (10 cm tube: 114 Hz .. 2011 Hz).
         transfer_matrix_two_load(
-            load_a, load_b, thickness=THICKNESS, wavenumber=k,
-            characteristic_impedance=RC, diameter=0.10, **GEOM,
+            load_a,
+            load_b,
+            thickness=THICKNESS,
+            wavenumber=k,
+            characteristic_impedance=RC,
+            diameter=0.10,
+            **GEOM,
         )
         # No diameter -> no range check, as in the ISO branch.
-        k_wide = np.asarray(
-            tube_wavenumber(np.array([50.0, 2500.0]), C0)
-        ).real.astype(np.complex128)
+        k_wide = np.asarray(tube_wavenumber(np.array([50.0, 2500.0]), C0)).real.astype(
+            np.complex128
+        )
         tm_wide = air_layer_transfer_matrix(k_wide, THICKNESS, RC)
         wide_a = _synth_four_mics(tm_wide, np.asarray(k_wide), 1.0 + 0.0j, 0.3 + 0.0j)
         wide_b = _synth_four_mics(tm_wide, np.asarray(k_wide), 0.4 + 0.5j, -0.6 + 0.1j)
         transfer_matrix_two_load(
-            wide_a, wide_b, thickness=THICKNESS, wavenumber=k_wide,
-            characteristic_impedance=RC, **GEOM,
+            wide_a,
+            wide_b,
+            thickness=THICKNESS,
+            wavenumber=k_wide,
+            characteristic_impedance=RC,
+            **GEOM,
         )
 
 
@@ -687,9 +745,15 @@ def test_transfer_matrix_retains_measurement_context() -> None:
     load_a = _synth_four_mics(tm, np.asarray(k), 1.0 + 0.0j, 0.3 + 0.0j)
     load_b = _synth_four_mics(tm, np.asarray(k), 1.0 + 0.0j, -0.5 + 0.2j)
     rec = transfer_matrix_two_load(
-        load_a, load_b, thickness=THICKNESS, wavenumber=k,
-        characteristic_impedance=RC, frequency=f, diameter=0.10,
-        shape="square", **GEOM,
+        load_a,
+        load_b,
+        thickness=THICKNESS,
+        wavenumber=k,
+        characteristic_impedance=RC,
+        frequency=f,
+        diameter=0.10,
+        shape="square",
+        **GEOM,
     )
     assert rec.l1 == pytest.approx(GEOM["l1"])
     assert rec.s1 == pytest.approx(GEOM["s1"])
@@ -713,18 +777,36 @@ def test_public_exports() -> None:
     from phonometry import materials
 
     for name in (
-        "ImpedanceTubeResult", "ImpedanceTubeWarning", "TransferMatrix",
-        "reflection_factor", "surface_impedance", "absorption_from_reflection",
-        "normalized_surface_impedance", "normalized_surface_admittance",
-        "characteristic_impedance", "speed_of_sound_iso", "speed_of_sound_astm",
-        "air_density_iso", "air_density_astm", "tube_wavenumber",
-        "tube_attenuation_constant", "mic_calibration_factor", "apply_mic_calibration",
-        "two_microphone_impedance", "plane_wave_frequency_range",
-        "plane_wave_frequency_range_astm", "hydraulic_diameter",
-        "standing_wave_absorption", "standing_wave_reflection",
-        "standing_wave_reflection_magnitude", "standing_wave_ratio_from_level",
-        "standing_wave_normalized_impedance", "wave_decomposition", "face_quantities",
-        "transfer_matrix_two_load", "transfer_matrix_one_load",
+        "ImpedanceTubeResult",
+        "ImpedanceTubeWarning",
+        "TransferMatrix",
+        "reflection_factor",
+        "surface_impedance",
+        "absorption_from_reflection",
+        "normalized_surface_impedance",
+        "normalized_surface_admittance",
+        "characteristic_impedance",
+        "speed_of_sound_iso",
+        "speed_of_sound_astm",
+        "air_density_iso",
+        "air_density_astm",
+        "tube_wavenumber",
+        "tube_attenuation_constant",
+        "mic_calibration_factor",
+        "apply_mic_calibration",
+        "two_microphone_impedance",
+        "plane_wave_frequency_range",
+        "plane_wave_frequency_range_astm",
+        "hydraulic_diameter",
+        "standing_wave_absorption",
+        "standing_wave_reflection",
+        "standing_wave_reflection_magnitude",
+        "standing_wave_ratio_from_level",
+        "standing_wave_normalized_impedance",
+        "wave_decomposition",
+        "face_quantities",
+        "transfer_matrix_two_load",
+        "transfer_matrix_one_load",
         "air_layer_transfer_matrix",
     ):
         assert hasattr(materials, name), name

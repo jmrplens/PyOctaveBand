@@ -152,7 +152,12 @@ _C1_OTHER = [
 
 @pytest.mark.parametrize("frequency, level_db, field, presentation, phon", _C1_OTHER)
 def test_annex_c1_other_tones(
-    mg_tone, frequency: float, level_db: float, field: str, presentation: str, phon: float
+    mg_tone,
+    frequency: float,
+    level_db: float,
+    field: str,
+    presentation: str,
+    phon: float,
 ) -> None:
     """3 kHz / 100 Hz / 4 kHz and monaural earphone tones match Annex C.1."""
     res = mg_tone(frequency, level_db, field=field, presentation=presentation)
@@ -175,7 +180,12 @@ _C1_SONE = [
 
 @pytest.mark.parametrize("frequency, field, presentation, level_db, sone", _C1_SONE)
 def test_annex_c1_sone_values(
-    mg_tone, frequency: float, field: str, presentation: str, level_db: float, sone: float
+    mg_tone,
+    frequency: float,
+    field: str,
+    presentation: str,
+    level_db: float,
+    sone: float,
 ) -> None:
     """Annex C.1.2/C.1.3 peak long-term loudness in sone.
 
@@ -223,9 +233,7 @@ def test_annex_c3_multi_tone(
 def test_steady_matches_iso532_2_stationary() -> None:
     """A long steady tone converges to the ISO 532-2 stationary loudness."""
 
-    stationary = psychoacoustics.loudness_moore_glasberg_from_spectrum(
-        [(1000.0, 60.0)]
-    )
+    stationary = psychoacoustics.loudness_moore_glasberg_from_spectrum([(1000.0, 60.0)])
     res = psychoacoustics.loudness_moore_glasberg_time(_tone(1000.0, 60.0), FS)
     # Both models share the excitation/specific-loudness machinery (different
     # calibration constants); agree well within the standard's uncertainty.
@@ -288,9 +296,7 @@ def test_release_is_slower_than_attack() -> None:
 
 def test_silence_is_zero() -> None:
     """Silence yields a zero loudness trace and zero peak."""
-    res = psychoacoustics.loudness_moore_glasberg_time(
-        np.zeros(int(0.3 * FS)), FS
-    )
+    res = psychoacoustics.loudness_moore_glasberg_time(np.zeros(int(0.3 * FS)), FS)
     assert res.n_max == 0.0
     assert np.all(res.short_term_loudness == 0.0)
     assert np.all(res.long_term_loudness == 0.0)
@@ -444,7 +450,9 @@ def test_low_freq_band_not_truncated_across_sample_rates() -> None:
     """
     import importlib
 
-    _mgt_mod = importlib.import_module("phonometry.psychoacoustics.loudness.moore_glasberg_time")
+    _mgt_mod = importlib.import_module(
+        "phonometry.psychoacoustics.loudness.moore_glasberg_time"
+    )
 
     def _band_level(fs: float) -> float:
         p_rms = 2e-5 * 10.0 ** (60.0 / 20.0)
@@ -466,12 +474,8 @@ def test_invalid_inputs_raise() -> None:
     with pytest.raises(ValueError, match="field must be one of"):
         psychoacoustics.loudness_moore_glasberg_time(tone, FS, field="bogus")
     with pytest.raises(ValueError, match="presentation must be one of"):
-        psychoacoustics.loudness_moore_glasberg_time(
-            tone, FS, presentation="bogus"
-        )
-    with pytest.raises(
-        ValueError, match="'fs' must be a positive sampling rate"
-    ):
+        psychoacoustics.loudness_moore_glasberg_time(tone, FS, presentation="bogus")
+    with pytest.raises(ValueError, match="'fs' must be a positive sampling rate"):
         psychoacoustics.loudness_moore_glasberg_time(tone, -1.0)
     empty = np.array([])
     with pytest.raises(ValueError, match="Input signal cannot be empty"):

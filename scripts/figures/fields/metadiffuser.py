@@ -53,38 +53,47 @@ def _meshed_metadiffuser_ntff_levels() -> tuple[Any, Any]:
     slab = round(0.023 / dx)
     ny = r_face + slab + marg + gap + sponge
     mask = np.zeros((ny, nx), dtype=bool)
-    mask[r_face:r_face + slab, lat:lat + face_cells] = True
+    mask[r_face : r_face + slab, lat : lat + face_cells] = True
     for n, (h, l_n, l_c, w_n, w_c) in enumerate(_METADIFFUSER_T1_ROWS):
         x_slit = (n + 0.12) * _META_PITCH
         c0s = lat + round(x_slit / dx)
         c1s = lat + round((x_slit + h * 1e-3) / dx)
-        mask[r_face:r_face + round(0.02 / dx), c0s:c1s] = False
+        mask[r_face : r_face + round(0.02 / dx), c0s:c1s] = False
         for m in range(2):
             y_m = (m + 0.5) * 0.01
             x_neck = x_slit + h * 1e-3
             r0 = r_face + round((y_m - 0.5e-3 * w_n) / dx)
             r1 = r_face + round((y_m + 0.5e-3 * w_n) / dx)
-            mask[r0:r1, c1s:lat + round((x_neck + l_n * 1e-3) / dx)] = False
+            mask[r0:r1, c1s : lat + round((x_neck + l_n * 1e-3) / dx)] = False
             r0 = r_face + round((y_m - 0.5e-3 * w_c) / dx)
             r1 = r_face + round((y_m + 0.5e-3 * w_c) / dx)
-            mask[r0:r1, lat + round((x_neck + l_n * 1e-3) / dx):
-                 lat + round((x_neck + (l_n + l_c) * 1e-3) / dx)] = False
+            mask[
+                r0:r1,
+                lat + round((x_neck + l_n * 1e-3) / dx) : lat
+                + round((x_neck + (l_n + l_c) * 1e-3) / dx),
+            ] = False
     # cfl 0.9 trims the step count; at 340 cells per wavelength the
     # numerical dispersion is negligible at any stable Courant number.
-    sim = FDTD2D(343.0, dx, shape=(ny, nx), sponge_width=sponge, cfl=0.9,
-                 obstacle_mask=mask)
-    sim.add_source(PlaneWaveSource("down", CWSource(0, 0, f0).value,
-                                   offset=sponge))
-    probe = sim.add_contour_probe(lat - marg, lat + face_cells + marg - 1,
-                                  r_face - front, r_face + slab + marg - 1,
-                                  frequencies=[f0])
-    sim.run(round(8e-3 / sim.dt))            # transient out (ramp + ring-up)
+    sim = FDTD2D(
+        343.0, dx, shape=(ny, nx), sponge_width=sponge, cfl=0.9, obstacle_mask=mask
+    )
+    sim.add_source(PlaneWaveSource("down", CWSource(0, 0, f0).value, offset=sponge))
+    probe = sim.add_contour_probe(
+        lat - marg,
+        lat + face_cells + marg - 1,
+        r_face - front,
+        r_face + slab + marg - 1,
+        frequencies=[f0],
+    )
+    sim.run(round(8e-3 / sim.dt))  # transient out (ramp + ring-up)
     probe.reset()
-    sim.run(round(10.0 / f0 / sim.dt))       # ten whole periods of DFT
+    sim.run(round(10.0 / f0 / sim.dt))  # ten whole periods of DFT
     angles = np.arange(-90.0, 90.1, 5.0)
     pattern = far_field_from_contour(
-        probe.phasors(f0), angles - 90.0,
-        origin=((lat + face_cells / 2.0) * dx, r_face * dx))
+        probe.phasors(f0),
+        angles - 90.0,
+        origin=((lat + face_cells / 2.0) * dx, r_face * dx),
+    )
     magnitude = np.abs(pattern)
     levels = 20.0 * np.log10(np.maximum(magnitude / magnitude.max(), 1e-10))
     return angles, levels
@@ -108,26 +117,31 @@ def _metadiffuser_panel_mask(rho: Any) -> None:
     dx, y1 = _META_DX, _META_FACE
     rows = _METADIFFUSER_T1_ROWS
     depth, back = 0.02, 0.003
-    rho[round((y1 - depth - back) / dx):round(y1 / dx),
-        round(_META_XL / dx):round((_META_XL + _META_PERIODS * 5
-                                    * _META_PITCH) / dx)] = 1.2e6
+    rho[
+        round((y1 - depth - back) / dx) : round(y1 / dx),
+        round(_META_XL / dx) : round((_META_XL + _META_PERIODS * 5 * _META_PITCH) / dx),
+    ] = 1.2e6
     lattice = depth / 2
     for period in range(_META_PERIODS):
         for n, (h, ln, lc, wn, wc) in enumerate(rows):
             x0 = _META_XL + (period * 5 + n) * _META_PITCH
             x_slit = x0 + 0.12 * _META_PITCH
             c0s, c1s = round(x_slit / dx), round((x_slit + h * 1e-3) / dx)
-            rho[round((y1 - depth) / dx):round(y1 / dx), c0s:c1s] = 1.2
+            rho[round((y1 - depth) / dx) : round(y1 / dx), c0s:c1s] = 1.2
             for m in range(2):
                 y_m = y1 - depth + (2 - m - 0.5) * lattice
                 x_neck = x_slit + h * 1e-3
                 r0 = round((y_m - 0.5 * wn * 1e-3) / dx)
                 r1 = round((y_m + 0.5 * wn * 1e-3) / dx)
-                rho[r0:r1, c1s:round((x_neck + ln * 1e-3) / dx)] = 1.2
+                rho[r0:r1, c1s : round((x_neck + ln * 1e-3) / dx)] = 1.2
                 r0 = round((y_m - 0.5 * wc * 1e-3) / dx)
                 r1 = round((y_m + 0.5 * wc * 1e-3) / dx)
-                rho[r0:r1, round((x_neck + ln * 1e-3) / dx):
-                    round((x_neck + (ln + lc) * 1e-3) / dx)] = 1.2
+                rho[
+                    r0:r1,
+                    round((x_neck + ln * 1e-3) / dx) : round(
+                        (x_neck + (ln + lc) * 1e-3) / dx
+                    ),
+                ] = 1.2
 
 
 def _meta_qrd_wells() -> list[tuple[float, float, float]]:
@@ -153,19 +167,24 @@ def _meta_rho(kind: str) -> Any:
     x_r = _META_XL + _META_PERIODS * 5 * _META_PITCH
     rho = np.full((ny, nx), 1.2)
     if kind == "qrd":
-        rho[round(0.05 / dx):round(y1 / dx),
-            round(_META_XL / dx):round(x_r / dx)] = 1.2e6
+        rho[
+            round(0.05 / dx) : round(y1 / dx), round(_META_XL / dx) : round(x_r / dx)
+        ] = 1.2e6
         for wx0, wx1, d in _meta_qrd_wells():
             if d > 0.0:
-                rho[round((y1 - d) / dx):round(y1 / dx),
-                    round(wx0 / dx):round(wx1 / dx)] = 1.2
+                rho[
+                    round((y1 - d) / dx) : round(y1 / dx),
+                    round(wx0 / dx) : round(wx1 / dx),
+                ] = 1.2
     elif kind == "meta":
         _metadiffuser_panel_mask(rho)
     elif kind == "flat":
         # A flat rigid slab with the metadiffuser's exact silhouette, so
         # the fans can only come from the slits, not from the outline.
-        rho[round((y1 - 0.023) / dx):round(y1 / dx),
-            round(_META_XL / dx):round(x_r / dx)] = 1.2e6
+        rho[
+            round((y1 - 0.023) / dx) : round(y1 / dx),
+            round(_META_XL / dx) : round(x_r / dx),
+        ] = 1.2e6
     return rho
 
 
@@ -188,7 +207,7 @@ def _meta_taper() -> Any:
     return w
 
 
-_META_FRAMES = 600   # 6.13 ms / 10.2 us per frame (49 frames per period)
+_META_FRAMES = 600  # 6.13 ms / 10.2 us per frame (49 frames per period)
 
 
 def _meta_pair_worker(kind: str, n_frames: int) -> tuple[Any, Any, Any]:
@@ -209,8 +228,9 @@ def _meta_pair_worker(kind: str, n_frames: int) -> tuple[Any, Any, Any]:
     every = 33
     sims = []
     for rho in (_meta_rho(kind), _meta_rho("ref")):
-        sim = fdtd2d.FDTD2D(c0, dx, rho=rho, shape=(_META_NY, _META_NX),
-                            sponge_width=200)
+        sim = fdtd2d.FDTD2D(
+            c0, dx, rho=rho, shape=(_META_NY, _META_NX), sponge_width=200
+        )
         sim.add_plane_wave("up", center=0.80, width=0.05, wavelength=lam0)
         taper = _meta_taper()
         sim.p *= taper[np.newaxis, :]
@@ -263,8 +283,7 @@ def _metadiffuser_fields(
 
         fdtd_gpu_remote.load_env()
         config = fdtd_gpu_remote.RemoteConfig.from_env()
-        use_gpu = bool(config.host) and fdtd_gpu_remote.remote_available(
-            config)
+        use_gpu = bool(config.host) and fdtd_gpu_remote.remote_available(config)
     except (ImportError, OSError, ValueError):
         use_gpu = False
     if use_gpu:
@@ -279,18 +298,28 @@ def _metadiffuser_fields(
         frames: dict[str, Any] = {}
         for kind in ("flat", "qrd", "meta", "ref"):
             job = fdtd_gpu_remote.build_job(
-                343.0, _META_DX, steps=every * n_frames,
-                sample_steps=sample_steps, shape=(_META_NY, _META_NX),
-                rho=_meta_rho(kind), sponge_width=200,
-                plane_waves=[{"direction": "up", "center": 0.80,
-                              "width": 0.05, "wavelength": lam0}],
+                343.0,
+                _META_DX,
+                steps=every * n_frames,
+                sample_steps=sample_steps,
+                shape=(_META_NY, _META_NX),
+                rho=_meta_rho(kind),
+                sponge_width=200,
+                plane_waves=[
+                    {
+                        "direction": "up",
+                        "center": 0.80,
+                        "width": 0.05,
+                        "wavelength": lam0,
+                    }
+                ],
                 init_scale_x=_meta_taper(),
-                sample_stride=stride, sample_dtype="float32",
+                sample_stride=stride,
+                sample_dtype="float32",
             )
             # The four 19 800-step field jobs run ~10-12 min each on the
             # GPU host; give each submit an hour before falling back.
-            frames[kind] = fdtd_gpu_remote.submit(
-                job, config, timeout=3600.0)["frames"]
+            frames[kind] = fdtd_gpu_remote.submit(job, config, timeout=3600.0)["frames"]
         face_row = round(_META_FACE / _META_DX) // stride
         decay = float(2.0 ** (-(every * dt) / 0.0015))
         tot_list, trail_list = [], []
@@ -317,7 +346,7 @@ def _metadiffuser_fields(
         tot = np.stack([part[0] for part in parts])
         trail = np.stack([part[1] for part in parts])
         times = parts[0][2]
-    ref = float(trail[:, trail.shape[1] // 3:].max()) or 1.0
+    ref = float(trail[:, trail.shape[1] // 3 :].max()) or 1.0
     with np.errstate(divide="ignore"):
         trail_db = 20.0 * np.log10(trail / ref)
     trail_db = np.clip(trail_db, -30.0, 0.0).astype(np.float32)
@@ -333,8 +362,7 @@ def animate_fdtd_metadiffuser(output_dir: str) -> None:
     from matplotlib.patches import Polygon, Rectangle
 
     T = _translate_str
-    outline = [patheffects.withStroke(linewidth=2.0,
-                                      foreground=FIELD_STROKE)]
+    outline = [patheffects.withStroke(linewidth=2.0, foreground=FIELD_STROKE)]
     tot_all, trail_db, times = _metadiffuser_fields()
     y1 = _META_FACE
     x_l = _META_XL
@@ -342,11 +370,15 @@ def animate_fdtd_metadiffuser(output_dir: str) -> None:
     vmax = float(np.quantile(np.abs(tot_all[:, 0]), 0.999))
 
     fig = _anim_figure()
-    fig.suptitle(T("Schroeder diffuser vs metadiffuser (2D FDTD)"),
-                 )
+    fig.suptitle(
+        T("Schroeder diffuser vs metadiffuser (2D FDTD)"),
+    )
     gs = fig.add_gridspec(2, 3)
-    titles = [T("Flat rigid panel"), T("QRD, wells down to 27 cm"),
-              T("Metadiffuser, 2 cm panel")]
+    titles = [
+        T("Flat rigid panel"),
+        T("QRD, wells down to 27 cm"),
+        T("Metadiffuser, 2 cm panel"),
+    ]
     qrd_poly: list[tuple[float, float]] = [(x_l, 0.05), (x_l, y1)]
     for wx0, wx1, d in _meta_qrd_wells():
         qrd_poly += [(wx0, y1), (wx0, y1 - d), (wx1, y1 - d), (wx1, y1)]
@@ -358,63 +390,128 @@ def animate_fdtd_metadiffuser(output_dir: str) -> None:
     for col in range(3):
         ax_t = fig.add_subplot(gs[0, col])
         ax_s = fig.add_subplot(gs[1, col])
-        im_t = ax_t.imshow(tot_all[col][0], origin="lower",
-                           extent=(0.0, 1.6, 0.0, 1.2), cmap=CMAP_FIELD,
-                           vmin=-vmax, vmax=vmax, interpolation="bilinear")
-        im_s = ax_s.imshow(trail_db[col][0], origin="lower",
-                           extent=(0.0, 1.6, 0.0, 1.2), cmap="magma",
-                           vmin=-30.0, vmax=0.0, interpolation="bilinear")
+        im_t = ax_t.imshow(
+            tot_all[col][0],
+            origin="lower",
+            extent=(0.0, 1.6, 0.0, 1.2),
+            cmap=CMAP_FIELD,
+            vmin=-vmax,
+            vmax=vmax,
+            interpolation="bilinear",
+        )
+        im_s = ax_s.imshow(
+            trail_db[col][0],
+            origin="lower",
+            extent=(0.0, 1.6, 0.0, 1.2),
+            cmap="magma",
+            vmin=-30.0,
+            vmax=0.0,
+            interpolation="bilinear",
+        )
         ax_t.set_title(titles[col], fontsize=10)
         for ax in (ax_t, ax_s):
             ax.grid(False)
             if col == 1:
-                ax.add_patch(Polygon(qrd_poly, closed=True,
-                                     facecolor=COLOR_GRID,
-                                     edgecolor=COLOR_FG, lw=0.8))
+                ax.add_patch(
+                    Polygon(
+                        qrd_poly,
+                        closed=True,
+                        facecolor=COLOR_GRID,
+                        edgecolor=COLOR_FG,
+                        lw=0.8,
+                    )
+                )
             else:
-                ax.add_patch(Rectangle((x_l, y1 - 0.023), x_r - x_l, 0.023,
-                                       facecolor=COLOR_GRID,
-                                       edgecolor=COLOR_FG, lw=0.8))
+                ax.add_patch(
+                    Rectangle(
+                        (x_l, y1 - 0.023),
+                        x_r - x_l,
+                        0.023,
+                        facecolor=COLOR_GRID,
+                        edgecolor=COLOR_FG,
+                        lw=0.8,
+                    )
+                )
             ax.set_xlim(0.06, 1.54)
             ax.set_ylim(0.0, 1.12)
             ax.tick_params(labelsize=7)
         ax_t.tick_params(labelbottom=False)
         ax_s.set_xlabel("$x$ [m]", fontsize=8)
         if col == 1:
-            ax_t.text(xc, 0.97, T("incident plane wavefront"), ha="center",
-                      va="bottom", color=FIELD_INK, fontsize=7.5,
-                      path_effects=outline)
-            ax_t.annotate("", xy=(xc, 0.83), xytext=(xc, 0.955),
-                          arrowprops={"arrowstyle": "-|>", "color": FIELD_INK,
-                                      "lw": 1.2})
-        d_txt = ax_s.text(xc, 1.03, "", ha="center", va="top",
-                          color="white", fontsize=7.5, fontweight="bold")
+            ax_t.text(
+                xc,
+                0.97,
+                T("incident plane wavefront"),
+                ha="center",
+                va="bottom",
+                color=FIELD_INK,
+                fontsize=7.5,
+                path_effects=outline,
+            )
+            ax_t.annotate(
+                "",
+                xy=(xc, 0.83),
+                xytext=(xc, 0.955),
+                arrowprops={"arrowstyle": "-|>", "color": FIELD_INK, "lw": 1.2},
+            )
+        d_txt = ax_s.text(
+            xc,
+            1.03,
+            "",
+            ha="center",
+            va="top",
+            color="white",
+            fontsize=7.5,
+            fontweight="bold",
+        )
         if col == 0:
             ax_t.set_ylabel(T("sound field $p$"), fontsize=9)
-            ax_s.set_ylabel(T("scattered field (total − incident)"),
-                            fontsize=8)
+            ax_s.set_ylabel(T("scattered field (total − incident)"), fontsize=8)
         else:
             ax_t.tick_params(labelleft=False)
             ax_s.tick_params(labelleft=False)
         if col == 1:
-            ax_t.annotate("", xy=(x_r + 0.045, y1 - 0.274),
-                          xytext=(x_r + 0.045, y1),
-                          arrowprops={"arrowstyle": "-", "color": COLOR_FG,
-                                      "lw": 1.6})
-            ax_t.text(x_r + 0.07, y1 - 0.14, "27 cm", ha="left",
-                      va="center", fontsize=7, color=COLOR_FG)
+            ax_t.annotate(
+                "",
+                xy=(x_r + 0.045, y1 - 0.274),
+                xytext=(x_r + 0.045, y1),
+                arrowprops={"arrowstyle": "-", "color": COLOR_FG, "lw": 1.6},
+            )
+            ax_t.text(
+                x_r + 0.07,
+                y1 - 0.14,
+                "27 cm",
+                ha="left",
+                va="center",
+                fontsize=7,
+                color=COLOR_FG,
+            )
         if col == 2:
-            ax_t.text(xc, 0.06, T("real slits and resonators meshed at "
-                                  "0.25 mm"), ha="center", va="bottom",
-                      color=FIELD_INK, fontsize=6.5, path_effects=outline)
+            ax_t.text(
+                xc,
+                0.06,
+                T("real slits and resonators meshed at 0.25 mm"),
+                ha="center",
+                va="bottom",
+                color=FIELD_INK,
+                fontsize=6.5,
+                path_effects=outline,
+            )
             # No dimension bar on this one: the panel is 2 cm deep against
             # the QRD's 27, and a bar drawn to that scale is four pixels of
             # a stroke 1.6 wide -- a full stop in front of the text, not a
             # measurement. The number sits against the end of the slab it
             # measures instead, which at this thickness is the slab's own
             # thickness anyway.
-            ax_t.text(x_r + 0.02, y1 - 0.012, "2 cm", ha="left",
-                      va="center", fontsize=7, color=COLOR_FG)
+            ax_t.text(
+                x_r + 0.02,
+                y1 - 0.012,
+                "2 cm",
+                ha="left",
+                va="center",
+                fontsize=7,
+                color=COLOR_FG,
+            )
         ims += [im_t, im_s]
         d_txts.append(d_txt)
     # Top-left margin, beside the centred suptitle: three columns of field
@@ -422,13 +519,23 @@ def animate_fdtd_metadiffuser(output_dir: str) -> None:
     # bottom-right corner, and a readout parked there merged with the third
     # column's tick row -- the stem of the "t" reading as part of 1.00, the
     # "ms" as part of 1.50.
-    t_txt = fig.text(0.012, 0.985, "", ha="left", va="top",
-                     family="monospace", fontsize=10, color=COLOR_FG)
+    t_txt = fig.text(
+        0.012,
+        0.985,
+        "",
+        ha="left",
+        va="top",
+        family="monospace",
+        fontsize=10,
+        color=COLOR_FG,
+    )
     reveal = int(0.8 * tot_all.shape[1])
 
-    verdicts = [T("a collimated specular beam"),
-                T("a wide scattered fan"),
-                T("the same fan, from 2 cm")]
+    verdicts = [
+        T("a collimated specular beam"),
+        T("a wide scattered fan"),
+        T("the same fan, from 2 cm"),
+    ]
 
     def update(k: int) -> tuple[Any, ...]:
         for col in range(3):
@@ -438,5 +545,11 @@ def animate_fdtd_metadiffuser(output_dir: str) -> None:
         t_txt.set_text(T(f"$t$ = {times[k] * 1000.0:4.2f} ms"))
         return (*ims, *d_txts, t_txt)
 
-    _render_clip(fig, update, output_dir, "anim_fdtd_metadiffuser",
-                 frames=int(tot_all.shape[1]), gif_fps=8)
+    _render_clip(
+        fig,
+        update,
+        output_dir,
+        "anim_fdtd_metadiffuser",
+        frames=int(tot_all.shape[1]),
+        gif_fps=8,
+    )

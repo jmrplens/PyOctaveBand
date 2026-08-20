@@ -75,9 +75,7 @@ def test_power_cepstrum_echo_rahmonics_are_exact() -> None:
         expected = (-1.0) ** (n + 1) * ALPHA**n / n
         assert res.cepstrum[n * DELAY] == pytest.approx(expected, abs=1e-12)
     # The rahmonic amplitude partial sums converge to ln(1 + a).
-    total = sum(
-        (-1.0) ** (n + 1) * ALPHA**n / n for n in range(1, 60)
-    )
+    total = sum((-1.0) ** (n + 1) * ALPHA**n / n for n in range(1, 60))
     assert total == pytest.approx(np.log1p(ALPHA), abs=1e-15)
 
 
@@ -121,9 +119,7 @@ def test_quefrency_axis_and_shapes() -> None:
 
 
 def test_odd_record_pads_to_even_nfft() -> None:
-    res = ph.signals.cepstrum(
-        np.random.default_rng(7).standard_normal(4095), FS
-    )
+    res = ph.signals.cepstrum(np.random.default_rng(7).standard_normal(4095), FS)
     assert res.nfft == 4096
 
 
@@ -223,7 +219,9 @@ def test_echo_detection_search_band_is_respected() -> None:
     # Restrict the band away from the true echo: the peak reported must
     # come from inside the band.
     res = ph.signals.echo_detection(
-        _impulse_echo(), FS, min_quefrency=400.0 / FS,
+        _impulse_echo(),
+        FS,
+        min_quefrency=400.0 / FS,
         max_quefrency=1000.0 / FS,
     )
     assert 400 <= res.delay_samples <= 1000
@@ -317,9 +315,7 @@ def test_results_are_frozen() -> None:
 # ---------------------------------------------------------------------------
 
 
-def _old_minimum_phase(
-    response: np.ndarray, *, oversample: int = 8
-) -> np.ndarray:
+def _old_minimum_phase(response: np.ndarray, *, oversample: int = 8) -> np.ndarray:
     """Verbatim frozen copy of the pre-refactor ``minimum_phase`` body.
 
     Only the private helpers it called (validation and the trigonometric
@@ -365,9 +361,11 @@ def _fixed_responses() -> list[np.ndarray]:
     # A seeded rough magnitude (measurement-like).
     rng = np.random.default_rng(20260721)
     rough = np.exp(0.3 * rng.standard_normal(w.size)) + 0.1
-    return [np.asarray(biquad, dtype=np.complex128),
-            bandpass.astype(np.float64),
-            rough.astype(np.float64)]
+    return [
+        np.asarray(biquad, dtype=np.complex128),
+        bandpass.astype(np.float64),
+        rough.astype(np.float64),
+    ]
 
 
 @pytest.mark.parametrize("oversample", [1, 4, 8])
@@ -378,9 +376,9 @@ def test_minimum_phase_refactor_is_bit_exact(oversample: int) -> None:
         new = ph.signals.minimum_phase(response, oversample=oversample)
         assert old.dtype == new.dtype
         assert old.shape == new.shape
-        assert np.array_equal(
-            old.view(np.float64), new.view(np.float64)
-        ), "minimum_phase output changed bitwise after the cepstrum refactor"
+        assert np.array_equal(old.view(np.float64), new.view(np.float64)), (
+            "minimum_phase output changed bitwise after the cepstrum refactor"
+        )
 
 
 def test_phase_decomposition_uses_the_shared_core_bit_exactly() -> None:

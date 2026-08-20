@@ -194,29 +194,24 @@ _STRINGS: dict[str, str] = {
     "nominal $L_{FE}$": "$L_{FE}$ nominal",
     "measured $L_{FE}$": "$L_{FE}$ medido",
     "outside tolerance": "fuera de tolerancia",
-    "Impact force exposure level $L_{FE}$ [dB re 1 N]":
-        "Nivel de exposición a la fuerza de impacto $L_{FE}$ [dB re 1 N]",
+    "Impact force exposure level $L_{FE}$ [dB re 1 N]": "Nivel de exposición a la fuerza de impacto $L_{FE}$ [dB re 1 N]",
     "conforms": "cumple",
     "does not conform": "no cumple",
     "Heavy impact source conformance": "Conformidad de la fuente de impacto pesada",
     "rubber ball": "pelota de caucho",
     "bang machine": "máquina de neumático",
     r"$L_\mathrm{i,Fmax}$ (measured)": r"$L_\mathrm{i,Fmax}$ (medido)",
-    r"$L^{\prime}_{\mathrm{i,Fmax},V,T}$ (standardized)":
-        r"$L^{\prime}_{\mathrm{i,Fmax},V,T}$ (estandarizado)",
+    r"$L^{\prime}_{\mathrm{i,Fmax},V,T}$ (standardized)": r"$L^{\prime}_{\mathrm{i,Fmax},V,T}$ (estandarizado)",
     "standardization correction": "corrección de estandarización",
     _MAX_IMPACT_LABEL: "Nivel máximo de presión acústica de impactos [dB]",
-    "ISO 16283-2 rubber-ball standardization":
-        "Estandarización de la pelota de caucho ISO 16283-2",
+    "ISO 16283-2 rubber-ball standardization": "Estandarización de la pelota de caucho ISO 16283-2",
     "A-weighted contribution": "contribución ponderada A",
     r"$X_\mathrm{i,Fmax}$ (unweighted)": r"$X_\mathrm{i,Fmax}$ (sin ponderar)",
-    "ISO 717-2 Annex D heavy-impact rating":
-        "Índice de impacto pesado ISO 717-2 Anexo D",
+    "ISO 717-2 Annex D heavy-impact rating": "Índice de impacto pesado ISO 717-2 Anexo D",
     "one-third octave": "tercio de octava",
     "octave": "octava",
     "Normalized ceiling attenuation": "Diferencia de niveles normalizada del techo",
-    "Normalized ceiling attenuation $D_\\mathrm{n,c}$ [dB]":
-        "Diferencia de niveles normalizada del techo $D_\\mathrm{n,c}$ [dB]",
+    "Normalized ceiling attenuation $D_\\mathrm{n,c}$ [dB]": "Diferencia de niveles normalizada del techo $D_\\mathrm{n,c}$ [dB]",
     "$R_\\mathrm{S} + R_\\mathrm{R}$ (two ceilings)": "$R_\\mathrm{S} + R_\\mathrm{R}$ (dos techos)",
     r"$R_\mathrm{cl}$ (ceiling/plenum path)": r"$R_\mathrm{cl}$ (trayecto techo/plenum)",
     "plenum penalty": "penalización del plenum",
@@ -258,8 +253,10 @@ def _t(text: str, language: str = "en") -> str:
 
 
 def plot_sound_reduction(
-    result: SoundReductionResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: SoundReductionResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Predicted sound reduction index ``R(f)`` (Bies 7.2).
 
@@ -281,36 +278,58 @@ def plot_sound_reduction(
     kwargs.setdefault("label", _t("predicted $R$", language))
     ax.semilogx(freq, r, **kwargs)
     if result.critical_frequency is not None:
-        symbol = "$f_{c1}$" if result.critical_frequency_upper is not None else "$f_\\mathrm{c}$"
-        ax.axvline(
-            result.critical_frequency, color=_C_REFERENCE, ls="--", lw=1.0,
-            label=f"{symbol} = "
-                  f"{format_number(result.critical_frequency, language, decimals=0)} Hz",
+        symbol = (
+            "$f_{c1}$"
+            if result.critical_frequency_upper is not None
+            else "$f_\\mathrm{c}$"
         )
-    if result.critical_frequency is not None and result.critical_frequency_upper is not None:
+        ax.axvline(
+            result.critical_frequency,
+            color=_C_REFERENCE,
+            ls="--",
+            lw=1.0,
+            label=f"{symbol} = "
+            f"{format_number(result.critical_frequency, language, decimals=0)} Hz",
+        )
+    if (
+        result.critical_frequency is not None
+        and result.critical_frequency_upper is not None
+    ):
         # An orthotropic panel has a coincidence *range*, not a dip: shade it,
         # because that band is where R flattens below the mass law.
         ax.axvspan(
-            result.critical_frequency, result.critical_frequency_upper,
-            color=theme_fill(_C_TERTIARY, ax), lw=0, zorder=0,
+            result.critical_frequency,
+            result.critical_frequency_upper,
+            color=theme_fill(_C_TERTIARY, ax),
+            lw=0,
+            zorder=0,
             label=_t("coincidence range ($f_{c1}$ to $f_{c2}$)", language),
         )
         ax.axvline(
-            result.critical_frequency_upper, color=_C_REFERENCE, ls="--", lw=1.0,
+            result.critical_frequency_upper,
+            color=_C_REFERENCE,
+            ls="--",
+            lw=1.0,
             label="$f_{c2}$ = "
-                  f"{format_number(result.critical_frequency_upper, language, decimals=0)} Hz",
+            f"{format_number(result.critical_frequency_upper, language, decimals=0)} Hz",
         )
     if result.resonance_frequency is not None:
         ax.axvline(
-            result.resonance_frequency, color=_C_SECONDARY, ls="--", lw=1.0,
+            result.resonance_frequency,
+            color=_C_SECONDARY,
+            ls="--",
+            lw=1.0,
             label=f"$f_0$ = {format_number(result.resonance_frequency, language, decimals=0)} Hz",
         )
     if result.plateau_start is not None and result.plateau_end is not None:
         # Shade the coincidence plateau of the Watters construction, whose two
         # construction points A and B are what the whole estimate hangs on.
         ax.axvspan(
-            result.plateau_start, result.plateau_end,
-            color=theme_fill(_C_SECONDARY, ax), lw=0, zorder=0,
+            result.plateau_start,
+            result.plateau_end,
+            color=theme_fill(_C_SECONDARY, ax),
+            lw=0,
+            zorder=0,
             label=_t("coincidence plateau (A to B)", language),
         )
     format_frequency_axis(ax, float(freq.min()), float(freq.max()))
@@ -324,8 +343,10 @@ def plot_sound_reduction(
 
 
 def plot_aperture_transmission(
-    result: ApertureTransmissionResult, ax: Axes | None = None,
-    language: str = "en", **kwargs: Any
+    result: ApertureTransmissionResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Aperture sound reduction index ``R(f) = -10 log10(tau)`` (Hopkins 4.3.10).
 
@@ -356,8 +377,10 @@ def plot_aperture_transmission(
 
 
 def plot_weighted_rating(
-    result: WeightedRatingResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: WeightedRatingResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Airborne rating curve vs shifted reference (ISO 717-1).
 
@@ -393,8 +416,10 @@ def plot_weighted_rating(
 
 
 def plot_impact_rating(
-    result: ImpactRatingResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: ImpactRatingResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Impact rating curve vs shifted reference (ISO 717-2).
 
@@ -478,27 +503,47 @@ def _plot_extended_rating(
 
     # Mark the bands outside the 100-3150 Hz core as the enlarged range.
     if float(freqs.min()) < float(core_freqs.min()):
-        ax.axvspan(float(freqs.min()), float(core_freqs.min()),
-                   color=_C_MUTED, alpha=0.12, label=_t(span_label, language))
-    if float(freqs.max()) > float(core_freqs.max()):
-        label = None if float(freqs.min()) < float(core_freqs.min()) else _t(
-            span_label, language
+        ax.axvspan(
+            float(freqs.min()),
+            float(core_freqs.min()),
+            color=_C_MUTED,
+            alpha=0.12,
+            label=_t(span_label, language),
         )
-        ax.axvspan(float(core_freqs.max()), float(freqs.max()),
-                   color=_C_MUTED, alpha=0.12, label=label)
+    if float(freqs.max()) > float(core_freqs.max()):
+        label = (
+            None
+            if float(freqs.min()) < float(core_freqs.min())
+            else _t(span_label, language)
+        )
+        ax.axvspan(
+            float(core_freqs.max()),
+            float(freqs.max()),
+            color=_C_MUTED,
+            alpha=0.12,
+            label=label,
+        )
 
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", _t("Measured", language))
     ax.plot(freqs, measured, "o-", **kwargs)
-    ax.plot(core_freqs, core_ref, "s--", color=_C_REFERENCE,
-            label=_t("Shifted reference (core bands)", language))
-    unfavourable = (
-        core_measured > core_ref if impact else core_measured < core_ref
+    ax.plot(
+        core_freqs,
+        core_ref,
+        "s--",
+        color=_C_REFERENCE,
+        label=_t("Shifted reference (core bands)", language),
     )
+    unfavourable = core_measured > core_ref if impact else core_measured < core_ref
     ax.fill_between(
-        core_freqs, core_measured, core_ref, where=unfavourable.tolist(),
-        color=_C_SECONDARY, alpha=0.4,
-        label=_t_common("Unfavourable deviations", language), interpolate=True,
+        core_freqs,
+        core_measured,
+        core_ref,
+        where=unfavourable.tolist(),
+        color=_C_SECONDARY,
+        alpha=0.4,
+        label=_t_common("Unfavourable deviations", language),
+        interpolate=True,
     )
     _freq_axis(ax, freqs, language=language)
     ax.set_ylabel(ylabel)
@@ -524,8 +569,10 @@ def _extended_terms_line(
 
 
 def plot_extended_weighted_rating(
-    result: ExtendedWeightedRatingResult, ax: Axes | None = None,
-    language: str = "en", **kwargs: Any
+    result: ExtendedWeightedRatingResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Enlarged-range airborne rating curve vs shifted reference (ISO 717-1 Annex B).
 
@@ -558,21 +605,28 @@ def plot_extended_weighted_rating(
             (r"$C_{\mathrm{tr},50‐5000}$", result.ctr_50_5000),
             (r"$C_{\mathrm{tr},100‐5000}$", result.ctr_100_5000),
         ],
-        language, decimals,
+        language,
+        decimals,
     )
     if extended:
         title = f"{title}\n{extended}"
     return _plot_extended_rating(
-        result, impact=False, title=title,
+        result,
+        impact=False,
+        title=title,
         ylabel=_t(_REDUCTION_INDEX_LABEL, language),
-        span_label="enlarged range (Annex B)", ax=ax, language=language,
+        span_label="enlarged range (Annex B)",
+        ax=ax,
+        language=language,
         **kwargs,
     )
 
 
 def plot_extended_impact_rating(
-    result: ExtendedImpactRatingResult, ax: Axes | None = None,
-    language: str = "en", **kwargs: Any
+    result: ExtendedImpactRatingResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Enlarged-range impact rating curve vs shifted reference (ISO 717-2 A.2.1).
 
@@ -600,16 +654,22 @@ def plot_extended_impact_rating(
             rf"{format_number(result.ci_50_2500, language, decimals=decimals)}"
         )
     return _plot_extended_rating(
-        result, impact=True, title=title,
+        result,
+        impact=True,
+        title=title,
         ylabel=_t(_IMPACT_LEVEL_LABEL, language),
-        span_label="enlarged range (A.2.1)", ax=ax, language=language,
+        span_label="enlarged range (A.2.1)",
+        ax=ax,
+        language=language,
         **kwargs,
     )
 
 
 def plot_facade_insulation(
-    result: FacadeInsulationResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: FacadeInsulationResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Per-band façade sound-insulation profile (ISO 16283-3).
 
@@ -630,9 +690,7 @@ def plot_facade_insulation(
     ax = ax if ax is not None else _new_axes()
     dnt = np.asarray(result.d_2m_nt, dtype=np.float64)
     n = dnt.size
-    x = _facade_x_axis(
-        ax, getattr(result, "frequencies", None), n, language=language
-    )
+    x = _facade_x_axis(ax, getattr(result, "frequencies", None), n, language=language)
 
     # D2m,nT first so it is lines[0]; other quantities follow when present.
     curves = [("$D_{2m,nT}$", dnt)]
@@ -659,8 +717,10 @@ def plot_facade_insulation(
 
 
 def plot_facade_prediction(
-    result: FacadePredictionResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: FacadePredictionResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Predicted façade insulation profile (EN 12354-3:2000).
 
@@ -684,7 +744,9 @@ def plot_facade_prediction(
     x = _facade_x_axis(ax, result.frequencies, n, language=language)
 
     for name, rp in result.element_r.items():
-        ax.plot(x, np.asarray(rp, dtype=np.float64), "--", lw=0.9, alpha=0.6, label=name)
+        ax.plot(
+            x, np.asarray(rp, dtype=np.float64), "--", lw=0.9, alpha=0.6, label=name
+        )
 
     opts: dict[str, Any] = {"label": _R_PRIME, "color": "black", "lw": 2.0}
     opts.update(kwargs)
@@ -707,8 +769,10 @@ def plot_facade_prediction(
 
 
 def plot_radiated_power(
-    result: RadiatedPowerResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: RadiatedPowerResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Radiated sound power level ``LW`` per band (EN 12354-4:2000).
 
@@ -731,7 +795,9 @@ def plot_radiated_power(
     if result.frequencies is None:
         labels = [f"{_t('Band', language)} {i + 1}" for i in range(n)]
     else:
-        labels = [_format_freq(f) for f in np.asarray(result.frequencies, dtype=np.float64)]
+        labels = [
+            _format_freq(f) for f in np.asarray(result.frequencies, dtype=np.float64)
+        ]
 
     opts: dict[str, Any] = {"color": "tab:red", "alpha": 0.8, "label": "$L_W$"}
     opts.update(kwargs)
@@ -755,8 +821,10 @@ def plot_radiated_power(
 
 
 def plot_vibration_reduction(
-    result: VibrationReductionResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: VibrationReductionResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Vibration reduction index ``Kij`` versus frequency (ISO 10848).
 
@@ -802,8 +870,10 @@ def plot_vibration_reduction(
 
 
 def plot_structure_borne_power(
-    result: StructureBornePowerResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: StructureBornePowerResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Characteristic structure-borne sound power level per band (EN 15657).
 
@@ -816,8 +886,13 @@ def plot_structure_borne_power(
     from .._i18n import localize_axes
 
     ax = _plot_band_level_bars(
-        ax, result.power_level, result.frequencies, result.total_level,
-        ylabel=_t(r"Structure-borne power level $L_{W\mathrm{s}}$ [dB re 1 pW]", language),
+        ax,
+        result.power_level,
+        result.frequencies,
+        result.total_level,
+        ylabel=_t(
+            r"Structure-borne power level $L_{W\mathrm{s}}$ [dB re 1 pW]", language
+        ),
         title=_t("EN 15657 characteristic structure-borne sound power", language),
         language=language,
         **kwargs,
@@ -827,8 +902,10 @@ def plot_structure_borne_power(
 
 
 def plot_installed_structure_borne(
-    result: InstalledSourceResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: InstalledSourceResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Per-path and total normalised structure-borne SPL (EN 12354-5).
 
@@ -852,8 +929,15 @@ def plot_installed_structure_borne(
         x = np.arange(1, n_bands + 1, dtype=np.float64)
         ax.set_xlabel(_t("Band", language))
     for k, path in enumerate(paths):
-        ax.plot(x, path, color=_C_MUTED, lw=1.0, ls=":", marker=".",
-                label=_t("paths", language) if k == 0 else None)
+        ax.plot(
+            x,
+            path,
+            color=_C_MUTED,
+            lw=1.0,
+            ls=":",
+            marker=".",
+            label=_t("paths", language) if k == 0 else None,
+        )
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("lw", 2.2)
     kwargs.setdefault("label", _t(r"total $L_\mathrm{n,s}$", language))
@@ -869,8 +953,10 @@ def plot_installed_structure_borne(
 
 
 def plot_airborne_prediction(
-    result: AirbornePredictionResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: AirbornePredictionResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Per-path shares of the transmitted energy (EN 12354-1).
 
@@ -911,8 +997,10 @@ def plot_airborne_prediction(
 
 
 def plot_impact_prediction(
-    result: ImpactPredictionResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: ImpactPredictionResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Terms of the apparent impact-level prediction (EN 12354-2).
 
@@ -931,7 +1019,9 @@ def plot_impact_prediction(
 
     ax = ax if ax is not None else _new_axes()
     labels = (
-        r"$L_\mathrm{n,w,eq}$", r"$-\Delta L_\mathrm{w}$", "$+K$",
+        r"$L_\mathrm{n,w,eq}$",
+        r"$-\Delta L_\mathrm{w}$",
+        "$+K$",
         r"$L^{\prime}_\mathrm{n,w}$",
     )
     values = (
@@ -992,8 +1082,14 @@ def _plot_path_shares(
     pooled = order[_MAX_NAMED_PATHS:]
 
     positions = _band_axis(ax, np.asarray(result.frequencies), language=language)
-    palette = (_C_PRIMARY, _C_SECONDARY, _C_TERTIARY, _C_QUATERNARY,
-               _C_PRIMARY_LIGHT, _C_SECONDARY_LIGHT)
+    palette = (
+        _C_PRIMARY,
+        _C_SECONDARY,
+        _C_TERTIARY,
+        _C_QUATERNARY,
+        _C_PRIMARY_LIGHT,
+        _C_SECONDARY_LIGHT,
+    )
     bottom = np.zeros(positions.size, dtype=np.float64)
     for colour, k in zip(palette, named):
         share = 100.0 * fractions[k]
@@ -1002,27 +1098,56 @@ def _plot_path_shares(
         # so a single default would put the first path's label on all of them.
         path_kwargs = dict(kwargs)
         path_kwargs.setdefault("label", labels[k])
-        ax.bar(positions, share, bottom=bottom, width=0.85, color=colour,
-               edgecolor="none", zorder=0, **path_kwargs)
+        ax.bar(
+            positions,
+            share,
+            bottom=bottom,
+            width=0.85,
+            color=colour,
+            edgecolor="none",
+            zorder=0,
+            **path_kwargs,
+        )
         bottom = bottom + share
     if pooled:
         share = 100.0 * fractions[pooled].sum(axis=0)
         pooled_kwargs = dict(kwargs)
         pooled_kwargs.setdefault("label", _t("other paths", language))
-        ax.bar(positions, share, bottom=bottom, width=0.85, color=_C_MUTED,
-               edgecolor="none", zorder=0, **pooled_kwargs)
+        ax.bar(
+            positions,
+            share,
+            bottom=bottom,
+            width=0.85,
+            color=_C_MUTED,
+            edgecolor="none",
+            zorder=0,
+            **pooled_kwargs,
+        )
     ax.set_ylabel(_t(_SHARE_LABEL, language))
     ax.set_ylim(0.0, 100.0)
     ax.set_title(title)
 
     twin = ax.twinx()
-    twin.plot(positions, np.asarray(total, dtype=np.float64), color=_C_REFERENCE,
-              lw=2.0, marker="o", ms=4, label=total_label, zorder=3)
+    twin.plot(
+        positions,
+        np.asarray(total, dtype=np.float64),
+        color=_C_REFERENCE,
+        lw=2.0,
+        marker="o",
+        ms=4,
+        label=total_label,
+        zorder=3,
+    )
     twin.set_ylabel(_t(ylabel, language))
     handles, texts = ax.get_legend_handles_labels()
     extra_handles, extra_texts = twin.get_legend_handles_labels()
-    ax.legend(handles + extra_handles, texts + extra_texts, loc="best",
-              fontsize="small", ncol=2)
+    ax.legend(
+        handles + extra_handles,
+        texts + extra_texts,
+        loc="best",
+        fontsize="small",
+        ncol=2,
+    )
     ax.grid(True, axis="y", alpha=0.3)
     localize_axes(ax, language)
     localize_axes(twin, language)
@@ -1030,8 +1155,10 @@ def _plot_path_shares(
 
 
 def plot_detailed_airborne_prediction(
-    result: DetailedAirborneResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: DetailedAirborneResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Per-band path contributions and ``R'`` (EN/ISO 12354-1 detailed model).
 
@@ -1051,15 +1178,22 @@ def plot_detailed_airborne_prediction(
             rf"{format_number(result.rating.rating, language, decimals=0)} dB"
         )
     return _plot_path_shares(
-        result, result.r_prime, total_label=_R_PRIME,
-        ylabel=_REDUCTION_INDEX_LABEL, title=title, ax=ax,
-        language=language, **kwargs,
+        result,
+        result.r_prime,
+        total_label=_R_PRIME,
+        ylabel=_REDUCTION_INDEX_LABEL,
+        title=title,
+        ax=ax,
+        language=language,
+        **kwargs,
     )
 
 
 def plot_detailed_impact_prediction(
-    result: DetailedImpactResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: DetailedImpactResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Per-band path contributions and ``L'n`` (EN/ISO 12354-2 detailed model).
 
@@ -1079,15 +1213,22 @@ def plot_detailed_impact_prediction(
             rf"{format_number(result.rating.rating, language, decimals=0)} dB"
         )
     return _plot_path_shares(
-        result, result.l_prime_n, total_label=r"$L^{\prime}_\mathrm{n}$",
-        ylabel=_IMPACT_LEVEL_LABEL, title=title, ax=ax,
-        language=language, **kwargs,
+        result,
+        result.l_prime_n,
+        total_label=r"$L^{\prime}_\mathrm{n}$",
+        ylabel=_IMPACT_LEVEL_LABEL,
+        title=title,
+        ax=ax,
+        language=language,
+        **kwargs,
     )
 
 
 def plot_in_situ_element(
-    result: InSituElementResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: InSituElementResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """In-situ ``Rsitu`` and ``Ln,situ`` of one element (EN/ISO 12354).
 
@@ -1107,14 +1248,19 @@ def plot_in_situ_element(
     kwargs.setdefault("ms", 4)
     kwargs.setdefault("label", r"$R_\mathrm{situ}$")
     ax.plot(freqs, result.sound_reduction_index, **kwargs)
-    ax.plot(freqs, result.impact_level, color=_C_SECONDARY, marker="s", ms=4,
-            label=r"$L_\mathrm{n,situ}$")
+    ax.plot(
+        freqs,
+        result.impact_level,
+        color=_C_SECONDARY,
+        marker="s",
+        ms=4,
+        label=r"$L_\mathrm{n,situ}$",
+    )
     ax.set_xscale("log")
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Reduction index / impact level [dB]", language))
     ax.set_title(
-        f"{_t('In-situ element performance (ISO 12354)', language)} — "
-        f"{result.label}"
+        f"{_t('In-situ element performance (ISO 12354)', language)} — {result.label}"
     )
     ax.grid(True, which="both", alpha=0.3)
     ax.legend(loc="best", fontsize="small")
@@ -1124,8 +1270,10 @@ def plot_in_situ_element(
 
 
 def plot_airborne_insulation(
-    result: AirborneInsulationResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: AirborneInsulationResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Per-band airborne insulation quantities (ISO 16283-1).
 
@@ -1160,8 +1308,10 @@ def plot_airborne_insulation(
 
 
 def plot_impact_insulation(
-    result: ImpactInsulationResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: ImpactInsulationResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Per-band impact sound pressure levels (ISO 16283-2).
 
@@ -1176,9 +1326,7 @@ def plot_impact_insulation(
     """
     from .._i18n import localize_axes
 
-    curves = [
-        (r"$L^{\prime}_\mathrm{nT}$", np.asarray(result.l_n_t, dtype=np.float64))
-    ]
+    curves = [(r"$L^{\prime}_\mathrm{nT}$", np.asarray(result.l_n_t, dtype=np.float64))]
     if result.l_n is not None:
         curves.append(
             (r"$L^{\prime}_\mathrm{n}$", np.asarray(result.l_n, dtype=np.float64))
@@ -1196,8 +1344,7 @@ def plot_impact_insulation(
 
 
 def plot_band_uncertainty(
-    result: BandUncertainty, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: BandUncertainty, ax: Axes | None = None, language: str = "en", **kwargs: Any
 ) -> Axes:
     """Per-band standard uncertainty of an insulation quantity (ISO 12999-1).
 
@@ -1220,7 +1367,8 @@ def plot_band_uncertainty(
     ax.set_ylim(bottom=0.0)
     quantity = (
         _t(r"$\sigma_\mathrm{R95}$ upper limit", language)
-        if result.upper_limit else "$u$"
+        if result.upper_limit
+        else "$u$"
     )
     ax.set_title(
         f"ISO 12999-1 {_t('band uncertainty', language)} ({quantity}) — "
@@ -1232,8 +1380,10 @@ def plot_band_uncertainty(
 
 
 def plot_floor_covering_improvement(
-    result: FloorCoveringImprovementResult, ax: Axes | None = None,
-    language: str = "en", **kwargs: Any
+    result: FloorCoveringImprovementResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Impact-sound improvement spectrum ΔL of a floor covering (ISO 16251-1).
 
@@ -1254,8 +1404,15 @@ def plot_floor_covering_improvement(
     # Mark bands at the limit of measurement (reported as > delta-L).
     if result.limited.size and bool(np.any(result.limited)):
         ax.plot(
-            freqs[result.limited], dl[result.limited], ls="", marker="v",
-            color=_C_SECONDARY, ms=9, mfc="none", mew=1.6, zorder=5,
+            freqs[result.limited],
+            dl[result.limited],
+            ls="",
+            marker="v",
+            color=_C_SECONDARY,
+            ms=9,
+            mfc="none",
+            mew=1.6,
+            zorder=5,
             label=_t(r"limit of measurement (> $\Delta L$)", language),
         )
     _freq_axis(ax, freqs, language=language)
@@ -1285,8 +1442,10 @@ _DB_HR_SPECTRUM_LABELS = {
 
 
 def plot_db_hr_global_index(
-    result: DbHrGlobalIndexResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: DbHrGlobalIndexResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Band insulation and per-band transmitted level of a DB-HR global index.
 
@@ -1321,8 +1480,14 @@ def plot_db_hr_global_index(
     # goes on its own axis; the bands where it peaks are the ones that set the
     # index, which is minus the energy sum of that curve.
     twin = ax.twinx()
-    twin.plot(positions, contributions, "o-", color=_C_SECONDARY, ms=4.0,
-              label=_t("transmitted level $L_{x,i} - X_i$", language))
+    twin.plot(
+        positions,
+        contributions,
+        "o-",
+        color=_C_SECONDARY,
+        ms=4.0,
+        label=_t("transmitted level $L_{x,i} - X_i$", language),
+    )
     twin.set_ylabel(_t("Transmitted level [dBA]", language))
 
     spectrum = _t(_DB_HR_SPECTRUM_LABELS[result.spectrum], language)
@@ -1332,8 +1497,12 @@ def plot_db_hr_global_index(
     )
     handles, labels = ax.get_legend_handles_labels()
     extra_handles, extra_labels = twin.get_legend_handles_labels()
-    ax.legend(handles + extra_handles, labels + extra_labels,
-              loc="upper left", fontsize="small")
+    ax.legend(
+        handles + extra_handles,
+        labels + extra_labels,
+        loc="upper left",
+        fontsize="small",
+    )
     ax.grid(True, axis="y", alpha=0.3)
     localize_axes(ax, language)
     localize_axes(twin, language)
@@ -1341,8 +1510,7 @@ def plot_db_hr_global_index(
 
 
 def plot_db_hr_assessment(
-    result: DbHrAssessment, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: DbHrAssessment, ax: Axes | None = None, language: str = "en", **kwargs: Any
 ) -> Axes:
     """Achieved values against their CTE DB-HR requirements.
 
@@ -1368,8 +1536,15 @@ def plot_db_hr_assessment(
     colours = [_C_TERTIARY if c.complies else _C_REFERENCE for c in checks]
 
     ax.hlines(rows, limits, achieved, colors=colours, linewidth=2.0)
-    ax.scatter(limits, rows, marker="|", s=220, color=_C_MUTED,
-               label=_t("required", language), zorder=4)
+    ax.scatter(
+        limits,
+        rows,
+        marker="|",
+        s=220,
+        color=_C_MUTED,
+        label=_t("required", language),
+        zorder=4,
+    )
     kwargs.setdefault("marker", "o")
     kwargs.setdefault("s", 55)
     kwargs.setdefault("label", _t("achieved", language))
@@ -1413,19 +1588,30 @@ def _plot_shaded_band_pair(
     ax = ax if ax is not None else _new_axes()
     labels = frequencies if frequencies is not None else np.arange(curve.size) + 1.0
     positions = _band_axis(
-        ax, labels,
+        ax,
+        labels,
         xlabel=_FREQ_LABEL if frequencies is not None else _BAND_INDEX_LABEL,
         language=language,
     )
-    ax.plot(positions, reference, "s--", color=_C_REFERENCE, lw=1.2,
-            label=_t(reference_label, language))
+    ax.plot(
+        positions,
+        reference,
+        "s--",
+        color=_C_REFERENCE,
+        lw=1.2,
+        label=_t(reference_label, language),
+    )
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("marker", "o")
     kwargs.setdefault("label", _t(curve_label, language))
     ax.plot(positions, curve, "-", **kwargs)
     ax.fill_between(
-        positions, reference, curve,
-        color=theme_fill(_C_SECONDARY, ax), lw=0, zorder=0,
+        positions,
+        reference,
+        curve,
+        color=theme_fill(_C_SECONDARY, ax),
+        lw=0,
+        zorder=0,
         label=_t(fill_label, language),
     )
     ax.set_ylabel(_t(ylabel, language))
@@ -1436,8 +1622,10 @@ def _plot_shaded_band_pair(
 
 
 def plot_heavy_impact_source(
-    result: HeavyImpactSourceCheck, ax: Axes | None = None,
-    language: str = "en", **kwargs: Any
+    result: HeavyImpactSourceCheck,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Measured heavy-impact source ``LFE`` against its printed tolerance band.
 
@@ -1455,23 +1643,42 @@ def plot_heavy_impact_source(
     lower = result.nominal - result.tolerance
     upper = result.nominal + result.tolerance
     ax.fill_between(
-        positions, lower, upper, color=theme_fill(_C_TERTIARY, ax), lw=0, zorder=0,
+        positions,
+        lower,
+        upper,
+        color=theme_fill(_C_TERTIARY, ax),
+        lw=0,
+        zorder=0,
         label=_t("tolerance band", language),
     )
-    ax.plot(positions, result.nominal, "s--", color=_C_REFERENCE, lw=1.2,
-            label=_t("nominal $L_{FE}$", language))
+    ax.plot(
+        positions,
+        result.nominal,
+        "s--",
+        color=_C_REFERENCE,
+        lw=1.2,
+        label=_t("nominal $L_{FE}$", language),
+    )
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("marker", "o")
     kwargs.setdefault("label", _t("measured $L_{FE}$", language))
-    ax.plot(positions, result.measured, "-",
-            **kwargs)
+    ax.plot(positions, result.measured, "-", **kwargs)
     failing = ~result.within_tolerance
     if bool(np.any(failing)):
-        ax.plot(positions[failing], result.measured[failing], ls="", marker="X",
-                color=_C_SECONDARY, ms=11, zorder=6,
-                label=_t("outside tolerance", language))
+        ax.plot(
+            positions[failing],
+            result.measured[failing],
+            ls="",
+            marker="X",
+            color=_C_SECONDARY,
+            ms=11,
+            zorder=6,
+            label=_t("outside tolerance", language),
+        )
     ax.set_ylabel(_t("Impact force exposure level $L_{FE}$ [dB re 1 N]", language))
-    verdict = _t("conforms", language) if result.passed else _t("does not conform", language)
+    verdict = (
+        _t("conforms", language) if result.passed else _t("does not conform", language)
+    )
     source = _t(_HEAVY_IMPACT_SOURCE_LABELS[result.source], language)
     ax.set_title(
         f"{_t('Heavy impact source conformance', language)}: {source} ({verdict})"
@@ -1483,8 +1690,10 @@ def plot_heavy_impact_source(
 
 
 def plot_standardized_maximum_impact(
-    result: StandardizedMaximumImpactResult, ax: Axes | None = None,
-    language: str = "en", **kwargs: Any
+    result: StandardizedMaximumImpactResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Measured and standardized maximum impact levels (ISO 16283-2 3.16).
 
@@ -1518,8 +1727,10 @@ def plot_standardized_maximum_impact(
 
 
 def plot_a_weighted_maximum_impact(
-    result: AWeightedMaximumImpactResult, ax: Axes | None = None,
-    language: str = "en", **kwargs: Any
+    result: AWeightedMaximumImpactResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """A-weighted maximum impact level and its band contributions (ISO 717-2 D).
 
@@ -1536,12 +1747,24 @@ def plot_a_weighted_maximum_impact(
     positions = _band_axis(ax, result.frequencies, language=language)
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", _t("A-weighted contribution", language))
-    ax.bar(positions, result.corrected, width=0.7, zorder=2,
-           **kwargs)
-    ax.plot(positions, result.levels, "s--", color=_C_REFERENCE, lw=1.2, zorder=3,
-            label=_t(r"$X_\mathrm{i,Fmax}$ (unweighted)", language))
-    ax.axhline(result.rating, color=_C_SECONDARY, ls="-", lw=1.6, zorder=4,
-               label=rf"$X_\mathrm{{iA,Fmax}}$ = {result.rating} dB")
+    ax.bar(positions, result.corrected, width=0.7, zorder=2, **kwargs)
+    ax.plot(
+        positions,
+        result.levels,
+        "s--",
+        color=_C_REFERENCE,
+        lw=1.2,
+        zorder=3,
+        label=_t(r"$X_\mathrm{i,Fmax}$ (unweighted)", language),
+    )
+    ax.axhline(
+        result.rating,
+        color=_C_SECONDARY,
+        ls="-",
+        lw=1.6,
+        zorder=4,
+        label=rf"$X_\mathrm{{iA,Fmax}}$ = {result.rating} dB",
+    )
     ax.set_ylabel(_t(_MAX_IMPACT_LABEL, language))
     ax.set_title(
         f"{_t('ISO 717-2 Annex D heavy-impact rating', language)} "
@@ -1555,8 +1778,10 @@ def plot_a_weighted_maximum_impact(
 
 
 def plot_ceiling_attenuation(
-    result: CeilingAttenuationResult, ax: Axes | None = None,
-    language: str = "en", **kwargs: Any
+    result: CeilingAttenuationResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Normalized ceiling attenuation against the fitted ASTM E413 contour.
 
@@ -1590,8 +1815,10 @@ def plot_ceiling_attenuation(
 
 
 def plot_plenum_flanking(
-    result: PlenumFlankingResult, ax: Axes | None = None,
-    language: str = "en", **kwargs: Any
+    result: PlenumFlankingResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Ceiling/plenum flanking path ``Rcl`` against the two ceilings.
 
@@ -1627,8 +1854,10 @@ def plot_plenum_flanking(
 
 
 def plot_wall_tie_coupling(
-    result: WallTieCouplingResult, ax: Axes | None = None,
-    language: str = "en", **kwargs: Any
+    result: WallTieCouplingResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Wall-tie coupling loss factor against the rigid-connection ceiling.
 
@@ -1643,24 +1872,34 @@ def plot_wall_tie_coupling(
 
     ax = ax if ax is not None else _new_axes()
     freq = np.asarray(result.frequencies, dtype=np.float64)
-    ax.loglog(freq, result.rigid_coupling_loss_factor, "--", color=_C_REFERENCE,
-              lw=1.2, label=_t("rigid connection ($Y_\\mathrm{c}$ = 0)", language))
+    ax.loglog(
+        freq,
+        result.rigid_coupling_loss_factor,
+        "--",
+        color=_C_REFERENCE,
+        lw=1.2,
+        label=_t("rigid connection ($Y_\\mathrm{c}$ = 0)", language),
+    )
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", _t("resilient tie array", language))
-    ax.loglog(freq, result.coupling_loss_factor,
-              **kwargs)
+    ax.loglog(freq, result.coupling_loss_factor, **kwargs)
     ax.fill_between(
-        freq, result.coupling_loss_factor, result.rigid_coupling_loss_factor,
-        color=theme_fill(_C_TERTIARY, ax), lw=0, zorder=0,
+        freq,
+        result.coupling_loss_factor,
+        result.rigid_coupling_loss_factor,
+        color=theme_fill(_C_TERTIARY, ax),
+        lw=0,
+        zorder=0,
         label=_t("isolation gained by the tie", language),
     )
     format_frequency_axis(ax, float(freq.min()), float(freq.max()))
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Coupling loss factor $\\eta_{ij}$", language))
     stiffness = (
-        "" if result.tie_stiffness is None
+        ""
+        if result.tie_stiffness is None
         else ", $k$ = "
-             f"{format_number(result.tie_stiffness / 1e6, language, decimals=1)} MN/m"
+        f"{format_number(result.tie_stiffness / 1e6, language, decimals=1)} MN/m"
     )
     ax.set_title(
         f"{_t('Wall-tie structure-borne coupling', language)} "
@@ -1699,7 +1938,10 @@ def _plot_improvement_spectrum(
         ax.plot(freqs, values, color=colour, ls=style, label=_t(label, language))
     if marker_frequency is not None:
         ax.axvline(
-            marker_frequency, color=_C_MUTED, ls=":", lw=1.2,
+            marker_frequency,
+            color=_C_MUTED,
+            ls=":",
+            lw=1.2,
             label=f"{_t(marker_label, language)} = {_format_freq(marker_frequency)} Hz",
         )
     ax.set_xlabel(_t(_FREQ_LABEL, language))
@@ -1710,8 +1952,10 @@ def _plot_improvement_spectrum(
 
 
 def plot_tapping_force(
-    result: TappingForceResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: TappingForceResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Force spectrum of the ISO tapping machine on one walking surface.
 
@@ -1731,15 +1975,29 @@ def plot_tapping_force(
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     kwargs.setdefault("color", _C_PRIMARY)
-    kwargs.setdefault("label", kwargs.pop("label", _t("force spectrum $|F_n|$", language)))
-    ax.plot(freqs, result.peak_force,
-            **kwargs)
-    ax.axhline(result.upper_limit, color=_C_REFERENCE, ls="--", lw=1.2,
-               label=r"$|F_n|_\mathrm{upper}$")
-    ax.axhline(result.lower_limit, color=_C_MUTED, ls="--", lw=1.2,
-               label=r"$|F_n|_\mathrm{lower}$")
+    kwargs.setdefault(
+        "label", kwargs.pop("label", _t("force spectrum $|F_n|$", language))
+    )
+    ax.plot(freqs, result.peak_force, **kwargs)
+    ax.axhline(
+        result.upper_limit,
+        color=_C_REFERENCE,
+        ls="--",
+        lw=1.2,
+        label=r"$|F_n|_\mathrm{upper}$",
+    )
+    ax.axhline(
+        result.lower_limit,
+        color=_C_MUTED,
+        ls="--",
+        lw=1.2,
+        label=r"$|F_n|_\mathrm{lower}$",
+    )
     ax.axvline(
-        result.cut_off_frequency, color=_C_SECONDARY, ls=":", lw=1.2,
+        result.cut_off_frequency,
+        color=_C_SECONDARY,
+        ls=":",
+        lw=1.2,
         label=rf"$f_\mathrm{{co}}$ = {_format_freq(result.cut_off_frequency)} Hz",
     )
     ax.set_xlabel(_t(_FREQ_LABEL, language))
@@ -1747,8 +2005,7 @@ def plot_tapping_force(
     ax.set_yscale("log")
     regime = "over-critical" if result.over_critical else "under-critical"
     ax.set_title(
-        f"{_t('ISO tapping machine force spectrum', language)} "
-        f"({_t(regime, language)})"
+        f"{_t('ISO tapping machine force spectrum', language)} ({_t(regime, language)})"
     )
     ax.grid(True, which="both", alpha=0.3)
     ax.legend(loc="best", fontsize="small")
@@ -1758,8 +2015,10 @@ def plot_tapping_force(
 
 
 def plot_covering_improvement(
-    result: CoveringImprovementResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: CoveringImprovementResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Predicted ``ΔL`` of a soft floor covering beside its two-line estimate.
 
@@ -1775,13 +2034,21 @@ def plot_covering_improvement(
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     _plot_improvement_spectrum(
-        ax, freqs,
+        ax,
+        freqs,
         [
             (result.improvement, "band force ratio (Eq. 4.114)", _C_PRIMARY, "-"),
-            (result.two_line, "two-line estimate (0 dB, 12 dB/oct)",
-             _C_SECONDARY, "--"),
+            (
+                result.two_line,
+                "two-line estimate (0 dB, 12 dB/oct)",
+                _C_SECONDARY,
+                "--",
+            ),
         ],
-        result.cut_off_frequency, r"$f_\mathrm{co}$", language, kwargs,
+        result.cut_off_frequency,
+        r"$f_\mathrm{co}$",
+        language,
+        kwargs,
     )
     ax.set_title(_t("Soft floor covering improvement (Hopkins 4.4.3.1)", language))
     localize_axes(ax, language)
@@ -1789,8 +2056,10 @@ def plot_covering_improvement(
 
 
 def plot_floating_floor_improvement(
-    result: FloatingFloorImprovementResult, ax: Axes | None = None,
-    language: str = "en", **kwargs: Any
+    result: FloatingFloorImprovementResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Predicted ``ΔL`` of a floating floor above its mass-spring resonance.
 
@@ -1807,8 +2076,13 @@ def plot_floating_floor_improvement(
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     label = rf"{result.model} ({result.slope:.0f} log10(f/$f_\mathrm{{o}}$))"
     _plot_improvement_spectrum(
-        ax, freqs, [(result.improvement, label, _C_PRIMARY, "-")],
-        result.resonance_frequency, r"$f_\mathrm{o}$", language, kwargs,
+        ax,
+        freqs,
+        [(result.improvement, label, _C_PRIMARY, "-")],
+        result.resonance_frequency,
+        r"$f_\mathrm{o}$",
+        language,
+        kwargs,
     )
     title = _t("Floating floor improvement (ISO 12354-2 Annex C)", language)
     if result.delta_lw is not None:
@@ -1822,8 +2096,10 @@ def plot_floating_floor_improvement(
 
 
 def plot_lining_improvement(
-    result: LiningImprovementResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: LiningImprovementResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Annex D single-number ratings of an additional layer against ``fo``.
 
@@ -1849,7 +2125,9 @@ def plot_lining_improvement(
     sweep[0], sweep[-1] = 30.0, 5000.0
     ratings: list[tuple[float, float, float]] = [
         lining_improvement(
-            float(f), system=result.system, anchors=result.anchors,
+            float(f),
+            system=result.system,
+            anchors=result.anchors,
             glued_area=result.glued_area,
         ).ratings
         for f in sweep
@@ -1858,12 +2136,26 @@ def plot_lining_improvement(
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", kwargs.pop("label", r"$\Delta R_\mathrm{w}$"))
     ax.plot(sweep, curves[:, 0], **kwargs)
-    ax.plot(sweep, curves[:, 1], color=_C_SECONDARY, ls="--", label=r"$\Delta R_\mathrm{A}$")
-    ax.plot(sweep, curves[:, 2], color=_C_TERTIARY, ls="-.", label=r"$\Delta R_\mathrm{A,tr}$")
-    ax.plot([result.resonance_frequency], [result.delta_rw], marker="o", ms=8,
-            color=_C_REFERENCE, ls="",
-            label=rf"$f_\mathrm{{o}}$ = "
-                  rf"{_format_freq(result.resonance_frequency)} Hz")
+    ax.plot(
+        sweep, curves[:, 1], color=_C_SECONDARY, ls="--", label=r"$\Delta R_\mathrm{A}$"
+    )
+    ax.plot(
+        sweep,
+        curves[:, 2],
+        color=_C_TERTIARY,
+        ls="-.",
+        label=r"$\Delta R_\mathrm{A,tr}$",
+    )
+    ax.plot(
+        [result.resonance_frequency],
+        [result.delta_rw],
+        marker="o",
+        ms=8,
+        color=_C_REFERENCE,
+        ls="",
+        label=rf"$f_\mathrm{{o}}$ = "
+        rf"{_format_freq(result.resonance_frequency)} Hz",
+    )
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Sound reduction index improvement [dB]", language))
     ax.set_title(

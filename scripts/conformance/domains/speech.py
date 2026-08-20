@@ -95,9 +95,19 @@ _STI_F2 = [8.00, 5.00, 3.15, 10.00, 6.25, 4.00, 12.50]
 _STI_LEVELS = [-2.5, 0.5, 0.0, -6.0, -12.0, -18.0, -24.0]
 # m <-> STI staircase of the Ed.5 verification bench (m in 0,1 steps;
 # TI = (10 lg(m/(1-m)) + 15)/30, rounded as published).
-_STI_STAIRCASE = {0.0: 0.00, 0.1: 0.18, 0.2: 0.30, 0.3: 0.38, 0.4: 0.44,
-                  0.5: 0.50, 0.6: 0.56, 0.7: 0.62, 0.8: 0.70, 0.9: 0.82,
-                  1.0: 1.00}
+_STI_STAIRCASE = {
+    0.0: 0.00,
+    0.1: 0.18,
+    0.2: 0.30,
+    0.3: 0.38,
+    0.4: 0.44,
+    0.5: 0.50,
+    0.6: 0.56,
+    0.7: 0.62,
+    0.8: 0.70,
+    0.9: 0.82,
+    1.0: 1.00,
+}
 
 
 def _stipa_sine_signal(
@@ -187,13 +197,27 @@ def _chk_sti_indirect_expdecay() -> Outcome:
     # 0,0002 STI; tolerance +/-0,005.
     rt60 = 1.0
     t = np.arange(int(3.0 * _FS)) / _FS
-    x = np.sum(
-        [np.sin(2 * np.pi * fc * t) for fc in _STI_CENTERS], axis=0
-    ) * 10.0 ** (-3.0 * t / rt60)
+    x = np.sum([np.sin(2 * np.pi * fc * t) for fc in _STI_CENTERS], axis=0) * 10.0 ** (
+        -3.0 * t / rt60
+    )
     # The 14 modulation frequencies 0,63 - 12,5 Hz (Ed.5 A.2.2).
     mod_freqs = np.array(
-        [0.63, 0.80, 1.00, 1.25, 1.60, 2.00, 2.50, 3.15, 4.00, 5.00, 6.30,
-         8.00, 10.0, 12.5]
+        [
+            0.63,
+            0.80,
+            1.00,
+            1.25,
+            1.60,
+            2.00,
+            2.50,
+            3.15,
+            4.00,
+            5.00,
+            6.30,
+            8.00,
+            10.0,
+            12.5,
+        ]
     )
     m_formula = 1.0 / np.sqrt(
         1.0 + (2.0 * np.pi * mod_freqs * rt60 / (6.0 * np.log(10.0))) ** 2
@@ -286,8 +310,13 @@ def _chk_golay_complementary() -> Outcome:
     sidelobe = float(np.max(np.abs(acorr[1:])))
     if not peak_ok:
         return numeric(2.0 * length, float(acorr[0]), 1e-8, places=4)
-    return numeric(0.0, sidelobe, 1e-10, places=6,
-                   expected_label="0 (algebraic identity, +/-1e-10)")
+    return numeric(
+        0.0,
+        sidelobe,
+        1e-10,
+        places=6,
+        expected_label="0 (algebraic identity, +/-1e-10)",
+    )
 
 
 @register(
@@ -304,8 +333,9 @@ def _chk_golay_recovery() -> Outcome:
     expected = np.zeros(pair[0].size)
     expected[delay] = gain
     err = float(np.max(np.abs(np.asarray(res) - expected)))
-    return numeric(0.0, err, 1e-13, places=6,
-                   expected_label="0 (machine precision, +/-1e-13)")
+    return numeric(
+        0.0, err, 1e-13, places=6, expected_label="0 (machine precision, +/-1e-13)"
+    )
 
 
 def _sysmeas_inverse() -> Any:
@@ -329,8 +359,9 @@ def _chk_kirkeby_in_band() -> Outcome:
     power = np.abs(res.response_spectrum[band]) ** 2
     residue = res.regularization[band] / (power + res.regularization[band])
     err = float(np.max(np.abs((1.0 - product) - residue)))
-    return numeric(0.0, err, 1e-12, places=6,
-                   expected_label="0 (closed form, +/-1e-12)")
+    return numeric(
+        0.0, err, 1e-12, places=6, expected_label="0 (closed form, +/-1e-12)"
+    )
 
 
 @register(
@@ -359,12 +390,20 @@ def _chk_shaped_sweep_pink() -> Outcome:
     res = ph.room.shaped_sweep_signal(_FS, 50.0, 5000.0, 2.0, target="pink")
     nperseg = 8192
     freqs, psd = sg.welch(
-        np.asarray(res), fs=float(_FS), nperseg=nperseg,
+        np.asarray(res),
+        fs=float(_FS),
+        nperseg=nperseg,
         noverlap=3 * nperseg // 4,
     )
     third = 2.0 ** (1.0 / 3.0)
     band = (freqs >= 50.0 * third) & (freqs <= 5000.0 / third)
     diff = 10.0 * np.log10(psd[band]) + 10.0 * np.log10(freqs[band] / 50.0)
     dev = float(np.max(np.abs(diff - np.median(diff))))
-    return numeric(0.0, dev, 0.5, unit="dB", places=4,
-                   expected_label="0 dB in-band deviation (+/-0.5 dB)")
+    return numeric(
+        0.0,
+        dev,
+        0.5,
+        unit="dB",
+        places=4,
+        expected_label="0 dB in-band deviation (+/-0.5 dB)",
+    )

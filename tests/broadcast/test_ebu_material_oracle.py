@@ -165,6 +165,4 @@ def test_committed_series_match_the_audio(key: str) -> None:
     np.testing.assert_allclose(
         res.momentary[::_GATE_STRIDE], _SERIES[f"{key}_momentary"], atol=5e-4
     )
-    np.testing.assert_allclose(
-        res.short_term, _SERIES[f"{key}_short_term"], atol=5e-4
-    )
+    np.testing.assert_allclose(res.short_term, _SERIES[f"{key}_short_term"], atol=5e-4)

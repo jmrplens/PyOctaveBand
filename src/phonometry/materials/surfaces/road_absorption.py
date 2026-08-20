@@ -109,8 +109,19 @@ SPOT_NARROW_BAND_RANGE = (220.0, 1800.0)
 
 #: Nominal one-third-octave midband frequencies spanning both methods, in hertz.
 _ONE_THIRD_OCTAVE_CENTERS = (
-    250.0, 315.0, 400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0, 1600.0,
-    2000.0, 2500.0, 3150.0, 4000.0,
+    250.0,
+    315.0,
+    400.0,
+    500.0,
+    630.0,
+    800.0,
+    1000.0,
+    1250.0,
+    1600.0,
+    2000.0,
+    2500.0,
+    3150.0,
+    4000.0,
 )
 
 #: ISO 13472-2 Clause 5.4.1 upper-frequency factor ``f_u = 0.58 c0 / d``.
@@ -159,6 +170,7 @@ class RoadAbsorptionWarning(PhonometryWarning):
 #: Rejection messages the entry points of this module share.
 _FS_POSITIVE = "'fs' must be positive."
 _SPEED_POSITIVE = "'speed_of_sound' must be positive."
+
 
 def geometric_spreading_factor(
     source_height: float = DEFAULT_SOURCE_HEIGHT,
@@ -408,9 +420,7 @@ def insitu_reflection_factor(
     :raises ValueError: On empty inputs, invalid geometry, or ``delay`` given
         without ``fs``.
     """
-    kr = geometric_spreading_factor_angle(
-        incidence_angle, source_height, mic_height
-    )
+    kr = geometric_spreading_factor_angle(incidence_angle, source_height, mic_height)
     fs = resolve_optional_pair_fs(
         incident_ir, reflected_ir, fs, names=("incident_ir", "reflected_ir")
     )
@@ -476,9 +486,7 @@ def power_reflection_coefficient(
     :param n: FFT length; defaults to the longer input.
     :return: Sound-power reflection factor ``QW(f)`` (real).
     """
-    kr = geometric_spreading_factor_angle(
-        incidence_angle, source_height, mic_height
-    )
+    kr = geometric_spreading_factor_angle(incidence_angle, source_height, mic_height)
     hi, hr, _length = _transfer_functions(incident_ir, reflected_ir, n)
     ratio = np.abs(hr) / np.abs(hi)
     return np.asarray((ratio / kr) ** 2, dtype=np.float64)
@@ -634,7 +642,9 @@ class InsituAbsorptionResult:
     source_height: float | None = None
     mic_height: float | None = None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the in-situ absorption spectrum ``alpha(f)``.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the

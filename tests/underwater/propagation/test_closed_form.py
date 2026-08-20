@@ -49,7 +49,9 @@ def test_practical_requires_transition_range() -> None:
 
 def test_thorp_absorption_recompute() -> None:
     f_khz = 10.0
-    expected = 1.0936 * (0.1 * f_khz**2 / (1 + f_khz**2) + 40 * f_khz**2 / (4100 + f_khz**2))
+    expected = 1.0936 * (
+        0.1 * f_khz**2 / (1 + f_khz**2) + 40 * f_khz**2 / (4100 + f_khz**2)
+    )
     got = seawater_absorption(10_000.0, model="thorp")
     assert got[0] == pytest.approx(expected, rel=1e-9)
     assert got[0] == pytest.approx(1.1498, abs=1e-3)
@@ -71,7 +73,7 @@ def test_thorp_absorption_recompute() -> None:
 _FG_TABLE_IV = [
     # (f kHz, T degC, S ppt, alpha dB/km, ULP)
     (0.4, 10.0, 30.0, 0.015, 0.001),
-    (2.0, 10.0, 35.0, 0.123, 0.001),   # boric-dominated
+    (2.0, 10.0, 35.0, 0.123, 0.001),  # boric-dominated
     (10.0, 30.0, 35.0, 0.606, 0.001),  # boric-dominated
     (10.0, -1.8, 35.0, 1.36, 0.01),
     (14.0, 20.0, 35.0, 1.29, 0.01),
@@ -96,10 +98,20 @@ _FG_TABLE_IV = [
 
 @pytest.mark.parametrize(("f_khz", "t", "s", "alpha_ref", "ulp"), _FG_TABLE_IV)
 def test_francois_garrison_part2_table_iv_printed_values(
-    f_khz: float, t: float, s: float, alpha_ref: float, ulp: float,
+    f_khz: float,
+    t: float,
+    s: float,
+    alpha_ref: float,
+    ulp: float,
 ) -> None:
-    got = seawater_absorption(f_khz * 1000.0, temperature=t, salinity=s,
-                              depth=0.0, ph=8.0, model="francois-garrison")
+    got = seawater_absorption(
+        f_khz * 1000.0,
+        temperature=t,
+        salinity=s,
+        depth=0.0,
+        ph=8.0,
+        model="francois-garrison",
+    )
     assert float(got[0]) == pytest.approx(alpha_ref, abs=0.5 * ulp)
 
 
@@ -116,19 +128,34 @@ def test_francois_garrison_recompute() -> None:
     a2 = 21.44 * (s / c) * (1 + 0.025 * t)
     f2 = 8.17 * 10 ** (8 - 1990 / (273 + t)) / (1 + 0.0018 * (s - 35))
     a3 = 4.937e-4 - 2.59e-5 * t + 9.11e-7 * t**2 - 1.50e-8 * t**3
-    expected = a1 * f1 * f**2 / (f**2 + f1**2) + a2 * f2 * f**2 / (f**2 + f2**2) + a3 * f**2
-    got = seawater_absorption(10_000.0, temperature=t, salinity=s, depth=z, ph=ph,
-                              model="francois-garrison")
+    expected = (
+        a1 * f1 * f**2 / (f**2 + f1**2) + a2 * f2 * f**2 / (f**2 + f2**2) + a3 * f**2
+    )
+    got = seawater_absorption(
+        10_000.0, temperature=t, salinity=s, depth=z, ph=ph, model="francois-garrison"
+    )
     assert got[0] == pytest.approx(expected, rel=1e-9)
 
 
 def test_francois_garrison_and_ainslie_mccolm_agree() -> None:
     # Ainslie-McColm 1998: within 10 % of Francois-Garrison, 100 Hz - 1 MHz.
     freqs = np.array([1e3, 1e4, 1e5, 5e5])
-    fg = seawater_absorption(freqs, temperature=10.0, salinity=35.0, depth=0.0, ph=8.0,
-                             model="francois-garrison")
-    am = seawater_absorption(freqs, temperature=10.0, salinity=35.0, depth=0.0, ph=8.0,
-                             model="ainslie-mccolm")
+    fg = seawater_absorption(
+        freqs,
+        temperature=10.0,
+        salinity=35.0,
+        depth=0.0,
+        ph=8.0,
+        model="francois-garrison",
+    )
+    am = seawater_absorption(
+        freqs,
+        temperature=10.0,
+        salinity=35.0,
+        depth=0.0,
+        ph=8.0,
+        model="ainslie-mccolm",
+    )
     assert np.all(np.abs(am - fg) <= 0.10 * fg)
 
 
@@ -146,12 +173,18 @@ def test_unknown_absorption_model_rejected() -> None:
 
 def test_propagation_loss_is_spreading_plus_absorption() -> None:
     res = propagation_loss(
-        [100.0, 1000.0, 10000.0], 10_000.0, law="spherical",
-        temperature=10.0, salinity=35.0, depth=0.0, model="francois-garrison",
+        [100.0, 1000.0, 10000.0],
+        10_000.0,
+        law="spherical",
+        temperature=10.0,
+        salinity=35.0,
+        depth=0.0,
+        model="francois-garrison",
     )
     assert isinstance(res, PropagationLossResult)
-    alpha = seawater_absorption(10_000.0, temperature=10.0, salinity=35.0, depth=0.0,
-                                model="francois-garrison")[0]
+    alpha = seawater_absorption(
+        10_000.0, temperature=10.0, salinity=35.0, depth=0.0, model="francois-garrison"
+    )[0]
     expected = 20.0 * np.log10(res.range_m) + alpha * (res.range_m / 1000.0)
     np.testing.assert_allclose(res.pl, expected, rtol=1e-9)
     np.testing.assert_allclose(res.spreading + res.absorption, res.pl)
@@ -173,19 +206,29 @@ def test_ainslie_mccolm_table_i_oceans_within_ten_percent_of_fg() -> None:
     # (simplified formula within 10 % of Francois-Garrison) holds across
     # 100 Hz - 1 MHz for all four (measured headroom >= 1.65 %).
     oceans = [  # (pH, S, T, z_km)
-        (7.7, 34.0, 4.0, 1.0),    # Pacific
-        (8.2, 40.0, 22.0, 0.2),   # Red Sea
-        (8.2, 30.0, -1.5, 0.0),   # Arctic
-        (7.9, 8.0, 4.0, 0.0),     # Baltic
+        (7.7, 34.0, 4.0, 1.0),  # Pacific
+        (8.2, 40.0, 22.0, 0.2),  # Red Sea
+        (8.2, 30.0, -1.5, 0.0),  # Arctic
+        (7.9, 8.0, 4.0, 0.0),  # Baltic
     ]
     f = np.logspace(2, 6, 200)
     for ph_v, s, t, z_km in oceans:
-        fg = seawater_absorption(f, temperature=t, salinity=s,
-                                 depth=z_km * 1000.0, ph=ph_v,
-                                 model="francois-garrison")
-        am = seawater_absorption(f, temperature=t, salinity=s,
-                                 depth=z_km * 1000.0, ph=ph_v,
-                                 model="ainslie-mccolm")
+        fg = seawater_absorption(
+            f,
+            temperature=t,
+            salinity=s,
+            depth=z_km * 1000.0,
+            ph=ph_v,
+            model="francois-garrison",
+        )
+        am = seawater_absorption(
+            f,
+            temperature=t,
+            salinity=s,
+            depth=z_km * 1000.0,
+            ph=ph_v,
+            model="ainslie-mccolm",
+        )
         assert float(np.max(np.abs(am - fg) / fg)) <= 0.10, (ph_v, s, t, z_km)
 
 
@@ -198,7 +241,11 @@ def test_ainslie_mccolm_book_spot_value_300hz() -> None:
     # (exact Ainslie-McColm value 0.00858 dB/km), so 1e-4 dB/km covers the
     # rounding.
     alpha = seawater_absorption(
-        300.0, temperature=10.0, salinity=35.0, depth=0.0, ph=8.0,
+        300.0,
+        temperature=10.0,
+        salinity=35.0,
+        depth=0.0,
+        ph=8.0,
         model="ainslie-mccolm",
     )
     assert float(alpha[0]) == pytest.approx(0.0086, abs=1e-4)

@@ -35,9 +35,7 @@ from phonometry.materials.diffusers.scattering_diffusion import DiffusionSpectru
 
 # --- Geometry: quadratic residue sequence and depths (Eqs. (10.2)/(10.3)) ---
 def test_quadratic_residue_sequence_n7_by_hand() -> None:
-    np.testing.assert_array_equal(
-        quadratic_residue_sequence(7), [0, 1, 4, 2, 2, 4, 1]
-    )
+    np.testing.assert_array_equal(quadratic_residue_sequence(7), [0, 1, 4, 2, 2, 4, 1])
 
 
 def test_quadratic_residue_sequence_n5_by_hand() -> None:
@@ -84,9 +82,7 @@ def test_qrd_diffusion_exceeds_flat_panel() -> None:
     freqs = [500.0, 1000.0, 2000.0]
     depths = qrd_well_depths(7, 500.0)
     qrd = predicted_diffusion_spectrum(0.10, freqs, depths=depths, periods=5)
-    flat = predicted_diffusion_spectrum(
-        0.10, freqs, depths=np.zeros(7), periods=5
-    )
+    flat = predicted_diffusion_spectrum(0.10, freqs, depths=np.zeros(7), periods=5)
     # Markedly higher raw diffusion in every band, and clearly positive when
     # normalised against the flat reference.
     assert np.all(qrd.diffusion > flat.diffusion + 0.1)
@@ -96,9 +92,7 @@ def test_qrd_diffusion_exceeds_flat_panel() -> None:
 
 def test_qrd_normalized_diffusion_2k_value() -> None:
     depths = qrd_well_depths(7, 500.0, speed_of_sound=343.0)
-    spectrum = predicted_diffusion_spectrum(
-        0.10, [2000.0], depths=depths, periods=5
-    )
+    spectrum = predicted_diffusion_spectrum(0.10, [2000.0], depths=depths, periods=5)
     assert spectrum.normalized is not None
     assert float(spectrum.normalized[0]) == pytest.approx(0.208, abs=1e-3)
 
@@ -122,7 +116,9 @@ def test_obliquity_factor_is_symmetric_kirchhoff(psi: float) -> None:
     reflection = np.exp(-2j * k * depths)
     angles = np.asarray(DEFAULT_POLAR_ANGLES, dtype=np.float64)
     common = {
-        "source_angle": psi, "periods": 3, "speed_of_sound": c,
+        "source_angle": psi,
+        "periods": 3,
+        "speed_of_sound": c,
         "include_aperture": True,
     }
     with_factor = _scattered_pressure(

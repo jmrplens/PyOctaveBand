@@ -217,7 +217,8 @@ def render_structure_borne_power_report(
             language,
         )
     return render_sound_power_fiche(
-        result, path,
+        result,
+        path,
         copy=FicheCopy(
             title=t("Structure-borne sound power determination", language),
             basis=_basis(language),

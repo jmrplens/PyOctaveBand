@@ -51,23 +51,27 @@ NIPTS_FREQUENCIES: np.ndarray = np.array(
 
 #: Table 1 columns ``u``, ``v`` and ``L0`` (dB) for the median NIPTS N50.
 _UVL0: np.ndarray = np.array(
-    [[-0.033, 0.110, 93.0],
-     [-0.020, 0.070, 89.0],
-     [-0.045, 0.066, 80.0],
-     [0.012, 0.037, 77.0],
-     [0.025, 0.025, 75.0],
-     [0.019, 0.024, 77.0]],
+    [
+        [-0.033, 0.110, 93.0],
+        [-0.020, 0.070, 89.0],
+        [-0.045, 0.066, 80.0],
+        [0.012, 0.037, 77.0],
+        [0.025, 0.025, 75.0],
+        [0.019, 0.024, 77.0],
+    ],
     dtype=np.float64,
 )
 
 #: Table 3 columns ``Xu``, ``Yu``, ``Xl``, ``Yl`` for the spreads du and dl.
 _XY: np.ndarray = np.array(
-    [[0.044, 0.016, 0.033, 0.002],
-     [0.022, 0.016, 0.020, 0.000],
-     [0.031, -0.002, 0.016, 0.000],
-     [0.007, 0.016, 0.029, -0.010],
-     [0.005, 0.009, 0.016, -0.002],
-     [0.013, 0.008, 0.028, -0.007]],
+    [
+        [0.044, 0.016, 0.033, 0.002],
+        [0.022, 0.016, 0.020, 0.000],
+        [0.031, -0.002, 0.016, 0.000],
+        [0.007, 0.016, 0.029, -0.010],
+        [0.005, 0.009, 0.016, -0.002],
+        [0.013, 0.008, 0.028, -0.007],
+    ],
     dtype=np.float64,
 )
 
@@ -161,7 +165,9 @@ class NiptsResult:
     spread_upper: np.ndarray
     spread_lower: np.ndarray
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the NIPTS spectrum with the fractile band over frequency.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -252,7 +258,9 @@ class HtlanResult:
     nipts: np.ndarray
     threshold: np.ndarray
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the age, noise and combined threshold components over frequency.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -333,7 +341,9 @@ def _select(values: np.ndarray, frequencies: ArrayLike | None) -> np.ndarray:
     return values[idx]
 
 
-def _nipts_components(l_ex: float, years: float) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def _nipts_components(
+    l_ex: float, years: float
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Median N50 and the spreads du, dl at every audiometric frequency."""
     u, v, l0 = _UVL0[:, 0], _UVL0[:, 1], _UVL0[:, 2]
     # L_EX,8h deemed equal to L0 where it is smaller, so the effect is zero.

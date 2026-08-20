@@ -156,8 +156,17 @@ def _stipa_quiet(x: np.ndarray) -> speech.STIResult:
 # m <-> STI staircase from the signal description (Table with related m,
 # SNR and STI values); m and TI = (10 lg(m/(1-m)) + 15)/30 in 0,1 steps.
 _C32_EXPECTED = {
-    0.0: 0.00, 0.1: 0.18, 0.2: 0.30, 0.3: 0.38, 0.4: 0.44, 0.5: 0.50,
-    0.6: 0.56, 0.7: 0.62, 0.8: 0.70, 0.9: 0.82, 1.0: 1.00,
+    0.0: 0.00,
+    0.1: 0.18,
+    0.2: 0.30,
+    0.3: 0.38,
+    0.4: 0.44,
+    0.5: 0.50,
+    0.6: 0.56,
+    0.7: 0.62,
+    0.8: 0.70,
+    0.9: 0.82,
+    1.0: 1.00,
 }
 _C32_FILES = {m: f"Annex C.3.2/STIPA-sinecarrier-M={m:g}.wav" for m in _C32_EXPECTED}
 
@@ -197,9 +206,7 @@ def test_c33_indirect_method_exponential_decay(rt60: float) -> None:
     m_expected = _schroeder_m(rt60)
     # Per-band, per-modulation-frequency MTF against the closed form
     # (worst measured deviation 0,018 at RT60 = 0,125 s -> tol 0,03).
-    np.testing.assert_allclose(
-        res.mtf, np.tile(m_expected, (_NUM_BANDS, 1)), atol=0.03
-    )
+    np.testing.assert_allclose(res.mtf, np.tile(m_expected, (_NUM_BANDS, 1)), atol=0.03)
     # STI derived from the closed-form MTF through the standard TI chain
     # (worst measured |dSTI| = 0,0002 -> tol 0,005).
     sti_expected = _sti_from_mtf(np.tile(m_expected, (_NUM_BANDS, 1))).sti
@@ -225,7 +232,9 @@ def test_c42_filter_slope(case: tuple[str, int]) -> None:
     # Normative pass criterion of the bench: m >= 0,5 in the observed
     # band (an unmodulated tone one octave away, 41 dB louder, must not
     # leak enough to halve the modulation depth).
-    assert np.all(m_observed >= 0.5), f"m = {m_observed} in the {band} Hz band ({slope})"
+    assert np.all(m_observed >= 0.5), (
+        f"m = {m_observed} in the {band} Hz band ({slope})"
+    )
     # Regression lock well above the criterion: the zero-phase bank
     # achieves m >= 0,937 on all 14 signals.
     assert np.all(m_observed >= 0.85)

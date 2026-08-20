@@ -63,18 +63,14 @@ def test_long_self_noise_63_db_for_one_talker() -> None:
 def test_long_signal_to_noise_is_minus_3_db() -> None:
     """Long p. 665: "our signal-to-noise ratio is -3 dB"."""
     signal = float(np.asarray(room.speech_direct_level(1.2))[()])
-    noise = float(
-        np.asarray(room.crowd_noise_level(1, LONG_HARD_ABSORPTION))[()]
-    )
+    noise = float(np.asarray(room.crowd_noise_level(1, LONG_HARD_ABSORPTION))[()])
     assert round(signal - noise) == -3
 
 
 def test_long_twenty_talkers_reach_76_db() -> None:
     """Long p. 665: "If there are 20 tables in the room ... the reverberant
     noise level rises to 76 dB"."""
-    lp = float(
-        np.asarray(room.crowd_noise_level(20, LONG_HARD_ABSORPTION))[()]
-    )
+    lp = float(np.asarray(room.crowd_noise_level(20, LONG_HARD_ABSORPTION))[()])
     assert round(lp) == 76
 
 
@@ -104,9 +100,7 @@ def test_long_communication_bound_is_6_3_square_metres_at_1_m() -> None:
 
 def test_long_privacy_bound_is_20_square_metres_at_2_5_m() -> None:
     """Long p. 666: at 2.5 m spacing, "no more than 20 m2 (215 ft2) per table"."""
-    a_tab = float(
-        np.asarray(room.absorption_per_table(2.5, room.PRIVACY_SNR))[()]
-    )
+    a_tab = float(np.asarray(room.absorption_per_table(2.5, room.PRIVACY_SNR))[()])
     assert round(a_tab, -1) == 20.0
     # 215 sq ft is Long's conversion of the rounded 20 m2, so it lands 0.2 m2
     # above the closed form.
@@ -116,9 +110,7 @@ def test_long_privacy_bound_is_20_square_metres_at_2_5_m() -> None:
 def test_long_privacy_constant_is_3_16() -> None:
     """Long Equation (17.54): A_tab < 3.16 rt^2 (printed constant, Q = 2)."""
     for rt in (1.0, 2.0, 3.5):
-        a_tab = float(
-            np.asarray(room.absorption_per_table(rt, room.PRIVACY_SNR))[()]
-        )
+        a_tab = float(np.asarray(room.absorption_per_table(rt, room.PRIVACY_SNR))[()])
         assert a_tab / rt**2 == pytest.approx(3.16, abs=0.005)
 
 
@@ -155,9 +147,9 @@ def test_speech_to_noise_is_independent_of_power_and_occupancy() -> None:
 def test_absorption_per_table_inverts_the_ratio() -> None:
     for snr in (-3.0, -6.0, -9.0, -12.0):
         a_tab = float(np.asarray(room.absorption_per_table(1.7, snr))[()])
-        assert float(
-            np.asarray(room.speech_to_noise_ratio(1.7, a_tab))[()]
-        ) == (pytest.approx(snr))
+        assert float(np.asarray(room.speech_to_noise_ratio(1.7, a_tab))[()]) == (
+            pytest.approx(snr)
+        )
 
 
 def test_limit_of_a_perfectly_absorptive_room() -> None:

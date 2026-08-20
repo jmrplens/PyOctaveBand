@@ -26,6 +26,7 @@ from phonometry.materials.absorbers.sound_absorption import _speed_of_sound
 
 # --- Eq. (6): speed of sound ------------------------------------------------
 
+
 def test_speed_of_sound_reference_20c() -> None:
     # c = 331 + 0,6*20 = 343 m/s.
     assert _speed_of_sound(20.0) == pytest.approx(343.0)
@@ -40,12 +41,11 @@ def test_default_temperature_is_20c() -> None:
 
 # --- Eq. (5)/(7): absorption area & exact T->A->T inversion -----------------
 
+
 def test_absorption_area_formula() -> None:
     v, c, t = 200.0, 343.0, 3.5
     expected = 55.3 * v / (c * t)  # m = 0
-    assert materials.absorption_area(t, v, speed_of_sound=c) == pytest.approx(
-        expected
-    )
+    assert materials.absorption_area(t, v, speed_of_sound=c) == pytest.approx(expected)
 
 
 def test_exact_inversion_t_to_a_to_t() -> None:
@@ -65,12 +65,13 @@ def test_array_input_shape_preserved() -> None:
 
 # --- Air-attenuation term ---------------------------------------------------
 
+
 def test_air_correction_zero_when_m_zero() -> None:
     # -4 V m term vanishes at m = 0 (reference/zero condition).
     v, c, t = 200.0, 343.0, 4.0
-    assert materials.absorption_area(
-        t, v, speed_of_sound=c, m=0.0
-    ) == pytest.approx(55.3 * v / (c * t))
+    assert materials.absorption_area(t, v, speed_of_sound=c, m=0.0) == pytest.approx(
+        55.3 * v / (c * t)
+    )
 
 
 def test_air_correction_subtracts_4vm() -> None:
@@ -90,12 +91,11 @@ def test_air_correction_per_band_array() -> None:
 
 # --- m from ISO 9613-1 alpha (dB/m) -----------------------------------------
 
+
 def test_attenuation_from_alpha_conversion() -> None:
     # m = alpha / (10 lg e); 10*lg(e) = 4,342944819...
     alpha = 4.342944819032518
-    assert materials.attenuation_from_alpha(alpha) == pytest.approx(
-        1.0, rel=1e-9
-    )
+    assert materials.attenuation_from_alpha(alpha) == pytest.approx(1.0, rel=1e-9)
     assert materials.attenuation_from_alpha(0.0) == 0.0
 
 
@@ -106,6 +106,7 @@ def test_attenuation_from_alpha_array() -> None:
 
 
 # --- Eq. (8)/(9): absorption coefficient of a synthetic sample --------------
+
 
 def test_recover_known_alpha() -> None:
     v, c, s, alpha_true = 200.0, 343.0, 10.0, 0.80
@@ -173,17 +174,13 @@ def test_speed_of_sound2_defaults_to_speed_of_sound1() -> None:
     (c2 defaults to c1), mirroring the temperature2 -> temperature1 default."""
     v, s = 200.0, 10.0
     c = 340.0
-    only_c1 = materials.absorption_coefficient(
-        5.0, 3.0, v, s, speed_of_sound1=c
-    )
+    only_c1 = materials.absorption_coefficient(5.0, 3.0, v, s, speed_of_sound1=c)
     both = materials.absorption_coefficient(
         5.0, 3.0, v, s, speed_of_sound1=c, speed_of_sound2=c
     )
     assert float(np.asarray(only_c1)) == pytest.approx(float(np.asarray(both)))
     # And it must differ from letting c2 fall back to the 20 degC default.
-    default_c2 = materials.absorption_coefficient(
-        5.0, 3.0, v, s, speed_of_sound1=c
-    )
+    default_c2 = materials.absorption_coefficient(5.0, 3.0, v, s, speed_of_sound1=c)
     explicit_343 = materials.absorption_coefficient(
         5.0, 3.0, v, s, speed_of_sound1=c, speed_of_sound2=_speed_of_sound(20.0)
     )
@@ -193,6 +190,7 @@ def test_speed_of_sound2_defaults_to_speed_of_sound1() -> None:
 
 
 # --- Non-physical result warning (A2 <= A1, i.e. T2 >= T1) ------------------
+
 
 def test_warns_when_alpha_non_positive() -> None:
     # Adding an absorber must reduce T; T2 >= T1 gives alpha_s <= 0.
@@ -207,6 +205,7 @@ def test_no_warning_for_positive_alpha() -> None:
 
 
 # --- Setup advisories: room volume (6.1.1) & sample area (6.2.1.1) ----------
+
 
 def test_warns_small_room_absorption_area() -> None:
     # Clause 6.1.1: V < 150 m3 is advisory (result still returned).
@@ -281,6 +280,7 @@ def test_no_sample_area_warning_at_limits() -> None:
 
 # --- Range / input validation ----------------------------------------------
 
+
 def test_negative_volume_raises() -> None:
     with pytest.raises(ValueError):
         materials.absorption_area(3.0, -1.0)
@@ -308,9 +308,7 @@ def test_m_matching_shape_and_scalar_allowed() -> None:
     """A scalar 'm' or one matching 't60' is accepted."""
     t60 = np.array([3.0, 2.5, 2.0])
     a_scalar = materials.absorption_area(t60, 200.0, m=0.001)
-    a_perband = materials.absorption_area(
-        t60, 200.0, m=np.array([0.001, 0.001, 0.001])
-    )
+    a_perband = materials.absorption_area(t60, 200.0, m=np.array([0.001, 0.001, 0.001]))
     assert a_scalar.shape == (3,)
     assert np.allclose(a_scalar, a_perband)
 
@@ -334,12 +332,11 @@ def test_temperature_outside_eq6_range_warns() -> None:
 def test_no_temperature_warning_when_speed_supplied() -> None:
     with warnings.catch_warnings():
         warnings.simplefilter("error")
-        materials.absorption_area(
-            3.0, 200.0, temperature=5.0, speed_of_sound=340.0
-        )
+        materials.absorption_area(3.0, 200.0, temperature=5.0, speed_of_sound=340.0)
 
 
 # --- Synergy with room_parameters -------------------------------------------
+
 
 def test_synergy_with_room_parameters() -> None:
     from phonometry import room
@@ -367,19 +364,82 @@ def test_synergy_with_room_parameters() -> None:
 #: pair (V = 200 m3, S = 10.8 m2, t = 20 degC -> c = 343 m/s, m = 0). The
 #: closed-form Eq. (5)/(7)/(8)/(9) values of two bands are asserted below.
 _FREQS = np.array(
-    [100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-     1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000],
+    [
+        100,
+        125,
+        160,
+        200,
+        250,
+        315,
+        400,
+        500,
+        630,
+        800,
+        1000,
+        1250,
+        1600,
+        2000,
+        2500,
+        3150,
+        4000,
+        5000,
+    ],
     dtype=float,
 )
-_T1 = np.array([9.0, 9.0, 8.8, 8.6, 8.4, 8.2, 8.0, 7.8, 7.5, 7.2,
-                6.9, 6.6, 6.2, 5.8, 5.4, 5.0, 4.6, 4.2])
-_T2 = np.array([8.4, 8.2, 7.7, 7.2, 6.5, 5.7, 4.9, 4.2, 3.6, 3.15,
-                2.85, 2.65, 2.55, 2.5, 2.55, 2.6, 2.7, 2.85])
+_T1 = np.array(
+    [
+        9.0,
+        9.0,
+        8.8,
+        8.6,
+        8.4,
+        8.2,
+        8.0,
+        7.8,
+        7.5,
+        7.2,
+        6.9,
+        6.6,
+        6.2,
+        5.8,
+        5.4,
+        5.0,
+        4.6,
+        4.2,
+    ]
+)
+_T2 = np.array(
+    [
+        8.4,
+        8.2,
+        7.7,
+        7.2,
+        6.5,
+        5.7,
+        4.9,
+        4.2,
+        3.6,
+        3.15,
+        2.85,
+        2.65,
+        2.55,
+        2.5,
+        2.55,
+        2.6,
+        2.7,
+        2.85,
+    ]
+)
 
 
 def _measurement() -> materials.SoundAbsorptionMeasurement:
     return materials.measure_sound_absorption(
-        _FREQS, _T1, _T2, volume=200.0, area=10.8, temperature=20.0,
+        _FREQS,
+        _T1,
+        _T2,
+        volume=200.0,
+        area=10.8,
+        temperature=20.0,
         humidity=54.0,
     )
 
@@ -392,9 +452,7 @@ def test_measurement_speed_of_sound_from_eq6() -> None:
 def test_measurement_alpha_s_matches_absorption_coefficient() -> None:
     # The result must reuse the validated Eq. (8)/(9) path, not re-derive it.
     res = _measurement()
-    ref = materials.absorption_coefficient(
-        _T1, _T2, 200.0, 10.8, temperature1=20.0
-    )
+    ref = materials.absorption_coefficient(_T1, _T2, 200.0, 10.8, temperature1=20.0)
     np.testing.assert_allclose(res.alpha_s, np.asarray(ref), rtol=0, atol=1e-12)
 
 
@@ -481,7 +539,8 @@ def test_measurement_temperature_out_of_range_warns_once() -> None:
             _FREQS, _T1, _T2, volume=200.0, area=10.8, temperature=5.0
         )
     temp_warnings = [
-        w for w in caught
+        w
+        for w in caught
         if issubclass(w.category, materials.AbsorptionWarning)
         and "Eq. (6)" in str(w.message)
     ]

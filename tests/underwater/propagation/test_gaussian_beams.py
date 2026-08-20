@@ -178,9 +178,16 @@ def test_the_free_field_is_the_unit_point_source_in_magnitude_and_in_phase() -> 
     zs = depth / 2.0
     r = np.array([500.0, 1000.0, 1500.0, 2000.0])
     z = zs + np.array([-400.0, -100.0, 0.0, 100.0, 400.0])
-    res = gaussian_beams(f, [0.0, depth], [_C, _C], source_depth=zs,
-                         max_range=rmax, ranges_m=r, receiver_depths_m=z,
-                         range_step=10.0)
+    res = gaussian_beams(
+        f,
+        [0.0, depth],
+        [_C, _C],
+        source_depth=zs,
+        max_range=rmax,
+        ranges_m=r,
+        receiver_depths_m=z,
+        range_step=10.0,
+    )
     assert isinstance(res, GaussianBeamResult)
     slant = np.hypot(r[None, :], z[:, None] - zs)
     exact = np.exp(1j * 2.0 * np.pi * f / _C * slant) / slant
@@ -217,14 +224,22 @@ def test_the_near_field_survives_a_beam_whose_foot_lands_on_the_source() -> None
     depth = _free_space_column(rmax)
     zs = depth / 2.0
     offs = np.array([50.0, 100.0, 200.0, 400.0])
-    res = gaussian_beams(f, [0.0, depth], [_C, _C], source_depth=zs,
-                         max_range=rmax, ranges_m=offs, receiver_depths_m=zs + offs,
-                         fan=BeamFan(max_angle_deg=80.0, n_beams=321))
+    res = gaussian_beams(
+        f,
+        [0.0, depth],
+        [_C, _C],
+        source_depth=zs,
+        max_range=rmax,
+        ranges_m=offs,
+        receiver_depths_m=zs + offs,
+        fan=BeamFan(max_angle_deg=80.0, n_beams=321),
+    )
     # Not asserted as exact equality: the fan is built in radians and read back
     # in degrees, so -45 lands on a rung to within a rounding rather than by
     # construction. A rounding of a degree is close enough to be the same test.
     assert np.abs(res.launch_angles + 45.0).min() < 1e-9, (
-        "the singular beam has to be in the fan")
+        "the singular beam has to be in the fan"
+    )
     slant = np.hypot(res.ranges[None, :], res.depths[:, None] - zs)
     err = res.propagation_loss - 20.0 * np.log10(slant)
     assert np.all(np.isfinite(res.propagation_loss))
@@ -250,11 +265,19 @@ def test_one_reflection_is_the_two_ray_field() -> None:
     r = np.array([1000.0, 2000.0, 4000.0])
     k = 2.0 * np.pi * f / _C
     direct, image = np.hypot(r, zr - zs), np.hypot(r, zr + zs)
-    exact = -20.0 * np.log10(np.abs(np.exp(1j * k * direct) / direct
-                                    - np.exp(1j * k * image) / image))
-    res = gaussian_beams(f, [0.0, depth], [_C, _C], source_depth=zs,
-                         max_range=4200.0, ranges_m=r,
-                         receiver_depths_m=np.array([zr]), range_step=10.0)
+    exact = -20.0 * np.log10(
+        np.abs(np.exp(1j * k * direct) / direct - np.exp(1j * k * image) / image)
+    )
+    res = gaussian_beams(
+        f,
+        [0.0, depth],
+        [_C, _C],
+        source_depth=zs,
+        max_range=4200.0,
+        ranges_m=r,
+        receiver_depths_m=np.array([zr]),
+        range_step=10.0,
+    )
     assert np.abs(res.propagation_loss[0] - exact).max() < 0.05
 
 
@@ -271,15 +294,26 @@ def _thorp_1967(f_hz: float) -> float:
 
 
 def _ainslie_mccolm_1998(
-    f_hz: float, t_c: float, s_ppt: float, z_km: float, ph: float,
+    f_hz: float,
+    t_c: float,
+    s_ppt: float,
+    z_km: float,
+    ph: float,
 ) -> float:
     """Ainslie & McColm, JASA 103 (1998), Eqs. (2)-(4): dB/km, f in kHz."""
     f = f_hz / 1000.0
     f1 = 0.78 * np.sqrt(s_ppt / 35.0) * np.exp(t_c / 26.0)
     f2 = 42.0 * np.exp(t_c / 17.0)
     boric = 0.106 * f1 * f**2 / (f**2 + f1**2) * np.exp((ph - 8.0) / 0.56)
-    mgso4 = (0.52 * (1.0 + t_c / 43.0) * (s_ppt / 35.0)
-             * f2 * f**2 / (f**2 + f2**2) * np.exp(-z_km / 6.0))
+    mgso4 = (
+        0.52
+        * (1.0 + t_c / 43.0)
+        * (s_ppt / 35.0)
+        * f2
+        * f**2
+        / (f**2 + f2**2)
+        * np.exp(-z_km / 6.0)
+    )
     water = 0.00049 * f**2 * np.exp(-(t_c / 27.0 + z_km / 17.0))
     return float(boric + mgso4 + water)
 
@@ -309,15 +343,24 @@ def test_absorption_multiplies_the_free_field_by_exp_minus_alpha_R() -> None:
     cases = [
         ("thorp", 3000.0, _thorp_1967(3000.0)),
         ("thorp", 10_000.0, _thorp_1967(10_000.0)),
-        ("ainslie-mccolm", 20_000.0,
-         _ainslie_mccolm_1998(20_000.0, 10.0, 35.0, zs / 1000.0, 8.0)),
+        (
+            "ainslie-mccolm",
+            20_000.0,
+            _ainslie_mccolm_1998(20_000.0, 10.0, 35.0, zs / 1000.0, 8.0),
+        ),
     ]
     for model, f, alpha in cases:
-        res = gaussian_beams(f, [0.0, depth], [_C, _C], source_depth=zs,
-                             max_range=3000.0, ranges_m=r,
-                             receiver_depths_m=zs + dz,
-                             fan=BeamFan(max_angle_deg=30.0),
-                             absorption=model)
+        res = gaussian_beams(
+            f,
+            [0.0, depth],
+            [_C, _C],
+            source_depth=zs,
+            max_range=3000.0,
+            ranges_m=r,
+            receiver_depths_m=zs + dz,
+            fan=BeamFan(max_angle_deg=30.0),
+            absorption=model,
+        )
         assert res.absorption_model == model
         # The recorded coefficient is the same published number, digit for
         # digit, which pins the solver's model wiring as well as its arithmetic.
@@ -349,10 +392,17 @@ def test_absorption_is_charged_along_the_arc_and_not_along_the_range() -> None:
     zs = depth / 2.0
     r, dz = 500.0, 1500.0
     alpha = _thorp_1967(f)
-    res = gaussian_beams(f, [0.0, depth], [_C, _C], source_depth=zs,
-                         max_range=rmax, ranges_m=np.array([r]),
-                         receiver_depths_m=np.array([zs + dz]),
-                         range_step=10.0, absorption="thorp")
+    res = gaussian_beams(
+        f,
+        [0.0, depth],
+        [_C, _C],
+        source_depth=zs,
+        max_range=rmax,
+        ranges_m=np.array([r]),
+        receiver_depths_m=np.array([zs + dz]),
+        range_step=10.0,
+        absorption="thorp",
+    )
     slant = float(np.hypot(r, dz))
     along_arc = 20.0 * np.log10(slant) + alpha * slant / 1000.0
     along_range = 20.0 * np.log10(slant) + alpha * r / 1000.0
@@ -373,18 +423,21 @@ def test_absorption_is_off_by_default_and_bit_for_bit_identical() -> None:
     f, rmax = 100.0, 1500.0
     depth = _free_space_column(rmax, 30.0)
     zs = depth / 2.0
-    kwargs = {"source_depth": zs, "max_range": rmax,
-              "ranges_m": np.array([500.0, 1500.0]),
-              "receiver_depths_m": np.array([zs - 200.0, zs + 350.0]),
-              "fan": BeamFan(max_angle_deg=30.0)}
+    kwargs = {
+        "source_depth": zs,
+        "max_range": rmax,
+        "ranges_m": np.array([500.0, 1500.0]),
+        "receiver_depths_m": np.array([zs - 200.0, zs + 350.0]),
+        "fan": BeamFan(max_angle_deg=30.0),
+    }
     default = gaussian_beams(f, [0.0, depth], [_C, _C], **kwargs)
-    explicit = gaussian_beams(f, [0.0, depth], [_C, _C], **kwargs,
-                              absorption=None)
+    explicit = gaussian_beams(f, [0.0, depth], [_C, _C], **kwargs, absorption=None)
     assert default.absorption_model is None
     assert default.absorption_coefficient == 0.0
     assert np.array_equal(default.pressure, explicit.pressure)
-    withit = gaussian_beams(f, [0.0, depth], [_C, _C], **kwargs,
-                            absorption="francois-garrison")
+    withit = gaussian_beams(
+        f, [0.0, depth], [_C, _C], **kwargs, absorption="francois-garrison"
+    )
     assert withit.absorption_coefficient > 0.0
     assert not np.array_equal(default.pressure, withit.pressure)
 
@@ -405,21 +458,40 @@ def test_absorption_defaults_route_to_francois_garrison_at_the_source() -> None:
     depth, zs = 4000.0, 2000.0
     f = 10_000.0
     r = np.array([1000.0, 2500.0])
-    res = gaussian_beams(f, [0.0, depth], [_C, _C], source_depth=zs,
-                         max_range=2500.0, ranges_m=r,
-                         receiver_depths_m=np.array([zs]),
-                         fan=BeamFan(max_angle_deg=30.0),
-                         absorption=VolumeAbsorption(
-                             "francois-garrison", temperature=4.0,
-                             salinity=34.0, ph=7.9))
-    expected = float(seawater_absorption(f, temperature=4.0, salinity=34.0,
-                                         depth=zs, ph=7.9,
-                                         model="francois-garrison")[0])
+    res = gaussian_beams(
+        f,
+        [0.0, depth],
+        [_C, _C],
+        source_depth=zs,
+        max_range=2500.0,
+        ranges_m=r,
+        receiver_depths_m=np.array([zs]),
+        fan=BeamFan(max_angle_deg=30.0),
+        absorption=VolumeAbsorption(
+            "francois-garrison", temperature=4.0, salinity=34.0, ph=7.9
+        ),
+    )
+    expected = float(
+        seawater_absorption(
+            f,
+            temperature=4.0,
+            salinity=34.0,
+            depth=zs,
+            ph=7.9,
+            model="francois-garrison",
+        )[0]
+    )
     assert res.absorption_coefficient == expected
-    off = gaussian_beams(f, [0.0, depth], [_C, _C], source_depth=zs,
-                         max_range=2500.0, ranges_m=r,
-                         receiver_depths_m=np.array([zs]),
-                         fan=BeamFan(max_angle_deg=30.0))
+    off = gaussian_beams(
+        f,
+        [0.0, depth],
+        [_C, _C],
+        source_depth=zs,
+        max_range=2500.0,
+        ranges_m=r,
+        receiver_depths_m=np.array([zs]),
+        fan=BeamFan(max_angle_deg=30.0),
+    )
     added = res.propagation_loss[0] - off.propagation_loss[0]
     assert np.abs(added - expected * r / 1000.0).max() < 1e-3
 
@@ -432,13 +504,22 @@ def test_absorption_defaults_route_to_francois_garrison_at_the_source() -> None:
 # z = D. The sum converges slowly (each term falls off only as 1/R and it is the
 # alternating signs that close it), hence the term count below.
 
-_GUIDE = {"water_depth": 1000.0, "frequency": 300.0,
-          "source_depth": 300.0, "receiver_depth": 600.0}
+_GUIDE = {
+    "water_depth": 1000.0,
+    "frequency": 300.0,
+    "source_depth": 300.0,
+    "receiver_depth": 600.0,
+}
 
 
 def _image_source_loss(
-    ranges: np.ndarray, *, water_depth: float, frequency: float,
-    source_depth: float, receiver_depth: float, max_angle_deg: float | None = None,
+    ranges: np.ndarray,
+    *,
+    water_depth: float,
+    frequency: float,
+    source_depth: float,
+    receiver_depth: float,
+    max_angle_deg: float | None = None,
     n_images: int = 40_000,
 ) -> np.ndarray:
     """Propagation loss of the ideal guide, optionally cut to a fan half-angle."""
@@ -453,8 +534,10 @@ def _image_source_loss(
         slope = np.tan(np.radians(max_angle_deg))
         take_up = np.abs(up) < slope * rr
         take_down = np.abs(down) < slope * rr
-    field = (np.exp(1j * k * r_up) / r_up * take_up
-             - np.exp(1j * k * r_down) / r_down * take_down).sum(axis=0)
+    field = (
+        np.exp(1j * k * r_up) / r_up * take_up
+        - np.exp(1j * k * r_down) / r_down * take_down
+    ).sum(axis=0)
     return np.asarray(-20.0 * np.log10(np.abs(field)))
 
 
@@ -475,10 +558,16 @@ def test_the_ideal_waveguide_matches_the_image_source_sum() -> None:
     r = np.array([2000.0])
     exact = _image_source_loss(r, **_GUIDE)
     res = gaussian_beams(
-        _GUIDE["frequency"], [0.0, _GUIDE["water_depth"]], [_C, _C],
-        source_depth=_GUIDE["source_depth"], max_range=2200.0, ranges_m=r,
+        _GUIDE["frequency"],
+        [0.0, _GUIDE["water_depth"]],
+        [_C, _C],
+        source_depth=_GUIDE["source_depth"],
+        max_range=2200.0,
+        ranges_m=r,
         receiver_depths_m=np.array([_GUIDE["receiver_depth"]]),
-        fan=BeamFan(max_angle_deg=88.0, beam_width=100.0), range_step=2.0)
+        fan=BeamFan(max_angle_deg=88.0, beam_width=100.0),
+        range_step=2.0,
+    )
     assert np.abs(res.propagation_loss[0] - exact).max() < 5e-4
 
 
@@ -495,19 +584,27 @@ def test_a_narrower_fan_costs_exactly_what_cutting_the_image_sum_costs() -> None
     complete = _image_source_loss(r, **_GUIDE)
     truncated = _image_source_loss(r, max_angle_deg=80.0, **_GUIDE)
     res = gaussian_beams(
-        _GUIDE["frequency"], [0.0, _GUIDE["water_depth"]], [_C, _C],
-        source_depth=_GUIDE["source_depth"], max_range=2200.0, ranges_m=r,
+        _GUIDE["frequency"],
+        [0.0, _GUIDE["water_depth"]],
+        [_C, _C],
+        source_depth=_GUIDE["source_depth"],
+        max_range=2200.0,
+        ranges_m=r,
         receiver_depths_m=np.array([_GUIDE["receiver_depth"]]),
-        fan=BeamFan(max_angle_deg=80.0, beam_width=100.0), range_step=10.0)
+        fan=BeamFan(max_angle_deg=80.0, beam_width=100.0),
+        range_step=10.0,
+    )
     missed = float(np.abs(truncated - complete).max())
     assert missed > 0.1, "the fan has to bite for this test to mean anything"
     assert np.abs(res.propagation_loss[0] - truncated).max() < 0.5 * missed
 
 
 @pytest.mark.parametrize(
-    ("bottom", "at_bottom"), [("pressure-release", 0.0), ("rigid", 2.0)])
+    ("bottom", "at_bottom"), [("pressure-release", 0.0), ("rigid", 2.0)]
+)
 def test_both_boundary_conditions_fall_out_of_the_folded_images(
-    bottom: str, at_bottom: float,
+    bottom: str,
+    at_bottom: float,
 ) -> None:
     """Nothing imposes them; they are what the image ladder sums to.
 
@@ -519,12 +616,17 @@ def test_both_boundary_conditions_fall_out_of_the_folded_images(
     """
     depth = _GUIDE["water_depth"]
     res = gaussian_beams(
-        _GUIDE["frequency"], [0.0, depth], [_C, _C],
-        source_depth=_GUIDE["source_depth"], max_range=2200.0,
+        _GUIDE["frequency"],
+        [0.0, depth],
+        [_C, _C],
+        source_depth=_GUIDE["source_depth"],
+        max_range=2200.0,
         ranges_m=np.array([2000.0]),
         receiver_depths_m=np.array([0.0, 0.5 * depth, depth]),
-        fan=BeamFan(max_angle_deg=85.0, beam_width=100.0), range_step=5.0,
-        bottom=bottom)
+        fan=BeamFan(max_angle_deg=85.0, beam_width=100.0),
+        range_step=5.0,
+        bottom=bottom,
+    )
     scale = np.abs(res.pressure[1, 0])
     assert np.abs(res.pressure[0, 0]) / scale < 1e-3
     assert np.abs(res.pressure[2, 0]) / scale == pytest.approx(at_bottom, abs=0.2)
@@ -557,9 +659,17 @@ _SEABED = {"rho1": 1000.0, "rho2": 1800.0, "c2": 1700.0}  # sand-like, phi_c = 2
 
 
 def _lossy_image_loss(
-    ranges: np.ndarray, *, water_depth: float, frequency: float,
-    source_depth: float, receiver_depth: float, rho1: float, rho2: float,
-    c2: float, n_images: int = 400, magnitude_only: bool = False,
+    ranges: np.ndarray,
+    *,
+    water_depth: float,
+    frequency: float,
+    source_depth: float,
+    receiver_depth: float,
+    rho1: float,
+    rho2: float,
+    c2: float,
+    n_images: int = 400,
+    magnitude_only: bool = False,
 ) -> np.ndarray:
     """The lossy guide's loss as the image sum described above.
 
@@ -589,12 +699,15 @@ def _lossy_image_loss(
         for offset, n_surface, n_bottom in families:
             distance = np.hypot(r, offset)
             grazing = np.degrees(np.arctan2(abs(offset), r))
-            refl = reflection_coefficient(grazing, rho1=rho1, c1=_C,
-                                          rho2=rho2, c2=c2)
+            refl = reflection_coefficient(grazing, rho1=rho1, c1=_C, rho2=rho2, c2=c2)
             if magnitude_only:
                 refl = np.abs(refl)
-            field = field + ((-1.0) ** n_surface * refl**n_bottom
-                             * np.exp(1j * k * distance) / distance)
+            field = field + (
+                (-1.0) ** n_surface
+                * refl**n_bottom
+                * np.exp(1j * k * distance)
+                / distance
+            )
     return np.asarray(-20.0 * np.log10(np.abs(field)))
 
 
@@ -637,13 +750,21 @@ def test_a_lossy_seabed_is_the_image_sum_with_R_at_each_images_own_angle() -> No
     r = np.array([2000.0, 3000.0, 4000.0])
     exact = _lossy_image_loss(r, **_GUIDE, **_SEABED)
     res = gaussian_beams(
-        _GUIDE["frequency"], [0.0, _GUIDE["water_depth"]], [_C, _C],
-        source_depth=_GUIDE["source_depth"], max_range=4200.0, ranges_m=r,
+        _GUIDE["frequency"],
+        [0.0, _GUIDE["water_depth"]],
+        [_C, _C],
+        source_depth=_GUIDE["source_depth"],
+        max_range=4200.0,
+        ranges_m=r,
         receiver_depths_m=np.array([_GUIDE["receiver_depth"]]),
-        fan=BeamFan(max_angle_deg=85.0, beam_width=100.0), range_step=2.5,
-        bottom=FluidSeabed(density=_SEABED["rho2"],
-                           sound_speed=_SEABED["c2"],
-                           water_density=_SEABED["rho1"]))
+        fan=BeamFan(max_angle_deg=85.0, beam_width=100.0),
+        range_step=2.5,
+        bottom=FluidSeabed(
+            density=_SEABED["rho2"],
+            sound_speed=_SEABED["c2"],
+            water_density=_SEABED["rho1"],
+        ),
+    )
     assert np.abs(res.propagation_loss[0] - exact).max() < 0.15
     assert res.seabed_density == _SEABED["rho2"]
     assert res.seabed_sound_speed == _SEABED["c2"]
@@ -652,16 +773,27 @@ def test_a_lossy_seabed_is_the_image_sum_with_R_at_each_images_own_angle() -> No
     # bottom-touching image at 2 km is above it with |R| < 1, and at 4 km the
     # dominant one is below it with |R| = 1 and a phase that means something.
     phi_c = critical_angle(_C, _SEABED["c2"])
-    depth, zs, zr = (_GUIDE["water_depth"], _GUIDE["source_depth"],
-                     _GUIDE["receiver_depth"])
+    depth, zs, zr = (
+        _GUIDE["water_depth"],
+        _GUIDE["source_depth"],
+        _GUIDE["receiver_depth"],
+    )
     shallowest_touch = np.degrees(np.arctan2(2.0 * depth - zs - zr, r))
     assert shallowest_touch[0] > phi_c > shallowest_touch[-1]
-    r_above = reflection_coefficient(float(shallowest_touch[0]),
-                                     rho1=_SEABED["rho1"], c1=_C,
-                                     rho2=_SEABED["rho2"], c2=_SEABED["c2"])
-    r_below = reflection_coefficient(float(shallowest_touch[-1]),
-                                     rho1=_SEABED["rho1"], c1=_C,
-                                     rho2=_SEABED["rho2"], c2=_SEABED["c2"])
+    r_above = reflection_coefficient(
+        float(shallowest_touch[0]),
+        rho1=_SEABED["rho1"],
+        c1=_C,
+        rho2=_SEABED["rho2"],
+        c2=_SEABED["c2"],
+    )
+    r_below = reflection_coefficient(
+        float(shallowest_touch[-1]),
+        rho1=_SEABED["rho1"],
+        c1=_C,
+        rho2=_SEABED["rho2"],
+        c2=_SEABED["c2"],
+    )
     assert np.abs(r_above[0]) < 0.999
     assert np.abs(r_below[0]) == pytest.approx(1.0, abs=1e-12)
     assert abs(np.angle(r_below[0])) > 0.3
@@ -687,23 +819,34 @@ def test_the_perfect_default_is_the_seabed_machinery_off_state() -> None:
     closely, and spelling the default out must change nothing.
     """
     r = np.array([2000.0])
-    kwargs = {"source_depth": _GUIDE["source_depth"], "max_range": 2200.0,
-              "ranges_m": r,
-              "receiver_depths_m": np.array([_GUIDE["receiver_depth"]]),
-              "fan": BeamFan(max_angle_deg=85.0, beam_width=100.0),
-              "range_step": 10.0}
-    default = gaussian_beams(_GUIDE["frequency"],
-                             [0.0, _GUIDE["water_depth"]], [_C, _C], **kwargs)
-    explicit = gaussian_beams(_GUIDE["frequency"],
-                              [0.0, _GUIDE["water_depth"]], [_C, _C], **kwargs,
-                              bottom="pressure-release")
+    kwargs = {
+        "source_depth": _GUIDE["source_depth"],
+        "max_range": 2200.0,
+        "ranges_m": r,
+        "receiver_depths_m": np.array([_GUIDE["receiver_depth"]]),
+        "fan": BeamFan(max_angle_deg=85.0, beam_width=100.0),
+        "range_step": 10.0,
+    }
+    default = gaussian_beams(
+        _GUIDE["frequency"], [0.0, _GUIDE["water_depth"]], [_C, _C], **kwargs
+    )
+    explicit = gaussian_beams(
+        _GUIDE["frequency"],
+        [0.0, _GUIDE["water_depth"]],
+        [_C, _C],
+        **kwargs,
+        bottom="pressure-release",
+    )
     assert default.seabed_density is None
     assert default.seabed_sound_speed is None
     assert np.array_equal(default.pressure, explicit.pressure)
-    lossy = gaussian_beams(_GUIDE["frequency"],
-                           [0.0, _GUIDE["water_depth"]], [_C, _C], **kwargs,
-                           bottom=FluidSeabed(density=_SEABED["rho2"],
-                                              sound_speed=_SEABED["c2"]))
+    lossy = gaussian_beams(
+        _GUIDE["frequency"],
+        [0.0, _GUIDE["water_depth"]],
+        [_C, _C],
+        **kwargs,
+        bottom=FluidSeabed(density=_SEABED["rho2"], sound_speed=_SEABED["c2"]),
+    )
     assert not np.array_equal(default.pressure, lossy.pressure)
 
 
@@ -733,13 +876,22 @@ def test_a_malformed_seabed_is_rejected() -> None:
 # footing, and because it can be written down from the boundary conditions
 # alone, absolute phase included.
 
-_MODAL_GUIDE = {"water_depth": 1000.0, "frequency": 290.0,
-                "source_depth": 300.0, "receiver_depth": 600.0}
+_MODAL_GUIDE = {
+    "water_depth": 1000.0,
+    "frequency": 290.0,
+    "source_depth": 300.0,
+    "receiver_depth": 600.0,
+}
 
 
 def _modal_pressure(
-    ranges: np.ndarray, *, water_depth: float, frequency: float,
-    source_depth: float, receiver_depth: float, n_evanescent: int = 200,
+    ranges: np.ndarray,
+    *,
+    water_depth: float,
+    frequency: float,
+    source_depth: float,
+    receiver_depth: float,
+    n_evanescent: int = 200,
 ) -> np.ndarray:
     r"""The ideal guide's field as its own eigenfunction expansion.
 
@@ -778,16 +930,23 @@ def _modal_pressure(
     k = 2.0 * np.pi * frequency / _C
     n_modes = int(np.floor(k * water_depth / np.pi)) + n_evanescent
     kz = (np.arange(1, n_modes + 1) * np.pi / water_depth)[:, None]
-    excitation = (2.0 / water_depth) * (np.sin(kz * source_depth)
-                                        * np.sin(kz * receiver_depth))
+    excitation = (2.0 / water_depth) * (
+        np.sin(kz * source_depth) * np.sin(kz * receiver_depth)
+    )
     r = np.asarray(ranges, dtype=np.float64)[None, :]
     below = (kz < k).ravel()
-    field = 1j * np.pi * (excitation[below]
-                          * hankel1(0, np.sqrt(k**2 - kz[below] ** 2) * r)).sum(axis=0)
+    field = (
+        1j
+        * np.pi
+        * (excitation[below] * hankel1(0, np.sqrt(k**2 - kz[below] ** 2) * r)).sum(
+            axis=0
+        )
+    )
     beyond = np.sqrt(kz[~below] ** 2 - k**2) * r
     return np.asarray(
         field + 2.0 * (excitation[~below] * k0e(beyond) * np.exp(-beyond)).sum(axis=0),
-        dtype=np.complex128)
+        dtype=np.complex128,
+    )
 
 
 def test_the_ideal_waveguide_matches_its_own_modal_expansion() -> None:
@@ -810,10 +969,16 @@ def test_the_ideal_waveguide_matches_its_own_modal_expansion() -> None:
     r = np.array([1500.0, 2000.0])
     exact = _modal_pressure(r, **_MODAL_GUIDE)
     res = gaussian_beams(
-        _MODAL_GUIDE["frequency"], [0.0, _MODAL_GUIDE["water_depth"]], [_C, _C],
-        source_depth=_MODAL_GUIDE["source_depth"], max_range=2200.0, ranges_m=r,
+        _MODAL_GUIDE["frequency"],
+        [0.0, _MODAL_GUIDE["water_depth"]],
+        [_C, _C],
+        source_depth=_MODAL_GUIDE["source_depth"],
+        max_range=2200.0,
+        ranges_m=r,
         receiver_depths_m=np.array([_MODAL_GUIDE["receiver_depth"]]),
-        fan=BeamFan(max_angle_deg=88.0, beam_width=100.0), range_step=2.0)
+        fan=BeamFan(max_angle_deg=88.0, beam_width=100.0),
+        range_step=2.0,
+    )
     assert np.abs(res.propagation_loss[0] + 20.0 * np.log10(np.abs(exact))).max() < 0.1
     assert np.abs(np.angle(res.pressure[0] / exact)).max() < 5e-3
 
@@ -826,12 +991,18 @@ def test_the_ideal_waveguide_matches_its_own_modal_expansion() -> None:
 # marcher applies at a flat boundary is identically zero. The oracle below is
 # built to fill exactly that gap, and it is the only one here that does.
 
-_AIRY_GUIDE = {"water_depth": 200.0, "frequency": 200.0, "bottom_speed": 1530.0,
-               "source_depth": 30.5, "receiver_depth": 120.5}
+_AIRY_GUIDE = {
+    "water_depth": 200.0,
+    "frequency": 200.0,
+    "bottom_speed": 1530.0,
+    "source_depth": 30.5,
+    "receiver_depth": 120.5,
+}
 
 
-def _n2_linear_speeds(depths: np.ndarray, *, bottom_speed: float,
-                      water_depth: float) -> np.ndarray:
+def _n2_linear_speeds(
+    depths: np.ndarray, *, bottom_speed: float, water_depth: float
+) -> np.ndarray:
     r"""Jensen's :math:`n^2`-linear profile, Eq. (3.77), scaled to two speeds.
 
     :math:`c(z) = c_0/\sqrt{1 + 2az/c_0}` makes :math:`k^2(z) = \omega^2/c^2`
@@ -864,14 +1035,21 @@ def _airy_square_integral(x: float, pair: tuple[float, float]) -> float:
 
     alpha, beta = pair
     ai, aip, bi, bip = airy(x)
-    return float(alpha**2 * (x * ai * ai - aip * aip)
-                 + 2.0 * alpha * beta * (x * ai * bi - aip * bip)
-                 + beta**2 * (x * bi * bi - bip * bip))
+    return float(
+        alpha**2 * (x * ai * ai - aip * aip)
+        + 2.0 * alpha * beta * (x * ai * bi - aip * bip)
+        + beta**2 * (x * bi * bi - bip * bip)
+    )
 
 
 def _airy_mode_pressure(
-    ranges: np.ndarray, *, water_depth: float, frequency: float,
-    bottom_speed: float, source_depth: float, receiver_depth: float,
+    ranges: np.ndarray,
+    *,
+    water_depth: float,
+    frequency: float,
+    bottom_speed: float,
+    source_depth: float,
+    receiver_depth: float,
 ) -> np.ndarray:
     r"""The refracting guide's exact field, mode by mode, in closed form.
 
@@ -939,12 +1117,13 @@ def _airy_mode_pressure(
         ai0, _, bi0, _ = airy(x0)
         pair = (float(bi0), -float(ai0))
         turning = (kr**2 - coef_a) / coef_b
-        norm = (_airy_square_integral(float(xd), pair)
-                - _airy_square_integral(float(x0), pair)) / mu
+        norm = (
+            _airy_square_integral(float(xd), pair)
+            - _airy_square_integral(float(x0), pair)
+        ) / mu
         at_source = _airy_shape(mu * (source_depth - turning), pair)
         at_receiver = _airy_shape(mu * (receiver_depth - turning), pair)
-        field += (1j * np.pi * at_source * at_receiver / norm
-                  * hankel1(0, kr * r))
+        field += 1j * np.pi * at_source * at_receiver / norm * hankel1(0, kr * r)
     return np.asarray(field, dtype=np.complex128)
 
 
@@ -958,8 +1137,10 @@ def _incoherent(loss: np.ndarray, window: int = 11) -> np.ndarray:
     transmission-loss curve is read for.
     """
     kernel = np.ones(window) / window
-    return np.asarray(-10.0 * np.log10(
-        np.convolve(10.0 ** (-np.asarray(loss) / 10.0), kernel, mode="same")))
+    return np.asarray(
+        -10.0
+        * np.log10(np.convolve(10.0 ** (-np.asarray(loss) / 10.0), kernel, mode="same"))
+    )
 
 
 def test_a_refracting_guide_matches_its_exact_airy_modes() -> None:
@@ -993,13 +1174,22 @@ def test_a_refracting_guide_matches_its_exact_airy_modes() -> None:
     r = np.linspace(500.0, 4000.0, 100)
     exact = -20.0 * np.log10(np.abs(_airy_mode_pressure(r, **_AIRY_GUIDE)))
     depths = np.linspace(0.0, _AIRY_GUIDE["water_depth"], 21)
-    speeds = _n2_linear_speeds(depths, bottom_speed=_AIRY_GUIDE["bottom_speed"],
-                               water_depth=_AIRY_GUIDE["water_depth"])
+    speeds = _n2_linear_speeds(
+        depths,
+        bottom_speed=_AIRY_GUIDE["bottom_speed"],
+        water_depth=_AIRY_GUIDE["water_depth"],
+    )
     res = gaussian_beams(
-        _AIRY_GUIDE["frequency"], depths, speeds,
-        source_depth=_AIRY_GUIDE["source_depth"], max_range=4200.0, ranges_m=r,
+        _AIRY_GUIDE["frequency"],
+        depths,
+        speeds,
+        source_depth=_AIRY_GUIDE["source_depth"],
+        max_range=4200.0,
+        ranges_m=r,
         receiver_depths_m=np.array([_AIRY_GUIDE["receiver_depth"]]),
-        fan=BeamFan(max_angle_deg=80.0), range_step=5.0)
+        fan=BeamFan(max_angle_deg=80.0),
+        range_step=5.0,
+    )
     # The convolution's own edges are not an average of anything, so they go.
     difference = (_incoherent(res.propagation_loss[0]) - _incoherent(exact))[10:-10]
     assert abs(float(difference.mean())) < 1.0
@@ -1010,7 +1200,8 @@ def test_a_refracting_guide_matches_its_exact_airy_modes() -> None:
     # every guide-ruled beam is the same 4 D / pi.
     four_d_over_pi = 4.0 * _AIRY_GUIDE["water_depth"] / np.pi
     assert float(res.initial_beam_widths.max()) == pytest.approx(
-        four_d_over_pi, rel=1e-4)
+        four_d_over_pi, rel=1e-4
+    )
     assert res.initial_beam_widths[0] < res.initial_beam_widths.max()
 
 
@@ -1030,28 +1221,42 @@ def test_a_shallow_guide_no_longer_pays_the_quarter_depth_caps_toll() -> None:
     numbers are asserted, the first from below and the second from above, so
     this stays a measurement of the cap's cost and not a story about it.
     """
-    guide = {"water_depth": 100.0, "frequency": 250.0, "bottom_speed": 1520.0,
-             "source_depth": 15.5, "receiver_depth": 70.5}
+    guide = {
+        "water_depth": 100.0,
+        "frequency": 250.0,
+        "bottom_speed": 1520.0,
+        "source_depth": 15.5,
+        "receiver_depth": 70.5,
+    }
     r = np.linspace(300.0, 2500.0, 100)
     exact = -20.0 * np.log10(np.abs(_airy_mode_pressure(r, **guide)))
     depths = np.linspace(0.0, guide["water_depth"], 21)
-    speeds = _n2_linear_speeds(depths, bottom_speed=guide["bottom_speed"],
-                               water_depth=guide["water_depth"])
+    speeds = _n2_linear_speeds(
+        depths, bottom_speed=guide["bottom_speed"], water_depth=guide["water_depth"]
+    )
 
     def bias(beam_width: float | None) -> float:
         res = gaussian_beams(
-            guide["frequency"], depths, speeds,
-            source_depth=guide["source_depth"], max_range=2600.0, ranges_m=r,
+            guide["frequency"],
+            depths,
+            speeds,
+            source_depth=guide["source_depth"],
+            max_range=2600.0,
+            ranges_m=r,
             receiver_depths_m=np.array([guide["receiver_depth"]]),
             fan=BeamFan(max_angle_deg=80.0, beam_width=beam_width),
-            range_step=2.5)
-        return float((_incoherent(res.propagation_loss[0])
-                      - _incoherent(exact))[10:-10].mean())
+            range_step=2.5,
+        )
+        return float(
+            (_incoherent(res.propagation_loss[0]) - _incoherent(exact))[10:-10].mean()
+        )
 
     capped = bias(guide["water_depth"] / 4.0)  # what the retired cap forced
     unclamped = bias(None)
     assert capped > 3.0, f"the cap has to cost decibels here, measured {capped:.2f}"
-    assert abs(unclamped) < 0.8, f"the default has to remove it, measured {unclamped:.2f}"
+    assert abs(unclamped) < 0.8, (
+        f"the default has to remove it, measured {unclamped:.2f}"
+    )
     assert abs(unclamped) < 0.2 * capped
 
 
@@ -1072,12 +1277,17 @@ def _free_space_beam() -> tuple[GaussianBeamResult, np.ndarray, float]:
     rayleigh = (2.0 * np.pi * f / _C) * w0**2 / 2.0
     rmax = 2.0 * rayleigh * np.cos(np.radians(45.0))
     depth = _free_space_column(rmax, 45.0)
-    res = gaussian_beams(f, [0.0, depth], [_C, _C], source_depth=depth / 2.0,
-                         max_range=rmax,
-                         fan=BeamFan(max_angle_deg=45.0, beam_width=w0,
-                                     n_beams=9),
-                         range_step=rmax / 400.0, n_depth_points=2,
-                         ranges_m=np.array([rmax]))
+    res = gaussian_beams(
+        f,
+        [0.0, depth],
+        [_C, _C],
+        source_depth=depth / 2.0,
+        max_range=rmax,
+        fan=BeamFan(max_angle_deg=45.0, beam_width=w0, n_beams=9),
+        range_step=rmax / 400.0,
+        n_depth_points=2,
+        ranges_m=np.array([rmax]),
+    )
     arc = res.ray_ranges / np.cos(np.radians(res.launch_angles))[:, None]
     return res, arc, rayleigh
 
@@ -1117,12 +1327,14 @@ def test_the_wavefront_curvature_is_the_complex_source_point_one() -> None:
     result exposes: positive for a beam spreading away from its waist.
     """
     res, arc, rayleigh = _free_space_beam()
-    assert np.allclose(res.wavefront_curvatures, arc / (arc**2 + rayleigh**2),
-                       rtol=1e-12, atol=1e-15)
+    assert np.allclose(
+        res.wavefront_curvatures, arc / (arc**2 + rayleigh**2), rtol=1e-12, atol=1e-15
+    )
     # Flat at the waist, and the curvature peaks one Rayleigh range out.
     assert np.all(res.wavefront_curvatures[:, 0] == 0.0)
     assert arc[0, int(np.argmax(res.wavefront_curvatures[0]))] == pytest.approx(
-        rayleigh, rel=0.02)
+        rayleigh, rel=0.02
+    )
 
 
 def test_the_conserved_wronskian_is_why_the_spreading_never_vanishes() -> None:
@@ -1149,11 +1361,21 @@ def test_the_conserved_wronskian_is_why_the_spreading_never_vanishes() -> None:
     c0 = float(np.interp(200.0, z_prof, c_prof))
     xi = np.cos(angles) / c0
     march = march_rays(
-        _ocean_ray_derivative(z_prof, c_prof), xi=xi,
-        z0=np.full(angles.size, 200.0), zeta0=np.sin(angles) / c0,
-        range_step=10.0, n_steps=1201, lower=0.0, upper=depth,
-        dynamic=DynamicRays(np.full(angles.size, 0.5j * omega * w0**2),
-                            np.full(angles.size, 1.0 + 0.0j), z_prof, c_prof))
+        _ocean_ray_derivative(z_prof, c_prof),
+        xi=xi,
+        z0=np.full(angles.size, 200.0),
+        zeta0=np.sin(angles) / c0,
+        range_step=10.0,
+        n_steps=1201,
+        lower=0.0,
+        upper=depth,
+        dynamic=DynamicRays(
+            np.full(angles.size, 0.5j * omega * w0**2),
+            np.full(angles.size, 1.0 + 0.0j),
+            z_prof,
+            c_prof,
+        ),
+    )
     assert march.reflections.sum() > 10  # the path really does work both walls
     q = np.asarray(march.spreadings)
     p = np.asarray(march.spreading_slopes)
@@ -1179,8 +1401,11 @@ _N2_SPEEDS = _N2_C0 / np.sqrt(1.0 + 2.4 * _N2_DEPTHS / _N2_C0)
 
 
 def _geometric_spreading(
-    source_depth: float, angles_deg: np.ndarray | list[float], *,
-    max_range: float, n_steps: int,
+    source_depth: float,
+    angles_deg: np.ndarray | list[float],
+    *,
+    max_range: float,
+    n_steps: int,
 ) -> tuple[np.ndarray, np.ndarray]:
     """``(q, z)`` for the *geometric* initial conditions of Eq. (3.63).
 
@@ -1194,30 +1419,50 @@ def _geometric_spreading(
     c0 = float(np.interp(source_depth, _N2_DEPTHS, _N2_SPEEDS))
     xi = np.cos(th) / c0
     march = march_rays(
-        _ocean_ray_derivative(_N2_DEPTHS, _N2_SPEEDS), xi=xi,
-        z0=np.full(th.size, source_depth), zeta0=np.sin(th) / c0,
-        range_step=max_range / (n_steps - 1), n_steps=n_steps, lower=0.0,
+        _ocean_ray_derivative(_N2_DEPTHS, _N2_SPEEDS),
+        xi=xi,
+        z0=np.full(th.size, source_depth),
+        zeta0=np.sin(th) / c0,
+        range_step=max_range / (n_steps - 1),
+        n_steps=n_steps,
+        lower=0.0,
         upper=_N2_DEPTH,
-        dynamic=DynamicRays(np.zeros(th.size), np.full(th.size, 1.0 / c0),
-                            _N2_DEPTHS, _N2_SPEEDS))
+        dynamic=DynamicRays(
+            np.zeros(th.size), np.full(th.size, 1.0 / c0), _N2_DEPTHS, _N2_SPEEDS
+        ),
+    )
     return np.asarray(march.spreadings, dtype=np.float64), march.positions
 
 
 def _beam_spreading(
-    source_depth: float, angles_deg: np.ndarray | list[float], *,
-    max_range: float, n_steps: int, omega: float, beam_width: float,
+    source_depth: float,
+    angles_deg: np.ndarray | list[float],
+    *,
+    max_range: float,
+    n_steps: int,
+    omega: float,
+    beam_width: float,
 ) -> np.ndarray:
     """``q`` for the *beam* initial conditions of Eq. (3.91), same marcher."""
     th = np.radians(np.atleast_1d(np.asarray(angles_deg, dtype=np.float64)))
     c0 = float(np.interp(source_depth, _N2_DEPTHS, _N2_SPEEDS))
     xi = np.cos(th) / c0
     march = march_rays(
-        _ocean_ray_derivative(_N2_DEPTHS, _N2_SPEEDS), xi=xi,
-        z0=np.full(th.size, source_depth), zeta0=np.sin(th) / c0,
-        range_step=max_range / (n_steps - 1), n_steps=n_steps, lower=0.0,
+        _ocean_ray_derivative(_N2_DEPTHS, _N2_SPEEDS),
+        xi=xi,
+        z0=np.full(th.size, source_depth),
+        zeta0=np.sin(th) / c0,
+        range_step=max_range / (n_steps - 1),
+        n_steps=n_steps,
+        lower=0.0,
         upper=_N2_DEPTH,
-        dynamic=DynamicRays(np.full(th.size, 0.5j * omega * beam_width**2),
-                            np.full(th.size, 1.0 + 0.0j), _N2_DEPTHS, _N2_SPEEDS))
+        dynamic=DynamicRays(
+            np.full(th.size, 0.5j * omega * beam_width**2),
+            np.full(th.size, 1.0 + 0.0j),
+            _N2_DEPTHS,
+            _N2_SPEEDS,
+        ),
+    )
     return np.asarray(march.spreadings, dtype=np.complex128)
 
 
@@ -1250,8 +1495,9 @@ def test_the_tracked_branch_of_the_square_root_is_the_kmah_index() -> None:
     zs, rmax, n_steps = 992.5, 4000.0, 4001
     omega, w0 = 2.0 * np.pi * 600.0, 35.9
     angles = np.array([-25.0, -20.0, -13.3886, -8.0, -3.0, 3.0, 10.0, 20.0, 30.0])
-    q = _beam_spreading(zs, angles, max_range=rmax, n_steps=n_steps,
-                        omega=omega, beam_width=w0)
+    q = _beam_spreading(
+        zs, angles, max_range=rmax, n_steps=n_steps, omega=omega, beam_width=w0
+    )
 
     # Re[q] is the geometric spreading, which is what puts caustics on the axis.
     geometric, _z = _geometric_spreading(zs, angles, max_range=rmax, n_steps=n_steps)
@@ -1279,8 +1525,9 @@ def test_the_tracked_branch_of_the_square_root_is_the_kmah_index() -> None:
 
     # And the march resolves the winding rather than aliasing it: at a twentieth
     # of the sampling the ladder is the same one, so no rung was ever skipped.
-    coarse = _beam_spreading(zs, angles, max_range=rmax, n_steps=201,
-                             omega=omega, beam_width=w0)
+    coarse = _beam_spreading(
+        zs, angles, max_range=rmax, n_steps=201, omega=omega, beam_width=w0
+    )
     fine_turn = np.unwrap(np.angle(q), axis=1)[:, -1]
     coarse_turn = np.unwrap(np.angle(coarse), axis=1)[:, -1]
     assert np.abs(fine_turn - coarse_turn).max() < 0.5 * np.pi
@@ -1329,18 +1576,30 @@ def test_the_influence_sum_uses_the_tracked_branch_and_not_the_principal_one() -
         weight=np.array([[1.0 + 0.0j]]),
         reach=np.array([50.0]),
     )
-    got = _beam_influence(samples, np.array([z_ray]), water_depth=1.0e6,
-                          bottom_reflection=1.0, omega=omega, beam_width=w0,
-                          attenuation=0.0)
+    got = _beam_influence(
+        samples,
+        np.array([z_ray]),
+        water_depth=1.0e6,
+        bottom_reflection=1.0,
+        omega=omega,
+        beam_width=w0,
+        attenuation=0.0,
+    )
 
-    expected = (np.sqrt(c / r_col) / np.sqrt(abs(q))
-                * np.exp(-0.5j * (np.angle(q) - 2.0 * np.pi) - 1j * omega * tau))
+    expected = (
+        np.sqrt(c / r_col)
+        / np.sqrt(abs(q))
+        * np.exp(-0.5j * (np.angle(q) - 2.0 * np.pi) - 1j * omega * tau)
+    )
     assert got.shape == (1, 1)
     assert got[0, 0] == pytest.approx(expected, rel=1e-12)
     # The principal value is the same number with the opposite sign, so this is
     # not a tolerance that a rounding change could drift across.
-    principal = (np.sqrt(c / r_col) / np.sqrt(abs(q))
-                 * np.exp(-0.5j * np.angle(q) - 1j * omega * tau))
+    principal = (
+        np.sqrt(c / r_col)
+        / np.sqrt(abs(q))
+        * np.exp(-0.5j * np.angle(q) - 1j * omega * tau)
+    )
     assert principal == pytest.approx(-expected, rel=1e-12)
     assert abs(got[0, 0] - principal) == pytest.approx(2.0 * abs(expected), rel=1e-12)
 
@@ -1362,14 +1621,16 @@ def test_the_field_is_finite_where_the_classical_amplitude_is_not() -> None:
     crossings = np.flatnonzero(np.diff(np.sign(q_scan[:, column])) != 0)
     assert crossings.size, "the scan has to straddle a caustic"
     lo, hi = scan[crossings[0]], scan[crossings[0] + 1]
-    sign_lo = np.sign(_geometric_spreading(
-        zs, [lo], max_range=rmax, n_steps=n_steps)[0][0, column])
+    sign_lo = np.sign(
+        _geometric_spreading(zs, [lo], max_range=rmax, n_steps=n_steps)[0][0, column]
+    )
     for _ in range(60):
         mid = 0.5 * (lo + hi)
         q_mid, _z = _geometric_spreading(zs, [mid], max_range=rmax, n_steps=n_steps)
         lo, hi = (mid, hi) if np.sign(q_mid[0, column]) == sign_lo else (lo, mid)
-    q_c, z_c = _geometric_spreading(zs, [0.5 * (lo + hi)], max_range=rmax,
-                                    n_steps=n_steps)
+    q_c, z_c = _geometric_spreading(
+        zs, [0.5 * (lo + hi)], max_range=rmax, n_steps=n_steps
+    )
     r_caustic, z_caustic = float(ranges[column]), float(z_c[0, column])
     tube = np.abs(ranges[1:] * q_c[0, 1:])
     # The classical amplitude is 1/sqrt(|r q|): seven orders of magnitude above
@@ -1380,10 +1641,17 @@ def test_the_field_is_finite_where_the_classical_amplitude_is_not() -> None:
     # nothing to say about a receiver under the seabed and refuses to pretend.
     reach = min(120.0, z_caustic - 1.0, _N2_DEPTH - z_caustic - 1.0)
     offsets = np.linspace(-reach, reach, 121)
-    res = gaussian_beams(600.0, _N2_DEPTHS, _N2_SPEEDS, source_depth=zs,
-                         max_range=rmax, ranges_m=np.array([r_caustic]),
-                         receiver_depths_m=z_caustic + offsets,
-                         fan=BeamFan(max_angle_deg=45.0), range_step=2.0)
+    res = gaussian_beams(
+        600.0,
+        _N2_DEPTHS,
+        _N2_SPEEDS,
+        source_depth=zs,
+        max_range=rmax,
+        ranges_m=np.array([r_caustic]),
+        receiver_depths_m=z_caustic + offsets,
+        fan=BeamFan(max_angle_deg=45.0),
+        range_step=2.0,
+    )
     pl = res.propagation_loss[:, 0]
     assert np.all(np.isfinite(pl))
     assert pl.min() > 30.0  # finite, and not absurdly loud either
@@ -1403,9 +1671,14 @@ def test_the_shadow_zone_decays_smoothly_without_going_silent() -> None:
     gradually (Fig. 3.11) and so does this one.
     """
     zs, f = 77.5, 2000.0
-    rays = ray_trace(_N2_DEPTHS, _N2_SPEEDS, source_depth=zs,
-                     launch_angles_deg=np.linspace(-19.0, 19.0, 761),
-                     max_range=1400.0, n_steps=1401)
+    rays = ray_trace(
+        _N2_DEPTHS,
+        _N2_SPEEDS,
+        source_depth=zs,
+        launch_angles_deg=np.linspace(-19.0, 19.0, 761),
+        max_range=1400.0,
+        n_steps=1401,
+    )
     closest = np.abs(rays.depths - zs).min(axis=0)
     limiting = float(rays.ranges[0][np.flatnonzero(closest > 2.0)[0]])
     assert 800.0 < limiting < 950.0
@@ -1414,10 +1687,17 @@ def test_the_shadow_zone_decays_smoothly_without_going_silent() -> None:
     assert closest[np.argmin(np.abs(rays.ranges[0] - 1300.0))] > 100.0
 
     r = np.linspace(600.0, 1350.0, 76)
-    res = gaussian_beams(f, _N2_DEPTHS, _N2_SPEEDS, source_depth=zs,
-                         max_range=1500.0, ranges_m=r,
-                         receiver_depths_m=np.array([zs]),
-                         fan=BeamFan(max_angle_deg=30.0), range_step=2.0)
+    res = gaussian_beams(
+        f,
+        _N2_DEPTHS,
+        _N2_SPEEDS,
+        source_depth=zs,
+        max_range=1500.0,
+        ranges_m=r,
+        receiver_depths_m=np.array([zs]),
+        fan=BeamFan(max_angle_deg=30.0),
+        range_step=2.0,
+    )
     pl = res.propagation_loss[0]
     assert np.all(np.isfinite(pl))
     # Nonzero everywhere: the beams' tails carry energy into the shadow, which
@@ -1452,17 +1732,25 @@ def test_the_shadow_zone_decays_smoothly_without_going_silent() -> None:
     ],
 )
 def test_the_default_width_is_the_optimum_raised_to_the_guides_need(
-    frequency: float, max_range: float, water_depth: float,
-    axial: float, edge: float,
+    frequency: float,
+    max_range: float,
+    water_depth: float,
+    axial: float,
+    edge: float,
 ) -> None:
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", PhonometryWarning)
         res = gaussian_beams(
-            frequency, [0.0, water_depth], [_C, _C],
-            source_depth=0.5 * water_depth, max_range=max_range,
-            ranges_m=np.array([max_range]), n_depth_points=2,
+            frequency,
+            [0.0, water_depth],
+            [_C, _C],
+            source_depth=0.5 * water_depth,
+            max_range=max_range,
+            ranges_m=np.array([max_range]),
+            n_depth_points=2,
             fan=BeamFan(max_angle_deg=20.0, n_beams=9),
-            range_step=max_range / 4.0)
+            range_step=max_range / 4.0,
+        )
     assert res.initial_beam_widths.shape == (9,)
     assert res.initial_beam_widths[4] == pytest.approx(axial, rel=1e-3)
     assert res.initial_beam_widths[0] == pytest.approx(edge, rel=1e-3)
@@ -1480,10 +1768,16 @@ def test_the_answer_does_not_care_which_width_inside_the_band_is_used() -> None:
     losses = []
     for w0 in (60.0, 120.0, 240.0):
         res = gaussian_beams(
-            _GUIDE["frequency"], [0.0, _GUIDE["water_depth"]], [_C, _C],
-            source_depth=_GUIDE["source_depth"], max_range=2200.0, ranges_m=r,
+            _GUIDE["frequency"],
+            [0.0, _GUIDE["water_depth"]],
+            [_C, _C],
+            source_depth=_GUIDE["source_depth"],
+            max_range=2200.0,
+            ranges_m=r,
             receiver_depths_m=np.array([_GUIDE["receiver_depth"]]),
-            fan=BeamFan(max_angle_deg=85.0, beam_width=w0), range_step=5.0)
+            fan=BeamFan(max_angle_deg=85.0, beam_width=w0),
+            range_step=5.0,
+        )
         losses.append(float(res.propagation_loss[0, 0]))
     assert max(losses) - min(losses) < 0.2  # measured 0.13 dB
 
@@ -1494,16 +1788,31 @@ def test_a_source_on_a_profile_kink_is_warned_about() -> None:
     r = np.array([1000.0])
     fan = BeamFan(max_angle_deg=30.0, n_beams=9)
     with pytest.warns(PhonometryWarning, match="gradient discontinuity"):
-        gaussian_beams(200.0, z, c, source_depth=100.0, max_range=1000.0,
-                       ranges_m=r, n_depth_points=2, fan=fan,
-                       range_step=100.0)
+        gaussian_beams(
+            200.0,
+            z,
+            c,
+            source_depth=100.0,
+            max_range=1000.0,
+            ranges_m=r,
+            n_depth_points=2,
+            fan=fan,
+            range_step=100.0,
+        )
     # A metre off the node is a different problem, and silent.
     with warnings.catch_warnings():
         warnings.simplefilter("error", PhonometryWarning)
-        gaussian_beams(200.0, z, c, source_depth=101.0, max_range=1000.0,
-                       ranges_m=np.array([1000.0]), n_depth_points=2,
-                       fan=BeamFan(max_angle_deg=30.0, n_beams=9),
-                       range_step=100.0)
+        gaussian_beams(
+            200.0,
+            z,
+            c,
+            source_depth=101.0,
+            max_range=1000.0,
+            ranges_m=np.array([1000.0]),
+            n_depth_points=2,
+            fan=BeamFan(max_angle_deg=30.0, n_beams=9),
+            range_step=100.0,
+        )
 
 
 def test_a_beam_wider_than_a_quarter_of_the_channel_passes_in_silence() -> None:
@@ -1518,20 +1827,34 @@ def test_a_beam_wider_than_a_quarter_of_the_channel_passes_in_silence() -> None:
     """
     with warnings.catch_warnings():
         warnings.simplefilter("error", PhonometryWarning)
-        gaussian_beams(200.0, [0.0, 400.0], [_C, _C], source_depth=200.0,
-                       max_range=1000.0, ranges_m=np.array([1000.0]),
-                       n_depth_points=2, range_step=20.0,
-                       fan=BeamFan(max_angle_deg=30.0, n_beams=9,
-                                   beam_width=150.0))
+        gaussian_beams(
+            200.0,
+            [0.0, 400.0],
+            [_C, _C],
+            source_depth=200.0,
+            max_range=1000.0,
+            ranges_m=np.array([1000.0]),
+            n_depth_points=2,
+            range_step=20.0,
+            fan=BeamFan(max_angle_deg=30.0, n_beams=9, beam_width=150.0),
+        )
 
 
 def test_a_step_that_cannot_follow_the_steepest_beam_is_warned_about() -> None:
     r = np.array([2000.0])
     steep_fan = BeamFan(max_angle_deg=85.0, n_beams=9)
     with pytest.warns(PhonometryWarning, match="steepest beam"):
-        gaussian_beams(200.0, [0.0, 400.0], [_C, _C], source_depth=200.0,
-                       max_range=2000.0, ranges_m=r, n_depth_points=2,
-                       fan=steep_fan, range_step=100.0)
+        gaussian_beams(
+            200.0,
+            [0.0, 400.0],
+            [_C, _C],
+            source_depth=200.0,
+            max_range=2000.0,
+            ranges_m=r,
+            n_depth_points=2,
+            fan=steep_fan,
+            range_step=100.0,
+        )
 
 
 def test_every_warning_is_reported_against_the_line_that_caused_it() -> None:
@@ -1551,13 +1874,29 @@ def test_every_warning_is_reported_against_the_line_that_caused_it() -> None:
     far = np.array([2000.0])
     steep_fan = BeamFan(max_angle_deg=85.0, n_beams=9)
     with pytest.warns(PhonometryWarning) as kink:
-        gaussian_beams(200.0, z, c, source_depth=100.0, max_range=1000.0,
-                       ranges_m=on_kink, n_depth_points=2, fan=flat_fan,
-                       range_step=100.0)
+        gaussian_beams(
+            200.0,
+            z,
+            c,
+            source_depth=100.0,
+            max_range=1000.0,
+            ranges_m=on_kink,
+            n_depth_points=2,
+            fan=flat_fan,
+            range_step=100.0,
+        )
     with pytest.warns(PhonometryWarning) as steep:
-        gaussian_beams(200.0, [0.0, 400.0], [_C, _C], source_depth=200.0,
-                       max_range=2000.0, ranges_m=far, n_depth_points=2,
-                       fan=steep_fan, range_step=100.0)
+        gaussian_beams(
+            200.0,
+            [0.0, 400.0],
+            [_C, _C],
+            source_depth=200.0,
+            max_range=2000.0,
+            ranges_m=far,
+            n_depth_points=2,
+            fan=steep_fan,
+            range_step=100.0,
+        )
     for caught in (kink, steep):
         assert caught[0].filename == __file__
 
@@ -1572,27 +1911,36 @@ def test_invalid_inputs_rejected() -> None:
     with pytest.raises(ValueError, match="bottom"):
         gaussian_beams(200.0, *iso, source_depth=500.0, bottom="sandy")
     with pytest.raises(ValueError, match="range_step"):
-        gaussian_beams(200.0, *iso, source_depth=500.0, max_range=100.0,
-                       range_step=200.0)
+        gaussian_beams(
+            200.0, *iso, source_depth=500.0, max_range=100.0, range_step=200.0
+        )
     unpaired = BeamFan(n_beams=1)
     with pytest.raises(ValueError, match="n_beams"):
         gaussian_beams(200.0, *iso, source_depth=500.0, fan=unpaired)
     with pytest.raises(ValueError, match="ranges_m"):
         gaussian_beams(200.0, *iso, source_depth=500.0, ranges_m=[-1.0])
     with pytest.raises(ValueError, match="receiver_depths_m"):
-        gaussian_beams(200.0, *iso, source_depth=500.0,
-                       ranges_m=[500.0], receiver_depths_m=[])
+        gaussian_beams(
+            200.0, *iso, source_depth=500.0, ranges_m=[500.0], receiver_depths_m=[]
+        )
     with pytest.raises(ValueError, match="receiver_depths_m"):
-        gaussian_beams(200.0, *iso, source_depth=500.0, ranges_m=[500.0],
-                       receiver_depths_m=[1200.0])  # below the seabed
+        gaussian_beams(
+            200.0,
+            *iso,
+            source_depth=500.0,
+            ranges_m=[500.0],
+            receiver_depths_m=[1200.0],
+        )  # below the seabed
     with pytest.raises(ValueError, match="ranges_m"):
         # Past the march there is no column to read a beam off, and answering
         # by extrapolating the last one would be a silent wrong answer.
-        gaussian_beams(200.0, *iso, source_depth=500.0, max_range=1000.0,
-                       ranges_m=[2000.0])
+        gaussian_beams(
+            200.0, *iso, source_depth=500.0, max_range=1000.0, ranges_m=[2000.0]
+        )
     with pytest.raises(ValueError, match="n_depth_points"):
-        gaussian_beams(200.0, *iso, source_depth=500.0, ranges_m=[500.0],
-                       n_depth_points=1)
+        gaussian_beams(
+            200.0, *iso, source_depth=500.0, ranges_m=[500.0], n_depth_points=1
+        )
     with pytest.raises(ValueError, match="absorption"):
         gaussian_beams(200.0, *iso, source_depth=500.0, absorption="mud")
 
@@ -1602,17 +1950,30 @@ def test_the_result_lines_up_with_the_parabolic_equation_grid_and_plots() -> Non
     from phonometry.underwater.propagation.numerical import parabolic_equation
 
     iso = ([0.0, 1000.0], [_C, _C])
-    beams = gaussian_beams(200.0, *iso, source_depth=500.0, max_range=2000.0,
-                           range_step=100.0, n_depth_points=32,
-                           fan=BeamFan(max_angle_deg=45.0, n_beams=101))
-    pe = parabolic_equation(200.0, *iso, source_depth=500.0, max_range=2000.0,
-                            range_step=100.0, n_depth_points=32)
+    beams = gaussian_beams(
+        200.0,
+        *iso,
+        source_depth=500.0,
+        max_range=2000.0,
+        range_step=100.0,
+        n_depth_points=32,
+        fan=BeamFan(max_angle_deg=45.0, n_beams=101),
+    )
+    pe = parabolic_equation(
+        200.0,
+        *iso,
+        source_depth=500.0,
+        max_range=2000.0,
+        range_step=100.0,
+        n_depth_points=32,
+    )
     assert np.allclose(beams.depths, pe.depths)
     assert beams.propagation_loss.shape == (32, beams.ranges.size)
     assert beams.propagation_loss.shape[0] == pe.propagation_loss.shape[0]
     with np.errstate(divide="ignore"):
-        assert np.allclose(beams.propagation_loss,
-                           -20.0 * np.log10(np.abs(beams.pressure)))
+        assert np.allclose(
+            beams.propagation_loss, -20.0 * np.log10(np.abs(beams.pressure))
+        )
     assert beams.plot() is not None
     assert beams.plot(language="es") is not None
 
@@ -1635,9 +1996,16 @@ def test_the_colour_window_lands_on_the_field_and_not_beside_it() -> None:
     c0 = 1550.0
     z = np.linspace(0.0, 1000.0, 201)
     c = c0 / np.sqrt(1.0 + 2.4 * z / c0)
-    beams = gaussian_beams(600.0, z, c, source_depth=992.5, max_range=2500.0,
-                           range_step=25.0, fan=BeamFan(max_angle_deg=45.0),
-                           n_depth_points=80)
+    beams = gaussian_beams(
+        600.0,
+        z,
+        c,
+        source_depth=992.5,
+        max_range=2500.0,
+        range_step=25.0,
+        fan=BeamFan(max_angle_deg=45.0),
+        n_depth_points=80,
+    )
     pl = beams.propagation_loss
     finite = pl[np.isfinite(pl)]
     assert np.isinf(pl).mean() > 0.1, "the un-illuminated wedge has to be there"

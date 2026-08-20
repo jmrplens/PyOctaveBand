@@ -198,8 +198,15 @@ def render_survey_airborne_report(
     """
     curve_attr, _, spec = _AIRBORNE_QUANTITIES[quantity]
     return _render_survey(
-        result, rating, path, spec=spec, is_impact=False, curve_attr=curve_attr,
-        metadata=metadata, verbose=verbose, language=language,
+        result,
+        rating,
+        path,
+        spec=spec,
+        is_impact=False,
+        curve_attr=curve_attr,
+        metadata=metadata,
+        verbose=verbose,
+        language=language,
     )
 
 
@@ -229,8 +236,15 @@ def render_survey_impact_report(
         installed.
     """
     return _render_survey(
-        result, rating, path, spec=_L_NT_SPEC, is_impact=True, curve_attr="l_nt",
-        metadata=metadata, verbose=verbose, language=language,
+        result,
+        rating,
+        path,
+        spec=_L_NT_SPEC,
+        is_impact=True,
+        curve_attr="l_nt",
+        metadata=metadata,
+        verbose=verbose,
+        language=language,
     )
 
 
@@ -260,7 +274,13 @@ def render_survey_facade_report(
         installed.
     """
     return _render_survey(
-        result, rating, path, spec=_D_2M_NT_SPEC, is_impact=False,
-        curve_attr="d_2m_nt", metadata=metadata, verbose=verbose,
+        result,
+        rating,
+        path,
+        spec=_D_2M_NT_SPEC,
+        is_impact=False,
+        curve_attr="d_2m_nt",
+        metadata=metadata,
+        verbose=verbose,
         language=language,
     )

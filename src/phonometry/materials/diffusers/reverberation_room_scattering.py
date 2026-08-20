@@ -86,17 +86,48 @@ _DB_PER_NEPER = 10.0 * math.log10(math.e)
 #: One-third-octave centre frequencies of ISO 17497-1 Table 1, in Hz
 #: (equivalent full-scale ``f / N``), 100 Hz to 5000 Hz.
 BASE_PLATE_BANDS: tuple[int, ...] = (
-    100, 125, 160, 200, 250, 315, 400, 500, 630,
-    800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000,
+    100,
+    125,
+    160,
+    200,
+    250,
+    315,
+    400,
+    500,
+    630,
+    800,
+    1000,
+    1250,
+    1600,
+    2000,
+    2500,
+    3150,
+    4000,
+    5000,
 )
 
 #: Maximum admissible scattering coefficient of the base plate alone
 #: (ISO 17497-1:2004+A1:2014, Table 1, Clause 6.2), keyed by equivalent
 #: full-scale one-third-octave centre frequency in Hz.
 BASE_PLATE_MAX_SCATTERING: dict[int, float] = {
-    100: 0.05, 125: 0.05, 160: 0.05, 200: 0.05, 250: 0.05, 315: 0.05,
-    400: 0.05, 500: 0.05, 630: 0.10, 800: 0.10, 1000: 0.10, 1250: 0.15,
-    1600: 0.15, 2000: 0.15, 2500: 0.20, 3150: 0.20, 4000: 0.20, 5000: 0.25,
+    100: 0.05,
+    125: 0.05,
+    160: 0.05,
+    200: 0.05,
+    250: 0.05,
+    315: 0.05,
+    400: 0.05,
+    500: 0.05,
+    630: 0.10,
+    800: 0.10,
+    1000: 0.10,
+    1250: 0.15,
+    1600: 0.15,
+    2000: 0.15,
+    2500: 0.20,
+    3150: 0.20,
+    4000: 0.20,
+    5000: 0.25,
 }
 
 
@@ -152,9 +183,7 @@ def speed_of_sound(temperature: ArrayLike) -> Real:
     kelvin = _T0 + t
     if np.any(kelvin <= 0.0):
         raise ValueError("'temperature' must exceed -273,15 degC.")
-    return np.asarray(
-        _C_REF * np.sqrt(kelvin / _T_REF_K), dtype=np.float64
-    )
+    return np.asarray(_C_REF * np.sqrt(kelvin / _T_REF_K), dtype=np.float64)
 
 
 def air_attenuation_coefficient(pressure_attenuation_db_per_m: ArrayLike) -> Real:
@@ -209,12 +238,9 @@ def _sabine_absorption(
     t_b = _positive_array(situation_b[1], "T")
     m_b = _nonneg_array(situation_b[2], "m")
     ratio = vol / surf
-    absorption = (
-        _SABINE_CONSTANT
-        * ratio
-        * (1.0 / (c_b * t_b) - 1.0 / (c_a * t_a))
-        - 4.0 * ratio * (m_b - m_a)
-    )
+    absorption = _SABINE_CONSTANT * ratio * (
+        1.0 / (c_b * t_b) - 1.0 / (c_a * t_a)
+    ) - 4.0 * ratio * (m_b - m_a)
     return np.asarray(absorption, dtype=np.float64)
 
 
@@ -344,7 +370,9 @@ class ScatteringResult:
     random_incidence: Real
     specular: Real
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the scattering coefficient ``s`` versus frequency.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the

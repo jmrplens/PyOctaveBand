@@ -61,8 +61,9 @@ def test_calibrated_signal_survives_write_sidecar_read_exactly(
     reread = read(path)  # no argument: the sidecar carries the calibration
     assert reread.calibration_factor == 17.3
     assert reread.calibration_factor is not None
-    level_after = signals.leq(np.asarray(reread),
-                              calibration_factor=reread.calibration_factor)
+    level_after = signals.leq(
+        np.asarray(reread), calibration_factor=reread.calibration_factor
+    )
     assert level_after == level_before
 
 
@@ -80,8 +81,8 @@ def test_calibration_cancellation_holds_on_disk(tmp_path: Path) -> None:
     times larger than the float files. The 1e-3 dB bound is a hundredth
     of the 0.1 dB indication resolution of an IEC 61672 meter.
     """
-    calibrator = _tone(0.5, 1000.0, 2.0)     # the 94 dB reference take
-    measurement = _tone(0.05, 250.0, 2.0)    # the quiet measurement take
+    calibrator = _tone(0.5, 1000.0, 2.0)  # the 94 dB reference take
+    measurement = _tone(0.05, 250.0, 2.0)  # the quiet measurement take
 
     levels: list[float] = []
     for subtype in ("PCM_16", "DOUBLE"):
@@ -90,8 +91,9 @@ def test_calibration_cancellation_holds_on_disk(tmp_path: Path) -> None:
         write(cal_path, calibrator, FS, subtype=subtype)
         write(meas_path, measurement, FS, subtype=subtype)
         factor = metrology.sensitivity(np.asarray(read(cal_path)), 94.0, fs=FS)
-        levels.append(float(signals.leq(np.asarray(read(meas_path)),
-                                        calibration_factor=factor)))
+        levels.append(
+            float(signals.leq(np.asarray(read(meas_path)), calibration_factor=factor))
+        )
 
     assert abs(levels[0] - levels[1]) < 1e-3  # dB
 

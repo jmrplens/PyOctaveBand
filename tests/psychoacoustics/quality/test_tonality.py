@@ -78,9 +78,7 @@ def test_tnr_of_synthetic_tone_matches_analytic() -> None:
 
 def test_tnr_prominence_criteria() -> None:
     """Formulae (12)-(13): 8 dB at 1 kHz+, frequency-dependent below."""
-    loud = psychoacoustics.tone_to_noise_ratio(
-        _tone_in_noise(2000.0, 0.2, 0.02), FS
-    )
+    loud = psychoacoustics.tone_to_noise_ratio(_tone_in_noise(2000.0, 0.2, 0.02), FS)
     assert loud.criterion_db == pytest.approx(8.0)
     assert loud.prominent
 
@@ -89,9 +87,7 @@ def test_tnr_prominence_criteria() -> None:
     )
     assert not quiet.prominent
 
-    low = psychoacoustics.tone_to_noise_ratio(
-        _tone_in_noise(200.0, 0.2, 0.02), FS
-    )
+    low = psychoacoustics.tone_to_noise_ratio(_tone_in_noise(200.0, 0.2, 0.02), FS)
     assert low.criterion_db == pytest.approx(8.0 + 8.33 * np.log10(5.0), abs=1e-6)
 
 
@@ -122,9 +118,7 @@ def test_pr_of_synthetic_tone_matches_analytic() -> None:
 
 def test_pr_criteria_and_noise_only() -> None:
     """9 dB at 1 kHz+ (Formula 26); pure noise is never prominent."""
-    loud = psychoacoustics.prominence_ratio(
-        _tone_in_noise(3000.0, 0.3, 0.02), FS
-    )
+    loud = psychoacoustics.prominence_ratio(_tone_in_noise(3000.0, 0.3, 0.02), FS)
     assert loud.criterion_db == pytest.approx(9.0)
     assert loud.prominent
 
@@ -142,7 +136,9 @@ def test_pr_low_frequency_truncated_band() -> None:
     result = psychoacoustics.prominence_ratio(x, FS, tone_freq=120.0)
     assert result.frequency == pytest.approx(120.0, abs=1.0)
     assert result.prominent
-    assert result.criterion_db == pytest.approx(9.0 + 10 * np.log10(1000 / 120), abs=1e-6)
+    assert result.criterion_db == pytest.approx(
+        9.0 + 10 * np.log10(1000 / 120), abs=1e-6
+    )
 
 
 def test_tnr_proximate_tones_combine() -> None:
@@ -196,13 +192,9 @@ def test_coarse_resolution_warns_at_low_frequency() -> None:
     half-width, biasing the ratio; the function warns (it does not raise)."""
     x = _tone_in_noise(250.0, 0.2, 0.02)
     with pytest.warns(UserWarning, match="bins"):
-        psychoacoustics.tone_to_noise_ratio(
-            x, FS, tone_freq=250.0, resolution_hz=4.0
-        )
+        psychoacoustics.tone_to_noise_ratio(x, FS, tone_freq=250.0, resolution_hz=4.0)
     with pytest.warns(UserWarning, match="bins"):
-        psychoacoustics.prominence_ratio(
-            x, FS, tone_freq=250.0, resolution_hz=4.0
-        )
+        psychoacoustics.prominence_ratio(x, FS, tone_freq=250.0, resolution_hz=4.0)
 
 
 def test_range_edge_warns() -> None:
@@ -234,9 +226,7 @@ def test_plot_draws_criterion_curve_and_the_assessed_tone() -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    res = psychoacoustics.tone_to_noise_ratio(
-        _tone_in_noise(1000.0, 0.1, 0.02), FS
-    )
+    res = psychoacoustics.tone_to_noise_ratio(_tone_in_noise(1000.0, 0.1, 0.02), FS)
     ax = res.plot()
     # The marker sits at (frequency, ratio) and the criterion curve passes
     # through the criterion value at that frequency.
@@ -244,8 +234,9 @@ def test_plot_draws_criterion_curve_and_the_assessed_tone() -> None:
     assert marker.get_xdata()[0] == pytest.approx(res.frequency)
     assert marker.get_ydata()[0] == pytest.approx(res.ratio_db)
     criterion_curve = ax.lines[0]
-    at_tone = np.interp(res.frequency, criterion_curve.get_xdata(),
-                        criterion_curve.get_ydata())
+    at_tone = np.interp(
+        res.frequency, criterion_curve.get_xdata(), criterion_curve.get_ydata()
+    )
     assert at_tone == pytest.approx(res.criterion_db, abs=0.1)
     assert "TNR" in ax.get_title()
     assert "prominent" in ax.get_title()

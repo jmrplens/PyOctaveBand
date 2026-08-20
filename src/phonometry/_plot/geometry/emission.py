@@ -14,6 +14,7 @@ leaf never imports domain code at module level.
 
 from __future__ import annotations
 
+import contextlib
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any
 
@@ -90,11 +91,10 @@ def _recede_3d_scaffolding(ax: Any, foreground: str) -> None:
         # `_axinfo["grid"]` takes colour, width and style and nothing else: an
         # `alpha` key here is silently fatal. The colour is the page mixed the
         # least it can be towards the ink, which recedes on either theme.
-        try:
+        with contextlib.suppress(AttributeError, KeyError, TypeError):
             axis._axinfo["grid"].update(
-                color=theme_fill(foreground, ax, delta_e=24.0), linewidth=0.5)
-        except (AttributeError, KeyError, TypeError):
-            pass
+                color=theme_fill(foreground, ax, delta_e=24.0), linewidth=0.5
+            )
 
 
 def _number_points(ax: Any, pts: np.ndarray, colours: Any) -> None:
@@ -115,10 +115,16 @@ def _number_points(ax: Any, pts: np.ndarray, colours: Any) -> None:
         # depth, so without this a point in front of its own label clips the
         # digits, which is what the numbers looked like before.
         ax.text(
-            x, y, z, f"{index}", fontsize=7, color=ink, zorder=5,
-            ha="center", va="center",
-            bbox={"boxstyle": "round,pad=0.18", "facecolor": chip,
-                  "edgecolor": "none"},
+            x,
+            y,
+            z,
+            f"{index}",
+            fontsize=7,
+            color=ink,
+            zorder=5,
+            ha="center",
+            va="center",
+            bbox={"boxstyle": "round,pad=0.18", "facecolor": chip, "edgecolor": "none"},
         )
 
 
@@ -155,8 +161,10 @@ def plot_microphone_positions(
         raise ValueError("'positions' must have shape (N, 3) with N >= 1.")
     if radius is not None and radius <= 0.0:
         raise ValueError("'radius' must be positive when given.")
-    r = float(radius) if radius is not None else float(
-        np.linalg.norm(pts, axis=1).max()
+    r = (
+        float(radius)
+        if radius is not None
+        else float(np.linalg.norm(pts, axis=1).max())
     )
     if ax is None:
         plt = _import_pyplot()
@@ -181,7 +189,9 @@ def plot_microphone_positions(
         # page and vanishes on the dark one. A 0.4 pt line has no opacity to
         # spare. The contrast checker never caught it because it measures
         # filled regions, and this is a stroke.
-        color=foreground, linewidth=0.7, alpha=0.9,
+        color=foreground,
+        linewidth=0.7,
+        alpha=0.9,
     )
     if not full_sphere:
         # Reflecting plane disc at z = 0.
@@ -191,14 +201,26 @@ def plot_microphone_positions(
         # opacity derived from the page and the surface left unshaded so the
         # drawn colour is the one that was measured.
         ax.plot_surface(
-            d_grid * np.cos(a_grid), d_grid * np.sin(a_grid),
-            np.zeros_like(d_grid), color=_C_SECONDARY_LIGHT, linewidth=0.0,
-            alpha=min(1.0, 2.2 * theme_fill_alpha(_C_SECONDARY_LIGHT, ax)), shade=False,
+            d_grid * np.cos(a_grid),
+            d_grid * np.sin(a_grid),
+            np.zeros_like(d_grid),
+            color=_C_SECONDARY_LIGHT,
+            linewidth=0.0,
+            alpha=min(1.0, 2.2 * theme_fill_alpha(_C_SECONDARY_LIGHT, ax)),
+            shade=False,
         )
         ax.text(
-            1.1 * r, 0.0, 0.0, _t("Reflecting plane", language), fontsize=8,
-            bbox={"boxstyle": "round,pad=0.12", "facecolor": _page_color(ax, None),
-             "edgecolor": "none", "alpha": 0.72},
+            1.1 * r,
+            0.0,
+            0.0,
+            _t("Reflecting plane", language),
+            fontsize=8,
+            bbox={
+                "boxstyle": "round,pad=0.12",
+                "facecolor": _page_color(ax, None),
+                "edgecolor": "none",
+                "alpha": 0.72,
+            },
         )
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("s", 30)
@@ -243,37 +265,68 @@ def plot_pp_probe_geometry(
     if ax is None:
         ax = _new_axes()
     dr = float(spacing)
-    d_mic = 0.55 * dr                       # half-inch capsule vs 12 mm
+    d_mic = 0.55 * dr  # half-inch capsule vs 12 mm
     body = 2.2 * dr
     # Spacer between the two face-to-face capsules.
-    _material_rect(ax, -0.5 * dr + 0.5 * d_mic, -0.18 * dr,
-                   dr - d_mic, 0.36 * dr, "cavity", **kwargs)
-    ax.text(0.0, 0.28 * dr, _t("Spacer", language), fontsize=8,
-            ha="center", va="bottom")
+    _material_rect(
+        ax,
+        -0.5 * dr + 0.5 * d_mic,
+        -0.18 * dr,
+        dr - d_mic,
+        0.36 * dr,
+        "cavity",
+        **kwargs,
+    )
+    ax.text(
+        0.0, 0.28 * dr, _t("Spacer", language), fontsize=8, ha="center", va="bottom"
+    )
     for sign in (-1.0, 1.0):
         centre = sign * 0.5 * dr
-        ax.add_patch(Circle((centre, 0.0), 0.5 * d_mic,
-                            facecolor=_C_PRIMARY, edgecolor=_C_EDGE,
-                            linewidth=0.8, zorder=5))
-        ax.add_patch(Rectangle(
-            (centre + sign * 0.5 * d_mic, -0.30 * dr)
-            if sign > 0 else (centre - body - 0.5 * d_mic, -0.30 * dr),
-            body, 0.60 * dr, facecolor=_C_MUTED, edgecolor=_C_EDGE,
-            linewidth=0.8, alpha=0.6,
-        ))
+        ax.add_patch(
+            Circle(
+                (centre, 0.0),
+                0.5 * d_mic,
+                facecolor=_C_PRIMARY,
+                edgecolor=_C_EDGE,
+                linewidth=0.8,
+                zorder=5,
+            )
+        )
+        ax.add_patch(
+            Rectangle(
+                (centre + sign * 0.5 * d_mic, -0.30 * dr)
+                if sign > 0
+                else (centre - body - 0.5 * d_mic, -0.30 * dr),
+                body,
+                0.60 * dr,
+                facecolor=_C_MUTED,
+                edgecolor=_C_EDGE,
+                linewidth=0.8,
+                alpha=0.6,
+            )
+        )
     x_arrow = 0.5 * dr + d_mic + body
     # Annotation arrows do not autoscale: a silent sentinel keeps the tip
     # inside the axes limits.
     ax.plot([x_arrow + 1.5 * dr], [0.0], linestyle="none")
     ax.annotate(
-        "", xy=(x_arrow + 1.3 * dr, 0.0), xytext=(x_arrow + 0.2 * dr, 0.0),
-        arrowprops={"arrowstyle": "-|>", "color": _C_PRIMARY,
-                    "linewidth": 1.6},
+        "",
+        xy=(x_arrow + 1.3 * dr, 0.0),
+        xytext=(x_arrow + 0.2 * dr, 0.0),
+        arrowprops={"arrowstyle": "-|>", "color": _C_PRIMARY, "linewidth": 1.6},
     )
-    ax.text(x_arrow + 0.75 * dr, 0.1 * dr, "I$_r$", fontsize=9,
-            ha="center", va="bottom", color=_C_PRIMARY)
-    _dim(ax, (-0.5 * dr, -0.5 * dr), (0.5 * dr, -0.5 * dr),
-         _mm(dr, language), tight=True)
+    ax.text(
+        x_arrow + 0.75 * dr,
+        0.1 * dr,
+        "I$_r$",
+        fontsize=9,
+        ha="center",
+        va="bottom",
+        color=_C_PRIMARY,
+    )
+    _dim(
+        ax, (-0.5 * dr, -0.5 * dr), (0.5 * dr, -0.5 * dr), _mm(dr, language), tight=True
+    )
     _finish_geometry_axes(ax, _t("p-p intensity probe", language))
     return ax
 
@@ -291,6 +344,4 @@ def plot_intensity_result_geometry(
             "This result does not retain its microphone spacing; call "
             "plot_pp_probe_geometry(spacing)."
         )
-    return plot_pp_probe_geometry(
-        result.spacing, ax=ax, language=language, **kwargs
-    )
+    return plot_pp_probe_geometry(result.spacing, ax=ax, language=language, **kwargs)

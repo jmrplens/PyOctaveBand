@@ -157,9 +157,7 @@ def seat_to_spine_transfer(frequencies: ArrayLike) -> np.ndarray:
     return np.asarray(response, dtype=np.complex128)
 
 
-def spinal_response(
-    acceleration: SignalInput, fs: float | None = None
-) -> np.ndarray:
+def spinal_response(acceleration: SignalInput, fs: float | None = None) -> np.ndarray:
     r"""Vertical spinal response :math:`A_\mathrm{z}(t)` (clause 5.2, Formula 2).
 
     Applies the seat-to-spine transfer function to the measured conditioned
@@ -237,9 +235,7 @@ def dose_from_peaks(peaks: ArrayLike) -> float:
     return float(DOSE_AMPLITUDE_FACTOR * total ** (1.0 / DOSE_EXPONENT))
 
 
-def acceleration_dose(
-    acceleration: SignalInput, fs: float | None = None
-) -> float:
+def acceleration_dose(acceleration: SignalInput, fs: float | None = None) -> float:
     r"""Acceleration dose :math:`D_\mathrm{z}` from a seat acceleration time history.
 
     Filters the acceleration through the seat-to-spine transfer function
@@ -327,7 +323,9 @@ def static_stress(mz: float = MZ_MALE) -> float:
     return mz * GRAVITY
 
 
-def ultimate_strength(age: ArrayLike, *, sex: Literal["male", "female"] = "male") -> np.ndarray:
+def ultimate_strength(
+    age: ArrayLike, *, sex: Literal["male", "female"] = "male"
+) -> np.ndarray:
     r"""Ultimate lumbar strength :math:`S_\mathrm{u}` at an age (Annex C,
     Formula C.4).
 
@@ -390,7 +388,9 @@ def injury_risk(
     return float(total ** (1.0 / DOSE_EXPONENT))
 
 
-def injury_probability(risk: ArrayLike, *, sex: Literal["male", "female"] = "male") -> np.ndarray | float:
+def injury_probability(
+    risk: ArrayLike, *, sex: Literal["male", "female"] = "male"
+) -> np.ndarray | float:
     r"""Probability of lumbar injury :math:`P(R)` (Annex C, Formula C.5).
 
     :param risk: The stress variable :math:`R` (see :func:`injury_risk`);
@@ -444,7 +444,9 @@ class MultipleShockResult:
     peaks: np.ndarray
     risk_thresholds: tuple[float, float, float]
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         r"""Plot the injury-probability curve with this assessment's
         :math:`R`.
 
@@ -454,7 +456,9 @@ class MultipleShockResult:
         from ..._i18n import check_language
         from ..._plot.vibration import plot_multiple_shock
 
-        return plot_multiple_shock(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_multiple_shock(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
     def report(
         self,

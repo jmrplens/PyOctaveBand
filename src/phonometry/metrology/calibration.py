@@ -128,7 +128,9 @@ def sensitivity(
     # calibrate=False: this function *derives* the digital-to-pascal factor
     # from a calibrator take, so scaling the samples by a factor the object
     # already carries would fold the old calibration into the new one.
-    signal_arr = np.asarray(resolve_samples(ref_signal, calibrate=False), dtype=np.float64)
+    signal_arr = np.asarray(
+        resolve_samples(ref_signal, calibrate=False), dtype=np.float64
+    )
     if signal_arr.size == 0:
         raise ValueError("Reference signal is empty, cannot calibrate.")
     if not np.all(np.isfinite(signal_arr)):
@@ -141,7 +143,7 @@ def sensitivity(
             raise ValueError("narrowband tone estimation requires 'fs'.")
         rms_ref = _narrowband_tone_rms(signal_arr, fs, frequency)
     else:
-        rms_ref = float(np.sqrt(np.mean(signal_arr ** 2)))
+        rms_ref = float(np.sqrt(np.mean(signal_arr**2)))
     if rms_ref == 0:
         raise ValueError("Reference signal is silent, cannot calibrate.")
 
@@ -195,9 +197,7 @@ def _validate_reference_stability(
         )
 
 
-def _narrowband_tone_rms(
-    signal_arr: np.ndarray, fs: int, frequency: float
-) -> float:
+def _narrowband_tone_rms(signal_arr: np.ndarray, fs: int, frequency: float) -> float:
     r"""RMS amplitude of the calibration tone via coherent detection.
 
     A Hann-windowed single-frequency (Goertzel) detector locked to the tone
@@ -216,7 +216,7 @@ def _narrowband_tone_rms(
     n = x.size
     if n < 4:
         # Too short for a coherent estimate; fall back to broadband RMS.
-        return float(np.sqrt(np.mean(x ** 2)))
+        return float(np.sqrt(np.mean(x**2)))
     window = np.hanning(n)
     freqs = np.fft.rfftfreq(n, 1.0 / fs)
     df = float(fs) / n

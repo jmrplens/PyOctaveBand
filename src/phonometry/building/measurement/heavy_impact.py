@@ -168,9 +168,18 @@ HEAVY_IMPACT_SOURCES: dict[str, tuple[tuple[float, float], ...]] = {
 #: centre frequency in Hz to ``Aj`` in dB.
 HEAVY_IMPACT_A_WEIGHTING: dict[str, dict[float, float]] = {
     "third": {
-        50.0: -30.3, 63.0: -26.2, 80.0: -22.4, 100.0: -19.1,
-        125.0: -16.2, 160.0: -13.2, 200.0: -10.8, 250.0: -8.7,
-        315.0: -6.6, 400.0: -4.8, 500.0: -3.2, 630.0: -1.9,
+        50.0: -30.3,
+        63.0: -26.2,
+        80.0: -22.4,
+        100.0: -19.1,
+        125.0: -16.2,
+        160.0: -13.2,
+        200.0: -10.8,
+        250.0: -8.7,
+        315.0: -6.6,
+        400.0: -4.8,
+        500.0: -3.2,
+        630.0: -1.9,
     },
     "octave": {63.0: -26.2, 125.0: -16.2, 250.0: -8.7, 500.0: -3.2},
 }
@@ -279,7 +288,9 @@ _SPECS: dict[str, HeavyImpactSourceSpec] = {
 }
 
 
-def heavy_impact_source_specification(source: str = "rubber_ball") -> HeavyImpactSourceSpec:
+def heavy_impact_source_specification(
+    source: str = "rubber_ball",
+) -> HeavyImpactSourceSpec:
     """Printed specification of a standard heavy and soft impact source.
 
     :param source: ``"rubber_ball"`` (ISO 16283-2 Annex A.2, ISO 10140-5
@@ -354,9 +365,7 @@ def impact_force_exposure_level(
     :return: The impact force exposure level ``LFE``, in dB re 1 N.
     :raises ValueError: for a malformed record or a non-positive parameter.
     """
-    sample_rate = resolve_fs(
-        force, sample_rate, name="force", rate="sample_rate"
-    )
+    sample_rate = resolve_fs(force, sample_rate, name="force", rate="sample_rate")
     # calibrate=False: a Signal may carry a digital-to-pascal factor and
     # this record is a force in newtons. See phonometry.io._resolve.
     f = require_finite_array(resolve_samples(force, calibrate=False), "force")
@@ -394,7 +403,9 @@ class HeavyImpactSourceCheck:
     within_tolerance: np.ndarray
     passed: bool
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the measured ``LFE`` against the printed tolerance band.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -523,7 +534,9 @@ class StandardizedMaximumImpactResult:
     volume: float
     reverberation_time: np.ndarray
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot ``Li,Fmax`` and ``L'i,Fmax,V,T`` per band.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -533,7 +546,9 @@ class StandardizedMaximumImpactResult:
         from ..._plot.building import plot_standardized_maximum_impact
 
         check_language(language)
-        return plot_standardized_maximum_impact(self, ax=ax, language=language, **kwargs)
+        return plot_standardized_maximum_impact(
+            self, ax=ax, language=language, **kwargs
+        )
 
 
 def standardized_maximum_impact_level(
@@ -641,7 +656,9 @@ class AWeightedMaximumImpactResult:
     unrounded: float
     rating: int
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the band levels, their A-weighted contributions and the rating.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the

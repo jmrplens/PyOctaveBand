@@ -154,7 +154,9 @@ class StaticAirflowResult:
     linear_coefficient: float
     quadratic_coefficient: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the fitted ``dp(u)`` curve with the evaluation point.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -318,7 +320,9 @@ def airflow_resistivity(specific_resistance: float, thickness: float) -> float:
     return specific_resistance / thickness
 
 
-def _warn_static_velocity_range(velocities: NDArray[np.float64], stacklevel: int) -> None:
+def _warn_static_velocity_range(
+    velocities: NDArray[np.float64], stacklevel: int
+) -> None:
     """Advise when a stepwise velocity exceeds the ISO 9053-1 clause 7.5 limit."""
     top = float(np.max(velocities))
     if top > _STATIC_MAX_VELOCITY:
@@ -456,7 +460,9 @@ def thermal_boundary_layer_thickness(
     if thermal_conductivity <= 0.0:
         raise ValueError("'thermal_conductivity' must be positive.")
     omega = 2.0 * math.pi * frequency
-    diffusion_length = thermal_conductivity / (air_density * speed_of_sound * specific_heat_cp)
+    diffusion_length = thermal_conductivity / (
+        air_density * speed_of_sound * specific_heat_cp
+    )
     return math.sqrt(2.0 * speed_of_sound * diffusion_length / omega)
 
 
@@ -605,7 +611,11 @@ def alternating_airflow_resistance(
     stroke_ratio = piston_stroke_termination / piston_stroke_specimen
     level_factor = float(10.0 ** ((level_specimen - level_termination) / 20.0))
     ratio_term = stroke_ratio * level_factor
-    _warn_alternating_validity(ratio_term, level_specimen, background_level, stacklevel=2)
+    _warn_alternating_validity(
+        ratio_term, level_specimen, background_level, stacklevel=2
+    )
 
-    prefactor = kappa_prime * static_pressure / (2.0 * math.pi * frequency * cavity_volume)
+    prefactor = (
+        kappa_prime * static_pressure / (2.0 * math.pi * frequency * cavity_volume)
+    )
     return prefactor * ratio_term

@@ -114,32 +114,114 @@ __all__ = [
 
 #: The eighteen one-third-octave band centre frequencies of DB-HR Annex A.
 DB_HR_FREQUENCIES: tuple[float, ...] = (
-    100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0, 630.0,
-    800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0,
+    100.0,
+    125.0,
+    160.0,
+    200.0,
+    250.0,
+    315.0,
+    400.0,
+    500.0,
+    630.0,
+    800.0,
+    1000.0,
+    1250.0,
+    1600.0,
+    2000.0,
+    2500.0,
+    3150.0,
+    4000.0,
+    5000.0,
 )
 
 #: Normalised A-weighted source spectra of DB-HR Annex A, in dBA.
 #: ``"pink"`` is Table A.5 (``LAr,i``), ``"traffic"`` Table A.3 (``LAtr,i``),
 #: ``"railway"`` Table A.4 (``LAef,i``, numerically equal to Table A.3) and
 #: ``"aircraft"`` Table A.2 (``LAav,i``).
-DB_HR_NORMALISED_SPECTRA: Mapping[str, tuple[float, ...]] = MappingProxyType({
-    "pink": (
-        -30.1, -27.1, -24.4, -21.9, -19.6, -17.6, -15.8, -14.2, -12.9,
-        -11.8, -11.0, -10.4, -10.0, -9.8, -9.7, -9.8, -10.0, -10.5,
-    ),
-    "traffic": (
-        -20.0, -20.0, -18.0, -16.0, -15.0, -14.0, -13.0, -12.0, -11.0,
-        -9.0, -8.0, -9.0, -10.0, -11.0, -13.0, -15.0, -16.0, -18.0,
-    ),
-    "railway": (
-        -20.0, -20.0, -18.0, -16.0, -15.0, -14.0, -13.0, -12.0, -11.0,
-        -9.0, -8.0, -9.0, -10.0, -11.0, -13.0, -15.0, -16.0, -18.0,
-    ),
-    "aircraft": (
-        -23.8, -20.2, -15.4, -13.1, -12.6, -10.4, -9.8, -9.5, -8.7,
-        -9.5, -10.5, -11.0, -12.5, -14.9, -15.9, -18.6, -23.3, -29.9,
-    ),
-})
+DB_HR_NORMALISED_SPECTRA: Mapping[str, tuple[float, ...]] = MappingProxyType(
+    {
+        "pink": (
+            -30.1,
+            -27.1,
+            -24.4,
+            -21.9,
+            -19.6,
+            -17.6,
+            -15.8,
+            -14.2,
+            -12.9,
+            -11.8,
+            -11.0,
+            -10.4,
+            -10.0,
+            -9.8,
+            -9.7,
+            -9.8,
+            -10.0,
+            -10.5,
+        ),
+        "traffic": (
+            -20.0,
+            -20.0,
+            -18.0,
+            -16.0,
+            -15.0,
+            -14.0,
+            -13.0,
+            -12.0,
+            -11.0,
+            -9.0,
+            -8.0,
+            -9.0,
+            -10.0,
+            -11.0,
+            -13.0,
+            -15.0,
+            -16.0,
+            -18.0,
+        ),
+        "railway": (
+            -20.0,
+            -20.0,
+            -18.0,
+            -16.0,
+            -15.0,
+            -14.0,
+            -13.0,
+            -12.0,
+            -11.0,
+            -9.0,
+            -8.0,
+            -9.0,
+            -10.0,
+            -11.0,
+            -13.0,
+            -15.0,
+            -16.0,
+            -18.0,
+        ),
+        "aircraft": (
+            -23.8,
+            -20.2,
+            -15.4,
+            -13.1,
+            -12.6,
+            -10.4,
+            -9.8,
+            -9.5,
+            -8.7,
+            -9.5,
+            -10.5,
+            -11.0,
+            -12.5,
+            -14.9,
+            -15.9,
+            -18.6,
+            -23.3,
+            -29.9,
+        ),
+    }
+)
 
 #: The DB-HR table each normalised spectrum is read from.
 _SPECTRUM_TABLES: dict[str, str] = {
@@ -282,7 +364,9 @@ class DbHrGlobalIndexResult:
     band_contributions: np.ndarray
     reference: str
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the band insulation with the weighted per-band contributions."""
         from ..._i18n import check_language
         from ..._plot.building import plot_db_hr_global_index
@@ -397,7 +481,9 @@ def ra(
     :param frequencies: Band centre frequencies, in Hz (optional).
     :return: A :class:`DbHrGlobalIndexResult` named ``"RA"``.
     """
-    return db_hr_global_index(reduction_index, "pink", frequencies=frequencies, name="RA")
+    return db_hr_global_index(
+        reduction_index, "pink", frequencies=frequencies, name="RA"
+    )
 
 
 def ra_tr(
@@ -607,7 +693,9 @@ class DbHrAssessment:
         """Whether every check is met."""
         return all(c.complies for c in self.checks)
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the achieved values against their DB-HR limits."""
         from ..._i18n import check_language
         from ..._plot.building import plot_db_hr_assessment
@@ -696,8 +784,7 @@ def db_hr_facade_requirement(
         decimals=0,
         reference="CTE DB-HR Table 2.1",
         description=(
-            f"{use} building, {room.replace('_', ' ')}, "
-            f"Ld = {value:g} dBA{note}"
+            f"{use} building, {room.replace('_', ' ')}, Ld = {value:g} dBA{note}"
         ),
     )
 
@@ -711,35 +798,51 @@ _CLAUSE_HABITABLE_SERVICES = "CTE DB-HR 2.1.1 b) iii"
 #: DB-HR 2.1.1 airborne requirements, keyed by (receiving room, source room).
 _AIRBORNE_ROWS: dict[tuple[str, str], tuple[str, float, str, str]] = {
     ("protected", "same_unit"): (
-        "RA", 33.0, "CTE DB-HR 2.1.1 a) i",
+        "RA",
+        33.0,
+        "CTE DB-HR 2.1.1 a) i",
         "partition walls within a dwelling of a private residential building",
     ),
     ("protected", "other_unit"): (
-        _DNT_A, 50.0, "CTE DB-HR 2.1.1 a) ii",
+        _DNT_A,
+        50.0,
+        "CTE DB-HR 2.1.1 a) ii",
         "protected room against a room of another dwelling or use unit",
     ),
     ("protected", "installations"): (
-        _DNT_A, 55.0, "CTE DB-HR 2.1.1 a) iii",
+        _DNT_A,
+        55.0,
+        "CTE DB-HR 2.1.1 a) iii",
         "protected room against a services or activity room",
     ),
     ("protected", "activity"): (
-        _DNT_A, 55.0, "CTE DB-HR 2.1.1 a) iii",
+        _DNT_A,
+        55.0,
+        "CTE DB-HR 2.1.1 a) iii",
         "protected room against a services or activity room",
     ),
     ("habitable", "same_unit"): (
-        "RA", 33.0, "CTE DB-HR 2.1.1 b) i",
+        "RA",
+        33.0,
+        "CTE DB-HR 2.1.1 b) i",
         "partition walls within a dwelling of a private residential building",
     ),
     ("habitable", "other_unit"): (
-        _DNT_A, 45.0, "CTE DB-HR 2.1.1 b) ii",
+        _DNT_A,
+        45.0,
+        "CTE DB-HR 2.1.1 b) ii",
         "habitable room against a room of another dwelling or use unit",
     ),
     ("habitable", "installations"): (
-        _DNT_A, 45.0, _CLAUSE_HABITABLE_SERVICES,
+        _DNT_A,
+        45.0,
+        _CLAUSE_HABITABLE_SERVICES,
         "habitable room against a services or activity room",
     ),
     ("habitable", "activity"): (
-        _DNT_A, 45.0, _CLAUSE_HABITABLE_SERVICES,
+        _DNT_A,
+        45.0,
+        _CLAUSE_HABITABLE_SERVICES,
         "habitable room against a services or activity room",
     ),
 }
@@ -930,15 +1033,18 @@ def db_hr_impact_requirement(receiving_room: str, source_room: str) -> DbHrRequi
 #: DB-HR 2.2 reverberation-time limits: (limit in s, clause, description).
 _REVERBERATION_ROWS: dict[str, tuple[float, str, str]] = {
     "classroom": (
-        0.7, "CTE DB-HR 2.2 point 1 a)",
+        0.7,
+        "CTE DB-HR 2.2 point 1 a)",
         "empty classroom or conference hall under 350 m3",
     ),
     "classroom_seated": (
-        0.5, "CTE DB-HR 2.2 point 1 b)",
+        0.5,
+        "CTE DB-HR 2.2 point 1 b)",
         "empty classroom or conference hall under 350 m3, seating included",
     ),
     "restaurant": (
-        0.9, "CTE DB-HR 2.2 point 1 c)",
+        0.9,
+        "CTE DB-HR 2.2 point 1 c)",
         "empty restaurant or dining room",
     ),
 }

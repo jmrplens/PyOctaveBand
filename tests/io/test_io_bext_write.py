@@ -62,11 +62,15 @@ def _expected_line(*, bits: int, channels: int = 1) -> str:
 # Field-by-field round trips, on both writer paths (scipy append, in-house)
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize(("subtype", "bits"), [
-    ("PCM_16", 16),   # scipy writes the file; the chunk is appended
-    ("PCM_24", 24),   # the in-house writer inlines the chunk before data
-    ("DOUBLE", 64),   # float path: fact chunk present, append after data
-])
+
+@pytest.mark.parametrize(
+    ("subtype", "bits"),
+    [
+        ("PCM_16", 16),  # scipy writes the file; the chunk is appended
+        ("PCM_24", 24),  # the in-house writer inlines the chunk before data
+        ("DOUBLE", 64),  # float path: fact chunk present, append after data
+    ],
+)
 def test_every_bext_field_survives_the_round_trip(
     tmp_path: Path, subtype: str, bits: int
 ) -> None:
@@ -97,6 +101,7 @@ def test_samples_survive_an_inline_odd_length_bext(tmp_path: Path) -> None:
 # CodingHistory: extended under the existing trail, never replaced
 # ---------------------------------------------------------------------------
 
+
 def test_provenance_is_carried_and_its_history_extended(tmp_path: Path) -> None:
     """Write bext, read it, write that Signal again: two lines accrue."""
     first = tmp_path / "gen1.wav"
@@ -115,7 +120,8 @@ def test_provenance_is_carried_and_its_history_extended(tmp_path: Path) -> None:
     # reader strips the final CR/LF terminator).
     assert generation2.coding_history == (
         FULL_META.coding_history
-        + _expected_line(bits=16) + "\r\n"
+        + _expected_line(bits=16)
+        + "\r\n"
         + _expected_line(bits=24)
     )
 
@@ -149,6 +155,7 @@ def test_extend_coding_history_restores_the_crlf_terminator() -> None:
 # bext="loudness": the R 128 fields are measured, not invented
 # ---------------------------------------------------------------------------
 
+
 def test_loudness_fields_match_bs1770_called_directly(tmp_path: Path) -> None:
     rng = np.random.default_rng(20260818)
     t = np.arange(4 * FS) / FS
@@ -164,9 +171,7 @@ def test_loudness_fields_match_bs1770_called_directly(tmp_path: Path) -> None:
     assert got.loudness_range == round(oracle.loudness_range * 100) / 100
     assert got.max_true_peak_level == round(oracle.true_peak * 100) / 100
     assert got.max_momentary_loudness == round(oracle.max_momentary * 100) / 100
-    assert got.max_short_term_loudness == (
-        round(oracle.max_short_term * 100) / 100
-    )
+    assert got.max_short_term_loudness == (round(oracle.max_short_term * 100) / 100)
     assert got.version == 2
     assert got.originator == f"phonometry {__version__}"[:32]
     assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", got.origination_date)
@@ -188,9 +193,9 @@ def test_unset_loudness_reads_back_as_none(tmp_path: Path) -> None:
 
 
 def test_loudness_encoding_pins_its_edges() -> None:
-    assert _encode_loudness(None) == 0x7FFF          # the unset sentinel
+    assert _encode_loudness(None) == 0x7FFF  # the unset sentinel
     assert _encode_loudness(-23.0) == -2300
-    assert _encode_loudness(327.67) == 0x7FFE        # clamps off the sentinel
+    assert _encode_loudness(327.67) == 0x7FFE  # clamps off the sentinel
     assert _encode_loudness(float("-inf")) == -32768  # digital silence
     assert _encode_loudness(-400.0) == -32768
 
@@ -218,6 +223,7 @@ def test_loudness_encoding_reproduces_the_tech3285_worked_examples(
 # ---------------------------------------------------------------------------
 # Refusals: a chunk that would lie about itself is not written
 # ---------------------------------------------------------------------------
+
 
 def test_oversize_fields_raise_instead_of_truncating(tmp_path: Path) -> None:
     long_originator = replace(fresh_metadata(), originator="x" * 33)

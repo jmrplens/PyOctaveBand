@@ -144,7 +144,9 @@ class RoomAcousticsResult:
     t30_valid: np.ndarray
     curvature: np.ndarray
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes | np.ndarray:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes | np.ndarray:
         """Plot per-band decay times (EDT/T20/T30) and clarity (C50/C80).
 
         Invalid bands are hatched and greyed. With ``ax`` given, only the
@@ -426,7 +428,9 @@ class DecayCurve:
         yield self.time
         yield self.level
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the decay curve with optional straight T-fit overlays.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -497,7 +501,10 @@ def decay_curve(
             limits=[band / half_width, band * half_width],
         )
         _, freqs, signals = bank.filter(
-            x, sigbands=True, detrend=False, calculate_level=False,
+            x,
+            sigbands=True,
+            detrend=False,
+            calculate_level=False,
             zero_phase=zero_phase,
         )
         idx = int(np.argmin(np.abs(np.asarray(freqs, dtype=np.float64) - band)))
@@ -579,7 +586,10 @@ def room_parameters(
             fs=fs, fraction=fraction, order=6, limits=[limits[0], limits[1]]
         )
         _, freqs, bands = bank.filter(
-            x, sigbands=True, detrend=False, calculate_level=False,
+            x,
+            sigbands=True,
+            detrend=False,
+            calculate_level=False,
             zero_phase=zero_phase,
         )
         # np.asarray, not a cast: a bank on the default calibration hands

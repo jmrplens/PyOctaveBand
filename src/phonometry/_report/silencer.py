@@ -130,16 +130,14 @@ def _statement(result: Any, language: str = "en") -> tuple[float, str, list[str]
     mean_tl = mean_finite(tl)
     finite = tl[np.isfinite(tl)]
     peak_tl = float(np.max(finite)) if finite.size else float("nan")
-    statement = t(
-        "Mean transmission loss TL = <b>{value} dB</b>", language
-    ).format(value=d1(mean_tl, language))
+    statement = t("Mean transmission loss TL = <b>{value} dB</b>", language).format(
+        value=d1(mean_tl, language)
+    )
     extended = [
         t("Peak transmission loss = {value} dB", language).format(
             value=d1(peak_tl, language)
         ),
-        t("Device: {kind}", language).format(
-            kind=t(str(result.kind), language)
-        ),
+        t("Device: {kind}", language).format(kind=t(str(result.kind), language)),
     ]
     if result.insertion_loss is not None:
         mean_il = mean_finite(result.insertion_loss)
@@ -200,8 +198,11 @@ def render_reactive_silencer_report(
     verdict = None
     if metadata is not None and metadata.requirement is not None:
         verdict = performance_verdict(
-            mean_tl, metadata.requirement, "TL",
-            higher_is_better=True, language=language,
+            mean_tl,
+            metadata.requirement,
+            "TL",
+            higher_is_better=True,
+            language=language,
         )
     return render_noise_control_fiche(
         result,

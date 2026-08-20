@@ -22,7 +22,9 @@ import pytest
 
 from phonometry import psychoacoustics
 
-_fse = importlib.import_module("phonometry.psychoacoustics.quality.fluctuation_strength_ecma")
+_fse = importlib.import_module(
+    "phonometry.psychoacoustics.quality.fluctuation_strength_ecma"
+)
 
 FS = 48000
 P0 = 2e-5
@@ -344,9 +346,7 @@ def test_deterministic(
 def test_free_and_diffuse_differ() -> None:
     sig = _am_tone(1000.0, 4.0, 1.0, 60.0)
     free = psychoacoustics.fluctuation_strength_ecma(sig, FS, field="free")
-    diffuse = psychoacoustics.fluctuation_strength_ecma(
-        sig, FS, field="diffuse"
-    )
+    diffuse = psychoacoustics.fluctuation_strength_ecma(sig, FS, field="diffuse")
     assert free.fluctuation_strength != diffuse.fluctuation_strength
 
 

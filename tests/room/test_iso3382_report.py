@@ -236,9 +236,7 @@ def test_third_octave_report_renders(tmp_path) -> None:
     bands are averaged (not the two full octaves), so the boxed descriptor
     must say so instead of the octave "500-1000 Hz" label.
     """
-    res = room.room_parameters(
-        _synthetic_ir(), _FS, limits=(100.0, 5000.0), fraction=3
-    )
+    res = room.room_parameters(_synthetic_ir(), _FS, limits=(100.0, 5000.0), fraction=3)
     out = tmp_path / "thirds.pdf"
     res.report(str(out), metadata=_full_metadata())
     _assert_one_page(str(out))
@@ -268,9 +266,7 @@ def test_edt_label_follows_edts_own_band_coverage(tmp_path) -> None:
     1000 Hz band, never a false "EDT_mid".
     """
     freq = np.array([500.0, 1000.0])
-    res = _synthetic_result(
-        freq, t30=np.array([1.2, 1.1]), edt=np.array([np.nan, 1.0])
-    )
+    res = _synthetic_result(freq, t30=np.array([1.2, 1.1]), edt=np.array([np.nan, 1.0]))
     out = tmp_path / "edt_divergent.pdf"
     res.report(str(out), metadata=_full_metadata())
     text = _extract_text(str(out))
@@ -283,9 +279,7 @@ def test_edt_label_follows_edts_own_band_coverage(tmp_path) -> None:
 def test_verdict_uses_display_rounded_values(tmp_path) -> None:
     """T_mid = 1.1502 s prints as 1.15 s and must PASS a 1.15 s target."""
     freq = np.array([500.0, 1000.0])
-    res = _synthetic_result(
-        freq, t30=np.array([1.2004, 1.1]), edt=np.array([1.2, 1.1])
-    )
+    res = _synthetic_result(freq, t30=np.array([1.2004, 1.1]), edt=np.array([1.2, 1.1]))
     out = tmp_path / "boundary.pdf"
     res.report(str(out), metadata=_full_metadata(requirement=1.15))
     text = _extract_text(str(out))
@@ -300,9 +294,7 @@ def test_single_band_is_not_labeled_broadband(tmp_path) -> None:
     Selecting a single octave band leaves one frequency entry (not ``None``),
     so the caption must read "Single-band parameters", never "Broadband".
     """
-    res = room.room_parameters(
-        _synthetic_ir(), _FS, limits=(490.0, 510.0), fraction=1
-    )
+    res = room.room_parameters(_synthetic_ir(), _FS, limits=(490.0, 510.0), fraction=1)
     assert res.frequency is not None
     assert len(res.frequency) == 1
     out = tmp_path / "single_band.pdf"
@@ -320,9 +312,7 @@ def test_octave_report_many_bands_renders(tmp_path) -> None:
     wide octave set (11 bands) is still labelled an octave-band set and grouped
     by octave, not by spurious one-third-octave triplets.
     """
-    res = room.room_parameters(
-        _synthetic_ir(), _FS, limits=(16.0, 16000.0), fraction=1
-    )
+    res = room.room_parameters(_synthetic_ir(), _FS, limits=(16.0, 16000.0), fraction=1)
     assert res.frequency is not None
     assert len(res.frequency) > 6
     out = tmp_path / "octave_wide.pdf"

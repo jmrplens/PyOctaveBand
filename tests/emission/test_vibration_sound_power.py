@@ -27,9 +27,7 @@ ZCN, ZC0, P0 = 411.0, 400.0, 1.0e-12
 # ---------------------------------------------------------------------------
 def test_velocity_level_reference() -> None:
     assert emission.velocity_level(V0) == pytest.approx(0.0)
-    assert emission.velocity_level(5.0e-5) == pytest.approx(
-        60.0
-    )  # 20 lg(1000)
+    assert emission.velocity_level(5.0e-5) == pytest.approx(60.0)  # 20 lg(1000)
 
 
 def test_calibration_example_from_standard() -> None:
@@ -41,9 +39,7 @@ def test_calibration_example_from_standard() -> None:
 def test_calibration_matches_hand_formula() -> None:
     a, f = 4.0, 250.0
     expected = 20.0 * math.log10(a / (2.0 * math.pi * f * V0 * math.sqrt(2.0)))
-    assert emission.velocity_level_from_acceleration(a, f) == pytest.approx(
-        expected
-    )
+    assert emission.velocity_level_from_acceleration(a, f) == pytest.approx(expected)
 
 
 def test_calibration_rejects_non_positive_frequency() -> None:
@@ -63,12 +59,8 @@ def test_mean_velocity_level_energetic() -> None:
 def test_mean_velocity_level_area_weighted() -> None:
     levels = np.array([60.0, 66.0])
     areas = np.array([1.0, 3.0])
-    expected = 10.0 * math.log10(
-        np.sum(areas * 10.0 ** (0.1 * levels)) / np.sum(areas)
-    )
-    assert emission.mean_velocity_level(levels, areas=areas) == pytest.approx(
-        expected
-    )
+    expected = 10.0 * math.log10(np.sum(areas * 10.0 ** (0.1 * levels)) / np.sum(areas))
+    assert emission.mean_velocity_level(levels, areas=areas) == pytest.approx(expected)
 
 
 def test_mean_velocity_level_area_shape_mismatch() -> None:
@@ -81,9 +73,7 @@ def test_mean_velocity_level_area_shape_mismatch() -> None:
 # ---------------------------------------------------------------------------
 def test_radiation_factor_definition() -> None:
     p, s, v2 = 3.0e-4, 2.0, (1.0e-3) ** 2
-    assert emission.radiation_factor(p, s, v2) == pytest.approx(
-        p / (ZCN * v2 * s)
-    )
+    assert emission.radiation_factor(p, s, v2) == pytest.approx(p / (ZCN * v2 * s))
 
 
 def test_power_level_round_trip_through_radiation_factor() -> None:
@@ -91,9 +81,7 @@ def test_power_level_round_trip_through_radiation_factor() -> None:
     p, s, v2 = 3.0e-4, 2.0, (1.0e-3) ** 2
     eps = float(emission.radiation_factor(p, s, v2))
     lv = float(emission.velocity_level(math.sqrt(v2)))
-    lw = float(
-        emission.radiated_sound_power_level(lv, s, radiation_factor=eps)
-    )
+    lw = float(emission.radiated_sound_power_level(lv, s, radiation_factor=eps))
     assert lw == pytest.approx(10.0 * math.log10(p / P0))
 
 
@@ -108,9 +96,7 @@ def test_upper_limit_is_largest() -> None:
     # Part 1 (eps = 1) is an upper limit for any eps < 1.
     lv, s = 75.0, 2.0
     upper = float(emission.radiated_sound_power_level(lv, s))
-    measured = float(
-        emission.radiated_sound_power_level(lv, s, radiation_factor=0.4)
-    )
+    measured = float(emission.radiated_sound_power_level(lv, s, radiation_factor=0.4))
     assert upper > measured
 
 
@@ -125,18 +111,12 @@ def test_power_level_rejects_bad_area() -> None:
 def test_k1a_table_values() -> None:
     table = {3: 3.0, 4: 2.0, 5: 2.0, 6: 1.0, 7: 1.0, 8: 1.0, 9: 1.0, 10: 0.0}
     for dlv, k in table.items():
-        assert emission.extraneous_velocity_correction(
-            float(dlv)
-        ) == pytest.approx(k)
+        assert emission.extraneous_velocity_correction(float(dlv)) == pytest.approx(k)
 
 
 def test_k1a_boundaries() -> None:
-    assert (
-        emission.extraneous_velocity_correction(2.0) == 3.0
-    )  # dLv < 3 -> 3 dB
-    assert (
-        emission.extraneous_velocity_correction(15.0) == 0.0
-    )  # dLv >= 10 -> 0
+    assert emission.extraneous_velocity_correction(2.0) == 3.0  # dLv < 3 -> 3 dB
+    assert emission.extraneous_velocity_correction(15.0) == 0.0  # dLv >= 10 -> 0
 
 
 # ---------------------------------------------------------------------------

@@ -50,7 +50,7 @@ family (ISO 10846-1, Annex A / Table A.2):
 mechanical impedance and effective mass through
 :func:`phonometry.vibration.convert_frf` (``"dynamic_stiffness"`` <->
 ``"impedance"`` <-> ``"apparent_mass"``). This module feeds the structure-borne
-source and building prediction standards (ISO 9611, EN 15657, EN 12354-5). """
+source and building prediction standards (ISO 9611, EN 15657, EN 12354-5)."""
 
 from __future__ import annotations
 
@@ -339,7 +339,9 @@ class TransferStiffnessResult:
             self.transfer_stiffness, self.frequencies, "dynamic_stiffness", target
         )
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the transfer-stiffness level ``L_k(f)``.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -348,7 +350,9 @@ class TransferStiffnessResult:
         from ..._i18n import check_language
         from ..._plot.vibration import plot_transfer_stiffness
 
-        return plot_transfer_stiffness(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_transfer_stiffness(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
     def report(
         self,

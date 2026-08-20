@@ -75,9 +75,7 @@ def _metadata_pairs(
         (t("Date of test", language), metadata.test_date),
     ]
     return [
-        (label, html.escape(str(value)))
-        for label, value in specs
-        if value is not None
+        (label, html.escape(str(value))) for label, value in specs if value is not None
     ]
 
 
@@ -151,7 +149,9 @@ def _verdict(
     passed = display_round(float(result.loudness)) <= requirement + 1e-9
     text = t("{sym} = {value} sone, required &#8804; {req} sone", language).format(
         sym=_loudness_symbol(result),
-        value=format_number(display_round(float(result.loudness)), language, decimals=1),
+        value=format_number(
+            display_round(float(result.loudness)), language, decimals=1
+        ),
         req=fmt_num(requirement, language),
     )
     return text, passed
@@ -177,11 +177,14 @@ def _basis_line(
         metadata.measurement_standard if metadata is not None else None
     )
     if measurement_standard:
-        basis = t("{standard} loudness. Rating per ISO 532-1:2017 (Zwicker method), {method}.", language).format(
-            standard=html.escape(measurement_standard), method=method
-        )
+        basis = t(
+            "{standard} loudness. Rating per ISO 532-1:2017 (Zwicker method), {method}.",
+            language,
+        ).format(standard=html.escape(measurement_standard), method=method)
     else:
-        basis = t("Loudness rating per ISO 532-1:2017 (Zwicker method), {method}.", language).format(method=method)
+        basis = t(
+            "Loudness rating per ISO 532-1:2017 (Zwicker method), {method}.", language
+        ).format(method=method)
     if result.field in ("free", "diffuse"):
         field_text = (
             t("free (F)", language)
@@ -252,7 +255,9 @@ def render_iso532_report(
     # time-varying fiche shortens this panel to make room for the mandatory
     # N(t) trace below while keeping the one-page layout.
     plot_drawing = render_figure_drawing(
-        result.plot, 116 * mm, y_top=None,
+        result.plot,
+        116 * mm,
+        y_top=None,
         figsize=(5.8, 4.4) if _is_time_varying(result) else None,
         language=language,
     )
@@ -278,7 +283,10 @@ def render_iso532_report(
         )
         flow.append(
             render_figure_drawing(
-                _time_plot, 174 * mm, y_top=None, figsize=(9.2, 3.4),
+                _time_plot,
+                174 * mm,
+                y_top=None,
+                figsize=(9.2, 3.4),
                 language=language,
             )
         )

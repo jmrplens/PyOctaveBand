@@ -30,9 +30,15 @@ FS = 48000
 # Round-trips per subtype: write with our writer, reread with our reader
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize(("subtype", "bits"), [
-    ("PCM_16", 16), ("PCM_24", 24), ("PCM_32", 32),
-])
+
+@pytest.mark.parametrize(
+    ("subtype", "bits"),
+    [
+        ("PCM_16", 16),
+        ("PCM_24", 24),
+        ("PCM_32", 32),
+    ],
+)
 def test_integer_subtypes_roundtrip_grid_values_exactly(
     tmp_path: Path, subtype: str, bits: int
 ) -> None:
@@ -96,15 +102,15 @@ def test_bare_array_requires_fs(tmp_path: Path) -> None:
 # 24-bit: the packing scipy lacks, pinned against the forge's own packer
 # ---------------------------------------------------------------------------
 
+
 def test_pcm24_payload_matches_the_hand_packed_oracle(tmp_path: Path) -> None:
     """The in-house 3-byte packing equals wav_forge's independent packer."""
-    codes = np.array([0, 1, -1, 2**23 - 1, -(2**23), 123456, -654321],
-                     dtype=np.int64)
+    codes = np.array([0, 1, -1, 2**23 - 1, -(2**23), 123456, -654321], dtype=np.int64)
     path = tmp_path / "packed.wav"
     write(path, codes / 2**23, FS, subtype="PCM_24")
     parsed = parse_wav_chunks(path)
     payload = path.read_bytes()[
-        parsed.data_offset:parsed.data_offset + parsed.data_size
+        parsed.data_offset : parsed.data_offset + parsed.data_size
     ]
     assert payload == pcm_data(codes, 24)
 
@@ -124,32 +130,31 @@ def test_pcm24_stereo_roundtrips_through_scipy_decoding(tmp_path: Path) -> None:
 # Integer pass-through: the archival path stores the codes themselves
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.parametrize(("dtype", "bits"), [(np.int16, 16), (np.int32, 32)])
 def test_integer_input_passes_codes_through_bit_exact(
     tmp_path: Path, dtype: type, bits: int
 ) -> None:
-    codes = np.array([0, 1, -1, 2**(bits - 1) - 1, -(2**(bits - 1))],
-                     dtype=dtype)
+    codes = np.array([0, 1, -1, 2 ** (bits - 1) - 1, -(2 ** (bits - 1))], dtype=dtype)
     path = tmp_path / "codes.wav"
     write(path, codes, FS)
-    assert np.asarray(read(path)).tolist() == (codes / 2**(bits - 1)).tolist()
+    assert np.asarray(read(path)).tolist() == (codes / 2 ** (bits - 1)).tolist()
 
 
 def test_integer_input_refuses_a_conflicting_subtype(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="pass-through"):
-        write(tmp_path / "c.wav", np.zeros(4, dtype=np.int16), FS,
-              subtype="PCM_32")
+        write(tmp_path / "c.wav", np.zeros(4, dtype=np.int16), FS, subtype="PCM_32")
 
 
 def test_integer_input_refuses_dither(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="nothing to dither"):
-        write(tmp_path / "c.wav", np.zeros(4, dtype=np.int16), FS,
-              dither="tpdf")
+        write(tmp_path / "c.wav", np.zeros(4, dtype=np.int16), FS, dither="tpdf")
 
 
 # ---------------------------------------------------------------------------
 # Clipping: saturated, counted, announced; never rescaled, never wrapped
 # ---------------------------------------------------------------------------
+
 
 def test_clipping_saturates_counts_and_warns(tmp_path: Path) -> None:
     x = np.array([0.5, 1.5, -2.0, -0.25])
@@ -188,6 +193,7 @@ def test_float_subtypes_carry_over_range_values_without_warning(
 # Dither: TPDF at 16 bits only, unbiased where plain rounding is biased
 # ---------------------------------------------------------------------------
 
+
 def test_tpdf_dither_renders_the_mean_code_unbiased(tmp_path: Path) -> None:
     """A constant between codes averages to itself only under dither.
 
@@ -207,23 +213,29 @@ def test_tpdf_dither_renders_the_mean_code_unbiased(tmp_path: Path) -> None:
     assert set(codes_plain.tolist()) == {10000.0}
 
     dithered = tmp_path / "dithered.wav"
-    write(dithered, x, FS, subtype="PCM_16", dither="tpdf",
-          rng=np.random.default_rng(1992))
+    write(
+        dithered,
+        x,
+        FS,
+        subtype="PCM_16",
+        dither="tpdf",
+        rng=np.random.default_rng(1992),
+    )
     codes_dithered = np.asarray(read(dithered)) * 32768
     assert len(set(codes_dithered.tolist())) > 1
     assert abs(float(np.mean(codes_dithered)) - 10000.4) < 0.1
 
     again = tmp_path / "again.wav"
-    write(again, x, FS, subtype="PCM_16", dither="tpdf",
-          rng=np.random.default_rng(1992))
+    write(
+        again, x, FS, subtype="PCM_16", dither="tpdf", rng=np.random.default_rng(1992)
+    )
     assert again.read_bytes() == dithered.read_bytes()
 
 
 def test_dither_is_refused_outside_pcm16(tmp_path: Path) -> None:
     for subtype in ("PCM_24", "PCM_32", "FLOAT", "DOUBLE"):
         with pytest.raises(ValueError, match="PCM_16"):
-            write(tmp_path / "d.wav", np.zeros(4), FS, subtype=subtype,
-                  dither="tpdf")
+            write(tmp_path / "d.wav", np.zeros(4), FS, subtype=subtype, dither="tpdf")
     with pytest.raises(ValueError, match="dither"):
         write(tmp_path / "d.wav", np.zeros(4), FS, dither="rectangular")
     # rng exists to seed the dither; alone it would promise a
@@ -236,6 +248,7 @@ def test_dither_is_refused_outside_pcm16(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 # Containers: suffix dispatch and the RF64 promotion threshold
 # ---------------------------------------------------------------------------
+
 
 def test_lossy_and_unknown_targets_are_refused(tmp_path: Path) -> None:
     for name in ("copy.mp3", "copy.ogg", "copy.opus", "copy.xyz"):
@@ -250,21 +263,18 @@ def test_header_stays_riff_at_the_4gib_boundary() -> None:
     payload exactly on 0xFFFFFFFF: payload = 4 + 24 (fmt) + 8 + 2*frames.
     """
     frames = (0xFFFFFFFF - 36) // 2
-    header = build_wav_header(fs=FS, channels=1, subtype="PCM_16",
-                              frames=frames)
+    header = build_wav_header(fs=FS, channels=1, subtype="PCM_16", frames=frames)
     assert header[:4] == b"RIFF"
     assert struct.unpack_from("<I", header, 4)[0] == 0xFFFFFFFF - 1
     # One frame more (payload 0x100000001, past the sentinel) promotes.
-    promoted = build_wav_header(fs=FS, channels=1, subtype="PCM_16",
-                                frames=frames + 1)
+    promoted = build_wav_header(fs=FS, channels=1, subtype="PCM_16", frames=frames + 1)
     assert promoted[:4] == b"RF64"
 
 
 def test_rf64_header_carries_the_real_sizes_in_ds64() -> None:
     """Past 4 GiB the header is EBU Tech 3306: ds64 first, sentinels after."""
     frames = 2**31  # 4 GiB of stereo PCM_16 data: 8 GiB payload
-    header = build_wav_header(fs=FS, channels=2, subtype="PCM_16",
-                              frames=frames)
+    header = build_wav_header(fs=FS, channels=2, subtype="PCM_16", frames=frames)
     assert header[:4] == b"RF64"
     assert struct.unpack_from("<I", header, 4)[0] == 0xFFFFFFFF
     assert header[8:16] == b"WAVEds64"
@@ -297,7 +307,12 @@ def test_streamed_header_reconciles_with_an_estimated_frame_count(
     """
     path = tmp_path / "reconciled.wav"
     write_wav_stream(
-        path, [np.zeros((1, actual))], FS, 1, "FLOAT", 1152,
+        path,
+        [np.zeros((1, actual))],
+        FS,
+        1,
+        "FLOAT",
+        1152,
         frames_are_estimate=True,
     )
     assert info(path).frames == actual

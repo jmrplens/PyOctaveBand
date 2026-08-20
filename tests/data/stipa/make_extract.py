@@ -103,8 +103,7 @@ def encode(samples: np.ndarray, order: int) -> bytes:
 def best_order(samples: np.ndarray) -> int:
     """Return the difference order that compresses ``samples`` smallest."""
     sizes = {
-        order: len(lzma.compress(encode(samples, order), preset=6))
-        for order in _ORDERS
+        order: len(lzma.compress(encode(samples, order), preset=6)) for order in _ORDERS
     }
     return min(sizes, key=lambda order: sizes[order])
 
@@ -123,15 +122,15 @@ def build(source: pathlib.Path, destination: pathlib.Path) -> None:
         staging.unlink(missing_ok=True)
         raise
     staging.replace(destination)
-    print(f"{destination}: {len(SELECTION)} signals, {destination.stat().st_size} bytes")
+    print(
+        f"{destination}: {len(SELECTION)} signals, {destination.stat().st_size} bytes"
+    )
 
 
 def _write(source: pathlib.Path, destination: pathlib.Path) -> None:
     """Build the archive at ``destination`` (see :func:`build`)."""
     entries = []
-    with zipfile.ZipFile(
-        destination, "w", compression=zipfile.ZIP_LZMA
-    ) as archive:
+    with zipfile.ZipFile(destination, "w", compression=zipfile.ZIP_LZMA) as archive:
         for relative in SELECTION:
             path = source / relative
             fs, samples = wavfile.read(path)

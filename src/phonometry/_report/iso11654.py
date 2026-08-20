@@ -77,8 +77,12 @@ def _thead_style() -> Any:
 
     styles = getSampleStyleSheet()
     return ParagraphStyle(
-        "iso11654_thead", parent=styles["Normal"], fontSize=7.2,
-        textColor=colors.white, alignment=1, leading=8.5,
+        "iso11654_thead",
+        parent=styles["Normal"],
+        fontSize=7.2,
+        textColor=colors.white,
+        alignment=1,
+        leading=8.5,
     )
 
 
@@ -135,9 +139,7 @@ def _metadata_pairs(
     # Values are user-supplied free text; escape XML specials so a '&' or '<'
     # cannot break reportlab's Paragraph parser. Labels carry intentional markup.
     return [
-        (label, html.escape(str(value)))
-        for label, value in specs
-        if value is not None
+        (label, html.escape(str(value))) for label, value in specs if value is not None
     ]
 
 
@@ -265,9 +267,7 @@ def _statement(result: AbsorptionRatingResult, language: str = "en") -> str:
     return f"&#945;<sub>w</sub> = <b>{value}</b>"
 
 
-def _extended_terms(
-    result: AbsorptionRatingResult, language: str = "en"
-) -> list[str]:
+def _extended_terms(result: AbsorptionRatingResult, language: str = "en") -> list[str]:
     """The absorption class, shape indicator and applied shift shown by the box."""
     terms = [
         t("Absorption class: {value}", language).format(
@@ -276,9 +276,7 @@ def _extended_terms(
     ]
     if result.shape_indicator:
         terms.append(
-            t("Shape indicator: {value}", language).format(
-                value=result.shape_indicator
-            )
+            t("Shape indicator: {value}", language).format(value=result.shape_indicator)
         )
     terms.append(
         t("Applied shift: {value}", language).format(
@@ -353,9 +351,10 @@ def render_iso11654_report(
         metadata.measurement_standard if metadata is not None else None
     )
     if measurement_standard:
-        basis = t("{standard} laboratory measurement of sound absorption. Rating per ISO 11654:1997.", language).format(
-            standard=html.escape(measurement_standard)
-        )
+        basis = t(
+            "{standard} laboratory measurement of sound absorption. Rating per ISO 11654:1997.",
+            language,
+        ).format(standard=html.escape(measurement_standard))
     else:
         basis = t("Sound absorption rating per ISO 11654:1997.", language)
 
@@ -384,7 +383,9 @@ def render_iso11654_report(
             measured,
             language,
         )
-        caption = t("One-third-octave &#945;<sub>s</sub>, octave &#945;<sub>p</sub>", language)
+        caption = t(
+            "One-third-octave &#945;<sub>s</sub>, octave &#945;<sub>p</sub>", language
+        )
     else:
         value_table = _value_table(
             centers, measured, shifted, deviations, verbose, language
@@ -402,7 +403,9 @@ def render_iso11654_report(
 
     flow.append(
         result_box(
-            _statement(result, language), styles, accent,
+            _statement(result, language),
+            styles,
+            accent,
             _extended_terms(result, language),
         )
     )
@@ -413,13 +416,19 @@ def render_iso11654_report(
         from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 
         note_style = ParagraphStyle(
-            "fiche_iso11654_note", parent=getSampleStyleSheet()["Normal"],
-            fontSize=7.5, leading=10, textColor=colors.HexColor(_MUTED_HEX),
+            "fiche_iso11654_note",
+            parent=getSampleStyleSheet()["Normal"],
+            fontSize=7.5,
+            leading=10,
+            textColor=colors.HexColor(_MUTED_HEX),
             spaceBefore=4,
         )
         flow.append(
             Paragraph(
-                t("A shape indicator applies: ISO 11654 (5.3 NOTE) recommends using &#945;<sub>w</sub> in combination with the complete sound absorption coefficient curve, shown above.", language),
+                t(
+                    "A shape indicator applies: ISO 11654 (5.3 NOTE) recommends using &#945;<sub>w</sub> in combination with the complete sound absorption coefficient curve, shown above.",
+                    language,
+                ),
                 note_style,
             )
         )

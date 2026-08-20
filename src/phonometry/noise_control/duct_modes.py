@@ -117,7 +117,9 @@ class DuctModeResult:
         """The lowest cut-on frequency, Hz: plane waves only below it."""
         return float(np.min(self.cut_on))
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the cut-on ladder, with and without flow, over the mode order.
 
         Requires matplotlib (``pip install phonometry[plot]``).
@@ -184,9 +186,7 @@ def circular_duct_cut_on(
     d = require_positive(diameter, "diameter")
     mach, beta = _mach(flow_velocity, speed_of_sound)
     if not 1 <= count <= len(CIRCULAR_EIGENVALUES):
-        raise ValueError(
-            f"'count' must be between 1 and {len(CIRCULAR_EIGENVALUES)}."
-        )
+        raise ValueError(f"'count' must be between 1 and {len(CIRCULAR_EIGENVALUES)}.")
     radius = 0.5 * d
     ordered = sorted(CIRCULAR_EIGENVALUES.items(), key=lambda item: item[1])[:count]
     modes = tuple(mode for mode, _ in ordered)
@@ -243,14 +243,9 @@ def rectangular_duct_cut_on(
         raise ValueError("'count' must be at least 1.")
     # A (count+1)-square grid of orders always contains the `count` lowest.
     orders = [
-        (p, q)
-        for p in range(count + 1)
-        for q in range(count + 1)
-        if (p, q) != (0, 0)
+        (p, q) for p in range(count + 1) for q in range(count + 1) if (p, q) != (0, 0)
     ]
-    kappa = np.array(
-        [np.pi * np.hypot(p / a, q / b) for p, q in orders]
-    )
+    kappa = np.array([np.pi * np.hypot(p / a, q / b) for p, q in orders])
     order = np.argsort(kappa, kind="stable")[:count]
     modes = tuple(orders[i] for i in order)
     kappa = kappa[order]
@@ -263,8 +258,7 @@ def rectangular_duct_cut_on(
         mach=mach,
         section="rectangular",
         label=(
-            f"Rectangular duct ({a * 1000:.0f} x {b * 1000:.0f} mm, "
-            f"M = {mach:.3f})"
+            f"Rectangular duct ({a * 1000:.0f} x {b * 1000:.0f} mm, M = {mach:.3f})"
         ),
     )
 
@@ -297,18 +291,21 @@ def plane_wave_limit(
     """
     if width is not None and height is not None:
         return rectangular_duct_cut_on(
-            width, height, flow_velocity=flow_velocity,
-            speed_of_sound=speed_of_sound, count=1,
+            width,
+            height,
+            flow_velocity=flow_velocity,
+            speed_of_sound=speed_of_sound,
+            count=1,
         ).plane_wave_limit
     if diameter is None and area is not None:
         diameter = float(np.sqrt(4.0 * require_positive(area, "area") / np.pi))
     if diameter is None:
-        raise ValueError(
-            "give 'diameter', or both 'width' and 'height', or 'area'."
-        )
+        raise ValueError("give 'diameter', or both 'width' and 'height', or 'area'.")
     return circular_duct_cut_on(
-        diameter, flow_velocity=flow_velocity,
-        speed_of_sound=speed_of_sound, count=1,
+        diameter,
+        flow_velocity=flow_velocity,
+        speed_of_sound=speed_of_sound,
+        count=1,
     ).plane_wave_limit
 
 

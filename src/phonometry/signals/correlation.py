@@ -201,8 +201,9 @@ class CorrelationResult:
             dtype=np.float64,
         )
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en",
-             **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the correlation estimate against the lag in seconds.
 
         :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -263,11 +264,7 @@ def correlation(
     """
     xa = _validate_signal(x, "x", context="a correlation estimate")
     is_auto = y is None
-    ya = (
-        xa
-        if y is None
-        else _validate_signal(y, "y", context="a correlation estimate")
-    )
+    ya = xa if y is None else _validate_signal(y, "y", context="a correlation estimate")
     if xa.size != ya.size:
         raise ValueError("'x' and 'y' must have the same length.")
     if isinstance(x, Signal) or isinstance(y, Signal):
@@ -286,8 +283,7 @@ def correlation(
         m = round(_positive(max_lag, "max_lag") * fs_v)
         if not 1 <= m <= n - 1:
             raise ValueError(
-                "'max_lag' must be at least one sample and shorter than "
-                "the record."
+                "'max_lag' must be at least one sample and shorter than the record."
             )
 
     lag_samples = np.arange(-(n - 1), n, dtype=np.float64)
@@ -370,9 +366,7 @@ def _peak_location_std(random_error: float, bandwidth: float) -> float:
     normalized random error :math:`\varepsilon`; B&P Example 8.5 rounds
     the :math:`(3/4)^{1/4}` factor to 0.93.
     """
-    return float(
-        (0.75**0.25) * np.sqrt(random_error) / (np.pi * bandwidth)
-    )
+    return float((0.75**0.25) * np.sqrt(random_error) / (np.pi * bandwidth))
 
 
 # ---------------------------------------------------------------------------
@@ -508,8 +502,9 @@ class TimeDelayResult:
     signal_bandwidth: float | None
     fs: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en",
-             **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the correlation function with the estimated delay marked.
 
         :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -537,25 +532,17 @@ def _gcc_weight(
     if weighting == "none":
         return np.ones_like(gxx)
     if weighting == "roth":
-        return np.divide(
-            1.0, gxx, out=np.zeros_like(gxx), where=gxx > 0.0
-        )
+        return np.divide(1.0, gxx, out=np.zeros_like(gxx), where=gxx > 0.0)
     if weighting == "scot":
         denom = np.sqrt(gxx * gyy)
-        return np.divide(
-            1.0, denom, out=np.zeros_like(denom), where=denom > 0.0
-        )
+        return np.divide(1.0, denom, out=np.zeros_like(denom), where=denom > 0.0)
     if weighting == "phat":
         return np.divide(1.0, mag, out=np.zeros_like(mag), where=mag > 0.0)
     if weighting == "ml":
         coherence = _coherence_from_spectra(gxy, gxx, gyy)
         denom = mag * (1.0 - coherence)
-        return np.divide(
-            coherence, denom, out=np.zeros_like(denom), where=denom > 0.0
-        )
-    raise ValueError(
-        "'weighting' must be 'none', 'roth', 'scot', 'phat' or 'ml'."
-    )
+        return np.divide(coherence, denom, out=np.zeros_like(denom), where=denom > 0.0)
+    raise ValueError("'weighting' must be 'none', 'roth', 'scot', 'phat' or 'ml'.")
 
 
 def _delay_error(
@@ -635,8 +622,7 @@ def _direct_tde_curve(
         m = round(_positive(max_delay, "max_delay") * fs)
         if not 1 <= m <= n - 1:
             raise ValueError(
-                "'max_delay' must be at least one sample and shorter than "
-                "the record."
+                "'max_delay' must be at least one sample and shorter than the record."
             )
     curve = _coefficient_correlation(xa, ya)
     lag_samples = np.arange(-(n - 1), n, dtype=np.float64)
@@ -777,8 +763,7 @@ def time_delay(
         raise ValueError("'x' and 'y' must have the same length.")
     if float(np.std(xa)) <= 0.0 or float(np.std(ya)) <= 0.0:
         raise ValueError(
-            "'x' and 'y' must not be constant: there is no correlation "
-            "peak to locate."
+            "'x' and 'y' must not be constant: there is no correlation peak to locate."
         )
     fs_v = _positive(fs, "fs")
     factor = _validate_refinement(interpolation, upsample)
@@ -921,8 +906,9 @@ class AlignedImpulseResponseResult:
     delay_samples: float
     fs: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en",
-             **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the reference and the aligned impulse response.
 
         :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -931,8 +917,7 @@ class AlignedImpulseResponseResult:
         from .._plot.signals import plot_aligned_impulse_response
 
         check_language(language)
-        return plot_aligned_impulse_response(self, ax=ax, language=language,
-                                             **kwargs)
+        return plot_aligned_impulse_response(self, ax=ax, language=language, **kwargs)
 
 
 def align_impulse_responses(
@@ -967,14 +952,17 @@ def align_impulse_responses(
     :raises ValueError: If the inputs or parameters are invalid.
     """
     ira = _validate_signal(ir, "ir", context=_DELAY_CONTEXT)
-    refa = _validate_signal(
-        reference, "reference", context=_DELAY_CONTEXT
-    )
+    refa = _validate_signal(reference, "reference", context=_DELAY_CONTEXT)
     if ira.size != refa.size:
         raise ValueError("'ir' and 'reference' must have the same length.")
-    fs_v = _positive(resolve_pair_fs(ir, reference, fs, names=("ir", "reference")), "fs")
+    fs_v = _positive(
+        resolve_pair_fs(ir, reference, fs, names=("ir", "reference")), "fs"
+    )
     delay = impulse_response_delay(
-        ira, fs_v, reference=refa, interpolation=interpolation,
+        ira,
+        fs_v,
+        reference=refa,
+        interpolation=interpolation,
         upsample=upsample,
     )
     aligned = _fractional_advance(ira, delay * fs_v)

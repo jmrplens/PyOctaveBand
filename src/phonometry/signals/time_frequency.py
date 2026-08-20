@@ -360,9 +360,7 @@ def zoom_fft(
     lo = float(f_min)
     hi = float(f_max)
     if not 0.0 <= lo < hi <= fs_v / 2.0:
-        raise ValueError(
-            "The zoom band must satisfy 0 <= f_min < f_max <= fs/2."
-        )
+        raise ValueError("The zoom band must satisfy 0 <= f_min < f_max <= fs/2.")
     if n_points is None:
         m = int(np.ceil((hi - lo) * xa.size / fs_v)) + 1
     else:
@@ -403,9 +401,7 @@ def zoom_fft(
         amplitude=amplitude,
         power=power,
         bin_spacing=(hi - lo) / (m - 1),
-        resolution_bandwidth=fs_v
-        * float(np.sum(w * w))
-        / float(np.sum(w)) ** 2,
+        resolution_bandwidth=fs_v * float(np.sum(w * w)) / float(np.sum(w)) ** 2,
         window=window,
         n_points=m,
     )

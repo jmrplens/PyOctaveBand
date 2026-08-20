@@ -186,11 +186,7 @@ def structure_borne_power_level(
     if not np.all(np.isfinite(eta)) or np.any(eta <= 0.0):
         raise ValueError("'loss_factor' must contain positive, finite values.")
     offset = 10.0 * np.log10(reference_velocity**2 / REFERENCE_SOUND_POWER)
-    lw = (
-        10.0 * np.log10(2.0 * np.pi * f * eta * mass_per_area * area)
-        + lv
-        + offset
-    )
+    lw = 10.0 * np.log10(2.0 * np.pi * f * eta * mass_per_area * area) + lv + offset
     return np.asarray(lw, dtype=np.float64)
 
 
@@ -226,7 +222,9 @@ class StructureBornePowerResult:
         lw = np.asarray(self.power_level, dtype=np.float64)
         return float(10.0 * np.log10(np.sum(10.0 ** (0.1 * lw))))
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the characteristic structure-borne power level per band.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -337,9 +335,7 @@ def reception_plate_power(
     elif reverberation_time is not None:
         eta = np.asarray(plate_loss_factor(freq, reverberation_time), dtype=np.float64)
     else:
-        raise ValueError(
-            "provide either 'loss_factor' or 'reverberation_time'."
-        )
+        raise ValueError("provide either 'loss_factor' or 'reverberation_time'.")
     lw = structure_borne_power_level(lv, freq, mass_per_area, area, eta)
     return StructureBornePowerResult(
         power_level=np.asarray(lw, dtype=np.float64),
@@ -374,14 +370,13 @@ def equivalent_blocked_force_level(
     lw = np.asarray(power_level, dtype=np.float64)
     y = np.asarray(plate_mobility, dtype=np.complex128)
     y_re = np.real(y)
-    if (not np.all(np.isfinite(y.real)) or not np.all(np.isfinite(y.imag))
-            or np.any(y_re <= 0.0)):
-        raise ValueError(
-            "'plate_mobility' must be finite with a positive real part."
-        )
-    return np.asarray(
-        lw - 10.0 * np.log10(y_re / REFERENCE_MOBILITY), dtype=np.float64
-    )
+    if (
+        not np.all(np.isfinite(y.real))
+        or not np.all(np.isfinite(y.imag))
+        or np.any(y_re <= 0.0)
+    ):
+        raise ValueError("'plate_mobility' must be finite with a positive real part.")
+    return np.asarray(lw - 10.0 * np.log10(y_re / REFERENCE_MOBILITY), dtype=np.float64)
 
 
 def characteristic_reception_plate_power(
@@ -442,11 +437,12 @@ def equivalent_free_velocity_level(
     lw = np.asarray(power_level, dtype=np.float64)
     y = np.asarray(plate_mobility, dtype=np.complex128)
     y_re = np.real(y)
-    if (not np.all(np.isfinite(y.real)) or not np.all(np.isfinite(y.imag))
-            or np.any(y_re <= 0.0)):
-        raise ValueError(
-            "'plate_mobility' must be finite with a positive real part."
-        )
+    if (
+        not np.all(np.isfinite(y.real))
+        or not np.all(np.isfinite(y.imag))
+        or np.any(y_re <= 0.0)
+    ):
+        raise ValueError("'plate_mobility' must be finite with a positive real part.")
     term = np.abs(y) ** 2 / (y_re * REFERENCE_MOBILITY)
     return np.asarray(lw + 10.0 * np.log10(term) + 60.0, dtype=np.float64)
 

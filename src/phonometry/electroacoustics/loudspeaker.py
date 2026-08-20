@@ -82,7 +82,9 @@ def _as_curve(
     f = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     v = np.atleast_1d(np.asarray(values, dtype=np.float64))
     if f.ndim != 1 or v.ndim != 1 or f.shape != v.shape:
-        raise ValueError(f"'{name}' frequencies and values must be 1-D and equal length.")
+        raise ValueError(
+            f"'{name}' frequencies and values must be 1-D and equal length."
+        )
     if f.size < 2:
         raise ValueError(f"'{name}' needs at least two frequency points.")
     if np.any(f <= 0.0) or not np.all(np.isfinite(f)):
@@ -124,7 +126,9 @@ def _reference_level(
     """
     best = -np.inf
     for f_c in frequencies:
-        in_band = (frequencies >= f_c / _OCTAVE_HALF) & (frequencies <= f_c * _OCTAVE_HALF)
+        in_band = (frequencies >= f_c / _OCTAVE_HALF) & (
+            frequencies <= f_c * _OCTAVE_HALF
+        )
         if np.any(in_band):
             best = max(best, _energetic_mean_db(spl_db[in_band]))
     return float(best)
@@ -196,7 +200,10 @@ def _band_edge(
     if not 0 <= neighbour < frequencies.size:
         return float(frequencies[edge])
     return _threshold_crossing(
-        frequencies[edge], spl_db[edge], frequencies[neighbour], spl_db[neighbour],
+        frequencies[edge],
+        spl_db[edge],
+        frequencies[neighbour],
+        spl_db[neighbour],
         threshold,
     )
 
@@ -383,7 +390,9 @@ class LoudspeakerCharacteristics:
             if self.rated_frequency_range is not None
             else self.effective_range
         )
-        in_range = (self.impedance_frequencies >= lo) & (self.impedance_frequencies <= hi)
+        in_range = (self.impedance_frequencies >= lo) & (
+            self.impedance_frequencies <= hi
+        )
         band = self.impedance_modulus[in_range]
         if band.size == 0:
             band = self.impedance_modulus
@@ -438,8 +447,12 @@ class LoudspeakerCharacteristics:
         )
 
     def plot(
-        self, quantity: str = "response", ax: Axes | None = None, *,
-        language: str = "en", **kwargs: Any,
+        self,
+        quantity: str = "response",
+        ax: Axes | None = None,
+        *,
+        language: str = "en",
+        **kwargs: Any,
     ) -> Axes:
         """Plot one IEC 60268-5 loudspeaker rated characteristic on one axes.
 
@@ -479,7 +492,11 @@ def _polar_from_piston(
             "'angles' so it carries a directivity pattern."
         )
     freqs = np.asarray(piston.frequencies, dtype=np.float64)
-    target = float(polar_frequency) if polar_frequency is not None else float(freqs[freqs.size // 2])
+    target = (
+        float(polar_frequency)
+        if polar_frequency is not None
+        else float(freqs[freqs.size // 2])
+    )
     idx = int(np.argmin(np.abs(freqs - target)))
     pattern = np.asarray(piston.directivity[idx], dtype=np.float64)
     with np.errstate(divide="ignore"):

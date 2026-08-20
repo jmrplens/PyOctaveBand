@@ -48,9 +48,7 @@ def _plane_wave_pair(
 def _chk_plane_wave_intensity() -> Outcome:
     rho, c, spacing = 1.204, 343.0, 0.012
     p1, p2 = _plane_wave_pair(spacing / c)
-    res = ph.emission.sound_intensity(
-        p1, p2, _FS, spacing=spacing, rho=rho, c=c
-    )
+    res = ph.emission.sound_intensity(p1, p2, _FS, spacing=spacing, rho=rho, c=c)
     expected = float(np.mean(((p1 + p2) / 2.0) ** 2)) / (rho * c)
     return numeric(
         expected, float(res.total_intensity), 0.015, unit="W/m^2", rel=True, places=5
@@ -65,9 +63,7 @@ def _chk_plane_wave_intensity() -> Outcome:
 def _chk_monopole_lw() -> Outcome:
     lw_true, r = 95.0, 4.0
     lp = lw_true - 10.0 * math.log10(2.0 * math.pi * r**2)
-    res = ph.emission.sound_power_pressure(
-        np.full((10, 1), lp), "hemisphere", radius=r
-    )
+    res = ph.emission.sound_power_pressure(np.full((10, 1), lp), "hemisphere", radius=r)
     return numeric(lw_true, float(res.sound_power_level[0]), 1e-9, unit="dB", places=6)
 
 
@@ -113,8 +109,7 @@ def _chk_iec61043_table2() -> Outcome:
 @register(
     "Intensity & sound power",
     "IEC 61043:1993 Table 2 Note 1",
-    "Separation rule +10 lg(x/25) on all six columns of 25 mm minima "
-    "(x = 50 mm)",
+    "Separation rule +10 lg(x/25) on all six columns of 25 mm minima (x = 50 mm)",
 )
 def _chk_iec61043_spacing_rule() -> Outcome:
     # Note 1 applies to every figure in the table, so the check sweeps all
@@ -127,9 +122,7 @@ def _chk_iec61043_spacing_rule() -> Outcome:
         base = ph.emission.residual_index_limits(device)
         wide = ph.emission.residual_index_limits(device, spacing=0.050)
         for cls in (1, 2):
-            offsets.extend(
-                (np.asarray(wide[cls]) - np.asarray(base[cls])).tolist()
-            )
+            offsets.extend((np.asarray(wide[cls]) - np.asarray(base[cls])).tolist())
     # Report the single offset furthest from the rule, so one column that
     # failed to shift cannot average out against five that did.
     worst = max(offsets, key=lambda v: abs(v - expected))
@@ -180,7 +173,9 @@ def _chk_iso9614_1_f1() -> Outcome:
 )
 def _chk_iso4871_declared_value() -> Outcome:
     mode = ph.emission.OperatingModeDeclaration("Operating mode 1", 88.0, 2.0)
-    return numeric(90.0, float(mode.declared_sound_power_level), 0.0, unit="dB", places=1)
+    return numeric(
+        90.0, float(mode.declared_sound_power_level), 0.0, unit="dB", places=1
+    )
 
 
 @register(
@@ -205,8 +200,12 @@ def _chk_iso4871_verification() -> Outcome:
 
 
 def _reverb_bracket(
-    t60: np.ndarray, volume: float, surface: float, freq: np.ndarray,
-    theta: float, ps: float,
+    t60: np.ndarray,
+    volume: float,
+    surface: float,
+    freq: np.ndarray,
+    theta: float,
+    ps: float,
 ) -> np.ndarray:
     """Independent re-implementation of the ISO 3741 Eq. (20) bracket.
 

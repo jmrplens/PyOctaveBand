@@ -182,9 +182,7 @@ def test_unknown_language_rejected(tmp_path) -> None:
 
 def test_metadata_xml_specials_do_not_break(tmp_path) -> None:
     out = tmp_path / "dyn_xml.pdf"
-    _result().report(
-        str(out), metadata=_metadata(specimen='Layer <A> & <B> "edge"')
-    )
+    _result().report(str(out), metadata=_metadata(specimen='Layer <A> & <B> "edge"'))
     _assert_one_page(str(out))
 
 

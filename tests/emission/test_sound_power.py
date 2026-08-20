@@ -32,9 +32,7 @@ def test_hemisphere_key_positions_count_and_radius() -> None:
 
 def test_hemisphere_survey_four_positions() -> None:
     """Survey, one plane -> 4 positions 4,5,6,10 (ISO 3746 clause 8.2.1)."""
-    pos = emission.measurement_positions(
-        "hemisphere", radius=1.0, grade="survey"
-    )
+    pos = emission.measurement_positions("hemisphere", radius=1.0, grade="survey")
     assert pos.shape == (4, 3)
 
 
@@ -46,18 +44,14 @@ def test_hemisphere_exact_table_b1_position_one() -> None:
 
 def test_hemisphere_two_planes_uses_table_b2() -> None:
     """Two planes -> 5 positions 2,3,6,7,9 from Table B.2 (ISO 3744 8.1.1)."""
-    pos = emission.measurement_positions(
-        "hemisphere", radius=1.0, reflecting_planes=2
-    )
+    pos = emission.measurement_positions("hemisphere", radius=1.0, reflecting_planes=2)
     assert pos.shape == (5, 3)
     assert np.allclose(pos[0], [0.50, -0.86, 0.15])  # position 2 of Table B.2
 
 
 def test_hemisphere_three_planes_uses_table_b3() -> None:
     """Three planes -> 3 positions 1,2,3 from Table B.3 (ISO 3744 8.1.1)."""
-    pos = emission.measurement_positions(
-        "hemisphere", radius=1.0, reflecting_planes=3
-    )
+    pos = emission.measurement_positions("hemisphere", radius=1.0, reflecting_planes=3)
     assert pos.shape == (3, 3)
     assert np.allclose(pos[0], [0.86, -0.50, 0.15])  # position 1 of Table B.3
 
@@ -75,17 +69,13 @@ def test_survey_three_planes_not_implemented() -> None:
 # --------------------------------------------------------------------------
 def test_k1_exact_value_at_6db() -> None:
     """dL = 6 dB -> K1 = -10*lg(1-10^-0,6) = 1,2560... dB."""
-    k1 = emission.background_noise_correction(
-        np.array([56.0]), np.array([50.0])
-    )
+    k1 = emission.background_noise_correction(np.array([56.0]), np.array([50.0]))
     assert k1[0] == pytest.approx(1.25628, abs=1e-4)
 
 
 def test_k1_zero_above_15db() -> None:
     """dL > 15 dB -> K1 = 0 (no correction)."""
-    k1 = emission.background_noise_correction(
-        np.array([80.0]), np.array([60.0])
-    )
+    k1 = emission.background_noise_correction(np.array([80.0]), np.array([60.0]))
     assert k1[0] == 0.0
 
 
@@ -93,9 +83,7 @@ def test_k1_applies_equation_16_at_exactly_15db() -> None:
     """dL == 15 dB stays inside '6 dB <= dLp <= 15 dB' (ISO 3744:2010, 8.2.3),
     so Eq. (16) applies: K1 = -10*lg(1-10^-1,5) = 0,1395... dB; K1 = 0 only
     for dLp strictly above 15 dB."""
-    k1 = emission.background_noise_correction(
-        np.array([75.0]), np.array([60.0])
-    )
+    k1 = emission.background_noise_correction(np.array([75.0]), np.array([60.0]))
     assert k1[0] == pytest.approx(-10.0 * np.log10(1.0 - 10.0**-1.5), abs=1e-9)
     assert k1[0] == pytest.approx(0.13955, abs=1e-4)
 
@@ -107,17 +95,18 @@ def test_k1_survey_applies_equation_at_exactly_10db() -> None:
         np.array([70.0]), np.array([60.0]), grade="survey"
     )
     assert k1[0] == pytest.approx(0.45757, abs=1e-4)
-    assert emission.background_noise_correction(
-        np.array([70.1]), np.array([60.0]), grade="survey"
-    )[0] == 0.0
+    assert (
+        emission.background_noise_correction(
+            np.array([70.1]), np.array([60.0]), grade="survey"
+        )[0]
+        == 0.0
+    )
 
 
 def test_k1_below_criterion_clamps_and_warns() -> None:
     """dL < 6 dB (engineering) -> clamp to the 6 dB value, warn."""
     with pytest.warns(emission.SoundPowerWarning):
-        k1 = emission.background_noise_correction(
-            np.array([53.0]), np.array([50.0])
-        )
+        k1 = emission.background_noise_correction(np.array([53.0]), np.array([50.0]))
     assert k1[0] == pytest.approx(1.25628, abs=1e-4)
 
 
@@ -147,9 +136,7 @@ def test_k2_closed_form_from_absorption() -> None:
 
 def test_k2_from_reverberation_time_sabine() -> None:
     """A = 0,16*V/T; V=300, T=1,2 -> A=40; S=40 -> K2=10*lg(1+4)=6,9897 dB."""
-    k2 = emission.environmental_correction(
-        40.0, reverberation_time=1.2, volume=300.0
-    )
+    k2 = emission.environmental_correction(40.0, reverberation_time=1.2, volume=300.0)
     assert k2 == pytest.approx(6.9897, abs=1e-4)
 
 
@@ -172,9 +159,7 @@ def test_k2_volume_without_reverberation_time_raises() -> None:
 
 def test_k2_mean_absorption_without_room_surface_raises() -> None:
     with pytest.raises(ValueError, match="room_surface"):
-        emission.environmental_correction(
-            50.0, mean_absorption_coefficient=0.2
-        )
+        emission.environmental_correction(50.0, mean_absorption_coefficient=0.2)
 
 
 def test_k2_room_surface_without_mean_absorption_raises() -> None:
@@ -301,8 +286,7 @@ def test_directivity_index_background_corrects_each_position() -> None:
     difference: DI_i = (Lp_i - K1) - (mean - K1) = Lp_i - mean. The DI must
     NOT carry a residual +K1 offset (ISO 3744 Eq. 7, notes sec. 9)."""
     src = np.array(
-        [[82.0], [78.0], [80.0], [79.0], [81.0],
-         [80.0], [83.0], [77.0], [80.0], [80.0]]
+        [[82.0], [78.0], [80.0], [79.0], [81.0], [80.0], [83.0], [77.0], [80.0], [80.0]]
     )
     bg = np.full((10, 1), 72.0)  # dL ~ 8.4 dB -> above the 6 dB criterion
     res = emission.sound_power_pressure(
@@ -358,7 +342,10 @@ def test_background_levels_single_spectrum_broadcasts() -> None:
         levels, "hemisphere", radius=2.0, background_levels=bg_spectrum[np.newaxis, :]
     )
     res_full = emission.sound_power_pressure(
-        levels, "hemisphere", radius=2.0, background_levels=np.tile(bg_spectrum, (10, 1))
+        levels,
+        "hemisphere",
+        radius=2.0,
+        background_levels=np.tile(bg_spectrum, (10, 1)),
     )
     assert np.allclose(res_1d.background_correction, res_full.background_correction)
     assert np.allclose(res_row.background_correction, res_full.background_correction)
@@ -393,9 +380,7 @@ def test_k2_per_band_eq_a7_from_mean_absorption() -> None:
     )
     expected = np.array(
         [
-            emission.environmental_correction(
-                50.0, absorption_area=float(al) * sv
-            )
+            emission.environmental_correction(50.0, absorption_area=float(al) * sv)
             for al in alpha
         ]
     )
@@ -407,9 +392,7 @@ def test_k2_per_band_from_reverberation_time() -> None:
     """Eq. A.3: A = 0,16*V/T per band gives a per-band K2."""
     t = np.array([1.0, 2.0, 4.0])
     v = 300.0
-    k2 = emission.environmental_correction(
-        40.0, reverberation_time=t, volume=v
-    )
+    k2 = emission.environmental_correction(40.0, reverberation_time=t, volume=v)
     expected = 10.0 * np.log10(1.0 + 4.0 * 40.0 / (0.16 * v / t))
     assert np.allclose(k2, expected)
 

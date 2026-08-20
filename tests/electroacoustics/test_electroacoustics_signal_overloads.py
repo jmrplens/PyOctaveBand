@@ -101,14 +101,18 @@ PAIR_IDS = [f.__name__ for f, _ in PAIRS]
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize(("func", "record", "kwargs"), SOLO + FULL_SCALE, ids=SOLO_IDS + FULL_SCALE_IDS)
+@pytest.mark.parametrize(
+    ("func", "record", "kwargs"), SOLO + FULL_SCALE, ids=SOLO_IDS + FULL_SCALE_IDS
+)
 def test_an_uncalibrated_signal_computes_the_bare_array_result(
     func, record, kwargs
 ) -> None:
     assert_same(func(Signal(record, FS), **kwargs), func(record, FS, **kwargs))
 
 
-@pytest.mark.parametrize(("func", "record", "kwargs"), SOLO + FULL_SCALE, ids=SOLO_IDS + FULL_SCALE_IDS)
+@pytest.mark.parametrize(
+    ("func", "record", "kwargs"), SOLO + FULL_SCALE, ids=SOLO_IDS + FULL_SCALE_IDS
+)
 def test_a_conflicting_rate_is_refused_a_matching_one_is_not(
     func, record, kwargs
 ) -> None:
@@ -119,13 +123,17 @@ def test_a_conflicting_rate_is_refused_a_matching_one_is_not(
     func(sig, FS, **kwargs)
 
 
-@pytest.mark.parametrize(("func", "record", "kwargs"), SOLO + FULL_SCALE, ids=SOLO_IDS + FULL_SCALE_IDS)
+@pytest.mark.parametrize(
+    ("func", "record", "kwargs"), SOLO + FULL_SCALE, ids=SOLO_IDS + FULL_SCALE_IDS
+)
 def test_a_bare_array_still_requires_fs(func, record, kwargs) -> None:
     with pytest.raises(ValueError, match="fs is required"):
         func(record, **kwargs)
 
 
-@pytest.mark.parametrize(("func", "record", "kwargs"), SOLO + FULL_SCALE, ids=SOLO_IDS + FULL_SCALE_IDS)
+@pytest.mark.parametrize(
+    ("func", "record", "kwargs"), SOLO + FULL_SCALE, ids=SOLO_IDS + FULL_SCALE_IDS
+)
 def test_a_multichannel_signal_is_refused_by_name(func, record, kwargs) -> None:
     """These metrics are defined on one record, and say so."""
     block = Signal(np.stack([record, record]), FS)
@@ -147,9 +155,7 @@ def test_a_calibrated_signal_is_analysed_in_pascals(func, record, kwargs) -> Non
 
 
 @pytest.mark.parametrize(("func", "record", "kwargs"), FULL_SCALE, ids=FULL_SCALE_IDS)
-def test_a_full_scale_quantity_never_sees_the_calibration(
-    func, record, kwargs
-) -> None:
+def test_a_full_scale_quantity_never_sees_the_calibration(func, record, kwargs) -> None:
     """The exemption, asserted from both sides.
 
     The calibrated call must equal the *bare* one, and must differ from the
@@ -215,7 +221,9 @@ def test_the_transfer_function_moves_with_an_unequal_pair() -> None:
     plain = transfer_function(x, y, FS)
     scaled = transfer_function(x, 3.0 * y, FS)
     assert np.allclose(scaled.response, 3.0 * plain.response)
-    from_objects = transfer_function(Signal(x, FS), Signal(y, FS, calibration_factor=3.0))
+    from_objects = transfer_function(
+        Signal(x, FS), Signal(y, FS, calibration_factor=3.0)
+    )
     assert np.allclose(from_objects.response, scaled.response)
 
 

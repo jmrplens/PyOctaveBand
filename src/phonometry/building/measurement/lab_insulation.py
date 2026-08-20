@@ -169,8 +169,13 @@ class LabAirborneInsulationResult:
             the embedded rating figure (``pip install phonometry[plot]``).
         """
         return _render_iso10140(
-            self, path, quantity="r", metadata=metadata, engine=engine,
-            verbose=verbose, language=language,
+            self,
+            path,
+            quantity="r",
+            metadata=metadata,
+            engine=engine,
+            verbose=verbose,
+            language=language,
         )
 
 
@@ -249,8 +254,13 @@ class LabImpactInsulationResult:
             the embedded rating figure (``pip install phonometry[plot]``).
         """
         return _render_iso10140(
-            self, path, quantity="l_n", metadata=metadata, engine=engine,
-            verbose=verbose, language=language,
+            self,
+            path,
+            quantity="l_n",
+            metadata=metadata,
+            engine=engine,
+            verbose=verbose,
+            language=language,
         )
 
 
@@ -292,8 +302,13 @@ def _render_iso10140(
     from ..._report.iso10140 import render_iso10140_report
 
     return render_iso10140_report(
-        result, rating, path, quantity=quantity, metadata=metadata,
-        verbose=verbose, language=language,
+        result,
+        rating,
+        path,
+        quantity=quantity,
+        metadata=metadata,
+        verbose=verbose,
+        language=language,
     )
 
 
@@ -308,9 +323,7 @@ def _absorption_area(
     if t.ndim != 1:
         raise ValueError("'t2' must be one-dimensional (one value per band).")
     if t.size != n_bands:
-        raise ValueError(
-            "'t2' must share the band count of the level input."
-        )
+        raise ValueError("'t2' must share the band count of the level input.")
     if not np.all(np.isfinite(t)) or np.any(t <= 0.0):
         raise ValueError("'t2' must contain positive, finite values.")
     if not np.isfinite(volume) or volume <= 0.0:

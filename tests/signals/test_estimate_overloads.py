@@ -143,7 +143,10 @@ def test_a_multichannel_signal_is_refused_by_name(func, kwargs) -> None:
 @pytest.mark.parametrize(("func", "kwargs"), SOLO, ids=SOLO_IDS)
 def test_a_calibrated_signal_is_analysed_in_pascals(func, kwargs) -> None:
     x = _record()
-    assert_same(func(Signal(x, FS, calibration_factor=CAL), **kwargs), func(CAL * x, FS, **kwargs))
+    assert_same(
+        func(Signal(x, FS, calibration_factor=CAL), **kwargs),
+        func(CAL * x, FS, **kwargs),
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -279,4 +282,7 @@ def test_the_arguments_behind_fs_are_keyword_only_and_required() -> None:
 def test_the_positional_call_is_unchanged() -> None:
     """``zoom_fft(x, fs, f_min=f_min, f_max=f_max)`` still reads as it always did."""
     x = _tone()
-    assert_same(zoom_fft(x, FS, f_min=100.0, f_max=1000.0), zoom_fft(x, fs=FS, f_min=100.0, f_max=1000.0))
+    assert_same(
+        zoom_fft(x, FS, f_min=100.0, f_max=1000.0),
+        zoom_fft(x, fs=FS, f_min=100.0, f_max=1000.0),
+    )

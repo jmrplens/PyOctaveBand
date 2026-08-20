@@ -20,4 +20,3 @@ point imports them in is the order of the report.
 from . import registry
 
 __all__ = ["registry"]
-

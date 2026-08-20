@@ -80,7 +80,7 @@ def _reverberation_prediction_example() -> tuple[object, ReportMetadata, str]:
     """
     freqs = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
     treated = [0.10, 0.15, 0.30, 0.45, 0.55, 0.60]  # broadband absorber wall
-    side = [0.08, 0.10, 0.12, 0.15, 0.18, 0.20]      # lightly absorptive walls
+    side = [0.08, 0.10, 0.12, 0.15, 0.18, 0.20]  # lightly absorptive walls
     floor_ceiling = [0.05, 0.08, 0.10, 0.12, 0.15, 0.18]
     result = ph.room.reverberation_time_models(
         (8.0, 5.0, 3.0), (treated, side, floor_ceiling), frequencies=freqs
@@ -114,15 +114,18 @@ def _enclosed_space_absorption_example() -> tuple[object, ReportMetadata, str]:
     estimate, not a measurement.
     """
     surfaces = [
-        (20.0, [0.05, 0.10, 0.20, 0.30, 0.40, 0.50, 0.55]),   # carpeted floor
-        (20.0, [0.20, 0.40, 0.65, 0.75, 0.80, 0.80, 0.75]),   # acoustic ceiling
-        (45.0, [0.02, 0.02, 0.03, 0.04, 0.05, 0.05, 0.05]),   # painted-plaster walls
+        (20.0, [0.05, 0.10, 0.20, 0.30, 0.40, 0.50, 0.55]),  # carpeted floor
+        (20.0, [0.20, 0.40, 0.65, 0.75, 0.80, 0.80, 0.75]),  # acoustic ceiling
+        (45.0, [0.02, 0.02, 0.03, 0.04, 0.05, 0.05, 0.05]),  # painted-plaster walls
     ]
     object_volumes = [0.5, 0.8, 0.3]  # furniture and fittings, m3
     objects = ph.room.hard_object_absorption(object_volumes)
     psi = ph.room.object_fraction(object_volumes, 50.0)
     result = ph.room.enclosed_space_reverberation(
-        surfaces, 50.0, objects=objects, object_fraction=psi,
+        surfaces,
+        50.0,
+        objects=objects,
+        object_fraction=psi,
         air_condition="20C_50-70",
     )
     metadata = ReportMetadata(

@@ -36,20 +36,26 @@ def _page(tmp_path: pathlib.Path, *blocks: str, name: str = "page.md") -> pathli
 
 
 def test_rebinding_an_imported_name_is_reported(tmp_path: pathlib.Path) -> None:
-    page = _page(tmp_path, """
+    page = _page(
+        tmp_path,
+        """
 from phonometry import signals
 
 signals = [1.0, 2.0]
-""")
+""",
+    )
     (failure,) = check_doc_snippets.check_shadowing([page])
     assert "'signals = ...' rebinds" in failure
 
 
 def test_second_import_of_the_same_name_is_reported(tmp_path: pathlib.Path) -> None:
-    page = _page(tmp_path, """
+    page = _page(
+        tmp_path,
+        """
 from phonometry import signals
 from scipy import signals
-""")
+""",
+    )
     (failure,) = check_doc_snippets.check_shadowing([page])
     assert "rebinds the name imported from phonometry" in failure
 
@@ -81,13 +87,16 @@ def test_a_generated_dump_does_not_carry_imports_across_pages(
 
 def test_a_different_name_next_to_scipy_is_fine(tmp_path: pathlib.Path) -> None:
     """The permitted arrangement: distinct names, so neither is shadowed."""
-    page = _page(tmp_path, """
+    page = _page(
+        tmp_path,
+        """
 from scipy import signal
 from phonometry import signals
 
 b, a = signal.butter(2, 0.2)
 level = signals.leq([1.0], 48000)
-""")
+""",
+    )
     assert check_doc_snippets.check_shadowing([page]) == []
 
 

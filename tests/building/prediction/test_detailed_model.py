@@ -130,10 +130,50 @@ def test_forced_radiation_factor_matches_table_b1_openings() -> None:
     bands = BANDS[:-1]  # Table B.1 stops at 4 kHz
     small = building.forced_radiation_factor(bands, length1=1.5, length2=1.25)
     large = building.forced_radiation_factor(bands, length1=3.75, length2=2.65)
-    printed_small = (-6.5, -4.8, -3.5, -2.6, -1.8, -1.1, -0.5, 0.0, 0.5, 0.9,
-                     1.3, 1.7, 2.0, 2.3, 2.6, 2.9, 3.0, 3.0, 3.0, 3.0)
-    printed_large = (-2.1, -1.4, -0.7, -0.2, 0.3, 0.8, 1.1, 1.5, 1.8, 2.2, 2.5,
-                     2.7, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0)
+    printed_small = (
+        -6.5,
+        -4.8,
+        -3.5,
+        -2.6,
+        -1.8,
+        -1.1,
+        -0.5,
+        0.0,
+        0.5,
+        0.9,
+        1.3,
+        1.7,
+        2.0,
+        2.3,
+        2.6,
+        2.9,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+    )
+    printed_large = (
+        -2.1,
+        -1.4,
+        -0.7,
+        -0.2,
+        0.3,
+        0.8,
+        1.1,
+        1.5,
+        1.8,
+        2.2,
+        2.5,
+        2.7,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+    )
     assert 10.0 * np.log10(small) == pytest.approx(printed_small, abs=0.05)
     assert 10.0 * np.log10(large) == pytest.approx(printed_large, abs=0.05)
 
@@ -189,12 +229,14 @@ def test_table_l4_velocity_level_differences(situ: dict) -> None:
     kij = iso12354_building.junction_indices()
     lengths = iso12354_building.COUPLING_LENGTH
     d1 = building.in_situ_velocity_level_difference(
-        kij["floor-ext"], coupling_length=lengths["ext1"],
+        kij["floor-ext"],
+        coupling_length=lengths["ext1"],
         absorption_length_i=situ["floor"].absorption_length,
         absorption_length_j=situ["ext1"].absorption_length,
     )
     fourth = building.in_situ_velocity_level_difference(
-        kij["floor-int"], coupling_length=lengths["int2"],
+        kij["floor-int"],
+        coupling_length=lengths["int2"],
         absorption_length_i=situ["floor"].absorption_length,
         absorption_length_j=situ["int2"].absorption_length,
     )
@@ -205,7 +247,9 @@ def test_table_l4_velocity_level_differences(situ: dict) -> None:
 def test_velocity_level_difference_is_floored_at_zero() -> None:
     """Formula (10) states ``Dv,ij,situ ≥ 0 dB``."""
     got = building.in_situ_velocity_level_difference(
-        -30.0, coupling_length=4.0, absorption_length_i=10.0,
+        -30.0,
+        coupling_length=4.0,
+        absorption_length_i=10.0,
         absorption_length_j=10.0,
     )
     assert got == pytest.approx(0.0)
@@ -355,12 +399,19 @@ def test_simplified_model_agrees_with_the_detailed_model(airborne) -> None:
         lij = lengths[name]
         k_cross = kij["floor-ext"] if key == "ext" else kij["floor-int"]
         k_through = kij["ext-ext"] if key == "ext" else kij["int-int"]
-        paths.extend(building.flanking_element(
-            label=tag, r_flanking=rw[key], r_separating=rw["floor"],
-            k_ff=k_through, k_fd=k_cross, k_df=k_cross,
-            separating_area=SEPARATING_AREA, coupling_length=lij,
-            delta_r_df=ref.ISO12354_ANNEX_L10_DELTA_RW,
-        ))
+        paths.extend(
+            building.flanking_element(
+                label=tag,
+                r_flanking=rw[key],
+                r_separating=rw["floor"],
+                k_ff=k_through,
+                k_fd=k_cross,
+                k_df=k_cross,
+                separating_area=SEPARATING_AREA,
+                coupling_length=lij,
+                delta_r_df=ref.ISO12354_ANNEX_L10_DELTA_RW,
+            )
+        )
     simplified = building.predicted_airborne_insulation(
         r_direct=rw["floor"],
         delta_r_direct=ref.ISO12354_ANNEX_L10_DELTA_RW,
@@ -429,13 +480,33 @@ def test_table_l11_lightweight_flanking_paths_and_total() -> None:
 
 def test_table_l11_path_ratings() -> None:
     """Table L.11, the ISO 717-1 rating of each lightweight path."""
-    index = [int(np.flatnonzero(np.isclose(BANDS, f))[0])
-             for f in (100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-                       1000, 1250, 1600, 2000, 2500, 3150)]
+    index = [
+        int(np.flatnonzero(np.isclose(BANDS, f))[0])
+        for f in (
+            100,
+            125,
+            160,
+            200,
+            250,
+            315,
+            400,
+            500,
+            630,
+            800,
+            1000,
+            1250,
+            1600,
+            2000,
+            2500,
+            3150,
+        )
+    ]
     printed = ref.ISO12354_TABLE_L11_RATINGS
-    for key, values in (("Rd", ref.ISO12354_TABLE_L12_RD_FLOOR),
-                        ("RFf", ref.ISO12354_TABLE_L11_R_FF),
-                        ("RDf", ref.ISO12354_TABLE_L11_R_DF)):
+    for key, values in (
+        ("Rd", ref.ISO12354_TABLE_L12_RD_FLOOR),
+        ("RFf", ref.ISO12354_TABLE_L11_R_FF),
+        ("RDf", ref.ISO12354_TABLE_L11_R_DF),
+    ):
         spectrum = np.asarray(values, dtype=np.float64)[index]
         assert building.weighted_rating(spectrum).rating == printed[key], key
 
@@ -463,12 +534,18 @@ def test_flanking_impact_level_from_a_measured_flanking_level() -> None:
     """
     ln_f = np.array([60.0, 58.0, 56.0])
     assert building.flanking_impact_level_from_flanking_level(
-        ln_f, area=20.0, laboratory_area=10.0,
-        coupling_length=4.0, laboratory_coupling_length=4.5,
+        ln_f,
+        area=20.0,
+        laboratory_area=10.0,
+        coupling_length=4.0,
+        laboratory_coupling_length=4.5,
     ) == pytest.approx([56.4782, 54.4782, 52.4782], abs=5e-4)
     assert building.flanking_impact_level_from_flanking_level(
-        ln_f, area=10.0, laboratory_area=10.0,
-        coupling_length=2.5, laboratory_coupling_length=2.5,
+        ln_f,
+        area=10.0,
+        laboratory_area=10.0,
+        coupling_length=2.5,
+        laboratory_coupling_length=2.5,
     ) == pytest.approx(ln_f)
 
 
@@ -532,7 +609,8 @@ def test_table_g11_lightweight_impact_paths_and_total() -> None:
     from phonometry.building.prediction.detailed_model import BandPath
 
     result = building.detailed_impact_prediction(
-        BANDS, direct_level=direct,
+        BANDS,
+        direct_level=direct,
         flanking_paths=[BandPath("Df", "Df", flanking)],
     )
     assert result.l_prime_n == pytest.approx(ref.ISO12354_TABLE_G11_LN_TOTAL, abs=TOL)
@@ -542,11 +620,31 @@ def test_table_g11_lightweight_impact_paths_and_total() -> None:
 
 def test_table_g11_path_ratings() -> None:
     """Table G.11, the ISO 717-2 rating of each lightweight impact path."""
-    index = [int(np.flatnonzero(np.isclose(BANDS, f))[0])
-             for f in (100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-                       1000, 1250, 1600, 2000, 2500, 3150)]
-    for key, values in (("LnDd", ref.ISO12354_TABLE_G11_LN_DD),
-                        ("LnDf", ref.ISO12354_TABLE_G11_LN_DF)):
+    index = [
+        int(np.flatnonzero(np.isclose(BANDS, f))[0])
+        for f in (
+            100,
+            125,
+            160,
+            200,
+            250,
+            315,
+            400,
+            500,
+            630,
+            800,
+            1000,
+            1250,
+            1600,
+            2000,
+            2500,
+            3150,
+        )
+    ]
+    for key, values in (
+        ("LnDd", ref.ISO12354_TABLE_G11_LN_DD),
+        ("LnDf", ref.ISO12354_TABLE_G11_LN_DF),
+    ):
         spectrum = np.asarray(values, dtype=np.float64)[index]
         rating = building.weighted_impact_rating(spectrum).rating
         assert rating == ref.ISO12354_TABLE_G11_RATINGS[key], key
@@ -593,15 +691,10 @@ def test_table_b2_octave_impact_levels_of_monolithic_floors() -> None:
             ),
             radiation_factor=sigma,
         )
-        octave = 10.0 * np.log10(
-            (10.0 ** (ln.reshape(-1, 3) / 10.0)).sum(axis=1)
-        )
+        octave = 10.0 * np.log10((10.0 ** (ln.reshape(-1, 3) / 10.0)).sum(axis=1))
         assert octave[1:6] == pytest.approx(printed[1:6], abs=2.0), material
         assert (
-            abs(
-                building.weighted_impact_rating(octave[1:6], "octave").rating
-                - rating
-            )
+            abs(building.weighted_impact_rating(octave[1:6], "octave").rating - rating)
             <= 1
         )
 
@@ -645,12 +738,10 @@ def test_in_situ_transfer_direction_matches_the_printed_signs() -> None:
     assert building.in_situ_reduction_index(50.0, half, lab) == pytest.approx(
         50.0 + three
     )
-    assert building.in_situ_impact_level(60.0, half, lab) == pytest.approx(
-        60.0 - three
+    assert building.in_situ_impact_level(60.0, half, lab) == pytest.approx(60.0 - three)
+    assert building.in_situ_reduction_index(50.0, double, lab) == pytest.approx(
+        50.0 - three
     )
-    assert building.in_situ_reduction_index(
-        50.0, double, lab
-    ) == pytest.approx(50.0 - three)
     assert building.in_situ_impact_level(60.0, double, lab) == pytest.approx(
         60.0 + three
     )
@@ -664,12 +755,19 @@ def test_in_situ_absorption_length_matches_formula_11(situ: dict) -> None:
     ) == pytest.approx(floor.absorption_length, rel=1e-12)
 
 
-def test_in_situ_total_loss_factor_without_perimeter_is_internal_plus_radiation() -> None:
+def test_in_situ_total_loss_factor_without_perimeter_is_internal_plus_radiation() -> (
+    None
+):
     """With no perimeter losses Formula (C.1) keeps only its first two terms."""
     sigma = np.ones(BANDS.size)
     eta = building.in_situ_total_loss_factor(
-        BANDS, internal_loss_factor=0.01, mass_per_area=400.0, area=20.0,
-        critical_frequency=100.0, radiation_factor=sigma, perimeter_absorption=0.0,
+        BANDS,
+        internal_loss_factor=0.01,
+        mass_per_area=400.0,
+        area=20.0,
+        critical_frequency=100.0,
+        radiation_factor=sigma,
+        perimeter_absorption=0.0,
     )
     expected = 0.01 + 2.0 * 1.29 * 340.0 / (2.0 * np.pi * BANDS * 400.0)
     assert eta == pytest.approx(expected)
@@ -683,12 +781,12 @@ def test_resonant_only_raises_the_index_below_the_critical_frequency() -> None:
     sigma = building.bending_radiation_factor(
         BANDS, critical_frequency=FC_INT, length1=4.0, length2=2.75
     )
-    sigma_f = building.forced_radiation_factor(
-        BANDS, length1=4.0, length2=2.75
-    )
+    sigma_f = building.forced_radiation_factor(BANDS, length1=4.0, length2=2.75)
     kwargs = {
-        "mass_per_area": M_INT, "critical_frequency": FC_INT,
-        "total_loss_factor": 0.03, "radiation_factor": sigma,
+        "mass_per_area": M_INT,
+        "critical_frequency": FC_INT,
+        "total_loss_factor": 0.03,
+        "radiation_factor": sigma,
         "forced_radiation_factor": sigma_f,
     }
     full = building.calculated_sound_reduction_index(BANDS, **kwargs)
@@ -746,8 +844,12 @@ def test_flanking_path_rejects_an_unknown_kind(situ: dict) -> None:
     """Only the three Annex-defined flanking paths exist."""
     with pytest.raises(ValueError, match="kind"):
         building.airborne_flanking_path(
-            label="x", kind="Dd", element_i=situ["floor"], element_j=situ["ext1"],
-            vibration_reduction_index=6.0, coupling_length=4.0,
+            label="x",
+            kind="Dd",
+            element_i=situ["floor"],
+            element_j=situ["ext1"],
+            vibration_reduction_index=6.0,
+            coupling_length=4.0,
             separating_area=20.0,
         )
 

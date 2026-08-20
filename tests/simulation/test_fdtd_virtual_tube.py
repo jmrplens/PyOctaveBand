@@ -71,7 +71,11 @@ def _run_tube(
     if right_impedance is not None:
         boundaries["right"] = right_impedance
     sim = FDTD2D(
-        c_map, DX, rho=rho_map, damping=damping, edge_impedance=boundaries,
+        c_map,
+        DX,
+        rho=rho_map,
+        damping=damping,
+        edge_impedance=boundaries,
     )
     sim.add_plane_wave("right", center=0.35, width=0.05)
     records = np.empty((len(probe_cells), steps))
@@ -89,17 +93,13 @@ def _spectra(records: np.ndarray, dt: float) -> tuple[np.ndarray, np.ndarray]:
     return freqs, spec
 
 
-def _band_ratio(
-    freqs: np.ndarray, num: np.ndarray, den: np.ndarray
-) -> np.ndarray:
+def _band_ratio(freqs: np.ndarray, num: np.ndarray, den: np.ndarray) -> np.ndarray:
     """Transfer function sampled on the analysis band."""
     floor = 1e-12 * float(np.abs(den).max())
     safe = np.abs(den) > floor
     ratio = np.zeros_like(num)
     ratio[safe] = num[safe] / den[safe]
-    return np.interp(BAND, freqs, ratio.real) + 1j * np.interp(
-        BAND, freqs, ratio.imag
-    )
+    return np.interp(BAND, freqs, ratio.real) + 1j * np.interp(BAND, freqs, ratio.imag)
 
 
 def _analytic_layer_wavenumber() -> np.ndarray:
@@ -113,20 +113,26 @@ def test_virtual_iso10534_recovers_analytic_absorption() -> None:
     # normative positions; the full ISO 10534-2 reduction runs on the
     # simulated histories.
     nx = 280
-    face_cell = nx - round(THICKNESS / DX)       # sample front face
+    face_cell = nx - round(THICKNESS / DX)  # sample front face
     face_x = face_cell * DX
-    mic1, mic2 = 219, 229                              # farther, nearer
+    mic1, mic2 = 219, 229  # farther, nearer
     x1 = face_x - (mic1 + 0.5) * DX
     spacing = (mic2 - mic1) * DX
     records = _run_tube(
-        nx, sample_cells=slice(face_cell, nx),
-        probe_cells=(mic1, mic2), steps=9000,
+        nx,
+        sample_cells=slice(face_cell, nx),
+        probe_cells=(mic1, mic2),
+        steps=9000,
     )
     sim_dt = FDTD2D(C0, DX, shape=(NY, 8)).dt
     freqs, spec = _spectra(records, sim_dt)
     h12 = _band_ratio(freqs, spec[1], spec[0])
     result = two_microphone_impedance(
-        h12, frequency=BAND, spacing=spacing, x1=x1, speed_of_sound=C0,
+        h12,
+        frequency=BAND,
+        spacing=spacing,
+        x1=x1,
+        speed_of_sound=C0,
         characteristic_impedance=RHO0 * C0,
     )
     k2 = _analytic_layer_wavenumber()
@@ -146,13 +152,20 @@ def test_virtual_iso10534_empty_tube_is_rigid() -> None:
     x1 = nx * DX - (mic1 + 0.5) * DX
     spacing = (mic2 - mic1) * DX
     records = _run_tube(
-        nx, sample_cells=None, probe_cells=(mic1, mic2), steps=2600,
+        nx,
+        sample_cells=None,
+        probe_cells=(mic1, mic2),
+        steps=2600,
     )
     sim_dt = FDTD2D(C0, DX, shape=(NY, 8)).dt
     freqs, spec = _spectra(records, sim_dt)
     h12 = _band_ratio(freqs, spec[1], spec[0])
     result = two_microphone_impedance(
-        h12, frequency=BAND, spacing=spacing, x1=x1, speed_of_sound=C0,
+        h12,
+        frequency=BAND,
+        spacing=spacing,
+        x1=x1,
+        speed_of_sound=C0,
         characteristic_impedance=RHO0 * C0,
     )
     assert np.max(result.absorption) < 0.03
@@ -166,27 +179,33 @@ def test_virtual_astm_one_load_recovers_layer_tl() -> None:
     face_cell = 260
     back_cell = face_cell + round(THICKNESS / DX)
     face_x = face_cell * DX
-    up1, up2 = 199, 209          # H1 farther, H2 nearer (upstream)
-    dn3, dn4 = 309, 319          # H3 nearer, H4 farther (downstream)
+    up1, up2 = 199, 209  # H1 farther, H2 nearer (upstream)
+    dn3, dn4 = 309, 319  # H3 nearer, H4 farther (downstream)
     l1 = face_x - (up2 + 0.5) * DX
     s1 = (up2 - up1) * DX
     l2 = (dn3 + 0.5) * DX - face_x
     s2 = (dn4 - dn3) * DX
     records = _run_tube(
-        nx, sample_cells=slice(face_cell, back_cell),
-        probe_cells=(up1, up2, dn3, dn4), steps=7000,
+        nx,
+        sample_cells=slice(face_cell, back_cell),
+        probe_cells=(up1, up2, dn3, dn4),
+        steps=7000,
         right_impedance=RHO0 * C0,
     )
     sim_dt = FDTD2D(C0, DX, shape=(NY, 8)).dt
     freqs, spec = _spectra(records, sim_dt)
     reference = spec[1]
-    loads = tuple(
-        _band_ratio(freqs, spec[k], reference) for k in range(4)
-    )
+    loads = tuple(_band_ratio(freqs, spec[k], reference) for k in range(4))
     k_air = 2.0 * np.pi * BAND / C0
     matrix = transfer_matrix_one_load(
-        loads, l1=l1, s1=s1, l2=l2, s2=s2, thickness=THICKNESS,
-        wavenumber=k_air, characteristic_impedance=RHO0 * C0,
+        loads,
+        l1=l1,
+        s1=s1,
+        l2=l2,
+        s2=s2,
+        thickness=THICKNESS,
+        wavenumber=k_air,
+        characteristic_impedance=RHO0 * C0,
     )
     tl_fdtd = matrix.transmission_loss(RHO0 * C0)
     analytic = air_layer_transfer_matrix(
@@ -206,20 +225,28 @@ def test_virtual_astm_empty_tube_tl_is_zero() -> None:
     l2 = (dn3 + 0.5) * DX - face_x
     s2 = (dn4 - dn3) * DX
     records = _run_tube(
-        nx, sample_cells=None, probe_cells=(up1, up2, dn3, dn4),
-        steps=3600, right_impedance=RHO0 * C0,
+        nx,
+        sample_cells=None,
+        probe_cells=(up1, up2, dn3, dn4),
+        steps=3600,
+        right_impedance=RHO0 * C0,
     )
     sim_dt = FDTD2D(C0, DX, shape=(NY, 8)).dt
     freqs, spec = _spectra(records, sim_dt)
-    loads = tuple(
-        _band_ratio(freqs, spec[k], spec[1]) for k in range(4)
-    )
+    loads = tuple(_band_ratio(freqs, spec[k], spec[1]) for k in range(4))
     k_air = 2.0 * np.pi * BAND / C0
     matrix = transfer_matrix_one_load(
-        loads, l1=l1, s1=s1, l2=l2, s2=s2, thickness=THICKNESS,
-        wavenumber=k_air, characteristic_impedance=RHO0 * C0,
+        loads,
+        l1=l1,
+        s1=s1,
+        l2=l2,
+        s2=s2,
+        thickness=THICKNESS,
+        wavenumber=k_air,
+        characteristic_impedance=RHO0 * C0,
     )
     assert np.max(np.abs(matrix.transmission_loss(RHO0 * C0))) < 0.5
+
 
 def test_damping_map_validation() -> None:
     # The per-cell damping map must be 2-D and match the grid.

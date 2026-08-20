@@ -138,10 +138,7 @@ def _areas_sentence(
     elif area is not None:
         key = "S = {s} m<super>2</super> (ISO 15186-1:2000 Clause 8)."
     elif measurement_area is not None:
-        key = (
-            "S<sub>m</sub> = {sm} m<super>2</super> (ISO 15186-1:2000 "
-            "Clause 8)."
-        )
+        key = "S<sub>m</sub> = {sm} m<super>2</super> (ISO 15186-1:2000 Clause 8)."
     else:
         return ""
     return " " + t(key, language).format(
@@ -226,9 +223,7 @@ def render_iso15186_report(
                 col_widths = [12 * mm] + [22 * mm for _ in columns]
             return columns, caption, col_widths
         caption_key = (
-            "Octave-band {vh} [dB]"
-            if is_octave
-            else "One-third-octave {vh} [dB]"
+            "Octave-band {vh} [dB]" if is_octave else "One-third-octave {vh} [dB]"
         )
         caption = t(caption_key, language).format(vh=_SPEC["symbol"])
         if extra:
@@ -243,7 +238,9 @@ def render_iso15186_report(
         language,
     )
     return render_insulation_fiche(
-        result, rating, path,
+        result,
+        rating,
+        path,
         spec=spec,
         is_impact=False,
         curve_attr="r_i",
@@ -289,8 +286,7 @@ def _element_extras_sentence(
     n = int(getattr(result, "n", 1))
     if n > 1:
         note = t(
-            "DI,n,e is the per-unit value of N = {n} element units measured "
-            "together.",
+            "DI,n,e is the per-unit value of N = {n} element units measured together.",
             language,
         ).format(n=n)
         sentence = f"{sentence} {note}" if sentence else f" {note}"
@@ -357,17 +353,17 @@ def render_iso15186_element_report(
         # plus the qualification columns, so the Clause 8 i) content takes
         # precedence whenever it is supplied.
         columns: list[Column] = [(value_header, curve, 1), *extra]
-        caption = t(f"{band_set} {{vh}} [dB]", language).format(
-            vh=_DINE_SPEC["symbol"]
-        )
+        caption = t(f"{band_set} {{vh}} [dB]", language).format(vh=_DINE_SPEC["symbol"])
         return columns, caption, _even_widths(len(columns) + 1)
 
     spec = dict(_DINE_SPEC)
-    spec["statement"] = t(
-        _DINE_SPEC["statement"], language
-    ) + _element_extras_sentence(result, language)
+    spec["statement"] = t(_DINE_SPEC["statement"], language) + _element_extras_sentence(
+        result, language
+    )
     return render_insulation_fiche(
-        result, rating, path,
+        result,
+        rating,
+        path,
         spec=spec,
         is_impact=False,
         curve_attr="d_i_n_e",

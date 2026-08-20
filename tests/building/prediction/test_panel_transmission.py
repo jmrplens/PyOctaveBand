@@ -23,8 +23,25 @@ from phonometry.materials import miki
 
 # ISO 717-1 one-third-octave band centres, 100 Hz to 3150 Hz.
 BANDS = np.array(
-    [100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-     1000, 1250, 1600, 2000, 2500, 3150], dtype=float
+    [
+        100,
+        125,
+        160,
+        200,
+        250,
+        315,
+        400,
+        500,
+        630,
+        800,
+        1000,
+        1250,
+        1600,
+        2000,
+        2500,
+        3150,
+    ],
+    dtype=float,
 )
 
 
@@ -38,21 +55,15 @@ def test_mass_law_six_db_per_octave() -> None:
 
 
 def test_mass_law_six_db_per_mass_doubling() -> None:
-    light = building.mass_law_transmission_loss(
-        500.0, 20.0, incidence="normal"
-    )
-    heavy = building.mass_law_transmission_loss(
-        500.0, 40.0, incidence="normal"
-    )
+    light = building.mass_law_transmission_loss(500.0, 20.0, incidence="normal")
+    heavy = building.mass_law_transmission_loss(500.0, 40.0, incidence="normal")
     assert float(heavy - light) == pytest.approx(6.02, abs=0.01)
 
 
 def test_field_incidence_correction_values() -> None:
     assert building.field_incidence_correction("third") == 5.5
     assert building.field_incidence_correction("octave") == 4.0
-    normal = building.mass_law_transmission_loss(
-        500.0, 20.0, incidence="normal"
-    )
+    normal = building.mass_law_transmission_loss(500.0, 20.0, incidence="normal")
     field = building.mass_law_transmission_loss(
         500.0, 20.0, incidence="field", band="third"
     )
@@ -155,9 +166,7 @@ def test_double_wall_below_f0_is_total_mass_law() -> None:
     m1, m2, d = 12.16, 12.16, 0.1
     f0 = building.mass_spring_mass_resonance(m1, m2, d)
     fb = 0.5 * f0
-    dw = building.double_wall_transmission_loss(
-        [fb], m1, m2, d
-    ).transmission_loss[0]
+    dw = building.double_wall_transmission_loss([fb], m1, m2, d).transmission_loss[0]
     ml = building.mass_law_transmission_loss(fb, m1 + m2)
     assert float(dw) == pytest.approx(float(ml))
 
@@ -177,9 +186,7 @@ def test_double_wall_continuous_at_limiting_frequency() -> None:
 
 def test_double_wall_beats_single_leaf_above_resonance() -> None:
     m1, m2, d = 12.16, 12.16, 0.1
-    dw = building.double_wall_transmission_loss(
-        [500.0], m1, m2, d
-    ).transmission_loss[0]
+    dw = building.double_wall_transmission_loss([500.0], m1, m2, d).transmission_loss[0]
     single = building.mass_law_transmission_loss(500.0, m1 + m2)
     assert float(dw) > float(single) + 10.0
 
@@ -189,9 +196,7 @@ def test_double_wall_porous_fill_lowers_resonance() -> None:
     f0_air = building.mass_spring_mass_resonance(m1, m2, d)
     # Flow resistivity chosen so f/sigma stays within the Miki fit range at f0.
     medium = miki([f0_air], 7000.0)
-    f0_fill = building.mass_spring_mass_resonance(
-        m1, m2, d, cavity_medium=medium
-    )
+    f0_fill = building.mass_spring_mass_resonance(m1, m2, d, cavity_medium=medium)
     assert f0_fill < f0_air
 
 
@@ -199,19 +204,17 @@ def test_double_wall_degenerate_f0_above_fl_is_partitioned() -> None:
     # Very light leaves with a wide gap push f0 above f_l = c0/(2 pi d); the
     # transition band collapses but the masks must stay a strict partition
     # (no silent overwrite), giving finite, monotone-ish values everywhere.
-    m1 = m2 = 0.3          # kg/m2 (thin membranes)
-    d = 0.3                # 300 mm gap
+    m1 = m2 = 0.3  # kg/m2 (thin membranes)
+    d = 0.3  # 300 mm gap
     f0 = building.mass_spring_mass_resonance(m1, m2, d)
     f_l = 343.0 / (2.0 * math.pi * d)
-    assert f0 > f_l        # the degenerate regime
+    assert f0 > f_l  # the degenerate regime
     res = building.double_wall_transmission_loss(BANDS, m1, m2, d)
     assert np.all(np.isfinite(res.transmission_loss))
     # Below f0 it is still the combined-mass law; above f0 it is the +6 branch.
     lo = float(res.transmission_loss[BANDS <= f0][0])
     assert lo == pytest.approx(
-        float(
-            building.mass_law_transmission_loss(BANDS[BANDS <= f0][0], m1 + m2)
-        )
+        float(building.mass_law_transmission_loss(BANDS[BANDS <= f0][0], m1 + m2))
     )
 
 
@@ -286,7 +289,9 @@ P314_TL = np.array([6.4, 12.2, 18.1, 24.1, 30.1, 36.1, 42.1, 48.1, 27.0, 38.6])
 def _brick_wall() -> building.SoundReductionResult:
 
     return building.plateau_transmission_loss(
-        P311_BANDS, material="brick", thickness_mm=110.0,
+        P311_BANDS,
+        material="brick",
+        thickness_mm=110.0,
         air_density=NORTON_AIR_DENSITY,
     )
 
@@ -353,7 +358,10 @@ def test_plateau_construction_points() -> None:
     assert res.plateau_end is not None
     assert res.plateau_end / res.plateau_start == pytest.approx(4.5, rel=1e-12)
     mass_law = building.mass_law_transmission_loss(
-        res.plateau_start, 231.0, incidence="field", field_correction=5.0,
+        res.plateau_start,
+        231.0,
+        incidence="field",
+        field_correction=5.0,
         air_density=NORTON_AIR_DENSITY,
     )
     assert float(mass_law) == pytest.approx(37.0, abs=1e-9)
@@ -365,10 +373,16 @@ def test_plateau_degenerates_to_the_mass_law_below_point_a() -> None:
 
     low = np.array([20.0, 40.0])
     res = building.plateau_transmission_loss(
-        low, material="brick", thickness_mm=110.0, air_density=NORTON_AIR_DENSITY,
+        low,
+        material="brick",
+        thickness_mm=110.0,
+        air_density=NORTON_AIR_DENSITY,
     )
     reference = building.mass_law_transmission_loss(
-        low, 231.0, incidence="field", field_correction=5.0,
+        low,
+        231.0,
+        incidence="field",
+        field_correction=5.0,
         air_density=NORTON_AIR_DENSITY,
     )
     np.testing.assert_allclose(res.transmission_loss, reference, rtol=1e-12)
@@ -382,8 +396,11 @@ def test_plateau_explicit_panel_matches_the_table() -> None:
 
     by_table = _brick_wall()
     by_hand = building.plateau_transmission_loss(
-        P311_BANDS, mass_per_area=2.10 * 110.0, plateau_height=37.0,
-        frequency_ratio=4.5, air_density=NORTON_AIR_DENSITY,
+        P311_BANDS,
+        mass_per_area=2.10 * 110.0,
+        plateau_height=37.0,
+        frequency_ratio=4.5,
+        air_density=NORTON_AIR_DENSITY,
     )
     np.testing.assert_allclose(
         by_hand.transmission_loss, by_table.transmission_loss, rtol=1e-12
@@ -402,7 +419,9 @@ def test_plateau_construction_uses_every_column_of_the_named_row(
     thickness_mm = 10.0
     bands = np.array([31.5, 63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
     res = building.plateau_transmission_loss(
-        bands, material=material, thickness_mm=thickness_mm,
+        bands,
+        material=material,
+        thickness_mm=thickness_mm,
         air_density=NORTON_AIR_DENSITY,
     )
     assert res.plateau_height == height
@@ -410,8 +429,10 @@ def test_plateau_construction_uses_every_column_of_the_named_row(
     # Point A is where the field-incidence mass law of this row's surface
     # density reaches the plateau height, so the two must agree there.
     at_a = building.mass_law_transmission_loss(
-        np.array([res.plateau_start]), density_per_mm * thickness_mm,
-        incidence="field", field_correction=5.0,
+        np.array([res.plateau_start]),
+        density_per_mm * thickness_mm,
+        incidence="field",
+        field_correction=5.0,
         air_density=NORTON_AIR_DENSITY,
     )
     assert at_a[0] == pytest.approx(height, abs=1e-9)
@@ -421,8 +442,12 @@ def test_cremer_problem_314_printed_answers() -> None:
     # Field-incidence mass law below fc (Eq. 3.104) and Cremer's Eq. (3.110)
     # above it, against the printed "diffuse field" column of problem 3.14.
     res = building.single_panel_transmission_loss(
-        P314_BANDS, 750.0 * 0.020, critical_frequency=97.7 / 0.020,
-        loss_factor=1.5e-3, coincidence_model="cremer", field_correction=5.0,
+        P314_BANDS,
+        750.0 * 0.020,
+        critical_frequency=97.7 / 0.020,
+        loss_factor=1.5e-3,
+        coincidence_model="cremer",
+        field_correction=5.0,
         air_density=NORTON_AIR_DENSITY,
     )
     assert res.model == "cremer-single"
@@ -436,8 +461,11 @@ def test_cremer_is_floored_at_the_coincidence_frequency() -> None:
     # do worse, so no band may report tau > 1.
     fc = 2000.0
     res = building.single_panel_transmission_loss(
-        np.array([0.999 * fc, fc, 1.0005 * fc, 1.05 * fc]), 15.0,
-        critical_frequency=fc, loss_factor=0.01, coincidence_model="cremer",
+        np.array([0.999 * fc, fc, 1.0005 * fc, 1.05 * fc]),
+        15.0,
+        critical_frequency=fc,
+        loss_factor=0.01,
+        coincidence_model="cremer",
     )
     assert res.transmission_loss[1] == 0.0
     assert np.all(res.transmission_loss >= 0.0)
@@ -452,7 +480,10 @@ def test_cremer_rises_ten_db_per_octave_far_above_coincidence() -> None:
     fc = 500.0
     f = fc * np.array([64.0, 128.0])
     res = building.single_panel_transmission_loss(
-        f, 15.0, critical_frequency=fc, loss_factor=0.01,
+        f,
+        15.0,
+        critical_frequency=fc,
+        loss_factor=0.01,
         coincidence_model="cremer",
     )
     assert np.diff(res.transmission_loss)[0] == pytest.approx(9.0, abs=0.15)
@@ -466,10 +497,16 @@ def test_plateau_and_physical_model_agree_in_the_mass_law_region() -> None:
     mass = 2.47 * thickness_mm
     low = np.array([125.0, 250.0])
     quick = building.plateau_transmission_loss(
-        low, material="glass", thickness_mm=thickness_mm, field_correction=5.5,
+        low,
+        material="glass",
+        thickness_mm=thickness_mm,
+        field_correction=5.5,
     )
     physical = building.single_panel_transmission_loss(
-        low, mass, critical_frequency=fc, loss_factor=0.02,
+        low,
+        mass,
+        critical_frequency=fc,
+        loss_factor=0.02,
     )
     np.testing.assert_allclose(
         quick.transmission_loss, physical.transmission_loss, atol=0.3
@@ -511,8 +548,11 @@ def test_plateau_rejects_a_height_that_underflows_point_a() -> None:
 
     with pytest.raises(ValueError, match="sits below the mass law"):
         building.plateau_transmission_loss(
-            P311_BANDS, mass_per_area=231.0, plateau_height=1e-300,
-            frequency_ratio=4.5, field_correction=0.0,
+            P311_BANDS,
+            mass_per_area=231.0,
+            plateau_height=1e-300,
+            frequency_ratio=4.5,
+            field_correction=0.0,
         )
 
 
@@ -523,9 +563,7 @@ def test_plateau_rejects_bad_frequency_axis() -> None:
             [100.0, -1.0], material="brick", thickness_mm=110.0
         )
     with pytest.raises(ValueError, match="non-empty"):
-        building.plateau_transmission_loss(
-            [], material="brick", thickness_mm=110.0
-        )
+        building.plateau_transmission_loss([], material="brick", thickness_mm=110.0)
 
 
 def test_negative_field_correction_rejected() -> None:

@@ -206,17 +206,13 @@ class _WithSourceEmission:
     keeping the generator loop unchanged.
     """
 
-    def __init__(
-        self, result: Any, emission: ph.environment.SourceEmission
-    ) -> None:
+    def __init__(self, result: Any, emission: ph.environment.SourceEmission) -> None:
         self._result = result
         self._emission = emission
 
     def report(self, path: str, *, metadata: ReportMetadata | None = None) -> str:
         return str(
-            self._result.report(
-                path, metadata=metadata, source_emission=self._emission
-            )
+            self._result.report(path, metadata=metadata, source_emission=self._emission)
         )
 
 
@@ -233,12 +229,18 @@ def _outdoor_attenuation_example() -> tuple[object, ReportMetadata, str]:
     """
     freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
     lw = np.array([95, 100, 103, 105, 104, 101, 95, 88], dtype=float)
-    barrier = ph.environment.Barrier(
-        source_to_edge=105.0, edge_to_receiver=105.0
-    )
+    barrier = ph.environment.Barrier(source_to_edge=105.0, edge_to_receiver=105.0)
     result = ph.environment.outdoor_propagation_attenuation(
-        200.0, 4.0, 2.0, freqs, 1.0, 1.0, 1.0, barrier=barrier,
-        temperature=10.0, relative_humidity=70.0,
+        200.0,
+        4.0,
+        2.0,
+        freqs,
+        1.0,
+        1.0,
+        1.0,
+        barrier=barrier,
+        temperature=10.0,
+        relative_humidity=70.0,
     )
     emission = ph.environment.SourceEmission(sound_power_level=lw)
     metadata = ReportMetadata(
@@ -271,9 +273,7 @@ def _barrier_insertion_loss_example() -> tuple[object, ReportMetadata, str]:
     tests/environment/propagation/test_ground_barriers.py).
     """
     freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
-    result = ph.environment.barrier_insertion_loss(
-        freqs, 1.0, 50.0, 4.0, 100.0, 1.5
-    )
+    result = ph.environment.barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5)
     metadata = ReportMetadata(
         specimen="Roadside noise barrier, 4 m high",
         client="Example client",
@@ -310,14 +310,10 @@ def _rd1367_example() -> tuple[object, ReportMetadata, str]:
         ph.environment.NoisePhase(
             6.0, 50.0, kt=6.0, kf=3.0, label="Maquina ruidosa activa"
         ),
-        ph.environment.NoisePhase(
-            4.0, 48.0, kt=3.0, kf=3.0, label="Resto de fuentes"
-        ),
+        ph.environment.NoisePhase(4.0, 48.0, kt=3.0, kf=3.0, label="Resto de fuentes"),
     ]
     evening = [
-        ph.environment.NoisePhase(
-            2.0, 48.0, kt=3.0, kf=3.0, label="Resto de fuentes"
-        ),
+        ph.environment.NoisePhase(2.0, 48.0, kt=3.0, kf=3.0, label="Resto de fuentes"),
         ph.environment.NoisePhase(2.0, 0.0, label="Actividad cerrada"),
     ]
     result = ph.environment.assess_activity(

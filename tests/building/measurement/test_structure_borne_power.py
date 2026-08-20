@@ -26,15 +26,13 @@ V0, P0 = 1.0e-9, 1.0e-12
 def test_spatial_mean_is_energetic_average() -> None:
     levels = np.array([78.0, 80.0, 82.0, 79.0, 81.0, 80.0])
     expected = 10.0 * math.log10(np.mean(10.0 ** (0.1 * levels)))
-    assert building.spatial_mean_velocity_level(levels) == pytest.approx(
-        expected
-    )
+    assert building.spatial_mean_velocity_level(levels) == pytest.approx(expected)
 
 
 def test_spatial_mean_uniform_levels() -> None:
-    assert building.spatial_mean_velocity_level(
-        [75.0, 75.0, 75.0]
-    ) == pytest.approx(75.0)
+    assert building.spatial_mean_velocity_level([75.0, 75.0, 75.0]) == pytest.approx(
+        75.0
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -56,9 +54,7 @@ def test_loss_factor_matches_iso10848() -> None:
 # Power level (Formula 14) and the resonant-plate power balance
 # ---------------------------------------------------------------------------
 def test_power_level_hand_value() -> None:
-    lw = float(
-        building.structure_borne_power_level(80.0, 1000.0, 10.0, 1.0, 0.01)
-    )
+    lw = float(building.structure_borne_power_level(80.0, 1000.0, 10.0, 1.0, 0.01))
     assert lw == pytest.approx(47.982, abs=1e-3)
 
 
@@ -95,7 +91,10 @@ def test_power_level_rejects_bad_inputs() -> None:
 def test_reception_plate_from_reverberation_time() -> None:
     f = np.array([500.0, 1000.0, 2000.0])
     res = building.reception_plate_power(
-        np.array([80.0, 82.0, 79.0]), f, mass_per_area=25.0, area=1.2,
+        np.array([80.0, 82.0, 79.0]),
+        f,
+        mass_per_area=25.0,
+        area=1.2,
         reverberation_time=0.4,
     )
     assert isinstance(res, building.StructureBornePowerResult)
@@ -120,8 +119,11 @@ def test_reception_plate_explicit_loss_factor_broadcasts() -> None:
 
 def test_reception_plate_total_level() -> None:
     res = building.reception_plate_power(
-        np.array([80.0, 82.0, 79.0]), np.array([500.0, 1000.0, 2000.0]),
-        mass_per_area=25.0, area=1.2, loss_factor=0.01,
+        np.array([80.0, 82.0, 79.0]),
+        np.array([500.0, 1000.0, 2000.0]),
+        mass_per_area=25.0,
+        area=1.2,
+        loss_factor=0.01,
     )
     expected = 10.0 * math.log10(np.sum(10.0 ** (0.1 * res.power_level)))
     assert res.total_level == pytest.approx(expected)
@@ -136,8 +138,11 @@ def test_reception_plate_velocity_shape_mismatch() -> None:
     # a non-broadcastable velocity_level vs frequency length raises
     with pytest.raises(ValueError):
         building.reception_plate_power(
-            [80.0, 82.0, 79.0], [500.0, 1000.0, 2000.0, 4000.0],
-            mass_per_area=25.0, area=1.2, loss_factor=0.01,
+            [80.0, 82.0, 79.0],
+            [500.0, 1000.0, 2000.0, 4000.0],
+            mass_per_area=25.0,
+            area=1.2,
+            loss_factor=0.01,
         )
 
 
@@ -147,8 +152,11 @@ def test_plot_returns_axes() -> None:
 
     matplotlib.use("Agg")
     res = building.reception_plate_power(
-        np.array([80.0, 82.0, 79.0]), np.array([500.0, 1000.0, 2000.0]),
-        mass_per_area=25.0, area=1.2, loss_factor=0.01,
+        np.array([80.0, 82.0, 79.0]),
+        np.array([500.0, 1000.0, 2000.0]),
+        mass_per_area=25.0,
+        area=1.2,
+        loss_factor=0.01,
     )
     assert res.plot() is not None
 
@@ -156,6 +164,7 @@ def test_plot_returns_axes() -> None:
 # ---------------------------------------------------------------------------
 # EN 15657 source-quantity conversion chain (Formulae 15/17/18/19)
 # ---------------------------------------------------------------------------
+
 
 def test_blocked_force_level_formula_15() -> None:
     """L_Fb,eq = L_Ws,low - 10 lg(Re{Y}/Y0), dB re 1e-6 N."""
@@ -174,9 +183,7 @@ def test_characteristic_reception_plate_power_formula_17() -> None:
 
     lfb = building.equivalent_blocked_force_level(61.7, 5.34e-6)
     lwsn = building.characteristic_reception_plate_power(lfb)
-    assert float(lwsn) == pytest.approx(
-        61.7 + 10.0 * math.log10(5.0e-6 / 5.34e-6)
-    )
+    assert float(lwsn) == pytest.approx(61.7 + 10.0 * math.log10(5.0e-6 / 5.34e-6))
     with pytest.raises(ValueError, match="characteristic_mobility"):
         building.characteristic_reception_plate_power(
             100.0, characteristic_mobility=0.0
@@ -187,7 +194,6 @@ def test_conversion_chain_reproduces_annex_i8_wall() -> None:
     """(15)+(17) then the Annex I mobility correction reproduce Table I.8."""
     import reference_data as ref
 
-
     lwsn = building.characteristic_reception_plate_power(
         building.equivalent_blocked_force_level(
             ref.EN12354_5_I8_WALL_LWS, ref.EN12354_5_I8_PLATE_MOBILITY
@@ -197,7 +203,8 @@ def test_conversion_chain_reproduces_annex_i8_wall() -> None:
         lwsn, ref.EN12354_5_I8_Y_WALL
     )
     np.testing.assert_allclose(
-        installed, ref.EN12354_5_I8_WALL_INSTALLED,
+        installed,
+        ref.EN12354_5_I8_WALL_INSTALLED,
         atol=ref.EN12354_5_ANNEX_I_TOL,
     )
 
@@ -227,12 +234,12 @@ def test_formulas_15_18_19_are_mutually_consistent() -> None:
     ideal low- and high-mobility plates, then recover the source mobility.
     """
 
-    y_source = 2.5e-4          # true |Y_S|, m/(N s)
-    v_free = 3.2e-6            # true free velocity, m/s
+    y_source = 2.5e-4  # true |Y_S|, m/(N s)
+    v_free = 3.2e-6  # true free velocity, m/s
     f_blocked = v_free / y_source
-    y_low = 5.0e-6             # low-mobility plate: F ~ F_b, P = F_b**2 Re{Y}
+    y_low = 5.0e-6  # low-mobility plate: F ~ F_b, P = F_b**2 Re{Y}
     lw_low = 10.0 * math.log10(f_blocked**2 * y_low / 1e-12)
-    y_high = 1.0e-2            # high-mobility plate: v ~ v_f, P = v_f**2 / Y
+    y_high = 1.0e-2  # high-mobility plate: v ~ v_f, P = v_f**2 / Y
     lw_high = 10.0 * math.log10(v_free**2 / y_high / 1e-12)
     lfb = building.equivalent_blocked_force_level(lw_low, y_low)
     lvf = building.equivalent_free_velocity_level(lw_high, y_high)
@@ -264,19 +271,15 @@ def test_iso9611_mean_free_velocity_level() -> None:
     )
 
     assert FREE_VELOCITY_REFERENCE == ref.ISO9611_FREE_VELOCITY_REFERENCE
-    assert building.mean_free_velocity_level(
-        ref.ISO9611_MEAN_LEVELS
-    ) == pytest.approx(ref.ISO9611_MEAN_EXPECTED)
-    # Uniform levels are a fixed point of the energy mean.
-    assert building.mean_free_velocity_level([66.0, 66.0]) == pytest.approx(
-        66.0
+    assert building.mean_free_velocity_level(ref.ISO9611_MEAN_LEVELS) == pytest.approx(
+        ref.ISO9611_MEAN_EXPECTED
     )
+    # Uniform levels are a fixed point of the energy mean.
+    assert building.mean_free_velocity_level([66.0, 66.0]) == pytest.approx(66.0)
 
 
 def test_power_level_rejects_nonpositive_loss_factor() -> None:
     with pytest.raises(ValueError, match="loss_factor"):
         building.structure_borne_power_level(80.0, 1000.0, 10.0, 1.0, 0.0)
     with pytest.raises(ValueError, match="loss_factor"):
-        building.structure_borne_power_level(
-            80.0, 1000.0, 10.0, 1.0, [0.01, -0.01]
-        )
+        building.structure_borne_power_level(80.0, 1000.0, 10.0, 1.0, [0.01, -0.01])

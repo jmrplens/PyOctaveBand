@@ -39,21 +39,21 @@ from __future__ import annotations
 # the running sum of the sizes above it, starting at 0.
 # ---------------------------------------------------------------------------
 TECH3285_BEXT_FIELDS: tuple[tuple[str, int, int], ...] = (
-    ("Description", 0, 256),           # CHAR[256], p. 9
-    ("Originator", 256, 32),           # CHAR[32], p. 9
+    ("Description", 0, 256),  # CHAR[256], p. 9
+    ("Originator", 256, 32),  # CHAR[32], p. 9
     ("OriginatorReference", 288, 32),  # CHAR[32], p. 9
-    ("OriginationDate", 320, 10),      # CHAR[10], p. 9
-    ("OriginationTime", 330, 8),       # CHAR[8], p. 10
-    ("TimeReferenceLow", 338, 4),      # DWORD, p. 10
-    ("TimeReferenceHigh", 342, 4),     # DWORD, p. 10
-    ("Version", 346, 2),               # WORD, p. 10
-    ("UMID", 348, 64),                 # BYTE[64] (UMID_0..UMID_63), p. 10
-    ("LoudnessValue", 412, 2),         # WORD, p. 10
-    ("LoudnessRange", 414, 2),         # WORD, p. 10
-    ("MaxTruePeakLevel", 416, 2),      # WORD, p. 10
+    ("OriginationDate", 320, 10),  # CHAR[10], p. 9
+    ("OriginationTime", 330, 8),  # CHAR[8], p. 10
+    ("TimeReferenceLow", 338, 4),  # DWORD, p. 10
+    ("TimeReferenceHigh", 342, 4),  # DWORD, p. 10
+    ("Version", 346, 2),  # WORD, p. 10
+    ("UMID", 348, 64),  # BYTE[64] (UMID_0..UMID_63), p. 10
+    ("LoudnessValue", 412, 2),  # WORD, p. 10
+    ("LoudnessRange", 414, 2),  # WORD, p. 10
+    ("MaxTruePeakLevel", 416, 2),  # WORD, p. 10
     ("MaxMomentaryLoudness", 418, 2),  # WORD, p. 10
     ("MaxShortTermLoudness", 420, 2),  # WORD, p. 10
-    ("Reserved", 422, 180),            # BYTE[180], zeros in v1/v2, pp. 10-11
+    ("Reserved", 422, 180),  # BYTE[180], zeros in v1/v2, pp. 10-11
 )
 
 #: Size of the fixed part (running sum of the sizes above); the
@@ -64,11 +64,11 @@ TECH3285_BEXT_FIXED_SIZE = 602
 #: guard test recomputes the tail of the struct from: Version 1 took "64 of
 #: the 254 reserved bytes" of Version 0 for the UMID, and Version 2 took
 #: "10 of the 190 reserved bytes" of Version 1 for the loudness fields.
-TECH3285_V0_RESERVED = 254    # p. 8 ("64 of the 254 reserved bytes")
-TECH3285_UMID_SIZE = 64       # p. 8 / p. 11 (64 bytes, SMPTE 330M)
-TECH3285_V1_RESERVED = 190    # p. 8 ("10 of the 190 reserved bytes")
+TECH3285_V0_RESERVED = 254  # p. 8 ("64 of the 254 reserved bytes")
+TECH3285_UMID_SIZE = 64  # p. 8 / p. 11 (64 bytes, SMPTE 330M)
+TECH3285_V1_RESERVED = 190  # p. 8 ("10 of the 190 reserved bytes")
 TECH3285_LOUDNESS_BYTES = 10  # p. 8 (five WORDs)
-TECH3285_V2_RESERVED = 180    # pp. 10-11 (Reserved[180], zeros)
+TECH3285_V2_RESERVED = 180  # pp. 10-11 (Reserved[180], zeros)
 
 #: Version field values (p. 11): "For Version 1 it shall be set to 0001h and
 #: for Version 2 it shall be set to 0002h."
@@ -87,9 +87,9 @@ TECH3285_LOUDNESS_EXAMPLES: tuple[tuple[float, int, int], ...] = (
     (-22.644, -2264, 0xF728),  # p. 12 (negative numbers table)
     (-22.645, -2265, 0xF727),  # p. 12
     (-22.646, -2265, 0xF727),  # p. 12
-    (12.764, 1276, 0x04FC),    # p. 13 (positive numbers table)
-    (12.765, 1277, 0x04FD),    # p. 13
-    (12.766, 1277, 0x04FD),    # p. 13
+    (12.764, 1276, 0x04FC),  # p. 13 (positive numbers table)
+    (12.765, 1277, 0x04FD),  # p. 13
+    (12.766, 1277, 0x04FD),  # p. 13
 )
 
 #: The unset sentinel (p. 13): "If any of the loudness parameters are not
@@ -140,13 +140,13 @@ BS2088_SIZE_SENTINEL = 0xFFFFFFFF
 #: with EBU Tech 3306's RF64, which carries <fact> size information there
 #: (4.2, p. 11).
 BS2088_DS64_FIELDS: tuple[tuple[str, int, int], ...] = (
-    ("bw64SizeLow", 0, 4),    # DWORD, p. 9
-    ("bw64SizeHigh", 4, 4),   # DWORD, p. 9
-    ("dataSizeLow", 8, 4),    # DWORD, p. 9
+    ("bw64SizeLow", 0, 4),  # DWORD, p. 9
+    ("bw64SizeHigh", 4, 4),  # DWORD, p. 9
+    ("dataSizeLow", 8, 4),  # DWORD, p. 9
     ("dataSizeHigh", 12, 4),  # DWORD, p. 10
-    ("dummyLow", 16, 4),      # DWORD, p. 10
-    ("dummyHigh", 20, 4),     # DWORD, p. 10
-    ("tableLength", 24, 4),   # DWORD, p. 10
+    ("dummyLow", 16, 4),  # DWORD, p. 10
+    ("dummyHigh", 20, 4),  # DWORD, p. 10
+    ("tableLength", 24, 4),  # DWORD, p. 10
 )
 
 #: Minimum <ds64> payload: the seven leading DWORDs, before the optional

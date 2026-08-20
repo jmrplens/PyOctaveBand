@@ -157,9 +157,7 @@ def render_markdown() -> tuple[str, int, int]:
     passed = sum(1 for _, o in results if o.passed)
     total = len(results)
 
-    filters_ok = all(
-        o.passed for c, o in results if c.domain == "Filters & weightings"
-    )
+    filters_ok = all(o.passed for c, o in results if c.domain == "Filters & weightings")
     headline_emoji = "&#9989;" if passed == total else "&#10060;"
 
     out: list[str] = []
@@ -200,7 +198,9 @@ def render_markdown() -> tuple[str, int, int]:
             f"({passed_d}/{total_d})</summary>"
         )
         out.append("")
-        out.append("| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |")
+        out.append(
+            "| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |"
+        )
         out.append("|:---|:---|:---|:---|:---|:---:|")
         for chk, outcome in rows:
             out.append(

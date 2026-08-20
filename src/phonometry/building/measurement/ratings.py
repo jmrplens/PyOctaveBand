@@ -78,15 +78,44 @@ if TYPE_CHECKING:
 
 #: One-third-octave reference values, 100 Hz to 3150 Hz (Table 3).
 _REF_THIRD_OCTAVE: tuple[int, ...] = (
-    33, 36, 39, 42, 45, 48, 51, 52, 53, 54, 55, 56, 56, 56, 56, 56,
+    33,
+    36,
+    39,
+    42,
+    45,
+    48,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    56,
+    56,
+    56,
+    56,
 )
 #: Octave reference values, 125 Hz to 2000 Hz (Table 3).
 _REF_OCTAVE: tuple[int, ...] = (36, 45, 52, 55, 56)
 
 #: One-third-octave band centre frequencies, 100 Hz to 3150 Hz (16 bands).
 _FREQ_THIRD_OCTAVE: tuple[float, ...] = (
-    100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0,
-    630.0, 800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0,
+    100.0,
+    125.0,
+    160.0,
+    200.0,
+    250.0,
+    315.0,
+    400.0,
+    500.0,
+    630.0,
+    800.0,
+    1000.0,
+    1250.0,
+    1600.0,
+    2000.0,
+    2500.0,
+    3150.0,
 )
 #: Octave band centre frequencies, 125 Hz to 2000 Hz (5 bands).
 _FREQ_OCTAVE: tuple[float, ...] = (125.0, 250.0, 500.0, 1000.0, 2000.0)
@@ -110,7 +139,22 @@ _SHIFT_TOLERANCE = 1e-6
 
 #: One-third-octave impact reference values, 100 Hz to 3150 Hz (Table 3).
 _REF_IMPACT_THIRD_OCTAVE: tuple[int, ...] = (
-    62, 62, 62, 62, 62, 62, 61, 60, 59, 58, 57, 54, 51, 48, 45, 42,
+    62,
+    62,
+    62,
+    62,
+    62,
+    62,
+    61,
+    60,
+    59,
+    58,
+    57,
+    54,
+    51,
+    48,
+    45,
+    42,
 )
 #: Octave impact reference values, 125 Hz to 2000 Hz (Table 3).
 _REF_IMPACT_OCTAVE: tuple[int, ...] = (67, 67, 65, 62, 49)
@@ -126,11 +170,41 @@ _CI_THIRD_OCTAVE_BANDS = 15
 
 #: Spectrum No. 1 (pink noise, for C), one-third octave 100-3150 Hz.
 _SPECTRUM1_THIRD: tuple[int, ...] = (
-    -29, -26, -23, -21, -19, -17, -15, -13, -12, -11, -10, -9, -9, -9, -9, -9,
+    -29,
+    -26,
+    -23,
+    -21,
+    -19,
+    -17,
+    -15,
+    -13,
+    -12,
+    -11,
+    -10,
+    -9,
+    -9,
+    -9,
+    -9,
+    -9,
 )
 #: Spectrum No. 2 (urban traffic, for Ctr), one-third octave 100-3150 Hz.
 _SPECTRUM2_THIRD: tuple[int, ...] = (
-    -20, -20, -18, -16, -15, -14, -13, -12, -11, -9, -8, -9, -10, -11, -13, -15,
+    -20,
+    -20,
+    -18,
+    -16,
+    -15,
+    -14,
+    -13,
+    -12,
+    -11,
+    -9,
+    -8,
+    -9,
+    -10,
+    -11,
+    -13,
+    -15,
 )
 #: Spectrum No. 1 (for C), octave 125-2000 Hz.
 _SPECTRUM1_OCTAVE: tuple[int, ...] = (-21, -14, -8, -5, -4)
@@ -145,38 +219,94 @@ _SPECTRUM2_OCTAVE: tuple[int, ...] = (-14, -10, -7, -4, -6)
 
 #: One-third-octave band centre frequencies, 50 Hz to 5000 Hz (21 bands).
 _FREQ_50_5000: tuple[float, ...] = (
-    50.0, 63.0, 80.0, *_FREQ_THIRD_OCTAVE, 4000.0, 5000.0,
+    50.0,
+    63.0,
+    80.0,
+    *_FREQ_THIRD_OCTAVE,
+    4000.0,
+    5000.0,
 )
 #: Spectrum No. 1 column for C50-3150 (19 bands, 50-3150 Hz).
 _SPECTRUM1_50_3150: tuple[int, ...] = (
-    -40, -36, -33, -29, -26, -23, -21, -19, -17, -15,
-    -13, -12, -11, -10, -9, -9, -9, -9, -9,
+    -40,
+    -36,
+    -33,
+    -29,
+    -26,
+    -23,
+    -21,
+    -19,
+    -17,
+    -15,
+    -13,
+    -12,
+    -11,
+    -10,
+    -9,
+    -9,
+    -9,
+    -9,
+    -9,
 )
 #: Spectrum No. 1 column for C50-5000 and C100-5000 (21 bands, 50-5000 Hz;
 #: the 100-5000 Hz range uses the same column restricted to its bands).
 _SPECTRUM1_50_5000: tuple[int, ...] = (
-    -41, -37, -34, -30, -27, -24, -22, -20, -18, -16, -14,
-    -13, -12, -11, -10, -10, -10, -10, -10, -10, -10,
+    -41,
+    -37,
+    -34,
+    -30,
+    -27,
+    -24,
+    -22,
+    -20,
+    -18,
+    -16,
+    -14,
+    -13,
+    -12,
+    -11,
+    -10,
+    -10,
+    -10,
+    -10,
+    -10,
+    -10,
+    -10,
 )
 #: Spectrum No. 2 column for Ctr in any enlarged range (21 bands, 50-5000 Hz).
 _SPECTRUM2_50_5000: tuple[int, ...] = (
-    -25, -23, -21, -20, -20, -18, -16, -15, -14, -13, -12,
-    -11, -9, -8, -9, -10, -11, -13, -15, -16, -18,
+    -25,
+    -23,
+    -21,
+    -20,
+    -20,
+    -18,
+    -16,
+    -15,
+    -14,
+    -13,
+    -12,
+    -11,
+    -9,
+    -8,
+    -9,
+    -10,
+    -11,
+    -13,
+    -15,
+    -16,
+    -18,
 )
 
 #: The enlarged one-third-octave adaptation ranges of ISO 717-1:2020 Annex B
 #: (airborne): descriptor suffix -> (band frequencies, spectrum No. 1 levels,
 #: spectrum No. 2 levels).
-_EXTENDED_RANGES: dict[str, tuple[
-    tuple[float, ...], tuple[int, ...], tuple[int, ...]
-]] = {
-    "50_3150": (
-        _FREQ_50_5000[:19], _SPECTRUM1_50_3150, _SPECTRUM2_50_5000[:19]
-    ),
+_EXTENDED_RANGES: dict[
+    str, tuple[tuple[float, ...], tuple[int, ...], tuple[int, ...]]
+] = {
+    "50_3150": (_FREQ_50_5000[:19], _SPECTRUM1_50_3150, _SPECTRUM2_50_5000[:19]),
     "50_5000": (_FREQ_50_5000, _SPECTRUM1_50_5000, _SPECTRUM2_50_5000),
-    "100_5000": (
-        _FREQ_50_5000[3:], _SPECTRUM1_50_5000[3:], _SPECTRUM2_50_5000[3:]
-    ),
+    "100_5000": (_FREQ_50_5000[3:], _SPECTRUM1_50_5000[3:], _SPECTRUM2_50_5000[3:]),
 }
 
 #: The enlarged CI summation range of ISO 717-2:2020 A.2.1 NOTE: 50-2500 Hz
@@ -222,7 +352,9 @@ class WeightedRatingResult:
     shifted_reference: np.ndarray | None = None
     quantity: str = "airborne"
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the measured curve vs the shifted reference (ISO 717-1).
 
         Unfavourable deviations (reference above measurement) are shaded and
@@ -280,8 +412,13 @@ class WeightedRatingResult:
             the embedded figure (``pip install phonometry[plot]``).
         """
         return _render_iso717(
-            self, path, metadata=metadata, engine=engine, verbose=verbose,
-            language=language, symbol=symbol,
+            self,
+            path,
+            metadata=metadata,
+            engine=engine,
+            verbose=verbose,
+            language=language,
+            symbol=symbol,
         )
 
 
@@ -317,7 +454,9 @@ class ImpactRatingResult:
     shifted_reference: np.ndarray | None = None
     quantity: str = "impact"
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the measured curve vs the shifted reference (ISO 717-2).
 
         Unfavourable deviations (measurement above the reference, the sign
@@ -374,8 +513,13 @@ class ImpactRatingResult:
             the embedded figure (``pip install phonometry[plot]``).
         """
         return _render_iso717(
-            self, path, metadata=metadata, engine=engine, verbose=verbose,
-            language=language, symbol=symbol,
+            self,
+            path,
+            metadata=metadata,
+            engine=engine,
+            verbose=verbose,
+            language=language,
+            symbol=symbol,
         )
 
 
@@ -416,7 +560,11 @@ def _render_iso717(
     from ..._report.iso717 import render_iso717_report
 
     return render_iso717_report(
-        result, path, metadata=metadata, verbose=verbose, language=language,
+        result,
+        path,
+        metadata=metadata,
+        verbose=verbose,
+        language=language,
         symbol=symbol,
     )
 
@@ -455,8 +603,7 @@ def _resolve_band_set(
     if bands == "third-octave" or (bands is None and n == 16):
         if n != 16:
             raise ValueError(
-                "One-third-octave rating needs 16 bands (100-3150 Hz), "
-                f"got {n}."
+                f"One-third-octave rating needs 16 bands (100-3150 Hz), got {n}."
             )
         return (
             _REF_THIRD_OCTAVE,
@@ -467,9 +614,7 @@ def _resolve_band_set(
         )
     if bands == "octave" or (bands is None and n == 5):
         if n != 5:
-            raise ValueError(
-                "Octave rating needs 5 bands (125-2000 Hz), " f"got {n}."
-            )
+            raise ValueError(f"Octave rating needs 5 bands (125-2000 Hz), got {n}.")
         return (
             _REF_OCTAVE,
             _MAX_UNFAVOURABLE_OCTAVE,
@@ -600,8 +745,7 @@ def _resolve_impact_band_set(
     if bands == "third-octave" or (bands is None and n == 16):
         if n != 16:
             raise ValueError(
-                "One-third-octave impact rating needs 16 bands "
-                f"(100-3150 Hz), got {n}."
+                f"One-third-octave impact rating needs 16 bands (100-3150 Hz), got {n}."
             )
         return (
             _REF_IMPACT_THIRD_OCTAVE,
@@ -613,8 +757,7 @@ def _resolve_impact_band_set(
     if bands == "octave" or (bands is None and n == 5):
         if n != 5:
             raise ValueError(
-                "Octave impact rating needs 5 bands (125-2000 Hz), "
-                f"got {n}."
+                f"Octave impact rating needs 5 bands (125-2000 Hz), got {n}."
             )
         return (
             _REF_IMPACT_OCTAVE,
@@ -686,8 +829,8 @@ def weighted_impact_rating(
     if not np.all(np.isfinite(data)):
         raise ValueError(_VALUES_FINITE_MSG)
 
-    reference, limit, index_500, octave_offset, ci_bands = (
-        _resolve_impact_band_set(int(data.size), bands)
+    reference, limit, index_500, octave_offset, ci_bands = _resolve_impact_band_set(
+        int(data.size), bands
     )
     measured = _round_half_up_tenths(data)
     ref = np.asarray(reference, dtype=np.float64)
@@ -714,8 +857,22 @@ def weighted_impact_rating(
 #: the heavyweight reference floor, 16 one-third-octave bands 100 Hz to 3150 Hz,
 #: in dB. Its weighted rating is ``Ln,r,0,w = 78 dB`` (Clause 5.2).
 _IMPACT_REFERENCE_FLOOR = (
-    67.0, 67.5, 68.0, 68.5, 69.0, 69.5, 70.0, 70.5,
-    71.0, 71.5, 72.0, 72.0, 72.0, 72.0, 72.0, 72.0,
+    67.0,
+    67.5,
+    68.0,
+    68.5,
+    69.0,
+    69.5,
+    70.0,
+    70.5,
+    71.0,
+    71.5,
+    72.0,
+    72.0,
+    72.0,
+    72.0,
+    72.0,
+    72.0,
 )
 _IMPACT_REFERENCE_FLOOR_RATING = 78  # Ln,r,0,w (Table 4 / Clause 5.2)
 #: Spectrum adaptation term of the bare reference floor (ISO 717-2:2020
@@ -837,7 +994,9 @@ class ExtendedWeightedRatingResult:
     band_centers: np.ndarray | None = None
     measured: np.ndarray | None = None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the enlarged-range curve vs the shifted reference (Annex B).
 
         The measured curve is drawn over the full enlarged range, the
@@ -884,7 +1043,9 @@ class ExtendedImpactRatingResult:
     band_centers: np.ndarray | None = None
     measured: np.ndarray | None = None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the enlarged-range curve vs the shifted reference (ISO 717-2).
 
         The measured curve is drawn over the full enlarged range, the
@@ -945,8 +1106,7 @@ def _validated_extended_input(
         freqs = np.asarray(frequencies, dtype=np.float64)
         if freqs.shape != data.shape:
             raise ValueError(
-                "'frequencies' must have one value per band of "
-                "'values_by_band'."
+                "'frequencies' must have one value per band of 'values_by_band'."
             )
         if not np.all(np.isfinite(freqs)) or np.any(freqs <= 0.0):
             raise ValueError("'frequencies' must contain positive values.")
@@ -991,9 +1151,7 @@ def weighted_rating_extended(
     :raises ValueError: If the input is not one-dimensional and finite, the
         band counts differ, or the core bands are missing.
     """
-    measured, freqs, core_idx = _validated_extended_input(
-        values_by_band, frequencies
-    )
+    measured, freqs, core_idx = _validated_extended_input(values_by_band, frequencies)
     core_measured = measured[core_idx]
     ref = np.asarray(_REF_THIRD_OCTAVE, dtype=np.float64)
     step = 0.1 if one_decimal else 1.0
@@ -1013,7 +1171,10 @@ def weighted_rating_extended(
             extended[f"c_{suffix}"] = None
             extended[f"ctr_{suffix}"] = None
             continue
-        for name, spectrum in ((f"c_{suffix}", spectrum1), (f"ctr_{suffix}", spectrum2)):
+        for name, spectrum in (
+            (f"c_{suffix}", spectrum1),
+            (f"ctr_{suffix}", spectrum2),
+        ):
             term = _term(measured[idx], spectrum)
             extended[name] = term if one_decimal else int(term)
 
@@ -1062,9 +1223,7 @@ def weighted_impact_rating_extended(
     :raises ValueError: If the input is not one-dimensional and finite, the
         band counts differ, or the core bands are missing.
     """
-    measured, freqs, core_idx = _validated_extended_input(
-        values_by_band, frequencies
-    )
+    measured, freqs, core_idx = _validated_extended_input(values_by_band, frequencies)
     core_measured = measured[core_idx]
     ref = np.asarray(_REF_IMPACT_THIRD_OCTAVE, dtype=np.float64)
     step = 0.1 if one_decimal else 1.0

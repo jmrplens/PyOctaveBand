@@ -17,8 +17,24 @@ import reference_data as ref
 from phonometry import building, vibration
 
 THIRD_OCTAVE = [
-    100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-    1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000,
+    100,
+    125,
+    160,
+    200,
+    250,
+    315,
+    400,
+    500,
+    630,
+    800,
+    1000,
+    1250,
+    1600,
+    2000,
+    2500,
+    3150,
+    4000,
+    5000,
 ]
 
 
@@ -99,7 +115,10 @@ def test_full_formula_uses_absorption_length() -> None:
     """With Ts + frequency the full Formula (13) differs from the simplified."""
     dv = np.full(len(THIRD_OCTAVE), 8.0)
     full = building.vibration_reduction_index(
-        dv, 2.0, 10.0, 12.0,
+        dv,
+        2.0,
+        10.0,
+        12.0,
         frequency=THIRD_OCTAVE,
         structural_reverberation_time_i=0.4,
         structural_reverberation_time_j=0.5,
@@ -120,9 +139,7 @@ def test_full_formula_uses_absorption_length() -> None:
 def test_single_number_is_mean_over_200_1250() -> None:
     """K̄ij is the arithmetic mean of Kij over 200-1250 Hz (Annex A)."""
     k = np.arange(len(THIRD_OCTAVE), dtype=float)  # distinct per band
-    res = building.vibration_reduction_index(
-        k, 2.0, 4.0, 4.0, frequency=THIRD_OCTAVE
-    )
+    res = building.vibration_reduction_index(k, 2.0, 4.0, 4.0, frequency=THIRD_OCTAVE)
     freqs = np.asarray(THIRD_OCTAVE, dtype=float)
     mask = (freqs >= 200.0) & (freqs <= 1250.0)
     expected = float(np.mean(res.k_ij[mask]))
@@ -139,21 +156,17 @@ def test_single_number_none_without_frequency() -> None:
 def test_octave_band_energy_sum() -> None:
     """Kij,oct = −10 lg[(1/3) Σ 10^(−Kij/10)] over each triple."""
     dv = np.full(len(THIRD_OCTAVE), 6.0)
-    res = building.vibration_reduction_index(
-        dv, 2.0, 4.0, 4.0, frequency=THIRD_OCTAVE
-    )
-    oct = res.octave_bands()
-    assert oct.k_ij.size == 6
+    res = building.vibration_reduction_index(dv, 2.0, 4.0, 4.0, frequency=THIRD_OCTAVE)
+    octaves = res.octave_bands()
+    assert octaves.k_ij.size == 6
     first = res.k_ij[:3]
     expected = -10.0 * np.log10(np.mean(10.0 ** (-first / 10.0)))
-    assert oct.k_ij[0] == pytest.approx(expected)
-    assert list(oct.frequencies.astype(int)) == [125, 250, 500, 1000, 2000, 4000]
+    assert octaves.k_ij[0] == pytest.approx(expected)
+    assert list(octaves.frequencies.astype(int)) == [125, 250, 500, 1000, 2000, 4000]
 
 
 def test_octave_bands_requires_multiple_of_three() -> None:
-    res = building.vibration_reduction_index(
-        [1.0, 2.0, 3.0, 4.0], 2.0, 4.0, 4.0
-    )
+    res = building.vibration_reduction_index([1.0, 2.0, 3.0, 4.0], 2.0, 4.0, 4.0)
     with pytest.raises(ValueError, match="multiple of three"):
         res.octave_bands()
 
@@ -167,9 +180,7 @@ def test_octave_single_number_averages_125_to_1000() -> None:
     125-1000 Hz average.
     """
     k = np.arange(len(THIRD_OCTAVE), dtype=float)  # 1 dB per third band
-    res = building.vibration_reduction_index(
-        k, 2.0, 4.0, 4.0, frequency=THIRD_OCTAVE
-    )
+    res = building.vibration_reduction_index(k, 2.0, 4.0, 4.0, frequency=THIRD_OCTAVE)
     oct_res = res.octave_bands()
     assert oct_res.frequencies is not None
     freqs = oct_res.frequencies
@@ -214,8 +225,12 @@ def test_modal_overlap_brackets_and_excludes_bands() -> None:
 
 def test_modal_overlap_all_bracketed_gives_no_single_number() -> None:
     res = building.vibration_reduction_index(
-        np.zeros(len(THIRD_OCTAVE)), 2.0, 4.0, 4.0,
-        frequency=THIRD_OCTAVE, modal_overlap=np.full(len(THIRD_OCTAVE), 0.1),
+        np.zeros(len(THIRD_OCTAVE)),
+        2.0,
+        4.0,
+        4.0,
+        frequency=THIRD_OCTAVE,
+        modal_overlap=np.full(len(THIRD_OCTAVE), 0.1),
     )
     assert res.single_number is None
     assert res.bracketed is not None
@@ -227,8 +242,12 @@ def test_modal_overlap_propagates_to_octave_bands() -> None:
     m = np.full(len(THIRD_OCTAVE), 1.0)
     m[4] = 0.2  # 250 Hz third -> 250 Hz octave bracketed
     res = building.vibration_reduction_index(
-        np.zeros(len(THIRD_OCTAVE)), 2.0, 4.0, 4.0,
-        frequency=THIRD_OCTAVE, modal_overlap=m,
+        np.zeros(len(THIRD_OCTAVE)),
+        2.0,
+        4.0,
+        4.0,
+        frequency=THIRD_OCTAVE,
+        modal_overlap=m,
     )
     oct_res = res.octave_bands()
     assert oct_res.bracketed is not None
@@ -236,9 +255,7 @@ def test_modal_overlap_propagates_to_octave_bands() -> None:
     # 250 Hz octave excluded: mean over 125, 500 and 1000 Hz only.
     assert oct_res.frequencies is not None
     keep = np.isin(oct_res.frequencies, [125.0, 500.0, 1000.0])
-    assert oct_res.single_number == pytest.approx(
-        float(np.mean(oct_res.k_ij[keep]))
-    )
+    assert oct_res.single_number == pytest.approx(float(np.mean(oct_res.k_ij[keep])))
 
 
 def test_modal_overlap_rejects_nonpositive() -> None:
@@ -268,9 +285,7 @@ def test_flanking_descriptors_rating_when_16_bands() -> None:
     d = building.normalized_flanking_level_difference(
         np.full(16, 80.0), np.full(16, 50.0), np.full(16, 5.0)
     )
-    li = building.normalized_flanking_impact_level(
-        np.full(16, 50.0), np.full(16, 5.0)
-    )
+    li = building.normalized_flanking_impact_level(np.full(16, 50.0), np.full(16, 5.0))
     assert d.rating is not None
     assert li.rating is not None
     assert isinstance(int(d.rating.rating), int)
@@ -278,9 +293,7 @@ def test_flanking_descriptors_rating_when_16_bands() -> None:
 
 
 def test_flanking_descriptors_no_rating_for_odd_band_count() -> None:
-    d = building.normalized_flanking_level_difference(
-        [80.0] * 7, [50.0] * 7, [5.0] * 7
-    )
+    d = building.normalized_flanking_level_difference([80.0] * 7, [50.0] * 7, [5.0] * 7)
     assert d.rating is None
 
 
@@ -336,9 +349,7 @@ def test_critical_frequency() -> None:
 def test_strong_coupling_check() -> None:
     """Formula (15): the threshold is 3 − 10 lg((mi·fcj)/(mj·fci))."""
     # equal masses and critical frequencies -> threshold = 3 dB
-    ok = building.strong_coupling_satisfied(
-        [4.0, 2.0], 20.0, 20.0, 100.0, 100.0
-    )
+    ok = building.strong_coupling_satisfied([4.0, 2.0], 20.0, 20.0, 100.0, 100.0)
     assert list(ok) == [True, False]
 
 
@@ -363,7 +374,10 @@ def test_band_mode_count() -> None:
 def test_only_one_reverberation_time_raises() -> None:
     with pytest.raises(ValueError, match="both structural reverberation times"):
         building.vibration_reduction_index(
-            [5.0], 2.0, 4.0, 4.0,
+            [5.0],
+            2.0,
+            4.0,
+            4.0,
             frequency=[1000.0],
             structural_reverberation_time_i=0.5,
         )
@@ -372,7 +386,10 @@ def test_only_one_reverberation_time_raises() -> None:
 def test_reverberation_time_needs_frequency() -> None:
     with pytest.raises(ValueError, match="'frequency' is required"):
         building.vibration_reduction_index(
-            [5.0], 2.0, 4.0, 4.0,
+            [5.0],
+            2.0,
+            4.0,
+            4.0,
             structural_reverberation_time_i=0.5,
             structural_reverberation_time_j=0.5,
         )
@@ -411,14 +428,10 @@ def test_plot_returns_axes() -> None:
     matplotlib.use("Agg")
 
     dv = np.full(len(THIRD_OCTAVE), 6.0)
-    res = building.vibration_reduction_index(
-        dv, 2.0, 4.0, 4.0, frequency=THIRD_OCTAVE
-    )
+    res = building.vibration_reduction_index(dv, 2.0, 4.0, 4.0, frequency=THIRD_OCTAVE)
     assert res.plot() is not None
     # frequency-less result falls back to a band-index axis
     assert (
-        building.vibration_reduction_index(
-            [1.0, 2.0, 3.0], 2.0, 4.0, 4.0
-        ).plot()
+        building.vibration_reduction_index([1.0, 2.0, 3.0], 2.0, 4.0, 4.0).plot()
         is not None
     )

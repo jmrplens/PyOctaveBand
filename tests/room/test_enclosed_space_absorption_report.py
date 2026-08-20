@@ -39,7 +39,10 @@ def _result() -> room.ReverberationResult:
     objects = room.hard_object_absorption(_OBJECT_VOLUMES)
     psi = room.object_fraction(_OBJECT_VOLUMES, _VOLUME)
     return room.enclosed_space_reverberation(
-        _SURFACES, _VOLUME, objects=objects, object_fraction=psi,
+        _SURFACES,
+        _VOLUME,
+        objects=objects,
+        object_fraction=psi,
         air_condition="20C_50-70",
     )
 
@@ -73,9 +76,9 @@ def _assert_one_page(path: str) -> None:
 def _text(path: str) -> str:
     from pypdf import PdfReader
 
-    return "\n".join(
-        page.extract_text() for page in PdfReader(path).pages
-    ).replace("\n", " ")
+    return "\n".join(page.extract_text() for page in PdfReader(path).pages).replace(
+        "\n", " "
+    )
 
 
 def test_report_writes_one_page_pdf(tmp_path) -> None:

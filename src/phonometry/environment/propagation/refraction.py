@@ -95,15 +95,20 @@ class EffectiveSoundSpeedProfile:
     def speed_at(self, height: ArrayLike) -> NDArray[np.float64]:
         """Piecewise-linear effective sound speed at one or more heights."""
         z = np.asarray(height, dtype=np.float64)
-        return np.asarray(np.interp(z, self.heights, self.sound_speeds),
-                          dtype=np.float64)
+        return np.asarray(
+            np.interp(z, self.heights, self.sound_speeds), dtype=np.float64
+        )
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the effective sound-speed profile (height on the vertical axis)."""
         from ..._i18n import check_language
         from ..._plot.environment import plot_sound_speed_profile
 
-        return plot_sound_speed_profile(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_sound_speed_profile(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def linear_sound_speed_profile(
@@ -178,10 +183,12 @@ def log_linear_sound_speed_profile(
     if int(n_points) < 2:
         raise ValueError("'n_points' must be at least 2.")
     # Logarithmic height grid from the ground to max_height (z = 0 included).
-    z = np.concatenate((
-        [0.0],
-        np.geomspace(min(z0, h) * 0.1, h, int(n_points) - 1),
-    ))
+    z = np.concatenate(
+        (
+            [0.0],
+            np.geomspace(min(z0, h) * 0.1, h, int(n_points) - 1),
+        )
+    )
     z = np.unique(np.clip(z, 0.0, h))
     c = c0 + b * np.log1p(z / z0)
     if np.any(c <= 0.0):
@@ -290,7 +297,9 @@ def shadow_zone_distance(
     if source_height < 0.0 or receiver_height < 0.0:
         raise ValueError("Source and receiver heights must be non-negative.")
     rc = c0 / abs(gradient)
-    return float(np.sqrt(2.0 * rc) * (np.sqrt(source_height) + np.sqrt(receiver_height)))
+    return float(
+        np.sqrt(2.0 * rc) * (np.sqrt(source_height) + np.sqrt(receiver_height))
+    )
 
 
 # ===========================================================================
@@ -319,12 +328,16 @@ class AtmosphericRayResult:
     ground_reflections: NDArray[np.int_]
     source_height: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the curved ray paths (height on the vertical axis)."""
         from ..._i18n import check_language
         from ..._plot.environment import plot_atmospheric_rays
 
-        return plot_atmospheric_rays(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_atmospheric_rays(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def atmospheric_ray_paths(
@@ -381,8 +394,9 @@ def atmospheric_ray_paths(
     seg_grad = np.diff(c_prof) / np.diff(z_prof)
 
     def _grad_at(zq: NDArray[np.float64]) -> NDArray[np.float64]:
-        seg = np.clip(np.searchsorted(z_prof, zq, side="right") - 1,
-                      0, seg_grad.size - 1)
+        seg = np.clip(
+            np.searchsorted(z_prof, zq, side="right") - 1, 0, seg_grad.size - 1
+        )
         g = seg_grad[seg]
         return np.asarray(np.where(zq > top, 0.0, g), dtype=np.float64)
 
@@ -403,29 +417,48 @@ def atmospheric_ray_paths(
     # solvers charge volume absorption along it); this tracer integrates it at
     # the cost of a division per stage and does not expose it.
     def deriv(
-        z_arr: NDArray[np.float64], zeta_arr: NDArray[np.float64],
-        xi_arr: NDArray[np.float64], /,
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64],
-               NDArray[np.float64]]:
+        z_arr: NDArray[np.float64],
+        zeta_arr: NDArray[np.float64],
+        xi_arr: NDArray[np.float64],
+        /,
+    ) -> tuple[
+        NDArray[np.float64],
+        NDArray[np.float64],
+        NDArray[np.float64],
+        NDArray[np.float64],
+    ]:
         cc = _speed_at(z_arr)
-        return (zeta_arr / xi_arr, -_grad_at(z_arr) / (cc**3 * xi_arr),
-                1.0 / (xi_arr * cc**2), 1.0 / (xi_arr * cc))
+        return (
+            zeta_arr / xi_arr,
+            -_grad_at(z_arr) / (cc**3 * xi_arr),
+            1.0 / (xi_arr * cc**2),
+            1.0 / (xi_arr * cc),
+        )
 
     # The ground is the only boundary: the atmosphere is open above, so a ray
     # that climbs out of the profile simply keeps climbing. The march splits
     # every step at the ground rather than folding the overshoot back after a
     # whole one, which is what keeps a reflected ray at the order the rest of
     # the path is integrated with; it is the same core the ocean solver runs on.
-    march = march_rays(deriv, xi=xi, z0=np.full(angles.size, zs),
-                       zeta0=np.sin(th) / c0, range_step=rmax / (ns - 1),
-                       n_steps=ns, lower=0.0)
+    march = march_rays(
+        deriv,
+        xi=xi,
+        z0=np.full(angles.size, zs),
+        zeta0=np.sin(th) / c0,
+        range_step=rmax / (ns - 1),
+        n_steps=ns,
+        lower=0.0,
+    )
     ray_z, ray_t = march.positions, march.times
     bounces = march.reflections.sum(axis=1)
     # Turning points: a sign change of the vertical slowness between samples
     # that a ground reflection did not cause.
     sign = np.sign(march.verticals)
-    turns = ((sign[:, 1:] != sign[:, :-1]) & (march.reflections[:, 1:] == 0)
-             & (sign[:, :-1] != 0)).sum(axis=1)
+    turns = (
+        (sign[:, 1:] != sign[:, :-1])
+        & (march.reflections[:, 1:] == 0)
+        & (sign[:, :-1] != 0)
+    ).sum(axis=1)
     ray_r = np.broadcast_to(ranges, ray_z.shape).copy()
 
     return AtmosphericRayResult(
@@ -467,12 +500,16 @@ class AtmosphericPEResult:
         i = int(np.argmin(np.abs(self.heights - float(height))))
         return np.asarray(self.relative_level[i], dtype=np.float64)
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the relative-level field over the range-height plane."""
         from ..._i18n import check_language
         from ..._plot.environment import plot_atmospheric_pe
 
-        return plot_atmospheric_pe(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_atmospheric_pe(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def _resolve_pe_impedance(
@@ -487,8 +524,9 @@ def _resolve_pe_impedance(
     from .ground_barriers import _normalized_ground_impedance
 
     f = np.array([float(frequency)], dtype=np.float64)
-    z = _normalized_ground_impedance(f, impedance, flow_resistivity, model,
-                                     speed_of_sound, air_density)
+    z = _normalized_ground_impedance(
+        f, impedance, flow_resistivity, model, speed_of_sound, air_density
+    )
     return complex(z[0])
 
 
@@ -566,12 +604,17 @@ def atmospheric_parabolic_equation(
     zmax = require_positive(max_height, "max_height")
     c_ref = float(c_prof[0])  # reference speed at the ground (ka = k0)
     lam = c_ref / f
-    dz = require_positive(height_step, "height_step") if height_step is not None else lam / 10.0
+    dz = (
+        require_positive(height_step, "height_step")
+        if height_step is not None
+        else lam / 10.0
+    )
     dr = require_positive(range_step, "range_step") if range_step is not None else lam
     if dr > rmax:
         raise ValueError("'range_step' must not exceed 'max_range'.")
-    z_imp = _resolve_pe_impedance(f, impedance, flow_resistivity, model, c_ref,
-                                  air_density)
+    z_imp = _resolve_pe_impedance(
+        f, impedance, flow_resistivity, model, c_ref, air_density
+    )
 
     # Grid: physical region [0, zmax] plus a 50-wavelength absorbing layer, then
     # padded to N = 2M so only the lower half carries the (positive-height) field
@@ -622,8 +665,7 @@ def atmospheric_parabolic_equation(
     # incidence plane-wave reflection coefficient weights the image (Eq. (G.77)).
     cp = (z_imp - 1.0) / (z_imp + 1.0)
     starter = np.sqrt(1j * ka) * (
-        np.exp(-0.5 * ka**2 * (z - zs) ** 2)
-        + cp * np.exp(-0.5 * ka**2 * (z + zs) ** 2)
+        np.exp(-0.5 * ka**2 * (z - zs) ** 2) + cp * np.exp(-0.5 * ka**2 * (z + zs) ** 2)
     )
     psi = starter.astype(np.complex128)
     psi[m:] = 0.0
@@ -664,8 +706,10 @@ def atmospheric_parabolic_equation(
             surface = 2j * beta * phi * sw_propagator * sw_profile
         else:
             surface = 0.0
-        psi = (np.fft.ifft((spec + reflection * spec_neg) * propagator * mid_inv)
-               / dz + surface)
+        psi = (
+            np.fft.ifft((spec + reflection * spec_neg) * propagator * mid_inv) / dz
+            + surface
+        )
         psi = refraction * psi
         psi[m:] = 0.0
 

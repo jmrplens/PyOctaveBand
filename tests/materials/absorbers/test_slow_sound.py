@@ -46,15 +46,20 @@ _C0 = 343.0
 _GAMMA = 1.4
 _P0 = 101325.0
 _AIR = AirProperties(
-    speed_of_sound=_C0, density=_RHO0, viscosity=_ETA,
-    heat_capacity_ratio=_GAMMA, atmospheric_pressure=_P0,
+    speed_of_sound=_C0,
+    density=_RHO0,
+    viscosity=_ETA,
+    heat_capacity_ratio=_GAMMA,
+    atmospheric_pressure=_P0,
 )
 
 
 def _base_resonator() -> HelmholtzResonator:
     return HelmholtzResonator(
-        neck_length=1.0e-3, neck_side=3.0e-3,
-        cavity_length=30.0e-3, cavity_side=27.0e-3,
+        neck_length=1.0e-3,
+        neck_side=3.0e-3,
+        cavity_length=30.0e-3,
+        cavity_side=27.0e-3,
     )
 
 
@@ -91,7 +96,10 @@ def test_square_duct_high_frequency_limits() -> None:
     """rho -> rho0 and kappa -> kappa0 for a wide duct at high frequency."""
     f = np.array([5.0e4])
     rho, kap = rectangular_duct_properties(
-        f, side=5.0e-2, air=_AIR, sum_terms=120,
+        f,
+        side=5.0e-2,
+        air=_AIR,
+        sum_terms=120,
     )
     assert rho[0].real == pytest.approx(_RHO0, rel=1e-2)
     assert kap[0].real == pytest.approx(_GAMMA * _P0, rel=1e-2)
@@ -134,7 +142,8 @@ def test_duct_reduces_to_slit_in_wide_limit() -> None:
     sk = np.sum(1.0 / (base * (sab - g2k)))
     rho_d = np.conj(-_RHO0 * h**2 * 0.08**2 / (64.0 * g2r * sr))
     kap_d = np.conj(
-        air.heat_capacity_ratio * air.atmospheric_pressure
+        air.heat_capacity_ratio
+        * air.atmospheric_pressure
         / (
             air.heat_capacity_ratio
             + (64.0 * (air.heat_capacity_ratio - 1.0) * g2k / (h**2 * 0.08**2)) * sk
@@ -155,12 +164,16 @@ def test_resonator_impedance_lumped_helmholtz_limit() -> None:
     lumped ``f0 = (c0 / 2 pi) sqrt(S_n / (V_c (l_n + neck end corrections)))``.
     """
     res = HelmholtzResonator(
-        neck_length=5.0e-3, neck_side=6.0e-3,
-        cavity_length=40.0e-3, cavity_side=30.0e-3,
+        neck_length=5.0e-3,
+        neck_side=6.0e-3,
+        cavity_length=40.0e-3,
+        cavity_side=30.0e-3,
     )
     f = np.linspace(150.0, 900.0, 4000)
     z = helmholtz_resonator_impedance(
-        f, res, air=AirProperties(density=_RHO0, viscosity=_ETA),
+        f,
+        res,
+        air=AirProperties(density=_RHO0, viscosity=_ETA),
     )
     # resonance = reactance sign change
     react = z.imag
@@ -185,7 +198,11 @@ def test_panel_absorption_bounds_and_shapes() -> None:
     f = np.linspace(100.0, 900.0, 200)
     res = _base_resonator()
     out = slit_helmholtz_absorber(
-        f, res, slit_height=1.0e-3, lattice_step=3.0e-2, period=5.0e-2,
+        f,
+        res,
+        slit_height=1.0e-3,
+        lattice_step=3.0e-2,
+        period=5.0e-2,
     )
     assert isinstance(out, SlitResonatorAbsorberResult)
     assert out.absorption.shape == f.shape
@@ -205,10 +222,19 @@ def test_panel_optional_correction_branches_stay_passive() -> None:
     """
     f = np.linspace(100.0, 900.0, 128)
     res = _base_resonator()
-    for end_correction, slit_radiation in ((False, True), (True, False), (False, False)):
+    for end_correction, slit_radiation in (
+        (False, True),
+        (True, False),
+        (False, False),
+    ):
         out = slit_helmholtz_absorber(
-            f, res, slit_height=1.0e-3, lattice_step=3.0e-2, period=5.0e-2,
-            end_correction=end_correction, slit_radiation=slit_radiation,
+            f,
+            res,
+            slit_height=1.0e-3,
+            lattice_step=3.0e-2,
+            period=5.0e-2,
+            end_correction=end_correction,
+            slit_radiation=slit_radiation,
         )
         assert out.absorption.shape == f.shape
         assert np.all(out.absorption >= 0.0)
@@ -256,7 +282,12 @@ def test_panel_passivity_random_geometries() -> None:
             cavity_side=float(rng.uniform(0.4 * a, 0.9 * a)),
         )
         out = slit_helmholtz_absorber(
-            f, res, slit_height=h, lattice_step=a, period=d, angle=0.35,
+            f,
+            res,
+            slit_height=h,
+            lattice_step=a,
+            period=d,
+            angle=0.35,
         )
         assert np.all(out.absorption >= -1e-9)
         assert np.all(out.absorption <= 1.0 + 1e-9)
@@ -267,7 +298,11 @@ def test_panel_accepts_multiple_resonators() -> None:
     f = np.linspace(100.0, 800.0, 120)
     res = [_base_resonator(), _base_resonator()]
     out = slit_helmholtz_absorber(
-        f, res, slit_height=1.2e-3, lattice_step=1.2e-2, period=7.0e-2,
+        f,
+        res,
+        slit_height=1.2e-3,
+        lattice_step=1.2e-2,
+        period=7.0e-2,
     )
     # slit depth L = N * a is reflected in the effective wavenumber array
     assert out.effective_wavenumber.shape == f.shape
@@ -277,12 +312,18 @@ def test_panel_accepts_multiple_resonators() -> None:
 # ---------------------------------------------------------------------------
 # Critical coupling: the analytic perfect-absorption anchor
 # ---------------------------------------------------------------------------
-@pytest.mark.parametrize("f0,angle", [(250.0, 0.0), (300.0, 0.0), (350.0, np.radians(20.0))])
+@pytest.mark.parametrize(
+    "f0,angle", [(250.0, 0.0), (300.0, 0.0), (350.0, np.radians(20.0))]
+)
 def test_critical_coupling_gives_perfect_absorption(f0: float, angle: float) -> None:
     """The designed geometry yields alpha ~ 1 at the design frequency."""
     res = _base_resonator()
     design = critical_coupling_design(
-        f0, res, lattice_step=3.0e-2, period=5.0e-2, angle=angle,
+        f0,
+        res,
+        lattice_step=3.0e-2,
+        period=5.0e-2,
+        angle=angle,
     )
     assert isinstance(design, CriticalCouplingResult)
     assert design.converged
@@ -290,8 +331,12 @@ def test_critical_coupling_gives_perfect_absorption(f0: float, angle: float) -> 
     assert abs(design.normalized_impedance) == pytest.approx(1.0, abs=1e-3)
     # the full panel must reproduce alpha ~ 1 at f0 with the designed geometry
     out = slit_helmholtz_absorber(
-        np.array([f0]), design.resonator, slit_height=design.slit_height,
-        lattice_step=3.0e-2, period=5.0e-2, angle=angle,
+        np.array([f0]),
+        design.resonator,
+        slit_height=design.slit_height,
+        lattice_step=3.0e-2,
+        period=5.0e-2,
+        angle=angle,
     )
     assert float(out.absorption[0]) == pytest.approx(1.0, abs=1e-3)
 
@@ -303,8 +348,11 @@ def test_critical_coupling_peak_at_design_frequency() -> None:
     design = critical_coupling_design(f0, res, lattice_step=3.0e-2, period=5.0e-2)
     f = np.linspace(200.0, 450.0, 1000)
     out = slit_helmholtz_absorber(
-        f, design.resonator, slit_height=design.slit_height,
-        lattice_step=3.0e-2, period=5.0e-2,
+        f,
+        design.resonator,
+        slit_height=design.slit_height,
+        lattice_step=3.0e-2,
+        period=5.0e-2,
     )
     f_peak = float(f[int(np.argmax(out.absorption))])
     assert f_peak == pytest.approx(f0, abs=8.0)
@@ -315,7 +363,10 @@ def test_critical_coupling_warns_when_infeasible() -> None:
     res = _base_resonator()
     with pytest.warns(SlowSoundAbsorberWarning):
         design = critical_coupling_design(
-            300.0, res, lattice_step=3.0e-2, period=5.0e-2,
+            300.0,
+            res,
+            lattice_step=3.0e-2,
+            period=5.0e-2,
             cavity_length_bounds=(1.0e-3, 1.2e-3),
             slit_height_bounds=(0.5e-3, 0.6e-3),
         )
@@ -331,7 +382,9 @@ def test_invalid_inputs() -> None:
     with pytest.raises(ValueError):
         slit_helmholtz_absorber(f, [], slit_height=1e-3, lattice_step=3e-2, period=5e-2)
     with pytest.raises(ValueError):
-        slit_helmholtz_absorber(f, res, slit_height=6e-2, lattice_step=3e-2, period=5e-2)
+        slit_helmholtz_absorber(
+            f, res, slit_height=6e-2, lattice_step=3e-2, period=5e-2
+        )
     with pytest.raises(ValueError):
         slit_helmholtz_absorber(
             f, res, slit_height=1e-3, lattice_step=3e-2, period=5e-2, angle=np.pi / 2.0

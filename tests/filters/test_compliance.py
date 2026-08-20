@@ -25,10 +25,10 @@ def test_class_limits_table1_anchor_values() -> None:
     assert lo[0] == pytest.approx(-0.4)
     assert hi[0] == pytest.approx(0.4)
     # Band edge (inside): max +5.3 (class 1)
-    lo, hi = class_limits(1.0, 1, np.array([G ** 0.5 * 0.999999]))
+    lo, hi = class_limits(1.0, 1, np.array([G**0.5 * 0.999999]))
     assert hi[0] == pytest.approx(5.3, abs=0.05)
     # Just outside the edge: minimum attenuation +1.2 (class 1)
-    lo, hi = class_limits(1.0, 1, np.array([G ** 0.5 * 1.000001]))
+    lo, hi = class_limits(1.0, 1, np.array([G**0.5 * 1.000001]))
     assert lo[0] == pytest.approx(1.2, abs=0.05)
     assert np.isinf(hi[0])
     # One octave out: minimum +16.6 (class 1) / +15.6 (class 2)
@@ -37,8 +37,8 @@ def test_class_limits_table1_anchor_values() -> None:
     assert lo1[0] == pytest.approx(16.6)
     assert lo2[0] == pytest.approx(15.6)
     # Far stopband: minimum +70 (class 1) / +60 (class 2)
-    lo1, _ = class_limits(1.0, 1, np.array([G ** 5]))
-    lo2, _ = class_limits(1.0, 2, np.array([G ** 5]))
+    lo1, _ = class_limits(1.0, 1, np.array([G**5]))
+    lo2, _ = class_limits(1.0, 2, np.array([G**5]))
     assert lo1[0] == pytest.approx(70.0)
     assert lo2[0] == pytest.approx(60.0)
 
@@ -53,34 +53,26 @@ def test_class_limits_low_side_is_reciprocal() -> None:
 
 
 def test_butter_order6_third_octave_meets_class1() -> None:
-    bank = filters.OctaveFilterBank(
-        fs=48000, fraction=3, order=6, limits=[100, 5000]
-    )
+    bank = filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[100, 5000])
     result = filters.verify_filter_class(bank)
     assert result["overall_class"] == 1, result
 
 
 def test_butter_order6_octave_meets_class1() -> None:
-    bank = filters.OctaveFilterBank(
-        fs=48000, fraction=1, order=6, limits=[125, 4000]
-    )
+    bank = filters.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
     result = filters.verify_filter_class(bank)
     assert result["overall_class"] == 1, result
 
 
 def test_low_order_fails_class1() -> None:
     """A 1st-order bank cannot reach the class stopband attenuations."""
-    bank = filters.OctaveFilterBank(
-        fs=48000, fraction=1, order=1, limits=[500, 2000]
-    )
+    bank = filters.OctaveFilterBank(fs=48000, fraction=1, order=1, limits=[500, 2000])
     result = filters.verify_filter_class(bank)
     assert result["overall_class"] is None
 
 
 def test_result_has_per_band_details() -> None:
-    bank = filters.OctaveFilterBank(
-        fs=48000, fraction=1, order=6, limits=[500, 2000]
-    )
+    bank = filters.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[500, 2000])
     result = filters.verify_filter_class(bank)
     assert len(result["bands"]) == bank.num_bands
     for band in result["bands"]:
@@ -134,9 +126,7 @@ def test_coarse_grid_breakpoints_evaluated_exactly() -> None:
 
 
 def test_invalid_inputs_raise() -> None:
-    bank = filters.OctaveFilterBank(
-        fs=48000, fraction=1, order=6, limits=[500, 2000]
-    )
+    bank = filters.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[500, 2000])
     band_centre = np.array([1.0])
     with pytest.raises(ValueError, match="num_points"):
         filters.verify_filter_class(bank, num_points=4)
@@ -166,13 +156,13 @@ def test_1995_class0_anchor_values() -> None:
     """class_limits reproduces the Table 1 class-0 anchors (octave band)."""
     g = 10 ** (3 / 10)
     lo, hi = class_limits(1.0, 0, np.array([1.0]), edition="1995")
-    assert (lo[0], hi[0]) == (-0.15, 0.15)          # Omega = 1
-    lo, hi = class_limits(1.0, 0, np.array([g ** 0.5 * 0.999999]), edition="1995")
-    assert hi[0] == pytest.approx(4.5, abs=1e-3)     # pass-band edge max
-    lo, _ = class_limits(1.0, 0, np.array([g ** 0.5 * 1.000001]), edition="1995")
-    assert lo[0] == pytest.approx(2.3, abs=1e-3)     # stop-band edge min
+    assert (lo[0], hi[0]) == (-0.15, 0.15)  # Omega = 1
+    lo, hi = class_limits(1.0, 0, np.array([g**0.5 * 0.999999]), edition="1995")
+    assert hi[0] == pytest.approx(4.5, abs=1e-3)  # pass-band edge max
+    lo, _ = class_limits(1.0, 0, np.array([g**0.5 * 1.000001]), edition="1995")
+    assert lo[0] == pytest.approx(2.3, abs=1e-3)  # stop-band edge min
     lo, _ = class_limits(1.0, 0, np.array([g]), edition="1995")
-    assert lo[0] == pytest.approx(18.0, abs=1e-6)    # G**1 min
+    assert lo[0] == pytest.approx(18.0, abs=1e-6)  # G**1 min
 
 
 def test_1995_class0_is_strictest() -> None:
@@ -183,7 +173,7 @@ def test_1995_class0_is_strictest() -> None:
     lo1, hi1 = class_limits(1.0, 1, omega, edition="1995")
     lo2, hi2 = class_limits(1.0, 2, omega, edition="1995")
     # Tighter class => smaller (or equal) maximum allowance in the pass-band.
-    pb = omega <= g ** 0.5
+    pb = omega <= g**0.5
     assert np.all(hi0[pb] <= hi1[pb] + 1e-9)
     assert np.all(hi1[pb] <= hi2[pb] + 1e-9)
     # ...and a larger (or equal) minimum: the corridor floor rises with strictness.
@@ -198,8 +188,12 @@ def test_butter_meets_class0_1995() -> None:
     assert result["overall_class"] == 0, result
     band = result["bands"][0]
     assert set(band) == {
-        "freq", "class", "checked_to_omega",
-        "margin_class0_db", "margin_class1_db", "margin_class2_db",
+        "freq",
+        "class",
+        "checked_to_omega",
+        "margin_class0_db",
+        "margin_class1_db",
+        "margin_class2_db",
     }
     # A class-0 band must clear class 1 and class 2 by at least as much.
     for b in result["bands"]:
@@ -213,7 +207,11 @@ def test_2014_default_unaffected_by_edition_support() -> None:
     result = filters.verify_filter_class(bank)
     assert result["overall_class"] == 1
     assert set(result["bands"][0]) == {
-        "freq", "class", "checked_to_omega", "margin_class1_db", "margin_class2_db"
+        "freq",
+        "class",
+        "checked_to_omega",
+        "margin_class1_db",
+        "margin_class2_db",
     }
 
 
@@ -225,14 +223,12 @@ def test_range_limited_flag_reports_unverifiable_stopband() -> None:
     rows cannot be demonstrated and the verdict must say so instead of
     claiming full Table 1 conformance.
     """
-    bank = filters.OctaveFilterBank(
-        fs=48000, fraction=1, order=6, limits=[125, 4000]
-    )
+    bank = filters.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
     result = filters.verify_filter_class(bank)
     assert result["range_limited"] is True
     for band in result["bands"]:
         # The checked range covers the band edge but not the G^4 mask end.
-        assert 10 ** 0.15 < band["checked_to_omega"] < 15.0
+        assert 10**0.15 < band["checked_to_omega"] < 15.0
 
 
 def test_1995_rejects_out_of_range_class_and_bad_edition() -> None:
@@ -243,9 +239,7 @@ def test_1995_rejects_out_of_range_class_and_bad_edition() -> None:
         class_limits(1.0, 0, band_centre)  # class 0 invalid for 2014
     with pytest.raises(ValueError, match="edition"):
         class_limits(1.0, 1, band_centre, edition="2020")
-    bank = filters.OctaveFilterBank(
-        fs=48000, fraction=1, order=6, limits=[500, 2000]
-    )
+    bank = filters.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[500, 2000])
     with pytest.raises(ValueError, match="edition"):
         filters.verify_filter_class(bank, edition="2020")
 

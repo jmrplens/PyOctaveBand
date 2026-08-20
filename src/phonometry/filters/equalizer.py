@@ -211,7 +211,11 @@ def _validate_section_parameterization(section: EQSection) -> None:
     """Check the ``gain_db`` / ``q`` / ``bw`` / ``slope`` combination."""
     given = [
         name
-        for name, value in (("q", section.q), ("bw", section.bw), ("slope", section.slope))
+        for name, value in (
+            ("q", section.q),
+            ("bw", section.bw),
+            ("slope", section.slope),
+        )
         if value is not None
     ]
     if len(given) > 1:
@@ -259,7 +263,9 @@ def _design_bandpass(c: float, s: float, alpha: float, big_a: float) -> _Coeffic
     return (alpha, 0.0, -alpha), (1 + alpha, -2 * c, 1 - alpha)
 
 
-def _design_bandpass_skirt(c: float, s: float, alpha: float, big_a: float) -> _Coefficients:
+def _design_bandpass_skirt(
+    c: float, s: float, alpha: float, big_a: float
+) -> _Coefficients:
     # Constant skirt gain; the peak gain is Q (b0 = sin(w0)/2 = Q*alpha).
     return (s / 2, 0.0, -s / 2), (1 + alpha, -2 * c, 1 - alpha)
 
@@ -331,9 +337,7 @@ def _section_alpha(section: EQSection, w0: float, big_a: float) -> float:
         # Nyquist frequency that factor diverges, so a wide 'bw' can push
         # the sinh argument past the floating-point range.
         try:
-            return sin_w0 * math.sinh(
-                math.log(2.0) / 2 * section.bw * w0 / sin_w0
-            )
+            return sin_w0 * math.sinh(math.log(2.0) / 2 * section.bw * w0 / sin_w0)
         except OverflowError:
             raise ValueError(
                 f"Bandwidth 'bw' = {section.bw:g} octaves is too wide for "
@@ -424,8 +428,12 @@ class EQResponseResult:
     sections: tuple[EQSection, ...]
 
     def plot(
-        self, ax: Axes | None = None, *, language: str = "en",
-        show_sections: bool = True, **kwargs: Any
+        self,
+        ax: Axes | None = None,
+        *,
+        language: str = "en",
+        show_sections: bool = True,
+        **kwargs: Any,
     ) -> Axes | NDArray[Any]:
         """Plot the cascade magnitude and phase response.
 
@@ -491,9 +499,7 @@ class ParametricEQ:
             self.zi = np.array([])
             self._steady_ic = steady_ic
 
-    def filter(
-        self, x: Signal | list[float] | np.ndarray
-    ) -> Signal | np.ndarray:
+    def filter(self, x: Signal | list[float] | np.ndarray) -> Signal | np.ndarray:
         """Apply the EQ cascade to a signal.
 
         :param x: Input signal (1D or 2D ``[channels, samples]``), or a

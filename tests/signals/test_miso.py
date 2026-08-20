@@ -42,9 +42,7 @@ N = 1 << 19
 
 
 def _white(seed: int, rms: float = 1.0, n: int = N) -> np.ndarray:
-    return ph.signals.noise_signal(
-        FS, n / FS, color="white", rms=rms, seed=seed
-    )
+    return ph.signals.noise_signal(FS, n / FS, color="white", rms=rms, seed=seed)
 
 
 def _fir(x: np.ndarray, taps: list[float]) -> np.ndarray:
@@ -118,8 +116,10 @@ def test_conditioned_matrix_is_hermitian_with_positive_diagonal() -> None:
     assert np.all(res.noise_psd[band] >= 0.0)
     # Coherent output contributions are non-negative and never exceed Gyy.
     assert np.all(res.coherent_output_spectra[:, band] >= 0.0)
-    assert np.all(res.coherent_output_spectra[:, band].sum(axis=0)
-                  <= res.output_psd[band] * (1.0 + 1e-9))
+    assert np.all(
+        res.coherent_output_spectra[:, band].sum(axis=0)
+        <= res.output_psd[band] * (1.0 + 1e-9)
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -167,8 +167,7 @@ def test_independent_inputs_partial_equals_ordinary() -> None:
     res = ph.signals.miso_coherence([x1, x2], y, FS, nperseg=2048)
     band = _band(res.frequencies)
     for i in (0, 1):
-        diff = np.abs(res.partial_coherence[i][band]
-                      - res.ordinary_coherence[i][band])
+        diff = np.abs(res.partial_coherence[i][band] - res.ordinary_coherence[i][band])
         # Both estimates share the estimator bias (Section 9.3); with several
         # hundred averages the identity holds to a few hundredths.
         assert float(np.median(diff)) < 0.02
@@ -223,9 +222,7 @@ def test_four_uncorrelated_inputs_general_q_identity() -> None:
     # Section 9.3 bias slightly over the two-input case, so allow a comfortable
     # few hundredths.
     for i in range(4):
-        diff = np.abs(
-            res.partial_coherence[i][band] - res.ordinary_coherence[i][band]
-        )
+        diff = np.abs(res.partial_coherence[i][band] - res.ordinary_coherence[i][band])
         assert float(np.median(diff)) < 0.03
     # (c) multiple == sum of ordinaries, clipped to one (Eq. 7.116).
     expected = np.minimum(res.ordinary_coherence[:, band].sum(axis=0), 1.0)
@@ -277,8 +274,12 @@ def test_output_power_decomposition_is_exact() -> None:
     x1 = _white(70)
     x2 = 0.5 * x1 + _white(71)
     x3 = _white(72)
-    y = (_fir(x1, [1.0, 0.3]) + _fir(x2, [0.4, -0.5])
-         + _fir(x3, [0.2, 0.1]) + _white(73, rms=0.3))
+    y = (
+        _fir(x1, [1.0, 0.3])
+        + _fir(x2, [0.4, -0.5])
+        + _fir(x3, [0.2, 0.1])
+        + _white(73, rms=0.3)
+    )
     res = ph.signals.miso_coherence([x1, x2, x3], y, FS, nperseg=2048)
     reconstructed = res.coherent_output_spectra.sum(axis=0) + res.noise_psd
     np.testing.assert_allclose(reconstructed, res.output_psd, rtol=1e-9)
@@ -337,12 +338,8 @@ def test_ordinary_and_multiple_coherence_are_order_invariant() -> None:
     x1 = _white(90)
     x2 = 0.5 * x1 + _white(91)
     y = _fir(x1, [1.0, 0.3]) + _fir(x2, [0.4, -0.5]) + _white(92, rms=0.3)
-    forward = ph.signals.miso_coherence(
-        [x1, x2], y, FS, nperseg=2048, order=(0, 1)
-    )
-    reverse = ph.signals.miso_coherence(
-        [x1, x2], y, FS, nperseg=2048, order=(1, 0)
-    )
+    forward = ph.signals.miso_coherence([x1, x2], y, FS, nperseg=2048, order=(0, 1))
+    reverse = ph.signals.miso_coherence([x1, x2], y, FS, nperseg=2048, order=(1, 0))
     np.testing.assert_allclose(
         forward.ordinary_coherence, reverse.ordinary_coherence, atol=1e-12
     )
@@ -364,8 +361,7 @@ def test_dominant_input_tracks_the_band_with_more_power() -> None:
     x2 = _white(101)
     lp = sp_signal.butter(4, 500.0, fs=FS, output="sos")
     hp = sp_signal.butter(4, 2000.0, btype="high", fs=FS, output="sos")
-    y = (sp_signal.sosfilt(lp, x1) + sp_signal.sosfilt(hp, x2)
-         + _white(102, rms=0.05))
+    y = sp_signal.sosfilt(lp, x1) + sp_signal.sosfilt(hp, x2) + _white(102, rms=0.05)
     res = ph.signals.miso_coherence([x1, x2], y, FS, nperseg=2048)
     dom = res.dominant_input()
     freqs = res.frequencies

@@ -30,10 +30,10 @@ def test_calibration_logic() -> None:
     rms_ref = 0.5
     t = np.linspace(0, 1, fs)
     ref_signal = rms_ref * np.sqrt(2) * np.sin(2 * np.pi * 1000 * t)
-    
+
     # Calculate sensitivity
     factor = metrology.sensitivity(ref_signal, target_spl=94.0)
-    
+
     # Analyze same signal with that factor
     spl, _ = filters.octave_filter(
         ref_signal,
@@ -42,7 +42,7 @@ def test_calibration_logic() -> None:
         limits=[800, 1200],
         calibration=filters.LevelCalibration(factor=factor),
     )
-    
+
     # It should be exactly 94 dB
     assert abs(spl[0] - 94.0) < 0.01
 
@@ -64,7 +64,7 @@ def test_dbfs_logic() -> None:
     # Sine wave with peak 1.0 -> RMS 0.707 -> -3.01 dBFS
     t = np.linspace(0, 1, fs)
     x = np.sin(2 * np.pi * 1000 * t)
-    
+
     spl, _ = filters.octave_filter(
         x,
         fs,
@@ -72,7 +72,7 @@ def test_dbfs_logic() -> None:
         limits=[800, 1200],
         calibration=filters.LevelCalibration(dbfs=True),
     )
-    
+
     assert abs(spl[0] - (-3.01)) < 0.05
 
 
@@ -94,13 +94,13 @@ def test_peak_mode_logic() -> None:
     fs = 48000
     x = np.zeros(fs)
     x[100] = 0.5  # Large peak
-    
+
     spl_rms, _ = filters.octave_filter(x, fs, mode="rms", fraction=1)
     spl_peak, _ = filters.octave_filter(x, fs, mode="peak", fraction=1)
-    
+
     # Peak must be greater than RMS for an impulse
     assert np.all(spl_peak > spl_rms)
-    
+
     # Theoretical peak for 0.5: 20*log10(0.5 / 2e-5) = 20*log10(25000) approx 87.9 dB
     # (Minus some attenuation due to the filter bandwidth and energy spreading)
     assert np.max(spl_peak) > 75.0
@@ -124,18 +124,20 @@ def test_a_weighting_response() -> None:
     fs = 48000
     duration = 1.0
     t = np.linspace(0, duration, fs, endpoint=False)
-    
+
     test_freqs = [100, 1000, 8000]
     expected_gain = [-19.1, 0.0, -1.1]
-    
+
     for f, expected in zip(test_freqs, expected_gain, strict=True):
         # Generate tone
         x = np.sin(2 * np.pi * f * t)
         y = filters.weighting_filter(x, fs, curve="A")
-        
+
         # Calculate gain in dB (RMS)
         gain_db = 20 * np.log10(np.std(y) / np.std(x))
-        assert abs(gain_db - expected) < 1.0, f"A-weighting at {f}Hz failed. Got {gain_db:.1f}dB, expected {expected}dB"
+        assert abs(gain_db - expected) < 1.0, (
+            f"A-weighting at {f}Hz failed. Got {gain_db:.1f}dB, expected {expected}dB"
+        )
 
 
 def test_c_weighting_response() -> None:
@@ -156,16 +158,18 @@ def test_c_weighting_response() -> None:
     fs = 48000
     duration = 1.0
     t = np.linspace(0, duration, fs, endpoint=False)
-    
+
     test_freqs = [31.5, 1000, 8000]
     expected_gain = [-3.0, 0.0, -3.0]
-    
+
     for f, expected in zip(test_freqs, expected_gain, strict=True):
         x = np.sin(2 * np.pi * f * t)
         y = filters.weighting_filter(x, fs, curve="C")
-        
+
         gain_db = 20 * np.log10(np.std(y) / np.std(x))
-        assert abs(gain_db - expected) < 1.0, f"C-weighting at {f}Hz failed. Got {gain_db:.1f}dB, expected {expected}dB"
+        assert abs(gain_db - expected) < 1.0, (
+            f"C-weighting at {f}Hz failed. Got {gain_db:.1f}dB, expected {expected}dB"
+        )
 
 
 def test_weighting_filter_c_output_shape() -> None:
@@ -215,10 +219,10 @@ def test_time_weighting_fast() -> None:
     """
     fs = 1000
     tau = 0.125
-    x = np.ones(int(fs * 2)) # Step signal
-    
+    x = np.ones(int(fs * 2))  # Step signal
+
     y = filters.time_weighting(x, fs, mode="fast")
-    
+
     # Check at index corresponding to tau
     idx_tau = int(fs * tau)
     # Expected: 1 - exp(-1) approx 0.632
@@ -375,13 +379,13 @@ def test_linkwitz_riley_sum() -> None:
     fs = 48000
     rng = np.random.default_rng(42)
     x = rng.standard_normal(fs)
-    
+
     # Split at 1000 Hz
     lp, hp = filters.linkwitz_riley(x, fs, freq=1000, order=4)
-    
+
     # Sum of bands
     y_sum = lp + hp
-    
+
     # Check RMS ratio
     gain_db = 20 * np.log10(np.std(y_sum) / np.std(x))
     assert abs(gain_db) < 0.1, f"Linkwitz-Riley sum not flat: {gain_db:.2f} dB"
@@ -404,6 +408,7 @@ def test_weighting_z_bypass() -> None:
     x = rng.standard_normal(1000)
     y = filters.weighting_filter(x, 48000, curve="Z")
     assert np.all(x == y)
+
 
 def test_time_weighting_int16_no_overflow() -> None:
     """
@@ -454,16 +459,12 @@ def _analytic_a_weight_db(f: float) -> float:
     """IEC 61672-1 analytic A-weighting curve."""
     f2 = float(f) ** 2
     ra = (12194**2 * f2**2) / (
-        (f2 + 20.6**2)
-        * np.sqrt((f2 + 107.7**2) * (f2 + 737.9**2))
-        * (f2 + 12194**2)
+        (f2 + 20.6**2) * np.sqrt((f2 + 107.7**2) * (f2 + 737.9**2)) * (f2 + 12194**2)
     )
     return float(20 * np.log10(ra) + 2.0)
 
 
-def _measured_gain_db(
-    wf: filters.WeightingFilter, fs: int, f0: float
-) -> float:
+def _measured_gain_db(wf: filters.WeightingFilter, fs: int, f0: float) -> float:
     """End-to-end RMS gain of the weighting filter at a single frequency."""
     t = np.arange(int(fs * 0.5)) / fs
     x = np.sin(2 * np.pi * f0 * t)
@@ -493,7 +494,11 @@ def test_a_weighting_class1_high_frequencies(fs: int) -> None:
     # Tightened to lock the 144 kHz oversample-target fit (audit N1 A6): with
     # the target raised from 96 to 144 kHz both 44.1k and 48k oversample enough
     # to keep the HF error within +/-0.7 dB of the analytic curve up to 16 kHz.
-    for f0, tol_lo, tol_hi in [(8000, -0.7, 0.7), (12500, -0.7, 0.7), (16000, -0.7, 0.7)]:
+    for f0, tol_lo, tol_hi in [
+        (8000, -0.7, 0.7),
+        (12500, -0.7, 0.7),
+        (16000, -0.7, 0.7),
+    ]:
         err = _measured_gain_db(wf, fs, f0) - _analytic_a_weight_db(f0)
         assert tol_lo < err < tol_hi, f"{f0} Hz: error {err:.2f} dB at fs={fs}"
 
@@ -549,7 +554,11 @@ def test_c_weighting_class1_high_frequencies(fs: int) -> None:
     """
     wf = filters.WeightingFilter(fs, "C")
     # Tightened alongside the A curve for the 144 kHz oversample target (A6).
-    for f0, tol_lo, tol_hi in [(8000, -0.7, 0.7), (12500, -0.7, 0.7), (16000, -0.7, 0.7)]:
+    for f0, tol_lo, tol_hi in [
+        (8000, -0.7, 0.7),
+        (12500, -0.7, 0.7),
+        (16000, -0.7, 0.7),
+    ]:
         err = _measured_gain_db(wf, fs, f0) - _analytic_c_weight_db(f0)
         assert tol_lo < err < tol_hi, f"{f0} Hz: error {err:.2f} dB at fs={fs}"
 
@@ -576,7 +585,15 @@ def test_a_weighting_positive_gain_region() -> None:
     """
     fs = 48000
     wf = filters.WeightingFilter(fs, "A")
-    for f0, expected in [(1250, 0.6), (2000, 1.2), (2500, 1.3), (4000, 1.0), (5000, 0.5)]:
+    for f0, expected in [
+        (1250, 0.6),
+        (2000, 1.2),
+        (2500, 1.3),
+        (4000, 1.0),
+        (5000, 0.5),
+    ]:
         gain = _measured_gain_db(wf, fs, f0)
         assert gain > 0, f"A-weighting must be positive at {f0} Hz, got {gain:.2f} dB"
-        assert gain == pytest.approx(expected, abs=0.15), f"{f0} Hz: {gain:.2f} dB vs Table 2 {expected}"
+        assert gain == pytest.approx(expected, abs=0.15), (
+            f"{f0} Hz: {gain:.2f} dB vs Table 2 {expected}"
+        )

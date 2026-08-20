@@ -45,7 +45,13 @@ def _analyze(
 ) -> ph.electroacoustics.SweptSineDistortionResult:
     x = ph.electroacoustics.synchronized_sweep_signal(FS, F1, F2, SECONDS)
     return ph.electroacoustics.swept_sine_distortion(
-        _polynomial_recording(x), FS, f1=F1, f2=F2, seconds=SECONDS, n_harmonics=3, **kwargs
+        _polynomial_recording(x),
+        FS,
+        f1=F1,
+        f2=F2,
+        seconds=SECONDS,
+        n_harmonics=3,
+        **kwargs,
     )
 
 
@@ -85,15 +91,11 @@ def test_synchronized_sweep_band_and_duration_validation() -> None:
     with pytest.raises(ValueError, match="f2"):
         ph.electroacoustics.synchronized_sweep_signal(FS, 100.0, 50.0, SECONDS)
     with pytest.raises(ValueError, match="Nyquist"):
-        ph.electroacoustics.synchronized_sweep_signal(
-            FS, 100.0, 30000.0, SECONDS
-        )
+        ph.electroacoustics.synchronized_sweep_signal(FS, 100.0, 30000.0, SECONDS)
     with pytest.raises(ValueError, match="synchronize"):
         ph.electroacoustics.synchronized_sweep_signal(FS, 1.0, 1000.0, 0.5)
     with pytest.raises(ValueError, match="fade"):
-        ph.electroacoustics.synchronized_sweep_signal(
-            FS, F1, F2, SECONDS, fade=0.7
-        )
+        ph.electroacoustics.synchronized_sweep_signal(FS, F1, F2, SECONDS, fade=0.7)
 
 
 def test_synchronized_sweep_rejects_bad_amplitude() -> None:
@@ -315,7 +317,9 @@ def test_validation_errors() -> None:
             not_finite, FS, f1=F1, f2=F2, seconds=SECONDS
         )
     with pytest.raises(ValueError, match="method"):
-        ph.electroacoustics.swept_sine_distortion(rec, FS, f1=F1, f2=F2, seconds=SECONDS, method="nope")  # type: ignore[arg-type]
+        ph.electroacoustics.swept_sine_distortion(
+            rec, FS, f1=F1, f2=F2, seconds=SECONDS, method="nope"
+        )  # type: ignore[arg-type]
     with pytest.raises(ValueError, match="n_harmonics"):
         ph.electroacoustics.swept_sine_distortion(
             rec, FS, f1=F1, f2=F2, seconds=SECONDS, n_harmonics=1
@@ -397,8 +401,13 @@ def test_explicit_ir_length_below_minimum_has_its_own_message() -> None:
 def test_ir_length_explicit_and_windows_centered() -> None:
     x = ph.electroacoustics.synchronized_sweep_signal(FS, F1, F2, SECONDS)
     res = ph.electroacoustics.swept_sine_distortion(
-        _polynomial_recording(x), FS, f1=F1, f2=F2, seconds=SECONDS,
-        n_harmonics=3, ir_length=2048,
+        _polynomial_recording(x),
+        FS,
+        f1=F1,
+        f2=F2,
+        seconds=SECONDS,
+        n_harmonics=3,
+        ir_length=2048,
     )
     assert res.harmonic_irs.shape == (3, 2048)
     # Each memoryless harmonic IR peaks at its window centre (the

@@ -48,7 +48,9 @@ from phonometry.underwater.bioacoustics.audiograms import (
         ("PCW", 53.0),
     ],
 )
-def test_threshold_at_f0_matches_the_published_prose_value(group: str, printed: float) -> None:
+def test_threshold_at_f0_matches_the_published_prose_value(
+    group: str, printed: float
+) -> None:
     """Eq. (1) + Table 2 + Table 4 reproduce the three thresholds quoted in prose."""
     f0_khz = BEST_HEARING_FREQUENCY_KHZ[group][0]
     got = group_audiogram(f0_khz * 1000.0, group).threshold[0]
@@ -76,7 +78,9 @@ def test_normalized_audiogram_removes_the_absolute_sensitivity() -> None:
         group_audiogram(freqs, group, normalized=True).best_threshold
         for group in AUDIOGRAM_GROUPS
     ]
-    absolute = [group_audiogram(freqs, group).best_threshold for group in AUDIOGRAM_GROUPS]
+    absolute = [
+        group_audiogram(freqs, group).best_threshold for group in AUDIOGRAM_GROUPS
+    ]
     assert max(abs(v) for v in normalized) < 10.0
     assert max(absolute) - min(absolute) > 70.0
 
@@ -123,7 +127,7 @@ def test_lf_cetaceans_have_no_published_audiogram() -> None:
 
 
 def test_orca_audiogram_minimum_matches_the_printed_value() -> None:
-    """"the minimum hearing threshold, of 39.0 dB re µPa², occurs at 22.6 kHz"."""
+    """ "the minimum hearing threshold, of 39.0 dB re µPa², occurs at 22.6 kHz"."""
     assert orca_audiogram(22.6e3).threshold[0] == pytest.approx(39.0, abs=0.05)
 
 
@@ -135,7 +139,7 @@ def test_orca_audiogram_minimum_location() -> None:
 
 
 def test_orca_audiogram_at_50_khz_needs_the_third_branch() -> None:
-    """"The threshold ... at the pulse center frequency (50 kHz) is 51.2 dB re µPa²".
+    """ "The threshold ... at the pulse center frequency (50 kHz) is 51.2 dB re µPa²".
 
     50 kHz sits above the 46.2 kHz break, so the third branch applies. Using
     the second one there returns 50.51 dB, 0.7 dB low: that is the regression

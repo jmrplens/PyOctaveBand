@@ -45,7 +45,7 @@ rating bands 100 Hz to 3150 Hz; a wider clause 6.3 spectrum (18 bands 100-5000
 Hz, optionally extended to 50 Hz) is rated on that sub-range. The statement of
 results (Clause 8 e)) also carries the spectrum adaptation term ``CI,Δ`` (ISO
 717-2:2020 Formula (A.4)) via
-:func:`phonometry.building.impact_improvement_adaptation_term`. """
+:func:`phonometry.building.impact_improvement_adaptation_term`."""
 
 from __future__ import annotations
 
@@ -83,8 +83,22 @@ _LIMIT_CORRECTION = 1.3
 
 #: The 16 one-third-octave centre frequencies rated by ISO 717-2 (100-3150 Hz).
 _RATING_FREQS = (
-    100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0,
-    630.0, 800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0,
+    100.0,
+    125.0,
+    160.0,
+    200.0,
+    250.0,
+    315.0,
+    400.0,
+    500.0,
+    630.0,
+    800.0,
+    1000.0,
+    1250.0,
+    1600.0,
+    2000.0,
+    2500.0,
+    3150.0,
 )
 
 
@@ -180,7 +194,9 @@ class FloorCoveringImprovementResult:
         """Return ``(octave_freqs, ΔLoct)`` via Formula (5) (needs 16 1/3-oct bands)."""
         return improvement_octave_bands(self.improvement, self.frequencies)
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the improvement spectrum ``ΔL`` (with ``ΔLw`` when available).
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -409,7 +425,15 @@ def improvement_octave_bands(
 def _octave_centres(freqs: np.ndarray) -> list[float]:
     """The octave centres (…125, 250, 500…) present among one-third-octave freqs."""
     octaves = [
-        31.5, 63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0,
+        31.5,
+        63.0,
+        125.0,
+        250.0,
+        500.0,
+        1000.0,
+        2000.0,
+        4000.0,
+        8000.0,
     ]
     lo, hi = float(np.min(freqs)), float(np.max(freqs))
     return [c for c in octaves if lo <= c <= hi]

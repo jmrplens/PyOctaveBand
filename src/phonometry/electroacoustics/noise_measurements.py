@@ -78,7 +78,11 @@ def _ccir_rms_weighted_rms(
     gains[nonzero] = 10.0 ** (
         (itu_r_468_weighting(freqs[nonzero]) + _CCIR_RMS_OFFSET_DB) / 20.0
     )
-    f_hi = fs / 2.0 if bandwidth is None else min(_positive(bandwidth, "bandwidth"), fs / 2.0)
+    f_hi = (
+        fs / 2.0
+        if bandwidth is None
+        else min(_positive(bandwidth, "bandwidth"), fs / 2.0)
+    )
     out_of_band = (freqs < _AES17_HIGHPASS_HZ) | (freqs > f_hi)
     gains[out_of_band] = 0.0
     weights = np.full(freqs.size, 2.0)

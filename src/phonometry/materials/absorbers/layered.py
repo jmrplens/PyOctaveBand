@@ -230,7 +230,9 @@ class LayeredAbsorberResult:
     transfer_matrix: Complex
     layers: tuple[Layer, ...] | None = None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         r"""Plot the absorption spectrum :math:`\alpha(f)` with
         :math:`\lvert R \rvert` overlaid.
 
@@ -257,9 +259,7 @@ class LayeredAbsorberResult:
         from ..._plot.geometry import plot_layered_absorber_geometry
 
         check_language(language)
-        return plot_layered_absorber_geometry(
-            self, ax=ax, language=language, **kwargs
-        )
+        return plot_layered_absorber_geometry(self, ax=ax, language=language, **kwargs)
 
 
 @dataclass(frozen=True)
@@ -276,7 +276,9 @@ class DiffuseFieldAbsorptionResult:
     absorption: Real
     angle_limit: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         r"""Plot the random-incidence absorption spectrum
         :math:`\alpha_{\mathrm{dif}}(f)`.
 
@@ -611,12 +613,15 @@ def _stack_blocks(
         if not pending:
             return
         terms = _layer_terms(
-            pending, f, k0=k0, k0_sin2=k0_sin2, rc=rc, rho0=rho0,
+            pending,
+            f,
+            k0=k0,
+            k0_sin2=k0_sin2,
+            rc=rc,
+            rho0=rho0,
             viscosity=viscosity,
         )
-        groups = _split_fluid_run(
-            terms, biot._BLOCK_NEPERS, biot._MAX_BLOCKS
-        )
+        groups = _split_fluid_run(terms, biot._BLOCK_NEPERS, biot._MAX_BLOCKS)
         for group in groups:
             chain = _chain_matrix(group, f)
             blocks.append(biot._fluid_block(np.moveaxis(chain, -1, 0)))
@@ -718,7 +723,12 @@ def layered_absorber(
         from . import biot
 
         blocks = _stack_blocks(
-            layers, f, k0=k0, k0_sin2=k0_sin2, rc=rc, rho0=rho0,
+            layers,
+            f,
+            k0=k0,
+            k0_sin2=k0_sin2,
+            rc=rc,
+            rho0=rho0,
             viscosity=viscosity,
             transverse_wavenumber=np.asarray(k0 * np.sin(theta)),
         )
@@ -733,7 +743,12 @@ def layered_absorber(
         tm = np.full((2, 2, f.size), np.nan + 0j, dtype=np.complex128)
     else:
         terms = _layer_terms(
-            layers, f, k0=k0, k0_sin2=k0_sin2, rc=rc, rho0=rho0,
+            layers,
+            f,
+            k0=k0,
+            k0_sin2=k0_sin2,
+            rc=rc,
+            rho0=rho0,
             viscosity=viscosity,
         )
         g = _surface_admittance(
@@ -870,8 +885,7 @@ def statistical_absorption(
     cos_t = np.cos(lim)
     sin2_t = np.sin(lim) ** 2
     log_term = np.log(
-        (g1**2 + g2**2 + 2.0 * g1 * cos_t + cos_t**2)
-        / (1.0 + g1**2 + g2**2 + 2.0 * g1)
+        (g1**2 + g2**2 + 2.0 * g1 * cos_t + cos_t**2) / (1.0 + g1**2 + g2**2 + 2.0 * g1)
     )
     # Mechel prints (g1^2 - g2^2)/g2 * [arctan((1+g1)/g2) -
     # arctan((g1+cosT)/g2)], which cancels catastrophically as g2 -> 0

@@ -73,51 +73,39 @@ _STRINGS: dict[str, str] = {
     "Phase [rad]": "Fase [rad]",
     "Spectral density [dB re 1/Hz]": "Densidad espectral [dB re 1/Hz]",
     "Power spectrum [dB]": "Espectro de potencia [dB]",
-    r"{pct} % confidence ($\chi^2$, $n_\mathrm{{d}}$ = {nd})":
-        r"{pct} % de confianza ($\chi^2$, $n_\mathrm{{d}}$ = {nd})",
-    r"Welch spectral density — $\varepsilon_\mathrm{{r}}$ = {er} %":
-        r"Densidad espectral de Welch — $\varepsilon_\mathrm{{r}}$ = {er} %",
-    "Cross-spectral density (Bendat & Piersol)":
-        "Densidad espectral cruzada (Bendat y Piersol)",
-    r"$\pm$ s.d.$[\hat{\theta}_{xy}]$ (Eq. 9.52)":
-        r"$\pm$ d.e.$[\hat{\theta}_{xy}]$ (Ec. 9.52)",
+    r"{pct} % confidence ($\chi^2$, $n_\mathrm{{d}}$ = {nd})": r"{pct} % de confianza ($\chi^2$, $n_\mathrm{{d}}$ = {nd})",
+    r"Welch spectral density — $\varepsilon_\mathrm{{r}}$ = {er} %": r"Densidad espectral de Welch — $\varepsilon_\mathrm{{r}}$ = {er} %",
+    "Cross-spectral density (Bendat & Piersol)": "Densidad espectral cruzada (Bendat y Piersol)",
+    r"$\pm$ s.d.$[\hat{\theta}_{xy}]$ (Eq. 9.52)": r"$\pm$ d.e.$[\hat{\theta}_{xy}]$ (Ec. 9.52)",
     r"$\hat{G}_{yy}$ (output)": r"$\hat{G}_{yy}$ (salida)",
     r"$\hat{G}_{nn}$ (noise)": r"$\hat{G}_{nn}$ (ruido)",
-    "Coherent output spectrum (Bendat & Piersol 9.2.2)":
-        "Espectro de salida coherente (Bendat y Piersol 9.2.2)",
+    "Coherent output spectrum (Bendat & Piersol 9.2.2)": "Espectro de salida coherente (Bendat y Piersol 9.2.2)",
     "Spectral SNR [dB]": "SNR espectral [dB]",
     r"$\hat{G}_{yy}$ (measured output)": r"$\hat{G}_{yy}$ (salida medida)",
     r"$\hat{G}_{nn}$ (residual noise)": r"$\hat{G}_{nn}$ (ruido residual)",
     "Input {i}": "Entrada {i}",
-    "Partial coherent output spectra (Bendat & Piersol 7.3)":
-        "Espectros de salida coherente parciales (Bendat y Piersol 7.3)",
+    "Partial coherent output spectra (Bendat & Piersol 7.3)": "Espectros de salida coherente parciales (Bendat y Piersol 7.3)",
     "Coherence": "Coherencia",
     r"$\gamma^2_{y:x}$ (multiple)": r"$\gamma^2_{y:x}$ (múltiple)",
     "Input {i} (partial)": "Entrada {i} (parcial)",
     "Multiple and partial coherence": "Coherencia múltiple y parcial",
-    "Calibrated spectrogram (Bendat & Piersol 12.6.4.2)":
-        "Espectrograma calibrado (Bendat y Piersol 12.6.4.2)",
-    "Zoom FFT (Bendat & Piersol 11.5.4)":
-        "FFT con zoom (Bendat y Piersol 11.5.4)",
+    "Calibrated spectrogram (Bendat & Piersol 12.6.4.2)": "Espectrograma calibrado (Bendat y Piersol 12.6.4.2)",
+    "Zoom FFT (Bendat & Piersol 11.5.4)": "FFT con zoom (Bendat y Piersol 11.5.4)",
     _CORRELATION_COEFFICIENT_LABEL: "Coeficiente de correlación",
     "Correlation ({norm})": "Correlación ({norm})",
-    "{kind} estimate (Bendat & Piersol)":
-        "Estimación de {kind} (Bendat y Piersol)",
+    "{kind} estimate (Bendat & Piersol)": "Estimación de {kind} (Bendat y Piersol)",
     "Autocorrelation": "autocorrelación",
     "Cross-correlation": "correlación cruzada",
     r"$\hat{R}_{xy}(\tau)$ (context)": r"$\hat{R}_{xy}(\tau)$ (contexto)",
     "95 % interval (Eq. 8.130)": "Intervalo 95 % (Ec. 8.130)",
     "Normalized correlation": "Correlación normalizada",
-    "Time-delay estimate — {method}":
-        "Estimación del retardo temporal — {method}",
+    "Time-delay estimate — {method}": "Estimación del retardo temporal — {method}",
     "Reference IR": "RI de referencia",
     "Aligned IR (delay {n} samples)": "RI alineada (retardo {n} muestras)",
-    "Impulse-response alignment (sub-sample)":
-        "Alineación de la respuesta al impulso (submuestra)",
+    "Impulse-response alignment (sub-sample)": "Alineación de la respuesta al impulso (submuestra)",
     "Signal": "Señal",
     "Envelope $A(t)$ (Eq. 13.17)": "Envolvente $A(t)$ (Ec. 13.17)",
-    "Hilbert envelope (Bendat & Piersol Ch. 13)":
-        "Envolvente de Hilbert (Bendat y Piersol Cap. 13)",
+    "Hilbert envelope (Bendat & Piersol Ch. 13)": "Envolvente de Hilbert (Bendat y Piersol Cap. 13)",
     "Instantaneous frequency [Hz]": "Frecuencia instantánea [Hz]",
     _QUEFRENCY_LABEL: "Quefrencia [ms]",
     "Cepstrum": "Cepstro",
@@ -132,70 +120,53 @@ _STRINGS: dict[str, str] = {
     "Liftering at {q} ms ({mode})": "Liftering a {q} ms ({mode})",
     "Searched band": "Banda de búsqueda",
     "Echo: {delay} ms, $a$ = {a}": "Eco: {delay} ms, $a$ = {a}",
-    "Echo detection on the power cepstrum":
-        "Detección de ecos en el cepstro de potencia",
+    "Echo detection on the power cepstrum": "Detección de ecos en el cepstro de potencia",
     "Envelope ({kind})": "Envolvente ({kind})",
     "magnitude": "magnitud",
     "squared": "cuadrática",
     "Mean level": "Nivel medio",
     "Modulation amplitude": "Amplitud de modulación",
-    "Envelope spectrum (Bendat & Piersol 13.3)":
-        "Espectro de la envolvente (Bendat y Piersol 13.3)",
+    "Envelope spectrum (Bendat & Piersol 13.3)": "Espectro de la envolvente (Bendat y Piersol 13.3)",
     "Measured phase": "Fase medida",
     "Minimum phase (from $|H|$)": "Fase mínima (de $|H|$)",
     "Excess phase (all-pass)": "Fase de exceso (pasa-todo)",
     "Phase decomposition": "Descomposición de fase",
-    "Minimum-phase / all-pass decomposition":
-        "Descomposición fase mínima / pasa-todo",
+    "Minimum-phase / all-pass decomposition": "Descomposición fase mínima / pasa-todo",
     "Group delay": "Retardo de grupo",
     "Excess group delay": "Retardo de grupo de exceso",
     "Group delay [ms]": "Retardo de grupo [ms]",
     "biased": "sesgada",
     "unbiased": "insesgada",
     "Gating envelope": "Envolvente de conmutación",
-    "Tone burst (IEC 60268-1): {f} Hz, {cycles} cycles":
-        "Salva de tono (IEC 60268-1): {f} Hz, {cycles} ciclos",
-    "Tone burst (IEC 60268-1): {f} Hz, {cycles} cycles, {rate}/s":
-        "Salva de tono (IEC 60268-1): {f} Hz, {cycles} ciclos, {rate}/s",
+    "Tone burst (IEC 60268-1): {f} Hz, {cycles} cycles": "Salva de tono (IEC 60268-1): {f} Hz, {cycles} ciclos",
+    "Tone burst (IEC 60268-1): {f} Hz, {cycles} cycles, {rate}/s": "Salva de tono (IEC 60268-1): {f} Hz, {cycles} ciclos, {rate}/s",
     "Window $w[m]$": "Ventana $w[m]$",
     "Sample": "Muestra",
-    "Frequency offset [DFT bins]":
-        "Desplazamiento en frecuencia [bins de la DFT]",
+    "Frequency offset [DFT bins]": "Desplazamiento en frecuencia [bins de la DFT]",
     "Level re main lobe [dB]": "Nivel re lóbulo principal [dB]",
     _ENBW_LABEL: _ENBW_LABEL,
     "Highest sidelobe {sll} dB": "Lóbulo lateral máximo {sll} dB",
     "Scalloping loss {sl} dB": "Pérdida de festoneado {sl} dB",
-    "Window metrics (Harris 1978): {window}":
-        "Métricas de la ventana (Harris 1978): {window}",
-    r"{pct} % confidence ($\chi^2$, $\bar\nu$ = {nu})":
-        r"{pct} % de confianza ($\chi^2$, $\bar\nu$ = {nu})",
-    "Thomson multitaper density — $K$ = {k} tapers, $NW$ = {nw}":
-        "Densidad multitaper de Thomson — $K$ = {k} tapers, $NW$ = {nw}",
+    "Window metrics (Harris 1978): {window}": "Métricas de la ventana (Harris 1978): {window}",
+    r"{pct} % confidence ($\chi^2$, $\bar\nu$ = {nu})": r"{pct} % de confianza ($\chi^2$, $\bar\nu$ = {nu})",
+    "Thomson multitaper density — $K$ = {k} tapers, $NW$ = {nw}": "Densidad multitaper de Thomson — $K$ = {k} tapers, $NW$ = {nw}",
     "Measured response $|H|$": "Respuesta medida $|H|$",
-    r"Inverse filter $|H_{\mathrm{inv}}|$":
-        r"Filtro inverso $|H_{\mathrm{inv}}|$",
-    r"Equalized $|H \cdot H_{\mathrm{inv}}|$":
-        r"Ecualizado $|H \cdot H_{\mathrm{inv}}|$",
+    r"Inverse filter $|H_{\mathrm{inv}}|$": r"Filtro inverso $|H_{\mathrm{inv}}|$",
+    r"Equalized $|H \cdot H_{\mathrm{inv}}|$": r"Ecualizado $|H \cdot H_{\mathrm{inv}}|$",
     "Equalized band": "Banda ecualizada",
-    "Regularized inversion (Kirkeby) — flatness {flat} dB":
-        "Inversión regularizada (Kirkeby) — planitud {flat} dB",
-    "Time synchronous average (McFadden 1987)":
-        "Promediado síncrono en el tiempo (McFadden 1987)",
-    "Averaged periodic waveform ($N$ = {n})":
-        "Forma de onda periódica promediada ($N$ = {n})",
+    "Regularized inversion (Kirkeby) — flatness {flat} dB": "Inversión regularizada (Kirkeby) — planitud {flat} dB",
+    "Time synchronous average (McFadden 1987)": "Promediado síncrono en el tiempo (McFadden 1987)",
+    "Averaged periodic waveform ($N$ = {n})": "Forma de onda periódica promediada ($N$ = {n})",
     "Time [ms]": "Tiempo [ms]",
     "Frequency [orders]": "Frecuencia [órdenes]",
     "Comb filter $|C(f)|$ (Eq. 8)": "Filtro peine $|C(f)|$ (Ec. 8)",
     "Harmonics of $1/T$": "Armónicos de $1/T$",
     "Anti-alias filter $|H(f)|$": "Filtro antisolapamiento $|H(f)|$",
     "Passband edge": "Borde de la banda de paso",
-    "Stopband edge (alias fold)":
-        "Borde de la banda atenuada (pliegue de alias)",
+    "Stopband edge (alias fold)": "Borde de la banda atenuada (pliegue de alias)",
     "Design attenuation −{a} dB": "Atenuación de diseño −{a} dB",
-    "Rejected band (would fold back as aliases)":
-        "Banda rechazada (se plegaría como alias)",
-    "Polyphase resampling {fs0} Hz → {fs1} Hz ($L/M$ = {up}/{down}, {taps} taps)":
-        "Remuestreo polifásico {fs0} Hz → {fs1} Hz ($L/M$ = {up}/{down}, {taps} coeficientes)",
+    "Rejected band (would fold back as aliases)": "Banda rechazada (se plegaría como alias)",
+    "Polyphase resampling {fs0} Hz → {fs1} Hz ($L/M$ = {up}/{down}, {taps} taps)": "Remuestreo polifásico {fs0} Hz → {fs1} Hz ($L/M$ = {up}/{down}, {taps} coeficientes)",
 }
 
 
@@ -270,9 +241,14 @@ def _plot_density_with_band(
     format_frequency_axis(ax, float(freqs[pos].min()), float(freqs[pos].max()))
     localize_axes(ax, language)
     return ax
+
+
 def plot_spectral_density(
-    result: SpectralDensityResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: SpectralDensityResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Spectral density in dB with its chi-square confidence band.
 
@@ -294,16 +270,27 @@ def plot_spectral_density(
         kwargs,
         band_color=None,  # the band shares the line color, translucent
         band_alpha=0.25,
-        band_label=_t(r"{pct} % confidence ($\chi^2$, $n_\mathrm{{d}}$ = {nd})",
-                      language, pct=pct, nd=nd),
+        band_label=_t(
+            r"{pct} % confidence ($\chi^2$, $n_\mathrm{{d}}$ = {nd})",
+            language,
+            pct=pct,
+            nd=nd,
+        ),
         line_label="$\\hat{G}_{xx}(f)$",
-        title=_t(r"Welch spectral density — $\varepsilon_\mathrm{{r}}$ = {er} %", language, er=er),
+        title=_t(
+            r"Welch spectral density — $\varepsilon_\mathrm{{r}}$ = {er} %",
+            language,
+            er=er,
+        ),
     )
 
 
 def plot_multitaper_spectral_density(
-    result: MultitaperSpectralDensityResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: MultitaperSpectralDensityResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Multitaper spectral density in dB with its chi-square band.
 
@@ -335,12 +322,15 @@ def plot_multitaper_spectral_density(
         kwargs,
         band_color=_C_PRIMARY_LIGHT,
         band_alpha=None,  # pale opaque fill
-        band_label=_t(r"{pct} % confidence ($\chi^2$, $\bar\nu$ = {nu})",
-                      language, pct=pct, nu=nu),
+        band_label=_t(
+            r"{pct} % confidence ($\chi^2$, $\bar\nu$ = {nu})", language, pct=pct, nu=nu
+        ),
         line_label="$\\hat{S}^{(mt)}(f)$",
         title=_t(
             r"Thomson multitaper density — $K$ = {k} tapers, $NW$ = {nw}",
-            language, k=result.n_tapers, nw=nw,
+            language,
+            k=result.n_tapers,
+            nw=nw,
         ),
     )
 
@@ -372,9 +362,7 @@ def plot_cross_spectral_density(
 
     def _magnitude(axm: Axes) -> None:
         kwargs.setdefault("label", "$|\\hat{G}_{xy}(f)|$")
-        axm.semilogx(
-            freqs[pos], _db10(result.magnitude[pos]), color=color, **kwargs
-        )
+        axm.semilogx(freqs[pos], _db10(result.magnitude[pos]), color=color, **kwargs)
         axm.set_ylabel(_psd_ylabel(result.scaling, language))
         axm.grid(True, which="both", alpha=0.3)
         axm.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
@@ -454,8 +442,7 @@ def plot_coherent_output_spectrum(
         kwargs.setdefault(
             "label", "$\\hat{G}_{vv} = \\hat{\\gamma}^2_{xy}\\hat{G}_{yy}$"
         )
-        axs.semilogx(freqs[pos], _db10(result.coherent_psd[pos]), color=color,
-                     **kwargs)
+        axs.semilogx(freqs[pos], _db10(result.coherent_psd[pos]), color=color, **kwargs)
         axs.semilogx(
             freqs[pos],
             _db10(result.noise_psd[pos]),
@@ -494,33 +481,49 @@ _MISO_COLORS = (_C_PRIMARY, _C_SECONDARY, _C_TERTIARY)
 
 
 def _miso_spectra_panel(
-    axs: Axes, result: MISOCoherenceResult, freqs: np.ndarray,
-    pos: np.ndarray, language: str,
+    axs: Axes,
+    result: MISOCoherenceResult,
+    freqs: np.ndarray,
+    pos: np.ndarray,
+    language: str,
 ) -> None:
     """Draw the per-input coherent output spectra with pale opaque fills."""
     output_db = _db10(result.output_psd[pos])
     noise_db = _db10(result.noise_psd[pos])
     coherent_db = [
-        _db10(result.coherent_output_spectra[i][pos])
-        for i in range(result.n_inputs)
+        _db10(result.coherent_output_spectra[i][pos]) for i in range(result.n_inputs)
     ]
     # A single fixed baseline for every fill, derived once from the finite
     # dynamic range of the panel. A coherent output that dips to zero gives
     # -inf in dB; clipping to this floor keeps the fills and the y-limits
     # deterministic instead of letting one empty bin drag the axis.
     floor = _finite_db_floor([output_db, noise_db, *coherent_db], margin=5.0)
-    axs.semilogx(freqs[pos], output_db, color=_C_MUTED, lw=1.4,
-                 label=_t(r"$\hat{G}_{yy}$ (measured output)", language))
+    axs.semilogx(
+        freqs[pos],
+        output_db,
+        color=_C_MUTED,
+        lw=1.4,
+        label=_t(r"$\hat{G}_{yy}$ (measured output)", language),
+    )
     for i in range(result.n_inputs):
         color = _MISO_COLORS[i % len(_MISO_COLORS)]
         level = np.clip(coherent_db[i], floor, None)
-        axs.fill_between(freqs[pos], floor, level, color=color, alpha=0.12,
-                         lw=0.0)
-        axs.semilogx(freqs[pos], level, color=color, lw=1.2,
-                     label=_t("Input {i}", language, i=i + 1))
-    axs.semilogx(freqs[pos], np.clip(noise_db, floor, None),
-                 color=_C_REFERENCE, ls="--", lw=1.0,
-                 label=_t(r"$\hat{G}_{nn}$ (residual noise)", language))
+        axs.fill_between(freqs[pos], floor, level, color=color, alpha=0.12, lw=0.0)
+        axs.semilogx(
+            freqs[pos],
+            level,
+            color=color,
+            lw=1.2,
+            label=_t("Input {i}", language, i=i + 1),
+        )
+    axs.semilogx(
+        freqs[pos],
+        np.clip(noise_db, floor, None),
+        color=_C_REFERENCE,
+        ls="--",
+        lw=1.0,
+        label=_t(r"$\hat{G}_{nn}$ (residual noise)", language),
+    )
     finite_top = output_db[np.isfinite(output_db)]
     top = float(np.max(finite_top)) if finite_top.size else floor + 1.0
     axs.set_ylim(floor, top + 3.0)
@@ -530,17 +533,30 @@ def _miso_spectra_panel(
 
 
 def _miso_coherence_panel(
-    axc: Axes, result: MISOCoherenceResult, freqs: np.ndarray,
-    pos: np.ndarray, language: str,
+    axc: Axes,
+    result: MISOCoherenceResult,
+    freqs: np.ndarray,
+    pos: np.ndarray,
+    language: str,
 ) -> None:
     """Draw the multiple coherence over the per-input partial coherences."""
     for i in range(result.n_inputs):
         color = _MISO_COLORS[i % len(_MISO_COLORS)]
-        axc.semilogx(freqs[pos], result.partial_coherence[i][pos], color=color,
-                     lw=1.0, alpha=0.85,
-                     label=_t("Input {i} (partial)", language, i=i + 1))
-    axc.semilogx(freqs[pos], result.multiple_coherence[pos], color=_C_EDGE,
-                 lw=1.8, label=_t(r"$\gamma^2_{y:x}$ (multiple)", language))
+        axc.semilogx(
+            freqs[pos],
+            result.partial_coherence[i][pos],
+            color=color,
+            lw=1.0,
+            alpha=0.85,
+            label=_t("Input {i} (partial)", language, i=i + 1),
+        )
+    axc.semilogx(
+        freqs[pos],
+        result.multiple_coherence[pos],
+        color=_C_EDGE,
+        lw=1.8,
+        label=_t(r"$\gamma^2_{y:x}$ (multiple)", language),
+    )
     axc.set_ylabel(_t("Coherence", language))
     axc.set_ylim(0.0, 1.05)
     axc.grid(True, which="both", alpha=0.3)
@@ -596,8 +612,11 @@ def plot_miso_coherence(
 
 
 def plot_spectrogram(
-    result: SpectrogramResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: SpectrogramResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Spectrogram in dB over the time-frequency plane.
 
@@ -651,8 +670,11 @@ def plot_spectrogram(
 
 
 def plot_zoom_fft(
-    result: ZoomFFTResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: ZoomFFTResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Zoom power spectrum in dB over the zoom band (linear axis).
 
@@ -670,11 +692,10 @@ def plot_zoom_fft(
     color = kwargs.pop("color", _C_PRIMARY)
     be = format_number(result.resolution_bandwidth, language, decimals=2)
     df = format_number(result.bin_spacing, language, decimals=3)
-    kwargs.setdefault(
-        "label", f"$B_\\mathrm{{e}}$ = {be} Hz, $\\Delta f$ = {df} Hz"
+    kwargs.setdefault("label", f"$B_\\mathrm{{e}}$ = {be} Hz, $\\Delta f$ = {df} Hz")
+    ax.plot(
+        freqs, _db10(np.asarray(result.power, dtype=np.float64)), color=color, **kwargs
     )
-    ax.plot(freqs, _db10(np.asarray(result.power, dtype=np.float64)),
-            color=color, **kwargs)
     ax.set_xlim(float(freqs[0]), float(freqs[-1]))
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_psd_ylabel("spectrum", language))
@@ -683,11 +704,18 @@ def plot_zoom_fft(
     ax.grid(True, alpha=0.3)
     localize_axes(ax, language)
     return ax
+
+
 _LAG_LABEL = "Lag [s]"
 _TIME_LABEL = "Time [s]"
+
+
 def plot_correlation(
-    result: CorrelationResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: CorrelationResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Correlation estimate against the lag in seconds.
 
@@ -700,9 +728,7 @@ def plot_correlation(
     from .._i18n import localize_axes
 
     ax = ax if ax is not None else _new_axes()
-    symbol = (
-        "\\hat{\\rho}" if result.normalization == "coefficient" else "\\hat{R}"
-    )
+    symbol = "\\hat{\\rho}" if result.normalization == "coefficient" else "\\hat{R}"
     sub = "xx" if result.kind == "autocorrelation" else "xy"
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", f"${symbol}_{{{sub}}}(\\tau)$")
@@ -712,9 +738,11 @@ def plot_correlation(
     if result.normalization == "coefficient":
         ax.set_ylabel(_t(_CORRELATION_COEFFICIENT_LABEL, language))
     else:
-        norm = (_t(result.normalization, language)
-                if result.normalization in _STRINGS
-                else result.normalization)
+        norm = (
+            _t(result.normalization, language)
+            if result.normalization in _STRINGS
+            else result.normalization
+        )
         ax.set_ylabel(_t("Correlation ({norm})", language, norm=norm))
     kind_en = result.kind.capitalize()
     kind = _t(kind_en, language) if kind_en in _STRINGS else kind_en
@@ -726,8 +754,11 @@ def plot_correlation(
 
 
 def plot_time_delay(
-    result: TimeDelayResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: TimeDelayResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Correlation function with the estimated delay marked.
 
@@ -797,8 +828,9 @@ def plot_aligned_impulse_response(
 
     ax = ax if ax is not None else _new_axes()
     t = np.arange(result.reference.size) / result.fs
-    ax.plot(t, result.reference, color=_C_MUTED, lw=1.0,
-            label=_t("Reference IR", language))
+    ax.plot(
+        t, result.reference, color=_C_MUTED, lw=1.0, label=_t("Reference IR", language)
+    )
     kwargs.setdefault("color", _C_PRIMARY)
     n = decimal_comma(fmt_minus(result.delay_samples, "+.3f"), language)
     kwargs.setdefault("label", _t("Aligned IR (delay {n} samples)", language, n=n))
@@ -813,8 +845,11 @@ def plot_aligned_impulse_response(
 
 
 def plot_envelope(
-    result: EnvelopeResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: EnvelopeResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes | np.ndarray:
     """Signal with its Hilbert envelope, plus the instantaneous frequency.
 
@@ -833,8 +868,11 @@ def plot_envelope(
 
     def _envelope_panel(axe: Axes) -> None:
         axe.plot(
-            t_signal, result.signal, color=_C_MUTED, lw=0.7,
-            label=_t("Signal", language)
+            t_signal,
+            result.signal,
+            color=_C_MUTED,
+            lw=0.7,
+            label=_t("Signal", language),
         )
         kwargs.setdefault("color", _C_PRIMARY)
         kwargs.setdefault("label", _t("Envelope $A(t)$ (Eq. 13.17)", language))
@@ -867,8 +905,11 @@ def plot_envelope(
 
 
 def plot_phase_decomposition(
-    result: PhaseDecompositionResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: PhaseDecompositionResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes | np.ndarray:
     """Magnitude, phase decomposition and group delay of a response.
 
@@ -893,11 +934,16 @@ def plot_phase_decomposition(
         kwargs.setdefault("label", _t("Measured phase", language))
         axp.semilogx(freqs[pos], result.phase[pos], **kwargs)
         axp.semilogx(
-            freqs[pos], result.minimum_phase[pos], color=_C_SECONDARY,
-            ls="--", label=_t("Minimum phase (from $|H|$)", language),
+            freqs[pos],
+            result.minimum_phase[pos],
+            color=_C_SECONDARY,
+            ls="--",
+            label=_t("Minimum phase (from $|H|$)", language),
         )
         axp.semilogx(
-            freqs[pos], result.excess_phase[pos], color=_C_MUTED,
+            freqs[pos],
+            result.excess_phase[pos],
+            color=_C_MUTED,
             label=_t("Excess phase (all-pass)", language),
         )
         axp.set_ylabel(_t("Phase [rad]", language))
@@ -925,11 +971,15 @@ def plot_phase_decomposition(
     axes[0].grid(True, which="both", alpha=0.3)
     _phase_panel(axes[1])
     axes[2].semilogx(
-        freqs[pos], 1e3 * result.group_delay[pos], color=_C_PRIMARY,
+        freqs[pos],
+        1e3 * result.group_delay[pos],
+        color=_C_PRIMARY,
         label=_t("Group delay", language),
     )
     axes[2].semilogx(
-        freqs[pos], 1e3 * result.excess_group_delay[pos], color=_C_MUTED,
+        freqs[pos],
+        1e3 * result.excess_group_delay[pos],
+        color=_C_MUTED,
         label=_t("Excess group delay", language),
     )
     axes[2].set_ylabel(_t("Group delay [ms]", language))
@@ -943,8 +993,11 @@ def plot_phase_decomposition(
 
 
 def plot_tone_burst(
-    result: ToneBurstResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: ToneBurstResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Burst waveform with its rectangular gating envelope.
 
@@ -962,19 +1015,29 @@ def plot_tone_burst(
     ax.plot(t, result.signal, **kwargs)
     for sign in (1.0, -1.0):
         ax.plot(
-            t, sign * result.envelope, color=_C_SECONDARY, lw=1.4,
+            t,
+            sign * result.envelope,
+            color=_C_SECONDARY,
+            lw=1.4,
             linestyle="--",
             label=_t("Gating envelope", language) if sign > 0 else None,
         )
     f = decimal_comma(f"{result.frequency:g}", language)
     if result.repetition_rate is None:
-        title = _t("Tone burst (IEC 60268-1): {f} Hz, {cycles} cycles",
-                   language, f=f, cycles=result.cycles)
+        title = _t(
+            "Tone burst (IEC 60268-1): {f} Hz, {cycles} cycles",
+            language,
+            f=f,
+            cycles=result.cycles,
+        )
     else:
         rate = decimal_comma(f"{result.repetition_rate:g}", language)
         title = _t(
             "Tone burst (IEC 60268-1): {f} Hz, {cycles} cycles, {rate}/s",
-            language, f=f, cycles=result.cycles, rate=rate,
+            language,
+            f=f,
+            cycles=result.cycles,
+            rate=rate,
         )
     ax.set_title(title)
     ax.set_xlabel(_t(_TIME_LABEL, language))
@@ -986,8 +1049,11 @@ def plot_tone_burst(
 
 
 def plot_resampled_signal(
-    result: ResampledSignalResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: ResampledSignalResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Anti-alias filter magnitude with the design edges and attenuation.
 
@@ -1017,9 +1083,7 @@ def plot_resampled_signal(
     # more stopband floor).
     f_hi = min(fs_up / 2.0, 4.0 * result.stopband_edge_hz)
     f_lo = result.stopband_edge_hz / 8.0
-    freqs, h = sp_signal.freqz(
-        result.filter_taps, worN=1 << 16, fs=fs_up
-    )
+    freqs, h = sp_signal.freqz(result.filter_taps, worN=1 << 16, fs=fs_up)
     tiny = np.finfo(np.float64).tiny
     mag_db = 20.0 * np.log10(np.maximum(np.abs(h), tiny))
     view = (freqs > 0.0) & (freqs <= f_hi)
@@ -1027,38 +1091,61 @@ def plot_resampled_signal(
     if "lw" not in kwargs and "linewidth" not in kwargs:
         kwargs["lw"] = 1.2
     kwargs.setdefault("label", _t("Anti-alias filter $|H(f)|$", language))
-    ax.semilogx(freqs[view], mag_db[view],
-                **kwargs)
-    ax.axvline(result.passband_edge_hz, color=_C_TERTIARY, linestyle="--",
-               lw=1.2, label=_t("Passband edge", language))
-    ax.axvline(result.stopband_edge_hz, color=_C_SECONDARY, linestyle="--",
-               lw=1.2, label=_t("Stopband edge (alias fold)", language))
-    atten = format_number(result.stopband_attenuation_db, language,
-                          decimals=0)
-    ax.axhline(-result.stopband_attenuation_db, color=_C_MUTED,
-               linestyle=":", lw=1.2,
-               label=_t("Design attenuation −{a} dB", language, a=atten))
-    ax.axvspan(result.stopband_edge_hz, f_hi, color=_C_SECONDARY,
-               alpha=0.08,
-               label=_t("Rejected band (would fold back as aliases)",
-                        language))
+    ax.semilogx(freqs[view], mag_db[view], **kwargs)
+    ax.axvline(
+        result.passband_edge_hz,
+        color=_C_TERTIARY,
+        linestyle="--",
+        lw=1.2,
+        label=_t("Passband edge", language),
+    )
+    ax.axvline(
+        result.stopband_edge_hz,
+        color=_C_SECONDARY,
+        linestyle="--",
+        lw=1.2,
+        label=_t("Stopband edge (alias fold)", language),
+    )
+    atten = format_number(result.stopband_attenuation_db, language, decimals=0)
+    ax.axhline(
+        -result.stopband_attenuation_db,
+        color=_C_MUTED,
+        linestyle=":",
+        lw=1.2,
+        label=_t("Design attenuation −{a} dB", language, a=atten),
+    )
+    ax.axvspan(
+        result.stopband_edge_hz,
+        f_hi,
+        color=_C_SECONDARY,
+        alpha=0.08,
+        label=_t("Rejected band (would fold back as aliases)", language),
+    )
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t(_MAGNITUDE_LABEL, language))
     ax.set_ylim(-result.stopband_attenuation_db - 40.0, 10.0)
     fs0 = format_number(result.original_fs, language, decimals=0)
     fs1 = format_number(result.fs, language, decimals=0)
-    ax.set_title(_t(
-        "Polyphase resampling {fs0} Hz → {fs1} Hz ($L/M$ = {up}/{down}, "
-        "{taps} taps)",
-        language, fs0=fs0, fs1=fs1, up=result.up, down=result.down,
-        taps=result.n_taps,
-    ))
+    ax.set_title(
+        _t(
+            "Polyphase resampling {fs0} Hz → {fs1} Hz ($L/M$ = {up}/{down}, "
+            "{taps} taps)",
+            language,
+            fs0=fs0,
+            fs1=fs1,
+            up=result.up,
+            down=result.down,
+            taps=result.n_taps,
+        )
+    )
     ax.grid(True, which="both", alpha=0.3)
     ax.legend(loc="lower left", fontsize="small")
     ax.set_xlim(f_lo, f_hi)
     format_frequency_axis(ax, f_lo, f_hi, minor=None)
     localize_axes(ax, language)
     return ax
+
+
 # ---------------------------------------------------------------------------
 # Cepstral analysis (Havelock Chs. 27/87) and envelope spectrum (B&P 13.3)
 # ---------------------------------------------------------------------------
@@ -1070,8 +1157,11 @@ _CEPSTRUM_TITLES = {
 
 
 def plot_cepstrum(
-    result: CepstrumResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: CepstrumResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Cepstrum against quefrency, over the unambiguous first half-axis.
 
@@ -1098,8 +1188,11 @@ def plot_cepstrum(
 
 
 def plot_window_metrics(
-    result: WindowMetricsResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: WindowMetricsResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes | np.ndarray:
     """Window shape and spectrum with the Harris figures of merit marked.
 
@@ -1128,14 +1221,20 @@ def plot_window_metrics(
         axs.plot(bins[shown], level[shown], **kwargs)
         sll = decimal_comma(fmt_minus(result.highest_sidelobe_db, ".1f"), language)
         axs.axhline(
-            result.highest_sidelobe_db, color=_C_REFERENCE, lw=1.0,
+            result.highest_sidelobe_db,
+            color=_C_REFERENCE,
+            lw=1.0,
             linestyle="--",
             label=_t("Highest sidelobe {sll} dB", language, sll=sll),
         )
         sl = decimal_comma(f"{result.scalloping_loss_db:.2f}", language)
         axs.plot(
-            [0.5], [-result.scalloping_loss_db], "o", color=_C_SECONDARY,
-            ms=5.0, label=_t("Scalloping loss {sl} dB", language, sl=sl),
+            [0.5],
+            [-result.scalloping_loss_db],
+            "o",
+            color=_C_SECONDARY,
+            ms=5.0,
+            label=_t("Scalloping loss {sl} dB", language, sl=sl),
         )
         axs.set_xlim(0.0, max_bins)
         axs.set_ylim(bottom=max(-140.0, float(np.min(level[shown])) - 5.0))
@@ -1144,8 +1243,7 @@ def plot_window_metrics(
         axs.grid(True, alpha=0.3)
         axs.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
 
-    title = _t("Window metrics (Harris 1978): {window}", language,
-               window=result.window)
+    title = _t("Window metrics (Harris 1978): {window}", language, window=result.window)
     if ax is not None:
         _spectrum_panel(ax)
         ax.set_title(title)
@@ -1166,8 +1264,7 @@ def plot_window_metrics(
 
 
 def plot_lifter(
-    result: LifterResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: LifterResult, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
 ) -> Axes | np.ndarray:
     """Real cepstrum with the lifter cutoff, plus the split log spectrum.
 
@@ -1182,19 +1279,20 @@ def plot_lifter(
     """
     from .._i18n import format_number, localize_axes
 
-    cutoff_ms = format_number(1e3 * result.cutoff, language, decimals=2,
-                              trim=True)
+    cutoff_ms = format_number(1e3 * result.cutoff, language, decimals=2, trim=True)
 
     def _spectrum_panel(axe: Axes) -> None:
         axe.plot(
-            result.frequencies, result.spectrum_db, color=_C_MUTED, lw=0.8,
+            result.frequencies,
+            result.spectrum_db,
+            color=_C_MUTED,
+            lw=0.8,
             label=_t("Log spectrum", language),
         )
         kwargs.setdefault("color", _C_PRIMARY)
         kwargs.setdefault(
             "label",
-            _t("Liftered ({mode})", language,
-               mode=_t(result.mode, language)),
+            _t("Liftered ({mode})", language, mode=_t(result.mode, language)),
         )
         axe.plot(result.frequencies, result.liftered_db, lw=1.6, **kwargs)
         axe.set_xlabel(_t(_FREQ_LABEL, language))
@@ -1210,11 +1308,16 @@ def plot_lifter(
     axes = _new_axes_column(2, figsize=(8.0, 6.4))
     half = result.nfft // 2 + 1
     axes[0].plot(
-        1e3 * result.quefrencies[:half], result.cepstrum[:half],
-        color=_C_SECONDARY, lw=1.0,
+        1e3 * result.quefrencies[:half],
+        result.cepstrum[:half],
+        color=_C_SECONDARY,
+        lw=1.0,
     )
     axes[0].axvline(
-        1e3 * result.cutoff, color=_C_REFERENCE, linestyle="--", lw=1.2,
+        1e3 * result.cutoff,
+        color=_C_REFERENCE,
+        linestyle="--",
+        lw=1.2,
         label=_t("Lifter cutoff ({q} ms)", language, q=cutoff_ms),
     )
     axes[0].set_xlabel(_t(_QUEFRENCY_LABEL, language))
@@ -1222,8 +1325,12 @@ def plot_lifter(
     axes[0].grid(True, alpha=0.3)
     axes[0].legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     axes[0].set_title(
-        _t("Liftering at {q} ms ({mode})", language, q=cutoff_ms,
-           mode=_t(result.mode, language))
+        _t(
+            "Liftering at {q} ms ({mode})",
+            language,
+            q=cutoff_ms,
+            mode=_t(result.mode, language),
+        )
     )
     _spectrum_panel(axes[1])
     for axf in axes:
@@ -1232,8 +1339,11 @@ def plot_lifter(
 
 
 def plot_echo_detection(
-    result: EchoDetectionResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: EchoDetectionResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Power cepstrum with the searched band and the detected echo marked.
 
@@ -1254,19 +1364,25 @@ def plot_echo_detection(
     kwargs.setdefault("lw", 1.0)
     ax.plot(1e3 * result.quefrencies[:half], result.cepstrum[:half], **kwargs)
     ax.axvspan(
-        1e3 * result.search_range[0], 1e3 * result.search_range[1],
-        color=_C_PRIMARY_LIGHT, alpha=0.25,
+        1e3 * result.search_range[0],
+        1e3 * result.search_range[1],
+        color=_C_PRIMARY_LIGHT,
+        alpha=0.25,
         label=_t("Searched band", language),
     )
     ax.plot(
-        [1e3 * result.delay], [result.reflection_coefficient], "v",
-        color=_C_SECONDARY, markersize=9,
+        [1e3 * result.delay],
+        [result.reflection_coefficient],
+        "v",
+        color=_C_SECONDARY,
+        markersize=9,
         label=_t(
-            "Echo: {delay} ms, $a$ = {a}", language,
-            delay=format_number(1e3 * result.delay, language, decimals=2,
-                                trim=True),
-            a=format_number(result.reflection_coefficient, language,
-                            decimals=3, trim=True),
+            "Echo: {delay} ms, $a$ = {a}",
+            language,
+            delay=format_number(1e3 * result.delay, language, decimals=2, trim=True),
+            a=format_number(
+                result.reflection_coefficient, language, decimals=3, trim=True
+            ),
         ),
     )
     ax.set_xlabel(_t(_QUEFRENCY_LABEL, language))
@@ -1278,8 +1394,11 @@ def plot_echo_detection(
 
 
 def plot_envelope_spectrum(
-    result: EnvelopeSpectrumResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: EnvelopeSpectrumResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes | np.ndarray:
     """Detected envelope over time and its amplitude spectrum.
 
@@ -1310,12 +1429,17 @@ def plot_envelope_spectrum(
 
     axes = _new_axes_column(2, figsize=(8.0, 6.4))
     axes[0].plot(
-        result.times, result.envelope, color=_C_SECONDARY, lw=1.0,
-        label=_t("Envelope ({kind})", language,
-                 kind=_t(result.kind, language)),
+        result.times,
+        result.envelope,
+        color=_C_SECONDARY,
+        lw=1.0,
+        label=_t("Envelope ({kind})", language, kind=_t(result.kind, language)),
     )
     axes[0].axhline(
-        result.mean_level, color=_C_REFERENCE, linestyle="--", lw=1.2,
+        result.mean_level,
+        color=_C_REFERENCE,
+        linestyle="--",
+        lw=1.2,
         label=_t("Mean level", language),
     )
     axes[0].set_xlabel(_t(_TIME_LABEL, language))
@@ -1331,8 +1455,7 @@ def plot_envelope_spectrum(
 
 #: Y-axis labels of the stationarity plot, keyed by the segment statistic.
 def plot_inverse_filter(
-    result: Any, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: Any, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
 ) -> Axes:
     """Measured, inverse and equalized magnitudes of a regularized inversion.
 
@@ -1363,36 +1486,47 @@ def plot_inverse_filter(
 
     kwargs.setdefault("label", _t("Measured response $|H|$", language))
     ax.semilogx(
-        freqs[pos], 20.0 * np.log10(np.maximum(h_mag[pos], tiny) / peak),
-        color=color, lw=1.2,
+        freqs[pos],
+        20.0 * np.log10(np.maximum(h_mag[pos], tiny) / peak),
+        color=color,
+        lw=1.2,
         **kwargs,
     )
     ax.semilogx(
-        freqs[pos], 20.0 * np.log10(np.maximum(inv_mag[pos] * peak, tiny)),
-        color=_C_SECONDARY, lw=1.2,
+        freqs[pos],
+        20.0 * np.log10(np.maximum(inv_mag[pos] * peak, tiny)),
+        color=_C_SECONDARY,
+        lw=1.2,
         label=_t(r"Inverse filter $|H_{\mathrm{inv}}|$", language),
     )
     ax.semilogx(
-        freqs[pos], 20.0 * np.log10(np.maximum(eq_mag[pos], tiny)),
-        color=_C_TERTIARY, lw=1.6,
+        freqs[pos],
+        20.0 * np.log10(np.maximum(eq_mag[pos], tiny)),
+        color=_C_TERTIARY,
+        lw=1.6,
         label=_t(r"Equalized $|H \cdot H_{\mathrm{inv}}|$", language),
     )
-    ax.axvspan(f1, f2, color=color, alpha=0.08,
-               label=_t("Equalized band", language))
+    ax.axvspan(f1, f2, color=color, alpha=0.08, label=_t("Equalized band", language))
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t(_MAGNITUDE_LABEL, language))
     ax.set_ylim(bottom=-60.0, top=20.0)
     flat = format_number(result.flatness_db, language, decimals=2)
-    ax.set_title(_t("Regularized inversion (Kirkeby) — flatness {flat} dB",
-                    language, flat=flat))
+    ax.set_title(
+        _t("Regularized inversion (Kirkeby) — flatness {flat} dB", language, flat=flat)
+    )
     ax.grid(True, which="both", alpha=0.3)
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     format_frequency_axis(ax, float(freqs[pos].min()), float(freqs[pos].max()))
     localize_axes(ax, language)
     return ax
+
+
 def plot_synchronous_average(
-    result: SynchronousAverageResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: SynchronousAverageResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes | np.ndarray:
     """Averaged periodic waveform and the synchronous-averaging comb filter.
 
@@ -1411,10 +1545,13 @@ def plot_synchronous_average(
     def _waveform(axw: Axes) -> None:
         kwargs.setdefault("color", _C_PRIMARY)
         kwargs.setdefault("lw", 1.6)
-        kwargs.setdefault("label", _t("Averaged periodic waveform ($N$ = {n})", language,
-                     n=result.n_averages))
+        kwargs.setdefault(
+            "label",
+            _t("Averaged periodic waveform ($N$ = {n})", language, n=result.n_averages),
+        )
         axw.plot(
-            1e3 * result.times, result.period_waveform,
+            1e3 * result.times,
+            result.period_waveform,
             **kwargs,
         )
         axw.set_xlabel(_t("Time [ms]", language))
@@ -1436,7 +1573,11 @@ def plot_synchronous_average(
     top = int(np.floor(orders[-1] + 1e-9))
     for k in range(1, top + 1):
         axes[1].axvline(
-            float(k), color=_C_REFERENCE, linestyle=":", lw=0.8, alpha=0.6,
+            float(k),
+            color=_C_REFERENCE,
+            linestyle=":",
+            lw=0.8,
+            alpha=0.6,
             label=_t("Harmonics of $1/T$", language) if k == 1 else None,
         )
     axes[1].set_xlabel(_t("Frequency [orders]", language))

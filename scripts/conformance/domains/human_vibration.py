@@ -55,8 +55,7 @@ def _chk_iso8041_wb_annex_b() -> Outcome:
 def _chk_iso8041_wb_annex_b_edges() -> Outcome:
     worst = max(
         abs(
-            float(ph.vibration.weighting_factors("Wb", _true_centre(n))[0])
-            / expected
+            float(ph.vibration.weighting_factors("Wb", _true_centre(n))[0]) / expected
             - 1.0
         )
         for n, expected in (
@@ -64,9 +63,7 @@ def _chk_iso8041_wb_annex_b_edges() -> Outcome:
             (20, ref.ISO8041_1_WB_FACTOR_100HZ),
         )
     )
-    return numeric(
-        0.0, worst, 1e-3, places=6, expected_label="max rel dev ≤ 0,1 %"
-    )
+    return numeric(0.0, worst, 1e-3, places=6, expected_label="max rel dev ≤ 0,1 %")
 
 
 @register(_HUMAN_VIB, "ISO 8041-1:2017 Table 1", "Wc factor at the 100 rad/s reference")
@@ -84,18 +81,13 @@ def _chk_iso8041_wc_reference() -> Outcome:
 )
 def _chk_iso8041_wd_reference_and_annex_b() -> Outcome:
     worst = max(
-        abs(
-            float(ph.vibration.weighting_factors("Wd", freq)[0]) / expected
-            - 1.0
-        )
+        abs(float(ph.vibration.weighting_factors("Wd", freq)[0]) / expected - 1.0)
         for freq, expected in (
             (ref.ISO8041_1_WBV_REF_FREQ_HZ, ref.ISO8041_1_WD_REF_FACTOR),
             (_true_centre(0), ref.ISO8041_1_WD_FACTOR_1HZ),
         )
     )
-    return numeric(
-        0.0, worst, 1e-3, places=6, expected_label="max rel dev ≤ 0,1 %"
-    )
+    return numeric(0.0, worst, 1e-3, places=6, expected_label="max rel dev ≤ 0,1 %")
 
 
 @register(_HUMAN_VIB, "ISO 8041-1:2017 Table B.4", "We design-goal factor at 8 Hz")
@@ -110,8 +102,7 @@ def _chk_iso8041_we_annex_b() -> Outcome:
 def _chk_iso8041_wf_annex_b() -> Outcome:
     worst = max(
         abs(
-            float(ph.vibration.weighting_factors("Wf", _true_centre(n))[0])
-            / expected
+            float(ph.vibration.weighting_factors("Wf", _true_centre(n))[0]) / expected
             - 1.0
         )
         for n, expected in (
@@ -119,9 +110,7 @@ def _chk_iso8041_wf_annex_b() -> Outcome:
             (-10, ref.ISO8041_1_WF_FACTOR_0P1HZ),
         )
     )
-    return numeric(
-        0.0, worst, 1e-3, places=6, expected_label="max rel dev ≤ 0,1 %"
-    )
+    return numeric(0.0, worst, 1e-3, places=6, expected_label="max rel dev ≤ 0,1 %")
 
 
 @register(
@@ -130,8 +119,7 @@ def _chk_iso8041_wf_annex_b() -> Outcome:
 def _chk_iso8041_wj_annex_b() -> Outcome:
     worst = max(
         abs(
-            float(ph.vibration.weighting_factors("Wj", _true_centre(n))[0])
-            / expected
+            float(ph.vibration.weighting_factors("Wj", _true_centre(n))[0]) / expected
             - 1.0
         )
         for n, expected in (
@@ -139,9 +127,7 @@ def _chk_iso8041_wj_annex_b() -> Outcome:
             (9, ref.ISO8041_1_WJ_FACTOR_8HZ),
         )
     )
-    return numeric(
-        0.0, worst, 1e-3, places=6, expected_label="max rel dev ≤ 0,1 %"
-    )
+    return numeric(0.0, worst, 1e-3, places=6, expected_label="max rel dev ≤ 0,1 %")
 
 
 @register(
@@ -166,19 +152,21 @@ def _chk_iso8041_table5_envelope() -> Outcome:
             else:
                 region = 4
             upper, lower = ref.ISO8041_1_TABLE5_TOLERANCES[region]
-            ratio = (
-                float(ph.vibration.weighting_factors(name, freq)[0]) / printed
-                - 1.0
-            )
+            ratio = float(ph.vibration.weighting_factors(name, freq)[0]) / printed - 1.0
             if not -lower <= ratio <= upper:
                 violations += 1
     return numeric(
-        0.0, float(violations), 0.0, places=0,
+        0.0,
+        float(violations),
+        0.0,
+        places=0,
         expected_label="0 bands outside the Table 5 tolerances",
     )
 
 
-@register(_HUMAN_VIB, "ISO 5349-2:2001 Example E.2.1", "Single-tool daily exposure A(8)")
+@register(
+    _HUMAN_VIB, "ISO 5349-2:2001 Example E.2.1", "Single-tool daily exposure A(8)"
+)
 def _chk_iso5349_e21() -> Outcome:
     a8 = ph.vibration.daily_exposure(7.4, 2.5 * 3600.0)
     return numeric(ref.ISO5349_2_E21_A8, a8, 0.05, unit="m/s^2", places=2)

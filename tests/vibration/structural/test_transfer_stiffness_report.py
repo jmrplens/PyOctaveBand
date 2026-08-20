@@ -27,8 +27,29 @@ from phonometry import PhonometryWarning, ReportMetadata, vibration
 _PDF_MAGIC = b"%PDF"
 
 _FREQS = np.array(
-    [20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315,
-     400, 500, 630, 800, 1000, 1250, 1600, 2000],
+    [
+        20,
+        25,
+        31.5,
+        40,
+        50,
+        63,
+        80,
+        100,
+        125,
+        160,
+        200,
+        250,
+        315,
+        400,
+        500,
+        630,
+        800,
+        1000,
+        1250,
+        1600,
+        2000,
+    ],
     dtype=float,
 )
 _K, _C = 1.0e6, 80.0
@@ -98,8 +119,9 @@ def test_indirect_method_labels_blocking_mass(tmp_path) -> None:
     """The indirect method names ISO 10846-3 and prints the blocking mass."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
-    freqs = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000],
-                     dtype=float)
+    freqs = np.array(
+        [100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000], dtype=float
+    )
     # A blocking mass well above the mass/spring resonance keeps |T| <= 0.1, so
     # the ISO 10846-3 validity advisory does not fire.
     transmissibility = vibration.base_transmissibility(freqs, 50.0, _K, 40.0)

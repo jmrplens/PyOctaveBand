@@ -107,6 +107,7 @@ def _common_metadata_pairs(
     reused across a Part 1 and a Part 2 campaign never leaks them into the
     diffusion sheet).
     """
+
     def _md(name: str) -> Any:
         return getattr(metadata, name) if metadata is not None else None
 
@@ -121,20 +122,30 @@ def _common_metadata_pairs(
         (t("Client", language), _md("client")),
         (t("Manufacturer", language), _md("manufacturer")),
         (t("Description", language), _md("specimen")),
-        (t("Sample area S [m<super>2</super>]", language),
-         fmt_meta(area, language) if area is not None else None),
-        (t("Room volume V [m<super>3</super>]", language),
-         fmt_meta(room_volume, language) if room_volume is not None else None),
+        (
+            t("Sample area S [m<super>2</super>]", language),
+            fmt_meta(area, language) if area is not None else None,
+        ),
+        (
+            t("Room volume V [m<super>3</super>]", language),
+            fmt_meta(room_volume, language) if room_volume is not None else None,
+        ),
         (freq_label, freq_range),
         (t("Mounting", language), _md("mounting")),
         (t("Test room", language), _md("test_room")),
         (t("Date of test", language), _md("test_date")),
-        (t("Temperature [&#176;C]", language),
-         fmt_meta(temperature, language) if temperature is not None else None),
-        (t("Relative humidity [%]", language),
-         fmt_meta(humidity, language) if humidity is not None else None),
-        (t("Ambient pressure [kPa]", language),
-         fmt_meta(pressure, language) if pressure is not None else None),
+        (
+            t("Temperature [&#176;C]", language),
+            fmt_meta(temperature, language) if temperature is not None else None,
+        ),
+        (
+            t("Relative humidity [%]", language),
+            fmt_meta(humidity, language) if humidity is not None else None,
+        ),
+        (
+            t("Ambient pressure [kPa]", language),
+            fmt_meta(pressure, language) if pressure is not None else None,
+        ),
     ]
     return [
         (label, value if label == freq_label else html.escape(str(value)))
@@ -217,12 +228,14 @@ def _scattering_table(
         ]
         rows: list[list[Any]] = [header]
         for fk, ak, spk, sk in zip(freqs, a_s, spec, s):
-            rows.append([
-                f"{round(fk)}",
-                _c2(ak, language),
-                _c2(spk, language),
-                _c2(sk, language),
-            ])
+            rows.append(
+                [
+                    f"{round(fk)}",
+                    _c2(ak, language),
+                    _c2(spk, language),
+                    _c2(sk, language),
+                ]
+            )
         col_widths = [22 * mm, 22 * mm, 24 * mm, 20 * mm]
     else:
         header = [
@@ -232,11 +245,13 @@ def _scattering_table(
         ]
         rows = [header]
         for fk, ak, sk in zip(freqs, a_s, s):
-            rows.append([
-                f"{round(fk)}",
-                _c2(ak, language),
-                _c2(sk, language),
-            ])
+            rows.append(
+                [
+                    f"{round(fk)}",
+                    _c2(ak, language),
+                    _c2(sk, language),
+                ]
+            )
         col_widths = [20 * mm, 18 * mm, 18 * mm]
     return band_table(rows, col_widths, len(freqs))
 
@@ -300,11 +315,15 @@ def render_scattering_report(
     from .._plot.materials import plot_scattering_report
 
     caption = (
-        t("One-third-octave &#945;<sub>s</sub>, &#945;<sub>spec</sub> and "
-          "scattering coefficient s", language)
+        t(
+            "One-third-octave &#945;<sub>s</sub>, &#945;<sub>spec</sub> and "
+            "scattering coefficient s",
+            language,
+        )
         if verbose
-        else t("One-third-octave &#945;<sub>s</sub> and scattering "
-               "coefficient s", language)
+        else t(
+            "One-third-octave &#945;<sub>s</sub> and scattering coefficient s", language
+        )
     )
     left_cell = [
         Paragraph(caption, caption_style),
@@ -361,11 +380,13 @@ def _diffusion_table(
         ]
         rows: list[list[Any]] = [header]
         for fk, dk, dnk in zip(freqs, d, d_n):
-            rows.append([
-                f"{round(fk)}",
-                _c2(dk, language),
-                _c2(dnk, language),
-            ])
+            rows.append(
+                [
+                    f"{round(fk)}",
+                    _c2(dk, language),
+                    _c2(dnk, language),
+                ]
+            )
         col_widths = [20 * mm, 18 * mm, 18 * mm]
     else:
         header = [
@@ -431,7 +452,9 @@ def render_diffusion_spectrum_report(
         language,
     )
     header_pairs = _common_metadata_pairs(
-        metadata, _freq_range(freqs, language), language,
+        metadata,
+        _freq_range(freqs, language),
+        language,
         include_room_fields=False,
     )
     flow = _header_flow(title, basis, header_pairs, title_style, basis_style)
@@ -440,8 +463,10 @@ def render_diffusion_spectrum_report(
 
     show_normalized = verbose and result.normalized is not None
     caption = (
-        t("One-third-octave diffusion coefficient d and normalised d<sub>n</sub>",
-          language)
+        t(
+            "One-third-octave diffusion coefficient d and normalised d<sub>n</sub>",
+            language,
+        )
         if show_normalized
         else t("One-third-octave diffusion coefficient d", language)
     )
@@ -551,13 +576,14 @@ def render_diffusion_polar_report(
     left_cell = [Paragraph(caption, caption_style), _polar_table(result, language)]
     plot_fn = functools.partial(plot_diffusion_polar_report, result)
     plot_drawing = render_figure_drawing(
-        plot_fn, 108 * mm, y_top=None,
-        subplot_kw={"projection": "polar"}, language=language,
+        plot_fn,
+        108 * mm,
+        y_top=None,
+        subplot_kw={"projection": "polar"},
+        language=language,
     )
     flow.append(
-        two_panel_body(
-            left_cell, plot_drawing, left_width_mm=64.0, plot_width_mm=110.0
-        )
+        two_panel_body(left_cell, plot_drawing, left_width_mm=64.0, plot_width_mm=110.0)
     )
     flow.append(Spacer(1, 8))
 

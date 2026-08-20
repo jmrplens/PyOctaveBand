@@ -70,7 +70,7 @@ def read_flac_bext(path: str | Path) -> BroadcastMetadata | None:
                     and len(payload) >= 12
                 ):
                     (size,) = struct.unpack_from("<I", payload, 8)
-                    return _parse_bext(payload[12:12 + size])
+                    return _parse_bext(payload[12 : 12 + size])
             else:
                 fh.seek(length, 1)
             if header[0] & 0x80:  # that was the last metadata block
@@ -94,8 +94,11 @@ def embed_flac_bext(path: str | Path, bext_payload: bytes) -> None:
         24-bit block length a FLAC metadata block can hold.
     """
     chunk = (
-        _RIFF_APP_ID + b"bext" + struct.pack("<I", len(bext_payload))
-        + bext_payload + (b"\x00" if len(bext_payload) % 2 else b"")
+        _RIFF_APP_ID
+        + b"bext"
+        + struct.pack("<I", len(bext_payload))
+        + bext_payload
+        + (b"\x00" if len(bext_payload) % 2 else b"")
     )
     if len(chunk) >= 1 << 24:
         raise ValueError(

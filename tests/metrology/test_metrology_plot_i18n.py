@@ -60,8 +60,11 @@ def test_uncertainty_budget_es() -> None:
 
 def test_monte_carlo_es() -> None:
     mc = u.monte_carlo(
-        _add4, [u.Quantity(0.0, 1.0, "rectangular") for _ in range(4)],
-        trials=20_000, seed=3, keep_samples=True,
+        _add4,
+        [u.Quantity(0.0, 1.0, "rectangular") for _ in range(4)],
+        trials=20_000,
+        seed=3,
+        keep_samples=True,
     )
     ax = mc.plot(language="es")
     assert ax.get_ylabel() == "Densidad de probabilidad"
@@ -70,8 +73,28 @@ def test_monte_carlo_es() -> None:
 
 
 def test_trend_test_es_and_bad_language() -> None:
-    values = [5.2, 6.2, 3.7, 6.4, 3.9, 4.0, 3.9, 5.3, 4.0, 4.6,
-              5.9, 6.5, 4.3, 5.7, 3.1, 5.6, 5.2, 3.9, 6.2, 5.0]
+    values = [
+        5.2,
+        6.2,
+        3.7,
+        6.4,
+        3.9,
+        4.0,
+        3.9,
+        5.3,
+        4.0,
+        4.6,
+        5.9,
+        6.5,
+        4.3,
+        5.7,
+        3.1,
+        5.6,
+        5.2,
+        3.9,
+        6.2,
+        5.0,
+    ]
     res = ph.metrology.trend_test(values)
     ax = res.plot(language="es")
     assert "Test de tendencia" in ax.get_title()

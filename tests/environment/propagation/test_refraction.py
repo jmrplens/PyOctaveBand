@@ -65,8 +65,9 @@ def test_linear_profile_is_exactly_linear() -> None:
 
 def test_log_linear_profile_matches_salomons_eq_4_5() -> None:
     b, z0, c0 = 1.0, 0.1, 340.0
-    prof = log_linear_sound_speed_profile(b, ground_speed=c0, roughness_length=z0,
-                                          max_height=100.0)
+    prof = log_linear_sound_speed_profile(
+        b, ground_speed=c0, roughness_length=z0, max_height=100.0
+    )
     # The sampled speeds follow Salomons Eq. (4.5) exactly at every grid height.
     expected = c0 + b * np.log1p(prof.heights / z0)
     np.testing.assert_allclose(prof.sound_speeds, expected, rtol=1e-12)
@@ -134,14 +135,21 @@ def _circle_fit_radius(x: np.ndarray, y: np.ndarray) -> float:
     return float(np.sqrt(cc + cx**2 + cy**2))
 
 
-@pytest.mark.parametrize(("gradient", "angle"), [(0.1, 20.0), (-0.05, 30.0), (0.2, 10.0)])
+@pytest.mark.parametrize(
+    ("gradient", "angle"), [(0.1, 20.0), (-0.05, 30.0), (0.2, 10.0)]
+)
 def test_ray_is_exact_circular_arc(gradient: float, angle: float) -> None:
     # A ray launched at the ground (where c = ground_speed) is an exact circle
     # of the closed-form radius; a circle fit recovers it to <0.01 %.
     prof = linear_sound_speed_profile(gradient, ground_speed=C0, max_height=3000.0)
     rc = ray_curvature_radius(gradient, ground_speed=C0, launch_angle_deg=angle)
-    res = atmospheric_ray_paths(prof, source_height=0.0, launch_angles_deg=[angle],
-                                max_range=300.0, n_steps=8000)
+    res = atmospheric_ray_paths(
+        prof,
+        source_height=0.0,
+        launch_angles_deg=[angle],
+        max_range=300.0,
+        n_steps=8000,
+    )
     r, z = res.ranges[0], res.heights[0]
     seg = slice(0, r.size // 2)  # first arc, before any turn/reflection
     assert _circle_fit_radius(r[seg], z[seg]) == pytest.approx(rc, rel=1e-3)
@@ -152,8 +160,13 @@ def test_turning_height_matches_geometry() -> None:
     gradient, angle = 0.2, 10.0
     prof = linear_sound_speed_profile(gradient, ground_speed=C0, max_height=3000.0)
     rc = ray_curvature_radius(gradient, ground_speed=C0, launch_angle_deg=angle)
-    res = atmospheric_ray_paths(prof, source_height=0.0, launch_angles_deg=[angle],
-                                max_range=600.0, n_steps=8000)
+    res = atmospheric_ray_paths(
+        prof,
+        source_height=0.0,
+        launch_angles_deg=[angle],
+        max_range=600.0,
+        n_steps=8000,
+    )
     peak = float(res.heights[0].max())
     assert peak == pytest.approx(rc * (1.0 - np.cos(np.radians(angle))), rel=2e-3)
     # One up-and-down excursion registers a single turning point.
@@ -163,8 +176,13 @@ def test_turning_height_matches_geometry() -> None:
 def test_ray_reflects_at_ground() -> None:
     # A downward launch from a low source reflects off the ground at least once.
     prof = linear_sound_speed_profile(0.05, ground_speed=C0, max_height=500.0)
-    res = atmospheric_ray_paths(prof, source_height=5.0, launch_angles_deg=[-10.0],
-                                max_range=400.0, n_steps=4000)
+    res = atmospheric_ray_paths(
+        prof,
+        source_height=5.0,
+        launch_angles_deg=[-10.0],
+        max_range=400.0,
+        n_steps=4000,
+    )
     assert res.ground_reflections[0] >= 1
     assert np.all(res.heights >= -1e-9)  # never dips below the ground
 
@@ -172,8 +190,9 @@ def test_ray_reflects_at_ground() -> None:
 def test_ray_travel_time_free_field() -> None:
     # In a homogeneous atmosphere a horizontal ray travels at c0: t = r/c0.
     prof = linear_sound_speed_profile(1e-12, ground_speed=C0, max_height=100.0)
-    res = atmospheric_ray_paths(prof, source_height=10.0, launch_angles_deg=[0.0],
-                                max_range=343.0, n_steps=2000)
+    res = atmospheric_ray_paths(
+        prof, source_height=10.0, launch_angles_deg=[0.0], max_range=343.0, n_steps=2000
+    )
     assert res.travel_times[0, -1] == pytest.approx(343.0 / C0, rel=1e-6)
 
 
@@ -207,7 +226,11 @@ def test_ray_validation() -> None:
     with pytest.raises(ValueError):
         atmospheric_ray_paths(prof, source_height=1.0, launch_angles_deg=[90.0])
     with pytest.raises(ValueError):
-        atmospheric_ray_paths(prof, source_height=1.0, launch_angles_deg=[], )
+        atmospheric_ray_paths(
+            prof,
+            source_height=1.0,
+            launch_angles_deg=[],
+        )
 
 
 # --------------------------------------------------------------------------- #
@@ -220,16 +243,29 @@ def _flat_profile() -> EffectiveSoundSpeedProfile:
 
 def test_pe_reproduces_spherical_ground_effect() -> None:
     freq, zs, zr = 500.0, 2.0, 2.0
-    pe = atmospheric_parabolic_equation(freq, _flat_profile(), source_height=zs,
-                                        impedance=Z_GRASS, max_range=1000.0,
-                                        max_height=50.0)
+    pe = atmospheric_parabolic_equation(
+        freq,
+        _flat_profile(),
+        source_height=zs,
+        impedance=Z_GRASS,
+        max_range=1000.0,
+        max_height=50.0,
+    )
     level = pe.level_at_height(zr)
     ranges = pe.ranges
-    oracle = np.array([
-        ground_effect(np.array([freq]), zs, zr, max(float(r), 1.0),
-                      impedance=Z_GRASS, speed_of_sound=C0).excess_attenuation[0]
-        for r in ranges
-    ])
+    oracle = np.array(
+        [
+            ground_effect(
+                np.array([freq]),
+                zs,
+                zr,
+                max(float(r), 1.0),
+                impedance=Z_GRASS,
+                speed_of_sound=C0,
+            ).excess_attenuation[0]
+            for r in ranges
+        ]
+    )
     band = (ranges >= 50.0) & (ranges <= 1000.0)
     # Default grid (dz = lambda/10): a few tenths of a dB; halving dz converges
     # the long-range tail below 0.3 dB.
@@ -238,16 +274,29 @@ def test_pe_reproduces_spherical_ground_effect() -> None:
 
 @pytest.mark.parametrize(("freq", "zs", "zr"), [(250.0, 1.0, 1.0), (1000.0, 2.0, 5.0)])
 def test_pe_matches_ground_effect_configs(freq: float, zs: float, zr: float) -> None:
-    pe = atmospheric_parabolic_equation(freq, _flat_profile(), source_height=zs,
-                                        impedance=Z_GRASS, max_range=800.0,
-                                        max_height=40.0)
+    pe = atmospheric_parabolic_equation(
+        freq,
+        _flat_profile(),
+        source_height=zs,
+        impedance=Z_GRASS,
+        max_range=800.0,
+        max_height=40.0,
+    )
     level = pe.level_at_height(zr)
     ranges = pe.ranges
-    oracle = np.array([
-        ground_effect(np.array([freq]), zs, zr, max(float(r), 1.0),
-                      impedance=Z_GRASS, speed_of_sound=C0).excess_attenuation[0]
-        for r in ranges
-    ])
+    oracle = np.array(
+        [
+            ground_effect(
+                np.array([freq]),
+                zs,
+                zr,
+                max(float(r), 1.0),
+                impedance=Z_GRASS,
+                speed_of_sound=C0,
+            ).excess_attenuation[0]
+            for r in ranges
+        ]
+    )
     band = (ranges >= 50.0) & (ranges <= 800.0)
     assert np.max(np.abs(level[band] - oracle[band])) < 0.6
 
@@ -258,18 +307,37 @@ def test_pe_hard_ground_enhancement() -> None:
     # GFPE needs a taller grid than an absorbing ground to converge.
     freq, zs, zr = 500.0, 2.0, 2.0
     hard = complex(1e6, 0.0)
-    pe = atmospheric_parabolic_equation(freq, _flat_profile(), source_height=zs,
-                                        impedance=hard, max_range=600.0,
-                                        max_height=150.0)
+    pe = atmospheric_parabolic_equation(
+        freq,
+        _flat_profile(),
+        source_height=zs,
+        impedance=hard,
+        max_range=600.0,
+        max_height=150.0,
+    )
     level = pe.level_at_height(zr)
     ranges = pe.ranges
-    oracle = np.array([
-        20.0 * np.log10(np.abs(
-            1.0 + (np.hypot(r, zs - zr) / np.hypot(r, zs + zr))
-            * np.exp(1j * 2.0 * np.pi * freq / C0
-                     * (np.hypot(r, zs + zr) - np.hypot(r, zs - zr)))))
-        for r in ranges if r > 0
-    ])
+    oracle = np.array(
+        [
+            20.0
+            * np.log10(
+                np.abs(
+                    1.0
+                    + (np.hypot(r, zs - zr) / np.hypot(r, zs + zr))
+                    * np.exp(
+                        1j
+                        * 2.0
+                        * np.pi
+                        * freq
+                        / C0
+                        * (np.hypot(r, zs + zr) - np.hypot(r, zs - zr))
+                    )
+                )
+            )
+            for r in ranges
+            if r > 0
+        ]
+    )
     band = (ranges[1:] >= 100.0) & (ranges[1:] <= 600.0)
     assert np.max(np.abs(level[1:][band] - oracle[band])) < 0.6
     assert level[np.argmin(np.abs(ranges - 500.0))] > 5.0  # near +6 dB
@@ -284,13 +352,22 @@ def test_pe_finite_ground_shows_dip_below_hard_ground() -> None:
     freq, zs, zr = 395.0, 2.0, 2.0
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        soft = atmospheric_parabolic_equation(freq, _flat_profile(),
-                                              source_height=zs,
-                                              flow_resistivity=2e5,
-                                              max_range=120.0, max_height=50.0)
-    hard = atmospheric_parabolic_equation(freq, _flat_profile(), source_height=zs,
-                                          impedance=complex(1e6, 0.0),
-                                          max_range=120.0, max_height=150.0)
+        soft = atmospheric_parabolic_equation(
+            freq,
+            _flat_profile(),
+            source_height=zs,
+            flow_resistivity=2e5,
+            max_range=120.0,
+            max_height=50.0,
+        )
+    hard = atmospheric_parabolic_equation(
+        freq,
+        _flat_profile(),
+        source_height=zs,
+        impedance=complex(1e6, 0.0),
+        max_range=120.0,
+        max_height=150.0,
+    )
     i = int(np.argmin(np.abs(soft.ranges - 100.0)))
     j = int(np.argmin(np.abs(hard.ranges - 100.0)))
     dip = soft.level_at_height(zr)[i] - hard.level_at_height(zr)[j]
@@ -299,12 +376,22 @@ def test_pe_finite_ground_shows_dip_below_hard_ground() -> None:
 
 def test_pe_reciprocity() -> None:
     freq = 400.0
-    a = atmospheric_parabolic_equation(freq, _flat_profile(), source_height=2.0,
-                                       impedance=Z_GRASS, max_range=500.0,
-                                       max_height=40.0)
-    b = atmospheric_parabolic_equation(freq, _flat_profile(), source_height=10.0,
-                                       impedance=Z_GRASS, max_range=500.0,
-                                       max_height=40.0)
+    a = atmospheric_parabolic_equation(
+        freq,
+        _flat_profile(),
+        source_height=2.0,
+        impedance=Z_GRASS,
+        max_range=500.0,
+        max_height=40.0,
+    )
+    b = atmospheric_parabolic_equation(
+        freq,
+        _flat_profile(),
+        source_height=10.0,
+        impedance=Z_GRASS,
+        max_range=500.0,
+        max_height=40.0,
+    )
     band = (a.ranges >= 50.0) & (a.ranges <= 500.0)
     diff = a.level_at_height(10.0)[band] - b.level_at_height(2.0)[band]
     assert np.max(np.abs(diff)) < 0.5
@@ -316,12 +403,17 @@ def test_pe_upward_refraction_shadow() -> None:
     freq, zs, zr = 400.0, 2.0, 2.0
     up = log_linear_sound_speed_profile(-1.0, ground_speed=340.0, max_height=200.0)
     down = log_linear_sound_speed_profile(1.0, ground_speed=340.0, max_height=200.0)
-    pu = atmospheric_parabolic_equation(freq, up, source_height=zs,
-                                        impedance=Z_GRASS, max_range=800.0,
-                                        max_height=40.0)
-    pd = atmospheric_parabolic_equation(freq, down, source_height=zs,
-                                        impedance=Z_GRASS, max_range=800.0,
-                                        max_height=40.0)
+    pu = atmospheric_parabolic_equation(
+        freq, up, source_height=zs, impedance=Z_GRASS, max_range=800.0, max_height=40.0
+    )
+    pd = atmospheric_parabolic_equation(
+        freq,
+        down,
+        source_height=zs,
+        impedance=Z_GRASS,
+        max_range=800.0,
+        max_height=40.0,
+    )
     i = int(np.argmin(np.abs(pu.ranges - 700.0)))
     assert pu.level_at_height(zr)[i] < pd.level_at_height(zr)[i] - 20.0
 
@@ -337,35 +429,58 @@ def test_pe_flow_resistivity_matches_impedance_path() -> None:
     freq = 500.0
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", PorousAbsorberWarning)
-        z = complex(np.conj(delany_bazley(np.array([freq]), 2.0e5,
-                                          speed_of_sound=C0).normalized_impedance[0]))
+        z = complex(
+            np.conj(
+                delany_bazley(
+                    np.array([freq]), 2.0e5, speed_of_sound=C0
+                ).normalized_impedance[0]
+            )
+        )
         via_sigma = atmospheric_parabolic_equation(
-            freq, _flat_profile(), source_height=2.0, flow_resistivity=2.0e5,
-            max_range=400.0, max_height=30.0)
+            freq,
+            _flat_profile(),
+            source_height=2.0,
+            flow_resistivity=2.0e5,
+            max_range=400.0,
+            max_height=30.0,
+        )
     via_z = atmospheric_parabolic_equation(
-        freq, _flat_profile(), source_height=2.0, impedance=z,
-        max_range=400.0, max_height=30.0)
+        freq,
+        _flat_profile(),
+        source_height=2.0,
+        impedance=z,
+        max_range=400.0,
+        max_height=30.0,
+    )
     assert via_sigma.normalized_impedance == pytest.approx(z)
-    np.testing.assert_allclose(via_sigma.relative_level, via_z.relative_level,
-                               rtol=0, atol=1e-9)
+    np.testing.assert_allclose(
+        via_sigma.relative_level, via_z.relative_level, rtol=0, atol=1e-9
+    )
 
 
 def test_pe_validation() -> None:
     prof = _flat_profile()
     with pytest.raises(ValueError):
-        atmospheric_parabolic_equation(500.0, prof, source_height=0.0,
-                                       impedance=Z_GRASS)
+        atmospheric_parabolic_equation(
+            500.0, prof, source_height=0.0, impedance=Z_GRASS
+        )
     with pytest.raises(ValueError):
         # Neither impedance nor flow_resistivity.
         atmospheric_parabolic_equation(500.0, prof, source_height=2.0)
     with pytest.raises(ValueError):
         # Both impedance and flow_resistivity.
-        atmospheric_parabolic_equation(500.0, prof, source_height=2.0,
-                                       impedance=Z_GRASS, flow_resistivity=2e5)
+        atmospheric_parabolic_equation(
+            500.0, prof, source_height=2.0, impedance=Z_GRASS, flow_resistivity=2e5
+        )
     with pytest.raises(ValueError):
-        atmospheric_parabolic_equation(500.0, prof, source_height=2.0,
-                                       impedance=Z_GRASS, range_step=1e9,
-                                       max_range=100.0)
+        atmospheric_parabolic_equation(
+            500.0,
+            prof,
+            source_height=2.0,
+            impedance=Z_GRASS,
+            range_step=1e9,
+            max_range=100.0,
+        )
 
 
 # --------------------------------------------------------------------------- #
@@ -373,15 +488,24 @@ def test_pe_validation() -> None:
 # --------------------------------------------------------------------------- #
 def test_result_types_and_shapes() -> None:
     prof = _flat_profile()
-    rays = atmospheric_ray_paths(prof, source_height=2.0,
-                                 launch_angles_deg=[-5.0, 0.0, 5.0],
-                                 max_range=300.0, n_steps=500)
+    rays = atmospheric_ray_paths(
+        prof,
+        source_height=2.0,
+        launch_angles_deg=[-5.0, 0.0, 5.0],
+        max_range=300.0,
+        n_steps=500,
+    )
     assert isinstance(rays, AtmosphericRayResult)
     assert rays.heights.shape == (3, 500)
     assert rays.travel_times.shape == (3, 500)
-    pe = atmospheric_parabolic_equation(500.0, prof, source_height=2.0,
-                                        impedance=Z_GRASS, max_range=200.0,
-                                        max_height=30.0)
+    pe = atmospheric_parabolic_equation(
+        500.0,
+        prof,
+        source_height=2.0,
+        impedance=Z_GRASS,
+        max_range=200.0,
+        max_height=30.0,
+    )
     assert isinstance(pe, AtmosphericPEResult)
     assert pe.relative_level.shape == (pe.heights.size, pe.ranges.size)
 
@@ -390,14 +514,25 @@ def test_result_types_and_shapes() -> None:
 def test_plots_smoke() -> None:
     pytest.importorskip("matplotlib")
     import matplotlib
+
     matplotlib.use("Agg")
     prof = log_linear_sound_speed_profile(1.0, max_height=100.0)
     prof.plot()
-    atmospheric_ray_paths(prof, source_height=2.0,
-                          launch_angles_deg=[-2.0, 0.0, 2.0],
-                          max_range=300.0, n_steps=500).plot()
-    atmospheric_parabolic_equation(500.0, prof, source_height=2.0,
-                                   impedance=Z_GRASS, max_range=200.0,
-                                   max_height=30.0).plot()
+    atmospheric_ray_paths(
+        prof,
+        source_height=2.0,
+        launch_angles_deg=[-2.0, 0.0, 2.0],
+        max_range=300.0,
+        n_steps=500,
+    ).plot()
+    atmospheric_parabolic_equation(
+        500.0,
+        prof,
+        source_height=2.0,
+        impedance=Z_GRASS,
+        max_range=200.0,
+        max_height=30.0,
+    ).plot()
     import matplotlib.pyplot as plt
+
     plt.close("all")

@@ -70,15 +70,19 @@ def _chk_cnossos_road_workbook() -> Outcome:
             gradient=float(case["gradient_pct"]),
             studded_months=float(case["studded_months"]),
             junction_distance=float(case["junction_distance_m"]),
-            junction_type=ph.environment.JunctionType(
-                int(case["junction_type"])
-            ),
+            junction_type=ph.environment.JunctionType(int(case["junction_type"])),
             coefficients=coefficients,
         )
         for got, band in zip(result.total_line_power, ref.CNOSSOS_ROAD_BANDS):
             worst = max(worst, abs(float(got) - float(case[f"lw_{band}"])))
-    return numeric(0.0, worst, 0.01, unit="dB", places=4,
-                   expected_label="<= 0.01 dB on 480 published band levels (60 cases)")
+    return numeric(
+        0.0,
+        worst,
+        0.01,
+        unit="dB",
+        places=4,
+        expected_label="<= 0.01 dB on 480 published band levels (60 cases)",
+    )
 
 
 @register(
@@ -108,8 +112,14 @@ def _chk_cnossos_road_table_f1() -> Outcome:
             ),
         )
         bad += sum(1 for got, want in pairs for a, b in zip(got, want) if a != b)
-    return numeric(0.0, float(bad), 0.0, unit="mismatches", places=0,
-                   expected_label="160 coefficients identical")
+    return numeric(
+        0.0,
+        float(bad),
+        0.0,
+        unit="mismatches",
+        places=0,
+        expected_label="160 coefficients identical",
+    )
 
 
 @register(
@@ -124,10 +134,18 @@ def _chk_cnossos_road_table_f4() -> Outcome:
         expected = ref.CNOSSOS_ROAD_TABLE_F4[surface.value]
         for category in ("1", "2", "3", "4a", "4b"):
             key = category if category in expected else "4a/4b"
-            bad += sum(1 for a, b in zip(row.alpha[category], expected[key][0]) if a != b)
+            bad += sum(
+                1 for a, b in zip(row.alpha[category], expected[key][0]) if a != b
+            )
             bad += int(row.beta[category] != expected[key][1])
-    return numeric(0.0, float(bad), 0.0, unit="mismatches", places=0,
-                   expected_label="675 stored coefficients identical")
+    return numeric(
+        0.0,
+        float(bad),
+        0.0,
+        unit="mismatches",
+        places=0,
+        expected_label="675 stored coefficients identical",
+    )
 
 
 @register(
@@ -156,8 +174,14 @@ def _chk_cnossos_road_tables_f2_f3() -> Outcome:
             ph.environment.ROAD_COEFFICIENTS.junction_c[category]
             != (expected[1], expected[2])
         )
-    return numeric(0.0, float(bad), 0.0, unit="mismatches", places=0,
-                   expected_label="36 coefficients identical")
+    return numeric(
+        0.0,
+        float(bad),
+        0.0,
+        unit="mismatches",
+        places=0,
+        expected_label="36 coefficients identical",
+    )
 
 
 @register(
@@ -181,8 +205,14 @@ def _chk_cnossos_road_reference_conditions() -> Outcome:
             ),
         ):
             worst = max(worst, max(abs(float(a) - b) for a, b in zip(got, want)))
-    return numeric(0.0, worst, 0.0, unit="dB", places=6,
-                   expected_label="exactly A_R,i,m and A_P,i,m")
+    return numeric(
+        0.0,
+        worst,
+        0.0,
+        unit="dB",
+        places=6,
+        expected_label="exactly A_R,i,m and A_P,i,m",
+    )
 
 
 @register(
@@ -198,8 +228,14 @@ def _chk_cnossos_a_weighting() -> Outcome:
         )
         if a != b
     )
-    return numeric(0.0, float(bad), 0.0, unit="mismatches", places=0,
-                   expected_label="8 values identical")
+    return numeric(
+        0.0,
+        float(bad),
+        0.0,
+        unit="mismatches",
+        places=0,
+        expected_label="8 values identical",
+    )
 
 
 # ===========================================================================

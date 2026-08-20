@@ -30,12 +30,12 @@ from .elastic import (
 # same dx = h / 4 = 2.5 mm, same _EC_CB_TUNE, so the two clips describe one
 # plate with one critical frequency and the reader can put them side by side.
 _RE_NY, _RE_NX = 280, 540
-_RE_SPONGE = 80                    # 0.20 m on all four sides
-_RE_R0 = 180                       # first plate row (its upper face)
-_RE_PLATE_ROWS = 4                 # h / dx, the 10 mm plate
-_RE_VIEW_ROWS = (80, 200)          # rows shown: the sponges stay off screen
-_RE_VIEW_COLS = (80, 460)          # 0.95 m of plate, sponge-free
-_RE_DEC = 2                        # display decimation
+_RE_SPONGE = 80  # 0.20 m on all four sides
+_RE_R0 = 180  # first plate row (its upper face)
+_RE_PLATE_ROWS = 4  # h / dx, the 10 mm plate
+_RE_VIEW_ROWS = (80, 200)  # rows shown: the sponges stay off screen
+_RE_VIEW_COLS = (80, 460)  # 0.95 m of plate, sponge-free
+_RE_DEC = 2  # display decimation
 # Drive. A vertical line force on the mid-plate face, phase-graded with the
 # panel's own k_B so the plate carries a wave running to the right, applied
 # over the *whole* plate and rolled off only in the outer 0.15 m at each end,
@@ -50,23 +50,23 @@ _RE_DEC = 2                        # display decimation
 # 0.17 m against the 0.091 m of an evanescent wave. Driving the whole plate
 # instead is both the cleaner picture and the honest model of the infinite
 # plate the section is about.
-_RE_ROLLOFF = 0.15                 # taper length at each end of the drive [m]
-_RE_SPAN_X0 = 0.45                 # measurement span starts here [m]; it runs
+_RE_ROLLOFF = 0.15  # taper length at each end of the drive [m]
+_RE_SPAN_X0 = 0.45  # measurement span starts here [m]; it runs
 #                                    one bending wavelength of the lower
 #                                    panel, exactly two of the upper one, so
 #                                    both close on a whole number of cycles
 #                                    in space as well as in time, and it sits
 #                                    in the middle of the view, clear of both
 #                                    roll-offs
-_RE_PROBE_H = 0.02                 # height of the air row the horizontal
+_RE_PROBE_H = 0.02  # height of the air row the horizontal
 #                                    wavenumber is read from [m]; close in,
 #                                    where the evanescent branch of the
 #                                    subsonic panel still dominates whatever
 #                                    little else is in the air
-_RE_RAMP_CYCLES = 1.5              # source onset, in periods of each panel
-_RE_AVG_CYCLES = 2                 # settled averaging, in periods of f_c / 2
-_RE_EVERY = 64                     # capture stride [solver steps]
-_RE_FPS = 70                       # 810 active frames + 2 s hold = 13.3 s
+_RE_RAMP_CYCLES = 1.5  # source onset, in periods of each panel
+_RE_AVG_CYCLES = 2  # settled averaging, in periods of f_c / 2
+_RE_EVERY = 64  # capture stride [solver steps]
+_RE_FPS = 70  # 810 active frames + 2 s hold = 13.3 s
 #: Colour half-range on the normalisation that divides the air pressure by
 #: ``rho0 c0 v_plate``, i.e. by the pressure a piston of the same surface
 #: velocity would make. 1.6 leaves the supersonic panel's beam room without
@@ -164,8 +164,7 @@ def _radiation_efficiency_fields() -> tuple[Any, Any, Any, Any, Any]:
     dt = 0.6 * dx / (cp_plate * float(np.sqrt(2.0)))
     lam_b_lo = 2.0 * np.pi / _re_bending_wavenumber(freqs[0])
     ramp_lo = _RE_RAMP_CYCLES / freqs[0]
-    span = slice(round(_RE_SPAN_X0 / dx),
-                 round((_RE_SPAN_X0 + lam_b_lo) / dx))
+    span = slice(round(_RE_SPAN_X0 / dx), round((_RE_SPAN_X0 + lam_b_lo) / dx))
     x0, x1, _h0, h1 = _re_geometry()
     diagonal = float(np.hypot(x1 - x0, h1))
     span_t = ramp_lo + 1.2 * diagonal / _EL_C0 + _RE_AVG_CYCLES / freqs[0]
@@ -173,15 +172,14 @@ def _radiation_efficiency_fields() -> tuple[Any, Any, Any, Any, Any]:
     steps = n_active * _RE_EVERY
 
     r0 = _RE_R0
-    drive_row = r0 + 1                      # mid-plate y-face
+    drive_row = r0 + 1  # mid-plate y-face
     rows = slice(_RE_VIEW_ROWS[0], _RE_VIEW_ROWS[1], _RE_DEC)
     cols = slice(_RE_VIEW_COLS[0], _RE_VIEW_COLS[1], _RE_DEC)
     src_cols = np.arange(_RE_NX)
     x_src = (src_cols + 0.5) * dx
     # Full-width drive with a cosine-squared roll-off over the outer
     # _RE_ROLLOFF at each end, both of which sit inside the sponges.
-    edge = np.clip(np.minimum(x_src, _RE_NX * dx - x_src) / _RE_ROLLOFF,
-                   0.0, 1.0)
+    edge = np.clip(np.minimum(x_src, _RE_NX * dx - x_src) / _RE_ROLLOFF, 0.0, 1.0)
     taper = np.sin(0.5 * np.pi * edge) ** 2
 
     stacks: list[Any] = []
@@ -191,12 +189,10 @@ def _radiation_efficiency_fields() -> tuple[Any, Any, Any, Any, Any]:
         c_p = np.full((_RE_NY, _RE_NX), _EL_C0)
         c_s = np.zeros((_RE_NY, _RE_NX))
         rho = np.full((_RE_NY, _RE_NX), _EL_RHO0)
-        c_p[r0:r0 + _RE_PLATE_ROWS] = cp_plate
-        c_s[r0:r0 + _RE_PLATE_ROWS] = _EL_CS * _EC_CB_TUNE
-        rho[r0:r0 + _RE_PLATE_ROWS] = _EL_RHO
-        sim = simulation.ElasticFDTD2D(
-            c_p, c_s, dx, rho=rho, sponge_width=_RE_SPONGE
-        )
+        c_p[r0 : r0 + _RE_PLATE_ROWS] = cp_plate
+        c_s[r0 : r0 + _RE_PLATE_ROWS] = _EL_CS * _EC_CB_TUNE
+        rho[r0 : r0 + _RE_PLATE_ROWS] = _EL_RHO
+        sim = simulation.ElasticFDTD2D(c_p, c_s, dx, rho=rho, sponge_width=_RE_SPONGE)
         omega = 2.0 * np.pi * f0
         k_b = _re_bending_wavenumber(f0)
         ramp_t = _RE_RAMP_CYCLES / f0
@@ -213,8 +209,9 @@ def _radiation_efficiency_fields() -> tuple[Any, Any, Any, Any, Any]:
             sim.step()
             t = sim.time
             r = min(t / ramp_t, 1.0)
-            sim.vy[drive_row] += ((r * r * (3.0 - 2.0 * r)) * taper
-                                  * np.sin(omega * t - k_b * x_src))
+            sim.vy[drive_row] += (
+                (r * r * (3.0 - 2.0 * r)) * taper * np.sin(omega * t - k_b * x_src)
+            )
             if i >= avg_from:
                 v2_sum += float(np.mean(sim.vy[drive_row, span] ** 2))
                 n_avg += 1
@@ -224,7 +221,7 @@ def _radiation_efficiency_fields() -> tuple[Any, Any, Any, Any, Any]:
                 # mean normal stress, orders above any air pressure, and the
                 # plate is drawn as a patch instead. One row either side
                 # would blank the air the near field lives in.
-                p[r0:r0 + _RE_PLATE_ROWS] = 0.0
+                p[r0 : r0 + _RE_PLATE_ROWS] = 0.0
                 frames.append(p[rows, cols].astype(np.float32))
                 plate.append(sim.vy[drive_row, cols].astype(np.float32))
                 ts.append(t)
@@ -236,7 +233,7 @@ def _radiation_efficiency_fields() -> tuple[Any, Any, Any, Any, Any]:
         stack = np.stack(frames) / p_piston
         prof = np.stack(plate)
         stacks.append(stack[:, ::-1, :])
-        plates.append(prof / float(np.abs(prof[3 * n_active // 4:]).max()))
+        plates.append(prof / float(np.abs(prof[3 * n_active // 4 :]).max()))
         times = np.asarray(ts)
     return stacks[0], stacks[1], plates[0], plates[1], times
 
@@ -279,8 +276,7 @@ def animate_elastic_radiation_efficiency(output_dir: str) -> None:
     k_b0 = _re_bending_wavenumber(freqs[0])
     k_00 = 2.0 * np.pi * freqs[0] / _EL_C0
     skin_exact = 1.0 / float(np.sqrt(k_b0**2 - k_00**2))
-    outline = [patheffects.withStroke(linewidth=2.0,
-                                      foreground=FIELD_STROKE)]
+    outline = [patheffects.withStroke(linewidth=2.0, foreground=FIELD_STROKE)]
     x0, x1, h0, h1 = _re_geometry()
     n_active = int(times.size)
     x_plate = np.linspace(x0, x1, plate_lo.shape[1])
@@ -294,42 +290,71 @@ def animate_elastic_radiation_efficiency(output_dir: str) -> None:
     fig.get_layout_engine().set(rect=(0.0, 0.055, 1.0, 0.945))
     # Short on purpose: the Spanish of the longer title overran the canvas
     # at both ends. The solver and the plate moved to the footer.
-    fig.suptitle(T("Radiation efficiency: a driven plate below and above "
-                   "$f_\\mathrm{c}$"))
+    fig.suptitle(
+        T("Radiation efficiency: a driven plate below and above $f_\\mathrm{c}$")
+    )
     axes = fig.subplots(2, 1, sharex=True)
     titles = [
-        T(f"$f = f_\\mathrm{{c}}/2$ = {freqs[0]:.0f} Hz, below coincidence: the plate "
-          f"wave is slower than sound"),
-        T(f"$f = 2f_\\mathrm{{c}}$ = {freqs[1]:.0f} Hz, above coincidence: the plate "
-          f"wave is faster than sound"),
+        T(
+            f"$f = f_\\mathrm{{c}}/2$ = {freqs[0]:.0f} Hz, below coincidence: the plate "
+            f"wave is slower than sound"
+        ),
+        T(
+            f"$f = 2f_\\mathrm{{c}}$ = {freqs[1]:.0f} Hz, above coincidence: the plate "
+            f"wave is faster than sound"
+        ),
     ]
     # One measurement per panel, each the one its regime admits: a decay
     # where the field is evanescent, an angle where it propagates.
     verdicts = [
-        T(f"$\\lambda_\\mathrm{{B}}$ = {lam_b[0]:.2f} m is shorter than $\\lambda$ = "
-          f"{lam_0[0]:.2f} m in air\nno angle solves "
-          f"$\\sin\\theta = \\lambda/\\lambda_\\mathrm{{B}}$: the skin dies in "
-          f"{skin_exact:.3f} m"),
-        T(f"$\\lambda_\\mathrm{{B}}$ = {lam_b[1]:.2f} m is longer than $\\lambda$ = "
-          f"{lam_0[1]:.2f} m in air\nthe trace match sends a beam out at "
-          f"{theta:.0f}°"),
+        T(
+            f"$\\lambda_\\mathrm{{B}}$ = {lam_b[0]:.2f} m is shorter than $\\lambda$ = "
+            f"{lam_0[0]:.2f} m in air\nno angle solves "
+            f"$\\sin\\theta = \\lambda/\\lambda_\\mathrm{{B}}$: the skin dies in "
+            f"{skin_exact:.3f} m"
+        ),
+        T(
+            f"$\\lambda_\\mathrm{{B}}$ = {lam_b[1]:.2f} m is longer than $\\lambda$ = "
+            f"{lam_0[1]:.2f} m in air\nthe trace match sends a beam out at "
+            f"{theta:.0f}°"
+        ),
     ]
     ims: list[Any] = []
     defl: list[Any] = []
     v_txts: list[Any] = []
-    for row, (data, title) in enumerate(((p_lo, titles[0]),
-                                         (p_hi, titles[1]))):
+    for row, (data, title) in enumerate(((p_lo, titles[0]), (p_hi, titles[1]))):
         ax = axes[row]
         ax.grid(False)
-        im = ax.imshow(data[0], origin="lower", extent=(x0, x1, h0, h1),
-                       cmap=CMAP_FIELD, vmin=-_RE_VLIM, vmax=_RE_VLIM,
-                       aspect="equal", interpolation="bilinear")
+        im = ax.imshow(
+            data[0],
+            origin="lower",
+            extent=(x0, x1, h0, h1),
+            cmap=CMAP_FIELD,
+            vmin=-_RE_VLIM,
+            vmax=_RE_VLIM,
+            aspect="equal",
+            interpolation="bilinear",
+        )
         ax.set_title(title, fontsize=9)
-        ax.add_patch(Rectangle((x0, -_EL_H), x1 - x0, _EL_H,
-                               facecolor=COLOR_GRID, edgecolor=COLOR_FG,
-                               lw=0.7, zorder=3))
-        (line,) = ax.plot(x_plate, np.zeros_like(x_plate), lw=1.2,
-                          color=FIELD_INK, path_effects=outline, zorder=4)
+        ax.add_patch(
+            Rectangle(
+                (x0, -_EL_H),
+                x1 - x0,
+                _EL_H,
+                facecolor=COLOR_GRID,
+                edgecolor=COLOR_FG,
+                lw=0.7,
+                zorder=3,
+            )
+        )
+        (line,) = ax.plot(
+            x_plate,
+            np.zeros_like(x_plate),
+            lw=1.2,
+            color=FIELD_INK,
+            path_effects=outline,
+            zorder=4,
+        )
         ax.set_ylabel(T("height above the plate [m]"), fontsize=8)
         ax.tick_params(labelsize=7)
         ax.set_yticks([0.0, 0.1, 0.2])
@@ -341,56 +366,122 @@ def animate_elastic_radiation_efficiency(output_dir: str) -> None:
             reach = 0.85 * h1
             foot_x = 0.12
             ax.annotate(
-                "", xy=(foot_x + reach * float(np.tan(np.radians(theta))),
-                        reach), xytext=(foot_x, 0.0),
-                arrowprops={"arrowstyle": "-|>", "color": FIELD_INK,
-                            "lw": 1.3, "ls": "--"}, zorder=5)
-            ax.text(foot_x + 0.6 * reach * float(np.tan(np.radians(theta)))
-                    - 0.012, 0.6 * reach, T(f"{theta:.0f}°"), fontsize=8,
-                    ha="right", va="center", color=FIELD_INK,
-                    path_effects=outline, zorder=6)
+                "",
+                xy=(foot_x + reach * float(np.tan(np.radians(theta))), reach),
+                xytext=(foot_x, 0.0),
+                arrowprops={
+                    "arrowstyle": "-|>",
+                    "color": FIELD_INK,
+                    "lw": 1.3,
+                    "ls": "--",
+                },
+                zorder=5,
+            )
+            ax.text(
+                foot_x + 0.6 * reach * float(np.tan(np.radians(theta))) - 0.012,
+                0.6 * reach,
+                T(f"{theta:.0f}°"),
+                fontsize=8,
+                ha="right",
+                va="center",
+                color=FIELD_INK,
+                path_effects=outline,
+                zorder=6,
+            )
         else:
             # Bottom-left, under the plate: the top-left abutted the
             # verdict pill once the Spanish widened it.
-            ax.text(x0 + 0.012, h0 + 0.008, T("the whole plate is driven"),
-                    ha="left", va="bottom", fontsize=7, color="white",
-                    zorder=6,
-                    bbox={"boxstyle": _ANIM_PILL_BOX, "facecolor": "black",
-                          "alpha": 0.5, "edgecolor": "none"})
+            ax.text(
+                x0 + 0.012,
+                h0 + 0.008,
+                T("the whole plate is driven"),
+                ha="left",
+                va="bottom",
+                fontsize=7,
+                color="white",
+                zorder=6,
+                bbox={
+                    "boxstyle": _ANIM_PILL_BOX,
+                    "facecolor": "black",
+                    "alpha": 0.5,
+                    "edgecolor": "none",
+                },
+            )
         # Top-right, clear of the "driven here" pill over the aperture, of
         # the trace-match arrow that climbs to the left of it, and of the
         # plate and its deflection overlay along the bottom.
-        v_txt = ax.text(x1 - 0.012, h1 - 0.010, "", ha="right", va="top",
-                        color="white", fontsize=8, zorder=7,
-                        bbox={"boxstyle": _ANIM_PILL_BOX,
-                              "facecolor": "black", "alpha": 0.6,
-                              "edgecolor": "none"})
+        v_txt = ax.text(
+            x1 - 0.012,
+            h1 - 0.010,
+            "",
+            ha="right",
+            va="top",
+            color="white",
+            fontsize=8,
+            zorder=7,
+            bbox={
+                "boxstyle": _ANIM_PILL_BOX,
+                "facecolor": "black",
+                "alpha": 0.6,
+                "edgecolor": "none",
+            },
+        )
         ims.append(im)
         defl.append(line)
         v_txts.append(v_txt)
-    foot = fig.text(0.5, 0.030,
-                    T("colour: air pressure / the pressure a piston of the "
-                      "same surface velocity would make"),
-                    ha="center", va="bottom", fontsize=7.5, color=COLOR_FG)
-    foot2 = fig.text(0.5, 0.006,
-                     T(f"elastic 2D FDTD, 10 mm steel plate, "
-                       f"$f_\\mathrm{{c}}$ = {fc:.0f} Hz · overlaid line: its "
-                       f"deflection, exaggerated"),
-                     ha="center", va="bottom", fontsize=7, color=COLOR_FG,
-                     alpha=0.85)
-    t_txt = fig.text(0.988, 0.030, "", ha="right", va="bottom",
-                     family="monospace", fontsize=9, color=COLOR_FG)
+    foot = fig.text(
+        0.5,
+        0.030,
+        T(
+            "colour: air pressure / the pressure a piston of the "
+            "same surface velocity would make"
+        ),
+        ha="center",
+        va="bottom",
+        fontsize=7.5,
+        color=COLOR_FG,
+    )
+    foot2 = fig.text(
+        0.5,
+        0.006,
+        T(
+            f"elastic 2D FDTD, 10 mm steel plate, "
+            f"$f_\\mathrm{{c}}$ = {fc:.0f} Hz · overlaid line: its "
+            f"deflection, exaggerated"
+        ),
+        ha="center",
+        va="bottom",
+        fontsize=7,
+        color=COLOR_FG,
+        alpha=0.85,
+    )
+    t_txt = fig.text(
+        0.988,
+        0.030,
+        "",
+        ha="right",
+        va="bottom",
+        family="monospace",
+        fontsize=9,
+        color=COLOR_FG,
+    )
     reveal = int(0.80 * n_active)
 
     def update(k: int) -> tuple[Any, ...]:
         kf = min(k, n_active - 1)
-        for i, (stack, prof) in enumerate(((p_lo, plate_lo),
-                                           (p_hi, plate_hi))):
+        for i, (stack, prof) in enumerate(((p_lo, plate_lo), (p_hi, plate_hi))):
             ims[i].set_data(stack[kf])
             defl[i].set_ydata(-0.5 * _EL_H + swing * prof[kf])
             v_txts[i].set_text(verdicts[i] if k >= reveal else "")
         t_txt.set_text(T(f"$t$ = {times[kf] * 1e3:5.2f} ms"))
         return (*ims, *defl, *v_txts, foot, foot2, t_txt)
 
-    _render_clip(fig, update, output_dir, "anim_elastic_radiation_efficiency",
-                 frames=n_active + 2 * _RE_FPS, fps=_RE_FPS, gif_fps=5)
+    _render_clip(
+        fig,
+        update,
+        output_dir,
+        "anim_elastic_radiation_efficiency",
+        frames=n_active + 2 * _RE_FPS,
+        fps=_RE_FPS,
+        gif_fps=5,
+    )

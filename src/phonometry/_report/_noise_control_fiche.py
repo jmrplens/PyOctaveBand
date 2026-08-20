@@ -107,14 +107,10 @@ def performance_verdict(
     rounded_requirement = display_round(requirement)
     if higher_is_better:
         passed = math.isfinite(value) and rounded >= rounded_requirement
-        template = t(
-            "{sym} = {value} {unit}, required &#8805; {req} {unit}", language
-        )
+        template = t("{sym} = {value} {unit}, required &#8805; {req} {unit}", language)
     else:
         passed = math.isfinite(value) and rounded <= rounded_requirement
-        template = t(
-            "{sym} = {value} {unit}, required &#8804; {req} {unit}", language
-        )
+        template = t("{sym} = {value} {unit}, required &#8804; {req} {unit}", language)
     text = template.format(
         sym=symbol,
         value=d1(rounded, language),
@@ -216,8 +212,11 @@ def render_noise_control_fiche(
         Paragraph(
             prediction_statement,
             ParagraphStyle(
-                "noise_control_prediction", parent=styles["Normal"], fontSize=8.5,
-                textColor=colors.HexColor(_MUTED_HEX), spaceBefore=4,
+                "noise_control_prediction",
+                parent=styles["Normal"],
+                fontSize=8.5,
+                textColor=colors.HexColor(_MUTED_HEX),
+                spaceBefore=4,
             ),
         )
     )

@@ -50,7 +50,9 @@ iso = importlib.import_module("phonometry.environment.assessment.impulsive_sound
 DT = 0.02  # 20 ms, within the 10-25 ms range of Clause 4.
 
 
-def _ramp(level_start: float, level_difference: float, rise: float, *, pre=0.2, post=0.3):
+def _ramp(
+    level_start: float, level_difference: float, rise: float, *, pre=0.2, post=0.3
+):
     """A flat-ramp-flat ``LpAF`` history sampled at :data:`DT`.
 
     The onset spans exactly ``rise`` seconds so its onset rate is
@@ -78,7 +80,9 @@ def test_ramp_onset_rate_and_level_difference() -> None:
     onsets = iso.detect_onsets(levels, DT)
     assert len(onsets) == 1
     o = onsets[0]
-    assert o.level_difference == pytest.approx(ISO1996_3_RAMP_LEVEL_DIFFERENCE, abs=1e-9)
+    assert o.level_difference == pytest.approx(
+        ISO1996_3_RAMP_LEVEL_DIFFERENCE, abs=1e-9
+    )
     assert o.onset_rate == pytest.approx(ISO1996_3_RAMP_ONSET_RATE, abs=1e-9)
     assert o.qualifies
 
@@ -94,7 +98,9 @@ def test_ramp_prominence_and_adjustment() -> None:
     # Cross-check against a fully independent hand evaluation.
     p_hand = 3.0 * math.log10(100.0) + 2.0 * math.log10(30.0)
     assert o.prominence == pytest.approx(p_hand, abs=1e-9)
-    assert float(iso.impulse_adjustment(o.prominence)) == pytest.approx(1.8 * (p_hand - 5.0))
+    assert float(iso.impulse_adjustment(o.prominence)) == pytest.approx(
+        1.8 * (p_hand - 5.0)
+    )
 
 
 def test_strongly_impulsive_near_cap() -> None:

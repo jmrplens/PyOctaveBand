@@ -109,12 +109,16 @@ class RotorcraftHemisphere:
     levels: NDArray[np.float64]
     distance: float = _RH
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the hemisphere directivity for one band (polar section)."""
         from .._i18n import check_language
         from .._plot.aircraft import plot_rotorcraft_hemisphere
 
-        return plot_rotorcraft_hemisphere(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_rotorcraft_hemisphere(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
     def mirrored(self) -> RotorcraftHemisphere:
         """The hemisphere with the azimuth axis reversed (``φ → −φ``).
@@ -147,13 +151,16 @@ class RotorcraftHemisphere:
             cached = _fill_grid(
                 np.asarray(self.azimuth, dtype=np.float64),
                 np.asarray(self.polar, dtype=np.float64),
-                np.asarray(self.levels, dtype=np.float64))
+                np.asarray(self.levels, dtype=np.float64),
+            )
             object.__setattr__(self, "_filled_cache", cached)
         return np.asarray(cached, dtype=np.float64)
 
 
 def hemisphere_source_level(
-    hemisphere: RotorcraftHemisphere, azimuth_deg: float, polar_deg: float,
+    hemisphere: RotorcraftHemisphere,
+    azimuth_deg: float,
+    polar_deg: float,
 ) -> NDArray[np.float64]:
     """Interpolated source level ``L(fc, φ, θ)`` from a hemisphere (Eq. 13-15).
 
@@ -175,14 +182,18 @@ def hemisphere_source_level(
     :param polar_deg: Emission polar angle ``θ``, in degrees.
     :return: Band levels at ``(φ, θ)``, in dB, shape ``(F,)``.
     """
-    out = _source_levels(hemisphere, np.asarray([azimuth_deg], dtype=np.float64),
-                         np.asarray([polar_deg], dtype=np.float64))
+    out = _source_levels(
+        hemisphere,
+        np.asarray([azimuth_deg], dtype=np.float64),
+        np.asarray([polar_deg], dtype=np.float64),
+    )
     return np.asarray(out[0], dtype=np.float64)
 
 
 def _source_levels(
     hemisphere: RotorcraftHemisphere,
-    azimuth_deg: NDArray[np.float64], polar_deg: NDArray[np.float64],
+    azimuth_deg: NDArray[np.float64],
+    polar_deg: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """Vectorised :func:`hemisphere_source_level` over ``M`` queries, shape ``(M, F)``.
 
@@ -199,20 +210,23 @@ def _source_levels(
 
     ia, wa = _axis_cells(az, phi)
     ip, wp = _axis_cells(po, theta)
-    ia1 = np.minimum(ia + 1, az.size - 1)   # size-1 axis: weight 0, index clamped
+    ia1 = np.minimum(ia + 1, az.size - 1)  # size-1 axis: weight 0, index clamped
     ip1 = np.minimum(ip + 1, po.size - 1)
     wa = wa[:, None]
     wp = wp[:, None]
-    energy = ((1.0 - wa) * (1.0 - wp) * 10.0 ** (lv[ia, ip, :] / 10.0)
-              + wa * (1.0 - wp) * 10.0 ** (lv[ia1, ip, :] / 10.0)
-              + (1.0 - wa) * wp * 10.0 ** (lv[ia, ip1, :] / 10.0)
-              + wa * wp * 10.0 ** (lv[ia1, ip1, :] / 10.0))
+    energy = (
+        (1.0 - wa) * (1.0 - wp) * 10.0 ** (lv[ia, ip, :] / 10.0)
+        + wa * (1.0 - wp) * 10.0 ** (lv[ia1, ip, :] / 10.0)
+        + (1.0 - wa) * wp * 10.0 ** (lv[ia, ip1, :] / 10.0)
+        + wa * wp * 10.0 ** (lv[ia1, ip1, :] / 10.0)
+    )
     with np.errstate(divide="ignore", invalid="ignore"):
         return np.asarray(10.0 * np.log10(energy), dtype=np.float64)
 
 
 def _axis_cells(
-    nodes: NDArray[np.float64], values: NDArray[np.float64],
+    nodes: NDArray[np.float64],
+    values: NDArray[np.float64],
 ) -> tuple[NDArray[np.intp], NDArray[np.float64]]:
     """Lower cell indices and fractional weights of ``values`` on a node axis.
 
@@ -230,7 +244,8 @@ def _axis_cells(
 
 
 def _fill_grid(
-    azimuth: NDArray[np.float64], polar: NDArray[np.float64],
+    azimuth: NDArray[np.float64],
+    polar: NDArray[np.float64],
     levels: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     r"""Nearest-bin gap fill of a hemisphere grid (Eq. 14/15).
@@ -247,9 +262,14 @@ def _fill_grid(
     # z = sinθ·cosφ, one row per (φ, θ) bin in row-major grid order.
     phi = np.radians(azimuth)[:, None]
     theta = np.radians(polar)[None, :]
-    vecs = np.stack([np.broadcast_to(np.cos(theta), (n_az, n_po)),
-                     np.sin(theta) * np.sin(phi),
-                     np.sin(theta) * np.cos(phi)], axis=-1).reshape(-1, 3)
+    vecs = np.stack(
+        [
+            np.broadcast_to(np.cos(theta), (n_az, n_po)),
+            np.sin(theta) * np.sin(phi),
+            np.sin(theta) * np.cos(phi),
+        ],
+        axis=-1,
+    ).reshape(-1, 3)
     dots = np.clip(vecs @ vecs.T, -1.0, 1.0)
     flat = levels.reshape(n_az * n_po, n_f).copy()
     for b in range(n_f):
@@ -258,10 +278,11 @@ def _fill_grid(
         if filled.all() or not filled.any():
             continue
         d = dots[np.ix_(~filled, filled)]
-        nearest = d >= d.max(axis=1, keepdims=True) - 1e-9   # ties: energy average
+        nearest = d >= d.max(axis=1, keepdims=True) - 1e-9  # ties: energy average
         e = 10.0 ** (band[filled] / 10.0)
         flat[~filled, b] = 10.0 * np.log10(
-            (nearest * e).sum(axis=1) / nearest.sum(axis=1))
+            (nearest * e).sum(axis=1) / nearest.sum(axis=1)
+        )
     return flat.reshape(n_az, n_po, n_f)
 
 
@@ -273,26 +294,34 @@ def _fill_grid(
 #: The published Table 3 (Approach 3) offsets from the in-ground-hover disk, in
 #: dB (guidance §A.3.5). The guidance's own note warns they were derived from
 #: inverted microphones on ground plates and may not hold for other setups.
-_TABLE3_OFFSETS_DB: Final[Mapping[str, float]] = MappingProxyType({
-    "out_of_ground_hover": 12.0,   # HOGE = HIGE + 12 dB
-    "reduced_rpm_idle": -12.0,     # Gr. idle = HIGE - 12 dB
-    "full_rpm_idle": -2.5,         # Fl. idle = HIGE - 2.5 dB
-})
+_TABLE3_OFFSETS_DB: Final[Mapping[str, float]] = MappingProxyType(
+    {
+        "out_of_ground_hover": 12.0,  # HOGE = HIGE + 12 dB
+        "reduced_rpm_idle": -12.0,  # Gr. idle = HIGE - 12 dB
+        "full_rpm_idle": -2.5,  # Fl. idle = HIGE - 2.5 dB
+    }
+)
 
 
 def _grid_axis(
-    start: float, stop: float, step: float, name: str,
+    start: float,
+    stop: float,
+    step: float,
+    name: str,
 ) -> NDArray[np.float64]:
     """A regular node axis from ``start`` to ``stop``; ``step`` must divide it."""
     s = require_positive(step, name)
     n = round((stop - start) / s)
     if n < 1 or abs((stop - start) / s - n) > 1e-9:
-        raise ValueError(f"'{name}' must divide the {stop - start:g} degree span evenly.")
+        raise ValueError(
+            f"'{name}' must divide the {stop - start:g} degree span evenly."
+        )
     return np.linspace(start, stop, n + 1)
 
 
 def _ring_levels(
-    bearings: NDArray[np.float64], levels: NDArray[np.float64],
+    bearings: NDArray[np.float64],
+    levels: NDArray[np.float64],
     query_deg: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """Ring band levels at the query bearings, shape ``query_deg.shape + (F,)``.
@@ -380,8 +409,9 @@ def hover_ring_hemisphere(
     if brg[0] < -180.0 or brg[-1] > 180.0:
         raise ValueError("'bearings' must lie within [-180, 180] degrees.")
     if lv.shape != (brg.size, freqs.size):
-        raise ValueError("'levels' must have shape (B, F) matching 'bearings' "
-                         "and 'frequencies'.")
+        raise ValueError(
+            "'levels' must have shape (B, F) matching 'bearings' and 'frequencies'."
+        )
     if not np.all(np.isfinite(lv)):
         raise ValueError("'levels' must be finite.")
     dist = require_positive(distance, "distance")
@@ -406,13 +436,13 @@ def hover_ring_hemisphere(
         # 180/14 leaves its floating-point node a few ulp away from zero.
         cells = az.size - 1
         grid[: (cells + 1) // 2] = port
-        grid[cells // 2 + 1:] = starboard
+        grid[cells // 2 + 1 :] = starboard
         if cells % 2 == 0:
             energy = 0.5 * (10.0 ** (starboard / 10.0) + 10.0 ** (port / 10.0))
             grid[cells // 2] = 10.0 * np.log10(energy)
     return RotorcraftHemisphere(
-        frequencies=freqs.copy(), azimuth=az, polar=po, levels=grid,
-        distance=dist)
+        frequencies=freqs.copy(), azimuth=az, polar=po, levels=grid, distance=dist
+    )
 
 
 def hover_derived_hemisphere(
@@ -463,7 +493,8 @@ def hover_derived_hemisphere(
         azimuth=np.asarray(hemisphere.azimuth, dtype=np.float64).copy(),
         polar=np.asarray(hemisphere.polar, dtype=np.float64).copy(),
         levels=np.asarray(hemisphere.levels, dtype=np.float64) + offset,
-        distance=hemisphere.distance)
+        distance=hemisphere.distance,
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -528,7 +559,9 @@ def flight_condition_weights(
     v = np.atleast_1d(np.asarray(airspeeds, dtype=np.float64))
     g = np.atleast_1d(np.asarray(path_angles, dtype=np.float64))
     if v.ndim != 1 or v.shape != g.shape or v.size < 1:
-        raise ValueError("'airspeeds' and 'path_angles' must be 1-D of equal, non-zero size.")
+        raise ValueError(
+            "'airspeeds' and 'path_angles' must be 1-D of equal, non-zero size."
+        )
     if not (np.all(np.isfinite(v)) and np.all(np.isfinite(g))):
         raise ValueError("'airspeeds' and 'path_angles' must be finite.")
     ffc = require_positive(scaling_factor, "scaling_factor")
@@ -548,11 +581,11 @@ def flight_condition_weights(
     delta = np.hypot(vn - qv, gn - qg)
 
     exact = int(np.argmin(delta))
-    if delta[exact] < 1e-12:                       # on a database condition
+    if delta[exact] < 1e-12:  # on a database condition
         return [(exact, 1.0)]
 
     simplex = _enveloping_simplex(pts, q, v.size, triangles)
-    if simplex is None:                            # outside the hull (Eq. 9/10)
+    if simplex is None:  # outside the hull (Eq. 9/10)
         return [(exact, 1.0)]
     d = delta[simplex]
     w = (1.0 / d) / np.sum(1.0 / d)
@@ -561,7 +594,9 @@ def flight_condition_weights(
 
 
 def _enveloping_simplex(
-    pts: NDArray[np.float64], q: NDArray[np.float64], n: int,
+    pts: NDArray[np.float64],
+    q: NDArray[np.float64],
+    n: int,
     triangles: NDArray[np.int_] | list[list[int]] | None,
 ) -> NDArray[np.intp] | None:
     """The triangle of ``pts`` (given or Delaunay) enveloping ``q``, or ``None``."""
@@ -571,7 +606,7 @@ def _enveloping_simplex(
 
     try:
         dt = Delaunay(pts)
-    except QhullError:                             # collinear/duplicate conditions
+    except QhullError:  # collinear/duplicate conditions
         return None
     simplex = int(dt.find_simplex(q))
     if simplex < 0:
@@ -580,7 +615,9 @@ def _enveloping_simplex(
 
 
 def _simplex_from_table(
-    pts: NDArray[np.float64], q: NDArray[np.float64], n: int,
+    pts: NDArray[np.float64],
+    q: NDArray[np.float64],
+    n: int,
     triangles: NDArray[np.int_] | list[list[int]],
 ) -> NDArray[np.intp] | None:
     """The first triangle of a lookup table enveloping ``q``, or ``None``."""
@@ -594,7 +631,7 @@ def _simplex_from_table(
         m = np.column_stack([p1 - p0, p2 - p0])
         try:
             lam = np.linalg.solve(m, q - p0)
-        except np.linalg.LinAlgError:              # degenerate triangle
+        except np.linalg.LinAlgError:  # degenerate triangle
             continue
         if lam[0] >= -1e-9 and lam[1] >= -1e-9 and lam.sum() <= 1.0 + 1e-9:
             return np.asarray(row, dtype=np.intp)
@@ -633,12 +670,18 @@ def interpolated_source_level(
     """
     freqs = _common_frequencies(hemispheres, airspeeds)
     weights = flight_condition_weights(
-        airspeeds, path_angles, airspeed, path_angle,
-        scaling_factor=scaling_factor, triangles=triangles)
+        airspeeds,
+        path_angles,
+        airspeed,
+        path_angle,
+        scaling_factor=scaling_factor,
+        triangles=triangles,
+    )
     energy = np.zeros(freqs.shape, dtype=np.float64)
     for j, w in weights:
-        energy += w * 10.0 ** (hemisphere_source_level(
-            hemispheres[j], azimuth_deg, polar_deg) / 10.0)
+        energy += w * 10.0 ** (
+            hemisphere_source_level(hemispheres[j], azimuth_deg, polar_deg) / 10.0
+        )
     with np.errstate(divide="ignore", invalid="ignore"):
         return np.asarray(10.0 * np.log10(energy), dtype=np.float64)
 
@@ -652,7 +695,9 @@ def _common_frequencies(
         raise ValueError("'hemispheres' must not be empty.")
     n = np.atleast_1d(np.asarray(airspeeds, dtype=np.float64)).size
     if len(hemispheres) != n:
-        raise ValueError("'hemispheres' and the flight conditions must have equal length.")
+        raise ValueError(
+            "'hemispheres' and the flight conditions must have equal length."
+        )
     freqs = np.asarray(hemispheres[0].frequencies, dtype=np.float64)
     for h in hemispheres[1:]:
         if not np.array_equal(np.asarray(h.frequencies, dtype=np.float64), freqs):
@@ -705,12 +750,16 @@ class FlightPathKinematics:
     bank_angle: NDArray[np.float64]
     path_angle: NDArray[np.float64]
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the speed and angle profiles along the track."""
         from .._i18n import check_language
         from .._plot.aircraft import plot_flight_path_kinematics
 
-        return plot_flight_path_kinematics(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_flight_path_kinematics(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def flight_path_kinematics(
@@ -759,9 +808,15 @@ def flight_path_kinematics(
     bank = np.degrees(np.arctan(dtheta_dt * vg / g0))
     path_angle = np.degrees(np.arctan2(vz, vg))
     return FlightPathKinematics(
-        times=t, positions=p, ground_speed=vg, airspeed=va, heading=heading,
-        curvature=np.asarray(curvature, dtype=np.float64), bank_angle=bank,
-        path_angle=path_angle)
+        times=t,
+        positions=p,
+        ground_speed=vg,
+        airspeed=va,
+        heading=heading,
+        curvature=np.asarray(curvature, dtype=np.float64),
+        bank_angle=bank,
+        path_angle=path_angle,
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -774,12 +829,12 @@ def _a_weighting_db(frequencies: NDArray[np.float64]) -> NDArray[np.float64]:
     f = np.asarray(frequencies, dtype=np.float64)
     f1, f2, f3, f4 = 20.598997, 107.65265, 737.86223, 12194.217
     num = f4**2 * f**4
-    den = ((f**2 + f1**2) * np.sqrt((f**2 + f2**2) * (f**2 + f3**2)) * (f**2 + f4**2))
+    den = (f**2 + f1**2) * np.sqrt((f**2 + f2**2) * (f**2 + f3**2)) * (f**2 + f4**2)
     ra = num / den
     f0 = 1000.0
-    ra0 = (f4**2 * f0**4) / ((f0**2 + f1**2)
-                             * np.sqrt((f0**2 + f2**2) * (f0**2 + f3**2))
-                             * (f0**2 + f4**2))
+    ra0 = (f4**2 * f0**4) / (
+        (f0**2 + f1**2) * np.sqrt((f0**2 + f2**2) * (f0**2 + f3**2)) * (f0**2 + f4**2)
+    )
     return np.asarray(20.0 * np.log10(ra / ra0), dtype=np.float64)
 
 
@@ -811,8 +866,10 @@ def _emission_angles(
     # Tilt about the forward axis; at zero bank cos = 1 and sin = 0 exactly,
     # so the rotation is the identity and needs no special case.
     b = np.radians(bank_deg)
-    right, down = (np.cos(b) * right + np.sin(b) * down,
-                   -np.sin(b) * right + np.cos(b) * down)
+    right, down = (
+        np.cos(b) * right + np.sin(b) * down,
+        -np.sin(b) * right + np.cos(b) * down,
+    )
     d = receivers - position[None, :]
     dist = np.sqrt(np.sum(d**2, axis=1))
     safe = np.where(dist > 0.0, dist, 1.0)
@@ -871,12 +928,16 @@ class RotorcraftEventResult:
     pnltm: float
     epnl: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the A-weighted level time history with its event metrics."""
         from .._i18n import check_language
         from .._plot.aircraft import plot_rotorcraft_event
 
-        return plot_rotorcraft_event(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_rotorcraft_event(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 @dataclass(frozen=True)
@@ -894,16 +955,22 @@ class RotorcraftNoiseContourResult:
     level: NDArray[np.float64]
     metric: str
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot filled noise contours over the ground plane."""
         from .._i18n import check_language
         from .._plot.aircraft import plot_rotorcraft_noise_contour
 
-        return plot_rotorcraft_noise_contour(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_rotorcraft_noise_contour(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def _per_point(
-    value: float | NDArray[np.float64] | list[float] | None, n: int, name: str,
+    value: float | NDArray[np.float64] | list[float] | None,
+    n: int,
+    name: str,
 ) -> NDArray[np.float64] | None:
     """A per-track-point parameter: scalar broadcast, ``(N,)`` array, or ``None``."""
     if value is None:
@@ -1008,10 +1075,23 @@ class RotorcraftGround:
     """
 
     receiver_height: float = 1.2
-    ground_elevation: float | NDArray[np.float64] | list[float] | list[list[float]] = 0.0
-    flow_resistivity: float | str | np.floating[Any] | np.integer[Any] \
-        | NDArray[np.float64] | list[float] | list[list[float]] = "G"
-    terrain: tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]] | Sequence[NDArray[np.float64]] | None = None
+    ground_elevation: float | NDArray[np.float64] | list[float] | list[list[float]] = (
+        0.0
+    )
+    flow_resistivity: (
+        float
+        | str
+        | np.floating[Any]
+        | np.integer[Any]
+        | NDArray[np.float64]
+        | list[float]
+        | list[list[float]]
+    ) = "G"
+    terrain: (
+        tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]
+        | Sequence[NDArray[np.float64]]
+        | None
+    ) = None
     terrain_resolution: float | None = None
 
 
@@ -1128,24 +1208,37 @@ def _event_setup(
     sigma = _setup_resistivity(ground.flow_resistivity, dem)
     elevation = _setup_ground_elevation(ground.ground_elevation, dem)
     method = require_choice(
-        atmosphere.atmospheric_method, "atmospheric_method", ("iso9613", "sae"))
+        atmosphere.atmospheric_method, "atmospheric_method", ("iso9613", "sae")
+    )
     spd, gam, hdg, bank = _resolved_track_state(t, p, track_state)
     off = _per_point(level_offset, t.size, "level_offset")
     offsets = off if off is not None else np.zeros(t.size)
     alpha = _absorption_coefficient(
-        freqs, atmosphere.temperature, atmosphere.relative_humidity,
-        atmosphere.pressure)
+        freqs, atmosphere.temperature, atmosphere.relative_humidity, atmosphere.pressure
+    )
     return _EventSetup(
         hemispheres=tuple(hemispheres),
         airspeeds=np.atleast_1d(np.asarray(airspeeds, dtype=np.float64)),
         path_angles=np.atleast_1d(np.asarray(path_angles, dtype=np.float64)),
-        frequencies=freqs, times=t, positions=p, speed=spd, gamma=gam,
-        heading=hdg, bank=bank, offsets=offsets,
-        ground_elevation=elevation, receiver_height=hr,
-        sigma=sigma, alpha=alpha, rref=rref,
+        frequencies=freqs,
+        times=t,
+        positions=p,
+        speed=spd,
+        gamma=gam,
+        heading=hdg,
+        bank=bank,
+        offsets=offsets,
+        ground_elevation=elevation,
+        receiver_height=hr,
+        sigma=sigma,
+        alpha=alpha,
+        rref=rref,
         scaling_factor=interpolation.scaling_factor,
-        triangles=interpolation.triangles, band_integrated=method == "sae",
-        terrain=dem, terrain_resolution=spacing)
+        triangles=interpolation.triangles,
+        band_integrated=method == "sae",
+        terrain=dem,
+        terrain_resolution=spacing,
+    )
 
 
 def _section_spacing(
@@ -1161,8 +1254,13 @@ def _section_spacing(
 
 
 def _setup_resistivity(
-    flow_resistivity: float | str | np.floating[Any] | np.integer[Any]
-    | NDArray[np.float64] | list[float] | list[list[float]],
+    flow_resistivity: float
+    | str
+    | np.floating[Any]
+    | np.integer[Any]
+    | NDArray[np.float64]
+    | list[float]
+    | list[list[float]],
     dem: tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]] | None,
 ) -> float | NDArray[np.float64]:
     """The scalar (or per-receiver) flow resistivity of an event run."""
@@ -1171,10 +1269,13 @@ def _setup_resistivity(
     if np.ndim(flow_resistivity) == 0:
         return _resolve_flow_resistivity(float(np.asarray(flow_resistivity)))
     if dem is not None:
-        raise ValueError("With 'terrain', 'flow_resistivity' must be a single "
-                         "value or class (per-path maps are not supported).")
+        raise ValueError(
+            "With 'terrain', 'flow_resistivity' must be a single "
+            "value or class (per-path maps are not supported)."
+        )
     return require_positive_array(
-        np.asarray(flow_resistivity, dtype=np.float64).ravel(), "flow_resistivity")
+        np.asarray(flow_resistivity, dtype=np.float64).ravel(), "flow_resistivity"
+    )
 
 
 def _setup_ground_elevation(
@@ -1190,14 +1291,18 @@ def _setup_ground_elevation(
     if not np.all(np.isfinite(arr)):
         raise ValueError("'ground_elevation' must be finite.")
     if dem is not None:
-        raise ValueError("With 'terrain', 'ground_elevation' comes from the "
-                         "elevation model and must be left scalar.")
+        raise ValueError(
+            "With 'terrain', 'ground_elevation' comes from the "
+            "elevation model and must be left scalar."
+        )
     return arr
 
 
 def _require_dem_coverage(
     dem: tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]],
-    x: NDArray[np.float64], y: NDArray[np.float64], what: str,
+    x: NDArray[np.float64],
+    y: NDArray[np.float64],
+    what: str,
 ) -> None:
     """Reject points outside the elevation model's horizontal extent.
 
@@ -1206,14 +1311,22 @@ def _require_dem_coverage(
     edge would fabricate terrain instead.
     """
     tx, ty, _ = dem
-    if (np.min(x) < tx[0] or np.max(x) > tx[-1]
-            or np.min(y) < ty[0] or np.max(y) > ty[-1]):
-        raise ValueError(f"'terrain' must cover the whole {what} (x in "
-                         f"[{tx[0]:g}, {tx[-1]:g}], y in [{ty[0]:g}, {ty[-1]:g}]).")
+    if (
+        np.min(x) < tx[0]
+        or np.max(x) > tx[-1]
+        or np.min(y) < ty[0]
+        or np.max(y) > ty[-1]
+    ):
+        raise ValueError(
+            f"'terrain' must cover the whole {what} (x in "
+            f"[{tx[0]:g}, {tx[-1]:g}], y in [{ty[0]:g}, {ty[-1]:g}])."
+        )
 
 
 def _validated_terrain(
-    terrain: tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]] | Sequence[NDArray[np.float64]] | None,
+    terrain: tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]
+    | Sequence[NDArray[np.float64]]
+    | None,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]] | None:
     """The validated ``(x, y, z)`` digital elevation model, or ``None``."""
     if terrain is None:
@@ -1223,8 +1336,15 @@ def _validated_terrain(
     tx = np.asarray(terrain[0], dtype=np.float64).ravel()
     ty = np.asarray(terrain[1], dtype=np.float64).ravel()
     tz = np.asarray(terrain[2], dtype=np.float64)
-    if tx.size < 2 or ty.size < 2 or np.any(np.diff(tx) <= 0) or np.any(np.diff(ty) <= 0):
-        raise ValueError("'terrain' x and y must be strictly increasing with >= 2 points.")
+    if (
+        tx.size < 2
+        or ty.size < 2
+        or np.any(np.diff(tx) <= 0)
+        or np.any(np.diff(ty) <= 0)
+    ):
+        raise ValueError(
+            "'terrain' x and y must be strictly increasing with >= 2 points."
+        )
     if tz.shape != (ty.size, tx.size) or not np.all(np.isfinite(tz)):
         raise ValueError("'terrain' z must be finite with shape (len(y), len(x)).")
     if not (np.all(np.isfinite(tx)) and np.all(np.isfinite(ty))):
@@ -1234,7 +1354,8 @@ def _validated_terrain(
 
 def _dem_height(
     dem: tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]],
-    x: NDArray[np.float64], y: NDArray[np.float64],
+    x: NDArray[np.float64],
+    y: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """Bilinear elevation lookup.
 
@@ -1247,9 +1368,12 @@ def _dem_height(
     wx = np.clip((x - tx[cx]) / (tx[cx + 1] - tx[cx]), 0.0, 1.0)
     wy = np.clip((y - ty[cy]) / (ty[cy + 1] - ty[cy]), 0.0, 1.0)
     return np.asarray(
-        (1 - wy) * (1 - wx) * tz[cy, cx] + (1 - wy) * wx * tz[cy, cx + 1]
-        + wy * (1 - wx) * tz[cy + 1, cx] + wy * wx * tz[cy + 1, cx + 1],
-        dtype=np.float64)
+        (1 - wy) * (1 - wx) * tz[cy, cx]
+        + (1 - wy) * wx * tz[cy, cx + 1]
+        + wy * (1 - wx) * tz[cy + 1, cx]
+        + wy * wx * tz[cy + 1, cx + 1],
+        dtype=np.float64,
+    )
 
 
 def _event_histories(
@@ -1273,7 +1397,7 @@ def _event_histories(
     trec = np.empty((n_k, n_g), dtype=np.float64)
     la = np.empty((n_k, n_g), dtype=np.float64)
     spectra = np.empty((n_k, freqs.size), dtype=np.float64)
-    ref_band = _sae_band(setup.alpha * setup.rref)   # only used when band_integrated
+    ref_band = _sae_band(setup.alpha * setup.rref)  # only used when band_integrated
     weight_cache: dict[tuple[float, float], list[tuple[int, float]]] = {}
 
     for k in range(n_k):
@@ -1281,15 +1405,23 @@ def _event_histories(
         weights = weight_cache.get(key)
         if weights is None:
             weights = flight_condition_weights(
-                setup.airspeeds, setup.path_angles, key[0], key[1],
-                scaling_factor=setup.scaling_factor, triangles=setup.triangles)
+                setup.airspeeds,
+                setup.path_angles,
+                key[0],
+                key[1],
+                scaling_factor=setup.scaling_factor,
+                triangles=setup.triangles,
+            )
             weight_cache[key] = weights
         phi, theta, dist = _emission_angles(
-            positions[k], receivers, setup.heading[k], setup.bank[k])
+            positions[k], receivers, setup.heading[k], setup.bank[k]
+        )
         dist = np.maximum(dist, 1e-6)
         energy = np.zeros((n_g, freqs.size), dtype=np.float64)
         for j, w in weights:
-            energy += w * 10.0 ** (_source_levels(setup.hemispheres[j], phi, theta) / 10.0)
+            energy += w * 10.0 ** (
+                _source_levels(setup.hemispheres[j], phi, theta) / 10.0
+            )
         with np.errstate(divide="ignore", invalid="ignore"):
             src = 10.0 * np.log10(energy)
         dls = -20.0 * np.log10(dist / setup.rref)
@@ -1297,15 +1429,21 @@ def _event_histories(
             dla = -(_sae_band(setup.alpha[None, :] * dist[:, None]) - ref_band[None, :])
         else:
             dla = -setup.alpha[None, :] * (dist[:, None] - setup.rref)
-        dp = np.hypot(receivers[:, 0] - positions[k, 0], receivers[:, 1] - positions[k, 1])
+        dp = np.hypot(
+            receivers[:, 0] - positions[k, 0], receivers[:, 1] - positions[k, 1]
+        )
         if setup.terrain is not None:
-            dlg = _terrain_adjustments(setup, setup.terrain, positions[k], receivers, dp)
+            dlg = _terrain_adjustments(
+                setup, setup.terrain, positions[k], receivers, dp
+            )
         else:
             hs = float(positions[k, 2]) - setup.ground_elevation
             dlg = _ground_effect(freqs, hs, setup.receiver_height, dp, setup.sigma)
         spl = src + setup.offsets[k] + dls[:, None] + dla + dlg
         with np.errstate(divide="ignore", invalid="ignore"):
-            la[k] = 10.0 * np.log10(np.nansum(10.0 ** ((spl + aw[None, :]) / 10.0), axis=1))
+            la[k] = 10.0 * np.log10(
+                np.nansum(10.0 ** ((spl + aw[None, :]) / 10.0), axis=1)
+            )
         trec[k] = setup.times[k] + dist / _C
         spectra[k] = spl[0]
     return trec, la, spectra
@@ -1338,27 +1476,31 @@ def _terrain_adjustments(
     sx, sy, sz = float(position[0]), float(position[1]), float(position[2])
     for i in range(receivers.shape[0]):
         span = float(dp[i])
-        n = min(max(2, math.ceil(span / setup.terrain_resolution) + 1),
-                _MAX_SECTION_SAMPLES)
+        n = min(
+            max(2, math.ceil(span / setup.terrain_resolution) + 1), _MAX_SECTION_SAMPLES
+        )
         t = np.linspace(0.0, 1.0, n)
         px = sx + (receivers[i, 0] - sx) * t
         py = sy + (receivers[i, 1] - sy) * t
         pz = _dem_height(dem, px, py)
         d = span * t
-        if span <= 1e-6:                      # receiver under the source
+        if span <= 1e-6:  # receiver under the source
             hs = sz - float(pz[0])
-            out[i] = _ground_effect(freqs, hs, setup.receiver_height,
-                                    np.asarray([0.0]), sigma)[0]
+            out[i] = _ground_effect(
+                freqs, hs, setup.receiver_height, np.asarray([0.0]), sigma
+            )[0]
             continue
         sigma_seg = np.full(n - 1, sigma)
         adj, _, _, _ = _screening_core(
-            freqs, (0.0, sz), (span, float(receivers[i, 2])), d, pz, sigma_seg)
+            freqs, (0.0, sz), (span, float(receivers[i, 2])), d, pz, sigma_seg
+        )
         out[i] = adj
     return out
 
 
 def _exposure_level(
-    la: NDArray[np.float64], trec: NDArray[np.float64],
+    la: NDArray[np.float64],
+    trec: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     r"""``SEL`` (Doc 32 Eq. 27, :math:`t_0 = 1` s) per receiver, ``(K, G)``.
 
@@ -1389,7 +1531,9 @@ def _event_metrics(
     sel = float(_exposure_level(la[:, None], trec[:, None])[0])
     kf, kl = _ten_db_down_limits(la, la_max - 10.0)
     if kl > kf:
-        sel_10db = float(_exposure_level(la[kf:kl + 1, None], trec[kf:kl + 1, None])[0])
+        sel_10db = float(
+            _exposure_level(la[kf : kl + 1, None], trec[kf : kl + 1, None])[0]
+        )
     else:  # degenerate single-record window
         sel_10db = float(la[kf] + 10.0 * np.log10(np.gradient(trec)[kf]))
 
@@ -1402,7 +1546,7 @@ def _event_metrics(
             if not np.all(np.isfinite(row)):
                 continue
             pnl = perceived_noise_level(row)
-            if pnl <= 0.0:      # zero total noisiness: PNLT undefined
+            if pnl <= 0.0:  # zero total noisiness: PNLT undefined
                 continue
             # start_band=0: the slope analysis starts at 50 Hz for helicopters
             # (ICAO Annex 16 App. 2 §4.3.1 Step 1), not the aeroplane 80 Hz.
@@ -1412,7 +1556,8 @@ def _event_metrics(
     if np.any(valid):
         dt = np.gradient(trec)
         epnl, pnltm, _, _ = epnl_from_pnlt(
-            pnlt[valid], dt[valid], tone_corrections=tcs[valid])
+            pnlt[valid], dt[valid], tone_corrections=tcs[valid]
+        )
     else:
         epnl = pnltm = float("nan")
     return la_max, sel, sel_10db, pnlt, pnltm, epnl
@@ -1435,7 +1580,9 @@ def _resolved_track_state(
     times: NDArray[np.float64],
     positions: NDArray[np.float64],
     state: RotorcraftTrackState,
-) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+) -> tuple[
+    NDArray[np.float64], NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]
+]:
     """Per-point ``(V_A, γ, Θ, Φ)``: explicit overrides, else derived (Eq. 16-21)."""
     n = times.size
     spd = _per_point(state.airspeed, n, "airspeed")
@@ -1515,15 +1662,25 @@ def rotorcraft_event_level(
     :raises ValueError: If the inputs are invalid.
     """
     setup = _event_setup(
-        hemispheres, airspeeds, path_angles, times, positions,
-        level_offset=level_offset, atmosphere=atmosphere, ground=ground,
-        track_state=track_state, interpolation=interpolation)
+        hemispheres,
+        airspeeds,
+        path_angles,
+        times,
+        positions,
+        level_offset=level_offset,
+        atmosphere=atmosphere,
+        ground=ground,
+        track_state=track_state,
+        interpolation=interpolation,
+    )
     rx = np.asarray(receiver, dtype=np.float64).ravel()
     if rx.size != 2 or not np.all(np.isfinite(rx)):
         raise ValueError("'receiver' must be a finite (x, y) ground position.")
     if not (np.isscalar(setup.sigma) and np.isscalar(setup.ground_elevation)):
-        raise ValueError("A single receiver takes scalar 'flow_resistivity' and "
-                         "'ground_elevation'; arrays are for the contour grid.")
+        raise ValueError(
+            "A single receiver takes scalar 'flow_resistivity' and "
+            "'ground_elevation'; arrays are for the contour grid."
+        )
     if setup.terrain is not None:
         _require_dem_coverage(setup.terrain, rx[:1], rx[1:2], "receiver")
         local = float(_dem_height(setup.terrain, rx[:1], rx[1:2])[0])
@@ -1532,19 +1689,34 @@ def rotorcraft_event_level(
     receivers = np.array([[rx[0], rx[1], local + setup.receiver_height]])
     trec, la, spectra = _event_histories(setup, receivers)
     phi, theta, dist = _track_emission_geometry(
-        setup.positions, receivers[0], setup.heading, setup.bank)
+        setup.positions, receivers[0], setup.heading, setup.bank
+    )
     la_max, sel, sel_10db, pnlt, pnltm, epnl = _event_metrics(
-        setup.frequencies, trec[:, 0], la[:, 0], spectra)
+        setup.frequencies, trec[:, 0], la[:, 0], spectra
+    )
     return RotorcraftEventResult(
-        frequencies=setup.frequencies, emission_times=setup.times,
-        times=trec[:, 0], distance=dist, azimuth=phi, polar=theta,
-        band_levels=spectra, a_levels=la[:, 0], la_max=la_max, sel=sel,
-        sel_10db=sel_10db, pnlt=pnlt, pnltm=pnltm, epnl=epnl)
+        frequencies=setup.frequencies,
+        emission_times=setup.times,
+        times=trec[:, 0],
+        distance=dist,
+        azimuth=phi,
+        polar=theta,
+        band_levels=spectra,
+        a_levels=la[:, 0],
+        la_max=la_max,
+        sel=sel,
+        sel_10db=sel_10db,
+        pnlt=pnlt,
+        pnltm=pnltm,
+        epnl=epnl,
+    )
 
 
 def _track_emission_geometry(
-    positions: NDArray[np.float64], receiver: NDArray[np.float64],
-    heading: NDArray[np.float64], bank: NDArray[np.float64],
+    positions: NDArray[np.float64],
+    receiver: NDArray[np.float64],
+    heading: NDArray[np.float64],
+    bank: NDArray[np.float64],
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
     """Emission ``(φ, θ, r)`` of every track point towards one receiver."""
     n = positions.shape[0]
@@ -1607,24 +1779,42 @@ def rotorcraft_noise_contour(
     :raises ValueError: If the inputs are invalid.
     """
     setup = _event_setup(
-        hemispheres, airspeeds, path_angles, times, positions,
-        level_offset=level_offset, atmosphere=atmosphere, ground=ground,
-        track_state=track_state, interpolation=interpolation)
+        hemispheres,
+        airspeeds,
+        path_angles,
+        times,
+        positions,
+        level_offset=level_offset,
+        atmosphere=atmosphere,
+        ground=ground,
+        track_state=track_state,
+        interpolation=interpolation,
+    )
     gx = np.asarray(x, dtype=np.float64).ravel()
     gy = np.asarray(y, dtype=np.float64).ravel()
-    if gx.size < 2 or gy.size < 2 or not (np.all(np.isfinite(gx)) and np.all(np.isfinite(gy))):
-        raise ValueError("'x' and 'y' must each be finite with at least two grid points.")
+    if (
+        gx.size < 2
+        or gy.size < 2
+        or not (np.all(np.isfinite(gx)) and np.all(np.isfinite(gy)))
+    ):
+        raise ValueError(
+            "'x' and 'y' must each be finite with at least two grid points."
+        )
     key = require_choice(metric, "metric", ("exposure", "maximum"))
     xx, yy = np.meshgrid(gx, gy)
     n_g = xx.size
-    for name, value in (("flow_resistivity", ground.flow_resistivity),
-                        ("ground_elevation", ground.ground_elevation)):
+    for name, value in (
+        ("flow_resistivity", ground.flow_resistivity),
+        ("ground_elevation", ground.ground_elevation),
+    ):
         if np.isscalar(value) or isinstance(value, str):
             continue
         shape = np.asarray(value).shape
         if shape not in ((n_g,), (gy.size, gx.size)):
-            raise ValueError(f"A per-receiver '{name}' must carry one value per grid "
-                             "point, shape (len(y), len(x)).")
+            raise ValueError(
+                f"A per-receiver '{name}' must carry one value per grid "
+                "point, shape (len(y), len(x))."
+            )
     if setup.terrain is not None:
         _require_dem_coverage(setup.terrain, gx, gy, "receiver grid")
         local = _dem_height(setup.terrain, xx.ravel(), yy.ravel())
@@ -1632,12 +1822,9 @@ def rotorcraft_noise_contour(
         local = np.full(n_g, float(np.atleast_1d(setup.ground_elevation)[0]))
     else:
         local = np.asarray(setup.ground_elevation, dtype=np.float64)
-    receivers = np.column_stack([
-        xx.ravel(), yy.ravel(), local + setup.receiver_height])
+    receivers = np.column_stack([xx.ravel(), yy.ravel(), local + setup.receiver_height])
     trec, la, _ = _event_histories(setup, receivers)
-    if key == "exposure":
-        level = _exposure_level(la, trec)
-    else:
-        level = np.max(la, axis=0)
+    level = _exposure_level(la, trec) if key == "exposure" else np.max(la, axis=0)
     return RotorcraftNoiseContourResult(
-        x=gx, y=gy, level=level.reshape(gy.size, gx.size), metric=key)
+        x=gx, y=gy, level=level.reshape(gy.size, gx.size), metric=key
+    )

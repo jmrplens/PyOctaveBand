@@ -39,8 +39,14 @@ def _annex_h3_airborne() -> AirbornePredictionResult:
     paths = []
     for label, rw, kff, kfd, lf in ref.EN12354_1_ANNEX_H3_ELEMENTS:
         ff, df, fd = building.flanking_element(
-            label=label, r_flanking=rw, r_separating=r_direct,
-            k_ff=kff, k_fd=kfd, k_df=kfd, separating_area=ss, coupling_length=lf,
+            label=label,
+            r_flanking=rw,
+            r_separating=r_direct,
+            k_ff=kff,
+            k_fd=kfd,
+            k_df=kfd,
+            separating_area=ss,
+            coupling_length=lf,
         )
         paths += [ff, df, fd]
     return building.predicted_airborne_insulation(
@@ -66,9 +72,7 @@ def _annex_f_facade() -> FacadePredictionResult:
         for name, area, r in ref.EN12354_3_ANNEX_F_ELEMENTS
     ]
     elements.append(
-        building.FacadeElement(
-            name="air inlet", dn_e=ref.EN12354_3_ANNEX_F_INLET_DNE
-        )
+        building.FacadeElement(name="air inlet", dn_e=ref.EN12354_3_ANNEX_F_INLET_DNE)
     )
     return building.facade_sound_reduction(
         elements,
@@ -315,7 +319,8 @@ def test_facade_report_requires_single_number_ratings(tmp_path) -> None:
     # Three bands: not the 5 octave / 16 one-third-octave set, so no rating.
     result = building.facade_sound_reduction(
         [building.FacadeElement(name="wall", area=10.0, r=[40.0, 41.0, 42.0])],
-        area=10.0, volume=50.0,
+        area=10.0,
+        volume=50.0,
     )
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="single-number"):

@@ -81,7 +81,7 @@ def parse_test_results(test_dir):
 def read_conformance_report():
     """Return the conformance-report Markdown, or a fallback notice."""
     if os.path.exists("conformance_report.md"):
-        with open("conformance_report.md", "r", encoding="utf-8") as f:
+        with open("conformance_report.md", encoding="utf-8") as f:
             return f.read().strip()
     return (
         "## Numerical conformance report\n\n"

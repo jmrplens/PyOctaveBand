@@ -96,15 +96,40 @@ _WEIGHTING_COL = {"A": 1, "C": 2, "Z": None}
 # C columns of Table IV equal IEC 61672-1:2013 Table 3 digit for digit, so
 # only the B column is transcribed here. Row = (nominal Hz, B dB).
 _ANSI_S14_TABLE4_B: list[tuple[float, float]] = [
-    (10.0, -38.2), (12.5, -33.2), (16.0, -28.5), (20.0, -24.2),
-    (25.0, -20.4), (31.5, -17.1), (40.0, -14.2), (50.0, -11.6),
-    (63.0, -9.3), (80.0, -7.4), (100.0, -5.6), (125.0, -4.2),
-    (160.0, -3.0), (200.0, -2.0), (250.0, -1.3), (315.0, -0.8),
-    (400.0, -0.5), (500.0, -0.3), (630.0, -0.1), (800.0, 0.0),
-    (1000.0, 0.0), (1250.0, 0.0), (1600.0, 0.0), (2000.0, -0.1),
-    (2500.0, -0.2), (3150.0, -0.4), (4000.0, -0.7), (5000.0, -1.2),
-    (6300.0, -1.9), (8000.0, -2.9), (10000.0, -4.3), (12500.0, -6.1),
-    (16000.0, -8.4), (20000.0, -11.1),
+    (10.0, -38.2),
+    (12.5, -33.2),
+    (16.0, -28.5),
+    (20.0, -24.2),
+    (25.0, -20.4),
+    (31.5, -17.1),
+    (40.0, -14.2),
+    (50.0, -11.6),
+    (63.0, -9.3),
+    (80.0, -7.4),
+    (100.0, -5.6),
+    (125.0, -4.2),
+    (160.0, -3.0),
+    (200.0, -2.0),
+    (250.0, -1.3),
+    (315.0, -0.8),
+    (400.0, -0.5),
+    (500.0, -0.3),
+    (630.0, -0.1),
+    (800.0, 0.0),
+    (1000.0, 0.0),
+    (1250.0, 0.0),
+    (1600.0, 0.0),
+    (2000.0, -0.1),
+    (2500.0, -0.2),
+    (3150.0, -0.4),
+    (4000.0, -0.7),
+    (5000.0, -1.2),
+    (6300.0, -1.9),
+    (8000.0, -2.9),
+    (10000.0, -4.3),
+    (12500.0, -6.1),
+    (16000.0, -8.4),
+    (20000.0, -11.1),
 ]
 
 # ANSI S1.4-1983 Table V (standard page 6): tolerance limits on relative
@@ -170,19 +195,42 @@ _F5 = 158.48932
 # lower limit at 40 kHz means upper-only. Row = (nominal Hz, U dB, upper
 # tolerance, lower tolerance).
 _IEC61012_TABLE1: list[tuple[float, float, float, float]] = [
-    (10.0, 0.0, 3.0, -3.0), (12.5, 0.0, 3.0, -3.0), (16.0, 0.0, 3.0, -3.0),
-    (20.0, 0.0, 3.0, -3.0), (25.0, 0.0, 2.0, -2.0), (31.5, 0.0, 1.0, -1.0),
-    (40.0, 0.0, 1.0, -1.0), (50.0, 0.0, 1.0, -1.0), (63.0, 0.0, 1.0, -1.0),
-    (80.0, 0.0, 1.0, -1.0), (100.0, 0.0, 1.0, -1.0), (125.0, 0.0, 1.0, -1.0),
-    (160.0, 0.0, 1.0, -1.0), (200.0, 0.0, 1.0, -1.0), (250.0, 0.0, 1.0, -1.0),
-    (315.0, 0.0, 1.0, -1.0), (400.0, 0.0, 1.0, -1.0), (500.0, 0.0, 1.0, -1.0),
-    (630.0, 0.0, 1.0, -1.0), (800.0, 0.0, 1.0, -1.0), (1000.0, 0.0, 0.0, 0.0),
-    (1250.0, 0.0, 1.0, -1.0), (1600.0, 0.0, 1.0, -1.0), (2000.0, 0.0, 1.0, -1.0),
-    (2500.0, 0.0, 1.0, -1.0), (3150.0, 0.0, 1.0, -1.0), (4000.0, 0.0, 1.0, -1.0),
-    (5000.0, 0.0, 1.0, -1.0), (6300.0, 0.0, 1.0, -1.0), (8000.0, 0.0, 1.0, -1.0),
-    (10000.0, 0.0, 1.0, -1.0), (12500.0, -2.8, 2.0, -2.0),
-    (16000.0, -13.0, 3.0, -3.0), (20000.0, -25.3, 3.0, -6.0),
-    (25000.0, -37.6, 3.0, -6.0), (31500.0, -49.7, 3.0, -10.0),
+    (10.0, 0.0, 3.0, -3.0),
+    (12.5, 0.0, 3.0, -3.0),
+    (16.0, 0.0, 3.0, -3.0),
+    (20.0, 0.0, 3.0, -3.0),
+    (25.0, 0.0, 2.0, -2.0),
+    (31.5, 0.0, 1.0, -1.0),
+    (40.0, 0.0, 1.0, -1.0),
+    (50.0, 0.0, 1.0, -1.0),
+    (63.0, 0.0, 1.0, -1.0),
+    (80.0, 0.0, 1.0, -1.0),
+    (100.0, 0.0, 1.0, -1.0),
+    (125.0, 0.0, 1.0, -1.0),
+    (160.0, 0.0, 1.0, -1.0),
+    (200.0, 0.0, 1.0, -1.0),
+    (250.0, 0.0, 1.0, -1.0),
+    (315.0, 0.0, 1.0, -1.0),
+    (400.0, 0.0, 1.0, -1.0),
+    (500.0, 0.0, 1.0, -1.0),
+    (630.0, 0.0, 1.0, -1.0),
+    (800.0, 0.0, 1.0, -1.0),
+    (1000.0, 0.0, 0.0, 0.0),
+    (1250.0, 0.0, 1.0, -1.0),
+    (1600.0, 0.0, 1.0, -1.0),
+    (2000.0, 0.0, 1.0, -1.0),
+    (2500.0, 0.0, 1.0, -1.0),
+    (3150.0, 0.0, 1.0, -1.0),
+    (4000.0, 0.0, 1.0, -1.0),
+    (5000.0, 0.0, 1.0, -1.0),
+    (6300.0, 0.0, 1.0, -1.0),
+    (8000.0, 0.0, 1.0, -1.0),
+    (10000.0, 0.0, 1.0, -1.0),
+    (12500.0, -2.8, 2.0, -2.0),
+    (16000.0, -13.0, 3.0, -3.0),
+    (20000.0, -25.3, 3.0, -6.0),
+    (25000.0, -37.6, 3.0, -6.0),
+    (31500.0, -49.7, 3.0, -10.0),
     (40000.0, -61.8, 3.0, -_INF),
 ]
 
@@ -255,9 +303,7 @@ def _analytic_weighting_db(curve: str, frequencies: np.ndarray) -> np.ndarray:
     def _b_gain(x: np.ndarray) -> np.ndarray:
         # ANSI S1.4-1983 Formula (C2): W_B = 10 lg(K2 f^2/(f^2 + f5^2)) + W_C
         # (the constant K2 cancels in the 1 kHz normalization below).
-        return np.asarray(
-            _c_gain(x) * x / np.sqrt(x**2 + _F5**2), dtype=np.float64
-        )
+        return np.asarray(_c_gain(x) * x / np.sqrt(x**2 + _F5**2), dtype=np.float64)
 
     def _u_gain(x: np.ndarray) -> np.ndarray:
         # Magnitude of the all-pole U weighting from the Table 2 pole
@@ -426,8 +472,9 @@ def _between_nominals_sweep(
     sweep_dev = _weighting_response_db(wf, grid) - _analytic_weighting_db(
         wf.curve, grid
     )
-    seg = np.clip(np.searchsorted(freqs_exact, grid, side="right") - 1, 0,
-                  freqs_exact.size - 2)
+    seg = np.clip(
+        np.searchsorted(freqs_exact, grid, side="right") - 1, 0, freqs_exact.size - 2
+    )
     up1 = np.maximum(upper1[seg], upper1[seg + 1])
     lo1 = np.minimum(lower1[seg], lower1[seg + 1])
     up2 = np.maximum(upper2[seg], upper2[seg + 1])
@@ -524,9 +571,7 @@ def verify_weighting_class(
         raise ValueError("'sweep_points' must be at least 64.")
 
     nyquist = wf.fs / 2.0
-    nominal, design_all, limits1_all, limits2_all = _curve_design_and_limits(
-        wf.curve
-    )
+    nominal, design_all, limits1_all, limits2_all = _curve_design_and_limits(wf.curve)
     lower1_all, upper1_all = limits1_all
     lower2_all, upper2_all = limits2_all
     exact = _exact_base10(nominal)
@@ -566,10 +611,7 @@ def verify_weighting_class(
     classes = [band["class"] for band in bands]
     if all(c == 1 for c in classes) and between["margin_class1_db"] >= 0.0:
         overall: int | None = 1
-    elif (
-        all(c in (1, 2) for c in classes)
-        and between["margin_class2_db"] >= 0.0
-    ):
+    elif all(c in (1, 2) for c in classes) and between["margin_class2_db"] >= 0.0:
         overall = 2
     else:
         overall = None

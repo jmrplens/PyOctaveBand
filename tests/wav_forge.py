@@ -28,7 +28,9 @@ import numpy as np
 KSDATAFORMAT_TAIL = b"\x00\x00\x00\x00\x10\x00\x80\x00\x00\xaa\x00\x38\x9b\x71"
 
 
-def chunk(chunk_id: bytes, payload: bytes, *, declared_size: int | None = None) -> bytes:
+def chunk(
+    chunk_id: bytes, payload: bytes, *, declared_size: int | None = None
+) -> bytes:
     """One RIFF chunk: header, payload, and the pad byte of an odd payload.
 
     ``declared_size`` forges a size field that differs from the payload (the
@@ -68,8 +70,10 @@ def extensible_fmt_payload(
     guid = struct.pack("<H", sub_tag) + guid_tail
     assert len(guid) == 16
     return struct.pack("<HHIIHH", 0xFFFE, channels, fs, fs * block, block, bits) + (
-        struct.pack("<HHI", 22, valid_bits if valid_bits is not None else bits,
-                    channel_mask) + guid
+        struct.pack(
+            "<HHI", 22, valid_bits if valid_bits is not None else bits, channel_mask
+        )
+        + guid
     )
 
 
@@ -93,9 +97,7 @@ def pcm_data(samples: np.ndarray, bits: int) -> bytes:
     if bits == 16:
         return flat.astype("<i2").tobytes()
     if bits == 24:
-        return b"".join(
-            int(v).to_bytes(4, "little", signed=True)[:3] for v in flat
-        )
+        return b"".join(int(v).to_bytes(4, "little", signed=True)[:3] for v in flat)
     if bits == 32:
         return flat.astype("<i4").tobytes()
     raise ValueError(f"unsupported PCM depth {bits}")

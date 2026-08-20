@@ -70,11 +70,17 @@ def _ground_effect_fields(
     import fdtd2d
 
     c0, dx = 343.0, 0.02
-    ny, nx = 400, 700                      # 8 m x 14 m
-    sim = fdtd2d.FDTD2D(c0, dx, shape=(ny, nx), sponge_width=40,
-                        sponge_sides=("left", "right", "bottom"))
-    sim.add_source(fdtd2d.CWSource(ix=80, iy=75, frequency=_GROUND_FREQ,
-                                   ramp_cycles=2.0))
+    ny, nx = 400, 700  # 8 m x 14 m
+    sim = fdtd2d.FDTD2D(
+        c0,
+        dx,
+        shape=(ny, nx),
+        sponge_width=40,
+        sponge_sides=("left", "right", "bottom"),
+    )
+    sim.add_source(
+        fdtd2d.CWSource(ix=80, iy=75, frequency=_GROUND_FREQ, ramp_cycles=2.0)
+    )
     every = _GROUND_EVERY
     lam = c0 / _GROUND_FREQ
     theta = np.arange(1.0, 62.5, 0.5)
@@ -106,16 +112,17 @@ def _ground_effect_fields(
     # Two-path image-source model on the same arc (2D line source: 1/sqrt(r)
     # spreading), and the predicted nulls where r2 - r1 = (m + 1/2) lambda.
     def paths(th: Any) -> tuple[Any, Any]:
-        x, y = (_GROUND_ARC_R * np.cos(np.radians(th)),
-                _GROUND_ARC_R * np.sin(np.radians(th)))
+        x, y = (
+            _GROUND_ARC_R * np.cos(np.radians(th)),
+            _GROUND_ARC_R * np.sin(np.radians(th)),
+        )
         r1 = np.hypot(x, y - _GROUND_H)
         r2 = np.hypot(x, y + _GROUND_H)
         return r1, r2
 
     r1, r2 = paths(theta)
     k = 2.0 * np.pi / lam
-    h = (np.exp(1j * k * r1) / np.sqrt(r1)
-         + np.exp(1j * k * r2) / np.sqrt(r2))
+    h = np.exp(1j * k * r1) / np.sqrt(r1) + np.exp(1j * k * r2) / np.sqrt(r2)
     model_db = 20.0 * np.log10(np.abs(h) / float(np.abs(h).max()))
     th_fine = np.arange(0.5, 62.4, 0.02)
     r1f, r2f = paths(th_fine)
@@ -124,10 +131,19 @@ def _ground_effect_fields(
     for m in range(4):
         target = (m + 0.5) * lam
         cross = np.nonzero(np.diff(np.sign(delta - target)))[0]
-        nulls.extend(float(np.interp(target, delta[c:c + 2],
-                                     th_fine[c:c + 2])) for c in cross)
-    return (np.stack(ps), _rms_to_db(np.stack(rs)), np.asarray(ts),
-            theta, arc_db.astype(np.float32), model_db, tuple(sorted(nulls)))
+        nulls.extend(
+            float(np.interp(target, delta[c : c + 2], th_fine[c : c + 2]))
+            for c in cross
+        )
+    return (
+        np.stack(ps),
+        _rms_to_db(np.stack(rs)),
+        np.asarray(ts),
+        theta,
+        arc_db.astype(np.float32),
+        model_db,
+        tuple(sorted(nulls)),
+    )
 
 
 def animate_fdtd_ground_effect(output_dir: str) -> None:
@@ -139,72 +155,161 @@ def animate_fdtd_ground_effect(output_dir: str) -> None:
     from matplotlib import patheffects
 
     T = _translate_str
-    outline = [patheffects.withStroke(linewidth=2.0,
-                                      foreground=FIELD_STROKE)]
-    (p_frames, db_frames, times, theta, arc_db, model_db,
-     nulls) = _ground_effect_fields()
+    outline = [patheffects.withStroke(linewidth=2.0, foreground=FIELD_STROKE)]
+    (p_frames, db_frames, times, theta, arc_db, model_db, nulls) = (
+        _ground_effect_fields()
+    )
     half = p_frames.shape[0] // 2
     vmax = float(np.quantile(np.abs(p_frames[half:]), 0.995))
 
     fig = _anim_figure()
-    fig.suptitle(T("Ground effect: direct + reflected interference "
-                   "(2D FDTD)"))
+    fig.suptitle(T("Ground effect: direct + reflected interference (2D FDTD)"))
     gs = fig.add_gridspec(2, 2, width_ratios=[1.5, 1.0])
     ax_p = fig.add_subplot(gs[0, 0])
     ax_r = fig.add_subplot(gs[1, 0])
     ax_l = fig.add_subplot(gs[:, 1])
 
-    im_p = ax_p.imshow(p_frames[0], origin="lower",
-                       extent=(0.0, 14.0, 0.0, 8.0), cmap=CMAP_FIELD,
-                       vmin=-vmax, vmax=vmax, interpolation="bilinear")
-    im_r = ax_r.imshow(db_frames[0], origin="lower",
-                       extent=(0.0, 14.0, 0.0, 8.0), cmap="magma",
-                       vmin=-40.0, vmax=0.0, interpolation="bilinear")
+    im_p = ax_p.imshow(
+        p_frames[0],
+        origin="lower",
+        extent=(0.0, 14.0, 0.0, 8.0),
+        cmap=CMAP_FIELD,
+        vmin=-vmax,
+        vmax=vmax,
+        interpolation="bilinear",
+    )
+    im_r = ax_r.imshow(
+        db_frames[0],
+        origin="lower",
+        extent=(0.0, 14.0, 0.0, 8.0),
+        cmap="magma",
+        vmin=-40.0,
+        vmax=0.0,
+        interpolation="bilinear",
+    )
     rad = np.radians(theta)
     arc_x = 1.6 + _GROUND_ARC_R * np.cos(rad)
     arc_y = _GROUND_ARC_R * np.sin(rad)
     for ax in (ax_p, ax_r):
         ax.grid(False)
         ax.set_ylim(-1.9, 8.0)
-        ax.fill_between([0.0, 14.0], -1.9, 0.0, facecolor=COLOR_GRID,
-                        edgecolor=COLOR_FG, lw=0.8, hatch="///")
+        ax.fill_between(
+            [0.0, 14.0],
+            -1.9,
+            0.0,
+            facecolor=COLOR_GRID,
+            edgecolor=COLOR_FG,
+            lw=0.8,
+            hatch="///",
+        )
         ax.tick_params(labelsize=7)
     ax_p.tick_params(labelbottom=False)
     ax_r.set_xlabel("$x$ [m]", fontsize=8)
     ax_p.set_ylabel(T("instantaneous pressure"), fontsize=9)
     ax_r.set_ylabel(T("RMS level: interference lobes"), fontsize=8)
     # Source, ghosted image source and the mirror geometry.
-    ax_p.plot([1.6], [_GROUND_H], marker="o", ms=5, color=COLOR_TERTIARY,
-              markeredgecolor=FIELD_STROKE, markeredgewidth=0.8)
-    ax_p.text(1.95, 1.65, T("source ($h$ = 1.5 m)"), ha="left", va="center",
-              color=FIELD_INK, fontsize=7.5, path_effects=outline)
-    ax_p.plot([1.6], [-_GROUND_H], marker="o", ms=5, mfc="none",
-              color=COLOR_TERTIARY, alpha=0.85)
-    ax_p.plot([1.6, 1.6], [_GROUND_H, -_GROUND_H], ls=":",
-              color=COLOR_TERTIARY, lw=1.0, alpha=0.7)
-    hatch_box = {"boxstyle": "round,pad=0.2",
-                 "facecolor": fig.get_facecolor(), "edgecolor": "none"}
-    ax_p.text(1.95, -1.5, T("image source (ghost)"), ha="left",
-              va="center", color=COLOR_FG, fontsize=7.5, bbox=hatch_box)
-    ax_p.text(13.5, -0.95, T("rigid ground"), ha="right", va="center",
-              color=COLOR_FG, fontsize=6.5, bbox=hatch_box)
-    ax_p.text(0.3, 7.6, f"$f$ = {_GROUND_FREQ:.0f} Hz", ha="left", va="top",
-              color=FIELD_INK, fontsize=8, path_effects=outline)
+    ax_p.plot(
+        [1.6],
+        [_GROUND_H],
+        marker="o",
+        ms=5,
+        color=COLOR_TERTIARY,
+        markeredgecolor=FIELD_STROKE,
+        markeredgewidth=0.8,
+    )
+    ax_p.text(
+        1.95,
+        1.65,
+        T("source ($h$ = 1.5 m)"),
+        ha="left",
+        va="center",
+        color=FIELD_INK,
+        fontsize=7.5,
+        path_effects=outline,
+    )
+    ax_p.plot(
+        [1.6],
+        [-_GROUND_H],
+        marker="o",
+        ms=5,
+        mfc="none",
+        color=COLOR_TERTIARY,
+        alpha=0.85,
+    )
+    ax_p.plot(
+        [1.6, 1.6],
+        [_GROUND_H, -_GROUND_H],
+        ls=":",
+        color=COLOR_TERTIARY,
+        lw=1.0,
+        alpha=0.7,
+    )
+    hatch_box = {
+        "boxstyle": "round,pad=0.2",
+        "facecolor": fig.get_facecolor(),
+        "edgecolor": "none",
+    }
+    ax_p.text(
+        1.95,
+        -1.5,
+        T("image source (ghost)"),
+        ha="left",
+        va="center",
+        color=COLOR_FG,
+        fontsize=7.5,
+        bbox=hatch_box,
+    )
+    ax_p.text(
+        13.5,
+        -0.95,
+        T("rigid ground"),
+        ha="right",
+        va="center",
+        color=COLOR_FG,
+        fontsize=6.5,
+        bbox=hatch_box,
+    )
+    ax_p.text(
+        0.3,
+        7.6,
+        f"$f$ = {_GROUND_FREQ:.0f} Hz",
+        ha="left",
+        va="top",
+        color=FIELD_INK,
+        fontsize=8,
+        path_effects=outline,
+    )
     # Sampling arc and the receiver sitting in the first-order dip.
     ax_r.plot(arc_x, arc_y, ls=":", color="white", lw=0.9, alpha=0.6)
     th_dip = nulls[1]
     dip_x = 1.6 + _GROUND_ARC_R * np.cos(np.radians(th_dip))
     dip_y = _GROUND_ARC_R * np.sin(np.radians(th_dip))
-    ax_r.plot([dip_x], [dip_y], marker="o", ms=5, color="white",
-              markeredgecolor="black", markeredgewidth=0.8)
+    ax_r.plot(
+        [dip_x],
+        [dip_y],
+        marker="o",
+        ms=5,
+        color="white",
+        markeredgecolor="black",
+        markeredgewidth=0.8,
+    )
     # Right-aligned to the left of the dot: the Spanish label is longer
     # and would clip at the panel edge on the other side.
-    ax_r.text(dip_x - 0.35, dip_y + 0.42, T("receiver in a dip"),
-              ha="right", va="center", color="white", fontsize=7.5)
+    ax_r.text(
+        dip_x - 0.35,
+        dip_y + 0.42,
+        T("receiver in a dip"),
+        ha="right",
+        va="center",
+        color="white",
+        fontsize=7.5,
+    )
     # Level vs elevation angle, converging to the image-source model.
     _grid_axes(ax_l)
-    ax_l.set_title(T("Level on the 8 m arc"), fontsize=10,
-                   )
+    ax_l.set_title(
+        T("Level on the 8 m arc"),
+        fontsize=10,
+    )
     ax_l.set_xlabel(T(r"elevation angle $\theta$ [°]"), fontsize=8)
     ax_l.set_ylabel(T("level [dB re max]"), fontsize=8)
     ax_l.set_xlim(0.0, 63.0)
@@ -214,38 +319,76 @@ def animate_fdtd_ground_effect(output_dir: str) -> None:
         # Spanning the reading band, not the frame: the strip below it is
         # the legend's, and a full-height marker would be the thing the
         # legend covers.
-        ax_l.plot([th, th], [_GROUND_ARC_FLOOR, _GROUND_ARC_TOP],
-                  color=COLOR_SECONDARY, ls=":", lw=1.2,
-                  label=T("predicted nulls") if i == 0 else None)
-    ax_l.plot(theta, model_db, ls="--", color=COLOR_FG, lw=1.3, alpha=0.75,
-              label=T("image-source model"))
+        ax_l.plot(
+            [th, th],
+            [_GROUND_ARC_FLOOR, _GROUND_ARC_TOP],
+            color=COLOR_SECONDARY,
+            ls=":",
+            lw=1.2,
+            label=T("predicted nulls") if i == 0 else None,
+        )
+    ax_l.plot(
+        theta,
+        model_db,
+        ls="--",
+        color=COLOR_FG,
+        lw=1.3,
+        alpha=0.75,
+        label=T("image-source model"),
+    )
     (l_sim,) = ax_l.plot([], [], color=COLOR_PRIMARY, lw=2.0, label="FDTD")
     # Same white-dot styling as the field receiver, so the two views of
     # the receiver are visually the same object.
-    ax_l.plot([th_dip], [float(np.interp(th_dip, theta, model_db))],
-              marker="o", ms=5, color="white", markeredgecolor="black",
-              markeredgewidth=0.8)
+    ax_l.plot(
+        [th_dip],
+        [float(np.interp(th_dip, theta, model_db))],
+        marker="o",
+        ms=5,
+        color="white",
+        markeredgecolor="black",
+        markeredgewidth=0.8,
+    )
     # In the strip below the reading floor (see the band constants), which
     # is the only patch of the panel neither curve nor marker enters.
-    ax_l.legend(fontsize=7, loc="lower right", framealpha=0.92,
-                borderpad=0.4, labelspacing=0.35, borderaxespad=0.4)
+    ax_l.legend(
+        fontsize=7,
+        loc="lower right",
+        framealpha=0.92,
+        borderpad=0.4,
+        labelspacing=0.35,
+        borderaxespad=0.4,
+    )
     # The strip above 0 dB is data-free, so the closing caption fits there.
     # The longer Spanish verdict spans the whole panel at 7.5 pt, so it drops
     # a step to keep a margin on both sides. The dotted null lines run the
     # full height of the panel and through the words, so the caption carries
     # a halo to keep a clear channel around its glyphs.
-    verdict_txt = ax_l.text(0.5, 0.975, "", transform=ax_l.transAxes,
-                            ha="center", va="top", color=COLOR_FG,
-                            fontsize=7.5 if _LANG == "en" else 6.5,
-                            fontweight="bold", path_effects=[
-                                patheffects.withStroke(
-                                    linewidth=2.6, foreground=FIELD_STROKE)])
+    verdict_txt = ax_l.text(
+        0.5,
+        0.975,
+        "",
+        transform=ax_l.transAxes,
+        ha="center",
+        va="top",
+        color=COLOR_FG,
+        fontsize=7.5 if _LANG == "en" else 6.5,
+        fontweight="bold",
+        path_effects=[patheffects.withStroke(linewidth=2.6, foreground=FIELD_STROKE)],
+    )
     # Level with the arc panel's title, over the field panels, which carry
     # no title of their own: the bottom-left corner put the readout right
     # under the first x tick of the RMS panel, and the bottom-right one
     # belongs to the arc panel's wide x-label.
-    t_txt = fig.text(0.02, 0.935, "", ha="left", va="top",
-                     family="monospace", fontsize=10, color=COLOR_FG)
+    t_txt = fig.text(
+        0.02,
+        0.935,
+        "",
+        ha="left",
+        va="top",
+        family="monospace",
+        fontsize=10,
+        color=COLOR_FG,
+    )
     reveal = int(0.83 * p_frames.shape[0])
 
     def update(k: int) -> tuple[Any, ...]:
@@ -253,10 +396,17 @@ def animate_fdtd_ground_effect(output_dir: str) -> None:
         im_r.set_data(db_frames[k])
         l_sim.set_data(theta, arc_db[k])
         verdict_txt.set_text(
-            T("dips land exactly on the predicted nulls")
-            if k >= reveal else "")
+            T("dips land exactly on the predicted nulls") if k >= reveal else ""
+        )
         t_txt.set_text(T(f"$t$ = {times[k] * 1000.0:4.1f} ms"))
         return (im_p, im_r, l_sim, verdict_txt, t_txt)
 
-    _render_clip(fig, update, output_dir, "anim_fdtd_ground_effect",
-                 frames=int(p_frames.shape[0]), fps=_GROUND_FPS, gif_fps=5)
+    _render_clip(
+        fig,
+        update,
+        output_dir,
+        "anim_fdtd_ground_effect",
+        frames=int(p_frames.shape[0]),
+        fps=_GROUND_FPS,
+        gif_fps=5,
+    )

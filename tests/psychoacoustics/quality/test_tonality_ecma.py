@@ -93,9 +93,7 @@ def test_decision_thresholds_are_the_standard_constants() -> None:
 
     assert PROMINENT_TONALITY_TU_HMS == ref.ECMA418_2_PROMINENT_TONALITY_TU
     assert PROMINENT_ROUGHNESS_ASPER == ref.ECMA418_2_PROMINENT_ROUGHNESS_ASPER
-    assert (
-        AUDIBILITY_THRESHOLD_SONE_HMS == ref.ECMA418_2_AUDIBILITY_THRESHOLD_SONE
-    )
+    assert AUDIBILITY_THRESHOLD_SONE_HMS == ref.ECMA418_2_AUDIBILITY_THRESHOLD_SONE
 
 
 # --------------------------------------------------------------------------
@@ -128,9 +126,7 @@ def test_tonal_frequency_tracks_tone(
 
 def test_tonal_frequency_tracks_a_second_tone() -> None:
     # Frequency tracking is spectral, not duration-driven: 0.7 s suffices.
-    result = psychoacoustics.tonality_ecma(
-        _tone(2000.0, 50.0, seconds=0.7), FS
-    )
+    result = psychoacoustics.tonality_ecma(_tone(2000.0, 50.0, seconds=0.7), FS)
     peak_band = int(np.argmax(result.specific_tonality))
     assert result.tonal_frequencies[peak_band] == pytest.approx(2000.0, rel=0.05)
 
@@ -144,9 +140,7 @@ def test_short_signal_averages_over_all_blocks() -> None:
     noise (the normal-length calibration anchor is unaffected: those signals
     have far more blocks than the 56-block transient window).
     """
-    short_tone = psychoacoustics.tonality_ecma(
-        _tone(1000.0, 40.0, seconds=0.2), FS
-    )
+    short_tone = psychoacoustics.tonality_ecma(_tone(1000.0, 40.0, seconds=0.2), FS)
     assert np.isfinite(short_tone.tonality)
     assert short_tone.tonality > 0.3
     short_noise = psychoacoustics.tonality_ecma(_noise(60.0, seconds=0.2), FS)
@@ -189,7 +183,6 @@ def test_loudness_and_tonality_share_the_tonal_split(monkeypatch) -> None:
     N'_tonal(l, z) arrays are identical.
     """
     import sys
-
 
     L = sys.modules["phonometry.psychoacoustics.loudness.ecma"]
     T = sys.modules["phonometry.psychoacoustics.quality.tonality_ecma"]

@@ -79,9 +79,12 @@ def _metadata_pairs(
     environmental conditions.
     """
     middle: list[tuple[str, str | None]] = [
-        (t("Thickness d [mm]", language),
-         fmt_meta(metadata.thickness * 1e3, language)
-         if metadata.thickness is not None else None),
+        (
+            t("Thickness d [mm]", language),
+            fmt_meta(metadata.thickness * 1e3, language)
+            if metadata.thickness is not None
+            else None,
+        ),
     ]
     return material_metadata_pairs(metadata, language, middle)
 
@@ -98,28 +101,44 @@ def _metric_rows(
     specific airflow resistance) and ``b`` close the table.
     """
     rows: list[tuple[str, str]] = [
-        (t("Evaluation velocity u [mm/s]", language),
-         _mm_s(result.evaluation_velocity, language)),
-        (t("Fitted pressure difference &#916;p [Pa]", language),
-         _pa(result.pressure_drop, language)),
-        (t("Airflow resistance R [Pa&#183;s/m<super>3</super>]", language),
-         _pas(result.resistance, language)),
-        (t("Specific airflow resistance R<sub>s</sub> [Pa&#183;s/m]", language),
-         _pas(result.specific_resistance, language)),
+        (
+            t("Evaluation velocity u [mm/s]", language),
+            _mm_s(result.evaluation_velocity, language),
+        ),
+        (
+            t("Fitted pressure difference &#916;p [Pa]", language),
+            _pa(result.pressure_drop, language),
+        ),
+        (
+            t("Airflow resistance R [Pa&#183;s/m<super>3</super>]", language),
+            _pas(result.resistance, language),
+        ),
+        (
+            t("Specific airflow resistance R<sub>s</sub> [Pa&#183;s/m]", language),
+            _pas(result.specific_resistance, language),
+        ),
     ]
     if result.resistivity is not None:
         rows.append(
-            (t("Airflow resistivity &#963; [Pa&#183;s/m<super>2</super>]", language),
-             _pas(result.resistivity, language))
+            (
+                t("Airflow resistivity &#963; [Pa&#183;s/m<super>2</super>]", language),
+                _pas(result.resistivity, language),
+            )
         )
     rows.append(
-        (t("Zero-velocity resistance a [Pa&#183;s/m]", language),
-         _pas(result.linear_coefficient, language))
+        (
+            t("Zero-velocity resistance a [Pa&#183;s/m]", language),
+            _pas(result.linear_coefficient, language),
+        )
     )
     rows.append(
-        (t("Quadratic coefficient b [Pa&#183;s<super>2</super>/m<super>2</super>]",
-           language),
-         _pas(result.quadratic_coefficient, language))
+        (
+            t(
+                "Quadratic coefficient b [Pa&#183;s<super>2</super>/m<super>2</super>]",
+                language,
+            ),
+            _pas(result.quadratic_coefficient, language),
+        )
     )
     return rows
 
@@ -127,24 +146,24 @@ def _metric_rows(
 def _statement(result: StaticAirflowResult, language: str = "en") -> str:
     """The boxed specific airflow resistance ``R_s`` (clause 7.5)."""
     return t(
-        "Specific airflow resistance R<sub>s</sub> = "
-        "<b>{value} Pa&#183;s/m</b>", language
+        "Specific airflow resistance R<sub>s</sub> = <b>{value} Pa&#183;s/m</b>",
+        language,
     ).format(value=_pas(result.specific_resistance, language))
 
 
-def _extended_terms(
-    result: StaticAirflowResult, language: str = "en"
-) -> list[str]:
+def _extended_terms(result: StaticAirflowResult, language: str = "en") -> list[str]:
     """The airflow resistance ``R``, resistivity ``sigma`` and evaluation velocity."""
     terms = [
-        t("Airflow resistance R = {value} Pa&#183;s/m<super>3</super>", language).format(
-            value=_pas(result.resistance, language)
-        ),
+        t(
+            "Airflow resistance R = {value} Pa&#183;s/m<super>3</super>", language
+        ).format(value=_pas(result.resistance, language)),
     ]
     if result.resistivity is not None:
         terms.append(
-            t("Airflow resistivity &#963; = {value} Pa&#183;s/m<super>2</super>",
-              language).format(value=_pas(result.resistivity, language))
+            t(
+                "Airflow resistivity &#963; = {value} Pa&#183;s/m<super>2</super>",
+                language,
+            ).format(value=_pas(result.resistivity, language))
         )
     terms.append(
         t("Evaluated at u = {value} mm/s", language).format(
@@ -210,4 +229,6 @@ def render_static_airflow_report(
         statement=_statement(result, language),
         extended=_extended_terms(result, language),
     )
-    return render_material_fiche(result.plot, path, content, metadata, language=language)
+    return render_material_fiche(
+        result.plot, path, content, metadata, language=language
+    )

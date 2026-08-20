@@ -61,9 +61,11 @@ def outputs(clip: str) -> list[str]:
     ``figures/media.py`` writes all three for every clip: the poster always,
     the GIF for English only, in both themes.
     """
-    return ([f"{clip}{suffix}.webm" for suffix in VARIANTS]
-            + [f"{clip}{suffix}_poster.jpg" for suffix in VARIANTS]
-            + [f"{clip}{suffix}.gif" for suffix in ("", "_dark")])
+    return (
+        [f"{clip}{suffix}.webm" for suffix in VARIANTS]
+        + [f"{clip}{suffix}_poster.jpg" for suffix in VARIANTS]
+        + [f"{clip}{suffix}.gif" for suffix in ("", "_dark")]
+    )
 
 
 def main() -> int:
@@ -74,38 +76,46 @@ def main() -> int:
     for clip in sorted(set(stamped) - set(current)):
         problems.append(
             f"{clip}: stamped in {fp.MANIFEST.name} but no longer a registered "
-            "clip; delete the line if the clip is gone")
+            "clip; delete the line if the clip is gone"
+        )
     for clip in sorted(current):
         expected = outputs(clip)
         missing = [name for name in expected if not (IMAGES / name).exists()]
         if len(missing) == len(expected):
             problems.append(
                 f"{clip}: registered but not committed at all (none of its "
-                f"{len(expected)} files are there); render it")
+                f"{len(expected)} files are there); render it"
+            )
         elif missing:
             problems.append(
                 f"{clip}: committed half-rendered, {len(missing)} of its "
                 f"{len(expected)} files are missing "
-                f"({', '.join(missing)})")
+                f"({', '.join(missing)})"
+            )
         if clip not in stamped:
             problems.append(
-                f"{clip}: no fingerprint recorded; re-render the clip to "
-                "stamp it")
+                f"{clip}: no fingerprint recorded; re-render the clip to stamp it"
+            )
         elif stamped[clip] != current[clip]:
             problems.append(
                 f"{clip}: drawn by code that has changed since "
-                f"(recorded {stamped[clip]}, current {current[clip]})")
+                f"(recorded {stamped[clip]}, current {current[clip]})"
+            )
 
     if problems:
-        print("::error::a committed clip is incomplete or older than the code "
-              "that draws it - re-render it with "
-              "'python scripts/generate_graphs.py --animations --anim <clip>'")
+        print(
+            "::error::a committed clip is incomplete or older than the code "
+            "that draws it - re-render it with "
+            "'python scripts/generate_graphs.py --animations --anim <clip>'"
+        )
         for problem in problems:
             print(f"  - {problem}")
         return 1
 
-    print(f"All {len(current)} committed clips are complete and match the "
-          "code that draws them.")
+    print(
+        f"All {len(current)} committed clips are complete and match the "
+        "code that draws them."
+    )
     return 0
 
 

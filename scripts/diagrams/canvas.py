@@ -60,12 +60,24 @@ class Theme:
 
 
 LIGHT = Theme(
-    suffix="", bg="#ffffff", fg="#1a1a1a", muted="#666666", panel="#f0f2f5",
-    primary="#1f77b4", secondary="#d62728", accent="#2ca02c",
+    suffix="",
+    bg="#ffffff",
+    fg="#1a1a1a",
+    muted="#666666",
+    panel="#f0f2f5",
+    primary="#1f77b4",
+    secondary="#d62728",
+    accent="#2ca02c",
 )
 DARK = Theme(
-    suffix="_dark", bg="#0d1117", fg="#e6e6e6", muted="#9a9a9a", panel="#1c2128",
-    primary="#4da3d8", secondary="#e46a6a", accent="#5abf5a",
+    suffix="_dark",
+    bg="#0d1117",
+    fg="#e6e6e6",
+    muted="#9a9a9a",
+    panel="#1c2128",
+    primary="#4da3d8",
+    secondary="#e46a6a",
+    accent="#5abf5a",
 )
 
 #: The letter runs a sub/superscript sets upright: the descriptive
@@ -113,16 +125,83 @@ DARK = Theme(
 #: $K_r$ sloped where the prose, holding one page against one standard,
 #: now sets both upright: the ``d`` and the ``r`` they share are spoken
 #: for by the two path lengths above.
-_ROMAN_SCRIPTS = frozenset((
-    "Aeq", "eq", "EQ", "EX", "max", "MAX", "min", "upper", "lower", "sup",
-    "low", "high", "limit", "ref", "rms", "tot", "TOT", "eff", "mod",
-    "norm", "spec", "inst", "cal", "tab", "cum", "ss", "shadow", "co",
-    "tr", "diff", "ff", "ax", "SN", "CS", "MS", "hv", "hwx", "hwy", "hwz",
-    "wx", "wy", "wz", "obj", "air", "wall", "win", "perp", "MF",
-    "AF", "Cpeak", "sa", "situ",
-    "C", "D", "E", "F", "G", "K", "L", "P", "R", "T",
-    "c", "e", "f", "g", "h", "l", "m", "s", "t", "u", "w",
-))
+_ROMAN_SCRIPTS = frozenset(
+    (
+        "Aeq",
+        "eq",
+        "EQ",
+        "EX",
+        "max",
+        "MAX",
+        "min",
+        "upper",
+        "lower",
+        "sup",
+        "low",
+        "high",
+        "limit",
+        "ref",
+        "rms",
+        "tot",
+        "TOT",
+        "eff",
+        "mod",
+        "norm",
+        "spec",
+        "inst",
+        "cal",
+        "tab",
+        "cum",
+        "ss",
+        "shadow",
+        "co",
+        "tr",
+        "diff",
+        "ff",
+        "ax",
+        "SN",
+        "CS",
+        "MS",
+        "hv",
+        "hwx",
+        "hwy",
+        "hwz",
+        "wx",
+        "wy",
+        "wz",
+        "obj",
+        "air",
+        "wall",
+        "win",
+        "perp",
+        "MF",
+        "AF",
+        "Cpeak",
+        "sa",
+        "situ",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "K",
+        "L",
+        "P",
+        "R",
+        "T",
+        "c",
+        "e",
+        "f",
+        "g",
+        "h",
+        "l",
+        "m",
+        "s",
+        "t",
+        "u",
+        "w",
+    )
+)
 
 #: Subscripts that are part quantity symbol and part word, letter by letter:
 #: ``"v"`` for the italic of a quantity, ``"u"`` for the upright of an
@@ -248,20 +327,16 @@ def _math_tokens(run: str, s: str, script: bool = False) -> list[tuple[str, str]
             if run[i + 1] == "{":
                 end = run.find("}", i + 2)
                 if end < 0:
-                    raise ValueError(
-                        f"unclosed script brace {run[i:]!r} in {s!r}"
-                    )
+                    raise ValueError(f"unclosed script brace {run[i:]!r} in {s!r}")
                 if end == i + 2:
-                    raise ValueError(
-                        f"empty script {run[i:end + 1]!r} in {s!r}"
-                    )
-                out.append((kind, run[i + 2:end]))
+                    raise ValueError(f"empty script {run[i : end + 1]!r} in {s!r}")
+                out.append((kind, run[i + 2 : end]))
                 i = end + 1
             else:
-                nxt = run[i + 2:i + 3]
+                nxt = run[i + 2 : i + 3]
                 if nxt == "(":
                     raise ValueError(
-                        f"ambiguous script {run[i:i + 2]!r} before '(' in "
+                        f"ambiguous script {run[i : i + 2]!r} before '(' in "
                         f"{s!r}: brace the script and keep the argument "
                         f"outside, as {ch}{{{run[i + 1]}}}(...)"
                     )
@@ -276,8 +351,7 @@ def _math_tokens(run: str, s: str, script: bool = False) -> list[tuple[str, str]
                     )
                 if nxt == "," and i + 3 < len(run) and run[i + 3].isalnum():
                     j = i + 3
-                    while j < len(run) and (run[j].isalnum()
-                                            or run[j] == ","):
+                    while j < len(run) and (run[j].isalnum() or run[j] == ","):
                         j += 1
                     raise ValueError(
                         f"ambiguous comma {run[i:j]!r} in {s!r}: glued to "
@@ -285,7 +359,7 @@ def _math_tokens(run: str, s: str, script: bool = False) -> list[tuple[str, str]
                         f"write {ch}{{{run[i + 1]},...}} or space the "
                         "comma off"
                     )
-                out.append((kind, run[i + 1:i + 2]))
+                out.append((kind, run[i + 1 : i + 2]))
                 i += 2
         elif ch.isalpha():
             latin = ch.isascii()
@@ -363,8 +437,9 @@ def _math_runs(s: str) -> list[tuple[str, bool, float, float]]:
         raise ValueError(f"unbalanced $ markup in {s!r}")
     chunks: list[tuple[str, bool, float, float]] = []
 
-    def add(text: str, italic: bool = False, shift: float = 0.0,
-            scale: float = 1.0) -> None:
+    def add(
+        text: str, italic: bool = False, shift: float = 0.0, scale: float = 1.0
+    ) -> None:
         if not text:
             return
         if chunks and chunks[-1][1:] == (italic, shift, scale):
@@ -387,8 +462,12 @@ def _math_runs(s: str) -> list[tuple[str, bool, float, float]]:
             else:
                 shift = _SUB_DROP if kind == "sub" else _SUP_RISE
                 for kind2, payload2 in _math_tokens(payload, s, script=True):
-                    add(payload2, italic=kind2 == "var", shift=shift,
-                        scale=_SCRIPT_SCALE)
+                    add(
+                        payload2,
+                        italic=kind2 == "var",
+                        shift=shift,
+                        scale=_SCRIPT_SCALE,
+                    )
     return chunks
 
 
@@ -399,8 +478,9 @@ def _math_runs(s: str) -> list[tuple[str, bool, float, float]]:
 _WS_RUN = re.compile(r"[ \t\r\n]+")
 
 
-def _label_runs(s: str, *, mono: bool = False, bold: bool = False,
-                italic: bool = False) -> list[Run]:
+def _label_runs(
+    s: str, *, mono: bool = False, bold: bool = False, italic: bool = False
+) -> list[Run]:
     """Compose a translated label into the styled runs the engine sets.
 
     A ``$...$`` label takes the composer's runs, with the call's ``bold``
@@ -451,33 +531,80 @@ class SVG:
     def add(self, fragment: str) -> None:
         self.parts.append(fragment)
 
-    def rect(self, x: float, y: float, w: float, h: float, fill: str,
-             stroke: str = "none", rx: float = 0.0, sw: float = 1.5,
-             dash: str = "") -> None:
+    def rect(
+        self,
+        x: float,
+        y: float,
+        w: float,
+        h: float,
+        fill: str,
+        stroke: str = "none",
+        rx: float = 0.0,
+        sw: float = 1.5,
+        dash: str = "",
+    ) -> None:
         d = f' stroke-dasharray="{dash}"' if dash else ""
-        self.add(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{rx}" '
-                 f'fill="{fill}" stroke="{stroke}" stroke-width="{sw}"{d}/>')
+        self.add(
+            f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{rx}" '
+            f'fill="{fill}" stroke="{stroke}" stroke-width="{sw}"{d}/>'
+        )
 
-    def line(self, x1: float, y1: float, x2: float, y2: float, stroke: str,
-             sw: float = 1.5, dash: str = "") -> None:
+    def line(
+        self,
+        x1: float,
+        y1: float,
+        x2: float,
+        y2: float,
+        stroke: str,
+        sw: float = 1.5,
+        dash: str = "",
+    ) -> None:
         d = f' stroke-dasharray="{dash}"' if dash else ""
-        self.add(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" '
-                 f'stroke="{stroke}" stroke-width="{sw}"{d} stroke-linecap="round"/>')
+        self.add(
+            f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" '
+            f'stroke="{stroke}" stroke-width="{sw}"{d} stroke-linecap="round"/>'
+        )
 
-    def circle(self, cx: float, cy: float, r: float, fill: str,
-               stroke: str = "none", sw: float = 1.5) -> None:
-        self.add(f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{fill}" '
-                 f'stroke="{stroke}" stroke-width="{sw}"/>')
+    def circle(
+        self,
+        cx: float,
+        cy: float,
+        r: float,
+        fill: str,
+        stroke: str = "none",
+        sw: float = 1.5,
+    ) -> None:
+        self.add(
+            f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{fill}" '
+            f'stroke="{stroke}" stroke-width="{sw}"/>'
+        )
 
-    def ellipse(self, cx: float, cy: float, rx: float, ry: float,
-                fill: str = "none", stroke: str = "none", sw: float = 1.5,
-                dash: str = "") -> None:
+    def ellipse(
+        self,
+        cx: float,
+        cy: float,
+        rx: float,
+        ry: float,
+        fill: str = "none",
+        stroke: str = "none",
+        sw: float = 1.5,
+        dash: str = "",
+    ) -> None:
         d = f' stroke-dasharray="{dash}"' if dash else ""
-        self.add(f'<ellipse cx="{cx}" cy="{cy}" rx="{rx}" ry="{ry}" '
-                 f'fill="{fill}" stroke="{stroke}" stroke-width="{sw}"{d}/>')
+        self.add(
+            f'<ellipse cx="{cx}" cy="{cy}" rx="{rx}" ry="{ry}" '
+            f'fill="{fill}" stroke="{stroke}" stroke-width="{sw}"{d}/>'
+        )
 
-    def text_width(self, s: str, size: float, *, bold: bool = False,
-                   mono: bool = False, italic: bool = False) -> float:
+    def text_width(
+        self,
+        s: str,
+        size: float,
+        *,
+        bold: bool = False,
+        mono: bool = False,
+        italic: bool = False,
+    ) -> float:
         """Pen advance the label ``s`` will occupy, in the sheet's language.
 
         The same translate-compose-measure the emission runs, stopping one
@@ -489,9 +616,16 @@ class SVG:
         runs = _label_runs(self.tr(s), mono=mono, bold=bold, italic=italic)
         return measure(runs, size) if runs else 0.0
 
-    def fit_size(self, labels: Sequence[str], sizes: Sequence[int],
-                 width: float, *, bold: bool = False, mono: bool = False,
-                 italic: bool = False) -> int:
+    def fit_size(
+        self,
+        labels: Sequence[str],
+        sizes: Sequence[int],
+        width: float,
+        *,
+        bold: bool = False,
+        mono: bool = False,
+        italic: bool = False,
+    ) -> int:
         """The first of ``sizes`` at which every label fits ``width``.
 
         The body counterpart of :meth:`title_size`, and the same decision
@@ -506,8 +640,10 @@ class SVG:
         its box is still better than one that raises here.
         """
         for size in sizes:
-            if all(self.text_width(s, size, bold=bold, mono=mono,
-                                   italic=italic) <= width for s in labels):
+            if all(
+                self.text_width(s, size, bold=bold, mono=mono, italic=italic) <= width
+                for s in labels
+            ):
                 return size
         return sizes[-1]
 
@@ -527,18 +663,46 @@ class SVG:
                 return size
         return _TITLE_SIZES[-1]
 
-    def text(self, x: float, y: float, s: str, size: int = 17,
-             fill: str = "", anchor: str = "middle", bold: bool = False,
-             mono: bool = False, italic: bool = False) -> None:
+    def text(
+        self,
+        x: float,
+        y: float,
+        s: str,
+        size: int = 17,
+        fill: str = "",
+        anchor: str = "middle",
+        bold: bool = False,
+        mono: bool = False,
+        italic: bool = False,
+    ) -> None:
         s = self.tr(s)
-        fragment = self._emit_text(x, y, s, size, fill or self.th.fg, anchor,
-                                   bold=bold, mono=mono, italic=italic)
+        fragment = self._emit_text(
+            x,
+            y,
+            s,
+            size,
+            fill or self.th.fg,
+            anchor,
+            bold=bold,
+            mono=mono,
+            italic=italic,
+        )
         if fragment:
             self.add(fragment)
 
-    def _emit_text(self, x: float, y: float, s: str, size: int, fill: str,
-                   anchor: str, *, bold: bool = False, mono: bool = False,
-                   italic: bool = False) -> str:
+    def _emit_text(
+        self,
+        x: float,
+        y: float,
+        s: str,
+        size: int,
+        fill: str,
+        anchor: str,
+        *,
+        bold: bool = False,
+        mono: bool = False,
+        italic: bool = False,
+    ) -> str:
         """The emission core of :meth:`text`: one already-translated label.
 
         The caller translates; this composes, measures and outlines. The
@@ -557,35 +721,58 @@ class SVG:
         width = measure(runs, size)
         x0 = x - {"start": 0.0, "middle": width / 2, "end": width}[anchor]
         if x0 < -0.5 or x0 + width > self.w + 0.5:
-            message = (f"label {s!r} spans {x0:.0f}..{x0 + width:.0f} "
-                       f"on a {self.w} px sheet")
+            message = (
+                f"label {s!r} spans {x0:.0f}..{x0 + width:.0f} on a {self.w} px sheet"
+            )
             if os.environ.get("PHONO_DIAGRAM_FIT") == "report":
                 print(f"fit: {message}", file=sys.stderr)
             else:
                 raise ValueError(message)
         return _comment(s) + emit_runs(self._glyphs, runs, x0, y, size, fill)
 
-    def path(self, d: str, fill: str = "none", stroke: str = "none",
-             sw: float = 1.5, dash: str = "") -> None:
+    def path(
+        self,
+        d: str,
+        fill: str = "none",
+        stroke: str = "none",
+        sw: float = 1.5,
+        dash: str = "",
+    ) -> None:
         dd = f' stroke-dasharray="{dash}"' if dash else ""
-        self.add(f'<path d="{d}" fill="{fill}" stroke="{stroke}" '
-                 f'stroke-width="{sw}" stroke-linejoin="round"{dd}/>')
+        self.add(
+            f'<path d="{d}" fill="{fill}" stroke="{stroke}" '
+            f'stroke-width="{sw}" stroke-linejoin="round"{dd}/>'
+        )
 
     # -- technical helpers -------------------------------------------------
-    def arrow(self, x1: float, y1: float, x2: float, y2: float, stroke: str,
-              sw: float = 1.6) -> None:
+    def arrow(
+        self, x1: float, y1: float, x2: float, y2: float, stroke: str, sw: float = 1.6
+    ) -> None:
         """Straight arrow with a filled head at (x2, y2)."""
         import math
+
         ang = math.atan2(y2 - y1, x2 - x1)
         L, W = 9.0, 3.6
         bx, by = x2 - L * math.cos(ang), y2 - L * math.sin(ang)
         px, py = -math.sin(ang), math.cos(ang)
         self.line(x1, y1, bx, by, stroke, sw)
-        self.path(f"M {x2:.1f} {y2:.1f} L {bx + W * px:.1f} {by + W * py:.1f} "
-                  f"L {bx - W * px:.1f} {by - W * py:.1f} Z", fill=stroke)
+        self.path(
+            f"M {x2:.1f} {y2:.1f} L {bx + W * px:.1f} {by + W * py:.1f} "
+            f"L {bx - W * px:.1f} {by - W * py:.1f} Z",
+            fill=stroke,
+        )
 
-    def dim(self, x1: float, y1: float, x2: float, y2: float, label: str,
-            offset: float = 0.0, size: int = 15, label_side: str = "left") -> None:
+    def dim(
+        self,
+        x1: float,
+        y1: float,
+        x2: float,
+        y2: float,
+        label: str,
+        offset: float = 0.0,
+        size: int = 15,
+        label_side: str = "left",
+    ) -> None:
         """Dimension between two measured points, drafting style.
 
         The dimension line is placed ``offset`` px away (perpendicular);
@@ -618,8 +805,9 @@ class SVG:
             else:
                 self.text(x - 9, mid + 6, label, size, th.fg, "end")
 
-    def mic(self, x: float, capsule_top: float, ground: float,
-            scale: float = 1.0) -> None:
+    def mic(
+        self, x: float, capsule_top: float, ground: float, scale: float = 1.0
+    ) -> None:
         """Measurement microphone on a stand that reaches the ground.
 
         ``capsule_top`` is the y of the capsule tip (the measurement point).
@@ -644,9 +832,13 @@ class SVG:
             self.line(x, y - h * 0.35, x + h * 0.13, y, th.muted, 2.4)
         else:
             self.circle(x, y - h + r, r, th.muted)
-            self.line(x, y - h + 2 * r, x, y - h * 0.45, th.muted, 3)       # torso
-            self.line(x, y - h * 0.45, x + h * 0.30, y - h * 0.45, th.muted, 2.4)  # thigh
-            self.line(x + h * 0.30, y - h * 0.45, x + h * 0.30, y, th.muted, 2.4)  # shin
+            self.line(x, y - h + 2 * r, x, y - h * 0.45, th.muted, 3)  # torso
+            self.line(
+                x, y - h * 0.45, x + h * 0.30, y - h * 0.45, th.muted, 2.4
+            )  # thigh
+            self.line(
+                x + h * 0.30, y - h * 0.45, x + h * 0.30, y, th.muted, 2.4
+            )  # shin
             self.line(x, y - h * 0.70, x + h * 0.22, y - h * 0.55, th.muted, 2.4)  # arm
 
     def ground(self, y: float, x1: float, x2: float, hatch: int = 24) -> None:
@@ -671,18 +863,28 @@ class SVG:
         """
         th = self.th
         t = self.tr(title)
-        title_fragment = self._emit_text(self.w / 2, 30, t, self.title_size(t),
-                                         th.fg, "middle", bold=True)
-        return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" '
-                f'height="{self.h}" viewBox="0 0 {self.w} {self.h}">'
-                f'<rect width="{self.w}" height="{self.h}" fill="{th.bg}"/>'
-                f'<title>{_esc(t)}</title>'
-                f'<defs>{self._glyphs.defs()}</defs>'
-                + title_fragment + "".join(self.parts) + "</svg>")
+        title_fragment = self._emit_text(
+            self.w / 2, 30, t, self.title_size(t), th.fg, "middle", bold=True
+        )
+        return (
+            f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" '
+            f'height="{self.h}" viewBox="0 0 {self.w} {self.h}">'
+            f'<rect width="{self.w}" height="{self.h}" fill="{th.bg}"/>'
+            f"<title>{_esc(t)}</title>"
+            f"<defs>{self._glyphs.defs()}</defs>"
+            + title_fragment
+            + "".join(self.parts)
+            + "</svg>"
+        )
 
 
-def _write(output_dir: str, name: str, build: Callable[[SVG, Theme], None], title: str,
-           height: int = 560) -> None:
+def _write(
+    output_dir: str,
+    name: str,
+    build: Callable[[SVG, Theme], None],
+    title: str,
+    height: int = 560,
+) -> None:
     assert_capabilities()
     for lang, lang_suffix in (("en", ""), ("es", "_es")):
         for th in (LIGHT, DARK):

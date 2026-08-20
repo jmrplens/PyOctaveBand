@@ -308,7 +308,9 @@ class DuctPathResult:
         return rows
 
     # -- presentation -----------------------------------------------------
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the spectrum cascading down the path against the criterion curve.
 
         One line per element shows where the spectrum stands after that
@@ -483,7 +485,9 @@ def duct_path(
             )
         )
 
-    room = None if room_effect is None else as_band_spectrum(room_effect, n, "room_effect")
+    room = (
+        None if room_effect is None else as_band_spectrum(room_effect, n, "room_effect")
+    )
     received = level if room is None else level - room
     return DuctPathResult(
         frequencies=f,

@@ -28,10 +28,7 @@ _BANDS = np.asarray(ref.ISO12354_ANNEX_L_BANDS, dtype=np.float64)
 
 def _situ() -> tuple[dict, np.ndarray]:
     """The Annex L building in situ, plus the floating floor's improvement."""
-    situ = {
-        k: building.in_situ_element(e, _BANDS)
-        for k, e in bld.elements().items()
-    }
+    situ = {k: building.in_situ_element(e, _BANDS) for k, e in bld.elements().items()}
     delta = building.floating_floor_improvement(
         _BANDS, resonance_frequency=bld.floating_floor_resonance()
     )
@@ -44,7 +41,8 @@ def _annex_l_airborne():
     return building.detailed_airborne_prediction(
         _BANDS,
         direct_index=building.direct_reduction_index(
-            situ["floor"].sound_reduction_index, delta_r_source=delta),
+            situ["floor"].sound_reduction_index, delta_r_source=delta
+        ),
         flanking_paths=bld.airborne_paths(situ, delta),
     )
 
@@ -110,7 +108,9 @@ def test_detailed_impact_fiche_boxes_the_annex_g_rating(tmp_path) -> None:
         str(out),
         metadata=ReportMetadata(
             specimen="220 mm concrete floor with floating screed",
-            area=20.0, receiving_volume=55.0, requirement=50.0,
+            area=20.0,
+            receiving_volume=55.0,
+            requirement=50.0,
         ),
         verbose=True,
     ) == str(out)
@@ -119,7 +119,7 @@ def test_detailed_impact_fiche_boxes_the_annex_g_rating(tmp_path) -> None:
     assert f"{ref.ISO12354_ANNEX_G1_L_PRIME_N_W} dB" in text
     assert "ISO 12354-2:2017" in text
     assert "ISO 717-2" in text
-    assert "PASS" in text          # 41 dB against the 50 dB requirement
+    assert "PASS" in text  # 41 dB against the 50 dB requirement
     assert "not a measurement" in text
     assert "Df1" in text
 

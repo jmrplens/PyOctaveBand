@@ -152,7 +152,9 @@ class IntensityResult:
     max_valid_frequency: float
     spacing: float | None = None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot Lp vs LI per band with the pressure-intensity index.
 
         Requires per-band data (call ``sound_intensity(..., fraction=...)``)
@@ -277,8 +279,11 @@ class FieldIndicators:
 
         check_language(language)
         return plot_field_indicators(
-            self, ax=ax, dynamic_capability=dynamic_capability,
-            language=language, **kwargs
+            self,
+            ax=ax,
+            dynamic_capability=dynamic_capability,
+            language=language,
+            **kwargs,
         )
 
 
@@ -448,16 +453,16 @@ def sound_intensity(
     _validate_probe_medium(fs, spacing, rho, c)
     _validate_band_options(fraction, limits)
     if x1.size < 32:
-        raise ValueError(f"Signals too short for a spectral estimate: {x1.size} samples.")
+        raise ValueError(
+            f"Signals too short for a spectral estimate: {x1.size} samples."
+        )
 
     # Hann-windowed Welch/CSD averaging through the shared spectral core
     # (50% overlap, detrend off); the shared default segment length targets
     # a resolution of at most 4 Hz so low-frequency bands are resolved.
     nperseg = _default_nperseg(x1.size, float(fs))
     f, g12 = _welch_cross_spectrum(x1, x2, float(fs), nperseg, nperseg // 2)
-    _, spp = _welch_autospectrum(
-        (x1 + x2) / 2.0, float(fs), nperseg, nperseg // 2
-    )
+    _, spp = _welch_autospectrum((x1 + x2) / 2.0, float(fs), nperseg, nperseg // 2)
     df = float(f[1] - f[0])
     pos = f > 0
     fpos = f[pos]
@@ -491,7 +496,9 @@ def sound_intensity(
     bias_correction: np.ndarray | None = None
 
     if fraction is not None:
-        band_limits = [float(limits[0]), float(limits[1])] if limits else [12.0, 20000.0]
+        band_limits = (
+            [float(limits[0]), float(limits[1])] if limits else [12.0, 20000.0]
+        )
         frequency, intensity, band_msp = _band_integrals(
             fpos, i_density, p_density, df, fraction, band_limits, fs
         )
@@ -565,9 +572,7 @@ def _coefficient_of_variation(
     mean = float(np.mean(samples))
     if mean <= 0.0:
         raise ValueError(non_positive_message)
-    deviation = float(
-        np.sqrt(np.sum((samples - mean) ** 2) / (samples.size - 1))
-    )
+    deviation = float(np.sqrt(np.sum((samples - mean) ** 2) / (samples.size - 1)))
     return deviation / mean
 
 
@@ -622,9 +627,7 @@ def temporal_variability_indicator(
             "(ISO 9614-1 Annex A Note 9 recommends M = 10)."
         )
     if samples.ndim == 1:
-        return _coefficient_of_variation(
-            samples, non_positive_message=_F1_NON_POSITIVE
-        )
+        return _coefficient_of_variation(samples, non_positive_message=_F1_NON_POSITIVE)
     return np.asarray(
         [
             _coefficient_of_variation(
@@ -636,9 +639,7 @@ def temporal_variability_indicator(
     )
 
 
-def _field_indicators_1d(
-    lp: np.ndarray, i_n: np.ndarray
-) -> tuple[float, float, float]:
+def _field_indicators_1d(lp: np.ndarray, i_n: np.ndarray) -> tuple[float, float, float]:
     """F2/F3/F4 of one band from the per-position ``Lpi`` and ``Ini``."""
     # Equation (A.4): surface pressure level.
     lp_surface = energy_mean(lp)
@@ -746,8 +747,7 @@ def field_indicators(
     i_n = np.atleast_1d(np.asarray(normal_intensity, dtype=np.float64))
     if lp.ndim not in (1, 2) or i_n.ndim not in (1, 2):
         raise ValueError(
-            "field_indicators expects 1D (positions,) or 2D (positions, bands) "
-            "arrays."
+            "field_indicators expects 1D (positions,) or 2D (positions, bands) arrays."
         )
     if lp.shape != i_n.shape:
         raise ValueError(
@@ -775,9 +775,7 @@ def field_indicators(
         f2, f3, f4 = _field_indicators_1d(lp, i_n)
         return FieldIndicators(f2=f2, f3=f3, f4=f4, frequency=freqs, f1=f1)
 
-    per_band = [
-        _field_indicators_1d(lp[:, b], i_n[:, b]) for b in range(lp.shape[1])
-    ]
+    per_band = [_field_indicators_1d(lp[:, b], i_n[:, b]) for b in range(lp.shape[1])]
     values = np.asarray(per_band, dtype=np.float64)
     return FieldIndicators(
         f2=values[:, 0], f3=values[:, 1], f4=values[:, 2], frequency=freqs, f1=f1

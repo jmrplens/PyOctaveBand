@@ -34,8 +34,8 @@ def test_predicted_prominence_vectorised() -> None:
 def test_adjustment_formula_2_and_threshold() -> None:
     # KI at P = 10 is 1.8*(10-5) = 9.0.
     assert float(nt.impulse_adjustment(10.0)) == pytest.approx(NTACOU112_ADJUSTMENT_P10)
-    assert float(nt.impulse_adjustment(5.0)) == 0.0                   # threshold
-    assert float(nt.impulse_adjustment(3.0)) == 0.0                   # below
+    assert float(nt.impulse_adjustment(5.0)) == 0.0  # threshold
+    assert float(nt.impulse_adjustment(3.0)) == 0.0  # below
     # Just above the threshold the adjustment is small and positive.
     ki = float(nt.impulse_adjustment(5.5))
     assert 0.0 < ki
@@ -48,9 +48,11 @@ def test_governing_impulse_is_the_highest_p() -> None:
     # P = 3 lg(OR) + 2 lg(LD) per impulse (Formula 1).
     np.testing.assert_allclose(
         result.per_impulse,
-        [3 * np.log10(50.0) + 2 * np.log10(12.0),
-         3 * np.log10(1000.0) + 2 * np.log10(30.0),
-         3 * np.log10(200.0) + 2 * np.log10(20.0)],
+        [
+            3 * np.log10(50.0) + 2 * np.log10(12.0),
+            3 * np.log10(1000.0) + 2 * np.log10(30.0),
+            3 * np.log10(200.0) + 2 * np.log10(20.0),
+        ],
     )
     assert result.prominence == pytest.approx(float(result.per_impulse.max()))
     assert result.prominence == pytest.approx(NTACOU112_PROMINENCE, abs=1e-4)
@@ -125,9 +127,7 @@ def test_onset_rate_gate_governing_from_qualifying_only() -> None:
     assert res.qualifies.tolist() == [False, True]
     p_qualifying = float(nt.predicted_prominence(30.0, 20.0))
     assert res.prominence == pytest.approx(p_qualifying)
-    assert res.adjustment == pytest.approx(
-        float(nt.impulse_adjustment(p_qualifying))
-    )
+    assert res.adjustment == pytest.approx(float(nt.impulse_adjustment(p_qualifying)))
 
 
 def test_assessment_period_defaults_and_validates() -> None:

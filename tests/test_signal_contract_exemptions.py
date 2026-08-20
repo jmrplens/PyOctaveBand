@@ -139,7 +139,7 @@ def test_the_probe_intensity_goes_as_the_product_of_the_two_pressures() -> None:
 
 
 def test_a_ratio_of_two_records_still_applies_both_factors() -> None:
-    """"Cancels" has to mean applied and divided out, not skipped.
+    """ "Cancels" has to mean applied and divided out, not skipped.
 
     The in-situ absorption is the ratio of two measured impulse responses,
     so a factor the two share leaves it where it was. That is only true
@@ -153,9 +153,7 @@ def test_a_ratio_of_two_records_still_applies_both_factors() -> None:
         Signal(incident, FS, calibration_factor=CAL),
         Signal(reflected, FS, calibration_factor=CAL),
     )
-    assert_same(
-        both, insitu_absorption_spectrum(CAL * incident, CAL * reflected, FS)
-    )
+    assert_same(both, insitu_absorption_spectrum(CAL * incident, CAL * reflected, FS))
     bare = insitu_absorption_spectrum(incident, reflected, FS)
     assert np.allclose(both.absorption, bare.absorption, equal_nan=True)
     one_only = insitu_absorption_spectrum(
@@ -177,9 +175,7 @@ def test_a_delegating_chain_applies_the_factor_once() -> None:
     record = 0.01 * rng.standard_normal(FS * 2)
     record[FS : FS + 2000] += 0.5 * np.exp(-np.arange(2000) / 300.0)
     once = impulsive_sound_adjustment(Signal(record, FS, calibration_factor=CAL))
-    assert once.laeq == pytest.approx(
-        impulsive_sound_adjustment(CAL * record, FS).laeq
-    )
+    assert once.laeq == pytest.approx(impulsive_sound_adjustment(CAL * record, FS).laeq)
     assert once.laeq != pytest.approx(
         impulsive_sound_adjustment(CAL**2 * record, FS).laeq
     )

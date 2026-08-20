@@ -270,7 +270,9 @@ def test_no_renderer_defaults_a_label_on_the_shared_kwargs_inside_a_loop() -> No
     import ast
     import pathlib
 
-    root = pathlib.Path(__file__).resolve().parent.parent / "src" / "phonometry" / "_plot"
+    root = (
+        pathlib.Path(__file__).resolve().parent.parent / "src" / "phonometry" / "_plot"
+    )
     offenders: list[str] = []
     for path in sorted(root.rglob("*.py")):
         tree = ast.parse(path.read_text(encoding="utf-8"))

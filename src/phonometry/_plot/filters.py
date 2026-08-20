@@ -42,20 +42,17 @@ _STRINGS: dict[str, str] = {
     "Class {cls} pass corridor": "Corredor de aceptación clase {cls}",
     r"Measured $\Delta A$": r"$\Delta A$ medida",
     "Out of tolerance": "Fuera de tolerancia",
-    r"Normalised frequency $f\,/\,f_{\mathrm{m}}$":
-        r"Frecuencia normalizada $f\,/\,f_{\mathrm{m}}$",
+    r"Normalised frequency $f\,/\,f_{\mathrm{m}}$": r"Frecuencia normalizada $f\,/\,f_{\mathrm{m}}$",
     "Relative attenuation [dB]": "Atenuación relativa [dB]",
     # The mid-band subscript is upright (m abbreviates "mid-band", as
     # IEC 61260-1:2014 5.4.1 prints it); its braces are doubled because this
     # title is the one string here that goes through ``str.format``.
-    r"IEC 61260-1 class {cls} mask — $f_{{\mathrm{{m}}}}$ = {fm} Hz":
-        r"Máscara clase {cls} IEC 61260-1 — $f_{{\mathrm{{m}}}}$ = {fm} Hz",
+    r"IEC 61260-1 class {cls} mask — $f_{{\mathrm{{m}}}}$ = {fm} Hz": r"Máscara clase {cls} IEC 61260-1 — $f_{{\mathrm{{m}}}}$ = {fm} Hz",
     "lowpass": "paso bajo",
     "highpass": "paso alto",
     "magnitude": "magnitud",
     "Cascade": "Cascada",
-    "Parametric EQ response (Audio EQ Cookbook)":
-        "Respuesta del EQ paramétrico (Audio EQ Cookbook)",
+    "Parametric EQ response (Audio EQ Cookbook)": "Respuesta del EQ paramétrico (Audio EQ Cookbook)",
     "peaking": "campana",
     "lowshelf": "shelf de graves",
     "highshelf": "shelf de agudos",
@@ -88,8 +85,11 @@ def _worst_band_index(result: FilterComplianceResult) -> int:
 
 
 def plot_filter_class(
-    result: FilterComplianceResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: FilterComplianceResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Measured relative attenuation of the binding band over its class corridor.
 
@@ -165,8 +165,12 @@ def plot_filter_class(
     # (unbounded attenuation allowed), so it is clipped to the axis top there.
     upper_fill = np.where(finite_upper, upper, y_top)
     ax.fill_between(
-        omega[win], lower[win], upper_fill[win], color=theme_fill(_C_TERTIARY, ax),
-        lw=0.0, label=_t("Class {cls} pass corridor", language, cls=cls),
+        omega[win],
+        lower[win],
+        upper_fill[win],
+        color=theme_fill(_C_TERTIARY, ax),
+        lw=0.0,
+        label=_t("Class {cls} pass corridor", language, cls=cls),
     )
     ax.plot(omega[win], lower[win], color=_C_TERTIARY, lw=1.0, ls="--")
     fin = win & finite_upper
@@ -181,8 +185,13 @@ def plot_filter_class(
     viol_win = violated & win
     if np.any(viol_win):
         ax.plot(
-            omega[viol_win], delta_a[viol_win], ls="", marker="o", ms=3.5,
-            color=_C_REFERENCE, label=_t("Out of tolerance", language),
+            omega[viol_win],
+            delta_a[viol_win],
+            ls="",
+            marker="o",
+            ms=3.5,
+            color=_C_REFERENCE,
+            label=_t("Out of tolerance", language),
         )
 
     ax.axvline(1.0, color=_C_MUTED, ls=":", lw=1.0)
@@ -192,8 +201,12 @@ def plot_filter_class(
     ax.set_xlabel(_t(r"Normalised frequency $f\,/\,f_{\mathrm{m}}$", language))
     ax.set_ylabel(_t("Relative attenuation [dB]", language))
     ax.set_title(
-        _t(r"IEC 61260-1 class {cls} mask — $f_{{\mathrm{{m}}}}$ = {fm} Hz",
-           language, cls=cls, fm=format_number(fm, language, decimals=0))
+        _t(
+            r"IEC 61260-1 class {cls} mask — $f_{{\mathrm{{m}}}}$ = {fm} Hz",
+            language,
+            cls=cls,
+            fm=format_number(fm, language, decimals=0),
+        )
     )
     ax.legend(loc="upper center", fontsize="small")
     ax.grid(True, which="both", alpha=0.3)
@@ -225,8 +238,12 @@ def _normalized_frequency_axis(
 
 
 def plot_parametric_eq(
-    result: EQResponseResult, ax: Axes | None = None, *,
-    language: str = "en", show_sections: bool = True, **kwargs: Any
+    result: EQResponseResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    show_sections: bool = True,
+    **kwargs: Any,
 ) -> Axes | np.ndarray:
     """Magnitude and phase response of a parametric-EQ cascade.
 
@@ -264,8 +281,11 @@ def plot_parametric_eq(
                     language,
                 )
                 axm.semilogx(
-                    freqs, result.section_magnitude_db[idx],
-                    color=_C_MUTED, lw=0.9, alpha=0.7,
+                    freqs,
+                    result.section_magnitude_db[idx],
+                    color=_C_MUTED,
+                    lw=0.9,
+                    alpha=0.7,
                     label=label if idx < 8 else None,
                 )
         kwargs.setdefault("lw", 1.8)
@@ -274,8 +294,9 @@ def plot_parametric_eq(
         # Quiet by colour, not by opacity: half opacity on a 0.8 pt line
         # composites to within a level or two of the dark page and the
         # reference disappears, while reading fine on the white one.
-        axm.axhline(0.0, color=theme_line(_C_REFERENCE, axm, quiet=0.6),
-                    linestyle=":", lw=0.8)
+        axm.axhline(
+            0.0, color=theme_line(_C_REFERENCE, axm, quiet=0.6), linestyle=":", lw=0.8
+        )
         axm.set_ylabel(_t("Magnitude [dB]", language))
         axm.grid(True, which="both", alpha=0.3)
         axm.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
@@ -289,9 +310,7 @@ def plot_parametric_eq(
 
     axes = _new_axes_column(2, sharex=True, figsize=(8.0, 6.4))
     _magnitude(axes[0])
-    axes[0].set_title(
-        _t("Parametric EQ response (Audio EQ Cookbook)", language)
-    )
+    axes[0].set_title(_t("Parametric EQ response (Audio EQ Cookbook)", language))
     axes[1].semilogx(freqs, np.degrees(result.phase_rad), color=color, lw=1.4)
     axes[1].set_ylabel(_t("Phase [deg]", language))
     axes[1].set_xlabel(_t(_FREQ_LABEL, language))
@@ -350,22 +369,26 @@ def plot_time_weighted_envelope(
             # otherwise hit "got multiple values for keyword argument
             # 'label'". Theirs wins.
             per_channel = dict(kwargs)
-            per_channel.setdefault(
-                "label", _t("Channel {n}", language, n=index + 1)
-            )
+            per_channel.setdefault("label", _t("Channel {n}", language, n=index + 1))
             axw.plot(result.times, channel, **per_channel)
         axw.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     axw.set_xlabel(_t("Time [s]", language))
-    axw.set_ylabel(_t(
-        "Sound pressure level [dB re 20 uPa]" if result.calibrated
-        else "Mean square [FS\u00b2]",
-        language,
-    ))
+    axw.set_ylabel(
+        _t(
+            "Sound pressure level [dB re 20 uPa]"
+            if result.calibrated
+            else "Mean square [FS\u00b2]",
+            language,
+        )
+    )
     axw.grid(True, alpha=0.3)
     if new_figure:
-        axw.set_title(_t(
-            "{mode} time-weighted level", language,
-            mode=_t(result.mode, language).capitalize(),
-        ))
+        axw.set_title(
+            _t(
+                "{mode} time-weighted level",
+                language,
+                mode=_t(result.mode, language).capitalize(),
+            )
+        )
     localize_axes(axw, language)
     return axw

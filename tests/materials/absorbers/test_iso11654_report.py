@@ -49,8 +49,21 @@ _PDF_MAGIC = b"%PDF"
 # Fifteen one-third-octave alpha_s (200 Hz to 5000 Hz) whose octave means are
 # the Annex A.2 practical coefficients (0.35, 1.00, 0.65, 0.60, 0.55).
 _THIRD_OCTAVE_ALPHA_S = (
-    0.30, 0.35, 0.40, 1.00, 1.00, 1.00, 0.62, 0.66, 0.67,
-    0.58, 0.60, 0.62, 0.53, 0.55, 0.57,
+    0.30,
+    0.35,
+    0.40,
+    1.00,
+    1.00,
+    1.00,
+    0.62,
+    0.66,
+    0.67,
+    0.58,
+    0.60,
+    0.62,
+    0.53,
+    0.55,
+    0.57,
 )
 
 
@@ -115,8 +128,23 @@ def test_third_octave_fiche_renders_and_round_trips(tmp_path) -> None:
     np.testing.assert_allclose(result.third_octave_alpha_s, _THIRD_OCTAVE_ALPHA_S)
     np.testing.assert_allclose(
         result.third_octave_bands,
-        [200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500,
-         3150, 4000, 5000],
+        [
+            200,
+            250,
+            315,
+            400,
+            500,
+            630,
+            800,
+            1000,
+            1250,
+            1600,
+            2000,
+            2500,
+            3150,
+            4000,
+            5000,
+        ],
     )
     out = tmp_path / "third_octave.pdf"
     result.report(str(out))
@@ -145,9 +173,9 @@ def test_statement_writes_shape_indicator_without_space(tmp_path) -> None:
     assert result.rating_label == "0.60(M)"
     out = tmp_path / "statement.pdf"
     result.report(str(out))
-    text = "\n".join(
-        page.extract_text() for page in PdfReader(str(out)).pages
-    ).replace("\n", " ")
+    text = "\n".join(page.extract_text() for page in PdfReader(str(out)).pages).replace(
+        "\n", " "
+    )
     assert "0.60(M)" in text
     assert "0.60 (M)" not in text
     assert "5.3 NOTE" in text  # shape-indicator recommendation footnote

@@ -31,8 +31,24 @@ from phonometry.building.measurement.intensity_insulation import (
 _PDF_MAGIC = b"%PDF"
 
 _RATING_FREQS = np.array(
-    [100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-     1000, 1250, 1600, 2000, 2500, 3150],
+    [
+        100,
+        125,
+        160,
+        200,
+        250,
+        315,
+        400,
+        500,
+        630,
+        800,
+        1000,
+        1250,
+        1600,
+        2000,
+        2500,
+        3150,
+    ],
     dtype=float,
 )
 
@@ -118,9 +134,7 @@ def test_full_metadata_and_verbose_render_one_page(tmp_path) -> None:
         requirement=25.0,
     )
     out = tmp_path / "verbose.pdf"
-    _intensity_result(with_kc=True).report(
-        str(out), metadata=metadata, verbose=True
-    )
+    _intensity_result(with_kc=True).report(str(out), metadata=metadata, verbose=True)
     _assert_one_page(str(out))
     text = " ".join(_extract_text(str(out)).split())
     assert "PASS" in text  # RI,w = 30 dB >= 25 dB
@@ -249,8 +263,13 @@ def test_non_iso_band_count_rejected(tmp_path) -> None:
     centers = np.array([100, 125, 160, 200, 250, 315, 400, 500], dtype=float)
     curve = np.linspace(20.0, 40.0, 8)
     rating = building.WeightedRatingResult(
-        rating=30, c=-2, ctr=-3, unfavourable_sum=0.0,
-        band_centers=centers, measured=curve, shifted_reference=curve,
+        rating=30,
+        c=-2,
+        ctr=-3,
+        unfavourable_sum=0.0,
+        band_centers=centers,
+        measured=curve,
+        shifted_reference=curve,
     )
     result = IntensityReductionResult(
         r_i=curve, r_i_modified=None, rating=rating, rating_modified=None

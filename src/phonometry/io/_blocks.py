@@ -56,9 +56,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 
-def _decode_linear_frames(
-    raw: bytes, fmt: FormatChunk
-) -> NDArray[np.float64]:
+def _decode_linear_frames(raw: bytes, fmt: FormatChunk) -> NDArray[np.float64]:
     """Decode interleaved linear PCM/float bytes to ``(channels, frames)``.
 
     The scaling convention of :mod:`phonometry.io._wav`, applied straight
@@ -72,8 +70,7 @@ def _decode_linear_frames(
         data = np.frombuffer(raw, dtype="<f4" if bits == 32 else "<f8")
         scaled = data.astype(np.float64)
     elif bits == 8:
-        scaled = (np.frombuffer(raw, dtype=np.uint8)
-                  .astype(np.float64) - 128.0) / 128.0
+        scaled = (np.frombuffer(raw, dtype=np.uint8).astype(np.float64) - 128.0) / 128.0
     elif bits == 24:
         triplets = np.frombuffer(raw, dtype=np.uint8).reshape(-1, 3)
         values = (
@@ -126,8 +123,11 @@ def _iter_soundfile_blocks(
     if _soundfile_lossy(subtype):
         _warn_lossy(f"{format_name} ({subtype})", path)
     for block in sf.blocks(
-        str(path), blocksize=block_size, overlap=overlap,
-        dtype="float64", always_2d=True,
+        str(path),
+        blocksize=block_size,
+        overlap=overlap,
+        dtype="float64",
+        always_2d=True,
     ):
         yield _squeeze(np.ascontiguousarray(block.T))
 

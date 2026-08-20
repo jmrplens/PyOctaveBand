@@ -53,8 +53,7 @@ _BARRIER_FPS = 120
 
 
 @lru_cache(maxsize=1)
-def _barrier_fields(
-        n_frames: int = _BARRIER_FRAMES) -> tuple[Any, Any, Any, Any]:
+def _barrier_fields(n_frames: int = _BARRIER_FRAMES) -> tuple[Any, Any, Any, Any]:
     """Two CW barrier-diffraction runs (low/high frequency), cached.
 
     A 12 m x 7 m half-space over rigid ground with a thin rigid barrier
@@ -72,16 +71,18 @@ def _barrier_fields(
     import fdtd2d
 
     c0, dx = 343.0, 0.02
-    ny, nx = 350, 600                      # 7 m x 12 m
+    ny, nx = 350, 600  # 7 m x 12 m
     rho = np.full((ny, nx), 1.2)
-    bx = round(5.5 / dx)              # thin barrier: 3 cells = 6 cm
-    rho[:round(2.5 / dx), bx:bx + 3] = 1.2e6
+    bx = round(5.5 / dx)  # thin barrier: 3 cells = 6 cm
+    rho[: round(2.5 / dx), bx : bx + 3] = 1.2e6
     every = _BARRIER_EVERY
     # Receiver patch: 0.6 m x 0.6 m around the shadow-zone receiver,
     # energy-averaged so residual interference fringes average out.
     rx, ry = _BARRIER_RECEIVER
-    patch = (slice(int((ry - 0.3) / dx), int((ry + 0.3) / dx) + 1),
-             slice(int((rx - 0.3) / dx), int((rx + 0.3) / dx) + 1))
+    patch = (
+        slice(int((ry - 0.3) / dx), int((ry + 0.3) / dx) + 1),
+        slice(int((rx - 0.3) / dx), int((rx + 0.3) / dx) + 1),
+    )
     p_all, db_all, ils = [], [], []
     times = np.zeros(0)
     for f in _BARRIER_FREQS:
@@ -90,12 +91,15 @@ def _barrier_fields(
         # in the imshow-origin naming of fdtd2d); the ground stays rigid.
         rms_patch = []
         for rho_map in (rho, None):
-            sim = fdtd2d.FDTD2D(c0, dx, shape=(ny, nx),
-                                rho=1.2 if rho_map is None else rho_map,
-                                sponge_width=40,
-                                sponge_sides=("left", "right", "bottom"))
-            sim.add_source(fdtd2d.CWSource(ix=100, iy=25, frequency=f,
-                                           ramp_cycles=2.0))
+            sim = fdtd2d.FDTD2D(
+                c0,
+                dx,
+                shape=(ny, nx),
+                rho=1.2 if rho_map is None else rho_map,
+                sponge_width=40,
+                sponge_sides=("left", "right", "bottom"),
+            )
+            sim.add_source(fdtd2d.CWSource(ix=100, iy=25, frequency=f, ramp_cycles=2.0))
             if rho_map is not None:
                 ps, rs, times, _ = _fdtd_cw_capture(sim, f, every, n_frames)
                 p_all.append(ps)
@@ -134,22 +138,26 @@ def animate_fdtd_barrier(output_dir: str) -> None:
     from matplotlib.patches import Rectangle
 
     T = _translate_str
-    outline = [patheffects.withStroke(linewidth=2.0,
-                                      foreground=FIELD_STROKE)]
+    outline = [patheffects.withStroke(linewidth=2.0, foreground=FIELD_STROKE)]
     p_all, db_all, times, ils = _barrier_fields()
     half = p_all.shape[1] // 2
     lam = tuple(343.0 / f for f in _BARRIER_FREQS)
     rx, ry = _BARRIER_RECEIVER
 
     fig = _anim_figure()
-    sup = fig.suptitle(T("Barrier diffraction into the shadow zone (2D FDTD)"),
-                       )
+    sup = fig.suptitle(
+        T("Barrier diffraction into the shadow zone (2D FDTD)"),
+    )
     gs = fig.add_gridspec(2, 2)
     titles = [
-        T(rf"Low frequency: {_BARRIER_FREQS[0]:.0f} Hz "
-          rf"($\lambda$ ≈ {lam[0]:.1f} m)"),
-        T(rf"High frequency: {_BARRIER_FREQS[1]:.0f} Hz "
-          rf"($\lambda$ ≈ {lam[1]:.2f} m)"),
+        T(
+            rf"Low frequency: {_BARRIER_FREQS[0]:.0f} Hz "
+            rf"($\lambda$ ≈ {lam[0]:.1f} m)"
+        ),
+        T(
+            rf"High frequency: {_BARRIER_FREQS[1]:.0f} Hz "
+            rf"($\lambda$ ≈ {lam[1]:.2f} m)"
+        ),
     ]
     verdicts = [T("diffraction fills the shadow"), T("deep, clean shadow")]
     ims: list[Any] = []
@@ -158,46 +166,119 @@ def animate_fdtd_barrier(output_dir: str) -> None:
         vmax = float(np.quantile(np.abs(p_all[col][half:]), 0.995))
         ax_p = fig.add_subplot(gs[0, col])
         ax_r = fig.add_subplot(gs[1, col])
-        im_p = ax_p.imshow(p_all[col][0], origin="lower",
-                           extent=(0.0, 12.0, 0.0, 7.0), cmap=CMAP_FIELD,
-                           vmin=-vmax, vmax=vmax, interpolation="bilinear")
-        im_r = ax_r.imshow(db_all[col][0], origin="lower",
-                           extent=(0.0, 12.0, 0.0, 7.0), cmap="magma",
-                           vmin=-40.0, vmax=0.0, interpolation="bilinear")
+        im_p = ax_p.imshow(
+            p_all[col][0],
+            origin="lower",
+            extent=(0.0, 12.0, 0.0, 7.0),
+            cmap=CMAP_FIELD,
+            vmin=-vmax,
+            vmax=vmax,
+            interpolation="bilinear",
+        )
+        im_r = ax_r.imshow(
+            db_all[col][0],
+            origin="lower",
+            extent=(0.0, 12.0, 0.0, 7.0),
+            cmap="magma",
+            vmin=-40.0,
+            vmax=0.0,
+            interpolation="bilinear",
+        )
         ax_p.set_title(titles[col], fontsize=10)
         for ax in (ax_p, ax_r):
             ax.grid(False)
             ax.set_ylim(-0.5, 7.0)
-            ax.add_patch(Rectangle((0.0, -0.5), 12.0, 0.5,
-                                   facecolor=COLOR_GRID, edgecolor=COLOR_FG,
-                                   lw=0.8, hatch="///"))
+            ax.add_patch(
+                Rectangle(
+                    (0.0, -0.5),
+                    12.0,
+                    0.5,
+                    facecolor=COLOR_GRID,
+                    edgecolor=COLOR_FG,
+                    lw=0.8,
+                    hatch="///",
+                )
+            )
             # Theme-independent bar: mid-gray with a white edge stays
             # visible on the near-white RdBu row and the black magma row.
-            ax.add_patch(Rectangle((5.44, 0.0), 0.18, 2.5,
-                                   facecolor="#707070", edgecolor="white",
-                                   lw=0.6))
+            ax.add_patch(
+                Rectangle(
+                    (5.44, 0.0),
+                    0.18,
+                    2.5,
+                    facecolor="#707070",
+                    edgecolor="white",
+                    lw=0.6,
+                )
+            )
             ax.tick_params(labelsize=7)
         ax_p.tick_params(labelbottom=False)
         ax_r.set_xlabel("$x$ [m]", fontsize=8)
-        ax_p.plot([2.0], [0.5], marker="o", ms=5, color=COLOR_TERTIARY,
-                  markeredgecolor=FIELD_STROKE, markeredgewidth=0.8)
-        ax_p.text(2.25, 0.55, T("source"), ha="left", va="center",
-                  color=FIELD_INK, fontsize=7.5, path_effects=outline)
-        ax_p.text(5.53, 2.7, T("barrier"), ha="center", va="bottom",
-                  color=FIELD_INK, fontsize=7.5, path_effects=outline)
-        ax_p.text(9.2, 1.1, T("shadow zone"), ha="center", va="center",
-                  color=FIELD_INK, fontsize=7.5, path_effects=outline)
-        ax_r.text(11.7, 6.4, verdicts[col], ha="right", va="top",
-                  color="white", fontsize=8)
-        ax_r.plot([rx], [ry], marker="o", ms=5, color="white",
-                  markeredgecolor="black", markeredgewidth=0.8)
+        ax_p.plot(
+            [2.0],
+            [0.5],
+            marker="o",
+            ms=5,
+            color=COLOR_TERTIARY,
+            markeredgecolor=FIELD_STROKE,
+            markeredgewidth=0.8,
+        )
+        ax_p.text(
+            2.25,
+            0.55,
+            T("source"),
+            ha="left",
+            va="center",
+            color=FIELD_INK,
+            fontsize=7.5,
+            path_effects=outline,
+        )
+        ax_p.text(
+            5.53,
+            2.7,
+            T("barrier"),
+            ha="center",
+            va="bottom",
+            color=FIELD_INK,
+            fontsize=7.5,
+            path_effects=outline,
+        )
+        ax_p.text(
+            9.2,
+            1.1,
+            T("shadow zone"),
+            ha="center",
+            va="center",
+            color=FIELD_INK,
+            fontsize=7.5,
+            path_effects=outline,
+        )
+        ax_r.text(
+            11.7, 6.4, verdicts[col], ha="right", va="top", color="white", fontsize=8
+        )
+        ax_r.plot(
+            [rx],
+            [ry],
+            marker="o",
+            ms=5,
+            color="white",
+            markeredgecolor="black",
+            markeredgewidth=0.8,
+        )
         # Written out here, not in update(): the string never changes once
         # the number is revealed, and the clamp below has to measure the
         # label that will actually be drawn.
         il_txts.append(
-            ax_r.text(rx, ry + 0.45,
-                      T(f"insertion loss {ils[col]:.0f} dB"), ha="center",
-                      va="bottom", color="white", fontsize=7.5))
+            ax_r.text(
+                rx,
+                ry + 0.45,
+                T(f"insertion loss {ils[col]:.0f} dB"),
+                ha="center",
+                va="bottom",
+                color="white",
+                fontsize=7.5,
+            )
+        )
         if col == 0:
             ax_p.set_ylabel(T("instantaneous $p(x, y)$"), fontsize=9)
             ax_r.set_ylabel(T("RMS level [dB re panel max]"), fontsize=8)
@@ -205,22 +286,46 @@ def animate_fdtd_barrier(output_dir: str) -> None:
             # rounded box behind the label started about a pixel off the
             # left spine and read as touching it. The extra 0.2 m is
             # daylight between the box and the spine, not data.
-            ax_p.text(0.45, -0.27, T("rigid ground"), ha="left",
-                      va="center", color=COLOR_FG, fontsize=6.5,
-                      bbox={"boxstyle": "round,pad=0.2",
-                            "facecolor": fig.get_facecolor(),
-                            "edgecolor": "none"})
+            ax_p.text(
+                0.45,
+                -0.27,
+                T("rigid ground"),
+                ha="left",
+                va="center",
+                color=COLOR_FG,
+                fontsize=6.5,
+                bbox={
+                    "boxstyle": "round,pad=0.2",
+                    "facecolor": fig.get_facecolor(),
+                    "edgecolor": "none",
+                },
+            )
         else:
             ax_p.tick_params(labelleft=False)
             ax_r.tick_params(labelleft=False)
-            ax_r.text(0.3, 5.45, T("each panel on its own dB scale"),
-                      color="white", fontsize=7, ha="left", va="top")
+            ax_r.text(
+                0.3,
+                5.45,
+                T("each panel on its own dB scale"),
+                color="white",
+                fontsize=7,
+                ha="left",
+                va="top",
+            )
         ims += [im_p, im_r]
     # Top-left margin: the field panels run their x-axis (ticks + "x [m]")
     # to the very bottom-right corner, so a bottom readout collides with the
     # tick labels; the top-left stays clear of the centred column titles.
-    t_txt = fig.text(0.012, 0.985, "", ha="left", va="top",
-                     family="monospace", fontsize=10, color=COLOR_FG)
+    t_txt = fig.text(
+        0.012,
+        0.985,
+        "",
+        ha="left",
+        va="top",
+        family="monospace",
+        fontsize=10,
+        color=COLOR_FG,
+    )
     # The insertion-loss labels are centred on the receiver, which sits
     # 9 m along a 12 m panel with the screen at 5.5 m: the room they have
     # is the shadow zone, and the English string fits in it while the
@@ -228,14 +333,18 @@ def animate_fdtd_barrier(output_dir: str) -> None:
     # drawn, scale it to the room if it is over, then slide it back inside
     # the panel -- so it neither leaves the axes nor climbs onto the screen.
     shadow = (5.62 + 0.15, il_txts[0].axes.get_xlim()[1] - 0.35)
+
     # One size for both panels -- they are twins, and two sizes would read
     # as two kinds of annotation -- stepped down until the longer string
     # fits. Stepped rather than scaled by the ratio: the rasteriser rounds
     # the glyph size to whole pixels, so a 2 % reduction can come back the
     # same width it went in.
     def fit_annotations() -> None:
-        while (max(_text_width_x(fig, il.axes, il) for il in il_txts)
-               > shadow[1] - shadow[0] and il_txts[0].get_fontsize() > 6.0):
+        while (
+            max(_text_width_x(fig, il.axes, il) for il in il_txts)
+            > shadow[1] - shadow[0]
+            and il_txts[0].get_fontsize() > 6.0
+        ):
             for il in il_txts:
                 il.set_fontsize(il.get_fontsize() - 0.25)
         for il in il_txts:
@@ -252,8 +361,10 @@ def animate_fdtd_barrier(output_dir: str) -> None:
         # separates them.
         t_txt.set_text(T(f"$t$ = {times[-1] * 1000.0:4.1f} ms"))
         _settle(fig)
-        while (sup.get_window_extent().x0 - t_txt.get_window_extent().x1
-               < 0.6 * fig.dpi and sup.get_fontsize() > 9.0):
+        while (
+            sup.get_window_extent().x0 - t_txt.get_window_extent().x1 < 0.6 * fig.dpi
+            and sup.get_fontsize() > 9.0
+        ):
             sup.set_fontsize(sup.get_fontsize() - 0.25)
         t_txt.set_text("")
 
@@ -265,11 +376,18 @@ def animate_fdtd_barrier(output_dir: str) -> None:
             # actually reached and settled at the receiver, so the number
             # never precedes its cause.
             il_txts[col].set_text(
-                T(f"insertion loss {ils[col]:.0f} dB")
-                if times[k] >= 0.032 else "")
+                T(f"insertion loss {ils[col]:.0f} dB") if times[k] >= 0.032 else ""
+            )
         t_txt.set_text(T(f"$t$ = {times[k] * 1000.0:4.1f} ms"))
         return (*ims, *il_txts, t_txt)
 
-    _render_clip(fig, update, output_dir, "anim_fdtd_barrier",
-                 frames=int(p_all.shape[1]), fps=_BARRIER_FPS, gif_fps=5,
-                 measure=fit_annotations)
+    _render_clip(
+        fig,
+        update,
+        output_dir,
+        "anim_fdtd_barrier",
+        frames=int(p_all.shape[1]),
+        fps=_BARRIER_FPS,
+        gif_fps=5,
+        measure=fit_annotations,
+    )

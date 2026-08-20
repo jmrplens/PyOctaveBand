@@ -153,8 +153,11 @@ def _diffuse():
 # (id, builder, expected Spanish substring) for every materials result renderer.
 _CASES = [
     ("weighted_absorption", _weighted, "Coeficiente de absorción acústica"),
-    ("sound_absorption", _measurement,
-     "Absorción acústica en cámara reverberante ISO 354"),
+    (
+        "sound_absorption",
+        _measurement,
+        "Absorción acústica en cámara reverberante ISO 354",
+    ),
     ("scattering", _scattering, "Coeficiente de dispersión"),
     ("diffusion_polar", _diffusion, "Coeficiente de difusión"),
     ("insitu_absorption", _insitu, "Absorción in situ de pavimentos"),

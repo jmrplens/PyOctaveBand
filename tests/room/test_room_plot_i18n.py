@@ -115,8 +115,7 @@ def _steady_field():
 
 
 def _room_modes():
-    return room_modes((7.0, 5.0, 3.0), max_frequency=120.0,
-                      reverberation_time=0.8)
+    return room_modes((7.0, 5.0, 3.0), max_frequency=120.0, reverberation_time=0.8)
 
 
 def _crowd_noise():

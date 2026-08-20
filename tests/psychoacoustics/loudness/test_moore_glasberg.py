@@ -56,9 +56,7 @@ def _pink_band(f_lo: float, f_hi: float, density_at_1k: float) -> list:
 
 
 def test_anchor_1khz_40db_is_one_sone() -> None:
-    result = psychoacoustics.loudness_moore_glasberg_from_spectrum(
-        [(1000.0, 40.0)]
-    )
+    result = psychoacoustics.loudness_moore_glasberg_from_spectrum([(1000.0, 40.0)])
     # C is the standard's tabulated constant; the anchor emerges near-exactly.
     assert result.loudness == pytest.approx(1.0, abs=0.01)
     assert result.loudness_level == pytest.approx(40.0, abs=0.3)
@@ -105,9 +103,7 @@ def test_calibration_constant_is_the_tabulated_c() -> None:
     ],
 )
 def test_b1_1_tone_1khz_free_binaural(level: float, sone: float, phon: float) -> None:
-    result = psychoacoustics.loudness_moore_glasberg_from_spectrum(
-        [(1000.0, level)]
-    )
+    result = psychoacoustics.loudness_moore_glasberg_from_spectrum([(1000.0, level)])
     assert result.loudness == pytest.approx(sone, rel=0.05, abs=0.01)
     assert result.loudness_level == pytest.approx(phon, abs=1.0)
 
@@ -117,9 +113,7 @@ def test_b1_1_tone_1khz_free_binaural(level: float, sone: float, phon: float) ->
     [(20.0, 0.35, 28.0), (40.0, 1.8, 48.0), (60.0, 7.0, 68.0), (80.0, 27.2, 87.5)],
 )
 def test_b1_2_tone_3khz_free_binaural(level: float, sone: float, phon: float) -> None:
-    result = psychoacoustics.loudness_moore_glasberg_from_spectrum(
-        [(3000.0, level)]
-    )
+    result = psychoacoustics.loudness_moore_glasberg_from_spectrum([(3000.0, level)])
     assert result.loudness == pytest.approx(sone, rel=0.05)
     # Annex B.1.2 phon column (reproduces to < 0.1 phon).
     assert result.loudness_level == pytest.approx(phon, abs=0.15)
@@ -141,9 +135,7 @@ def test_b1_3_tone_1khz_earphone_monaural(
 
 
 def test_b1_4_tone_100hz_50db_free_binaural() -> None:
-    result = psychoacoustics.loudness_moore_glasberg_from_spectrum(
-        [(100.0, 50.0)]
-    )
+    result = psychoacoustics.loudness_moore_glasberg_from_spectrum([(100.0, 50.0)])
     assert result.loudness == pytest.approx(0.351, rel=0.05)
 
 
@@ -197,9 +189,7 @@ def test_b2_3_pink_noise(density: float, sone: float, phon: float) -> None:
 def test_b2_4_broadband_third_octave_binaural(
     level: float, sone: float, phon: float
 ) -> None:
-    result = psychoacoustics.loudness_moore_glasberg_from_third_octave(
-        [level] * 29
-    )
+    result = psychoacoustics.loudness_moore_glasberg_from_third_octave([level] * 29)
     assert result.loudness == pytest.approx(sone, rel=0.05)
     # Annex B.2.4 phon column (reproduces to < 0.1 phon).
     assert result.loudness_level == pytest.approx(phon, abs=0.15)
@@ -275,9 +265,7 @@ def test_b4_tone_with_noise_less_overlap_is_louder() -> None:
 
 def test_monotonic_in_level() -> None:
     values = [
-        psychoacoustics.loudness_moore_glasberg_from_spectrum(
-            [(1000.0, lvl)]
-        ).loudness
+        psychoacoustics.loudness_moore_glasberg_from_spectrum([(1000.0, lvl)]).loudness
         for lvl in (20.0, 40.0, 60.0, 80.0)
     ]
     assert values[0] < values[1] < values[2] < values[3]
@@ -310,9 +298,7 @@ def test_silence_is_zero() -> None:
     assert empty.loudness == 0.0
     assert empty.loudness_level == 0.0
     assert np.all(empty.specific == 0.0)
-    quiet = psychoacoustics.loudness_moore_glasberg_from_third_octave(
-        [-80.0] * 29
-    )
+    quiet = psychoacoustics.loudness_moore_glasberg_from_third_octave([-80.0] * 29)
     assert quiet.loudness < 1e-3
 
 
@@ -320,9 +306,7 @@ def test_ballpark_agreement_with_zwicker_broadband() -> None:
     # Different model, so only order-of-magnitude agreement is expected.
 
     levels_28 = [60.0] * 28  # ISO 532-1 uses 28 bands (25 Hz..12.5 kHz)
-    zwicker = psychoacoustics.loudness_zwicker_from_spectrum(
-        levels_28
-    ).loudness
+    zwicker = psychoacoustics.loudness_zwicker_from_spectrum(levels_28).loudness
     moore = psychoacoustics.loudness_moore_glasberg_from_third_octave(
         [60.0] * 29
     ).loudness
@@ -335,9 +319,7 @@ def test_ballpark_agreement_with_zwicker_broadband() -> None:
 
 
 def test_result_structure() -> None:
-    result = psychoacoustics.loudness_moore_glasberg_from_spectrum(
-        [(1000.0, 60.0)]
-    )
+    result = psychoacoustics.loudness_moore_glasberg_from_spectrum([(1000.0, 60.0)])
     assert isinstance(result, psychoacoustics.MooreGlasbergLoudness)
     assert result.specific.shape == (372,)
     assert result.erb_number.shape == (372,)
@@ -351,7 +333,9 @@ def test_result_structure() -> None:
     assert 14.0 < peak_cam < 17.0
 
 
-def _tone_signal(level_db: float, freq: float = 1000.0, seconds: float = 1.0) -> np.ndarray:
+def _tone_signal(
+    level_db: float, freq: float = 1000.0, seconds: float = 1.0
+) -> np.ndarray:
     t = np.arange(int(FS * seconds)) / FS
     amp = np.sqrt(2.0) * 2e-5 * 10 ** (level_db / 20.0)
     return amp * np.sin(2.0 * np.pi * freq * t)
@@ -410,16 +394,10 @@ def test_invalid_inputs() -> None:
         psychoacoustics.loudness_moore_glasberg_from_spectrum(
             [(1000.0, 40.0)], presentation="mono"
         )
-    with pytest.raises(
-        ValueError, match="component frequencies must be positive"
-    ):
+    with pytest.raises(ValueError, match="component frequencies must be positive"):
         psychoacoustics.loudness_moore_glasberg_from_spectrum([(-10.0, 40.0)])
-    with pytest.raises(
-        ValueError, match="components must contain only finite values"
-    ):
-        psychoacoustics.loudness_moore_glasberg_from_spectrum(
-            [(1000.0, np.inf)]
-        )
+    with pytest.raises(ValueError, match="components must contain only finite values"):
+        psychoacoustics.loudness_moore_glasberg_from_spectrum([(1000.0, np.inf)])
     with pytest.raises(ValueError, match="band_levels must contain exactly"):
         psychoacoustics.loudness_moore_glasberg_from_third_octave(
             [60.0] * 10
@@ -428,7 +406,5 @@ def test_invalid_inputs() -> None:
     with pytest.raises(ValueError, match="Input signal 'x' cannot be empty"):
         psychoacoustics.loudness_moore_glasberg(empty, FS)
     short = np.ones(100)
-    with pytest.raises(
-        ValueError, match="'fs' must be a positive sampling rate"
-    ):
+    with pytest.raises(ValueError, match="'fs' must be a positive sampling rate"):
         psychoacoustics.loudness_moore_glasberg(short, -1.0)

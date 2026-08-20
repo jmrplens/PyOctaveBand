@@ -138,7 +138,7 @@ class InverseFilterResult:
         if arr.ndim != 1:
             raise ValueError("'x' must be one-dimensional.")
         full = sp_signal.fftconvolve(arr, self.inverse)
-        return np.asarray(full[self.delay:self.delay + arr.size])
+        return np.asarray(full[self.delay : self.delay + arr.size])
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -177,7 +177,7 @@ def _regularization_profile(
     smooth transition-band advice of Kirkeby & Nelson (1999, Sec. 3.2).
     """
     f1, f2 = f_range
-    ratio = 2.0 ** transition_octaves
+    ratio = 2.0**transition_octaves
     weight = np.zeros_like(freqs)  # 1 = in-band, 0 = out-of-band
     inside = (freqs >= f1) & (freqs <= f2)
     weight[inside] = 1.0
@@ -189,9 +189,7 @@ def _regularization_profile(
     if np.any(above):
         x = np.log2(freqs[above] / f2) / transition_octaves
         weight[above] = 0.5 + 0.5 * np.cos(np.pi * x)
-    log_eps = weight * np.log(eps_inside) + (1.0 - weight) * np.log(
-        eps_outside
-    )
+    log_eps = weight * np.log(eps_inside) + (1.0 - weight) * np.log(eps_outside)
     return np.asarray(np.exp(log_eps))
 
 
@@ -207,9 +205,7 @@ def _validated_response(response: Any) -> np.ndarray:
     return apply_calibration(response, h)
 
 
-def _validated_band(
-    f_range: tuple[float, float], fs: float
-) -> tuple[float, float]:
+def _validated_band(f_range: tuple[float, float], fs: float) -> tuple[float, float]:
     """Validate the equalization band against the sample rate."""
     f1, f2 = float(f_range[0]), float(f_range[1])
     if f1 <= 0.0:
@@ -332,8 +328,7 @@ def regularized_inverse_filter(
     freqs = np.asarray(np.fft.rfftfreq(size, 1.0 / fs_v), dtype=np.float64)
     if not np.any((freqs >= f1) & (freqs <= f2)):
         raise ValueError(
-            "no frequency bin falls within f_range; increase n_fft or widen "
-            "the band."
+            "no frequency bin falls within f_range; increase n_fft or widen the band."
         )
     spectrum_h = np.fft.rfft(h, n=size)
     power = np.abs(spectrum_h) ** 2
@@ -355,15 +350,11 @@ def regularized_inverse_filter(
     band = (freqs >= f1) & (freqs <= f2)
     with np.errstate(divide="ignore"):
         flatness = float(np.max(np.abs(20.0 * np.log10(equalized[band]))))
-    ratio = 2.0 ** transition_octaves
+    ratio = 2.0**transition_octaves
     outside = (freqs > 0.0) & ((freqs < f1 / ratio) | (freqs > f2 * ratio))
     gain = np.abs(inv_spectrum[outside]) if np.any(outside) else np.array([])
     peak_h = float(np.sqrt(scale))
-    max_gain = (
-        20.0 * np.log10(float(np.max(gain)) * peak_h)
-        if gain.size
-        else -np.inf
-    )
+    max_gain = 20.0 * np.log10(float(np.max(gain)) * peak_h) if gain.size else -np.inf
 
     return InverseFilterResult(
         inverse=np.asarray(inverse),

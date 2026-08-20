@@ -91,11 +91,50 @@ class OccupationalExposureWarning(PhonometryWarning):
 # Table C.4: uncertainty contribution c1*u1 (dB) for job/full-day sampling,
 # as a function of the number of samples N and the standard uncertainty u1.
 # --------------------------------------------------------------------------- #
-_C4_U1_AXIS: tuple[float, ...] = (0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0)
+_C4_U1_AXIS: tuple[float, ...] = (
+    0.5,
+    1.0,
+    1.5,
+    2.0,
+    2.5,
+    3.0,
+    3.5,
+    4.0,
+    4.5,
+    5.0,
+    5.5,
+    6.0,
+)
 _C4_N_AXIS: tuple[int, ...] = (3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30)
 _C4_TABLE: tuple[tuple[float, ...], ...] = (
-    (0.6, 1.6, 3.1, 5.2, 8.0, 11.5, 15.7, 20.6, 26.1, 32.2, 39.0, 46.5),  # row of 3 samples
-    (0.4, 0.9, 1.6, 2.5, 3.6, 5.0, 6.7, 8.6, 10.9, 13.4, 16.1, 19.2),  # row of 4 samples
+    (
+        0.6,
+        1.6,
+        3.1,
+        5.2,
+        8.0,
+        11.5,
+        15.7,
+        20.6,
+        26.1,
+        32.2,
+        39.0,
+        46.5,
+    ),  # row of 3 samples
+    (
+        0.4,
+        0.9,
+        1.6,
+        2.5,
+        3.6,
+        5.0,
+        6.7,
+        8.6,
+        10.9,
+        13.4,
+        16.1,
+        19.2,
+    ),  # row of 4 samples
     (0.3, 0.7, 1.2, 1.7, 2.4, 3.3, 4.4, 5.6, 6.9, 8.5, 10.2, 12.1),  # row of 5 samples
     (0.3, 0.6, 0.9, 1.4, 1.9, 2.6, 3.3, 4.2, 5.2, 6.3, 7.6, 8.9),  # row of 6 samples
     (0.2, 0.5, 0.8, 1.2, 1.6, 2.2, 2.8, 3.5, 4.3, 5.1, 6.1, 7.2),  # row of 7 samples
@@ -138,13 +177,17 @@ def table_c4_contribution(n_samples: int, u1: float) -> float:
     n_axis = np.asarray(_C4_N_AXIS, dtype=float)
     u_axis = np.asarray((0.0,) + _C4_U1_AXIS, dtype=float)
     # Prepend the origin column (u1 = 0 -> 0 dB) to every row.
-    table = np.column_stack([np.zeros(len(_C4_N_AXIS)), np.asarray(_C4_TABLE, dtype=float)])
+    table = np.column_stack(
+        [np.zeros(len(_C4_N_AXIS)), np.asarray(_C4_TABLE, dtype=float)]
+    )
 
     n_clamped = float(np.clip(n_samples, n_axis[0], n_axis[-1]))
     u_clamped = float(np.clip(u1, u_axis[0], u_axis[-1]))
 
     # Interpolate along u1 for every tabulated N, then along N.
-    per_row = np.array([np.interp(u_clamped, u_axis, table[r]) for r in range(len(n_axis))])
+    per_row = np.array(
+        [np.interp(u_clamped, u_axis, table[r]) for r in range(len(n_axis))]
+    )
     return float(np.interp(n_clamped, n_axis, per_row))
 
 
@@ -253,7 +296,10 @@ class TaskContribution:
     def variance_contribution(self) -> float:
         r"""This task's contribution to :math:`u^2(L_\mathrm{EX,8h})` (a term of
         Eq C.3), dB²."""
-        return self.c1a**2 * (self.u1a**2 + self.u2**2 + self.u3**2) + (self.c1b * self.u1b) ** 2
+        return (
+            self.c1a**2 * (self.u1a**2 + self.u2**2 + self.u3**2)
+            + (self.c1b * self.u1b) ** 2
+        )
 
 
 @dataclass(frozen=True)
@@ -296,7 +342,9 @@ class ExposureResult:
         """Upper limit ``LEX,8h + U`` of the one-sided 95 % interval, dB."""
         return self.lex_8h + self.expanded_uncertainty
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the per-task contributions with the ``LEX,8h`` line.
 
         Only task-based results carry per-task contributions (the job and
@@ -307,7 +355,9 @@ class ExposureResult:
         from .._i18n import check_language
         from .._plot.hearing import plot_occupational_exposure
 
-        return plot_occupational_exposure(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_occupational_exposure(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
     def report(
         self,
@@ -407,7 +457,9 @@ def _duration_uncertainty(task: Task) -> float:
     if task.duration_range is not None:
         t_min, t_max = task.duration_range
         if t_max < t_min:
-            raise ValueError("duration_range must be (T_min, T_max) with T_max >= T_min.")
+            raise ValueError(
+                "duration_range must be (T_min, T_max) with T_max >= T_min."
+            )
         return 0.5 * (t_max - t_min)
     return 0.0
 
@@ -611,7 +663,13 @@ def job_based_exposure(
     if sample_duration_hours is not None and sample_duration_hours <= 0.0:
         raise ValueError("'sample_duration_hours' must be positive.")
     result = _sampled_exposure(
-        samples, effective_duration_hours, instrument, u3, "job", warn, spread_advisory=False
+        samples,
+        effective_duration_hours,
+        instrument,
+        u3,
+        "job",
+        warn,
+        spread_advisory=False,
     )
     if n_workers is not None and sample_duration_hours is not None:
         required = minimum_cumulative_duration_hours(n_workers)
@@ -662,6 +720,11 @@ def full_day_exposure(
             stacklevel=2,
         )
     return _sampled_exposure(
-        samples, effective_duration_hours, instrument, u3, "full_day", warn, spread_advisory=spread
+        samples,
+        effective_duration_hours,
+        instrument,
+        u3,
+        "full_day",
+        warn,
+        spread_advisory=spread,
     )
-

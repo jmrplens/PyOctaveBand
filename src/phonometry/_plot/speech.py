@@ -41,25 +41,20 @@ _SII_TITLE = "ANSI S3.5 SII = {sii}"
 _STRINGS: dict[str, str] = {
     _FREQ_LABEL: "Frecuencia [Hz]",
     "Band": "Banda",
-    "Modulation transfer index MTI":
-        "Índice de transferencia de modulación MTI",
+    "Modulation transfer index MTI": "Índice de transferencia de modulación MTI",
     _THIRD_OCTAVE_LABEL: "Banda de tercio de octava [Hz]",
     "Mean intermediate correlation": "Correlación intermedia media",
     "Spectral correlation $d_\\mathrm{m}$": "Correlación espectral $d_\\mathrm{m}$",
     "Analysis segment": "Segmento de análisis",
     "Band audibility": "Audibilidad de banda",
     "Band audibility $A_i$": "Audibilidad de banda $A_i$",
-    r"Importance-weighted $I_i\,A_i$ (scaled)":
-        r"Ponderada por importancia $I_i\,A_i$ (escalada)",
-    "IEC 60268-16 STI = {sti}  (rating {rating})":
-        "IEC 60268-16 STI = {sti}  (calificación {rating})",
+    r"Importance-weighted $I_i\,A_i$ (scaled)": r"Ponderada por importancia $I_i\,A_i$ (escalada)",
+    "IEC 60268-16 STI = {sti}  (rating {rating})": "IEC 60268-16 STI = {sti}  (calificación {rating})",
     _NAME_VALUE_LABEL: _NAME_VALUE_LABEL,
     _SII_TITLE: _SII_TITLE,
     "Speech spectrum level [dB SPL]": "Nivel del espectro de voz [dB SPL]",
-    "ANSI S3.5-1997 standard speech spectrum":
-        "ANSI S3.5-1997 espectro de voz estándar",
-    "ANSI S3.5-1997 band-importance function":
-        "ANSI S3.5-1997 función de importancia de banda",
+    "ANSI S3.5-1997 standard speech spectrum": "ANSI S3.5-1997 espectro de voz estándar",
+    "ANSI S3.5-1997 band-importance function": "ANSI S3.5-1997 función de importancia de banda",
     "Band importance $I_i$": "Importancia de banda $I_i$",
     "Critical band (21)": "Banda crítica (21)",
     "Equally contributing (17)": "Contribución equitativa (17)",
@@ -78,7 +73,10 @@ def _t(text: str, language: str = "en") -> str:
 
 
 def plot_sti(
-    result: STIResult, ax: Axes | None = None, *, language: str = "en",
+    result: STIResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
     **kwargs: Any,
 ) -> Axes:
     """Per-band modulation transfer index bars with the STI and rating.
@@ -105,9 +103,12 @@ def plot_sti(
         ax.set_xlabel(_t("Band", language))
     ax.set_ylabel(_t("Modulation transfer index MTI", language))
     ax.set_ylim(0.0, 1.0)
-    ax.set_title(_t("IEC 60268-16 STI = {sti}  (rating {rating})", language).format(
-        sti=format_number(result.sti, language, decimals=2), rating=result.rating,
-    ))
+    ax.set_title(
+        _t("IEC 60268-16 STI = {sti}  (rating {rating})", language).format(
+            sti=format_number(result.sti, language, decimals=2),
+            rating=result.rating,
+        )
+    )
     ax.grid(True, axis="y", alpha=0.3)
     # localize_axes leaves the categorical band axis (a FuncFormatter) alone.
     localize_axes(ax, language)
@@ -115,7 +116,10 @@ def plot_sti(
 
 
 def plot_stoi(
-    result: STOIResult, ax: Axes | None = None, *, language: str = "en",
+    result: STOIResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
     **kwargs: Any,
 ) -> Axes:
     """Intermediate intelligibility that averages to the STOI/ESTOI index.
@@ -146,8 +150,11 @@ def plot_stoi(
         # The STOI band centres are exact one-third-octave ratios from 150 Hz
         # (188.988..., 377.976...), so they are labelled at whole-hertz
         # resolution: the nominal band, not the generating float.
-        ax.set_xticklabels([decimal_comma(f"{f:.0f}", language) for f in freqs],
-                           rotation=45, ha="right")
+        ax.set_xticklabels(
+            [decimal_comma(f"{f:.0f}", language) for f in freqs],
+            rotation=45,
+            ha="right",
+        )
         ax.set_xlabel(_t(_THIRD_OCTAVE_LABEL, language))
         ax.set_ylabel(_t("Mean intermediate correlation", language))
     else:
@@ -160,9 +167,12 @@ def plot_stoi(
     # [-1, 1] (unlike the [0, 1] ratios of plot_sti/plot_sii), so keep room
     # for anti-correlated bands rather than clipping them at zero.
     ax.set_ylim(-1.0, 1.0)
-    ax.set_title(_t(_NAME_VALUE_LABEL, language).format(
-        name=name, v=format_number(result.value, language, decimals=3),
-    ))
+    ax.set_title(
+        _t(_NAME_VALUE_LABEL, language).format(
+            name=name,
+            v=format_number(result.value, language, decimals=3),
+        )
+    )
     ax.grid(True, axis="y", alpha=0.3)
     # localize_axes leaves the categorical band labels (a FuncFormatter) alone,
     # so the comma-localized labels set above survive.
@@ -171,7 +181,10 @@ def plot_stoi(
 
 
 def plot_sii(
-    result: SIIResult, ax: Axes | None = None, *, language: str = "en",
+    result: SIIResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
     **kwargs: Any,
 ) -> Axes:
     """Per-band audibility and its importance-weighted contribution to the SII.
@@ -190,21 +203,26 @@ def plot_sii(
     contribution = audibility * np.asarray(result.band_importance, dtype=np.float64)
     positions = _band_axis(ax, freqs, language=language)
     ax.set_xlabel(_t(_FREQ_LABEL, language))
-    ax.bar(positions, audibility, color=_C_PRIMARY_LIGHT,
-           label=_t("Band audibility $A_i$", language))
+    ax.bar(
+        positions,
+        audibility,
+        color=_C_PRIMARY_LIGHT,
+        label=_t("Band audibility $A_i$", language),
+    )
     kwargs.setdefault("color", _C_PRIMARY)
     # A fully masked speech signal (SII = 0) has an all-zero contribution;
     # keep the zero bars rather than dividing 0/0 into NaN.
     peak = float(contribution.max()) if contribution.size else 0.0
     scaled = contribution / peak if peak > 0.0 else contribution
     kwargs.setdefault("label", _t(r"Importance-weighted $I_i\,A_i$ (scaled)", language))
-    ax.bar(positions, scaled, width=0.5,
-           **kwargs)
+    ax.bar(positions, scaled, width=0.5, **kwargs)
     ax.set_ylabel(_t("Band audibility", language))
     ax.set_ylim(0.0, 1.0)
-    ax.set_title(_t(_SII_TITLE, language).format(
-        sii=format_number(result.sii, language, decimals=3),
-    ))
+    ax.set_title(
+        _t(_SII_TITLE, language).format(
+            sii=format_number(result.sii, language, decimals=3),
+        )
+    )
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)
     # localize_axes leaves the categorical band axis (a FuncFormatter) alone.
@@ -224,7 +242,10 @@ _SII_METHOD_LABELS: dict[str, str] = {
 
 
 def plot_sii_procedure(
-    result: SIIProcedure, ax: Axes | None = None, *, language: str = "en",
+    result: SIIProcedure,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
     **kwargs: Any,
 ) -> Axes:
     """Band-importance function of one ANSI S3.5-1997 band procedure.
@@ -248,15 +269,14 @@ def plot_sii_procedure(
     kwargs.setdefault("label", _t(_SII_METHOD_LABELS[result.method], language))
     # A post-step draws each band's Ii flat across its own width, which is what
     # makes a 6-band and a 21-band function comparable at a glance.
-    ax.plot(edges, np.append(importance, importance[-1]), drawstyle="steps-post",
-            **kwargs)
+    ax.plot(
+        edges, np.append(importance, importance[-1]), drawstyle="steps-post", **kwargs
+    )
     ax.set_ylabel(_t("Band importance $I_i$", language))
     # Start at zero, and never let a fixed limit from an earlier procedure clip
     # a wider-band one: an octave band carries three times the importance of a
     # one-third-octave band at the same centre frequency.
-    ax.set_ylim(
-        0.0, max(float(ax.get_ylim()[1]), float(importance.max()) * 1.15)
-    )
+    ax.set_ylim(0.0, max(float(ax.get_ylim()[1]), float(importance.max()) * 1.15))
     ax.set_title(_t("ANSI S3.5-1997 band-importance function", language))
     # No explicit range: the tick set follows the axis limits, so overlaying a
     # second procedure that reaches lower or higher relabels the whole axis
@@ -275,8 +295,11 @@ _EFFORT_COLORS = (_C_PRIMARY, _C_TERTIARY, _C_SECONDARY, _C_REFERENCE)
 
 
 def plot_standard_speech_spectrum(
-    result: StandardSpeechSpectrum, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any,
+    result: StandardSpeechSpectrum,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Standard speech spectrum level by vocal effort (ANSI S3.5-1997 Table 3).
 

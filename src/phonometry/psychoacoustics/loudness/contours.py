@@ -76,9 +76,9 @@ def _params(frequency: float) -> tuple[float, float, float]:
 def _spl_from_phon(frequency: float, phon: float) -> float:
     """ISO 226:2023 Formula (1), clause 4.1 (p. 2)."""
     alpha_f, l_u, t_f = _params(frequency)
-    term = (4.0e-10) ** (0.3 - alpha_f) * (
-        10 ** (0.03 * phon) - 10 ** 0.072
-    ) + 10 ** (alpha_f * (t_f + l_u) / 10)
+    term = (4.0e-10) ** (0.3 - alpha_f) * (10 ** (0.03 * phon) - 10**0.072) + 10 ** (
+        alpha_f * (t_f + l_u) / 10
+    )
     return float(10 / alpha_f * np.log10(term) - l_u)
 
 
@@ -119,9 +119,9 @@ def loudness_level(spl: float, frequency: float) -> float:
         4 kHz) are extrapolations the standard labels as informative only.
     """
     alpha_f, l_u, t_f = _params(frequency)
-    b = (
-        10 ** (alpha_f * (spl + l_u) / 10) - 10 ** (alpha_f * (t_f + l_u) / 10)
-    ) / (4.0e-10) ** (0.3 - alpha_f) + 10 ** 0.072
+    b = (10 ** (alpha_f * (spl + l_u) / 10) - 10 ** (alpha_f * (t_f + l_u) / 10)) / (
+        4.0e-10
+    ) ** (0.3 - alpha_f) + 10**0.072
     return float(100.0 / 3.0 * np.log10(b))
 
 
@@ -138,7 +138,14 @@ def hearing_threshold() -> tuple[np.ndarray, np.ndarray]:
 #: Default loudness levels of the classic ISO 226:2023 contour family: the
 #: 20 phon to 90 phon range of Formula (1) in 10 phon steps.
 _DEFAULT_PHONS: tuple[float, ...] = (
-    20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0,
+    20.0,
+    30.0,
+    40.0,
+    50.0,
+    60.0,
+    70.0,
+    80.0,
+    90.0,
 )
 
 
@@ -228,7 +235,10 @@ def equal_loudness_contours(
 
     tf_freqs, tf_vals = hearing_threshold()
     threshold = np.array(
-        [tf_vals[int(np.flatnonzero(np.isclose(tf_freqs, f, rtol=1e-6))[0])] for f in grid]
+        [
+            tf_vals[int(np.flatnonzero(np.isclose(tf_freqs, f, rtol=1e-6))[0])]
+            for f in grid
+        ]
     )
     return EqualLoudnessContours(
         frequencies=grid, phons=phon_tuple, contours=contours, threshold=threshold

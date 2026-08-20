@@ -317,13 +317,13 @@ def _resolve_reflection(
     sequence) must be given.
     """
     if (depths is None) == (reflection is None):
-        raise ValueError(
-            "Provide exactly one of 'depths' or 'reflection'."
-        )
+        raise ValueError("Provide exactly one of 'depths' or 'reflection'.")
     if reflection is not None:
         r = np.atleast_1d(np.asarray(reflection, dtype=np.complex128))
         if r.ndim != 1 or r.size < 2:
-            raise ValueError("'reflection' must be a 1-D sequence of at least two wells.")
+            raise ValueError(
+                "'reflection' must be a 1-D sequence of at least two wells."
+            )
         if not np.all(np.isfinite(r)):
             raise ValueError("'reflection' values must be finite.")
         return r
@@ -445,9 +445,15 @@ def predict_diffuser_polar_response(
     )
     r_period = _resolve_reflection(depths, reflection, f, c)
     pressure = _scattered_pressure(
-        r_period, w, f, ang,
-        source_angle=psi, periods=n_periods, speed_of_sound=c,
-        include_aperture=include_aperture, include_obliquity=include_obliquity,
+        r_period,
+        w,
+        f,
+        ang,
+        source_angle=psi,
+        periods=n_periods,
+        speed_of_sound=c,
+        include_aperture=include_aperture,
+        include_obliquity=include_obliquity,
     )
     levels = _polar_levels(pressure)
     coefficient = directional_diffusion_coefficient(levels)
@@ -458,10 +464,7 @@ def predict_diffuser_polar_response(
         coefficient=coefficient,
         source_angle=psi,
         well_width=w,
-        depths=(
-            np.asarray(depths, dtype=np.float64) if depths is not None
-            else None
-        ),
+        depths=(np.asarray(depths, dtype=np.float64) if depths is not None else None),
         periods=n_periods,
     )
 
@@ -532,17 +535,27 @@ def predicted_diffusion_spectrum(
     norm = np.empty(freqs.size, dtype=np.float64) if normalize else None
     for i, f in enumerate(freqs):
         surface = predict_diffuser_polar_response(
-            well_width, float(f), depths=d_period, angles=angles,
-            source_angle=source_angle, periods=periods,
-            speed_of_sound=speed_of_sound, include_aperture=include_aperture,
+            well_width,
+            float(f),
+            depths=d_period,
+            angles=angles,
+            source_angle=source_angle,
+            periods=periods,
+            speed_of_sound=speed_of_sound,
+            include_aperture=include_aperture,
             include_obliquity=include_obliquity,
         )
         raw[i] = surface.coefficient
         if norm is not None:
             reference = predict_diffuser_polar_response(
-                well_width, float(f), depths=flat, angles=angles,
-                source_angle=source_angle, periods=periods,
-                speed_of_sound=speed_of_sound, include_aperture=include_aperture,
+                well_width,
+                float(f),
+                depths=flat,
+                angles=angles,
+                source_angle=source_angle,
+                periods=periods,
+                speed_of_sound=speed_of_sound,
+                include_aperture=include_aperture,
                 include_obliquity=include_obliquity,
             )
             norm[i] = float(

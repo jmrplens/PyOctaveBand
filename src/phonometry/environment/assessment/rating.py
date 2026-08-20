@@ -41,9 +41,7 @@ def composite_rating_level(periods: Iterable[tuple[float, float, float]]) -> flo
     total = float(np.sum(hours))
     if abs(total - 24.0) > 1e-9:
         raise ValueError(f"Period durations must sum to 24 h; got {total!r}.")
-    acc = sum(
-        h / 24.0 * 10 ** (0.1 * (level + k)) for level, h, k in periods
-    )
+    acc = sum(h / 24.0 * 10 ** (0.1 * (level + k)) for level, h, k in periods)
     return float(10 * np.log10(acc))
 
 

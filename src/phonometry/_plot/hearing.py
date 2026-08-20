@@ -40,8 +40,7 @@ _STRINGS: dict[str, str] = {
     _FREQ_LABEL: "Frecuencia [Hz]",
     "Median": "Mediana",
     "Median $N_{50}$": "Mediana $N_{50}$",
-    "Threshold deviation from age 18 [dB]":
-        "Desviación del umbral respecto a 18 años [dB]",
+    "Threshold deviation from age 18 [dB]": "Desviación del umbral respecto a 18 años [dB]",
     _NIPTS_LABEL: _NIPTS_LABEL,
     "Age (HTLA, ISO 7029)": "Edad (HTLA, ISO 7029)",
     "Noise (NIPTS)": "Ruido (NIPTS)",
@@ -51,15 +50,11 @@ _STRINGS: dict[str, str] = {
     _FRACTILE_LABEL: "Fractil {v}",
     "male": "hombre",
     "female": "mujer",
-    "ISO 7029 hearing threshold — {sex}, age {age}":
-        "ISO 7029 umbral de audición — {sex}, edad {age}",
-    r"ISO 1999 NIPTS — $L_\mathrm{{EX,8h}}$ = {lex} dB, {years} yr":
-        r"ISO 1999 NIPTS — $L_\mathrm{{EX,8h}}$ = {lex} dB, {years} años",
-    "ISO 1999 HTLAN — {sex}, age {age}, {lex} dB / {years} yr":
-        "ISO 1999 HTLAN — {sex}, edad {age}, {lex} dB / {years} años",
-    r"ISO 9612 daily noise exposure — $L_\mathrm{{EX,8h}}$ = {lex} dB ($U$ = {u} dB)":
-        r"ISO 9612 exposición diaria al ruido — $L_\mathrm{{EX,8h}}$ = {lex} dB "
-        r"($U$ = {u} dB)",
+    "ISO 7029 hearing threshold — {sex}, age {age}": "ISO 7029 umbral de audición — {sex}, edad {age}",
+    r"ISO 1999 NIPTS — $L_\mathrm{{EX,8h}}$ = {lex} dB, {years} yr": r"ISO 1999 NIPTS — $L_\mathrm{{EX,8h}}$ = {lex} dB, {years} años",
+    "ISO 1999 HTLAN — {sex}, age {age}, {lex} dB / {years} yr": "ISO 1999 HTLAN — {sex}, edad {age}, {lex} dB / {years} años",
+    r"ISO 9612 daily noise exposure — $L_\mathrm{{EX,8h}}$ = {lex} dB ($U$ = {u} dB)": r"ISO 9612 exposición diaria al ruido — $L_\mathrm{{EX,8h}}$ = {lex} dB "
+    r"($U$ = {u} dB)",
 }
 
 
@@ -69,7 +64,10 @@ def _t(text: str, language: str = "en") -> str:
 
 
 def plot_age_threshold(
-    result: AgeThresholdResult, ax: Axes | None = None, *, language: str = "en",
+    result: AgeThresholdResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
     **kwargs: Any,
 ) -> Axes:
     """Median age-related hearing threshold with the 10-90 % fractile band.
@@ -93,16 +91,24 @@ def plot_age_threshold(
     kwargs.setdefault("label", _t("Median", language))
     ax.plot(freqs, median, "o-", **kwargs)
     if abs(result.fractile - 0.5) > 1e-9:
-        ax.plot(freqs, np.asarray(result.threshold, dtype=np.float64), "s--",
-                color=_C_REFERENCE, label=_t(_FRACTILE_LABEL, language).format(
-                    v=decimal_comma(f"{result.fractile:g}", language)))
+        ax.plot(
+            freqs,
+            np.asarray(result.threshold, dtype=np.float64),
+            "s--",
+            color=_C_REFERENCE,
+            label=_t(_FRACTILE_LABEL, language).format(
+                v=decimal_comma(f"{result.fractile:g}", language)
+            ),
+        )
     _freq_axis(ax, freqs, language=language)
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Threshold deviation from age 18 [dB]", language))
     ax.invert_yaxis()  # audiogram convention: worse hearing downward
-    ax.set_title(_t("ISO 7029 hearing threshold — {sex}, age {age}", language).format(
-        sex=_t(result.sex, language),
-        age=decimal_comma(f"{result.age:g}", language)))
+    ax.set_title(
+        _t("ISO 7029 hearing threshold — {sex}, age {age}", language).format(
+            sex=_t(result.sex, language), age=decimal_comma(f"{result.age:g}", language)
+        )
+    )
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     ax.grid(True, which="both", alpha=0.3)
     localize_axes(ax, language)
@@ -110,7 +116,10 @@ def plot_age_threshold(
 
 
 def plot_nipts(
-    result: NiptsResult, ax: Axes | None = None, *, language: str = "en",
+    result: NiptsResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
     **kwargs: Any,
 ) -> Axes:
     """Median NIPTS spectrum with the 10-90 % fractile band (ISO 1999).
@@ -130,16 +139,28 @@ def plot_nipts(
     dl = np.asarray(result.spread_lower, dtype=np.float64)
 
     _fractile_band(
-        ax, freqs, median, dl, du, color=_C_SECONDARY, floor=0.0,
+        ax,
+        freqs,
+        median,
+        dl,
+        du,
+        color=_C_SECONDARY,
+        floor=0.0,
         language=language,
     )
     kwargs.setdefault("color", _C_SECONDARY)
     kwargs.setdefault("label", _t("Median $N_{50}$", language))
     ax.plot(freqs, median, "o-", **kwargs)
     if abs(result.fractile - 0.5) > 1e-9:
-        ax.plot(freqs, np.asarray(result.value, dtype=np.float64), "s--",
-                color=_C_REFERENCE, label=_t(_FRACTILE_LABEL, language).format(
-                    v=decimal_comma(f"{result.fractile:g}", language)))
+        ax.plot(
+            freqs,
+            np.asarray(result.value, dtype=np.float64),
+            "s--",
+            color=_C_REFERENCE,
+            label=_t(_FRACTILE_LABEL, language).format(
+                v=decimal_comma(f"{result.fractile:g}", language)
+            ),
+        )
     _freq_axis(ax, freqs, language=language)
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t(_NIPTS_LABEL, language))
@@ -147,10 +168,14 @@ def plot_nipts(
     # l_ex carries no lower bound (only a domain warning), so sign it with
     # fmt_minus: an ASCII hyphen here would be shorter than the U+2212 the
     # axis ticks beside it already draw. The duration is validated positive.
-    ax.set_title(_t(
-        r"ISO 1999 NIPTS — $L_\mathrm{{EX,8h}}$ = {lex} dB, {years} yr", language).format(
-        lex=decimal_comma(fmt_minus(result.l_ex, "g"), language),
-        years=decimal_comma(f"{result.years:g}", language)))
+    ax.set_title(
+        _t(
+            r"ISO 1999 NIPTS — $L_\mathrm{{EX,8h}}$ = {lex} dB, {years} yr", language
+        ).format(
+            lex=decimal_comma(fmt_minus(result.l_ex, "g"), language),
+            years=decimal_comma(f"{result.years:g}", language),
+        )
+    )
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     ax.grid(True, which="both", alpha=0.3)
     localize_axes(ax, language)
@@ -158,7 +183,10 @@ def plot_nipts(
 
 
 def plot_htlan(
-    result: HtlanResult, ax: Axes | None = None, *, language: str = "en",
+    result: HtlanResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
     **kwargs: Any,
 ) -> Axes:
     """Age, noise and combined hearing threshold components (ISO 1999, 6.1).
@@ -173,23 +201,35 @@ def plot_htlan(
 
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(result.frequencies, dtype=np.float64)
-    ax.plot(freqs, np.asarray(result.htla, dtype=np.float64), "o-",
-            color=_C_PRIMARY, label=_t("Age (HTLA, ISO 7029)", language))
-    ax.plot(freqs, np.asarray(result.nipts, dtype=np.float64), "^-",
-            color=_C_SECONDARY, label=_t("Noise (NIPTS)", language))
+    ax.plot(
+        freqs,
+        np.asarray(result.htla, dtype=np.float64),
+        "o-",
+        color=_C_PRIMARY,
+        label=_t("Age (HTLA, ISO 7029)", language),
+    )
+    ax.plot(
+        freqs,
+        np.asarray(result.nipts, dtype=np.float64),
+        "^-",
+        color=_C_SECONDARY,
+        label=_t("Noise (NIPTS)", language),
+    )
     kwargs.setdefault("color", _C_REFERENCE)
     kwargs.setdefault("label", _t("Age + noise (HTLAN)", language))
-    ax.plot(freqs, np.asarray(result.threshold, dtype=np.float64), "s--",
-            **kwargs)
+    ax.plot(freqs, np.asarray(result.threshold, dtype=np.float64), "s--", **kwargs)
     _freq_axis(ax, freqs, language=language)
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Hearing threshold level [dB]", language))
     ax.invert_yaxis()  # audiogram convention: worse hearing downward
-    ax.set_title(_t("ISO 1999 HTLAN — {sex}, age {age}, {lex} dB / {years} yr", language).format(
-        sex=_t(result.sex, language),
-        age=decimal_comma(f"{result.age:g}", language),
-        lex=decimal_comma(fmt_minus(result.l_ex, "g"), language),
-        years=decimal_comma(f"{result.years:g}", language)))
+    ax.set_title(
+        _t("ISO 1999 HTLAN — {sex}, age {age}, {lex} dB / {years} yr", language).format(
+            sex=_t(result.sex, language),
+            age=decimal_comma(f"{result.age:g}", language),
+            lex=decimal_comma(fmt_minus(result.l_ex, "g"), language),
+            years=decimal_comma(f"{result.years:g}", language),
+        )
+    )
     ax.legend(loc="lower left", fontsize="small")
     ax.grid(True, which="both", alpha=0.3)
     localize_axes(ax, language)
@@ -197,7 +237,10 @@ def plot_htlan(
 
 
 def plot_occupational_exposure(
-    result: ExposureResult, ax: Axes | None = None, *, language: str = "en",
+    result: ExposureResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
     **kwargs: Any,
 ) -> Axes:
     """Per-task contributions to the daily exposure level (ISO 9612).
@@ -231,22 +274,35 @@ def plot_occupational_exposure(
     ax.set_xticks(positions)
     ax.set_xticklabels(labels, rotation=45, ha="right")
 
-    ax.axhline(result.lex_8h, color=_C_REFERENCE, ls="--",
-               label=r"$L_\mathrm{EX,8h}$ = "
-                     + format_number(result.lex_8h, language, decimals=1) + " dB")
-    ax.axhline(result.upper_limit, color=_C_MUTED, ls=":",
-               label=r"$L_\mathrm{EX,8h} + U$ = "
-                     + format_number(result.upper_limit, language, decimals=1)
-                     + " dB")
+    ax.axhline(
+        result.lex_8h,
+        color=_C_REFERENCE,
+        ls="--",
+        label=r"$L_\mathrm{EX,8h}$ = "
+        + format_number(result.lex_8h, language, decimals=1)
+        + " dB",
+    )
+    ax.axhline(
+        result.upper_limit,
+        color=_C_MUTED,
+        ls=":",
+        label=r"$L_\mathrm{EX,8h} + U$ = "
+        + format_number(result.upper_limit, language, decimals=1)
+        + " dB",
+    )
     top = max(result.upper_limit, max(contributions))
     bottom = min(0.0, min(contributions))
     ax.set_ylim(bottom * 1.12 if bottom < 0.0 else 0.0, top * 1.12)
     ax.set_ylabel(_t("A-weighted level [dB]", language))
-    ax.set_title(_t(
-        r"ISO 9612 daily noise exposure — $L_\mathrm{{EX,8h}}$ = {lex} dB ($U$ = {u} dB)",
-        language).format(
-        lex=format_number(result.lex_8h, language, decimals=1),
-        u=format_number(result.expanded_uncertainty, language, decimals=1)))
+    ax.set_title(
+        _t(
+            r"ISO 9612 daily noise exposure — $L_\mathrm{{EX,8h}}$ = {lex} dB ($U$ = {u} dB)",
+            language,
+        ).format(
+            lex=format_number(result.lex_8h, language, decimals=1),
+            u=format_number(result.expanded_uncertainty, language, decimals=1),
+        )
+    )
     ax.legend(loc="lower right", fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)
     # localize_axes leaves the categorical task-label axis (a FuncFormatter) alone.

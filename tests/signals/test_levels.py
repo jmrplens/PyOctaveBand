@@ -40,12 +40,10 @@ def test_leq_dbfs_zero_reference_is_rms_one_not_a_full_scale_sine() -> None:
     0 dBFS; here it reads -3.01, and it takes a sine of amplitude sqrt(2)
     (RMS 1.0) to reach 0. Anything else is a 3.01 dB systematic offset.
     """
-    assert signals.leq(
-        _tone(1000, amp=np.sqrt(2.0)), dbfs=True
-    ) == pytest.approx(0.0, abs=1e-6)
-    assert signals.leq(_tone(1000), dbfs=True) == pytest.approx(
-        -3.0103, abs=1e-3
+    assert signals.leq(_tone(1000, amp=np.sqrt(2.0)), dbfs=True) == pytest.approx(
+        0.0, abs=1e-6
     )
+    assert signals.leq(_tone(1000), dbfs=True) == pytest.approx(-3.0103, abs=1e-3)
     # Any RMS-1.0 waveform hits 0 dBFS: the reference is RMS, not a shape.
     assert signals.leq(np.ones(FS), dbfs=True) == pytest.approx(0.0, abs=1e-9)
 
@@ -73,9 +71,7 @@ def test_laeq_1khz_equals_leq() -> None:
 def test_laeq_100hz_attenuated() -> None:
     """A-weighting at 100 Hz is about -19.1 dB."""
     x = _tone(100, seconds=2.0)
-    assert signals.laeq(x, FS) - signals.leq(x) == pytest.approx(
-        -19.1, abs=0.5
-    )
+    assert signals.laeq(x, FS) - signals.leq(x) == pytest.approx(-19.1, abs=0.5)
 
 
 def test_ln_levels_constant_signal_all_equal() -> None:
@@ -167,9 +163,7 @@ def test_lc_peak_steady_1khz() -> None:
     """C weighting is ~0 dB at 1 kHz: LCpeak of a steady sine = 20*log10(A/p0)."""
 
     x = _faded(_tone(1000, seconds=1.0, amp=1.0))
-    assert signals.lc_peak(x, FS) == pytest.approx(
-        20 * np.log10(1.0 / 2e-5), abs=0.15
-    )
+    assert signals.lc_peak(x, FS) == pytest.approx(20 * np.log10(1.0 / 2e-5), abs=0.15)
 
 
 def test_lc_peak_exceeds_lc_by_crest_factor() -> None:
@@ -200,11 +194,11 @@ def test_lc_peak_multichannel_and_dbfs() -> None:
         # BS EN 61672-1:2013 Table 5 (standard page 27): reference differences
         # LCpeak - LC and class 1 acceptance limits. Test frequencies are the
         # EXACT one-third-octave frequencies (Annex D), not nominal.
-        (1.0, 10 ** 1.5, 2.5, 2.0),     # one cycle, 31.5 Hz nominal
-        (1.0, 10 ** 2.7, 3.5, 1.0),     # one cycle, 500 Hz nominal
-        (1.0, 10 ** 3.9, 3.4, 2.0),     # one cycle, 8 kHz nominal
-        (0.5, 10 ** 2.7, 2.4, 1.0),     # positive half cycle, 500 Hz
-        (-0.5, 10 ** 2.7, 2.4, 1.0),    # negative half cycle, 500 Hz
+        (1.0, 10**1.5, 2.5, 2.0),  # one cycle, 31.5 Hz nominal
+        (1.0, 10**2.7, 3.5, 1.0),  # one cycle, 500 Hz nominal
+        (1.0, 10**3.9, 3.4, 2.0),  # one cycle, 8 kHz nominal
+        (0.5, 10**2.7, 2.4, 1.0),  # positive half cycle, 500 Hz
+        (-0.5, 10**2.7, 2.4, 1.0),  # negative half cycle, 500 Hz
     ],
 )
 def test_lc_peak_iec_table5(cycles: float, freq: float, ref: float, tol: float) -> None:
@@ -221,10 +215,12 @@ def test_lc_peak_iec_table5(cycles: float, freq: float, ref: float, tol: float) 
     burst = np.zeros(int(fs * 1.0))
     start = len(burst) // 2
     tt = np.arange(n) / fs
-    burst[start:start + n] = sign * np.sin(2 * np.pi * freq * tt)
+    burst[start : start + n] = sign * np.sin(2 * np.pi * freq * tt)
 
     diff = signals.lc_peak(burst, fs) - lc_steady
-    assert diff == pytest.approx(ref, abs=tol), f"{cycles} cycles @ {freq:.0f} Hz: {diff:.2f} dB"
+    assert diff == pytest.approx(ref, abs=tol), (
+        f"{cycles} cycles @ {freq:.0f} Hz: {diff:.2f} dB"
+    )
 
 
 @pytest.mark.parametrize(
@@ -234,14 +230,16 @@ def test_lc_peak_iec_table5(cycles: float, freq: float, ref: float, tol: float) 
         # 48 kHz (audit N2 I-1: the standard test ran only at 96 kHz, masking
         # the inter-sample peak loss). Must still reproduce Table 5 within
         # class 1 with the oversampled peak detection.
-        (1.0, 10 ** 1.5, 2.5, 2.0),     # one cycle, 31.5 Hz nominal
-        (1.0, 10 ** 2.7, 3.5, 1.0),     # one cycle, 500 Hz nominal
-        (1.0, 10 ** 3.9, 3.4, 2.0),     # one cycle, 8 kHz nominal
-        (0.5, 10 ** 2.7, 2.4, 1.0),     # positive half cycle, 500 Hz
-        (-0.5, 10 ** 2.7, 2.4, 1.0),    # negative half cycle, 500 Hz
+        (1.0, 10**1.5, 2.5, 2.0),  # one cycle, 31.5 Hz nominal
+        (1.0, 10**2.7, 3.5, 1.0),  # one cycle, 500 Hz nominal
+        (1.0, 10**3.9, 3.4, 2.0),  # one cycle, 8 kHz nominal
+        (0.5, 10**2.7, 2.4, 1.0),  # positive half cycle, 500 Hz
+        (-0.5, 10**2.7, 2.4, 1.0),  # negative half cycle, 500 Hz
     ],
 )
-def test_lc_peak_iec_table5_48k(cycles: float, freq: float, ref: float, tol: float) -> None:
+def test_lc_peak_iec_table5_48k(
+    cycles: float, freq: float, ref: float, tol: float
+) -> None:
     """Table 5 reference differences must also hold at fs = 48 kHz."""
     from phonometry.filters.weighting import weighting_filter
 
@@ -255,10 +253,12 @@ def test_lc_peak_iec_table5_48k(cycles: float, freq: float, ref: float, tol: flo
     burst = np.zeros(int(fs * 1.0))
     start = len(burst) // 2
     tt = np.arange(n) / fs
-    burst[start:start + n] = sign * np.sin(2 * np.pi * freq * tt)
+    burst[start : start + n] = sign * np.sin(2 * np.pi * freq * tt)
 
     diff = signals.lc_peak(burst, fs) - lc_steady
-    assert diff == pytest.approx(ref, abs=tol), f"{cycles} cycles @ {freq:.0f} Hz: {diff:.2f} dB"
+    assert diff == pytest.approx(ref, abs=tol), (
+        f"{cycles} cycles @ {freq:.0f} Hz: {diff:.2f} dB"
+    )
 
 
 def _lcpeak_analytic_steady(x: np.ndarray, fs: int) -> float:
@@ -271,8 +271,8 @@ def _lcpeak_analytic_steady(x: np.ndarray, fs: int) -> float:
     from phonometry.filters.weighting import weighting_filter
 
     w = weighting_filter(x, fs, "C")
-    mid = w[int(0.4 * w.shape[-1]):int(0.6 * w.shape[-1])]
-    rms = np.sqrt(np.mean(mid ** 2))
+    mid = w[int(0.4 * w.shape[-1]) : int(0.6 * w.shape[-1])]
+    rms = np.sqrt(np.mean(mid**2))
     return float(20 * np.log10(rms / 2e-5) + 3.01)
 
 
@@ -297,8 +297,8 @@ def test_lc_peak_oversample_keyword_controls_recovery() -> None:
     ref = _lcpeak_analytic_steady(x, FS)
     legacy_err = signals.lc_peak(x, FS, oversample=1) - ref
     fixed_err = signals.lc_peak(x, FS) - ref
-    assert legacy_err < -0.5          # legacy on-grid detection under-reads
-    assert abs(fixed_err) < abs(legacy_err)   # default oversampling recovers it
+    assert legacy_err < -0.5  # legacy on-grid detection under-reads
+    assert abs(fixed_err) < abs(legacy_err)  # default oversampling recovers it
 
 
 # ---------------------------------------------------------------------------
@@ -334,7 +334,9 @@ def test_sel_a_weighted() -> None:
 # ---------------------------------------------------------------------------
 
 
-def _tone_at_level(level_db: float, seconds: float = 2.0, f0: float = 1000.0) -> np.ndarray:
+def _tone_at_level(
+    level_db: float, seconds: float = 2.0, f0: float = 1000.0
+) -> np.ndarray:
     """1 kHz tone whose A-weighted level equals level_db (A(1 kHz) = 0 dB)."""
     rms = 2e-5 * 10 ** (level_db / 20)
     t = np.arange(int(FS * seconds)) / FS
@@ -353,9 +355,7 @@ def test_sound_exposure_anchor_90db_8h_is_3p2_pa2h() -> None:
 def test_lex_8h_anchor_90db() -> None:
 
     x = _tone_at_level(90.0)
-    assert signals.lex_8h(x, FS, duration_hours=8.0) == pytest.approx(
-        90.0, abs=0.05
-    )
+    assert signals.lex_8h(x, FS, duration_hours=8.0) == pytest.approx(90.0, abs=0.05)
 
 
 def test_lex_8h_half_workday_subtracts_3db() -> None:
@@ -374,9 +374,7 @@ def test_sound_exposure_1_pa2h_is_nearly_85db() -> None:
     assert signals.sound_exposure(x, FS, duration_hours=8.0) == pytest.approx(
         1.0, rel=0.01
     )
-    assert signals.lex_8h(x, FS, duration_hours=8.0) == pytest.approx(
-        84.95, abs=0.05
-    )
+    assert signals.lex_8h(x, FS, duration_hours=8.0) == pytest.approx(84.95, abs=0.05)
 
 
 def test_sound_exposure_defaults_to_recording_duration() -> None:
@@ -560,6 +558,7 @@ def test_ln_levels_and_sel_reject_an_unknown_weighting() -> None:
 # to a nearby number.
 # ---------------------------------------------------------------------------
 
+
 def test_leq_takes_the_signals_own_calibration() -> None:
     from phonometry.io import Signal
 
@@ -601,9 +600,7 @@ def test_fs_functions_take_the_signals_rate_and_calibration() -> None:
 
     x = _tone(1000, seconds=2.0)
     sig = Signal(x, FS, calibration_factor=0.5)
-    assert signals.lc_peak(sig) == signals.lc_peak(
-        x, FS, calibration_factor=0.5
-    )
+    assert signals.lc_peak(sig) == signals.lc_peak(x, FS, calibration_factor=0.5)
     assert signals.sel(sig, weighting="A") == signals.sel(
         x, FS, weighting="A", calibration_factor=0.5
     )
@@ -653,9 +650,7 @@ def test_exposure_functions_take_the_signals_rate_and_calibration() -> None:
     assert signals.sound_exposure(sig) == signals.sound_exposure(
         x, FS, calibration_factor=3.5
     )
-    assert signals.sound_exposure(
-        sig, duration_hours=8.0
-    ) == signals.sound_exposure(
+    assert signals.sound_exposure(sig, duration_hours=8.0) == signals.sound_exposure(
         x, FS, duration_hours=8.0, calibration_factor=3.5
     )
     assert signals.lex_8h(sig) == signals.lex_8h(x, FS, calibration_factor=3.5)
@@ -677,7 +672,4 @@ def test_multichannel_signal_returns_per_channel_levels() -> None:
     out = signals.leq(Signal(x, FS, calibration_factor=2.0))
     assert isinstance(out, np.ndarray)
     assert out.shape == (2,)
-    assert (
-        out.tolist()
-        == np.asarray(signals.leq(x, calibration_factor=2.0)).tolist()
-    )
+    assert out.tolist() == np.asarray(signals.leq(x, calibration_factor=2.0)).tolist()

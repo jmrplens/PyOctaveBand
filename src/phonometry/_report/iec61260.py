@@ -92,9 +92,7 @@ def _metadata_pairs(
         (t("Date of test", language), metadata.test_date),
     ]
     return [
-        (label, html.escape(str(value)))
-        for label, value in specs
-        if value is not None
+        (label, html.escape(str(value))) for label, value in specs if value is not None
     ]
 
 
@@ -148,13 +146,18 @@ def _statement(result: FilterComplianceResult, language: str = "en") -> str:
     """The boxed class-compliance statement with the binding margin."""
     if result.overall_class is not None:
         margin = _binding_margin(result, result.overall_class)
-        return t("Class <b>{cls}</b> - COMPLIES &nbsp; (margin {margin} dB)", language).format(
+        return t(
+            "Class <b>{cls}</b> - COMPLIES &nbsp; (margin {margin} dB)", language
+        ).format(
             cls=result.overall_class,
             margin=decimal_comma(f"{margin:+.2f}", language),
         )
     classes = "/".join(str(c) for c in result.available_classes())
     margin = _binding_margin(result, result.reference_class())
-    return t("<b>Does not comply</b> with class {classes} &nbsp; (closest margin {margin} dB)", language).format(
+    return t(
+        "<b>Does not comply</b> with class {classes} &nbsp; (closest margin {margin} dB)",
+        language,
+    ).format(
         classes=classes,
         margin=decimal_comma(f"{margin:+.2f}", language),
     )
@@ -169,9 +172,7 @@ def _verdict(
     strict, i.e. an overall class index of ``N`` or lower (class 0 is the
     strictest).
     """
-    passed = (
-        result.overall_class is not None and result.overall_class <= required_class
-    )
+    passed = result.overall_class is not None and result.overall_class <= required_class
     achieved = (
         t("none", language)
         if result.overall_class is None
@@ -239,8 +240,11 @@ def render_iec61260_report(
     # Measurement-basis strip: the bandwidth designator and sampling rate, plus
     # the reference-attenuation convention the margins are read against.
     basis_strip_style = ParagraphStyle(
-        "fiche_iec61260_basis", parent=getSampleStyleSheet()["Normal"],
-        fontSize=7.5, leading=10, textColor=colors.HexColor(_MUTED_HEX),
+        "fiche_iec61260_basis",
+        parent=getSampleStyleSheet()["Normal"],
+        fontSize=7.5,
+        leading=10,
+        textColor=colors.HexColor(_MUTED_HEX),
         spaceBefore=6,
     )
     basis_strip_key = (
@@ -278,7 +282,10 @@ def render_iec61260_report(
         # so the stated class attests the verified range and says so.
         flow.append(
             Paragraph(
-                t("Stop-band limits verified up to each band's processing Nyquist frequency; the multirate anti-aliasing leaves no signal energy beyond it, but the Table 1 limits there are not demonstrated, so the stated class attests the verified frequency range.", language),
+                t(
+                    "Stop-band limits verified up to each band's processing Nyquist frequency; the multirate anti-aliasing leaves no signal energy beyond it, but the Table 1 limits there are not demonstrated, so the stated class attests the verified frequency range.",
+                    language,
+                ),
                 basis_strip_style,
             )
         )

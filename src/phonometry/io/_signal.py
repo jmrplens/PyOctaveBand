@@ -110,7 +110,10 @@ class Signal:
                 f"data must be 1-D or (channels, samples); got {data.ndim}-D"
             )
         object.__setattr__(self, "data", np.ascontiguousarray(data))
-        if self.channel_labels is not None and len(self.channel_labels) != data.shape[0]:
+        if (
+            self.channel_labels is not None
+            and len(self.channel_labels) != data.shape[0]
+        ):
             raise ValueError(
                 f"{len(self.channel_labels)} channel labels for "
                 f"{data.shape[0]} channels"
@@ -190,7 +193,9 @@ class Signal:
         :return: A :class:`Signal` with those channels, in that order.
         :raises IndexError: If a channel is out of range.
         """
-        wanted = [channels] if isinstance(channels, (int, np.integer)) else list(channels)
+        wanted = (
+            [channels] if isinstance(channels, (int, np.integer)) else list(channels)
+        )
         picked = [int(c) for c in wanted]
         for c in picked:
             if not -self.data.shape[0] <= c < self.data.shape[0]:

@@ -91,7 +91,8 @@ def test_empty_label_emits_nothing() -> None:
 def test_subscript_composition() -> None:
     # The chunk list is the contract: italic base, italic dropped script.
     assert _math_runs("$L_p$") == [
-        ("L", True, 0.0, 1.0), ("p", True, 0.22, 0.70),
+        ("L", True, 0.0, 1.0),
+        ("p", True, 0.22, 0.70),
     ]
     element = _element("$L_p$", size=20)
     # Script placement is the confusable pair, pinned: the glyph is drawn
@@ -105,7 +106,8 @@ def test_subscript_composition() -> None:
 def test_superscript_composition() -> None:
     element = _element("$c^2$", size=20)
     assert _math_runs("$c^2$") == [
-        ("c", True, 0.0, 1.0), ("2", False, -0.38, 0.70),
+        ("c", True, 0.0, 1.0),
+        ("2", False, -0.38, 0.70),
     ]
     # The superscript rises by 0.38 of the element size: 100 - 7.6.
     assert "92.4) scale(0.14 -0.14)" in element
@@ -145,7 +147,8 @@ def test_greek_letters_are_italic_variables() -> None:
     # prime is an upright glyph after its greek base.
     assert _math_runs("$ρc$") == [("ρc", True, 0.0, 1.0)]
     assert _math_runs("$κ′$") == [
-        ("κ", True, 0.0, 1.0), ("′", False, 0.0, 1.0),
+        ("κ", True, 0.0, 1.0),
+        ("′", False, 0.0, 1.0),
     ]
 
 
@@ -164,8 +167,7 @@ def test_prose_and_math_share_one_pen_with_whitespace_verbatim() -> None:
     # Run whitespace is kept verbatim: the upright prose before the math
     # merges with nothing and its boundary space keeps its advance, so
     # the italic L starts strictly right of the prose run.
-    xs = [float(m) for m in
-          re.findall(r"translate\(([\d.\-]+) ", element)]
+    xs = [float(m) for m in re.findall(r"translate\(([\d.\-]+) ", element)]
     assert xs == sorted(xs)
     assert "<text" not in element
 
@@ -221,11 +223,14 @@ def test_comma_glued_to_unbraced_script_raises() -> None:
     assert "ambiguous comma '_p,i'" in str(excinfo.value)
     assert "'$L_p,i$'" in str(excinfo.value)
     assert _math_runs("$a_x , a_y , a_z$") == [
-        ("a", True, 0.0, 1.0), ("x", True, 0.22, 0.70),
+        ("a", True, 0.0, 1.0),
+        ("x", True, 0.22, 0.70),
         (" , ", False, 0.0, 1.0),
-        ("a", True, 0.0, 1.0), ("y", True, 0.22, 0.70),
+        ("a", True, 0.0, 1.0),
+        ("y", True, 0.22, 0.70),
         (" , ", False, 0.0, 1.0),
-        ("a", True, 0.0, 1.0), ("z", True, 0.22, 0.70),
+        ("a", True, 0.0, 1.0),
+        ("z", True, 0.22, 0.70),
     ]
     # Braced, the comma composes inside the script, mixing the italic
     # indices and the roman descriptive runs. `w` and `eq` are descriptive
@@ -291,10 +296,12 @@ def test_index_subscripts_are_italic() -> None:
     # Letters inside a script are indices: italic, unlike the same run at
     # the baseline, where two or more Latin letters read as an acronym.
     assert _math_runs("$K_{ij}$") == [
-        ("K", True, 0.0, 1.0), ("ij", True, 0.22, 0.70),
+        ("K", True, 0.0, 1.0),
+        ("ij", True, 0.22, 0.70),
     ]
     assert _math_runs("$η_{ij}$") == [
-        ("η", True, 0.0, 1.0), ("ij", True, 0.22, 0.70),
+        ("η", True, 0.0, 1.0),
+        ("ij", True, 0.22, 0.70),
     ]
 
 
@@ -311,10 +318,10 @@ def test_capital_greek_is_upright_and_lowercase_stays_italic() -> None:
     # Doc 29 prints the SOR subscript in italic (eq. 4-23): it is not on
     # the curated roman list, so it takes the italic index default.
     assert _math_runs("$Δ_{SOR}$") == [
-        ("Δ", False, 0.0, 1.0), ("SOR", True, 0.22, 0.70),
+        ("Δ", False, 0.0, 1.0),
+        ("SOR", True, 0.22, 0.70),
     ]
-    assert all(not italic for _, italic, _, _ in
-               _math_runs("banked by $Φ$ in turns"))
+    assert all(not italic for _, italic, _, _ in _math_runs("banked by $Φ$ in turns"))
     # Lowercase Greek keeps the italic-variable rule, base and script.
     assert _math_runs("$θ$") == [("θ", True, 0.0, 1.0)]
 
@@ -323,10 +330,12 @@ def test_descriptive_subscripts_stay_upright() -> None:
     # The curated descriptive subscripts are word abbreviations and keep
     # the roman the standards print them in.
     assert _math_runs("$L_{Aeq}$") == [
-        ("L", True, 0.0, 1.0), ("Aeq", False, 0.22, 0.70),
+        ("L", True, 0.0, 1.0),
+        ("Aeq", False, 0.22, 0.70),
     ]
     assert _math_runs("$f_{max}$") == [
-        ("f", True, 0.0, 1.0), ("max", False, 0.22, 0.70),
+        ("f", True, 0.0, 1.0),
+        ("max", False, 0.22, 0.70),
     ]
 
 
@@ -335,7 +344,8 @@ def test_tilde_travels_with_its_letter() -> None:
     # runs of different style would detach the mark from its base.
     assert _math_runs("$x̃$") == [("x̃", True, 0.0, 1.0)]
     assert _math_runs("$x̃_{ref}$") == [
-        ("x̃", True, 0.0, 1.0), ("ref", False, 0.22, 0.70),
+        ("x̃", True, 0.0, 1.0),
+        ("ref", False, 0.22, 0.70),
     ]
 
 
@@ -369,7 +379,8 @@ def test_fit_gate_raises_on_overflow_and_passes_the_boundary() -> None:
 
 
 def test_fit_gate_report_mode_records_and_continues(
-    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     monkeypatch.setenv("PHONO_DIAGRAM_FIT", "report")
     svg = SVG(900, 560, LIGHT)
@@ -449,8 +460,8 @@ def _style_runs(s: str) -> list[list[tuple[str, str]]]:
                 pieces = [("base", kind)]
             else:
                 pieces = [
-                    (kind, kind2) for kind2, _ in
-                    canvas._math_tokens(payload, s, script=True)
+                    (kind, kind2)
+                    for kind2, _ in canvas._math_tokens(payload, s, script=True)
                 ]
             for piece in pieces:
                 if not runs or runs[-1] != piece:

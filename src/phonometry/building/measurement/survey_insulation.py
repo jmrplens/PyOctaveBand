@@ -63,7 +63,7 @@ heavy/soft impact source uses 63 Hz to 500 Hz. The single-number weighted
 ratings reuse the verified :func:`phonometry.building.weighted_rating` (ISO
 717-1) and :func:`phonometry.building.weighted_impact_rating` (ISO 717-2)
 engines, formed only when exactly 5 octave (or 16 one-third-octave) values are
-supplied. No background correction is applied (Clause 6.2). """
+supplied. No background correction is applied (Clause 6.2)."""
 
 from __future__ import annotations
 
@@ -101,6 +101,7 @@ def _validate_report_request(engine: str, language: str) -> None:
         raise ValueError(
             f"Unknown report engine {engine!r}; only 'reportlab' is supported."
         )
+
 
 #: Refusal raised by every survey-result ``plot()`` when the measured band set
 #: is too coarse for the ISO 717 weighted rating the plot draws against.
@@ -222,9 +223,7 @@ def _positive(value: float, name: str) -> float:
 
 def _normalization_term(volume: float) -> float:
     """The 10 lg(A0 T0 / (0,16 V)) normalization offset, in dB."""
-    return float(
-        10.0 * np.log10(_A0 * _T0 / (_SABINE * _positive(volume, "volume")))
-    )
+    return float(10.0 * np.log10(_A0 * _T0 / (_SABINE * _positive(volume, "volume"))))
 
 
 def _rate(values: np.ndarray) -> WeightedRatingResult | None:
@@ -306,11 +305,7 @@ def estimate_reverberation_index(
 
     entries = _TABLE3[idx]
     room_norm = room.strip().lower()
-    key = (
-        "furnished"
-        if room_norm in ("furnished", "other", "others")
-        else room_norm
-    )
+    key = "furnished" if room_norm in ("furnished", "other", "others") else room_norm
     if key not in entries:
         available = ", ".join(sorted(entries))
         limits = _TABLE3_VOLUME_LIMITS
@@ -409,8 +404,7 @@ class SurveyAirborneResult:
         _validate_report_request(engine, language)
         if quantity not in ("dnt", "r_prime"):
             raise ValueError(
-                f"Unknown survey quantity {quantity!r}; expected 'dnt' or "
-                "'r_prime'."
+                f"Unknown survey quantity {quantity!r}; expected 'dnt' or 'r_prime'."
             )
         rating = self.rating if quantity == "dnt" else self.r_prime_rating
         if rating is None:
@@ -422,8 +416,13 @@ class SurveyAirborneResult:
         from ..._report.iso10052 import render_survey_airborne_report
 
         return render_survey_airborne_report(
-            self, rating, path, quantity=quantity, metadata=metadata,
-            verbose=verbose, language=language,
+            self,
+            rating,
+            path,
+            quantity=quantity,
+            metadata=metadata,
+            verbose=verbose,
+            language=language,
         )
 
 
@@ -496,7 +495,11 @@ class SurveyImpactResult:
         from ..._report.iso10052 import render_survey_impact_report
 
         return render_survey_impact_report(
-            self, self.rating, path, metadata=metadata, verbose=verbose,
+            self,
+            self.rating,
+            path,
+            metadata=metadata,
+            verbose=verbose,
             language=language,
         )
 
@@ -571,7 +574,11 @@ class SurveyFacadeResult:
         from ..._report.iso10052 import render_survey_facade_report
 
         return render_survey_facade_report(
-            self, self.rating, path, metadata=metadata, verbose=verbose,
+            self,
+            self.rating,
+            path,
+            metadata=metadata,
+            verbose=verbose,
             language=language,
         )
 

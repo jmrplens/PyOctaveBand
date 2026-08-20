@@ -17,8 +17,8 @@ from ..theme import COLOR_FG
 
 
 def _fdtd_cw_capture(
-        sim: Any, frequency: float, every: int, n_frames: int,
-        decimate: int = 2) -> tuple[Any, Any, Any, Any]:
+    sim: Any, frequency: float, every: int, n_frames: int, decimate: int = 2
+) -> tuple[Any, Any, Any, Any]:
     """Drive a CW simulation and capture instantaneous + running-RMS frames.
 
     The running mean square uses a two-period time constant, so the RMS map
@@ -68,12 +68,26 @@ def _rms_to_db(rms_frames: Any, *, floor: float = -40.0) -> Any:
 # starts at 5 (14 dB) so a region that already uses a fifth of the ramp is
 # left alone -- the caveat such a panel would have to print costs more than
 # the contrast it would buy.
-_GAIN_STEPS = (5.0, 7.0, 10.0, 15.0, 20.0, 30.0, 50.0, 70.0, 100.0, 150.0,
-               200.0, 300.0, 500.0, 700.0, 1000.0)
+_GAIN_STEPS = (
+    5.0,
+    7.0,
+    10.0,
+    15.0,
+    20.0,
+    30.0,
+    50.0,
+    70.0,
+    100.0,
+    150.0,
+    200.0,
+    300.0,
+    500.0,
+    700.0,
+    1000.0,
+)
 
 
-def _weak_field_gain(weak: Any, vmax: float, *,
-                     quantile: float = 0.999) -> float:
+def _weak_field_gain(weak: Any, vmax: float, *, quantile: float = 0.999) -> float:
     """Rounded display gain that lifts a weak field onto a readable colour.
 
     ``weak`` is the quiet region of the field (any shape), ``vmax`` the
@@ -146,8 +160,9 @@ def _text_width_x(fig: Any, ax: Any, artist: Any) -> float:
     return float(abs(x1 - x0))
 
 
-def _fit_text_below(fig: Any, ax: Any, artist: Any, other: Any, *,
-                    gap: float = 8.0) -> float:
+def _fit_text_below(
+    fig: Any, ax: Any, artist: Any, other: Any, *, gap: float = 8.0
+) -> float:
     """Slide *artist* back along its own baseline until it clears *other*.
 
     The companion of :func:`_fit_text_x` for a label set along a slope -- a
@@ -178,7 +193,7 @@ def _fit_text_below(fig: Any, ax: Any, artist: Any, other: Any, *,
     # magnitude here would have sent into the text it is clearing.
     slope = np.radians(artist.get_rotation())
     sin_t = float(np.sin(slope))
-    if abs(sin_t) < 1e-6:            # a level label can only go down
+    if abs(sin_t) < 1e-6:  # a level label can only go down
         dx_px, dy_px = 0.0, floor - top
     else:
         step = (floor - top) / sin_t
@@ -191,8 +206,9 @@ def _fit_text_below(fig: Any, ax: Any, artist: Any, other: Any, *,
     return float(np.hypot(dx_px, dy_px))
 
 
-def _fit_text_x(fig: Any, ax: Any, artist: Any,
-                x_lo: float, x_hi: float, *, margin: float = 0.0) -> float:
+def _fit_text_x(
+    fig: Any, ax: Any, artist: Any, x_lo: float, x_hi: float, *, margin: float = 0.0
+) -> float:
     """Slide *artist* along x until its rendered box sits inside the panel.
 
     An annotation anchored at a data coordinate is placed for the string it
@@ -218,22 +234,29 @@ def _fit_text_x(fig: Any, ax: Any, artist: Any,
     lo, hi = min(dx0, dx1), max(dx0, dx1)
     room_lo, room_hi = x_lo + margin, x_hi - margin
     if hi - lo > room_hi - room_lo:
-        print(f"note: {artist.get_text()!r} does not fit "
-              f"[{room_lo:.3g}, {room_hi:.3g}] even flush against one edge "
-              f"({hi - lo:.3g} > {room_hi - room_lo:.3g} data units)",
-              file=sys.stderr)
+        print(
+            f"note: {artist.get_text()!r} does not fit "
+            f"[{room_lo:.3g}, {room_hi:.3g}] even flush against one edge "
+            f"({hi - lo:.3g} > {room_hi - room_lo:.3g} data units)",
+            file=sys.stderr,
+        )
         shift = room_lo - lo
     else:
-        shift = (max(0.0, room_lo - lo)
-                 - max(0.0, hi - room_hi))
+        shift = max(0.0, room_lo - lo) - max(0.0, hi - room_hi)
     if shift:
         artist.set_x(float(artist.get_position()[0]) + shift)
     return float(shift)
 
 
-def _anim_speaker(ax: Any, x0: float, y_mid: float, bore: float, *,
-                  tip_inset: float | None = None,
-                  label_y: float | None = None) -> None:
+def _anim_speaker(
+    ax: Any,
+    x0: float,
+    y_mid: float,
+    bore: float,
+    *,
+    tip_inset: float | None = None,
+    label_y: float | None = None,
+) -> None:
     """Drive loudspeaker of the FDTD tube/duct clips: magnet block plus
     cone, the cone tip on the ``x0`` plane, centred on ``y_mid`` for the
     given ``bore``. The tip stops ``tip_inset`` short of each bore edge
@@ -244,16 +267,38 @@ def _anim_speaker(ax: Any, x0: float, y_mid: float, bore: float, *,
     if tip_inset is None:
         tip_inset = 0.03 * bore
     magnet_w, cone_w = 0.05, 0.045
-    ax.add_patch(Rectangle((x0 - magnet_w - cone_w, y_mid - 0.32 * bore),
-                           magnet_w, 0.64 * bore, facecolor="#9a9a9a",
-                           edgecolor=COLOR_FG, linewidth=0.8, zorder=4))
-    ax.add_patch(Polygon(
-        [(x0 - cone_w, y_mid - 0.20 * bore),
-         (x0 - cone_w, y_mid + 0.20 * bore),
-         (x0, y_mid + 0.5 * bore - tip_inset),
-         (x0, y_mid - 0.5 * bore + tip_inset)],
-        closed=True, facecolor="#e8b98a", edgecolor=COLOR_FG,
-        linewidth=0.8, zorder=4))
+    ax.add_patch(
+        Rectangle(
+            (x0 - magnet_w - cone_w, y_mid - 0.32 * bore),
+            magnet_w,
+            0.64 * bore,
+            facecolor="#9a9a9a",
+            edgecolor=COLOR_FG,
+            linewidth=0.8,
+            zorder=4,
+        )
+    )
+    ax.add_patch(
+        Polygon(
+            [
+                (x0 - cone_w, y_mid - 0.20 * bore),
+                (x0 - cone_w, y_mid + 0.20 * bore),
+                (x0, y_mid + 0.5 * bore - tip_inset),
+                (x0, y_mid - 0.5 * bore + tip_inset),
+            ],
+            closed=True,
+            facecolor="#e8b98a",
+            edgecolor=COLOR_FG,
+            linewidth=0.8,
+            zorder=4,
+        )
+    )
     if label_y is not None:
-        ax.text(x0 - magnet_w - cone_w, label_y, "loudspeaker",
-                ha="left", va="top", fontsize=7.5)
+        ax.text(
+            x0 - magnet_w - cone_w,
+            label_y,
+            "loudspeaker",
+            ha="left",
+            va="top",
+            fontsize=7.5,
+        )

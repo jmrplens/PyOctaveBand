@@ -54,7 +54,27 @@ if TYPE_CHECKING:  # pragma: no cover - for the type checker, never at run time
     from .io import Signal as Signal
 
 #: The nineteen domain packages, imported on first use.
-_PACKAGES = ['aircraft', 'broadcast', 'building', 'electroacoustics', 'emission', 'environment', 'filters', 'hearing', 'io', 'materials', 'metrology', 'noise_control', 'psychoacoustics', 'room', 'signals', 'simulation', 'speech', 'underwater', 'vibration']
+_PACKAGES = [
+    "aircraft",
+    "broadcast",
+    "building",
+    "electroacoustics",
+    "emission",
+    "environment",
+    "filters",
+    "hearing",
+    "io",
+    "materials",
+    "metrology",
+    "noise_control",
+    "psychoacoustics",
+    "room",
+    "signals",
+    "simulation",
+    "speech",
+    "underwater",
+    "vibration",
+]
 
 #: The four names that belong to no domain, and the private module each is
 #: defined in. ``Signal`` is ``phonometry.io``'s, and reached from here too

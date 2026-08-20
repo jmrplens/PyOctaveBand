@@ -101,7 +101,20 @@ def test_workbook_data_is_complete() -> None:
     assert len({(c["temperature_c"], c["studded_months"]) for c in cases}) == 4
     assert len({(c["gradient_pct"], c["junction_type"]) for c in cases}) == 5
     speeds = {float(c[f"v_{k}"]) for c in cases for k in CATEGORIES}
-    assert speeds == {20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 110.0, 120.0, 130.0}
+    assert speeds == {
+        20.0,
+        30.0,
+        40.0,
+        50.0,
+        60.0,
+        70.0,
+        80.0,
+        90.0,
+        100.0,
+        110.0,
+        120.0,
+        130.0,
+    }
 
 
 @pytest.mark.parametrize("case", _workbook_cases(), ids=lambda c: c["case"])
@@ -171,7 +184,16 @@ def test_a_weighting_matches_official_journal() -> None:
 
 def test_octave_bands_are_the_corrected_range() -> None:
     """The corrigendum of OJ L 5, 10.1.2018 sets 2.2.1 to 63 Hz - 8 kHz."""
-    assert ROAD_OCTAVE_BANDS == (63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0)
+    assert ROAD_OCTAVE_BANDS == (
+        63.0,
+        125.0,
+        250.0,
+        500.0,
+        1000.0,
+        2000.0,
+        4000.0,
+        8000.0,
+    )
 
 
 @pytest.mark.parametrize("surface", list(RoadSurface))
@@ -203,7 +225,9 @@ def test_reference_conditions_reduce_to_table_f1(category: str) -> None:
     rolling = road_rolling_noise(category, ROAD_REFERENCE_SPEED)
     propulsion = road_propulsion_noise(category, ROAD_REFERENCE_SPEED)
     assert np.array_equal(rolling, np.asarray(ROAD_COEFFICIENTS.rolling_a[category]))
-    assert np.array_equal(propulsion, np.asarray(ROAD_COEFFICIENTS.propulsion_a[category]))
+    assert np.array_equal(
+        propulsion, np.asarray(ROAD_COEFFICIENTS.propulsion_a[category])
+    )
 
 
 @pytest.mark.parametrize("category", ("1", "2", "3"))
@@ -218,9 +242,13 @@ def test_rolling_speed_law_is_exactly_logarithmic(category: str) -> None:
 @pytest.mark.parametrize("category", CATEGORIES)
 def test_propulsion_speed_law_is_exactly_linear(category: str) -> None:
     """(2.2.11) is affine in ``v``: equal speed steps give equal level steps."""
-    step = np.asarray(ROAD_COEFFICIENTS.propulsion_b[category]) * (10.0 / ROAD_REFERENCE_SPEED)
+    step = np.asarray(ROAD_COEFFICIENTS.propulsion_b[category]) * (
+        10.0 / ROAD_REFERENCE_SPEED
+    )
     for v in (30.0, 60.0, 90.0, 120.0):
-        delta = road_propulsion_noise(category, v + 10.0) - road_propulsion_noise(category, v)
+        delta = road_propulsion_noise(category, v + 10.0) - road_propulsion_noise(
+            category, v
+        )
         assert delta == pytest.approx(step, abs=1e-12)
 
 
@@ -285,15 +313,21 @@ def test_temperature_correction_is_linear_and_zero_at_20_degrees() -> None:
     cold = road_rolling_noise("1", 50.0, temperature=-5.0)
     assert warm - base == pytest.approx(np.full(8, -0.8), abs=1e-12)
     assert cold - base == pytest.approx(np.full(8, 2.0), abs=1e-12)
-    heavy = road_rolling_noise("3", 50.0, temperature=0.0) - road_rolling_noise("3", 50.0)
+    heavy = road_rolling_noise("3", 50.0, temperature=0.0) - road_rolling_noise(
+        "3", 50.0
+    )
     assert heavy == pytest.approx(np.full(8, 0.8), abs=1e-12)
 
 
 def test_studded_tyres_vanish_without_a_season_or_a_fleet() -> None:
     """(2.2.7)/(2.2.8): ``p_s = 0`` leaves ``10 lg 1 = 0``."""
     base = road_rolling_noise("1", 60.0)
-    assert np.array_equal(road_rolling_noise("1", 60.0, studded_fraction=0.0, studded_months=4.0), base)
-    assert np.array_equal(road_rolling_noise("1", 60.0, studded_fraction=0.5, studded_months=0.0), base)
+    assert np.array_equal(
+        road_rolling_noise("1", 60.0, studded_fraction=0.0, studded_months=4.0), base
+    )
+    assert np.array_equal(
+        road_rolling_noise("1", 60.0, studded_fraction=0.5, studded_months=0.0), base
+    )
 
 
 def test_studded_tyres_at_full_penetration_give_exactly_d_stud() -> None:
@@ -330,7 +364,9 @@ def test_studded_tyres_are_a_light_vehicle_effect_only() -> None:
     """(2.2.9): every category other than 1 takes zero."""
     for category in ("2", "3", "4a", "4b"):
         base = road_rolling_noise(category, 60.0)
-        studded = road_rolling_noise(category, 60.0, studded_fraction=1.0, studded_months=12.0)
+        studded = road_rolling_noise(
+            category, 60.0, studded_fraction=1.0, studded_months=12.0
+        )
         assert np.array_equal(studded, base)
 
 
@@ -347,20 +383,27 @@ def test_junction_correction_breakpoints() -> None:
         ) - road_propulsion_noise(category, 50.0)
         assert prop_zero == pytest.approx(np.full(8, c_p), abs=1e-12)
         half = road_rolling_noise(
-            category, 50.0, junction_distance=-50.0, junction_type=JunctionType.ROUNDABOUT
+            category,
+            50.0,
+            junction_distance=-50.0,
+            junction_type=JunctionType.ROUNDABOUT,
         ) - road_rolling_noise(category, 50.0)
         assert half == pytest.approx(
             np.full(8, ROAD_COEFFICIENTS.junction_c[category][1][0] * 0.5), abs=1e-12
         )
         for distance in (100.0, 150.0):
             far = road_propulsion_noise(
-                category, 50.0, junction_distance=distance, junction_type=JunctionType.CROSSING
+                category,
+                50.0,
+                junction_distance=distance,
+                junction_type=JunctionType.CROSSING,
             )
             assert np.array_equal(far, road_propulsion_noise(category, 50.0))
 
 
 @pytest.mark.parametrize(
-    ("category", "flat_low", "flat_high"), [("1", -6.0, 2.0), ("2", -4.0, 0.0), ("3", -4.0, 0.0)]
+    ("category", "flat_low", "flat_high"),
+    [("1", -6.0, 2.0), ("2", -4.0, 0.0), ("3", -4.0, 0.0)],
 )
 def test_gradient_correction_is_zero_inside_the_flat_band(
     category: str, flat_low: float, flat_high: float
@@ -368,7 +411,9 @@ def test_gradient_correction_is_zero_inside_the_flat_band(
     """(2.2.13)-(2.2.15): no correction between the two breakpoints."""
     base = road_propulsion_noise(category, 70.0)
     for slope in (flat_low, 0.5 * (flat_low + flat_high), flat_high):
-        assert np.array_equal(road_propulsion_noise(category, 70.0, gradient=slope), base)
+        assert np.array_equal(
+            road_propulsion_noise(category, 70.0, gradient=slope), base
+        )
 
 
 def test_gradient_correction_downhill_branches() -> None:
@@ -429,9 +474,13 @@ def test_gradient_dead_band_is_pinned_on_both_sides_of_every_breakpoint(
     """
     base = road_propulsion_noise(category, 70.0)
     for slope in inside:
-        assert np.array_equal(road_propulsion_noise(category, 70.0, gradient=slope), base)
+        assert np.array_equal(
+            road_propulsion_noise(category, 70.0, gradient=slope), base
+        )
     for slope in just_outside:
-        assert not np.array_equal(road_propulsion_noise(category, 70.0, gradient=slope), base)
+        assert not np.array_equal(
+            road_propulsion_noise(category, 70.0, gradient=slope), base
+        )
 
 
 def test_gradient_correction_never_subtracts() -> None:
@@ -446,7 +495,8 @@ def test_gradient_correction_never_subtracts() -> None:
         base = road_propulsion_noise(category, 70.0)
         for slope in np.arange(-15.0, 15.001, 0.25):
             assert np.all(
-                road_propulsion_noise(category, 70.0, gradient=float(slope)) >= base - 1e-12
+                road_propulsion_noise(category, 70.0, gradient=float(slope))
+                >= base - 1e-12
             )
 
 
@@ -466,7 +516,9 @@ def test_gradient_does_not_touch_powered_two_wheelers() -> None:
     for category in ("4a", "4b"):
         base = road_propulsion_noise(category, 70.0)
         for slope in (-12.0, -5.0, 5.0, 12.0):
-            assert np.array_equal(road_propulsion_noise(category, 70.0, gradient=slope), base)
+            assert np.array_equal(
+                road_propulsion_noise(category, 70.0, gradient=slope), base
+            )
 
 
 def test_reference_surface_is_transparent() -> None:
@@ -484,10 +536,16 @@ def test_surface_effect_on_rolling_and_propulsion_differ() -> None:
     row = road_surface_coefficients(surface)
     v = 40.0
     rolling = road_rolling_noise("1", v, surface=surface) - road_rolling_noise("1", v)
-    expected = np.asarray(row.alpha["1"]) + row.beta["1"] * math.log10(v / ROAD_REFERENCE_SPEED)
+    expected = np.asarray(row.alpha["1"]) + row.beta["1"] * math.log10(
+        v / ROAD_REFERENCE_SPEED
+    )
     assert rolling == pytest.approx(expected, abs=1e-12)
-    propulsion = road_propulsion_noise("1", v, surface=surface) - road_propulsion_noise("1", v)
-    assert propulsion == pytest.approx(np.minimum(np.asarray(row.alpha["1"]), 0.0), abs=1e-12)
+    propulsion = road_propulsion_noise("1", v, surface=surface) - road_propulsion_noise(
+        "1", v
+    )
+    assert propulsion == pytest.approx(
+        np.minimum(np.asarray(row.alpha["1"]), 0.0), abs=1e-12
+    )
     # Every alpha of this loud surface is positive, so propulsion is untouched.
     assert np.array_equal(propulsion, np.zeros(8))
 
@@ -496,8 +554,12 @@ def test_absorbing_surface_reduces_propulsion_noise() -> None:
     """A negative ``alpha`` passes straight through (2.2.20)."""
     surface = RoadSurface.TWO_LAYER_ZOAB_FINE
     row = road_surface_coefficients(surface)
-    delta = road_propulsion_noise("1", 100.0, surface=surface) - road_propulsion_noise("1", 100.0)
-    assert delta == pytest.approx(np.minimum(np.asarray(row.alpha["1"]), 0.0), abs=1e-12)
+    delta = road_propulsion_noise("1", 100.0, surface=surface) - road_propulsion_noise(
+        "1", 100.0
+    )
+    assert delta == pytest.approx(
+        np.minimum(np.asarray(row.alpha["1"]), 0.0), abs=1e-12
+    )
     assert float(np.min(delta)) < 0.0
 
 
@@ -532,7 +594,9 @@ def test_result_arrays_are_consistent() -> None:
     assert result.source_height == 0.05
     assert result.vehicle_power[0] == pytest.approx(
         10.0
-        * np.log10(10.0 ** (result.rolling[0] / 10.0) + 10.0 ** (result.propulsion[0] / 10.0)),
+        * np.log10(
+            10.0 ** (result.rolling[0] / 10.0) + 10.0 ** (result.propulsion[0] / 10.0)
+        ),
         abs=1e-12,
     )
 
@@ -548,7 +612,9 @@ def test_a_weighted_line_power_uses_the_directive_table() -> None:
 def test_segment_power_is_the_line_power_plus_ten_log_length() -> None:
     line = np.array([90.0, 92.0, 94.0])
     assert line_source_segment_power(line, 1.0) == pytest.approx(line, abs=1e-12)
-    assert line_source_segment_power(line, 10.0) == pytest.approx(line + 10.0, abs=1e-12)
+    assert line_source_segment_power(line, 10.0) == pytest.approx(
+        line + 10.0, abs=1e-12
+    )
     assert line_source_segment_power(90.0, 25.0) == pytest.approx(
         np.array([90.0 + 10.0 * math.log10(25.0)]), abs=1e-12
     )
@@ -688,7 +754,9 @@ def test_studded_tyre_inputs_are_range_checked() -> None:
     with pytest.raises(ValueError, match="fraction in "):
         road_rolling_noise("3", 60.0, studded_fraction=2.0)
     # The two extremes themselves are valid.
-    assert road_rolling_noise("1", 60.0, studded_fraction=1.0, studded_months=12.0).shape == (8,)
+    assert road_rolling_noise(
+        "1", 60.0, studded_fraction=1.0, studded_months=12.0
+    ).shape == (8,)
 
 
 def test_plot_draws_the_total_and_every_category() -> None:

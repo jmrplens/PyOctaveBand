@@ -303,9 +303,9 @@ def _nc_statement_terms(result: NCResult, language: str) -> tuple[str, list[str]
     extended: list[str] = []
     if math.isfinite(result.sil):
         extended.append(
-            t(
-                "Speech interference level SIL = {value} dB", language
-            ).format(value=format_number(result.sil, language, decimals=1))
+            t("Speech interference level SIL = {value} dB", language).format(
+                value=format_number(result.sil, language, decimals=1)
+            )
         )
     if result.out_of_range == "above":
         statement = "&gt;NC-<b>70</b>"

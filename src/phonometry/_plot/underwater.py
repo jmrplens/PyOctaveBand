@@ -155,8 +155,11 @@ def _t(text: str, language: str = "en") -> str:
 
 
 def plot_ship_source_level(
-    result: ShipSourceLevelResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: ShipSourceLevelResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Radiated noise level, source level and the ΔL surface correction.
 
@@ -181,15 +184,26 @@ def plot_ship_source_level(
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", _t(r"Source level $L_\mathrm{s}$", language))
     ax.semilogx(freqs, ls, "o-", **kwargs)
-    ax.semilogx(freqs, rnl, "s--", color=_C_REFERENCE, label=_t("Radiated noise level", language))
+    ax.semilogx(
+        freqs,
+        rnl,
+        "s--",
+        color=_C_REFERENCE,
+        label=_t("Radiated noise level", language),
+    )
     ax.set_xlabel(_t(_FREQUENCY_LABEL, language))
     ax.set_ylabel(_t("Level [dB re 1 µPa·m]", language))
     ax.grid(True, which="both", alpha=0.3)
     ax.set_axisbelow(True)
 
     twin = ax.twinx()
-    twin.semilogx(freqs, dl, ":", color=_C_TERTIARY,
-                  label=_t(r"Surface correction $\Delta L$", language))
+    twin.semilogx(
+        freqs,
+        dl,
+        ":",
+        color=_C_TERTIARY,
+        label=_t(r"Surface correction $\Delta L$", language),
+    )
     twin.set_ylabel(_t(r"Surface correction $\Delta L$ [dB]", language))
     # After twinx() (it re-initialises the shared x-axis with the default log
     # locator) so the octave-band labelling is not reset back to 10^n ticks.
@@ -206,9 +220,13 @@ def plot_ship_source_level(
     localize_axes(ax, language)
     return ax
 
+
 def plot_pile_strike(
-    result: PileStrikeResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: PileStrikeResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes | np.ndarray:
     """Pile-strike pressure waveform and its cumulative energy.
 
@@ -236,8 +254,13 @@ def plot_pile_strike(
 
     def _waveform(axw: Axes) -> None:
         axw.plot(t, pressure, color=color, lw=0.8, **kwargs)
-        axw.plot([t[peak_idx]], [pressure[peak_idx]], "o", color=_C_REFERENCE,
-                 label=f"{_t('Peak', language)} ({format_number(result.peak_spl, language, decimals=0)} dB re 1 µPa)")
+        axw.plot(
+            [t[peak_idx]],
+            [pressure[peak_idx]],
+            "o",
+            color=_C_REFERENCE,
+            label=f"{_t('Peak', language)} ({format_number(result.peak_spl, language, decimals=0)} dB re 1 µPa)",
+        )
         axw.set_ylabel(_t("Pressure [Pa]", language))
         axw.grid(True, alpha=0.3)
         axw.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
@@ -265,15 +288,21 @@ def plot_pile_strike(
         axes[1].axhline(frac, color=_C_MUTED, ls="--", lw=0.8)
     axes[1].set_ylabel(_t("Cumulative energy (norm.)", language))
     axes[1].set_xlabel(_t(_TIME_LABEL, language))
-    axes[1].set_title(f"{_t('90 % pulse duration', language)} = {format_number(result.pulse_duration * 1e3, language, decimals=0)} ms")
+    axes[1].set_title(
+        f"{_t('90 % pulse duration', language)} = {format_number(result.pulse_duration * 1e3, language, decimals=0)} ms"
+    )
     axes[1].grid(True, alpha=0.3)
     localize_axes(axes[0], language)
     localize_axes(axes[1], language)
     return axes
 
+
 def plot_sound_speed_profile(
-    result: SoundSpeedProfile, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: SoundSpeedProfile,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Sound-speed profile: speed vs depth, with depth increasing downward.
 
@@ -300,9 +329,13 @@ def plot_sound_speed_profile(
     localize_axes(ax, language)
     return ax
 
+
 def plot_propagation_loss(
-    result: PropagationLossResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: PropagationLossResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Propagation loss versus range, with spreading and absorption split out.
 
@@ -319,11 +352,27 @@ def plot_propagation_loss(
     ax = ax if ax is not None else _new_axes()
     r = np.asarray(result.range_m, dtype=np.float64)
     label = f"{_t('Total PL', language)} ({decimal_comma(f'{result.frequency / 1000.0:.3g}', language)} kHz)"
-    ax.plot(r, np.asarray(result.pl), **{"color": _C_PRIMARY, "lw": 1.6, "label": label, **kwargs})
-    ax.plot(r, np.asarray(result.spreading), color=_C_MUTED, lw=1.0, ls="--",
-            label=f"{_t('Spreading', language)} ({result.law})")
-    ax.plot(r, np.asarray(result.absorption), color=_C_SECONDARY, lw=1.0, ls=":",
-            label=f"{_t('Absorption', language)} ({decimal_comma(f'{result.absorption_coefficient:.3g}', language)} dB/km)")
+    ax.plot(
+        r,
+        np.asarray(result.pl),
+        **{"color": _C_PRIMARY, "lw": 1.6, "label": label, **kwargs},
+    )
+    ax.plot(
+        r,
+        np.asarray(result.spreading),
+        color=_C_MUTED,
+        lw=1.0,
+        ls="--",
+        label=f"{_t('Spreading', language)} ({result.law})",
+    )
+    ax.plot(
+        r,
+        np.asarray(result.absorption),
+        color=_C_SECONDARY,
+        lw=1.0,
+        ls=":",
+        label=f"{_t('Absorption', language)} ({decimal_comma(f'{result.absorption_coefficient:.3g}', language)} dB/km)",
+    )
     ax.set_xlabel(_t(_RANGE_LABEL, language))
     ax.set_ylabel(_t(_PROPAGATION_LOSS_LABEL, language))
     ax.set_title(f"{_t('Underwater propagation loss', language)} ({result.model})")
@@ -334,9 +383,13 @@ def plot_propagation_loss(
     localize_axes(ax, language)
     return ax
 
+
 def plot_sonar_equation(
-    result: SonarEquationResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: SonarEquationResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Signal excess versus propagation loss, with the detection limit (SE = 0).
 
@@ -353,11 +406,25 @@ def plot_sonar_equation(
     se = np.asarray(result.signal_excess, dtype=np.float64)
     order = np.argsort(pl)
     label = f"{_t('Signal excess', language)} ({result.mode})"
-    ax.plot(pl[order], se[order], **{"color": _C_PRIMARY, "lw": 1.6, "label": label, **kwargs})
-    ax.axhline(0.0, color=_C_REFERENCE, ls="--", lw=1.0,
-               label=_t(r"Detection limit ($\mathrm{SE}$ = 0)", language))
-    ax.axvline(result.figure_of_merit, color=_C_MUTED, ls=":", lw=1.0,
-               label=f"{_t('Figure of merit', language)} = {format_number(result.figure_of_merit, language)} dB")
+    ax.plot(
+        pl[order],
+        se[order],
+        **{"color": _C_PRIMARY, "lw": 1.6, "label": label, **kwargs},
+    )
+    ax.axhline(
+        0.0,
+        color=_C_REFERENCE,
+        ls="--",
+        lw=1.0,
+        label=_t(r"Detection limit ($\mathrm{SE}$ = 0)", language),
+    )
+    ax.axvline(
+        result.figure_of_merit,
+        color=_C_MUTED,
+        ls=":",
+        lw=1.0,
+        label=f"{_t('Figure of merit', language)} = {format_number(result.figure_of_merit, language)} dB",
+    )
     ax.set_xlabel(_t(_PROPAGATION_LOSS_LABEL, language))
     ax.set_ylabel(_t("Signal excess [dB]", language))
     ax.set_title(_t("Sonar equation", language))
@@ -366,9 +433,13 @@ def plot_sonar_equation(
     localize_axes(ax, language)
     return ax
 
+
 def plot_bottom_loss(
-    result: BottomLossResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: BottomLossResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Bottom reflection loss versus grazing angle, marking the critical angle.
 
@@ -383,10 +454,24 @@ def plot_bottom_loss(
     ax = ax if ax is not None else _new_axes()
     phi = np.asarray(result.grazing_angle, dtype=np.float64)
     loss = np.asarray(result.reflection_loss, dtype=np.float64)
-    ax.plot(phi, loss, **{"color": _C_PRIMARY, "lw": 1.6, "label": _t("Bottom loss", language), **kwargs})
+    ax.plot(
+        phi,
+        loss,
+        **{
+            "color": _C_PRIMARY,
+            "lw": 1.6,
+            "label": _t("Bottom loss", language),
+            **kwargs,
+        },
+    )
     if result.critical_angle is not None:
-        ax.axvline(result.critical_angle, color=_C_REFERENCE, ls="--", lw=1.0,
-                   label=f"{_t('Critical angle', language)} = {format_number(result.critical_angle, language)}°")
+        ax.axvline(
+            result.critical_angle,
+            color=_C_REFERENCE,
+            ls="--",
+            lw=1.0,
+            label=f"{_t('Critical angle', language)} = {format_number(result.critical_angle, language)}°",
+        )
     ax.set_xlabel(_t(_GRAZING_ANGLE_LABEL, language))
     ax.set_ylabel(_t("Bottom loss [dB]", language))
     ax.set_title(_t("Seabed reflection loss", language))
@@ -395,9 +480,13 @@ def plot_bottom_loss(
     localize_axes(ax, language)
     return ax
 
+
 def plot_seabed_reflection(
-    result: SeabedReflection, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: SeabedReflection,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Seabed reflection-coefficient magnitude versus grazing angle.
 
@@ -415,10 +504,17 @@ def plot_seabed_reflection(
     ax = ax if ax is not None else _new_axes()
     phi = np.asarray(result.grazing_angle, dtype=np.float64)
     magnitude = np.asarray(result.magnitude, dtype=np.float64)
-    ax.plot(phi, magnitude, **{"color": _C_PRIMARY, "lw": 1.6, "label": "$|R|$", **kwargs})
+    ax.plot(
+        phi, magnitude, **{"color": _C_PRIMARY, "lw": 1.6, "label": "$|R|$", **kwargs}
+    )
     if result.critical_angle is not None:
-        ax.axvline(result.critical_angle, color=_C_REFERENCE, ls="--", lw=1.0,
-                   label=f"{_t('Critical angle', language)} = {format_number(result.critical_angle, language)}°")
+        ax.axvline(
+            result.critical_angle,
+            color=_C_REFERENCE,
+            ls="--",
+            lw=1.0,
+            label=f"{_t('Critical angle', language)} = {format_number(result.critical_angle, language)}°",
+        )
     ax.set_xlabel(_t(_GRAZING_ANGLE_LABEL, language))
     ax.set_xlim(0.0, 90.0)
     ax.set_ylabel(f"{_t('Reflection coefficient magnitude', language)} $|R|$")
@@ -428,9 +524,13 @@ def plot_seabed_reflection(
     localize_axes(ax, language)
     return ax
 
+
 def plot_ambient_noise(
-    result: AmbientNoiseResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: AmbientNoiseResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Composite ambient-noise spectrum and its components versus frequency.
 
@@ -445,13 +545,36 @@ def plot_ambient_noise(
     ax = ax if ax is not None else _new_axes()
     f = np.asarray(result.frequency, dtype=np.float64)
     label = f"{_t('Total', language)} ({format_number(result.wind_speed_knots, language)} kn)"
-    ax.plot(f, np.asarray(result.spectrum_level),
-            **{"color": _C_PRIMARY, "lw": 1.8, "label": label, **kwargs})
-    ax.plot(f, np.asarray(result.wind), color=_C_SECONDARY, lw=1.0, ls="--", label=_t("Wind", language))
-    ax.plot(f, np.asarray(result.thermal), color=_C_TERTIARY, lw=1.0, ls=":", label=_t("Thermal", language))
+    ax.plot(
+        f,
+        np.asarray(result.spectrum_level),
+        **{"color": _C_PRIMARY, "lw": 1.8, "label": label, **kwargs},
+    )
+    ax.plot(
+        f,
+        np.asarray(result.wind),
+        color=_C_SECONDARY,
+        lw=1.0,
+        ls="--",
+        label=_t("Wind", language),
+    )
+    ax.plot(
+        f,
+        np.asarray(result.thermal),
+        color=_C_TERTIARY,
+        lw=1.0,
+        ls=":",
+        label=_t("Thermal", language),
+    )
     if result.shipping is not None:
-        ax.plot(f, np.asarray(result.shipping), color=_C_REFERENCE, lw=1.0, ls="-.",
-                label=_t("Shipping", language))
+        ax.plot(
+            f,
+            np.asarray(result.shipping),
+            color=_C_REFERENCE,
+            lw=1.0,
+            ls="-.",
+            label=_t("Shipping", language),
+        )
     ax.set_xscale("log")
     ax.set_xlabel(_t(_FREQUENCY_LABEL, language))
     ax.set_ylabel(_t("Spectrum level [dB re 1 µPa²/Hz]", language))
@@ -462,9 +585,13 @@ def plot_ambient_noise(
     localize_axes(ax, language)
     return ax
 
+
 def plot_ship_traffic_spectrum(
-    result: ShipTrafficSpectrum, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: ShipTrafficSpectrum,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Predicted ship source spectral-density level versus frequency.
 
@@ -494,9 +621,13 @@ def plot_ship_traffic_spectrum(
     localize_axes(ax, language)
     return ax
 
+
 def plot_normal_modes(
-    result: NormalModeResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: NormalModeResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Normal-mode propagation loss versus range (loss increasing downward).
 
@@ -512,7 +643,9 @@ def plot_normal_modes(
     r = np.asarray(result.ranges, dtype=np.float64)
     pl = np.asarray(result.propagation_loss, dtype=np.float64)
     label = f"{result.wavenumbers.size} {_t('modes', language)} ({format_number(result.frequency, language, decimals=0)} Hz)"
-    ax.plot(r / 1000.0, pl, **{"color": _C_PRIMARY, "lw": 1.2, "label": label, **kwargs})
+    ax.plot(
+        r / 1000.0, pl, **{"color": _C_PRIMARY, "lw": 1.2, "label": label, **kwargs}
+    )
     ax.set_xlabel(_t(_RANGE_KM_LABEL, language))
     ax.set_ylabel(_t(_PROPAGATION_LOSS_LABEL, language))
     ax.set_title(_t("Normal-mode propagation loss", language))
@@ -523,8 +656,14 @@ def plot_normal_modes(
     localize_axes(ax, language)
     return ax
 
-def plot_ray_trace(result: RayTraceResult, ax: Axes | None = None, *, language: str = "en",
-                   **kwargs: Any) -> Axes:
+
+def plot_ray_trace(
+    result: RayTraceResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
     """Ray paths through the water column (depth increasing downward).
 
     :param result: A :class:`~phonometry.underwater.propagation.numerical.RayTraceResult`.
@@ -539,9 +678,19 @@ def plot_ray_trace(result: RayTraceResult, ax: Axes | None = None, *, language: 
     r = np.asarray(result.ranges, dtype=np.float64)
     z = np.asarray(result.depths, dtype=np.float64)
     for i in range(r.shape[0]):
-        ax.plot(r[i] / 1000.0, z[i], **{"color": _C_PRIMARY, "lw": 0.7, "alpha": 0.7, **kwargs})
+        ax.plot(
+            r[i] / 1000.0,
+            z[i],
+            **{"color": _C_PRIMARY, "lw": 0.7, "alpha": 0.7, **kwargs},
+        )
     _draw_bathymetry(ax, result, float(np.max(r)), language, labelled=True)
-    ax.plot([0.0], [result.source_depth], "o", color=_C_REFERENCE, label=_t("Source", language))
+    ax.plot(
+        [0.0],
+        [result.source_depth],
+        "o",
+        color=_C_REFERENCE,
+        label=_t("Source", language),
+    )
     ax.set_xlabel(_t(_RANGE_KM_LABEL, language))
     ax.set_ylabel(_t(_DEPTH_LABEL, language))
     ax.set_title(_t("Ray trace", language))
@@ -552,8 +701,14 @@ def plot_ray_trace(result: RayTraceResult, ax: Axes | None = None, *, language: 
     localize_axes(ax, language)
     return ax
 
+
 def _draw_bathymetry(
-    ax: Axes, result: Any, r_max: float, language: str, *, labelled: bool,
+    ax: Axes,
+    result: Any,
+    r_max: float,
+    language: str,
+    *,
+    labelled: bool,
 ) -> None:
     """Draw the bottom polyline of a sloping-bathymetry result, if it has one.
 
@@ -575,8 +730,11 @@ def _draw_bathymetry(
 
 
 def plot_eigenrays(
-    result: EigenrayResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: EigenrayResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Arrival structure of the eigenrays: per-path loss stems against delay.
 
@@ -603,7 +761,8 @@ def plot_eigenrays(
     tiny = np.finfo(np.float64).tiny
     loss = -20.0 * np.log10(np.maximum(amp, tiny))
     bounces = np.asarray(
-        result.surface_reflections + result.bottom_reflections, dtype=np.int_)
+        result.surface_reflections + result.bottom_reflections, dtype=np.int_
+    )
     if t.size:
         # Stems hang from the quiet end of the window (the axis is inverted
         # below, so that end is the bottom of the picture).
@@ -611,20 +770,32 @@ def plot_eigenrays(
         direct = bounces == 0
         reflected = ~direct
         if np.any(reflected):
-            ax.vlines(t[reflected], base, loss[reflected], color=_C_MUTED,
-                      lw=0.6, alpha=0.6, zorder=2)
-            sc = ax.scatter(t[reflected], loss[reflected], c=bounces[reflected],
-                            cmap="viridis", s=16, zorder=3,
-                            label=_t("Reflected paths", language))
+            ax.vlines(
+                t[reflected],
+                base,
+                loss[reflected],
+                color=_C_MUTED,
+                lw=0.6,
+                alpha=0.6,
+                zorder=2,
+            )
+            sc = ax.scatter(
+                t[reflected],
+                loss[reflected],
+                c=bounces[reflected],
+                cmap="viridis",
+                s=16,
+                zorder=3,
+                label=_t("Reflected paths", language),
+            )
             cbar = ax.figure.colorbar(sc, ax=ax, pad=0.02)
             cbar.set_label(_t("Boundary reflections", language))
         if np.any(direct):
-            ax.vlines(t[direct], base, loss[direct], color=_C_PRIMARY, lw=1.4,
-                      zorder=4)
+            ax.vlines(t[direct], base, loss[direct], color=_C_PRIMARY, lw=1.4, zorder=4)
             kwargs.setdefault("label", _t("Refracted or direct", language))
-            ax.plot(t[direct], loss[direct], "o", color=_C_PRIMARY, ms=6,
-                    zorder=5,
-                    **kwargs)
+            ax.plot(
+                t[direct], loss[direct], "o", color=_C_PRIMARY, ms=6, zorder=5, **kwargs
+            )
         ax.set_ylim(base, float(loss.min()) - 3.0)
         ax.legend(loc=_LEGEND_LOWER_RIGHT, fontsize="small")
     elif not ax.yaxis_inverted():
@@ -638,8 +809,14 @@ def plot_eigenrays(
 
 
 def _plot_loss_field(
-    ax: Axes | None, ranges: np.ndarray, depths: np.ndarray, pl: np.ndarray, *,
-    title: str, language: str, kwargs: dict[str, Any],
+    ax: Axes | None,
+    ranges: np.ndarray,
+    depths: np.ndarray,
+    pl: np.ndarray,
+    *,
+    title: str,
+    language: str,
+    kwargs: dict[str, Any],
 ) -> Axes:
     """A propagation-loss field on a range-depth grid, shared by two solvers.
 
@@ -695,8 +872,11 @@ def _plot_loss_field(
 
 
 def plot_parabolic_equation(
-    result: ParabolicEquationResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: ParabolicEquationResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Parabolic-equation propagation-loss field (range x depth).
 
@@ -708,14 +888,22 @@ def plot_parabolic_equation(
     :return: The axes.
     """
     return _plot_loss_field(
-        ax, result.ranges, result.depths, result.propagation_loss,
-        title="Parabolic-equation propagation loss", language=language,
-        kwargs=kwargs)
+        ax,
+        result.ranges,
+        result.depths,
+        result.propagation_loss,
+        title="Parabolic-equation propagation loss",
+        language=language,
+        kwargs=kwargs,
+    )
 
 
 def plot_gaussian_beams(
-    result: GaussianBeamResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: GaussianBeamResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Gaussian beam propagation-loss field (range x depth).
 
@@ -739,11 +927,15 @@ def plot_gaussian_beams(
     :return: The axes.
     """
     ax = _plot_loss_field(
-        ax, result.ranges, result.depths, result.propagation_loss,
-        title="Gaussian beam propagation loss", language=language,
-        kwargs=kwargs)
-    _draw_bathymetry(ax, result, float(np.max(result.ranges)), language,
-                     labelled=False)
+        ax,
+        result.ranges,
+        result.depths,
+        result.propagation_loss,
+        title="Gaussian beam propagation loss",
+        language=language,
+        kwargs=kwargs,
+    )
+    _draw_bathymetry(ax, result, float(np.max(result.ranges)), language, labelled=False)
     return ax
 
 
@@ -758,7 +950,12 @@ def _plottable(levels: Any) -> np.ndarray:
 
 
 def _spectrum_axes(
-    ax: Axes | None, freqs: np.ndarray, *, ylabel: str, title: str, language: str,
+    ax: Axes | None,
+    freqs: np.ndarray,
+    *,
+    ylabel: str,
+    title: str,
+    language: str,
 ) -> Axes:
     """Shared frame for the frequency-domain underwater renderers."""
     ax = ax if ax is not None else _new_axes()
@@ -773,8 +970,11 @@ def _spectrum_axes(
 
 
 def plot_weston_regimes(
-    result: WestonPropagationResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: WestonPropagationResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Composite Weston propagation loss with each regime's law and boundaries.
 
@@ -793,13 +993,32 @@ def plot_weston_regimes(
     for label, curve, color, style in (
         (r"Spherical ($20\,\log_{10} r$)", result.spherical, _C_MUTED, ":"),
         (r"Cylindrical ($10\,\log_{10} r$)", result.cylindrical, _C_SECONDARY, "--"),
-        (r"Mode stripping ($15\,\log_{10} r$)", result.mode_stripping, _C_TERTIARY, "-."),
+        (
+            r"Mode stripping ($15\,\log_{10} r$)",
+            result.mode_stripping,
+            _C_TERTIARY,
+            "-.",
+        ),
         ("Single mode", result.single_mode, _C_QUATERNARY, (0, (3, 1, 1, 1))),
     ):
-        ax.plot(r, np.asarray(curve, dtype=np.float64), ls=style, lw=1.0, color=color,
-                label=_t(label, language))
-    ax.plot(r, np.asarray(result.propagation_loss, dtype=np.float64),
-            **{"color": _C_PRIMARY, "lw": 2.0, "label": _t("Composite", language), **kwargs})
+        ax.plot(
+            r,
+            np.asarray(curve, dtype=np.float64),
+            ls=style,
+            lw=1.0,
+            color=color,
+            label=_t(label, language),
+        )
+    ax.plot(
+        r,
+        np.asarray(result.propagation_loss, dtype=np.float64),
+        **{
+            "color": _C_PRIMARY,
+            "lw": 2.0,
+            "label": _t("Composite", language),
+            **kwargs,
+        },
+    )
     for boundary in (
         result.boundaries.spherical_to_cylindrical,
         result.boundaries.cylindrical_to_mode_stripping,
@@ -825,8 +1044,11 @@ def plot_weston_regimes(
 
 
 def plot_marine_mammal_audiogram(
-    result: AudiogramResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: AudiogramResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Hearing threshold versus frequency with the point of best sensitivity.
 
@@ -841,21 +1063,35 @@ def plot_marine_mammal_audiogram(
 
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     title = "Orca audiogram" if result.group == "orca" else "Group audiogram"
-    ax = _spectrum_axes(ax, freqs, ylabel="Hearing threshold [dB]",
-                        title=title, language=language)
-    ax.plot(freqs, np.asarray(result.threshold, dtype=np.float64),
-            **{"color": _C_PRIMARY, "lw": 1.4, "label": result.group, **kwargs})
-    ax.plot([result.best_frequency], [result.best_threshold], "o", color=_C_REFERENCE,
-            label=(f"{_t('Best sensitivity', language)}: "
-                   f"{format_number(result.best_threshold, language)} dB"))
+    ax = _spectrum_axes(
+        ax, freqs, ylabel="Hearing threshold [dB]", title=title, language=language
+    )
+    ax.plot(
+        freqs,
+        np.asarray(result.threshold, dtype=np.float64),
+        **{"color": _C_PRIMARY, "lw": 1.4, "label": result.group, **kwargs},
+    )
+    ax.plot(
+        [result.best_frequency],
+        [result.best_threshold],
+        "o",
+        color=_C_REFERENCE,
+        label=(
+            f"{_t('Best sensitivity', language)}: "
+            f"{format_number(result.best_threshold, language)} dB"
+        ),
+    )
     ax.legend(loc="best", fontsize="small")
     localize_axes(ax, language)
     return ax
 
 
 def plot_auditory_weighting(
-    result: AuditoryWeightingResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: AuditoryWeightingResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Auditory weighting function of a marine-mammal hearing group.
 
@@ -869,11 +1105,19 @@ def plot_auditory_weighting(
     from .._i18n import localize_axes
 
     freqs = np.asarray(result.frequencies, dtype=np.float64)
-    ax = _spectrum_axes(ax, freqs, ylabel="Weighting $W(f)$ [dB]",
-                        title="Auditory weighting function", language=language)
+    ax = _spectrum_axes(
+        ax,
+        freqs,
+        ylabel="Weighting $W(f)$ [dB]",
+        title="Auditory weighting function",
+        language=language,
+    )
     label = f"{result.group} ({result.guidance})"
-    ax.plot(freqs, np.asarray(result.weighting, dtype=np.float64),
-            **{"color": _C_PRIMARY, "lw": 1.4, "label": label, **kwargs})
+    ax.plot(
+        freqs,
+        np.asarray(result.weighting, dtype=np.float64),
+        **{"color": _C_PRIMARY, "lw": 1.4, "label": label, **kwargs},
+    )
     ax.axhline(0.0, color=_C_MUTED, ls=":", lw=0.8)
     ax.legend(loc="lower center", fontsize="small")
     localize_axes(ax, language)
@@ -881,8 +1125,11 @@ def plot_auditory_weighting(
 
 
 def plot_weighted_exposure(
-    result: WeightedExposureResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: WeightedExposureResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Unweighted and weighted band spectra against the exposure criteria.
 
@@ -896,33 +1143,68 @@ def plot_weighted_exposure(
     from .._i18n import format_number, localize_axes
 
     freqs = np.asarray(result.frequencies, dtype=np.float64)
-    ax = _spectrum_axes(ax, freqs, ylabel=_BAND_SEL_LABEL,
-                        title="Weighted exposure vs criteria", language=language)
-    ax.plot(freqs, _plottable(result.band_sel), "o--", ms=3,
-            color=_C_MUTED, lw=1.0, label=_t("Unweighted", language))
-    ax.plot(freqs, _plottable(result.weighted_band_sel),
-            **{"color": _C_PRIMARY, "lw": 1.6, "marker": "o", "ms": 3,
-               "label": f"{_t('Weighted', language)} ({result.group}, {result.guidance})",
-               **kwargs})
+    ax = _spectrum_axes(
+        ax,
+        freqs,
+        ylabel=_BAND_SEL_LABEL,
+        title="Weighted exposure vs criteria",
+        language=language,
+    )
+    ax.plot(
+        freqs,
+        _plottable(result.band_sel),
+        "o--",
+        ms=3,
+        color=_C_MUTED,
+        lw=1.0,
+        label=_t("Unweighted", language),
+    )
+    ax.plot(
+        freqs,
+        _plottable(result.weighted_band_sel),
+        **{
+            "color": _C_PRIMARY,
+            "lw": 1.6,
+            "marker": "o",
+            "ms": 3,
+            "label": f"{_t('Weighted', language)} ({result.group}, {result.guidance})",
+            **kwargs,
+        },
+    )
     for level, color, name in (
         (result.criteria.tts_sel, _C_SECONDARY, "TTS"),
         (result.criteria.injury_sel, _C_REFERENCE, result.criteria.injury_label),
     ):
         if level is not None:
-            ax.axhline(level, color=color, ls="--", lw=1.2,
-                       label=f"{name} {format_number(level, language, decimals=0)} dB")
-    ax.axhline(result.cumulative_sel, color=_C_TERTIARY, ls="-.", lw=1.2,
-               label=(rf"$\mathrm{{SEL}}_{{\mathrm{{cum}}}}$ "
-                      rf"{format_number(result.cumulative_sel, language)} dB "
-                      rf"($N$ = {result.n_events})"))
+            ax.axhline(
+                level,
+                color=color,
+                ls="--",
+                lw=1.2,
+                label=f"{name} {format_number(level, language, decimals=0)} dB",
+            )
+    ax.axhline(
+        result.cumulative_sel,
+        color=_C_TERTIARY,
+        ls="-.",
+        lw=1.2,
+        label=(
+            rf"$\mathrm{{SEL}}_{{\mathrm{{cum}}}}$ "
+            rf"{format_number(result.cumulative_sel, language)} dB "
+            rf"($N$ = {result.n_events})"
+        ),
+    )
     ax.legend(loc="best", fontsize="small")
     localize_axes(ax, language)
     return ax
 
 
 def plot_strike_sel_spectrum(
-    result: StrikeSelSpectrum, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: StrikeSelSpectrum,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Per-band single-strike sound exposure level of a pile strike.
 
@@ -936,22 +1218,46 @@ def plot_strike_sel_spectrum(
     from .._i18n import format_number, localize_axes
 
     freqs = np.asarray(result.frequencies, dtype=np.float64)
-    ax = _spectrum_axes(ax, freqs, ylabel=_BAND_SEL_LABEL,
-                        title="Single-strike SEL per band", language=language)
-    ax.plot(freqs, _plottable(result.band_sel),
-            **{"color": _C_PRIMARY, "lw": 1.4, "marker": "o", "ms": 3,
-               "label": f"1/{result.fraction}", **kwargs})
-    ax.axhline(result.total_sel, color=_C_REFERENCE, ls="--", lw=1.2,
-               label=(rf"$\mathrm{{SEL}}_{{\mathrm{{ss}}}}$ "
-                      rf"{format_number(result.total_sel, language)} dB"))
+    ax = _spectrum_axes(
+        ax,
+        freqs,
+        ylabel=_BAND_SEL_LABEL,
+        title="Single-strike SEL per band",
+        language=language,
+    )
+    ax.plot(
+        freqs,
+        _plottable(result.band_sel),
+        **{
+            "color": _C_PRIMARY,
+            "lw": 1.4,
+            "marker": "o",
+            "ms": 3,
+            "label": f"1/{result.fraction}",
+            **kwargs,
+        },
+    )
+    ax.axhline(
+        result.total_sel,
+        color=_C_REFERENCE,
+        ls="--",
+        lw=1.2,
+        label=(
+            rf"$\mathrm{{SEL}}_{{\mathrm{{ss}}}}$ "
+            rf"{format_number(result.total_sel, language)} dB"
+        ),
+    )
     ax.legend(loc="best", fontsize="small")
     localize_axes(ax, language)
     return ax
 
 
 def plot_detection_range(
-    result: DetectionRangeResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: DetectionRangeResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Propagation loss against the figure of merit, with the detection range.
 
@@ -966,15 +1272,32 @@ def plot_detection_range(
 
     ax = ax if ax is not None else _new_axes()
     r = np.asarray(result.range_m, dtype=np.float64)
-    ax.plot(r, np.asarray(result.propagation_loss, dtype=np.float64),
-            **{"color": _C_PRIMARY, "lw": 1.4, "label": _t("Total PL", language), **kwargs})
-    ax.axhline(result.figure_of_merit, color=_C_SECONDARY, ls="--", lw=1.2,
-               label=(f"{_t('Figure of merit', language)} "
-                      f"{format_number(result.figure_of_merit, language)} dB"))
+    ax.plot(
+        r,
+        np.asarray(result.propagation_loss, dtype=np.float64),
+        **{"color": _C_PRIMARY, "lw": 1.4, "label": _t("Total PL", language), **kwargs},
+    )
+    ax.axhline(
+        result.figure_of_merit,
+        color=_C_SECONDARY,
+        ls="--",
+        lw=1.2,
+        label=(
+            f"{_t('Figure of merit', language)} "
+            f"{format_number(result.figure_of_merit, language)} dB"
+        ),
+    )
     if np.isfinite(result.detection_range) and result.detection_range > 0.0:
-        ax.axvline(result.detection_range, color=_C_REFERENCE, ls=":", lw=1.2,
-                   label=(f"{_t('Detection range', language)} "
-                          f"{format_number(result.detection_range, language, decimals=0)} m"))
+        ax.axvline(
+            result.detection_range,
+            color=_C_REFERENCE,
+            ls=":",
+            lw=1.2,
+            label=(
+                f"{_t('Detection range', language)} "
+                f"{format_number(result.detection_range, language, decimals=0)} m"
+            ),
+        )
     ax.set_xlabel(_t(_RANGE_LABEL, language))
     ax.set_ylabel(_t(_PROPAGATION_LOSS_LABEL, language))
     ax.set_title(_t("Propagation loss vs figure of merit", language))

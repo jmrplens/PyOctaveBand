@@ -89,9 +89,7 @@ def _audible_as_displayed(result: WindTurbineTonalityResult) -> bool:
     > 0", contradicting its own number at the 0 dB boundary. A tone must still
     have been identified (subclause 9.5.4) for any audibility decision to apply.
     """
-    return (
-        result.has_identified_tone and display_round(result.tonal_audibility) > 0.0
-    )
+    return result.has_identified_tone and display_round(result.tonal_audibility) > 0.0
 
 
 def _metadata_pairs(
@@ -192,9 +190,7 @@ def _statement(
     return statement, extended
 
 
-def _decision_phrase(
-    result: WindTurbineTonalityResult, language: str = "en"
-) -> str:
+def _decision_phrase(result: WindTurbineTonalityResult, language: str = "en") -> str:
     """A short coloured phrase carrying the audibility decision.
 
     When no tone was identified in the critical band the result carries no
@@ -235,9 +231,7 @@ def _verdict(
     return text, passed
 
 
-def _decision_note(
-    result: WindTurbineTonalityResult, language: str = "en"
-) -> str:
+def _decision_note(result: WindTurbineTonalityResult, language: str = "en") -> str:
     """The measurement-basis note stating the audibility decision."""
     delta = _fmt(display_round(result.tonal_audibility), language)
     if not result.has_identified_tone:
@@ -321,9 +315,7 @@ def render_wind_turbine_tonality_report(
 
     left_cell = [
         Paragraph(t("Critical-band analysis", language), caption_style),
-        metrics_table(
-            _metric_rows(result, language), col_widths=[38 * mm, 18 * mm]
-        ),
+        metrics_table(_metric_rows(result, language), col_widths=[38 * mm, 18 * mm]),
     ]
     # Non-band plot (the narrowband spectrum with the critical band, masking
     # level and tone): self-scaling axis, drawn by the result's own ``plot``.

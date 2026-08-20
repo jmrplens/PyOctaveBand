@@ -34,9 +34,7 @@ def test_coincidence_frequency_closed_form() -> None:
 
 def test_coincidence_frequency_glass_near_2079() -> None:
     # Hopkins declares fc = 2079 Hz for this pane; the closed form gives ~2107.
-    assert vibration.coincidence_frequency(M2, BP) == pytest.approx(
-        2079.0, rel=0.02
-    )
+    assert vibration.coincidence_frequency(M2, BP) == pytest.approx(2079.0, rel=0.02)
 
 
 # ---------------------------------------------------------------------------
@@ -85,9 +83,7 @@ def test_clamped_boundary_radiates_more() -> None:
     ss = vibration.radiation_efficiency(
         [500.0], LX, LY, fc, boundary="simply_supported"
     )
-    cl = vibration.radiation_efficiency(
-        [500.0], LX, LY, fc, boundary="clamped"
-    )
+    cl = vibration.radiation_efficiency([500.0], LX, LY, fc, boundary="clamped")
     assert cl.radiation_efficiency[0] > ss.radiation_efficiency[0]
 
 
@@ -96,9 +92,7 @@ def test_clamped_boundary_radiates_more() -> None:
 # ---------------------------------------------------------------------------
 def test_rejects_bad_input() -> None:
     with pytest.raises(ValueError, match="boundary"):
-        vibration.radiation_efficiency(
-            [500.0], LX, LY, 2000.0, boundary="pinned"
-        )
+        vibration.radiation_efficiency([500.0], LX, LY, 2000.0, boundary="pinned")
     with pytest.raises(ValueError, match="critical_frequency"):
         vibration.radiation_efficiency([500.0], LX, LY, -1.0)
     with pytest.raises(ValueError, match="frequency"):

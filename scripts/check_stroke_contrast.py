@@ -74,7 +74,11 @@ def _parse(style: str) -> tuple[tuple[int, int, int] | None, float, float]:
         return None, 1.0, 1.0
     v = colour.group(1)
     rgb = (int(v[0:2], 16), int(v[2:4], 16), int(v[4:6], 16))
-    return rgb, float(opacity.group(1)) if opacity else 1.0, float(width.group(1)) if width else 1.0
+    return (
+        rgb,
+        float(opacity.group(1)) if opacity else 1.0,
+        float(width.group(1)) if width else 1.0,
+    )
 
 
 def _group_id(element: ElementTree.Element) -> str:
@@ -91,9 +95,7 @@ def _is_field(element: ElementTree.Element) -> bool:
     if _group_id(element) in FIELD_GROUPS:
         # A contour set drawn as *lines* is the thing being checked, not a
         # field: only the filled one hides the page.
-        return any(
-            "fill: #" in (child.get("style") or "") for child in element.iter()
-        )
+        return any("fill: #" in (child.get("style") or "") for child in element.iter())
     return any(_is_field(child) for child in element)
 
 
@@ -133,8 +135,10 @@ def main() -> int:
             # A hairline has to work harder: below 0.6 pt demand 3:1, else 2:1.
             floor = 3.0 if width < 0.6 else 2.0
             if ratio < floor:
-                detail = (f"#{rgb[0]:02x}{rgb[1]:02x}{rgb[2]:02x} alpha={alpha} "
-                          f"width={width} -> {ratio:.2f}:1 (min {floor})")
+                detail = (
+                    f"#{rgb[0]:02x}{rgb[1]:02x}{rgb[2]:02x} alpha={alpha} "
+                    f"width={width} -> {ratio:.2f}:1 (min {floor})"
+                )
                 rows.append((ratio, svg.name, detail))
     rows.sort()
     print(f"{len(rows)} low-contrast strokes on the dark page\n")

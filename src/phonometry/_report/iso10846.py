@@ -111,20 +111,31 @@ def _metric_rows(
     blocking_mass = result.blocking_mass
     if blocking_mass is not None:
         rows.append(
-            (t("Blocking mass m<sub>2</sub> [kg]", language),
-             format_number(float(blocking_mass), language, decimals=1))
+            (
+                t("Blocking mass m<sub>2</sub> [kg]", language),
+                format_number(float(blocking_mass), language, decimals=1),
+            )
         )
     rows.extend(
         [
-            (t("Frequency range f [Hz]", language),
-             frequency_range(np.asarray(result.frequencies, dtype=np.float64),
-                             language)),
-            (t("Low-frequency |k<sub>2,1</sub>| [MN/m]", language),
-             _mn(magnitude, language)),
-            (t("Low-frequency L<sub>k</sub> [dB re 1 N/m]", language),
-             format_number(level, language, decimals=1)),
-            (t("Loss factor &#951; (low frequency)", language),
-             format_number(eta, language, decimals=3)),
+            (
+                t("Frequency range f [Hz]", language),
+                frequency_range(
+                    np.asarray(result.frequencies, dtype=np.float64), language
+                ),
+            ),
+            (
+                t("Low-frequency |k<sub>2,1</sub>| [MN/m]", language),
+                _mn(magnitude, language),
+            ),
+            (
+                t("Low-frequency L<sub>k</sub> [dB re 1 N/m]", language),
+                format_number(level, language, decimals=1),
+            ),
+            (
+                t("Loss factor &#951; (low frequency)", language),
+                format_number(eta, language, decimals=3),
+            ),
         ]
     )
     return rows
@@ -135,20 +146,21 @@ def _statement(result: TransferStiffnessResult, language: str = "en") -> str:
     _, _, level, _ = _low_frequency_values(result)
     return t(
         "Low-frequency dynamic transfer stiffness level "
-        "L<sub>k</sub> = <b>{value} dB re 1 N/m</b>", language
+        "L<sub>k</sub> = <b>{value} dB re 1 N/m</b>",
+        language,
     ).format(value=format_number(level, language, decimals=1))
 
 
-def _extended_terms(
-    result: TransferStiffnessResult, language: str = "en"
-) -> list[str]:
+def _extended_terms(result: TransferStiffnessResult, language: str = "en") -> list[str]:
     """The stiffness magnitude, the method and the loss factor shown beside the box."""
     freq, magnitude, _, eta = _low_frequency_values(result)
     return [
-        t("Low-frequency stiffness |k<sub>2,1</sub>| = {value} MN/m at {freq} Hz",
-          language).format(
-              value=_mn(magnitude, language),
-              freq=format_number(freq, language, decimals=1, trim=True),
+        t(
+            "Low-frequency stiffness |k<sub>2,1</sub>| = {value} MN/m at {freq} Hz",
+            language,
+        ).format(
+            value=_mn(magnitude, language),
+            freq=format_number(freq, language, decimals=1, trim=True),
         ),
         t("Method: {method}", language).format(method=_method(result, language)),
         t("Loss factor &#951; = {value} (low frequency)", language).format(

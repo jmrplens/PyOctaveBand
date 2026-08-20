@@ -112,9 +112,14 @@ _AIRBORNE_STANDARDIZATION = 0.32
 _FK_DOUBLE_LEAF = 500.0
 
 JunctionType = Literal[
-    "rigid_cross", "rigid_t", "flexible_t", "lightweight_facade",
-    "lightweight_double_homogeneous", "lightweight_double_coupled",
-    "corner", "thickness_change",
+    "rigid_cross",
+    "rigid_t",
+    "flexible_t",
+    "lightweight_facade",
+    "lightweight_double_homogeneous",
+    "lightweight_double_coupled",
+    "corner",
+    "thickness_change",
 ]
 PathKind = Literal["through", "corner", "double_leaf"]
 
@@ -187,7 +192,9 @@ class AirbornePredictionResult:
     paths: tuple[PathContribution, ...]
     dominant: PathContribution
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the per-path shares of the transmitted energy.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -250,8 +257,7 @@ class AirbornePredictionResult:
         check_language(language)
         if engine != "reportlab":
             raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is "
-                "supported."
+                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
             )
         from ..._report.iso12354 import render_iso12354_airborne_report
 
@@ -276,7 +282,9 @@ class ImpactPredictionResult:
     delta_l_w: float
     k_correction: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the Formula 21 terms and the resulting ``L'n,w``.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -341,8 +349,7 @@ class ImpactPredictionResult:
         check_language(language)
         if engine != "reportlab":
             raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is "
-                "supported."
+                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
             )
         from ..._report.iso12354 import render_iso12354_impact_report
 
@@ -451,8 +458,7 @@ def _kij_corner(path: PathKind, t: _KijTerms) -> float:
     if path == "corner":
         return max(15.0 * abs(t.m) - 3.0, -2.0)
     raise ValueError(
-        "A 'corner' junction has the single path K12 = K21; use "
-        "path='corner'."
+        "A 'corner' junction has the single path K12 = K21; use path='corner'."
     )
 
 
@@ -654,9 +660,7 @@ def _coupling_term(separating_area: float, coupling_length: float) -> float:
     ss = _check_finite(separating_area, "separating_area")
     lf = _check_finite(coupling_length, "coupling_length")
     if ss <= 0.0 or lf <= 0.0:
-        raise ValueError(
-            "'separating_area' and 'coupling_length' must be positive."
-        )
+        raise ValueError("'separating_area' and 'coupling_length' must be positive.")
     return 10.0 * log10(ss / (_L0 * lf))
 
 
@@ -715,9 +719,7 @@ def flanking_path(
     if kij_min is not None:
         kij = max(kij, _check_finite(kij_min, "kij_min"))
     dr = _check_finite(delta_r, "delta_r")
-    r_ij = (rs + rr) / 2.0 + dr + kij + _coupling_term(
-        separating_area, coupling_length
-    )
+    r_ij = (rs + rr) / 2.0 + dr + kij + _coupling_term(separating_area, coupling_length)
     return FlankingPath(label=label, kind=kind, r_ij_w=r_ij)
 
 
@@ -784,21 +786,36 @@ def flanking_element(
             coupling_length, flanking_area, separating_area
         )
     ff = flanking_path(
-        label=f"{label}-Ff", kind="Ff", r_source=r_flanking,
-        r_receive=r_flanking, k_ij=k_ff, separating_area=separating_area,
-        coupling_length=coupling_length, delta_r=delta_r_ff,
+        label=f"{label}-Ff",
+        kind="Ff",
+        r_source=r_flanking,
+        r_receive=r_flanking,
+        k_ij=k_ff,
+        separating_area=separating_area,
+        coupling_length=coupling_length,
+        delta_r=delta_r_ff,
         kij_min=kij_min_ff,
     )
     df = flanking_path(
-        label=f"{label}-Df", kind="Df", r_source=r_separating,
-        r_receive=r_flanking, k_ij=k_df, separating_area=separating_area,
-        coupling_length=coupling_length, delta_r=delta_r_df,
+        label=f"{label}-Df",
+        kind="Df",
+        r_source=r_separating,
+        r_receive=r_flanking,
+        k_ij=k_df,
+        separating_area=separating_area,
+        coupling_length=coupling_length,
+        delta_r=delta_r_df,
         kij_min=kij_min_cross,
     )
     fd = flanking_path(
-        label=f"{label}-Fd", kind="Fd", r_source=r_flanking,
-        r_receive=r_separating, k_ij=k_fd, separating_area=separating_area,
-        coupling_length=coupling_length, delta_r=delta_r_fd,
+        label=f"{label}-Fd",
+        kind="Fd",
+        r_source=r_flanking,
+        r_receive=r_separating,
+        k_ij=k_fd,
+        separating_area=separating_area,
+        coupling_length=coupling_length,
+        delta_r=delta_r_fd,
         kij_min=kij_min_cross,
     )
     return ff, df, fd
@@ -849,7 +866,9 @@ def predicted_airborne_insulation(
     ]
     contributions += [
         PathContribution(
-            label=p.label, kind=p.kind, r_w=p.r_ij_w,
+            label=p.label,
+            kind=p.kind,
+            r_w=p.r_ij_w,
             fraction=tau / tau_total,
         )
         for p, tau in zip(flanking_paths, tau_paths)
@@ -892,9 +911,7 @@ def equivalent_impact_level(mass_per_area: float) -> float:
     return _LN_EQ_A - _LN_EQ_B * log10(m / _M0)
 
 
-def impact_flanking_correction(
-    separating_mass: float, flanking_mass: float
-) -> int:
+def impact_flanking_correction(separating_mass: float, flanking_mass: float) -> int:
     """Flanking correction ``K`` from Table 1 (EN 12354-2:2000).
 
     Looks up ``K`` (dB) for the separating-floor mass and the mean mass of the

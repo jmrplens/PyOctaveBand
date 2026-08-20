@@ -124,8 +124,11 @@ def _limit_edge(
         return float(f[edge])
     threshold = tolerance if rel_db[neighbour] > tolerance else -tolerance
     return _threshold_crossing(
-        float(f[edge]), float(rel_db[edge]),
-        float(f[neighbour]), float(rel_db[neighbour]), threshold,
+        float(f[edge]),
+        float(rel_db[edge]),
+        float(f[neighbour]),
+        float(rel_db[neighbour]),
+        threshold,
     )
 
 
@@ -496,8 +499,12 @@ class MicrophoneCharacteristics:
         )
 
     def plot(
-        self, quantity: str = "response", ax: Axes | None = None, *,
-        language: str = "en", **kwargs: Any,
+        self,
+        quantity: str = "response",
+        ax: Axes | None = None,
+        *,
+        language: str = "en",
+        **kwargs: Any,
     ) -> Axes:
         """Plot one IEC 60268-4 microphone rated characteristic on one axes.
 

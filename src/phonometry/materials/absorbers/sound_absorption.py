@@ -322,10 +322,18 @@ def absorption_coefficient(
     _warn_small_room(volume, stacklevel=2)
     _warn_sample_area(sample_area, volume, stacklevel=2)
     a1 = _absorption_area(
-        t1, volume, temperature=temperature1, speed_of_sound=speed_of_sound1, m=m1,
+        t1,
+        volume,
+        temperature=temperature1,
+        speed_of_sound=speed_of_sound1,
+        m=m1,
     )
     a2 = _absorption_area(
-        t2, volume, temperature=temperature2, speed_of_sound=speed_of_sound2, m=m2,
+        t2,
+        volume,
+        temperature=temperature2,
+        speed_of_sound=speed_of_sound2,
+        m=m2,
     )
     area_specimen = a2 - a1
     alpha_s = area_specimen / sample_area
@@ -561,9 +569,14 @@ def measure_sound_absorption(
     # alpha_s reuses the validated Eq. (8)/(9) path (it also emits the volume,
     # sample-area and non-physical advisories exactly once).
     alpha_s = absorption_coefficient(
-        t1, t2, volume, area,
-        temperature1=temperature, speed_of_sound1=c,
-        m1=m_arr, m2=m_arr,
+        t1,
+        t2,
+        volume,
+        area,
+        temperature1=temperature,
+        speed_of_sound1=c,
+        m1=m_arr,
+        m2=m_arr,
     )
     return SoundAbsorptionMeasurement(
         frequencies=freqs,

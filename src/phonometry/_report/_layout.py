@@ -99,9 +99,7 @@ def escaped_pairs(
     they are left untouched.
     """
     return [
-        (label, html.escape(str(value)))
-        for label, value in specs
-        if value is not None
+        (label, html.escape(str(value))) for label, value in specs if value is not None
     ]
 
 
@@ -117,8 +115,11 @@ def measurement_basis_style() -> Any:
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 
     return ParagraphStyle(
-        "fiche_measurement_basis", parent=getSampleStyleSheet()["Normal"],
-        fontSize=7.5, leading=10, textColor=colors.HexColor(_MUTED_HEX),
+        "fiche_measurement_basis",
+        parent=getSampleStyleSheet()["Normal"],
+        fontSize=7.5,
+        leading=10,
+        textColor=colors.HexColor(_MUTED_HEX),
         spaceBefore=6,
     )
 
@@ -247,9 +248,15 @@ def render_figure_drawing(
             # axes, and tight_layout would shrink the plot to fit it, leaving
             # the impact chart narrower than its airborne sibling.
             ax.legend(
-                handles, labels, loc="lower left",
-                bbox_to_anchor=(0.0, 1.005), ncol=min(len(handles), 3),
-                frameon=False, fontsize=8, handlelength=1.6, columnspacing=1.2,
+                handles,
+                labels,
+                loc="lower left",
+                bbox_to_anchor=(0.0, 1.005),
+                ncol=min(len(handles), 3),
+                frameon=False,
+                fontsize=8,
+                handlelength=1.6,
+                columnspacing=1.2,
             )
         # Localise the tick-label decimal separator for Spanish (a no-op for
         # English, so English figures are byte-for-byte unchanged). Imported
@@ -289,11 +296,15 @@ def grid_table(pairs: list[tuple[str, str]]) -> Any:
     styles = getSampleStyleSheet()
     accent = colors.HexColor(_ACCENT_HEX)
     label_style = ParagraphStyle(
-        "fiche_meta_label", parent=styles["Normal"], fontSize=8,
+        "fiche_meta_label",
+        parent=styles["Normal"],
+        fontSize=8,
         textColor=colors.HexColor(_MUTED_HEX),
     )
     value_style = ParagraphStyle(
-        "fiche_meta_value", parent=styles["Normal"], fontSize=8.5,
+        "fiche_meta_value",
+        parent=styles["Normal"],
+        fontSize=8.5,
         textColor=colors.black,
     )
 
@@ -336,8 +347,12 @@ def band_table_header_style() -> Any:
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 
     return ParagraphStyle(
-        "fiche_band_thead", parent=getSampleStyleSheet()["Normal"],
-        fontSize=7.2, textColor=colors.white, alignment=1, leading=8.5,
+        "fiche_band_thead",
+        parent=getSampleStyleSheet()["Normal"],
+        fontSize=7.2,
+        textColor=colors.white,
+        alignment=1,
+        leading=8.5,
     )
 
 
@@ -400,16 +415,26 @@ def document_styles(accent: Any) -> tuple[Any, Any, Any, Any]:
 
     styles = getSampleStyleSheet()
     title_style = ParagraphStyle(
-        "fiche_title", parent=styles["Title"], fontSize=16, textColor=accent,
-        spaceAfter=1, alignment=0,
+        "fiche_title",
+        parent=styles["Title"],
+        fontSize=16,
+        textColor=accent,
+        spaceAfter=1,
+        alignment=0,
     )
     basis_style = ParagraphStyle(
-        "fiche_basis", parent=styles["Normal"], fontSize=9.5,
-        textColor=colors.HexColor(_MUTED_HEX), spaceAfter=2,
+        "fiche_basis",
+        parent=styles["Normal"],
+        fontSize=9.5,
+        textColor=colors.HexColor(_MUTED_HEX),
+        spaceAfter=2,
     )
     caption_style = ParagraphStyle(
-        "fiche_caption", parent=styles["Normal"], fontSize=8,
-        textColor=accent, spaceAfter=3,
+        "fiche_caption",
+        parent=styles["Normal"],
+        fontSize=8,
+        textColor=accent,
+        spaceAfter=3,
     )
     return styles, title_style, basis_style, caption_style
 
@@ -471,10 +496,16 @@ def metrics_table(rows: list[tuple[str, str]], *, col_widths: Any = None) -> Any
     accent = colors.HexColor(_ACCENT_HEX)
     light = colors.HexColor(_LIGHT_HEX)
     label_style = ParagraphStyle(
-        "fiche_metric_label", parent=styles["Normal"], fontSize=8.5, leading=11,
+        "fiche_metric_label",
+        parent=styles["Normal"],
+        fontSize=8.5,
+        leading=11,
     )
     value_style = ParagraphStyle(
-        "fiche_metric_value", parent=styles["Normal"], fontSize=8.5, leading=11,
+        "fiche_metric_value",
+        parent=styles["Normal"],
+        fontSize=8.5,
+        leading=11,
         alignment=2,
     )
     data = [
@@ -532,28 +563,33 @@ def compliance_table(
     accent = colors.HexColor(_ACCENT_HEX)
     light = colors.HexColor(_LIGHT_HEX)
     header_style = ParagraphStyle(
-        "fiche_compliance_header", parent=styles["Normal"], fontSize=8.5,
-        leading=11, textColor=colors.white,
+        "fiche_compliance_header",
+        parent=styles["Normal"],
+        fontSize=8.5,
+        leading=11,
+        textColor=colors.white,
     )
     cell_style = ParagraphStyle(
-        "fiche_compliance_cell", parent=styles["Normal"], fontSize=8.5,
+        "fiche_compliance_cell",
+        parent=styles["Normal"],
+        fontSize=8.5,
         leading=11,
     )
     result_style = ParagraphStyle(
-        "fiche_compliance_result", parent=styles["Normal"], fontSize=8.5,
+        "fiche_compliance_result",
+        parent=styles["Normal"],
+        fontSize=8.5,
         leading=11,
     )
 
     def _result_markup(status: str) -> str:
         if status == "pass":
             return (
-                f"<font color='{_VERDICT_OK_HEX}'>&#9679; "
-                f"{t('PASS', language)}</font>"
+                f"<font color='{_VERDICT_OK_HEX}'>&#9679; {t('PASS', language)}</font>"
             )
         if status == "fail":
             return (
-                f"<font color='{_VERDICT_BAD_HEX}'>&#9679; "
-                f"{t('FAIL', language)}</font>"
+                f"<font color='{_VERDICT_BAD_HEX}'>&#9679; {t('FAIL', language)}</font>"
             )
         return f"<font color='{_MUTED_HEX}'>&#8211;</font>"
 
@@ -608,14 +644,24 @@ def analysis_cell_styles(prefix: str) -> tuple[Any, Any, Any]:
 
     styles = getSampleStyleSheet()
     header_style = ParagraphStyle(
-        f"{prefix}_thead", parent=styles["Normal"], fontSize=8.5, leading=11,
-        textColor=colors.white, alignment=1,
+        f"{prefix}_thead",
+        parent=styles["Normal"],
+        fontSize=8.5,
+        leading=11,
+        textColor=colors.white,
+        alignment=1,
     )
     label_style = ParagraphStyle(
-        f"{prefix}_label", parent=styles["Normal"], fontSize=8.5, leading=11,
+        f"{prefix}_label",
+        parent=styles["Normal"],
+        fontSize=8.5,
+        leading=11,
     )
     value_style = ParagraphStyle(
-        f"{prefix}_value", parent=styles["Normal"], fontSize=8.5, leading=11,
+        f"{prefix}_value",
+        parent=styles["Normal"],
+        fontSize=8.5,
+        leading=11,
         alignment=1,
     )
     return header_style, label_style, value_style
@@ -634,12 +680,10 @@ def exceedance_markup(exceeded: bool | None, language: str = "en") -> str:
         return f"<font color='{_MUTED_HEX}'>&#8211;</font>"
     if exceeded:
         return (
-            f"<font color='{_VERDICT_BAD_HEX}'>&#9679; "
-            f"{t('Exceeded', language)}</font>"
+            f"<font color='{_VERDICT_BAD_HEX}'>&#9679; {t('Exceeded', language)}</font>"
         )
     return (
-        f"<font color='{_VERDICT_OK_HEX}'>&#9679; "
-        f"{t('Not exceeded', language)}</font>"
+        f"<font color='{_VERDICT_OK_HEX}'>&#9679; {t('Not exceeded', language)}</font>"
     )
 
 
@@ -692,14 +736,20 @@ def result_box(
     from reportlab.platypus import Table, TableStyle
 
     result_style = ParagraphStyle(
-        "fiche_result", parent=styles["Normal"], fontSize=13, leading=17,
+        "fiche_result",
+        parent=styles["Normal"],
+        fontSize=13,
+        leading=17,
         textColor=accent,
     )
     box_cells: list[Any] = [fiche_paragraph(statement, result_style)]
     box_widths = [174 * mm]
     if extended:
         ext_style = ParagraphStyle(
-            "fiche_ext", parent=styles["Normal"], fontSize=8.5, leading=12,
+            "fiche_ext",
+            parent=styles["Normal"],
+            fontSize=8.5,
+            leading=12,
         )
         box_cells = [
             fiche_paragraph(statement, result_style),
@@ -737,14 +787,16 @@ def verdict_flow(
     badge = t("PASS", language) if passed else t("FAIL", language)
     badge_hex = _VERDICT_OK_HEX if passed else _VERDICT_BAD_HEX
     verdict_style = ParagraphStyle(
-        "fiche_verdict", parent=styles["Normal"], fontSize=10, leading=14,
+        "fiche_verdict",
+        parent=styles["Normal"],
+        fontSize=10,
+        leading=14,
         spaceBefore=4,
     )
     lead = t("Result vs requirement", language)
     return [
         fiche_paragraph(
-            f"{lead}: {text} &#8594; "
-            f"<b><font color='{badge_hex}'>{badge}</font></b>",
+            f"{lead}: {text} &#8594; <b><font color='{badge_hex}'>{badge}</font></b>",
             verdict_style,
         )
     ]
@@ -773,14 +825,23 @@ def footer_flow(
     muted = colors.HexColor(_MUTED_HEX)
 
     ident_style = ParagraphStyle(
-        "fiche_footer", parent=styles["Normal"], fontSize=8.5, leading=12,
+        "fiche_footer",
+        parent=styles["Normal"],
+        fontSize=8.5,
+        leading=12,
     )
     sign_style = ParagraphStyle(
-        "fiche_sign", parent=styles["Normal"], fontSize=8.5, leading=16,
+        "fiche_sign",
+        parent=styles["Normal"],
+        fontSize=8.5,
+        leading=16,
     )
     disclaimer_style = ParagraphStyle(
-        "fiche_disclaimer", parent=styles["Normal"], fontSize=8,
-        textColor=muted, leading=11,
+        "fiche_disclaimer",
+        parent=styles["Normal"],
+        fontSize=8,
+        textColor=muted,
+        leading=11,
     )
 
     signature = t("Signature", language)
@@ -796,18 +857,15 @@ def footer_flow(
             )
         if metadata.report_id:
             lines.append(
-                f"<b>{t('Report no.', language)}:</b> "
-                f"{html.escape(metadata.report_id)}"
+                f"<b>{t('Report no.', language)}:</b> {html.escape(metadata.report_id)}"
             )
         if metadata.test_date:
             lines.append(
-                f"<b>{t('Date', language)}:</b> "
-                f"{html.escape(metadata.test_date)}"
+                f"<b>{t('Date', language)}:</b> {html.escape(metadata.test_date)}"
             )
         if metadata.notes:
             lines.append(
-                f"<b>{t('Notes', language)}:</b> "
-                f"{html.escape(metadata.notes)}"
+                f"<b>{t('Notes', language)}:</b> {html.escape(metadata.notes)}"
             )
     for line in lines:
         flow.append(fiche_paragraph(line, ident_style))
@@ -829,8 +887,7 @@ def footer_flow(
     flow.append(Spacer(1, 4))
     flow.append(
         fiche_paragraph(
-            f"<font color='{_ACCENT_HEX}'>&#9632;</font> "
-            f"{t(disclaimer, language)}",
+            f"<font color='{_ACCENT_HEX}'>&#9632;</font> {t(disclaimer, language)}",
             disclaimer_style,
         )
     )

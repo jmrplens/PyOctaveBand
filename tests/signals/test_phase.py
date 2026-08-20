@@ -133,9 +133,7 @@ def test_allpass_group_delay_closed_form() -> None:
     omega = _digital_grid()
     _, response = sp_signal.freqz([a_coef, 1.0], [1.0, a_coef], worN=omega)
     tau = ph.signals.group_delay(response, FS)  # seconds
-    expected = (1.0 - a_coef**2) / (
-        1.0 + 2.0 * a_coef * np.cos(omega) + a_coef**2
-    ) / FS
+    expected = (1.0 - a_coef**2) / (1.0 + 2.0 * a_coef * np.cos(omega) + a_coef**2) / FS
     # Central differences on this grid resolve the closed form to about
     # 1e-5 samples.
     np.testing.assert_allclose(tau, expected, atol=1e-5 / FS)

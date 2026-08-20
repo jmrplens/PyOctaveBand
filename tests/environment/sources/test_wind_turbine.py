@@ -90,7 +90,9 @@ def test_low_frequency_fixed_critical_band() -> None:
     res = wind_turbine_tonality(levels, freqs, tone_frequency=40.0)
     # Only the 40 Hz tone survives -> single tone line, masking noise = 30 dB.
     assert res.tone_level == pytest.approx(60.0, abs=0.05)
-    assert res.masking_level == pytest.approx(30.0 + 10.0 * np.log10(100.0 / 3.0), abs=0.05)
+    assert res.masking_level == pytest.approx(
+        30.0 + 10.0 * np.log10(100.0 / 3.0), abs=0.05
+    )
 
 
 def test_non_contiguous_tone_lines_counted() -> None:
@@ -148,8 +150,7 @@ def test_tonal_audibility_plot_smoke_and_export() -> None:
     # them (no duplicate-keyword TypeError).
     assert res.plot(lw=2.0, label="spectrum") is not None
     assert (
-        phonometry.environment.apparent_sound_power_level
-        is apparent_sound_power_level
+        phonometry.environment.apparent_sound_power_level is apparent_sound_power_level
     )
 
 

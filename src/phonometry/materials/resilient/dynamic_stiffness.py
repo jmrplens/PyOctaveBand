@@ -157,7 +157,9 @@ def enclosed_gas_stiffness(
         this reduces to :math:`s'_\mathrm{a} = 111/d` MN/m3 for ``d`` in millimetres
         (clause 8.2 NOTE).
     """
-    atmospheric_pressure = require_positive(atmospheric_pressure, "atmospheric_pressure")
+    atmospheric_pressure = require_positive(
+        atmospheric_pressure, "atmospheric_pressure"
+    )
     if not 0.0 < porosity <= 1.0:
         raise ValueError("'porosity' must be in the range (0, 1].")
     d = np.asarray(thickness, dtype=np.float64)
@@ -271,7 +273,9 @@ class DynamicStiffnessResult:
     floor_mass_per_area: float
     natural_frequency: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot ``f0(s')`` with this design point marked.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -382,7 +386,9 @@ def floating_floor_resonance(
     :param atmospheric_pressure: Atmospheric pressure ``p0``, in pascals.
     :return: The :class:`DynamicStiffnessResult`.
     """
-    s_apparent = float(apparent_dynamic_stiffness(resonant_frequency, total_mass_per_area))
+    s_apparent = float(
+        apparent_dynamic_stiffness(resonant_frequency, total_mass_per_area)
+    )
     s_gas = 0.0
     if airflow_resistivity < _HIGH_RESISTIVITY:
         if thickness is None or porosity is None:

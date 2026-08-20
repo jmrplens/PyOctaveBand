@@ -189,17 +189,26 @@ def render_iso16283_report(
         if is_impact:
             impact_result = cast("ImpactInsulationResult", result)
             chain: list[Column] = [
-                ("L<sub>i</sub> [dB]",
-                 np.asarray(impact_result.li, dtype=np.float64), 1),
+                (
+                    "L<sub>i</sub> [dB]",
+                    np.asarray(impact_result.li, dtype=np.float64),
+                    1,
+                ),
                 ("T [s]", np.asarray(impact_result.t2, dtype=np.float64), 2),
             ]
         else:
             airborne_result = cast("AirborneInsulationResult", result)
             chain = [
-                ("L<sub>1</sub> [dB]",
-                 np.asarray(airborne_result.l1, dtype=np.float64), 1),
-                ("L<sub>2</sub> [dB]",
-                 np.asarray(airborne_result.l2, dtype=np.float64), 1),
+                (
+                    "L<sub>1</sub> [dB]",
+                    np.asarray(airborne_result.l1, dtype=np.float64),
+                    1,
+                ),
+                (
+                    "L<sub>2</sub> [dB]",
+                    np.asarray(airborne_result.l2, dtype=np.float64),
+                    1,
+                ),
                 ("T [s]", np.asarray(airborne_result.t2, dtype=np.float64), 2),
             ]
         columns = chain + [(value_header, curve, 1)]
@@ -213,7 +222,9 @@ def render_iso16283_report(
         return columns, caption, col_widths
 
     return render_insulation_fiche(
-        result, rating, path,
+        result,
+        rating,
+        path,
         spec=spec,
         is_impact=is_impact,
         curve_attr=quantity,
@@ -324,7 +335,9 @@ def render_iso16283_facade_report(
         spec_key = "r_prime_tr"
     spec = _FACADE_SPECS[spec_key]
     return render_insulation_fiche(
-        result, rating, path,
+        result,
+        rating,
+        path,
         spec=spec,
         is_impact=False,
         curve_attr=quantity,

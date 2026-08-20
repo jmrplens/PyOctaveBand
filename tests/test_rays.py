@@ -69,24 +69,33 @@ _ISO = (np.array([0.0, 1000.0]), np.array([1500.0, 1500.0]))
 #: Constant gradient, 0.02 s^-1.
 _GRAD = (np.array([0.0, 1000.0]), np.array([1500.0, 1520.0]))
 #: A thermocline: three segments, so two nodes where dc/dz jumps hard.
-_KINK = (np.array([0.0, 100.0, 300.0, 1000.0]),
-         np.array([1500.0, 1510.0, 1488.0, 1512.0]))
+_KINK = (
+    np.array([0.0, 100.0, 300.0, 1000.0]),
+    np.array([1500.0, 1510.0, 1488.0, 1512.0]),
+)
 #: A downwind atmosphere sampled to 200 m, 0.05 s^-1, and homogeneous above it:
 #: the shape the marcher meets with no boundary over it, where the last node of
 #: the profile is an ordinary kink rather than the top of the medium.
 _CAPPED_GRADIENT = 0.05
 _CAPPED_HEIGHT = 200.0
 _CAPPED_SOURCE = 5.0
-_CAPPED = (np.array([0.0, _CAPPED_HEIGHT]),
-           np.array([340.0, 340.0 + _CAPPED_GRADIENT * _CAPPED_HEIGHT]))
+_CAPPED = (
+    np.array([0.0, _CAPPED_HEIGHT]),
+    np.array([340.0, 340.0 + _CAPPED_GRADIENT * _CAPPED_HEIGHT]),
+)
 
 
 def _march(
-    profile: tuple[np.ndarray, np.ndarray], source_depth: float,
-    angles_deg: list[float], *, max_range: float, n_steps: int,
+    profile: tuple[np.ndarray, np.ndarray],
+    source_depth: float,
+    angles_deg: list[float],
+    *,
+    max_range: float,
+    n_steps: int,
     water_depth: float | None = 1000.0,
     spreading: complex | np.ndarray | None = None,
-    slope: complex | np.ndarray | None = None, dynamic: bool = True,
+    slope: complex | np.ndarray | None = None,
+    dynamic: bool = True,
 ) -> tuple[RayMarch, np.ndarray]:
     """Trace a fan through ``profile``, optionally carrying (q, p).
 
@@ -110,32 +119,54 @@ def _march(
     xi = np.cos(th) / c0
 
     def deriv(
-        z_arr: np.ndarray, zeta_arr: np.ndarray, xi_arr: np.ndarray, /,
+        z_arr: np.ndarray,
+        zeta_arr: np.ndarray,
+        xi_arr: np.ndarray,
+        /,
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         cc = np.interp(z_arr, z_prof, c_prof)
-        seg = np.where(zeta_arr >= 0.0,
-                       np.searchsorted(z_prof, z_arr, side="right") - 1,
-                       np.searchsorted(z_prof, z_arr, side="left") - 1)
+        seg = np.where(
+            zeta_arr >= 0.0,
+            np.searchsorted(z_prof, z_arr, side="right") - 1,
+            np.searchsorted(z_prof, z_arr, side="left") - 1,
+        )
         grad = seg_grad[np.clip(seg, 0, seg_grad.size - 1)]
         if open_above:
             grad = np.where(z_arr > top, 0.0, grad)
-        return (zeta_arr / xi_arr, -grad / (cc**3 * xi_arr),
-                1.0 / (xi_arr * cc**2), 1.0 / (xi_arr * cc))
+        return (
+            zeta_arr / xi_arr,
+            -grad / (cc**3 * xi_arr),
+            1.0 / (xi_arr * cc**2),
+            1.0 / (xi_arr * cc),
+        )
 
     dyn = None
     if dynamic:
         q0 = np.zeros(th.size) if spreading is None else np.full(th.size, spreading)
         p0 = np.full(th.size, 1.0 / c0) if slope is None else np.full(th.size, slope)
         dyn = DynamicRays(q0, p0, z_prof, c_prof)
-    march = march_rays(deriv, xi=xi, z0=np.full(th.size, float(source_depth)),
-                       zeta0=np.sin(th) / c0, range_step=max_range / (n_steps - 1),
-                       n_steps=n_steps, lower=0.0, upper=water_depth, dynamic=dyn)
+    march = march_rays(
+        deriv,
+        xi=xi,
+        z0=np.full(th.size, float(source_depth)),
+        zeta0=np.sin(th) / c0,
+        range_step=max_range / (n_steps - 1),
+        n_steps=n_steps,
+        lower=0.0,
+        upper=water_depth,
+        dynamic=dyn,
+    )
     return march, xi
 
 
 def _jacobian_spreading(
-    profile: tuple[np.ndarray, np.ndarray], source_depth: float, angle_deg: float,
-    *, max_range: float, n_steps: int, water_depth: float | None = 1000.0,
+    profile: tuple[np.ndarray, np.ndarray],
+    source_depth: float,
+    angle_deg: float,
+    *,
+    max_range: float,
+    n_steps: int,
+    water_depth: float | None = 1000.0,
     delta_deg: float = 1e-4,
 ) -> np.ndarray:
     """``q`` read off the ray family: ``c xi dz/dtheta0`` at fixed range.
@@ -148,13 +179,11 @@ def _jacobian_spreading(
     and swamps the quantity under test.
     """
     z_prof, c_prof = profile
-    kw = {"max_range": max_range, "n_steps": n_steps,
-          "water_depth": water_depth}
+    kw = {"max_range": max_range, "n_steps": n_steps, "water_depth": water_depth}
     mid, xi = _march(profile, source_depth, [angle_deg], **kw)
     hi, _ = _march(profile, source_depth, [angle_deg + delta_deg], **kw)
     lo, _ = _march(profile, source_depth, [angle_deg - delta_deg], **kw)
-    dz_dtheta = ((hi.positions[0] - lo.positions[0])
-                 / (2.0 * np.radians(delta_deg)))
+    dz_dtheta = (hi.positions[0] - lo.positions[0]) / (2.0 * np.radians(delta_deg))
     parity = (-1.0) ** np.cumsum(mid.reflections[0])
     return parity * np.interp(mid.positions[0], z_prof, c_prof) * xi[0] * dz_dtheta
 
@@ -165,7 +194,8 @@ def _jacobian_spreading(
 @pytest.mark.parametrize("profile", [_ISO, _GRAD], ids=["isovelocity", "gradient"])
 @pytest.mark.parametrize("angle", [-7.0, -3.0, 0.0, 4.0, 8.0])
 def test_spreading_is_range_over_cosine_where_the_profile_has_no_curvature(
-    profile: tuple[np.ndarray, np.ndarray], angle: float,
+    profile: tuple[np.ndarray, np.ndarray],
+    angle: float,
 ) -> None:
     # Both profiles have c'' = 0 everywhere, so p never moves and q is exactly
     # r / cos(theta0) (see the module docstring). The angles are shallow enough
@@ -265,8 +295,14 @@ def test_the_two_boundaries_are_counted_apart_and_add_up_to_the_total() -> None:
 def test_a_medium_open_above_never_reports_an_upper_reflection() -> None:
     # The atmosphere has no boundary over it, so every bounce is the ground's
     # and the upper counter stays empty however far the rays climb.
-    march, _ = _march(_CAPPED, _CAPPED_SOURCE, [-6.0, 3.0, 30.0],
-                      max_range=8000.0, n_steps=801, water_depth=None)
+    march, _ = _march(
+        _CAPPED,
+        _CAPPED_SOURCE,
+        [-6.0, 3.0, 30.0],
+        max_range=8000.0,
+        n_steps=801,
+        water_depth=None,
+    )
     assert march.reflections.sum() > 0
     assert march.upper_reflections.sum() == 0
 
@@ -297,8 +333,9 @@ def test_arc_length_only_grows_and_never_undercuts_the_range() -> None:
     # thermocline's kinks, its turning points and its bounces change the local
     # obliquity, never the sign or the bound.
     rmax, ns = 8000.0, 801
-    march, _ = _march(_KINK, 500.0, [-40.0, -12.0, 0.0, 9.0, 33.0],
-                      max_range=rmax, n_steps=ns)
+    march, _ = _march(
+        _KINK, 500.0, [-40.0, -12.0, 0.0, 9.0, 33.0], max_range=rmax, n_steps=ns
+    )
     r = np.linspace(0.0, rmax, ns)
     assert np.all(np.diff(march.arc_lengths, axis=1) > 0.0)
     assert np.all(march.arc_lengths >= r[None, :] - 1e-9)
@@ -308,8 +345,13 @@ def test_arc_length_only_grows_and_never_undercuts_the_range() -> None:
 
 
 def _smooth_reference(
-    c0: float, a: float, b: float, source_depth: float, angle_deg: float,
-    max_range: float, n_steps: int,
+    c0: float,
+    a: float,
+    b: float,
+    source_depth: float,
+    angle_deg: float,
+    max_range: float,
+    n_steps: int,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Integrate the *smooth* equations for ``c(z) = c0 + a z + b z^2``.
 
@@ -324,13 +366,23 @@ def _smooth_reference(
     def rhs(_r: float, y: np.ndarray) -> list[float]:
         z, zeta, q, p = y
         cc = c0 + a * z + b * z * z
-        return [zeta / xi, -(a + 2 * b * z) / (cc**3 * xi), p / xi,
-                -xi * (2 * b) * q / cc]
+        return [
+            zeta / xi,
+            -(a + 2 * b * z) / (cc**3 * xi),
+            p / xi,
+            -xi * (2 * b) * q / cc,
+        ]
 
     ranges = np.linspace(0.0, max_range, n_steps)
-    sol = solve_ivp(rhs, (0.0, max_range),
-                    [source_depth, np.sin(th) / c_s, 0.0, 1.0 / c_s],
-                    t_eval=ranges, rtol=1e-12, atol=1e-14, method="DOP853")
+    sol = solve_ivp(
+        rhs,
+        (0.0, max_range),
+        [source_depth, np.sin(th) / c_s, 0.0, 1.0 / c_s],
+        t_eval=ranges,
+        rtol=1e-12,
+        atol=1e-14,
+        method="DOP853",
+    )
     return sol.y[0], sol.y[2]
 
 
@@ -378,7 +430,7 @@ def test_the_spreading_is_continuous_across_a_node_and_its_slope_is_not() -> Non
     assert treads.size == 2, "one impulse per node crossed, and no more"
     # Between them p does not move at all: c'' is identically zero inside a
     # segment, so nothing but a node may touch it.
-    assert np.ptp(p[treads[0] + 1:treads[1] + 1]) == 0.0
+    assert np.ptp(p[treads[0] + 1 : treads[1] + 1]) == 0.0
     # q meanwhile has no seam: a jump in it would stand out by three orders of
     # magnitude against the per-step increment, which is all the slope change
     # amounts to.
@@ -388,7 +440,8 @@ def test_the_spreading_is_continuous_across_a_node_and_its_slope_is_not() -> Non
 
 
 def _capped_layer_paths(
-    angle_deg: float, ranges: np.ndarray,
+    angle_deg: float,
+    ranges: np.ndarray,
 ) -> tuple[np.ndarray, float]:
     """``z(r)`` in closed form for a gradient layer under a homogeneous cap.
 
@@ -419,7 +472,9 @@ def _capped_layer_paths(
 
 
 def _capped_layer_spreading(
-    angle_deg: float, ranges: np.ndarray, delta_deg: float = 1e-3,
+    angle_deg: float,
+    ranges: np.ndarray,
+    delta_deg: float = 1e-3,
 ) -> np.ndarray:
     """``q = c(z) xi dz/dtheta0`` at fixed range, off the closed-form family.
 
@@ -434,8 +489,7 @@ def _capped_layer_spreading(
     return c_at * xi * (hi - lo) / (2.0 * np.radians(delta_deg))
 
 
-def test_the_last_node_of_an_open_medium_kinks_the_spreading_like_any_other(
-) -> None:
+def test_the_last_node_of_an_open_medium_kinks_the_spreading_like_any_other() -> None:
     # A medium with no boundary above ends its profile in mid air: the caller
     # reads the sound speed off a clamped interpolation, so past the last node
     # the medium is homogeneous and that node is a discontinuity of dc/dz the
@@ -447,14 +501,19 @@ def test_the_last_node_of_an_open_medium_kinks_the_spreading_like_any_other(
     errors = []
     for ns in (201, 1601):
         ranges = np.linspace(0.0, rmax, ns)
-        march, _ = _march(_CAPPED, _CAPPED_SOURCE, [25.0], max_range=rmax,
-                          n_steps=ns, water_depth=None)
+        march, _ = _march(
+            _CAPPED,
+            _CAPPED_SOURCE,
+            [25.0],
+            max_range=rmax,
+            n_steps=ns,
+            water_depth=None,
+        )
         oracle = _capped_layer_spreading(25.0, ranges)
         assert march.positions.max() > _CAPPED_HEIGHT, "the ray must leave it"
         assert march.reflections.sum() == 0
         assert march.spreadings is not None
-        errors.append(float(np.max(np.abs(march.spreadings[0][1:] / oracle[1:]
-                                          - 1.0))))
+        errors.append(float(np.max(np.abs(march.spreadings[0][1:] / oracle[1:] - 1.0))))
     # Refining the march drives it onto the family, which is the signature of a
     # crossing resolved at the right range rather than one merely accounted for.
     assert errors[0] < 1e-4
@@ -472,13 +531,18 @@ def test_the_last_node_of_an_open_medium_kinks_the_spreading_like_any_other(
 def _capped_layer_error(angle_deg: float, n_steps: int, max_range: float) -> float:
     """How far the marched ``q`` sits from the closed-form family, relatively."""
     ranges = np.linspace(0.0, max_range, n_steps)
-    march, _ = _march(_CAPPED, _CAPPED_SOURCE, [angle_deg], max_range=max_range,
-                      n_steps=n_steps, water_depth=None)
+    march, _ = _march(
+        _CAPPED,
+        _CAPPED_SOURCE,
+        [angle_deg],
+        max_range=max_range,
+        n_steps=n_steps,
+        water_depth=None,
+    )
     oracle = _capped_layer_spreading(angle_deg, ranges)
     assert march.positions.max() > _CAPPED_HEIGHT, "the ray must cross the cap"
     assert march.spreadings is not None
-    return float(np.max(np.abs(march.spreadings[0] - oracle))
-                 / np.max(np.abs(oracle)))
+    return float(np.max(np.abs(march.spreadings[0] - oracle)) / np.max(np.abs(oracle)))
 
 
 def test_a_near_tangential_crossing_costs_what_a_square_one_does_not() -> None:
@@ -491,8 +555,9 @@ def test_a_near_tangential_crossing_costs_what_a_square_one_does_not() -> None:
     # the numbers in the module docstring honest, and what would catch a
     # sub-step that stopped landing on the node at all.
     rmax, coarse, fine = 4000.0, 401, 1601
-    grazing = np.degrees(np.arccos(
-        (_CAPPED[1][0] + _CAPPED_GRADIENT * _CAPPED_SOURCE) / _CAPPED[1][1]))
+    grazing = np.degrees(
+        np.arccos((_CAPPED[1][0] + _CAPPED_GRADIENT * _CAPPED_SOURCE) / _CAPPED[1][1])
+    )
     tangential = _capped_layer_error(grazing + 0.01, coarse, rmax)
     square = _capped_layer_error(25.0, coarse, rmax)
     assert square < 2e-4
@@ -539,8 +604,7 @@ def test_complex_initial_conditions_ride_the_same_linear_march() -> None:
 
 
 def test_a_march_without_dynamics_reports_no_spreading() -> None:
-    march, _ = _march(_KINK, 200.0, [3.0], max_range=1000.0, n_steps=51,
-                      dynamic=False)
+    march, _ = _march(_KINK, 200.0, [3.0], max_range=1000.0, n_steps=51, dynamic=False)
     assert march.spreadings is None
     assert march.spreading_slopes is None
 
@@ -554,26 +618,70 @@ def test_a_march_without_dynamics_reports_no_spreading() -> None:
 #: march split its steps at the profile nodes. The run was verified equal
 #: bit for bit at the time; the tolerance here is for the last-place libm
 #: differences between machines that the figure gate already allows for.
-_ATMOSPHERIC_HEIGHTS = np.array([
-    [20.0, 75.37324473692166, 141.82670785541063, 196.3062831902225,
-     245.5334411479058],
-    [20.0, 48.98105414984245, 100.9594954419497, 136.19175149790775,
-     159.48089515475627],
-    [20.0, 46.16660103940749, 33.340746708386284, 40.777097915517544,
-     115.13013126048429],
-    [20.0, 163.50943267713717, 296.6995242873955, 429.5415876471756,
-     562.3836510069547],
-])
-_ATMOSPHERIC_TIMES = np.array([
-    [0.0, 2.190434863741247, 4.362559980742843, 6.529099115036047,
-     8.693532228182598],
-    [0.0, 2.1763756856459073, 4.333177746652069, 6.484261180638386,
-     8.632625345886305],
-    [0.0, 2.1699828083316524, 4.33778562968088, 6.517628075077829,
-     8.678149616330794],
-    [0.0, 2.2024794486058665, 4.39406281050967, 6.585306571214145,
-     8.776550331918637],
-])
+_ATMOSPHERIC_HEIGHTS = np.array(
+    [
+        [
+            20.0,
+            75.37324473692166,
+            141.82670785541063,
+            196.3062831902225,
+            245.5334411479058,
+        ],
+        [
+            20.0,
+            48.98105414984245,
+            100.9594954419497,
+            136.19175149790775,
+            159.48089515475627,
+        ],
+        [
+            20.0,
+            46.16660103940749,
+            33.340746708386284,
+            40.777097915517544,
+            115.13013126048429,
+        ],
+        [
+            20.0,
+            163.50943267713717,
+            296.6995242873955,
+            429.5415876471756,
+            562.3836510069547,
+        ],
+    ]
+)
+_ATMOSPHERIC_TIMES = np.array(
+    [
+        [
+            0.0,
+            2.190434863741247,
+            4.362559980742843,
+            6.529099115036047,
+            8.693532228182598,
+        ],
+        [
+            0.0,
+            2.1763756856459073,
+            4.333177746652069,
+            6.484261180638386,
+            8.632625345886305,
+        ],
+        [
+            0.0,
+            2.1699828083316524,
+            4.33778562968088,
+            6.517628075077829,
+            8.678149616330794,
+        ],
+        [
+            0.0,
+            2.2024794486058665,
+            4.39406281050967,
+            6.585306571214145,
+            8.776550331918637,
+        ],
+    ]
+)
 
 
 def test_atmospheric_ray_paths_are_untouched_by_the_dynamic_states() -> None:
@@ -583,9 +691,13 @@ def test_atmospheric_ray_paths_are_untouched_by_the_dynamic_states() -> None:
     )
 
     profile = log_linear_sound_speed_profile(1.0, max_height=200.0, n_points=64)
-    res = atmospheric_ray_paths(profile, source_height=20.0,
-                                launch_angles_deg=[-8.0, -2.0, 4.0, 12.0],
-                                max_range=3000.0, n_steps=201)
+    res = atmospheric_ray_paths(
+        profile,
+        source_height=20.0,
+        launch_angles_deg=[-8.0, -2.0, 4.0, 12.0],
+        max_range=3000.0,
+        n_steps=201,
+    )
     assert np.allclose(res.heights[:, ::50], _ATMOSPHERIC_HEIGHTS, rtol=1e-12)
     assert np.allclose(res.travel_times[:, ::50], _ATMOSPHERIC_TIMES, rtol=1e-12)
     assert np.array_equal(res.ground_reflections, [1, 1, 1, 0])

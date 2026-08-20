@@ -8,6 +8,7 @@ import os
 # Set at import time so it takes effect before any test module imports pyplot.
 os.environ.setdefault("MPLBACKEND", "Agg")
 
+
 def pytest_configure(config):
     """
     Configure environment variables for the test session.

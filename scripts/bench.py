@@ -47,16 +47,26 @@ def airport_inputs() -> dict[str, Any]:
     """A small departure scenario for the ECAC Doc 29 contour chain."""
     xs = np.linspace(0.0, 12000.0, 13)
     path = np.column_stack(
-        [xs, np.zeros_like(xs), np.clip((xs - 1500.0) * 0.10, 0.0, 1800.0),
-         np.where(xs < 3000.0, 12000.0, 10000.0), np.full_like(xs, 82.311)])
+        [
+            xs,
+            np.zeros_like(xs),
+            np.clip((xs - 1500.0) * 0.10, 0.0, 1800.0),
+            np.where(xs < 3000.0, 12000.0, 10000.0),
+            np.full_like(xs, 82.311),
+        ]
+    )
     return {
         "path": path,
         "powers": [8000.0, 12000.0],
         "distances": [60.0, 120.0, 240.0, 480.0, 960.0, 1920.0, 3840.0],
-        "sel": [[98.0, 92.0, 86.0, 80.0, 74.0, 68.0, 62.0],
-                [104.0, 98.0, 92.0, 86.0, 80.0, 74.0, 68.0]],
-        "lmax": [[94.0, 88.0, 82.0, 76.0, 70.0, 64.0, 58.0],
-                 [100.0, 94.0, 88.0, 82.0, 76.0, 70.0, 64.0]],
+        "sel": [
+            [98.0, 92.0, 86.0, 80.0, 74.0, 68.0, 62.0],
+            [104.0, 98.0, 92.0, 86.0, 80.0, 74.0, 68.0],
+        ],
+        "lmax": [
+            [94.0, 88.0, 82.0, 76.0, 70.0, 64.0, 58.0],
+            [100.0, 94.0, 88.0, 82.0, 76.0, 70.0, 64.0],
+        ],
         "grid_x": np.linspace(-2000.0, 14000.0, 10),
         "grid_y": np.linspace(-4000.0, 4000.0, 8),
         "observer": [2000.0, 500.0, 0.0],
@@ -75,30 +85,45 @@ def hemisphere_inputs() -> dict[str, Any]:
     a_r = np.radians(az)[:, None, None]
     p_r = np.radians(po)[None, :, None]
     band = np.arange(fr.size)[None, None, :]
-    levels = (80.0 + 6.0 * np.sin(p_r) * np.cos(a_r) - 3.0 * band
-              + 0.5 * np.cos(3.0 * p_r))
+    levels = (
+        80.0 + 6.0 * np.sin(p_r) * np.cos(a_r) - 3.0 * band + 0.5 * np.cos(3.0 * p_r)
+    )
     # Out-of-coverage wedge (as in real measured hemispheres) and a tie hole.
-    levels[az < -55.0, :, :] = np.nan          # port wedge unmeasured
-    levels[:, po < 25.0, :] = np.nan           # forward cap unmeasured
+    levels[az < -55.0, :, :] = np.nan  # port wedge unmeasured
+    levels[:, po < 25.0, :] = np.nan  # forward cap unmeasured
     levels[az == 0.0, po == 90.0, 0] = np.nan  # 4-way-tie hole, 500 Hz band
     queries = [(0.0, 90.0), (5.0, 85.0), (-45.0, 120.0), (88.0, 178.0), (0.0, 25.0)]
-    return {"frequencies": fr, "azimuth": az, "polar": po, "levels": levels,
-            "queries": queries}
+    return {
+        "frequencies": fr,
+        "azimuth": az,
+        "polar": po,
+        "levels": levels,
+        "queries": queries,
+    }
 
 
 def pe_inputs() -> dict[str, Any]:
     """Isovelocity duct for the parabolic-equation marching solver."""
-    return {"frequency_hz": 100.0, "depths": [0.0, 1000.0],
-            "sound_speeds": [1500.0, 1500.0], "source_depth": 50.0,
-            "max_range": 3000.0, "range_step": 20.0, "n_depth_points": 256}
+    return {
+        "frequency_hz": 100.0,
+        "depths": [0.0, 1000.0],
+        "sound_speeds": [1500.0, 1500.0],
+        "source_depth": 50.0,
+        "max_range": 3000.0,
+        "range_step": 20.0,
+        "n_depth_points": 256,
+    }
 
 
 def ecma_signal() -> tuple[np.ndarray, float]:
     """A 0.5 s two-tone signal for the ECMA-418-2 analysers."""
     fs = 48000.0
     t = np.arange(int(0.5 * fs)) / fs
-    sig = 0.08 * np.sin(2.0 * np.pi * 1000.0 * t) * (
-        1.0 + 0.6 * np.sin(2.0 * np.pi * 70.0 * t))
+    sig = (
+        0.08
+        * np.sin(2.0 * np.pi * 1000.0 * t)
+        * (1.0 + 0.6 * np.sin(2.0 * np.pi * 70.0 * t))
+    )
     return sig, fs
 
 
@@ -152,9 +177,7 @@ def run_npd_batch() -> np.ndarray:
     a = airport_inputs()
     q = np.array([75.0, 150.0, 300.0, 600.0, 1200.0, 2400.0, 5000.0])
     return np.asarray(
-        ph.aircraft.npd_level(
-            a["powers"], a["distances"], a["sel"], 10000.0, q
-        )
+        ph.aircraft.npd_level(a["powers"], a["distances"], a["sel"], 10000.0, q)
     )
 
 
@@ -165,8 +188,10 @@ def run_hemisphere_queries() -> np.ndarray:
     hemi = ph.aircraft.RotorcraftHemisphere(
         h["frequencies"], h["azimuth"], h["polar"], h["levels"]
     )
-    out = [ph.aircraft.hemisphere_source_level(hemi, phi, theta)
-           for phi, theta in h["queries"]]
+    out = [
+        ph.aircraft.hemisphere_source_level(hemi, phi, theta)
+        for phi, theta in h["queries"]
+    ]
     return np.concatenate(out)
 
 
@@ -192,8 +217,9 @@ def run_ecma_loudness() -> np.ndarray:
 
     sig, fs = ecma_signal()
     res = ph.psychoacoustics.loudness_ecma(sig, fs)
-    return np.concatenate([[float(res.loudness)],
-                           np.asarray(res.specific_loudness).ravel()])
+    return np.concatenate(
+        [[float(res.loudness)], np.asarray(res.specific_loudness).ravel()]
+    )
 
 
 def run_ecma_roughness() -> np.ndarray:
@@ -201,8 +227,9 @@ def run_ecma_roughness() -> np.ndarray:
 
     sig, fs = ecma_signal()
     res = ph.psychoacoustics.roughness_ecma(sig, fs)
-    return np.concatenate([[float(res.roughness)],
-                           np.asarray(res.specific_roughness).ravel()])
+    return np.concatenate(
+        [[float(res.roughness)], np.asarray(res.specific_roughness).ravel()]
+    )
 
 
 def run_ecma_tonality() -> np.ndarray:
@@ -210,8 +237,9 @@ def run_ecma_tonality() -> np.ndarray:
 
     sig, fs = ecma_signal()
     res = ph.psychoacoustics.tonality_ecma(sig, fs)
-    return np.concatenate([[float(res.tonality)],
-                           np.asarray(res.specific_tonality).ravel()])
+    return np.concatenate(
+        [[float(res.tonality)], np.asarray(res.specific_tonality).ravel()]
+    )
 
 
 def run_vibration_weighting() -> np.ndarray:
@@ -252,8 +280,10 @@ def _bench() -> None:
         # Aim for ~1 s of total measurement, at least 3 repeats of >=1 run.
         number = max(1, int(0.35 / max(once, 1e-4)))
         best = min(timeit.repeat(fn, number=number, repeat=3)) / number
-        print(f"{name:<30} {best * 1e3:>12.2f} {3 * number:>6}   "
-              f"shape={np.asarray(out).shape}")
+        print(
+            f"{name:<30} {best * 1e3:>12.2f} {3 * number:>6}   "
+            f"shape={np.asarray(out).shape}"
+        )
 
 
 def _write_golden() -> None:
@@ -271,6 +301,7 @@ def _write_golden() -> None:
         "",
         "GOLDEN = {",
     ]
+
     def _literal(v: float) -> str:
         if np.isnan(v):
             return "np.nan"
@@ -281,7 +312,7 @@ def _write_golden() -> None:
     for name, fn in CASES.items():
         arr = np.asarray(fn(), dtype=np.float64).ravel()
         chunks = [
-            ", ".join(_literal(float(v)) for v in arr[i:i + 4])
+            ", ".join(_literal(float(v)) for v in arr[i : i + 4])
             for i in range(0, arr.size, 4)
         ]
         vals = ",\n        ".join(chunks)
@@ -304,8 +335,10 @@ def _time_figures() -> None:
     import inspect
 
     for name in sorted(dir(gg)):
-        if not name.startswith("generate_") or name in ("generate_all",
-                                                        "generate_animations"):
+        if not name.startswith("generate_") or name in (
+            "generate_all",
+            "generate_animations",
+        ):
             continue
         fn = getattr(gg, name)
         params = list(inspect.signature(fn).parameters)
@@ -319,16 +352,24 @@ def _time_figures() -> None:
     print("-" * 57)
     for dt, name in rows:
         print(f"{name:<45} {dt:>10.2f}")
-    print(f"\ntotal: {sum(dt for dt, _ in rows):.1f} s "
-          f"(single EN/light variant, {len(rows)} functions)")
+    print(
+        f"\ntotal: {sum(dt for dt, _ in rows):.1f} s "
+        f"(single EN/light variant, {len(rows)} functions)"
+    )
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--golden", action="store_true",
-                        help="rewrite tests/golden_data.py with current outputs")
-    parser.add_argument("--figures", action="store_true",
-                        help="time every figure function (EN/light) and rank them")
+    parser.add_argument(
+        "--golden",
+        action="store_true",
+        help="rewrite tests/golden_data.py with current outputs",
+    )
+    parser.add_argument(
+        "--figures",
+        action="store_true",
+        help="time every figure function (EN/light) and rank them",
+    )
     args = parser.parse_args()
     if args.golden:
         _write_golden()

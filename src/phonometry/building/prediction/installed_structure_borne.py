@@ -104,8 +104,11 @@ def _positive_real_part(values: ArrayLike, name: str) -> np.ndarray:
     """Validate that the real part of a mobility/impedance is positive."""
     arr = np.asarray(values, dtype=np.complex128)
     re = np.real(arr)
-    if (not np.all(np.isfinite(arr.real)) or not np.all(np.isfinite(arr.imag))
-            or np.any(re <= 0.0)):
+    if (
+        not np.all(np.isfinite(arr.real))
+        or not np.all(np.isfinite(arr.imag))
+        or np.any(re <= 0.0)
+    ):
         raise ValueError(
             f"'{name}' must be finite with a positive real part (a passive "
             "receiver dissipates power)."
@@ -461,8 +464,7 @@ def _table_d1_arguments(
     needs_frequency = structure in _TABLE_D1_FREQUENCY_DEPENDENT
     if needs_frequency and frequency is None:
         raise ValueError(
-            f"Table D.1 row {structure!r} depends on frequency; pass "
-            "'frequency'."
+            f"Table D.1 row {structure!r} depends on frequency; pass 'frequency'."
         )
     if not needs_frequency and frequency is not None:
         raise ValueError(
@@ -629,14 +631,28 @@ def typical_element_mobility(
 #: EN 12354-5, Table F.1: the nominal octave-band centre frequencies of the
 #: header row, in hertz. The standard prints the first as "31".
 TABLE_F1_OCTAVE_BANDS: tuple[float, ...] = (
-    31.5, 63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0,
+    31.5,
+    63.0,
+    125.0,
+    250.0,
+    500.0,
+    1000.0,
+    2000.0,
+    4000.0,
 )
 
 #: EN 12354-5, Table F.1: the force level ``L_F`` of the ISO tapping machine
 #: per octave band of :data:`TABLE_F1_OCTAVE_BANDS`, in dB re 1e-6 N
 #: (the caption prints "re 1 pN"; see ``docs/ERRATA.md``).
 TABLE_F1_FORCE_LEVEL: tuple[float, ...] = (
-    139.0, 142.0, 145.0, 148.0, 151.0, 154.0, 156.0, 156.0,
+    139.0,
+    142.0,
+    145.0,
+    148.0,
+    151.0,
+    154.0,
+    156.0,
+    156.0,
 )
 
 #: Bandwidth coefficient of the closed form printed under Table F.1:
@@ -689,14 +705,10 @@ def tapping_machine_force_level_estimate(
         "re 1 pN"; see ``docs/ERRATA.md``).
     :raises ValueError: for a non-positive frequency or an unknown bandwidth.
     """
-    band = require_choice(
-        bandwidth, "bandwidth", tuple(_TAPPING_MACHINE_COEFFICIENT)
-    )
+    band = require_choice(bandwidth, "bandwidth", tuple(_TAPPING_MACHINE_COEFFICIENT))
     f = _positive_values(frequency, "frequency")
     coefficient = _TAPPING_MACHINE_COEFFICIENT[band]
-    return np.asarray(
-        10.0 * np.log10(coefficient * f / 1.0e-12), dtype=np.float64
-    )
+    return np.asarray(10.0 * np.log10(coefficient * f / 1.0e-12), dtype=np.float64)
 
 
 def tapping_machine_characteristic_power_level(
@@ -889,9 +901,7 @@ def installed_power_from_reception_plate(
     y_i = np.abs(np.asarray(receiver_mobility, dtype=np.complex128))
     if not np.all(np.isfinite(y_i)) or np.any(y_i <= 0.0):
         raise ValueError("'receiver_mobility' must be finite and non-zero.")
-    return np.asarray(
-        lw + 10.0 * np.log10(y_i / plate_mobility), dtype=np.float64
-    )
+    return np.asarray(lw + 10.0 * np.log10(y_i / plate_mobility), dtype=np.float64)
 
 
 def installed_structure_borne_power_level(
@@ -946,7 +956,9 @@ def structure_borne_pressure_level_path(
     dsa = np.asarray(adjustment_term, dtype=np.float64)
     rij = np.asarray(flanking_reduction_index, dtype=np.float64)
     lp = (
-        lw - dsa - rij
+        lw
+        - dsa
+        - rij
         - 10.0 * np.log10(element_area / reference_area)
         - 10.0 * np.log10(reference_area / 4.0)
     )
@@ -992,7 +1004,9 @@ class InstalledSourceResult:
         lt = np.atleast_1d(np.asarray(self.total_level, dtype=np.float64))
         return float(10.0 * np.log10(np.sum(10.0 ** (0.1 * lt))))
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the per-path and total normalised sound pressure levels.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -1063,7 +1077,9 @@ class InstalledSourceResult:
 #: Keys every transmission path must carry: the adjustment term ``D_sa``, the
 #: flanking reduction index ``R_ij,ref`` and the element area ``S_i``.
 _REQUIRED_PATH_KEYS = (
-    "adjustment_term", "flanking_reduction_index", "element_area",
+    "adjustment_term",
+    "flanking_reduction_index",
+    "element_area",
 )
 #: The subset of :data:`_REQUIRED_PATH_KEYS` that may carry one value per band.
 _PER_BAND_PATH_KEYS = ("adjustment_term", "flanking_reduction_index")
@@ -1110,8 +1126,10 @@ def _path_pressure_levels(
         rows.append(
             np.broadcast_to(
                 structure_borne_pressure_level_path(
-                    lw_inst, p["adjustment_term"],
-                    p["flanking_reduction_index"], p["element_area"],
+                    lw_inst,
+                    p["adjustment_term"],
+                    p["flanking_reduction_index"],
+                    p["element_area"],
                 ),
                 (n_bands,),
             )

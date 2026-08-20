@@ -24,8 +24,22 @@ import phonometry as ph
 _TABLE_D4 = (65.3, 64.5, 58.0, 55.8)
 # ALA 16-091-4 (2016), tested to ASTM E1414/E1414M-11a: CAC 34.
 _ALA_DNC = (
-    14.4, 18.6, 21.7, 24.1, 23.4, 30.3, 33.7, 35.2,
-    41.6, 44.2, 42.1, 36.8, 35.7, 36.0, 36.9, 37.9,
+    14.4,
+    18.6,
+    21.7,
+    24.1,
+    23.4,
+    30.3,
+    33.7,
+    35.2,
+    41.6,
+    44.2,
+    42.1,
+    36.8,
+    35.7,
+    36.0,
+    36.9,
+    37.9,
 )
 
 
@@ -102,7 +116,9 @@ def test_source_check_plot_forwards_kwargs() -> None:
 @pytest.mark.parametrize("language", ["en", "es"])
 def test_standardization_plot_draws_both_spectra(language: str) -> None:
     res = ph.building.standardized_maximum_impact_level(
-        _TABLE_D4, 41.4, [1.43, 3.7, 3.1, 2.38],
+        _TABLE_D4,
+        41.4,
+        [1.43, 3.7, 3.1, 2.38],
         frequency=[63.0, 125.0, 250.0, 500.0],
     )
     ax = res.plot(language=language)
@@ -137,9 +153,7 @@ def test_rating_plot_bars_carry_the_corrected_values(language: str) -> None:
     heights = [p.get_height() for p in ax.patches]
     np.testing.assert_allclose(heights, res.corrected, atol=1e-9)
     # The rating is drawn as a horizontal line.
-    assert any(
-        np.allclose(ln.get_ydata(), float(res.rating)) for ln in ax.lines
-    )
+    assert any(np.allclose(ln.get_ydata(), float(res.rating)) for ln in ax.lines)
 
 
 def test_rating_plot_third_octave_has_twelve_bars() -> None:
@@ -211,9 +225,7 @@ def test_plenum_plot_without_frequencies_uses_band_indices() -> None:
 
 
 def test_plenum_plot_of_the_attenuated_model() -> None:
-    res = _plenum(
-        attenuation_source=[0.3] * 5, attenuation_receiving=[0.3] * 5
-    )
+    res = _plenum(attenuation_source=[0.3] * 5, attenuation_receiving=[0.3] * 5)
     assert res.model == "attenuated"
     ax = res.plot()
     values = [ln.get_ydata() for ln in ax.lines]
@@ -281,12 +293,8 @@ def test_wall_tie_plot_forwards_kwargs() -> None:
 @pytest.mark.parametrize(
     "factory",
     [
-        lambda: ph.building.check_heavy_impact_source(
-            [39.0, 31.0, 23.0, 17.0, 12.5]
-        ),
-        lambda: ph.building.standardized_maximum_impact_level(
-            _TABLE_D4, 41.4, 2.0
-        ),
+        lambda: ph.building.check_heavy_impact_source([39.0, 31.0, 23.0, 17.0, 12.5]),
+        lambda: ph.building.standardized_maximum_impact_level(_TABLE_D4, 41.4, 2.0),
         lambda: ph.building.a_weighted_maximum_impact_level(_TABLE_D4),
         lambda: ph.building.ceiling_attenuation_class(_ALA_DNC),
         _plenum,

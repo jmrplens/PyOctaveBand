@@ -87,6 +87,7 @@ def _metadata_pairs(
     millimetres. Only fields that are set are returned, so empty rows never
     appear.
     """
+
     def _md(name: str) -> Any:
         return getattr(metadata, name) if metadata is not None else None
 
@@ -113,30 +114,43 @@ def _metadata_pairs(
         (t("Client", language), client),
         (t("Manufacturer", language), manufacturer),
         (t("Description", language), specimen),
-        (t("Tube diameter d [mm]", language),
-         fmt_meta(tube_diameter * 1e3, language)
-         if tube_diameter is not None else None),
-        (t("Tube cross-section", language),
-         t(_SHAPE_LABELS[tube_shape], language)
-         if tube_shape is not None else None),
-        (t("Microphone spacing s [mm]", language),
-         fmt_meta(mic_spacing * 1e3, language)
-         if mic_spacing is not None else None),
+        (
+            t("Tube diameter d [mm]", language),
+            fmt_meta(tube_diameter * 1e3, language)
+            if tube_diameter is not None
+            else None,
+        ),
+        (
+            t("Tube cross-section", language),
+            t(_SHAPE_LABELS[tube_shape], language) if tube_shape is not None else None,
+        ),
+        (
+            t("Microphone spacing s [mm]", language),
+            fmt_meta(mic_spacing * 1e3, language) if mic_spacing is not None else None,
+        ),
         (t("Frequency range [Hz]", language), freq_range),
         (t("Mounting", language), mounting),
         (t("Test facility", language), test_room),
         (t("Date of test", language), test_date),
-        (t("Temperature [&#176;C]", language),
-         fmt_meta(temperature, language) if temperature is not None else None),
-        (t("Ambient pressure [kPa]", language),
-         fmt_meta(pressure, language) if pressure is not None else None),
+        (
+            t("Temperature [&#176;C]", language),
+            fmt_meta(temperature, language) if temperature is not None else None,
+        ),
+        (
+            t("Ambient pressure [kPa]", language),
+            fmt_meta(pressure, language) if pressure is not None else None,
+        ),
     ]
     # The frequency range is a formatted (label-safe) string; the remaining
     # values are user-supplied free text, so escape XML specials so a stray '&'
     # or '<' cannot break reportlab's Paragraph parser. Labels carry markup.
     return [
-        (label, value if label == t("Frequency range [Hz]", language)
-         else html.escape(str(value)))
+        (
+            label,
+            value
+            if label == t("Frequency range [Hz]", language)
+            else html.escape(str(value)),
+        )
         for label, value in specs
         if value is not None
     ]
@@ -172,13 +186,15 @@ def _value_table(
         ]
         rows: list[list[Any]] = [header]
         for fk, ak, rk, zk in zip(freqs, alpha, r_mag, z):
-            rows.append([
-                f"{round(fk)}",
-                _a2(ak, language),
-                _a2(rk, language),
-                _a2(zk.real, language),
-                _a2(zk.imag, language),
-            ])
+            rows.append(
+                [
+                    f"{round(fk)}",
+                    _a2(ak, language),
+                    _a2(rk, language),
+                    _a2(zk.real, language),
+                    _a2(zk.imag, language),
+                ]
+            )
         col_widths = [16 * mm, 18 * mm, 18 * mm, 18 * mm, 18 * mm]
     else:
         header = [
@@ -189,12 +205,14 @@ def _value_table(
         ]
         rows = [header]
         for fk, ak, zk in zip(freqs, alpha, z):
-            rows.append([
-                f"{round(fk)}",
-                _a2(ak, language),
-                _a2(zk.real, language),
-                _a2(zk.imag, language),
-            ])
+            rows.append(
+                [
+                    f"{round(fk)}",
+                    _a2(ak, language),
+                    _a2(zk.real, language),
+                    _a2(zk.imag, language),
+                ]
+            )
         col_widths = [21 * mm, 23 * mm, 23 * mm, 23 * mm]
     return band_table(rows, col_widths, len(freqs))
 
@@ -238,9 +256,7 @@ def _caption(verbose: bool, language: str = "en") -> str:
             "Normal-incidence &#945;, |r| and normalised surface impedance z",
             language,
         )
-    return t(
-        "Normal-incidence &#945; and normalised surface impedance z", language
-    )
+    return t("Normal-incidence &#945; and normalised surface impedance z", language)
 
 
 def _body(

@@ -15,6 +15,7 @@ an editor importing a single domain module -- reaches its numerical imports
 through a submodule of this package, so the package ``__init__`` is the one
 place that is always first.
 """
+
 import os
 import sys
 
@@ -24,14 +25,19 @@ import sys
 # across machines (the CI "Documentation figures" job runs on a different core
 # count than a dev box, which is what made the heavy compute figures flaky).
 for _threads_var in (
-    "OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS",
-    "NUMEXPR_NUM_THREADS", "NUMBA_NUM_THREADS", "VECLIB_MAXIMUM_THREADS",
+    "OMP_NUM_THREADS",
+    "MKL_NUM_THREADS",
+    "OPENBLAS_NUM_THREADS",
+    "NUMEXPR_NUM_THREADS",
+    "NUMBA_NUM_THREADS",
+    "VECLIB_MAXIMUM_THREADS",
 ):
     os.environ.setdefault(_threads_var, "1")
 
 # Add src to path to use the local package
-sys.path.insert(0, os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..", "src")))
+sys.path.insert(
+    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "src"))
+)
 
 
 def _publish(**values: object) -> None:

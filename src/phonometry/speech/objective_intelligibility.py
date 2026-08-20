@@ -110,7 +110,9 @@ class STOIResult:
     band_frequencies: NDArray[np.float64]
     sample_rate: int
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the intermediate intelligibility that averages to the index.
 
         For STOI this is the mean correlation per one-third-octave band; for
@@ -159,8 +161,9 @@ def _n_frames(size: int, hop: int) -> int:
     return len(range(0, size - _FRAME, hop))
 
 
-def _frame_signal(sig: NDArray[np.float64], window: NDArray[np.float64],
-                  hop: int) -> NDArray[np.float64]:
+def _frame_signal(
+    sig: NDArray[np.float64], window: NDArray[np.float64], hop: int
+) -> NDArray[np.float64]:
     """Stack of ``window``-tapered, ``hop``-spaced frames of length ``_FRAME``.
 
     Vectorised frame extraction (a single strided gather then one broadcast
@@ -204,13 +207,12 @@ def _overlap_add(frames: NDArray[np.float64], hop: int) -> NDArray[np.float64]:
         return np.zeros(0, dtype=np.float64)
     out = np.zeros((n_frames - 1) * hop + _FRAME, dtype=np.float64)
     for i in range(n_frames):
-        out[i * hop:i * hop + _FRAME] += frames[i]
+        out[i * hop : i * hop + _FRAME] += frames[i]
     return out
 
 
 def _band_spectrogram(
-    sig: NDArray[np.float64], window: NDArray[np.float64],
-    matrix: NDArray[np.float64]
+    sig: NDArray[np.float64], window: NDArray[np.float64], matrix: NDArray[np.float64]
 ) -> NDArray[np.float64]:
     """One-third-octave band energies per short-time frame (Eq. 1).
 
@@ -250,8 +252,7 @@ def _validate_pair(
         raise ValueError("'clean' and 'degraded' must be 1-D signals.")
     if x.shape != y.shape:
         raise ValueError(
-            f"'clean' and 'degraded' must have equal length; got {x.size} "
-            f"and {y.size}."
+            f"'clean' and 'degraded' must have equal length; got {x.size} and {y.size}."
         )
     if x.size == 0:
         raise ValueError("'clean' and 'degraded' must be non-empty.")
@@ -268,7 +269,7 @@ def _segments(bands: NDArray[np.float64]) -> NDArray[np.float64]:
     """
     n_frames = bands.shape[1]
     return np.array(
-        [bands[:, m - _N_SEGMENT:m] for m in range(_N_SEGMENT, n_frames + 1)],
+        [bands[:, m - _N_SEGMENT : m] for m in range(_N_SEGMENT, n_frames + 1)],
         dtype=np.float64,
     )
 

@@ -158,8 +158,7 @@ def write_sidecar(
             "model": record.calibrator_model,
         },
         "channel_labels": (
-            None if record.channel_labels is None
-            else list(record.channel_labels)
+            None if record.channel_labels is None else list(record.channel_labels)
         ),
     }
     target.write_text(
@@ -232,9 +231,7 @@ def _calibrator_fields(
     return calibrator, model
 
 
-def _channel_labels(
-    payload: dict[str, object], source: Path
-) -> tuple[str, ...] | None:
+def _channel_labels(payload: dict[str, object], source: Path) -> tuple[str, ...] | None:
     """The channel labels as a tuple, or ``None`` when absent or null."""
     labels = payload.get("channel_labels")
     if labels is None:
@@ -275,14 +272,13 @@ def read_sidecar(audio_path: str | Path) -> CalibrationSidecar | None:
         return CalibrationSidecar(
             calibration_factor=factor,
             reference_spl=_optional_number(payload, "reference_spl", source),
-            calibrator_frequency=_optional_number(
-                calibrator, "frequency", source
-            ),
+            calibrator_frequency=_optional_number(calibrator, "frequency", source),
             calibrator_model=model,
             channel_labels=labels,
             phonometry_version=(
                 str(payload["phonometry_version"])
-                if payload.get("phonometry_version") is not None else None
+                if payload.get("phonometry_version") is not None
+                else None
             ),
         )
     except ValueError as exc:

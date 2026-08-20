@@ -31,19 +31,17 @@ def test_closed_form() -> None:
 
 
 def test_room_constant_consistency() -> None:
-    res = noise_control.enclosure_insertion_loss(
-        [30.0], 6.0, 5.0, np.array([0.3])
-    )
-    assert res.room_constant[0] == pytest.approx(
-        float(room.room_constant(5.0, 0.3))
-    )
+    res = noise_control.enclosure_insertion_loss([30.0], 6.0, 5.0, np.array([0.3]))
+    assert res.room_constant[0] == pytest.approx(float(room.room_constant(5.0, 0.3)))
 
 
 def test_fully_absorbing_interior_floor() -> None:
     # alpha -> 1: R_i -> inf, C -> 10 log10(0.3) = -5.23 dB, IL = R + 5.23.
     res = noise_control.enclosure_insertion_loss([40.0], 6.0, 5.0, 0.999999)
     assert res.correction[0] == pytest.approx(10.0 * math.log10(0.3), abs=1e-3)
-    assert res.insertion_loss[0] == pytest.approx(40.0 - 10.0 * math.log10(0.3), abs=1e-3)
+    assert res.insertion_loss[0] == pytest.approx(
+        40.0 - 10.0 * math.log10(0.3), abs=1e-3
+    )
 
 
 def test_harder_interior_wastes_more_panel() -> None:
@@ -115,7 +113,10 @@ def test_panel_result_frequencies_override() -> None:
 
 def test_result_type_and_plot() -> None:
     res = noise_control.enclosure_insertion_loss(
-        [20.0, 30.0, 40.0], 6.0, 5.0, 0.3,
+        [20.0, 30.0, 40.0],
+        6.0,
+        5.0,
+        0.3,
         frequencies=[125.0, 250.0, 500.0],
     )
     assert isinstance(res, EnclosureResult)
@@ -125,9 +126,7 @@ def test_result_type_and_plot() -> None:
     assert res.plot().get_ylabel()
     # No-frequency plot uses band indices.
     assert (
-        noise_control.enclosure_insertion_loss(
-            [20.0, 30.0], 6.0, 5.0, 0.3
-        ).plot()
+        noise_control.enclosure_insertion_loss([20.0, 30.0], 6.0, 5.0, 0.3).plot()
         is not None
     )
 
@@ -136,9 +135,7 @@ def test_norton_model_drops_the_floor() -> None:
     """``model="norton"`` is Norton & Karczub Eq. (4.115): no ``0.3`` inside the log."""
     r = np.array([20.0, 30.0, 40.0])
     s_e, s_i, alpha = 6.0, 5.0, 0.3
-    res = noise_control.enclosure_insertion_loss(
-        r, s_e, s_i, alpha, model="norton"
-    )
+    res = noise_control.enclosure_insertion_loss(r, s_e, s_i, alpha, model="norton")
     r_i = float(room.room_constant(s_i, alpha))
     assert np.allclose(res.correction, 10.0 * math.log10(s_e / r_i))
     bies = noise_control.enclosure_insertion_loss(r, s_e, s_i, alpha)
@@ -159,9 +156,7 @@ def test_required_transmission_loss_inverts_the_equation() -> None:
     """``enclosure_required_transmission_loss`` is the exact inverse."""
 
     target = np.array([10.0, 20.0, 30.0])
-    required = noise_control.enclosure_required_transmission_loss(
-        target, 6.0, 5.0, 0.3
-    )
+    required = noise_control.enclosure_required_transmission_loss(target, 6.0, 5.0, 0.3)
     assert np.allclose(required.insertion_loss, target)
     forward = noise_control.enclosure_insertion_loss(
         required.panel_transmission_loss, 6.0, 5.0, 0.3
@@ -185,9 +180,7 @@ def test_required_transmission_loss_callable_and_result_shape() -> None:
     matplotlib.use("Agg")
     assert res.plot().get_ylabel()
     with pytest.raises(ValueError, match="frequencies"):
-        noise_control.enclosure_required_transmission_loss(
-            lambda f: f, 6.0, 5.0, 0.3
-        )
+        noise_control.enclosure_required_transmission_loss(lambda f: f, 6.0, 5.0, 0.3)
 
 
 def test_validation() -> None:
@@ -196,6 +189,4 @@ def test_validation() -> None:
     with pytest.raises(ValueError):
         noise_control.enclosure_insertion_loss([20.0], 6.0, 5.0, 1.0)
     with pytest.raises(ValueError, match="model"):
-        noise_control.enclosure_insertion_loss(
-            [20.0], 6.0, 5.0, 0.3, model="hansen"
-        )
+        noise_control.enclosure_insertion_loss([20.0], 6.0, 5.0, 0.3, model="hansen")

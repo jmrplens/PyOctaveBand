@@ -58,12 +58,20 @@ def _pulse_spectrum(
     """Probe spectrum of one broadband pulse run: ``(frequencies, P(f))``."""
     dt = 0.6 * dx / (_C * math.sqrt(2.0))
     res = fdtd_simulation(
-        _C, dx, steps * dt,
+        _C,
+        dx,
+        steps * dt,
         sources=[GaussianPulse(ix=source[0], iy=source[1], width=pulse_width)],
-        shape=obstacle.shape, probes=[probe],
-        boundaries={"left": "absorbing", "right": "absorbing",
-                    "top": "rigid", "bottom": "rigid"},
-        absorbing_layer_cells=sponge, obstacle_mask=obstacle,
+        shape=obstacle.shape,
+        probes=[probe],
+        boundaries={
+            "left": "absorbing",
+            "right": "absorbing",
+            "top": "rigid",
+            "bottom": "rigid",
+        },
+        absorbing_layer_cells=sponge,
+        obstacle_mask=obstacle,
     )
     p = res.pressures[0]
     n = p.size * _PAD
@@ -74,41 +82,49 @@ def _pulse_spectrum(
 
 _DX = 0.02
 _NY, _NX = 16, 200
-_DUCT_ROWS = (6, 7, 8, 9)      # 4-cell duct; chamber is the full 16 rows -> m = 4
-_X1, _X2 = 80, 100             # chamber columns
-_L = (_X2 - _X1) * _DX         # chamber length, 0.4 m
-_M = _NY / len(_DUCT_ROWS)     # area (height) ratio = 4
+_DUCT_ROWS = (6, 7, 8, 9)  # 4-cell duct; chamber is the full 16 rows -> m = 4
+_X1, _X2 = 80, 100  # chamber columns
+_L = (_X2 - _X1) * _DX  # chamber length, 0.4 m
+_M = _NY / len(_DUCT_ROWS)  # area (height) ratio = 4
 
 
 def _chamber_mask() -> np.ndarray:
     mask = np.ones((_NY, _NX), dtype=bool)
     for r in _DUCT_ROWS:
-        mask[r, :] = False     # open the narrow inlet/outlet duct
-    mask[:, _X1:_X2] = False    # open the full-height chamber
+        mask[r, :] = False  # open the narrow inlet/outlet duct
+    mask[:, _X1:_X2] = False  # open the full-height chamber
     return mask
 
 
 def _transmitted_rms(frequency: float) -> float:
     mask = _chamber_mask()
     boundaries = {
-        "left": "absorbing", "right": "absorbing",
-        "top": "rigid", "bottom": "rigid",
+        "left": "absorbing",
+        "right": "absorbing",
+        "top": "rigid",
+        "bottom": "rigid",
     }
     src = CWSource(ix=25, iy=7, frequency=frequency, amplitude=1.0, ramp_cycles=6.0)
     steps = 3000
     dt = 0.6 * _DX / (_C * math.sqrt(2.0))
     res = fdtd_simulation(
-        _C, _DX, steps * dt, sources=[src], shape=(_NY, _NX),
-        probes=[(170, 7)], boundaries=boundaries,
-        absorbing_layer_cells=10, obstacle_mask=mask,
+        _C,
+        _DX,
+        steps * dt,
+        sources=[src],
+        shape=(_NY, _NX),
+        probes=[(170, 7)],
+        boundaries=boundaries,
+        absorbing_layer_cells=10,
+        obstacle_mask=mask,
     )
     p = res.pressures[0]
-    tail = p[int(p.size * 0.6):]        # steady-state window
+    tail = p[int(p.size * 0.6) :]  # steady-state window
     return float(np.sqrt(np.mean(tail**2)))
 
 
 def test_fdtd_matches_expansion_chamber_peak_tl() -> None:
-    f_peak = _C / (4.0 * _L)    # kL = pi/2, four-pole TL maximum
+    f_peak = _C / (4.0 * _L)  # kL = pi/2, four-pole TL maximum
     f_trough = _C / (2.0 * _L)  # kL = pi, four-pole TL = 0 (transparent)
 
     down_peak = _transmitted_rms(f_peak)
@@ -166,19 +182,19 @@ def test_four_pole_peak_frequency_and_trough() -> None:
 # width and level are still predictions.
 
 _HDX = 0.01
-_HDUCT = 8          # main duct height, cells
-_HNECK_W = 3        # neck width, cells
-_HNECK_L = 8        # neck geometric length, cells
-_HCAV_D = 14        # cavity depth along the neck axis, cells (both cavities)
-_HCAV_NARROW = 14   # cavity width, cells
-_HCAV_WIDE = 28     # the same cavity, twice the volume
-_HNY = _HCAV_D + _HNECK_L + _HDUCT      # 30 rows
+_HDUCT = 8  # main duct height, cells
+_HNECK_W = 3  # neck width, cells
+_HNECK_L = 8  # neck geometric length, cells
+_HCAV_D = 14  # cavity depth along the neck axis, cells (both cavities)
+_HCAV_NARROW = 14  # cavity width, cells
+_HCAV_WIDE = 28  # the same cavity, twice the volume
+_HNY = _HCAV_D + _HNECK_L + _HDUCT  # 30 rows
 _HNX = 380
-_HNECK_X = _HNX // 2 - 40               # first neck column
+_HNECK_X = _HNX // 2 - 40  # first neck column
 _HSTEPS = 5000
 _HSPONGE = 20
-_HSRC = (45, _HNY - 4)                  # on the duct axis, upstream
-_HPROBE = (_HNX - 60, _HNY - 4)         # on the duct axis, downstream
+_HSRC = (45, _HNY - 4)  # on the duct axis, upstream
+_HPROBE = (_HNX - 60, _HNY - 4)  # on the duct axis, downstream
 
 _HS_DUCT = _HDUCT * _HDX
 _HS_NECK = _HNECK_W * _HDX
@@ -197,15 +213,18 @@ def _h_nominal_resonance(cavity_width: int) -> float:
     assertions use :func:`_h_lumped_resonance` instead.
     """
     volume = _h_volume(cavity_width)
-    return (_C / (2.0 * math.pi)
-            * math.sqrt(_HS_NECK / (_HNECK_L * _HDX * volume)))
+    return _C / (2.0 * math.pi) * math.sqrt(_HS_NECK / (_HNECK_L * _HDX * volume))
 
 
 def _h_lumped_resonance(neck_length: float, cavity_width: int) -> float:
     """The library's own ``f_0`` for this geometry and effective neck length."""
     result = sl.helmholtz_resonator(
-        np.array([100.0]), _HS_DUCT, _HS_NECK, neck_length,
-        _h_volume(cavity_width), speed_of_sound=_C,
+        np.array([100.0]),
+        _HS_DUCT,
+        _HS_NECK,
+        neck_length,
+        _h_volume(cavity_width),
+        speed_of_sound=_C,
     )
     assert result.resonances is not None
     return float(result.resonances[0])
@@ -214,31 +233,35 @@ def _h_lumped_resonance(neck_length: float, cavity_width: int) -> float:
 def _helmholtz_mask(cavity_width: int | None) -> NDArray[np.bool_]:
     """Rigid-cell map; ``None`` gives the bare duct used as the reference."""
     mask = np.ones((_HNY, _HNX), dtype=bool)
-    mask[_HCAV_D + _HNECK_L:, :] = False            # the straight main duct
+    mask[_HCAV_D + _HNECK_L :, :] = False  # the straight main duct
     if cavity_width is None:
         return mask
-    mask[_HCAV_D:_HCAV_D + _HNECK_L,
-         _HNECK_X:_HNECK_X + _HNECK_W] = False      # the neck
+    mask[_HCAV_D : _HCAV_D + _HNECK_L, _HNECK_X : _HNECK_X + _HNECK_W] = (
+        False  # the neck
+    )
     left = _HNECK_X + _HNECK_W // 2 - cavity_width // 2
-    mask[:_HCAV_D, left:left + cavity_width] = False    # the cavity
+    mask[:_HCAV_D, left : left + cavity_width] = False  # the cavity
     return mask
 
 
-def _h_transmission(cavity_width: int | None) -> tuple[
-    NDArray[np.float64], NDArray[np.complex128]
-]:
+def _h_transmission(
+    cavity_width: int | None,
+) -> tuple[NDArray[np.float64], NDArray[np.complex128]]:
     """Probe spectrum of one pulse run: ``(frequencies, P(f))``."""
     return _pulse_spectrum(
-        _helmholtz_mask(cavity_width), source=_HSRC, probe=_HPROBE,
-        steps=_HSTEPS, dx=_HDX, sponge=_HSPONGE,
+        _helmholtz_mask(cavity_width),
+        source=_HSRC,
+        probe=_HPROBE,
+        steps=_HSTEPS,
+        dx=_HDX,
+        sponge=_HSPONGE,
         # A Gaussian wide enough to cover DC up to about twice the resonance.
         pulse_width=1.0 / (4.0 * _h_nominal_resonance(_HCAV_NARROW)),
     )
 
 
 @pytest.fixture(scope="module")
-def helmholtz_spectra() -> dict[int, tuple[NDArray[np.float64],
-                                           NDArray[np.float64]]]:
+def helmholtz_spectra() -> dict[int, tuple[NDArray[np.float64], NDArray[np.float64]]]:
     """One bare-duct run plus one run per cavity: transmitted pressure ratio.
 
     Three FDTD runs in total (~1.7 s), shared by every test below.
@@ -249,13 +272,11 @@ def helmholtz_spectra() -> dict[int, tuple[NDArray[np.float64],
         _, loaded = _h_transmission(width)
         nominal = _h_nominal_resonance(width)
         band = (freq > 0.45 * nominal) & (freq < 1.45 * nominal)
-        out[width] = (freq[band],
-                      np.abs(loaded[band]) / np.abs(bare[band]))
+        out[width] = (freq[band], np.abs(loaded[band]) / np.abs(bare[band]))
     return out
 
 
-def _h_resonance(freq: NDArray[np.float64],
-                 ratio: NDArray[np.float64]) -> float:
+def _h_resonance(freq: NDArray[np.float64], ratio: NDArray[np.float64]) -> float:
     """Resonance from the simple zero of the transmitted amplitude.
 
     A lossless side branch shorts the duct at ``f_0``, so ``|p/p_bare|`` has a
@@ -273,8 +294,7 @@ def _h_resonance(freq: NDArray[np.float64],
 @pytest.mark.xdist_group("fdtd-helmholtz")
 @pytest.mark.parametrize("width", [_HCAV_NARROW, _HCAV_WIDE])
 def test_fdtd_helmholtz_resonance_within_end_correction_bracket(
-    helmholtz_spectra: dict[int, tuple[NDArray[np.float64],
-                                       NDArray[np.float64]]],
+    helmholtz_spectra: dict[int, tuple[NDArray[np.float64], NDArray[np.float64]]],
     width: int,
 ) -> None:
     # Every effect the lumped model leaves out pushes the resonance *down*:
@@ -292,16 +312,13 @@ def test_fdtd_helmholtz_resonance_within_end_correction_bracket(
     freq, ratio = helmholtz_spectra[width]
     measured = _h_resonance(freq, ratio)
     geometric = _h_lumped_resonance(_HNECK_L * _HDX, width)
-    corrected = _h_lumped_resonance(
-        (_HNECK_L + 2 * _HNECK_W) * _HDX, width
-    )
+    corrected = _h_lumped_resonance((_HNECK_L + 2 * _HNECK_W) * _HDX, width)
     assert corrected < measured < geometric
 
 
 @pytest.mark.xdist_group("fdtd-helmholtz")
 def test_fdtd_helmholtz_follows_inverse_root_volume(
-    helmholtz_spectra: dict[int, tuple[NDArray[np.float64],
-                                       NDArray[np.float64]]],
+    helmholtz_spectra: dict[int, tuple[NDArray[np.float64], NDArray[np.float64]]],
 ) -> None:
     # The content of the Helmholtz formula that survives the end-correction
     # ambiguity: with the neck untouched, f_0 goes as 1 / sqrt(V). The wide
@@ -324,8 +341,9 @@ def test_fdtd_helmholtz_follows_inverse_root_volume(
     # serves: it is common to both cavities and cancels, which is exactly why
     # the ratio is the part of the formula the simulation can pin down.
     length = _HNECK_L * _HDX
-    predicted = (_h_lumped_resonance(length, _HCAV_NARROW)
-                 / _h_lumped_resonance(length, _HCAV_WIDE))
+    predicted = _h_lumped_resonance(length, _HCAV_NARROW) / _h_lumped_resonance(
+        length, _HCAV_WIDE
+    )
     assert _h_volume(_HCAV_WIDE) == pytest.approx(2.0 * _h_volume(_HCAV_NARROW))
     assert predicted == pytest.approx(math.sqrt(2.0), rel=1e-12)
     assert narrow / wide == pytest.approx(predicted, rel=0.01)
@@ -334,8 +352,7 @@ def test_fdtd_helmholtz_follows_inverse_root_volume(
 @pytest.mark.xdist_group("fdtd-helmholtz")
 @pytest.mark.parametrize("width", [_HCAV_NARROW, _HCAV_WIDE])
 def test_fdtd_helmholtz_transmission_loss_curve(
-    helmholtz_spectra: dict[int, tuple[NDArray[np.float64],
-                                       NDArray[np.float64]]],
+    helmholtz_spectra: dict[int, tuple[NDArray[np.float64], NDArray[np.float64]]],
     width: int,
 ) -> None:
     # With the single unknown pinned -- the effective neck length read back
@@ -357,20 +374,20 @@ def test_fdtd_helmholtz_transmission_loss_curve(
     freq, ratio = helmholtz_spectra[width]
     resonance = _h_resonance(freq, ratio)
     volume = _h_volume(width)
-    neck_length = (
-        _HS_NECK * _C**2 / (4.0 * math.pi**2 * resonance**2 * volume)
-    )
+    neck_length = _HS_NECK * _C**2 / (4.0 * math.pi**2 * resonance**2 * volume)
 
-    probe = resonance * np.array(
-        [0.6, 0.7, 0.8, 0.9, 0.95, 1.05, 1.1, 1.2, 1.3, 1.4]
-    )
+    probe = resonance * np.array([0.6, 0.7, 0.8, 0.9, 0.95, 1.05, 1.1, 1.2, 1.3, 1.4])
     analytic = sl.helmholtz_resonator(
-        probe, _HS_DUCT, _HS_NECK, neck_length, volume, speed_of_sound=_C,
+        probe,
+        _HS_DUCT,
+        _HS_NECK,
+        neck_length,
+        volume,
+        speed_of_sound=_C,
     ).transmission_loss
-    measured = np.array([
-        -20.0 * math.log10(ratio[int(np.argmin(np.abs(freq - f)))])
-        for f in probe
-    ])
+    measured = np.array(
+        [-20.0 * math.log10(ratio[int(np.argmin(np.abs(freq - f)))]) for f in probe]
+    )
     assert measured == pytest.approx(analytic, abs=1.5)
 
     # And the branch really does short the duct: a deep notch, not a dent.
@@ -398,14 +415,14 @@ def test_fdtd_helmholtz_transmission_loss_curve(
 # grid than the point is worth.
 
 _EDX = 0.01
-_ENY = 40            # chamber height, cells; the duct is _EDUCT of them
+_ENY = 40  # chamber height, cells; the duct is _EDUCT of them
 _ENX = 260
 _EDUCT = 6
-_EDUCT0 = 17         # first duct row, so the pipe walls are rows 16 and 23
-_EX1, _EX2 = 100, 180                   # chamber columns -> L = 0.8 m
+_EDUCT0 = 17  # first duct row, so the pipe walls are rows 16 and 23
+_EX1, _EX2 = 100, 180  # chamber columns -> L = 0.8 m
 _EL = (_EX2 - _EX1) * _EDX
-_ELA = (_EX2 - _EX1) // 2               # inlet extension L/2
-_ELB = (_EX2 - _EX1) // 4               # outlet extension L/4
+_ELA = (_EX2 - _EX1) // 2  # inlet extension L/2
+_ELB = (_EX2 - _EX1) // 4  # outlet extension L/4
 _ESTEPS = 5000
 _ESPONGE = 20
 _ESRC = (45, _EDUCT0 + 3)
@@ -424,13 +441,13 @@ _E_KL_PI = np.array([0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.55])
 def _extended_tube_mask(*, extended: bool) -> NDArray[np.bool_]:
     """Rigid-cell map; ``extended=False`` gives the bare reference duct."""
     mask = np.ones((_ENY, _ENX), dtype=bool)
-    mask[_EDUCT0:_EDUCT0 + _EDUCT, :] = False       # the straight main duct
+    mask[_EDUCT0 : _EDUCT0 + _EDUCT, :] = False  # the straight main duct
     if not extended:
         return mask
-    mask[:, _EX1:_EX2] = False                      # the chamber, full height
-    for row in (_EDUCT0 - 1, _EDUCT0 + _EDUCT):     # the two pipe walls
-        mask[row, _EX1:_EX1 + _ELA] = True          # carried on as the inlet
-        mask[row, _EX2 - _ELB:_EX2] = True          # and the outlet extension
+    mask[:, _EX1:_EX2] = False  # the chamber, full height
+    for row in (_EDUCT0 - 1, _EDUCT0 + _EDUCT):  # the two pipe walls
+        mask[row, _EX1 : _EX1 + _ELA] = True  # carried on as the inlet
+        mask[row, _EX2 - _ELB : _EX2] = True  # and the outlet extension
     return mask
 
 
@@ -438,13 +455,22 @@ def _extended_tube_mask(*, extended: bool) -> NDArray[np.bool_]:
 def extended_tube_loss() -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """``(frequencies, transmission loss)`` from two FDTD runs (~1 s)."""
     frequencies, bare = _pulse_spectrum(
-        _extended_tube_mask(extended=False), source=_ESRC, probe=_EPROBE,
-        steps=_ESTEPS, dx=_EDX, sponge=_ESPONGE,
-        pulse_width=_EL / _C,   # covers DC through several kL/pi
+        _extended_tube_mask(extended=False),
+        source=_ESRC,
+        probe=_EPROBE,
+        steps=_ESTEPS,
+        dx=_EDX,
+        sponge=_ESPONGE,
+        pulse_width=_EL / _C,  # covers DC through several kL/pi
     )
     _, loaded = _pulse_spectrum(
-        _extended_tube_mask(extended=True), source=_ESRC, probe=_EPROBE,
-        steps=_ESTEPS, dx=_EDX, sponge=_ESPONGE, pulse_width=_EL / _C,
+        _extended_tube_mask(extended=True),
+        source=_ESRC,
+        probe=_EPROBE,
+        steps=_ESTEPS,
+        dx=_EDX,
+        sponge=_ESPONGE,
+        pulse_width=_EL / _C,
     )
     return frequencies, 20.0 * np.log10(np.abs(bare) / np.abs(loaded))
 
@@ -455,9 +481,7 @@ def _e_measured(
     """Transmission loss at the comparison frequencies."""
     frequencies, loss = spectrum
     wanted = _E_KL_PI * _C / (2.0 * _EL)
-    return np.array([
-        loss[int(np.argmin(np.abs(frequencies - f)))] for f in wanted
-    ])
+    return np.array([loss[int(np.argmin(np.abs(frequencies - f)))] for f in wanted])
 
 
 def _e_cascade_by_hand(straight: float) -> NDArray[np.float64]:
@@ -466,13 +490,21 @@ def _e_cascade_by_hand(straight: float) -> NDArray[np.float64]:
     annulus = _ES_EXP - _ES_DUCT
     return sl.transmission_loss(
         sl.cascade(
-            sl.shunt_matrix(sl.quarter_wave_impedance(
-                frequencies, _ELA * _EDX, annulus, speed_of_sound=_C)),
+            sl.shunt_matrix(
+                sl.quarter_wave_impedance(
+                    frequencies, _ELA * _EDX, annulus, speed_of_sound=_C
+                )
+            ),
             sl.duct_matrix(frequencies, straight, _ES_EXP, speed_of_sound=_C),
-            sl.shunt_matrix(sl.quarter_wave_impedance(
-                frequencies, _ELB * _EDX, annulus, speed_of_sound=_C)),
+            sl.shunt_matrix(
+                sl.quarter_wave_impedance(
+                    frequencies, _ELB * _EDX, annulus, speed_of_sound=_C
+                )
+            ),
         ),
-        inlet_area=_ES_DUCT, outlet_area=_ES_DUCT, speed_of_sound=_C,
+        inlet_area=_ES_DUCT,
+        outlet_area=_ES_DUCT,
+        speed_of_sound=_C,
     )
 
 
@@ -501,8 +533,12 @@ def test_fdtd_matches_extended_tube_chamber(
     # Measured: -0.30 to +0.97 dB.
     measured = _e_measured(extended_tube_loss)
     analytic = sl.extended_tube_chamber(
-        _E_KL_PI * _C / (2.0 * _EL), _EL, _ES_EXP, _ES_DUCT,
-        inlet_extension=_ELA * _EDX, outlet_extension=_ELB * _EDX,
+        _E_KL_PI * _C / (2.0 * _EL),
+        _EL,
+        _ES_EXP,
+        _ES_DUCT,
+        inlet_extension=_ELA * _EDX,
+        outlet_extension=_ELB * _EDX,
         speed_of_sound=_C,
     ).transmission_loss
     assert measured == pytest.approx(analytic, abs=1.5)

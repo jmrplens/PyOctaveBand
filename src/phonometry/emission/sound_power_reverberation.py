@@ -109,7 +109,9 @@ class ReverberationSoundPowerResult:
     sound_power_level_a: float
     method: str
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the LW spectrum with the A-weighted total annotated.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -188,9 +190,7 @@ def _validate_meteorology(temperature: float, static_pressure: float) -> None:
     static pressure makes :math:`\log_{10}(p_\mathrm{s}/p_{\mathrm{s}0})` undefined; both are rejected
     with a clean ``ValueError``."""
     if not np.isfinite(temperature) or temperature <= -273.0:
-        raise ValueError(
-            "'temperature' must be finite and greater than -273 degC."
-        )
+        raise ValueError("'temperature' must be finite and greater than -273 degC.")
     if not np.isfinite(static_pressure) or static_pressure <= 0.0:
         raise ValueError("'static_pressure' must be finite and positive.")
 
@@ -574,9 +574,7 @@ def sound_power_comparison(
             raise ValueError(
                 "'frequencies' are required to apply 'background_levels_ref'."
             )
-        lp_rss, _ = _background_corrected_mean(
-            levels_ref, background_levels_ref, freqs
-        )
+        lp_rss, _ = _background_corrected_mean(levels_ref, background_levels_ref, freqs)
 
     c2 = _c2_correction(temperature, static_pressure)
     lw = np.asarray(lw_rss + (lp_st - lp_rss + c2), dtype=np.float64)

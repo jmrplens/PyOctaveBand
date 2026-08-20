@@ -367,7 +367,9 @@ def mean_narrowband_level(
         positive/finite, or no lines fall in the critical band.
     """
     ls, _ = _mean_narrowband_level_lines(
-        levels, frequencies, tone_frequency,
+        levels,
+        frequencies,
+        tone_frequency,
         effective_bandwidth_factor=effective_bandwidth_factor,
     )
     return ls
@@ -392,9 +394,7 @@ def _mean_narrowband_level_lines(
 
     f1, f2 = critical_band_corners(ft)
     under = int(np.argmin(np.abs(freq - ft)))
-    band = [
-        i for i in range(lev.size) if f1 <= freq[i] <= f2 and i != under
-    ]
+    band = [i for i in range(lev.size) if f1 <= freq[i] <= f2 and i != under]
     if not band:
         raise ValueError("No spectral lines fall in the critical band.")
 
@@ -515,14 +515,12 @@ def _is_distinct(
         return False
     ft = freq[peak]
     if low - 1 >= 0:
-        lower = ft * (lev[peak] - lev[low - 1]) / (
-            np.sqrt(2.0) * (ft - freq[low - 1])
-        )
+        lower = ft * (lev[peak] - lev[low - 1]) / (np.sqrt(2.0) * (ft - freq[low - 1]))
         if lower < _DISTINCT_EDGE_STEEPNESS:
             return False
     if high + 1 < lev.size:
-        upper = ft * (lev[peak] - lev[high + 1]) / (
-            np.sqrt(2.0) * (freq[high + 1] - ft)
+        upper = (
+            ft * (lev[peak] - lev[high + 1]) / (np.sqrt(2.0) * (freq[high + 1] - ft))
         )
         if upper < _DISTINCT_EDGE_STEEPNESS:
             return False
@@ -543,9 +541,7 @@ def _next_local_maximum(lev: NDArray[np.float64], start: int) -> int:
     return i
 
 
-def _tone_line_run(
-    lev: NDArray[np.float64], start: int, ls: float
-) -> tuple[int, int]:
+def _tone_line_run(lev: NDArray[np.float64], start: int, ls: float) -> tuple[int, int]:
     """Strongest line and end of the run of lines above ``LS + 6 dB``.
 
     :return: ``(peak, resume)``: the strongest line of the run starting at
@@ -690,9 +686,7 @@ def analyze_spectrum(
 
     tones = []  # (freq, LT, LS, U, dL, low, high) of each audible tone
     for peak, low, high, ls in detected:
-        lt = energy_sum_level(
-            lev[low : high + 1], effective_bandwidth_factor=factor
-        )
+        lt = energy_sum_level(lev[low : high + 1], effective_bandwidth_factor=factor)
         delta = tone_audibility(lt, ls, float(freq[peak]), df)
         if delta > 0.0:
             # Extended uncertainty U (Clause 6) from the K tone lines and the
@@ -1033,9 +1027,7 @@ def mean_audibility_uncertainty(
     if not (np.all(np.isfinite(deltas)) and np.all(np.isfinite(uncertainties))):
         raise ValueError("Inputs must be finite.")
     weights = 10.0 ** (0.1 * deltas)
-    return float(
-        np.sqrt(np.sum((weights * uncertainties) ** 2)) / np.sum(weights)
-    )
+    return float(np.sqrt(np.sum((weights * uncertainties) ** 2)) / np.sum(weights))
 
 
 # --------------------------------------------------------------------------- #
@@ -1128,10 +1120,12 @@ class ToneAudibilityResult:
         )
 
         if view not in ("audibility", "levels"):
-            raise ValueError(
-                f"Unknown view {view!r}; use 'audibility' or 'levels'."
-            )
-        render = plot_tone_audibility if view == "audibility" else plot_tone_audibility_levels
+            raise ValueError(f"Unknown view {view!r}; use 'audibility' or 'levels'.")
+        render = (
+            plot_tone_audibility
+            if view == "audibility"
+            else plot_tone_audibility_levels
+        )
         return render(self, ax=ax, language=check_language(language), **kwargs)
 
     def report(
@@ -1266,9 +1260,7 @@ def assess_tones(
     if not (np.all(np.isfinite(freqs)) and np.all(freqs > 0.0)):
         raise ValueError("'tone_frequencies' must be positive and finite.")
     if not (np.all(np.isfinite(lt)) and np.all(np.isfinite(ls))):
-        raise ValueError(
-            "'tone_levels' and 'mean_narrowband_levels' must be finite."
-        )
+        raise ValueError("'tone_levels' and 'mean_narrowband_levels' must be finite.")
 
     uncertainties: NDArray[np.float64] | None = None
     if extended_uncertainties is not None:

@@ -82,14 +82,20 @@ def test_sensitivity_drive_voltage_correction() -> None:
     result = electroacoustics.loudspeaker_characteristics(
         f, spl, _R, input_voltage=2.0 * math.sqrt(_R), sensitivity_band=(200.0, 4000.0)
     )
-    assert result.sensitivity_level_db == pytest.approx(_L0 - 20.0 * math.log10(2.0), abs=1e-9)
+    assert result.sensitivity_level_db == pytest.approx(
+        _L0 - 20.0 * math.log10(2.0), abs=1e-9
+    )
 
 
 def test_sensitivity_distance_correction_cancels() -> None:
     """A 2 m distance with a doubled voltage cancels back to L0 (20.3.2)."""
     f, spl = _flat_response()
     result = electroacoustics.loudspeaker_characteristics(
-        f, spl, _R, input_voltage=2.0 * math.sqrt(_R), distance=2.0,
+        f,
+        spl,
+        _R,
+        input_voltage=2.0 * math.sqrt(_R),
+        distance=2.0,
         sensitivity_band=(200.0, 4000.0),
     )
     assert result.sensitivity_level_db == pytest.approx(_L0, abs=1e-9)
@@ -168,9 +174,7 @@ def test_minimum_impedance_uses_rated_range_when_supplied() -> None:
         _R,
         sensitivity_band=(200.0, 4000.0),
         impedance=(fz, z),
-        ratings=electroacoustics.LoudspeakerRatings(
-            frequency_range=(30.0, 20000.0)
-        ),
+        ratings=electroacoustics.LoudspeakerRatings(frequency_range=(30.0, 20000.0)),
     )
     lo_eff, _ = result.effective_range
     assert lo_eff > 40.0  # the dip sits outside the computed effective range
@@ -218,9 +222,7 @@ def test_distortion_from_swept_sine_result() -> None:
     import phonometry as ph
 
     fs = 48000
-    sweep = ph.electroacoustics.synchronized_sweep_signal(
-        fs, 100.0, 5000.0, 1.0
-    )
+    sweep = ph.electroacoustics.synchronized_sweep_signal(fs, 100.0, 5000.0, 1.0)
     a2, a3 = 0.05, 0.02
     y = sweep + a2 * sweep**2 + a3 * sweep**3
     swept = ph.electroacoustics.swept_sine_distortion(
@@ -271,8 +273,11 @@ def test_report_renders_one_page_with_rated_table(tmp_path) -> None:
     pytest.importorskip("matplotlib")
     result = _example_result()
     md = ReportMetadata(
-        manufacturer="Example audio", specimen="Two-way loudspeaker",
-        measurement_standard="IEC 60268-5", report_id="PHN-60268-5", requirement=84.0,
+        manufacturer="Example audio",
+        specimen="Two-way loudspeaker",
+        measurement_standard="IEC 60268-5",
+        report_id="PHN-60268-5",
+        requirement=84.0,
     )
     out = tmp_path / "loudspeaker.pdf"
     returned = result.report(str(out), metadata=md)

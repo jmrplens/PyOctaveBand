@@ -61,6 +61,8 @@ import zipfile
 import matplotlib
 
 matplotlib.use("Agg")
+import contextlib
+
 import numpy as np
 import oracle_data
 import pytest
@@ -162,8 +164,7 @@ def _parse_hem(path: pathlib.Path) -> tuple[np.ndarray, ...]:
     return phi, theta, freqs, levels
 
 
-def _parse_ring(path: pathlib.Path) -> tuple[np.ndarray, np.ndarray,
-                                             np.ndarray, float]:
+def _parse_ring(path: pathlib.Path) -> tuple[np.ndarray, np.ndarray, np.ndarray, float]:
     """Bearings, bands, band levels and polar distance of a ring-format .hem.
 
     The hover-disk format carries a single ``PHIOBSEC`` bearing axis instead
@@ -197,18 +198,23 @@ def _parse_ring(path: pathlib.Path) -> tuple[np.ndarray, np.ndarray,
                 bearing = float(parts[0])
             except ValueError:
                 continue
-            row = np.array([float(v) for v in parts[1:freqs.size + 1]])
+            row = np.array([float(v) for v in parts[1 : freqs.size + 1]])
             levels[int(np.argmin(np.abs(bearings - bearing)))] = row
     assert np.all(np.isfinite(levels)), path
     return bearings, freqs, levels, dist
 
 
-def _parse_int(path: pathlib.Path) -> tuple[list[tuple[int, float, float, str]],
-                                            list[tuple[int, ...]]]:
+def _parse_int(
+    path: pathlib.Path,
+) -> tuple[list[tuple[int, float, float, str]], list[tuple[int, ...]]]:
     """Hemisphere table and triangulation of a *_triangulation.int file."""
     txt = path.read_text()
-    hems = [(int(m.group(1)), float(m.group(2)), float(m.group(3)), m.group(4))
-            for m in re.finditer(r"^(\d+)\t([\d.+-]+)\t([\d.+-]+)\t(\S+\.hem)", txt, re.MULTILINE)]
+    hems = [
+        (int(m.group(1)), float(m.group(2)), float(m.group(3)), m.group(4))
+        for m in re.finditer(
+            r"^(\d+)\t([\d.+-]+)\t([\d.+-]+)\t(\S+\.hem)", txt, re.MULTILINE
+        )
+    ]
     tris: list[tuple[int, ...]] = []
     in_tri = False
     for line in txt.splitlines():
@@ -232,19 +238,26 @@ def _parse_inp(path: pathlib.Path) -> dict:
     for line in txt.splitlines():
         parts = line.split()
         if started and len(parts) >= 10:
-            try:
-                rows.append([float(parts[i]) for i in (0, 1, 2, 3)]
-                            + [float(parts[i]) for i in (5, 6, 7, 8, 9)])
-            except ValueError:
-                pass
+            with contextlib.suppress(ValueError):
+                rows.append(
+                    [float(parts[i]) for i in (0, 1, 2, 3)]
+                    + [float(parts[i]) for i in (5, 6, 7, 8, 9)]
+                )
         if line.strip().startswith("sec"):
             started = True
     arr = np.asarray(rows)
     heli = re.search(r"HELIHEM\s*=\s*(\S+)", txt)
     assert heli is not None
-    return {"heli": heli.group(1), "times": arr[:, 0], "positions": arr[:, 1:4],
-            "speed": arr[:, 4], "vang": arr[:, 5], "heading": arr[:, 6],
-            "roll": arr[:, 7], "ddb": arr[:, 8]}
+    return {
+        "heli": heli.group(1),
+        "times": arr[:, 0],
+        "positions": arr[:, 1:4],
+        "speed": arr[:, 4],
+        "vang": arr[:, 5],
+        "heading": arr[:, 6],
+        "roll": arr[:, 7],
+        "ddb": arr[:, 8],
+    }
 
 
 def _parse_his(path: pathlib.Path) -> tuple[dict, np.ndarray]:
@@ -255,16 +268,27 @@ def _parse_his(path: pathlib.Path) -> tuple[dict, np.ndarray]:
     for i, line in enumerate(lines):
         if line.strip().startswith("m          m          m"):
             vals = [float(v) for v in lines[i + 1].split()]
-            keys = ["XMICM", "YMICM", "ZMIC", "HMIC", "SIGMA", "LAE", "LAMAX",
-                    "PNLTM", "EPNL", "SELA", "T1pnlt", "T2pnlt", "I10db"]
+            keys = [
+                "XMICM",
+                "YMICM",
+                "ZMIC",
+                "HMIC",
+                "SIGMA",
+                "LAE",
+                "LAMAX",
+                "PNLTM",
+                "EPNL",
+                "SELA",
+                "T1pnlt",
+                "T2pnlt",
+                "I10db",
+            ]
             header = dict(zip(keys, vals))
             continue
         parts = line.split()
         if header is not None and len(parts) == 12:
-            try:
+            with contextlib.suppress(ValueError):
                 rows.append([float(v) for v in parts])
-            except ValueError:
-                pass
     assert header is not None, path
     return header, np.asarray(rows)
 
@@ -276,7 +300,9 @@ def _parse_onl(path: pathlib.Path) -> np.ndarray:
         parts = line.split()
         if len(parts) == 12 and parts[0].isdigit():
             rows.append([float(v) for v in parts[1:]])
-    return np.asarray(rows)  # XMICM YMICM ZMIC HMIC SIGMA EPNL PNLTM LAE LAMAX SELA I10db
+    return np.asarray(
+        rows
+    )  # XMICM YMICM ZMIC HMIC SIGMA EPNL PNLTM LAE LAMAX SELA I10db
 
 
 @pytest.fixture(scope="session")
@@ -293,10 +319,17 @@ def r22_set(norah_root: pathlib.Path) -> dict:
         angles.append(ang)
         ids.append(ih)
     id2pos = {ih: i for i, ih in enumerate(ids)}
-    triangles = [[id2pos[a], id2pos[b], id2pos[c]] for a, b, c in tris
-                 if a in id2pos and b in id2pos and c in id2pos]
-    return {"hemispheres": objs, "airspeeds": np.array(speeds),
-            "path_angles": np.array(angles), "triangles": np.array(triangles)}
+    triangles = [
+        [id2pos[a], id2pos[b], id2pos[c]]
+        for a, b, c in tris
+        if a in id2pos and b in id2pos and c in id2pos
+    ]
+    return {
+        "hemispheres": objs,
+        "airspeeds": np.array(speeds),
+        "path_angles": np.array(angles),
+        "triangles": np.array(triangles),
+    }
 
 
 def _run_event(case: pathlib.Path, r22: dict) -> tuple[dict, np.ndarray, object]:
@@ -305,18 +338,27 @@ def _run_event(case: pathlib.Path, r22: dict) -> tuple[dict, np.ndarray, object]
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")  # sub-noy-floor spectra warn in PNL
         res = rotorcraft_event_level(
-            r22["hemispheres"], r22["airspeeds"], r22["path_angles"],
-            inp["times"], inp["positions"], (header["XMICM"], header["YMICM"]),
+            r22["hemispheres"],
+            r22["airspeeds"],
+            r22["path_angles"],
+            inp["times"],
+            inp["positions"],
+            (header["XMICM"], header["YMICM"]),
             level_offset=inp["ddb"],
-            ground=RotorcraftGround(receiver_height=header["HMIC"],
-                                    ground_elevation=header["ZMIC"],
-                                    flow_resistivity=header["SIGMA"]),
+            ground=RotorcraftGround(
+                receiver_height=header["HMIC"],
+                ground_elevation=header["ZMIC"],
+                flow_resistivity=header["SIGMA"],
+            ),
             track_state=RotorcraftTrackState(
-                airspeed=inp["speed"], path_angle=inp["vang"],
-                heading=inp["heading"], bank_angle=inp["roll"]),
-            interpolation=FlightConditionInterpolation(
-                triangles=r22["triangles"]),
-            atmosphere=RotorcraftAtmosphere(atmospheric_method="sae"))
+                airspeed=inp["speed"],
+                path_angle=inp["vang"],
+                heading=inp["heading"],
+                bank_angle=inp["roll"],
+            ),
+            interpolation=FlightConditionInterpolation(triangles=r22["triangles"]),
+            atmosphere=RotorcraftAtmosphere(atmospheric_method="sae"),
+        )
     return header, rows, res
 
 
@@ -359,7 +401,8 @@ def test_hover_ring_rim_reproduces_ring_rows(norah_root: pathlib.Path) -> None:
     # hemisphere rim at (phi, theta) = (+-90, |bearing|), band for band, and
     # a hover event over the derived hemisphere runs finite.
     bearings, freqs, levels, dist = _parse_ring(
-        norah_root / "Hemispheres" / "R22_Ingroundhover_0kts_0deg_test.hem")
+        norah_root / "Hemispheres" / "R22_Ingroundhover_0kts_0deg_test.hem"
+    )
     assert dist == 70.0
     assert bearings.size == 13
     assert freqs.size == 31
@@ -375,9 +418,16 @@ def test_hover_ring_rim_reproduces_ring_rows(norah_root: pathlib.Path) -> None:
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")  # sub-noy-floor spectra warn in PNL
         res = rotorcraft_event_level(
-            [hige], [0.0], [0.0], t, pos, (100.0, 0.0),
-            track_state=RotorcraftTrackState(airspeed=0.0, path_angle=0.0,
-                                             heading=0.0, bank_angle=0.0))
+            [hige],
+            [0.0],
+            [0.0],
+            t,
+            pos,
+            (100.0, 0.0),
+            track_state=RotorcraftTrackState(
+                airspeed=0.0, path_angle=0.0, heading=0.0, bank_angle=0.0
+            ),
+        )
     assert np.isfinite(res.la_max)
     assert np.isfinite(res.sel)
 
@@ -389,9 +439,11 @@ def test_case4_hover_ogh_event(norah_root: pathlib.Path) -> None:
     # own database correction, +8 dB in the shipped .int files where the
     # guidance's Table 3 publishes +12, so both are passed explicitly here.
     bearings, freqs, levels, dist = _parse_ring(
-        norah_root / "Hemispheres" / "R22_Ingroundhover_0kts_0deg_test.hem")
-    hige = hover_ring_hemisphere(freqs, bearings, levels, distance=dist,
-                                 mapping="bearing")
+        norah_root / "Hemispheres" / "R22_Ingroundhover_0kts_0deg_test.hem"
+    )
+    hige = hover_ring_hemisphere(
+        freqs, bearings, levels, distance=dist, mapping="bearing"
+    )
     hoge = hover_derived_hemisphere(hige, "out_of_ground_hover", offset_db=8.0)
     case = norah_root / "ARP" / "Case4" / "SE" / "R22_DEP_RT2"
     inp = _parse_inp(case.with_suffix(".inp"))
@@ -403,19 +455,30 @@ def test_case4_hover_ogh_event(norah_root: pathlib.Path) -> None:
     t = np.array([0.0, 1.0])
     pos = np.repeat(inp["positions"], 2, axis=0)
     state = RotorcraftTrackState(
-        airspeed=float(inp["speed"][0]), path_angle=float(inp["vang"][0]),
-        heading=float(inp["heading"][0]), bank_angle=float(inp["roll"][0]))
+        airspeed=float(inp["speed"][0]),
+        path_angle=float(inp["vang"][0]),
+        heading=float(inp["heading"][0]),
+        bank_angle=float(inp["roll"][0]),
+    )
     nadir = None
     for mic in mics:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")  # sub-noy-floor spectra warn in PNL
             res = rotorcraft_event_level(
-                [hoge], [0.0], [0.0], t, pos, (mic[0], mic[1]),
-                ground=RotorcraftGround(receiver_height=mic[3],
-                                        ground_elevation=mic[2],
-                                        flow_resistivity=mic[4]),
+                [hoge],
+                [0.0],
+                [0.0],
+                t,
+                pos,
+                (mic[0], mic[1]),
+                ground=RotorcraftGround(
+                    receiver_height=mic[3],
+                    ground_elevation=mic[2],
+                    flow_resistivity=mic[4],
+                ),
                 track_state=state,
-                atmosphere=RotorcraftAtmosphere(atmospheric_method="sae"))
+                atmosphere=RotorcraftAtmosphere(atmospheric_method="sae"),
+            )
         # Measured deviations peak at +0.42 dB on the nadir and near-nadir
         # microphones (the prototype damps the coherent two-ray interference
         # of Eq. 30, as documented for the flyover cases); the six oblique
@@ -433,12 +496,13 @@ def test_case4_hover_ogh_event(norah_root: pathlib.Path) -> None:
     # 10*lg(0.5/10) duration correction, which measures its printing
     # convention rather than the event chain.
     assert nadir is not None
-    assert nadir.distance[0] == pytest.approx(rows[0, 5], abs=0.05)   # DOBS
-    assert nadir.polar[0] == pytest.approx(rows[0, 6], abs=0.01)      # THETAOBS
-    assert nadir.azimuth[0] == pytest.approx(rows[0, 7], abs=0.01)    # PHIOBSAC
+    assert nadir.distance[0] == pytest.approx(rows[0, 5], abs=0.05)  # DOBS
+    assert nadir.polar[0] == pytest.approx(rows[0, 6], abs=0.01)  # THETAOBS
+    assert nadir.azimuth[0] == pytest.approx(rows[0, 7], abs=0.01)  # PHIOBSAC
     assert nadir.times[0] - nadir.emission_times[0] == pytest.approx(
-        rows[0, 4], abs=0.01)                                         # trec
-    assert nadir.a_levels[0] == pytest.approx(rows[0, 9], abs=0.45)   # LA
+        rows[0, 4], abs=0.01
+    )  # trec
+    assert nadir.a_levels[0] == pytest.approx(rows[0, 9], abs=0.45)  # LA
     assert nadir.la_max == pytest.approx(header["LAMAX"], abs=0.45)
     assert nadir.pnltm == pytest.approx(header["PNLTM"], abs=0.5)
 
@@ -454,7 +518,7 @@ def test_case2_soft_ground_event(norah_root: pathlib.Path, r22_set: dict) -> Non
     near = rows[:, 9] >= header["LAMAX"] - 20.0
     assert np.max(np.abs(d_la[near])) < 2.0
     assert np.max(np.abs(d_la)) < 5.5
-    assert np.all(d_la < 0.5)   # this implementation never exceeds the prototype
+    assert np.all(d_la < 0.5)  # this implementation never exceeds the prototype
     assert res.la_max == pytest.approx(header["LAMAX"], abs=0.03)
     assert res.sel == pytest.approx(header["SELA"], abs=0.4)
     assert res.pnltm == pytest.approx(header["PNLTM"], abs=0.15)
@@ -513,25 +577,44 @@ def test_case2_contour_grid(norah_root: pathlib.Path, r22_set: dict) -> None:
     assert xs.size == 11
     assert ys.size == 17
     kwargs = {
-        "x": xs, "y": ys, "level_offset": inp["ddb"],
+        "x": xs,
+        "y": ys,
+        "level_offset": inp["ddb"],
         "track_state": RotorcraftTrackState(
-            airspeed=inp["speed"], path_angle=inp["vang"],
-            heading=inp["heading"], bank_angle=inp["roll"]),
-        "interpolation": FlightConditionInterpolation(
-            triangles=r22_set["triangles"]),
-        "atmosphere": RotorcraftAtmosphere(atmospheric_method="sae")}
+            airspeed=inp["speed"],
+            path_angle=inp["vang"],
+            heading=inp["heading"],
+            bank_angle=inp["roll"],
+        ),
+        "interpolation": FlightConditionInterpolation(triangles=r22_set["triangles"]),
+        "atmosphere": RotorcraftAtmosphere(atmospheric_method="sae"),
+    }
     for sigma, tol_sel, tol_max in ((2.0e5, 0.7, 0.7), (8.0e5, 0.15, 0.7)):
-        ground = RotorcraftGround(receiver_height=1.2,
-                                  ground_elevation=float(mics[0, 2]),
-                                  flow_resistivity=sigma)
+        ground = RotorcraftGround(
+            receiver_height=1.2,
+            ground_elevation=float(mics[0, 2]),
+            flow_resistivity=sigma,
+        )
         sel = rotorcraft_noise_contour(
-            r22_set["hemispheres"], r22_set["airspeeds"], r22_set["path_angles"],
-            inp["times"], inp["positions"], metric="exposure",
-            ground=ground, **kwargs)
+            r22_set["hemispheres"],
+            r22_set["airspeeds"],
+            r22_set["path_angles"],
+            inp["times"],
+            inp["positions"],
+            metric="exposure",
+            ground=ground,
+            **kwargs,
+        )
         lam = rotorcraft_noise_contour(
-            r22_set["hemispheres"], r22_set["airspeeds"], r22_set["path_angles"],
-            inp["times"], inp["positions"], metric="maximum",
-            ground=ground, **kwargs)
+            r22_set["hemispheres"],
+            r22_set["airspeeds"],
+            r22_set["path_angles"],
+            inp["times"],
+            inp["positions"],
+            metric="maximum",
+            ground=ground,
+            **kwargs,
+        )
         sub = mics[mics[:, 4] == sigma]
         assert sub.shape[0] > 30
         d_sel, d_max = [], []
@@ -546,13 +629,15 @@ def test_case2_contour_grid(norah_root: pathlib.Path, r22_set: dict) -> None:
         assert np.percentile(np.abs(d_max), 50) < 0.1
 
 
-def test_reference_hemisphere_node_lookup(norah_root: pathlib.Path,
-                                          r22_set: dict) -> None:
+def test_reference_hemisphere_node_lookup(
+    norah_root: pathlib.Path, r22_set: dict
+) -> None:
     # The parsed database reproduces the factual node values baked into the
     # synthetic suite (test_rotorcraft_noise._A109-style checks use inline
     # copies; here the real file feeds the same lookup).
     phi, theta, freqs, levels = _parse_hem(
-        norah_root / "Hemispheres" / "R22_Flyover_55kts_0deg.hem")
+        norah_root / "Hemispheres" / "R22_Flyover_55kts_0deg.hem"
+    )
     h = RotorcraftHemisphere(freqs, phi, theta, levels)
     assert phi.size == 19
     assert theta.size == 19
@@ -560,12 +645,14 @@ def test_reference_hemisphere_node_lookup(norah_root: pathlib.Path,
     from phonometry.aircraft.rotorcraft_noise import hemisphere_source_level
 
     k = int(np.nonzero(freqs == 500.0)[0][0])
-    node = levels[9, 9, k]   # phi = 0, theta = 90
+    node = levels[9, 9, k]  # phi = 0, theta = 90
     assert np.isfinite(node)
     assert hemisphere_source_level(h, 0.0, 90.0)[k] == pytest.approx(node)
 
 
-def test_case3_elevated_receiver_events(norah_root: pathlib.Path, r22_set: dict) -> None:
+def test_case3_elevated_receiver_events(
+    norah_root: pathlib.Path, r22_set: dict
+) -> None:
     # Case 3 places every microphone on its own ground elevation (an explicit
     # per-receiver ZMIC ramp) over sigma = 1e5 ground, with the track
     # pre-truncated to 2 km of the grid: an end-to-end oracle for the
@@ -581,8 +668,9 @@ def test_case3_elevated_receiver_events(norah_root: pathlib.Path, r22_set: dict)
         assert res.epnl == pytest.approx(header["EPNL"], abs=epnl_tol)
 
 
-def test_case3_contour_with_elevation_grid(norah_root: pathlib.Path,
-                                           r22_set: dict) -> None:
+def test_case3_contour_with_elevation_grid(
+    norah_root: pathlib.Path, r22_set: dict
+) -> None:
     # One contour call with the per-receiver ground-elevation array of the
     # Case 3 grid file reproduces every microphone of the .onl.
     case = norah_root / "ARP" / "Case3" / "SE" / "CH7_H1_APP_STD1_NE"
@@ -601,30 +689,48 @@ def test_case3_contour_with_elevation_grid(norah_root: pathlib.Path,
     assert np.all(np.isfinite(elevation))
     assert np.unique(mics[:, 4]).tolist() == [1.0e5]
     kwargs = {
-        "x": xs, "y": ys, "level_offset": inp["ddb"],
-        "ground": RotorcraftGround(receiver_height=1.2,
-                                   ground_elevation=elevation,
-                                   flow_resistivity=1.0e5),
+        "x": xs,
+        "y": ys,
+        "level_offset": inp["ddb"],
+        "ground": RotorcraftGround(
+            receiver_height=1.2, ground_elevation=elevation, flow_resistivity=1.0e5
+        ),
         "track_state": RotorcraftTrackState(
-            airspeed=inp["speed"], path_angle=inp["vang"],
-            heading=inp["heading"], bank_angle=inp["roll"]),
-        "interpolation": FlightConditionInterpolation(
-            triangles=r22_set["triangles"]),
-        "atmosphere": RotorcraftAtmosphere(atmospheric_method="sae")}
+            airspeed=inp["speed"],
+            path_angle=inp["vang"],
+            heading=inp["heading"],
+            bank_angle=inp["roll"],
+        ),
+        "interpolation": FlightConditionInterpolation(triangles=r22_set["triangles"]),
+        "atmosphere": RotorcraftAtmosphere(atmospheric_method="sae"),
+    }
     sel = rotorcraft_noise_contour(
-        r22_set["hemispheres"], r22_set["airspeeds"], r22_set["path_angles"],
-        inp["times"], inp["positions"], metric="exposure", **kwargs)
+        r22_set["hemispheres"],
+        r22_set["airspeeds"],
+        r22_set["path_angles"],
+        inp["times"],
+        inp["positions"],
+        metric="exposure",
+        **kwargs,
+    )
     lam = rotorcraft_noise_contour(
-        r22_set["hemispheres"], r22_set["airspeeds"], r22_set["path_angles"],
-        inp["times"], inp["positions"], metric="maximum", **kwargs)
+        r22_set["hemispheres"],
+        r22_set["airspeeds"],
+        r22_set["path_angles"],
+        inp["times"],
+        inp["positions"],
+        metric="maximum",
+        **kwargs,
+    )
     assert np.nanmax(np.abs(sel.level - ref_sel)) < 0.15
     assert np.nanmax(np.abs(lam.level - ref_max)) < 0.4
     assert np.nanpercentile(np.abs(sel.level - ref_sel), 50) < 0.05
     assert np.nanpercentile(np.abs(lam.level - ref_max), 50) < 0.05
 
 
-def test_case2_contour_single_call_with_sigma_map(norah_root: pathlib.Path,
-                                                  r22_set: dict) -> None:
+def test_case2_contour_single_call_with_sigma_map(
+    norah_root: pathlib.Path, r22_set: dict
+) -> None:
     # The Case 2 grid mixes two ground classes across its microphones; one
     # contour call with the per-receiver flow-resistivity array reproduces
     # the whole .onl (the per-class scalar runs of the PR-2-era test remain
@@ -645,22 +751,41 @@ def test_case2_contour_single_call_with_sigma_map(norah_root: pathlib.Path,
     assert np.all(np.isfinite(sigma))
     assert sorted(np.unique(sigma).tolist()) == [2.0e5, 8.0e5]
     kwargs = {
-        "x": xs, "y": ys, "level_offset": inp["ddb"],
-        "ground": RotorcraftGround(receiver_height=1.2,
-                                   ground_elevation=float(mics[0, 2]),
-                                   flow_resistivity=sigma),
+        "x": xs,
+        "y": ys,
+        "level_offset": inp["ddb"],
+        "ground": RotorcraftGround(
+            receiver_height=1.2,
+            ground_elevation=float(mics[0, 2]),
+            flow_resistivity=sigma,
+        ),
         "track_state": RotorcraftTrackState(
-            airspeed=inp["speed"], path_angle=inp["vang"],
-            heading=inp["heading"], bank_angle=inp["roll"]),
-        "interpolation": FlightConditionInterpolation(
-            triangles=r22_set["triangles"]),
-        "atmosphere": RotorcraftAtmosphere(atmospheric_method="sae")}
+            airspeed=inp["speed"],
+            path_angle=inp["vang"],
+            heading=inp["heading"],
+            bank_angle=inp["roll"],
+        ),
+        "interpolation": FlightConditionInterpolation(triangles=r22_set["triangles"]),
+        "atmosphere": RotorcraftAtmosphere(atmospheric_method="sae"),
+    }
     sel = rotorcraft_noise_contour(
-        r22_set["hemispheres"], r22_set["airspeeds"], r22_set["path_angles"],
-        inp["times"], inp["positions"], metric="exposure", **kwargs)
+        r22_set["hemispheres"],
+        r22_set["airspeeds"],
+        r22_set["path_angles"],
+        inp["times"],
+        inp["positions"],
+        metric="exposure",
+        **kwargs,
+    )
     lam = rotorcraft_noise_contour(
-        r22_set["hemispheres"], r22_set["airspeeds"], r22_set["path_angles"],
-        inp["times"], inp["positions"], metric="maximum", **kwargs)
+        r22_set["hemispheres"],
+        r22_set["airspeeds"],
+        r22_set["path_angles"],
+        inp["times"],
+        inp["positions"],
+        metric="maximum",
+        **kwargs,
+    )
     # Tolerances follow the per-class PR-2 measurements (the soft class
     # carries the documented far-tail interference divergence into SEL).
     assert np.nanmax(np.abs(sel.level - ref_sel)) < 0.7

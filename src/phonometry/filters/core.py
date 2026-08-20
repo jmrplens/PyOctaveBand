@@ -146,7 +146,9 @@ def _validate_bank_design(
         raise ValueError(f"Invalid filter_type. Must be one of {_VALID_FILTERS}")
     if design.resample and block_processing.stateful:
         # a stateful resampling algorithm would be required...
-        raise ValueError("Resampling and stateful behaviour (block processing) are not supported.")
+        raise ValueError(
+            "Resampling and stateful behaviour (block processing) are not supported."
+        )
     return limits
 
 
@@ -155,7 +157,7 @@ class OctaveFilterBank:
     A class-based representation of an Octave Filter Bank.
     Allows for pre-calculating and reusing filter coefficients.
     """
-    
+
     def __init__(
         self,
         fs: int,
@@ -188,7 +190,9 @@ class OctaveFilterBank:
         :param response_plot: Whether to show or save the filter response plot
             drawn while designing the bank (:class:`ResponsePlot`).
         """
-        limits = _validate_bank_design(fs, fraction, order, limits, design, block_processing)
+        limits = _validate_bank_design(
+            fs, fraction, order, limits, design, block_processing
+        )
 
         self.fs = fs
         self.fraction = fraction
@@ -209,9 +213,10 @@ class OctaveFilterBank:
         self.stateful = block_processing.stateful
 
         # Generate frequencies
-        self.freq, self.freq_d, self.freq_u, self.nominal_freq = _genfreqs(limits, fraction, fs)
+        self.freq, self.freq_d, self.freq_u, self.nominal_freq = _genfreqs(
+            limits, fraction, fs
+        )
         self.num_bands = len(self.freq)
-
 
         # Calculate factors and design SOS
         if design.resample:
@@ -220,22 +225,30 @@ class OctaveFilterBank:
                 # The cheby2 stopband extends above the band's upper edge;
                 # 5% safety margin so it clears the decimated Nyquist.
                 headroom = max(
-                    headroom, 1.05 * _cheby2_headroom(fraction, order, design.attenuation)
+                    headroom,
+                    1.05 * _cheby2_headroom(fraction, order, design.attenuation),
                 )
             self.factor = _downsamplingfactor(self.freq_u, fs, headroom)
         else:
             self.factor = np.ones(self.num_bands, dtype=int)
 
         self.sos = _design_sos_filter(
-            self.freq, self.freq_d, self.freq_u, fs, order, self.factor,
-            design.filter_type, design.ripple, design.attenuation,
-            response_plot.show, response_plot.file
+            self.freq,
+            self.freq_d,
+            self.freq_u,
+            fs,
+            order,
+            self.factor,
+            design.filter_type,
+            design.ripple,
+            design.attenuation,
+            response_plot.show,
+            response_plot.file,
         )
 
         # Calculate initial conditions for filter state
         if self.stateful:
             self._init_filter_state(block_processing.steady_ic)
-
 
     def _init_filter_state(self, steady_ic: bool) -> None:
         """Initialize filter state (zi) for stateful block-wise processing.
@@ -245,7 +258,6 @@ class OctaveFilterBank:
         """
         self.zi: list[np.ndarray] = [np.array([]) for _ in range(self.num_bands)]
         self._steady_ic = steady_ic
-
 
     def __repr__(self) -> str:
         return (
@@ -403,8 +415,12 @@ class OctaveFilterBank:
 
         # Process signal across all bands and channels
         spl, xb = self._process_bands(
-            x_proc, num_channels, sigbands, mode=mode,
-            calculate_level=calculate_level, zero_phase=zero_phase,
+            x_proc,
+            num_channels,
+            sigbands,
+            mode=mode,
+            calculate_level=calculate_level,
+            zero_phase=zero_phase,
         )
 
         # Format output based on input dimensionality
@@ -416,7 +432,9 @@ class OctaveFilterBank:
 
         # Return a copy: the bank (possibly shared via the octave_filter()
         # design cache) must not be corrupted by callers mutating the list.
-        freq_out: list[float] | list[str] = list(self.nominal_freq) if nominal else list(self.freq)
+        freq_out: list[float] | list[str] = (
+            list(self.nominal_freq) if nominal else list(self.freq)
+        )
 
         if sigbands and xb is not None:
             # The band waveforms are pressure records and come back as
@@ -425,9 +443,7 @@ class OctaveFilterBank:
             # of its own, filtered digital units: handing those back as a
             # Signal would label them pascals. See _default_calibration.
             if isinstance(x, Signal) and self._default_calibration:
-                bands: list[Signal] = [
-                    like_input(x, band, fs=self.fs) for band in xb
-                ]
+                bands: list[Signal] = [like_input(x, band, fs=self.fs) for band in xb]
                 return spl, freq_out, bands
             return spl, freq_out, xb
         return spl, freq_out
@@ -463,7 +479,7 @@ class OctaveFilterBank:
                     stacklevel=3,
                 )
             # Axis -1 handles both 1D and 2D arrays correctly
-            x_proc = signal.detrend(x_proc, axis=-1, type='constant')
+            x_proc = signal.detrend(x_proc, axis=-1, type="constant")
 
         is_multichannel = x_proc.ndim > 1
         if not is_multichannel:
@@ -512,16 +528,22 @@ class OctaveFilterBank:
         win = round(window_time * self.fs)
         hop = max(1, round(win * (1 - overlap)))
         if win <= 0 or win > n_samples:
-            raise ValueError("window_time must be positive and shorter than the signal.")
+            raise ValueError(
+                "window_time must be positive and shorter than the signal."
+            )
 
         # Filter once per band at full rate so windows stay time-aligned
         # across bands regardless of per-band decimation.
         if detrend:
-            x_proc = signal.detrend(x_proc, axis=-1, type='constant')
+            x_proc = signal.detrend(x_proc, axis=-1, type="constant")
         x_2d = x_proc if is_multichannel else x_proc[np.newaxis, :]
         _, bands_opt = self._process_bands(
-            x_2d, x_2d.shape[0], sigbands=True, mode=mode,
-            calculate_level=False, zero_phase=zero_phase,
+            x_2d,
+            x_2d.shape[0],
+            sigbands=True,
+            mode=mode,
+            calculate_level=False,
+            zero_phase=zero_phase,
         )
         # sigbands=True always fills the band list
         bands = cast(list[np.ndarray], bands_opt)
@@ -535,10 +557,12 @@ class OctaveFilterBank:
         # chunking keeps memory bounded for long signals / high overlap.
         frame_chunk = 256
         for b, yb in enumerate(bands):
-            windows = np.lib.stride_tricks.sliding_window_view(yb, win, axis=-1)[:, ::hop, :]
+            windows = np.lib.stride_tricks.sliding_window_view(yb, win, axis=-1)[
+                :, ::hop, :
+            ]
             for j0 in range(0, windows.shape[1], frame_chunk):
-                seg = windows[:, j0:j0 + frame_chunk, :]
-                levels[:, b, j0:j0 + frame_chunk] = self._calculate_level(seg, mode)
+                seg = windows[:, j0 : j0 + frame_chunk, :]
+                levels[:, b, j0 : j0 + frame_chunk] = self._calculate_level(seg, mode)
 
         if not is_multichannel:
             return levels[0], list(self.freq), times
@@ -564,11 +588,10 @@ class OctaveFilterBank:
         :param zero_phase: If True, use forward-backward filtering.
         :return: A tuple containing (SPL_array, Optional_List_of_filtered_signals).
         """
-        if calculate_level:
-            spl = np.zeros([num_channels, self.num_bands])
-        else:
-            spl = None
-        xb: list[np.ndarray] | None = [np.array([]) for _ in range(self.num_bands)] if sigbands else None
+        spl = np.zeros([num_channels, self.num_bands]) if calculate_level else None
+        xb: list[np.ndarray] | None = (
+            [np.array([]) for _ in range(self.num_bands)] if sigbands else None
+        )
 
         for idx in range(self.num_bands):
             # Vectorized processing for all channels
@@ -581,13 +604,16 @@ class OctaveFilterBank:
             if sigbands and xb is not None:
                 # Restore original length
                 # filtered_signal is [channels, downsampled_samples]
-                y_resampled = _resample_to_length(filtered_signal, int(self.factor[idx]), x_proc.shape[1])
+                y_resampled = _resample_to_length(
+                    filtered_signal, int(self.factor[idx]), x_proc.shape[1]
+                )
                 xb[idx] = y_resampled
 
         return spl, xb
 
-
-    def _filter_and_resample(self, x: np.ndarray, idx: int, zero_phase: bool = False) -> np.ndarray:
+    def _filter_and_resample(
+        self, x: np.ndarray, idx: int, zero_phase: bool = False
+    ) -> np.ndarray:
         """Resample and filter for a specific band (vectorized)."""
         if self.factor[idx] > 1:
             # axis=-1 is default for resample_poly, but being explicit is good
@@ -610,8 +636,12 @@ class OctaveFilterBank:
                     self.zi[idx] = np.zeros((n_sections, n_channels, 2))
                 else:
                     zi_base = signal.sosfilt_zi(self.sos[idx])
-                    self.zi[idx] = np.tile(zi_base[:, np.newaxis, :], (1, n_channels, 1))
-            y, self.zi[idx] = signal.sosfilt(self.sos[idx], sd, axis=-1, zi=self.zi[idx])
+                    self.zi[idx] = np.tile(
+                        zi_base[:, np.newaxis, :], (1, n_channels, 1)
+                    )
+            y, self.zi[idx] = signal.sosfilt(
+                self.sos[idx], sd, axis=-1, zi=self.zi[idx]
+            )
         else:
             y = signal.sosfilt(self.sos[idx], sd, axis=-1)
 
@@ -630,14 +660,14 @@ class OctaveFilterBank:
             raise ValueError("Invalid mode. Use 'rms' or 'peak'.")
 
         eps = np.finfo(float).eps
-        
+
         # Ensure val_linear is at least eps to avoid log(0)
         val_linear = np.maximum(val_linear, eps)
 
         if self.dbfs:
             # dBFS: 0 dB is RMS = 1.0 or Peak = 1.0
             return cast(np.ndarray, 20 * np.log10(val_linear))
-        
+
         # Physical SPL: apply sensitivity and use 20uPa reference
         pressure_pa = val_linear * self.calibration_factor
         return cast(np.ndarray, 20 * np.log10(np.maximum(pressure_pa, eps) / 2e-5))
@@ -749,7 +779,12 @@ def octave_filter(
     design: FilterDesign = _DEFAULT_DESIGN,
     calibration: LevelCalibration = _DEFAULT_CALIBRATION,
     response_plot: ResponsePlot = _DEFAULT_RESPONSE_PLOT,
-) -> tuple[np.ndarray, list[float]] | tuple[np.ndarray, list[str]] | tuple[np.ndarray, list[float], list[Signal] | list[np.ndarray]] | tuple[np.ndarray, list[str], list[Signal] | list[np.ndarray]]:
+) -> (
+    tuple[np.ndarray, list[float]]
+    | tuple[np.ndarray, list[str]]
+    | tuple[np.ndarray, list[float], list[Signal] | list[np.ndarray]]
+    | tuple[np.ndarray, list[str], list[Signal] | list[np.ndarray]]
+):
     """
     Filter a signal with octave or fractional octave filter bank.
 
@@ -819,6 +854,10 @@ def octave_filter(
         # so they are hashable and compare by value: equal options hit the
         # same cache entry.
         limits_key = tuple(map(float, limits)) if limits is not None else None
-        filter_bank = _cached_filter_bank(fs, fraction, order, limits_key, design, calibration)
+        filter_bank = _cached_filter_bank(
+            fs, fraction, order, limits_key, design, calibration
+        )
 
-    return filter_bank.filter(x, sigbands=sigbands, mode=mode, detrend=detrend, nominal=nominal)  # type: ignore[call-overload,no-any-return]
+    return filter_bank.filter(  # type: ignore[call-overload,no-any-return]
+        x, sigbands=sigbands, mode=mode, detrend=detrend, nominal=nominal
+    )

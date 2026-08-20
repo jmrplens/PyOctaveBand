@@ -189,12 +189,16 @@ class TonalAssessmentResult:
     audibility: float
     adjustment: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the ``Kt(ΔLta)`` adjustment curve with this tone marked."""
         from ..._i18n import check_language
         from ..._plot.environment import plot_tonal_adjustment
 
-        return plot_tonal_adjustment(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_tonal_adjustment(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def assess_tonal_audibility(
@@ -358,9 +362,7 @@ def residual_sound_correction(
     lres = _finite(residual_level, "residual_level")
     margin = lp - lres
     if margin <= 0.0:
-        raise ValueError(
-            "'residual_level' must be below 'measured_level' to correct."
-        )
+        raise ValueError("'residual_level' must be below 'measured_level' to correct.")
     corrected = 10.0 * np.log10(10.0 ** (lp / 10.0) - 10.0 ** (lres / 10.0))
     reliable = margin > 3.0
     if not reliable:
@@ -491,9 +493,7 @@ def expanded_uncertainty(
     if u < 0.0:
         raise ValueError("'standard_uncertainty' must be non-negative.")
     if confidence not in _COVERAGE_FACTORS:
-        raise ValueError(
-            f"'confidence' must be one of {sorted(_COVERAGE_FACTORS)}."
-        )
+        raise ValueError(f"'confidence' must be one of {sorted(_COVERAGE_FACTORS)}.")
     return float(_COVERAGE_FACTORS[confidence] * u)
 
 

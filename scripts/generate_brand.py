@@ -75,18 +75,39 @@ class Ribbon:
 
 RIBBONS: tuple[Ribbon, ...] = (
     Ribbon(  # settles high, the shallowest of the three
-        spine=((32.5, 32.5), (46.8, 35.3), (71.2, 44.4), (111.2, 56.1),
-               (163.5, 80.0), (217.0, 88.5), (232.0, 90.0)),
+        spine=(
+            (32.5, 32.5),
+            (46.8, 35.3),
+            (71.2, 44.4),
+            (111.2, 56.1),
+            (163.5, 80.0),
+            (217.0, 88.5),
+            (232.0, 90.0),
+        ),
         width=(7.0, 10.0, 12.0, 18.0, 21.0, 11.0, 0.0),
     ),
     Ribbon(  # through the middle of the grid
-        spine=((32.5, 32.5), (46.8, 61.3), (74.0, 74.5), (121.4, 101.0),
-               (168.8, 139.2), (223.3, 155.1), (233.0, 157.0)),
+        spine=(
+            (32.5, 32.5),
+            (46.8, 61.3),
+            (74.0, 74.5),
+            (121.4, 101.0),
+            (168.8, 139.2),
+            (223.3, 155.1),
+            (233.0, 157.0),
+        ),
         width=(7.5, 11.0, 14.0, 23.5, 21.0, 10.0, 0.0),
     ),
     Ribbon(  # plunges out of the source, then runs out along the bottom
-        spine=((32.5, 32.5), (46.8, 92.6), (77.1, 109.1), (116.8, 154.8),
-               (159.2, 208.2), (218.3, 234.4), (231.0, 236.5)),
+        spine=(
+            (32.5, 32.5),
+            (46.8, 92.6),
+            (77.1, 109.1),
+            (116.8, 154.8),
+            (159.2, 208.2),
+            (218.3, 234.4),
+            (231.0, 236.5),
+        ),
         width=(8.0, 12.0, 15.5, 21.0, 22.0, 12.0, 0.0),
     ),
 )
@@ -240,7 +261,7 @@ def mark_svg(
         ' role="img" aria-label="phonometry">\n'
         "  <title>phonometry</title>"
         f"{style}\n"
-        f"  <g{grid_class} fill=\"none\" stroke=\"{grid_ink}\""
+        f'  <g{grid_class} fill="none" stroke="{grid_ink}"'
         f' stroke-width="{_fmt(GRID_STROKE)}"{opacity}>\n'
         f'    <rect x="{_fmt(GX)}" y="{_fmt(GY)}"'
         f' width="{_fmt(GRID_W)}" height="{_fmt(GRID_W)}"/>\n'
@@ -283,8 +304,11 @@ def render_png(
     ax.set_axis_off()
     if background is not None:
         fig.patch.set_facecolor(background)
-        ax.add_patch(Rectangle((0, 0), 1, 1, transform=ax.transAxes,
-                               facecolor=background, zorder=0))
+        ax.add_patch(
+            Rectangle(
+                (0, 0), 1, 1, transform=ax.transAxes, facecolor=background, zorder=0
+            )
+        )
     else:
         fig.patch.set_alpha(0.0)
 
@@ -296,27 +320,59 @@ def render_png(
 
     # The grid is drawn in points; at 1 inch square, 1 point is VB/72 units.
     lw = GRID_STROKE / span * 72.0
-    ax.add_patch(Rectangle((GX, GY), GRID_W, GRID_W, fill=False,
-                           edgecolor=grid_ink, linewidth=lw, joinstyle="miter",
-                           zorder=1))
+    ax.add_patch(
+        Rectangle(
+            (GX, GY),
+            GRID_W,
+            GRID_W,
+            fill=False,
+            edgecolor=grid_ink,
+            linewidth=lw,
+            joinstyle="miter",
+            zorder=1,
+        )
+    )
     pitch = GRID_W / COLS
     for i in range(1, COLS):
-        ax.plot([GX + i * pitch] * 2, [GY, GY + GRID_W],
-                color=grid_ink, linewidth=lw, solid_capstyle="butt", zorder=1)
-        ax.plot([GX, GX + GRID_W], [GY + i * pitch] * 2,
-                color=grid_ink, linewidth=lw, solid_capstyle="butt", zorder=1)
+        ax.plot(
+            [GX + i * pitch] * 2,
+            [GY, GY + GRID_W],
+            color=grid_ink,
+            linewidth=lw,
+            solid_capstyle="butt",
+            zorder=1,
+        )
+        ax.plot(
+            [GX, GX + GRID_W],
+            [GY + i * pitch] * 2,
+            color=grid_ink,
+            linewidth=lw,
+            solid_capstyle="butt",
+            zorder=1,
+        )
 
     for ribbon in RIBBONS:
-        ax.add_patch(PathPatch(_mpl_path(*ribbon_outline(ribbon)),
-                               facecolor=ink, edgecolor="none", zorder=2))
+        ax.add_patch(
+            PathPatch(
+                _mpl_path(*ribbon_outline(ribbon)),
+                facecolor=ink,
+                edgecolor="none",
+                zorder=2,
+            )
+        )
     ax.add_patch(Circle(SRC_C, SRC_R, facecolor=ink, edgecolor="none", zorder=2))
 
     dest.parent.mkdir(parents=True, exist_ok=True)
     with plt.rc_context({"savefig.bbox": None, "savefig.pad_inches": 0.0}):
         # Software=None keeps matplotlib's version out of the PNG's tEXt
         # chunk, so a version bump does not rewrite every icon byte for byte.
-        fig.savefig(dest, dpi=size, transparent=background is None,
-                    facecolor=fig.get_facecolor(), metadata={"Software": None})
+        fig.savefig(
+            dest,
+            dpi=size,
+            transparent=background is None,
+            facecolor=fig.get_facecolor(),
+            metadata={"Software": None},
+        )
     plt.close(fig)
     _report(dest)
 
@@ -356,8 +412,13 @@ def text_outline(text: str, font: Path, size: float, origin: Point) -> MplPath:
 
 
 def text_svg_path(
-    text: str, font: Path, size: float, origin: Point, colour: str,
-    *, css_class: str = "",
+    text: str,
+    font: Path,
+    size: float,
+    origin: Point,
+    colour: str,
+    *,
+    css_class: str = "",
 ) -> str:
     """One ``<path>`` element holding the text as outlines."""
     parts: list[str] = []
@@ -367,12 +428,15 @@ def text_svg_path(
         elif code == MplPath.LINETO:
             parts.append(f"L{_fmt(verts[0])} {_fmt(verts[1])}")
         elif code == MplPath.CURVE3:
-            parts.append(f"Q{_fmt(verts[0])} {_fmt(verts[1])}"
-                         f" {_fmt(verts[2])} {_fmt(verts[3])}")
+            parts.append(
+                f"Q{_fmt(verts[0])} {_fmt(verts[1])} {_fmt(verts[2])} {_fmt(verts[3])}"
+            )
         elif code == MplPath.CURVE4:
-            parts.append(f"C{_fmt(verts[0])} {_fmt(verts[1])}"
-                         f" {_fmt(verts[2])} {_fmt(verts[3])}"
-                         f" {_fmt(verts[4])} {_fmt(verts[5])}")
+            parts.append(
+                f"C{_fmt(verts[0])} {_fmt(verts[1])}"
+                f" {_fmt(verts[2])} {_fmt(verts[3])}"
+                f" {_fmt(verts[4])} {_fmt(verts[5])}"
+            )
         elif code == MplPath.CLOSEPOLY:
             parts.append("Z")
     attr = f' class="{css_class}"' if css_class else ""
@@ -380,8 +444,14 @@ def text_svg_path(
 
 
 def _mark_group(
-    x: float, y: float, scale: float, ink: str, grid_ink: str,
-    *, ink_class: str = "", grid_class: str = "",
+    x: float,
+    y: float,
+    scale: float,
+    ink: str,
+    grid_ink: str,
+    *,
+    ink_class: str = "",
+    grid_class: str = "",
 ) -> str:
     """The mark, translated and scaled into a larger composition."""
     ink_attr = f' class="{ink_class}"' if ink_class else ""
@@ -495,7 +565,9 @@ def banner_layout() -> Card:
     mark_px = 168.0
     text_x = 72.0 + mark_px + 48.0
     return Card(
-        width=1200.0, height=height, mark_px=mark_px,
+        width=1200.0,
+        height=height,
+        mark_px=mark_px,
         mark_at=(72.0, (height - mark_px) / 2),
         lines=(
             Line(WORDMARK, FONT_DISPLAY, 68.0, HEADING, (text_x, height / 2 + 2)),
@@ -507,7 +579,10 @@ def banner_layout() -> Card:
 def social_layout() -> Card:
     """The repository card: mark high on the left, three lines stacked below."""
     return Card(
-        width=1280.0, height=640.0, mark_px=148.0, mark_at=(88.0, 96.0),
+        width=1280.0,
+        height=640.0,
+        mark_px=148.0,
+        mark_at=(88.0, 96.0),
         lines=(
             Line(WORDMARK, FONT_DISPLAY, 74.0, HEADING, (88.0, 372.0)),
             Line(TAGLINE, FONT_REGULAR, 27.0, SUPPORT, (90.0, 424.0)),
@@ -563,8 +638,10 @@ def lockup_svg() -> str:
     scale = card.mark_px / VB
     (mx0, my0), (mx1, my1) = _mark_ink_bounds()
     mark = (
-        card.mark_at[0] + mx0 * scale, card.mark_at[1] + my0 * scale,
-        card.mark_at[0] + mx1 * scale, card.mark_at[1] + my1 * scale,
+        card.mark_at[0] + mx0 * scale,
+        card.mark_at[1] + my0 * scale,
+        card.mark_at[0] + mx1 * scale,
+        card.mark_at[1] + my1 * scale,
     )
     ink = text_outline(word.text, word.font, word.size, word.at).get_extents()
     x0, y0 = min(mark[0], ink.x0), min(mark[1], ink.y0)
@@ -640,33 +717,80 @@ def card_png(dest: Path, card: Card, art: Path, *, scale: int = 1) -> None:
         else:
             keep = round(src.width / target)
             box = (0, (src.height - keep) // 2, src.width, (src.height + keep) // 2)
-        ax.imshow(src.resize((width, height), Image.Resampling.LANCZOS, box=box),
-                  extent=(0, card.width, card.height, 0), zorder=0)
+        ax.imshow(
+            src.resize((width, height), Image.Resampling.LANCZOS, box=box),
+            extent=(0, card.width, card.height, 0),
+            zorder=0,
+        )
 
     unit = card.mark_px / VB
     trans = Affine2D().scale(unit).translate(*card.mark_at) + ax.transData
     lw = GRID_STROKE * unit * 72.0 / dpi * scale
-    ax.add_patch(Rectangle((GX, GY), GRID_W, GRID_W, fill=False, zorder=2,
-                           edgecolor=ICON_GRID, linewidth=lw, transform=trans,
-                           joinstyle="miter"))
+    ax.add_patch(
+        Rectangle(
+            (GX, GY),
+            GRID_W,
+            GRID_W,
+            fill=False,
+            zorder=2,
+            edgecolor=ICON_GRID,
+            linewidth=lw,
+            transform=trans,
+            joinstyle="miter",
+        )
+    )
     pitch = GRID_W / COLS
     for i in range(1, COLS):
-        ax.plot([GX + i * pitch] * 2, [GY, GY + GRID_W], color=ICON_GRID,
-                linewidth=lw, transform=trans, solid_capstyle="butt", zorder=2)
-        ax.plot([GX, GX + GRID_W], [GY + i * pitch] * 2, color=ICON_GRID,
-                linewidth=lw, transform=trans, solid_capstyle="butt", zorder=2)
+        ax.plot(
+            [GX + i * pitch] * 2,
+            [GY, GY + GRID_W],
+            color=ICON_GRID,
+            linewidth=lw,
+            transform=trans,
+            solid_capstyle="butt",
+            zorder=2,
+        )
+        ax.plot(
+            [GX, GX + GRID_W],
+            [GY + i * pitch] * 2,
+            color=ICON_GRID,
+            linewidth=lw,
+            transform=trans,
+            solid_capstyle="butt",
+            zorder=2,
+        )
     for ribbon in RIBBONS:
-        ax.add_patch(PathPatch(_mpl_path(*ribbon_outline(ribbon)), zorder=3,
-                               facecolor=ICON_INK, edgecolor="none",
-                               transform=trans))
-    ax.add_patch(Circle(SRC_C, SRC_R, facecolor=ICON_INK, edgecolor="none",
-                        transform=trans, zorder=3))
+        ax.add_patch(
+            PathPatch(
+                _mpl_path(*ribbon_outline(ribbon)),
+                zorder=3,
+                facecolor=ICON_INK,
+                edgecolor="none",
+                transform=trans,
+            )
+        )
+    ax.add_patch(
+        Circle(
+            SRC_C,
+            SRC_R,
+            facecolor=ICON_INK,
+            edgecolor="none",
+            transform=trans,
+            zorder=3,
+        )
+    )
 
     for line in card.lines:
-        ax.text(line.at[0], line.at[1], line.text, color=line.colour, zorder=3,
-                fontsize=line.size * 72.0 / dpi * scale,
-                fontproperties=FontProperties(fname=str(line.font)),
-                va="baseline")
+        ax.text(
+            line.at[0],
+            line.at[1],
+            line.text,
+            color=line.colour,
+            zorder=3,
+            fontsize=line.size * 72.0 / dpi * scale,
+            fontproperties=FontProperties(fname=str(line.font)),
+            va="baseline",
+        )
 
     import io
 
@@ -714,8 +838,10 @@ def generate_all() -> None:
         (brand / "logo.svg", mark_svg(theme_aware=True)),
         # One flat colour inherited from the surrounding text, for badges,
         # stamps and anywhere the mark has to survive a single-ink reproduction.
-        (brand / "logo-mono.svg", mark_svg("currentColor", "currentColor",
-                                           grid_opacity=0.45)),
+        (
+            brand / "logo-mono.svg",
+            mark_svg("currentColor", "currentColor", grid_opacity=0.45),
+        ),
         (public / "favicon.svg", mark_svg(theme_aware=True)),
         # Mark and wordmark as one asset, for the header of the documentation
         # site: the type is already outlines, so the header needs no web font
@@ -741,8 +867,13 @@ def generate_all() -> None:
     render_png(brand / "logo-1024.png", 1024, margin=0.04)
     # The mark reversed out for the cards: the site's Open Graph generator
     # composes it over the dark artwork and cannot recolour an SVG.
-    render_png(brand / "logo-on-dark-512.png", 512, margin=0.02,
-               ink=ICON_INK, grid_ink=ICON_GRID)
+    render_png(
+        brand / "logo-on-dark-512.png",
+        512,
+        margin=0.02,
+        ink=ICON_INK,
+        grid_ink=ICON_GRID,
+    )
 
     print("Generating favicon fallback...")
     render_png(brand / "_favicon-48.png", 48, ink=INK, grid_ink=GRID_INK)
@@ -762,8 +893,13 @@ def generate_all() -> None:
     card_png(brand / "banner.webp", banner, banner_art, scale=2)
     # The site-wide fallback, for the docstring-generated API pages that get no
     # card of their own. Same layout as the repository card, 1200x630.
-    site_card = Card(width=1200.0, height=630.0, mark_px=148.0, mark_at=(88.0, 92.0),
-                     lines=social.lines)
+    site_card = Card(
+        width=1200.0,
+        height=630.0,
+        mark_px=148.0,
+        mark_at=(88.0, 92.0),
+        lines=social.lines,
+    )
     card_png(public / "og-image.png", site_card, social_art)
     # GitHub's social-preview uploader takes PNG, JPG or GIF, so this one cannot
     # be WebP however much smaller that would be.

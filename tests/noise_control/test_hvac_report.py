@@ -61,7 +61,10 @@ def _result():
 def _oracle_lw() -> np.ndarray:
     """Closed-form VDI 2081-1 straight-duct band sound power level."""
     return (
-        7.0 + 50.0 * np.log10(_U) + 10.0 * np.log10(_S) - 2.0
+        7.0
+        + 50.0 * np.log10(_U)
+        + 10.0 * np.log10(_S)
+        - 2.0
         - 26.0 * np.log10(1.14 + 0.02 * _FREQS / _U)
     )
 

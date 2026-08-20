@@ -106,6 +106,7 @@ def _validate_report_request(engine: str, language: str) -> None:
             f"Unknown report engine {engine!r}; only 'reportlab' is supported."
         )
 
+
 #: Reference equivalent sound absorption area ``A0`` for the normalized
 #: flanking descriptors (ISO 10848-1:2006, Clauses 3.2/3.3): 10 m².
 _REFERENCE_ABSORPTION_AREA = 10.0
@@ -278,7 +279,9 @@ def equivalent_absorption_length(
     f = _positive_array(frequency, "frequency")
     ts = _positive_array(structural_reverberation_time, "structural_reverberation_time")
     ts = _broadcast(ts, f.size, "structural_reverberation_time")
-    return _ABSORPTION_LENGTH_CONSTANT * s / (ts * c0) * np.sqrt(_REFERENCE_FREQUENCY / f)
+    return (
+        _ABSORPTION_LENGTH_CONSTANT * s / (ts * c0) * np.sqrt(_REFERENCE_FREQUENCY / f)
+    )
 
 
 def _broadcast(values: np.ndarray, n_bands: int, name: str) -> np.ndarray:
@@ -357,7 +360,9 @@ class VibrationReductionResult:
             bracketed=oct_bracketed,
         )
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot ``Kij`` against frequency.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -546,10 +551,16 @@ def vibration_reduction_index(
                 "supplied (Formula (12))."
             )
         a_i = equivalent_absorption_length(
-            s_i, structural_reverberation_time_i, freq, speed_of_sound=speed_of_sound  # type: ignore[arg-type]
+            s_i,
+            structural_reverberation_time_i,  # type: ignore[arg-type]
+            freq,
+            speed_of_sound=speed_of_sound,
         )
         a_j = equivalent_absorption_length(
-            s_j, structural_reverberation_time_j, freq, speed_of_sound=speed_of_sound  # type: ignore[arg-type]
+            s_j,
+            structural_reverberation_time_j,  # type: ignore[arg-type]
+            freq,
+            speed_of_sound=speed_of_sound,
         )
     else:
         a_i = np.full(dv.size, s_i / _REFERENCE_LENGTH, dtype=np.float64)
@@ -566,7 +577,8 @@ def vibration_reduction_index(
         frequencies=freq,
         k_ij=k_ij,
         single_number=_single_number_kij(
-            freq, k_ij, bracketed=bracketed, band_type=_detect_band_type(freq)),
+            freq, k_ij, bracketed=bracketed, band_type=_detect_band_type(freq)
+        ),
         bracketed=bracketed,
     )
 
@@ -609,7 +621,9 @@ def vibration_reduction_index_from_flanking(
     :return: ``Kij`` per band, in dB.
     :raises ValueError: On incompatible band counts or non-positive geometry.
     """
-    dn_f = _as_1d(normalized_flanking_level_difference, "normalized_flanking_level_difference")
+    dn_f = _as_1d(
+        normalized_flanking_level_difference, "normalized_flanking_level_difference"
+    )
     r_i = _as_1d(reduction_index_i, "reduction_index_i")
     r_j = _as_1d(reduction_index_j, "reduction_index_j")
     a_i = _positive_array(absorption_length_i, "absorption_length_i")
@@ -645,7 +659,9 @@ class FlankingLevelDifferenceResult:
     d_n_f: np.ndarray
     rating: WeightedRatingResult | None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot ``Dn,f`` against the shifted ISO 717-1 reference curve."""
         if self.rating is None:
             raise ValueError(
@@ -704,7 +720,11 @@ class FlankingLevelDifferenceResult:
         from ..._report.iso10848 import render_flanking_level_difference_report
 
         return render_flanking_level_difference_report(
-            self, path, metadata=metadata, verbose=verbose, language=language,
+            self,
+            path,
+            metadata=metadata,
+            verbose=verbose,
+            language=language,
             part=part,
         )
 
@@ -721,7 +741,9 @@ class FlankingImpactLevelResult:
     l_n_f: np.ndarray
     rating: ImpactRatingResult | None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot ``Ln,f`` against the shifted ISO 717-2 reference curve."""
         if self.rating is None:
             raise ValueError(
@@ -780,7 +802,11 @@ class FlankingImpactLevelResult:
         from ..._report.iso10848 import render_flanking_impact_level_report
 
         return render_flanking_impact_level_report(
-            self, path, metadata=metadata, verbose=verbose, language=language,
+            self,
+            path,
+            metadata=metadata,
+            verbose=verbose,
+            language=language,
             part=part,
         )
 
@@ -815,7 +841,9 @@ def normalized_flanking_level_difference(
     area = _positive_array(absorption_area, "absorption_area")
     a0 = _positive(reference_area, "reference_area")
     if not (l1.size == l2.size == area.size):
-        raise ValueError("'source_level', 'receive_level' and 'absorption_area' must share their length.")
+        raise ValueError(
+            "'source_level', 'receive_level' and 'absorption_area' must share their length."
+        )
     d_n_f = l1 - l2 - 10.0 * np.log10(area / a0)
     rating = _maybe_rating(d_n_f, bands)
     return FlankingLevelDifferenceResult(d_n_f=d_n_f, rating=rating)
@@ -850,7 +878,9 @@ def normalized_flanking_impact_level(
     area = _positive_array(absorption_area, "absorption_area")
     a0 = _positive(reference_area, "reference_area")
     if l2.size != area.size:
-        raise ValueError("'receive_level' and 'absorption_area' must share their length.")
+        raise ValueError(
+            "'receive_level' and 'absorption_area' must share their length."
+        )
     l_n_f = l2 + 10.0 * np.log10(area / a0)
     rating: ImpactRatingResult | None = None
     if l_n_f.size in (16, 5):
@@ -858,9 +888,7 @@ def normalized_flanking_impact_level(
     return FlankingImpactLevelResult(l_n_f=l_n_f, rating=rating)
 
 
-def _maybe_rating(
-    values: np.ndarray, bands: str | None
-) -> WeightedRatingResult | None:
+def _maybe_rating(values: np.ndarray, bands: str | None) -> WeightedRatingResult | None:
     """Form the ISO 717-1 rating when the band count is 16 or 5, else ``None``."""
     if values.size in (16, 5):
         return weighted_rating(values, bands)

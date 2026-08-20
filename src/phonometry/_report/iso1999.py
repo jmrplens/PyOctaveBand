@@ -195,15 +195,21 @@ def _nipts_table(
         ]
         if verbose:
             row += [
-                Paragraph(_fmt_db(float(result.spread_upper[i]), language), value_style),
-                Paragraph(_fmt_db(float(result.spread_lower[i]), language), value_style),
+                Paragraph(
+                    _fmt_db(float(result.spread_upper[i]), language), value_style
+                ),
+                Paragraph(
+                    _fmt_db(float(result.spread_lower[i]), language), value_style
+                ),
             ]
         data.append(row)
 
     return stacked_table(data, [w * mm for w in widths])
 
 
-def _nipts_statement(result: NiptsResult, language: str = "en") -> tuple[str, list[str]]:
+def _nipts_statement(
+    result: NiptsResult, language: str = "en"
+) -> tuple[str, list[str]]:
     """The boxed representative NIPTS statement and the exposure-condition terms."""
     is_handicap, value, freq = _representative(result.frequencies, result.value)
     if is_handicap:
@@ -303,13 +309,18 @@ def render_nipts_report(
     ]
     left_width = 96.0 if verbose else 66.0
     plot_drawing = render_figure_drawing(
-        result.plot, (174.0 - left_width) * mm, y_top=None,
-        figsize=(5.4, 4.6), language=language,
+        result.plot,
+        (174.0 - left_width) * mm,
+        y_top=None,
+        figsize=(5.4, 4.6),
+        language=language,
     )
     flow.append(
         two_panel_body(
-            left_cell, plot_drawing,
-            left_width_mm=left_width, plot_width_mm=174.0 - left_width,
+            left_cell,
+            plot_drawing,
+            left_width_mm=left_width,
+            plot_width_mm=174.0 - left_width,
         )
     )
     flow.append(Spacer(1, 8))
@@ -370,13 +381,17 @@ def _htlan_table(
         ]
         if verbose:
             row.append(Paragraph(_fmt_db(h * n / _HTLAN_DENOM, language), value_style))
-        row.append(Paragraph(_fmt_db(float(result.threshold[i]), language), value_style))
+        row.append(
+            Paragraph(_fmt_db(float(result.threshold[i]), language), value_style)
+        )
         data.append(row)
 
     return stacked_table(data, [w * mm for w in widths])
 
 
-def _htlan_statement(result: HtlanResult, language: str = "en") -> tuple[str, list[str]]:
+def _htlan_statement(
+    result: HtlanResult, language: str = "en"
+) -> tuple[str, list[str]]:
     """The boxed representative HTLAN statement and the listener/exposure terms."""
     is_handicap, value, freq = _representative(result.frequencies, result.threshold)
     if is_handicap:
@@ -396,7 +411,9 @@ def _htlan_statement(result: HtlanResult, language: str = "en") -> tuple[str, li
         t("Listener: {sex}, age {age} years", language).format(
             sex=sex, age=decimal_comma(f"{result.age:g}", language)
         ),
-        t("Noise exposure L<sub>EX,8h</sub> = {lex} dB over {years} years", language).format(
+        t(
+            "Noise exposure L<sub>EX,8h</sub> = {lex} dB over {years} years", language
+        ).format(
             lex=decimal_comma(f"{result.l_ex:g}", language),
             years=decimal_comma(f"{result.years:g}", language),
         ),
@@ -474,13 +491,18 @@ def render_htlan_report(
     ]
     left_width = 92.0 if verbose else 74.0
     plot_drawing = render_figure_drawing(
-        result.plot, (174.0 - left_width) * mm, y_top=None,
-        figsize=(5.4, 4.6), language=language,
+        result.plot,
+        (174.0 - left_width) * mm,
+        y_top=None,
+        figsize=(5.4, 4.6),
+        language=language,
     )
     flow.append(
         two_panel_body(
-            left_cell, plot_drawing,
-            left_width_mm=left_width, plot_width_mm=174.0 - left_width,
+            left_cell,
+            plot_drawing,
+            left_width_mm=left_width,
+            plot_width_mm=174.0 - left_width,
         )
     )
     flow.append(Spacer(1, 8))
@@ -554,8 +576,11 @@ def _prediction_notes(
     from ._layout import fiche_paragraph as Paragraph
 
     note_style = ParagraphStyle(
-        "iso1999_notes", parent=getSampleStyleSheet()["Normal"],
-        fontSize=7.5, leading=10, textColor=colors.HexColor(_MUTED_HEX),
+        "iso1999_notes",
+        parent=getSampleStyleSheet()["Normal"],
+        fontSize=7.5,
+        leading=10,
+        textColor=colors.HexColor(_MUTED_HEX),
         spaceBefore=6,
     )
     notes: list[Any] = [

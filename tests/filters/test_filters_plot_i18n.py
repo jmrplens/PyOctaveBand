@@ -63,10 +63,13 @@ def test_filter_class_es() -> None:
 
 
 def test_parametric_eq_es_and_bad_language() -> None:
-    eq = ph.filters.ParametricEQ(FS, [
-        ph.filters.EQSection("lowshelf", 100.0, gain_db=4.0),
-        ph.filters.EQSection("peaking", 1000.0, gain_db=-6.0, q=1.5),
-    ])
+    eq = ph.filters.ParametricEQ(
+        FS,
+        [
+            ph.filters.EQSection("lowshelf", 100.0, gain_db=4.0),
+            ph.filters.EQSection("peaking", 1000.0, gain_db=-6.0, q=1.5),
+        ],
+    )
     res = eq.response(n_points=64)
     axes = res.plot(language="es")
     assert "Respuesta del EQ paramétrico (Audio EQ Cookbook)" in _titles(axes)

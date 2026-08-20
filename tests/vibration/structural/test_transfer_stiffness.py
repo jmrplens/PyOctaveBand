@@ -28,9 +28,7 @@ from phonometry.vibration.structural.transfer_stiffness import TRANSMISSIBILITY_
 def test_level_reference_decade() -> None:
     assert vibration.transfer_stiffness_level(1.0) == pytest.approx(0.0)
     assert vibration.transfer_stiffness_level(1e6) == pytest.approx(120.0)
-    assert vibration.transfer_stiffness_level(2e6) == pytest.approx(
-        126.0206, abs=1e-3
-    )
+    assert vibration.transfer_stiffness_level(2e6) == pytest.approx(126.0206, abs=1e-3)
 
 
 def test_level_uses_magnitude_of_complex() -> None:
@@ -41,9 +39,7 @@ def test_level_uses_magnitude_of_complex() -> None:
 
 
 def test_level_custom_reference() -> None:
-    assert vibration.transfer_stiffness_level(
-        1e3, reference=1e3
-    ) == pytest.approx(0.0)
+    assert vibration.transfer_stiffness_level(1e3, reference=1e3) == pytest.approx(0.0)
 
 
 def test_level_rejects_non_positive_reference() -> None:
@@ -104,17 +100,15 @@ def test_direct_method_rejects_zero_displacement() -> None:
 def test_indirect_matches_equation_1() -> None:
     f, m2, t = 500.0, 10.0, 0.01 + 0j
     expected = -((2.0 * math.pi * f) ** 2) * m2 * t
-    assert complex(
-        vibration.transfer_stiffness_indirect(f, t, m2)
-    ) == pytest.approx(expected)
+    assert complex(vibration.transfer_stiffness_indirect(f, t, m2)) == pytest.approx(
+        expected
+    )
 
 
 def test_indirect_includes_flange_mass() -> None:
     f, t = 300.0, 0.02 + 0j
     k_no_flange = vibration.transfer_stiffness_indirect(f, t, 8.0)
-    k_flange = vibration.transfer_stiffness_indirect(
-        f, t, 8.0, flange_mass=2.0
-    )
+    k_flange = vibration.transfer_stiffness_indirect(f, t, 8.0, flange_mass=2.0)
     assert complex(k_flange) == pytest.approx(complex(k_no_flange) * 10.0 / 8.0)
 
 
@@ -122,7 +116,7 @@ def test_indirect_recovers_kelvin_voigt_at_high_frequency() -> None:
     """A massless (k + jwc) element loaded by m: T -> indirect recovers k+jwc."""
     k, c, m = 1e6, 200.0, 5.0
     f0 = math.sqrt(k / m) / (2.0 * math.pi)
-    f = 30.0 * f0                                   # well into T << 1
+    f = 30.0 * f0  # well into T << 1
     t = vibration.base_transmissibility(f, m, k, c)
     k_rec = complex(vibration.transfer_stiffness_indirect(f, t, m))
     k_true = k + 1j * (2.0 * math.pi * f) * c
@@ -150,9 +144,7 @@ def test_indirect_silent_within_transmissibility_limit() -> None:
     with warnings.catch_warnings():
         warnings.simplefilter("error", PhonometryWarning)
         vibration.transfer_stiffness_indirect(500.0, 0.05 + 0j, 10.0)
-        vibration.transfer_stiffness_indirect(
-            500.0, TRANSMISSIBILITY_LIMIT + 0j, 10.0
-        )
+        vibration.transfer_stiffness_indirect(500.0, TRANSMISSIBILITY_LIMIT + 0j, 10.0)
 
 
 def test_result_helper_warns_above_transmissibility_limit() -> None:
@@ -277,7 +269,5 @@ def test_plot_returns_axes() -> None:
     # The synthetic curve exceeds |T| = 0.1 near resonance, so the
     # ISO 10846-3 validity advisory is expected, as in the tests above.
     with pytest.warns(PhonometryWarning, match="ISO 10846-3"):
-        res = vibration.indirect_transfer_stiffness_result(
-            f, t, blocking_mass=5.0
-        )
+        res = vibration.indirect_transfer_stiffness_result(f, t, blocking_mass=5.0)
     assert res.plot() is not None

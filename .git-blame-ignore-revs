@@ -1,11 +1,10 @@
-# Mechanical commits excluded from git blame (register with:
-#   git config blame.ignoreRevsFile .git-blame-ignore-revs)
-# 3.2 modularization move/split commits are appended at the end of Phase 1.
-700c186c5a578ade0b8b1b307de27cca42bdad72
-0b53a9082bf3c139f0265f416349c31aa57f3d36
-94acc49870906d8e9f0d1e81b7637f48f7008dff
-d494de3fdc3009fa7d154d5715f8cd190eef4428
-01a595f12cddd36b6851c90bf4150bfa7d02f8a4
-8af0855e9a1be30956dc305f1984651df56efcca
-b555a666ba5ad3449e3da2374d94814d29c44577
-cc297d1e8e175108a0e518a437344f217c5be278
+# Revisions that changed shape and not behaviour. Point git at this file so
+# they do not stand in front of the commit that actually wrote a line:
+#
+#     git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# GitHub reads it without being asked.
+
+# Formatted 673 of the 812 Python files, the first time this tree had a
+# formatter at all.
+71aff67c5136fa455fbef280c699540568003a77

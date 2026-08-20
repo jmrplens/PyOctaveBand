@@ -133,8 +133,9 @@ _PRECISION_FIGSIZE = (9.2, 2.5)
 
 def _basis(result: Any, language: str = "en") -> str:
     """The standard-basis line naming the scanning method and its grade."""
-    grade = _GRADE_PHRASE.get(getattr(result, "grade", "engineering"),
-                              _GRADE_PHRASE["engineering"])
+    grade = _GRADE_PHRASE.get(
+        getattr(result, "grade", "engineering"), _GRADE_PHRASE["engineering"]
+    )
     return t(
         "Determination of the sound power level from the normal sound intensity "
         "scanned over a surface enclosing the source (ISO 9614-2:1996, "
@@ -210,8 +211,9 @@ def _statement(result: Any, language: str = "en") -> tuple[str, list[str]]:
     """
     statement, extended = power_statement(result, language)
     surface = float(result.surface_area)
-    grade_phrase = _GRADE_PHRASE.get(getattr(result, "grade", "engineering"),
-                                     _GRADE_PHRASE["engineering"])
+    grade_phrase = _GRADE_PHRASE.get(
+        getattr(result, "grade", "engineering"), _GRADE_PHRASE["engineering"]
+    )
     extended.append(
         t("Measurement surface S = {value} m<super>2</super>", language).format(
             value=format_number(surface, language, decimals=2)
@@ -308,7 +310,8 @@ def render_intensity_power_report(
     """
     statement, extended = _statement(result, language)
     return render_sound_power_fiche(
-        result, path,
+        result,
+        path,
         copy=FicheCopy(
             title=t("Sound power determination", language),
             basis=_basis(result, language),
@@ -316,9 +319,9 @@ def render_intensity_power_report(
             statement=statement,
             extended=extended,
             basis_strips=[
-            _indicator_strip(result, language),
-            _criteria_strip(result, language),
-        ],
+                _indicator_strip(result, language),
+                _criteria_strip(result, language),
+            ],
         ),
         value_table=_value_table(result, verbose, language),
         metadata=metadata,
@@ -388,7 +391,11 @@ def _paired(
     half = (len(rows_data) + 1) // 2
     blank = [""] * len(header)
     paired_rows = [
-        [*rows_data[i], "", *(rows_data[i + half] if i + half < len(rows_data) else blank)]
+        [
+            *rows_data[i],
+            "",
+            *(rows_data[i + half] if i + half < len(rows_data) else blank),
+        ]
         for i in range(half)
     ]
     widths = [20.0, 22.0, 22.0, 18.0, 10.0, 20.0, 22.0, 22.0, 18.0]
@@ -591,9 +598,9 @@ def _precision_statement(
     offset = _normalization_offset(result)
     if math.isfinite(level_a) and math.isfinite(offset):
         extended.append(
-            t(
-                "Normalized L<sub>WA0</sub> = {value} dB(A) re {ref}", language
-            ).format(value=d1(level_a - offset, language), ref="1 pW")
+            t("Normalized L<sub>WA0</sub> = {value} dB(A) re {ref}", language).format(
+                value=d1(level_a - offset, language), ref="1 pW"
+            )
         )
     extended.append(
         t("Measurement surface S = {value} m<super>2</super>", language).format(
@@ -662,18 +669,14 @@ def _precision_model_strip(
             if not math.isfinite(offset)
             else format_number(offset, language, decimals=2)
         ),
-        ft=_indicator_range(
-            None if indicators is None else indicators.ft, language, 2
-        ),
+        ft=_indicator_range(None if indicators is None else indicators.ft, language, 2),
         unsigned=_indicator_range(
             None if indicators is None else indicators.f_pi_unsigned, language
         ),
         signed=_indicator_range(
             None if indicators is None else indicators.f_pi_signed, language
         ),
-        fs=_indicator_range(
-            None if indicators is None else indicators.fs, language, 2
-        ),
+        fs=_indicator_range(None if indicators is None else indicators.fs, language, 2),
         residual=_indicator_range(residual, language),
         ld=_indicator_range(_dynamic_capability(residual_index), language),
     )
@@ -854,7 +857,8 @@ def render_precision_intensity_report(
         else power_verdict(result, metadata.requirement, language, level_a=level_a)
     )
     return render_sound_power_fiche(
-        result, path,
+        result,
+        path,
         copy=FicheCopy(
             title=t("Sound power determination", language),
             basis=_precision_basis(language),
@@ -862,9 +866,9 @@ def render_precision_intensity_report(
             statement=statement,
             extended=extended,
             basis_strips=[
-            _precision_model_strip(result, indicators, residual_index, language),
-            _precision_criteria_strip(result, criteria, omitted, language),
-        ],
+                _precision_model_strip(result, indicators, residual_index, language),
+                _precision_criteria_strip(result, criteria, omitted, language),
+            ],
         ),
         value_table=_precision_value_table(
             result, indicators, criteria, verbose, language

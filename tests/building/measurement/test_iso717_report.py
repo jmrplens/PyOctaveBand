@@ -72,8 +72,22 @@ def test_impact_report_writes_pdf(tmp_path) -> None:
 def test_panel_result_report_convenience(tmp_path) -> None:
     """``SoundReductionResult.report()`` rates ``R(f)`` and writes its fiche."""
     freqs = [
-        100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-        1000, 1250, 1600, 2000, 2500, 3150,
+        100,
+        125,
+        160,
+        200,
+        250,
+        315,
+        400,
+        500,
+        630,
+        800,
+        1000,
+        1250,
+        1600,
+        2000,
+        2500,
+        3150,
     ]
     res = building.single_panel_transmission_loss(
         freqs, 15.0, critical_frequency=2000.0, loss_factor=0.02
@@ -93,9 +107,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
 
 def test_missing_band_data_rejected(tmp_path) -> None:
     """A rating built without the per-band curves cannot be reported."""
-    bare = building.WeightedRatingResult(
-        rating=52, c=-1, ctr=-4, unfavourable_sum=30.0
-    )
+    bare = building.WeightedRatingResult(rating=52, c=-1, ctr=-4, unfavourable_sum=30.0)
     assert bare.band_centers is None
     out = str(tmp_path / "bare.pdf")
     with pytest.raises(ValueError, match="per-band data"):
@@ -113,13 +125,15 @@ def test_airborne_fiche_reproduces_iso717_1_annex_c1(tmp_path) -> None:
     assert (result.rating, result.c, result.ctr) == (30, -2, -3)
     assert result.unfavourable_sum == pytest.approx(31.8, abs=0.05)
     # Reference values shifted by -22 dB (Table C.1, column 3).
-    shifted = np.array([11, 14, 17, 20, 23, 26, 29, 30,
-                        31, 32, 33, 34, 34, 34, 34, 34], float)
+    shifted = np.array(
+        [11, 14, 17, 20, 23, 26, 29, 30, 31, 32, 33, 34, 34, 34, 34, 34], float
+    )
     assert np.allclose(result.shifted_reference, shifted)
     # Unfavourable deviations (Table C.1, column 4; "-" printed as 0).
     deviations = np.maximum(result.shifted_reference - result.measured, 0.0)
-    expected = np.array([0, 0, 0, 0, 0.6, 3.3, 4.2, 3.4,
-                        3.0, 1.5, 1.2, 1.5, 0.6, 1.0, 3.0, 8.5], float)
+    expected = np.array(
+        [0, 0, 0, 0, 0.6, 3.3, 4.2, 3.4, 3.0, 1.5, 1.2, 1.5, 0.6, 1.0, 3.0, 8.5], float
+    )
     assert np.allclose(deviations, expected, atol=0.05)
     _assert_pdf(str(result.report(str(tmp_path / "airborne_c1.pdf"))))
 
@@ -168,8 +182,9 @@ def _full_metadata(**overrides) -> ReportMetadata:
 
 def test_metadata_allows_non_positive_temperature() -> None:
     """Test temperatures of 0 C or below are valid (cold field conditions)."""
-    md = ReportMetadata(temperature=-5.0, source_temperature=0.0,
-                        receiving_temperature=-12.3)
+    md = ReportMetadata(
+        temperature=-5.0, source_temperature=0.0, receiving_temperature=-12.3
+    )
     assert md.temperature == -5.0
 
 
@@ -229,8 +244,10 @@ def test_impact_requirement_verdict_renders(tmp_path) -> None:
     result.report(
         str(out),
         metadata=ReportMetadata(
-            specimen="150 mm slab", measurement_standard="ISO 16283-2",
-            requirement=60.0, laboratory="Phonometry Reference Laboratory",
+            specimen="150 mm slab",
+            measurement_standard="ISO 16283-2",
+            requirement=60.0,
+            laboratory="Phonometry Reference Laboratory",
         ),
     )
     _assert_one_page(str(out))
@@ -292,9 +309,7 @@ def test_symbol_labels_field_quantity(tmp_path) -> None:
     """
     result = building.weighted_rating(_AIRBORNE_R)
     out = tmp_path / "symbol.pdf"
-    result.report(
-        str(out), metadata=ReportMetadata(requirement=25.0), symbol="DnT,w"
-    )
+    result.report(str(out), metadata=ReportMetadata(requirement=25.0), symbol="DnT,w")
     text = _extract_text(str(out))
     assert "DnT,w (C; Ctr) = 30 (-2; -3) dB" in text
     assert "DnT,w = 30 dB" in text  # verdict row
@@ -323,9 +338,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     """``language="es"`` renders a one-page Spanish fiche with comma decimals."""
     import re
 
-    result = building.weighted_rating(
-        _AIRBORNE_R
-    )  # Rw = 30 dB, passes a 25 dB minimum
+    result = building.weighted_rating(_AIRBORNE_R)  # Rw = 30 dB, passes a 25 dB minimum
     out = tmp_path / "airborne_es.pdf"
     result.report(str(out), metadata=_full_metadata(requirement=25.0), language="es")
     _assert_one_page(str(out))

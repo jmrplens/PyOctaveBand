@@ -69,12 +69,12 @@ def _resolve_cfl(cfl: float) -> float:
 def _positive_map(name: str, field: Field2D) -> None:
     """Validate that every cell of *field* is strictly positive and finite."""
     if not np.all(np.isfinite(field)) or bool(np.any(field <= 0.0)):
-        raise ValueError(f"{name} must be strictly positive and finite "
-                         "everywhere")
+        raise ValueError(f"{name} must be strictly positive and finite everywhere")
 
 
-def _sponge_profile(n: int, width: int, sides: tuple[bool, bool],
-                    sigma_max: float) -> Field2D:
+def _sponge_profile(
+    n: int, width: int, sides: tuple[bool, bool], sigma_max: float
+) -> Field2D:
     """1D absorption rate sigma(i) [1/s]: quadratic ramp into each sponge side.
 
     ``sides`` selects (low-index side, high-index side). Identical to the
@@ -88,12 +88,11 @@ def _sponge_profile(n: int, width: int, sides: tuple[bool, bool],
     if sides[0]:
         sigma[:width] = np.maximum(sigma[:width], ramp)
     if sides[1]:
-        sigma[n - width:] = np.maximum(sigma[n - width:], ramp[::-1])
+        sigma[n - width :] = np.maximum(sigma[n - width :], ramp[::-1])
     return sigma
 
 
-def _resolve_c_map(c: float | Field2D,
-                   shape: tuple[int, int] | None) -> Field2D:
+def _resolve_c_map(c: float | Field2D, shape: tuple[int, int] | None) -> Field2D:
     """Broadcast/validate the sound-speed spec into a positive 2D map."""
     if np.isscalar(c):
         if shape is None:
@@ -109,31 +108,34 @@ def _resolve_c_map(c: float | Field2D,
 
 def _resolve_rho_map(rho: float | Field2D, ny: int, nx: int) -> Field2D:
     """Broadcast/validate the density spec into a positive ``(ny, nx)`` map."""
-    rho_map = (np.full((ny, nx), float(np.real(rho)), dtype=np.float64)
-               if np.isscalar(rho) else np.asarray(rho, dtype=np.float64))
+    rho_map = (
+        np.full((ny, nx), float(np.real(rho)), dtype=np.float64)
+        if np.isscalar(rho)
+        else np.asarray(rho, dtype=np.float64)
+    )
     if rho_map.shape != (ny, nx):
         raise ValueError("rho map must match the shape of c")
     _positive_map("rho", rho_map)
     return rho_map
 
 
-def _resolve_sponge(sponge_width: Any, sponge_reflection: float,
-                    ny: int, nx: int) -> tuple[int, float]:
+def _resolve_sponge(
+    sponge_width: Any, sponge_reflection: float, ny: int, nx: int
+) -> tuple[int, float]:
     """Validate the sponge configuration exactly as the library does."""
     width = _integer("sponge_width", sponge_width)
     if width < 0:
         raise ValueError("sponge_width must be non-negative")
     if width >= min(nx, ny):
-        raise ValueError("sponge_width must be narrower than the "
-                         "smallest grid side")
+        raise ValueError("sponge_width must be narrower than the smallest grid side")
     if not 0.0 < sponge_reflection < 1.0:
-        raise ValueError("sponge_reflection must lie strictly between "
-                         "0 and 1")
+        raise ValueError("sponge_reflection must lie strictly between 0 and 1")
     return width, float(sponge_reflection)
 
 
-def _resolve_damping(damping: float | NDArray[np.float64],
-                     ny: int, nx: int) -> NDArray[np.float64]:
+def _resolve_damping(
+    damping: float | NDArray[np.float64], ny: int, nx: int
+) -> NDArray[np.float64]:
     """Validate the damping spec into a non-negative 0D or ``(ny, nx)`` array."""
     damping_map = np.asarray(damping, dtype=np.float64)
     if damping_map.ndim not in (0, 2):
@@ -142,8 +144,8 @@ def _resolve_damping(damping: float | NDArray[np.float64],
         raise ValueError("damping must be non-negative and finite")
     if damping_map.ndim == 2 and damping_map.shape != (ny, nx):
         raise ValueError(
-            f"damping map shape {damping_map.shape} does not match the "
-            f"grid {(ny, nx)}")
+            f"damping map shape {damping_map.shape} does not match the grid {(ny, nx)}"
+        )
     return damping_map
 
 
@@ -161,8 +163,9 @@ def _resolve_sponge_sides(sponge_sides: Any) -> tuple[str, ...]:
     return sides
 
 
-def _edge_impedance_profile(side: str, value: float | NDArray[np.float64],
-                            n_edge: int) -> Field2D:
+def _edge_impedance_profile(
+    side: str, value: float | NDArray[np.float64], n_edge: int
+) -> Field2D:
     """Broadcast/validate one side's impedance into a positive 1D profile."""
     z = np.asarray(value, dtype=np.float64)
     if z.ndim == 0:
@@ -170,10 +173,12 @@ def _edge_impedance_profile(side: str, value: float | NDArray[np.float64],
     if z.shape != (n_edge,):
         raise ValueError(
             f"impedance for side {side!r} must be a scalar or a 1D "
-            f"array of length {n_edge}")
+            f"array of length {n_edge}"
+        )
     if not np.all(np.isfinite(z)) or bool(np.any(z <= 0.0)):
-        raise ValueError(f"impedance for side {side!r} must be "
-                         "strictly positive and finite")
+        raise ValueError(
+            f"impedance for side {side!r} must be strictly positive and finite"
+        )
     return z
 
 
@@ -197,20 +202,21 @@ def _resolve_edge_impedance(
         raise ValueError(f"unknown impedance sides: {sorted(unknown)}")
     absorbing = set(sponge_sides) if sponge_width > 0 else set()
     profiles: dict[str, Field2D] = {}
-    for side in _SIDES:                          # deterministic order
+    for side in _SIDES:  # deterministic order
         if side not in edge_impedance:
             continue
         if side in absorbing:
-            raise ValueError(f"side {side!r} cannot be both absorbing "
-                             "and an impedance boundary")
+            raise ValueError(
+                f"side {side!r} cannot be both absorbing and an impedance boundary"
+            )
         n_edge = ny if side in ("left", "right") else nx
-        profiles[side] = _edge_impedance_profile(side, edge_impedance[side],
-                                                 n_edge)
+        profiles[side] = _edge_impedance_profile(side, edge_impedance[side], n_edge)
     return profiles
 
 
-def _resolve_obstacle_mask(obstacle_mask: NDArray[np.bool_] | None,
-                           ny: int, nx: int) -> NDArray[np.bool_] | None:
+def _resolve_obstacle_mask(
+    obstacle_mask: NDArray[np.bool_] | None, ny: int, nx: int
+) -> NDArray[np.bool_] | None:
     """Validate the obstacle spec into a boolean ``(ny, nx)`` map (or None)."""
     if obstacle_mask is None:
         return None
@@ -234,8 +240,15 @@ class _ImpedanceEdge:
 
     __slots__ = ("c1", "c2", "side", "vb")
 
-    def __init__(self, xp: Any, side: str, impedance: Field2D,
-                 rho_edge: Field2D, dt: float, dx: float) -> None:
+    def __init__(
+        self,
+        xp: Any,
+        side: str,
+        impedance: Field2D,
+        rho_edge: Field2D,
+        dt: float,
+        dx: float,
+    ) -> None:
         self.side = side
         a = dt * impedance / (rho_edge * dx)
         self.c1: XPArray = xp.asarray((1.0 - a) / (1.0 + a))
@@ -250,7 +263,7 @@ class _ImpedanceEdge:
             self.vb = self.c1 * self.vb + self.c2 * p[:, -1]
         elif self.side == "top":
             self.vb = self.c1 * self.vb - self.c2 * p[0, :]
-        else:                                          # bottom
+        else:  # bottom
             self.vb = self.c1 * self.vb + self.c2 * p[-1, :]
 
     def add_flux(self, div: XPArray) -> None:
@@ -261,7 +274,7 @@ class _ImpedanceEdge:
             div[:, -1] += self.vb
         elif self.side == "top":
             div[0, :] -= self.vb
-        else:                                          # bottom
+        else:  # bottom
             div[-1, :] += self.vb
 
 
@@ -313,7 +326,8 @@ class GpuFDTD2D:
         ny, nx = c_map.shape
         rho_map = _resolve_rho_map(rho, ny, nx)
         sponge_width, sponge_reflection = _resolve_sponge(
-            sponge_width, sponge_reflection, ny, nx)
+            sponge_width, sponge_reflection, ny, nx
+        )
         damping_map = _resolve_damping(damping, ny, nx)
 
         self._xp = xp
@@ -322,7 +336,7 @@ class GpuFDTD2D:
         #: Time step [s]: ``cfl * dx / (c_max * sqrt(2))``, as the library.
         self.dt = cfl * self.dx / (c_max * float(np.sqrt(2.0)))
         self._c_ref = float(c_map.mean())
-        kappa = rho_map * c_map**2               # bulk modulus at centres
+        kappa = rho_map * c_map**2  # bulk modulus at centres
         rho_x = 0.5 * (rho_map[:, 1:] + rho_map[:, :-1])
         rho_y = 0.5 * (rho_map[1:, :] + rho_map[:-1, :])
 
@@ -332,29 +346,38 @@ class GpuFDTD2D:
         self._div: XPArray = xp.zeros((ny, nx), dtype=np.float64)
         self.kappa: XPArray = xp.asarray(kappa)
         self._rho_x: XPArray = xp.asarray(rho_x)
-        self._rho_x_np = rho_x                   # host copy for plane waves
+        self._rho_x_np = rho_x  # host copy for plane waves
         self._rho_y: XPArray = xp.asarray(rho_y)
         self._rho_y_np = rho_y
-        self.n = 0                               # completed steps
+        self.n = 0  # completed steps
 
         sides = _resolve_sponge_sides(sponge_sides)
         sigma_max = 0.0
         if sponge_width > 0:
-            sigma_max = (-3.0 * c_max * float(np.log(sponge_reflection))
-                         / (2.0 * sponge_width * self.dx))
-        sig_x = _sponge_profile(nx, sponge_width,
-                                ("left" in sides, "right" in sides), sigma_max)
-        sig_y = _sponge_profile(ny, sponge_width,
-                                ("top" in sides, "bottom" in sides), sigma_max)
+            sigma_max = (
+                -3.0
+                * c_max
+                * float(np.log(sponge_reflection))
+                / (2.0 * sponge_width * self.dx)
+            )
+        sig_x = _sponge_profile(
+            nx, sponge_width, ("left" in sides, "right" in sides), sigma_max
+        )
+        sig_y = _sponge_profile(
+            ny, sponge_width, ("top" in sides, "bottom" in sides), sigma_max
+        )
         sigma = sig_x[np.newaxis, :] + sig_y[:, np.newaxis] + damping_map
         self._decay_p: XPArray = xp.asarray(np.exp(-sigma * self.dt))
-        self._decay_vx: XPArray = xp.asarray(np.exp(
-            -(0.5 * (sigma[:, 1:] + sigma[:, :-1])) * self.dt))
-        self._decay_vy: XPArray = xp.asarray(np.exp(
-            -(0.5 * (sigma[1:, :] + sigma[:-1, :])) * self.dt))
+        self._decay_vx: XPArray = xp.asarray(
+            np.exp(-(0.5 * (sigma[:, 1:] + sigma[:, :-1])) * self.dt)
+        )
+        self._decay_vy: XPArray = xp.asarray(
+            np.exp(-(0.5 * (sigma[1:, :] + sigma[:-1, :])) * self.dt)
+        )
 
-        self._edges = self._build_edges(edge_impedance, sponge_width, sides,
-                                        rho_map, ny, nx)
+        self._edges = self._build_edges(
+            edge_impedance, sponge_width, sides, rho_map, ny, nx
+        )
         self._init_obstacle(obstacle_mask, ny, nx)
 
     def _build_edges(
@@ -367,16 +390,23 @@ class GpuFDTD2D:
         nx: int,
     ) -> list[_ImpedanceEdge]:
         """Validate the per-side impedance spec into edge updaters."""
-        profiles = _resolve_edge_impedance(edge_impedance, sponge_width,
-                                           sponge_sides, ny, nx)
-        rho_edges = {"left": rho_map[:, 0], "right": rho_map[:, -1],
-                     "top": rho_map[0, :], "bottom": rho_map[-1, :]}
-        return [_ImpedanceEdge(self._xp, side, z, rho_edges[side],
-                               self.dt, self.dx)
-                for side, z in profiles.items()]
+        profiles = _resolve_edge_impedance(
+            edge_impedance, sponge_width, sponge_sides, ny, nx
+        )
+        rho_edges = {
+            "left": rho_map[:, 0],
+            "right": rho_map[:, -1],
+            "top": rho_map[0, :],
+            "bottom": rho_map[-1, :],
+        }
+        return [
+            _ImpedanceEdge(self._xp, side, z, rho_edges[side], self.dt, self.dx)
+            for side, z in profiles.items()
+        ]
 
-    def _init_obstacle(self, obstacle_mask: NDArray[np.bool_] | None,
-                       ny: int, nx: int) -> None:
+    def _init_obstacle(
+        self, obstacle_mask: NDArray[np.bool_] | None, ny: int, nx: int
+    ) -> None:
         """Validate the obstacle mask into closed-face velocity factors."""
         self._vx_open: XPArray | None = None
         self._vy_open: XPArray | None = None
@@ -384,9 +414,11 @@ class GpuFDTD2D:
         if mask is not None and bool(mask.any()):
             xp = self._xp
             self._vx_open = xp.asarray(
-                (~(mask[:, 1:] | mask[:, :-1])).astype(np.float64))
+                (~(mask[:, 1:] | mask[:, :-1])).astype(np.float64)
+            )
             self._vy_open = xp.asarray(
-                (~(mask[1:, :] | mask[:-1, :])).astype(np.float64))
+                (~(mask[1:, :] | mask[:-1, :])).astype(np.float64)
+            )
 
     @property
     def time(self) -> float:
@@ -419,9 +451,7 @@ class GpuFDTD2D:
         :param wavelength: Optional carrier wavelength [m].
         """
         if direction not in _SIDE_TRAVEL:
-            raise ValueError(
-                "'direction' must be 'down', 'up', 'left' or 'right'."
-            )
+            raise ValueError("'direction' must be 'down', 'up', 'left' or 'right'.")
         if width <= 0.0:
             raise ValueError("'width' must be positive.")
         if wavelength is not None and wavelength <= 0.0:
@@ -487,6 +517,6 @@ class GpuFDTD2D:
 
     def pressure(self) -> Field2D:
         """The current pressure field as a host (NumPy) array copy."""
-        if hasattr(self.p, "get"):               # CuPy device array
+        if hasattr(self.p, "get"):  # CuPy device array
             return np.asarray(self.p.get(), dtype=np.float64)
         return np.array(self.p, dtype=np.float64)

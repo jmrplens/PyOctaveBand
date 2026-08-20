@@ -40,8 +40,10 @@ def _well(
     h: float, ln: float, lc: float, wn: float, wc: float, m: int = 1
 ) -> MetadiffuserWell:
     resonator = HelmholtzResonator(
-        neck_length=max(ln, 0.05) * MM, neck_side=wn * MM,
-        cavity_length=lc * MM, cavity_side=wc * MM,
+        neck_length=max(ln, 0.05) * MM,
+        neck_side=wn * MM,
+        cavity_length=lc * MM,
+        cavity_side=wc * MM,
     )
     return MetadiffuserWell(h * MM, (resonator,) * m)
 
@@ -72,11 +74,16 @@ ABSORBER = _well(10.0, 69.4, 10.2, 2.4, 29.0)
 
 # Table 4: broadband panel, N = 11 slits, M = 1, L = 3 cm, d = 12 cm.
 BROADBAND_ROWS = [
-    (5.7, 16.3, 97.1, 6.7, 29.0), (4.9, 7.3, 106.8, 6.5, 29.0),
-    (7.7, 37.1, 74.2, 10.0, 29.0), (82.9, 0.0, 36.0, 29.0, 29.0),
-    (48.4, 35.3, 35.3, 29.0, 29.0), (74.9, 22.1, 22.1, 29.0, 29.0),
-    (20.0, 14.7, 84.3, 14.0, 29.0), (6.6, 0.1, 112.2, 9.5, 29.0),
-    (76.2, 0.0, 42.7, 29.0, 29.0), (29.5, 0.1, 89.4, 27.6, 29.0),
+    (5.7, 16.3, 97.1, 6.7, 29.0),
+    (4.9, 7.3, 106.8, 6.5, 29.0),
+    (7.7, 37.1, 74.2, 10.0, 29.0),
+    (82.9, 0.0, 36.0, 29.0, 29.0),
+    (48.4, 35.3, 35.3, 29.0, 29.0),
+    (74.9, 22.1, 22.1, 29.0, 29.0),
+    (20.0, 14.7, 84.3, 14.0, 29.0),
+    (6.6, 0.1, 112.2, 9.5, 29.0),
+    (76.2, 0.0, 42.7, 29.0, 29.0),
+    (29.5, 0.1, 89.4, 27.6, 29.0),
     (7.6, 4.8, 106.5, 6.2, 29.0),
 ]
 
@@ -104,9 +111,7 @@ def test_qr_reflection_matches_target_qrd_at_evaluation_frequency() -> None:
     result = metadiffuser_reflection(
         np.array([2000.0]), QR_WELLS, depth=0.02, period=0.07
     )
-    mismatch = np.degrees(
-        np.abs(np.angle(result.reflection[:, 0] * np.conj(target)))
-    )
+    mismatch = np.degrees(np.abs(np.angle(result.reflection[:, 0] * np.conj(target))))
     assert float(mismatch.max()) < 10.0
 
 
@@ -123,9 +128,7 @@ def test_qr_panel_diffuses_like_the_supplementary_says() -> None:
 def test_pa_state_is_a_perfect_absorber_at_500_hz() -> None:
     # Table 3 zero state: critical coupling at the 500 Hz design point.
     f = np.arange(420.0, 601.0, 2.0)
-    result = metadiffuser_reflection(
-        f, [ABSORBER, ABSORBER], depth=0.03, period=0.10
-    )
+    result = metadiffuser_reflection(f, [ABSORBER, ABSORBER], depth=0.03, period=0.10)
     alpha = result.well_absorption[0]
     peak = int(np.argmax(alpha))
     assert alpha[peak] > 0.99
@@ -170,10 +173,13 @@ def test_pr_metadiffuser_specular_notch() -> None:
 def test_ternary_sequence_suppresses_the_specular_beam() -> None:
     # Fig. 6: the [1, -1, -1, 0, -1, 1, 1, 0] sequence balances in-phase
     # and inverted wells, so the specular direction is no longer the peak.
-    wells = [None, INVERTER, INVERTER, ABSORBER,
-             INVERTER, None, None, ABSORBER]
+    wells = [None, INVERTER, INVERTER, ABSORBER, INVERTER, None, None, ABSORBER]
     polar = metadiffuser_polar_response(
-        500.0, wells, depth=0.03, period=0.10, periods=6,
+        500.0,
+        wells,
+        depth=0.03,
+        period=0.10,
+        periods=6,
         angles=np.arange(-90.0, 91.0, 1.0),
     )
     angles = np.asarray(polar.angles)
@@ -198,13 +204,9 @@ def test_face_average_and_flat_strips() -> None:
     # A None well is a rigid strip with R = 1 exactly, and the
     # face-averaged absorption is the mean of the per-well coefficients.
     f = np.array([500.0, 1000.0])
-    result = metadiffuser_reflection(
-        f, [ABSORBER, None], depth=0.03, period=0.10
-    )
+    result = metadiffuser_reflection(f, [ABSORBER, None], depth=0.03, period=0.10)
     assert np.allclose(result.reflection[1], 1.0)
-    assert np.allclose(
-        result.absorption, result.well_absorption.mean(axis=0)
-    )
+    assert np.allclose(result.absorption, result.well_absorption.mean(axis=0))
     assert result.depth == pytest.approx(0.03)
     assert result.period == pytest.approx(0.10)
 
@@ -233,13 +235,19 @@ def test_square_resonator_geometry_and_validation() -> None:
     # validates its inputs.
     f = np.array([500.0, 1000.0])
     result = metadiffuser_reflection(
-        f, [ABSORBER, None], depth=0.03, period=0.10,
+        f,
+        [ABSORBER, None],
+        depth=0.03,
+        period=0.10,
         resonator_geometry="square",
     )
     assert result.reflection.shape == (2, 2)
     with pytest.raises(ValueError, match="geometry"):
         metadiffuser_reflection(
-            f, [ABSORBER, None], depth=0.03, period=0.10,
+            f,
+            [ABSORBER, None],
+            depth=0.03,
+            period=0.10,
             resonator_geometry="round",
         )
 
@@ -254,9 +262,7 @@ def test_result_plots_render_and_validate() -> None:
     from phonometry.materials.diffusers.metadiffuser import MetadiffuserResult
 
     f = np.arange(400.0, 601.0, 50.0)
-    result = metadiffuser_reflection(
-        f, [ABSORBER, INVERTER], depth=0.03, period=0.10
-    )
+    result = metadiffuser_reflection(f, [ABSORBER, INVERTER], depth=0.03, period=0.10)
     for language in ("en", "es"):
         ax = result.plot(language=language)
         assert ax.get_lines()

@@ -133,8 +133,9 @@ class MultitaperSpectralDensityResult:
     adaptive: bool
     scaling: str
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en",
-             **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the multitaper density in dB with its confidence band.
 
         :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -160,8 +161,7 @@ def _validate_multitaper_params(
     nw = _positive(time_half_bandwidth, "time_half_bandwidth")
     if nw < 1.0 or nw >= n / 2.0:
         raise ValueError(
-            "'time_half_bandwidth' must be in [1, n/2) "
-            f"(got {nw:g} for {n} samples)."
+            f"'time_half_bandwidth' must be in [1, n/2) (got {nw:g} for {n} samples)."
         )
     shannon = int(2.0 * nw)
     k = shannon - 1 if n_tapers is None else int(n_tapers)
@@ -175,9 +175,7 @@ def _validate_multitaper_params(
 
 def _dpss_eigenspectra(
     x: NDArray[np.float64], fs: float, nw: float, k: int
-) -> tuple[
-    NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]
-]:
+) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
     r"""Eigenspectra :math:`\hat{S}_k(f)` on the one-sided rfft grid.
 
     Two-sided scale. The Slepian tapers come from
@@ -198,18 +196,14 @@ def _dpss_eigenspectra(
     """
     from scipy.signal import windows as sp_windows
 
-    tapers, eigenvalues = sp_windows.dpss(
-        x.size, nw, Kmax=k, return_ratios=True
-    )
+    tapers, eigenvalues = sp_windows.dpss(x.size, nw, Kmax=k, return_ratios=True)
     tapers = np.atleast_2d(np.asarray(tapers, dtype=np.float64))
     yk = np.fft.rfft(tapers * x, axis=-1)
     sk = (np.abs(yk) ** 2) / fs
     # Near-unity concentrations can exceed 1 by a few ulp (the numerical
     # hazard P&W document around their Table 380); clip so the broad-band
     # bias term (1-lambda) of the adaptive weights can never turn negative.
-    lam = np.clip(
-        np.atleast_1d(np.asarray(eigenvalues, dtype=np.float64)), 0.0, 1.0
-    )
+    lam = np.clip(np.atleast_1d(np.asarray(eigenvalues, dtype=np.float64)), 0.0, 1.0)
     return sk, lam, np.sum(tapers, axis=-1) ** 2
 
 
@@ -235,22 +229,16 @@ def _adaptive_multitaper_weights(
     """
     lam = eigenvalues[:, np.newaxis]
     k_seed = min(2, sk.shape[0])
-    s = np.sum(lam[:k_seed] * sk[:k_seed], axis=0) / float(
-        np.sum(eigenvalues[:k_seed])
-    )
+    s = np.sum(lam[:k_seed] * sk[:k_seed], axis=0) / float(np.sum(eigenvalues[:k_seed]))
     d = eigenvalues[:, np.newaxis] * np.ones_like(sk)
     for _ in range(_ADAPTIVE_MAX_ITER):
         # The denominator is bounded below by (1-lambda_k)*sigma^2*dt,
         # positive for every taper with lambda_k < 1; the floor covers the
         # degenerate lambda_k == 1 taper meeting an all-zero bin.
-        b = s / np.maximum(
-            lam * s + (1.0 - lam) * power_density, np.finfo(float).tiny
-        )
+        b = s / np.maximum(lam * s + (1.0 - lam) * power_density, np.finfo(float).tiny)
         d = b * b * lam
         dsum = np.sum(d, axis=0)
-        s_new = np.divide(
-            np.sum(d * sk, axis=0), dsum, out=s.copy(), where=dsum > 0.0
-        )
+        s_new = np.divide(np.sum(d * sk, axis=0), dsum, out=s.copy(), where=dsum > 0.0)
         # Relative change per bin; a bin whose new estimate is exactly zero is
         # trivially converged, so it contributes 0 to the maximum rather than
         # dividing by a clamped subnormal.
@@ -266,9 +254,7 @@ def _adaptive_multitaper_weights(
     return np.where(np.sum(d, axis=0) > 0.0, d, lam)
 
 
-def _multitaper_dof(
-    d: NDArray[np.float64], nyquist_bin: bool
-) -> NDArray[np.float64]:
+def _multitaper_dof(d: NDArray[np.float64], nyquist_bin: bool) -> NDArray[np.float64]:
     r"""Equivalent degrees of freedom
     :math:`\nu(f) = 2 \left( \sum_k d_k \right)^2 / \sum_k d_k^2`.
 
@@ -301,11 +287,13 @@ def _chi2_interval_pointwise(
     from scipy import stats as sp_stats
 
     alpha = 1.0 - confidence
-    lower = psd * dof / np.asarray(
-        sp_stats.chi2.isf(alpha / 2.0, dof), dtype=np.float64
+    lower = (
+        psd * dof / np.asarray(sp_stats.chi2.isf(alpha / 2.0, dof), dtype=np.float64)
     )
-    upper = psd * dof / np.asarray(
-        sp_stats.chi2.isf(1.0 - alpha / 2.0, dof), dtype=np.float64
+    upper = (
+        psd
+        * dof
+        / np.asarray(sp_stats.chi2.isf(1.0 - alpha / 2.0, dof), dtype=np.float64)
     )
     return lower, upper
 

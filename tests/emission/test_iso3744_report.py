@@ -30,8 +30,16 @@ from phonometry.emission import sound_power_anechoic, sound_power_pressure
 _PDF_MAGIC = b"%PDF"
 
 # ISO 3744:2010 Annex E, Table E.2 octave-band A-weighting corrections Ck (dB).
-_CK_OCTAVE = {63: -26.2, 125: -16.1, 250: -8.6, 500: -3.2,
-              1000: 0.0, 2000: 1.2, 4000: 1.0, 8000: -1.1}
+_CK_OCTAVE = {
+    63: -26.2,
+    125: -16.1,
+    250: -8.6,
+    500: -3.2,
+    1000: 0.0,
+    2000: 1.2,
+    4000: 1.0,
+    8000: -1.1,
+}
 
 _FREQS = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
 _SURFACE_LP = np.array([70.0, 74, 78, 80, 79, 76, 71, 64])
@@ -134,7 +142,10 @@ def test_third_octave_labels_and_grouping(tmp_path) -> None:
     freqs = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800], dtype=float)
     lp = np.linspace(70.0, 82.0, freqs.size)
     res = sound_power_pressure(
-        np.tile(lp, (10, 1)), "hemisphere", radius=2.0, frequencies=freqs,
+        np.tile(lp, (10, 1)),
+        "hemisphere",
+        radius=2.0,
+        frequencies=freqs,
         grade="engineering",
     )
     out = tmp_path / "third.pdf"

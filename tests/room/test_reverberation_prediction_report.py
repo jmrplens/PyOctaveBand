@@ -70,9 +70,9 @@ def _assert_one_page(path: str) -> None:
 def _text(path: str) -> str:
     from pypdf import PdfReader
 
-    return "\n".join(
-        page.extract_text() for page in PdfReader(path).pages
-    ).replace("\n", " ")
+    return "\n".join(page.extract_text() for page in PdfReader(path).pages).replace(
+        "\n", " "
+    )
 
 
 def test_report_writes_one_page_pdf(tmp_path) -> None:

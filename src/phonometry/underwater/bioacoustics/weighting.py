@@ -107,16 +107,33 @@ class WeightingParameters:
 
 
 def _row(
-    group: str, guidance: str, description: str, a: float, b: float, f1: float,
-    f2: float, c: float, k: float, *,
+    group: str,
+    guidance: str,
+    description: str,
+    a: float,
+    b: float,
+    f1: float,
+    f2: float,
+    c: float,
+    k: float,
+    *,
     hearing_range: tuple[float, float] | None = None,
-    in_air: bool = False, c_printed: float | None = None,
+    in_air: bool = False,
+    c_printed: float | None = None,
 ) -> WeightingParameters:
     return WeightingParameters(
-        group=group, guidance=guidance, description=description, a=a, b=b,
-        f1_khz=f1, f2_khz=f2, c_db=c,
+        group=group,
+        guidance=guidance,
+        description=description,
+        a=a,
+        b=b,
+        f1_khz=f1,
+        f2_khz=f2,
+        c_db=c,
         c_db_as_printed=c if c_printed is None else c_printed,
-        k_db=k, in_air=in_air, hearing_range_hz=hearing_range,
+        k_db=k,
+        in_air=in_air,
+        hearing_range_hz=hearing_range,
     )
 
 
@@ -129,60 +146,224 @@ _HF_CETACEANS = "High-frequency cetaceans"
 #: NMFS (2018) revision v2.0, Table 3 = Table ES2 (printed pp. 18 and 3) with
 #: the generalised hearing ranges of Table ES1 (printed p. 2).
 _NMFS_2018: dict[str, WeightingParameters] = {
-    "LF": _row("LF", "nmfs-2018", _LF_CETACEANS,
-               1.0, 2.0, 0.2, 19.0, 0.13, 179.0, hearing_range=(7.0, 35e3)),
-    "MF": _row("MF", "nmfs-2018", "Mid-frequency cetaceans",
-               1.6, 2.0, 8.8, 110.0, 1.20, 177.0, hearing_range=(150.0, 160e3)),
-    "HF": _row("HF", "nmfs-2018", _HF_CETACEANS,
-               1.8, 2.0, 12.0, 140.0, 1.36, 152.0, hearing_range=(275.0, 160e3)),
-    "PW": _row("PW", "nmfs-2018", "Phocid pinnipeds (underwater)",
-               1.0, 2.0, 1.9, 30.0, 0.75, 180.0, hearing_range=(50.0, 86e3)),
-    "OW": _row("OW", "nmfs-2018", "Otariid pinnipeds (underwater)",
-               2.0, 2.0, 0.94, 25.0, 0.64, 198.0, hearing_range=(60.0, 39e3)),
+    "LF": _row(
+        "LF",
+        "nmfs-2018",
+        _LF_CETACEANS,
+        1.0,
+        2.0,
+        0.2,
+        19.0,
+        0.13,
+        179.0,
+        hearing_range=(7.0, 35e3),
+    ),
+    "MF": _row(
+        "MF",
+        "nmfs-2018",
+        "Mid-frequency cetaceans",
+        1.6,
+        2.0,
+        8.8,
+        110.0,
+        1.20,
+        177.0,
+        hearing_range=(150.0, 160e3),
+    ),
+    "HF": _row(
+        "HF",
+        "nmfs-2018",
+        _HF_CETACEANS,
+        1.8,
+        2.0,
+        12.0,
+        140.0,
+        1.36,
+        152.0,
+        hearing_range=(275.0, 160e3),
+    ),
+    "PW": _row(
+        "PW",
+        "nmfs-2018",
+        "Phocid pinnipeds (underwater)",
+        1.0,
+        2.0,
+        1.9,
+        30.0,
+        0.75,
+        180.0,
+        hearing_range=(50.0, 86e3),
+    ),
+    "OW": _row(
+        "OW",
+        "nmfs-2018",
+        "Otariid pinnipeds (underwater)",
+        2.0,
+        2.0,
+        0.94,
+        25.0,
+        0.64,
+        198.0,
+        hearing_range=(60.0, 39e3),
+    ),
 }
 
 #: NMFS (2024) update v3.0, Table 5 = Table ES2 (printed pp. 25 and 3) with the
 #: generalised hearing ranges of Table ES1 (printed p. 2). The otariid ``C`` is
 #: implemented as 1.36 dB (see the module note).
 _NMFS_2024: dict[str, WeightingParameters] = {
-    "LF": _row("LF", "nmfs-2024", _LF_CETACEANS,
-               0.99, 5.0, 0.168, 26.6, 0.12, 177.0, hearing_range=(7.0, 36e3)),
-    "HF": _row("HF", "nmfs-2024", _HF_CETACEANS,
-               1.55, 5.0, 1.73, 129.0, 0.32, 181.0, hearing_range=(150.0, 160e3)),
-    "VHF": _row("VHF", "nmfs-2024", "Very high-frequency cetaceans",
-                2.23, 5.0, 5.93, 186.0, 0.91, 160.0, hearing_range=(200.0, 165e3)),
-    "PW": _row("PW", "nmfs-2024", "Phocid pinnipeds (underwater)",
-               1.63, 5.0, 0.81, 68.3, 0.29, 175.0, hearing_range=(40.0, 90e3)),
-    "OW": _row("OW", "nmfs-2024", "Otariid pinnipeds (underwater)",
-               1.58, 5.0, 2.53, 43.8, 1.36, 178.0, hearing_range=(60.0, 68e3),
-               c_printed=1.37),
-    "PA": _row("PA", "nmfs-2024", "Phocid pinnipeds (in air)",
-               2.05, 5.0, 0.74, 24.4, 0.83, 133.0, hearing_range=(42.0, 52e3),
-               in_air=True),
-    "OA": _row("OA", "nmfs-2024", "Otariid pinnipeds (in air)",
-               1.35, 5.0, 1.75, 32.5, 1.18, 156.0, hearing_range=(90.0, 40e3),
-               in_air=True),
+    "LF": _row(
+        "LF",
+        "nmfs-2024",
+        _LF_CETACEANS,
+        0.99,
+        5.0,
+        0.168,
+        26.6,
+        0.12,
+        177.0,
+        hearing_range=(7.0, 36e3),
+    ),
+    "HF": _row(
+        "HF",
+        "nmfs-2024",
+        _HF_CETACEANS,
+        1.55,
+        5.0,
+        1.73,
+        129.0,
+        0.32,
+        181.0,
+        hearing_range=(150.0, 160e3),
+    ),
+    "VHF": _row(
+        "VHF",
+        "nmfs-2024",
+        "Very high-frequency cetaceans",
+        2.23,
+        5.0,
+        5.93,
+        186.0,
+        0.91,
+        160.0,
+        hearing_range=(200.0, 165e3),
+    ),
+    "PW": _row(
+        "PW",
+        "nmfs-2024",
+        "Phocid pinnipeds (underwater)",
+        1.63,
+        5.0,
+        0.81,
+        68.3,
+        0.29,
+        175.0,
+        hearing_range=(40.0, 90e3),
+    ),
+    "OW": _row(
+        "OW",
+        "nmfs-2024",
+        "Otariid pinnipeds (underwater)",
+        1.58,
+        5.0,
+        2.53,
+        43.8,
+        1.36,
+        178.0,
+        hearing_range=(60.0, 68e3),
+        c_printed=1.37,
+    ),
+    "PA": _row(
+        "PA",
+        "nmfs-2024",
+        "Phocid pinnipeds (in air)",
+        2.05,
+        5.0,
+        0.74,
+        24.4,
+        0.83,
+        133.0,
+        hearing_range=(42.0, 52e3),
+        in_air=True,
+    ),
+    "OA": _row(
+        "OA",
+        "nmfs-2024",
+        "Otariid pinnipeds (in air)",
+        1.35,
+        5.0,
+        1.75,
+        32.5,
+        1.18,
+        156.0,
+        hearing_range=(90.0, 40e3),
+        in_air=True,
+    ),
 }
 
 #: Southall et al. (2019) Table 5 (printed p. 149). The article tabulates no
 #: generalised hearing range, so those fields stay ``None``.
 _SOUTHALL_2019: dict[str, WeightingParameters] = {
-    "LF": _row("LF", "southall-2019", _LF_CETACEANS,
-               1.0, 2.0, 0.20, 19.0, 0.13, 179.0),
-    "HF": _row("HF", "southall-2019", _HF_CETACEANS,
-               1.6, 2.0, 8.8, 110.0, 1.20, 177.0),
-    "VHF": _row("VHF", "southall-2019", "Very high-frequency cetaceans",
-                1.8, 2.0, 12.0, 140.0, 1.36, 152.0),
-    "SI": _row("SI", "southall-2019", "Sirenians",
-               1.8, 2.0, 4.3, 25.0, 2.62, 183.0),
-    "PCW": _row("PCW", "southall-2019", "Phocid carnivores (underwater)",
-                1.0, 2.0, 1.9, 30.0, 0.75, 180.0),
-    "OCW": _row("OCW", "southall-2019", "Other marine carnivores (underwater)",
-                2.0, 2.0, 0.94, 25.0, 0.64, 198.0),
-    "PCA": _row("PCA", "southall-2019", "Phocid carnivores (in air)",
-                2.0, 2.0, 0.75, 8.3, 1.50, 132.0, in_air=True),
-    "OCA": _row("OCA", "southall-2019", "Other marine carnivores (in air)",
-                1.4, 2.0, 2.0, 20.0, 1.39, 156.0, in_air=True),
+    "LF": _row("LF", "southall-2019", _LF_CETACEANS, 1.0, 2.0, 0.20, 19.0, 0.13, 179.0),
+    "HF": _row("HF", "southall-2019", _HF_CETACEANS, 1.6, 2.0, 8.8, 110.0, 1.20, 177.0),
+    "VHF": _row(
+        "VHF",
+        "southall-2019",
+        "Very high-frequency cetaceans",
+        1.8,
+        2.0,
+        12.0,
+        140.0,
+        1.36,
+        152.0,
+    ),
+    "SI": _row("SI", "southall-2019", "Sirenians", 1.8, 2.0, 4.3, 25.0, 2.62, 183.0),
+    "PCW": _row(
+        "PCW",
+        "southall-2019",
+        "Phocid carnivores (underwater)",
+        1.0,
+        2.0,
+        1.9,
+        30.0,
+        0.75,
+        180.0,
+    ),
+    "OCW": _row(
+        "OCW",
+        "southall-2019",
+        "Other marine carnivores (underwater)",
+        2.0,
+        2.0,
+        0.94,
+        25.0,
+        0.64,
+        198.0,
+    ),
+    "PCA": _row(
+        "PCA",
+        "southall-2019",
+        "Phocid carnivores (in air)",
+        2.0,
+        2.0,
+        0.75,
+        8.3,
+        1.50,
+        132.0,
+        in_air=True,
+    ),
+    "OCA": _row(
+        "OCA",
+        "southall-2019",
+        "Other marine carnivores (in air)",
+        1.4,
+        2.0,
+        2.0,
+        20.0,
+        1.39,
+        156.0,
+        in_air=True,
+    ),
 }
 
 _PARAMETERS: dict[str, dict[str, WeightingParameters]] = {
@@ -232,57 +413,84 @@ _CriteriaRow = tuple[float | None, float | None, float | None, float | None]
 #: Non-impulsive and impulsive criteria per guidance version and group.
 #: NMFS 2018: Table 3 (weighted TTS onset) and Table ES3 (PTS onset).
 _CRITERIA_2018_CONTINUOUS: dict[str, _CriteriaRow] = {
-    "LF": (179.0, 199.0, None, None), "MF": (178.0, 198.0, None, None),
-    "HF": (153.0, 173.0, None, None), "PW": (181.0, 201.0, None, None),
+    "LF": (179.0, 199.0, None, None),
+    "MF": (178.0, 198.0, None, None),
+    "HF": (153.0, 173.0, None, None),
+    "PW": (181.0, 201.0, None, None),
     "OW": (199.0, 219.0, None, None),
 }
 _CRITERIA_2018_IMPULSIVE: dict[str, _CriteriaRow] = {
-    "LF": (None, 183.0, None, 219.0), "MF": (None, 185.0, None, 230.0),
-    "HF": (None, 155.0, None, 202.0), "PW": (None, 185.0, None, 218.0),
+    "LF": (None, 183.0, None, 219.0),
+    "MF": (None, 185.0, None, 230.0),
+    "HF": (None, 155.0, None, 202.0),
+    "PW": (None, 185.0, None, 218.0),
     "OW": (None, 203.0, None, 232.0),
 }
 #: NMFS 2024: Table 5 / Table ES3, completed with the Navy Phase 4 impulsive
 #: TTS values of Table A.E-2 (printed p. 43) that ES3 does not repeat.
 _CRITERIA_2024_CONTINUOUS: dict[str, _CriteriaRow] = {
-    "LF": (177.0, 197.0, None, None), "HF": (181.0, 201.0, None, None),
-    "VHF": (161.0, 181.0, None, None), "PW": (175.0, 195.0, None, None),
-    "OW": (179.0, 199.0, None, None), "PA": (134.0, 154.0, None, None),
+    "LF": (177.0, 197.0, None, None),
+    "HF": (181.0, 201.0, None, None),
+    "VHF": (161.0, 181.0, None, None),
+    "PW": (175.0, 195.0, None, None),
+    "OW": (179.0, 199.0, None, None),
+    "PA": (134.0, 154.0, None, None),
     "OA": (157.0, 177.0, None, None),
 }
 _CRITERIA_2024_IMPULSIVE: dict[str, _CriteriaRow] = {
-    "LF": (168.0, 183.0, 216.0, 222.0), "HF": (178.0, 193.0, 224.0, 230.0),
-    "VHF": (144.0, 159.0, 196.0, 202.0), "PW": (168.0, 183.0, 217.0, 223.0),
-    "OW": (170.0, 185.0, 224.0, 230.0), "PA": (125.0, 140.0, 156.0, 162.0),
+    "LF": (168.0, 183.0, 216.0, 222.0),
+    "HF": (178.0, 193.0, 224.0, 230.0),
+    "VHF": (144.0, 159.0, 196.0, 202.0),
+    "PW": (168.0, 183.0, 217.0, 223.0),
+    "OW": (170.0, 185.0, 224.0, 230.0),
+    "PA": (125.0, 140.0, 156.0, 162.0),
     "OA": (148.0, 163.0, 171.0, 177.0),
 }
 #: Southall et al. (2019) Table 6 (non-impulsive) and Table 7 as corrected by
 #: the errata of Aquatic Mammals 45(5), printed p. 570.
 _CRITERIA_SOUTHALL_CONTINUOUS: dict[str, _CriteriaRow] = {
-    "LF": (179.0, 199.0, None, None), "HF": (178.0, 198.0, None, None),
-    "VHF": (153.0, 173.0, None, None), "SI": (186.0, 206.0, None, None),
-    "PCW": (181.0, 201.0, None, None), "OCW": (199.0, 219.0, None, None),
-    "PCA": (134.0, 154.0, None, None), "OCA": (157.0, 177.0, None, None),
+    "LF": (179.0, 199.0, None, None),
+    "HF": (178.0, 198.0, None, None),
+    "VHF": (153.0, 173.0, None, None),
+    "SI": (186.0, 206.0, None, None),
+    "PCW": (181.0, 201.0, None, None),
+    "OCW": (199.0, 219.0, None, None),
+    "PCA": (134.0, 154.0, None, None),
+    "OCA": (157.0, 177.0, None, None),
 }
 _CRITERIA_SOUTHALL_IMPULSIVE: dict[str, _CriteriaRow] = {
-    "LF": (168.0, 183.0, 213.0, 219.0), "HF": (170.0, 185.0, 224.0, 230.0),
-    "VHF": (140.0, 155.0, 196.0, 202.0), "SI": (175.0, 190.0, 220.0, 226.0),
-    "PCW": (170.0, 185.0, 212.0, 218.0), "OCW": (188.0, 203.0, 226.0, 232.0),
+    "LF": (168.0, 183.0, 213.0, 219.0),
+    "HF": (170.0, 185.0, 224.0, 230.0),
+    "VHF": (140.0, 155.0, 196.0, 202.0),
+    "SI": (175.0, 190.0, 220.0, 226.0),
+    "PCW": (170.0, 185.0, 212.0, 218.0),
+    "OCW": (188.0, 203.0, 226.0, 232.0),
     # Errata-corrected peak SPL values (printed 138/144 and 161/167).
-    "PCA": (123.0, 138.0, 155.0, 161.0), "OCA": (146.0, 161.0, 170.0, 176.0),
+    "PCA": (123.0, 138.0, 155.0, 161.0),
+    "OCA": (146.0, 161.0, 170.0, 176.0),
 }
 
-_CRITERIA: dict[str, tuple[dict[str, _CriteriaRow], dict[str, _CriteriaRow], str, str, str]] = {
+_CRITERIA: dict[
+    str, tuple[dict[str, _CriteriaRow], dict[str, _CriteriaRow], str, str, str]
+] = {
     "nmfs-2018": (
-        _CRITERIA_2018_CONTINUOUS, _CRITERIA_2018_IMPULSIVE, "PTS",
-        "NMFS (2018) v2.0 Table 3", "NMFS (2018) v2.0 Table ES3",
+        _CRITERIA_2018_CONTINUOUS,
+        _CRITERIA_2018_IMPULSIVE,
+        "PTS",
+        "NMFS (2018) v2.0 Table 3",
+        "NMFS (2018) v2.0 Table ES3",
     ),
     "nmfs-2024": (
-        _CRITERIA_2024_CONTINUOUS, _CRITERIA_2024_IMPULSIVE, "AUD INJ",
+        _CRITERIA_2024_CONTINUOUS,
+        _CRITERIA_2024_IMPULSIVE,
+        "AUD INJ",
         "NMFS (2024) v3.0 Table 5 / Table ES3",
         "NMFS (2024) v3.0 Table ES3 / Table A.E-2",
     ),
     "southall-2019": (
-        _CRITERIA_SOUTHALL_CONTINUOUS, _CRITERIA_SOUTHALL_IMPULSIVE, "PTS",
+        _CRITERIA_SOUTHALL_CONTINUOUS,
+        _CRITERIA_SOUTHALL_IMPULSIVE,
+        "PTS",
         "Southall et al. (2019) Table 6",
         "Southall et al. (2019) Table 7 (errata-corrected)",
     ),
@@ -299,7 +507,9 @@ def check_guidance(guidance: str) -> str:
     """
     key = str(guidance).strip().lower().replace("_", "-")
     if key not in _PARAMETERS:
-        raise ValueError(f"'guidance' must be one of {WEIGHTING_GUIDANCE}, got {guidance!r}.")
+        raise ValueError(
+            f"'guidance' must be one of {WEIGHTING_GUIDANCE}, got {guidance!r}."
+        )
     return key
 
 
@@ -313,7 +523,9 @@ def hearing_groups(guidance: str = "nmfs-2024") -> tuple[str, ...]:
     return tuple(_PARAMETERS[check_guidance(guidance)])
 
 
-def weighting_parameters(group: str, *, guidance: str = "nmfs-2024") -> WeightingParameters:
+def weighting_parameters(
+    group: str, *, guidance: str = "nmfs-2024"
+) -> WeightingParameters:
     """Weighting/exposure parameters of one hearing group.
 
     :param group: Hearing-group code as used by ``guidance`` (case-insensitive).
@@ -332,12 +544,13 @@ def weighting_parameters(group: str, *, guidance: str = "nmfs-2024") -> Weightin
     return table[name]
 
 
-def _band_pass_db(f_khz: NDArray[np.float64], p: WeightingParameters) -> NDArray[np.float64]:
+def _band_pass_db(
+    f_khz: NDArray[np.float64], p: WeightingParameters
+) -> NDArray[np.float64]:
     r""":math:`10 \log_{10}` of the band-pass ratio shared by ``W(f)`` and
     ``E(f)``."""
     ratio = (f_khz / p.f1_khz) ** (2.0 * p.a) / (
-        (1.0 + (f_khz / p.f1_khz) ** 2) ** p.a
-        * (1.0 + (f_khz / p.f2_khz) ** 2) ** p.b
+        (1.0 + (f_khz / p.f1_khz) ** 2) ** p.a * (1.0 + (f_khz / p.f2_khz) ** 2) ** p.b
     )
     return np.asarray(10.0 * np.log10(ratio), dtype=np.float64)
 
@@ -367,12 +580,16 @@ class AuditoryWeightingResult:
     group: str
     weighted_tts_onset: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the weighting function versus frequency."""
         from ..._i18n import check_language
         from ..._plot.underwater import plot_auditory_weighting
 
-        return plot_auditory_weighting(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_auditory_weighting(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def _positive_frequencies(
@@ -432,7 +649,9 @@ def exposure_criteria(
     """
     params = weighting_parameters(group, guidance=guidance)
     cont, imp, label, cont_source, imp_source = _CRITERIA[params.guidance]
-    tts_sel, injury_sel, tts_peak, injury_peak = (imp if impulsive else cont)[params.group]
+    tts_sel, injury_sel, tts_peak, injury_peak = (imp if impulsive else cont)[
+        params.group
+    ]
     sel_ref = "dB re (20 µPa)²·s" if params.in_air else "dB re 1 µPa²·s"
     peak_ref = "dB re 20 µPa" if params.in_air else "dB re 1 µPa"
     return ExposureCriteria(
@@ -502,12 +721,16 @@ class WeightedExposureResult:
     guidance: str
     group: str
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the unweighted and weighted band spectra with the criteria."""
         from ..._i18n import check_language
         from ..._plot.underwater import plot_weighted_exposure
 
-        return plot_weighted_exposure(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_weighted_exposure(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def _energy_sum(levels: NDArray[np.float64]) -> float:
@@ -566,7 +789,9 @@ def weighted_exposure(
     # -inf is admitted as the level of a band that carries no energy (see
     # StrikeSelSpectrum.band_sel); it is the neutral element of the energy sum.
     if np.any(np.isnan(sel)) or np.any(sel == np.inf):
-        raise ValueError("'band_sel' must be finite, or -inf for a band with no energy.")
+        raise ValueError(
+            "'band_sel' must be finite, or -inf for a band with no energy."
+        )
     n_float = float(n_events)
     if not n_float.is_integer() or int(n_float) < 1:
         raise ValueError("'n_events' must be a whole number of events, at least 1.")

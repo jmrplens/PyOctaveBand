@@ -122,15 +122,12 @@ _STRINGS: dict[str, str] = {
     "Incidence angle [deg]": "Ángulo de incidencia [grados]",
     r"Transmission coefficient $\tau$": r"Coeficiente de transmisión $\tau$",
     "Bending-wave transmission, {junction}-junction "
-    "($\\chi$ = {chi}, $\\psi$ = {psi})":
-        "Transmisión de onda de flexión, unión {junction} "
-        "($\\chi$ = {chi}, $\\psi$ = {psi})",
+    "($\\chi$ = {chi}, $\\psi$ = {psi})": "Transmisión de onda de flexión, unión {junction} "
+    "($\\chi$ = {chi}, $\\psi$ = {psi})",
     r"corner $\tau_{12}(\theta)$": r"esquina $\tau_{12}(\theta)$",
     r"straight $\tau_{13}(\theta)$": r"recta $\tau_{13}(\theta)$",
-    r"corner average $\bar\tau_{12}$ = {value}":
-        r"media esquina $\bar\tau_{12}$ = {value}",
-    r"straight average $\bar\tau_{13}$ = {value}":
-        r"media recta $\bar\tau_{13}$ = {value}",
+    r"corner average $\bar\tau_{12}$ = {value}": r"media esquina $\bar\tau_{12}$ = {value}",
+    r"straight average $\bar\tau_{13}$ = {value}": r"media recta $\bar\tau_{13}$ = {value}",
 }
 
 
@@ -140,7 +137,10 @@ def _t(text: str, language: str = "en") -> str:
 
 
 def plot_vibration_weighting(
-    result: WeightingResponse, ax: Axes | None = None, *, language: str = "en",
+    result: WeightingResponse,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
     **kwargs: Any,
 ) -> Axes:
     """Frequency-weighting factor (dB) versus frequency (ISO 8041-1).
@@ -162,7 +162,9 @@ def plot_vibration_weighting(
     ax.semilogx(freqs, mag_db, **kwargs)
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Weighting factor [dB]", language))
-    ax.set_title(_t("Frequency weighting {name} (ISO 8041-1)", language).format(name=result.name))
+    ax.set_title(
+        _t("Frequency weighting {name} (ISO 8041-1)", language).format(name=result.name)
+    )
     ax.grid(True, which="both", alpha=0.3)
     format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
     localize_axes(ax, language)
@@ -170,7 +172,10 @@ def plot_vibration_weighting(
 
 
 def plot_weighted_spectrum(
-    result: WeightedSpectrum, ax: Axes | None = None, *, language: str = "en",
+    result: WeightedSpectrum,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
     **kwargs: Any,
 ) -> Axes:
     """Unweighted vs weighted one-third-octave acceleration spectrum.
@@ -199,10 +204,16 @@ def plot_weighted_spectrum(
     # The weighted bars are the primary artist; forward user kwargs there.
     kwargs.setdefault("color", _C_PRIMARY)
     ax.bar(
-        positions - width / 2, raw, width, color=_C_MUTED,
+        positions - width / 2,
+        raw,
+        width,
+        color=_C_MUTED,
         label=_t("Unweighted $a_i$", language),
     )
-    kwargs.setdefault("label", _t("Weighted $W_i a_i$ ({name})", language).format(name=result.weighting_name))
+    kwargs.setdefault(
+        "label",
+        _t("Weighted $W_i a_i$ ({name})", language).format(name=result.weighting_name),
+    )
     ax.bar(
         positions + width / 2,
         weighted,
@@ -213,10 +224,15 @@ def plot_weighted_spectrum(
     # Wh is the hand-arm weighting of ISO 5349-1; the others (Wk, Wd, Wm...)
     # are the whole-body weightings of ISO 2631.
     designation = "ISO 5349-1" if str(result.weighting_name) == "Wh" else "ISO 2631"
-    ax.set_title(_t("{designation} weighted acceleration spectrum  ($a_\\mathrm{{w}}$ = {aw} m/s²)", language).format(
-        designation=designation,
-        aw=format_number(float(result.overall), language, decimals=3),
-    ))
+    ax.set_title(
+        _t(
+            "{designation} weighted acceleration spectrum  ($a_\\mathrm{{w}}$ = {aw} m/s²)",
+            language,
+        ).format(
+            designation=designation,
+            aw=format_number(float(result.overall), language, decimals=3),
+        )
+    )
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)
     # localize_axes leaves the categorical band axis (a FuncFormatter) alone.
@@ -225,7 +241,10 @@ def plot_weighted_spectrum(
 
 
 def plot_daily_exposure(
-    result: DailyVibrationExposure, ax: Axes | None = None, *, language: str = "en",
+    result: DailyVibrationExposure,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
     **kwargs: Any,
 ) -> Axes:
     """Partial daily exposures against the EAV / ELV (Directive 2002/44/EC).
@@ -265,15 +284,26 @@ def plot_daily_exposure(
         task_kwargs = dict(kwargs)
         task_kwargs.setdefault("label", str(result.labels[i]))
         ax.bar(
-            positions[i], partials[i], width=width,
-            color=_OP_COLORS[i % len(_OP_COLORS)], edgecolor=edgecolor,
-            linewidth=0.6, zorder=3, **task_kwargs,
+            positions[i],
+            partials[i],
+            width=width,
+            color=_OP_COLORS[i % len(_OP_COLORS)],
+            edgecolor=edgecolor,
+            linewidth=0.6,
+            zorder=3,
+            **task_kwargs,
         )
     total_kwargs = dict(kwargs)
     total_kwargs.setdefault("label", "$A(8)$")
     ax.bar(
-        positions[-1], values[-1], width=width, color=_A8_COLOR,
-        edgecolor=edgecolor, linewidth=0.6, zorder=3, **total_kwargs,
+        positions[-1],
+        values[-1],
+        width=width,
+        color=_A8_COLOR,
+        edgecolor=edgecolor,
+        linewidth=0.6,
+        zorder=3,
+        **total_kwargs,
     )
     # The legend carries the bar identity, so the crowded category ticks go.
     ax.set_xticks([])
@@ -282,21 +312,44 @@ def plot_daily_exposure(
     assessment = result.assessment
     eav = float(assessment.action_value)
     elv = float(assessment.limit_value)
-    ax.axhline(eav, color=_C_SECONDARY, ls="--", lw=1.4,
-               label="EAV = " + decimal_comma(f"{eav:g}", language))
-    ax.axhline(elv, color=_C_REFERENCE, ls="--", lw=1.4,
-               label="ELV = " + decimal_comma(f"{elv:g}", language))
+    ax.axhline(
+        eav,
+        color=_C_SECONDARY,
+        ls="--",
+        lw=1.4,
+        label="EAV = " + decimal_comma(f"{eav:g}", language),
+    )
+    ax.axhline(
+        elv,
+        color=_C_REFERENCE,
+        ls="--",
+        lw=1.4,
+        label="ELV = " + decimal_comma(f"{elv:g}", language),
+    )
     top = max(elv, float(np.max(values))) * 1.28
     ax.set_ylim(0.0, top)
     kind = str(assessment.kind).upper()
     zone = _t(str(assessment.zone), language)
-    ax.set_title(_t("Directive 2002/44/EC daily {kind} exposure  ($A(8)$ = {a8} m/s², {zone})", language).format(
-        kind=kind, a8=format_number(float(result.a8), language, decimals=2),
-        zone=zone,
-    ))
+    ax.set_title(
+        _t(
+            "Directive 2002/44/EC daily {kind} exposure  ($A(8)$ = {a8} m/s², {zone})",
+            language,
+        ).format(
+            kind=kind,
+            a8=format_number(float(result.a8), language, decimals=2),
+            zone=zone,
+        )
+    )
     handles, leg_labels = ax.get_legend_handles_labels()
-    ax.legend(handles, leg_labels, loc="upper center", ncol=min(3, len(handles)),
-              fontsize="small", frameon=True, framealpha=0.9)
+    ax.legend(
+        handles,
+        leg_labels,
+        loc="upper center",
+        ncol=min(3, len(handles)),
+        fontsize="small",
+        frameon=True,
+        framealpha=0.9,
+    )
     ax.grid(True, axis="y", alpha=0.3)
     ax.set_axisbelow(True)
     localize_axes(ax, language)
@@ -304,7 +357,10 @@ def plot_daily_exposure(
 
 
 def plot_mobility(
-    result: MobilityResult, ax: Axes | None = None, *, language: str = "en",
+    result: MobilityResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
     **kwargs: Any,
 ) -> Axes:
     """Mobility magnitude ``|Y(f)|`` on log-log axes (ISO 7626-1).
@@ -321,15 +377,25 @@ def plot_mobility(
     freq = np.asarray(result.frequencies, dtype=np.float64)
     mag = np.asarray(result.magnitude, dtype=np.float64)
     kwargs.setdefault("color", _C_PRIMARY)
-    label = (_t("driving-point mobility", language) if result.driving_point
-             else _t("transfer mobility", language))
+    label = (
+        _t("driving-point mobility", language)
+        if result.driving_point
+        else _t("transfer mobility", language)
+    )
     kwargs.setdefault("label", label)
     ax.loglog(freq, mag, **kwargs)
     # Mark the mobility peak (a resonance for a driving-point FRF).
     peak = int(np.argmax(mag))
-    ax.plot(freq[peak], mag[peak], "o", color=_C_REFERENCE, zorder=5,
-            label=_t("peak at {v} Hz", language).format(
-                v=format_number(freq[peak], language, decimals=1)))
+    ax.plot(
+        freq[peak],
+        mag[peak],
+        "o",
+        color=_C_REFERENCE,
+        zorder=5,
+        label=_t("peak at {v} Hz", language).format(
+            v=format_number(freq[peak], language, decimals=1)
+        ),
+    )
     format_frequency_axis(ax, float(freq.min()), float(freq.max()))
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t(_MOBILITY_LABEL, language))
@@ -341,8 +407,11 @@ def plot_mobility(
 
 
 def plot_rigid_mass_calibration(
-    result: RigidMassCalibrationResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any,
+    result: RigidMassCalibrationResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes | np.ndarray:
     """Rigid-mass operational calibration check (ISO 7626-2, 7.5.2).
 
@@ -379,27 +448,41 @@ def plot_rigid_mass_calibration(
     fmin, fmax = float(freq.min()), float(freq.max())
     p = format_number(tol_pct, language, decimals=1, trim=True)
     band_label = _t(r"$\pm${p} % tolerance", language).format(p=p)
-    exp_label = (_t(r"expected $|A| = 1/m$", language)
-                 if result.quantity == "accelerance"
-                 else _t(r"expected $|Y| = 1/(2\pi f m)$", language))
-    mag_ylabel = (_t("Accelerance $|A|$ [1/kg]", language)
-                  if result.quantity == "accelerance"
-                  else _t(_MOBILITY_LABEL, language))
+    exp_label = (
+        _t(r"expected $|A| = 1/m$", language)
+        if result.quantity == "accelerance"
+        else _t(r"expected $|Y| = 1/(2\pi f m)$", language)
+    )
+    mag_ylabel = (
+        _t("Accelerance $|A|$ [1/kg]", language)
+        if result.quantity == "accelerance"
+        else _t(_MOBILITY_LABEL, language)
+    )
     within_label = _t("measured (within tolerance)", language)
     outside_label = _t("measured (out of tolerance)", language)
 
     def _deviation_panel(axd: Axes, **line_kwargs: Any) -> None:
-        axd.axhspan(-tol_pct, tol_pct, color=_C_REFERENCE, alpha=0.15,
-                    label=band_label)
+        axd.axhspan(-tol_pct, tol_pct, color=_C_REFERENCE, alpha=0.15, label=band_label)
         axd.axhline(0.0, color=_C_MUTED, ls=":", lw=0.9)
         line_kwargs.setdefault("color", _C_PRIMARY)
-        axd.semilogx(freq, 100.0 * deviation, "-", lw=1.4, zorder=2,
-                     **line_kwargs)
-        axd.plot(freq[within], 100.0 * deviation[within], "o", color=_C_PRIMARY,
-                 zorder=3, label=within_label)
+        axd.semilogx(freq, 100.0 * deviation, "-", lw=1.4, zorder=2, **line_kwargs)
+        axd.plot(
+            freq[within],
+            100.0 * deviation[within],
+            "o",
+            color=_C_PRIMARY,
+            zorder=3,
+            label=within_label,
+        )
         if not np.all(within):
-            axd.plot(freq[~within], 100.0 * deviation[~within], "o",
-                     color=_C_SECONDARY, zorder=4, label=outside_label)
+            axd.plot(
+                freq[~within],
+                100.0 * deviation[~within],
+                "o",
+                color=_C_SECONDARY,
+                zorder=4,
+                label=outside_label,
+            )
         axd.set_xlabel(_t(_FREQ_LABEL, language))
         axd.set_ylabel(_t("Deviation [%]", language))
         axd.grid(True, which="both", alpha=0.3)
@@ -414,15 +497,26 @@ def plot_rigid_mass_calibration(
     axes = _new_axes_column(2, sharex=True, figsize=(8.0, 6.6))
     axm, axd = axes[0], axes[1]
     kwargs.setdefault("color", _C_PRIMARY)
-    axm.fill_between(freq, expected * (1.0 - tol), expected * (1.0 + tol),
-                     color=_C_REFERENCE, alpha=0.15, label=band_label)
-    axm.loglog(freq, expected, ls="--", color=_C_REFERENCE, lw=1.4,
-               label=exp_label)
+    axm.fill_between(
+        freq,
+        expected * (1.0 - tol),
+        expected * (1.0 + tol),
+        color=_C_REFERENCE,
+        alpha=0.15,
+        label=band_label,
+    )
+    axm.loglog(freq, expected, ls="--", color=_C_REFERENCE, lw=1.4, label=exp_label)
     kwargs.setdefault("label", within_label)
     axm.loglog(freq, measured, "o-", lw=1.4, **kwargs)
     if not np.all(within):
-        axm.plot(freq[~within], measured[~within], "o", color=_C_SECONDARY,
-                 zorder=4, label=outside_label)
+        axm.plot(
+            freq[~within],
+            measured[~within],
+            "o",
+            color=_C_SECONDARY,
+            zorder=4,
+            label=outside_label,
+        )
     axm.set_ylabel(mag_ylabel)
     axm.grid(True, which="both", alpha=0.3)
     axm.legend(loc="best", fontsize="small")
@@ -431,8 +525,7 @@ def plot_rigid_mass_calibration(
     else:
         verdict = "INCORRECTO" if language == "es" else "FAIL"
     axm.set_title(
-        _t("ISO 7626-2 rigid-mass calibration check", language)
-        + f" ({verdict})"
+        _t("ISO 7626-2 rigid-mass calibration check", language) + f" ({verdict})"
     )
     _deviation_panel(axd)
     for axf in axes:
@@ -442,8 +535,11 @@ def plot_rigid_mass_calibration(
 
 
 def plot_transfer_stiffness(
-    result: TransferStiffnessResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any,
+    result: TransferStiffnessResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Dynamic transfer stiffness level ``L_k(f)`` on a log-frequency axis.
 
@@ -472,8 +568,11 @@ def plot_transfer_stiffness(
 
 
 def plot_radiation_efficiency(
-    result: RadiationEfficiencyResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any,
+    result: RadiationEfficiencyResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Radiation efficiency ``sigma(f)`` on log-log axes (Hopkins 2.9.4).
 
@@ -513,7 +612,10 @@ def plot_radiation_efficiency(
 
 
 def plot_multiple_shock(
-    result: MultipleShockResult, ax: Axes | None = None, *, language: str = "en",
+    result: MultipleShockResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
     **kwargs: Any,
 ) -> Axes:
     """Injury-probability curve ``P(R)`` with this assessment's ``R`` marked.
@@ -532,8 +634,12 @@ def plot_multiple_shock(
     r_max = max(result.risk, r90) * 1.3
     grid = np.linspace(0.0, r_max, 240)
     prob = np.asarray(injury_probability(grid, sex=result.sex), dtype=np.float64)
-    ax.plot(grid, 100.0 * prob, color=_C_PRIMARY,
-            label=r"$\Pi(R) = 1 - e^{-(R/\alpha)^{\beta}}$")
+    ax.plot(
+        grid,
+        100.0 * prob,
+        color=_C_PRIMARY,
+        label=r"$\Pi(R) = 1 - e^{-(R/\alpha)^{\beta}}$",
+    )
     for level, r_val in zip((10, 50, 90), (r10, r50, r90)):
         ax.axhline(level, color=_C_MUTED, ls=":", lw=0.8)
         ax.plot([r_val, r_val], [0.0, level], color=_C_MUTED, ls=":", lw=0.8)
@@ -541,11 +647,14 @@ def plot_multiple_shock(
     kwargs.setdefault("color", _C_REFERENCE)
     kwargs.setdefault("zorder", 4)
     kwargs.setdefault("s", 90)
-    kwargs.setdefault("label", _t(_RISK_LABEL, language).format(
-                   r=format_number(result.risk, language, decimals=2),
-                   p=format_number(100.0 * result.probability, language, decimals=0)))
-    ax.scatter([result.risk], [100.0 * result.probability],
-               **kwargs)
+    kwargs.setdefault(
+        "label",
+        _t(_RISK_LABEL, language).format(
+            r=format_number(result.risk, language, decimals=2),
+            p=format_number(100.0 * result.probability, language, decimals=0),
+        ),
+    )
+    ax.scatter([result.risk], [100.0 * result.probability], **kwargs)
     ax.set_xlabel(_t("Stress variable $R$", language))
     ax.set_ylabel(_t("Probability of lumbar injury [%]", language))
     ax.set_title(
@@ -592,8 +701,7 @@ def _draw_measured_spectrum(
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("lw", 1.0)
     kwargs.setdefault("label", _t("envelope spectrum", language))
-    ax.plot(frequencies[keep], amplitude[keep],
-            **kwargs)
+    ax.plot(frequencies[keep], amplitude[keep], **kwargs)
     ax.set_ylabel(_t("Envelope amplitude", language))
     return float(np.max(amplitude[keep])) if np.any(keep) else 1.0
 
@@ -631,8 +739,10 @@ def _axis_extent_points(ax: Axes) -> tuple[float, float]:
         width_pt, height_pt = box.width * 72.0 / dpi, box.height * 72.0 / dpi
     except (AttributeError, ValueError):  # pragma: no cover - defensive
         return _LABEL_FALLBACK_WIDTH_PT, _LABEL_FALLBACK_HEIGHT_PT
-    return (width_pt if width_pt > 0.0 else _LABEL_FALLBACK_WIDTH_PT,
-            height_pt if height_pt > 0.0 else _LABEL_FALLBACK_HEIGHT_PT)
+    return (
+        width_pt if width_pt > 0.0 else _LABEL_FALLBACK_WIDTH_PT,
+        height_pt if height_pt > 0.0 else _LABEL_FALLBACK_HEIGHT_PT,
+    )
 
 
 def _axis_width_points(ax: Axes) -> float:
@@ -670,7 +780,9 @@ def _label_strip(ax: Axes, names: list[str]) -> tuple[float, float]:
 
 
 def _label_offsets(
-    frequencies: list[float], f_max: float, width_pt: float,
+    frequencies: list[float],
+    f_max: float,
+    width_pt: float,
     label_pt: float = _LABEL_WIDTH_PT,
 ) -> dict[int, float]:
     """Horizontal label offsets in points, keyed by index into *frequencies*.
@@ -717,7 +829,9 @@ def _draw_fault_lines(
     if annotate:
         band, label_pt = _label_strip(ax, [line.name for line in visible])
     offsets = _label_offsets(
-        [line.frequency for line in visible], f_max, _axis_width_points(ax),
+        [line.frequency for line in visible],
+        f_max,
+        _axis_width_points(ax),
         label_pt,
     )
     labelled: set[str] = set()
@@ -725,23 +839,40 @@ def _draw_fault_lines(
         colour = _FAMILY_COLORS.get(line.family, _C_EDGE)
         label = None if line.family in labelled else _t(line.family, language)
         labelled.add(line.family)
-        ax.axvline(line.frequency, ymax=band, color=colour, ls="--", lw=1.0,
-                   alpha=0.85, label=label, zorder=2)
+        ax.axvline(
+            line.frequency,
+            ymax=band,
+            color=colour,
+            ls="--",
+            lw=1.0,
+            alpha=0.85,
+            label=label,
+            zorder=2,
+        )
         if annotate:
             ax.annotate(
-                line.name, xy=(line.frequency, band),
+                line.name,
+                xy=(line.frequency, band),
                 xycoords=("data", "axes fraction"),
-                xytext=(offsets[i], _LABEL_PAD_PT), textcoords="offset points",
-                rotation=90, fontsize="x-small", color=colour,
-                ha="left", va="bottom",
+                xytext=(offsets[i], _LABEL_PAD_PT),
+                textcoords="offset points",
+                rotation=90,
+                fontsize="x-small",
+                color=colour,
+                ha="left",
+                va="bottom",
             )
     return band
 
 
 def plot_fault_frequencies(
-    result: FaultFrequencyResult, ax: Axes | None = None, *,
-    language: str = "en", spectrum: Any | None = None,
-    max_frequency: float | None = None, annotate: bool = True,
+    result: FaultFrequencyResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    spectrum: Any | None = None,
+    max_frequency: float | None = None,
+    annotate: bool = True,
     **kwargs: Any,
 ) -> Axes:
     """Predicted machine fault lines over a measured envelope spectrum.
@@ -783,9 +914,7 @@ def plot_fault_frequencies(
     if f_max is None:
         f_max = 1.15 * float(freqs.max())
 
-    top = _draw_measured_spectrum(
-        ax, spectrum_f, spectrum_a, f_max, language, kwargs
-    )
+    top = _draw_measured_spectrum(ax, spectrum_f, spectrum_a, f_max, language, kwargs)
     band = _draw_fault_lines(ax, result, f_max, language, annotate=annotate)
     ax.set_ylim(0.0, 1.03 * top / band)
     ax.set_xlim(0.0, f_max)
@@ -798,16 +927,18 @@ def plot_fault_frequencies(
     )
     # The legend belongs to the spectrum, so it is anchored to the part of the
     # axes the spectrum has: above the strip start there are only line names.
-    ax.legend(loc="upper right", fontsize="small",
-              bbox_to_anchor=(0.0, 0.0, 1.0, band))
+    ax.legend(loc="upper right", fontsize="small", bbox_to_anchor=(0.0, 0.0, 1.0, band))
     ax.grid(True, axis="y", alpha=0.3)
     localize_axes(ax, language)
     return ax
 
 
 def plot_power_injection(
-    result: PowerInjectionResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any,
+    result: PowerInjectionResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Loss-factor budget of a two-subsystem SEA model (Norton Ch. 6).
 
@@ -831,14 +962,31 @@ def plot_power_injection(
     kwargs.setdefault("marker", "o")
     kwargs.setdefault("markersize", 4)
     kwargs.setdefault("label", r"$\eta_{12}$")
-    ax.loglog(freq, result.coupling_loss_factor12,
-              **kwargs)
-    ax.loglog(freq, result.coupling_loss_factor21, color=_C_SECONDARY,
-              marker="s", markersize=4, label=r"$\eta_{21}$")
-    ax.loglog(freq, result.internal_loss_factor1, color=_C_TERTIARY, ls="--",
-              lw=1.1, label=r"$\eta_{1}$")
-    ax.loglog(freq, result.internal_loss_factor2, color=_C_QUATERNARY, ls=":",
-              lw=1.3, label=r"$\eta_{2}$")
+    ax.loglog(freq, result.coupling_loss_factor12, **kwargs)
+    ax.loglog(
+        freq,
+        result.coupling_loss_factor21,
+        color=_C_SECONDARY,
+        marker="s",
+        markersize=4,
+        label=r"$\eta_{21}$",
+    )
+    ax.loglog(
+        freq,
+        result.internal_loss_factor1,
+        color=_C_TERTIARY,
+        ls="--",
+        lw=1.1,
+        label=r"$\eta_{1}$",
+    )
+    ax.loglog(
+        freq,
+        result.internal_loss_factor2,
+        color=_C_QUATERNARY,
+        ls=":",
+        lw=1.3,
+        label=r"$\eta_{2}$",
+    )
     format_frequency_axis(ax, float(freq.min()), float(freq.max()))
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Loss factor", language))
@@ -854,8 +1002,11 @@ def plot_power_injection(
 
 
 def plot_junction_transmission(
-    result: JunctionTransmissionResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any,
+    result: JunctionTransmissionResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Plot ``tau(theta)`` versus incidence angle (Hopkins Eqs 5.12/5.13).
 
@@ -880,7 +1031,10 @@ def plot_junction_transmission(
     kwargs.setdefault("label", _t(r"corner $\tau_{12}(\theta)$", language))
     ax.plot(angles, corner, **kwargs)
     ax.axhline(
-        result.corner_average, color=_C_PRIMARY, ls="--", lw=1.0,
+        result.corner_average,
+        color=_C_PRIMARY,
+        ls="--",
+        lw=1.0,
         label=_t(r"corner average $\bar\tau_{12}$ = {value}", language).replace(
             "{value}", format_number(result.corner_average, language, decimals=4)
         ),
@@ -888,11 +1042,16 @@ def plot_junction_transmission(
     if result.straight is not None and result.straight_average is not None:
         straight = np.asarray(result.straight, dtype=np.float64)
         ax.plot(
-            angles, straight, color=_C_SECONDARY,
+            angles,
+            straight,
+            color=_C_SECONDARY,
             label=_t(r"straight $\tau_{13}(\theta)$", language),
         )
         ax.axhline(
-            result.straight_average, color=_C_SECONDARY, ls=":", lw=1.0,
+            result.straight_average,
+            color=_C_SECONDARY,
+            ls=":",
+            lw=1.0,
             label=_t(r"straight average $\bar\tau_{13}$ = {value}", language).replace(
                 "{value}", format_number(result.straight_average, language, decimals=4)
             ),

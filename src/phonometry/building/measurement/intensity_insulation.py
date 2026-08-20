@@ -67,7 +67,7 @@ to 50 Hz. The single-number weighted rating uses the ISO 717-1 core range, so
 the automatic rating (``RI,w``, ``RI,M,w``, ``DI,n,e,w``) is formed via the
 verified :func:`phonometry.building.weighted_rating` engine only when exactly
 16 one-third-octave (100-3150 Hz) or 5 octave (125-2000 Hz) values are
-supplied. """
+supplied."""
 
 from __future__ import annotations
 
@@ -272,9 +272,14 @@ class IntensityReductionResult:
         from ..._report.iso15186 import render_iso15186_report
 
         return render_iso15186_report(
-            self, rating, path, metadata=metadata,
-            verbose=verbose, language=language,
-            fpi=fpi, residual_index=residual_index,
+            self,
+            rating,
+            path,
+            metadata=metadata,
+            verbose=verbose,
+            language=language,
+            fpi=fpi,
+            residual_index=residual_index,
         )
 
 
@@ -394,9 +399,14 @@ class IntensityElementNormalizedResult:
         from ..._report.iso15186 import render_iso15186_element_report
 
         return render_iso15186_element_report(
-            self, rating, path, metadata=metadata,
-            verbose=verbose, language=language,
-            fpi=fpi, residual_index=residual_index,
+            self,
+            rating,
+            path,
+            metadata=metadata,
+            verbose=verbose,
+            language=language,
+            fpi=fpi,
+            residual_index=residual_index,
         )
 
 
@@ -543,14 +553,11 @@ def combine_subareas(
     """
     levels = np.asarray(l_in, dtype=np.float64)
     if levels.ndim != 2:
-        raise ValueError(
-            "'l_in' must be a two-dimensional (subareas, bands) array."
-        )
+        raise ValueError("'l_in' must be a two-dimensional (subareas, bands) array.")
     areas = np.asarray(measurement_area, dtype=np.float64)
     if areas.ndim != 1 or areas.size != levels.shape[0]:
         raise ValueError(
-            "'measurement_area' must give one area per subarea (row of "
-            "'l_in')."
+            "'measurement_area' must give one area per subarea (row of 'l_in')."
         )
     if not np.all(np.isfinite(levels)):
         raise ValueError("'l_in' must contain only finite values.")

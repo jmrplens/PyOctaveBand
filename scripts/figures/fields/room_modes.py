@@ -41,7 +41,8 @@ _ROOM_FPS = _ANIM_FPS * 13.0 / 3.0
 
 @lru_cache(maxsize=1)
 def _room_mode_fields(
-        n_frames: int = _ROOM_FRAMES) -> tuple[Any, Any, Any, float, float]:
+    n_frames: int = _ROOM_FRAMES,
+) -> tuple[Any, Any, Any, float, float]:
     """Run the two FDTD room simulations once per process (all variants).
 
     Returns instantaneous-pressure frames, running-RMS frames (both float32,
@@ -52,11 +53,11 @@ def _room_mode_fields(
     import fdtd2d
 
     lx, ly, c0 = 5.0, 3.5, 343.0
-    dx = 0.01                                    # 500 x 350 cells
+    dx = 0.01  # 500 x 350 cells
     ny, nx = round(ly / dx), round(lx / dx)
-    f_mode = 0.5 * c0 * float(np.hypot(2 / lx, 1 / ly))   # (2,1) ~ 84.3 Hz
-    f_next = 0.5 * c0 * (2 / ly)                          # (0,2) = 98 Hz
-    f_off = 0.5 * (f_mode + f_next)              # between resonances
+    f_mode = 0.5 * c0 * float(np.hypot(2 / lx, 1 / ly))  # (2,1) ~ 84.3 Hz
+    f_next = 0.5 * c0 * (2 / ly)  # (0,2) = 98 Hz
+    f_off = 0.5 * (f_mode + f_next)  # between resonances
     t60 = 0.7
     every = _ROOM_EVERY
     steps = every * n_frames
@@ -64,8 +65,7 @@ def _room_mode_fields(
     times = np.zeros(0)
     for f in (f_mode, f_off):
         sim = fdtd2d.FDTD2D(c0, dx, shape=(ny, nx), damping=6.9077 / t60)
-        sim.add_source(fdtd2d.CWSource(ix=25, iy=25, frequency=f,
-                                       ramp_cycles=2.0))
+        sim.add_source(fdtd2d.CWSource(ix=25, iy=25, frequency=f, ramp_cycles=2.0))
         # Running mean square with a two-period time constant: the pattern
         # (the mode map) builds up as the resonance settles.
         beta = float(np.exp(-sim.dt * f / 2.0))
@@ -94,37 +94,63 @@ def animate_fdtd_room_modes(output_dir: str) -> None:
     from matplotlib import patheffects
 
     T = _translate_str
-    outline = [patheffects.withStroke(linewidth=2.0,
-                                      foreground=FIELD_STROKE)]
+    outline = [patheffects.withStroke(linewidth=2.0, foreground=FIELD_STROKE)]
     p_all, r_all, times, f_mode, f_off = _room_mode_fields()
     half = p_all.shape[1] // 2
     vmax_p = float(np.quantile(np.abs(p_all[0][half:]), 0.995))
     vmax_r = float(np.quantile(r_all[0][-1], 0.999))
 
     fig = _anim_figure()
-    fig.suptitle(T("Room modes in a rigid 5 m × 3.5 m room (2D FDTD)"),
-                 )
+    fig.suptitle(
+        T("Room modes in a rigid 5 m × 3.5 m room (2D FDTD)"),
+    )
     gs = fig.add_gridspec(2, 2)
-    titles = [T(f"On the (2,1) mode: {f_mode:.1f} Hz"),
-              T(f"Off mode: {f_off:.1f} Hz")]
+    titles = [T(f"On the (2,1) mode: {f_mode:.1f} Hz"), T(f"Off mode: {f_off:.1f} Hz")]
     ims: list[Any] = []
     for col in range(2):
         ax_p = fig.add_subplot(gs[0, col])
         ax_p.grid(False)
-        im_p = ax_p.imshow(p_all[col][0], origin="lower",
-                           extent=(0.0, 5.0, 0.0, 3.5), cmap=CMAP_FIELD,
-                           vmin=-vmax_p, vmax=vmax_p, interpolation="bilinear")
+        im_p = ax_p.imshow(
+            p_all[col][0],
+            origin="lower",
+            extent=(0.0, 5.0, 0.0, 3.5),
+            cmap=CMAP_FIELD,
+            vmin=-vmax_p,
+            vmax=vmax_p,
+            interpolation="bilinear",
+        )
         ax_p.set_title(titles[col], fontsize=10)
-        ax_p.plot([0.25], [0.25], marker="o", ms=5, color=COLOR_TERTIARY,
-                  markeredgecolor=FIELD_STROKE, markeredgewidth=0.8)
-        ax_p.text(0.45, 0.22, T("source"), ha="left", va="center",
-                  color=FIELD_INK, fontsize=7.5, path_effects=outline)
+        ax_p.plot(
+            [0.25],
+            [0.25],
+            marker="o",
+            ms=5,
+            color=COLOR_TERTIARY,
+            markeredgecolor=FIELD_STROKE,
+            markeredgewidth=0.8,
+        )
+        ax_p.text(
+            0.45,
+            0.22,
+            T("source"),
+            ha="left",
+            va="center",
+            color=FIELD_INK,
+            fontsize=7.5,
+            path_effects=outline,
+        )
         ax_p.tick_params(labelsize=7, labelbottom=False)
         ax_r = fig.add_subplot(gs[1, col])
         ax_r.grid(False)
-        im_r = ax_r.imshow(r_all[col][0], origin="lower",
-                           extent=(0.0, 5.0, 0.0, 3.5), cmap="magma",
-                           vmin=0.0, vmax=vmax_r, interpolation="bilinear")
+        im_r = ax_r.imshow(
+            r_all[col][0],
+            origin="lower",
+            extent=(0.0, 5.0, 0.0, 3.5),
+            cmap="magma",
+            vmin=0.0,
+            vmax=vmax_r,
+            interpolation="bilinear",
+        )
         ax_r.tick_params(labelsize=7)
         ax_r.set_xlabel("$x$ [m]", fontsize=8)
         if col == 0:
@@ -133,16 +159,38 @@ def animate_fdtd_room_modes(output_dir: str) -> None:
             for xn in (1.25, 3.75):
                 ax_r.axvline(xn, color="white", ls="--", lw=1.0, alpha=0.75)
             ax_r.axhline(1.75, color="white", ls="--", lw=1.0, alpha=0.75)
-            ax_r.text(0.12, 3.3, T("nodal lines (2,1)"), color="white",
-                      fontsize=8, ha="left", va="top")
+            ax_r.text(
+                0.12,
+                3.3,
+                T("nodal lines (2,1)"),
+                color="white",
+                fontsize=8,
+                ha="left",
+                va="top",
+            )
         else:
             ax_p.tick_params(labelleft=False)
             ax_r.tick_params(labelleft=False)
-            ax_r.text(0.12, 3.3, T("same color scale"), color="white",
-                      fontsize=8, ha="left", va="top")
+            ax_r.text(
+                0.12,
+                3.3,
+                T("same color scale"),
+                color="white",
+                fontsize=8,
+                ha="left",
+                va="top",
+            )
         ims += [im_p, im_r]
-    t_txt = fig.text(0.985, 0.955, "", ha="right", va="top",
-                     family="monospace", fontsize=10, color=COLOR_FG)
+    t_txt = fig.text(
+        0.985,
+        0.955,
+        "",
+        ha="right",
+        va="top",
+        family="monospace",
+        fontsize=10,
+        color=COLOR_FG,
+    )
 
     def update(k: int) -> tuple[Any, ...]:
         for col in range(2):
@@ -155,5 +203,12 @@ def animate_fdtd_room_modes(output_dir: str) -> None:
     # 1 572 frames at 49.3 per acoustic period, played at 260/3 fps. The
     # GitHub GIF samples this long clip at a reduced rate so the
     # palette-quantized file stays well under 4 MB.
-    _render_clip(fig, update, output_dir, "anim_fdtd_room_modes",
-                 frames=int(p_all.shape[1]), fps=_ROOM_FPS, gif_fps=5)
+    _render_clip(
+        fig,
+        update,
+        output_dir,
+        "anim_fdtd_room_modes",
+        frames=int(p_all.shape[1]),
+        fps=_ROOM_FPS,
+        gif_fps=5,
+    )

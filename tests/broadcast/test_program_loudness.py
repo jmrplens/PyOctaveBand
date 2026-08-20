@@ -264,9 +264,7 @@ def test_tech3341_case2_momentary_short_term() -> None:
 def test_tech3341_case9_short_term_constant() -> None:
     """(1.34 s at -20; 1.66 s at -30) x 5: S = -23.0 constant after 3 s."""
     x = _stereo(
-        np.concatenate(
-            [np.concatenate([_sine(-20.0, 1.34), _sine(-30.0, 1.66)])] * 5
-        )
+        np.concatenate([np.concatenate([_sine(-20.0, 1.34), _sine(-30.0, 1.66)])] * 5)
     )
     res = program_loudness(x, FS)
     settled = res.short_term[res.short_term_time >= 3.0]
@@ -276,9 +274,7 @@ def test_tech3341_case9_short_term_constant() -> None:
 def test_tech3341_case12_momentary_constant() -> None:
     """(0.18 s at -20; 0.22 s at -30) x 25: M = -23.0 constant after 1 s."""
     x = _stereo(
-        np.concatenate(
-            [np.concatenate([_sine(-20.0, 0.18), _sine(-30.0, 0.22)])] * 25
-        )
+        np.concatenate([np.concatenate([_sine(-20.0, 0.18), _sine(-30.0, 0.22)])] * 25)
     )
     res = program_loudness(x, FS)
     settled = res.momentary[res.momentary_time >= 1.0]
@@ -289,9 +285,7 @@ def test_tech3341_case12_momentary_constant() -> None:
 def test_tech3341_case10_max_short_term_per_segment(i: int) -> None:
     """i*0.15 s silence + 3 s at -23 + 1 s silence: Max S = -23.0 each."""
     x = _stereo(
-        np.concatenate(
-            [np.zeros(int(i * 0.15 * FS)), _sine(-23.0, 3.0), np.zeros(FS)]
-        )
+        np.concatenate([np.zeros(int(i * 0.15 * FS)), _sine(-23.0, 3.0), np.zeros(FS)])
     )
     res = program_loudness(x, FS)
     assert res.max_short_term == pytest.approx(-23.0, abs=EBU_TECH3341_TOL_LU)
@@ -301,9 +295,7 @@ def test_tech3341_case10_max_short_term_per_segment(i: int) -> None:
 def test_tech3341_case13_max_momentary_per_segment(i: int) -> None:
     """i*20 ms silence + 400 ms at -23 + 1 s silence: Max M = -23.0 each."""
     x = _stereo(
-        np.concatenate(
-            [np.zeros(int(i * 0.02 * FS)), _sine(-23.0, 0.4), np.zeros(FS)]
-        )
+        np.concatenate([np.zeros(int(i * 0.02 * FS)), _sine(-23.0, 0.4), np.zeros(FS)])
     )
     res = program_loudness(x, FS)
     assert res.max_momentary == pytest.approx(-23.0, abs=EBU_TECH3341_TOL_LU)
@@ -328,9 +320,7 @@ def test_tech3341_case11_successive_max_short_term() -> None:
     res = program_loudness(x, FS)
     for i in range(20):
         upto = res.short_term[res.short_term_time <= (i + 1) * 6.0 + 1e-9]
-        assert float(np.max(upto)) == pytest.approx(
-            -38.0 + i, abs=EBU_TECH3341_TOL_LU
-        )
+        assert float(np.max(upto)) == pytest.approx(-38.0 + i, abs=EBU_TECH3341_TOL_LU)
 
 
 def test_tech3341_case14_successive_max_momentary() -> None:
@@ -352,9 +342,7 @@ def test_tech3341_case14_successive_max_momentary() -> None:
     res = program_loudness(x, FS)
     for i in range(20):
         upto = res.momentary[res.momentary_time <= (i + 1) * 0.8 + 1e-9]
-        assert float(np.max(upto)) == pytest.approx(
-            -38.0 + i, abs=EBU_TECH3341_TOL_LU
-        )
+        assert float(np.max(upto)) == pytest.approx(-38.0 + i, abs=EBU_TECH3341_TOL_LU)
 
 
 # ---------------------------------------------------------------------------
@@ -395,9 +383,7 @@ def test_tech3341_true_peak_intersample_offsets(offset: int) -> None:
     frequency[mid : mid + period] = FS / 4.0
     amplitude[mid : mid + period] = 1.0
     # Phase-continuous synthesis at 4 fs, tapered as the table asks.
-    x4 = _tapered(
-        amplitude * np.sin(2.0 * np.pi * np.cumsum(frequency) / fs4), fs4
-    )
+    x4 = _tapered(amplitude * np.sin(2.0 * np.pi * np.cumsum(frequency) / fs4), fs4)
     # Anti-alias lowpass, then decimate with the given offset.
     taps = sg.firwin(1023, 0.9 / 4.0)
     x = sg.lfilter(taps, 1.0, x4)[511 + offset :: 4]

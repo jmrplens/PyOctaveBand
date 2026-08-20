@@ -131,8 +131,12 @@ def plot_piston_geometry(
     for y0 in (a, -a - baffle_h):
         _material_rect(ax, -wall, y0, wall, baffle_h, "rigid")
     ax.text(
-        -0.5 * wall, a + baffle_h * 1.03, _t("Baffle", language),
-        fontsize=8, ha="center", va="bottom",
+        -0.5 * wall,
+        a + baffle_h * 1.03,
+        _t("Baffle", language),
+        fontsize=8,
+        ha="center",
+        va="bottom",
     )
     kwargs.setdefault("facecolor", _C_SECONDARY_LIGHT)
     kwargs.setdefault("edgecolor", _C_EDGE)
@@ -140,8 +144,7 @@ def plot_piston_geometry(
 
     piston = Rectangle((-wall, -a), 0.6 * wall, 2.0 * a, **kwargs)
     ax.add_patch(piston)
-    ax.plot([0.0, 3.2 * a], [0.0, 0.0], linestyle=":", linewidth=0.8,
-            color=_C_MUTED)
+    ax.plot([0.0, 3.2 * a], [0.0, 0.0], linestyle=":", linewidth=0.8, color=_C_MUTED)
     if angles is not None and directivity is not None:
         ang = np.asarray(angles, dtype=np.float64)
         d_lin = np.abs(np.asarray(directivity, dtype=np.float64))
@@ -151,13 +154,14 @@ def plot_piston_geometry(
         if peak > 0.0:
             scale = 2.8 * a / peak
             ax.plot(
-                d_lin * scale * np.cos(ang), d_lin * scale * np.sin(ang),
-                linewidth=1.6, color=_C_PRIMARY,
+                d_lin * scale * np.cos(ang),
+                d_lin * scale * np.sin(ang),
+                linewidth=1.6,
+                color=_C_PRIMARY,
                 label=lobe_label or _t("Normalised directivity", language),
             )
             ax.legend(loc=_LEGEND_LOC, fontsize=8)
-    _dim(ax, (-1.4 * wall, -a), (-1.4 * wall, a),
-         "2a = " + _mm(2.0 * a, language))
+    _dim(ax, (-1.4 * wall, -a), (-1.4 * wall, a), "2a = " + _mm(2.0 * a, language))
     _finish_geometry_axes(ax, _t("Baffled piston", language))
     return ax
 
@@ -185,8 +189,7 @@ def plot_piston_result_geometry(
         n_rows = int(directivity.shape[0])
         if not -n_rows <= frequency_index < n_rows or ka.size < n_rows:
             raise ValueError(
-                f"'frequency_index' must index the {n_rows} computed "
-                "frequencies."
+                f"'frequency_index' must index the {n_rows} computed frequencies."
             )
         row = directivity[frequency_index]
         angles = np.asarray(result.angles, dtype=np.float64)
@@ -197,8 +200,13 @@ def plot_piston_result_geometry(
             float(ka[frequency_index]), language, decimals=1, trim=True
         )
     return plot_piston_geometry(
-        result.radius, ax=ax, angles=angles, directivity=lobe,
-        lobe_label=label, language=language, **kwargs,
+        result.radius,
+        ax=ax,
+        angles=angles,
+        directivity=lobe,
+        lobe_label=label,
+        language=language,
+        **kwargs,
     )
 
 
@@ -237,7 +245,8 @@ def plot_sound_reinforcement_geometry(
 
     _check_language(language)
     lengths = (
-        float(talker_distance), float(microphone_distance),
+        float(talker_distance),
+        float(microphone_distance),
         float(listener_distance),
     )
     if not all(np.isfinite(v) and v > 0.0 for v in lengths):
@@ -251,49 +260,108 @@ def plot_sound_reinforcement_geometry(
     t_xy, m_xy, h_xy, l_xy = (1.0, 0.0), (2.2, 0.0), (3.6, 2.4), (9.0, 0.0)
     ax.plot([0.2, 9.8], [0.0, 0.0], color=_C_MUTED, linewidth=1.0, zorder=1)
 
-    ax.plot([t_xy[0]], [t_xy[1]], marker="*", markersize=14,
-            color=_C_REFERENCE, linestyle="none", zorder=6)
-    ax.text(t_xy[0], -0.28, _t("Talker (T)", language), fontsize=8,
-            ha="center", va="top")
-    ax.plot([m_xy[0], m_xy[0]], [0.0, 0.5], color=_C_EDGE, linewidth=1.4,
-            zorder=5)
-    ax.plot([m_xy[0]], [0.62], marker="o", markersize=9, color=_C_PRIMARY,
-            markeredgecolor=_C_EDGE, linestyle="none", zorder=6)
-    ax.text(m_xy[0] + 0.15, 0.82, _t("Microphone (M)", language), fontsize=8,
-            ha="left", va="bottom")
+    ax.plot(
+        [t_xy[0]],
+        [t_xy[1]],
+        marker="*",
+        markersize=14,
+        color=_C_REFERENCE,
+        linestyle="none",
+        zorder=6,
+    )
+    ax.text(
+        t_xy[0], -0.28, _t("Talker (T)", language), fontsize=8, ha="center", va="top"
+    )
+    ax.plot([m_xy[0], m_xy[0]], [0.0, 0.5], color=_C_EDGE, linewidth=1.4, zorder=5)
+    ax.plot(
+        [m_xy[0]],
+        [0.62],
+        marker="o",
+        markersize=9,
+        color=_C_PRIMARY,
+        markeredgecolor=_C_EDGE,
+        linestyle="none",
+        zorder=6,
+    )
+    ax.text(
+        m_xy[0] + 0.15,
+        0.82,
+        _t("Microphone (M)", language),
+        fontsize=8,
+        ha="left",
+        va="bottom",
+    )
     ax.add_patch(
         Polygon(
-            [(h_xy[0] - 0.28, h_xy[1] - 0.22), (h_xy[0] - 0.28, h_xy[1] + 0.22),
-             (h_xy[0] + 0.22, h_xy[1] + 0.5), (h_xy[0] + 0.22, h_xy[1] - 0.5)],
-            closed=True, facecolor=_C_SECONDARY_LIGHT, edgecolor=_C_EDGE,
-            linewidth=0.9, zorder=5,
+            [
+                (h_xy[0] - 0.28, h_xy[1] - 0.22),
+                (h_xy[0] - 0.28, h_xy[1] + 0.22),
+                (h_xy[0] + 0.22, h_xy[1] + 0.5),
+                (h_xy[0] + 0.22, h_xy[1] - 0.5),
+            ],
+            closed=True,
+            facecolor=_C_SECONDARY_LIGHT,
+            edgecolor=_C_EDGE,
+            linewidth=0.9,
+            zorder=5,
         )
     )
-    ax.text(h_xy[0], h_xy[1] + 0.62, _t("Loudspeaker (H)", language),
-            fontsize=8, ha="center", va="bottom")
-    ax.plot([l_xy[0]], [l_xy[1]], marker="o", markersize=9, color=_C_TERTIARY,
-            markeredgecolor=_C_EDGE, linestyle="none", zorder=6)
-    ax.text(l_xy[0], -0.28, _t("Listener (L)", language), fontsize=8,
-            ha="center", va="top")
+    ax.text(
+        h_xy[0],
+        h_xy[1] + 0.62,
+        _t("Loudspeaker (H)", language),
+        fontsize=8,
+        ha="center",
+        va="bottom",
+    )
+    ax.plot(
+        [l_xy[0]],
+        [l_xy[1]],
+        marker="o",
+        markersize=9,
+        color=_C_TERTIARY,
+        markeredgecolor=_C_EDGE,
+        linestyle="none",
+        zorder=6,
+    )
+    ax.text(
+        l_xy[0], -0.28, _t("Listener (L)", language), fontsize=8, ha="center", va="top"
+    )
 
-    ax.plot([t_xy[0], m_xy[0]], [0.12, 0.5], color=_C_PRIMARY, linewidth=1.6,
-            zorder=4, label=_t("Signal path", language))
-    ax.plot([h_xy[0], l_xy[0]], [h_xy[1], l_xy[1]], color=_C_PRIMARY,
-            linewidth=1.6, zorder=4)
+    ax.plot(
+        [t_xy[0], m_xy[0]],
+        [0.12, 0.5],
+        color=_C_PRIMARY,
+        linewidth=1.6,
+        zorder=4,
+        label=_t("Signal path", language),
+    )
+    ax.plot(
+        [h_xy[0], l_xy[0]],
+        [h_xy[1], l_xy[1]],
+        color=_C_PRIMARY,
+        linewidth=1.6,
+        zorder=4,
+    )
     kwargs.setdefault("color", _C_SECONDARY)
     kwargs.setdefault("linewidth", 1.4)
     kwargs.setdefault("linestyle", "--")
     kwargs.setdefault("label", _t("Feedback path", language))
-    ax.plot([h_xy[0], m_xy[0]], [h_xy[1], 0.62], zorder=4,
-            **kwargs)
+    ax.plot([h_xy[0], m_xy[0]], [h_xy[1], 0.62], zorder=4, **kwargs)
 
     for (x0, y0), (x1, y1), value, dy in (
         (t_xy, (m_xy[0], 0.5), d_tm, 0.16),
         ((h_xy[0], h_xy[1]), (m_xy[0], 0.62), d_hm, 0.12),
         (h_xy, l_xy, d_hl, 0.12),
     ):
-        ax.text(0.5 * (x0 + x1), 0.5 * (y0 + y1) + dy,
-                _metres(value, language), fontsize=8, ha="center", va="bottom")
+        ax.text(
+            0.5 * (x0 + x1),
+            0.5 * (y0 + y1) + dy,
+            _metres(value, language),
+            fontsize=8,
+            ha="center",
+            va="bottom",
+        )
 
     ax.set_ylim(-0.9, 3.6)
     ax.legend(loc=_LEGEND_LOC, fontsize=8)

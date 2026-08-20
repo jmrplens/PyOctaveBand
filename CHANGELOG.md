@@ -99,6 +99,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Ruff is the formatter, and there is a configuration to say so. The tree had
+  none: no `[tool.ruff]`, no `ruff.toml`, no pre-commit, no `.editorconfig`, and
+  CI ran `ruff check .` on ruff's default rules alone, which are four families
+  of outright errors. Nothing checked shape, so 673 of the 812 Python files had
+  drifted from any single style. They are formatted now, `ruff format --check`
+  runs in CI beside the linter and in `make lint`, and an `.editorconfig`
+  carries the same numbers to editors that never read `pyproject.toml`.
+
+  The line length is 88, which is both the tooling default and, measured, the
+  one that moves this tree least: 100 and 120 each rewrite more files, because
+  a longer limit rejoins lines that were split by hand. Only 0,8 % of the lines
+  here were over 88 to begin with.
+
+  Markdown stays outside it. Ruff formats fenced Python inside `.md` and does
+  not recognise `.mdx` at all, and every snippet in `docs/` is mirrored by hand
+  into the site in English and Spanish, so formatting one copy would drift the
+  three apart with no gate to notice. Those snippets also align their trailing
+  comments to show the output each line prints, which is a teaching device.
+
+  The linter now selects the families this tree already satisfied or nearly
+  did, and the fifty-odd findings they raised are fixed. One rule is selected
+  by its family and then turned back off: `SIM300` calls anything with an
+  upper-case name a literal, and on that reading it gets three idioms here
+  backwards. `spectrum[OCTAVE_BANDS == f]` is a numpy mask, not a condition;
+  `res.transmission_loss[BANDS <= f0]` reads "the bands at or below f0" until
+  it becomes `f0 >= BANDS`; and `value == pytest.approx(x)` is how pytest is
+  written. It is right about two of the nineteen it finds and wrong about the
+  rest, which SonarCloud noticed as assertions whose argument order no longer
+  agrees within a file. Six thousand more from
+  `PL`, `RUF`, `TID`, `N`, `T20` and `COM` are deliberately not selected: they
+  would rename the symbols standards spell as `Rw` and `LAeq`, flag the
+  transcribed normative constants as magic values, and ban the relative imports
+  this package uses by design. `B905` is the one worth adding next, and is left
+  for its own review because `strict=True` raises where the code truncates.
+
 - `import phonometry` imports the top level and nothing else. The nineteen
   domain packages and the four names it publishes arrive on first use, through
   a module `__getattr__` (PEP 562), so the statement costs **4.4 ms and 56

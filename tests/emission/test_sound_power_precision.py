@@ -87,9 +87,7 @@ def test_precision_positions_hemisphere_z_nonnegative() -> None:
 
 
 def test_precision_positions_invalid_surface_raises() -> None:
-    with pytest.raises(
-        ValueError, match="'surface' must be 'sphere' or 'hemisphere'"
-    ):
+    with pytest.raises(ValueError, match="'surface' must be 'sphere' or 'hemisphere'"):
         precision_positions("box", radius=1.0)  # type: ignore[arg-type]
 
 
@@ -166,9 +164,7 @@ def test_k1_frequency_length_mismatch_raises() -> None:
     source_2_bands = np.array([[56.0, 57.0]])
     background_2_bands = np.array([[50.0, 50.0]])
     one_frequency = np.array([200.0])
-    with pytest.raises(
-        ValueError, match="must match the number of 'frequencies'"
-    ):
+    with pytest.raises(ValueError, match="must match the number of 'frequencies'"):
         precision_background_correction(
             source_2_bands, background_2_bands, one_frequency
         )
@@ -214,9 +210,7 @@ def test_c3_from_air_absorption() -> None:
 
 
 def test_meteorological_invalid_pressure_raises() -> None:
-    with pytest.raises(
-        ValueError, match="'static_pressure' must be positive"
-    ):
+    with pytest.raises(ValueError, match="'static_pressure' must be positive"):
         meteorological_corrections(23.0, 0.0)
 
 
@@ -236,9 +230,7 @@ def test_uncertainty_one_sided_k_1p6() -> None:
 
 
 def test_uncertainty_bad_coverage_factor_raises() -> None:
-    with pytest.raises(
-        ValueError, match="'coverage_factor' must be positive"
-    ):
+    with pytest.raises(ValueError, match="'coverage_factor' must be positive"):
         precision_uncertainty(0.5, 2.0, 0.0)
 
 
@@ -362,9 +354,7 @@ def test_anechoic_bands_above_10khz_survive_without_lwa() -> None:
 
 def test_anechoic_invalid_surface_raises() -> None:
     levels = np.full((40, 1), 70.0)
-    with pytest.raises(
-        ValueError, match="'surface' must be 'sphere' or 'hemisphere'"
-    ):
+    with pytest.raises(ValueError, match="'surface' must be 'sphere' or 'hemisphere'"):
         sound_power_anechoic(levels, "box", radius=1.0)  # type: ignore[arg-type]
 
 
@@ -451,9 +441,7 @@ def test_lw0_shift_off_reference() -> None:
 def test_intensity_areas_mismatch_raises() -> None:
     intensity_3_segments = np.full((3,), 1e-5)
     areas_2_segments = np.array([1.0, 1.0])
-    with pytest.raises(
-        ValueError, match="'partial_intensity' first axis"
-    ):
+    with pytest.raises(ValueError, match="'partial_intensity' first axis"):
         sound_power_intensity_precision(intensity_3_segments, areas_2_segments)
 
 
@@ -471,9 +459,7 @@ def test_intensity_single_segment_2d_input_not_transposed() -> None:
     i_n = np.array([[1e-5, 2e-5, 3e-5]])  # 1 segment, 3 bands
     res = sound_power_intensity_precision(i_n, np.array([2.0]))
     assert res.sound_power.shape == (3,)  # 3 bands, not 3 segments
-    np.testing.assert_allclose(
-        res.partial_power[0], np.array([2e-5, 4e-5, 6e-5])
-    )
+    np.testing.assert_allclose(res.partial_power[0], np.array([2e-5, 4e-5, 6e-5]))
 
 
 # ==========================================================================
@@ -665,9 +651,7 @@ def test_criterion_1_without_limit_raises() -> None:
     lp = np.full((4, 1), 60.0)
     ind = precision_field_indicators(i_n, lp)
     scan_1, scan_2 = np.array([70.0]), np.array([70.2])
-    with pytest.raises(
-        ValueError, match="Criterion 1 needs the limit s"
-    ):
+    with pytest.raises(ValueError, match="Criterion 1 needs the limit s"):
         precision_qualification(
             ind,
             scan_intensity_level_1=scan_1,
@@ -693,8 +677,7 @@ def test_anechoic_result_plot_returns_axes() -> None:
 
     freqs = np.array([250.0, 500.0, 1000.0, 2000.0])
     levels = np.full((40, freqs.size), 74.0)
-    result = sound_power_anechoic(levels, "hemisphere", radius=1.0,
-                                  frequencies=freqs)
+    result = sound_power_anechoic(levels, "hemisphere", radius=1.0, frequencies=freqs)
     assert isinstance(result, PrecisionSoundPowerResult)
     ax = result.plot()
     assert isinstance(ax, plt.Axes)
@@ -721,11 +704,18 @@ def test_public_exports() -> None:
     from phonometry import emission
 
     for name in (
-        "sound_power_anechoic", "PrecisionSoundPowerResult", "precision_positions",
-        "precision_background_correction", "meteorological_corrections",
-        "MeteorologicalCorrection", "precision_uncertainty",
-        "sound_power_intensity_precision", "PrecisionIntensityResult",
-        "precision_field_indicators", "PrecisionFieldIndicators",
-        "precision_qualification", "PrecisionCriteria",
+        "sound_power_anechoic",
+        "PrecisionSoundPowerResult",
+        "precision_positions",
+        "precision_background_correction",
+        "meteorological_corrections",
+        "MeteorologicalCorrection",
+        "precision_uncertainty",
+        "sound_power_intensity_precision",
+        "PrecisionIntensityResult",
+        "precision_field_indicators",
+        "PrecisionFieldIndicators",
+        "precision_qualification",
+        "PrecisionCriteria",
     ):
         assert hasattr(emission, name), name

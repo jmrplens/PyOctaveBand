@@ -189,8 +189,11 @@ def test_metadata_header_renders(tmp_path) -> None:
     _assert_one_page(str(out))
     text = _extract_text(str(out))
     for token in (
-        "Example works", "Reciprocating compressor", "Machine hall, line 3",
-        "Class 1 SLM, octave bank", "Acoustics lab",
+        "Example works",
+        "Reciprocating compressor",
+        "Machine hall, line 3",
+        "Class 1 SLM, octave bank",
+        "Acoustics lab",
     ):
         assert token in text
 

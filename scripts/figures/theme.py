@@ -132,9 +132,15 @@ def set_theme(dark: bool) -> None:
         FIELD_INK = "black"
         FIELD_STROKE = "white"
         _SERIES_SPAN = _SERIES_SPAN_LIGHT
-    _publish(COLOR_FG=COLOR_FG, COLOR_GRID=COLOR_GRID, COLOR_PANEL=COLOR_PANEL,
-             _FILENAME_SUFFIX=_FILENAME_SUFFIX, CMAP_FIELD=CMAP_FIELD,
-             FIELD_INK=FIELD_INK, FIELD_STROKE=FIELD_STROKE)
+    _publish(
+        COLOR_FG=COLOR_FG,
+        COLOR_GRID=COLOR_GRID,
+        COLOR_PANEL=COLOR_PANEL,
+        _FILENAME_SUFFIX=_FILENAME_SUFFIX,
+        CMAP_FIELD=CMAP_FIELD,
+        FIELD_INK=FIELD_INK,
+        FIELD_STROKE=FIELD_STROKE,
+    )
     plt.rcParams.update(
         {
             "font.size": 10,
@@ -275,8 +281,7 @@ def save_figure(output_dir: str, filename: str, **kwargs: Any) -> None:
     # Drop matplotlib's version-stamped Software chunk (and any date). Merge
     # instead of setdefault: a caller-supplied metadata dict must not silently
     # reintroduce the version-dependent chunks.
-    kwargs["metadata"] = {"Software": None, "Date": None,
-                          **kwargs.get("metadata", {})}
+    kwargs["metadata"] = {"Software": None, "Date": None, **kwargs.get("metadata", {})}
     with io.BytesIO() as buffer:
         plt.savefig(buffer, format="png", **kwargs)
         buffer.seek(0)
@@ -289,8 +294,12 @@ def save_figure(output_dir: str, filename: str, **kwargs: Any) -> None:
             image.save(path, "WEBP", lossless=True, quality=100, method=6)
 
 
-
-def apply_axis_styling(ax: Any, title: str, xlim: tuple[float, float] | None = None, ylim: tuple[float, float] | None = None) -> None:
+def apply_axis_styling(
+    ax: Any,
+    title: str,
+    xlim: tuple[float, float] | None = None,
+    ylim: tuple[float, float] | None = None,
+) -> None:
     """Apply consistent styling to plots."""
     ax.set_title(title, pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
@@ -305,35 +314,53 @@ def apply_axis_styling(ax: Any, title: str, xlim: tuple[float, float] | None = N
 
     # Standard Octave Ticks
     xticks = [16, 31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]
-    xticklabels = ["16", "31.5", "63", "125", "250", "500", "1k", "2k", "4k", "8k", "16k"]
+    xticklabels = [
+        "16",
+        "31.5",
+        "63",
+        "125",
+        "250",
+        "500",
+        "1k",
+        "2k",
+        "4k",
+        "8k",
+        "16k",
+    ]
     ax.set_xticks(xticks)
     ax.set_xticklabels(xticklabels)
 
 
-def plot_psd(ax: Any, x: np.ndarray, fs: int, label: str = "Raw Signal PSD", color: str = "gray", alpha: float = 0.3) -> None:
+def plot_psd(
+    ax: Any,
+    x: np.ndarray,
+    fs: int,
+    label: str = "Raw Signal PSD",
+    color: str = "gray",
+    alpha: float = 0.3,
+) -> None:
     """Calculate and plot the Power Spectral Density of the raw signal."""
     # Use Welch's method for a smooth PSD estimate
     f, Pxx = scipy_signal.welch(x, fs, nperseg=4096)
-    
+
     # Convert to dB (relative to max to match SPL scale roughly or just show shape)
     # Since SPL is calibrated differently, we just want to show the 'shape' of the spectrum
     # in the background. We can normalize Pxx to match the peak of the octave bands roughly
     # or just plot it as is if we had calibrated units.
     # Here we'll just plot relative dB
-    
+
     # Avoid log(0)
     Pxx_db = 10 * np.log10(Pxx + 1e-12)
-    
-    # Normalize PSD peak to 0 dB for visualization shape, then shift down? 
-    # Or better: don't normalize, just plot. But PSD density vs Octave Band Power (integrated) 
+
+    # Normalize PSD peak to 0 dB for visualization shape, then shift down?
+    # Or better: don't normalize, just plot. But PSD density vs Octave Band Power (integrated)
     # are different units (dB/Hz vs dB).
     # So we will plot it on a secondary Y axis or just scaled to fit nicely in background.
-    
+
     # Let's shift it so its mean roughly aligns with the mean of the SPL for visualization
     # This is purely for qualitative comparison of "where the energy is".
-    
-    ax.semilogx(f, Pxx_db, color=color, alpha=alpha, linewidth=1, label=label, zorder=0)
 
+    ax.semilogx(f, Pxx_db, color=color, alpha=alpha, linewidth=1, label=label, zorder=0)
 
 
 def measure_weighting_response(
@@ -369,21 +396,41 @@ def measure_weighting_response(
         # Drop the 0 Hz point: it cannot be drawn on a log frequency axis.
         return w[1:], mag_db[1:]
     return w, mag_db
+
+
 # ---------------------------------------------------------------------------
 # Building & structure-borne result figures (WP: guide figure coverage).
 # Each figure is a realistic user result: example data -> real function ->
 # result object, drawn the way the result's own .plot() presents it.
 # ---------------------------------------------------------------------------
-_THIRD_OCTAVE_16 = [100, 125, 160, 200, 250, 315, 400, 500,
-                    630, 800, 1000, 1250, 1600, 2000, 2500, 3150]
+_THIRD_OCTAVE_16 = [
+    100,
+    125,
+    160,
+    200,
+    250,
+    315,
+    400,
+    500,
+    630,
+    800,
+    1000,
+    1250,
+    1600,
+    2000,
+    2500,
+    3150,
+]
 
 
-def _band_index_axis(ax: Any, freqs: Sequence[float] | np.ndarray,
-                     fontsize: int = 8) -> np.ndarray:
+def _band_index_axis(
+    ax: Any, freqs: Sequence[float] | np.ndarray, fontsize: int = 8
+) -> np.ndarray:
     """Rotated nominal band labels on an index axis (band-data figures)."""
     x = np.arange(len(freqs))
     ax.set_xticks(x)
-    ax.set_xticklabels([f"{b:g}" for b in np.asarray(freqs)],
-                       rotation=45, fontsize=fontsize)
+    ax.set_xticklabels(
+        [f"{b:g}" for b in np.asarray(freqs)], rotation=45, fontsize=fontsize
+    )
     ax.set_xlabel(LABEL_FREQ_HZ)
     return x

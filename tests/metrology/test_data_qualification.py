@@ -34,15 +34,43 @@ from phonometry.metrology import data_qualification as rd
 
 #: B&P Example 4.4: N = 20 observations whose reverse arrangements A = 86.
 EXAMPLE_4_4 = [
-    5.2, 6.2, 3.7, 6.4, 3.9, 4.0, 3.9, 5.3, 4.0, 4.6,
-    5.9, 6.5, 4.3, 5.7, 3.1, 5.6, 5.2, 3.9, 6.2, 5.0,
+    5.2,
+    6.2,
+    3.7,
+    6.4,
+    3.9,
+    4.0,
+    3.9,
+    5.3,
+    4.0,
+    4.6,
+    5.9,
+    6.5,
+    4.3,
+    5.7,
+    3.1,
+    5.6,
+    5.2,
+    3.9,
+    6.2,
+    5.0,
 ]
 
 #: B&P Table A.6, alpha = 0.05 columns: N -> (A_{N;0.975}, A_{N;0.025}).
 TABLE_A6_ALPHA_05 = {
-    10: (11, 33), 12: (18, 47), 14: (27, 63), 16: (38, 81), 18: (50, 102),
-    20: (64, 125), 30: (162, 272), 40: (305, 474), 50: (495, 729),
-    60: (731, 1038), 70: (1014, 1400), 80: (1344, 1815), 90: (1721, 2283),
+    10: (11, 33),
+    12: (18, 47),
+    14: (27, 63),
+    16: (38, 81),
+    18: (50, 102),
+    20: (64, 125),
+    30: (162, 272),
+    40: (305, 474),
+    50: (495, 729),
+    60: (731, 1038),
+    70: (1014, 1400),
+    80: (1344, 1815),
+    90: (1721, 2283),
     100: (2145, 2804),
 }
 
@@ -67,9 +95,7 @@ def test_example_4_4_accepted_at_5_percent() -> None:
 
 
 @pytest.mark.parametrize(("n", "bounds"), sorted(TABLE_A6_ALPHA_05.items()))
-def test_table_a6_alpha_05_percentage_points(
-    n: int, bounds: tuple[int, int]
-) -> None:
+def test_table_a6_alpha_05_percentage_points(n: int, bounds: tuple[int, int]) -> None:
     assert rd._reverse_arrangement_bounds(n, 0.05) == bounds
 
 
@@ -204,23 +230,18 @@ def test_gain_ramp_is_rejected_like_example_10_3() -> None:
 def test_segment_statistics_are_consistent() -> None:
     rng = np.random.default_rng(5)
     x = rng.standard_normal(4000)
-    ms = ph.metrology.stationarity_test(
-        x, FS, n_segments=10, statistic="mean_square"
-    )
+    ms = ph.metrology.stationarity_test(x, FS, n_segments=10, statistic="mean_square")
     rms = ph.metrology.stationarity_test(x, FS, n_segments=10, statistic="rms")
     np.testing.assert_allclose(
         rms.segment_values, np.sqrt(ms.segment_values), rtol=1e-12
     )
-    mean = ph.metrology.stationarity_test(
-        x, FS, n_segments=10, statistic="mean"
-    )
-    var = ph.metrology.stationarity_test(
-        x, FS, n_segments=10, statistic="variance"
-    )
+    mean = ph.metrology.stationarity_test(x, FS, n_segments=10, statistic="mean")
+    var = ph.metrology.stationarity_test(x, FS, n_segments=10, statistic="variance")
     np.testing.assert_allclose(
         var.segment_values,
         ms.segment_values - mean.segment_values**2,
-        rtol=1e-9, atol=1e-12,
+        rtol=1e-9,
+        atol=1e-12,
     )
 
 
@@ -255,9 +276,7 @@ def _bandlimited_gaussian(
     """Exactly bandlimited unit-variance Gaussian noise (FFT synthesis)."""
     rng = np.random.default_rng(seed)
     freqs = np.fft.rfftfreq(n, 1.0 / fs)
-    spec = rng.standard_normal(freqs.size) + 1j * rng.standard_normal(
-        freqs.size
-    )
+    spec = rng.standard_normal(freqs.size) + 1j * rng.standard_normal(freqs.size)
     spec[(freqs < f1) | (freqs > f2)] = 0.0
     x = np.fft.irfft(spec, n)
     return np.asarray(x / np.std(x))
@@ -294,9 +313,7 @@ def test_zero_crossing_rate_of_lowpass_noise_example_5_12() -> None:
     band = 2000.0
     x = _bandlimited_gaussian(1, fs, n, 0.0, band)
     res = ph.metrology.level_crossing_rate(x, fs)
-    assert res.zero_crossing_rate == pytest.approx(
-        2.0 * band / np.sqrt(3.0), rel=1e-2
-    )
+    assert res.zero_crossing_rate == pytest.approx(2.0 * band / np.sqrt(3.0), rel=1e-2)
 
 
 def test_sine_crosses_zero_at_twice_its_frequency() -> None:
@@ -340,9 +357,7 @@ def test_narrowband_peaks_are_rayleigh_example_5_14() -> None:
     # Example 5.14: Prob[peak > 4 sigma] = exp(-8) = 0.00033.
     assert res.peak_exceedance(4.0)[0] == pytest.approx(np.exp(-8.0), rel=1e-2)
     # One maximum per zero-crossing cycle: M matches N0 / 2.
-    assert res.peak_rate == pytest.approx(
-        res.zero_crossing_rate_rice / 2.0, rel=2e-2
-    )
+    assert res.peak_rate == pytest.approx(res.zero_crossing_rate_rice / 2.0, rel=2e-2)
 
 
 def test_wideband_irregularity_factor_of_lowpass_noise() -> None:
@@ -352,13 +367,9 @@ def test_wideband_irregularity_factor_of_lowpass_noise() -> None:
     band = 2000.0
     x = _bandlimited_gaussian(3, fs, n, 0.0, band)
     res = ph.metrology.peak_statistics(x, fs)
-    assert res.peak_rate_rice == pytest.approx(
-        band * np.sqrt(3.0 / 5.0), rel=1e-2
-    )
+    assert res.peak_rate_rice == pytest.approx(band * np.sqrt(3.0 / 5.0), rel=1e-2)
     assert res.peak_rate == pytest.approx(band * np.sqrt(3.0 / 5.0), rel=2e-2)
-    assert res.irregularity_factor == pytest.approx(
-        np.sqrt(5.0) / 3.0, rel=1e-2
-    )
+    assert res.irregularity_factor == pytest.approx(np.sqrt(5.0) / 3.0, rel=1e-2)
 
 
 def test_peak_exceedance_limits_and_density_consistency() -> None:
@@ -434,9 +445,7 @@ def test_runs_plot_draws_original_classification_median() -> None:
     assert res.median == 10.0
     assert float(np.median(res.values)) == 100.0  # filtered median differs
     ax = res.plot()
-    median_lines = [
-        ln for ln in ax.get_lines() if ln.get_label() == "Sequence median"
-    ]
+    median_lines = [ln for ln in ax.get_lines() if ln.get_label() == "Sequence median"]
     assert len(median_lines) == 1
     assert np.allclose(median_lines[0].get_ydata(), 10.0)
     plt.close("all")
@@ -468,9 +477,7 @@ def test_plots_render_and_return_axes() -> None:
 
 
 def test_peak_plot_without_maxima_raises() -> None:
-    ramp_result = ph.metrology.peak_statistics(
-        np.linspace(0.0, 1.0, 4096) ** 2, FS
-    )
+    ramp_result = ph.metrology.peak_statistics(np.linspace(0.0, 1.0, 4096) ** 2, FS)
     assert ramp_result.peak_values.size == 0
     with pytest.raises(ValueError, match="maxima"):
         ramp_result.plot()

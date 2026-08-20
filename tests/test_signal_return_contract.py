@@ -55,6 +55,7 @@ def _record(seconds: float = 1.0, seed: int = 0) -> np.ndarray:
 
 _RECORD = _record()
 
+
 def _sections():
     """One peaking section, so ``parametric_eq`` has something to do."""
     from phonometry.filters import EQSection
@@ -216,7 +217,9 @@ def test_the_object_forms_of_the_filters_wrap_too() -> None:
     weighted = WeightingFilter(FS, "A").filter(sig)
     assert isinstance(weighted, Signal)
     assert weighted.calibration_factor == 1.0
-    assert np.array_equal(np.asarray(weighted), np.asarray(weighting_filter(sig, curve="A")))
+    assert np.array_equal(
+        np.asarray(weighted), np.asarray(weighting_filter(sig, curve="A"))
+    )
 
     equalized = ParametricEQ(FS, _sections()).filter(sig)
     assert isinstance(equalized, Signal)
@@ -292,7 +295,9 @@ def test_the_envelope_plot_is_translated() -> None:
     assert axes.get_xlabel() == "Tiempo [s]"
 
 
-def test_the_band_waveforms_come_back_as_signals_only_when_the_bank_read_the_factor() -> None:
+def test_the_band_waveforms_come_back_as_signals_only_when_the_bank_read_the_factor() -> (
+    None
+):
     """Both sides of the gate on the filter bank's band output.
 
     ``sigbands=True`` hands back one waveform per band, and each one is a
@@ -315,7 +320,9 @@ def test_the_band_waveforms_come_back_as_signals_only_when_the_bank_read_the_fac
     assert {band.calibration_factor for band in bands} == {1.0}
 
     _spl, _freq, digital = octave_filter(
-        record, sigbands=True, detrend=False,
+        record,
+        sigbands=True,
+        detrend=False,
         calibration=LevelCalibration(dbfs=True),
     )
     assert not any(isinstance(band, Signal) for band in digital)

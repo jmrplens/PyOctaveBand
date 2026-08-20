@@ -80,13 +80,30 @@ OCTAVE_BANDS: tuple[int, ...] = (250, 500, 1000, 2000, 4000)
 #: One-third-octave bands feeding the five octaves, in Hz (200 Hz to
 #: 5000 Hz); each consecutive triple averages into one octave (Clause 4.1).
 THIRD_OCTAVE_BANDS: tuple[int, ...] = (
-    200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150,
-    4000, 5000,
+    200,
+    250,
+    315,
+    400,
+    500,
+    630,
+    800,
+    1000,
+    1250,
+    1600,
+    2000,
+    2500,
+    3150,
+    4000,
+    5000,
 )
 
 #: Reference absorption curve, Figure 1 (Clause 4.2), per octave band.
 REFERENCE_CURVE: dict[int, float] = {
-    250: 0.80, 500: 1.00, 1000: 1.00, 2000: 1.00, 4000: 0.90,
+    250: 0.80,
+    500: 1.00,
+    1000: 1.00,
+    2000: 1.00,
+    4000: 0.90,
 }
 
 #: Index of the 500 Hz band, where ``alpha_w`` is read (Clause 4.2).
@@ -108,8 +125,8 @@ _CLASS_TABLE: tuple[tuple[int, str], ...] = (
     (18, "A"),  # 0,90 - 1,00
     (16, "B"),  # 0,80 - 0,85
     (12, "C"),  # 0,60 - 0,75
-    (6, "D"),   # 0,30 - 0,55
-    (3, "E"),   # 0,15 - 0,25
+    (6, "D"),  # 0,30 - 0,55
+    (3, "E"),  # 0,15 - 0,25
 )
 _NOT_CLASSIFIED = "Not classified"
 
@@ -161,8 +178,7 @@ def _coerce(
                 out.append(float(values[float(c)]))
             else:
                 raise ValueError(
-                    f"{name} mapping is missing band {c} Hz; "
-                    f"expected keys {centers}"
+                    f"{name} mapping is missing band {c} Hz; expected keys {centers}"
                 )
     else:
         arr = np.asarray(values, dtype=np.float64)
@@ -232,7 +248,9 @@ class AbsorptionRatingResult:
             return f"{self.alpha_w:.2f}({self.shape_indicator})"
         return f"{self.alpha_w:.2f}"
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the practical curve vs the shifted reference (ISO 11654).
 
         Unfavourable deviations (measured below the shifted reference) are
@@ -331,8 +349,7 @@ def _shape_indicator(measured_units: list[int], reference_units: list[int]) -> s
     reference by 0,25 or more contributes L (250 Hz), M (500/1000 Hz) or
     H (2000/4000 Hz)."""
     excess = [
-        m - r >= _SHAPE_THRESHOLD_UNITS
-        for m, r in zip(measured_units, reference_units)
+        m - r >= _SHAPE_THRESHOLD_UNITS for m, r in zip(measured_units, reference_units)
     ]
     indicator = ""
     if excess[0]:
@@ -385,9 +402,7 @@ def _rate(
     shift_units = 0
     while shift_units <= 20:
         shifted_units = [r - shift_units for r in _REFERENCE_UNITS]
-        unfav_units = sum(
-            max(0, s - m) for s, m in zip(shifted_units, measured_units)
-        )
+        unfav_units = sum(max(0, s - m) for s, m in zip(shifted_units, measured_units))
         if unfav_units <= _UNFAVOURABLE_BUDGET_UNITS:
             break
         shift_units += 1

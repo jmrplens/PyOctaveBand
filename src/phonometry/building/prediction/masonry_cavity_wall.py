@@ -130,14 +130,11 @@ def wall_tie_stiffness(tie: str) -> tuple[float, float]:
         return WALL_TIE_STIFFNESS[tie]
     except KeyError:
         raise ValueError(
-            f"Unknown wall tie {tie!r}; choose one of "
-            f"{sorted(WALL_TIE_STIFFNESS)}."
+            f"Unknown wall tie {tie!r}; choose one of {sorted(WALL_TIE_STIFFNESS)}."
         ) from None
 
 
-def wall_tie_stiffness_per_area(
-    ties_per_area: float, tie: str | float
-) -> float:
+def wall_tie_stiffness_per_area(ties_per_area: float, tie: str | float) -> float:
     r"""Stiffness per unit area of a tie array, :math:`N k / S` (Hopkins
     Eq. 4.89).
 
@@ -155,8 +152,10 @@ def wall_tie_stiffness_per_area(
     :raises ValueError: for a non-positive input or an unknown tie name.
     """
     n = require_positive(ties_per_area, "ties_per_area")
-    k = wall_tie_stiffness(tie)[1] if isinstance(tie, str) else require_positive(
-        float(tie), "tie"
+    k = (
+        wall_tie_stiffness(tie)[1]
+        if isinstance(tie, str)
+        else require_positive(float(tie), "tie")
     )
     return float(n * k)
 
@@ -190,7 +189,9 @@ class WallTieCouplingResult:
     tie_stiffness: float | None
     rigid_coupling_loss_factor: np.ndarray
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot ``eta_ij(f)`` against the rigid-connection ceiling.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -252,8 +253,10 @@ def wall_tie_coupling_loss_factor(
 
     k: float | None = None
     if tie is not None:
-        k = wall_tie_stiffness(tie)[1] if isinstance(tie, str) else require_positive(
-            float(tie), "tie"
+        k = (
+            wall_tie_stiffness(tie)[1]
+            if isinstance(tie, str)
+            else require_positive(float(tie), "tie")
         )
     yc = np.zeros_like(f) if k is None else omega / k
     # Yi and Yj are real for a thin plate, Yc purely imaginary.

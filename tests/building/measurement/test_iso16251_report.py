@@ -31,8 +31,24 @@ from phonometry import ReportMetadata, building
 _PDF_MAGIC = b"%PDF"
 
 _FREQS = np.array(
-    [100, 125, 160, 200, 250, 315, 400, 500,
-     630, 800, 1000, 1250, 1600, 2000, 2500, 3150],
+    [
+        100,
+        125,
+        160,
+        200,
+        250,
+        315,
+        400,
+        500,
+        630,
+        800,
+        1000,
+        1250,
+        1600,
+        2000,
+        2500,
+        3150,
+    ],
     dtype=float,
 )
 _DELTA_L = np.array(
@@ -77,9 +93,9 @@ def _assert_one_page(path: str) -> None:
 def _text(path: str) -> str:
     from pypdf import PdfReader
 
-    return "\n".join(
-        page.extract_text() for page in PdfReader(path).pages
-    ).replace("\n", " ")
+    return "\n".join(page.extract_text() for page in PdfReader(path).pages).replace(
+        "\n", " "
+    )
 
 
 def test_report_writes_one_page_pdf(tmp_path) -> None:
@@ -165,9 +181,7 @@ def test_limited_band_uses_literal_greater_than(tmp_path) -> None:
     bare = np.full(16, 50.0)
     covering = np.full(16, 49.0)
     background = np.full(16, 48.0)  # margin 2 dB < 6 dB -> every band limited
-    result = building.impact_improvement(
-        bare, covering, _FREQS, background=background
-    )
+    result = building.impact_improvement(bare, covering, _FREQS, background=background)
     assert bool(np.any(result.limited))
     out = tmp_path / "iso16251_limited.pdf"
     result.report(str(out))
@@ -211,9 +225,7 @@ def test_manual_result_without_ci_delta_omits_adaptation_term(tmp_path) -> None:
 
 def test_metadata_xml_specials_do_not_break(tmp_path) -> None:
     out = tmp_path / "iso16251_xml.pdf"
-    _result().report(
-        str(out), metadata=_metadata(specimen="Carpet <A> & <B> \"edge\"")
-    )
+    _result().report(str(out), metadata=_metadata(specimen='Carpet <A> & <B> "edge"'))
     _assert_one_page(str(out))
 
 

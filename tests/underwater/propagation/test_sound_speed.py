@@ -78,7 +78,10 @@ _WONG_ZHU_TABLE_IV = [
 
 @pytest.mark.parametrize(("p_bar", "t90", "s", "c_ref"), _WONG_ZHU_TABLE_III)
 def test_unesco_wong_zhu_table_iii_printed_check_values(
-    p_bar: float, t90: float, s: float, c_ref: float,
+    p_bar: float,
+    t90: float,
+    s: float,
+    c_ref: float,
 ) -> None:
     # The module implements exactly this refit, so it must agree at the
     # table's printed resolution (0.001 m/s; measured max |dev| 0.0005 m/s).
@@ -87,11 +90,15 @@ def test_unesco_wong_zhu_table_iii_printed_check_values(
 
 @pytest.mark.parametrize(("p_bar", "t90", "s", "c_ref"), _WONG_ZHU_TABLE_IV)
 def test_del_grosso_wong_zhu_table_iv_printed_check_values(
-    p_bar: float, t90: float, s: float, c_ref: float,
+    p_bar: float,
+    t90: float,
+    s: float,
+    c_ref: float,
 ) -> None:
     # Same printed-decimal tolerance (measured max |dev| 0.0005 m/s).
     assert float(_del_grosso(t90, s, p_bar * _KGCM2_PER_BAR)) == pytest.approx(
-        c_ref, abs=1e-3)
+        c_ref, abs=1e-3
+    )
 
 
 def test_mackenzie_canonical_check_value() -> None:
@@ -125,15 +132,21 @@ def test_medwin_matches_hand_evaluation_of_equation_1_2() -> None:
     """
     t, s, z = 15.0, 38.0, 200.0
     expected = (
-        1449.2 + 4.6 * t + 0.016 * z - 0.055 * t**2
-        + (1.34 - 0.010 * t) * (s - 35.0) + 2.9e-4 * t**3
+        1449.2
+        + 4.6 * t
+        + 0.016 * z
+        - 0.055 * t**2
+        + (1.34 - 0.010 * t) * (s - 35.0)
+        + 2.9e-4 * t**3
     )
-    assert sea_water_sound_speed(t, s, z, model="medwin") == pytest.approx(expected, rel=1e-12)
+    assert sea_water_sound_speed(t, s, z, model="medwin") == pytest.approx(
+        expected, rel=1e-12
+    )
 
 
 @pytest.mark.parametrize("temperature", [0.0, 10.0, 20.0, 30.0])
 def test_medwin_temperature_derivative_matches_equation_1_3(temperature: float) -> None:
-    """"∂c/∂T ≈ 4.6 − 0.110·T m/s per degree Celsius", neglecting the bracketed terms.
+    """ "∂c/∂T ≈ 4.6 − 0.110·T m/s per degree Celsius", neglecting the bracketed terms.
 
     Ainslie states 3.5 m/s per °C at T = 10 °C.
     """
@@ -151,7 +164,7 @@ def test_medwin_temperature_derivative_matches_equation_1_3(temperature: float) 
 
 
 def test_medwin_depth_derivative_matches_equation_1_4() -> None:
-    """"∂c/∂z ≈ 0.016 m/s per meter" -- exact for the Medwin form."""
+    """ "∂c/∂z ≈ 0.016 m/s per meter" -- exact for the Medwin form."""
     h = 1e-3
     kw = {"model": "medwin"}
     gradient = (
@@ -200,7 +213,9 @@ def test_negative_depth_rejected() -> None:
 
 def test_profile_gradient_and_shape() -> None:
     depths = np.linspace(0.0, 2000.0, 21)
-    prof = sound_speed_profile(depths, temperatures=10.0, salinities=35.0, model="unesco")
+    prof = sound_speed_profile(
+        depths, temperatures=10.0, salinities=35.0, model="unesco"
+    )
     assert isinstance(prof, SoundSpeedProfile)
     assert prof.sound_speed.shape == depths.shape
     assert prof.gradient.shape == depths.shape
@@ -226,4 +241,5 @@ def test_unesco_published_canonical_check_value() -> None:
     # the Wong-Zhu ITS-90 refit, so convert T90 = T68/1.00024; the tolerance
     # covers the published refit residual (~0.01 m/s).
     assert float(_unesco(40.0 / 1.00024, 40.0, 1000.0)) == pytest.approx(
-        1731.995, abs=0.02)
+        1731.995, abs=0.02
+    )

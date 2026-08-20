@@ -59,9 +59,7 @@ def test_zwicker_time_varying_returns_two_panels() -> None:
 # Moore-Glasberg loudness (ISO 532-2)
 # --------------------------------------------------------------------------
 def test_moore_glasberg_returns_single_axes_with_specific_curve() -> None:
-    res = ph.psychoacoustics.loudness_moore_glasberg_from_spectrum(
-        [(1000.0, 60.0)]
-    )
+    res = ph.psychoacoustics.loudness_moore_glasberg_from_spectrum([(1000.0, 60.0)])
     ax = res.plot()
     assert not isinstance(ax, np.ndarray)
     np.testing.assert_allclose(ax.lines[0].get_ydata(), res.specific)

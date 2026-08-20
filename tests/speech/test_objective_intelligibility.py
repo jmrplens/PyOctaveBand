@@ -32,8 +32,12 @@ def _speech_like(seed: int, seconds: float = 3.0) -> np.ndarray:
     t = np.arange(int(seconds * FS)) / FS
     sig = np.zeros_like(t)
     for f0 in (200.0, 400.0, 700.0, 1100.0, 1800.0, 2600.0):
-        depth = 0.5 * (1.0 + np.sin(2.0 * np.pi * rng.uniform(2.0, 6.0) * t
-                                    + rng.uniform(0.0, 2.0 * np.pi)))
+        depth = 0.5 * (
+            1.0
+            + np.sin(
+                2.0 * np.pi * rng.uniform(2.0, 6.0) * t + rng.uniform(0.0, 2.0 * np.pi)
+            )
+        )
         sig += depth * np.sin(2.0 * np.pi * f0 * t + rng.uniform(0.0, 2.0 * np.pi))
     return sig
 
@@ -70,9 +74,7 @@ def test_monotonic_with_snr(extended: bool) -> None:
     # Higher SNR must not lower the index (monotonic relation with quality).
     x = _speech_like(2)
     values = [
-        speech.stoi(
-            x, _add_noise(x, snr, seed=10), FS, extended=extended
-        ).value
+        speech.stoi(x, _add_noise(x, snr, seed=10), FS, extended=extended).value
         for snr in (-15.0, -5.0, 5.0, 15.0, 25.0)
     ]
     assert all(b >= a - 1e-9 for a, b in itertools.pairwise(values))
@@ -140,6 +142,7 @@ def test_too_short_signal_raises() -> None:
 
 
 # --- External cross-check against pystoi (test-only, skipped if absent) ----
+
 
 @pytest.mark.parametrize("extended", [False, True])
 @pytest.mark.parametrize("snr_db", [20.0, 10.0, 0.0, -10.0])

@@ -84,9 +84,13 @@ POLAR_ANGLES = np.arange(-90.0, 90.1, 5.0)
 #: l_c, neck w_n, cavity w_c, in mm).
 PITCH = 0.07
 META_DEPTH, META_BACK = 0.02, 0.003
-META_ROWS = ((14.7, 13.0, 16.4, 6.2, 9.0), (30.9, 9.1, 4.3, 3.5, 9.0),
-             (30.9, 9.1, 4.3, 3.5, 9.0), (15.7, 13.3, 17.0, 6.3, 9.0),
-             (20.3, 18.0, 20.7, 3.2, 9.0))
+META_ROWS = (
+    (14.7, 13.0, 16.4, 6.2, 9.0),
+    (30.9, 9.1, 4.3, 3.5, 9.0),
+    (30.9, 9.1, 4.3, 3.5, 9.0),
+    (15.7, 13.3, 17.0, 6.3, 9.0),
+    (20.3, 18.0, 20.7, 3.2, 9.0),
+)
 
 #: QRD twin of the metadiffuser: same residue order, 500 Hz design.
 QRD_DEPTHS = np.array([1, 4, 4, 1, 0]) * (C0 / 500.0) / 10.0
@@ -116,10 +120,8 @@ def monopole_far_field() -> dict[str, object]:
     sim = FDTD2D(C0, dx, shape=(ny, nx), sponge_width=40)
     cx, cy = nx // 2, ny // 2
     sim.add_source(CWSource(ix=cx, iy=cy, frequency=F0, ramp_cycles=4.0))
-    probe = sim.add_contour_probe(cx - 60, cx + 60, cy - 60, cy + 60,
-                                  frequencies=[F0])
-    probe_off = sim.add_contour_probe(48, 84, cy - 18, cy + 18,
-                                      frequencies=[F0])
+    probe = sim.add_contour_probe(cx - 60, cx + 60, cy - 60, cy + 60, frequencies=[F0])
+    probe_off = sim.add_contour_probe(48, 84, cy - 18, cy + 18, frequencies=[F0])
     dt = sim.dt
     sim.run(round(4.5e-3 / dt))
     probe.reset()
@@ -138,17 +140,18 @@ def monopole_far_field() -> dict[str, object]:
     return {
         "phasors": phasors,
         "pattern": far_field_from_contour(phasors, angles, origin=origin),
-        "pattern_off": far_field_from_contour(probe_off.phasors(F0), angles,
-                                              origin=origin),
-        "at_060": far_field_from_contour(phasors, angles, distance=0.60,
-                                         origin=origin),
+        "pattern_off": far_field_from_contour(
+            probe_off.phasors(F0), angles, origin=origin
+        ),
+        "at_060": far_field_from_contour(phasors, angles, distance=0.60, origin=origin),
         "amplitude": complex(amplitude),
     }
 
 
 @pytest.mark.xdist_group("fdtd-ntff-monopole")
 def test_monopole_pattern_is_omnidirectional(
-        monopole_far_field: dict[str, object]) -> None:
+    monopole_far_field: dict[str, object],
+) -> None:
     # A line source has no directivity: the reconstructed far-field
     # pattern must be flat all around the circle.
     levels = 20.0 * np.log10(np.abs(monopole_far_field["pattern"]))
@@ -157,13 +160,17 @@ def test_monopole_pattern_is_omnidirectional(
 
 @pytest.mark.xdist_group("fdtd-ntff-monopole")
 def test_monopole_level_matches_2d_green_function(
-        monopole_far_field: dict[str, object]) -> None:
+    monopole_far_field: dict[str, object],
+) -> None:
     # p = A H0(2)(k r) has the far-field pattern A sqrt(2/(pi k))
     # exp(j pi/4): the NTFF absolute level must reproduce it from the
     # amplitude fitted at the independent probe cell.
     pattern = np.asarray(monopole_far_field["pattern"])
-    expected = (complex(monopole_far_field["amplitude"])
-                * np.sqrt(2.0 / (np.pi * K0)) * np.exp(0.25j * np.pi))
+    expected = (
+        complex(monopole_far_field["amplitude"])
+        * np.sqrt(2.0 / (np.pi * K0))
+        * np.exp(0.25j * np.pi)
+    )
     level_error = 20.0 * np.log10(np.abs(pattern) / np.abs(expected))
     assert float(np.abs(level_error).max()) < 0.3
     phase_error = np.degrees(np.angle(pattern / expected))
@@ -172,20 +179,20 @@ def test_monopole_level_matches_2d_green_function(
 
 @pytest.mark.xdist_group("fdtd-ntff-monopole")
 def test_monopole_finite_distance_matches_hankel(
-        monopole_far_field: dict[str, object]) -> None:
+    monopole_far_field: dict[str, object],
+) -> None:
     # The exact (finite-radius) evaluation must reproduce A H0(2)(k R) on
     # a circle outside the contour, in magnitude and phase.
     reconstructed = np.asarray(monopole_far_field["at_060"])
-    exact = (complex(monopole_far_field["amplitude"])
-             * hankel2(0, K0 * 0.60))
+    exact = complex(monopole_far_field["amplitude"]) * hankel2(0, K0 * 0.60)
     assert float(np.abs(np.abs(reconstructed / exact) - 1.0).max()) < 0.03
-    assert float(np.abs(np.degrees(
-        np.angle(reconstructed / exact))).max()) < 5.0
+    assert float(np.abs(np.degrees(np.angle(reconstructed / exact))).max()) < 5.0
 
 
 @pytest.mark.xdist_group("fdtd-ntff-monopole")
 def test_contour_not_enclosing_the_source_extinguishes(
-        monopole_far_field: dict[str, object]) -> None:
+    monopole_far_field: dict[str, object],
+) -> None:
     # Fields whose sources lie outside the contour contribute nothing to
     # the exterior integral; the residual is grid-dispersion leakage.
     inside = float(np.abs(monopole_far_field["pattern"]).mean())
@@ -195,7 +202,8 @@ def test_contour_not_enclosing_the_source_extinguishes(
 
 @pytest.mark.xdist_group("fdtd-ntff-monopole")
 def test_subtracting_a_run_from_itself_cancels(
-        monopole_far_field: dict[str, object]) -> None:
+    monopole_far_field: dict[str, object],
+) -> None:
     phasors = monopole_far_field["phasors"]
     assert isinstance(phasors, ContourPhasors)
     null = phasors.subtract(phasors)
@@ -209,20 +217,23 @@ def test_dipole_pattern_matches_two_source_oracle() -> None:
     dx, ny, nx = 0.005, 300, 300
     sim = FDTD2D(C0, dx, shape=(ny, nx), sponge_width=40)
     cx, cy = nx // 2, ny // 2
-    sim.add_source(CWSource(ix=cx - 3, iy=cy, frequency=F0,
-                            amplitude=1.0, ramp_cycles=4.0))
-    sim.add_source(CWSource(ix=cx + 3, iy=cy, frequency=F0,
-                            amplitude=-1.0, ramp_cycles=4.0))
-    probe = sim.add_contour_probe(cx - 60, cx + 60, cy - 60, cy + 60,
-                                  frequencies=[F0])
+    sim.add_source(
+        CWSource(ix=cx - 3, iy=cy, frequency=F0, amplitude=1.0, ramp_cycles=4.0)
+    )
+    sim.add_source(
+        CWSource(ix=cx + 3, iy=cy, frequency=F0, amplitude=-1.0, ramp_cycles=4.0)
+    )
+    probe = sim.add_contour_probe(cx - 60, cx + 60, cy - 60, cy + 60, frequencies=[F0])
     dt = sim.dt
     sim.run(round(4.5e-3 / dt))
     probe.reset()
     sim.run(round(10.0 / F0 / dt))
     angles = np.arange(0.0, 360.0, 5.0)
-    pattern = np.abs(far_field_from_contour(
-        probe.phasors(F0), angles,
-        origin=((cx + 0.5) * dx, (cy + 0.5) * dx)))
+    pattern = np.abs(
+        far_field_from_contour(
+            probe.phasors(F0), angles, origin=((cx + 0.5) * dx, (cy + 0.5) * dx)
+        )
+    )
     oracle = np.abs(np.sin(K0 * 3 * dx * np.cos(np.radians(angles))))
     error = pattern / pattern.max() - oracle / oracle.max()
     assert float(np.abs(error).max()) < 0.02
@@ -233,10 +244,15 @@ def test_dipole_pattern_matches_two_source_oracle() -> None:
 # ---------------------------------------------------------------------------
 # Meshed Schroeder surfaces: full-wave far field vs the library models.
 # ---------------------------------------------------------------------------
-def _cw_panel_levels(mask: np.ndarray, dx: float, sponge: int,
-                     contour: tuple[int, int, int, int],
-                     origin: tuple[float, float],
-                     settle: float, cycles: float) -> np.ndarray:
+def _cw_panel_levels(
+    mask: np.ndarray,
+    dx: float,
+    sponge: int,
+    contour: tuple[int, int, int, int],
+    origin: tuple[float, float],
+    settle: float,
+    cycles: float,
+) -> np.ndarray:
     """Steady-state 2 kHz scattered polar levels of one meshed panel.
 
     A normally incident plane wave is injected just inside the top sponge,
@@ -250,22 +266,23 @@ def _cw_panel_levels(mask: np.ndarray, dx: float, sponge: int,
     stable ``cfl``.
     """
     ny, nx = mask.shape
-    sim = FDTD2D(C0, dx, shape=(ny, nx), sponge_width=sponge, cfl=0.9,
-                 obstacle_mask=mask)
-    sim.add_source(PlaneWaveSource("down", CWSource(0, 0, F0).value,
-                                   offset=sponge))
+    sim = FDTD2D(
+        C0, dx, shape=(ny, nx), sponge_width=sponge, cfl=0.9, obstacle_mask=mask
+    )
+    sim.add_source(PlaneWaveSource("down", CWSource(0, 0, F0).value, offset=sponge))
     probe = sim.add_contour_probe(*contour, frequencies=[F0])
     sim.run(round(settle / sim.dt))
     probe.reset()
     sim.run(round(cycles / F0 / sim.dt))
-    pattern = far_field_from_contour(probe.phasors(F0), POLAR_ANGLES - 90.0,
-                                     origin=origin)
+    pattern = far_field_from_contour(
+        probe.phasors(F0), POLAR_ANGLES - 90.0, origin=origin
+    )
     return _levels(pattern)
 
 
-def _panel_scene(dx: float, slab_depth: float, sponge: int
-                 ) -> tuple[np.ndarray, tuple[int, int, int, int],
-                            tuple[float, float], int, int]:
+def _panel_scene(
+    dx: float, slab_depth: float, sponge: int
+) -> tuple[np.ndarray, tuple[int, int, int, int], tuple[float, float], int, int]:
     """Empty scene around a 35 cm panel: mask, contour, origin, px0, r_face.
 
     Vertical budget: top sponge (with the injection line at its inner
@@ -282,8 +299,12 @@ def _panel_scene(dx: float, slab_depth: float, sponge: int
     slab = round(slab_depth / dx)
     ny = r_face + slab + marg + gap + sponge
     mask = np.zeros((ny, nx), dtype=bool)
-    contour = (lat - marg, lat + face_cells + marg - 1,
-               r_face - front, r_face + slab + marg - 1)
+    contour = (
+        lat - marg,
+        lat + face_cells + marg - 1,
+        r_face - front,
+        r_face + slab + marg - 1,
+    )
     origin = ((lat + face_cells / 2.0) * dx, r_face * dx)
     return mask, contour, origin, lat, r_face
 
@@ -298,16 +319,18 @@ def qrd_levels() -> np.ndarray:
     """
     dx, sponge = 0.00125, 60
     mask, contour, origin, px0, r_face = _panel_scene(
-        dx, float(QRD_DEPTHS.max()) + QRD_FIN, sponge)
-    mask[r_face:r_face + round((QRD_DEPTHS.max() + QRD_FIN) / dx),
-         px0:px0 + round(5 * PITCH / dx)] = True
+        dx, float(QRD_DEPTHS.max()) + QRD_FIN, sponge
+    )
+    mask[
+        r_face : r_face + round((QRD_DEPTHS.max() + QRD_FIN) / dx),
+        px0 : px0 + round(5 * PITCH / dx),
+    ] = True
     for n, depth in enumerate(QRD_DEPTHS):
         if depth > 0.0:
             c0 = px0 + round((n * PITCH + QRD_FIN) / dx)
             c1 = px0 + round((n + 1) * PITCH / dx)
-            mask[r_face:r_face + round(depth / dx), c0:c1] = False
-    return _cw_panel_levels(mask, dx, sponge, contour, origin,
-                            settle=6e-3, cycles=10.0)
+            mask[r_face : r_face + round(depth / dx), c0:c1] = False
+    return _cw_panel_levels(mask, dx, sponge, contour, origin, settle=6e-3, cycles=10.0)
 
 
 @pytest.fixture(scope="module")
@@ -322,35 +345,44 @@ def metadiffuser_levels() -> np.ndarray:
     """
     dx, sponge = 0.0005, 60
     mask, contour, origin, px0, r_face = _panel_scene(
-        dx, META_DEPTH + META_BACK, sponge)
-    mask[r_face:r_face + round((META_DEPTH + META_BACK) / dx),
-         px0:px0 + round(5 * PITCH / dx)] = True
+        dx, META_DEPTH + META_BACK, sponge
+    )
+    mask[
+        r_face : r_face + round((META_DEPTH + META_BACK) / dx),
+        px0 : px0 + round(5 * PITCH / dx),
+    ] = True
     lattice = META_DEPTH / 2.0
     for n, (h, l_n, l_c, w_n, w_c) in enumerate(META_ROWS):
         x_slit = n * PITCH + 0.12 * PITCH
         c0 = px0 + round(x_slit / dx)
         c1 = px0 + round((x_slit + h * 1e-3) / dx)
-        mask[r_face:r_face + round(META_DEPTH / dx), c0:c1] = False
+        mask[r_face : r_face + round(META_DEPTH / dx), c0:c1] = False
         for m in range(2):
             y_m = (m + 0.5) * lattice
             x_neck = x_slit + h * 1e-3
             r0 = r_face + round((y_m - 0.5e-3 * w_n) / dx)
             r1 = r_face + round((y_m + 0.5e-3 * w_n) / dx)
-            mask[r0:r1, c1:px0 + round((x_neck + l_n * 1e-3) / dx)] = False
+            mask[r0:r1, c1 : px0 + round((x_neck + l_n * 1e-3) / dx)] = False
             r0 = r_face + round((y_m - 0.5e-3 * w_c) / dx)
             r1 = r_face + round((y_m + 0.5e-3 * w_c) / dx)
-            mask[r0:r1, px0 + round((x_neck + l_n * 1e-3) / dx):
-                 px0 + round((x_neck + (l_n + l_c) * 1e-3) / dx)] = False
-    return _cw_panel_levels(mask, dx, sponge, contour, origin,
-                            settle=8e-3, cycles=10.0)
+            mask[
+                r0:r1,
+                px0 + round((x_neck + l_n * 1e-3) / dx) : px0
+                + round((x_neck + (l_n + l_c) * 1e-3) / dx),
+            ] = False
+    return _cw_panel_levels(mask, dx, sponge, contour, origin, settle=8e-3, cycles=10.0)
 
 
 @pytest.mark.xdist_group("fdtd-ntff-mesh")
-def test_meshed_qrd_far_field_matches_fraunhofer_model(
-        qrd_levels: np.ndarray) -> None:
+def test_meshed_qrd_far_field_matches_fraunhofer_model(qrd_levels: np.ndarray) -> None:
     model = predict_diffuser_polar_response(
-        PITCH, F0, depths=QRD_DEPTHS, angles=POLAR_ANGLES, periods=1,
-        include_obliquity=True)
+        PITCH,
+        F0,
+        depths=QRD_DEPTHS,
+        angles=POLAR_ANGLES,
+        periods=1,
+        include_obliquity=True,
+    )
     # Full wave vs Fraunhofer: high pattern correlation, lobe-level
     # agreement away from grazing, and a diffusion coefficient within
     # 0.1. Measured: correlation 0.94, worst lobe error 5.1 dB inside
@@ -361,32 +393,35 @@ def test_meshed_qrd_far_field_matches_fraunhofer_model(
     assert float(np.corrcoef(qrd_levels, model.levels)[0, 1]) > 0.9
     sel = np.abs(POLAR_ANGLES) <= 60.0
     assert float(np.abs(qrd_levels - model.levels)[sel].max()) < 6.0
-    assert abs(directional_diffusion_coefficient(qrd_levels)
-               - model.coefficient) < 0.1
+    assert abs(directional_diffusion_coefficient(qrd_levels) - model.coefficient) < 0.1
 
 
 @pytest.mark.xdist_group("fdtd-ntff-mesh")
 def test_meshed_metadiffuser_mimics_the_meshed_qrd(
-        qrd_levels: np.ndarray,
-        metadiffuser_levels: np.ndarray) -> None:
+    qrd_levels: np.ndarray, metadiffuser_levels: np.ndarray
+) -> None:
     # The paper's headline claim (their Fig. 3), reproduced end to end
     # with one independent full-wave solver on both panels: the 2 cm
     # metadiffuser scatters at 2 kHz like the 13.7x deeper QRD whose
     # phase profile it mimics. Measured: pattern correlation 0.97, worst
     # lobe difference 2.9 dB inside +/-60 degrees, and directional
     # diffusion coefficients 0.51 vs 0.57.
-    assert float(
-        np.corrcoef(metadiffuser_levels, qrd_levels)[0, 1]) > 0.9
+    assert float(np.corrcoef(metadiffuser_levels, qrd_levels)[0, 1]) > 0.9
     sel = np.abs(POLAR_ANGLES) <= 60.0
-    assert float(
-        np.abs(metadiffuser_levels - qrd_levels)[sel].max()) < 6.0
-    assert abs(directional_diffusion_coefficient(metadiffuser_levels)
-               - directional_diffusion_coefficient(qrd_levels)) < 0.15
+    assert float(np.abs(metadiffuser_levels - qrd_levels)[sel].max()) < 6.0
+    assert (
+        abs(
+            directional_diffusion_coefficient(metadiffuser_levels)
+            - directional_diffusion_coefficient(qrd_levels)
+        )
+        < 0.15
+    )
 
 
 @pytest.mark.xdist_group("fdtd-ntff-mesh")
 def test_meshed_metadiffuser_far_field_matches_tmm_model(
-        metadiffuser_levels: np.ndarray) -> None:
+    metadiffuser_levels: np.ndarray,
+) -> None:
     # End to end against the TMM + Fraunhofer chain, the library-side
     # counterpart of the paper's TMM-vs-FEM comparison, which the paper
     # itself reports agreeing up to small discrepancies. The TMM
@@ -415,24 +450,26 @@ def test_meshed_metadiffuser_far_field_matches_tmm_model(
         )
         for h, l_n, l_c, w_n, w_c in META_ROWS
     ]
-    module = metadiffuser_polar_response(F0, wells, depth=META_DEPTH,
-                                         period=PITCH,
-                                         angles=POLAR_ANGLES, periods=1)
+    module = metadiffuser_polar_response(
+        F0, wells, depth=META_DEPTH, period=PITCH, angles=POLAR_ANGLES, periods=1
+    )
     reflection = metadiffuser_reflection(
-        np.asarray([F0]), wells, depth=META_DEPTH,
-        period=PITCH).reflection[:, 0]
+        np.asarray([F0]), wells, depth=META_DEPTH, period=PITCH
+    ).reflection[:, 0]
     obliq = predict_diffuser_polar_response(
-        PITCH, F0, reflection=reflection, angles=POLAR_ANGLES, periods=1,
-        include_obliquity=True)
+        PITCH,
+        F0,
+        reflection=reflection,
+        angles=POLAR_ANGLES,
+        periods=1,
+        include_obliquity=True,
+    )
     sel = np.abs(POLAR_ANGLES) <= 60.0
     d_fdtd = directional_diffusion_coefficient(metadiffuser_levels)
-    assert float(
-        np.corrcoef(metadiffuser_levels, obliq.levels)[0, 1]) > 0.8
-    assert float(
-        np.abs(metadiffuser_levels - obliq.levels)[sel].max()) < 7.0
+    assert float(np.corrcoef(metadiffuser_levels, obliq.levels)[0, 1]) > 0.8
+    assert float(np.abs(metadiffuser_levels - obliq.levels)[sel].max()) < 7.0
     assert abs(d_fdtd - obliq.coefficient) < 0.2
-    assert float(
-        np.corrcoef(metadiffuser_levels, module.levels)[0, 1]) > 0.5
+    assert float(np.corrcoef(metadiffuser_levels, module.levels)[0, 1]) > 0.5
     assert abs(d_fdtd - module.coefficient) < 0.25
 
 
@@ -473,8 +510,7 @@ def test_contour_probe_geometry_record() -> None:
     n_points = 2 * (6 + 6)
     assert probe.positions.shape == (n_points, 2)
     assert probe.normals.shape == (n_points, 2)
-    assert np.allclose(np.hypot(probe.normals[:, 0], probe.normals[:, 1]),
-                       1.0)
+    assert np.allclose(np.hypot(probe.normals[:, 0], probe.normals[:, 1]), 1.0)
     # The left side runs along x = ix0 dx with an outward -x normal.
     assert np.allclose(probe.positions[:6, 0], 0.05)
     assert np.allclose(probe.normals[:6], (-1.0, 0.0))

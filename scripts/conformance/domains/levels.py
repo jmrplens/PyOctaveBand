@@ -121,8 +121,24 @@ _RD1367_DAY_PHASES = [
 #: Manual Ejemplo 7.2: the measured apparent sound reduction index R' of a
 #: field test, one-third-octave bands 100 Hz to 5 kHz.
 _DBHR_R_PRIME = [
-    36.2, 41.5, 36.9, 40.4, 44.7, 42.4, 45.7, 46.1, 47.1,
-    52.3, 54.3, 57.5, 57.8, 57.3, 59.0, 62.8, 64.7, 65.3,
+    36.2,
+    41.5,
+    36.9,
+    40.4,
+    44.7,
+    42.4,
+    45.7,
+    46.1,
+    47.1,
+    52.3,
+    54.3,
+    57.5,
+    57.8,
+    57.3,
+    59.0,
+    62.8,
+    64.7,
+    65.3,
 ]
 
 
@@ -151,9 +167,7 @@ def _chk_rd1367_period_level() -> Outcome:
     "Long-term level LK,d (Manual Ejemplo 3.2: 303 operating days of 365)",
 )
 def _chk_rd1367_long_term_level() -> Outcome:
-    level = ph.environment.long_term_corrected_level(
-        [57.0, 0.0], weights=[303.0, 62.0]
-    )
+    level = ph.environment.long_term_corrected_level([57.0, 0.0], weights=[303.0, 62.0])
     return numeric(
         56.0,
         float(ph.environment.round_reported_level(level)),
@@ -218,8 +232,24 @@ def _chk_dbhr_ra() -> Outcome:
 )
 def _chk_dbhr_d2m_nt_atr() -> Outcome:
     values = [
-        28.5, 28.5, 18.9, 23.7, 30.7, 31.3, 37.8, 35.2, 34.7,
-        38.5, 37.7, 43.1, 42.3, 44.2, 41.9, 37.5, 39.4, 41.5,
+        28.5,
+        28.5,
+        18.9,
+        23.7,
+        30.7,
+        31.3,
+        37.8,
+        35.2,
+        34.7,
+        38.5,
+        37.7,
+        43.1,
+        42.3,
+        44.2,
+        41.9,
+        37.5,
+        39.4,
+        41.5,
     ]
     computed = ph.building.d2m_nt_atr(values).intermediate
     return numeric(32.8, float(computed), 0.05, unit="dBA", places=2)
@@ -269,7 +299,12 @@ def _chk_dbhr_window_correction() -> Outcome:
 _RT_DIMS = (8.0, 5.0, 3.0)
 _RT_VOLUME = 120.0
 _RT_SURFACES = [
-    (40.0, 0.2), (40.0, 0.2), (24.0, 0.2), (24.0, 0.2), (15.0, 0.2), (15.0, 0.2)
+    (40.0, 0.2),
+    (40.0, 0.2),
+    (24.0, 0.2),
+    (24.0, 0.2),
+    (15.0, 0.2),
+    (15.0, 0.2),
 ]
 
 
@@ -279,9 +314,7 @@ _RT_SURFACES = [
     "Reverberation time T = k·V/A  (V=120 m³, S=158 m², α=0.2)",
 )
 def _chk_sabine_rt() -> Outcome:
-    computed = float(
-        ph.room.sabine_reverberation_time(_RT_VOLUME, _RT_SURFACES)
-    )
+    computed = float(ph.room.sabine_reverberation_time(_RT_VOLUME, _RT_SURFACES))
     return numeric(0.6118246547, computed, 1e-6, unit="s", places=6)
 
 
@@ -294,9 +327,7 @@ def _chk_long_room_modes() -> Outcome:
     # Long's Chapter 2 quotes c0 = 344 m/s at 20 degC; the printed table is
     # consistent with 344.7 m/s, so the tolerance is one printed digit.
     printed = np.array([24.6, 34.5, 42.4, 49.2, 57.4, 60.1])
-    res = ph.room.room_modes(
-        (7.0, 5.0, 3.0), max_frequency=61.0, speed_of_sound=344.0
-    )
+    res = ph.room.room_modes((7.0, 5.0, 3.0), max_frequency=61.0, speed_of_sound=344.0)
     computed = np.asarray(res.frequencies, dtype=float)
     worst = int(np.argmax(np.abs(computed - printed)))
     return numeric(printed[worst], computed[worst], 0.13, unit="Hz", places=2)
@@ -310,9 +341,7 @@ def _chk_long_room_modes() -> Outcome:
 def _chk_long_modal_density() -> Outcome:
     density = float(
         np.asarray(
-            ph.room.room_modal_density(
-                1000.0, (7.0, 5.0, 3.0), speed_of_sound=344.0
-            )
+            ph.room.room_modal_density(1000.0, (7.0, 5.0, 3.0), speed_of_sound=344.0)
         )[()]
     )
     return numeric(34.0, density, 0.5, unit="modes/Hz", places=2)
@@ -360,9 +389,7 @@ def _chk_sabine_everest() -> Outcome:
     "Reverberation time T = k·V/(-S·ln(1-ᾱ))  (α=0.2)",
 )
 def _chk_eyring_rt() -> Outcome:
-    computed = float(
-        ph.room.eyring_reverberation_time(_RT_VOLUME, _RT_SURFACES)
-    )
+    computed = float(ph.room.eyring_reverberation_time(_RT_VOLUME, _RT_SURFACES))
     return numeric(0.5483686633, computed, 1e-6, unit="s", places=6)
 
 
@@ -385,11 +412,15 @@ def _chk_arau_rt() -> Outcome:
 )
 def _chk_arau_eyring_identity() -> Outcome:
     eyring = float(ph.room.eyring_reverberation_time(_RT_VOLUME, _RT_SURFACES))
-    arau = float(
-        ph.room.arau_puchades_reverberation_time(_RT_DIMS, (0.2, 0.2, 0.2))
+    arau = float(ph.room.arau_puchades_reverberation_time(_RT_DIMS, (0.2, 0.2, 0.2)))
+    return numeric(
+        eyring,
+        arau,
+        1e-9,
+        unit="s",
+        places=6,
+        expected_label=f"{eyring:.6f} s (= Eyring)",
     )
-    return numeric(eyring, arau, 1e-9, unit="s", places=6,
-                   expected_label=f"{eyring:.6f} s (= Eyring)")
 
 
 @register(
@@ -398,8 +429,9 @@ def _chk_arau_eyring_identity() -> Outcome:
     "Image-source direct-sound amplitude 1/(4πr) and delay r/c (r = 4 m)",
 )
 def _chk_image_source_direct() -> Outcome:
-    res = ph.room.image_source_rir((8.0, 5.0, 3.0), (2.0, 2.5, 1.5),
-                              (6.0, 2.5, 1.5), 0.2, fs=48000, max_order=2)
+    res = ph.room.image_source_rir(
+        (8.0, 5.0, 3.0), (2.0, 2.5, 1.5), (6.0, 2.5, 1.5), 0.2, fs=48000, max_order=2
+    )
     amp = float(np.atleast_1d(res.amplitudes)[0])
     return numeric(1.0 / (4.0 * math.pi * 4.0), amp, 1e-9, places=7)
 
@@ -431,8 +463,9 @@ def _chk_reflection_density() -> Outcome:
     "Room constant R = Sᾱ/(1-ᾱ)  (S = 100 m², ᾱ = 0.2 → 25 m²)",
 )
 def _chk_room_constant() -> Outcome:
-    return numeric(25.0, float(ph.room.room_constant(100.0, 0.2)), 1e-9,
-                   unit="m²", places=6)
+    return numeric(
+        25.0, float(ph.room.room_constant(100.0, 0.2)), 1e-9, unit="m²", places=6
+    )
 
 
 @register(
@@ -444,8 +477,13 @@ def _chk_critical_distance_crossover() -> Outcome:
     rc = float(ph.room.critical_distance(25.0))
     direct = 1.0 / (4.0 * math.pi * rc**2)
     reverberant = 4.0 / 25.0
-    return numeric(reverberant, direct, 1e-9, places=6,
-                   expected_label=f"{reverberant:.6f} (= reverberant term)")
+    return numeric(
+        reverberant,
+        direct,
+        1e-9,
+        places=6,
+        expected_label=f"{reverberant:.6f} (= reverberant term)",
+    )
 
 
 @register(
@@ -455,8 +493,7 @@ def _chk_critical_distance_crossover() -> Outcome:
 )
 def _chk_schroeder_frequency() -> Outcome:
     computed = float(ph.room.schroeder_frequency(1.0, 200.0))
-    return numeric(2000.0 * math.sqrt(1.0 / 200.0), computed, 1e-6,
-                   unit="Hz", places=3)
+    return numeric(2000.0 * math.sqrt(1.0 / 200.0), computed, 1e-6, unit="Hz", places=3)
 
 
 @register(
