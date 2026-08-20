@@ -38,7 +38,7 @@ def test_adjustment_formula_2_and_threshold() -> None:
     assert float(nt.impulse_adjustment(3.0)) == 0.0  # below
     # Just above the threshold the adjustment is small and positive.
     ki = float(nt.impulse_adjustment(5.5))
-    assert ki > 0.0
+    assert 0.0 < ki
     assert ki == pytest.approx(0.9)
 
 

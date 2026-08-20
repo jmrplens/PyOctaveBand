@@ -173,7 +173,7 @@ def _fill_narrow_troughs(
         j = i
         while j < n and not above[j]:
             j += 1
-        if i > 0 and j < n:
+        if 0 < i and j < n:
             lo_f = _threshold_crossing(
                 frequencies[i - 1], spl_db[i - 1], frequencies[i], spl_db[i], threshold
             )

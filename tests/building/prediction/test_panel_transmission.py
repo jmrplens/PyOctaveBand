@@ -104,7 +104,7 @@ def test_single_panel_dip_at_coincidence() -> None:
     # A local dip must sit near the coincidence frequency.
     dip_band = BANDS[int(np.argmin(np.abs(BANDS - fc)))]
     below = res.transmission_loss[BANDS == 1000.0][0]
-    at_dip = res.transmission_loss[dip_band == BANDS][0]
+    at_dip = res.transmission_loss[BANDS == dip_band][0]
     assert at_dip < below
 
 
@@ -212,9 +212,9 @@ def test_double_wall_degenerate_f0_above_fl_is_partitioned() -> None:
     res = building.double_wall_transmission_loss(BANDS, m1, m2, d)
     assert np.all(np.isfinite(res.transmission_loss))
     # Below f0 it is still the combined-mass law; above f0 it is the +6 branch.
-    lo = float(res.transmission_loss[f0 >= BANDS][0])
+    lo = float(res.transmission_loss[BANDS <= f0][0])
     assert lo == pytest.approx(
-        float(building.mass_law_transmission_loss(BANDS[f0 >= BANDS][0], m1 + m2))
+        float(building.mass_law_transmission_loss(BANDS[BANDS <= f0][0], m1 + m2))
     )
 
 

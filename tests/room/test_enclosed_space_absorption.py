@@ -92,7 +92,7 @@ def test_air_absorption_area_formula_2() -> None:
 
 def test_reverberation_factor_is_016() -> None:
     # 55.3 / c0 = 0.16 for the standard's c0 = 345.6 m/s.
-    assert pytest.approx(0.16, abs=1e-4) == m._RT_CONSTANT / m.SPEED_OF_SOUND
+    assert m._RT_CONSTANT / m.SPEED_OF_SOUND == pytest.approx(0.16, abs=1e-4)
 
 
 def test_object_fraction_formula_3() -> None:

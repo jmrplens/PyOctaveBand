@@ -198,7 +198,7 @@ def test_table1_exact_values_spot_bands() -> None:
         4000,
         5000,
     )
-    assert tuple(BASE_PLATE_MAX_SCATTERING) == BASE_PLATE_BANDS
+    assert BASE_PLATE_BANDS == tuple(BASE_PLATE_MAX_SCATTERING)
     assert BASE_PLATE_MAX_SCATTERING[100] == 0.05
     assert BASE_PLATE_MAX_SCATTERING[500] == 0.05
     assert BASE_PLATE_MAX_SCATTERING[630] == 0.10

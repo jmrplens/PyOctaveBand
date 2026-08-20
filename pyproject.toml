@@ -150,7 +150,17 @@ select = [
     "PIE", "DTZ", "G",      # zero findings today: these only guard the future
     "FURB",                 # long-hand forms of builtins
 ]
-ignore = ["B905"]  # selected by "B"; see the note below
+ignore = [
+    "B905",  # selected by "B"; see the note below
+    # SIM300 calls anything with an upper-case name a literal, and gets three
+    # idioms in this tree backwards for it. `spectrum[OCTAVE_BANDS == f]` is a
+    # numpy mask, not a condition, and `res.transmission_loss[BANDS <= f0]`
+    # reads "the bands at or below f0" until it is flipped to `f0 >= BANDS`.
+    # `value == pytest.approx(x)` is how pytest is written. It is right about
+    # two of the nineteen it finds here, and wrong about the rest; SonarCloud
+    # flagged the result as assertions whose argument order no longer agrees.
+    "SIM300",
+]
 # Selected next, in their own review, because each is a change to code rather
 # than to its shape and the diff has to be readable to be checked:
 #   TC    (313) moves imports that only a type checker needs under

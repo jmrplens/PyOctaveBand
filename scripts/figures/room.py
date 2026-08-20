@@ -1440,7 +1440,7 @@ def generate_room_noise_criteria(output_dir: str) -> None:
     ax_nc.plot(
         OCTAVE_BANDS, spectrum, "o-", color=COLOR_PRIMARY, zorder=3, label="Measured"
     )
-    gov = spectrum[nc.governing_frequency == OCTAVE_BANDS][0]
+    gov = spectrum[OCTAVE_BANDS == nc.governing_frequency][0]
     ax_nc.plot(
         [nc.governing_frequency],
         [gov],
@@ -1568,7 +1568,7 @@ def generate_nc_blind_spot(output_dir: str) -> None:
             zorder=3,
             label=f"{label} — tangent at {nc.governing_frequency:g} Hz",
         )
-        gov = spectrum[nc.governing_frequency == OCTAVE_BANDS][0]
+        gov = spectrum[OCTAVE_BANDS == nc.governing_frequency][0]
         ax_nc.plot(
             [nc.governing_frequency],
             [gov],

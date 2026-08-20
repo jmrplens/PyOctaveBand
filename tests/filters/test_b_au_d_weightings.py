@@ -85,7 +85,7 @@ def test_au_masks_match_reference_data() -> None:
     assert len(_IEC61012_TABLE1) == len(IEC61012_TABLE1) == 37
     for row, ref_row in zip(_IEC61012_TABLE1, IEC61012_TABLE1):
         assert row == pytest.approx(ref_row), f"Table 1 mismatch at {ref_row[0]} Hz"
-    assert pytest.approx(IEC61012_AU_HF) == _IEC61012_AU_HF
+    assert _IEC61012_AU_HF == pytest.approx(IEC61012_AU_HF)
     poles = [(p.real, p.imag) for p in _U_POLES_HZ]
     assert poles == pytest.approx(IEC61012_TABLE2_POLES_HZ)
 

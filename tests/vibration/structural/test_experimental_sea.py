@@ -136,7 +136,7 @@ class TestNortonProblem610:
     def test_printed_pair_satisfies_reciprocity(self) -> None:
         """The two printed loss factors imply the computed modal-density ratio."""
         _, _, n_1, n_2 = _problem_610_inputs()
-        assert pytest.approx(n_1 / n_2, rel=0.005) == 3.92e-4 / 4.26e-4
+        assert 3.92e-4 / 4.26e-4 == pytest.approx(n_1 / n_2, rel=0.005)
 
     def test_input_power_equals_dissipated_power(self, result) -> None:  # type: ignore[no-untyped-def]
         """Eq. (6.10) collapses to the total dissipation in the steady state."""

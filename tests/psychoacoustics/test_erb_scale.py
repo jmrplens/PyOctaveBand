@@ -111,12 +111,9 @@ def test_cam_is_the_integral_of_one_over_the_erb() -> None:
     :func:`cam_from_frequency`; that identity fixes the relation
     ``C_CAM = ln(10) / (C1 C2)`` between the three constants.
     """
-    assert (
-        pytest.approx(
-            math.log(10.0) / (psychoacoustics.ERB_C1 * psychoacoustics.ERB_C2),
-            rel=5e-5,
-        )
-        == psychoacoustics.CAM_C
+    assert psychoacoustics.CAM_C == pytest.approx(
+        math.log(10.0) / (psychoacoustics.ERB_C1 * psychoacoustics.ERB_C2),
+        rel=5e-5,
     )
     f = np.linspace(0.0, 4000.0, 400001)
     integral = float(

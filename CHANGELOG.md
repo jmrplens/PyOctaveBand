@@ -119,7 +119,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   comments to show the output each line prints, which is a teaching device.
 
   The linter now selects the families this tree already satisfied or nearly
-  did, and the fifty-odd findings they raised are fixed. Six thousand more from
+  did, and the fifty-odd findings they raised are fixed. One rule is selected
+  by its family and then turned back off: `SIM300` calls anything with an
+  upper-case name a literal, and on that reading it gets three idioms here
+  backwards. `spectrum[OCTAVE_BANDS == f]` is a numpy mask, not a condition;
+  `res.transmission_loss[BANDS <= f0]` reads "the bands at or below f0" until
+  it becomes `f0 >= BANDS`; and `value == pytest.approx(x)` is how pytest is
+  written. It is right about two of the nineteen it finds and wrong about the
+  rest, which SonarCloud noticed as assertions whose argument order no longer
+  agrees within a file. Six thousand more from
   `PL`, `RUF`, `TID`, `N`, `T20` and `COM` are deliberately not selected: they
   would rename the symbols standards spell as `Rw` and `LAeq`, flag the
   transcribed normative constants as magic values, and ban the relative imports
