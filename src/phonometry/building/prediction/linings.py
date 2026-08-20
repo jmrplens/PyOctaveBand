@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Prediction of wall and ceiling linings: the weighted improvement an additional
+r"""Prediction of wall and ceiling linings: the weighted improvement an additional
 layer gives the element behind it (ISO 12354-1:2017 Annex D).
 
 A lining is not a floor covering. It is added to a wall or a ceiling, not laid

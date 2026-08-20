@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for ISO 3382-1:2009 / ISO 3382-2:2008 room acoustic parameters.
+"""Tests for ISO 3382-1:2009 / ISO 3382-2:2008 room acoustic parameters.
 
 Validation strategy (closed forms, not self-consistency). For a purely
 exponential energy decay p^2(t) = exp(-a*t) with a = 6*ln(10)/T:
@@ -41,7 +40,8 @@ def multitone_ir(
     t60: float, seconds: float, freqs: list[float], fs: int = FS
 ) -> np.ndarray:
     """One sine carrier per octave band, all sharing the same exponential
-    energy envelope, so every band-filtered envelope is exp(-A60*t/t60)."""
+    energy envelope, so every band-filtered envelope is exp(-A60*t/t60).
+    """
     t = np.arange(round(seconds * fs)) / fs
     env = np.exp(-0.5 * A60 * t / t60)
     out = np.zeros_like(t)
@@ -128,7 +128,8 @@ def test_zero_phase_reduces_short_decay_group_delay_bias() -> None:
     filtering removes the filter group delay, which otherwise inflates the
     apparent decay time of a short low-frequency decay. On a deterministic
     125 Hz damped sinusoid (T = 0.2 s) the zero-phase T20/T30 sit closer to
-    the true value than the causal fit."""
+    the true value than the causal fit.
+    """
     t60, fc = 0.2, 125.89254118
     n = int(1.2 * FS)
     t = np.arange(n) / FS
@@ -236,7 +237,8 @@ def test_decay_validity_thresholds_account_for_tail_compensation() -> None:
     the truncated tail (Schroeder Eq. (3), C != 0), whose residual bias is
     positive, so a flagged-valid T20 at dyn=35 / T30 at dyn=45 exceeds the
     5 % JND (ISO 3382-2 Table A.1). Flags must tighten to ~46 dB (T20) and
-    ~54 dB (T30), where the bias falls below the JND."""
+    ~54 dB (T30), where the bias falls below the JND.
+    """
 
     def noisy_exp(sigma: float, seed: int) -> np.ndarray:
         rng = np.random.default_rng(seed)

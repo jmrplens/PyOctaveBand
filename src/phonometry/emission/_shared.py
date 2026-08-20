@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-What every sound-power method has in common: the A-weighting band corrections
+r"""What every sound-power method has in common: the A-weighting band corrections
 of ISO 3744:2010 Annex E, the reference area, the accuracy-grade vocabulary
 and the qualification warning.
 
@@ -51,7 +50,8 @@ class SoundPowerWarning(PhonometryWarning):
     and microphone/source-position sampling; and for ISO 9614-2 negative total
     partial power and unmet field-indicator criteria. Where a lower criterion
     is only just met the returned levels represent upper bounds and must be
-    reported as such."""
+    reported as such.
+    """
 
 
 # --- ISO 3744:2010 Annex E, A-weighting band corrections Ck (dB) ------------
@@ -99,7 +99,8 @@ def _a_weighting_corrections(frequencies: np.ndarray) -> np.ndarray:
     """A-weighting band corrections Ck for the given nominal mid-band
     frequencies (ISO 3744:2010 Annex E, Tables E.1/E.2). The octave-band
     values (Table E.2) coincide with the one-third-octave values (Table E.1)
-    at the shared mid-band frequencies, so a single lookup serves both."""
+    at the shared mid-band frequencies, so a single lookup serves both.
+    """
     nominal = [round(f) for f in frequencies]
     # Use the octave table (E.2) when every band is an octave mid-band centre,
     # otherwise the one-third-octave table (E.1); the two agree where they

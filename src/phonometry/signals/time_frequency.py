@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Calibrated time-frequency analysis: STFT spectrogram and zoom FFT.
+r"""Calibrated time-frequency analysis: STFT spectrogram and zoom FFT.
 
 Fine-band time-frequency views of a record, following Bendat & Piersol,
 *Random Data: Analysis and Measurement Procedures* (4th ed., 2010):

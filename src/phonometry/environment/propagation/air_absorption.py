@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Atmospheric absorption of sound: ISO 9613-1:1993.
+r"""Atmospheric absorption of sound: ISO 9613-1:1993.
 
 The attenuation of a pure tone propagating through the atmosphere is governed by
 a pure-tone attenuation coefficient ``alpha`` (in dB/m) that depends on frequency,

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Metadiffuser panels against the published designs (Sci. Rep. 7:5389, 2017).
+"""Metadiffuser panels against the published designs (Sci. Rep. 7:5389, 2017).
 
 The oracles are the printed numbers of the paper and its supplementary
 material, computed here through an independent implementation of the same

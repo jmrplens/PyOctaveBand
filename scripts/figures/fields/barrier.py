@@ -133,7 +133,8 @@ def animate_fdtd_barrier(output_dir: str) -> None:
     """A point source behind a thin rigid barrier on reflecting ground
     (2D FDTD), at 100 Hz and 500 Hz side by side: the long wavelength
     diffracts around the edge and fills the shadow zone, the short one is
-    cast into a deep, clean shadow -- why barriers fail at low frequency."""
+    cast into a deep, clean shadow -- why barriers fail at low frequency.
+    """
     from matplotlib import patheffects
     from matplotlib.patches import Rectangle
 

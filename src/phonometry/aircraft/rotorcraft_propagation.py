@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Rotorcraft propagation, ground effect and screening (ECAC Doc 32 / NORAH2).
+r"""Rotorcraft propagation, ground effect and screening (ECAC Doc 32 / NORAH2).
 
 Between the noise hemisphere that describes a helicopter and the receiver on the
 ground lies the path, and the path knows nothing about rotorcraft. The ECAC

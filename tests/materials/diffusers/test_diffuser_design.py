@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Diffuser-design far-field prediction tests (Cox & D'Antonio Fraunhofer model).
+"""Diffuser-design far-field prediction tests (Cox & D'Antonio Fraunhofer model).
 
 The predictor has no numeric worked example to anchor on, so every test rests
 on a closed-form geometry identity or an exact-by-physics behaviour:

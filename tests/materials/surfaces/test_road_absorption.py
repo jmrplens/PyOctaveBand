@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-In-situ road-surface sound absorption (ISO 13472-1 / ISO 13472-2).
+"""In-situ road-surface sound absorption (ISO 13472-1 / ISO 13472-2).
 
 Neither standard gives a computable narrow-band worked example, so the tests
 anchor on physics identities and the numeric oracles captured in the Step-0

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Sound absorption in a reverberation room: BS EN ISO 354:2003.
+r"""Sound absorption in a reverberation room: BS EN ISO 354:2003.
 
 The mean reverberation time of a reverberation room is measured empty and with
 the test specimen installed. From those two reverberation times the equivalent
@@ -203,7 +202,8 @@ def _absorption_area(
 
     Shared by :func:`absorption_area` (which adds the ISO 354 clause 6.1.1
     volume advisory) and :func:`absorption_coefficient` (which advises the
-    volume once for the pair of measurements)."""
+    volume once for the pair of measurements).
+    """
     t = np.asarray(t60, dtype=np.float64)
     m_arr = np.asarray(m, dtype=np.float64)
     _validate_area_inputs(t, volume, m_arr)

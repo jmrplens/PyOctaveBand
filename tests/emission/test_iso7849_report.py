@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the ISO/TS 7849 sound-power-from-vibration ``.report()`` fiche.
+"""Tests for the ISO/TS 7849 sound-power-from-vibration ``.report()`` fiche.
 
 The rendered values are checked against a clean-room oracle derived from the
 standard, independent of the library's own combination path. A machine casing

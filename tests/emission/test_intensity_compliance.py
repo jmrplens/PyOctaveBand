@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-IEC 61043:1993 sound-intensity instrument class verification.
+"""IEC 61043:1993 sound-intensity instrument class verification.
 
 Oracles (independent of the implementation):
 

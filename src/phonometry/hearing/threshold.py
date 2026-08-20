@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Age-related hearing threshold (ISO 7029:2017) and audiometric reference zero
+r"""Age-related hearing threshold (ISO 7029:2017) and audiometric reference zero
 (ISO 389-7:2005).
 
 Implements the statistical distribution of the hearing threshold of an

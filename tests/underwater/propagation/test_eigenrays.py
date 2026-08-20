@@ -271,7 +271,8 @@ def test_a_lossy_seabed_charges_R_at_each_arrivals_own_angle_as_printed() -> Non
 
 def test_the_cap_keeps_the_earliest_arrivals_and_says_so() -> None:
     """``max_arrivals`` truncates the sorted tail and warns, changing nothing
-    about the arrivals it keeps."""
+    about the arrivals it keeps.
+    """
     trace, full = _guide_arrivals()
     with pytest.warns(PhonometryWarning, match="11 eigenrays.*6 earliest"):
         capped = eigenrays(

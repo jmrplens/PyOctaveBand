@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Airborne sound power from surface vibration (ISO/TS 7849-1/-2:2009).
+r"""Airborne sound power from surface vibration (ISO/TS 7849-1/-2:2009).
 
 The airborne sound power a machine radiates through the structure-borne
 vibration of its outer surface is estimated from the surface vibratory velocity
@@ -272,7 +271,8 @@ class VibrationSoundPowerResult:
     @property
     def total_level(self) -> float:
         r"""Band-summed sound power level, in dB:
-        :math:`10 \log_{10} \sum_j 10^{0.1 L_{Wj}}`."""
+        :math:`10 \log_{10} \sum_j 10^{0.1 L_{Wj}}`.
+        """
         lw = np.asarray(self.sound_power_level, dtype=np.float64)
         return float(10.0 * np.log10(np.sum(10.0 ** (0.1 * lw))))
 

@@ -366,12 +366,12 @@ def _sloping_slope(boundary: _Sloping, r: NDArray[np.float64]) -> NDArray[np.flo
 
 
 class DynamicRays(NamedTuple):
-    """The dynamic ray equations to integrate alongside the trajectory.
+    r"""The dynamic ray equations to integrate alongside the trajectory.
 
     :ivar spreading: Per-ray :math:`q(0)`. With :math:`q(0) = 0` and
         :math:`p(0) = 1/c(0)` (Jensen Eq. 3.63) the pair is the geometric
-        spreading, :math:`r\\,q = J`; with :math:`p(0) = 1` and
-        :math:`q(0) = i\\omega W_0^2/2` (Eq. 3.91) it is a Gaussian beam of
+        spreading, :math:`r\,q = J`; with :math:`p(0) = 1` and
+        :math:`q(0) = i\omega W_0^2/2` (Eq. 3.91) it is a Gaussian beam of
         initial half-width :math:`W_0` and flat wavefront.
     :ivar slope: Per-ray :math:`p(0)`, in the same dtype as ``spreading``.
     :ivar profile_depths: Node coordinates of the sound-speed profile,
@@ -392,19 +392,19 @@ class DynamicRays(NamedTuple):
 
 
 class RayMarch(NamedTuple):
-    """Per-ray history of a range march, all of shape ``(n_rays, n_steps)``.
+    r"""Per-ray history of a range march, all of shape ``(n_rays, n_steps)``.
 
     :ivar positions: ``z`` at each range sample.
     :ivar times: Cumulative travel time at each range sample, zero at the start.
     :ivar arc_lengths: Cumulative arc length along the ray at each range sample,
-        zero at the start. :math:`ds/dr = 1/(\\xi c) = 1/\\cos\\theta \\ge 1`
-        with :math:`\\theta` the local ray angle, so it never falls below the
+        zero at the start. :math:`ds/dr = 1/(\xi c) = 1/\cos\theta \ge 1`
+        with :math:`\theta` the local ray angle, so it never falls below the
         range spanned and exceeds it by exactly the obliquity of the path; a
         reflection adds no path, so it stays continuous across one, like the
         time. This is the measure a volume absorption
-        :math:`e^{-\\int \\alpha\\,ds}` multiplies on (Jensen Sect. 3.6.2,
+        :math:`e^{-\int \alpha\,ds}` multiplies on (Jensen Sect. 3.6.2,
         Eq. 3.116).
-    :ivar verticals: Vertical slowness :math:`\\zeta` at each range sample.
+    :ivar verticals: Vertical slowness :math:`\zeta` at each range sample.
     :ivar reflections: Boundary reflections resolved inside each range step
         (zero in the first column, which is the launch point). Crossings of a
         profile node are not reflections and are not counted here.
@@ -417,12 +417,12 @@ class RayMarch(NamedTuple):
         for a medium with no upper boundary.
     :ivar spreadings: Ray-tube spreading :math:`q`, or ``None`` when the march
         was not asked to carry it.
-    :ivar spreading_slopes: Its conjugate :math:`p`, :math:`p = \\xi\\,dq/dr`,
+    :ivar spreading_slopes: Its conjugate :math:`p`, :math:`p = \xi\,dq/dr`,
         or ``None``. The beam half-width and wavefront curvature follow from the
         pair as Jensen Eqs. (3.89)-(3.90),
-        :math:`W = \\sqrt{-2/(\\omega\\,\\mathrm{Im}[p/q])}` and
-        :math:`K = -c\\,\\mathrm{Re}[p/q]`.
-    :ivar horizontals: Horizontal slowness :math:`\\xi` at each range sample.
+        :math:`W = \sqrt{-2/(\omega\,\mathrm{Im}[p/q])}` and
+        :math:`K = -c\,\mathrm{Re}[p/q]`.
+    :ivar horizontals: Horizontal slowness :math:`\xi` at each range sample.
         Over level boundaries it is the launch column repeated, Snell's
         invariant; a reflection off a sloping boundary rotates it (module
         docstring), so a consumer forming ray-centred coordinates must read it

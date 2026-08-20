@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the IEC 61043 class-verification report (``.report()`` -> PDF).
+"""Tests for the IEC 61043 class-verification report (``.report()`` -> PDF).
 
 The report is a rendering feature, so these tests assert only structural facts:
 a compliant chain renders a valid single-page COMPLIES fiche, the Spanish

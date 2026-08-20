@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Block streaming: feed hours of recording through a constant memory window.
+r"""Block streaming: feed hours of recording through a constant memory window.
 
 A night of environmental monitoring at 48 kHz/24-bit/2 channels grows past
 4 GiB on disk in under four hours and costs about 5.5 GiB of RAM *per

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Rotorcraft noise by the hemisphere method (ECAC Doc 32 / NORAH2).
+r"""Rotorcraft noise by the hemisphere method (ECAC Doc 32 / NORAH2).
 
 The ECAC Doc 32 rotorcraft-noise method describes a helicopter's highly directive
 source with a **noise hemisphere**: one-third-octave-band sound pressure levels on

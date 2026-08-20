@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for ISO 9613-1:1993 atmospheric sound absorption.
+"""Tests for ISO 9613-1:1993 atmospheric sound absorption.
 
 Normative anchors (ISO 9613-1:1993):
 - Eq. (3): frO = (pa/pr)[24 + 4,04e4 h (0,02+h)/(0,391+h)]  (oxygen relaxation).
@@ -214,7 +213,8 @@ def test_iso9613_2_table2_grid_exact_midbands() -> None:
     across the eight octave bands, evaluated at the exact base-10 midbands
     (the table's own convention). Every cell agrees to half a unit of its
     last printed digit except the documented 15 degC / 80 % / 1 kHz print
-    quirk (printed 4,1 vs exact 4,151)."""
+    quirk (printed 4,1 vs exact 4,151).
+    """
     import reference_data as ref
 
     for (temp, rh), row in ref.ISO9613_2_TABLE2.items():

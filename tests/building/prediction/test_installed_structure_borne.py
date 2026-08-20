@@ -322,7 +322,8 @@ def test_annex_i3_cistern_coupling_terms() -> None:
 
 def test_annex_i3_cistern_full_chain_table_i9() -> None:
     """Table I.9 end-to-end: all four paths, the Formula (17) total and the
-    29 dB(A) receiving-room value, within the +/-0,15 dB table rounding."""
+    29 dB(A) receiving-room value, within the +/-0,15 dB table rounding.
+    """
     import reference_data as ref
 
     tol = ref.EN12354_5_ANNEX_I_TOL

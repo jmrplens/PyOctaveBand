@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Speech Intelligibility Index (SII) per ANSI S3.5-1997 (R2017).
+"""Speech Intelligibility Index (SII) per ANSI S3.5-1997 (R2017).
 
 Implements all four band procedures of ANSI S3.5-1997, *American National
 Standard Methods for the Calculation of the Speech Intelligibility Index*:

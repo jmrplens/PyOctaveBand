@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Base-install WAV reading: scipy decodes the samples, the walker the rest.
+r"""Base-install WAV reading: scipy decodes the samples, the walker the rest.
 
 :mod:`scipy.io.wavfile` already decodes every linear WAV variant measurement
 equipment writes -- PCM 1-64 bit (24-bit arrives as ``int32`` with the sample

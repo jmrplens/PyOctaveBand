@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Radiation of a rigid circular piston set in an infinite baffle.
+r"""Radiation of a rigid circular piston set in an infinite baffle.
 
 The baffled circular piston is the canonical acoustic radiator: a flat rigid
 disc of radius ``a`` vibrating with a uniform normal velocity in an otherwise

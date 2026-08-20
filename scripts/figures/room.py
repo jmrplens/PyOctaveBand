@@ -66,7 +66,8 @@ def generate_schroeder_decay(output_dir: str) -> None:
     def fit_line(decay_range: tuple[float, float]) -> tuple[float, float]:
         """Least-squares (slope, intercept) over an evaluation range,
         replicating room_acoustics._fit_decay_time so the drawn line has
-        slope -60/T with the annotated T."""
+        slope -60/T with the annotated T.
+        """
         mask = (level <= -decay_range[0]) & (level >= -decay_range[1])
         slope, intercept = np.polyfit(time[mask], level[mask], 1)
         return float(slope), float(intercept)

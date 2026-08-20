@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Prediction of resilient-layer performance: tapping force, floor coverings,
+r"""Prediction of resilient-layer performance: tapping force, floor coverings,
 floating floors.
 
 The measurement modules of this domain report what a resilient layer *achieved*
@@ -277,7 +276,8 @@ def covering_contact_stiffness(
 
 def _is_over_critical(stiffness: float, impedance: float, mass: float) -> bool:
     r"""``True`` for an over-critical oscillation,
-    :math:`K m \ge 4 Z_\mathrm{dp}^{2}` (Eq. 3.95)."""
+    :math:`K m \ge 4 Z_\mathrm{dp}^{2}` (Eq. 3.95).
+    """
     return stiffness * mass >= 4.0 * impedance**2
 
 
@@ -486,7 +486,8 @@ class TappingForceResult:
     @property
     def power_input_level(self) -> np.ndarray:
         r"""Power input level :math:`10 \log_{10}(W_\mathrm{in}/1~\text{pW})`, in dB
-        (Hopkins Fig. 3.33)."""
+        (Hopkins Fig. 3.33).
+        """
         return np.asarray(10.0 * np.log10(self.power_input / _POWER_REFERENCE))
 
     def plot(

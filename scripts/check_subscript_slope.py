@@ -168,13 +168,13 @@ Sightings = dict[tuple[str, str], dict[str, list[int]]]
 
 
 def sightings(text: str, suffix: str) -> Sightings:
-    """Every one-letter subscript of *text*, by symbol and by slope.
+    r"""Every one-letter subscript of *text*, by symbol and by slope.
 
     A comma-separated subscript is read component by component, since that is
-    how a reader reads it: :math:`\\alpha_{\\mathrm{s},i}` is the Sabine
+    how a reader reads it: :math:`\alpha_{\mathrm{s},i}` is the Sabine
     absorption of surface *i*, one abbreviation and one index, and the letter
     that matters is the one being compared. Where the upright command wraps the
-    whole run, as ``L_\\mathrm{n,w,eq}`` does, every component of it is upright.
+    whole run, as ``L_\mathrm{n,w,eq}`` does, every component of it is upright.
     Any component that is not a single letter is passed over: a digit, a
     weighting prefix and a word are not what this is about.
     """

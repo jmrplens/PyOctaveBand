@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the ISO 532-1 Zwicker loudness report (``.report()`` -> PDF).
+"""Tests for the ISO 532-1 Zwicker loudness report (``.report()`` -> PDF).
 
 The report is a rendering feature, so these tests assert only structural facts:
 a valid single-page PDF is written for a stationary loudness result, unknown
@@ -175,7 +174,6 @@ def test_time_varying_fiche_reports_nmax_percentiles_and_nt(tmp_path) -> None:
     time-varying sounds and names the reported maximum "loudness (Nmax)";
     the fiche must not label it as the stationary total loudness N.
     """
-
     fs = 48000
     t = np.arange(fs) / fs
     x = (

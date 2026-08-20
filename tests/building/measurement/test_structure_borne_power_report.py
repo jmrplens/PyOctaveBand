@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the EN 15657 structure-borne sound power ``.report()`` fiche.
+"""Tests for the EN 15657 structure-borne sound power ``.report()`` fiche.
 
 The rendered values are checked against a clean-room oracle derived from the
 standard, independent of the library's own combination path. A source on a

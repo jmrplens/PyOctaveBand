@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the machine-enclosure insertion-loss ``.report()`` fiche.
+"""Tests for the machine-enclosure insertion-loss ``.report()`` fiche.
 
 The rendered values are checked against a clean-room oracle derived from the
 Bies, Hansen & Howard model (Engineering Noise Control 5th ed., section 7.4.2),

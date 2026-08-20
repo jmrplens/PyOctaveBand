@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Building acoustic performance prediction (EN 12354-1/-2:2000).
+r"""Building acoustic performance prediction (EN 12354-1/-2:2000).
 
 This is the **prediction** counterpart of the measurement modules
 (:mod:`phonometry.building.measurement.lab_insulation` for laboratory ``R``/``Ln`` and
@@ -369,11 +368,11 @@ def _check_finite(value: float, name: str) -> float:
 
 @dataclass(frozen=True)
 class _KijTerms:
-    """The terms every Annex E branch is written in.
+    r"""The terms every Annex E branch is written in.
 
-    :ivar m: :math:`M = \\log_{10}` of the mass ratio (Formula E.2).
+    :ivar m: :math:`M = \log_{10}` of the mass ratio (Formula E.2).
     :ivar ratio: The mass ratio itself, which the E.7 validity test reads.
-    :ivar lg_f_fk: :math:`\\log_{10}(f/f_k)` of the double-leaf branches.
+    :ivar lg_f_fk: :math:`\log_{10}(f/f_k)` of the double-leaf branches.
     :ivar delta1: The E.4/E.5 frequency term, zero below ``f1``.
     """
 

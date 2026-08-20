@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-The :class:`Signal` result object: samples plus the metadata they need.
+r"""The :class:`Signal` result object: samples plus the metadata they need.
 
 A measurement WAV is only interpretable together with its sample rate, its
 calibration and its provenance, yet the ecosystem's readers return a bare

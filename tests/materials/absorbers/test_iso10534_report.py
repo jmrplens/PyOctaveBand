@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the ISO 10534-2 impedance-tube test report (``.report()`` -> PDF).
+"""Tests for the ISO 10534-2 impedance-tube test report (``.report()`` -> PDF).
 
 The report is a rendering feature, so these tests assert only structural
 facts: a valid single-page PDF is written for a two-microphone measurement,

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Field survey method for sound insulation and service-equipment noise
+r"""Field survey method for sound insulation and service-equipment noise
 (ISO 10052:2021).
 
 This is the **survey (control) method**: a fast, octave-band field procedure
@@ -63,7 +62,8 @@ heavy/soft impact source uses 63 Hz to 500 Hz. The single-number weighted
 ratings reuse the verified :func:`phonometry.building.weighted_rating` (ISO
 717-1) and :func:`phonometry.building.weighted_impact_rating` (ISO 717-2)
 engines, formed only when exactly 5 octave (or 16 one-third-octave) values are
-supplied. No background correction is applied (Clause 6.2)."""
+supplied. No background correction is applied (Clause 6.2).
+"""
 
 from __future__ import annotations
 
@@ -641,8 +641,7 @@ def survey_airborne_insulation(
     volume: float | None = None,
     area: float | None = None,
 ) -> SurveyAirborneResult:
-    r"""
-    Airborne sound insulation between rooms, survey method (ISO 10052:2021).
+    r"""Airborne sound insulation between rooms, survey method (ISO 10052:2021).
 
     Computes, per octave band, the level difference :math:`D = L_1 - L_2`
     (Clause 3.2), the standardized level difference :math:`D_\mathrm{nT} = D + k`
@@ -708,8 +707,7 @@ def survey_impact_insulation(
     *,
     volume: float | None = None,
 ) -> SurveyImpactResult:
-    r"""
-    Impact sound insulation between rooms, survey method (ISO 10052:2021).
+    r"""Impact sound insulation between rooms, survey method (ISO 10052:2021).
 
     Computes, per octave band, the energy-average impact sound pressure level
     ``Li`` (Clause 3.7), the standardized impact level
@@ -745,8 +743,7 @@ def survey_facade_insulation(
     *,
     volume: float | None = None,
 ) -> SurveyFacadeResult:
-    r"""
-    Façade sound insulation, survey method (ISO 10052:2021).
+    r"""Façade sound insulation, survey method (ISO 10052:2021).
 
     Computes, per octave band, the façade level difference
     :math:`D_{2\mathrm{m}} = L_{1,2\mathrm{m}} - L_2` (Clause 3.13), the standardized façade
@@ -788,8 +785,7 @@ def survey_service_equipment_level(
     *,
     volume: float | None = None,
 ) -> SurveyServiceEquipmentResult:
-    r"""
-    Service-equipment sound pressure level, survey method (ISO 10052:2021).
+    r"""Service-equipment sound pressure level, survey method (ISO 10052:2021).
 
     Computes the service-equipment level
     :math:`L_{XY} = 10 \log_{10}[(1/3) \sum 10^{0.1 L_{XY,j}}]`

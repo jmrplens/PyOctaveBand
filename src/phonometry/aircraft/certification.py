@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Aircraft noise certification: Effective Perceived Noise Level (ICAO Annex 16).
+r"""Aircraft noise certification: Effective Perceived Noise Level (ICAO Annex 16).
 
 The EPNL is the noise-certification metric for transport-category aircraft. It
 is built from a half-second spectral time history (24 one-third-octave bands,

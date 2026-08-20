@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Sound power level of a noise source measured in a reverberation test room:
+r"""Sound power level of a noise source measured in a reverberation test room:
 ISO 3741:2010 (precision method, accuracy grade 1).
 
 The source is placed in a hard-walled reverberation room whose reverberant
@@ -95,7 +94,8 @@ class ReverberationSoundPowerResult:
     ``sound_power_level_a`` is the A-weighted total ``LWA`` (Annex F Eq. F.2),
     computed only when ``frequencies`` are supplied (``NaN`` for several bands
     without them; equal to ``LW`` for a single band). ``method`` is ``'direct'``
-    or ``'comparison'``."""
+    or ``'comparison'``.
+    """
 
     frequencies: np.ndarray | None
     sound_power_level: np.ndarray
@@ -188,7 +188,8 @@ def _validate_meteorology(temperature: float, static_pressure: float) -> None:
     A non-finite or :math:`\le -273` degC temperature makes
     :math:`\sqrt{273 + \theta}` complex/zero, and a non-finite or non-positive
     static pressure makes :math:`\log_{10}(p_\mathrm{s}/p_{\mathrm{s}0})` undefined; both are rejected
-    with a clean ``ValueError``."""
+    with a clean ``ValueError``.
+    """
     if not np.isfinite(temperature) or temperature <= -273.0:
         raise ValueError("'temperature' must be finite and greater than -273 degC.")
     if not np.isfinite(static_pressure) or static_pressure <= 0.0:
@@ -197,7 +198,8 @@ def _validate_meteorology(temperature: float, static_pressure: float) -> None:
 
 def _speed_of_sound(temperature: float) -> float:
     r"""Speed of sound :math:`c = 20.05 \sqrt{273 + \theta}` (ISO 3741,
-    clause 9.1.4)."""
+    clause 9.1.4).
+    """
     return float(20.05 * np.sqrt(273.0 + temperature))
 
 
@@ -220,7 +222,8 @@ def _c2_correction(temperature: float, static_pressure: float) -> float:
 def _mean_level(levels: np.ndarray) -> np.ndarray:
     """Energy mean over microphone positions (rows), returning one value per
     band. A 1D input is treated as a single averaged spectrum (ISO 3741
-    Eq. 16)."""
+    Eq. 16).
+    """
     arr = np.asarray(levels, dtype=np.float64)
     if arr.ndim == 1:
         return arr
@@ -239,7 +242,8 @@ def _k1_eq14(delta: np.ndarray, frequencies: np.ndarray) -> tuple[np.ndarray, bo
     250 Hz to 5 000 Hz) ``K1`` is clamped to the criterion value (1.26 dB /
     0.46 dB) and the levels become upper bounds. ``delta`` may be per band
     ``(NB,)`` or per position and band ``(NM, NB)``; the second returned value
-    flags whether any element fell below the lower criterion."""
+    flags whether any element fell below the lower criterion.
+    """
     low = np.where((frequencies <= 200.0) | (frequencies >= 6300.0), 6.0, 10.0)
     clamped = np.maximum(delta, low)
     k1 = -10.0 * np.log10(1.0 - 10.0 ** (-0.1 * clamped))
@@ -267,7 +271,8 @@ def _background_corrected_mean(
     With 1D pre-averaged ``levels`` the per-position information is gone, so a
     single ``K1`` is computed from the averaged spectra -- an approximation of
     the per-position procedure that is exact only when every position has the
-    same source-to-background margin. Prefer per-position input."""
+    same source-to-background margin. Prefer per-position input.
+    """
     arr = np.asarray(levels, dtype=np.float64)
     raw_mean = _mean_level(levels)
     if arr.ndim == 2:
@@ -309,7 +314,8 @@ def _min_room_volume(lowest_band: float) -> float:
     """Minimum room volume for the lowest band of interest (ISO 3741 Table 1).
 
     Bands at or below 160 Hz demand a progressively larger room; from 200 Hz
-    upward the floor is 70 m^3."""
+    upward the floor is 70 m^3.
+    """
     for band, vmin in _TABLE1_MIN_VOLUME:
         if lowest_band <= band:
             return vmin
@@ -323,12 +329,13 @@ def _room_qualification_warnings(
     surface_area: float,
     frequencies: np.ndarray,
 ) -> None:
-    """Emit advisory :class:`SoundPowerWarning`\\ s when the room or the
+    r"""Emit advisory :class:`SoundPowerWarning`\ s when the room or the
     microphone sampling fails an ISO 3741 qualification criterion.
 
     The determination still proceeds and returns a result; the warnings flag
     that the room must be qualified per Annex C/D or that more microphone
-    positions are needed (ISO 3741:2010, clauses 5.2, 5.3, 8.3, 8.4.2.2)."""
+    positions are needed (ISO 3741:2010, clauses 5.2, 5.3, 8.3, 8.4.2.2).
+    """
     lowest = float(np.min(frequencies))
     vmin = _min_room_volume(lowest)
     if volume < vmin:
@@ -360,7 +367,8 @@ def _position_sampling_warnings(levels: np.ndarray, stacklevel: int) -> None:
     inter-position standard deviation above the sM criterion (1,5 dB;
     8.4.2.2, Eq. 10). These sampling criteria need no room geometry, so they
     apply to both the direct and the comparison methods. A 1D (already-averaged)
-    spectrum carries no per-position information and is skipped."""
+    spectrum carries no per-position information and is skipped.
+    """
     arr = np.asarray(levels, dtype=np.float64)
     if arr.ndim != 2:
         return
@@ -391,7 +399,8 @@ def _a_weighted_total(
     sound_power_level: np.ndarray, frequencies: np.ndarray | None
 ) -> float:
     """A-weighted total ``LWA`` (ISO 3741 Annex F Eq. F.2). ``NaN`` for several
-    bands without frequencies; equal to ``LW`` for a single band."""
+    bands without frequencies; equal to ``LW`` for a single band.
+    """
     n_bands = sound_power_level.shape[0]
     if frequencies is not None:
         try:

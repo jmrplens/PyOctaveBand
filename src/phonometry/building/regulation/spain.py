@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Spanish building code CTE DB-HR: global indices and requirement checks.
+r"""Spanish building code CTE DB-HR: global indices and requirement checks.
 
 The *Documento Basico HR Proteccion frente al ruido* of the Spanish Codigo
 Tecnico de la Edificacion states its requirements in A-weighted global

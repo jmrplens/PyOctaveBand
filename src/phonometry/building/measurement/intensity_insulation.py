@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Sound insulation measured with sound intensity (ISO 15186).
+r"""Sound insulation measured with sound intensity (ISO 15186).
 
 This is the sound-**intensity** counterpart of the sound-pressure methods in
 :mod:`phonometry.building.measurement.lab_insulation` (ISO 10140) and :mod:`phonometry.building.measurement.insulation`
@@ -67,7 +66,8 @@ to 50 Hz. The single-number weighted rating uses the ISO 717-1 core range, so
 the automatic rating (``RI,w``, ``RI,M,w``, ``DI,n,e,w``) is formed via the
 verified :func:`phonometry.building.weighted_rating` engine only when exactly
 16 one-third-octave (100-3150 Hz) or 5 octave (125-2000 Hz) values are
-supplied."""
+supplied.
+"""
 
 from __future__ import annotations
 
@@ -588,8 +588,7 @@ def intensity_sound_reduction(
     area: float,
     kc: Sequence[float] | np.ndarray | None = None,
 ) -> IntensityReductionResult:
-    r"""
-    Intensity sound reduction index per ISO 15186-1:2000 (Formula (7)).
+    r"""Intensity sound reduction index per ISO 15186-1:2000 (Formula (7)).
 
     Computes, per frequency band, the intensity sound reduction index, in dB,
 
@@ -666,8 +665,7 @@ def intensity_element_normalized_difference(
     measurement_area: float,
     n: int = 1,
 ) -> IntensityElementNormalizedResult:
-    r"""
-    Intensity element normalized level difference per ISO 15186-1 (Formula (8)).
+    r"""Intensity element normalized level difference per ISO 15186-1 (Formula (8)).
 
     Computes, per frequency band, the intensity element normalized level
     difference of a single element unit, in dB,

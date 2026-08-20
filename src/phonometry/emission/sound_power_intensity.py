@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Sound power level of a noise source by sound-intensity **scanning**:
+r"""Sound power level of a noise source by sound-intensity **scanning**:
 ISO 9614-2:1996 (engineering, grade 2; survey/control, grade 3) and
 ISO 9614-3:2002 (precision, grade 1).
 
@@ -293,7 +292,8 @@ class SoundPowerIntensityResult:
 
 def _level_magnitude(values: np.ndarray) -> np.ndarray:
     r"""Magnitude level :math:`10 \log_{10}(|P_i|/P_0)` in dB, with a tiny-floor
-    guard for zeros."""
+    guard for zeros.
+    """
     guarded = np.maximum(np.abs(values), np.finfo(float).tiny)
     return np.asarray(10.0 * np.log10(guarded / _P0), dtype=np.float64)
 
@@ -609,7 +609,8 @@ def _a_weighting_omission(
     (:math:`F_{+/-} \le 3` dB, B.1.2) binds engineering-grade determinations
     only
     (optional for grade 3, Note 16). Net-negative bands are excluded already
-    as non-determinable (clause 9.2), so they are not flagged here."""
+    as non-determinable (clause 9.2), so they are not flagged here.
+    """
     if fpi is None or ld is None:
         return None
     fails = ~(ld > fpi)
@@ -630,7 +631,8 @@ def _a_weighted_total(
     Sums the determinable bands (net power :math:`P > 0`, clause 9.2) minus the
     bands omitted per clause 10.6 b (criteria 1 and/or 2 failed). When the
     screening could not be evaluated (``omitted`` is ``None``) every
-    determinable band is summed and a :class:`SoundPowerWarning` is emitted."""
+    determinable band is summed and a :class:`SoundPowerWarning` is emitted.
+    """
     determinable = ~negative_band
     if frequencies is not None:
         freqs = np.asarray(frequencies, dtype=np.float64)
@@ -684,7 +686,8 @@ class PrecisionFieldIndicators:
     magnitude of the segment intensities) and ``f_pi_signed`` the signed one
     (= F3, Eq. B.6, using the algebraic mean); by construction
     :math:`F_{pI_\mathrm{n}}^{\mathrm{signed}} \ge F_{pI_\mathrm{n}}^{\mathrm{unsigned}}`.
-    ``fs`` is the field-non-uniformity indicator (= F4, Eq. B.8)."""
+    ``fs`` is the field-non-uniformity indicator (= F4, Eq. B.8).
+    """
 
     ft: np.ndarray | None
     f_pi_unsigned: np.ndarray
@@ -710,7 +713,8 @@ class PrecisionCriteria:
     through criterion 4
     or, where evaluated, criterion 5 (C.1.6.2: a band satisfying criterion 5
     is qualified as a final result even if :math:`F_\mathrm{S}(2) \ge 2`); ``None``
-    unless both criterion 1 and criterion 2 are evaluable."""
+    unless both criterion 1 and criterion 2 are evaluable.
+    """
 
     criterion_1: np.ndarray | None
     criterion_2: np.ndarray | None
@@ -785,7 +789,8 @@ class PrecisionIntensityResult:
     where :math:`P \le 0` (``not_applicable_band`` True, clause 9.2).
     ``sound_power_level_normalized`` is ``LW0`` normalized to 23 deg C /
     101 325 Pa (Eq. 10). ``sound_power_level_a`` is the A-weighted total over
-    applicable bands (``NaN`` without ``frequencies`` and more than one band)."""
+    applicable bands (``NaN`` without ``frequencies`` and more than one band).
+    """
 
     frequencies: np.ndarray | None
     partial_power: np.ndarray

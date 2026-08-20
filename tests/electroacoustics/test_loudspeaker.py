@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the IEC 60268-5 loudspeaker rated characteristics and their
+"""Tests for the IEC 60268-5 loudspeaker rated characteristics and their
 ``.report()`` fiche (characteristics model + PDF rendering).
 
 The two computed characteristics are checked against IEC 60268-5's own

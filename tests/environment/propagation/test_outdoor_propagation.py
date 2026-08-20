@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for ISO 9613-2:1996 outdoor sound propagation (general method).
+"""Tests for ISO 9613-2:1996 outdoor sound propagation (general method).
 
 Normative anchors (ISO 9613-2:1996):
 - Eq. (3): LfT(DW) = Lw + Dc - A.

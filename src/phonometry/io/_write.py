@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Base-install WAV writing: scipy where it already serves, in-house where not.
+r"""Base-install WAV writing: scipy where it already serves, in-house where not.
 
 :func:`scipy.io.wavfile.write` covers most of what a measurement export
 needs -- PCM 16/32, IEEE float 32/64, and automatic RF64 promotion when the

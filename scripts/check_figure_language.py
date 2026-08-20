@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Find English text inside the Spanish edition of a figure.
+r"""Find English text inside the Spanish edition of a figure.
 
 Every figure ships in four variants (``X.svg``, ``X_dark.svg``, ``X_es.svg``,
 ``X_es_dark.svg``), and the Spanish ones are not drawn in Spanish. The figure
@@ -18,8 +18,8 @@ Two ways of looking for it do not work:
 
 * **Diffing the text nodes of ``X.svg`` and ``X_es.svg``.** A label with any
   mathtext in it is not a string in the file: matplotlib lays it out glyph by
-  glyph, so ``$|\\mu|$ = fluid / frame displacement`` is written as thirty
-  positioned ``<tspan>``\\ s with the mu pushed to the end (biot_waves_es.svg,
+  glyph, so ``$|\mu|$ = fluid / frame displacement`` is written as thirty
+  positioned ``<tspan>``\ s with the mu pushed to the end (biot_waves_es.svg,
   as committed). There is nothing there to look up in a table or to name in a
   report. Nor does that method reach a label a tick formatter builds at draw
   time: it is on no ``Text`` artist beforehand, which is why

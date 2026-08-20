@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Installed structure-borne sound from service equipment (EN 12354-5:2009).
+r"""Installed structure-borne sound from service equipment (EN 12354-5:2009).
 
 EN 12354-5 predicts the sound pressure level in a receiving room caused by
 building service equipment that injects **structure-borne sound** into the
@@ -1000,7 +999,8 @@ class InstalledSourceResult:
     @property
     def overall_level(self) -> float:
         r"""Band-summed total level :math:`10 \log_{10}(\sum 10^{0.1 L_\mathrm{n,s}})`,
-        in dB."""
+        in dB.
+        """
         lt = np.atleast_1d(np.asarray(self.total_level, dtype=np.float64))
         return float(10.0 * np.log10(np.sum(10.0 ** (0.1 * lt))))
 

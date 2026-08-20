@@ -341,7 +341,8 @@ def test_force_pulse_transform_matches_the_closed_form_spectrum() -> None:
 
 def test_over_critical_pulse_stays_positive() -> None:
     """H printed p. 279: "For over-critical oscillations, the force pulse decays
-    to zero and takes only positive values"."""
+    to zero and takes only positive values".
+    """
     stiffness, impedance = _plate("chipboard", 0.022)
     time = np.linspace(0.0, 0.02, 5000)
     pulse = building.force_pulse(time, stiffness, impedance)
@@ -527,7 +528,8 @@ def test_critical_case_is_inclusive_and_finite() -> None:
 
 def test_troughs_occur_at_odd_multiples_of_the_cut_off() -> None:
     """H printed p. 514: "deep troughs in the force spectra above the cut-off
-    frequency; these occur at frequencies n fco where n = 3, 5, 7, etc."."""
+    frequency; these occur at frequencies n fco where n = 3, 5, 7, etc.".
+    """
     impedance = _plate("concrete", 0.14)[1]
     stiffness = building.covering_contact_stiffness(2.8e8 * 0.005, 0.005)
     result = building.tapping_force_spectrum([1.0], stiffness, impedance)
@@ -568,7 +570,8 @@ def test_covering_improvement_is_zero_below_the_cut_off() -> None:
     """H printed p. 514: "Below fco the soft floor covering does not
     significantly alter the force input compared to the bare slab; hence it
     does not improve the impact sound insulation ... Below fco, DeltaL is
-    approximately 0 dB"."""
+    approximately 0 dB".
+    """
     plate_stiffness, impedance = _plate("concrete", 0.14)
     thickness = 0.005
     covering = building.covering_contact_stiffness(2.8e8 * thickness, thickness)
@@ -580,7 +583,8 @@ def test_covering_improvement_is_zero_below_the_cut_off() -> None:
 
 def test_two_line_estimate_rises_12_db_per_octave() -> None:
     """H printed p. 514: "the curves will tend towards a straight slope of
-    12 dB/octave (equivalent to 40 dB/decade) for f >= fco"."""
+    12 dB/octave (equivalent to 40 dB/decade) for f >= fco".
+    """
     plate_stiffness, impedance = _plate("concrete", 0.14)
     thickness = 0.005
     covering = building.covering_contact_stiffness(2.8e8 * thickness, thickness)
@@ -765,7 +769,8 @@ def test_covering_bands_are_the_iec_61260_base_ten_bands(
 
 def test_covering_improvement_result_carries_both_cut_offs() -> None:
     """The bare slab's own cut-off (about 7 kHz) is reported alongside the
-    covering's, since above it the bare force falls too (H printed p. 514)."""
+    covering's, since above it the bare force falls too (H printed p. 514).
+    """
     plate_stiffness, impedance = _plate("concrete", 0.14)
     thickness = 0.005
     covering = building.covering_contact_stiffness(2.8e8 * thickness, thickness)
@@ -828,7 +833,8 @@ def test_weighted_improvement_matches_the_printed_32_2_db() -> None:
 def test_asphalt_branch_is_the_40_lg_law() -> None:
     """ISO 12354-2:2017 Formula (C.3), ``DeltaL = 40 lg(f/fo)`` for asphalt and
     dry floating floors; H Eq. (4.119) is the same law from Cremer's
-    infinite-plate derivation, "12 dB per octave" (V printed p. 308)."""
+    infinite-plate derivation, "12 dB per octave" (V printed p. 308).
+    """
     freqs = np.array([100.0, 200.0, 400.0, 800.0])
     result = building.floating_floor_improvement_spectrum(
         freqs, resonance_frequency=50.0, model="cremer"
@@ -839,7 +845,8 @@ def test_asphalt_branch_is_the_40_lg_law() -> None:
 
 def test_en12354_branch_is_the_30_lg_law() -> None:
     """ISO 12354-2:2017 Formula (C.1) / H Eq. (4.124): 30 lg(f/fo), i.e. the
-    "9 dB per octave" of V printed p. 308, and 0 dB at and below ``fo``."""
+    "9 dB per octave" of V printed p. 308, and 0 dB at and below ``fo``.
+    """
     freqs = np.array([25.0, 50.0, 100.0, 200.0])
     result = building.floating_floor_improvement_spectrum(
         freqs, resonance_frequency=50.0

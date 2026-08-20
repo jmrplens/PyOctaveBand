@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Field measurement of sound insulation: airborne (ISO 16283-1:2014), impact
+r"""Field measurement of sound insulation: airborne (ISO 16283-1:2014), impact
 (ISO 16283-2) and facade (ISO 16283-3:2016).
 
 **Field quantities (ISO 16283-1:2014).** From the energy-average sound
@@ -381,6 +380,7 @@ class FacadeInsulationResult:
     method: str = "loudspeaker"
 
     def __post_init__(self) -> None:
+        """Reject a ``method`` other than ``"loudspeaker"`` or ``"road_traffic"``."""
         if self.method not in _FACADE_CORRECTION:
             raise ValueError(
                 "'method' must be 'loudspeaker' or 'road_traffic', got "
@@ -612,8 +612,7 @@ def _render_iso16283_facade(
 def energy_average_level(
     levels: Sequence[float] | np.ndarray, axis: int = -1
 ) -> np.ndarray | float:
-    r"""
-    Energy-average sound pressure level (ISO 16283-1:2014, Formula (9)).
+    r"""Energy-average sound pressure level (ISO 16283-1:2014, Formula (9)).
 
     Combines sound pressure levels measured at several microphone
     positions into
@@ -702,8 +701,7 @@ def airborne_insulation(
     volume: float | None = None,
     t0: float = 0.5,
 ) -> AirborneInsulationResult:
-    r"""
-    Field airborne sound insulation per ISO 16283-1:2014.
+    r"""Field airborne sound insulation per ISO 16283-1:2014.
 
     Computes, per frequency band, the level difference
     :math:`D = L_1 - L_2`
@@ -776,8 +774,7 @@ def impact_insulation(
     volume: float | None = None,
     t0: float = 0.5,
 ) -> ImpactInsulationResult:
-    r"""
-    Field impact sound insulation per ISO 16283-2 (tapping machine).
+    r"""Field impact sound insulation per ISO 16283-2 (tapping machine).
 
     Computes, per frequency band, the standardized impact sound pressure
     level :math:`L'_\mathrm{nT} = L_\mathrm{i} - 10 \log_{10}(T/T_0)` (Formula (1)) and, when the
@@ -869,8 +866,7 @@ def facade_insulation(
     t0: float = 0.5,
     frequencies: Sequence[float] | np.ndarray | None = None,
 ) -> FacadeInsulationResult:
-    r"""
-    Field façade sound insulation per ISO 16283-3:2016.
+    r"""Field façade sound insulation per ISO 16283-3:2016.
 
     Computes, per frequency band, the global-method level difference
     :math:`D_{2\mathrm{m}} = L_{1,2\mathrm{m}} - L_2` (Clause 3.14), its standardized form

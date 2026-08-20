@@ -213,7 +213,8 @@ def test_correlated_budget_requires_explicit_coverage_factor() -> None:
     the GUM defines no correlated form: with finite input dof the effective
     dof are undefined (NaN) and expanded() demands an explicit coverage
     factor, instead of a meaningless (possibly ~1e-5) effective dof that
-    explodes the coverage factor or an invented normal fallback."""
+    explodes the coverage factor or an invented normal fallback.
+    """
     qs = [u.Quantity(10.0, 0.1, dof=5), u.Quantity(10.0, 0.1, dof=5)]
     r = np.array([[1.0, 0.999], [0.999, 1.0]])
     with pytest.warns(u.UncertaintyWarning, match="Welch-Satterthwaite"):
@@ -233,7 +234,8 @@ def test_correlated_budget_requires_explicit_coverage_factor() -> None:
 
 def test_correlated_budget_with_infinite_dof_stays_normal() -> None:
     """All-infinite input dof: the output is treated as normal regardless of
-    correlation, so veff stays infinite and no warning fires."""
+    correlation, so veff stays infinite and no warning fires.
+    """
     qs = [u.Quantity(10.0, 0.1), u.Quantity(10.0, 0.1)]
     r = np.array([[1.0, 0.5], [0.5, 1.0]])
     result = u.combine_uncertainty(lambda a, b: a + b, qs, correlation=r)
@@ -246,7 +248,8 @@ def test_sensitivity_step_stays_local_on_nonlinear_model() -> None:
     """The finite-difference step is the input uncertainty with only a
     64-ULP floor: for a large-magnitude input with structure at the
     uncertainty scale, a sqrt(eps)*|x| step (~15 units at 1e9) would probe
-    far outside the uncertainty region and bias the sensitivity."""
+    far outside the uncertainty region and bias the sensitivity.
+    """
     x0, ux = 1.0e9, 1.0e-3
 
     def model(x):
@@ -260,7 +263,8 @@ def test_sensitivity_step_stays_local_on_nonlinear_model() -> None:
 
 def test_identity_correlation_keeps_welch_satterthwaite() -> None:
     """An explicit identity matrix is the uncorrelated case: the finite input
-    dof still propagate (no fallback, no warning)."""
+    dof still propagate (no fallback, no warning).
+    """
     qs = [u.Quantity(0.0, 1.0, dof=10) for _ in range(4)]
     result = u.combine_uncertainty(_add4, qs, correlation=np.eye(4))
     assert result.effective_dof == pytest.approx(40.0, abs=1e-6)
@@ -270,7 +274,8 @@ def test_sensitivity_step_survives_tiny_relative_uncertainty() -> None:
     """M10 regression: xi = 1e9 with u = 1e-6 used to underflow the 1e-9
     perturbation below np.spacing(1e9) = 1.2e-7, zeroing both sensitivities
     and reporting uc = 0. The step max(u, sqrt(eps)|x|) recovers the exact
-    uc = sqrt(2) * 1e-6."""
+    uc = sqrt(2) * 1e-6.
+    """
     qs = [u.Quantity(1e9, 1e-6), u.Quantity(1e9, 1e-6)]
     result = u.combine_uncertainty(lambda a, b: a + b, qs)
     np.testing.assert_allclose(result.sensitivities, 1.0, rtol=1e-6)
@@ -280,7 +285,8 @@ def test_sensitivity_step_survives_tiny_relative_uncertainty() -> None:
 def test_flat_direction_warns_but_computes() -> None:
     """A model genuinely flat along one input (here b, multiplied by zero)
     warns that its uncertainty does not propagate, and the rest of the budget
-    is unaffected."""
+    is unaffected.
+    """
     qs = [u.Quantity(3.0, 0.1), u.Quantity(4.0, 0.2)]
     with pytest.warns(u.UncertaintyWarning, match="does not change"):
         result = u.combine_uncertainty(lambda a, b: a + 0.0 * b, qs)
@@ -316,7 +322,8 @@ def _h1_budget() -> u.UncertaintyResult:
 def test_gum_h1_end_to_end_combined_uncertainty() -> None:
     """GUM H.1.4/H.1.6: l = 50 000 838 nm, uc = 32 nm (31.71 unrounded),
     contributions (25, 9.7, 0, 0, 2.9, 16.7) nm, veff = 16.7 (printed
-    truncated to 16)."""
+    truncated to 16).
+    """
     from reference_data import (
         GUM_H1_CONTRIBUTIONS,
         GUM_H1_UC,
@@ -333,7 +340,8 @@ def test_gum_h1_end_to_end_combined_uncertainty() -> None:
 
 def test_gum_h1_expanded_uncertainty_99() -> None:
     """GUM H.1.6: U99 = 93 nm at k(0.99, veff=16) = 2.92; interpolating at
-    the untruncated veff = 16.66 (G.4.2 NOTE 1) gives 92.1 nm."""
+    the untruncated veff = 16.66 (G.4.2 NOTE 1) gives 92.1 nm.
+    """
     from reference_data import GUM_H1_U99
 
     result = _h1_budget()
@@ -382,7 +390,8 @@ def test_gum_h2_correlated_measurement() -> None:
 
 def test_monte_carlo_matches_supplement1_table2_gaussian() -> None:
     """Supplement 1 Table 2 (clause 9.2.2): four standard Gaussian Xi ->
-    u(y) = 2.00 and the 95 % symmetric interval [-3.92, 3.92]."""
+    u(y) = 2.00 and the 95 % symmetric interval [-3.92, 3.92].
+    """
     from reference_data import GUMS1_TABLE2_INTERVAL_95
 
     qs = [u.Quantity(0.0, 1.0) for _ in range(4)]

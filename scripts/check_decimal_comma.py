@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Name the labels whose Spanish decimal the save-time comma pass will skip.
+r"""Name the labels whose Spanish decimal the save-time comma pass will skip.
 
 The Spanish edition of a figure is the English one with its text rewritten at
 save time, and the last step of that rewrite is the decimal comma::
 
-    if s and "$" not in s and re.search(r"\\d\\.\\d", s):
+    if s and "$" not in s and re.search(r"\d\.\d", s):
         artist.set_text(_decimal_comma(s))
 
 The guard is deliberate -- a bare comma inside ``$...$`` sets as a maths
@@ -12,7 +12,7 @@ separator with the wrong spacing -- but it tests the WHOLE string. So a label
 that carries mathematics ANYWHERE and a decimal number ANYWHERE ELSE keeps the
 English point in its Spanish variant:
 
-    "$L_\\mathrm{eq}$ = 52.4 dB"   ->  Spanish figure still prints 52.4
+    "$L_\mathrm{eq}$ = 52.4 dB"   ->  Spanish figure still prints 52.4
 
 Nothing downstream can see it. The language gate compares what each pass could
 not translate, and a number is not a word; the parity check sees a pair,

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Normal equal-loudness-level contours per ISO 226:2023.
+"""Normal equal-loudness-level contours per ISO 226:2023.
 
 Implements Formula (1) (clause 4.1: SPL of a pure tone from its loudness
 level) and Formula (2) (clause 4.2: the inverse) with the Table 1 (p. 4)
@@ -84,8 +83,7 @@ def _spl_from_phon(frequency: float, phon: float) -> float:
 
 
 def equal_loudness_contour(phon: float) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Normal equal-loudness-level contour (ISO 226:2023 Formula 1).
+    """Normal equal-loudness-level contour (ISO 226:2023 Formula 1).
 
     Returns the sound pressure levels of pure tones judged equally loud as
     a 1 kHz tone at ``phon`` dB SPL, at the 29 preferred third-octave
@@ -109,8 +107,7 @@ def equal_loudness_contour(phon: float) -> tuple[np.ndarray, np.ndarray]:
 
 
 def loudness_level(spl: float, frequency: float) -> float:
-    """
-    Loudness level of a pure tone (ISO 226:2023 Formula 2).
+    """Loudness level of a pure tone (ISO 226:2023 Formula 2).
 
     :param spl: Sound pressure level of the tone in dB re 20 uPa.
     :param frequency: Tone frequency in Hz; must be one of the 29 preferred
@@ -127,8 +124,7 @@ def loudness_level(spl: float, frequency: float) -> float:
 
 
 def hearing_threshold() -> tuple[np.ndarray, np.ndarray]:
-    """
-    Threshold of hearing T_f (ISO 226:2023 Table 1).
+    """Threshold of hearing T_f (ISO 226:2023 Table 1).
 
     :return: Tuple ``(frequencies, threshold)`` in Hz and dB re 20 uPa.
     """
@@ -200,8 +196,7 @@ def equal_loudness_contours(
     phons: Sequence[float] = _DEFAULT_PHONS,
     frequencies: Sequence[float] | np.ndarray | None = None,
 ) -> EqualLoudnessContours:
-    """
-    Build the ISO 226:2023 equal-loudness-level contour family.
+    """Build the ISO 226:2023 equal-loudness-level contour family.
 
     Evaluates :func:`equal_loudness_contour` at each level in ``phons`` and
     :func:`hearing_threshold`, and bundles them into an

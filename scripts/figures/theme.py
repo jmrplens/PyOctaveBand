@@ -366,8 +366,7 @@ def plot_psd(
 def measure_weighting_response(
     fs: int, curve: str, freqs: "np.ndarray | None" = None
 ) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Measure a weighting curve the way the docs figure plots it: impulse
+    """Measure a weighting curve the way the docs figure plots it: impulse
     response through the real filter path, evaluated with ``freqz`` (DTFT
     of the measured response).
 

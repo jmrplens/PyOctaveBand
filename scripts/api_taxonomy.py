@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Taxonomy for the generated API reference (scripts/generate_api_docs.py).
+"""Taxonomy for the generated API reference (scripts/generate_api_docs.py).
 
 Maps every public phonometry module to a documentation section. Sections
 become directories under ``site/src/content/docs/reference/api/<section>/``

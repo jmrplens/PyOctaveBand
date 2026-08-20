@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Every electroacoustic measurement takes a ``Signal`` in place of ``(x, fs)``.
+"""Every electroacoustic measurement takes a ``Signal`` in place of ``(x, fs)``.
 
 Same contract as ``signals``, ``filters`` and ``signals.levels``, held by
 ``phonometry.io._resolve``: the object supplies the rate when ``fs`` is

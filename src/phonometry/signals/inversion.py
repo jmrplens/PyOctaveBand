@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Regularized spectral inversion with frequency-dependent regularization.
+r"""Regularized spectral inversion with frequency-dependent regularization.
 
 Inverting a measured transfer function -- to equalize a measurement
 loudspeaker, flatten a microphone response or post-process an acquired
@@ -113,6 +112,7 @@ class InverseFilterResult:
         return np.asarray(self.inverse, dtype=dtype)
 
     def __len__(self) -> int:
+        """Number of inverse-filter samples, the ``n_fft`` of the design."""
         return int(self.inverse.shape[-1])
 
     @property
@@ -251,8 +251,7 @@ def regularized_inverse_filter(
     n_fft: int | None = None,
     delay: int | None = None,
 ) -> InverseFilterResult:
-    r"""
-    Design a regularized inverse filter for a measured impulse response.
+    r"""Design a regularized inverse filter for a measured impulse response.
 
     Computes the frequency-dependent Tikhonov inverse of Kirkeby & Nelson
     (JAES 47(7/8), 1999, Eq. (17)),

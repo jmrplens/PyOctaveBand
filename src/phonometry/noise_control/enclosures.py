@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Insertion loss of a close or free-standing machine enclosure.
+r"""Insertion loss of a close or free-standing machine enclosure.
 
 Wrapping a machine in a sealed enclosure reduces the radiated noise by the
 transmission loss of its panels, *minus* a penalty for the reverberant build-up

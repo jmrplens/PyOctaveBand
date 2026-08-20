@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Near-to-far-field (NTFF) transformation: analytic and full-wave oracles.
+"""Near-to-far-field (NTFF) transformation: analytic and full-wave oracles.
 
 The contour capture and the 2D Kirchhoff-Helmholtz integral are checked in
 three tiers, each independent of the code under test:

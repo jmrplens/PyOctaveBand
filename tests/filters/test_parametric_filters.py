@@ -1,7 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for parametric filters: Weighting (A, C), Time Weighting and Linkwitz-Riley.
-"""
+"""Tests for parametric filters: Weighting (A, C), Time Weighting and Linkwitz-Riley."""
 
 import numpy as np
 import pytest
@@ -10,8 +8,7 @@ from phonometry import filters, metrology
 
 
 def test_calibration_logic() -> None:
-    """
-    Verify that calibration correctly maps digital RMS to target SPL.
+    """Verify that calibration correctly maps digital RMS to target SPL.
 
     **Purpose:**
     Confirm that the `sensitivity` function produces a multiplier that accurately
@@ -48,8 +45,7 @@ def test_calibration_logic() -> None:
 
 
 def test_dbfs_logic() -> None:
-    """
-    Verify dBFS mode returns RMS relative to 1.0.
+    """Verify dBFS mode returns RMS relative to 1.0.
 
     **Purpose:**
     Ensure the `dbfs=True` option correctly calculates decibels relative to full scale (0 dBFS = RMS of 1.0).
@@ -77,8 +73,7 @@ def test_dbfs_logic() -> None:
 
 
 def test_peak_mode_logic() -> None:
-    """
-    Verify that Peak mode returns the absolute maximum of the filtered band.
+    """Verify that Peak mode returns the absolute maximum of the filtered band.
 
     **Purpose:**
     Addressing Issue #10 regarding consistency with professional software (peak-holding).
@@ -107,8 +102,7 @@ def test_peak_mode_logic() -> None:
 
 
 def test_a_weighting_response() -> None:
-    """
-    Verify A-weighting frequency response.
+    """Verify A-weighting frequency response.
 
     **Purpose:**
     Confirm that the A-weighting filter matches the standardized IEC 61672-1:2013 gains at key frequencies.
@@ -141,8 +135,7 @@ def test_a_weighting_response() -> None:
 
 
 def test_c_weighting_response() -> None:
-    """
-    Verify C-weighting frequency response.
+    """Verify C-weighting frequency response.
 
     **Purpose:**
     Confirm that the C-weighting filter matches the standardized IEC 61672-1:2013 gains.
@@ -204,8 +197,7 @@ def test_weighting_filter_class_direct_use() -> None:
 
 
 def test_time_weighting_fast() -> None:
-    """
-    Verify Fast (125ms) time weighting response to a step.
+    r"""Verify Fast (125ms) time weighting response to a step.
 
     **Purpose:**
     Validate the exponential integration constant ($\tau$) for time ballistics.
@@ -230,9 +222,7 @@ def test_time_weighting_fast() -> None:
 
 
 def test_time_weighting_initial_state_first() -> None:
-    """
-    Verify that initial_state='first' starts the integrator from the first energy value.
-    """
+    """Verify that initial_state='first' starts the integrator from the first energy value."""
     fs = 1000
     x = np.ones(fs)
 
@@ -242,9 +232,7 @@ def test_time_weighting_initial_state_first() -> None:
 
 
 def test_time_weighting_initial_state_custom() -> None:
-    """
-    Verify custom initial_state matches the recursive equation with y[-1] set.
-    """
+    """Verify custom initial_state matches the recursive equation with y[-1] set."""
     fs = 1000
     tau = 0.125
     alpha = 1 - np.exp(-1 / (fs * tau))
@@ -293,9 +281,7 @@ def test_time_weighting_initial_state_array_per_channel() -> None:
 
 
 def test_time_weighting_initial_state_multichannel_first() -> None:
-    """
-    Verify initial_state='first' is applied independently per channel.
-    """
+    """Verify initial_state='first' is applied independently per channel."""
     fs = 1000
     x = np.vstack([np.ones(fs), 2 * np.ones(fs)])
 
@@ -306,9 +292,7 @@ def test_time_weighting_initial_state_multichannel_first() -> None:
 
 
 def test_time_weighting_initial_state_invalid() -> None:
-    """
-    Verify invalid initial_state names are rejected.
-    """
+    """Verify invalid initial_state names are rejected."""
     fs = 1000
     x = np.ones(fs)
 
@@ -361,8 +345,7 @@ def test_time_weighting_impulse_initial_state_first_1d() -> None:
 
 
 def test_linkwitz_riley_sum() -> None:
-    """
-    Verify that the sum of Linkwitz-Riley bands is flat.
+    """Verify that the sum of Linkwitz-Riley bands is flat.
 
     **Purpose:**
     The defining characteristic of an LR4 crossover is that the combined response of the
@@ -392,8 +375,7 @@ def test_linkwitz_riley_sum() -> None:
 
 
 def test_weighting_z_bypass() -> None:
-    """
-    Verify Z-weighting is a bypass.
+    """Verify Z-weighting is a bypass.
 
     **Purpose:**
     Confirm that 'Z' (Zero weighting) does not modify the signal.
@@ -411,8 +393,7 @@ def test_weighting_z_bypass() -> None:
 
 
 def test_time_weighting_int16_no_overflow() -> None:
-    """
-    Verify integer input does not overflow when squared internally.
+    """Verify integer input does not overflow when squared internally.
 
     **Purpose:**
     int16 audio (e.g. from ``scipy.io.wavfile.read``) previously overflowed
@@ -436,8 +417,7 @@ def test_time_weighting_int16_no_overflow() -> None:
 
 
 def test_sensitivity_int16_matches_float() -> None:
-    """
-    Verify calibration works with integer reference recordings.
+    """Verify calibration works with integer reference recordings.
 
     **Purpose:**
     ``sensitivity`` previously squared the raw integer array,
@@ -477,8 +457,7 @@ def _measured_gain_db(wf: filters.WeightingFilter, fs: int, f0: float) -> float:
 
 @pytest.mark.parametrize("fs", [44100, 48000])
 def test_a_weighting_class1_high_frequencies(fs: int) -> None:
-    """
-    Verify A-weighting stays within IEC 61672-1 class 1 tolerances at HF.
+    """Verify A-weighting stays within IEC 61672-1 class 1 tolerances at HF.
 
     **Purpose:**
     The plain bilinear design compresses the response near Nyquist: at
@@ -545,8 +524,7 @@ def _analytic_c_weight_db(f: float) -> float:
 
 @pytest.mark.parametrize("fs", [44100, 48000])
 def test_c_weighting_class1_high_frequencies(fs: int) -> None:
-    """
-    Verify C-weighting stays within IEC 61672-1 class 1 tolerances at HF.
+    """Verify C-weighting stays within IEC 61672-1 class 1 tolerances at HF.
 
     **Purpose:**
     Same oversampled design path as the A curve; dedicated regression so a
@@ -571,8 +549,7 @@ def test_weighting_filter_empty_signal_high_accuracy() -> None:
 
 
 def test_a_weighting_positive_gain_region() -> None:
-    """
-    Verify the A-curve is POSITIVE between 1.25 and 5 kHz (IEC 61672-1 Table 2).
+    """Verify the A-curve is POSITIVE between 1.25 and 5 kHz (IEC 61672-1 Table 2).
 
     **Purpose:**
     The A-weighting models equal-loudness sensitivity: the ear is MORE

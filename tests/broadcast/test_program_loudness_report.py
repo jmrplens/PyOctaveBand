@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the EBU R 128 programme-loudness report (``.report()`` -> PDF).
+"""Tests for the EBU R 128 programme-loudness report (``.report()`` -> PDF).
 
 These tests assert both structural facts (a valid single-page PDF is written
 for a measured programme, unknown engines/tolerances are rejected, a compliant
@@ -213,7 +212,8 @@ def test_verdict_follows_displayed_rounding_at_boundary() -> None:
 
 def test_fiche_pins_displayed_numbers(tmp_path) -> None:
     """The rendered fiche shows the QC tolerance, its R 128 item and the
-    0.1 LU rounded measured loudness."""
+    0.1 LU rounded measured loudness.
+    """
     result = _case1_result()
     out = tmp_path / "pins.pdf"
     result.report(str(out), metadata=ReportMetadata(requirement=-23.0))

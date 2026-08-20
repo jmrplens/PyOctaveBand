@@ -1,7 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests that the filter-bank design work is reused rather than repeated.
-"""
+"""Tests that the filter-bank design work is reused rather than repeated."""
 
 import time
 from typing import Any
@@ -36,8 +34,7 @@ def design_counter(monkeypatch: pytest.MonkeyPatch) -> _DesignCounter:
 
 
 def test_filterbank_reuse_skips_redesign(design_counter: _DesignCounter) -> None:
-    """
-    Verify that reusing OctaveFilterBank designs its coefficients exactly once.
+    """Verify that reusing OctaveFilterBank designs its coefficients exactly once.
 
     **Purpose:**
     The class-based API exists so that the SOS design runs at construction and
@@ -81,8 +78,7 @@ def test_filterbank_reuse_skips_redesign(design_counter: _DesignCounter) -> None
 
 
 def test_octave_filter_cache_reuses_the_bank(design_counter: _DesignCounter) -> None:
-    """
-    Verify that repeated ``octave_filter`` calls share one design.
+    """Verify that repeated ``octave_filter`` calls share one design.
 
     **Purpose:**
     ``_cached_filter_bank`` is what makes the functional API affordable in a
@@ -106,8 +102,7 @@ def test_octave_filter_cache_reuses_the_bank(design_counter: _DesignCounter) -> 
 
 
 def test_filterbank_reuse_is_not_slower() -> None:
-    """
-    Report the wall-clock cost of both paths, without gating on it.
+    """Report the wall-clock cost of both paths, without gating on it.
 
     **Purpose:**
     The timings are what a reader of this file wants to see, and they are worth

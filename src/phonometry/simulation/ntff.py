@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-2D near-to-far-field (NTFF) transformation over a closed contour.
+r"""2D near-to-far-field (NTFF) transformation over a closed contour.
 
 Given the steady-state pressure and outward normal velocity phasors on a
 closed contour that encloses a scatterer (or any source region), the
@@ -106,6 +105,7 @@ class ContourPhasors:
     segment: float
 
     def __post_init__(self) -> None:
+        """Check positive scalars, matched shapes and finite samples; coerce dtypes."""
         if not np.isfinite(self.frequency) or self.frequency <= 0.0:
             raise ValueError("frequency must be positive and finite")
         if not np.isfinite(self.segment) or self.segment <= 0.0:

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-IEC 61260-1:2014 band-filter class verification.
+r"""IEC 61260-1:2014 band-filter class verification.
 
 Acceptance limits on relative attenuation transcribed from the
 official text (BS EN 61260-1:2014, **Table 1**, standard pages 15-16):
@@ -129,8 +128,7 @@ _FILTER_EDITIONS: dict[str, dict[str, Any]] = {
 
 
 def _map_breakpoint(exponent: float, fraction: float) -> float:
-    r"""
-    Map an octave-band breakpoint :math:`G^x` to a fractional-octave one.
+    r"""Map an octave-band breakpoint :math:`G^x` to a fractional-octave one.
 
     BS EN 61260-1:2014 Formula (9): the high-frequency breakpoint for
     bandwidth designator 1/b is
@@ -148,8 +146,7 @@ def _map_breakpoint(exponent: float, fraction: float) -> float:
 def class_limits(
     fraction: float, filter_class: int, omega: np.ndarray, *, edition: str = "2014"
 ) -> tuple[np.ndarray, np.ndarray]:
-    r"""
-    Acceptance limits on relative attenuation at normalized frequencies.
+    r"""Acceptance limits on relative attenuation at normalized frequencies.
 
     :param fraction: Bandwidth designator denominator b (1 for octave,
         3 for one-third octave, ...).
@@ -283,8 +280,7 @@ def _verify_band(
 def verify_filter_class(
     bank: OctaveFilterBank, num_points: int = 2**15, *, edition: str = "2014"
 ) -> dict[str, Any]:
-    """
-    Verify a filter bank against the IEC 61260 class limits.
+    """Verify a filter bank against the IEC 61260 class limits.
 
     Each band's relative attenuation (referenced to the attenuation at its
     exact mid-band frequency) is checked against every acceptance-limit class of

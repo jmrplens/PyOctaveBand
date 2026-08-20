@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Slow-sound slit panels loaded with Helmholtz resonators (perfect absorbers).
+r"""Slow-sound slit panels loaded with Helmholtz resonators (perfect absorbers).
 
 A rigid panel perforated by a periodic array of thin closed slits, whose upper
 wall is loaded by an array of Helmholtz resonators (HRs), behaves as a

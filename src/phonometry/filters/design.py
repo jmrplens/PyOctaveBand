@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Band-filter design and visualization: the SOS designer behind the octave and
+"""Band-filter design and visualization: the SOS designer behind the octave and
 fractional-octave banks, and the response plot the banks draw with it.
 """
 
@@ -22,8 +21,7 @@ def _cheby2_transition_ratio(order: int, attenuation: float) -> float:
 def _cheby2_stopband_edges(
     fd: float, fu: float, order: int, attenuation: float, fs: float | None = None
 ) -> tuple[float, float]:
-    """
-    Map desired -3 dB band edges (fd, fu) to the Chebyshev II stopband
+    """Map desired -3 dB band edges (fd, fu) to the Chebyshev II stopband
     edges that scipy expects as ``Wn``.
 
     Uses the analog lowpass-to-bandpass transform: the stopband keeps the
@@ -55,8 +53,7 @@ def _cheby2_stopband_edges(
 
 
 def _cheby2_headroom(fraction: float, order: int, attenuation: float) -> float:
-    """
-    Headroom factor ``f2_stop / f_upper_edge`` needed above the band's upper
+    """Headroom factor ``f2_stop / f_upper_edge`` needed above the band's upper
     edge. Constant across bands of the same fraction (bands are geometric).
     """
     g = 10 ** (3 / 10)
@@ -79,8 +76,7 @@ def _design_sos_filter(
     show: bool = False,
     plot_file: str | None = None,
 ) -> list[np.ndarray]:
-    """
-    Generate SOS coefficients for the filter bank.
+    """Generate SOS coefficients for the filter bank.
 
     :param freq: Center frequencies.
     :param freq_d: Lower edge frequencies.
@@ -157,8 +153,7 @@ def _showfilter(
     plot_file: str | None = None,
     close: bool = True,
 ) -> None:
-    """
-    Visualize filter bank frequency response.
+    """Visualize filter bank frequency response.
 
     :param sos: List of SOS coefficients.
     :param freq: Center frequencies.

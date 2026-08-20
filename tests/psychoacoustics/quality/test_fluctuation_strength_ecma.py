@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-ECMA-418-2:2025 (Sottek Hearing Model) fluctuation-strength conformance tests.
+"""ECMA-418-2:2025 (Sottek Hearing Model) fluctuation-strength conformance tests.
 
 The primary oracle is the standard's own calibration (Clause 9, intro and
 9.1.11): a 1 kHz carrier, 100 % amplitude-modulated (m = 1) at 4 Hz and a

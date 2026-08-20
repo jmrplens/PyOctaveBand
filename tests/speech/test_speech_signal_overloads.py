@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-The speech measurements take a ``Signal`` in place of ``(x, fs)``.
+"""The speech measurements take a ``Signal`` in place of ``(x, fs)``.
 
 Same contract as the rest of the library, held by
 ``phonometry.io._resolve``: the object supplies the rate when ``fs`` is

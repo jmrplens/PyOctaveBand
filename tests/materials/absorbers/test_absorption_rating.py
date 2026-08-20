@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for ISO 11654:1997 single-number sound absorption rating (alpha_w).
+"""Tests for ISO 11654:1997 single-number sound absorption rating (alpha_w).
 
 Validation strategy: the standard's own numbers, not self-consistency.
 

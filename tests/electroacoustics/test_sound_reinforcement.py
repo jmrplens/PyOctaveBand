@@ -42,7 +42,8 @@ LEVEL_AT_LISTENER = 80.0
 
 def test_stability_margin_default_is_10_db() -> None:
     """Long p. 698: "This text uses a middle value of 10 dB for an equalised
-    system" (12 dB unequalised, 6 dB carefully equalised)."""
+    system" (12 dB unequalised, 6 dB carefully equalised).
+    """
     assert electroacoustics.DEFAULT_STABILITY_MARGIN == 10.0
 
 

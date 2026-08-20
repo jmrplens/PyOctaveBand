@@ -99,6 +99,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Docstrings hold one shape now. The summary sits on the first line, the
+  closing quotes take their own, and 873 docstrings moved to say so without
+  changing by a word. Where a docstring carries backslashes (matplotlib
+  mathtext, regular expressions) it is a raw string now, 37 sites, under one
+  invariant: the value Python stores in `__doc__` stays byte-identical,
+  checked by parsing the tree before and after. The check earned its keep
+  once. One test docstring wrote `\tau` twice and `\approx` once inside a
+  cooked string, so the stored value held a tab and a bell character where
+  the source shows mathematics; the raw prefix is the repair, and it is the
+  only docstring whose value moved.
+
+  Twenty-one magic methods explain themselves now: mostly the
+  `__post_init__` of a dataclass naming what it rejects, and `__len__` and
+  `__getitem__` naming what they count and where they forward.
+
+  The docstring rules that judge prose rather than shape stay out, measured
+  one by one. `D401` would put 999 summaries in the imperative mood; `D205`
+  would fold the deliberate multi-line opening sentence of 516 docstrings;
+  `D403` would capitalise `dBFS`, `dL` and `matplotlib`; and `D400`'s nine
+  missing periods are four questions that rightly end in their own mark and
+  five sentences that finish on the next line. `D210` stands down in the
+  tests alone, where a docstring may open with the clause it checks quoted
+  verbatim, and the space it objects to is all that separates the quotation
+  mark from the triple quote.
+
 - Imports say what they are for, and names say what they are. An import that
   only a type checker needs sits under `if TYPE_CHECKING` now, 313 of them; a
   well-known package is imported under the alias everyone writes, 190 of them;

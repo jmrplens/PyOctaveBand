@@ -202,7 +202,8 @@ def _plate_top(
 ) -> None:
     """Horizontal slab in oblique projection: top face, front face and the
     visible right end face. ``(x0, y0)`` = front-left corner of the top face,
-    ``w`` its width, ``dp`` its oblique depth and ``t`` its thickness."""
+    ``w`` its width, ``dp`` its oblique depth and ``t`` its thickness.
+    """
     dxo, dyo = dp * 0.72, dp * 0.55
     s.path(
         f"M {x0} {y0} L {x0 + w} {y0} L {x0 + w + dxo} {y0 - dyo} "
@@ -225,7 +226,8 @@ def _plate_up(
     s: SVG, th: Theme, x0: float, y_base: float, t: float, h: float, dp: float
 ) -> None:
     """Vertical slab in oblique projection standing on ``y_base``: front
-    edge face, top face and the visible right-hand surface."""
+    edge face, top face and the visible right-hand surface.
+    """
     dxo, dyo = dp * 0.72, dp * 0.55
     y_top = y_base - h
     s.rect(x0, y_top, t, h, th.panel, th.fg, sw=1.8)

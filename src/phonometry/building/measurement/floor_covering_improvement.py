@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Impact-sound improvement of floor coverings on a small mock-up
+r"""Impact-sound improvement of floor coverings on a small mock-up
 (ISO 16251-1:2014).
 
 Laboratory method for the **improvement of impact sound insulation** ``ΔL`` of a
@@ -45,7 +44,8 @@ rating bands 100 Hz to 3150 Hz; a wider clause 6.3 spectrum (18 bands 100-5000
 Hz, optionally extended to 50 Hz) is rated on that sub-range. The statement of
 results (Clause 8 e)) also carries the spectrum adaptation term ``CI,Δ`` (ISO
 717-2:2020 Formula (A.4)) via
-:func:`phonometry.building.impact_improvement_adaptation_term`."""
+:func:`phonometry.building.impact_improvement_adaptation_term`.
+"""
 
 from __future__ import annotations
 

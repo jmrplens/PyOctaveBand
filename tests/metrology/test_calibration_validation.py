@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Calibration-tone stability validation (IEC 60942:2017).
+"""Calibration-tone stability validation (IEC 60942:2017).
 
 IEC 60942:2017 (EN IEC 60942:2018) 5.3.3: the short-term level fluctuation is
 measured with time-weighting F over 60 s, sampling at least 30 times; the
@@ -95,7 +94,8 @@ def test_multichannel_stable_at_different_levels_no_warning() -> None:
 
 def test_default_limit_follows_iec_60942_2017_table2() -> None:
     """~0.13 dB fluctuation: over the 0.07 dB class 1 limit at 1 kHz, but
-    within the 0.20 dB limit for a 31.5-63 Hz nominal frequency (Table 2)."""
+    within the 0.20 dB limit for a 31.5-63 Hz nominal frequency (Table 2).
+    """
     x = _cal_tone(am_depth=0.015)
     with pytest.warns(metrology.CalibrationWarning, match="Table 2"):
         metrology.sensitivity(x, fs=FS)
@@ -116,7 +116,8 @@ def test_asymmetric_fluctuation_uses_max_min_vs_mean() -> None:
 
 def test_narrowband_rejects_broadband_noise() -> None:
     """A noisy calibrator take biases the broadband-RMS factor low by
-    ``-10*lg(1 + 1/SNR)``; the narrowband tone estimator recovers it."""
+    ``-10*lg(1 + 1/SNR)``; the narrowband tone estimator recovers it.
+    """
     tone = _cal_tone(seconds=3.0)
     tone_power = float(np.mean(tone**2))
     rng = np.random.default_rng(0)
@@ -152,7 +153,8 @@ def test_narrowband_requires_fs() -> None:
 
 def test_table2_row_boundaries() -> None:
     """IEC 60942:2017 Table 2: 160 Hz belongs to the 0.07 dB row and 63 Hz
-    to the 0.20 dB row; the open interval between them gets 0.10 dB."""
+    to the 0.20 dB row; the open interval between them gets 0.10 dB.
+    """
     from phonometry.metrology.calibration import _class1_fluctuation_limit
 
     assert _class1_fluctuation_limit(63.0) == pytest.approx(0.20)

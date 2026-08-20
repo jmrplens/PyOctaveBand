@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Room-to-room noise reduction: source room, partition, receiving room, criterion.
+r"""Room-to-room noise reduction: source room, partition, receiving room, criterion.
 
 The other classic bookkeeping exercise of noise control, beside the duct-borne
 cascade of :mod:`phonometry.noise_control.duct_path`. A machine runs in one

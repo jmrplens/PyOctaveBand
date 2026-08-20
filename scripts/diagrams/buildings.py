@@ -1620,7 +1620,8 @@ def _d_iso12999(s: SVG, th: Theme) -> None:
 
 def _d_reception_plate(s: SVG, th: Theme) -> None:
     """EN 15657 reception plate: source machine on a resiliently supported
-    plate, averaged plate velocity, plate power balance."""
+    plate, averaged plate velocity, plate power balance.
+    """
     # ===== Source machine standing on the plate =====
     mx = 260.0
     s.text(mx, 150, "Source under test (pump, fan, boiler …)", 17, th.fg, bold=True)
@@ -1673,7 +1674,8 @@ def _d_reception_plate(s: SVG, th: Theme) -> None:
 
 def _d_installed_paths(s: SVG, th: Theme) -> None:
     """EN 12354-5: service equipment on a floor slab, structure-borne paths
-    into the receiving room below, and the prediction cascade."""
+    into the receiving room below, and the prediction cascade.
+    """
     bx0, bx1 = 80.0, 590.0
     top, slab_top, slab_bot, bot = 92.0, 296.0, 324.0, 528.0
 
@@ -1772,7 +1774,8 @@ def _d_insulation_lab(s: SVG, th: Theme) -> None:
     """ISO 10140 laboratory transmission suite in plan view: two
     structurally decoupled reverberant rooms, the test element mounted in
     the ~10 m2 test opening, a corner loudspeaker in the source room and a
-    continuously moving (rotating) microphone in each room."""
+    continuously moving (rotating) microphone in each room.
+    """
     top = 92.0
     sc = 72.0  # px per metre
     src_bot = top + 4.4 * sc  # source room 5.0 m x 4.4 m
@@ -1857,7 +1860,8 @@ def _d_insulation_lab(s: SVG, th: Theme) -> None:
 def _d_reverberation_prediction(s: SVG, th: Theme) -> None:
     """The guide's 10 x 7 x 3.5 m room through the Sabine and Eyring
     absorption terms into the per-band T60 table the library returns,
-    with the diffuse-field validity note."""
+    with the diffuse-field validity note.
+    """
     # Room data
     s.rect(170, 52, 560, 78, th.panel, th.fg, rx=10, sw=2)
     s.text(
@@ -1952,7 +1956,8 @@ def _d_panel_insulation(s: SVG, th: Theme) -> None:
     """A single 12.5 mm plasterboard leaf (m'' = 8.75 kg/m2) mounted in its
     test opening under diffuse incidence, with the predicted R(f) of
     ``single_panel_transmission_loss`` inset: the mass-law rise and the
-    coincidence dip at the fc = 2619 Hz of this leaf (Rw = 27 dB)."""
+    coincidence dip at the fc = 2619 Hz of this leaf (Rw = 27 dB).
+    """
     # --- test opening: heavy filler above and below, the leaf between ------
     px_l, px_r = 380.0, 396.0
     op_t, op_b = 108.0, 332.0
@@ -2085,7 +2090,8 @@ def _d_room_image_sources(s: SVG, th: Theme) -> None:
     """Plan of the guide's 7 x 5 x 3 m room with the source at (2, 1.6),
     the receiver at (5.2, 3.4) and the in-plane images of order 1 and 2 on
     the mirror-room grid, each labelled with its image_source_rir arrival
-    time (direct 10.7 ms, first reflections 17.3 to 21.6 ms)."""
+    time (direct 10.7 ms, first reflections 17.3 to 21.6 ms).
+    """
     sc = 32.0  # px per metre
 
     def x(mx: float) -> float:
@@ -2201,7 +2207,8 @@ def _d_room_image_sources(s: SVG, th: Theme) -> None:
 
 def _d_reception_plate_rigs(s: SVG, th: Theme) -> None:
     """The two plates EN 15657 clauses 7.2.2 and 7.3.2 specify, and the
-    three-plate bench of its Figure 2, drawn with conforming dimensions."""
+    three-plate bench of its Figure 2, drawn with conforming dimensions.
+    """
     top = 74.0
 
     # ===== Panel 1: the low-mobility plate in plan (clause 7.2.2) =====
@@ -2367,7 +2374,8 @@ def _d_reception_plate_rigs(s: SVG, th: Theme) -> None:
 
 def _d_iso16251_mockup(s: SVG, th: Theme) -> None:
     """The Annex A rig: the 1 200 x 800 x 200 mm slab on four elastic pads,
-    the covering specimen, the tapping machine and the accelerometers."""
+    the covering specimen, the tapping machine and the accelerometers.
+    """
     top = 74.0
 
     # ===== Left: a section through the rig =====
@@ -2799,7 +2807,8 @@ def _d_directivity_factor(s: SVG, th: Theme) -> None:
 
 def _d_decay_range(s: SVG, th: Theme) -> None:
     """The level budget of one band: INR, the truncation point and the three
-    ISO 3382 evaluation windows with their 15 dB margins."""
+    ISO 3382 evaluation windows with their 15 dB margins.
+    """
     x0, x1 = 118.0, 588.0  # time axis
     y0, y1 = 84.0, 384.0  # 0 dB to -70 dB
     per_db = (y1 - y0) / 70.0
@@ -2937,7 +2946,8 @@ def _d_decay_range(s: SVG, th: Theme) -> None:
 
 def _d_junction_catalogue(s: SVG, th: Theme) -> None:
     """The Annex E junction types, the three path branches and the mass ratio,
-    with the argument pair each drawing maps onto."""
+    with the argument pair each drawing maps onto.
+    """
     dark = bool(th.suffix)
     c_through = th.primary  # K13, the 'through' branch
     c_corner = "#f0a94e" if dark else "#d9820e"  # K12 = K23, the 'corner' branch
@@ -3520,7 +3530,8 @@ def _d_survey_sweep(s: SVG, th: Theme) -> None:
 
 def _d_iso12354_annexl(s: SVG, th: Theme) -> None:
     """The worked building both parts share: two stacked dwellings, the
-    separating floor and its four junctions, and where the thirteen paths run."""
+    separating floor and its four junctions, and where the thirteen paths run.
+    """
     top = 74.0
 
     # ===== Left: a section through the two dwellings =====
@@ -3665,7 +3676,8 @@ def _d_iso12354_annexl(s: SVG, th: Theme) -> None:
 
 def _d_resilient_buildups(s: SVG, th: Theme) -> None:
     """Floating floor, discrete mounts and a wall lining in section, each with
-    the formula its construction detail selects."""
+    the formula its construction detail selects.
+    """
     top = 74.0
     col = (48.0, 330.0, 612.0)
     cw = 240.0

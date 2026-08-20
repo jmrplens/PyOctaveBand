@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Zwicker loudness (ISO 532-1:2017) conformance tests.
+"""Zwicker loudness (ISO 532-1:2017) conformance tests.
 
 Expected values and tolerances come from the results workbooks of the
 freely downloadable ISO 532-1:2017 electronic attachment (Annex B),
@@ -164,7 +163,8 @@ def test_stationary_time_skip() -> None:
     leading silence and the filterbank onset do not dilute the mean square.
     A tone with 150 ms of leading silence (like the shipped WAVs) reads low
     without the skip and recovers the steady-tone value with it; invalid
-    skips raise."""
+    skips raise.
+    """
     lead = np.zeros(int(FS * 0.15))
     x = np.concatenate([lead, _tone(1000.0, 60.0, seconds=1.0, pad_ms=0.0)])
     n_all = psychoacoustics.loudness_zwicker(x, FS, stationary=True).loudness
@@ -186,7 +186,8 @@ def test_stationary_time_skip() -> None:
 
 def test_1khz_60db_anchor() -> None:
     """Definitional anchor: a 1 kHz tone at 40 phon is 1 sone; 60 dB -> 4 sone
-    (each 10 phon doubles loudness)."""
+    (each 10 phon doubles loudness).
+    """
     res = psychoacoustics.loudness_zwicker(
         _tone(1000.0, 60.0, seconds=2.0, pad_ms=0.0), FS, stationary=True
     )
@@ -220,7 +221,8 @@ def _read_wav_fullscale(path: str) -> tuple[np.ndarray, int]:
 
 def _read_wav_pa(path: pathlib.Path, peak_rms_db: float) -> tuple[np.ndarray, int]:
     """Read a 16-bit ISO test WAV and calibrate its peak short-time RMS to
-    the level stated in Annex B (the WAVs carry no absolute scale)."""
+    the level stated in Annex B (the WAVs carry no absolute scale).
+    """
     x, fs = _read_wav_fullscale(str(path))
     win = max(1, int(fs * 0.002))
     sq = np.convolve(x**2, np.ones(win) / win, mode="same")
@@ -324,7 +326,8 @@ def test_annex_b4_tone_pulses(case: str, num: int, level: float) -> None:
     this test enforces sample by sample, plus the Nmax header value.
     (The workbook header N5 values are not reproducible from their own
     published traces with the Annex A percentile formula and are therefore
-    not asserted.)"""
+    not asserted.)
+    """
     exp = EXPECTED[case]
     x, fs = _read_wav_pa(DATA / f"iso532_1_test_signal_{num}.wav", level)
     res = psychoacoustics.loudness_zwicker(x, fs, stationary=False)
@@ -351,7 +354,8 @@ def test_n5_n10_use_full_rate_series(monkeypatch) -> None:
     four phases, spreading N5 by up to ~3 % across the phases (Annex B
     TS 10, 0.7513..0.7752); the full-rate percentile (0.7628) is
     phase-unambiguous and sits inside that envelope. The 500 Hz
-    ``loudness_vs_time`` output is unchanged (public contract)."""
+    ``loudness_vs_time`` output is unchanged (public contract).
+    """
     import sys
 
     from phonometry.psychoacoustics.loudness.zwicker import _SR_LEVEL, _SR_LOUDNESS
@@ -458,7 +462,8 @@ def test_non_finite_inputs_rejected() -> None:
 
 def test_pathological_resampling_ratio_rejected() -> None:
     """gcd(48000, 44101) = 1 would demand a 48000/44101 polyphase filter;
-    reject instead of hanging."""
+    reject instead of hanging.
+    """
     x = np.ones(1000)
     with pytest.raises(ValueError, match="resampl"):
         psychoacoustics.loudness_zwicker(x, 44101)
@@ -474,7 +479,8 @@ def test_diffuse_field_differs() -> None:
 
 def test_minimal_length_validation() -> None:
     """Signals shorter than one 500 Hz output sample raise cleanly instead
-    of crashing on an empty percentile buffer."""
+    of crashing on an empty percentile buffer.
+    """
     too_short = np.ones(48)
     with pytest.raises(ValueError, match="too short"):
         psychoacoustics.loudness_zwicker(too_short, FS)
@@ -488,7 +494,8 @@ def test_specific_pattern_matches_reported_max() -> None:
     """The returned pattern is taken at the same decimated instant as the
     reported Nmax. For a steady tone the temporal weighting converges, so
     the pattern integral must match Nmax there (for transients the
-    instantaneous pattern legitimately exceeds the weighted maximum)."""
+    instantaneous pattern legitimately exceeds the weighted maximum).
+    """
     res = psychoacoustics.loudness_zwicker(
         _tone(1000.0, 70.0, seconds=2.0, pad_ms=0.0), FS
     )

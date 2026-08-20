@@ -1,10 +1,10 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""The subscript-slope gate, held against the shapes this corpus writes.
+r"""The subscript-slope gate, held against the shapes this corpus writes.
 
 ``scripts/check_subscript_slope.py`` reads mathematics as it is typed rather
 than as it renders, and the two ways of writing an upright subscript are the
 whole difficulty: the command may wrap the whole comma-separated run
-(``L_\\mathrm{n,w,eq}``) or one component of it (``\\alpha_{\\mathrm{s},i}``).
+(``L_\mathrm{n,w,eq}``) or one component of it (``\alpha_{\mathrm{s},i}``).
 A first version read the wrapped run component by component, decided that its
 ``w`` was italic, and reported four pages that were correctly set. These tests
 fix both readings, the silence between files that the file scope depends on,
@@ -67,7 +67,7 @@ def test_component_of_a_compound_subscript_is_read(tmp_path):
 
 
 def test_a_run_inside_one_wrapper_is_upright_throughout(tmp_path):
-    """``L_\\mathrm{n,w,eq}`` sets three upright components, not one."""
+    r"""``L_\mathrm{n,w,eq}`` sets three upright components, not one."""
     path = _write(
         tmp_path,
         "impact.md",

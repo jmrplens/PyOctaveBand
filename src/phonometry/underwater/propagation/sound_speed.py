@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Speed of sound in sea water (empirical equations).
+r"""Speed of sound in sea water (empirical equations).
 
 Four coexisting equations for the sound speed ``c`` as a function of
 temperature, salinity and depth/pressure, selectable through ``model``:

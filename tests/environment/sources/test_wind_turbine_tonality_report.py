@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the wind-turbine tonal audibility report (``.report()`` -> PDF).
+"""Tests for the wind-turbine tonal audibility report (``.report()`` -> PDF).
 
 The report is a rendering feature, so these tests assert only structural facts:
 a valid single-page PDF is written, unknown engines and languages are rejected,

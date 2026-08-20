@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Backend dispatch: base install for the WAV family, ``[audio]`` for the rest.
+r"""Backend dispatch: base install for the WAV family, ``[audio]`` for the rest.
 
 The base install (NumPy + SciPy) reads every *linear* WAV a measurement
 chain produces -- PCM at any depth, IEEE float, EXTENSIBLE, BWF metadata,

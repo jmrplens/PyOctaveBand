@@ -59,7 +59,8 @@ def _slit_absorber_cell_rows(
     dx: float, slit_cells: int, ny: int
 ) -> dict[str, tuple[int, int]]:
     """Row/column spans of the meshed cell (slit at the top of the period,
-    neck and cavity below it, mirroring ``plot_slit_absorber_geometry``)."""
+    neck and cavity below it, mirroring ``plot_slit_absorber_geometry``).
+    """
     res = _slit_absorber_design().resonator
     neck_cells = round(res.neck_length / dx)
     cav_cells = round(res.cavity_length / dx)
@@ -234,7 +235,8 @@ def animate_fdtd_slit_absorber(output_dir: str) -> None:
     library's visco-thermal effective fluids. At the design slit height
     the loss/leakage balance swallows the wave (alpha = 1, flat envelope);
     widening the slit breaks the balance and the reflection rebuilds the
-    standing wave. A zoom shows the field crawling through the slit."""
+    standing wave. A zoom shows the field crawling through the slit.
+    """
     from matplotlib.patches import Rectangle
 
     T = _translate_str
@@ -507,7 +509,8 @@ def _anim_slit_tube_walls(
 ) -> None:
     """Tube walls and drive loudspeaker for the slit-absorber clip (the
     shared ``_anim_tube_hardware`` labels its termination as a plug, but
-    here the termination IS the meshed panel, drawn by the caller)."""
+    here the termination IS the meshed panel, drawn by the caller).
+    """
     from matplotlib.patches import Rectangle
 
     wall = 0.007

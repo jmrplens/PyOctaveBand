@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-ISO 532-2:2017 (Moore-Glasberg) stationary loudness conformance tests.
+"""ISO 532-2:2017 (Moore-Glasberg) stationary loudness conformance tests.
 
 The primary oracle is Annex B of the standard, which tabulates the calculated
 loudness (sone) and loudness level (phon) for a set of reference signals:

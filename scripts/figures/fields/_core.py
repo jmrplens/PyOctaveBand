@@ -261,7 +261,8 @@ def _anim_speaker(
     cone, the cone tip on the ``x0`` plane, centred on ``y_mid`` for the
     given ``bore``. The tip stops ``tip_inset`` short of each bore edge
     (3 % of the bore when omitted); a "loudspeaker" caption is drawn at
-    ``label_y`` when given (``None`` skips it)."""
+    ``label_y`` when given (``None`` skips it).
+    """
     from matplotlib.patches import Polygon, Rectangle
 
     if tip_inset is None:

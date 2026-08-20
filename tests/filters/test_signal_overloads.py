@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Every public filter takes a ``phonometry.io.Signal`` in place of ``(x, fs)``.
+"""Every public filter takes a ``phonometry.io.Signal`` in place of ``(x, fs)``.
 
 The contract is the one ``signals.levels`` established and
 ``phonometry.io._resolve`` now holds for the whole library: the

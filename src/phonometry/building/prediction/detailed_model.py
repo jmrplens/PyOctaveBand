@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Detailed per-band building prediction (EN/ISO 12354-1/-2:2017).
+r"""Detailed per-band building prediction (EN/ISO 12354-1/-2:2017).
 
 This is the **detailed model** of the building-prediction chain, the per-band
 counterpart of the simplified single-number model implemented in

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Two-microphone transfer-function method in the impedance tube.
+r"""Two-microphone transfer-function method in the impedance tube.
 
 **BS EN ISO 10534-2:2001**: the complex reflection factor ``r`` at the sample
 surface is obtained from the measured transfer function ``H12`` between two

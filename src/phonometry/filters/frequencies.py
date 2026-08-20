@@ -1,7 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Frequency calculation logic according to ANSI/IEC standards.
-"""
+"""Frequency calculation logic according to ANSI/IEC standards."""
 
 from __future__ import annotations
 
@@ -17,8 +15,7 @@ def nominal_frequencies(
     fraction: float,
     limits: list[float] | None = None,
 ) -> tuple[list[float], list[float], list[float], list[str]]:
-    """
-    Calculate frequencies according to ANSI/IEC standards.
+    """Calculate frequencies according to ANSI/IEC standards.
 
     :param fraction: Bandwidth fraction (e.g., 1, 3).
     :param limits: [f_min, f_max] limits.
@@ -48,8 +45,7 @@ def nominal_frequencies(
 
 
 def _initindex(f: float, fr: float, g: float, b: float) -> int:
-    """
-    Calculate starting index for band generation.
+    """Calculate starting index for band generation.
 
     :param f: Frequency.
     :param fr: Reference frequency.
@@ -63,8 +59,7 @@ def _initindex(f: float, fr: float, g: float, b: float) -> int:
 
 
 def _ratio(g: float, x: int, b: float) -> float:
-    """
-    Calculate ratio for center frequency.
+    """Calculate ratio for center frequency.
 
     :param g: Base ratio.
     :param x: Index.
@@ -77,8 +72,7 @@ def _ratio(g: float, x: int, b: float) -> float:
 
 
 def _bandedge(g: float, b: float) -> float:
-    """
-    Calculate band-edge ratio.
+    """Calculate band-edge ratio.
 
     :param g: Base ratio.
     :param b: Bandwidth fraction.
@@ -90,8 +84,7 @@ def _bandedge(g: float, b: float) -> float:
 def _deleteouters(
     freq: list[float], freq_d: list[float], freq_u: list[float], fs: int
 ) -> tuple[list[float], list[float], list[float]]:
-    """
-    Remove bands exceeding the Nyquist frequency.
+    """Remove bands exceeding the Nyquist frequency.
 
     :param freq: Center frequencies.
     :param freq_d: Lower edges.
@@ -120,8 +113,7 @@ def _deleteouters(
 def _genfreqs(
     limits: list[float], fraction: float, fs: int
 ) -> tuple[list[float], list[float], list[float], list[str]]:
-    """
-    Determine band frequencies within limits.
+    """Determine band frequencies within limits.
 
     :param limits: [f_min, f_max].
     :param fraction: Bandwidth fraction.
@@ -189,8 +181,7 @@ def _format_nominal_freq(f: float) -> str:
 
 
 def normalized_frequencies(fraction: int) -> list[float]:
-    """
-    Get standardized IEC center frequencies.
+    """Get standardized IEC center frequencies.
 
     :param fraction: 1 or 3 (Octave or 1/3 Octave).
     :return: List of standard frequencies.

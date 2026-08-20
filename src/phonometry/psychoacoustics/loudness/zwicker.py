@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Zwicker loudness for stationary and time-varying sounds per ISO 532-1:2017.
+"""Zwicker loudness for stationary and time-varying sounds per ISO 532-1:2017.
 
 Clean-room Python port of the normative reference implementation given in
 Annex A of ISO 532-1:2017 (program "ISO_532-1", Annex A.4).  Two entry
@@ -718,8 +717,7 @@ def loudness_zwicker_from_spectrum(
     levels: list[float] | np.ndarray,
     field: Literal["free", "diffuse"] = "free",
 ) -> ZwickerLoudness:
-    """
-    Stationary Zwicker loudness from one-third-octave band levels.
+    """Stationary Zwicker loudness from one-third-octave band levels.
 
     Implements the method for stationary sounds of ISO 532-1:2017
     (clause 5) starting from the 28 one-third-octave band levels with
@@ -760,8 +758,7 @@ def loudness_zwicker(
     calibration_factor: float | None = None,
     time_skip: float = 0.0,
 ) -> ZwickerLoudness:
-    r"""
-    Zwicker loudness of a calibrated time signal per ISO 532-1:2017.
+    r"""Zwicker loudness of a calibrated time signal per ISO 532-1:2017.
 
     The signal is resampled to the internal 48 kHz rate if needed, split
     into 28 one-third-octave bands with the Annex A filterbank (Tables

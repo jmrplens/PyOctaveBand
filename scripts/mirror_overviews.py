@@ -99,7 +99,8 @@ PLANNED: set[Path] = set()
 
 def _relative_link(from_route: str, to_route: str) -> str | None:
     """The mirror-relative path from one route's index to another page, if
-    that page has, or will have, a mirror file."""
+    that page has, or will have, a mirror file.
+    """
     alias = ROUTE_ALIASES.get(to_route)
     if alias is not None:
         target = DOCS / alias

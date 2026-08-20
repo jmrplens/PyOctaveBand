@@ -266,7 +266,8 @@ def test_ci_delta_validation() -> None:
 
 def test_clause_63_18_band_spectrum_rates_on_sub_range() -> None:
     """A clause 6.3 spectrum (18 bands 100-5000 Hz) now yields ΔLw and CI,Δ
-    from its 100-3150 Hz sub-range."""
+    from its 100-3150 Hz sub-range.
+    """
     dl16 = np.asarray(ref.ISO717_2_ANNEX_C2_DELTA_L)
     dl18 = np.concatenate([dl16, [22.0, 21.0]])  # 4 k / 5 kHz extensions
     bare = np.full(18, 75.0)

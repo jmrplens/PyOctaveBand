@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Geometry drawings of the secondary set-ups (``_plot/geometry/``).
+"""Geometry drawings of the secondary set-ups (``_plot/geometry/``).
 
 Facade elevation, double wall, plate junctions, the in-situ absorption
 set-up, the dynamic-stiffness rig, the diffusion goniometer, the baffled

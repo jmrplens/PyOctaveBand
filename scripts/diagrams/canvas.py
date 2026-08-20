@@ -285,7 +285,7 @@ def _comment(s: str) -> str:
 
 
 def _math_tokens(run: str, s: str, script: bool = False) -> list[tuple[str, str]]:
-    """Split one math run into ``(kind, text)`` chunks.
+    r"""Split one math run into ``(kind, text)`` chunks.
 
     ``var`` is set in italic: at the baseline a single letter -- Latin or
     lowercase Greek, with any combining marks -- and at script level
@@ -295,7 +295,7 @@ def _math_tokens(run: str, s: str, script: bool = False) -> list[tuple[str, str]
     ``up`` stays upright: digits, operators, primes, brackets, capital
     Greek letters at every level (``Δ``, ``Φ``: operators and descriptors
     per the roman Δ of ISO 80000-2, the ``Δ_SOR`` print of ECAC Doc 29 and
-    the upright ``\\Delta`` mathtext sets in the matplotlib figures), and
+    the upright ``\Delta`` mathtext sets in the matplotlib figures), and
     at the baseline runs of two or more Latin letters, which are operator
     names and acronyms (log, grad, CN), never products; a product of two
     symbols is written with an explicit space or middle dot between them. ``sub`` and ``sup``
@@ -403,7 +403,7 @@ def _math_tokens(run: str, s: str, script: bool = False) -> list[tuple[str, str]
 
 
 def _math_runs(s: str) -> list[tuple[str, bool, float, float]]:
-    """Chunk a translated ``$...$`` string into styled runs.
+    r"""Chunk a translated ``$...$`` string into styled runs.
 
     Each run is ``(text, italic, shift, scale)``: the glyphs, whether they
     are italicised, how far the baseline drops (positive) or rises
@@ -430,7 +430,7 @@ def _math_runs(s: str) -> list[tuple[str, bool, float, float]]:
     ``$Δ_{SOR}$``, ``$Φ$``) -- in this corpus a capital Greek letter is an
     operator or a descriptor, matching the roman Δ of difference of ISO
     80000-2, the ``Δ_SOR`` print of ECAC Doc 29 §4.5.7 and the upright
-    ``\\Delta`` matplotlib's mathtext sets in the figures. The
+    ``\Delta`` matplotlib's mathtext sets in the figures. The
     grid steps ``dx``/``dt`` follow that baseline rule inside a formula
     (upright, per the roman d of ISO 80000-2); in plain prose ("dt from
     the Courant number") they are not mathematics and take no ``$...$``.

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Rated microphone characteristics (IEC 60268-4).
+r"""Rated microphone characteristics (IEC 60268-4).
 
 A microphone measurement/rating report gathers the *rated characteristics*
 IEC 60268-4:2014 defines around a measured free-field frequency response: the
@@ -90,7 +89,8 @@ _MIN_POLAR_SPAN_DEG = 150.0
 
 def _sensitivity_level_db(sensitivity_v_per_pa: float) -> float:
     r"""Sensitivity level :math:`20 \log_{10}(M / 1\,\mathrm{V/Pa})`, in dB re
-    1 V/Pa (11.1)."""
+    1 V/Pa (11.1).
+    """
     return float(20.0 * np.log10(sensitivity_v_per_pa / _M_REF))
 
 

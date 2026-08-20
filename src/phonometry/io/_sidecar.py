@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-The calibration sidecar: a versioned JSON file beside the audio.
+r"""The calibration sidecar: a versioned JSON file beside the audio.
 
 No audio container carries a microphone calibration. The equipment survey
 behind this module found the same pattern everywhere: sound level meters

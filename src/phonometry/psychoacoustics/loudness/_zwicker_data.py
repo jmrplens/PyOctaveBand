@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Numeric tables of the ISO 532-1:2017 Zwicker loudness reference algorithm.
+"""Numeric tables of the ISO 532-1:2017 Zwicker loudness reference algorithm.
 
 Every constant reproduces, digit for digit, one table of the normative
 Annex A reference implementation of ISO 532-1:2017 (program "ISO_532-1.c",

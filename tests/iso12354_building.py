@@ -162,7 +162,6 @@ def airborne_paths(situ: dict, delta_r: object) -> list:
     :return: The twelve :class:`~phonometry.BandPath` objects, labelled as
         Table L.1 labels its columns (``D1``, ``1d``, ``11``, ...).
     """
-
     kij = junction_indices()
     paths = []
     for tag, name in enumerate_flanking():
@@ -215,7 +214,6 @@ def impact_paths(situ: dict, delta_l: object) -> list:
     :return: The four :class:`~phonometry.BandPath` objects, labelled as
         Table G.1 labels its columns (``Df1`` to ``Df4``).
     """
-
     kij = junction_indices()
     return [
         building.impact_flanking_path(

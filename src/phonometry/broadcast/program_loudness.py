@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Programme loudness and true-peak level (ITU-R BS.1770-5, EBU R 128).
+r"""Programme loudness and true-peak level (ITU-R BS.1770-5, EBU R 128).
 
 Implements the objective multichannel loudness measurement algorithm of
 ITU-R BS.1770-5 Annex 1 and its companions:
@@ -123,12 +122,12 @@ DEFAULT_CHANNEL_WEIGHTS: dict[int, tuple[float, ...]] = {
 
 
 def _analog_from_biquad(coeffs: tuple[float, float, float], rate: float) -> np.ndarray:
-    """Map a digital biquad polynomial to its bilinear analog prototype.
+    r"""Map a digital biquad polynomial to its bilinear analog prototype.
 
-    Substituting :math:`z^{-1} = (K - s)/(K + s)` with :math:`K = 2 f_\\mathrm{s}`
+    Substituting :math:`z^{-1} = (K - s)/(K + s)` with :math:`K = 2 f_\mathrm{s}`
     (the inverse of the bilinear transform) into
     :math:`c_0 + c_1 z^{-1} + c_2 z^{-2}` gives the analog quadratic
-    :math:`(c_0 - c_1 + c_2)\\,s^2 + 2K(c_0 - c_2)\\,s + K^2(c_0 + c_1 + c_2)`.
+    :math:`(c_0 - c_1 + c_2)\,s^2 + 2K(c_0 - c_2)\,s + K^2(c_0 + c_1 + c_2)`.
 
     :param coeffs: The digital polynomial coefficients ``(c0, c1, c2)``.
     :param rate: The sample rate the digital coefficients are valid at, Hz.

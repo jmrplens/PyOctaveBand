@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for ISO 10140 laboratory sound insulation.
+"""Tests for ISO 10140 laboratory sound insulation.
 
 Validation strategy: closed-form identities from the standards' own
 formulae, and consistency with the verified ISO 717-1/2 rating engine.

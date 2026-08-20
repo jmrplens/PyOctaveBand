@@ -79,6 +79,7 @@ class MetadiffuserWell:
     resonators: tuple[HelmholtzResonator, ...]
 
     def __post_init__(self) -> None:
+        """Reject a non-positive ``slit_height`` and a well with no resonators."""
         require_positive(self.slit_height, "slit_height")
         if not self.resonators:
             raise ValueError("'resonators' must contain at least one resonator.")

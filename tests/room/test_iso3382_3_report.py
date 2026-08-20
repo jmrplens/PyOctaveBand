@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the ISO 3382-3:2012 open-plan office acoustics report (``.report()``).
+"""Tests for the ISO 3382-3:2012 open-plan office acoustics report (``.report()``).
 
 The report is a rendering feature, so these tests assert only structural facts:
 a valid single-page PDF is written for an open-plan result, the four

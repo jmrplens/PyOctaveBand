@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Laboratory sound insulation of building elements (ISO 10140).
+r"""Laboratory sound insulation of building elements (ISO 10140).
 
 This is the **laboratory** counterpart of the field ISO 16283 family in
 :mod:`phonometry.building.measurement.insulation`. In a qualified test facility flanking
@@ -412,8 +411,7 @@ def lab_airborne_insulation(
     area: float,
     volume: float,
 ) -> LabAirborneInsulationResult:
-    r"""
-    Laboratory airborne sound reduction index per ISO 10140-2:2010.
+    r"""Laboratory airborne sound reduction index per ISO 10140-2:2010.
 
     Computes, per frequency band, the sound reduction index
     :math:`R = L_1 - L_2 + 10 \log_{10}(S/A)` (Clause 3.1, Formula (2)) with the
@@ -463,8 +461,7 @@ def lab_impact_insulation(
     *,
     volume: float,
 ) -> LabImpactInsulationResult:
-    r"""
-    Laboratory impact sound pressure level per ISO 10140-3:2010.
+    r"""Laboratory impact sound pressure level per ISO 10140-3:2010.
 
     Computes, per frequency band, the normalized impact sound pressure level
     :math:`L_\mathrm{n} = L_\mathrm{i} + 10 \log_{10}(A/A_0)` (Clause 3.2, Formula (1)) with the

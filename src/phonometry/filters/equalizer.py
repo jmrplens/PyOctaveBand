@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Parametric equalizer biquads per the RBJ Audio EQ Cookbook.
+r"""Parametric equalizer biquads per the RBJ Audio EQ Cookbook.
 
 Second-order (biquad) IIR sections designed from the closed-form recipes of
 Robert Bristow-Johnson's *Audio EQ Cookbook*, the de-facto reference for
@@ -140,6 +139,7 @@ class EQSection:
     slope: float | None = None
 
     def __post_init__(self) -> None:
+        """Reject a section the cookbook cannot design (type, ``f0``, gain, Q/BW/S)."""
         _validate_section(self)
 
 
@@ -477,8 +477,7 @@ class ParametricEQ:
         stateful: bool = False,
         steady_ic: bool = False,
     ) -> None:
-        """
-        :param fs: Sample rate in Hz.
+        """:param fs: Sample rate in Hz.
         :param sections: One :class:`EQSection` or a sequence of them; the
             cascade applies them in order.
         :param stateful: If True, :meth:`filter` carries the filter state

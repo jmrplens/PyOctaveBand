@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Harmonic distortion of electroacoustic equipment (IEC 60268-3 / AES17).
+"""Harmonic distortion of electroacoustic equipment (IEC 60268-3 / AES17).
 
 Single-tone distortion metrics of amplifiers and audio equipment, from a
 captured signal:

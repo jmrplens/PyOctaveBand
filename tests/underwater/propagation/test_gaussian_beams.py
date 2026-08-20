@@ -852,7 +852,8 @@ def test_the_perfect_default_is_the_seabed_machinery_off_state() -> None:
 
 def test_a_malformed_seabed_is_rejected() -> None:
     """A ``FluidSeabed`` cannot half-arrive, so what is left to reject is a
-    nonphysical one, each field with its own message."""
+    nonphysical one, each field with its own message.
+    """
     iso = ([0.0, 1000.0], [_C, _C])
     airy = FluidSeabed(density=-1.0, sound_speed=1700.0)
     still = FluidSeabed(density=1800.0, sound_speed=0.0)

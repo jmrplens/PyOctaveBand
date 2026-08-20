@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Random-incidence scattering coefficient in a reverberation room.
+r"""Random-incidence scattering coefficient in a reverberation room.
 
 **ISO 17497-1:2004+A1:2014.** Four reverberation times (Table 2) taken with and
 without the test sample, with a static and a rotating turntable, give two

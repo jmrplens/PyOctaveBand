@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-p-p sound intensity (IEC 61043:1993) and ISO 9614-1:1993 field indicators.
+"""p-p sound intensity (IEC 61043:1993) and ISO 9614-1:1993 field indicators.
 
 Physics anchors:
 - Plane progressive wave: I = p_rms^2 / (rho*c), so Lp - LI =
@@ -29,7 +28,8 @@ def _plane_wave_pair(
     seed: int = 42,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Band-limited noise observed at two points; the second is a pure
-    (fractional, circular) delay of the first: p2(t) = p1(t - delay)."""
+    (fractional, circular) delay of the first: p2(t) = p1(t - delay).
+    """
     rng = np.random.default_rng(seed)
     n = int(FS * seconds)
     freqs = np.fft.rfftfreq(n, 1.0 / FS)
@@ -65,7 +65,8 @@ def test_plane_progressive_wave_broadband() -> None:
 def test_bias_correct_undoes_finite_difference_underread() -> None:
     """bias_correct=True lifts each in-band bin by (k*dr)/sin(k*dr)
     (IEC 61043:1993, 7.3). For a single tone the corrected total therefore
-    equals the raw total times that factor; at low frequency it is ~1."""
+    equals the raw total times that factor; at low frequency it is ~1.
+    """
     spacing, f0 = 0.05, 500.0
     t = np.arange(int(FS * 2)) / FS
     delay = spacing / C
@@ -95,7 +96,8 @@ def test_bias_correct_near_null_does_not_explode() -> None:
     intensity that is almost nulled; the un-clamped reciprocal
     (k*dr)/sin(k*dr) would blow up by ~30x there and let a few near-null bins
     dominate the total. Clamping the correction at k*dr = pi/2 keeps the
-    corrected total finite and bounded by the constant pi/2 factor."""
+    corrected total finite and bounded by the constant pi/2 factor.
+    """
     spacing = SPACING  # 12 mm -> first null at 343/0.024 = 14.3 kHz
     f0 = 14000.0  # k*dr ~ 0.98*pi, deep in the near-null region
     t = np.arange(int(FS * 2)) / FS
@@ -121,7 +123,8 @@ def test_bias_correct_near_null_does_not_explode() -> None:
 def test_bias_correct_below_cutoff_matches_analytic() -> None:
     """Below the pi/2 cutoff the clamped correction equals the exact
     reciprocal, so bias_correct recovers the unbiased plane-wave intensity
-    A^2/(2*rho*c) (behaviour unchanged from the un-clamped correction)."""
+    A^2/(2*rho*c) (behaviour unchanged from the un-clamped correction).
+    """
     spacing, f0 = SPACING, 4000.0  # k*dr = 0.88 rad < pi/2
     t = np.arange(int(FS * 5.0)) / FS
     amp = np.sqrt(2.0)  # 1 Pa rms
@@ -186,7 +189,8 @@ def test_standing_wave_high_pressure_intensity_index() -> None:
 
 def test_1khz_tone_exact_analytic_intensity() -> None:
     """Pure tone with exact phase lag k*dr: the cross-spectral estimator
-    must return (A^2/(2*rho*c)) * sin(k*dr)/(k*dr) exactly."""
+    must return (A^2/(2*rho*c)) * sin(k*dr)/(k*dr) exactly.
+    """
     t = np.arange(int(FS * 5.0)) / FS
     f0 = 1000.0
     amp = np.sqrt(2.0)  # 1 Pa rms
@@ -271,7 +275,8 @@ def test_validation_errors() -> None:
 
 def test_field_indicators_uniform_field() -> None:
     """Uniform positive intensity: F4 = 0 and F2 = F3; a plane-wave-like
-    surface gives F2 = 10*lg(rho*c/400) = 0,14 dB."""
+    surface gives F2 = 10*lg(rho*c/400) = 0,14 dB.
+    """
     i_n = np.full(8, 1.0 / (RHO * C))  # plane-wave intensity for 1 Pa^2
     lp = np.full(8, 93.98)  # 1 Pa^2 mean-square pressure
     ind = emission.field_indicators(lp, i_n)
@@ -309,7 +314,8 @@ def test_field_indicators_validation() -> None:
 
 def test_field_indicators_per_band_matches_per_column_scalars() -> None:
     """2D (positions, bands) input returns per-band arrays, one indicator
-    triple per column, identical to the scalar call on that column."""
+    triple per column, identical to the scalar call on that column.
+    """
     rng = np.random.default_rng(9614)
     freqs = np.array([125.0, 250.0, 500.0, 1000.0])
     lp = 74.0 + rng.normal(0.0, 0.8, (8, 4))
@@ -369,7 +375,8 @@ def test_field_indicators_plot_draws_indicators_and_ld() -> None:
 
 def test_dynamic_capability_index() -> None:
     """Ld = delta_pI0 - K (ISO 9614-1 equation (10)); adequate when
-    Ld > F2 (criterion 1, equation (B.1))."""
+    Ld > F2 (criterion 1, equation (B.1)).
+    """
     assert emission.dynamic_capability_index(18.0) == pytest.approx(8.0)
     assert emission.dynamic_capability_index(
         18.0, bias_error_factor=7.0

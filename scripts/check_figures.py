@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""Tolerance-aware staleness check for the committed documentation figures.
+r"""Tolerance-aware staleness check for the committed documentation figures.
 
 The ``Documentation figures up to date`` CI job regenerates ``.github/images``
 with ``make graphs`` and must confirm the result still matches what is
@@ -18,7 +18,7 @@ committed versions (``git HEAD``) within a tolerance instead:
   relative tolerance. A moved element, changed label or new path fails; a
   last-bit coordinate wobble passes.
 * **Raster (WebP/PNG)** -- identical dimensions, at most
-  :data:`RASTER_TOL`\\ ``.max_sig_pixels`` meaningfully changed pixels and a
+  :data:`RASTER_TOL`\ ``.max_sig_pixels`` meaningfully changed pixels and a
   bounded root-mean-square difference (see
   :class:`~generated_assets.RasterTolerance`).
 * **Anything else** -- exact byte compare.

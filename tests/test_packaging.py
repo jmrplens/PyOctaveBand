@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Packaging guarantees: PEP 561 typing marker shipped with the package, and
+"""Packaging guarantees: PEP 561 typing marker shipped with the package, and
 the generated PyPI long description in sync with the GitHub README.
 
 The long description also has a property the README does not: PyPI freezes it

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Sound power in a reverberation test room: ISO 3741:2010 (precision, grade 1).
+"""Sound power in a reverberation test room: ISO 3741:2010 (precision, grade 1).
 
 Physics / normative anchors (ISO 3741:2010):
 - Direct method, Eq. (20):
@@ -140,7 +139,8 @@ def test_comparison_reference_conditions_c2_near_zero() -> None:
 
 def test_comparison_fewer_than_six_positions_warns() -> None:
     """2D per-position test-source levels below the 6-position minimum warn
-    in the comparison method too (no V/S check -- no room geometry)."""
+    in the comparison method too (no V/S check -- no room geometry).
+    """
     levels = np.array([[80.0], [80.1], [79.9]])  # 3 positions, tight spread
     lp_rss = np.array([70.0])
     lw_ref = np.array([90.0])
@@ -293,7 +293,8 @@ def test_background_shape_mismatch_raises() -> None:
 
 def test_preaveraged_1d_levels_keep_single_k1_path() -> None:
     """1D pre-averaged spectra carry no per-position data: a single K1 from
-    the averaged spectra applies (documented approximation of 9.1.2)."""
+    the averaged spectra applies (documented approximation of 9.1.2).
+    """
     freqs = np.array([1000.0])
     t60 = np.array([1.5])
     res = emission.sound_power_reverberation(
@@ -311,7 +312,8 @@ def test_preaveraged_1d_levels_keep_single_k1_path() -> None:
 
 def test_comparison_method_corrects_test_source_per_position() -> None:
     """The comparison method applies the same per-position Eq. 14/15/16 chain
-    to the source under test before Eq. (21)."""
+    to the source under test before Eq. (21).
+    """
     freqs = np.array([1000.0])
     levels = np.array([[70.0], [68.0], [66.0], [72.0], [71.0], [69.0]])
     background = np.array([[58.0], [60.0], [59.0], [60.0], [62.0], [58.0]])
@@ -459,7 +461,8 @@ def test_qualified_room_emits_no_warning() -> None:
 # --------------------------------------------------------------------------
 def test_comparison_wrong_frequency_length_raises_clean_error() -> None:
     """Wrong-length 'frequencies' with 'background_levels' must raise a clean
-    ValueError (shape check ahead of the background broadcasting)."""
+    ValueError (shape check ahead of the background broadcasting).
+    """
     levels = np.array([80.0, 81.0, 82.0])
     levels_ref = np.array([70.0, 71.0, 72.0])
     lw_ref = np.array([90.0, 91.0, 92.0])
@@ -477,7 +480,8 @@ def test_comparison_wrong_frequency_length_raises_clean_error() -> None:
 
 def test_comparison_wrong_shape_raises_without_sampling_warning() -> None:
     """Malformed shapes raise ValueError before any position-sampling advisory
-    (warn-after-validate: a fewer-than-6-positions input must not warn first)."""
+    (warn-after-validate: a fewer-than-6-positions input must not warn first).
+    """
     # 3 positions (< 6) x 2 bands, but levels_ref spans 3 bands -> mismatch.
     levels = np.array([[80.0, 81.0], [80.1, 81.1], [79.9, 80.9]])
     levels_ref = np.array([70.0, 71.0, 72.0])
@@ -493,7 +497,8 @@ def test_comparison_wrong_shape_raises_without_sampling_warning() -> None:
 # --------------------------------------------------------------------------
 def test_comparison_reports_applied_background_correction() -> None:
     """The comparison method reports the ST K1 actually applied per band (Eq.
-    14), and reporting the field does not alter the computed LW."""
+    14), and reporting the field does not alter the computed LW.
+    """
     freqs = np.array([1000.0])
     lw_ref = np.array([90.0])
     lp_rss = np.array([70.0])

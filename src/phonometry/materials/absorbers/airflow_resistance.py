@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Airflow resistance of porous materials: ISO 9053-1 and ISO 9053-2.
+r"""Airflow resistance of porous materials: ISO 9053-1 and ISO 9053-2.
 
 Two standardised measurement methods share the same three quantities and units
 (ISO 9053-1:2018, Clause 3; ISO 9053-2:2020, Clause 3):

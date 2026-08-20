@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Sound absorption in enclosed spaces (EN 12354-6:2003).
+r"""Sound absorption in enclosed spaces (EN 12354-6:2003).
 
 Estimates the total equivalent sound absorption area of a room and the
 resulting reverberation time from the absorption of its surfaces and objects

@@ -95,7 +95,8 @@ def _load(name: str) -> tuple[np.ndarray, float]:
 )
 def test_gated_integrated_loudness_from_series(key: str, case: str) -> None:
     """The BS.1770-5 two-stage gate over the committed 400 ms momentary
-    series must land on the EBU-published -23,0 LUFS."""
+    series must land on the EBU-published -23,0 LUFS.
+    """
     integrated, _ = _integrated_from_blocks(_SERIES[f"{key}_momentary"])
     assert integrated == pytest.approx(-23.0, abs=0.1), case
 

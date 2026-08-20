@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Marine-mammal hearing thresholds (group audiograms and the orca audiogram).
+r"""Marine-mammal hearing thresholds (group audiograms and the orca audiogram).
 
 Two independent published descriptions of how well a marine mammal hears:
 

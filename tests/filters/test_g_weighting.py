@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-G frequency weighting for infrasound (ISO 7196:1995).
+"""G frequency weighting for infrasound (ISO 7196:1995).
 
 Clause 4: the G frequency response is the pole-zero configuration of
 Table 1 (transcribed below from the official PDF, p. 2), with 0 dB gain at
@@ -39,7 +38,8 @@ def test_g_gain_is_0db_at_10hz() -> None:
 def test_g_matches_iso7196_table2(freq: float, expected_db: float) -> None:
     """Digital response vs the Table 2 values (given at nominal one-third-
     octave frequencies; evaluated at the exact base-10 frequencies
-    10^(n/10), the same convention as IEC 61672-1 Annex D)."""
+    10^(n/10), the same convention as IEC 61672-1 Annex D).
+    """
     exact = 10 ** (round(10 * np.log10(freq)) / 10)
     # Worst measured deviation vs Table 2 is 0.047 dB; 0.1 keeps ~2x headroom
     # (was 0.3, ~6x looser) while staying well inside the +/-1 dB tolerance.
@@ -91,7 +91,8 @@ def test_g_stateful_holds_its_reference_at_low_fs() -> None:
     while stateful filtering ran at the input rate, so an SOS built for
     fs * 24 was applied at fs = 2000 and the reference read -36 dB. The
     existing stateful test could not see it: at 48 kHz the oversample
-    factor is one and both paths coincide."""
+    factor is one and both paths coincide.
+    """
     fs = 2000
     t = np.arange(fs * 8) / fs
     x = np.sin(2 * np.pi * 10.0 * t)
@@ -116,7 +117,8 @@ def test_g_weighting_consistent_at_low_sample_rates() -> None:
     """The G response must not depend on fs: at low rates (infrasound
     recorders) 315 Hz approaches Nyquist and the un-prewarped bilinear
     design would otherwise warp; the fs-aware oversampling keeps every
-    rate within a few hundredths of a dB of the 48 kHz design."""
+    rate within a few hundredths of a dB of the 48 kHz design.
+    """
 
     def gain_at(fs: int, freq: float) -> float:
         t = np.arange(int(fs * 8)) / fs

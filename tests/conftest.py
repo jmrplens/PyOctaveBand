@@ -10,8 +10,7 @@ os.environ.setdefault("MPLBACKEND", "Agg")
 
 
 def pytest_configure(config):
-    """
-    Configure environment variables for the test session.
+    """Configure environment variables for the test session.
     We disable Numba JIT to allow coverage tools to trace inside the kernels.
     """
     # Disable JIT by default for tests to ensure 100% coverage reporting.

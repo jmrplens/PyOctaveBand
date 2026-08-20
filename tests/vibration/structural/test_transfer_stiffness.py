@@ -156,7 +156,8 @@ def test_result_helper_warns_above_transmissibility_limit() -> None:
 
 def test_indirect_bias_at_the_validity_limit_is_within_1_db() -> None:
     """At |T| = 0.1 (DeltaL1,2 = 20 dB) the undamped mass-spring model gives
-    k_indirect = 1.1 k: a 0.83 dB (10 %) bias, inside the 1 dB (12 %) bound."""
+    k_indirect = 1.1 k: a 0.83 dB (10 %) bias, inside the 1 dB (12 %) bound.
+    """
     k, m = 1e6, 1.0
     f = math.sqrt(11.0 * k / m) / (2.0 * math.pi)  # omega^2 m = 11 k -> T = -0.1
     t = complex(vibration.base_transmissibility(f, m, k))
@@ -171,7 +172,8 @@ def test_indirect_bias_at_the_validity_limit_is_within_1_db() -> None:
 
 def test_linearity_criterion_10_db_step() -> None:
     """ISO 10846-2/-3, 7.6: input spectra 10 dB apart must give transfer-
-    stiffness levels within 1.5 dB - exact equality for a linear element."""
+    stiffness levels within 1.5 dB - exact equality for a linear element.
+    """
     u_a, step = 1e-6 + 0j, 10.0 ** (-10.0 / 20.0)
     k = 1e6 + 3e4j
     lk_a = float(

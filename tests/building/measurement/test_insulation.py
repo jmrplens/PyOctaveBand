@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for ISO 16283-1:2014 field airborne sound insulation and
+"""Tests for ISO 16283-1:2014 field airborne sound insulation and
 ISO 717-1 weighted ratings (C / Ctr).
 
 Validation strategy: the standards' own numbers, not self-consistency.
@@ -345,7 +344,8 @@ def test_field_rating_pipeline_dnt_w() -> None:
 
 def test_extended_annex_c2_enlarged_range() -> None:
     """ISO 717-1:2020 Annex C Table C.2: Rw(C;Ctr;C50-5000;Ctr,50-5000)
-    = 30 (-2; -3; -2; -4) dB."""
+    = 30 (-2; -3; -2; -4) dB.
+    """
     import reference_data as ref
 
     freqs = [
@@ -446,7 +446,8 @@ def test_extended_requires_core_bands() -> None:
 
 def test_one_decimal_rating_annex_b() -> None:
     """ISO 12999-1:2020 Annex B: the 0,1 dB shift yields Rw = 57,4 dB and the
-    one-decimal sums Rw + C50-5000 = 56,4 / Rw + Ctr,50-5000 = 51,1 dB."""
+    one-decimal sums Rw + C50-5000 = 56,4 / Rw + Ctr,50-5000 = 51,1 dB.
+    """
     import reference_data as ref
 
     res = building.weighted_rating_extended(
@@ -472,7 +473,8 @@ def test_one_decimal_rating_annex_b() -> None:
 
 def test_impact_extended_ci_50_2500() -> None:
     """CI,50-2500 sums 50-2500 Hz (A.2.1 NOTE); flat extensions with low
-    energy leave it equal to the core CI."""
+    energy leave it equal to the core CI.
+    """
     import reference_data as ref
 
     freqs = [
@@ -496,7 +498,8 @@ def test_impact_extended_ci_50_2500() -> None:
 
 def test_impact_one_decimal_reference_floor() -> None:
     """The 0,1 dB variant reproduces the printed uncertainty constants of
-    ISO 717-2:2020 A.2.2: Ln,r,0,w = 77,6 dB and CI,r,0 = -10,3 dB."""
+    ISO 717-2:2020 A.2.2: Ln,r,0,w = 77,6 dB and CI,r,0 = -10,3 dB.
+    """
     import reference_data as ref
 
     res = building.weighted_impact_rating_extended(

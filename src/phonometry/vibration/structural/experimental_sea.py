@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Experimental statistical energy analysis: coupling loss factors from measured
+r"""Experimental statistical energy analysis: coupling loss factors from measured
 energies (Norton & Karczub Ch. 6).
 
 Statistical energy analysis (SEA) has two routes to the coupling loss factor

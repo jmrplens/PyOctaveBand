@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Radiated underwater sound from percussive pile driving (ISO 18406:2017).
+r"""Radiated underwater sound from percussive pile driving (ISO 18406:2017).
 
 Percussive pile driving radiates a train of impulsive acoustic pulses, one per
 hammer strike. ISO 18406 characterises them with:

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Human exposure to whole-body and hand-transmitted vibration.
+r"""Human exposure to whole-body and hand-transmitted vibration.
 
 The measurement chain of the ISO human-vibration family is implemented from the
 standards' own analog definitions, clean-room:

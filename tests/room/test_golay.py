@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for complementary Golay-pair impulse-response acquisition.
+"""Tests for complementary Golay-pair impulse-response acquisition.
 
 Validation strategy (closed-form, not self-consistency):
 - The complementary property is an algebraic identity: the sum of the two

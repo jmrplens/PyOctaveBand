@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Normal equal-loudness-level contours (ISO 226:2023).
+"""Normal equal-loudness-level contours (ISO 226:2023).
 
 Formula (1) (clause 4.1, p. 2) derives the SPL of a pure tone from its
 loudness level; Formula (2) (clause 4.2, p. 3) is the inverse. Both use the
@@ -97,7 +96,8 @@ def test_validity_limits() -> None:
 
 def test_untabulated_frequency_raises() -> None:
     """Table 1 defines parameters only at the 29 preferred frequencies; the
-    standard specifies no interpolation between them."""
+    standard specifies no interpolation between them.
+    """
     with pytest.raises(ValueError, match="frequency"):
         psychoacoustics.loudness_level(60.0, 440.0)
 

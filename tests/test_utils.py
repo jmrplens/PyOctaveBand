@@ -1,7 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for internal utility helpers.
-"""
+"""Tests for internal utility helpers."""
 
 import numpy as np
 

@@ -2808,7 +2808,8 @@ def generate_htlan_compression(output_dir: str) -> None:
 def generate_exposure_budget(output_dir: str) -> None:
     """The ISO 9612 Annex C budget: where the variance comes from, and what
     reduces it. Left, the Annex D day term by term; right, the expanded
-    uncertainty against the sample count for the two sampling models."""
+    uncertainty against the sample count for the two sampling models.
+    """
     print("Generating exposure_budget.png...")
     from phonometry import hearing
 

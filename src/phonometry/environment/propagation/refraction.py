@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Atmospheric refraction: ray tracing and the parabolic equation (PE).
+r"""Atmospheric refraction: ray tracing and the parabolic equation (PE).
 
 Sound propagation outdoors is bent by vertical gradients of the effective sound
 speed :math:`c_\mathrm{eff}(z) = c(z) + u(z)` (the adiabatic sound speed plus the

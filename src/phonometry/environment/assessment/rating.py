@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Environmental noise descriptors per ISO 1996-1:2016.
+"""Environmental noise descriptors per ISO 1996-1:2016.
 
 Day-evening-night (Lden, 3.6.4) and day-night (Ldn, 3.6.5) sound levels,
 and composite whole-day rating levels (6.5, Formulae 5-6).
@@ -17,8 +16,7 @@ if TYPE_CHECKING:
 
 
 def composite_rating_level(periods: Iterable[tuple[float, float, float]]) -> float:
-    r"""
-    Composite whole-day rating level (ISO 1996-1:2016, 6.5).
+    r"""Composite whole-day rating level (ISO 1996-1:2016, 6.5).
 
     Generalizes Formulae (5) and (6): each period contributes its rating
     level plus adjustment, weighted by its share of the 24 h day:
@@ -54,8 +52,7 @@ def lden(
     lnight: float,
     hours: tuple[float, float, float] = (12.0, 4.0, 8.0),
 ) -> float:
-    r"""
-    Day-evening-night sound level Lden (ISO 1996-1:2016, 3.6.4).
+    r"""Day-evening-night sound level Lden (ISO 1996-1:2016, 3.6.4).
 
     .. math::
 
@@ -82,8 +79,7 @@ def ldn(
     lnight: float,
     hours: tuple[float, float] = (15.0, 9.0),
 ) -> float:
-    r"""
-    Day-night sound level Ldn (ISO 1996-1:2016, 3.6.5).
+    r"""Day-night sound level Ldn (ISO 1996-1:2016, 3.6.5).
 
     .. math::
 

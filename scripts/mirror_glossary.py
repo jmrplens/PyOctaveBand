@@ -88,7 +88,8 @@ def _localized(value: Any) -> str:
 
 def _relative_link(to_route: str) -> str | None:
     """The mirror-relative path from the glossary to another page, if that page
-    has a mirror file."""
+    has a mirror file.
+    """
     target = DOCS / f"{to_route}.md"
     if not target.exists():
         target = DOCS / to_route / "index.md"
@@ -116,7 +117,8 @@ def _rewrite_links(body: str) -> str:
 
 def _prose() -> str:
     """The page's own prose: everything between the frontmatter and the card
-    component, with the component import dropped."""
+    component, with the component import dropped.
+    """
     text = PAGE.read_text(encoding="utf-8")
     match = re.match(r"---\n.*?\n---\n", text, re.DOTALL)
     if not match:
@@ -156,7 +158,8 @@ def _row(term: dict[str, Any], titles: dict[str, str]) -> str:
 
 def _titles() -> dict[str, str]:
     """The title of every English page, by route, so a link carries the name the
-    site gives the page instead of a hand-kept copy of it."""
+    site gives the page instead of a hand-kept copy of it.
+    """
     found: dict[str, str] = {}
     for page in SITE.rglob("*.md*"):
         route = page.relative_to(SITE).with_suffix("").as_posix()

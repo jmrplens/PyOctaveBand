@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Four-microphone transfer-matrix method for the transmission of a specimen.
+r"""Four-microphone transfer-matrix method for the transmission of a specimen.
 
 **ASTM E2611-19**, the two-tube method: the specimen sits between an upstream
 and a downstream tube section with two microphones on each side, and the wave

@@ -1,7 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Parametric tests using pytest best practices for signal processing verification.
-"""
+"""Parametric tests using pytest best practices for signal processing verification."""
 
 import numpy as np
 import pytest
@@ -17,8 +15,7 @@ from phonometry import filters
     ],
 )
 def test_band_count_estimates(fraction: float, expected_bands: int) -> None:
-    """
-    Verify that the filter bank generates the expected number of frequency bands.
+    """Verify that the filter bank generates the expected number of frequency bands.
 
     **Purpose:**
     Ensure that the band generation logic (`_genfreqs`) correctly interprets the fraction
@@ -47,8 +44,7 @@ def test_band_count_estimates(fraction: float, expected_bands: int) -> None:
 
 @pytest.mark.parametrize("dtype", [np.float32, np.float64])
 def test_input_dtypes(dtype: np.dtype) -> None:
-    """
-    Ensure the library correctly handles different floating-point precisions.
+    """Ensure the library correctly handles different floating-point precisions.
 
     **Purpose:**
     Audio data can come in float32 (common in WAV files/real-time) or float64.
@@ -74,8 +70,7 @@ def test_input_dtypes(dtype: np.dtype) -> None:
 
 @pytest.mark.parametrize("channels", [1, 2, 4])
 def test_multichannel_shapes(channels: int) -> None:
-    """
-    Verify the library handles different channel counts (Mono, Stereo, Multichannel).
+    """Verify the library handles different channel counts (Mono, Stereo, Multichannel).
 
     **Purpose:**
     The library claims to support multichannel input. The output shape must reflect the input channels.
@@ -113,8 +108,7 @@ def test_multichannel_shapes(channels: int) -> None:
 )
 @pytest.mark.parametrize("target_freq", [63, 1000, 8000])
 def test_frequency_isolation(target_freq: float, filter_type: str) -> None:
-    """
-    Critical Audio Test: Verify spectral isolation of pure tones.
+    """Critical Audio Test: Verify spectral isolation of pure tones.
 
     **Purpose:**
     This is the core functional test of a filter bank. A pure sine wave at 1000 Hz should
@@ -176,8 +170,7 @@ def test_frequency_isolation(target_freq: float, filter_type: str) -> None:
     "filter_type", ["butter", "cheby1", "cheby2", "ellip", "bessel"]
 )
 def test_impulse_response_decay(filter_type: str) -> None:
-    """
-    Verify filter stability using the Impulse Response (IR).
+    """Verify filter stability using the Impulse Response (IR).
 
     **Purpose:**
     Stable filters must have a decaying impulse response. If the energy does not decay,
@@ -213,8 +206,7 @@ def test_impulse_response_decay(filter_type: str) -> None:
 
 
 def test_filterbank_class_direct() -> None:
-    """
-    Verify direct usage of OctaveFilterBank class.
+    """Verify direct usage of OctaveFilterBank class.
 
     **Purpose:**
     Confirm that the class can be instantiated and used independently of the wrapper function.
@@ -243,8 +235,7 @@ def test_filterbank_class_direct() -> None:
 
 
 def test_impulse_kernel_python_fallback_matches_numba() -> None:
-    """
-    Verify the pure-Python kernel matches the (possibly jitted) default.
+    """Verify the pure-Python kernel matches the (possibly jitted) default.
 
     **Purpose:**
     numba is an optional dependency; without it, time_weighting 'impulse'
@@ -263,7 +254,6 @@ def test_impulse_kernel_python_fallback_matches_numba() -> None:
 
 def test_time_weighting_class_blocks_match_continuous() -> None:
     """Block-wise TimeWeighting must equal one-shot time_weighting."""
-
     fs = 48000
     rng = np.random.default_rng(5)
     x = rng.standard_normal(fs)
@@ -307,7 +297,6 @@ def test_time_weighting_class_invalid_params() -> None:
 
 def test_time_weighting_class_impulse_blocks_match_continuous() -> None:
     """Impulse mode uses a distinct asymmetric kernel: verify state carrying."""
-
     fs = 48000
     rng = np.random.default_rng(7)
     x = rng.standard_normal((2, fs))

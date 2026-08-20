@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-IEC 61672-1:2013 tone-burst response compliance.
+"""IEC 61672-1:2013 tone-burst response compliance.
 
 Reference values and acceptance limits transcribed from the official text:
 BS EN 61672-1:2013, **Table 4** ("Reference 4 kHz toneburst responses and
@@ -93,8 +92,7 @@ def test_slow_tone_burst_iec_table4(
 
 
 def test_delta_ref_equation7_consistency() -> None:
-    """
-    Sanity-check the transcription: Table 4 values follow Equation (7),
+    """Sanity-check the transcription: Table 4 values follow Equation (7),
     ``delta_ref = 10*lg(1 - exp(-Tb/tau))`` (tau_F = 0.125 s, tau_S = 1 s),
     within the standard's own rounding (0.1 dB, plus its -0.1-quirk rows).
     """
@@ -152,8 +150,7 @@ def test_sel_tone_burst_iec_table4(
 
 
 def test_delta_ref_equation8_consistency() -> None:
-    """
-    Sanity-check the transcription: the ``LAE - LA`` column of Table 4 follows
+    """Sanity-check the transcription: the ``LAE - LA`` column of Table 4 follows
     Equation (8), ``delta_ref = 10*lg(Tb/T0)`` with ``T0 = 1 s``.
 
     The counterpart of :func:`test_delta_ref_equation7_consistency` for the

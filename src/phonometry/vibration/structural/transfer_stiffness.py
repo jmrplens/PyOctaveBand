@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Dynamic transfer stiffness of resilient elements (ISO 10846-1/-2/-3).
+r"""Dynamic transfer stiffness of resilient elements (ISO 10846-1/-2/-3).
 
 The vibro-acoustic transfer property of a resilient element (a vibration
 isolator, mount, bellows or hose) is its **dynamic transfer stiffness**: the
@@ -50,7 +49,8 @@ family (ISO 10846-1, Annex A / Table A.2):
 mechanical impedance and effective mass through
 :func:`phonometry.vibration.convert_frf` (``"dynamic_stiffness"`` <->
 ``"impedance"`` <-> ``"apparent_mass"``). This module feeds the structure-borne
-source and building prediction standards (ISO 9611, EN 15657, EN 12354-5)."""
+source and building prediction standards (ISO 9611, EN 15657, EN 12354-5).
+"""
 
 from __future__ import annotations
 
@@ -325,7 +325,8 @@ class TransferStiffnessResult:
     @property
     def loss_factor(self) -> np.ndarray:
         r"""Loss factor :math:`\eta = \operatorname{Im}/\operatorname{Re}`
-        per frequency (3.8)."""
+        per frequency (3.8).
+        """
         return loss_factor(self.transfer_stiffness)
 
     def to(self, target: str) -> np.ndarray:

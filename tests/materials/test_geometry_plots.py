@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Geometry drawings of materials devices (``_plot/geometry/``).
+"""Geometry drawings of materials devices (``_plot/geometry/``).
 
 Smoke coverage plus the contracts that matter: every renderer returns the
 axes it drew on with an equal aspect, results retain the geometry their

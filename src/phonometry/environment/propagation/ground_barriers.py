@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Spherical-wave ground effect and advanced barrier diffraction.
+r"""Spherical-wave ground effect and advanced barrier diffraction.
 
 This module extends the tabulated ground and barrier terms of ISO 9613-2 (see
 :mod:`phonometry.environment.propagation.outdoor_propagation`) with the underlying wave
@@ -884,7 +883,8 @@ def _diffracted_over_barrier(
     k: Real,
 ) -> Complex:
     """Diffracted field over a thin (``near_edge``) or thick (``near``/``far``
-    edges) barrier for one source/receiver pair; see :func:`_screen_field`."""
+    edges) barrier for one source/receiver pair; see :func:`_screen_field`.
+    """
     if thickness is None:
         return _screen_field(source, near_edge, near_edge, receiver, k)
     return _screen_field(source, near_edge, far_edge, receiver, k)

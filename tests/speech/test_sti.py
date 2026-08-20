@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Speech Transmission Index per IEC 60268-16:2020 (Edition 5).
+"""Speech Transmission Index per IEC 60268-16:2020 (Edition 5).
 
 Validation vectors:
 - Weighting-factor test (Ed.5 A.2.2): band pairs with TI=1 give exact STI
@@ -51,7 +50,8 @@ def _uniform_mtf(m: float) -> np.ndarray:
 
 def _decay_ir(t60: float, fs: int, seed: int = 0) -> np.ndarray:
     """Noise-carrier impulse response with exponential energy decay:
-    p(t) ~ e^(-13.8 t / T60), i.e. -60 dB at t = T60."""
+    p(t) ~ e^(-13.8 t / T60), i.e. -60 dB at t = T60.
+    """
     rng = np.random.default_rng(seed)
     n = int(2.0 * t60 * fs)
     t = np.arange(n) / fs
@@ -60,7 +60,8 @@ def _decay_ir(t60: float, fs: int, seed: int = 0) -> np.ndarray:
 
 def _analytic_decay_sti(t60: float) -> float:
     """Expected STI from the closed-form Schroeder MTF of an exponential
-    decay, identical in all bands: m(F) = 1/sqrt(1 + (2 pi F T/13,8)^2)."""
+    decay, identical in all bands: m(F) = 1/sqrt(1 + (2 pi F T/13,8)^2).
+    """
     m = 1.0 / np.sqrt(1.0 + (2.0 * np.pi * _MOD_FREQS * t60 / 13.8) ** 2)
     return _sti_from_mtf(np.tile(m, (_NUM_BANDS, 1))).sti
 
@@ -254,7 +255,8 @@ def test_stipa_loopback_ideal_channel(stipa_18s_seed1234: np.ndarray):
 def test_stipa_short_recording_warns(stipa_18s_seed1234: np.ndarray):
     """A recording shorter than the recommended 15 s biases the recovered
     modulation depths (and STI) low; stipa should warn (IEC 60268-16 STIPA
-    practice recommends 15 s to 25 s)."""
+    practice recommends 15 s to 25 s).
+    """
     short = speech.stipa_signal(FS, seconds=5.0, seed=1234)
     with pytest.warns(UserWarning, match="15"):
         speech.stipa(short, FS)
@@ -444,7 +446,8 @@ def _c32_signal(m: float, fs: int, seconds: float) -> np.ndarray:
 def test_stipa_direct_method_modulation_depth_staircase(i: int) -> None:
     """Ed.5 C.3.2: the full stipa() audio path (octave bank, intensity
     envelopes, sine/cosine correlation, TI chain) must reproduce the
-    published STI staircase for the Formula (C.1) signal within +/-0,05."""
+    published STI staircase for the Formula (C.1) signal within +/-0,05.
+    """
     m = i / 10.0
     x = _c32_signal(m, FS, seconds=16.0)
     res = speech.stipa(x, FS)

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Regulatory auditory weighting and exposure criteria for marine mammals.
+r"""Regulatory auditory weighting and exposure criteria for marine mammals.
 
 Noise-exposure assessments weight a spectrum by a hearing-group filter before
 comparing it with a threshold. The filter is the same band-pass form in all
@@ -548,7 +547,8 @@ def _band_pass_db(
     f_khz: NDArray[np.float64], p: WeightingParameters
 ) -> NDArray[np.float64]:
     r""":math:`10 \log_{10}` of the band-pass ratio shared by ``W(f)`` and
-    ``E(f)``."""
+    ``E(f)``.
+    """
     ratio = (f_khz / p.f1_khz) ** (2.0 * p.a) / (
         (1.0 + (f_khz / p.f1_khz) ** 2) ** p.a * (1.0 + (f_khz / p.f2_khz) ** 2) ** p.b
     )

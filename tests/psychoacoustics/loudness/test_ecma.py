@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-ECMA-418-2:2025 (Sottek Hearing Model) loudness conformance tests.
+"""ECMA-418-2:2025 (Sottek Hearing Model) loudness conformance tests.
 
 The primary oracle is the standard's own calibration (Clause 5.1.8): a
 1 kHz sinusoid at 40 dB SPL yields 1 sone_HMS via the Clause 8 method. The

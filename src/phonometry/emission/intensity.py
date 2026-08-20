@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Two-microphone (p-p) sound intensity per IEC 61043:1993 and the
+r"""Two-microphone (p-p) sound intensity per IEC 61043:1993 and the
 ISO 9614-1:1993 field indicators.
 
 A p-p probe holds two pressure microphones a fixed distance ``spacing``
@@ -289,7 +288,8 @@ class FieldIndicators:
 
 def _level(value: float, reference: float) -> float:
     r"""Level :math:`10 \log_{10}(\mathrm{value}/\mathrm{reference})` in dB, with a
-    tiny-floor guard for zero values."""
+    tiny-floor guard for zero values.
+    """
     return float(10.0 * np.log10(max(value, np.finfo(float).tiny) / reference))
 
 
@@ -375,8 +375,7 @@ def sound_intensity(
     limits: list[float] | None = None,
     bias_correct: bool = False,
 ) -> IntensityResult:
-    r"""
-    Sound intensity from a two-microphone (p-p) probe (IEC 61043:1993).
+    r"""Sound intensity from a two-microphone (p-p) probe (IEC 61043:1993).
 
     The one-sided cross spectrum ``G12`` of the two microphone pressures
     is estimated with Welch-averaged, Hann-windowed segments
@@ -579,8 +578,7 @@ def _coefficient_of_variation(
 def temporal_variability_indicator(
     short_time_intensity: list[float] | np.ndarray,
 ) -> float | np.ndarray:
-    r"""
-    ISO 9614-1:1993 temporal variability indicator F1 (equation (A.1)).
+    r"""ISO 9614-1:1993 temporal variability indicator F1 (equation (A.1)).
 
     In the initial test a "typical" measurement position is chosen on an
     initial measurement surface and the normal sound intensity is sampled
@@ -699,8 +697,7 @@ def field_indicators(
     *,
     temporal_intensity: list[float] | np.ndarray | None = None,
 ) -> FieldIndicators:
-    r"""
-    ISO 9614-1:1993 Annex A field indicators F1 to F4.
+    r"""ISO 9614-1:1993 Annex A field indicators F1 to F4.
 
     Given the sound pressure level ``Lpi`` (dB) and the signed normal
     sound intensity ``Ini`` (W/m^2) measured at each of the N discrete
@@ -785,8 +782,7 @@ def field_indicators(
 def dynamic_capability_index(
     pressure_residual_intensity_index: float, bias_error_factor: float = 10.0
 ) -> float:
-    r"""
-    Dynamic capability index Ld (ISO 9614-1:1993, clause 3.12).
+    r"""Dynamic capability index Ld (ISO 9614-1:1993, clause 3.12).
 
     :math:`L_\mathrm{d} = \delta_{pI0} - K` (equation (10)), where
     :math:`\delta_{pI0}` is the

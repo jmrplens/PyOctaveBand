@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the ISO 1999:2013 hearing-loss prediction ``.report()`` fiches.
+"""Tests for the ISO 1999:2013 hearing-loss prediction ``.report()`` fiches.
 
 The two occupational-hearing-loss result types render one-page statistical
 prediction fiches: NIPTS (noise-induced permanent threshold shift, clause 6.3)

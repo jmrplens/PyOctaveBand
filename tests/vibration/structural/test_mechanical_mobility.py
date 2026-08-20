@@ -90,7 +90,8 @@ def test_reciprocals_multiply_to_one() -> None:
 
 def test_rigid_mass_decade_identity_at_1000_rad_s() -> None:
     """At omega = 1000 rad/s a rigid 1 kg mass spans exact decades:
-    accelerance 1 1/kg <-> mobility 1e-3 m/(N.s) <-> compliance 1e-6 m/N."""
+    accelerance 1 1/kg <-> mobility 1e-3 m/(N.s) <-> compliance 1e-6 m/N.
+    """
     f = 1000.0 / (2.0 * math.pi)
     y = vibration.convert_frf(1.0, f, "apparent_mass", "mobility")
     h = vibration.convert_frf(1.0, f, "apparent_mass", "receptance")

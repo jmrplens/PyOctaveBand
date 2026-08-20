@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Porous-material models and multilayer absorber prediction.
+"""Porous-material models and multilayer absorber prediction.
 
 Oracle strategy (no free fitting anywhere):
 
@@ -715,7 +714,8 @@ class TestResonantSheets:
 
     def test_effectively_grazing_angle_rejected(self) -> None:
         """Angles within ~1e-6 of pi/2 would drive an air layer's kx to
-        exactly zero (inf * 0 = nan); they are rejected up front."""
+        exactly zero (inf * 0 = nan); they are rejected up front.
+        """
         f = np.array([1000.0])
         layers = [AirLayer(0.05)]
         with pytest.raises(ValueError, match="angle"):

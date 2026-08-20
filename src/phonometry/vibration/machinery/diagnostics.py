@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Kinematic fault frequencies of rotating machinery (Norton & Karczub Ch. 8).
+r"""Kinematic fault frequencies of rotating machinery (Norton & Karczub Ch. 8).
 
 Condition monitoring starts with arithmetic, not with signal processing: every
 rolling-contact bearing, gear pair, induction motor and bladed rotor excites a

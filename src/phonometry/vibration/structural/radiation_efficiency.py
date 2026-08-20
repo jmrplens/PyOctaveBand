@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Radiation efficiency of a plate in bending (Hopkins 2007, Sound Insulation,
+r"""Radiation efficiency of a plate in bending (Hopkins 2007, Sound Insulation,
 Section 2.9; Leppington et al. 1982; Maidanik 1962).
 
 The **radiation efficiency** ``sigma`` of a vibrating plate relates the

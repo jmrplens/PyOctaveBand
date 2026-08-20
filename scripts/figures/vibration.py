@@ -13,10 +13,10 @@ from typing import TYPE_CHECKING, Literal
 
 
 def _sci_math(value: float, digits: int = 2) -> str:
-    """A scientific-notation reading composed as mathtext.
+    r"""A scientific-notation reading composed as mathtext.
 
     ``f"{4.4e-3:.2e}"`` writes "4.40e-03", which a figure has no business
-    showing; this returns ``$4.40\\times10^{-3}$``, where mathtext sets the
+    showing; this returns ``$4.40\times10^{-3}$``, where mathtext sets the
     proper multiplication sign and a typographic minus in the exponent.
     """
     exponent = math.floor(math.log10(abs(value)))

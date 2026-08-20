@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-2D elastic finite-difference time-domain (P-SV) simulation.
+r"""2D elastic finite-difference time-domain (P-SV) simulation.
 
 A staggered-grid velocity-stress leapfrog solver for the 2D elastodynamic
 equations in an isotropic linear medium, following the reference formulation
@@ -136,6 +135,7 @@ class ExplosionSource:
     amplitude: float = 1.0
 
     def __post_init__(self) -> None:
+        """Reject a non-finite ``amplitude`` gain."""
         _finite("amplitude", self.amplitude)
 
 
@@ -171,6 +171,7 @@ class ForceSource:
     amplitude: float = 1.0
 
     def __post_init__(self) -> None:
+        """Reject a non-finite gain and a ``direction`` other than ``"x"``/``"y"``."""
         _finite("amplitude", self.amplitude)
         if self.direction not in _DIRECTIONS:
             raise ValueError("direction must be 'x' or 'y'")
@@ -209,6 +210,7 @@ class Material:
     rho: float
 
     def __post_init__(self) -> None:
+        """Reject non-positive ``c_p``/``rho``, negative ``c_s`` and negative lambda."""
         c_p = _positive_finite("c_p", self.c_p)
         c_s = _finite("c_s", self.c_s)
         if c_s < 0.0:

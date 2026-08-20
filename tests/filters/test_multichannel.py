@@ -1,7 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Multichannel processing validation tests.
-"""
+"""Multichannel processing validation tests."""
 
 import numpy as np
 
@@ -9,8 +7,7 @@ from phonometry import filters
 
 
 def test_multichannel() -> None:
-    """
-    Validate processing of signals with multiple channels (e.g., stereo).
+    """Validate processing of signals with multiple channels (e.g., stereo).
 
     **Purpose:**
     Verify that the `octave_filter` function can independently process multiple audio channels

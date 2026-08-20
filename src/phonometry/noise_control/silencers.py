@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Reactive silencers by the four-pole (transmission-matrix) method.
+r"""Reactive silencers by the four-pole (transmission-matrix) method.
 
 A reactive silencer controls noise by *reflecting* it back to the source with
 impedance discontinuities -- sudden area changes and side branches -- rather

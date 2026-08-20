@@ -1,7 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for integrated and statistical sound levels (Leq, LAeq, LN).
-"""
+"""Tests for integrated and statistical sound levels (Leq, LAeq, LN)."""
 
 import inspect
 import pathlib
@@ -76,7 +74,6 @@ def test_laeq_100hz_attenuated() -> None:
 
 def test_ln_levels_constant_signal_all_equal() -> None:
     """For a steady tone, L10 == L90 and L50 == Leq (within envelope ripple)."""
-
     x = _tone(1000, seconds=3.0)
     out = signals.ln_levels(x, FS, n=(10, 50, 90))
     assert set(out.keys()) == {10, 50, 90}
@@ -88,7 +85,6 @@ def test_ln_levels_constant_signal_all_equal() -> None:
 
 def test_ln_levels_ordering() -> None:
     """L10 (exceeded 10% of time) >= L50 >= L90 for a fluctuating signal."""
-
     rng = np.random.default_rng(0)
     x = rng.standard_normal(FS * 3) * np.linspace(0.1, 1.0, FS * 3)
     out = signals.ln_levels(x, FS)
@@ -161,7 +157,6 @@ def _faded(x: np.ndarray, ramp: float = 0.05) -> np.ndarray:
 
 def test_lc_peak_steady_1khz() -> None:
     """C weighting is ~0 dB at 1 kHz: LCpeak of a steady sine = 20*log10(A/p0)."""
-
     x = _faded(_tone(1000, seconds=1.0, amp=1.0))
     assert signals.lc_peak(x, FS) == pytest.approx(20 * np.log10(1.0 / 2e-5), abs=0.15)
 
@@ -284,7 +279,6 @@ def test_lc_peak_recovers_inter_sample_peak_8k_48k() -> None:
     (audit N2 I-1: up to -1.15 dB worst-case over phase, -0.69 dB at phase 0).
     Oversampled peak detection recovers the analytic sinusoid crest.
     """
-
     x = _faded(_tone(8000, seconds=1.0))
     err = signals.lc_peak(x, FS) - _lcpeak_analytic_steady(x, FS)
     assert abs(err) < 0.5, f"LCpeak under-reads by {err:+.3f} dB (inter-sample loss)"
@@ -292,7 +286,6 @@ def test_lc_peak_recovers_inter_sample_peak_8k_48k() -> None:
 
 def test_lc_peak_oversample_keyword_controls_recovery() -> None:
     """oversample=1 reproduces the legacy on-grid under-read; the default fixes it."""
-
     x = _faded(_tone(8000, seconds=1.0))
     ref = _lcpeak_analytic_steady(x, FS)
     legacy_err = signals.lc_peak(x, FS, oversample=1) - ref
@@ -308,7 +301,6 @@ def test_lc_peak_oversample_keyword_controls_recovery() -> None:
 
 def test_sel_steady_signal_normalizes_to_one_second() -> None:
     """SEL = Leq + 10*log10(T / 1 s) for a steady signal of duration T."""
-
     x = _tone(1000, seconds=4.0)
     assert signals.sel(x, FS) == pytest.approx(
         signals.leq(x) + 10 * np.log10(4.0), abs=1e-6
@@ -345,7 +337,6 @@ def _tone_at_level(
 
 def test_sound_exposure_anchor_90db_8h_is_3p2_pa2h() -> None:
     """BS EN 61252:1995 Annex A / §3.3 NOTE 4: 3.2 Pa²h <-> exactly 90 dB."""
-
     x = _tone_at_level(90.0)
     assert signals.sound_exposure(x, FS, duration_hours=8.0) == pytest.approx(
         3.2, rel=0.01
@@ -360,7 +351,6 @@ def test_lex_8h_anchor_90db() -> None:
 
 def test_lex_8h_half_workday_subtracts_3db() -> None:
     """LEX,8h = LAeq,T + 10*log10(T/8h): a 4 h exposure at 90 dB -> 86.99 dB."""
-
     x = _tone_at_level(90.0)
     assert signals.lex_8h(x, FS, duration_hours=4.0) == pytest.approx(
         90.0 + 10 * np.log10(4 / 8), abs=0.05
@@ -369,7 +359,6 @@ def test_lex_8h_half_workday_subtracts_3db() -> None:
 
 def test_sound_exposure_1_pa2h_is_nearly_85db() -> None:
     """§3.3 NOTE 4: 1 Pa²h corresponds to a LEX,8h of nearly 85 dB (84.95)."""
-
     x = _tone_at_level(84.9485)
     assert signals.sound_exposure(x, FS, duration_hours=8.0) == pytest.approx(
         1.0, rel=0.01
@@ -379,7 +368,6 @@ def test_sound_exposure_1_pa2h_is_nearly_85db() -> None:
 
 def test_sound_exposure_defaults_to_recording_duration() -> None:
     """Without duration_hours, x IS the whole event: E = integral over len(x)."""
-
     x = _tone_at_level(90.0, seconds=2.0)
     expected = (2e-5 * 10 ** (90 / 20)) ** 2 * (2.0 / 3600.0)  # Pa² * hours
     assert signals.sound_exposure(x, FS) == pytest.approx(expected, rel=0.01)
@@ -536,7 +524,6 @@ def test_ln_levels_and_sel_accept_every_weighting_filter_curve(curve: str) -> No
     'A', 'C', 'G', 'Z'; the real accepted set is whatever `weighting_filter`
     takes. Only an unknown letter raises.
     """
-
     x = _tone(1000, seconds=2.0)
     assert np.isfinite(signals.ln_levels(x, FS, n=(50,), weighting=curve)[50])
     assert np.isfinite(signals.sel(x, FS, weighting=curve))

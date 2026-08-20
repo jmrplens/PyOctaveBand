@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Psychoacoustic roughness per ECMA-418-2:2025 (4th ed., Sottek Hearing Model).
+r"""Psychoacoustic roughness per ECMA-418-2:2025 (4th ed., Sottek Hearing Model).
 
 Clean-room implementation of the roughness signal chain of ECMA-418-2:2025
 (Clause 7). The shared auditory front-end (Clause 5: outer/middle-ear filter,

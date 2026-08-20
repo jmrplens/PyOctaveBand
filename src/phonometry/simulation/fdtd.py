@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-2D acoustic finite-difference time-domain (FDTD) simulation.
+r"""2D acoustic finite-difference time-domain (FDTD) simulation.
 
 A staggered-grid (Yee-style) pressure-velocity leapfrog solver for the
 linear acoustic equations in a non-moving medium, following the reference
@@ -116,6 +115,7 @@ class GaussianPulse:
     amplitude: float = 1.0
 
     def __post_init__(self) -> None:
+        """Require a positive ``width`` and finite ``amplitude`` and ``t0``."""
         _positive_finite("width", self.width)
         _finite("amplitude", self.amplitude)
         if self.t0 is not None:
@@ -148,6 +148,7 @@ class CWSource:
     ramp_cycles: float = 3.0
 
     def __post_init__(self) -> None:
+        """Require a positive ``frequency`` and a non-negative ``ramp_cycles``."""
         _positive_finite("frequency", self.frequency)
         _finite("amplitude", self.amplitude)
         if not np.isfinite(self.ramp_cycles) or self.ramp_cycles < 0.0:
@@ -190,6 +191,7 @@ class SignalSource:
     amplitude: float = 1.0
 
     def __post_init__(self) -> None:
+        """Require a positive ``sample_rate`` and freeze finite 1D ``samples``."""
         _positive_finite("sample_rate", self.sample_rate)
         _finite("amplitude", self.amplitude)
         arr = np.array(self.samples, dtype=np.float64)

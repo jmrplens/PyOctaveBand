@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for ISO 3382-3:2012 open-plan-office spatial metrics.
+"""Tests for ISO 3382-3:2012 open-plan-office spatial metrics.
 
 Validation strategy: exact analytic constructions (not self-consistency).
 
@@ -126,7 +125,8 @@ def test_exactly_one_in_range_gives_nan_decay() -> None:
 
     A single in-range point cannot define a decay slope, so the module
     degrades gracefully to NaN (as documented) rather than crashing, while
-    the distance-based STI regression still resolves rD."""
+    the distance-based STI regression still resolves rD.
+    """
     r = np.array([0.5, 1.0, 4.0, 18.0])  # only 4 m lies in [2, 16] m
     lp = np.array([60.0, 58.0, 50.0, 40.0])
     sti = 0.6 - 0.02 * r

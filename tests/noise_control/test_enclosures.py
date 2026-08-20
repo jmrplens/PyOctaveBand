@@ -154,7 +154,6 @@ def test_norton_model_has_no_insertion_loss_ceiling() -> None:
 
 def test_required_transmission_loss_inverts_the_equation() -> None:
     """``enclosure_required_transmission_loss`` is the exact inverse."""
-
     target = np.array([10.0, 20.0, 30.0])
     required = noise_control.enclosure_required_transmission_loss(target, 6.0, 5.0, 0.3)
     assert np.allclose(required.insertion_loss, target)
@@ -167,7 +166,6 @@ def test_required_transmission_loss_inverts_the_equation() -> None:
 
 def test_required_transmission_loss_callable_and_result_shape() -> None:
     """A callable target and the frequency labelling behave as in the forward call."""
-
     freqs = np.array([125.0, 250.0, 500.0])
     res = noise_control.enclosure_required_transmission_loss(
         lambda f: 5.0 + 10.0 * np.log10(f / 125.0), 6.0, 5.0, 0.3, frequencies=freqs

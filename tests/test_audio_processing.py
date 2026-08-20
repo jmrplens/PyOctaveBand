@@ -1,7 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Advanced audio processing tests including Pink Noise spectral analysis.
-"""
+"""Advanced audio processing tests including Pink Noise spectral analysis."""
 
 from typing import cast
 
@@ -11,9 +9,7 @@ from phonometry import filters
 
 
 def generate_pink_noise(samples: int) -> np.ndarray:
-    """
-    Generate pink noise (1/f noise) using the Voss-McCartney algorithm.
-    """
+    """Generate pink noise (1/f noise) using the Voss-McCartney algorithm."""
     num_cols = 16
     rng = np.random.default_rng(42)  # Seeded for reproducibility
     array = np.empty((samples, num_cols))
@@ -35,8 +31,7 @@ def generate_pink_noise(samples: int) -> np.ndarray:
 
 
 def test_pink_noise_flatness() -> None:
-    """
-    Verify that Pink Noise produces a flat spectrum on a fractional octave analyzer.
+    """Verify that Pink Noise produces a flat spectrum on a fractional octave analyzer.
 
     **Purpose:**
     Pink noise has equal energy per octave (or fractional octave). This is a fundamental property used

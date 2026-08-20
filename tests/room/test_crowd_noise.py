@@ -55,7 +55,8 @@ def test_long_direct_field_60_db_at_1_2_m() -> None:
 
 def test_long_self_noise_63_db_for_one_talker() -> None:
     """Long p. 665: "With 20 metric sabins, our self-generated reverberant-field
-    noise is 63 dB"."""
+    noise is 63 dB".
+    """
     lp = float(np.asarray(room.crowd_noise_level(1, LONG_HARD_ABSORPTION))[()])
     assert round(lp) == 63
 
@@ -69,14 +70,16 @@ def test_long_signal_to_noise_is_minus_3_db() -> None:
 
 def test_long_twenty_talkers_reach_76_db() -> None:
     """Long p. 665: "If there are 20 tables in the room ... the reverberant
-    noise level rises to 76 dB"."""
+    noise level rises to 76 dB".
+    """
     lp = float(np.asarray(room.crowd_noise_level(20, LONG_HARD_ABSORPTION))[()])
     assert round(lp) == 76
 
 
 def test_long_absorptive_ceiling_adds_170_sabins() -> None:
     """Long p. 665: an alpha 0.9 ceiling over 13.7 x 13.7 m "adds 170 metric
-    sabins"."""
+    sabins".
+    """
     added = LONG_CEILING_ALPHA * LONG_TREATED_ROOM_SIDE**2
     assert round(added, -1) == 170.0
 

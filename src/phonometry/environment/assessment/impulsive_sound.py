@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Prominence of impulsive sounds and the ``LAeq`` adjustment (NT ACOU 112:2002,
+r"""Prominence of impulsive sounds and the ``LAeq`` adjustment (NT ACOU 112:2002,
 ISO/PAS 1996-3:2022).
 
 Noise with prominent impulses is more annoying than a steady sound of the same

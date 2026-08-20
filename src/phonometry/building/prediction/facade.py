@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Façade sound insulation and outdoor radiation prediction (EN 12354-3/-4:2000).
+r"""Façade sound insulation and outdoor radiation prediction (EN 12354-3/-4:2000).
 
 Two companion prediction models for the building envelope, both built on the
 same energy summation of element transmission factors

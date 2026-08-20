@@ -443,15 +443,15 @@ def _capped_layer_paths(
     angle_deg: float,
     ranges: np.ndarray,
 ) -> tuple[np.ndarray, float]:
-    """``z(r)`` in closed form for a gradient layer under a homogeneous cap.
+    r"""``z(r)`` in closed form for a gradient layer under a homogeneous cap.
 
     In the layer the ray is the usual circular arc, and the angle from the
     horizontal is what writes it down without solving anything: differentiating
-    Snell's law :math:`\\cos\\theta = c\\,\\xi` along the ray gives
-    :math:`d\\theta/dr = -\\xi g/\\cos\\theta`, hence
-    :math:`\\sin\\theta(r) = \\sin\\theta_0 - \\xi g r`, and Snell's law itself
-    then gives :math:`z - z_\\mathrm{s} = (\\cos\\theta - \\cos\\theta_0)/
-    (\\xi g)`. Above the cap the sound speed is constant and the ray is the
+    Snell's law :math:`\cos\theta = c\,\xi` along the ray gives
+    :math:`d\theta/dr = -\xi g/\cos\theta`, hence
+    :math:`\sin\theta(r) = \sin\theta_0 - \xi g r`, and Snell's law itself
+    then gives :math:`z - z_\mathrm{s} = (\cos\theta - \cos\theta_0)/
+    (\xi g)`. Above the cap the sound speed is constant and the ray is the
     straight line it arrives as. No integrator and no ray-tube quantity anywhere
     in it, which is what makes the family below an oracle rather than a
     restatement.

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Steady-state sound field in a room: room constant, critical distance, level.
+r"""Steady-state sound field in a room: room constant, critical distance, level.
 
 When a source of constant sound power runs in a room, the sound pressure level
 at a receiver settles to a steady value made of two parts: the **direct field**

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Calibrated spectral-density estimation with statistical error analysis.
+r"""Calibrated spectral-density estimation with statistical error analysis.
 
 Welch-averaged auto- and cross-spectral density estimators that report,
 alongside the spectrum itself, the statistical quality of the estimate,
@@ -332,7 +331,8 @@ def _coherence_from_spectra(
     gyy: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     r"""Coherence :math:`\gamma^2 = \lvert G_{xy} \rvert^2 /
-    (G_{xx} G_{yy})` clipped to [0, 1]."""
+    (G_{xx} G_{yy})` clipped to [0, 1].
+    """
     denom = gxx * gyy
     coh = np.divide(np.abs(gxy) ** 2, denom, out=np.zeros_like(gxx), where=denom > 0.0)
     return np.asarray(np.clip(coh, 0.0, 1.0), dtype=np.float64)

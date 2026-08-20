@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Impedance-tube material characterisation (ISO 10534-1/-2, ASTM E2611-19).
+"""Impedance-tube material characterisation (ISO 10534-1/-2, ASTM E2611-19).
 
 No worked numeric example exists in either standard, so the tests anchor on
 physics identities:

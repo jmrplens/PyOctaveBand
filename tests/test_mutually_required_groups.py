@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Every parameter group that has to travel together is refused when it does not.
+"""Every parameter group that has to travel together is refused when it does not.
 
 Twenty public functions take a group of arguments that the signature used to
 present as independently optional: some are "exactly one of", some are "all or

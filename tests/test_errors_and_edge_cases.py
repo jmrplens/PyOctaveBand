@@ -1,7 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for error handling and edge cases across all modules.
-"""
+"""Tests for error handling and edge cases across all modules."""
 
 import numpy as np
 import pytest
@@ -11,8 +9,7 @@ from phonometry.filters.frequencies import nominal_frequencies
 
 
 def test_octave_filter_bank_invalid_init() -> None:
-    """
-    Verify that OctaveFilterBank raises appropriate errors for invalid parameters.
+    """Verify that OctaveFilterBank raises appropriate errors for invalid parameters.
 
     **Purpose:**
     Ensure that the class constructor robustly validates all input arguments to prevent
@@ -50,8 +47,7 @@ def test_octave_filter_bank_invalid_init() -> None:
 
 
 def test_weighting_filter_invalid() -> None:
-    """
-    Verify error handling for invalid weighting curves.
+    """Verify error handling for invalid weighting curves.
 
     **Purpose:**
     Ensure that only the supported curves (A, B, C, D, G, AU, Z) are accepted.
@@ -71,8 +67,7 @@ def test_weighting_filter_invalid() -> None:
 
 
 def test_time_weighting_invalid() -> None:
-    """
-    Verify error handling for invalid time weighting modes.
+    """Verify error handling for invalid time weighting modes.
 
     **Purpose:**
     Ensure that only standardized ballistic modes (Fast, Slow, Impulse) are accepted.
@@ -90,8 +85,7 @@ def test_time_weighting_invalid() -> None:
 
 
 def test_linkwitz_riley_invalid() -> None:
-    """
-    Verify error handling for Linkwitz-Riley order.
+    """Verify error handling for Linkwitz-Riley order.
 
     **Purpose:**
     Linkwitz-Riley filters require an even order to ensure correct phase alignment.
@@ -109,8 +103,7 @@ def test_linkwitz_riley_invalid() -> None:
 
 
 def test_calculate_sensitivity_silent() -> None:
-    """
-    Verify error handling for silent reference signal.
+    """Verify error handling for silent reference signal.
 
     **Purpose:**
     Prevent division by zero during calibration when the reference signal is empty or silent.
@@ -127,8 +120,7 @@ def test_calculate_sensitivity_silent() -> None:
 
 
 def test_octave_filter_vs_class_consistency() -> None:
-    """
-    Verify that octave_filter function and OctaveFilterBank class yield identical results.
+    """Verify that octave_filter function and OctaveFilterBank class yield identical results.
 
     **Purpose:**
     Ensure that the functional wrapper correctly proxies all arguments to the underlying
@@ -171,8 +163,7 @@ def test_octave_filter_vs_class_consistency() -> None:
 
 
 def test_single_sample_signal() -> None:
-    """
-    Verify handling of extremely short signals.
+    """Verify handling of extremely short signals.
 
     **Purpose:**
     Ensure the library doesn't crash when provided with a single-sample signal,
@@ -192,8 +183,7 @@ def test_single_sample_signal() -> None:
 
 
 def test_multichannel_consistency() -> None:
-    """
-    Verify that processing 2 channels together is same as processing them separately.
+    """Verify that processing 2 channels together is same as processing them separately.
 
     **Purpose:**
     Confirm that the multichannel implementation correctly isolates channels and does

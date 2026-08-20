@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-RIFF/RF64 chunk walker for WAVE measurement files, in pure ``struct``.
+r"""RIFF/RF64 chunk walker for WAVE measurement files, in pure ``struct``.
 
 :mod:`scipy.io.wavfile` decodes the samples of every WAV variant a
 measurement chain produces (PCM 1-64 bit, IEEE float, WAVE_FORMAT_EXTENSIBLE,

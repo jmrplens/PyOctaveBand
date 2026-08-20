@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for atmospheric refraction: ray tracing and the parabolic equation.
+"""Tests for atmospheric refraction: ray tracing and the parabolic equation.
 
 Clean-room anchors:
 - Salomons, *Computational Atmospheric Acoustics* (Springer, 2001): Eq. (4.3)

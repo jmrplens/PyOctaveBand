@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Far-field polar response and diffusion coefficient predicted from a diffuser design.
+r"""Far-field polar response and diffusion coefficient predicted from a diffuser design.
 
 Where :mod:`phonometry.materials.diffusers.scattering_diffusion` evaluates the *measured*
 directional diffusion coefficient of ISO 17497-2 from a set of reflected

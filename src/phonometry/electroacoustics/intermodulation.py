@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Intermodulation distortion of audio equipment (IEC 60268-3 14.12.7-10).
+r"""Intermodulation distortion of audio equipment (IEC 60268-3 14.12.7-10).
 
 Where the harmonic metrics of :mod:`phonometry.electroacoustics.distortion`
 drive the equipment with a single tone, these drive it with two (or with a
@@ -11,7 +10,7 @@ inharmonic with the programme:
 
 * **Modulation distortion** ``d_m,2``/``d_m,3`` (14.12.7): a large low tone
   :math:`f_1` modulating a small high tone :math:`f_2`, read on the
-  sidebands at :math:`f_2 \\pm (n-1) f_1`.
+  sidebands at :math:`f_2 \pm (n-1) f_1`.
 * **Difference-frequency distortion** ``d_d,2``/``d_d,3`` (14.12.8) from two
   equal-amplitude tones, and the **total difference-frequency distortion**
   (14.12.10) of the standard 8 kHz / 11,95 kHz pair.
@@ -373,7 +372,8 @@ _DIM_SEARCH_FACTOR = 0.1
 def _dim_components(f_sine: float, f_square: float, nyquist: float) -> list[float]:
     r"""DIM difference products
     :math:`\lvert k \, f_\mathrm{square} - f_\mathrm{sine} \rvert`
-    below ``f_sine`` (Table 2)."""
+    below ``f_sine`` (Table 2).
+    """
     products: set[float] = set()
     for k in range(1, _DIM_MAX_ORDER + 1):
         for sign in (-1.0, 1.0):

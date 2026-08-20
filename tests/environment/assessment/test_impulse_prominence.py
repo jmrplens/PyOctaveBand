@@ -111,7 +111,8 @@ def test_plot_returns_axes() -> None:
 def test_onset_rate_gate_zeroes_non_qualifying_impulses() -> None:
     """Clause 8 applies the adjustment only for onset rates above 10 dB/s
     (clause 4.5): a 5 dB/s level rise (P = 5.30 for LD = 40 dB) must not
-    yield KI > 0."""
+    yield KI > 0.
+    """
     with pytest.warns(nt.ImpulseProminenceWarning, match="10 dB/s"):
         res = nt.impulse_prominence([5.0], [40.0])
     assert res.qualifies.tolist() == [False]
@@ -121,7 +122,8 @@ def test_onset_rate_gate_zeroes_non_qualifying_impulses() -> None:
 
 def test_onset_rate_gate_governing_from_qualifying_only() -> None:
     """A non-qualifying event with the highest P cannot govern: the KI comes
-    from the strongest QUALIFYING impulse."""
+    from the strongest QUALIFYING impulse.
+    """
     with pytest.warns(nt.ImpulseProminenceWarning):
         res = nt.impulse_prominence([8.0, 30.0], [60.0, 20.0])
     assert res.qualifies.tolist() == [False, True]

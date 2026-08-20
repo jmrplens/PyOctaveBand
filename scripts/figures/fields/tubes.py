@@ -50,7 +50,8 @@ def _anim_tube_hardware(
     label_speaker: bool = True,
 ) -> None:
     """Draw the tube as hardware around the FDTD bore: walls, loudspeaker,
-    sample block, microphones and the termination, all to scale (metres)."""
+    sample block, microphones and the termination, all to scale (metres).
+    """
     from matplotlib.patches import Rectangle
 
     wall = 0.014
@@ -255,7 +256,8 @@ def animate_fdtd_impedance_tube(output_dir: str) -> None:
     the standing wave grows deep nulls (|r| ~ 1), while a 10 cm lossy
     sample in front of the same plug leaves the minima shallow: the ISO
     10534-2 microphone pair reads exactly that envelope. One concept: the
-    standing-wave ratio IS the absorption measurement."""
+    standing-wave ratio IS the absorption measurement.
+    """
     T = _translate_str
     (p_e, env_e), (p_s, env_s), times, alpha = _impedance_tube_fields()
     vmax = float(np.quantile(np.abs(p_e), 0.999))
@@ -491,7 +493,8 @@ def animate_fdtd_transmission_tube(output_dir: str) -> None:
     The empty tube passes it unchanged; a 10 cm lossy layer mid-tube splits
     it into a reflection and a weakened transmission that the four ASTM
     E2611 microphones resolve. One concept: transmission loss is what fails
-    to come out the other side."""
+    to come out the other side.
+    """
     T = _translate_str
     p_e, p_s, times, tl = _transmission_tube_fields()
     vmax = float(np.quantile(np.abs(p_e), 0.999))
@@ -588,7 +591,8 @@ def animate_standing_wave_tube(output_dir: str) -> None:
     """ISO 10534-2 impedance tube: the incident and reflected waves travel
     inside a drawn tube and their sum forms the standing-wave envelope; a
     rigid termination (deep nodes) is compared with a porous sample
-    (shallow nodes) sampled by the two wall microphones."""
+    (shallow nodes) sampled by the two wall microphones.
+    """
     from matplotlib.patches import Polygon, Rectangle
 
     T = _translate_str

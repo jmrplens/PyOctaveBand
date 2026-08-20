@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-HVAC duct acoustics: fan power, duct losses, plenums and flow-generated noise.
+r"""HVAC duct acoustics: fan power, duct losses, plenums and flow-generated noise.
 
 A ventilation duct network attenuates fan noise through several mechanisms
 that add up along the path, and it *regenerates* noise wherever the airflow is

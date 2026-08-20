@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Standing-wave-ratio method for normal-incidence absorption and impedance.
+r"""Standing-wave-ratio method for normal-incidence absorption and impedance.
 
 **BS EN ISO 10534-1:2001**, the probe-traverse method of the impedance tube: a
 loudspeaker drives one pure tone at a time, a probe microphone traverses the

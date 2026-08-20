@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Correlation analysis and time-delay estimation.
+r"""Correlation analysis and time-delay estimation.
 
 Auto- and cross-correlation estimators with the three standard
 normalizations, generalized cross-correlation (GCC) time-delay estimation

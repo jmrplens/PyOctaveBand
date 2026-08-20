@@ -163,7 +163,8 @@ def test_envelope_rejects_invalid_inputs() -> None:
 
 def test_short_record_antialiased_decimation_is_supported() -> None:
     """scipy's FIR decimator runs through resample_poly, so even the
-    32-sample minimum record decimates without a length cushion."""
+    32-sample minimum record decimates without a length cushion.
+    """
     x = np.sin(0.3 * np.arange(32))
     res = ph.signals.envelope(x, FS, decimation_factor=8)
     assert res.envelope.size == 4

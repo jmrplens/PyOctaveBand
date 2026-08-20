@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Carrying the ``bext`` provenance chunk inside a FLAC file.
+r"""Carrying the ``bext`` provenance chunk inside a FLAC file.
 
 FLAC is the one compressed format a measurement archive can defend
 (lossless by construction, RFC 9639), but its metadata model has no

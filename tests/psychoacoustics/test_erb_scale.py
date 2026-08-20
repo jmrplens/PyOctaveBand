@@ -58,7 +58,8 @@ def test_erb_bandwidth_at_1_khz_is_about_130_hz() -> None:
 
 def test_935_to_1065_hz_spans_one_erb() -> None:
     """Moore p. 76: "an increase in frequency from 935 to 1065 Hz corresponds
-    to one ERB_N"."""
+    to one ERB_N".
+    """
     span = 1065.0 - 935.0
     centre = 0.5 * (935.0 + 1065.0)
     erb = float(np.asarray(psychoacoustics.erb_bandwidth(centre))[()])

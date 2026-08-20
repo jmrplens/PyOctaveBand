@@ -153,6 +153,10 @@ select = [
     "ICN",                  # the conventional alias for a well-known package
     "N812",                 # an alias must not disguise a function as a class
     "INP", "T20",           # both already clean in `src`, and kept that way
+    "D105",                 # a magic method still explains itself
+    "D2", "D301",           # docstring shape: where the summary sits and how
+                            # quotes and backslashes are spelled. Shape only;
+                            # no rule here rewords prose.
 ]
 ignore = [
     "B905",  # selected by "B"; see the note below
@@ -170,6 +174,23 @@ ignore = [
     # two of the nineteen it finds here, and wrong about the rest; SonarCloud
     # flagged the result as assertions whose argument order no longer agrees.
     "SIM300",
+    # Four docstring rules are measured out because they would rewrite prose,
+    # and the documentation's voice is content here, not shape:
+    #   D401  (999) demands imperative mood ("Return the..."); the house style
+    #               opens with a noun phrase and the API reference renders it.
+    #   D205  (528) wants a one-line summary, a blank line, then the rest.
+    #               Measured, 516 of the 528 openings are deliberate multi-line
+    #               sentences; satisfying the rule means rewriting them all.
+    #   D403   (50) would capitalise the first word, which here is `dBFS`,
+    #               `dL`, `fc`, `matplotlib`: symbols and identifiers.
+    #   D404/D415   wording rules with 2 and 5 hits; same principle.
+    #   D400    (9) the trailing period. All nine first lines are right as
+    #               they stand: four are questions, which end in the mark
+    #               they deserve, and five open a sentence that finishes on
+    #               the next line.
+    "D205", "D400", "D401", "D403", "D404", "D415",
+    "D203",  # a blank line before a class docstring; D211 is the house shape
+    "D213",  # the summary on the second line; D212 is the house shape
 ]
 # Selected next, in their own review, because each is a change to code rather
 # than to its shape and the diff has to be readable to be checked:
@@ -194,7 +215,12 @@ ignore = [
 # tests are packages anyone imports by name. Both rules are here to hold `src`,
 # where they already find nothing.
 "scripts/**" = ["E402", "T201", "INP001"]
-"tests/**" = ["E402", "T201", "INP001"]
+# A test may open its docstring with the clause it checks, quoted verbatim:
+# `""" "Up till about 1000 Hz..." `. The space after the triple quote is what
+# keeps that from being four quotation marks in a row; D210 wants it gone and
+# has no way to fix it. The quotation stays, so the rule stands down in tests
+# and holds `src`, where it finds nothing.
+"tests/**" = ["E402", "T201", "INP001", "D210"]
 ".github/**" = ["T201", "INP001"]
 # The PyOctaveBand transition shim exists to re-export the whole package under
 # the old name; the star import is the point of the file.

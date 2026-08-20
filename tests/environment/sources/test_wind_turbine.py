@@ -161,7 +161,8 @@ def test_two_tone_band_anchors_to_highest_tone_line() -> None:
     49.5 dB @ 520 Hz on a 30 dB floor (df = 2 Hz): the 49.5 dB line falls
     outside 10 dB of the 60 dB maximum (candidate-anchored it would count),
     L_pt = 10 lg(10^5.2 + 10^6) = 60.639 dB, L_pn = 30 + 10 lg(CBW(480)/3),
-    L_a at 500 Hz, giving dL_a = 17.066 dB at 500 Hz (hand-derived)."""
+    L_a at 500 Hz, giving dL_a = 17.066 dB at 500 Hz (hand-derived).
+    """
     df = 2.0
     freqs = np.arange(420.0, 540.0 + df, df)
     levels = np.full(freqs.size, 30.0)
@@ -179,7 +180,8 @@ def test_two_tone_band_anchors_to_highest_tone_line() -> None:
 def test_no_identified_tone_is_flagged() -> None:
     """A broad 33 dB bump on a 30 dB floor produces no classified tone line
     (9.5.4): the result must say so instead of fabricating a tone, and such
-    spectra are excluded from the 9.5.1 bin averaging."""
+    spectra are excluded from the 9.5.1 bin averaging.
+    """
     df = 2.0
     freqs = np.arange(380.0, 620.0 + df, df)
     levels = np.full(freqs.size, 30.0)
@@ -192,7 +194,8 @@ def test_no_identified_tone_is_flagged() -> None:
 
 def test_possible_tone_screen_rejects_non_local_maximum() -> None:
     """9.5.2: a candidate that is not a local maximum is not a possible tone,
-    even when strong lines exist elsewhere in the band."""
+    even when strong lines exist elsewhere in the band.
+    """
     df = 2.0
     freqs = np.arange(420.0, 580.0 + df, df)
     levels = np.full(freqs.size, 30.0)

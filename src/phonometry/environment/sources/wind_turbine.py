@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Wind-turbine acoustic noise (IEC 61400-11:2012+A1:2018).
+r"""Wind-turbine acoustic noise (IEC 61400-11:2012+A1:2018).
 
 Two closed-form quantities of the standard:
 
@@ -309,7 +308,8 @@ def _candidate_peak(
     tone_frequency: float | None,
 ) -> int:
     """Index of the candidate line: the spectrum maximum, or the validated
-    nearest bin to the requested frequency."""
+    nearest bin to the requested frequency.
+    """
     if tone_frequency is None:
         return int(np.argmax(lv))
     tf = float(tone_frequency)
@@ -328,7 +328,8 @@ def _screen_possible_tone(
 ) -> bool:
     """9.5.2 possible-tone screen: local maximum more than 6 dB above the
     critical-band energy average that excludes the maximum line and its two
-    adjacent lines."""
+    adjacent lines.
+    """
     screen_indices = np.nonzero(in_band)[0]
     screen_indices = screen_indices[np.abs(screen_indices - peak) > 1]
     local_max = (peak == 0 or lv[peak] >= lv[peak - 1]) and (

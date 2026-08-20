@@ -1,7 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Calibration utilities for mapping digital signals to physical SPL levels.
-"""
+"""Calibration utilities for mapping digital signals to physical SPL levels."""
 
 from __future__ import annotations
 
@@ -73,8 +71,7 @@ def sensitivity(
     frequency: float = 1000.0,
     narrowband: bool = False,
 ) -> float:
-    r"""
-    Calculate the calibration factor (multiplier) to convert digital units
+    r"""Calculate the calibration factor (multiplier) to convert digital units
     to Pascals based on a reference recording (e.g., 1kHz @ 94dB).
 
     When ``fs`` is provided (and ``validate`` is True), the recording's

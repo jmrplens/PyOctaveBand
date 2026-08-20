@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the EN 29052-1 / ISO 9052-1 dynamic-stiffness report (``.report()``).
+"""Tests for the EN 29052-1 / ISO 9052-1 dynamic-stiffness report (``.report()``).
 
 The report is a rendering feature, so these tests assert only structural facts:
 a valid single-page PDF is written, the displayed key quantities match the

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Every signal-analysis estimate takes a ``Signal`` in place of ``(x, fs)``.
+"""Every signal-analysis estimate takes a ``Signal`` in place of ``(x, fs)``.
 
 Same contract as ``signals.levels`` and ``filters``, held by
 ``phonometry.io._resolve``: the object supplies the rate when ``fs`` is

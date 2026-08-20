@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-IEC 61672-1:2013 frequency-weighting class verification.
+r"""IEC 61672-1:2013 frequency-weighting class verification.
 
 A/C/Z frequency-weighting acceptance limits transcribed from
 BS EN 61672-1:2013, **Table 3** (standard page 22): the design-goal responses
@@ -322,8 +321,7 @@ def _analytic_weighting_db(curve: str, frequencies: np.ndarray) -> np.ndarray:
 def weighting_class_limits(
     weighting_class: int,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """
-    IEC 61672-1:2013 Table 3 acceptance limits for a performance class.
+    """IEC 61672-1:2013 Table 3 acceptance limits for a performance class.
 
     The limits apply to every IEC 61672-1 weighting (A, C, Z); they qualify
     the deviation of the measured relative response from the design goal at
@@ -492,8 +490,7 @@ def _between_nominals_sweep(
 def verify_weighting_class(
     wf: WeightingFilter, *, sweep_points: int = 4096
 ) -> dict[str, Any]:
-    r"""
-    Verify a frequency-weighting filter against its standard's tolerances.
+    r"""Verify a frequency-weighting filter against its standard's tolerances.
 
     ``A``/``C``/``Z`` are checked against IEC 61672-1:2013 Table 3 (classes 1
     and 2). The historical ``B`` weighting is checked against ANSI S1.4-1983:

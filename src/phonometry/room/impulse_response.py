@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Impulse-response acquisition per BS EN ISO 18233:2006.
+r"""Impulse-response acquisition per BS EN ISO 18233:2006.
 
 This module provides the deterministic-excitation front end for the "new
 measurement methods" of ISO 18233: generate an excitation signal, play it
@@ -144,7 +143,8 @@ class ImpulseResponseResult:
     :func:`phonometry.room.decay_curve` and
     :func:`phonometry.speech.sti_from_impulse_response`. Indexing,
     ``len(result)`` and the ``size``/``ndim``/``shape``/``dtype`` attributes
-    forward to ``ir``."""
+    forward to ``ir``.
+    """
 
     ir: np.ndarray
     fs: int | None
@@ -155,9 +155,11 @@ class ImpulseResponseResult:
         return np.asarray(self.ir, dtype=dtype)
 
     def __len__(self) -> int:
+        """Number of impulse-response samples (the length of ``ir``'s last axis)."""
         return int(self.ir.shape[-1])
 
     def __getitem__(self, key: Any) -> Any:
+        """Forward indexing to ``ir``: ``result[key]`` yields ``ir[key]``."""
         return self.ir[key]
 
     @property
@@ -204,8 +206,7 @@ def sweep_signal(
     amplitude: float = 1.0,
     fade: float = 0.01,
 ) -> np.ndarray:
-    r"""
-    Generate an exponential sine sweep (ESS) with exact analytic phase.
+    r"""Generate an exponential sine sweep (ESS) with exact analytic phase.
 
     The instantaneous frequency rises exponentially from ``f1`` to ``f2``,
     :math:`f(t) = f_1 (f_2/f_1)^{t/T}`, so the time spent per octave is
@@ -282,8 +283,7 @@ def inverse_filter(
     amplitude: float = 1.0,
     fade: float = 0.01,
 ) -> np.ndarray:
-    """
-    Build the Farina inverse filter for an exponential sine sweep.
+    """Build the Farina inverse filter for an exponential sine sweep.
 
     The inverse filter is the time-reversed sweep multiplied by an amplitude
     envelope that rises by 6 dB/octave (``prop. to the instantaneous
@@ -415,8 +415,7 @@ def impulse_response(
     length: int | None = None,
     return_full: bool = False,
 ) -> ImpulseResponseResult:
-    r"""
-    Recover the broadband impulse response by sweep deconvolution.
+    r"""Recover the broadband impulse response by sweep deconvolution.
 
     Implements the linear (non-circular) deconvolution of ISO 18233:2006,
     B.5. Both signals are zero-padded to ``len(recorded)+len(reference)-1``
@@ -506,8 +505,7 @@ def impulse_response(
 
 
 def mls_signal(order: int) -> np.ndarray:
-    """
-    Generate a maximum-length sequence (MLS) of the given order.
+    """Generate a maximum-length sequence (MLS) of the given order.
 
     A Fibonacci LFSR with primitive-polynomial feedback taps produces a
     binary sequence of length ``2**order - 1`` whose circular
@@ -545,8 +543,7 @@ def mls_impulse_response(
     length: int | None = None,
     fs: int | None = None,
 ) -> ImpulseResponseResult:
-    """
-    Recover an impulse response from a periodic MLS excitation.
+    """Recover an impulse response from a periodic MLS excitation.
 
     The recording must span an integer number of MLS periods; the periods
     are averaged (raising the effective signal-to-noise ratio by 3 dB per
@@ -664,8 +661,7 @@ _SHAPED_EDGE_OCTAVES = 1.0 / 6.0
 
 
 def golay_pair(order: int) -> tuple[np.ndarray, np.ndarray]:
-    r"""
-    Generate a complementary Golay pair of length ``2**order``.
+    r"""Generate a complementary Golay pair of length ``2**order``.
 
     Built with the append recursion of Golay (1961): starting from
     ``a1 = (+1, +1)``, ``b1 = (+1, -1)``, each step appends ``b`` to ``a``
@@ -699,8 +695,7 @@ def golay_impulse_response(
     length: int | None = None,
     fs: int | None = None,
 ) -> ImpulseResponseResult:
-    r"""
-    Recover an impulse response from a complementary Golay-pair excitation.
+    r"""Recover an impulse response from a complementary Golay-pair excitation.
 
     Each code of the pair is emitted periodically (as with an MLS, record in
     the steady state: at least one settling period before acquisition); the
@@ -833,9 +828,11 @@ class ShapedSweepResult:
         return np.asarray(self.signal, dtype=dtype)
 
     def __len__(self) -> int:
+        """Number of sweep samples (the length of ``signal``'s last axis)."""
         return int(self.signal.shape[-1])
 
     def __getitem__(self, key: Any) -> Any:
+        """Forward indexing to ``signal``: ``result[key]`` yields ``signal[key]``."""
         return self.signal[key]
 
     @property
@@ -944,8 +941,7 @@ def shaped_sweep_signal(
     start_delay: float | None = None,
     fade: float = 0.01,
 ) -> ShapedSweepResult:
-    r"""
-    Synthesize a sweep with an arbitrary target magnitude spectrum.
+    r"""Synthesize a sweep with an arbitrary target magnitude spectrum.
 
     Implements the frequency-domain sweep construction of
     Mueller & Massarani ("Transfer-Function Measurement with Sweeps", JAES

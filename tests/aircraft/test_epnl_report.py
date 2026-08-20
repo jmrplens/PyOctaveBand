@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the ICAO Annex 16 EPNL report (``.report()`` -> PDF).
+"""Tests for the ICAO Annex 16 EPNL report (``.report()`` -> PDF).
 
 The report is a rendering feature, so these tests assert only structural facts:
 a valid single-page PDF is written for a computed flyover, unknown engines are

@@ -1,7 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Signal processing utilities for phonometry.
-"""
+"""Signal processing utilities for phonometry."""
 
 from __future__ import annotations
 
@@ -15,8 +13,7 @@ if TYPE_CHECKING:
 
 
 def _typesignal(x: Sequence[float] | np.ndarray) -> np.ndarray:
-    """
-    Ensure signal is a float64 numpy array.
+    """Ensure signal is a float64 numpy array.
 
     Integer inputs (e.g. int16 audio from ``scipy.io.wavfile.read``) are
     converted to float64 to prevent silent overflow when the signal is
@@ -29,8 +26,7 @@ def _typesignal(x: Sequence[float] | np.ndarray) -> np.ndarray:
 
 
 def _resample_to_length(y: np.ndarray, factor: int, target_length: int) -> np.ndarray:
-    """
-    Resample signal and ensure the output matches target_length exactly.
+    """Resample signal and ensure the output matches target_length exactly.
     Handles both 1D and 2D (channels, samples) arrays.
 
     :param y: Input signal.
@@ -66,8 +62,7 @@ def _resample_to_length(y: np.ndarray, factor: int, target_length: int) -> np.nd
 def _downsamplingfactor(
     freq: list[float], fs: int, headroom: float = 1.25
 ) -> np.ndarray:
-    """
-    Compute optimal downsampling factors for filter stability.
+    """Compute optimal downsampling factors for filter stability.
 
     :param freq: Band upper-edge frequencies.
     :param fs: Sample rate.

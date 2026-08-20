@@ -90,7 +90,8 @@ def animate_fdtd_room_modes(output_dir: str) -> None:
     """On-mode vs off-mode CW drive in a rigid 5 x 3.5 m room (2D FDTD):
     on resonance the (2,1) standing-wave pattern grows until it dominates
     the field; off resonance the forced response stays weak and never
-    organises into that nodal structure."""
+    organises into that nodal structure.
+    """
     from matplotlib import patheffects
 
     T = _translate_str
