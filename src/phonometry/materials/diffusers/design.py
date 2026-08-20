@@ -106,7 +106,8 @@ def _positive_scalar(value: float, name: str) -> float:
     """Return ``value`` as a positive, finite float or raise ``ValueError``."""
     v = float(value)
     if not math.isfinite(v) or v <= 0.0:
-        raise ValueError(f"'{name}' must be a positive, finite number.")
+        msg = f"'{name}' must be a positive, finite number."
+        raise ValueError(msg)
     return v
 
 
@@ -114,12 +115,15 @@ def _prime_generator(prime: int) -> int:
     """Return ``prime`` as an odd prime >= 3 or raise ``ValueError``."""
     n = int(prime)
     if n != prime:
-        raise ValueError("'prime' must be an integer.")
+        msg = "'prime' must be an integer."
+        raise ValueError(msg)
     if n < 3 or n % 2 == 0:
-        raise ValueError("'prime' must be an odd prime >= 3.")
+        msg = "'prime' must be an odd prime >= 3."
+        raise ValueError(msg)
     for factor in range(3, math.isqrt(n) + 1, 2):
         if n % factor == 0:
-            raise ValueError(f"'prime' must be prime; {n} is divisible by {factor}.")
+            msg = f"'prime' must be prime; {n} is divisible by {factor}."
+            raise ValueError(msg)
     return n
 
 
@@ -233,9 +237,8 @@ def _polar_levels(pressure: Complex) -> Real:
     magnitude = np.abs(np.asarray(pressure, dtype=np.complex128))
     peak = float(np.max(magnitude))
     if peak <= 0.0:
-        raise ValueError(
-            "The predicted polar response carries no energy; check the inputs."
-        )
+        msg = "The predicted polar response carries no energy; check the inputs."
+        raise ValueError(msg)
     ratio = magnitude / peak
     floor = 1e-10  # -200 dB relative to the peak.
     return np.asarray(20.0 * np.log10(np.maximum(ratio, floor)), dtype=np.float64)
@@ -317,21 +320,24 @@ def _resolve_reflection(
     sequence) must be given.
     """
     if (depths is None) == (reflection is None):
-        raise ValueError("Provide exactly one of 'depths' or 'reflection'.")
+        msg = "Provide exactly one of 'depths' or 'reflection'."
+        raise ValueError(msg)
     if reflection is not None:
         r = np.atleast_1d(np.asarray(reflection, dtype=np.complex128))
         if r.ndim != 1 or r.size < 2:
-            raise ValueError(
-                "'reflection' must be a 1-D sequence of at least two wells."
-            )
+            msg = "'reflection' must be a 1-D sequence of at least two wells."
+            raise ValueError(msg)
         if not np.all(np.isfinite(r)):
-            raise ValueError("'reflection' values must be finite.")
+            msg = "'reflection' values must be finite."
+            raise ValueError(msg)
         return r
     d = np.atleast_1d(np.asarray(depths, dtype=np.float64))
     if d.ndim != 1 or d.size < 2:
-        raise ValueError("'depths' must be a 1-D sequence of at least two wells.")
+        msg = "'depths' must be a 1-D sequence of at least two wells."
+        raise ValueError(msg)
     if not np.all(np.isfinite(d)) or np.any(d < 0.0):
-        raise ValueError("'depths' values must be finite and non-negative.")
+        msg = "'depths' values must be finite and non-negative."
+        raise ValueError(msg)
     k = 2.0 * np.pi * frequency / speed_of_sound
     return np.asarray(np.exp(-2j * k * d), dtype=np.complex128)
 
@@ -350,15 +356,19 @@ def _prepare_geometry(
     c = _positive_scalar(speed_of_sound, "speed_of_sound")
     ang = np.atleast_1d(np.asarray(angles, dtype=np.float64))
     if ang.ndim != 1 or ang.size < 2:
-        raise ValueError("'angles' must be a 1-D sequence of at least two angles.")
+        msg = "'angles' must be a 1-D sequence of at least two angles."
+        raise ValueError(msg)
     if not np.all(np.isfinite(ang)):
-        raise ValueError("'angles' values must be finite.")
+        msg = "'angles' values must be finite."
+        raise ValueError(msg)
     psi = float(source_angle)
     if not math.isfinite(psi):
-        raise ValueError("'source_angle' must be finite.")
+        msg = "'source_angle' must be finite."
+        raise ValueError(msg)
     n_periods = int(periods)
     if n_periods != periods or n_periods < 1:
-        raise ValueError("'periods' must be an integer of at least 1.")
+        msg = "'periods' must be an integer of at least 1."
+        raise ValueError(msg)
     return w, f, ang, psi, n_periods, c
 
 
@@ -520,14 +530,16 @@ def predicted_diffusion_spectrum(
         if ``reflection_of`` is not ``None``.
     """
     if reflection_of is not None:
-        raise ValueError(
+        msg = (
             "'reflection_of' is reserved for a future frequency-dependent "
             "reflection model and must be None; build the spectrum from "
             "predict_diffuser_polar_response for an explicit reflection model."
         )
+        raise ValueError(msg)
     freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if freqs.ndim != 1 or freqs.size == 0:
-        raise ValueError("'frequencies' must be a non-empty 1-D sequence.")
+        msg = "'frequencies' must be a non-empty 1-D sequence."
+        raise ValueError(msg)
     d_period = np.atleast_1d(np.asarray(depths, dtype=np.float64))
     flat = np.zeros_like(d_period)
 

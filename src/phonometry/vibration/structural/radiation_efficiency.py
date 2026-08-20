@@ -216,9 +216,11 @@ def radiation_efficiency(
     """
     freq = np.atleast_1d(np.asarray(frequency, dtype=np.float64))
     if freq.ndim != 1 or freq.size == 0:
-        raise ValueError("'frequency' must be a non-empty 1-D array.")
+        msg = "'frequency' must be a non-empty 1-D array."
+        raise ValueError(msg)
     if np.any(freq <= 0.0):
-        raise ValueError("'frequency' must be positive.")
+        msg = "'frequency' must be positive."
+        raise ValueError(msg)
     lx = require_positive(length_x, "length_x")
     ly = require_positive(length_y, "length_y")
     fc = require_positive(critical_frequency, "critical_frequency")

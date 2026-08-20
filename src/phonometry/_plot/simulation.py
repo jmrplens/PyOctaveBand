@@ -248,10 +248,11 @@ def plot_fdtd_snapshot(
     :raises ValueError: If the result holds no snapshots.
     """
     if result.snapshots is None or result.snapshot_times is None:
-        raise ValueError(
+        msg = (
             "the result holds no snapshots; rerun the "
             "simulation with snapshot_every set"
         )
+        raise ValueError(msg)
     ax = ax if ax is not None else _new_axes()
     t_txt = _snapshot_time_text(result.snapshot_times, frame, language)
     return _render_snapshot(
@@ -361,10 +362,11 @@ def plot_elastic_snapshot(
     :raises ValueError: If the result holds no snapshots.
     """
     if result.snapshots is None or result.snapshot_times is None:
-        raise ValueError(
+        msg = (
             "the result holds no snapshots; rerun the "
             "simulation with snapshot_every set"
         )
+        raise ValueError(msg)
     ax = ax if ax is not None else _new_axes()
     t_txt = _snapshot_time_text(result.snapshot_times, frame, language)
     return _render_snapshot(

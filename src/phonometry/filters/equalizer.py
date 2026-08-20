@@ -146,10 +146,11 @@ class EQSection:
 def _validate_section(section: EQSection) -> None:
     """Validate one :class:`EQSection` against the cookbook's parameter rules."""
     if section.filter_type not in _DESIGNERS:
-        raise ValueError(
+        msg = (
             f"Unknown filter_type {section.filter_type!r}; expected one of "
             f"{sorted(_DESIGNERS)}."
         )
+        raise ValueError(msg)
     for name, value in (
         ("f0", section.f0),
         ("gain_db", section.gain_db),
@@ -158,9 +159,11 @@ def _validate_section(section: EQSection) -> None:
         ("slope", section.slope),
     ):
         if value is not None and not math.isfinite(value):
-            raise ValueError(f"'{name}' must be finite, got {value!r}.")
+            msg = f"'{name}' must be finite, got {value!r}."
+            raise ValueError(msg)
     if section.f0 <= 0:
-        raise ValueError("Centre frequency 'f0' must be positive.")
+        msg = "Centre frequency 'f0' must be positive."
+        raise ValueError(msg)
     _gain_amplitude(section.gain_db)
     _validate_section_parameterization(section)
 
@@ -178,10 +181,11 @@ def _gain_amplitude(gain_db: float) -> float:
     except OverflowError:
         big_a = math.inf
     if not (big_a > 0.0 and math.isfinite(big_a)):
-        raise ValueError(
+        msg = (
             f"'gain_db' = {gain_db:g} dB is outside the representable "
             "range: 10^(gain_db/40) must be a positive finite number."
         )
+        raise ValueError(msg)
     return big_a
 
 
@@ -201,11 +205,12 @@ def _validate_shelf_slope(section: EQSection) -> None:
         return
     bound = a_sum / (a_sum - 2.0)
     if section.slope >= bound:
-        raise ValueError(
+        msg = (
             f"Shelf slope 'slope' = {section.slope:g} is too steep for "
             f"gain_db = {section.gain_db:g}: the cookbook's alpha is real "
             f"only for slopes below (A + 1/A)/(A + 1/A - 2) = {bound:.6g}."
         )
+        raise ValueError(msg)
 
 
 def _validate_section_parameterization(section: EQSection) -> None:
@@ -220,23 +225,28 @@ def _validate_section_parameterization(section: EQSection) -> None:
         if value is not None
     ]
     if len(given) > 1:
-        raise ValueError(f"Give only one of 'q', 'bw' and 'slope', not {given}.")
+        msg = f"Give only one of 'q', 'bw' and 'slope', not {given}."
+        raise ValueError(msg)
     if section.q is not None and section.q <= 0:
-        raise ValueError("Quality factor 'q' must be positive.")
+        msg = "Quality factor 'q' must be positive."
+        raise ValueError(msg)
     if section.bw is not None and section.bw <= 0:
-        raise ValueError("Bandwidth 'bw' must be positive (octaves).")
+        msg = "Bandwidth 'bw' must be positive (octaves)."
+        raise ValueError(msg)
     if section.slope is not None and section.slope <= 0:
-        raise ValueError("Shelf slope 'slope' must be positive.")
+        msg = "Shelf slope 'slope' must be positive."
+        raise ValueError(msg)
     if section.slope is not None and section.filter_type not in _SHELF_TYPES:
-        raise ValueError("'slope' applies to the shelving types only.")
+        msg = "'slope' applies to the shelving types only."
+        raise ValueError(msg)
     if section.bw is not None and section.filter_type not in _BANDWIDTH_TYPES:
-        raise ValueError(
+        msg = (
             "'bw' applies to 'peaking', 'bandpass', 'bandpass_skirt' and 'notch' only."
         )
+        raise ValueError(msg)
     if abs(section.gain_db) > 0 and section.filter_type not in _GAIN_TYPES:
-        raise ValueError(
-            "'gain_db' applies to 'peaking', 'lowshelf' and 'highshelf' only."
-        )
+        msg = "'gain_db' applies to 'peaking', 'lowshelf' and 'highshelf' only."
+        raise ValueError(msg)
     _validate_shelf_slope(section)
 
 
@@ -340,13 +350,14 @@ def _section_alpha(section: EQSection, w0: float, big_a: float) -> float:
         try:
             return sin_w0 * math.sinh(math.log(2.0) / 2 * section.bw * w0 / sin_w0)
         except OverflowError:
-            raise ValueError(
+            msg = (
                 f"Bandwidth 'bw' = {section.bw:g} octaves is too wide for "
                 f"f0 = {section.f0:g} Hz this close to the Nyquist "
                 "frequency: the cookbook's bandwidth-to-alpha relation "
                 "overflows. Reduce 'bw', lower 'f0' or parameterize the "
                 "section with 'q' instead."
-            ) from None
+            )
+            raise ValueError(msg) from None
     if section.slope is not None:
         return (sin_w0 / 2) * math.sqrt(
             (big_a + 1 / big_a) * (1 / section.slope - 1) + 2
@@ -369,7 +380,7 @@ def _check_section_stability(
     """
     if abs(a2) < 1.0 and abs(a1) < 1.0 + a2:
         return
-    raise ValueError(
+    msg = (
         f"The designed {section.filter_type!r} section at f0 = "
         f"{section.f0:g} Hz (fs = {fs:g} Hz) is not strictly stable after "
         f"rounding (a1 = {a1:.17g}, a2 = {a2:.17g}): its poles do not lie "
@@ -378,15 +389,17 @@ def _check_section_stability(
         "Nyquist frequency; bring the section parameters back from the "
         "extreme."
     )
+    raise ValueError(msg)
 
 
 def _section_sos(fs: float, section: EQSection) -> NDArray[np.float64]:
     """One normalized SOS row ``[b0, b1, b2, 1, a1, a2]`` for the section."""
     if section.f0 >= fs / 2:
-        raise ValueError(
+        msg = (
             f"Centre frequency f0 = {section.f0} Hz must sit below the "
             f"Nyquist frequency {fs / 2} Hz."
         )
+        raise ValueError(msg)
     w0 = 2 * math.pi * section.f0 / fs
     big_a = _gain_amplitude(section.gain_db)
     alpha = _section_alpha(section, w0, big_a)
@@ -485,11 +498,13 @@ class ParametricEQ:
         :param steady_ic: If True, initialize the state at steady state.
         """
         if fs <= 0:
-            raise ValueError("Sample rate 'fs' must be positive.")
+            msg = "Sample rate 'fs' must be positive."
+            raise ValueError(msg)
         if isinstance(sections, EQSection):
             sections = (sections,)
         if len(sections) == 0:
-            raise ValueError("Give at least one EQSection.")
+            msg = "Give at least one EQSection."
+            raise ValueError(msg)
 
         self.fs = float(fs)
         self.sections: tuple[EQSection, ...] = tuple(sections)
@@ -539,15 +554,17 @@ class ParametricEQ:
             plots the magnitude/phase response).
         """
         if n_points < 2:
-            raise ValueError("'n_points' must be at least 2.")
+            msg = "'n_points' must be at least 2."
+            raise ValueError(msg)
         nyquist = self.fs / 2
         if f_max is None:
             f_max = nyquist
         if not 0 < f_min < f_max <= nyquist:
-            raise ValueError(
+            msg = (
                 "Need 0 < f_min < f_max <= fs/2; got "
                 f"f_min = {f_min}, f_max = {f_max}, fs/2 = {nyquist}."
             )
+            raise ValueError(msg)
 
         freqs = np.logspace(np.log10(f_min), np.log10(f_max), n_points)
         # Per-section responses; the cascade is their product.

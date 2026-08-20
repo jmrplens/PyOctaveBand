@@ -326,7 +326,8 @@ def _sheet_impedance(
             surface_density=layer.surface_density,
             resistance=layer.resistance,
         )
-    raise TypeError(f"not a sheet layer: {layer!r}")  # pragma: no cover
+    msg = f"not a sheet layer: {layer!r}"
+    raise TypeError(msg)  # pragma: no cover
 
 
 def _fluid_layer_terms(
@@ -448,17 +449,18 @@ def _termination_impedance(
             return None
         if termination == "free":
             return np.full(f.shape, rc / cos_t, dtype=np.complex128)
-        raise ValueError(
-            "'termination' must be 'rigid', 'free' or a complex impedance."
-        )
+        msg = "'termination' must be 'rigid', 'free' or a complex impedance."
+        raise ValueError(msg)
     zl_arr = np.asarray(termination, dtype=np.complex128)
     if zl_arr.ndim > 0 and zl_arr.shape != f.shape:
-        raise ValueError(
+        msg = (
             "'termination' impedance array must be scalar or match the "
             f"frequency vector length ({f.size}), got {zl_arr.size}."
         )
+        raise ValueError(msg)
     if not np.all(np.abs(zl_arr) > 0.0):
-        raise ValueError("'termination' impedance must be non-zero.")
+        msg = "'termination' impedance must be non-zero."
+        raise ValueError(msg)
     return np.asarray(np.broadcast_to(zl_arr, f.shape), dtype=np.complex128)
 
 
@@ -509,10 +511,11 @@ def _chain_matrix(terms: list[tuple[str, Complex, Complex]], f: Real) -> Complex
 def _check_medium_grid(medium: PorousMediumResult, f: Real, owner: str) -> None:
     """Reject a medium evaluated on a different frequency vector."""
     if not np.array_equal(np.asarray(medium.frequency), f):
-        raise ValueError(
+        msg = (
             f"{owner}.medium was evaluated on a different frequency "
             "vector; rebuild the medium on the solver grid."
         )
+        raise ValueError(msg)
 
 
 def _split_fluid_run(
@@ -543,12 +546,13 @@ def _split_fluid_run(
     # Checked before the run is expanded, so an absurd input cannot build the
     # sub-layer list it would then be refused for.
     if attenuation > budget * limit:
-        raise ValueError(
+        msg = (
             f"the fluid layers of the stack attenuate by {attenuation:.0f} "
             f"nepers, which the global-matrix assembly cannot resolve in "
             f"{limit} blocks. Reduce their thickness: nothing behind such a "
             "run contributes to the surface impedance."
         )
+        raise ValueError(msg)
 
     parts: list[tuple[str, Complex, Complex, float]] = []
     for (kind, a, b), loss in zip(terms, losses):
@@ -575,12 +579,13 @@ def _split_fluid_run(
     # into more blocks than the assembly resolves. Refuse on what was actually
     # produced rather than on what was estimated.
     if len(groups) > limit:
-        raise ValueError(
+        msg = (
             f"the fluid layers of the stack pack into {len(groups)} chain "
             f"blocks of at most {budget:.0f} nepers, more than the {limit} "
             "the global-matrix assembly can resolve. Reduce their thickness: "
             "nothing behind such a run contributes to the surface impedance."
         )
+        raise ValueError(msg)
     return groups
 
 
@@ -703,13 +708,15 @@ def layered_absorber(
     """
     f = require_positive_array(frequency, "frequency")
     if not layers:
-        raise ValueError("'layers' must contain at least one layer.")
+        msg = "'layers' must contain at least one layer."
+        raise ValueError(msg)
     theta = float(angle)
     # The last ~3e-8 rad below pi/2 round sin(theta)**2 to 1.0, driving the
     # in-depth wavenumber of an air layer to exactly zero (inf * 0 = nan in
     # the recursion); reject effectively grazing input with a clear error.
     if not 0.0 <= theta < np.pi / 2.0 - 1e-6:
-        raise ValueError("'angle' must satisfy 0 <= angle < pi/2 - 1e-6.")
+        msg = "'angle' must satisfy 0 <= angle < pi/2 - 1e-6."
+        raise ValueError(msg)
     c0 = require_positive(speed_of_sound, "speed_of_sound")
     rho0 = require_positive(air_density, "air_density")
     require_positive(viscosity, "viscosity")
@@ -733,7 +740,8 @@ def layered_absorber(
             transverse_wavenumber=np.asarray(k0 * np.sin(theta)),
         )
         if not blocks:
-            raise ValueError("'layers' must contain at least one layer.")
+            msg = "'layers' must contain at least one layer."
+            raise ValueError(msg)
         zs = biot._stack_surface_impedance(
             blocks, _termination_impedance(termination, f, cos_t=cos_t, rc=rc)
         )
@@ -815,10 +823,12 @@ def diffuse_field_absorption(
     f = require_positive_array(frequency, "frequency")
     lim = float(angle_limit)
     if not 0.0 < lim <= np.pi / 2.0:
-        raise ValueError("'angle_limit' must satisfy 0 < angle_limit <= pi/2.")
+        msg = "'angle_limit' must satisfy 0 < angle_limit <= pi/2."
+        raise ValueError(msg)
     n = int(quadrature_points)
     if n < 2:
-        raise ValueError("'quadrature_points' must be at least 2.")
+        msg = "'quadrature_points' must be at least 2."
+        raise ValueError(msg)
     nodes, weights = np.polynomial.legendre.leggauss(n)
     theta = 0.5 * lim * (nodes + 1.0)
     w = 0.5 * lim * weights
@@ -875,10 +885,12 @@ def statistical_absorption(
     """
     z = np.asarray(normalized_impedance, dtype=np.complex128)
     if np.any(z.real <= 0.0):
-        raise ValueError("'normalized_impedance' must have a positive real part.")
+        msg = "'normalized_impedance' must have a positive real part."
+        raise ValueError(msg)
     lim = float(angle_limit)
     if not 0.0 < lim <= np.pi / 2.0:
-        raise ValueError("'angle_limit' must satisfy 0 < angle_limit <= pi/2.")
+        msg = "'angle_limit' must satisfy 0 < angle_limit <= pi/2."
+        raise ValueError(msg)
     g = 1.0 / z
     g1 = g.real
     g2 = g.imag

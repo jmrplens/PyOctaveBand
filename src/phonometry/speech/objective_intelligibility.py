@@ -249,15 +249,19 @@ def _validate_pair(
     x = np.asarray(clean, dtype=np.float64)
     y = np.asarray(degraded, dtype=np.float64)
     if x.ndim != 1 or y.ndim != 1:
-        raise ValueError("'clean' and 'degraded' must be 1-D signals.")
+        msg = "'clean' and 'degraded' must be 1-D signals."
+        raise ValueError(msg)
     if x.shape != y.shape:
-        raise ValueError(
+        msg = (
             f"'clean' and 'degraded' must have equal length; got {x.size} and {y.size}."
         )
+        raise ValueError(msg)
     if x.size == 0:
-        raise ValueError("'clean' and 'degraded' must be non-empty.")
+        msg = "'clean' and 'degraded' must be non-empty."
+        raise ValueError(msg)
     if not (np.all(np.isfinite(x)) and np.all(np.isfinite(y))):
-        raise ValueError("'clean' and 'degraded' must be finite.")
+        msg = "'clean' and 'degraded' must be finite."
+        raise ValueError(msg)
     return apply_calibration(clean, x), apply_calibration(degraded, y)
 
 
@@ -326,7 +330,8 @@ def stoi(
     fs = resolve_pair_fs(clean, degraded, fs, names=("clean", "degraded"))
     x, y = _validate_pair(clean, degraded)
     if int(fs) <= 0:
-        raise ValueError("'fs' must be a positive sample rate.")
+        msg = "'fs' must be a positive sample rate."
+        raise ValueError(msg)
 
     x = _resample_to_internal(x, int(fs))
     y = _resample_to_internal(y, int(fs))
@@ -337,11 +342,12 @@ def stoi(
     # friendly message (a bare matmul on an empty spectrogram would raise a
     # cryptic shape error instead).
     if _n_frames(x.size, _FRAME // 2) < _N_SEGMENT:
-        raise ValueError(
+        msg = (
             "Too few short-time frames to score (need at least 30 after "
             "silent-frame removal, i.e. about 0.4 s of active speech); check "
             "the inputs are speech and long enough."
         )
+        raise ValueError(msg)
 
     matrix, centers = _third_octave_matrix()
     window = _analysis_window()

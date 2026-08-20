@@ -135,21 +135,25 @@ def _resolve_input(
     """
     if isinstance(x, Signal):
         if fs is not None and int(fs) != x.fs:
-            raise ValueError(
+            msg = (
                 f"fs={fs} conflicts with the Signal's own fs={x.fs}; "
                 "pass one or the other, not a disagreement"
             )
+            raise ValueError(msg)
         return x.data, x.fs
     data = np.asarray(x)
     if fs is None:
-        raise ValueError("fs is required when writing a bare array")
+        msg = "fs is required when writing a bare array"
+        raise ValueError(msg)
     if int(fs) <= 0:
-        raise ValueError("fs must be positive")
+        msg = "fs must be positive"
+        raise ValueError(msg)
     if data.dtype not in _PASSTHROUGH_SUBTYPES:
         data = np.asarray(data, dtype=np.float64)
     data = np.atleast_2d(data)
     if data.ndim != 2:
-        raise ValueError(f"x must be 1-D or (channels, samples); got {data.ndim}-D")
+        msg = f"x must be 1-D or (channels, samples); got {data.ndim}-D"
+        raise ValueError(msg)
     return data, int(fs)
 
 
@@ -167,24 +171,27 @@ def _resolve_subtype(data: np.ndarray, subtype: str | None) -> str:
     implied = _PASSTHROUGH_SUBTYPES.get(data.dtype)
     if implied is not None:
         if subtype is not None and subtype != implied:
-            raise ValueError(
+            msg = (
                 f"integer {data.dtype} input is a bit-exact pass-through of "
                 f"{implied}; requesting subtype={subtype!r} would resample "
                 "the codes. Convert to float64 first to choose a depth."
             )
+            raise ValueError(msg)
         return implied
     if data.dtype.kind != "f":
-        raise ValueError(
+        msg = (
             f"unsupported input dtype {data.dtype}: pass float data, or "
             "int16/int32 codes for bit-exact pass-through"
         )
+        raise ValueError(msg)
     if subtype is None:
         return "FLOAT"
     if subtype not in _SUBTYPE_SPEC:
-        raise ValueError(
+        msg = (
             f"unknown subtype {subtype!r}; the WAV writer offers "
             f"{sorted(_SUBTYPE_SPEC)}"
         )
+        raise ValueError(msg)
     return subtype
 
 
@@ -354,7 +361,8 @@ def append_riff_chunk(path: str | Path, chunk_id: bytes, payload: bytes) -> None
     with Path(path).open("r+b") as fh:
         fourcc = fh.read(4)
         if fourcc not in (b"RIFF", b"RF64", b"BW64"):
-            raise ValueError(f"{path}: not a RIFF/RF64/BW64 file")
+            msg = f"{path}: not a RIFF/RF64/BW64 file"
+            raise ValueError(msg)
         fh.seek(0, 2)
         if fh.tell() % 2:
             fh.write(b"\x00")
@@ -362,10 +370,11 @@ def append_riff_chunk(path: str | Path, chunk_id: bytes, payload: bytes) -> None
         riff_size = fh.tell() - 8
         if fourcc == b"RIFF":
             if riff_size > 0xFFFFFFFF:
-                raise ValueError(
+                msg = (
                     f"{path}: appending {len(payload)} bytes overflows the "
                     "32-bit RIFF size; the file needed to be RF64"
                 )
+                raise ValueError(msg)
             fh.seek(4)
             fh.write(struct.pack("<I", riff_size))
         else:
@@ -388,14 +397,16 @@ def _check_dither(dither: str | None, subtype: str) -> None:
     if dither is None:
         return
     if dither != "tpdf":
-        raise ValueError(f"unknown dither {dither!r}; offered: 'tpdf'")
+        msg = f"unknown dither {dither!r}; offered: 'tpdf'"
+        raise ValueError(msg)
     if subtype != "PCM_16":
-        raise ValueError(
+        msg = (
             "dither='tpdf' applies only when quantising to PCM_16: at "
             "24 bits and above the quantisation error is already far "
             "below any microphone chain's noise floor, and dithering "
             "float data only adds noise to it"
         )
+        raise ValueError(msg)
 
 
 def _resolve_bext(
@@ -431,9 +442,8 @@ def _resolve_bext(
             full_scale = data / float(2 ** (8 * data.dtype.itemsize - 1))
         meta = with_measured_loudness(base, full_scale, fs)
     else:
-        raise ValueError(
-            f"unknown bext {bext!r}: pass None, 'loudness' or a BroadcastMetadata"
-        )
+        msg = f"unknown bext {bext!r}: pass None, 'loudness' or a BroadcastMetadata"
+        raise ValueError(msg)
     if meta is None:
         return None
     line = coding_history_line(
@@ -477,11 +487,12 @@ def _reconcile_streamed_header(
         metadata_chunks=metadata_chunks,
     )
     if len(patched) != header_len:
-        raise ValueError(
+        msg = (
             f"{path}: the {written} frames actually streamed move the "
             "header across the RF64 promotion boundary the estimated "
             "count chose; the estimate was too wrong to reconcile"
         )
+        raise ValueError(msg)
     fh.seek(0)
     fh.write(patched)
 
@@ -549,10 +560,11 @@ def write_wav_stream(
             )
             frames = written
     if written != frames:
-        raise ValueError(
+        msg = (
             f"{path}: the block stream carried {written} frames but the "
             f"header promised {frames}; the file is inconsistent"
         )
+        raise ValueError(msg)
 
 
 def write_wav(
@@ -579,13 +591,14 @@ def _check_target_suffix(path: str | Path, target: Path) -> None:
     """Refuse any destination outside the WAV family and FLAC."""
     suffix = target.suffix.lower()
     if suffix not in _WAV_SUFFIXES and suffix != ".flac":
-        raise ValueError(
+        msg = (
             f"{path}: unsupported target {target.suffix!r}; the writer "
             "produces the WAV family (.wav, .wave, .bwf) and, with the "
             "[audio] extra, FLAC. Lossy formats are deliberately not "
             "offered: a metrology library does not export approximations "
             "of its own data."
         )
+        raise ValueError(msg)
 
 
 def _check_sidecar_request(
@@ -593,20 +606,22 @@ def _check_sidecar_request(
 ) -> None:
     """Refuse a sidecar request without a calibrated Signal behind it."""
     if sidecar and (not isinstance(x, Signal) or x.calibration_factor is None):
-        raise ValueError(
+        msg = (
             "sidecar=True needs a Signal with a calibration_factor: the "
             "sidecar exists to carry a calibration, and inventing one "
             "is the single thing this library must never do"
         )
+        raise ValueError(msg)
 
 
 def _refuse_passthrough_dither(dither: str | None) -> None:
     """Integer input has nothing to dither; say so instead of ignoring."""
     if dither is not None:
-        raise ValueError(
+        msg = (
             "dither applies to quantisation, and integer input is a "
             "bit-exact pass-through: there is nothing to dither"
         )
+        raise ValueError(msg)
 
 
 def _write_pcm24(
@@ -763,10 +778,11 @@ def write(
     _check_target_suffix(path, target)
     _check_sidecar_request(x, sidecar)
     if rng is not None and dither is None:
-        raise ValueError(
+        msg = (
             "rng seeds the TPDF dither noise and does nothing without it; "
             "pass dither='tpdf' alongside it or drop it"
         )
+        raise ValueError(msg)
     data, rate = _resolve_input(x, fs)
     if target.suffix.lower() == ".flac":
         _write_flac(path, x, data, rate, subtype, bext, dither, rng)
@@ -830,10 +846,11 @@ def _flac_passthrough_codes(
 ) -> np.ndarray:
     """int16 codes pass through whole; a conflicting request is refused."""
     if subtype not in (None, "PCM_16"):
-        raise ValueError(
+        msg = (
             "integer int16 input is a bit-exact pass-through of PCM_16; "
             f"requesting subtype={subtype!r} would resample the codes"
         )
+        raise ValueError(msg)
     _refuse_passthrough_dither(dither)
     return data.astype(np.int16)
 
@@ -847,16 +864,18 @@ def _flac_quantised_codes(
 ) -> tuple[str, np.ndarray]:
     """Quantise float data to the integer codes a FLAC subtype stores."""
     if data.dtype.kind != "f":
-        raise ValueError(
+        msg = (
             f"unsupported input dtype {data.dtype}: pass float data, "
             "or int16 codes for bit-exact pass-through"
         )
+        raise ValueError(msg)
     resolved = "PCM_24" if subtype is None else subtype
     if resolved not in ("PCM_16", "PCM_24"):
-        raise ValueError(
+        msg = (
             f"FLAC holds integer PCM up to 24 bits; subtype "
             f"{resolved!r} is not available (choose PCM_16 or PCM_24)"
         )
+        raise ValueError(msg)
     _check_dither(dither, resolved)
     bits = _SUBTYPE_BITS[resolved]
     codes, clipped, peak_dbfs = _quantise(data, bits, dither, rng)
@@ -903,12 +922,13 @@ def _write_flac(
     implied = _PASSTHROUGH_SUBTYPES.get(data.dtype)
     out: np.ndarray
     if implied == "PCM_32":
-        raise ValueError(
+        msg = (
             f"{path}: FLAC stores integers up to 24 bits (libsndfile), so "
             "int32 codes cannot pass through bit-exact. Convert to float64 "
             "and choose subtype='PCM_24' to accept the 8-bit truncation "
             "explicitly."
         )
+        raise ValueError(msg)
     if implied == "PCM_16":
         resolved = "PCM_16"
         out = _flac_passthrough_codes(data, subtype, dither)

@@ -129,7 +129,8 @@ def apparent_dynamic_stiffness(
     total_mass_per_area = require_positive(total_mass_per_area, "total_mass_per_area")
     fr = np.asarray(resonant_frequency, dtype=np.float64)
     if np.any(fr <= 0.0):
-        raise ValueError("'resonant_frequency' must be positive.")
+        msg = "'resonant_frequency' must be positive."
+        raise ValueError(msg)
     return as_float_or_array(_FOUR_PI_SQ * total_mass_per_area * fr**2)
 
 
@@ -160,10 +161,12 @@ def enclosed_gas_stiffness(
         atmospheric_pressure, "atmospheric_pressure"
     )
     if not 0.0 < porosity <= 1.0:
-        raise ValueError("'porosity' must be in the range (0, 1].")
+        msg = "'porosity' must be in the range (0, 1]."
+        raise ValueError(msg)
     d = np.asarray(thickness, dtype=np.float64)
     if np.any(d <= 0.0):
-        raise ValueError("'thickness' must be positive.")
+        msg = "'thickness' must be positive."
+        raise ValueError(msg)
     return as_float_or_array(atmospheric_pressure / (d * porosity))
 
 
@@ -199,9 +202,11 @@ def installed_dynamic_stiffness(
     """
     apparent_stiffness = require_positive(apparent_stiffness, "apparent_stiffness")
     if airflow_resistivity <= 0.0:
-        raise ValueError("'airflow_resistivity' must be positive.")
+        msg = "'airflow_resistivity' must be positive."
+        raise ValueError(msg)
     if gas_stiffness < 0.0:
-        raise ValueError("'gas_stiffness' must be non-negative.")
+        msg = "'gas_stiffness' must be non-negative."
+        raise ValueError(msg)
 
     if airflow_resistivity >= _HIGH_RESISTIVITY:
         return apparent_stiffness
@@ -244,7 +249,8 @@ def natural_frequency(
     mass_per_area = require_positive(mass_per_area, "mass_per_area")
     s = np.asarray(dynamic_stiffness, dtype=np.float64)
     if np.any(s <= 0.0):
-        raise ValueError("'dynamic_stiffness' must be positive.")
+        msg = "'dynamic_stiffness' must be positive."
+        raise ValueError(msg)
     return as_float_or_array(np.sqrt(s / mass_per_area) / _TWO_PI)
 
 
@@ -343,9 +349,8 @@ class DynamicStiffnessResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iso9052 import render_dynamic_stiffness_report
 
         return render_dynamic_stiffness_report(
@@ -391,10 +396,11 @@ def floating_floor_resonance(
     s_gas = 0.0
     if airflow_resistivity < _HIGH_RESISTIVITY:
         if thickness is None or porosity is None:
-            raise ValueError(
+            msg = (
                 "'thickness' and 'porosity' are required for the enclosed-gas "
                 "term when airflow_resistivity < 100 kPa.s/m2."
             )
+            raise ValueError(msg)
         s_gas = float(
             enclosed_gas_stiffness(
                 thickness, porosity, atmospheric_pressure=atmospheric_pressure

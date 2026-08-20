@@ -287,9 +287,11 @@ def _check_angle(angle: ArrayLike) -> NDArray[np.float64]:
     """Incidence angle(s) in radians, restricted to ``[0, pi/2]``."""
     theta = np.asarray(angle, dtype=np.float64)
     if not np.all(np.isfinite(theta)):
-        raise ValueError("'angle' must be finite.")
+        msg = "'angle' must be finite."
+        raise ValueError(msg)
     if np.any(theta < 0.0) or np.any(theta > math.pi / 2.0 + 1e-9):
-        raise ValueError("'angle' must lie in [0, pi/2] radians.")
+        msg = "'angle' must lie in [0, pi/2] radians."
+        raise ValueError(msg)
     return theta
 
 
@@ -347,9 +349,8 @@ def straight_transmission_coefficient(
     p = require_positive(psi, "psi")
     _, _, j3 = _junction(junction)
     if j3 is None:
-        raise ValueError(
-            f"junction {junction!r} has no straight section (use 'X' or 'T1')."
-        )
+        msg = f"junction {junction!r} has no straight section (use 'X' or 'T1')."
+        raise ValueError(msg)
     sin = np.sin(theta)
     sin2 = sin * sin
     cos2 = np.cos(theta) ** 2
@@ -456,12 +457,14 @@ def coupling_loss_factor(
     """
     tau = np.asarray(transmission_coefficient, dtype=np.float64)
     if np.any(tau < 0.0):
-        raise ValueError("'transmission_coefficient' must be non-negative.")
+        msg = "'transmission_coefficient' must be non-negative."
+        raise ValueError(msg)
     cg = require_positive(group_velocity, "group_velocity")
     lij = require_positive(junction_length, "junction_length")
     freq = np.asarray(frequency, dtype=np.float64)
     if np.any(freq <= 0.0):
-        raise ValueError("'frequency' must be positive.")
+        msg = "'frequency' must be positive."
+        raise ValueError(msg)
     area = require_positive(plate_area, "plate_area")
     eta = cg * lij * tau / (2.0 * math.pi**2 * freq * area)
     return np.asarray(eta, dtype=np.float64)
@@ -584,10 +587,12 @@ def point_connection_coupling_loss_factor(
     """
     freq = np.asarray(frequency, dtype=np.float64)
     if np.any(freq <= 0.0):
-        raise ValueError("'frequency' must be positive.")
+        msg = "'frequency' must be positive."
+        raise ValueError(msg)
     n = int(n_connections)
     if n < 1:
-        raise ValueError("'n_connections' must be a positive integer.")
+        msg = "'n_connections' must be a positive integer."
+        raise ValueError(msg)
     h_1 = require_positive(thickness1, "thickness1")
     h_2 = require_positive(thickness2, "thickness2")
     rs_1 = require_positive(surface_density1, "surface_density1")
@@ -634,7 +639,8 @@ def wave_vibration_reduction_index(
     """
     tau = np.asarray(transmission_coefficient, dtype=np.float64)
     if np.any(tau <= 0.0):
-        raise ValueError("'transmission_coefficient' must be positive.")
+        msg = "'transmission_coefficient' must be positive."
+        raise ValueError(msg)
     fcj = require_positive(critical_frequency_receiver, "critical_frequency_receiver")
     kij = 10.0 * np.log10(1.0 / tau) + 5.0 * math.log10(fcj / _REFERENCE_FREQUENCY)
     return np.asarray(kij, dtype=np.float64)
@@ -775,7 +781,8 @@ def junction_transmission(
     else:
         grid = np.atleast_1d(np.asarray(angles_deg, dtype=np.float64))
         if grid.ndim != 1 or grid.size == 0:
-            raise ValueError("'angles_deg' must be a non-empty 1-D array.")
+            msg = "'angles_deg' must be a non-empty 1-D array."
+            raise ValueError(msg)
     theta = np.radians(grid)
     corner = corner_transmission_coefficient(theta, chi, psi, name)
     corner_avg = angular_average_transmission_coefficient(

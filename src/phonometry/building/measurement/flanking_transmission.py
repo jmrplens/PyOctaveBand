@@ -102,9 +102,8 @@ def _validate_report_request(engine: str, language: str) -> None:
 
     check_language(language)
     if engine != "reportlab":
-        raise ValueError(
-            f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-        )
+        msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+        raise ValueError(msg)
 
 
 #: Reference equivalent sound absorption area ``A0`` for the normalized
@@ -152,11 +151,14 @@ def _as_1d(values: float | Sequence[float] | np.ndarray, name: str) -> np.ndarra
     """Coerce to a finite 1-D float array."""
     data = np.atleast_1d(np.asarray(values, dtype=np.float64))
     if data.ndim != 1:
-        raise ValueError(f"'{name}' must be one-dimensional (one value per band).")
+        msg = f"'{name}' must be one-dimensional (one value per band)."
+        raise ValueError(msg)
     if data.size == 0:
-        raise ValueError(f"'{name}' must not be empty.")
+        msg = f"'{name}' must not be empty."
+        raise ValueError(msg)
     if not np.all(np.isfinite(data)):
-        raise ValueError(f"'{name}' must contain only finite values.")
+        msg = f"'{name}' must contain only finite values."
+        raise ValueError(msg)
     return data
 
 
@@ -164,7 +166,8 @@ def _positive(value: float, name: str) -> float:
     """Validate a positive, finite scalar."""
     scalar = float(value)
     if not np.isfinite(scalar) or scalar <= 0.0:
-        raise ValueError(f"'{name}' must be a positive, finite number.")
+        msg = f"'{name}' must be a positive, finite number."
+        raise ValueError(msg)
     return scalar
 
 
@@ -174,7 +177,8 @@ def _positive_array(
     """Validate a 1-D array of positive, finite values."""
     data = _as_1d(values, name)
     if np.any(data <= 0.0):
-        raise ValueError(f"'{name}' must contain positive values.")
+        msg = f"'{name}' must contain positive values."
+        raise ValueError(msg)
     return data
 
 
@@ -198,7 +202,8 @@ def velocity_level_difference(
     lv_i = _as_1d(source_level, "source_level")
     lv_j = _as_1d(receive_level, "receive_level")
     if lv_i.size != lv_j.size:
-        raise ValueError("'source_level' and 'receive_level' must share their length.")
+        msg = "'source_level' and 'receive_level' must share their length."
+        raise ValueError(msg)
     return np.asarray(lv_i - lv_j, dtype=np.float64)
 
 
@@ -222,7 +227,8 @@ def direction_averaged_level_difference(
     a = _as_1d(dv_ij, "dv_ij")
     b = _as_1d(dv_ji, "dv_ji")
     if a.size != b.size:
-        raise ValueError("'dv_ij' and 'dv_ji' must share their length.")
+        msg = "'dv_ij' and 'dv_ji' must share their length."
+        raise ValueError(msg)
     return np.asarray(0.5 * (a + b), dtype=np.float64)
 
 
@@ -289,7 +295,8 @@ def _broadcast(values: np.ndarray, n_bands: int, name: str) -> np.ndarray:
     if values.size == 1:
         return np.full(n_bands, values[0], dtype=np.float64)
     if values.size != n_bands:
-        raise ValueError(f"'{name}' must have one value per band (or a single value).")
+        msg = f"'{name}' must have one value per band (or a single value)."
+        raise ValueError(msg)
     return values
 
 
@@ -338,9 +345,8 @@ class VibrationReductionResult:
             the frequencies do not open on complete octave triples.
         """
         if self.k_ij.size % 3 != 0:
-            raise ValueError(
-                "octave_bands() needs a band count that is a multiple of three."
-            )
+            msg = "octave_bands() needs a band count that is a multiple of three."
+            raise ValueError(msg)
         groups = self.k_ij.reshape(-1, 3)
         oct_k = -10.0 * np.log10(np.mean(10.0 ** (-groups / 10.0), axis=1))
         oct_f: np.ndarray | None = None
@@ -433,12 +439,13 @@ def _validate_octave_triples(freq_groups: np.ndarray) -> None:
             and abs(high - mid * third) <= 0.06 * (mid * third)
         )
         if not aligned:
-            raise ValueError(
+            msg = (
                 "octave_bands() needs whole octave triples: the group "
                 f"({low:g}, {mid:g}, {high:g}) Hz is not the three "
                 "one-third-octave bands of one octave. Start the input at "
                 "the lower third of an octave band."
             )
+            raise ValueError(msg)
 
 
 def _detect_band_type(frequencies: np.ndarray | None) -> str:
@@ -534,22 +541,23 @@ def vibration_reduction_index(
 
     freq = None if frequency is None else _positive_array(frequency, "frequency")
     if freq is not None and freq.size != dv.size:
-        raise ValueError("'frequency' must share the band count of the level input.")
+        msg = "'frequency' must share the band count of the level input."
+        raise ValueError(msg)
 
     ts_given = (structural_reverberation_time_i is not None) + (
         structural_reverberation_time_j is not None
     )
     if ts_given == 1:
-        raise ValueError(
-            "Supply both structural reverberation times (i and j) or neither."
-        )
+        msg = "Supply both structural reverberation times (i and j) or neither."
+        raise ValueError(msg)
 
     if ts_given == 2:
         if freq is None:
-            raise ValueError(
+            msg = (
                 "'frequency' is required when structural reverberation times are "
                 "supplied (Formula (12))."
             )
+            raise ValueError(msg)
         a_i = equivalent_absorption_length(
             s_i,
             structural_reverberation_time_i,  # type: ignore[arg-type]
@@ -634,7 +642,8 @@ def vibration_reduction_index_from_flanking(
     a0 = _positive(reference_area, "reference_area")
     sizes = {dn_f.size, r_i.size, r_j.size, a_i.size, a_j.size}
     if len(sizes) != 1:
-        raise ValueError("All per-band inputs must share the same length.")
+        msg = "All per-band inputs must share the same length."
+        raise ValueError(msg)
     k_ij = (
         dn_f
         - 0.5 * (r_i + r_j)
@@ -664,10 +673,11 @@ class FlankingLevelDifferenceResult:
     ) -> Axes:
         """Plot ``Dn,f`` against the shifted ISO 717-1 reference curve."""
         if self.rating is None:
-            raise ValueError(
+            msg = (
                 "No single-number rating is available to plot (need 16 "
                 "one-third-octave or 5 octave bands)."
             )
+            raise ValueError(msg)
         return self.rating.plot(ax=ax, language=language, **kwargs)
 
     def report(
@@ -713,10 +723,11 @@ class FlankingLevelDifferenceResult:
         """
         _validate_report_request(engine, language)
         if self.rating is None:
-            raise ValueError(
+            msg = (
                 "The Dn,f report needs the ISO 717-1 single-number rating; "
                 "supply 16 one-third-octave or 5 octave bands."
             )
+            raise ValueError(msg)
         from ..._report.iso10848 import render_flanking_level_difference_report
 
         return render_flanking_level_difference_report(
@@ -746,10 +757,11 @@ class FlankingImpactLevelResult:
     ) -> Axes:
         """Plot ``Ln,f`` against the shifted ISO 717-2 reference curve."""
         if self.rating is None:
-            raise ValueError(
+            msg = (
                 "No single-number rating is available to plot (need 16 "
                 "one-third-octave or 5 octave bands)."
             )
+            raise ValueError(msg)
         return self.rating.plot(ax=ax, language=language, **kwargs)
 
     def report(
@@ -795,10 +807,11 @@ class FlankingImpactLevelResult:
         """
         _validate_report_request(engine, language)
         if self.rating is None:
-            raise ValueError(
+            msg = (
                 "The Ln,f report needs the ISO 717-2 single-number rating; "
                 "supply 16 one-third-octave or 5 octave bands."
             )
+            raise ValueError(msg)
         from ..._report.iso10848 import render_flanking_impact_level_report
 
         return render_flanking_impact_level_report(
@@ -841,9 +854,8 @@ def normalized_flanking_level_difference(
     area = _positive_array(absorption_area, "absorption_area")
     a0 = _positive(reference_area, "reference_area")
     if not (l1.size == l2.size == area.size):
-        raise ValueError(
-            "'source_level', 'receive_level' and 'absorption_area' must share their length."
-        )
+        msg = "'source_level', 'receive_level' and 'absorption_area' must share their length."
+        raise ValueError(msg)
     d_n_f = l1 - l2 - 10.0 * np.log10(area / a0)
     rating = _maybe_rating(d_n_f, bands)
     return FlankingLevelDifferenceResult(d_n_f=d_n_f, rating=rating)
@@ -878,9 +890,8 @@ def normalized_flanking_impact_level(
     area = _positive_array(absorption_area, "absorption_area")
     a0 = _positive(reference_area, "reference_area")
     if l2.size != area.size:
-        raise ValueError(
-            "'receive_level' and 'absorption_area' must share their length."
-        )
+        msg = "'receive_level' and 'absorption_area' must share their length."
+        raise ValueError(msg)
     l_n_f = l2 + 10.0 * np.log10(area / a0)
     rating: ImpactRatingResult | None = None
     if l_n_f.size in (16, 5):

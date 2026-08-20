@@ -179,15 +179,17 @@ def _averaged_spectrum(
     """
     nperseg = round(fs / resolution_hz)
     if nperseg < 16:
-        raise ValueError(
+        msg = (
             f"resolution_hz={resolution_hz!r} is too coarse for fs={fs}: it "
             "leaves fewer than 16 samples per FFT segment."
         )
+        raise ValueError(msg)
     if x.shape[-1] < nperseg:
-        raise ValueError(
+        msg = (
             f"Signal too short for the requested {resolution_hz} Hz "
             f"resolution: need at least {nperseg} samples, got {x.shape[-1]}."
         )
+        raise ValueError(msg)
     freqs, psd = _welch_autospectrum(x, float(fs), nperseg, nperseg // 2)
     df = float(freqs[1] - freqs[0])
     return freqs, psd * df, df
@@ -197,12 +199,14 @@ def _find_peak(freqs: np.ndarray, power: np.ndarray, tone_freq: float | None) ->
     if tone_freq is None:
         in_range = (freqs >= _F_MIN) & (freqs <= _F_MAX)
         if not np.any(in_range):
-            raise ValueError("Spectrum has no bins in the 89.1 Hz - 11.2 kHz range.")
+            msg = "Spectrum has no bins in the 89.1 Hz - 11.2 kHz range."
+            raise ValueError(msg)
         return int(np.flatnonzero(in_range)[np.argmax(power[in_range])])
     _, _, dfc = _critical_band(tone_freq)
     near = np.abs(freqs - tone_freq) <= dfc / 2.0
     if not np.any(near):
-        raise ValueError(f"No spectrum bins near tone_freq={tone_freq!r} Hz.")
+        msg = f"No spectrum bins near tone_freq={tone_freq!r} Hz."
+        raise ValueError(msg)
     return int(np.flatnonzero(near)[np.argmax(power[near])])
 
 
@@ -236,10 +240,11 @@ def _band_power(
     mask = (freqs > f1) & (freqs <= f2)
     n = int(np.count_nonzero(mask))
     if n == 0:
-        raise ValueError(
+        msg = (
             f"No spectrum bins fall in the {f1:.1f}-{f2:.1f} Hz band; use a "
             "finer resolution_hz."
         )
+        raise ValueError(msg)
     return float(np.sum(power[mask])), n
 
 
@@ -291,13 +296,17 @@ def tone_to_noise_ratio(
     fs = resolve_fs(x, fs)
     x_proc = apply_calibration(x, np.atleast_1d(_typesignal(np.asarray(x))))
     if x_proc.ndim != 1:
-        raise ValueError("tone_to_noise_ratio expects a 1D signal.")
+        msg = "tone_to_noise_ratio expects a 1D signal."
+        raise ValueError(msg)
     if fs <= 0:
-        raise ValueError("Sample rate 'fs' must be positive.")
+        msg = "Sample rate 'fs' must be positive."
+        raise ValueError(msg)
     if resolution_hz <= 0:
-        raise ValueError("'resolution_hz' must be positive.")
+        msg = "'resolution_hz' must be positive."
+        raise ValueError(msg)
     if tone_freq is not None and tone_freq <= 0:
-        raise ValueError("'tone_freq' must be positive.")
+        msg = "'tone_freq' must be positive."
+        raise ValueError(msg)
 
     freqs, power, df = _averaged_spectrum(x_proc, fs, resolution_hz)
     peak = _find_peak(freqs, power, tone_freq)
@@ -378,7 +387,8 @@ def _fitted_edge(
     for lo, hi, (c0, c1, c2) in table:
         if lo <= ft <= hi:
             return float(c0 + c1 * ft + c2 * ft**2)
-    raise AssertionError("unreachable: ft clipped to the table span")
+    msg = "unreachable: ft clipped to the table span"
+    raise AssertionError(msg)
 
 
 def prominence_ratio(
@@ -413,13 +423,17 @@ def prominence_ratio(
     fs = resolve_fs(x, fs)
     x_proc = apply_calibration(x, np.atleast_1d(_typesignal(np.asarray(x))))
     if x_proc.ndim != 1:
-        raise ValueError("prominence_ratio expects a 1D signal.")
+        msg = "prominence_ratio expects a 1D signal."
+        raise ValueError(msg)
     if fs <= 0:
-        raise ValueError("Sample rate 'fs' must be positive.")
+        msg = "Sample rate 'fs' must be positive."
+        raise ValueError(msg)
     if resolution_hz <= 0:
-        raise ValueError("'resolution_hz' must be positive.")
+        msg = "'resolution_hz' must be positive."
+        raise ValueError(msg)
     if tone_freq is not None and tone_freq <= 0:
-        raise ValueError("'tone_freq' must be positive.")
+        msg = "'tone_freq' must be positive."
+        raise ValueError(msg)
 
     freqs, power, df = _averaged_spectrum(x_proc, fs, resolution_hz)
     peak = _find_peak(freqs, power, tone_freq)

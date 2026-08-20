@@ -349,10 +349,11 @@ def render_iso16251_report(
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     delta_l = np.asarray(result.improvement, dtype=np.float64)
     if freqs.shape != delta_l.shape:
-        raise ValueError(
+        msg = (
             "render_iso16251_report() needs 'frequencies' and 'improvement' of "
             "equal length."
         )
+        raise ValueError(msg)
 
     styles, title_style, basis_style, caption_style = document_styles(accent)
     title = t("Floor-covering impact sound improvement", language)

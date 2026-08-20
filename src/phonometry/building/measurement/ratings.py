@@ -544,19 +544,19 @@ def _render_iso717(
 
     check_language(language)
     if engine != "reportlab":
-        raise ValueError(
-            f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-        )
+        msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+        raise ValueError(msg)
     if (
         result.band_centers is None
         or result.measured is None
         or result.shifted_reference is None
     ):
-        raise ValueError(
+        msg = (
             "report() needs the per-band data ('band_centers', 'measured', "
             "'shifted_reference'); build the rating with weighted_rating() or "
             "weighted_impact_rating() so they are populated."
         )
+        raise ValueError(msg)
     from ..._report.iso717 import render_iso717_report
 
     return render_iso717_report(
@@ -602,9 +602,8 @@ def _resolve_band_set(
     """
     if bands == "third-octave" or (bands is None and n == 16):
         if n != 16:
-            raise ValueError(
-                f"One-third-octave rating needs 16 bands (100-3150 Hz), got {n}."
-            )
+            msg = f"One-third-octave rating needs 16 bands (100-3150 Hz), got {n}."
+            raise ValueError(msg)
         return (
             _REF_THIRD_OCTAVE,
             _MAX_UNFAVOURABLE_THIRD,
@@ -614,7 +613,8 @@ def _resolve_band_set(
         )
     if bands == "octave" or (bands is None and n == 5):
         if n != 5:
-            raise ValueError(f"Octave rating needs 5 bands (125-2000 Hz), got {n}.")
+            msg = f"Octave rating needs 5 bands (125-2000 Hz), got {n}."
+            raise ValueError(msg)
         return (
             _REF_OCTAVE,
             _MAX_UNFAVOURABLE_OCTAVE,
@@ -623,11 +623,13 @@ def _resolve_band_set(
             _SPECTRUM2_OCTAVE,
         )
     if bands is not None:
-        raise ValueError("'bands' must be 'third-octave', 'octave' or None.")
-    raise ValueError(
+        msg = "'bands' must be 'third-octave', 'octave' or None."
+        raise ValueError(msg)
+    msg = (
         "Expected 16 one-third-octave (100-3150 Hz) or 5 octave "
         f"(125-2000 Hz) values, got {n}."
     )
+    raise ValueError(msg)
 
 
 def _best_shift(
@@ -657,7 +659,8 @@ def _best_shift(
     """
     scale = round(1.0 / step)
     if scale < 1 or abs(scale * step - 1.0) > 1e-12:
-        raise ValueError("'step' must divide 1 dB exactly (e.g. 1.0 or 0.1).")
+        msg = "'step' must divide 1 dB exactly (e.g. 1.0 or 0.1)."
+        raise ValueError(msg)
     # Start below any feasible shift, then climb while the bound holds.
     n = (int(np.floor(np.min(measured - reference))) - 1) * scale
     while True:
@@ -743,9 +746,10 @@ def _resolve_impact_band_set(
     """
     if bands == "third-octave" or (bands is None and n == 16):
         if n != 16:
-            raise ValueError(
+            msg = (
                 f"One-third-octave impact rating needs 16 bands (100-3150 Hz), got {n}."
             )
+            raise ValueError(msg)
         return (
             _REF_IMPACT_THIRD_OCTAVE,
             _MAX_UNFAVOURABLE_THIRD,
@@ -755,9 +759,8 @@ def _resolve_impact_band_set(
         )
     if bands == "octave" or (bands is None and n == 5):
         if n != 5:
-            raise ValueError(
-                f"Octave impact rating needs 5 bands (125-2000 Hz), got {n}."
-            )
+            msg = f"Octave impact rating needs 5 bands (125-2000 Hz), got {n}."
+            raise ValueError(msg)
         return (
             _REF_IMPACT_OCTAVE,
             _MAX_UNFAVOURABLE_OCTAVE,
@@ -766,11 +769,13 @@ def _resolve_impact_band_set(
             5,
         )
     if bands is not None:
-        raise ValueError("'bands' must be 'third-octave', 'octave' or None.")
-    raise ValueError(
+        msg = "'bands' must be 'third-octave', 'octave' or None."
+        raise ValueError(msg)
+    msg = (
         "Expected 16 one-third-octave (100-3150 Hz) or 5 octave "
         f"(125-2000 Hz) values, got {n}."
     )
+    raise ValueError(msg)
 
 
 def _impact_ci(measured: np.ndarray, rating: int, n_bands: int) -> int:
@@ -902,11 +907,11 @@ def weighted_impact_improvement(
     """
     dl = np.asarray(delta_l, dtype=np.float64)
     if dl.shape != (16,):
-        raise ValueError(
-            "'delta_l' must give the 16 one-third-octave values 100-3150 Hz."
-        )
+        msg = "'delta_l' must give the 16 one-third-octave values 100-3150 Hz."
+        raise ValueError(msg)
     if not np.all(np.isfinite(dl)):
-        raise ValueError("'delta_l' must contain only finite values.")
+        msg = "'delta_l' must contain only finite values."
+        raise ValueError(msg)
     ln_r = np.asarray(_IMPACT_REFERENCE_FLOOR, dtype=np.float64) - dl
     ln_r_w = weighted_impact_rating(ln_r).rating
     return _IMPACT_REFERENCE_FLOOR_RATING - ln_r_w
@@ -935,11 +940,11 @@ def impact_improvement_adaptation_term(
     """
     dl = np.asarray(delta_l, dtype=np.float64)
     if dl.shape != (16,):
-        raise ValueError(
-            "'delta_l' must give the 16 one-third-octave values 100-3150 Hz."
-        )
+        msg = "'delta_l' must give the 16 one-third-octave values 100-3150 Hz."
+        raise ValueError(msg)
     if not np.all(np.isfinite(dl)):
-        raise ValueError("'delta_l' must contain only finite values.")
+        msg = "'delta_l' must contain only finite values."
+        raise ValueError(msg)
     ln_r = np.asarray(_IMPACT_REFERENCE_FLOOR, dtype=np.float64) - dl
     ci_r = weighted_impact_rating(ln_r).ci
     return _IMPACT_REFERENCE_FLOOR_CI - ci_r
@@ -1094,26 +1099,28 @@ def _validated_extended_input(
         raise ValueError(_VALUES_FINITE_MSG)
     if frequencies is None:
         if data.size != len(_FREQ_THIRD_OCTAVE):
-            raise ValueError(
+            msg = (
                 "Without 'frequencies' the input must be the 16 core "
                 "one-third-octave bands 100-3150 Hz; pass the band centre "
                 "frequencies for an enlarged range."
             )
+            raise ValueError(msg)
         freqs = np.asarray(_FREQ_THIRD_OCTAVE, dtype=np.float64)
     else:
         freqs = np.asarray(frequencies, dtype=np.float64)
         if freqs.shape != data.shape:
-            raise ValueError(
-                "'frequencies' must have one value per band of 'values_by_band'."
-            )
+            msg = "'frequencies' must have one value per band of 'values_by_band'."
+            raise ValueError(msg)
         if not np.all(np.isfinite(freqs)) or np.any(freqs <= 0.0):
-            raise ValueError("'frequencies' must contain positive values.")
+            msg = "'frequencies' must contain positive values."
+            raise ValueError(msg)
     core_idx = _match_bands(freqs, _FREQ_THIRD_OCTAVE)
     if core_idx is None:
-        raise ValueError(
+        msg = (
             "The input must contain the 16 core one-third-octave bands "
             "100-3150 Hz (ISO 717 rates the single number on that range)."
         )
+        raise ValueError(msg)
     return _round_half_up_tenths(data), freqs, core_idx
 
 

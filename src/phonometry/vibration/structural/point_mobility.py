@@ -110,7 +110,8 @@ def plate_bending_stiffness(
     e = require_positive(youngs_modulus, "youngs_modulus")
     h = require_positive(thickness, "thickness")
     if not -1.0 < poisson_ratio < 1.0:
-        raise ValueError("'poisson_ratio' must lie in (-1, 1).")
+        msg = "'poisson_ratio' must lie in (-1, 1)."
+        raise ValueError(msg)
     return float(e * h**3 / (12.0 * (1.0 - poisson_ratio**2)))
 
 
@@ -155,7 +156,8 @@ def _omega(frequency: ArrayLike) -> NDArray[np.float64]:
     r"""Angular frequency :math:`\omega = 2\pi f` (rad/s); rejects f <= 0."""
     f = np.asarray(frequency, dtype=np.float64)
     if np.any(f <= 0.0):
-        raise ValueError("'frequency' must be positive.")
+        msg = "'frequency' must be positive."
+        raise ValueError(msg)
     return np.asarray(2.0 * np.pi * f, dtype=np.float64)
 
 
@@ -186,7 +188,8 @@ def infinite_plate_impedance(
     b = require_positive(bending_stiffness, "bending_stiffness")
     m2 = require_positive(mass_per_area, "mass_per_area")
     if location not in _PLATE_CONSTANT:
-        raise ValueError("'location' must be 'centre' or 'edge'.")
+        msg = "'location' must be 'centre' or 'edge'."
+        raise ValueError(msg)
     return float(_PLATE_CONSTANT[location] * np.sqrt(b * m2))
 
 
@@ -239,7 +242,8 @@ def infinite_beam_impedance(
     :raises ValueError: for a non-positive input or unknown location.
     """
     if location not in _BEAM_CONSTANT:
-        raise ValueError("'location' must be 'centre' or 'end'.")
+        msg = "'location' must be 'centre' or 'end'."
+        raise ValueError(msg)
     m1 = require_positive(mass_per_length, "mass_per_length")
     c_b = beam_bending_wave_speed(frequency, bending_stiffness, m1)
     z = _BEAM_CONSTANT[location] * m1 * c_b * (1.0 + 1j)
@@ -382,7 +386,8 @@ def infinite_plate_point_mobility(
     """
     freq = np.atleast_1d(np.asarray(frequency, dtype=np.float64))
     if np.any(freq <= 0.0):
-        raise ValueError("'frequency' must be positive.")
+        msg = "'frequency' must be positive."
+        raise ValueError(msg)
     y = infinite_plate_mobility(bending_stiffness, mass_per_area, location=location)
     mob = np.full(freq.shape, y, dtype=np.complex128)
     return MobilityResult(frequencies=freq, mobility=mob, driving_point=True)

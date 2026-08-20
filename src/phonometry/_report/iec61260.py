@@ -291,12 +291,13 @@ def render_iec61260_report(
         )
     if metadata is not None and metadata.required_class is not None:
         if metadata.required_class not in result.available_classes():
-            raise ValueError(
+            msg = (
                 f"required_class={metadata.required_class} does not exist in "
                 f"the {result.edition} edition this result was verified "
                 f"against (available classes: {result.available_classes()}); "
                 "class 0 requires edition='1995'."
             )
+            raise ValueError(msg)
         text, passed = _verdict(result, metadata.required_class, language)
         flow.extend(verdict_flow(text, passed, styles, language))
     flow.extend(footer_flow(metadata, language))

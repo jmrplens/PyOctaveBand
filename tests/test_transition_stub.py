@@ -88,7 +88,8 @@ def _gate(tool: str) -> tuple[str, str]:
             elif not text.startswith("- name:"):
                 break
         return command, " ".join(reversed(comment))
-    raise AssertionError(f"no step in {_WORKFLOW.name} runs {tool}")
+    msg = f"no step in {_WORKFLOW.name} runs {tool}"
+    raise AssertionError(msg)
 
 
 def _stub_project() -> dict[str, object]:

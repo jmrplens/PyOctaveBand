@@ -208,12 +208,15 @@ def build_job(
     )
     sample_stride = fdtd_gpu._integer("sample_stride", sample_stride)
     if sample_stride < 1:
-        raise ValueError("sample_stride must be >= 1")
+        msg = "sample_stride must be >= 1"
+        raise ValueError(msg)
     if sample_dtype not in ("float64", "float32"):
-        raise ValueError("sample_dtype must be 'float64' or 'float32'")
+        msg = "sample_dtype must be 'float64' or 'float32'"
+        raise ValueError(msg)
     sample_arr = np.unique(np.asarray(sample_steps, dtype=np.int64))
     if sample_arr.size and (int(sample_arr.min()) < 0 or int(sample_arr.max()) > steps):
-        raise ValueError("sample_steps must lie within [0, steps]")
+        msg = "sample_steps must lie within [0, steps]"
+        raise ValueError(msg)
     # None is the "not given" sentinel (all four sides when a sponge is
     # active, as the library); an explicit iterable, including the empty
     # tuple, is resolved and stored literally.
@@ -251,9 +254,11 @@ def build_job(
     if init_scale_x is not None:
         w = np.asarray(init_scale_x, dtype=np.float64)
         if w.ndim != 1 or w.shape[0] != nx:
-            raise ValueError(f"init_scale_x must be a 1D array of length nx = {nx}")
+            msg = f"init_scale_x must be a 1D array of length nx = {nx}"
+            raise ValueError(msg)
         if not np.all(np.isfinite(w)):
-            raise ValueError("init_scale_x must be finite everywhere")
+            msg = "init_scale_x must be finite everywhere"
+            raise ValueError(msg)
         job["init_scale_x"] = w
     return job
 
@@ -300,7 +305,8 @@ def _scp(sources: list[str], dest: str, timeout: float) -> None:
         check=False,
     )
     if proc.returncode != 0:
-        raise RemoteRunError(f"scp failed: {proc.stderr.strip()}")
+        msg = f"scp failed: {proc.stderr.strip()}"
+        raise RemoteRunError(msg)
 
 
 def remote_available(config: RemoteConfig) -> bool:
@@ -334,9 +340,8 @@ def run_remote(
         np.savez_compressed(job_path, **job)
         mkdir = _ssh(config, f"mkdir -p {q_dir}", timeout=30.0)
         if mkdir.returncode != 0:
-            raise RemoteRunError(
-                f"cannot create {job_dir} on {config.target}: {mkdir.stderr.strip()}"
-            )
+            msg = f"cannot create {job_dir} on {config.target}: {mkdir.stderr.strip()}"
+            raise RemoteRunError(msg)
         try:
             _scp(
                 [
@@ -355,11 +360,11 @@ def run_remote(
             try:
                 run = _ssh(config, docker_cmd, timeout=timeout)
             except subprocess.TimeoutExpired as exc:
-                raise RemoteRunError(f"remote job exceeded {timeout:.0f} s") from exc
+                msg = f"remote job exceeded {timeout:.0f} s"
+                raise RemoteRunError(msg) from exc
             if run.returncode != 0:
-                raise RemoteRunError(
-                    f"remote docker run failed: {run.stderr.strip()[-800:]}"
-                )
+                msg = f"remote docker run failed: {run.stderr.strip()[-800:]}"
+                raise RemoteRunError(msg)
             frames_path = Path(tmp) / "frames.npz"
             _scp(
                 [f"{config.target}:{q_dir}/frames.npz"], str(frames_path), timeout=300.0

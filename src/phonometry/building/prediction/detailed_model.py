@@ -193,17 +193,19 @@ def _band_array(
     """Coerce *values* to ``n_bands`` finite floats, broadcasting a scalar."""
     data = np.atleast_1d(np.asarray(values, dtype=np.float64))
     if data.ndim != 1 or data.size == 0:
-        raise ValueError(f"'{name}' must be a non-empty 1-D array.")
+        msg = f"'{name}' must be a non-empty 1-D array."
+        raise ValueError(msg)
     if not np.all(np.isfinite(data)):
-        raise ValueError(f"'{name}' must be finite.")
+        msg = f"'{name}' must be finite."
+        raise ValueError(msg)
     if positive and np.any(data <= 0.0):
-        raise ValueError(f"'{name}' must be strictly positive.")
+        msg = f"'{name}' must be strictly positive."
+        raise ValueError(msg)
     if data.size == 1:
         return np.full(n_bands, data[0], dtype=np.float64)
     if data.size != n_bands:
-        raise ValueError(
-            f"'{name}' must have one value per band ({n_bands}) or a single value."
-        )
+        msg = f"'{name}' must have one value per band ({n_bands}) or a single value."
+        raise ValueError(msg)
     return data
 
 
@@ -244,9 +246,8 @@ def _check_report_request(engine: str, language: str) -> None:
 
     check_language(language)
     if engine != "reportlab":
-        raise ValueError(
-            f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-        )
+        msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+        raise ValueError(msg)
 
 
 # --------------------------------------------------------------------------- #
@@ -585,12 +586,14 @@ def perimeter_absorption_coefficient(
     fc = require_positive_array(critical_frequencies, "critical_frequencies")
     kij = np.atleast_1d(np.asarray(vibration_reduction_indices, dtype=np.float64))
     if kij.shape != fc.shape:
-        raise ValueError(
+        msg = (
             "'critical_frequencies' and 'vibration_reduction_indices' must "
             "have the same length (one value per connected element)."
         )
+        raise ValueError(msg)
     if not np.all(np.isfinite(kij)):
-        raise ValueError("'vibration_reduction_indices' must be finite.")
+        msg = "'vibration_reduction_indices' must be finite."
+        raise ValueError(msg)
     return float(np.sum(np.sqrt(fc / REFERENCE_FREQUENCY) * 10.0 ** (-kij / 10.0)))
 
 
@@ -641,7 +644,8 @@ def in_situ_total_loss_factor(
     sigma = _band_array(radiation_factor, f.size, "radiation_factor", positive=True)
     perimeter_sum = float(perimeter_absorption)
     if not np.isfinite(perimeter_sum) or perimeter_sum < 0.0:
-        raise ValueError("'perimeter_absorption' must be finite and non-negative.")
+        msg = "'perimeter_absorption' must be finite and non-negative."
+        raise ValueError(msg)
 
     radiation = 2.0 * rho0 * c0 * sigma / (2.0 * np.pi * f * m)
     perimeter = c0 / (np.pi**2 * s * np.sqrt(f * fc)) * perimeter_sum
@@ -1791,10 +1795,11 @@ def detailed_impact_prediction(
 
     f = require_positive_array(frequencies, "frequencies")
     if direct_level is None and not flanking_paths:
-        raise ValueError(
+        msg = (
             "'detailed_impact_prediction' needs a 'direct_level', at least one "
             "flanking path, or both."
         )
+        raise ValueError(msg)
     paths: tuple[BandPath, ...] = tuple(flanking_paths)
     if direct_level is not None:
         direct = BandPath(

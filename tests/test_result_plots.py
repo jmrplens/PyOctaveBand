@@ -112,7 +112,8 @@ def test_plot_raises_helpful_error_without_matplotlib(monkeypatch) -> None:
 
     def blocked(name, *args, **kwargs):
         if name.startswith("matplotlib"):
-            raise ImportError("No module named 'matplotlib'")
+            msg = "No module named 'matplotlib'"
+            raise ImportError(msg)
         return real_import(name, *args, **kwargs)
 
     res = _zwicker_stationary()

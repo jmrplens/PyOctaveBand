@@ -129,19 +129,22 @@ def comb_filter_response(
     period_v = _positive(period, "period")
     n = int(n_averages)
     if n < 1:
-        raise ValueError("'n_averages' must be a positive integer.")
+        msg = "'n_averages' must be a positive integer."
+        raise ValueError(msg)
     freqs = np.asarray(frequencies, dtype=np.float64)
     if not np.all(np.isfinite(freqs)):
-        raise ValueError("'frequencies' must be finite.")
+        msg = "'frequencies' must be finite."
+        raise ValueError(msg)
     order = freqs * period_v
     # Finite inputs can still overflow the phase products f*T and N*pi*f*T
     # (sin(inf) is NaN); reject them so the bounded-response contract holds.
     if not np.all(np.isfinite(n * np.pi * order)):
-        raise ValueError(
+        msg = (
             "'frequencies' * 'period' (times n_averages*pi) overflows the "
             "floating-point range; the comb filter cannot be evaluated at "
             "such orders."
         )
+        raise ValueError(msg)
     lower = np.sin(np.pi * order)
     upper = np.sin(n * np.pi * order)
     with np.errstate(divide="ignore", invalid="ignore"):
@@ -222,10 +225,11 @@ def _samples_per_period(fs: float, period: float) -> tuple[float, int]:
     samples = fs * period
     rounded = round(samples)
     if rounded < 2:
-        raise ValueError(
+        msg = (
             "'period' is too short for the sample rate: it must span at "
             "least 2 samples."
         )
+        raise ValueError(msg)
     return samples, rounded
 
 
@@ -235,17 +239,20 @@ def _resolve_n_averages(
     """Number of whole periods to average, validated against the record."""
     available = int(np.floor((length - m_int) / samples)) + 1
     if available < 1:
-        raise ValueError("The record is shorter than one period; nothing to average.")
+        msg = "The record is shorter than one period; nothing to average."
+        raise ValueError(msg)
     if n_averages is None:
         return available
     requested = int(n_averages)
     if requested < 1:
-        raise ValueError("'n_averages' must be a positive integer.")
+        msg = "'n_averages' must be a positive integer."
+        raise ValueError(msg)
     if requested > available:
-        raise ValueError(
+        msg = (
             f"'n_averages' = {requested} exceeds the {available} whole "
             f"periods available in the record."
         )
+        raise ValueError(msg)
     return requested
 
 
@@ -322,7 +329,8 @@ def time_synchronous_average(
     period_v = _positive(period, "period")
     n_harmonics_v = int(n_harmonics)
     if n_harmonics_v < 1:
-        raise ValueError("'n_harmonics' must be a positive integer.")
+        msg = "'n_harmonics' must be a positive integer."
+        raise ValueError(msg)
 
     samples, m_int = _samples_per_period(fs_v, period_v)
     n_avg = _resolve_n_averages(n_averages, xa.size, samples, m_int)

@@ -132,14 +132,16 @@ NO_TONE_AUDIBILITY = -10.0
 def _positive(value: float, name: str) -> float:
     scalar = float(value)
     if not np.isfinite(scalar) or scalar <= 0.0:
-        raise ValueError(f"'{name}' must be a positive, finite number.")
+        msg = f"'{name}' must be a positive, finite number."
+        raise ValueError(msg)
     return scalar
 
 
 def _finite(value: float, name: str) -> float:
     scalar = float(value)
     if not np.isfinite(scalar):
-        raise ValueError(f"'{name}' must be finite.")
+        msg = f"'{name}' must be finite."
+        raise ValueError(msg)
     return scalar
 
 
@@ -284,9 +286,11 @@ def energy_sum_level(
     """
     levels = np.asarray(line_levels, dtype=np.float64)
     if levels.size == 0:
-        raise ValueError("'line_levels' must contain at least one line.")
+        msg = "'line_levels' must contain at least one line."
+        raise ValueError(msg)
     if not np.all(np.isfinite(levels)):
-        raise ValueError("'line_levels' must be finite.")
+        msg = "'line_levels' must be finite."
+        raise ValueError(msg)
     factor = _positive(effective_bandwidth_factor, "effective_bandwidth_factor")
     if levels.size == 1:
         # Formula (7): a single-line tone takes its level unchanged; the
@@ -307,17 +311,23 @@ def _validate_spectrum(
     lev = np.asarray(levels, dtype=np.float64)
     freq = np.asarray(frequencies, dtype=np.float64)
     if lev.ndim != 1 or freq.ndim != 1:
-        raise ValueError("'levels' and 'frequencies' must be one-dimensional.")
+        msg = "'levels' and 'frequencies' must be one-dimensional."
+        raise ValueError(msg)
     if lev.size != freq.size:
-        raise ValueError("'levels' and 'frequencies' must share their length.")
+        msg = "'levels' and 'frequencies' must share their length."
+        raise ValueError(msg)
     if lev.size == 0:
-        raise ValueError("'levels' and 'frequencies' must not be empty.")
+        msg = "'levels' and 'frequencies' must not be empty."
+        raise ValueError(msg)
     if not (np.all(np.isfinite(lev)) and np.all(np.isfinite(freq))):
-        raise ValueError("'levels' and 'frequencies' must be finite.")
+        msg = "'levels' and 'frequencies' must be finite."
+        raise ValueError(msg)
     if not np.all(np.diff(freq) > 0.0):
-        raise ValueError("'frequencies' must be strictly increasing.")
+        msg = "'frequencies' must be strictly increasing."
+        raise ValueError(msg)
     if freq[0] <= 0.0:
-        raise ValueError("'frequencies' must be positive.")
+        msg = "'frequencies' must be positive."
+        raise ValueError(msg)
     return lev, freq
 
 
@@ -395,7 +405,8 @@ def _mean_narrowband_level_lines(
     under = int(np.argmin(np.abs(freq - ft)))
     band = [i for i in range(lev.size) if f1 <= freq[i] <= f2 and i != under]
     if not band:
-        raise ValueError("No spectral lines fall in the critical band.")
+        msg = "No spectral lines fall in the critical band."
+        raise ValueError(msg)
 
     def _ls(indices: list[int]) -> float:
         return float(
@@ -698,7 +709,8 @@ def analyze_spectrum(
             )
             tones.append((float(freq[peak]), lt, ls, u, delta, kept))
     if not tones:
-        raise ValueError("No audible tone was detected in the spectrum.")
+        msg = "No audible tone was detected in the spectrum."
+        raise ValueError(msg)
 
     # Clause 5.3.8 Step 3: combine the tone levels of tones sharing a critical
     # band (Formula (17)), rated at the most audible member, except exactly
@@ -775,12 +787,14 @@ def combined_tone_level(
     fts = np.asarray(tone_frequencies, dtype=np.float64)
     lss = np.asarray(mean_narrowband_levels, dtype=np.float64)
     if fts.ndim != 1 or lss.ndim != 1 or fts.size != lss.size:
-        raise ValueError(
+        msg = (
             "'tone_frequencies' and 'mean_narrowband_levels' must be "
             "one-dimensional and share their length."
         )
+        raise ValueError(msg)
     if fts.size == 0:
-        raise ValueError("At least one tone is required.")
+        msg = "At least one tone is required."
+        raise ValueError(msg)
     marked: set[int] = set()
     for ft, ls in zip(fts, lss):
         peak = int(np.argmin(np.abs(freq - ft)))
@@ -901,9 +915,11 @@ def mean_audibility(decisive_audibilities: ArrayLike) -> float:
     """
     deltas = np.asarray(decisive_audibilities, dtype=np.float64)
     if deltas.size == 0:
-        raise ValueError("'decisive_audibilities' must not be empty.")
+        msg = "'decisive_audibilities' must not be empty."
+        raise ValueError(msg)
     if not np.all(np.isfinite(deltas)):
-        raise ValueError("'decisive_audibilities' must be finite.")
+        msg = "'decisive_audibilities' must be finite."
+        raise ValueError(msg)
     return float(10.0 * np.log10(np.mean(10.0 ** (deltas / 10.0))))
 
 
@@ -971,9 +987,11 @@ def audibility_uncertainty(
     lt = np.asarray(tone_line_levels, dtype=np.float64)
     ls = np.asarray(noise_line_levels, dtype=np.float64)
     if lt.size == 0 or ls.size == 0:
-        raise ValueError("Both line sets must contain at least one line.")
+        msg = "Both line sets must contain at least one line."
+        raise ValueError(msg)
     if not (np.all(np.isfinite(lt)) and np.all(np.isfinite(ls))):
-        raise ValueError("Line levels must be finite.")
+        msg = "Line levels must be finite."
+        raise ValueError(msg)
     ft = _positive(tone_frequency, "tone_frequency")
     df = _positive(line_spacing, "line_spacing")
     sigma = _positive(sigma_level_db, "sigma_level_db")
@@ -1017,14 +1035,17 @@ def mean_audibility_uncertainty(
     deltas = np.asarray(decisive_audibilities, dtype=np.float64)
     uncertainties = np.asarray(extended_uncertainties, dtype=np.float64)
     if deltas.size == 0:
-        raise ValueError("'decisive_audibilities' must not be empty.")
+        msg = "'decisive_audibilities' must not be empty."
+        raise ValueError(msg)
     if deltas.shape != uncertainties.shape:
-        raise ValueError(
+        msg = (
             "'decisive_audibilities' and 'extended_uncertainties' must share "
             "their length."
         )
+        raise ValueError(msg)
     if not (np.all(np.isfinite(deltas)) and np.all(np.isfinite(uncertainties))):
-        raise ValueError("Inputs must be finite.")
+        msg = "Inputs must be finite."
+        raise ValueError(msg)
     weights = 10.0 ** (0.1 * deltas)
     return float(np.sqrt(np.sum((weights * uncertainties) ** 2)) / np.sum(weights))
 
@@ -1120,7 +1141,8 @@ class ToneAudibilityResult:
         )
 
         if view not in ("audibility", "levels"):
-            raise ValueError(f"Unknown view {view!r}; use 'audibility' or 'levels'.")
+            msg = f"Unknown view {view!r}; use 'audibility' or 'levels'."
+            raise ValueError(msg)
         render = (
             plot_tone_audibility
             if view == "audibility"
@@ -1173,9 +1195,8 @@ class ToneAudibilityResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iso1996_tone import render_tone_audibility_report
 
         return render_tone_audibility_report(
@@ -1246,31 +1267,36 @@ def assess_tones(
     ls = np.asarray(mean_narrowband_levels, dtype=np.float64)
     df = _positive(line_spacing, "line_spacing")
     if freqs.ndim != 1 or lt.ndim != 1 or ls.ndim != 1:
-        raise ValueError(
+        msg = (
             "'tone_frequencies', 'tone_levels' and 'mean_narrowband_levels' "
             "must be one-dimensional."
         )
+        raise ValueError(msg)
     if not (freqs.size == lt.size == ls.size):
-        raise ValueError(
+        msg = (
             "'tone_frequencies', 'tone_levels' and 'mean_narrowband_levels' "
             "must share their length."
         )
+        raise ValueError(msg)
     if freqs.size == 0:
-        raise ValueError("At least one tone is required.")
+        msg = "At least one tone is required."
+        raise ValueError(msg)
     if not (np.all(np.isfinite(freqs)) and np.all(freqs > 0.0)):
-        raise ValueError("'tone_frequencies' must be positive and finite.")
+        msg = "'tone_frequencies' must be positive and finite."
+        raise ValueError(msg)
     if not (np.all(np.isfinite(lt)) and np.all(np.isfinite(ls))):
-        raise ValueError("'tone_levels' and 'mean_narrowband_levels' must be finite.")
+        msg = "'tone_levels' and 'mean_narrowband_levels' must be finite."
+        raise ValueError(msg)
 
     uncertainties: NDArray[np.float64] | None = None
     if extended_uncertainties is not None:
         uncertainties = np.asarray(extended_uncertainties, dtype=np.float64)
         if uncertainties.shape != freqs.shape:
-            raise ValueError(
-                "'extended_uncertainties' must match 'tone_frequencies' in length."
-            )
+            msg = "'extended_uncertainties' must match 'tone_frequencies' in length."
+            raise ValueError(msg)
         if not np.all(np.isfinite(uncertainties)):
-            raise ValueError("'extended_uncertainties' must be finite.")
+            msg = "'extended_uncertainties' must be finite."
+            raise ValueError(msg)
 
     dfc = np.array([critical_bandwidth_engineering(f) for f in freqs])
     # Corner frequencies (Formulae 4/5) from the already-computed Δfc, in the

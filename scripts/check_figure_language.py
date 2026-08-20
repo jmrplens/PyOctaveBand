@@ -214,7 +214,8 @@ def read_baseline(path: pathlib.Path) -> dict[str, set[str]]:
             continue
         stem, _, raw = line.partition(": ")
         if not raw:
-            raise SystemExit(f"{path}:{number}: expected 'stem: \"string\"'")
+            msg = f"{path}:{number}: expected 'stem: \"string\"'"
+            raise SystemExit(msg)
         entries.setdefault(stem, set()).add(json.loads(raw))
     return entries
 

@@ -902,7 +902,8 @@ def plot_fault_frequencies(
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     if freqs.size == 0:
-        raise ValueError("the result carries no fault lines to plot.")
+        msg = "the result carries no fault lines to plot."
+        raise ValueError(msg)
 
     f_max = max_frequency
     spectrum_f = spectrum_a = None

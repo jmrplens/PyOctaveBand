@@ -95,10 +95,12 @@ def object_fraction(object_volumes: ArrayLike, volume: float) -> float:
     volume = require_positive(volume, "volume")
     vols = np.asarray(object_volumes, dtype=np.float64)
     if np.any(vols < 0.0):
-        raise ValueError("object volumes must be non-negative.")
+        msg = "object volumes must be non-negative."
+        raise ValueError(msg)
     psi = float(np.sum(vols)) / volume
     if psi >= 1.0:
-        raise ValueError("the object volumes cannot exceed the room volume.")
+        msg = "the object volumes cannot exceed the room volume."
+        raise ValueError(msg)
     return psi
 
 
@@ -114,7 +116,8 @@ def hard_object_absorption(object_volume: ArrayLike) -> np.ndarray:
     """
     vol = np.asarray(object_volume, dtype=np.float64)
     if np.any(vol < 0.0):
-        raise ValueError("object volumes must be non-negative.")
+        msg = "object volumes must be non-negative."
+        raise ValueError(msg)
     return vol**_OBJECT_EXPONENT
 
 
@@ -134,7 +137,8 @@ def air_absorption_area(
     object_fraction = require_fraction(object_fraction, "object_fraction")
     m_arr = np.asarray(m, dtype=np.float64)
     if np.any(m_arr < 0.0):
-        raise ValueError("the attenuation coefficient m must be non-negative.")
+        msg = "the attenuation coefficient m must be non-negative."
+        raise ValueError(msg)
     area = 4.0 * m_arr * volume * (1.0 - object_fraction)
     return as_float_or_array(area)
 
@@ -161,18 +165,22 @@ def equivalent_absorption_area(
     """
     total = np.asarray(air_area, dtype=np.float64)
     if np.any(total < 0.0):
-        raise ValueError("air_area must be non-negative.")
+        msg = "air_area must be non-negative."
+        raise ValueError(msg)
     for area, alpha in surfaces:
         if area < 0.0:
-            raise ValueError("surface areas must be non-negative.")
+            msg = "surface areas must be non-negative."
+            raise ValueError(msg)
         alpha_arr = np.asarray(alpha, dtype=np.float64)
         if np.any(alpha_arr < 0.0):
-            raise ValueError("absorption coefficients must be non-negative.")
+            msg = "absorption coefficients must be non-negative."
+            raise ValueError(msg)
         total = total + area * alpha_arr
     obj = np.atleast_1d(np.asarray(objects, dtype=np.float64))
     if obj.size:
         if np.any(obj < 0.0):
-            raise ValueError("object absorption areas must be non-negative.")
+            msg = "object absorption areas must be non-negative."
+            raise ValueError(msg)
         total = total + obj.sum(axis=0)
     return as_float_or_array(total)
 
@@ -204,7 +212,8 @@ def reverberation_time(
     object_fraction = require_fraction(object_fraction, "object_fraction")
     area = np.asarray(absorption_area, dtype=np.float64)
     if np.any(area <= 0.0):
-        raise ValueError("absorption_area must be positive.")
+        msg = "absorption_area must be positive."
+        raise ValueError(msg)
     t = _RT_CONSTANT / speed_of_sound * volume * (1.0 - object_fraction) / area
     return as_float_or_array(t)
 
@@ -284,9 +293,8 @@ class ReverberationResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.reverberation import render_enclosed_space_report
 
         return render_enclosed_space_report(
@@ -324,11 +332,12 @@ def enclosed_space_reverberation(
     """
     freq = np.asarray(frequencies, dtype=np.float64)
     if air_condition is not None and not np.array_equal(freq, OCTAVE_BANDS):
-        raise ValueError(
+        msg = (
             "the built-in air_condition profiles cover the standard "
             "OCTAVE_BANDS only; for custom frequencies compute the air term "
             "with air_absorption_area and pass it to equivalent_absorption_area."
         )
+        raise ValueError(msg)
     if air_condition is None:
         air_area: np.ndarray | float = 0.0
     elif air_condition in AIR_ATTENUATION:
@@ -336,10 +345,11 @@ def enclosed_space_reverberation(
             AIR_ATTENUATION[air_condition], volume, object_fraction
         )
     else:
-        raise ValueError(
+        msg = (
             f"air_condition must be one of {tuple(AIR_ATTENUATION)} or None; "
             f"got {air_condition!r}."
         )
+        raise ValueError(msg)
     area = np.broadcast_to(
         equivalent_absorption_area(surfaces, objects=objects, air_area=air_area),
         freq.shape,

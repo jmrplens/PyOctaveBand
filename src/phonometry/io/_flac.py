@@ -54,7 +54,8 @@ def read_flac_bext(path: str | Path) -> BroadcastMetadata | None:
     """
     with Path(path).open("rb") as fh:
         if fh.read(4) != b"fLaC":
-            raise ValueError(f"{path}: not a FLAC file")
+            msg = f"{path}: not a FLAC file"
+            raise ValueError(msg)
         while True:
             header = fh.read(4)
             if len(header) < 4:
@@ -100,21 +101,24 @@ def embed_flac_bext(path: str | Path, bext_payload: bytes) -> None:
         + (b"\x00" if len(bext_payload) % 2 else b"")
     )
     if len(chunk) >= 1 << 24:
-        raise ValueError(
+        msg = (
             f"{path}: bext chunk of {len(bext_payload)} bytes exceeds the "
             "24-bit FLAC metadata block length"
         )
+        raise ValueError(msg)
     source = Path(path)
     staging = source.with_name(source.name + ".phonometry-tmp")
     with source.open("rb") as src, staging.open("wb") as dst:
         magic = src.read(4)
         if magic != b"fLaC":
-            raise ValueError(f"{path}: not a FLAC file")
+            msg = f"{path}: not a FLAC file"
+            raise ValueError(msg)
         dst.write(magic)
         while True:
             header = src.read(4)
             if len(header) < 4:
-                raise ValueError(f"{path}: truncated FLAC metadata chain")
+                msg = f"{path}: truncated FLAC metadata chain"
+                raise ValueError(msg)
             body = src.read(int.from_bytes(header[1:4], "big"))
             last = bool(header[0] & 0x80)
             # Clear the last-block flag: our block goes beneath this one.

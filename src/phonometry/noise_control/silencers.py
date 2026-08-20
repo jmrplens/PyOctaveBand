@@ -142,9 +142,11 @@ def _frequencies(frequencies: ArrayLike) -> NDArray[np.float64]:
     """Validate a strictly positive, finite 1-D frequency grid (Hz)."""
     f = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if f.ndim != 1 or f.size == 0:
-        raise ValueError("'frequencies' must be a non-empty 1-D array.")
+        msg = "'frequencies' must be a non-empty 1-D array."
+        raise ValueError(msg)
     if np.any(f <= 0.0) or not np.all(np.isfinite(f)):
-        raise ValueError("'frequencies' must be positive and finite.")
+        msg = "'frequencies' must be positive and finite."
+        raise ValueError(msg)
     return f
 
 
@@ -191,7 +193,8 @@ def shunt_matrix(branch_impedance: ArrayLike) -> _Complex:
     """
     zb = np.atleast_1d(np.asarray(branch_impedance, dtype=np.complex128))
     if zb.ndim != 1 or zb.size == 0:
-        raise ValueError("'branch_impedance' must be a non-empty 1-D array.")
+        msg = "'branch_impedance' must be a non-empty 1-D array."
+        raise ValueError(msg)
     t = np.zeros((zb.size, 2, 2), dtype=np.complex128)
     t[:, 0, 0] = 1.0
     # A lossless branch at exact resonance has Z_b -> 0 (it shorts the duct);
@@ -236,12 +239,12 @@ def cascade(*matrices: _Complex) -> _Complex:
     :return: The compound ``(n_freq, 2, 2)`` array.
     """
     if not matrices:
-        raise ValueError("cascade() needs at least one matrix.")
+        msg = "cascade() needs at least one matrix."
+        raise ValueError(msg)
     n = matrices[0].shape[0]
     if any(m.shape[0] != n for m in matrices[1:]):
-        raise ValueError(
-            "cascade() matrices must share the same frequency grid (n_freq)."
-        )
+        msg = "cascade() matrices must share the same frequency grid (n_freq)."
+        raise ValueError(msg)
     total = matrices[0]
     for m in matrices[1:]:
         total = np.matmul(total, m)
@@ -534,9 +537,8 @@ class ReactiveSilencerResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.silencer import render_reactive_silencer_report
 
         return render_reactive_silencer_report(
@@ -832,7 +834,8 @@ def extended_tube_chamber(
     la = require_non_negative(inlet_extension, "inlet_extension")
     lb = require_non_negative(outlet_extension, "outlet_extension")
     if s_exp <= s_duct:
-        raise ValueError("'chamber_area' must exceed 'pipe_area'.")
+        msg = "'chamber_area' must exceed 'pipe_area'."
+        raise ValueError(msg)
     # The straight section between the two junction planes. Extensions that
     # meet exactly are the accepted limit, but binary arithmetic does not
     # respect that: 0.1 + 0.2 exceeds 0.3 by an ulp, so a chamber described in
@@ -842,11 +845,12 @@ def extended_tube_chamber(
     # negative length is not a thing either.
     straight = length - la - lb
     if straight < -_MEETING_SLACK * max(length, la + lb):
-        raise ValueError(
+        msg = (
             "the inlet and outlet extensions cannot together exceed the "
             "chamber length (they would overlap inside the chamber, leaving "
             "a straight chamber section of negative length)."
         )
+        raise ValueError(msg)
     straight = max(straight, 0.0)
     annulus = s_exp - s_duct
 
@@ -1051,11 +1055,12 @@ class SilencerChain:
         if zb.ndim == 0:
             zb = np.full(self._frequencies.size, zb, dtype=np.complex128)
         if zb.shape != self._frequencies.shape:
-            raise ValueError(
+            msg = (
                 "'branch_impedance' must be a scalar or hold one value per "
                 f"analysis frequency ({self._frequencies.size} values); got "
                 f"shape {zb.shape}."
             )
+            raise ValueError(msg)
         self._elements.append(
             SilencerChainElement(
                 matrix=shunt_matrix(zb),

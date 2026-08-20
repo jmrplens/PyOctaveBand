@@ -86,15 +86,18 @@ _DEFAULT_MAX_IR_LENGTH = 8192
 def _positive(value: float, name: str) -> float:
     scalar = float(value)
     if not np.isfinite(scalar) or scalar <= 0.0:
-        raise ValueError(f"'{name}' must be a positive, finite number.")
+        msg = f"'{name}' must be a positive, finite number."
+        raise ValueError(msg)
     return scalar
 
 
 def _validate_sweep_band(fs: float, f1: float, f2: float) -> None:
     if f2 <= f1:
-        raise ValueError("'f2' must be greater than 'f1'.")
+        msg = "'f2' must be greater than 'f1'."
+        raise ValueError(msg)
     if f2 > fs / 2.0:
-        raise ValueError("'f2' must not exceed the Nyquist frequency fs/2.")
+        msg = "'f2' must not exceed the Nyquist frequency fs/2."
+        raise ValueError(msg)
 
 
 def _sweep_rate(f1: float, f2: float, seconds: float) -> float:
@@ -108,11 +111,12 @@ def _sweep_rate(f1: float, f2: float, seconds: float) -> float:
     """
     k = round(f1 * seconds / float(np.log(f2 / f1)))
     if k < 1:
-        raise ValueError(
+        msg = (
             "'seconds' is too short to synchronize the sweep: "
             "f1*seconds/ln(f2/f1) rounds to zero periods. Lengthen the "
             "sweep or raise 'f1'."
         )
+        raise ValueError(msg)
     return k / f1
 
 
@@ -162,7 +166,8 @@ def synchronized_sweep_signal(
     seconds_v = _positive(seconds, "seconds")
     amplitude_v = _positive(amplitude, "amplitude")
     if not 0.0 <= fade < 0.5:
-        raise ValueError("fade must be in [0, 0.5)")
+        msg = "fade must be in [0, 0.5)"
+        raise ValueError(msg)
     rate = _sweep_rate(f1_v, float(f2), seconds_v)
     duration = rate * np.log(float(f2) / f1_v)
     n = int(np.ceil(duration * fs_v))
@@ -388,13 +393,14 @@ def _thd_curves(
         f_max = min(f_max, upper_band / 2.0)
     grid = (frequencies >= f1) & (frequencies <= f_max)
     if not np.any(grid):
-        raise ValueError(
+        msg = (
             f"no excitation-frequency bin has a measurable order-2 "
             f"product: the THD grid [{f1:.6g}, {f_max:.6g}] Hz is empty at "
             f"the {frequencies[1]:.6g}-Hz window resolution. Lower 'f1' "
             "(the order-2 product must stay below Nyquist) or raise "
             "'ir_length' for a finer grid."
         )
+        raise ValueError(msg)
     thd_freqs = frequencies[grid]
     fundamental = np.abs(responses[0][grid])
     ratios = np.zeros((max(n_orders - 1, 0), thd_freqs.size), dtype=np.float64)
@@ -425,9 +431,11 @@ def _validated_recording(
 ) -> NDArray[np.float64]:
     rec = np.asarray(recorded, dtype=np.float64)
     if rec.ndim != 1:
-        raise ValueError("'recorded' must be one-dimensional.")
+        msg = "'recorded' must be one-dimensional."
+        raise ValueError(msg)
     if not np.all(np.isfinite(rec)):
-        raise ValueError("'recorded' must be finite.")
+        msg = "'recorded' must be finite."
+        raise ValueError(msg)
     return rec
 
 
@@ -466,23 +474,26 @@ def _harmonic_window(
     if ir_length is not None:
         window = int(ir_length)
         if window < _MIN_IR_LENGTH:
-            raise ValueError(f"'ir_length' must be at least {_MIN_IR_LENGTH} samples.")
+            msg = f"'ir_length' must be at least {_MIN_IR_LENGTH} samples."
+            raise ValueError(msg)
     else:
         window = _default_ir_length(min_spacing)
         if window < _MIN_IR_LENGTH:
-            raise ValueError(
+            msg = (
                 f"the harmonic windows would be {window} samples long "
                 f"(minimum {_MIN_IR_LENGTH}); the two closest arrivals are "
                 f"only {min_spacing} samples apart. Lengthen the sweep or "
                 "lower 'n_harmonics'."
             )
+            raise ValueError(msg)
     if window > min_spacing:
-        raise ValueError(
+        msg = (
             f"'ir_length' ({window}) exceeds the {min_spacing}-sample "
             f"spacing between orders {n_orders - 1} and {n_orders}; the "
             "windows would overlap. Shorten 'ir_length', lengthen the "
             "sweep or lower 'n_harmonics'."
         )
+        raise ValueError(msg)
     return window
 
 
@@ -612,18 +623,21 @@ def swept_sine_distortion(
     seconds_v = _positive(seconds, "seconds")
     amplitude_v = _positive(amplitude, "amplitude")
     if method not in ("synchronized", "farina"):
-        raise ValueError("'method' must be 'synchronized' or 'farina'.")
+        msg = "'method' must be 'synchronized' or 'farina'."
+        raise ValueError(msg)
     n_orders = int(n_harmonics)
     if n_orders < 2:
-        raise ValueError("'n_harmonics' must be at least 2.")
+        msg = "'n_harmonics' must be at least 2."
+        raise ValueError(msg)
 
     rate, duration, sweep_samples = _sweep_timing(method, fs_v, f1_v, f2_v, seconds_v)
     if rec.size < sweep_samples:
-        raise ValueError(
+        msg = (
             f"'recorded' has {rec.size} samples but the sweep lasts "
             f"{sweep_samples}; record at least the whole sweep (plus the "
             "system decay)."
         )
+        raise ValueError(msg)
 
     orders = np.arange(1, n_orders + 1, dtype=np.float64)
     delays_samples = rate * np.log(orders) * fs_v

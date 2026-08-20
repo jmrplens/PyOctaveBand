@@ -126,7 +126,8 @@ def run_job(job: Any) -> dict[str, Any]:
     steps = int(job["steps"])
     stride = int(job["sample_stride"]) if "sample_stride" in job else 1
     if stride < 1:
-        raise ValueError("sample_stride must be >= 1")
+        msg = "sample_stride must be >= 1"
+        raise ValueError(msg)
     dtype = np.dtype(str(job["sample_dtype"]) if "sample_dtype" in job else "float64")
     # Deduplicate defensively (build_job already stores unique steps, but
     # the archive may come from elsewhere): ascending order, one recorded

@@ -62,7 +62,8 @@ def _metadata_of_wheel(path: pathlib.Path) -> Message:
             name for name in archive.namelist() if name.endswith(".dist-info/METADATA")
         ]
         if len(names) != 1:
-            raise SystemExit(f"{path.name}: expected one METADATA, found {names}")
+            msg = f"{path.name}: expected one METADATA, found {names}"
+            raise SystemExit(msg)
         return message_from_string(archive.read(names[0]).decode("utf-8"))
 
 
@@ -72,10 +73,12 @@ def _metadata_of_sdist(path: pathlib.Path) -> Message:
         # The top-level PKG-INFO, not one belonging to a vendored tree.
         names = [name for name in names if name.count("/") == 1]
         if len(names) != 1:
-            raise SystemExit(f"{path.name}: expected one PKG-INFO, found {names}")
+            msg = f"{path.name}: expected one PKG-INFO, found {names}"
+            raise SystemExit(msg)
         handle = archive.extractfile(names[0])
         if handle is None:
-            raise SystemExit(f"{path.name}: {names[0]} is not a regular file")
+            msg = f"{path.name}: {names[0]} is not a regular file"
+            raise SystemExit(msg)
         return message_from_string(handle.read().decode("utf-8"))
 
 
@@ -85,10 +88,11 @@ def _phonometry_requirement(metadata: Message, label: str) -> Requirement:
     ]
     named = [item for item in declared if item.name == "phonometry"]
     if len(named) != 1:
-        raise SystemExit(
+        msg = (
             f"{label}: expected exactly one phonometry requirement, "
             f"found {[str(item) for item in named]}"
         )
+        raise SystemExit(msg)
     return named[0]
 
 
@@ -124,10 +128,11 @@ def _problems(requirement: Requirement, label: str) -> list[str]:
 def main() -> int:
     artifacts = sorted(_DIST.glob("*.whl")) + sorted(_DIST.glob("*.tar.gz"))
     if not artifacts:
-        raise SystemExit(
+        msg = (
             f"no built artifacts in {_DIST.relative_to(_ROOT)}; "
             f"run 'python -m build stub/' first"
         )
+        raise SystemExit(msg)
 
     problems: list[str] = []
     for artifact in artifacts:

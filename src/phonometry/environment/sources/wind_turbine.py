@@ -57,7 +57,8 @@ _LOW_FREQ_BANDWIDTH = 100.0
 def _positive(value: float, name: str) -> float:
     scalar = float(value)
     if not np.isfinite(scalar) or scalar <= 0.0:
-        raise ValueError(f"'{name}' must be a positive, finite number.")
+        msg = f"'{name}' must be a positive, finite number."
+        raise ValueError(msg)
     return scalar
 
 
@@ -89,7 +90,8 @@ def slant_distance(
     elif rotor_axis == "vertical":
         r0 = h + d
     else:
-        raise ValueError("'rotor_axis' must be 'horizontal' or 'vertical'.")
+        msg = "'rotor_axis' must be 'horizontal' or 'vertical'."
+        raise ValueError(msg)
     return float(np.hypot(h, r0))
 
 
@@ -116,7 +118,8 @@ def apparent_sound_power_level(
     """
     levels = np.atleast_1d(np.asarray(band_levels, dtype=np.float64))
     if levels.size == 0 or not np.all(np.isfinite(levels)):
-        raise ValueError("'band_levels' must be finite and non-empty.")
+        msg = "'band_levels' must be finite and non-empty."
+        raise ValueError(msg)
     r = _positive(r1, "r1")
     geometry = 10.0 * np.log10(4.0 * np.pi * r**2 / _REFERENCE_AREA)
     lwa_bands = levels - _BOARD_TERM + geometry
@@ -268,9 +271,8 @@ class WindTurbineTonalityResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iec61400 import render_wind_turbine_tonality_report
 
         return render_wind_turbine_tonality_report(
@@ -286,19 +288,19 @@ def _validate_narrowband(
     lv = np.asarray(levels, dtype=np.float64)
     fr = np.asarray(frequencies, dtype=np.float64)
     if lv.ndim != 1 or lv.shape != fr.shape or lv.size < 3:
-        raise ValueError(
-            "'levels' and 'frequencies' must be 1-D and the same length (>= 3)."
-        )
+        msg = "'levels' and 'frequencies' must be 1-D and the same length (>= 3)."
+        raise ValueError(msg)
     if not (np.all(np.isfinite(lv)) and np.all(np.isfinite(fr))):
-        raise ValueError("'levels' and 'frequencies' must be finite.")
+        msg = "'levels' and 'frequencies' must be finite."
+        raise ValueError(msg)
     diffs = np.diff(fr)
     if np.any(diffs <= 0.0):
-        raise ValueError("'frequencies' must be strictly increasing.")
+        msg = "'frequencies' must be strictly increasing."
+        raise ValueError(msg)
     df = float(np.median(diffs))
     if np.any(np.abs(diffs - df) > 1e-3 * df):
-        raise ValueError(
-            "'frequencies' must be uniformly spaced (a narrowband spectrum)."
-        )
+        msg = "'frequencies' must be uniformly spaced (a narrowband spectrum)."
+        raise ValueError(msg)
     return lv, fr, df
 
 
@@ -314,10 +316,11 @@ def _candidate_peak(
         return int(np.argmax(lv))
     tf = float(tone_frequency)
     if not np.isfinite(tf) or tf < float(fr[0]) or tf > float(fr[-1]):
-        raise ValueError(
+        msg = (
             "'tone_frequency' must be finite and inside the spectrum's "
             f"frequency range [{fr[0]:.1f}, {fr[-1]:.1f}] Hz."
         )
+        raise ValueError(msg)
     return int(np.argmin(np.abs(fr - tf)))
 
 
@@ -387,10 +390,11 @@ def wind_turbine_tonality(
     peak = _candidate_peak(lv, fr, tone_frequency)
     fc = float(fr[peak])
     if fc < _LOW_FREQ_MIN:
-        raise ValueError(
+        msg = (
             "The candidate tone lies below 20 Hz: outside the standard's "
             "analysis range (the critical band would extend below 0 Hz)."
         )
+        raise ValueError(msg)
     cbw = critical_bandwidth(fc)
     lo, hi = _critical_band_edges(fc)
     if fr[0] > lo + 1e-9 or fr[-1] < hi - 1e-9:

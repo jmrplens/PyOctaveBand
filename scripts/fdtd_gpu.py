@@ -47,14 +47,16 @@ def _positive_finite(name: str, value: float) -> float:
     """Validate that *value* is a strictly positive finite scalar."""
     out = float(value)
     if not np.isfinite(out) or out <= 0.0:
-        raise ValueError(f"{name} must be positive and finite")
+        msg = f"{name} must be positive and finite"
+        raise ValueError(msg)
     return out
 
 
 def _integer(name: str, value: int) -> int:
     """Validate that *value* is an integral scalar (bool is rejected)."""
     if isinstance(value, bool) or not isinstance(value, (int, np.integer)):
-        raise ValueError(f"{name} must be an integer")  # noqa: TRY004 - ValueError keeps the module validation errors uniform
+        msg = f"{name} must be an integer"
+        raise ValueError(msg)  # noqa: TRY004 - ValueError keeps the module validation errors uniform
     return int(value)
 
 
@@ -62,14 +64,16 @@ def _resolve_cfl(cfl: float) -> float:
     """Validate the Courant number into a float strictly inside (0, 1)."""
     out = float(cfl)
     if not np.isfinite(out) or not 0.0 < out < 1.0:
-        raise ValueError("cfl must lie in (0, 1)")
+        msg = "cfl must lie in (0, 1)"
+        raise ValueError(msg)
     return out
 
 
 def _positive_map(name: str, field: Field2D) -> None:
     """Validate that every cell of *field* is strictly positive and finite."""
     if not np.all(np.isfinite(field)) or bool(np.any(field <= 0.0)):
-        raise ValueError(f"{name} must be strictly positive and finite everywhere")
+        msg = f"{name} must be strictly positive and finite everywhere"
+        raise ValueError(msg)
 
 
 def _sponge_profile(
@@ -96,12 +100,14 @@ def _resolve_c_map(c: float | Field2D, shape: tuple[int, int] | None) -> Field2D
     """Broadcast/validate the sound-speed spec into a positive 2D map."""
     if np.isscalar(c):
         if shape is None:
-            raise ValueError("shape is required when c is a scalar")
+            msg = "shape is required when c is a scalar"
+            raise ValueError(msg)
         c_map = np.full(shape, float(np.real(c)), dtype=np.float64)
     else:
         c_map = np.asarray(c, dtype=np.float64)
     if c_map.ndim != 2:
-        raise ValueError("c must be a 2D (ny, nx) map")
+        msg = "c must be a 2D (ny, nx) map"
+        raise ValueError(msg)
     _positive_map("c", c_map)
     return c_map
 
@@ -114,7 +120,8 @@ def _resolve_rho_map(rho: float | Field2D, ny: int, nx: int) -> Field2D:
         else np.asarray(rho, dtype=np.float64)
     )
     if rho_map.shape != (ny, nx):
-        raise ValueError("rho map must match the shape of c")
+        msg = "rho map must match the shape of c"
+        raise ValueError(msg)
     _positive_map("rho", rho_map)
     return rho_map
 
@@ -125,11 +132,14 @@ def _resolve_sponge(
     """Validate the sponge configuration exactly as the library does."""
     width = _integer("sponge_width", sponge_width)
     if width < 0:
-        raise ValueError("sponge_width must be non-negative")
+        msg = "sponge_width must be non-negative"
+        raise ValueError(msg)
     if width >= min(nx, ny):
-        raise ValueError("sponge_width must be narrower than the smallest grid side")
+        msg = "sponge_width must be narrower than the smallest grid side"
+        raise ValueError(msg)
     if not 0.0 < sponge_reflection < 1.0:
-        raise ValueError("sponge_reflection must lie strictly between 0 and 1")
+        msg = "sponge_reflection must lie strictly between 0 and 1"
+        raise ValueError(msg)
     return width, float(sponge_reflection)
 
 
@@ -139,13 +149,16 @@ def _resolve_damping(
     """Validate the damping spec into a non-negative 0D or ``(ny, nx)`` array."""
     damping_map = np.asarray(damping, dtype=np.float64)
     if damping_map.ndim not in (0, 2):
-        raise ValueError("damping must be a scalar or an (ny, nx) map")
+        msg = "damping must be a scalar or an (ny, nx) map"
+        raise ValueError(msg)
     if not np.all(np.isfinite(damping_map)) or np.any(damping_map < 0.0):
-        raise ValueError("damping must be non-negative and finite")
+        msg = "damping must be non-negative and finite"
+        raise ValueError(msg)
     if damping_map.ndim == 2 and damping_map.shape != (ny, nx):
-        raise ValueError(
+        msg = (
             f"damping map shape {damping_map.shape} does not match the grid {(ny, nx)}"
         )
+        raise ValueError(msg)
     return damping_map
 
 
@@ -159,7 +172,8 @@ def _resolve_sponge_sides(sponge_sides: Any) -> tuple[str, ...]:
         sides = tuple(sponge_sides)
     unknown = set(sides) - set(_SIDES)
     if unknown:
-        raise ValueError(f"unknown sponge sides: {sorted(unknown)}")
+        msg = f"unknown sponge sides: {sorted(unknown)}"
+        raise ValueError(msg)
     return sides
 
 
@@ -171,14 +185,14 @@ def _edge_impedance_profile(
     if z.ndim == 0:
         z = np.full(n_edge, float(z), dtype=np.float64)
     if z.shape != (n_edge,):
-        raise ValueError(
+        msg = (
             f"impedance for side {side!r} must be a scalar or a 1D "
             f"array of length {n_edge}"
         )
+        raise ValueError(msg)
     if not np.all(np.isfinite(z)) or bool(np.any(z <= 0.0)):
-        raise ValueError(
-            f"impedance for side {side!r} must be strictly positive and finite"
-        )
+        msg = f"impedance for side {side!r} must be strictly positive and finite"
+        raise ValueError(msg)
     return z
 
 
@@ -199,16 +213,16 @@ def _resolve_edge_impedance(
         return {}
     unknown = set(edge_impedance) - set(_SIDES)
     if unknown:
-        raise ValueError(f"unknown impedance sides: {sorted(unknown)}")
+        msg = f"unknown impedance sides: {sorted(unknown)}"
+        raise ValueError(msg)
     absorbing = set(sponge_sides) if sponge_width > 0 else set()
     profiles: dict[str, Field2D] = {}
     for side in _SIDES:  # deterministic order
         if side not in edge_impedance:
             continue
         if side in absorbing:
-            raise ValueError(
-                f"side {side!r} cannot be both absorbing and an impedance boundary"
-            )
+            msg = f"side {side!r} cannot be both absorbing and an impedance boundary"
+            raise ValueError(msg)
         n_edge = ny if side in ("left", "right") else nx
         profiles[side] = _edge_impedance_profile(side, edge_impedance[side], n_edge)
     return profiles
@@ -222,11 +236,14 @@ def _resolve_obstacle_mask(
         return None
     mask = np.asarray(obstacle_mask)
     if mask.shape != (ny, nx):
-        raise ValueError("obstacle_mask must match the grid shape")
+        msg = "obstacle_mask must match the grid shape"
+        raise ValueError(msg)
     if mask.dtype != np.bool_:
-        raise ValueError("obstacle_mask must be a boolean array")
+        msg = "obstacle_mask must be a boolean array"
+        raise ValueError(msg)
     if bool(mask.all()):
-        raise ValueError("obstacle_mask must leave open cells")
+        msg = "obstacle_mask must leave open cells"
+        raise ValueError(msg)
     return mask
 
 
@@ -451,11 +468,14 @@ class GpuFDTD2D:
         :param wavelength: Optional carrier wavelength [m].
         """
         if direction not in _SIDE_TRAVEL:
-            raise ValueError("'direction' must be 'down', 'up', 'left' or 'right'.")
+            msg = "'direction' must be 'down', 'up', 'left' or 'right'."
+            raise ValueError(msg)
         if width <= 0.0:
-            raise ValueError("'width' must be positive.")
+            msg = "'width' must be positive."
+            raise ValueError(msg)
         if wavelength is not None and wavelength <= 0.0:
-            raise ValueError("'wavelength' must be positive.")
+            msg = "'wavelength' must be positive."
+            raise ValueError(msg)
 
         def profile(coord: NDArray[np.floating]) -> Field2D:
             envelope = amplitude * np.exp(-(((coord - center) / width) ** 2))

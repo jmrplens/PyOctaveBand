@@ -129,9 +129,8 @@ class WeightingFilter:
         if high_accuracy is None:
             high_accuracy = not stateful
         if high_accuracy and stateful:
-            raise ValueError(
-                "high_accuracy is not compatible with stateful processing."
-            )
+            msg = "high_accuracy is not compatible with stateful processing."
+            raise ValueError(msg)
 
         self.fs = fs
         self.curve = curve.upper()
@@ -152,9 +151,8 @@ class WeightingFilter:
             return
 
         if self.curve not in ["A", "B", "C", "D", "G", "AU"]:
-            raise ValueError(
-                "Weighting curve must be 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z'"
-            )
+            msg = "Weighting curve must be 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z'"
+            raise ValueError(msg)
 
         z, p, k = self._analog_design()
 
@@ -645,9 +643,8 @@ def _prepare_time_weighting_initial_state(
     try:
         return np.broadcast_to(state, state_shape).astype(x_sq.dtype, copy=True)
     except ValueError as exc:
-        raise ValueError(
-            "initial_state must be scalar or broadcastable to the input shape without the time axis"
-        ) from exc
+        msg = "initial_state must be scalar or broadcastable to the input shape without the time axis"
+        raise ValueError(msg) from exc
 
 
 def _impulse_kernel_py(
@@ -759,7 +756,8 @@ def time_weighting(
         # Move time axis back
         return _as_envelope(x, np.moveaxis(y_t, 0, -1), fs, mode_lower)
 
-    raise ValueError("Invalid time weighting mode. Use ['fast', 'slow', 'impulse']")
+    msg = "Invalid time weighting mode. Use ['fast', 'slow', 'impulse']"
+    raise ValueError(msg)
 
 
 class TimeWeighting:
@@ -776,9 +774,8 @@ class TimeWeighting:
         if fs <= 0:
             raise ValueError(_FS_POSITIVE)
         if mode.lower() not in ("fast", "slow", "impulse"):
-            raise ValueError(
-                "Invalid time weighting mode. Use ['fast', 'slow', 'impulse']"
-            )
+            msg = "Invalid time weighting mode. Use ['fast', 'slow', 'impulse']"
+            raise ValueError(msg)
         self.fs = fs
         self.mode = mode.lower()
         self._state: np.ndarray | None = None
@@ -855,7 +852,8 @@ def linkwitz_riley(
     fs = resolve_fs(x, fs)
     x_proc = resolve_samples(x)
     if order % 2 != 0:
-        raise ValueError("Linkwitz-Riley order must be even (typically 2 or 4).")
+        msg = "Linkwitz-Riley order must be even (typically 2 or 4)."
+        raise ValueError(msg)
 
     # A Linkwitz-Riley filter of order N is two Butterworth filters of order N/2 in series
     half_order = order // 2

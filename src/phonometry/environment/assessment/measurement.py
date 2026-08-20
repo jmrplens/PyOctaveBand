@@ -93,14 +93,16 @@ class EnvironmentalMeasurementWarning(PhonometryWarning):
 def _positive(value: float, name: str) -> float:
     scalar = float(value)
     if not np.isfinite(scalar) or scalar <= 0.0:
-        raise ValueError(f"'{name}' must be a positive, finite number.")
+        msg = f"'{name}' must be a positive, finite number."
+        raise ValueError(msg)
     return scalar
 
 
 def _finite(value: float, name: str) -> float:
     scalar = float(value)
     if not np.isfinite(scalar):
-        raise ValueError(f"'{name}' must be finite.")
+        msg = f"'{name}' must be finite."
+        raise ValueError(msg)
     return scalar
 
 
@@ -285,13 +287,17 @@ def tonal_seeking_survey(
     lev = np.asarray(levels, dtype=np.float64)
     freq = np.asarray(frequencies, dtype=np.float64)
     if lev.ndim != 1 or freq.ndim != 1:
-        raise ValueError("'levels' and 'frequencies' must be one-dimensional.")
+        msg = "'levels' and 'frequencies' must be one-dimensional."
+        raise ValueError(msg)
     if lev.size != freq.size:
-        raise ValueError("'levels' and 'frequencies' must share their length.")
+        msg = "'levels' and 'frequencies' must share their length."
+        raise ValueError(msg)
     if lev.size < 3:
-        raise ValueError("Need at least three bands to test the neighbours.")
+        msg = "Need at least three bands to test the neighbours."
+        raise ValueError(msg)
     if not (np.all(np.isfinite(lev)) and np.all(np.isfinite(freq))):
-        raise ValueError("'levels' and 'frequencies' must be finite.")
+        msg = "'levels' and 'frequencies' must be finite."
+        raise ValueError(msg)
     flags = np.zeros(lev.size, dtype=np.bool_)
     for i in range(1, lev.size - 1):
         threshold = _survey_threshold(freq[i])
@@ -362,7 +368,8 @@ def residual_sound_correction(
     lres = _finite(residual_level, "residual_level")
     margin = lp - lres
     if margin <= 0.0:
-        raise ValueError("'residual_level' must be below 'measured_level' to correct.")
+        msg = "'residual_level' must be below 'measured_level' to correct."
+        raise ValueError(msg)
     corrected = 10.0 * np.log10(10.0 ** (lp / 10.0) - 10.0 ** (lres / 10.0))
     reliable = margin > 3.0
     if not reliable:
@@ -412,7 +419,8 @@ def gaussian_residual_level(
     """
     median = _finite(l50, "l50")
     if (l90 is None) == (l95 is None):
-        raise ValueError("Supply exactly one of 'l90' or 'l95'.")
+        msg = "Supply exactly one of 'l90' or 'l95'."
+        raise ValueError(msg)
     if l90 is not None:
         spread = median - _finite(l90, "l90")
         divisor = _GAUSS_DIVISOR_L90
@@ -422,12 +430,14 @@ def gaussian_residual_level(
         divisor = _GAUSS_DIVISOR_L95
         name = "l95"
     else:  # unreachable: the check above guarantees exactly one is supplied
-        raise ValueError("Supply exactly one of 'l90' or 'l95'.")
+        msg = "Supply exactly one of 'l90' or 'l95'."
+        raise ValueError(msg)
     if spread < 0.0:
-        raise ValueError(
+        msg = (
             f"'{name}' exceeds 'l50': the exceedance percentiles satisfy "
             "L50 >= L90 >= L95, so the arguments look swapped."
         )
+        raise ValueError(msg)
     return float(median + _GAUSS_CONSTANT * (spread / divisor) ** 2)
 
 
@@ -450,19 +460,22 @@ def combined_standard_uncertainty(
     """
     items = list(contributions)
     if not items:
-        raise ValueError("'contributions' must not be empty.")
+        msg = "'contributions' must not be empty."
+        raise ValueError(msg)
     products = []
     for item in items:
         if isinstance(item, (tuple, list, np.ndarray)):
             pair = np.asarray(item, dtype=np.float64)
             if pair.shape != (2,):
-                raise ValueError("Each pair must be (uncertainty, sensitivity).")
+                msg = "Each pair must be (uncertainty, sensitivity)."
+                raise ValueError(msg)
             products.append(pair[0] * pair[1])
         else:
             products.append(float(item))
     arr = np.asarray(products, dtype=np.float64)
     if not np.all(np.isfinite(arr)):
-        raise ValueError("'contributions' must be finite.")
+        msg = "'contributions' must be finite."
+        raise ValueError(msg)
     return float(np.sqrt(np.sum(arr**2)))
 
 
@@ -491,9 +504,11 @@ def expanded_uncertainty(
     """
     u = _finite(standard_uncertainty, "standard_uncertainty")
     if u < 0.0:
-        raise ValueError("'standard_uncertainty' must be non-negative.")
+        msg = "'standard_uncertainty' must be non-negative."
+        raise ValueError(msg)
     if confidence not in _COVERAGE_FACTORS:
-        raise ValueError(f"'confidence' must be one of {sorted(_COVERAGE_FACTORS)}.")
+        msg = f"'confidence' must be one of {sorted(_COVERAGE_FACTORS)}."
+        raise ValueError(msg)
     return float(_COVERAGE_FACTORS[confidence] * u)
 
 
@@ -523,9 +538,11 @@ def residual_correction_uncertainty(
     u_lp = _finite(measured_uncertainty, "measured_uncertainty")
     u_res = _finite(residual_uncertainty, "residual_uncertainty")
     if lp - lres <= 0.0:
-        raise ValueError("'residual_level' must be below 'measured_level'.")
+        msg = "'residual_level' must be below 'measured_level'."
+        raise ValueError(msg)
     if u_lp < 0.0 or u_res < 0.0:
-        raise ValueError("Uncertainties must be non-negative.")
+        msg = "Uncertainties must be non-negative."
+        raise ValueError(msg)
     m = 10.0 ** (-0.1 * (lp - lres))
     c_lp = 1.0 / (1.0 - m)
     c_res = -m / (1.0 - m)
@@ -589,9 +606,11 @@ def uncertainty_from_repeated_measurements(
 
     lev = np.asarray(levels, dtype=np.float64)
     if lev.ndim != 1 or lev.size < 2:
-        raise ValueError("'levels' must be a 1-D array of at least two values.")
+        msg = "'levels' must be a 1-D array of at least two values."
+        raise ValueError(msg)
     if not np.all(np.isfinite(lev)):
-        raise ValueError("'levels' must be finite.")
+        msg = "'levels' must be finite."
+        raise ValueError(msg)
     n = int(lev.size)
     energies = 10.0 ** (0.1 * lev)
     mean_energy = float(np.mean(energies))

@@ -85,7 +85,8 @@ def _omega(frequency: ArrayLike) -> NDArray[np.float64]:
     r"""Angular frequency :math:`\omega = 2\pi f` (rad/s); rejects f <= 0."""
     f = np.asarray(frequency, dtype=np.float64)
     if np.any(f <= 0.0):
-        raise ValueError("'frequency' must be positive.")
+        msg = "'frequency' must be positive."
+        raise ValueError(msg)
     return 2.0 * np.pi * f
 
 
@@ -107,10 +108,11 @@ def transfer_stiffness_level(
     reference = require_positive(reference, "reference")
     magnitude = np.abs(np.asarray(stiffness, dtype=np.complex128))
     if not np.all(magnitude > 0.0):
-        raise ValueError(
+        msg = (
             "'stiffness' contains zero magnitudes; a zero (dead-channel) "
             "stiffness has no level."
         )
+        raise ValueError(msg)
     return np.asarray(20.0 * np.log10(magnitude / reference), dtype=np.float64)
 
 
@@ -131,10 +133,11 @@ def loss_factor(stiffness: ArrayLike) -> np.ndarray:
     """
     k = np.asarray(stiffness, dtype=np.complex128)
     if not np.all(np.abs(k.real) > 0.0):
-        raise ValueError(
+        msg = (
             "'stiffness' contains purely imaginary values (Re = 0); the loss "
             "factor eta = Im/Re is undefined there."
         )
+        raise ValueError(msg)
     return np.asarray(k.imag / k.real, dtype=np.float64)
 
 
@@ -155,10 +158,11 @@ def transfer_stiffness_direct(
     f2b = np.asarray(blocking_force, dtype=np.complex128)
     u1 = np.asarray(input_displacement, dtype=np.complex128)
     if not np.all(np.abs(u1) > 0.0):
-        raise ValueError(
+        msg = (
             "'input_displacement' contains zeros (dead input channel); the "
             "ratio k2,1 = F2,b/u1 is undefined there."
         )
+        raise ValueError(msg)
     return np.asarray(f2b / u1, dtype=np.complex128)
 
 
@@ -259,7 +263,8 @@ def blocking_force_ratio(
     k22 = np.asarray(driving_point_stiffness, dtype=np.complex128)
     kt = np.asarray(termination_stiffness, dtype=np.complex128)
     if not np.all(np.abs(kt) > 0.0):
-        raise ValueError("'termination_stiffness' must be non-zero.")
+        msg = "'termination_stiffness' must be non-zero."
+        raise ValueError(msg)
     return np.asarray(1.0 / (1.0 + k22 / kt), dtype=np.complex128)
 
 
@@ -405,9 +410,8 @@ class TransferStiffnessResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iso10846 import render_transfer_stiffness_report
 
         return render_transfer_stiffness_report(

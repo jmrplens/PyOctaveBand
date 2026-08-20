@@ -103,11 +103,14 @@ def fluctuation_strength_am_noise(
     fmod = float(mod_frequency)
     lvl = float(level_db)
     if not np.isfinite(m) or not 0.0 <= m <= 1.0:
-        raise ValueError("'modulation_factor' must be in [0, 1].")
+        msg = "'modulation_factor' must be in [0, 1]."
+        raise ValueError(msg)
     if not np.isfinite(fmod) or fmod <= 0.0:
-        raise ValueError("'mod_frequency' must be positive and finite.")
+        msg = "'mod_frequency' must be positive and finite."
+        raise ValueError(msg)
     if not np.isfinite(lvl):
-        raise ValueError("'level_db' must be finite.")
+        msg = "'level_db' must be finite."
+        raise ValueError(msg)
     numerator = (
         _BBN_SCALE
         * (_BBN_M_SLOPE * m - _BBN_M_OFFSET)
@@ -254,11 +257,14 @@ def _cross_covariance(x: NDArray[np.float64], y: NDArray[np.float64]) -> float:
 def _validate_signal(x: Signal | NDArray[np.float64]) -> NDArray[np.float64]:
     sig = np.asarray(x, dtype=np.float64)
     if sig.ndim != 1:
-        raise ValueError("'signal' must be one-dimensional.")
+        msg = "'signal' must be one-dimensional."
+        raise ValueError(msg)
     if sig.size == 0:
-        raise ValueError("'signal' must not be empty.")
+        msg = "'signal' must not be empty."
+        raise ValueError(msg)
     if not np.all(np.isfinite(sig)):
-        raise ValueError("'signal' must be finite.")
+        msg = "'signal' must be finite."
+        raise ValueError(msg)
     return sig
 
 
@@ -447,7 +453,8 @@ def _c_fs() -> float:
         raw = float(np.median(_analyze(_reference_signal())[0]))
         c = 1.0 / raw if raw > 0.0 else 0.0
         if not 0.15 <= c < 0.50:  # pragma: no cover - sanity guard
-            raise RuntimeError(f"C_FS={c} outside the expected range")
+            msg = f"C_FS={c} outside the expected range"
+            raise RuntimeError(msg)
         _C_FS = c
     return _C_FS
 
@@ -515,7 +522,8 @@ def fluctuation_strength(
     sig = apply_calibration(signal_in, _validate_signal(signal_in))
     fs_v = float(fs)
     if not np.isfinite(fs_v) or fs_v <= 0.0:
-        raise ValueError("'fs' must be positive and finite.")
+        msg = "'fs' must be positive and finite."
+        raise ValueError(msg)
 
     # Resample to the model design rate.
     if fs_v != _FS_SAMPLE_RATE:

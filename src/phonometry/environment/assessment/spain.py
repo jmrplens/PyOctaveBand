@@ -291,7 +291,8 @@ def _finite(value: float, name: str) -> float:
     """Return ``value`` as a float, rejecting non-finite input."""
     scalar = float(value)
     if not math.isfinite(scalar):
-        raise ValueError(f"'{name}' must be finite.")
+        msg = f"'{name}' must be finite."
+        raise ValueError(msg)
     return scalar
 
 
@@ -299,14 +300,16 @@ def _positive(value: float, name: str) -> float:
     """Return ``value`` as a float, rejecting non-positive or non-finite input."""
     scalar = float(value)
     if not math.isfinite(scalar) or scalar <= 0.0:
-        raise ValueError(f"'{name}' must be a positive, finite number.")
+        msg = f"'{name}' must be a positive, finite number."
+        raise ValueError(msg)
     return scalar
 
 
 def _normalise(value: str, aliases: Mapping[str, str], name: str) -> str:
     """Lower-case ``value``, replace spaces by underscores and resolve aliases."""
     if not isinstance(value, str):
-        raise ValueError(f"'{name}' must be a string; got {value!r}.")  # noqa: TRY004 - ValueError keeps the module validation errors uniform
+        msg = f"'{name}' must be a string; got {value!r}."
+        raise ValueError(msg)  # noqa: TRY004 - ValueError keeps the module validation errors uniform
     key = value.strip().lower().replace(" ", "_").replace("-", "_")
     return aliases.get(key, key)
 
@@ -315,9 +318,8 @@ def _check_period(period: str) -> str:
     """Validate an evaluation-period name."""
     key = str(period).strip().lower()
     if key not in RD1367_EVALUATION_PERIODS:
-        raise ValueError(
-            f"'period' must be one of 'day', 'evening', 'night'; got {period!r}."
-        )
+        msg = f"'period' must be one of 'day', 'evening', 'night'; got {period!r}."
+        raise ValueError(msg)
     return key
 
 
@@ -395,23 +397,29 @@ def _validate_kt_spectrum(band_levels: np.ndarray, freqs: np.ndarray) -> None:
     :raises ValueError: For a shape, a value or an order the procedure needs.
     """
     if band_levels.ndim != 1 or freqs.ndim != 1:
-        raise ValueError("'levels' and 'frequencies' must be one-dimensional.")
+        msg = "'levels' and 'frequencies' must be one-dimensional."
+        raise ValueError(msg)
     if band_levels.shape != freqs.shape:
-        raise ValueError(
+        msg = (
             "'levels' and 'frequencies' must have the same length; got "
             f"{band_levels.size} and {freqs.size}."
         )
+        raise ValueError(msg)
     if band_levels.size < 3:
-        raise ValueError(
+        msg = (
             "At least three one-third-octave bands are needed: the procedure "
             "compares a band against its two neighbours."
         )
+        raise ValueError(msg)
     if not np.all(np.isfinite(band_levels)):
-        raise ValueError("'levels' must contain finite values.")
+        msg = "'levels' must contain finite values."
+        raise ValueError(msg)
     if not np.all(np.isfinite(freqs)) or np.any(freqs <= 0.0):
-        raise ValueError("'frequencies' must contain positive, finite values.")
+        msg = "'frequencies' must contain positive, finite values."
+        raise ValueError(msg)
     if np.any(np.diff(freqs) <= 0.0):
-        raise ValueError("'frequencies' must be strictly ascending.")
+        msg = "'frequencies' must be strictly ascending."
+        raise ValueError(msg)
 
 
 def _band_tonal_corrections(
@@ -586,10 +594,11 @@ def total_correction(kt: float = 0.0, kf: float = 0.0, ki: float = 0.0) -> float
     for value, name in ((kt, "kt"), (kf, "kf"), (ki, "ki")):
         scalar = _finite(value, name)
         if not any(math.isclose(scalar, step) for step in RD1367_CORRECTION_VALUES):
-            raise ValueError(
+            msg = (
                 f"'{name}' must be 0, 3 or 6 dB, the only values the Annex IV "
                 f"A.3.3 tables grade; got {value!r}."
             )
+            raise ValueError(msg)
         total += scalar
     return min(total, RD1367_MAX_CORRECTION)
 
@@ -685,7 +694,8 @@ def evaluation_period_level(
     """
     items = list(phases)
     if not items:
-        raise ValueError("At least one noise phase is required.")
+        msg = "At least one noise phase is required."
+        raise ValueError(msg)
     durations = np.array([p.hours for p in items], dtype=np.float64)
     levels = np.array([p.lkeq for p in items], dtype=np.float64)
     total = float(np.sum(durations))
@@ -694,10 +704,11 @@ def evaluation_period_level(
     else:
         period = _positive(hours, "hours")
         if abs(total - period) > 1e-9:
-            raise ValueError(
+            msg = (
                 "The phase durations must sum to the period duration "
                 f"(sum Ti = T); got {total!r} h for T = {period!r} h."
             )
+            raise ValueError(msg)
     return float(10.0 * np.log10(np.sum(durations * 10.0 ** (levels / 10.0)) / period))
 
 
@@ -723,20 +734,24 @@ def long_term_corrected_level(
     """
     levels = np.asarray(daily_levels, dtype=np.float64).ravel()
     if levels.size == 0:
-        raise ValueError("At least one daily level is required.")
+        msg = "At least one daily level is required."
+        raise ValueError(msg)
     if not np.all(np.isfinite(levels)):
-        raise ValueError("'daily_levels' must contain finite values.")
+        msg = "'daily_levels' must contain finite values."
+        raise ValueError(msg)
     if weights is None:
         counts = np.ones_like(levels)
     else:
         counts = np.asarray(weights, dtype=np.float64).ravel()
         if counts.shape != levels.shape:
-            raise ValueError(
+            msg = (
                 "'weights' must have one value per daily level; got "
                 f"{counts.size} for {levels.size} levels."
             )
+            raise ValueError(msg)
         if not np.all(np.isfinite(counts)) or np.any(counts <= 0.0):
-            raise ValueError("'weights' must contain positive, finite values.")
+            msg = "'weights' must contain positive, finite values."
+            raise ValueError(msg)
     return float(
         10.0 * np.log10(np.sum(counts * 10.0 ** (levels / 10.0)) / np.sum(counts))
     )
@@ -798,10 +813,11 @@ def _area_key(area_type: str, table: Mapping[str, Any]) -> str:
     """Resolve and validate an acoustic area type against a table."""
     key = _normalise(area_type, _AREA_ALIASES, "area_type")
     if key not in table:
-        raise ValueError(
+        msg = (
             "'area_type' must be one of "
             f"{sorted(table)} (or a documented alias); got {area_type!r}."
         )
+        raise ValueError(msg)
     return key
 
 
@@ -828,9 +844,8 @@ def outdoor_quality_objectives(
     key = _area_key(area_type, _OUTDOOR_OBJECTIVES)
     state = str(urbanisation).strip().lower()
     if state not in ("existing", "new"):
-        raise ValueError(
-            f"'urbanisation' must be 'existing' or 'new'; got {urbanisation!r}."
-        )
+        msg = f"'urbanisation' must be 'existing' or 'new'; got {urbanisation!r}."
+        raise ValueError(msg)
     offset = 0.0 if state == "existing" else -5.0
     suffix = (
         "existing urbanised areas"
@@ -854,10 +869,11 @@ def _indoor_key(
     use = _normalise(building_use, _USE_ALIASES, "building_use")
     room = _normalise(room_type, _ROOM_ALIASES, "room_type")
     if (use, room) not in table:
-        raise ValueError(
+        msg = (
             "Unknown (building_use, room_type) combination "
             f"{(building_use, room_type)!r}; the table holds {sorted(table)}."
         )
+        raise ValueError(msg)
     return use, room
 
 
@@ -895,10 +911,11 @@ def vibration_quality_objective(building_use: str) -> float:
     """
     use = _normalise(building_use, _USE_ALIASES, "building_use")
     if use not in _VIBRATION_OBJECTIVES:
-        raise ValueError(
+        msg = (
             "'building_use' must be one of "
             f"{sorted(_VIBRATION_OBJECTIVES)}; got {building_use!r}."
         )
+        raise ValueError(msg)
     return _VIBRATION_OBJECTIVES[use]
 
 
@@ -1135,20 +1152,21 @@ def _validate_annual_inputs(
     :raises ValueError: For a fractional or out-of-range count of days.
     """
     if int(year_days) != year_days or int(year_days) <= 0:
-        raise ValueError(
-            f"'year_days' must be a positive whole number; got {year_days!r}."
-        )
+        msg = f"'year_days' must be a positive whole number; got {year_days!r}."
+        raise ValueError(msg)
     if operating_days is None:
         return
     if int(operating_days) != operating_days:
-        raise ValueError(
+        msg = (
             f"'operating_days' must be a whole number of days; got {operating_days!r}."
         )
+        raise ValueError(msg)
     if not 0 < int(operating_days) <= int(year_days):
-        raise ValueError(
+        msg = (
             "'operating_days' must be a positive integer no larger than "
             f"'year_days'; got {operating_days!r} of {year_days!r}."
         )
+        raise ValueError(msg)
     _finite(closed_level, "closed_level")
 
 
@@ -1208,7 +1226,8 @@ def _assess_period(
     :raises ValueError: If the period carries no noise phases.
     """
     if not phases:
-        raise ValueError(f"Period {name!r} has no noise phases.")
+        msg = f"Period {name!r} has no noise phases."
+        raise ValueError(msg)
     level = evaluation_period_level(phases, hours=duration)
     reported = round_reported_level(level)
     annual = _annual_index(
@@ -1286,7 +1305,8 @@ def assess_activity(
         inconsistent durations, or invalid annual parameters.
     """
     if not measurements:
-        raise ValueError("At least one evaluation period must be supplied.")
+        msg = "At least one evaluation period must be supplied."
+        raise ValueError(msg)
     durations = _period_durations(period_hours)
     _validate_annual_inputs(operating_days, year_days, closed_level)
 
@@ -1306,22 +1326,24 @@ def assess_activity(
         if name in measurements
     ]
     if not assessments:
-        raise ValueError(
+        msg = (
             "None of the supplied keys is an evaluation period; expected "
             f"any of {RD1367_EVALUATION_PERIODS}."
         )
+        raise ValueError(msg)
     if new_activity and all(p.long_term_pass is None for p in assessments):
         # Article 25.1 b i is mandatory for a new activity, so an assessment
         # that never evaluates it cannot conclude anything about compliance.
         # Checked after the structural validation so the more specific error
         # about the measurements themselves wins.
-        raise ValueError(
+        msg = (
             "A new activity is assessed against all three criteria of Article "
             "25.1 b, so the annual index LK,x is required: supply "
             "'long_term_levels' or 'operating_days'. For the inspection of an "
             "activity already in operation, which Article 25.2 subjects only "
             "to the daily and phase criteria, pass new_activity=False."
         )
+        raise ValueError(msg)
     return ActivityAssessment(
         periods=tuple(assessments), limits=limits, new_activity=new_activity
     )

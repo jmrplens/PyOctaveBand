@@ -106,23 +106,26 @@ class OperatingModeDeclaration:
     def __post_init__(self) -> None:
         """Validate the levels, the uncertainties and the pressure pairing."""
         if not str(self.mode).strip():
-            raise ValueError("OperatingModeDeclaration.mode must be a non-empty label.")
+            msg = "OperatingModeDeclaration.mode must be a non-empty label."
+            raise ValueError(msg)
         for name in ("sound_power_level", "verification_level"):
             value = getattr(self, name)
             if value is not None and not math.isfinite(float(value)):
-                raise ValueError(
+                msg = (
                     f"OperatingModeDeclaration.{name} must be finite when given; "
                     f"got {value!r}."
                 )
+                raise ValueError(msg)
         for name in ("sound_power_uncertainty", "emission_pressure_uncertainty"):
             value = getattr(self, name)
             if value is not None and not (
                 math.isfinite(float(value)) and float(value) >= 0.0
             ):
-                raise ValueError(
+                msg = (
                     f"OperatingModeDeclaration.{name} must be finite and "
                     f"non-negative when given; got {value!r}."
                 )
+                raise ValueError(msg)
         if (self.emission_pressure_level is None) != (
             self.emission_pressure_uncertainty is None
         ):
@@ -131,18 +134,20 @@ class OperatingModeDeclaration:
                 if self.emission_pressure_uncertainty is None
                 else "emission_pressure_level"
             )
-            raise ValueError(
+            msg = (
                 "emission_pressure_level and emission_pressure_uncertainty must "
                 f"be given together (ISO 4871 dual-number form); '{missing}' is "
                 "missing."
             )
+            raise ValueError(msg)
         if self.emission_pressure_level is not None and not math.isfinite(
             float(self.emission_pressure_level)
         ):
-            raise ValueError(
+            msg = (
                 "OperatingModeDeclaration.emission_pressure_level must be finite "
                 f"when given; got {self.emission_pressure_level!r}."
             )
+            raise ValueError(msg)
 
     @property
     def declared_sound_power_level(self) -> int:
@@ -258,19 +263,19 @@ class NoiseEmissionDeclaration:
         """Coerce the sequences to tuples and validate the form and mode count."""
         modes = tuple(self.modes)
         if not modes:
-            raise ValueError(
-                "NoiseEmissionDeclaration requires at least one operating mode."
-            )
+            msg = "NoiseEmissionDeclaration requires at least one operating mode."
+            raise ValueError(msg)
         standards = (
             (self.basic_standards,)
             if isinstance(self.basic_standards, str)
             else tuple(self.basic_standards)
         )
         if self.form not in ("dual-number", "single-number"):
-            raise ValueError(
+            msg = (
                 "NoiseEmissionDeclaration.form must be 'dual-number' or "
                 f"'single-number'; got {self.form!r}."
             )
+            raise ValueError(msg)
         object.__setattr__(self, "modes", modes)
         object.__setattr__(self, "basic_standards", standards)
 
@@ -319,9 +324,8 @@ class NoiseEmissionDeclaration:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.iso4871 import render_iso4871_report
 
         return render_iso4871_report(

@@ -115,9 +115,8 @@ def _omega(frequency: ArrayLike) -> NDArray[np.float64]:
     r"""Angular frequency :math:`\omega = 2 \pi f` (rad/s); rejects f <= 0."""
     f = np.asarray(frequency, dtype=np.float64)
     if np.any(f <= 0.0):
-        raise ValueError(
-            "'frequency' must be positive (mobility conversions divide by omega)."
-        )
+        msg = "'frequency' must be positive (mobility conversions divide by omega)."
+        raise ValueError(msg)
     return 2.0 * np.pi * f
 
 
@@ -177,19 +176,19 @@ def convert_frf(
     """
     for name, role in ((source, "source"), (target, "target")):
         if name not in _FRF_TYPES:
-            raise ValueError(
-                f"unknown {role} FRF {name!r}; choose from {tuple(_FRF_TYPES)}."
-            )
+            msg = f"unknown {role} FRF {name!r}; choose from {tuple(_FRF_TYPES)}."
+            raise ValueError(msg)
     omega = _omega(frequency)
     val = np.asarray(value, dtype=np.complex128)
     if (_FRF_TYPES[source][1] or _FRF_TYPES[target][1]) and not np.all(
         np.abs(val) > 0.0
     ):
-        raise ValueError(
+        msg = (
             "'value' contains zeros (dead channel); converting "
             f"{source!r} to {target!r} takes a reciprocal, which is "
             "undefined there."
         )
+        raise ValueError(msg)
     receptance = _to_receptance(val, omega, source)
     return np.asarray(_from_receptance(receptance, omega, target), dtype=np.complex128)
 
@@ -351,13 +350,15 @@ def rigid_mass_calibration_check(
         or frequency, or mismatched shapes.
     """
     if quantity not in ("accelerance", "mobility"):
-        raise ValueError("'quantity' must be 'accelerance' or 'mobility'.")
+        msg = "'quantity' must be 'accelerance' or 'mobility'."
+        raise ValueError(msg)
     mass = require_positive(mass, "mass")
     tolerance = require_positive(tolerance, "tolerance")
     freq = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     measured = np.abs(np.atleast_1d(np.asarray(frf, dtype=np.complex128)))
     if measured.shape != freq.shape:
-        raise ValueError("'frf' and 'frequencies' must have the same shape.")
+        msg = "'frf' and 'frequencies' must have the same shape."
+        raise ValueError(msg)
     omega = _omega(freq)
     if quantity == "accelerance":
         expected = np.full_like(freq, 1.0 / mass)
@@ -399,10 +400,12 @@ def random_error_percent(coherence: ArrayLike, n_averages: int) -> np.ndarray:
     """
     n = int(n_averages)
     if n < 1:
-        raise ValueError("'n_averages' must be at least 1.")
+        msg = "'n_averages' must be at least 1."
+        raise ValueError(msg)
     gamma2 = np.asarray(coherence, dtype=np.float64)
     if np.any(gamma2 <= 0.0) or np.any(gamma2 > 1.0):
-        raise ValueError("'coherence' must lie in (0, 1].")
+        msg = "'coherence' must lie in (0, 1]."
+        raise ValueError(msg)
     eps = np.sqrt((1.0 - gamma2) / (2.0 * n * gamma2))
     return np.asarray(100.0 * eps, dtype=np.float64)
 
@@ -504,9 +507,8 @@ class MobilityResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iso7626 import render_mobility_report
 
         return render_mobility_report(

@@ -135,15 +135,17 @@ def assert_capabilities() -> None:
         return
     raqm = getattr(ft2font, "__libraqm_version__", None)
     if not raqm:
-        raise RuntimeError(
+        msg = (
             "matplotlib was built without libraqm: combining marks would "
             "shape with their own advance and the plates would mis-set "
             "every T̂/L̄/x̃ label"
         )
+        raise RuntimeError(msg)
     for chain in _FACES.values():
         for path in chain:
             if not path.is_file():
-                raise RuntimeError(f"font file missing from the chain: {path}")
+                msg = f"font file missing from the chain: {path}"
+                raise RuntimeError(msg)
     _capabilities_checked = True
 
 
@@ -202,11 +204,13 @@ def segment(text: str, face_key: FaceKey) -> list[FaceRun]:
                 None,
             )
             if ch is not None:
-                raise ValueError(f"no face in the chain draws {ch!r} of {text!r}")
-            raise ValueError(
+                msg = f"no face in the chain draws {ch!r} of {text!r}"
+                raise ValueError(msg)
+            msg = (
                 f"no single face in the chain covers the cluster "
                 f"{cluster!r} of {text!r}"
             )
+            raise ValueError(msg)
         if runs and runs[-1].path == path:
             runs[-1] = FaceRun(runs[-1].text + cluster, path)
         else:

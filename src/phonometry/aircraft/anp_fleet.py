@@ -86,9 +86,10 @@ def _operation_code(operation: str) -> str:
     """Normalise an operation label to the ANP code ``"A"``/``"D"``."""
     key = str(operation).strip().lower()
     if key not in _OPERATION:
-        raise ValueError(
+        msg = (
             f"'operation' must be 'departure'/'D' or 'arrival'/'A', got {operation!r}."
         )
+        raise ValueError(msg)
     return _OPERATION[key]
 
 
@@ -108,14 +109,14 @@ def _pick(name: str, tables: Mapping[str, str]) -> str:
     """
     matches = [f for f in tables if name in f.lower()]
     if len(matches) > 1:
-        raise ValueError(
+        msg = (
             f"ambiguous ANP table for {name!r}: {sorted(matches)}. Keep a single "
             f"file per table in the export directory."
         )
+        raise ValueError(msg)
     if not matches:
-        raise FileNotFoundError(
-            f"no ANP table matching {name!r} found (looked in: {sorted(tables)})."
-        )
+        msg = f"no ANP table matching {name!r} found (looked in: {sorted(tables)})."
+        raise FileNotFoundError(msg)
     return tables[matches[0]]
 
 
@@ -127,10 +128,12 @@ def _distances_m(header: Iterable[str]) -> NDArray[np.float64]:
         if c.startswith("L_") and c.endswith("ft"):
             dist_ft.append(float(c[2:-2]))
     if len(dist_ft) < 2:
-        raise ValueError("NPD table has fewer than two 'L_<ft>ft' distance columns.")
+        msg = "NPD table has fewer than two 'L_<ft>ft' distance columns."
+        raise ValueError(msg)
     distances = np.asarray(dist_ft, dtype=np.float64) * _FT_M
     if np.any(np.diff(distances) <= 0.0):
-        raise ValueError("NPD 'L_<ft>ft' distance columns must be strictly increasing.")
+        msg = "NPD 'L_<ft>ft' distance columns must be strictly increasing."
+        raise ValueError(msg)
     distances.flags.writeable = False  # shared across every AnpNpdCurves
     return distances
 
@@ -335,10 +338,11 @@ class AnpDatabase:
         :raises KeyError: If the identifier is not in the database.
         """
         if aircraft_id not in self._aircraft:
-            raise KeyError(
+            msg = (
                 f"aircraft {aircraft_id!r} not in this ANP database "
                 f"(available: {self.aircraft_ids})."
             )
+            raise KeyError(msg)
         m = self._aircraft[aircraft_id]
         lat = m.get("Lateral Directivity Identifier", "").strip().lower()
         return AnpAircraft(
@@ -366,18 +370,21 @@ class AnpDatabase:
         :raises ValueError: If the metric or operation is unknown.
         """
         if metric not in _METRICS:
-            raise ValueError(f"'metric' must be one of {_METRICS}, got {metric!r}.")
+            msg = f"'metric' must be one of {_METRICS}, got {metric!r}."
+            raise ValueError(msg)
         op = _operation_code(operation)
         m = self._aircraft.get(aircraft_id)
         if m is None:
-            raise KeyError(f"aircraft {aircraft_id!r} not in this ANP database.")
+            msg = f"aircraft {aircraft_id!r} not in this ANP database."
+            raise KeyError(msg)
         npd_id = m.get("NPD_ID", "")
         key = (npd_id, metric, op)
         if key not in self._npd:
-            raise KeyError(
+            msg = (
                 f"no {metric} NPD data for aircraft {aircraft_id!r} "
                 f"(NPD_ID {npd_id!r}), operation {op!r}."
             )
+            raise KeyError(msg)
         powers, levels = self._npd[key]
         return AnpNpdCurves(
             aircraft_id=aircraft_id,
@@ -418,10 +425,11 @@ class AnpDatabase:
             exist with none of them named ``"DEFAULT"``.
         """
         if aircraft_id not in self._aircraft:
-            raise KeyError(
+            msg = (
                 f"aircraft {aircraft_id!r} not in this ANP database "
                 f"(available: {self.aircraft_ids})."
             )
+            raise KeyError(msg)
         op = _operation_code(operation)
         stage = int(stage_length)
         ids = sorted(
@@ -437,30 +445,33 @@ class AnpDatabase:
                     if a == aircraft_id and o == op
                 }
             )
-            raise KeyError(
+            msg = (
                 f"no fixed-point profile for aircraft {aircraft_id!r}, operation "
                 f"{op!r}, stage length {stage_length} (available stage lengths: "
                 f"{avail}). Aircraft with only procedural-step profiles are not "
                 f"supported by this bridge."
             )
+            raise KeyError(msg)
         if profile_id is not None:
             pid = str(profile_id)
             if pid not in ids:
-                raise KeyError(
+                msg = (
                     f"no fixed-point profile {pid!r} for aircraft "
                     f"{aircraft_id!r}, operation {op!r}, stage length "
                     f"{stage_length} (available profiles: {ids})."
                 )
+                raise KeyError(msg)
         elif "DEFAULT" in ids:
             pid = "DEFAULT"
         elif len(ids) == 1:
             pid = ids[0]
         else:
-            raise ValueError(
+            msg = (
                 f"aircraft {aircraft_id!r}, operation {op!r}, stage length "
                 f"{stage_length} has several fixed-point profiles and none is "
                 f"'DEFAULT': {ids}. Pass profile_id= to choose one."
             )
+            raise ValueError(msg)
         path = self._profiles[(aircraft_id, op, pid, stage)]
         # Ground-roll segments run along the runway: both endpoints at field
         # elevation. Tabulated ground points sit at exactly 0 m and the lowest
@@ -501,11 +512,12 @@ class AnpDatabase:
         # so the two metrics must share power settings. They always do in the ANP
         # database; this guards a malformed user-supplied export.
         if not np.array_equal(sel.powers, lmax.powers):
-            raise ValueError(
+            msg = (
                 f"SEL and LAmax NPD power settings differ for aircraft "
                 f"{aircraft_id!r}, operation {operation!r}: {sel.powers} vs "
                 f"{lmax.powers}."
             )
+            raise ValueError(msg)
         return acft, prof, sel.powers, sel.distances, sel.levels, lmax.levels
 
     def event_level(
@@ -614,10 +626,12 @@ def _read_tables(path: Path | str | None) -> dict[str, str]:
 
     directory = pathlib.Path(path)
     if not directory.is_dir():
-        raise NotADirectoryError(f"ANP database path {path!r} is not a directory.")
+        msg = f"ANP database path {path!r} is not a directory."
+        raise NotADirectoryError(msg)
     files_found = sorted(directory.glob("*.csv")) + sorted(directory.glob("*.CSV"))
     if not files_found:
-        raise FileNotFoundError(f"no .csv ANP tables found in {path!r}.")
+        msg = f"no .csv ANP tables found in {path!r}."
+        raise FileNotFoundError(msg)
     return {f.name: f.read_text(encoding="utf-8-sig") for f in files_found}
 
 
@@ -630,7 +644,8 @@ def _parse_npd(
     """Parse the NPD table into ``{(npd_id, metric, op): (powers, levels)}``."""
     rows = _rows(text)
     if not rows:
-        raise ValueError("empty NPD table.")
+        msg = "empty NPD table."
+        raise ValueError(msg)
     level_cols = [c for c in rows[0] if c.startswith("L_") and c.endswith("ft")]
     distances = _distances_m(rows[0].keys())
     grouped: dict[tuple[str, str, str], list[tuple[float, list[float]]]] = {}
@@ -689,12 +704,13 @@ def _parse_profiles(
         numbers = [p[0] for p in pts]
         if numbers != list(range(numbers[0], numbers[0] + len(numbers))):
             acft, op, pid, stage = key
-            raise ValueError(
+            msg = (
                 f"fixed-point profile for aircraft {acft!r}, operation {op!r}, "
                 f"profile {pid!r}, stage length {stage} has duplicate or "
                 f"non-consecutive point numbers {numbers}; the table is "
                 f"malformed."
             )
+            raise ValueError(msg)
         path = np.asarray([p[1] for p in pts], dtype=np.float64)
         path.flags.writeable = False  # exposed by reference on AnpProfile
         profiles[key] = path

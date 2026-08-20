@@ -124,11 +124,12 @@ def _resolve_miso_fs(
         # for at most one of them.
         rates = sorted({row.fs for row in signals})
         if len(rates) > 1:
-            raise ValueError(
+            msg = (
                 f"'inputs' holds Signals recorded at different rates ({rates} "
                 "Hz); a MISO estimate cross-spectra them against each other, "
                 "so resample them to a common rate first"
             )
+            raise ValueError(msg)
         carrier = signals[0] if signals else np.asarray(output)
     if isinstance(carrier, Signal) or isinstance(output, Signal):
         return float(resolve_pair_fs(carrier, output, fs, names=("inputs", "output")))
@@ -162,12 +163,14 @@ def _validate_inputs(
         # calibration, applied by _validate_signal below.
         rows = list(inputs)
     if len(rows) < 2:
-        raise ValueError("'inputs' must hold at least two input records.")
+        msg = "'inputs' must hold at least two input records."
+        raise ValueError(msg)
     xs = [_validate_signal(x, f"inputs[{i}]") for i, x in enumerate(rows)]
     ya = _validate_signal(output, "output")
     for i, x in enumerate(xs):
         if x.size != ya.size:
-            raise ValueError(f"'inputs[{i}]' and 'output' must have the same length.")
+            msg = f"'inputs[{i}]' and 'output' must have the same length."
+            raise ValueError(msg)
     return xs, ya
 
 
@@ -177,7 +180,8 @@ def _validate_order(order: Sequence[int] | None, q: int) -> tuple[int, ...]:
         return tuple(range(q))
     perm = tuple(int(i) for i in order)
     if sorted(perm) != list(range(q)):
-        raise ValueError(f"'order' must be a permutation of range({q}).")
+        msg = f"'order' must be a permutation of range({q})."
+        raise ValueError(msg)
     return perm
 
 

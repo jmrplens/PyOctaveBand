@@ -105,10 +105,11 @@ def _iso532_b5_signal(
         str(_DATA / "iso532_1" / "Annex B.5" / f"Test signal {num} *.wav")
     )
     if not matches:
-        raise FileNotFoundError(
+        msg = (
             f"No ISO 532-1 Annex B.5 WAV found for Test signal {num} "
             "(see tests/data/iso532_1/README.md)."
         )
+        raise FileNotFoundError(msg)
     # WAV/RIFF is little-endian, so the dtype is fixed to '<i2'; a multi-channel
     # file keeps only channel 0.
     with wave.open(matches[0]) as handle:
@@ -120,7 +121,8 @@ def _iso532_b5_signal(
     signal = raw.astype(np.float64) / 32768.0 * (2.0 * math.sqrt(2.0))
     field = str(entry["field"])
     if field not in ("free", "diffuse"):
-        raise ValueError(f"unexpected sound field {field!r} in the workbook")
+        msg = f"unexpected sound field {field!r} in the workbook"
+        raise ValueError(msg)
     return (
         signal,
         int(fs),

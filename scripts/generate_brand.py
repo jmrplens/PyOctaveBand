@@ -176,7 +176,8 @@ def ribbon_outline(ribbon: Ribbon) -> tuple[Point, list[Segment]]:
     point of the bottom one, and the malformed tip would show in both emitters.
     """
     if ribbon.width[-1] != 0.0:
-        raise ValueError("a ribbon has to taper to zero width at its tip")
+        msg = "a ribbon has to taper to zero width at its tip"
+        raise ValueError(msg)
     spine, width = ribbon.spine, ribbon.width
     nrm = _normals(spine)
     upper = [

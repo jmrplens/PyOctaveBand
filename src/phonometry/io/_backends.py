@@ -117,7 +117,8 @@ def _sniff(path: str | Path) -> str | None:
     # (11 set bits: 0xFF 0xE0).
     if len(head) >= 2 and head[0] == 0xFF and head[1] & 0xE0 == 0xE0:
         return "MPEG audio (MP3)"
-    raise ValueError(f"{path}: not a recognised audio file")
+    msg = f"{path}: not a recognised audio file"
+    raise ValueError(msg)
 
 
 def _import_soundfile(format_name: str) -> Any:
@@ -125,10 +126,11 @@ def _import_soundfile(format_name: str) -> Any:
     try:
         import soundfile
     except ImportError as exc:
-        raise ImportError(
+        msg = (
             f"Reading {format_name} requires python-soundfile, which "
             f"phonometry ships as the [audio] extra. {_AUDIO_EXTRA_HINT}"
-        ) from exc
+        )
+        raise ImportError(msg) from exc
     return soundfile
 
 

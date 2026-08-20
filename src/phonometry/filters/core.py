@@ -127,26 +127,32 @@ def _validate_bank_design(
     none was given.
     """
     if fs <= 0:
-        raise ValueError("Sample rate 'fs' must be positive.")
+        msg = "Sample rate 'fs' must be positive."
+        raise ValueError(msg)
     if fraction <= 0:
-        raise ValueError("Bandwidth 'fraction' must be positive.")
+        msg = "Bandwidth 'fraction' must be positive."
+        raise ValueError(msg)
     if order <= 0:
-        raise ValueError("Filter 'order' must be positive.")
+        msg = "Filter 'order' must be positive."
+        raise ValueError(msg)
     if limits is None:
         limits = [12, 20000]
     if len(limits) != 2:
-        raise ValueError("Limits must be a list of two frequencies [f_min, f_max].")
+        msg = "Limits must be a list of two frequencies [f_min, f_max]."
+        raise ValueError(msg)
     if limits[0] <= 0 or limits[1] <= 0:
-        raise ValueError("Limit frequencies must be positive.")
+        msg = "Limit frequencies must be positive."
+        raise ValueError(msg)
     if limits[0] >= limits[1]:
-        raise ValueError("The lower limit must be less than the upper limit.")
+        msg = "The lower limit must be less than the upper limit."
+        raise ValueError(msg)
     if design.filter_type not in _VALID_FILTERS:
-        raise ValueError(f"Invalid filter_type. Must be one of {_VALID_FILTERS}")
+        msg = f"Invalid filter_type. Must be one of {_VALID_FILTERS}"
+        raise ValueError(msg)
     if design.resample and block_processing.stateful:
         # a stateful resampling algorithm would be required...
-        raise ValueError(
-            "Resampling and stateful behaviour (block processing) are not supported."
-        )
+        msg = "Resampling and stateful behaviour (block processing) are not supported."
+        raise ValueError(msg)
     return limits
 
 
@@ -404,7 +410,8 @@ class OctaveFilterBank:
         :return: A tuple containing (SPL_array, Frequencies_list) or (SPL_array, Frequencies_list, signals).
         """
         if zero_phase and self.stateful:
-            raise ValueError("zero_phase is not compatible with stateful processing.")
+            msg = "zero_phase is not compatible with stateful processing."
+            raise ValueError(msg)
 
         x_proc, is_multichannel = self._prepare_signal(x, detrend)
         num_channels = x_proc.shape[0]
@@ -512,9 +519,11 @@ class OctaveFilterBank:
             each window's center in seconds.
         """
         if self.stateful:
-            raise ValueError("spectrogram() is not supported on stateful banks.")
+            msg = "spectrogram() is not supported on stateful banks."
+            raise ValueError(msg)
         if not 0 <= overlap < 1:
-            raise ValueError("overlap must be in [0, 1).")
+            msg = "overlap must be in [0, 1)."
+            raise ValueError(msg)
 
         refuse_foreign_rate(x, self.fs, "filter bank")
         x_proc = resolve_samples(x, calibrate=self._default_calibration)
@@ -523,9 +532,8 @@ class OctaveFilterBank:
         win = round(window_time * self.fs)
         hop = max(1, round(win * (1 - overlap)))
         if win <= 0 or win > n_samples:
-            raise ValueError(
-                "window_time must be positive and shorter than the signal."
-            )
+            msg = "window_time must be positive and shorter than the signal."
+            raise ValueError(msg)
 
         # Filter once per band at full rate so windows stay time-aligned
         # across bands regardless of per-band decimation.
@@ -651,7 +659,8 @@ class OctaveFilterBank:
         elif mode.lower() == "peak":
             val_linear = np.max(np.abs(y), axis=-1)
         else:
-            raise ValueError("Invalid mode. Use 'rms' or 'peak'.")
+            msg = "Invalid mode. Use 'rms' or 'peak'."
+            raise ValueError(msg)
 
         eps = np.finfo(float).eps
 

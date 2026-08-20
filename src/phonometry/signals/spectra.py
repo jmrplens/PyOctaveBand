@@ -103,7 +103,8 @@ _MIN_SAMPLES = 32
 def _positive(value: float, name: str) -> float:
     scalar = float(value)
     if not np.isfinite(scalar) or scalar <= 0.0:
-        raise ValueError(f"'{name}' must be a positive, finite number.")
+        msg = f"'{name}' must be a positive, finite number."
+        raise ValueError(msg)
     return scalar
 
 
@@ -126,11 +127,14 @@ def _validate_signal(
     """
     xa = np.asarray(x, dtype=np.float64)
     if xa.ndim != 1:
-        raise ValueError(f"'{name}' must be one-dimensional.")
+        msg = f"'{name}' must be one-dimensional."
+        raise ValueError(msg)
     if xa.size < _MIN_SAMPLES:
-        raise ValueError(f"Signal too short for {context}: {xa.size} samples.")
+        msg = f"Signal too short for {context}: {xa.size} samples."
+        raise ValueError(msg)
     if not np.all(np.isfinite(xa)):
-        raise ValueError(f"'{name}' must be finite.")
+        msg = f"'{name}' must be finite."
+        raise ValueError(msg)
     return apply_calibration(x, xa)
 
 
@@ -138,12 +142,12 @@ def _validate_welch_params(
     n: int, fs: float, nperseg: int | None, overlap: float
 ) -> tuple[int, float]:
     if not 0.0 <= float(overlap) < 1.0:
-        raise ValueError("'overlap' must be in [0, 1).")
+        msg = "'overlap' must be in [0, 1)."
+        raise ValueError(msg)
     seg = _default_nperseg(n, fs) if nperseg is None else int(nperseg)
     if seg < _MIN_SAMPLES or seg > n:
-        raise ValueError(
-            f"'nperseg' must be between {_MIN_SAMPLES} and the signal length."
-        )
+        msg = f"'nperseg' must be between {_MIN_SAMPLES} and the signal length."
+        raise ValueError(msg)
     return seg, float(overlap)
 
 
@@ -341,13 +345,15 @@ def _coherence_from_spectra(
 def _validate_confidence(confidence: float) -> float:
     conf = float(confidence)
     if not 0.0 < conf < 1.0:
-        raise ValueError("'confidence' must be in (0, 1).")
+        msg = "'confidence' must be in (0, 1)."
+        raise ValueError(msg)
     return conf
 
 
 def _validate_scaling(scaling: str) -> str:
     if scaling not in ("density", "spectrum"):
-        raise ValueError("'scaling' must be 'density' or 'spectrum'.")
+        msg = "'scaling' must be 'density' or 'spectrum'."
+        raise ValueError(msg)
     return scaling
 
 
@@ -629,7 +635,8 @@ def cross_spectral_density(
     xa = _validate_signal(x, "x")
     ya = _validate_signal(y, "y")
     if xa.size != ya.size:
-        raise ValueError("'x' and 'y' must have the same length.")
+        msg = "'x' and 'y' must have the same length."
+        raise ValueError(msg)
     fs_v = _positive(resolve_pair_fs(x, y, fs), "fs")
     scaling_v = _validate_scaling(scaling)
     seg, ovl = _validate_welch_params(xa.size, fs_v, nperseg, overlap)
@@ -803,7 +810,8 @@ def coherent_output_spectrum(
     xa = _validate_signal(x, "x")
     ya = _validate_signal(y, "y")
     if xa.size != ya.size:
-        raise ValueError("'x' and 'y' must have the same length.")
+        msg = "'x' and 'y' must have the same length."
+        raise ValueError(msg)
     fs_v = _positive(resolve_pair_fs(x, y, fs), "fs")
     scaling_v = _validate_scaling(scaling)
     seg, ovl = _validate_welch_params(xa.size, fs_v, nperseg, overlap)
@@ -863,25 +871,32 @@ def coherent_output_spectrum(
 def _smoothing_validate(f: NDArray[np.float64], v: NDArray[np.float64]) -> None:
     """Validate the frequency axis / spectrum pair of the smoother."""
     if f.ndim != 1 or v.ndim != 1:
-        raise ValueError("'frequencies' and 'values' must be one-dimensional.")
+        msg = "'frequencies' and 'values' must be one-dimensional."
+        raise ValueError(msg)
     if f.size != v.size:
-        raise ValueError("'frequencies' and 'values' must have the same length.")
+        msg = "'frequencies' and 'values' must have the same length."
+        raise ValueError(msg)
     if f.size < 2:
-        raise ValueError("At least two frequency points are required.")
+        msg = "At least two frequency points are required."
+        raise ValueError(msg)
     if not np.all(np.isfinite(f)) or not np.all(np.isfinite(v)):
-        raise ValueError("'frequencies' and 'values' must be finite.")
+        msg = "'frequencies' and 'values' must be finite."
+        raise ValueError(msg)
     if np.any(np.diff(f) <= 0.0):
-        raise ValueError("'frequencies' must be strictly increasing.")
+        msg = "'frequencies' must be strictly increasing."
+        raise ValueError(msg)
 
 
 def _smoothing_to_power(v: NDArray[np.float64], domain: str) -> NDArray[np.float64]:
     """Map the input spectrum onto power-like values per ``domain``."""
     if domain not in ("power", "amplitude", "db"):
-        raise ValueError("'domain' must be 'power', 'amplitude' or 'db'.")
+        msg = "'domain' must be 'power', 'amplitude' or 'db'."
+        raise ValueError(msg)
     if domain == "db":
         return np.asarray(10.0 ** (v / 10.0), dtype=np.float64)
     if np.any(v < 0.0):
-        raise ValueError(f"'values' must be non-negative in the {domain} domain.")
+        msg = f"'values' must be non-negative in the {domain} domain."
+        raise ValueError(msg)
     return v.copy() if domain == "power" else v * v
 
 

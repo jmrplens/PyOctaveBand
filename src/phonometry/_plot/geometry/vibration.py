@@ -79,9 +79,11 @@ def plot_junction_geometry(
     """
     _check_language(language)
     if junction not in ("L", "T1", "T2", "X"):
-        raise ValueError("'junction' must be 'L', 'T1', 'T2' or 'X'.")
+        msg = "'junction' must be 'L', 'T1', 'T2' or 'X'."
+        raise ValueError(msg)
     if thickness1 <= 0.0 or thickness2 <= 0.0:
-        raise ValueError("Thicknesses must be positive.")
+        msg = "Thicknesses must be positive."
+        raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
     h1, h2 = float(thickness1), float(thickness2)
@@ -122,10 +124,11 @@ def plot_junction_result_geometry(
 ) -> Axes:
     """Junction drawing for a result that retained its thicknesses."""
     if result.thickness1 is None or result.thickness2 is None:
-        raise ValueError(
+        msg = (
             "This result does not retain the plate thicknesses; call "
             "plot_junction_geometry(junction, thickness1, thickness2)."
         )
+        raise ValueError(msg)
     return plot_junction_geometry(
         result.junction,
         result.thickness1,
@@ -162,7 +165,8 @@ def plot_plate_geometry(
     """
     _check_language(language)
     if length_x <= 0.0 or length_y <= 0.0:
-        raise ValueError("'length_x' and 'length_y' must be positive.")
+        msg = "'length_x' and 'length_y' must be positive."
+        raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
     a, b = float(length_x), float(length_y)

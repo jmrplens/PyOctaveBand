@@ -234,7 +234,8 @@ def reflected_path_delay(
     :raises ValueError: If ``dm`` or ``c`` is not positive.
     """
     if mic_height <= 0.0:
-        raise ValueError("'mic_height' must be positive.")
+        msg = "'mic_height' must be positive."
+        raise ValueError(msg)
     if speed_of_sound <= 0.0:
         raise ValueError(_SPEED_POSITIVE)
     return float(2.0 * mic_height / speed_of_sound)
@@ -321,16 +322,20 @@ def adrienne_window(
     if fs <= 0.0:
         raise ValueError(_FS_POSITIVE)
     if flat_duration <= 0.0:
-        raise ValueError("'flat_duration' must be positive.")
+        msg = "'flat_duration' must be positive."
+        raise ValueError(msg)
     if leading_duration < 0.0 or trailing_duration < 0.0:
-        raise ValueError("Edge durations must be non-negative.")
+        msg = "Edge durations must be non-negative."
+        raise ValueError(msg)
     if leading_edge not in _EDGE_SHAPES or trailing_edge not in _EDGE_SHAPES:
-        raise ValueError(f"Edge shapes must be one of {_EDGE_SHAPES}.")
+        msg = f"Edge shapes must be one of {_EDGE_SHAPES}."
+        raise ValueError(msg)
     n_lead = round(leading_duration * fs)
     n_flat = round(flat_duration * fs)
     n_trail = round(trailing_duration * fs)
     if n_flat <= 0:
-        raise ValueError("'flat_duration' is too short for 'fs'.")
+        msg = "'flat_duration' is too short for 'fs'."
+        raise ValueError(msg)
     rising = _edge(n_lead, leading_edge, rising=True)
     flat = np.ones(n_flat, dtype=np.float64)
     falling = _edge(n_trail, trailing_edge, rising=False)
@@ -358,10 +363,12 @@ def _transfer_functions(
         reflected_ir, np.atleast_1d(np.asarray(reflected_ir, dtype=np.float64))
     )
     if hi_t.size == 0 or hr_t.size == 0:
-        raise ValueError("Impulse responses must be non-empty.")
+        msg = "Impulse responses must be non-empty."
+        raise ValueError(msg)
     length = n if n is not None else max(hi_t.size, hr_t.size)
     if length <= 0:
-        raise ValueError("'n' must be positive.")
+        msg = "'n' must be positive."
+        raise ValueError(msg)
     hi = np.fft.rfft(hi_t, n=length)
     hr = np.fft.rfft(hr_t, n=length)
     return (
@@ -428,7 +435,8 @@ def insitu_reflection_factor(
     r = (hr / hi) / kr
     if delay is not None:
         if fs is None:
-            raise ValueError("'fs' is required to apply 'delay'.")
+            msg = "'fs' is required to apply 'delay'."
+            raise ValueError(msg)
         if fs <= 0.0:
             raise ValueError(_FS_POSITIVE)
         # ``length`` is the exact time-domain length used for the FFTs, so
@@ -605,9 +613,8 @@ def one_third_octave_absorption(
     freq = np.atleast_1d(np.asarray(frequency, dtype=np.float64))
     alpha = np.atleast_1d(np.asarray(absorption, dtype=np.float64))
     if freq.size == 0 or freq.shape != alpha.shape:
-        raise ValueError(
-            "'frequency' and 'absorption' must be non-empty and equal-length."
-        )
+        msg = "'frequency' and 'absorption' must be non-empty and equal-length."
+        raise ValueError(msg)
     centres = np.array(
         [c for c in _ONE_THIRD_OCTAVE_CENTERS if f_min <= c <= f_max],
         dtype=np.float64,
@@ -786,7 +793,8 @@ def max_sampled_area_radius(
     """
     _check_geometry(source_height, mic_height)
     if window_width <= 0.0:
-        raise ValueError("'window_width' must be positive.")
+        msg = "'window_width' must be positive."
+        raise ValueError(msg)
     if speed_of_sound <= 0.0:
         raise ValueError(_SPEED_POSITIVE)
     ds, dm, ctw = source_height, mic_height, speed_of_sound * window_width
@@ -820,13 +828,16 @@ def msa_major_axis(
     :raises ValueError: On non-positive window width, speed, or negative ``dp``.
     """
     if window_width <= 0.0:
-        raise ValueError("'window_width' must be positive.")
+        msg = "'window_width' must be positive."
+        raise ValueError(msg)
     if speed_of_sound <= 0.0:
         raise ValueError(_SPEED_POSITIVE)
     if projected_distance < 0.0:
-        raise ValueError("'projected_distance' must be non-negative.")
+        msg = "'projected_distance' must be non-negative."
+        raise ValueError(msg)
     if source_height <= 0.0 or mic_height <= 0.0:
-        raise ValueError("Heights must be positive.")
+        msg = "Heights must be positive."
+        raise ValueError(msg)
     return float(
         speed_of_sound * window_width
         + np.hypot(source_height + mic_height, projected_distance)
@@ -854,7 +865,8 @@ def spot_tube_upper_frequency(
     :raises ValueError: If ``d`` or ``c0`` is not positive.
     """
     if diameter <= 0.0:
-        raise ValueError("'diameter' must be positive.")
+        msg = "'diameter' must be positive."
+        raise ValueError(msg)
     if speed_of_sound <= 0.0:
         raise ValueError(_SPEED_POSITIVE)
     return float(_SPOT_FU_FACTOR * speed_of_sound / diameter)
@@ -887,9 +899,11 @@ def spot_microphone_spacing_bounds(
     if speed_of_sound <= 0.0:
         raise ValueError(_SPEED_POSITIVE)
     if f_min <= 0.0 or f_max <= 0.0:
-        raise ValueError("Frequencies must be positive.")
+        msg = "Frequencies must be positive."
+        raise ValueError(msg)
     if f_min >= f_max:
-        raise ValueError("'f_min' must be less than 'f_max'.")
+        msg = "'f_min' must be less than 'f_max'."
+        raise ValueError(msg)
     s_max = _SPOT_SMAX_FACTOR * speed_of_sound / f_max
     s_min = _SPOT_SMIN_FACTOR * speed_of_sound / f_min
     if s_min >= s_max:
@@ -915,7 +929,8 @@ def check_spot_frequency_range(frequency: ArrayLike) -> None:
     """
     freq = np.atleast_1d(np.asarray(frequency, dtype=np.float64))
     if np.any(freq < 0.0):
-        raise ValueError("'frequency' must be non-negative.")
+        msg = "'frequency' must be non-negative."
+        raise ValueError(msg)
     lo, hi = SPOT_FREQUENCY_RANGE
     if np.any(freq < lo) or np.any(freq > hi):
         warnings.warn(
@@ -959,9 +974,8 @@ def spot_internal_loss_correction(
     alpha_m = np.atleast_1d(np.asarray(measured_absorption, dtype=np.float64))
     alpha_s = np.atleast_1d(np.asarray(system_absorption, dtype=np.float64))
     if alpha_m.shape != alpha_s.shape:
-        raise ValueError(
-            "'measured_absorption' and 'system_absorption' must share a shape."
-        )
+        msg = "'measured_absorption' and 'system_absorption' must share a shape."
+        raise ValueError(msg)
     corrected = alpha_m - alpha_s
     if clip_negative:
         corrected = np.maximum(corrected, 0.0)
@@ -971,6 +985,8 @@ def spot_internal_loss_correction(
 def _check_geometry(source_height: float, mic_height: float) -> None:
     """Validate the source/microphone heights of the extended-surface geometry."""
     if source_height <= 0.0 or mic_height <= 0.0:
-        raise ValueError("'source_height' and 'mic_height' must be positive.")
+        msg = "'source_height' and 'mic_height' must be positive."
+        raise ValueError(msg)
     if source_height <= mic_height:
-        raise ValueError("'source_height' must exceed 'mic_height'.")
+        msg = "'source_height' must exceed 'mic_height'."
+        raise ValueError(msg)

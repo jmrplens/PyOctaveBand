@@ -385,9 +385,11 @@ _DAMPER_CORRECTION: dict[str, NDArray[np.float64]] = {
 def _frequencies(frequencies: ArrayLike) -> NDArray[np.float64]:
     f = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if f.ndim != 1 or f.size == 0:
-        raise ValueError("'frequencies' must be a non-empty 1-D array.")
+        msg = "'frequencies' must be a non-empty 1-D array."
+        raise ValueError(msg)
     if np.any(f <= 0.0) or not np.all(np.isfinite(f)):
-        raise ValueError("'frequencies' must be positive and finite.")
+        msg = "'frequencies' must be positive and finite."
+        raise ValueError(msg)
     return f
 
 
@@ -411,10 +413,11 @@ def _octave_slots(
     ratio = np.abs(np.log2(f[:, None] / bands[None, :]))
     idx = np.asarray(np.argmin(ratio, axis=1), dtype=np.intp)
     if np.any(ratio[np.arange(f.size), idx] > np.log2(1.05)):
-        raise ValueError(
+        msg = (
             "'frequencies' must be octave-band centres of "
             f"{bands.tolist()} Hz for this tabulated method."
         )
+        raise ValueError(msg)
     return f, idx
 
 
@@ -495,9 +498,8 @@ class HvacSpectrumResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.hvac import render_hvac_report
 
         return render_hvac_report(
@@ -553,7 +555,8 @@ def end_reflection_loss(
     elif termination == "free":
         table = _END_REFLECTION_FREE
     else:
-        raise ValueError("'termination' must be 'flush' or 'free'.")
+        msg = "'termination' must be 'flush' or 'free'."
+        raise ValueError(msg)
     require_positive(speed_of_sound, "speed_of_sound")
 
     log_d = np.log(_END_REFLECTION_DIAMETERS_MM)
@@ -600,12 +603,14 @@ def elbow_insertion_loss(
     c = require_positive(speed_of_sound, "speed_of_sound")
     if bend_type == "round":
         if vanes or lined:
-            raise ValueError("round bends take neither vanes nor lining.")
+            msg = "round bends take neither vanes nor lining."
+            raise ValueError(msg)
         key = "round"
     elif bend_type == "square":
         key = "square" + ("_vanes" if vanes else "") + ("_lined" if lined else "")
     else:
-        raise ValueError("'bend_type' must be 'square' or 'round'.")
+        msg = "'bend_type' must be 'square' or 'round'."
+        raise ValueError(msg)
     col = _ELBOW_TABLE[key]
     wl = w * f / c
     # Table 8.11 bounds each row as "a <= W/lambda < b", so a ratio exactly on
@@ -659,7 +664,8 @@ def plenum_attenuation(
     s_w = require_positive(wall_area, "wall_area")
     alpha = np.asarray(mean_absorption, dtype=np.float64)
     if np.any(alpha <= 0.0) or np.any(alpha >= 1.0) or not np.all(np.isfinite(alpha)):
-        raise ValueError("'mean_absorption' must lie strictly in (0, 1).")
+        msg = "'mean_absorption' must lie strictly in (0, 1)."
+        raise ValueError(msg)
     r_const = np.asarray(room_constant(s_w, alpha), dtype=np.float64)
     direct = np.cos(angle) / (np.pi * r**2)
     reverberant = 1.0 / r_const
@@ -771,7 +777,8 @@ def blade_passing_frequency(rotational_speed: float, blades: int) -> float:
     """
     rpm = require_positive(rotational_speed, "rotational_speed")
     if blades <= 0:
-        raise ValueError("'blades' must be a positive integer.")
+        msg = "'blades' must be a positive integer."
+        raise ValueError(msg)
     return rpm * float(blades) / 60.0
 
 
@@ -792,7 +799,8 @@ def fan_efficiency_correction(relative_efficiency: float) -> float:
     """
     eta = require_positive(relative_efficiency, "relative_efficiency")
     if eta > 100.0:
-        raise ValueError("'relative_efficiency' must not exceed 100 per cent.")
+        msg = "'relative_efficiency' must not exceed 100 per cent."
+        raise ValueError(msg)
     for lower, correction in _EFFICIENCY_CORRECTION:
         if eta >= lower:
             return correction
@@ -1174,11 +1182,14 @@ def split_loss(
     s_m = require_positive(main_area, "main_area")
     areas = np.atleast_1d(np.asarray(branch_areas, dtype=np.float64))
     if areas.ndim != 1 or areas.size == 0:
-        raise ValueError("'branch_areas' must be a non-empty 1-D array.")
+        msg = "'branch_areas' must be a non-empty 1-D array."
+        raise ValueError(msg)
     if np.any(areas <= 0.0) or not np.all(np.isfinite(areas)):
-        raise ValueError("'branch_areas' must be positive and finite.")
+        msg = "'branch_areas' must be positive and finite."
+        raise ValueError(msg)
     if not 0 <= branch < areas.size:
-        raise ValueError(f"'branch' must index 'branch_areas' (0..{areas.size - 1}).")
+        msg = f"'branch' must index 'branch_areas' (0..{areas.size - 1})."
+        raise ValueError(msg)
     total = float(np.sum(areas))
     reflection = 1.0 - ((total - s_m) / (total + s_m)) ** 2
     return float(-10.0 * np.log10(reflection) - 10.0 * np.log10(areas[branch] / total))
@@ -1290,9 +1301,11 @@ def splitter_silencer_insertion_loss(
     """
     widths = np.atleast_1d(np.asarray(airway_widths, dtype=np.float64))
     if widths.ndim != 1 or widths.size == 0:
-        raise ValueError("'airway_widths' must be a non-empty 1-D array.")
+        msg = "'airway_widths' must be a non-empty 1-D array."
+        raise ValueError(msg)
     if np.any(widths <= 0.0) or not np.all(np.isfinite(widths)):
-        raise ValueError("'airway_widths' must be positive and finite.")
+        msg = "'airway_widths' must be positive and finite."
+        raise ValueError(msg)
     thickness = require_positive(splitter_thickness, "splitter_thickness")
     liner = 0.5 * thickness
     per_airway = np.array(
@@ -1358,7 +1371,8 @@ def silencer_self_noise(
     f, idx = _octave_slots(frequencies)
     v = require_positive(airway_velocity, "airway_velocity")
     if passages <= 0:
-        raise ValueError("'passages' must be a positive integer.")
+        msg = "'passages' must be a positive integer."
+        raise ValueError(msg)
     h_mm = require_positive(height, "height") * 1000.0
     overall = (
         55.0 * np.log10(v)
@@ -1449,7 +1463,8 @@ def diffuser_sound_power(
     drop_in_wg = require_positive(pressure_drop, "pressure_drop") / _PA_PER_IN_WG
     profile = require_choice(shape, "shape", ("rectangular", "round"))
     if count <= 0:
-        raise ValueError("'count' must be a positive integer.")
+        msg = "'count' must be a positive integer."
+        raise ValueError(msg)
     # Eq. 13.28: Long prints "ft/min" under U_\mathrm{G} but defines it in the same
     # breath as Q / (60 S_\mathrm{G}), which is ft/s, the unit Eq. 13.27 declares and
     # the only one for which the 334.9 constant is the velocity-pressure
@@ -1501,10 +1516,11 @@ def air_terminal_velocity_limit(
     table = _TERMINAL_VELOCITY_LIMIT[side]
     key = round(design_criterion)
     if key not in table:
-        raise ValueError(
+        msg = (
             f"'design_criterion' must be one of {sorted(table)}; "
             f"got {design_criterion!r}."
         )
+        raise ValueError(msg)
     return table[key]
 
 
@@ -1573,6 +1589,7 @@ def room_effect(
     q = require_positive(directivity, "directivity")
     r_const = np.asarray(room_constant, dtype=np.float64)
     if np.any(r_const <= 0.0) or not np.all(np.isfinite(r_const)):
-        raise ValueError("'room_constant' must be positive and finite.")
+        msg = "'room_constant' must be positive and finite."
+        raise ValueError(msg)
     values = -10.0 * np.log10(q / (4.0 * np.pi * r**2) + 4.0 / r_const)
     return float(values) if values.ndim == 0 else values

@@ -169,9 +169,11 @@ def table_c4_contribution(n_samples: int, u1: float) -> float:
     :return: The contribution :math:`c_1 u_1` in dB.
     """
     if n_samples < 2:
-        raise ValueError("Table C.4 needs at least 2 samples.")
+        msg = "Table C.4 needs at least 2 samples."
+        raise ValueError(msg)
     if u1 < 0:
-        raise ValueError("'u1' must be non-negative.")
+        msg = "'u1' must be non-negative."
+        raise ValueError(msg)
 
     n_axis = np.asarray(_C4_N_AXIS, dtype=float)
     u_axis = np.asarray((0.0,) + _C4_U1_AXIS, dtype=float)
@@ -199,7 +201,8 @@ def minimum_cumulative_duration_hours(n_workers: int) -> float:
         is the tabulated fallback.
     """
     if n_workers < 1:
-        raise ValueError("'n_workers' must be a positive integer.")
+        msg = "'n_workers' must be a positive integer."
+        raise ValueError(msg)
     if n_workers <= 5:
         return 5.0
     if n_workers <= 15:
@@ -267,9 +270,11 @@ class Task:
     def __post_init__(self) -> None:
         """Reject an empty ``samples`` tuple and a non-positive ``duration_hours``."""
         if len(self.samples) == 0:
-            raise ValueError("A Task needs at least one Lp,A,eqT sample.")
+            msg = "A Task needs at least one Lp,A,eqT sample."
+            raise ValueError(msg)
         if self.duration_hours <= 0.0:
-            raise ValueError("'duration_hours' must be positive.")
+            msg = "'duration_hours' must be positive."
+            raise ValueError(msg)
 
 
 @dataclass(frozen=True)
@@ -403,9 +408,8 @@ class ExposureResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.iso9612 import render_iso9612_report
 
         return render_iso9612_report(
@@ -455,9 +459,8 @@ def _duration_uncertainty(task: Task) -> float:
     if task.duration_range is not None:
         t_min, t_max = task.duration_range
         if t_max < t_min:
-            raise ValueError(
-                "duration_range must be (T_min, T_max) with T_max >= T_min."
-            )
+            msg = "duration_range must be (T_min, T_max) with T_max >= T_min."
+            raise ValueError(msg)
         return 0.5 * (t_max - t_min)
     return 0.0
 
@@ -538,9 +541,11 @@ def task_based_exposure(
     :return: An :class:`ExposureResult` with per-task contributions.
     """
     if not tasks:
-        raise ValueError("At least one task is required.")
+        msg = "At least one task is required."
+        raise ValueError(msg)
     if u3 < 0:
-        raise ValueError("'u3' must be non-negative.")
+        msg = "'u3' must be non-negative."
+        raise ValueError(msg)
 
     # First pass: task levels and durations (Eq 7, 8).
     levels, durations = _task_levels(tasks)
@@ -585,11 +590,14 @@ def _sampled_exposure(
     arr = np.asarray(samples, dtype=float)
     n = int(arr.size)
     if n < 2:
-        raise ValueError("At least two samples are required.")
+        msg = "At least two samples are required."
+        raise ValueError(msg)
     if effective_duration_hours <= 0:
-        raise ValueError("'effective_duration_hours' must be positive.")
+        msg = "'effective_duration_hours' must be positive."
+        raise ValueError(msg)
     if u3 < 0:
-        raise ValueError("'u3' must be non-negative.")
+        msg = "'u3' must be non-negative."
+        raise ValueError(msg)
 
     lp_aeqte = energy_mean(samples)  # Eq 11
     lex_8h = lp_aeqte + 10.0 * log10(effective_duration_hours / _T0)  # Eq 12/13
@@ -657,7 +665,8 @@ def job_based_exposure(
     :return: An :class:`ExposureResult`.
     """
     if sample_duration_hours is not None and sample_duration_hours <= 0.0:
-        raise ValueError("'sample_duration_hours' must be positive.")
+        msg = "'sample_duration_hours' must be positive."
+        raise ValueError(msg)
     result = _sampled_exposure(
         samples,
         effective_duration_hours,

@@ -370,13 +370,15 @@ def impact_force_exposure_level(
     # this record is a force in newtons. See phonometry.io._resolve.
     f = require_finite_array(resolve_samples(force, calibrate=False), "force")
     if f.size < 2:
-        raise ValueError("'force' must be a 1-D record of at least two samples.")
+        msg = "'force' must be a 1-D record of at least two samples."
+        raise ValueError(msg)
     fs = require_positive(sample_rate, "sample_rate")
     f0 = require_positive(reference_force, "reference_force")
     tref = require_positive(reference_time, "reference_time")
     energy = float(np.trapezoid((f / f0) ** 2, dx=1.0 / fs))
     if energy <= 0.0:
-        raise ValueError("'force' must carry non-zero energy.")
+        msg = "'force' must carry non-zero energy."
+        raise ValueError(msg)
     return float(10.0 * np.log10(energy / tref))
 
 
@@ -438,10 +440,11 @@ def check_heavy_impact_source(
     measured = require_finite_array(force_exposure_level, "force_exposure_level")
     n = len(spec.frequencies)
     if measured.shape != (n,):
-        raise ValueError(
+        msg = (
             f"'force_exposure_level' must hold {n} octave-band values "
             f"(31,5 Hz to 500 Hz)."
         )
+        raise ValueError(msg)
     nominal = np.asarray(spec.force_exposure_level, dtype=np.float64)
     tol = np.asarray(spec.tolerance, dtype=np.float64)
     deviation = measured - nominal
@@ -500,7 +503,8 @@ def fast_reverberation_correction(
     """
     t = require_finite_array(reverberation_time, "reverberation_time")
     if np.any(t <= 0.0):
-        raise ValueError("'reverberation_time' must be positive and finite.")
+        msg = "'reverberation_time' must be positive and finite."
+        raise ValueError(msg)
     t0 = require_positive(reference_time, "reference_time")
     c = t / _FAST_FACTOR
     c0 = np.full_like(c, t0 / _FAST_FACTOR)
@@ -587,12 +591,14 @@ def standardized_maximum_impact_level(
     if t.size == 1:
         t = np.full(li.shape, float(t[0]))
     if t.shape != li.shape:
-        raise ValueError("'reverberation_time' must be a scalar or match 'level'.")
+        msg = "'reverberation_time' must be a scalar or match 'level'."
+        raise ValueError(msg)
     freqs: np.ndarray | None = None
     if frequency is not None:
         freqs = require_finite_array(frequency, "frequency")
         if freqs.shape != li.shape:
-            raise ValueError("'frequency' must match 'level'.")
+            msg = "'frequency' must match 'level'."
+            raise ValueError(msg)
     correction = fast_reverberation_correction(t, reference_time=reference_time)
     volume_term = float(10.0 * np.log10(v / v0))
     return StandardizedMaximumImpactResult(
@@ -627,7 +633,8 @@ def heavy_impact_octave_levels(level: ArrayLike) -> np.ndarray:
     """
     x = require_finite_array(level, "level")
     if x.size % 3 != 0:
-        raise ValueError("'level' must be a 1-D array whose length is a multiple of 3.")
+        msg = "'level' must be a 1-D array whose length is a multiple of 3."
+        raise ValueError(msg)
     return np.asarray(
         10.0 * np.log10(np.sum(10.0 ** (x.reshape(-1, 3) / 10.0), axis=1)),
         dtype=np.float64,
@@ -711,25 +718,28 @@ def a_weighted_maximum_impact_level(
     if band is None:
         band = {12: "third", 4: "octave"}.get(x.size, "")
         if not band:
-            raise ValueError(
+            msg = (
                 "'level' must hold 12 one-third-octave values (50-630 Hz) or "
                 "4 octave values (63-500 Hz); pass 'band' to disambiguate."
             )
+            raise ValueError(msg)
     chosen = require_choice(band, "band", ("third", "octave"))
     table = HEAVY_IMPACT_A_WEIGHTING[chosen]
     bands = np.asarray(sorted(table), dtype=np.float64)
     if x.shape != bands.shape:
-        raise ValueError(
+        msg = (
             f"'level' must hold {bands.size} values for band={chosen!r} "
             f"({bands[0]:g} Hz to {bands[-1]:g} Hz)."
         )
+        raise ValueError(msg)
     if frequency is not None:
         given = require_finite_array(frequency, "frequency")
         if given.shape != bands.shape or not np.allclose(given, bands):
-            raise ValueError(
+            msg = (
                 f"'frequency' must be the ISO 717-2 Annex D rating bands for "
                 f"band={chosen!r}: {[float(b) for b in bands]}."
             )
+            raise ValueError(msg)
     a_weighting = np.asarray([table[float(b)] for b in bands], dtype=np.float64)
     corrected = x + a_weighting
     unrounded = float(10.0 * np.log10(np.sum(10.0 ** (corrected / 10.0))))

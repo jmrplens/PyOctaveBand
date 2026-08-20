@@ -106,7 +106,8 @@ _RATING_FREQS = (
 def _finite(values: float | Sequence[float] | np.ndarray, name: str) -> np.ndarray:
     a = np.atleast_1d(np.asarray(values, dtype=np.float64))
     if not np.all(np.isfinite(a)):
-        raise ValueError(f"'{name}' must contain only finite values.")
+        msg = f"'{name}' must contain only finite values."
+        raise ValueError(msg)
     return a
 
 
@@ -127,9 +128,11 @@ def acceleration_level(
     """
     a = _finite(acceleration, "acceleration")
     if np.any(a <= 0.0):
-        raise ValueError("'acceleration' must be positive.")
+        msg = "'acceleration' must be positive."
+        raise ValueError(msg)
     if reference <= 0.0:
-        raise ValueError("'reference' must be positive.")
+        msg = "'reference' must be positive."
+        raise ValueError(msg)
     return 20.0 * np.log10(a / reference)
 
 
@@ -150,9 +153,8 @@ def background_corrected_level(
     lp = _finite(signal_and_background, "signal_and_background")
     lb = _finite(background, "background")
     if lp.shape != lb.shape:
-        raise ValueError(
-            "'signal_and_background' and 'background' must share their shape."
-        )
+        msg = "'signal_and_background' and 'background' must share their shape."
+        raise ValueError(msg)
     margin = lp - lb
     diff = 10.0 ** (lp / 10.0) - 10.0 ** (lb / 10.0)
     with np.errstate(invalid="ignore", divide="ignore"):
@@ -262,9 +264,8 @@ class FloorCoveringImprovementResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iso16251 import render_iso16251_report
 
         return render_iso16251_report(
@@ -346,21 +347,24 @@ def impact_improvement(
     freqs = _finite(frequencies, "frequencies")
     n_bands = freqs.shape[0]
     if l0.shape != l1.shape:
-        raise ValueError("'bare' and 'with_covering' must share their shape.")
+        msg = "'bare' and 'with_covering' must share their shape."
+        raise ValueError(msg)
     if l0.ndim not in (1, 2) or l0.shape[-1] != n_bands:
-        raise ValueError(
+        msg = (
             "'bare'/'with_covering' must be (bands,) or (positions, bands) "
             "matching 'frequencies'."
         )
+        raise ValueError(msg)
 
     limited_pos = np.zeros(l0.shape, dtype=bool)
     if background is not None:
         lb = _finite(background, "background")
         if lb.shape not in ((n_bands,), l0.shape):
-            raise ValueError(
+            msg = (
                 "'background' must be (bands,) or match the (positions, bands) "
                 "shape of 'bare'/'with_covering'."
             )
+            raise ValueError(msg)
         lb = np.broadcast_to(lb, l0.shape)
         # Formula (2) per position, then Formula (3), then Formula (4).
         l0, lim0 = background_corrected_level(l0, lb)
@@ -403,7 +407,8 @@ def improvement_octave_bands(
     dl = _finite(improvement, "improvement")
     freqs = _finite(frequencies, "frequencies")
     if dl.shape != freqs.shape:
-        raise ValueError("'improvement' and 'frequencies' must share their shape.")
+        msg = "'improvement' and 'frequencies' must share their shape."
+        raise ValueError(msg)
     octave_freqs: list[float] = []
     octave_values: list[float] = []
     by_freq = {round(float(f), 3): float(d) for f, d in zip(freqs, dl)}
@@ -412,10 +417,11 @@ def improvement_octave_bands(
         try:
             vals = [by_freq[round(t, 3)] for t in _nearest(thirds, by_freq)]
         except KeyError:
-            raise ValueError(
+            msg = (
                 f"Octave {centre:g} Hz is missing one of its one-third-octave "
                 "bands; provide complete triplets."
-            ) from None
+            )
+            raise ValueError(msg) from None
         octave_freqs.append(centre)
         octave_values.append(
             -10.0 * np.log10(np.mean([10.0 ** (-v / 10.0) for v in vals]))

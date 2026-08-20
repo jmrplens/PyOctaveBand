@@ -26,7 +26,8 @@ def require_positive(value: float, name: str) -> float:
     :raises ValueError: for a non-finite or non-positive value.
     """
     if not math.isfinite(value) or value <= 0.0:
-        raise ValueError(f"'{name}' must be positive.")
+        msg = f"'{name}' must be positive."
+        raise ValueError(msg)
     return float(value)
 
 
@@ -39,7 +40,8 @@ def require_non_negative(value: float, name: str) -> float:
     :raises ValueError: for a non-finite or negative value.
     """
     if not math.isfinite(value) or value < 0.0:
-        raise ValueError(f"'{name}' must be non-negative.")
+        msg = f"'{name}' must be non-negative."
+        raise ValueError(msg)
     return float(value)
 
 
@@ -52,7 +54,8 @@ def require_fraction(value: float, name: str) -> float:
     :raises ValueError: for a non-finite value or one outside ``[0, 1)``.
     """
     if not math.isfinite(value) or value < 0.0 or value >= 1.0:
-        raise ValueError(f"'{name}' must be in the range [0, 1).")
+        msg = f"'{name}' must be in the range [0, 1)."
+        raise ValueError(msg)
     return float(value)
 
 
@@ -66,7 +69,8 @@ def require_choice(value: str, name: str, options: tuple[str, ...]) -> str:
     :raises ValueError: for a value not in *options*.
     """
     if value not in options:
-        raise ValueError(f"'{name}' must be one of {options}; got {value!r}.")
+        msg = f"'{name}' must be one of {options}; got {value!r}."
+        raise ValueError(msg)
     return value
 
 
@@ -81,11 +85,14 @@ def require_positive_array(x: ArrayLike, name: str) -> np.ndarray:
     """
     arr = np.atleast_1d(np.asarray(x, dtype=np.float64))
     if arr.ndim != 1 or arr.size == 0:
-        raise ValueError(f"'{name}' must be a non-empty 1-D array.")
+        msg = f"'{name}' must be a non-empty 1-D array."
+        raise ValueError(msg)
     if not np.all(np.isfinite(arr)):
-        raise ValueError(f"'{name}' must be finite.")
+        msg = f"'{name}' must be finite."
+        raise ValueError(msg)
     if np.any(arr <= 0.0):
-        raise ValueError(f"'{name}' must be strictly positive.")
+        msg = f"'{name}' must be strictly positive."
+        raise ValueError(msg)
     return arr
 
 
@@ -103,9 +110,11 @@ def require_finite_array(x: ArrayLike, name: str) -> np.ndarray:
     """
     arr = np.atleast_1d(np.asarray(x, dtype=np.float64))
     if arr.ndim != 1 or arr.size == 0:
-        raise ValueError(f"'{name}' must be a non-empty 1-D array.")
+        msg = f"'{name}' must be a non-empty 1-D array."
+        raise ValueError(msg)
     if not np.all(np.isfinite(arr)):
-        raise ValueError(f"'{name}' must contain only finite values.")
+        msg = f"'{name}' must contain only finite values."
+        raise ValueError(msg)
     return arr
 
 
@@ -122,8 +131,9 @@ def require_1d_signal(x: ArrayLike, name: str = "signal") -> np.ndarray:
     """
     arr = np.asarray(x, dtype=np.float64)
     if arr.ndim != 1:
-        raise ValueError(
+        msg = (
             f"{name} must be a 1-D time series; got shape {arr.shape}. "
             "Process multichannel signals one channel at a time."
         )
+        raise ValueError(msg)
     return arr

@@ -67,7 +67,8 @@ def _positive_finite(name: str, value: float) -> float:
     """Validate that *value* is a strictly positive finite scalar."""
     out = float(value)
     if not np.isfinite(out) or out <= 0.0:
-        raise ValueError(f"{name} must be positive and finite")
+        msg = f"{name} must be positive and finite"
+        raise ValueError(msg)
     return out
 
 
@@ -75,21 +76,24 @@ def _finite(name: str, value: float) -> float:
     """Validate that *value* is a finite scalar."""
     out = float(value)
     if not np.isfinite(out):
-        raise ValueError(f"{name} must be finite")
+        msg = f"{name} must be finite"
+        raise ValueError(msg)
     return out
 
 
 def _integer(name: str, value: int) -> int:
     """Validate that *value* is an integral scalar (bool is rejected)."""
     if isinstance(value, bool) or not isinstance(value, (int, np.integer)):
-        raise ValueError(f"{name} must be an integer")  # noqa: TRY004 - ValueError keeps the module validation errors uniform
+        msg = f"{name} must be an integer"
+        raise ValueError(msg)  # noqa: TRY004 - ValueError keeps the module validation errors uniform
     return int(value)
 
 
 def _positive_map(name: str, field: Field2D) -> None:
     """Validate that every cell of *field* is strictly positive and finite."""
     if not np.all(np.isfinite(field)) or bool(np.any(field <= 0.0)):
-        raise ValueError(f"{name} must be strictly positive and finite everywhere")
+        msg = f"{name} must be strictly positive and finite everywhere"
+        raise ValueError(msg)
 
 
 @dataclass(frozen=True)
@@ -152,7 +156,8 @@ class CWSource:
         _positive_finite("frequency", self.frequency)
         _finite("amplitude", self.amplitude)
         if not np.isfinite(self.ramp_cycles) or self.ramp_cycles < 0.0:
-            raise ValueError("ramp_cycles must be non-negative and finite")
+            msg = "ramp_cycles must be non-negative and finite"
+            raise ValueError(msg)
 
     def value(self, t: float) -> float:
         """Source waveform at time ``t`` (seconds)."""
@@ -196,11 +201,14 @@ class SignalSource:
         _finite("amplitude", self.amplitude)
         arr = np.array(self.samples, dtype=np.float64)
         if arr.ndim != 1:
-            raise ValueError("samples must be a 1D array")
+            msg = "samples must be a 1D array"
+            raise ValueError(msg)
         if arr.size == 0:
-            raise ValueError("samples must not be empty")
+            msg = "samples must not be empty"
+            raise ValueError(msg)
         if not np.all(np.isfinite(arr)):
-            raise ValueError("samples must be finite")
+            msg = "samples must be finite"
+            raise ValueError(msg)
         arr.flags.writeable = False
         object.__setattr__(self, "samples", arr)
 
@@ -310,20 +318,26 @@ def _validate_sponge_damping(
     """Validate the sponge/damping spec into ``(width, damping map)``."""
     sponge_width = _integer("sponge_width", sponge_width)
     if sponge_width < 0:
-        raise ValueError("sponge_width must be non-negative")
+        msg = "sponge_width must be non-negative"
+        raise ValueError(msg)
     if sponge_width >= min(nx, ny):
-        raise ValueError("sponge_width must be narrower than the smallest grid side")
+        msg = "sponge_width must be narrower than the smallest grid side"
+        raise ValueError(msg)
     if not 0.0 < sponge_reflection < 1.0:
-        raise ValueError("sponge_reflection must lie strictly between 0 and 1")
+        msg = "sponge_reflection must lie strictly between 0 and 1"
+        raise ValueError(msg)
     damping_map = np.asarray(damping, dtype=np.float64)
     if damping_map.ndim not in (0, 2):
-        raise ValueError("damping must be a scalar or an (ny, nx) map")
+        msg = "damping must be a scalar or an (ny, nx) map"
+        raise ValueError(msg)
     if not np.all(np.isfinite(damping_map)) or np.any(damping_map < 0.0):
-        raise ValueError("damping must be non-negative and finite")
+        msg = "damping must be non-negative and finite"
+        raise ValueError(msg)
     if damping_map.ndim == 2 and damping_map.shape != (ny, nx):
-        raise ValueError(
+        msg = (
             f"damping map shape {damping_map.shape} does not match the grid {(ny, nx)}"
         )
+        raise ValueError(msg)
     return sponge_width, damping_map
 
 
@@ -347,14 +361,17 @@ def _run_recording(
     """Validate the ``run()`` arguments and march, stacking pressure frames."""
     steps = _integer("steps", steps)
     if steps < 0:
-        raise ValueError("steps must be non-negative")
+        msg = "steps must be non-negative"
+        raise ValueError(msg)
     if record_every is not None:
         record_every = _integer("record_every", record_every)
         if record_every < 1:
-            raise ValueError("record_every must be >= 1")
+            msg = "record_every must be >= 1"
+            raise ValueError(msg)
     decimate = _integer("decimate", decimate)
     if decimate < 1:
-        raise ValueError("decimate must be >= 1")
+        msg = "decimate must be >= 1"
+        raise ValueError(msg)
     frames: list[Field2D] = []
     if record_every is not None:
         frames.append(engine.p[::decimate, ::decimate].copy())
@@ -375,11 +392,14 @@ def _validated_obstacle(
         return None
     mask = np.asarray(obstacle_mask)
     if mask.shape != (ny, nx):
-        raise ValueError("obstacle_mask must match the grid shape")
+        msg = "obstacle_mask must match the grid shape"
+        raise ValueError(msg)
     if mask.dtype != np.bool_:
-        raise ValueError("obstacle_mask must be a boolean array")
+        msg = "obstacle_mask must be a boolean array"
+        raise ValueError(msg)
     if bool(mask.all()):
-        raise ValueError("obstacle_mask must leave open cells")
+        msg = "obstacle_mask must leave open cells"
+        raise ValueError(msg)
     return mask.copy() if bool(mask.any()) else None
 
 
@@ -387,12 +407,14 @@ def _resolve_c_map(c: float | Field2D, shape: tuple[int, int] | None) -> Field2D
     """Broadcast/validate the sound-speed spec into a positive 2D map."""
     if np.isscalar(c):
         if shape is None:
-            raise ValueError("shape is required when c is a scalar")
+            msg = "shape is required when c is a scalar"
+            raise ValueError(msg)
         c_map = np.full(shape, float(np.real(c)), dtype=np.float64)
     else:
         c_map = np.asarray(c, dtype=np.float64)
     if c_map.ndim != 2:
-        raise ValueError("c must be a 2D (ny, nx) map")
+        msg = "c must be a 2D (ny, nx) map"
+        raise ValueError(msg)
     _positive_map("c", c_map)
     return c_map
 
@@ -405,7 +427,8 @@ def _resolve_rho_map(rho: float | Field2D, ny: int, nx: int) -> Field2D:
         else np.asarray(rho, dtype=np.float64)
     )
     if rho_map.shape != (ny, nx):
-        raise ValueError("rho map must match the shape of c")
+        msg = "rho map must match the shape of c"
+        raise ValueError(msg)
     _positive_map("rho", rho_map)
     return rho_map
 
@@ -423,7 +446,8 @@ def _resolve_sponge_sides(
         sides = tuple(sponge_sides)
     unknown = set(sides) - set(_SIDES)
     if unknown:
-        raise ValueError(f"unknown sponge sides: {sorted(unknown)}")
+        msg = f"unknown sponge sides: {sorted(unknown)}"
+        raise ValueError(msg)
     return sides
 
 
@@ -435,14 +459,14 @@ def _edge_impedance_profile(
     if z.ndim == 0:
         z = np.full(n_edge, float(z), dtype=np.float64)
     if z.shape != (n_edge,):
-        raise ValueError(
+        msg = (
             f"impedance for side {side!r} must be a scalar or a 1D "
             f"array of length {n_edge}"
         )
+        raise ValueError(msg)
     if not np.all(np.isfinite(z)) or bool(np.any(z <= 0.0)):
-        raise ValueError(
-            f"impedance for side {side!r} must be strictly positive and finite"
-        )
+        msg = f"impedance for side {side!r} must be strictly positive and finite"
+        raise ValueError(msg)
     return z
 
 
@@ -537,11 +561,12 @@ class ContourProbe:
         iy0 = _integer("iy0", iy0)
         iy1 = _integer("iy1", iy1)
         if not (1 <= ix0 <= ix1 <= nx - 2 and 1 <= iy0 <= iy1 <= ny - 2):
-            raise ValueError(
+            msg = (
                 "the contour block needs 1 <= ix0 <= ix1 <= nx - 2 and "
                 "1 <= iy0 <= iy1 <= ny - 2, so every sampled face has an "
                 "open cell on both sides"
             )
+            raise ValueError(msg)
         freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
         if (
             freqs.ndim != 1
@@ -549,9 +574,10 @@ class ContourProbe:
             or not np.all(np.isfinite(freqs))
             or bool(np.any(freqs <= 0.0))
         ):
-            raise ValueError(
+            msg = (
                 "frequencies must be a non-empty 1D sequence of positive finite values"
             )
+            raise ValueError(msg)
         if sim._obstacle is not None:
             # Every sampled face needs open cells on both of its sides:
             # the two cell columns flanking the vertical faces and the two
@@ -561,11 +587,12 @@ class ContourProbe:
                 or sim._obstacle[[iy0 - 1, iy0, iy1, iy1 + 1], ix0 : ix1 + 1].any()
             )
             if blocked:
-                raise ValueError(
+                msg = (
                     "the contour faces touch obstacle cells; the closed "
                     "rectangle must run through open air with the whole "
                     "scatterer strictly inside"
                 )
+                raise ValueError(msg)
         self._ix0, self._ix1 = ix0, ix1
         self._iy0, self._iy1 = iy0, iy1
         self._ys = slice(iy0, iy1 + 1)
@@ -648,12 +675,14 @@ class ContourProbe:
             i for i, f in enumerate(self.frequencies) if np.isclose(f, float(frequency))
         ]
         if not matches:
-            raise ValueError(
+            msg = (
                 f"frequency {frequency!r} Hz is not tracked by this probe "
                 f"(tracked: {self.frequencies})"
             )
+            raise ValueError(msg)
         if self.samples == 0:
-            raise ValueError("no samples accumulated yet; step the simulation first")
+            msg = "no samples accumulated yet; step the simulation first"
+            raise ValueError(msg)
         scale = 2.0 / self.samples
         i = matches[0]
         return ContourPhasors(
@@ -736,10 +765,11 @@ class FDTD2D:
     ) -> None:
         c_map = _resolve_c_map(c, shape)
         if not np.isfinite(cfl) or not 0.0 < cfl < 1.0:
-            raise ValueError(
+            msg = (
                 "cfl must lie in (0, 1): the leapfrog scheme "
                 "is unstable beyond the Courant bound CN = 1"
             )
+            raise ValueError(msg)
         ny, nx = c_map.shape
         rho_map = _resolve_rho_map(rho, ny, nx)
         sponge_width, damping_map = _validate_sponge_damping(
@@ -836,7 +866,8 @@ class FDTD2D:
             return edges
         unknown = set(edge_impedance) - set(_SIDES)
         if unknown:
-            raise ValueError(f"unknown impedance sides: {sorted(unknown)}")
+            msg = f"unknown impedance sides: {sorted(unknown)}"
+            raise ValueError(msg)
         absorbing = set(sponge_sides) if sponge_width > 0 else set()
         rho_edges = {
             "left": self.rho[:, 0],
@@ -848,9 +879,10 @@ class FDTD2D:
             if side not in edge_impedance:
                 continue
             if side in absorbing:
-                raise ValueError(
+                msg = (
                     f"side {side!r} cannot be both absorbing and an impedance boundary"
                 )
+                raise ValueError(msg)
             n_edge = ny if side in ("left", "right") else nx
             z = _edge_impedance_profile(side, edge_impedance[side], n_edge)
             edges.append(_ImpedanceEdge(side, z, rho_edges[side], self.dt, self.dx))
@@ -896,11 +928,14 @@ class FDTD2D:
             ``width``/``wavelength``.
         """
         if direction not in _SIDE_TRAVEL:
-            raise ValueError("'direction' must be 'down', 'up', 'left' or 'right'.")
+            msg = "'direction' must be 'down', 'up', 'left' or 'right'."
+            raise ValueError(msg)
         if width <= 0.0:
-            raise ValueError("'width' must be positive.")
+            msg = "'width' must be positive."
+            raise ValueError(msg)
         if wavelength is not None and wavelength <= 0.0:
-            raise ValueError("'wavelength' must be positive.")
+            msg = "'wavelength' must be positive."
+            raise ValueError(msg)
 
         def profile(coord: NDArray[np.floating]) -> NDArray[np.float64]:
             envelope = amplitude * np.exp(-(((coord - center) / width) ** 2))
@@ -974,9 +1009,11 @@ class FDTD2D:
         ix = _integer("source ix", source.ix)
         iy = _integer("source iy", source.iy)
         if not (0 <= ix < nx and 0 <= iy < ny):
-            raise ValueError("source position lies outside the grid")
+            msg = "source position lies outside the grid"
+            raise ValueError(msg)
         if self._obstacle is not None and self._obstacle[iy, ix]:
-            raise ValueError("source position lies inside an obstacle")
+            msg = "source position lies inside an obstacle"
+            raise ValueError(msg)
         self._sources.append(source)
 
     def add_contour_probe(
@@ -1018,12 +1055,14 @@ class FDTD2D:
     def _add_plane_source(self, source: PlaneWaveSource) -> None:
         """Validate and register a plane-wave injection line."""
         if source.direction not in _SIDE_TRAVEL:
-            raise ValueError("'direction' must be 'down', 'up', 'left' or 'right'.")
+            msg = "'direction' must be 'down', 'up', 'left' or 'right'."
+            raise ValueError(msg)
         offset = _integer("plane-wave offset", source.offset)
         ny, nx = self.p.shape
         limit = ny if source.direction in ("down", "up") else nx
         if not 0 <= offset < limit - 1:
-            raise ValueError("plane-wave offset lies outside the grid")
+            msg = "plane-wave offset lies outside the grid"
+            raise ValueError(msg)
         if self._obstacle is not None:
             if source.direction == "down":
                 line = self._obstacle[offset, :]
@@ -1034,7 +1073,8 @@ class FDTD2D:
             else:
                 line = self._obstacle[:, nx - 1 - offset]
             if bool(np.any(line)):
-                raise ValueError("plane-wave injection line crosses an obstacle")
+                msg = "plane-wave injection line crosses an obstacle"
+                raise ValueError(msg)
         self._plane_sources.append(source)
 
     def step(self) -> None:
@@ -1200,7 +1240,8 @@ class FDTDResult:
             return plot_fdtd_snapshot(
                 self, ax=ax, frame=frame, language=language, **kwargs
             )
-        raise ValueError("kind must be 'probes' or 'snapshot'")
+        msg = "kind must be 'probes' or 'snapshot'"
+        raise ValueError(msg)
 
 
 def _parse_boundaries(
@@ -1213,7 +1254,8 @@ def _parse_boundaries(
     else:
         unknown = set(boundaries) - set(_SIDES)
         if unknown:
-            raise ValueError(f"unknown boundary sides: {sorted(unknown)}")
+            msg = f"unknown boundary sides: {sorted(unknown)}"
+            raise ValueError(msg)
         spec = {side: boundaries.get(side, "rigid") for side in _SIDES}
     absorbing: list[str] = []
     impedance: dict[str, float | NDArray[np.float64]] = {}
@@ -1221,10 +1263,11 @@ def _parse_boundaries(
         value = spec[side]
         if isinstance(value, str):
             if value not in _BOUNDARY_NAMES:
-                raise ValueError(
+                msg = (
                     f"boundary for side {side!r} must be one of "
                     f"{_BOUNDARY_NAMES} or a real impedance, got {value!r}"
                 )
+                raise ValueError(msg)
             if value == "absorbing":
                 absorbing.append(side)
         else:
@@ -1244,9 +1287,11 @@ def _probe_indices(
         ix = _integer("probe ix", ix)
         iy = _integer("probe iy", iy)
         if not (0 <= ix < nx and 0 <= iy < ny):
-            raise ValueError(f"probe ({ix}, {iy}) lies outside the grid")
+            msg = f"probe ({ix}, {iy}) lies outside the grid"
+            raise ValueError(msg)
         if obstacle is not None and obstacle[iy, ix]:
-            raise ValueError(f"probe ({ix}, {iy}) lies inside an obstacle")
+            msg = f"probe ({ix}, {iy}) lies inside an obstacle"
+            raise ValueError(msg)
         probe_ix[k] = (ix, iy)
     return probe_ix
 
@@ -1343,17 +1388,20 @@ def fdtd_simulation(
     :raises ValueError: If the inputs are invalid.
     """
     if len(sources) == 0:
-        raise ValueError("at least one source is required")
+        msg = "at least one source is required"
+        raise ValueError(msg)
     duration = _positive_finite("duration", duration)
     if snapshot_every is not None:
         snapshot_every = _integer("snapshot_every", snapshot_every)
         if snapshot_every < 1:
-            raise ValueError("snapshot_every must be >= 1")
+            msg = "snapshot_every must be >= 1"
+            raise ValueError(msg)
     absorbing_sides, edge_impedance = _parse_boundaries(boundaries)
     if absorbing_sides:
         absorbing_layer_cells = _integer("absorbing_layer_cells", absorbing_layer_cells)
         if absorbing_layer_cells < 1:
-            raise ValueError("absorbing_layer_cells must be >= 1")
+            msg = "absorbing_layer_cells must be >= 1"
+            raise ValueError(msg)
 
     sim = FDTD2D(
         c,
@@ -1375,9 +1423,8 @@ def fdtd_simulation(
 
     steps = round(duration / sim.dt)
     if steps < 1:
-        raise ValueError(
-            f"duration must cover at least one time step (dt = {sim.dt:.3e} s)"
-        )
+        msg = f"duration must cover at least one time step (dt = {sim.dt:.3e} s)"
+        raise ValueError(msg)
     times = np.arange(steps + 1, dtype=np.float64) * sim.dt
     pressures, frames, frame_steps = _record_run(sim, steps, probe_ix, snapshot_every)
 

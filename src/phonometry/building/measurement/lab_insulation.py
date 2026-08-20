@@ -120,10 +120,11 @@ class LabAirborneInsulationResult:
         :class:`~matplotlib.axes.Axes`.
         """
         if self.rating is None:
-            raise ValueError(
+            msg = (
                 "No single-number rating is available to plot (need 16 "
                 "one-third-octave or 5 octave bands)."
             )
+            raise ValueError(msg)
         return self.rating.plot(ax=ax, **kwargs)
 
     def report(
@@ -206,10 +207,11 @@ class LabImpactInsulationResult:
         :class:`~matplotlib.axes.Axes`.
         """
         if self.rating is None:
-            raise ValueError(
+            msg = (
                 "No single-number rating is available to plot (need 16 "
                 "one-third-octave or 5 octave bands)."
             )
+            raise ValueError(msg)
         return self.rating.plot(ax=ax, **kwargs)
 
     def report(
@@ -287,17 +289,17 @@ def _render_iso10140(
 
     check_language(language)
     if engine != "reportlab":
-        raise ValueError(
-            f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-        )
+        msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+        raise ValueError(msg)
     rating = result.rating
     if rating is None:
-        raise ValueError(
+        msg = (
             "The laboratory report needs the ISO 717 single-number rating; "
             "it is formed only for exactly 16 one-third-octave (100 Hz to "
             "3150 Hz) or 5 octave (125 Hz to 2000 Hz) bands. Build the result "
             "with that band count."
         )
+        raise ValueError(msg)
 
     from ..._report.iso10140 import render_iso10140_report
 
@@ -321,13 +323,17 @@ def _absorption_area(
     """
     t = np.asarray(t2, dtype=np.float64)
     if t.ndim != 1:
-        raise ValueError("'t2' must be one-dimensional (one value per band).")
+        msg = "'t2' must be one-dimensional (one value per band)."
+        raise ValueError(msg)
     if t.size != n_bands:
-        raise ValueError("'t2' must share the band count of the level input.")
+        msg = "'t2' must share the band count of the level input."
+        raise ValueError(msg)
     if not np.all(np.isfinite(t)) or np.any(t <= 0.0):
-        raise ValueError("'t2' must contain positive, finite values.")
+        msg = "'t2' must contain positive, finite values."
+        raise ValueError(msg)
     if not np.isfinite(volume) or volume <= 0.0:
-        raise ValueError("'volume' must be positive.")
+        msg = "'volume' must be positive."
+        raise ValueError(msg)
     return _SABINE * volume / t
 
 
@@ -376,11 +382,11 @@ def background_correction(
     lsb = np.asarray(signal_and_background, dtype=np.float64)
     lb = np.asarray(background, dtype=np.float64)
     if lsb.shape != lb.shape:
-        raise ValueError(
-            "'signal_and_background' and 'background' must share their shape."
-        )
+        msg = "'signal_and_background' and 'background' must share their shape."
+        raise ValueError(msg)
     if not (np.all(np.isfinite(lsb)) and np.all(np.isfinite(lb))):
-        raise ValueError("Levels must contain only finite values.")
+        msg = "Levels must contain only finite values."
+        raise ValueError(msg)
 
     margin = lsb - lb
     # Formula (4) for the 6 < margin < 15 band; unchanged at margin >= 15.
@@ -442,9 +448,11 @@ def lab_airborne_insulation(
     l1_bands = _as_band_levels(l1, "l1")
     l2_bands = _as_band_levels(l2, "l2")
     if l1_bands.shape != l2_bands.shape:
-        raise ValueError("'l1' and 'l2' must share the same band count.")
+        msg = "'l1' and 'l2' must share the same band count."
+        raise ValueError(msg)
     if not np.isfinite(area) or area <= 0.0:
-        raise ValueError("'area' must be positive.")
+        msg = "'area' must be positive."
+        raise ValueError(msg)
 
     absorption = _absorption_area(t2, volume, int(l1_bands.size))
     r = l1_bands - l2_bands + 10.0 * np.log10(area / absorption)

@@ -147,10 +147,11 @@ def plot_filter_class(
         # symmetric window is empty. Unreachable through the public verifier,
         # which never designs such a band; kept so a future designer that does
         # fails clearly instead of on a cryptic reduction.
-        raise ValueError(
+        msg = (
             "Cannot plot the filter class corridor: the mid-band frequency is at "
             "or above the analysis Nyquist, so the f/f_m window is empty."
         )
+        raise ValueError(msg)
     finite_upper = np.isfinite(upper)
 
     # Scale the axis to the mask, not to the measured curve: a steep bank

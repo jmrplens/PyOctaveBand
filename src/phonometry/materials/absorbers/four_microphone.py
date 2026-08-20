@@ -101,7 +101,8 @@ def speed_of_sound_astm(temperature: ArrayLike) -> Real:
     """
     t = np.asarray(temperature, dtype=np.float64)
     if np.any(t <= -_ASTM_T0):
-        raise ValueError("'temperature' must exceed -273,15 degC.")
+        msg = "'temperature' must exceed -273,15 degC."
+        raise ValueError(msg)
     return np.asarray(_ASTM_C_CONST * np.sqrt(_ASTM_T0 + t), dtype=np.float64)
 
 
@@ -120,9 +121,11 @@ def air_density_astm(
     t = np.asarray(temperature, dtype=np.float64)
     p = np.asarray(atmospheric_pressure, dtype=np.float64)
     if np.any(t <= -_ASTM_T0):
-        raise ValueError("'temperature' must exceed -273,15 degC.")
+        msg = "'temperature' must exceed -273,15 degC."
+        raise ValueError(msg)
     if np.any(p <= 0.0):
-        raise ValueError("'atmospheric_pressure' must be positive (kPa).")
+        msg = "'atmospheric_pressure' must be positive (kPa)."
+        raise ValueError(msg)
     return np.asarray(
         _ASTM_RHO_REF * (p / _ASTM_P_REF) * (_ASTM_T0 / (_ASTM_T0 + t)),
         dtype=np.float64,
@@ -193,7 +196,8 @@ def _warn_astm_plane_wave(
     every microphone pair (largest spacing), the lower one the smallest.
     """
     if s1 <= 0.0 or s2 <= 0.0:
-        raise ValueError("'s1' and 's2' must be positive.")
+        msg = "'s1' and 's2' must be positive."
+        raise ValueError(msg)
     if diameter <= 0.0:
         raise ValueError(_DIAMETER_POSITIVE)
     k = np.real(np.asarray(wavenumber, dtype=np.complex128))
@@ -275,7 +279,8 @@ def wave_decomposition(
     :return: Tuple ``(A, B, C, D)`` of complex amplitudes.
     """
     if s1 <= 0.0 or s2 <= 0.0:
-        raise ValueError("'s1' and 's2' must be positive.")
+        msg = "'s1' and 's2' must be positive."
+        raise ValueError(msg)
     canonical = _canonical_shape(shape)
     if diameter is not None:
         _warn_astm_plane_wave(
@@ -457,7 +462,8 @@ class TransferMatrix:
         :return: Complex material wavenumber ``k'``, in reciprocal metres.
         """
         if thickness <= 0.0:
-            raise ValueError("'thickness' must be positive.")
+            msg = "'thickness' must be positive."
+            raise ValueError(msg)
         t11 = np.asarray(self.t11, dtype=np.complex128)
         return np.asarray(np.arccos(t11) / thickness, dtype=np.complex128)
 
@@ -515,10 +521,11 @@ class TransferMatrix:
         if characteristic_impedance is None:
             characteristic_impedance = self.air_characteristic_impedance
         if frequency is None or characteristic_impedance is None:
-            raise ValueError(
+            msg = (
                 "'frequency' and 'characteristic_impedance' must be supplied "
                 "when the matrix does not retain them (hand-built matrices)."
             )
+            raise ValueError(msg)
         from ..._i18n import check_language
         from ..._plot.materials import plot_transfer_matrix
 
@@ -572,7 +579,8 @@ def air_layer_transfer_matrix(
     if characteristic_impedance <= 0.0:
         raise ValueError(_IMPEDANCE_POSITIVE)
     if thickness <= 0.0:
-        raise ValueError("'thickness' must be positive.")
+        msg = "'thickness' must be positive."
+        raise ValueError(msg)
     rc = characteristic_impedance
     k = np.asarray(wavenumber, dtype=np.complex128)
     kd = k * thickness

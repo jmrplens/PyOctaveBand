@@ -141,10 +141,11 @@ def _mach(flow_velocity: float, speed_of_sound: float) -> tuple[float, float]:
     u = require_non_negative(flow_velocity, "flow_velocity")
     mach = u / c
     if mach >= 1.0:
-        raise ValueError(
+        msg = (
             "'flow_velocity' must be subsonic; the cut-on correction "
             "sqrt(1 - M^2) is undefined at and above M = 1."
         )
+        raise ValueError(msg)
     return mach, float(np.sqrt(1.0 - mach**2))
 
 
@@ -185,7 +186,8 @@ def circular_duct_cut_on(
     d = require_positive(diameter, "diameter")
     mach, beta = _mach(flow_velocity, speed_of_sound)
     if not 1 <= count <= len(CIRCULAR_EIGENVALUES):
-        raise ValueError(f"'count' must be between 1 and {len(CIRCULAR_EIGENVALUES)}.")
+        msg = f"'count' must be between 1 and {len(CIRCULAR_EIGENVALUES)}."
+        raise ValueError(msg)
     radius = 0.5 * d
     ordered = sorted(CIRCULAR_EIGENVALUES.items(), key=lambda item: item[1])[:count]
     modes = tuple(mode for mode, _ in ordered)
@@ -239,7 +241,8 @@ def rectangular_duct_cut_on(
     b = require_positive(height, "height")
     mach, beta = _mach(flow_velocity, speed_of_sound)
     if count < 1:
-        raise ValueError("'count' must be at least 1.")
+        msg = "'count' must be at least 1."
+        raise ValueError(msg)
     # A (count+1)-square grid of orders always contains the `count` lowest.
     orders = [
         (p, q) for p in range(count + 1) for q in range(count + 1) if (p, q) != (0, 0)
@@ -299,7 +302,8 @@ def plane_wave_limit(
     if diameter is None and area is not None:
         diameter = float(np.sqrt(4.0 * require_positive(area, "area") / np.pi))
     if diameter is None:
-        raise ValueError("give 'diameter', or both 'width' and 'height', or 'area'.")
+        msg = "give 'diameter', or both 'width' and 'height', or 'area'."
+        raise ValueError(msg)
     return circular_duct_cut_on(
         diameter,
         flow_velocity=flow_velocity,

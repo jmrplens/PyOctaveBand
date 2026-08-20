@@ -153,6 +153,9 @@ select = [
     "ICN",                  # the conventional alias for a well-known package
     "N812",                 # an alias must not disguise a function as a class
     "INP", "T20",           # both already clean in `src`, and kept that way
+    "EM",                   # the message lives in a variable, so a traceback
+                            # shows `raise ClauseError(msg)` and the text once,
+                            # not a two-line message split across the frame
     "D105",                 # a magic method still explains itself
     "D2", "D301",           # docstring shape: where the summary sits and how
                             # quotes and backslashes are spelled. Shape only;

@@ -122,7 +122,8 @@ def speed_of_sound_iso(temperature: ArrayLike) -> Real:
     """
     t = np.asarray(temperature, dtype=np.float64)
     if np.any(t <= 0.0):
-        raise ValueError("'temperature' must be positive (kelvin).")
+        msg = "'temperature' must be positive (kelvin)."
+        raise ValueError(msg)
     return np.asarray(_ISO_C_REF * np.sqrt(t / _ISO_T_REF), dtype=np.float64)
 
 
@@ -142,9 +143,11 @@ def air_density_iso(
     t = np.asarray(temperature, dtype=np.float64)
     pa = np.asarray(atmospheric_pressure, dtype=np.float64)
     if np.any(t <= 0.0):
-        raise ValueError("'temperature' must be positive (kelvin).")
+        msg = "'temperature' must be positive (kelvin)."
+        raise ValueError(msg)
     if np.any(pa <= 0.0):
-        raise ValueError("'atmospheric_pressure' must be positive (kPa).")
+        msg = "'atmospheric_pressure' must be positive (kPa)."
+        raise ValueError(msg)
     return np.asarray(
         _ISO_RHO_REF * (pa * _ISO_T_REF) / (_ISO_P_REF * t), dtype=np.float64
     )
@@ -158,9 +161,8 @@ def _canonical_shape(shape: str) -> str:
     try:
         return _SHAPE_ALIASES[shape]
     except KeyError:
-        raise ValueError(
-            "'shape' must be 'circular', 'rectangular' or 'square'."
-        ) from None
+        msg = "'shape' must be 'circular', 'rectangular' or 'square'."
+        raise ValueError(msg) from None
 
 
 def hydraulic_diameter(width: float, height: float) -> float:
@@ -177,7 +179,8 @@ def hydraulic_diameter(width: float, height: float) -> float:
     :return: Hydraulic diameter :math:`d_\mathrm{h} = 4A/P`, in metres.
     """
     if width <= 0.0 or height <= 0.0:
-        raise ValueError("'width' and 'height' must be positive.")
+        msg = "'width' and 'height' must be positive."
+        raise ValueError(msg)
     return float(2.0 * width * height / (width + height))
 
 
@@ -203,7 +206,8 @@ def tube_attenuation_constant(
         raise ValueError(_DIAMETER_POSITIVE)
     f = np.asarray(frequency, dtype=np.float64)
     if np.any(f < 0.0):
-        raise ValueError("'frequency' must be non-negative.")
+        msg = "'frequency' must be non-negative."
+        raise ValueError(msg)
     return np.asarray(
         _ISO_ATTEN_CONST * np.sqrt(f) / (speed_of_sound * diameter),
         dtype=np.float64,
@@ -274,9 +278,11 @@ def reflection_factor(
     :return: Complex reflection factor ``r`` at the reference plane.
     """
     if spacing <= 0.0:
-        raise ValueError("'spacing' must be positive.")
+        msg = "'spacing' must be positive."
+        raise ValueError(msg)
     if x1 <= 0.0:
-        raise ValueError("'x1' must be positive.")
+        msg = "'x1' must be positive."
+        raise ValueError(msg)
     h = np.asarray(h12, dtype=np.complex128)
     k0 = np.asarray(wavenumber, dtype=np.complex128)
     h_i = np.exp(-1j * k0 * spacing)
@@ -310,7 +316,8 @@ def surface_impedance(
     :return: Surface impedance ``Z``, in rayls (complex).
     """
     if characteristic_impedance <= 0.0:
-        raise ValueError("'characteristic_impedance' must be positive.")
+        msg = "'characteristic_impedance' must be positive."
+        raise ValueError(msg)
     return np.asarray(
         characteristic_impedance * normalized_surface_impedance(reflection),
         dtype=np.complex128,
@@ -426,7 +433,8 @@ def _frequency_range(
 ) -> tuple[float, float]:
     """Shared ISO/ASTM plane-wave frequency-range arithmetic."""
     if spacing <= 0.0:
-        raise ValueError("'spacing' must be positive.")
+        msg = "'spacing' must be positive."
+        raise ValueError(msg)
     if speed_of_sound <= 0.0:
         raise ValueError(_SPEED_OF_SOUND_POSITIVE)
     canonical = _canonical_shape(shape)
@@ -570,9 +578,8 @@ class ImpedanceTubeResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iso10534 import render_iso10534_report
 
         return render_iso10534_report(
@@ -650,5 +657,6 @@ def characteristic_impedance(density: float, speed_of_sound: float) -> float:
     :return: Characteristic impedance ``rho c``, in rayls.
     """
     if density <= 0.0 or speed_of_sound <= 0.0:
-        raise ValueError("'density' and 'speed_of_sound' must be positive.")
+        msg = "'density' and 'speed_of_sound' must be positive."
+        raise ValueError(msg)
     return float(density * speed_of_sound)

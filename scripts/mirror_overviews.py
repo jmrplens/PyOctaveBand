@@ -56,14 +56,16 @@ def _frontmatter(text: str, page: Path) -> tuple[dict[str, str], str]:
     """The title of a page, and its body."""
     match = re.match(r"---\n(.*?)\n---\n", text, re.DOTALL)
     if not match:
-        raise SystemExit(f"{page}: overview without frontmatter")
+        msg = f"{page}: overview without frontmatter"
+        raise SystemExit(msg)
     found = re.search(
         r"""^title:\s*(?:"((?:[^"\\]|\\.)*)"|'([^']*)'|(\S.*?))\s*$""",
         match.group(1),
         re.MULTILINE,
     )
     if not found:
-        raise SystemExit(f"{page}: overview without a title")
+        msg = f"{page}: overview without a title"
+        raise SystemExit(msg)
     title = (found.group(1) or found.group(2) or found.group(3)).replace('\\"', '"')
     return {"title": title}, text[match.end() :]
 
@@ -169,7 +171,8 @@ def render(page: Path) -> tuple[Path, str]:
     fields, body = _frontmatter(page.read_text(encoding="utf-8"), page)
     title = fields.get("title")
     if not title:
-        raise SystemExit(f"{page}: overview without a title")
+        msg = f"{page}: overview without a title"
+        raise SystemExit(msg)
     up = "../" * len(Path(route).parts)
     head = f"← [Documentation index]({up}README.md)\n\n# {title}\n\n"
     body = _rewrite_links(_strip_components(body), route) + "\n"

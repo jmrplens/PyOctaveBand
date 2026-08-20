@@ -122,9 +122,8 @@ def _seabed(seabed: str | WestonSeabed) -> WestonSeabed:
         return seabed
     key = str(seabed).strip().lower()
     if key not in WESTON_SEABEDS:
-        raise ValueError(
-            f"'seabed' must be one of {tuple(WESTON_SEABEDS)} or a WestonSeabed, got {seabed!r}."
-        )
+        msg = f"'seabed' must be one of {tuple(WESTON_SEABEDS)} or a WestonSeabed, got {seabed!r}."
+        raise ValueError(msg)
     return WESTON_SEABEDS[key]
 
 
@@ -160,9 +159,8 @@ def loss_parameter(attenuation_db_per_wavelength: float) -> float:
     """
     beta = float(attenuation_db_per_wavelength)
     if not np.isfinite(beta) or beta < 0.0:
-        raise ValueError(
-            "'attenuation_db_per_wavelength' must be non-negative and finite."
-        )
+        msg = "'attenuation_db_per_wavelength' must be non-negative and finite."
+        raise ValueError(msg)
     return float(beta / (40.0 * np.pi * np.log10(np.e)))
 
 
@@ -200,14 +198,14 @@ def reflection_loss_gradient(
             / np.sin(psi_c) ** 3
         )
     if bed.sound_speed_gradient <= 0.0:
-        raise ValueError(
+        msg = (
             "a seabed without a critical angle needs a positive 'sound_speed_gradient'"
             " to use the refracting branch of Equation (9.53)."
         )
+        raise ValueError(msg)
     if frequency_hz is None:
-        raise ValueError(
-            "'frequency_hz' is required for a refracting seabed (Equation 9.53)."
-        )
+        msg = "'frequency_hz' is required for a refracting seabed (Equation 9.53)."
+        raise ValueError(msg)
     f = require_positive(frequency_hz, "frequency_hz")
     return float(
         2.0 * (2.0 * np.pi * f) * bed.loss_parameter / bed.sound_speed_gradient
@@ -242,10 +240,11 @@ def effective_depth(
     bed = _seabed(seabed)
     psi_c = critical_grazing_angle(bed.sound_speed_ratio)
     if psi_c <= 0.0:
-        raise ValueError(
+        msg = (
             "'effective_depth' needs a seabed with a critical angle (c_sed > c_w);"
             f" {bed.name!r} has none."
         )
+        raise ValueError(msg)
     k = 2.0 * np.pi * f / c
     return float(h + bed.density_ratio / (k * np.sin(psi_c)))
 
@@ -275,10 +274,11 @@ def waveguide_cutoff_frequency(
     bed = _seabed(seabed)
     psi_c = critical_grazing_angle(bed.sound_speed_ratio)
     if psi_c <= 0.0:
-        raise ValueError(
+        msg = (
             "'waveguide_cutoff_frequency' needs a seabed with a critical angle"
             f" (c_sed > c_w); {bed.name!r} has none."
         )
+        raise ValueError(msg)
     return float((np.pi - bed.density_ratio) / (2.0 * np.pi * np.sin(psi_c)) * c / h)
 
 
@@ -397,23 +397,24 @@ def _angle_and_gradient(
     if critical_angle is None:
         psi_c = critical_grazing_angle(bed.sound_speed_ratio)
         if psi_c <= 0.0:
-            raise ValueError(
+            msg = (
                 f"seabed {bed.name!r} has no critical angle; pass 'critical_angle'"
                 " explicitly (in degrees) to fix the trapped-ray cone."
             )
+            raise ValueError(msg)
     else:
         deg = float(critical_angle)
         if not np.isfinite(deg) or not (0.0 < deg <= 90.0):
-            raise ValueError("'critical_angle' must lie in (0, 90] degrees.")
+            msg = "'critical_angle' must lie in (0, 90] degrees."
+            raise ValueError(msg)
         psi_c = np.radians(deg)
     if gradient is None:
         eta = reflection_loss_gradient(bed, frequency_hz=frequency_hz)
     else:
         eta = float(gradient)
         if not np.isfinite(eta) or eta < 0.0:
-            raise ValueError(
-                "'reflection_loss_gradient_value' must be non-negative and finite."
-            )
+            msg = "'reflection_loss_gradient_value' must be non-negative and finite."
+            raise ValueError(msg)
     return float(psi_c), float(eta)
 
 
@@ -523,14 +524,17 @@ def weston_propagation_loss(
     c = require_positive(sound_speed, "sound_speed")
     r = np.atleast_1d(np.asarray(range_m, dtype=np.float64))
     if r.size == 0 or not np.all(np.isfinite(r)):
-        raise ValueError("'range_m' must be finite and non-empty.")
+        msg = "'range_m' must be finite and non-empty."
+        raise ValueError(msg)
     if np.any(r <= 0.0):
-        raise ValueError("'range_m' must be strictly positive.")
+        msg = "'range_m' must be strictly positive."
+        raise ValueError(msg)
     z0 = h / 2.0 if source_depth is None else float(source_depth)
     zr = h / 2.0 if receiver_depth is None else float(receiver_depth)
     for name, value in (("source_depth", z0), ("receiver_depth", zr)):
         if not np.isfinite(value) or not (0.0 <= value <= h):
-            raise ValueError(f"'{name}' must lie within the water column [0, H].")
+            msg = f"'{name}' must lie within the water column [0, H]."
+            raise ValueError(msg)
 
     bed = _seabed(seabed)
     bounds = weston_regime_boundaries(

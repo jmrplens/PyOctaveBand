@@ -333,9 +333,8 @@ class PrecisionSoundPowerResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.iso3744 import render_sound_power_report
 
         return render_sound_power_report(
@@ -353,10 +352,11 @@ def _precision_table(surface: PrecisionSurface, array: PrecisionArray) -> np.nda
         raise ValueError(_SURFACE_CHOICE_MSG)
     norms = np.linalg.norm(table, axis=1)
     if np.any(np.abs(norms - 1.0) > _UNIT_NORM_TOL):
-        raise ValueError(
+        msg = (
             "Microphone coordinate table is not a set of unit vectors within "
             f"{_UNIT_NORM_TOL:g}; a transcription error is present."
         )
+        raise ValueError(msg)
     return table
 
 
@@ -387,11 +387,14 @@ def precision_positions(
     if surface not in ("sphere", "hemisphere"):
         raise ValueError(_SURFACE_CHOICE_MSG)
     if array not in ("general", "broadband"):
-        raise ValueError("'array' must be 'general' or 'broadband'.")
+        msg = "'array' must be 'general' or 'broadband'."
+        raise ValueError(msg)
     if radius <= 0:
-        raise ValueError("A positive 'radius' is required.")
+        msg = "A positive 'radius' is required."
+        raise ValueError(msg)
     if count not in (20, 40):
-        raise ValueError("'count' must be 20 (primary array) or 40 (full array).")
+        msg = "'count' must be 20 (primary array) or 40 (full array)."
+        raise ValueError(msg)
     table = _precision_table(surface, array)
     return np.asarray(table[:count] * radius, dtype=np.float64)
 
@@ -436,10 +439,11 @@ def precision_background_correction(
     bg = np.asarray(background_levels, dtype=np.float64)
     freqs = np.asarray(frequencies, dtype=np.float64)
     if src.shape[-1] != freqs.shape[0] or bg.shape[-1] != freqs.shape[0]:
-        raise ValueError(
+        msg = (
             "The last axis of 'source_levels'/'background_levels' must match "
             "the number of 'frequencies'."
         )
+        raise ValueError(msg)
     low = _k1_lower_criterion(freqs)  # (NB,)
     delta = src - bg
     clamped = np.maximum(delta, low)
@@ -498,11 +502,14 @@ def meteorological_corrections(
     :return: :class:`MeteorologicalCorrection`.
     """
     if static_pressure <= 0.0:
-        raise ValueError("'static_pressure' must be positive (kPa).")
+        msg = "'static_pressure' must be positive (kPa)."
+        raise ValueError(msg)
     if temperature <= -273.0:
-        raise ValueError("'temperature' must be above -273 degrees Celsius.")
+        msg = "'temperature' must be above -273 degrees Celsius."
+        raise ValueError(msg)
     if radius <= 0.0:
-        raise ValueError("'radius' must be positive.")
+        msg = "'radius' must be positive."
+        raise ValueError(msg)
     theta_k = 273.0 + temperature
     p_term = -10.0 * np.log10(static_pressure / _PS0_KPA)
     c1 = float(p_term + 5.0 * np.log10(theta_k / _THETA0_K))
@@ -512,7 +519,8 @@ def meteorological_corrections(
     else:
         a0 = np.asarray(air_absorption_coefficient, dtype=np.float64) * radius
         if np.any(a0 < 0.0):
-            raise ValueError("'air_absorption_coefficient' must be non-negative.")
+            msg = "'air_absorption_coefficient' must be non-negative."
+            raise ValueError(msg)
         c3_arr = a0 * (1.0053 - 0.0012 * a0) ** 1.6
         c3 = as_float_or_array(c3_arr)
     return MeteorologicalCorrection(c1=c1, c2=c2, c3=c3)
@@ -530,10 +538,11 @@ def _sigma_r0_3745(nominal: int, room: PrecisionRoom) -> float:
         return 1.5 if room == "hemi-anechoic" else 1.0
     if 12500 <= nominal <= 20000:
         return 2.0
-    raise ValueError(
+    msg = (
         f"No ISO 3745:2012 sigma_R0 for {nominal} Hz; expected a nominal "
         "one-third-octave mid-band from 50 Hz to 20 kHz."
     )
+    raise ValueError(msg)
 
 
 def precision_uncertainty(
@@ -554,9 +563,11 @@ def precision_uncertainty(
     :return: ``U`` in decibels, scalar or per band matching ``sigma_r0``.
     """
     if coverage_factor <= 0.0:
-        raise ValueError("'coverage_factor' must be positive.")
+        msg = "'coverage_factor' must be positive."
+        raise ValueError(msg)
     if sigma_omc < 0.0:
-        raise ValueError("'sigma_omc' must be non-negative.")
+        msg = "'sigma_omc' must be non-negative."
+        raise ValueError(msg)
     sigma_tot = np.hypot(np.asarray(sigma_r0, dtype=np.float64), sigma_omc)
     u = coverage_factor * sigma_tot
     return as_float_or_array(u)
@@ -575,19 +586,21 @@ def _precision_k1(
     if background_levels is None:
         return np.zeros_like(levels)
     if freqs is None:
-        raise ValueError(
+        msg = (
             "'frequencies' are required with 'background_levels' to select "
             "the frequency-dependent K1 criterion (ISO 3745:2012 9.4.2)."
         )
+        raise ValueError(msg)
     n_positions, n_bands = levels.shape
     bg = np.atleast_2d(np.asarray(background_levels, dtype=np.float64))
     if bg.shape == (1, n_bands) and n_positions != 1:
         bg = np.broadcast_to(bg, (n_positions, n_bands))
     if bg.shape != levels.shape:
-        raise ValueError(
+        msg = (
             "'background_levels' must match 'levels_positions' shape, or be "
             "a single spectrum of shape (NB,) or (1, NB)."
         )
+        raise ValueError(msg)
     return precision_background_correction(levels, bg, freqs)
 
 
@@ -602,9 +615,11 @@ def _precision_surface_level(
     n_positions = corrected.shape[0]
     seg = np.asarray(areas, dtype=np.float64)
     if seg.shape != (n_positions,):
-        raise ValueError("'areas' must have one value per microphone position.")
+        msg = "'areas' must have one value per microphone position."
+        raise ValueError(msg)
     if np.any(seg <= 0.0):
-        raise ValueError("All 'areas' must be positive.")
+        msg = "All 'areas' must be positive."
+        raise ValueError(msg)
     return np.asarray(
         weighted_energy_mean(corrected, seg[:, None], axis=0), dtype=np.float64
     )
@@ -734,10 +749,12 @@ def sound_power_anechoic(
     if surface not in ("sphere", "hemisphere"):
         raise ValueError(_SURFACE_CHOICE_MSG)
     if radius <= 0:
-        raise ValueError("A positive 'radius' is required.")
+        msg = "A positive 'radius' is required."
+        raise ValueError(msg)
     levels = np.atleast_2d(np.asarray(levels_positions, dtype=np.float64))
     if levels.ndim != 2:
-        raise ValueError("'levels_positions' must be a 2D (positions, bands) array.")
+        msg = "'levels_positions' must be a 2D (positions, bands) array."
+        raise ValueError(msg)
     n_positions, n_bands = levels.shape
 
     area = (4.0 if surface == "sphere" else 2.0) * np.pi * radius**2
@@ -745,7 +762,8 @@ def sound_power_anechoic(
 
     freqs = None if frequencies is None else np.asarray(frequencies, dtype=np.float64)
     if freqs is not None and freqs.shape[0] != n_bands:
-        raise ValueError("'frequencies' length must match the number of bands.")
+        msg = "'frequencies' length must match the number of bands."
+        raise ValueError(msg)
 
     # --- per-position background correction K1i (Eq. 11) ------------------
     k1 = _precision_k1(levels, background_levels, freqs)

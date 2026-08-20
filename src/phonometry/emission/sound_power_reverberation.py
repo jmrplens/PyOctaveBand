@@ -172,9 +172,8 @@ class ReverberationSoundPowerResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.iso3741 import render_reverberation_power_report
 
         return render_reverberation_power_report(
@@ -191,9 +190,11 @@ def _validate_meteorology(temperature: float, static_pressure: float) -> None:
     with a clean ``ValueError``.
     """
     if not np.isfinite(temperature) or temperature <= -273.0:
-        raise ValueError("'temperature' must be finite and greater than -273 degC.")
+        msg = "'temperature' must be finite and greater than -273 degC."
+        raise ValueError(msg)
     if not np.isfinite(static_pressure) or static_pressure <= 0.0:
-        raise ValueError("'static_pressure' must be finite and positive.")
+        msg = "'static_pressure' must be finite and positive."
+        raise ValueError(msg)
 
 
 def _speed_of_sound(temperature: float) -> float:
@@ -229,7 +230,8 @@ def _mean_level(levels: np.ndarray) -> np.ndarray:
         return arr
     if arr.ndim == 2:
         return energy_mean(arr, axis=0)
-    raise ValueError("'levels' must be a 1D spectrum or a 2D (positions, bands) array.")
+    msg = "'levels' must be a 1D spectrum or a 2D (positions, bands) array."
+    raise ValueError(msg)
 
 
 def _k1_eq14(delta: np.ndarray, frequencies: np.ndarray) -> tuple[np.ndarray, bool]:
@@ -280,10 +282,11 @@ def _background_corrected_mean(
         if bg.ndim == 1:
             bg = np.broadcast_to(bg, arr.shape)
         if bg.shape != arr.shape:
-            raise ValueError(
+            msg = (
                 "'background_levels' must match the per-position 'levels' "
                 "shape or be a single (bands,) spectrum."
             )
+            raise ValueError(msg)
         k1i, clamped = _k1_eq14(arr - bg, frequencies)
         corrected = energy_mean(arr - k1i, axis=0)
     else:
@@ -461,18 +464,22 @@ def sound_power_reverberation(
     :return: :class:`ReverberationSoundPowerResult`.
     """
     if volume <= 0 or surface_area <= 0:
-        raise ValueError("'volume' and 'surface_area' must be positive.")
+        msg = "'volume' and 'surface_area' must be positive."
+        raise ValueError(msg)
     _validate_meteorology(temperature, static_pressure)
     mean_level = _mean_level(levels)
     n_bands = mean_level.shape[0]
     freqs = np.asarray(frequencies, dtype=np.float64)
     t60_arr = np.broadcast_to(np.asarray(t60, dtype=np.float64), (n_bands,)).copy()
     if freqs.shape != (n_bands,):
-        raise ValueError("'frequencies' length must match the number of bands.")
+        msg = "'frequencies' length must match the number of bands."
+        raise ValueError(msg)
     if np.any(t60_arr <= 0.0):
-        raise ValueError("'t60' values must be positive.")
+        msg = "'t60' values must be positive."
+        raise ValueError(msg)
     if np.any(freqs <= 0.0):
-        raise ValueError("'frequencies' must be positive.")
+        msg = "'frequencies' must be positive."
+        raise ValueError(msg)
 
     _room_qualification_warnings(levels, t60_arr, volume, surface_area, freqs)
 
@@ -559,13 +566,13 @@ def sound_power_comparison(
     lw_rss = np.asarray(lw_ref, dtype=np.float64)
     n_bands = lp_st.shape[0]
     if lp_rss.shape != (n_bands,) or lw_rss.shape != (n_bands,):
-        raise ValueError(
-            "'levels', 'levels_ref' and 'lw_ref' must span the same bands."
-        )
+        msg = "'levels', 'levels_ref' and 'lw_ref' must span the same bands."
+        raise ValueError(msg)
 
     freqs = None if frequencies is None else np.asarray(frequencies, dtype=np.float64)
     if freqs is not None and freqs.shape != (n_bands,):
-        raise ValueError("'frequencies' length must match the number of bands.")
+        msg = "'frequencies' length must match the number of bands."
+        raise ValueError(msg)
 
     # Microphone-sampling advisories (<6 positions, sM > 1,5 dB) apply to the
     # per-position measurement of the source under test, exactly as in the
@@ -576,13 +583,13 @@ def sound_power_comparison(
     k1_st = np.zeros(n_bands, dtype=np.float64)
     if background_levels is not None:
         if freqs is None:
-            raise ValueError("'frequencies' are required to apply 'background_levels'.")
+            msg = "'frequencies' are required to apply 'background_levels'."
+            raise ValueError(msg)
         lp_st, k1_st = _background_corrected_mean(levels, background_levels, freqs)
     if background_levels_ref is not None:
         if freqs is None:
-            raise ValueError(
-                "'frequencies' are required to apply 'background_levels_ref'."
-            )
+            msg = "'frequencies' are required to apply 'background_levels_ref'."
+            raise ValueError(msg)
         lp_rss, _ = _background_corrected_mean(levels_ref, background_levels_ref, freqs)
 
     c2 = _c2_correction(temperature, static_pressure)

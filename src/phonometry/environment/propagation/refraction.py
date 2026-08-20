@@ -132,13 +132,15 @@ def linear_sound_speed_profile(
     c0 = require_positive(ground_speed, "ground_speed")
     h = require_positive(max_height, "max_height")
     if not np.isfinite(gradient):
-        raise ValueError("'gradient' must be finite.")
+        msg = "'gradient' must be finite."
+        raise ValueError(msg)
     top = c0 + gradient * h
     if top <= 0.0:
-        raise ValueError(
+        msg = (
             "the linear profile reaches a non-positive sound speed within "
             "'max_height'; reduce 'max_height' or the gradient magnitude."
         )
+        raise ValueError(msg)
     sign = "+" if gradient >= 0 else "-"
     return EffectiveSoundSpeedProfile(
         heights=np.array([0.0, h], dtype=np.float64),
@@ -177,9 +179,11 @@ def log_linear_sound_speed_profile(
     z0 = require_positive(roughness_length, "roughness_length")
     h = require_positive(max_height, "max_height")
     if not np.isfinite(b):
-        raise ValueError("'b' must be finite.")
+        msg = "'b' must be finite."
+        raise ValueError(msg)
     if int(n_points) < 2:
-        raise ValueError("'n_points' must be at least 2.")
+        msg = "'n_points' must be at least 2."
+        raise ValueError(msg)
     # Logarithmic height grid from the ground to max_height (z = 0 included).
     z = np.concatenate(
         (
@@ -190,10 +194,11 @@ def log_linear_sound_speed_profile(
     z = np.unique(np.clip(z, 0.0, h))
     c = c0 + b * np.log1p(z / z0)
     if np.any(c <= 0.0):
-        raise ValueError(
+        msg = (
             "the logarithmic profile reaches a non-positive sound speed within "
             "'max_height'; reduce 'max_height' or |b|."
         )
+        raise ValueError(msg)
     sign = "+" if b >= 0 else "-"
     return EffectiveSoundSpeedProfile(
         heights=np.asarray(z, dtype=np.float64),
@@ -209,17 +214,23 @@ def _clean_profile(
     z = np.asarray(profile.heights, dtype=np.float64)
     c = np.asarray(profile.sound_speeds, dtype=np.float64)
     if z.ndim != 1 or z.size < 2:
-        raise ValueError("the profile must have at least two height samples.")
+        msg = "the profile must have at least two height samples."
+        raise ValueError(msg)
     if c.shape != z.shape:
-        raise ValueError("'sound_speeds' must match 'heights' in length.")
+        msg = "'sound_speeds' must match 'heights' in length."
+        raise ValueError(msg)
     if not (np.all(np.isfinite(z)) and np.all(np.isfinite(c))):
-        raise ValueError("the profile heights and speeds must be finite.")
+        msg = "the profile heights and speeds must be finite."
+        raise ValueError(msg)
     if abs(float(z[0])) > 1e-9:
-        raise ValueError("the profile must start at the ground z = 0.")
+        msg = "the profile must start at the ground z = 0."
+        raise ValueError(msg)
     if np.any(np.diff(z) <= 0.0):
-        raise ValueError("the profile heights must be strictly increasing.")
+        msg = "the profile heights must be strictly increasing."
+        raise ValueError(msg)
     if np.any(c <= 0.0):
-        raise ValueError("the profile sound speeds must be strictly positive.")
+        msg = "the profile sound speeds must be strictly positive."
+        raise ValueError(msg)
     return z, c
 
 
@@ -250,9 +261,11 @@ def ray_curvature_radius(
     """
     c0 = require_positive(ground_speed, "ground_speed")
     if not (np.isfinite(gradient) and abs(gradient) > 0.0):
-        raise ValueError("'gradient' must be finite and non-zero (a curved ray).")
+        msg = "'gradient' must be finite and non-zero (a curved ray)."
+        raise ValueError(msg)
     if abs(launch_angle_deg) >= 90.0:
-        raise ValueError("'launch_angle_deg' must be within (-90, 90) degrees.")
+        msg = "'launch_angle_deg' must be within (-90, 90) degrees."
+        raise ValueError(msg)
     return float(c0 / (abs(gradient) * np.cos(np.radians(launch_angle_deg))))
 
 
@@ -288,12 +301,14 @@ def shadow_zone_distance(
     """
     c0 = require_positive(ground_speed, "ground_speed")
     if not np.isfinite(gradient) or gradient >= 0.0:
-        raise ValueError(
+        msg = (
             "'gradient' must be negative (an upward-refracting profile) for an "
             "acoustic shadow zone to exist."
         )
+        raise ValueError(msg)
     if source_height < 0.0 or receiver_height < 0.0:
-        raise ValueError("Source and receiver heights must be non-negative.")
+        msg = "Source and receiver heights must be non-negative."
+        raise ValueError(msg)
     rc = c0 / abs(gradient)
     return float(
         np.sqrt(2.0 * rc) * (np.sqrt(source_height) + np.sqrt(receiver_height))
@@ -377,15 +392,19 @@ def atmospheric_ray_paths(
     top = float(z_prof[-1])
     zs = float(source_height)
     if zs < 0.0:
-        raise ValueError("'source_height' must be non-negative.")
+        msg = "'source_height' must be non-negative."
+        raise ValueError(msg)
     rmax = require_positive(max_range, "max_range")
     if int(n_steps) < 2:
-        raise ValueError("'n_steps' must be at least 2.")
+        msg = "'n_steps' must be at least 2."
+        raise ValueError(msg)
     angles = np.asarray(launch_angles_deg, dtype=np.float64).ravel()
     if angles.size == 0 or not np.all(np.isfinite(angles)):
-        raise ValueError("'launch_angles_deg' must be finite and non-empty.")
+        msg = "'launch_angles_deg' must be finite and non-empty."
+        raise ValueError(msg)
     if np.any(np.abs(angles) >= 90.0):
-        raise ValueError("'launch_angles_deg' must be within (-90, 90) degrees.")
+        msg = "'launch_angles_deg' must be within (-90, 90) degrees."
+        raise ValueError(msg)
 
     # Piecewise-constant gradient per profile segment (sharp kinks preserved);
     # above the profile top the atmosphere is taken as homogeneous (gradient 0).
@@ -597,7 +616,8 @@ def atmospheric_parabolic_equation(
     z_prof, c_prof = _clean_profile(profile)
     zs = float(source_height)
     if zs <= 0.0:
-        raise ValueError("'source_height' must be positive.")
+        msg = "'source_height' must be positive."
+        raise ValueError(msg)
     rmax = require_positive(max_range, "max_range")
     zmax = require_positive(max_height, "max_height")
     c_ref = float(c_prof[0])  # reference speed at the ground (ka = k0)
@@ -609,7 +629,8 @@ def atmospheric_parabolic_equation(
     )
     dr = require_positive(range_step, "range_step") if range_step is not None else lam
     if dr > rmax:
-        raise ValueError("'range_step' must not exceed 'max_range'.")
+        msg = "'range_step' must not exceed 'max_range'."
+        raise ValueError(msg)
     z_imp = _resolve_pe_impedance(
         f, impedance, flow_resistivity, model, c_ref, air_density
     )

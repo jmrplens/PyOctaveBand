@@ -174,7 +174,8 @@ class ForceSource:
         """Reject a non-finite gain and a ``direction`` other than ``"x"``/``"y"``."""
         _finite("amplitude", self.amplitude)
         if self.direction not in _DIRECTIONS:
-            raise ValueError("direction must be 'x' or 'y'")
+            msg = "direction must be 'x' or 'y'"
+            raise ValueError(msg)
 
 
 ElasticSource = ExplosionSource | ForceSource
@@ -214,10 +215,12 @@ class Material:
         c_p = _positive_finite("c_p", self.c_p)
         c_s = _finite("c_s", self.c_s)
         if c_s < 0.0:
-            raise ValueError("c_s must be non-negative (0 marks a fluid)")
+            msg = "c_s must be non-negative (0 marks a fluid)"
+            raise ValueError(msg)
         rho = _positive_finite("rho", self.rho)
         if c_p**2 < 2.0 * c_s**2 * (1.0 - 1e-9):
-            raise ValueError("c_p**2 must be at least 2 * c_s**2 (non-negative lambda)")
+            msg = "c_p**2 must be at least 2 * c_s**2 (non-negative lambda)"
+            raise ValueError(msg)
         object.__setattr__(self, "c_p", c_p)
         object.__setattr__(self, "c_s", c_s)
         object.__setattr__(self, "rho", rho)
@@ -251,7 +254,8 @@ def _as_material(name: str, value: object) -> Material:
     if isinstance(value, Sequence) and not isinstance(value, str) and len(value) == 3:
         c_p, c_s, rho = (float(np.real(v)) for v in value)
         return Material(c_p=c_p, c_s=c_s, rho=rho)
-    raise ValueError(f"{name} must be a Material or a (c_p, c_s, rho) triple")
+    msg = f"{name} must be a Material or a (c_p, c_s, rho) triple"
+    raise ValueError(msg)
 
 
 def scholte_speed(
@@ -293,9 +297,11 @@ def scholte_speed(
     flu = _as_material("fluid", fluid)
     sol = _as_material("solid", solid)
     if not flu.is_fluid:
-        raise ValueError("fluid must have c_s = 0")
+        msg = "fluid must have c_s = 0"
+        raise ValueError(msg)
     if sol.is_fluid:
-        raise ValueError("solid must have c_s > 0")
+        msg = "solid must have c_s > 0"
+        raise ValueError(msg)
     q = sol.c_s**2 / sol.c_p**2
     r = sol.c_s**2 / flu.c_p**2
     m = sol.rho / flu.rho
@@ -318,7 +324,8 @@ def scholte_speed(
     signs = np.sign(values)
     crossings = np.nonzero(np.diff(signs) != 0)[0]
     if crossings.size == 0:  # pragma: no cover - a root always exists
-        raise ValueError("no Scholte root found; check the material pair")
+        msg = "no Scholte root found; check the material pair"
+        raise ValueError(msg)
     k = int(crossings[-1])
     root = float(brentq(characteristic, grid[k], grid[k + 1], xtol=1e-15, rtol=8.9e-16))
     return sol.c_s * float(np.sqrt(root))
@@ -330,12 +337,14 @@ def _resolve_speed_map(
     """Broadcast/validate a wave-speed spec into a finite 2D map."""
     if np.isscalar(value):
         if shape is None:
-            raise ValueError(f"shape is required when {name} is a scalar")
+            msg = f"shape is required when {name} is a scalar"
+            raise ValueError(msg)
         out = np.full(shape, float(np.real(value)), dtype=np.float64)
     else:
         out = np.asarray(value, dtype=np.float64)
     if out.ndim != 2:
-        raise ValueError(f"{name} must be a 2D (ny, nx) map")
+        msg = f"{name} must be a 2D (ny, nx) map"
+        raise ValueError(msg)
     return out
 
 
@@ -352,7 +361,8 @@ def _resolve_free_sides(
         sides = tuple(free_sides)
     unknown = set(sides) - set(_SIDES)
     if unknown:
-        raise ValueError(f"unknown free sides: {sorted(unknown)}")
+        msg = f"unknown free sides: {sorted(unknown)}"
+        raise ValueError(msg)
     return sides
 
 
@@ -436,32 +446,38 @@ class ElasticFDTD2D:
         _positive_map("c_p", cp_map)
         ny, nx = cp_map.shape
         if ny < 2 or nx < 2:
-            raise ValueError("the grid must be at least 2 x 2 cells")
+            msg = "the grid must be at least 2 x 2 cells"
+            raise ValueError(msg)
         cs_map = _resolve_speed_map("c_s", c_s, (ny, nx))
         if cs_map.shape != (ny, nx):
-            raise ValueError("c_s map must match the shape of c_p")
+            msg = "c_s map must match the shape of c_p"
+            raise ValueError(msg)
         if not np.all(np.isfinite(cs_map)) or bool(np.any(cs_map < 0.0)):
-            raise ValueError("c_s must be non-negative and finite everywhere")
+            msg = "c_s must be non-negative and finite everywhere"
+            raise ValueError(msg)
         # lambda >= 0 <=> c_p**2 >= 2 c_s**2 (a small relative tolerance
         # admits c_s = c_p / sqrt(2) given in rounded floats).
         if bool(np.any(cp_map**2 < 2.0 * cs_map**2 * (1.0 - 1e-9))):
-            raise ValueError(
+            msg = (
                 "c_p**2 must be at least 2 * c_s**2 in every "
                 "cell (non-negative lambda); c_s = 0 marks a "
                 "fluid cell"
             )
+            raise ValueError(msg)
         if not np.isfinite(cfl) or not 0.0 < cfl < 1.0:
-            raise ValueError(
+            msg = (
                 "cfl must lie in (0, 1): the leapfrog scheme "
                 "is unstable beyond the Courant bound CN = 1"
             )
+            raise ValueError(msg)
         rho_map = (
             np.full((ny, nx), float(np.real(rho)), dtype=np.float64)
             if np.isscalar(rho)
             else np.asarray(rho, dtype=np.float64)
         )
         if rho_map.shape != (ny, nx):
-            raise ValueError("rho map must match the shape of c_p")
+            msg = "rho map must match the shape of c_p"
+            raise ValueError(msg)
         _positive_map("rho", rho_map)
         sponge_width, damping_map = _validate_sponge_damping(
             sponge_width, sponge_reflection, damping, ny, nx
@@ -516,9 +532,8 @@ class ElasticFDTD2D:
         self.free_sides: tuple[str, ...] = _resolve_free_sides(free_sides)
         overlap = set(self.free_sides) & set(self.sponge_sides)
         if overlap:
-            raise ValueError(
-                f"sides {sorted(overlap)} cannot be both free and absorbing"
-            )
+            msg = f"sides {sorted(overlap)} cannot be both free and absorbing"
+            raise ValueError(msg)
         self._init_decay(sides, sponge_width, sponge_reflection, damping_map, c_max)
         self._init_obstacle(obstacle_mask, ny, nx)
 
@@ -566,7 +581,8 @@ class ElasticFDTD2D:
         ny = _integer("shape[0]", shape[0])
         nx = _integer("shape[1]", shape[1])
         if ny < 2 or nx < 2:
-            raise ValueError("the grid must be at least 2 x 2 cells")
+            msg = "the grid must be at least 2 x 2 cells"
+            raise ValueError(msg)
         bg = _as_material("background", background)
         c_p = np.full((ny, nx), bg.c_p, dtype=np.float64)
         c_s = np.full((ny, nx), bg.c_s, dtype=np.float64)
@@ -577,9 +593,8 @@ class ElasticFDTD2D:
             if isinstance(index, np.ndarray) and (
                 index.dtype != np.bool_ or index.shape != (ny, nx)
             ):
-                raise ValueError(
-                    f"regions[{k}] mask must be a boolean array of shape {(ny, nx)}"
-                )
+                msg = f"regions[{k}] mask must be a boolean array of shape {(ny, nx)}"
+                raise ValueError(msg)
             c_p[index] = mat.c_p
             c_s[index] = mat.c_s
             rho[index] = mat.rho
@@ -691,9 +706,11 @@ class ElasticFDTD2D:
         """Check an explosion cell against the grid and the obstacle mask."""
         ny, nx = self.txx.shape
         if not (0 <= ix < nx and 0 <= iy < ny):
-            raise ValueError("source position lies outside the grid")
+            msg = "source position lies outside the grid"
+            raise ValueError(msg)
         if self._obstacle is not None and self._obstacle[iy, ix]:
-            raise ValueError("source position lies inside an obstacle")
+            msg = "source position lies inside an obstacle"
+            raise ValueError(msg)
 
     def _validate_force_position(self, source: ForceSource, ix: int, iy: int) -> None:
         """Check a force velocity node against the grid and the obstacle."""
@@ -701,12 +718,14 @@ class ElasticFDTD2D:
         open_map = self._vx_open if source.direction == "x" else self._vy_open
         limit = (ny, nx - 1) if source.direction == "x" else (ny - 1, nx)
         if not (0 <= ix < limit[1] and 0 <= iy < limit[0]):
-            raise ValueError("source position lies outside the grid")
+            msg = "source position lies outside the grid"
+            raise ValueError(msg)
         # The open map holds exact 0.0/1.0 factors cast from booleans:
         # exact zero marks a face closed by the obstacle mask (<= avoids
         # the float-equality lint without changing the semantics).
         if open_map is not None and open_map[iy, ix] <= 0.0:
-            raise ValueError("source position lies inside an obstacle")
+            msg = "source position lies inside an obstacle"
+            raise ValueError(msg)
 
     def step(self) -> None:
         """Advance the leapfrog scheme by one time step (Virieux Eq. 5)."""
@@ -929,7 +948,8 @@ class ElasticFDTD2D:
         if field == "p":
             return self.p
         if field not in _FIELD_NAMES:
-            raise ValueError(f"field must be one of {_FIELD_NAMES}")
+            msg = f"field must be one of {_FIELD_NAMES}"
+            raise ValueError(msg)
         ny, nx = self.txx.shape
         out = np.zeros((ny, nx), dtype=np.float64)
         if field == "vx":
@@ -1042,7 +1062,8 @@ class ElasticFDTDResult:
             return plot_elastic_snapshot(
                 self, ax=ax, frame=frame, language=language, **kwargs
             )
-        raise ValueError("kind must be 'probes' or 'snapshot'")
+        msg = "kind must be 'probes' or 'snapshot'"
+        raise ValueError(msg)
 
 
 @dataclass(frozen=True)
@@ -1098,17 +1119,19 @@ def _parse_elastic_boundaries(
     else:
         unknown = set(boundaries) - set(_SIDES)
         if unknown:
-            raise ValueError(f"unknown boundary sides: {sorted(unknown)}")
+            msg = f"unknown boundary sides: {sorted(unknown)}"
+            raise ValueError(msg)
         spec = {side: boundaries.get(side, "rigid") for side in _SIDES}
     absorbing: list[str] = []
     free: list[str] = []
     for side in _SIDES:
         value = spec[side]
         if value not in _BOUNDARY_NAMES:
-            raise ValueError(
+            msg = (
                 f"boundary for side {side!r} must be one of "
                 f"{_BOUNDARY_NAMES}, got {value!r}"
             )
+            raise ValueError(msg)
         if value == "absorbing":
             absorbing.append(side)
         elif value == "free":
@@ -1120,12 +1143,15 @@ def _resolve_probe_fields(probe_fields: Sequence[str]) -> tuple[str, ...]:
     """Validate the probe-field spec into a non-empty unique tuple."""
     fields = tuple(probe_fields)
     if not fields:
-        raise ValueError("probe_fields must not be empty")
+        msg = "probe_fields must not be empty"
+        raise ValueError(msg)
     unknown = set(fields) - set(_FIELD_NAMES)
     if unknown:
-        raise ValueError(f"unknown probe fields: {sorted(unknown)}")
+        msg = f"unknown probe fields: {sorted(unknown)}"
+        raise ValueError(msg)
     if len(set(fields)) != len(fields):
-        raise ValueError("probe_fields must not repeat a field")
+        msg = "probe_fields must not repeat a field"
+        raise ValueError(msg)
     return fields
 
 
@@ -1183,11 +1209,13 @@ def _validated_snapshot_options(
     snapshot_every = recording.snapshot_every
     snapshot_field = recording.snapshot_field
     if snapshot_field not in _FIELD_NAMES:
-        raise ValueError(f"snapshot_field must be one of {_FIELD_NAMES}")
+        msg = f"snapshot_field must be one of {_FIELD_NAMES}"
+        raise ValueError(msg)
     if snapshot_every is not None:
         snapshot_every = _integer("snapshot_every", snapshot_every)
         if snapshot_every < 1:
-            raise ValueError("snapshot_every must be >= 1")
+            msg = "snapshot_every must be >= 1"
+            raise ValueError(msg)
     return snapshot_every, snapshot_field
 
 
@@ -1200,7 +1228,8 @@ def _validated_absorbing_layer(
         return 0
     cells = _integer("absorbing_layer_cells", boundaries.absorbing_layer_cells)
     if cells < 1:
-        raise ValueError("absorbing_layer_cells must be >= 1")
+        msg = "absorbing_layer_cells must be >= 1"
+        raise ValueError(msg)
     return cells
 
 
@@ -1266,7 +1295,8 @@ def elastic_fdtd_simulation(
     recording = ElasticRecording() if recording is None else recording
     boundaries = ElasticBoundaries() if boundaries is None else boundaries
     if len(sources) == 0:
-        raise ValueError("at least one source is required")
+        msg = "at least one source is required"
+        raise ValueError(msg)
     duration = _positive_finite("duration", duration)
     fields = _resolve_probe_fields(recording.probe_fields)
     snapshot_every, snapshot_field = _validated_snapshot_options(recording)
@@ -1294,9 +1324,8 @@ def elastic_fdtd_simulation(
 
     steps = round(duration / sim.dt)
     if steps < 1:
-        raise ValueError(
-            f"duration must cover at least one time step (dt = {sim.dt:.3e} s)"
-        )
+        msg = f"duration must cover at least one time step (dt = {sim.dt:.3e} s)"
+        raise ValueError(msg)
     times = np.arange(steps + 1, dtype=np.float64) * sim.dt
     signals, frames, frame_steps = _record_elastic_run(
         sim, steps, probe_ix, fields, snapshot_every, snapshot_field

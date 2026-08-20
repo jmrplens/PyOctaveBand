@@ -467,10 +467,11 @@ def module_section(module: str) -> Section:
     """
     section = _MODULE_TO_SECTION.get(module)
     if section is None:
-        raise KeyError(
+        msg = (
             f"module {module!r} is not mapped to any API-reference section; "
             "add it to the matching Section in scripts/api_taxonomy.py"
         )
+        raise KeyError(msg)
     return section
 
 
@@ -486,24 +487,27 @@ def _build_module_index() -> dict[str, Section]:
         allowed = _SECTION_SUBPACKAGES[section.key]
         for module in section.modules:
             if module in index:
-                raise ValueError(
+                msg = (
                     f"module {module!r} is assigned to both "
                     f"{index[module].key!r} and {section.key!r}"
                 )
+                raise ValueError(msg)
             parent = _parent_subpackage(module)
             if parent not in allowed:
-                raise ValueError(
+                msg = (
                     f"module {module!r} (subpackage {parent!r}) does not "
                     f"belong to section {section.key!r}, which only accepts "
                     f"subpackages {allowed!r}"
                 )
+                raise ValueError(msg)
             index[module] = section
     for name, module in OBJECT_MODULE_OVERRIDES.items():
         if module not in index:
-            raise ValueError(
+            msg = (
                 f"OBJECT_MODULE_OVERRIDES[{name!r}] points to unmapped "
                 f"module {module!r}"
             )
+            raise ValueError(msg)
     return index
 
 
@@ -535,10 +539,11 @@ def public_names() -> dict[str, ModuleType]:
         for member in getattr(package, "__all__", ()):
             previous = owners.get(member)
             if previous is not None:
-                raise ValueError(
+                msg = (
                     f"{member!r} is published by both {previous.__name__} and "
                     f"{package.__name__}; one name, one owner"
                 )
+                raise ValueError(msg)
             owners[member] = package
     # The names the top level holds itself, which is every one it publishes
     # that no package does. `Signal` is not among them: it is published at the

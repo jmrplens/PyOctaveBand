@@ -106,12 +106,14 @@ def _qualification_columns(
             continue
         arr = np.asarray(values, dtype=np.float64)
         if arr.shape != (n_bands,):
-            raise ValueError(
+            msg = (
                 f"'{name}' must carry one value per reported band "
                 f"({n_bands}); got shape {arr.shape}."
             )
+            raise ValueError(msg)
         if not np.all(np.isfinite(arr)):
-            raise ValueError(f"'{name}' must contain only finite values.")
+            msg = f"'{name}' must contain only finite values."
+            raise ValueError(msg)
         columns.append((header, arr, 1))
     return columns
 

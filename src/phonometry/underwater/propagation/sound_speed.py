@@ -52,14 +52,16 @@ _DEPTH_MODELS = ("mackenzie", "medwin")
 def _positive(value: float, name: str) -> float:
     scalar = float(value)
     if not np.isfinite(scalar) or scalar <= 0.0:
-        raise ValueError(f"'{name}' must be a positive, finite number.")
+        msg = f"'{name}' must be a positive, finite number."
+        raise ValueError(msg)
     return scalar
 
 
 def _finite(value: float, name: str) -> float:
     scalar = float(value)
     if not np.isfinite(scalar):
-        raise ValueError(f"'{name}' must be a finite number.")
+        msg = f"'{name}' must be a finite number."
+        raise ValueError(msg)
     return scalar
 
 
@@ -77,7 +79,8 @@ def depth_to_pressure(depth: float, latitude: float = 45.0) -> float:
     """
     z = _finite(depth, "depth")
     if z < 0.0:
-        raise ValueError("'depth' must be non-negative.")
+        msg = "'depth' must be non-negative."
+        raise ValueError(msg)
     return float(_pressure_mpa(z, _finite(latitude, "latitude")))
 
 
@@ -258,10 +261,12 @@ def sea_water_sound_speed(
     t = _finite(temperature, "temperature")
     s = _finite(salinity, "salinity")
     if s < 0.0:
-        raise ValueError("'salinity' must be non-negative.")
+        msg = "'salinity' must be non-negative."
+        raise ValueError(msg)
     z = _finite(depth, "depth")
     if z < 0.0:
-        raise ValueError("'depth' must be non-negative.")
+        msg = "'depth' must be non-negative."
+        raise ValueError(msg)
     key = model.strip().lower()
     if key == "mackenzie":
         return float(_mackenzie(t, s, z))
@@ -272,7 +277,8 @@ def sea_water_sound_speed(
         return float(_unesco(t, s, pressure_bar))
     if key == "del_grosso":
         return float(_del_grosso(t, s, pressure_bar * _KGCM2_PER_BAR))
-    raise ValueError(f"'model' must be one of {_MODELS}, got {model!r}.")
+    msg = f"'model' must be one of {_MODELS}, got {model!r}."
+    raise ValueError(msg)
 
 
 @dataclass(frozen=True)
@@ -323,17 +329,22 @@ def sound_speed_profile(
     """
     z = np.asarray(depths, dtype=np.float64)
     if z.ndim != 1 or z.size < 2:
-        raise ValueError("'depths' must be a 1-D array of at least two depths.")
+        msg = "'depths' must be a 1-D array of at least two depths."
+        raise ValueError(msg)
     if np.any(z < 0.0) or not np.all(np.isfinite(z)):
-        raise ValueError("'depths' must be finite and non-negative.")
+        msg = "'depths' must be finite and non-negative."
+        raise ValueError(msg)
     if np.any(np.diff(z) <= 0.0):
-        raise ValueError("'depths' must be strictly increasing.")
+        msg = "'depths' must be strictly increasing."
+        raise ValueError(msg)
     temp = np.broadcast_to(np.asarray(temperatures, dtype=np.float64), z.shape)
     sal = np.broadcast_to(np.asarray(salinities, dtype=np.float64), z.shape)
     if not (np.all(np.isfinite(temp)) and np.all(np.isfinite(sal))):
-        raise ValueError("'temperatures' and 'salinities' must be finite.")
+        msg = "'temperatures' and 'salinities' must be finite."
+        raise ValueError(msg)
     if np.any(sal < 0.0):
-        raise ValueError("'salinities' must be non-negative.")
+        msg = "'salinities' must be non-negative."
+        raise ValueError(msg)
     key = model.strip().lower()
     lat = _finite(latitude, "latitude")
     if key in _DEPTH_MODELS:
@@ -348,7 +359,8 @@ def sound_speed_profile(
             else _del_grosso(temp, sal, pressure_bar * _KGCM2_PER_BAR)
         )
     else:
-        raise ValueError(f"'model' must be one of {_MODELS}, got {model!r}.")
+        msg = f"'model' must be one of {_MODELS}, got {model!r}."
+        raise ValueError(msg)
     c = np.asarray(c_any, dtype=np.float64)
     gradient = np.gradient(c, z)
     return SoundSpeedProfile(

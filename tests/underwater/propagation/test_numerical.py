@@ -366,7 +366,8 @@ def _arc_walk(rmax: float) -> tuple[float, float]:
         r += leg
         t += abs(arc(phi) - arc(phi_b)) / _BOUNCE_G
         phi = -phi_b  # the reflection itself
-    raise AssertionError("the arc walk did not reach the range")
+    msg = "the arc walk did not reach the range"
+    raise AssertionError(msg)
 
 
 def test_bouncing_ray_matches_the_exact_arc_through_every_reflection() -> None:

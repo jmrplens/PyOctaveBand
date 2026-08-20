@@ -125,7 +125,8 @@ def _layer_kind_and_thickness(layer: Any, total: float) -> tuple[str, float, str
         return "plate", float(layer.thickness), "Microperforated plate"
     if name == "MembraneLayer":
         return "membrane", _MEMBRANE_DRAW_FRACTION * total, "Membrane"
-    raise TypeError(f"Unsupported layer type: {name!r}.")
+    msg = f"Unsupported layer type: {name!r}."
+    raise TypeError(msg)
 
 
 def _stack_total_depth(layers: Sequence[Any]) -> float:
@@ -186,7 +187,8 @@ def plot_absorber_stack(
     _check_language(language)
     stack = list(layers) if isinstance(layers, Sequence) else [layers]
     if not stack:
-        raise ValueError("'layers' must contain at least one layer.")
+        msg = "'layers' must contain at least one layer."
+        raise ValueError(msg)
     total = _stack_total_depth(stack)
     if total <= 0.0:
         total = 0.05
@@ -387,10 +389,12 @@ def plot_slit_absorber_geometry(
     """
     _check_language(language)
     if slit_height <= 0.0 or lattice_step <= 0.0 or period <= 0.0:
-        raise ValueError("'slit_height', 'lattice_step' and 'period' must be positive.")
+        msg = "'slit_height', 'lattice_step' and 'period' must be positive."
+        raise ValueError(msg)
     chain = list(resonators) if isinstance(resonators, Sequence) else [resonators]
     if not chain:
-        raise ValueError("'resonators' must contain at least one resonator.")
+        msg = "'resonators' must contain at least one resonator."
+        raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
     n = len(chain)
@@ -486,16 +490,21 @@ def plot_qrd_geometry(
     _check_language(language)
     d = np.asarray(depths, dtype=np.float64)
     if d.ndim != 1 or d.size == 0:
-        raise ValueError("'depths' must be a non-empty 1-D sequence.")
+        msg = "'depths' must be a non-empty 1-D sequence."
+        raise ValueError(msg)
     if np.any(d < 0.0):
-        raise ValueError("'depths' must be non-negative.")
+        msg = "'depths' must be non-negative."
+        raise ValueError(msg)
     if well_width <= 0.0:
-        raise ValueError("'well_width' must be positive.")
+        msg = "'well_width' must be positive."
+        raise ValueError(msg)
     if periods < 1:
-        raise ValueError("'periods' must be >= 1.")
+        msg = "'periods' must be >= 1."
+        raise ValueError(msg)
     fin = well_width / 12.0 if fin_width is None else float(fin_width)
     if fin < 0.0:
-        raise ValueError("'fin_width' must be non-negative.")
+        msg = "'fin_width' must be non-negative."
+        raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
     n = int(d.size)
@@ -708,11 +717,14 @@ def plot_impedance_tube_geometry(
 
     _check_language(language)
     if spacing <= 0.0 or x1 <= spacing:
-        raise ValueError("'spacing' must be positive and 'x1' > 'spacing'.")
+        msg = "'spacing' must be positive and 'x1' > 'spacing'."
+        raise ValueError(msg)
     if diameter is not None and diameter <= 0.0:
-        raise ValueError("'diameter' must be positive when given.")
+        msg = "'diameter' must be positive when given."
+        raise ValueError(msg)
     if sample_thickness is not None and sample_thickness <= 0.0:
-        raise ValueError("'sample_thickness' must be positive when given.")
+        msg = "'sample_thickness' must be positive when given."
+        raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
     bore = _nominal_bore(diameter, 1.5 * spacing)
@@ -822,13 +834,14 @@ def plot_transmission_tube_geometry(
 
     _check_language(language)
     if min(l1, s1, l2, s2, thickness) <= 0.0:
-        raise ValueError("'l1', 's1', 'l2', 's2' and 'thickness' must be positive.")
+        msg = "'l1', 's1', 'l2', 's2' and 'thickness' must be positive."
+        raise ValueError(msg)
     if diameter is not None and diameter <= 0.0:
-        raise ValueError("'diameter' must be positive when given.")
+        msg = "'diameter' must be positive when given."
+        raise ValueError(msg)
     if l2 <= thickness:
-        raise ValueError(
-            "'l2' is measured from the front face and must exceed 'thickness'."
-        )
+        msg = "'l2' is measured from the front face and must exceed 'thickness'."
+        raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
     bore = _nominal_bore(diameter, 1.5 * max(s1, s2))
@@ -930,10 +943,11 @@ def plot_layered_absorber_geometry(
 ) -> Axes:
     """Stack drawing for a result that retained its ``layers``."""
     if result.layers is None:
-        raise ValueError(
+        msg = (
             "This result does not retain its layers; call "
             "plot_absorber_stack(layers) with the original layer sequence."
         )
+        raise ValueError(msg)
     return plot_absorber_stack(result.layers, ax=ax, language=language, **kwargs)
 
 
@@ -951,10 +965,11 @@ def plot_slit_absorber_result_geometry(
         or result.lattice_step is None
         or result.period is None
     ):
-        raise ValueError(
+        msg = (
             "This result does not retain its geometry; call "
             "plot_slit_absorber_geometry(...) with the original arguments."
         )
+        raise ValueError(msg)
     return plot_slit_absorber_geometry(
         result.resonators,
         ax=ax,
@@ -1034,13 +1049,16 @@ def plot_metadiffuser_panel_geometry(
     """
     _check_language(language)
     if depth <= 0.0 or period <= 0.0:
-        raise ValueError("'depth' and 'period' must be positive.")
+        msg = "'depth' and 'period' must be positive."
+        raise ValueError(msg)
     cells = list(wells)
     if len(cells) < 2:
-        raise ValueError("'wells' must contain at least two wells.")
+        msg = "'wells' must contain at least two wells."
+        raise ValueError(msg)
     for well in cells:
         if well is not None and well.slit_height >= period:
-            raise ValueError("every slit height must be smaller than the period.")
+            msg = "every slit height must be smaller than the period."
+            raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
     n_wells = len(cells)
@@ -1133,11 +1151,12 @@ def plot_metadiffuser_geometry(
 ) -> Axes:
     """Panel drawing for a metadiffuser result that retained its geometry."""
     if result.wells is None or result.depth is None or result.period is None:
-        raise ValueError(
+        msg = (
             "This result does not retain its geometry; call "
             "plot_metadiffuser_panel_geometry(...) with the original "
             "arguments."
         )
+        raise ValueError(msg)
     return plot_metadiffuser_panel_geometry(
         result.wells,
         ax=ax,
@@ -1157,10 +1176,11 @@ def plot_diffuser_geometry(
 ) -> Axes:
     """QRD well profile for a polar response that retained its geometry."""
     if result.depths is None or result.well_width is None:
-        raise ValueError(
+        msg = (
             "This response does not retain its well geometry; call "
             "plot_qrd_geometry(depths, well_width) instead."
         )
+        raise ValueError(msg)
     return plot_qrd_geometry(
         result.depths,
         result.well_width,
@@ -1180,10 +1200,11 @@ def plot_impedance_tube_result_geometry(
 ) -> Axes:
     """Tube drawing for an ISO 10534-2 result that retained its geometry."""
     if result.spacing is None or result.x1 is None:
-        raise ValueError(
+        msg = (
             "This result does not retain its tube geometry; call "
             "plot_impedance_tube_geometry(...) with the original arguments."
         )
+        raise ValueError(msg)
     return plot_impedance_tube_geometry(
         ax=ax,
         spacing=result.spacing,
@@ -1210,11 +1231,12 @@ def plot_transfer_matrix_geometry(
         or result.s2 is None
         or result.thickness is None
     ):
-        raise ValueError(
+        msg = (
             "This matrix does not retain its tube geometry; call "
             "plot_transmission_tube_geometry(...) with the original "
             "arguments."
         )
+        raise ValueError(msg)
     return plot_transmission_tube_geometry(
         ax=ax,
         l1=result.l1,
@@ -1259,11 +1281,11 @@ def plot_insitu_geometry(
     """
     _check_language(language)
     if mic_height <= 0.0 or source_height <= mic_height:
-        raise ValueError(
-            "'source_height' must exceed 'mic_height' and both be positive."
-        )
+        msg = "'source_height' must exceed 'mic_height' and both be positive."
+        raise ValueError(msg)
     if sampled_radius is not None and sampled_radius <= 0.0:
-        raise ValueError("'sampled_radius' must be positive when given.")
+        msg = "'sampled_radius' must be positive when given."
+        raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
     half = max(source_height, sampled_radius or 0.0) * 1.2
@@ -1344,10 +1366,11 @@ def plot_insitu_result_geometry(
 ) -> Axes:
     """Set-up drawing for a result that retained its geometry."""
     if result.source_height is None or result.mic_height is None:
-        raise ValueError(
+        msg = (
             "This result does not retain its set-up heights; call "
             "plot_insitu_geometry(source_height=..., mic_height=...)."
         )
+        raise ValueError(msg)
     return plot_insitu_geometry(
         ax=ax,
         source_height=result.source_height,
@@ -1386,9 +1409,8 @@ def plot_dynamic_stiffness_rig(
     """
     _check_language(language)
     if specimen_side <= 0.0 or specimen_thickness <= 0.0 or load_mass <= 0.0:
-        raise ValueError(
-            "'specimen_side', 'specimen_thickness' and 'load_mass' must be positive."
-        )
+        msg = "'specimen_side', 'specimen_thickness' and 'load_mass' must be positive."
+        raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
     side = float(specimen_side)
@@ -1474,11 +1496,14 @@ def plot_goniometer_geometry(
     """
     _check_language(language)
     if source_distance <= 0.0 or receiver_radius <= 0.0:
-        raise ValueError("'source_distance' and 'receiver_radius' must be positive.")
+        msg = "'source_distance' and 'receiver_radius' must be positive."
+        raise ValueError(msg)
     if not 0.0 < angular_step <= 90.0:
-        raise ValueError("'angular_step' must be in (0, 90] degrees.")
+        msg = "'angular_step' must be in (0, 90] degrees."
+        raise ValueError(msg)
     if sample_width <= 0.0:
-        raise ValueError("'sample_width' must be positive.")
+        msg = "'sample_width' must be positive."
+        raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
     angles = np.radians(np.arange(-90.0, 90.0 + 0.5 * angular_step, angular_step))

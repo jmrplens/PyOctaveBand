@@ -78,21 +78,26 @@ def _validate_response(
 ) -> NDArray[np.complex128]:
     arr = np.asarray(response)
     if arr.ndim != 1:
-        raise ValueError(f"'{name}' must be one-dimensional.")
+        msg = f"'{name}' must be one-dimensional."
+        raise ValueError(msg)
     if arr.size < _MIN_BINS:
-        raise ValueError(f"'{name}' must have at least {_MIN_BINS} frequency bins.")
+        msg = f"'{name}' must have at least {_MIN_BINS} frequency bins."
+        raise ValueError(msg)
     if not np.all(np.isfinite(arr)):
-        raise ValueError(f"'{name}' must be finite.")
+        msg = f"'{name}' must be finite."
+        raise ValueError(msg)
     out = arr.astype(np.complex128, copy=False)
     if not np.any(np.abs(out) > 0.0):
-        raise ValueError(f"'{name}' must not be identically zero.")
+        msg = f"'{name}' must not be identically zero."
+        raise ValueError(msg)
     return out
 
 
 def _validate_oversample(oversample: int) -> int:
     factor = int(oversample)
     if factor < 1:
-        raise ValueError("'oversample' must be a positive integer.")
+        msg = "'oversample' must be a positive integer."
+        raise ValueError(msg)
     return factor
 
 
@@ -193,7 +198,8 @@ def group_delay(
     resp = _validate_response(response)
     fs_v = float(fs)
     if not np.isfinite(fs_v) or fs_v <= 0.0:
-        raise ValueError("'fs' must be a positive, finite number.")
+        msg = "'fs' must be a positive, finite number."
+        raise ValueError(msg)
     phase = np.unwrap(np.angle(resp))
     domega = 2.0 * np.pi * (fs_v / 2.0) / (resp.size - 1)
     return np.asarray(-np.gradient(phase, domega), dtype=np.float64)
@@ -304,7 +310,8 @@ def phase_decomposition(
     resp = _validate_response(response)
     fs_v = float(fs)
     if not np.isfinite(fs_v) or fs_v <= 0.0:
-        raise ValueError("'fs' must be a positive, finite number.")
+        msg = "'fs' must be a positive, finite number."
+        raise ValueError(msg)
     reconstructed = minimum_phase(resp, oversample=oversample)
     measured = np.unwrap(np.angle(resp))
     measured = measured - measured[0]

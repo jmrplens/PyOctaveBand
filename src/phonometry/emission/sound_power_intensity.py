@@ -164,11 +164,12 @@ def _table2_s(nominal: int, band_type: BandType) -> float:
             6300: 2.5,
         }
     if nominal not in table:
-        raise ValueError(
+        msg = (
             f"No ISO 9614-2 Table 2 standard deviation for {nominal} Hz "
             f"({band_type}); expected a nominal band centre in the qualified "
             "range (Table 2)."
         )
+        raise ValueError(msg)
     return table[nominal]
 
 
@@ -280,9 +281,8 @@ class SoundPowerIntensityResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.iso9614 import render_intensity_power_report
 
         return render_intensity_power_report(
@@ -303,10 +303,11 @@ def _as_2d(name: str, arr: np.ndarray, n_seg: int, n_bands: int) -> np.ndarray:
     if a.shape == (1, n_seg) and n_bands != n_seg:
         a = a.T  # a 1D (N_seg,) input arrives as (1, N_seg)
     if a.shape != (n_seg, n_bands):
-        raise ValueError(
+        msg = (
             f"'{name}' must have shape ({n_seg}, {n_bands}) matching "
             f"'normal_intensity', got {a.shape}."
         )
+        raise ValueError(msg)
     return a
 
 
@@ -322,21 +323,24 @@ def _validate_scan(
     areas as ``(N_seg,)``.
     """
     if band_type not in ("octave", "third"):
-        raise ValueError("'band_type' must be 'octave' or 'third'.")
+        msg = "'band_type' must be 'octave' or 'third'."
+        raise ValueError(msg)
 
     intensity = np.atleast_2d(np.asarray(normal_intensity, dtype=np.float64))
     seg = np.asarray(areas, dtype=np.float64)
     if seg.ndim != 1:
-        raise ValueError("'areas' must be a 1D array of segment areas.")
+        msg = "'areas' must be a 1D array of segment areas."
+        raise ValueError(msg)
     n_seg = seg.shape[0]
     # A 1D (N_seg,) intensity arrives from atleast_2d as (1, N_seg): transpose.
     if intensity.shape == (1, n_seg) and n_seg != 1:
         intensity = intensity.T
     if intensity.shape[0] != n_seg:
-        raise ValueError(
+        msg = (
             f"'normal_intensity' first axis ({intensity.shape[0]}) must match "
             f"the number of segment 'areas' ({n_seg})."
         )
+        raise ValueError(msg)
     if frequencies is not None and np.asarray(frequencies).shape != (
         intensity.shape[1],
     ):
@@ -344,7 +348,8 @@ def _validate_scan(
         # rather than an IndexError from the Table 2 lookup during classification.
         raise ValueError(_FREQUENCIES_BAND_COUNT_MSG)
     if np.any(seg <= 0.0):
-        raise ValueError("All segment 'areas' must be positive.")
+        msg = "All segment 'areas' must be positive."
+        raise ValueError(msg)
     if n_seg < 4:
         warnings.warn(
             f"Only {n_seg} segment(s); ISO 9614-2:1996 clause 8.2 requires at "
@@ -562,10 +567,11 @@ def _classify(
         s_sur = s_eng
     else:
         if frequencies is None:
-            raise ValueError(
+            msg = (
                 "The achieved grade needs the criterion-3 limit s: provide "
                 "'frequencies' (Table 2 lookup) or 'repeatability_limit'."
             )
+            raise ValueError(msg)
         nominal = [round(float(f)) for f in np.asarray(frequencies)]
         s_eng = np.array([_table2_s(f, band_type) for f in nominal], dtype=np.float64)
         s_sur = np.full(n_bands, _S_SURVEY, dtype=np.float64)
@@ -766,16 +772,18 @@ def _check_report_bands(
     if residual_index is not None:
         index = np.atleast_1d(np.asarray(residual_index, dtype=np.float64))
         if index.size not in (1, n_bands):
-            raise ValueError(
+            msg = (
                 f"'residual_index' must be a scalar or span the {n_bands} "
                 f"bands of the determination; got {index.size} values."
             )
+            raise ValueError(msg)
     for name, values in arrays:
         if values.shape != (n_bands,):
-            raise ValueError(
+            msg = (
                 f"'{name}' must span the {n_bands} bands of the determination; "
                 f"got shape {values.shape}."
             )
+            raise ValueError(msg)
 
 
 @dataclass(frozen=True)
@@ -894,9 +902,8 @@ class PrecisionIntensityResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         n_bands = int(np.asarray(self.sound_power_level).size)
         _check_report_bands(indicators, criteria, residual_index, n_bands)
 
@@ -955,13 +962,15 @@ def precision_field_indicators(
     i_n = np.atleast_2d(np.asarray(segment_intensity, dtype=np.float64))
     lp = np.atleast_2d(np.asarray(segment_pressure_levels, dtype=np.float64))
     if i_n.shape != lp.shape:
-        raise ValueError(
+        msg = (
             "'segment_intensity' and 'segment_pressure_levels' must have the "
             f"same shape, got {i_n.shape} and {lp.shape}."
         )
+        raise ValueError(msg)
     n_seg = i_n.shape[0]
     if n_seg < 2:
-        raise ValueError("At least two segments are required for the indicators.")
+        msg = "At least two segments are required for the indicators."
+        raise ValueError(msg)
 
     lp_bar = energy_mean(lp, axis=0)  # Eq. B.4
     li_unsigned = 10.0 * np.log10(np.mean(np.abs(i_n), axis=0) / _I0)  # Eq. B.5
@@ -985,12 +994,12 @@ def precision_field_indicators(
     if time_window_intensity is not None:
         win = np.atleast_2d(np.asarray(time_window_intensity, dtype=np.float64))
         if win.shape[-1] != i_n.shape[-1]:
-            raise ValueError(
-                "'time_window_intensity' last axis must match the number of bands."
-            )
+            msg = "'time_window_intensity' last axis must match the number of bands."
+            raise ValueError(msg)
         m = win.shape[0]
         if m < 2:
-            raise ValueError("At least two time windows are required for FT.")
+            msg = "At least two time windows are required for FT."
+            raise ValueError(msg)
         mean_t = np.mean(win, axis=0)
         with np.errstate(divide="ignore", invalid="ignore"):
             ft = np.asarray(
@@ -1014,10 +1023,11 @@ def _sigma_r0_9614_3(nominal: int) -> float:
         return 1.0
     if nominal == 6300:
         return 2.0
-    raise ValueError(
+    msg = (
         f"No ISO 9614-3:2002 Table 1 sigma_R0 for {nominal} Hz; expected a "
         "nominal one-third-octave mid-band from 50 Hz to 6300 Hz."
     )
+    raise ValueError(msg)
 
 
 def precision_qualification(
@@ -1072,10 +1082,11 @@ def precision_qualification(
             nominal = [round(float(f)) for f in np.asarray(frequencies)]
             s = np.array([_sigma_r0_9614_3(f) for f in nominal], dtype=np.float64)
         else:
-            raise ValueError(
+            msg = (
                 "Criterion 1 needs the limit s: provide 'frequencies' (Table 1) "
                 "or 'repeatability_limit'."
             )
+            raise ValueError(msg)
         criterion_1 = np.asarray(np.abs(l1 - l2) <= s / 2.0, dtype=bool)
 
     # Criterion 2: Ld >= F_pIn(signed), Ld = delta_pI0 - K.
@@ -1172,7 +1183,8 @@ def sound_power_intensity_precision(
     raw_intensity = np.asarray(partial_intensity, dtype=np.float64)
     seg = np.asarray(areas, dtype=np.float64)
     if seg.ndim != 1:
-        raise ValueError("'areas' must be a 1D array of partial surface areas.")
+        msg = "'areas' must be a 1D array of partial surface areas."
+        raise ValueError(msg)
     n_seg = seg.shape[0]
     # A 1-D input is unambiguously ``(N,)`` segments with one band -> ``(N, 1)``;
     # a 2-D input is taken as ``(segments, bands)`` as given. Keying off the
@@ -1183,16 +1195,20 @@ def sound_power_intensity_precision(
     else:
         intensity = np.atleast_2d(raw_intensity)
     if intensity.shape[0] != n_seg:
-        raise ValueError(
+        msg = (
             f"'partial_intensity' first axis ({intensity.shape[0]}) must match "
             f"the number of 'areas' ({n_seg})."
         )
+        raise ValueError(msg)
     if np.any(seg <= 0.0):
-        raise ValueError("All 'areas' must be positive.")
+        msg = "All 'areas' must be positive."
+        raise ValueError(msg)
     if temperature <= -273.15:
-        raise ValueError("'temperature' must be above -273,15 degrees Celsius.")
+        msg = "'temperature' must be above -273,15 degrees Celsius."
+        raise ValueError(msg)
     if barometric_pressure <= 0.0:
-        raise ValueError("'barometric_pressure' must be positive (Pa).")
+        msg = "'barometric_pressure' must be positive (Pa)."
+        raise ValueError(msg)
     n_bands = intensity.shape[1]
     if frequencies is not None and np.asarray(frequencies).shape != (n_bands,):
         raise ValueError(_FREQUENCIES_BAND_COUNT_MSG)

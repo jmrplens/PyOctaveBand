@@ -558,16 +558,19 @@ def roughness_ecma(
     asper with the tabulated c_R of Formula (104)).
     """
     if field not in ("free", "diffuse"):
-        raise ValueError("field must be 'free' or 'diffuse'")
+        msg = "field must be 'free' or 'diffuse'"
+        raise ValueError(msg)
     fs = resolve_fs(signal_in, fs, name="signal_in")
     x = apply_calibration(
         signal_in, require_1d_signal(_typesignal(np.asarray(signal_in)))
     )
     if x.size == 0:
-        raise ValueError("signal must not be empty")
+        msg = "signal must not be empty"
+        raise ValueError(msg)
     fs = float(fs)
     if fs <= 0.0:
-        raise ValueError("fs must be positive")
+        msg = "fs must be positive"
+        raise ValueError(msg)
     if fs != _FS:
         x = signal.resample(x, round(x.size * _FS / fs))
 

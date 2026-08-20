@@ -96,7 +96,8 @@ def transmission_loss_from_coefficient(tau: ArrayLike) -> np.ndarray:
     """
     t = np.asarray(tau, dtype=np.float64)
     if np.any(t <= 0.0):
-        raise ValueError("'tau' must be positive.")
+        msg = "'tau' must be positive."
+        raise ValueError(msg)
     return np.asarray(-10.0 * np.log10(t), dtype=np.float64)
 
 
@@ -196,9 +197,11 @@ def slit_transmission_coefficient(
     position = require_choice(position, "position", tuple(_POSITION_N))
     f = np.atleast_1d(np.asarray(frequency, dtype=np.float64))
     if f.ndim != 1 or f.size == 0:
-        raise ValueError("'frequency' must be a non-empty 1-D array.")
+        msg = "'frequency' must be a non-empty 1-D array."
+        raise ValueError(msg)
     if np.any(f <= 0.0):
-        raise ValueError("'frequency' must be positive.")
+        msg = "'frequency' must be positive."
+        raise ValueError(msg)
 
     m = _FIELD_M[field]
     n = _POSITION_N[position]
@@ -261,7 +264,8 @@ def slit_resonance_frequencies(
     w = require_positive(width, "width")
     c0 = require_positive(speed_of_sound, "speed_of_sound")
     if orders < 1:
-        raise ValueError("'orders' must be at least 1.")
+        msg = "'orders' must be at least 1."
+        raise ValueError(msg)
     out = np.empty(orders, dtype=np.float64)
     for i in range(orders):
         z = i + 1
@@ -272,11 +276,12 @@ def slit_resonance_frequencies(
             e = (np.log(8.0 / k_big) - _EULER_GAMMA) / np.pi
             effective_depth = d + 2.0 * e * w
             if effective_depth <= 0.0:
-                raise ValueError(
+                msg = (
                     "slit too wide relative to its depth: the effective depth "
                     "d + 2e is non-positive, so no resonance exists (the "
                     "Gomperts slit model requires 'width' << wavelength)."
                 )
+                raise ValueError(msg)
             f_new = z * c0 / (2.0 * effective_depth)
             if abs(f_new - f) < 1e-9 * f:
                 f = f_new
@@ -307,9 +312,11 @@ def circular_aperture_transmission_coefficient(
     c0 = require_positive(speed_of_sound, "speed_of_sound")
     f = np.atleast_1d(np.asarray(frequency, dtype=np.float64))
     if f.ndim != 1 or f.size == 0:
-        raise ValueError("'frequency' must be a non-empty 1-D array.")
+        msg = "'frequency' must be a non-empty 1-D array."
+        raise ValueError(msg)
     if np.any(f <= 0.0):
-        raise ValueError("'frequency' must be positive.")
+        msg = "'frequency' must be positive."
+        raise ValueError(msg)
 
     k = 2.0 * np.pi * f / c0
     x = 2.0 * k * a
@@ -355,20 +362,25 @@ def composite_transmission_loss(
     """
     s = np.atleast_1d(np.asarray(areas, dtype=np.float64))
     if s.ndim != 1 or s.size == 0:
-        raise ValueError("'areas' must be a non-empty 1-D array.")
+        msg = "'areas' must be a non-empty 1-D array."
+        raise ValueError(msg)
     if np.any(s <= 0.0) or not np.all(np.isfinite(s)):
-        raise ValueError("'areas' must be positive and finite.")
+        msg = "'areas' must be positive and finite."
+        raise ValueError(msg)
     r = np.asarray(reduction_indices, dtype=np.float64)
     if r.ndim == 1:
         if r.shape[0] != s.shape[0]:
-            raise ValueError("'reduction_indices' length must match 'areas'.")
+            msg = "'reduction_indices' length must match 'areas'."
+            raise ValueError(msg)
         tau = 10.0 ** (-r / 10.0)
         total_1d = float(np.sum(s * tau) / np.sum(s))
         return np.asarray(-10.0 * np.log10(total_1d), dtype=np.float64)
     if r.ndim == 2:
         if r.shape[0] != s.shape[0]:
-            raise ValueError("'reduction_indices' first axis must match 'areas'.")
+            msg = "'reduction_indices' first axis must match 'areas'."
+            raise ValueError(msg)
         tau = 10.0 ** (-r / 10.0)
         total_2d = np.sum(s[:, None] * tau, axis=0) / np.sum(s)
         return np.asarray(-10.0 * np.log10(total_2d), dtype=np.float64)
-    raise ValueError("'reduction_indices' must be 1-D or 2-D.")
+    msg = "'reduction_indices' must be 1-D or 2-D."
+    raise ValueError(msg)

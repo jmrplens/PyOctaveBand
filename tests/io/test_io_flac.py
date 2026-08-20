@@ -198,7 +198,8 @@ def test_flac_target_without_the_extra_names_it(
 
     def blocked(name: str, *args: object, **kwargs: object) -> object:
         if name.split(".")[0] == "soundfile":
-            raise ImportError("blocked for the test")
+            msg = "blocked for the test"
+            raise ImportError(msg)
         return real_import(name, *args, **kwargs)  # type: ignore[arg-type]
 
     monkeypatch.setattr(builtins, "__import__", blocked)

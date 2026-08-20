@@ -265,7 +265,8 @@ def correlation(
     is_auto = y is None
     ya = xa if y is None else _validate_signal(y, "y", context="a correlation estimate")
     if xa.size != ya.size:
-        raise ValueError("'x' and 'y' must have the same length.")
+        msg = "'x' and 'y' must have the same length."
+        raise ValueError(msg)
     if isinstance(x, Signal) or isinstance(y, Signal):
         fs = resolve_pair_fs(x, x if y is None else y, fs)
     elif fs is None:
@@ -281,9 +282,8 @@ def correlation(
     if max_lag is not None:
         m = round(_positive(max_lag, "max_lag") * fs_v)
         if not 1 <= m <= n - 1:
-            raise ValueError(
-                "'max_lag' must be at least one sample and shorter than the record."
-            )
+            msg = "'max_lag' must be at least one sample and shorter than the record."
+            raise ValueError(msg)
 
     lag_samples = np.arange(-(n - 1), n, dtype=np.float64)
     coeff = _coefficient_correlation(xa, ya)
@@ -294,9 +294,8 @@ def correlation(
     elif normalization == "unbiased":
         values = _linear_correlation(xa, ya) / (n - np.abs(lag_samples))
     else:
-        raise ValueError(
-            "'normalization' must be 'biased', 'unbiased' or 'coefficient'."
-        )
+        msg = "'normalization' must be 'biased', 'unbiased' or 'coefficient'."
+        raise ValueError(msg)
 
     keep = np.abs(lag_samples) <= m
     return CorrelationResult(
@@ -348,7 +347,8 @@ def correlation_random_error(
     t = _positive(duration, "duration")
     rho = float(coefficient)
     if not np.isfinite(rho) or abs(rho) > 1.0:
-        raise ValueError("'coefficient' must be in [-1, 1].")
+        msg = "'coefficient' must be in [-1, 1]."
+        raise ValueError(msg)
     # IEEE division carries rho = 0 to the correct limit (an infinite
     # error) without a floating-point equality branch.
     with np.errstate(divide="ignore"):
@@ -444,10 +444,12 @@ def _refine_peak(
 
 def _validate_refinement(interpolation: str, upsample: int) -> int:
     if interpolation not in ("parabolic", "none"):
-        raise ValueError("'interpolation' must be 'parabolic' or 'none'.")
+        msg = "'interpolation' must be 'parabolic' or 'none'."
+        raise ValueError(msg)
     factor = int(upsample)
     if factor < 1:
-        raise ValueError("'upsample' must be a positive integer.")
+        msg = "'upsample' must be a positive integer."
+        raise ValueError(msg)
     return factor
 
 
@@ -541,7 +543,8 @@ def _gcc_weight(
         coherence = _coherence_from_spectra(gxy, gxx, gyy)
         denom = mag * (1.0 - coherence)
         return np.divide(coherence, denom, out=np.zeros_like(denom), where=denom > 0.0)
-    raise ValueError("'weighting' must be 'none', 'roth', 'scot', 'phat' or 'ml'.")
+    msg = "'weighting' must be 'none', 'roth', 'scot', 'phat' or 'ml'."
+    raise ValueError(msg)
 
 
 def _delay_error(
@@ -620,9 +623,8 @@ def _direct_tde_curve(
     if max_delay is not None:
         m = round(_positive(max_delay, "max_delay") * fs)
         if not 1 <= m <= n - 1:
-            raise ValueError(
-                "'max_delay' must be at least one sample and shorter than the record."
-            )
+            msg = "'max_delay' must be at least one sample and shorter than the record."
+            raise ValueError(msg)
     curve = _coefficient_correlation(xa, ya)
     lag_samples = np.arange(-(n - 1), n, dtype=np.float64)
     keep = np.abs(lag_samples) <= m
@@ -646,10 +648,11 @@ def _gcc_curve(
         # Knapp & Carter's Eq. 45b weight exists only for |γ|² < 1; a
         # single-segment coherence estimate is identically one, so the
         # weight would be floating-point rounding noise.
-        raise ValueError(
+        msg = (
             "the 'ml' weighting needs an averaged coherence estimate: "
             "use at least two Welch segments (reduce 'nperseg')."
         )
+        raise ValueError(msg)
     _freqs, gxy, gxx, gyy = _welch_pair(xa, ya, fs, seg, nov, window)
     psi = _gcc_weight(weighting, gxy, gxx, gyy)
     r = np.fft.irfft(psi * gxy, n=seg)
@@ -658,11 +661,12 @@ def _gcc_curve(
     if max_delay is not None:
         m = round(_positive(max_delay, "max_delay") * fs)
         if not 1 <= m <= (seg - 1) // 2:
-            raise ValueError(
+            msg = (
                 "'max_delay' must be at least one sample and shorter than "
                 "half the segment length (increase 'nperseg' for longer "
                 "delays)."
             )
+            raise ValueError(msg)
         keep = np.abs(lag_samples) <= m
         lag_samples = lag_samples[keep]
         curve = curve[keep]
@@ -759,11 +763,13 @@ def time_delay(
     ya = _validate_signal(y, "y", context="a time-delay estimate")
     fs = resolve_pair_fs(x, y, fs)
     if xa.size != ya.size:
-        raise ValueError("'x' and 'y' must have the same length.")
+        msg = "'x' and 'y' must have the same length."
+        raise ValueError(msg)
     if float(np.std(xa)) <= 0.0 or float(np.std(ya)) <= 0.0:
-        raise ValueError(
+        msg = (
             "'x' and 'y' must not be constant: there is no correlation peak to locate."
         )
+        raise ValueError(msg)
     fs_v = _positive(fs, "fs")
     factor = _validate_refinement(interpolation, upsample)
 
@@ -798,7 +804,8 @@ def time_delay(
         if peak_mag > 0.0:
             curve = curve / peak_mag
     else:
-        raise ValueError("'method' must be 'gcc', 'direct' or 'phase'.")
+        msg = "'method' must be 'gcc', 'direct' or 'phase'."
+        raise ValueError(msg)
 
     rho, std, interval = _delay_error(
         xa, ya, float(delay_samples), signal_bandwidth, fs_v
@@ -953,7 +960,8 @@ def align_impulse_responses(
     ira = _validate_signal(ir, "ir", context=_DELAY_CONTEXT)
     refa = _validate_signal(reference, "reference", context=_DELAY_CONTEXT)
     if ira.size != refa.size:
-        raise ValueError("'ir' and 'reference' must have the same length.")
+        msg = "'ir' and 'reference' must have the same length."
+        raise ValueError(msg)
     fs_v = _positive(
         resolve_pair_fs(ir, reference, fs, names=("ir", "reference")), "fs"
     )

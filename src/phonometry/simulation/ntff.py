@@ -107,26 +107,30 @@ class ContourPhasors:
     def __post_init__(self) -> None:
         """Check positive scalars, matched shapes and finite samples; coerce dtypes."""
         if not np.isfinite(self.frequency) or self.frequency <= 0.0:
-            raise ValueError("frequency must be positive and finite")
+            msg = "frequency must be positive and finite"
+            raise ValueError(msg)
         if not np.isfinite(self.segment) or self.segment <= 0.0:
-            raise ValueError("segment must be positive and finite")
+            msg = "segment must be positive and finite"
+            raise ValueError(msg)
         pos = np.asarray(self.positions, dtype=np.float64)
         nrm = np.asarray(self.normals, dtype=np.float64)
         p = np.asarray(self.pressure, dtype=np.complex128)
         v = np.asarray(self.normal_velocity, dtype=np.complex128)
         n = p.shape[0] if p.ndim == 1 else -1
         if n < 1 or pos.shape != (n, 2) or nrm.shape != (n, 2) or v.shape != (n,):
-            raise ValueError(
+            msg = (
                 "positions and normals must have shape (n, 2) and pressure "
                 "and normal_velocity shape (n,) for the same n >= 1"
             )
+            raise ValueError(msg)
         if not (
             np.all(np.isfinite(pos))
             and np.all(np.isfinite(nrm))
             and np.all(np.isfinite(p))
             and np.all(np.isfinite(v))
         ):
-            raise ValueError("contour phasor arrays must be finite")
+            msg = "contour phasor arrays must be finite"
+            raise ValueError(msg)
         # Store the converted arrays so hand-built instances (lists, mixed
         # dtypes) behave exactly like probe-built ones downstream.
         object.__setattr__(self, "positions", pos)
@@ -143,12 +147,14 @@ class ContourPhasors:
         (incident-only) phasors. Geometry and frequency must match.
         """
         if not np.isclose(self.frequency, reference.frequency):
-            raise ValueError("cannot subtract phasors at different frequencies")
+            msg = "cannot subtract phasors at different frequencies"
+            raise ValueError(msg)
         if self.positions.shape != reference.positions.shape or not (
             np.allclose(self.positions, reference.positions)
             and np.allclose(self.normals, reference.normals)
         ):
-            raise ValueError("cannot subtract phasors sampled on different contours")
+            msg = "cannot subtract phasors sampled on different contours"
+            raise ValueError(msg)
         return ContourPhasors(
             frequency=self.frequency,
             positions=self.positions,
@@ -231,23 +237,26 @@ def far_field_from_contour(
         an observation circle that does not clear the contour.
     """
     if not isinstance(contour, ContourPhasors):
-        raise TypeError("contour must be a ContourPhasors")
+        msg = "contour must be a ContourPhasors"
+        raise TypeError(msg)
     ang = np.atleast_1d(np.asarray(angles, dtype=np.float64))
     if ang.ndim != 1 or ang.size == 0 or not np.all(np.isfinite(ang)):
-        raise ValueError(
-            "angles must be a non-empty 1D sequence of finite values in degrees"
-        )
+        msg = "angles must be a non-empty 1D sequence of finite values in degrees"
+        raise ValueError(msg)
     c = float(speed_of_sound)
     rho = float(air_density)
     if not np.isfinite(c) or c <= 0.0:
-        raise ValueError("speed_of_sound must be positive and finite")
+        msg = "speed_of_sound must be positive and finite"
+        raise ValueError(msg)
     if not np.isfinite(rho) or rho <= 0.0:
-        raise ValueError("air_density must be positive and finite")
+        msg = "air_density must be positive and finite"
+        raise ValueError(msg)
     omega = 2.0 * np.pi * contour.frequency
     k = omega / c
     ox, oy = float(origin[0]), float(origin[1])
     if not (np.isfinite(ox) and np.isfinite(oy)):
-        raise ValueError("origin must be finite")
+        msg = "origin must be finite"
+        raise ValueError(msg)
     pos = contour.positions - np.asarray([ox, oy])
     rad = np.radians(ang)
     u = np.stack((np.cos(rad), np.sin(rad)), axis=1)  # (A, 2)
@@ -264,13 +273,15 @@ def far_field_from_contour(
         )
     d = float(distance)
     if not np.isfinite(d) or d <= 0.0:
-        raise ValueError("distance must be positive and finite")
+        msg = "distance must be positive and finite"
+        raise ValueError(msg)
     reach = float(np.max(np.hypot(pos[:, 0], pos[:, 1])))
     if d <= reach:
-        raise ValueError(
+        msg = (
             f"distance {d:g} m does not clear the contour (farthest sample "
             f"{reach:g} m from origin); the representation is exterior only"
         )
+        raise ValueError(msg)
     obs = d * u  # (A, 2)
     sep = obs[:, np.newaxis, :] - pos[np.newaxis, :, :]  # (A, n, 2)
     dist = np.hypot(sep[..., 0], sep[..., 1])  # (A, n)

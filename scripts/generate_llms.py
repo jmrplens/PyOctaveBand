@@ -153,10 +153,11 @@ def _conformance_counts() -> tuple[int, int, int]:
         source,
     )
     if match is None:
-        raise SystemExit(
+        msg = (
             "docs/CONFORMANCE.md: headline not found. Regenerate it with "
             "`make conformance`."
         )
+        raise SystemExit(msg)
     return int(match[1]), int(match[2]), int(match[3])
 
 
@@ -562,10 +563,11 @@ def build_llms_txt(version: str, shard_slugs: tuple[str, ...]) -> str:
         if entry is None:
             # These are listed by hand, so an unresolvable one is always a
             # bug; the About page went missing this way once, silently.
-            raise SystemExit(
+            msg = (
                 f"generate_llms.py: START_ROUTES names {route}, "
                 "which has no mirror page"
             )
+            raise SystemExit(msg)
         lines.append(entry)
     lines += [
         f"- [Guides index]({SITE_URL}/start/guides/)",

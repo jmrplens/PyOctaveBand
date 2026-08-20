@@ -85,7 +85,8 @@ def erb_bandwidth(frequency: ArrayLike) -> np.ndarray | float:
     """
     f = np.asarray(frequency, dtype=np.float64)
     if not np.all(np.isfinite(f)) or np.any(f < 0.0):
-        raise ValueError("'frequency' must be non-negative and finite.")
+        msg = "'frequency' must be non-negative and finite."
+        raise ValueError(msg)
     return as_float_or_array(ERB_C1 * (ERB_C2 * f + 1.0))
 
 
@@ -102,7 +103,8 @@ def cam_from_frequency(frequency: ArrayLike) -> np.ndarray | float:
     """
     f = np.asarray(frequency, dtype=np.float64)
     if not np.all(np.isfinite(f)) or np.any(f < 0.0):
-        raise ValueError("'frequency' must be non-negative and finite.")
+        msg = "'frequency' must be non-negative and finite."
+        raise ValueError(msg)
     return as_float_or_array(CAM_C * np.log10(ERB_C2 * f + 1.0))
 
 
@@ -116,5 +118,6 @@ def frequency_from_cam(cam: ArrayLike) -> np.ndarray | float:
     """
     i = np.asarray(cam, dtype=np.float64)
     if not np.all(np.isfinite(i)) or np.any(i < 0.0):
-        raise ValueError("'cam' must be non-negative and finite.")
+        msg = "'cam' must be non-negative and finite."
+        raise ValueError(msg)
     return as_float_or_array((np.power(10.0, i / CAM_C) - 1.0) / ERB_C2)

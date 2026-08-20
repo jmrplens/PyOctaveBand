@@ -109,14 +109,17 @@ def _require_shear_modulus(value: complex, name: str) -> complex:
     r"""Validate a complex shear modulus :math:`N = N'(1 + j \eta)`."""
     n = complex(value)
     if not np.isfinite(n):
-        raise ValueError(f"'{name}' must be finite.")
+        msg = f"'{name}' must be finite."
+        raise ValueError(msg)
     if n.real <= 0.0:
-        raise ValueError(f"'{name}' must have a positive real part.")
+        msg = f"'{name}' must have a positive real part."
+        raise ValueError(msg)
     if n.imag < 0.0:
-        raise ValueError(
+        msg = (
             f"'{name}' must have a non-negative imaginary part in the "
             "e^{+j w t} convention (a lossy frame has Im(N) >= 0)."
         )
+        raise ValueError(msg)
     return n
 
 
@@ -124,7 +127,8 @@ def _require_poisson_ratio(value: float) -> float:
     """Validate a Poisson coefficient of an isotropic frame."""
     nu = float(value)
     if not -1.0 < nu < 0.5:
-        raise ValueError("'poisson_ratio' must satisfy -1 < nu < 0,5.")
+        msg = "'poisson_ratio' must satisfy -1 < nu < 0,5."
+        raise ValueError(msg)
     return nu
 
 
@@ -423,7 +427,8 @@ def biot_waves(
         raise ValueError(_POROSITY_MESSAGE)
     alpha_inf = require_positive(tortuosity, "tortuosity")
     if alpha_inf < 1.0:
-        raise ValueError("'tortuosity' must be >= 1.")
+        msg = "'tortuosity' must be >= 1."
+        raise ValueError(msg)
     rho1 = require_positive(frame_density, "frame_density")
     n_mod = _require_shear_modulus(shear_modulus, "shear_modulus")
     nu = _require_poisson_ratio(poisson_ratio)
@@ -785,12 +790,13 @@ def _block_count(attenuation: float, owner: str) -> int:
     """Blocks needed to keep *attenuation* nepers under the budget."""
     pieces = max(1, int(np.ceil(attenuation / _BLOCK_NEPERS)))
     if pieces > _MAX_BLOCKS:
-        raise ValueError(
+        msg = (
             f"{owner} attenuates by {attenuation:.0f} nepers, which the "
             f"global-matrix assembly cannot resolve in {_MAX_BLOCKS} blocks. "
             "Reduce the thickness, or, for a frame with no stiffness, model "
             "the material with limp_frame() instead of a Biot layer."
         )
+        raise ValueError(msg)
     return pieces
 
 

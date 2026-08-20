@@ -54,9 +54,8 @@ def _line_by_label(ax, needle: str):
     for line in ax.lines:
         if needle in line.get_label():
             return line
-    raise AssertionError(
-        f"no line labelled with {needle!r}; got {[ln.get_label() for ln in ax.lines]}"
-    )
+    msg = f"no line labelled with {needle!r}; got {[ln.get_label() for ln in ax.lines]}"
+    raise AssertionError(msg)
 
 
 # ---------------------------------------------------------------------------

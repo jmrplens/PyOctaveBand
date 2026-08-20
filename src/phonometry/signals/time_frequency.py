@@ -360,13 +360,15 @@ def zoom_fft(
     lo = float(f_min)
     hi = float(f_max)
     if not 0.0 <= lo < hi <= fs_v / 2.0:
-        raise ValueError("The zoom band must satisfy 0 <= f_min < f_max <= fs/2.")
+        msg = "The zoom band must satisfy 0 <= f_min < f_max <= fs/2."
+        raise ValueError(msg)
     if n_points is None:
         m = int(np.ceil((hi - lo) * xa.size / fs_v)) + 1
     else:
         m = int(n_points)
     if m < 2:
-        raise ValueError("'n_points' must be at least 2.")
+        msg = "'n_points' must be at least 2."
+        raise ValueError(msg)
 
     w = _taper(window, xa.size)
     coeffs = np.asarray(

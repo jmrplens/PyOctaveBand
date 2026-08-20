@@ -178,21 +178,23 @@ def _coerce(
             elif float(c) in values:
                 out.append(float(values[float(c)]))
             else:
-                raise ValueError(
-                    f"{name} mapping is missing band {c} Hz; expected keys {centers}"
-                )
+                msg = f"{name} mapping is missing band {c} Hz; expected keys {centers}"
+                raise ValueError(msg)
     else:
         arr = np.asarray(values, dtype=np.float64)
         if arr.ndim != 1:
-            raise ValueError(f"{name} must be 1-D, got shape {arr.shape}.")
+            msg = f"{name} must be 1-D, got shape {arr.shape}."
+            raise ValueError(msg)
         out = arr.tolist()
         if len(out) != len(centers):
-            raise ValueError(
+            msg = (
                 f"{name} must have {len(centers)} values for bands {centers}, "
                 f"got {len(out)}"
             )
+            raise ValueError(msg)
     if not all(math.isfinite(v) for v in out):
-        raise ValueError(f"{name} values must all be finite (no NaN or inf).")
+        msg = f"{name} values must all be finite (no NaN or inf)."
+        raise ValueError(msg)
     return out
 
 
@@ -307,9 +309,8 @@ class AbsorptionRatingResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iso11654 import render_iso11654_report
 
         return render_iso11654_report(
@@ -338,7 +339,8 @@ def practical_absorption_coefficient(
     """
     values = _coerce(third_octave_alpha_s, THIRD_OCTAVE_BANDS, "third_octave_alpha_s")
     if any(v < 0.0 for v in values):
-        raise ValueError("alpha_s values must be non-negative")
+        msg = "alpha_s values must be non-negative"
+        raise ValueError(msg)
     alpha_p = [
         _practical_round((values[3 * i] + values[3 * i + 1] + values[3 * i + 2]) / 3.0)
         for i in range(len(OCTAVE_BANDS))

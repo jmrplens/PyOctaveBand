@@ -54,15 +54,17 @@ def _validate_pair(
     xa = np.asarray(x, dtype=np.float64)
     ya = np.asarray(y, dtype=np.float64)
     if xa.ndim != 1 or ya.ndim != 1:
-        raise ValueError("'x' and 'y' must be one-dimensional.")
+        msg = "'x' and 'y' must be one-dimensional."
+        raise ValueError(msg)
     if xa.size != ya.size:
-        raise ValueError("'x' and 'y' must have the same length.")
+        msg = "'x' and 'y' must have the same length."
+        raise ValueError(msg)
     if xa.size < _MIN_SAMPLES:
-        raise ValueError(
-            f"Signals too short for a spectral estimate: {xa.size} samples."
-        )
+        msg = f"Signals too short for a spectral estimate: {xa.size} samples."
+        raise ValueError(msg)
     if not (np.all(np.isfinite(xa)) and np.all(np.isfinite(ya))):
-        raise ValueError("'x' and 'y' must be finite.")
+        msg = "'x' and 'y' must be finite."
+        raise ValueError(msg)
     return apply_calibration(x, xa), apply_calibration(y, ya)
 
 
@@ -164,12 +166,15 @@ def transfer_function(
     xa, ya = _validate_pair(x, y)
     fs_v = _positive(fs, "fs")
     if estimator not in ("H1", "H2"):
-        raise ValueError("'estimator' must be 'H1' or 'H2'.")
+        msg = "'estimator' must be 'H1' or 'H2'."
+        raise ValueError(msg)
     if not 0.0 <= float(overlap) < 1.0:
-        raise ValueError("'overlap' must be in [0, 1).")
+        msg = "'overlap' must be in [0, 1)."
+        raise ValueError(msg)
     seg = _default_nperseg(xa.size, fs_v) if nperseg is None else int(nperseg)
     if seg < _MIN_SAMPLES or seg > xa.size:
-        raise ValueError("'nperseg' must be between 32 and the signal length.")
+        msg = "'nperseg' must be between 32 and the signal length."
+        raise ValueError(msg)
 
     freqs, gxy, gxx, gyy = _spectra(xa, ya, fs_v, seg, float(overlap))
     if estimator == "H1":
@@ -238,10 +243,12 @@ def coherence(
     xa, ya = _validate_pair(x, y)
     fs_v = _positive(fs, "fs")
     if not 0.0 <= float(overlap) < 1.0:
-        raise ValueError("'overlap' must be in [0, 1).")
+        msg = "'overlap' must be in [0, 1)."
+        raise ValueError(msg)
     seg = _default_nperseg(xa.size, fs_v) if nperseg is None else int(nperseg)
     if seg < _MIN_SAMPLES or seg > xa.size:
-        raise ValueError("'nperseg' must be between 32 and the signal length.")
+        msg = "'nperseg' must be between 32 and the signal length."
+        raise ValueError(msg)
     freqs, gxy, gxx, gyy = _spectra(xa, ya, fs_v, seg, float(overlap))
     denom = gxx * gyy
     coh = np.divide(np.abs(gxy) ** 2, denom, out=np.zeros_like(gxx), where=denom > 0.0)

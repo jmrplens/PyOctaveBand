@@ -59,12 +59,14 @@ def _iec61265_directional_limit(frequency: float, angle: float) -> float:
         None,
     )
     if row is None:
-        raise ValueError(
+        msg = (
             "'frequency' is not an IEC 61265 tabulated one-third-octave band "
             "(50 Hz-1.6 kHz, then 2, 2.5, 3.15, 4, 5, 6.3, 8, 10 kHz)."
         )
+        raise ValueError(msg)
     if angle <= 0.0 or angle > _IEC61265_ANGLES[-1]:
-        raise ValueError("'angle' must lie in (0, 150] degrees.")
+        msg = "'angle' must lie in (0, 150] degrees."
+        raise ValueError(msg)
     col = next(i for i, a in enumerate(_IEC61265_ANGLES) if a >= angle)
     return row[col]
 
@@ -163,7 +165,8 @@ def _linearity_checks(linearity: dict[str, float]) -> list[dict[str, Any]]:
     checks: list[dict[str, Any]] = []
     for kind, dev in linearity.items():
         if kind not in _LINEARITY_LIMITS:
-            raise ValueError("linearity keys must be 'reference' or 'other'.")
+            msg = "linearity keys must be 'reference' or 'other'."
+            raise ValueError(msg)
         limit = _LINEARITY_LIMITS[kind]
         checks.append(
             {

@@ -264,9 +264,8 @@ def _resolve_flow_resistivity(flow_resistivity: float | str) -> float:
         key = flow_resistivity.strip().upper()
         if key not in _FLOW_RESISTIVITY:
             valid = ", ".join(sorted(_FLOW_RESISTIVITY))
-            raise ValueError(
-                f"'flow_resistivity' class must be one of {valid}, got {flow_resistivity!r}."
-            )
+            msg = f"'flow_resistivity' class must be one of {valid}, got {flow_resistivity!r}."
+            raise ValueError(msg)
         return _FLOW_RESISTIVITY[key]
     return require_positive(flow_resistivity, "flow_resistivity")
 
@@ -422,11 +421,14 @@ def _validated_section(
     d = np.atleast_1d(np.asarray(distances, dtype=np.float64))
     z = np.atleast_1d(np.asarray(heights, dtype=np.float64))
     if d.ndim != 1 or d.shape != z.shape or d.size < 2:
-        raise ValueError("'distances' and 'heights' must be 1-D of equal size >= 2.")
+        msg = "'distances' and 'heights' must be 1-D of equal size >= 2."
+        raise ValueError(msg)
     if not (np.all(np.isfinite(d)) and np.all(np.isfinite(z))):
-        raise ValueError("'distances' and 'heights' must be finite.")
+        msg = "'distances' and 'heights' must be finite."
+        raise ValueError(msg)
     if np.any(np.diff(d) <= 0.0):
-        raise ValueError("'distances' must be strictly increasing.")
+        msg = "'distances' must be strictly increasing."
+        raise ValueError(msg)
     return d, z
 
 
@@ -469,7 +471,8 @@ def mean_flow_resistivity(
     d = require_positive_array(lengths, "lengths")
     sig = require_positive_array(resistivities, "resistivities")
     if d.shape != sig.shape:
-        raise ValueError("'lengths' and 'resistivities' must have equal shape.")
+        msg = "'lengths' and 'resistivities' must have equal shape."
+        raise ValueError(msg)
     return float(10.0 ** (np.sum(d * np.log10(sig)) / np.sum(d)))
 
 
@@ -521,7 +524,8 @@ def diffraction_attenuation(
     """
     f = require_positive_array(frequencies, "frequencies")
     if not np.isfinite(path_difference):
-        raise ValueError("'path_difference' must be finite.")
+        msg = "'path_difference' must be finite."
+        raise ValueError(msg)
     h0 = require_non_negative(edge_height, "edge_height")
     e = require_non_negative(edge_span, "edge_span")
     lam = _C / f
@@ -643,13 +647,14 @@ def terrain_screening_adjustment(
         and np.isfinite(rcv[0])
         and np.isfinite(rcv[1])
     ):
-        raise ValueError("'source' and 'receiver' must be finite (d, z) points.")
+        msg = "'source' and 'receiver' must be finite (d, z) points."
+        raise ValueError(msg)
     if src[0] >= rcv[0]:
-        raise ValueError(
-            "'source' must lie at a smaller section distance than 'receiver'."
-        )
+        msg = "'source' must lie at a smaller section distance than 'receiver'."
+        raise ValueError(msg)
     if d[0] > src[0] + 1e-9 or d[-1] < rcv[0] - 1e-9:
-        raise ValueError("The terrain section must cover [source d, receiver d].")
+        msg = "The terrain section must cover [source d, receiver d]."
+        raise ValueError(msg)
     sigma_seg = _segment_resistivities(flow_resistivity, d.size - 1)
     d, z, sigma_seg = _cropped_section(d, z, sigma_seg, src[0], rcv[0])
     adjustment, screened, delta, points = _screening_core(f, src, rcv, d, z, sigma_seg)
@@ -677,9 +682,8 @@ def _segment_resistivities(
         return np.full(n_segments, _resolve_flow_resistivity(float(flow_resistivity)))  # type: ignore[arg-type]
     arr = require_positive_array(flow_resistivity, "flow_resistivity")
     if arr.shape != (n_segments,):
-        raise ValueError(
-            "Per-segment 'flow_resistivity' must have one value per profile segment."
-        )
+        msg = "Per-segment 'flow_resistivity' must have one value per profile segment."
+        raise ValueError(msg)
     return arr
 
 

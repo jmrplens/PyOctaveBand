@@ -256,9 +256,8 @@ class AirbornePredictionResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iso12354 import render_iso12354_airborne_report
 
         return render_iso12354_airborne_report(
@@ -348,9 +347,8 @@ class ImpactPredictionResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iso12354 import render_iso12354_impact_report
 
         return render_iso12354_impact_report(
@@ -362,7 +360,8 @@ def _check_finite(value: float, name: str) -> float:
     """Return ``value`` as a float, raising if it is not finite."""
     v = float(value)
     if not isfinite(v):
-        raise ValueError(f"'{name}' must be a finite number.")
+        msg = f"'{name}' must be a finite number."
+        raise ValueError(msg)
     return v
 
 
@@ -430,13 +429,14 @@ def _kij_lightweight_double_homogeneous(path: PathKind, t: _KijTerms) -> float:
     # the 2-4 path are more than three times heavier than a leaf
     # (m2/m1 > 3), i.e. for a per-path mass_ratio = m'\u22a5,i/m'i < 1/3.
     if t.ratio >= 1.0 / 3.0:
-        raise ValueError(
+        msg = (
             "The E.7 double-leaf branch (K24) is given only for "
             "mass_ratio = m'\u22a5,i/m'i < 1/3 (the homogeneous element "
             "carries the 2-4 path, so the ratio is leaf mass over "
             "homogeneous-element mass and the printed condition "
             "m2/m1 > 3 reads mass_ratio < 1/3)."
         )
+        raise ValueError(msg)
     # Per-path form (ISO 12354-1:2017 E.3.5); the 2000 print recasts the
     # same relation as 3,0 - 14,1 M + 5,7 M^2 in the Figure E.9 x-axis
     # variable lg(m2/m1), against its own Annex E definition of M (see
@@ -457,19 +457,19 @@ def _kij_corner(path: PathKind, t: _KijTerms) -> float:
     """Corner junction (E.9): one path, K12 = K21."""
     if path == "corner":
         return max(15.0 * abs(t.m) - 3.0, -2.0)
-    raise ValueError(
-        "A 'corner' junction has the single path K12 = K21; use path='corner'."
-    )
+    msg = "A 'corner' junction has the single path K12 = K21; use path='corner'."
+    raise ValueError(msg)
 
 
 def _kij_thickness_change(path: PathKind, t: _KijTerms) -> float:
     """Change of thickness in line (E.10): one path, K12 = K21."""
     if path == "through":
         return 5.0 * t.m * t.m - 5.0
-    raise ValueError(
+    msg = (
         "A 'thickness_change' junction has the single in-line path "
         "K12 = K21; use path='through'."
     )
+    raise ValueError(msg)
 
 
 #: One branch of EN 12354-1 Annex E per junction type. A branch returns
@@ -573,21 +573,26 @@ def junction_vibration_reduction(
     """
     ratio = _check_finite(mass_ratio, "mass_ratio")
     if ratio <= 0.0:
-        raise ValueError("'mass_ratio' must be positive.")
+        msg = "'mass_ratio' must be positive."
+        raise ValueError(msg)
     if _check_finite(frequency, "frequency") <= 0.0:
-        raise ValueError("'frequency' must be positive.")
+        msg = "'frequency' must be positive."
+        raise ValueError(msg)
     if _check_finite(f1, "f1") <= 0.0:
-        raise ValueError("'f1' must be positive.")
+        msg = "'f1' must be positive."
+        raise ValueError(msg)
     if path not in ("through", "corner", "double_leaf"):
-        raise ValueError("'path' must be 'through', 'corner' or 'double_leaf'.")
+        msg = "'path' must be 'through', 'corner' or 'double_leaf'."
+        raise ValueError(msg)
     branch = _KIJ_BRANCHES.get(junction_type)
     if branch is None:
-        raise ValueError(
+        msg = (
             "'junction_type' must be one of 'rigid_cross', 'rigid_t', "
             "'flexible_t', 'lightweight_facade', "
             "'lightweight_double_homogeneous', 'lightweight_double_coupled', "
             "'corner', 'thickness_change'."
         )
+        raise ValueError(msg)
     terms = _KijTerms(
         m=log10(ratio),
         ratio=ratio,
@@ -597,10 +602,11 @@ def junction_vibration_reduction(
     )
     kij = branch(path, terms)
     if kij is None:
-        raise ValueError(
+        msg = (
             f"Junction type {junction_type!r} has no 'double_leaf' (K24) "
             "branch in EN 12354-1 Annex E."
         )
+        raise ValueError(msg)
     return kij
 
 
@@ -626,7 +632,8 @@ def junction_min_vibration_reduction(
     si = _check_finite(s_i, "s_i")
     sj = _check_finite(s_j, "s_j")
     if lf <= 0.0 or si <= 0.0 or sj <= 0.0:
-        raise ValueError("'coupling_length', 's_i' and 's_j' must be positive.")
+        msg = "'coupling_length', 's_i' and 's_j' must be positive."
+        raise ValueError(msg)
     return 10.0 * log10(lf * _L0 * (1.0 / si + 1.0 / sj))
 
 
@@ -660,7 +667,8 @@ def _coupling_term(separating_area: float, coupling_length: float) -> float:
     ss = _check_finite(separating_area, "separating_area")
     lf = _check_finite(coupling_length, "coupling_length")
     if ss <= 0.0 or lf <= 0.0:
-        raise ValueError("'separating_area' and 'coupling_length' must be positive.")
+        msg = "'separating_area' and 'coupling_length' must be positive."
+        raise ValueError(msg)
     return 10.0 * log10(ss / (_L0 * lf))
 
 
@@ -712,7 +720,8 @@ def flanking_path(
         or any value is non-finite.
     """
     if kind not in ("Ff", "Df", "Fd"):
-        raise ValueError("'kind' must be 'Ff', 'Df' or 'Fd'.")
+        msg = "'kind' must be 'Ff', 'Df' or 'Fd'."
+        raise ValueError(msg)
     rs = _check_finite(r_source, "r_source")
     rr = _check_finite(r_receive, "r_receive")
     kij = _check_finite(k_ij, "k_ij")
@@ -899,7 +908,8 @@ def equivalent_impact_level(mass_per_area: float) -> float:
     """
     m = _check_finite(mass_per_area, "mass_per_area")
     if m <= 0.0:
-        raise ValueError("'mass_per_area' must be positive.")
+        msg = "'mass_per_area' must be positive."
+        raise ValueError(msg)
     if not (_LN_EQ_MASS_MIN <= m <= _LN_EQ_MASS_MAX):
         warnings.warn(
             f"mass_per_area = {m:g} kg/m² lies outside the 100-600 kg/m² "
@@ -928,7 +938,8 @@ def impact_flanking_correction(separating_mass: float, flanking_mass: float) -> 
     sm = _check_finite(separating_mass, "separating_mass")
     fm = _check_finite(flanking_mass, "flanking_mass")
     if sm <= 0.0 or fm <= 0.0:
-        raise ValueError("'separating_mass' and 'flanking_mass' must be positive.")
+        msg = "'separating_mass' and 'flanking_mass' must be positive."
+        raise ValueError(msg)
     # Nearest-neighbour selection on the discrete Table 1 grid. Both mass axes
     # are ascending, and ``min`` returns the first index reaching the smallest
     # distance, so a mass exactly halfway between two tabulated values (e.g.
@@ -989,7 +1000,8 @@ def standardized_impact_level(l_prime_n_w: float, volume: float) -> float:
     lnw = _check_finite(l_prime_n_w, "l_prime_n_w")
     v = _check_finite(volume, "volume")
     if v <= 0.0:
-        raise ValueError("'volume' must be positive.")
+        msg = "'volume' must be positive."
+        raise ValueError(msg)
     return lnw - 10.0 * log10(_IMPACT_STANDARDIZATION * v)
 
 
@@ -1022,7 +1034,9 @@ def standardized_level_difference(
     v = _check_finite(volume, "volume")
     ss = _check_finite(separating_area, "separating_area")
     if v <= 0.0:
-        raise ValueError("'volume' must be positive.")
+        msg = "'volume' must be positive."
+        raise ValueError(msg)
     if ss <= 0.0:
-        raise ValueError("'separating_area' must be positive.")
+        msg = "'separating_area' must be positive."
+        raise ValueError(msg)
     return rw + 10.0 * log10(_AIRBORNE_STANDARDIZATION * v / ss)

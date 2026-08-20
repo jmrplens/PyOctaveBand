@@ -93,14 +93,17 @@ def plot_barrier_geometry(
     """
     _check_language(language)
     if min(source_height, barrier_height, receiver_height) < 0.0:
-        raise ValueError("Heights must be non-negative.")
+        msg = "Heights must be non-negative."
+        raise ValueError(msg)
     if barrier_distance <= 0.0 or receiver_distance <= barrier_distance:
-        raise ValueError(
+        msg = (
             "'barrier_distance' must be positive and 'receiver_distance' "
             "greater than it."
         )
+        raise ValueError(msg)
     if thickness is not None and thickness <= 0.0:
-        raise ValueError("'thickness' must be positive when given.")
+        msg = "'thickness' must be positive when given."
+        raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
     e = 0.0 if thickness is None else float(thickness)
@@ -226,10 +229,11 @@ def plot_barrier_result_geometry(
         or result.receiver_distance is None
         or result.receiver_height is None
     ):
-        raise ValueError(
+        msg = (
             "This result does not retain its geometry; call "
             "plot_barrier_geometry(...) with the original arguments."
         )
+        raise ValueError(msg)
     return plot_barrier_geometry(
         ax=ax,
         source_height=result.source_height,

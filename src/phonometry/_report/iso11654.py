@@ -337,10 +337,11 @@ def render_iso11654_report(
     measured = np.asarray(result.measured, dtype=np.float64)
     shifted = np.asarray(result.shifted_reference, dtype=np.float64)
     if not centers.shape == measured.shape == shifted.shape:
-        raise ValueError(
+        msg = (
             "render_iso11654_report() needs 'band_centers', 'measured' and "
             "'shifted_reference' of equal length."
         )
+        raise ValueError(msg)
     # Unfavourable deviation: measured practical coefficient below the curve.
     deviations = np.maximum(shifted - measured, 0.0)
 

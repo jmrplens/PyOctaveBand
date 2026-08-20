@@ -113,14 +113,16 @@ def _resolve_walls(
     """
     alpha = np.asarray(absorption, dtype=np.float64)
     if not np.all(np.isfinite(alpha)):
-        raise ValueError("absorption coefficients must be finite.")
+        msg = "absorption coefficients must be finite."
+        raise ValueError(msg)
     if np.any(alpha < 0.0) or np.any(alpha > 1.0):
-        raise ValueError(
+        msg = (
             "absorption coefficients must lie in [0, 1]: the image-source "
             "reflection factor R = sqrt(1 - alpha) has no real value for "
             "alpha > 1, so the edge-effect coefficients above 1 that Sabine "
             "tolerates must be capped at 1 here."
         )
+        raise ValueError(msg)
     if alpha.ndim == 0:
         walls = np.full((6, 1), float(alpha), dtype=np.float64)
     elif alpha.ndim == 1 and alpha.shape[0] == 6 and n_freq != 6:
@@ -133,11 +135,12 @@ def _resolve_walls(
     elif alpha.ndim == 2 and alpha.shape[0] == 6:
         walls = alpha
     else:
-        raise ValueError(
+        msg = (
             "'absorption' must be a scalar, a length-6 per-wall vector, a "
             "per-band vector, or a (6, n_bands) per-wall per-band array; got "
             f"shape {alpha.shape}."
         )
+        raise ValueError(msg)
     return np.sqrt(1.0 - walls), walls.shape[1]
 
 
@@ -274,15 +277,18 @@ def _validate_point(
     """Validate a 3-vector strictly inside the room box."""
     p = np.asarray(point, dtype=np.float64)
     if p.shape != (3,):
-        raise ValueError(f"'{name}' must be a 3-vector (x, y, z).")
+        msg = f"'{name}' must be a 3-vector (x, y, z)."
+        raise ValueError(msg)
     if not np.all(np.isfinite(p)):
-        raise ValueError(f"'{name}' coordinates must be finite.")
+        msg = f"'{name}' coordinates must be finite."
+        raise ValueError(msg)
     for value, length, axis in zip(p, dimensions, "xyz"):
         if not 0.0 < value < length:
-            raise ValueError(
+            msg = (
                 f"'{name}' coordinate {axis} = {value} lies outside the room "
                 f"(0, {length}); source and receiver must be strictly inside."
             )
+            raise ValueError(msg)
     return p
 
 
@@ -304,7 +310,8 @@ def _resolve_band_maps(
     """
     m = np.asarray(air_attenuation, dtype=np.float64)
     if not np.all(np.isfinite(m)) or np.any(m < 0.0):
-        raise ValueError("'air_attenuation' must be finite and non-negative.")
+        msg = "'air_attenuation' must be finite and non-negative."
+        raise ValueError(msg)
     banded = freq is not None or n_alpha_bands > 1 or m.size > 1
     if freq is not None:
         n_bands = freq.size
@@ -315,16 +322,18 @@ def _resolve_band_maps(
     if reflection.shape[1] == 1 and n_bands > 1:
         reflection = np.broadcast_to(reflection, (6, n_bands)).copy()
     elif reflection.shape[1] not in (1, n_bands):
-        raise ValueError(
+        msg = (
             f"'absorption' has {reflection.shape[1]} bands but the result has "
             f"{n_bands}; a per-band 'absorption' must match the band count of "
             "'frequencies' (or the air attenuation)."
         )
+        raise ValueError(msg)
     if m.size not in (1, n_bands):
-        raise ValueError(
+        msg = (
             f"'air_attenuation' has {m.size} bands but the result has "
             f"{n_bands}; they must match."
         )
+        raise ValueError(msg)
     return reflection, np.broadcast_to(m, (n_bands,)), n_bands, banded
 
 
@@ -413,7 +422,8 @@ def _sample_ir(
         duration = require_positive(duration, "duration")
     n_samples = int(np.ceil(duration * fs))
     if n_samples < 1:
-        raise ValueError("'duration' must cover at least one sample.")
+        msg = "'duration' must cover at least one sample."
+        raise ValueError(msg)
     sample_idx = np.rint(times * fs).astype(np.int64)
     inside = sample_idx < n_samples
     ir = np.zeros((n_bands, n_samples), dtype=np.float64)
@@ -493,18 +503,21 @@ def image_source_rir(
     lz = require_positive(float(dimensions[2]), "Lz")
     dims = (lx, ly, lz)
     if fs <= 0:
-        raise ValueError("Sample rate 'fs' must be positive.")
+        msg = "Sample rate 'fs' must be positive."
+        raise ValueError(msg)
     speed_of_sound = require_positive(speed_of_sound, "speed_of_sound")
     if max_order < 0:
-        raise ValueError("'max_order' must be non-negative.")
+        msg = "'max_order' must be non-negative."
+        raise ValueError(msg)
     src = _validate_point(source, dims, "source")
     rcv = _validate_point(receiver, dims, "receiver")
     if float(np.linalg.norm(src - rcv)) <= 0.0:
-        raise ValueError(
+        msg = (
             "source and receiver coincide; the direct path has zero length "
             "and infinite amplitude. Separate them so the direct distance is "
             "positive."
         )
+        raise ValueError(msg)
 
     freq: np.ndarray | None = None
     n_freq: int | None = None
@@ -559,7 +572,8 @@ def audible_image_count(max_order: int) -> int:
     :return: The audible image count.
     """
     if max_order < 0:
-        raise ValueError("'max_order' must be non-negative.")
+        msg = "'max_order' must be non-negative."
+        raise ValueError(msg)
     i0 = int(max_order)
     return (2 * (2 * i0**3 + 3 * i0**2 + 4 * i0)) // 3
 

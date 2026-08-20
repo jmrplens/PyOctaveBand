@@ -125,12 +125,13 @@ def _load(relative: str) -> np.ndarray:
         # the full bench, but a signal inside one of them is missing. Say so
         # rather than dying on a bare FileNotFoundError - and do not quietly
         # substitute the committed extract, which would hide the gap.
-        raise AssertionError(
+        msg = (
             f"{relative} is missing from the local bench at {FULL_BENCH}. "
             "The download is incomplete: remove or complete it, or point "
             "STIPA_VERIFICATION_DATA elsewhere, to fall back to the "
             "committed extract."
         )
+        raise AssertionError(msg)
     return _read_wav(path)
 
 

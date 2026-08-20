@@ -51,7 +51,8 @@ _M_PER_KM = 1000.0
 def _positive(value: float, name: str) -> float:
     scalar = float(value)
     if not np.isfinite(scalar) or scalar <= 0.0:
-        raise ValueError(f"'{name}' must be a positive, finite number.")
+        msg = f"'{name}' must be a positive, finite number."
+        raise ValueError(msg)
     return scalar
 
 
@@ -60,9 +61,11 @@ def _positive_array(
 ) -> NDArray[np.float64]:
     arr = np.atleast_1d(np.asarray(values, dtype=np.float64))
     if arr.size == 0 or not np.all(np.isfinite(arr)):
-        raise ValueError(f"'{name}' must be finite and non-empty.")
+        msg = f"'{name}' must be finite and non-empty."
+        raise ValueError(msg)
     if np.any(arr <= 0.0):
-        raise ValueError(f"'{name}' must be strictly positive.")
+        msg = f"'{name}' must be strictly positive."
+        raise ValueError(msg)
     return arr
 
 
@@ -95,12 +98,14 @@ def spreading_loss(
         return 10.0 * np.log10(r)
     if key == "practical":
         if transition_range is None:
-            raise ValueError("'transition_range' is required for the 'practical' law.")
+            msg = "'transition_range' is required for the 'practical' law."
+            raise ValueError(msg)
         r0 = _positive(transition_range, "transition_range")
         return np.where(
             r <= r0, 20.0 * np.log10(r), 20.0 * np.log10(r0) + 10.0 * np.log10(r / r0)
         )
-    raise ValueError(f"'law' must be one of {_SPREADING_LAWS}, got {law!r}.")
+    msg = f"'law' must be one of {_SPREADING_LAWS}, got {law!r}."
+    raise ValueError(msg)
 
 
 def _thorp(f_khz: NDArray[np.float64]) -> NDArray[np.float64]:
@@ -186,9 +191,11 @@ def seawater_absorption(
     s = float(salinity)
     z = float(depth)
     if not (np.isfinite(t) and np.isfinite(s) and np.isfinite(z) and np.isfinite(ph)):
-        raise ValueError("'temperature', 'salinity', 'depth' and 'ph' must be finite.")
+        msg = "'temperature', 'salinity', 'depth' and 'ph' must be finite."
+        raise ValueError(msg)
     if s < 0.0 or z < 0.0:
-        raise ValueError("'salinity' and 'depth' must be non-negative.")
+        msg = "'salinity' and 'depth' must be non-negative."
+        raise ValueError(msg)
     key = model.strip().lower()
     if key == "thorp":
         return _thorp(f_khz)
@@ -196,7 +203,8 @@ def seawater_absorption(
         return _francois_garrison(f_khz, t, s, z, float(ph))
     if key == "ainslie-mccolm":
         return _ainslie_mccolm(f_khz, t, s, z / _M_PER_KM, float(ph))
-    raise ValueError(f"'model' must be one of {_ABSORPTION_MODELS}, got {model!r}.")
+    msg = f"'model' must be one of {_ABSORPTION_MODELS}, got {model!r}."
+    raise ValueError(msg)
 
 
 @dataclass(frozen=True)

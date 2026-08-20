@@ -397,10 +397,11 @@ def _broadcast_bands(
     for name, value in values.items():
         arr = np.atleast_1d(require_positive_array(value, name))
         if arr.size not in (1, f.size):
-            raise ValueError(
+            msg = (
                 f"'{name}' must be a scalar or match the {f.size} frequency "
                 f"bands, got {arr.size} values."
             )
+            raise ValueError(msg)
         out[name] = np.broadcast_to(arr, f.shape).astype(np.float64)
     return f, out
 
@@ -466,11 +467,12 @@ def power_injection_clf(
     denominator = e_1 - e_2 * ratio
     if np.any(denominator <= 0.0):
         bad = f[denominator <= 0.0]
-        raise ValueError(
+        msg = (
             "the driven subsystem must hold more modal energy than the "
             "receiver (E1/n1 > E2/n2) for a two-subsystem SEA inversion; "
             f"violated at {np.array2string(bad, precision=4)} Hz."
         )
+        raise ValueError(msg)
     eta_12 = eta_2 * e_2 / denominator
     eta_21 = eta_12 * ratio
     power_in = 2.0 * np.pi * f * (eta_1 * e_1 + eta_2 * e_2)
@@ -521,15 +523,17 @@ def power_injection_matrix(
     e = np.asarray(energies, dtype=np.float64)
     p = np.asarray(input_powers, dtype=np.float64)
     if e.shape != (2, 2, f.size):
-        raise ValueError(f"'energies' must have shape (2, 2, {f.size}), got {e.shape}.")
+        msg = f"'energies' must have shape (2, 2, {f.size}), got {e.shape}."
+        raise ValueError(msg)
     if p.shape != (2, f.size):
-        raise ValueError(
-            f"'input_powers' must have shape (2, {f.size}), got {p.shape}."
-        )
+        msg = f"'input_powers' must have shape (2, {f.size}), got {p.shape}."
+        raise ValueError(msg)
     if not np.all(np.isfinite(e)) or np.any(e <= 0.0):
-        raise ValueError("'energies' must be finite and positive.")
+        msg = "'energies' must be finite and positive."
+        raise ValueError(msg)
     if not np.all(np.isfinite(p)) or np.any(p <= 0.0):
-        raise ValueError("'input_powers' must be finite and positive.")
+        msg = "'input_powers' must be finite and positive."
+        raise ValueError(msg)
 
     omega = 2.0 * np.pi * f
     # Test j gives  (eta1 + eta12) E1j - eta21 E2j = P1j/omega  and
@@ -554,10 +558,11 @@ def power_injection_matrix(
         axis=-2,
     )
     if np.any(np.abs(np.linalg.det(m_a)) < np.finfo(np.float64).tiny):
-        raise ValueError(
+        msg = (
             "the measured energy matrix is singular in at least one band; the "
             "two drive tests must produce independent energy distributions."
         )
+        raise ValueError(msg)
     # numpy>=2 only treats the right-hand side as a stack of vectors when it is
     # 1-D, so give it the explicit trailing axis and drop it again.
     ab = np.linalg.solve(m_a, (p_1.T / omega[:, None])[..., None])[..., 0]

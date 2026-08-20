@@ -99,6 +99,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Every exception message is assigned to a variable and raised by name:
+  2148 sites, `msg = ...` then `raise SomethingError(msg)`. What it buys is
+  the traceback: the line the interpreter prints for the raise is
+  `raise ClauseError(msg)`, not the first of several wrapped lines of a long
+  clause citation, so the message appears once, in the exception itself, and
+  the frame stays one line. The one site left alone is a guard in the code
+  that draws `anim_fdtd_side_branch`, where the rewrite would move the clip's
+  recorded fingerprint and demand a re-render that draws the same frames; it
+  says so next to the `noqa`.
+
 - Docstrings hold one shape now. The summary sits on the first line, the
   closing quotes take their own, and 873 docstrings moved to say so without
   changing by a word. Where a docstring carries backslashes (matplotlib

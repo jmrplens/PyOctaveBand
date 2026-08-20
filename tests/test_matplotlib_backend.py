@@ -322,7 +322,8 @@ def test_showfilter_raises_helpful_error_without_matplotlib(monkeypatch) -> None
 
     def blocked_import(name, *args, **kwargs):
         if name.startswith("matplotlib"):
-            raise ImportError("No module named 'matplotlib'")
+            msg = "No module named 'matplotlib'"
+            raise ImportError(msg)
         return real_import(name, *args, **kwargs)
 
     spectrum = np.array([1])

@@ -77,7 +77,8 @@ _HARMONIC_SEARCH_FACTOR = 0.1
 def _positive(value: float, name: str) -> float:
     scalar = float(value)
     if not np.isfinite(scalar) or scalar <= 0.0:
-        raise ValueError(f"'{name}' must be a positive, finite number.")
+        msg = f"'{name}' must be a positive, finite number."
+        raise ValueError(msg)
     return scalar
 
 
@@ -85,7 +86,8 @@ def _validate_notch_q(notch_q: float) -> float:
     """Validate the effective notch quality factor (AES17 5.2.8: 1.2 <= Q <= 3)."""
     q = float(notch_q)
     if not 1.2 <= q <= 3.0:
-        raise ValueError("'notch_q' must be within the AES17 range [1.2, 3].")
+        msg = "'notch_q' must be within the AES17 range [1.2, 3]."
+        raise ValueError(msg)
     return q
 
 
@@ -107,14 +109,17 @@ def _validate_signal(
     """
     sig = np.asarray(signal, dtype=np.float64)
     if sig.ndim != 1:
-        raise ValueError("'signal' must be one-dimensional.")
+        msg = "'signal' must be one-dimensional."
+        raise ValueError(msg)
     if sig.size < _MIN_SIGNAL_SAMPLES:
-        raise ValueError(
+        msg = (
             f"'signal' must contain at least {_MIN_SIGNAL_SAMPLES} samples to "
             "resolve a fundamental and its harmonics."
         )
+        raise ValueError(msg)
     if not np.all(np.isfinite(sig)):
-        raise ValueError("'signal' must be finite.")
+        msg = "'signal' must be finite."
+        raise ValueError(msg)
     return apply_calibration(signal, sig) if calibrate else sig
 
 
@@ -169,7 +174,8 @@ def _harmonic_amplitudes(
         else float(fundamental)
     )
     if f0 <= 0.0:
-        raise ValueError("Could not determine a positive fundamental frequency.")
+        msg = "Could not determine a positive fundamental frequency."
+        raise ValueError(msg)
     search = f0 * _HARMONIC_SEARCH_FACTOR
     nyquist = fs / 2.0
     amps = []
@@ -235,15 +241,18 @@ def thd(
     sig = _validate_signal(signal)
     fs_v = _positive(fs, "fs")
     if kind not in ("F", "R"):
-        raise ValueError("'kind' must be 'F' or 'R'.")
+        msg = "'kind' must be 'F' or 'R'."
+        raise ValueError(msg)
     _f0, amps = _harmonic_amplitudes(sig, fs_v, fundamental, n_harmonics, window)
     if amps.size == 0 or amps[0] <= 0.0:
-        raise ValueError("No fundamental component found in the signal.")
+        msg = "No fundamental component found in the signal."
+        raise ValueError(msg)
     if amps.size < 2:
-        raise ValueError(
+        msg = (
             "No harmonic of the fundamental lies below the Nyquist frequency; "
             "the THD is undefined (raise fs or lower the fundamental)."
         )
+        raise ValueError(msg)
     harmonic_rms = float(np.sqrt(np.sum(amps[1:] ** 2)))
     if kind == "F":
         return float(harmonic_rms / amps[0])
@@ -285,11 +294,13 @@ def harmonic_distortion(
     fs_v = _positive(fs, "fs")
     f0 = _positive(fundamental, "fundamental")
     if order < 2:
-        raise ValueError("'order' must be at least 2.")
+        msg = "'order' must be at least 2."
+        raise ValueError(msg)
     n = max(n_harmonics, order)
     _, amps = _harmonic_amplitudes(sig, fs_v, f0, n, window)
     if amps.size < order or amps[0] <= 0.0:
-        raise ValueError("The requested harmonic order exceeds the Nyquist limit.")
+        msg = "The requested harmonic order exceeds the Nyquist limit."
+        raise ValueError(msg)
     total_rms = float(np.sqrt(np.sum(amps**2)))
     return float(amps[order - 1] / total_rms)
 
@@ -306,7 +317,8 @@ def _notched_residual(
     from scipy import signal as sp_signal
 
     if f0 >= fs / 2.0:
-        raise ValueError("'fundamental' must be below the Nyquist frequency (fs / 2).")
+        msg = "'fundamental' must be below the Nyquist frequency (fs / 2)."
+        raise ValueError(msg)
     b, a = sp_signal.iirnotch(f0, notch_q * _FILTFILT_NOTCH_Q_FACTOR, fs)
     return np.asarray(sp_signal.filtfilt(b, a, signal), dtype=np.float64)
 
@@ -429,7 +441,8 @@ def thd_plus_noise(
         sig, residual, fs_v, f0, float(notch_q), bandwidth
     )
     if total_rms <= 0.0:
-        raise ValueError("Signal has no energy.")
+        msg = "Signal has no energy."
+        raise ValueError(msg)
     ratio = residual_rms / total_rms
     if as_db:
         return float(20.0 * np.log10(ratio)) if ratio > 0.0 else -np.inf
@@ -530,7 +543,8 @@ def itu_r_468_weighting(frequencies: ArrayLike) -> NDArray[np.float64]:
     """
     f = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if not np.all(np.isfinite(f)) or np.any(f < 0.0):
-        raise ValueError("'frequencies' must be finite and non-negative.")
+        msg = "'frequencies' must be finite and non-negative."
+        raise ValueError(msg)
     table_f = np.array([row[0] for row in _ITU_R_468_TABLE])
     table_db = np.array([row[1] for row in _ITU_R_468_TABLE])
     log_f = np.log10(np.maximum(f, np.finfo(np.float64).tiny))
@@ -609,7 +623,8 @@ def weighted_thd(
     sig = _validate_signal(signal)
     fs_v = _positive(fs, "fs")
     if weighting not in ("468", "A", "C"):
-        raise ValueError("'weighting' must be '468', 'A' or 'C'.")
+        msg = "'weighting' must be '468', 'A' or 'C'."
+        raise ValueError(msg)
     _validate_notch_q(notch_q)
     if fundamental is None:
         freqs, amp = _amplitude_spectrum(sig, fs_v, window)
@@ -620,7 +635,8 @@ def weighted_thd(
     sl = _steady_slice(sig.size, fs_v, f0, float(notch_q))
     total_rms = float(np.sqrt(np.mean(sig[sl] ** 2)))
     if total_rms <= 0.0:
-        raise ValueError("Signal has no energy.")
+        msg = "Signal has no energy."
+        raise ValueError(msg)
     if weighting == "468":
         weighted_rms = _weighted_rms_468(np.asarray(residual[sl]), fs_v)
     else:
@@ -709,7 +725,8 @@ def harmonic_analysis(
     fs_v = _positive(fs, "fs")
     f0, amps = _harmonic_amplitudes(sig, fs_v, fundamental, n_harmonics, window)
     if amps.size == 0 or amps[0] <= 0.0:
-        raise ValueError("No fundamental component found in the signal.")
+        msg = "No fundamental component found in the signal."
+        raise ValueError(msg)
     freqs = np.array([(k + 1) * f0 for k in range(amps.size)], dtype=np.float64)
     thd_f = thd(sig, fs_v, f0, kind="F", n_harmonics=n_harmonics, window=window)
     thd_r = thd(sig, fs_v, f0, kind="R", n_harmonics=n_harmonics, window=window)

@@ -200,10 +200,11 @@ class FaultFrequencyResult:
         for line in self.lines:
             if line.name == name:
                 return line.frequency
-        raise KeyError(
+        msg = (
             f"no fault line named {name!r}; available: "
             f"{', '.join(line.name for line in self.lines)}."
         )
+        raise KeyError(msg)
 
     def __contains__(self, name: object) -> bool:
         """Whether a line called *name* is present."""
@@ -255,7 +256,8 @@ class FaultFrequencyResult:
         lo = require_non_negative(low, "low")
         hi = require_positive(high, "high")
         if hi <= lo:
-            raise ValueError("'high' must be greater than 'low'.")
+            msg = "'high' must be greater than 'low'."
+            raise ValueError(msg)
         kept = tuple(ln for ln in self.lines if lo <= ln.frequency <= hi)
         return FaultFrequencyResult(
             lines=kept, shaft_rate=self.shaft_rate, source=self.source
@@ -304,13 +306,15 @@ def combine_fault_lines(
     :raises ValueError: If no result is given, or the shaft rates disagree.
     """
     if not results:
-        raise ValueError("'combine_fault_lines' needs at least one result.")
+        msg = "'combine_fault_lines' needs at least one result."
+        raise ValueError(msg)
     rates = {round(res.shaft_rate, 9) for res in results}
     if len(rates) > 1:
-        raise ValueError(
+        msg = (
             "all results must share the same shaft rate; got "
             f"{sorted(res.shaft_rate for res in results)} Hz."
         )
+        raise ValueError(msg)
     seen: set[str] = set()
     merged: list[FaultLine] = []
     for res in results:
@@ -379,10 +383,12 @@ def bearing_fault_frequencies(
     d = require_positive(element_diameter, "element_diameter")
     dm = require_positive(pitch_diameter, "pitch_diameter")
     if d >= dm:
-        raise ValueError("'element_diameter' must be smaller than 'pitch_diameter'.")
+        msg = "'element_diameter' must be smaller than 'pitch_diameter'."
+        raise ValueError(msg)
     phi = require_non_negative(contact_angle_deg, "contact_angle_deg")
     if phi >= 90.0:
-        raise ValueError("'contact_angle_deg' must be below 90 degrees.")
+        msg = "'contact_angle_deg' must be below 90 degrees."
+        raise ValueError(msg)
     race = require_choice(rotating_race, "rotating_race", ("inner", "outer"))
 
     # g = (d/D) cos(phi). The cage rate carries (1 - g) with a stationary
@@ -610,7 +616,8 @@ def induction_motor_frequencies(
     fs = shaft_rate(speed_rpm)
     p = int(poles)
     if p < 2 or p % 2:
-        raise ValueError("'poles' must be an even integer of at least 2.")
+        msg = "'poles' must be an even integer of at least 2."
+        raise ValueError(msg)
     bars = _require_count(rotor_bars, "rotor_bars")
     n_slot = _require_count(slot_harmonics, "slot_harmonics")
     n_side = _require_count(sidebands, "sidebands", minimum=0)
@@ -619,16 +626,18 @@ def induction_motor_frequencies(
         fe = require_positive(supply_frequency, "supply_frequency")
         synchronous = 2.0 * fe / p
         if fs >= synchronous:
-            raise ValueError(
+            msg = (
                 "the shaft rate must stay below the synchronous speed "
                 f"{synchronous:g} Hz implied by 'supply_frequency' and "
                 "'poles'; check the pole count."
             )
+            raise ValueError(msg)
         s = 1.0 - fs / synchronous
     else:
         s = require_non_negative(slip, "slip")
         if s >= 1.0:
-            raise ValueError("'slip' must be below 1.")
+            msg = "'slip' must be below 1."
+            raise ValueError(msg)
         # Eq. (8.19), fe = fs p / 2, made slip-consistent: the field turns at
         # fs/(1 - s), so fe = fs p / (2 (1 - s)). Identical at s = 0.
         fe = fs * p / (2.0 * (1.0 - s))

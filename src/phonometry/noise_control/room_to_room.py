@@ -133,15 +133,17 @@ class SourceRoom:
         at the line that built it.
         """
         if (self.level is None) == (self.power_level is None):
-            raise ValueError(
+            msg = (
                 "give exactly one of 'level' (the source-room level L_p1) or "
                 "'power_level' (the source sound power level L_W)."
             )
+            raise ValueError(msg)
         if self.power_level is not None and self.room_constant is None:
-            raise ValueError(
+            msg = (
                 "'room_constant' is required with 'power_level'; build it "
                 "with phonometry.room.room_constant."
             )
+            raise ValueError(msg)
 
 
 @dataclass(frozen=True)
@@ -436,7 +438,8 @@ def room_to_room_transmission(
 
     f = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if f.ndim != 1 or f.size == 0:
-        raise ValueError("'frequencies' must be a non-empty 1-D array.")
+        msg = "'frequencies' must be a non-empty 1-D array."
+        raise ValueError(msg)
     n = f.size
 
     require_choice(source.model, "source.model", tuple(SOURCE_POWER_MODELS))
@@ -456,7 +459,8 @@ def room_to_room_transmission(
             dtype=np.float64,
         )
     elif source.level is None:  # pragma: no cover - __post_init__ guards this
-        raise ValueError("'source.level' must be given.")
+        msg = "'source.level' must be given."
+        raise ValueError(msg)
     else:
         lp1 = as_band_spectrum(source.level, n, "source.level")
 
@@ -464,10 +468,11 @@ def room_to_room_transmission(
     s_w = require_positive(partition_area, "partition_area")
     absorption = as_band_spectrum(receiving_absorption, n, "receiving_absorption")
     if np.any(absorption <= 0.0):
-        raise ValueError(
+        msg = (
             "'receiving_absorption' must be positive: a receiving room with no "
             "absorption has no finite reverberant level."
         )
+        raise ValueError(msg)
     penalty = require_non_negative(
         criterion.flanking_penalty, "criterion.flanking_penalty"
     )

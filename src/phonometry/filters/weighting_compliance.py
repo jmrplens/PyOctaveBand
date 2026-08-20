@@ -335,7 +335,8 @@ def weighting_class_limits(
         limit of ``-inf`` means only the upper limit applies.
     """
     if weighting_class not in (1, 2):
-        raise ValueError("weighting_class must be 1 or 2.")
+        msg = "weighting_class must be 1 or 2."
+        raise ValueError(msg)
     up_col, lo_col = (3, 4) if weighting_class == 1 else (5, 6)
     freqs = np.array([row[0] for row in _WEIGHTING_TABLE3], dtype=np.float64)
     upper = np.array([row[up_col] for row in _WEIGHTING_TABLE3], dtype=np.float64)
@@ -563,9 +564,11 @@ def verify_weighting_class(
         "margin_class1_db", "margin_class2_db"}`` for the sweep.
     """
     if wf.curve not in _WEIGHTING_COL and wf.curve not in ("B", "AU"):
-        raise ValueError("Weighting curve must be 'A', 'B', 'C', 'AU' or 'Z'.")
+        msg = "Weighting curve must be 'A', 'B', 'C', 'AU' or 'Z'."
+        raise ValueError(msg)
     if sweep_points < 64:
-        raise ValueError("'sweep_points' must be at least 64.")
+        msg = "'sweep_points' must be at least 64."
+        raise ValueError(msg)
 
     nyquist = wf.fs / 2.0
     nominal, design_all, limits1_all, limits2_all = _curve_design_and_limits(wf.curve)

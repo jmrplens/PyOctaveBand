@@ -348,7 +348,8 @@ def generate_decomposition_plot(output_dir: str) -> None:
     _, _, xb_cheby2 = bank_cheby2.filter(y, sigbands=True)
 
     if xb_butter is None or xb_cheby2 is None:
-        raise ValueError("Signal bands should not be None")
+        msg = "Signal bands should not be None"
+        raise ValueError(msg)
 
     num_plots = len(xb_butter) + 2  # +1 for original, +1 for impulse response
     _fig, axes = plt.subplots(num_plots, 1, figsize=(10, 2.2 * num_plots), sharex=False)

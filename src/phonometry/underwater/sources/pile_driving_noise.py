@@ -81,9 +81,11 @@ def cumulative_sel(single_sels: NDArray[np.float64] | list[float]) -> float:
     """
     sels = np.asarray(single_sels, dtype=np.float64)
     if sels.ndim != 1 or sels.size < 1:
-        raise ValueError("'single_sels' must be a non-empty 1-D sequence.")
+        msg = "'single_sels' must be a non-empty 1-D sequence."
+        raise ValueError(msg)
     if not np.all(np.isfinite(sels)):
-        raise ValueError("'single_sels' must be finite.")
+        msg = "'single_sels' must be finite."
+        raise ValueError(msg)
     return float(10.0 * np.log10(np.sum(10.0 ** (sels / 10.0))))
 
 
@@ -99,12 +101,15 @@ def cumulative_sel_identical(sel_ss: float, n_strikes: int) -> float:
     """
     n_float = float(n_strikes)
     if not n_float.is_integer():
-        raise ValueError("'n_strikes' must be a whole number of strikes.")
+        msg = "'n_strikes' must be a whole number of strikes."
+        raise ValueError(msg)
     n = int(n_float)
     if n < 1:
-        raise ValueError("'n_strikes' must be at least 1.")
+        msg = "'n_strikes' must be at least 1."
+        raise ValueError(msg)
     if not np.isfinite(sel_ss):
-        raise ValueError("'sel_ss' must be finite.")
+        msg = "'sel_ss' must be finite."
+        raise ValueError(msg)
     return float(float(sel_ss) + 10.0 * np.log10(n))
 
 
@@ -233,10 +238,12 @@ def strike_sel_spectrum(
     sig = _validate_pressure(pressure, min_samples=2)
     fs_v = _positive(fs, "fs")
     if int(fraction) not in (1, 3):
-        raise ValueError("'fraction' must be 1 (octave) or 3 (one-third octave).")
+        msg = "'fraction' must be 1 (octave) or 3 (one-third octave)."
+        raise ValueError(msg)
     lo, hi = (float(limits[0]), float(limits[1]))
     if not (np.isfinite(lo) and np.isfinite(hi)) or not (0.0 < lo < hi):
-        raise ValueError("'limits' must be a finite, increasing, positive pair.")
+        msg = "'limits' must be a finite, increasing, positive pair."
+        raise ValueError(msg)
 
     centres, lower, upper, _ = nominal_frequencies(int(fraction), [lo, hi])
     n = sig.size
@@ -264,7 +271,8 @@ def strike_sel_spectrum(
         band_sel = 10.0 * np.log10(band_energy / e0)
     total = float(band_energy.sum())
     if total <= 0.0:
-        raise ValueError("'pressure' has no energy inside the requested bands.")
+        msg = "'pressure' has no energy inside the requested bands."
+        raise ValueError(msg)
     return StrikeSelSpectrum(
         frequencies=fc,
         band_sel=np.asarray(band_sel, dtype=np.float64),

@@ -160,16 +160,16 @@ def _validate_multitaper_params(
     """
     nw = _positive(time_half_bandwidth, "time_half_bandwidth")
     if nw < 1.0 or nw >= n / 2.0:
-        raise ValueError(
-            f"'time_half_bandwidth' must be in [1, n/2) (got {nw:g} for {n} samples)."
-        )
+        msg = f"'time_half_bandwidth' must be in [1, n/2) (got {nw:g} for {n} samples)."
+        raise ValueError(msg)
     shannon = int(2.0 * nw)
     k = shannon - 1 if n_tapers is None else int(n_tapers)
     if not 1 <= k <= shannon:
-        raise ValueError(
+        msg = (
             "'n_tapers' must be between 1 and the Shannon number "
             f"2·NW = {shannon} (got {k})."
         )
+        raise ValueError(msg)
     return nw, k
 
 
@@ -383,7 +383,8 @@ def multitaper_psd(
     # calibration (a DC offset counts as signal power here too).
     power = float(np.mean(xa * xa))
     if power <= 0.0:
-        raise ValueError("'x' must not be identically zero.")
+        msg = "'x' must not be identically zero."
+        raise ValueError(msg)
 
     sk, eigenvalues, dc_gains_sq = _dpss_eigenspectra(xa, fs_v, nw, k)
     if adaptive:

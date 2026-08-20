@@ -28,10 +28,11 @@ _VALID_LANGUAGES = ("en", "es")
 def check_language(language: str) -> Language:
     """Return ``language`` if supported, else raise a clear :class:`ValueError`."""
     if language not in _VALID_LANGUAGES:
-        raise ValueError(
+        msg = (
             f"Unknown language {language!r}; supported languages are "
             f"{_VALID_LANGUAGES}."
         )
+        raise ValueError(msg)
     return language  # type: ignore[return-value]
 
 

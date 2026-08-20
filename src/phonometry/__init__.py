@@ -126,7 +126,8 @@ def __getattr__(name: str) -> object:
     elif name in _NAMES:
         value = getattr(import_module(_NAMES[name], __name__), name)
     else:
-        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+        msg = f"module {__name__!r} has no attribute {name!r}"
+        raise AttributeError(msg)
     globals()[name] = value
     return value
 

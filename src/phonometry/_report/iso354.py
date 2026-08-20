@@ -233,9 +233,10 @@ def render_iso354_report(
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     alpha_s = np.asarray(result.alpha_s, dtype=np.float64)
     if freqs.shape != alpha_s.shape:
-        raise ValueError(
+        msg = (
             "render_iso354_report() needs 'frequencies' and 'alpha_s' of equal length."
         )
+        raise ValueError(msg)
 
     styles, title_style, basis_style, caption_style = document_styles(accent)
     title = t("Sound absorption measurement", language)

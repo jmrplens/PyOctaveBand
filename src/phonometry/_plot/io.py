@@ -45,11 +45,12 @@ def _db_waveform(y: np.ndarray, calibrated: bool) -> np.ndarray:
         have no reference to count decibels from.
     """
     if not calibrated:
-        raise ValueError(
+        msg = (
             "scale='db' needs a calibrated Signal: without a "
             "calibration_factor the samples are digital full-scale units "
             "and there is no reference to count decibels from"
         )
+        raise ValueError(msg)
     # Deferred, not tidiness: signals.levels imports io, so reaching for
     # the reference pressure at module level here is an import cycle that
     # takes down `import phonometry` outright.
@@ -124,7 +125,8 @@ def plot_signal(
     from .._i18n import localize_axes
 
     if scale not in ("linear", "db"):
-        raise ValueError(f"scale must be 'linear' or 'db'; got {scale!r}")
+        msg = f"scale must be 'linear' or 'db'; got {scale!r}"
+        raise ValueError(msg)
 
     factor = result.calibration_factor
     calibrated = factor is not None

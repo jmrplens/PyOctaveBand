@@ -637,9 +637,8 @@ def _procedure(method: str) -> _BandProcedure:
     try:
         return _PROCEDURES[method]
     except KeyError:
-        raise ValueError(
-            f"Unknown SII method {method!r}; choose from {', '.join(SII_METHODS)}."
-        ) from None
+        msg = f"Unknown SII method {method!r}; choose from {', '.join(SII_METHODS)}."
+        raise ValueError(msg) from None
 
 
 @dataclass(frozen=True)
@@ -724,9 +723,8 @@ class SIIResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.sii import render_sii_report
 
         return render_sii_report(
@@ -745,10 +743,11 @@ def standard_speech_spectrum(vocal_effort: str = "normal") -> np.ndarray:
     try:
         return _SPEECH_SPECTRA[vocal_effort].copy()
     except KeyError:
-        raise ValueError(
+        msg = (
             f"Unknown vocal_effort {vocal_effort!r}; choose from "
             f"{', '.join(VOCAL_EFFORTS)}."
-        ) from None
+        )
+        raise ValueError(msg) from None
 
 
 @dataclass(frozen=True)
@@ -822,10 +821,11 @@ def standard_speech_spectra(
         (vocal_efforts,) if isinstance(vocal_efforts, str) else tuple(vocal_efforts)
     )
     if not efforts:
-        raise ValueError(
+        msg = (
             "'vocal_efforts' cannot be empty; choose at least one of "
             f"{', '.join(VOCAL_EFFORTS)}."
         )
+        raise ValueError(msg)
     levels = np.array(
         [standard_speech_spectrum(effort) for effort in efforts],
         dtype=np.float64,
@@ -849,11 +849,12 @@ def _as_band_vector(
         # one-third-octave procedure the limits are the computed 2**(-+1/6) fi,
         # and "142.544 Hz - 8979.7 Hz" is a worse hint than "160 Hz - 8000 Hz".
         centres = proc.frequencies
-        raise ValueError(
+        msg = (
             f"{name!r} must be a 1-D vector of {expected} "
             f"{proc.method} band values "
             f"({centres[0]:g} Hz - {centres[-1]:g} Hz); got shape {arr.shape}."
         )
+        raise ValueError(msg)
     return arr
 
 
@@ -910,16 +911,18 @@ def _procedure_speech_spectrum(
     if vocal_effort == "normal":
         return procedure.speech_spectrum.copy()
     if vocal_effort in VOCAL_EFFORTS:
-        raise ValueError(
+        msg = (
             f"The {procedure.method!r} procedure carries the standard speech "
             f"spectrum for normal vocal effort only; {vocal_effort!r} is "
             "carried for the one-third-octave procedure. Pass an explicit "
             "equivalent speech spectrum level instead."
         )
-    raise ValueError(
+        raise ValueError(msg)
+    msg = (
         f"Unknown vocal_effort {vocal_effort!r}; choose from "
         f"{', '.join(VOCAL_EFFORTS)}."
     )
+    raise ValueError(msg)
 
 
 def speech_intelligibility_index(

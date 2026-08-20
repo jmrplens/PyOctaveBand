@@ -106,31 +106,33 @@ class Signal:
     def __post_init__(self) -> None:
         data = np.atleast_2d(np.asarray(self.data, dtype=np.float64))
         if data.ndim != 2:
-            raise ValueError(
-                f"data must be 1-D or (channels, samples); got {data.ndim}-D"
-            )
+            msg = f"data must be 1-D or (channels, samples); got {data.ndim}-D"
+            raise ValueError(msg)
         object.__setattr__(self, "data", np.ascontiguousarray(data))
         if (
             self.channel_labels is not None
             and len(self.channel_labels) != data.shape[0]
         ):
-            raise ValueError(
+            msg = (
                 f"{len(self.channel_labels)} channel labels for "
                 f"{data.shape[0]} channels"
             )
+            raise ValueError(msg)
         # Finiteness is checked alongside the sign: NaN and infinity pass
         # every comparison against zero, and an fs or calibration of NaN
         # would flow into durations and levels as a wrong number that
         # looks computed.
         if not np.isfinite(self.fs) or self.fs <= 0:
-            raise ValueError(f"fs must be a positive finite number; got {self.fs}")
+            msg = f"fs must be a positive finite number; got {self.fs}"
+            raise ValueError(msg)
         if self.calibration_factor is not None and (
             not np.isfinite(self.calibration_factor) or self.calibration_factor <= 0
         ):
-            raise ValueError(
+            msg = (
                 "calibration_factor must be a positive finite number; "
                 f"got {self.calibration_factor}"
             )
+            raise ValueError(msg)
 
     @property
     def _view(self) -> NDArray[np.float64]:
@@ -199,9 +201,8 @@ class Signal:
         picked = [int(c) for c in wanted]
         for c in picked:
             if not -self.data.shape[0] <= c < self.data.shape[0]:
-                raise IndexError(
-                    f"channel {c} out of range for a {self.data.shape[0]}-channel signal"
-                )
+                msg = f"channel {c} out of range for a {self.data.shape[0]}-channel signal"
+                raise IndexError(msg)
         labels = (
             tuple(self.channel_labels[c] for c in picked)
             if self.channel_labels is not None
@@ -234,11 +235,14 @@ class Signal:
         start = 0.0 if tmin is None else float(tmin)
         stop = self.duration if tmax is None else float(tmax)
         if not np.isfinite(start) or not np.isfinite(stop):
-            raise ValueError("'tmin' and 'tmax' must be finite times in seconds")
+            msg = "'tmin' and 'tmax' must be finite times in seconds"
+            raise ValueError(msg)
         if start < 0.0:
-            raise ValueError(f"'tmin' must not be negative; got {start}")
+            msg = f"'tmin' must not be negative; got {start}"
+            raise ValueError(msg)
         if stop <= start:
-            raise ValueError(f"'tmax' ({stop}) must be greater than 'tmin' ({start})")
+            msg = f"'tmax' ({stop}) must be greater than 'tmin' ({start})"
+            raise ValueError(msg)
         # Ceiling, not rounding: the span is half-open, so a sample belongs
         # to it when tmin <= i/fs < tmax, which is i >= tmin*fs. Rounding
         # would pull in the sample just before tmin whenever the edge falls
@@ -247,9 +251,8 @@ class Signal:
         first = math.ceil(round(start * self.fs, 9))
         last = min(math.ceil(round(stop * self.fs, 9)), self.data.shape[1])
         if first >= last:
-            raise ValueError(
-                f"the span [{start}, {stop}) s holds no samples at {self.fs} Hz"
-            )
+            msg = f"the span [{start}, {stop}) s holds no samples at {self.fs} Hz"
+            raise ValueError(msg)
         return Signal(
             data=self.data[:, first:last],
             fs=self.fs,

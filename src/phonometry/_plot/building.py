@@ -472,10 +472,11 @@ def _require_extended_curve(
     result: ExtendedWeightedRatingResult | ExtendedImpactRatingResult,
 ) -> None:
     if result.band_centers is None or result.measured is None:
-        raise ValueError(
+        msg = (
             "This extended rating result carries no band curve to plot (it "
             "was constructed without band_centers/measured data)."
         )
+        raise ValueError(msg)
 
 
 def _plot_extended_rating(

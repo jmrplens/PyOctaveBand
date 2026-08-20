@@ -150,10 +150,11 @@ def plot_monte_carlo(
     from .._i18n import decimal_comma, fmt_minus, localize_axes
 
     if result.samples is None:
-        raise ValueError(
+        msg = (
             "plot() needs the Monte Carlo output samples; call "
             "monte_carlo(..., keep_samples=True) to retain them."
         )
+        raise ValueError(msg)
     ax = ax if ax is not None else _new_axes()
     samples = np.asarray(result.samples, dtype=np.float64)
     kwargs.setdefault("color", _C_PRIMARY_LIGHT)
@@ -401,7 +402,8 @@ def plot_peak_statistics(
         ax.set_title(_t("Peak-height distribution (Bendat & Piersol 5.5.4)", language))
     peaks = result.peak_values
     if peaks.size == 0:
-        raise ValueError("The record has no local maxima to plot.")
+        msg = "The record has no local maxima to plot."
+        raise ValueError(msg)
     exceedance = 1.0 - np.arange(1, peaks.size + 1) / peaks.size
     z = np.linspace(float(peaks[0]), float(peaks[-1]), 400)
     ax.plot(

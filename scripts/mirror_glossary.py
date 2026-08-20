@@ -60,9 +60,8 @@ def _load() -> list[dict[str, Any]]:
     """The glossary array, read through node."""
     node = shutil.which("node")
     if node is None:
-        raise SystemExit(
-            "scripts/mirror_glossary.py needs node to read site/src/data/glossary.mjs"
-        )
+        msg = "scripts/mirror_glossary.py needs node to read site/src/data/glossary.mjs"
+        raise SystemExit(msg)
     program = _DUMP % json.dumps(DATA.as_uri())
     # Fixed argv, no shell: the only variable is a path this repo owns.
     result = subprocess.run(
@@ -72,7 +71,8 @@ def _load() -> list[dict[str, Any]]:
         check=False,
     )
     if result.returncode != 0:
-        raise SystemExit(f"could not read {DATA}: {result.stderr.strip()}")
+        msg = f"could not read {DATA}: {result.stderr.strip()}"
+        raise SystemExit(msg)
     data: list[dict[str, Any]] = json.loads(result.stdout)
     return data
 
@@ -122,7 +122,8 @@ def _prose() -> str:
     text = PAGE.read_text(encoding="utf-8")
     match = re.match(r"---\n.*?\n---\n", text, re.DOTALL)
     if not match:
-        raise SystemExit(f"{PAGE}: page without frontmatter")
+        msg = f"{PAGE}: page without frontmatter"
+        raise SystemExit(msg)
     body = text[match.end() :]
     body = re.sub(r"^import .*$", "", body, flags=re.MULTILINE)
     body = body.split("<Glossary")[0]

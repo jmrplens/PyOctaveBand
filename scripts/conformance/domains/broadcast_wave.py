@@ -90,7 +90,8 @@ def _bext_payload(blob: bytes) -> bytes:
         if chunk_id == b"bext":
             return blob[pos + 8 : pos + 8 + size]
         pos += 8 + size + size % 2
-    raise ValueError("no bext chunk in the written file")
+    msg = "no bext chunk in the written file"
+    raise ValueError(msg)
 
 
 def _write_and_capture(
@@ -107,7 +108,8 @@ def _write_and_capture(
         reread = read(path).provenance
         payload = _bext_payload(path.read_bytes())
     if reread is None:
-        raise ValueError("written bext did not read back")
+        msg = "written bext did not read back"
+        raise ValueError(msg)
     return payload, reread
 
 

@@ -181,11 +181,12 @@ def k_weighting_coefficients(
     """
     fs = require_positive(float(fs), "fs")
     if fs < 16000.0:
-        raise ValueError(
+        msg = (
             "the K-weighting redesign requires fs >= 16000 Hz; below that "
             "the bilinear warping no longer preserves the specified response "
             f"within the metering tolerance; got fs={fs:g}."
         )
+        raise ValueError(msg)
     if fs == _TABLE_RATE:
         return (
             (np.array(_STAGE1_B48), np.array(_STAGE1_A48)),
@@ -318,16 +319,17 @@ def k_weighting_response(
     nyquist = fs / 2.0
     if frequencies is None:
         if n < 1:
-            raise ValueError(f"n must be a positive integer; got {n}.")
+            msg = f"n must be a positive integer; got {n}."
+            raise ValueError(msg)
         freqs = np.logspace(np.log10(10.0), np.log10(nyquist), int(n))
     else:
         freqs = np.asarray(frequencies, dtype=np.float64).ravel()
         if freqs.size == 0:
-            raise ValueError("'frequencies' cannot be empty.")
+            msg = "'frequencies' cannot be empty."
+            raise ValueError(msg)
         if np.any(freqs <= 0.0) or np.any(freqs > nyquist):
-            raise ValueError(
-                f"every frequency must lie in (0, fs/2] = (0, {nyquist:g}] Hz."
-            )
+            msg = f"every frequency must lie in (0, fs/2] = (0, {nyquist:g}] Hz."
+            raise ValueError(msg)
     shelf_db = 20.0 * np.log10(np.abs(signal.freqz(b1, a1, worN=freqs, fs=fs)[1]))
     highpass_db = 20.0 * np.log10(np.abs(signal.freqz(b2, a2, worN=freqs, fs=fs)[1]))
     return KWeightingResponse(
@@ -364,11 +366,11 @@ def channel_weight(
     theta = np.abs(np.asarray(azimuth, dtype=np.float64))
     phi = np.abs(np.asarray(elevation, dtype=np.float64))
     if not (np.all(np.isfinite(theta)) and np.all(np.isfinite(phi))):
-        raise ValueError("azimuth and elevation must be finite.")
+        msg = "azimuth and elevation must be finite."
+        raise ValueError(msg)
     if np.any(theta > 360.0) or np.any(phi > 90.0):
-        raise ValueError(
-            "azimuth must be within +/-360 deg and elevation within +/-90 deg."
-        )
+        msg = "azimuth must be within +/-360 deg and elevation within +/-90 deg."
+        raise ValueError(msg)
     theta = np.where(theta > 180.0, 360.0 - theta, theta)
     side = (theta >= 60.0) & (theta <= 120.0) & (phi < 30.0)
     return as_float_or_array(np.where(side, 1.41, 1.0))
@@ -380,23 +382,27 @@ def _resolve_weights(n_channels: int, weights: ArrayLike | None) -> np.ndarray:
         try:
             return np.array(DEFAULT_CHANNEL_WEIGHTS[n_channels])
         except KeyError:
-            raise ValueError(
+            msg = (
                 f"no default channel weighting for {n_channels} channels: "
                 "Table 3 covers mono, stereo, 3/2 multichannel (L/R/C/Ls/Rs) "
                 "and 5.1 (L/R/C/LFE/Ls/Rs). Pass explicit weights (see "
                 "channel_weight for the Annex 3 position-dependent values; "
                 "use 0.0 to exclude an LFE channel)."
-            ) from None
+            )
+            raise ValueError(msg) from None
     w = np.asarray(weights, dtype=np.float64)
     if w.ndim != 1 or w.size != n_channels:
-        raise ValueError(
+        msg = (
             f"weights must be a 1D sequence with one entry per channel "
             f"({n_channels}); got shape {w.shape}."
         )
+        raise ValueError(msg)
     if not np.all(np.isfinite(w)):
-        raise ValueError("channel weights must be finite.")
+        msg = "channel weights must be finite."
+        raise ValueError(msg)
     if np.any(w < 0.0):
-        raise ValueError("channel weights must be non-negative.")
+        msg = "channel weights must be non-negative."
+        raise ValueError(msg)
     return w
 
 
@@ -550,7 +556,8 @@ def true_peak_level(
         or not isinstance(oversample, (int, np.integer))
         or oversample < 1
     ):
-        raise ValueError("oversample must be an integer >= 1.")
+        msg = "oversample must be an integer >= 1."
+        raise ValueError(msg)
     x_proc = _typesignal(resolve_samples(x, calibrate=False))
     if x_proc.shape[-1] == 0:
         raise ValueError(_EMPTY_SIGNAL)
@@ -615,7 +622,8 @@ def _prepare_signal(
     if x_proc.shape[-1] == 0:
         raise ValueError(_EMPTY_SIGNAL)
     if not np.all(np.isfinite(x_proc)):
-        raise ValueError("Input signal 'x' must be finite (no NaN/inf samples).")
+        msg = "Input signal 'x' must be finite (no NaN/inf samples)."
+        raise ValueError(msg)
     return x_proc, _resolve_weights(x_proc.shape[0], weights)
 
 
@@ -739,9 +747,8 @@ class ProgramLoudnessResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.broadcast import render_program_loudness_report
 
         return render_program_loudness_report(
@@ -811,11 +818,12 @@ def program_loudness(
     momentary_step = require_positive(float(momentary_step), "momentary_step")
     short_term_step = require_positive(float(short_term_step), "short_term_step")
     if momentary_step > 0.1 or short_term_step > 0.1:
-        raise ValueError(
+        msg = (
             "momentary_step and short_term_step must be <= 0.1 s: EBU Tech "
             "3341 requires a meter update rate of at least 10 Hz, and Tech "
             "3342 needs it for the LRA input."
         )
+        raise ValueError(msg)
 
     csum = _power_cumsum(k_weighting(x_proc, fs))
     n_block, block_step = _block_geometry(fs)

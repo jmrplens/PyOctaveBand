@@ -180,9 +180,8 @@ class OpenPlanResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.iso3382_3 import render_iso3382_3_report
 
         return render_iso3382_3_report(
@@ -252,23 +251,22 @@ def open_plan_metrics(
     sti = np.asarray(sti_values, dtype=np.float64)
 
     if not (r.shape == lp.shape == sti.shape):
-        raise ValueError(
-            "positions_m, spl_a_speech and sti_values must have the same length."
-        )
+        msg = "positions_m, spl_a_speech and sti_values must have the same length."
+        raise ValueError(msg)
     if r.ndim != 1:
-        raise ValueError("Inputs must be one-dimensional.")
+        msg = "Inputs must be one-dimensional."
+        raise ValueError(msg)
     if r.size < _MIN_POSITIONS:
-        raise ValueError(
-            f"ISO 3382-3 requires at least 4 measurement positions (got {r.size})."
-        )
+        msg = f"ISO 3382-3 requires at least 4 measurement positions (got {r.size})."
+        raise ValueError(msg)
     if not (
         np.all(np.isfinite(r)) and np.all(np.isfinite(lp)) and np.all(np.isfinite(sti))
     ):
-        raise ValueError(
-            "positions_m, spl_a_speech and sti_values must be finite (no NaN or Inf)."
-        )
+        msg = "positions_m, spl_a_speech and sti_values must be finite (no NaN or Inf)."
+        raise ValueError(msg)
     if np.any(r <= 0.0):
-        raise ValueError("Distances 'positions_m' must be positive.")
+        msg = "Distances 'positions_m' must be positive."
+        raise ValueError(msg)
 
     d2s = float("nan")
     lp_as_4m = float("nan")

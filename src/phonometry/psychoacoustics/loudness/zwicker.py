@@ -178,9 +178,8 @@ class ZwickerLoudness:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from ..._report.iso532 import render_iso532_report
 
         return render_iso532_report(
@@ -244,10 +243,11 @@ def _third_octave_levels(
         # One 500 Hz output sample needs _SR_LEVEL/_SR_LOUDNESS level steps.
         min_steps = _SR_LEVEL // _SR_LOUDNESS
         if num_dec < min_steps:
-            raise ValueError(
+            msg = (
                 "Input signal is too short for the time-varying method: at "
                 f"least {dec_factor * min_steps} samples at 48 kHz are required."
             )
+            raise ValueError(msg)
 
     levels = np.empty((_N_BANDS, num_dec))
     for band in range(_N_BANDS):
@@ -700,7 +700,8 @@ def _percentile(values: np.ndarray, percentile: int) -> float:
 def _validate_field(field: str) -> bool:
     """Return True for the diffuse field; raise on invalid values."""
     if field not in ("free", "diffuse"):
-        raise ValueError(f"'field' must be 'free' or 'diffuse', got {field!r}.")
+        msg = f"'field' must be 'free' or 'diffuse', got {field!r}."
+        raise ValueError(msg)
     return field == "diffuse"
 
 
@@ -733,12 +734,14 @@ def loudness_zwicker_from_spectrum(
     diffuse = _validate_field(field)
     band_levels = np.asarray(levels, dtype=np.float64)
     if band_levels.ndim != 1 or band_levels.size != _N_BANDS:
-        raise ValueError(
+        msg = (
             f"'levels' must contain exactly {_N_BANDS} one-third-octave band "
             f"levels (25 Hz to 12.5 kHz), got shape {band_levels.shape}."
         )
+        raise ValueError(msg)
     if not np.all(np.isfinite(band_levels)):
-        raise ValueError("'levels' must contain only finite values.")
+        msg = "'levels' must contain only finite values."
+        raise ValueError(msg)
     core = _core_loudness_from_levels(band_levels[:, np.newaxis], diffuse)
     loudness, specific = _slopes_over_time(core)
     total = float(loudness[0])
@@ -827,44 +830,52 @@ def loudness_zwicker(
     diffuse = _validate_field(field)
     fs = resolve_fs(x, fs)
     if fs <= 0:
-        raise ValueError(f"'fs' must be a positive sampling rate, got {fs!r}.")
+        msg = f"'fs' must be a positive sampling rate, got {fs!r}."
+        raise ValueError(msg)
     factor = resolve_calibration(x, calibration_factor)
     require_positive(factor, "calibration_factor")
     pressure = _typesignal(np.asarray(x))
     if pressure.ndim != 1:
-        raise ValueError(
+        msg = (
             "loudness_zwicker() accepts single-channel signals only, got "
             f"shape {pressure.shape}."
         )
+        raise ValueError(msg)
     if pressure.size == 0:
-        raise ValueError("Input signal 'x' cannot be empty.")
+        msg = "Input signal 'x' cannot be empty."
+        raise ValueError(msg)
     if not np.all(np.isfinite(pressure)):
-        raise ValueError("Input signal 'x' must contain only finite values.")
+        msg = "Input signal 'x' must contain only finite values."
+        raise ValueError(msg)
     pressure = pressure * factor
 
     if int(fs) != fs:
-        raise ValueError(f"'fs' must be an integer sampling rate, got {fs!r}.")
+        msg = f"'fs' must be an integer sampling rate, got {fs!r}."
+        raise ValueError(msg)
     fs_int = int(fs)
     if fs_int != _FS_REF:
         gcd = math.gcd(_FS_REF, fs_int)
         up, down = _FS_REF // gcd, fs_int // gcd
         if max(up, down) > 1000:
-            raise ValueError(
+            msg = (
                 f"Sampling rate {fs_int} Hz needs an impractical resampling "
                 f"ratio ({up}/{down}) to reach 48000 Hz; resample the signal "
                 "to a standard rate first."
             )
+            raise ValueError(msg)
         pressure = np.asarray(signal.resample_poly(pressure, up, down))
 
     time_skip = float(time_skip)
     if not math.isfinite(time_skip) or time_skip < 0.0:
-        raise ValueError("'time_skip' must be a non-negative, finite time.")
+        msg = "'time_skip' must be a non-negative, finite time."
+        raise ValueError(msg)
     skip_samples = round(time_skip * _FS_REF)
     if skip_samples >= pressure.size:
-        raise ValueError(
+        msg = (
             "'time_skip' must leave at least one sample of signal "
             f"({time_skip} s skips the whole {pressure.size / _FS_REF:.3f} s input)."
         )
+        raise ValueError(msg)
 
     levels = _third_octave_levels(pressure, stationary, skip_samples)
     core = _core_loudness_from_levels(levels, diffuse)

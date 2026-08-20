@@ -97,10 +97,11 @@ class CalibrationSidecar:
     def __post_init__(self) -> None:
         factor = float(self.calibration_factor)
         if not (math.isfinite(factor) and factor > 0):
-            raise ValueError(
+            msg = (
                 f"calibration_factor must be finite and positive; got "
                 f"{self.calibration_factor!r}"
             )
+            raise ValueError(msg)
 
 
 def sidecar_path(audio_path: str | Path) -> Path:
@@ -172,8 +173,9 @@ def _optional_number(payload: dict[str, object], key: str, path: Path) -> float 
     if value is None:
         return None
     if isinstance(value, bool) or not isinstance(value, int | float):
+        msg = f"{path}: {key} must be a number or null; got {value!r}"
         raise ValueError(  # noqa: TRY004 - ValueError keeps the module validation errors uniform
-            f"{path}: {key} must be a number or null; got {value!r}"
+            msg
         )
     return float(value)
 
@@ -183,23 +185,27 @@ def _load_sidecar_payload(source: Path) -> dict[str, object]:
     try:
         payload = json.loads(source.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
-        raise ValueError(f"{source}: sidecar is not valid JSON") from exc
+        msg = f"{source}: sidecar is not valid JSON"
+        raise ValueError(msg) from exc
     if not isinstance(payload, dict) or payload.get("schema") != SIDECAR_SCHEMA:
-        raise ValueError(
+        msg = (
             f"{source}: not a {SIDECAR_SCHEMA!r} sidecar; refusing to "
             "guess at its meaning"
         )
+        raise ValueError(msg)
     version = payload.get("schema_version")
     if not isinstance(version, int) or isinstance(version, bool):
+        msg = f"{source}: schema_version must be an integer"
         raise ValueError(  # noqa: TRY004 - ValueError keeps the module validation errors uniform
-            f"{source}: schema_version must be an integer"
+            msg
         )
     if version > SIDECAR_VERSION:
-        raise ValueError(
+        msg = (
             f"{source}: sidecar schema version {version} is newer than the "
             f"version {SIDECAR_VERSION} this phonometry understands; "
             "upgrade phonometry to read it"
         )
+        raise ValueError(msg)
     return payload
 
 
@@ -207,8 +213,9 @@ def _required_factor(payload: dict[str, object], source: Path) -> float:
     """The mandatory calibration factor, validated as a number."""
     factor = payload.get("calibration_factor")
     if isinstance(factor, bool) or not isinstance(factor, int | float):
+        msg = f"{source}: calibration_factor must be a number; got {factor!r}"
         raise ValueError(  # noqa: TRY004 - ValueError keeps the module validation errors uniform
-            f"{source}: calibration_factor must be a number; got {factor!r}"
+            msg
         )
     return float(factor)
 
@@ -221,12 +228,14 @@ def _calibrator_fields(
     if calibrator is None:
         calibrator = {}
     if not isinstance(calibrator, dict):
+        msg = f"{source}: calibrator must be an object or null"
         raise ValueError(  # noqa: TRY004 - ValueError keeps the module validation errors uniform
-            f"{source}: calibrator must be an object or null"
+            msg
         )
     model = calibrator.get("model")
     if model is not None and not isinstance(model, str):
-        raise ValueError(f"{source}: calibrator model must be a string or null")
+        msg = f"{source}: calibrator model must be a string or null"
+        raise ValueError(msg)
     return calibrator, model
 
 
@@ -238,9 +247,8 @@ def _channel_labels(payload: dict[str, object], source: Path) -> tuple[str, ...]
     if not isinstance(labels, list) or not all(
         isinstance(label, str) for label in labels
     ):
-        raise ValueError(
-            f"{source}: channel_labels must be an array of strings or null"
-        )
+        msg = f"{source}: channel_labels must be an array of strings or null"
+        raise ValueError(msg)
     return tuple(labels)
 
 
@@ -281,4 +289,5 @@ def read_sidecar(audio_path: str | Path) -> CalibrationSidecar | None:
             ),
         )
     except ValueError as exc:
-        raise ValueError(f"{source}: {exc}") from exc
+        msg = f"{source}: {exc}"
+        raise ValueError(msg) from exc

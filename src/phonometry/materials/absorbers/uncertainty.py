@@ -135,9 +135,8 @@ _COEFFICIENT_QUANTITIES = frozenset(
 
 def _condition(condition: str) -> str:
     if condition not in _CONDITIONS:
-        raise ValueError(
-            f"'condition' must be one of {_CONDITIONS}; got {condition!r}."
-        )
+        msg = f"'condition' must be one of {_CONDITIONS}; got {condition!r}."
+        raise ValueError(msg)
     return condition
 
 
@@ -146,7 +145,8 @@ def _finite_bands(
 ) -> np.ndarray:
     a = np.atleast_1d(np.asarray(values, dtype=np.float64))
     if not np.all(np.isfinite(a)):
-        raise ValueError(f"'{name}' must contain only finite values.")
+        msg = f"'{name}' must contain only finite values."
+        raise ValueError(msg)
     return a
 
 
@@ -167,9 +167,10 @@ def absorption_coverage_factor(confidence: float = 0.95) -> float:
         if abs(level - confidence) < 1e-9:
             return k
     valid = ", ".join(f"{level:g}" for level in _COVERAGE_FACTORS)
-    raise ValueError(
+    msg = (
         f"Confidence level {confidence!r} is not tabulated in Table 3. Valid: {valid}."
     )
+    raise ValueError(msg)
 
 
 @dataclass(frozen=True)
@@ -240,10 +241,11 @@ def _table_constants(
         mn = np.array([table[float(f)] for f in frequencies], dtype=np.float64)
     except KeyError as exc:
         valid = ", ".join(f"{f:g}" for f in table)
-        raise ValueError(
+        msg = (
             f"Frequency {exc.args[0]:g} Hz is not a tabulated {band_kind} band. "
             f"Valid: {valid}."
-        ) from None
+        )
+        raise ValueError(msg) from None
     return mn[:, 0], mn[:, 1]
 
 
@@ -261,10 +263,11 @@ def _band_uncertainty(
     :math:`\sigma_\mathrm{R} = m \alpha + n` (values == α).
     """
     if values.shape != frequencies.shape:
-        raise ValueError(
+        msg = (
             f"'{quantity}' values and frequencies must have the same shape; "
             f"got {values.shape} and {frequencies.shape}."
         )
+        raise ValueError(msg)
     m, n = _table_constants(frequencies, table, band_kind)
     sigma_r = m * values + n
     u = sigma_r if condition == "reproducibility" else _REPEATABILITY_FACTOR * sigma_r
@@ -336,10 +339,11 @@ def equivalent_area_uncertainty(
     a = _finite_bands(area, "area")
     f = _finite_bands(frequencies, "frequencies")
     if a.shape != f.shape:
-        raise ValueError(
+        msg = (
             f"'area' values and frequencies must have the same shape; "
             f"got {a.shape} and {f.shape}."
         )
+        raise ValueError(msg)
     m, n = _table_constants(f, _TABLE1, "one-third-octave")
     cond = _condition(condition)
     sigma_r = m * a + n * _EQUIV_AREA_REFERENCE_S
@@ -458,7 +462,8 @@ def single_number_rating_uncertainty(
     """
     value = float(dl_alpha)
     if not np.isfinite(value) or value < 0.0:
-        raise ValueError("'dl_alpha' must be a non-negative, finite value.")
+        msg = "'dl_alpha' must be a non-negative, finite value."
+        raise ValueError(msg)
     cond = _condition(condition)
     return _single_number(
         value,

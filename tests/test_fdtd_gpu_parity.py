@@ -427,7 +427,8 @@ def test_submit_falls_back_to_local_numpy_run(
     monkeypatch.setattr(fdtd_gpu_remote, "remote_available", lambda config: True)
 
     def _boom(job: dict[str, Any], config: Any, timeout: float = 0.0) -> dict[str, Any]:
-        raise fdtd_gpu_remote.RemoteRunError("docker run failed")
+        msg = "docker run failed"
+        raise fdtd_gpu_remote.RemoteRunError(msg)
 
     monkeypatch.setattr(fdtd_gpu_remote, "run_remote", _boom)
     monkeypatch.setattr(job_runner, "_pick_backend", lambda: (np, "numpy"))

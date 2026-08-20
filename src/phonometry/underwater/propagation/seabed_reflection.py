@@ -59,7 +59,8 @@ def critical_angle(c1: float, c2: float) -> float:
     cw = require_positive(c1, "c1")
     cs = require_positive(c2, "c2")
     if cs <= cw:
-        raise ValueError("A critical angle exists only when c2 > c1 (faster sediment).")
+        msg = "A critical angle exists only when c2 > c1 (faster sediment)."
+        raise ValueError(msg)
     return float(np.degrees(np.arccos(cw / cs)))
 
 
@@ -85,9 +86,11 @@ def reflection_coefficient(
     """
     phi = np.atleast_1d(np.asarray(grazing_angle, dtype=np.float64))
     if phi.size == 0 or not np.all(np.isfinite(phi)):
-        raise ValueError("'grazing_angle' must be finite and non-empty.")
+        msg = "'grazing_angle' must be finite and non-empty."
+        raise ValueError(msg)
     if np.any(phi < 0.0) or np.any(phi > 90.0):
-        raise ValueError("'grazing_angle' must be within [0, 90] degrees.")
+        msg = "'grazing_angle' must be within [0, 90] degrees."
+        raise ValueError(msg)
     r1 = require_positive(rho1, "rho1")
     cw = require_positive(c1, "c1")
     r2 = require_positive(rho2, "rho2")

@@ -89,9 +89,8 @@ def hydrophone_depths(
         or np.any(ang <= 0.0)
         or np.any(ang >= 90.0)
     ):
-        raise ValueError(
-            "'angles' must be finite and lie in the open interval (0, 90) degrees."
-        )
+        msg = "'angles' must be finite and lie in the open interval (0, 90) degrees."
+        raise ValueError(msg)
     return np.asarray(cpa * np.tan(np.radians(ang)), dtype=np.float64)
 
 
@@ -198,13 +197,16 @@ def monopole_source_level(
     freqs = np.atleast_1d(np.asarray(frequency, dtype=np.float64))
     rnl_arr = np.atleast_1d(np.asarray(rnl, dtype=np.float64))
     if np.any(freqs <= 0.0) or not np.all(np.isfinite(freqs)):
-        raise ValueError("'frequency' must be positive and finite.")
+        msg = "'frequency' must be positive and finite."
+        raise ValueError(msg)
     if not np.all(np.isfinite(rnl_arr)):
-        raise ValueError("'rnl' must be finite.")
+        msg = "'rnl' must be finite."
+        raise ValueError(msg)
     if rnl_arr.size == 1 and freqs.size > 1:
         rnl_arr = np.full(freqs.shape, rnl_arr[0])
     if rnl_arr.shape != freqs.shape:
-        raise ValueError("'rnl' and 'frequency' must have the same length.")
+        msg = "'rnl' and 'frequency' must have the same length."
+        raise ValueError(msg)
     source_depth = _SOURCE_DEPTH_FRACTION * d
     delta_l = _surface_correction(freqs, source_depth, speed)
     return ShipSourceLevelResult(

@@ -77,14 +77,17 @@ class Quantity:
     def __post_init__(self) -> None:
         """Reject a negative uncertainty, an unrecognised PDF or non-positive dof."""
         if self.uncertainty < 0.0:
-            raise ValueError("uncertainty must be non-negative.")
+            msg = "uncertainty must be non-negative."
+            raise ValueError(msg)
         if self.distribution not in DISTRIBUTIONS:
-            raise ValueError(
+            msg = (
                 f"distribution must be one of {DISTRIBUTIONS}; "
                 f"got {self.distribution!r}."
             )
+            raise ValueError(msg)
         if self.dof <= 0.0:
-            raise ValueError("dof must be positive.")
+            msg = "dof must be positive."
+            raise ValueError(msg)
 
 
 def rectangular(value: float, half_width: float, name: str = "") -> Quantity:
@@ -155,12 +158,13 @@ class UncertaintyResult:
             k = float(coverage_factor_override)
             return k, k * self.combined_uncertainty
         if math.isnan(self.effective_dof):
-            raise ValueError(
+            msg = (
                 "The effective degrees of freedom are undefined for a "
                 "correlated budget with finite input dof (the GUM defines "
                 "no Welch-Satterthwaite form there): pass an explicit "
                 "coverage_factor_override."
             )
+            raise ValueError(msg)
         k = coverage_factor(coverage, self.effective_dof)
         return k, k * self.combined_uncertainty
 
@@ -283,16 +287,20 @@ def _validated_correlation(correlation: ArrayLike | None, n: int) -> np.ndarray 
         return None
     r = np.asarray(correlation, dtype=np.float64)
     if r.shape != (n, n):
-        raise ValueError(f"correlation must have shape ({n}, {n}); got {r.shape}.")
+        msg = f"correlation must have shape ({n}, {n}); got {r.shape}."
+        raise ValueError(msg)
     if not np.allclose(r, r.T):
-        raise ValueError("correlation matrix must be symmetric.")
+        msg = "correlation matrix must be symmetric."
+        raise ValueError(msg)
     if not np.allclose(np.diag(r), 1.0):
-        raise ValueError("correlation matrix diagonal must be 1.0.")
+        msg = "correlation matrix diagonal must be 1.0."
+        raise ValueError(msg)
     # A symmetric, unit-diagonal matrix can still be indefinite, which would
     # make the variance negative and be silently masked by the clamp that
     # follows the propagation; reject it.
     if float(np.min(np.linalg.eigvalsh(r))) < -1e-8:
-        raise ValueError("correlation matrix must be positive semi-definite.")
+        msg = "correlation matrix must be positive semi-definite."
+        raise ValueError(msg)
     return r
 
 
@@ -358,7 +366,8 @@ def combine_uncertainty(
     :raises ValueError: for no inputs or a malformed correlation matrix.
     """
     if len(quantities) == 0:
-        raise ValueError("at least one input quantity is required.")
+        msg = "at least one input quantity is required."
+        raise ValueError(msg)
     values = np.array([q.value for q in quantities], dtype=np.float64)
     uncert = np.array([q.uncertainty for q in quantities], dtype=np.float64)
     n = values.size
@@ -399,7 +408,8 @@ def coverage_factor(coverage: float = 0.95, dof: float = math.inf) -> float:
     :raises ValueError: for a coverage outside (0, 1).
     """
     if not 0.0 < coverage < 1.0:
-        raise ValueError(f"coverage must be in (0, 1); got {coverage}.")
+        msg = f"coverage must be in (0, 1); got {coverage}."
+        raise ValueError(msg)
     p = 0.5 * (1.0 + coverage)
     if math.isinf(dof):
         from scipy.special import ndtri
@@ -482,11 +492,14 @@ def monte_carlo(
     :raises ValueError: for no inputs, fewer than 2 trials or bad coverage.
     """
     if len(quantities) == 0:
-        raise ValueError("at least one input quantity is required.")
+        msg = "at least one input quantity is required."
+        raise ValueError(msg)
     if trials < 2:
-        raise ValueError("trials must be at least 2.")
+        msg = "trials must be at least 2."
+        raise ValueError(msg)
     if not 0.0 < coverage < 1.0:
-        raise ValueError(f"coverage must be in (0, 1); got {coverage}.")
+        msg = f"coverage must be in (0, 1); got {coverage}."
+        raise ValueError(msg)
 
     rng = np.random.default_rng(seed)
     samples = [_sample(q, trials, rng) for q in quantities]

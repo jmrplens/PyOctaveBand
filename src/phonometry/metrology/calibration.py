@@ -129,20 +129,24 @@ def sensitivity(
         resolve_samples(ref_signal, calibrate=False), dtype=np.float64
     )
     if signal_arr.size == 0:
-        raise ValueError("Reference signal is empty, cannot calibrate.")
+        msg = "Reference signal is empty, cannot calibrate."
+        raise ValueError(msg)
     if not np.all(np.isfinite(signal_arr)):
-        raise ValueError(
+        msg = (
             "Reference signal contains non-finite samples (NaN/inf); they "
             "would silently corrupt the calibration factor."
         )
+        raise ValueError(msg)
     if narrowband:
         if fs is None:
-            raise ValueError("narrowband tone estimation requires 'fs'.")
+            msg = "narrowband tone estimation requires 'fs'."
+            raise ValueError(msg)
         rms_ref = _narrowband_tone_rms(signal_arr, fs, frequency)
     else:
         rms_ref = float(np.sqrt(np.mean(signal_arr**2)))
     if rms_ref == 0:
-        raise ValueError("Reference signal is silent, cannot calibrate.")
+        msg = "Reference signal is silent, cannot calibrate."
+        raise ValueError(msg)
 
     if validate and fs is not None:
         limit = (

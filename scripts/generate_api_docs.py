@@ -533,9 +533,12 @@ def attribute_module(name: str, obj: object) -> str:
     if isinstance(module, str) and _is_public_module(module):
         return module
     if isinstance(module, str):
-        raise LookupError(  # noqa: TRY004 - a private-module lookup is a configuration error, not a type error
+        msg = (
             f"public name {name!r} is defined in private module {module!r}; "
             "add it to OBJECT_MODULE_OVERRIDES in scripts/api_taxonomy.py"
+        )
+        raise LookupError(  # noqa: TRY004 - a private-module lookup is a configuration error, not a type error
+            msg
         )
     # Module-level constant: find the taxonomy module that defines it.
     hits: list[str] = []
@@ -548,10 +551,11 @@ def attribute_module(name: str, obj: object) -> str:
                 hits.append(candidate)
     if len(hits) == 1:
         return hits[0]
-    raise LookupError(
+    msg = (
         f"constant {name!r} matches modules {hits!r}; add it to "
         "OBJECT_MODULE_OVERRIDES in scripts/api_taxonomy.py"
     )
+    raise LookupError(msg)
 
 
 _SENTINEL = object()
@@ -775,9 +779,8 @@ def build_model() -> tuple[list[ModuleDoc], dict[str, str], list[str]]:
     mapped = {m for s in SECTIONS.values() for m in s.modules}
     stale = sorted(mapped - set(by_module))
     if stale:
-        raise ValueError(
-            f"taxonomy modules with no public names (remove or fix): {stale}"
-        )
+        msg = f"taxonomy modules with no public names (remove or fix): {stale}"
+        raise ValueError(msg)
 
     pages: list[ModuleDoc] = []
     xref: dict[str, str] = {}
@@ -806,7 +809,8 @@ def build_model() -> tuple[list[ModuleDoc], dict[str, str], list[str]]:
 
     slugs = {(page.section.key, page.slug) for page in pages}
     if len(slugs) != len(pages):
-        raise ValueError("slug collision between module pages")
+        msg = "slug collision between module pages"
+        raise ValueError(msg)
 
     return pages, xref, issues
 

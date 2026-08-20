@@ -211,9 +211,8 @@ class RoomAcousticsResult:
 
         check_language(language)
         if engine != "reportlab":
-            raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            )
+            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+            raise ValueError(msg)
         from .._report.iso3382 import render_iso3382_report
 
         return render_iso3382_report(
@@ -397,11 +396,14 @@ def _band_parameters(x: np.ndarray, fs: int) -> tuple[float, ...]:
 def _validate_ir(ir: Signal | list[float] | np.ndarray, fs: int) -> np.ndarray:
     x = _typesignal(np.asarray(ir))
     if x.ndim != 1:
-        raise ValueError("The impulse response must be one-dimensional.")
+        msg = "The impulse response must be one-dimensional."
+        raise ValueError(msg)
     if fs <= 0:
-        raise ValueError("Sample rate 'fs' must be positive.")
+        msg = "Sample rate 'fs' must be positive."
+        raise ValueError(msg)
     if not np.any(x):
-        raise ValueError("Impulse response 'ir' is silent.")
+        msg = "Impulse response 'ir' is silent."
+        raise ValueError(msg)
     return apply_calibration(ir, x)
 
 
@@ -491,7 +493,8 @@ def decay_curve(
     x = _validate_ir(ir, fs)
     if band is not None:
         if band <= 0.0:
-            raise ValueError("Band centre frequency 'band' must be positive.")
+            msg = "Band centre frequency 'band' must be positive."
+            raise ValueError(msg)
         half_width = 2.0 ** (1.0 / (4.0 * fraction))
         bank = OctaveFilterBank(
             fs=fs,
@@ -512,7 +515,8 @@ def decay_curve(
         x = np.asarray(signals[idx])
     p2 = x.astype(np.float64) ** 2
     if not np.any(p2 > 0.0):
-        raise ValueError("The selected band has no energy.")
+        msg = "The selected band has no energy."
+        raise ValueError(msg)
     p2 = p2[_onset_index(p2) :]
     time, level, _, _, _, _ = _schroeder(p2, fs)
     return DecayCurve(time=time, level=level, band=band)
@@ -579,7 +583,8 @@ def room_parameters(
         band_signals: list[np.ndarray] = [x]
     else:
         if len(limits) != 2:
-            raise ValueError("'limits' must be a (f_min, f_max) pair or None.")
+            msg = "'limits' must be a (f_min, f_max) pair or None."
+            raise ValueError(msg)
         bank = OctaveFilterBank(
             fs=fs, fraction=fraction, order=6, limits=[limits[0], limits[1]]
         )

@@ -136,7 +136,8 @@ class InverseFilterResult:
 
         arr = _typesignal(x)
         if arr.ndim != 1:
-            raise ValueError("'x' must be one-dimensional.")
+            msg = "'x' must be one-dimensional."
+            raise ValueError(msg)
         full = sp_signal.fftconvolve(arr, self.inverse)
         return np.asarray(full[self.delay : self.delay + arr.size])
 
@@ -197,11 +198,14 @@ def _validated_response(response: Any) -> np.ndarray:
     """Validate the measured impulse response array."""
     h = _typesignal(np.asarray(response, dtype=np.float64))
     if h.ndim != 1:
-        raise ValueError("'response' must be one-dimensional.")
+        msg = "'response' must be one-dimensional."
+        raise ValueError(msg)
     if h.size < 2:
-        raise ValueError("'response' must have at least 2 samples.")
+        msg = "'response' must have at least 2 samples."
+        raise ValueError(msg)
     if not np.all(np.isfinite(h)):
-        raise ValueError("'response' must be finite.")
+        msg = "'response' must be finite."
+        raise ValueError(msg)
     return apply_calibration(response, h)
 
 
@@ -209,11 +213,14 @@ def _validated_band(f_range: tuple[float, float], fs: float) -> tuple[float, flo
     """Validate the equalization band against the sample rate."""
     f1, f2 = float(f_range[0]), float(f_range[1])
     if f1 <= 0.0:
-        raise ValueError("f_range[0] must be positive")
+        msg = "f_range[0] must be positive"
+        raise ValueError(msg)
     if f2 <= f1:
-        raise ValueError("f_range[1] must be greater than f_range[0]")
+        msg = "f_range[1] must be greater than f_range[0]"
+        raise ValueError(msg)
     if f2 > fs / 2.0:
-        raise ValueError("f_range[1] must not exceed the Nyquist frequency")
+        msg = "f_range[1] must not exceed the Nyquist frequency"
+        raise ValueError(msg)
     return f1, f2
 
 
@@ -230,13 +237,15 @@ def _resolve_fs(response: Any, fs: float | None) -> float:
     if fs is None:
         fs = getattr(response, "fs", None)
     if fs is None:
-        raise ValueError(
+        msg = (
             "'fs' is required (pass it explicitly, or pass a result object "
             "that carries a sample rate)"
         )
+        raise ValueError(msg)
     fs_v = float(fs)
     if fs_v <= 0.0:
-        raise ValueError("fs must be positive")
+        msg = "fs must be positive"
+        raise ValueError(msg)
     return fs_v
 
 
@@ -313,27 +322,31 @@ def regularized_inverse_filter(
     fs_v = _resolve_fs(response, fs)
     f1, f2 = _validated_band(f_range, fs_v)
     if regularization_inside <= 0.0 or regularization_outside <= 0.0:
-        raise ValueError("both regularization levels must be positive")
+        msg = "both regularization levels must be positive"
+        raise ValueError(msg)
     if transition_octaves <= 0.0:
-        raise ValueError("transition_octaves must be positive")
+        msg = "transition_octaves must be positive"
+        raise ValueError(msg)
 
     size = n_fft if n_fft is not None else 2 ** int(np.ceil(np.log2(2 * h.size)))
     if size < h.size:
-        raise ValueError("n_fft must be at least the response length")
+        msg = "n_fft must be at least the response length"
+        raise ValueError(msg)
     lag = size // 2 if delay is None else int(delay)
     if not 0 <= lag < size:
-        raise ValueError("delay must be in [0, n_fft)")
+        msg = "delay must be in [0, n_fft)"
+        raise ValueError(msg)
 
     freqs = np.asarray(np.fft.rfftfreq(size, 1.0 / fs_v), dtype=np.float64)
     if not np.any((freqs >= f1) & (freqs <= f2)):
-        raise ValueError(
-            "no frequency bin falls within f_range; increase n_fft or widen the band."
-        )
+        msg = "no frequency bin falls within f_range; increase n_fft or widen the band."
+        raise ValueError(msg)
     spectrum_h = np.fft.rfft(h, n=size)
     power = np.abs(spectrum_h) ** 2
     scale = float(np.max(power))
     if scale <= 0.0:
-        raise ValueError("'response' must not be identically zero.")
+        msg = "'response' must not be identically zero."
+        raise ValueError(msg)
     eps = _regularization_profile(
         freqs,
         (f1, f2),

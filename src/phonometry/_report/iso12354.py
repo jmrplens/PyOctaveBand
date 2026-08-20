@@ -411,11 +411,12 @@ def _detailed_path_rows(
 def _detailed_rating(result: Any) -> Any:
     """Return the result's ISO 717 rating, refusing an unrated spectrum."""
     if result.rating is None:
-        raise ValueError(
+        msg = (
             "A detailed prediction report needs the ISO 717 single-number "
             "rating: build the result on bands covering 100 Hz to 3150 Hz "
             "(one-third octave) or 125 Hz to 2000 Hz (octave)."
         )
+        raise ValueError(msg)
     return result.rating
 
 
@@ -562,12 +563,13 @@ def render_iso12354_facade_report(
         installed.
     """
     if result.d_2m_nt_w is None or result.r_tr_s_w is None or result.c_tr is None:
-        raise ValueError(
+        msg = (
             "A facade prediction report needs the ISO 717-1 single-number "
             "ratings: build the result on the 5 octave or 16 one-third-octave "
             "bands (pass matching per-band element data and 'bands' to "
             "facade_sound_reduction)."
         )
+        raise ValueError(msg)
     from ..building.measurement.insulation import weighted_rating
 
     shares = _facade_energy_shares(result) if verbose else {}

@@ -313,9 +313,8 @@ def _grid_axis(
     s = require_positive(step, name)
     n = round((stop - start) / s)
     if n < 1 or abs((stop - start) / s - n) > 1e-9:
-        raise ValueError(
-            f"'{name}' must divide the {stop - start:g} degree span evenly."
-        )
+        msg = f"'{name}' must divide the {stop - start:g} degree span evenly."
+        raise ValueError(msg)
     return np.linspace(start, stop, n + 1)
 
 
@@ -403,17 +402,20 @@ def hover_ring_hemisphere(
     brg = np.atleast_1d(np.asarray(bearings, dtype=np.float64))
     lv = np.asarray(levels, dtype=np.float64)
     if brg.ndim != 1 or brg.size < 2:
-        raise ValueError("'bearings' must be 1-D with at least two ring directions.")
+        msg = "'bearings' must be 1-D with at least two ring directions."
+        raise ValueError(msg)
     if not np.all(np.isfinite(brg)) or np.any(np.diff(brg) <= 0.0):
-        raise ValueError("'bearings' must be finite and strictly increasing.")
+        msg = "'bearings' must be finite and strictly increasing."
+        raise ValueError(msg)
     if brg[0] < -180.0 or brg[-1] > 180.0:
-        raise ValueError("'bearings' must lie within [-180, 180] degrees.")
+        msg = "'bearings' must lie within [-180, 180] degrees."
+        raise ValueError(msg)
     if lv.shape != (brg.size, freqs.size):
-        raise ValueError(
-            "'levels' must have shape (B, F) matching 'bearings' and 'frequencies'."
-        )
+        msg = "'levels' must have shape (B, F) matching 'bearings' and 'frequencies'."
+        raise ValueError(msg)
     if not np.all(np.isfinite(lv)):
-        raise ValueError("'levels' must be finite.")
+        msg = "'levels' must be finite."
+        raise ValueError(msg)
     dist = require_positive(distance, "distance")
     key = require_choice(mapping, "mapping", ("constant_phi", "bearing"))
     az = _grid_axis(-90.0, 90.0, azimuth_step, "azimuth_step")
@@ -487,7 +489,8 @@ def hover_derived_hemisphere(
     elif math.isfinite(offset_db):
         offset = float(offset_db)
     else:
-        raise ValueError("'offset_db' must be finite.")
+        msg = "'offset_db' must be finite."
+        raise ValueError(msg)
     return RotorcraftHemisphere(
         frequencies=np.asarray(hemisphere.frequencies, dtype=np.float64).copy(),
         azimuth=np.asarray(hemisphere.azimuth, dtype=np.float64).copy(),
@@ -559,14 +562,15 @@ def flight_condition_weights(
     v = np.atleast_1d(np.asarray(airspeeds, dtype=np.float64))
     g = np.atleast_1d(np.asarray(path_angles, dtype=np.float64))
     if v.ndim != 1 or v.shape != g.shape or v.size < 1:
-        raise ValueError(
-            "'airspeeds' and 'path_angles' must be 1-D of equal, non-zero size."
-        )
+        msg = "'airspeeds' and 'path_angles' must be 1-D of equal, non-zero size."
+        raise ValueError(msg)
     if not (np.all(np.isfinite(v)) and np.all(np.isfinite(g))):
-        raise ValueError("'airspeeds' and 'path_angles' must be finite.")
+        msg = "'airspeeds' and 'path_angles' must be finite."
+        raise ValueError(msg)
     ffc = require_positive(scaling_factor, "scaling_factor")
     if not np.isfinite(airspeed) or not np.isfinite(path_angle):
-        raise ValueError("'airspeed' and 'path_angle' must be finite.")
+        msg = "'airspeed' and 'path_angle' must be finite."
+        raise ValueError(msg)
     if v.size == 1:
         return [(0, 1.0)]
 
@@ -623,9 +627,11 @@ def _simplex_from_table(
     """The first triangle of a lookup table enveloping ``q``, or ``None``."""
     tri = np.asarray(triangles, dtype=np.intp)
     if tri.ndim != 2 or tri.shape[1] != 3 or tri.size == 0:
-        raise ValueError("'triangles' must have shape (T, 3).")
+        msg = "'triangles' must have shape (T, 3)."
+        raise ValueError(msg)
     if tri.min() < 0 or tri.max() >= n:
-        raise ValueError("'triangles' indices must address the database conditions.")
+        msg = "'triangles' indices must address the database conditions."
+        raise ValueError(msg)
     for row in tri:
         p0, p1, p2 = pts[row]
         m = np.column_stack([p1 - p0, p2 - p0])
@@ -692,16 +698,17 @@ def _common_frequencies(
 ) -> NDArray[np.float64]:
     """The shared band grid of a hemisphere set (validated)."""
     if len(hemispheres) == 0:
-        raise ValueError("'hemispheres' must not be empty.")
+        msg = "'hemispheres' must not be empty."
+        raise ValueError(msg)
     n = np.atleast_1d(np.asarray(airspeeds, dtype=np.float64)).size
     if len(hemispheres) != n:
-        raise ValueError(
-            "'hemispheres' and the flight conditions must have equal length."
-        )
+        msg = "'hemispheres' and the flight conditions must have equal length."
+        raise ValueError(msg)
     freqs = np.asarray(hemispheres[0].frequencies, dtype=np.float64)
     for h in hemispheres[1:]:
         if not np.array_equal(np.asarray(h.frequencies, dtype=np.float64), freqs):
-            raise ValueError("All hemispheres must share one band grid.")
+            msg = "All hemispheres must share one band grid."
+            raise ValueError(msg)
     return freqs
 
 
@@ -979,9 +986,11 @@ def _per_point(
     if arr.ndim == 0:
         arr = np.full(n, float(arr))
     if arr.shape != (n,):
-        raise ValueError(f"'{name}' must be a scalar or match the track length.")
+        msg = f"'{name}' must be a scalar or match the track length."
+        raise ValueError(msg)
     if not np.all(np.isfinite(arr)):
-        raise ValueError(f"'{name}' must be finite.")
+        msg = f"'{name}' must be finite."
+        raise ValueError(msg)
     return arr
 
 
@@ -993,13 +1002,17 @@ def _validated_track(
     t = np.asarray(times, dtype=np.float64)
     p = np.asarray(positions, dtype=np.float64)
     if t.ndim != 1 or t.size < 2:
-        raise ValueError("'times' must be 1-D with at least two points.")
+        msg = "'times' must be 1-D with at least two points."
+        raise ValueError(msg)
     if p.shape != (t.size, 3):
-        raise ValueError("'positions' must have shape (N, 3) matching 'times'.")
+        msg = "'positions' must have shape (N, 3) matching 'times'."
+        raise ValueError(msg)
     if not (np.all(np.isfinite(t)) and np.all(np.isfinite(p))):
-        raise ValueError("'times' and 'positions' must be finite.")
+        msg = "'times' and 'positions' must be finite."
+        raise ValueError(msg)
     if np.any(np.diff(t) <= 0.0):
-        raise ValueError("'times' must be strictly increasing.")
+        msg = "'times' must be strictly increasing."
+        raise ValueError(msg)
     return t, p
 
 
@@ -1008,7 +1021,8 @@ def _reference_distance(hemispheres: Sequence[RotorcraftHemisphere]) -> float:
     rref = float(hemispheres[0].distance)
     for h in hemispheres[1:]:
         if float(h.distance) != rref:
-            raise ValueError("All hemispheres must share one reference distance.")
+            msg = "All hemispheres must share one reference distance."
+            raise ValueError(msg)
     return require_positive(rref, "hemisphere distance")
 
 
@@ -1269,10 +1283,11 @@ def _setup_resistivity(
     if np.ndim(flow_resistivity) == 0:
         return _resolve_flow_resistivity(float(np.asarray(flow_resistivity)))
     if dem is not None:
-        raise ValueError(
+        msg = (
             "With 'terrain', 'flow_resistivity' must be a single "
             "value or class (per-path maps are not supported)."
         )
+        raise ValueError(msg)
     return require_positive_array(
         np.asarray(flow_resistivity, dtype=np.float64).ravel(), "flow_resistivity"
     )
@@ -1285,16 +1300,19 @@ def _setup_ground_elevation(
     """The scalar (or per-receiver) ground elevation of an event run."""
     if np.isscalar(ground_elevation):
         if not np.isfinite(ground_elevation):
-            raise ValueError("'ground_elevation' must be finite.")
+            msg = "'ground_elevation' must be finite."
+            raise ValueError(msg)
         return float(ground_elevation)  # type: ignore[arg-type]
     arr = np.asarray(ground_elevation, dtype=np.float64).ravel()
     if not np.all(np.isfinite(arr)):
-        raise ValueError("'ground_elevation' must be finite.")
+        msg = "'ground_elevation' must be finite."
+        raise ValueError(msg)
     if dem is not None:
-        raise ValueError(
+        msg = (
             "With 'terrain', 'ground_elevation' comes from the "
             "elevation model and must be left scalar."
         )
+        raise ValueError(msg)
     return arr
 
 
@@ -1317,10 +1335,11 @@ def _require_dem_coverage(
         or np.min(y) < ty[0]
         or np.max(y) > ty[-1]
     ):
-        raise ValueError(
+        msg = (
             f"'terrain' must cover the whole {what} (x in "
             f"[{tx[0]:g}, {tx[-1]:g}], y in [{ty[0]:g}, {ty[-1]:g}])."
         )
+        raise ValueError(msg)
 
 
 def _validated_terrain(
@@ -1332,7 +1351,8 @@ def _validated_terrain(
     if terrain is None:
         return None
     if len(terrain) != 3:
-        raise ValueError("'terrain' must be an (x, y, z) elevation model.")
+        msg = "'terrain' must be an (x, y, z) elevation model."
+        raise ValueError(msg)
     tx = np.asarray(terrain[0], dtype=np.float64).ravel()
     ty = np.asarray(terrain[1], dtype=np.float64).ravel()
     tz = np.asarray(terrain[2], dtype=np.float64)
@@ -1342,13 +1362,14 @@ def _validated_terrain(
         or np.any(np.diff(tx) <= 0)
         or np.any(np.diff(ty) <= 0)
     ):
-        raise ValueError(
-            "'terrain' x and y must be strictly increasing with >= 2 points."
-        )
+        msg = "'terrain' x and y must be strictly increasing with >= 2 points."
+        raise ValueError(msg)
     if tz.shape != (ty.size, tx.size) or not np.all(np.isfinite(tz)):
-        raise ValueError("'terrain' z must be finite with shape (len(y), len(x)).")
+        msg = "'terrain' z must be finite with shape (len(y), len(x))."
+        raise ValueError(msg)
     if not (np.all(np.isfinite(tx)) and np.all(np.isfinite(ty))):
-        raise ValueError("'terrain' coordinates must be finite.")
+        msg = "'terrain' coordinates must be finite."
+        raise ValueError(msg)
     return tx, ty, tz
 
 
@@ -1675,12 +1696,14 @@ def rotorcraft_event_level(
     )
     rx = np.asarray(receiver, dtype=np.float64).ravel()
     if rx.size != 2 or not np.all(np.isfinite(rx)):
-        raise ValueError("'receiver' must be a finite (x, y) ground position.")
+        msg = "'receiver' must be a finite (x, y) ground position."
+        raise ValueError(msg)
     if not (np.isscalar(setup.sigma) and np.isscalar(setup.ground_elevation)):
-        raise ValueError(
+        msg = (
             "A single receiver takes scalar 'flow_resistivity' and "
             "'ground_elevation'; arrays are for the contour grid."
         )
+        raise ValueError(msg)
     if setup.terrain is not None:
         _require_dem_coverage(setup.terrain, rx[:1], rx[1:2], "receiver")
         local = float(_dem_height(setup.terrain, rx[:1], rx[1:2])[0])
@@ -1797,9 +1820,8 @@ def rotorcraft_noise_contour(
         or gy.size < 2
         or not (np.all(np.isfinite(gx)) and np.all(np.isfinite(gy)))
     ):
-        raise ValueError(
-            "'x' and 'y' must each be finite with at least two grid points."
-        )
+        msg = "'x' and 'y' must each be finite with at least two grid points."
+        raise ValueError(msg)
     key = require_choice(metric, "metric", ("exposure", "maximum"))
     xx, yy = np.meshgrid(gx, gy)
     n_g = xx.size
@@ -1811,10 +1833,11 @@ def rotorcraft_noise_contour(
             continue
         shape = np.asarray(value).shape
         if shape not in ((n_g,), (gy.size, gx.size)):
-            raise ValueError(
+            msg = (
                 f"A per-receiver '{name}' must carry one value per grid "
                 "point, shape (len(y), len(x))."
             )
+            raise ValueError(msg)
     if setup.terrain is not None:
         _require_dem_coverage(setup.terrain, gx, gy, "receiver grid")
         local = _dem_height(setup.terrain, xx.ravel(), yy.ravel())
