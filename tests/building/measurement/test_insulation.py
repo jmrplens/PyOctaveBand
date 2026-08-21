@@ -318,6 +318,17 @@ def test_airborne_rejects_length_mismatch() -> None:
         building.airborne_insulation(two_bands, one_band, one_time)
 
 
+def test_airborne_rejects_reverberation_time_with_an_extra_axis() -> None:
+    """A `t2` carrying an extra axis is named for what is wrong with it.
+
+    The band counts match here, so a message about counts would be false.
+    """
+    two_bands = np.array([80.0, 80.0])
+    other_two_bands = np.array([40.0, 40.0])
+    with pytest.raises(ValueError, match="'t2' must be one-dimensional"):
+        building.airborne_insulation(two_bands, other_two_bands, np.full((1, 2), 0.5))
+
+
 def test_airborne_requires_both_area_and_volume() -> None:
     l1 = np.array([80.0])
     l2 = np.array([40.0])

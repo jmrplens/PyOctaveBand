@@ -487,10 +487,9 @@ def _average_bands_full(p_bands: list[np.ndarray], n_new: int) -> list[np.ndarra
         # fire: bands with N_B > 0 all sit at low index (0..24, block size
         # >= 2048), so their distance to the top band (>= 28) never limits the
         # symmetric reach (n_b <= 2).  Only the ``band`` lower-edge term bites.
+        # Never zero here: the two branches above have already taken every
+        # case that could make it so, which is why there is no early-out.
         reach = min(n_b, band, _CBF - 1 - band)
-        if reach == 0:
-            out.append(native)
-            continue
         # Sequential accumulation; bit-identical to np.mean over a stacked
         # axis-0 (numpy reduces a non-contiguous axis sequentially, so
         # pairwise summation never applies) while avoiding the stacked copy.

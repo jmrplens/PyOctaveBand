@@ -73,7 +73,11 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from scipy.optimize import root
 
-from ..._internal.validation import require_positive, require_positive_array
+from ..._internal.validation import (
+    require_choice,
+    require_positive,
+    require_positive_array,
+)
 from ..._internal.warnings import PhonometryWarning
 from .porous import DEFAULT_AIR, AirProperties, Complex
 
@@ -685,6 +689,12 @@ def slit_helmholtz_absorber(
     if not 0.0 <= theta < np.pi / 2.0 - 1e-6:
         msg = "'angle' must satisfy 0 <= angle < pi/2 - 1e-6."
         raise ValueError(msg)
+    # Checked here rather than where it is used. The value travels down two
+    # private frames before `helmholtz_resonator_impedance` rejects it, and
+    # that function calls the parameter `geometry`, so a caller who mistyped
+    # `resonator_geometry` was told about an argument its signature does not
+    # have.
+    require_choice(resonator_geometry, "resonator_geometry", ("square", "slit"))
 
     omega = 2.0 * np.pi * f
     tm = _panel_transfer_matrix(

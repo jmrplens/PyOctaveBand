@@ -287,14 +287,12 @@ def test_negative_volume_raises() -> None:
 
 
 def test_zero_reverberation_time_raises() -> None:
-    with pytest.raises(ValueError, match="Reverberation times must be positive"):
+    with pytest.raises(ValueError, match="'t60' must be positive"):
         materials.absorption_area(0.0, 200.0)
 
 
 def test_negative_m_raises() -> None:
-    with pytest.raises(
-        ValueError, match="Air attenuation coefficient 'm' must be non-negative"
-    ):
+    with pytest.raises(ValueError, match="'m' must be non-negative"):
         materials.absorption_area(3.0, 200.0, m=-0.001)
 
 
@@ -321,7 +319,8 @@ def test_negative_sample_area_raises() -> None:
 
 
 def test_negative_t1_raises() -> None:
-    with pytest.raises(ValueError, match="Reverberation times must be positive"):
+    # `t1`, not `t60`: the message names the argument this function takes.
+    with pytest.raises(ValueError, match="'t1' must be positive"):
         materials.absorption_coefficient(-5.0, 3.0, 200.0, 10.0)
 
 

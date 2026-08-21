@@ -97,6 +97,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   is iterable, so the callers that wrote `times, levels = ...` keep working,
   the way `DecayCurve` replaced its own tuple return.
 
+### Fixed
+
+- Four guards that answered the wrong question, or could not answer at all.
+
+  `sound_power_reverberation` named `background_levels` in its message but
+  checked the shape one line *after* broadcasting it, so a spectrum of the
+  wrong length died inside `np.broadcast_to`, whose text reports two shapes
+  from inside numpy and names neither the argument nor the function. The check
+  runs first now and covers both wrong shapes with the one sentence.
+
+  `slit_helmholtz_absorber` let `resonator_geometry` travel two private frames
+  down to `helmholtz_resonator_impedance`, which calls the same value
+  `geometry`. A caller who mistyped the keyword was answered with the name of
+  a parameter that function does not have.
+
+  `_validate_area_inputs` was shared by four call sites and named none of
+  them. Reached through `absorption_coefficient(t1, t2, ..., m1=, m2=)`, a bad
+  `m1` reported a message about `'m'` and `'t60'`, neither of which is an
+  argument of that function. It takes the caller's names now, so three
+  messages changed text.
+
+  And `airborne_insulation` diagnosed the wrong defect. Given a reverberation
+  time carrying an extra axis, `(1, n)` against `n` bands, it said the band
+  counts differed, which was false: they matched, and the extra axis was the
+  problem. Its sibling `lab_airborne_insulation` had said so correctly all
+  along, because it compares sizes where this one compared shapes. The three
+  field-measurement pre-screens compare sizes now, so both halves of the
+  package give the same answer, and the dimensionality check they were masking
+  is reachable and tested rather than dead.
+
+  Two guards found in the same pass are left exactly as they were, and it is
+  worth saying why: the one in `io/_wav.py` cannot be reached from inside this
+  repository, but it is promised by its own docstring and it screens a file
+  header, and the one in `roughness_ecma` is one of three identical lines
+  across parallel front ends. A guard that cannot fire today is not always
+  dead weight. One that genuinely was, an early-out in `ecma` whose condition
+  the two branches above had already taken, is gone.
+
 ### Changed
 
 - The FDTD GPU parity is proved where the GPU is, not only where the process

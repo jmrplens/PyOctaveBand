@@ -529,3 +529,32 @@ def test_comparison_background_correction_zero_without_background() -> None:
         np.array([90.0, 90.0]),
     )
     assert np.all(res.background_correction == 0.0)
+
+
+@pytest.mark.parametrize(
+    ("label", "background"),
+    [
+        ("1-D of the wrong length", np.full(5, 60.0)),
+        ("2-D of the wrong shape", np.full((3, 6), 60.0)),
+    ],
+)
+def test_background_levels_of_the_wrong_shape_name_themselves(
+    label: str, background: np.ndarray
+) -> None:
+    """Both wrong shapes reach the library's own message, not numpy's.
+
+    The 1-D case is the one that used to escape: it met `np.broadcast_to`
+    a line before the guard, and numpy reports two shapes from inside its own
+    code without naming the argument or the function.
+    """
+    levels = np.full((4, 6), 80.0)
+    frequencies = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+    with pytest.raises(ValueError, match="'background_levels' must match"):
+        emission.sound_power_reverberation(
+            levels,
+            np.full(6, 1.5),
+            200.0,
+            220.0,
+            frequencies,
+            background_levels=background,
+        )

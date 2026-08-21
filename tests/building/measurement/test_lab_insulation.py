@@ -18,12 +18,17 @@ formulae, and consistency with the verified ISO 717-1/2 rating engine.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 import reference_data as ref
 
 from phonometry import building
 from phonometry.building.measurement.lab_insulation import LabInsulationWarning
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from collections.abc import Callable
 
 # ISO 717-1 Table 3 airborne reference (100-3150 Hz, 16 bands).
 _REF_AIRBORNE = np.array(
@@ -349,3 +354,35 @@ def test_reference_floor_impact_end_to_end(ln_name: str, rating_name: str) -> No
     np.testing.assert_allclose(res.l_n, ln, atol=1e-9)
     assert res.rating is not None
     assert (res.rating.rating, res.rating.ci) == (lnw, ci)
+
+
+@pytest.mark.parametrize(
+    ("call", "shape"),
+    [
+        (
+            lambda t2: building.lab_airborne_insulation(
+                [80.0, 80.0, 80.0], [50.0, 50.0, 50.0], t2, area=10.0, volume=50.0
+            ),
+            (1, 3),
+        ),
+        (
+            lambda t2: building.lab_impact_insulation(
+                [80.0, 80.0, 80.0], t2, volume=50.0
+            ),
+            (3, 1),
+        ),
+    ],
+    ids=["airborne", "impact"],
+)
+def test_reverberation_time_with_an_extra_axis_says_so(
+    call: Callable[[np.ndarray], object], shape: tuple[int, int]
+) -> None:
+    """A `t2` carrying an extra axis is named for what is wrong with it.
+
+    The band counts match, so a message about counts would be false. This
+    guard was live and untested: nothing in the suite asserted its sentence,
+    so dropping it altogether left the suite green while a (1, n) array
+    broadcast its way to a wrongly shaped result.
+    """
+    with pytest.raises(ValueError, match="'t2' must be one-dimensional"):
+        call(np.full(shape, 0.5))

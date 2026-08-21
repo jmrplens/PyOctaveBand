@@ -274,6 +274,16 @@ def test_impact_rejects_length_mismatch() -> None:
         building.impact_insulation(li_2_bands, t2_1_band)
 
 
+def test_impact_rejects_reverberation_time_with_an_extra_axis() -> None:
+    """A `t2` carrying an extra axis is named for what is wrong with it.
+
+    The band counts match here, so a message about counts would be false.
+    """
+    li_2_bands = np.array([60.0, 60.0])
+    with pytest.raises(ValueError, match="'t2' must be one-dimensional"):
+        building.impact_insulation(li_2_bands, np.full((2, 1), 0.5))
+
+
 def test_impact_rejects_bad_reverberation_time() -> None:
     li = np.array([60.0])
     zero_t2 = np.array([0.0])
