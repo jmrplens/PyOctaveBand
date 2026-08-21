@@ -325,7 +325,7 @@ def _band_integrals(
     centers: list[float] = []
     band_i: list[float] = []
     band_msp: list[float] = []
-    for fc, lo, hi in zip(freq, freq_d, freq_u):
+    for fc, lo, hi in zip(freq, freq_d, freq_u, strict=True):
         mask = (fpos > lo) & (fpos <= hi)
         if not np.any(mask):
             continue  # band narrower than the spectral resolution

@@ -411,7 +411,11 @@ def test_title_steps_down_only_as_far_as_the_sheet_demands() -> None:
     # Each step is taken at the width the step above stops keeping its
     # margin at, and the floor is returned rather than a further step.
     room = 900 - 2 * canvas._TITLE_MARGIN
-    for larger, smaller in zip(canvas._TITLE_SIZES, canvas._TITLE_SIZES[1:]):
+    for larger, smaller in zip(
+        canvas._TITLE_SIZES,
+        canvas._TITLE_SIZES[1:],  # one shorter: the floor has no step below it
+        strict=False,
+    ):
         wide = "W" * (int(room / measure(_label_runs("W", bold=True), larger)) + 1)
         assert svg.title_size(wide) <= smaller
     assert svg.title_size("W" * 200) == canvas._TITLE_SIZES[-1]

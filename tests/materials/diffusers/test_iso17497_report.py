@@ -5,9 +5,10 @@ The report is a rendering feature, so these tests assert only structural facts:
 a valid single-page PDF is written for each fiche (scattering ``s(f)``, the
 diffusion spectrum ``d(f)`` and the single-source polar response), the displayed
 coefficients match the documented clean-room oracle, the band/angle labels and
-metadata appear, unknown engines/languages are rejected, XML specials in
-metadata do not break reportlab, and the Spanish fiche uses a decimal comma.
-Pixel or layout content is never inspected.
+metadata appear, unknown engines/languages are rejected, a hand-built result
+whose per-band arrays disagree in length is refused before the file is written,
+XML specials in metadata do not break reportlab, and the Spanish fiche uses a
+decimal comma. Pixel or layout content is never inspected.
 """
 
 from __future__ import annotations
@@ -15,6 +16,8 @@ from __future__ import annotations
 import pytest
 
 pytest.importorskip("reportlab")
+
+from dataclasses import replace
 
 import numpy as np
 
@@ -237,6 +240,30 @@ def test_scattering_spanish_uses_comma_decimal(tmp_path) -> None:
     assert "0,45" in _text(str(out))  # Spanish decimal comma
 
 
+def test_scattering_short_random_incidence_rejected(tmp_path) -> None:
+    """ScatteringResult is a frozen dataclass, so the fiche checks the lengths.
+
+    A caller can hand-build one whose per-band arrays disagree; the alpha_s
+    column would then silently cut the table short, so the render refuses it.
+    """
+    result = _scattering()
+    short = replace(result, random_incidence=result.random_incidence[:-1])
+    out = tmp_path / "scat_short.pdf"
+    with pytest.raises(ValueError, match="'random_incidence'"):
+        short.report(str(out))
+    assert not out.exists()  # refused before the fiche is written
+
+
+def test_scattering_verbose_short_specular_rejected(tmp_path) -> None:
+    """The alpha_spec column is only tabulated when verbose, and so is its length."""
+    result = _scattering()
+    short = replace(result, specular=result.specular[:-1])
+    out = tmp_path / "scat_short_verbose.pdf"
+    with pytest.raises(ValueError, match="'specular'"):
+        short.report(str(out), verbose=True)
+    assert not out.exists()
+
+
 # --- ISO 17497-2 diffusion spectrum ---------------------------------------
 def test_diffusion_writes_one_page_pdf(tmp_path) -> None:
     out = tmp_path / "diff.pdf"
@@ -283,6 +310,20 @@ def test_diffusion_spanish_uses_comma_decimal(tmp_path) -> None:
     _diffusion_spectrum().report(str(out), metadata=_metadata(), language="es")
     _assert_one_page(str(out))
     assert "0,81" in _text(str(out))
+
+
+def test_diffusion_short_normalized_rejected(tmp_path) -> None:
+    """The normalised spectrum is optional, but a present one has to be full length.
+
+    The figure draws d_n whenever it is there, so the length is checked for any
+    hand-built DiffusionSpectrum, not only for the verbose table.
+    """
+    result = _diffusion_spectrum()
+    short = replace(result, normalized=result.normalized[:-1])
+    out = tmp_path / "diff_short.pdf"
+    with pytest.raises(ValueError, match="'normalized'"):
+        short.report(str(out))
+    assert not out.exists()
 
 
 # --- ISO 17497-2 polar response -------------------------------------------

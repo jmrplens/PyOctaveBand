@@ -258,6 +258,15 @@ def _rc_left_cell(
 
     levels = np.asarray(result.levels, dtype=np.float64)
     reference = np.asarray(result.reference_curve, dtype=np.float64)
+    # Guard a manually constructed result: RCResult is a plain frozen dataclass,
+    # so a hand-built one can carry a reference curve of a different length than
+    # its levels, and only the verbose columns pair the two band by band.
+    if verbose and levels.shape != reference.shape:
+        msg = (
+            "render_rc_report(verbose=True) needs 'levels' and "
+            "'reference_curve' of equal length."
+        )
+        raise ValueError(msg)
     columns = _base_columns(levels, language)
     if verbose:
         columns.append(
@@ -271,7 +280,7 @@ def _rc_left_cell(
                 t("Dev. [dB]", language),
                 [
                     _level_cell(lvl - ref, language)
-                    for lvl, ref in zip(levels, reference)
+                    for lvl, ref in zip(levels, reference, strict=True)
                 ],
             )
         )

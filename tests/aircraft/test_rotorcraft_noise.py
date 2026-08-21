@@ -452,7 +452,7 @@ _BILINEAR_CASES = [
 @pytest.mark.parametrize(("rotorcraft", "cases"), _BILINEAR_CASES)
 def test_reference_bilinear_off_node(rotorcraft: str, cases: list) -> None:
     for (corners, expected), (phi, theta, (a0, a1), (p0, p1)) in zip(
-        cases, _BILINEAR_QUERIES
+        cases, _BILINEAR_QUERIES, strict=True
     ):
         lv = np.array(corners, dtype=np.float64).reshape(2, 2, 1)
         h = RotorcraftHemisphere(
@@ -1103,7 +1103,7 @@ def test_fc_weights_are_unit_invariant() -> None:
     ms = [v * 0.514444 for v in kts]
     w1 = flight_condition_weights(kts, [0.0, 0.0, 10.0], 60.0, 2.5)
     w2 = flight_condition_weights(ms, [0.0, 0.0, 10.0], 60.0 * 0.514444, 2.5)
-    for (i1, a), (i2, b) in zip(w1, w2):
+    for (i1, a), (i2, b) in zip(w1, w2, strict=True):
         assert i1 == i2
         assert a == pytest.approx(b, abs=1e-12)
 

@@ -73,7 +73,9 @@ def _chk_cnossos_road_workbook() -> Outcome:
             junction_type=ph.environment.JunctionType(int(case["junction_type"])),
             coefficients=coefficients,
         )
-        for got, band in zip(result.total_line_power, ref.CNOSSOS_ROAD_BANDS):
+        for got, band in zip(
+            result.total_line_power, ref.CNOSSOS_ROAD_BANDS, strict=True
+        ):
             worst = max(worst, abs(float(got) - float(case[f"lw_{band}"])))
     return numeric(
         0.0,
@@ -111,7 +113,9 @@ def _chk_cnossos_road_table_f1() -> Outcome:
                 expected["BP"],
             ),
         )
-        bad += sum(1 for got, want in pairs for a, b in zip(got, want) if a != b)
+        bad += sum(
+            1 for got, want in pairs for a, b in zip(got, want, strict=True) if a != b
+        )
     return numeric(
         0.0,
         float(bad),
@@ -135,7 +139,9 @@ def _chk_cnossos_road_table_f4() -> Outcome:
         for category in ("1", "2", "3", "4a", "4b"):
             key = category if category in expected else "4a/4b"
             bad += sum(
-                1 for a, b in zip(row.alpha[category], expected[key][0]) if a != b
+                1
+                for a, b in zip(row.alpha[category], expected[key][0], strict=True)
+                if a != b
             )
             bad += int(row.beta[category] != expected[key][1])
     return numeric(
@@ -166,7 +172,7 @@ def _chk_cnossos_road_tables_f2_f3() -> Outcome:
                 ref.CNOSSOS_ROAD_TABLE_F2["bi"],
             ),
         )
-        for a, b in zip(got, want)
+        for a, b in zip(got, want, strict=True)
         if a != b
     )
     for category, expected in ref.CNOSSOS_ROAD_TABLE_F3.items():
@@ -204,7 +210,9 @@ def _chk_cnossos_road_reference_conditions() -> Outcome:
                 ph.environment.ROAD_COEFFICIENTS.propulsion_a[category],
             ),
         ):
-            worst = max(worst, max(abs(float(a) - b) for a, b in zip(got, want)))
+            worst = max(
+                worst, max(abs(float(a) - b) for a, b in zip(got, want, strict=True))
+            )
     return numeric(
         0.0,
         worst,
@@ -224,7 +232,9 @@ def _chk_cnossos_a_weighting() -> Outcome:
     bad = sum(
         1
         for a, b in zip(
-            ph.environment.CNOSSOS_A_WEIGHTING, ref.CNOSSOS_A_WEIGHTING_TABLE
+            ph.environment.CNOSSOS_A_WEIGHTING,
+            ref.CNOSSOS_A_WEIGHTING_TABLE,
+            strict=True,
         )
         if a != b
     )

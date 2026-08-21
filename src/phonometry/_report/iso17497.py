@@ -227,7 +227,7 @@ def _scattering_table(
             fiche_paragraph("s", head_style),
         ]
         rows: list[list[Any]] = [header]
-        for fk, ak, spk, sk in zip(freqs, a_s, spec, s):
+        for fk, ak, spk, sk in zip(freqs, a_s, spec, s, strict=True):
             rows.append(
                 [
                     f"{round(fk)}",
@@ -244,7 +244,7 @@ def _scattering_table(
             fiche_paragraph("s", head_style),
         ]
         rows = [header]
-        for fk, ak, sk in zip(freqs, a_s, s):
+        for fk, ak, sk in zip(freqs, a_s, s, strict=True):
             rows.append(
                 [
                     f"{round(fk)}",
@@ -289,12 +289,22 @@ def render_scattering_report(
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
 
+    # Guard a manually constructed result: ScatteringResult is a plain frozen
+    # dataclass, so every per-band array the table and the figure consume has
+    # to be checked here (a short one would otherwise cut the fiche table).
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     s = np.asarray(result.scattering, dtype=np.float64)
-    if freqs.shape != s.shape:
+    a_s = np.asarray(result.random_incidence, dtype=np.float64)
+    if not freqs.shape == s.shape == a_s.shape:
         msg = (
-            "render_scattering_report() needs 'frequencies' and 'scattering' "
-            "of equal length."
+            "render_scattering_report() needs 'frequencies', 'scattering' and "
+            "'random_incidence' of equal length."
+        )
+        raise ValueError(msg)
+    if verbose and np.asarray(result.specular, dtype=np.float64).shape != freqs.shape:
+        msg = (
+            "render_scattering_report(verbose=True) needs 'specular' of the "
+            "same length as 'frequencies'."
         )
         raise ValueError(msg)
 
@@ -380,7 +390,7 @@ def _diffusion_table(
             fiche_paragraph("d<sub>n</sub>", head_style),
         ]
         rows: list[list[Any]] = [header]
-        for fk, dk, dnk in zip(freqs, d, d_n):
+        for fk, dk, dnk in zip(freqs, d, d_n, strict=True):
             rows.append(
                 [
                     f"{round(fk)}",
@@ -395,7 +405,7 @@ def _diffusion_table(
             fiche_paragraph("d", head_style),
         ]
         rows = [header]
-        for fk, dk in zip(freqs, d):
+        for fk, dk in zip(freqs, d, strict=True):
             rows.append([f"{round(fk)}", _c2(dk, language)])
         col_widths = [28 * mm, 28 * mm]
     return band_table(rows, col_widths, len(freqs))
@@ -434,12 +444,24 @@ def render_diffusion_spectrum_report(
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
 
+    # Guard a manually constructed result: DiffusionSpectrum is a plain frozen
+    # dataclass, so the optional 'normalized' spectrum is checked here too (the
+    # figure draws it whenever it is present, the table when verbose).
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     d = np.asarray(result.diffusion, dtype=np.float64)
     if freqs.shape != d.shape:
         msg = (
             "render_diffusion_spectrum_report() needs 'frequencies' and "
             "'diffusion' of equal length."
+        )
+        raise ValueError(msg)
+    if (
+        result.normalized is not None
+        and np.asarray(result.normalized, dtype=np.float64).shape != freqs.shape
+    ):
+        msg = (
+            "render_diffusion_spectrum_report() needs 'normalized' of the same "
+            "length as 'frequencies'."
         )
         raise ValueError(msg)
 
@@ -510,7 +532,7 @@ def _polar_table(result: DiffusionResult, language: str = "en") -> Any:
         fiche_paragraph("L [dB]", head_style),
     ]
     rows: list[list[Any]] = [header]
-    for ang, lev in zip(angles, levels):
+    for ang, lev in zip(angles, levels, strict=True):
         rows.append([_d1(ang, language), _d1(lev, language)])
     return band_table(rows, [28 * mm, 28 * mm], len(angles))
 

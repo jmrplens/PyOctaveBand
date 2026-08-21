@@ -734,7 +734,7 @@ def generate_multiple_shock(output_dir: str) -> None:
     r_male = vibration.injury_risk(
         sd, start_age=20, years=20, days_per_year=120, sex="male"
     )
-    for level, r_val in zip((10, 50, 90), RISK_THRESHOLDS_MALE):
+    for level, r_val in zip((10, 50, 90), RISK_THRESHOLDS_MALE, strict=True):
         ax_r.axhline(level, color="#7f7f7f", linestyle=":", lw=0.8)
         ax_r.plot([r_val, r_val], [0.0, level], color="#7f7f7f", linestyle=":", lw=0.8)
     ax_r.scatter(
@@ -1160,7 +1160,7 @@ def _positive_peak_indices(response: np.ndarray) -> np.ndarray:
     return np.array(
         [
             int(a + np.argmax(response[a:b]))
-            for a, b in zip(starts, stops)
+            for a, b in zip(starts, stops, strict=True)
             if positive[a]
         ]
     )
@@ -1324,7 +1324,7 @@ def generate_junction_kij_thickness(output_dir: str) -> None:
         ("-", COLOR_SECONDARY),
         ("-", COLOR_TERTIARY),
     ]
-    for (label, values), (ls, color) in zip(curves.items(), styles):
+    for (label, values), (ls, color) in zip(curves.items(), styles, strict=True):
         ax.plot(ratios, values, ls, color=color, linewidth=2.0, label=label)
     # The identical-plate X-junction: Kij = 10 log10 12 + 5 log10(fc2/1000).
     res_eq = vibration.junction_transmission("X", h1, cl, rho * h1, h1, cl, rho * h1)

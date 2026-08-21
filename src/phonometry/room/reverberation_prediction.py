@@ -182,9 +182,9 @@ def _accumulate_surfaces(
         msg = "the total surface area must be positive."
         raise ValueError(msg)
     absorption_area = np.zeros(shape, dtype=np.float64)
-    for area, alpha_arr in zip(areas, alphas):
+    for area, alpha_arr in zip(areas, alphas, strict=True):
         absorption_area = absorption_area + area * alpha_arr
-    return total_area, absorption_area, list(zip(areas, alphas))
+    return total_area, absorption_area, list(zip(areas, alphas, strict=True))
 
 
 def _air_term(air_attenuation: ArrayLike, volume: float) -> NDArray[np.float64]:
@@ -499,7 +499,9 @@ def fitzroy_reverberation_time(
     weights, times = _axial_eyring_times(
         dimensions, absorptions, air_attenuation, speed_of_sound
     )
-    total = sum(w * np.asarray(t, dtype=np.float64) for w, t in zip(weights, times))
+    total = sum(
+        w * np.asarray(t, dtype=np.float64) for w, t in zip(weights, times, strict=True)
+    )
     return as_float_or_array(total)
 
 
@@ -531,7 +533,8 @@ def arau_puchades_reverberation_time(
         dimensions, absorptions, air_attenuation, speed_of_sound
     )
     log_t = sum(
-        w * np.log(np.asarray(t, dtype=np.float64)) for w, t in zip(weights, times)
+        w * np.log(np.asarray(t, dtype=np.float64))
+        for w, t in zip(weights, times, strict=True)
     )
     return as_float_or_array(np.exp(log_t))
 
@@ -680,7 +683,7 @@ def reverberation_time_models(
         raise ValueError(msg)
     # Two equal-area opposing walls per axis share the axis mean absorption.
     surfaces: list[Surface] = []
-    for area, alpha in zip(pair_areas, absorptions):
+    for area, alpha in zip(pair_areas, absorptions, strict=True):
         surfaces.append((float(area) / 2.0, alpha))
         surfaces.append((float(area) / 2.0, alpha))
 

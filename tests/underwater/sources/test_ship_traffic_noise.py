@@ -103,7 +103,7 @@ _WALES_HEITMEYER_EQ = [
 def test_wales_heitmeyer_printed_equation_values() -> None:
     freqs = [f for f, _ in _WALES_HEITMEYER_EQ]
     s = ship_source_spectrum(model="wales-heitmeyer", frequency_hz=freqs)
-    for (_, psd_ref), psd in zip(_WALES_HEITMEYER_EQ, s.source_psd):
+    for (_, psd_ref), psd in zip(_WALES_HEITMEYER_EQ, s.source_psd, strict=True):
         assert float(psd) == pytest.approx(psd_ref, abs=1e-3)
 
 

@@ -437,7 +437,7 @@ def lining_improvement(
     if anchors:
         ratings = [
             factor * value + offset
-            for value, (factor, offset) in zip(ratings, _ANNEX_D_ANCHORS)
+            for value, (factor, offset) in zip(ratings, _ANNEX_D_ANCHORS, strict=True)
         ]
     if glued_area is not None:
         if system == "studs":

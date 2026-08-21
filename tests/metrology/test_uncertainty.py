@@ -370,7 +370,7 @@ def test_gum_h2_correlated_measurement() -> None:
     assert r[0, 2] == pytest.approx(0.86, abs=0.005)
     assert r[1, 2] == pytest.approx(-0.65, abs=0.005)
 
-    qs = [u.Quantity(m, s) for m, s in zip(means, u_means)]
+    qs = [u.Quantity(m, s) for m, s in zip(means, u_means, strict=True)]
     models = {
         "R": lambda v, i, p: v / i * math.cos(p),
         "X": lambda v, i, p: v / i * math.sin(p),

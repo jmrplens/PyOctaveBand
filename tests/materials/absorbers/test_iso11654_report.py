@@ -158,6 +158,27 @@ def test_third_octave_fiche_with_metadata(tmp_path) -> None:
     _assert_one_page(str(out))
 
 
+def test_third_octave_fiche_rejects_band_count_mismatch(tmp_path) -> None:
+    """One-third-octave arrays of unequal length raise ``ValueError``.
+
+    ``AbsorptionRatingResult`` is a frozen dataclass with no validation, so a
+    caller can pair fifteen ``alpha_s`` with fourteen band centres; the
+    accredited table used to be drawn silently short. The guard fires before
+    the table is built, so no PDF is written.
+    """
+    import dataclasses
+
+    result = weighted_absorption_from_third_octave(_THIRD_OCTAVE_ALPHA_S)
+    assert result.third_octave_bands is not None
+    short = dataclasses.replace(
+        result, third_octave_bands=result.third_octave_bands[:-1]
+    )
+    out = tmp_path / "mismatch.pdf"
+    with pytest.raises(ValueError, match="third_octave_bands"):
+        short.report(str(out))
+    assert not out.exists()
+
+
 def test_statement_writes_shape_indicator_without_space(tmp_path) -> None:
     """The boxed rating is written ``0.60(M)``, the ISO 11654 5.3 style.
 

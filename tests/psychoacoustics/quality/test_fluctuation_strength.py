@@ -149,7 +149,9 @@ def test_signal_carrier_sweep_tracks_fig_10_5() -> None:
         ).fluctuation_strength
         for fc in ref.FS_CARRIER_SWEEP_HZ
     }
-    for fc, expected in zip(ref.FS_CARRIER_SWEEP_HZ, ref.FS_CARRIER_SWEEP_VACIL):
+    for fc, expected in zip(
+        ref.FS_CARRIER_SWEEP_HZ, ref.FS_CARRIER_SWEEP_VACIL, strict=True
+    ):
         assert model[fc] == pytest.approx(expected, rel=0.15), (
             f"fc={fc:g} Hz: F={model[fc]:.3f} vs {expected} vacil"
         )

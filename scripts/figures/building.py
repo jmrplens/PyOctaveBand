@@ -402,7 +402,7 @@ def generate_facade_prediction(output_dir: str) -> None:
     # transmission floor rather than being the answer. Held back by shade, not
     # by opacity: a faded blue or red is a faded page on the dark theme.
     el_colors = [COLOR_PRIMARY, COLOR_SECONDARY, "#9467bd", "#ff7f0e"]
-    for (name, rp), colour in zip(result.element_r.items(), el_colors):
+    for (name, rp), colour in zip(result.element_r.items(), el_colors, strict=True):
         ax.plot(
             x,
             rp,

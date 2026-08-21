@@ -1072,7 +1072,7 @@ def generate_tone_burst_iec(output_dir: str) -> None:
     steady = np.sin(2 * np.pi * 4000 * t_all)
     ref = filters.time_weighting(steady, fs, mode="fast")[int(1.5 * fs) :].mean()
 
-    for ax, (duration, target) in zip(axes, cases):
+    for ax, (duration, target) in zip(axes, cases, strict=True):
         burst = np.zeros_like(t_all)
         start = int(0.5 * fs)
         burst[start : start + round(duration * fs)] = steady[
@@ -1913,7 +1913,7 @@ def generate_peak_oversampling(output_dir: str) -> None:
     per_cycle = np.array([3.0, 4.0, 6.0, 8.0, 12.0, 24.0, 48.0])
     phases = np.linspace(0.0, 2 * np.pi, 46)
     colors = [COLOR_SECONDARY, COLOR_QUATERNARY, COLOR_TERTIARY, COLOR_PRIMARY]
-    for factor, color in zip((1, 2, 4, 8), colors):
+    for factor, color in zip((1, 2, 4, 8), colors, strict=True):
         worst = []
         for n_samples in per_cycle:
             tones = [np.sin(2 * np.pi * (fs / n_samples) * t_tone + p) for p in phases]
@@ -2154,7 +2154,7 @@ def generate_c_minus_a_spectrum(output_dir: str) -> None:
         ("C", COLOR_PRIMARY, "--"),
         ("A", COLOR_SECONDARY, ":"),
     ]
-    for ax, (title, x) in zip(axes, scenes):
+    for ax, (title, x) in zip(axes, scenes, strict=True):
         for curve, color, style in curves:
             weighted = filters.weighting_filter(x, fs, curve=curve)
             band_levels, centres = filters.octave_filter(weighted, fs, fraction=3)
@@ -2385,7 +2385,7 @@ def generate_architecture_tradeoff(output_dir: str) -> None:
     ax_a.bar(
         x + 0.19, four_fm, 0.36, color=COLOR_TERTIARY, label=r"at $4 f_{\mathrm{m}}$"
     )
-    for xi, value in zip(x - 0.19, two_fm):
+    for xi, value in zip(x - 0.19, two_fm, strict=True):
         ax_a.annotate(
             _fmt_minus(value, ".0f"),
             (xi, value),
@@ -2395,7 +2395,7 @@ def generate_architecture_tradeoff(output_dir: str) -> None:
             xytext=(0, -4),
             textcoords="offset points",
         )
-    for xi, value in zip(x + 0.19, four_fm):
+    for xi, value in zip(x + 0.19, four_fm, strict=True):
         ax_a.annotate(
             _fmt_minus(value, ".0f"),
             (xi, value),
@@ -2413,7 +2413,7 @@ def generate_architecture_tradeoff(output_dir: str) -> None:
     ax_a.legend(loc="lower right", fontsize=9)
 
     ax_b.bar(x, delays, 0.5, color=COLOR_SECONDARY)
-    for xi, value in zip(x, delays):
+    for xi, value in zip(x, delays, strict=True):
         ax_b.annotate(
             f"{value:.2f}",
             (xi, value),
@@ -2447,7 +2447,7 @@ def generate_class_mask_architectures(output_dir: str) -> None:
         ("bessel", "Bessel: roll-off too slow"),
     )
     fig, axes = plt.subplots(2, 2, figsize=(12, 8))
-    for ax, (ftype, title) in zip(axes.ravel(), cases):
+    for ax, (ftype, title) in zip(axes.ravel(), cases, strict=True):
         bank = filters.OctaveFilterBank(
             fs,
             fraction=1,

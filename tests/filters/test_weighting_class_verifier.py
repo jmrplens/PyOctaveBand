@@ -22,7 +22,7 @@ from phonometry.filters.weighting_compliance import (
 def test_masks_match_reference_data() -> None:
     """The module's Table 3 (freq, A, C, class1 upper/lower) equals reference_data."""
     assert len(_WEIGHTING_TABLE3) == len(TABLE3) == 34
-    for row, ref in zip(_WEIGHTING_TABLE3, TABLE3):
+    for row, ref in zip(_WEIGHTING_TABLE3, TABLE3, strict=True):
         assert row[:5] == pytest.approx(ref, nan_ok=False), f"mismatch at {ref[0]} Hz"
 
 

@@ -173,7 +173,7 @@ def test_lined_rectangular_duct_eq_14_12() -> None:
     c = [1.959, 1.410, 0.824, 0.500, 0.695, 0.802, 0.451, 0.219]
     ps, length = 10.0 / 3.0, 6.0
     # t = 1 in, so t^D = 1 for every band and D drops out of this case.
-    expected = [bi * ps**ci * length for bi, ci in zip(b, c)]
+    expected = [bi * ps**ci * length for bi, ci in zip(b, c, strict=True)]
     assert np.allclose(res.values, expected)
 
 

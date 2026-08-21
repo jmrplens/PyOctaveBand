@@ -739,7 +739,7 @@ def _d_room_measurement(s: SVG, th: Theme) -> None:
         yy = ty + th_row * (r + 1)
         if r < len(rows) - 1:
             s.line(60, yy + th_row, 60 + tw, yy + th_row, th.muted, 1.0)
-        for (cx, _, anchor), value in zip(cols, row):
+        for (cx, _, anchor), value in zip(cols, row, strict=True):
             col = th.primary if cx == 70.0 else th.fg
             s.text(cx, yy + 26, value, 15, col, anchor, bold=(cx == 70.0))
 
@@ -1086,7 +1086,7 @@ def _d_room_measurement_section(s: SVG, th: Theme) -> None:
     tw, row_h = 516.0, 36.0
     s.rect(70, ty, tw, row_h * 2, "none", th.fg, rx=6, sw=1.8)
     s.rect(70, ty, tw, row_h, th.panel, th.fg, rx=6, sw=1.8)
-    for i, (freq, value) in enumerate(zip(cols, tol)):
+    for i, (freq, value) in enumerate(zip(cols, tol, strict=True)):
         cx = 70 + tw * (i + 0.5) / len(cols)
         s.text(cx, ty + 24, f"{freq:g}", 14, th.fg, "middle", bold=True)
         s.text(cx, ty + 24 + row_h, value, 14, th.primary, "middle")
@@ -1908,14 +1908,14 @@ def _d_reverberation_prediction(s: SVG, th: Theme) -> None:
     sab = ("0.74", "0.47", "0.37", "0.31", "0.30", "0.30")
     eyr = ("0.66", "0.39", "0.29", "0.23", "0.21", "0.22")
     xc = [292.0 + 94.0 * i for i in range(6)]
-    for x, f in zip(xc, freqs):
+    for x, f in zip(xc, freqs, strict=True):
         s.text(x, 372, f, 10, th.muted, bold=True)
     s.line(130, 382, 770, 382, th.muted, 1.0)
     s.text(130, 404, "Sabine [s]", 10, th.primary, bold=True, anchor="start")
-    for x, v in zip(xc, sab):
+    for x, v in zip(xc, sab, strict=True):
         s.text(x, 404, v, 11, th.fg)
     s.text(130, 432, "Eyring [s]", 10, th.secondary, bold=True, anchor="start")
-    for x, v in zip(xc, eyr):
+    for x, v in zip(xc, eyr, strict=True):
         s.text(x, 432, v, 11, th.fg)
     s.text(
         450,

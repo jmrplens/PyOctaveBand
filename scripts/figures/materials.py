@@ -1514,7 +1514,7 @@ def generate_metadiffuser_phase_match(output_dir: str) -> None:
         zorder=4,
         label="Metadiffuser, panel 2 cm",
     )
-    for i, r in zip(index, r_design):
+    for i, r in zip(index, r_design, strict=True):
         ax_l.annotate(
             f"$|R|$ = {abs(r):.2f}",
             (i, np.degrees(np.angle(r)) - 12.0),
@@ -1968,7 +1968,9 @@ def generate_diffusion_measurement_chain(output_dir: str) -> None:
     seq = np.tile(depths, 6)
     t_well = 2.0 * float(depths.max()) / c
     delays = np.linspace(t_first, t_last - t_well, seq.size) + 2.0 * seq / c
-    ideal_sample = sum(_spike(d, 0.16 / (1.0 + 6.0 * s)) for d, s in zip(delays, seq))
+    ideal_sample = sum(
+        _spike(d, 0.16 / (1.0 + 6.0 * s)) for d, s in zip(delays, seq, strict=True)
+    )
     ideal_room = _spike(t_room, 0.30)
     ideal_direct = _spike(t_direct, 1.0)
 
@@ -2009,7 +2011,7 @@ def generate_diffusion_measurement_chain(output_dir: str) -> None:
         (h4 * window, "(e) windowed, Clause 7.4.3", s_dec),
     )
     fig, axes = plt.subplots(5, 1, sharex=True, figsize=(10, 9.6))
-    for ax, (y, label, scale) in zip(axes, panels):
+    for ax, (y, label, scale) in zip(axes, panels, strict=True):
         ax.plot(ms, y, color=COLOR_PRIMARY, linewidth=1.1, zorder=3)
         ax.set_ylabel(
             label, fontsize=9, rotation=0, ha="right", va="center", labelpad=8

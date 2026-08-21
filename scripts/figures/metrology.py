@@ -930,7 +930,7 @@ def generate_uncertainty_gum_vs_mc(output_dir: str) -> None:
     )
 
     _fig, axes = plt.subplots(3, 1, figsize=(10, 11))
-    for ax, (title, model, quantities, xlabel, ymax) in zip(axes, panels):
+    for ax, (title, model, quantities, xlabel, ymax) in zip(axes, panels, strict=True):
         gum = ph.metrology.combine_uncertainty(model, quantities)
         mc = ph.metrology.monte_carlo(
             model,
@@ -1061,7 +1061,7 @@ def generate_uncertainty_correlation(output_dir: str) -> None:
         width=0.55,
         zorder=2,
     )
-    for rect, val in zip(bars, (quad, linear)):
+    for rect, val in zip(bars, (quad, linear), strict=True):
         ax_r.text(
             rect.get_x() + rect.get_width() / 2,
             val + 0.012,
@@ -1097,7 +1097,7 @@ def generate_runs_test(output_dir: str) -> None:
     sequences = [rng.standard_normal(40), np.tile([1.0, -1.0], 10)]
 
     _fig, axes = plt.subplots(1, 2, figsize=(12.5, 5.4))
-    for ax, seq in zip(axes, sequences):
+    for ax, seq in zip(axes, sequences, strict=True):
         res = metrology.trend_test(seq, method="runs")
         idx = np.arange(1, seq.size + 1)
         median = float(np.median(seq))

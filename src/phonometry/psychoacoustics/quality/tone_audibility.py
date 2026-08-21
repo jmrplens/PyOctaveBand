@@ -796,7 +796,7 @@ def combined_tone_level(
         msg = "At least one tone is required."
         raise ValueError(msg)
     marked: set[int] = set()
-    for ft, ls in zip(fts, lss):
+    for ft, ls in zip(fts, lss, strict=True):
         peak = int(np.argmin(np.abs(freq - ft)))
         low, high = _tone_line_span(lev, peak, float(ls))
         marked.update(range(low, high + 1))

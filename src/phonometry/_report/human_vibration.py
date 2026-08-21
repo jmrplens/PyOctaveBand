@@ -49,6 +49,8 @@ from __future__ import annotations
 import html
 from typing import TYPE_CHECKING, Any
 
+import numpy as np
+
 from ._i18n import decimal_comma, t
 from ._layout import (
     _ACCENT_HEX,
@@ -194,7 +196,11 @@ def _operations_table(
     a8_energy = float(result.a8) ** 2
     data: list[list[Any]] = [[fiche_paragraph(h, header_style) for h in headers]]
     for label, total_value, duration_s, partial in zip(
-        result.labels, result.total_values, result.durations_s, result.partials
+        result.labels,
+        result.total_values,
+        result.durations_s,
+        result.partials,
+        strict=True,
     ):
         row = [
             fiche_paragraph(html.escape(str(label)), label_style),
@@ -398,6 +404,8 @@ def render_human_vibration_report(
         of the daily vibration energy ``A_i(8)^2 / A(8)^2``.
     :param language: ``"en"`` (default) or ``"es"``.
     :return: The written ``path`` as a :class:`str`.
+    :raises ValueError: If ``total_values``, ``durations_s`` or ``partials``
+        does not carry one value per operation label.
     :raises ImportError: If reportlab or matplotlib is not installed. The
         fiche always embeds the contribution chart, so both are required
         (``pip install "phonometry[report,plot]"``).
@@ -412,6 +420,24 @@ def render_human_vibration_report(
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
+
+    # Guard a manually constructed result: DailyVibrationExposure is a plain
+    # frozen dataclass, so every per-operation array the table and the chart
+    # consume has to be checked here. A short one would otherwise cut the
+    # operations table while the daily-total row kept summing every duration.
+    n_ops = len(result.labels)
+    for name, values in (
+        ("total_values", result.total_values),
+        ("durations_s", result.durations_s),
+        ("partials", result.partials),
+    ):
+        shape = np.asarray(values, dtype=np.float64).shape
+        if shape != (n_ops,):
+            msg = (
+                f"render_human_vibration_report() needs '{name}' to carry one "
+                f"value per operation ({n_ops} in 'labels'); got shape {shape}."
+            )
+            raise ValueError(msg)
 
     styles, title_style, basis_style, caption_style = document_styles(accent)
     title = t("Daily vibration exposure assessment", language)

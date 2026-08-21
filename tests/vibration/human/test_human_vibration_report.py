@@ -14,6 +14,7 @@ Values are read back from the PDF via pypdf text extraction; structural facts
 
 from __future__ import annotations
 
+import dataclasses
 import math
 import os
 
@@ -292,6 +293,59 @@ def test_unknown_language_rejected(tmp_path) -> None:
     out = str(tmp_path / "bad.pdf")
     with pytest.raises(ValueError, match="language"):
         res.report(out, language="xx")
+
+
+@pytest.mark.parametrize("field", ["total_values", "durations_s", "partials"])
+def test_report_rejects_per_operation_array_short_by_one(tmp_path, field: str) -> None:
+    """A per-operation array one entry short is named in a ValueError.
+
+    ``DailyVibrationExposure`` is a frozen dataclass with no ``__post_init__``,
+    so a hand-built result can carry arrays that disagree with ``labels``. The
+    operations table used to run short in silence instead of complaining.
+    """
+    pytest.importorskip("reportlab")
+    res = _annex_e3_result()
+    short = dataclasses.replace(res, **{field: getattr(res, field)[:-1]})
+    out = tmp_path / f"short_{field}.pdf"
+    with pytest.raises(ValueError, match=field):
+        short.report(str(out))
+    # The guard fires before the table and the chart, so nothing is written.
+    assert not out.exists()
+
+
+def test_report_rejects_fewer_labels_than_operations(tmp_path) -> None:
+    """``labels`` sets the expected count, so dropping one is a mismatch too.
+
+    The message names the array that disagreed rather than ``labels`` itself,
+    because ``labels`` is what the count is read from: matching both halves
+    pins that reading, where matching ``labels`` alone would pass against any
+    of the four messages this guard can raise.
+    """
+    pytest.importorskip("reportlab")
+    res = _annex_e3_result()
+    short = dataclasses.replace(res, labels=res.labels[:-1])
+    out = tmp_path / "short_labels.pdf"
+    with pytest.raises(ValueError, match=r"'total_values'.*\(2 in 'labels'\)"):
+        short.report(str(out))
+    assert not out.exists()
+
+
+def test_report_accepts_matching_per_operation_arrays(tmp_path) -> None:
+    """Dropping the same operation from every array passes the guard."""
+    pytest.importorskip("reportlab")
+    pytest.importorskip("matplotlib")
+    res = _annex_e3_result()
+    two_ops = dataclasses.replace(
+        res,
+        labels=res.labels[:-1],
+        total_values=res.total_values[:-1],
+        durations_s=res.durations_s[:-1],
+        partials=res.partials[:-1],
+    )
+    out = tmp_path / "two_ops.pdf"
+    two_ops.report(str(out))
+    _assert_one_page(str(out))
+    assert "stripping" not in _extract_text(str(out))
 
 
 def test_partial_exposure_closed_form() -> None:

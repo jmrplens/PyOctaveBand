@@ -183,7 +183,7 @@ def plot_harmonic_distortion(
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", _t("Harmonics", language))
     ax.plot(orders, levels_db, "o", **kwargs)
-    for order, level in zip(orders, levels_db):
+    for order, level in zip(orders, levels_db, strict=True):
         if level > floor_db:
             ax.annotate(
                 f"{order}",

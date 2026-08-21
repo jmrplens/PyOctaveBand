@@ -278,7 +278,7 @@ def generate_psd_segment_tradeoff(output_dir: str) -> None:
     # Left: the peak itself, at four segment lengths.
     colors = (COLOR_FG, COLOR_TERTIARY, COLOR_PRIMARY, COLOR_SECONDARY)
     peak_ref = None
-    for nperseg, color in zip(lengths, colors):
+    for nperseg, color in zip(lengths, colors, strict=True):
         res = signals.power_spectral_density(resonant, fs, nperseg=nperseg)
         band = (res.frequencies >= 880.0) & (res.frequencies <= 1120.0)
         level = 10.0 * np.log10(res.psd[band])

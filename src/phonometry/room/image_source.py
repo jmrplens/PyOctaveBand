@@ -286,7 +286,7 @@ def _validate_point(
     if not np.all(np.isfinite(p)):
         msg = f"'{name}' coordinates must be finite."
         raise ValueError(msg)
-    for value, length, axis in zip(p, dimensions, "xyz"):
+    for value, length, axis in zip(p, dimensions, "xyz", strict=True):
         if not 0.0 < value < length:
             msg = (
                 f"'{name}' coordinate {axis} = {value} lies outside the room "

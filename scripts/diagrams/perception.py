@@ -1316,7 +1316,7 @@ def _d_soundfield_audiometry(s: SVG, th: Theme) -> None:
         s.text(x + pw / 2, 90, sub, 12, th.muted)
 
     def notes(x: float, color: str, *rows: str) -> None:
-        for y, row in zip(note_y, rows):
+        for y, row in zip(note_y, rows, strict=True):
             s.text(x + pw / 2, y, row, 11, color)
 
     def ghost_subject(x: float) -> float:
@@ -1481,7 +1481,7 @@ def _d_slm_workstation(s: SVG, th: Theme) -> None:
         s.text(x + pw / 2, 90, sub, 13, th.muted)
 
     def notes(x: float, color: str, *rows: str) -> None:
-        for y, row in zip(note_y, rows):
+        for y, row in zip(note_y, rows, strict=True):
             s.text(x + pw / 2, y, row, 12, color)
 
     def machine(x: float) -> None:
@@ -1600,7 +1600,7 @@ def _d_sti_setup(s: SVG, th: Theme) -> None:
         s.ground(gy, x, x + pw)
 
     def notes(x: float, color: str, *rows: str) -> None:
-        for y, row in zip(note_y, rows):
+        for y, row in zip(note_y, rows, strict=True):
             s.text(x + pw / 2, y, row, 12, color)
 
     def receiver(x: float, *, ghost: bool = False) -> None:

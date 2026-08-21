@@ -732,7 +732,9 @@ def generate_installed_structure_borne(output_dir: str) -> None:
     # Frequency-dependent source / receiver point mobilities (illustrative).
     ys = (2.0e-4 + 1.0e-4j) * (bands / 250.0)
     yi = (3.0e-5 + 1.0e-5j) * np.ones_like(bands)
-    dc = np.array([float(building.coupling_term(a, b)) for a, b in zip(ys, yi)])
+    dc = np.array(
+        [float(building.coupling_term(a, b)) for a, b in zip(ys, yi, strict=True)]
+    )
     lws_inst = building.installed_structure_borne_power_level(lws_c, dc)
     # Dsa is negative and falls with frequency (Annex F.2, Formula F.3); the
     # standard's own Annex I columns run from about -14 dB at 63 Hz to -45 dB
@@ -1091,7 +1093,7 @@ def generate_impact_prediction_terms(output_dir: str) -> None:
     ax.axhline(0.0, color=COLOR_FG, linewidth=0.8)
     ax.set_xticks(np.arange(4))
     ax.set_xticklabels(labels, fontsize=12)
-    for bar, value in zip(bars, values):
+    for bar, value in zip(bars, values, strict=True):
         ax.annotate(
             _fmt_minus(value, "+.1f"),
             xy=(bar.get_x() + bar.get_width() / 2.0, value),
@@ -1207,7 +1209,7 @@ def generate_detailed_prediction_paths(output_dir: str) -> None:
         "#ff9896",
     ]
     bottom = np.zeros(x.size)
-    for colour, k in zip(palette, order[:6]):
+    for colour, k in zip(palette, order[:6], strict=False):  # six colours, rest pooled
         share = 100.0 * res.fractions[k]
         ax.bar(
             x,

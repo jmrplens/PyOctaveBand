@@ -680,7 +680,7 @@ def _smooth(pattern: np.ndarray) -> np.ndarray:
     """
     smoothed = np.zeros_like(pattern)
     n = pattern.size
-    for offset, weight in zip(_INH_TAPS, _INH_KERNEL):
+    for offset, weight in zip(_INH_TAPS, _INH_KERNEL, strict=True):
         src_lo = max(0, offset)
         src_hi = min(n, n + offset)
         dst_lo = max(0, -offset)
@@ -839,7 +839,7 @@ def _third_octave_components(
     """
     freqs: list[float] = []
     levels: list[float] = []
-    for centre, level in zip(_THIRD_OCTAVE_FREQ, band_levels):
+    for centre, level in zip(_THIRD_OCTAVE_FREQ, band_levels, strict=True):
         width = centre * (_THIRD_OCTAVE_RATIO - 1.0 / _THIRD_OCTAVE_RATIO)
         spectrum_level = float(level) - 10.0 * math.log10(width)
         spacing = 1.0 if centre <= _FINE_SPACING_MAX_CENTRE_HZ else 10.0

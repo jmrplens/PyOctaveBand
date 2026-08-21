@@ -572,7 +572,7 @@ def check_base_plate_scattering(
                 f"bands {BASE_PLATE_BANDS}, got shape {arr.shape}"
             )
             raise ValueError(msg)
-        values = dict(zip(BASE_PLATE_BANDS, arr.tolist()))
+        values = dict(zip(BASE_PLATE_BANDS, arr.tolist(), strict=True))
     exceeded = tuple(
         band
         for band in BASE_PLATE_BANDS

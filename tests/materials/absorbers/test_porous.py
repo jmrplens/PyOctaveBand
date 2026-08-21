@@ -668,7 +668,10 @@ class TestResonantSheets:
     def test_maa_table_i_printed_values(self) -> None:
         """Maa 1998 Table I: alpha0 (Eq. (10)) and B = f2/f1 (Eq. (21))."""
         for r, alpha0, b in zip(
-            ref.MAA_TABLE_I_R, ref.MAA_TABLE_I_ALPHA0, ref.MAA_TABLE_I_BANDWIDTH
+            ref.MAA_TABLE_I_R,
+            ref.MAA_TABLE_I_ALPHA0,
+            ref.MAA_TABLE_I_BANDWIDTH,
+            strict=True,
         ):
             assert 4.0 * r / (1.0 + r) ** 2 == pytest.approx(alpha0, abs=0.005)
             arccot = np.arctan(1.0 / (1.0 + r))

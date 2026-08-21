@@ -295,7 +295,7 @@ def _value_table(
         return format_number(value, language, decimals=1)
 
     rows: list[list[Any]] = [header]
-    for fk, m, r_, d in zip(centers, measured, shifted, deviations):
+    for fk, m, r_, d in zip(centers, measured, shifted, deviations, strict=True):
         if verbose:
             rows.append(
                 [

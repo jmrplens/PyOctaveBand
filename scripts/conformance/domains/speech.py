@@ -128,7 +128,7 @@ def _stipa_sine_signal(
     t = np.arange(round(seconds * _FS)) / _FS
     x = np.zeros(t.size)
     for k, (fc, fa, fb, level) in enumerate(
-        zip(_STI_CENTERS, _STI_F1, _STI_F2, _STI_LEVELS)
+        zip(_STI_CENTERS, _STI_F1, _STI_F2, _STI_LEVELS, strict=True)
     ):
         mk = m if bands is None or k in bands else 0.0
         env = 0.5 * (

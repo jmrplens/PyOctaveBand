@@ -81,7 +81,9 @@ def _chk_iso9613_2_table2_grid() -> Outcome:
             )
             * 1000.0
         )
-        for got, printed, band in zip(alpha, row, ref.ISO9613_2_TABLE2_BANDS):
+        for got, printed, band in zip(
+            alpha, row, ref.ISO9613_2_TABLE2_BANDS, strict=True
+        ):
             tol = 0.5 if printed >= 100.0 else 0.05
             if (temp, rh, band) == (15.0, 80.0, 1000.0):
                 tol = 0.06
