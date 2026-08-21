@@ -206,6 +206,16 @@ def test_band_count_mismatch_raises() -> None:
         building.facade_insulation(outdoor, indoor_two_bands, rt)
 
 
+def test_reverberation_time_with_an_extra_axis_raises() -> None:
+    """A `t2` carrying an extra axis is named for what is wrong with it.
+
+    The band counts match here, so a message about counts would be false.
+    """
+    outdoor, indoor = _flat(3, 70.0), _flat(3, 30.0)
+    with pytest.raises(ValueError, match="'t2' must be one-dimensional"):
+        building.facade_insulation(outdoor, indoor, np.full((1, 3), 0.5))
+
+
 def test_nonpositive_reverberation_raises() -> None:
     outdoor, indoor = _flat(3, 70.0), _flat(3, 30.0)
     rt_with_zero = np.array([0.5, 0.0, 0.5])
