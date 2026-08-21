@@ -16,6 +16,7 @@ pytest.importorskip("reportlab")
 from phonometry._report._layout import (  # noqa: E402
     _octave_grouping,
     _require_column_widths,
+    band_table,
     compliance_table,
     grid_table,
 )
@@ -142,3 +143,16 @@ def test_a_drawing_is_scaled_by_what_it_covers_not_by_what_it_declares() -> None
     target = 100.0
     drawing = render_figure_drawing(wide_legend, target, y_top=None)
     assert drawing.getBounds()[2] <= target + 0.5
+
+
+def test_band_centres_that_are_not_the_rows_are_refused() -> None:
+    """The rules are counted off the rows and read off the centres.
+
+    Nothing else relates the two, so a caller handing over a longer axis than
+    it tabulated would rule the rows it printed by the structure of bands it
+    did not.
+    """
+    rows = [["f", "value"], ["100", "1.0"], ["125", "2.0"], ["160", "3.0"]]
+    centres = [100, 125, 160, 200, 250, 315]
+    with pytest.raises(ValueError, match="carries 6 entries for 3 band rows"):
+        band_table(rows, [28.0, 28.0], 3, band_centres=centres)

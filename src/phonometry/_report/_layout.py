@@ -533,6 +533,18 @@ def band_table(
         ("BOTTOMPADDING", (0, 0), (-1, -1), 2.6),
         ("BOX", (0, 0), (-1, -1), 0.5, accent),
     ]
+    # The rules are counted off the rows while the grouping is read off the
+    # centres, so the two have to be the same bands. Nothing else relates
+    # them: a caller that hands over a longer axis than it tabulated would
+    # rule the rows it did print by the structure of bands it did not.
+    if band_centres is not None and np.size(band_centres) != n_data:
+        msg = (
+            f"band_table: 'band_centres' carries {np.size(band_centres)} "
+            f"entries for {n_data} band rows. The octave rules are drawn "
+            "across the rows and read from the centres, so they have to be "
+            "the same bands."
+        )
+        raise ValueError(msg)
     group_every = _octave_grouping(band_centres)
     if group_every is not None:
         style_cmds.extend(

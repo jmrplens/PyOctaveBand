@@ -22,7 +22,6 @@ alpha = 1 - 1/5 = 0.80 with |r| = 1/sqrt(5) = 0.45.
 from __future__ import annotations
 
 import dataclasses
-import pathlib
 import re
 
 import pytest
@@ -30,10 +29,8 @@ import pytest
 pytest.importorskip("reportlab")
 
 import numpy as np
+import result_factories
 from report_assertions import assert_one_page
-
-#: The tests root, where the shared result factories live.
-_TESTS_ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 from phonometry import ReportMetadata
 from phonometry.materials import (
@@ -226,12 +223,7 @@ def test_a_table_longer_than_the_page_is_refused(tmp_path, points: int) -> None:
     identity on pages nobody stamped. Past that reportlab gave up with a
     LayoutError naming a flowable and a frame in points.
     """
-    import sys
-
-    sys.path.insert(0, str(_TESTS_ROOT))
-    import result_factories as rf
-
-    base = rf._impedance_tube()
+    base = result_factories._impedance_tube()
     size = np.size(base.frequency)
     trimmed = dataclasses.replace(
         base,
