@@ -22,6 +22,7 @@ import math
 import os
 import re
 import tempfile
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -224,8 +225,9 @@ def render_figure_drawing(
     except ImportError as exc:  # pragma: no cover - exercised via monkeypatch
         raise ImportError(_SVGLIB_HINT) from exc
 
-    svg_fd, svg_path = tempfile.mkstemp(suffix=".svg")
+    svg_fd, svg_name = tempfile.mkstemp(suffix=".svg")
     os.close(svg_fd)
+    svg_path = Path(svg_name)
     try:
         fig = Figure(figsize=figsize if figsize is not None else (5.8, 6.4))
         FigureCanvasAgg(fig)
@@ -277,8 +279,7 @@ def render_figure_drawing(
             fig.savefig(svg_path, format="svg")
         drawing = svg2rlg(svg_path)
     finally:
-        if os.path.exists(svg_path):
-            os.remove(svg_path)
+        svg_path.unlink(missing_ok=True)
     if drawing is None or not drawing.width:
         msg = "Could not convert the report plot to vector graphics."
         raise ValueError(msg)
@@ -399,10 +400,10 @@ def band_table(
     ]
     # Octave-band tables (5 rows, one per octave) have no triplets to group.
     if n_data != _OCTAVE_TABLE_ROWS:
-        for triplet_end in range(3, n_data, 3):
-            style_cmds.append(
-                ("LINEBELOW", (0, triplet_end), (-1, triplet_end), 0.4, thin)
-            )
+        style_cmds.extend(
+            ("LINEBELOW", (0, triplet_end), (-1, triplet_end), 0.4, thin)
+            for triplet_end in range(3, n_data, 3)
+        )
     if extra_styles:
         style_cmds += extra_styles
     table = Table(rows, colWidths=col_widths, repeatRows=1)
@@ -876,8 +877,7 @@ def footer_flow(
             lines.append(
                 f"<b>{t('Notes', language)}:</b> {html.escape(metadata.notes)}"
             )
-    for line in lines:
-        flow.append(fiche_paragraph(line, ident_style))
+    flow.extend(fiche_paragraph(line, ident_style) for line in lines)
 
     operator = metadata.operator if metadata is not None else None
     if operator:

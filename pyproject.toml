@@ -173,6 +173,15 @@ select = [
                             # not move: the parameter it is about, not the
                             # sentence around it, not a bound, not a list of
                             # allowed values, not wording numpy owns.
+    "PTH",                  # a path is a `Path`. Read one at a time: the two
+                            # spell the same destination but not the same type,
+                            # and a `Path` prints like its string while
+                            # comparing unequal to it, so the sites that hand
+                            # their value to a sort, a comparison or a
+                            # dictionary key were the ones worth reading.
+    "PERF",                 # a loop whose whole body is one `append` is a
+                            # comprehension, unless saying so costs more lines
+                            # than it saves
 ]
 ignore = [
     # TC006 quotes the first argument of `typing.cast`, which that function
@@ -207,11 +216,6 @@ ignore = [
     "D203",  # a blank line before a class docstring; D211 is the house shape
     "D213",  # the summary on the second line; D212 is the house shape
 ]
-# Selected next, in their own review, because each is a change to code rather
-# than to its shape and the diff has to be readable to be checked:
-#   PTH   (158) pathlib over os.path.
-#   PERF   (34) manual loops that build a list.
-
 [tool.ruff.lint.per-file-ignores]
 # `matplotlib.use("Agg")` has to run between `import matplotlib` and the first
 # `import matplotlib.pyplot`, and the scripts put the repository on `sys.path`

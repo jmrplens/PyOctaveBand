@@ -36,7 +36,11 @@ for _threads_var in (
 
 # Add src to path to use the local package
 sys.path.insert(
-    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "src"))
+    # The code that draws the clips is hashed into
+    # scripts/animation_fingerprints.txt, so rewriting this asks for a
+    # re-render that would draw the very same frames.
+    0,
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "src")),  # noqa: PTH100, PTH118, PTH120
 )
 
 

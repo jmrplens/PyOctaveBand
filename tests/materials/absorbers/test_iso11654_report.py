@@ -36,14 +36,13 @@ from reference_data import (
 from reference_data import (
     ISO11654_ANNEX_A2_INDICATOR as _A2_INDICATOR,
 )
+from report_assertions import assert_one_page, assert_pdf
 
 from phonometry import ReportMetadata
 from phonometry.materials import (
     weighted_absorption,
     weighted_absorption_from_third_octave,
 )
-
-_PDF_MAGIC = b"%PDF"
 
 # Fifteen one-third-octave alpha_s (200 Hz to 5000 Hz) whose octave means are
 # the Annex A.2 practical coefficients (0.35, 1.00, 0.65, 0.60, 0.55).
@@ -66,30 +65,13 @@ _THIRD_OCTAVE_ALPHA_S = (
 )
 
 
-def _assert_pdf(path: str) -> None:
-    """A written report is a non-empty file beginning with ``%PDF``."""
-    import os
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-
-
-def _assert_one_page(path: str) -> None:
-    """The fiche is a single-page PDF beginning with ``%PDF``."""
-    _assert_pdf(path)
-    from pypdf import PdfReader
-
-    assert len(PdfReader(path).pages) == 1
-
-
 def test_absorption_report_writes_pdf(tmp_path) -> None:
     """A weighted absorption rating renders a PDF fiche."""
     result = weighted_absorption(_A1_ALPHA_P)
     out = tmp_path / "absorption.pdf"
     returned = result.report(str(out))
     assert returned == str(out)
-    _assert_pdf(str(out))
+    assert_pdf(str(out))
 
 
 def test_unknown_engine_rejected(tmp_path) -> None:
@@ -106,7 +88,7 @@ def test_fiche_reproduces_iso11654_annex_a1(tmp_path) -> None:
     assert result.alpha_w == pytest.approx(_A1_ALPHA_W)
     assert result.absorption_class == _A1_CLASS
     assert result.shape_indicator == _A1_INDICATOR
-    _assert_one_page(str(result.report(str(tmp_path / "a1.pdf"))))
+    assert_one_page(str(result.report(str(tmp_path / "a1.pdf"))))
 
 
 def test_fiche_reproduces_iso11654_annex_a2(tmp_path) -> None:
@@ -114,7 +96,7 @@ def test_fiche_reproduces_iso11654_annex_a2(tmp_path) -> None:
     result = weighted_absorption(_A2_ALPHA_P)
     assert result.alpha_w == pytest.approx(_A2_ALPHA_W)
     assert result.shape_indicator == _A2_INDICATOR
-    _assert_one_page(str(result.report(str(tmp_path / "a2.pdf"))))
+    assert_one_page(str(result.report(str(tmp_path / "a2.pdf"))))
 
 
 def test_third_octave_fiche_renders_and_round_trips(tmp_path) -> None:
@@ -147,7 +129,7 @@ def test_third_octave_fiche_renders_and_round_trips(tmp_path) -> None:
     )
     out = tmp_path / "third_octave.pdf"
     result.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_third_octave_fiche_with_metadata(tmp_path) -> None:
@@ -155,7 +137,7 @@ def test_third_octave_fiche_with_metadata(tmp_path) -> None:
     result = weighted_absorption_from_third_octave(_THIRD_OCTAVE_ALPHA_S)
     out = tmp_path / "third_octave_meta.pdf"
     result.report(str(out), metadata=_full_metadata(requirement=0.55))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_third_octave_fiche_rejects_band_count_mismatch(tmp_path) -> None:
@@ -207,7 +189,7 @@ def test_plain_rating_without_alpha_s_still_renders(tmp_path) -> None:
     assert result.third_octave_alpha_s is None
     out = tmp_path / "plain.pdf"
     result.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_verbose_renders_evaluation_table(tmp_path) -> None:
@@ -215,7 +197,7 @@ def test_verbose_renders_evaluation_table(tmp_path) -> None:
     result = weighted_absorption(_A2_ALPHA_P)
     out = tmp_path / "verbose.pdf"
     result.report(str(out), verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def _full_metadata(**overrides) -> ReportMetadata:
@@ -244,7 +226,7 @@ def test_full_metadata_renders_one_page(tmp_path) -> None:
     result = weighted_absorption(_A2_ALPHA_P)
     out = tmp_path / "meta.pdf"
     result.report(str(out), metadata=_full_metadata())
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_requirement_pass_and_fail_both_render(tmp_path) -> None:
@@ -254,8 +236,8 @@ def test_requirement_pass_and_fail_both_render(tmp_path) -> None:
     failing = tmp_path / "fail.pdf"
     result.report(str(passing), metadata=_full_metadata(requirement=0.55))
     result.report(str(failing), metadata=_full_metadata(requirement=0.80))
-    _assert_one_page(str(passing))
-    _assert_one_page(str(failing))
+    assert_one_page(str(passing))
+    assert_one_page(str(failing))
 
 
 def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
@@ -271,7 +253,7 @@ def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
     )
     out = tmp_path / "xml.pdf"
     result.report(str(out), metadata=md)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def _extract_text(path: str) -> str:
@@ -292,7 +274,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
         metadata=ReportMetadata(requirement=0.55, temperature=21.4),
         language="es",
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Índice de absorción acústica" in text
     assert "CUMPLE" in text

@@ -13,25 +13,13 @@ rejected engines/languages) complete the rendering contract.
 
 from __future__ import annotations
 
-import os
-
 import numpy as np
 import pytest
+from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.speech import sti_from_impulse_response
 from phonometry.speech.sti import _MOD_FREQS, _NUM_BANDS, _sti_from_mtf
-
-_PDF_MAGIC = b"%PDF"
-
-
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -69,7 +57,7 @@ def test_uniform_mtf_half_renders_sti_half(tmp_path) -> None:
     out = tmp_path / "sti.pdf"
     returned = res.report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "STI = 0.50" in text
     assert "Annex F): G" in text
@@ -84,7 +72,7 @@ def test_stipa_method_is_named(tmp_path) -> None:
     res = _sti_from_mtf(np.full((_NUM_BANDS, 2), 0.5))
     out = tmp_path / "stipa.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "STIPA, direct method" in _extract_text(str(out))
 
 
@@ -172,7 +160,7 @@ def test_decay_measurement_renders_its_own_value(tmp_path) -> None:
             requirement=0.5,
         ),
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert f"STI = {format_number(res.sti, 'en', decimals=2)}" in text
     assert f"Annex F): {res.rating}" in text
@@ -198,7 +186,7 @@ def test_metadata_header_renders(tmp_path) -> None:
             report_id="STI-1",
         ),
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Example works" in text
     assert "Public-address system" in text
@@ -215,7 +203,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     res = _uniform_result(0.5)
     out = tmp_path / "sti_es.pdf"
     res.report(str(out), metadata=ReportMetadata(requirement=0.45), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Índice de transmisión del habla" in text
     assert "STI = 0,50" in text

@@ -232,9 +232,11 @@ def write_baseline(path: pathlib.Path, found: dict[str, set[str]]) -> None:
         "# in English belongs in ENGLISH_BY_DESIGN, with its reason.",
         "",
     ]
-    for stem in sorted(found):
-        for text in sorted(found[stem]):
-            lines.append(f"{stem}: {json.dumps(text, ensure_ascii=False)}")
+    lines.extend(
+        f"{stem}: {json.dumps(text, ensure_ascii=False)}"
+        for stem in sorted(found)
+        for text in sorted(found[stem])
+    )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -296,10 +298,11 @@ def report(
     """Compare the run against the baseline in both directions."""
     problems: list[str] = []
 
-    new: list[tuple[str, str]] = []
-    for stem in sorted(found):
-        for text in sorted(found[stem] - baseline.get(stem, set())):
-            new.append((stem, text))
+    new: list[tuple[str, str]] = [
+        (stem, text)
+        for stem in sorted(found)
+        for text in sorted(found[stem] - baseline.get(stem, set()))
+    ]
     if new:
         problems.append(
             f"{len({stem for stem, _ in new})} figure(s) ship untranslated "
@@ -322,8 +325,7 @@ def report(
                 if stem not in optional:
                     stale.extend((stem, text) for text in sorted(baseline[stem]))
                 continue
-            for text in sorted(baseline[stem] - found[stem]):
-                stale.append((stem, text))
+            stale.extend((stem, text) for text in sorted(baseline[stem] - found[stem]))
         if stale:
             problems.append(
                 f"{len(stale)} baseline line(s) are no longer true "

@@ -18,12 +18,12 @@ import pytest
 
 pytest.importorskip("reportlab")
 
+from report_assertions import assert_one_page
+
 from phonometry import ReportMetadata
 from phonometry.environment.sources.wind_turbine import (
     wind_turbine_tonality,
 )
-
-_PDF_MAGIC = b"%PDF"
 
 
 def _synthetic_tone() -> tuple[np.ndarray, np.ndarray]:
@@ -43,17 +43,6 @@ def _result():
     return wind_turbine_tonality(levels, freqs)
 
 
-def _assert_one_page(path: str) -> None:
-    import os
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    from pypdf import PdfReader
-
-    assert len(PdfReader(path).pages) == 1
-
-
 def _extract_text(path: str) -> str:
     from pypdf import PdfReader
 
@@ -66,7 +55,7 @@ def test_report_writes_one_page_pdf(tmp_path) -> None:
     out = tmp_path / "wt.pdf"
     returned = result.report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_unknown_engine_rejected(tmp_path) -> None:
@@ -115,7 +104,7 @@ def test_metadata_appears_and_one_page(tmp_path) -> None:
     )
     out = tmp_path / "meta.pdf"
     _result().report(str(out), metadata=md, verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out)).replace("\n", " ")
     assert "Horizontal-axis wind turbine, gearbox tone" in text
     assert "Ground board, downwind reference position" in text
@@ -131,8 +120,8 @@ def test_requirement_pass_and_fail_both_render(tmp_path) -> None:
     failing = tmp_path / "fail.pdf"
     result.report(str(passing), metadata=ReportMetadata(requirement=delta + 2.0))
     result.report(str(failing), metadata=ReportMetadata(requirement=delta - 2.0))
-    _assert_one_page(str(passing))
-    _assert_one_page(str(failing))
+    assert_one_page(str(passing))
+    assert_one_page(str(failing))
     assert "PASS" in _extract_text(str(passing)).replace("\n", " ")
     assert "FAIL" in _extract_text(str(failing)).replace("\n", " ")
 
@@ -150,7 +139,7 @@ def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
     )
     out = tmp_path / "xml.pdf"
     _result().report(str(out), metadata=md)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
@@ -163,7 +152,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
         metadata=ReportMetadata(specimen="aerogenerador de eje horizontal"),
         language="es",
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Evaluación de la audibilidad tonal de aerogenerador" in text
     assert "Decisión" in text
@@ -183,7 +172,7 @@ def test_decision_matches_displayed_audibility_at_boundary(tmp_path) -> None:
     assert result.is_audible is True  # raw flag is audible
     out = tmp_path / "boundary.pdf"
     result.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out)).replace("\n", " ")
     assert "The tone is not audible" in text
     assert "0.0 dB" in text
@@ -203,7 +192,7 @@ def test_no_identified_tone_reports_exclusion(tmp_path) -> None:
     result = wind_turbine_tonality(levels, freqs, tone_frequency=500.0)
     out = tmp_path / "notone.pdf"
     result.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out)).replace("\n", " ")
     assert result.has_identified_tone is False
     assert result.is_audible is False

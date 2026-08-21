@@ -31,10 +31,9 @@ from reference_data import (
 from reference_data import (
     ISO717_2_ANNEX_C1_LN as _IMPACT_LN,
 )
+from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, building
-
-_PDF_MAGIC = b"%PDF"
 
 #: Receiving-room reverberation time and volume that make the equivalent
 #: absorption area A = 0,16 V / T equal to 10 m2 in every band, so both the
@@ -59,18 +58,6 @@ def _impact_result(**kwargs) -> building.LabImpactInsulationResult:
     return building.lab_impact_insulation(li, _T_UNITY, **params)
 
 
-def _assert_one_page(path: str) -> None:
-    """A written report is a non-empty single-page PDF."""
-    import os
-
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
-
-
 def _extract_text(path: str) -> str:
     """The concatenated text of every page."""
     from pypdf import PdfReader
@@ -89,7 +76,7 @@ def test_airborne_fiche_rating_pinned_to_iso717_1_annex_c(tmp_path) -> None:
     """The R fiche's rating is the published ISO 717-1 Annex C 30 (-2; -3) dB."""
     out = tmp_path / "r.pdf"
     _airborne_result().report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "30 (-2; -3) dB" in text
     assert "ISO 10140-2:2010" in text
@@ -111,7 +98,7 @@ def test_impact_fiche_rating_pinned_to_iso717_2_annex_c(tmp_path) -> None:
     """The Ln fiche's rating is the published ISO 717-2 Annex C 79 (-11) dB."""
     out = tmp_path / "ln.pdf"
     _impact_result().report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     expected = f"{_IMPACT_EXPECTED['ln_w']} ({_IMPACT_EXPECTED['ci']:+d}) dB"
     assert expected in text
@@ -149,7 +136,7 @@ def test_full_metadata_and_verbose_render_one_page(tmp_path) -> None:
     )
     out = tmp_path / "verbose.pdf"
     _airborne_result().report(str(out), metadata=metadata, verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = " ".join(_extract_text(str(out)).split())
     assert "PASS" in text  # Rw = 30 dB >= 25 dB
     assert "100 mm autoclaved aerated concrete" in text
@@ -179,7 +166,7 @@ def test_octave_band_fiche_renders(tmp_path) -> None:
     assert result.rating is not None
     out = tmp_path / "octave.pdf"
     result.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "Octave-band" in _extract_text(str(out))
 
 
@@ -194,7 +181,7 @@ def test_spanish_fiche_renders_translated(tmp_path) -> None:
         verbose=True,
         language="es",
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "CUMPLE" in text
     assert re.search(r"\d+,\d", text)  # comma decimal separator
@@ -259,7 +246,7 @@ def test_manual_impact_result_renders(tmp_path) -> None:
     )
     out = tmp_path / "bare.pdf"
     bare.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_report_rejects_band_count_mismatch(tmp_path) -> None:

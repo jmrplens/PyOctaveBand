@@ -32,6 +32,7 @@ from __future__ import annotations
 import html
 import os
 import tempfile
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -212,15 +213,15 @@ def _drawing_from_figure(fig: Any, target_width: float, language: str = "en") ->
 
     for ax in fig.axes:
         localize_axes(ax, language)
-    svg_fd, svg_path = tempfile.mkstemp(suffix=".svg")
+    svg_fd, svg_name = tempfile.mkstemp(suffix=".svg")
     os.close(svg_fd)
+    svg_path = Path(svg_name)
     try:
         with mpl.rc_context({"svg.fonttype": "path"}):
             fig.savefig(svg_path, format="svg", bbox_inches="tight")
         drawing = svg2rlg(svg_path)
     finally:
-        if os.path.exists(svg_path):
-            os.remove(svg_path)
+        svg_path.unlink(missing_ok=True)
     if drawing is None or not drawing.width:
         msg = "Could not convert the report plot to vector graphics."
         raise ValueError(msg)

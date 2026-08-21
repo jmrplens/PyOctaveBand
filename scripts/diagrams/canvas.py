@@ -34,6 +34,7 @@ import os
 import re
 import sys
 from dataclasses import dataclass
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from .i18n import lookup, visit
@@ -903,7 +904,7 @@ def _write(
             visit(name, lang)
             svg = SVG(900, height, th, lang)
             build(svg, th)
-            path = os.path.join(output_dir, f"{name}{lang_suffix}{th.suffix}.svg")
-            with open(path, "w", encoding="utf-8") as fh:
+            path = Path(output_dir) / f"{name}{lang_suffix}{th.suffix}.svg"
+            with path.open("w", encoding="utf-8") as fh:
                 fh.write(svg.render(title))
     print(f"Generated {name}.svg (+dark, +es, +es_dark)")

@@ -12,25 +12,13 @@ complete the rendering contract.
 
 from __future__ import annotations
 
-import os
-
 import numpy as np
 import pytest
+from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.noise_control.duct_path import DuctElement, duct_path
 from phonometry.noise_control.hvac import OCTAVE_BANDS
-
-_PDF_MAGIC = b"%PDF"
-
-
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -101,7 +89,7 @@ def test_report_renders_the_published_sheet(tmp_path) -> None:
     out = tmp_path / "duct_path.pdf"
     returned = res.report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
 
     assert "Duct-borne noise path calculation" in text
@@ -133,8 +121,8 @@ def test_non_verbose_sheet_drops_the_intermediate_rows(tmp_path) -> None:
     verbose = tmp_path / "verbose.pdf"
     res.report(str(plain))
     res.report(str(verbose), verbose=True)
-    _assert_one_page(str(plain))
-    _assert_one_page(str(verbose))
+    assert_one_page(str(plain))
+    assert_one_page(str(verbose))
     plain_text = _extract_text(str(plain))
     verbose_text = _extract_text(str(verbose))
     assert "Sum" not in plain_text
@@ -160,7 +148,7 @@ def test_metadata_header_and_requirement_override(tmp_path) -> None:
             requirement=20.0,
         ),
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Example client" in text
     assert "EXAMPLE-DUCT" in text
@@ -184,7 +172,7 @@ def test_spanish_sheet(tmp_path) -> None:
     res = _supply()
     out = tmp_path / "es.pdf"
     res.report(str(out), language="es", verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Cálculo del trayecto de ruido por conductos" in text
     assert "Elemento" in text
@@ -213,7 +201,7 @@ def test_combined_paths_sheet_lists_its_contributions(tmp_path) -> None:
     both = combine_duct_paths([supply, other], label="Supply and return")
     out = tmp_path / "combined.pdf"
     both.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Supply path" in text
     assert "Return path" in text
@@ -247,7 +235,7 @@ def test_a_long_path_still_renders_on_one_page(tmp_path, verbose: bool) -> None:
             operator="phonometry",
         ),
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "elements omitted" in text
     # The head, the foot and the criterion survive the elision.

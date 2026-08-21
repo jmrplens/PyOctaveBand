@@ -23,10 +23,9 @@ engines, languages and band counts) complete the rendering contract.
 
 from __future__ import annotations
 
-import os
-
 import numpy as np
 import pytest
+from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.emission import (
@@ -35,8 +34,6 @@ from phonometry.emission import (
     precision_qualification,
     sound_power_intensity_precision,
 )
-
-_PDF_MAGIC = b"%PDF"
 
 # Standard one-third-octave A-weighting corrections Ck (dB), IEC 61672 /
 # ISO 3744 Annex E Table E.1, at the example band centres.
@@ -102,15 +99,6 @@ def _render_stack() -> None:
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
     pytest.importorskip("matplotlib")
-
-
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -209,7 +197,7 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     out = tmp_path / "iso9614_3.pdf"
     returned = res.report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
 
     # The A-weighted total heads the boxed statement.
@@ -293,7 +281,7 @@ def test_verbose_tabulates_annex_b_indicators(tmp_path) -> None:
     indicators, criteria = _qualification(np.full(_FREQS.size, 2.0))
     out = tmp_path / "verbose.pdf"
     res.report(str(out), verbose=True, indicators=indicators, criteria=criteria)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     flat = "".join(text.split())
     for header in ("FT", "Fp|In|", "FpIn", "FS", "Qualified"):
@@ -384,7 +372,7 @@ def test_failing_band_is_omitted_and_named(tmp_path) -> None:
         criteria=criteria,
         residual_index=_RESIDUAL_INDEX,
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     # The boxed LWA is the total over the qualified bands, and the result's own
     # unscreened total is nowhere on the sheet.
@@ -416,7 +404,7 @@ def test_not_applicable_band_named_with_clause_9_2(tmp_path) -> None:
     indicators, criteria = _qualification(np.full(_FREQS.size, 2.0))
     out = tmp_path / "not_applicable.pdf"
     res.report(str(out), indicators=indicators, criteria=criteria)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "250 Hz (clause 9.2)" in text
     # The determinable 315 Hz band still prints its level.
@@ -477,7 +465,7 @@ def test_wide_band_set_is_paired_onto_one_page(tmp_path) -> None:
     res = _determination(intensity, freqs)
     out = tmp_path / "wide.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     for label in ("100", "3150"):
         assert label in text
@@ -540,7 +528,7 @@ def test_metadata_header_renders(tmp_path) -> None:
     )
     out = tmp_path / "meta.pdf"
     res.report(str(out), metadata=metadata)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     for value in (
         "Example works",
@@ -574,7 +562,7 @@ def test_spanish_fiche_translates_every_fixed_string(tmp_path) -> None:
         criteria=criteria,
         residual_index=_RESIDUAL_INDEX,
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     for spanish in (
         "Determinación de la potencia acústica",
@@ -676,7 +664,7 @@ def test_frequencies_none_falls_back_to_the_band_total(tmp_path) -> None:
     )
     out = tmp_path / "unbanded.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     total = 10.0 * np.log10(np.sum(10.0 ** (_oracle_lw() / 10.0)))
     assert f"Sound power level LW = {total:.1f} dB re 1 pW" in text
@@ -691,7 +679,7 @@ def test_odd_band_count_pairs_with_a_blank_row(tmp_path) -> None:
     res = _determination(intensity, freqs)
     out = tmp_path / "odd.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     lw = _oracle_lw(intensity)
     lw0 = lw - _oracle_normalization()

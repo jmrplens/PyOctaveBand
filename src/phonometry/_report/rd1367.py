@@ -220,6 +220,51 @@ def _criterion_cell(
     return text
 
 
+def _result_row(
+    period: PeriodAssessment, label_style: Any, value_style: Any, language: str
+) -> list[Any]:
+    """The six cells of one period row of the Article 25.1 b results table.
+
+    Called only after the renderer has imported reportlab.
+    """
+    from ._layout import fiche_paragraph
+
+    return [
+        fiche_paragraph(t(_PERIOD_LABELS[period.period], language), label_style),
+        fiche_paragraph(_fmt(period.limit, language, decimals=0), value_style),
+        fiche_paragraph(
+            _criterion_cell(
+                period.max_phase_level,
+                period.phase_limit,
+                period.phase_pass,
+                language,
+            ),
+            value_style,
+        ),
+        fiche_paragraph(
+            _criterion_cell(
+                float(period.reported_level),
+                period.daily_limit,
+                period.daily_pass,
+                language,
+            ),
+            value_style,
+        ),
+        fiche_paragraph(
+            _criterion_cell(
+                None
+                if period.reported_long_term is None
+                else float(period.reported_long_term),
+                period.limit,
+                period.long_term_pass,
+                language,
+            ),
+            value_style,
+        ),
+        fiche_paragraph(_status_markup(period.complies, language), value_style),
+    ]
+
+
 def _results_table(result: ActivityAssessment, language: str = "en") -> Any:
     """The per-period results table against the Article 25.1 b criteria.
 
@@ -244,45 +289,10 @@ def _results_table(result: ActivityAssessment, language: str = "en") -> Any:
     ]
     widths = [24.0, 24.0, 32.0, 32.0, 32.0, 30.0]
     data: list[list[Any]] = [[fiche_paragraph(h, header_style) for h in headers]]
-    for period in result.periods:
-        data.append(
-            [
-                fiche_paragraph(
-                    t(_PERIOD_LABELS[period.period], language), label_style
-                ),
-                fiche_paragraph(_fmt(period.limit, language, decimals=0), value_style),
-                fiche_paragraph(
-                    _criterion_cell(
-                        period.max_phase_level,
-                        period.phase_limit,
-                        period.phase_pass,
-                        language,
-                    ),
-                    value_style,
-                ),
-                fiche_paragraph(
-                    _criterion_cell(
-                        float(period.reported_level),
-                        period.daily_limit,
-                        period.daily_pass,
-                        language,
-                    ),
-                    value_style,
-                ),
-                fiche_paragraph(
-                    _criterion_cell(
-                        None
-                        if period.reported_long_term is None
-                        else float(period.reported_long_term),
-                        period.limit,
-                        period.long_term_pass,
-                        language,
-                    ),
-                    value_style,
-                ),
-                fiche_paragraph(_status_markup(period.complies, language), value_style),
-            ]
-        )
+    data.extend(
+        _result_row(period, label_style, value_style, language)
+        for period in result.periods
+    )
     return stacked_table(data, [w * mm for w in widths])
 
 

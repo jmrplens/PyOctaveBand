@@ -150,12 +150,12 @@ def _rebindings(tree: ast.AST, names: dict[str, int]) -> list[str]:
                         f"name imported from phonometry on line {names[name]}"
                     )
         elif isinstance(node, ast.Assign):
-            for target in node.targets:
-                if isinstance(target, ast.Name) and target.id in names:
-                    reports.append(
-                        f"line {node.lineno}: '{target.id} = ...' rebinds the name "
-                        f"imported from phonometry on line {names[target.id]}"
-                    )
+            reports += [
+                f"line {node.lineno}: '{target.id} = ...' rebinds the name "
+                f"imported from phonometry on line {names[target.id]}"
+                for target in node.targets
+                if isinstance(target, ast.Name) and target.id in names
+            ]
     return reports
 
 
@@ -180,8 +180,10 @@ def check_shadowing(pages: list[pathlib.Path], *, carry: bool = True) -> list[st
             imported = _phonometry_imports(tree)
             seen = {**carried, **imported}
             if seen:
-                for report in _rebindings(tree, seen):
-                    failures.append(f"{_rel(page)} block {i}: {report}")
+                failures += [
+                    f"{_rel(page)} block {i}: {report}"
+                    for report in _rebindings(tree, seen)
+                ]
             # A block that rebinds a carried name owns it from here on.
             for node in ast.walk(tree):
                 if isinstance(node, ast.Assign):

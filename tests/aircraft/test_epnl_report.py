@@ -20,9 +20,9 @@ import pytest
 
 pytest.importorskip("reportlab")
 
-from phonometry import ReportMetadata, aircraft
+from report_assertions import assert_one_page
 
-_PDF_MAGIC = b"%PDF"
+from phonometry import ReportMetadata, aircraft
 
 
 def _flyover():
@@ -38,17 +38,6 @@ def _flyover():
     return aircraft.effective_perceived_noise_level(spectra, dt)
 
 
-def _assert_one_page(path: str) -> None:
-    import os
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    from pypdf import PdfReader
-
-    assert len(PdfReader(path).pages) == 1
-
-
 def test_report_writes_one_page_pdf(tmp_path) -> None:
     """A computed flyover renders a one-page certification fiche."""
     result = _flyover()
@@ -56,7 +45,7 @@ def test_report_writes_one_page_pdf(tmp_path) -> None:
     out = tmp_path / "epnl.pdf"
     returned = result.report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_unknown_engine_rejected(tmp_path) -> None:
@@ -73,7 +62,7 @@ def test_passing_requirement_renders(tmp_path) -> None:
     limit = float(result.epnl) + 3.0
     out = tmp_path / "pass.pdf"
     result.report(str(out), metadata=ReportMetadata(requirement=limit))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_failing_requirement_renders(tmp_path) -> None:
@@ -82,7 +71,7 @@ def test_failing_requirement_renders(tmp_path) -> None:
     limit = float(result.epnl) - 3.0
     out = tmp_path / "fail.pdf"
     result.report(str(out), metadata=ReportMetadata(requirement=limit))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_full_metadata_renders_one_page(tmp_path) -> None:
@@ -101,14 +90,14 @@ def test_full_metadata_renders_one_page(tmp_path) -> None:
     )
     out = tmp_path / "meta.pdf"
     _flyover().report(str(out), metadata=md)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_no_metadata_prediction_fiche(tmp_path) -> None:
     """With ``metadata=None`` a prediction fiche renders (no verdict row)."""
     out = tmp_path / "prediction.pdf"
     _flyover().report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def _extract_text(path: str) -> str:
@@ -131,7 +120,7 @@ def test_verdict_follows_one_decimal_epnl_at_the_limit(tmp_path) -> None:
     result = dataclasses.replace(_flyover(), epnl=101.04)
     out = tmp_path / "boundary.pdf"
     result.report(str(out), metadata=ReportMetadata(requirement=101.0))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out)).replace("\n", " ")
     assert "EPNL = 101.0 EPNdB" in text
     assert "margin +0.0" in text
@@ -163,7 +152,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     result = _flyover()
     out = tmp_path / "epnl_es.pdf"
     result.report(str(out), metadata=ReportMetadata(requirement=101.0), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Certificación de ruido de aeronaves" in text
     assert re.search(r"\d,\d", text) is not None  # comma decimal separator

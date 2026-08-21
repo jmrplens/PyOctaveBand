@@ -7,6 +7,7 @@ a collapsed section below it.
 
 import os
 import xml.etree.ElementTree as ET
+from pathlib import Path
 
 
 def parse_test_results(test_dir):
@@ -14,7 +15,7 @@ def parse_test_results(test_dir):
     total_tests = 0
     total_failures = 0
 
-    if not os.path.exists(test_dir):
+    if not Path(test_dir).exists():
         return "No test results found.", 0, 0
 
     # Distinguish between test results and coverage reports
@@ -23,21 +24,24 @@ def parse_test_results(test_dir):
 
     for root, _, filenames in os.walk(test_dir):
         for filename in filenames:
-            f_path = os.path.join(root, filename)
+            f_path = Path(root) / filename
             if filename.startswith("test-results-") and filename.endswith(".xml"):
                 test_files.append(f_path)
             elif filename == "coverage.xml":
                 # Extract version from parent directory name
-                version = os.path.basename(root).replace("test-results-", "")
+                version = Path(root).name.replace("test-results-", "")
                 coverage_files[version] = f_path
 
-    test_files.sort()
+    # Sorted as text, so the row order does not depend on whether the list
+    # holds strings or Path objects: a Path compares component by component,
+    # which reorders names where one is a prefix of another.
+    test_files.sort(key=str)
 
     summary.append("| Python Version | Tests | Failures | Coverage | Status |")
     summary.append("|---|---|---|---|---|")
 
     for f_path in test_files:
-        f_name = os.path.basename(f_path)
+        f_name = f_path.name
         try:
             tree = ET.parse(f_path)
             root = tree.getroot()
@@ -80,9 +84,9 @@ def parse_test_results(test_dir):
 
 def read_conformance_report():
     """Return the conformance-report Markdown, or a fallback notice."""
-    if os.path.exists("conformance_report.md"):
-        with open("conformance_report.md", encoding="utf-8") as f:
-            return f.read().strip()
+    report = Path("conformance_report.md")
+    if report.exists():
+        return report.read_text(encoding="utf-8").strip()
     return (
         "## Numerical conformance report\n\n"
         "⚠️ The conformance report could not be generated in this run."
@@ -116,8 +120,7 @@ def main():
 <a href="https://github.com/{repo}/actions/runs/{run_id}">full CI artifacts</a></sub>
 """
 
-    with open("pr_comment_body.md", "w", encoding="utf-8") as f:
-        f.write(body)
+    Path("pr_comment_body.md").write_text(body, encoding="utf-8")
 
 
 if __name__ == "__main__":

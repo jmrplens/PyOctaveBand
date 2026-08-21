@@ -22,10 +22,10 @@ import pytest
 
 pytest.importorskip("reportlab")
 
+from report_assertions import assert_one_page
+
 from phonometry import ReportMetadata
 from phonometry.environment.assessment import spain as rd
-
-_PDF_MAGIC = b"%PDF"
 
 
 def _measurements() -> dict[str, list[rd.NoisePhase]]:
@@ -53,17 +53,6 @@ def _result(**kwargs: object) -> rd.ActivityAssessment:
     )
 
 
-def _assert_one_page(path: str) -> None:
-    import os
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    from pypdf import PdfReader
-
-    assert len(PdfReader(path).pages) == 1
-
-
 def _extract_text(path: str) -> str:
     from pypdf import PdfReader
 
@@ -75,7 +64,7 @@ def test_report_writes_one_page_pdf(tmp_path) -> None:
     out = tmp_path / "acta.pdf"
     returned = _result().report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_unknown_language_rejected(tmp_path) -> None:
@@ -95,7 +84,7 @@ def test_fiche_defaults_to_spanish(tmp_path) -> None:
     """
     out = tmp_path / "acta_es.pdf"
     _result().report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out)).replace("\n", " ")
     assert "Valoración acústica de actividad (RD 1367/2007)" in text
     assert "Fases de ruido" in text
@@ -112,7 +101,7 @@ def test_english_fiche_renders_one_page(tmp_path) -> None:
     """``language="en"`` renders the same fiche in English on one page."""
     out = tmp_path / "acta_en.pdf"
     _result().report(str(out), language="en")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out)).replace("\n", " ")
     assert "Activity noise assessment (RD 1367/2007)" in text
     assert "Noise phases" in text
@@ -156,8 +145,8 @@ def test_verdict_fails_for_a_new_activity_and_passes_for_an_existing_one(
     existing = tmp_path / "existing.pdf"
     _result().report(str(new), language="en")
     _result(new_activity=False).report(str(existing), language="en")
-    _assert_one_page(str(new))
-    _assert_one_page(str(existing))
+    assert_one_page(str(new))
+    assert_one_page(str(existing))
 
     new_text = _extract_text(str(new)).replace("\n", " ")
     existing_text = _extract_text(str(existing)).replace("\n", " ")
@@ -193,7 +182,7 @@ def test_metadata_appears_and_stays_one_page(tmp_path) -> None:
     )
     out = tmp_path / "meta.pdf"
     _result().report(str(out), metadata=md, verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out)).replace("\n", " ")
     assert "Taller mecanico, horario 9 h a 21 h" in text
     assert "Sonometro integrador-promediador clase 1" in text
@@ -221,7 +210,7 @@ def test_report_escapes_xml_specials_in_metadata_and_phase_labels(tmp_path) -> N
     )
     out = tmp_path / "xml.pdf"
     result.report(str(out), metadata=md, language="en")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out)).replace("\n", " ")
     assert "Taller <A> & <B>" in text
     assert "Ac & Co <Ltd>" in text
@@ -253,7 +242,7 @@ def test_three_period_fiche_stays_one_page(tmp_path) -> None:
         for verbose in (False, True):
             out = tmp_path / f"three_{language}_{verbose}.pdf"
             result.report(str(out), metadata=md, language=language, verbose=verbose)
-            _assert_one_page(str(out))
+            assert_one_page(str(out))
 
 
 def test_adjacent_premises_limit_row_renders(tmp_path) -> None:
@@ -269,7 +258,7 @@ def test_adjacent_premises_limit_row_renders(tmp_path) -> None:
         operating_days=303,
     )
     result.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out)).replace("\n", " ")
     assert "anexo III tabla B2" in text
     assert "dormitorios" in text

@@ -10,8 +10,8 @@ predicts from it.
 
 from __future__ import annotations
 
-import os
 import sys
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -24,7 +24,10 @@ from phonometry import ReportMetadata
 # detailed-prediction fiches below show that same building, so they read it
 # from the same place rather than becoming a third transcription of a worked
 # example whose inputs the registry already records two corrections to.
-_TESTS = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "tests"))
+# parents[2] is the repository root from scripts/reports/<module>.py; the entry
+# stays text because sys.path holds strings and the membership test below has
+# to match the ones already there.
+_TESTS = str(Path(__file__).resolve().parents[2] / "tests")
 if _TESTS not in sys.path:
     sys.path.insert(0, _TESTS)
 

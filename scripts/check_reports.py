@@ -149,12 +149,13 @@ def _problems() -> list[str]:
     """Collect every way the committed fiches differ from the regenerated ones."""
     disk = {str(p) for p in Path(REPORT_DIR).rglob("*") if p.is_file()}
     tracked = tracked_files(REPORT_DIR)
-    problems: list[str] = []
-
-    for path in sorted(disk - tracked):
-        problems.append(f"new fiche not committed: {path}")
-    for path in sorted(tracked - disk):
-        problems.append(f"committed fiche no longer generated: {path}")
+    problems: list[str] = [
+        f"new fiche not committed: {path}" for path in sorted(disk - tracked)
+    ]
+    problems += [
+        f"committed fiche no longer generated: {path}"
+        for path in sorted(tracked - disk)
+    ]
 
     for path in sorted(disk & tracked):
         new = Path(path).read_bytes()

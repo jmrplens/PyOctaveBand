@@ -18,9 +18,9 @@ import pytest
 
 pytest.importorskip("reportlab")
 
-from phonometry import ReportMetadata, building
+from report_assertions import assert_one_page
 
-_PDF_MAGIC = b"%PDF"
+from phonometry import ReportMetadata, building
 
 #: ISO 717-1 Annex C Table C.1 measured curve; rated 30 (-2; -3) dB.
 _ANNEX_C_R = np.array(
@@ -47,18 +47,6 @@ _ANNEX_C_R = np.array(
 #: A receiving-room reverberation time equal to T0 = 0,5 s in every band, so
 #: D2m,nT = D2m and the fiche's rating is hand-computable.
 _T_AT_T0 = np.full(16, 0.5)
-
-
-def _assert_one_page(path: str) -> None:
-    """A written report is a non-empty single-page PDF."""
-    import os
-
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -102,7 +90,7 @@ def test_dnt_fiche_rating_pinned_to_iso717_1_annex_c(tmp_path) -> None:
     """The D2m,nT fiche's rating is the published ISO 717-1 Annex C 30 (-2; -3)."""
     out = tmp_path / "d2mnt.pdf"
     _facade_dnt().report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "30 (-2; -3) dB" in text
     assert "ISO 16283-3:2016" in text
@@ -119,7 +107,7 @@ def test_r_prime_fiche(tmp_path) -> None:
     np.testing.assert_allclose(result.r_prime, _ANNEX_C_R, atol=1e-9)
     out = tmp_path / "rprime.pdf"
     result.report(str(out), quantity="r_prime")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Apparent sound reduction index" in text
     assert "loudspeaker method" in text
@@ -144,7 +132,7 @@ def test_r_prime_road_traffic_fiche_labelled_rtrs(tmp_path) -> None:
     np.testing.assert_allclose(result.r_prime, _ANNEX_C_R, atol=1e-9)
     out = tmp_path / "rtrs.pdf"
     result.report(str(out), quantity="r_prime")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "road traffic method" in text
     assert "tr,s" in text
@@ -158,7 +146,7 @@ def test_d_2m_n_fiche(tmp_path) -> None:
     assert result.d_2m_n is not None
     out = tmp_path / "d2mn.pdf"
     result.report(str(out), quantity="d_2m_n")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "Normalized facade level difference" in _extract_text(str(out))
 
 
@@ -179,7 +167,7 @@ def test_full_metadata_and_verbose_render_one_page(tmp_path) -> None:
     )
     out = tmp_path / "verbose.pdf"
     _facade_dnt().report(str(out), metadata=metadata, verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "PASS" in text  # D2m,nT,w = 30 dB >= 30 dB (higher is better)
     assert "Unfav. dev." in text
@@ -202,7 +190,7 @@ def test_spanish_fiche(tmp_path) -> None:
         metadata=ReportMetadata(requirement=30.0, laboratory="Ejemplo"),
         language="es",
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Aislamiento acústico de fachada in situ" in text
     assert "CUMPLE" in text

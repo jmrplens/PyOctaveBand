@@ -12,12 +12,12 @@ Run directly or via ``make graphs``.
 
 from __future__ import annotations
 
-import os
 import sys
+from pathlib import Path
 
-_SCRIPTS = os.path.dirname(os.path.abspath(__file__))
-if _SCRIPTS not in sys.path:
-    sys.path.insert(0, _SCRIPTS)
+_SCRIPTS = Path(__file__).resolve().parent
+if str(_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS))
 
 from diagrams import DIAGRAMS, generate_all
 from diagrams.canvas import DARK, LIGHT, SVG, Theme

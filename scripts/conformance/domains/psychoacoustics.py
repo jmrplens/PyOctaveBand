@@ -36,14 +36,12 @@ def _iso532_stationary_expected() -> tuple[float, float, float]:
 
 
 def _iso532_levels() -> np.ndarray:
-    levels = []
-    for line in (
-        (_DATA / "iso532_1" / "iso532_1_test_signal_1_levels.txt")
-        .read_text()
-        .splitlines()
-    ):
-        if ":" in line and not line.strip().startswith("#"):
-            levels.append(float(line.split(":")[1]))
+    path = _DATA / "iso532_1" / "iso532_1_test_signal_1_levels.txt"
+    levels = [
+        float(line.split(":")[1])
+        for line in path.read_text().splitlines()
+        if ":" in line and not line.strip().startswith("#")
+    ]
     return np.array(levels)
 
 
@@ -94,15 +92,14 @@ def _iso532_b5_signal(
     The 16-bit WAV is scaled per Annex B.1 (full scale = 100 dB SPL, so one
     full-scale unit is 2*sqrt(2) Pa peak).
     """
-    import glob
     import wave
 
     data = json.loads(
         (_DATA / "iso532_1" / "iso532_1_annexB_expected.json").read_text()
     )
     entry = data[f"Test signal {num}"]
-    matches = glob.glob(
-        str(_DATA / "iso532_1" / "Annex B.5" / f"Test signal {num} *.wav")
+    matches = sorted(
+        (_DATA / "iso532_1" / "Annex B.5").glob(f"Test signal {num} *.wav")
     )
     if not matches:
         msg = (
@@ -112,7 +109,7 @@ def _iso532_b5_signal(
         raise FileNotFoundError(msg)
     # WAV/RIFF is little-endian, so the dtype is fixed to '<i2'; a multi-channel
     # file keeps only channel 0.
-    with wave.open(matches[0]) as handle:
+    with wave.open(str(matches[0])) as handle:
         fs = handle.getframerate()
         n_channels = handle.getnchannels()
         raw = np.frombuffer(handle.readframes(handle.getnframes()), dtype="<i2")

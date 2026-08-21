@@ -18,15 +18,12 @@ contract.
 
 from __future__ import annotations
 
-import os
-
 import numpy as np
 import pytest
+from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.emission import sound_power_from_vibration
-
-_PDF_MAGIC = b"%PDF"
 
 # Standard octave-band A-weighting corrections Ck (dB), IEC 61672 / ISO 3744
 # Annex E Table E.2, at the example band centres.
@@ -42,15 +39,6 @@ _AREA = 1.6  # radiating area S, m^2
 # The fixed terms of Eq. 12/15: 10 lg(S/S0) and the impedance term 10 lg(411/400).
 _S_TERM = 10.0 * np.log10(_AREA / 1.0)
 _IMP_TERM = 10.0 * np.log10(411.0 / 400.0)
-
-
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -104,7 +92,7 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     out = tmp_path / "iso7849.pdf"
     returned = res.report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
 
     # A-weighted total to one decimal, boxed with its reference power.
@@ -136,7 +124,7 @@ def test_survey_part1_basis_and_method(tmp_path) -> None:
     res = _survey_result()
     out = tmp_path / "survey.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "ISO/TS 7849-1:2009" in text
     assert "survey method" in text
@@ -156,7 +144,7 @@ def test_broadband_result_has_no_a_weighted_claim(tmp_path) -> None:
     assert np.isnan(res.sound_power_level_a)
     out = tmp_path / "broadband.pdf"
     res.report(str(out), metadata=ReportMetadata(requirement=80.0))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     # The unweighted total LW is boxed; nothing is labelled A-weighted.
     lw = float(85.0 + _S_TERM + _IMP_TERM)
@@ -178,7 +166,7 @@ def test_third_octave_labels_and_grouping(tmp_path) -> None:
     res = sound_power_from_vibration(lv, area=_AREA, frequencies=freqs)
     out = tmp_path / "third.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "One-third-octave-band sound power levels" in text
     for label in ("100", "125", "160", "800"):
@@ -196,7 +184,7 @@ def test_verbose_adds_radiation_factor_column(tmp_path) -> None:
     res = _engineering_result()
     out = tmp_path / "verbose.pdf"
     res.report(str(out), verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     # The 500 Hz radiation factor 0.750 appears to three decimals.
     assert "0.750" in text
@@ -242,7 +230,7 @@ def test_metadata_header_renders(tmp_path) -> None:
     )
     out = tmp_path / "meta.pdf"
     res.report(str(out), metadata=metadata)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Example works" in text
     assert "Gearbox casing" in text
@@ -262,7 +250,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     res = _engineering_result()
     out = tmp_path / "es.pdf"
     res.report(str(out), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Determinación de la potencia acústica" in text
     assert "método de ingeniería" in text

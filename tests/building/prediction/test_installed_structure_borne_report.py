@@ -16,14 +16,12 @@ engines/languages) complete the rendering contract.
 
 from __future__ import annotations
 
-import os
-
 import numpy as np
 import pytest
+from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, building
 
-_PDF_MAGIC = b"%PDF"
 _S0 = 10.0
 
 _BANDS = np.array([63, 125, 250, 500, 1000, 2000], dtype=float)
@@ -35,15 +33,6 @@ _DSA = np.array([-13.6, -17.3, -17.4, -20.0, -26.9, -32.9])
 _R_WALL_FLOOR = np.array([43.0, 46.0, 50.2, 54.7, 64.6, 73.0])
 _R_WALL_WALL = np.array([37.0, 41.2, 35.9, 37.7, 49.0, 57.8])
 _S_WALL = 12.8
-
-
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -124,7 +113,7 @@ def test_report_reads_as_prediction(tmp_path) -> None:
     out = tmp_path / "en12354_5.pdf"
     returned = res.report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Predicted" in text
     assert "not a measurement" in text
@@ -142,7 +131,7 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     res = _result()
     out = tmp_path / "values.pdf"
     res.report(str(out), verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
 
     # Overall band-summed L_n,s to one decimal.
@@ -169,7 +158,7 @@ def test_nonverbose_hides_path_columns(tmp_path) -> None:
     res = _result()
     out = tmp_path / "compact.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     # The total is still shown; the wall-wall path column value need not appear.
     assert f"{_oracle_total()[0]:.1f}" in text
@@ -207,7 +196,7 @@ def test_metadata_header_renders(tmp_path) -> None:
     )
     out = tmp_path / "meta.pdf"
     res.report(str(out), metadata=metadata)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Example dwelling" in text
     assert "WC flushing cistern" in text
@@ -223,7 +212,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     res = _result()
     out = tmp_path / "es.pdf"
     res.report(str(out), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Sonido estructural instalado previsto" in text
     assert "no una medición" in text
@@ -259,6 +248,6 @@ def test_scalar_source_level_fiche_renders(tmp_path) -> None:
     assert result.installed_power_level.shape == _BANDS.shape
     out = tmp_path / "scalar.pdf"
     result.report(str(out), verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "70.0" in text  # the broadcast installed power level

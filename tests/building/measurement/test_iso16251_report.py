@@ -24,10 +24,9 @@ import pytest
 pytest.importorskip("reportlab")
 
 import numpy as np
+from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, building
-
-_PDF_MAGIC = b"%PDF"
 
 _FREQS = np.array(
     [
@@ -81,14 +80,6 @@ def _metadata(**overrides) -> ReportMetadata:
     return ReportMetadata(**base)
 
 
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert len(PdfReader(path).pages) == 1
-
-
 def _text(path: str) -> str:
     from pypdf import PdfReader
 
@@ -101,13 +92,13 @@ def test_report_writes_one_page_pdf(tmp_path) -> None:
     out = tmp_path / "iso16251.pdf"
     returned = _result().report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_report_with_metadata_one_page(tmp_path) -> None:
     out = tmp_path / "iso16251_meta.pdf"
     _result().report(str(out), metadata=_metadata())
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_unknown_engine_rejected(tmp_path) -> None:
@@ -143,7 +134,7 @@ def test_verbose_shows_reference_floor_column_one_page(tmp_path) -> None:
     """verbose=True adds the reference-floor L_n,r column and stays one page."""
     out = tmp_path / "iso16251_verbose.pdf"
     _result().report(str(out), metadata=_metadata(), verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _text(str(out))
     # L_n,r(100 Hz) = 67 - 0 = 67.0 and L_n,r(500 Hz) = 70.5 - 15 = 55.5.
     assert "67.0" in text
@@ -216,7 +207,7 @@ def test_manual_result_without_ci_delta_omits_adaptation_term(tmp_path) -> None:
     )
     out = tmp_path / "iso16251_noci.pdf"
     result.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _text(str(out))
     assert "(+0)" not in text
     assert "15 dB" in text
@@ -225,21 +216,21 @@ def test_manual_result_without_ci_delta_omits_adaptation_term(tmp_path) -> None:
 def test_metadata_xml_specials_do_not_break(tmp_path) -> None:
     out = tmp_path / "iso16251_xml.pdf"
     _result().report(str(out), metadata=_metadata(specimen='Carpet <A> & <B> "edge"'))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_no_metadata_still_renders(tmp_path) -> None:
     """Without metadata the header still shows the measured frequency range."""
     out = tmp_path / "iso16251_bare.pdf"
     _result().report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "100 to 3150" in _text(str(out))
 
 
 def test_spanish_fiche_uses_comma_decimal(tmp_path) -> None:
     out = tmp_path / "iso16251_es.pdf"
     _result().report(str(out), metadata=_metadata(), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "15,0" in _text(str(out))  # Spanish decimal comma
 
 
@@ -251,4 +242,4 @@ def test_characterisation_headline_without_rating_bands(tmp_path) -> None:
     assert result.delta_lw is None
     out = tmp_path / "iso16251_norate.pdf"
     result.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))

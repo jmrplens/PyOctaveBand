@@ -18,15 +18,13 @@ facts (one page, rejected engines/languages) complete the rendering contract.
 from __future__ import annotations
 
 import math
-import os
 
 import numpy as np
 import pytest
+from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.emission import sound_power_anechoic, sound_power_pressure
-
-_PDF_MAGIC = b"%PDF"
 
 # ISO 3744:2010 Annex E, Table E.2 octave-band A-weighting corrections Ck (dB).
 _CK_OCTAVE = {
@@ -42,15 +40,6 @@ _CK_OCTAVE = {
 
 _FREQS = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
 _SURFACE_LP = np.array([70.0, 74, 78, 80, 79, 76, 71, 64])
-
-
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -113,7 +102,7 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     out = tmp_path / "iso3744.pdf"
     returned = res.report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
 
     # A-weighted total to one decimal, boxed with its reference power.
@@ -166,7 +155,7 @@ def test_verbose_adds_correction_columns(tmp_path) -> None:
     res = _uniform_result()
     out = tmp_path / "verbose.pdf"
     res.report(str(out), verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     flat = "".join(_extract_text(str(out)).split())
     assert "K1" in flat
     assert "K2" in flat
@@ -213,7 +202,7 @@ def test_metadata_header_renders(tmp_path) -> None:
     )
     out = tmp_path / "meta.pdf"
     res.report(str(out), metadata=metadata)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Example works" in text
     assert "Air compressor" in text
@@ -235,7 +224,7 @@ def test_precision_report_names_iso3745(tmp_path) -> None:
     )
     out = tmp_path / "precision.pdf"
     res.report(str(out), verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "ISO 3745:2012" in text
     assert "precision method" in text
@@ -262,7 +251,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     res = _uniform_result()
     out = tmp_path / "es.pdf"
     res.report(str(out), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Determinación de la potencia acústica" in text
     assert "método de ingeniería" in text

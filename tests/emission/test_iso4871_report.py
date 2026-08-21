@@ -15,15 +15,13 @@ translated Spanish output, and rejected engines/languages.
 from __future__ import annotations
 
 import math
-import os
 import pickle
 
 import numpy as np
 import pytest
+from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, emission
-
-_PDF_MAGIC = b"%PDF"
 
 
 def _annex_b_modes() -> tuple[
@@ -55,15 +53,6 @@ def _annex_b_declaration(**kwargs) -> emission.NoiseEmissionDeclaration:
         basic_standards="ISO 3744",
         **kwargs,
     )
-
-
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -258,7 +247,7 @@ def test_dual_number_report_renders_one_page(tmp_path) -> None:
     out = tmp_path / "iso4871.pdf"
     returned = decl.report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "DECLARED DUAL-NUMBER" in text
     assert "Operating mode 1" in text
@@ -271,7 +260,7 @@ def test_single_number_report_renders_one_page(tmp_path) -> None:
     decl = _annex_b_declaration(form="single-number")
     out = tmp_path / "iso4871_single.pdf"
     decl.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "DECLARED SINGLE-NUMBER" in _extract_text(str(out))
 
 
@@ -329,7 +318,7 @@ def test_verification_verdict_renders_both_ways(tmp_path) -> None:
     decl = emission.NoiseEmissionDeclaration((mode1, mode2), basic_standards="ISO 3744")
     out = tmp_path / "iso4871_verify.pdf"
     decl.report(str(out), metadata=ReportMetadata(report_id="PHN-4871"))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Verification" in text
     assert "PASS" in text
@@ -342,7 +331,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     decl = _annex_b_declaration()
     out = tmp_path / "iso4871_es.pdf"
     decl.report(str(out), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Declaración de emisión sonora" in text
     assert "DOBLE NÚMERO" in text

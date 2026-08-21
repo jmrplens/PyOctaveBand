@@ -20,6 +20,8 @@ pytest.importorskip("reportlab")
 
 from typing import TYPE_CHECKING
 
+from report_assertions import assert_one_page
+
 from phonometry import ReportMetadata, building
 from phonometry._i18n import fmt_minus
 
@@ -31,8 +33,6 @@ if TYPE_CHECKING:
         AirbornePredictionResult,
         ImpactPredictionResult,
     )
-
-_PDF_MAGIC = b"%PDF"
 
 
 def _annex_h3_airborne() -> AirbornePredictionResult:
@@ -86,18 +86,6 @@ def _annex_f_facade() -> FacadePredictionResult:
     )
 
 
-def _assert_one_page(path: str) -> None:
-    """A written report is a non-empty single-page PDF."""
-    import os
-
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
-
-
 def _extract_text(path: str) -> str:
     """The concatenated, whitespace-normalised text of every page."""
     from pypdf import PdfReader
@@ -112,7 +100,7 @@ def test_airborne_prediction_rating_pinned_to_annex_h3(tmp_path) -> None:
     out = tmp_path / "air.pdf"
     # report() returns the written path (part of the public contract).
     assert _annex_h3_airborne().report(str(out)) == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert f"{ref.EN12354_1_ANNEX_H3_RPRIME_W} dB" in text  # boxed R'w = 52 dB
     assert "EN 12354-1:2000" in text
@@ -133,7 +121,7 @@ def test_impact_prediction_rating_pinned_to_annex_e3(tmp_path) -> None:
     """The impact fiche boxes the Annex E.3 predicted L'n,w = 45 dB."""
     out = tmp_path / "imp.pdf"
     assert _annex_e3_impact().report(str(out)) == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert f"{ref.EN12354_2_ANNEX_E3_LPRIME_N_W} dB" in text  # boxed L'n,w = 45
     assert "EN 12354-2:2000" in text
@@ -197,7 +185,7 @@ def test_metadata_header_renders(tmp_path) -> None:
     )
     out = tmp_path / "meta.pdf"
     _annex_h3_airborne().report(str(out), metadata=metadata)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Separating wall Rs,w = 57 dB" in text
     assert "Phonometry Reference Laboratory" in text
@@ -207,7 +195,7 @@ def test_lightweight_fiche_without_metadata(tmp_path) -> None:
     """A fiche with no metadata is still a valid one-page prediction report."""
     out = tmp_path / "bare.pdf"
     _annex_e3_impact().report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "prediction" in _extract_text(str(out))
 
 
@@ -222,7 +210,7 @@ def test_spanish_fiche_renders_translated(tmp_path) -> None:
         verbose=True,
         language="es",
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "CUMPLE" in text  # R'w = 52 dB >= 50 dB
     assert "previsto" in text  # "predicted"
@@ -234,7 +222,7 @@ def test_impact_spanish_fiche_renders_translated(tmp_path) -> None:
     """The impact fiche also renders in Spanish."""
     out = tmp_path / "es_imp.pdf"
     _annex_e3_impact().report(str(out), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "previsto" in text
     assert "rmula (21)" in text  # "fórmula (21)"
@@ -244,7 +232,7 @@ def test_facade_prediction_rating_pinned_to_annex_f(tmp_path) -> None:
     """The facade fiche boxes the Annex F predicted D2m,nT,w = 33 dB."""
     out = tmp_path / "facade.pdf"
     assert _annex_f_facade().report(str(out)) == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert f"{ref.EN12354_3_ANNEX_F_D2MNT_W} dB" in text  # boxed D2m,nT,w = 33 dB
     assert "D2m,nT,w" in text
@@ -296,7 +284,7 @@ def test_facade_lightweight_fiche_without_metadata(tmp_path) -> None:
     """A facade fiche with no metadata is still a valid one-page prediction."""
     out = tmp_path / "bare.pdf"
     _annex_f_facade().report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "prediction" in _extract_text(str(out))
 
 
@@ -309,7 +297,7 @@ def test_facade_spanish_fiche_renders_translated(tmp_path) -> None:
         verbose=True,
         language="es",
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "CUMPLE" in text  # D2m,nT,w = 33 dB >= 30 dB
     assert "previsto" in text  # "predicted"

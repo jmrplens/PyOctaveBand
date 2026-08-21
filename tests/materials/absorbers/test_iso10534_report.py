@@ -29,6 +29,7 @@ import pytest
 pytest.importorskip("reportlab")
 
 import numpy as np
+from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.materials import (
@@ -38,8 +39,6 @@ from phonometry.materials import (
     tube_wavenumber,
     two_microphone_impedance,
 )
-
-_PDF_MAGIC = b"%PDF"
 
 _TEMPERATURE_K = 293.15  # 20 degC
 _DIAMETER, _SPACING, _X1 = 0.100, 0.050, 0.100
@@ -92,14 +91,6 @@ def _metadata(**overrides) -> ReportMetadata:
     return ReportMetadata(**base)
 
 
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert len(PdfReader(path).pages) == 1
-
-
 def _text(path: str) -> str:
     from pypdf import PdfReader
 
@@ -112,13 +103,13 @@ def test_report_writes_one_page_pdf(tmp_path) -> None:
     out = tmp_path / "iso10534.pdf"
     returned = _result().report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_report_with_metadata_one_page(tmp_path) -> None:
     out = tmp_path / "iso10534_meta.pdf"
     _result().report(str(out), metadata=_metadata())
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_unknown_engine_rejected(tmp_path) -> None:
@@ -179,7 +170,7 @@ def test_verbose_shows_reflection_column_one_page(tmp_path) -> None:
     """verbose=True adds the |r| column and stays one page."""
     out = tmp_path / "iso10534_verbose.pdf"
     _result().report(str(out), metadata=_metadata(), verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _text(str(out))
     assert "0.45" in text  # |r|(500 Hz) = 1/sqrt(5)
 
@@ -187,21 +178,21 @@ def test_verbose_shows_reflection_column_one_page(tmp_path) -> None:
 def test_metadata_xml_specials_do_not_break(tmp_path) -> None:
     out = tmp_path / "iso10534_xml.pdf"
     _result().report(str(out), metadata=_metadata(specimen='Panel <A> & <B> "edge"'))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_no_metadata_still_renders(tmp_path) -> None:
     """Without metadata the header still shows the measured frequency range."""
     out = tmp_path / "iso10534_bare.pdf"
     _result().report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "400 to 1600" in _text(str(out))
 
 
 def test_spanish_fiche_uses_comma_decimal(tmp_path) -> None:
     out = tmp_path / "iso10534_es.pdf"
     _result().report(str(out), metadata=_metadata(), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "0,80" in _text(str(out))  # Spanish decimal comma
 
 

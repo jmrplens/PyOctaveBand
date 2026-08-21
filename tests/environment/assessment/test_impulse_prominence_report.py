@@ -20,10 +20,10 @@ import pytest
 
 pytest.importorskip("reportlab")
 
+from report_assertions import assert_one_page
+
 from phonometry import ReportMetadata
 from phonometry.environment.assessment import impulsive_sound as nt
-
-_PDF_MAGIC = b"%PDF"
 
 # The documented three-impulse pile-driving set: (onset rate dB/s, level
 # difference dB). All three qualify (onset rate > 10 dB/s); the first governs.
@@ -41,17 +41,6 @@ def _result():
     return nt.impulse_prominence(_ONSET_RATES, _LEVEL_DIFFERENCES)
 
 
-def _assert_one_page(path: str) -> None:
-    import os
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    from pypdf import PdfReader
-
-    assert len(PdfReader(path).pages) == 1
-
-
 def _extract_text(path: str) -> str:
     from pypdf import PdfReader
 
@@ -64,7 +53,7 @@ def test_report_writes_one_page_pdf(tmp_path) -> None:
     out = tmp_path / "impulse.pdf"
     returned = result.report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_unknown_engine_rejected(tmp_path) -> None:
@@ -119,7 +108,7 @@ def test_metadata_appears_and_one_page(tmp_path) -> None:
     )
     out = tmp_path / "meta.pdf"
     _result().report(str(out), metadata=md, verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out)).replace("\n", " ")
     assert "Pile-driving site, intermittent hammering" in text
     assert "Free field, 25 m from source" in text
@@ -137,8 +126,8 @@ def test_requirement_pass_and_fail_both_render(tmp_path) -> None:
     failing = tmp_path / "fail.pdf"
     result.report(str(passing), metadata=ReportMetadata(requirement=p + 2.0))
     result.report(str(failing), metadata=ReportMetadata(requirement=p - 2.0))
-    _assert_one_page(str(passing))
-    _assert_one_page(str(failing))
+    assert_one_page(str(passing))
+    assert_one_page(str(failing))
     assert "PASS" in _extract_text(str(passing)).replace("\n", " ")
     assert "FAIL" in _extract_text(str(failing)).replace("\n", " ")
 
@@ -161,7 +150,7 @@ def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
     )
     out = tmp_path / "xml.pdf"
     _result().report(str(out), metadata=md)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out)).replace("\n", " ")
     # The escaped values render back to their literal glyphs in the PDF text.
     assert "hammer <A> & pile" in text  # source/situation (specimen)
@@ -180,7 +169,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
         metadata=ReportMetadata(specimen="hincado de pilotes"),
         language="es",
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Evaluación de la prominencia de sonidos impulsivos" in text
     assert "ajuste de L" in text
@@ -198,7 +187,7 @@ def test_verdict_compares_unrounded_prominence(tmp_path) -> None:
     out = tmp_path / "boundary.pdf"
     requirement = result.prominence - 1e-3  # just below the unrounded P
     result.report(str(out), metadata=ReportMetadata(requirement=requirement))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out)).replace("\n", " ")
     assert result.prominence > requirement
     assert "FAIL" in text
@@ -210,7 +199,7 @@ def test_verdict_passes_at_the_requirement(tmp_path) -> None:
     result = _result()
     out = tmp_path / "atlimit.pdf"
     result.report(str(out), metadata=ReportMetadata(requirement=result.prominence))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "PASS" in _extract_text(str(out)).replace("\n", " ")
 
 
@@ -233,7 +222,7 @@ def test_oversized_impulse_set_stays_one_page(tmp_path) -> None:
         result = nt.impulse_prominence(onset_rates, level_differences)
     out = tmp_path / "big.pdf"
     result.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out)).replace("\n", " ")
     assert "more impulses of lower prominence" in text
     assert f"{result.prominence:.2f}" in text  # boxed governing P still present
@@ -289,7 +278,7 @@ def test_non_prominent_impulse_reports_zero_adjustment(tmp_path) -> None:
     result = nt.impulse_prominence([15.0], [5.0])
     out = tmp_path / "weak.pdf"
     result.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out)).replace("\n", " ")
     assert result.prominence <= 5.0
     assert result.adjustment == 0.0
@@ -312,7 +301,7 @@ def test_non_qualifying_set_justifies_on_the_onset_gate(tmp_path) -> None:
     assert result.prominence > 5.0  # informational only
     out = tmp_path / "no_qualifying.pdf"
     result.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out)).replace("\n", " ")
     assert "No level rise qualifies as an impulse" in text
     assert "informational only" in text

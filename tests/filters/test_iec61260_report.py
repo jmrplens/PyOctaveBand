@@ -12,30 +12,20 @@ verification itself is validated against the standard's Table 1 elsewhere
 
 from __future__ import annotations
 
-import os
 import pickle
 
 import pytest
 
 pytest.importorskip("reportlab")
 
-from phonometry import ReportMetadata, filters
+from report_assertions import assert_one_page
 
-_PDF_MAGIC = b"%PDF"
+from phonometry import ReportMetadata, filters
 
 
 def _class1_bank() -> filters.OctaveFilterBank:
     """A default Butterworth octave bank that meets IEC 61260-1:2014 class 1."""
     return filters.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
-
-
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
 
 
 def test_filter_class_compliance_carries_bank_data() -> None:
@@ -66,7 +56,7 @@ def test_class1_bank_reports_complies(tmp_path) -> None:
     out = tmp_path / "iec.pdf"
     returned = result.report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_1995_edition_reports_class0(tmp_path) -> None:
@@ -83,7 +73,7 @@ def test_1995_edition_reports_class0(tmp_path) -> None:
             measurement_standard="IEC 61260:1995", required_class=0
         ),
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_full_metadata_renders_one_page(tmp_path) -> None:
@@ -103,7 +93,7 @@ def test_full_metadata_renders_one_page(tmp_path) -> None:
     )
     out = tmp_path / "meta.pdf"
     result.report(str(out), metadata=md)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_unknown_engine_rejected(tmp_path) -> None:
@@ -122,7 +112,7 @@ def test_required_class_pass_and_fail_both_render(tmp_path) -> None:
     assert result.overall_class == 1
     passing = tmp_path / "pass.pdf"
     result.report(str(passing), metadata=ReportMetadata(required_class=1))
-    _assert_one_page(str(passing))
+    assert_one_page(str(passing))
     # FAIL case: a low-order bank meets no class of the edition.
     failing_result = filters.filter_class_compliance(
         filters.OctaveFilterBank(fs=48000, fraction=1, order=1, limits=[500, 2000])
@@ -130,7 +120,7 @@ def test_required_class_pass_and_fail_both_render(tmp_path) -> None:
     assert failing_result.overall_class is None
     failing = tmp_path / "fail.pdf"
     failing_result.report(str(failing), metadata=ReportMetadata(required_class=1))
-    _assert_one_page(str(failing))
+    assert_one_page(str(failing))
 
 
 def test_required_class_missing_from_edition_rejected(tmp_path) -> None:
@@ -190,7 +180,7 @@ def test_non_compliant_bank_renders(tmp_path) -> None:
     assert result.overall_class is None
     out = tmp_path / "noncompliant.pdf"
     result.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_empty_bands_result_is_graceful() -> None:
@@ -231,7 +221,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     result = filters.filter_class_compliance(_class1_bank())
     out = tmp_path / "filter_es.pdf"
     result.report(str(out), metadata=ReportMetadata(required_class=1), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Conformidad de clase de filtro" in text
     assert "CUMPLE" in text
