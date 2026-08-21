@@ -67,6 +67,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_same_length
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
@@ -423,6 +425,24 @@ class IntensityInstrumentComplianceResult:
     spacing: float
     spacing_offset_db: float
     range_limited: bool = False
+
+    def __post_init__(self) -> None:
+        """Reject a verdict whose per-band entries disagree.
+
+        The fiche prints one row per band and, in its box, the overall class
+        of the whole instrument, so a band list short of an entry gives a
+        sheet whose verdict covers a band that is nowhere in its table.
+
+        :raises ValueError: if the per-band entries disagree.
+        """
+        require_same_length(
+            self,
+            "bands",
+            "frequency",
+            "residual_index",
+            "limit_class1",
+            "limit_class2",
+        )
 
     def reference_class(self) -> int:
         """The class whose mask the fiche and the plot read margins against.

@@ -64,6 +64,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from ..._internal.validation import require_same_length
 from ..._internal.warnings import PhonometryWarning
 from ...io._resolve import SignalInput, resolve_fs, resolve_samples
 
@@ -129,6 +130,24 @@ class ImpulseProminenceResult:
     prominence: float
     adjustment: float
     assessment_period_min: float = DEFAULT_ASSESSMENT_PERIOD_MIN
+
+    def __post_init__(self) -> None:
+        """Reject a set of impulses whose per-impulse columns disagree.
+
+        The fiche prints one row per impulse and, above them, a prominence
+        taken over the whole set, so a column short of a row leaves a sheet
+        whose headline covers an impulse that is not in the table.
+
+        :raises ValueError: if the per-impulse columns disagree.
+        """
+        require_same_length(
+            self,
+            "onset_rates",
+            "level_differences",
+            "per_impulse",
+            "qualifies",
+            axis="impulse",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

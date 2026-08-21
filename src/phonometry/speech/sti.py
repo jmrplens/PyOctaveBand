@@ -32,6 +32,7 @@ if TYPE_CHECKING:
 from scipy import signal
 
 from .._internal.utils import _typesignal
+from .._internal.validation import require_same_length
 from .._internal.warnings import PhonometryWarning
 from ..filters.core import OctaveFilterBank
 from ..filters.frequencies import nominal_frequencies
@@ -128,6 +129,16 @@ class STIResult:
     mtf: np.ndarray
     band_levels: np.ndarray | None
     rating: str
+
+    def __post_init__(self) -> None:
+        """Reject a result whose per-band quantities disagree.
+
+        ``mti`` is the per-band index the fiche tabulates beside the band
+        levels and the modulation matrix, all three on the same band axis.
+
+        :raises ValueError: if the band axes disagree.
+        """
+        require_same_length(self, "mti", ("mtf", 0), "band_levels")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

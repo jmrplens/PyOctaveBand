@@ -150,3 +150,24 @@ def test_assessment_period_defaults_and_validates() -> None:
     for bad in (0.0, -5.0, float("nan"), float("inf")):
         with pytest.raises(ValueError, match="assessment_period_min"):
             nt.impulse_prominence([1200.0], [32.0], assessment_period_min=bad)
+
+
+# --------------------------------------------------------------------------
+# Per-impulse columns that do not agree
+# --------------------------------------------------------------------------
+@pytest.mark.parametrize("trim", [True, False], ids=["short", "long"])
+def test_per_impulse_columns_that_disagree_are_refused(trim: bool) -> None:
+    """The prominence is taken over the whole set the table prints.
+
+    A column short of a row leaves a sheet whose headline covers an impulse
+    that is not in the table; one row too long is truncated by the table.
+    """
+    import dataclasses
+
+    result = nt.impulse_prominence(
+        onset_rates=[12.0, 25.0, 40.0], level_differences=[8.0, 12.0, 20.0]
+    )
+    values = np.asarray(result.qualifies)
+    wrong = values[:-1] if trim else np.append(values, values[-1])
+    with pytest.raises(ValueError, match="per impulse"):
+        dataclasses.replace(result, qualifies=wrong)

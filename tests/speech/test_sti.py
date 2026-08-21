@@ -479,3 +479,27 @@ def test_annex_m_full_sti_worked_example() -> None:
     )
     assert result.sti == pytest.approx(IEC60268_16_ANNEX_M_STI, abs=0.005)
     assert round(result.sti, 2) == IEC60268_16_ANNEX_M_STI
+
+
+# --------------------------------------------------------------------------
+# Per-band quantities that do not run over the band axis
+# --------------------------------------------------------------------------
+def test_an_sti_result_refuses_an_mti_off_the_band_axis() -> None:
+    """The fiche tabulates ``mti`` beside the modulation matrix and the levels.
+
+    All three run over the same seven octave bands, so a per-band column of
+    another length is a table whose rows no longer describe one band each.
+    """
+    import dataclasses
+
+    from phonometry.speech.sti import STIResult
+
+    result = STIResult(
+        sti=0.75,
+        mti=np.full(7, 0.75),
+        mtf=np.full((7, 2), 0.75),
+        band_levels=np.full(7, 60.0),
+        rating="B",
+    )
+    with pytest.raises(ValueError, match="'mti'"):
+        dataclasses.replace(result, mti=result.mti[:-1])

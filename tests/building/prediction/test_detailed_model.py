@@ -924,3 +924,37 @@ def test_plot_pools_the_paths_beyond_the_named_set(airborne) -> None:
     # Every band's dominant path is named rather than pooled.
     assert set(airborne.dominant) <= set(labels)
     plt.close(ax.get_figure())
+
+
+# --------------------------------------------------------------------------
+# Paths and bands that do not line up
+# --------------------------------------------------------------------------
+def test_a_share_column_short_of_a_path_is_refused(airborne) -> None:
+    """The share column is printed beside the path rows and sums to 100 %.
+
+    A ``fractions`` array short of a path row leaves a sheet listing fewer
+    paths than the shares it prints sum over, so the column stops reaching
+    100 % under a box holding the rating of the whole transmission.
+    """
+    import dataclasses
+
+    with pytest.raises(ValueError, match="per transmission path"):
+        dataclasses.replace(airborne, fractions=airborne.fractions[:-1])
+
+
+def test_a_share_column_short_of_a_band_is_refused(airborne) -> None:
+    """``fractions`` is paths by bands: axis 1 is the one that carries bands."""
+    import dataclasses
+
+    with pytest.raises(ValueError, match=r"'fractions \(axis 1\)'"):
+        dataclasses.replace(airborne, fractions=airborne.fractions[:, :-1])
+
+
+def test_a_path_row_off_the_band_axis_is_refused(airborne) -> None:
+    """Every path row runs over the same bands as the frequency axis."""
+    import dataclasses
+
+    first = airborne.paths[0]
+    short = dataclasses.replace(first, values=first.values[:-1])
+    with pytest.raises(ValueError, match=r"'paths\[0\]"):
+        dataclasses.replace(airborne, paths=(short, *airborne.paths[1:]))

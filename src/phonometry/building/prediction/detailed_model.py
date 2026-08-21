@@ -101,8 +101,10 @@ import numpy as np
 
 from ..._internal.validation import (
     require_choice,
+    require_equal_counts,
     require_positive,
     require_positive_array,
+    require_same_length,
 )
 
 if TYPE_CHECKING:
@@ -1577,6 +1579,32 @@ class DetailedAirborneResult:
     fractions: np.ndarray
     rating: WeightedRatingResult | None
 
+    def __post_init__(self) -> None:
+        """Reject a decomposition whose paths and bands do not line up.
+
+        ``fractions`` is indexed by path to name the dominant one and printed
+        as a share column beside the path rows, so a fractions array short of
+        a path row yields a sheet listing fewer paths than the shares it
+        prints sum over: the column no longer reaches 100 %, under a box
+        holding the single-number rating of the whole transmission.
+
+        :raises ValueError: if the band or path axes disagree.
+        """
+        require_same_length(self, "frequencies", "r_prime", ("fractions", 1))
+        for i, path in enumerate(self.paths):
+            require_equal_counts(
+                type(self).__name__,
+                {
+                    "frequencies": len(self.frequencies),
+                    f"paths[{i}] {path.label!r}": len(path.values),
+                },
+            )
+        require_equal_counts(
+            type(self).__name__,
+            {"paths": len(self.paths), "fractions": len(self.fractions)},
+            "transmission path",
+        )
+
     @property
     def dominant(self) -> tuple[str, ...]:
         """Label of the path carrying most energy in each band."""
@@ -1654,6 +1682,32 @@ class DetailedImpactResult:
     l_prime_n: np.ndarray
     fractions: np.ndarray
     rating: ImpactRatingResult | None
+
+    def __post_init__(self) -> None:
+        """Reject a decomposition whose paths and bands do not line up.
+
+        ``fractions`` is indexed by path to name the dominant one and printed
+        as a share column beside the path rows, so a fractions array short of
+        a path row yields a sheet listing fewer paths than the shares it
+        prints sum over: the column no longer reaches 100 %, under a box
+        holding the single-number rating of the whole radiation.
+
+        :raises ValueError: if the band or path axes disagree.
+        """
+        require_same_length(self, "frequencies", "l_prime_n", ("fractions", 1))
+        for i, path in enumerate(self.paths):
+            require_equal_counts(
+                type(self).__name__,
+                {
+                    "frequencies": len(self.frequencies),
+                    f"paths[{i}] {path.label!r}": len(path.values),
+                },
+            )
+        require_equal_counts(
+            type(self).__name__,
+            {"paths": len(self.paths), "fractions": len(self.fractions)},
+            "transmission path",
+        )
 
     @property
     def dominant(self) -> tuple[str, ...]:
