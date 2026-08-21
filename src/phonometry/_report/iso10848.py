@@ -349,7 +349,7 @@ def _kij_value_table(
             row.append(t("yes", language) if bool(in_mean[k]) else t("no", language))
         rows.append(row)
 
-    return band_table(rows, widths, len(frequencies))
+    return band_table(rows, widths, len(frequencies), band_centres=frequencies)
 
 
 def _kij_result_box(

@@ -214,7 +214,7 @@ def _value_table(
                 ]
             )
         col_widths = [21 * mm, 23 * mm, 23 * mm, 23 * mm]
-    return band_table(rows, col_widths, len(freqs))
+    return band_table(rows, col_widths, len(freqs), band_centres=freqs)
 
 
 def _statement(result: ImpedanceTubeResult, language: str = "en") -> str:

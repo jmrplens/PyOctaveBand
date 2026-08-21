@@ -72,10 +72,14 @@ _SCRIPT_RISE = "25%"
 #: attributes, so only the attribute-less tags need rewriting.
 _SCRIPT_TAG_RE = re.compile(r"<(sub|sup|super)>")
 
-#: Row count of the octave-band variant of the sound-insulation band table
-#: (one row per octave, the five octave centres 125-2000 Hz); a table this
-#: size carries no one-third-octave triplets to rule.
-_OCTAVE_TABLE_ROWS = 5
+#: Ratio between adjacent one-third-octave mid-band centres, 2**(1/3).
+_THIRD_OCTAVE_RATIO = 2.0 ** (1.0 / 3.0)
+
+#: Relative tolerance on that ratio. The nominal centres of IEC 61260 are
+#: rounded (400, 500, 630 gives 1.25 and 1.26), so the exact step is never
+#: what a fiche tabulates; 3 % admits the rounded series and still refuses a
+#: linear sweep, whose neighbouring ratios march steadily towards 1.
+_BAND_RATIO_TOLERANCE = 0.03
 
 
 def fiche_paragraph(text: str, style: Any, **kwargs: Any) -> Any:
@@ -247,8 +251,21 @@ def render_figure_drawing(
                 _, data_top = ax.get_ylim()
                 top = max(top, float(np.ceil(data_top / expand_step) * expand_step))
             ax.set_ylim(0.0, top)
-        # Move the legend above the axes, as the reference reports do.
+        # Move the legend above the axes, as the reference reports do. The
+        # handles are collected from the twin axes as well as from `ax`,
+        # because a plot that draws a second quantity on `ax.twinx()` merges
+        # both handle lists into the one legend it builds, and rebuilding from
+        # `ax` alone would drop that half: the ISO 12354 sheets lost the very
+        # curve they rate, R' and L'n, from their own legend. Walking
+        # `figure.axes` rather than the sibling set keeps the order the plot
+        # used, which the fiche comparison gate depends on.
         handles, labels = ax.get_legend_handles_labels()
+        twins = ax.get_shared_x_axes().get_siblings(ax)
+        for other in ax.figure.axes:
+            if other is not ax and other in twins:
+                more_handles, more_labels = other.get_legend_handles_labels()
+                handles.extend(more_handles)
+                labels.extend(more_labels)
         existing = ax.get_legend()
         if existing is not None:
             existing.remove()
@@ -366,20 +383,55 @@ def band_table_header_style() -> Any:
     )
 
 
+def _octave_grouping(band_centres: Any) -> int | None:
+    """Rows per octave in *band_centres*, or ``None`` when they are not bands.
+
+    The thin rules of the accredited reports group a table by octave, so they
+    mean something only where consecutive rows really are adjacent band
+    centres. This measures rather than assumes: every adjacent ratio must sit
+    close to the one-third-octave step for a triplet rule to be drawn.
+
+    One row per octave needs no rule, and anything else, a goniometer angle
+    axis or a linear frequency sweep, gets none: a rule drawn every three rows
+    across nineteen receiver angles states a grouping the data does not have.
+
+    :param band_centres: The mid-band centre frequencies the rows tabulate, or
+        ``None`` when the rows are not frequency bands.
+    :return: 3 for one-third-octave rows, ``None`` otherwise.
+    """
+    if band_centres is None:
+        return None
+    centres = np.asarray(band_centres, dtype=np.float64)
+    if centres.size < 3 or np.any(centres <= 0.0):  # noqa: PLR2004
+        return None
+    ratios = centres[1:] / centres[:-1]
+    if np.allclose(ratios, _THIRD_OCTAVE_RATIO, rtol=_BAND_RATIO_TOLERANCE):
+        return 3
+    return None
+
+
 def band_table(
     rows: list[list[Any]],
     col_widths: list[Any],
     n_data: int,
     extra_styles: list[Any] | None = None,
+    *,
+    band_centres: Any,
 ) -> Any:
-    """Assemble a one-third-octave band table with the accredited styling.
+    """Assemble a band table with the accredited styling.
 
     Applies the shared look of the sound-insulation fiches: the accent header
-    row, zebra body rows, a box rule and a thin rule after every
-    third-octave triplet (grouping the table by octave exactly as the
-    accredited reference reports do). ``rows`` holds the header row followed
-    by ``n_data`` band rows (plus any trailing summary rows, styled through
-    ``extra_styles``). Called only after the renderer has imported reportlab.
+    row, zebra body rows, a box rule and, where the rows really are
+    one-third-octave bands, a thin rule after every triplet, grouping the
+    table by octave exactly as the accredited reference reports do. ``rows``
+    holds the header row followed by ``n_data`` body rows (plus any trailing
+    summary rows, styled through ``extra_styles``). Called only after the
+    renderer has imported reportlab.
+
+    :param band_centres: The mid-band centre frequencies the rows tabulate.
+        ``None`` says the rows are not frequency bands, which is the honest
+        answer for a goniometer angle axis or a linear sweep and keeps the
+        octave rules off a table that has no octaves.
     """
     from reportlab.lib import colors
     from reportlab.platypus import Table, TableStyle
@@ -398,11 +450,11 @@ def band_table(
         ("BOTTOMPADDING", (0, 0), (-1, -1), 2.6),
         ("BOX", (0, 0), (-1, -1), 0.5, accent),
     ]
-    # Octave-band tables (5 rows, one per octave) have no triplets to group.
-    if n_data != _OCTAVE_TABLE_ROWS:
+    group_every = _octave_grouping(band_centres)
+    if group_every is not None:
         style_cmds.extend(
-            ("LINEBELOW", (0, triplet_end), (-1, triplet_end), 0.4, thin)
-            for triplet_end in range(3, n_data, 3)
+            ("LINEBELOW", (0, group_end), (-1, group_end), 0.4, thin)
+            for group_end in range(group_every, n_data, group_every)
         )
     if extra_styles:
         style_cmds += extra_styles

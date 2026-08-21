@@ -22,6 +22,10 @@ pytest.importorskip("reportlab")
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, building
+from phonometry._report.iso12354 import (
+    render_iso12354_detailed_airborne_report,
+    render_iso12354_detailed_impact_report,
+)
 
 _BANDS = np.asarray(ref.ISO12354_ANNEX_L_BANDS, dtype=np.float64)
 
@@ -145,3 +149,42 @@ def test_detailed_fiche_rejects_an_unknown_engine(tmp_path) -> None:
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="engine"):
         result.report(out, engine="weasyprint")
+
+
+# --------------------------------------------------------------------------
+# The legend the plot builds is the legend the fiche prints
+# --------------------------------------------------------------------------
+@pytest.mark.parametrize(
+    ("build", "render", "rated"),
+    [
+        (_annex_l_airborne, render_iso12354_detailed_airborne_report, r"R^{\prime}"),
+        (_annex_g_impact, render_iso12354_detailed_impact_report, r"L^{\prime}"),
+    ],
+    ids=["airborne", "impact"],
+)
+def test_the_fiche_legend_keeps_the_curve_it_rates(
+    tmp_path, monkeypatch, build, render, rated
+) -> None:
+    """The rated curve is drawn on a twin axis and must survive the rebuild.
+
+    The fiche moves the legend above the axes, which means removing the one
+    the plot built and making it again. Collecting the handles from the
+    primary axes alone dropped the twin's half, so the sheet printed a legend
+    without the very quantity the whole page rates.
+    """
+    from matplotlib.axes import Axes
+
+    legends: list[list[str]] = []
+    original = Axes.legend
+
+    def record(self, *args, **kwargs):
+        drawn = original(self, *args, **kwargs)
+        legends.append([text.get_text() for text in drawn.get_texts()])
+        return drawn
+
+    monkeypatch.setattr(Axes, "legend", record)
+    render(build(), str(tmp_path / "legend.pdf"))
+
+    assert len(legends) == 2, "the plot builds one legend and the fiche rebuilds it"
+    assert any(rated in entry for entry in legends[0]), "the plot labels its curve"
+    assert legends[1] == legends[0], "the rebuilt legend says what the plot said"

@@ -99,8 +99,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
-- Thirteen result types now refuse to exist carrying per-band arrays of
-  different lengths, which used to produce a fiche rather than an error.
+- The ISO 12354 detailed fiches drew the curve they rate without a legend
+  entry. The sheet moves the legend above the axes, which means removing the
+  one the plot built and making it again, and it collected the handles from
+  the primary axes alone. Both detailed models draw their total on a twin
+  axis, so `R'` and `L'n`, the quantities the whole page rates, were the half
+  that went missing. The rebuild now gathers the twins' handles too, in the
+  order the plot used, so the printed legend says what the plot said.
+
+- The band tables decided whether their rows were one-third-octave triplets
+  by counting them, and drew a rule after every third row unless there were
+  exactly five. Rows that are not frequency bands got the rules anyway: the
+  ISO 17497 polar fiche ruled its nineteen receiver angles into triplets, and
+  a two-microphone impedance measurement on a linear frequency grid ruled
+  that. The caller now says what its rows tabulate and the grouping is
+  measured from the band centres, so an octave table of any length is left
+  alone and a linear sweep gets no octave rules.
 
   A result dataclass is frozen, exported and has its constructor in the
   generated reference, so one could be built, or replaced into, with a

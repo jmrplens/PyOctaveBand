@@ -320,7 +320,7 @@ def _value_table(
             ("FONTSIZE", (0, -1), (-1, -1), 7.5),
         ]
 
-    return band_table(rows, col_widths, n_data, extra_styles)
+    return band_table(rows, col_widths, n_data, extra_styles, band_centres=centers)
 
 
 def _verdict(
