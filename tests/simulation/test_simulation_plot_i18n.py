@@ -39,7 +39,7 @@ def test_fdtd_probes_es_and_bad_language() -> None:
     labels = [t.get_text() for t in ax.get_legend().get_texts()]
     assert any(s.startswith("sonda") for s in labels)
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -48,5 +48,5 @@ def test_fdtd_snapshot_es() -> None:
     ax = res.plot(kind="snapshot", frame=-1, language="es")
     assert ax.get_title().startswith("Campo de presión FDTD en $t$ =")
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(kind="snapshot", language="xx")

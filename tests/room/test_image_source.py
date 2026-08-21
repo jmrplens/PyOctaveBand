@@ -161,7 +161,7 @@ def _energy_density_t60(res: room.ImageSourceResult, win: float = 0.008) -> floa
     return float(-60.0 / slope)
 
 
-@pytest.mark.parametrize("length,alpha", [(5.0, 0.12), (4.0, 0.15), (6.0, 0.1)])
+@pytest.mark.parametrize(("length", "alpha"), [(5.0, 0.12), (4.0, 0.15), (6.0, 0.1)])
 def test_cubic_room_recovers_eyring(length: float, alpha: float) -> None:
     dims = (length, length, length)
     volume = length**3
@@ -412,11 +412,11 @@ def test_coincident_source_receiver_rejected() -> None:
 
 
 def test_bad_dimension_and_fs() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'Lx' must be positive"):
         room.image_source_rir(
             (0.0, 4.0, 3.0), (1.0, 2.0, 1.5), (3.0, 2.0, 1.5), 0.2, fs=16000
         )
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Sample rate 'fs'"):
         room.image_source_rir(
             (5.0, 4.0, 3.0), (1.0, 2.0, 1.5), (3.0, 2.0, 1.5), 0.2, fs=0
         )

@@ -206,7 +206,9 @@ def test_rprime_cap_off_by_default() -> None:
     assert res.l_w[0] == pytest.approx(44.0)
 
 
-@pytest.mark.parametrize("shape,height,alpha,expected", ref.EN12354_3_ANNEX_C_DLFS)
+@pytest.mark.parametrize(
+    ("shape", "height", "alpha", "expected"), ref.EN12354_3_ANNEX_C_DLFS
+)
 def test_facade_shape_level_difference_table(
     shape: str, height: float, alpha: float, expected: float
 ) -> None:
@@ -288,7 +290,7 @@ def test_a_weighted_single_number() -> None:
 
 
 @pytest.mark.parametrize(
-    "width,height,distance,expected", ref.EN12354_4_ANNEX_G_ATTENUATION
+    ("width", "height", "distance", "expected"), ref.EN12354_4_ANNEX_G_ATTENUATION
 )
 def test_annex_e_attenuation(
     width: float, height: float, distance: float, expected: float

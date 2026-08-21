@@ -118,6 +118,35 @@ def require_finite_array(x: ArrayLike, name: str) -> np.ndarray:
     return arr
 
 
+def require_per_band(
+    x: ArrayLike, name: str, bands: np.ndarray, bands_name: str = "frequency"
+) -> np.ndarray:
+    """Broadcast *x* over the band axis, saying whose length disagrees.
+
+    ``np.broadcast_to`` accepts a scalar and an array of matching length and
+    rejects everything else, which is the rule wanted here. What it does not
+    do is name the culprit: it reports the two shapes it could not reconcile,
+    from inside its own C code, so the caller learns nothing about which of
+    its arguments was wrong.
+
+    :param x: The per-band input (a scalar applies to every band).
+    :param name: Parameter name used in the error message.
+    :param bands: The band axis to match, already coerced.
+    :param bands_name: Parameter name of the band axis, for the message.
+    :return: The broadcast ``float64`` array, of ``bands.shape``.
+    :raises ValueError: if *x* is neither a scalar nor of ``bands``' length.
+    """
+    arr = np.asarray(x, dtype=np.float64)
+    try:
+        return np.broadcast_to(arr, bands.shape).astype(np.float64)
+    except ValueError:
+        msg = (
+            f"'{name}' must be a scalar or carry one value per band "
+            f"({bands.size} in '{bands_name}'); got shape {arr.shape}."
+        )
+        raise ValueError(msg) from None
+
+
 def require_1d_signal(x: ArrayLike, name: str = "signal") -> np.ndarray:
     """Coerce *x* to a float64 array and require a 1-D time series.
 

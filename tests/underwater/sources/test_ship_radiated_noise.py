@@ -49,9 +49,9 @@ def test_radiated_noise_level_closed_form() -> None:
 
 
 def test_radiated_noise_level_rejects_bad_input() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'rms_pressure'"):
         underwater.radiated_noise_level(0.0, 100.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'distance'"):
         underwater.radiated_noise_level(1e-6, -1.0)
 
 
@@ -96,15 +96,15 @@ def test_hydrophone_depths() -> None:
 
 
 def test_hydrophone_depths_rejects_bad_angles() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'angles'"):
         underwater.hydrophone_depths(100.0, angles=(90.0,))
 
 
 def test_hydrophone_depths_rejects_non_finite_angles() -> None:
     # NaN/inf angles must be rejected, not silently yield NaN depths.
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'angles'"):
         underwater.hydrophone_depths(100.0, angles=(np.nan,))
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'angles'"):
         underwater.hydrophone_depths(100.0, angles=(np.inf,))
 
 
@@ -127,5 +127,5 @@ def test_result_plot_smoke() -> None:
 def test_rejects_shape_mismatch() -> None:
     levels_2_bands = np.array([1.0, 2.0])
     frequencies_3_bands = np.array([100.0, 200.0, 300.0])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'rnl' and 'frequency'"):
         underwater.monopole_source_level(levels_2_bands, frequencies_3_bands, 8.0)

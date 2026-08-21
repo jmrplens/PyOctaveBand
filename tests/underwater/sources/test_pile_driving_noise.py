@@ -59,18 +59,18 @@ def test_cumulative_sel_differing_strikes() -> None:
 
 
 def test_cumulative_sel_rejects_empty() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'single_sels' must be a non-empty"):
         underwater.cumulative_sel([])
 
 
 def test_cumulative_sel_identical_rejects_zero_strikes() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'n_strikes' must be at least"):
         underwater.cumulative_sel_identical(180.0, 0)
 
 
 def test_cumulative_sel_identical_rejects_fractional_strikes() -> None:
     # A non-integer count must be rejected, not silently truncated to int().
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'n_strikes' must be a whole number"):
         underwater.cumulative_sel_identical(180.0, 1.9)  # type: ignore[arg-type]
 
 
@@ -89,7 +89,7 @@ def test_pile_strike_metrics_bundle_and_plot() -> None:
 
 def test_pile_strike_metrics_rejects_short_signal() -> None:
     too_short = np.array([1.0])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'pressure' must contain at least"):
         underwater.pile_strike_metrics(too_short, FS)
 
 

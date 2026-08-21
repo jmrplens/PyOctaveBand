@@ -240,5 +240,5 @@ def test_plot_smoke() -> None:
     assert ax.get_title().startswith("Room-to-room transmission")
     ax_es = result.plot(language="es")
     assert ax_es.get_ylabel() == "Nivel [dB]"
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         result.plot(language="fr")

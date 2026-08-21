@@ -99,7 +99,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
-- Every `zip()` says whether its inputs must be the same length. `B905` is
+- Every test that expects an error says which error. `PT` is selected, and the
+  241 `pytest.raises(ValueError)` calls that named no message now name one.
+  This was already the habit rather than a new rule: 1755 of the 2065
+  `pytest.raises` in the suite passed `match=` before this, so what changed is
+  the stragglers. Each of the 241 was resolved by reading the guard it lands
+  on, not the test around it, because a test that catches any `ValueError` at
+  all passes when the wrong guard fires, and the wrong guard firing is exactly
+  the regression it was written to catch.
+
+  The fragment is the part of the message that does not move. That means the
+  parameter the guard is about, and not the sentence around it: not a bound,
+  which changes when the bound does; not the list of allowed values, which
+  grows when a value is added; and not wording that belongs to numpy, whose
+  shape-mismatch text is assembled inside a C extension and carries no
+  stability promise. Where a message is already just a parameter and a
+  predicate, as in `'frequencies' must be positive`, it is quoted whole,
+  because there is nothing volatile in it to drop.
+
+  Reading the guards turned up two tests that were passing without checking
+  what they claimed. `test_short_frequencies_raises_value_error_not_index_error`
+  waited on `frequencies`, a word three separate messages in that module
+  contain, and a test named for rejecting a non-positive frequency waited on
+  `must be positive`, which every positivity guard in its module shares. Both
+  now name their guard. Neither was reported by the linter, because both did
+  pass a `match=`; only reading them found it.
+
+  Alongside it, 44 `parametrize` decorators take the shape the other 467
+  already use, tuples for the names and a list for the values, and ten
+  assertions of the form `assert a is not None and b is not None` became two
+  assertions, so a failure says which of the two was missing. `B905` is
   selected, and the 162 calls it found were read one at a time: 158 pair
   arrays that are equal by construction and now say `strict=True`, and four
   consume the shorter input on purpose and say `strict=False` with a line

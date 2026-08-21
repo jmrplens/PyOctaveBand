@@ -175,12 +175,12 @@ def test_practical_mean_of_three() -> None:
 
 
 def test_practical_rejects_negative() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="alpha_s values must be non-negative"):
         practical_absorption_coefficient([-0.1] + [0.5] * 14)
 
 
 def test_practical_wrong_length() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"third_octave_alpha_s must have \d+ values"):
         practical_absorption_coefficient([0.5] * 14)
 
 
@@ -330,7 +330,7 @@ def test_from_third_octave_accepts_mapping() -> None:
 
 
 def test_from_third_octave_rejects_wrong_length() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"third_octave_alpha_s must have \d+ values"):
         weighted_absorption_from_third_octave([0.5] * 14)
 
 

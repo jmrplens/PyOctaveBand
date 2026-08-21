@@ -134,15 +134,30 @@ def test_reception_plate_requires_eta_or_ts() -> None:
         building.reception_plate_power(80.0, 1000.0, 25.0, 1.2)
 
 
-def test_reception_plate_velocity_shape_mismatch() -> None:
-    # a non-broadcastable velocity_level vs frequency length raises
-    with pytest.raises(ValueError):
+@pytest.mark.parametrize(
+    ("name", "kwargs"),
+    [
+        ("velocity_level", {"loss_factor": 0.01}),
+        ("loss_factor", {"loss_factor": [0.01, 0.02, 0.03]}),
+    ],
+)
+def test_reception_plate_rejects_a_per_band_input_of_the_wrong_length(
+    name: str, kwargs: dict
+) -> None:
+    """A per-band input that is neither scalar nor band-long names itself.
+
+    Both arguments reach ``np.broadcast_to``, whose own message is raised from
+    inside numpy and reports two shapes without saying which argument carried
+    which, so the guard is the library's own and names the parameter.
+    """
+    velocity = [80.0, 82.0, 79.0] if name == "velocity_level" else 80.0
+    with pytest.raises(ValueError, match=f"'{name}' must be a scalar or carry"):
         building.reception_plate_power(
-            [80.0, 82.0, 79.0],
+            velocity,
             [500.0, 1000.0, 2000.0, 4000.0],
             mass_per_area=25.0,
             area=1.2,
-            loss_factor=0.01,
+            **kwargs,
         )
 
 

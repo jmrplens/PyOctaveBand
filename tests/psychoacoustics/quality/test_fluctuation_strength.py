@@ -213,11 +213,11 @@ def test_signal_rejects_bad_inputs() -> None:
     empty = np.array([])
     with_nan = np.array([1.0, np.nan])
     valid = _am_tone(1000.0, 60.0, 1.0, 4.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'signal' must be one-dimensional"):
         psychoacoustics.fluctuation_strength(two_dimensional, _FS)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'signal' must not be empty"):
         psychoacoustics.fluctuation_strength(empty, _FS)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'signal' must be finite"):
         psychoacoustics.fluctuation_strength(with_nan, _FS)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'fs' must be positive"):
         psychoacoustics.fluctuation_strength(valid, 0.0)

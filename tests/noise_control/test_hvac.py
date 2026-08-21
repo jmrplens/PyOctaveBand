@@ -84,7 +84,7 @@ def test_elbow_lined_beats_unlined_high_freq() -> None:
 
 
 def test_elbow_round_rejects_options() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="neither vanes nor lining"):
         hvac.elbow_insertion_loss([500.0], 0.3, bend_type="round", lined=True)
 
 
@@ -156,7 +156,7 @@ def test_plot_and_validation() -> None:
     mpl.use("Agg")
     hvac.end_reflection_loss([125.0, 250.0], 0.3).plot()
     hvac.flow_noise_straight_duct([250.0, 500.0], 10.0, 0.04).plot()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'termination' must be"):
         hvac.end_reflection_loss([125.0], 0.3, termination="bad")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'mean_absorption' must lie strictly"):
         hvac.plenum_attenuation(0.1, 1.0, 20.0, 1.0)

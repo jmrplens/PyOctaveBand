@@ -336,6 +336,6 @@ def test_plot_rejects_unknown_language() -> None:
     result = ph.signals.time_synchronous_average(
         _repeat(_periodic(PERIOD, M, (1.0,)), 4), FS, period=PERIOD
     )
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         result.plot(language="fr")
     plt.close("all")

@@ -105,7 +105,7 @@ TABLE2 = {
 }
 
 
-@pytest.mark.parametrize("situation,col", [("A", 0), ("B", 1), ("C", 2)])
+@pytest.mark.parametrize(("situation", "col"), [("A", 0), ("B", 1), ("C", 2)])
 def test_table2_airborne_every_band(situation, col):
     result = band_uncertainty("airborne", situation)
     assert list(result.frequencies) == FREQ_FULL
@@ -140,7 +140,7 @@ TABLE4 = {
 }
 
 
-@pytest.mark.parametrize("situation,col", [("B", 0), ("C", 1)])
+@pytest.mark.parametrize(("situation", "col"), [("B", 0), ("C", 1)])
 def test_table4_impact_every_band(situation, col):
     result = band_uncertainty("impact", situation)
     assert list(result.frequencies) == FREQ_IMPACT
@@ -285,8 +285,8 @@ TABLE3 = {
 }
 
 
-@pytest.mark.parametrize("quantity,values", list(TABLE3.items()))
-@pytest.mark.parametrize("situation,idx", [("A", 0), ("B", 1), ("C", 2)])
+@pytest.mark.parametrize(("quantity", "values"), list(TABLE3.items()))
+@pytest.mark.parametrize(("situation", "idx"), [("A", 0), ("B", 1), ("C", 2)])
 def test_table3_single_number(quantity, values, situation, idx):
     assert single_number_uncertainty(quantity, situation) == pytest.approx(values[idx])
 
@@ -301,7 +301,7 @@ def test_airborne_aliases_share_row():
 # Table 5 — impact single-number (ISO 717-2).
 # --------------------------------------------------------------------------- #
 @pytest.mark.parametrize(
-    "quantity,expected",
+    ("quantity", "expected"),
     [("ln_w", (1.5, 1.0, 0.5)), ("ln_w+ci", (1.5, 1.0, 0.6))],
 )
 def test_table5_impact_single_number(quantity, expected):
@@ -343,7 +343,7 @@ TABLED2 = {
 }
 
 
-@pytest.mark.parametrize("quantity,expected", list(TABLED2.items()))
+@pytest.mark.parametrize(("quantity", "expected"), list(TABLED2.items()))
 def test_tabled2_sigma_r95_single_number(quantity, expected):
     assert single_number_uncertainty(quantity, "A", upper_limit=True) == pytest.approx(
         expected
@@ -364,7 +364,7 @@ def test_sigma_r95_single_number_impact_absent():
 # Table 8 — coverage factors (Clause 8), every row.
 # --------------------------------------------------------------------------- #
 @pytest.mark.parametrize(
-    "confidence,k",
+    ("confidence", "k"),
     [
         (0.68, 1.00),
         (0.80, 1.28),
@@ -379,7 +379,7 @@ def test_table8_two_sided(confidence, k):
 
 
 @pytest.mark.parametrize(
-    "confidence,k",
+    ("confidence", "k"),
     [
         (0.84, 1.00),
         (0.90, 1.28),
@@ -438,7 +438,7 @@ def test_coverage_minimum_k_is_one():
 
 
 def test_expanded_uncertainty_rejects_negative():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Standard uncertainty u must be non-negative"):
         insulation_expanded_uncertainty(-0.1)
 
 
@@ -554,7 +554,7 @@ def test_band_uncertainty_to_arrays_roundtrip():
 
 
 def test_prediction_input_rejects_bad_n():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="n must be a positive integer"):
         prediction_input_uncertainty(1.2, 1.0, 0)
 
 

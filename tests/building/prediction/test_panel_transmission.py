@@ -524,19 +524,35 @@ def test_plateau_plot_shades_the_coincidence_plateau() -> None:
 
 
 @pytest.mark.parametrize(
-    "kwargs",
+    ("kwargs", "match"),
     [
-        {"material": "granite", "thickness_mm": 100.0},
-        {"material": "brick"},
-        {"mass_per_area": 231.0, "plateau_height": 37.0},
-        {"mass_per_area": 231.0, "plateau_height": 37.0, "frequency_ratio": 1.0},
-        {"mass_per_area": -1.0, "plateau_height": 37.0, "frequency_ratio": 4.5},
-        {"mass_per_area": 231.0, "plateau_height": 0.0, "frequency_ratio": 4.5},
+        (
+            {"material": "granite", "thickness_mm": 100.0},
+            "'material' must be one of",
+        ),
+        ({"material": "brick"}, "give 'thickness_mm' with 'material'"),
+        (
+            {"mass_per_area": 231.0, "plateau_height": 37.0},
+            "the plateau construction needs",
+        ),
+        (
+            {"mass_per_area": 231.0, "plateau_height": 37.0, "frequency_ratio": 1.0},
+            "'frequency_ratio' must be greater than",
+        ),
+        (
+            {"mass_per_area": -1.0, "plateau_height": 37.0, "frequency_ratio": 4.5},
+            "'mass_per_area' must be positive",
+        ),
+        (
+            {"mass_per_area": 231.0, "plateau_height": 0.0, "frequency_ratio": 4.5},
+            "'plateau_height' must be positive",
+        ),
     ],
 )
-def test_plateau_validation(kwargs: dict[str, object]) -> None:
-
-    with pytest.raises(ValueError):
+def test_plateau_validation(kwargs: dict[str, object], match: str) -> None:
+    # Each case must reach its own guard, so the expected message travels with
+    # the kwargs that provoke it.
+    with pytest.raises(ValueError, match=match):
         building.plateau_transmission_loss(P311_BANDS, **kwargs)  # type: ignore[arg-type]
 
 
@@ -572,7 +588,7 @@ def test_negative_field_correction_rejected() -> None:
 
 
 def test_unknown_coincidence_model_rejected() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'coincidence_model' must be one of"):
         building.single_panel_transmission_loss(
             BANDS, 15.0, critical_frequency=2000.0, coincidence_model="watters"
         )

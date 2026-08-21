@@ -391,7 +391,7 @@ def test_info_answers_a_giant_rf64_from_its_headers_alone(
     assert bext.max_short_term_loudness == pytest.approx(-21.10)
 
     # The proof that no sample was touched: touching them is impossible.
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="truncated recording"):
         read(path)
 
 

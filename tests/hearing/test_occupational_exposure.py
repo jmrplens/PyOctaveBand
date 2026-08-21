@@ -306,14 +306,14 @@ def test_job_based_high_spread_triggers_c4_advisory():
 
 
 def test_task_based_requires_tasks():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="At least one task"):
         task_based_exposure([])
 
 
 def test_task_rejects_nonpositive_duration():
     # Task.__post_init__ is what rejects it: task_based_exposure never gets to
     # see an object with a non-positive duration.
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'duration_hours' must be positive"):
         Task(samples=(85.0,), duration_hours=0.0)
 
 
@@ -330,7 +330,7 @@ def test_job_based_rejects_nonpositive_sample_duration():
 
 
 def test_job_based_requires_two_samples():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="At least two samples"):
         job_based_exposure([85.0], 8.0)
 
 
@@ -338,7 +338,7 @@ def test_duration_range_order_validated():
     reversed_range = Task(
         samples=(85.0, 85.0), duration_hours=4.0, duration_range=(6.0, 4.0)
     )
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"duration_range must be \(T_min, T_max\)"):
         task_based_exposure([reversed_range])
 
 

@@ -453,7 +453,7 @@ def test_sound_power_level_a_single_band_equals_level() -> None:
 def test_too_few_positions_raises() -> None:
     """Engineering hemisphere needs >= 10 positions (ISO 3744 clause 8.1.1)."""
     five_positions = np.full((5, 1), 60.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="microphone positions"):
         emission.sound_power_pressure(five_positions, "hemisphere", radius=2.0)
 
 
@@ -467,13 +467,13 @@ def test_survey_allows_four_positions() -> None:
 
 def test_missing_radius_raises() -> None:
     levels = np.full((10, 1), 60.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'radius' is required"):
         emission.sound_power_pressure(levels, "hemisphere")
 
 
 def test_invalid_surface_raises() -> None:
     levels = np.full((10, 1), 60.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'surface' must be"):
         emission.sound_power_pressure(levels, "sphere", radius=2.0)
 
 

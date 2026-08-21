@@ -149,7 +149,7 @@ class TestDelanyBazley:
             delany_bazley(f, 10000.0, coefficients="nope")
         with pytest.raises(ValueError, match="8 values"):
             delany_bazley(f, 10000.0, coefficients=(1.0, 2.0))
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="'flow_resistivity' must be positive"):
             delany_bazley(f, -1.0)
 
 

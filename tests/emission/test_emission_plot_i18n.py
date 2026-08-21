@@ -43,5 +43,5 @@ def test_intensity_class_es() -> None:
     assert "Mínimo clase 1" in _labels(ax)
     assert "Región de aceptación clase 1" in _labels(ax)
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")

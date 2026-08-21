@@ -199,7 +199,8 @@ def generate_elastic_halfspace_waves(output_dir: str) -> None:
     )
 
     _fig, ax = plt.subplots(figsize=(9.5, 5.4))
-    assert res.snapshots is not None and res.snapshot_times is not None
+    assert res.snapshots is not None
+    assert res.snapshot_times is not None
     vmax = 0.18 * float(np.abs(res.snapshots[-1]).max())
     res.plot(kind="snapshot", frame=-1, ax=ax, vmin=-vmax, vmax=vmax)
 

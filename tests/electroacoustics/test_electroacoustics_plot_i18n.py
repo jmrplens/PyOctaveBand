@@ -44,7 +44,7 @@ def test_harmonic_distortion_es() -> None:
     assert ax.get_ylabel() == "Nivel respecto al fundamental [dB]"
     assert ax.get_xlabel().startswith("Orden del armónico")
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -77,7 +77,7 @@ def test_swept_sine_distortion_es() -> None:
     single = res.plot(ax=ext, language="es")
     assert single.get_title() == "THD de barrido sinusoidal (Farina / Novak)"
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -91,7 +91,7 @@ def test_feedback_stability_es() -> None:
     unstable = ph.electroacoustics.feedback_stability(0.0, 80.0, 80.0)
     assert "inestable" in unstable.plot(language="es").get_title()
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -102,7 +102,7 @@ def test_sound_reinforcement_geometry_es() -> None:
     assert "Lazo de realimentación" in ax.get_title()
     assert "Camino de realimentación" in _labels(ax)
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         ph.electroacoustics.plot_sound_reinforcement_geometry(
             0.3, 4.0, 12.0, language="xx"
         )
@@ -114,7 +114,7 @@ def test_piston_impedance_es() -> None:
     assert "pistón circular con pantalla" in ax.get_title()
     assert "Impedancia de radiación normalizada" in ax.get_ylabel()
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -124,7 +124,7 @@ def test_piston_directivity_es() -> None:
     assert ax.name == "polar"
     assert ax.get_title() == "Directividad de un pistón circular con pantalla"
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -194,9 +194,9 @@ def test_loudspeaker_characteristics_es() -> None:
         "Nivel de presión acústica [dB]"
     )
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="unknown quantity"):
         res.plot(quantity="bogus")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -219,7 +219,7 @@ def test_microphone_characteristics_es() -> None:
         "Nivel de presión acústica [dB]"
     )
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="unknown quantity"):
         res.plot(quantity="bogus")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")

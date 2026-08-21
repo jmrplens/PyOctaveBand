@@ -171,7 +171,9 @@ _CASES = [
 ]
 
 
-@pytest.mark.parametrize("name, build, spanish", _CASES, ids=[c[0] for c in _CASES])
+@pytest.mark.parametrize(
+    ("name", "build", "spanish"), _CASES, ids=[c[0] for c in _CASES]
+)
 def test_plot_spanish_labels(name: str, build, spanish: str) -> None:
     result = build()
     ax = result.plot(language="es")
@@ -179,7 +181,9 @@ def test_plot_spanish_labels(name: str, build, spanish: str) -> None:
     plt.close("all")
 
 
-@pytest.mark.parametrize("name, build, spanish", _CASES, ids=[c[0] for c in _CASES])
+@pytest.mark.parametrize(
+    ("name", "build", "spanish"), _CASES, ids=[c[0] for c in _CASES]
+)
 def test_plot_rejects_unknown_language(name: str, build, spanish: str) -> None:
     result = build()
     with pytest.raises(ValueError, match="Unknown language"):

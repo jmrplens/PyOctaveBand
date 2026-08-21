@@ -299,27 +299,27 @@ def test_result_structure(
 
 def test_invalid_field_raises() -> None:
     sig = _tone(1000.0, 60.0, 1.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="field must be"):
         psychoacoustics.fluctuation_strength_ecma(sig, FS, field="bogus")
 
 
 def test_empty_signal_raises() -> None:
     empty = np.array([])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="signal must not be empty"):
         psychoacoustics.fluctuation_strength_ecma(empty, FS)
 
 
 @pytest.mark.parametrize("bad_fs", [0.0, -48000.0, float("nan"), float("inf")])
 def test_invalid_fs_raises(bad_fs: float) -> None:
     sig = _tone(1000.0, 60.0, 1.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'fs' must be positive"):
         psychoacoustics.fluctuation_strength_ecma(sig, bad_fs)
 
 
 def test_non_finite_signal_raises() -> None:
     sig = _tone(1000.0, 60.0, 1.0)
     sig[100] = np.nan
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'signal' must be finite"):
         psychoacoustics.fluctuation_strength_ecma(sig, FS)
 
 

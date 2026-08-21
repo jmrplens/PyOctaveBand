@@ -278,5 +278,5 @@ def test_report_rejects_band_count_mismatch(tmp_path) -> None:
     )
     bad = dataclasses.replace(res, rating=short)
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="matching per-band lengths"):
         bad.report(out)

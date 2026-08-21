@@ -255,11 +255,11 @@ def test_plot_on_supplied_axes_draws_the_ladder_only() -> None:
 
 
 def test_other_validation_errors() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'max_frequency' must be positive"):
         room.room_modes(LONG_ROOM, max_frequency=0.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'speed_of_sound' must be positive"):
         room.room_modes(LONG_ROOM, speed_of_sound=-1.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'reverberation_time' must be positive"):
         room.room_modes(LONG_ROOM, reverberation_time=0.0)
     with pytest.raises(ValueError, match="non-negative integers"):
         room.room_mode_frequency((1, -1, 0), LONG_ROOM)

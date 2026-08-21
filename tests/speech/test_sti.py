@@ -72,7 +72,7 @@ def _analytic_decay_sti(t60: float) -> float:
 
 
 @pytest.mark.parametrize(
-    "bands, expected",
+    ("bands", "expected"),
     [
         ((0, 1), 0.127),  # 125 + 250 Hz
         ((1, 2), 0.279),  # 250 + 500 Hz
@@ -96,7 +96,7 @@ def test_weighting_factor_pairs(bands, expected):
 
 
 @pytest.mark.parametrize(
-    "m, expected_sti",
+    ("m", "expected_sti"),
     [
         (0.0, 0.0),
         (0.059351, 0.1),
@@ -210,7 +210,7 @@ def test_level_corrections_reduce_sti():
 
 
 @pytest.mark.parametrize(
-    "level, expected",
+    ("level", "expected"),
     [(60.0, -35.0), (65.0, -29.9), (80.0, -19.8), (100.0, -10.0)],
 )
 def test_masking_amdb_control_points(level, expected):

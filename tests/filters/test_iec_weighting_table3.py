@@ -58,7 +58,7 @@ _CLASS1_MISSES: dict[tuple[str, int], set[float]] = {
 
 
 @pytest.mark.parametrize("fs", [16000, 32000, 48000, 96000])
-@pytest.mark.parametrize("curve,column", [("A", 1), ("C", 2)])
+@pytest.mark.parametrize(("curve", "column"), [("A", 1), ("C", 2)])
 def test_weighting_within_class1_limits_table3(
     fs: int, curve: str, column: int
 ) -> None:

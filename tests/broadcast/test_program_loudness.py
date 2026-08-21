@@ -212,7 +212,7 @@ def test_k_weighting_response_plot() -> None:
         line.get_color() == "magenta" and line.get_linewidth() == 3.0
         for line in styled.get_lines()
     )
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="fr")
     plt.close("all")
 

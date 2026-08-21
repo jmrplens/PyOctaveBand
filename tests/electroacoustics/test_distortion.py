@@ -62,7 +62,7 @@ def test_nth_order_harmonic_distortion() -> None:
 
 def test_harmonic_distortion_rejects_order_below_two() -> None:
     tone = _tone(1000.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'order' must be at least"):
         electroacoustics.harmonic_distortion(tone, FS, fundamental=1000.0, order=1)
 
 
@@ -126,7 +126,7 @@ def test_thd_plus_noise_pure_tone_is_tiny() -> None:
 
 def test_thd_plus_noise_rejects_q_out_of_range() -> None:
     tone = _tone(1000.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'notch_q' must be within the AES17 range"):
         electroacoustics.thd_plus_noise(tone, FS, 1000.0, notch_q=5.0)
 
 
@@ -141,14 +141,14 @@ def test_weighted_thd_attenuates_low_harmonics() -> None:
 
 def test_weighted_thd_rejects_bad_notch_q() -> None:
     tone = _tone(1000.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'notch_q' must be within the AES17 range"):
         electroacoustics.weighted_thd(tone, FS, 1000.0, notch_q=5.0)
 
 
 def test_thd_plus_noise_rejects_fundamental_above_nyquist() -> None:
     # A fundamental at/above fs/2 cannot be notched (iirnotch would fail).
     tone = _tone(1000.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'fundamental' must be below the Nyquist"):
         electroacoustics.thd_plus_noise(tone, FS, FS / 2.0)
 
 
@@ -234,7 +234,7 @@ def test_modulation_distortion_plot_marks_carrier_and_sidebands() -> None:
     ax_es = res.plot(language="es")
     assert ax_es.get_ylabel() == "Nivel respecto a la portadora [dB]"
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
     # A hand-built result without the spectral fields cannot be plotted.
     bare = electroacoustics.ModulationDistortionResult(d2=0.1, d3=0.05, smpte=0.08)
@@ -327,13 +327,13 @@ def test_difference_frequency_dc_offset_not_counted() -> None:
 
 def test_difference_frequency_rejects_bad_args() -> None:
     tone = _tone(1000.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'f1' must be lower than 'f2'"):
         electroacoustics.difference_frequency_distortion(tone, FS, f1=2000.0, f2=1000.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'order' must be"):
         electroacoustics.difference_frequency_distortion(
             tone, FS, f1=1000.0, f2=2000.0, order=4
         )
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'f1' must be lower than 'f2'"):
         electroacoustics.total_difference_frequency_distortion(tone, FS, 2000.0, 1000.0)
 
 
@@ -387,21 +387,21 @@ def test_harmonic_analysis_bundle_and_plot() -> None:
 )
 def test_rejects_non_finite_signal(func) -> None:  # type: ignore[no-untyped-def]
     bad = np.array([np.nan] * 100)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'signal' must be finite"):
         func(bad, FS)
 
 
 def test_rejects_bad_fs_and_kind() -> None:
     tone = _tone(1000.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'fs' must be a positive"):
         electroacoustics.thd(tone, 0.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'kind' must be"):
         electroacoustics.thd(tone, FS, 1000.0, kind="X")  # type: ignore[arg-type]
 
 
 def test_rejects_too_short_signal() -> None:
     too_short = np.array([0.0, 1.0, 0.0])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'signal' must contain at least"):
         electroacoustics.thd(too_short, FS)
 
 
@@ -459,7 +459,7 @@ def test_itu_r_468_weighting_table_values() -> None:
     assert grid[int(np.argmax(curve))] == pytest.approx(6300.0, rel=1e-3)
     # DC blocks completely; negative/non-finite frequencies are rejected.
     assert electroacoustics.itu_r_468_weighting([0.0])[0] == -np.inf
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'frequencies' must be"):
         electroacoustics.itu_r_468_weighting([-100.0])
 
 
@@ -484,7 +484,7 @@ def test_weighted_thd_468_emphasises_6khz_products() -> None:
     assert w468 == pytest.approx(0.01 * 10.0 ** (12.2 / 20.0), rel=0.02)
     w_a = electroacoustics.weighted_thd(x, FS, 100.0, weighting="A")
     assert w468 / w_a == pytest.approx(10.0 ** (12.2 / 20.0), rel=0.05)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'weighting' must be"):
         electroacoustics.weighted_thd(x, FS, 100.0, weighting="B")  # type: ignore[arg-type]
 
 
@@ -636,9 +636,9 @@ def test_dynamic_range_full_scale_reference() -> None:
 
 def test_dynamic_range_rejects_bad_notch_q_and_full_scale() -> None:
     sig = _dbfs_sine_amplitude(-60.0) * _tone(997.0) + 1e-3 * _tone(2000.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'notch_q' must be within the AES17 range"):
         electroacoustics.dynamic_range(sig, FS, 997.0, notch_q=0.5)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'full_scale' must be a positive"):
         electroacoustics.dynamic_range(sig, FS, 997.0, full_scale=0.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'full_scale' must be a positive"):
         electroacoustics.idle_channel_noise(sig, FS, full_scale=-1.0)

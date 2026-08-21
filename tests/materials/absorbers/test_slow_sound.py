@@ -312,7 +312,7 @@ def test_panel_accepts_multiple_resonators() -> None:
 # Critical coupling: the analytic perfect-absorption anchor
 # ---------------------------------------------------------------------------
 @pytest.mark.parametrize(
-    "f0,angle", [(250.0, 0.0), (300.0, 0.0), (350.0, np.radians(20.0))]
+    ("f0", "angle"), [(250.0, 0.0), (300.0, 0.0), (350.0, np.radians(20.0))]
 )
 def test_critical_coupling_gives_perfect_absorption(f0: float, angle: float) -> None:
     """The designed geometry yields alpha ~ 1 at the design frequency."""
@@ -378,13 +378,13 @@ def test_critical_coupling_warns_when_infeasible() -> None:
 def test_invalid_inputs() -> None:
     res = _base_resonator()
     f = np.array([300.0])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="at least one resonator"):
         slit_helmholtz_absorber(f, [], slit_height=1e-3, lattice_step=3e-2, period=5e-2)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'slit_height' must not exceed 'period'"):
         slit_helmholtz_absorber(
             f, res, slit_height=6e-2, lattice_step=3e-2, period=5e-2
         )
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'angle' must satisfy"):
         slit_helmholtz_absorber(
             f, res, slit_height=1e-3, lattice_step=3e-2, period=5e-2, angle=np.pi / 2.0
         )

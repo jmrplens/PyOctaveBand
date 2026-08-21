@@ -334,7 +334,7 @@ def test_table_g1_direct_path_over_the_whole_range(impact) -> None:
     assert by_label["Dd"] == pytest.approx(ref.ISO12354_ANNEX_G1_PATHS["Dd"], abs=TOL)
 
 
-@pytest.mark.parametrize("label", ("Df1", "Df2", "Df3", "Df4"))
+@pytest.mark.parametrize("label", ["Df1", "Df2", "Df3", "Df4"])
 def test_table_g1_flanking_paths_from_100_hz(impact, label: str) -> None:
     """Table G.1, per-element flanking impact levels, 100 Hz to 5 kHz.
 
@@ -821,16 +821,25 @@ def test_rating_is_none_when_the_bands_do_not_cover_iso717() -> None:
 
 
 @pytest.mark.parametrize(
-    "kwargs",
+    ("kwargs", "message"),
     [
-        {"critical_frequency": -1.0, "length1": 4.0, "length2": 2.75},
-        {"critical_frequency": 100.0, "length1": 0.0, "length2": 2.75},
-        {"critical_frequency": 100.0, "length1": 4.0, "length2": float("nan")},
+        (
+            {"critical_frequency": -1.0, "length1": 4.0, "length2": 2.75},
+            "'critical_frequency' must be positive",
+        ),
+        (
+            {"critical_frequency": 100.0, "length1": 0.0, "length2": 2.75},
+            "'length1' must be positive",
+        ),
+        (
+            {"critical_frequency": 100.0, "length1": 4.0, "length2": float("nan")},
+            "'length2' must be positive",
+        ),
     ],
 )
-def test_radiation_factor_rejects_invalid_geometry(kwargs: dict) -> None:
+def test_radiation_factor_rejects_invalid_geometry(kwargs: dict, message: str) -> None:
     """Non-positive or non-finite geometry is refused."""
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=message):
         building.bending_radiation_factor(BANDS, **kwargs)
 
 
@@ -864,7 +873,7 @@ def test_band_count_mismatch_is_reported(situ: dict) -> None:
 # --------------------------------------------------------------------------
 # .plot() coverage
 # --------------------------------------------------------------------------
-@pytest.mark.parametrize("language", ("en", "es"))
+@pytest.mark.parametrize("language", ["en", "es"])
 def test_detailed_airborne_plot_draws_bars_and_the_total(airborne, language) -> None:
     """The airborne renderer stacks one bar per path and overlays ``R'``."""
     plt = pytest.importorskip("matplotlib.pyplot")
@@ -877,7 +886,7 @@ def test_detailed_airborne_plot_draws_bars_and_the_total(airborne, language) -> 
     plt.close(ax.get_figure())
 
 
-@pytest.mark.parametrize("language", ("en", "es"))
+@pytest.mark.parametrize("language", ["en", "es"])
 def test_detailed_impact_plot_draws_bars_and_the_total(impact, language) -> None:
     """The impact renderer is the same figure with ``L'n`` overlaid."""
     plt = pytest.importorskip("matplotlib.pyplot")
@@ -889,7 +898,7 @@ def test_detailed_impact_plot_draws_bars_and_the_total(impact, language) -> None
     plt.close(ax.get_figure())
 
 
-@pytest.mark.parametrize("language", ("en", "es"))
+@pytest.mark.parametrize("language", ["en", "es"])
 def test_in_situ_element_plot_draws_both_spectra(situ: dict, language) -> None:
     """The element renderer draws ``Rsitu`` and ``Ln,situ``."""
     plt = pytest.importorskip("matplotlib.pyplot")
@@ -902,7 +911,7 @@ def test_in_situ_element_plot_draws_both_spectra(situ: dict, language) -> None:
 def test_plot_rejects_an_unknown_language(airborne) -> None:
     """Only the languages the renderers translate are accepted."""
     pytest.importorskip("matplotlib.pyplot")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         airborne.plot(language="fr")
 
 

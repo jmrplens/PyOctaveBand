@@ -230,7 +230,7 @@ def test_reference_conditions_reduce_to_table_f1(category: str) -> None:
     )
 
 
-@pytest.mark.parametrize("category", ("1", "2", "3"))
+@pytest.mark.parametrize("category", ["1", "2", "3"])
 def test_rolling_speed_law_is_exactly_logarithmic(category: str) -> None:
     """Doubling the speed adds exactly ``B_R lg 2`` to the rolling noise."""
     low = road_rolling_noise(category, 45.0)

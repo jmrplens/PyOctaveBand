@@ -37,7 +37,7 @@ def test_room_constant_domain() -> None:
         room.room_constant(100.0, 1.0)
     with pytest.raises(ValueError, match="strictly in"):
         room.room_constant(100.0, 0.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'surface_area' must be positive"):
         room.room_constant(-1.0, 0.2)
 
 
@@ -155,16 +155,16 @@ def test_steady_state_field_custom_distances() -> None:
 
 
 def test_steady_field_validation() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'distance' must be positive"):
         room.steady_state_spl(90.0, -1.0, 25.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'room_constant' must be positive"):
         room.steady_state_spl(90.0, 1.0, -25.0)
     with pytest.raises(ValueError, match="source_model"):
         room.steady_state_spl(90.0, 1.0, 25.0, source_model="constant_intensity")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'reverberation_time' must be positive"):
         room.schroeder_frequency(-1.0, 200.0)
     empty = np.array([])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'distances' must be a non-empty"):
         room.steady_state_field(90.0, 100.0, 0.2, distances=empty)
 
 

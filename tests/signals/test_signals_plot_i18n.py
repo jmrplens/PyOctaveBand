@@ -53,7 +53,7 @@ def test_spectral_density_es_and_bad_language() -> None:
     assert "Densidad espectral de Welch" in ax.get_title()
     assert ax.get_xlabel() == "Frecuencia [Hz]"
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -64,7 +64,7 @@ def test_multitaper_psd_es_and_bad_language() -> None:
     assert ax.get_xlabel() == "Frecuencia [Hz]"
     assert "de confianza" in _labels(ax)
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -93,7 +93,7 @@ def test_spectrogram_es() -> None:
     assert ax.get_xlabel() == "Tiempo [s]"
     assert ax.get_ylabel() == "Frecuencia [Hz]"
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -103,7 +103,7 @@ def test_zoom_fft_es() -> None:
     assert ax.get_title() == "FFT con zoom (Bendat y Piersol 11.5.4)"
     assert ax.get_ylabel() == "Espectro de potencia [dB]"
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -113,7 +113,7 @@ def test_correlation_es() -> None:
     assert ax.get_title() == "Estimación de autocorrelación (Bendat y Piersol)"
     assert ax.get_xlabel() == "Retardo [s]"
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -149,7 +149,7 @@ def test_aligned_impulse_response_es() -> None:
     assert "Alineación de la respuesta al impulso" in ax.get_title()
     assert "RI de referencia" in _labels(ax)
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -173,7 +173,7 @@ def test_cepstrum_es() -> None:
     ax = res.plot(language="es")
     assert "Cepstro de potencia" in _titles(ax)
     assert "Quefrencia [ms]" in _labels(ax)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
     plt.close("all")
 
@@ -212,7 +212,7 @@ def test_tone_burst_es_and_bad_language() -> None:
     assert ax.get_xlabel() == "Tiempo [s]"
     assert "Envolvente de conmutación" in _labels(ax)
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -226,7 +226,7 @@ def test_resampled_signal_es_and_bad_language() -> None:
     assert "Filtro antisolapamiento" in _labels(ax)
     assert "Borde de la banda de paso" in _labels(ax)
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -237,7 +237,7 @@ def test_window_metrics_es_and_bad_language() -> None:
     assert "Pérdida de festoneado" in _labels(axes)
     assert "bins de la DFT" in _labels(axes)
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -254,5 +254,5 @@ def test_inverse_filter_es() -> None:
     assert "Inversión regularizada (Kirkeby)" in ax.get_title()
     assert "Banda ecualizada" in _labels(ax)
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")

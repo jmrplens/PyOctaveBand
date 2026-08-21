@@ -66,7 +66,7 @@ def test_resample_and_stateful():
 
     resampling_design = FilterDesign(resample=True)
     stateful_blocks = BlockProcessing(stateful=True)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Resampling and stateful"):
         OctaveFilterBank(
             48000,
             design=resampling_design,

@@ -54,19 +54,19 @@ def test_scalar_checks() -> None:
 
 
 def test_out_of_range_frequency_raises() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'frequency' is not an IEC 61265 tabulated"):
         aircraft.verify_aircraft_noise_system(directional={20.0: {90: 0.5}})
 
 
 def test_out_of_range_angle_raises() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'angle' must lie in"):
         aircraft.verify_aircraft_noise_system(directional={4000.0: {0.0: 0.5}})
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'angle' must lie in"):
         aircraft.verify_aircraft_noise_system(directional={4000.0: {160.0: 0.5}})
 
 
 def test_linearity_rejects_unknown_key() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="linearity keys must be"):
         aircraft.verify_aircraft_noise_system(linearity={"refernce": 0.3})
 
 

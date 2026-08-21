@@ -319,13 +319,13 @@ def test_rejects_bad_input() -> None:
     two_dimensional = np.zeros((2, 100))
     silent = np.zeros(100)
     decaying = exponential_ir(1.0, 1.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="impulse response must be one-dimensional"):
         room.room_parameters(two_dimensional, FS)  # 2D
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'ir' is silent"):
         room.room_parameters(silent, FS)  # silent
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'fs' must be positive"):
         room.room_parameters(decaying, 0)  # bad fs
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'ir' is silent"):
         room.decay_curve(silent, FS)  # silent
 
 

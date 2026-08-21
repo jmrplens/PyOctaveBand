@@ -167,6 +167,12 @@ select = [
     "D2", "D301",           # docstring shape: where the summary sits and how
                             # quotes and backslashes are spelled. Shape only;
                             # no rule here rewords prose.
+    "PT",                   # a test that expects an error says which one. Every
+                            # `pytest.raises` names a fragment of the message it
+                            # waits for, and the fragment is the part that does
+                            # not move: the parameter it is about, not the
+                            # sentence around it, not a bound, not a list of
+                            # allowed values, not wording numpy owns.
 ]
 ignore = [
     # TC006 quotes the first argument of `typing.cast`, which that function
@@ -203,10 +209,6 @@ ignore = [
 ]
 # Selected next, in their own review, because each is a change to code rather
 # than to its shape and the diff has to be readable to be checked:
-#   PT    (295) pytest idiom. 241 of them are `pytest.raises` without `match=`,
-#               and the habit here is already the other way: 1755 of the 2065
-#               `pytest.raises` in the suite do pass `match=`. These are the
-#               stragglers, not a style.
 #   PTH   (158) pathlib over os.path.
 #   PERF   (34) manual loops that build a list.
 
