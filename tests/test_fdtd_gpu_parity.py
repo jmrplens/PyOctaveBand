@@ -51,6 +51,30 @@ def _cupy_or_none() -> Any:
 
 _CUPY = _cupy_or_none()
 
+
+def _remote_or_none() -> Any:
+    """The configured GPU host when it answers, else None.
+
+    A CUDA card is not the only way to reach one. ``fdtd_gpu_remote`` already
+    ships a job to a machine that has one, and that is the path the animation
+    renders take, so the same parity can be proved on a workstation with no
+    GPU of its own: what is under test is the engine, not the local hardware.
+    """
+    fdtd_gpu_remote.load_env()
+    config = fdtd_gpu_remote.RemoteConfig.from_env()
+    if not config.host or not fdtd_gpu_remote.remote_available(config):
+        return None
+    return config
+
+
+_REMOTE = _remote_or_none()
+
+#: Skip mark for the cases that need the remote GPU.
+_needs_remote = pytest.mark.skipif(
+    _REMOTE is None,
+    reason="no PHONO_GPU_HOST answers (set it in .env to run the GPU parity here)",
+)
+
 BACKENDS = [
     pytest.param(np, 1e-12, id="numpy"),
     pytest.param(
@@ -66,6 +90,16 @@ BACKENDS = [
 _NY, _NX = 60, 80
 _DX = 0.01
 _STEPS = 200
+
+#: Relative to the run peak. The GPU reassociates the update sums, so the two
+#: engines agree to ULP scale rather than bit for bit, as the local `cupy`
+#: parameter above already allows.
+_GPU_TOL = 1e-10
+
+#: One remote job is an SSH round trip plus a Docker start, measured at about
+#: six seconds for these grids. The ceiling is generous enough that a cold
+#: image pull does not turn a slow run into a red one.
+_REMOTE_TIMEOUT_S = 180.0
 
 
 def _scenarios() -> dict[str, dict[str, Any]]:
@@ -461,3 +495,51 @@ def test_load_env_real_environment_wins(
     assert values == {"PHONO_GPU_HOST": "file-host", "PHONO_GPU_NAME": "lab GPU"}
     assert os.environ["PHONO_GPU_HOST"] == "env-host"  # real env wins
     assert os.environ["PHONO_GPU_NAME"] == "lab GPU"  # quotes stripped
+
+
+def _remote_frames(
+    kwargs: dict[str, Any], wave: dict[str, Any], direction: str
+) -> list[np.ndarray]:
+    """The same scenario, stepped on the remote GPU, frame by frame.
+
+    ``run_remote`` rather than ``submit``: submitting falls back to a local
+    NumPy run when anything goes wrong, which for a render is the right call
+    and for a test is the wrong one. A silent fallback here would compare
+    NumPy against NumPy and pass while proving nothing about the GPU.
+    """
+    c, rest = _split_c(kwargs)
+    job = fdtd_gpu_remote.build_job(
+        c,
+        _DX,
+        shape=(_NY, _NX),
+        steps=_STEPS,
+        sample_steps=[50, 100, 150, 200],
+        plane_waves=[{"direction": direction, **wave}],
+        **rest,
+    )
+    result = fdtd_gpu_remote.run_remote(job, _REMOTE, timeout=_REMOTE_TIMEOUT_S)
+    # The backend the job actually ran on is the whole point of the exercise:
+    # the runner picks NumPy when CuPy is missing on the far side, and that
+    # result would satisfy every tolerance below without touching a GPU.
+    assert result["backend"] == "cupy"
+    assert int(result["cells"]) == _NY * _NX
+    return list(np.asarray(result["frames"]))
+
+
+@_needs_remote
+@pytest.mark.parametrize("direction", list(_WAVES))
+def test_plane_wave_directions_match_library_on_the_remote_gpu(direction: str) -> None:
+    """A plane packet in each direction reproduces the library on the GPU."""
+    wave = _WAVES[direction]
+    fields = _reference({}, wave, direction)
+    _assert_parity(fields, _remote_frames({}, wave, direction), _GPU_TOL)
+
+
+@_needs_remote
+@pytest.mark.parametrize("scenario", list(_scenarios()))
+def test_scenarios_match_library_on_the_remote_gpu(scenario: str) -> None:
+    """Each engine feature reproduces the library on the GPU."""
+    kwargs = _scenarios()[scenario]
+    wave = {"center": 0.15, "width": 0.06, "wavelength": 0.09}
+    fields = _reference(kwargs, wave, "down")
+    _assert_parity(fields, _remote_frames(kwargs, wave, "down"), _GPU_TOL)
