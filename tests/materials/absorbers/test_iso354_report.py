@@ -4,12 +4,15 @@
 The report is a rendering feature, so these tests assert only structural
 facts: a valid single-page PDF is written for a reverberation-room measurement,
 the displayed one-third-octave values match the closed-form ISO 354 oracle,
-the verbose detail table stays on one page, unknown engines are rejected, and
-XML specials in metadata do not break reportlab. Pixel or layout content is
-never inspected.
+the verbose detail table stays on one page, a hand-built result whose per-band
+columns disagree in length is rejected before anything is written, unknown
+engines are rejected, and XML specials in metadata do not break reportlab.
+Pixel or layout content is never inspected.
 """
 
 from __future__ import annotations
+
+from dataclasses import replace
 
 import pytest
 
@@ -186,6 +189,31 @@ def test_verbose_shows_areas_and_times_one_page(tmp_path) -> None:
     text = _text(str(out))
     assert "7.80" in text  # T1(500 Hz)
     assert "7.7" in text  # A2(500 Hz) = 7.677 m2 rounded to 0.1
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "t_empty",
+        "t_specimen",
+        "absorption_area_empty",
+        "absorption_area_with_specimen",
+    ],
+)
+def test_verbose_rejects_short_band_column(field: str, tmp_path) -> None:
+    """Every column of the verbose table must be as long as ``frequencies``.
+
+    ``SoundAbsorptionMeasurement`` is a frozen dataclass with no validation, so
+    a hand-built result can carry a per-band column one band short. The detail
+    table would then be silently truncated, so the renderer names the offending
+    column and raises before any PDF is written.
+    """
+    result = _result()
+    short = replace(result, **{field: getattr(result, field)[:-1]})
+    out = tmp_path / "iso354_short.pdf"
+    with pytest.raises(ValueError, match=field):
+        short.report(str(out), metadata=_metadata(), verbose=True)
+    assert not out.exists()
 
 
 def test_metadata_xml_specials_do_not_break(tmp_path) -> None:

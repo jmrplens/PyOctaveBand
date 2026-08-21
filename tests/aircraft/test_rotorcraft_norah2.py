@@ -285,9 +285,11 @@ def _parse_his(path: pathlib.Path) -> tuple[dict, np.ndarray]:
                 "T2pnlt",
                 "I10db",
             ]
-            # Names the leading columns of the parsed header row; any further
-            # column of a .his variant stays unnamed.
-            header = dict(zip(keys, vals, strict=False))
+            # Every .his header of the public release carries exactly these
+            # thirteen metrics, in the committed extract and in the full
+            # archive alike, so a file that carries another count is a change
+            # of format worth failing on rather than absorbing.
+            header = dict(zip(keys, vals, strict=True))
             continue
         parts = line.split()
         if header is not None and len(parts) == 12:

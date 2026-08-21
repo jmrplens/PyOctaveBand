@@ -31,6 +31,7 @@ here rather than asserted:
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import numpy as np
@@ -213,6 +214,24 @@ def test_plot_draws_one_curve_per_absorption_plus_two_references() -> None:
     labels = [t.get_text() for t in ax.get_legend().get_texts()]
     assert any("Communication limit" in label for label in labels)
     assert "Simultaneous talkers" in ax.get_xlabel()
+    plt.close("all")
+
+
+def test_plot_rejects_fewer_absorption_areas_than_level_rows() -> None:
+    """The result is frozen but unchecked, so the plot enforces its own shape.
+
+    Nothing validates ``levels`` against ``absorption_areas`` at construction,
+    and a hand-built result with one area missing used to draw one curve fewer
+    in silence instead of saying so.
+    """
+    matplotlib = pytest.importorskip("matplotlib")
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    result = room.crowd_noise([20.0, 90.0, 190.0])
+    short = dataclasses.replace(result, absorption_areas=result.absorption_areas[:-1])
+    with pytest.raises(ValueError, match="absorption_areas"):
+        short.plot()
     plt.close("all")
 
 

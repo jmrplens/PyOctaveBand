@@ -342,3 +342,24 @@ def test_subset_spectrum_renders_missing_bands(tmp_path) -> None:
     _assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "—" in text  # the unmeasured low bands are shown as an em dash
+
+
+# --------------------------------------------------------------------------
+# Hand-built results with mismatched bands
+# --------------------------------------------------------------------------
+def test_verbose_rc_report_rejects_short_reference_curve(tmp_path) -> None:
+    """A verbose RC fiche refuses a reference curve shorter than the levels.
+
+    ``RCResult`` is a frozen dataclass without validation exported from a
+    public package, so a hand-built one can pair its measured levels with a
+    reference curve of another length; only the verbose columns read the two
+    band by band, and a short curve used to render a silently short table.
+    """
+    from dataclasses import replace
+
+    result = _rc_result()
+    mismatched = replace(result, reference_curve=result.reference_curve[:-1])
+    out = tmp_path / "rc_short_reference.pdf"
+    with pytest.raises(ValueError, match="reference_curve"):
+        mismatched.report(str(out), metadata=_full_metadata(), verbose=True)
+    assert not out.exists()  # the guard fires before the fiche is written

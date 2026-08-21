@@ -100,16 +100,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Changed
 
 - Every `zip()` says whether its inputs must be the same length. `B905` is
-  selected, and the 162 calls it found were read one at a time: 157 pair
-  arrays that are equal by construction and now say `strict=True`, and five
+  selected, and the 162 calls it found were read one at a time: 158 pair
+  arrays that are equal by construction and now say `strict=True`, and four
   consume the shorter input on purpose and say `strict=False` with a line
-  saying what ends the loop. The five are worth naming, because they are the
+  saying what ends the loop. The four are worth naming, because they are the
   cases a blanket fix would have got wrong: two walk a palette against fewer
   paths than it holds, one walks the fixed seven-band STI table against
-  whatever the result carries, one walks a list of title sizes against the
-  same list offset by one, where the smallest size has no step below it, and
-  one names the leading columns of a rotorcraft `.his` header, leaving any
-  further column of a variant file unnamed.
+  whatever the result carries, and one walks a list of title sizes against
+  the same list offset by one, where the smallest size has no step below it.
 
   `strict=True` is not a formality: it turns a silent truncation into a
   `ValueError`, so it is only the truth where something upstream guarantees

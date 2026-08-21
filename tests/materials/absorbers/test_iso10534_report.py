@@ -21,6 +21,7 @@ alpha = 1 - 1/5 = 0.80 with |r| = 1/sqrt(5) = 0.45.
 
 from __future__ import annotations
 
+import dataclasses
 import re
 
 import pytest
@@ -132,6 +133,29 @@ def test_unknown_language_rejected(tmp_path) -> None:
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="Unknown language"):
         result.report(out, language="xx")
+
+
+@pytest.mark.parametrize("verbose", [False, True])
+@pytest.mark.parametrize(
+    "field", ["frequency", "absorption", "reflection", "normalized_impedance"]
+)
+def test_short_per_frequency_array_rejected(
+    field: str, verbose: bool, tmp_path
+) -> None:
+    """One short per-frequency array raises before the fiche is written.
+
+    ``ImpedanceTubeResult`` is a frozen dataclass with no validation, so a
+    caller can hand the renderer a result whose arrays disagree in length; the
+    value table would then be silently cut short, in the plain four-column
+    branch and in the verbose ``|r|`` branch alike. The renderer names the
+    field it needs of equal length and leaves no PDF behind.
+    """
+    result = _result()
+    ragged = dataclasses.replace(result, **{field: getattr(result, field)[:-1]})
+    out = tmp_path / "iso10534_ragged.pdf"
+    with pytest.raises(ValueError, match=field):
+        ragged.report(str(out), metadata=_metadata(), verbose=verbose)
+    assert not out.exists()
 
 
 def test_displayed_absorption_matches_oracle(tmp_path) -> None:
