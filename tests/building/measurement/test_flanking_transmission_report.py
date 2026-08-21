@@ -12,16 +12,14 @@ report tests.
 
 from __future__ import annotations
 
-import os
-
 import numpy as np
 import pytest
 
 pytest.importorskip("reportlab")
 
-from phonometry import ReportMetadata, building
+from report_assertions import assert_one_page
 
-_PDF_MAGIC = b"%PDF"
+from phonometry import ReportMetadata, building
 
 #: The ISO 10848 mandatory one-third-octave range (100 Hz to 5000 Hz, 18 bands).
 _FREQS = [
@@ -69,16 +67,6 @@ _DV = np.array(
         12.7,
     ]
 )
-
-
-def _assert_one_page(path: str) -> None:
-    """A written report is a non-empty single-page PDF."""
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -135,7 +123,7 @@ def test_kij_fiche_renders_single_number_and_basis(tmp_path) -> None:
     result = _kij_result()
     out = tmp_path / "kij.pdf"
     result.report(str(out), metadata=ReportMetadata(specimen="Rigid junction"))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = " ".join(_extract_text(str(out)).split())
     assert result.single_number is not None
     assert f"{result.single_number:.1f} dB" in text
@@ -150,7 +138,7 @@ def test_kij_fiche_verbose_adds_membership_column(tmp_path) -> None:
     """``verbose=True`` adds the single-number-membership column."""
     out = tmp_path / "kij_verbose.pdf"
     _kij_result().report(str(out), verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "In mean" in text
 
@@ -235,7 +223,7 @@ def test_kij_fiche_spanish(tmp_path) -> None:
 
     out = tmp_path / "kij_es.pdf"
     _kij_result().report(str(out), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Índice de reducción vibracional de la unión" in text
     assert re.search(r"\d+,\d", text)
@@ -251,7 +239,7 @@ def test_dnf_fiche_rating_and_basis(tmp_path) -> None:
     assert rating is not None
     out = tmp_path / "dnf.pdf"
     result.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     expected = f"{rating.rating} ({rating.c:+d}; {rating.ctr:+d}) dB"
     assert expected in text
@@ -265,7 +253,7 @@ def test_dnf_fiche_verbose_and_verdict(tmp_path) -> None:
     _dnf_result().report(
         str(out), metadata=ReportMetadata(requirement=55.0), verbose=True
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = " ".join(_extract_text(str(out)).split())
     assert "PASS" in text  # Dn,f,w = 60 dB >= 55 dB
     assert "Unfav. dev." in text
@@ -277,7 +265,7 @@ def test_dnf_fiche_part_selects_basis_designation(tmp_path) -> None:
     for part, designation in ((3, "ISO 10848-3:2006"), (4, "ISO 10848-4:2010")):
         out = tmp_path / f"dnf_part{part}.pdf"
         result.report(str(out), part=part)
-        _assert_one_page(str(out))
+        assert_one_page(str(out))
         text = _extract_text(str(out))
         assert designation in text
         assert "ISO 10848-2:2006" not in text
@@ -313,7 +301,7 @@ def test_lnf_fiche_rating_and_basis(tmp_path) -> None:
     assert rating is not None
     out = tmp_path / "lnf.pdf"
     result.report(str(out), metadata=ReportMetadata(requirement=55.0))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert f"{rating.rating} ({rating.ci:+d}) dB" in text
     assert "ISO 10848-2:2006" in text
@@ -325,7 +313,7 @@ def test_lnf_fiche_part_selects_basis_designation(tmp_path) -> None:
     """``part=4`` names ISO 10848-4:2010 on the Ln,f basis line."""
     out = tmp_path / "lnf_part4.pdf"
     _lnf_result().report(str(out), part=4)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "ISO 10848-4:2010" in text
     assert "ISO 10848-2:2006" not in text
@@ -335,7 +323,7 @@ def test_lnf_fiche_spanish(tmp_path) -> None:
     """``language="es"`` renders the Spanish Ln,f fiche."""
     out = tmp_path / "lnf_es.pdf"
     _lnf_result().report(str(out), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Aislamiento acústico por flancos a ruido de impactos" in text
     assert "ISO 10848-2:2006" in text  # the {standard} template is filled

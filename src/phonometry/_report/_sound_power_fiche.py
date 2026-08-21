@@ -362,10 +362,10 @@ def power_value_table(
     # A one-third-octave set groups by octave (a thin rule after every triplet),
     # as accredited sound-power tables print it; an octave set has no triplets.
     if fraction == _THIRD_OCTAVE_FRACTION:
-        for triplet_end in range(3, n, 3):
-            style_cmds.append(
-                ("LINEBELOW", (0, triplet_end), (-1, triplet_end), 0.4, thin)
-            )
+        style_cmds.extend(
+            ("LINEBELOW", (0, triplet_end), (-1, triplet_end), 0.4, thin)
+            for triplet_end in range(3, n, 3)
+        )
     table = Table(rows, colWidths=[w * mm for w in widths], repeatRows=1)
     table.setStyle(TableStyle(style_cmds))
     table.hAlign = "CENTER"
@@ -491,8 +491,9 @@ def render_sound_power_fiche(
         flow.extend(verdict_flow(text, passed, styles, language))
 
     basis_style_strip = measurement_basis_style()
-    for strip in copy.basis_strips:
-        flow.append(fiche_paragraph(strip, basis_style_strip))
+    flow.extend(
+        fiche_paragraph(strip, basis_style_strip) for strip in copy.basis_strips
+    )
     flow.extend(footer_flow(metadata, language, disclaimer=disclaimer))
 
     return build_document(path, flow, copy.title)

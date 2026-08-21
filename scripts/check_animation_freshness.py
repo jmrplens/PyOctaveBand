@@ -72,12 +72,12 @@ def main() -> int:
     current = fp.fingerprints(_SCRIPTS.parent)
     stamped = fp.read_manifest()
     problems: list[str] = []
+    problems.extend(
+        f"{clip}: stamped in {fp.MANIFEST.name} but no longer a registered "
+        "clip; delete the line if the clip is gone"
+        for clip in sorted(set(stamped) - set(current))
+    )
 
-    for clip in sorted(set(stamped) - set(current)):
-        problems.append(
-            f"{clip}: stamped in {fp.MANIFEST.name} but no longer a registered "
-            "clip; delete the line if the clip is gone"
-        )
     for clip in sorted(current):
         expected = outputs(clip)
         missing = [name for name in expected if not (IMAGES / name).exists()]

@@ -367,9 +367,11 @@ def _declaration_table(
         ("TOPPADDING", (0, footnote_row), (-1, footnote_row), 5),
     ]
     # Zebra striping on the value rows and a light rule under each.
-    for i in range(first_value_row, footnote_row):
-        if (i - first_value_row) % 2 == 1:
-            style.append(("BACKGROUND", (0, i), (-1, i), light))
+    style.extend(
+        ("BACKGROUND", (0, i), (-1, i), light)
+        for i in range(first_value_row, footnote_row)
+        if (i - first_value_row) % 2 == 1
+    )
     # A vertical rule separating the label column from the mode columns.
     style.append(("LINEAFTER", (0, 3), (0, footnote_row - 1), 0.4, accent))
     table.setStyle(TableStyle(style))

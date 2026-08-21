@@ -16,23 +16,12 @@ from __future__ import annotations
 
 import dataclasses
 import math
-import os
 
 import pytest
+from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.vibration import daily_vibration_exposure
-
-_PDF_MAGIC = b"%PDF"
-
-
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -75,7 +64,7 @@ def test_report_renders_annex_e3_numbers(tmp_path) -> None:
     out = tmp_path / "e3.pdf"
     returned = res.report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     # Vibration total values (a_hv) per operation.
     assert "4.60" in text
@@ -104,7 +93,7 @@ def test_verbose_adds_energy_share_column(tmp_path) -> None:
     res = _annex_e3_result()
     out = tmp_path / "verbose.pdf"
     res.report(str(out), verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     flat = "".join(_extract_text(str(out)).split())
     # Shares: 2.30^2/3.61^2 = 41 %, 2.12^2 = 35 %, 1.80^2 = 25 % (rounded).
     assert "41%" in flat
@@ -200,7 +189,7 @@ def test_whole_body_thresholds_and_basis(tmp_path) -> None:
     )
     out = tmp_path / "wbv.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "ISO 2631-1:1997" in text
     assert "0.50" in text  # EAV
@@ -248,7 +237,7 @@ def test_metadata_header_renders(tmp_path) -> None:
     )
     out = tmp_path / "meta.pdf"
     res.report(str(out), metadata=metadata)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Example forestry contractor" in text
     assert "Forestry worker (right hand)" in text
@@ -267,7 +256,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     res = _annex_e3_result()
     out = tmp_path / "es.pdf"
     res.report(str(out), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Evaluación de la exposición diaria a vibraciones" in text
     assert "Valor límite de exposición (ELV)" in text
@@ -344,7 +333,7 @@ def test_report_accepts_matching_per_operation_arrays(tmp_path) -> None:
     )
     out = tmp_path / "two_ops.pdf"
     two_ops.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "stripping" not in _extract_text(str(out))
 
 

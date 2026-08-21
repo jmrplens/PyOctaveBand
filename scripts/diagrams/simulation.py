@@ -437,9 +437,10 @@ def _d_elastic_fluid_solid(s: SVG, th: Theme) -> None:
     s.text(628, y_if + 74, "sediment 3500 / 2000", 11, th.muted, "start")
     s.circle(cx - 78, y_if - 92, 6.0, th.secondary)
     s.text(cx - 68, y_if - 96, "shot, 10 m up", 11, th.secondary, "start")
-    pts = []
-    for k in range(41):
-        pts.append(f"{cx - 46 + 2.7 * k:.1f} {y_if - 12 * math.sin(k * 0.9):.1f}")
+    pts = [
+        f"{cx - 46 + 2.7 * k:.1f} {y_if - 12 * math.sin(k * 0.9):.1f}"
+        for k in range(41)
+    ]
     s.path("M " + " L ".join(pts), stroke=th.accent, sw=2.2)
     for dy in (-34.0, 34.0):
         s.line(cx - 46, y_if + dy, cx + 62, y_if + dy, th.primary, 1.0, dash="3,4")

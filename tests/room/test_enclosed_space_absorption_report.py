@@ -23,9 +23,10 @@ pytest.importorskip("reportlab")
 pytest.importorskip("svglib")
 pytest.importorskip("pypdf")
 
+from report_assertions import assert_one_page
+
 from phonometry import ReportMetadata, room
 
-_PDF_MAGIC = b"%PDF"
 _VOLUME = 50.0
 _SURFACES = [
     (20.0, [0.05, 0.10, 0.20, 0.30, 0.40, 0.50, 0.55]),
@@ -65,14 +66,6 @@ def _metadata(**overrides) -> ReportMetadata:
     return ReportMetadata(**base)
 
 
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert len(PdfReader(path).pages) == 1
-
-
 def _text(path: str) -> str:
     from pypdf import PdfReader
 
@@ -85,19 +78,19 @@ def test_report_writes_one_page_pdf(tmp_path) -> None:
     out = tmp_path / "enclosed.pdf"
     returned = _result().report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_report_with_metadata_one_page(tmp_path) -> None:
     out = tmp_path / "enclosed_meta.pdf"
     _result().report(str(out), metadata=_metadata())
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_no_metadata_still_renders(tmp_path) -> None:
     out = tmp_path / "enclosed_bare.pdf"
     _result().report(str(out), metadata=None)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_unknown_engine_rejected(tmp_path) -> None:
@@ -158,7 +151,7 @@ def test_metadata_xml_specials_do_not_break(tmp_path) -> None:
     )
     out = tmp_path / "xml.pdf"
     _result().report(str(out), metadata=md)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_spanish_fiche_uses_comma_decimal(tmp_path) -> None:
@@ -166,7 +159,7 @@ def test_spanish_fiche_uses_comma_decimal(tmp_path) -> None:
 
     out = tmp_path / "enclosed_es.pdf"
     _result().report(str(out), metadata=_metadata(requirement=0.6), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _text(str(out))
     assert "Absorción acústica en un recinto" in text
     assert "Tiempo de reverberación objetivo" in text

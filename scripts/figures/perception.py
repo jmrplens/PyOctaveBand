@@ -3169,7 +3169,7 @@ def generate_sii_octave_masking_blindness(output_dir: str) -> None:
         "octave": ("--", COLOR_SECONDARY),
     }
     curves: dict[str, np.ndarray] = {}
-    for method, (_style, _color) in styles.items():
+    for method in styles:
         proc = speech.sii_procedure(method)
         freqs = np.asarray(proc.frequencies)
         curves[method] = np.array(

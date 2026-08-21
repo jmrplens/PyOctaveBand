@@ -263,9 +263,11 @@ def _candidate_ratios(body: str) -> list[tuple[str, float]]:
     """Multiplicative claims stated in an entry, as (quotation, ratio)."""
     body = _plain(body)
     found: list[tuple[str, float]] = []
-    for pattern in (_TIMES, _FACTOR):
-        for match in pattern.finditer(body):
-            found.append((match.group(0), _number(match.group("value"))))
+    found.extend(
+        (match.group(0), _number(match.group("value")))
+        for pattern in (_TIMES, _FACTOR)
+        for match in pattern.finditer(body)
+    )
     for match in _DECIBEL.finditer(body):
         raw = match.group("value") or match.group("value2")
         decibels = _number(raw)

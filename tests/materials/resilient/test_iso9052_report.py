@@ -20,12 +20,12 @@ import pytest
 
 pytest.importorskip("reportlab")
 
+from report_assertions import assert_one_page
+
 from phonometry import (
     ReportMetadata,
     materials,
 )
-
-_PDF_MAGIC = b"%PDF"
 
 # The committed clean-room example: the standard 8 kg load plate over the
 # 0.04 m2 specimen (m't = 200 kg/m2, Clauses 5-6), a measured resonance of
@@ -71,14 +71,6 @@ def _metadata(**overrides) -> ReportMetadata:
     return ReportMetadata(**base)
 
 
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert len(PdfReader(path).pages) == 1
-
-
 def _raw_text(path: str) -> str:
     """The extracted PDF text with its line breaks kept (for row anchoring)."""
     from pypdf import PdfReader
@@ -99,7 +91,7 @@ def test_writes_one_page_pdf(tmp_path) -> None:
     out = tmp_path / "dyn.pdf"
     returned = _result().report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_displayed_values_match_oracle(tmp_path) -> None:
@@ -148,7 +140,7 @@ def test_metadata_fields_appear(tmp_path) -> None:
 def test_no_metadata_still_renders(tmp_path) -> None:
     out = tmp_path / "dyn_bare.pdf"
     _result().report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "EN 29052-1" in _text(str(out))  # standard-basis line
 
 
@@ -161,7 +153,7 @@ def test_high_resistivity_omits_gas_term(tmp_path) -> None:
         floor_mass_per_area=_MFLOOR,
     )
     result.report(str(out), metadata=_metadata())
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "Enclosed-gas stiffness" not in _text(str(out))
 
 
@@ -182,13 +174,13 @@ def test_unknown_language_rejected(tmp_path) -> None:
 def test_metadata_xml_specials_do_not_break(tmp_path) -> None:
     out = tmp_path / "dyn_xml.pdf"
     _result().report(str(out), metadata=_metadata(specimen='Layer <A> & <B> "edge"'))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_spanish_uses_comma_decimal(tmp_path) -> None:
     out = tmp_path / "dyn_es.pdf"
     _result().report(str(out), metadata=_metadata(), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _text(str(out))
     # Each Spanish decimal comma is anchored to its labelled box statement.
     assert "Frecuencia de resonancia fr = 45,0 Hz" in text

@@ -10,8 +10,8 @@ the public API inside the generator, so the panel shows what a user's own
 and its site twins.
 """
 
-import os
 import tempfile
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -75,7 +75,7 @@ def generate_signal_provenance(output_dir: str) -> None:
         coding_history="A=PCM,F=48000,W=24,M=mono,T=SLM",
     )
     with tempfile.TemporaryDirectory() as tmp:
-        path = os.path.join(tmp, "night_p3.wav")
+        path = Path(tmp) / "night_p3.wav"
         io.write(
             path,
             io.Signal(data=_night_measurement(fs), fs=fs, calibration_factor=20.0),
@@ -121,7 +121,7 @@ def generate_signal_provenance(output_dir: str) -> None:
     first_sample = (f"{provenance.time_reference:,} samples").replace(",", " ")
     calibration = f"{sig.calibration_factor:.1f} Pa at full scale, from the sidecar"
     rows: tuple[tuple[str, str], ...] = (
-        ("File", os.path.basename(origin.path)),
+        ("File", Path(origin.path).name),
         ("Container", container),
         ("Sample rate", f"{sig.fs / 1000:g} kHz"),
         ("Recorded by", str(provenance.originator)),

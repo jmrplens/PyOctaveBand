@@ -17,6 +17,8 @@ import pytest
 
 pytest.importorskip("reportlab")
 
+from report_assertions import assert_one_page
+
 from phonometry import ReportMetadata, psychoacoustics
 
 # A shaped 28-band one-third-octave spectrum (25 Hz..12.5 kHz), descending.
@@ -54,26 +56,9 @@ _LEVELS = np.array(
     dtype=float,
 )
 
-_PDF_MAGIC = b"%PDF"
-
 
 def _result():
     return psychoacoustics.loudness_zwicker_from_spectrum(_LEVELS, field="free")
-
-
-def _assert_pdf(path: str) -> None:
-    import os
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-
-
-def _assert_one_page(path: str) -> None:
-    _assert_pdf(path)
-    from pypdf import PdfReader
-
-    assert len(PdfReader(path).pages) == 1
 
 
 def test_loudness_report_writes_pdf(tmp_path) -> None:
@@ -87,7 +72,7 @@ def test_loudness_report_writes_pdf(tmp_path) -> None:
     out = tmp_path / "loudness.pdf"
     returned = result.report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_unknown_engine_rejected(tmp_path) -> None:
@@ -113,7 +98,7 @@ def test_full_metadata_renders_one_page(tmp_path) -> None:
     )
     out = tmp_path / "meta.pdf"
     _result().report(str(out), metadata=md)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_requirement_pass_and_fail_both_render(tmp_path) -> None:
@@ -124,8 +109,8 @@ def test_requirement_pass_and_fail_both_render(tmp_path) -> None:
     failing = tmp_path / "fail.pdf"
     result.report(str(passing), metadata=ReportMetadata(requirement=n + 5.0))
     result.report(str(failing), metadata=ReportMetadata(requirement=max(n - 2.0, 0.1)))
-    _assert_one_page(str(passing))
-    _assert_one_page(str(failing))
+    assert_one_page(str(passing))
+    assert_one_page(str(failing))
 
 
 def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
@@ -140,7 +125,7 @@ def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
     )
     out = tmp_path / "xml.pdf"
     _result().report(str(out), metadata=md)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def _extract_text(path: str) -> str:
@@ -187,7 +172,7 @@ def test_time_varying_fiche_reports_nmax_percentiles_and_nt(tmp_path) -> None:
     assert result.field == "diffuse"
     out = tmp_path / "tv.pdf"
     result.report(str(out), metadata=ReportMetadata(requirement=result.loudness + 1.0))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out)).replace("\n", " ")
     assert "method for time-varying sounds (clause 6)" in text
     assert "Sound field: diffuse (D)" in text
@@ -209,7 +194,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
         metadata=ReportMetadata(specimen="ruido de electrodoméstico"),
         language="es",
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Índice de sonoridad" in text
     assert "Sonoridad total" in text

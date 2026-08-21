@@ -19,9 +19,9 @@ import pytest
 
 pytest.importorskip("reportlab")
 
-from phonometry import ReportMetadata, building
+from report_assertions import assert_one_page
 
-_PDF_MAGIC = b"%PDF"
+from phonometry import ReportMetadata, building
 
 #: Five octave bands (125 Hz to 2000 Hz), the ISO 10052 survey range.
 _OCTAVE = 5
@@ -29,18 +29,6 @@ _OCTAVE = 5
 #: A reverberation index of 0 dB in every band (T = T0), so the standardized
 #: quantities equal the raw ones and the rating is hand-checkable.
 _K0 = np.zeros(_OCTAVE)
-
-
-def _assert_one_page(path: str) -> None:
-    """A written report is a non-empty single-page PDF."""
-    import os
-
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -82,7 +70,7 @@ def test_airborne_fiche_rating_and_basis(tmp_path) -> None:
     assert rating is not None
     out = tmp_path / "dnt.pdf"
     result.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert f"{rating.rating} ({rating.c:+d}; {rating.ctr:+d}) dB" in text
     assert "ISO 10052:2021" in text
@@ -97,7 +85,7 @@ def test_airborne_r_prime_quantity(tmp_path) -> None:
     assert result.r_prime_rating is not None
     out = tmp_path / "rprime.pdf"
     result.report(str(out), quantity="r_prime")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Apparent sound reduction index" in text
 
@@ -117,7 +105,7 @@ def test_airborne_one_third_octave_caption(tmp_path) -> None:
     )
     out = tmp_path / "dnt_third.pdf"
     result.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "One-third-octave" in text
     assert "Octave-band" not in text
@@ -132,7 +120,7 @@ def test_airborne_verbose_and_verdict_pass(tmp_path) -> None:
     _airborne().report(
         str(out), metadata=ReportMetadata(requirement=40.0), verbose=True
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "PASS" in text  # DnT,w = 44 dB >= 40 dB
     assert "Unfav. dev." in text
@@ -156,7 +144,7 @@ def test_airborne_spanish(tmp_path) -> None:
         verbose=True,
         language="es",
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "método de control" in text
     assert "CUMPLE" in text
@@ -173,7 +161,7 @@ def test_impact_fiche_rating_and_basis(tmp_path) -> None:
     assert rating is not None
     out = tmp_path / "lnt.pdf"
     result.report(str(out), metadata=ReportMetadata(requirement=62.0))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert f"{rating.rating} ({rating.ci:+d}) dB" in text
     assert "ISO 10052:2021" in text
@@ -199,7 +187,7 @@ def test_facade_fiche_rating_and_basis(tmp_path) -> None:
     assert rating is not None
     out = tmp_path / "d2mnt.pdf"
     result.report(str(out), metadata=ReportMetadata(requirement=33.0))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert f"{rating.rating} ({rating.c:+d}; {rating.ctr:+d}) dB" in text
     assert "ISO 10052:2021" in text
@@ -211,7 +199,7 @@ def test_facade_spanish(tmp_path) -> None:
     """``language='es'`` renders the Spanish survey facade fiche."""
     out = tmp_path / "es.pdf"
     _facade().report(str(out), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "Aislamiento acústico de fachada in situ" in _extract_text(str(out))
 
 

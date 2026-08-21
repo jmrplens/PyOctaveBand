@@ -116,10 +116,13 @@ def main() -> int:
     tracked = tracked_files(IMG_DIR)
     problems: list[str] = []
 
-    for path in sorted(disk - tracked):
-        problems.append(f"new figure not committed: {path}")
-    for path in sorted(tracked - disk):
-        problems.append(f"committed figure no longer generated: {path}")
+    problems.extend(
+        f"new figure not committed: {path}" for path in sorted(disk - tracked)
+    )
+    problems.extend(
+        f"committed figure no longer generated: {path}"
+        for path in sorted(tracked - disk)
+    )
 
     for path in sorted(disk & tracked):
         new = Path(path).read_bytes()

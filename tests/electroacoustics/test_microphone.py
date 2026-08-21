@@ -26,14 +26,13 @@ rejected engines/languages.
 from __future__ import annotations
 
 import math
-import os
 
 import numpy as np
 import pytest
+from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, electroacoustics
 
-_PDF_MAGIC = b"%PDF"
 _M_MV = 12.5
 _TOL = 3.0
 
@@ -49,15 +48,6 @@ def _flat_response() -> tuple[np.ndarray, np.ndarray]:
     above = f > f_b
     rel[above] = -_TOL * (np.log2(f[above] / f_b) / np.log2(f_hi / f_b))
     return f, rel
-
-
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -451,7 +441,7 @@ def test_report_renders_one_page_with_rated_table(tmp_path) -> None:
     out = tmp_path / "microphone.pdf"
     returned = result.report(str(out), metadata=md)
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     # The table cell labels can wrap across lines in the PDF text layer, so the
     # assertions use single-line fragments.
     text = _extract_text(str(out))
@@ -472,7 +462,7 @@ def test_report_without_optional_panels(tmp_path) -> None:
     )
     out = tmp_path / "microphone_min.pdf"
     result.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
@@ -482,7 +472,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     result = _example_result()
     out = tmp_path / "microphone_es.pdf"
     result.report(str(out), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Características del micrófono" in text
     assert "Sensibilidad en campo libre" in text

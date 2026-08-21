@@ -238,19 +238,19 @@ def _parameter_table(result: RoomAcousticsResult, language: str = "en") -> Any:
         fiche_paragraph("T<sub>s</sub> [ms]", head_style),
     ]
     rows: list[list[Any]] = [header]
-    for i in range(n):
-        rows.append(
-            [
-                labels[i],
-                _cell(t20[i], 2, language),
-                _cell(t30[i], 2, language),
-                _cell(edt[i], 2, language),
-                _cell(c50[i], 1, language),
-                _cell(c80[i], 1, language),
-                _cell(d50[i], 2, language),
-                _cell(ts[i], 0, language, scale=1000.0),
-            ]
-        )
+    rows.extend(
+        [
+            labels[i],
+            _cell(t20[i], 2, language),
+            _cell(t30[i], 2, language),
+            _cell(edt[i], 2, language),
+            _cell(c50[i], 1, language),
+            _cell(c80[i], 1, language),
+            _cell(d50[i], 2, language),
+            _cell(ts[i], 0, language, scale=1000.0),
+        ]
+        for i in range(n)
+    )
 
     col_widths = [
         24 * mm,
@@ -279,10 +279,10 @@ def _parameter_table(result: RoomAcousticsResult, language: str = "en") -> Any:
     # grouping rule is gated on the band structure actually being one-third
     # octave rather than merely on the row count.
     if freq is not None and fraction == _THIRD_OCTAVE_FRACTION:
-        for triplet_end in range(3, n, 3):
-            style_cmds.append(
-                ("LINEBELOW", (0, triplet_end), (-1, triplet_end), 0.4, thin)
-            )
+        style_cmds.extend(
+            ("LINEBELOW", (0, triplet_end), (-1, triplet_end), 0.4, thin)
+            for triplet_end in range(3, n, 3)
+        )
     table = Table(rows, colWidths=col_widths, repeatRows=1)
     table.setStyle(TableStyle(style_cmds))
     return table

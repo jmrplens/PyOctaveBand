@@ -227,8 +227,7 @@ def render_noise_control_fiche(
         flow.extend(verdict_flow(text, passed, styles, language))
 
     basis_style_strip = measurement_basis_style()
-    for strip in basis_strips:
-        flow.append(fiche_paragraph(strip, basis_style_strip))
+    flow.extend(fiche_paragraph(strip, basis_style_strip) for strip in basis_strips)
     flow.extend(footer_flow(metadata, language, disclaimer=PREDICTION_DISCLAIMER))
 
     return build_document(path, flow, title)

@@ -230,11 +230,11 @@ def _sheet_table(
     if rows is None:
         rows = _visible_rows(result.table(), verbose)
     data: list[list[Any]] = [_band_header(frequencies, language)]
-    for row in rows:
-        data.append(
-            [row["code"], _element_label(row, language)]
-            + [_cell(v, language) for v in np.asarray(row["values"])]
-        )
+    data.extend(
+        [row["code"], _element_label(row, language)]
+        + [_cell(v, language) for v in np.asarray(row["values"])]
+        for row in rows
+    )
 
     accent = colors.HexColor(_ACCENT_HEX)
     light = colors.HexColor(_LIGHT_HEX)
@@ -480,8 +480,10 @@ def render_duct_path_report(
     )
 
     basis_style_strip = measurement_basis_style()
-    for strip in _basis_strips(result, language):
-        flow.append(fiche_paragraph(strip, basis_style_strip))
+    flow.extend(
+        fiche_paragraph(strip, basis_style_strip)
+        for strip in _basis_strips(result, language)
+    )
     flow.extend(footer_flow(metadata, language, disclaimer=PREDICTION_DISCLAIMER))
 
     _fit_to_one_page(flow, table_index, result, rows, verbose, language)

@@ -23,7 +23,10 @@ from . import _publish
 # place. Guard the path the way the other cross-imports in ``scripts/`` do
 # (see check_figures.py), so an editor importing a single figure module also
 # resolves it.
-_SCRIPTS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# The code that draws the clips is hashed into
+# scripts/animation_fingerprints.txt, so rewriting this asks for a
+# re-render that would draw the very same frames.
+_SCRIPTS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # noqa: PTH100, PTH120
 if _SCRIPTS not in sys.path:
     sys.path.insert(0, _SCRIPTS)
 

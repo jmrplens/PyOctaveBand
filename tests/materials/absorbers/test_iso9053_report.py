@@ -21,12 +21,12 @@ import pytest
 
 pytest.importorskip("reportlab")
 
+from report_assertions import assert_one_page
+
 from phonometry import (
     ReportMetadata,
     materials,
 )
-
-_PDF_MAGIC = b"%PDF"
 
 # The committed clean-room example: a 50 mm porous absorber in a 100 mm diameter
 # cell (A = pi*0.05^2 m2), stepped to 12 mm/s (below the 15 mm/s clause-7.5
@@ -70,14 +70,6 @@ def _metadata(**overrides) -> ReportMetadata:
     return ReportMetadata(**base)
 
 
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert len(PdfReader(path).pages) == 1
-
-
 def _raw_text(path: str) -> str:
     """The extracted PDF text with its line breaks kept (for row anchoring)."""
     from pypdf import PdfReader
@@ -94,7 +86,7 @@ def test_writes_one_page_pdf(tmp_path) -> None:
     out = tmp_path / "airflow.pdf"
     returned = _result().report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_displayed_values_match_oracle(tmp_path) -> None:
@@ -136,7 +128,7 @@ def test_metadata_and_fit_rows_appear(tmp_path) -> None:
 def test_no_metadata_still_renders(tmp_path) -> None:
     out = tmp_path / "airflow_bare.pdf"
     _result().report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "ISO 9053-1:2018" in _text(str(out))  # standard-basis line
 
 
@@ -147,7 +139,7 @@ def test_no_thickness_omits_resistivity(tmp_path) -> None:
     result = materials.static_airflow_resistance(u, dp, area=_AREA)
     out = tmp_path / "airflow_nod.pdf"
     result.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "Airflow resistivity" not in _text(str(out))
 
 
@@ -168,13 +160,13 @@ def test_unknown_language_rejected(tmp_path) -> None:
 def test_metadata_xml_specials_do_not_break(tmp_path) -> None:
     out = tmp_path / "airflow_xml.pdf"
     _result().report(str(out), metadata=_metadata(specimen='Foam <A> & <B> "edge"'))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_spanish_uses_comma_decimal(tmp_path) -> None:
     out = tmp_path / "airflow_es.pdf"
     _result().report(str(out), metadata=_metadata(), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _text(str(out))
     # Spanish fixed strings and the decimal comma on the evaluation velocity.
     assert "Resistencia especifica al flujo de aire" in text.replace("í", "i")

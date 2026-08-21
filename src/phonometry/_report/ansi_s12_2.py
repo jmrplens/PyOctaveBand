@@ -154,8 +154,7 @@ def _value_table(
 
     n_data = len(columns[0][1])
     rows: list[list[Any]] = [[fiche_paragraph(header, head) for header, _ in columns]]
-    for i in range(n_data):
-        rows.append([cells[i] for _, cells in columns])
+    rows.extend([cells[i] for _, cells in columns] for i in range(n_data))
 
     table = Table(rows, colWidths=col_widths, repeatRows=1)
     table.setStyle(

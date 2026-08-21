@@ -18,15 +18,12 @@ the rendering contract.
 
 from __future__ import annotations
 
-import os
-
 import numpy as np
 import pytest
+from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.emission import SoundPowerWarning, sound_power_intensity
-
-_PDF_MAGIC = b"%PDF"
 
 # Standard octave-band A-weighting corrections Ck (dB), IEC 61672 / ISO 3744
 # Annex E Table E.2, at the example band centres.
@@ -38,15 +35,6 @@ _INTENSITY = np.array([0.6e-4, 1.0e-4, 1.5e-4, 1.4e-4, 0.9e-4, 0.5e-4])
 _N_SEG = 6
 _SEG_AREA = 0.5
 _SURFACE = _N_SEG * _SEG_AREA  # 3.0 m^2
-
-
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -108,7 +96,7 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     out = tmp_path / "iso9614.pdf"
     returned = res.report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
 
     # A-weighted total to one decimal, boxed with its reference power.
@@ -160,7 +148,7 @@ def test_verbose_adds_indicator_columns(tmp_path) -> None:
     res = _uniform_result()
     out = tmp_path / "verbose.pdf"
     res.report(str(out), verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     flat = "".join(_extract_text(str(out)).split())
     assert "FpI" in flat
     # Every band qualifies at engineering grade, so the grade cell reads "2".
@@ -193,7 +181,7 @@ def test_omitted_bands_listed_in_basis_strip(tmp_path) -> None:
     assert res.a_weighting_omitted_bands.tolist() == [True] + [False] * 5
     out = tmp_path / "omitted.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "10.6 b" in text
     assert "125 Hz" in text
@@ -236,7 +224,7 @@ def test_negative_band_reported_as_dash(tmp_path) -> None:
         )
     out = tmp_path / "negative.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     # The determinable 500 Hz band still prints its level.
     assert f"{_oracle_lw()[2]:.1f}" in text
@@ -261,7 +249,7 @@ def test_metadata_header_renders(tmp_path) -> None:
     )
     out = tmp_path / "meta.pdf"
     res.report(str(out), metadata=metadata)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Example works" in text
     assert "Air compressor" in text
@@ -281,7 +269,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     res = _uniform_result()
     out = tmp_path / "es.pdf"
     res.report(str(out), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Determinación de la potencia acústica" in text
     assert "intensidad acústica normal" in text

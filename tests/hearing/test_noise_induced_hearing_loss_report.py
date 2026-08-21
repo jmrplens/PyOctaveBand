@@ -14,23 +14,11 @@ English and Spanish fiches are exercised.
 
 from __future__ import annotations
 
-import os
-
 import pytest
+from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.hearing import NoiseInducedHearingLossWarning, htlan, nipts
-
-_PDF_MAGIC = b"%PDF"
-
-
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -53,7 +41,7 @@ def test_nipts_report_renders_annex_d_values(tmp_path) -> None:
     out = tmp_path / "nipts.pdf"
     returned = res.report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "12.9" in text  # median N50 at 4 kHz (Table D.2)
     assert "17.8" in text  # NIPTS at Q = 0.90, 4 kHz (worst tenth)
@@ -72,7 +60,7 @@ def test_nipts_verbose_adds_spread_columns(tmp_path) -> None:
     res = nipts(95.0, 20.0, 0.9)
     out = tmp_path / "nipts_v.pdf"
     res.report(str(out), verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     flat = "".join(_extract_text(str(out)).split())
     assert "du[dB]" in flat
     assert "dl[dB]" in flat
@@ -120,7 +108,7 @@ def test_nipts_outside_domain_prints_extrapolation_caveat(tmp_path) -> None:
         res = nipts(130.0, 60.0, 0.99)
     out = tmp_path / "extrapolated.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "outside the validated domain" in text
     assert "extrapolation" in text
@@ -138,7 +126,7 @@ def test_nipts_subset_boxes_peak_shift(tmp_path) -> None:
     res = nipts(95.0, 20.0, 0.9, frequencies=[500.0, 6000.0])
     out = tmp_path / "sub.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "peak NIPTS" in _extract_text(str(out))
 
 
@@ -153,7 +141,7 @@ def test_htlan_report_renders_components(tmp_path) -> None:
     res = htlan(60, "male", 95.0, 30.0, 0.5)
     out = tmp_path / "htlan.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     # Regression guards, not normative oracles: the ISO 1999 Annex C example
     # pins the NIPTS chain (see tests/hearing/test_noise_induced_hearing_loss.py
@@ -177,7 +165,7 @@ def test_htlan_verbose_adds_compression_term(tmp_path) -> None:
     res = htlan(60, "male", 95.0, 30.0, 0.5)
     out = tmp_path / "htlan_v.pdf"
     res.report(str(out), verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     flat = "".join(_extract_text(str(out)).split())
     assert "N/120" in flat
 
@@ -212,7 +200,7 @@ def test_nipts_spanish_report(tmp_path) -> None:
     res = nipts(90.0, 20.0, 0.9)
     out = tmp_path / "nipts_es.pdf"
     res.report(str(out), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Predicción de la pérdida auditiva inducida por ruido" in text
     assert "13,9" in text  # comma decimal separator
@@ -228,7 +216,7 @@ def test_htlan_spanish_report(tmp_path) -> None:
     res = htlan(60, "male", 95.0, 30.0, 0.5)
     out = tmp_path / "htlan_es.pdf"
     res.report(str(out), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "edad y ruido" in text
     assert "hombre" in text

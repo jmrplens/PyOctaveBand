@@ -124,20 +124,26 @@ def math_regions(text: str, suffix: str) -> list[tuple[int, str]]:
     ``$$...$$`` and ``$...$`` in every file kind, plus the reStructuredText
     ``:math:`...``` roles and ``.. math::`` blocks the docstrings use.
     """
-    out: list[tuple[int, str]] = []
-    for m in re.finditer(r"\$\$(.+?)\$\$", text, re.DOTALL):
-        out.append((m.start(1), m.group(1)))
-    for m in re.finditer(r"(?<![$\\])\$(?!\$)([^$\n]+?)\$(?!\$)", text):
-        out.append((m.start(1), m.group(1)))
+    out: list[tuple[int, str]] = [
+        (m.start(1), m.group(1)) for m in re.finditer(r"\$\$(.+?)\$\$", text, re.DOTALL)
+    ]
+    out.extend(
+        (m.start(1), m.group(1))
+        for m in re.finditer(r"(?<![$\\])\$(?!\$)([^$\n]+?)\$(?!\$)", text)
+    )
     if suffix == ".py":
-        for m in re.finditer(r":math:`(.+?)`", text, re.DOTALL):
-            out.append((m.start(1), m.group(1)))
-        for m in re.finditer(
-            r"^([ \t]*)\.\. math::[ \t]*\n(.*?)(?=\n\s*\n|\Z)",
-            text,
-            re.DOTALL | re.MULTILINE,
-        ):
-            out.append((m.start(2), m.group(2)))
+        out.extend(
+            (m.start(1), m.group(1))
+            for m in re.finditer(r":math:`(.+?)`", text, re.DOTALL)
+        )
+        out.extend(
+            (m.start(2), m.group(2))
+            for m in re.finditer(
+                r"^([ \t]*)\.\. math::[ \t]*\n(.*?)(?=\n\s*\n|\Z)",
+                text,
+                re.DOTALL | re.MULTILINE,
+            )
+        )
     return out
 
 

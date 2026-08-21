@@ -5292,7 +5292,10 @@ def animate_feedback_howl(output_dir: str) -> None:
     ax_t.legend(loc="upper left", fontsize=7.5, framealpha=0.9, handlelength=1.4)
     limit_lines = []
     for c in colors[:2]:
-        limit_lines.append(ax_t.axhline(0.0, color=c, lw=1.1, ls=":", visible=False))
+        # The code that draws the clips is hashed into
+        # scripts/animation_fingerprints.txt, so rewriting this asks for a
+        # re-render that would draw the very same frames.
+        limit_lines.append(ax_t.axhline(0.0, color=c, lw=1.1, ls=":", visible=False))  # noqa: PERF401
 
     sweep = _ANIM_FRAMES - _ANIM_HOLD
     per_act = sweep // 3

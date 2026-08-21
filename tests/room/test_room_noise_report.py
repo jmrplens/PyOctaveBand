@@ -27,10 +27,10 @@ pytest.importorskip("reportlab")
 pytest.importorskip("svglib")
 pytest.importorskip("pypdf")
 
+from report_assertions import assert_one_page
+
 from phonometry import ReportMetadata
 from phonometry.room import noise_criteria as rn
-
-_PDF_MAGIC = b"%PDF"
 
 
 def _nc_result() -> rn.NCResult:
@@ -46,18 +46,6 @@ def _rc_result() -> rn.RCResult:
     levels = rn.rc_curve(35.0)
     levels[4] += 8.0  # 250 Hz rumble.
     return rn.room_criterion(levels)
-
-
-def _assert_one_page(path: str) -> None:
-    """The fiche is a single-page PDF beginning with ``%PDF``."""
-    import os
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    from pypdf import PdfReader
-
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -112,7 +100,7 @@ def test_nc_report_writes_pdf(tmp_path) -> None:
     out = tmp_path / "nc.pdf"
     returned = _nc_result().report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_rc_report_writes_pdf(tmp_path) -> None:
@@ -120,23 +108,23 @@ def test_rc_report_writes_pdf(tmp_path) -> None:
     out = tmp_path / "rc.pdf"
     returned = _rc_result().report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_reports_with_full_metadata_one_page(tmp_path) -> None:
     """A full ReportMetadata renders a one-page fiche for both ratings."""
     _nc_result().report(str(tmp_path / "nc_meta.pdf"), metadata=_full_metadata())
     _rc_result().report(str(tmp_path / "rc_meta.pdf"), metadata=_full_metadata())
-    _assert_one_page(str(tmp_path / "nc_meta.pdf"))
-    _assert_one_page(str(tmp_path / "rc_meta.pdf"))
+    assert_one_page(str(tmp_path / "nc_meta.pdf"))
+    assert_one_page(str(tmp_path / "rc_meta.pdf"))
 
 
 def test_reports_bare_without_metadata(tmp_path) -> None:
     """metadata=None renders a bare assessment fiche (no header)."""
     _nc_result().report(str(tmp_path / "nc_bare.pdf"), metadata=None)
     _rc_result().report(str(tmp_path / "rc_bare.pdf"), metadata=None)
-    _assert_one_page(str(tmp_path / "nc_bare.pdf"))
-    _assert_one_page(str(tmp_path / "rc_bare.pdf"))
+    assert_one_page(str(tmp_path / "nc_bare.pdf"))
+    assert_one_page(str(tmp_path / "rc_bare.pdf"))
 
 
 def test_verbose_reports_one_page(tmp_path) -> None:
@@ -147,8 +135,8 @@ def test_verbose_reports_one_page(tmp_path) -> None:
     _rc_result().report(
         str(tmp_path / "rc_v.pdf"), metadata=_full_metadata(), verbose=True
     )
-    _assert_one_page(str(tmp_path / "nc_v.pdf"))
-    _assert_one_page(str(tmp_path / "rc_v.pdf"))
+    assert_one_page(str(tmp_path / "nc_v.pdf"))
+    assert_one_page(str(tmp_path / "rc_v.pdf"))
 
 
 @pytest.mark.parametrize("factory", [_nc_result, _rc_result])
@@ -307,7 +295,7 @@ def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
     )
     out = tmp_path / "xml.pdf"
     _nc_result().report(str(out), metadata=md)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_spanish_reports_render_translated(tmp_path) -> None:
@@ -322,8 +310,8 @@ def test_spanish_reports_render_translated(tmp_path) -> None:
     _rc_result().report(
         str(rc_out), metadata=_full_metadata(requirement=30.0), language="es"
     )
-    _assert_one_page(str(nc_out))
-    _assert_one_page(str(rc_out))
+    assert_one_page(str(nc_out))
+    assert_one_page(str(rc_out))
     nc_text = _extract_text(str(nc_out))
     assert "Calificación del ruido de salas" in nc_text
     assert "CUMPLE" in nc_text
@@ -339,7 +327,7 @@ def test_subset_spectrum_renders_missing_bands(tmp_path) -> None:
     levels = [40.0, 35.0, 30.0, 27.0, 22.0]
     out = tmp_path / "subset.pdf"
     rn.noise_criterion(levels, freqs).report(str(out), metadata=_full_metadata())
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "—" in text  # the unmeasured low bands are shown as an em dash
 

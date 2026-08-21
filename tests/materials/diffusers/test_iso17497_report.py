@@ -20,13 +20,12 @@ pytest.importorskip("reportlab")
 from dataclasses import replace
 
 import numpy as np
+from report_assertions import assert_one_page
 
 from phonometry import (
     ReportMetadata,
     materials,
 )
-
-_PDF_MAGIC = b"%PDF"
 
 # The committed clean-room example: V = 200 m3, S = 10 m2, 20 degC (c = 343.2),
 # m = 0, symmetrical base plate (T1 = T3). See scripts/generate_reports.py.
@@ -158,14 +157,6 @@ def _metadata(**overrides) -> ReportMetadata:
     return ReportMetadata(**base)
 
 
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert len(PdfReader(path).pages) == 1
-
-
 def _text(path: str) -> str:
     from pypdf import PdfReader
 
@@ -179,7 +170,7 @@ def test_scattering_writes_one_page_pdf(tmp_path) -> None:
     out = tmp_path / "scat.pdf"
     returned = _scattering().report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_scattering_displayed_values_match_oracle(tmp_path) -> None:
@@ -200,7 +191,7 @@ def test_scattering_displayed_values_match_oracle(tmp_path) -> None:
 def test_scattering_verbose_shows_alpha_spec_one_page(tmp_path) -> None:
     out = tmp_path / "scat_v.pdf"
     _scattering().report(str(out), metadata=_metadata(), verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "0.13" in _text(str(out))  # alpha_spec(500 Hz) = 0.131 -> 0.13
 
 
@@ -223,20 +214,20 @@ def test_scattering_metadata_xml_specials_do_not_break(tmp_path) -> None:
     _scattering().report(
         str(out), metadata=_metadata(specimen='Panel <A> & <B> "edge"')
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_scattering_no_metadata_still_renders(tmp_path) -> None:
     out = tmp_path / "scat_bare.pdf"
     _scattering().report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "100 to 5000" in _text(str(out))  # measured frequency range
 
 
 def test_scattering_spanish_uses_comma_decimal(tmp_path) -> None:
     out = tmp_path / "scat_es.pdf"
     _scattering().report(str(out), metadata=_metadata(), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "0,45" in _text(str(out))  # Spanish decimal comma
 
 
@@ -268,7 +259,7 @@ def test_scattering_verbose_short_specular_rejected(tmp_path) -> None:
 def test_diffusion_writes_one_page_pdf(tmp_path) -> None:
     out = tmp_path / "diff.pdf"
     _diffusion_spectrum().report(str(out), metadata=_metadata())
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_diffusion_displayed_values_match_oracle(tmp_path) -> None:
@@ -294,7 +285,7 @@ def test_diffusion_omits_room_fields(tmp_path) -> None:
 def test_diffusion_verbose_shows_normalized_one_page(tmp_path) -> None:
     out = tmp_path / "diff_v.pdf"
     _diffusion_spectrum().report(str(out), metadata=_metadata(), verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "0.35" in _text(str(out))  # d_n(500 Hz) = 0.347 -> 0.35
 
 
@@ -308,7 +299,7 @@ def test_diffusion_unknown_engine_rejected(tmp_path) -> None:
 def test_diffusion_spanish_uses_comma_decimal(tmp_path) -> None:
     out = tmp_path / "diff_es.pdf"
     _diffusion_spectrum().report(str(out), metadata=_metadata(), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "0,81" in _text(str(out))
 
 
@@ -330,7 +321,7 @@ def test_diffusion_short_normalized_rejected(tmp_path) -> None:
 def test_polar_writes_one_page_pdf(tmp_path) -> None:
     out = tmp_path / "polar.pdf"
     _polar().report(str(out), metadata=_metadata())
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_polar_displays_coefficient_and_angles(tmp_path) -> None:
@@ -351,5 +342,5 @@ def test_polar_unknown_engine_rejected(tmp_path) -> None:
 def test_polar_spanish_uses_comma_decimal(tmp_path) -> None:
     out = tmp_path / "polar_es.pdf"
     _polar().report(str(out), metadata=_metadata(), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "0,67" in _text(str(out))

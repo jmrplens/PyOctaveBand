@@ -27,10 +27,10 @@ pytest.importorskip("svglib")
 pytest.importorskip("pypdf")
 
 import numpy as np
+from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, room
 
-_PDF_MAGIC = b"%PDF"
 _FS = 48000
 #: 6*ln(10): energy-decay-rate constant so exp(-A60*t/T) falls 60 dB in T s.
 _A60 = 6.0 * np.log(10.0)
@@ -53,18 +53,6 @@ def _synthetic_ir(seconds: float = 5.0) -> np.ndarray:
 
 def _result() -> room.RoomAcousticsResult:
     return room.room_parameters(_synthetic_ir(), _FS)
-
-
-def _assert_one_page(path: str) -> None:
-    """The fiche is a single-page PDF beginning with ``%PDF``."""
-    import os
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    from pypdf import PdfReader
-
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -121,21 +109,21 @@ def test_report_writes_pdf(tmp_path) -> None:
     out = tmp_path / "room.pdf"
     returned = _result().report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_report_with_full_metadata_one_page(tmp_path) -> None:
     """A full ReportMetadata renders a one-page accredited room fiche."""
     out = tmp_path / "room_meta.pdf"
     _result().report(str(out), metadata=_full_metadata())
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_report_bare_without_metadata(tmp_path) -> None:
     """metadata=None renders a bare characterisation fiche (no header)."""
     out = tmp_path / "bare.pdf"
     _result().report(str(out), metadata=None)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_unknown_engine_rejected(tmp_path) -> None:
@@ -179,8 +167,8 @@ def test_mid_frequency_descriptor_and_verdict(tmp_path) -> None:
     failing = tmp_path / "fail.pdf"
     _result().report(str(passing), metadata=_full_metadata(requirement=1.30))
     _result().report(str(failing), metadata=_full_metadata(requirement=1.00))
-    _assert_one_page(str(passing))
-    _assert_one_page(str(failing))
+    assert_one_page(str(passing))
+    assert_one_page(str(failing))
     assert abs(_T_MID - 1.15) < 1e-9
     pass_text = _extract_text(str(passing))
     assert "1.15" in pass_text
@@ -238,7 +226,7 @@ def test_third_octave_report_renders(tmp_path) -> None:
     res = room.room_parameters(_synthetic_ir(), _FS, limits=(100.0, 5000.0), fraction=3)
     out = tmp_path / "thirds.pdf"
     res.report(str(out), metadata=_full_metadata())
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "500 Hz and 1 kHz one-third-octave bands" in text
     assert "500-1000 Hz" not in text
@@ -298,7 +286,7 @@ def test_single_band_is_not_labeled_broadband(tmp_path) -> None:
     assert len(res.frequency) == 1
     out = tmp_path / "single_band.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Single-band parameters" in text
     assert "Broadband" not in text
@@ -316,7 +304,7 @@ def test_octave_report_many_bands_renders(tmp_path) -> None:
     assert len(res.frequency) > 6
     out = tmp_path / "octave_wide.pdf"
     res.report(str(out), metadata=_full_metadata())
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "Octave-band parameters" in _extract_text(str(out))
 
 
@@ -326,7 +314,7 @@ def test_broadband_report_renders(tmp_path) -> None:
     assert res.frequency is None
     out = tmp_path / "broadband.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "Broadband" in _extract_text(str(out))
 
 
@@ -365,7 +353,7 @@ def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
     )
     out = tmp_path / "xml.pdf"
     _result().report(str(out), metadata=md)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
@@ -374,7 +362,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
 
     out = tmp_path / "room_es.pdf"
     _result().report(str(out), metadata=_full_metadata(requirement=1.30), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Parámetros acústicos de salas" in text
     assert "CUMPLE" in text

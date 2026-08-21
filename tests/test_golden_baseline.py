@@ -16,7 +16,7 @@ tolerance for the same reason the figure CI gate is tolerance-based.
 
 from __future__ import annotations
 
-import os
+import pathlib
 import sys
 
 import matplotlib as mpl
@@ -25,7 +25,7 @@ mpl.use("Agg")
 import numpy as np
 import pytest
 
-_SCRIPTS = os.path.join(os.path.dirname(__file__), "..", "scripts")
+_SCRIPTS = str(pathlib.Path(__file__).resolve().parent.parent / "scripts")
 if _SCRIPTS not in sys.path:
     sys.path.insert(0, _SCRIPTS)
 

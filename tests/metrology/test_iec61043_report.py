@@ -12,8 +12,6 @@ tests/metrology/test_intensity_compliance.py.
 
 from __future__ import annotations
 
-import os
-
 import matplotlib as mpl
 import pytest
 
@@ -23,10 +21,9 @@ pytest.importorskip("reportlab")
 pytest.importorskip("svglib")
 
 import reference_data as ref
+from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, emission
-
-_PDF_MAGIC = b"%PDF"
 
 _BANDS = [row[0] for row in ref.IEC61043_TABLE2]
 
@@ -53,25 +50,16 @@ def _metadata(**kwargs: object) -> ReportMetadata:
     return ReportMetadata(**base)  # type: ignore[arg-type]
 
 
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
-
-
 def test_compliant_chain_renders_one_page(tmp_path) -> None:
     result = _class1_chain()
     path = result.report(str(tmp_path / "iec61043.pdf"), metadata=_metadata())
-    _assert_one_page(path)
+    assert_one_page(path)
 
 
 def test_bare_fiche_without_metadata(tmp_path) -> None:
     """A fiche without metadata still renders body, result and disclaimer."""
     result = _class1_chain()
-    _assert_one_page(result.report(str(tmp_path / "bare.pdf")))
+    assert_one_page(result.report(str(tmp_path / "bare.pdf")))
 
 
 def _extract_text(path: str) -> str:
@@ -85,7 +73,7 @@ def _extract_text(path: str) -> str:
 def test_spanish_fiche_renders(tmp_path) -> None:
     result = _class1_chain()
     path = result.report(str(tmp_path / "es.pdf"), metadata=_metadata(), language="es")
-    _assert_one_page(path)
+    assert_one_page(path)
 
 
 def test_spanish_fiche_translates_every_fixed_string(tmp_path) -> None:
@@ -135,14 +123,14 @@ def test_spanish_fiche_translates_every_fixed_string(tmp_path) -> None:
 def test_required_class_verdict_both_ways(tmp_path) -> None:
     """The verdict row renders whether the chain meets the requirement or not."""
     passing = _class1_chain()
-    _assert_one_page(
+    assert_one_page(
         passing.report(str(tmp_path / "pass.pdf"), metadata=_metadata(required_class=1))
     )
     # 1 dB short of class 1 everywhere, so the chain lands on class 2.
     freqs, class1, _ = emission.residual_index_limits("instrument")
     failing = emission.intensity_class_compliance(class1 - 1.0, freqs)
     assert failing.overall_class == 2
-    _assert_one_page(
+    assert_one_page(
         failing.report(str(tmp_path / "fail.pdf"), metadata=_metadata(required_class=1))
     )
 
@@ -152,7 +140,7 @@ def test_non_compliant_chain_renders(tmp_path) -> None:
     freqs, _, class2 = emission.residual_index_limits("probe")
     result = emission.intensity_class_compliance(class2 - 2.0, freqs, device="probe")
     assert result.overall_class is None
-    _assert_one_page(result.report(str(tmp_path / "none.pdf"), metadata=_metadata()))
+    assert_one_page(result.report(str(tmp_path / "none.pdf"), metadata=_metadata()))
 
 
 def test_range_limited_note_renders(tmp_path) -> None:
@@ -161,7 +149,7 @@ def test_range_limited_note_renders(tmp_path) -> None:
     freqs, class1, _ = emission.residual_index_limits("processor", frequencies=bands)
     result = emission.intensity_class_compliance(class1, freqs, device="processor")
     assert result.range_limited is True
-    _assert_one_page(result.report(str(tmp_path / "partial.pdf"), metadata=_metadata()))
+    assert_one_page(result.report(str(tmp_path / "partial.pdf"), metadata=_metadata()))
 
 
 def test_range_limited_note_drops_the_class_wording_when_no_class_is_met(
@@ -184,7 +172,7 @@ def test_range_limited_note_drops_the_class_wording_when_no_class_is_met(
     assert result.range_limited is True
 
     path = result.report(str(tmp_path / "noclass.pdf"), metadata=_metadata())
-    _assert_one_page(path)
+    assert_one_page(path)
     text = _extract_text(path)
     assert "this verification covers the bands listed above" in text
     assert "the stated class attests" not in text

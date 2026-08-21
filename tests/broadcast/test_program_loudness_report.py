@@ -23,12 +23,13 @@ import pytest
 
 pytest.importorskip("reportlab")
 
+from report_assertions import assert_one_page
+
 from phonometry import ReportMetadata
 from phonometry._report.broadcast import _verdict
 from phonometry.broadcast import program_loudness
 
 FS = 48000
-_PDF_MAGIC = b"%PDF"
 
 
 def _sine(level_dbfs: float, duration: float, freq: float = 1000.0) -> np.ndarray:
@@ -57,21 +58,6 @@ def _case1_result():
     return program_loudness(_steps(((-20.4, 20.0), (-30.4, 20.0))), FS)
 
 
-def _assert_pdf(path: str) -> None:
-    import os
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-
-
-def _assert_one_page(path: str) -> None:
-    _assert_pdf(path)
-    from pypdf import PdfReader
-
-    assert len(PdfReader(path).pages) == 1
-
-
 def test_report_writes_one_page_pdf(tmp_path) -> None:
     """A measured programme renders a one-page compliance fiche."""
     result = _case1_result()
@@ -79,7 +65,7 @@ def test_report_writes_one_page_pdf(tmp_path) -> None:
     out = tmp_path / "loudness.pdf"
     returned = result.report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_unknown_engine_rejected(tmp_path) -> None:
@@ -106,7 +92,7 @@ def test_full_metadata_renders_one_page(tmp_path) -> None:
     )
     out = tmp_path / "meta.pdf"
     _case1_result().report(str(out), metadata=md)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_compliant_programme_passes(tmp_path) -> None:
@@ -117,7 +103,7 @@ def test_compliant_programme_passes(tmp_path) -> None:
     assert passed is True
     out = tmp_path / "pass.pdf"
     result.report(str(out), metadata=ReportMetadata(requirement=-23.0))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_non_compliant_true_peak_fails(tmp_path) -> None:
@@ -128,7 +114,7 @@ def test_non_compliant_true_peak_fails(tmp_path) -> None:
     assert passed is False
     out = tmp_path / "fail.pdf"
     result.report(str(out), metadata=ReportMetadata(requirement=-23.0))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_informational_rows_do_not_change_verdict(tmp_path) -> None:
@@ -145,7 +131,7 @@ def test_informational_rows_do_not_change_verdict(tmp_path) -> None:
     assert passed2 is True
     out = tmp_path / "info.pdf"
     tampered.report(str(out), metadata=ReportMetadata(requirement=-23.0))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def _extract_text(path: str) -> str:
@@ -180,7 +166,7 @@ def test_live_tolerance_applies_item_h_1_lu(tmp_path) -> None:
     result.report(
         str(out), metadata=ReportMetadata(requirement=-23.0), tolerance="live"
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out)).replace("\n", " ")
     assert "±1.0 LU" in text
     assert "item h" in text
@@ -217,7 +203,7 @@ def test_fiche_pins_displayed_numbers(tmp_path) -> None:
     result = _case1_result()
     out = tmp_path / "pins.pdf"
     result.report(str(out), metadata=ReportMetadata(requirement=-23.0))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     # Independent expectation: the trimmed Case 1 steps land at -23.0 LUFS
     # (the -20/-30 dBFS analytic pair shifted by -0.4 dB). The printed sign is
@@ -235,7 +221,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     result = _case1_result()
     out = tmp_path / "program_es.pdf"
     result.report(str(out), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Conformidad de sonoridad de programa" in text
     assert re.search(r"\d,\d", text) is not None  # comma decimal separator

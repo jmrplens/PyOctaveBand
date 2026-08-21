@@ -263,9 +263,11 @@ def test_subpackage_reexports_cover_facade_imports() -> None:
         if len(parts) < 2 or parts[0].startswith("_"):
             continue
         pkg = importlib.import_module(f"phonometry.{parts[0]}")
-        for alias in node.names:
-            if not hasattr(pkg, alias.name):
-                missing.append(f"phonometry.{parts[0]}.{alias.name}")
+        missing.extend(
+            f"phonometry.{parts[0]}.{alias.name}"
+            for alias in node.names
+            if not hasattr(pkg, alias.name)
+        )
     assert not missing, (
         "facade imports not re-exported by their subpackage:\n" + "\n".join(missing)
     )

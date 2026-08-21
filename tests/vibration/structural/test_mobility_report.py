@@ -14,28 +14,17 @@ contract.
 from __future__ import annotations
 
 import math
-import os
 
 import numpy as np
 import pytest
+from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.vibration import sdof_mobility_result
 from phonometry.vibration.structural.mechanical_mobility import MobilityResult
 
-_PDF_MAGIC = b"%PDF"
-
 _M, _K, _C = 2.0, 8000.0, 5.0
 _F0 = math.sqrt(_K / _M) / (2.0 * math.pi)  # ~10.066 Hz
-
-
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -68,7 +57,7 @@ def test_report_renders_peak_and_basis(tmp_path) -> None:
     out = tmp_path / "mobility.pdf"
     returned = res.report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Mechanical mobility measurement" in text
     assert "ISO 7626-1:2011" in text
@@ -92,7 +81,7 @@ def test_transfer_frf_labels_transfer(tmp_path) -> None:
     )
     out = tmp_path / "transfer.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "transfer mechanical mobility" in text
     assert "driving-point" not in text
@@ -113,7 +102,7 @@ def test_metadata_header_renders(tmp_path) -> None:
     )
     out = tmp_path / "meta.pdf"
     res.report(str(out), metadata=metadata)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Example structures client" in text
     assert "Machine support bracket" in text
@@ -128,7 +117,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     res = _driving_point_result()
     out = tmp_path / "es.pdf"
     res.report(str(out), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Medición de la movilidad mecánica" in text
     assert "en punto de excitación" in text

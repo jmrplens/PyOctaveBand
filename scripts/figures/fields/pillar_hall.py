@@ -34,7 +34,10 @@ def _poster_ss_for(webm: str) -> float | None:
       the right edge (it leaves the 0.30 m view at 103 us) and both body
       fronts are drawn against their analytic arcs.
     """
-    name = os.path.basename(webm)
+    # The code that draws the clips is hashed into
+    # scripts/animation_fingerprints.txt, so rewriting this asks for a
+    # re-render that would draw the very same frames.
+    name = os.path.basename(webm)  # noqa: PTH119
     if _PILLAR_STEM in name:
         import fdtd2d
 

@@ -10,15 +10,15 @@ both languages and are shared.
 
 from __future__ import annotations
 
-import os
 import sys
+from pathlib import Path
 
 # The miss recorder sits at the top of ``scripts/``, next to the checker that
 # reads what it writes; guard the path the way the other cross-imports in
 # ``scripts/`` do (see check_figures.py).
-_SCRIPTS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if _SCRIPTS not in sys.path:
-    sys.path.insert(0, _SCRIPTS)
+_SCRIPTS = Path(__file__).resolve().parent.parent
+if str(_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS))
 
 import figure_language_audit as _audit
 

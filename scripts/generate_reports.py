@@ -33,15 +33,16 @@ unnoticed.
 from __future__ import annotations
 
 import argparse
-import os
 import sys
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 # The fiche builders live in the ``reports`` package beside this file. Running
 # this script puts ``scripts/`` on the import path for free, but loading the
 # file by its path (as the test suite does) does not, so the directory is added
-# here and both entry points reach the same package.
-_SCRIPTS = os.path.dirname(os.path.abspath(__file__))
+# here and both entry points reach the same package. ``sys.path`` holds plain
+# strings, so the entry is spelled as text: a Path would never match the guard.
+_SCRIPTS = str(Path(__file__).resolve().parent)
 if _SCRIPTS not in sys.path:
     sys.path.insert(0, _SCRIPTS)
 
@@ -144,9 +145,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
 #: Committed output directory for the example fiches.
-_DEFAULT_DIR = os.path.normpath(
-    os.path.join(os.path.dirname(__file__), "..", ".github", "reports")
-)
+_DEFAULT_DIR = Path(__file__).resolve().parent.parent / ".github" / "reports"
 
 #: Pixel width of the rendered WebP preview. A4 portrait at this width is ~1415
 #: px tall: crisp on the docs pages (shown at ~80 % column width) yet small
@@ -250,12 +249,12 @@ _FICHES: dict[str, Callable[[], _Fiche]] = {
 _EXAMPLES: list[Callable[[], _Fiche]] = list(_FICHES.values())
 
 
-def preview_path_for(pdf_path: str) -> str:
+def preview_path_for(pdf_path: str | Path) -> Path:
     """Return the WebP-preview path that pairs with ``pdf_path`` (``.pdf`` -> ``.webp``)."""
-    return os.path.splitext(pdf_path)[0] + ".webp"
+    return Path(pdf_path).with_suffix(".webp")
 
 
-def _write_preview(pdf_path: str) -> str:
+def _write_preview(pdf_path: Path) -> Path:
     """Rasterize the first page of ``pdf_path`` to a lossless WebP beside it.
 
     The preview is what the documentation embeds inline; it is not byte-compared
@@ -283,9 +282,9 @@ def _write_preview(pdf_path: str) -> str:
 
 
 def generate_reports(
-    output_dir: str,
+    output_dir: str | Path,
     examples: Sequence[Callable[[], _Fiche]] | None = None,
-) -> list[str]:
+) -> list[Path]:
     """Write every example fiche (PDF + WebP preview) into ``output_dir``.
 
     ``examples`` restricts the run to a subset of the registered factories
@@ -295,14 +294,19 @@ def generate_reports(
     each has a paired ``.webp`` preview next to it (see
     :func:`preview_path_for`).
     """
-    os.makedirs(output_dir, exist_ok=True)
-    written: list[str] = []
+    directory = Path(output_dir)
+    directory.mkdir(parents=True, exist_ok=True)
+    written: list[Path] = []
     for factory in _EXAMPLES if examples is None else examples:
         fiche = factory()
         result, metadata, name = fiche[0], fiche[1], fiche[2]
         kwargs: dict[str, Any] = fiche[3] if len(fiche) == 4 else {}
-        path = os.path.join(output_dir, name)
-        result.report(path, metadata=metadata, **kwargs)  # type: ignore[attr-defined]
+        path = directory / name
+        # ``report()`` takes a filename, and reportlab refuses anything that is
+        # not a string, so the path becomes text at that one boundary and stays
+        # a Path everywhere else.
+        dest = str(path)
+        result.report(dest, metadata=metadata, **kwargs)  # type: ignore[attr-defined]
         _write_preview(path)
         written.append(path)
     return written
@@ -313,7 +317,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", default=_DEFAULT_DIR)
     args = parser.parse_args()
-    for path in generate_reports(os.path.abspath(args.output_dir)):
+    for path in generate_reports(Path(args.output_dir).resolve()):
         print(f"wrote {path}")
         print(f"wrote {preview_path_for(path)}")
 

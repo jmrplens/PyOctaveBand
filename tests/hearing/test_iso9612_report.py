@@ -18,9 +18,9 @@ the rendering contract.
 from __future__ import annotations
 
 import math
-import os
 
 import pytest
+from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.hearing import (
@@ -29,17 +29,6 @@ from phonometry.hearing import (
     job_based_exposure,
     task_based_exposure,
 )
-
-_PDF_MAGIC = b"%PDF"
-
-
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -92,7 +81,7 @@ def test_report_renders_hand_computed_values(tmp_path) -> None:
     out = tmp_path / "iso9612.pdf"
     returned = res.report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "82.4" in text  # LEX,8h to one decimal (Clause 15 e)
     assert "2.7" in text  # U to one decimal, stated separately
@@ -125,7 +114,7 @@ def test_annex_d_example_renders_pinned_numbers(tmp_path) -> None:
     res = task_based_exposure(tasks, warn=False)
     out = tmp_path / "annex_d.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "84.3" in text
     assert "3.2" in text
@@ -173,7 +162,7 @@ def test_job_based_report_renders_sampling_summary(tmp_path) -> None:
     )
     out = tmp_path / "job.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "job-based measurement (Clause 10)" in text
     assert "Sampling summary" in text
@@ -190,7 +179,7 @@ def test_full_day_report_renders(tmp_path) -> None:
     )
     out = tmp_path / "full_day.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "full-day measurement (Clause 11)" in text
     assert "90.1" in text
@@ -216,7 +205,7 @@ def test_metadata_header_and_instrumentation_override(tmp_path) -> None:
     )
     out = tmp_path / "meta.pdf"
     res.report(str(out), metadata=metadata)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Example works" in text
     assert "Lathe operators" in text
@@ -233,7 +222,7 @@ def test_verbose_adds_annex_c_columns(tmp_path) -> None:
     res = _two_task_result()
     out = tmp_path / "verbose.pdf"
     res.report(str(out), verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     flat = "".join(_extract_text(str(out)).split())
     assert "u1a,m" in flat
     assert "u1b,m" in flat
@@ -272,7 +261,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     res = _two_task_result()
     out = tmp_path / "iso9612_es.pdf"
     res.report(str(out), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Determinación de la exposición al ruido en el trabajo" in text
     assert "Nivel de exposición diario equivalente" in text

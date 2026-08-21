@@ -14,17 +14,16 @@ measurement" wording and the verdict direction, like the sibling report tests.
 
 from __future__ import annotations
 
-import os
-
 import numpy as np
 import pytest
 
 pytest.importorskip("reportlab")
 
+from report_assertions import assert_one_page
+
 import phonometry as ph
 from phonometry import ReportMetadata, environment
 
-_PDF_MAGIC = b"%PDF"
 _BANDS = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
 
 
@@ -47,16 +46,6 @@ def _barrier(method: str = "exact") -> ph.environment.BarrierInsertionLoss:
     )
 
 
-def _assert_one_page(path: str) -> None:
-    """A written report is a non-empty single-page PDF."""
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
-
-
 def _extract_text(path: str) -> str:
     """The concatenated, whitespace-normalised text of every page."""
     from pypdf import PdfReader
@@ -73,7 +62,7 @@ def test_attenuation_with_emission_boxes_receiver_level(tmp_path) -> None:
     """With a source emission the fiche boxes the A-weighted downwind level."""
     out = tmp_path / "atten.pdf"
     assert _attenuation().report(str(out), source_emission=_emission()) == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "LAT(DW) = 46.5 dB" in text  # boxed A-weighted downwind level
     assert "ISO 9613-2:1996" in text
@@ -88,7 +77,7 @@ def test_attenuation_without_emission_boxes_total_range(tmp_path) -> None:
     """Without a source emission the fiche boxes the total-attenuation range."""
     out = tmp_path / "bare.pdf"
     _attenuation().report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Total attenuation A" in text
     assert "52.8" in text  # min total attenuation
@@ -150,7 +139,7 @@ def test_attenuation_metadata_header_and_distance(tmp_path) -> None:
     )
     out = tmp_path / "meta.pdf"
     _attenuation().report(str(out), metadata=metadata, source_emission=_emission())
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Industrial fan plant" in text
     assert "Phonometry Reference Laboratory" in text
@@ -168,7 +157,7 @@ def test_attenuation_spanish_fiche(tmp_path) -> None:
         source_emission=_emission(),
         language="es",
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "CUMPLE" in text  # 46.5 dB <= 50 dB
     assert "prevista" in text  # "predicted"
@@ -183,7 +172,7 @@ def test_barrier_report_structure_and_numbers(tmp_path) -> None:
     """The barrier fiche boxes the mean insertion loss and cites the model."""
     out = tmp_path / "bar.pdf"
     assert _barrier().report(str(out)) == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "IL = 12.9 dB" in text  # boxed mean insertion loss
     assert "prediction" in text
@@ -222,7 +211,7 @@ def test_barrier_kurze_anderson_model_cited(tmp_path) -> None:
     """The Kurze-Anderson method is named in the basis line."""
     out = tmp_path / "ka.pdf"
     _barrier(method="kurze_anderson").report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "Kurze-Anderson" in _extract_text(str(out))
 
 
@@ -230,7 +219,7 @@ def test_barrier_lightweight_without_metadata(tmp_path) -> None:
     """A barrier fiche with no metadata is still a valid one-page prediction."""
     out = tmp_path / "bare.pdf"
     _barrier().report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "prediction" in _extract_text(str(out))
 
 
@@ -238,7 +227,7 @@ def test_barrier_spanish_fiche(tmp_path) -> None:
     """``language="es"`` renders the Spanish barrier fiche."""
     out = tmp_path / "es.pdf"
     _barrier().report(str(out), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "prevista" in text  # "predicted"
     assert "no una medici" in text  # "not a measurement"

@@ -14,6 +14,7 @@ silently degrouping a cached figure or dropping a clip's field builder.
 import os
 import sys
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
 import matplotlib.pyplot as plt
@@ -1160,15 +1161,15 @@ def generate_posters(output_dir: str) -> None:
     Used by ``--posters`` (`make posters`) to refresh the stills without the
     slow re-encode of the clips themselves.
     """
-    import glob
-
-    webms = sorted(glob.glob(os.path.join(output_dir, "anim_*.webm")))
+    # `_extract_poster` trims the `.webm` off the text it is handed and returns
+    # the poster path the same way, so the clips are named as text from here on.
+    webms = sorted(str(webm) for webm in Path(output_dir).glob("anim_*.webm"))
     if not webms:
         msg = f"no anim_*.webm files found in {output_dir}; run `make animations` first"
         raise RuntimeError(msg)
     for webm in webms:
         poster = _extract_poster(webm, _poster_ss_for(webm))
-        print(f"  {os.path.basename(webm)} -> {os.path.basename(poster)}")
+        print(f"  {Path(webm).name} -> {Path(poster).name}")
 
 
 _ANIMATIONS: dict[str, Callable[[str], None]] = {
@@ -1748,7 +1749,7 @@ def main(argv: list[str] | None = None) -> None:
     args = parser.parse_args(argv)
 
     img_dir = ".github/images"
-    os.makedirs(img_dir, exist_ok=True)
+    Path(img_dir).mkdir(parents=True, exist_ok=True)
 
     do_figs = not (args.animations or args.posters) or args.do_all
     do_anim = args.animations or args.do_all

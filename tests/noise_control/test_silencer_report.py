@@ -15,29 +15,17 @@ complete the rendering contract.
 
 from __future__ import annotations
 
-import os
-
 import numpy as np
 import pytest
+from report_assertions import assert_one_page
 
 from phonometry.noise_control import silencers as sl
-
-_PDF_MAGIC = b"%PDF"
 
 _FREQS = np.array([63, 125, 250, 500, 1000, 2000, 4000], dtype=float)
 _LENGTH = 0.5
 _S_EXP = 0.08
 _S_DUCT = 0.01
 _C = 343.0
-
-
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -73,7 +61,7 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     out = tmp_path / "silencer.pdf"
     returned = res.report(str(out), metadata=None)
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
 
     tl = _oracle_tl()
@@ -114,7 +102,7 @@ def test_insertion_loss_column_when_impedances_given(tmp_path) -> None:
     )
     out = tmp_path / "with_il.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "IL [dB]" in text
     # For the anechoic reference the insertion loss equals the transmission loss.
@@ -130,7 +118,7 @@ def test_resonator_reports_resonances(tmp_path) -> None:
     res = sl.helmholtz_resonator(f, 0.01, 1e-4, 0.02, 1e-3)
     out = tmp_path / "helmholtz.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Helmholtz resonator" in text
     assert "Resonance frequencies" in text
@@ -164,7 +152,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     res = _result()
     out = tmp_path / "es.pdf"
     res.report(str(out), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Pérdida por transmisión de silenciador reactivo" in text
     assert "Pérdida por transmisión media" in text

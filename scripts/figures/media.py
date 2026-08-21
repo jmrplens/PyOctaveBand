@@ -128,7 +128,10 @@ def _translate_str(s: str) -> str:
 
 def _anim_path(output_dir: str, stem: str, ext: str) -> str:
     """Animation output path with the active language + theme suffixes."""
-    return os.path.join(output_dir, f"{stem}{_LANG_SUFFIX}{_FILENAME_SUFFIX}.{ext}")
+    # The code that draws the clips is hashed into
+    # scripts/animation_fingerprints.txt, so rewriting this asks for a
+    # re-render that would draw the very same frames.
+    return os.path.join(output_dir, f"{stem}{_LANG_SUFFIX}{_FILENAME_SUFFIX}.{ext}")  # noqa: PTH118
 
 
 def _anim_figure() -> Any:
@@ -314,7 +317,7 @@ ssh -o BatchMode=yes -- {q_target} "rm -f {q_dir}/$rid"
         "w", suffix=".sh", prefix="ffmpeg-gpu-", delete=False
     ) as handle:
         handle.write(script)
-    os.chmod(handle.name, 0o755)
+    os.chmod(handle.name, 0o755)  # noqa: PTH101
     return handle.name
 
 
@@ -373,7 +376,7 @@ def _save_animation(
         except (RuntimeError, subprocess.CalledProcessError, OSError) as exc:
             print(f"  [gpu-encode] {stem}: {exc}; falling back to VP9")
         finally:
-            os.remove(wrapper)
+            os.remove(wrapper)  # noqa: PTH107
     if not saved:
         writer = FFMpegWriter(
             fps=rate_arg, codec="libvpx-vp9", extra_args=_vp9_extra_args()
@@ -389,7 +392,7 @@ def _save_animation(
     made_gif = False
     if make_gif and _LANG == "en":
         gif = _anim_path(output_dir, stem, "gif")
-        palette = os.path.join(output_dir, f".{stem}{_FILENAME_SUFFIX}_pal.png")
+        palette = os.path.join(output_dir, f".{stem}{_FILENAME_SUFFIX}_pal.png")  # noqa: PTH118
         vf = (
             f"fps={_GIF_FPS if gif_fps is None else gif_fps},"
             f"scale={_GIF_SCALE}:-1:flags=lanczos"
@@ -428,7 +431,7 @@ def _save_animation(
             ],
             check=True,
         )
-        os.remove(palette)
+        os.remove(palette)  # noqa: PTH107
         made_gif = True
     plt.close(fig)
     theme = "dark" if _FILENAME_SUFFIX else "light"

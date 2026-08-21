@@ -99,6 +99,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- A path is a `Path`, and a loop that only appends is a comprehension. `PTH`
+  and `PERF` are selected, and the 193 sites they found were read one at a
+  time, because the two spellings of a path are not the same type: a `Path`
+  prints like its string and compares unequal to it, so the sites worth
+  reading were the ones that hand their value to a sort, a comparison or a
+  dictionary key. One did. The CI comment builder sorted a list of artifact
+  paths, and sorting `Path` objects compares them component by component
+  rather than as text, which reorders the rows whenever one matrix name is a
+  prefix of another, as `3.13` is of `3.13-dev`. It sorts as text now, and
+  says so.
+
+  Half of what the rules found was one pair of lines copied fifty-four times.
+  Every fiche test carried its own `_assert_one_page` and its own
+  `_PDF_MAGIC`, in eight spellings, and forty-six of them also asserted a
+  non-zero file size, which could not fail: reading the first four bytes and
+  finding `%PDF` already proves the file holds four bytes. Converting each
+  copy would have carried the duplication into `pathlib`, so the assertion
+  that carries weight now lives once, in `tests/report_assertions.py`, and
+  the fifty-four copies are gone.
+
+  Fifteen sites keep the older spelling behind a `noqa` that says why: they
+  sit in the code that draws the animations, which is hashed into
+  `scripts/animation_fingerprints.txt`, so rewriting a line there asks for a
+  re-render of clips that would come back frame for frame identical.
+
 - Every test that expects an error says which error. `PT` is selected, and the
   241 `pytest.raises(ValueError)` calls that named no message now name one.
   This was already the habit rather than a new rule: of the 2075 `pytest.raises`

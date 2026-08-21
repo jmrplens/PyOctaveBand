@@ -19,9 +19,10 @@ import reference_data as ref
 
 pytest.importorskip("reportlab")
 
+from report_assertions import assert_one_page
+
 from phonometry import ReportMetadata, building
 
-_PDF_MAGIC = b"%PDF"
 _BANDS = np.asarray(ref.ISO12354_ANNEX_L_BANDS, dtype=np.float64)
 
 
@@ -58,18 +59,6 @@ def _annex_g_impact():
     )
 
 
-def _assert_one_page(path: str) -> None:
-    """A written report is a non-empty single-page PDF."""
-    import os
-
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
-
-
 def _extract_text(path: str) -> str:
     """The concatenated, whitespace-normalised text of every page."""
     from pypdf import PdfReader
@@ -83,7 +72,7 @@ def test_detailed_airborne_fiche_boxes_the_annex_l_rating(tmp_path) -> None:
     """The detailed airborne fiche boxes R'w = 57 dB and names Clause 4.2."""
     out = tmp_path / "air.pdf"
     assert _annex_l_airborne().report(str(out)) == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert f"{ref.ISO12354_ANNEX_L1_R_PRIME_W} dB" in text
     assert "ISO 12354-1:2017" in text
@@ -113,7 +102,7 @@ def test_detailed_impact_fiche_boxes_the_annex_g_rating(tmp_path) -> None:
         ),
         verbose=True,
     ) == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert f"{ref.ISO12354_ANNEX_G1_L_PRIME_N_W} dB" in text
     assert "ISO 12354-2:2017" in text
@@ -127,7 +116,7 @@ def test_spanish_detailed_fiche_renders(tmp_path) -> None:
     """The fiches translate to Spanish like every other report."""
     out = tmp_path / "air_es.pdf"
     _annex_l_airborne().report(str(out), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "ISO 12354-1:2017" in text
     assert "57 dB" in text

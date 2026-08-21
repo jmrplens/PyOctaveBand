@@ -74,10 +74,12 @@ def _tone(
 
 
 def _levels_from_file() -> np.ndarray:
-    levels = []
-    for line in (DATA / "iso532_1_test_signal_1_levels.txt").read_text().splitlines():
-        if ":" in line and not line.strip().startswith("#"):
-            levels.append(float(line.split(":")[1]))
+    lines = (DATA / "iso532_1_test_signal_1_levels.txt").read_text().splitlines()
+    levels = [
+        float(line.split(":")[1])
+        for line in lines
+        if ":" in line and not line.strip().startswith("#")
+    ]
     return np.array(levels)
 
 
@@ -408,15 +410,13 @@ def test_time_varying_outputs() -> None:
 @requires_iso_data
 @pytest.mark.parametrize("num", list(range(14, 26)))
 def test_annex_b5_technical_signals(num: int) -> None:
-    import glob
-
-    matches = glob.glob(str(DATA / "Annex B.5" / f"Test signal {num} *.wav"))
+    matches = list((DATA / "Annex B.5").glob(f"Test signal {num} *.wav"))
     if not matches:
         pytest.skip(f"signal {num} not found")
     # Annex B.1: "0 dB (relative to full scale) shall correspond to a sound
     # pressure level of 100 dB" — a full-scale sine is 100 dB SPL (2 Pa RMS),
     # so one full-scale unit is 2*sqrt(2) Pa peak.
-    fullscale, fs = _read_wav_fullscale(matches[0])
+    fullscale, fs = _read_wav_fullscale(str(matches[0]))
     x = fullscale * (2.0 * np.sqrt(2.0))
     exp = EXPECTED[f"Test signal {num}"]
     # Each B.5 signal is validated in the sound field its ISO results

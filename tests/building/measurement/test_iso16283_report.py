@@ -28,10 +28,9 @@ from reference_data import (
 from reference_data import (
     ISO717_2_ANNEX_C1_LN as _IMPACT_LN,
 )
+from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, building
-
-_PDF_MAGIC = b"%PDF"
 
 #: A receiving-room reverberation time equal to T0 = 0,5 s in every band:
 #: the standardized quantities then equal the raw ones exactly
@@ -44,18 +43,6 @@ def _airborne_result(**kwargs) -> building.AirborneInsulationResult:
     l1 = np.full(16, 90.0)
     l2 = l1 - np.asarray(_AIRBORNE_R, dtype=np.float64)
     return building.airborne_insulation(l1, l2, _T_AT_T0, **kwargs)
-
-
-def _assert_one_page(path: str) -> None:
-    """A written report is a non-empty single-page PDF."""
-    import os
-
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -88,7 +75,7 @@ def test_airborne_fiche_rating_pinned_to_iso717_1_annex_c(tmp_path) -> None:
     """
     out = tmp_path / "dnt.pdf"
     _airborne_result().report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "30 (-2; -3) dB" in text
     assert "ISO 16283-1:2014" in text
@@ -110,7 +97,7 @@ def test_r_prime_fiche_hand_computed(tmp_path) -> None:
     assert np.allclose(result.r_prime, expected)
     out = tmp_path / "r_prime.pdf"
     result.report(str(out), quantity="r_prime")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Apparent sound reduction index" in text
 
@@ -126,7 +113,7 @@ def test_impact_fiche_rating_pinned_to_iso717_2_annex_c(tmp_path) -> None:
     result = building.impact_insulation(_IMPACT_LN, _T_AT_T0, volume=31.25)
     out = tmp_path / "lnt.pdf"
     result.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     expected = f"{_IMPACT_EXPECTED['ln_w']} ({_IMPACT_EXPECTED['ci']:+d}) dB"
     assert expected in text
@@ -147,7 +134,7 @@ def test_impact_l_n_fiche_hand_computed(tmp_path) -> None:
     assert np.allclose(result.l_n, _IMPACT_LN)
     out = tmp_path / "ln.pdf"
     result.report(str(out), quantity="l_n")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert f"{_IMPACT_EXPECTED['ln_w']} ({_IMPACT_EXPECTED['ci']:+d}) dB" in text
     assert "Normalized impact sound pressure level" in text
@@ -173,7 +160,7 @@ def test_full_metadata_and_verbose_render_one_page(tmp_path) -> None:
     )
     out = tmp_path / "verbose.pdf"
     result.report(str(out), metadata=metadata, verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "PASS" in text  # DnT,w = 30 dB >= 25 dB
 
@@ -203,7 +190,7 @@ def test_spanish_fiche_renders_translated(tmp_path) -> None:
         verbose=True,
         language="es",
     )
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "in situ" in text
     assert "CUMPLE" in text
@@ -257,7 +244,7 @@ def test_verbose_needs_measurement_chain(tmp_path) -> None:
     # The non-verbose form still renders from the quantity alone.
     out = tmp_path / "bare.pdf"
     bare.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_manual_impact_result_renders_without_chain(tmp_path) -> None:
@@ -266,7 +253,7 @@ def test_manual_impact_result_renders_without_chain(tmp_path) -> None:
     bare = building.ImpactInsulationResult(l_n_t=curve, l_n=None)
     out = tmp_path / "bare_impact.pdf"
     bare.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     rejected = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="measurement chain"):
         bare.report(rejected, verbose=True)

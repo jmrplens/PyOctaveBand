@@ -31,6 +31,7 @@ pytest.importorskip("pypdf")
 from typing import TYPE_CHECKING
 
 import numpy as np
+from report_assertions import assert_one_page
 
 from phonometry import (
     ReportMetadata,
@@ -40,7 +41,6 @@ from phonometry import (
 if TYPE_CHECKING:
     from phonometry.room import OpenPlanResult
 
-_PDF_MAGIC = b"%PDF"
 
 #: Documented measurement line and its exact closed-form single-number results.
 _POSITIONS = np.array([2.0, 3.0, 4.0, 6.0, 8.0, 11.0, 16.0])
@@ -54,18 +54,6 @@ _RP = 15.0
 
 def _result() -> OpenPlanResult:
     return room.open_plan_metrics(_POSITIONS, _SPL, _STI)
-
-
-def _assert_one_page(path: str) -> None:
-    """The fiche is a single-page PDF beginning with ``%PDF``."""
-    import os
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    from pypdf import PdfReader
-
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -119,21 +107,21 @@ def test_report_writes_pdf(tmp_path) -> None:
     out = tmp_path / "openplan.pdf"
     returned = _result().report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_report_with_full_metadata_one_page(tmp_path) -> None:
     """A full ReportMetadata renders a one-page accredited open-plan fiche."""
     out = tmp_path / "openplan_meta.pdf"
     _result().report(str(out), metadata=_full_metadata())
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_report_bare_without_metadata(tmp_path) -> None:
     """metadata=None renders a bare characterisation fiche (no header)."""
     out = tmp_path / "bare.pdf"
     _result().report(str(out), metadata=None)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_unknown_engine_rejected(tmp_path) -> None:
@@ -180,8 +168,8 @@ def test_verdict_renders_both_ways(tmp_path) -> None:
     failing = tmp_path / "fail.pdf"
     _result().report(str(passing), metadata=_full_metadata(requirement=7.0))
     _result().report(str(failing), metadata=_full_metadata(requirement=8.0))
-    _assert_one_page(str(passing))
-    _assert_one_page(str(failing))
+    assert_one_page(str(passing))
+    assert_one_page(str(failing))
     assert "PASS" in _extract_text(str(passing))
     assert "FAIL" in _extract_text(str(failing))
 
@@ -210,7 +198,7 @@ def test_degenerate_result_renders_without_plot(tmp_path) -> None:
     assert not np.isfinite(res.d2s)
     out = tmp_path / "degenerate.pdf"
     res.report(str(out), metadata=_full_metadata())
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     assert "—" in _extract_text(str(out))  # em-dash empty-cell symbol
 
 
@@ -227,7 +215,7 @@ def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
     )
     out = tmp_path / "xml.pdf"
     _result().report(str(out), metadata=md)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
 
 
 def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
@@ -236,7 +224,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
 
     out = tmp_path / "openplan_es.pdf"
     _result().report(str(out), metadata=_full_metadata(requirement=7.0), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Acústica de oficinas diáfanas" in text
     assert "CUMPLE" in text

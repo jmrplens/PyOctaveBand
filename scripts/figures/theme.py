@@ -216,11 +216,14 @@ def save_figure(output_dir: str, filename: str, **kwargs: Any) -> None:
     across matplotlib builds and runs. In both cases ``filename`` may carry
     any extension; the real one is chosen here.
     """
-    stem = os.path.splitext(filename)[0]
+    # The code that draws the clips is hashed into
+    # scripts/animation_fingerprints.txt, so rewriting this asks for a
+    # re-render that would draw the very same frames.
+    stem = os.path.splitext(filename)[0]  # noqa: PTH122
     audit_figure(stem)
     _translate_figure(plt.gcf())
     ext = "webp" if stem in _RASTER_FIGURES else "svg"
-    path = os.path.join(output_dir, f"{stem}{_LANG_SUFFIX}{_FILENAME_SUFFIX}.{ext}")
+    path = os.path.join(output_dir, f"{stem}{_LANG_SUFFIX}{_FILENAME_SUFFIX}.{ext}")  # noqa: PTH118
     if ext == "svg":
         plt.rcParams["svg.hashsalt"] = "phonometry"
         # Text is drawn as outlines, not as <text>. Keeping it as text made a

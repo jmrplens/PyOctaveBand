@@ -71,11 +71,12 @@ def test_every_registered_fiche_is_committed() -> None:
     factory still writes the file it is registered under.
     """
     committed = pathlib.Path(_MODULE._DEFAULT_DIR)
-    missing = []
-    for name in _MODULE._FICHES:
-        for path in (committed / name, committed / _MODULE.preview_path_for(name)):
-            if not path.is_file():
-                missing.append(path.name)
+    missing = [
+        path.name
+        for name in _MODULE._FICHES
+        for path in (committed / name, committed / _MODULE.preview_path_for(name))
+        if not path.is_file()
+    ]
     assert not missing, (
         f"registered fiches with no committed render: {sorted(missing)} - "
         "run 'make reports' and commit the result"
@@ -99,7 +100,7 @@ def test_each_example_writes_a_one_page_pdf_and_preview(
     assert _MODULE._FICHES.get(p.name) is factory
     assert p.is_file()
     assert p.stat().st_size > 0
-    with open(p, "rb") as handle:
+    with p.open("rb") as handle:
         assert handle.read(4) == b"%PDF"
     assert len(PdfReader(str(p)).pages) == 1
     preview = pathlib.Path(_MODULE.preview_path_for(str(p)))

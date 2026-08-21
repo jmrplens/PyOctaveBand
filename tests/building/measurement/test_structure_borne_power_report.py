@@ -16,14 +16,11 @@ the rendering contract.
 
 from __future__ import annotations
 
-import os
-
 import numpy as np
 import pytest
+from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, building
-
-_PDF_MAGIC = b"%PDF"
 
 _FREQS = np.array([125, 250, 500, 1000, 2000, 4000], dtype=float)
 # Spatial mean plate velocity level Lv (dB re 1e-9 m/s) per octave band.
@@ -31,15 +28,6 @@ _LV = np.array([88.0, 90.0, 86.0, 82.0, 78.0, 73.0])
 _MASS = 25.0  # plate mass per area m, kg/m^2
 _AREA = 1.2  # reception-plate area S, m^2
 _TS = 0.3  # structural reverberation time Ts, s
-
-
-def _assert_one_page(path: str) -> None:
-    from pypdf import PdfReader
-
-    with open(path, "rb") as handle:
-        assert handle.read(4) == _PDF_MAGIC
-    assert os.path.getsize(path) > 0
-    assert len(PdfReader(path).pages) == 1
 
 
 def _extract_text(path: str) -> str:
@@ -92,7 +80,7 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     out = tmp_path / "en15657.pdf"
     returned = res.report(str(out))
     assert returned == str(out)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
 
     # Band-summed total to one decimal, boxed with its reference power.
@@ -125,7 +113,7 @@ def test_verbose_adds_loss_factor_column(tmp_path) -> None:
     res = _result()
     out = tmp_path / "verbose.pdf"
     res.report(str(out), verbose=True)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     # The 1 kHz loss factor eta = 2,2/(1000*0,3) = 0,0073 (four decimals).
     eta = _oracle_eta()
@@ -144,7 +132,7 @@ def test_third_octave_labels_and_caption(tmp_path) -> None:
     )
     out = tmp_path / "third.pdf"
     res.report(str(out))
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "One-third-octave-band structure-borne sound power levels" in text
     for label in ("100", "125", "160", "800"):
@@ -184,7 +172,7 @@ def test_metadata_header_renders(tmp_path) -> None:
     )
     out = tmp_path / "meta.pdf"
     res.report(str(out), metadata=metadata)
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Example works" in text
     assert "Circulation pump" in text
@@ -201,7 +189,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     res = _result()
     out = tmp_path / "es.pdf"
     res.report(str(out), language="es")
-    _assert_one_page(str(out))
+    assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Determinación de la potencia acústica estructural" in text
     assert "método de la placa de recepción" in text

@@ -280,18 +280,18 @@ def test_no_renderer_defaults_a_label_on_the_shared_kwargs_inside_a_loop() -> No
         for node in ast.walk(tree):
             if not isinstance(node, ast.For | ast.While | ast.AsyncFor):
                 continue
-            for child in ast.walk(node):
-                if (
-                    isinstance(child, ast.Call)
-                    and isinstance(child.func, ast.Attribute)
-                    and child.func.attr == "setdefault"
-                    and isinstance(child.func.value, ast.Name)
-                    and child.func.value.id == "kwargs"
-                    and child.args
-                    and isinstance(child.args[0], ast.Constant)
-                    and child.args[0].value == "label"
-                ):
-                    offenders.append(f"{path.name}:{child.lineno}")
+            offenders.extend(
+                f"{path.name}:{child.lineno}"
+                for child in ast.walk(node)
+                if isinstance(child, ast.Call)
+                and isinstance(child.func, ast.Attribute)
+                and child.func.attr == "setdefault"
+                and isinstance(child.func.value, ast.Name)
+                and child.func.value.id == "kwargs"
+                and child.args
+                and isinstance(child.args[0], ast.Constant)
+                and child.args[0].value == "label"
+            )
     assert not offenders, (
         "a label default on the shared kwargs inside a loop names every curve "
         f"after the first one: {offenders}. Take a copy per iteration."
