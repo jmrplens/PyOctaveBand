@@ -27,7 +27,6 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_choice
 from ._i18n import format_number, t
 
 if TYPE_CHECKING:
@@ -305,7 +304,15 @@ def render_figure_drawing(
     if drawing is None or not drawing.width:
         msg = "Could not convert the report plot to vector graphics."
         raise ValueError(msg)
-    scale = target_width / drawing.width
+    # Scale by what the drawing *covers*, not by the width it declares. A
+    # legend anchored outside the axes reaches past the figure box svglib
+    # reports, and scaling by the declared width let that overhang through at
+    # full size: the duct-path sheet declared 96 mm, drew 106.6, and put its
+    # legend 10.7 mm beyond the right margin of the page, straight through
+    # the plot's own border. Taking the rightmost ink puts the far edge of
+    # the drawing exactly where the caller asked for it.
+    covered = max(float(drawing.width), float(drawing.getBounds()[2]))
+    scale = target_width / covered
     drawing.scale(scale, scale)
     drawing.width = drawing.width * scale
     drawing.height = drawing.height * scale
@@ -729,6 +736,10 @@ def compliance_table(
         mistyped verdict into no verdict at all, and the row a caller meant
         to mark FAIL came out looking like a row nobody had judged.
         """
+        # Imported here, not at module level: a rendering leaf may not reach
+        # domain code on import (tests/test_package_architecture.py).
+        from .._internal.validation import require_choice
+
         require_choice(status, "status", ("pass", "fail", "info"))
         if status == "pass":
             return (

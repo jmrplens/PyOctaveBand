@@ -115,3 +115,30 @@ def test_the_octave_grouping_is_measured_from_the_band_centres(
     length other than five got one-third-octave rules.
     """
     assert _octave_grouping(centres) == expected
+
+
+# --------------------------------------------------------------------------
+# A drawing wider than the width it declares
+# --------------------------------------------------------------------------
+def test_a_drawing_is_scaled_by_what_it_covers_not_by_what_it_declares() -> None:
+    """A legend anchored outside the axes reaches past the figure box.
+
+    svglib reports the declared box, so scaling by that let the overhang
+    through at full size: the duct-path sheet asked for 96 mm, drew 106.6,
+    and put its legend 10.7 mm beyond the right margin of the page, straight
+    through the plot's own border.
+    """
+    pytest.importorskip("matplotlib")
+    pytest.importorskip("svglib")
+
+    from phonometry._report._layout import render_figure_drawing
+
+    def wide_legend(ax=None, language="en", **kwargs):
+        """A plot whose legend is far wider than its axes."""
+        ax.plot([1.0, 2.0], [1.0, 2.0], label="a legend entry long enough to overhang")
+        ax.legend(loc="lower left", bbox_to_anchor=(0.0, 1.005))
+        return ax
+
+    target = 100.0
+    drawing = render_figure_drawing(wide_legend, target, y_top=None)
+    assert drawing.getBounds()[2] <= target + 0.5

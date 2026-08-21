@@ -107,6 +107,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   that went missing. The rebuild now gathers the twins' handles too, in the
   order the plot used, so the printed legend says what the plot said.
 
+- Two committed fiches printed past the right margin of the page. The
+  embedded plot was scaled by the width its SVG declares, and a legend
+  anchored outside the axes reaches past that box, so the overhang went
+  through at full size: the duct-path sheet asked for a 96 mm drawing, drew
+  106.6, and put its legend 10.7 mm beyond the margin, straight through the
+  plot's own border. The IEC 61043 sheet ran 3.2 mm over the same way. The
+  drawing is scaled by what it covers now, and both sheets end where every
+  other one does.
+
 - A fiche is one page, and nothing checked that it came to one. An
   impedance-tube result of forty frequencies rendered three pages, the first
   a title over a blank half and the rest carrying the table, the result and
