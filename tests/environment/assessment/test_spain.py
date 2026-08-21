@@ -666,3 +666,16 @@ def test_round_reported_level_rejects_non_finite() -> None:
     """Rounding a non-finite level is an error rather than a silent NaN."""
     with pytest.raises(ValueError, match="finite"):
         rd.round_reported_level(math.inf)
+
+
+# --------------------------------------------------------------------------
+# Per-band columns that do not agree
+# --------------------------------------------------------------------------
+def test_a_tonal_correction_refuses_per_band_columns_that_disagree() -> None:
+    """The correction names a governing band, so the columns must line up."""
+    import dataclasses
+
+    frequencies = np.array([100.0, 125.0, 160.0, 200.0, 250.0])
+    result = rd.tonal_correction(np.array([50.0, 62.0, 51.0, 50.0, 49.0]), frequencies)
+    with pytest.raises(ValueError, match="'levels'"):
+        dataclasses.replace(result, levels=result.levels[:-1])

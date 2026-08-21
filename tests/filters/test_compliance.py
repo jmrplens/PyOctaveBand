@@ -257,3 +257,23 @@ def test_map_breakpoint_reproduces_table_f1() -> None:
         got = _map_breakpoint(exponent, 3)
         assert got == pytest.approx(omega, abs=5e-6), exponent
         assert 1.0 / got == pytest.approx(reciprocal, abs=5e-6), exponent
+
+
+# --------------------------------------------------------------------------
+# Per-band entries that do not agree
+# --------------------------------------------------------------------------
+def test_a_filter_verdict_refuses_per_band_entries_that_disagree() -> None:
+    """The fiche prints one row per band under the bank's overall class.
+
+    A band list short of an entry gives a sheet whose verdict covers a band
+    that is nowhere in its table.
+    """
+    import dataclasses
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    with pytest.raises(ValueError, match="'bands'"):
+        dataclasses.replace(result, bands=result.bands[:-1])

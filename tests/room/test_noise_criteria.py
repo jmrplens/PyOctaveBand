@@ -306,3 +306,23 @@ def test_nc_verdict_long_hvac_receiver_spectrum() -> None:
     )
     assert res.out_of_range is None
     assert res.rating <= 30.0
+
+
+# --------------------------------------------------------------------------
+# A spectrum that does not run over its own band axis
+# --------------------------------------------------------------------------
+@pytest.mark.parametrize("trim", [True, False], ids=["short", "long"])
+def test_an_nc_rating_refuses_levels_off_the_band_axis(trim: bool) -> None:
+    """The rating names a governing band, so the two axes must agree.
+
+    A spectrum of the wrong length would have the rating name a band the
+    levels never had.
+    """
+    import dataclasses
+
+    bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
+    result = rn.noise_criterion([50.0, 45.0, 40.0, 38.0, 35.0, 32.0, 30.0, 28.0], bands)
+    levels = np.asarray(result.levels)
+    wrong = levels[:-1] if trim else np.append(levels, levels[-1])
+    with pytest.raises(ValueError, match="'levels'"):
+        dataclasses.replace(result, levels=wrong)

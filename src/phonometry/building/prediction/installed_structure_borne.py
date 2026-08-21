@@ -88,6 +88,8 @@ from ..._internal.validation import (
     require_choice,
     require_non_negative,
     require_positive,
+    require_ranks,
+    require_same_length,
 )
 from .resilient_layers import TAPPING_HAMMER_MASS
 
@@ -1000,6 +1002,33 @@ class InstalledSourceResult:
     total_level: np.ndarray
     installed_power_level: np.ndarray
     frequencies: np.ndarray | None = None
+
+    def __post_init__(self) -> None:
+        """Reject a prediction whose paths and bands do not line up.
+
+        The fiche prints one row per transmission path and, in its box, the
+        band-summed :attr:`overall_level`, which is computed from
+        ``total_level`` and not from the rows. A ``path_levels`` short of a
+        row therefore yields a sheet whose box sums a path that is nowhere in
+        the table, under a caption stating that the total is the energy sum of
+        the rows above.
+
+        :raises ValueError: if the band or path axes disagree.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            total_level=1,
+            installed_power_level=1,
+            path_levels=2,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "total_level",
+            "installed_power_level",
+            ("path_levels", 1),
+        )
 
     @property
     def overall_level(self) -> float:

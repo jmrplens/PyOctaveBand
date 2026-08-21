@@ -85,6 +85,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
+
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
@@ -376,6 +378,26 @@ class TonalCorrectionResult:
     band_corrections: np.ndarray
     correction: float
     governing_frequency: float | None
+
+    def __post_init__(self) -> None:
+        """Reject a correction whose per-band columns disagree.
+
+        The correction names a governing band, and the fiche tabulates the
+        levels, the differences and the per-band corrections beside the band
+        centres, so a column of another length names the wrong band.
+
+        :raises ValueError: if the per-band columns disagree.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            levels=1,
+            differences=1,
+            band_corrections=1,
+        )
+        require_same_length(
+            self, "frequencies", "levels", "differences", "band_corrections"
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

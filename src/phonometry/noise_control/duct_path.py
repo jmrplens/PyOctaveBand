@@ -53,6 +53,12 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import (
+    require_axis_count,
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
 from ._criterion import (
     as_band_spectrum,
     curve_of,
@@ -168,6 +174,51 @@ class DuctPathResult:
     target: float | None
     label: str
     contributions: tuple[tuple[str, np.ndarray], ...] = field(default_factory=tuple)
+
+    def __post_init__(self) -> None:
+        """Reject a sheet whose rows do not all run over the same bands.
+
+        The calculation sheet prints one row per element under a single band
+        header and a running total beneath them, so a row of the wrong length
+        is not a detail: reportlab pads the short row out to the header and
+        the sheet then shows a total summing a band that appears nowhere in
+        the column above it.
+
+        :raises ValueError: if any spectrum disagrees with ``frequencies``.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            source_level=1,
+            room_effect=1,
+            received_level=1,
+        )
+        require_same_length(
+            self, "frequencies", "source_level", "room_effect", "received_level"
+        )
+        owner = type(self).__name__
+        bands = require_axis_count(self.frequencies, owner, "frequencies", rank=None)
+        for i, stage in enumerate(self.stages):
+            for name in ("attenuation", "attenuated", "self_noise", "level"):
+                label = f"stages[{i}].{name}"
+                require_equal_counts(
+                    owner,
+                    {
+                        "frequencies": bands,
+                        label: require_axis_count(
+                            getattr(stage, name), owner, label, rank=1
+                        ),
+                    },
+                )
+        for i, (name, level) in enumerate(self.contributions):
+            label = f"contributions[{i}] ({name})"
+            require_equal_counts(
+                owner,
+                {
+                    "frequencies": bands,
+                    label: require_axis_count(level, owner, label, rank=1),
+                },
+            )
 
     # -- ratings ----------------------------------------------------------
     @property

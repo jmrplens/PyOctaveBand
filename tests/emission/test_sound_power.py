@@ -501,3 +501,41 @@ def test_plot_language_spanish_and_validation() -> None:
     assert ax_en.get_ylabel() == "Sound power level $L_W$ [dB]"
     with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
+
+
+# --------------------------------------------------------------------------
+# Per-band quantities that do not run over the band axis
+# --------------------------------------------------------------------------
+def _ten_position_determination() -> object:
+    """A ten-position, four-band ISO 3744 determination."""
+    return emission.sound_power_pressure(
+        np.tile(np.array([80.0, 78.0, 76.0, 74.0]), (10, 1)),
+        "hemisphere",
+        radius=2.0,
+        frequencies=np.array([250.0, 500.0, 1000.0, 2000.0]),
+    )
+
+
+@pytest.mark.parametrize("trim", [True, False], ids=["short", "long"])
+def test_a_per_band_quantity_off_the_band_axis_is_refused(trim: bool) -> None:
+    """The boxed A-weighted total sums every band of ``sound_power_level``.
+
+    A spectrum of another length than the band axis gives a sheet whose
+    headline number sums bands its own table does not print.
+    """
+    import dataclasses
+
+    result = _ten_position_determination()
+    values = np.asarray(result.sound_power_level)
+    wrong = values[:-1] if trim else np.append(values, values[-1])
+    with pytest.raises(ValueError, match="'sound_power_level'"):
+        dataclasses.replace(result, sound_power_level=wrong)
+
+
+def test_the_directivity_index_is_pinned_on_its_band_axis() -> None:
+    """``directivity_index`` is positions by bands: axis 1 carries the bands."""
+    import dataclasses
+
+    result = _ten_position_determination()
+    with pytest.raises(ValueError, match=r"'directivity_index \(axis 1\)'"):
+        dataclasses.replace(result, directivity_index=result.directivity_index[:, :-1])

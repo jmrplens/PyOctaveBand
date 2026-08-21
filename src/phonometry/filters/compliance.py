@@ -40,6 +40,8 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from scipy import signal
 
+from .._internal.validation import require_ranks, require_same_length
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
@@ -409,6 +411,18 @@ class FilterComplianceResult:
     fs: float
     num_points: int
     range_limited: bool = False
+
+    def __post_init__(self) -> None:
+        """Reject a verdict whose per-band entries disagree.
+
+        The fiche prints one row per band and, in its box, the overall class
+        of the whole bank, so a band list short of an entry gives a sheet
+        whose verdict covers a band that is nowhere in its table.
+
+        :raises ValueError: if the per-band entries disagree.
+        """
+        require_ranks(self, band_frequencies=1)
+        require_same_length(self, "bands", "sos", "band_frequencies", "factors")
 
     def available_classes(self) -> list[int]:
         """The performance classes carried by the per-band verdict dictionaries.

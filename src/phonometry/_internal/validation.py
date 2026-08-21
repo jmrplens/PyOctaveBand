@@ -14,6 +14,8 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from numpy.typing import ArrayLike
 
 
@@ -116,6 +118,157 @@ def require_finite_array(x: ArrayLike, name: str) -> np.ndarray:
         msg = f"'{name}' must contain only finite values."
         raise ValueError(msg)
     return arr
+
+
+def require_axis_count(
+    value: object, owner: str, name: str, axis: str = "band", *, rank: int | None
+) -> int:
+    """The number of entries along the first axis of *value*.
+
+    ``len()``, not ``np.shape()``: the first axis of a tuple of per-band
+    arrays is its length whatever the arrays hold, while ``np.shape`` would
+    try to stack them and raise about an inhomogeneous shape for a bank whose
+    bands carry filters of different orders.
+
+    *rank* has no default and must be stated, because a count on its own says
+    nothing about how many axes there are: an array of shape ``(bands, 2)``
+    counts the right number of bands on its first axis and carries the second
+    one onward untouched. Pass ``None`` only where the rank is pinned
+    elsewhere, as :func:`require_ranks` does for a whole result at once.
+
+    :param value: The field whose entries are counted.
+    :param owner: Name of the type being checked, used in the error message.
+    :param name: Field name used in the error message.
+    :param axis: What the entries measure, singular, for the error message.
+    :param rank: The number of axes the field must have, or ``None`` when that
+        is checked elsewhere.
+    :return: The number of entries.
+    :raises ValueError: if *value* is a single number, or has another rank.
+    """
+    if rank is not None:
+        require_axis_rank(value, owner, name, rank)
+    try:
+        return len(value)  # type: ignore[arg-type]
+    except TypeError:
+        msg = f"{owner}: '{name}' must carry one value per {axis}, not a single number."
+        raise ValueError(msg) from None
+
+
+def require_axis_rank(value: object, owner: str, name: str, rank: int) -> None:
+    """Require *value* to have exactly *rank* axes.
+
+    Counting an axis is not enough on its own: an array of shape
+    ``(paths, bands, 2)`` has the right number of paths on its first axis and
+    the right number of bands on its second, so every count agrees and the
+    extra axis travels on into whatever indexes the field next.
+
+    Only arrays are measured. A tuple of per-band entries is one axis of
+    entries whatever each entry holds, and asking numpy for its rank would
+    stack them and raise about an inhomogeneous shape.
+
+    :param value: The field whose axes are counted.
+    :param owner: Name of the type being checked, used in the error message.
+    :param name: Field name used in the error message.
+    :param rank: The number of axes the field must have.
+    :raises ValueError: if *value* has a different number of axes.
+    """
+    actual = value.ndim if isinstance(value, np.ndarray) else 1
+    if actual != rank:
+        axes = "one axis" if rank == 1 else f"{rank} axes"
+        msg = (
+            f"{owner}: '{name}' must have {axes}; got {actual}. "
+            "An extra axis passes every count and reaches the reader intact."
+        )
+        raise ValueError(msg)
+
+
+def require_ranks(owner: object, **ranks: int) -> None:
+    """Require each named field of *owner* to have the given number of axes.
+
+    The companion of :func:`require_same_length`, which pins how long an axis
+    is but not how many there are. ``None`` fields are skipped.
+
+    :param owner: The instance whose fields are measured.
+    :param ranks: Field name to the number of axes it must have.
+    :raises ValueError: if a field has a different number of axes.
+    """
+    for name, rank in ranks.items():
+        value = getattr(owner, name)
+        if value is None:
+            continue
+        require_axis_rank(value, type(owner).__name__, name, rank)
+
+
+def require_equal_counts(
+    owner: str, counts: Mapping[str, int], axis: str = "band"
+) -> None:
+    """Require every measured count to agree, naming each one that does not.
+
+    The sibling of :func:`require_same_length` for the counts a caller has
+    already measured: entries of a nested sequence, an axis picked out of a
+    two-dimensional field, anything whose label is not a plain attribute name.
+
+    The message lists every count it was given rather than picking out an odd
+    one, because among peers no count is authoritative and a majority winner
+    would be a guess. Where one quantity *is* authoritative, pass it and the
+    single suspect: two entries make the shortest true message there is.
+
+    :param owner: Name of the type being checked, used in the error message.
+    :param counts: Label to count, in the order they should be reported.
+    :param axis: What the counts measure, singular, for the error message.
+    :raises ValueError: if two of the counts disagree.
+    """
+    if len(set(counts.values())) <= 1:
+        return
+    listed = ", ".join(f"'{label}' ({n})" for label, n in counts.items())
+    msg = f"{owner}: {listed} must each carry one value per {axis}."
+    raise ValueError(msg)
+
+
+def require_same_length(
+    owner: object, *fields: str | tuple[str, int], axis: str = "band"
+) -> None:
+    """Require the named fields of *owner* to share one length.
+
+    Written for the ``__post_init__`` of a result dataclass, so that a result
+    whose per-band arrays disagree cannot be built at all. Validating here
+    rather than where the values are read covers the readers that do not
+    exist yet, and both directions of the mistake: an array one short raises
+    somewhere downstream, but an array one long is silently truncated by the
+    table that prints it, under a total that summed the whole of it.
+
+    A field may be given as ``"name"`` for a length along the first axis, or
+    as ``("name", i)`` when the axis in question is not the first one, as it
+    is not for a per-path-per-band array whose bands run along axis 1.
+
+    ``None`` fields are skipped: an absent optional quantity is not a
+    disagreement.
+
+    :param owner: The instance whose fields are compared.
+    :param fields: Field names, or ``(name, axis_index)`` pairs.
+    :param axis: What the lengths measure, singular, for the error message.
+    :raises ValueError: if two of the fields disagree, or one is a scalar.
+    """
+    counts: dict[str, int] = {}
+    for field in fields:
+        name, index = field if isinstance(field, tuple) else (field, 0)
+        value = getattr(owner, name)
+        if value is None:
+            continue
+        if index == 0:
+            counts[name] = require_axis_count(
+                value, type(owner).__name__, name, axis, rank=None
+            )
+            continue
+        shape = np.shape(value)
+        if len(shape) <= index:
+            msg = (
+                f"{type(owner).__name__}: '{name}' must have an axis {index} "
+                f"to carry one value per {axis}; got shape {shape}."
+            )
+            raise ValueError(msg)
+        counts[f"{name} (axis {index})"] = shape[index]
+    require_equal_counts(type(owner).__name__, counts, axis)
 
 
 def require_per_band(

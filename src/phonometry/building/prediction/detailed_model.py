@@ -100,9 +100,13 @@ from typing import TYPE_CHECKING, Any, Literal
 import numpy as np
 
 from ..._internal.validation import (
+    require_axis_count,
     require_choice,
+    require_equal_counts,
     require_positive,
     require_positive_array,
+    require_ranks,
+    require_same_length,
 )
 
 if TYPE_CHECKING:
@@ -1464,6 +1468,48 @@ def _path_matrix(paths: Sequence[BandPath], n_bands: int) -> np.ndarray:
     )
 
 
+def _require_paths_and_bands(result: Any, total: str) -> None:
+    """Reject a decomposition whose paths and bands do not line up.
+
+    Shared by the airborne and the impact result, which decompose different
+    quantities over the same two axes and print the same sheet: one row per
+    transmission path, a share column beside those rows, and a box holding the
+    single number of the whole.
+
+    ``fractions`` is indexed by path to name the dominant one, so an array
+    short of a path row yields a sheet listing fewer paths than the shares it
+    prints sum over, and the column stops reaching 100 % under a box that
+    still rates the whole.
+
+    :param result: The result being built.
+    :param total: Name of its per-band total, ``r_prime`` or ``l_prime_n``.
+    :raises ValueError: if the band or path axes disagree.
+    """
+    owner = type(result).__name__
+    require_ranks(result, frequencies=1, fractions=2, **{total: 1})
+    require_same_length(result, "frequencies", total, ("fractions", 1))
+    bands = require_axis_count(result.frequencies, owner, "frequencies", rank=None)
+    for i, path in enumerate(result.paths):
+        label = f"paths[{i}] ({path.label})"
+        require_equal_counts(
+            owner,
+            {
+                "frequencies": bands,
+                label: require_axis_count(path.values, owner, label, rank=1),
+            },
+        )
+    require_equal_counts(
+        owner,
+        {
+            "paths": len(result.paths),
+            "fractions": require_axis_count(
+                result.fractions, owner, "fractions", "transmission path", rank=None
+            ),
+        },
+        "transmission path",
+    )
+
+
 def airborne_flanking_path(
     *,
     label: str,
@@ -1577,6 +1623,13 @@ class DetailedAirborneResult:
     fractions: np.ndarray
     rating: WeightedRatingResult | None
 
+    def __post_init__(self) -> None:
+        """Reject a decomposition whose paths and bands do not line up.
+
+        :raises ValueError: if the band or path axes disagree.
+        """
+        _require_paths_and_bands(self, "r_prime")
+
     @property
     def dominant(self) -> tuple[str, ...]:
         """Label of the path carrying most energy in each band."""
@@ -1654,6 +1707,13 @@ class DetailedImpactResult:
     l_prime_n: np.ndarray
     fractions: np.ndarray
     rating: ImpactRatingResult | None
+
+    def __post_init__(self) -> None:
+        """Reject a decomposition whose paths and bands do not line up.
+
+        :raises ValueError: if the band or path axes disagree.
+        """
+        _require_paths_and_bands(self, "l_prime_n")
 
     @property
     def dominant(self) -> tuple[str, ...]:

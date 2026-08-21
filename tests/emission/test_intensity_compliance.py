@@ -430,3 +430,21 @@ def test_result_phase_mismatch_matches_the_standalone_conversion() -> None:
         np.asarray(measured), np.asarray(_BANDS), 0.012
     )
     assert result.phase_mismatch() == pytest.approx(expected)
+
+
+# --------------------------------------------------------------------------
+# Per-band entries that do not agree
+# --------------------------------------------------------------------------
+def test_an_instrument_verdict_refuses_per_band_entries_that_disagree() -> None:
+    """The fiche prints one row per band under the instrument's overall class."""
+    import dataclasses
+
+    frequencies = np.array([250.0, 500.0, 1000.0, 2000.0])
+    result = emission.intensity_class_compliance(
+        np.full(frequencies.size, 20.0),
+        frequencies,
+        device="instrument",
+        spacing=0.025,
+    )
+    with pytest.raises(ValueError, match="'bands'"):
+        dataclasses.replace(result, bands=result.bands[:-1])

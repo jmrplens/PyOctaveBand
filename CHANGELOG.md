@@ -99,6 +99,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- Thirteen result types now refuse to exist carrying per-band arrays of
+  different lengths, which used to produce a fiche rather than an error.
+
+  A result dataclass is frozen, exported and has its constructor in the
+  generated reference, so one could be built, or replaced into, with a
+  spectrum that did not run over its own band axis. What that produced was
+  not a failure: a fiche prints one row per band under a single header, so
+  reportlab pads the short row out and the sheet then states a total summing
+  a band that appears nowhere in the column above it. An array one *too long*
+  is truncated by the same table, just as quietly, and the strips that report
+  a field indicator as a range print a range taken over the wrong set of
+  bands, which nothing downstream can object to because a range is well
+  formed whatever it was taken over.
+
+  Checking where the values are read would have to be repeated at every
+  renderer, every plot and every reader not written yet; checking when the
+  result is built covers all of them, in both directions. The types are
+  `DuctPathResult` (including its element rows and its contributions),
+  `SoundPowerIntensityResult` (on its band axis and its segment axis),
+  `SoundPowerResult`, `InstalledSourceResult`, `DetailedAirborneResult` and
+  `DetailedImpactResult` (on their band axis and their path axis),
+  `NCResult`, `RCResult`, `STIResult`, `FilterComplianceResult`,
+  `IntensityInstrumentComplianceResult`, `ImpulseProminenceResult` and
+  `TonalCorrectionResult`. The message names the type, the axis and every
+  count it was given.
+
+  How many axes there are is pinned as well as how long each one is, because
+  counting alone is not enough: an array of shape ``(paths, bands, 2)`` has
+  the right number of paths on its first axis and the right number of bands
+  on its second, so every count agrees and the extra axis travels on into
+  whatever indexes the field next.
+
 - Four guards that answered the wrong question, or could not answer at all.
 
   `sound_power_reverberation` named `background_levels` in its message but

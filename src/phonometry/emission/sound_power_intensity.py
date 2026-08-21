@@ -99,6 +99,7 @@ if TYPE_CHECKING:
     from .._report.metadata import ReportMetadata
 
 from .._internal.levels_math import energy_mean, weighted_energy_mean
+from .._internal.validation import require_ranks, require_same_length
 from ._shared import SoundPowerWarning, _a_weighting_corrections, _check_grade
 from .intensity import dynamic_capability_index
 
@@ -223,6 +224,56 @@ class SoundPowerIntensityResult:
     sound_power_level_a: float
     a_weighting_omitted_bands: np.ndarray | None
     grade: str
+
+    def __post_init__(self) -> None:
+        """Reject a determination whose per-band quantities disagree.
+
+        The field indicators reach the fiche's measurement-basis strip as a
+        range rather than as a column, so a short or long indicator array
+        prints a range taken over the wrong set of bands, on a sheet whose
+        next sentence turns that range into a qualification verdict. Nothing
+        downstream can catch that, because a range is well formed whatever it
+        was taken over.
+
+        :raises ValueError: if any per-band quantity disagrees with the rest.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            partial_power=2,
+            partial_power_level=2,
+            sound_power=1,
+            sound_power_level=1,
+            negative_band=1,
+            surface_pressure_intensity_index=1,
+            negative_partial_power_index=1,
+            repeatability=2,
+            dynamic_capability_index=1,
+            achieved_grade=1,
+            a_weighting_omitted_bands=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            ("partial_power", 1),
+            ("partial_power_level", 1),
+            "sound_power",
+            "sound_power_level",
+            "negative_band",
+            "surface_pressure_intensity_index",
+            "negative_partial_power_index",
+            ("repeatability", 1),
+            "dynamic_capability_index",
+            "achieved_grade",
+            "a_weighting_omitted_bands",
+        )
+        require_same_length(
+            self,
+            "partial_power",
+            "partial_power_level",
+            "repeatability",
+            axis="measurement segment",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

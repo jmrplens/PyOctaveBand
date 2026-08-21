@@ -38,6 +38,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_ranks, require_same_length
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import ArrayLike
@@ -150,6 +152,17 @@ class NCResult:
     method: str = "tangency"
     out_of_range: str | None = None
 
+    def __post_init__(self) -> None:
+        """Reject a rating whose spectrum and band axis disagree.
+
+        The rating names a governing band, so a spectrum of the wrong length
+        names the wrong one.
+
+        :raises ValueError: if 'frequencies' and 'levels' differ in length.
+        """
+        require_ranks(self, frequencies=1, levels=1)
+        require_same_length(self, "frequencies", "levels")
+
     @property
     def label(self) -> str:
         """The textual NC designation.
@@ -255,6 +268,18 @@ class RCResult:
     reference_curve: np.ndarray
     frequencies: np.ndarray
     levels: np.ndarray
+
+    def __post_init__(self) -> None:
+        """Reject a rating whose spectrum, curve and band axis disagree.
+
+        The fiche draws the reference curve over the measured spectrum and
+        tabulates both, so a curve of the wrong length is compared band by
+        band against the wrong bands.
+
+        :raises ValueError: if the three do not share one length.
+        """
+        require_ranks(self, frequencies=1, levels=1, reference_curve=1)
+        require_same_length(self, "frequencies", "levels", "reference_curve")
 
     @property
     def label(self) -> str:

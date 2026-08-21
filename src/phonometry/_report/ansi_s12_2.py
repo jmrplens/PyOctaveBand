@@ -257,15 +257,9 @@ def _rc_left_cell(
 
     levels = np.asarray(result.levels, dtype=np.float64)
     reference = np.asarray(result.reference_curve, dtype=np.float64)
-    # Guard a manually constructed result: RCResult is a plain frozen dataclass,
-    # so a hand-built one can carry a reference curve of a different length than
-    # its levels, and only the verbose columns pair the two band by band.
-    if verbose and levels.shape != reference.shape:
-        msg = (
-            "render_rc_report(verbose=True) needs 'levels' and "
-            "'reference_curve' of equal length."
-        )
-        raise ValueError(msg)
+    # No guard on the two agreeing: RCResult requires both to be
+    # one-dimensional and of one length when it is built, which leaves no
+    # shape for them to disagree in by the time they arrive here.
     columns = _base_columns(levels, language)
     if verbose:
         columns.append(

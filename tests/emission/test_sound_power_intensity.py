@@ -507,3 +507,60 @@ def test_bad_grade_raises() -> None:
     areas = np.array([0.5, 0.5, 0.5, 0.5])
     with pytest.raises(ValueError, match="'grade' must be"):
         emission.sound_power_intensity(intensity, areas, grade="bogus")
+
+
+# --------------------------------------------------------------------------
+# Quantities that do not run over the band axis
+# --------------------------------------------------------------------------
+def _five_band_determination() -> object:
+    """A four-segment, five-band determination with every indicator populated."""
+    intensity = np.tile(np.array([6e-4, 5e-4, 4e-4, 3e-4, 2e-4]), (4, 1))
+    return emission.sound_power_intensity(
+        intensity,
+        np.full(4, 0.5),
+        frequencies=np.array([125.0, 250.0, 500.0, 1000.0, 2000.0]),
+        normal_intensity_2=intensity * 0.9,
+        pressure_levels=np.tile(np.full(5, 80.0), (4, 1)),
+        pressure_residual_index=12.0,
+    )
+
+
+@pytest.mark.parametrize(
+    "field_name",
+    [
+        "sound_power_level",
+        "negative_band",
+        "surface_pressure_intensity_index",
+        "negative_partial_power_index",
+        "dynamic_capability_index",
+        "a_weighting_omitted_bands",
+    ],
+)
+@pytest.mark.parametrize("trim", [True, False], ids=["short", "long"])
+def test_a_per_band_quantity_off_the_band_axis_is_refused(
+    field_name: str, trim: bool
+) -> None:
+    """Every per-band quantity is pinned to the band axis at construction.
+
+    The field indicators reach the fiche as a range rather than as a column,
+    so an array of the wrong length prints a range taken over the wrong set of
+    bands and nothing downstream can object: a range is well formed whatever
+    it was taken over. That is why the long direction matters as much as the
+    short one.
+    """
+    import dataclasses
+
+    result = _five_band_determination()
+    values = np.asarray(getattr(result, field_name))
+    wrong = values[:-1] if trim else np.append(values, values[-1])
+    with pytest.raises(ValueError, match=f"'{field_name}'"):
+        dataclasses.replace(result, **{field_name: wrong})
+
+
+def test_a_per_segment_quantity_off_the_segment_axis_is_refused() -> None:
+    """The segment axis is its own axis: repeatability is per segment and band."""
+    import dataclasses
+
+    result = _five_band_determination()
+    with pytest.raises(ValueError, match="measurement segment"):
+        dataclasses.replace(result, repeatability=result.repeatability[:-1])

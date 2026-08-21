@@ -25,6 +25,8 @@ tolerance is the 1 dB the sheet itself carries.
 
 from __future__ import annotations
 
+import dataclasses
+import re
 import warnings
 
 import numpy as np
@@ -399,3 +401,100 @@ def test_combine_of_one_path_is_that_path() -> None:
     same = combine_duct_paths([supply])
     assert np.allclose(same.received_level, supply.received_level)
     assert same.stages == ()
+
+
+# --------------------------------------------------------------------------
+# Rows that do not run over the analysis bands
+# --------------------------------------------------------------------------
+@pytest.mark.parametrize(
+    "field_name",
+    ["attenuation", "attenuated", "self_noise", "level"],
+)
+@pytest.mark.parametrize("trim", [True, False], ids=["short", "long"])
+def test_a_stage_row_off_the_band_axis_is_refused(field_name: str, trim: bool) -> None:
+    """A calculation sheet cannot carry a row of the wrong width.
+
+    The sheet prints one row per element under a single band header with a
+    running total beneath, so reportlab pads a short row out to the header and
+    the total then sums a band that appears nowhere in the column above it. A
+    row one *too long* is truncated by the same table, just as quietly.
+    """
+    result = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")
+    stage = result.stages[0]
+    row = np.asarray(getattr(stage, field_name))
+    wrong = row[:-1] if trim else np.append(row, row[-1])
+    # The stage itself carries no guard, so it is built outside the block:
+    # what is under test is the sheet refusing to hold it.
+    stages = (dataclasses.replace(stage, **{field_name: wrong}), *result.stages[1:])
+    with pytest.raises(ValueError, match=f"'stages\\[0\\]\\.{field_name}'"):
+        dataclasses.replace(result, stages=stages)
+
+
+def test_a_room_effect_off_the_band_axis_is_refused() -> None:
+    """The room effect is applied band by band, so it must have the bands."""
+    result = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")
+    one_band_short = np.zeros(len(OCTAVE_BANDS) - 1)
+    with pytest.raises(ValueError, match="'room_effect'"):
+        dataclasses.replace(result, room_effect=one_band_short)
+
+
+def test_no_room_effect_at_all_is_still_allowed() -> None:
+    """``None`` is an absent quantity, not a disagreement."""
+    result = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")
+    assert dataclasses.replace(result, room_effect=None).room_effect is None
+
+
+@pytest.mark.parametrize(
+    ("what", "build"),
+    [
+        (
+            "stages[0].attenuation",
+            lambda r: {"stages": (dataclasses.replace(r.stages[0], attenuation=3.0),)},
+        ),
+        ("contributions[0] (Supply)", lambda r: {"contributions": (("Supply", 3.0),)}),
+        ("frequencies", lambda r: {"frequencies": 500.0}),
+    ],
+    ids=["stage-row", "contribution", "band-axis"],
+)
+def test_a_single_number_where_a_spectrum_belongs_says_so(what, build) -> None:
+    """A scalar in a nested field is named, not left to numpy or to len().
+
+    Reaching the nested rows means indexing a shape or taking a length, and
+    both answer a scalar with an exception of their own that names neither the
+    field nor the type the guard promises to name.
+    """
+    result = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")
+    scalar_field = build(result)
+    with pytest.raises(ValueError, match=f"'{re.escape(what)}'"):
+        dataclasses.replace(result, **scalar_field)
+
+
+@pytest.mark.parametrize(
+    ("what", "build"),
+    [
+        (
+            "stages[0].attenuation",
+            lambda r, wrong: {
+                "stages": (dataclasses.replace(r.stages[0], attenuation=wrong),)
+            },
+        ),
+        (
+            "contributions[0] (Supply)",
+            lambda r, wrong: {"contributions": (("Supply", wrong),)},
+        ),
+    ],
+    ids=["stage-row", "contribution"],
+)
+def test_a_nested_row_with_an_extra_axis_is_refused(what, build) -> None:
+    """The nested rows are pinned by their axes, not only by their length.
+
+    A row of shape ``(bands, 2)`` counts the right number of bands on its
+    first axis, so counting alone lets it into the sheet with a second axis
+    nobody asked for.
+    """
+    result = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")
+    row = np.asarray(result.stages[0].attenuation)
+    two_dimensional = np.column_stack([row, row])
+    replacement = build(result, two_dimensional)
+    with pytest.raises(ValueError, match=f"'{re.escape(what)}' must have one axis"):
+        dataclasses.replace(result, **replacement)
