@@ -153,8 +153,9 @@ def test_short_per_frequency_array_rejected(
     result = _result()
     ragged = dataclasses.replace(result, **{field: getattr(result, field)[:-1]})
     out = tmp_path / "iso10534_ragged.pdf"
+    metadata = _metadata()
     with pytest.raises(ValueError, match=field):
-        ragged.report(str(out), metadata=_metadata(), verbose=verbose)
+        ragged.report(str(out), metadata=metadata, verbose=verbose)
     assert not out.exists()
 
 

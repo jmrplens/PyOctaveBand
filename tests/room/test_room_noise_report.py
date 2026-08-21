@@ -360,6 +360,7 @@ def test_verbose_rc_report_rejects_short_reference_curve(tmp_path) -> None:
     result = _rc_result()
     mismatched = replace(result, reference_curve=result.reference_curve[:-1])
     out = tmp_path / "rc_short_reference.pdf"
+    metadata = _full_metadata()
     with pytest.raises(ValueError, match="reference_curve"):
-        mismatched.report(str(out), metadata=_full_metadata(), verbose=True)
+        mismatched.report(str(out), metadata=metadata, verbose=True)
     assert not out.exists()  # the guard fires before the fiche is written

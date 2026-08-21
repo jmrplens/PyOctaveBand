@@ -211,8 +211,9 @@ def test_verbose_rejects_short_band_column(field: str, tmp_path) -> None:
     result = _result()
     short = replace(result, **{field: getattr(result, field)[:-1]})
     out = tmp_path / "iso354_short.pdf"
+    metadata = _metadata()
     with pytest.raises(ValueError, match=field):
-        short.report(str(out), metadata=_metadata(), verbose=True)
+        short.report(str(out), metadata=metadata, verbose=True)
     assert not out.exists()
 
 
