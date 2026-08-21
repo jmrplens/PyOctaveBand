@@ -135,22 +135,28 @@ def test_reception_plate_requires_eta_or_ts() -> None:
 
 
 @pytest.mark.parametrize(
-    ("name", "kwargs"),
+    ("name", "velocity", "kwargs"),
     [
-        ("velocity_level", {"loss_factor": 0.01}),
-        ("loss_factor", {"loss_factor": [0.01, 0.02, 0.03]}),
+        # Too short for the four bands.
+        ("velocity_level", [80.0, 82.0, 79.0], {"loss_factor": 0.01}),
+        ("loss_factor", 80.0, {"loss_factor": [0.01, 0.02, 0.03]}),
+        # One element, which broadcasting alone would stretch over all four.
+        ("velocity_level", [80.0], {"loss_factor": 0.01}),
+        ("loss_factor", 80.0, {"loss_factor": [0.01]}),
     ],
 )
 def test_reception_plate_rejects_a_per_band_input_of_the_wrong_length(
-    name: str, kwargs: dict
+    name: str, velocity: object, kwargs: dict
 ) -> None:
     """A per-band input that is neither scalar nor band-long names itself.
 
-    Both arguments reach ``np.broadcast_to``, whose own message is raised from
-    inside numpy and reports two shapes without saying which argument carried
-    which, so the guard is the library's own and names the parameter.
+    Both arguments used to reach ``np.broadcast_to`` unchecked, whose message
+    is raised from inside numpy and reports two shapes without saying which
+    argument carried which. The one-element cases are the reason the guard
+    cannot be broadcasting alone: numpy stretches a single value over every
+    band, and the level that comes back from four copies of one measurement
+    reads exactly like a measurement of four bands.
     """
-    velocity = [80.0, 82.0, 79.0] if name == "velocity_level" else 80.0
     with pytest.raises(ValueError, match=f"'{name}' must be a scalar or carry"):
         building.reception_plate_power(
             velocity,
@@ -159,6 +165,19 @@ def test_reception_plate_rejects_a_per_band_input_of_the_wrong_length(
             area=1.2,
             **kwargs,
         )
+
+
+def test_reception_plate_still_takes_a_scalar_for_every_band() -> None:
+    """A true scalar is the supported way to say "the same for all bands"."""
+    result = building.reception_plate_power(
+        80.0,
+        [500.0, 1000.0, 2000.0, 4000.0],
+        mass_per_area=25.0,
+        area=1.2,
+        loss_factor=0.01,
+    )
+    assert np.asarray(result.velocity_level).shape == (4,)
+    assert np.allclose(np.asarray(result.velocity_level), 80.0)
 
 
 def test_plot_returns_axes() -> None:

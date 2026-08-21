@@ -101,12 +101,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - Every test that expects an error says which error. `PT` is selected, and the
   241 `pytest.raises(ValueError)` calls that named no message now name one.
-  This was already the habit rather than a new rule: 1755 of the 2065
-  `pytest.raises` in the suite passed `match=` before this, so what changed is
-  the stragglers. Each of the 241 was resolved by reading the guard it lands
-  on, not the test around it, because a test that catches any `ValueError` at
-  all passes when the wrong guard fires, and the wrong guard firing is exactly
-  the regression it was written to catch.
+  This was already the habit rather than a new rule: of the 2075 `pytest.raises`
+  in the suite, 1795 passed `match=` before this, so what changed is the
+  stragglers. The 39 that still name no message are the ones the rule does not
+  ask about, and does not need to: `FrozenInstanceError`, `ModuleNotFoundError`
+  and `AttributeError` are raised by one thing each here, so the class is
+  already the whole assertion. `ValueError` is the one that is not, which is
+  why the rule asks about it. Each of the 241 was resolved by reading the guard
+  it lands on rather than the surrounding test, because a test that catches any
+  `ValueError` at all passes when the wrong guard fires, and the wrong guard
+  firing is the regression it was written to catch.
 
   The fragment is the part of the message that does not move. That means the
   parameter the guard is about, and not the sentence around it: not a bound,
