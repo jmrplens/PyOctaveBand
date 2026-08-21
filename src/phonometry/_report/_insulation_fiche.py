@@ -150,7 +150,7 @@ def band_value_table(
             row.append(format_number(float(values[k]), language, decimals=decimals))
         rows.append(row)
 
-    return band_table(rows, widths, len(centers))
+    return band_table(rows, widths, len(centers), band_centres=centers)
 
 
 def iso717_columns_builder(

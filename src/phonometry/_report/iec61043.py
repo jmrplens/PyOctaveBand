@@ -321,7 +321,7 @@ def render_iec61043_report(
 
     rows = _band_rows(result, language)
     widths = [13 * mm, 13 * mm, 13 * mm, 14 * mm, 15 * mm, 12 * mm]
-    left_cell = band_table(rows, widths, len(rows) - 1)
+    left_cell = band_table(rows, widths, len(rows) - 1, band_centres=result.frequency)
     # A tall, narrow figure: the 22-row band table sets the body height, and a
     # squat plot beside it would leave a band of white across the page.
     plot_drawing = render_figure_drawing(

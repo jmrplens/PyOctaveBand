@@ -144,7 +144,7 @@ def _alpha_table(freqs: np.ndarray, alpha_s: np.ndarray, language: str = "en") -
     rows: list[list[Any]] = [header]
     for fk, a_s in zip(freqs, alpha_s, strict=True):
         rows.append([f"{round(fk)}", _a2(a_s, language)])
-    return band_table(rows, [28 * mm, 28 * mm], len(freqs))
+    return band_table(rows, [28 * mm, 28 * mm], len(freqs), band_centres=freqs)
 
 
 def _detail_table(result: SoundAbsorptionMeasurement, language: str = "en") -> Any:
@@ -181,7 +181,7 @@ def _detail_table(result: SoundAbsorptionMeasurement, language: str = "en") -> A
             ]
         )
     col_widths = [15 * mm, 17 * mm, 17 * mm, 18 * mm, 18 * mm, 17 * mm]
-    return band_table(rows, col_widths, len(freqs))
+    return band_table(rows, col_widths, len(freqs), band_centres=freqs)
 
 
 def _statement(result: SoundAbsorptionMeasurement, language: str = "en") -> str:

@@ -58,6 +58,14 @@ if TYPE_CHECKING:
 #: En dash printed wherever the declaration carries no value for a cell.
 _NOT_DECLARED = "&#8211;"
 
+#: Widest declaration the mode columns can print. The 100 mm left over after
+#: the 74 mm label column divides into 16.7 mm at six modes, which still holds
+#: a three-digit level with its padding; at seven the column is narrower than
+#: the number and the table starts stacking digits. Mirrors the cap
+#: :data:`~phonometry._report.en12354_5._MAX_PATH_COLUMNS` puts on path
+#: columns for the same reason.
+_MAX_MODE_COLUMNS = 6
+
 
 def _basis(
     declaration: NoiseEmissionDeclaration,
@@ -339,6 +347,15 @@ def _declaration_table(
     )
 
     label_w = 74.0
+    if n_modes > _MAX_MODE_COLUMNS:
+        msg = (
+            f"A declaration of {n_modes} operating modes does not fit the "
+            f"sheet: the {174.0 - label_w:g} mm of mode columns divide into "
+            f"{(174.0 - label_w) / n_modes:.1f} mm each, narrower than the "
+            "levels they hold. Declare the modes in groups of "
+            f"{_MAX_MODE_COLUMNS} or fewer."
+        )
+        raise ValueError(msg)
     mode_w = (174.0 - label_w) / n_modes
     table = Table(
         data,

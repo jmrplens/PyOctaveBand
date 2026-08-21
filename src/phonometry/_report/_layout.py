@@ -72,10 +72,18 @@ _SCRIPT_RISE = "25%"
 #: attributes, so only the attribute-less tags need rewriting.
 _SCRIPT_TAG_RE = re.compile(r"<(sub|sup|super)>")
 
-#: Row count of the octave-band variant of the sound-insulation band table
-#: (one row per octave, the five octave centres 125-2000 Hz); a table this
-#: size carries no one-third-octave triplets to rule.
-_OCTAVE_TABLE_ROWS = 5
+#: Ratio between adjacent one-third-octave mid-band centres, 2**(1/3).
+_THIRD_OCTAVE_RATIO = 2.0 ** (1.0 / 3.0)
+
+#: Relative tolerance on that ratio. The nominal centres of IEC 61260 are
+#: rounded (400, 500, 630 gives 1.25 and 1.26), so the exact step is never
+#: what a fiche tabulates; 3 % admits the rounded series and still refuses a
+#: linear sweep, whose neighbouring ratios march steadily towards 1.
+_BAND_RATIO_TOLERANCE = 0.03
+
+#: Narrowest span a fiche response panel can be drawn over, as the ratio of
+#: the highest frequency to the lowest: one-third of an octave.
+_MIN_RESPONSE_SPAN = 2.0 ** (1.0 / 3.0)
 
 
 def fiche_paragraph(text: str, style: Any, **kwargs: Any) -> Any:
@@ -247,8 +255,21 @@ def render_figure_drawing(
                 _, data_top = ax.get_ylim()
                 top = max(top, float(np.ceil(data_top / expand_step) * expand_step))
             ax.set_ylim(0.0, top)
-        # Move the legend above the axes, as the reference reports do.
+        # Move the legend above the axes, as the reference reports do. The
+        # handles are collected from the twin axes as well as from `ax`,
+        # because a plot that draws a second quantity on `ax.twinx()` merges
+        # both handle lists into the one legend it builds, and rebuilding from
+        # `ax` alone would drop that half: the ISO 12354 sheets lost the very
+        # curve they rate, R' and L'n, from their own legend. Walking
+        # `figure.axes` rather than the sibling set keeps the order the plot
+        # used, which the fiche comparison gate depends on.
         handles, labels = ax.get_legend_handles_labels()
+        twins = ax.get_shared_x_axes().get_siblings(ax)
+        for other in ax.figure.axes:
+            if other is not ax and other in twins:
+                more_handles, more_labels = other.get_legend_handles_labels()
+                handles.extend(more_handles)
+                labels.extend(more_labels)
         existing = ax.get_legend()
         if existing is not None:
             existing.remove()
@@ -283,7 +304,15 @@ def render_figure_drawing(
     if drawing is None or not drawing.width:
         msg = "Could not convert the report plot to vector graphics."
         raise ValueError(msg)
-    scale = target_width / drawing.width
+    # Scale by what the drawing *covers*, not by the width it declares. A
+    # legend anchored outside the axes reaches past the figure box svglib
+    # reports, and scaling by the declared width let that overhang through at
+    # full size: the duct-path sheet declared 96 mm, drew 106.6, and put its
+    # legend 10.7 mm beyond the right margin of the page, straight through
+    # the plot's own border. Taking the rightmost ink puts the far edge of
+    # the drawing exactly where the caller asked for it.
+    covered = max(float(drawing.width), float(drawing.getBounds()[2]))
+    scale = target_width / covered
     drawing.scale(scale, scale)
     drawing.width = drawing.width * scale
     drawing.height = drawing.height * scale
@@ -318,18 +347,24 @@ def grid_table(pairs: list[tuple[str, str]]) -> Any:
         textColor=colors.black,
     )
 
+    def cells(pair: tuple[str, str]) -> list[Any]:
+        """The label and value cells of one pair, both drawn either way.
+
+        A pair with no label still has a value to print, so the value is not
+        made conditional on the label: an odd number of pairs is padded with
+        an explicit empty cell below, which is the only case that ever wanted
+        a blank one.
+        """
+        label, value = pair
+        return [
+            fiche_paragraph(f"{label}:", label_style) if label else "",
+            fiche_paragraph(value, value_style),
+        ]
+
     rows: list[list[Any]] = []
     for i in range(0, len(pairs), 2):
-        left = pairs[i]
-        right = pairs[i + 1] if i + 1 < len(pairs) else ("", "")
-        rows.append(
-            [
-                fiche_paragraph(f"{left[0]}:", label_style) if left[0] else "",
-                fiche_paragraph(left[1], value_style),
-                fiche_paragraph(f"{right[0]}:", label_style) if right[0] else "",
-                fiche_paragraph(right[1], value_style) if right[0] else "",
-            ]
-        )
+        right = cells(pairs[i + 1]) if i + 1 < len(pairs) else ["", ""]
+        rows.append([*cells(pairs[i]), *right])
     table = Table(rows, colWidths=[36 * mm, 51 * mm, 36 * mm, 51 * mm])
     table.setStyle(
         TableStyle(
@@ -366,20 +401,120 @@ def band_table_header_style() -> Any:
     )
 
 
+def response_decades(frequencies: Any, where: str) -> float:
+    """The decades a response curve spans, refusing a span too narrow to draw.
+
+    The IEC 60268 fiches keep their response panel to the IEC 60263 scale by
+    setting a box aspect of ``span_db / (dB per decade * decades)``, so the
+    number of decades is a divisor. A curve whose ends are a hair apart, which
+    every other check on it accepts, sends that aspect towards infinity: the
+    panel collapses to nothing and the sheet prints a frequency range whose
+    two ends read as the same number, with no warning of any kind.
+
+    One-third of an octave is the floor, the narrowest band this library
+    works in. Narrower curves are legitimate elsewhere, a distortion sweep
+    over 100 to 120 Hz among them, which is why this is asked here and not of
+    every curve.
+
+    :param frequencies: The response curve's frequency axis.
+    :param where: The fiche's name, for the error message.
+    :return: The number of decades the curve spans.
+    :raises ValueError: if the span is narrower than one-third of an octave.
+    """
+    f = np.asarray(frequencies, dtype=np.float64)
+    low, high = float(np.min(f)), float(np.max(f))
+    if low <= 0.0 or high / low < _MIN_RESPONSE_SPAN:
+        msg = (
+            f"{where}: the response spans {low:g} to {high:g} Hz, which the "
+            "fiche cannot draw. Its panel is scaled by the decades the curve "
+            "covers, so a span this narrow leaves the panel empty under a "
+            "range whose two ends print as the same frequency."
+        )
+        raise ValueError(msg)
+    return float(np.log10(high / low))
+
+
+def _require_column_widths(data: list[list[Any]], col_widths: Any, where: str) -> None:
+    """Require a width list to have one entry per column of *data*.
+
+    reportlab does not refuse a list of the wrong length: it takes the column
+    count from the widest row and then pads the list by repeating its last
+    entry, or truncates it, silently and at build time. A table given six
+    widths for eight columns therefore prints two columns as wide as the
+    sixth and can run off the page, with the caller's stated geometry
+    quietly rewritten.
+
+    A single number is left alone, because that one reportlab really does
+    broadcast to every column, and it is a legitimate way to ask for an even
+    table.
+
+    :param data: The table rows, header included.
+    :param col_widths: The widths the caller passed.
+    :param where: The builder's name, for the error message.
+    :raises ValueError: if a width list does not match the column count.
+    """
+    if col_widths is None or not isinstance(col_widths, (list, tuple)):
+        return
+    columns = max((len(row) for row in data), default=0)
+    if len(col_widths) != columns:
+        msg = (
+            f"{where}: 'col_widths' has {len(col_widths)} entries for "
+            f"{columns} columns. reportlab would pad the list by repeating "
+            "its last width, or cut it short, and print a table of a width "
+            "nobody asked for."
+        )
+        raise ValueError(msg)
+
+
+def _octave_grouping(band_centres: Any) -> int | None:
+    """Rows per octave in *band_centres*, or ``None`` when they are not bands.
+
+    The thin rules of the accredited reports group a table by octave, so they
+    mean something only where consecutive rows really are adjacent band
+    centres. This measures rather than assumes: every adjacent ratio must sit
+    close to the one-third-octave step for a triplet rule to be drawn.
+
+    One row per octave needs no rule, and anything else, a goniometer angle
+    axis or a linear frequency sweep, gets none: a rule drawn every three rows
+    across nineteen receiver angles states a grouping the data does not have.
+
+    :param band_centres: The mid-band centre frequencies the rows tabulate, or
+        ``None`` when the rows are not frequency bands.
+    :return: 3 for one-third-octave rows, ``None`` otherwise.
+    """
+    if band_centres is None:
+        return None
+    centres = np.asarray(band_centres, dtype=np.float64)
+    if centres.size < 3 or np.any(centres <= 0.0):  # noqa: PLR2004
+        return None
+    ratios = centres[1:] / centres[:-1]
+    if np.allclose(ratios, _THIRD_OCTAVE_RATIO, rtol=_BAND_RATIO_TOLERANCE):
+        return 3
+    return None
+
+
 def band_table(
     rows: list[list[Any]],
     col_widths: list[Any],
     n_data: int,
     extra_styles: list[Any] | None = None,
+    *,
+    band_centres: Any,
 ) -> Any:
-    """Assemble a one-third-octave band table with the accredited styling.
+    """Assemble a band table with the accredited styling.
 
     Applies the shared look of the sound-insulation fiches: the accent header
-    row, zebra body rows, a box rule and a thin rule after every
-    third-octave triplet (grouping the table by octave exactly as the
-    accredited reference reports do). ``rows`` holds the header row followed
-    by ``n_data`` band rows (plus any trailing summary rows, styled through
-    ``extra_styles``). Called only after the renderer has imported reportlab.
+    row, zebra body rows, a box rule and, where the rows really are
+    one-third-octave bands, a thin rule after every triplet, grouping the
+    table by octave exactly as the accredited reference reports do. ``rows``
+    holds the header row followed by ``n_data`` body rows (plus any trailing
+    summary rows, styled through ``extra_styles``). Called only after the
+    renderer has imported reportlab.
+
+    :param band_centres: The mid-band centre frequencies the rows tabulate.
+        ``None`` says the rows are not frequency bands, which is the honest
+        answer for a goniometer angle axis or a linear sweep and keeps the
+        octave rules off a table that has no octaves.
     """
     from reportlab.lib import colors
     from reportlab.platypus import Table, TableStyle
@@ -398,14 +533,27 @@ def band_table(
         ("BOTTOMPADDING", (0, 0), (-1, -1), 2.6),
         ("BOX", (0, 0), (-1, -1), 0.5, accent),
     ]
-    # Octave-band tables (5 rows, one per octave) have no triplets to group.
-    if n_data != _OCTAVE_TABLE_ROWS:
+    # The rules are counted off the rows while the grouping is read off the
+    # centres, so the two have to be the same bands. Nothing else relates
+    # them: a caller that hands over a longer axis than it tabulated would
+    # rule the rows it did print by the structure of bands it did not.
+    if band_centres is not None and np.size(band_centres) != n_data:
+        msg = (
+            f"band_table: 'band_centres' carries {np.size(band_centres)} "
+            f"entries for {n_data} band rows. The octave rules are drawn "
+            "across the rows and read from the centres, so they have to be "
+            "the same bands."
+        )
+        raise ValueError(msg)
+    group_every = _octave_grouping(band_centres)
+    if group_every is not None:
         style_cmds.extend(
-            ("LINEBELOW", (0, triplet_end), (-1, triplet_end), 0.4, thin)
-            for triplet_end in range(3, n_data, 3)
+            ("LINEBELOW", (0, group_end), (-1, group_end), 0.4, thin)
+            for group_end in range(group_every, n_data, group_every)
         )
     if extra_styles:
         style_cmds += extra_styles
+    _require_column_widths(rows, col_widths, "band_table")
     table = Table(rows, colWidths=col_widths, repeatRows=1)
     table.setStyle(TableStyle(style_cmds))
     return table
@@ -593,6 +741,18 @@ def compliance_table(
     )
 
     def _result_markup(status: str) -> str:
+        """The result cell of one row: a verdict, or the informational dash.
+
+        The dash is what an unjudged row prints, so it has to be asked for by
+        name. Letting anything unrecognised fall through to it turned a
+        mistyped verdict into no verdict at all, and the row a caller meant
+        to mark FAIL came out looking like a row nobody had judged.
+        """
+        # Imported here, not at module level: a rendering leaf may not reach
+        # domain code on import (tests/test_package_architecture.py).
+        from .._internal.validation import require_choice
+
+        require_choice(status, "status", ("pass", "fail", "info"))
         if status == "pass":
             return (
                 f"<font color='{_VERDICT_OK_HEX}'>&#9679; {t('PASS', language)}</font>"
@@ -710,6 +870,7 @@ def stacked_table(data: list[list[Any]], col_widths: list[Any]) -> Any:
 
     accent = colors.HexColor(_ACCENT_HEX)
     light = colors.HexColor(_LIGHT_HEX)
+    _require_column_widths(data, col_widths, "stacked_table")
     table = Table(data, colWidths=col_widths, repeatRows=1)
     table.setStyle(
         TableStyle(
@@ -918,6 +1079,7 @@ def build_document(path: str, flow: list[Any], title: str) -> str:
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.units import mm
     from reportlab.platypus import SimpleDocTemplate
+    from reportlab.platypus.doctemplate import LayoutError
 
     doc_kwargs = {
         "pagesize": A4,
@@ -933,5 +1095,29 @@ def build_document(path: str, flow: list[Any], title: str) -> str:
         doc = SimpleDocTemplate(path, invariant=1, **doc_kwargs)
     except TypeError:  # pragma: no cover - older reportlab
         doc = SimpleDocTemplate(path, **doc_kwargs)
-    doc.build(flow)
+    # A fiche is one page, and nothing checked that it came to one. Too long
+    # a table failed in two ways, neither of them useful: up to about forty
+    # rows the sheet quietly ran on, leaving page 1 with the title over a
+    # blank half-page and the table, the result and the laboratory identity
+    # on pages nobody stamped; past that reportlab gave up with a LayoutError
+    # naming a flowable and a frame in points.
+    #
+    # reportlab's own page count settles the first case, since measuring the
+    # flow beforehand would be a second copy of its layout, free to drift.
+    # Either way the half-written sheet is taken away again: a fiche that
+    # does not fit is not a fiche.
+    too_long = (
+        f"{title!r} does not fit the single page a fiche is. Its table is "
+        "longer than the sheet holds: report a narrower frequency range, or "
+        "leave the verbose columns off."
+    )
+    try:
+        doc.build(flow)
+    except LayoutError as exc:
+        Path(path).unlink(missing_ok=True)
+        raise ValueError(too_long) from exc
+    if doc.page != 1:
+        Path(path).unlink(missing_ok=True)
+        msg = f"{too_long} It came to {doc.page} pages."
+        raise ValueError(msg)
     return str(path)

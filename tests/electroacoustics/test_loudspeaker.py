@@ -369,3 +369,41 @@ def test_unknown_language_rejected(tmp_path) -> None:
     out = str(tmp_path / "bad.pdf")
     with pytest.raises(ValueError, match="language"):
         result.report(out, language="xx")
+
+
+# --------------------------------------------------------------------------
+# A response the panel cannot be drawn over
+# --------------------------------------------------------------------------
+def test_a_response_span_too_narrow_to_draw_is_refused(tmp_path) -> None:
+    """The fiche scales its panel by the decades the curve spans.
+
+    Two points a hair apart pass every other check on the curve and send that
+    divisor towards zero: the panel comes out empty under a printed range
+    whose two ends read as the same frequency, and nothing warns.
+    """
+    frequencies = np.linspace(1000.0, 1000.001, 10)
+    result = electroacoustics.loudspeaker_characteristics(
+        frequencies, np.full(frequencies.size, 90.0), rated_impedance=8.0
+    )
+    out = tmp_path / "degenerate.pdf"
+    with pytest.raises(ValueError, match="the fiche cannot draw"):
+        result.report(str(out))
+    assert not out.exists()
+
+
+def test_a_narrow_curve_is_still_fine_where_no_panel_scales_by_it() -> None:
+    """A distortion sweep over a third of an octave is a legitimate curve.
+
+    The span is asked of the response the panel is drawn over, not of every
+    curve a result carries, so measuring distortion across 100 to 120 Hz
+    stays allowed.
+    """
+    frequencies = np.array([100.0, 110.0, 120.0])
+    result = electroacoustics.loudspeaker_characteristics(
+        np.logspace(np.log10(50.0), np.log10(20000.0), 50),
+        np.full(50, 90.0),
+        rated_impedance=8.0,
+        distortion=(frequencies, np.full(3, 0.5)),
+    )
+    assert result.thd_frequencies is not None
+    assert result.thd_frequencies.size == 3

@@ -351,3 +351,36 @@ def test_unknown_language_rejected(tmp_path) -> None:
     decl = _annex_b_declaration()
     with pytest.raises(ValueError, match="language"):
         decl.report(str(tmp_path / "bad.pdf"), language="xx")
+
+
+# --------------------------------------------------------------------------
+# More modes than the sheet has width for
+# --------------------------------------------------------------------------
+def test_more_modes_than_the_sheet_can_print_are_refused(tmp_path) -> None:
+    """The mode columns divide the page width, with nothing bounding them.
+
+    A declaration is free to carry as many operating modes as the machine
+    has; the sheet is not. Seven of them leave each column narrower than the
+    three-digit level it holds, and the table starts stacking digits rather
+    than saying so.
+    """
+    modes = tuple(
+        emission.OperatingModeDeclaration(f"Mode {i}", 88.0, 2.0) for i in range(7)
+    )
+    declaration = emission.NoiseEmissionDeclaration(
+        modes, machine="Many-mode machine", basic_standards="ISO 3744"
+    )
+    out = tmp_path / "too_many_modes.pdf"
+    with pytest.raises(ValueError, match="does not fit the sheet"):
+        declaration.report(str(out))
+
+
+def test_six_modes_still_print(tmp_path) -> None:
+    """Six is the widest that still holds a three-digit level per column."""
+    modes = tuple(
+        emission.OperatingModeDeclaration(f"Mode {i}", 88.0, 2.0) for i in range(6)
+    )
+    declaration = emission.NoiseEmissionDeclaration(
+        modes, machine="Six-mode machine", basic_standards="ISO 3744"
+    )
+    assert_one_page(declaration.report(str(tmp_path / "six_modes.pdf")))

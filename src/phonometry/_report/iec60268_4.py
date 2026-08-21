@@ -36,8 +36,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-import numpy as np
-
 from ._i18n import format_number, t
 from ._layout import (
     _ACCENT_HEX,
@@ -48,6 +46,7 @@ from ._layout import (
     footer_flow,
     grid_table,
     metrics_table,
+    response_decades,
     result_box,
     two_panel_body,
     verdict_flow,
@@ -200,7 +199,7 @@ def _response_drawing(
     FigureCanvasAgg(fig)
     ax = fig.subplots()
     _draw_microphone_response(result, ax, language=language)
-    decades = np.log10(float(np.max(f)) / float(np.min(f)))
+    decades = response_decades(f, "IEC 60268-4 microphone fiche")
     from .._plot.electroacoustics import _RESPONSE_SPAN_MIC
 
     ax.set_box_aspect(_RESPONSE_SPAN_MIC / (_DB_PER_DECADE * decades))

@@ -253,7 +253,7 @@ def _scattering_table(
                 ]
             )
         col_widths = [20 * mm, 18 * mm, 18 * mm]
-    return band_table(rows, col_widths, len(freqs))
+    return band_table(rows, col_widths, len(freqs), band_centres=freqs)
 
 
 def render_scattering_report(
@@ -408,7 +408,7 @@ def _diffusion_table(
         for fk, dk in zip(freqs, d, strict=True):
             rows.append([f"{round(fk)}", _c2(dk, language)])
         col_widths = [28 * mm, 28 * mm]
-    return band_table(rows, col_widths, len(freqs))
+    return band_table(rows, col_widths, len(freqs), band_centres=freqs)
 
 
 def render_diffusion_spectrum_report(
@@ -534,7 +534,7 @@ def _polar_table(result: DiffusionResult, language: str = "en") -> Any:
     rows: list[list[Any]] = [header]
     for ang, lev in zip(angles, levels, strict=True):
         rows.append([_d1(ang, language), _d1(lev, language)])
-    return band_table(rows, [28 * mm, 28 * mm], len(angles))
+    return band_table(rows, [28 * mm, 28 * mm], len(angles), band_centres=None)
 
 
 def render_diffusion_polar_report(

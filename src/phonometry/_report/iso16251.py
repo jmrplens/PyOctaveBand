@@ -199,7 +199,7 @@ def _value_table(
         if ln_r is not None:
             row.append(format_number(float(ln_r[k]), language, decimals=1))
         rows.append(row)
-    return band_table(rows, widths, len(freqs))
+    return band_table(rows, widths, len(freqs), band_centres=freqs)
 
 
 def _basis_line(metadata: ReportMetadata | None, language: str = "en") -> str:
