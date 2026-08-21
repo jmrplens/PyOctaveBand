@@ -27,6 +27,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_choice
 from ._i18n import format_number, t
 
 if TYPE_CHECKING:
@@ -80,6 +81,10 @@ _THIRD_OCTAVE_RATIO = 2.0 ** (1.0 / 3.0)
 #: what a fiche tabulates; 3 % admits the rounded series and still refuses a
 #: linear sweep, whose neighbouring ratios march steadily towards 1.
 _BAND_RATIO_TOLERANCE = 0.03
+
+#: Narrowest span a fiche response panel can be drawn over, as the ratio of
+#: the highest frequency to the lowest: one-third of an octave.
+_MIN_RESPONSE_SPAN = 2.0 ** (1.0 / 3.0)
 
 
 def fiche_paragraph(text: str, style: Any, **kwargs: Any) -> Any:
@@ -335,18 +340,24 @@ def grid_table(pairs: list[tuple[str, str]]) -> Any:
         textColor=colors.black,
     )
 
+    def cells(pair: tuple[str, str]) -> list[Any]:
+        """The label and value cells of one pair, both drawn either way.
+
+        A pair with no label still has a value to print, so the value is not
+        made conditional on the label: an odd number of pairs is padded with
+        an explicit empty cell below, which is the only case that ever wanted
+        a blank one.
+        """
+        label, value = pair
+        return [
+            fiche_paragraph(f"{label}:", label_style) if label else "",
+            fiche_paragraph(value, value_style),
+        ]
+
     rows: list[list[Any]] = []
     for i in range(0, len(pairs), 2):
-        left = pairs[i]
-        right = pairs[i + 1] if i + 1 < len(pairs) else ("", "")
-        rows.append(
-            [
-                fiche_paragraph(f"{left[0]}:", label_style) if left[0] else "",
-                fiche_paragraph(left[1], value_style),
-                fiche_paragraph(f"{right[0]}:", label_style) if right[0] else "",
-                fiche_paragraph(right[1], value_style) if right[0] else "",
-            ]
-        )
+        right = cells(pairs[i + 1]) if i + 1 < len(pairs) else ["", ""]
+        rows.append([*cells(pairs[i]), *right])
     table = Table(rows, colWidths=[36 * mm, 51 * mm, 36 * mm, 51 * mm])
     table.setStyle(
         TableStyle(
@@ -381,6 +392,71 @@ def band_table_header_style() -> Any:
         alignment=1,
         leading=8.5,
     )
+
+
+def response_decades(frequencies: Any, where: str) -> float:
+    """The decades a response curve spans, refusing a span too narrow to draw.
+
+    The IEC 60268 fiches keep their response panel to the IEC 60263 scale by
+    setting a box aspect of ``span_db / (dB per decade * decades)``, so the
+    number of decades is a divisor. A curve whose ends are a hair apart, which
+    every other check on it accepts, sends that aspect towards infinity: the
+    panel collapses to nothing and the sheet prints a frequency range whose
+    two ends read as the same number, with no warning of any kind.
+
+    One-third of an octave is the floor, the narrowest band this library
+    works in. Narrower curves are legitimate elsewhere, a distortion sweep
+    over 100 to 120 Hz among them, which is why this is asked here and not of
+    every curve.
+
+    :param frequencies: The response curve's frequency axis.
+    :param where: The fiche's name, for the error message.
+    :return: The number of decades the curve spans.
+    :raises ValueError: if the span is narrower than one-third of an octave.
+    """
+    f = np.asarray(frequencies, dtype=np.float64)
+    low, high = float(np.min(f)), float(np.max(f))
+    if low <= 0.0 or high / low < _MIN_RESPONSE_SPAN:
+        msg = (
+            f"{where}: the response spans {low:g} to {high:g} Hz, which the "
+            "fiche cannot draw. Its panel is scaled by the decades the curve "
+            "covers, so a span this narrow leaves the panel empty under a "
+            "range whose two ends print as the same frequency."
+        )
+        raise ValueError(msg)
+    return float(np.log10(high / low))
+
+
+def _require_column_widths(data: list[list[Any]], col_widths: Any, where: str) -> None:
+    """Require a width list to have one entry per column of *data*.
+
+    reportlab does not refuse a list of the wrong length: it takes the column
+    count from the widest row and then pads the list by repeating its last
+    entry, or truncates it, silently and at build time. A table given six
+    widths for eight columns therefore prints two columns as wide as the
+    sixth and can run off the page, with the caller's stated geometry
+    quietly rewritten.
+
+    A single number is left alone, because that one reportlab really does
+    broadcast to every column, and it is a legitimate way to ask for an even
+    table.
+
+    :param data: The table rows, header included.
+    :param col_widths: The widths the caller passed.
+    :param where: The builder's name, for the error message.
+    :raises ValueError: if a width list does not match the column count.
+    """
+    if col_widths is None or not isinstance(col_widths, (list, tuple)):
+        return
+    columns = max((len(row) for row in data), default=0)
+    if len(col_widths) != columns:
+        msg = (
+            f"{where}: 'col_widths' has {len(col_widths)} entries for "
+            f"{columns} columns. reportlab would pad the list by repeating "
+            "its last width, or cut it short, and print a table of a width "
+            "nobody asked for."
+        )
+        raise ValueError(msg)
 
 
 def _octave_grouping(band_centres: Any) -> int | None:
@@ -458,6 +534,7 @@ def band_table(
         )
     if extra_styles:
         style_cmds += extra_styles
+    _require_column_widths(rows, col_widths, "band_table")
     table = Table(rows, colWidths=col_widths, repeatRows=1)
     table.setStyle(TableStyle(style_cmds))
     return table
@@ -645,6 +722,14 @@ def compliance_table(
     )
 
     def _result_markup(status: str) -> str:
+        """The result cell of one row: a verdict, or the informational dash.
+
+        The dash is what an unjudged row prints, so it has to be asked for by
+        name. Letting anything unrecognised fall through to it turned a
+        mistyped verdict into no verdict at all, and the row a caller meant
+        to mark FAIL came out looking like a row nobody had judged.
+        """
+        require_choice(status, "status", ("pass", "fail", "info"))
         if status == "pass":
             return (
                 f"<font color='{_VERDICT_OK_HEX}'>&#9679; {t('PASS', language)}</font>"
@@ -762,6 +847,7 @@ def stacked_table(data: list[list[Any]], col_widths: list[Any]) -> Any:
 
     accent = colors.HexColor(_ACCENT_HEX)
     light = colors.HexColor(_LIGHT_HEX)
+    _require_column_widths(data, col_widths, "stacked_table")
     table = Table(data, colWidths=col_widths, repeatRows=1)
     table.setStyle(
         TableStyle(
@@ -970,6 +1056,7 @@ def build_document(path: str, flow: list[Any], title: str) -> str:
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.units import mm
     from reportlab.platypus import SimpleDocTemplate
+    from reportlab.platypus.doctemplate import LayoutError
 
     doc_kwargs = {
         "pagesize": A4,
@@ -985,5 +1072,29 @@ def build_document(path: str, flow: list[Any], title: str) -> str:
         doc = SimpleDocTemplate(path, invariant=1, **doc_kwargs)
     except TypeError:  # pragma: no cover - older reportlab
         doc = SimpleDocTemplate(path, **doc_kwargs)
-    doc.build(flow)
+    # A fiche is one page, and nothing checked that it came to one. Too long
+    # a table failed in two ways, neither of them useful: up to about forty
+    # rows the sheet quietly ran on, leaving page 1 with the title over a
+    # blank half-page and the table, the result and the laboratory identity
+    # on pages nobody stamped; past that reportlab gave up with a LayoutError
+    # naming a flowable and a frame in points.
+    #
+    # reportlab's own page count settles the first case, since measuring the
+    # flow beforehand would be a second copy of its layout, free to drift.
+    # Either way the half-written sheet is taken away again: a fiche that
+    # does not fit is not a fiche.
+    too_long = (
+        f"{title!r} does not fit the single page a fiche is. Its table is "
+        "longer than the sheet holds: report a narrower frequency range, or "
+        "leave the verbose columns off."
+    )
+    try:
+        doc.build(flow)
+    except LayoutError as exc:
+        Path(path).unlink(missing_ok=True)
+        raise ValueError(too_long) from exc
+    if doc.page != 1:
+        Path(path).unlink(missing_ok=True)
+        msg = f"{too_long} It came to {doc.page} pages."
+        raise ValueError(msg)
     return str(path)

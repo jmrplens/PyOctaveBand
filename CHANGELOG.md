@@ -107,6 +107,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   that went missing. The rebuild now gathers the twins' handles too, in the
   order the plot used, so the printed legend says what the plot said.
 
+- A fiche is one page, and nothing checked that it came to one. An
+  impedance-tube result of forty frequencies rendered three pages, the first
+  a title over a blank half and the rest carrying the table, the result and
+  the laboratory identity with nothing to identify them; past about fifty
+  rows reportlab gave up with a message naming a flowable and a frame in
+  points. Both now say the table is longer than the sheet holds, and the
+  half-written file is removed rather than left behind.
+
+- The header grid dropped a value whose label was empty, on the right-hand
+  side only: the pad for an odd number of pairs was inferred from the empty
+  label, so it swallowed a genuine label-less value too. The pad is explicit
+  now and the two columns are treated alike.
+
+- A compliance row with an unrecognised verdict printed the informational
+  dash, so a mistyped `"FAIL"` came out looking like a row nobody had judged.
+  The three the table knows are named, `"info"` among them, and anything else
+  is refused.
+
+- `col_widths` lists that do not match the column count are refused. reportlab
+  does not object to them: it pads the list by repeating its last width, or
+  cuts it short, and prints a table of a width nobody asked for.
+
+- The IEC 60268 fiches scale their response panel by the decades the curve
+  spans, and nothing bounded that divisor. Two frequency points a hair apart
+  passed every check on the curve and left an empty panel under a range whose
+  ends printed as the same number. A response narrower than one-third of an
+  octave is refused, which is asked of the response the panel is drawn over
+  and not of every curve, so a distortion sweep across a narrow band is still
+  allowed.
+
+- An ISO 4871 declaration of more operating modes than the sheet has width
+  for is refused rather than printed with columns narrower than the levels
+  they hold.
+
 - The band tables decided whether their rows were one-third-octave triplets
   by counting them, and drew a rule after every third row unless there were
   exactly five. Rows that are not frequency bands got the rules anyway: the

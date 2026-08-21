@@ -22,6 +22,7 @@ alpha = 1 - 1/5 = 0.80 with |r| = 1/sqrt(5) = 0.45.
 from __future__ import annotations
 
 import dataclasses
+import pathlib
 import re
 
 import pytest
@@ -30,6 +31,9 @@ pytest.importorskip("reportlab")
 
 import numpy as np
 from report_assertions import assert_one_page
+
+#: The tests root, where the shared result factories live.
+_TESTS_ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 from phonometry import ReportMetadata
 from phonometry.materials import (
@@ -208,3 +212,38 @@ def test_metadata_rejects_invalid_geometry(field: str, value: float) -> None:
     """
     with pytest.raises(ValueError, match=field):
         ReportMetadata(**{field: value})
+
+
+# --------------------------------------------------------------------------
+# A table longer than the single page a fiche is
+# --------------------------------------------------------------------------
+@pytest.mark.parametrize("points", [38, 60], ids=["runs-on", "layout-error"])
+def test_a_table_longer_than_the_page_is_refused(tmp_path, points: int) -> None:
+    """A fiche is one page, and nothing used to check that it came to one.
+
+    Up to about forty rows the sheet quietly ran on, leaving page 1 with the
+    title over a blank half-page and the table, the result and the laboratory
+    identity on pages nobody stamped. Past that reportlab gave up with a
+    LayoutError naming a flowable and a frame in points.
+    """
+    import sys
+
+    sys.path.insert(0, str(_TESTS_ROOT))
+    import result_factories as rf
+
+    base = rf._impedance_tube()
+    size = np.size(base.frequency)
+    trimmed = dataclasses.replace(
+        base,
+        **{
+            field.name: np.asarray(getattr(base, field.name))[:points]
+            for field in dataclasses.fields(base)
+            if isinstance(getattr(base, field.name), np.ndarray)
+            and np.ndim(getattr(base, field.name)) == 1
+            and np.size(getattr(base, field.name)) == size
+        },
+    )
+    out = tmp_path / "too_long.pdf"
+    with pytest.raises(ValueError, match="does not fit the single page"):
+        trimmed.report(str(out))
+    assert not out.exists()  # a fiche that does not fit is not left behind
