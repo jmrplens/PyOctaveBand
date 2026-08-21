@@ -176,15 +176,28 @@ def require_same_length(
         value = getattr(owner, name)
         if value is None:
             continue
+        if index == 0:
+            # len(), not np.shape(): the first axis of a tuple of per-band
+            # arrays is its length whatever the arrays hold, while np.shape
+            # would try to stack them and raise about an inhomogeneous shape
+            # for a bank whose bands carry filters of different orders.
+            try:
+                counts[name] = len(value)
+            except TypeError:
+                msg = (
+                    f"{type(owner).__name__}: '{name}' must carry one value "
+                    f"per {axis}, not a single number."
+                )
+                raise ValueError(msg) from None
+            continue
         shape = np.shape(value)
-        label = name if index == 0 else f"{name} (axis {index})"
         if len(shape) <= index:
             msg = (
                 f"{type(owner).__name__}: '{name}' must have an axis {index} "
                 f"to carry one value per {axis}; got shape {shape}."
             )
             raise ValueError(msg)
-        counts[label] = shape[index]
+        counts[f"{name} (axis {index})"] = shape[index]
     require_equal_counts(type(owner).__name__, counts, axis)
 
 
