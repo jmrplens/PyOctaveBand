@@ -335,9 +335,13 @@ def test_kij_identical_plates_uses_common_critical_frequency() -> None:
 
 
 def test_kij_rejects_nonpositive_critical_frequency() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="'critical_frequency_receiver' must be positive"
+    ):
         vibration.wave_vibration_reduction_index(0.1, 0.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="'critical_frequency_receiver' must be positive"
+    ):
         vibration.wave_vibration_reduction_index(0.1, -100.0)
 
 
@@ -445,28 +449,28 @@ def test_plot_returns_axes() -> None:
 # Validation.
 # ---------------------------------------------------------------------------
 def test_unknown_junction_rejected() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'junction' must be one of"):
         vibration.corner_transmission_coefficient(0.0, 1.0, 1.0, "Z")
 
 
 def test_negative_parameters_rejected() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'chi' must be positive"):
         vibration.corner_transmission_coefficient(0.0, -1.0, 1.0, "X")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'thickness1' must be positive"):
         vibration.junction_wave_parameters(-0.1, 3200.0, 240.0, 0.1, 3200.0, 240.0)
 
 
 def test_out_of_range_angle_rejected() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"'angle' must lie in \[0, pi/2\]"):
         vibration.corner_transmission_coefficient(2.0, 1.0, 1.0, "X")  # > pi/2
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"'angle' must lie in \[0, pi/2\]"):
         vibration.corner_transmission_coefficient(-0.1, 1.0, 1.0, "X")
 
 
 def test_straight_section_undefined_for_t2_and_l() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="has no straight section"):
         vibration.straight_transmission_coefficient(0.0, 1.0, 1.0, "T2")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="has no straight section"):
         vibration.straight_transmission_coefficient(0.0, 1.0, 1.0, "L")
 
 
@@ -634,18 +638,18 @@ def test_norton_reciprocity_needs_the_plate_areas() -> None:
 
 
 @pytest.mark.parametrize(
-    "kwargs",
+    ("kwargs", "match"),
     [
-        {"thickness1": 0.0},
-        {"thickness2": -1.0},
-        {"density1": 0.0},
-        {"density2": 0.0},
-        {"wave_speed1": 0.0},
-        {"wave_speed2": 0.0},
-        {"incidence": "grazing"},
+        ({"thickness1": 0.0}, "'thickness1' must be positive"),
+        ({"thickness2": -1.0}, "'thickness2' must be positive"),
+        ({"density1": 0.0}, "'density1' must be positive"),
+        ({"density2": 0.0}, "'density2' must be positive"),
+        ({"wave_speed1": 0.0}, "'wave_speed1' must be positive"),
+        ({"wave_speed2": 0.0}, "'wave_speed2' must be positive"),
+        ({"incidence": "grazing"}, "'incidence' must be one of"),
     ],
 )
-def test_right_angle_validation(kwargs: dict[str, object]) -> None:
+def test_right_angle_validation(kwargs: dict[str, object], match: str) -> None:
     base: dict[str, object] = {
         "thickness1": _H1,
         "thickness2": _H2,
@@ -657,21 +661,21 @@ def test_right_angle_validation(kwargs: dict[str, object]) -> None:
     base.update(kwargs)
     thickness1 = base.pop("thickness1")
     thickness2 = base.pop("thickness2")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=match):
         vibration.right_angle_transmission_coefficient(thickness1, thickness2, **base)  # type: ignore[arg-type]
 
 
 @pytest.mark.parametrize(
-    "kwargs",
+    ("kwargs", "match"),
     [
-        {"n_connections": 0},
-        {"thickness1": 0.0},
-        {"surface_density1": 0.0},
-        {"wave_speed2": -1.0},
-        {"plate_area1": 0.0},
+        ({"n_connections": 0}, "'n_connections' must be a positive integer"),
+        ({"thickness1": 0.0}, "'thickness1' must be positive"),
+        ({"surface_density1": 0.0}, "'surface_density1' must be positive"),
+        ({"wave_speed2": -1.0}, "'wave_speed2' must be positive"),
+        ({"plate_area1": 0.0}, "'plate_area1' must be positive"),
     ],
 )
-def test_point_connection_validation(kwargs: dict[str, object]) -> None:
+def test_point_connection_validation(kwargs: dict[str, object], match: str) -> None:
     base: dict[str, object] = {
         "n_connections": 12,
         "thickness1": _H1,
@@ -684,12 +688,12 @@ def test_point_connection_validation(kwargs: dict[str, object]) -> None:
     }
     base.update(kwargs)
     n = base.pop("n_connections")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=match):
         vibration.point_connection_coupling_loss_factor(500.0, n, **base)  # type: ignore[arg-type]
 
 
 def test_point_connection_rejects_non_positive_frequency() -> None:
-    with pytest.raises(ValueError, match="must be positive"):
+    with pytest.raises(ValueError, match="'frequency' must be positive"):
         vibration.point_connection_coupling_loss_factor(
             [500.0, 0.0],
             12,

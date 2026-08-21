@@ -184,7 +184,7 @@ def test_lc_peak_multichannel_and_dbfs() -> None:
 
 
 @pytest.mark.parametrize(
-    "cycles,freq,ref,tol",
+    ("cycles", "freq", "ref", "tol"),
     [
         # BS EN 61672-1:2013 Table 5 (standard page 27): reference differences
         # LCpeak - LC and class 1 acceptance limits. Test frequencies are the
@@ -219,7 +219,7 @@ def test_lc_peak_iec_table5(cycles: float, freq: float, ref: float, tol: float) 
 
 
 @pytest.mark.parametrize(
-    "cycles,freq,ref,tol",
+    ("cycles", "freq", "ref", "tol"),
     [
         # Same BS EN 61672-1:2013 Table 5 cases as above, at a field-typical
         # 48 kHz (audit N2 I-1: the standard test ran only at 96 kHz, masking

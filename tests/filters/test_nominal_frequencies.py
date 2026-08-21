@@ -141,7 +141,9 @@ def test_normalizedfreq_fraction1_and_invalid_fraction() -> None:
     freq = filters.normalized_frequencies(1)
     assert 1000 in freq
 
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="Normalized frequencies only available for fraction"
+    ):
         filters.normalized_frequencies(5)
 
 

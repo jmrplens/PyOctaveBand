@@ -323,19 +323,19 @@ class TestValidation:
     """Every invalid input is rejected with a ValueError."""
 
     @pytest.mark.parametrize(
-        "kwargs",
+        ("kwargs", "match"),
         [
-            {"speed_rpm": 0.0},
-            {"n_elements": 0},
-            {"element_diameter": 0.0},
-            {"pitch_diameter": 0.0},
-            {"contact_angle_deg": -1.0},
-            {"contact_angle_deg": 90.0},
-            {"rotating_race": "middle"},
+            ({"speed_rpm": 0.0}, "'speed_rpm' must be positive"),
+            ({"n_elements": 0}, "'n_elements' must be a positive integer"),
+            ({"element_diameter": 0.0}, "'element_diameter' must be positive"),
+            ({"pitch_diameter": 0.0}, "'pitch_diameter' must be positive"),
+            ({"contact_angle_deg": -1.0}, "'contact_angle_deg' must be non-negative"),
+            ({"contact_angle_deg": 90.0}, "'contact_angle_deg' must be below"),
+            ({"rotating_race": "middle"}, "'rotating_race' must be one of"),
         ],
     )
-    def test_bearing_rejects(self, kwargs: dict[str, object]) -> None:
-        with pytest.raises(ValueError):
+    def test_bearing_rejects(self, kwargs: dict[str, object], match: str) -> None:
+        with pytest.raises(ValueError, match=match):
             bearing_fault_frequencies(**{**_P85, **kwargs})  # type: ignore[arg-type]
 
     def test_bearing_rejects_element_larger_than_pitch(self) -> None:
@@ -343,27 +343,32 @@ class TestValidation:
             bearing_fault_frequencies(2000.0, 15, 40.0, 34.0)
 
     @pytest.mark.parametrize(
-        "kwargs",
-        [{"n_teeth": 0}, {"harmonics": 0}, {"sidebands": -1}, {"sideband_rate": 0.0}],
+        ("kwargs", "match"),
+        [
+            ({"n_teeth": 0}, "'n_teeth' must be a positive integer"),
+            ({"harmonics": 0}, "'harmonics' must be a positive integer"),
+            ({"sidebands": -1}, "'sidebands' must be a non-negative integer"),
+            ({"sideband_rate": 0.0}, "'sideband_rate' must be positive"),
+        ],
     )
-    def test_gear_rejects(self, kwargs: dict[str, object]) -> None:
-        with pytest.raises(ValueError):
+    def test_gear_rejects(self, kwargs: dict[str, object], match: str) -> None:
+        with pytest.raises(ValueError, match=match):
             gear_mesh_frequencies(1500.0, **{"n_teeth": 28, **kwargs})  # type: ignore[arg-type]
 
     @pytest.mark.parametrize(
-        "kwargs",
+        ("kwargs", "match"),
         [
-            {"poles": 3},
-            {"poles": 0},
-            {"rotor_bars": 0},
-            {"slip": 1.0},
-            {"slip": -0.1},
-            {"slot_harmonics": 0},
-            {"sidebands": -1},
+            ({"poles": 3}, "'poles' must be an even integer"),
+            ({"poles": 0}, "'poles' must be an even integer"),
+            ({"rotor_bars": 0}, "'rotor_bars' must be a positive integer"),
+            ({"slip": 1.0}, "'slip' must be below"),
+            ({"slip": -0.1}, "'slip' must be non-negative"),
+            ({"slot_harmonics": 0}, "'slot_harmonics' must be a positive integer"),
+            ({"sidebands": -1}, "'sidebands' must be a non-negative integer"),
         ],
     )
-    def test_motor_rejects(self, kwargs: dict[str, object]) -> None:
-        with pytest.raises(ValueError):
+    def test_motor_rejects(self, kwargs: dict[str, object], match: str) -> None:
+        with pytest.raises(ValueError, match=match):
             induction_motor_frequencies(
                 1750.0, **{"poles": 4, "rotor_bars": 52, **kwargs}
             )  # type: ignore[arg-type]
@@ -374,11 +379,16 @@ class TestValidation:
             induction_motor_frequencies(3600.0, 4, 52, supply_frequency=60.0)
 
     @pytest.mark.parametrize(
-        "kwargs",
-        [{"n_blades": 0}, {"harmonics": 0}, {"n_vanes": 0}, {"lobe_orders": 0}],
+        ("kwargs", "match"),
+        [
+            ({"n_blades": 0}, "'n_blades' must be a positive integer"),
+            ({"harmonics": 0}, "'harmonics' must be a positive integer"),
+            ({"n_vanes": 0}, "'n_vanes' must be a positive integer"),
+            ({"lobe_orders": 0}, "'lobe_orders' must be a positive integer"),
+        ],
     )
-    def test_blade_rejects(self, kwargs: dict[str, object]) -> None:
-        with pytest.raises(ValueError):
+    def test_blade_rejects(self, kwargs: dict[str, object], match: str) -> None:
+        with pytest.raises(ValueError, match=match):
             blade_pass_frequencies(3500.0, **{"n_blades": 6, **kwargs})  # type: ignore[arg-type]
 
     def test_unknown_line_name(self) -> None:

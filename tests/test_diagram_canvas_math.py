@@ -199,7 +199,7 @@ def test_unbalanced_markup_raises() -> None:
 def test_multicharacter_script_without_braces_raises() -> None:
     # $f_max$ would silently set f with an m subscript and push "ax" back
     # to the baseline; the guard names the string and the ambiguous piece.
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(ValueError, match="ambiguous script '_max'") as excinfo:
         _element("cut-off $f_max$ of the array")
     assert "'_max'" in str(excinfo.value)
     assert "'cut-off $f_max$ of the array'" in str(excinfo.value)
@@ -208,7 +208,9 @@ def test_multicharacter_script_without_braces_raises() -> None:
     # An opening bracket right after the script character is the same trap,
     # but braces around the whole tail would swallow the argument into the
     # subscript, so the advice must point at bracing the script alone.
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(
+        ValueError, match=r"ambiguous script '_n' before '\('"
+    ) as excinfo:
         _element("$f_n(2h)$")
     assert "ambiguous script '_n' before '('" in str(excinfo.value)
     assert "_{n}(...)" in str(excinfo.value)
@@ -218,7 +220,7 @@ def test_comma_glued_to_unbraced_script_raises() -> None:
     # $L_p,i$ would set p as the subscript and push ",i" back to the
     # baseline; the guard demands braces. A spaced-off comma is a list
     # separator and stays legal.
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(ValueError, match="ambiguous comma '_p,i'") as excinfo:
         _element("$L_p,i$")
     assert "ambiguous comma '_p,i'" in str(excinfo.value)
     assert "'$L_p,i$'" in str(excinfo.value)
@@ -247,7 +249,7 @@ def test_comma_glued_to_unbraced_script_raises() -> None:
 def test_backslash_in_math_raises() -> None:
     # There are no LaTeX commands in the diagram composer; a backslash
     # would be published as a literal glyph.
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(ValueError, match="backslash in math run") as excinfo:
         _element("$\\theta_0$ incidence")
     assert "backslash" in str(excinfo.value)
     # repr doubles the backslash in the quoted pieces of the message.
@@ -256,7 +258,7 @@ def test_backslash_in_math_raises() -> None:
 
 
 def test_unclosed_script_brace_raises_with_context() -> None:
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(ValueError, match="unclosed script brace") as excinfo:
         _element("$L_{p$ level")
     assert "unclosed script brace" in str(excinfo.value)
     assert "'_{p'" in str(excinfo.value)
@@ -278,7 +280,9 @@ def test_consecutive_scripts_stay_legal() -> None:
 
 
 def test_nested_script_raises() -> None:
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(
+        ValueError, match="nested script '_1' inside a script"
+    ) as excinfo:
         _element("$L_{p_1}$")
     assert "nested script" in str(excinfo.value)
     assert "'$L_{p_1}$'" in str(excinfo.value)

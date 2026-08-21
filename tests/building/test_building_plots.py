@@ -302,5 +302,5 @@ def test_wall_tie_plot_forwards_kwargs() -> None:
 )
 def test_plot_rejects_an_unknown_language(factory) -> None:
     result = factory()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         result.plot(language="fr")

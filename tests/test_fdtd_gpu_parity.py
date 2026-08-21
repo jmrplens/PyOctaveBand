@@ -157,7 +157,7 @@ def _assert_parity(
         np.testing.assert_allclose(got_f, ref_f, rtol=0.0, atol=rtol_peak * peak)
 
 
-@pytest.mark.parametrize("xp,tol", BACKENDS)
+@pytest.mark.parametrize(("xp", "tol"), BACKENDS)
 @pytest.mark.parametrize("direction", list(_WAVES))
 def test_plane_wave_directions_match_library(
     xp: Any, tol: float, direction: str
@@ -178,7 +178,7 @@ def test_plane_wave_directions_match_library(
     assert sim.time == pytest.approx(_STEPS * sim.dt)
 
 
-@pytest.mark.parametrize("xp,tol", BACKENDS)
+@pytest.mark.parametrize(("xp", "tol"), BACKENDS)
 @pytest.mark.parametrize("scenario", list(_scenarios()))
 def test_scenarios_match_library(xp: Any, tol: float, scenario: str) -> None:
     """Each engine feature (and their combination) reproduces the library."""

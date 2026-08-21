@@ -623,7 +623,7 @@ def test_orthotropic_rejects_bad_input() -> None:
             critical_frequency_lower=4000.0,
             critical_frequency_upper=400.0,
         )
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'method' must be one of"):
         _fig627(BANDS, method="heckle")
     with pytest.raises(ValueError, match="must be positive"):
         building.orthotropic_transmission_loss(

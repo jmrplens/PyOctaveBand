@@ -54,7 +54,7 @@ def test_uncertainty_budget_es() -> None:
     assert ax.get_title().startswith("Presupuesto de incertidumbre (GUM)")
     assert "incertidumbre combinada" in ax.get_xlabel()
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         result.plot(language="xx")
 
 
@@ -108,7 +108,7 @@ def test_trend_test_es_and_bad_language() -> None:
     assert "Rachas $r$ =" in _labels(ax)
     assert "Mediana de la secuencia" in _labels(ax)
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -126,7 +126,7 @@ def test_stationarity_test_es_and_bad_language() -> None:
     assert "Rachas $r$ =" in _labels(ax)
     assert "Mediana de la secuencia" in _labels(ax)
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -137,7 +137,7 @@ def test_level_crossing_rate_es_and_bad_language() -> None:
     assert ax.get_ylabel() == "Cruces por segundo [1/s]"
     assert "Expectativa de Rice" in _labels(ax)
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -148,5 +148,5 @@ def test_peak_statistics_es_and_bad_language() -> None:
     assert "Límite de Rayleigh" in _labels(ax)
     assert "Excedencia empírica de picos" in _labels(ax)
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")

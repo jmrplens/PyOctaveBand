@@ -143,13 +143,13 @@ def test_result_structure(
 
 def test_invalid_field_raises() -> None:
     tone = _tone(1000.0, 60.0, 0.5)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="field.*'free'"):
         psychoacoustics.roughness_ecma(tone, FS, field="bogus")
 
 
 def test_empty_signal_raises() -> None:
     empty = np.array([])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="signal must not be empty"):
         psychoacoustics.roughness_ecma(empty, FS)
 
 

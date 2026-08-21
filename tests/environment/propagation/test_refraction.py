@@ -79,14 +79,16 @@ def test_log_linear_profile_matches_salomons_eq_4_5() -> None:
 
 
 def test_profile_validation() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'gradient' must be finite"):
         linear_sound_speed_profile(np.nan)
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="linear profile reaches a non-positive sound speed"
+    ):
         # A steep negative gradient drives the speed non-positive within range.
         linear_sound_speed_profile(-10.0, ground_speed=340.0, max_height=100.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'n_points' must be at least"):
         log_linear_sound_speed_profile(1.0, n_points=1)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'roughness_length' must be positive"):
         log_linear_sound_speed_profile(1.0, roughness_length=0.0)
 
 
@@ -104,9 +106,11 @@ def test_ray_curvature_radius_closed_form() -> None:
 
 
 def test_ray_curvature_radius_validation() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'gradient' must be finite and non-zero"):
         ray_curvature_radius(0.0)  # straight ray
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match=r"'launch_angle_deg' must be within \(-90, 90\)"
+    ):
         ray_curvature_radius(0.1, launch_angle_deg=90.0)
 
 
@@ -119,7 +123,10 @@ def test_shadow_zone_distance_closed_form() -> None:
 
 
 def test_shadow_zone_requires_upward_refraction() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError,
+        match=r"'gradient' must be negative \(an upward-refracting profile\)",
+    ):
         shadow_zone_distance(0.1, 2.0, 2.0)  # downward refraction: no shadow
 
 
@@ -220,11 +227,15 @@ def test_ground_reflection_costs_no_accuracy() -> None:
 
 def test_ray_validation() -> None:
     prof = linear_sound_speed_profile(0.1)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'source_height' must be non-negative"):
         atmospheric_ray_paths(prof, source_height=-1.0, launch_angles_deg=[0.0])
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match=r"'launch_angles_deg' must be within \(-90, 90\)"
+    ):
         atmospheric_ray_paths(prof, source_height=1.0, launch_angles_deg=[90.0])
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="'launch_angles_deg' must be finite and non-empty"
+    ):
         atmospheric_ray_paths(
             prof,
             source_height=1.0,
@@ -459,19 +470,23 @@ def test_pe_flow_resistivity_matches_impedance_path() -> None:
 
 def test_pe_validation() -> None:
     prof = _flat_profile()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'source_height' must be positive"):
         atmospheric_parabolic_equation(
             500.0, prof, source_height=0.0, impedance=Z_GRASS
         )
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="provide exactly one of 'impedance' or 'flow_resistivity'"
+    ):
         # Neither impedance nor flow_resistivity.
         atmospheric_parabolic_equation(500.0, prof, source_height=2.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="provide exactly one of 'impedance' or 'flow_resistivity'"
+    ):
         # Both impedance and flow_resistivity.
         atmospheric_parabolic_equation(
             500.0, prof, source_height=2.0, impedance=Z_GRASS, flow_resistivity=2e5
         )
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'range_step' must not exceed 'max_range'"):
         atmospheric_parabolic_equation(
             500.0,
             prof,

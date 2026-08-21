@@ -94,17 +94,19 @@ def test_air_density_reference_values() -> None:
 
 
 def test_air_property_domain_errors() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'temperature' must be positive"):
         speed_of_sound_iso(-1.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'temperature' must exceed"):
         speed_of_sound_astm(-300.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'atmospheric_pressure' must be positive"):
         air_density_iso(293.0, -1.0)
 
 
 def test_characteristic_impedance_is_real_product() -> None:
     assert characteristic_impedance(RHO, C0) == pytest.approx(RC)
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="'density' and 'speed_of_sound' must be positive"
+    ):
         characteristic_impedance(-1.0, C0)
 
 
@@ -372,7 +374,7 @@ def test_swr_reflection_and_absorption() -> None:
 
 
 def test_swr_invalid_ratio() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Standing-wave ratio 's' must be"):
         standing_wave_reflection_magnitude(0.5)
 
 

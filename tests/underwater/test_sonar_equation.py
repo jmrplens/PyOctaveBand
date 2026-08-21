@@ -87,7 +87,7 @@ def test_active_two_way_loss() -> None:
 
 
 def test_rejects_non_finite() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"'source_level'.*finite"):
         passive_sonar_equation(float("nan"), 80.0, 60.0)
 
 

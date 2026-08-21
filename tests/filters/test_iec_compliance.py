@@ -69,7 +69,7 @@ SLOW_CASES = [
 ]
 
 
-@pytest.mark.parametrize("duration,ref,upper,lower", FAST_CASES)
+@pytest.mark.parametrize(("duration", "ref", "upper", "lower"), FAST_CASES)
 def test_fast_tone_burst_iec_table4(
     duration: float, ref: float, upper: float, lower: float
 ) -> None:
@@ -80,7 +80,7 @@ def test_fast_tone_burst_iec_table4(
     )
 
 
-@pytest.mark.parametrize("duration,ref,upper,lower", SLOW_CASES)
+@pytest.mark.parametrize(("duration", "ref", "upper", "lower"), SLOW_CASES)
 def test_slow_tone_burst_iec_table4(
     duration: float, ref: float, upper: float, lower: float
 ) -> None:
@@ -138,7 +138,7 @@ SEL_CASES = [
 ]
 
 
-@pytest.mark.parametrize("duration,ref,upper,lower", SEL_CASES)
+@pytest.mark.parametrize(("duration", "ref", "upper", "lower"), SEL_CASES)
 def test_sel_tone_burst_iec_table4(
     duration: float, ref: float, upper: float, lower: float
 ) -> None:

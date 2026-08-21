@@ -110,7 +110,8 @@ def generate_signal_provenance(output_dir: str) -> None:
 
     origin = sig.source
     provenance = sig.provenance
-    assert origin is not None and provenance is not None
+    assert origin is not None
+    assert provenance is not None
     history_lines = provenance.coding_history.splitlines()
     appended = len(history_lines) - 1
     container = f"{origin.container}, {origin.bit_depth}-bit {origin.format_name}"

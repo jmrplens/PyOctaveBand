@@ -166,7 +166,7 @@ def test_directivity_pattern_plot() -> None:
     assert ax.name == "polar"
     assert len(ax.lines) == 3
     assert "piston directivity" in ax.get_title()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -193,18 +193,18 @@ def test_directivity_pattern_validation() -> None:
     ka_one = [1.0]
     infinite_angles = [np.inf]
     empty_ka = np.empty(0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'ka' must be non-negative"):
         electroacoustics.piston_directivity_pattern(-1.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'angles' must be finite"):
         electroacoustics.piston_directivity_pattern(ka_one, angles=infinite_angles)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'ka' must be a non-empty"):
         electroacoustics.piston_directivity_pattern(empty_ka)
 
 
 def test_validation() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'radius' must be positive"):
         electroacoustics.radiating_piston(-1.0, [100.0])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'frequencies' must be positive"):
         electroacoustics.radiating_piston(0.1, [0.0])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'x' must be non-negative"):
         electroacoustics.piston_resistance(-1.0)

@@ -365,7 +365,7 @@ class TestValidation:
 
     @pytest.mark.parametrize("bad", [0.0, -1.0])
     def test_non_positive_inputs(self, bad: float) -> None:
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="'energy1' must be strictly positive"):
             power_injection_clf(500.0, bad, 0.1, 4.4e-3, 2.4e-3, 1.0, 1.0)
 
     def test_band_length_mismatch(self) -> None:
@@ -403,19 +403,28 @@ class TestValidation:
             power_injection_matrix(_ONE_BAND, energies, powers)
 
     def test_unknown_band(self) -> None:
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="'band' must be one of"):
             cylindrical_shell_modal_density(500.0, 9.4, 0.003, 0.75, _CL, band="half")
 
     @pytest.mark.parametrize(
-        "call",
+        ("call", "message"),
         [
-            lambda: bar_modal_density(0.0, 5150.0),
-            lambda: bar_modal_density(1.0, 0.0),
-            lambda: beam_modal_density(100.0, 0.0, 7.8, 1.2e4),
-            lambda: flat_plate_modal_density(1.0, 0.0, 5150.0),
-            lambda: ring_frequency(0.0, 5150.0),
+            (lambda: bar_modal_density(0.0, 5150.0), "'length' must be positive"),
+            (
+                lambda: bar_modal_density(1.0, 0.0),
+                "'longitudinal_wave_speed' must be positive",
+            ),
+            (
+                lambda: beam_modal_density(100.0, 0.0, 7.8, 1.2e4),
+                "'length' must be positive",
+            ),
+            (
+                lambda: flat_plate_modal_density(1.0, 0.0, 5150.0),
+                "'thickness' must be positive",
+            ),
+            (lambda: ring_frequency(0.0, 5150.0), "'mean_radius' must be positive"),
         ],
     )
-    def test_non_positive_geometry(self, call) -> None:  # type: ignore[no-untyped-def]
-        with pytest.raises(ValueError):
+    def test_non_positive_geometry(self, call, message: str) -> None:  # type: ignore[no-untyped-def]
+        with pytest.raises(ValueError, match=message):
             call()

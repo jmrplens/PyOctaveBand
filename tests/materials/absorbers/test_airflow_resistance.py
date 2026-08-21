@@ -77,25 +77,34 @@ def test_quantity_chain_round_trip() -> None:
 
 
 def test_specific_resistance_requires_exactly_one_route() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Provide exactly one route"):
         specific_airflow_resistance(20000.0, 0.008, pressure_drop=20.0, velocity=0.125)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Provide exactly one route"):
         specific_airflow_resistance()
 
 
 @pytest.mark.parametrize(
-    "call",
+    ("call", "message"),
     [
-        lambda: airflow_resistance(-1.0, 0.001),
-        lambda: airflow_resistance(20.0, 0.0),
-        lambda: airflow_resistivity(160.0, 0.0),
-        lambda: linear_airflow_velocity(0.001, 0.0),
-        lambda: specific_airflow_resistance(-1.0, 0.008),
-        lambda: specific_airflow_resistance(pressure_drop=20.0, velocity=0.0),
+        (
+            lambda: airflow_resistance(-1.0, 0.001),
+            "'pressure_drop' must be non-negative",
+        ),
+        (lambda: airflow_resistance(20.0, 0.0), "'volume_flow_rate' must be positive"),
+        (lambda: airflow_resistivity(160.0, 0.0), "'thickness' must be positive"),
+        (lambda: linear_airflow_velocity(0.001, 0.0), "'area' must be positive"),
+        (
+            lambda: specific_airflow_resistance(-1.0, 0.008),
+            "'resistance' must be non-negative",
+        ),
+        (
+            lambda: specific_airflow_resistance(pressure_drop=20.0, velocity=0.0),
+            "'velocity' must be positive",
+        ),
     ],
 )
-def test_invalid_inputs_raise(call) -> None:  # type: ignore[no-untyped-def]
-    with pytest.raises(ValueError):
+def test_invalid_inputs_raise(call, message: str) -> None:  # type: ignore[no-untyped-def]
+    with pytest.raises(ValueError, match=message):
         call()
 
 
@@ -144,16 +153,28 @@ def test_static_velocity_above_limit_warns() -> None:
 
 
 @pytest.mark.parametrize(
-    "call",
+    ("call", "message"),
     [
-        lambda: static_airflow_resistance([1e-3], [12.0], 0.008),  # < 2 steps
-        lambda: static_airflow_resistance([1e-3, 2e-3], [12.0], 0.008),  # length
-        lambda: static_airflow_resistance([1e-3, -2e-3], [12.0, 24.0], 0.008),  # neg u
-        lambda: static_airflow_resistance([1e-3, 2e-3], [12.0, 24.0], 0.0),  # area
+        (  # < 2 steps
+            lambda: static_airflow_resistance([1e-3], [12.0], 0.008),
+            "At least two measurement steps",
+        ),
+        (  # length
+            lambda: static_airflow_resistance([1e-3, 2e-3], [12.0], 0.008),
+            "must have equal length",
+        ),
+        (  # neg u
+            lambda: static_airflow_resistance([1e-3, -2e-3], [12.0, 24.0], 0.008),
+            "All velocities must be positive",
+        ),
+        (  # area
+            lambda: static_airflow_resistance([1e-3, 2e-3], [12.0, 24.0], 0.0),
+            "'area' must be positive",
+        ),
     ],
 )
-def test_static_invalid_inputs_raise(call) -> None:  # type: ignore[no-untyped-def]
-    with pytest.raises(ValueError):
+def test_static_invalid_inputs_raise(call, message: str) -> None:  # type: ignore[no-untyped-def]
+    with pytest.raises(ValueError, match=message):
         call()
 
 
@@ -232,17 +253,22 @@ def test_alternating_frequency_out_of_range_warns() -> None:
 
 
 @pytest.mark.parametrize(
-    "kwargs",
+    ("kwargs", "message"),
     [
-        {"frequency": 0.0},
-        {"cavity_volume": 0.0},
-        {"piston_stroke_specimen": 0.0},
-        {"piston_stroke_termination": 0.0},
-        {"static_pressure": 0.0},
-        {"kappa_prime": 0.0},
+        ({"frequency": 0.0}, "'frequency' must be positive"),
+        ({"cavity_volume": 0.0}, "'cavity_volume' must be positive"),
+        ({"piston_stroke_specimen": 0.0}, "'piston_stroke_specimen' must be positive"),
+        (
+            {"piston_stroke_termination": 0.0},
+            "'piston_stroke_termination' must be positive",
+        ),
+        ({"static_pressure": 0.0}, "'static_pressure' must be positive"),
+        ({"kappa_prime": 0.0}, "'kappa_prime' must be positive"),
     ],
 )
-def test_alternating_invalid_inputs_raise(kwargs: dict[str, float]) -> None:
+def test_alternating_invalid_inputs_raise(
+    kwargs: dict[str, float], message: str
+) -> None:
     base = {
         "piston_stroke_specimen": 14.0e-3,
         "piston_stroke_termination": 1.4e-3,
@@ -250,7 +276,7 @@ def test_alternating_invalid_inputs_raise(kwargs: dict[str, float]) -> None:
         "cavity_volume": 1.0e-3,
     }
     base.update(kwargs)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=message):
         alternating_airflow_resistance(60.0, 80.0, **base)
 
 
@@ -289,18 +315,20 @@ def test_effective_kappa_below_adiabatic() -> None:
 
 
 @pytest.mark.parametrize(
-    "kwargs",
+    ("kwargs", "message"),
     [
-        {"cavity_surface": 0.0},
-        {"cavity_volume": 0.0},
-        {"frequency": 0.0},
-        {"specific_heat_ratio": 0.0},
+        ({"cavity_surface": 0.0}, "'cavity_surface' must be positive"),
+        ({"cavity_volume": 0.0}, "'cavity_volume' must be positive"),
+        ({"frequency": 0.0}, "'frequency' must be positive"),
+        ({"specific_heat_ratio": 0.0}, "'specific_heat_ratio' must be positive"),
     ],
 )
-def test_effective_kappa_invalid_inputs_raise(kwargs: dict[str, float]) -> None:
+def test_effective_kappa_invalid_inputs_raise(
+    kwargs: dict[str, float], message: str
+) -> None:
     base = {"cavity_surface": 0.0471, "cavity_volume": 7.854e-4, "frequency": 2.0}
     base.update(kwargs)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=message):
         effective_kappa(**base)
 
 

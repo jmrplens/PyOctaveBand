@@ -476,11 +476,15 @@ def test_non_positive_mean_cites_a23_only_for_the_surface_indicators() -> None:
     defines F1 over the M short-time samples at one position, states no such
     condition, so the F1 message must not claim A.2.3 backing.
     """
-    with pytest.raises(ValueError) as surface:
+    with pytest.raises(
+        ValueError, match="measurement surface is not positive"
+    ) as surface:
         emission.field_indicators([90.0, 90.0], [1e-3, -2e-3])
     assert "A.2.3" in str(surface.value)
 
-    with pytest.raises(ValueError) as temporal:
+    with pytest.raises(
+        ValueError, match="short-time normal intensity samples is not positive"
+    ) as temporal:
         emission.temporal_variability_indicator([1.0e-5, -3.0e-5])
     assert "A.2.3" not in str(temporal.value)
     assert "A.1" in str(temporal.value)

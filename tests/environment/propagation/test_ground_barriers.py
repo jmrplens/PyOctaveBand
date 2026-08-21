@@ -163,9 +163,9 @@ def test_ground_effect_requires_exactly_one_impedance_source(kwargs: dict) -> No
 
 
 def test_ground_effect_rejects_bad_geometry() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="heights must be non-negative"):
         environment.ground_effect(_BANDS, -1.0, 1.0, 20.0, impedance=10.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'distance' must be positive"):
         environment.ground_effect(_BANDS, 1.0, 1.0, 0.0, impedance=10.0)
 
 

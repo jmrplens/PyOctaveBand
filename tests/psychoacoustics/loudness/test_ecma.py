@@ -146,19 +146,19 @@ def test_result_structure(ref_1k_40: psychoacoustics.EcmaLoudness) -> None:
 
 def test_invalid_field() -> None:
     tone = _tone(1000.0, 40.0, seconds=0.5)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="field must be"):
         psychoacoustics.loudness_ecma(tone, FS, field="reverberant")
 
 
 def test_invalid_fs() -> None:
     tone = _tone(1000.0, 40.0, seconds=0.5)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="fs must be positive"):
         psychoacoustics.loudness_ecma(tone, 0.0)
 
 
 def test_empty_signal() -> None:
     empty = np.array([])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="signal must not be empty"):
         psychoacoustics.loudness_ecma(empty, FS)
 
 

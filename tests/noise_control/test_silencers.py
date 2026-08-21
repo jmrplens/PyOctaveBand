@@ -287,9 +287,9 @@ def test_insertion_loss_present_when_impedances_given() -> None:
 
 
 def test_validation() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'frequencies' must be positive"):
         sl.expansion_chamber([0.0], 0.3, 0.04, 0.01)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'chamber_area' must be positive"):
         sl.expansion_chamber([100.0], 0.3, -0.04, 0.01)
     with pytest.raises(ValueError, match="must exceed"):
         sl.extended_tube_chamber([100.0], 0.3, 0.01, 0.02)

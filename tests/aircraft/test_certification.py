@@ -145,7 +145,9 @@ def test_noy_floor_below_spld_is_zero() -> None:
 
 
 def test_noy_requires_24_bands() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="'spl' must contain the 24 one-third-octave-band levels"
+    ):
         perceived_noisiness([1.0, 2.0, 3.0])
 
 
@@ -226,7 +228,7 @@ def test_epnl_single_element_dt_treated_as_scalar() -> None:
 
 def test_effective_perceived_noise_level_rejects_bad_shape() -> None:
     two_dimensional = np.zeros((5, 10))
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"'spectra' must have shape \(K, 24\)"):
         effective_perceived_noise_level(two_dimensional)
 
 

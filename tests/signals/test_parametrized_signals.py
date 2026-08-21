@@ -8,7 +8,7 @@ from phonometry import filters
 
 
 @pytest.mark.parametrize(
-    "fraction, expected_bands",
+    ("fraction", "expected_bands"),
     [
         (1, 11),  # Standard 1 octave bands in [12, 20000] approx
         (3, 33),  # Standard 1/3 octave

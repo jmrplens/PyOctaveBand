@@ -56,7 +56,8 @@ def generate_junction_transmission(output_dir: str) -> None:
     # X-junction between a 100 mm and a 200 mm concrete plate (cL = 3200 m/s,
     # rho = 2400 kg/m^3 -> rho_s = 240 and 480 kg/m^2).
     res = vibration.junction_transmission("X", 0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
-    assert res.straight is not None and res.straight_average is not None
+    assert res.straight is not None
+    assert res.straight_average is not None
     angles = res.angles_deg
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))

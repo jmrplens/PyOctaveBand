@@ -44,7 +44,7 @@ def test_standard_speech_spectrum_es_and_bad_language() -> None:
     assert ax.get_ylabel() == "Nivel del espectro de voz [dB SPL]"
     assert ax.get_title() == "ANSI S3.5-1997 espectro de voz estándar"
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -89,7 +89,7 @@ def test_sti_es() -> None:
     assert "Índice de transferencia de modulación MTI" in text
     assert "calificación" in text
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 

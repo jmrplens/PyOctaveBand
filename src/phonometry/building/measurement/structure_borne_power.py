@@ -83,7 +83,7 @@ if TYPE_CHECKING:
     from ..._report.metadata import ReportMetadata
 
 
-from ..._internal.validation import require_positive
+from ..._internal.validation import require_per_band, require_positive
 from .flanking_transmission import total_loss_factor
 
 #: EN 15657 vibratory velocity reference ``v0`` (= ISO 1683 10^-9 m/s), m/s.
@@ -323,16 +323,13 @@ def reception_plate_power(
         when ``loss_factor`` is ``None``.
     :return: The :class:`StructureBornePowerResult`.
     :raises ValueError: if neither ``loss_factor`` nor ``reverberation_time``
-        is given.
+        is given, or if ``velocity_level`` or ``loss_factor`` is neither a
+        scalar nor one value per band.
     """
     freq = np.atleast_1d(np.asarray(frequency, dtype=np.float64))
-    lv = np.broadcast_to(
-        np.asarray(velocity_level, dtype=np.float64), freq.shape
-    ).astype(np.float64)
+    lv = require_per_band(velocity_level, "velocity_level", freq)
     if loss_factor is not None:
-        eta = np.broadcast_to(
-            np.asarray(loss_factor, dtype=np.float64), freq.shape
-        ).astype(np.float64)
+        eta = require_per_band(loss_factor, "loss_factor", freq)
     elif reverberation_time is not None:
         eta = np.asarray(plate_loss_factor(freq, reverberation_time), dtype=np.float64)
     else:

@@ -290,5 +290,5 @@ def test_limp_frame_criteria_match_the_printed_thresholds() -> None:
 def test_limp_frame_applicable_rejects_bad_input() -> None:
     with pytest.raises(ValueError, match="non-negative"):
         materials.limp_frame_applicable(-1.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'criterion' must be one of"):
         materials.limp_frame_applicable(1.0e3, criterion="panneton")

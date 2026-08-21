@@ -306,7 +306,8 @@ def _chk_iso12999_annex_b_values() -> Outcome:
         ref.ISO12999_1_ANNEX_B_FREQ,
         one_decimal=True,
     )
-    assert res.c_50_5000 is not None and res.ctr_50_5000 is not None
+    assert res.c_50_5000 is not None
+    assert res.ctr_50_5000 is not None
     rw = float(res.rating)
     rw_c = rw + float(res.c_50_5000)
     rw_ctr = rw + float(res.ctr_50_5000)

@@ -122,7 +122,7 @@ _C1_1KHZ = [
 ]
 
 
-@pytest.mark.parametrize("level_db, sone, phon", _C1_1KHZ)
+@pytest.mark.parametrize(("level_db", "sone", "phon"), _C1_1KHZ)
 def test_annex_c1_1khz_tone(mg_tone, level_db: float, sone: float, phon: float) -> None:
     """1 kHz tone 10-80 dB reaches the Annex C.1 peak long-term loudness."""
     res = mg_tone(1000.0, level_db)
@@ -149,7 +149,9 @@ _C1_OTHER = [
 ]
 
 
-@pytest.mark.parametrize("frequency, level_db, field, presentation, phon", _C1_OTHER)
+@pytest.mark.parametrize(
+    ("frequency", "level_db", "field", "presentation", "phon"), _C1_OTHER
+)
 def test_annex_c1_other_tones(
     mg_tone,
     frequency: float,
@@ -177,7 +179,9 @@ _C1_SONE = [
 ]
 
 
-@pytest.mark.parametrize("frequency, field, presentation, level_db, sone", _C1_SONE)
+@pytest.mark.parametrize(
+    ("frequency", "field", "presentation", "level_db", "sone"), _C1_SONE
+)
 def test_annex_c1_sone_values(
     mg_tone,
     frequency: float,
@@ -207,7 +211,7 @@ _C3_CASES = [
 ]
 
 
-@pytest.mark.parametrize("freqs, level_db, sone, phon", _C3_CASES)
+@pytest.mark.parametrize(("freqs", "level_db", "sone", "phon"), _C3_CASES)
 def test_annex_c3_multi_tone(
     freqs: list, level_db: float, sone: float, phon: float
 ) -> None:

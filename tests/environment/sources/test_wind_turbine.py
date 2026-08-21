@@ -122,7 +122,7 @@ def test_tonal_audibility_flat_spectrum_not_audible() -> None:
 
 
 def test_tonal_audibility_rejects_short_input() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="1-D and the same length"):
         wind_turbine_tonality([1.0, 2.0], [10.0, 12.0])
 
 

@@ -530,7 +530,8 @@ def generate_intensity_insulation(output_dir: str) -> None:
         np.full(16, lp1), l_in, measurement_area=sm, area=s, kc=kc
     )
     assert result.r_i_modified is not None
-    assert result.rating is not None and result.rating_modified is not None
+    assert result.rating is not None
+    assert result.rating_modified is not None
 
     x = np.arange(len(freqs))
     _fig, ax = plt.subplots(figsize=(10, 6.2))
@@ -1277,7 +1278,8 @@ def generate_extended_insulation_rating(output_dir: str) -> None:
     ext = building.weighted_rating_extended(
         [18.7, 19.2, 20.0, *r_core, 26.8, 29.2], freqs
     )
-    assert ext.measured is not None and ext.core.shifted_reference is not None
+    assert ext.measured is not None
+    assert ext.core.shifted_reference is not None
     assert ext.core.measured is not None
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
@@ -1573,7 +1575,8 @@ def generate_facade_field_insulation(output_dir: str) -> None:
         method="loudspeaker",
         frequencies=np.asarray(_THIRD_OCTAVE_16, float),
     )
-    assert fac.d_2m_n is not None and fac.r_prime is not None
+    assert fac.d_2m_n is not None
+    assert fac.r_prime is not None
     w = building.weighted_rating(fac.d_2m_nt)
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
@@ -1782,7 +1785,8 @@ def generate_lab_insulation_result(output_dir: str) -> None:
         ]
     )
     imp = building.lab_impact_insulation(li, t2, volume=50.0)
-    assert lab.rating is not None and imp.rating is not None
+    assert lab.rating is not None
+    assert imp.rating is not None
 
     _fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5.6))
     for ax in (ax1, ax2):

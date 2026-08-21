@@ -429,7 +429,7 @@ def test_trend_test_plot_renders_and_returns_axes() -> None:
     assert any("Runs $r$ =" in t for t in legend_texts)
     assert any("Sequence median" in t for t in legend_texts)
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
     plt.close("all")
 

@@ -348,14 +348,14 @@ def test_a_weighted_total_from_bands() -> None:
 # --------------------------------------------------------------------------
 def test_invalid_volume_raises() -> None:
     lp, t60, freqs = np.array([80.0]), np.array([1.5]), np.array([1000.0])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'volume' and 'surface_area'"):
         emission.sound_power_reverberation(lp, t60, -1.0, 210.0, freqs)
 
 
 def test_mismatched_shapes_raise() -> None:
     two_bands = np.array([80.0, 81.0])  # 2 levels against 1 band of T60/freq
     t60, freqs = np.array([1.5]), np.array([1000.0])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'frequencies' length must match"):
         emission.sound_power_reverberation(two_bands, t60, 200.0, 210.0, freqs)
 
 

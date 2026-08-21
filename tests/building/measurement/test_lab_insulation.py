@@ -235,7 +235,7 @@ def test_airborne_t2_band_mismatch() -> None:
         building.lab_airborne_insulation(l1, l2, short_t2, area=10.0, volume=50.0)
 
 
-@pytest.mark.parametrize("area,volume", [(0.0, 50.0), (-1.0, 50.0)])
+@pytest.mark.parametrize(("area", "volume"), [(0.0, 50.0), (-1.0, 50.0)])
 def test_airborne_bad_area(area: float, volume: float) -> None:
     l1, l2, t2 = np.full(16, 80.0), np.full(16, 30.0), np.full(16, 0.8)
     with pytest.raises(ValueError, match="area"):
@@ -305,7 +305,7 @@ def test_plot_without_rating_raises() -> None:
 
 
 @pytest.mark.parametrize(
-    "r_name,rating_name",
+    ("r_name", "rating_name"),
     [
         ("ISO10140_5_B1_HEAVY_WALL_R", "ISO10140_5_B1_HEAVY_WALL_RATING"),
         ("ISO10140_5_B1_HEAVY_FLOOR_R", "ISO10140_5_B1_HEAVY_FLOOR_RATING"),
@@ -330,7 +330,7 @@ def test_reference_element_airborne_end_to_end(r_name: str, rating_name: str) ->
 
 
 @pytest.mark.parametrize(
-    "ln_name,rating_name",
+    ("ln_name", "rating_name"),
     [
         ("ISO10140_5_C1_FLOOR_C1C2_LN", "ISO10140_5_C1_FLOOR_C1C2_RATING"),
         ("ISO10140_5_C1_FLOOR_C3_LN", "ISO10140_5_C1_FLOOR_C3_RATING"),

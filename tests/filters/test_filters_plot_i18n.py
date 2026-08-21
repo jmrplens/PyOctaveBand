@@ -58,7 +58,7 @@ def test_filter_class_es() -> None:
     assert "Máscara clase" in ax.get_title()
     assert ax.get_ylabel() == "Atenuación relativa [dB]"
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
 
 
@@ -78,5 +78,5 @@ def test_parametric_eq_es_and_bad_language() -> None:
     assert "campana 1000 Hz" in _labels(axes)
     assert "Fase [grados]" in _labels(axes)
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")

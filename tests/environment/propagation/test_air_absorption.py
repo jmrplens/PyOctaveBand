@@ -39,7 +39,7 @@ def _last_digit_ulp(value: float) -> float:
     return 10.0 ** (math.floor(math.log10(value)) - 2)
 
 
-@pytest.mark.parametrize("temp,rh,freq,alpha_km", ref.ISO9613_1_TABLE1)
+@pytest.mark.parametrize(("temp", "rh", "freq", "alpha_km"), ref.ISO9613_1_TABLE1)
 def test_table1_digit_exact(
     temp: float, rh: float, freq: float, alpha_km: float
 ) -> None:
@@ -159,17 +159,26 @@ def test_out_of_range_frequency_warns() -> None:
 
 
 @pytest.mark.parametrize(
-    "args,kwargs",
+    ("args", "kwargs", "match"),
     [
-        (([0.0, 1000.0],), {}),  # non-positive frequency
-        ((1000.0,), {"temperature": -273.15}),  # absolute zero
-        ((1000.0,), {"relative_humidity": -1.0}),  # negative RH
-        ((1000.0,), {"relative_humidity": 120.0}),  # > 100 %
-        ((1000.0,), {"pressure": 0.0}),  # non-positive pressure
+        # non-positive frequency
+        (([0.0, 1000.0],), {}, "'frequencies' must be positive"),
+        # absolute zero
+        (
+            (1000.0,),
+            {"temperature": -273.15},
+            "'temperature' must be above absolute zero",
+        ),
+        # negative RH
+        ((1000.0,), {"relative_humidity": -1.0}, "'relative_humidity' must be within"),
+        # > 100 %
+        ((1000.0,), {"relative_humidity": 120.0}, "'relative_humidity' must be within"),
+        # non-positive pressure
+        ((1000.0,), {"pressure": 0.0}, "'pressure' must be positive"),
     ],
 )
-def test_invalid_inputs_raise(args: tuple, kwargs: dict) -> None:
-    with pytest.raises(ValueError):
+def test_invalid_inputs_raise(args: tuple, kwargs: dict, match: str) -> None:
+    with pytest.raises(ValueError, match=match):
         environment.air_attenuation(*args, **kwargs)
 
 

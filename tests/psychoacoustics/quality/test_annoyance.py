@@ -76,13 +76,13 @@ def test_pa_silence_is_zero() -> None:
 
 @pytest.mark.parametrize("bad", [-1.0, math.nan, math.inf])
 def test_pa_rejects_bad_inputs(bad: float) -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'n5'.*non-negative"):
         psychoacoustics.psychoacoustic_annoyance(bad, 2.0, 0.5, 0.3)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'sharpness'.*non-negative"):
         psychoacoustics.psychoacoustic_annoyance(10.0, bad, 0.5, 0.3)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'fluctuation_strength'.*non-negative"):
         psychoacoustics.psychoacoustic_annoyance(10.0, 2.0, bad, 0.3)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'roughness'.*non-negative"):
         psychoacoustics.psychoacoustic_annoyance(10.0, 2.0, 0.5, bad)
 
 

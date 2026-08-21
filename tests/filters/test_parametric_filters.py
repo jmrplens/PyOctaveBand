@@ -190,9 +190,9 @@ def test_weighting_filter_class_direct_use() -> None:
     y_z = wf_z.filter(x)
     np.testing.assert_allclose(y_z, x)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Sample rate 'fs' must be positive"):
         filters.WeightingFilter(0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Weighting curve must be"):
         filters.WeightingFilter(fs, curve="invalid")
 
 

@@ -1302,7 +1302,8 @@ def generate_single_panel_rating(output_dir: str) -> None:
         bands, mass, critical_frequency=fc, loss_factor=0.024
     )
     w = res.rating()
-    assert w.shifted_reference is not None and w.measured is not None
+    assert w.shifted_reference is not None
+    assert w.measured is not None
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     x = _band_index_axis(ax, _THIRD_OCTAVE_16)
@@ -1401,7 +1402,8 @@ def generate_plateau_transmission_loss(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     x = _band_index_axis(ax, nominal)
-    assert quick.plateau_start is not None and quick.plateau_end is not None
+    assert quick.plateau_start is not None
+    assert quick.plateau_end is not None
     idx_a = float(np.interp(np.log10(quick.plateau_start), np.log10(bands), x))
     idx_b = float(np.interp(np.log10(quick.plateau_end), np.log10(bands), x))
     ax.axvspan(

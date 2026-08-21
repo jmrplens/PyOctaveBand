@@ -202,21 +202,21 @@ def test_positions_are_energy_averaged() -> None:
 # --------------------------------------------------------------------------
 def test_band_count_mismatch_raises() -> None:
     outdoor, indoor_two_bands, rt = _flat(3, 70.0), _flat(2, 30.0), _flat(3, 0.5)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="share the same band count"):
         building.facade_insulation(outdoor, indoor_two_bands, rt)
 
 
 def test_nonpositive_reverberation_raises() -> None:
     outdoor, indoor = _flat(3, 70.0), _flat(3, 30.0)
     rt_with_zero = np.array([0.5, 0.0, 0.5])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'t2' must contain positive"):
         building.facade_insulation(outdoor, indoor, rt_with_zero)
 
 
 def test_nonpositive_area_volume_raises() -> None:
     outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
     surface = _flat(3, 72.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'area' must be positive"):
         building.facade_insulation(
             outdoor,
             indoor,
@@ -253,7 +253,7 @@ def test_surface_area_and_volume_returns_r_prime() -> None:
 
 def test_invalid_method_raises() -> None:
     outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'method' must be"):
         building.facade_insulation(outdoor, indoor, rt, method="airplane")
 
 
@@ -275,7 +275,7 @@ def test_invalid_method_on_result_raises() -> None:
 def test_nonfinite_raises() -> None:
     outdoor_with_nan = np.array([70.0, np.nan, 70.0])
     indoor, rt = _flat(3, 30.0), _flat(3, 0.5)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'l1_2m' must contain only finite values"):
         building.facade_insulation(outdoor_with_nan, indoor, rt)
 
 

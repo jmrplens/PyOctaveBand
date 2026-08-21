@@ -182,9 +182,9 @@ def test_required_transmission_loss_callable_and_result_shape() -> None:
 
 
 def test_validation() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'external_area' must be positive"):
         noise_control.enclosure_insertion_loss([20.0], -1.0, 5.0, 0.3)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'internal_absorption' must lie strictly in"):
         noise_control.enclosure_insertion_loss([20.0], 6.0, 5.0, 1.0)
     with pytest.raises(ValueError, match="model"):
         noise_control.enclosure_insertion_loss([20.0], 6.0, 5.0, 0.3, model="hansen")

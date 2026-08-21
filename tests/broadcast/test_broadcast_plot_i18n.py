@@ -36,5 +36,5 @@ def test_program_loudness_es_and_bad_language() -> None:
     labels = [t.get_text() for t in ax.get_legend().get_texts()]
     assert any(s.startswith("Integrada") for s in labels)
     plt.close("all")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")

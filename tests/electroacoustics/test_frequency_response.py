@@ -95,15 +95,15 @@ def test_result_fields_and_plot() -> None:
 def test_rejects_mismatched_lengths() -> None:
     x = np.zeros(1000)
     shorter_y = np.zeros(500)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'x' and 'y' must have the same length"):
         electroacoustics.transfer_function(x, shorter_y, FS)
 
 
 def test_rejects_bad_estimator_and_overlap() -> None:
     x = np.zeros(1000)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'estimator'"):
         electroacoustics.transfer_function(x, x, FS, estimator="H3")  # type: ignore[arg-type]
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'overlap'"):
         electroacoustics.transfer_function(x, x, FS, overlap=1.0)
 
 
@@ -116,13 +116,13 @@ def test_high_overlap_does_not_crash() -> None:
 
 def test_rejects_bad_nperseg() -> None:
     x = np.zeros(1000)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'nperseg'"):
         electroacoustics.transfer_function(x, x, FS, nperseg=5000)
 
 
 def test_rejects_too_short_signal() -> None:
     too_short = np.zeros(10)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="too short for a spectral estimate"):
         electroacoustics.coherence(too_short, too_short, FS)
 
 

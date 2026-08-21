@@ -245,7 +245,7 @@ def test_mean_narrowband_level_rejects_unsorted_frequencies() -> None:
 
 
 def test_tone_level_rejects_non_finite_ls() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'mean_narrowband_level' must be finite"):
         psychoacoustics.tone_level(
             [50.0, 60.0, 50.0], [100.0, 102.7, 105.4], 102.7, float("nan")
         )
@@ -503,9 +503,9 @@ def test_resolve_separately_uses_more_prominent_tone() -> None:
 
 
 def test_resolve_separately_rejects_bad_input() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'tone1_frequency' must be a positive"):
         psychoacoustics.resolve_tones_separately(-1.0, 200.0, 1.0, 1.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'audibility1' must be finite"):
         psychoacoustics.resolve_tones_separately(200.0, 260.0, math.nan, 1.0)
 
 
@@ -607,27 +607,29 @@ def test_plot_rejects_unknown_view() -> None:
 # ---------------------------------------------------------------------------
 @pytest.mark.parametrize("bad", [0.0, -1.0, float("nan"), float("inf")])
 def test_critical_bandwidth_rejects_bad_frequency(bad: float) -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'tone_frequency' must be a positive"):
         psychoacoustics.critical_bandwidth_engineering(bad)
 
 
 def test_critical_band_level_rejects_bad_spacing() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'line_spacing' must be a positive"):
         psychoacoustics.critical_band_level(50.0, 137.3, 0.0)
 
 
 def test_audibility_rejects_non_finite() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'tone_level' must be finite"):
         psychoacoustics.audibility_from_levels(float("nan"), 60.0, -2.0)
 
 
 def test_energy_sum_rejects_empty() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="'line_levels' must contain at least one line"
+    ):
         psychoacoustics.energy_sum_level([])
 
 
 def test_mean_audibility_rejects_empty() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="'decisive_audibilities' must not be empty"):
         psychoacoustics.mean_audibility([])
 
 
@@ -637,7 +639,7 @@ def test_assess_tones_rejects_length_mismatch() -> None:
 
 
 def test_assess_tones_rejects_empty() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="At least one tone is required"):
         psychoacoustics.assess_tones([], [], [], 2.7)
 
 

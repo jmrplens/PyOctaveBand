@@ -183,7 +183,7 @@ def test_deviation_evaluated_at_exact_base10_frequency() -> None:
 
 
 @pytest.mark.parametrize(
-    "fs,label", [(16000, 8000.0), (32000, 16000.0), (48000, 16000.0)]
+    ("fs", "label"), [(16000, 8000.0), (32000, 16000.0), (48000, 16000.0)]
 )
 def test_verdict_measures_the_resampled_path(fs: int, label: float) -> None:
     """The row nearest Nyquist is judged on what ``filter()`` really does.
@@ -236,7 +236,7 @@ def test_sweep_result_reported_for_compliant_filter() -> None:
         filters.verify_weighting_class(wf, sweep_points=8)
 
 
-@pytest.mark.parametrize("fs,expected", [(32000, 2), (24000, 2)])
+@pytest.mark.parametrize(("fs", "expected"), [(32000, 2), (24000, 2)])
 def test_plain_bilinear_degrades_to_class2(fs: int, expected: int) -> None:
     """Without oversampling the bilinear warping fails class 1 near Nyquist."""
     result = filters.verify_weighting_class(
@@ -247,9 +247,9 @@ def test_plain_bilinear_degrades_to_class2(fs: int, expected: int) -> None:
 
 
 def test_invalid_class_raises() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="weighting_class must be"):
         filters.weighting_class_limits(0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="weighting_class must be"):
         filters.weighting_class_limits(3)
 
 
