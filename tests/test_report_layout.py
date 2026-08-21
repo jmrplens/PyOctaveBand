@@ -145,14 +145,21 @@ def test_a_drawing_is_scaled_by_what_it_covers_not_by_what_it_declares() -> None
     assert drawing.getBounds()[2] <= target + 0.5
 
 
-def test_band_centres_that_are_not_the_rows_are_refused() -> None:
+@pytest.mark.parametrize(
+    "centres",
+    [[100, 125], [100, 125, 160, 200, 250, 315]],
+    ids=["short", "long"],
+)
+def test_band_centres_that_are_not_the_rows_are_refused(centres: list[int]) -> None:
     """The rules are counted off the rows and read off the centres.
 
-    Nothing else relates the two, so a caller handing over a longer axis than
-    it tabulated would rule the rows it printed by the structure of bands it
-    did not.
+    Nothing else relates the two, so a caller handing over an axis that is not
+    what it tabulated would rule the rows it printed by the structure of bands
+    it did not. Either direction does that: a short axis says the rows are
+    bands it never carried, and a long one says the same of the rows it left
+    out.
     """
     rows = [["f", "value"], ["100", "1.0"], ["125", "2.0"], ["160", "3.0"]]
-    centres = [100, 125, 160, 200, 250, 315]
-    with pytest.raises(ValueError, match="carries 6 entries for 3 band rows"):
+    expected = rf"carries {len(centres)} entries for 3 band rows"
+    with pytest.raises(ValueError, match=expected):
         band_table(rows, [28.0, 28.0], 3, band_centres=centres)
