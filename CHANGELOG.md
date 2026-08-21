@@ -125,6 +125,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `TonalCorrectionResult`. The message names the type, the axis and every
   count it was given.
 
+  How many axes there are is pinned as well as how long each one is, because
+  counting alone is not enough: an array of shape ``(paths, bands, 2)`` has
+  the right number of paths on its first axis and the right number of bands
+  on its second, so every count agrees and the extra axis travels on into
+  whatever indexes the field next.
+
 - Four guards that answered the wrong question, or could not answer at all.
 
   `sound_power_reverberation` named `background_levels` in its message but

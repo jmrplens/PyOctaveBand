@@ -56,6 +56,7 @@ import numpy as np
 from .._internal.validation import (
     require_axis_count,
     require_equal_counts,
+    require_ranks,
     require_same_length,
 )
 from ._criterion import (
@@ -185,6 +186,13 @@ class DuctPathResult:
 
         :raises ValueError: if any spectrum disagrees with ``frequencies``.
         """
+        require_ranks(
+            self,
+            frequencies=1,
+            source_level=1,
+            room_effect=1,
+            received_level=1,
+        )
         require_same_length(
             self, "frequencies", "source_level", "room_effect", "received_level"
         )

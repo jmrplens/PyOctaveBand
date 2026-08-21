@@ -40,7 +40,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from scipy import signal
 
-from .._internal.validation import require_same_length
+from .._internal.validation import require_ranks, require_same_length
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -421,6 +421,7 @@ class FilterComplianceResult:
 
         :raises ValueError: if the per-band entries disagree.
         """
+        require_ranks(self, band_frequencies=1)
         require_same_length(self, "bands", "sos", "band_frequencies", "factors")
 
     def available_classes(self) -> list[int]:

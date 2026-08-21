@@ -958,3 +958,19 @@ def test_a_path_row_off_the_band_axis_is_refused(airborne) -> None:
     short = dataclasses.replace(first, values=first.values[:-1])
     with pytest.raises(ValueError, match=r"'paths\[0\]"):
         dataclasses.replace(airborne, paths=(short, *airborne.paths[1:]))
+
+
+def test_a_share_column_with_an_extra_axis_is_refused(airborne) -> None:
+    """Counting the axes is not enough on its own: their number is pinned too.
+
+    A ``fractions`` of shape ``(paths, bands, 2)`` has the right number of
+    paths on its first axis and the right number of bands on its second, so
+    every count agrees. The extra axis then reaches ``dominant``, which feeds
+    array indices to a tuple.
+    """
+    import dataclasses
+
+    values = np.asarray(airborne.fractions)
+    three_dimensional = np.stack([values, values], axis=-1)
+    with pytest.raises(ValueError, match="'fractions' must have 2 axes"):
+        dataclasses.replace(airborne, fractions=three_dimensional)

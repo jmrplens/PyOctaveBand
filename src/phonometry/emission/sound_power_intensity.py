@@ -99,7 +99,7 @@ if TYPE_CHECKING:
     from .._report.metadata import ReportMetadata
 
 from .._internal.levels_math import energy_mean, weighted_energy_mean
-from .._internal.validation import require_same_length
+from .._internal.validation import require_ranks, require_same_length
 from ._shared import SoundPowerWarning, _a_weighting_corrections, _check_grade
 from .intensity import dynamic_capability_index
 
@@ -237,6 +237,21 @@ class SoundPowerIntensityResult:
 
         :raises ValueError: if any per-band quantity disagrees with the rest.
         """
+        require_ranks(
+            self,
+            frequencies=1,
+            partial_power=2,
+            partial_power_level=2,
+            sound_power=1,
+            sound_power_level=1,
+            negative_band=1,
+            surface_pressure_intensity_index=1,
+            negative_partial_power_index=1,
+            repeatability=2,
+            dynamic_capability_index=1,
+            achieved_grade=1,
+            a_weighting_omitted_bands=1,
+        )
         require_same_length(
             self,
             "frequencies",

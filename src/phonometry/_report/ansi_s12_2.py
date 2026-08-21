@@ -257,18 +257,9 @@ def _rc_left_cell(
 
     levels = np.asarray(result.levels, dtype=np.float64)
     reference = np.asarray(result.reference_curve, dtype=np.float64)
-    # RCResult now refuses a reference curve of another *length* when it is
-    # built, so what is left here is the disagreement that survives that check:
-    # an extra axis. A curve of shape (n, 1) has n entries along axis 0 and
-    # passes construction, but the verbose column pairs the two band by band
-    # and would format a one-element array into every cell.
-    if verbose and levels.shape != reference.shape:
-        msg = (
-            "render_rc_report(verbose=True) needs 'levels' and "
-            "'reference_curve' of the same shape; a curve with an extra axis "
-            "has the right number of entries but not the right shape."
-        )
-        raise ValueError(msg)
+    # No guard on the two agreeing: RCResult requires both to be
+    # one-dimensional and of one length when it is built, which leaves no
+    # shape for them to disagree in by the time they arrive here.
     columns = _base_columns(levels, language)
     if verbose:
         columns.append(

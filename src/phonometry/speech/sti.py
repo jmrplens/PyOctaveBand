@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 from scipy import signal
 
 from .._internal.utils import _typesignal
-from .._internal.validation import require_same_length
+from .._internal.validation import require_ranks, require_same_length
 from .._internal.warnings import PhonometryWarning
 from ..filters.core import OctaveFilterBank
 from ..filters.frequencies import nominal_frequencies
@@ -138,6 +138,7 @@ class STIResult:
 
         :raises ValueError: if the band axes disagree.
         """
+        require_ranks(self, mti=1, mtf=2, band_levels=1)
         require_same_length(self, "mti", ("mtf", 0), "band_levels")
 
     def plot(

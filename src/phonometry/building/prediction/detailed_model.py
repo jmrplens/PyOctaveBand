@@ -101,10 +101,12 @@ import numpy as np
 
 from ..._internal.validation import (
     require_axis_count,
+    require_axis_rank,
     require_choice,
     require_equal_counts,
     require_positive,
     require_positive_array,
+    require_ranks,
     require_same_length,
 )
 
@@ -1485,10 +1487,12 @@ def _require_paths_and_bands(result: Any, total: str) -> None:
     :raises ValueError: if the band or path axes disagree.
     """
     owner = type(result).__name__
+    require_ranks(result, frequencies=1, fractions=2, **{total: 1})
     require_same_length(result, "frequencies", total, ("fractions", 1))
     bands = require_axis_count(result.frequencies, owner, "frequencies")
     for i, path in enumerate(result.paths):
         label = f"paths[{i}] ({path.label})"
+        require_axis_rank(path.values, owner, label, 1)
         require_equal_counts(
             owner,
             {

@@ -67,7 +67,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_same_length
+from .._internal.validation import require_ranks, require_same_length
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -435,6 +435,13 @@ class IntensityInstrumentComplianceResult:
 
         :raises ValueError: if the per-band entries disagree.
         """
+        require_ranks(
+            self,
+            frequency=1,
+            residual_index=1,
+            limit_class1=1,
+            limit_class2=1,
+        )
         require_same_length(
             self,
             "bands",

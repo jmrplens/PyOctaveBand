@@ -142,6 +142,51 @@ def require_axis_count(value: object, owner: str, name: str, axis: str = "band")
         raise ValueError(msg) from None
 
 
+def require_axis_rank(value: object, owner: str, name: str, rank: int) -> None:
+    """Require *value* to have exactly *rank* axes.
+
+    Counting an axis is not enough on its own: an array of shape
+    ``(paths, bands, 2)`` has the right number of paths on its first axis and
+    the right number of bands on its second, so every count agrees and the
+    extra axis travels on into whatever indexes the field next.
+
+    Only arrays are measured. A tuple of per-band entries is one axis of
+    entries whatever each entry holds, and asking numpy for its rank would
+    stack them and raise about an inhomogeneous shape.
+
+    :param value: The field whose axes are counted.
+    :param owner: Name of the type being checked, used in the error message.
+    :param name: Field name used in the error message.
+    :param rank: The number of axes the field must have.
+    :raises ValueError: if *value* has a different number of axes.
+    """
+    actual = value.ndim if isinstance(value, np.ndarray) else 1
+    if actual != rank:
+        axes = "one axis" if rank == 1 else f"{rank} axes"
+        msg = (
+            f"{owner}: '{name}' must have {axes}; got {actual}. "
+            "An extra axis passes every count and reaches the reader intact."
+        )
+        raise ValueError(msg)
+
+
+def require_ranks(owner: object, **ranks: int) -> None:
+    """Require each named field of *owner* to have the given number of axes.
+
+    The companion of :func:`require_same_length`, which pins how long an axis
+    is but not how many there are. ``None`` fields are skipped.
+
+    :param owner: The instance whose fields are measured.
+    :param ranks: Field name to the number of axes it must have.
+    :raises ValueError: if a field has a different number of axes.
+    """
+    for name, rank in ranks.items():
+        value = getattr(owner, name)
+        if value is None:
+            continue
+        require_axis_rank(value, type(owner).__name__, name, rank)
+
+
 def require_equal_counts(
     owner: str, counts: Mapping[str, int], axis: str = "band"
 ) -> None:

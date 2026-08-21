@@ -85,7 +85,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_same_length
+from ..._internal.validation import require_ranks, require_same_length
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -388,6 +388,13 @@ class TonalCorrectionResult:
 
         :raises ValueError: if the per-band columns disagree.
         """
+        require_ranks(
+            self,
+            frequencies=1,
+            levels=1,
+            differences=1,
+            band_corrections=1,
+        )
         require_same_length(
             self, "frequencies", "levels", "differences", "band_corrections"
         )

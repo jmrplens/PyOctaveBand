@@ -351,23 +351,17 @@ def test_rc_result_refuses_a_reference_curve_of_another_length() -> None:
         replace(result, reference_curve=result.reference_curve[:-1])
 
 
-def test_verbose_rc_report_rejects_a_reference_curve_with_an_extra_axis(
-    tmp_path,
-) -> None:
-    """A curve of shape ``(n, 1)`` survives construction and is caught here.
+def test_rc_result_refuses_a_reference_curve_with_an_extra_axis() -> None:
+    """A curve of shape ``(n, 1)`` is refused for the axis, not the length.
 
-    It carries n entries along its first axis, so the length check that runs
-    when the result is built has nothing to object to; the verbose column is
-    where the extra axis would reach the page.
+    It carries n entries along its first axis, so every count agrees and only
+    the rank is wrong. Counting alone would let it through to the verbose
+    column, which pairs the two band by band and would format a one-element
+    array into every cell.
     """
     from dataclasses import replace
 
     result = _rc_result()
-    mismatched = replace(
-        result, reference_curve=np.asarray(result.reference_curve).reshape(-1, 1)
-    )
-    out = tmp_path / "rc_two_dimensional_reference.pdf"
-    metadata = _full_metadata()
-    with pytest.raises(ValueError, match="'reference_curve' of the same shape"):
-        mismatched.report(str(out), metadata=metadata, verbose=True)
-    assert not out.exists()  # the guard fires before the fiche is written
+    two_dimensional = np.asarray(result.reference_curve).reshape(-1, 1)
+    with pytest.raises(ValueError, match="'reference_curve' must have one axis"):
+        replace(result, reference_curve=two_dimensional)

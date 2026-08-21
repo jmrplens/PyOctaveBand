@@ -55,7 +55,7 @@ import numpy as np
 
 from .._internal.levels_math import energy_mean, energy_sum
 from .._internal.types import as_float_or_array
-from .._internal.validation import require_same_length
+from .._internal.validation import require_ranks, require_same_length
 from ._shared import (
     _S0,
     Grade,
@@ -251,6 +251,16 @@ class SoundPowerResult:
 
         :raises ValueError: if any per-band quantity disagrees with the rest.
         """
+        require_ranks(
+            self,
+            frequencies=1,
+            sound_power_level=1,
+            surface_pressure_level=1,
+            mean_pressure_level=1,
+            background_correction=1,
+            environmental_correction=1,
+            directivity_index=2,
+        )
         require_same_length(
             self,
             "frequencies",

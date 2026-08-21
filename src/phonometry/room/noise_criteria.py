@@ -38,7 +38,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_same_length
+from .._internal.validation import require_ranks, require_same_length
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -160,6 +160,7 @@ class NCResult:
 
         :raises ValueError: if 'frequencies' and 'levels' differ in length.
         """
+        require_ranks(self, frequencies=1, levels=1)
         require_same_length(self, "frequencies", "levels")
 
     @property
@@ -277,6 +278,7 @@ class RCResult:
 
         :raises ValueError: if the three do not share one length.
         """
+        require_ranks(self, frequencies=1, levels=1, reference_curve=1)
         require_same_length(self, "frequencies", "levels", "reference_curve")
 
     @property

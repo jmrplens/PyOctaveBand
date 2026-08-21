@@ -88,6 +88,7 @@ from ..._internal.validation import (
     require_choice,
     require_non_negative,
     require_positive,
+    require_ranks,
     require_same_length,
 )
 from .resilient_layers import TAPPING_HAMMER_MASS
@@ -1014,6 +1015,13 @@ class InstalledSourceResult:
 
         :raises ValueError: if the band or path axes disagree.
         """
+        require_ranks(
+            self,
+            frequencies=1,
+            total_level=1,
+            installed_power_level=1,
+            path_levels=2,
+        )
         require_same_length(
             self,
             "frequencies",

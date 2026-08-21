@@ -64,7 +64,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
-from ..._internal.validation import require_same_length
+from ..._internal.validation import require_ranks, require_same_length
 from ..._internal.warnings import PhonometryWarning
 from ...io._resolve import SignalInput, resolve_fs, resolve_samples
 
@@ -140,6 +140,13 @@ class ImpulseProminenceResult:
 
         :raises ValueError: if the per-impulse columns disagree.
         """
+        require_ranks(
+            self,
+            onset_rates=1,
+            level_differences=1,
+            per_impulse=1,
+            qualifies=1,
+        )
         require_same_length(
             self,
             "onset_rates",
