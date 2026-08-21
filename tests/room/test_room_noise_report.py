@@ -367,6 +367,7 @@ def test_verbose_rc_report_rejects_a_reference_curve_with_an_extra_axis(
         result, reference_curve=np.asarray(result.reference_curve).reshape(-1, 1)
     )
     out = tmp_path / "rc_two_dimensional_reference.pdf"
+    metadata = _full_metadata()
     with pytest.raises(ValueError, match="'reference_curve' of the same shape"):
-        mismatched.report(str(out), metadata=_full_metadata(), verbose=True)
+        mismatched.report(str(out), metadata=metadata, verbose=True)
     assert not out.exists()  # the guard fires before the fiche is written

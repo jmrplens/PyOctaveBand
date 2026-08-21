@@ -1467,6 +1467,47 @@ def _path_matrix(paths: Sequence[BandPath], n_bands: int) -> np.ndarray:
     )
 
 
+def _require_paths_and_bands(result: Any, total: str) -> None:
+    """Reject a decomposition whose paths and bands do not line up.
+
+    Shared by the airborne and the impact result, which decompose different
+    quantities over the same two axes and print the same sheet: one row per
+    transmission path, a share column beside those rows, and a box holding the
+    single number of the whole.
+
+    ``fractions`` is indexed by path to name the dominant one, so an array
+    short of a path row yields a sheet listing fewer paths than the shares it
+    prints sum over, and the column stops reaching 100 % under a box that
+    still rates the whole.
+
+    :param result: The result being built.
+    :param total: Name of its per-band total, ``r_prime`` or ``l_prime_n``.
+    :raises ValueError: if the band or path axes disagree.
+    """
+    owner = type(result).__name__
+    require_same_length(result, "frequencies", total, ("fractions", 1))
+    bands = require_axis_count(result.frequencies, owner, "frequencies")
+    for i, path in enumerate(result.paths):
+        label = f"paths[{i}] ({path.label})"
+        require_equal_counts(
+            owner,
+            {
+                "frequencies": bands,
+                label: require_axis_count(path.values, owner, label),
+            },
+        )
+    require_equal_counts(
+        owner,
+        {
+            "paths": len(result.paths),
+            "fractions": require_axis_count(
+                result.fractions, owner, "fractions", "transmission path"
+            ),
+        },
+        "transmission path",
+    )
+
+
 def airborne_flanking_path(
     *,
     label: str,
@@ -1583,30 +1624,9 @@ class DetailedAirborneResult:
     def __post_init__(self) -> None:
         """Reject a decomposition whose paths and bands do not line up.
 
-        ``fractions`` is indexed by path to name the dominant one and printed
-        as a share column beside the path rows, so a fractions array short of
-        a path row yields a sheet listing fewer paths than the shares it
-        prints sum over: the column no longer reaches 100 %, under a box
-        holding the single-number rating of the whole transmission.
-
         :raises ValueError: if the band or path axes disagree.
         """
-        require_same_length(self, "frequencies", "r_prime", ("fractions", 1))
-        for i, path in enumerate(self.paths):
-            require_equal_counts(
-                type(self).__name__,
-                {
-                    "frequencies": len(self.frequencies),
-                    f"paths[{i}] ({path.label})": require_axis_count(
-                        path.values, type(self).__name__, f"paths[{i}]"
-                    ),
-                },
-            )
-        require_equal_counts(
-            type(self).__name__,
-            {"paths": len(self.paths), "fractions": len(self.fractions)},
-            "transmission path",
-        )
+        _require_paths_and_bands(self, "r_prime")
 
     @property
     def dominant(self) -> tuple[str, ...]:
@@ -1689,30 +1709,9 @@ class DetailedImpactResult:
     def __post_init__(self) -> None:
         """Reject a decomposition whose paths and bands do not line up.
 
-        ``fractions`` is indexed by path to name the dominant one and printed
-        as a share column beside the path rows, so a fractions array short of
-        a path row yields a sheet listing fewer paths than the shares it
-        prints sum over: the column no longer reaches 100 %, under a box
-        holding the single-number rating of the whole radiation.
-
         :raises ValueError: if the band or path axes disagree.
         """
-        require_same_length(self, "frequencies", "l_prime_n", ("fractions", 1))
-        for i, path in enumerate(self.paths):
-            require_equal_counts(
-                type(self).__name__,
-                {
-                    "frequencies": len(self.frequencies),
-                    f"paths[{i}] ({path.label})": require_axis_count(
-                        path.values, type(self).__name__, f"paths[{i}]"
-                    ),
-                },
-            )
-        require_equal_counts(
-            type(self).__name__,
-            {"paths": len(self.paths), "fractions": len(self.fractions)},
-            "transmission path",
-        )
+        _require_paths_and_bands(self, "l_prime_n")
 
     @property
     def dominant(self) -> tuple[str, ...]:

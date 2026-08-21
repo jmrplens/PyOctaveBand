@@ -423,21 +423,19 @@ def test_a_stage_row_off_the_band_axis_is_refused(field_name: str, trim: bool) -
     stage = result.stages[0]
     row = np.asarray(getattr(stage, field_name))
     wrong = row[:-1] if trim else np.append(row, row[-1])
+    # The stage itself carries no guard, so it is built outside the block:
+    # what is under test is the sheet refusing to hold it.
+    stages = (dataclasses.replace(stage, **{field_name: wrong}), *result.stages[1:])
     with pytest.raises(ValueError, match=f"'stages\\[0\\]\\.{field_name}'"):
-        dataclasses.replace(
-            result,
-            stages=(
-                dataclasses.replace(stage, **{field_name: wrong}),
-                *result.stages[1:],
-            ),
-        )
+        dataclasses.replace(result, stages=stages)
 
 
 def test_a_room_effect_off_the_band_axis_is_refused() -> None:
     """The room effect is applied band by band, so it must have the bands."""
     result = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")
+    one_band_short = np.zeros(len(OCTAVE_BANDS) - 1)
     with pytest.raises(ValueError, match="'room_effect'"):
-        dataclasses.replace(result, room_effect=np.zeros(len(OCTAVE_BANDS) - 1))
+        dataclasses.replace(result, room_effect=one_band_short)
 
 
 def test_no_room_effect_at_all_is_still_allowed() -> None:
@@ -466,5 +464,6 @@ def test_a_single_number_where_a_spectrum_belongs_says_so(what, build) -> None:
     field nor the type the guard promises to name.
     """
     result = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")
+    scalar_field = build(result)
     with pytest.raises(ValueError, match=f"'{re.escape(what)}'"):
-        dataclasses.replace(result, **build(result))
+        dataclasses.replace(result, **scalar_field)
