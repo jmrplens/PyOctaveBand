@@ -178,19 +178,42 @@ def attenuation_from_alpha(alpha: ArrayLike) -> NDArray[np.float64]:
 
 
 def _validate_area_inputs(
-    t: NDArray[np.float64], volume: float, m: NDArray[np.float64]
+    t: NDArray[np.float64],
+    volume: float,
+    m: NDArray[np.float64],
+    *,
+    t_name: str,
+    m_name: str,
 ) -> None:
+    """Reject the inputs of one area evaluation, naming the caller's arguments.
+
+    The names travel in because this helper is shared. Reached through
+    :func:`absorption_coefficient` the arguments are ``t1``/``m1`` and
+    ``t2``/``m2``, and a fixed message about ``t60`` and ``m`` would name two
+    parameters that function does not have.
+
+    :param t: Reverberation times, already coerced.
+    :param volume: Room volume, in cubic metres.
+    :param m: Air attenuation coefficient, already coerced.
+    :param t_name: What the caller calls *t*.
+    :param m_name: What the caller calls *m*.
+    :raises ValueError: for a non-positive volume or time, a negative
+        attenuation coefficient, or an *m* that is neither scalar nor of
+        *t*'s shape.
+    """
     if volume <= 0.0:
         msg = "'volume' must be positive."
         raise ValueError(msg)
     if np.any(t <= 0.0):
-        msg = "Reverberation times must be positive."
+        msg = f"'{t_name}' must be positive."
         raise ValueError(msg)
     if np.any(m < 0.0):
-        msg = "Air attenuation coefficient 'm' must be non-negative."
+        msg = f"'{m_name}' must be non-negative."
         raise ValueError(msg)
     if m.ndim != 0 and m.shape != t.shape:
-        msg = "'m' must be a scalar or an array matching the shape of 't60'."
+        msg = (
+            f"'{m_name}' must be a scalar or an array matching the shape of '{t_name}'."
+        )
         raise ValueError(msg)
 
 
@@ -201,16 +224,20 @@ def _absorption_area(
     temperature: float,
     speed_of_sound: float | None,
     m: ArrayLike,
+    t_name: str = "t60",
+    m_name: str = "m",
 ) -> NDArray[np.float64]:
     """Core Eq. (5)/(7) evaluation without the advisory volume warning.
 
     Shared by :func:`absorption_area` (which adds the ISO 354 clause 6.1.1
     volume advisory) and :func:`absorption_coefficient` (which advises the
-    volume once for the pair of measurements).
+    volume once for the pair of measurements). ``t_name`` and ``m_name`` are
+    what the public caller calls these two arguments, so a rejection names the
+    parameter that was actually passed.
     """
     t = np.asarray(t60, dtype=np.float64)
     m_arr = np.asarray(m, dtype=np.float64)
-    _validate_area_inputs(t, volume, m_arr)
+    _validate_area_inputs(t, volume, m_arr, t_name=t_name, m_name=m_name)
     c = _resolve_speed(temperature, speed_of_sound)
     return _SABINE * volume / (c * t) - 4.0 * volume * m_arr
 
@@ -333,6 +360,8 @@ def absorption_coefficient(
         temperature=temperature1,
         speed_of_sound=speed_of_sound1,
         m=m1,
+        t_name="t1",
+        m_name="m1",
     )
     a2 = _absorption_area(
         t2,
@@ -340,6 +369,8 @@ def absorption_coefficient(
         temperature=temperature2,
         speed_of_sound=speed_of_sound2,
         m=m2,
+        t_name="t2",
+        m_name="m2",
     )
     area_specimen = a2 - a1
     alpha_s = area_specimen / sample_area
@@ -567,10 +598,10 @@ def measure_sound_absorption(
     c = _resolve_speed(temperature, speed_of_sound)
     # A1/A2 reuse the Eq. (5)/(7) evaluation.
     a1 = _absorption_area(
-        t1, volume, temperature=temperature, speed_of_sound=c, m=m_arr
+        t1, volume, temperature=temperature, speed_of_sound=c, m=m_arr, t_name="t1"
     )
     a2 = _absorption_area(
-        t2, volume, temperature=temperature, speed_of_sound=c, m=m_arr
+        t2, volume, temperature=temperature, speed_of_sound=c, m=m_arr, t_name="t2"
     )
     # alpha_s reuses the validated Eq. (8)/(9) path (it also emits the volume,
     # sample-area and non-physical advisories exactly once).

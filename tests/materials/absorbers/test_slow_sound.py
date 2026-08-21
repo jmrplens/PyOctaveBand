@@ -388,3 +388,24 @@ def test_invalid_inputs() -> None:
         slit_helmholtz_absorber(
             f, res, slit_height=1e-3, lattice_step=3e-2, period=5e-2, angle=np.pi / 2.0
         )
+
+
+def test_bad_geometry_names_the_argument_the_caller_passed() -> None:
+    """The message names `resonator_geometry`, which is what the signature has.
+
+    The value travels two private frames down to
+    `helmholtz_resonator_impedance`, which calls it `geometry`, so before this
+    guard a mistyped keyword was answered with the name of an argument this
+    function does not take.
+    """
+    res = _base_resonator()
+    f = np.array([300.0])
+    with pytest.raises(ValueError, match="'resonator_geometry' must be one of"):
+        slit_helmholtz_absorber(
+            f,
+            res,
+            slit_height=1e-3,
+            lattice_step=3e-2,
+            period=5e-2,
+            resonator_geometry="squre",
+        )

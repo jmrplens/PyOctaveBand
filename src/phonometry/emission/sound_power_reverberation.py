@@ -302,14 +302,19 @@ def _background_corrected_mean(
     raw_mean = _mean_level(levels)
     if arr.ndim == 2:  # noqa: PLR2004
         bg = np.asarray(background_levels, dtype=np.float64)
-        if bg.ndim == 1:
-            bg = np.broadcast_to(bg, arr.shape)
-        if bg.shape != arr.shape:
+        # Checked before the broadcast, not after it. A 1-D spectrum of the
+        # wrong length used to die inside `np.broadcast_to`, whose message
+        # reports two shapes from inside numpy and names neither the argument
+        # nor the function, so the caller never saw the sentence below.
+        expected = arr.shape[1:] if bg.ndim == 1 else arr.shape
+        if bg.shape != expected:
             msg = (
                 "'background_levels' must match the per-position 'levels' "
                 "shape or be a single (bands,) spectrum."
             )
             raise ValueError(msg)
+        if bg.ndim == 1:
+            bg = np.broadcast_to(bg, arr.shape)
         k1i, clamped = _k1_eq14(arr - bg, frequencies)
         corrected = energy_mean(arr - k1i, axis=0)
     else:

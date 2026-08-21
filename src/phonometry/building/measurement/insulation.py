@@ -751,7 +751,11 @@ def airborne_insulation(
     l2_bands = _as_band_levels(l2, "l2")
     t = np.asarray(t2, dtype=np.float64)
 
-    if not (l1_bands.shape == l2_bands.shape == t.shape):
+    # Compared by count, not by shape, so a `t2` that carries an extra axis
+    # falls through to `_validate_reverberation`, which says that is what is
+    # wrong. Comparing shapes answered a (1, n) array against n bands with
+    # "must share the same band count", which was false: the counts matched.
+    if not (l1_bands.shape == l2_bands.shape and l1_bands.size == t.size):
         msg = "'l1', 'l2' and 't2' must share the same band count."
         raise ValueError(msg)
     _validate_reverberation(t, t0)
@@ -822,7 +826,11 @@ def impact_insulation(
     li_bands = _as_band_levels(li, "li")
     t = np.asarray(t2, dtype=np.float64)
 
-    if li_bands.shape != t.shape:
+    # Compared by count, not by shape, so a `t2` that carries an extra axis
+    # falls through to `_validate_reverberation`, which says that is what is
+    # wrong. Comparing shapes answered a (1, n) array against n bands with
+    # "must share the same band count", which was false: the counts matched.
+    if li_bands.size != t.size:
         msg = "'li' and 't2' must share the same band count."
         raise ValueError(msg)
     _validate_reverberation(t, t0)
@@ -956,7 +964,11 @@ def facade_insulation(
     l2_bands = _as_band_levels(l2, "l2")
     t = np.asarray(t2, dtype=np.float64)
 
-    if not (l1_bands.shape == l2_bands.shape == t.shape):
+    # Compared by count, not by shape, so a `t2` that carries an extra axis
+    # falls through to `_validate_reverberation`, which says that is what is
+    # wrong. Comparing shapes answered a (1, n) array against n bands with
+    # "must share the same band count", which was false: the counts matched.
+    if not (l1_bands.shape == l2_bands.shape and l1_bands.size == t.size):
         msg = "'l1_2m', 'l2' and 't2' must share the same band count."
         raise ValueError(msg)
     _validate_reverberation(t, t0)
