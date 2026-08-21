@@ -12,12 +12,14 @@
 # in any of these moves the rendered pixels well past that tolerance.
 #
 # Bump these together with a fresh `make reports` regeneration (generate the
-# fiches with exactly this stack, then commit both). Generated from the
-# maintainer's venv that produced the committed fiches.
-reportlab==5.0.0
-svglib==2.1.0
+# fiches with exactly this stack, then commit both), and with the matching
+# pins in requirements-dev.txt, which installs the same chain for the
+# `.report()` tests. Generated from the maintainer's venv that produced the
+# committed fiches.
+reportlab==5.0.1
+svglib==2.2.0
 pypdfium2==5.13.0
-lxml==6.1.1
+lxml==6.1.2
 cssselect2==0.9.0
 tinycss2==1.5.1
-webencodings==0.5.1
+webencodings==0.6.1

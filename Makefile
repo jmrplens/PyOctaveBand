@@ -34,11 +34,18 @@ FIGURE_ENV = OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
 FIGURE_LANGUAGE_DIR = build/figure-language
 FIGURE_LANGUAGE_ENV = PHONOMETRY_FIGURE_LANGUAGE_AUDIT=$(FIGURE_LANGUAGE_DIR)
 
+# `[full]` rather than a bare `-e .`: a development environment wants every
+# optional path importable, numba included, so `make test-perf` can exercise
+# the jitted kernel here the way the tests-perf job does in CI. numba stays out
+# of requirements-dev.txt on purpose: the main test matrix installs that file,
+# and numba caps numpy (`<2.6` today), so declaring it there would hold the
+# matrix back from the next numpy the day it ships, which is the one thing the
+# perf job's separate environment exists to prevent.
 install:
 	$(PYTHON) -m pip install --upgrade pip
 	$(PYTHON) -m pip install -r requirements.txt
 	$(PYTHON) -m pip install -r requirements-dev.txt
-	$(PYTHON) -m pip install -e .
+	$(PYTHON) -m pip install -e ".[full]"
 
 lint:
 	$(RUFF) check .
@@ -295,9 +302,25 @@ test:
 coverage:
 	$(TEST_ENV) $(PYTHON) -m pytest -n auto --cov=src/phonometry --cov-report=term-missing tests/
 
+# The jitted kernel, which the plain `test` target never reaches: conftest.py
+# disables the JIT by default so coverage can trace inside the kernels, and
+# `NUMBA_DISABLE_JIT=0` is what the tests-perf job in CI sets to exercise the
+# compiled path. This target is that job, run here. It needs the optional
+# extra: `pip install numba` (deliberately outside requirements-dev, since
+# numba caps numpy and the main matrix must stay free to move ahead of it).
+test-perf:
+	$(TEST_ENV) NUMBA_DISABLE_JIT=0 $(PYTHON) -m pytest -n auto tests/
+
+# The FDTD GPU parity, which needs a CUDA device. There is one either way: a
+# local CuPy install, or the machine named by PHONO_GPU_HOST in .env, which is
+# where the animation renders already run. With neither, every GPU case skips
+# and says which of the two is missing.
+test-gpu:
+	$(TEST_ENV) $(PYTHON) -m pytest -rs tests/test_fdtd_gpu_parity.py
+
 check: lint security test
 
 .PHONY: install lint format security snyk sonar graphs figure-contrast figure-language figures reports \
 	animations animation-freshness posters brand lighthouse \
-	llms pypi-readme api-docs site-reports conformance install-hooks test coverage check \
+	llms pypi-readme api-docs site-reports conformance install-hooks test test-perf test-gpu coverage check \
 	snippets snippets-static claims subscripts
