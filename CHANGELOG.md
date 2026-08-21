@@ -99,6 +99,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The FDTD GPU parity is proved where the GPU is, not only where the process
+  is. Those cases needed CuPy in this interpreter, so on a machine without a
+  CUDA card the whole GPU half of the file skipped and the engine went
+  unchecked. A card in this process is not the only way to reach one:
+  `fdtd_gpu_remote` already ships a packed job to a machine that has one,
+  which is the path the animation renders take. The same fifteen scenarios now
+  go that way and are compared against the library engine.
+
+  Two details decide whether such a test proves anything. It calls
+  `run_remote` rather than `submit`, because submitting falls back to a local
+  NumPy run when anything goes wrong, which is right for a render and wrong
+  for a test: the comparison would be NumPy against NumPy and would pass
+  without touching a GPU. And it asserts the backend that ran was `cupy`, for
+  the same reason. With no `PHONO_GPU_HOST` configured the cases skip in under
+  a second and say what to set, without opening a connection.
+
+- Every requirement is pinned. `requirements.txt` and `requirements-dev.txt`
+  used floors, and the two rendering stacks beside them used exact versions,
+  so a fresh `make install` landed on a newer reportlab and svglib than the
+  committed fiches were rendered with. Nothing was wrong with either version;
+  what was wrong is that `make reports` then showed drift in fiches nobody had
+  touched. Dependabot already watches these files weekly, so pinning turns an
+  upgrade into a pull request the suite votes on rather than a difference
+  between two machines.
+
+  The four packages that were behind (reportlab, svglib, lxml, webencodings,
+  all in the fiche chain) are now at the current release, and the 71 committed
+  fiches come out byte for byte identical under it. The figure stack was
+  already current, so no figure, plate or clip needed regenerating.
+
+  This pins the environment this repository is developed in. What the
+  published package asks of its users stays an open range in `pyproject.toml`,
+  because a library that pins its dependencies cannot be installed beside
+  anything else.
+
 - A path is a `Path`, and a loop that only appends is a comprehension. `PTH`
   and `PERF` are selected, and the 193 sites they found were read one at a
   time, because the two spellings of a path are not the same type: a `Path`

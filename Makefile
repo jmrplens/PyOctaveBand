@@ -37,7 +37,7 @@ FIGURE_LANGUAGE_ENV = PHONOMETRY_FIGURE_LANGUAGE_AUDIT=$(FIGURE_LANGUAGE_DIR)
 # `[full]` rather than a bare `-e .`: a development environment wants every
 # optional path importable, numba included, so `make test-perf` can exercise
 # the jitted kernel here the way the tests-perf job does in CI. numba stays out
-# of requirements-dev.txt on purpose. The main test matrix installs that file,
+# of requirements-dev.txt on purpose: the main test matrix installs that file,
 # and numba caps numpy (`<2.6` today), so declaring it there would hold the
 # matrix back from the next numpy the day it ships, which is the one thing the
 # perf job's separate environment exists to prevent.

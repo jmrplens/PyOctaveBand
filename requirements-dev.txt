@@ -1,15 +1,35 @@
-ruff>=0.16.3
-mypy>=2.3.0
-bandit>=1.9.4
-types-setuptools>=84.0.0.20260812
-pytest>=9.1.1
-pytest-cov>=7.1.0
-pytest-xdist>=3.8.0  # parallel test execution (`pytest -n auto`); coverage is combined across workers by pytest-cov
-matplotlib>=3.11.1  # required by the result-object .plot() tests
-reportlab>=5.0.0  # required by the result-object .report() tests (ISO 717 PDF fiche)
-pystoi>=0.4.1  # test-only external cross-check for STOI/ESTOI (reproduces the authors' MATLAB); the library reimplements from the papers and never imports it at runtime
-svglib>=2.1.0
-pypdf>=6.16.0  # one-page assertion in the ISO 717 report tests
-pypdfium2>=5.13.0  # rasterizes the .report() PDFs to committed WebP previews (scripts/generate_reports.py); no system Poppler needed
-pyyaml>=6.0.2  # the repository-config tests parse .coderabbit.yaml and the workflow triggers; bandit already pulls it in, this makes the direct import declared
-soundfile>=0.14.0  # the [audio] extra: exercises the io backend dispatch and lossy-warning lane of the tests
+# The development and test environment, pinned exactly, on top of
+# requirements.txt. Same reasoning as that file: Dependabot proposes the
+# upgrades weekly and the suite decides.
+#
+# The rendering half is the part that had to be pinned rather than floored.
+# reportlab, svglib and pypdfium2 are the chain a fiche goes through on its way
+# to a page, and requirements-reports.txt fixes that chain for the staleness
+# check. While these two files disagreed, `make install` landed on a newer
+# reportlab and svglib than the committed fiches were rendered with, so a
+# developer running `make reports` saw drift in fiches nobody had touched.
+# The versions here are the versions there; bump them together.
+ruff==0.16.4
+mypy==2.3.1
+bandit==1.9.4
+types-setuptools==84.0.0.20260812
+
+pytest==9.1.1
+pytest-cov==7.1.0
+pytest-xdist==3.8.0  # parallel test execution (`pytest -n auto`); coverage is combined across workers by pytest-cov
+
+matplotlib==3.11.1  # required by the result-object .plot() tests
+reportlab==5.0.1  # required by the result-object .report() tests (ISO 717 PDF fiche)
+svglib==2.2.0
+pypdf==6.16.1  # one-page assertion in the ISO 717 report tests
+pypdfium2==5.13.0  # rasterizes the .report() PDFs to committed WebP previews (scripts/generate_reports.py); no system Poppler needed
+
+pystoi==0.4.1  # test-only external cross-check for STOI/ESTOI (reproduces the authors' MATLAB); the library reimplements from the papers and never imports it at runtime
+pyyaml==6.0.3  # the repository-config tests parse .coderabbit.yaml and the workflow triggers; bandit already pulls it in, this makes the direct import declared
+soundfile==0.14.0  # the [audio] extra: exercises the io backend dispatch and lossy-warning lane of the tests
+
+# numba is deliberately absent. The main test matrix installs this file, and
+# numba caps numpy (`<2.6` today), so declaring it here would hold the matrix
+# back from the next numpy the day it ships. It arrives through the `perf`
+# extra instead, which is what the tests-perf job installs and what
+# `make install` pulls in via `[full]`.
