@@ -467,3 +467,34 @@ def test_a_single_number_where_a_spectrum_belongs_says_so(what, build) -> None:
     scalar_field = build(result)
     with pytest.raises(ValueError, match=f"'{re.escape(what)}'"):
         dataclasses.replace(result, **scalar_field)
+
+
+@pytest.mark.parametrize(
+    ("what", "build"),
+    [
+        (
+            "stages[0].attenuation",
+            lambda r, wrong: {
+                "stages": (dataclasses.replace(r.stages[0], attenuation=wrong),)
+            },
+        ),
+        (
+            "contributions[0] (Supply)",
+            lambda r, wrong: {"contributions": (("Supply", wrong),)},
+        ),
+    ],
+    ids=["stage-row", "contribution"],
+)
+def test_a_nested_row_with_an_extra_axis_is_refused(what, build) -> None:
+    """The nested rows are pinned by their axes, not only by their length.
+
+    A row of shape ``(bands, 2)`` counts the right number of bands on its
+    first axis, so counting alone lets it into the sheet with a second axis
+    nobody asked for.
+    """
+    result = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")
+    row = np.asarray(result.stages[0].attenuation)
+    two_dimensional = np.column_stack([row, row])
+    replacement = build(result, two_dimensional)
+    with pytest.raises(ValueError, match=f"'{re.escape(what)}' must have one axis"):
+        dataclasses.replace(result, **replacement)

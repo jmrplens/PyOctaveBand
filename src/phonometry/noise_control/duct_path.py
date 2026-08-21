@@ -197,7 +197,7 @@ class DuctPathResult:
             self, "frequencies", "source_level", "room_effect", "received_level"
         )
         owner = type(self).__name__
-        bands = require_axis_count(self.frequencies, owner, "frequencies")
+        bands = require_axis_count(self.frequencies, owner, "frequencies", rank=None)
         for i, stage in enumerate(self.stages):
             for name in ("attenuation", "attenuated", "self_noise", "level"):
                 label = f"stages[{i}].{name}"
@@ -205,7 +205,9 @@ class DuctPathResult:
                     owner,
                     {
                         "frequencies": bands,
-                        label: require_axis_count(getattr(stage, name), owner, label),
+                        label: require_axis_count(
+                            getattr(stage, name), owner, label, rank=1
+                        ),
                     },
                 )
         for i, (name, level) in enumerate(self.contributions):
@@ -214,7 +216,7 @@ class DuctPathResult:
                 owner,
                 {
                     "frequencies": bands,
-                    label: require_axis_count(level, owner, label),
+                    label: require_axis_count(level, owner, label, rank=1),
                 },
             )
 

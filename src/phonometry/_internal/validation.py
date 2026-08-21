@@ -120,7 +120,9 @@ def require_finite_array(x: ArrayLike, name: str) -> np.ndarray:
     return arr
 
 
-def require_axis_count(value: object, owner: str, name: str, axis: str = "band") -> int:
+def require_axis_count(
+    value: object, owner: str, name: str, axis: str = "band", *, rank: int | None
+) -> int:
     """The number of entries along the first axis of *value*.
 
     ``len()``, not ``np.shape()``: the first axis of a tuple of per-band
@@ -128,13 +130,23 @@ def require_axis_count(value: object, owner: str, name: str, axis: str = "band")
     try to stack them and raise about an inhomogeneous shape for a bank whose
     bands carry filters of different orders.
 
+    *rank* has no default and must be stated, because a count on its own says
+    nothing about how many axes there are: an array of shape ``(bands, 2)``
+    counts the right number of bands on its first axis and carries the second
+    one onward untouched. Pass ``None`` only where the rank is pinned
+    elsewhere, as :func:`require_ranks` does for a whole result at once.
+
     :param value: The field whose entries are counted.
     :param owner: Name of the type being checked, used in the error message.
     :param name: Field name used in the error message.
     :param axis: What the entries measure, singular, for the error message.
+    :param rank: The number of axes the field must have, or ``None`` when that
+        is checked elsewhere.
     :return: The number of entries.
-    :raises ValueError: if *value* is a single number rather than a sequence.
+    :raises ValueError: if *value* is a single number, or has another rank.
     """
+    if rank is not None:
+        require_axis_rank(value, owner, name, rank)
     try:
         return len(value)  # type: ignore[arg-type]
     except TypeError:
@@ -244,7 +256,9 @@ def require_same_length(
         if value is None:
             continue
         if index == 0:
-            counts[name] = require_axis_count(value, type(owner).__name__, name, axis)
+            counts[name] = require_axis_count(
+                value, type(owner).__name__, name, axis, rank=None
+            )
             continue
         shape = np.shape(value)
         if len(shape) <= index:

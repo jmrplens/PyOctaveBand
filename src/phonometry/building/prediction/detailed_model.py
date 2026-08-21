@@ -101,7 +101,6 @@ import numpy as np
 
 from ..._internal.validation import (
     require_axis_count,
-    require_axis_rank,
     require_choice,
     require_equal_counts,
     require_positive,
@@ -1489,15 +1488,14 @@ def _require_paths_and_bands(result: Any, total: str) -> None:
     owner = type(result).__name__
     require_ranks(result, frequencies=1, fractions=2, **{total: 1})
     require_same_length(result, "frequencies", total, ("fractions", 1))
-    bands = require_axis_count(result.frequencies, owner, "frequencies")
+    bands = require_axis_count(result.frequencies, owner, "frequencies", rank=None)
     for i, path in enumerate(result.paths):
         label = f"paths[{i}] ({path.label})"
-        require_axis_rank(path.values, owner, label, 1)
         require_equal_counts(
             owner,
             {
                 "frequencies": bands,
-                label: require_axis_count(path.values, owner, label),
+                label: require_axis_count(path.values, owner, label, rank=1),
             },
         )
     require_equal_counts(
@@ -1505,7 +1503,7 @@ def _require_paths_and_bands(result: Any, total: str) -> None:
         {
             "paths": len(result.paths),
             "fractions": require_axis_count(
-                result.fractions, owner, "fractions", "transmission path"
+                result.fractions, owner, "fractions", "transmission path", rank=None
             ),
         },
         "transmission path",
