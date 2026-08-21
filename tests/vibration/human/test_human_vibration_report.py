@@ -314,12 +314,18 @@ def test_report_rejects_per_operation_array_short_by_one(tmp_path, field: str) -
 
 
 def test_report_rejects_fewer_labels_than_operations(tmp_path) -> None:
-    """``labels`` sets the expected count, so dropping one is a mismatch too."""
+    """``labels`` sets the expected count, so dropping one is a mismatch too.
+
+    The message names the array that disagreed rather than ``labels`` itself,
+    because ``labels`` is what the count is read from: matching both halves
+    pins that reading, where matching ``labels`` alone would pass against any
+    of the four messages this guard can raise.
+    """
     pytest.importorskip("reportlab")
     res = _annex_e3_result()
     short = dataclasses.replace(res, labels=res.labels[:-1])
     out = tmp_path / "short_labels.pdf"
-    with pytest.raises(ValueError, match="labels"):
+    with pytest.raises(ValueError, match=r"'total_values'.*\(2 in 'labels'\)"):
         short.report(str(out))
     assert not out.exists()
 
