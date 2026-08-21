@@ -53,6 +53,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_equal_counts, require_same_length
 from ._criterion import (
     as_band_spectrum,
     curve_of,
@@ -168,6 +169,36 @@ class DuctPathResult:
     target: float | None
     label: str
     contributions: tuple[tuple[str, np.ndarray], ...] = field(default_factory=tuple)
+
+    def __post_init__(self) -> None:
+        """Reject a sheet whose rows do not all run over the same bands.
+
+        The calculation sheet prints one row per element under a single band
+        header and a running total beneath them, so a row of the wrong length
+        is not a detail: reportlab pads the short row out to the header and
+        the sheet then shows a total summing a band that appears nowhere in
+        the column above it.
+
+        :raises ValueError: if any spectrum disagrees with ``frequencies``.
+        """
+        require_same_length(
+            self, "frequencies", "source_level", "room_effect", "received_level"
+        )
+        bands = np.shape(self.frequencies)[0]
+        for i, stage in enumerate(self.stages):
+            for name in ("attenuation", "attenuated", "self_noise", "level"):
+                require_equal_counts(
+                    type(self).__name__,
+                    {
+                        "frequencies": bands,
+                        f"stages[{i}].{name}": np.shape(getattr(stage, name))[0],
+                    },
+                )
+        for i, (label, level) in enumerate(self.contributions):
+            require_equal_counts(
+                type(self).__name__,
+                {"frequencies": bands, f"contributions[{i}] {label!r}": len(level)},
+            )
 
     # -- ratings ----------------------------------------------------------
     @property

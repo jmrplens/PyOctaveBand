@@ -405,3 +405,54 @@ def test_prediction_frequencies_length_mismatch() -> None:
         building.installed_source_prediction(
             power_level, coupling, paths, frequencies=short_frequencies
         )
+
+
+# --------------------------------------------------------------------------
+# Quantities that do not run over the band axis
+# --------------------------------------------------------------------------
+def _annex_i_prediction() -> building.InstalledSourceResult:
+    """A two-path, six-band prediction, the shape the EN 12354-5 fiche prints."""
+    bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0])
+    return building.installed_source_prediction(
+        np.array([70.0, 68.0, 66.0, 64.0, 62.0, 60.0]),
+        np.array([-2.0, -2.0, -3.0, -3.0, -4.0, -4.0]),
+        [
+            {
+                "adjustment_term": np.full(6, 5.0),
+                "flanking_reduction_index": np.full(6, 45.0),
+                "element_area": 10.0,
+            },
+            {
+                "adjustment_term": np.full(6, 5.0),
+                "flanking_reduction_index": np.full(6, 50.0),
+                "element_area": 10.0,
+            },
+        ],
+        frequencies=bands,
+    )
+
+
+@pytest.mark.parametrize(
+    "field_name", ["frequencies", "total_level", "installed_power_level"]
+)
+@pytest.mark.parametrize("trim", [True, False], ids=["short", "long"])
+def test_a_per_band_quantity_off_the_band_axis_is_refused(
+    field_name: str, trim: bool
+) -> None:
+    """The band axis is pinned when the prediction is built, either direction."""
+    import dataclasses
+
+    result = _annex_i_prediction()
+    values = np.asarray(getattr(result, field_name))
+    wrong = values[:-1] if trim else np.append(values, values[-1])
+    with pytest.raises(ValueError, match=f"'{field_name}'"):
+        dataclasses.replace(result, **{field_name: wrong})
+
+
+def test_path_levels_are_pinned_on_their_band_axis_not_their_path_axis() -> None:
+    """``path_levels`` is paths by bands: axis 1 is the one that must agree."""
+    import dataclasses
+
+    result = _annex_i_prediction()
+    with pytest.raises(ValueError, match=r"'path_levels \(axis 1\)'"):
+        dataclasses.replace(result, path_levels=result.path_levels[:, :-1])

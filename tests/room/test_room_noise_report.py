@@ -21,6 +21,7 @@ RC-35(R)).
 
 from __future__ import annotations
 
+import numpy as np
 import pytest
 
 pytest.importorskip("reportlab")
@@ -335,20 +336,37 @@ def test_subset_spectrum_renders_missing_bands(tmp_path) -> None:
 # --------------------------------------------------------------------------
 # Hand-built results with mismatched bands
 # --------------------------------------------------------------------------
-def test_verbose_rc_report_rejects_short_reference_curve(tmp_path) -> None:
-    """A verbose RC fiche refuses a reference curve shorter than the levels.
+def test_rc_result_refuses_a_reference_curve_of_another_length() -> None:
+    """A reference curve of another length cannot be paired with the levels.
 
-    ``RCResult`` is a frozen dataclass without validation exported from a
-    public package, so a hand-built one can pair its measured levels with a
-    reference curve of another length; only the verbose columns read the two
-    band by band, and a short curve used to render a silently short table.
+    ``RCResult`` is exported from a public package, so a hand-built one used
+    to be able to carry a curve of any length; only the verbose columns read
+    the two band by band, so the plain fiche rendered a silently short table.
+    Refusing the pairing at construction covers both fiches and the plot.
     """
     from dataclasses import replace
 
     result = _rc_result()
-    mismatched = replace(result, reference_curve=result.reference_curve[:-1])
-    out = tmp_path / "rc_short_reference.pdf"
-    metadata = _full_metadata()
-    with pytest.raises(ValueError, match="reference_curve"):
-        mismatched.report(str(out), metadata=metadata, verbose=True)
+    with pytest.raises(ValueError, match="'reference_curve'"):
+        replace(result, reference_curve=result.reference_curve[:-1])
+
+
+def test_verbose_rc_report_rejects_a_reference_curve_with_an_extra_axis(
+    tmp_path,
+) -> None:
+    """A curve of shape ``(n, 1)`` survives construction and is caught here.
+
+    It carries n entries along its first axis, so the length check that runs
+    when the result is built has nothing to object to; the verbose column is
+    where the extra axis would reach the page.
+    """
+    from dataclasses import replace
+
+    result = _rc_result()
+    mismatched = replace(
+        result, reference_curve=np.asarray(result.reference_curve).reshape(-1, 1)
+    )
+    out = tmp_path / "rc_two_dimensional_reference.pdf"
+    with pytest.raises(ValueError, match="'reference_curve' of equal length"):
+        mismatched.report(str(out), metadata=_full_metadata(), verbose=True)
     assert not out.exists()  # the guard fires before the fiche is written

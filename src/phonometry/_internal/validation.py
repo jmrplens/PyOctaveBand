@@ -14,6 +14,8 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from numpy.typing import ArrayLike
 
 
@@ -116,6 +118,74 @@ def require_finite_array(x: ArrayLike, name: str) -> np.ndarray:
         msg = f"'{name}' must contain only finite values."
         raise ValueError(msg)
     return arr
+
+
+def require_equal_counts(
+    owner: str, counts: Mapping[str, int], axis: str = "band"
+) -> None:
+    """Require every measured count to agree, naming each one that does not.
+
+    The sibling of :func:`require_same_length` for the counts a caller has
+    already measured: entries of a nested sequence, an axis picked out of a
+    two-dimensional field, anything whose label is not a plain attribute name.
+
+    The message lists every count it was given rather than picking out an odd
+    one, because among peers no count is authoritative and a majority winner
+    would be a guess. Where one quantity *is* authoritative, pass it and the
+    single suspect: two entries make the shortest true message there is.
+
+    :param owner: Name of the type being checked, used in the error message.
+    :param counts: Label to count, in the order they should be reported.
+    :param axis: What the counts measure, singular, for the error message.
+    :raises ValueError: if two of the counts disagree.
+    """
+    if len(set(counts.values())) <= 1:
+        return
+    listed = ", ".join(f"'{label}' ({n})" for label, n in counts.items())
+    msg = f"{owner}: {listed} must each carry one value per {axis}."
+    raise ValueError(msg)
+
+
+def require_same_length(
+    owner: object, *fields: str | tuple[str, int], axis: str = "band"
+) -> None:
+    """Require the named fields of *owner* to share one length.
+
+    Written for the ``__post_init__`` of a result dataclass, so that a result
+    whose per-band arrays disagree cannot be built at all. Validating here
+    rather than where the values are read covers the readers that do not
+    exist yet, and both directions of the mistake: an array one short raises
+    somewhere downstream, but an array one long is silently truncated by the
+    table that prints it, under a total that summed the whole of it.
+
+    A field may be given as ``"name"`` for a length along the first axis, or
+    as ``("name", i)`` when the axis in question is not the first one, as it
+    is not for a per-path-per-band array whose bands run along axis 1.
+
+    ``None`` fields are skipped: an absent optional quantity is not a
+    disagreement.
+
+    :param owner: The instance whose fields are compared.
+    :param fields: Field names, or ``(name, axis_index)`` pairs.
+    :param axis: What the lengths measure, singular, for the error message.
+    :raises ValueError: if two of the fields disagree, or one is a scalar.
+    """
+    counts: dict[str, int] = {}
+    for field in fields:
+        name, index = field if isinstance(field, tuple) else (field, 0)
+        value = getattr(owner, name)
+        if value is None:
+            continue
+        shape = np.shape(value)
+        label = name if index == 0 else f"{name} (axis {index})"
+        if len(shape) <= index:
+            msg = (
+                f"{type(owner).__name__}: '{name}' must have an axis {index} "
+                f"to carry one value per {axis}; got shape {shape}."
+            )
+            raise ValueError(msg)
+        counts[label] = shape[index]
+    require_equal_counts(type(owner).__name__, counts, axis)
 
 
 def require_per_band(

@@ -25,6 +25,7 @@ tolerance is the 1 dB the sheet itself carries.
 
 from __future__ import annotations
 
+import dataclasses
 import warnings
 
 import numpy as np
@@ -399,3 +400,46 @@ def test_combine_of_one_path_is_that_path() -> None:
     same = combine_duct_paths([supply])
     assert np.allclose(same.received_level, supply.received_level)
     assert same.stages == ()
+
+
+# --------------------------------------------------------------------------
+# Rows that do not run over the analysis bands
+# --------------------------------------------------------------------------
+@pytest.mark.parametrize(
+    "field_name",
+    ["attenuation", "attenuated", "self_noise", "level"],
+)
+@pytest.mark.parametrize("trim", [True, False], ids=["short", "long"])
+def test_a_stage_row_off_the_band_axis_is_refused(field_name: str, trim: bool) -> None:
+    """A calculation sheet cannot carry a row of the wrong width.
+
+    The sheet prints one row per element under a single band header with a
+    running total beneath, so reportlab pads a short row out to the header and
+    the total then sums a band that appears nowhere in the column above it. A
+    row one *too long* is truncated by the same table, just as quietly.
+    """
+    result = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")
+    stage = result.stages[0]
+    row = np.asarray(getattr(stage, field_name))
+    wrong = row[:-1] if trim else np.append(row, row[-1])
+    with pytest.raises(ValueError, match=f"'stages\\[0\\]\\.{field_name}'"):
+        dataclasses.replace(
+            result,
+            stages=(
+                dataclasses.replace(stage, **{field_name: wrong}),
+                *result.stages[1:],
+            ),
+        )
+
+
+def test_a_room_effect_off_the_band_axis_is_refused() -> None:
+    """The room effect is applied band by band, so it must have the bands."""
+    result = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")
+    with pytest.raises(ValueError, match="'room_effect'"):
+        dataclasses.replace(result, room_effect=np.zeros(len(OCTAVE_BANDS) - 1))
+
+
+def test_no_room_effect_at_all_is_still_allowed() -> None:
+    """``None`` is an absent quantity, not a disagreement."""
+    result = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")
+    assert dataclasses.replace(result, room_effect=None).room_effect is None
