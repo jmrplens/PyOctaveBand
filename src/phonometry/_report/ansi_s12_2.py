@@ -265,7 +265,8 @@ def _rc_left_cell(
     if verbose and levels.shape != reference.shape:
         msg = (
             "render_rc_report(verbose=True) needs 'levels' and "
-            "'reference_curve' of equal length."
+            "'reference_curve' of the same shape; a curve with an extra axis "
+            "has the right number of entries but not the right shape."
         )
         raise ValueError(msg)
     columns = _base_columns(levels, language)

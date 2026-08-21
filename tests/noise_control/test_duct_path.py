@@ -26,6 +26,7 @@ tolerance is the 1 dB the sheet itself carries.
 from __future__ import annotations
 
 import dataclasses
+import re
 import warnings
 
 import numpy as np
@@ -443,3 +444,27 @@ def test_no_room_effect_at_all_is_still_allowed() -> None:
     """``None`` is an absent quantity, not a disagreement."""
     result = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")
     assert dataclasses.replace(result, room_effect=None).room_effect is None
+
+
+@pytest.mark.parametrize(
+    ("what", "build"),
+    [
+        (
+            "stages[0].attenuation",
+            lambda r: {"stages": (dataclasses.replace(r.stages[0], attenuation=3.0),)},
+        ),
+        ("contributions[0] (Supply)", lambda r: {"contributions": (("Supply", 3.0),)}),
+        ("frequencies", lambda r: {"frequencies": 500.0}),
+    ],
+    ids=["stage-row", "contribution", "band-axis"],
+)
+def test_a_single_number_where_a_spectrum_belongs_says_so(what, build) -> None:
+    """A scalar in a nested field is named, not left to numpy or to len().
+
+    Reaching the nested rows means indexing a shape or taking a length, and
+    both answer a scalar with an exception of their own that names neither the
+    field nor the type the guard promises to name.
+    """
+    result = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")
+    with pytest.raises(ValueError, match=f"'{re.escape(what)}'"):
+        dataclasses.replace(result, **build(result))

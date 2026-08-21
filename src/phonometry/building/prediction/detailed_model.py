@@ -100,6 +100,7 @@ from typing import TYPE_CHECKING, Any, Literal
 import numpy as np
 
 from ..._internal.validation import (
+    require_axis_count,
     require_choice,
     require_equal_counts,
     require_positive,
@@ -1596,7 +1597,9 @@ class DetailedAirborneResult:
                 type(self).__name__,
                 {
                     "frequencies": len(self.frequencies),
-                    f"paths[{i}] {path.label!r}": len(path.values),
+                    f"paths[{i}] ({path.label})": require_axis_count(
+                        path.values, type(self).__name__, f"paths[{i}]"
+                    ),
                 },
             )
         require_equal_counts(
@@ -1700,7 +1703,9 @@ class DetailedImpactResult:
                 type(self).__name__,
                 {
                     "frequencies": len(self.frequencies),
-                    f"paths[{i}] {path.label!r}": len(path.values),
+                    f"paths[{i}] ({path.label})": require_axis_count(
+                        path.values, type(self).__name__, f"paths[{i}]"
+                    ),
                 },
             )
         require_equal_counts(

@@ -53,7 +53,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_equal_counts, require_same_length
+from .._internal.validation import (
+    require_axis_count,
+    require_equal_counts,
+    require_same_length,
+)
 from ._criterion import (
     as_band_spectrum,
     curve_of,
@@ -184,20 +188,26 @@ class DuctPathResult:
         require_same_length(
             self, "frequencies", "source_level", "room_effect", "received_level"
         )
-        bands = np.shape(self.frequencies)[0]
+        owner = type(self).__name__
+        bands = require_axis_count(self.frequencies, owner, "frequencies")
         for i, stage in enumerate(self.stages):
             for name in ("attenuation", "attenuated", "self_noise", "level"):
+                label = f"stages[{i}].{name}"
                 require_equal_counts(
-                    type(self).__name__,
+                    owner,
                     {
                         "frequencies": bands,
-                        f"stages[{i}].{name}": np.shape(getattr(stage, name))[0],
+                        label: require_axis_count(getattr(stage, name), owner, label),
                     },
                 )
-        for i, (label, level) in enumerate(self.contributions):
+        for i, (name, level) in enumerate(self.contributions):
+            label = f"contributions[{i}] ({name})"
             require_equal_counts(
-                type(self).__name__,
-                {"frequencies": bands, f"contributions[{i}] {label!r}": len(level)},
+                owner,
+                {
+                    "frequencies": bands,
+                    label: require_axis_count(level, owner, label),
+                },
             )
 
     # -- ratings ----------------------------------------------------------
