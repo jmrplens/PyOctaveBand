@@ -262,7 +262,7 @@ quantities.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | if neither `loss_factor` nor `reverberation_time` is given. |
+| ValueError | if neither `loss_factor` nor `reverberation_time` is given, or if `velocity_level` or `loss_factor` is neither a scalar nor one value per band. |
 
 ## source_mobility_from_levels
 
