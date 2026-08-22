@@ -466,7 +466,7 @@ def facade_sound_reduction(
     if frequencies is not None:
         require_equal_counts(
             "facade_sound_reduction",
-            {"frequencies": len(frequencies), "elements": r_prime.size},
+            {"frequencies": len(frequencies), "r_prime": r_prime.size},
         )
     r_45 = r_prime + 1.0
     r_tr_s = r_prime.copy()
@@ -529,12 +529,12 @@ def radiated_sound_power(
     if lp.size == 1:
         lp = np.full(r_prime.size, float(lp[0]))
     require_equal_counts(
-        "radiated_sound_power", {"lp_in": lp.size, "elements": r_prime.size}
+        "radiated_sound_power", {"lp_in": lp.size, "r_prime": r_prime.size}
     )
     if octave_bands is not None:
         require_equal_counts(
             "radiated_sound_power",
-            {"octave_bands": len(octave_bands), "elements": r_prime.size},
+            {"octave_bands": len(octave_bands), "r_prime": r_prime.size},
         )
     l_w = lp + float(c_d) - r_prime + 10.0 * log10(float(area) / _S0)
 
