@@ -40,6 +40,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_equal_shapes
 from ._i18n import format_number, t
 from ._layout import (
     _ACCENT_HEX,
@@ -322,7 +323,7 @@ def _left_table(
     :param verbose: Keep the octave evaluation columns.
     :param language: Label language.
     :return: The table flowable and its caption.
-    :raises ValueError: If the one-third-octave arrays differ in length.
+    :raises ValueError: If the one-third-octave arrays differ in shape.
     """
     alpha_s = result.third_octave_alpha_s
     bands = result.third_octave_bands
@@ -331,12 +332,14 @@ def _left_table(
         return table, t("Octave-band &#945;<sub>p</sub>", language)
     third_octave_bands = np.asarray(bands, dtype=np.float64)
     third_octave_alpha_s = np.asarray(alpha_s, dtype=np.float64)
-    if third_octave_bands.shape != third_octave_alpha_s.shape:
-        msg = (
-            "render_iso11654_report() needs 'third_octave_bands' and "
-            "'third_octave_alpha_s' of equal length."
-        )
-        raise ValueError(msg)
+    require_equal_shapes(
+        "AbsorptionRatingResult.report",
+        {
+            "third_octave_bands": third_octave_bands.shape,
+            "third_octave_alpha_s": third_octave_alpha_s.shape,
+        },
+        "one-third-octave band",
+    )
     table = _third_octave_table(
         third_octave_bands, third_octave_alpha_s, measured, language
     )
@@ -384,12 +387,15 @@ def render_iso11654_report(
     centers = np.asarray(result.band_centers, dtype=np.float64)
     measured = np.asarray(result.measured, dtype=np.float64)
     shifted = np.asarray(result.shifted_reference, dtype=np.float64)
-    if not centers.shape == measured.shape == shifted.shape:
-        msg = (
-            "render_iso11654_report() needs 'band_centers', 'measured' and "
-            "'shifted_reference' of equal length."
-        )
-        raise ValueError(msg)
+    require_equal_shapes(
+        "AbsorptionRatingResult.report",
+        {
+            "band_centers": centers.shape,
+            "measured": measured.shape,
+            "shifted_reference": shifted.shape,
+        },
+        "octave band",
+    )
     # Unfavourable deviation: measured practical coefficient below the curve.
     deviations = np.maximum(shifted - measured, 0.0)
 

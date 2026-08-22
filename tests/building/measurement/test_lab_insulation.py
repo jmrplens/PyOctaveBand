@@ -230,7 +230,9 @@ def test_background_correction_feeds_r() -> None:
 def test_airborne_band_count_mismatch() -> None:
     l1, t2 = np.full(16, 80.0), np.full(16, 0.8)
     short_l2 = np.full(5, 30.0)
-    with pytest.raises(ValueError, match="band count"):
+    with pytest.raises(
+        ValueError, match=r"lab_airborne_insulation: 'l1' .*'l2' .*same shape"
+    ):
         building.lab_airborne_insulation(l1, short_l2, t2, area=10.0, volume=50.0)
 
 
@@ -276,7 +278,9 @@ def test_impact_bad_volume() -> None:
 
 
 def test_background_shape_mismatch() -> None:
-    with pytest.raises(ValueError, match="shape"):
+    with pytest.raises(
+        ValueError, match=r"background_correction: 'signal_and_background' .*same shape"
+    ):
         building.background_correction([60.0, 50.0], [50.0])
 
 

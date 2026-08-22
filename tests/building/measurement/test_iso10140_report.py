@@ -250,8 +250,8 @@ def test_manual_impact_result_renders(tmp_path) -> None:
 
 
 def test_report_rejects_band_count_mismatch(tmp_path) -> None:
-    """A rating whose per-band arrays are shorter than the curve raises a clear
-    ValueError (not an uncaught IndexError).
+    """A rating whose per-band arrays are shorter than the curve raises a
+    ValueError naming each array and its shape (not an uncaught IndexError).
     """
     import dataclasses
 
@@ -265,5 +265,9 @@ def test_report_rejects_band_count_mismatch(tmp_path) -> None:
     )
     bad = dataclasses.replace(res, rating=short)
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="matching per-band lengths"):
+    with pytest.raises(
+        ValueError,
+        match=r"LabAirborneInsulationResult\.report: .*'rating\.band_centers' "
+        r".* must all have the same shape, one value per band",
+    ):
         bad.report(out)

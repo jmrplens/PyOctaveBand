@@ -104,6 +104,7 @@ import numpy as np
 
 from ..._internal.validation import (
     require_choice,
+    require_equal_shapes,
     require_finite_array,
     require_positive,
     require_ranks,
@@ -679,9 +680,11 @@ def standardized_maximum_impact_level(
     freqs: np.ndarray | None = None
     if frequency is not None:
         freqs = require_finite_array(frequency, "frequency")
-        if freqs.shape != li.shape:
-            msg = "'frequency' must match 'level'."
-            raise ValueError(msg)
+        require_equal_shapes(
+            "standardized_maximum_impact_level",
+            {"level": li.shape, "frequency": freqs.shape},
+            "band",
+        )
     correction = fast_reverberation_correction(t, reference_time=reference_time)
     volume_term = float(10.0 * np.log10(v / v0))
     return StandardizedMaximumImpactResult(

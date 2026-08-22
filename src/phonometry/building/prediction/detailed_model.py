@@ -103,6 +103,7 @@ from ..._internal.validation import (
     require_axis_count,
     require_choice,
     require_equal_counts,
+    require_equal_shapes,
     require_positive,
     require_positive_array,
     require_ranks,
@@ -589,12 +590,14 @@ def perimeter_absorption_coefficient(
     """
     fc = require_positive_array(critical_frequencies, "critical_frequencies")
     kij = np.atleast_1d(np.asarray(vibration_reduction_indices, dtype=np.float64))
-    if kij.shape != fc.shape:
-        msg = (
-            "'critical_frequencies' and 'vibration_reduction_indices' must "
-            "have the same length (one value per connected element)."
-        )
-        raise ValueError(msg)
+    require_equal_shapes(
+        "perimeter_absorption_coefficient",
+        {
+            "critical_frequencies": fc.shape,
+            "vibration_reduction_indices": kij.shape,
+        },
+        "connected element",
+    )
     if not np.all(np.isfinite(kij)):
         msg = "'vibration_reduction_indices' must be finite."
         raise ValueError(msg)

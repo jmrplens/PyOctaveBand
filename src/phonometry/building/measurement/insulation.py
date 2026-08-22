@@ -75,6 +75,7 @@ from ..._internal.levels_math import energy_mean
 from ..._internal.types import as_float_or_array
 from ..._internal.validation import (
     require_equal_counts,
+    require_equal_shapes,
     require_ranks,
     require_same_length,
 )
@@ -1024,8 +1025,8 @@ def facade_insulation(
     :raises ValueError: If band counts differ, if ``method`` is unknown, if
         ``t2``/``t0``/``area``/``volume`` are not positive, if ``area`` is
         given without ``surface_level``, if ``surface_level`` and ``area`` are
-        given without ``volume``, if ``frequencies`` is given with a length
-        that differs from the band count, or if inputs are non-finite.
+        given without ``volume``, if ``frequencies`` is given with a shape
+        that differs from the band axis, or if inputs are non-finite.
         Supplying ``surface_level`` alone is not an error: ``r_prime`` simply
         stays ``None``.
     """
@@ -1063,9 +1064,11 @@ def facade_insulation(
     r_prime: np.ndarray | None = None
     if surface_level is not None and area is not None and absorption is not None:
         surf_bands = _as_band_levels(surface_level, "surface_level")
-        if surf_bands.shape != l2_bands.shape:
-            msg = "'surface_level' must share the band count of 'l2'."
-            raise ValueError(msg)
+        require_equal_shapes(
+            "facade_insulation",
+            {"surface_level": surf_bands.shape, "l2": l2_bands.shape},
+            "band",
+        )
         r_prime = (
             surf_bands
             - l2_bands
@@ -1076,12 +1079,12 @@ def facade_insulation(
     freqs = (
         np.asarray(frequencies, dtype=np.float64) if frequencies is not None else None
     )
-    if freqs is not None and freqs.shape != d_2m.shape:
-        msg = (
-            "'frequencies' must have one value per band; got "
-            f"{freqs.size} for {d_2m.size} bands."
+    if freqs is not None:
+        require_equal_shapes(
+            "facade_insulation",
+            {"l1_2m": l1_bands.shape, "frequencies": freqs.shape},
+            "band",
         )
-        raise ValueError(msg)
     return FacadeInsulationResult(
         d_2m=d_2m,
         d_2m_nt=d_2m_nt,

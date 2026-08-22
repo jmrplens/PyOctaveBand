@@ -507,7 +507,13 @@ def test_single_number_uncorrelated_dominant_band():
 
 
 def test_single_number_uncorrelated_length_mismatch():
-    with pytest.raises(ValueError, match="length"):
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"single_number_uncertainty_uncorrelated: 'band_uncertainties' .*"
+            r"'reference_differences' .*same shape"
+        ),
+    ):
         single_number_uncertainty_uncorrelated([1.0, 2.0], [0.0])
 
 

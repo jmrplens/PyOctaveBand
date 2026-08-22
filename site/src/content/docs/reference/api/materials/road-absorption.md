@@ -594,7 +594,7 @@ Clause 6.6 step 5); Part 1 does not mandate clipping, so pass
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If `frequency` and `absorption` differ in length or are empty. |
+| ValueError | If `frequency` and `absorption` differ in shape or are empty. |
 
 ## PART1_FREQUENCY_RANGE
 

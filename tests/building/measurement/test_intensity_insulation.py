@@ -189,7 +189,7 @@ def test_fpi_is_lp_minus_lin() -> None:
 
 
 def test_fpi_shape_mismatch_raises() -> None:
-    with pytest.raises(ValueError, match="share their shape"):
+    with pytest.raises(ValueError, match=r"'lp'.*'l_in'.*same shape"):
         building.surface_pressure_intensity_indicator([60.0, 58.0], [55.0])
 
 
@@ -264,14 +264,21 @@ def test_reduction_rejects_nonpositive_areas() -> None:
 
 
 def test_reduction_band_count_mismatch_raises() -> None:
-    with pytest.raises(ValueError, match="band count"):
+    with pytest.raises(ValueError, match=r"'lp1'.*'l_in'.*same shape"):
         building.intensity_sound_reduction(
             [80.0, 80.0], [40.0], measurement_area=10.0, area=10.0
         )
 
 
+def test_element_normalized_band_count_mismatch_raises() -> None:
+    with pytest.raises(ValueError, match=r"'lp1'.*'l_in'.*same shape"):
+        building.intensity_element_normalized_difference(
+            [80.0, 80.0], [40.0], measurement_area=10.0
+        )
+
+
 def test_kc_band_count_mismatch_raises() -> None:
-    with pytest.raises(ValueError, match="band count"):
+    with pytest.raises(ValueError, match=r"'lp1'.*'kc'.*same shape"):
         building.intensity_sound_reduction(
             [80.0], [40.0], measurement_area=10.0, area=10.0, kc=[1.0, 2.0]
         )

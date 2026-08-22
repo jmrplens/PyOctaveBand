@@ -207,7 +207,17 @@ def test_render_modules_only_type_check_domain_imports() -> None:
     for ``_plot/geometry/emission.py`` two dots are still ``_plot`` and it
     takes three. An import escapes when its level exceeds the module's own
     depth below the rendering root.
+
+    ``_internal`` is not domain code and is exempt. Counting dots is a proxy
+    for "reaches the domain", and it is the right proxy for every package but
+    this one: the eight modules under ``_internal`` import numpy, scipy and the
+    standard library and **nothing from this package at all**, so importing one
+    can no more drag a domain module into a rendering leaf than importing numpy
+    can. Without the exemption the shared guards would have to be imported
+    inside every function that validates an argument, which is a worse file for
+    a rule that was never about them.
     """
+    exempt = "_internal"
     checked = False
     for sub in ("_plot", "_report"):
         render_dir = SRC / sub
@@ -218,12 +228,15 @@ def test_render_modules_only_type_check_domain_imports() -> None:
             depth = len(path.relative_to(render_dir).parts)
             tree = ast.parse(path.read_text(encoding="utf-8"))
             for node in tree.body:  # module level only
-                if isinstance(node, ast.ImportFrom) and node.level > depth:
-                    pytest.fail(
-                        f"{path.relative_to(SRC)}:{node.lineno}: module-level "
-                        f"import of domain code '{'.' * node.level}"
-                        f"{node.module or ''}' (must live under TYPE_CHECKING)"
-                    )
+                if not isinstance(node, ast.ImportFrom) or node.level <= depth:
+                    continue
+                if (node.module or "").split(".")[0] == exempt:
+                    continue
+                pytest.fail(
+                    f"{path.relative_to(SRC)}:{node.lineno}: module-level "
+                    f"import of domain code '{'.' * node.level}"
+                    f"{node.module or ''}' (must live under TYPE_CHECKING)"
+                )
     if not checked:
         pytest.skip("neither _plot nor _report created yet")
 

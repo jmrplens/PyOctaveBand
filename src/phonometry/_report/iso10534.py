@@ -39,6 +39,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_equal_shapes
 from ._i18n import format_number, t
 from ._layout import (
     _ACCENT_HEX,
@@ -329,12 +330,16 @@ def render_iso10534_report(
     alpha = np.asarray(result.absorption, dtype=np.float64)
     reflection = np.asarray(result.reflection, dtype=np.complex128)
     z = np.asarray(result.normalized_impedance, dtype=np.complex128)
-    if not freqs.shape == alpha.shape == reflection.shape == z.shape:
-        msg = (
-            "render_iso10534_report() needs 'frequency', 'absorption', "
-            "'reflection' and 'normalized_impedance' of equal length."
-        )
-        raise ValueError(msg)
+    require_equal_shapes(
+        "ImpedanceTubeResult.report",
+        {
+            "frequency": freqs.shape,
+            "absorption": alpha.shape,
+            "reflection": reflection.shape,
+            "normalized_impedance": z.shape,
+        },
+        "frequency",
+    )
 
     styles, title_style, basis_style, caption_style = document_styles(accent)
     title = t("Impedance-tube sound absorption and impedance", language)

@@ -472,6 +472,15 @@ def test_normalization_rejects_a_non_positive_absorption() -> None:
         building.normalized_ceiling_attenuation([90.0], [50.0], 0.0)
 
 
+def test_normalization_rejects_levels_over_different_bands() -> None:
+    """Dn,c is a band-by-band difference, so L1 and L2 must share their bands.
+
+    The message names both spectra and the shapes it compared.
+    """
+    with pytest.raises(ValueError, match=r"'level_source'.*'level_receiving'.*shape"):
+        building.normalized_ceiling_attenuation([90.0, 88.0, 86.0], [50.0, 49.0], 10.0)
+
+
 # ---------------------------------------------------------------------------
 # One-dimensional plenum model (Vigran Eqs. (9.13), (9.18) to (9.20))
 # ---------------------------------------------------------------------------
@@ -766,6 +775,55 @@ def test_plenum_model_rejects_a_non_positive_height() -> None:
     with pytest.raises(ValueError, match="plenum_height"):
         building.plenum_flanking_reduction_index(
             [30.0], [30.0], ceiling_length=4.75, plenum_height=0.0
+        )
+
+
+def test_plenum_model_rejects_ceilings_over_different_bands() -> None:
+    """RS and RR are added band by band, so they must run over the same ones."""
+    with pytest.raises(
+        ValueError,
+        match=r"'reduction_index_source'.*'reduction_index_receiving'.*shape",
+    ):
+        building.plenum_flanking_reduction_index(
+            [30.0, 35.0, 40.0],
+            [28.0, 33.0],
+            ceiling_length=4.75,
+            plenum_height=0.43,
+        )
+
+
+def test_plenum_model_rejects_frequencies_of_another_length() -> None:
+    """The band axis is carried into the result and plotted against Rcl."""
+    with pytest.raises(
+        ValueError, match=r"'reduction_index_source'.*'frequency'.*shape"
+    ):
+        building.plenum_flanking_reduction_index(
+            [30.0, 35.0, 40.0],
+            [28.0, 33.0, 38.0],
+            ceiling_length=4.75,
+            plenum_height=0.43,
+            frequency=[125.0, 250.0],
+        )
+
+
+def test_plenum_model_names_which_attenuation_coefficient_disagrees() -> None:
+    """mS and mR are checked one by one, not as an indivisible pair.
+
+    The message points at the odd one out, naming every coefficient and the
+    band axis they were measured against.
+    """
+    with pytest.raises(
+        ValueError,
+        match=r"'reduction_index_source'.*'attenuation_source'"
+        r".*'attenuation_receiving'.*shape",
+    ):
+        building.plenum_flanking_reduction_index(
+            [30.0, 35.0, 40.0],
+            [28.0, 33.0, 38.0],
+            ceiling_length=4.75,
+            plenum_height=0.43,
+            attenuation_source=[0.5, 0.5],
+            attenuation_receiving=[0.5, 0.5, 0.5],
         )
 
 

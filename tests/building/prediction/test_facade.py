@@ -374,13 +374,34 @@ def test_area_element_requires_positive_area() -> None:
         element.tau(10.0, 1)
 
 
-def test_inconsistent_band_counts_raise() -> None:
+def test_inconsistent_band_counts_name_each_element() -> None:
+    """The guard names the elements that disagree, not just "the elements"."""
     elements = [
         building.FacadeElement(name="a", area=5.0, r=[40.0, 41.0, 42.0]),
         building.FacadeElement(name="b", area=5.0, r=[30.0, 31.0]),
     ]
-    with pytest.raises(ValueError, match="band count"):
+    with pytest.raises(
+        ValueError,
+        match=r"facade_sound_reduction: 'a \(r\)'.*'b \(r\)'.*"
+        r"same shape, one value per band",
+    ):
         building.facade_sound_reduction(elements, area=10.0, volume=50.0)
+
+
+def test_inconsistent_band_counts_leave_the_scalar_element_out() -> None:
+    """A scalar broadcasts, so it is not one of the shapes in dispute."""
+    elements = [
+        building.FacadeElement(name="a", area=5.0, r=[40.0, 41.0, 42.0]),
+        building.FacadeElement(name="b", area=5.0, r=30.0),
+        building.FacadeElement(name="c", dn_e=[30.0, 31.0]),
+    ]
+    with pytest.raises(
+        ValueError,
+        match=r"radiated_sound_power: 'a \(r\)'.*'c \(dn_e\)'.*"
+        r"same shape, one value per band",
+    ) as err:
+        building.radiated_sound_power(elements, lp_in=70.0, area=10.0)
+    assert "'b (r)'" not in str(err.value)
 
 
 def test_scalar_broadcasts_to_band_count() -> None:

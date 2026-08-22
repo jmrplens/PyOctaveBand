@@ -32,7 +32,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_equal_counts
+from ..._internal.validation import require_equal_counts, require_equal_shapes
 from .reverberation_room_scattering import _positive_scalar
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -261,19 +261,26 @@ def diffusion_spectrum(
     :param normalized: Optional normalised diffusion coefficient ``d_n`` per
         band; ``None`` when the reference flat surface was not measured.
     :return: A :class:`DiffusionSpectrum` with ``.plot()`` and ``.report()``.
-    :raises ValueError: if the inputs differ in length, are empty or not 1-D.
+    :raises ValueError: if the inputs differ in shape, are empty or not 1-D.
     """
     freq = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     d = np.atleast_1d(np.asarray(diffusion, dtype=np.float64))
-    if freq.ndim != 1 or freq.size == 0 or freq.shape != d.shape:
-        msg = "'frequencies' and 'diffusion' must be non-empty, 1-D and equal-length."
+    if freq.ndim != 1 or freq.size == 0:
+        msg = "'frequencies' must be a non-empty 1-D sequence of band centres."
         raise ValueError(msg)
+    require_equal_shapes(
+        "diffusion_spectrum",
+        {"frequencies": freq.shape, "diffusion": d.shape},
+        "band",
+    )
     d_n: Real | None = None
     if normalized is not None:
         d_n = np.atleast_1d(np.asarray(normalized, dtype=np.float64))
-        if d_n.shape != freq.shape:
-            msg = "'normalized' must match 'frequencies' in length."
-            raise ValueError(msg)
+        require_equal_shapes(
+            "diffusion_spectrum",
+            {"frequencies": freq.shape, "normalized": d_n.shape},
+            "band",
+        )
     return DiffusionSpectrum(
         frequencies=freq,
         diffusion=d,
@@ -303,9 +310,11 @@ def directional_diffusion(
     """
     ang = np.atleast_1d(np.asarray(angles, dtype=np.float64))
     lev = np.atleast_1d(np.asarray(levels, dtype=np.float64))
-    if ang.shape != lev.shape:
-        msg = "'angles' and 'levels' must have the same length."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "directional_diffusion",
+        {"angles": ang.shape, "levels": lev.shape},
+        "receiver",
+    )
     d = float(directional_diffusion_coefficient(lev, area_weights=weights))
     return DiffusionResult(angles=ang, levels=lev, coefficient=d)
 

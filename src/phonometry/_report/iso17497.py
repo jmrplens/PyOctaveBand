@@ -46,6 +46,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_equal_shapes
 from ._i18n import format_number, t
 from ._layout import (
     _ACCENT_HEX,
@@ -295,18 +296,21 @@ def render_scattering_report(
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     s = np.asarray(result.scattering, dtype=np.float64)
     a_s = np.asarray(result.random_incidence, dtype=np.float64)
-    if not freqs.shape == s.shape == a_s.shape:
-        msg = (
-            "render_scattering_report() needs 'frequencies', 'scattering' and "
-            "'random_incidence' of equal length."
+    require_equal_shapes(
+        "ScatteringResult.report",
+        {
+            "frequencies": freqs.shape,
+            "scattering": s.shape,
+            "random_incidence": a_s.shape,
+        },
+        "band",
+    )
+    if verbose:
+        require_equal_shapes(
+            "ScatteringResult.report(verbose=True)",
+            {"frequencies": freqs.shape, "specular": np.shape(result.specular)},
+            "band",
         )
-        raise ValueError(msg)
-    if verbose and np.asarray(result.specular, dtype=np.float64).shape != freqs.shape:
-        msg = (
-            "render_scattering_report(verbose=True) needs 'specular' of the "
-            "same length as 'frequencies'."
-        )
-        raise ValueError(msg)
 
     styles, title_style, basis_style, caption_style = document_styles(accent)
     title = t("Surface scattering measurement", language)
@@ -449,21 +453,17 @@ def render_diffusion_spectrum_report(
     # figure draws it whenever it is present, the table when verbose).
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     d = np.asarray(result.diffusion, dtype=np.float64)
-    if freqs.shape != d.shape:
-        msg = (
-            "render_diffusion_spectrum_report() needs 'frequencies' and "
-            "'diffusion' of equal length."
+    require_equal_shapes(
+        "DiffusionSpectrum.report",
+        {"frequencies": freqs.shape, "diffusion": d.shape},
+        "band",
+    )
+    if result.normalized is not None:
+        require_equal_shapes(
+            "DiffusionSpectrum.report",
+            {"frequencies": freqs.shape, "normalized": np.shape(result.normalized)},
+            "band",
         )
-        raise ValueError(msg)
-    if (
-        result.normalized is not None
-        and np.asarray(result.normalized, dtype=np.float64).shape != freqs.shape
-    ):
-        msg = (
-            "render_diffusion_spectrum_report() needs 'normalized' of the same "
-            "length as 'frequencies'."
-        )
-        raise ValueError(msg)
 
     styles, title_style, basis_style, caption_style = document_styles(accent)
     title = t("Surface diffusion measurement", language)
@@ -573,12 +573,11 @@ def render_diffusion_polar_report(
 
     angles = np.asarray(result.angles, dtype=np.float64)
     levels = np.asarray(result.levels, dtype=np.float64)
-    if angles.shape != levels.shape:
-        msg = (
-            "render_diffusion_polar_report() needs 'angles' and 'levels' of "
-            "equal length."
-        )
-        raise ValueError(msg)
+    require_equal_shapes(
+        "DiffusionResult.report",
+        {"angles": angles.shape, "levels": levels.shape},
+        "receiver angle",
+    )
 
     styles, title_style, basis_style, caption_style = document_styles(accent)
     title = t("Surface diffusion measurement", language)

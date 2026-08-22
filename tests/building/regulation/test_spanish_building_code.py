@@ -679,7 +679,7 @@ def test_global_index_validation() -> None:
     two_dimensional = np.zeros((2, 18))
     with pytest.raises(ValueError, match="one-dimensional"):
         hr.db_hr_global_index(two_dimensional)
-    with pytest.raises(ValueError, match="one value per band"):
+    with pytest.raises(ValueError, match=r"'frequencies'.*same shape"):
         hr.db_hr_global_index(_R_PRIME, frequencies=[100.0, 125.0])
     with pytest.raises(ValueError, match="positive"):
         hr.db_hr_global_index(_R_PRIME, frequencies=[0.0, *hr.DB_HR_FREQUENCIES[1:]])

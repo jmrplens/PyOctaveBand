@@ -313,7 +313,7 @@ curve (Annex F); pass the desired 16-band quantity to
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If band counts differ, if `method` is unknown, if `t2`/`t0`/`area`/`volume` are not positive, if `area` is given without `surface_level`, if `surface_level` and `area` are given without `volume`, if `frequencies` is given with a length that differs from the band count, or if inputs are non-finite. Supplying `surface_level` alone is not an error: `r_prime` simply stays `None`. |
+| ValueError | If band counts differ, if `method` is unknown, if `t2`/`t0`/`area`/`volume` are not positive, if `area` is given without `surface_level`, if `surface_level` and `area` are given without `volume`, if `frequencies` is given with a shape that differs from the band axis, or if inputs are non-finite. Supplying `surface_level` alone is not an error: `r_prime` simply stays `None`. |
 
 ## FacadeInsulationResult
 

@@ -471,8 +471,8 @@ def _termination_impedance(
     zl_arr = np.asarray(termination, dtype=np.complex128)
     if zl_arr.ndim > 0 and zl_arr.shape != f.shape:
         msg = (
-            "'termination' impedance array must be scalar or match the "
-            f"frequency vector length ({f.size}), got {zl_arr.size}."
+            "'termination' impedance array must be scalar or match the shape "
+            f"of 'frequency' {f.shape}; got shape {zl_arr.shape}."
         )
         raise ValueError(msg)
     if not np.all(np.abs(zl_arr) > 0.0):

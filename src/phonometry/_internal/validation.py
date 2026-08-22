@@ -331,6 +331,32 @@ def require_same_length(
     require_equal_counts(type(owner).__name__, counts, axis)
 
 
+def require_equal_shapes(
+    owner: str, shapes: Mapping[str, tuple[int, ...]], quantity: str = "point"
+) -> None:
+    """Require every shape to agree, naming each one that does not.
+
+    What :func:`require_equal_counts` is to :func:`require_same_length`, this
+    is to :func:`require_same_shape`: the form for values a caller is holding
+    loose, where there is no instance to read the fields off. An entry point
+    validating two of its own arguments is the usual case.
+
+    Shape rather than length, because two grids of the same height agree on
+    every count and can still disagree about every value in them.
+
+    :param owner: Name of the entry point, used in the error message. The one
+        the caller typed, not the private validator it reached.
+    :param shapes: Label to shape, in the order they should be reported.
+    :param quantity: What one element is, singular, for the error message.
+    :raises ValueError: if two of the shapes disagree.
+    """
+    if len(set(shapes.values())) <= 1:
+        return
+    listed = ", ".join(f"'{label}' {shape}" for label, shape in shapes.items())
+    msg = f"{owner}: {listed} must all have the same shape, one value per {quantity}."
+    raise ValueError(msg)
+
+
 def require_same_shape(owner: object, *fields: str, quantity: str = "point") -> None:
     """Require the named fields of *owner* to have exactly the same shape.
 
@@ -355,14 +381,7 @@ def require_same_shape(owner: object, *fields: str, quantity: str = "point") -> 
     if all(np.ndim(value) == 0 for _, value in present):
         return
     shapes = {name: np.shape(value) for name, value in present}
-    if len(set(shapes.values())) <= 1:
-        return
-    listed = ", ".join(f"'{name}' {shape}" for name, shape in shapes.items())
-    msg = (
-        f"{type(owner).__name__}: {listed} must all have the same shape, "
-        f"one value per {quantity}."
-    )
-    raise ValueError(msg)
+    require_equal_shapes(type(owner).__name__, shapes, quantity)
 
 
 def require_per_band(

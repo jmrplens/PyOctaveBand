@@ -579,20 +579,26 @@ def test_scattering_spectrum_recomputes_s_per_band() -> None:
     np.testing.assert_allclose(result.random_incidence, alpha_s)
 
 
-def test_scattering_spectrum_length_mismatch_raises() -> None:
-    with pytest.raises(ValueError, match="non-empty, 1-D and equal-length"):
+def test_scattering_spectrum_shape_mismatch_raises() -> None:
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"scattering_coefficient_spectrum: 'frequencies' "
+            r".*'specular_absorption' .*same shape"
+        ),
+    ):
         scattering_coefficient_spectrum([250.0, 500.0], [0.2], [0.1])
 
 
 def test_scattering_spectrum_empty_raises() -> None:
-    with pytest.raises(ValueError, match="non-empty, 1-D and equal-length"):
+    with pytest.raises(ValueError, match="'frequencies' must be a non-empty 1-D"):
         scattering_coefficient_spectrum([], [], [])
 
 
 def test_scattering_spectrum_rejects_2d_input() -> None:
     # frequencies is documented 1-D; equal-shaped 2-D arrays must be rejected.
     two_d = [[250.0, 500.0], [1000.0, 2000.0]]
-    with pytest.raises(ValueError, match="non-empty, 1-D and equal-length"):
+    with pytest.raises(ValueError, match="'frequencies' must be a non-empty 1-D"):
         scattering_coefficient_spectrum(two_d, two_d, two_d)
 
 
@@ -630,7 +636,7 @@ def test_directional_diffusion_coefficient_matches_scalar() -> None:
 
 def test_directional_diffusion_length_mismatch_raises() -> None:
     with pytest.raises(
-        ValueError, match="'angles' and 'levels' must have the same length"
+        ValueError, match=r"directional_diffusion: .*'levels'.*same shape"
     ):
         directional_diffusion([-30.0, 0.0, 30.0], [70.0, 72.0])
 
@@ -664,12 +670,24 @@ def test_diffusion_spectrum_optional_fields_default_none() -> None:
 
 
 def test_diffusion_spectrum_length_mismatch_raises() -> None:
-    with pytest.raises(ValueError, match="non-empty, 1-D and equal-length"):
+    with pytest.raises(ValueError, match=r"diffusion_spectrum: .*'diffusion'.*shape"):
         diffusion_spectrum([250.0, 500.0], [0.3])
 
 
+def test_diffusion_spectrum_empty_raises() -> None:
+    with pytest.raises(ValueError, match="'frequencies' must be a non-empty 1-D"):
+        diffusion_spectrum([], [])
+
+
+def test_diffusion_spectrum_rejects_2d_input() -> None:
+    # frequencies is documented 1-D; equal-shaped 2-D arrays must be rejected.
+    two_d = [[250.0, 500.0], [1000.0, 2000.0]]
+    with pytest.raises(ValueError, match="'frequencies' must be a non-empty 1-D"):
+        diffusion_spectrum(two_d, two_d)
+
+
 def test_diffusion_spectrum_normalized_mismatch_raises() -> None:
-    with pytest.raises(ValueError, match="'normalized' must match"):
+    with pytest.raises(ValueError, match=r"diffusion_spectrum: .*'normalized'.*shape"):
         diffusion_spectrum([250.0, 500.0], [0.3, 0.5], normalized=[0.2])
 
 

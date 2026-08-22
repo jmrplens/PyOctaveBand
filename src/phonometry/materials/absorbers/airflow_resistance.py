@@ -74,6 +74,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_equal_shapes
 from ..._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:
@@ -380,9 +381,11 @@ def static_airflow_resistance(
     if u.ndim != 1 or dp.ndim != 1:
         msg = "'velocities' and 'pressure_drops' must be 1-D."
         raise ValueError(msg)
-    if u.shape != dp.shape:
-        msg = "'velocities' and 'pressure_drops' must have equal length."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "static_airflow_resistance",
+        {"velocities": u.shape, "pressure_drops": dp.shape},
+        "measurement step",
+    )
     if u.size < _MIN_MEASUREMENT_STEPS:
         msg = "At least two measurement steps are required."
         raise ValueError(msg)

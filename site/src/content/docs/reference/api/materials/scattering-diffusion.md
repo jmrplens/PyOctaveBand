@@ -109,7 +109,7 @@ are carried through when supplied.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | if the inputs differ in length, are empty or not 1-D. |
+| ValueError | if the inputs differ in shape, are empty or not 1-D. |
 
 ## DiffusionResult
 

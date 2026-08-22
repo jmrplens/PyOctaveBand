@@ -139,14 +139,15 @@ def test_short_per_frequency_array_rejected(
     ``ImpedanceTubeResult`` is a frozen dataclass with no validation, so a
     caller can hand the renderer a result whose arrays disagree in length; the
     value table would then be silently cut short, in the plain four-column
-    branch and in the verbose ``|r|`` branch alike. The renderer names the
-    field it needs of equal length and leaves no PDF behind.
+    branch and in the verbose ``|r|`` branch alike. The renderer names every
+    per-frequency field beside the shape it was given, and leaves no PDF
+    behind.
     """
     result = _result()
     ragged = dataclasses.replace(result, **{field: getattr(result, field)[:-1]})
     out = tmp_path / "iso10534_ragged.pdf"
     metadata = _metadata()
-    with pytest.raises(ValueError, match=field):
+    with pytest.raises(ValueError, match=rf"'{field}'.*same shape"):
         ragged.report(str(out), metadata=metadata, verbose=verbose)
     assert not out.exists()
 

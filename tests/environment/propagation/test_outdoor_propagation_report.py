@@ -90,7 +90,9 @@ def test_attenuation_emission_length_mismatch_raises(tmp_path) -> None:
     result = _attenuation()
     bad = environment.SourceEmission(sound_power_level=np.full(4, 100.0))
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="one value per frequency"):
+    with pytest.raises(
+        ValueError, match=r"'source_emission\.sound_power_level'.*same shape"
+    ):
         result.report(out, source_emission=bad)
 
 

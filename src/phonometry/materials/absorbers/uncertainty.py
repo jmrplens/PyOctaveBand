@@ -47,7 +47,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import (
+    require_equal_shapes,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -301,6 +305,8 @@ def _band_uncertainty(
     frequencies: np.ndarray,
     table: dict[float, tuple[float, float]],
     *,
+    owner: str,
+    values_name: str,
     quantity: str,
     condition: str,
     confidence: float,
@@ -308,13 +314,19 @@ def _band_uncertainty(
 ) -> AbsorptionUncertaintyResult:
     r"""Shared engine for the coefficient formulae
     :math:`\sigma_\mathrm{R} = m \alpha + n` (values == α).
+
+    :param owner: Name of the entry point the caller invoked, so that the
+        shape complaint names the function that was typed rather than this
+        engine, which the Clause 5 and Clause 6 coefficients share.
+    :param values_name: Parameter name the coefficient arrived under, so that
+        the complaint quotes the argument the caller passed: ``alpha`` for
+        Clause 5, ``alpha_p`` for Clause 6.
     """
-    if values.shape != frequencies.shape:
-        msg = (
-            f"'{quantity}' values and frequencies must have the same shape; "
-            f"got {values.shape} and {frequencies.shape}."
-        )
-        raise ValueError(msg)
+    require_equal_shapes(
+        owner,
+        {values_name: values.shape, "frequencies": frequencies.shape},
+        "band",
+    )
     m, n = _table_constants(frequencies, table, band_kind)
     sigma_r = m * values + n
     u = sigma_r if condition == _REPRODUCIBILITY else _REPEATABILITY_FACTOR * sigma_r
@@ -355,6 +367,8 @@ def sound_absorption_coefficient_uncertainty(
         _finite_bands(alpha, "alpha"),
         _finite_bands(frequencies, "frequencies"),
         _TABLE1,
+        owner="sound_absorption_coefficient_uncertainty",
+        values_name="alpha",
         quantity="absorption_coefficient",
         condition=_condition(condition),
         confidence=confidence,
@@ -385,12 +399,11 @@ def equivalent_area_uncertainty(
     """
     a = _finite_bands(area, "area")
     f = _finite_bands(frequencies, "frequencies")
-    if a.shape != f.shape:
-        msg = (
-            f"'area' values and frequencies must have the same shape; "
-            f"got {a.shape} and {f.shape}."
-        )
-        raise ValueError(msg)
+    require_equal_shapes(
+        "equivalent_area_uncertainty",
+        {"area": a.shape, "frequencies": f.shape},
+        "band",
+    )
     m, n = _table_constants(f, _TABLE1, "one-third-octave")
     cond = _condition(condition)
     sigma_r = m * a + n * _EQUIV_AREA_REFERENCE_S
@@ -432,6 +445,8 @@ def practical_coefficient_uncertainty(
         _finite_bands(alpha_p, "alpha_p"),
         _finite_bands(frequencies, "frequencies"),
         _TABLE2,
+        owner="practical_coefficient_uncertainty",
+        values_name="alpha_p",
         quantity="practical_coefficient",
         condition=_condition(condition),
         confidence=confidence,
