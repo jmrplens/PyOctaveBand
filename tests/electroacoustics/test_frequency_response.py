@@ -8,6 +8,8 @@ is biased high (relative to H1) when the output is noisy.
 
 from __future__ import annotations
 
+import dataclasses
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -90,6 +92,30 @@ def test_result_fields_and_plot() -> None:
     assert res.magnitude_db.shape == res.frequencies.shape
     axes = res.plot()
     assert len(axes) == 3
+
+
+def test_response_curves_must_share_one_frequency_axis() -> None:
+    """An estimate whose five curves disagree cannot be built.
+
+    Only ``frequencies``, ``magnitude_db``, ``phase`` and ``coherence`` reach
+    the figure, and a wrong length there raises from inside numpy's boolean
+    index, which reports two axis sizes and names neither the field nor the
+    result. ``response`` is drawn by nothing: it is read positionally at an
+    index cut from ``frequencies``, so the three panels come out complete and
+    ordinary while the complex gain the caller quotes belongs to another
+    frequency. An extra axis passes every count, so the ranks are pinned too.
+    """
+    x, y, _, _ = _known_system()
+    good = electroacoustics.transfer_function(x, y, FS)
+    per_frequency = "one value per frequency"
+    for field in ("frequencies", "response", "magnitude_db", "phase", "coherence"):
+        curve = getattr(good, field)
+        for value in (curve[:-1], np.append(curve, curve[-1])):
+            with pytest.raises(ValueError, match=rf"'{field}'.*{per_frequency}"):
+                dataclasses.replace(good, **{field: value})
+    stacked = np.column_stack([good.magnitude_db] * 2)
+    with pytest.raises(ValueError, match=r"'magnitude_db' must have one axis"):
+        dataclasses.replace(good, magnitude_db=stacked)
 
 
 def test_rejects_mismatched_lengths() -> None:

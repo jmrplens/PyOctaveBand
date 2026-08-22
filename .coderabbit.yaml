@@ -6,6 +6,14 @@
 # second entry is the narrow exception, so its glob has to name exactly the
 # files `scripts/mirror_overviews.py` writes and no others.
 reviews:
+  # Review a pull request whatever it is aimed at, not only the ones aimed at
+  # the default branch. Work here is often stacked, and the lower pull request
+  # of a stack is aimed at the branch below it rather than at `main`, so the
+  # default left exactly the part that most needs reading unreviewed and
+  # answered with a note about checking this file.
+  auto_review:
+    base_branches:
+      - ".*"
   path_instructions:
     - path: "docs/**"
       instructions: >-

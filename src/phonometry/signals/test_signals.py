@@ -257,14 +257,21 @@ class ToneBurstResult:
         :attr:`envelope` is not an independent curve but a statement about
         :attr:`signal`: it is ``amplitude`` exactly where the gate of Clause
         A2.1 is open and zero everywhere else, which is what makes the record
-        readable as an integral number of full periods. The figure draws both
-        on one time axis built from the length of :attr:`signal`, mirroring
-        the envelope above and below the waveform, so an envelope of another
-        length stops describing this record: shorter, the gate appears to
-        close before the last burst has sounded; longer, it stays open over
-        silence that is not there.
+        readable as an integral number of full periods.
 
-        :raises ValueError: if the envelope disagrees with the signal.
+        The figure draws both on one time axis built from the length of
+        :attr:`signal`, mirroring the envelope above and below the waveform,
+        so an envelope of another length never reaches the page at all:
+        matplotlib refuses it in either direction, from inside the renderer
+        and naming two first dimensions rather than any field of this result.
+        Nothing else here reads :attr:`envelope`, so a burst that is never
+        plotted carries the mismatch back to the caller unremarked. An extra
+        axis on the envelope is quieter still: every count agrees, and the
+        figure draws one pair of mirrored gates per column over the same
+        waveform, under a legend entry repeated once per pair.
+
+        :raises ValueError: if the gate does not lie on the record, in
+            length or in number of axes.
         """
         require_ranks(self, signal=1, envelope=1)
         require_same_length(self, "signal", "envelope", axis="sample")
@@ -518,13 +525,17 @@ class ResampledSignalResult:
         beside a 1891-tap filter is the ordinary case, and any equality
         between the two would reject it.
 
-        What both must be is flat. :attr:`n_taps` reports ``filter_taps.size``
-        and the figure evaluates the magnitude response from the taps, so a
-        second axis on either one is counted into the total and filtered as
-        though it were more of the same filter -- a channel of a
-        multichannel record read as extra samples, a bank of designs read as
-        one long impulse response -- and both the reported tap count and the
-        plotted spec come out of a filter that was never designed.
+        What both must be is flat, and each is silent in its own way.
+        :attr:`n_taps` reports ``filter_taps.size``, so a bank of designs
+        stacked side by side is counted as one impulse response of the whole
+        length -- 1262 taps reported for a 631-tap design -- and that is the
+        number a caller reads. The figure never gets far enough to print it:
+        ``scipy.signal.freqz`` stops on the second axis, reporting two shapes
+        it could not broadcast and naming neither the field nor the result
+        they came from. :attr:`signal` is quieter yet, having no reader here
+        at all: the figure is drawn from the taps alone and comes out byte
+        for byte the same, and a multichannel record goes back to the caller
+        as the resampled series.
 
         :raises ValueError: if the record or the taps carry more than one
             axis.

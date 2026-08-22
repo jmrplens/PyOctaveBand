@@ -214,19 +214,20 @@ class FacadePredictionResult:
     def __post_init__(self) -> None:
         """Reject a prediction whose element rows and bands do not line up.
 
-        The fiche prints one row per façade element and rates each row on its
-        own through the ISO 717-1 curve fit, which recognises a spectrum by
-        how many values it holds: a row carrying the wrong band set is still
-        rated, against a reference curve for bands the façade was not
-        predicted on, and the ``Rp,w`` it prints looks like every other row of
-        the table. The verbose sheet then gives that same row a share of the
-        transmitted energy, summed over whatever bands it holds, so a row one
-        band too long claims energy the façade never transmitted and the sheet
-        can name the wrong element as the limiting one.
+        ``r_45`` and ``r_tr_s`` are the two spectra nothing here reads. The
+        plot and the fiche draw ``r_prime``, ``d_2m_nt`` and the element rows
+        against ``frequencies``, so a wrong length in any of those is refused
+        by matplotlib the moment a figure is drawn, and a row whose length is
+        no legal band set at all is refused a step earlier still by the
+        ISO 717-1 rating, which recognises a spectrum by how many values it
+        holds. A wrong-length ``r_45`` or ``r_tr_s`` reaches none of that: it
+        travels on to whatever the caller pairs it with, under single numbers
+        rated from the spectra the entry point actually computed.
 
         ``elements`` is the geometry :meth:`plot_geometry` draws, one patch per
-        element beside the table's one row per element, so the two views must
-        describe the same façade.
+        element beside the table's one row per ``element_r`` key, and that pair
+        is silent in both views at once: drop an element from the geometry
+        alone and the elevation shows a façade the table does not describe.
 
         :raises ValueError: if the per-band quantities disagree, if an element
             partial index does not run over the predicted bands, or if the

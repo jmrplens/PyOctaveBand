@@ -1708,7 +1708,7 @@ _SQUEAL_TRAM_RADIUS = 200.0
 _SQUEAL_MINIMUM_TRACK_LENGTH = 50.0
 
 #: The spectral axis CNOSSOS-EU tabulates rolling and traction noise over.
-_THIRD_OCTAVE_AXIS = "1/3-octave band"
+_THIRD_OCTAVE_AXIS = "one-third-octave band"
 
 #: The axis of the two source heights the method splits every spectrum over.
 _SOURCE_HEIGHT_AXIS = "source height"

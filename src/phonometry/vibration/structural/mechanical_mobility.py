@@ -471,14 +471,19 @@ class MobilityResult:
     def __post_init__(self) -> None:
         """Reject an FRF whose mobility does not lie on its frequency axis.
 
-        The fiche boxes one number, the peak of ``|Y|``, and dates it: it
-        takes the peak out of :attr:`mobility`, reads the frequency at that
-        same index out of :attr:`frequencies`, and states the measured range
-        from :attr:`frequencies` alone. Two axes of different lengths pair a
-        peak drawn from one of them with a range drawn from the other, so the
-        boxed resonance can sit outside the range printed beside it; where
-        the peak falls past the end of the shorter axis it is instead an
-        index error out of the renderer, naming neither field.
+        Every reader pairs the two axes, and none of them is quiet about a
+        pair that does not fit: :meth:`plot` draws one against the other,
+        :meth:`report` embeds that plot, and :meth:`to` divides one by a
+        function of the other. A mobility one short reaches the user as
+        matplotlib's complaint that x and y must have the same first
+        dimension, or as numpy's about operands that will not broadcast;
+        one long enough for the peak of ``|Y|`` to fall past the end of
+        :attr:`frequencies` is an index error out of the fiche instead,
+        where it reads the peak frequency at that index. What none of them
+        does is name a field: they quote two bare shapes from inside
+        matplotlib or numpy, at the far end of whatever built the result.
+        This refusal is raised at construction and says which field is
+        short.
 
         :raises ValueError: if the mobility does not carry one value per
             frequency.

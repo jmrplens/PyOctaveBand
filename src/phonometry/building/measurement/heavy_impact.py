@@ -416,10 +416,16 @@ class HeavyImpactSourceCheck:
 
         The conformance figure draws the measured ``LFE`` inside a tolerance
         band built band by band from ``nominal`` and ``tolerance``, and crosses
-        the bands ``within_tolerance`` reports as failing. Every column is
-        paired to the others by position, so one of another length holds a
-        measured band up against the printed limits of a different octave, and
-        ``passed`` beside the figure is the verdict on exactly that pairing.
+        the bands ``within_tolerance`` reports as failing. ``frequencies``,
+        ``measured``, ``nominal`` and ``tolerance`` stop it at any other
+        length, in both directions, with a shape complaint that names neither
+        the field nor the type.
+
+        The other two columns are quiet. ``deviation`` is never drawn at all,
+        and ``within_tolerance`` is indexed only to place the crosses, which a
+        mask marking every band as conforming never reaches: on a check that
+        passes, either column can be a band out and the figure comes back
+        unchanged, the deviations no longer explaining the mask beside them.
 
         The five octaves are fixed by the standard, so the check reads as a
         band count rather than as a range; it is written here because the type
@@ -584,13 +590,17 @@ class StandardizedMaximumImpactResult:
     def __post_init__(self) -> None:
         """Reject a standardization whose per-band columns disagree.
 
-        The figure draws ``measured`` and ``standardized`` against one
-        frequency axis and shades the standardization correction as the gap
-        between them, so a curve of another length shades the distance between
-        two different bands. The correction and the reverberation time it came
-        from are carried alongside rather than recomputed, and they are what a
-        report quotes to justify the shift, so a reader has nothing left to
-        check the pair against.
+        The figure draws ``measured`` and ``standardized`` against one band
+        axis and shades the standardization correction as the gap between
+        them. Those three columns are loud on their own: any other length
+        stops the plot with a shape complaint that names neither the field nor
+        the type, in both directions and with ``frequencies`` absent too.
+
+        The silent pair is the one carried alongside rather than recomputed.
+        ``reverberation_correction`` and the ``reverberation_time`` it came
+        from are never drawn and have no other reader, so a column a band out
+        there travels unremarked into the report that quotes it to justify the
+        shift.
 
         :raises ValueError: if any per-band column disagrees with the rest.
         """
@@ -741,10 +751,15 @@ class AWeightedMaximumImpactResult:
 
         The figure bars ``corrected`` over the band axis with the unweighted
         ``levels`` drawn above it and the single number as a horizontal line.
-        The Table D.3 correction falls by nearly 30 dB across the rating range,
-        so a column one band out draws a contribution decibels away from the
-        band it sits over, while the line above it, summed before the result
-        was built, still reads as the right answer.
+        Each of those three columns stops the plot at any other length, in
+        both directions, so no contribution is ever drawn over a band other
+        than its own.
+
+        ``a_weighting`` is the silent one. The Table D.3 correction is not
+        drawn, and this figure is the only reader the type has, so a column
+        one band out leaves ``corrected`` and ``rating`` standing beside a
+        weighting that no longer accounts for them, off by as much as the
+        nearly 30 dB the table falls across the rating range.
 
         :raises ValueError: if any per-band column disagrees with the rest.
         """

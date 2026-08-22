@@ -327,13 +327,27 @@ class ZoomFFTResult:
 
         The three spectral quantities are one measurement seen three ways:
         :attr:`amplitude` is the modulus of :attr:`spectrum` and
-        :attr:`power` its mean square, both taken bin by bin, and all three
-        are read against :attr:`frequencies`. The whole point of the zoom is
-        that a line's position on that grid is the answer -- which of two
-        sidebands is which, how far the hum sits from the tone -- so an array
-        of another length does not merely plot short: it shifts every line
-        onto a neighbour's frequency while the axis limits, taken from the
-        first and last grid points, still say the band was covered.
+        :attr:`power` its mean square, both taken bin by bin against
+        :attr:`frequencies`. Of the three, only ``power`` is ever drawn: the
+        figure plots it against the grid and only then takes its limits from
+        the first and last grid point, so a disagreement between those two
+        raises, short or long, ``ValueError: x and y must have same first
+        dimension, but have shapes (201,) and (200,)`` from inside
+        matplotlib before the limits are reached - two shapes, and neither
+        the field that carries the wrong one nor the result it came from,
+        with the figure already created and left open.
+
+        ``spectrum`` and ``amplitude`` are read by nothing at all, and that
+        is where the zoom loses its answer. A wrong length in either returns
+        the ordinary complete figure without a word (measured: the power
+        trace drawn over all 201 grid points, the band limits intact, no
+        warning), while the caller who takes the peak of ``amplitude`` and
+        reads its frequency off the grid is answered with a neighbour's:
+        with one grid point dropped, the 1000 Hz tone of a 1 Hz zoom reads
+        999 Hz. The whole point of the zoom is that a line's position on
+        that grid is the answer - which of two sidebands is which, how far
+        the hum sits from the tone - so that offset is the measurement, not
+        a cosmetic slip.
 
         :raises ValueError: if any spectral quantity disagrees with the zoom
             grid.

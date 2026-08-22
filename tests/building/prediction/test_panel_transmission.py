@@ -13,6 +13,7 @@ curves of Hopkins Fig. 4.8 / 4.9 as a few-dB sanity check in the mass-law range.
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import numpy as np
@@ -592,3 +593,21 @@ def test_unknown_coincidence_model_rejected() -> None:
         building.single_panel_transmission_loss(
             BANDS, 15.0, critical_frequency=2000.0, coincidence_model="watters"
         )
+
+
+def test_result_rejects_a_spectrum_that_is_not_on_its_band_centres() -> None:
+    """``rating()`` recognises the band set by how many values arrive.
+
+    Measured on the unguarded library: trimming this sixteen-band prediction
+    to its first five values leaves ``frequencies`` untouched, and the five
+    values computed at 100-250 Hz are then read as the octave bands from
+    125 Hz. ``rating()`` returns Rw = 25 where the whole spectrum rates 33,
+    and the fiche prints those values against the 125-2000 Hz centres without
+    a word about the axis the prediction was made over.
+    """
+    res = building.single_panel_transmission_loss(
+        BANDS, 20.0, critical_frequency=2000.0
+    )
+    five_of_sixteen = res.transmission_loss[:5]
+    with pytest.raises(ValueError, match=r"'transmission_loss'.*per band"):
+        dataclasses.replace(res, transmission_loss=five_of_sixteen)

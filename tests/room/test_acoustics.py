@@ -18,6 +18,7 @@ Tolerances are chosen far below the ISO 3382-1 Table A.1 JNDs
 
 from __future__ import annotations
 
+import dataclasses
 import warnings
 
 import numpy as np
@@ -327,6 +328,43 @@ def test_rejects_bad_input() -> None:
         room.room_parameters(decaying, 0)  # bad fs
     with pytest.raises(ValueError, match="'ir' is silent"):
         room.decay_curve(silent, FS)  # silent
+
+
+def test_parameters_off_the_band_axis_are_refused() -> None:
+    """Every per-band array is pinned to the band axis when the result is built.
+
+    The ISO 3382 fiche takes its row count from ``t30`` and reads the other
+    parameters at that row's index, so a parameter one entry short raises a
+    bare index error out of the row builder and one entry long is dropped off
+    the end of the table. The band axis is the silent one: with an extra band
+    centre at the front of ``frequency`` the whole sheet still renders, and
+    the boxed mid-frequency reverberation time, looked up by band centre and
+    taken from ``t30`` at the index found, quotes the next band's decay time
+    instead. The validity flags share the axis too, where the plot pairs bar
+    with flag under a strict zip.
+    """
+    ir = multitone_ir(1.0, 3.0, [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+    res = room.room_parameters(ir, FS)
+    for field in (f.name for f in dataclasses.fields(res)):
+        band_axis = np.asarray(getattr(res, field))
+        slipped = np.insert(band_axis, 0, band_axis[0])
+        for value in (band_axis[:-1], slipped):
+            with pytest.raises(ValueError, match=rf"'{field}'.*one value per band"):
+                dataclasses.replace(res, **{field: value})
+
+
+def test_decay_curve_halves_of_different_length_are_refused() -> None:
+    """The curve is one sampled decay read off by position.
+
+    ``time`` and ``level`` are paired by index by every fit and by the plot,
+    and the dataclass unpacks into two loose arrays that nothing re-pairs, so
+    a truncated half is refused here rather than reported as a pair of shapes
+    from inside whatever finally drew them.
+    """
+    curve = room.decay_curve(exponential_ir(1.0, 3.0), FS)
+    truncated = curve.level[:-1]
+    with pytest.raises(ValueError, match=r"'level'.*one value per sample"):
+        dataclasses.replace(curve, level=truncated)
 
 
 def test_constant_noise_no_decay_is_finite_and_invalid() -> None:

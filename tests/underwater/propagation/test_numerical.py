@@ -10,6 +10,7 @@ spreading for the parabolic equation.
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import matplotlib as mpl
@@ -579,6 +580,129 @@ def test_invalid_inputs_rejected() -> None:
         parabolic_equation(
             50.0, *_ISO, source_depth=50.0, max_range=1000.0, range_step=2000.0
         )
+
+
+_PER_RANGE = "one value per range"
+_PER_DEPTH = "one value per depth"
+_PER_MODE = "one value per mode"
+_PER_RAY = "one value per ray"
+_PER_SAMPLE = "one value per range sample"
+
+
+def test_pe_field_must_fill_the_grid_it_is_labelled_with() -> None:
+    """A loss field off its own grid moves every cell of the picture.
+
+    ``.plot()`` rasters the field with an extent read from the ends of
+    ``ranges`` and ``depths``, never from the array, so a field of another
+    shape is stretched to fit. Measured on the result below with the field
+    cropped to r <= 1000 m -- the shape a caller lands on by zooming a field
+    before plotting it -- the drawn extent stayed 0.00-2.00 km and the cell the
+    picture placed at 2000 m read 42.82 dB, which is the loss computed at
+    1000 m, against 45.83 dB truly there. Cropping the depth axis instead, or
+    shortening either grid, is silent the same way: the extent is redrawn from
+    whatever the grids say and the raster fills it.
+    """
+    good = parabolic_equation(
+        50.0,
+        np.array([0.0, 200.0]),
+        np.array([1500.0, 1500.0]),
+        source_depth=50.0,
+        max_range=2000.0,
+        range_step=10.0,
+        n_depth_points=256,
+    )
+    zoomed = good.propagation_loss[:, good.ranges <= 1000.0]
+    cases = (
+        ("propagation_loss", zoomed, rf"'propagation_loss \(axis 1\)'.*{_PER_RANGE}"),
+        (
+            "propagation_loss",
+            good.propagation_loss[:-1],
+            rf"'propagation_loss'.*{_PER_DEPTH}",
+        ),
+        ("depths", good.depths[:-1], rf"'depths'.*{_PER_DEPTH}"),
+        ("ranges", np.append(good.ranges, 2010.0), rf"'ranges'.*{_PER_RANGE}"),
+    )
+    for field, value, pattern in cases:
+        with pytest.raises(ValueError, match=pattern):
+            dataclasses.replace(good, **{field: value})
+
+
+def test_ray_fan_must_line_up_with_its_histories() -> None:
+    """A launch fan off its histories changes the answer without saying so.
+
+    ``plot_ray_trace`` loops over the rows of ``ranges`` alone and never opens
+    ``launch_angles``, so nothing in the picture reacts to the mismatch.
+    Measured unguarded on a 193-ray fan through an isovelocity 100 m guide,
+    with ``launch_angles`` rolled one entry short: the figure drew all 193 rays
+    without complaint, and :func:`eigenrays` to (500 m, 75 m) returned 11
+    arrivals where the aligned fan returns 12 -- an answer, not an error, since
+    it sorts the angles and indexes ``depths`` through that order. The other
+    histories are quieter still: a short ``travel_times``, or a column missing
+    from ``arc_lengths`` or the reflection counts, reaches no figure at all.
+    """
+    good = ray_trace(
+        *_ISO,
+        source_depth=25.0,
+        launch_angles_deg=np.arange(-20.0, 20.001, 5.0),
+        max_range=600.0,
+        n_steps=101,
+    )
+    cases = (
+        ("launch_angles", good.launch_angles[:-1], rf"'launch_angles'.*{_PER_RAY}"),
+        ("travel_times", good.travel_times[:-1], rf"'travel_times'.*{_PER_RAY}"),
+        (
+            "arc_lengths",
+            good.arc_lengths[:, :-1],
+            rf"'arc_lengths \(axis 1\)'.*{_PER_SAMPLE}",
+        ),
+        (
+            "profile_speeds",
+            good.profile_speeds[:-1],
+            r"'profile_speeds'.*per profile node",
+        ),
+    )
+    for field, value, pattern in cases:
+        with pytest.raises(ValueError, match=pattern):
+            dataclasses.replace(good, **{field: value})
+
+
+def test_modal_axes_must_line_up() -> None:
+    """A mode count the legend states and the mode shapes do not have.
+
+    ``plot_normal_modes`` writes its legend from ``wavenumbers.size`` and never
+    opens ``mode_functions``, so a shape block one row short draws an entirely
+    ordinary figure labelled "6 modes (50 Hz)" over five mode shapes. Measured
+    unguarded on the result below; the depth grid of those shapes is as silent,
+    since nothing in the figure opens it either. Only the range axis of the
+    loss slice reaches matplotlib, and it arrives as "x and y must have same
+    first dimension, but have shapes (25,) and (24,)" -- two shapes, naming
+    neither field nor which of them is short.
+    """
+    good = normal_modes(
+        50.0,
+        *_ISO,
+        source_depth=36.0,
+        receiver_depth=46.0,
+        ranges_m=np.linspace(100.0, 5000.0, 25),
+        n_depth_points=400,
+    )
+    cases = (
+        ("mode_functions", good.mode_functions[:-1], rf"'mode_functions'.*{_PER_MODE}"),
+        (
+            "wavenumbers",
+            np.append(good.wavenumbers, 0.2),
+            rf"'wavenumbers'.*{_PER_MODE}",
+        ),
+        ("mode_depths", good.mode_depths[:-1], rf"'mode_depths'.*{_PER_DEPTH}"),
+        (
+            "propagation_loss",
+            good.propagation_loss[:-1],
+            rf"'propagation_loss'.*{_PER_RANGE}",
+        ),
+    )
+    for field, value, pattern in cases:
+        with pytest.raises(ValueError, match=pattern):
+            dataclasses.replace(good, **{field: value})
 
 
 def test_parabolic_equation_covers_max_range_when_step_not_divisor() -> None:

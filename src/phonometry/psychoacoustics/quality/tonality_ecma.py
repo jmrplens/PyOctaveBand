@@ -116,6 +116,12 @@ class EcmaTonality:
         axis that disagrees is drawn nowhere and goes unnoticed until somebody
         asks for the whole figure.
 
+        The two tonal-frequency fields are quieter still: no panel draws
+        f_ton,z(z) or f_ton(l) and nothing else in the library reads them, so a
+        wrong length there is announced by no one. The figure comes out looking
+        perfectly ordinary and the array reaches the caller intact, one band or
+        one block out of step with the axis it is indexed against.
+
         The two axes are independent of each other: the auditory bands are the
         53 of the standard's filter bank whatever the signal, while the blocks
         are however many the signal ran to, so they are pinned separately.

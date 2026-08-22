@@ -467,20 +467,24 @@ class ReactiveSilencerResult:
     def __post_init__(self) -> None:
         """Reject a device whose curves do not all run over the same grid.
 
-        The fiche of :meth:`report` sizes its table from
-        :attr:`transmission_loss` and takes the nominal frequency of each row
-        from :attr:`frequencies`, so a grid of another length relabels every
-        row of the sheet with the frequency of a different point. An
-        :attr:`insertion_loss` one value short stops the table where it runs
-        out; one value long is truncated by the same table while the boxed
-        mean above it still averages the whole of it, and the sheet then
-        states a mean insertion loss over a frequency that appears nowhere in
-        its column.
+        :meth:`plot` draws :attr:`transmission_loss` and
+        :attr:`insertion_loss` against :attr:`frequencies`, and the fiche of
+        :meth:`report` embeds that same figure, so a curve of its own length
+        is already loud in both directions: matplotlib refuses two axes of
+        different length, and one value short is out of range for the table
+        the fiche builds row by row before the figure is even drawn. What
+        neither failure does is name the field, and neither happens until
+        something is rendered; refusing here names the odd curve where the
+        result was assembled.
 
-        :attr:`transfer_matrix` is pinned to three axes because two of them
-        are its own: the four-pole matrix is 2x2 at every frequency, and a
-        stack that lost the frequency axis would still count two rows on its
-        first one and pass any check that only counted.
+        :attr:`transfer_matrix` is the quiet one, and the reason this belongs
+        at construction rather than in a reader: nothing in the library opens
+        it again once the result is built, so a stack covering half the grid
+        travels through :meth:`plot` and an entirely ordinary PDF without a
+        word. It is pinned to three axes because two of them are its own: the
+        four-pole matrix is 2x2 at every frequency, and a stack that lost the
+        frequency axis would still count two rows on its first one and pass
+        any check that only counted.
 
         :attr:`resonances` is left out of the grid: it counts the notable
         frequencies of the device -- one tuning frequency for a Helmholtz

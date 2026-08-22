@@ -438,6 +438,23 @@ def test_an_extra_axis_on_the_trace_is_refused() -> None:
         dataclasses.replace(res, time=res.time[:, None])
 
 
+def test_an_extra_axis_on_the_specific_pattern_is_refused() -> None:
+    """``specific`` has no sibling to count against, so its rank is the pin.
+
+    Left to the reader, a (240, 2) pattern meets a Bark axis built from
+    ``specific.size`` and matplotlib answers about shapes (480,) and (240, 2),
+    naming neither field; a (240, 1) draws its line and then stops in the fill
+    under it on "'y1' is not 1-dimensional". Neither writes a PDF.
+    """
+    res = psychoacoustics.loudness_zwicker_from_spectrum(np.full(28, 60.0))
+    for pattern in (
+        res.specific[:, None],
+        np.column_stack([res.specific] * 2),
+    ):
+        with pytest.raises(ValueError, match="'specific' must have one axis"):
+            dataclasses.replace(res, specific=pattern)
+
+
 def test_stationary_result_keeps_its_absent_trace() -> None:
     """The stationary methods leave both fields ``None``, which is not a gap."""
     for res in (

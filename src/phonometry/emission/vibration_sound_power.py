@@ -286,11 +286,14 @@ class VibrationSoundPowerResult:
         row count from ``sound_power_level`` and reading ``velocity_level``
         (and ``radiation_factor`` in the verbose table) at the same indices,
         so a short array cannot be read to the end of the sheet and a long one
-        is dropped by it silently. ``frequencies`` are worse than truncated:
-        they pick the A-weighting corrections that :attr:`sound_power_level_a`
-        adds band by band, and a single stray frequency broadcasts its one
-        correction across every band, boxing an ``LWA`` that no band of the
-        table supports.
+        is dropped by it silently. ``frequencies`` are read there too, for the
+        row labels, but they never mislabel a sheet: the fiche dies on the
+        labels it runs out of, with a bare ``IndexError``. The quiet one is
+        :attr:`sound_power_level_a`, which picks one A-weighting correction
+        per band on its own: a single stray frequency broadcasts its one
+        correction over every level and hands back an ``LWA`` that no band of
+        the result supports, where any other mismatched length raises from
+        numpy about two shapes that name neither field.
 
         :raises ValueError: if any per-band quantity disagrees with the rest.
         """

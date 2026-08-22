@@ -12,6 +12,7 @@ random error) are anchored on the standard's own values.
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import numpy as np
@@ -208,6 +209,23 @@ def test_rigid_mass_calibration_validation() -> None:
         vibration.rigid_mass_calibration_check([0.1], [0.0], 10.0)
 
 
+def test_a_tolerance_mask_short_of_its_frequencies_is_refused() -> None:
+    """A mask that stops early would leave a pass standing over the rest.
+
+    :attr:`within_tolerance` is what carries the 7.5.2 verdict frequency by
+    frequency, and ``passed`` is stored rather than re-derived, so a mask
+    covering the first frequencies of the range says nothing about the ones
+    it never reached while the overall pass still reads true over all of
+    them. Only :meth:`plot` protests, and then from inside numpy's boolean
+    indexing, naming neither field.
+    """
+    f = np.geomspace(20.0, 2000.0, 12)
+    res = vibration.rigid_mass_calibration_check(np.full(12, 0.1), f, mass=10.0)
+    short = res.within_tolerance[:8]
+    with pytest.raises(ValueError, match="'within_tolerance'"):
+        dataclasses.replace(res, within_tolerance=short)
+
+
 # ---------------------------------------------------------------------------
 # Random error of averaged FRF estimates (ISO 7626-2, Annex A + 8.1.3)
 # ---------------------------------------------------------------------------
@@ -252,6 +270,20 @@ def test_mobility_result_bundle() -> None:
     # .to() converts to impedance = 1/Y
     z = res.to("impedance")
     assert np.allclose(z, 1.0 / res.mobility)
+
+
+def test_a_mobility_short_of_its_frequencies_is_refused() -> None:
+    """An FRF one value short is read position by position by everything.
+
+    :meth:`plot` draws the mobility against the frequencies, the fiche reads
+    the peak frequency at the peak index of ``|Y|``, and :meth:`to` divides
+    one array by a function of the other; all three raise on lengths that
+    disagree, out of matplotlib or numpy and naming neither field.
+    """
+    res = vibration.sdof_mobility_result(np.linspace(1.0, 50.0, 40), M, K, C)
+    short = res.mobility[:-1]
+    with pytest.raises(ValueError, match="'mobility'"):
+        dataclasses.replace(res, mobility=short)
 
 
 def test_plot_returns_axes() -> None:

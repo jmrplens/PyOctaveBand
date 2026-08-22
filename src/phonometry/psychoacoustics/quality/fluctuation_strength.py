@@ -51,6 +51,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
 from ...io._resolve import apply_calibration, resolve_fs
 
 if TYPE_CHECKING:
@@ -220,6 +221,37 @@ class FluctuationStrengthResult:
     specific: NDArray[np.float64]
     bark_axis: NDArray[np.float64]
     time_dependent: NDArray[np.float64]
+
+    def __post_init__(self) -> None:
+        """Reject a curve that disagrees with the axis it is drawn on.
+
+        ``specific`` and ``bark_axis`` are one axis written twice: the 47
+        auditory filters of the model, whatever the signal. The frames behind
+        ``time_dependent`` are the other axis and are however many the signal
+        ran to; no second field is measured along them, so there is nothing
+        there to disagree with.
+
+        The plot is one ``plot`` call pairing the two, with a shaded fill
+        underneath repeating the pair. A length short or long by one reaches
+        matplotlib, which raises about x and y differing in their first
+        dimension, names neither field, and does so from a call several frames
+        below the one the caller made.
+
+        Rank has to be pinned as well as length, because an extra axis passes
+        every count: a ``specific`` of shape ``(47, 2)`` carries 47 filters on
+        its first axis and ``plot`` draws it as one line per column without a
+        word. It is the ``fill_between`` underneath that stops, reporting that
+        ``'y1'`` is not 1-dimensional -- matplotlib's own parameter name, not
+        the field that carried the extra axis.
+
+        Neither mismatch touches the overall ``F``, which is a scalar of its
+        own: a result built this way reports its vacil figure as usual, and
+        the disagreement surfaces only if someone draws it.
+
+        :raises ValueError: if the per-filter quantities disagree.
+        """
+        require_ranks(self, specific=1, bark_axis=1)
+        require_same_length(self, "bark_axis", "specific", axis="auditory filter")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

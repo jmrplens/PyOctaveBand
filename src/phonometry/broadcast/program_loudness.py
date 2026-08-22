@@ -286,11 +286,13 @@ class KWeightingResponse:
         The plot lays the two stages under the combined curve on one shared
         frequency axis, and the combined magnitude is meant to be their sum, so
         a curve of another length is a curve read against the wrong
-        frequencies. What the reader takes from the figure are the two
-        landmarks the whole measurement is anchored to, the +4 dB shelf plateau
-        and the 0.69 dB gain at 997 Hz that the ``-0.691`` of Formula 2
-        cancels, and a shifted curve still shows both of them, just at the
-        wrong place on the axis.
+        frequencies. No such figure is ever drawn: all three curves go to the
+        plot against ``frequencies``, so matplotlib refuses the first one whose
+        length disagrees, in either direction and whichever curve it is. What
+        it refuses with is two bare shapes and no names, raised from inside the
+        drawing code at whatever call site asked for a figure. Checked here,
+        the same mistake names the curve that disagrees and gives every count,
+        where the response was built.
 
         :raises ValueError: if any curve disagrees with ``frequencies``.
         """
@@ -747,14 +749,19 @@ class ProgramLoudnessResult:
         two arrays are one set of readings seen twice, so they are checked pair
         by pair.
 
-        The fiche prints the momentary and short-term maxima as headline
-        figures and the series themselves as the plot below, so a reading
-        without its time is a maximum taken over a stretch of programme the
-        graph does not show. The channel columns never reach the sheet at all,
-        only their maximum does, which is exactly why they are checked here: a
-        weight vector that does not cover every channel leaves a headline true
-        peak for a channel the programme loudness never counted, and no reader
-        downstream is in a position to notice.
+        The two series axes are loud already. Each series is plotted against
+        its own time, so a pair that disagrees stops the figure in either
+        direction, and with it the fiche, which writes no file at all; and the
+        headline maxima the sheet prints above the graph are stored fields
+        copied verbatim, never maxima recomputed over the series. What is
+        gained by checking them here is the message: the pair and its two
+        counts, at the point the measurement was built, instead of two bare
+        shapes from inside the drawing code.
+
+        The channel axis is the silent one. The columns never reach the sheet,
+        only their maximum does, so a weight vector that does not cover every
+        channel renders a complete fiche without a word, carrying a headline
+        true peak for a channel the programme loudness never weighted.
 
         :raises ValueError: if the two arrays of any of the three axes
             disagree.

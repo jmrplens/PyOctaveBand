@@ -359,13 +359,21 @@ class LifterResult:
         length: the log spectra live on the ``nfft // 2 + 1`` bins of a real
         transform, the cepstrum on the full ``nfft`` quefrencies the lifter
         window was applied to. Each is checked against its own companions
-        only. :meth:`plot` overlays :attr:`spectrum_db` and
-        :attr:`liftered_db` on one frequency grid to show that the two
-        modes are complementary in dB, a reading that a curve of another
-        length turns into a comparison of two different bands; and it draws
-        the cepstrum panel through the same ``nfft // 2 + 1`` slice as
-        :class:`CepstrumResult`, which hides any disagreement past the
-        midpoint rather than reporting it.
+        only, and the two fail in different ways.
+
+        :meth:`plot` overlays :attr:`spectrum_db` and :attr:`liftered_db` on
+        :attr:`frequencies` with one ``Axes.plot`` call each, and those
+        refuse a mis-sized curve outright, in either direction ("x and y must
+        have same first dimension"). What the check adds there is where and
+        by what name: the refusal happens as the result is built rather than
+        whenever someone happens to draw it, and it names the column that
+        slipped instead of the two shapes matplotlib could not reconcile.
+
+        The cepstrum panel is the silent half. It is cut at the same
+        ``nfft // 2 + 1`` slice as :class:`CepstrumResult`, so a disagreement
+        past the midpoint is drawn as an ordinary complete curve rather than
+        reported, and the ``nfft`` the slice is cut from is recorded
+        separately from either array.
 
         :raises ValueError: if the spectra disagree with each other, or the
             cepstrum with its quefrency axis.

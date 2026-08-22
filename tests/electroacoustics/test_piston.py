@@ -11,6 +11,7 @@ extraction.
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import numpy as np
@@ -125,6 +126,28 @@ def test_result_shapes_and_plot() -> None:
     assert ax.get_ylabel()
 
 
+def test_a_directivity_index_column_of_another_length_is_refused() -> None:
+    """The per-frequency quantities are one table, and the data sheet reads it
+    by position.
+
+    ``loudspeaker_characteristics`` locates the polar frequency it was asked
+    for in ``frequencies`` alone, then indexes ``directivity_index`` and
+    ``directivity`` with that position; neither length is checked anywhere
+    downstream. A directivity index column one short slides every entry up by
+    one, and the IEC 60268-5 sheet prints the index of the next frequency under
+    the stated one: 15.19 dB at 800 Hz for the piston below, whose index there
+    is 4.56 dB.
+    """
+    result = electroacoustics.radiating_piston(
+        0.1,
+        [200.0, 800.0, 3200.0, 6400.0],
+        angles=np.radians(np.linspace(-90.0, 90.0, 37)),
+    )
+    one_frequency_short = result.directivity_index[1:]
+    with pytest.raises(ValueError, match=r"'directivity_index' \(3\).*per frequency"):
+        dataclasses.replace(result, directivity_index=one_frequency_short)
+
+
 def test_directivity_pattern_result_and_properties() -> None:
     # Default grid is 361 points over the front hemisphere -90 deg .. +90 deg.
     res = electroacoustics.piston_directivity_pattern([3.0, 8.0])
@@ -186,6 +209,24 @@ def test_directivity_pattern_plot_kwargs_single_ka_only() -> None:
     colors = {line.get_color() for line in ax_family.lines}
     assert "crimson" not in colors
     assert len(colors) == 3
+
+
+def test_a_pattern_matrix_with_a_surplus_row_is_refused() -> None:
+    """The matrix rows and the ``ka`` values are one enumeration, and only the
+    surplus is quiet.
+
+    :meth:`plot` loops over ``ka`` and draws row ``i`` as the pattern of
+    ``ka[i]``. A missing row runs that loop off the end, as numpy's "index 2 is
+    out of bounds for axis 0 with size 2", and a column count that disagrees
+    with ``angles`` is refused by matplotlib; both name no field, but both are
+    heard. A surplus row is not: the loop stops at the last ``ka``, so the
+    third pattern of a two-``ka`` bundle reaches neither the figure nor the
+    legend.
+    """
+    result = electroacoustics.piston_directivity_pattern([1.0, 3.0, 8.0])
+    two_of_the_three_ka = result.ka[:2]
+    with pytest.raises(ValueError, match=r"'directivity' \(3\).*per pattern"):
+        dataclasses.replace(result, ka=two_of_the_three_ka)
 
 
 def test_directivity_pattern_validation() -> None:

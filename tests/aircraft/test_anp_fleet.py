@@ -10,6 +10,7 @@ interpolation, which are the main risk in wiring the real fleet data in.
 from __future__ import annotations
 
 import csv
+import dataclasses
 from importlib.resources import files
 
 import matplotlib as mpl
@@ -178,6 +179,72 @@ def test_parsed_arrays_are_read_only() -> None:
         with pytest.raises(ValueError, match="read-only"):
             arr[0] = 0.0
     assert not _DB.profile("747100", "departure").path.flags.writeable
+
+
+def test_npd_curves_reject_level_table_short_of_its_powers() -> None:
+    """A level table one power row short cannot be built into a curve set."""
+    curves = _DB.npd_curves("747100", "departure", "SEL")
+    short = curves.levels[:-1]
+    with pytest.raises(ValueError, match="'levels'"):
+        dataclasses.replace(curves, levels=short)
+
+
+def test_npd_curves_reject_level_table_short_of_its_distances() -> None:
+    """The distance axis is pinned on its own: the power axis still agrees."""
+    curves = _DB.npd_curves("747100", "departure", "SEL")
+    short = curves.levels[:, :-1]
+    with pytest.raises(ValueError, match=r"'levels \(axis 1\)'"):
+        dataclasses.replace(curves, levels=short)
+
+
+def test_npd_curves_reject_level_table_with_an_extra_axis() -> None:
+    """Both counts agree on a (powers, distances, 1) table; the rank pin does not."""
+    curves = _DB.npd_curves("747100", "departure", "SEL")
+    boxed = curves.levels[:, :, None]
+    with pytest.raises(ValueError, match="'levels' must have 2 axes"):
+        dataclasses.replace(curves, levels=boxed)
+
+
+def test_profile_rejects_roll_mask_missing_a_segment() -> None:
+    """The roll masks are per segment, so one entry short is not a profile."""
+    prof = _DB.profile("747100", "departure")
+    short = prof.ground_roll[:-1]
+    with pytest.raises(ValueError, match="'ground_roll'"):
+        dataclasses.replace(prof, ground_roll=short)
+
+
+def test_profile_rejects_roll_mask_with_an_extra_axis() -> None:
+    """A column-shaped mask counts one entry per segment and is still refused."""
+    prof = _DB.profile("747100", "departure")
+    column = np.asarray(prof.ground_roll)[:, None]
+    with pytest.raises(ValueError, match="'ground_roll' must have one axis"):
+        dataclasses.replace(prof, ground_roll=column)
+
+
+def test_profile_names_the_segments_and_not_the_vertices_it_counted() -> None:
+    """A profile of N breakpoints has N-1 segments, and the message says so.
+
+    Naming the count ``path`` would report one fewer than ``path`` holds and
+    send a reader to measure the wrong attribute; naming it ``path segments``
+    says which derived quantity the number is.
+    """
+    prof = _DB.profile("747100", "departure")
+    vertices = len(prof.path)
+    surplus = np.zeros(vertices, dtype=bool)
+    with pytest.raises(ValueError, match=rf"'path segments' \({vertices - 1}\)"):
+        dataclasses.replace(prof, ground_roll=surplus, landing_roll=surplus)
+
+
+def test_a_profile_with_no_path_reports_no_segments_rather_than_minus_one() -> None:
+    """An empty path has nought segments, which is a count and not an error."""
+    prof = _DB.profile("747100", "departure")
+    empty = dataclasses.replace(
+        prof,
+        path=np.zeros((0, np.asarray(prof.path).shape[1])),
+        ground_roll=np.zeros(0, dtype=bool),
+        landing_roll=np.zeros(0, dtype=bool),
+    )
+    assert len(empty.path) == 0
 
 
 def test_profile_plot_highlights_full_roll_span() -> None:

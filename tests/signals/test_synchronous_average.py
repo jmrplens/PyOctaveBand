@@ -21,6 +21,8 @@ whose periodic part is known exactly:
 
 from __future__ import annotations
 
+import dataclasses
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -297,6 +299,48 @@ def test_record_shorter_than_one_period_raises() -> None:
     short = np.zeros(M // 2, dtype=np.float64)
     with pytest.raises(ValueError, match="shorter than one period"):
         ph.signals.time_synchronous_average(short, FS, period=PERIOD)
+
+
+def test_average_curves_must_run_over_their_own_axis() -> None:
+    """A curve off its own axis is refused when built, not when drawn.
+
+    The waveform panel draws ``period_waveform`` against ``times`` and the
+    comb panel draws ``comb_response`` against ``comb_frequencies``, so a
+    length disagreement in either pair surfaces only as matplotlib's "x and
+    y must have same first dimension" and two bare shapes, naming neither
+    field nor result. An extra axis is worse: it counts the same number of
+    entries on its first axis, passes every length check, and reaches the
+    plot as a second curve -- on the waveform panel under a legend entry
+    repeated word for word, on the comb panel with no entry at all.
+    ``residual`` is drawn by nothing, so an extra axis there is silent to
+    the end.
+    """
+    good = ph.signals.time_synchronous_average(
+        _repeat(_periodic(PERIOD, M, (1.0, 3.0)), 8), FS, period=PERIOD
+    )
+    pairs = (
+        (("times", "period_waveform"), "one value per period sample"),
+        (
+            ("comb_frequencies", "comb_response"),
+            "one value per comb-filter frequency",
+        ),
+    )
+    for fields, per_entry in pairs:
+        for field in fields:
+            value = np.asarray(getattr(good, field))
+            for wrong in (value[:-1], np.append(value, value[-1])):
+                with pytest.raises(ValueError, match=rf"'{field}'.*{per_entry}"):
+                    dataclasses.replace(good, **{field: wrong})
+    for field in (
+        "period_waveform",
+        "times",
+        "residual",
+        "comb_frequencies",
+        "comb_response",
+    ):
+        stacked = np.column_stack([np.asarray(getattr(good, field))] * 2)
+        with pytest.raises(ValueError, match=rf"'{field}' must have one axis"):
+            dataclasses.replace(good, **{field: stacked})
 
 
 def test_comb_filter_response_validation() -> None:

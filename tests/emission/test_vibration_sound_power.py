@@ -172,6 +172,56 @@ def test_plot_returns_axes() -> None:
     assert res.plot() is not None
 
 
+# ---------------------------------------------------------------------------
+# Per-band quantities that do not run over the band axis
+# ---------------------------------------------------------------------------
+def _four_band_determination() -> emission.VibrationSoundPowerResult:
+    """A four-band ISO/TS 7849-2 determination with a determined epsilon."""
+    return emission.sound_power_from_vibration(
+        [100.0, 102.0, 104.0, 101.0],
+        1.5,
+        radiation_factor=[0.8, 0.9, 1.0, 1.0],
+        frequencies=[250.0, 500.0, 1000.0, 2000.0],
+    )
+
+
+@pytest.mark.parametrize("field_name", ["velocity_level", "radiation_factor"])
+@pytest.mark.parametrize("trim", [True, False], ids=["short", "long"])
+def test_a_vibration_band_quantity_off_the_band_axis_is_refused(
+    field_name: str, trim: bool
+) -> None:
+    """The fiche reads these two columns at the row indices of ``LW``.
+
+    The table takes its row count from ``sound_power_level``, so one entry
+    too many is dropped from the sheet without a word (the surplus band is
+    nowhere on the rendered page, under a header that says nothing is
+    missing) and one too few stops the render with a bare ``IndexError``.
+    """
+    import dataclasses
+
+    result = _four_band_determination()
+    values = np.asarray(getattr(result, field_name))
+    wrong = values[:-1] if trim else np.append(values, values[-1])
+    with pytest.raises(ValueError, match=f"'{field_name}'"):
+        dataclasses.replace(result, **{field_name: wrong})
+
+
+def test_a_stray_single_frequency_is_refused() -> None:
+    """One frequency beside four bands is read by ``sound_power_level_a``.
+
+    The property picks an A-weighting correction per band and adds it to the
+    band levels, so a lone frequency stretches its single correction over the
+    whole spectrum: these bands then report L_WA = 109,7 dB where their own
+    centres give 108,8 dB, and nothing on the way says which one is meant.
+    """
+    import dataclasses
+
+    result = _four_band_determination()
+    one_band = np.asarray(result.frequencies)[2:3]
+    with pytest.raises(ValueError, match="'frequencies'"):
+        dataclasses.replace(result, frequencies=one_band)
+
+
 def test_radiated_power_norton_diesel_engine_example() -> None:
     # Norton & Karczub, Fundamentals of Noise and Vibration Analysis for
     # Engineers 2e (CUP, 2003), problem 3.9 (p. 580) with the published

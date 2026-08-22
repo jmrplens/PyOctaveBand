@@ -682,15 +682,21 @@ class HarmonicDistortionResult:
     sinad_db: float
 
     def __post_init__(self) -> None:
-        """Reject a result whose two harmonic axes are of different lengths.
+        """Reject a result whose two harmonic axes do not line up.
 
         The frequencies and the amplitudes are the one list of harmonics
-        written down twice, the nth frequency naming the nth amplitude. No
-        reader re-derives either from the other, so a pairing that ran short
-        goes uncontested: ``zip`` stops at the shorter of the two and the
-        table it fills loses a harmonic that the THD quoted above it summed.
+        written down twice, the nth frequency naming the nth amplitude.
+        Nothing in the library ever pairs them, so nothing here can contest a
+        mismatch: :meth:`plot` counts the harmonic orders off
+        ``harmonic_amplitudes`` and draws against those, never opening
+        ``harmonic_frequencies``, so a result whose frequencies ran short, ran
+        long, or arrived carrying a second axis draws the same ordinary
+        figure. The pairing is the caller's to make, and from the missing
+        harmonic onwards every frequency they read off names a different
+        harmonic from the amplitude beside it.
 
-        :raises ValueError: if the two disagree in length.
+        :raises ValueError: if the two disagree in length, or if either
+            carries more than one axis.
         """
         require_ranks(self, harmonic_frequencies=1, harmonic_amplitudes=1)
         require_same_length(

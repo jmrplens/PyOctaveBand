@@ -21,6 +21,8 @@ and R CRAN "SII" implementations where they overlap. See
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pytest
 from reference_data import (
@@ -369,6 +371,15 @@ def test_standard_speech_spectra_rejects_unknown_and_empty() -> None:
         sii.standard_speech_spectra("whisper")
     with pytest.raises(ValueError, match="empty"):
         sii.standard_speech_spectra([])
+
+
+def test_standard_speech_spectra_surplus_level_row_is_refused() -> None:
+    # The silent one: the plot walks the effort names, so a row that no name
+    # reaches is simply never drawn and the figure looks complete without it.
+    result = sii.standard_speech_spectra(["normal", "raised"])
+    surplus = np.vstack([result.levels, result.levels[-1]])
+    with pytest.raises(ValueError, match=r"'levels'.+one value per vocal effort"):
+        dataclasses.replace(result, levels=surplus)
 
 
 def test_standard_speech_spectra_plot_returns_axes() -> None:
@@ -809,6 +820,20 @@ def test_sii_procedure_returns_copies() -> None:
     assert sii.sii_procedure("critical-band").band_importance[0] == pytest.approx(
         0.0103
     )
+
+
+def test_sii_procedure_band_edges_without_the_closing_limit_is_refused() -> None:
+    # Band i is documented as running from band_edges[i] to band_edges[i + 1],
+    # so a table one limit short bounds every band with the next band's limits
+    # and leaves the last one with no upper limit at all. Only the step plot
+    # notices, comparing its own closed importance array against the limits,
+    # and the length it names belongs to neither field.
+    procedure = sii.sii_procedure("one-third-octave")
+    unclosed = procedure.band_edges[:-1]
+    with pytest.raises(
+        ValueError, match=r"'band_edges, less its closing limit'.+one value per band"
+    ):
+        dataclasses.replace(procedure, band_edges=unclosed)
 
 
 def test_sii_procedure_plot_returns_axes() -> None:

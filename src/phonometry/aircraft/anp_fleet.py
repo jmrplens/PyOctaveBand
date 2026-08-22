@@ -193,9 +193,9 @@ class AnpNpdCurves:
         construction names the export where it was read.
 
         The two axes are pinned separately because they are independent: the
-        bundled database holds sets of anything from two power settings to ten
-        over the same ten distances, so one count over both would reject all
-        but the handful whose two axes happen to be equally long.
+        bundled database holds sets of anything from two power settings to
+        thirteen over the same ten distances, so one count over both would
+        reject every set but the two whose axes happen to be equally long.
 
         :raises ValueError: if the level table disagrees with the powers or the
             distances.
@@ -272,7 +272,7 @@ class AnpProfile:
         require_equal_counts(
             owner,
             {
-                "path segments": len(self.path) - 1,
+                "path segments": max(len(self.path) - 1, 0),
                 "ground_roll": require_axis_count(
                     self.ground_roll, owner, "ground_roll", "segment", rank=None
                 ),

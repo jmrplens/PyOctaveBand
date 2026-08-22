@@ -18,7 +18,8 @@ formulae, and consistency with the verified ISO 717-1/2 rating engine.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import dataclasses
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pytest
@@ -290,6 +291,69 @@ def test_result_types() -> None:
     i = building.lab_impact_insulation(np.full(16, 60.0), np.full(16, 0.8), volume=50.0)
     assert isinstance(a, building.LabAirborneInsulationResult)
     assert isinstance(i, building.LabImpactInsulationResult)
+
+
+def _airborne_result() -> building.LabAirborneInsulationResult:
+    return building.lab_airborne_insulation(
+        np.linspace(90.0, 96.0, 16),
+        np.linspace(50.0, 40.0, 16),
+        np.full(16, 0.6),
+        area=10.0,
+        volume=50.0,
+    )
+
+
+def _impact_result() -> building.LabImpactInsulationResult:
+    return building.lab_impact_insulation(
+        np.linspace(70.0, 60.0, 16), np.full(16, 0.6), volume=50.0
+    )
+
+
+def test_airborne_absorption_of_another_band_count_is_refused() -> None:
+    """The fiche prints ``A`` beside ``R`` and compares neither with the other.
+
+    The verbose ISO 10140-2 table walks the band centres and reads each column
+    at that band, so an absorption area one entry too long is printed only as
+    far as the sixteenth band: the surplus 99,9 m² lands beside the 100 Hz
+    ``R`` and the tail is dropped with nothing said. The renderer checks the
+    reported curve against the rating and never looks at ``absorption``, so
+    construction is the last place the mismatch can be caught.
+    """
+    res = _airborne_result()
+    long_absorption = np.insert(res.absorption, 0, 99.9)
+    with pytest.raises(ValueError, match=r"'absorption' \(17\).*per band"):
+        dataclasses.replace(res, absorption=long_absorption)
+
+
+def test_impact_absorption_of_another_band_count_is_refused() -> None:
+    """``A`` is the normalization the ISO 10140-3 sheet exists to document.
+
+    ``Ln = Li + 10 lg(A/A0)``, and the verbose table prints the two side by
+    side band by band. A surplus entry shifts the whole ``A`` column against
+    an untouched ``Ln``, printing a step that never took place, and nothing
+    downstream recomputes one from the other.
+    """
+    res = _impact_result()
+    long_absorption = np.insert(res.absorption, 0, 99.9)
+    with pytest.raises(ValueError, match=r"'absorption' \(17\).*per band"):
+        dataclasses.replace(res, absorption=long_absorption)
+
+
+@pytest.mark.parametrize(
+    "build", [_airborne_result, _impact_result], ids=["airborne", "impact"]
+)
+def test_absorption_with_an_extra_axis_is_refused(build: Callable[[], Any]) -> None:
+    """An extra axis keeps the band count, so only the rank check pins it.
+
+    A ``(bands, 2)`` absorption area counts sixteen bands like a sound one and
+    reaches the fiche intact, where the cell formatter meets an array in place
+    of a number and raises ``TypeError: only 0-dimensional arrays can be
+    converted to Python scalars``, naming neither the field nor the result.
+    """
+    res = build()
+    stacked = np.column_stack([res.absorption, res.absorption])
+    with pytest.raises(ValueError, match="'absorption' must have one axis"):
+        dataclasses.replace(res, absorption=stacked)
 
 
 def test_plot_without_rating_raises() -> None:

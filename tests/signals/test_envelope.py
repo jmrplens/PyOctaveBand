@@ -11,6 +11,8 @@ the plain-subsampling decimation with the ECMA-internal convention.
 
 from __future__ import annotations
 
+import dataclasses
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -175,6 +177,37 @@ def test_result_is_frozen() -> None:
     res = ph.signals.envelope(_tone(1000.0), FS)
     with pytest.raises(AttributeError):
         res.envelope = res.envelope * 2.0  # type: ignore[misc]
+
+
+def test_envelope_outputs_must_lie_on_one_time_axis() -> None:
+    """An output off the decimated time axis is refused when built.
+
+    ``phase`` is the one nothing reads: the plot draws the envelope on the
+    upper panel and the instantaneous frequency on the lower one, so a phase
+    of another length, short or long, reaches the caller whole, indexed by a
+    time axis it was not measured on. The other three are loud when drawn,
+    but only as matplotlib's complaint about two first dimensions, naming
+    neither field. An extra axis is silent throughout: it passes every count,
+    and on the three that are drawn it lands on the figure as a second,
+    unannounced curve.
+    """
+    good = ph.signals.envelope(_am(1000.0, 10.0, 0.5)[0], FS, decimation_factor=4)
+    per_sample = "one value per output sample"
+    for field in ("times", "envelope", "phase", "instantaneous_frequency"):
+        value = np.asarray(getattr(good, field))
+        cases = (
+            (value[:-1], per_sample),
+            (np.append(value, value[-1]), per_sample),
+            (np.column_stack([value] * 2), "must have one axis"),
+        )
+        for wrong, fragment in cases:
+            with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+                dataclasses.replace(good, **{field: wrong})
+    # The record keeps its own full-rate axis, so its length is deliberately
+    # free of the four above; its rank is pinned all the same.
+    stacked_record = np.column_stack([good.signal] * 2)
+    with pytest.raises(ValueError, match="'signal'.*must have one axis"):
+        dataclasses.replace(good, signal=stacked_record)
 
 
 # ---------------------------------------------------------------------------
@@ -347,6 +380,37 @@ def test_envelope_spectrum_validates_inputs() -> None:
         ph.signals.envelope_spectrum(x, FS, nfft=100)
     with pytest.raises(ValueError, match="fs"):
         ph.signals.envelope_spectrum(x, -1.0)
+
+
+def test_envelope_spectrum_panels_must_lie_on_their_own_axes() -> None:
+    """Each panel's pair is refused when built, not when drawn.
+
+    The two halves of the Figure 13.11 chain are measured on axes of
+    different lengths -- the detected envelope over the record's samples,
+    its spectrum over the transform's bins -- so each pair is pinned only
+    against its own companion. A length disagreement inside a pair is loud
+    when the panel is drawn, but only as matplotlib's complaint about two
+    first dimensions, naming neither field; an extra axis is silent, and
+    reaches the panel as a second, unannounced curve.
+    """
+    good = ph.signals.envelope_spectrum(_am_signal(), FS)
+    assert good.frequencies.size != good.times.size  # two axes, not one
+    pairs = (
+        ("frequencies", "one value per frequency"),
+        ("amplitude", "one value per frequency"),
+        ("times", "one value per sample"),
+        ("envelope", "one value per sample"),
+    )
+    for field, per_entry in pairs:
+        value = np.asarray(getattr(good, field))
+        cases = (
+            (value[:-1], per_entry),
+            (np.append(value, value[-1]), per_entry),
+            (np.column_stack([value] * 2), "must have one axis"),
+        )
+        for wrong, fragment in cases:
+            with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+                dataclasses.replace(good, **{field: wrong})
 
 
 def test_envelope_spectrum_plot_two_panels_and_external_ax() -> None:

@@ -229,6 +229,31 @@ def test_fewer_absorption_areas_than_level_rows_is_refused() -> None:
         dataclasses.replace(result, absorption_areas=result.absorption_areas[:-1])
 
 
+def test_fewer_talkers_than_level_columns_is_refused() -> None:
+    """The occupancy axis is the one that used to reach the reader as shapes.
+
+    A slipped column count travelled all the way into matplotlib, which
+    complains about a first dimension of 19 against one of 20 and names
+    neither the field nor the result it came from.
+    """
+    result = room.crowd_noise([20.0, 90.0, 190.0])
+    short_axis = result.talkers[:-1]
+    with pytest.raises(ValueError, match="'talkers'"):
+        dataclasses.replace(result, talkers=short_axis)
+
+
+def test_extra_axis_on_the_level_grid_is_refused() -> None:
+    """An axis on top of the two is the slip nothing downstream notices.
+
+    A grid shaped ``(areas, talkers, 1)`` passes both counts and plots the
+    same curves a two-dimensional one would, so the rank is pinned here.
+    """
+    result = room.crowd_noise([20.0, 90.0, 190.0])
+    stacked = result.levels[..., None]
+    with pytest.raises(ValueError, match="'levels' must have 2 axes"):
+        dataclasses.replace(result, levels=stacked)
+
+
 @pytest.mark.parametrize(
     ("call", "match"),
     [

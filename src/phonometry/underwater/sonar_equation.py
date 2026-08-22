@@ -46,7 +46,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_ranks, require_same_length
+from .._internal.validation import require_same_shape
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -141,26 +141,31 @@ class SonarEquationResult:
         ``res.propagation_loss[i]``, so an offset one is wrong by an ordinary
         number of decibels with nothing downstream to disagree.
 
-        The ranks are pinned as well as the lengths, because a count cannot
-        see an extra axis. ``_finite_array`` widens a scalar and never narrows
-        a grid, so before this check a two-dimensional ``propagation_loss``
-        handed to either entry point came back as three arrays of that same
-        shape, first axes agreeing perfectly. The plot's sort then indexed a
-        ``(3, 2)`` pair into a ``(3, 2, 2)`` one, and matplotlib refused that
-        with ``x and y can be no greater than 2D, but have shapes (3, 2, 2)
-        and (3, 2, 2)`` -- its own complaint, about two shapes that appear
-        nowhere in the result.
+        The three are held to one shape rather than to one length, and no rank
+        is pinned. A loss over a grid of depth and range is exactly what
+        ``gaussian_beams`` and ``parabolic_equation`` hand back, and feeding it
+        here is how a detection footprint is drawn, so refusing a second axis
+        would refuse the library's own output. A length check is not enough
+        either: ``_finite_array`` widens a scalar and never narrows a grid, so
+        a ``(3, 2)`` loss beside a ``(3, 4)`` excess agrees on the only axis
+        such a check counts and disagrees about every value.
+
+        What the shape check does not cover is the figure. ``.plot()`` sorts by
+        propagation loss and cannot draw a grid: it indexes the ``(3, 2)`` pair
+        into a ``(3, 2, 2)`` one and matplotlib refuses with ``x and y can be
+        no greater than 2D``. That is a limit of the plot, not a disagreement
+        between the fields, and a detection map is read as numbers rather than
+        drawn as a curve.
 
         :raises ValueError: if the three quantities disagree in length, or
             one carries an axis the loss axis does not.
         """
-        require_ranks(self, propagation_loss=1, signal_excess=1, snr=1)
-        require_same_length(
+        require_same_shape(
             self,
             "propagation_loss",
             "signal_excess",
             "snr",
-            axis="propagation loss",
+            quantity="propagation loss",
         )
 
     def plot(

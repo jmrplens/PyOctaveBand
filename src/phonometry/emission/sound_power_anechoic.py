@@ -292,14 +292,24 @@ class PrecisionSoundPowerResult:
     def __post_init__(self) -> None:
         """Reject a determination whose per-band quantities disagree.
 
-        The fiche takes its row count from ``sound_power_level`` and its row
-        labels from ``frequencies``, so a longer band axis labels the rows
-        with the first of its centres and drops the rest without a word,
-        while the boxed A-weighted total was summed at construction over the
-        whole spectrum and states a number for bands the table beside it does
-        not show. The meteorological ``C3`` reaches the measurement-basis
-        strip as a range rather than as a column, and a range is well formed
-        whatever set of bands it was taken over.
+        The fiche takes its row count from ``sound_power_level`` and reads
+        that many entries of the columns beside it, so a surplus band in
+        ``surface_pressure_level`` or ``mean_pressure_level`` is dropped
+        without a word from a sheet that still looks complete, and
+        ``non_uniformity_index`` and ``uncertainty_bands`` are not opened by
+        the fiche at all, leaving whoever reads them to line them up against
+        ``frequencies`` unaided. The meteorological ``C3`` is the surplus
+        that does print: it reaches the measurement-basis strip as a range
+        over the whole array rather than as a column, so an extra band widens
+        the stated ``C3`` to cover a band the table beside it does not show.
+        The pair that does raise is ``frequencies`` against
+        ``sound_power_level``, and it raises in the wrong place: the table
+        indexes its row labels off the end of the shorter of the two, or the
+        embedded spectrum asks for one bar per level at one position per
+        centre frequency and matplotlib refuses two arrays it cannot
+        broadcast. Either complaint names a row index or a bar coordinate
+        rather than the field that was wrong, and it arrives after the table
+        has been built and before any page is written.
 
         ``background_correction`` and ``directivity_index`` carry the
         microphone positions on their first axis and the bands on their

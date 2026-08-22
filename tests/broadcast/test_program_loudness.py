@@ -11,6 +11,8 @@ the EBU and cannot be synthesized, so they are not reproduced here.
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 import numpy as np
 import pytest
 from reference_data import (
@@ -187,6 +189,14 @@ def test_k_weighting_response_rejects_bad_input() -> None:
         k_weighting_response(48000.0, frequencies=[])
     with pytest.raises(ValueError, match=r"\(0, fs/2\]"):
         k_weighting_response(48000.0, frequencies=[30000.0])
+
+
+def test_k_weighting_response_rejects_curve_off_the_grid() -> None:
+    """A curve of another length is refused where the response is built."""
+    res = k_weighting_response(48000.0, n=64)
+    short = res.shelf_db[:-1]
+    with pytest.raises(ValueError, match="'shelf_db'"):
+        replace(res, shelf_db=short)
 
 
 def test_k_weighting_response_plot() -> None:
@@ -583,6 +593,21 @@ def test_result_fields_and_series_geometry() -> None:
     # A frozen result: attributes cannot be reassigned.
     with pytest.raises(AttributeError):
         res.integrated = 0.0  # type: ignore[misc]
+
+
+def test_result_rejects_weights_that_miss_a_channel() -> None:
+    """The channel axis is the one no reader downstream would flag.
+
+    A weight vector shorter than the channel count renders a complete fiche
+    without a word, headlining a true peak for a channel the programme
+    loudness never weighted, so the pair is checked where the result is built.
+    """
+    x = np.vstack([_sine(lvl, 5.0) for lvl in EBU_TECH3341_CASE6_LEVELS])
+    res = program_loudness(x, FS)
+    assert res.true_peak_per_channel.shape == res.channel_weights.shape
+    short = res.channel_weights[:-1]
+    with pytest.raises(ValueError, match="'channel_weights'"):
+        replace(res, channel_weights=short)
 
 
 def test_program_loudness_matches_integrated_loudness() -> None:

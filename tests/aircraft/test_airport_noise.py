@@ -8,6 +8,8 @@ decrease with distance, and the terminal-segment extrapolation.
 
 from __future__ import annotations
 
+import dataclasses
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -88,6 +90,25 @@ def test_npd_curve_result_and_plot() -> None:
     # tabulated levels at P=1500 are the row means
     assert np.allclose(res.table_levels, [105.0, 99.0, 93.0, 87.0])
     assert res.plot() is not None
+
+
+def test_npd_curve_levels_are_pinned_to_their_own_distances() -> None:
+    """Each level array is refused unless it covers the distances beside it.
+
+    The sweep and the tabulated points are independent axes, and a level array
+    short of its own distances surfaces only at ``ax.plot``, as "x and y must
+    have same first dimension" over two bare shapes: which field was short, and
+    which of the two axes it belonged to, are left for the reader to work out.
+    """
+    res = npd_curve(_P, _D, _L, 1500.0)
+    short_sweep = res.level[:-1]
+    with pytest.raises(ValueError, match=r"'level'.*one value per query distance"):
+        dataclasses.replace(res, level=short_sweep)
+    short_table = res.table_levels[:-1]
+    with pytest.raises(
+        ValueError, match=r"'table_levels'.*one value per tabulated distance"
+    ):
+        dataclasses.replace(res, table_levels=short_table)
 
 
 def test_invalid_table_rejected() -> None:
@@ -254,6 +275,33 @@ def test_flyover_plot() -> None:
     assert isinstance(res, FlyoverResult)
     assert res.segment_levels.size == 200
     assert res.plot() is not None
+
+
+def test_flyover_arrays_are_refused_a_second_axis() -> None:
+    """Neither event array may be built with an axis it should not have.
+
+    A two-dimensional ``segment_levels`` reaches ``ax.bar`` as heights against
+    a flat bar index and fails there, in Matplotlib's words rather than the
+    library's; a two-dimensional ``observer`` is read by nothing at all and
+    would reach the caller unnoticed.
+    """
+    xs = np.linspace(-20000.0, 20000.0, 21)
+    path = np.column_stack(
+        [
+            xs,
+            np.zeros_like(xs),
+            np.full_like(xs, 300.0),
+            np.full_like(xs, 10000.0),
+            np.full_like(xs, _VREF),
+        ]
+    )
+    res = event_level(path, [0.0, 300.0, 0.0], _NP, _ND, _NSEL, _NMAX)
+    stacked_levels = np.column_stack([res.segment_levels] * 2)
+    with pytest.raises(ValueError, match=r"'segment_levels' must have one axis"):
+        dataclasses.replace(res, segment_levels=stacked_levels)
+    stacked_observer = np.column_stack([res.observer] * 2)
+    with pytest.raises(ValueError, match=r"'observer' must have one axis"):
+        dataclasses.replace(res, observer=stacked_observer)
 
 
 def test_event_level_farther_receiver_is_quieter() -> None:
@@ -432,6 +480,21 @@ def test_event_level_ground_roll_applies_directivity() -> None:
     assert prop_roll != pytest.approx(jet_roll)  # different SOR curves
 
 
+def test_segment_state_fields_must_cover_the_same_segments() -> None:
+    """A bundle whose own fields disagree is refused where it is put together.
+
+    The event entry points compare each field against the path they were handed
+    and only there, one at a time, so an inconsistent bundle is blamed on
+    whichever field happens to be validated first, and blamed afresh for every
+    path it is reused with. The count is of values, not of shape: a column of
+    one value per segment is ravelled by the entry points and accepted here.
+    """
+    with pytest.raises(ValueError, match=r"'bank'.*one value per segment"):
+        FlightSegmentState(ground_roll=[True, False, False], bank=[0.0, 8.0])
+    column = FlightSegmentState(bank=np.array([[0.0], [4.0], [8.0]]))
+    assert np.size(column.bank) == 3
+
+
 @pytest.mark.parametrize(("q", "length", "le_minus_lmax", "df_ref"), _WB_NOISE_FRACTION)
 def test_reference_workbook_noise_fraction(
     q: float,
@@ -498,6 +561,46 @@ def test_noise_contour_shape_and_plot() -> None:
     iy0 = int(np.argmin(np.abs(res.y)))
     assert np.max(res.level[iy0]) > np.max(res.level[0])
     assert res.plot() is not None
+
+
+def test_noise_contour_grid_is_pinned_to_both_axes() -> None:
+    """A grid that does not cover the x and y beside it is refused when built.
+
+    ``contourf`` does raise on a grid off by a row or a column, but with a
+    ``TypeError`` that compares a bare length with a count of rows and names
+    neither the result nor the field; a grid flattened to one axis raises there
+    about a dimension, equally anonymously.
+    """
+    xs = np.linspace(0.0, 15000.0, 12)
+    path = np.column_stack(
+        [
+            xs,
+            np.zeros_like(xs),
+            np.clip(xs * 0.1, 0.0, 2000.0),
+            np.full_like(xs, 10000.0),
+            np.full_like(xs, _VREF),
+        ]
+    )
+    res = noise_contour(
+        path,
+        _NP,
+        _ND,
+        _NSEL,
+        _NMAX,
+        x=np.linspace(-2000.0, 16000.0, 7),
+        y=np.linspace(-4000.0, 4000.0, 5),
+    )
+    short_rows = res.level[:-1]
+    with pytest.raises(ValueError, match=r"'level'.*one value per grid row"):
+        dataclasses.replace(res, level=short_rows)
+    short_columns = res.level[:, :-1]
+    with pytest.raises(
+        ValueError, match=r"'level \(axis 1\)'.*one value per grid column"
+    ):
+        dataclasses.replace(res, level=short_columns)
+    flattened = res.level.ravel()
+    with pytest.raises(ValueError, match=r"'level' must have 2 axes"):
+        dataclasses.replace(res, level=flattened)
 
 
 def test_event_level_invalid_inputs() -> None:

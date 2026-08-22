@@ -121,13 +121,16 @@ class EnclosureResult:
         The enclosure fiche prints one row per band -- nominal frequency, panel
         ``R``, correction ``C`` and net ``IL`` side by side, with the interior
         room constant ``R_i`` added in the verbose table -- and it sizes that
-        table from ``insertion_loss`` alone, while the boxed figures average
-        each column whole. A panel ``R`` one entry longer than the ``IL`` is
-        therefore truncated out of the printed rows and still counted in the
-        mean, so the sheet states a mean ``R`` that the column above it does
-        not average to. A column one entry *short* hides differently: an
-        ``R_i`` short of a band renders an ordinary-looking plain sheet and
-        fails only when someone asks for the verbose one.
+        table from ``insertion_loss`` alone. Of those columns only ``R_i``
+        stays out of the embedded figure, which is what makes it the one that
+        hides: the sheet draws this result's own plot, where ``R``, ``C`` and
+        ``IL`` share a single x axis, so one of them off the ``IL`` length
+        raises from matplotlib as the figure is drawn and no PDF is written at
+        all. An ``R_i`` one entry *long* fills every printed row from a column
+        that runs over other bands -- carry an extra band at the front and
+        each row states the previous band's ``R_i`` -- while one entry *short*
+        renders an ordinary-looking plain sheet and fails only when someone
+        asks for the verbose one.
 
         :raises ValueError: if the per-band quantities disagree, or one of them
             carries an extra axis.

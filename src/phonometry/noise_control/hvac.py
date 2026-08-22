@@ -458,12 +458,26 @@ class HvacSpectrumResult:
         """Reject a spectrum whose values do not run over its own bands.
 
         The HVAC fiche takes the number of rows it prints from ``values`` and
-        the nominal frequency labelling each one from ``frequencies``, so the
-        two lengths have to be the same for a row to say which band it is. One
-        value short and the sheet simply stops before the last band the result
-        names, boxing a mean attenuation over the bands that survived rather
-        than the ones the caption declares; one value long and the rows run
-        past the last label there is.
+        the nominal frequency labelling each one from ``frequencies``, and the
+        figure it embeds is the one ``plot()`` draws, one array against the
+        other. Between them no length disagreement gets through in either
+        direction; what it buys is an exception a long way from the mistake,
+        and no sheet at all. More values than frequencies runs the row loop
+        past the last label and raises ``IndexError: list index out of range``
+        from inside the table builder, naming no field. Fewer, and the table
+        would print a short sheet, but the figure refuses first, with
+        matplotlib's ``x and y must have same first dimension, but have
+        shapes (6,) and (5,)``: two bare shapes, naming neither the result nor
+        which array is which. A sound-power spectrum dies earlier still, on the
+        A-weighting corrections read at the band centres, with ``operands could
+        not be broadcast together with shapes (7,) (8,)``.
+
+        The extra axis is the silent one. A ``values`` of shape ``(bands, 2)``
+        counts one entry per band, so every length agrees, and ``plot()`` draws
+        each column as an ordinary curve and hands back axes carrying two
+        spectra and the same legend entry twice. Only the fiche notices, with
+        ``TypeError: only 0-dimensional arrays can be converted to Python
+        scalars`` raised while formatting the first row.
 
         :raises ValueError: if ``values`` does not carry one entry per band, or
             either field carries an extra axis.

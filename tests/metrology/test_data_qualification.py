@@ -17,6 +17,8 @@ Clean-room oracles from Bendat & Piersol, *Random Data* 4e:
 
 from __future__ import annotations
 
+import dataclasses
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -342,6 +344,35 @@ def test_level_crossing_default_levels_and_validation() -> None:
     nan_levels = [0.0, np.nan]
     with pytest.raises(ValueError, match="finite"):
         ph.metrology.level_crossing_rate(x, FS, levels=nan_levels)
+
+
+def test_rice_rates_of_another_length_than_the_levels_are_refused() -> None:
+    """A Rice curve longer than the levels is the silent direction.
+
+    The figure indexes ``rice_rates`` with ``argsort(levels)``, which reaches
+    as many entries as there are levels and no more: an expectation sampled on
+    a finer grid is drawn as an arbitrary prefix of itself, under the label
+    "Rice expectation (Eq. 5.196)", beside markers measured against another
+    grid entirely. On the record below the prefix drawn was 2317, 2246, 2043,
+    1745, 1400 crossings per second where the expectation at those five levels
+    is 2317, 2042, 1397, 742, 306: a curve hugging the markers instead of
+    falling away from them, which reads as a near-perfect fit and so defeats
+    the non-Gaussianity screen the comparison exists for. The other direction
+    is loud but anonymous, an ``IndexError`` about an out-of-bounds index
+    raised from inside the renderer, naming neither array. Both are refused
+    when the result is built now.
+    """
+    rng = np.random.default_rng(0)
+    x = rng.standard_normal(20000)
+    levels = [0.0, 0.5, 1.0, 1.5, 2.0]
+    res = ph.metrology.level_crossing_rate(x, 4000.0, levels=levels)
+    fine = np.linspace(0.0, 2.0, 9)
+    finer = res.zero_crossing_rate_rice * np.exp(-(fine**2) / (2.0 * res.sigma**2))
+    with pytest.raises(ValueError, match=r"'rice_rates'.*one value per level"):
+        dataclasses.replace(res, rice_rates=finer)
+    coarser = res.rice_rates[:-1]
+    with pytest.raises(ValueError, match=r"'rice_rates'.*one value per level"):
+        dataclasses.replace(res, rice_rates=coarser)
 
 
 # ---------------------------------------------------------------------------

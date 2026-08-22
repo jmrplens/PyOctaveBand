@@ -499,15 +499,26 @@ class ImpulsiveSoundResult:
     adjusted_laeq: float
 
     def __post_init__(self) -> None:
-        """Reject a trace whose levels and time axis are of different lengths.
+        """Reject a trace whose levels and time axis do not line up.
 
-        The result holds two accounts of when its samples were taken: the
-        times, and the ``dt`` the onsets were located and timed with. The two
-        are the same account only while there is one time per level. Where
-        there is not, the figure draws the trace on one of them and marks the
-        onsets on the other, and the governing onset -- the one the category
-        and the ``KI`` adjustment come from -- is annotated at a moment the
-        curve beneath it never reaches.
+        The figure is the one place either array is read again, in the call
+        that opens it, ``ax.plot(result.times, result.levels, ...)``, and the
+        two ways of disagreeing land very differently there.
+
+        A length mismatch is not the silent one. Measured without this guard,
+        matplotlib refuses it in both directions, "x and y must have same
+        first dimension, but have shapes (100,) and (99,)", and since the
+        trace is the first thing drawn nothing beyond it is reached: no onset
+        mark, no governing annotation, no labelled axes. What the guard adds
+        there is the name of the field that is wrong, at the point the result
+        is built, in place of two bare shapes raised from inside a drawing
+        call by whoever happened to plot it.
+
+        The silent one is the extra axis. A ``levels`` of shape ``(n, 2)``
+        draws without a word, one line per column, so the figure comes back
+        with a second trace over the onsets that is no level history at all,
+        both entries in the legend named ``LpAF``, and the level axis widened
+        to take the intruder in.
 
         :raises ValueError: if ``times`` and ``levels`` disagree.
         """

@@ -165,17 +165,21 @@ class RoomAcousticsResult:
         ``t30`` and reading every other parameter at that row's index, with
         the band label of the row taken from ``frequency``. A parameter one
         entry longer than the rest is dropped off the end of the table; one
-        entry shorter raises an index error from inside reportlab, naming
-        neither the field nor the two lengths. Worse than either, the boxed
-        mid-frequency reverberation time is read by looking the 500 Hz and
-        1000 Hz bands up in ``frequency`` and taking ``t30`` at the index
-        found there, so a band axis that has slipped against the parameters
-        quotes another band's decay time under the "500-1000 Hz" label, on a
-        sheet whose verdict row then compares that number with the target.
+        entry shorter raises an index error out of the row builder itself,
+        while the rows are still plain lists, naming neither the field nor
+        the two lengths. Worse than either, the boxed mid-frequency
+        reverberation time is read by looking the 500 Hz and 1000 Hz bands up
+        in ``frequency`` and taking ``t30`` at the index found there, so a
+        band axis that has slipped against the parameters quotes another
+        band's decay time under the "500-1000 Hz" label, on a sheet that
+        renders without complaint and whose verdict row then compares that
+        number with the target.
 
         The validity flags travel the same axis: the plot greys and hatches
-        the bars of the bands they reject, and a flag array of another length
-        greys the wrong ones.
+        the bars of the bands they reject, pairing each bar with its flag
+        under a strict zip, so a flag array of another length stops the
+        drawing part-way through in either direction, leaving the bars it had
+        already reached on whatever axes the caller passed in.
 
         :raises ValueError: if any per-band array disagrees with the rest.
         """

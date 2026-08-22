@@ -530,13 +530,23 @@ class EPNLResult:
 
         The certification sheet states PNLTM, the duration correction and the
         10 dB-down record window over the result's own PNLT-versus-time figure,
-        and that figure draws both histories against ``times`` and shades the
-        window between ``times[kF]`` and ``times[kL]``. Let the histories
-        disagree and the sheet is not produced at all: matplotlib refuses an x
-        and a y of different first dimensions, from inside the render, naming
-        neither the field nor the axis it was counting. Raising here says which
-        of the four disagreed, and says it before a determination nobody can
-        report has been handed on as one.
+        and that figure draws ``pnl`` and ``pnlt`` against ``times`` and shades
+        the window between ``times[kF]`` and ``times[kL]``. Let one of those
+        three disagree and the sheet is not produced at all: matplotlib refuses
+        an x and a y of different first dimensions, or the window index runs
+        off the end of ``times``, from inside the render and naming neither the
+        field nor the axis it was counting.
+
+        ``tone_correction`` is held to the same length for the opposite
+        reason: nothing downstream measures it at all. The figure never draws
+        it and the fiche never prints it, so a tone-correction history of
+        another length than the records is silent in both directions -- one
+        short or one long, the figure is drawn and the PDF written without
+        complaint, and the field travels on to whoever reads it record by
+        record with its corrections against the wrong records.
+
+        Raising here says which of the four disagreed, and says it before a
+        determination nobody can report has been handed on as one.
 
         ``frequencies`` is deliberately outside the group. It runs over the 24
         one-third-octave bands the noy law is tabulated on, not over the

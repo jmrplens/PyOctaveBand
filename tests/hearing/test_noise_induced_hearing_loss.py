@@ -12,6 +12,8 @@ most-susceptible tenth (fractile 0.9 here) and its 90 % column the least
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pytest
 from reference_data import (
@@ -229,6 +231,33 @@ def test_inside_validated_domain_is_silent() -> None:
         warnings.simplefilter("error", m.NoiseInducedHearingLossWarning)
         m.nipts(100.0, 1.0, 0.05)
         m.nipts(100.0, 40.0, 0.95)
+
+
+def test_nipts_rejects_a_fractile_spectrum_of_another_length() -> None:
+    """``value`` is the one spectrum the median fiche never draws.
+
+    At the default fractile the plot shows the median and its band alone, so a
+    ``value`` computed on another frequency grid reaches a finished sheet: the
+    table drops its tail without a word and the boxed 2/3/4 kHz mean, with the
+    PASS/FAIL verdict read off it, comes from the wrong positions.
+    """
+    result = m.nipts(95.0, 20.0)
+    on_another_grid = np.append(result.value, [12.0, 9.0])
+    with pytest.raises(ValueError, match="'value'"):
+        dataclasses.replace(result, value=on_another_grid)
+
+
+def test_htlan_rejects_a_component_of_another_length() -> None:
+    """The three components are combined, tabulated and drawn by position.
+
+    None of them reaches a finished sheet at the wrong length, but without this
+    check the complaint is an ``IndexError`` from inside the fiche table or a
+    shape mismatch from inside matplotlib, neither of which names the field.
+    """
+    result = m.htlan(60, "male", 95.0, 20.0, 0.5)
+    one_frequency_short = result.nipts[:-1]
+    with pytest.raises(ValueError, match="'nipts'"):
+        dataclasses.replace(result, nipts=one_frequency_short)
 
 
 def test_plots_return_axes() -> None:

@@ -68,6 +68,15 @@ pr_comment_body.md
 !tests/data/audio/**/*.wav
 !tests/data/audio/**/*.WAV
 tests/*.png
+# Figures written next to whatever was being run. Every figure the project
+# keeps is generated into its own directory by scripts/, so a PNG at the root
+# is a scratch file that was committed by accident.
+/*.png
+# One JUnit report per matrix job, written by the test run and uploaded as a
+# workflow artifact. The comment step downloads them; nothing reads a copy
+# committed here.
+test-results-*/
+test-results-*.xml
 snyk.sarif
 issues_final*.json
 node_modules/

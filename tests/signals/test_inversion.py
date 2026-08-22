@@ -16,6 +16,8 @@ Validation strategy (closed-form, not self-consistency):
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pytest
 from scipy import signal
@@ -180,6 +182,36 @@ def test_rejects_bad_inputs() -> None:
     all_zero = np.zeros(64)
     with pytest.raises(ValueError, match="zero"):
         signals.regularized_inverse_filter(all_zero, FS, f_range=(200.0, 4000.0))
+
+
+def test_design_must_lie_on_one_frequency_grid() -> None:
+    """A design off its own grid is refused when built, not when drawn.
+
+    ``plot_inverse_filter`` masks every magnitude with the positive-frequency
+    mask taken from ``frequencies``, so a mismatched ``frequencies``,
+    ``spectrum`` or ``response_spectrum`` already stops the figure there --
+    ``IndexError`` from the boolean index, or ``ValueError`` from the
+    product, naming neither field. ``regularization`` is the silent one: no
+    renderer opens it, and a profile short, long or a single bin wide draws
+    the whole figure without a word. An extra axis is silent too, and
+    doubles the ``size`` the result reports.
+    """
+    res = signals.regularized_inverse_filter(_biquad_ir(), FS, f_range=(500.0, 8000.0))
+    per_bin = "one value per frequency"
+    one_axis = "must have one axis"
+    cases = (
+        ("regularization", res.regularization[:-1], per_bin),
+        ("regularization", np.append(res.regularization, 1.0), per_bin),
+        ("regularization", res.regularization[:1], per_bin),
+        ("frequencies", res.frequencies[:-1], per_bin),
+        ("spectrum", res.spectrum[:1], per_bin),
+        ("response_spectrum", res.response_spectrum[:-1], per_bin),
+        ("inverse", np.column_stack([res.inverse] * 2), one_axis),
+        ("regularization", np.column_stack([res.regularization] * 2), one_axis),
+    )
+    for field, value, fragment in cases:
+        with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+            dataclasses.replace(res, **{field: value})
 
 
 def test_apply_rejects_non_1d() -> None:

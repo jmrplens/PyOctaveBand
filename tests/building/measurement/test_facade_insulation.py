@@ -21,6 +21,8 @@ quantities are defined by unnumbered formulas inline in the Clause 3 terms.
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pytest
 
@@ -280,6 +282,23 @@ def test_invalid_method_on_result_raises() -> None:
             r_prime=None,
             method="typo",
         )
+
+
+def test_a_companion_quantity_of_another_length_is_refused() -> None:
+    """The fiche reports one quantity and counts that curve alone.
+
+    A ``D2m`` one band longer than the ``D2m,nT`` beside it never reaches the
+    ISO 16283-3 sheet, which reads the reported quantity only, so a report of
+    ``D2m,nT`` comes out clean and says nothing about the disagreement. The
+    plot is what pairs them, and all it answers with is matplotlib's shape
+    message, which names neither the field nor the result.
+    """
+    result = building.facade_insulation(
+        _flat(16, 90.0), _flat(16, 50.0), _flat(16, 0.6), volume=50.0
+    )
+    longer = np.append(result.d_2m, 99.9)
+    with pytest.raises(ValueError, match="'d_2m' \\(17\\).*per band"):
+        dataclasses.replace(result, d_2m=longer)
 
 
 def test_nonfinite_raises() -> None:

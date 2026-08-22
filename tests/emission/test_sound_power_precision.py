@@ -377,6 +377,59 @@ def test_anechoic_areas_wrong_length_raises() -> None:
         sound_power_anechoic(levels, "sphere", radius=1.0, areas=short_areas)
 
 
+# --------------------------------------------------------------------------
+# Per-band and per-position quantities that do not run over their own axis
+# --------------------------------------------------------------------------
+def _forty_position_determination() -> PrecisionSoundPowerResult:
+    """A forty-position, four-band ISO 3745 hemi-anechoic determination."""
+    freqs = np.array([250.0, 500.0, 1000.0, 2000.0])
+    return sound_power_anechoic(
+        np.full((40, freqs.size), 74.0), "hemisphere", radius=2.0, frequencies=freqs
+    )
+
+
+@pytest.mark.parametrize("trim", [True, False], ids=["short", "long"])
+def test_a_per_band_column_off_the_band_axis_is_refused(trim: bool) -> None:
+    """``uncertainty_bands`` is per band and nothing downstream says so.
+
+    The fiche never opens the column, so a length other than the band axis
+    reaches no reader that could complain: the sheet renders complete with
+    the surplus value nowhere on it.
+    """
+    import dataclasses
+
+    result = _forty_position_determination()
+    values = result.uncertainty_bands
+    wrong = values[:-1] if trim else np.append(values, values[-1])
+    with pytest.raises(ValueError, match="'uncertainty_bands'"):
+        dataclasses.replace(result, uncertainty_bands=wrong)
+
+
+def test_the_background_correction_is_pinned_on_its_band_axis() -> None:
+    """``background_correction`` is positions by bands: axis 1 carries them."""
+    import dataclasses
+
+    result = _forty_position_determination()
+    with pytest.raises(ValueError, match=r"'background_correction \(axis 1\)'"):
+        dataclasses.replace(
+            result, background_correction=result.background_correction[:, :-1]
+        )
+
+
+def test_the_microphone_position_axis_is_pinned() -> None:
+    """K1i (Eq. 11) and DIi (Eq. 21) both describe the same position i.
+
+    Two position counts leave no position to read them side by side, and the
+    fiche states neither, so unguarded the mismatch reaches the sheet as no
+    difference at all.
+    """
+    import dataclasses
+
+    result = _forty_position_determination()
+    with pytest.raises(ValueError, match=r"'directivity_index'.*microphone position"):
+        dataclasses.replace(result, directivity_index=result.directivity_index[:-1])
+
+
 # ==========================================================================
 # ISO 9614-3 - sound power by intensity scanning (Eq. 5/8/9/10)
 # ==========================================================================
@@ -670,6 +723,109 @@ def test_field_indicators_shape_mismatch_raises() -> None:
         match="'segment_intensity' and 'segment_pressure_levels' must have",
     ):
         precision_field_indicators(intensity, mismatched_levels)
+
+
+# ==========================================================================
+# ISO 9614-3 - quantities pinned to their own axis at construction
+# ==========================================================================
+def _four_band_determination() -> PrecisionIntensityResult:
+    """A four-segment, four-band determination from the public entry point."""
+    areas = np.array([0.5, 1.0, 0.25, 2.0])
+    intensity = np.full((areas.size, 4), 1.0e-4 / float(np.sum(areas)))
+    return sound_power_intensity_precision(
+        intensity, areas, frequencies=np.array([250.0, 500.0, 1000.0, 2000.0])
+    )
+
+
+def _four_band_indicators() -> PrecisionFieldIndicators:
+    """Annex B indicators over four bands, from the public entry point."""
+    i_n = np.tile(np.array([[1.0e-6], [2.0e-6], [1.5e-6], [1.2e-6]]), (1, 4))
+    lp = np.full((4, 4), 62.0)
+    return precision_field_indicators(i_n, lp)
+
+
+@pytest.mark.parametrize(
+    "field_name",
+    [
+        "frequencies",
+        "sound_power",
+        "sound_power_level",
+        "sound_power_level_normalized",
+        "not_applicable_band",
+    ],
+)
+@pytest.mark.parametrize("trim", [True, False], ids=["short", "long"])
+def test_a_determination_column_off_the_band_axis_is_refused(
+    field_name: str, trim: bool
+) -> None:
+    """Every per-band quantity of the determination is pinned at construction.
+
+    ``sound_power`` is why the long direction matters as much as the short
+    one: the sheet prints the level, and the signed band total in watts is
+    the one column no reader in the library opens, so a band too many rides
+    all the way through a complete fiche.
+    """
+    import dataclasses
+
+    result = _four_band_determination()
+    values = np.asarray(getattr(result, field_name))
+    wrong = values[:-1] if trim else np.append(values, values[-1])
+    with pytest.raises(ValueError, match=f"'{field_name}'"):
+        dataclasses.replace(result, **{field_name: wrong})
+
+
+def test_partial_power_off_the_band_axis_is_refused() -> None:
+    """Partial powers run over surfaces on axis 0 and over bands on axis 1."""
+    import dataclasses
+
+    result = _four_band_determination()
+    three_bands = result.partial_power[:, :-1]
+    with pytest.raises(ValueError, match=r"'partial_power \(axis 1\)'"):
+        dataclasses.replace(result, partial_power=three_bands)
+
+
+def test_a_field_indicator_off_the_band_axis_is_refused() -> None:
+    """FS read on one band cannot stand in for a four-band spectrum (Eq. B.8)."""
+    import dataclasses
+
+    indicators = _four_band_indicators()
+    one_band_fs = indicators.fs[:1]
+    with pytest.raises(ValueError, match="'fs'"):
+        dataclasses.replace(indicators, fs=one_band_fs)
+
+
+def test_criteria_from_a_one_band_scan_pair_are_refused() -> None:
+    """Criterion 1 comes from the scan levels, the others from the indicators.
+
+    Nothing compares the two, so a repeatability pair read on a single band
+    (Eq. C.1) would otherwise decide 'qualified' for all four of them.
+    """
+    indicators = _four_band_indicators()
+    one_band_scan = np.array([70.0])
+    with pytest.raises(ValueError, match="'criterion_1'"):
+        precision_qualification(
+            indicators,
+            scan_intensity_level_1=one_band_scan,
+            scan_intensity_level_2=one_band_scan,
+            pressure_residual_index=14.0,
+            frequencies=np.array([1000.0]),
+        )
+
+
+def test_criterion_5_off_the_band_axis_is_refused() -> None:
+    """Criterion 5 rescues a band from criterion 4 (C.1.6.2) band by band."""
+    import dataclasses
+
+    indicators = _four_band_indicators()
+    criteria = precision_qualification(
+        indicators,
+        field_nonuniformity_1=indicators.fs.copy(),
+        field_nonuniformity_2=indicators.fs.copy(),
+    )
+    assert criteria.criterion_5 is not None
+    one_band_criterion_5 = criteria.criterion_5[:1]
+    with pytest.raises(ValueError, match="'criterion_5'"):
+        dataclasses.replace(criteria, criterion_5=one_band_criterion_5)
 
 
 def test_anechoic_result_plot_returns_axes() -> None:

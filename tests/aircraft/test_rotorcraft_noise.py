@@ -13,6 +13,8 @@ heterogeneous event chain, is tested in ``test_rotorcraft_terrain.py``.
 
 from __future__ import annotations
 
+import dataclasses
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -1034,6 +1036,24 @@ def test_hover_helpers_validation() -> None:
         hover_derived_hemisphere(h, "full_rpm_idle", offset_db=float("nan"))
 
 
+def test_hemisphere_axes_must_span_the_level_grid() -> None:
+    # The band axis is the quiet one: a `frequencies` axis that does not match
+    # the band axis of `levels` still looks up and still plots, and the plot
+    # labels its curve with a frequency the levels were never computed at. The
+    # angle axes eventually raise from inside the gap fill, in numpy's words;
+    # the construction names the field instead.
+    h = hover_ring_hemisphere([500.0, 1000.0], _RING_BEARINGS, _ring(np.full(12, 80.0)))
+    extra_band = np.append(h.frequencies, 2000.0)
+    with pytest.raises(ValueError, match=r"'frequencies'.*per band"):
+        dataclasses.replace(h, frequencies=extra_band)
+    short_azimuth = h.azimuth[:-1]
+    with pytest.raises(ValueError, match=r"'azimuth'.*per azimuth angle"):
+        dataclasses.replace(h, azimuth=short_azimuth)
+    extra_polar = np.append(h.polar, 200.0)
+    with pytest.raises(ValueError, match=r"'polar'.*per polar angle"):
+        dataclasses.replace(h, polar=extra_polar)
+
+
 # --------------------------------------------------------------------------- #
 # Flight-condition interpolation (guidance Eq. 3-10)
 # --------------------------------------------------------------------------- #
@@ -1249,6 +1269,20 @@ def test_kinematics_validation() -> None:
         flight_path_kinematics([0.0], [[0.0, 0.0, 0.0]])
 
 
+def test_kinematics_columns_must_span_the_track() -> None:
+    # The event chain walks the eight columns row by row with no check of its
+    # own, so a column of the wrong length has to be refused where it is built.
+    t = np.arange(0.0, 5.5, 0.5)
+    pos = np.column_stack([np.zeros_like(t), 40.0 * t, np.full_like(t, 100.0)])
+    kin = flight_path_kinematics(t, pos)
+    short_airspeed = kin.airspeed[:-1]
+    with pytest.raises(ValueError, match=r"'airspeed'.*per track point"):
+        dataclasses.replace(kin, airspeed=short_airspeed)
+    flat_positions = kin.positions[:, 0]
+    with pytest.raises(ValueError, match=r"'positions' must have 2 axes"):
+        dataclasses.replace(kin, positions=flat_positions)
+
+
 def test_kinematics_plot() -> None:
     t = np.arange(0.0, 10.5, 0.5)
     pos = np.column_stack([np.zeros_like(t), 40.0 * t, 100.0 + 2.0 * t])
@@ -1449,6 +1483,19 @@ def test_event_validation() -> None:
         )
 
 
+def test_event_history_and_spectrum_must_line_up() -> None:
+    # Every per-step array is one column of the same time history, and a reader
+    # that takes the step of LASmax reads the geometry back out at that index;
+    # the band axis of `band_levels` is pinned by `frequencies` the same way.
+    _t, _pos, res = _flyover(bands=[31.5], span=1000.0)
+    short_distance = res.distance[:-1]
+    with pytest.raises(ValueError, match=r"'distance'.*per emission step"):
+        dataclasses.replace(res, distance=short_distance)
+    extra_band = np.append(res.frequencies, 63.0)
+    with pytest.raises(ValueError, match=r"'frequencies'.*per band"):
+        dataclasses.replace(res, frequencies=extra_band)
+
+
 def test_event_plot() -> None:
     _, _, res = _flyover(level=90.0, bands=_NORAH_BANDS, span=1000.0)
     assert res.plot() is not None
@@ -1502,6 +1549,28 @@ def test_contour_validation() -> None:
         )
     with pytest.raises(ValueError, match="grid"):
         rotorcraft_noise_contour(hems, spd, ang, t, pos, x=[0.0], y=[0.0, 1.0])
+
+
+def test_contour_level_grid_must_span_its_coordinates() -> None:
+    # Matplotlib refuses these too, but only when someone draws the grid and in
+    # its own words (the length of x against the columns of z); the result
+    # names the field that disagrees at the moment it is built.
+    hems, spd, ang, t, pos = _contour_inputs()
+    res = rotorcraft_noise_contour(
+        hems,
+        spd,
+        ang,
+        t,
+        pos,
+        x=np.array([-200.0, 0.0, 150.0]),
+        y=np.array([-300.0, 100.0]),
+    )
+    short_x = res.x[:-1]
+    with pytest.raises(ValueError, match=r"'x'.*per grid column"):
+        dataclasses.replace(res, x=short_x)
+    extra_y = np.append(res.y, 500.0)
+    with pytest.raises(ValueError, match=r"'y'.*per grid row"):
+        dataclasses.replace(res, y=extra_y)
 
 
 def test_contour_plot() -> None:

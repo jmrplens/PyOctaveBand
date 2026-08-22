@@ -18,6 +18,8 @@ the clause or table reference in the test docstring:
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pytest
 
@@ -257,6 +259,30 @@ def test_unknown_source_name_is_rejected() -> None:
         building.heavy_impact_source_specification("tapping_machine")
 
 
+def test_check_source_rejects_a_deviation_of_another_length() -> None:
+    """``deviation`` is the one column the conformance figure never draws.
+
+    The others stop matplotlib on their own; a deviation a band out would
+    otherwise sit in the result beside a mask it no longer explains.
+    """
+    check = building.check_heavy_impact_source([v for v, _ in RUBBER_BALL_LFE])
+    stretched = np.append(check.deviation, 0.0)
+    with pytest.raises(ValueError, match="'deviation'"):
+        dataclasses.replace(check, deviation=stretched)
+
+
+def test_check_source_rejects_a_conforming_mask_of_another_length() -> None:
+    """The figure indexes ``within_tolerance`` only to cross the failing bands.
+
+    A mask that marks every band as conforming never reaches that indexing, so
+    on a check that passes it is as quiet as ``deviation`` beside it.
+    """
+    check = building.check_heavy_impact_source([v for v, _ in RUBBER_BALL_LFE])
+    stretched = np.append(check.within_tolerance, True)
+    with pytest.raises(ValueError, match="'within_tolerance'"):
+        dataclasses.replace(check, within_tolerance=stretched)
+
+
 # ---------------------------------------------------------------------------
 # Impact force exposure level (Formula (A.1))
 # ---------------------------------------------------------------------------
@@ -393,6 +419,18 @@ def test_standardization_reproduces_a_published_25_band_example() -> None:
 def test_standardization_rejects_a_mismatched_reverberation_time() -> None:
     with pytest.raises(ValueError, match="reverberation_time"):
         building.standardized_maximum_impact_level([70.0, 65.0], 50.0, [1.0, 2.0, 3.0])
+
+
+def test_standardization_result_rejects_a_stretched_reverberation_time() -> None:
+    """``reverberation_time`` is carried, not drawn, and not recomputed.
+
+    The figure draws only ``measured`` and ``standardized``, so this is the
+    column a report quotes to justify the shift and nothing else would catch.
+    """
+    res = building.standardized_maximum_impact_level([70.0] * 5, 50.0, 0.5)
+    stretched = np.append(res.reverberation_time, 0.5)
+    with pytest.raises(ValueError, match="'reverberation_time'"):
+        dataclasses.replace(res, reverberation_time=stretched)
 
 
 # ---------------------------------------------------------------------------
@@ -565,6 +603,18 @@ def test_rating_rejects_mismatched_frequencies() -> None:
         building.a_weighted_maximum_impact_level(
             ISO717_2_TABLE_D4_LEVELS, [125.0, 250.0, 500.0, 1000.0]
         )
+
+
+def test_rating_rejects_a_stretched_a_weighting() -> None:
+    """``a_weighting`` is the Table D.3 column the figure never draws.
+
+    The bars, the unweighted curve and the band axis all stop matplotlib at
+    another length; the weighting that explains them does not.
+    """
+    res = building.a_weighted_maximum_impact_level(ISO717_2_TABLE_D4_LEVELS)
+    stretched = np.append(res.a_weighting, 0.0)
+    with pytest.raises(ValueError, match="'a_weighting'"):
+        dataclasses.replace(res, a_weighting=stretched)
 
 
 def test_rating_and_standardization_compose() -> None:

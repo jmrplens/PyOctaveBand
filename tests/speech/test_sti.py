@@ -503,3 +503,21 @@ def test_an_sti_result_refuses_an_mti_off_the_band_axis() -> None:
     )
     with pytest.raises(ValueError, match="'mti'"):
         dataclasses.replace(result, mti=result.mti[:-1])
+
+
+def test_an_sti_result_refuses_a_bare_number_for_a_band_column() -> None:
+    """One number is not seven bands, however few axes it has.
+
+    A field with no axis at all is exempt from the band pin, for the entry
+    points elsewhere in the library that take a single frequency and answer
+    with bare numbers throughout. An STI result is never one of those: its
+    columns run over the seven octave bands, so a lone number among them is
+    left to the band count, which reports it by name.
+    """
+    import dataclasses
+
+    ir = np.zeros(FS // 2)
+    ir[100] = 1.0
+    result = speech.sti_from_impulse_response(ir, FS)
+    with pytest.raises(ValueError, match="'mti'"):
+        dataclasses.replace(result, mti=0.75)

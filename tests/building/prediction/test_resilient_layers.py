@@ -25,6 +25,8 @@ machine. What is left here of them is the guard clauses, which
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pytest
 import reference_data as ref
@@ -1212,6 +1214,24 @@ def test_power_input_level_is_consistent_with_the_power_input() -> None:
     assert result.mean_square_force[0] == pytest.approx(
         result.power_input[0] * impedance
     )
+
+
+def test_a_power_input_of_another_length_is_refused() -> None:
+    """``power_input_level`` is the reader that never sees the band axis.
+
+    It scales ``power_input`` by the reference power alone, so a power input
+    collapsed to one value came back as a one-value level spectrum for a
+    21-band force spectrum. The plot reads ``peak_force`` instead, and answers
+    a length disagreement with matplotlib's shape message, which names neither
+    the field nor the result.
+    """
+    stiffness, impedance = _plate("concrete", 0.14)
+    result = building.tapping_force_spectrum(
+        ref.ISO12354_ANNEX_L_BANDS, stiffness, impedance
+    )
+    collapsed = result.power_input[:1]
+    with pytest.raises(ValueError, match=r"'power_input' \(1\).*per band"):
+        dataclasses.replace(result, power_input=collapsed)
 
 
 def test_octave_bandwidth_factor() -> None:

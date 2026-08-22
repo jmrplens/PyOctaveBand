@@ -123,6 +123,12 @@ class LabAirborneInsulationResult:
         builder. Either way the sheet that documents how ``R`` was formed
         from ``A`` is the last place the mismatch could have been caught.
 
+        An ``absorption`` of shape ``(bands, n)`` counts the right number of
+        bands and so passes the length check; it is refused for its rank
+        instead, before the cell formatter meets an array where it expects a
+        number and answers with a ``TypeError`` about zero-dimensional
+        arrays, naming neither the field nor the result.
+
         :raises ValueError: if ``r`` and ``absorption`` disagree.
         """
         require_ranks(self, r=1, absorption=1)
@@ -226,6 +232,12 @@ class LabImpactInsulationResult:
         ``absorption`` alone, and the table indexes each column at the band
         centre it is on, quietly dropping a surplus entry and raising an
         ``IndexError`` from the table builder for a missing one.
+
+        An ``absorption`` of shape ``(bands, n)`` counts the right number of
+        bands and so passes the length check; it is refused for its rank
+        instead, before the cell formatter meets an array where it expects a
+        number and answers with a ``TypeError`` about zero-dimensional
+        arrays, naming neither the field nor the result.
 
         :raises ValueError: if ``l_n`` and ``absorption`` disagree.
         """

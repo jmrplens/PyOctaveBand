@@ -277,11 +277,15 @@ class CeilingAttenuationResult:
 
         ASTM E413 is a contour fitted band by band: the sum of the
         deficiencies and the largest of them are what stop the contour rising,
-        and the plot draws the data against that fitted contour. A curve
-        shorter than the sixteen bands leaves the drawing to pair the
-        remaining values with the wrong frequencies, and the two numbers
-        printed in the title are then sums over a set that the picture beneath
-        them does not show.
+        and the plot draws the data against that fitted contour. Of the five
+        per-band curves the plot reads three, and one of those of the wrong
+        length is refused by matplotlib either way, but only once the figure
+        is drawn and in terms of two shapes it cannot put a name to. The
+        other two, ``rounded`` and ``deficiencies``, no reader in the library
+        opens at all: a deficiency column that has lost or gained a band is
+        paired with the frequencies by whoever prints it, ``zip`` truncates
+        the two to the shorter without a word, and the total beside it stays
+        the sum of the column as it was fitted.
 
         :raises ValueError: if the per-band curves disagree.
         """

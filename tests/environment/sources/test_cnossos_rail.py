@@ -29,6 +29,7 @@ different evidential weight:
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import numpy as np
@@ -880,6 +881,62 @@ def test_invalid_inputs() -> None:
         roughness_to_frequency([1.0, 2.0], [1.0, 2.0], 50.0, frequencies=[0.0])
     with pytest.raises(ValueError, match="positive number of metres"):
         curve_squeal_excess(0.0)
+
+
+def _emission_result() -> RailwayEmissionResult:
+    """One emission as the public entry point hands it back, to be bent."""
+    return railway_source_power(
+        RailwayVehicle(_reference_stock(), flow_rate=10.0, speed=100.0),
+        _reference_track(),
+    )
+
+
+def test_a_component_on_the_octave_grid_is_refused() -> None:
+    """The breakdown carries no grid of its own: it is read against the 24 bands.
+
+    Nothing in the library opens :attr:`RailwayEmissionResult.components`, so a
+    component resampled onto the eight octave bands builds and draws without a
+    word -- the chart is made from the octave fields and comes out with its two
+    marker lines exactly as before -- and reading the eight values against
+    ``third_octave_frequencies`` quotes the bridge from 50 to 250 Hz and stops
+    there, sixteen bands short of the grid it is being read on.
+    """
+    result = _emission_result()
+    octave = np.full(result.frequencies.size, 90.0)
+    components = {**result.components, "bridge": (octave, octave)}
+    with pytest.raises(ValueError, match=r"'components\['bridge'\]\[0\]'"):
+        dataclasses.replace(result, components=components)
+
+
+def test_a_component_missing_a_source_height_is_refused() -> None:
+    """Each component holds the pair (source A, source B), and only the pair.
+
+    A pair holding source A alone is short in no reading that says so: summed
+    energetically over the heights it hands back source A by itself, which for
+    the traction of the reference train is 1.8 to 6.3 dB below the sum of the
+    two, band by band, and every one of those bands is an ordinary level.
+    """
+    result = _emission_result()
+    traction = (result.components["traction"][0],)
+    components = {**result.components, "traction": traction}
+    with pytest.raises(ValueError, match=r"'components\['traction'\]'.*source height"):
+        dataclasses.replace(result, components=components)
+
+
+def test_a_collapsed_third_octave_table_is_refused() -> None:
+    """Losing the source-height axis loses no number, so nothing looks amiss.
+
+    A 1/3-octave table collapsed to source A alone still holds 24 ordinary
+    levels, and no reader in the library opens it: the chart is drawn from the
+    octave fields and comes out unchanged. The heights are then read off the
+    wrong axis, and row 1, meant to be the spectrum of source B, is the 63 Hz
+    level of source A, 62.0 dB, where source B's own spectrum starts at
+    52.2 dB.
+    """
+    result = _emission_result()
+    collapsed = result.third_octave_line_power[0]
+    with pytest.raises(ValueError, match="'third_octave_line_power' must have 2 axes"):
+        dataclasses.replace(result, third_octave_line_power=collapsed)
 
 
 def test_result_plot_draws_both_heights() -> None:

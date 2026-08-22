@@ -24,6 +24,7 @@ merging and the least-squares onset rate).
 
 from __future__ import annotations
 
+import dataclasses
 import importlib
 import math
 
@@ -369,3 +370,33 @@ def test_the_history_reports_the_interval_it_actually_used() -> None:
     )
     assert result.dt == pytest.approx(float(result.times[1] - result.times[0]))
     assert result.dt != pytest.approx(0.021, abs=1e-9)
+
+
+# ---------------------------------------------------------------------------
+# Construction guards.
+# ---------------------------------------------------------------------------
+
+
+def test_the_trace_must_run_over_one_time_axis() -> None:
+    """A trace off its own time axis is refused when built, not when drawn.
+
+    The figure is the only reader of the two arrays and it draws one against
+    the other, so a length disagreement surfaces there as matplotlib's "x and
+    y must have same first dimension" and two bare shapes, naming neither the
+    field nor the result, and only for whoever plots. An extra axis is worse:
+    it passes every length check and draws in silence, one line per column,
+    laying a second trace and a repeated legend entry over the onsets.
+    """
+    signal = np.concatenate([np.zeros(int(0.6 * FS)), _tone(1000.0, 1.4, 1.0)])
+    good = iso.impulsive_sound_adjustment(signal, FS)
+    per_sample = "one value per sample"
+    cases = (
+        ("levels", good.levels[:-1], per_sample),
+        ("levels", np.append(good.levels, good.levels[-1]), per_sample),
+        ("times", good.times[:-1], per_sample),
+        ("levels", np.column_stack([good.levels] * 2), "must have one axis"),
+        ("times", np.column_stack([good.times] * 2), "must have one axis"),
+    )
+    for field, value, fragment in cases:
+        with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+            dataclasses.replace(good, **{field: value})

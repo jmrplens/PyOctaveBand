@@ -93,14 +93,23 @@ class AircraftBandAttenuation:
         Every array here is one value per one-third-octave band of the same
         spectrum: the band attenuation the certification correction subtracts,
         the pure-tone mid-band attenuation it was regressed from, and the
-        coefficient behind that. An array of another length either stops the
-        figure, which draws two of them against ``frequency`` on one pair of
-        axes and gets matplotlib's complaint about an x and a y that name
-        neither field, or -- where it has collapsed to a single value -- is
-        broadcast by numpy over the whole spectrum, correcting every band of a
-        measured flyover by one band's attenuation without a word.
+        coefficient behind that. Which field is wrong decides how loud the
+        mistake is. The figure draws ``band_attenuation`` and
+        ``midband_attenuation`` against ``frequency``, so any disagreement
+        among those three stops it, with matplotlib's complaint about an x and
+        a y that name neither field. ``coefficient`` reaches no figure and no
+        reader in this library: it leaves as dB/m for the caller to multiply
+        by a path length, so a wrong length here passes in silence, and one
+        collapsed to a single value is broadcast by numpy over the caller's
+        whole spectrum, correcting every band of a measured flyover by one
+        band's attenuation and handing back ordinary dB numbers. An extra
+        axis passes just as quietly: a column of the same coefficients counts
+        one entry per band on its first axis, so every length agrees, and the
+        caller's correction comes back as a band-by-band matrix instead of a
+        spectrum.
 
-        :raises ValueError: if a per-band array disagrees with the rest.
+        :raises ValueError: if a per-band array disagrees with the rest, or
+            carries an axis beyond the band one.
         """
         require_ranks(
             self,

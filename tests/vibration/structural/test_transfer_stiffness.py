@@ -12,6 +12,7 @@ back through the indirect relation recovers the element stiffness at ``T << 1``.
 
 from __future__ import annotations
 
+import dataclasses
 import math
 import warnings
 
@@ -273,3 +274,72 @@ def test_plot_returns_axes() -> None:
     with pytest.warns(PhonometryWarning, match="ISO 10846-3"):
         res = vibration.indirect_transfer_stiffness_result(f, t, blocking_mass=5.0)
     assert res.plot() is not None
+
+
+# ---------------------------------------------------------------------------
+# One stiffness per frequency
+# ---------------------------------------------------------------------------
+def test_a_single_frequency_result_keeps_its_bare_numbers() -> None:
+    """One frequency measured gives a result with no axis at all.
+
+    The frequency pin exempts a result whose every field is nought-
+    dimensional, and this call is what the exemption is for: a scalar
+    frequency in, a scalar stiffness out, nothing to disagree about. Pin it
+    from the accepting side too, or the exemption can be dropped without a
+    single test noticing that the library stops answering its own call.
+    """
+    res = vibration.indirect_transfer_stiffness_result(500.0, 0.01, blocking_mass=8.0)
+    assert res.frequencies.ndim == 0
+    assert res.transfer_stiffness.ndim == 0
+    assert complex(res.transfer_stiffness) == pytest.approx(
+        complex(vibration.transfer_stiffness_indirect(500.0, 0.01, 8.0))
+    )
+
+
+def test_a_stiffness_short_of_its_frequencies_is_refused() -> None:
+    """A spectrum one value short cannot be read against its own frequencies.
+
+    Every reader that lays the two columns side by side refuses a short
+    stiffness where it stands: ``.plot()`` and the ``.report()`` that embeds
+    it inside matplotlib, ``.to()`` inside numpy's broadcast, each naming two
+    shapes and neither field. The refusal here is raised at construction and
+    says which column is short.
+    """
+    f = np.array([100.0, 200.0, 400.0])
+    t = np.array([0.05, 0.02, 0.008]) * np.exp(1j * 0.1)
+    res = vibration.indirect_transfer_stiffness_result(f, t, blocking_mass=8.0)
+    short = res.transfer_stiffness[:-1]
+    with pytest.raises(ValueError, match="'transfer_stiffness'"):
+        dataclasses.replace(res, transfer_stiffness=short)
+
+
+def test_a_lone_frequency_beside_a_spectrum_is_refused() -> None:
+    """The exemption is for all the fields at once, not for one of them.
+
+    A bare number where the sibling carries a spectrum is the mixture the
+    exemption deliberately leaves to the count: exempting each field on its
+    own would let a one-frequency label sit under three stiffnesses.
+    """
+    res = vibration.indirect_transfer_stiffness_result(500.0, 0.01, blocking_mass=8.0)
+    spectrum = np.full(3, complex(res.transfer_stiffness))
+    with pytest.raises(ValueError, match="'frequencies'"):
+        dataclasses.replace(res, transfer_stiffness=spectrum)
+
+
+def test_one_stiffness_under_a_swept_frequency_is_refused() -> None:
+    """The one length numpy would stretch instead of rejecting.
+
+    A stiffness of length one is the only mismatch that reaches an answer:
+    ``.to()`` broadcasts it over the whole sweep and returns an impedance at
+    every frequency, all of them from that single value, which is a plain
+    ``1/f`` roll-off wearing the shape of a measured curve. Pin the count, or
+    the exemption for a genuinely nought-dimensional result could be widened
+    to cover this one and nothing would fail.
+    """
+    f = np.array([100.0, 200.0, 400.0])
+    t = np.array([0.05, 0.02, 0.008]) * np.exp(1j * 0.1)
+    res = vibration.indirect_transfer_stiffness_result(f, t, blocking_mass=8.0)
+    lone = res.transfer_stiffness[:1]
+    assert lone.ndim == 1
+    with pytest.raises(ValueError, match="'transfer_stiffness' [(]1[)]"):
+        dataclasses.replace(res, transfer_stiffness=lone)

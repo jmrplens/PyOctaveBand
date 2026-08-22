@@ -16,6 +16,8 @@ Oracles:
 
 from __future__ import annotations
 
+import dataclasses
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -186,6 +188,28 @@ def test_invalid_frequencies_raise(frequency: list[float]) -> None:
 def test_unknown_group_raises() -> None:
     with pytest.raises(ValueError, match="group"):
         group_audiogram(1e3, "dolphin")
+
+
+@pytest.mark.parametrize("field", ["frequencies", "threshold"])
+def test_an_audiogram_curve_with_an_extra_axis_is_refused(field: str) -> None:
+    """Two columns of the right height pass every count and reach the figure.
+
+    Stacking the 40-point curve into a (40, 2) column leaves 40 frequencies to
+    count, so nothing downstream objects: without the guard the same result
+    plots three lines where the aligned one plots two.
+    """
+    res = group_audiogram(np.logspace(2.0, 5.0, 40), "HF")
+    column = np.column_stack([getattr(res, field)] * 2)
+    with pytest.raises(ValueError, match=f"'{field}'"):
+        dataclasses.replace(res, **{field: column})
+
+
+def test_a_threshold_that_outruns_its_frequencies_is_refused() -> None:
+    """One threshold too many would leave the last point with no frequency."""
+    res = group_audiogram(np.logspace(2.0, 5.0, 40), "HF")
+    longer = np.append(res.threshold, res.threshold[-1])
+    with pytest.raises(ValueError, match="'threshold'"):
+        dataclasses.replace(res, threshold=longer)
 
 
 def test_plot_returns_axes() -> None:

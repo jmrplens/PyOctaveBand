@@ -37,7 +37,11 @@ from typing import TYPE_CHECKING, Any, NamedTuple
 
 import numpy as np
 
-from .._internal.validation import require_ranks, require_same_length
+from .._internal.validation import (
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -624,10 +628,19 @@ class FlightSegmentState:
         here names the two fields that disagree, at the point where they were
         put together.
 
+        The count is the number of values, not the shape they arrive in. Both
+        entry points ravel these fields before they look at them, so a column
+        of one value per segment is as good as a row and neither the check nor
+        the reader has any business preferring one.
+
         :raises ValueError: if two of the fields cover different segment counts.
         """
-        require_ranks(self, ground_roll=1, landing_roll=1, bank=1)
-        require_same_length(self, "ground_roll", "landing_roll", "bank", axis="segment")
+        counts = {
+            name: int(np.size(value))
+            for name in ("ground_roll", "landing_roll", "bank")
+            if (value := getattr(self, name)) is not None
+        }
+        require_equal_counts(type(self).__name__, counts, "segment")
 
 
 #: An airborne, unbanked movement: the default of the event entry points (one
@@ -660,11 +673,17 @@ class FlyoverResult:
         happens to make three segments, and a check that read that coincidence
         as a shared axis would reject every path of any other length.
 
-        The rank is worth pinning even so. The bar chart draws one bar per
-        entry of ``segment_levels``, and ``observer`` is carried through
-        untouched for the reader to place the result on a map; a second axis on
-        either passes every count there is and arrives intact at whatever draws
-        it.
+        The rank is worth pinning even so, though a second axis costs the two
+        fields different things. On ``segment_levels`` it reaches the bar
+        chart, which numbers one bar per entry and then hands those numbers and
+        the two-dimensional heights to ``ax.bar``. Matplotlib refuses them
+        there in one of two voices, depending on the shape: two shapes it
+        cannot broadcast against each other for a grid of several columns, and
+        a bar's line width that came out an array for a single column or row.
+        Neither message names this result or the field that carried the extra
+        axis. ``observer`` is read nowhere in the library, so nothing there
+        refuses it at all; the extra axis rides out untouched to whatever the
+        reader places on a map.
 
         :raises ValueError: if either array has more than one axis.
         """
@@ -1354,12 +1373,13 @@ class NoiseContourResult:
         """Reject a contour whose level grid does not match the axes beside it.
 
         ``contourf`` is handed ``x``, ``y`` and the grid together and reads the
-        grid as ``(len(y), len(x))``. A grid off by a row, or built the other
-        way round, raises from inside matplotlib about two shapes it cannot
-        attribute to a field, and says nothing about which axis it was that
-        disagreed. The two axes are pinned separately because they are
-        independent: a sweep asks for as many x as it likes and as many y, and
-        one count over both would reject every grid that is not square.
+        grid as ``(len(y), len(x))``. A grid off by a row or a column does
+        reach it and does fail there, but as a ``TypeError`` out of the drawing
+        code, comparing a bare length with a count of rows and naming neither
+        this result nor the field that fell short. The two axes are pinned
+        separately because they are independent: a sweep asks for as many x as
+        it likes and as many y, and one count over both would reject every grid
+        that is not square.
 
         :raises ValueError: if the level grid disagrees with the x or y axis.
         """

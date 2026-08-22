@@ -9,6 +9,8 @@ tonal frequency tracks the tone, silence -> 0, band restriction of the
 time-dependent maximum) plus result-structure guards.
 """
 
+import dataclasses
+
 import numpy as np
 import pytest
 
@@ -272,6 +274,42 @@ def test_result_structure(ref_1k_40: psychoacoustics.EcmaTonality) -> None:
     # Time-dependent tonality is sampled at 187.5 Hz (Clause 6.2.8/6.2.6).
     dt = np.diff(ref_1k_40.time)
     assert np.allclose(dt, 1.0 / 187.5)
+
+
+@pytest.mark.xdist_group("ecma-tonality-ref")
+@pytest.mark.parametrize("trim", [True, False], ids=["short", "long"])
+def test_tonal_frequencies_off_the_band_axis_are_refused(
+    ref_1k_40: psychoacoustics.EcmaTonality, trim: bool
+) -> None:
+    """A per-band tonal frequency array of the wrong length is refused.
+
+    Nothing downstream would say so. The figure's two panels pair the bark
+    scale with the specific tonality and time with the tonality, and never
+    touch f_ton,z(z), so an array one band short or one band long draws a
+    perfectly ordinary figure and reaches the caller intact, out of step with
+    the ``centre_frequencies`` it is read against.
+    """
+    values = ref_1k_40.tonal_frequencies
+    wrong = values[:-1] if trim else np.append(values, values[-1])
+    with pytest.raises(ValueError, match=r"'tonal_frequencies'.*per auditory band"):
+        dataclasses.replace(ref_1k_40, tonal_frequencies=wrong)
+
+
+@pytest.mark.xdist_group("ecma-tonality-ref")
+@pytest.mark.parametrize("trim", [True, False], ids=["short", "long"])
+def test_tonal_frequency_vs_time_off_the_block_axis_is_refused(
+    ref_1k_40: psychoacoustics.EcmaTonality, trim: bool
+) -> None:
+    """The time-dependent tonal frequency is pinned to the block axis.
+
+    f_ton(l) is drawn by no panel either, so unlike ``tonality_vs_time`` (whose
+    length matplotlib happens to catch when the whole figure is asked for) a
+    block-axis disagreement here is announced nowhere at all.
+    """
+    values = ref_1k_40.tonal_frequency_vs_time
+    wrong = values[:-1] if trim else np.append(values, values[-1])
+    with pytest.raises(ValueError, match=r"'tonal_frequency_vs_time'.*per time block"):
+        dataclasses.replace(ref_1k_40, tonal_frequency_vs_time=wrong)
 
 
 def test_invalid_field() -> None:

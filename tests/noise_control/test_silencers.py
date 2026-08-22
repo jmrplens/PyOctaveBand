@@ -13,6 +13,8 @@ unequal port areas (Munjal Eq. (3.27)), and limiting cases.
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pytest
 
@@ -293,6 +295,36 @@ def test_validation() -> None:
         sl.expansion_chamber([100.0], 0.3, -0.04, 0.01)
     with pytest.raises(ValueError, match="must exceed"):
         sl.extended_tube_chamber([100.0], 0.3, 0.01, 0.02)
+
+
+@pytest.mark.parametrize("trim", [True, False], ids=["short", "long"])
+def test_a_four_pole_stack_off_the_frequency_axis_is_refused(trim: bool) -> None:
+    """The stack is the field no reader would ever complain about.
+
+    ``TL``, ``IL`` and the frequencies meet in the figure ``.plot()`` draws
+    and ``.report()`` embeds, so a length of their own raises before a PDF
+    exists. Nothing opens ``transfer_matrix`` again once the result is built:
+    a stack over half the grid plots and reports without a word.
+    """
+    res = sl.expansion_chamber(np.linspace(50.0, 400.0, 8), 0.3, 0.05, 0.01)
+    t = res.transfer_matrix
+    wrong = t[:-1] if trim else np.concatenate([t, t[-1:]])
+    with pytest.raises(ValueError, match=r"'transfer_matrix'.*one value per frequency"):
+        dataclasses.replace(res, transfer_matrix=wrong)
+
+
+def test_a_four_pole_stack_that_lost_its_frequency_axis_is_refused() -> None:
+    """Counting is not enough: two of the three axes belong to the matrix.
+
+    A single four-pole is 2x2, so over a grid of two frequencies it counts
+    the right number of entries on its first axis and the length check has
+    nothing to object to. The rank is what tells the two apart.
+    """
+    res = sl.expansion_chamber(np.array([100.0, 200.0]), 0.3, 0.05, 0.01)
+    one_matrix = res.transfer_matrix[0]
+    assert len(one_matrix) == len(res.frequencies)  # the count it would pass
+    with pytest.raises(ValueError, match=r"'transfer_matrix' must have 3 axes"):
+        dataclasses.replace(res, transfer_matrix=one_matrix)
 
 
 def test_chain_matches_the_hand_built_cascade() -> None:

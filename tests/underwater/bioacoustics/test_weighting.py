@@ -18,6 +18,8 @@ Oracles:
 
 from __future__ import annotations
 
+import dataclasses
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -525,6 +527,72 @@ def test_non_finite_peak_spl_raises() -> None:
     not_a_number = float("nan")
     with pytest.raises(ValueError, match="peak_spl"):
         weighted_exposure([1000.0], [170.0], "LF", peak_spl=not_a_number)
+
+
+def test_a_curve_that_does_not_run_over_the_frequencies_is_refused() -> None:
+    """Neither reader of this result would report the disagreement itself.
+
+    ``weighting`` is the one the figure draws against ``frequencies``, so a
+    length that disagrees comes back as matplotlib's "x and y must have same
+    first dimension" -- late, and naming neither field. ``exposure_function``
+    is read by nothing here, so a short curve draws a clean figure while its
+    minimum, the weighted TTS onset and the frequency it falls at, is taken
+    over whichever part survived. An extra axis is quieter than either: an
+    ``(n, 2)`` column carries one value per frequency by every count and
+    reaches the figure intact, where it draws one curve per column under a
+    legend row repeated once per curve.
+    """
+    good = auditory_weighting(np.logspace(1.0, 5.0, 64), "LF")
+    per_frequency = "one value per frequency"
+    one_axis = "must have one axis"
+    cases = (
+        ("frequencies", good.frequencies[:-1], per_frequency),
+        ("weighting", good.weighting[:-1], per_frequency),
+        ("weighting", np.append(good.weighting, 0.0), per_frequency),
+        ("exposure_function", good.exposure_function[:-1], per_frequency),
+        ("exposure_function", np.append(good.exposure_function, 200.0), per_frequency),
+        ("frequencies", np.column_stack([good.frequencies] * 2), one_axis),
+        ("weighting", np.column_stack([good.weighting] * 2), one_axis),
+        ("exposure_function", np.column_stack([good.exposure_function] * 2), one_axis),
+    )
+    for field, value, fragment in cases:
+        with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+            dataclasses.replace(good, **{field: value})
+
+
+def test_a_grid_of_frequencies_is_refused_by_the_entry_point() -> None:
+    """``_positive_frequencies`` coerces with ``ndmin=1``, which passes a grid through.
+
+    Every length then agrees -- a ``(2, 2)`` frequency array and its two
+    ``(2, 2)`` curves all count two entries on the first axis -- so only the
+    rank stops it.
+    """
+    grid = np.array([[100.0, 1000.0], [10_000.0, 100_000.0]])
+    with pytest.raises(ValueError, match=r"'frequencies'.*must have one axis"):
+        auditory_weighting(grid, "LF")
+
+
+def test_an_exposure_row_that_does_not_run_over_the_bands_is_refused() -> None:
+    """The verdict is formed from totals summed over whole arrays.
+
+    ``cumulative_sel`` is an energy sum of every entry of
+    ``weighted_band_sel`` and ``exceeds_injury`` is what the margins from it
+    say, so a row of the wrong length changes the verdict before the figure,
+    the only reader that would object, is ever drawn.
+    """
+    good = weighted_exposure([125.0, 250.0, 500.0, 1000.0], [180.0] * 4, "LF")
+    per_band = "one value per band"
+    one_axis = "must have one axis"
+    cases = (
+        ("band_sel", good.band_sel[:-1], per_band),
+        ("weighting", np.append(good.weighting, 0.0), per_band),
+        ("weighted_band_sel", good.weighted_band_sel[:-1], per_band),
+        ("frequencies", np.column_stack([good.frequencies] * 2), one_axis),
+        ("weighted_band_sel", np.column_stack([good.weighted_band_sel] * 2), one_axis),
+    )
+    for field, value, fragment in cases:
+        with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+            dataclasses.replace(good, **{field: value})
 
 
 def test_plot_returns_axes() -> None:

@@ -9,6 +9,7 @@ room-constant reverberant term and limits, and the VDI 2081 flow-noise formulas
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import numpy as np
@@ -160,3 +161,32 @@ def test_plot_and_validation() -> None:
         hvac.end_reflection_loss([125.0], 0.3, termination="bad")
     with pytest.raises(ValueError, match="'mean_absorption' must lie strictly"):
         hvac.plenum_attenuation(0.1, 1.0, 20.0, 1.0)
+
+
+def test_spectrum_must_run_over_one_band_axis() -> None:
+    """A spectrum off its own band axis is refused when built, not when read.
+
+    Both readers pair the two arrays, so a length that disagrees is loud but
+    far from the mistake: the fiche's row loop raises a bare ``IndexError:
+    list index out of range`` for more values than labels, and the figure it
+    embeds, the same one ``plot()`` draws, reports matplotlib's ``x and y must
+    have same first dimension`` and two bare shapes naming neither field. The
+    extra axis is the silent one: a ``(bands, 2)`` array counts one entry per
+    band and ``plot()`` draws each column as an ordinary curve, handing back a
+    figure of two spectra that looks like a spectrum.
+    """
+    good = hvac.elbow_insertion_loss(
+        [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0], 0.4, lined=True
+    )
+    per_band = "one value per band"
+    cases = (
+        ("values", good.values[:-1], per_band),
+        ("values", np.append(good.values, good.values[-1]), per_band),
+        ("frequencies", good.frequencies[:-1], per_band),
+        ("frequencies", np.append(good.frequencies, 4000.0), per_band),
+        ("values", np.column_stack([good.values] * 2), "must have one axis"),
+        ("frequencies", np.column_stack([good.frequencies] * 2), "must have one axis"),
+    )
+    for field, value, fragment in cases:
+        with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+            dataclasses.replace(good, **{field: value})

@@ -1003,3 +1003,20 @@ def test_an_impact_total_off_the_band_axis_is_refused(impact) -> None:
 
     with pytest.raises(ValueError, match="'l_prime_n'"):
         dataclasses.replace(impact, l_prime_n=np.append(impact.l_prime_n, 99.0))
+
+
+def test_an_in_situ_spectrum_short_of_the_band_axis_is_refused(situ: dict) -> None:
+    """An in-situ element is an input to the paths as much as it is an output.
+
+    ``airborne_flanking_path`` combines the two elements' ``Rsitu`` band by
+    band, so an index that lost its band axis on either of them is stretched
+    over its partner's rather than refused. Collapsing external wall 1 to its
+    50 Hz value leaves the ``D1`` path of this building 21 bands long, finite
+    and in dB, and 16,1 dB low at 1250 Hz, with nothing said.
+    """
+    import dataclasses
+
+    element = situ["ext1"]
+    one_band = element.sound_reduction_index[:1]
+    with pytest.raises(ValueError, match="'sound_reduction_index'"):
+        dataclasses.replace(element, sound_reduction_index=one_band)
