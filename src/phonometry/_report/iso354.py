@@ -39,6 +39,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_equal_shapes
 from ._i18n import format_number, t
 from ._layout import (
     _ACCENT_HEX,
@@ -232,28 +233,32 @@ def render_iso354_report(
 
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     alpha_s = np.asarray(result.alpha_s, dtype=np.float64)
-    if freqs.shape != alpha_s.shape:
-        msg = (
-            "render_iso354_report() needs 'frequencies' and 'alpha_s' of equal length."
-        )
-        raise ValueError(msg)
-    # SoundAbsorptionMeasurement is a plain frozen dataclass, so a hand-built
-    # result can carry per-band arrays of differing lengths. The four columns
-    # only the verbose detail table reads are checked here too; the guard above
-    # covers 'alpha_s' alone.
+    require_equal_shapes(
+        "SoundAbsorptionMeasurement.report",
+        {"frequencies": freqs.shape, "alpha_s": alpha_s.shape},
+        "band",
+    )
+    # SoundAbsorptionMeasurement pins every per-band column to one length at
+    # construction, so both guards here catch only an instance whose fields
+    # were replaced past the frozen dataclass. The four columns that just the
+    # verbose detail table reads are checked below; the guard above covers
+    # 'alpha_s' alone.
     if verbose:
         t1 = np.asarray(result.t_empty, dtype=np.float64)
         t2 = np.asarray(result.t_specimen, dtype=np.float64)
         a1 = np.asarray(result.absorption_area_empty, dtype=np.float64)
         a2 = np.asarray(result.absorption_area_with_specimen, dtype=np.float64)
-        if not freqs.shape == t1.shape == t2.shape == a1.shape == a2.shape:
-            msg = (
-                "render_iso354_report(verbose=True) needs 't_empty', "
-                "'t_specimen', 'absorption_area_empty' and "
-                "'absorption_area_with_specimen' of the same length as "
-                "'frequencies'."
-            )
-            raise ValueError(msg)
+        require_equal_shapes(
+            "SoundAbsorptionMeasurement.report(verbose=True)",
+            {
+                "frequencies": freqs.shape,
+                "t_empty": t1.shape,
+                "t_specimen": t2.shape,
+                "absorption_area_empty": a1.shape,
+                "absorption_area_with_specimen": a2.shape,
+            },
+            "band",
+        )
 
     styles, title_style, basis_style, caption_style = document_styles(accent)
     title = t("Sound absorption measurement", language)

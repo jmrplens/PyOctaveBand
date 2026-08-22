@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 
+from .._internal.validation import require_equal_shapes
 from ._i18n import format_number, t
 from ._layout import (
     _ACCENT_HEX,
@@ -237,9 +238,10 @@ def render_insulation_fiche(
         verbose columns instead of the two-column ``f | value`` form.
     :param language: ``"en"`` (default) or ``"es"``.
     :return: The written ``path`` as a :class:`str`.
-    :raises ValueError: If ``rating.quantity`` does not match ``is_impact`` or
+    :raises ValueError: If ``rating.quantity`` does not match ``is_impact``, or
         the rating is missing its per-band ``band_centers`` / ``measured`` /
-        ``shifted_reference`` arrays (a manually constructed rating).
+        ``shifted_reference`` arrays, or those disagree in shape with the
+        reported curve (all three, a manually constructed rating).
     :raises ImportError: If reportlab (or, for the figure, matplotlib) is not
         installed.
     """
@@ -276,13 +278,16 @@ def render_insulation_fiche(
     centers = np.asarray(rating.band_centers, dtype=np.float64)
     measured = np.asarray(rating.measured, dtype=np.float64)
     shifted = np.asarray(rating.shifted_reference, dtype=np.float64)
-    if not (curve.shape == centers.shape == measured.shape == shifted.shape):
-        msg = (
-            "The report needs matching per-band lengths: the rating's "
-            "'band_centers', 'measured' and 'shifted_reference' and the "
-            "result's per-band curve must all have the same length."
-        )
-        raise ValueError(msg)
+    require_equal_shapes(
+        f"{type(result).__name__}.report",
+        {
+            curve_attr: curve.shape,
+            "rating.band_centers": centers.shape,
+            "rating.measured": measured.shape,
+            "rating.shifted_reference": shifted.shape,
+        },
+        "band",
+    )
 
     styles, title_style, basis_style, caption_style = document_styles(accent)
     title_text = t(spec["title"], language)

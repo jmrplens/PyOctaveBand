@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING, Any, overload
 
 import numpy as np
 
+from ..._internal.validation import require_equal_shapes
 from ..common import (
     _C_EDGE,
     _C_MUTED,
@@ -150,9 +151,11 @@ def plot_piston_geometry(
     if angles is not None and directivity is not None:
         ang = np.asarray(angles, dtype=np.float64)
         d_lin = np.abs(np.asarray(directivity, dtype=np.float64))
-        if ang.shape != d_lin.shape:
-            msg = "'angles' and 'directivity' must match."
-            raise ValueError(msg)
+        require_equal_shapes(
+            "plot_piston_geometry",
+            {"angles": ang.shape, "directivity": d_lin.shape},
+            "angle",
+        )
         peak = float(d_lin.max())
         if peak > 0.0:
             scale = 2.8 * a / peak

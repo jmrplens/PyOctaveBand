@@ -66,7 +66,11 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ..._internal.levels_math import energy_sum
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import (
+    require_equal_shapes,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -1185,10 +1189,16 @@ def _match_bands(
 
 
 def _validated_extended_input(
+    owner: str,
     values_by_band: Sequence[float] | np.ndarray,
     frequencies: Sequence[float] | np.ndarray | None,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Validate the extended-range input; return (measured, freqs, core_idx)."""
+    """Validate the extended-range input; return (measured, freqs, core_idx).
+
+    *owner* is the entry point the caller typed, so that the message about
+    the two spectra names it rather than this validator, which two entry
+    points share.
+    """
     data = np.asarray(values_by_band, dtype=np.float64)
     if data.ndim != 1:
         raise ValueError(_VALUES_1D_MSG)
@@ -1205,9 +1215,11 @@ def _validated_extended_input(
         freqs = np.asarray(_FREQ_THIRD_OCTAVE, dtype=np.float64)
     else:
         freqs = np.asarray(frequencies, dtype=np.float64)
-        if freqs.shape != data.shape:
-            msg = "'frequencies' must have one value per band of 'values_by_band'."
-            raise ValueError(msg)
+        require_equal_shapes(
+            owner,
+            {"values_by_band": data.shape, "frequencies": freqs.shape},
+            "band",
+        )
         if not np.all(np.isfinite(freqs)) or np.any(freqs <= 0.0):
             msg = "'frequencies' must contain positive values."
             raise ValueError(msg)
@@ -1253,7 +1265,9 @@ def weighted_rating_extended(
     :raises ValueError: If the input is not one-dimensional and finite, the
         band counts differ, or the core bands are missing.
     """
-    measured, freqs, core_idx = _validated_extended_input(values_by_band, frequencies)
+    measured, freqs, core_idx = _validated_extended_input(
+        "weighted_rating_extended", values_by_band, frequencies
+    )
     core_measured = measured[core_idx]
     ref = np.asarray(_REF_THIRD_OCTAVE, dtype=np.float64)
     step = 0.1 if one_decimal else 1.0
@@ -1325,7 +1339,9 @@ def weighted_impact_rating_extended(
     :raises ValueError: If the input is not one-dimensional and finite, the
         band counts differ, or the core bands are missing.
     """
-    measured, freqs, core_idx = _validated_extended_input(values_by_band, frequencies)
+    measured, freqs, core_idx = _validated_extended_input(
+        "weighted_impact_rating_extended", values_by_band, frequencies
+    )
     core_measured = measured[core_idx]
     ref = np.asarray(_REF_IMPACT_THIRD_OCTAVE, dtype=np.float64)
     step = 0.1 if one_decimal else 1.0

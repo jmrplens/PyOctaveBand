@@ -253,6 +253,21 @@ def test_surface_and_area_without_volume_raises() -> None:
         )
 
 
+def test_surface_level_of_another_band_count_raises() -> None:
+    # R' subtracts 'l2' from 'surface_level' band by band, so the message
+    # names both curves and the shapes it just compared.
+    outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
+    with pytest.raises(ValueError, match=r"'surface_level'.*'l2'.*same shape"):
+        building.facade_insulation(
+            outdoor,
+            indoor,
+            rt,
+            area=10.0,
+            volume=62.5,
+            surface_level=_flat(4, 72.0),
+        )
+
+
 def test_surface_area_and_volume_returns_r_prime() -> None:
     # The complete set of R' inputs still yields a value.
     res = building.facade_insulation(
@@ -315,8 +330,21 @@ def test_frequencies_length_mismatch_raises() -> None:
     # 'frequencies' shorter than the band count must fail clearly here rather
     # than deferring a confusing matplotlib shape error to plot().
     outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
-    with pytest.raises(ValueError, match="frequencies"):
+    with pytest.raises(ValueError, match=r"'frequencies'.*same shape"):
         building.facade_insulation(outdoor, indoor, rt, frequencies=[125.0, 250.0])
+
+
+def test_frequencies_with_an_extra_axis_raises() -> None:
+    """A `frequencies` of the right count but the wrong shape is named.
+
+    The counts agree here, so the old count-by-count message read "got 3 for
+    3 bands"; the shapes are what disagree, and they are what is reported.
+    """
+    outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
+    with pytest.raises(ValueError, match=r"'frequencies'.*same shape"):
+        building.facade_insulation(
+            outdoor, indoor, rt, frequencies=np.full((1, 3), 125.0)
+        )
 
 
 # --------------------------------------------------------------------------

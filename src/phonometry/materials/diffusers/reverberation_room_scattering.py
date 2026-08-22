@@ -32,6 +32,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_equal_shapes
 from ..._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -468,23 +469,27 @@ def scattering_coefficient_spectrum(
     :param random_absorption: Random-incidence absorption ``alpha_s`` per band.
     :param truncate_negative: Clip negative ``s`` to 0 (Clause 8.3 default).
     :return: A :class:`ScatteringResult` with ``.plot()``.
-    :raises ValueError: if the three inputs differ in length, are empty, or any
-        ``alpha_s`` equals 1.
+    :raises ValueError: if the three inputs differ in shape, the band centres
+        are empty or not 1-D, or any ``alpha_s`` equals 1.
     """
     freq = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     spec = np.atleast_1d(np.asarray(specular_absorption, dtype=np.float64))
     rand = np.atleast_1d(np.asarray(random_absorption, dtype=np.float64))
-    if (
-        freq.ndim != 1
-        or freq.size == 0
-        or freq.shape != spec.shape
-        or freq.shape != rand.shape
-    ):
+    if freq.ndim != 1 or freq.size == 0:
         msg = (
-            "'frequencies', 'specular_absorption' and 'random_absorption' must "
-            "be non-empty, 1-D and equal-length."
+            "'frequencies' must be a non-empty 1-D sequence of band centres; "
+            f"got shape {freq.shape}."
         )
         raise ValueError(msg)
+    require_equal_shapes(
+        "scattering_coefficient_spectrum",
+        {
+            "frequencies": freq.shape,
+            "specular_absorption": spec.shape,
+            "random_absorption": rand.shape,
+        },
+        "band",
+    )
     s = scattering_coefficient(spec, rand, truncate_negative=truncate_negative)
     return ScatteringResult(
         frequencies=freq,

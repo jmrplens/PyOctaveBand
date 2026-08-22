@@ -478,6 +478,21 @@ def test_extended_requires_core_bands() -> None:
         building.weighted_rating_extended([40.0] * 18)
 
 
+def test_extended_mismatched_frequencies_name_the_entry_point() -> None:
+    """Both entry points share one validator; each names itself, not it."""
+    freqs = [100.0 * 2.0 ** (k / 3.0) for k in range(16)]
+    with pytest.raises(
+        ValueError,
+        match=r"weighted_rating_extended: 'values_by_band'.*'frequencies'.*same shape",
+    ):
+        building.weighted_rating_extended([40.0] * 18, freqs)
+    with pytest.raises(
+        ValueError,
+        match=r"weighted_impact_rating_extended: 'values_by_band'.*'frequencies'",
+    ):
+        building.weighted_impact_rating_extended([40.0] * 18, freqs)
+
+
 def test_one_decimal_rating_annex_b() -> None:
     """ISO 12999-1:2020 Annex B: the 0,1 dB shift yields Rw = 57,4 dB and the
     one-decimal sums Rw + C50-5000 = 56,4 / Rw + Ctr,50-5000 = 51,1 dB.

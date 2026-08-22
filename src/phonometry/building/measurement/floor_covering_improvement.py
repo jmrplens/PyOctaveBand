@@ -54,7 +54,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import (
+    require_equal_shapes,
+    require_ranks,
+    require_same_length,
+)
 from .insulation import (
     impact_improvement_adaptation_term,
     weighted_impact_improvement,
@@ -153,9 +157,11 @@ def background_corrected_level(
     """
     lp = _finite(signal_and_background, "signal_and_background")
     lb = _finite(background, "background")
-    if lp.shape != lb.shape:
-        msg = "'signal_and_background' and 'background' must share their shape."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "background_corrected_level",
+        {"signal_and_background": lp.shape, "background": lb.shape},
+        "band",
+    )
     margin = lp - lb
     diff = 10.0 ** (lp / 10.0) - 10.0 ** (lb / 10.0)
     with np.errstate(invalid="ignore", divide="ignore"):
@@ -365,9 +371,11 @@ def impact_improvement(
     l1 = _finite(with_covering, "with_covering")
     freqs = _finite(frequencies, "frequencies")
     n_bands = freqs.shape[0]
-    if l0.shape != l1.shape:
-        msg = "'bare' and 'with_covering' must share their shape."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "impact_improvement",
+        {"bare": l0.shape, "with_covering": l1.shape},
+        "position and band",
+    )
     if l0.ndim not in (1, 2) or l0.shape[-1] != n_bands:
         msg = (
             "'bare'/'with_covering' must be (bands,) or (positions, bands) "
@@ -425,9 +433,11 @@ def improvement_octave_bands(
     """
     dl = _finite(improvement, "improvement")
     freqs = _finite(frequencies, "frequencies")
-    if dl.shape != freqs.shape:
-        msg = "'improvement' and 'frequencies' must share their shape."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "improvement_octave_bands",
+        {"improvement": dl.shape, "frequencies": freqs.shape},
+        "band",
+    )
     octave_freqs: list[float] = []
     octave_values: list[float] = []
     by_freq = {round(float(f), 3): float(d) for f, d in zip(freqs, dl, strict=True)}

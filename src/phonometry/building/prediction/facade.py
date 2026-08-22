@@ -74,6 +74,7 @@ import numpy as np
 from ..._internal.validation import (
     require_axis_count,
     require_equal_counts,
+    require_equal_shapes,
     require_ranks,
     require_same_length,
 )
@@ -163,17 +164,26 @@ class FacadeElement:
         return weight * 10.0 ** (-level / 10.0)
 
 
-def _band_count(elements: Sequence[FacadeElement]) -> int:
-    """Number of frequency bands implied by the elements (1 if all scalar)."""
-    sizes = set()
+def _band_count(elements: Sequence[FacadeElement], owner: str) -> int:
+    """Number of frequency bands implied by the elements (1 if all scalar).
+
+    *owner* is the entry point the caller typed, so that a façade whose
+    elements disagree is answered by name: which element carries which
+    spectrum, rather than the bare fact that two of them differ.
+    """
+    spectra: dict[str, np.ndarray] = {}
     for el in elements:
         kind = el._kind()  # exactly one of r / dn_e / insertion_loss
-        sizes.add(_as_array(getattr(el, kind), f"{el.name} ({kind})").size)
-    sizes.discard(1)
-    if len(sizes) > 1:
-        msg = "Elements have inconsistent band counts."
-        raise ValueError(msg)
-    return sizes.pop() if sizes else 1
+        label = f"{el.name} ({kind})"
+        level = _as_array(getattr(el, kind), label)
+        # A single value is broadcast over whatever the others carry
+        # (:meth:`FacadeElement.tau`), so it disagrees with nothing.
+        if level.size != 1:
+            spectra[label] = level
+    require_equal_shapes(
+        owner, {label: level.shape for label, level in spectra.items()}, "band"
+    )
+    return next(iter(spectra.values())).size if spectra else 1
 
 
 @dataclass(frozen=True)
@@ -396,7 +406,7 @@ _A_WEIGHT_OCTAVE = {
 
 
 def _apparent_reduction(
-    elements: Sequence[FacadeElement], total_area: float
+    elements: Sequence[FacadeElement], total_area: float, owner: str
 ) -> tuple[np.ndarray, dict[str, np.ndarray]]:
     r""":math:`R' = -10 \log_{10}(\sum \tau)` (F. 10 / Part 4 F. 3), plus ``Rp``."""
     if not elements:
@@ -409,7 +419,7 @@ def _apparent_reduction(
     if len(set(names)) != len(names):
         msg = "Façade element names must be unique (they key the per-element results)."
         raise ValueError(msg)
-    n = _band_count(elements)
+    n = _band_count(elements, owner)
     # Sum over the element list (not a name-keyed dict), so no element is ever
     # silently dropped, then key the per-element index by the unique names.
     taus = [el.tau(total_area, n) for el in elements]
@@ -462,7 +472,9 @@ def facade_sound_reduction(
     if v <= 0:
         msg = "'volume' must be positive."
         raise ValueError(msg)
-    r_prime, element_r = _apparent_reduction(elements, float(area))
+    r_prime, element_r = _apparent_reduction(
+        elements, float(area), "facade_sound_reduction"
+    )
     if frequencies is not None:
         require_equal_counts(
             "facade_sound_reduction",
@@ -522,7 +534,7 @@ def radiated_sound_power(
         the per-band data; enables the A-weighted single number.
     :return: A :class:`RadiatedPowerResult`.
     """
-    r_prime, _ = _apparent_reduction(elements, float(area))
+    r_prime, _ = _apparent_reduction(elements, float(area), "radiated_sound_power")
     if r_prime_cap is not None:
         r_prime = np.minimum(r_prime, float(r_prime_cap))
     lp = _as_array(lp_in, "lp_in")

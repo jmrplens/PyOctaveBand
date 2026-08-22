@@ -68,6 +68,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
+from ..._internal.validation import require_equal_shapes
 from ..._internal.warnings import PhonometryWarning
 from ...io._resolve import (
     SignalInput,
@@ -607,13 +608,18 @@ def one_third_octave_absorption(
     :param clip_negative: Set negative band results to zero (default ``True``).
     :return: Tuple ``(band_centres, band_absorption)``; a band with no
         narrow-band samples yields ``nan``.
-    :raises ValueError: If ``frequency`` and ``absorption`` differ in length or
+    :raises ValueError: If ``frequency`` and ``absorption`` differ in shape or
         are empty.
     """
     freq = np.atleast_1d(np.asarray(frequency, dtype=np.float64))
     alpha = np.atleast_1d(np.asarray(absorption, dtype=np.float64))
-    if freq.size == 0 or freq.shape != alpha.shape:
-        msg = "'frequency' and 'absorption' must be non-empty and equal-length."
+    require_equal_shapes(
+        "one_third_octave_absorption",
+        {"frequency": freq.shape, "absorption": alpha.shape},
+        "frequency",
+    )
+    if freq.size == 0:
+        msg = "'frequency' and 'absorption' must be non-empty."
         raise ValueError(msg)
     centres = np.array(
         [c for c in _ONE_THIRD_OCTAVE_CENTERS if f_min <= c <= f_max],
@@ -973,9 +979,14 @@ def spot_internal_loss_correction(
     """
     alpha_m = np.atleast_1d(np.asarray(measured_absorption, dtype=np.float64))
     alpha_s = np.atleast_1d(np.asarray(system_absorption, dtype=np.float64))
-    if alpha_m.shape != alpha_s.shape:
-        msg = "'measured_absorption' and 'system_absorption' must share a shape."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "spot_internal_loss_correction",
+        {
+            "measured_absorption": alpha_m.shape,
+            "system_absorption": alpha_s.shape,
+        },
+        "band",
+    )
     corrected = alpha_m - alpha_s
     if clip_negative:
         corrected = np.maximum(corrected, 0.0)

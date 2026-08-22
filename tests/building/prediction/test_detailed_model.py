@@ -845,7 +845,14 @@ def test_radiation_factor_rejects_invalid_geometry(kwargs: dict, message: str) -
 
 def test_perimeter_absorption_rejects_mismatched_lengths() -> None:
     """Formula (C.4) needs one ``Kij`` per connected element."""
-    with pytest.raises(ValueError, match="same length"):
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"perimeter_absorption_coefficient: 'critical_frequencies' .*"
+            r"'vibration_reduction_indices' .*same shape, "
+            r"one value per connected element"
+        ),
+    ):
         building.perimeter_absorption_coefficient([100.0, 200.0], [6.0])
 
 

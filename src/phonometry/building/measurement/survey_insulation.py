@@ -72,7 +72,11 @@ from typing import TYPE_CHECKING, Any, Literal, overload
 
 import numpy as np
 
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import (
+    require_equal_shapes,
+    require_ranks,
+    require_same_length,
+)
 from .insulation import (
     ImpactRatingResult,
     WeightedRatingResult,
@@ -747,9 +751,11 @@ def survey_airborne_insulation(
     """
     l1_bands = _as_band_levels(l1, "l1")
     l2_bands = _as_band_levels(l2, "l2")
-    if l1_bands.shape != l2_bands.shape:
-        msg = "'l1' and 'l2' must share the same band count."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "survey_airborne_insulation",
+        {"l1": l1_bands.shape, "l2": l2_bands.shape},
+        "band",
+    )
     k = _validate_index(reverberation_index, int(l1_bands.size))
 
     d = l1_bands - l2_bands
@@ -841,9 +847,11 @@ def survey_facade_insulation(
     """
     out = _as_band_levels(l1_2m, "l1_2m")
     l2_bands = _as_band_levels(l2, "l2")
-    if out.shape != l2_bands.shape:
-        msg = "'l1_2m' and 'l2' must share the same band count."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "survey_facade_insulation",
+        {"l1_2m": out.shape, "l2": l2_bands.shape},
+        "band",
+    )
     k = _validate_index(reverberation_index, int(out.size))
 
     d_2m = out - l2_bands

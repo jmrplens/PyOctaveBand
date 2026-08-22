@@ -39,6 +39,7 @@ from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 
+from .._internal.validation import require_equal_shapes
 from ._i18n import format_number, t
 from ._layout import (
     _ACCENT_HEX,
@@ -395,7 +396,7 @@ def _validated_curves(
     """Band centres, measured and shifted curves, and the unfavourable deviations.
 
     :raises ValueError: If a curve is missing from the result or the three do
-        not share a length.
+        not share a shape.
     """
     centers = result.band_centers
     measured = result.measured
@@ -409,12 +410,15 @@ def _validated_curves(
     centers = np.asarray(centers, dtype=np.float64)
     measured = np.asarray(measured, dtype=np.float64)
     shifted = np.asarray(shifted, dtype=np.float64)
-    if not centers.shape == measured.shape == shifted.shape:
-        msg = (
-            "render_iso717_report() needs 'band_centers', 'measured' and "
-            "'shifted_reference' of equal length."
-        )
-        raise ValueError(msg)
+    require_equal_shapes(
+        f"{type(result).__name__}.report",
+        {
+            "band_centers": centers.shape,
+            "measured": measured.shape,
+            "shifted_reference": shifted.shape,
+        },
+        "band",
+    )
 
     # Unfavourable deviation: reference above measurement (airborne) or
     # measurement above the reference (impact, the opposite sign).

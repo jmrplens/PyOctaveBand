@@ -337,9 +337,12 @@ def test_one_third_octave_clipping() -> None:
 
 
 def test_one_third_octave_guards() -> None:
-    with pytest.raises(ValueError, match="must be non-empty and equal-length"):
+    with pytest.raises(
+        ValueError,
+        match=r"one_third_octave_absorption: 'frequency' .*'absorption' .*same shape",
+    ):
         one_third_octave_absorption([250.0, 500.0], [0.1])
-    with pytest.raises(ValueError, match="must be non-empty and equal-length"):
+    with pytest.raises(ValueError, match=r"'frequency' .*must be non-empty"):
         one_third_octave_absorption([], [])
 
 
@@ -489,7 +492,13 @@ def test_spot_guards() -> None:
         spot_tube_upper_frequency(0.0)
     with pytest.raises(ValueError, match="'f_min' must be less than 'f_max'"):
         spot_microphone_spacing_bounds(340.0, f_min=1800.0, f_max=220.0)
-    with pytest.raises(ValueError, match="must share a shape"):
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"spot_internal_loss_correction: 'measured_absorption' "
+            r".*'system_absorption' .*same shape"
+        ),
+    ):
         spot_internal_loss_correction([0.1, 0.2], [0.1])
 
 

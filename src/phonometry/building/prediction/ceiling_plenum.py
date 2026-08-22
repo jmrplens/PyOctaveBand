@@ -109,6 +109,7 @@ import numpy as np
 
 from ..._internal.validation import (
     require_choice,
+    require_equal_shapes,
     require_finite_array,
     require_positive,
     require_ranks,
@@ -229,9 +230,11 @@ def normalized_ceiling_attenuation(
     """
     l1 = require_finite_array(level_source, "level_source")
     l2 = require_finite_array(level_receiving, "level_receiving")
-    if l1.shape != l2.shape:
-        msg = "'level_source' and 'level_receiving' must share their shape."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "normalized_ceiling_attenuation",
+        {"level_source": l1.shape, "level_receiving": l2.shape},
+        "band",
+    )
     area = require_finite_array(absorption_area, "absorption_area")
     if area.size == 1:
         area = np.full(l1.shape, float(area[0]))
@@ -558,12 +561,14 @@ def plenum_flanking_reduction_index(
     """
     rs = require_finite_array(reduction_index_source, "reduction_index_source")
     rr = require_finite_array(reduction_index_receiving, "reduction_index_receiving")
-    if rs.shape != rr.shape:
-        msg = (
-            "'reduction_index_source' and 'reduction_index_receiving' must "
-            "share their shape."
-        )
-        raise ValueError(msg)
+    require_equal_shapes(
+        "plenum_flanking_reduction_index",
+        {
+            "reduction_index_source": rs.shape,
+            "reduction_index_receiving": rr.shape,
+        },
+        "band",
+    )
     lr = require_positive(ceiling_length, "ceiling_length")
     h = require_positive(plenum_height, "plenum_height")
     ls = (
@@ -578,9 +583,11 @@ def plenum_flanking_reduction_index(
     freqs: np.ndarray | None = None
     if frequency is not None:
         freqs = require_finite_array(frequency, "frequency")
-        if freqs.shape != rs.shape:
-            msg = "'frequency' must match the reduction indices."
-            raise ValueError(msg)
+        require_equal_shapes(
+            "plenum_flanking_reduction_index",
+            {"reduction_index_source": rs.shape, "frequency": freqs.shape},
+            "band",
+        )
 
     tau_s = 10.0 ** (-rs / 10.0)
     tau_r = 10.0 ** (-rr / 10.0)
@@ -608,9 +615,15 @@ def plenum_flanking_reduction_index(
 
     ms = require_finite_array(attenuation_source, "attenuation_source")
     mr = require_finite_array(attenuation_receiving, "attenuation_receiving")
-    if ms.shape != rs.shape or mr.shape != rs.shape:
-        msg = "the attenuation coefficients must match the reduction indices."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "plenum_flanking_reduction_index",
+        {
+            "reduction_index_source": rs.shape,
+            "attenuation_source": ms.shape,
+            "attenuation_receiving": mr.shape,
+        },
+        "band",
+    )
     if np.any(ms <= 0.0) or np.any(mr <= 0.0):
         msg = "the attenuation coefficients must be positive."
         raise ValueError(msg)

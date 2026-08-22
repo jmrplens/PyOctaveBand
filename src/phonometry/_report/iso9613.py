@@ -37,6 +37,7 @@ from typing import TYPE_CHECKING, Any, NamedTuple
 
 import numpy as np
 
+from .._internal.validation import require_equal_shapes
 from ._i18n import format_number, t
 from ._layout import (
     _ACCENT_HEX,
@@ -307,12 +308,11 @@ def _resolve_levels(
 
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     lw = np.atleast_1d(np.asarray(emission.sound_power_level, dtype=np.float64))
-    if lw.shape != freqs.shape:
-        msg = (
-            "source_emission.sound_power_level must have one value per frequency "
-            f"band (got {lw.size}, expected {freqs.size})."
-        )
-        raise ValueError(msg)
+    require_equal_shapes(
+        "OutdoorAttenuation.report",
+        {"source_emission.sound_power_level": lw.shape, "frequencies": freqs.shape},
+        "band",
+    )
     receiver = _compose_receiver_level(
         lw,
         emission.directivity_index,

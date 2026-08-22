@@ -503,7 +503,10 @@ def test_measurement_air_attenuation_reduces_area() -> None:
 
 
 def test_measurement_shape_mismatch_raises() -> None:
-    with pytest.raises(ValueError, match="share one shape"):
+    with pytest.raises(
+        ValueError,
+        match=r"measure_sound_absorption: .*'t_empty' .* must all have the same shape",
+    ):
         materials.measure_sound_absorption(
             _FREQS, _T1[:-1], _T2, volume=200.0, area=10.8
         )

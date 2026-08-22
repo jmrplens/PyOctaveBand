@@ -421,6 +421,13 @@ def test_standardization_rejects_a_mismatched_reverberation_time() -> None:
         building.standardized_maximum_impact_level([70.0, 65.0], 50.0, [1.0, 2.0, 3.0])
 
 
+def test_standardization_rejects_a_mismatched_frequency_axis() -> None:
+    with pytest.raises(ValueError, match=r"'frequency'.*same shape"):
+        building.standardized_maximum_impact_level(
+            [70.0, 65.0, 60.0], 50.0, 0.5, frequency=[63.0, 125.0]
+        )
+
+
 def test_standardization_result_rejects_a_stretched_reverberation_time() -> None:
     """``reverberation_time`` is carried, not drawn, and not recomputed.
 

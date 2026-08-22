@@ -54,7 +54,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import (
+    require_equal_shapes,
+    require_ranks,
+    require_same_length,
+)
 from ..._internal.warnings import PhonometryWarning
 from .insulation import (
     ImpactRatingResult,
@@ -427,9 +431,11 @@ def background_correction(
     """
     lsb = np.asarray(signal_and_background, dtype=np.float64)
     lb = np.asarray(background, dtype=np.float64)
-    if lsb.shape != lb.shape:
-        msg = "'signal_and_background' and 'background' must share their shape."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "background_correction",
+        {"signal_and_background": lsb.shape, "background": lb.shape},
+        "band",
+    )
     if not (np.all(np.isfinite(lsb)) and np.all(np.isfinite(lb))):
         msg = "Levels must contain only finite values."
         raise ValueError(msg)
@@ -493,9 +499,11 @@ def lab_airborne_insulation(
     """
     l1_bands = _as_band_levels(l1, "l1")
     l2_bands = _as_band_levels(l2, "l2")
-    if l1_bands.shape != l2_bands.shape:
-        msg = "'l1' and 'l2' must share the same band count."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "lab_airborne_insulation",
+        {"l1": l1_bands.shape, "l2": l2_bands.shape},
+        "band",
+    )
     if not np.isfinite(area) or area <= 0.0:
         msg = "'area' must be positive."
         raise ValueError(msg)

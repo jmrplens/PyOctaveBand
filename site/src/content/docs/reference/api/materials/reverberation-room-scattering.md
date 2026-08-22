@@ -346,7 +346,7 @@ per-band specular `alpha_spec` (Eq. (4)) and random-incidence `alpha_s`
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | if the three inputs differ in length, are empty, or any `alpha_s` equals 1. |
+| ValueError | if the three inputs differ in shape, the band centres are empty or not 1-D, or any `alpha_s` equals 1. |
 
 ## scattering_coefficient_uncertainty
 

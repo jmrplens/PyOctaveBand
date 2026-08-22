@@ -394,7 +394,7 @@ and is not reproduced here.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | Mismatched lengths, empty input, or negative `u_i`. |
+| ValueError | Mismatched shapes, empty input, or negative `u_i`. |
 
 ## uncertain_value
 

@@ -27,6 +27,7 @@ import numpy as np
 import pytest
 
 from phonometry._internal.validation import (
+    require_equal_shapes,
     require_ranks,
     require_same_length,
     require_same_shape,
@@ -188,3 +189,29 @@ def test_the_message_names_the_result_the_fields_and_the_counts() -> None:
     assert "'first' (16)" in message
     assert "'second' (17)" in message
     assert "one value per band" in message
+
+
+def test_equal_shapes_names_the_entry_point_and_every_shape() -> None:
+    """The loose-arguments form, for a function validating what it was passed.
+
+    There is no instance to read fields off, so the caller states the label and
+    the shape. The owner is the name the caller typed, not the private
+    validator it happened to reach.
+    """
+    with pytest.raises(ValueError, match="'y'") as caught:
+        require_equal_shapes("coherence", {"x": (3, 2), "y": (3, 4)}, "sample")
+    message = str(caught.value)
+    assert "coherence:" in message
+    assert "'x' (3, 2)" in message
+    assert "one value per sample" in message
+
+
+def test_equal_shapes_is_quiet_when_they_agree() -> None:
+    require_equal_shapes("coherence", {"x": (3, 2), "y": (3, 2)}, "sample")
+
+
+def test_equal_shapes_sees_what_a_count_cannot() -> None:
+    """Two grids of the same height agree on every count a length check reads."""
+    require_equal_shapes("f", {"a": (3,), "b": (3,)})
+    with pytest.raises(ValueError, match="'b'"):
+        require_equal_shapes("f", {"a": (3, 2), "b": (3, 4)})

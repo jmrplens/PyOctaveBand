@@ -159,9 +159,9 @@ def test_static_velocity_above_limit_warns() -> None:
             lambda: static_airflow_resistance([1e-3], [12.0], 0.008),
             "At least two measurement steps",
         ),
-        (  # length
+        (  # shape
             lambda: static_airflow_resistance([1e-3, 2e-3], [12.0], 0.008),
-            "must have equal length",
+            r"'velocities'.*must all have the same shape",
         ),
         (  # neg u
             lambda: static_airflow_resistance([1e-3, -2e-3], [12.0, 24.0], 0.008),

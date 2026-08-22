@@ -95,6 +95,16 @@ def test_airborne_energy_averages_positions() -> None:
     np.testing.assert_allclose(multi.d, single.d)
 
 
+def test_airborne_room_levels_of_different_lengths_raise() -> None:
+    """The message names both rooms, since either one may be the wrong one."""
+    with pytest.raises(
+        ValueError, match=r"survey_airborne_insulation: 'l1' .*'l2' .*same shape"
+    ):
+        building.survey_airborne_insulation(
+            np.full(_OCTAVE, 80.0), np.full(3, 45.0), np.zeros(_OCTAVE)
+        )
+
+
 # ---------------------------------------------------------------------------
 # Impact (Formulas (8), (9), (10))
 # ---------------------------------------------------------------------------
@@ -126,6 +136,16 @@ def test_facade_d2m_family() -> None:
     assert res.d_2m_nt[0] == pytest.approx(37.0)  # D2m + k
     assert res.d_2m_n[0] == pytest.approx(35.0 + 2.0 + _norm(40.0))
     assert res.rating is not None
+
+
+def test_facade_outdoor_and_indoor_levels_of_different_lengths_raise() -> None:
+    """The outdoor and receiving-room levels are subtracted band by band."""
+    with pytest.raises(
+        ValueError, match=r"survey_facade_insulation: 'l1_2m' .*'l2' .*same shape"
+    ):
+        building.survey_facade_insulation(
+            np.full(_OCTAVE, 75.0), np.full(4, 40.0), np.zeros(_OCTAVE)
+        )
 
 
 # ---------------------------------------------------------------------------

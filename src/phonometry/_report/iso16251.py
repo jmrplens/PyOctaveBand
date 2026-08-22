@@ -44,6 +44,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_equal_shapes
 from ._i18n import format_number, t
 from ._layout import (
     _ACCENT_HEX,
@@ -348,12 +349,11 @@ def render_iso16251_report(
 
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     delta_l = np.asarray(result.improvement, dtype=np.float64)
-    if freqs.shape != delta_l.shape:
-        msg = (
-            "render_iso16251_report() needs 'frequencies' and 'improvement' of "
-            "equal length."
-        )
-        raise ValueError(msg)
+    require_equal_shapes(
+        "FloorCoveringImprovementResult.report",
+        {"frequencies": freqs.shape, "improvement": delta_l.shape},
+        "band",
+    )
 
     styles, title_style, basis_style, caption_style = document_styles(accent)
     title = t("Floor-covering impact sound improvement", language)

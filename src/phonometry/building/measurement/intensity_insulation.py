@@ -79,6 +79,7 @@ import numpy as np
 
 from ..._internal.validation import (
     require_equal_counts,
+    require_equal_shapes,
     require_ranks,
     require_same_length,
 )
@@ -536,9 +537,11 @@ def surface_pressure_intensity_indicator(
     """
     p = np.asarray(lp, dtype=np.float64)
     i = np.asarray(l_in, dtype=np.float64)
-    if p.shape != i.shape:
-        msg = "'lp' and 'l_in' must share their shape."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "surface_pressure_intensity_indicator",
+        {"lp": p.shape, "l_in": i.shape},
+        "band",
+    )
     if not (np.all(np.isfinite(p)) and np.all(np.isfinite(i))):
         msg = "Levels must contain only finite values."
         raise ValueError(msg)
@@ -665,9 +668,11 @@ def intensity_sound_reduction(
     """
     lp1_bands = _as_band_levels(lp1, "lp1")
     l_in_bands = _as_band_levels(l_in, "l_in")
-    if lp1_bands.shape != l_in_bands.shape:
-        msg = "'lp1' and 'l_in' must share the same band count."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "intensity_sound_reduction",
+        {"lp1": lp1_bands.shape, "l_in": l_in_bands.shape},
+        "band",
+    )
     sm = _positive_area(measurement_area, "measurement_area")
     s = _positive_area(area, "area")
 
@@ -676,9 +681,11 @@ def intensity_sound_reduction(
     r_i_modified: np.ndarray | None = None
     if kc is not None:
         kc_bands = np.asarray(kc, dtype=np.float64)
-        if kc_bands.shape != r_i.shape:
-            msg = "'kc' must share the band count of the levels."
-            raise ValueError(msg)
+        require_equal_shapes(
+            "intensity_sound_reduction",
+            {"lp1": lp1_bands.shape, "kc": kc_bands.shape},
+            "band",
+        )
         if not np.all(np.isfinite(kc_bands)):
             msg = "'kc' must contain only finite values."
             raise ValueError(msg)
@@ -748,9 +755,11 @@ def intensity_element_normalized_difference(
     """
     lp1_bands = _as_band_levels(lp1, "lp1")
     l_in_bands = _as_band_levels(l_in, "l_in")
-    if lp1_bands.shape != l_in_bands.shape:
-        msg = "'lp1' and 'l_in' must share the same band count."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "intensity_element_normalized_difference",
+        {"lp1": lp1_bands.shape, "l_in": l_in_bands.shape},
+        "band",
+    )
     sm = _positive_area(measurement_area, "measurement_area")
     if int(n) != n or n < 1:
         msg = "'n' must be a positive integer."

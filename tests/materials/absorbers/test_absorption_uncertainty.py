@@ -164,9 +164,11 @@ def test_frequency_must_be_tabulated() -> None:
 
 
 def test_shape_mismatch_raises() -> None:
-    with pytest.raises(ValueError, match="same shape"):
+    with pytest.raises(ValueError, match=r"'alpha'.*must all have the same shape"):
         materials.sound_absorption_coefficient_uncertainty([0.5, 0.6], [1000])
-    with pytest.raises(ValueError, match="same shape"):
+    with pytest.raises(ValueError, match=r"'alpha_p'.*must all have the same shape"):
+        materials.practical_coefficient_uncertainty([0.5, 0.6], [1000])
+    with pytest.raises(ValueError, match=r"'area'.*must all have the same shape"):
         materials.equivalent_area_uncertainty([5.0, 6.0], [500])
 
 

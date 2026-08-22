@@ -78,6 +78,7 @@ import numpy as np
 
 from ..._internal.validation import (
     require_equal_counts,
+    require_equal_shapes,
     require_ranks,
     require_same_length,
 )
@@ -679,10 +680,17 @@ def vibration_reduction_index_from_flanking(
     s_i = _positive(area_i, "area_i")
     s_j = _positive(area_j, "area_j")
     a0 = _positive(reference_area, "reference_area")
-    sizes = {dn_f.size, r_i.size, r_j.size, a_i.size, a_j.size}
-    if len(sizes) != 1:
-        msg = "All per-band inputs must share the same length."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "vibration_reduction_index_from_flanking",
+        {
+            "normalized_flanking_level_difference": dn_f.shape,
+            "reduction_index_i": r_i.shape,
+            "reduction_index_j": r_j.shape,
+            "absorption_length_i": a_i.shape,
+            "absorption_length_j": a_j.shape,
+        },
+        "band",
+    )
     k_ij = (
         dn_f
         - 0.5 * (r_i + r_j)

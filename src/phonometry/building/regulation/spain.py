@@ -84,7 +84,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import (
+    require_equal_shapes,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -501,9 +505,11 @@ def db_hr_global_index(
         selected = values.copy()
     else:
         given = np.asarray(frequencies, dtype=np.float64)
-        if given.shape != values.shape:
-            msg = "'frequencies' must have one value per band of 'band_values'."
-            raise ValueError(msg)
+        require_equal_shapes(
+            "db_hr_global_index",
+            {"band_values": values.shape, "frequencies": given.shape},
+            "band",
+        )
         if not np.all(np.isfinite(given)) or np.any(given <= 0.0):
             msg = "'frequencies' must contain positive values."
             raise ValueError(msg)

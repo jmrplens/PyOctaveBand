@@ -240,7 +240,10 @@ def test_scattering_short_random_incidence_rejected(tmp_path) -> None:
     result = _scattering()
     short = replace(result, random_incidence=result.random_incidence[:-1])
     out = tmp_path / "scat_short.pdf"
-    with pytest.raises(ValueError, match="'random_incidence'"):
+    with pytest.raises(
+        ValueError,
+        match=r"ScatteringResult\.report: .*'random_incidence'.*same shape",
+    ):
         short.report(str(out))
     assert not out.exists()  # refused before the fiche is written
 
@@ -250,7 +253,10 @@ def test_scattering_verbose_short_specular_rejected(tmp_path) -> None:
     result = _scattering()
     short = replace(result, specular=result.specular[:-1])
     out = tmp_path / "scat_short_verbose.pdf"
-    with pytest.raises(ValueError, match="'specular'"):
+    with pytest.raises(
+        ValueError,
+        match=r"ScatteringResult\.report\(verbose=True\): .*'specular'.*same shape",
+    ):
         short.report(str(out), verbose=True)
     assert not out.exists()
 
@@ -312,7 +318,23 @@ def test_diffusion_short_normalized_rejected(tmp_path) -> None:
     result = _diffusion_spectrum()
     short = replace(result, normalized=result.normalized[:-1])
     out = tmp_path / "diff_short.pdf"
-    with pytest.raises(ValueError, match="'normalized'"):
+    with pytest.raises(
+        ValueError,
+        match=r"DiffusionSpectrum\.report: .*'normalized'.*same shape",
+    ):
+        short.report(str(out))
+    assert not out.exists()
+
+
+def test_diffusion_short_spectrum_rejected(tmp_path) -> None:
+    """A hand-built spectrum whose d is short would cut the fiche table."""
+    result = _diffusion_spectrum()
+    short = replace(result, diffusion=result.diffusion[:-1])
+    out = tmp_path / "diff_short_d.pdf"
+    with pytest.raises(
+        ValueError,
+        match=r"DiffusionSpectrum\.report: .*'diffusion'.*same shape",
+    ):
         short.report(str(out))
     assert not out.exists()
 
@@ -337,6 +359,19 @@ def test_polar_unknown_engine_rejected(tmp_path) -> None:
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="engine"):
         result.report(out, engine="weasyprint")
+
+
+def test_polar_short_levels_rejected(tmp_path) -> None:
+    """One level per receiver angle: a short column is refused before rendering."""
+    result = _polar()
+    short = replace(result, levels=result.levels[:-1])
+    out = tmp_path / "polar_short.pdf"
+    with pytest.raises(
+        ValueError,
+        match=r"DiffusionResult\.report: .*'levels'.*one value per receiver angle",
+    ):
+        short.report(str(out))
+    assert not out.exists()
 
 
 def test_polar_spanish_uses_comma_decimal(tmp_path) -> None:

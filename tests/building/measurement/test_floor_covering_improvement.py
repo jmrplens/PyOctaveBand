@@ -142,7 +142,7 @@ def test_background_correction_boundary_at_6_subtracts() -> None:
 
 
 def test_background_correction_shape_mismatch() -> None:
-    with pytest.raises(ValueError, match="share their shape"):
+    with pytest.raises(ValueError, match=r"'signal_and_background'.*same shape"):
         building.background_corrected_level([80.0, 70.0], [50.0])
 
 
@@ -306,7 +306,7 @@ def test_impact_improvement_with_background_flags_limited() -> None:
 
 
 def test_impact_improvement_shape_mismatch() -> None:
-    with pytest.raises(ValueError, match="share their shape"):
+    with pytest.raises(ValueError, match=r"'with_covering'.*same shape"):
         building.impact_improvement([75.0, 75.0], [70.0], [500.0, 1000.0])
 
 

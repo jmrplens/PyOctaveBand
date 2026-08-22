@@ -316,6 +316,27 @@ def test_indirect_kij_from_flanking_roundtrip() -> None:
     assert recovered[0] == pytest.approx(k_true)
 
 
+def test_indirect_kij_band_count_mismatch_names_every_input() -> None:
+    """The guard names each per-band argument, not just "the inputs"."""
+    with pytest.raises(
+        ValueError,
+        match=r"vibration_reduction_index_from_flanking: "
+        r"'normalized_flanking_level_difference'.*'reduction_index_i'.*"
+        r"'reduction_index_j'.*'absorption_length_i'.*'absorption_length_j'.*"
+        r"same shape, one value per band",
+    ):
+        building.vibration_reduction_index_from_flanking(
+            [50.0, 52.0, 54.0],
+            [45.0, 46.0],
+            [44.0, 45.0, 46.0],
+            2.8,
+            10.0,
+            12.0,
+            [1.5, 1.6, 1.7],
+            [1.4, 1.5, 1.6, 1.7],
+        )
+
+
 # ---------------------------------------------------------------------------
 # Validity criteria
 # ---------------------------------------------------------------------------

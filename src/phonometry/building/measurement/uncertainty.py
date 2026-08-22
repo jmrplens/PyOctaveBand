@@ -52,6 +52,8 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from ..._internal.validation import require_equal_shapes
+
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
@@ -766,7 +768,7 @@ def single_number_uncertainty_uncorrelated(
     :param band_uncertainties: Per-band standard uncertainties ``u_i``, in dB.
     :param reference_differences: Per-band :math:`L_i - R_i`
         (reference-spectrum level minus measured band value), in dB.
-    :raises ValueError: Mismatched lengths, empty input, or negative ``u_i``.
+    :raises ValueError: Mismatched shapes, empty input, or negative ``u_i``.
     """
     u_arr = np.asarray(band_uncertainties, dtype=float)
     d_arr = np.asarray(reference_differences, dtype=float)
@@ -776,9 +778,14 @@ def single_number_uncertainty_uncorrelated(
     if u_arr.size == 0:
         msg = "At least one band is required."
         raise ValueError(msg)
-    if u_arr.shape != d_arr.shape:
-        msg = "band_uncertainties and reference_differences differ in length."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "single_number_uncertainty_uncorrelated",
+        {
+            "band_uncertainties": u_arr.shape,
+            "reference_differences": d_arr.shape,
+        },
+        "band",
+    )
     if np.any(u_arr < 0):
         msg = "Band uncertainties must be non-negative."
         raise ValueError(msg)

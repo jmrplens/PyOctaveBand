@@ -59,7 +59,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import (
+    require_equal_shapes,
+    require_ranks,
+    require_same_length,
+)
 from ..._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -621,12 +625,15 @@ def measure_sound_absorption(
     freqs = np.asarray(frequencies, dtype=np.float64)
     t1 = np.asarray(t_empty, dtype=np.float64)
     t2 = np.asarray(t_specimen, dtype=np.float64)
-    if not (freqs.shape == t1.shape == t2.shape):
-        msg = (
-            "'frequencies', 't_empty' and 't_specimen' must share one shape; "
-            f"got {freqs.shape}, {t1.shape} and {t2.shape}."
-        )
-        raise ValueError(msg)
+    require_equal_shapes(
+        "measure_sound_absorption",
+        {
+            "frequencies": freqs.shape,
+            "t_empty": t1.shape,
+            "t_specimen": t2.shape,
+        },
+        "band",
+    )
     m_arr = np.broadcast_to(np.asarray(m, dtype=np.float64), freqs.shape).astype(
         np.float64, copy=True
     )
