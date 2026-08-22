@@ -115,7 +115,10 @@ def test_source_metadata_travels_with_the_signal() -> None:
 
 def test_invalid_construction_is_rejected() -> None:
     tone = _tone()
-    with pytest.raises(ValueError, match="channel labels"):
+    with pytest.raises(
+        ValueError,
+        match=r"Signal: .*'channel_labels' .* must each carry one value per channel",
+    ):
         Signal(data=np.zeros((2, 10)), fs=FS, channel_labels=("FL",))
     with pytest.raises(ValueError, match="fs"):
         Signal(data=tone, fs=0)

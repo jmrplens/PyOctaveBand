@@ -434,7 +434,9 @@ def test_no_element_silently_dropped_when_names_unique() -> None:
 
 def test_frequencies_length_must_match_bands() -> None:
     elements = [building.FacadeElement(name="a", area=5.0, r=[40.0, 41.0, 42.0])]
-    with pytest.raises(ValueError, match="frequencies"):
+    with pytest.raises(
+        ValueError, match=r"'frequencies'.*must each carry one value per band"
+    ):
         building.facade_sound_reduction(
             elements,
             area=10.0,
@@ -445,13 +447,24 @@ def test_frequencies_length_must_match_bands() -> None:
 
 def test_octave_bands_length_must_match() -> None:
     elements = [building.FacadeElement(name="w", area=10.0, r=[40.0, 41.0])]
-    with pytest.raises(ValueError, match="octave_bands"):
+    with pytest.raises(
+        ValueError, match=r"'octave_bands'.*must each carry one value per band"
+    ):
         building.radiated_sound_power(
             elements,
             lp_in=[70.0, 71.0],
             area=10.0,
             octave_bands=[125],
         )
+
+
+def test_lp_in_length_must_match_bands() -> None:
+    """A per-band Lp,in that is not the element band count names both counts."""
+    elements = [building.FacadeElement(name="w", area=10.0, r=[40.0, 41.0])]
+    with pytest.raises(
+        ValueError, match=r"'lp_in'.*must each carry one value per band"
+    ):
+        building.radiated_sound_power(elements, lp_in=[70.0, 71.0, 72.0], area=10.0)
 
 
 def test_tau_rejects_non_positive_total_area() -> None:

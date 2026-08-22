@@ -313,7 +313,13 @@ def test_partial_band_set_is_range_limited() -> None:
 
 
 def test_mismatched_lengths_and_repeats_are_rejected() -> None:
-    with pytest.raises(ValueError, match="same length"):
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"verify_intensity_class: 'residual_index' .* must each carry "
+            r"one value per band"
+        ),
+    ):
         emission.verify_intensity_class([20.0, 20.0], [1000.0])
     with pytest.raises(ValueError, match="repeats"):
         emission.verify_intensity_class([20.0, 20.0], [1000.0, 1000.0])

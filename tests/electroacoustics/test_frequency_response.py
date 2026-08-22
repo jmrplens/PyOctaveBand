@@ -119,10 +119,14 @@ def test_response_curves_must_share_one_frequency_axis() -> None:
 
 
 def test_rejects_mismatched_lengths() -> None:
+    """Both entry points name themselves, not the validator they share."""
     x = np.zeros(1000)
     shorter_y = np.zeros(500)
-    with pytest.raises(ValueError, match="'x' and 'y' must have the same length"):
+    per_sample = r"'x'.*'y'.*one value per sample"
+    with pytest.raises(ValueError, match=rf"transfer_function: {per_sample}"):
         electroacoustics.transfer_function(x, shorter_y, FS)
+    with pytest.raises(ValueError, match=rf"coherence: {per_sample}"):
+        electroacoustics.coherence(x, shorter_y, FS)
 
 
 def test_rejects_bad_estimator_and_overlap() -> None:

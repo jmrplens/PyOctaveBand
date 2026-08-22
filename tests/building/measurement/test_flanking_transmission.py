@@ -396,7 +396,11 @@ def test_reverberation_time_needs_frequency() -> None:
 
 
 def test_frequency_band_count_mismatch_raises() -> None:
-    with pytest.raises(ValueError, match="band count"):
+    with pytest.raises(
+        ValueError,
+        match=r"vibration_reduction_index: 'velocity_level_difference'.*"
+        r"'frequency'.*one value per band",
+    ):
         building.vibration_reduction_index(
             [5.0, 6.0], 2.0, 4.0, 4.0, frequency=[1000.0]
         )
@@ -408,7 +412,11 @@ def test_nonpositive_geometry_raises() -> None:
 
 
 def test_mismatched_level_lengths_raise() -> None:
-    with pytest.raises(ValueError, match="share their length"):
+    with pytest.raises(
+        ValueError,
+        match=r"velocity_level_difference: 'source_level'.*'receive_level'.*"
+        r"one value per band",
+    ):
         building.velocity_level_difference([1.0, 2.0], [1.0])
 
 

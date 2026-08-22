@@ -61,6 +61,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from scipy import signal as sig
 
+from ..._internal.validation import require_equal_counts
 from ..._internal.warnings import PhonometryWarning
 from ...io._resolve import SignalInput, resolve_fs, resolve_samples
 
@@ -1147,9 +1148,11 @@ def daily_vibration_exposure(
         labels = tuple(f"op {i + 1}" for i in range(ahv.size))
     else:
         labels = tuple(labels)
-        if len(labels) != ahv.size:
-            msg = "'labels' must match the number of operations."
-            raise ValueError(msg)
+        require_equal_counts(
+            "daily_vibration_exposure",
+            {"total_values": ahv.size, "labels": len(labels)},
+            "operation",
+        )
     partials = np.array(
         [daily_exposure(float(a), float(dt)) for a, dt in zip(ahv, t, strict=True)],
         dtype=np.float64,

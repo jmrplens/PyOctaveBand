@@ -61,6 +61,7 @@ from scipy.special import j1, struve
 
 from ..._internal.validation import (
     require_choice,
+    require_equal_counts,
     require_positive,
     require_ranks,
     require_same_length,
@@ -390,19 +391,17 @@ def composite_transmission_loss(
         msg = "'areas' must be positive and finite."
         raise ValueError(msg)
     r = np.asarray(reduction_indices, dtype=np.float64)
+    if r.ndim not in (1, 2):
+        msg = "'reduction_indices' must be 1-D or 2-D."
+        raise ValueError(msg)
+    require_equal_counts(
+        "composite_transmission_loss",
+        {"areas": s.shape[0], "reduction_indices": r.shape[0]},
+        "element",
+    )
+    tau = 10.0 ** (-r / 10.0)
     if r.ndim == 1:
-        if r.shape[0] != s.shape[0]:
-            msg = "'reduction_indices' length must match 'areas'."
-            raise ValueError(msg)
-        tau = 10.0 ** (-r / 10.0)
         total_1d = float(np.sum(s * tau) / np.sum(s))
         return np.asarray(-10.0 * np.log10(total_1d), dtype=np.float64)
-    if r.ndim == 2:  # noqa: PLR2004
-        if r.shape[0] != s.shape[0]:
-            msg = "'reduction_indices' first axis must match 'areas'."
-            raise ValueError(msg)
-        tau = 10.0 ** (-r / 10.0)
-        total_2d = np.sum(s[:, None] * tau, axis=0) / np.sum(s)
-        return np.asarray(-10.0 * np.log10(total_2d), dtype=np.float64)
-    msg = "'reduction_indices' must be 1-D or 2-D."
-    raise ValueError(msg)
+    total_2d = np.sum(s[:, None] * tau, axis=0) / np.sum(s)
+    return np.asarray(-10.0 * np.log10(total_2d), dtype=np.float64)

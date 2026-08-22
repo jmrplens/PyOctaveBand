@@ -463,12 +463,11 @@ def facade_sound_reduction(
         msg = "'volume' must be positive."
         raise ValueError(msg)
     r_prime, element_r = _apparent_reduction(elements, float(area))
-    if frequencies is not None and len(frequencies) != r_prime.size:
-        msg = (
-            f"'frequencies' has {len(frequencies)} entries but the elements imply "
-            f"{r_prime.size} bands."
+    if frequencies is not None:
+        require_equal_counts(
+            "facade_sound_reduction",
+            {"frequencies": len(frequencies), "elements": r_prime.size},
         )
-        raise ValueError(msg)
     r_45 = r_prime + 1.0
     r_tr_s = r_prime.copy()
     d_2m_nt = r_prime + delta + 10.0 * log10(v / (6.0 * _T0 * float(area)))
@@ -529,15 +528,14 @@ def radiated_sound_power(
     lp = _as_array(lp_in, "lp_in")
     if lp.size == 1:
         lp = np.full(r_prime.size, float(lp[0]))
-    if lp.size != r_prime.size:
-        msg = "'lp_in' must match the element band count."
-        raise ValueError(msg)
-    if octave_bands is not None and len(octave_bands) != r_prime.size:
-        msg = (
-            f"'octave_bands' has {len(octave_bands)} entries but the elements imply "
-            f"{r_prime.size} bands."
+    require_equal_counts(
+        "radiated_sound_power", {"lp_in": lp.size, "elements": r_prime.size}
+    )
+    if octave_bands is not None:
+        require_equal_counts(
+            "radiated_sound_power",
+            {"octave_bands": len(octave_bands), "elements": r_prime.size},
         )
-        raise ValueError(msg)
     l_w = lp + float(c_d) - r_prime + 10.0 * log10(float(area) / _S0)
 
     l_w_dba: float | None = None

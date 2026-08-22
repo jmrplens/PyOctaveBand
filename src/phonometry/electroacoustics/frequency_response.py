@@ -30,7 +30,11 @@ import numpy as np
 
 # Shared Welch-core defaults and helpers (single source of truth for the
 # segment policy across the spectral estimators).
-from .._internal.validation import require_ranks, require_same_length
+from .._internal.validation import (
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
 from ..io._resolve import apply_calibration, resolve_pair_fs
 from ..signals.spectra import (
     _DEFAULT_OVERLAP,
@@ -51,15 +55,20 @@ if TYPE_CHECKING:
 def _validate_pair(
     x: Signal | NDArray[np.float64] | list[float],
     y: Signal | NDArray[np.float64] | list[float],
+    owner: str,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """Validate the input/output record pair of *owner*.
+
+    :param owner: Name of the entry point the caller invoked, so that the
+        length complaint names the function that was typed rather than this
+        validator, which two entry points share.
+    """
     xa = np.asarray(x, dtype=np.float64)
     ya = np.asarray(y, dtype=np.float64)
     if xa.ndim != 1 or ya.ndim != 1:
         msg = "'x' and 'y' must be one-dimensional."
         raise ValueError(msg)
-    if xa.size != ya.size:
-        msg = "'x' and 'y' must have the same length."
-        raise ValueError(msg)
+    require_equal_counts(owner, {"x": xa.size, "y": ya.size}, "sample")
     if xa.size < _MIN_SAMPLES:
         msg = f"Signals too short for a spectral estimate: {xa.size} samples."
         raise ValueError(msg)
@@ -203,7 +212,7 @@ def transfer_function(
     :raises ValueError: If the inputs or parameters are invalid.
     """
     fs = resolve_pair_fs(x, y, fs)
-    xa, ya = _validate_pair(x, y)
+    xa, ya = _validate_pair(x, y, "transfer_function")
     fs_v = _positive(fs, "fs")
     if estimator not in ("H1", "H2"):
         msg = "'estimator' must be 'H1' or 'H2'."
@@ -280,7 +289,7 @@ def coherence(
     :raises ValueError: If the inputs or parameters are invalid.
     """
     fs = resolve_pair_fs(x, y, fs)
-    xa, ya = _validate_pair(x, y)
+    xa, ya = _validate_pair(x, y, "coherence")
     fs_v = _positive(fs, "fs")
     if not 0.0 <= float(overlap) < 1.0:
         msg = "'overlap' must be in [0, 1)."

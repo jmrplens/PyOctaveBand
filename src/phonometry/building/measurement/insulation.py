@@ -73,7 +73,11 @@ import numpy as np
 
 from ..._internal.levels_math import energy_mean
 from ..._internal.types import as_float_or_array
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import (
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
 from .ratings import (
     _FREQ_THIRD_OCTAVE,
     ImpactRatingResult,
@@ -820,11 +824,13 @@ def airborne_insulation(
 
     # Compared by count, not by shape, so a `t2` that carries an extra axis
     # falls through to `_validate_reverberation`, which says that is what is
-    # wrong. Comparing shapes answered a (1, n) array against n bands with
-    # "must share the same band count", which was false: the counts matched.
-    if not (l1_bands.shape == l2_bands.shape and l1_bands.size == t.size):
-        msg = "'l1', 'l2' and 't2' must share the same band count."
-        raise ValueError(msg)
+    # wrong. Comparing shapes answered a (1, n) array against n bands with a
+    # band-count complaint, which was false: the counts matched.
+    require_equal_counts(
+        "airborne_insulation",
+        {"l1": l1_bands.size, "l2": l2_bands.size, "t2": t.size},
+        "band",
+    )
     _validate_reverberation(t, t0)
 
     d = l1_bands - l2_bands
@@ -895,11 +901,11 @@ def impact_insulation(
 
     # Compared by count, not by shape, so a `t2` that carries an extra axis
     # falls through to `_validate_reverberation`, which says that is what is
-    # wrong. Comparing shapes answered a (1, n) array against n bands with
-    # "must share the same band count", which was false: the counts matched.
-    if li_bands.size != t.size:
-        msg = "'li' and 't2' must share the same band count."
-        raise ValueError(msg)
+    # wrong. Comparing shapes answered a (1, n) array against n bands with a
+    # band-count complaint, which was false: the counts matched.
+    require_equal_counts(
+        "impact_insulation", {"li": li_bands.size, "t2": t.size}, "band"
+    )
     _validate_reverberation(t, t0)
 
     l_n_t = li_bands - 10.0 * np.log10(t / t0)
@@ -1033,11 +1039,13 @@ def facade_insulation(
 
     # Compared by count, not by shape, so a `t2` that carries an extra axis
     # falls through to `_validate_reverberation`, which says that is what is
-    # wrong. Comparing shapes answered a (1, n) array against n bands with
-    # "must share the same band count", which was false: the counts matched.
-    if not (l1_bands.shape == l2_bands.shape and l1_bands.size == t.size):
-        msg = "'l1_2m', 'l2' and 't2' must share the same band count."
-        raise ValueError(msg)
+    # wrong. Comparing shapes answered a (1, n) array against n bands with a
+    # band-count complaint, which was false: the counts matched.
+    require_equal_counts(
+        "facade_insulation",
+        {"l1_2m": l1_bands.size, "l2": l2_bands.size, "t2": t.size},
+        "band",
+    )
     _validate_reverberation(t, t0)
 
     d_2m = l1_bands - l2_bands

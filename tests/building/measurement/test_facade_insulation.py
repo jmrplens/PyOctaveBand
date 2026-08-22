@@ -204,7 +204,10 @@ def test_positions_are_energy_averaged() -> None:
 # --------------------------------------------------------------------------
 def test_band_count_mismatch_raises() -> None:
     outdoor, indoor_two_bands, rt = _flat(3, 70.0), _flat(2, 30.0), _flat(3, 0.5)
-    with pytest.raises(ValueError, match="share the same band count"):
+    with pytest.raises(
+        ValueError,
+        match=r"facade_insulation: 'l1_2m'.*'l2'.*'t2'.*one value per band",
+    ):
         building.facade_insulation(outdoor, indoor_two_bands, rt)
 
 

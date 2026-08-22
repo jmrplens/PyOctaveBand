@@ -314,7 +314,7 @@ def test_airborne_rejects_length_mismatch() -> None:
     one_time = np.array([0.5])
     with pytest.raises(
         ValueError,
-        match="'l1', 'l2' and 't2' must share the same band count",
+        match=r"airborne_insulation: 'l1'.*'l2'.*'t2'.*one value per band",
     ):
         building.airborne_insulation(two_bands, one_band, one_time)
 

@@ -176,10 +176,9 @@ def _validate_inputs(
         raise ValueError(msg)
     xs = [_validate_signal(x, f"inputs[{i}]") for i, x in enumerate(rows)]
     ya = _validate_signal(output, "output")
-    for i, x in enumerate(xs):
-        if x.size != ya.size:
-            msg = f"'inputs[{i}]' and 'output' must have the same length."
-            raise ValueError(msg)
+    counts = {f"inputs[{i}]": x.size for i, x in enumerate(xs)}
+    counts["output"] = ya.size
+    require_equal_counts("miso_coherence", counts, "sample")
     return xs, ya
 
 

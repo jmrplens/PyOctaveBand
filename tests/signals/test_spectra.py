@@ -408,7 +408,10 @@ def test_smoothing_zero_frequency_point_is_copied() -> None:
     ("kwargs", "match"),
     [
         ({"frequencies": [[1.0, 2.0]], "values": [1.0, 2.0]}, "one-dimensional"),
-        ({"frequencies": [1.0, 2.0], "values": [1.0]}, "same length"),
+        (
+            {"frequencies": [1.0, 2.0], "values": [1.0]},
+            r"'frequencies'.*'values'.*one value per frequency",
+        ),
         ({"frequencies": [1.0], "values": [1.0]}, "two frequency points"),
         ({"frequencies": [2.0, 1.0], "values": [1.0, 1.0]}, "increasing"),
         ({"frequencies": [1.0, np.nan], "values": [1.0, 1.0]}, "finite"),
@@ -474,7 +477,9 @@ def test_psd_rejects_invalid_inputs() -> None:
 )
 def test_two_channel_functions_reject_mismatched_lengths(func) -> None:
     x = _white(13)
-    with pytest.raises(ValueError, match="same length"):
+    with pytest.raises(
+        ValueError, match=rf"{func.__name__}: 'x'.*'y'.*one value per sample"
+    ):
         func(x, x[:-1], FS)
 
 

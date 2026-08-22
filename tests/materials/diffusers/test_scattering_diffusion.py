@@ -482,6 +482,22 @@ def test_diffusion_weight_length_mismatch() -> None:
         directional_diffusion_coefficient([70.0, 72.0], area_weights=[1.0])
 
 
+def test_random_incidence_weight_length_mismatch() -> None:
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"random_incidence_diffusion: 'directional_coefficients' .* 'weights' "
+            r".* must each carry one value per source position"
+        ),
+    ):
+        random_incidence_diffusion([0.5, 0.2, 0.2], weights=[1.0, 3.0])
+
+
+def test_random_incidence_rejects_two_dimensional_weights() -> None:
+    with pytest.raises(ValueError, match=r"'weights' must be a 1-D sequence"):
+        random_incidence_diffusion([0.5, 0.2], weights=[[1.0, 3.0], [1.0, 3.0]])
+
+
 def test_reverberation_uncertainty_requires_two() -> None:
     with pytest.raises(ValueError, match="'times' needs at least two measurements"):
         reverberation_time_uncertainty([6.0])

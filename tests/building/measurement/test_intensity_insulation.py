@@ -216,8 +216,10 @@ def test_combine_subareas_area_weighting() -> None:
 def test_combine_subareas_validation() -> None:
     with pytest.raises(ValueError, match="two-dimensional"):
         building.combine_subareas([40.0, 42.0], [5.0])
-    with pytest.raises(ValueError, match="one area per subarea"):
+    with pytest.raises(ValueError, match=r"'measurement_area'.*one value per subarea"):
         building.combine_subareas([[40.0, 42.0], [40.0, 42.0]], [5.0])
+    with pytest.raises(ValueError, match=r"'measurement_area' must be a one-dim"):
+        building.combine_subareas([[40.0], [42.0]], [[5.0], [5.0]])
     with pytest.raises(ValueError, match="non-zero"):
         building.combine_subareas([[40.0], [42.0]], [5.0, 0.0])
 

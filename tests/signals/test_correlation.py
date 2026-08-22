@@ -490,7 +490,9 @@ def test_alignment_of_identical_irs_is_a_no_op() -> None:
 
 def test_correlation_rejects_invalid_inputs() -> None:
     x = _white(16, n=4096)
-    with pytest.raises(ValueError, match="same length"):
+    with pytest.raises(
+        ValueError, match=r"correlation: 'x'.*'y'.*one value per sample"
+    ):
         ph.signals.correlation(x, x[:-1], FS)
     with pytest.raises(ValueError, match="normalization"):
         ph.signals.correlation(x, fs=FS, normalization="raw")  # type: ignore[arg-type]
@@ -526,7 +528,7 @@ def test_correlation_rejects_a_coefficient_of_another_length() -> None:
 def test_time_delay_rejects_invalid_inputs() -> None:
     x = _white(17, n=4096)
     y = np.roll(x, 5)
-    with pytest.raises(ValueError, match="same length"):
+    with pytest.raises(ValueError, match=r"time_delay: 'x'.*'y'.*one value per sample"):
         ph.signals.time_delay(x, y[:-1], FS)
     with pytest.raises(ValueError, match="method"):
         ph.signals.time_delay(x, y, FS, method="fft")  # type: ignore[arg-type]
@@ -546,7 +548,10 @@ def test_time_delay_rejects_invalid_inputs() -> None:
 
 def test_ir_utilities_reject_invalid_inputs() -> None:
     ir = _bandlimited_pulse(1024, 300.0, 0.2)
-    with pytest.raises(ValueError, match="same length"):
+    with pytest.raises(
+        ValueError,
+        match=r"align_impulse_responses: 'ir'.*'reference'.*one value per sample",
+    ):
         ph.signals.align_impulse_responses(ir, ir[:-1], FS)
     with pytest.raises(ValueError, match="upsample"):
         ph.signals.impulse_response_delay(ir, FS, upsample=-2)

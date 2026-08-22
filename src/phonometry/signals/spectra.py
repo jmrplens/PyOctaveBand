@@ -68,7 +68,11 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
-from .._internal.validation import require_ranks, require_same_length
+from .._internal.validation import (
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
 from ..io._resolve import apply_calibration, resolve_fs, resolve_pair_fs
 
 if TYPE_CHECKING:
@@ -712,9 +716,9 @@ def cross_spectral_density(
     """
     xa = _validate_signal(x, "x")
     ya = _validate_signal(y, "y")
-    if xa.size != ya.size:
-        msg = "'x' and 'y' must have the same length."
-        raise ValueError(msg)
+    require_equal_counts(
+        "cross_spectral_density", {"x": xa.size, "y": ya.size}, "sample"
+    )
     fs_v = _positive(resolve_pair_fs(x, y, fs), "fs")
     scaling_v = _validate_scaling(scaling)
     seg, ovl = _validate_welch_params(xa.size, fs_v, nperseg, overlap)
@@ -945,9 +949,9 @@ def coherent_output_spectrum(
     """
     xa = _validate_signal(x, "x")
     ya = _validate_signal(y, "y")
-    if xa.size != ya.size:
-        msg = "'x' and 'y' must have the same length."
-        raise ValueError(msg)
+    require_equal_counts(
+        "coherent_output_spectrum", {"x": xa.size, "y": ya.size}, "sample"
+    )
     fs_v = _positive(resolve_pair_fs(x, y, fs), "fs")
     scaling_v = _validate_scaling(scaling)
     seg, ovl = _validate_welch_params(xa.size, fs_v, nperseg, overlap)
@@ -1009,9 +1013,11 @@ def _smoothing_validate(f: NDArray[np.float64], v: NDArray[np.float64]) -> None:
     if f.ndim != 1 or v.ndim != 1:
         msg = "'frequencies' and 'values' must be one-dimensional."
         raise ValueError(msg)
-    if f.size != v.size:
-        msg = "'frequencies' and 'values' must have the same length."
-        raise ValueError(msg)
+    require_equal_counts(
+        "fractional_octave_smoothing",
+        {"frequencies": f.size, "values": v.size},
+        "frequency",
+    )
     if f.size < _MIN_SMOOTHING_POINTS:
         msg = "At least two frequency points are required."
         raise ValueError(msg)
