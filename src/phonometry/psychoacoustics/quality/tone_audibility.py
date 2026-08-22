@@ -1102,10 +1102,14 @@ class ToneAudibilityResult:
         """Reject an assessment whose per-tone quantities disagree in length.
 
         The fiche prints one row per entry of ``tone_frequencies`` under a
-        single header and reads every other quantity at that row's index, so a
-        quantity one entry short raises an ``IndexError`` from inside the table
+        single header and reads the tone level, the critical-band level, the
+        critical bandwidth and the audibility at that row's index, so one of
+        those one entry short raises an ``IndexError`` from inside the table
         builder, about an axis and a size, naming neither the tone it was on
-        nor the column it was reading.
+        nor the column it was reading. The corner frequencies raise the same
+        way one step later, from the level-versus-frequency figure the sheet
+        embeds, and a short ``tone_frequencies`` reaches that figure as
+        matplotlib's complaint that x and y have different first dimensions.
 
         An entry too *many* is the quiet one. The table stops at the last
         frequency, so the extra tone is dropped from the sheet without a word,
@@ -1115,6 +1119,14 @@ class ToneAudibilityResult:
         not in a list; if it is not the loudest, the sheet renders, reads as
         complete, and is missing an audible tone that the assessment behind it
         did find.
+
+        Two quantities are read by no fiche and no plot:
+        ``mean_narrowband_levels`` and ``masking_indices``, the masking noise
+        the audibility was computed from, carried for the caller rather than
+        printed. Short or long they raise nothing anywhere, and the sheet
+        comes out byte for byte the size of the intact one. They are held to
+        the tone count all the same, because whoever reads them reads them
+        beside the frequencies, at the same row.
 
         The optional quantities are skipped when absent: :func:`assess_tones`
         builds a result from bare levels, which carries neither the per-line

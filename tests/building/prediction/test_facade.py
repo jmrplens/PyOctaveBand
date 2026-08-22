@@ -21,6 +21,8 @@ import matplotlib as mpl
 
 mpl.use("Agg")
 
+import dataclasses
+
 import numpy as np
 import pytest
 import reference_data as ref
@@ -465,6 +467,54 @@ def test_positive_area_and_volume_required() -> None:
     elements = [building.FacadeElement(name="a", area=5.0, r=[40.0])]
     with pytest.raises(ValueError, match="area"):
         building.facade_sound_reduction(elements, area=0.0, volume=50.0)
+
+
+# ---------------------------------------------------------------------------
+# Result construction guards
+# ---------------------------------------------------------------------------
+
+
+def test_facade_prediction_geometry_must_hold_every_element() -> None:
+    """The elevation and the element table are two views of one façade.
+
+    ``plot_geometry`` draws one patch per entry of ``elements`` while the
+    fiche prints one row per ``element_r`` key. Dropping the inlet from the
+    geometry alone draws the Annex F façade with three of its four elements
+    and still rates all four in the table, and neither view says so.
+    """
+    res = _annex_f_result()
+    without_inlet = res.elements[:-1]
+    with pytest.raises(ValueError, match="'elements'"):
+        dataclasses.replace(res, elements=without_inlet)
+
+
+def test_facade_prediction_unread_spectrum_must_match_bands() -> None:
+    """``r_45`` is the spectrum no reader in the library opens.
+
+    The plot and the fiche draw ``r_prime``, ``d_2m_nt`` and the element rows
+    against the frequencies, so a wrong length there is refused by matplotlib
+    when the figure is drawn; a wrong-length ``r_45`` reaches nothing at all,
+    and pairing it with the five octave centres by hand truncates in silence.
+    """
+    res = _annex_f_result()
+    one_too_many = np.append(res.r_45, 99.0)
+    with pytest.raises(ValueError, match="'r_45'"):
+        dataclasses.replace(res, r_45=one_too_many)
+
+
+def test_radiated_power_frequencies_must_match_bands() -> None:
+    """A band centre too many hands every bar its neighbour's frequency.
+
+    The bars sit at one position per band of ``l_w`` on a categorical axis
+    while the ticks take one label per entry of ``frequencies``: a centre
+    inserted in front labels the 63 Hz bar 31.5 Hz and shifts the whole row
+    along, and one centre too few leaves the 8 kHz bar unlabelled. The bars
+    keep their heights either way, so the figure still reads as a spectrum.
+    """
+    res = _annex_g_side1_with_door()
+    one_too_many = np.insert(res.frequencies, 0, 31.5)
+    with pytest.raises(ValueError, match="'frequencies'"):
+        dataclasses.replace(res, frequencies=one_too_many)
 
 
 # ---------------------------------------------------------------------------

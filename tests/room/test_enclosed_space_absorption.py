@@ -7,6 +7,8 @@ Validated against the three worked cases of the standard's Annex E (a
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pytest
 from reference_data import (
@@ -175,6 +177,39 @@ def test_physical_range_validation() -> None:
         m.equivalent_absorption_area([(10.0, 0.1)], objects=[-1.0])
     with pytest.raises(ValueError, match="air_area"):
         m.equivalent_absorption_area([(10.0, 0.1)], air_area=-0.5)
+
+
+def _prediction() -> m.ReverberationResult:
+    """A seven-band prediction straight out of the public entry point."""
+    alpha = [0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70]
+    return m.enclosed_space_reverberation(
+        [(20.0, alpha)], 50.0, air_condition="20C_50-70"
+    )
+
+
+def test_absorption_area_off_the_band_axis_is_refused() -> None:
+    # The silent one: the plot beside the table never opens absorption_area,
+    # so an extra entry would only shift the printed A column and the boxed
+    # mid-frequency area, with nothing raised.
+    result = _prediction()
+    shifted = np.concatenate([[3.10], result.absorption_area])
+    with pytest.raises(ValueError, match=r"'absorption_area'.+one value per band"):
+        dataclasses.replace(result, absorption_area=shifted)
+
+
+def test_reverberation_time_off_the_band_axis_is_refused() -> None:
+    result = _prediction()
+    clipped = result.reverberation_time[:-1]
+    with pytest.raises(ValueError, match=r"'reverberation_time'.+one value per band"):
+        dataclasses.replace(result, reverberation_time=clipped)
+
+
+def test_absorption_area_with_an_extra_axis_is_refused() -> None:
+    # A (bands, 2) area counts the right number of bands on its first axis.
+    result = _prediction()
+    stacked = np.column_stack([result.absorption_area, result.absorption_area])
+    with pytest.raises(ValueError, match=r"'absorption_area' must have one axis"):
+        dataclasses.replace(result, absorption_area=stacked)
 
 
 def test_air_condition_requires_standard_bands() -> None:

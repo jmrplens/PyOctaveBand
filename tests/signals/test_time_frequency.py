@@ -10,6 +10,8 @@ independently and matched to machine precision.
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pytest
 
@@ -283,6 +285,43 @@ class TestZoomFFTValidation:
         x = np.ones(8)
         with pytest.raises(ValueError, match="too short"):
             signals.zoom_fft(x, 1000.0, f_min=100.0, f_max=200.0)
+
+    def test_spectral_quantities_must_sit_on_the_zoom_grid(self) -> None:
+        """A quantity off the grid is refused when built, not when read.
+
+        Only ``power`` is drawn, and it surfaces as matplotlib's "x and y
+        must have same first dimension" and two bare shapes, naming neither
+        the field nor the result. ``spectrum`` and ``amplitude`` are drawn
+        by nothing, so a dropped grid point renders the ordinary figure
+        while the peak the caller reads moves onto a neighbour's frequency.
+        An extra axis passes every count, so the ranks are pinned too.
+        """
+        good = signals.zoom_fft(
+            np.ones(1000), 1000.0, f_min=100.0, f_max=200.0, n_points=51
+        )
+        per_point = "one value per grid point"
+        cases = (
+            ("frequencies", good.frequencies[:-1], rf"\(50\).*{per_point}"),
+            ("spectrum", good.spectrum[:-1], rf"\(50\).*{per_point}"),
+            (
+                "spectrum",
+                np.append(good.spectrum, good.spectrum[-1]),
+                rf"\(52\).*{per_point}",
+            ),
+            ("amplitude", good.amplitude[:-1], rf"\(50\).*{per_point}"),
+            (
+                "amplitude",
+                np.append(good.amplitude, good.amplitude[-1]),
+                rf"\(52\).*{per_point}",
+            ),
+            ("power", good.power[:-1], rf"\(50\).*{per_point}"),
+            ("power", np.append(good.power, good.power[-1]), rf"\(52\).*{per_point}"),
+            ("amplitude", np.column_stack([good.amplitude] * 2), "must have one axis"),
+            ("power", np.column_stack([good.power] * 2), "must have one axis"),
+        )
+        for field, value, fragment in cases:
+            with pytest.raises(ValueError, match=rf"'{field}' {fragment}"):
+                dataclasses.replace(good, **{field: value})
 
 
 # ---------------------------------------------------------------------------

@@ -583,18 +583,34 @@ class AuditoryWeightingResult:
     weighted_tts_onset: float
 
     def __post_init__(self) -> None:
-        """Reject a filter whose two curves do not run over its frequencies.
+        r"""Reject a filter whose two curves do not run over its frequencies.
 
         ``W(f)`` and ``E(f)`` are one band-pass shape read twice against one
         frequency axis, and the identity that ties them, :math:`E = K + C - W`,
-        holds frequency by frequency and in no other way. That is how the
-        assessment uses them: :func:`weighted_exposure` adds ``weighting`` to a
-        band spectrum term by term, so a curve offset from its own axis charges
-        each band the attenuation of a different one, quietly and without ever
-        leaving the range of plausible dB.
+        holds frequency by frequency and in no other way. Nothing downstream
+        rebuilds it from a result handed in: :func:`weighted_exposure` takes
+        plain arrays and calls :func:`auditory_weighting` on them itself, so a
+        result assembled by hand reaches no arithmetic at all, only readers.
+
+        The two curves are read very differently, and neither way is one a
+        caller would want. ``weighting`` is what :meth:`plot` draws against
+        ``frequencies``, so a length that disagrees surfaces as matplotlib's
+        "x and y must have same first dimension", which does stop, but only at
+        draw time and naming neither field. ``exposure_function`` is read by
+        nothing here at all: :meth:`plot` never touches it, so a curve cut
+        short still draws a clean figure while the quantity it is consulted
+        for -- its minimum, the weighted TTS onset :math:`T_\mathrm{w}`, and
+        the frequency that minimum falls at -- is taken over whichever part
+        survived and comes back wrong without a word.
+
+        The rank is pinned beside the length, because an ``(n, 2)`` column
+        carries one value per frequency by every count and reaches the figure
+        intact, where it draws one curve per column under a legend row
+        repeated once per curve.
 
         :raises ValueError: if either curve disagrees with ``frequencies``.
         """
+        require_ranks(self, frequencies=1, weighting=1, exposure_function=1)
         require_same_length(
             self, "frequencies", "weighting", "exposure_function", axis="frequency"
         )

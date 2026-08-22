@@ -21,6 +21,7 @@ Validation strategy: the standards' own numbers, not self-consistency.
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import numpy as np
@@ -327,6 +328,28 @@ def test_airborne_rejects_reverberation_time_with_an_extra_axis() -> None:
     other_two_bands = np.array([40.0, 40.0])
     with pytest.raises(ValueError, match="'t2' must be one-dimensional"):
         building.airborne_insulation(two_bands, other_two_bands, np.full((1, 2), 0.5))
+
+
+def test_a_chain_column_of_another_length_is_refused() -> None:
+    """A source-room column one band long prints the chain out of step.
+
+    The verbose ISO 16283-1 fiche pairs ``L1``, ``L2``, ``T`` and ``DnT`` by
+    position and reads only as far as the frequency header, so a longer
+    ``L1`` sets every source level beside the receiving level of the next
+    band, drops the 3150 Hz value and leaves ``DnT`` untouched: the sheet
+    documents a derivation that never took place. The plot does not read the
+    chain at all, so nothing downstream complains.
+    """
+    result = building.airborne_insulation(
+        np.linspace(90.0, 96.0, 16),
+        np.linspace(50.0, 40.0, 16),
+        np.full(16, 0.6),
+        area=10.0,
+        volume=50.0,
+    )
+    longer = np.insert(result.l1, 0, 99.9)
+    with pytest.raises(ValueError, match="'l1' \\(17\\).*per band"):
+        dataclasses.replace(result, l1=longer)
 
 
 def test_airborne_requires_both_area_and_volume() -> None:

@@ -11,6 +11,7 @@ the caller (array or callable), never predicted here.
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import numpy as np
@@ -188,3 +189,23 @@ def test_validation() -> None:
         noise_control.enclosure_insertion_loss([20.0], 6.0, 5.0, 1.0)
     with pytest.raises(ValueError, match="model"):
         noise_control.enclosure_insertion_loss([20.0], 6.0, 5.0, 0.3, model="hansen")
+
+
+@pytest.mark.parametrize("trim", [True, False], ids=["short", "long"])
+def test_a_room_constant_off_the_band_axis_is_refused(trim: bool) -> None:
+    """``R_i`` is the column a fiche prints without complaining.
+
+    ``R``, ``C`` and ``IL`` are drawn against one x axis in the embedded
+    figure, so a length of their own raises from matplotlib before a PDF
+    exists. The room constant reaches only the verbose table, row by row
+    against rows counted from ``insertion_loss``: one band long it prints a
+    full sheet whose whole ``R_i`` column runs over other bands, one band
+    short it prints an ordinary plain sheet and fails only in verbose.
+    """
+    res = noise_control.enclosure_insertion_loss(
+        [20.0, 30.0, 40.0], 6.0, 5.0, 0.3, frequencies=[125.0, 250.0, 500.0]
+    )
+    r_i = res.room_constant
+    wrong = r_i[:-1] if trim else np.append(r_i, r_i[-1])
+    with pytest.raises(ValueError, match=r"'room_constant'.*one value per band"):
+        dataclasses.replace(res, room_constant=wrong)

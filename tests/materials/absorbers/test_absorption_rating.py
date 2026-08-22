@@ -263,6 +263,51 @@ def test_result_exposes_curves_for_plotting() -> None:
     assert res.measured.shape == res.shifted_reference.shape == res.band_centers.shape
 
 
+@pytest.mark.parametrize(
+    "field_name", ["band_centers", "measured", "shifted_reference"]
+)
+def test_an_octave_curve_off_the_rating_axis_is_refused(field_name: str) -> None:
+    """The three octave columns of the fiche table must share one length.
+
+    Neither reader is fooled by a curve of the wrong length, but neither
+    names the field either: the fiche lists all three at once and plot()
+    stops inside matplotlib on "x and y". Refusing at construction is what
+    prints each field beside the count it carries.
+    """
+    import dataclasses
+
+    res = weighted_absorption(_ANNEX_A1_ALPHA_P)
+    short = np.asarray(getattr(res, field_name), dtype=float)[:-1]
+    with pytest.raises(ValueError, match=f"'{field_name}'"):
+        dataclasses.replace(res, **{field_name: short})
+
+
+def test_a_single_value_reference_curve_is_refused() -> None:
+    """One value is the shape a caller lands on by reading alpha_w alone."""
+    import dataclasses
+
+    res = weighted_absorption(_ANNEX_A1_ALPHA_P)
+    one_value = np.array([res.shifted_reference[1]])
+    with pytest.raises(ValueError, match="'shifted_reference'"):
+        dataclasses.replace(res, shifted_reference=one_value)
+
+
+def test_a_retained_alpha_s_off_the_octave_triple_is_refused() -> None:
+    """The accredited table reads ``measured[j // 3]``: three thirds an octave.
+
+    Twelve one-third octaves against five rating octaves is the quiet
+    direction: the fiche renders, and its practical-coefficient column simply
+    stops before the last octave with nothing on the page to say so.
+    """
+    import dataclasses
+
+    res = weighted_absorption_from_third_octave([0.10 + 0.05 * i for i in range(15)])
+    twelve = np.asarray(res.third_octave_alpha_s, dtype=float)[:12]
+    bands = np.asarray(res.third_octave_bands, dtype=float)[:12]
+    with pytest.raises(ValueError, match="'third_octave_alpha_s'"):
+        dataclasses.replace(res, third_octave_alpha_s=twelve, third_octave_bands=bands)
+
+
 def test_weighted_mapping_matches_sequence() -> None:
     mapping = dict(zip(OCTAVE_BANDS, _ANNEX_A2_ALPHA_P, strict=True))
     res_map = weighted_absorption(mapping)

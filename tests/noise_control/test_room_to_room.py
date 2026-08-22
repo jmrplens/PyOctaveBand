@@ -11,6 +11,7 @@ Table 4.5. The published worked answers live in
 
 from __future__ import annotations
 
+import dataclasses
 import math
 from typing import TYPE_CHECKING
 
@@ -46,6 +47,25 @@ def _chain(**kwargs: object) -> RoomToRoomResult:
         20.0,
         _ABSORPTION,
         **defaults,  # type: ignore[arg-type]
+    )
+
+
+def _powered_chain() -> RoomToRoomResult:
+    """A chain with every spectrum filled in, for the band-axis tests.
+
+    ``source_power_level`` is only carried when the source room was described
+    by its sound power level, and the criterion rows only exist with a target,
+    so the rows that have to agree are all present here at once.
+    """
+    return noise_control.room_to_room_transmission(
+        _BANDS,
+        40.0,
+        20.0,
+        _ABSORPTION,
+        source=noise_control.SourceRoom(
+            power_level=np.full(6, 100.0), room_constant=50.0
+        ),
+        criterion=noise_control.DesignCriterion(target=45.0),
     )
 
 
@@ -225,6 +245,84 @@ def test_validation() -> None:
     nan_target = noise_control.DesignCriterion(target=_NAN)
     with pytest.raises(ValueError, match="target"):
         _chain(criterion=nan_target)
+
+
+# --------------------------------------------------------------------------
+# Rows that do not run over the analysis bands
+# --------------------------------------------------------------------------
+@pytest.mark.parametrize(
+    "field_name",
+    [
+        "frequencies",
+        "source_level",
+        "transmission_loss",
+        "receiving_absorption",
+        "noise_reduction",
+        "received_level",
+        "source_power_level",
+    ],
+)
+@pytest.mark.parametrize("trim", [True, False], ids=["short", "long"])
+def test_a_spectrum_off_the_band_axis_is_refused(field_name: str, trim: bool) -> None:
+    """A chain cannot carry a row that runs over other bands than the header.
+
+    :meth:`RoomToRoomResult.table` writes the chain out as one row per link
+    under a single band header and neither pads nor trims: a six-band chain
+    whose transmission loss ran five bands prints a five-number row beside
+    six-number ones, and the reader lays a receiving-room level against a
+    source-room level of other bands. The two directions are equally quiet, and
+    the flanking and criterion rows are built to the length of ``frequencies``
+    alone, so they go on printing at full width whichever row ran short.
+    ``frequencies``, ``source_level`` and ``receiving_absorption`` do stop a
+    sheet that declares a target, because the required row reads them, but on a
+    bare ``operands could not be broadcast together`` that names neither the
+    field nor the result.
+    """
+    result = _powered_chain()
+    row = np.asarray(getattr(result, field_name))
+    wrong = row[:-1] if trim else np.append(row, row[-1])
+    with pytest.raises(ValueError, match=f"'{field_name}'"):
+        dataclasses.replace(result, **{field_name: wrong})
+
+
+def test_a_single_absorption_number_is_refused() -> None:
+    """One number for the receiving room is broadcast, not caught.
+
+    :attr:`RoomToRoomResult.required_transmission_loss` divides the partition
+    area by the receiving-room absorption band by band, so an absorption given
+    as a single number where the bands needed several is stretched over the
+    whole spectrum without a murmur: the property then specifies the partition
+    against the absorption the room has in one band. With the graded room below
+    replaced by its 125 Hz value the requirement comes out 43 dB at 4 kHz where
+    the room really asks for 31, and only the 125 Hz band the number came from
+    is right. The sheet shows the same number as a bare scalar under the band
+    header.
+    """
+    graded = np.array([5.0, 10.0, 20.0, 40.0, 60.0, 80.0])
+    result = noise_control.room_to_room_transmission(
+        _BANDS,
+        40.0,
+        20.0,
+        graded,
+        source=noise_control.SourceRoom(level=_SOURCE),
+        criterion=noise_control.DesignCriterion(target=45.0),
+    )
+    one_number = float(graded[0])
+    with pytest.raises(ValueError, match="'receiving_absorption'"):
+        dataclasses.replace(result, receiving_absorption=one_number)
+
+
+def test_a_spectrum_with_an_extra_axis_is_refused() -> None:
+    """Counting the bands is not enough: an extra axis passes every count.
+
+    Two columns of six bands still count six entries along the first axis, so
+    a length check alone lets the pair into the sheet, where the row prints as
+    six pairs under a band header of six single numbers.
+    """
+    result = _powered_chain()
+    two_columns = np.column_stack([result.transmission_loss, result.transmission_loss])
+    with pytest.raises(ValueError, match="'transmission_loss' must have one axis"):
+        dataclasses.replace(result, transmission_loss=two_columns)
 
 
 def test_plot_smoke() -> None:

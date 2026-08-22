@@ -178,9 +178,14 @@ class NiptsResult:
         those same arrays; the plot draws the fractile band from the median and
         the two spreads against a single frequency axis. Everything pairs by
         position, so a spectrum one entry short stops the renderer far from
-        here, and one entry long is dropped from the table without a word, in
-        both cases after its values have been read against frequencies other
-        than the ones they were computed for.
+        here, having read its values against frequencies other than the ones
+        they were computed for. One entry long stops every spectrum the plot
+        draws, and passes unremarked in the one it does not: at the default
+        median fractile the plot leaves ``value`` out, so a longer ``value``
+        is dropped from the table without a word and the whole fiche is
+        written, with the boxed 2/3/4 kHz mean beneath the table, and the
+        PASS/FAIL verdict read off that mean, taken from positions belonging
+        to whatever grid the array was computed on.
 
         :raises ValueError: if any spectrum disagrees with ``frequencies``.
         """
@@ -301,10 +306,16 @@ class HtlanResult:
         audiometric frequency at a time, and the fiche prints that combination
         the same way: ``H``, ``N`` and ``H'`` side by side on one row per
         frequency, with a representative threshold boxed beneath from the
-        2/3/4 kHz positions of the combined array. Table and plot alike pair
-        the columns by position, so a component of another length sets an age
-        threshold beside a noise shift belonging to a different frequency and
-        the sheet shows a combination that was never computed.
+        2/3/4 kHz positions of the combined array. No disagreement here
+        reaches a finished sheet: a component shorter than ``frequencies``
+        stops the table with an ``IndexError`` as it reads its rows, and every
+        other mismatch stops the plot the fiche embeds beside that table,
+        which draws all three components against ``frequencies`` and refuses a
+        column of another length (``x and y must have same first dimension``).
+        A longer component is dropped from the table without a word first, but
+        the plot still refuses it. What this guard buys is the name and the
+        place of the failure: the field that disagrees, as the result is
+        built, instead of a shape mismatch raised from inside the renderer.
 
         :raises ValueError: if any component disagrees with ``frequencies``.
         """

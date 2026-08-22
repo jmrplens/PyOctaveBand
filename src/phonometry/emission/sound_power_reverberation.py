@@ -137,8 +137,10 @@ class ReverberationSoundPowerResult:
         (``Lp``, and ``K1``, ``A``, ``Cw`` in the verbose table) is indexed
         alongside it, and ``frequencies`` names the bands those rows are
         labelled with. A quantity one entry short therefore cannot be read at
-        all, and one entry too long is dropped by the table without a word,
-        under a boxed ``LWA`` that was summed over the whole of it.
+        all, raising a bare ``IndexError`` from inside the row loop, and one
+        entry too long is dropped by the table without a word: the boxed
+        ``LWA`` and the total beneath it come from ``LW``, so nothing on the
+        sheet is summed over the surplus and the fiche renders whole.
 
         :raises ValueError: if any per-band quantity disagrees with the rest.
         """

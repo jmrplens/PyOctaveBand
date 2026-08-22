@@ -225,12 +225,16 @@ class StructureBornePowerResult:
         """Reject a plate result whose per-band quantities disagree.
 
         The EN 15657 fiche prints ``Lv``, ``eta`` and ``L_Ws`` as columns of
-        one band table whose row count comes from ``L_Ws`` alone, so a
-        companion array one entry longer is not refused, merely cut off at
-        that count. ``frequencies`` fares worse than being cut off: the
-        octave grouping the labels are printed in is inferred from the whole
-        of it, so a surplus band the sheet never shows still decides how the
-        bands it does show are named and grouped.
+        one band table whose row count comes from ``L_Ws`` alone, and reads
+        every other column at those same row indices. A companion array one
+        entry longer is therefore not refused: whatever sits past the last row
+        is dropped, and a surplus entry ahead of the others carries the whole
+        column one band out of step with the labels beside it, so each printed
+        value belongs to its neighbour's band. ``frequencies`` decides more
+        than its own column: the band fraction is read off its first two
+        entries and settles whether the sheet calls its rows octave or
+        one-third-octave bands and rules them off in octave triplets, so a
+        surplus entry at the head of it regroups every band the sheet shows.
 
         :raises ValueError: if any per-band quantity disagrees with the rest.
         """

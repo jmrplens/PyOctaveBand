@@ -19,6 +19,7 @@ Validation strategy: the standards' own numbers, not self-consistency.
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import numpy as np
@@ -282,6 +283,23 @@ def test_impact_rejects_reverberation_time_with_an_extra_axis() -> None:
     li_2_bands = np.array([60.0, 60.0])
     with pytest.raises(ValueError, match="'t2' must be one-dimensional"):
         building.impact_insulation(li_2_bands, np.full((2, 1), 0.5))
+
+
+def test_an_impact_column_of_another_length_is_refused() -> None:
+    """An ``Li`` column one band long prints beside an untouched level.
+
+    The verbose ISO 16283-2 fiche pairs ``Li``, ``T`` and the reported level
+    by position and reads only as far as the frequency header, so a longer
+    ``Li`` puts the impact level of one band next to the reverberation time
+    and ``L'nT`` of the next, and drops its own last value. The plot draws
+    ``L'nT`` and ``L'n`` alone, so it never sees the disagreement.
+    """
+    result = building.impact_insulation(
+        np.linspace(70.0, 60.0, 16), np.full(16, 0.6), volume=50.0
+    )
+    longer = np.insert(result.li, 0, 99.9)
+    with pytest.raises(ValueError, match="'li' \\(17\\).*per band"):
+        dataclasses.replace(result, li=longer)
 
 
 def test_impact_rejects_bad_reverberation_time() -> None:

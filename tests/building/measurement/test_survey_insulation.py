@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pytest
 
@@ -187,6 +189,57 @@ def test_rating_none_off_band_count() -> None:
     assert res.rating is None
     with pytest.raises(ValueError, match="5 octave"):
         res.plot()
+
+
+# ---------------------------------------------------------------------------
+# One band set per result (the companion quantities nobody reads again)
+# ---------------------------------------------------------------------------
+
+
+def test_airborne_result_refuses_a_normalized_curve_of_another_length() -> None:
+    """Dn is a column of the airborne result that nothing downstream measures.
+
+    plot() draws from the ISO 717-1 rating and the field fiche reads exactly
+    one of DnT and R', whichever report() was asked for, so D, Dn and the
+    unreported quantity reach the reader and are never looked at again. With
+    the check off, a Dn one band longer plots and reports without a word.
+    """
+    res = building.survey_airborne_insulation(
+        np.full(_OCTAVE, 80.0), np.full(_OCTAVE, 50.0), np.zeros(_OCTAVE), volume=50.0
+    )
+    longer = np.append(res.d_n, 99.9)
+    with pytest.raises(ValueError, match=r"'d_n' \(6\).*per band"):
+        dataclasses.replace(res, d_n=longer)
+
+
+def test_impact_result_refuses_a_normalized_level_of_another_length() -> None:
+    """L'n is carried to the reader; only L'nT is drawn and reported.
+
+    The impact fiche reads L'nT alone, and plot() draws from the ISO 717-2
+    rating, so Li and L'n running over a different band set is a disagreement
+    nothing downstream would ever raise.
+    """
+    res = building.survey_impact_insulation(
+        np.full(_OCTAVE, 70.0), np.zeros(_OCTAVE), volume=50.0
+    )
+    longer = np.append(res.l_n, 99.9)
+    with pytest.raises(ValueError, match=r"'l_n' \(6\).*per band"):
+        dataclasses.replace(res, l_n=longer)
+
+
+def test_facade_result_refuses_a_normalized_curve_of_another_length() -> None:
+    """D2m,n reaches neither the facade sheet nor the plot.
+
+    Both take the reported D2m,nT, so a normalized form covering a different
+    span of bands is handed over unchallenged unless the result refuses it at
+    construction.
+    """
+    res = building.survey_facade_insulation(
+        np.full(_OCTAVE, 90.0), np.full(_OCTAVE, 50.0), np.zeros(_OCTAVE), volume=50.0
+    )
+    longer = np.append(res.d_2m_n, 99.9)
+    with pytest.raises(ValueError, match=r"'d_2m_n' \(6\).*per band"):
+        dataclasses.replace(res, d_2m_n=longer)
 
 
 # ---------------------------------------------------------------------------

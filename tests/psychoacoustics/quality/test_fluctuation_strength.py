@@ -9,6 +9,7 @@ the 1-vacil calibration point, to a documented tolerance.
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import matplotlib as mpl
@@ -221,3 +222,59 @@ def test_signal_rejects_bad_inputs() -> None:
         psychoacoustics.fluctuation_strength(with_nan, _FS)
     with pytest.raises(ValueError, match="'fs' must be positive"):
         psychoacoustics.fluctuation_strength(valid, 0.0)
+
+
+# ---------------------------------------------------------------------------
+# Construction guards on the filter axis
+# ---------------------------------------------------------------------------
+@pytest.fixture(scope="module")
+def reference_result() -> psychoacoustics.FluctuationStrengthResult:
+    """The 1-vacil reference stimulus, as the entry point returns it."""
+    return psychoacoustics.fluctuation_strength(_am_tone(1000.0, 60.0, 1.0, 4.0), _FS)
+
+
+@pytest.mark.parametrize("trim", [True, False])
+def test_a_specific_curve_off_the_filter_axis_is_refused(
+    reference_result: psychoacoustics.FluctuationStrengthResult, trim: bool
+) -> None:
+    """``specific`` and ``bark_axis`` are one axis of 47 filters, written twice.
+
+    A curve of another length is a curve read against the wrong critical-band
+    rates, and matplotlib is what stops it: it raises about x and y differing
+    in their first dimension, names neither field, and does so from a call
+    several frames below the one the caller made. Short and long fail there
+    the same way.
+    """
+    curve = reference_result.specific
+    wrong = curve[:-1] if trim else np.append(curve, curve[-1])
+    with pytest.raises(ValueError, match="'specific'"):
+        dataclasses.replace(reference_result, specific=wrong)
+
+
+def test_a_bark_axis_off_the_filter_axis_is_refused(
+    reference_result: psychoacoustics.FluctuationStrengthResult,
+) -> None:
+    """The same disagreement written on the axis instead of the curve.
+
+    Neither field is authoritative over the other, so the refusal names both
+    and their two counts rather than picking a culprit.
+    """
+    short_axis = reference_result.bark_axis[:-1]
+    with pytest.raises(ValueError, match="'bark_axis'"):
+        dataclasses.replace(reference_result, bark_axis=short_axis)
+
+
+def test_a_specific_curve_that_gained_an_axis_is_refused(
+    reference_result: psychoacoustics.FluctuationStrengthResult,
+) -> None:
+    """Counting the filters says nothing about how many axes carry them.
+
+    A ``specific`` of shape ``(47, 1)`` counts 47 filters on its first axis
+    and ``plot`` draws it as one line per column without a word. The shaded
+    fill underneath is what stops, reporting that ``'y1'`` is not
+    1-dimensional -- matplotlib's own parameter, not the field that carried
+    the extra axis.
+    """
+    column = reference_result.specific[:, None]
+    with pytest.raises(ValueError, match="'specific' must have one axis"):
+        dataclasses.replace(reference_result, specific=column)

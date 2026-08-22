@@ -15,6 +15,8 @@ frequency-domain fractional shifts, pinning the achievable accuracy.
 
 from __future__ import annotations
 
+import dataclasses
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -503,6 +505,24 @@ def test_correlation_rejects_invalid_inputs() -> None:
         res.random_error(0.0)
 
 
+def test_correlation_rejects_a_coefficient_of_another_length() -> None:
+    """``coefficient`` is the silent one of the three columns.
+
+    ``random_error()`` reads it position by position and never looks at
+    ``lags`` again, so a coefficient one bin short still returns a
+    well-formed error curve, shifted by one lag: at the peak of this
+    estimate it quotes 1.574, the uncertainty belonging to the next lag,
+    where the true figure is 0.064. ``plot()`` draws its two lines as
+    usual. A ``lags`` or ``values`` disagreement is loud instead, refused
+    from inside matplotlib for want of a matching first dimension.
+    """
+    x = _white(26, n=4096)
+    res = ph.signals.correlation(x, np.roll(x, 64), FS, max_lag=0.01)
+    one_lag_short = res.coefficient[1:]
+    with pytest.raises(ValueError, match="'coefficient'.*per lag"):
+        dataclasses.replace(res, coefficient=one_lag_short)
+
+
 def test_time_delay_rejects_invalid_inputs() -> None:
     x = _white(17, n=4096)
     y = np.roll(x, 5)
@@ -532,6 +552,36 @@ def test_ir_utilities_reject_invalid_inputs() -> None:
         ph.signals.impulse_response_delay(ir, FS, upsample=-2)
     with pytest.raises(ValueError, match="'fs'"):
         ph.signals.impulse_response_delay(ir, 0.0)
+
+
+def test_alignment_rejects_a_stacked_aligned_record() -> None:
+    """A second axis on ``aligned`` is the silent way to break the pair.
+
+    It passes every count, and ``plot()`` draws one trace per column over
+    the single time axis built from the reference: three lines where there
+    should be two, the aligned label and its one stored delay repeated in
+    the legend for a column it was never measured on.
+    """
+    reference = _bandlimited_pulse(1024, 300.0, 0.2)
+    ir = _bandlimited_pulse(1024, 310.0, 0.2)
+    res = ph.signals.align_impulse_responses(ir, reference, FS)
+    stacked = np.column_stack([res.aligned, res.reference])
+    with pytest.raises(ValueError, match="'aligned' must have one axis"):
+        dataclasses.replace(res, aligned=stacked)
+
+
+def test_alignment_rejects_records_of_different_lengths() -> None:
+    """The loud half of the same pairing, named here rather than left to
+    matplotlib's 'x and y must have same first dimension' from inside the
+    plotter: records that cannot be read sample against sample are refused
+    at construction, where the field is still called by its name.
+    """
+    reference = _bandlimited_pulse(1024, 300.0, 0.2)
+    ir = _bandlimited_pulse(1024, 310.0, 0.2)
+    res = ph.signals.align_impulse_responses(ir, reference, FS)
+    one_sample_short = res.aligned[:-1]
+    with pytest.raises(ValueError, match="'aligned'.*per sample"):
+        dataclasses.replace(res, aligned=one_sample_short)
 
 
 def test_results_are_frozen() -> None:

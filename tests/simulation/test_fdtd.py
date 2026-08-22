@@ -13,6 +13,8 @@ mode frequency under grid refinement.
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -658,6 +660,31 @@ def small_result() -> FDTDResult:
         obstacle_mask=mask,
         snapshot_every=20,
     )
+
+
+def test_result_rejects_rasters_recorded_on_another_grid(
+    small_result: FDTDResult,
+) -> None:
+    # The snapshot plot takes the extent of the picture from `shape` alone,
+    # so a frame recorded on another grid is stretched over a domain it never
+    # covered while the obstacle overlay, still drawn at `shape`, lands on
+    # cells that were never simulated. Measured without the guard: cropping
+    # the sponge layers off the frames of this very run draws a (20, 40)
+    # field over the same 2.0 x 1.5 m extent as the (30, 40) geometry, and
+    # neither imshow nor the eye objects. A mask of another shape is not
+    # silent, but it surfaces as an IndexError from inside
+    # `np.ma.masked_where`, which names two shapes and no field.
+    assert small_result.snapshots is not None
+    assert small_result.obstacle_mask is not None
+    fewer_rows = small_result.snapshots[:, 5:-5, :]
+    with pytest.raises(ValueError, match=r"'snapshots \(axis 1\)'"):
+        replace(small_result, snapshots=fewer_rows)
+    fewer_columns = small_result.snapshots[:, :, 5:-5]
+    with pytest.raises(ValueError, match=r"'snapshots \(axis 2\)'"):
+        replace(small_result, snapshots=fewer_columns)
+    cropped_mask = small_result.obstacle_mask[5:-5, :]
+    with pytest.raises(ValueError, match="'obstacle_mask'"):
+        replace(small_result, obstacle_mask=cropped_mask)
 
 
 def test_plot_probes(small_result: FDTDResult) -> None:

@@ -22,6 +22,8 @@ Oracles, with the source reference in each test docstring:
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pytest
 
@@ -343,6 +345,20 @@ def test_rating_rejects_mismatched_frequencies() -> None:
         building.ceiling_attenuation_class(
             [30.0] * 16, [100.0 * (i + 1) for i in range(16)]
         )
+
+
+def test_rating_result_rejects_a_short_deficiency_column() -> None:
+    """The deficiency column is the one no reader in the library opens.
+
+    The plot reads the frequencies, the data and the fitted contour, so a
+    short one there is refused by matplotlib when the figure is drawn; a
+    short ``deficiencies`` reaches nothing at all, and pairing it with the
+    sixteen frequencies by hand truncates in silence.
+    """
+    res = building.ceiling_attenuation_class([30.0] * 16)
+    short = res.deficiencies[:-1]
+    with pytest.raises(ValueError, match="'deficiencies'"):
+        dataclasses.replace(res, deficiencies=short)
 
 
 # ---------------------------------------------------------------------------
@@ -751,3 +767,21 @@ def test_plenum_model_rejects_a_non_positive_height() -> None:
         building.plenum_flanking_reduction_index(
             [30.0], [30.0], ceiling_length=4.75, plenum_height=0.0
         )
+
+
+def test_plenum_result_rejects_a_ceiling_evaluated_in_one_band() -> None:
+    """The plot adds RS to RR, and numpy would stretch a single band silently.
+
+    A one-band ``reduction_index_source`` broadcasts across the receiving
+    ceiling's whole axis, so the reference curve and the shaded plenum
+    penalty are drawn against a ceiling that was never evaluated there.
+    """
+    res = building.plenum_flanking_reduction_index(
+        [30.0, 35.0, 40.0],
+        [28.0, 33.0, 38.0],
+        ceiling_length=4.75,
+        plenum_height=0.43,
+    )
+    one_band = res.reduction_index_source[:1]
+    with pytest.raises(ValueError, match="'reduction_index_source'"):
+        dataclasses.replace(res, reduction_index_source=one_band)

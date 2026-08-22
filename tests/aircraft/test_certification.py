@@ -17,6 +17,7 @@ import pytest
 
 from phonometry.aircraft.certification import (
     NOY_BANDS,
+    EPNLResult,
     _tone_background,
     effective_perceived_noise_level,
     epnl_from_pnlt,
@@ -323,3 +324,62 @@ def test_effective_epnl_exposes_bandsharing_field() -> None:
     assert res.pnltm == pytest.approx(
         float(np.max(res.pnlt)) + res.bandsharing_adjustment
     )
+
+
+# --------------------------------------------------------------------------
+# Per-record histories that do not run over the record axis
+# --------------------------------------------------------------------------
+def _flyover() -> EPNLResult:
+    """A 20-record synthetic flyover, determined by the public entry point."""
+    rng = np.random.default_rng(0)
+    peak = 20.0 * np.exp(-((np.arange(20) - 10.0) ** 2) / 8.0)
+    spectra = 60.0 + peak[:, None] + rng.standard_normal((20, 24))
+    return effective_perceived_noise_level(spectra)
+
+
+@pytest.mark.parametrize("trim", [True, False], ids=["short", "long"])
+def test_a_tone_correction_off_the_record_axis_is_refused(trim: bool) -> None:
+    """``tone_correction`` is the history nothing downstream measures.
+
+    The figure draws PNL and PNLT against ``times`` and the fiche prints
+    neither, so a tone-correction history of another length than the records
+    is silent both ways: one short or one long, the sheet renders, and the
+    corrections reach the reader lined up against the wrong records.
+    """
+    import dataclasses
+
+    result = _flyover()
+    values = np.asarray(result.tone_correction)
+    wrong = values[:-1] if trim else np.append(values, values[-1])
+    with pytest.raises(ValueError, match="'tone_correction'"):
+        dataclasses.replace(result, tone_correction=wrong)
+
+
+def test_a_drawn_history_off_the_record_axis_is_refused() -> None:
+    """``pnlt`` is drawn against ``times``: the refusal comes before the render.
+
+    Unguarded this reached matplotlib, which names the two first dimensions it
+    could not reconcile but neither the field nor the axis it was counting.
+    """
+    import dataclasses
+
+    result = _flyover()
+    one_short = np.asarray(result.pnlt)[:-1]
+    with pytest.raises(ValueError, match="'pnlt'"):
+        dataclasses.replace(result, pnlt=one_short)
+
+
+def test_a_history_carrying_an_extra_axis_is_refused() -> None:
+    """A history of one record per row and two columns counts as many records.
+
+    Unguarded, ``pnl`` of shape ``(records, 2)`` passes the record count and
+    reaches ``ax.plot(times, pnl)``, which draws a curve per column: the figure
+    renders with two PNL traces where the flyover has one, and the fiche is
+    written from it without complaint.
+    """
+    import dataclasses
+
+    result = _flyover()
+    two_columns = np.column_stack([result.pnl, result.pnl])
+    with pytest.raises(ValueError, match="'pnl' must have one axis"):
+        dataclasses.replace(result, pnl=two_columns)

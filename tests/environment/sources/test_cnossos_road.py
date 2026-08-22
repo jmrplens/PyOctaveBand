@@ -26,6 +26,7 @@ closed forms of the published equations.
 
 from __future__ import annotations
 
+import dataclasses
 import functools
 import math
 import warnings
@@ -677,10 +678,49 @@ def test_invalid_inputs_are_rejected() -> None:
         line_source_segment_power(power, 0.0)
 
 
+def test_result_band_axis_is_refused_when_a_field_disagrees() -> None:
+    """A spectrum short of its band centres never reaches the A-weighting.
+
+    Unguarded, a one-band ``total_line_power`` beside eight band centres was
+    stretched over the eight weights of 2.5.5 by
+    :attr:`RoadEmissionResult.a_weighted_line_power`, which returned an
+    ordinary-looking dB(A) figure *above* the eight-band spectrum it came
+    from rather than raising anywhere.
+    """
+    result = road_source_power(
+        [
+            RoadTraffic(RoadVehicleCategory.LIGHT, 1200.0, 50.0),
+            RoadTraffic(RoadVehicleCategory.HEAVY, 45.0, 50.0),
+        ]
+    )
+    one_band = result.total_line_power[:1]
+    with pytest.raises(ValueError, match=r"'total_line_power' \(1\)"):
+        dataclasses.replace(result, total_line_power=one_band)
+
+
+def test_result_band_axis_is_refused_off_the_weighting_grid() -> None:
+    """Fields that agree with one another are still pinned to the eight bands.
+
+    The A-weights of 2.5.5 are a fixed table, not a field of the result, so
+    agreement among the fields does not reach them: a result whose every
+    array consistently carried one band passed every count and was stretched
+    over all eight just the same.
+    """
+    result = road_source_power(RoadTraffic(RoadVehicleCategory.LIGHT, 1200.0, 50.0))
+    first_band = {
+        "frequencies": result.frequencies[:1],
+        "rolling": result.rolling[:, :1],
+        "propulsion": result.propulsion[:, :1],
+        "vehicle_power": result.vehicle_power[:, :1],
+        "line_power": result.line_power[:, :1],
+        "total_line_power": result.total_line_power[:1],
+    }
+    with pytest.raises(ValueError, match=r"'frequencies' \(1\)"):
+        dataclasses.replace(result, **first_band)
+
+
 def test_substituted_database_may_replace_one_row() -> None:
     """A national Appendix F row overrides only the coefficients it carries."""
-    import dataclasses
-
     row = (83.4, 89.0, 88.1, 93.6, 100.4, 96.9, 87.0, 76.5)
     national = dataclasses.replace(
         ROAD_COEFFICIENTS,

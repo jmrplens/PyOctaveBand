@@ -813,14 +813,19 @@ class PrecisionCriteria:
 
         ``qualified`` is the conjunction of the others, and a conjunction is
         taken with numpy's broadcasting: a criterion carrying a single value
-        decides every band at once, so a five-band determination can be
-        qualified, and its A-weighted total taken over the bands the fiche
-        keeps (clause 10 f) 2)), on one band's verdict. The criteria come
-        from separately measured scans and reach this type without ever
-        having been compared with each other: criterion 5 is formed from its
-        own pair of field-non-uniformity spectra, whose length nothing else
-        constrains. A criterion is ``None`` when its inputs were not
-        supplied, which is not a disagreement.
+        decides every band at once. :func:`precision_qualification` reaches
+        that state on its own: it forms criterion 1 from the scan intensity
+        levels and the Table 1 limit read from ``frequencies``, and the rest
+        from the indicators, without comparing the two sets, so a
+        repeatability pair read on a single band leaves criterion 1 one band
+        long and ``qualified`` as long as the indicators, every band of it
+        decided by that one. The fiche is not where this surfaces:
+        ``PrecisionIntensityResult.report`` refuses a criteria set that does
+        not span the determination and names the criterion. What the
+        broadcast verdict reaches is ``qualified`` itself, at full length,
+        with nothing left in it to say that one band decided the rest. A
+        criterion is ``None`` when its inputs were not supplied, which is
+        not a disagreement.
 
         :raises ValueError: if two of the criteria span different numbers of
             bands.
@@ -928,14 +933,20 @@ class PrecisionIntensityResult:
         """Reject a determination whose per-band quantities disagree.
 
         The fiche prints one row per band, taking the row count from
-        ``sound_power_level`` and the labels from ``frequencies``, so a
-        longer band axis labels the rows with the first of its centres and
-        says nothing about the rest, while the boxed A-weighted total was
-        summed at construction over the whole spectrum and states a number
-        for bands the table beside it does not show. ``not_applicable_band``
+        ``sound_power_level`` and the labels from ``frequencies``, and it
+        reads each of those columns against another, so a band axis of the
+        wrong length raises part way through the sheet: from numpy about two
+        shapes it could not broadcast, or from a strict ``zip`` about two
+        argument lengths, naming neither field. ``not_applicable_band``
         marks the rows outside the method (clause 9.2) and joins the
-        qualification mask that drops bands from that total, a boolean array
-        combined with another: one value in it marks every band at once.
+        qualification mask that drops bands from the A-weighted total, and
+        that join is an in-place ``|=``, which refuses a mask of another
+        length as a non-broadcastable operand rather than stretching it over
+        every band. ``sound_power`` is the silent one: the signed band total
+        in watts is the only per-band quantity no reader in the library
+        opens, the sheet printing its level instead, so a determination
+        carrying one power too many renders a complete fiche and keeps the
+        extra band for whoever reads that column against ``frequencies``.
 
         ``partial_power`` carries the partial surfaces on its first axis and
         the bands on its second, so its band axis is index 1; the partial
@@ -1254,8 +1265,15 @@ def precision_qualification(
     # Criterion 5: 0,83 <= FS(1)/FS(2) <= 1,2.
     criterion_5: np.ndarray | None = None
     if field_nonuniformity_1 is not None and field_nonuniformity_2 is not None:
-        fs1 = np.asarray(field_nonuniformity_1, dtype=np.float64)
-        fs2 = np.asarray(field_nonuniformity_2, dtype=np.float64)
+        # Broadcast onto the band axis the way criterion 2 does with the
+        # residual index: a single FS pair states one ratio that holds for
+        # every band, and the result promises a verdict per band.
+        fs1 = np.broadcast_to(
+            np.asarray(field_nonuniformity_1, dtype=np.float64), (n_bands,)
+        )
+        fs2 = np.broadcast_to(
+            np.asarray(field_nonuniformity_2, dtype=np.float64), (n_bands,)
+        )
         with np.errstate(divide="ignore", invalid="ignore"):
             ratio = fs1 / fs2
         criterion_5 = np.asarray(

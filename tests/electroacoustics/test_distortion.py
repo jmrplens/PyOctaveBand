@@ -9,6 +9,7 @@ without leakage.
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import matplotlib as mpl
@@ -375,6 +376,31 @@ def test_harmonic_analysis_bundle_and_plot() -> None:
     assert res.harmonic_amplitudes[0] == pytest.approx(1.0, rel=1e-6)
     ax = res.plot()
     assert ax is not None
+
+
+def test_harmonic_result_rejects_frequency_axis_of_another_length() -> None:
+    res = electroacoustics.harmonic_analysis(_harmonic_signal(), FS, 1000.0)
+    stretched = np.append(res.harmonic_frequencies, 11_000.0)
+    with pytest.raises(
+        ValueError, match=r"'harmonic_frequencies'.*one value per harmonic"
+    ):
+        dataclasses.replace(res, harmonic_frequencies=stretched)
+
+
+def test_harmonic_result_rejects_frequencies_carrying_a_second_axis() -> None:
+    res = electroacoustics.harmonic_analysis(_harmonic_signal(), FS, 1000.0)
+    two_dimensional = np.column_stack([res.harmonic_frequencies] * 2)
+    with pytest.raises(ValueError, match=r"'harmonic_frequencies' must have one axis"):
+        dataclasses.replace(res, harmonic_frequencies=two_dimensional)
+
+
+def test_harmonic_result_rejects_amplitude_axis_of_another_length() -> None:
+    res = electroacoustics.harmonic_analysis(_harmonic_signal(), FS, 1000.0)
+    clipped = res.harmonic_amplitudes[:-1]
+    with pytest.raises(
+        ValueError, match=r"'harmonic_amplitudes'.*one value per harmonic"
+    ):
+        dataclasses.replace(res, harmonic_amplitudes=clipped)
 
 
 @pytest.mark.parametrize(

@@ -39,6 +39,8 @@ responses.
 
 from __future__ import annotations
 
+import dataclasses
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -308,6 +310,63 @@ def test_results_are_frozen() -> None:
     echo = ph.signals.echo_detection(_impulse_echo(), FS)
     with pytest.raises(AttributeError):
         echo.delay = 0.0  # type: ignore[misc]
+
+
+def test_a_cepstrum_result_refuses_a_cepstrum_short_of_its_quefrency_axis() -> None:
+    """The half a plot never draws is where a slipped pair hides.
+
+    :meth:`CepstrumResult.plot` cuts both arrays at ``nfft // 2 + 1``, so a
+    disagreement past that midpoint never reaches the figure: the curve comes
+    out complete and ordinary, and the samples that were never paired with a
+    quefrency are simply not there. That pair is what an echo delay is read
+    off, so it is pinned when the result is built instead.
+    """
+    res = ph.signals.cepstrum(_impulse_echo(), FS)
+    short = res.cepstrum[:-1]
+    with pytest.raises(ValueError, match=r"'cepstrum'.*one value per quefrency"):
+        dataclasses.replace(res, cepstrum=short)
+
+
+def test_a_lifter_result_refuses_a_quefrency_axis_short_of_its_cepstrum() -> None:
+    """The lifter's cepstrum panel is cut at the same midpoint, and as blind.
+
+    A quefrency axis one sample short of the cepstrum still covers the whole
+    ``nfft // 2 + 1`` slice the panel draws, so the figure is complete and the
+    mismatch is invisible in it.
+    """
+    res = ph.signals.lifter(_impulse_echo(), FS, cutoff=(DELAY - 50) / FS)
+    short = res.quefrencies[:-1]
+    with pytest.raises(ValueError, match=r"'quefrencies'.*one value per quefrency"):
+        dataclasses.replace(res, quefrencies=short)
+
+
+def test_a_lifter_result_names_the_spectrum_column_that_slipped() -> None:
+    """The overlay raises about two shapes; the result raises about a field.
+
+    Handing ``Axes.plot`` a curve of a different length from the frequency
+    axis is refused outright, in either direction, but the message names the
+    shapes it could not reconcile rather than the column they came from, and
+    only once someone draws. The check moves the refusal to construction,
+    where the column still has its name.
+    """
+    res = ph.signals.lifter(_impulse_echo(), FS, cutoff=(DELAY - 50) / FS)
+    short = res.liftered_db[:-1]
+    with pytest.raises(ValueError, match=r"'liftered_db'.*one value per frequency"):
+        dataclasses.replace(res, liftered_db=short)
+
+
+def test_an_echo_detection_result_refuses_a_cepstrum_short_of_its_axis() -> None:
+    """The detection reports a place, and the two axes are what pin it.
+
+    :attr:`delay_samples` is a position in the cepstrum and :attr:`delay` a
+    time on the quefrency axis; the report is the claim that those are the
+    same place. The plot slices at ``nfft // 2 + 1`` like the others, so a
+    pair that disagrees past the midpoint is drawn without complaint.
+    """
+    res = ph.signals.echo_detection(_impulse_echo(), FS)
+    short = res.cepstrum[:-1]
+    with pytest.raises(ValueError, match=r"'cepstrum'.*one value per quefrency"):
+        dataclasses.replace(res, cepstrum=short)
 
 
 # ---------------------------------------------------------------------------

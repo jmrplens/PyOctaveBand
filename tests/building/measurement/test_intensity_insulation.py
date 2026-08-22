@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pytest
 import reference_data as ref
@@ -271,3 +273,22 @@ def test_kc_band_count_mismatch_raises() -> None:
         building.intensity_sound_reduction(
             [80.0], [40.0], measurement_area=10.0, area=10.0, kc=[1.0, 2.0]
         )
+
+
+def test_reduction_rejects_modified_index_of_another_band_count() -> None:
+    """``r_i_modified`` is the column the verbose fiche never measures.
+
+    ``FpI`` and ``δpI0`` are arguments of ``report()`` and are measured there
+    against the reported band count; ``RI,M`` arrives on the result and is
+    admitted unmeasured. A column one entry too long prints beside ``RI``
+    shifted by a band -- the 100 Hz row shows the surplus value and the
+    3150 Hz row the 2500 Hz one -- and the last entry is dropped by the table
+    without a word.
+    """
+    result = building.intensity_sound_reduction(
+        [80.0] * 16, [40.0] * 16, measurement_area=12.0, area=10.0, kc=[1.0] * 16
+    )
+    assert result.r_i_modified is not None
+    stretched = np.append(result.r_i_modified, 0.0)
+    with pytest.raises(ValueError, match=r"'r_i_modified'.*one value per band"):
+        dataclasses.replace(result, r_i_modified=stretched)

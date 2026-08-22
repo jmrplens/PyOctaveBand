@@ -9,7 +9,7 @@ through these helpers; existing modules migrate as they are touched.
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 
@@ -162,9 +162,15 @@ def require_axis_rank(value: object, owner: str, name: str, rank: int) -> None:
     the right number of bands on its second, so every count agrees and the
     extra axis travels on into whatever indexes the field next.
 
-    Only arrays are measured. A tuple of per-band entries is one axis of
-    entries whatever each entry holds, and asking numpy for its rank would
-    stack them and raise about an inhomogeneous shape.
+    The rank is measured, not assumed from the type. A nested list is as
+    two-dimensional as the array it would become, and taking it for a single
+    axis would be wrong twice over: it would refuse a correctly shaped grid
+    handed in as lists, and it would let a list carrying an extra axis walk
+    past the very pin that exists to stop one.
+
+    Only a ragged sequence escapes measurement. A tuple whose entries are
+    per-band arrays of unequal length cannot be stacked, so numpy has no rank
+    to give; it is one axis of entries, whatever each entry holds.
 
     :param value: The field whose axes are counted.
     :param owner: Name of the type being checked, used in the error message.
@@ -172,7 +178,10 @@ def require_axis_rank(value: object, owner: str, name: str, rank: int) -> None:
     :param rank: The number of axes the field must have.
     :raises ValueError: if *value* has a different number of axes.
     """
-    actual = value.ndim if isinstance(value, np.ndarray) else 1
+    try:
+        actual = int(np.ndim(cast("ArrayLike", value)))
+    except ValueError:
+        actual = 1
     if actual != rank:
         axes = "one axis" if rank == 1 else f"{rank} axes"
         msg = (
@@ -194,11 +203,13 @@ def require_ranks(owner: object, **ranks: int) -> None:
     """
     for name, rank in ranks.items():
         value = getattr(owner, name)
-        # A bare number is left alone. Several entry points take a single
-        # frequency and hand back a result of nought-dimensional arrays; that
-        # is not an extra axis, it is no axis, and a mixture of scalars and
-        # arrays is caught by the length check instead.
-        if value is None or np.ndim(value) == 0:
+        # A bare number is left alone where one axis was asked for. Several
+        # entry points take a single frequency and hand back a result of
+        # nought-dimensional arrays; that is not an extra axis, it is no axis,
+        # and a mixture of scalars and arrays is caught by the length check
+        # instead. The exemption stops there: a field asked for two axes or
+        # more is a table, and no entry point collapses a table to a number.
+        if value is None or (rank == 1 and np.ndim(value) == 0):
             continue
         require_axis_rank(value, type(owner).__name__, name, rank)
 
@@ -282,6 +293,40 @@ def require_same_length(
             raise ValueError(msg)
         counts[f"{name} (axis {index})"] = shape[index]
     require_equal_counts(type(owner).__name__, counts, axis)
+
+
+def require_same_shape(owner: object, *fields: str, quantity: str = "point") -> None:
+    """Require the named fields of *owner* to have exactly the same shape.
+
+    The stricter sibling of :func:`require_same_length`, for fields derived
+    from one another elementwise rather than laid side by side along one axis.
+    A propagation loss and the signal excess computed from it agree point for
+    point, and the solver that produced them may well have returned a grid
+    over depth and range, so pinning a single axis would be both too weak,
+    two grids of the same height can disagree everywhere else, and too strong,
+    since it would refuse the grid the library itself hands back.
+
+    ``None`` fields are skipped, and so is a set of fields that are all bare
+    numbers.
+
+    :param owner: The instance whose fields are measured.
+    :param fields: Field names that must share one shape.
+    :param quantity: What one element is, used in the error message.
+    :raises ValueError: if two present fields have different shapes.
+    """
+    present = [(name, getattr(owner, name)) for name in fields]
+    present = [(name, value) for name, value in present if value is not None]
+    if all(np.ndim(value) == 0 for _, value in present):
+        return
+    shapes = {name: np.shape(value) for name, value in present}
+    if len(set(shapes.values())) <= 1:
+        return
+    listed = ", ".join(f"'{name}' {shape}" for name, shape in shapes.items())
+    msg = (
+        f"{type(owner).__name__}: {listed} must all have the same shape, "
+        f"one value per {quantity}."
+    )
+    raise ValueError(msg)
 
 
 def require_per_band(

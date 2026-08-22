@@ -265,12 +265,18 @@ class AbsorptionRatingResult:
         The evaluation table of the fiche prints one row per octave -- the
         band, its practical coefficient, the shifted reference there and the
         unfavourable deviation between them -- and totals that last column
-        beneath the rows, against the 0,10 budget of Clause 4.2. The deviation
-        column is a subtraction of two of these curves, and numpy stretches a
-        curve carrying a single value across the others rather than refuse it,
-        so the total can be taken over a reference the rows above it never
-        showed. :meth:`plot` shades the same deviations between the same two
-        curves.
+        beneath the rows, against the 0,10 budget of Clause 4.2. No total is
+        ever taken over curves of different lengths: the fiche refuses them on
+        a guard of its own, and :meth:`plot` stops inside matplotlib before it
+        can shade a deviation. What neither reader gives is the field at
+        fault. The fiche names all three at once, "needs 'band_centers',
+        'measured' and 'shifted_reference' of equal length", leaving the
+        caller to find the odd one; matplotlib names none of them, reporting
+        the two shapes it could not reconcile as "x and y" from inside its own
+        drawing code, with nothing to say which curve of which rating they
+        came from. Refusing here is what puts each field beside the count it
+        carries, and does it when the rating is built rather than when
+        something first tries to draw it.
 
         The two band axes are different sets, so they are checked apart: the
         rating runs over the five octaves of Clause 4.1, while the ``alpha_s``

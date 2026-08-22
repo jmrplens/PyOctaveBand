@@ -101,7 +101,6 @@ def test_plot_smoke() -> None:
 
 
 _PER_LOSS = "one value per propagation loss"
-_ONE_AXIS = "must have one axis"
 
 
 def test_solution_columns_must_run_over_one_loss_axis() -> None:
@@ -115,7 +114,8 @@ def test_solution_columns_must_run_over_one_loss_axis() -> None:
     that carries the negative excesses. ``snr`` reaches no figure at all and
     is silent in both directions, yet it is read entry by entry beside
     ``propagation_loss``. An extra axis is quieter still: an ``(n, 2)`` column
-    carries one value per loss by every count.
+    carries one value per loss by every count, which is why the three are held
+    to one shape rather than to one length.
     """
     good = passive_sonar_equation(
         150.0, np.linspace(60.0, 110.0, 6), 57.0, detection_threshold=8.0
@@ -126,31 +126,51 @@ def test_solution_columns_must_run_over_one_loss_axis() -> None:
         ("signal_excess", np.append(good.signal_excess, -20.0), _PER_LOSS),
         ("snr", good.snr[:-1], _PER_LOSS),
         ("snr", np.append(good.snr, -12.0), _PER_LOSS),
-        ("propagation_loss", np.column_stack([good.propagation_loss] * 2), _ONE_AXIS),
-        ("signal_excess", np.column_stack([good.signal_excess] * 2), _ONE_AXIS),
-        ("snr", np.column_stack([good.snr] * 2), _ONE_AXIS),
+        ("propagation_loss", np.column_stack([good.propagation_loss] * 2), _PER_LOSS),
+        ("signal_excess", np.column_stack([good.signal_excess] * 2), _PER_LOSS),
+        ("snr", np.column_stack([good.snr] * 2), _PER_LOSS),
     )
     for field, value, fragment in cases:
         with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
             dataclasses.replace(good, **{field: value})
 
 
-def test_entry_points_refuse_a_grid_of_losses() -> None:
-    """A two-dimensional loss input is refused where it is handed over.
+def test_entry_points_carry_a_grid_of_losses_through() -> None:
+    """A loss field of two axes is a detection map, and it survives intact.
 
-    The coercion only widens a scalar, so a grid passes straight through and
-    every derived quantity takes its shape: all three first axes agree and no
-    count notices. The plot's sort then indexes an ``(n, 2)`` pair into an
-    ``(n, 2, 2)`` one, and matplotlib complains about shapes that appear
-    nowhere in the result.
+    ``gaussian_beams`` and ``parabolic_equation`` hand back a loss over depth
+    and range, and feeding that to the sonar equation is how a detection
+    footprint is drawn. The equation is elementwise, so every derived quantity
+    keeps the grid's shape and each cell is the scalar result of the cell it
+    came from. This is why the three columns are held to one shape and not
+    merely to one length: pinning a single axis would refuse the grid the
+    library itself produces.
     """
     grid = np.array([[60.0, 70.0], [80.0, 90.0], [100.0, 110.0]])
-    for call in (
-        lambda: passive_sonar_equation(150.0, grid, 57.0),
-        lambda: active_sonar_equation(200.0, grid, 10.0, 50.0),
+    for result in (
+        passive_sonar_equation(150.0, grid, 57.0),
+        active_sonar_equation(200.0, grid, 10.0, 50.0),
     ):
-        with pytest.raises(ValueError, match=rf"'propagation_loss'.*{_ONE_AXIS}"):
-            call()
+        assert result.propagation_loss.shape == grid.shape
+        assert result.signal_excess.shape == grid.shape
+        assert result.snr.shape == grid.shape
+    # Passive: SNR = SL - PL - (NL - DI), cell by cell.
+    passive = passive_sonar_equation(150.0, grid, 57.0)
+    np.testing.assert_allclose(passive.snr, 150.0 - grid - 57.0)
+
+
+def test_a_grid_that_disagrees_with_its_solutions_is_refused() -> None:
+    """Two grids of the same height can still disagree everywhere else.
+
+    A length check counts first axes alone, so a ``(3, 2)`` loss beside a
+    ``(3, 4)`` excess passes it while agreeing about nothing. The shape is what
+    the elementwise equation actually needs.
+    """
+    good = passive_sonar_equation(
+        150.0, np.array([[60.0, 70.0], [80.0, 90.0], [100.0, 110.0]]), 57.0
+    )
+    with pytest.raises(ValueError, match=rf"'signal_excess'.*{_PER_LOSS}"):
+        dataclasses.replace(good, signal_excess=np.zeros((3, 4)))
 
 
 # ---------------------------------------------------------------------------

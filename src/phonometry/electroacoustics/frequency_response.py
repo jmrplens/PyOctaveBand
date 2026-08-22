@@ -117,13 +117,20 @@ class FrequencyResponseResult:
         The five fields are one Welch frequency axis and the four quantities
         read off it, so the Bode magnitude is plotted against ``frequencies``
         point for point and the coherence panel beneath it is the quality
-        flag of those same points. The panels select their positive-frequency
-        part with a mask cut from ``frequencies``, which turns a curve of the
-        wrong length into an index error raised from inside the plotter,
-        naming neither the field nor the two lengths; ``response``, which
-        nothing downstream re-derives, disagrees without a word.
+        flag of those same points. The three panels cut their
+        positive-frequency mask from ``frequencies``, so a wrong length in a
+        curve they draw surfaces as numpy's complaint about a boolean index
+        and two axis sizes, which names neither the field nor the result.
+        What no panel draws says nothing at all: ``response`` is read
+        positionally at an index cut from ``frequencies`` and hands back
+        another frequency's complex gain, and with an existing ``ax`` only the
+        magnitude is drawn, leaving the phase and the coherence just as quiet.
+        An extra axis passes every count, so the ranks are pinned too: a
+        two-dimensional ``magnitude_db`` draws a second identical curve on the
+        magnitude panel.
 
-        :raises ValueError: if the five curves do not share one length.
+        :raises ValueError: if the five curves do not share one length, or if
+            one of them carries more than one axis.
         """
         require_ranks(
             self,

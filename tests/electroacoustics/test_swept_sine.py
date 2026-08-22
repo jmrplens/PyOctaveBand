@@ -15,6 +15,8 @@ documented as excitation-dependent.
 
 from __future__ import annotations
 
+import dataclasses
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -414,6 +416,41 @@ def test_ir_length_explicit_and_windows_centered() -> None:
     # band-limited pulse can lean a couple of samples).
     for row in res.harmonic_irs:
         assert abs(int(np.argmax(np.abs(row))) - 1024) <= 3
+
+
+# ---------------------------------------------------------------------------
+# Result construction guards
+# ---------------------------------------------------------------------------
+
+
+def test_distortion_ratios_are_pinned_on_the_excitation_frequency_axis() -> None:
+    """The per-order ratios run along axis 1 of the excitation axis.
+
+    Nothing inside the package pairs ``distortion_ratios`` with
+    ``thd_frequencies``, so a row of another length reaches whoever plots the
+    two together and mispairs every point: with the first column dropped, the
+    ratio read at ``thd_frequencies[100]`` is the one measured at
+    ``thd_frequencies[101]``.
+    """
+    res = _analyze()
+    shifted = res.distortion_ratios[:, 1:]
+    with pytest.raises(
+        ValueError, match=r"'distortion_ratios \(axis 1\)'.*per excitation frequency"
+    ):
+        dataclasses.replace(res, distortion_ratios=shifted)
+
+
+def test_a_response_matrix_short_of_its_irs_and_delays_is_refused() -> None:
+    """``n_harmonics`` is read off ``harmonic_responses`` alone.
+
+    A matrix short of a row shrinks the reported order count instead of
+    disagreeing with anything, leaving ``harmonic_irs`` and ``delays`` still
+    listing the orders that were dropped.
+    """
+    res = _analyze()
+    missing_top_order = res.harmonic_responses[:-1]
+    with pytest.raises(ValueError, match=r"'harmonic_responses'.*per harmonic order"):
+        dataclasses.replace(res, harmonic_responses=missing_top_order)
 
 
 # ---------------------------------------------------------------------------

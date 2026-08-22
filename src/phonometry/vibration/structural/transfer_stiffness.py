@@ -325,19 +325,27 @@ class TransferStiffnessResult:
     def __post_init__(self) -> None:
         r"""Reject a spectrum whose stiffnesses do not run over its own frequencies.
 
-        The fiche characterises the element by its low-frequency plateau: it
-        takes the lowest entry of ``frequencies`` and reads
-        :math:`|k_{2,1}|`, ``L_k`` and ``eta`` at that same position of
-        ``transfer_stiffness``, then prints them together, the level as the
-        boxed representative value and the magnitude beside it stated *at that
-        frequency*. Let the two lengths differ and a position stops meaning
-        the same measurement in both, so the sheet hangs one frequency's
-        stiffness on another frequency's label, while the frequency range in
-        the same table still spans the whole of ``frequencies``, including
-        lines the spectrum never valued. A value too many at the end is the
-        same mistake in the other direction, and just as invisible: nothing on
-        a sheet that is well formed either way says how many stiffnesses there
-        were.
+        A plain length difference is loud, in both directions, and the fiche is
+        not where it shows. :meth:`report` characterises the element by its
+        low-frequency plateau, read at the lowest entry of ``frequencies``,
+        which for an ascending sweep is the first one: an index no missing or
+        extra value at the end can move, so the :math:`|k_{2,1}|`, ``L_k`` and
+        ``eta`` it would print are the correct ones to the last digit. What
+        stops the sheet is the ``L_k(f)`` spectrum beside them, where
+        matplotlib complains that x and y must have the same first dimension, a
+        stiffness one short and one long alike; :meth:`plot` fails there
+        directly, and :meth:`to` at numpy's refusal to broadcast the stiffness
+        against a function of the frequency. None of the three names a field,
+        and the shapes they quote belong to whatever the plotter or the
+        arithmetic was handed, not to the two attributes that disagree.
+
+        The length that does pass in silence is the one numpy is willing to
+        stretch. A single stiffness against a swept ``frequencies`` is
+        broadcast by :meth:`to`, which hands back an impedance or an effective
+        mass at every frequency, every one of them computed from that one
+        value: a smooth roll-off with the shape of a measured curve and the
+        content of a single point. Counting the entries refuses it, because one
+        stiffness disagrees with three frequencies exactly as two do.
 
         :raises ValueError: if ``transfer_stiffness`` does not carry one value
             per frequency, or either field carries an extra axis.

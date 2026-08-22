@@ -26,6 +26,7 @@ published spectra.
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import numpy as np
@@ -689,6 +690,21 @@ def test_global_index_rejects_a_spectrum_missing_a_db_hr_band() -> None:
     frequencies = [*hr.DB_HR_FREQUENCIES[:-1], 6300.0]
     with pytest.raises(ValueError, match="5000 Hz matched 0 bands"):
         hr.db_hr_global_index(_R_PRIME, frequencies=frequencies)
+
+
+def test_global_index_rejects_a_spectrum_of_another_band_set() -> None:
+    """The normalised spectrum is the column nothing downstream would catch.
+
+    The index and its two rounded forms closed over the bands they were handed
+    at construction, and the plot draws only the frequencies, the band values
+    and their contributions, so a spectrum one band too long changes nothing
+    anyone would see: the result would go on quoting an eighteen-band index
+    beside a nineteen-band Annex A table.
+    """
+    index = hr.ra(_R_PRIME)
+    one_band_too_many = np.append(index.spectrum_levels, 99.9)
+    with pytest.raises(ValueError, match="'spectrum_levels'"):
+        dataclasses.replace(index, spectrum_levels=one_band_too_many)
 
 
 def test_requirement_lookup_validation() -> None:

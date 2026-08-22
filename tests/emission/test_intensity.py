@@ -578,3 +578,70 @@ def test_field_indicators_plot_draws_f1_and_its_limit() -> None:
     assert any(np.allclose(y, np.asarray(ind.f1)) for y in ydata)
     assert any(np.allclose(y, emission.TEMPORAL_VARIABILITY_LIMIT) for y in ydata)
     plt.close("all")
+
+
+# ---------------------------------------------------------------------------
+# Per-band arrays that do not span the same bands
+# ---------------------------------------------------------------------------
+
+
+def _per_band_indicators() -> emission.FieldIndicators:
+    """Four-band indicators with F1 measured from per-band temporal samples."""
+    rng = np.random.default_rng(43)
+    freqs = np.array([250.0, 500.0, 1000.0, 2000.0])
+    lp = 76.0 + rng.normal(0.0, 0.5, (10, 4))
+    i_n = 2.0e-5 * (1.0 + rng.normal(0.0, 0.25, (10, 4)))
+    samples = 2.0e-5 * (1.0 + rng.normal(0.0, 0.6, (10, 4)))
+    return emission.field_indicators(lp, i_n, freqs, temporal_intensity=samples)
+
+
+@pytest.mark.parametrize("kind", ["scalar", "short", "long"])
+def test_an_f1_off_the_band_axis_is_refused(kind: str) -> None:
+    """F1 is pinned to the bands its siblings describe, at construction.
+
+    Clause 8.2 measures F1 at one typical position, and
+    :func:`temporal_variability_indicator` hands that single number back, so a
+    scalar dropped in beside per-band F2/F3/F4 is the mistake nearest to hand.
+    Nothing downstream reads it as short: plot() broadcasts F1 onto the band
+    axis, so the quietest band's 0,49 is drawn as a flat line under the
+    Table B.3 limit across the whole spectrum, and field_is_stationary()
+    answers a single True where these bands carry [1,19 0,92 0,49 0,55] and
+    two of the four exceed the limit.
+    """
+    import dataclasses
+
+    result = _per_band_indicators()
+    f1 = np.asarray(result.f1, dtype=float)
+    wrong = {
+        "scalar": float(f1.min()),
+        "short": f1[:-1],
+        "long": np.append(f1, f1[-1]),
+    }[kind]
+    with pytest.raises(ValueError, match="'f1'"):
+        dataclasses.replace(result, f1=wrong)
+
+
+@pytest.mark.parametrize("field_name", ["intensity", "direction", "bias_correction"])
+@pytest.mark.parametrize("trim", [True, False], ids=["short", "long"])
+def test_an_intensity_band_quantity_off_the_band_axis_is_refused(
+    field_name: str, trim: bool
+) -> None:
+    """The three per-band columns no reader touches are pinned as well.
+
+    plot() draws Lp, LI and the pressure-intensity index against ``frequency``
+    and stops on a length matplotlib cannot reconcile with the band centres,
+    so those four columns are caught downstream one way or another. These
+    three are read nowhere in the library: off the band axis they leave the
+    figure identical to the pixel and travel intact into whatever the caller
+    indexes against ``frequency``.
+    """
+    import dataclasses
+
+    p1, p2 = _plane_wave_pair(delay_s=SPACING / C)
+    result = emission.sound_intensity(
+        p1, p2, FS, spacing=SPACING, rho=RHO, c=C, fraction=3
+    )
+    values = np.asarray(getattr(result, field_name))
+    wrong = values[:-1] if trim else np.append(values, values[-1])
+    with pytest.raises(ValueError, match=f"'{field_name}'"):
+        dataclasses.replace(result, **{field_name: wrong})

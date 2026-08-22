@@ -499,10 +499,13 @@ class TappingForceResult:
         ``mean_square_force`` and the power input derived from it are band
         quantities, not samples of a curve: Eq. (3.91) weights each Fourier
         component by the width of the band it falls in, so a value belongs to
-        one band centre and to no other. A quantity of the wrong length slides
-        the spectrum along the frequency axis, and a force spectrum shifted by
-        a band or two is still a plausible one, read as a floor of a different
-        impedance rather than as a mistake.
+        one band centre and to no other. Only some of the readers notice a
+        quantity of the wrong length: the plot draws ``peak_force`` against
+        ``frequencies``, so matplotlib stops on the two first dimensions,
+        naming neither the field nor this result, but ``power_input_level``
+        scales ``power_input`` on its own and never sees the band axis, so a
+        power input collapsed to a single value comes back as a one-value
+        level spectrum, whatever the frequency axis beside it holds.
 
         :raises ValueError: if the per-band quantities disagree.
         """

@@ -208,15 +208,25 @@ class SynchronousAverageResult:
         """Reject an average whose two curves do not run over their own axis.
 
         The figure draws two panels from two independent axes, and each one
-        is a pair. Above, the averaged waveform against :attr:`times`: the
-        panel is read as one period, so a waveform longer than its time axis
-        is not merely clipped but redraws the tail of the period on top of
-        its head. Below, the comb magnitude against :attr:`comb_frequencies`,
-        converted to orders and annotated with a harmonic line at every
-        integer up to the last one the axis reaches -- so a response of the
-        wrong length puts the teeth of McFadden Eq. 8 somewhere other than
-        the harmonics the lines mark them at, which is the whole claim the
-        panel makes.
+        is a pair. Above, the averaged waveform against :attr:`times`, read
+        as one period. Below, the comb magnitude against
+        :attr:`comb_frequencies`, converted to orders and annotated with a
+        harmonic line at every integer up to the last one the axis reaches,
+        so that the teeth of McFadden Eq. 8 can be read against the
+        harmonics those lines mark. Each pair reaches matplotlib as x and y,
+        so a length disagreement stops the draw with "x and y must have same
+        first dimension" and two bare shapes, naming neither the field nor
+        this result; pinned here, the complaint names the field, and comes
+        before the value is stored.
+
+        An extra axis is the silent half. A waveform of shape ``(M, 2)``
+        still counts M entries along its first axis, so it passes every
+        length check, and matplotlib draws one curve per column: the
+        waveform panel comes back with a second line under a legend entry
+        repeated word for word, and a two-dimensional :attr:`comb_response`
+        adds an unlabelled second curve to the comb panel. Only
+        :attr:`comb_frequencies` is loud there, and then about converting an
+        array to a scalar rather than about any shape.
 
         The two axes are pinned separately because they are separate: the
         waveform runs over :attr:`samples_per_period` samples of the sampling
@@ -225,10 +235,13 @@ class SynchronousAverageResult:
 
         :attr:`residual` spans the whole analysed record,
         ``n_averages * samples_per_period`` samples rather than one period,
-        so it belongs to neither pair and stays out of both.
+        so it belongs to neither pair and stays out of both lengths. No plot
+        reads it at all, which makes its rank the one mistake here that
+        nothing downstream would ever report.
 
-        :raises ValueError: if the waveform disagrees with its time axis, or
-            the comb response with its frequency axis.
+        :raises ValueError: if the waveform disagrees with its time axis, the
+            comb response with its frequency axis, or any of the five carries
+            an axis it should not.
         """
         require_ranks(
             self,

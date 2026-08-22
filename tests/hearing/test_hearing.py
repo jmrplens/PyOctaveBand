@@ -9,6 +9,7 @@ reference threshold against the ISO 389-7 Table 1 values.
 
 from __future__ import annotations
 
+import dataclasses
 from itertools import pairwise
 
 import numpy as np
@@ -102,6 +103,24 @@ def test_invalid_inputs_raise() -> None:
         h.age_threshold(40, "male", frequencies=[777.0])
     with pytest.raises(ValueError, match="field must be"):
         h.reference_threshold("random")
+
+
+@pytest.mark.parametrize("case", ["short", "long", "own-database"])
+def test_a_spectrum_off_the_frequency_axis_is_refused(case: str) -> None:
+    """``threshold`` is the spectrum no reader catches at the median fractile.
+
+    The plot draws it only away from 0.5, so at the default fractile a wrong
+    length reaches ``combine_age_and_noise`` unseen, where a lone value from
+    an own HTLA database (clause 6.2) is broadcast over every noise band.
+    """
+    result = h.age_threshold(60, "male", 0.5)
+    wrong = {
+        "short": result.threshold[:-1],
+        "long": np.append(result.threshold, result.threshold[-1]),
+        "own-database": result.threshold[8:9],  # 4000 Hz alone
+    }[case]
+    with pytest.raises(ValueError, match="'threshold'"):
+        dataclasses.replace(result, threshold=wrong)
 
 
 def test_result_fields_and_plot() -> None:

@@ -266,21 +266,23 @@ class CrowdNoiseResult:
         absorption area, one column per occupancy -- and the plot reads it as
         such, drawing one curve per row against :attr:`talkers` and labelling
         that curve with the area at the same position in
-        :attr:`absorption_areas`. Neither count slips quietly once it gets
-        there: a row count that has slipped is ``zip(..., strict=True)``
-        refusing to pair the areas with the curves, a column count that has
-        slipped is matplotlib's complaint about two shapes. Both are raised
-        from inside the plotter and in the language of the machinery --
-        numbered arguments, bare shapes -- naming neither the fields that
-        disagree nor the result they came from. Checking here names them, and
-        names them before the grid is handed to a plot at all.
+        :attr:`absorption_areas`. The two counts fare differently there. A
+        slipped row count is caught by the plotter's own precondition, which
+        does name both fields and both shapes, but only once someone plots. A
+        slipped column count travels further and comes back as matplotlib's
+        ``x and y must have same first dimension``, followed by the two bare
+        shapes and naming neither the field that disagrees nor the result it
+        came from. An axis on top of the two is not caught at all -- a grid
+        shaped ``(areas, talkers, 1)`` draws exactly the curves a correct one
+        would. Checking here names the field in every one of those cases, and
+        names it at construction, before any reader sees the grid.
 
         The two axes are checked separately and never against each other:
         comparing occupancies with absorption areas would refuse the ordinary
         study of twenty occupancies against three areas.
 
-        :raises ValueError: if ``levels`` does not carry one row per
-            absorption area and one column per talker count.
+        :raises ValueError: if ``levels`` is not a two-dimensional grid of one
+            row per absorption area and one column per talker count.
         """
         require_ranks(self, talkers=1, absorption_areas=1, levels=2)
         require_same_length(self, "absorption_areas", "levels", axis="absorption area")

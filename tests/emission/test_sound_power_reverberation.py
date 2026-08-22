@@ -9,6 +9,7 @@ Physics / normative anchors (ISO 3741:2010):
 - Comparison method, Eq. (21): LW = LW(RSS) + (Lp(ST) - Lp(RSS) + C2).
 """
 
+import dataclasses
 import warnings
 
 import numpy as np
@@ -558,3 +559,48 @@ def test_background_levels_of_the_wrong_shape_name_themselves(
             frequencies,
             background_levels=background,
         )
+
+
+# --------------------------------------------------------------------------
+# Per-band columns share one band axis (refused when built, not when read)
+# --------------------------------------------------------------------------
+@pytest.mark.parametrize(
+    "field",
+    [
+        "frequencies",
+        "sound_power_level",
+        "mean_pressure_level",
+        "absorption_area",
+        "waterhouse_correction",
+        "background_correction",
+    ],
+)
+def test_per_band_columns_must_share_one_band_axis(field: str) -> None:
+    """A column off the band axis is refused when built, not when read.
+
+    Measured against the unguarded library: the ISO 3741 fiche takes its row
+    count from ``sound_power_level`` and reads every other column at that
+    band's index, so a surplus entry of ``mean_pressure_level``,
+    ``background_correction``, ``absorption_area`` or ``waterhouse_correction``
+    falls off the end of the table without a word and the sheet renders with
+    its four ordinary rows, the surplus nowhere on it. One entry short is the
+    loud direction, a bare ``IndexError`` from inside the row loop, and
+    ``sound_power_level`` and ``frequencies``, which set the row count and the
+    labels the rows are named by, raise both ways: from the row loop one way
+    and from the spectrum figure the other, neither naming a field. ``plot()``
+    draws the ``LW`` bars alone and never notices any of it.
+    """
+    good = emission.sound_power_reverberation(
+        np.tile([80.0, 82.0, 84.0, 81.0], (6, 1)),
+        [1.6, 1.5, 1.4, 1.1],
+        200.0,
+        220.0,
+        [250.0, 500.0, 1000.0, 2000.0],
+    )
+    column = np.asarray(getattr(good, field), dtype=np.float64)
+    surplus = np.append(column, column[-1])
+    with pytest.raises(ValueError, match=rf"'{field}' \(5\).*one value per band"):
+        dataclasses.replace(good, **{field: surplus})
+    missing = column[:-1]
+    with pytest.raises(ValueError, match=rf"'{field}' \(3\).*one value per band"):
+        dataclasses.replace(good, **{field: missing})

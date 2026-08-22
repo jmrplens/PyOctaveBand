@@ -195,13 +195,15 @@ class WallTieCouplingResult:
     def __post_init__(self) -> None:
         """Reject spectra that do not share one frequency axis.
 
-        The figure shades the gap between ``coupling_loss_factor`` and the
-        rigid ceiling, and that shaded band is the answer the reader takes
-        away: how much isolation the resilient tie buys over a screw. A gap
-        can only be read where both curves are given at the same frequency,
-        and ``connector_mobility`` is the term that opens it, so a spectrum of
-        another length puts the comparison between different frequencies while
-        the shading still looks like an amount of isolation.
+        Three of the four spectra are drawn: the figure shades the gap between
+        ``coupling_loss_factor`` and the rigid ceiling, both against
+        ``frequencies``, and a length that disagrees among those three stops
+        matplotlib, which reports the two shapes it could not reconcile
+        without naming the field or the result they came from.
+        ``connector_mobility`` is the one that says nothing. No renderer reads
+        it, so a spectrum of another length leaves the figure identical pixel
+        for pixel and reaches whoever does read it pairing the tie mobility
+        ``Yc`` with frequencies that are not its own.
 
         :raises ValueError: if the per-frequency spectra disagree.
         """

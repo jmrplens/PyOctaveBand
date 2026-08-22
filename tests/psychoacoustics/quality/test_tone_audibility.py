@@ -9,6 +9,7 @@ index av (Formula (13)), the per-tone audibility ΔL = LT − LG − av
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import matplotlib as mpl
@@ -646,6 +647,30 @@ def test_assess_tones_rejects_empty() -> None:
 def test_assess_tones_rejects_non_positive_frequency() -> None:
     with pytest.raises(ValueError, match="positive"):
         psychoacoustics.assess_tones([0.0], [60.0], [50.0], 2.7)
+
+
+@pytest.mark.parametrize(
+    "field", ["audibilities", "mean_narrowband_levels", "masking_indices"]
+)
+def test_result_rejects_per_tone_length_mismatch(field: str) -> None:
+    """A per-tone quantity that disagrees with the tone list is refused.
+
+    Measured against the unguarded library on the nine Annex E tones: a
+    surplus ``audibilities`` entry is silent where it matters most, since
+    :attr:`decisive_audibility` maxes over the whole array and hands back the
+    audibility of a tone that has no frequency, the Step 4 number the tonal
+    adjustment K is read from. ``mean_narrowband_levels`` and
+    ``masking_indices`` are read by neither fiche nor plot, so either length
+    renders a sheet byte for byte the size of the intact one.
+    """
+    good = _annex_e_result()
+    column = np.asarray(getattr(good, field), dtype=np.float64)
+    surplus = np.append(column, column[-1])
+    with pytest.raises(ValueError, match=rf"'{field}' \(10\).*one value per tone"):
+        dataclasses.replace(good, **{field: surplus})
+    missing = column[:-1]
+    with pytest.raises(ValueError, match=rf"'{field}' \(8\).*one value per tone"):
+        dataclasses.replace(good, **{field: missing})
 
 
 # ---------------------------------------------------------------------------

@@ -179,6 +179,32 @@ def test_tone_burst_invalid_inputs() -> None:
         ph.signals.tone_burst(FS, 5000.0, 25, amplitude=0.0)
 
 
+def test_tone_burst_gate_must_lie_on_the_record_it_gates() -> None:
+    """A gate off the record is refused when built, not when drawn.
+
+    A wrong-length ``envelope`` is loud, but only at the figure and only in
+    matplotlib's own terms ("x and y must have same first dimension, but
+    have shapes (240,) and (239,)"), naming neither field; nothing else in
+    the library opens ``envelope``, so a burst that is never plotted carries
+    the mismatch to the caller. An extra axis is silent: it passes the length
+    check, and the plot answers a two-column envelope with five lines instead
+    of three -- two pairs of mirrored gates over one waveform -- under a
+    legend entry drawn twice.
+    """
+    res = ph.signals.tone_burst(FS, 5000.0, 25)
+    per_sample = "one value per sample"
+    one_axis = "must have one axis"
+    cases = (
+        ("envelope", res.envelope[:-1], per_sample),
+        ("envelope", np.append(res.envelope, 0.0), per_sample),
+        ("envelope", np.column_stack([res.envelope] * 2), one_axis),
+        ("signal", np.column_stack([res.signal] * 2), one_axis),
+    )
+    for field, value, fragment in cases:
+        with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+            dataclasses.replace(res, **{field: value})
+
+
 def test_tone_burst_plot_waveform_and_envelope() -> None:
     res = ph.signals.tone_burst(FS, 5000.0, 25, repetitions=2, repetition_rate=10.0)
     ax = res.plot(linewidth=2)
@@ -279,6 +305,29 @@ def test_resample_invalid_parameters() -> None:
         ph.signals.resample_signal(x, FS, fs_new=32000.0, transition_width=0.9)
     with pytest.raises(ValueError, match="one-dimensional"):
         ph.signals.resample_signal(two_dimensional, FS, fs_new=32000.0)
+
+
+def test_resampled_record_and_taps_must_each_be_flat() -> None:
+    """An extra axis on either array is refused when the result is built.
+
+    Two designs stacked side by side are counted as one impulse response of
+    the whole length: ``n_taps`` reports 1262 for the 631-tap design below,
+    and the figure that would have printed it dies first inside
+    ``scipy.signal.freqz`` ("Array shapes are incompatible for
+    broadcasting"), naming neither field nor result. ``signal`` is silent
+    from end to end: no reader in the library opens it, and the figure drawn
+    from the taps alone is byte for byte the one a flat record gives.
+    """
+    x = ph.signals.noise_signal(FS, 0.05, seed=5)
+    res = ph.signals.resample_signal(x, FS, fs_new=24000.0)
+    one_axis = "must have one axis"
+    cases = (
+        ("filter_taps", np.column_stack([res.filter_taps] * 2), one_axis),
+        ("signal", np.column_stack([res.signal] * 2), one_axis),
+    )
+    for field, value, fragment in cases:
+        with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+            dataclasses.replace(res, **{field: value})
 
 
 def test_resample_plot_filter_and_edges() -> None:

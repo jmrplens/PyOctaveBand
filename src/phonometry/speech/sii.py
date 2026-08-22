@@ -531,10 +531,14 @@ class _BandProcedure:
         spectrum a caller passes is measured against ``band_importance``, while
         the spread of masking walks ``spread_decades`` row by row over the
         length of the *noise* vector. A masking matrix belonging to another
-        procedure is therefore never indexed past its edge; the walk reads its
-        leading block and returns an index built from another procedure's band
-        separations, in the right shape and the right units, some way off the
-        published one.
+        procedure is quiet in one direction only, and that direction is the one
+        worth catching: a matrix larger than the band table is never indexed
+        past its edge, so the walk reads its leading block and returns an index
+        built from another procedure's band separations, in the right shape and
+        the right units, some way off the published one. A smaller one is loud
+        but names no field, the row walk running off the first axis of the
+        matrix and NumPy answering with an ``IndexError`` about an index out of
+        bounds for a size it attributes to no quantity.
 
         :attr:`band_edges` bounds the same bands from outside, so it carries
         one value more than they do rather than one each, and is checked

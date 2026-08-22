@@ -26,6 +26,8 @@ https://www.w3.org/TR/audio-eq-cookbook/), independent of the module:
 
 from __future__ import annotations
 
+import dataclasses
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -571,6 +573,46 @@ def test_response_grid_validation() -> None:
         eq.response(f_min=100.0, f_max=50.0)
     with pytest.raises(ValueError, match="f_min"):
         eq.response(f_max=FS)
+
+
+def test_response_rejects_cascade_short_of_its_sections() -> None:
+    """Two rows of curves for three sections is not a response."""
+    res = ph.filters.ParametricEQ(FS, _three_sections()).response(n_points=128)
+    short = res.section_magnitude_db[:2]
+    with pytest.raises(ValueError, match="'section_magnitude_db'"):
+        dataclasses.replace(res, section_magnitude_db=short)
+
+
+def test_response_rejects_cascade_taller_than_its_sections() -> None:
+    """The silent direction: the plot loops over ``sections`` and drops the rest."""
+    res = ph.filters.ParametricEQ(FS, _three_sections()).response(n_points=128)
+    tall = np.vstack([res.section_magnitude_db, res.section_magnitude_db[:1]])
+    with pytest.raises(ValueError, match="'section_magnitude_db'"):
+        dataclasses.replace(res, section_magnitude_db=tall)
+
+
+def test_response_rejects_section_curves_off_the_evaluation_grid() -> None:
+    """The grid axis is pinned on its own: the section axis still agrees."""
+    res = ph.filters.ParametricEQ(FS, _three_sections()).response(n_points=128)
+    short_grid = res.section_magnitude_db[:, :-1]
+    with pytest.raises(ValueError, match=r"'section_magnitude_db \(axis 1\)'"):
+        dataclasses.replace(res, section_magnitude_db=short_grid)
+
+
+def test_response_rejects_sos_block_short_of_its_sections() -> None:
+    """The cascade that leaves here to be filtered with must be the drawn one."""
+    res = ph.filters.ParametricEQ(FS, _three_sections()).response(n_points=128)
+    short_sos = res.sos[:2]
+    with pytest.raises(ValueError, match="'sos'"):
+        dataclasses.replace(res, sos=short_sos)
+
+
+def test_response_rejects_section_curves_with_an_extra_axis() -> None:
+    """Both counts agree on a (sections, frequencies, 1) block; the rank pin does not."""
+    res = ph.filters.ParametricEQ(FS, _three_sections()).response(n_points=128)
+    boxed = res.section_magnitude_db[:, :, None]
+    with pytest.raises(ValueError, match="'section_magnitude_db' must have 2 axes"):
+        dataclasses.replace(res, section_magnitude_db=boxed)
 
 
 # ---------------------------------------------------------------------------

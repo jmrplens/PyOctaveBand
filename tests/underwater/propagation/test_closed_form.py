@@ -10,6 +10,8 @@ recomputation), and the mutual agreement of Francois-Garrison and Ainslie-McColm
 
 from __future__ import annotations
 
+import dataclasses
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -194,6 +196,46 @@ def test_propagation_loss_is_spreading_plus_absorption() -> None:
 def test_propagation_loss_rejects_nonpositive_range() -> None:
     with pytest.raises(ValueError, match="range_m"):
         propagation_loss([0.0, 100.0], 1000.0)
+
+
+_PER_RANGE = "one value per range"
+_ONE_AXIS = "must have one axis"
+
+
+def test_propagation_loss_curves_must_run_over_one_range_axis() -> None:
+    """The three terms are refused unless they run over the same ranges.
+
+    All three are drawn against ``range_m``, so a length disagreement does
+    reach the figure -- as matplotlib's "x and y must have same first
+    dimension" and two bare shapes, which name neither field and come from
+    the drawing rather than from the result. An extra axis is the silent one:
+    an ``(n, 2)`` column carries one value per range by every count, and
+    matplotlib draws both of its columns under a legend row printed twice.
+    """
+    good = propagation_loss([100.0, 200.0, 400.0, 800.0], 1000.0)
+    cases = (
+        ("range_m", good.range_m[:-1], _PER_RANGE),
+        ("pl", good.pl[:-1], _PER_RANGE),
+        ("pl", np.append(good.pl, 0.0), _PER_RANGE),
+        ("spreading", good.spreading[:1], _PER_RANGE),
+        ("absorption", np.append(good.absorption, 0.0), _PER_RANGE),
+        ("range_m", np.column_stack([good.range_m] * 2), _ONE_AXIS),
+        ("pl", np.column_stack([good.pl] * 2), _ONE_AXIS),
+        ("spreading", np.column_stack([good.spreading] * 2), _ONE_AXIS),
+        ("absorption", np.column_stack([good.absorption] * 2), _ONE_AXIS),
+    )
+    for field, value, fragment in cases:
+        with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+            dataclasses.replace(good, **{field: value})
+
+
+def test_propagation_loss_rejects_a_grid_of_ranges() -> None:
+    # A 2-D range grid passes the finite/positive input check and would reach
+    # the figure as nine lines under three legend labels, each joining ranges
+    # that are not neighbours.
+    grid = np.array([[100.0, 200.0, 400.0], [1000.0, 2000.0, 4000.0]])
+    with pytest.raises(ValueError, match=rf"'range_m' {_ONE_AXIS}"):
+        propagation_loss(grid, 1000.0)
 
 
 def test_propagation_loss_plot_smoke() -> None:

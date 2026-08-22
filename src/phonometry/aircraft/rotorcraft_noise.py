@@ -134,15 +134,19 @@ class RotorcraftHemisphere:
         """Reject a hemisphere whose grid does not span its own axes.
 
         Three axes meet in ``levels``, and every reader addresses one of them
-        through the axis beside it. An angle axis longer than the grid it
-        indexes runs the Eq. 13 lookup off the end of ``levels`` towards the
-        far side of the hemisphere, with an index message that names neither
-        array; one shorter clamps every query to a boundary well inside the
-        measured grid, so a direction the hemisphere does cover comes back as
-        the level of that boundary bin. The band axis fails more quietly
-        still: the directivity plot picks the band to draw by searching
-        ``frequencies``, so a band grid of the wrong length labels the curve
-        with a frequency the levels beside it were never computed at.
+        through the axis beside it. An angle axis of the wrong length is
+        refused either way even without this guard, but from inside the
+        Eq. 14/15 gap fill, only once someone looks a direction up, and in
+        numpy's own words: a failed broadcast quotes the two shapes it could
+        not reconcile, a failed stack quotes none at all, and neither message
+        names ``azimuth`` or ``polar``, let alone the hemisphere. The band
+        axis is the one that fails quietly: the lookup hands back one level
+        per band of ``levels`` whatever ``frequencies`` holds, and the
+        directivity plot picks its band by index and reads the label from
+        ``frequencies`` beside it, so a band grid of the wrong length labels
+        the curve with a frequency the levels were never computed at (unless
+        the index happens to fall off the shorter of the two, which raises
+        from inside the plot).
 
         :raises ValueError: if the level grid disagrees with an angle or band axis.
         """
@@ -1092,11 +1096,15 @@ class RotorcraftNoiseContourResult:
         """Reject a grid whose levels do not span its own coordinates.
 
         The contour map takes the two coordinate axes and the level grid
-        separately and pairs them by position. Matplotlib refuses most
-        mismatches, but with a message about dimensions that names no field of
-        this result and arrives long after the grid was built; the one it
-        cannot refuse is a square grid handed over transposed, which draws a
-        plausible footprint over ground that was never evaluated.
+        separately and pairs them by position. Matplotlib does refuse every
+        length mismatch it is handed, ``x`` against the columns of ``z`` or
+        ``y`` against its rows, but it speaks of the arguments it was passed
+        rather than the fields of this result, whose level grid it calls
+        ``z``, and it speaks only once someone draws a grid that was already
+        assembled wrong. Checking here names the field that disagrees, at the
+        point the result is built. What no length check catches, this one or Matplotlib's, is a
+        square grid handed over transposed: every count still agrees, and the
+        footprint is drawn over ground that was never evaluated.
 
         :raises ValueError: if the level grid disagrees with ``x`` or ``y``.
         """

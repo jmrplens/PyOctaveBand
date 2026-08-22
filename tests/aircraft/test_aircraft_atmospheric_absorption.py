@@ -9,6 +9,8 @@ published constants.
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -104,6 +106,34 @@ def test_invalid_inputs_rejected() -> None:
         sae_band_attenuation([-1.0], 100.0)
     with pytest.raises(ValueError, match="path_length"):
         sae_band_attenuation([1000.0], -5.0)
+
+
+def test_per_band_arrays_must_agree() -> None:
+    # The coefficient is the silent field: no figure draws it and nothing here
+    # reads it, so it leaves as dB/m for the caller to multiply by a path
+    # length, and collapsed to a single value numpy broadcasts it over every
+    # band of that spectrum. The other three stop the figure instead.
+    res = sae_band_attenuation([500.0, 1000.0, 2000.0, 4000.0], 1000.0)
+    collapsed = res.coefficient[:1]
+    with pytest.raises(ValueError, match="'coefficient'"):
+        replace(res, coefficient=collapsed)
+    scalar = float(res.coefficient[0])
+    with pytest.raises(ValueError, match="'coefficient'"):
+        replace(res, coefficient=scalar)
+    short = res.band_attenuation[:-1]
+    with pytest.raises(ValueError, match="'band_attenuation'"):
+        replace(res, band_attenuation=short)
+
+
+def test_per_band_array_must_carry_one_axis() -> None:
+    # A column of the same coefficients counts one entry per band on its first
+    # axis, so every length agrees and the length check alone lets it through;
+    # the caller who multiplies it by a path length and subtracts it from a
+    # spectrum gets a band-by-band matrix instead of a spectrum.
+    res = sae_band_attenuation([500.0, 1000.0, 2000.0, 4000.0], 1000.0)
+    column = res.coefficient.reshape(-1, 1)
+    with pytest.raises(ValueError, match="'coefficient' must have one axis"):
+        replace(res, coefficient=column)
 
 
 def test_plot_smoke() -> None:

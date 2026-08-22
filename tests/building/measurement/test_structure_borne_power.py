@@ -10,6 +10,7 @@ P = omega eta (m S) <v^2>, whose level equals L_Ws exactly.
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import numpy as np
@@ -178,6 +179,32 @@ def test_reception_plate_still_takes_a_scalar_for_every_band() -> None:
     )
     assert np.asarray(result.velocity_level).shape == (4,)
     assert np.allclose(np.asarray(result.velocity_level), 80.0)
+
+
+@pytest.mark.parametrize("field", ["velocity_level", "loss_factor", "frequencies"])
+def test_reception_plate_result_refuses_a_column_one_band_too_long(
+    field: str,
+) -> None:
+    """A companion column longer than ``L_Ws`` cannot be built at all.
+
+    The entry point already refuses a ragged argument, so this covers the
+    result assembled by hand or through :func:`dataclasses.replace`. Nothing
+    downstream catches it: the EN 15657 fiche takes its row count from
+    ``power_level`` and reads the other columns at those indices, so the extra
+    entry prepended here shifts the whole column one band, prints each value
+    against its neighbour's label and drops the last one, with no complaint.
+    """
+    result = building.reception_plate_power(
+        np.array([80.0, 82.0, 79.0]),
+        np.array([500.0, 1000.0, 2000.0]),
+        mass_per_area=25.0,
+        area=1.2,
+        loss_factor=0.01,
+    )
+    column = np.asarray(getattr(result, field), dtype=float)
+    one_too_long = np.insert(column, 0, column[0])
+    with pytest.raises(ValueError, match=rf"'{field}' \(4\)"):
+        dataclasses.replace(result, **{field: one_too_long})
 
 
 def test_plot_returns_axes() -> None:

@@ -134,7 +134,7 @@ class ZwickerLoudness:
     field: str | None = None
 
     def __post_init__(self) -> None:
-        """Reject a loudness-vs-time trace that does not match its own time axis.
+        """Reject a misshapen specific-loudness pattern or loudness-vs-time trace.
 
         ``time`` and ``loudness_vs_time`` are one axis written down twice: the
         constructor decimates the 2000 Hz weighted series to 500 Hz and builds
@@ -166,10 +166,25 @@ class ZwickerLoudness:
         The stationary result is not affected: it leaves both fields ``None``,
         and an absent optional quantity is passed over rather than counted.
 
-        :raises ValueError: if ``time`` and ``loudness_vs_time`` are not both
-            one-dimensional and of one length.
+        ``specific`` has no sibling to disagree with -- it is one pattern on
+        the fixed 0.1-Bark grid -- so what is pinned is its rank alone, and
+        every constructor here already hands in one axis. An extra one is not
+        silent, but it is nameless twice over. The Bark axis is built from
+        ``specific.size``, which counts elements and not rows, so a pattern of
+        shape (240, 2) is drawn against 480 Bark values and matplotlib answers
+        ``x and y must have same first dimension, but have shapes (480,) and
+        (240, 2)`` from inside ``Axes.plot``: two shapes, neither field, and
+        nothing to say the object was already malformed when it was built. A
+        (240, 1) gets one step further -- the line is drawn, and the fill under
+        it stops on ``'y1' is not 1-dimensional``, which names a parameter of
+        ``fill_between`` rather than anything the caller passed. Both take
+        ``.report()`` down with them and write no PDF at all.
+
+        :raises ValueError: if ``specific`` is not one-dimensional, or if
+            ``time`` and ``loudness_vs_time`` are not both one-dimensional and
+            of one length.
         """
-        require_ranks(self, time=1, loudness_vs_time=1)
+        require_ranks(self, specific=1, time=1, loudness_vs_time=1)
         require_same_length(self, "time", "loudness_vs_time", axis="time step")
 
     def plot(

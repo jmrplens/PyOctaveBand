@@ -16,6 +16,8 @@ monotonicity in level, the +10 phon ~ x2 sone rule, free/diffuse/eardrum
 differences, silence and input validation.
 """
 
+import dataclasses
+
 import numpy as np
 import pytest
 
@@ -407,3 +409,39 @@ def test_invalid_inputs() -> None:
     short = np.ones(100)
     with pytest.raises(ValueError, match="'fs' must be a positive sampling rate"):
         psychoacoustics.loudness_moore_glasberg(short, -1.0)
+
+
+# --------------------------------------------------------------------------
+# The one ERB-number grid the three arrays share
+# --------------------------------------------------------------------------
+
+
+def test_a_result_refuses_a_centre_frequency_per_filter_missing() -> None:
+    """``centre_frequencies`` is the column nothing in the library reads.
+
+    The chart draws the specific loudness against ``erb_number`` and takes the
+    ends of that scale for its x limits, so a mismatch between those two stops
+    matplotlib with a complaint about a first dimension. Nothing opens
+    ``centre_frequencies`` at all, here or in any renderer: one value short it
+    plots and titles exactly as before, and every value of the pattern is then
+    filed under the next auditory filter along. For the tone below the peak of
+    the pattern moves from 1000.9 Hz to 1014.2 Hz without changing by a sone.
+    """
+    result = psychoacoustics.loudness_moore_glasberg_from_spectrum([(1000.0, 60.0)])
+    one_filter_short = result.centre_frequencies[1:]
+    with pytest.raises(ValueError, match="'centre_frequencies'"):
+        dataclasses.replace(result, centre_frequencies=one_filter_short)
+
+
+def test_a_result_refuses_a_centre_frequency_column_of_pairs() -> None:
+    """An extra axis carries the right count on the first one.
+
+    A (372, 2) array holds one entry per auditory filter by every length the
+    result compares, so the count agrees and the second axis travels on
+    untouched: indexing the field by filter hands back a pair of frequencies
+    where the standard has one. The rank pin is what refuses it.
+    """
+    result = psychoacoustics.loudness_moore_glasberg_from_spectrum([(1000.0, 60.0)])
+    pairs = np.column_stack([result.centre_frequencies, result.centre_frequencies])
+    with pytest.raises(ValueError, match="'centre_frequencies'"):
+        dataclasses.replace(result, centre_frequencies=pairs)

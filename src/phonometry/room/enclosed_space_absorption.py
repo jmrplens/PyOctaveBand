@@ -244,13 +244,18 @@ class ReverberationResult:
         """Reject a prediction whose bands do not line up.
 
         The fiche walks ``frequencies`` and prints ``absorption_area`` and
-        ``reverberation_time`` at each band's index, so a spectrum longer than
-        the band axis simply stops being printed while the boxed
-        mid-frequency descriptor beneath the table -- picked by looking the
-        500 Hz and 1000 Hz bands up in ``frequencies`` and reading ``T`` and
-        ``A`` at the index found there -- states a number belonging to another
-        band under a "500-1000 Hz" label. A spectrum shorter than the band
-        axis raises an index error from inside reportlab, about neither field.
+        ``reverberation_time`` at each band's index, and ``absorption_area``
+        is the one that goes wrong in silence: the plot drawn beside the table
+        opens only ``reverberation_time``, so an area spectrum one entry too
+        long slides the whole A column down a band, leaves its last value off
+        the end of the table, and has the boxed mid-frequency descriptor --
+        picked by looking the 500 Hz and 1000 Hz bands up in ``frequencies``
+        and reading ``A`` at the index found there -- label the mean of two
+        lower bands "A (500-1000 Hz)", with nothing raised. A
+        ``reverberation_time`` one entry too long is stopped by that same
+        plot, as matplotlib's complaint that x and y have different first
+        dimensions; either spectrum one entry too short raises an index error
+        from the table builder, about neither field by name.
 
         :raises ValueError: if the two spectra and the band axis disagree.
         """

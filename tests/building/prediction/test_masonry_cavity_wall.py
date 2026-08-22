@@ -22,6 +22,8 @@ therefore closed-form identities and limits, not regressions on measured data.
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pytest
 
@@ -371,3 +373,26 @@ def test_coupling_rejects_an_unknown_tie() -> None:
         building.wall_tie_coupling_loss_factor(
             [100.0], 150.0, 170.0, 1.0e5, 1.2e5, ties_per_area=2.5, tie="staple"
         )
+
+
+def test_a_connector_mobility_of_another_length_is_refused() -> None:
+    """``connector_mobility`` is the spectrum of this result nothing draws.
+
+    The figure plots ``eta_ij`` and the rigid ceiling against ``frequencies``
+    and never opens ``connector_mobility``, so a tie mobility one band short
+    redraws the same picture pixel for pixel and only shows up in whatever
+    reads the field, paired with the wrong frequencies. The invariant
+    therefore has to be held at construction.
+    """
+    result = building.wall_tie_coupling_loss_factor(
+        np.logspace(np.log10(50.0), np.log10(5000.0), 16),
+        150.0,
+        170.0,
+        1.0e5,
+        1.2e5,
+        ties_per_area=2.5,
+        tie="butterfly",
+    )
+    shorter = result.connector_mobility[:-1]
+    with pytest.raises(ValueError, match=r"'connector_mobility' \(15\).*per frequency"):
+        dataclasses.replace(result, connector_mobility=shorter)

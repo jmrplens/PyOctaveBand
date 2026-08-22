@@ -214,9 +214,18 @@ class AgeThresholdResult:
         the ISO 1999 combined threshold the same way, added to the noise
         component one audiometric frequency at a time. Both pair by position,
         so a spectrum of another length shifts the band onto frequencies it
-        was not computed for; where the mismatch does surface, it surfaces as
-        matplotlib complaining that x and y differ in size, which says nothing
-        about which of the two spectra was the wrong one.
+        was not computed for.
+
+        ``threshold`` is the silent one, and the reason the check lives here
+        rather than in the readers: the plot draws that spectrum only away
+        from the median fractile, so at the default ``0.5`` one of the wrong
+        length is never looked at, and
+        :func:`~phonometry.hearing.combine_age_and_noise` then stretches a
+        lone age value over every band of the noise component and returns a
+        full combined spectrum built from it. A mismatched ``median``,
+        ``spread_upper`` or ``spread_lower`` does raise, but from the band
+        arithmetic itself, as ``operands could not be broadcast together with
+        shapes (5,) (6,)``, which names neither the spectrum nor the axis.
 
         :raises ValueError: if any spectrum disagrees with ``frequencies``.
         """

@@ -46,7 +46,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_ranks, require_same_length
+from .._internal.validation import require_same_shape
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -154,13 +154,12 @@ class SonarEquationResult:
         :raises ValueError: if the three quantities disagree in length, or
             one carries an axis the loss axis does not.
         """
-        require_ranks(self, propagation_loss=1, signal_excess=1, snr=1)
-        require_same_length(
+        require_same_shape(
             self,
             "propagation_loss",
             "signal_excess",
             "snr",
-            axis="propagation loss",
+            quantity="propagation loss",
         )
 
     def plot(

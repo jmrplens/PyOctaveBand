@@ -38,7 +38,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_same_length
+from ..._internal.validation import require_ranks, require_same_length
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -248,10 +248,32 @@ class PropagationLossResult:
         of those operations is elementwise. A term of another length is not
         obviously wrong to look at, since all three are losses in dB of
         entirely plausible size; it is wrong because each of its values then
-        answers for a range the row beside it did not come from.
+        answers for a range the row beside it did not come from. The figure
+        does stop on a length disagreement, all three curves being drawn
+        against ``range_m``, but with matplotlib's own ``x and y must have
+        same first dimension, but have shapes (4,) and (3,)`` -- shapes only,
+        naming neither field, and raised by the drawing rather than by the
+        result that was wrong all along.
 
-        :raises ValueError: if any curve disagrees with ``range_m``.
+        The ranks are pinned as well, because a count cannot see an extra
+        axis. A ``pl`` of shape ``(n, 2)`` -- two waters stacked side by side,
+        or ``(range, loss)`` pairs kept in one array -- carries one value per
+        range on its first axis exactly as a single curve does, passes the
+        length check, and reaches matplotlib, which draws every column it is
+        handed: the figure comes back with a second total-loss curve and the
+        ``Total PL`` legend row printed twice. A whole result of that shape is
+        what :func:`propagation_loss` would build from ranges handed to it as
+        a grid, the input check testing for finite positive values and not for
+        rank: from a two-by-three grid the figure would come back with nine
+        lines under three distinct legend labels, each one running down a
+        column and so joining ranges that are not neighbours -- the first of
+        them straight from 100 m to 1000 m, with the 200 m and 400 m between
+        them handed to two other lines.
+
+        :raises ValueError: if any curve disagrees with ``range_m``, or if one
+            carries an axis beyond the range axis.
         """
+        require_ranks(self, range_m=1, pl=1, spreading=1, absorption=1)
         require_same_length(
             self, "range_m", "pl", "spreading", "absorption", axis="range"
         )

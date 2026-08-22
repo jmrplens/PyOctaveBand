@@ -453,10 +453,16 @@ class EQResponseResult:
         the cascade, and the figure reads both by position: every curve is
         drawn against ``frequencies``, and each row of
         ``section_magnitude_db`` is labelled with the :class:`EQSection`
-        standing at the same place in ``sections``. A cascade taller than
-        that list therefore loses its surplus rows from the plot with no word
-        said, and one shorter than it labels a row with the parameters of a
-        biquad it was not computed from. The ``sos`` block is the third
+        standing at the same place in ``sections``. The overlay loops over
+        that list, so a cascade taller than it loses its surplus rows from
+        the plot with no word said, while a shorter one stops the figure
+        where the rows run out: two rows against three sections raise
+        ``IndexError: index 2 is out of bounds for axis 0 with size 2``, an
+        axis and a size that name neither the field nor the result it came
+        from. Shorter still goes quiet again, because the overlay is drawn
+        only for a cascade of more than one row: one row against three
+        sections draws the cascade curve alone, a figure identical to the
+        one ``show_sections=False`` asks for. The ``sos`` block is the third
         reading of the same axis: it leaves here to be filtered with, so a
         cascade of a different height is no longer the one the curves
         describe.

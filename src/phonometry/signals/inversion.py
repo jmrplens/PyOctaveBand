@@ -115,25 +115,37 @@ class InverseFilterResult:
         r"""Reject a design whose spectra do not share one frequency grid.
 
         The three spectra and the regularization profile are the design at
-        one frequency each, and the figure multiplies them together to make
-        its central claim: :meth:`plot` forms the equalized magnitude
-        :math:`\lvert H \, H_{\mathrm{inv}} \rvert` as an
-        elementwise product of :attr:`response_spectrum` and
-        :attr:`spectrum`, then draws it over :attr:`frequencies` with the
-        equalized band shaded and the achieved flatness in the title. Numpy
-        will broadcast a single-bin array across the whole grid without a
-        word, which is the shape a caller lands on by designing at one
-        frequency where the band needed the grid, and the flat 0 dB line
-        that comes back is precisely what the figure is meant to show.
+        one frequency each, but only three of the four are read by anything
+        that would object. :meth:`plot` forms the equalized magnitude
+        :math:`\lvert H \, H_{\mathrm{inv}} \rvert` as an elementwise
+        product of :attr:`response_spectrum` and :attr:`spectrum` -- which
+        numpy is content to broadcast from a single bin across the whole
+        grid -- and then masks each magnitude with the positive-frequency
+        mask taken from :attr:`frequencies`, one line before it draws. So
+        numpy is what refuses the mismatch today, and it refuses it out
+        loud: an ``IndexError`` about two axis sizes where the mask meets a
+        shorter array, a ``ValueError`` about two shapes where the product
+        does. No figure comes back either way, and neither message names
+        the field that is wrong.
 
-        :attr:`inverse` is deliberately left out. It is the filter in the
-        time domain, ``n_fft`` samples, while the spectra live on the
-        ``n_fft // 2 + 1`` bins of the real transform of it; the two lengths
-        are different measurements of the same design and pinning them
-        together would reject every filter the module produces.
+        :attr:`regularization` is the silent one. No renderer opens it, so
+        a profile a bin short, a bin long or a single bin wide draws the
+        whole figure with nothing said, and the :math:`\epsilon(f)` a
+        caller reads back to reproduce the residue
+        :math:`\epsilon/(\lvert H \rvert^2 + \epsilon)` is the one quantity
+        of the four that no picture ever checked.
+
+        :attr:`inverse` is deliberately left out of the length check. It is
+        the filter in the time domain, ``n_fft`` samples, while the spectra
+        live on the ``n_fft // 2 + 1`` bins of the real transform of it;
+        the two lengths are different measurements of the same design and
+        pinning them together would reject every filter the module
+        produces. Its rank is pinned all the same: a second axis passes
+        every length check, draws exactly as before, and doubles the sample
+        count :attr:`size` reports.
 
         :raises ValueError: if a spectrum or the profile disagrees with the
-            frequency grid.
+            frequency grid, or a field carries an extra axis.
         """
         require_ranks(
             self,

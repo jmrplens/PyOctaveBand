@@ -72,7 +72,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import require_same_shape
 from ..._internal.warnings import PhonometryWarning
 from ...materials.absorbers.sound_absorption import attenuation_from_alpha
 
@@ -363,17 +363,17 @@ class AtmosphericAttenuation:
         still refused as a coefficient that carries no value per frequency.
 
         :raises ValueError: if ``distance`` is negative or non-finite, or if
-            the coefficient and the frequency axis do not carry one value each
-            per frequency, or either of them carries an extra axis.
+            the coefficient and the frequency axis do not have one and the same
+            shape -- a different length either way, a scalar against an array,
+            or an extra axis on one of the two.
         """
         if self.distance is not None and (
             not np.isfinite(self.distance) or self.distance < 0.0
         ):
             msg = "'distance' must be a finite, non-negative number of metres."
             raise ValueError(msg)
-        require_ranks(self, frequencies=1, attenuation_coefficient=1)
-        require_same_length(
-            self, "frequencies", "attenuation_coefficient", axis="frequency"
+        require_same_shape(
+            self, "frequencies", "attenuation_coefficient", quantity="frequency"
         )
 
     @property

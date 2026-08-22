@@ -23,6 +23,8 @@ that contour (and agrees with the validated ISO 532-2 stationary module) to
 within ~1.5 phon.  Annex C.1 is therefore the tone oracle used.
 """
 
+import dataclasses
+
 import numpy as np
 import pytest
 
@@ -487,6 +489,28 @@ def test_invalid_inputs_raise() -> None:
         ValueError, match="Input signal must contain only finite values"
     ):
         psychoacoustics.loudness_moore_glasberg_time(with_nan, FS)
+
+
+def test_level_curve_off_the_frame_axis_is_refused(mg_tone) -> None:
+    """A phon curve that has lost a frame is refused at construction.
+
+    Neither loudness-level curve is drawn by the chart (it plots the two sone
+    traces) or read anywhere else in the library, so one of another length is
+    caught by nothing downstream: every index of it then reports the level of
+    a different instant.  Construction is the only place that can say so, and
+    the message must name the curve that is short, not merely the result type.
+    """
+    res = mg_tone(1000.0, 40.0)
+    long_term = res.long_term_loudness_level[:-1]
+    with pytest.raises(
+        ValueError, match=rf"'long_term_loudness_level' \({long_term.size}\)"
+    ):
+        dataclasses.replace(res, long_term_loudness_level=long_term)
+    short_term = res.short_term_loudness_level[:-1]
+    with pytest.raises(
+        ValueError, match=rf"'short_term_loudness_level' \({short_term.size}\)"
+    ):
+        dataclasses.replace(res, short_term_loudness_level=short_term)
 
 
 def test_plot_smoke() -> None:

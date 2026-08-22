@@ -18,6 +18,7 @@ digit -- far tighter than the standard's own +/- 10 % claim (clause 7.1).
 
 from __future__ import annotations
 
+import dataclasses
 import math
 import sys
 import warnings
@@ -320,6 +321,31 @@ def test_atmospheric_attenuation_direct_construction_guards_distance(
             pressure=101.325,
             distance=bad,
         )
+
+
+def test_atmospheric_attenuation_rejects_stacked_coefficient() -> None:
+    # The silent half of the pairing: a coefficient carrying a second axis --
+    # the shape a caller lands on by stacking two atmospheres -- passes every
+    # count and reaches plot(), which draws one curve per column over the one
+    # frequency axis and prints the single set of stored conditions once per
+    # curve ('20 °C, 50 % RH' twice). __post_init__ refuses it instead.
+    cold = environment.atmospheric_attenuation([63.0, 250.0, 1000.0], 5.0, 80.0)
+    warm = environment.atmospheric_attenuation([63.0, 250.0, 1000.0], 20.0, 50.0)
+    stacked = np.column_stack(
+        [cold.attenuation_coefficient, warm.attenuation_coefficient]
+    )
+    with pytest.raises(ValueError, match="'attenuation_coefficient'.*same shape"):
+        dataclasses.replace(warm, attenuation_coefficient=stacked)
+
+
+def test_atmospheric_attenuation_rejects_coefficient_of_other_length() -> None:
+    # The loud half, named here rather than left to matplotlib's 'x and y must
+    # have same first dimension' from inside the plotter: a coefficient one
+    # value short of its frequency axis is refused at construction.
+    res = environment.atmospheric_attenuation([63.0, 250.0, 1000.0], 20.0, 50.0)
+    short = res.attenuation_coefficient[:-1]
+    with pytest.raises(ValueError, match="'attenuation_coefficient'.*same shape"):
+        dataclasses.replace(res, attenuation_coefficient=short)
 
 
 def test_atmospheric_attenuation_plot_returns_axes() -> None:

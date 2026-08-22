@@ -54,7 +54,12 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import (
+    require_axis_count,
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -894,11 +899,12 @@ class RoadEmissionResult:
         """Reject an emission whose categories and bands do not line up.
 
         Two axes have to hold. The band axis is the one the A-weighted line
-        power reads: it adds the eight weights of 2.5.5 to the spectrum
-        term by term, so a spectrum of a single band is stretched over all
-        eight by numpy and returns an ordinary-looking dB(A) figure summed
-        over seven bands that were never computed. The category axis is the
-        one the chart reads: it takes the curves from the rows of
+        power reads: it adds the eight weights of 2.5.5 to the spectrum term
+        by term, so a spectrum of a single band standing beside eight band
+        centres is stretched over all eight weights by numpy and comes back
+        as an ordinary-looking dB(A) figure, that one band counted once under
+        every weight and summed as though it were the whole. The category
+        axis is the one the chart reads: it takes the curves from the rows of
         ``line_power`` and their names from ``categories`` in one strict
         zip, so a spectrum is never drawn under another category's label.
         What that zip cannot do is say what went wrong. It raises ``zip()
@@ -908,8 +914,23 @@ class RoadEmissionResult:
         the disagreement to the end. Refusing it here names both fields, at
         the point where the two counts were chosen.
 
+        Agreeing with each other is not enough on the band axis, because the
+        weights are a fixed table and not a field of the result: a spectrum
+        of a single band whose every other field is one band too agrees with
+        itself, passes every count above, and is stretched over the eight
+        weights just the same. What comes back is the band's own level plus
+        the energy sum of the whole weighting, about 7 dB, in place of the
+        band's level plus its own weight: too high by 5,8 dB in the 2 kHz
+        band and by 33,2 dB in the 63 Hz one, and ordinary-looking at either
+        end. So the band count is pinned here to the table it will be read
+        against. Unpinned, every other count reaches that read too, and comes
+        back from it as ``operands could not be broadcast together with
+        shapes (7,) (8,)``, naming neither the result nor the field the seven
+        came from.
+
         :raises ValueError: if a per-category array disagrees with
-            ``categories``, or a per-band one with ``frequencies``.
+            ``categories``, a per-band one with ``frequencies``, or the band
+            axis is not the eight octave bands of 2.5.5.
         """
         require_ranks(
             self,
@@ -937,6 +958,16 @@ class RoadEmissionResult:
             "vehicle_power",
             "line_power",
             axis="vehicle category",
+        )
+        owner = type(self).__name__
+        require_equal_counts(
+            owner,
+            {
+                "frequencies": require_axis_count(
+                    self.frequencies, owner, "frequencies", rank=None
+                ),
+                "the A-weighting of 2.5.5": len(CNOSSOS_A_WEIGHTING),
+            },
         )
 
     @property

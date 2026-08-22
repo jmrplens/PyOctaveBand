@@ -730,6 +730,24 @@ def small_result() -> ElasticFDTDResult:
     return _small_run()
 
 
+def test_result_rejects_snapshots_recorded_on_another_grid(
+    small_result: ElasticFDTDResult,
+) -> None:
+    # The grid check is shared with the acoustic result, so it is asserted at
+    # both call sites: were this result to stop making it, the acoustic test
+    # would still pass. Both results reach the same renderer, which takes the
+    # extent of the picture from `shape` alone; measured without the guard,
+    # a frame cropped to (30, 60) is drawn across the full 1.2 x 0.8 m
+    # domain, a plausible field over cells that were never simulated.
+    assert small_result.snapshots is not None
+    fewer_rows = small_result.snapshots[:, 5:-5, :]
+    with pytest.raises(ValueError, match=r"'snapshots \(axis 1\)'"):
+        replace(small_result, snapshots=fewer_rows)
+    fewer_columns = small_result.snapshots[:, :, 5:-5]
+    with pytest.raises(ValueError, match=r"'snapshots \(axis 2\)'"):
+        replace(small_result, snapshots=fewer_columns)
+
+
 def test_plot_probes(small_result: ElasticFDTDResult) -> None:
     ax = small_result.plot()
     lines = ax.get_lines()

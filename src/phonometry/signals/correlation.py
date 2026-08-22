@@ -962,10 +962,20 @@ class AlignedImpulseResponseResult:
         :attr:`reference` and drawing both traces on it. Two records of
         different lengths were never comparable in the first place, and
         :attr:`delay_samples`, a fractional shift stated in samples of a rate
-        both are supposed to share, has no meaning between them.
+        both are supposed to share, has no meaning between them; that half is
+        loud, refused from inside matplotlib for want of a matching first
+        dimension, though without naming the field that is wrong.
 
-        :raises ValueError: if the aligned record and the reference differ
-            in length.
+        A second axis on :attr:`aligned` is the half nothing catches. Its
+        first axis still counts one value per sample, so the lengths agree,
+        and :meth:`plot` draws one trace per column against that single time
+        axis, repeating the aligned label and the one stored delay in the
+        legend for a column that was never aligned. On :attr:`reference` the
+        same extra axis is loud, because the time axis is built from its
+        total number of elements and so comes out as long as the whole grid.
+
+        :raises ValueError: if the two records differ in length, or either
+            carries a second axis.
         """
         require_ranks(self, aligned=1, reference=1)
         require_same_length(self, "aligned", "reference", axis="sample")
