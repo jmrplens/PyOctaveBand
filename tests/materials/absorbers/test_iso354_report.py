@@ -200,8 +200,9 @@ def test_a_short_band_column_is_refused(field: str) -> None:
     and the plot with it.
     """
     result = _result()
+    one_short = getattr(result, field)[:-1]
     with pytest.raises(ValueError, match=f"'{field}'"):
-        replace(result, **{field: getattr(result, field)[:-1]})
+        replace(result, **{field: one_short})
 
 
 def test_metadata_xml_specials_do_not_break(tmp_path) -> None:

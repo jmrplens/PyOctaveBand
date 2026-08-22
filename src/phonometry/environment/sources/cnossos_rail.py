@@ -1707,6 +1707,12 @@ _SQUEAL_TRAIN_MODERATE_RADIUS = 500.0
 _SQUEAL_TRAM_RADIUS = 200.0
 _SQUEAL_MINIMUM_TRACK_LENGTH = 50.0
 
+#: The spectral axis CNOSSOS-EU tabulates rolling and traction noise over.
+_THIRD_OCTAVE_AXIS = "1/3-octave band"
+
+#: The axis of the two source heights the method splits every spectrum over.
+_SOURCE_HEIGHT_AXIS = "source height"
+
 
 # ---------------------------------------------------------------------------
 # Small helpers
@@ -2409,24 +2415,24 @@ class RailwayEmissionResult:
             self,
             "third_octave_frequencies",
             ("third_octave_line_power", 1),
-            axis="1/3-octave band",
+            axis=_THIRD_OCTAVE_AXIS,
         )
         require_same_length(
             self,
             "heights",
             "line_power",
             "third_octave_line_power",
-            axis="source height",
+            axis=_SOURCE_HEIGHT_AXIS,
         )
         owner = type(self).__name__
         heights = require_axis_count(
-            self.heights, owner, "heights", "source height", rank=None
+            self.heights, owner, "heights", _SOURCE_HEIGHT_AXIS, rank=None
         )
         bands = require_axis_count(
             self.third_octave_frequencies,
             owner,
             "third_octave_frequencies",
-            "1/3-octave band",
+            _THIRD_OCTAVE_AXIS,
             rank=None,
         )
         for name, pair in self.components.items():
@@ -2436,10 +2442,10 @@ class RailwayEmissionResult:
                 {
                     "heights": heights,
                     label: require_axis_count(
-                        pair, owner, label, "source height", rank=None
+                        pair, owner, label, _SOURCE_HEIGHT_AXIS, rank=None
                     ),
                 },
-                "source height",
+                _SOURCE_HEIGHT_AXIS,
             )
             for i, spectrum in enumerate(pair):
                 entry = f"{label}[{i}]"
@@ -2448,10 +2454,10 @@ class RailwayEmissionResult:
                     {
                         "third_octave_frequencies": bands,
                         entry: require_axis_count(
-                            spectrum, owner, entry, "1/3-octave band", rank=1
+                            spectrum, owner, entry, _THIRD_OCTAVE_AXIS, rank=1
                         ),
                     },
-                    "1/3-octave band",
+                    _THIRD_OCTAVE_AXIS,
                 )
 
     def plot(

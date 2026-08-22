@@ -201,8 +201,9 @@ def test_spectra_of_unequal_length_are_refused(field: str) -> None:
     res = materials.sound_absorption_coefficient_uncertainty(
         ref.ISO12999_2_TABLE4_ALPHA_S, ref.ISO12999_2_TABLE4_FREQ
     )
+    one_short = getattr(res, field)[:-1]
     with pytest.raises(ValueError, match=f"'{field}'"):
-        dataclasses.replace(res, **{field: getattr(res, field)[:-1]})
+        dataclasses.replace(res, **{field: one_short})
 
 
 def test_single_number_carries_a_value_without_a_spectrum() -> None:

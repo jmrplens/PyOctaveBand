@@ -141,6 +141,10 @@ _CLASS_TABLE: tuple[tuple[int, str], ...] = (
 )
 _NOT_CLASSIFIED = "Not classified"
 
+#: The axis the measured absorption is reported over before it is collected
+#: into the octave bands the rating is read from.
+_THIRD_OCTAVE_AXIS = "one-third-octave band"
+
 
 # --- rounding helpers ----------------------------------------------------
 
@@ -307,7 +311,7 @@ class AbsorptionRatingResult:
             self,
             "third_octave_alpha_s",
             "third_octave_bands",
-            axis="one-third-octave band",
+            axis=_THIRD_OCTAVE_AXIS,
         )
         if self.third_octave_alpha_s is not None:
             owner = type(self).__name__
@@ -318,7 +322,7 @@ class AbsorptionRatingResult:
                         self.third_octave_alpha_s,
                         owner,
                         "third_octave_alpha_s",
-                        "one-third-octave band",
+                        _THIRD_OCTAVE_AXIS,
                         rank=None,
                     ),
                     "3 x band_centers": 3
@@ -330,7 +334,7 @@ class AbsorptionRatingResult:
                         rank=None,
                     ),
                 },
-                "one-third-octave band",
+                _THIRD_OCTAVE_AXIS,
             )
 
     @property

@@ -62,6 +62,9 @@ _PSD_EIGENVALUE_TOLERANCE = 1e-8
 # is np.std(output, ddof=1), undefined for fewer than two samples.
 _MIN_TRIALS = 2
 
+#: The axis a budget runs over, one entry per quantity that feeds the result.
+_INPUT_QUANTITY_AXIS = "input quantity"
+
 
 class UncertaintyWarning(PhonometryWarning):
     """A GUM propagation fell back outside its nominal assumptions."""
@@ -193,7 +196,7 @@ class UncertaintyResult:
         """
         require_ranks(self, sensitivities=1, contributions=1)
         require_same_length(
-            self, "sensitivities", "contributions", axis="input quantity"
+            self, "sensitivities", "contributions", axis=_INPUT_QUANTITY_AXIS
         )
         if self.names:
             owner = type(self).__name__
@@ -204,12 +207,12 @@ class UncertaintyResult:
                         self.contributions,
                         owner,
                         "contributions",
-                        "input quantity",
+                        _INPUT_QUANTITY_AXIS,
                         rank=None,
                     ),
                     "names": len(self.names),
                 },
-                "input quantity",
+                _INPUT_QUANTITY_AXIS,
             )
 
     def expanded(

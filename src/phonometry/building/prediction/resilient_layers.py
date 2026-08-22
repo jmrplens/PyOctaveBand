@@ -187,6 +187,10 @@ _DELTA_LW_SCREED = (13.0, -14.2, 20.8)
 #: ``(−0,21 m' − 5,45) lg(s') + 0,46 m' + 23,8``.
 _DELTA_LW_ASPHALT = (-0.21, -5.45, 0.46, 23.8)
 
+#: The axis the tapping machine's force spectrum runs over, one third-octave
+#: band holding several of its lines.
+_FOURIER_LINE_AXIS = "Fourier line"
+
 #: Band width of the mean-square force (Hopkins Eq. 3.91).
 BandWidth = Literal["third", "octave"]
 #: Floating-floor construction of ISO 12354-2:2017 Annex C.
@@ -686,10 +690,10 @@ class CoveringImprovementResult:
             line_improvement=1,
         )
         require_same_length(self, "frequencies", "improvement", "two_line")
-        require_same_length(self, "lines", "line_improvement", axis="Fourier line")
+        require_same_length(self, "lines", "line_improvement", axis=_FOURIER_LINE_AXIS)
         owner = type(self).__name__
         lines = require_axis_count(
-            self.lines, owner, "lines", "Fourier line", rank=None
+            self.lines, owner, "lines", _FOURIER_LINE_AXIS, rank=None
         )
         for name in ("bare", "covered"):
             label = f"{name}.frequencies"
@@ -701,11 +705,11 @@ class CoveringImprovementResult:
                         getattr(self, name).frequencies,
                         owner,
                         label,
-                        "Fourier line",
+                        _FOURIER_LINE_AXIS,
                         rank=1,
                     ),
                 },
-                "Fourier line",
+                _FOURIER_LINE_AXIS,
             )
 
     def plot(
