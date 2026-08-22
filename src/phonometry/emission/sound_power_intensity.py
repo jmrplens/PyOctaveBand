@@ -95,6 +95,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
     from .._report.metadata import ReportMetadata
 
@@ -1177,6 +1178,22 @@ def precision_field_indicators(
     )
 
 
+def _spread_over_bands(value: ArrayLike, n_bands: int) -> np.ndarray:
+    """Put a field non-uniformity on the band axis without inventing values.
+
+    A bare number states one figure that holds for every band, so it is spread
+    over them. A value that already carries an axis is returned exactly as it
+    came, even when its length is wrong: stretching that one too would state a
+    figure for bands it was never measured on, and would hide the disagreement
+    behind numpy's broadcast message instead of letting it reach the per-band
+    check on the result, which names the criterion that does not fit.
+    """
+    spectrum = np.asarray(value, dtype=np.float64)
+    if spectrum.ndim == 0:
+        return np.broadcast_to(spectrum, (n_bands,))
+    return spectrum
+
+
 def _sigma_r0_9614_3(nominal: int) -> float:
     """Per-band sigma_R0 (ISO 9614-3:2002 Table 1), in dB; also criterion-1 s."""
     if 50 <= nominal <= 160:  # noqa: PLR2004
@@ -1265,20 +1282,8 @@ def precision_qualification(
     # Criterion 5: 0,83 <= FS(1)/FS(2) <= 1,2.
     criterion_5: np.ndarray | None = None
     if field_nonuniformity_1 is not None and field_nonuniformity_2 is not None:
-        # A single FS pair states one ratio that holds for every band, so a
-        # bare number is spread onto the band axis the way criterion 2 spreads
-        # the residual index, and the result keeps its promise of a verdict per
-        # band. A pair that already carries an axis is left exactly as it came:
-        # spreading that one too would stretch a lone value over bands it was
-        # never measured on, and would hide a pair of the wrong length behind
-        # numpy's broadcast message instead of letting it reach the per-band
-        # check below, which names the criterion that disagrees.
-        fs1 = np.asarray(field_nonuniformity_1, dtype=np.float64)
-        fs2 = np.asarray(field_nonuniformity_2, dtype=np.float64)
-        if fs1.ndim == 0:
-            fs1 = np.broadcast_to(fs1, (n_bands,))
-        if fs2.ndim == 0:
-            fs2 = np.broadcast_to(fs2, (n_bands,))
+        fs1 = _spread_over_bands(field_nonuniformity_1, n_bands)
+        fs2 = _spread_over_bands(field_nonuniformity_2, n_bands)
         with np.errstate(divide="ignore", invalid="ignore"):
             ratio = fs1 / fs2
         criterion_5 = np.asarray(

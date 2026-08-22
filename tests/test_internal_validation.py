@@ -93,8 +93,9 @@ def test_a_nested_list_cannot_smuggle_an_extra_axis_past_a_one_axis_pin() -> Non
     A ``(bands, 2)`` list satisfies every count on its first axis, so only the
     rank sees it.
     """
+    result = _Result(first=[[60.0, 1.0], [61.0, 1.0]])
     with pytest.raises(ValueError, match="'first'"):
-        require_ranks(_Result(first=[[60.0, 1.0], [61.0, 1.0]]), first=1)
+        require_ranks(result, first=1)
 
 
 def test_a_missing_axis_is_refused_and_not_described_as_an_extra_one() -> None:
