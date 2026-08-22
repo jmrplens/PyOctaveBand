@@ -76,7 +76,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import (
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
 from .insulation import (
     ImpactRatingResult,
     WeightedRatingResult,
@@ -207,9 +211,11 @@ def velocity_level_difference(
     """
     lv_i = _as_1d(source_level, "source_level")
     lv_j = _as_1d(receive_level, "receive_level")
-    if lv_i.size != lv_j.size:
-        msg = "'source_level' and 'receive_level' must share their length."
-        raise ValueError(msg)
+    require_equal_counts(
+        "velocity_level_difference",
+        {"source_level": lv_i.size, "receive_level": lv_j.size},
+        "band",
+    )
     return np.asarray(lv_i - lv_j, dtype=np.float64)
 
 
@@ -232,9 +238,11 @@ def direction_averaged_level_difference(
     """
     a = _as_1d(dv_ij, "dv_ij")
     b = _as_1d(dv_ji, "dv_ji")
-    if a.size != b.size:
-        msg = "'dv_ij' and 'dv_ji' must share their length."
-        raise ValueError(msg)
+    require_equal_counts(
+        "direction_averaged_level_difference",
+        {"dv_ij": a.size, "dv_ji": b.size},
+        "band",
+    )
     return np.asarray(0.5 * (a + b), dtype=np.float64)
 
 
@@ -568,9 +576,12 @@ def vibration_reduction_index(
     s_j = _positive(area_j, "area_j")
 
     freq = None if frequency is None else _positive_array(frequency, "frequency")
-    if freq is not None and freq.size != dv.size:
-        msg = "'frequency' must share the band count of the level input."
-        raise ValueError(msg)
+    if freq is not None:
+        require_equal_counts(
+            "vibration_reduction_index",
+            {"velocity_level_difference": dv.size, "frequency": freq.size},
+            "band",
+        )
 
     ts_given = (structural_reverberation_time_i is not None) + (
         structural_reverberation_time_j is not None
@@ -881,9 +892,15 @@ def normalized_flanking_level_difference(
     l2 = _as_1d(receive_level, "receive_level")
     area = _positive_array(absorption_area, "absorption_area")
     a0 = _positive(reference_area, "reference_area")
-    if not (l1.size == l2.size == area.size):
-        msg = "'source_level', 'receive_level' and 'absorption_area' must share their length."
-        raise ValueError(msg)
+    require_equal_counts(
+        "normalized_flanking_level_difference",
+        {
+            "source_level": l1.size,
+            "receive_level": l2.size,
+            "absorption_area": area.size,
+        },
+        "band",
+    )
     d_n_f = l1 - l2 - 10.0 * np.log10(area / a0)
     rating = _maybe_rating(d_n_f, bands)
     return FlankingLevelDifferenceResult(d_n_f=d_n_f, rating=rating)
@@ -917,9 +934,11 @@ def normalized_flanking_impact_level(
     l2 = _as_1d(receive_level, "receive_level")
     area = _positive_array(absorption_area, "absorption_area")
     a0 = _positive(reference_area, "reference_area")
-    if l2.size != area.size:
-        msg = "'receive_level' and 'absorption_area' must share their length."
-        raise ValueError(msg)
+    require_equal_counts(
+        "normalized_flanking_impact_level",
+        {"receive_level": l2.size, "absorption_area": area.size},
+        "band",
+    )
     l_n_f = l2 + 10.0 * np.log10(area / a0)
     rating: ImpactRatingResult | None = None
     if l_n_f.size in (16, 5):

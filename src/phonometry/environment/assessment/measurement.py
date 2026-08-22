@@ -52,6 +52,7 @@ from typing import TYPE_CHECKING, Any, overload
 
 import numpy as np
 
+from ..._internal.validation import require_equal_counts
 from ..._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:
@@ -312,9 +313,11 @@ def tonal_seeking_survey(
     if lev.ndim != 1 or freq.ndim != 1:
         msg = "'levels' and 'frequencies' must be one-dimensional."
         raise ValueError(msg)
-    if lev.size != freq.size:
-        msg = "'levels' and 'frequencies' must share their length."
-        raise ValueError(msg)
+    require_equal_counts(
+        "tonal_seeking_survey",
+        {"levels": lev.size, "frequencies": freq.size},
+        "band",
+    )
     if lev.size < _MIN_SURVEY_BANDS:
         msg = "Need at least three bands to test the neighbours."
         raise ValueError(msg)

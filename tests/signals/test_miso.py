@@ -434,7 +434,10 @@ def test_rejects_mismatched_length() -> None:
     x1 = _white(170, n=1 << 14)
     x2 = _white(171, n=1 << 13)
     y = _white(172, n=1 << 14)
-    with pytest.raises(ValueError, match="same length"):
+    with pytest.raises(
+        ValueError,
+        match=r"miso_coherence: 'inputs\[0\]' .* must each carry one value per sample",
+    ):
         ph.signals.miso_coherence([x1, x2], y, FS)
 
 

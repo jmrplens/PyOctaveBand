@@ -30,6 +30,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_equal_counts
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
@@ -109,15 +111,15 @@ class Signal:
             msg = f"data must be 1-D or (channels, samples); got {data.ndim}-D"
             raise ValueError(msg)
         object.__setattr__(self, "data", np.ascontiguousarray(data))
-        if (
-            self.channel_labels is not None
-            and len(self.channel_labels) != data.shape[0]
-        ):
-            msg = (
-                f"{len(self.channel_labels)} channel labels for "
-                f"{data.shape[0]} channels"
+        if self.channel_labels is not None:
+            require_equal_counts(
+                type(self).__name__,
+                {
+                    "data": int(data.shape[0]),
+                    "channel_labels": len(self.channel_labels),
+                },
+                "channel",
             )
-            raise ValueError(msg)
         # Finiteness is checked alongside the sign: NaN and infinity pass
         # every comparison against zero, and an fs or calibration of NaN
         # would flow into durations and levels as a wrong number that

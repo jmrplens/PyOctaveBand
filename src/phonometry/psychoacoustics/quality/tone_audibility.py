@@ -98,7 +98,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import (
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -307,17 +311,22 @@ def energy_sum_level(
 # (Clauses 5.3.2/5.3.3, Annex D)
 # --------------------------------------------------------------------------- #
 def _validate_spectrum(
-    levels: ArrayLike, frequencies: ArrayLike
+    levels: ArrayLike, frequencies: ArrayLike, owner: str
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-    """Coerce and validate a narrow-band ``(levels, frequencies)`` spectrum."""
+    """Coerce and validate a narrow-band ``(levels, frequencies)`` spectrum.
+
+    :param owner: Name of the entry point the caller invoked, so that the
+        line-count complaint names the function that was typed rather than
+        this validator, which four entry points share.
+    """
     lev = np.asarray(levels, dtype=np.float64)
     freq = np.asarray(frequencies, dtype=np.float64)
     if lev.ndim != 1 or freq.ndim != 1:
         msg = "'levels' and 'frequencies' must be one-dimensional."
         raise ValueError(msg)
-    if lev.size != freq.size:
-        msg = "'levels' and 'frequencies' must share their length."
-        raise ValueError(msg)
+    require_equal_counts(
+        owner, {"levels": lev.size, "frequencies": freq.size}, "spectral line"
+    )
     if lev.size == 0:
         msg = "'levels' and 'frequencies' must not be empty."
         raise ValueError(msg)
@@ -392,13 +401,18 @@ def _mean_narrowband_level_lines(
     tone_frequency: float,
     *,
     effective_bandwidth_factor: float = HANNING_BANDWIDTH_FACTOR,
+    owner: str = "mean_narrowband_level",
 ) -> tuple[float, list[int]]:
     """``LS`` plus the indices of the lines kept by the final iteration.
 
     The kept-line set is the ``M`` noise lines that Clause 6 uses in the
     uncertainty of the audibility (see :func:`audibility_uncertainty`).
+
+    :param owner: Name of the entry point the caller invoked, for the spectrum
+        complaints; the default is the entry point this body serves, and
+        :func:`analyze_spectrum` passes its own name.
     """
-    lev, freq = _validate_spectrum(levels, frequencies)
+    lev, freq = _validate_spectrum(levels, frequencies, owner)
     ft = _positive(tone_frequency, "tone_frequency")
     factor = _positive(effective_bandwidth_factor, "effective_bandwidth_factor")
     correction = 10.0 * np.log10(factor)
@@ -459,7 +473,7 @@ def tone_level(
     :return: Tone level ``LT``, in dB.
     :raises ValueError: If the spectrum is invalid or the levels are not finite.
     """
-    lev, freq = _validate_spectrum(levels, frequencies)
+    lev, freq = _validate_spectrum(levels, frequencies, "tone_level")
     ft = _positive(tone_frequency, "tone_frequency")
     ls = _finite(mean_narrowband_level, "mean_narrowband_level")
     peak = int(np.argmin(np.abs(freq - ft)))
@@ -691,7 +705,7 @@ def analyze_spectrum(
         their same-band FG combinations.
     :raises ValueError: If the spectrum is invalid or no audible tone is found.
     """
-    lev, freq = _validate_spectrum(levels, frequencies)
+    lev, freq = _validate_spectrum(levels, frequencies, "analyze_spectrum")
     df = _positive(line_spacing, "line_spacing")
     factor = _positive(effective_bandwidth_factor, "effective_bandwidth_factor")
     detected = _detect_tones(lev, freq, df, factor)
@@ -704,7 +718,11 @@ def analyze_spectrum(
             # Extended uncertainty U (Clause 6) from the K tone lines and the
             # M noise lines of the final Formula (6) iteration.
             _, kept = _mean_narrowband_level_lines(
-                lev, freq, float(freq[peak]), effective_bandwidth_factor=factor
+                lev,
+                freq,
+                float(freq[peak]),
+                effective_bandwidth_factor=factor,
+                owner="analyze_spectrum",
             )
             u = audibility_uncertainty(
                 lev[low : high + 1], lev[kept], float(freq[peak]), df
@@ -785,15 +803,17 @@ def combined_tone_level(
     :return: Combined tone level ``LT``, in dB.
     :raises ValueError: If the inputs are invalid or differ in length.
     """
-    lev, freq = _validate_spectrum(levels, frequencies)
+    lev, freq = _validate_spectrum(levels, frequencies, "combined_tone_level")
     fts = np.asarray(tone_frequencies, dtype=np.float64)
     lss = np.asarray(mean_narrowband_levels, dtype=np.float64)
-    if fts.ndim != 1 or lss.ndim != 1 or fts.size != lss.size:
-        msg = (
-            "'tone_frequencies' and 'mean_narrowband_levels' must be "
-            "one-dimensional and share their length."
-        )
+    if fts.ndim != 1 or lss.ndim != 1:
+        msg = "'tone_frequencies' and 'mean_narrowband_levels' must be one-dimensional."
         raise ValueError(msg)
+    require_equal_counts(
+        "combined_tone_level",
+        {"tone_frequencies": fts.size, "mean_narrowband_levels": lss.size},
+        "tone",
+    )
     if fts.size == 0:
         msg = "At least one tone is required."
         raise ValueError(msg)
@@ -1340,12 +1360,15 @@ def assess_tones(
             "must be one-dimensional."
         )
         raise ValueError(msg)
-    if not (freqs.size == lt.size == ls.size):
-        msg = (
-            "'tone_frequencies', 'tone_levels' and 'mean_narrowband_levels' "
-            "must share their length."
-        )
-        raise ValueError(msg)
+    require_equal_counts(
+        "assess_tones",
+        {
+            "tone_frequencies": freqs.size,
+            "tone_levels": lt.size,
+            "mean_narrowband_levels": ls.size,
+        },
+        "tone",
+    )
     if freqs.size == 0:
         msg = "At least one tone is required."
         raise ValueError(msg)

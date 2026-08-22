@@ -436,9 +436,7 @@ def _validate_probe_signals(x1: np.ndarray, x2: np.ndarray) -> None:
     if x1.ndim != 1 or x2.ndim != 1:
         msg = "sound_intensity expects 1D pressure signals."
         raise ValueError(msg)
-    if x1.size != x2.size:
-        msg = f"Microphone signals must have the same length, got {x1.size} and {x2.size}."
-        raise ValueError(msg)
+    require_equal_counts("sound_intensity", {"p1": x1.size, "p2": x2.size}, "sample")
 
 
 def _validate_probe_medium(fs: int, spacing: float, rho: float, c: float) -> None:

@@ -77,7 +77,11 @@ from typing import TYPE_CHECKING, Any, overload
 
 import numpy as np
 
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import (
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
 from .insulation import (
     WeightedRatingResult,
     _as_band_levels,
@@ -584,9 +588,14 @@ def combine_subareas(
         msg = "'l_in' must be a two-dimensional (subareas, bands) array."
         raise ValueError(msg)
     areas = np.asarray(measurement_area, dtype=np.float64)
-    if areas.ndim != 1 or areas.size != levels.shape[0]:
-        msg = "'measurement_area' must give one area per subarea (row of 'l_in')."
+    if areas.ndim != 1:
+        msg = "'measurement_area' must be a one-dimensional array of subarea areas."
         raise ValueError(msg)
+    require_equal_counts(
+        "combine_subareas",
+        {"measurement_area": areas.size, "l_in rows": levels.shape[0]},
+        "subarea",
+    )
     if not np.all(np.isfinite(levels)):
         msg = "'l_in' must contain only finite values."
         raise ValueError(msg)

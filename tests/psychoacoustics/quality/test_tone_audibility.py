@@ -234,7 +234,13 @@ def test_mean_narrowband_level_few_lines_returns_unpruned_mean() -> None:
 
 
 def test_mean_narrowband_level_rejects_length_mismatch() -> None:
-    with pytest.raises(ValueError, match="share their length"):
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"mean_narrowband_level: 'levels' .* 'frequencies' "
+            r".* must each carry one value per spectral line"
+        ),
+    ):
         psychoacoustics.mean_narrowband_level([50.0, 51.0], [100.0], 100.0)
 
 
@@ -429,7 +435,13 @@ def test_combined_tone_level_no_double_counting() -> None:
 
 
 def test_combined_tone_level_rejects_length_mismatch() -> None:
-    with pytest.raises(ValueError, match="share their length"):
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"combined_tone_level: 'tone_frequencies' .* 'mean_narrowband_levels' "
+            r".* must each carry one value per tone"
+        ),
+    ):
         psychoacoustics.combined_tone_level(
             ref.ISO20065_E1_LEVELS, ref.ISO20065_E1_FREQUENCIES, [137.3], [49.0, 50.0]
         )
@@ -635,7 +647,13 @@ def test_mean_audibility_rejects_empty() -> None:
 
 
 def test_assess_tones_rejects_length_mismatch() -> None:
-    with pytest.raises(ValueError, match="share their length"):
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"assess_tones: 'tone_frequencies' .* 'tone_levels' .* "
+            r"'mean_narrowband_levels' .* must each carry one value per tone"
+        ),
+    ):
         psychoacoustics.assess_tones([100.0, 200.0], [60.0], [50.0], 2.7)
 
 

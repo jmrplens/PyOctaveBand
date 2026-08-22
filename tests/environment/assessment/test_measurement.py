@@ -111,6 +111,17 @@ def test_survey_below_threshold_not_flagged() -> None:
     assert not environment.tonal_seeking_survey(levels, freqs)[1]
 
 
+def test_survey_names_both_band_counts() -> None:
+    """A level without a band centre is refused, naming what each input holds."""
+    with pytest.raises(
+        ValueError,
+        match=r"tonal_seeking_survey: 'levels' .* must each carry one value per band",
+    ):
+        environment.tonal_seeking_survey(
+            [40.0, 60.0, 40.0, 41.0], [100.0, 125.0, 160.0]
+        )
+
+
 # ---------------------------------------------------------------------------
 # Residual-noise correction (Formula 16, Annex I)
 # ---------------------------------------------------------------------------

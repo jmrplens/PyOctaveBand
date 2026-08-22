@@ -270,7 +270,7 @@ def test_impact_rejects_length_mismatch() -> None:
     li_2_bands = np.array([60.0, 60.0])
     t2_1_band = np.array([0.5])
     with pytest.raises(
-        ValueError, match="'li' and 't2' must share the same band count"
+        ValueError, match=r"impact_insulation: 'li'.*'t2'.*one value per band"
     ):
         building.impact_insulation(li_2_bands, t2_1_band)
 

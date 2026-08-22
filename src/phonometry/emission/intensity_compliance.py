@@ -67,7 +67,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_ranks, require_same_length
+from .._internal.validation import (
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -339,12 +343,11 @@ def verify_intensity_class(
     if measured.ndim != 1 or supplied.ndim != 1:
         msg = "verify_intensity_class expects 1D per-band arrays."
         raise ValueError(msg)
-    if measured.size != supplied.size:
-        msg = (
-            f"'residual_index' and 'frequencies' must have the same length, "
-            f"got {measured.size} and {supplied.size}."
-        )
-        raise ValueError(msg)
+    require_equal_counts(
+        "verify_intensity_class",
+        {"residual_index": measured.size, "frequencies": supplied.size},
+        "band",
+    )
     if measured.size == 0:
         msg = "At least one measurement band is required."
         raise ValueError(msg)

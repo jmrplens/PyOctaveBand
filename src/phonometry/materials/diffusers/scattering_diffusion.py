@@ -32,6 +32,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_equal_counts
 from .reverberation_room_scattering import _positive_scalar
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -520,12 +521,14 @@ def random_incidence_diffusion(
         w = np.ones(d.size, dtype=np.float64)
     else:
         w = np.asarray(weights, dtype=np.float64)
-        if w.ndim != 1 or w.size != d.size:
-            msg = (
-                "'weights' must match the number of source positions "
-                f"({d.size}), got shape {w.shape}."
-            )
+        if w.ndim != 1:
+            msg = f"'weights' must be a 1-D sequence, got shape {w.shape}."
             raise ValueError(msg)
+        require_equal_counts(
+            "random_incidence_diffusion",
+            {"directional_coefficients": d.size, "weights": w.size},
+            "source position",
+        )
         if np.any(w < 0.0):
             msg = "'weights' values must be non-negative."
             raise ValueError(msg)

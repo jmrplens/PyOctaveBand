@@ -56,7 +56,11 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
-from .._internal.validation import require_ranks, require_same_length
+from .._internal.validation import (
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
 from ..io._resolve import resolve_fs, resolve_pair_fs
 from ..io._signal import Signal
 from .spectra import (
@@ -287,9 +291,7 @@ def correlation(
     xa = _validate_signal(x, "x", context="a correlation estimate")
     is_auto = y is None
     ya = xa if y is None else _validate_signal(y, "y", context="a correlation estimate")
-    if xa.size != ya.size:
-        msg = "'x' and 'y' must have the same length."
-        raise ValueError(msg)
+    require_equal_counts("correlation", {"x": xa.size, "y": ya.size}, "sample")
     if isinstance(x, Signal) or isinstance(y, Signal):
         fs = resolve_pair_fs(x, x if y is None else y, fs)
     elif fs is None:
@@ -803,9 +805,7 @@ def time_delay(
     xa = _validate_signal(x, "x", context="a time-delay estimate")
     ya = _validate_signal(y, "y", context="a time-delay estimate")
     fs = resolve_pair_fs(x, y, fs)
-    if xa.size != ya.size:
-        msg = "'x' and 'y' must have the same length."
-        raise ValueError(msg)
+    require_equal_counts("time_delay", {"x": xa.size, "y": ya.size}, "sample")
     if float(np.std(xa)) <= 0.0 or float(np.std(ya)) <= 0.0:
         msg = (
             "'x' and 'y' must not be constant: there is no correlation peak to locate."
@@ -1027,9 +1027,9 @@ def align_impulse_responses(
     """
     ira = _validate_signal(ir, "ir", context=_DELAY_CONTEXT)
     refa = _validate_signal(reference, "reference", context=_DELAY_CONTEXT)
-    if ira.size != refa.size:
-        msg = "'ir' and 'reference' must have the same length."
-        raise ValueError(msg)
+    require_equal_counts(
+        "align_impulse_responses", {"ir": ira.size, "reference": refa.size}, "sample"
+    )
     fs_v = _positive(
         resolve_pair_fs(ir, reference, fs, names=("ir", "reference")), "fs"
     )

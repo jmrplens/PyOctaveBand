@@ -92,7 +92,10 @@ def test_mismatched_label_count_fails_loudly(tmp_path: Path) -> None:
     audio = tmp_path / "stereo.wav"
     write(audio, np.zeros((2, 8)), FS)
     write_sidecar(audio, 1.0, channel_labels=("only one",))
-    with pytest.raises(ValueError, match="channel labels"):
+    with pytest.raises(
+        ValueError,
+        match=r"Signal: .*'channel_labels' .* must each carry one value per channel",
+    ):
         read(audio)
 
 

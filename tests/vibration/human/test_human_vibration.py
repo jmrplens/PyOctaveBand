@@ -457,7 +457,9 @@ def test_daily_vibration_exposure_result() -> None:
 def test_daily_vibration_exposure_default_labels_and_mismatch() -> None:
     result = hv.daily_vibration_exposure([2.0], [3600.0], kind="wbv")
     assert result.labels == ("op 1",)
-    with pytest.raises(ValueError, match="labels"):
+    with pytest.raises(
+        ValueError, match="'labels'.*must each carry one value per operation"
+    ):
         hv.daily_vibration_exposure(
             [2.0, 3.0], [1.0, 1.0], kind="hav", labels=["only-one"]
         )

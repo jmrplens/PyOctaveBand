@@ -244,7 +244,9 @@ def test_octave_fraction_and_limits() -> None:
 
 def test_validation_errors() -> None:
     good = np.random.default_rng(0).standard_normal(FS)
-    with pytest.raises(ValueError, match="same length"):
+    with pytest.raises(
+        ValueError, match=r"sound_intensity: 'p1'.*'p2'.*one value per sample"
+    ):
         emission.sound_intensity(good, good[:-1], FS, spacing=SPACING)
     with pytest.raises(ValueError, match="spacing"):
         emission.sound_intensity(good, good, FS, spacing=0.0)

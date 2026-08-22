@@ -60,8 +60,15 @@ def test_composite_matches_facade_energy_sum() -> None:
 
 
 def test_composite_rejects_bad_shape() -> None:
-    with pytest.raises(ValueError, match="length must match"):
+    match = (
+        r"composite_transmission_loss: 'areas' .* must each carry one value per element"
+    )
+    with pytest.raises(ValueError, match=match):
         building.composite_transmission_loss([1.0, 2.0], [40.0])
+    with pytest.raises(ValueError, match=match):
+        building.composite_transmission_loss([1.0, 2.0], np.zeros((3, 4)))
+    with pytest.raises(ValueError, match="'reduction_indices' must be 1-D or 2-D"):
+        building.composite_transmission_loss([1.0, 2.0], np.zeros((2, 3, 4)))
 
 
 # ---------------------------------------------------------------------------
