@@ -46,7 +46,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_same_shape
+from .._internal.validation import require_equal_shapes, require_same_shape
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -439,9 +439,11 @@ def detection_range_from_curve(
     fom = _finite(figure_of_merit, "figure_of_merit")
     r = _finite_array(range_m, "range_m")
     pl = _finite_array(propagation_loss, "propagation_loss")
-    if r.shape != pl.shape:
-        msg = "'propagation_loss' must have the same length as 'range_m'."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "detection_range_from_curve",
+        {"range_m": r.shape, "propagation_loss": pl.shape},
+        "sample",
+    )
     if r.size < _MIN_CURVE_POINTS or np.any(np.diff(r) <= 0.0):
         msg = "'range_m' must be strictly increasing with at least two samples."
         raise ValueError(msg)

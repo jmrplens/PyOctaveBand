@@ -289,6 +289,10 @@ def test_piston_geometry_with_and_without_lobe() -> None:
         pm.electroacoustics.plot_piston_geometry(0.0)
     with pytest.raises(ValueError, match="together"):
         pm.electroacoustics.plot_piston_geometry(0.1, angles=angles)
+    with pytest.raises(ValueError, match=r"'directivity'.*same shape"):
+        pm.electroacoustics.plot_piston_geometry(
+            0.1, angles=angles, directivity=np.ones(angles.size - 1)
+        )
 
 
 # ---------------------------------------------------------------------------

@@ -198,6 +198,29 @@ def test_mismatched_response_lengths_rejected() -> None:
         )
 
 
+def test_mismatched_polar_pair_rejected() -> None:
+    """A polar pattern whose two halves disagree names both and their shapes."""
+    f, spl = _flat_response()
+    ragged_polar = electroacoustics.LoudspeakerDirectivity(
+        polar=([0.0, 90.0, 180.0], [0.0, -3.0]), frequency=1000.0
+    )
+    with pytest.raises(ValueError, match="'polar angles'.*same shape"):
+        electroacoustics.loudspeaker_characteristics(
+            f, spl, _R, directivity=ragged_polar
+        )
+
+
+def test_two_dimensional_polar_rejected() -> None:
+    """A polar pattern of matching but two-dimensional halves is still refused."""
+    f, spl = _flat_response()
+    grid_polar = electroacoustics.LoudspeakerDirectivity(
+        polar=([[0.0, 90.0], [180.0, 270.0]], [[0.0, -3.0], [-6.0, -3.0]]),
+        frequency=1000.0,
+    )
+    with pytest.raises(ValueError, match="'polar' angles and levels must be 1-D"):
+        electroacoustics.loudspeaker_characteristics(f, spl, _R, directivity=grid_polar)
+
+
 def test_sensitivity_band_out_of_range_rejected() -> None:
     f, spl = _flat_response()
     with pytest.raises(ValueError, match="no on-axis response samples"):

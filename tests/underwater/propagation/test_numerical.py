@@ -582,6 +582,36 @@ def test_invalid_inputs_rejected() -> None:
         )
 
 
+def test_profile_mismatch_names_the_solver_that_was_called() -> None:
+    """A sound speed missing from the profile names the call that raised.
+
+    The solvers share one profile cleaner, so the message has to carry the
+    name the caller typed rather than the private validator's, and the two
+    halves it compared rather than a bare demand that they agree.
+    """
+    z = np.array([0.0, 50.0, 100.0])
+    c = np.array([1500.0, 1500.0])
+    calls = (
+        (
+            "normal_modes",
+            lambda: normal_modes(50.0, z, c, source_depth=25.0, receiver_depth=35.0),
+        ),
+        (
+            "ray_trace",
+            lambda: ray_trace(z, c, source_depth=25.0, launch_angles_deg=[10.0]),
+        ),
+        (
+            "parabolic_equation",
+            lambda: parabolic_equation(50.0, z, c, source_depth=25.0),
+        ),
+    )
+    for name, call in calls:
+        with pytest.raises(
+            ValueError, match=rf"{name}: 'depths'.*'sound_speeds'.*same shape"
+        ):
+            call()
+
+
 _PER_RANGE = "one value per range"
 _PER_DEPTH = "one value per depth"
 _PER_MODE = "one value per mode"

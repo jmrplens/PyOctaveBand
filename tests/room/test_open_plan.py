@@ -100,11 +100,14 @@ def test_too_few_positions_raises() -> None:
 
 
 def test_mismatched_lengths_raise() -> None:
-    """Position / level / STI arrays must have equal length."""
+    """Position / level / STI arrays must have equal shape."""
     r = np.array([2.0, 4.0, 8.0, 16.0])
     lp = 70.0 - 6.0 * np.log2(r)
     sti = np.array([0.6, 0.4, 0.2])  # one short
-    with pytest.raises(ValueError, match="same length"):
+    with pytest.raises(
+        ValueError,
+        match=r"open_plan_metrics: .*'sti_values'.*must all have the same shape",
+    ):
         room.open_plan_metrics(r, lp, sti)
 
 

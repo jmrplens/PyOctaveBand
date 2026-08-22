@@ -227,6 +227,24 @@ def test_epnl_single_element_dt_treated_as_scalar() -> None:
     assert a == pytest.approx(b, rel=1e-12)
 
 
+def test_epnl_names_the_record_history_that_disagrees() -> None:
+    # A per-record dt or tone correction is matched record for record; the
+    # message names the offender rather than only that two things must agree.
+    p = np.array([90.0, 95.0, 90.0])
+    with pytest.raises(ValueError, match=r"'dt'.*same shape"):
+        epnl_from_pnlt(p, [0.5, 0.5])
+    with pytest.raises(ValueError, match=r"'tone_corrections'.*same shape"):
+        epnl_from_pnlt(p, 0.5, tone_corrections=[0.0, 0.0])
+
+
+def test_epnl_rejects_non_positive_and_non_finite_records() -> None:
+    p = np.array([90.0, 95.0, 90.0])
+    with pytest.raises(ValueError, match="'dt' must be positive"):
+        epnl_from_pnlt(p, np.full(3, -0.5))
+    with pytest.raises(ValueError, match="'tone_corrections' must be finite"):
+        epnl_from_pnlt(p, 0.5, tone_corrections=np.full(3, np.nan))
+
+
 def test_effective_perceived_noise_level_rejects_bad_shape() -> None:
     two_dimensional = np.zeros((5, 10))
     with pytest.raises(ValueError, match=r"'spectra' must have shape \(K, 24\)"):

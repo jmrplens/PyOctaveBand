@@ -393,7 +393,9 @@ def test_chain_shunt_accepts_a_constant_and_rejects_a_mismatch() -> None:
     # A constant impedance has no least value inside the grid.
     assert chain.elements[1].shorting_frequency is None
     empty = sl.SilencerChain(f)
-    with pytest.raises(ValueError, match="one value per analysis frequency"):
+    with pytest.raises(
+        ValueError, match=r"'branch_impedance' must be a scalar or hold one value"
+    ):
         empty.shunt(np.ones(7, dtype=np.complex128))
 
 

@@ -71,6 +71,7 @@ from .._internal.utils import _typesignal
 from .._internal.validation import (
     require_axis_count,
     require_equal_counts,
+    require_equal_shapes,
     require_ranks,
     require_same_length,
 )
@@ -854,12 +855,11 @@ def field_indicators(
             "field_indicators expects 1D (positions,) or 2D (positions, bands) arrays."
         )
         raise ValueError(msg)
-    if lp.shape != i_n.shape:
-        msg = (
-            f"'pressure_levels' and 'normal_intensity' must have the same "
-            f"shape, got {lp.shape} and {i_n.shape}."
-        )
-        raise ValueError(msg)
+    require_equal_shapes(
+        "field_indicators",
+        {"pressure_levels": lp.shape, "normal_intensity": i_n.shape},
+        "position",
+    )
     if lp.shape[0] < _MIN_VARIATION_OBSERVATIONS:
         msg = "At least two measurement positions are required."
         raise ValueError(msg)

@@ -66,7 +66,12 @@ from typing import TYPE_CHECKING, Any, Literal, overload
 import numpy as np
 
 from ..._internal.types import as_float_or_array
-from ..._internal.validation import require_1d_signal, require_choice, require_positive
+from ..._internal.validation import (
+    require_1d_signal,
+    require_choice,
+    require_equal_shapes,
+    require_positive,
+)
 from ...hearing.threshold import SEXES as _SEXES
 from ...io._resolve import SignalInput, resolve_fs, resolve_samples
 
@@ -291,9 +296,15 @@ def daily_dose_multi(
     dz = np.asarray(doses, dtype=np.float64).ravel()
     td = np.asarray(exposure_times, dtype=np.float64).ravel()
     tm = np.asarray(measurement_times, dtype=np.float64).ravel()
-    if not dz.shape == td.shape == tm.shape:
-        msg = "doses, exposure_times and measurement_times must match."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "daily_dose_multi",
+        {
+            "doses": dz.shape,
+            "exposure_times": td.shape,
+            "measurement_times": tm.shape,
+        },
+        "exposure condition",
+    )
     if dz.size == 0:
         msg = "at least one condition is required."
         raise ValueError(msg)

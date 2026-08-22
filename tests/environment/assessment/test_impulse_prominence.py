@@ -87,9 +87,15 @@ def test_invalid_inputs_raise() -> None:
         nt.predicted_prominence(100.0, -1.0)
     with pytest.raises(ValueError, match="at least one"):
         nt.impulse_prominence([], [])
-    with pytest.raises(ValueError, match="same shape"):
+    with pytest.raises(
+        ValueError,
+        match=r"impulse_prominence: 'onset_rates' .*'level_differences' .*same shape",
+    ):
         nt.impulse_prominence([1.0, 2.0], [1.0])
-    with pytest.raises(ValueError, match="equal length"):
+    with pytest.raises(
+        ValueError,
+        match=r"rating_level: 'laeq' .*'adjustment' .*'durations' .*same shape",
+    ):
         nt.rating_level([70.0, 60.0], [0.0], [30.0, 30.0], 60.0)
     with pytest.raises(ValueError, match="positive"):
         nt.rating_level([70.0], [0.0], [30.0], 0.0)

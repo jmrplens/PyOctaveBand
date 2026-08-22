@@ -67,7 +67,12 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_positive, require_ranks, require_same_length
+from .._internal.validation import (
+    require_equal_shapes,
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 from .loudspeaker import _as_curve, _threshold_crossing
 
 if TYPE_CHECKING:
@@ -652,8 +657,13 @@ def _resolve_polar(
         return None, None, index_db
     p_ang = np.atleast_1d(np.asarray(polar[0], dtype=np.float64))
     p_db = np.atleast_1d(np.asarray(polar[1], dtype=np.float64))
-    if p_ang.ndim != 1 or p_ang.shape != p_db.shape:
-        msg = "'polar' angles and levels must be 1-D and equal length."
+    require_equal_shapes(
+        "microphone_characteristics",
+        {"polar angles": p_ang.shape, "polar levels": p_db.shape},
+        "angle",
+    )
+    if p_ang.ndim != 1:
+        msg = f"'polar' angles and levels must be 1-D; got shape {p_ang.shape}."
         raise ValueError(msg)
     if p_ang.size < _MIN_CURVE_POINTS:
         msg = "'polar' needs at least two angle points."

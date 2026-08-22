@@ -100,7 +100,11 @@ if TYPE_CHECKING:
     from .._report.metadata import ReportMetadata
 
 from .._internal.levels_math import energy_mean, weighted_energy_mean
-from .._internal.validation import require_ranks, require_same_length
+from .._internal.validation import (
+    require_equal_shapes,
+    require_ranks,
+    require_same_length,
+)
 from ._shared import SoundPowerWarning, _a_weighting_corrections, _check_grade
 from .intensity import dynamic_capability_index
 
@@ -1126,12 +1130,11 @@ def precision_field_indicators(
     """
     i_n = np.atleast_2d(np.asarray(segment_intensity, dtype=np.float64))
     lp = np.atleast_2d(np.asarray(segment_pressure_levels, dtype=np.float64))
-    if i_n.shape != lp.shape:
-        msg = (
-            "'segment_intensity' and 'segment_pressure_levels' must have the "
-            f"same shape, got {i_n.shape} and {lp.shape}."
-        )
-        raise ValueError(msg)
+    require_equal_shapes(
+        "precision_field_indicators",
+        {"segment_intensity": i_n.shape, "segment_pressure_levels": lp.shape},
+        "segment",
+    )
     n_seg = i_n.shape[0]
     if n_seg < _MIN_STDDEV_SAMPLES:
         msg = "At least two segments are required for the indicators."

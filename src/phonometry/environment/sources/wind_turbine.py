@@ -30,7 +30,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import (
+    require_equal_shapes,
+    require_ranks,
+    require_same_length,
+)
 from ..._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:
@@ -53,7 +57,7 @@ _HANNING_ENBW_FACTOR = 1.5
 #: Low-frequency band where the critical band is fixed to 20-120 Hz.
 _LOW_FREQ_MIN, _LOW_FREQ_MAX = 20.0, 70.0
 _LOW_FREQ_BANDWIDTH = 100.0
-#: Minimum lines of a valid narrowband spectrum (the error message's ">= 3"):
+#: Minimum lines of a valid narrowband spectrum, named in the error message:
 #: the smallest size with more than one np.diff spacing to compare and
 #: adjacent lines about the candidate peak for the 9.5.2 screen.
 _MIN_SPECTRUM_LINES = 3
@@ -309,8 +313,19 @@ def _validate_narrowband(
     """Coerce and validate a uniformly-spaced narrowband spectrum."""
     lv = np.asarray(levels, dtype=np.float64)
     fr = np.asarray(frequencies, dtype=np.float64)
-    if lv.ndim != 1 or lv.shape != fr.shape or lv.size < _MIN_SPECTRUM_LINES:
-        msg = "'levels' and 'frequencies' must be 1-D and the same length (>= 3)."
+    require_equal_shapes(
+        "wind_turbine_tonality",
+        {"levels": lv.shape, "frequencies": fr.shape},
+        "line",
+    )
+    if lv.ndim != 1:
+        msg = f"'levels' and 'frequencies' must be 1-D; got shape {lv.shape}."
+        raise ValueError(msg)
+    if lv.size < _MIN_SPECTRUM_LINES:
+        msg = (
+            "'levels' and 'frequencies' must carry at least "
+            f"{_MIN_SPECTRUM_LINES} lines; got {lv.size}."
+        )
         raise ValueError(msg)
     if not (np.all(np.isfinite(lv)) and np.all(np.isfinite(fr))):
         msg = "'levels' and 'frequencies' must be finite."

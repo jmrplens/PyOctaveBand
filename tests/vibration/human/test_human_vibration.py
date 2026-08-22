@@ -247,7 +247,11 @@ def test_weighted_acceleration_single_band_equals_factor_times_level() -> None:
 
 
 def test_weighted_acceleration_length_mismatch_raises() -> None:
-    with pytest.raises(ValueError, match="equal-length"):
+    with pytest.raises(
+        ValueError,
+        match=r"weighted_acceleration: 'band_accelerations' .*'frequencies' "
+        r".*same shape",
+    ):
         hv.weighted_acceleration([1.0, 2.0], [8.0], "Wk")
 
 
@@ -500,7 +504,9 @@ def test_running_rms_rejects_empty_signal() -> None:
 def test_vibration_total_value_validates() -> None:
     with pytest.raises(ValueError, match="non-empty"):
         hv.vibration_total_value([])
-    with pytest.raises(ValueError, match="same length"):
+    with pytest.raises(
+        ValueError, match=r"vibration_total_value: 'components' .*'k' .*same shape"
+    ):
         hv.vibration_total_value([1.0, 2.0], k=[1.4])
 
 
@@ -515,14 +521,20 @@ def test_combine_partial_exposures_rejects_empty() -> None:
 
 
 def test_hav_daily_exposure_validates() -> None:
-    with pytest.raises(ValueError, match="equal-length"):
+    with pytest.raises(
+        ValueError, match=r"hav_daily_exposure: 'total_values' .*'durations_s' .*shape"
+    ):
         hv.hav_daily_exposure([2.0, 3.0], [3600.0])
     with pytest.raises(ValueError, match="non-negative"):
         hv.hav_daily_exposure([2.0, -3.0], [3600.0, 3600.0])
 
 
 def test_energy_equivalent_rejects_length_mismatch() -> None:
-    with pytest.raises(ValueError, match="equal-length"):
+    with pytest.raises(
+        ValueError,
+        match=r"energy_equivalent_acceleration: 'magnitudes' .*'durations_s' "
+        r".*same shape",
+    ):
         hv.energy_equivalent_acceleration([1.0, 2.0], [3600.0])
 
 
@@ -537,7 +549,11 @@ def test_hav_vwf_lifetime_rejects_nonpositive() -> None:
 
 
 def test_daily_vibration_exposure_rejects_length_mismatch() -> None:
-    with pytest.raises(ValueError, match="equal-length"):
+    with pytest.raises(
+        ValueError,
+        match=r"daily_vibration_exposure: 'total_values' .*'durations_s' "
+        r".*same shape",
+    ):
         hv.daily_vibration_exposure([2.0, 3.0], [3600.0], kind="hav")
 
 

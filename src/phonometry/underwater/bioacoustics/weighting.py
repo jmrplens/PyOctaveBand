@@ -61,7 +61,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import (
+    require_equal_shapes,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -821,7 +825,7 @@ def weighted_exposure(
 
     :param frequency_hz: Band centre frequencies, in Hz (1-D, positive).
     :param band_sel: Per-band single-event SEL, in dB re 1 µPa²·s (or
-        dB re (20 µPa)²·s for an in-air group); same length. ``-inf`` is
+        dB re (20 µPa)²·s for an in-air group); same shape. ``-inf`` is
         accepted for a band that carries no energy, which is what
         :func:`~phonometry.underwater.sources.pile_driving_noise.strike_sel_spectrum`
         returns for bands narrower than its FFT bin spacing; such a band adds
@@ -841,9 +845,9 @@ def weighted_exposure(
     """
     f = _positive_frequencies(frequency_hz)
     sel = np.array(band_sel, dtype=np.float64, copy=True, ndmin=1)
-    if sel.shape != f.shape:
-        msg = "'band_sel' must have the same length as 'frequency_hz'."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "weighted_exposure", {"frequency_hz": f.shape, "band_sel": sel.shape}, "band"
+    )
     # -inf is admitted as the level of a band that carries no energy (see
     # StrikeSelSpectrum.band_sel); it is the neutral element of the energy sum.
     if np.any(np.isnan(sel)) or np.any(sel == np.inf):

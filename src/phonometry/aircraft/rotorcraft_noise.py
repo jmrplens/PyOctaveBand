@@ -57,6 +57,7 @@ import numpy as np
 
 from .._internal.validation import (
     require_choice,
+    require_equal_shapes,
     require_positive,
     require_positive_array,
     require_ranks,
@@ -607,8 +608,16 @@ def flight_condition_weights(
     """
     v = np.atleast_1d(np.asarray(airspeeds, dtype=np.float64))
     g = np.atleast_1d(np.asarray(path_angles, dtype=np.float64))
-    if v.ndim != 1 or v.shape != g.shape or v.size < 1:
-        msg = "'airspeeds' and 'path_angles' must be 1-D of equal, non-zero size."
+    require_equal_shapes(
+        "flight_condition_weights",
+        {"airspeeds": v.shape, "path_angles": g.shape},
+        "flight condition",
+    )
+    if v.ndim != 1 or v.size < 1:
+        msg = (
+            "'airspeeds' and 'path_angles' must be 1-D and non-empty; "
+            f"got shape {v.shape}."
+        )
         raise ValueError(msg)
     if not (np.all(np.isfinite(v)) and np.all(np.isfinite(g))):
         msg = "'airspeeds' and 'path_angles' must be finite."

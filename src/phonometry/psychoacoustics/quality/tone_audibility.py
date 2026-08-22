@@ -100,6 +100,7 @@ import numpy as np
 
 from ..._internal.validation import (
     require_equal_counts,
+    require_equal_shapes,
     require_ranks,
     require_same_length,
 )
@@ -1059,12 +1060,14 @@ def mean_audibility_uncertainty(
     if deltas.size == 0:
         msg = "'decisive_audibilities' must not be empty."
         raise ValueError(msg)
-    if deltas.shape != uncertainties.shape:
-        msg = (
-            "'decisive_audibilities' and 'extended_uncertainties' must share "
-            "their length."
-        )
-        raise ValueError(msg)
+    require_equal_shapes(
+        "mean_audibility_uncertainty",
+        {
+            "decisive_audibilities": deltas.shape,
+            "extended_uncertainties": uncertainties.shape,
+        },
+        "spectrum",
+    )
     if not (np.all(np.isfinite(deltas)) and np.all(np.isfinite(uncertainties))):
         msg = "Inputs must be finite."
         raise ValueError(msg)
@@ -1382,9 +1385,14 @@ def assess_tones(
     uncertainties: NDArray[np.float64] | None = None
     if extended_uncertainties is not None:
         uncertainties = np.asarray(extended_uncertainties, dtype=np.float64)
-        if uncertainties.shape != freqs.shape:
-            msg = "'extended_uncertainties' must match 'tone_frequencies' in length."
-            raise ValueError(msg)
+        require_equal_shapes(
+            "assess_tones",
+            {
+                "tone_frequencies": freqs.shape,
+                "extended_uncertainties": uncertainties.shape,
+            },
+            "tone",
+        )
         if not np.all(np.isfinite(uncertainties)):
             msg = "'extended_uncertainties' must be finite."
             raise ValueError(msg)

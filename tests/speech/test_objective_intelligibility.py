@@ -122,7 +122,7 @@ def test_input_validation() -> None:
     with_nan[0] = np.nan
     empty = np.array([])
 
-    with pytest.raises(ValueError, match="equal length"):
+    with pytest.raises(ValueError, match=r"stoi: 'clean'.*'degraded'.*same shape"):
         speech.stoi(x, shorter, FS)
     with pytest.raises(ValueError, match="1-D"):
         speech.stoi(two_d, two_d, FS)

@@ -82,7 +82,7 @@ def test_mean_flow_resistivity_log_average() -> None:
     # Length weighting: 3:1 towards 1e6.
     got = aircraft.mean_flow_resistivity([1.0, 3.0], [1.0e4, 1.0e6])
     assert got == pytest.approx(10.0 ** (0.25 * 4.0 + 0.75 * 6.0))
-    with pytest.raises(ValueError, match="equal shape"):
+    with pytest.raises(ValueError, match=r"'resistivities'.*same shape"):
         aircraft.mean_flow_resistivity([1.0, 2.0], [1.0e5])
 
 

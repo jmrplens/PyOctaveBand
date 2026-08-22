@@ -122,8 +122,24 @@ def test_tonal_audibility_flat_spectrum_not_audible() -> None:
 
 
 def test_tonal_audibility_rejects_short_input() -> None:
-    with pytest.raises(ValueError, match="1-D and the same length"):
+    with pytest.raises(ValueError, match=r"'levels' and 'frequencies' must carry"):
         wind_turbine_tonality([1.0, 2.0], [10.0, 12.0])
+
+
+def test_tonal_audibility_rejects_two_dimensional_spectrum() -> None:
+    # Two spectra stacked into one array: shapes agree, the rank does not.
+    freqs = np.tile(np.arange(100.0, 108.0, 2.0), (2, 1))
+    with pytest.raises(ValueError, match=r"'levels' and 'frequencies' must be 1-D"):
+        wind_turbine_tonality(np.full_like(freqs, 30.0), freqs)
+
+
+def test_tonal_audibility_rejects_mismatched_spectrum() -> None:
+    # One level short of its own frequency axis: the message names both.
+    with pytest.raises(
+        ValueError,
+        match=r"wind_turbine_tonality: 'levels' .*'frequencies' .*same shape",
+    ):
+        wind_turbine_tonality([30.0, 31.0, 32.0], [100.0, 102.0, 104.0, 106.0])
 
 
 def test_tonal_audibility_rejects_non_monotonic_frequencies() -> None:

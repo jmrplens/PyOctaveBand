@@ -44,7 +44,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_ranks, require_same_length
+from .._internal.validation import (
+    require_equal_shapes,
+    require_ranks,
+    require_same_length,
+)
 from ..io._resolve import apply_calibration, resolve_pair_fs
 
 if TYPE_CHECKING:
@@ -273,11 +277,7 @@ def _validate_pair(
     if x.ndim != 1 or y.ndim != 1:
         msg = "'clean' and 'degraded' must be 1-D signals."
         raise ValueError(msg)
-    if x.shape != y.shape:
-        msg = (
-            f"'clean' and 'degraded' must have equal length; got {x.size} and {y.size}."
-        )
-        raise ValueError(msg)
+    require_equal_shapes("stoi", {"clean": x.shape, "degraded": y.shape}, "sample")
     if x.size == 0:
         msg = "'clean' and 'degraded' must be non-empty."
         raise ValueError(msg)

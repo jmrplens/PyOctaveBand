@@ -61,7 +61,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from scipy import signal as sig
 
-from ..._internal.validation import require_equal_counts
+from ..._internal.validation import require_equal_counts, require_equal_shapes
 from ..._internal.warnings import PhonometryWarning
 from ...io._resolve import SignalInput, resolve_fs, resolve_samples
 
@@ -556,12 +556,14 @@ def weighted_acceleration(
     """
     accel = np.atleast_1d(np.asarray(band_accelerations, dtype=np.float64))
     freq = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
-    if accel.ndim != 1 or accel.size == 0 or accel.shape != freq.shape:
-        msg = (
-            "'band_accelerations' and 'frequencies' must be non-empty, 1-D and "
-            "equal-length."
-        )
+    if accel.ndim != 1 or accel.size == 0:
+        msg = "'band_accelerations' must be a non-empty 1-D array."
         raise ValueError(msg)
+    require_equal_shapes(
+        "weighted_acceleration",
+        {"band_accelerations": accel.shape, "frequencies": freq.shape},
+        "band",
+    )
     factors = weighting_factors(weighting, freq)
     weighted = factors * accel
     overall = float(np.sqrt(np.sum(weighted**2)))
@@ -787,9 +789,11 @@ def vibration_total_value(
         factors = np.ones_like(comp)
     else:
         factors = np.atleast_1d(np.asarray(k, dtype=np.float64))
-        if factors.shape != comp.shape:
-            msg = "'k' must have the same length as 'components'."
-            raise ValueError(msg)
+        require_equal_shapes(
+            "vibration_total_value",
+            {"components": comp.shape, "k": factors.shape},
+            "axis",
+        )
     return float(np.sqrt(np.sum((factors * comp) ** 2)))
 
 
@@ -878,11 +882,14 @@ def hav_daily_exposure(
     """
     ahv = np.atleast_1d(np.asarray(total_values, dtype=np.float64))
     t = np.atleast_1d(np.asarray(durations_s, dtype=np.float64))
-    if ahv.ndim != 1 or ahv.size == 0 or ahv.shape != t.shape:
-        msg = (
-            "'total_values' and 'durations_s' must be non-empty, 1-D and equal-length."
-        )
+    if ahv.ndim != 1 or ahv.size == 0:
+        msg = "'total_values' must be a non-empty 1-D array."
         raise ValueError(msg)
+    require_equal_shapes(
+        "hav_daily_exposure",
+        {"total_values": ahv.shape, "durations_s": t.shape},
+        "operation",
+    )
     if np.any(ahv < 0.0) or np.any(t < 0.0):
         msg = "'total_values' and 'durations_s' must be non-negative."
         raise ValueError(msg)
@@ -905,9 +912,14 @@ def energy_equivalent_acceleration(
     """
     a = np.atleast_1d(np.asarray(magnitudes, dtype=np.float64))
     t = np.atleast_1d(np.asarray(durations_s, dtype=np.float64))
-    if a.ndim != 1 or a.size == 0 or a.shape != t.shape:
-        msg = "'magnitudes' and 'durations_s' must be non-empty, 1-D and equal-length."
+    if a.ndim != 1 or a.size == 0:
+        msg = "'magnitudes' must be a non-empty 1-D array."
         raise ValueError(msg)
+    require_equal_shapes(
+        "energy_equivalent_acceleration",
+        {"magnitudes": a.shape, "durations_s": t.shape},
+        "period",
+    )
     if np.any(t < 0.0):
         msg = "'durations_s' must be non-negative."
         raise ValueError(msg)
@@ -1139,11 +1151,14 @@ def daily_vibration_exposure(
     """
     ahv = np.atleast_1d(np.asarray(total_values, dtype=np.float64))
     t = np.atleast_1d(np.asarray(durations_s, dtype=np.float64))
-    if ahv.ndim != 1 or ahv.size == 0 or ahv.shape != t.shape:
-        msg = (
-            "'total_values' and 'durations_s' must be non-empty, 1-D and equal-length."
-        )
+    if ahv.ndim != 1 or ahv.size == 0:
+        msg = "'total_values' must be a non-empty 1-D array."
         raise ValueError(msg)
+    require_equal_shapes(
+        "daily_vibration_exposure",
+        {"total_values": ahv.shape, "durations_s": t.shape},
+        "operation",
+    )
     if labels is None:
         labels = tuple(f"op {i + 1}" for i in range(ahv.size))
     else:

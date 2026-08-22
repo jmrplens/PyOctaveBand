@@ -69,6 +69,7 @@ import numpy as np
 
 from .._internal.validation import (
     require_choice,
+    require_equal_shapes,
     require_positive,
     require_ranks,
     require_same_length,
@@ -284,6 +285,7 @@ def _resolve_interior(
     frequencies: ArrayLike | None,
     model: str,
     name: str,
+    owner: str,
 ) -> tuple[
     NDArray[np.float64] | None,
     NDArray[np.float64],
@@ -298,6 +300,10 @@ def _resolve_interior(
     ``values`` (a panel ``R`` for :func:`enclosure_insertion_loss`, a target
     ``IL`` for :func:`enclosure_required_transmission_loss`), and returns
     ``(frequencies, values, correction C, room constant R_i, S_E, S_i)``.
+
+    *name* is the parameter the spectrum arrived under and *owner* the entry
+    point the caller typed, so a band count that disagrees is reported in the
+    caller's own vocabulary rather than in this helper's.
     """
     s_e = require_positive(external_area, "external_area")
     s_i = require_positive(internal_area, "internal_area")
@@ -316,9 +322,17 @@ def _resolve_interior(
 
     r_i = np.atleast_1d(np.asarray(room_constant(s_i, alpha), dtype=np.float64))
     r_i_b, v_b = np.broadcast_arrays(r_i, v)
-    if freqs is not None and freqs.shape != v_b.shape:
-        msg = f"'frequencies' must match the number of {name} / absorption bands."
-        raise ValueError(msg)
+    if freqs is not None:
+        # The band count is whatever the spectrum and the absorption broadcast
+        # to, so either of them can be the one that disagrees with the labels.
+        require_equal_shapes(
+            owner,
+            {
+                "frequencies": freqs.shape,
+                f"{name} / internal_absorption": v_b.shape,
+            },
+            "band",
+        )
     correction = 10.0 * np.log10(floor + s_e / r_i_b)
     return (
         freqs,
@@ -390,7 +404,8 @@ def enclosure_insertion_loss(
         internal_absorption,
         frequencies,
         model,
-        "panel_transmission_loss",
+        name="panel_transmission_loss",
+        owner="enclosure_insertion_loss",
     )
     return EnclosureResult(
         frequencies=freqs,
@@ -447,7 +462,8 @@ def enclosure_required_transmission_loss(
         internal_absorption,
         frequencies,
         model,
-        "insertion_loss",
+        name="insertion_loss",
+        owner="enclosure_required_transmission_loss",
     )
     return EnclosureResult(
         frequencies=freqs,

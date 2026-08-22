@@ -36,6 +36,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_equal_shapes
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
@@ -249,15 +251,21 @@ def open_plan_metrics(
     :return: :class:`OpenPlanResult` with ``d2s``, ``lp_as_4m``, ``rd``
         and ``rp``.
     :raises ValueError: If fewer than four positions are given
-        (Clause 5.2.2) or the three arrays differ in length.
+        (Clause 5.2.2) or the three arrays differ in shape.
     """
     r = np.asarray(positions_m, dtype=np.float64)
     lp = np.asarray(spl_a_speech, dtype=np.float64)
     sti = np.asarray(sti_values, dtype=np.float64)
 
-    if not (r.shape == lp.shape == sti.shape):
-        msg = "positions_m, spl_a_speech and sti_values must have the same length."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "open_plan_metrics",
+        {
+            "positions_m": r.shape,
+            "spl_a_speech": lp.shape,
+            "sti_values": sti.shape,
+        },
+        "position",
+    )
     if r.ndim != 1:
         msg = "Inputs must be one-dimensional."
         raise ValueError(msg)

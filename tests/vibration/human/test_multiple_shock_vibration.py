@@ -214,7 +214,10 @@ def test_invalid_inputs_raise() -> None:
         v.spinal_response([], 256.0)
     with pytest.raises(ValueError, match="positive"):
         v.daily_dose(50.0, 8.0, 0.0)
-    with pytest.raises(ValueError, match="must match"):
+    with pytest.raises(
+        ValueError,
+        match=r"daily_dose_multi: 'doses'.*must all have the same shape",
+    ):
         v.daily_dose_multi([1.0, 2.0], [1.0], [1.0, 2.0])
     with pytest.raises(ValueError, match="years must be"):
         v.injury_risk(1.0, start_age=20, years=0, days_per_year=120)

@@ -588,7 +588,9 @@ def test_tonal_result_does_not_alias_the_caller_s_arrays() -> None:
 
 def test_tonal_correction_validation() -> None:
     """The Kt spectrum must be one-dimensional, aligned, finite and ascending."""
-    with pytest.raises(ValueError, match="same length"):
+    with pytest.raises(
+        ValueError, match=r"tonal_correction: 'levels' .*'frequencies' .*same shape"
+    ):
         rd.tonal_correction([60.0, 60.0], [100.0, 125.0, 160.0])
     with pytest.raises(ValueError, match="At least three"):
         rd.tonal_correction([60.0, 60.0], [100.0, 125.0])
@@ -656,7 +658,7 @@ def test_long_term_level_validation() -> None:
         rd.long_term_corrected_level([])
     with pytest.raises(ValueError, match="finite"):
         rd.long_term_corrected_level([math.nan])
-    with pytest.raises(ValueError, match="one value per"):
+    with pytest.raises(ValueError, match=r"'daily_levels' .*'weights' .*same shape"):
         rd.long_term_corrected_level([50.0, 50.0], weights=[1.0])
     with pytest.raises(ValueError, match="positive"):
         rd.long_term_corrected_level([50.0], weights=[0.0])

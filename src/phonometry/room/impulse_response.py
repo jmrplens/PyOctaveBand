@@ -71,7 +71,11 @@ import numpy as np
 from scipy import signal
 
 from .._internal.utils import _typesignal
-from .._internal.validation import require_ranks, require_same_length
+from .._internal.validation import (
+    require_equal_shapes,
+    require_ranks,
+    require_same_length,
+)
 from .._internal.warnings import PhonometryWarning
 from ..io._resolve import (
     apply_calibration,
@@ -955,12 +959,17 @@ def _shaped_target_db(
         raise ValueError(msg)
     t_freq = np.asarray(target[0], dtype=np.float64)
     t_db = np.asarray(target[1], dtype=np.float64)
-    if t_freq.ndim != 1 or t_freq.size < 2 or t_db.shape != t_freq.shape:  # noqa: PLR2004
+    if t_freq.ndim != 1 or t_freq.size < 2:  # noqa: PLR2004
         msg = (
             "an array target must be a (frequencies_hz, magnitude_db) pair "
-            "of equal-length 1-D arrays with at least 2 points"
+            "of 1-D arrays with at least 2 points"
         )
         raise ValueError(msg)
+    require_equal_shapes(
+        "shaped_sweep_signal",
+        {"frequencies_hz": t_freq.shape, "magnitude_db": t_db.shape},
+        "frequency",
+    )
     if np.any(t_freq <= 0.0) or np.any(np.diff(t_freq) <= 0.0):
         msg = "target frequencies must be positive and increasing"
         raise ValueError(msg)

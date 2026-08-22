@@ -127,5 +127,8 @@ def test_result_plot_smoke() -> None:
 def test_rejects_shape_mismatch() -> None:
     levels_2_bands = np.array([1.0, 2.0])
     frequencies_3_bands = np.array([100.0, 200.0, 300.0])
-    with pytest.raises(ValueError, match="'rnl' and 'frequency'"):
+    with pytest.raises(
+        ValueError,
+        match=r"monopole_source_level: 'rnl'.*must all have the same shape",
+    ):
         underwater.monopole_source_level(levels_2_bands, frequencies_3_bands, 8.0)

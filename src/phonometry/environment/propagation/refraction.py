@@ -55,6 +55,7 @@ import numpy as np
 
 from ..._internal.rays import march_rays
 from ..._internal.validation import (
+    require_equal_shapes,
     require_positive,
     require_ranks,
     require_same_length,
@@ -246,9 +247,11 @@ def _clean_profile(
     if z.ndim != 1 or z.size < _MIN_POLYLINE_NODES:
         msg = "the profile must have at least two height samples."
         raise ValueError(msg)
-    if c.shape != z.shape:
-        msg = "'sound_speeds' must match 'heights' in length."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "EffectiveSoundSpeedProfile",
+        {"heights": z.shape, "sound_speeds": c.shape},
+        "profile node",
+    )
     if not (np.all(np.isfinite(z)) and np.all(np.isfinite(c))):
         msg = "the profile heights and speeds must be finite."
         raise ValueError(msg)

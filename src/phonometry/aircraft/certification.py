@@ -27,7 +27,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_ranks, require_same_length
+from .._internal.validation import (
+    require_equal_shapes,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -467,12 +471,11 @@ def epnl_from_pnlt(
     dt_arr = (
         np.full(p.shape, float(dt_raw.reshape(-1)[0])) if dt_raw.size == 1 else dt_raw
     )
-    if (
-        dt_arr.shape != p.shape
-        or np.any(dt_arr <= 0.0)
-        or not np.all(np.isfinite(dt_arr))
-    ):
-        msg = "'dt' must be positive and match 'pnlt' in length."
+    require_equal_shapes(
+        "epnl_from_pnlt", {"pnlt": p.shape, "dt": dt_arr.shape}, "record"
+    )
+    if np.any(dt_arr <= 0.0) or not np.all(np.isfinite(dt_arr)):
+        msg = "'dt' must be positive and finite."
         raise ValueError(msg)
     if reference_time <= 0.0 or not np.isfinite(reference_time):
         msg = "'reference_time' must be a positive, finite number."
@@ -482,8 +485,11 @@ def epnl_from_pnlt(
     delta_b = 0.0
     if tone_corrections is not None:
         c = np.atleast_1d(np.asarray(tone_corrections, dtype=np.float64))
-        if c.shape != p.shape or not np.all(np.isfinite(c)):
-            msg = "'tone_corrections' must match 'pnlt' in length and be finite."
+        require_equal_shapes(
+            "epnl_from_pnlt", {"pnlt": p.shape, "tone_corrections": c.shape}, "record"
+        )
+        if not np.all(np.isfinite(c)):
+            msg = "'tone_corrections' must be finite."
             raise ValueError(msg)
         t_mid = np.cumsum(dt_arr) - 0.5 * dt_arr
         window = c[np.abs(t_mid - t_mid[km]) <= 1.0 + 1e-9]

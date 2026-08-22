@@ -38,7 +38,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_ranks, require_same_length
+from .._internal.validation import (
+    require_equal_shapes,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -425,8 +429,17 @@ def _criterion_curve_at(
     )
 
 
-def _align_levels(levels: ArrayLike, frequencies: ArrayLike | None) -> np.ndarray:
-    """Validate levels and align them to :data:`OCTAVE_BANDS`."""
+def _align_levels(
+    levels: ArrayLike, frequencies: ArrayLike | None, owner: str
+) -> np.ndarray:
+    """Validate levels and align them to :data:`OCTAVE_BANDS`.
+
+    :param levels: Octave-band sound pressure levels, in dB.
+    :param frequencies: Optional band centre frequencies matching ``levels``.
+    :param owner: Name of the entry point the caller typed, for the messages.
+    :return: The levels on the ten :data:`OCTAVE_BANDS`, absent bands NaN.
+    :raises ValueError: for malformed inputs or unknown band frequencies.
+    """
     lv = np.atleast_1d(np.asarray(levels, dtype=np.float64))
     if lv.ndim != 1:
         msg = "levels must be a 1-D vector of octave-band levels."
@@ -440,9 +453,7 @@ def _align_levels(levels: ArrayLike, frequencies: ArrayLike | None) -> np.ndarra
             raise ValueError(msg)
         return lv
     fr = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
-    if fr.shape != lv.shape:
-        msg = "levels and frequencies must have the same shape."
-        raise ValueError(msg)
+    require_equal_shapes(owner, {"levels": lv.shape, "frequencies": fr.shape}, "band")
     aligned = np.full(_N_BANDS, np.nan)
     for f, level in zip(fr, lv, strict=True):
         matches = np.isclose(OCTAVE_BANDS, f, rtol=0.03)
@@ -486,7 +497,7 @@ def noise_criterion(
     :return: An :class:`NCResult` with the designation and its ``.plot()``.
     :raises ValueError: for malformed inputs or unknown band frequencies.
     """
-    aligned = _align_levels(levels, frequencies)
+    aligned = _align_levels(levels, frequencies, "noise_criterion")
     valid = ~np.isnan(aligned)
     if not valid.any():
         msg = "no valid octave-band levels were supplied."
@@ -579,7 +590,7 @@ def room_criterion(levels: ArrayLike, frequencies: ArrayLike | None = None) -> R
     :return: An :class:`RCResult` with the rating, tag and its ``.plot()``.
     :raises ValueError: if the 500/1000/2000 Hz mid-frequency bands are absent.
     """
-    aligned = _align_levels(levels, frequencies)
+    aligned = _align_levels(levels, frequencies, "room_criterion")
     mid = aligned[5:8]  # 500, 1000, 2000 Hz.
     if np.isnan(mid).any():
         msg = (

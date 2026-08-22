@@ -485,7 +485,7 @@ def test_invalid_frequencies_raise(frequency: list[float]) -> None:
 
 
 def test_mismatched_band_spectrum_raises() -> None:
-    with pytest.raises(ValueError, match="band_sel"):
+    with pytest.raises(ValueError, match="band_sel.*same shape"):
         weighted_exposure([100.0, 200.0], [170.0], "LF")
 
 

@@ -83,6 +83,7 @@ if TYPE_CHECKING:
 
 
 from ..._internal.validation import (
+    require_equal_shapes,
     require_non_negative,
     require_positive,
     require_ranks,
@@ -396,9 +397,11 @@ def rigid_mass_calibration_check(
     tolerance = require_positive(tolerance, "tolerance")
     freq = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     measured = np.abs(np.atleast_1d(np.asarray(frf, dtype=np.complex128)))
-    if measured.shape != freq.shape:
-        msg = "'frf' and 'frequencies' must have the same shape."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "rigid_mass_calibration_check",
+        {"frf": measured.shape, "frequencies": freq.shape},
+        "frequency",
+    )
     omega = _omega(freq)
     if quantity == "accelerance":
         expected = np.full_like(freq, 1.0 / mass)

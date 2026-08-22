@@ -366,6 +366,30 @@ def test_empty_polar_rejected() -> None:
         )
 
 
+def test_mismatched_polar_pair_rejected() -> None:
+    """A pattern with more angles than levels names both shapes."""
+    f, rel = _flat_response()
+    ragged_polar = electroacoustics.MicrophoneDirectivity(
+        polar=([0.0, 90.0, 180.0], [0.0, -3.0])
+    )
+    with pytest.raises(ValueError, match="'polar angles'.*same shape"):
+        electroacoustics.microphone_characteristics(
+            f, rel, _M_MV, directivity=ragged_polar
+        )
+
+
+def test_two_dimensional_polar_rejected() -> None:
+    """Angles and levels agreeing on a two-dimensional shape are still refused."""
+    f, rel = _flat_response()
+    grid_polar = electroacoustics.MicrophoneDirectivity(
+        polar=([[0.0, 90.0], [180.0, 270.0]], [[0.0, -3.0], [-6.0, -3.0]])
+    )
+    with pytest.raises(ValueError, match="'polar' angles and levels must be 1-D"):
+        electroacoustics.microphone_characteristics(
+            f, rel, _M_MV, directivity=grid_polar
+        )
+
+
 def test_nonfinite_stated_directivity_index_rejected_with_polar() -> None:
     """A non-finite stated DI is rejected whether or not a pattern is given."""
     f, rel = _flat_response()

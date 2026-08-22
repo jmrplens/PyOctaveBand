@@ -657,6 +657,23 @@ def test_assess_tones_rejects_length_mismatch() -> None:
         psychoacoustics.assess_tones([100.0, 200.0], [60.0], [50.0], 2.7)
 
 
+def test_assess_tones_rejects_uncertainty_mismatch() -> None:
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"assess_tones: 'tone_frequencies' .*'extended_uncertainties' .* "
+            r"same shape, one value per tone"
+        ),
+    ):
+        psychoacoustics.assess_tones(
+            [100.0, 200.0],
+            [60.0, 61.0],
+            [50.0, 51.0],
+            2.7,
+            extended_uncertainties=[1.0],
+        )
+
+
 def test_assess_tones_rejects_empty() -> None:
     with pytest.raises(ValueError, match="At least one tone is required"):
         psychoacoustics.assess_tones([], [], [], 2.7)
@@ -777,7 +794,13 @@ def test_uncertainty_constants_and_validation() -> None:
         psychoacoustics.audibility_uncertainty([], [50.0], 137.3, 2.7)
     with pytest.raises(ValueError, match="finite"):
         psychoacoustics.audibility_uncertainty([60.0, np.nan], [50.0], 137.3, 2.7)
-    with pytest.raises(ValueError, match="share their length"):
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"mean_audibility_uncertainty: 'decisive_audibilities' .*"
+            r"'extended_uncertainties' .* same shape, one value per spectrum"
+        ),
+    ):
         psychoacoustics.mean_audibility_uncertainty([9.18, 6.04], [3.21])
 
 

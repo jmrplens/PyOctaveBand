@@ -307,9 +307,9 @@ def test_detection_range_validates_its_arguments(
 
 
 def test_detection_range_from_curve_validates_its_arguments() -> None:
-    with pytest.raises(ValueError, match="propagation_loss"):
+    with pytest.raises(ValueError, match="propagation_loss.*same shape"):
         detection_range_from_curve(60.0, [1.0, 2.0], [10.0])
-    with pytest.raises(ValueError, match="range_m"):
+    with pytest.raises(ValueError, match="range_m.*strictly increasing"):
         detection_range_from_curve(60.0, [2.0, 1.0], [10.0, 20.0])
     with pytest.raises(ValueError, match="crossing"):
         detection_range_from_curve(60.0, [1.0, 2.0], [10.0, 20.0], crossing="middle")

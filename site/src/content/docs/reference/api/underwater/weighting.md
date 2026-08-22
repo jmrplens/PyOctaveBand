@@ -254,7 +254,7 @@ dual-metric rule requires.
 | Name | Description |
 | :--- | :--- |
 | `frequency_hz` | Band centre frequencies, in Hz (1-D, positive). |
-| `band_sel` | Per-band single-event SEL, in dB re 1 µPa²·s (or dB re (20 µPa)²·s for an in-air group); same length. `-inf` is accepted for a band that carries no energy, which is what [`strike_sel_spectrum`](/phonometry/reference/api/underwater/pile-driving-noise/#strike_sel_spectrum) returns for bands narrower than its FFT bin spacing; such a band adds nothing to the energy sum. Both input arrays are copied, so the result never aliases the caller's data. |
+| `band_sel` | Per-band single-event SEL, in dB re 1 µPa²·s (or dB re (20 µPa)²·s for an in-air group); same shape. `-inf` is accepted for a band that carries no energy, which is what [`strike_sel_spectrum`](/phonometry/reference/api/underwater/pile-driving-noise/#strike_sel_spectrum) returns for bands narrower than its FFT bin spacing; such a band adds nothing to the energy sum. Both input arrays are copied, so the result never aliases the caller's data. |
 | `group` | Hearing-group code as used by `guidance`. |
 | `guidance` | `"nmfs-2024"` (default), `"nmfs-2018"` or `"southall-2019"`. |
 | `impulsive` | Compare against the impulsive criteria (the default, the case for pile driving and air guns). |

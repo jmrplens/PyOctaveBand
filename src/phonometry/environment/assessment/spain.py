@@ -85,7 +85,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import (
+    require_equal_shapes,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -431,12 +435,11 @@ def _validate_kt_spectrum(band_levels: np.ndarray, freqs: np.ndarray) -> None:
     if band_levels.ndim != 1 or freqs.ndim != 1:
         msg = "'levels' and 'frequencies' must be one-dimensional."
         raise ValueError(msg)
-    if band_levels.shape != freqs.shape:
-        msg = (
-            "'levels' and 'frequencies' must have the same length; got "
-            f"{band_levels.size} and {freqs.size}."
-        )
-        raise ValueError(msg)
+    require_equal_shapes(
+        "tonal_correction",
+        {"levels": band_levels.shape, "frequencies": freqs.shape},
+        "band",
+    )
     if band_levels.size < _MIN_KT_BANDS:
         msg = (
             "At least three one-third-octave bands are needed: the procedure "
@@ -775,12 +778,11 @@ def long_term_corrected_level(
         counts = np.ones_like(levels)
     else:
         counts = np.asarray(weights, dtype=np.float64).ravel()
-        if counts.shape != levels.shape:
-            msg = (
-                "'weights' must have one value per daily level; got "
-                f"{counts.size} for {levels.size} levels."
-            )
-            raise ValueError(msg)
+        require_equal_shapes(
+            "long_term_corrected_level",
+            {"daily_levels": levels.shape, "weights": counts.shape},
+            "daily level",
+        )
         if not np.all(np.isfinite(counts)) or np.any(counts <= 0.0):
             msg = "'weights' must contain positive, finite values."
             raise ValueError(msg)

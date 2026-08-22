@@ -28,7 +28,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import (
+    require_equal_shapes,
+    require_ranks,
+    require_same_length,
+)
 from ..acoustics import UNDERWATER_REFERENCE_PRESSURE, _positive
 
 if TYPE_CHECKING:
@@ -244,9 +248,11 @@ def monopole_source_level(
         raise ValueError(msg)
     if rnl_arr.size == 1 and freqs.size > 1:
         rnl_arr = np.full(freqs.shape, rnl_arr[0])
-    if rnl_arr.shape != freqs.shape:
-        msg = "'rnl' and 'frequency' must have the same length."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "monopole_source_level",
+        {"rnl": rnl_arr.shape, "frequency": freqs.shape},
+        "frequency",
+    )
     source_depth = _SOURCE_DEPTH_FRACTION * d
     delta_l = _surface_correction(freqs, source_depth, speed)
     return ShipSourceLevelResult(

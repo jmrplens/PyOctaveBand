@@ -191,6 +191,27 @@ def test_validation() -> None:
         noise_control.enclosure_insertion_loss([20.0], 6.0, 5.0, 0.3, model="hansen")
 
 
+def test_frequency_labels_off_the_band_count_are_refused() -> None:
+    """The labels must run over the bands the enclosure was solved on.
+
+    The band count is whatever the supplied spectrum and the interior
+    absorption broadcast to, so the message names both: a scalar absorption
+    leaves the spectrum in charge, a per-band one can set the count on its own.
+    """
+    with pytest.raises(ValueError, match=r"'frequencies'.*same shape"):
+        noise_control.enclosure_insertion_loss(
+            [20.0, 30.0, 40.0], 6.0, 5.0, 0.3, frequencies=[125.0, 250.0, 500.0, 1000.0]
+        )
+    with pytest.raises(ValueError, match=r"'frequencies'.*same shape"):
+        noise_control.enclosure_insertion_loss(
+            [20.0], 6.0, 5.0, np.array([0.1, 0.2, 0.3]), frequencies=[125.0]
+        )
+    with pytest.raises(ValueError, match=r"'frequencies'.*same shape"):
+        noise_control.enclosure_required_transmission_loss(
+            [10.0, 20.0], 6.0, 5.0, 0.3, frequencies=[125.0, 250.0, 500.0]
+        )
+
+
 @pytest.mark.parametrize("trim", [True, False], ids=["short", "long"])
 def test_a_room_constant_off_the_band_axis_is_refused(trim: bool) -> None:
     """``R_i`` is the column a fiche prints without complaining.

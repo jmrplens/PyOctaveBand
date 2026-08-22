@@ -230,7 +230,9 @@ def test_rc_requires_mid_frequency_bands() -> None:
 def test_invalid_inputs_raise() -> None:
     with pytest.raises(ValueError, match="octave-band values"):
         rn.noise_criterion([1.0, 2.0, 3.0])
-    with pytest.raises(ValueError, match="same shape"):
+    with pytest.raises(
+        ValueError, match=r"noise_criterion: 'levels'.*must all have the same shape"
+    ):
         rn.noise_criterion([1.0, 2.0], [63.0])
     with pytest.raises(ValueError, match="not one of"):
         rn.noise_criterion([50.0], [777.0])

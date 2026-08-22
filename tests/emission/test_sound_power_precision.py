@@ -720,7 +720,10 @@ def test_field_indicators_shape_mismatch_raises() -> None:
     mismatched_levels = np.full((3, 1), 60.0)
     with pytest.raises(
         ValueError,
-        match="'segment_intensity' and 'segment_pressure_levels' must have",
+        match=(
+            r"precision_field_indicators: 'segment_intensity' "
+            r".*'segment_pressure_levels' .*same shape"
+        ),
     ):
         precision_field_indicators(intensity, mismatched_levels)
 
