@@ -221,6 +221,32 @@ def test_profile_rejects_roll_mask_with_an_extra_axis() -> None:
         dataclasses.replace(prof, ground_roll=column)
 
 
+def test_profile_names_the_segments_and_not_the_vertices_it_counted() -> None:
+    """A profile of N breakpoints has N-1 segments, and the message says so.
+
+    Naming the count ``path`` would report one fewer than ``path`` holds and
+    send a reader to measure the wrong attribute; naming it ``path segments``
+    says which derived quantity the number is.
+    """
+    prof = _DB.profile("747100", "departure")
+    vertices = len(prof.path)
+    surplus = np.zeros(vertices, dtype=bool)
+    with pytest.raises(ValueError, match=rf"'path segments' \({vertices - 1}\)"):
+        dataclasses.replace(prof, ground_roll=surplus, landing_roll=surplus)
+
+
+def test_a_profile_with_no_path_reports_no_segments_rather_than_minus_one() -> None:
+    """An empty path has nought segments, which is a count and not an error."""
+    prof = _DB.profile("747100", "departure")
+    empty = dataclasses.replace(
+        prof,
+        path=np.zeros((0, np.asarray(prof.path).shape[1])),
+        ground_roll=np.zeros(0, dtype=bool),
+        landing_roll=np.zeros(0, dtype=bool),
+    )
+    assert len(empty.path) == 0
+
+
 def test_profile_plot_highlights_full_roll_span() -> None:
     """The roll highlight includes both endpoints of every roll segment."""
     prof = _DB.profile("747100", "arrival")
