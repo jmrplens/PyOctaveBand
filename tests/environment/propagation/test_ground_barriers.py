@@ -181,6 +181,19 @@ def test_ground_effect_rejects_non_finite_impedance() -> None:
         environment.ground_effect(_BANDS, 1.0, 1.0, 20.0, impedance=0.0)
 
 
+def test_impedance_is_a_scalar_or_one_value_per_frequency() -> None:
+    # Two admissible forms, and the message names both: a scalar is deliberately
+    # broadcast over every frequency, an array must carry one value per band.
+    broadcast = environment.ground_effect(_BANDS, 1.0, 1.0, 20.0, impedance=10.0 + 5.0j)
+    assert broadcast.normalized_impedance.shape == _BANDS.shape
+    with pytest.raises(ValueError, match=r"'impedance' must be a scalar or match"):
+        environment.ground_effect(_BANDS, 1.0, 1.0, 20.0, impedance=_BANDS[:3] * 1j)
+    with pytest.raises(ValueError, match=r"'impedance' must be a scalar or match"):
+        environment.spherical_reflection_coefficient(
+            _BANDS, _BANDS[:3] * 1j, 1.0, 1.5, 50.0
+        )
+
+
 def test_unknown_ground_model_raises() -> None:
     with pytest.raises(ValueError, match="unknown ground model"):
         environment.ground_effect(

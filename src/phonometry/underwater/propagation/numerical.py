@@ -58,6 +58,7 @@ import numpy as np
 
 from ..._internal.rays import DynamicRays, SlopingBoundary, march_rays
 from ..._internal.validation import (
+    require_equal_shapes,
     require_positive,
     require_ranks,
     require_same_length,
@@ -131,15 +132,27 @@ _MIN_PE_DEPTH_POINTS = 16
 def _clean_profile(
     depths: NDArray[np.float64] | list[float],
     sound_speeds: NDArray[np.float64] | list[float],
+    owner: str,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """One validated sound-speed profile out of the two node arrays.
+
+    :param depths: Depth nodes of the profile, in metres.
+    :param sound_speeds: Sound speed at each of those depths, in m/s.
+    :param owner: The solver the caller typed, for the error messages: the
+        four of them share this cleaner, and the name in the message should
+        be the one on the call that raised.
+    :return: The coerced ``(depths, sound_speeds)`` pair.
+    :raises ValueError: if the two do not describe one increasing profile
+        from the surface down.
+    """
     z = np.asarray(depths, dtype=np.float64)
     c = np.asarray(sound_speeds, dtype=np.float64)
     if z.ndim != 1 or z.size < _MIN_POLYLINE_NODES:
         msg = "'depths' must be a 1-D array of at least two points."
         raise ValueError(msg)
-    if c.shape != z.shape:
-        msg = "'sound_speeds' must match 'depths' in length."
-        raise ValueError(msg)
+    require_equal_shapes(
+        owner, {"depths": z.shape, "sound_speeds": c.shape}, "profile node"
+    )
     if not (np.all(np.isfinite(z)) and np.all(np.isfinite(c))):
         msg = "'depths' and 'sound_speeds' must be finite."
         raise ValueError(msg)
@@ -161,6 +174,7 @@ def _clean_bathymetry(
     ]
     | None,
     z_prof: NDArray[np.float64],
+    owner: str,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]] | None:
     """One validated depth(r) polyline out of the node pair, or ``None``.
 
@@ -170,6 +184,15 @@ def _clean_bathymetry(
     column at the source is stated rather than extrapolated, and it may not
     dive below the profile's last node, because the profile *is* the medium
     and a bottom below it would put water where no sound speed was given.
+
+    :param bathymetry: The ``(ranges_m, depths_m)`` node pair, or ``None``.
+    :param z_prof: Depth nodes of the sound-speed profile, whose last node is
+        the deepest water the medium is stated for.
+    :param owner: The solver the caller typed, for the error messages: both
+        of them share this cleaner.
+    :return: The coerced ``(ranges, depths)`` pair, or ``None``.
+    :raises ValueError: if the pair does not describe one increasing bottom
+        polyline from the source, inside the profile.
     """
     if bathymetry is None:
         return None
@@ -179,12 +202,14 @@ def _clean_bathymetry(
         raise ValueError(msg)
     br = np.asarray(pair[0], dtype=np.float64).ravel()
     bd = np.asarray(pair[1], dtype=np.float64).ravel()
-    if br.size < _MIN_POLYLINE_NODES or bd.shape != br.shape:
-        msg = (
-            "the two halves of 'bathymetry' must be 1-D"
-            " arrays of equal length, at least two points."
-        )
+    if br.size < _MIN_POLYLINE_NODES:
+        msg = "the two halves of 'bathymetry' must carry at least two points."
         raise ValueError(msg)
+    require_equal_shapes(
+        owner,
+        {"bathymetry ranges": br.shape, "bathymetry depths": bd.shape},
+        "node",
+    )
     if not (np.all(np.isfinite(br)) and np.all(np.isfinite(bd))):
         msg = "the bathymetry must be finite."
         raise ValueError(msg)
@@ -509,7 +534,7 @@ def normal_modes(
     """
     f = require_positive(frequency_hz, "frequency_hz")
     rho = require_positive(density, "density")
-    z_prof, c_prof = _clean_profile(depths, sound_speeds)
+    z_prof, c_prof = _clean_profile(depths, sound_speeds, "normal_modes")
     water_depth = float(z_prof[-1])
     zs = float(source_depth)
     zr = float(receiver_depth)
@@ -870,8 +895,8 @@ def ray_trace(
     :return: A :class:`RayTraceResult`.
     :raises ValueError: If the inputs are invalid.
     """
-    z_prof, c_prof = _clean_profile(depths, sound_speeds)
-    bathy = _clean_bathymetry(bathymetry, z_prof)
+    z_prof, c_prof = _clean_profile(depths, sound_speeds, "ray_trace")
+    bathy = _clean_bathymetry(bathymetry, z_prof, "ray_trace")
     water_depth = float(z_prof[-1])
     depth_at_source = water_depth if bathy is None else float(bathy[1][0])
     zs = float(source_depth)
@@ -3278,8 +3303,8 @@ def gaussian_beams(
     """
     f = require_positive(frequency_hz, "frequency_hz")
     fan = BeamFan() if fan is None else fan
-    z_prof, c_prof = _clean_profile(depths, sound_speeds)
-    bathy = _clean_bathymetry(bathymetry, z_prof)
+    z_prof, c_prof = _clean_profile(depths, sound_speeds, "gaussian_beams")
+    bathy = _clean_bathymetry(bathymetry, z_prof, "gaussian_beams")
     water_depth = float(z_prof[-1])
     depth_at_source = water_depth if bathy is None else float(bathy[1][0])
     zs = float(source_depth)
@@ -3641,7 +3666,7 @@ def parabolic_equation(
     from scipy.fft import dst, idst
 
     f = require_positive(frequency_hz, "frequency_hz")
-    z_prof, c_prof = _clean_profile(depths, sound_speeds)
+    z_prof, c_prof = _clean_profile(depths, sound_speeds, "parabolic_equation")
     water_depth = float(z_prof[-1])
     zs = float(source_depth)
     if not (0.0 < zs < water_depth):

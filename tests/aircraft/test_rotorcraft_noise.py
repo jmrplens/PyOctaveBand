@@ -1141,8 +1141,10 @@ def test_fc_weights_lookup_table_is_honoured() -> None:
 
 
 def test_fc_weights_validation() -> None:
-    with pytest.raises(ValueError, match="equal, non-zero size"):
+    with pytest.raises(ValueError, match=r"'path_angles'.*same shape"):
         flight_condition_weights([50.0, 60.0], [0.0], 55.0, 0.0)
+    with pytest.raises(ValueError, match=r"'airspeeds'.*non-empty"):
+        flight_condition_weights([[50.0, 60.0]], [[0.0, 1.0]], 55.0, 0.0)
     with pytest.raises(ValueError, match="finite"):
         flight_condition_weights([50.0, 60.0], [0.0, 0.0], np.nan, 0.0)
     with pytest.raises(ValueError, match="shape"):

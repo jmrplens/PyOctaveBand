@@ -33,6 +33,8 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ..._internal.validation import (
+    require_equal_shapes,
+    require_finite_array,
     require_non_negative,
     require_positive,
     require_positive_array,
@@ -218,10 +220,12 @@ def ocean_ambient_noise(
     energies = 10.0 ** (wind / 10.0) + 10.0 ** (thermal / 10.0)
     ship_arr: NDArray[np.float64] | None = None
     if shipping is not None:
-        ship_arr = np.asarray(shipping, dtype=np.float64)
-        if ship_arr.shape != f.shape or not np.all(np.isfinite(ship_arr)):
-            msg = "'shipping' must be finite and match 'frequency_hz' in length."
-            raise ValueError(msg)
+        ship_arr = require_finite_array(shipping, "shipping")
+        require_equal_shapes(
+            "ocean_ambient_noise",
+            {"frequency_hz": f.shape, "shipping": ship_arr.shape},
+            "frequency",
+        )
         energies = energies + 10.0 ** (ship_arr / 10.0)
     spectrum = 10.0 * np.log10(energies)
     return AmbientNoiseResult(

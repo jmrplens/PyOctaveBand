@@ -539,12 +539,22 @@ def test_contour_phasors_subtract_mismatch() -> None:
     sim = FDTD2D(C0, 0.01, shape=(40, 50))
     p1 = sim.add_contour_probe(5, 10, 20, 25, frequencies=[F0, 2.0 * F0])
     p2 = sim.add_contour_probe(5, 11, 20, 25, frequencies=[F0])
+    p3 = sim.add_contour_probe(6, 11, 20, 25, frequencies=[F0])
     sim.run(4)
     base = p1.phasors(F0)
     harmonic = p1.phasors(2.0 * F0)
-    shifted = p2.phasors(F0)
+    longer = p2.phasors(F0)
+    shifted = p3.phasors(F0)
     with pytest.raises(ValueError, match="different frequencies"):
         base.subtract(harmonic)
+    with pytest.raises(
+        ValueError,
+        match=r"ContourPhasors\.subtract: 'positions' .*'reference\.positions' "
+        r".*same shape",
+    ):
+        base.subtract(longer)
+    # Same sample count, one cell along: only the coordinates disagree.
+    assert shifted.positions.shape == base.positions.shape
     with pytest.raises(ValueError, match="different contours"):
         base.subtract(shifted)
 

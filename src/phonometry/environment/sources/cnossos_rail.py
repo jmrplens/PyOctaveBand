@@ -82,7 +82,9 @@ import numpy as np
 
 from ..._internal.validation import (
     require_axis_count,
+    require_axis_rank,
     require_equal_counts,
+    require_equal_shapes,
     require_ranks,
     require_same_length,
 )
@@ -2033,12 +2035,12 @@ def roughness_to_frequency(
     """
     y = np.asarray(levels, dtype=np.float64)
     lam = np.asarray(wavelengths, dtype=np.float64) / 1000.0
-    if y.ndim != 1 or y.shape != lam.shape:
-        msg = (
-            "'levels' and 'wavelengths' must be one-dimensional and of the "
-            f"same length; got {y.shape} and {lam.shape}."
-        )
-        raise ValueError(msg)
+    require_axis_rank(y, "roughness_to_frequency", "levels", 1)
+    require_equal_shapes(
+        "roughness_to_frequency",
+        {"levels": y.shape, "wavelengths": lam.shape},
+        "wavelength",
+    )
     if np.any(lam <= 0.0):
         msg = "'wavelengths' must all be positive."
         raise ValueError(msg)

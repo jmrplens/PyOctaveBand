@@ -873,8 +873,15 @@ def test_invalid_inputs() -> None:
         rolling_sound_power(roughness, roughness, 0)
     with pytest.raises(ValueError, match="non-negative number of m"):
         impact_roughness(roughness, -1.0)
-    with pytest.raises(ValueError, match="same length"):
+    with pytest.raises(
+        ValueError,
+        match=r"roughness_to_frequency: 'levels' .*'wavelengths' .*same shape",
+    ):
         roughness_to_frequency([1.0, 2.0], [1.0], 50.0)
+    with pytest.raises(
+        ValueError, match=r"roughness_to_frequency: 'levels' must have one axis"
+    ):
+        roughness_to_frequency([[1.0, 2.0]], [1.0, 2.0], 50.0)
     with pytest.raises(ValueError, match="'wavelengths' must all be positive"):
         roughness_to_frequency([1.0, 2.0], [1.0, 0.0], 50.0)
     with pytest.raises(ValueError, match="'frequencies' must all be positive"):

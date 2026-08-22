@@ -672,8 +672,10 @@ def test_invalid_bathymetry_is_rejected() -> None:
     good = {"source_depth": 60.0, "launch_angles_deg": [10.0], "max_range": 1000.0}
     with pytest.raises(ValueError, match="pair"):
         ray_trace([0.0, 200.0], [_C, _C], **good, bathymetry=([0.0, 1000.0],))  # type: ignore[arg-type]
-    with pytest.raises(ValueError, match="equal length"):
+    with pytest.raises(ValueError, match=r"ray_trace: 'bathymetry ranges'.*same shape"):
         ray_trace([0.0, 200.0], [_C, _C], **good, bathymetry=([0.0, 1000.0], [200.0]))
+    with pytest.raises(ValueError, match="at least two points"):
+        ray_trace([0.0, 200.0], [_C, _C], **good, bathymetry=([0.0], [200.0]))
     with pytest.raises(ValueError, match="strictly increasing"):
         ray_trace(
             [0.0, 200.0],

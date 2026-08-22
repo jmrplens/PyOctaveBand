@@ -60,6 +60,7 @@ if TYPE_CHECKING:
 
 
 from .._internal.validation import (
+    require_equal_shapes,
     require_positive,
     require_ranks,
     require_same_length,
@@ -159,9 +160,11 @@ def mean_velocity_level(levels: ArrayLike, areas: ArrayLike | None = None) -> fl
         mean_energy = float(np.mean(energy))
     else:
         s = np.asarray(areas, dtype=np.float64)
-        if s.shape != lv.shape:
-            msg = "'areas' must match the shape of 'levels'."
-            raise ValueError(msg)
+        require_equal_shapes(
+            "mean_velocity_level",
+            {"levels": lv.shape, "areas": s.shape},
+            "position",
+        )
         mean_energy = float(np.sum(s * energy) / np.sum(s))
     return float(10.0 * np.log10(mean_energy))
 
@@ -436,9 +439,11 @@ def sound_power_from_vibration(
     freq = None
     if frequencies is not None:
         freq = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
-        if freq.shape != lv.shape:
-            msg = "'frequencies' must match the shape of 'velocity_level'."
-            raise ValueError(msg)
+        require_equal_shapes(
+            "sound_power_from_vibration",
+            {"velocity_level": lv.shape, "frequencies": freq.shape},
+            "band",
+        )
     return VibrationSoundPowerResult(
         velocity_level=lv,
         sound_power_level=np.asarray(lw, dtype=np.float64),

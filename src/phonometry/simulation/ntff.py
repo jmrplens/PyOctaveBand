@@ -68,6 +68,8 @@ from typing import TYPE_CHECKING
 import numpy as np
 from scipy.special import hankel2
 
+from .._internal.validation import require_equal_shapes
+
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
 
@@ -190,7 +192,15 @@ class ContourPhasors:
         if not np.isclose(self.frequency, reference.frequency):
             msg = "cannot subtract phasors at different frequencies"
             raise ValueError(msg)
-        if self.positions.shape != reference.positions.shape or not (
+        require_equal_shapes(
+            "ContourPhasors.subtract",
+            {
+                "positions": self.positions.shape,
+                "reference.positions": reference.positions.shape,
+            },
+            "sample",
+        )
+        if not (
             np.allclose(self.positions, reference.positions)
             and np.allclose(self.normals, reference.normals)
         ):

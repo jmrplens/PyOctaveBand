@@ -18,6 +18,7 @@ import pytest
 from phonometry.underwater.sonar_equation import (
     SonarEquationResult,
     active_sonar_equation,
+    detection_range_from_curve,
     passive_sonar_equation,
 )
 
@@ -239,3 +240,19 @@ def test_ainslie_active_orca_hearing_threshold_fom() -> None:
     # masking level with no array gain and no detection threshold.
     res = active_sonar_equation(198.2, 0.0, -29.0, 51.2)
     assert res.figure_of_merit == pytest.approx(59.0, abs=0.05)
+
+
+def test_a_detection_curve_of_two_axes_is_refused_by_name() -> None:
+    """A curve is one axis, and the crossing search cannot answer for a grid.
+
+    Two equal two-dimensional inputs agree on their shape, so only the rank
+    sees them. Without it the interpolation of the bracketing pair ended in
+    numpy's "only 0-dimensional arrays can be converted to Python scalars",
+    which names neither this function nor the argument that was wrong.
+    """
+    ranges = np.array([100.0, 200.0, 300.0, 400.0])
+    losses = np.array([40.0, 50.0, 60.0, 70.0])
+    assert detection_range_from_curve(55.0, ranges, losses) == pytest.approx(250.0)
+    grid_r, grid_pl = ranges.reshape(2, 2), losses.reshape(2, 2)
+    with pytest.raises(ValueError, match=r"'range_m' must have one axis"):
+        detection_range_from_curve(55.0, grid_r, grid_pl)

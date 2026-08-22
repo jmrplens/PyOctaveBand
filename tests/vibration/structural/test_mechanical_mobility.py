@@ -203,7 +203,10 @@ def test_rigid_mass_calibration_validation() -> None:
         )
     with pytest.raises(ValueError, match="mass"):
         vibration.rigid_mass_calibration_check([0.1], [100.0], 0.0)
-    with pytest.raises(ValueError, match="same shape"):
+    with pytest.raises(
+        ValueError,
+        match=r"rigid_mass_calibration_check: 'frf'.*'frequencies'.*same shape",
+    ):
         vibration.rigid_mass_calibration_check([0.1, 0.1], [100.0], 10.0)
     with pytest.raises(ValueError, match="frequency"):
         vibration.rigid_mass_calibration_check([0.1], [0.0], 10.0)

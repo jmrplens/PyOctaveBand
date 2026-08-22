@@ -58,6 +58,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from .._internal.validation import (
+    require_equal_shapes,
     require_non_negative,
     require_positive,
     require_positive_array,
@@ -493,9 +494,11 @@ def mean_flow_resistivity(
     """
     d = require_positive_array(lengths, "lengths")
     sig = require_positive_array(resistivities, "resistivities")
-    if d.shape != sig.shape:
-        msg = "'lengths' and 'resistivities' must have equal shape."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "mean_flow_resistivity",
+        {"lengths": d.shape, "resistivities": sig.shape},
+        "segment",
+    )
     return float(10.0 ** (np.sum(d * np.log10(sig)) / np.sum(d)))
 
 

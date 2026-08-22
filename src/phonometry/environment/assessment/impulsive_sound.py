@@ -64,7 +64,11 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import (
+    require_equal_shapes,
+    require_ranks,
+    require_same_length,
+)
 from ..._internal.warnings import PhonometryWarning
 from ...io._resolve import SignalInput, resolve_fs, resolve_samples
 
@@ -314,12 +318,11 @@ def impulse_prominence(
     if orate.size == 0:
         msg = "at least one impulse is required."
         raise ValueError(msg)
-    if orate.shape != ld.shape:
-        msg = (
-            f"onset_rates and level_differences must have the same shape; "
-            f"got {orate.shape} and {ld.shape}."
-        )
-        raise ValueError(msg)
+    require_equal_shapes(
+        "impulse_prominence",
+        {"onset_rates": orate.shape, "level_differences": ld.shape},
+        "impulse",
+    )
     per_impulse = predicted_prominence(orate, ld)
     qualifies = orate > ONSET_RATE_LIMIT
     if not np.all(qualifies):
@@ -375,9 +378,11 @@ def rating_level(
     le = np.atleast_1d(np.asarray(laeq, dtype=np.float64))
     ki = np.atleast_1d(np.asarray(adjustment, dtype=np.float64))
     dt = np.atleast_1d(np.asarray(durations, dtype=np.float64))
-    if not le.shape == ki.shape == dt.shape:
-        msg = "laeq, adjustment and durations must have equal length."
-        raise ValueError(msg)
+    require_equal_shapes(
+        "rating_level",
+        {"laeq": le.shape, "adjustment": ki.shape, "durations": dt.shape},
+        "sub-interval",
+    )
     if le.size == 0:
         msg = "at least one sub-interval is required."
         raise ValueError(msg)

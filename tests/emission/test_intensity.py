@@ -302,7 +302,9 @@ def test_field_indicators_negative_partial_power() -> None:
 
 
 def test_field_indicators_validation() -> None:
-    with pytest.raises(ValueError, match="same shape"):
+    with pytest.raises(
+        ValueError, match=r"'pressure_levels'.*'normal_intensity'.*same shape"
+    ):
         emission.field_indicators([90.0, 91.0], [1e-3])
     with pytest.raises(ValueError, match="two measurement positions"):
         emission.field_indicators([90.0], [1e-3])

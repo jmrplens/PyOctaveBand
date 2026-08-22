@@ -104,8 +104,15 @@ def test_shipping_component_added_in_energy() -> None:
 
 
 def test_shipping_length_mismatch_rejected() -> None:
-    with pytest.raises(ValueError, match="shipping"):
+    with pytest.raises(ValueError, match="shipping.*same shape"):
         ocean_ambient_noise([100.0, 1000.0], wind_speed_knots=5.0, shipping=[80.0])
+
+
+def test_shipping_non_finite_rejected() -> None:
+    with pytest.raises(ValueError, match="shipping.*finite"):
+        ocean_ambient_noise(
+            [100.0, 1000.0], wind_speed_knots=5.0, shipping=[80.0, np.nan]
+        )
 
 
 def test_invalid_inputs_rejected() -> None:

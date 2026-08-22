@@ -64,7 +64,9 @@ def test_mean_velocity_level_area_weighted() -> None:
 
 
 def test_mean_velocity_level_area_shape_mismatch() -> None:
-    with pytest.raises(ValueError, match="areas"):
+    with pytest.raises(
+        ValueError, match=r"mean_velocity_level: 'levels' .*'areas' .*same shape"
+    ):
         emission.mean_velocity_level([60.0, 66.0], areas=[1.0])
 
 
@@ -142,7 +144,11 @@ def test_result_bundle_and_total() -> None:
 
 
 def test_result_frequencies_shape_mismatch() -> None:
-    with pytest.raises(ValueError, match="frequencies"):
+    with pytest.raises(
+        ValueError,
+        match=r"sound_power_from_vibration: 'velocity_level' .*"
+        r"'frequencies' .*same shape",
+    ):
         emission.sound_power_from_vibration(
             [70.0, 75.0, 72.0], 1.5, frequencies=[250.0, 500.0]
         )

@@ -71,7 +71,7 @@ the distraction distance `rD` (STI = 0.50) and privacy distance
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If fewer than four positions are given (Clause 5.2.2) or the three arrays differ in length. |
+| ValueError | If fewer than four positions are given (Clause 5.2.2) or the three arrays differ in shape. |
 
 ## OpenPlanResult
 
