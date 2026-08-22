@@ -67,7 +67,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_positive
+from .._internal.validation import require_positive, require_ranks, require_same_length
 from .loudspeaker import _as_curve, _threshold_crossing
 
 if TYPE_CHECKING:
@@ -431,6 +431,55 @@ class MicrophoneCharacteristics:
     directivity_index_db: float | None
     powering: str | None
     supply_current_ma: float | None
+
+    def __post_init__(self) -> None:
+        """Reject a data sheet whose paired curves disagree along their axis.
+
+        Each rated characteristic reaches the IEC 60268-4 fiche as one curve
+        against its own abscissa, and every panel reads the pair positionally:
+        the ``n``-th response level belongs to the ``n``-th frequency, the
+        ``n``-th polar level to the ``n``-th angle of incidence. Nothing
+        reconciles a disagreement on the way there -- every panel hands the
+        pair straight to matplotlib -- so a member one entry short, or one
+        entry long, raises ``x and y must have same first dimension`` from
+        inside the drawing code, naming neither the field nor the result and
+        only once that curve is asked for by :meth:`plot` or by the fiche. By
+        then the sensitivity level, the effective frequency range, the
+        directivity index and the equivalent noise level have long been
+        computed from the arrays as they were given. The check moves the
+        complaint to construction and names the pair that disagrees.
+
+        The four abscissae are independent quantities and are checked apart:
+        a fine free-field response beside a coarse polar and a one-third-octave
+        noise spectrum is the ordinary case, not a disagreement.
+
+        :raises ValueError: if either member of a paired curve disagrees with
+            the other.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            response_db=1,
+            distortion_spl_db=1,
+            distortion_thd_percent=1,
+            noise_frequencies=1,
+            noise_band_levels_db=1,
+            polar_angles_deg=1,
+            polar_db=1,
+        )
+        require_same_length(self, "frequencies", "response_db", axis="frequency")
+        require_same_length(
+            self, "polar_angles_deg", "polar_db", axis="angle of incidence"
+        )
+        require_same_length(
+            self, "noise_frequencies", "noise_band_levels_db", axis="band"
+        )
+        require_same_length(
+            self,
+            "distortion_spl_db",
+            "distortion_thd_percent",
+            axis="sound pressure level",
+        )
 
     @property
     def sensitivity_v_per_pa(self) -> float:

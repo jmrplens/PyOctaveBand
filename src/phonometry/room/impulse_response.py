@@ -71,6 +71,7 @@ import numpy as np
 from scipy import signal
 
 from .._internal.utils import _typesignal
+from .._internal.validation import require_ranks, require_same_length
 from .._internal.warnings import PhonometryWarning
 from ..io._resolve import (
     apply_calibration,
@@ -851,6 +852,45 @@ class ShapedSweepResult:
     group_delay: np.ndarray
     f_range: tuple[float, float]
     crest_factor_db: float
+
+    def __post_init__(self) -> None:
+        """Reject synthesis metadata that does not lie on one frequency grid.
+
+        The three arrays are the synthesis FFT grid written down three times:
+        the magnitude is the band-limited target evaluated bin by bin on
+        :attr:`frequencies`, and the group delay is the running sum of that
+        magnitude's power over the same bins, so the length they share is the
+        grid's own and nothing downstream re-derives the pairing.
+
+        The spectrum panel of :meth:`plot` normalises the target to its
+        in-band maximum by masking :attr:`frequencies` for the band and
+        applying that mask to the dB curve built from :attr:`magnitude`.
+        A grid and a magnitude of different lengths stop there, in either
+        direction, with numpy's ``IndexError`` about a boolean index and two
+        axis sizes -- a message that names neither field nor the result they
+        came from. :attr:`group_delay` has no reader at all: the plot never
+        opens it, so a trajectory of the wrong length raises nothing anywhere
+        and travels out to the caller, whose own pairing of it against
+        :attr:`frequencies` is what finally fails, one call site away from the
+        synthesis that built it.
+
+        The rank half is the silent one. A magnitude of shape ``(bin, 2)``
+        carries one row per bin and so passes every length check above, and
+        the plot draws its second column as a second dashed curve under the
+        single "Synthesis target" legend entry -- having first normalised both
+        by the larger of the two, which pushes the genuine target down by the
+        distance between the columns (12 dB for a second column four times the
+        first) while the Welch spectrum, normalised on its own, stays put. The
+        sweep is then read as missing a target it actually follows.
+
+        :raises ValueError: if the grid, the imposed magnitude and the group
+            delay span different numbers of bins, or one of them carries an
+            extra axis.
+        """
+        require_ranks(self, frequencies=1, magnitude=1, group_delay=1)
+        require_same_length(
+            self, "frequencies", "magnitude", "group_delay", axis="frequency bin"
+        )
 
     def __array__(self, dtype: Any = None) -> np.ndarray:
         """Return the sweep samples as an array (optionally recast)."""

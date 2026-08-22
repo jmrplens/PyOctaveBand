@@ -46,6 +46,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_ranks, require_same_length
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
@@ -107,6 +109,59 @@ class SonarEquationResult:
     detection_threshold: float
     target_strength: float | None
     reverberation_limited: bool
+
+    def __post_init__(self) -> None:
+        """Reject a solution whose three loss-axis quantities disagree.
+
+        The sonar equation is solved one propagation loss at a time: both
+        entry points take the loss array and subtract the same term balance
+        from every entry of it, so :attr:`snr` and :attr:`signal_excess` are
+        that axis written down twice more. Nothing pairs the three afterwards
+        except position.
+
+        The mistake is loud in one direction only. :meth:`plot` sorts by
+        propagation loss and reads the signal excess through that sort order,
+        so a short ``signal_excess`` arrives at numpy as an out-of-range fancy
+        index: ``IndexError: index 3 is out of bounds for axis 0 with size
+        3``, an axis and a size, naming neither the field nor the result it
+        came from. A long one says nothing at all. The sort order holds one
+        entry per loss, so the curve is drawn from as many signal-excess
+        values as there are losses and the tail is dropped in silence -- and
+        the tail is the half that matters, because signal excess falls as
+        loss grows and its last values are the negative ones. Five excesses
+        from 20 dB down to -20 dB plotted against three losses drew
+        ``[20, 10, 0]``: a curve that stops dead on the detection limit and
+        never crosses it, under the ``SE = 0`` line and the figure-of-merit
+        line drawn across it as usual, in a figure whose whole subject is
+        where that crossing falls.
+
+        :attr:`snr` has no reader in the library, which is why it is checked
+        here rather than left to one. It is the same excess before the
+        detection threshold comes off, read as ``res.snr[i]`` beside
+        ``res.propagation_loss[i]``, so an offset one is wrong by an ordinary
+        number of decibels with nothing downstream to disagree.
+
+        The ranks are pinned as well as the lengths, because a count cannot
+        see an extra axis. ``_finite_array`` widens a scalar and never narrows
+        a grid, so before this check a two-dimensional ``propagation_loss``
+        handed to either entry point came back as three arrays of that same
+        shape, first axes agreeing perfectly. The plot's sort then indexed a
+        ``(3, 2)`` pair into a ``(3, 2, 2)`` one, and matplotlib refused that
+        with ``x and y can be no greater than 2D, but have shapes (3, 2, 2)
+        and (3, 2, 2)`` -- its own complaint, about two shapes that appear
+        nowhere in the result.
+
+        :raises ValueError: if the three quantities disagree in length, or
+            one carries an axis the loss axis does not.
+        """
+        require_ranks(self, propagation_loss=1, signal_excess=1, snr=1)
+        require_same_length(
+            self,
+            "propagation_loss",
+            "signal_excess",
+            "snr",
+            axis="propagation loss",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

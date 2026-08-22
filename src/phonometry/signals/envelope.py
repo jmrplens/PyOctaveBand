@@ -52,6 +52,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_ranks, require_same_length
 from ..io._resolve import resolve_fs
 from .spectra import _positive, _validate_signal
 
@@ -102,6 +103,43 @@ class EnvelopeResult:
     signal_fs: float
     decimation_factor: int
     antialias: bool
+
+    def __post_init__(self) -> None:
+        """Reject outputs that do not all run over the decimated time axis.
+
+        The three analytic-signal quantities are one account of the record
+        over :attr:`times`, and the reader takes them that way: :meth:`plot`
+        stacks the envelope panel and the instantaneous-frequency panel on a
+        shared time axis, so the moment a modulation peaks in the upper panel
+        is read against the frequency directly below it. Decimation is what
+        makes that fragile -- the envelope goes through a filter and the
+        phase through plain subsampling, and only the output rate ties the
+        two results together afterwards.
+
+        :attr:`signal` is deliberately left out. It is the analysed record at
+        full rate, kept for the plot's background trace and drawn on a time
+        axis of its own built from :attr:`signal_fs`; it matches
+        :attr:`times` only when no decimation was asked for, and pinning the
+        two together would reject every decimated result the module produces.
+
+        :raises ValueError: if an output disagrees with the time axis.
+        """
+        require_ranks(
+            self,
+            times=1,
+            envelope=1,
+            phase=1,
+            instantaneous_frequency=1,
+            signal=1,
+        )
+        require_same_length(
+            self,
+            "times",
+            "envelope",
+            "phase",
+            "instantaneous_frequency",
+            axis="output sample",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -248,6 +286,31 @@ class EnvelopeSpectrumResult:
     fs: float
     nfft: int
     band: tuple[float, float] | None = None
+
+    def __post_init__(self) -> None:
+        """Reject a result whose two panels do not run over their own axes.
+
+        The result carries the two halves of Bendat & Piersol's Figure 13.11
+        chain, and they are measured on different axes that are not the same
+        length: the detected envelope over the record's ``n`` samples, its
+        amplitude spectrum over the ``nfft // 2 + 1`` bins of the transform
+        that was taken of it. Each is checked against its own companion only.
+        :meth:`plot` draws them as two panels, the envelope against
+        :attr:`times` above and the modulation lines against
+        :attr:`frequencies` below, and reads a line's height as the
+        modulation depth carried by the envelope in the panel above -- which
+        holds only while each panel's pair is one measurement.
+
+        :attr:`band` states the two edges of the optional band-pass front
+        end, so it is a pair rather than an axis and stays out of both
+        groups.
+
+        :raises ValueError: if the spectrum disagrees with its frequency
+            axis, or the envelope with its time axis.
+        """
+        require_ranks(self, frequencies=1, amplitude=1, times=1, envelope=1)
+        require_same_length(self, "frequencies", "amplitude", axis="frequency")
+        require_same_length(self, "times", "envelope", axis="sample")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

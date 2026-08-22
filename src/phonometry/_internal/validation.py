@@ -194,7 +194,11 @@ def require_ranks(owner: object, **ranks: int) -> None:
     """
     for name, rank in ranks.items():
         value = getattr(owner, name)
-        if value is None:
+        # A bare number is left alone. Several entry points take a single
+        # frequency and hand back a result of nought-dimensional arrays; that
+        # is not an extra axis, it is no axis, and a mixture of scalars and
+        # arrays is caught by the length check instead.
+        if value is None or np.ndim(value) == 0:
             continue
         require_axis_rank(value, type(owner).__name__, name, rank)
 
@@ -244,17 +248,26 @@ def require_same_length(
     ``None`` fields are skipped: an absent optional quantity is not a
     disagreement.
 
+    A result whose every field is a bare number is left alone. Several entry
+    points take a single frequency and hand back a result of nought-dimensional
+    arrays, and there is no axis there to disagree about; only a mixture of
+    scalars and arrays is a mistake, and that is what the count below reports.
+
     :param owner: The instance whose fields are compared.
     :param fields: Field names, or ``(name, axis_index)`` pairs.
     :param axis: What the lengths measure, singular, for the error message.
     :raises ValueError: if two of the fields disagree, or one is a scalar.
     """
+    present = [
+        (field if isinstance(field, tuple) else (field, 0))
+        for field in fields
+        if getattr(owner, field[0] if isinstance(field, tuple) else field) is not None
+    ]
+    if all(np.ndim(getattr(owner, name)) == 0 for name, _ in present):
+        return
     counts: dict[str, int] = {}
-    for field in fields:
-        name, index = field if isinstance(field, tuple) else (field, 0)
+    for name, index in present:
         value = getattr(owner, name)
-        if value is None:
-            continue
         if index == 0:
             counts[name] = require_axis_count(
                 value, type(owner).__name__, name, axis, rank=None

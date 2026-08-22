@@ -54,6 +54,13 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import (
+    require_axis_count,
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
+
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from matplotlib.axes import Axes
     from numpy.typing import ArrayLike, NDArray
@@ -133,6 +140,10 @@ _CLASS_TABLE: tuple[tuple[int, str], ...] = (
     (3, "E"),  # 0,15 - 0,25
 )
 _NOT_CLASSIFIED = "Not classified"
+
+#: The axis the measured absorption is reported over before it is collected
+#: into the octave bands the rating is read from.
+_THIRD_OCTAVE_AXIS = "one-third-octave band"
 
 
 # --- rounding helpers ----------------------------------------------------
@@ -247,6 +258,84 @@ class AbsorptionRatingResult:
     shifted_reference: NDArray[np.float64]
     third_octave_alpha_s: NDArray[np.float64] | None = None
     third_octave_bands: NDArray[np.float64] | None = None
+
+    def __post_init__(self) -> None:
+        """Reject a rating whose curves do not run over their own bands.
+
+        The evaluation table of the fiche prints one row per octave -- the
+        band, its practical coefficient, the shifted reference there and the
+        unfavourable deviation between them -- and totals that last column
+        beneath the rows, against the 0,10 budget of Clause 4.2. The deviation
+        column is a subtraction of two of these curves, and numpy stretches a
+        curve carrying a single value across the others rather than refuse it,
+        so the total can be taken over a reference the rows above it never
+        showed. :meth:`plot` shades the same deviations between the same two
+        curves.
+
+        The two band axes are different sets, so they are checked apart: the
+        rating runs over the five octaves of Clause 4.1, while the ``alpha_s``
+        retained from ISO 354 runs over the fifteen one-third octaves each
+        octave was averaged from. Apart is not independent, though. The
+        accredited table of the fiche prints the two side by side, and it
+        finds the octave belonging to one-third-octave row ``j`` by
+        arithmetic, reading ``measured[j // 3]``: three one-third octaves to
+        every octave, or the column does not line up. A retained ``alpha_s``
+        longer than three times the rating runs that lookup off the end of
+        ``measured`` and the fiche dies mid-table on a bare ``IndexError``
+        naming neither field; a shorter one writes a table short of rows
+        whose practical-coefficient column stops before the last octave,
+        with nothing on the page to say that octave was left out. Both
+        one-third-octave fields are absent together for a rating built from
+        octave coefficients alone, which is not a disagreement.
+
+        :raises ValueError: if the octave curves disagree with each other, if
+            the retained one-third-octave ``alpha_s`` disagrees with its band
+            centres, or if it does not hold three bands per rating octave.
+        """
+        require_ranks(
+            self,
+            band_centers=1,
+            measured=1,
+            shifted_reference=1,
+            third_octave_alpha_s=1,
+            third_octave_bands=1,
+        )
+        require_same_length(
+            self,
+            "band_centers",
+            "measured",
+            "shifted_reference",
+            axis="octave band",
+        )
+        require_same_length(
+            self,
+            "third_octave_alpha_s",
+            "third_octave_bands",
+            axis=_THIRD_OCTAVE_AXIS,
+        )
+        if self.third_octave_alpha_s is not None:
+            owner = type(self).__name__
+            require_equal_counts(
+                owner,
+                {
+                    "third_octave_alpha_s": require_axis_count(
+                        self.third_octave_alpha_s,
+                        owner,
+                        "third_octave_alpha_s",
+                        _THIRD_OCTAVE_AXIS,
+                        rank=None,
+                    ),
+                    "3 x band_centers": 3
+                    * require_axis_count(
+                        self.band_centers,
+                        owner,
+                        "band_centers",
+                        "octave band",
+                        rank=None,
+                    ),
+                },
+                _THIRD_OCTAVE_AXIS,
+            )
 
     @property
     def rating_label(self) -> str:

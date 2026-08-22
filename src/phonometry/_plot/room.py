@@ -1175,12 +1175,6 @@ def plot_crowd_noise(
     n = np.asarray(result.talkers, dtype=np.float64)
     levels = np.asarray(result.levels, dtype=np.float64)
     areas = np.asarray(result.absorption_areas, dtype=np.float64)
-    if areas.shape != levels.shape[:1]:
-        msg = (
-            "'levels' must carry one row per absorption area; got "
-            f"absorption_areas{areas.shape} against levels{levels.shape}."
-        )
-        raise ValueError(msg)
     palette = (_C_PRIMARY, _C_SECONDARY, _C_TERTIARY, _C_QUATERNARY, _C_MUTED)
     for row, (area, curve) in enumerate(zip(areas, levels, strict=True)):
         area_kwargs = dict(kwargs)

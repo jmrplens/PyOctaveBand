@@ -76,6 +76,12 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from scipy import special
 
+from .._internal.validation import (
+    require_axis_count,
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
 from ..io._resolve import resolve_fs
 from ..signals.spectra import _positive, _validate_signal, power_spectral_density
 
@@ -351,6 +357,38 @@ class TrendTestResult:
     alpha: float
     median: float | None = None
 
+    def __post_init__(self) -> None:
+        """Reject a sequence that disagrees with the count it was tested at.
+
+        The verdict is a statement about one sequence of :attr:`n`
+        observations: the statistic was counted on that sequence, and the
+        null mean, the standard deviation, the acceptance region and the
+        p-value all follow from the count. The plot then draws
+        :attr:`values` against a sample index counted out of the declared
+        :attr:`n` rather than out of the array beside it, so a sequence of
+        another length is a plot of a different record than the one the
+        legend rates. Matplotlib does refuse to draw the two against each
+        other, but from inside the renderer and about first dimensions,
+        naming neither the field nor the result; the declared count is the
+        authority here, and checking it at construction says which sequence
+        moved.
+
+        :raises ValueError: if the tested sequence spans a different number
+            of observations than the declared count.
+        """
+        require_ranks(self, values=1)
+        owner = type(self).__name__
+        require_equal_counts(
+            owner,
+            {
+                "n": self.n,
+                "values": require_axis_count(
+                    self.values, owner, "values", "observation", rank=None
+                ),
+            },
+            "observation",
+        )
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -541,6 +579,36 @@ class StationarityTestResult:
     segment_duration: float
     fs: float
 
+    def __post_init__(self) -> None:
+        """Reject a test whose per-segment sequences disagree.
+
+        The verdict is a statement about one sequence of segment values, and
+        everything the reader is shown has to be that same sequence: the plot
+        draws the values against a segment index counted out of
+        :attr:`n_segments` rather than out of the array beside it, and
+        :attr:`segment_times` places those values on the record's time axis
+        while nothing downstream re-derives it. A sequence of another length
+        than the count it is drawn against is a plot of a different record
+        than the one the legend rates, so the declared count is taken as the
+        authority here and the two sequences have to follow it.
+
+        :raises ValueError: if either per-segment sequence disagrees with the
+            other or with the declared number of segments.
+        """
+        require_ranks(self, segment_values=1, segment_times=1)
+        require_same_length(self, "segment_values", "segment_times", axis="segment")
+        owner = type(self).__name__
+        require_equal_counts(
+            owner,
+            {
+                "n_segments": self.n_segments,
+                "segment_values": require_axis_count(
+                    self.segment_values, owner, "segment_values", "segment", rank=None
+                ),
+            },
+            "segment",
+        )
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -722,6 +790,29 @@ class LevelCrossingResult:
     sigma: float
     duration: float
     fs: float
+
+    def __post_init__(self) -> None:
+        """Reject a result whose per-level quantities disagree.
+
+        The comparison this result exists for is level by level: each measured
+        rate belongs beside the Rice expectation at the same level, and the
+        plot draws the expectation as a curve indexed by the order that sorts
+        :attr:`levels`. An expectation array longer than the levels is
+        therefore not caught anywhere: that order reaches only as many of its
+        entries as there are levels, so the curve is drawn from part of one
+        expectation while the markers beside it were measured against
+        another, and the plot is well formed either way. One that is short
+        raises about an index from inside the renderer instead, naming
+        neither array.
+
+        The scalar zero-crossing rates stand outside the group: they describe
+        the single level zero, whatever levels were asked for.
+
+        :raises ValueError: if the levels, the measured rates or the Rice
+            expectations span different numbers of levels.
+        """
+        require_ranks(self, levels=1, rates=1, rice_rates=1)
+        require_same_length(self, "levels", "rates", "rice_rates", axis="level")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

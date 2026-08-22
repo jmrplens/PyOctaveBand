@@ -77,9 +77,13 @@ from typing import TYPE_CHECKING, Any, Literal, overload
 import numpy as np
 
 from ..._internal.validation import (
+    require_axis_count,
     require_choice,
+    require_equal_counts,
     require_positive,
     require_positive_array,
+    require_ranks,
+    require_same_length,
 )
 
 if TYPE_CHECKING:
@@ -182,6 +186,10 @@ _DELTA_LW_SCREED = (13.0, -14.2, 20.8)
 #: ISO 12354-2:2017 Formula (C.5), asphalt / dry floors:
 #: ``(−0,21 m' − 5,45) lg(s') + 0,46 m' + 23,8``.
 _DELTA_LW_ASPHALT = (-0.21, -5.45, 0.46, 23.8)
+
+#: The axis the tapping machine's force spectrum runs over, one third-octave
+#: band holding several of its lines.
+_FOURIER_LINE_AXIS = "Fourier line"
 
 #: Band width of the mean-square force (Hopkins Eq. 3.91).
 BandWidth = Literal["third", "octave"]
@@ -485,6 +493,30 @@ class TappingForceResult:
     upper_limit: float
     band: str = "third"
 
+    def __post_init__(self) -> None:
+        """Reject a force spectrum whose per-band quantities disagree.
+
+        ``mean_square_force`` and the power input derived from it are band
+        quantities, not samples of a curve: Eq. (3.91) weights each Fourier
+        component by the width of the band it falls in, so a value belongs to
+        one band centre and to no other. A quantity of the wrong length slides
+        the spectrum along the frequency axis, and a force spectrum shifted by
+        a band or two is still a plausible one, read as a floor of a different
+        impedance rather than as a mistake.
+
+        :raises ValueError: if the per-band quantities disagree.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            peak_force=1,
+            mean_square_force=1,
+            power_input=1,
+        )
+        require_same_length(
+            self, "frequencies", "peak_force", "mean_square_force", "power_input"
+        )
+
     @property
     def power_input_level(self) -> np.ndarray:
         r"""Power input level :math:`10 \log_{10}(W_\mathrm{in}/1~\text{pW})`, in dB
@@ -631,6 +663,54 @@ class CoveringImprovementResult:
     line_improvement: np.ndarray
     bare: TappingForceResult
     covered: TappingForceResult
+
+    def __post_init__(self) -> None:
+        """Reject an improvement whose bands and Fourier lines do not line up.
+
+        Two axes meet in this result and they are not interchangeable:
+        ``improvement`` and ``two_line`` are band values, while
+        ``line_improvement`` runs over the tapping machine's Fourier lines, of
+        which one third-octave band holds several. Keeping them apart is the
+        point of the model, because the per-line ratio carries exact nulls at
+        odd multiples of ``fco`` that the band value averages away, so a
+        per-line array the length of the band set would be read against the
+        band centres and put those nulls at frequencies where the covering has
+        none. ``bare`` and ``covered`` are evaluated at ``lines`` too: their
+        force spectra are the two sides of the ratio, line for line.
+
+        :raises ValueError: if the per-band or the per-line quantities
+            disagree.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            improvement=1,
+            two_line=1,
+            lines=1,
+            line_improvement=1,
+        )
+        require_same_length(self, "frequencies", "improvement", "two_line")
+        require_same_length(self, "lines", "line_improvement", axis=_FOURIER_LINE_AXIS)
+        owner = type(self).__name__
+        lines = require_axis_count(
+            self.lines, owner, "lines", _FOURIER_LINE_AXIS, rank=None
+        )
+        for name in ("bare", "covered"):
+            label = f"{name}.frequencies"
+            require_equal_counts(
+                owner,
+                {
+                    "lines": lines,
+                    label: require_axis_count(
+                        getattr(self, name).frequencies,
+                        owner,
+                        label,
+                        _FOURIER_LINE_AXIS,
+                        rank=1,
+                    ),
+                },
+                _FOURIER_LINE_AXIS,
+            )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -914,6 +994,21 @@ class FloatingFloorImprovementResult:
     slope: float
     limiting_frequency: float | None = None
     delta_lw: float | None = None
+
+    def __post_init__(self) -> None:
+        """Reject an improvement that does not match its band centres.
+
+        The figure draws ``improvement`` against ``frequencies`` and marks the
+        resonance on the same axis, and the whole reading of a floating floor
+        is where its improvement starts: 0 dB at ``fo``, then one straight
+        slope above it. A curve shifted along the band axis still shows that
+        shape, only with its knee at the wrong frequency, which is the one
+        number the drawing stage takes from the prediction.
+
+        :raises ValueError: if the improvement and the band centres disagree.
+        """
+        require_ranks(self, frequencies=1, improvement=1)
+        require_same_length(self, "frequencies", "improvement")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

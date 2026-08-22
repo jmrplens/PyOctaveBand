@@ -32,6 +32,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_ranks, require_same_length
 from ..io._resolve import resolve_fs
 from .distortion import (
     _amplitude_spectrum,
@@ -114,6 +115,28 @@ class ModulationDistortionResult:
     carrier_amplitude: float | None = None
     sideband_frequencies: NDArray[np.float64] | None = None
     sideband_amplitudes: NDArray[np.float64] | None = None
+
+    def __post_init__(self) -> None:
+        """Reject a sideband spectrum whose two halves do not correspond.
+
+        14.12.7 names the products the pair enumerates -- ``f2 ± f1`` and
+        ``f2 ± 2f1`` -- and the correspondence between them is the whole of
+        the measurement: the nth amplitude is the amplitude *of* the nth
+        frequency, and ``d2`` and ``d3`` are sums over that same enumeration.
+        A pair of unequal length has lost it, and the spectrum then states an
+        amplitude for a product it does not name, or names a product whose
+        amplitude the per-order ratios above it nonetheless counted.
+
+        Both fields are optional: a result carrying only the ratios states no
+        spectrum at all, and an absent half is skipped rather than read as a
+        disagreement.
+
+        :raises ValueError: if the two disagree in length.
+        """
+        require_ranks(self, sideband_frequencies=1, sideband_amplitudes=1)
+        require_same_length(
+            self, "sideband_frequencies", "sideband_amplitudes", axis="sideband"
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

@@ -58,6 +58,11 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from .._internal.validation import (
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
 from ..io._resolve import resolve_fs, resolve_pair_fs, resolve_samples
 from ..io._signal import Signal
 from .spectra import (
@@ -452,6 +457,81 @@ class MISOCoherenceResult:
     nperseg: int
     overlap: float
     scaling: str
+
+    def __post_init__(self) -> None:
+        """Reject a result whose arrays do not span its own two axes.
+
+        Every array here is written on one frequency axis and one input axis,
+        and both are read back unchecked. The figure indexes every curve it
+        draws with a single boolean mask built from :attr:`frequencies` alone,
+        so a per-band array of another length stops it from inside numpy
+        (``boolean index did not match indexed array along axis 0; size of
+        axis is 257 but size of corresponding boolean axis is 256``), naming
+        neither the field nor the result, on the short array and the long one
+        alike -- but only for the arrays it draws. :attr:`ordinary_coherence`,
+        :attr:`multiple_coherence_random_error` and
+        :attr:`coherent_output_random_error` are on no panel, so a mismatch
+        there reaches the reader untouched: a random error quoted per band
+        under a frequency axis it was never measured on.
+
+        :meth:`dominant_input` is the quiet one, on both axes. It promises one
+        index per entry of :attr:`frequencies` and takes the argmax of
+        :attr:`coherent_output_spectra` without looking at either the
+        frequency axis or :attr:`n_inputs`: a band axis one short returned 256
+        answers for a 257-bin result, and one row too many made it answer
+        ``2`` in every band of a two-input measurement, an original input
+        index that names no input. That extra row is dropped from both panels
+        of the figure without a word, though it carried more output power than
+        the two real inputs together; a missing row instead stops the loop
+        over :attr:`n_inputs` on numpy's ``index 2 is out of bounds for axis 0
+        with size 2``. :attr:`order` is read by no renderer, so one shorter or
+        longer than the inputs passes the figure intact and silently breaks
+        the only promise it carries, that ``partial_coherence[order[k]]`` is
+        the input conditioned on ``order[:k]``.
+
+        :raises ValueError: if a per-band array disagrees with the frequency
+            axis, or the per-input arrays, the conditioning order and
+            :attr:`n_inputs` disagree on the number of inputs.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            ordinary_coherence=2,
+            multiple_coherence=1,
+            partial_coherence=2,
+            coherent_output_spectra=2,
+            output_psd=1,
+            noise_psd=1,
+            multiple_coherence_random_error=1,
+            coherent_output_random_error=2,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            ("ordinary_coherence", 1),
+            "multiple_coherence",
+            ("partial_coherence", 1),
+            ("coherent_output_spectra", 1),
+            "output_psd",
+            "noise_psd",
+            "multiple_coherence_random_error",
+            ("coherent_output_random_error", 1),
+            axis="frequency",
+        )
+        require_same_length(
+            self,
+            "order",
+            "ordinary_coherence",
+            "partial_coherence",
+            "coherent_output_spectra",
+            "coherent_output_random_error",
+            axis="input",
+        )
+        require_equal_counts(
+            type(self).__name__,
+            {"order": len(self.order), "n_inputs": self.n_inputs},
+            "input",
+        )
 
     def dominant_input(self) -> NDArray[np.intp]:
         """Index of the input contributing the most output power per bin.

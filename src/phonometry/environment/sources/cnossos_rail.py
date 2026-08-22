@@ -80,6 +80,13 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import (
+    require_axis_count,
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
@@ -1700,6 +1707,12 @@ _SQUEAL_TRAIN_MODERATE_RADIUS = 500.0
 _SQUEAL_TRAM_RADIUS = 200.0
 _SQUEAL_MINIMUM_TRACK_LENGTH = 50.0
 
+#: The spectral axis CNOSSOS-EU tabulates rolling and traction noise over.
+_THIRD_OCTAVE_AXIS = "1/3-octave band"
+
+#: The axis of the two source heights the method splits every spectrum over.
+_SOURCE_HEIGHT_AXIS = "source height"
+
 
 # ---------------------------------------------------------------------------
 # Small helpers
@@ -2369,6 +2382,83 @@ class RailwayEmissionResult:
     components: dict[str, tuple[NDArray[np.float64], NDArray[np.float64]]] = field(
         default_factory=dict
     )
+
+    def __post_init__(self) -> None:
+        """Reject an emission whose three axes do not each line up.
+
+        The same emission is carried on three axes, and every reading of it
+        pairs a position on one with a position on another: a row of
+        :attr:`line_power` with the source height that names it, a value with
+        the band it is quoted at, a component spectrum with the 1/3-octave
+        grid it was resampled onto. None of that pairing is checked where it
+        happens -- the chart lays its two marker lines over the octave bars by
+        row order, and the source breakdown is read band by band against
+        :attr:`third_octave_frequencies` -- so an axis one entry out does not
+        announce itself. It attributes the noise to the wrong band, or to the
+        wrong one of the two source heights, and the level it reports there is
+        an ordinary number in an ordinary place.
+
+        :raises ValueError: if the band, 1/3-octave or source-height axes
+            disagree.
+        """
+        require_ranks(
+            self,
+            third_octave_frequencies=1,
+            frequencies=1,
+            heights=1,
+            third_octave_line_power=2,
+            line_power=2,
+            total_line_power=1,
+        )
+        require_same_length(self, "frequencies", ("line_power", 1), "total_line_power")
+        require_same_length(
+            self,
+            "third_octave_frequencies",
+            ("third_octave_line_power", 1),
+            axis=_THIRD_OCTAVE_AXIS,
+        )
+        require_same_length(
+            self,
+            "heights",
+            "line_power",
+            "third_octave_line_power",
+            axis=_SOURCE_HEIGHT_AXIS,
+        )
+        owner = type(self).__name__
+        heights = require_axis_count(
+            self.heights, owner, "heights", _SOURCE_HEIGHT_AXIS, rank=None
+        )
+        bands = require_axis_count(
+            self.third_octave_frequencies,
+            owner,
+            "third_octave_frequencies",
+            _THIRD_OCTAVE_AXIS,
+            rank=None,
+        )
+        for name, pair in self.components.items():
+            label = f"components[{name!r}]"
+            require_equal_counts(
+                owner,
+                {
+                    "heights": heights,
+                    label: require_axis_count(
+                        pair, owner, label, _SOURCE_HEIGHT_AXIS, rank=None
+                    ),
+                },
+                _SOURCE_HEIGHT_AXIS,
+            )
+            for i, spectrum in enumerate(pair):
+                entry = f"{label}[{i}]"
+                require_equal_counts(
+                    owner,
+                    {
+                        "third_octave_frequencies": bands,
+                        entry: require_axis_count(
+                            spectrum, owner, entry, _THIRD_OCTAVE_AXIS, rank=1
+                        ),
+                    },
+                    _THIRD_OCTAVE_AXIS,
+                )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

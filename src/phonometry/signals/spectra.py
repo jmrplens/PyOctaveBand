@@ -68,6 +68,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from .._internal.validation import require_ranks, require_same_length
 from ..io._resolve import apply_calibration, resolve_fs, resolve_pair_fs
 
 if TYPE_CHECKING:
@@ -413,6 +414,34 @@ class SpectralDensityResult:
     overlap: float
     scaling: str
 
+    def __post_init__(self) -> None:
+        """Reject a density whose band does not sit on its own frequency axis.
+
+        The four array fields are one Welch frequency axis and the three
+        curves read off it: the density, and the two chi-square bounds the
+        figure fills between as the confidence band. The plotter cuts a
+        positive-frequency mask from ``frequencies`` and applies it to the
+        other three, so a curve of the wrong length raises, in both
+        directions, ``IndexError: boolean index did not match indexed array
+        along axis 0; size of axis is 128 but size of corresponding boolean
+        axis is 129`` from inside numpy: two sizes, neither the field that
+        carries the wrong one nor the result it came from, and by then the
+        figure has been created and is left open. Refusing the result at
+        construction names both instead.
+
+        :raises ValueError: if the axis and the three curves do not share one
+            length.
+        """
+        require_ranks(self, frequencies=1, psd=1, ci_lower=1, ci_upper=1)
+        require_same_length(
+            self,
+            "frequencies",
+            "psd",
+            "ci_lower",
+            "ci_upper",
+            axis="frequency",
+        )
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -579,6 +608,52 @@ class CrossSpectralDensityResult:
     nperseg: int
     overlap: float
     scaling: str
+
+    def __post_init__(self) -> None:
+        r"""Reject a cross-spectrum whose curves do not share one axis.
+
+        The seven array fields are one Welch frequency axis and the six
+        quantities computed on it, all of them from the single
+        :math:`\hat{G}_{xy}` the same segment averaging returned. The figure
+        cuts a positive-frequency mask from ``frequencies`` and applies it to
+        ``magnitude``, ``phase``, ``phase_std`` and ``coherence``, so any of
+        those five out of step raises, short or long, ``IndexError: boolean
+        index did not match indexed array along axis 0; size of axis is 128
+        but size of corresponding boolean axis is 129`` from inside numpy -
+        two sizes, and neither the field nor the result.
+
+        The other two are worse off, because nothing draws them. A wrong
+        length in ``csd`` or in ``magnitude_random_error`` renders the full
+        three-panel figure without a word (measured: every panel drawn over
+        the same 128 positive bins, no warning raised), and what reaches the
+        caller is a complex spectrum, or a per-bin random error, that no
+        longer lines up bin for bin with the magnitude and phase taken from
+        it.
+
+        :raises ValueError: if the axis and the six curves do not share one
+            length.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            csd=1,
+            magnitude=1,
+            phase=1,
+            coherence=1,
+            magnitude_random_error=1,
+            phase_std=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "csd",
+            "magnitude",
+            "phase",
+            "coherence",
+            "magnitude_random_error",
+            "phase_std",
+            axis="frequency",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -748,6 +823,64 @@ class CoherentOutputSpectrumResult:
     nperseg: int
     overlap: float
     scaling: str
+
+    def __post_init__(self) -> None:
+        r"""Reject a split whose parts do not share one frequency axis.
+
+        The ten array fields are one Welch frequency axis and the nine
+        quantities read off it: the measured output autospectrum, the two
+        parts it splits into, the coherence that splits it, and the ratios
+        and errors derived from those. They are the same axis written down
+        ten times, so :math:`\hat{G}_{yy} = \hat{G}_{vv} + \hat{G}_{nn}`
+        holds bin for bin.
+
+        Only five of the ten are drawn. ``output_psd``, ``coherent_psd``
+        and ``noise_psd`` go on the spectra panel and ``snr_db`` on the one
+        below it, all masked by the positive-frequency part of
+        ``frequencies``, so a wrong length in those five raises, short or
+        long, ``IndexError: boolean index did not match indexed array along
+        axis 0; size of axis is 128 but size of corresponding boolean axis is
+        129`` from inside numpy, naming two sizes and neither the field nor
+        the result.
+
+        ``coherence``, ``snr``, ``random_error``, ``snr_random_error`` and
+        ``coherence_bias`` are drawn by nothing at all. A wrong length in any
+        of the five returns the complete two-panel figure with no warning
+        (measured: the three spectra and the SNR trace all drawn over the
+        same 128 positive bins), so the figure looks exactly as it should
+        while the coherence and the Eq. 9.73 and 9.75 errors the caller reads
+        beside it are off by a bin against the axis they are quoted on.
+
+        :raises ValueError: if the axis and the nine curves do not share one
+            length.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            output_psd=1,
+            coherent_psd=1,
+            noise_psd=1,
+            coherence=1,
+            snr=1,
+            snr_db=1,
+            random_error=1,
+            snr_random_error=1,
+            coherence_bias=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "output_psd",
+            "coherent_psd",
+            "noise_psd",
+            "coherence",
+            "snr",
+            "snr_db",
+            "random_error",
+            "snr_random_error",
+            "coherence_bias",
+            axis="frequency",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

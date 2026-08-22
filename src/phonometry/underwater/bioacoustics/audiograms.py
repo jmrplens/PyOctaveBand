@@ -43,6 +43,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
@@ -165,6 +167,23 @@ class AudiogramResult:
     in_air: bool
     best_frequency: float
     best_threshold: float
+
+    def __post_init__(self) -> None:
+        """Reject an audiogram whose threshold does not run over its frequencies.
+
+        An audiogram is a curve, and every threshold on it means the frequency
+        standing beside it. The drawing is the loud half of a mismatch:
+        matplotlib refuses a pair of unequal length outright. The quiet half is
+        already in the result, because ``best_frequency`` and
+        ``best_threshold`` were picked out of the two arrays by a single index,
+        so a threshold array offset from the frequency axis leaves the sensible
+        pair of numbers that name this animal's best hearing reading off two
+        different points of the curve.
+
+        :raises ValueError: if ``threshold`` disagrees with ``frequencies``.
+        """
+        require_ranks(self, frequencies=1, threshold=1)
+        require_same_length(self, "frequencies", "threshold", axis="frequency")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

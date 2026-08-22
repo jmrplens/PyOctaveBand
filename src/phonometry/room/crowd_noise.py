@@ -81,7 +81,11 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from .._internal.types import as_float_or_array
-from .._internal.validation import require_positive
+from .._internal.validation import (
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -254,6 +258,33 @@ class CrowdNoiseResult:
     sound_power_level: float
     directivity: float
     communication_level: float
+
+    def __post_init__(self) -> None:
+        """Reject a grid whose levels do not span its two axes.
+
+        :attr:`levels` is a surface over two independent axes -- one row per
+        absorption area, one column per occupancy -- and the plot reads it as
+        such, drawing one curve per row against :attr:`talkers` and labelling
+        that curve with the area at the same position in
+        :attr:`absorption_areas`. Neither count slips quietly once it gets
+        there: a row count that has slipped is ``zip(..., strict=True)``
+        refusing to pair the areas with the curves, a column count that has
+        slipped is matplotlib's complaint about two shapes. Both are raised
+        from inside the plotter and in the language of the machinery --
+        numbered arguments, bare shapes -- naming neither the fields that
+        disagree nor the result they came from. Checking here names them, and
+        names them before the grid is handed to a plot at all.
+
+        The two axes are checked separately and never against each other:
+        comparing occupancies with absorption areas would refuse the ordinary
+        study of twenty occupancies against three areas.
+
+        :raises ValueError: if ``levels`` does not carry one row per
+            absorption area and one column per talker count.
+        """
+        require_ranks(self, talkers=1, absorption_areas=1, levels=2)
+        require_same_length(self, "absorption_areas", "levels", axis="absorption area")
+        require_same_length(self, "talkers", ("levels", 1), axis="talker count")
 
     def speech_to_noise(self) -> np.ndarray:
         """Speech-to-noise ratio for every point of :attr:`levels`, dB."""

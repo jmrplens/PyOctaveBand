@@ -78,7 +78,12 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_choice, require_positive
+from .._internal.validation import (
+    require_choice,
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 from ..room.steady_field import room_constant
 
 if TYPE_CHECKING:
@@ -448,6 +453,23 @@ class HvacSpectrumResult:
     values: np.ndarray
     quantity: str
     label: str
+
+    def __post_init__(self) -> None:
+        """Reject a spectrum whose values do not run over its own bands.
+
+        The HVAC fiche takes the number of rows it prints from ``values`` and
+        the nominal frequency labelling each one from ``frequencies``, so the
+        two lengths have to be the same for a row to say which band it is. One
+        value short and the sheet simply stops before the last band the result
+        names, boxing a mean attenuation over the bands that survived rather
+        than the ones the caption declares; one value long and the rows run
+        past the last label there is.
+
+        :raises ValueError: if ``values`` does not carry one entry per band, or
+            either field carries an extra axis.
+        """
+        require_ranks(self, frequencies=1, values=1)
+        require_same_length(self, "frequencies", "values")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

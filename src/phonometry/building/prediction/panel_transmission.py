@@ -97,6 +97,8 @@ from ..._internal.validation import (
     require_choice,
     require_non_negative,
     require_positive,
+    require_ranks,
+    require_same_length,
 )
 from ...vibration.structural.radiation_efficiency import coincidence_frequency
 
@@ -276,6 +278,24 @@ class SoundReductionResult:
     plateau_start: float | None = None
     plateau_end: float | None = None
     critical_frequency_upper: float | None = None
+
+    def __post_init__(self) -> None:
+        """Reject a predicted spectrum that does not match its band centres.
+
+        :meth:`rating` and :meth:`report` hand ``transmission_loss`` alone to
+        the ISO 717-1 curve fit, which recognises the band set by how many
+        values arrive: 16 are read as the one-third-octave bands from 100 Hz
+        and 5 as the octave bands from 125 Hz, whatever ``frequencies`` says
+        the prediction covers. A spectrum longer than its own band centres is
+        therefore rated against a reference curve for bands the construction
+        was never evaluated on, and the rating fiche prints the standard
+        centres beside it, so nothing on the sheet recalls the axis the
+        prediction was actually made over.
+
+        :raises ValueError: if the spectrum and the band centres disagree.
+        """
+        require_ranks(self, frequencies=1, transmission_loss=1)
+        require_same_length(self, "frequencies", "transmission_loss")
 
     @property
     def transmission_coefficient(self) -> np.ndarray:

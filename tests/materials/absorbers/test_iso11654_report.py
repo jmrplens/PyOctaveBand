@@ -140,25 +140,39 @@ def test_third_octave_fiche_with_metadata(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_third_octave_fiche_rejects_band_count_mismatch(tmp_path) -> None:
-    """One-third-octave arrays of unequal length raise ``ValueError``.
+def test_third_octave_arrays_of_unequal_length_are_refused() -> None:
+    """Fifteen ``alpha_s`` cannot be paired with fourteen band centres.
 
-    ``AbsorptionRatingResult`` is a frozen dataclass with no validation, so a
-    caller can pair fifteen ``alpha_s`` with fourteen band centres; the
-    accredited table used to be drawn silently short. The guard fires before
-    the table is built, so no PDF is written.
+    The accredited table used to be drawn silently short. The refusal was the
+    renderer's; the rating refuses to hold the pairing at all now, so the
+    plot and any other reader are covered by the same sentence.
     """
     import dataclasses
 
     result = weighted_absorption_from_third_octave(_THIRD_OCTAVE_ALPHA_S)
     assert result.third_octave_bands is not None
-    short = dataclasses.replace(
-        result, third_octave_bands=result.third_octave_bands[:-1]
-    )
-    out = tmp_path / "mismatch.pdf"
-    with pytest.raises(ValueError, match="third_octave_bands"):
-        short.report(str(out))
-    assert not out.exists()
+    with pytest.raises(ValueError, match="'third_octave_bands'"):
+        dataclasses.replace(result, third_octave_bands=result.third_octave_bands[:-1])
+
+
+@pytest.mark.parametrize("bands", [12, 18])
+def test_third_octave_arrays_must_hold_three_bands_per_octave(bands: int) -> None:
+    """A matched pair is not enough: the table needs three of them per octave.
+
+    The accredited table reads ``measured[j // 3]`` on row ``j``, so eighteen
+    matched one-third octaves against a five-octave rating run the lookup off
+    the end of ``measured`` and twelve write a table that stops an octave
+    early without saying so.
+    """
+    import dataclasses
+
+    result = weighted_absorption_from_third_octave(_THIRD_OCTAVE_ALPHA_S)
+    with pytest.raises(ValueError, match="'3 x band_centers'"):
+        dataclasses.replace(
+            result,
+            third_octave_alpha_s=np.full(bands, 0.5),
+            third_octave_bands=np.linspace(200.0, 5000.0, bands),
+        )
 
 
 def test_statement_writes_shape_indicator_without_space(tmp_path) -> None:

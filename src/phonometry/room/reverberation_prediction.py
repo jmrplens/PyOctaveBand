@@ -76,7 +76,12 @@ if TYPE_CHECKING:
 from numpy.typing import ArrayLike, NDArray
 
 from .._internal.types import as_float_or_array
-from .._internal.validation import require_non_negative, require_positive
+from .._internal.validation import (
+    require_non_negative,
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 
 # ---------------------------------------------------------------------------
 # Constants.
@@ -567,6 +572,53 @@ class ReverberationModelResult:
     volume: float
     surface_area: float
 
+    def __post_init__(self) -> None:
+        """Reject a prediction whose five curves and band axis disagree.
+
+        Both readers take the six arrays for one band axis written down six
+        times. ``plot()`` draws each curve against ``frequencies`` point for
+        point, so a disagreement of length surfaces as matplotlib's ``x and y
+        must have same first dimension, but have shapes (6,) and (5,)``: two
+        bare shapes, naming neither the result nor which of the six arrays
+        carries which. The fiche walks ``frequencies`` and reads every curve
+        at that band's index, so a curve one entry short raises ``IndexError:
+        index 5 is out of bounds for axis 0 with size 5`` from inside the row
+        loop, naming no field at all. One entry long is quieter: the table
+        stops at the last frequency and the extra value simply never appears
+        -- a seventh Arau-Puchades time appended to a six-band prediction
+        leaves a table that ends at the 4000 Hz row looking exactly as it
+        would have -- and the fiche fails only afterwards, when it draws the
+        same figure the plot would have drawn.
+
+        The extra axis is the silent one. A curve of shape ``(bands, 1)``
+        counts the right number of bands, and ``plot()`` draws the column as
+        an ordinary line and hands back axes indistinguishable from a correct
+        figure. Only the fiche notices, with ``TypeError: only 0-dimensional
+        arrays can be converted to Python scalars`` raised while formatting a
+        table cell.
+
+        :raises ValueError: if the five curves and the band axis disagree, or
+            any of them carries an extra axis.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            sabine=1,
+            eyring=1,
+            millington_sette=1,
+            fitzroy=1,
+            arau_puchades=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "sabine",
+            "eyring",
+            "millington_sette",
+            "fitzroy",
+            "arau_puchades",
+        )
+
     @property
     def models(self) -> dict[str, np.ndarray]:
         """The five reverberation-time curves keyed by model name."""
@@ -733,7 +785,10 @@ def reverberation_time_models(
         n_bands = curve_bands
         freq = np.arange(1.0, n_bands + 1.0, dtype=np.float64)
     else:
-        freq = np.asarray(frequencies, dtype=np.float64)
+        # A single frequency is a band axis of one, as `frequencies=None`
+        # already produces: the five curves are 1-D whatever is passed, so a
+        # nought-dimensional axis beside them is a mixture no reader can walk.
+        freq = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
         if curve_bands not in (1, freq.size):
             msg = (
                 f"'frequencies' has {freq.size} bands but the per-band "

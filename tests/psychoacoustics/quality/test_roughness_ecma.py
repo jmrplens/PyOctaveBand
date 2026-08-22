@@ -10,6 +10,8 @@ modulation rate and falls off toward low and high rates, grows with modulation
 depth, an unmodulated tone and silence give ~0) plus result-structure guards.
 """
 
+import dataclasses
+
 import numpy as np
 import pytest
 
@@ -139,6 +141,76 @@ def test_result_structure(
     assert np.all(res.specific_roughness >= 0.0)
     assert np.all(res.roughness_vs_time >= 0.0)
     assert res.field == "free"
+
+
+def test_a_time_grid_that_does_not_match_its_curves_is_refused(
+    ref_calibration: psychoacoustics.EcmaRoughness,
+) -> None:
+    """The 50 Hz grid, the roughness trace and the heatmap are one axis.
+
+    The trace is drawn against the grid, and matplotlib answers a mismatch
+    with "x and y must have same first dimension, but have shapes (30,) and
+    (31,)", naming neither field. A heatmap of the wrong number of time steps
+    is quieter still: it raises out of ``pcolormesh`` only when the whole
+    figure is drawn, and a caller who supplies an ``ax`` never draws that
+    panel at all.
+    """
+    with pytest.raises(ValueError, match="'time'"):
+        dataclasses.replace(ref_calibration, time=ref_calibration.time[:-1])
+    trace = ref_calibration.roughness_vs_time
+    with pytest.raises(ValueError, match="'roughness_vs_time'"):
+        dataclasses.replace(ref_calibration, roughness_vs_time=np.append(trace, 0.0))
+    heat = ref_calibration.specific_roughness_vs_time
+    with pytest.raises(ValueError, match="'specific_roughness_vs_time'"):
+        dataclasses.replace(ref_calibration, specific_roughness_vs_time=heat[:-1])
+
+
+def test_a_band_axis_shorter_than_the_bands_is_refused(
+    ref_calibration: psychoacoustics.EcmaRoughness,
+) -> None:
+    """The 53 auditory bands are one axis across four fields.
+
+    ``bark`` is the heatmap's second axis, so a short one raises out of
+    ``pcolormesh`` about the dimensions of C, X and Y; the average specific
+    roughness is drawn by no panel of the built-in figure and reaches the
+    documented ``plot(res.bark, res.specific_roughness)`` snippet intact.
+    """
+    with pytest.raises(ValueError, match="'bark'"):
+        dataclasses.replace(ref_calibration, bark=ref_calibration.bark[:-1])
+    with pytest.raises(ValueError, match="'specific_roughness'"):
+        dataclasses.replace(
+            ref_calibration,
+            specific_roughness=ref_calibration.specific_roughness[:-1],
+        )
+    with pytest.raises(ValueError, match="'specific_roughness_vs_time"):
+        dataclasses.replace(
+            ref_calibration,
+            specific_roughness_vs_time=ref_calibration.specific_roughness_vs_time[
+                :, :-1
+            ],
+        )
+
+
+def test_an_extra_axis_on_the_curves_is_refused(
+    ref_calibration: psychoacoustics.EcmaRoughness,
+) -> None:
+    """Counting the steps and the bands is not enough; the ranks are pinned.
+
+    A ``bark`` of shape ``(53, 1)`` counts 53 bands and ``pcolormesh`` draws
+    it without a word, and a heatmap of shape ``(steps, bands, 1)`` counts
+    both axes right before it reaches the same call.
+    """
+    with pytest.raises(ValueError, match="'bark' must have one axis"):
+        dataclasses.replace(ref_calibration, bark=ref_calibration.bark[:, None])
+    with pytest.raises(
+        ValueError, match="'specific_roughness_vs_time' must have 2 axes"
+    ):
+        dataclasses.replace(
+            ref_calibration,
+            specific_roughness_vs_time=ref_calibration.specific_roughness_vs_time[
+                :, :, None
+            ],
+        )
 
 
 def test_invalid_field_raises() -> None:

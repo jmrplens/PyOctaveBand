@@ -73,6 +73,7 @@ import numpy as np
 
 from ..._internal.levels_math import energy_mean
 from ..._internal.types import as_float_or_array
+from ..._internal.validation import require_ranks, require_same_length
 from .ratings import (
     _FREQ_THIRD_OCTAVE,
     ImpactRatingResult,
@@ -178,6 +179,29 @@ class AirborneInsulationResult:
     t2: np.ndarray | None = None
     t0: float | None = None
 
+    def __post_init__(self) -> None:
+        """Reject a measurement whose per-band columns cover different bands.
+
+        The verbose ISO 16283-1 table prints the measurement chain a band at a
+        time, ``L1``, ``L2``, ``T`` and the reported quantity in one row, and
+        the plot lays ``D``, ``DnT`` and ``R'`` over one band-index axis: this
+        result carries no band centres, so the curves are drawn against
+        ``Band 1`` onwards rather than against frequency. Both pair the columns
+        by position, so a chain column longer than the rest is printed only as
+        far as the frequency header, setting a source-room level beside a
+        receiving-room level from a different band, and the sheet shows a
+        derivation that never took place. The quantities are carried already
+        formed rather than recomputed from the chain printed next to them, so
+        nothing downstream compares the two.
+
+        ``None`` stands for a quantity the measurement did not produce, so it
+        is passed over rather than counted.
+
+        :raises ValueError: if any per-band column disagrees with the rest.
+        """
+        require_ranks(self, d=1, dnt=1, r_prime=1, l1=1, l2=1, t2=1)
+        require_same_length(self, "d", "dnt", "r_prime", "l1", "l2", "t2")
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -275,6 +299,27 @@ class ImpactInsulationResult:
     li: np.ndarray | None = None
     t2: np.ndarray | None = None
     t0: float | None = None
+
+    def __post_init__(self) -> None:
+        """Reject a measurement whose per-band columns cover different bands.
+
+        The verbose ISO 16283-2 table prints ``Li``, ``T`` and the reported
+        level in one row per band, and the plot lays ``L'nT`` beside ``L'n``
+        over one band-index axis: this result carries no band centres either,
+        so the curves are drawn against ``Band 1`` onwards rather than against
+        frequency. Both pair the columns by position, so a chain column longer
+        than the rest is printed only as far as the frequency header and shows
+        an impact level next to the reverberation time of a different band. The
+        levels are carried already formed, not recomputed from the chain beside
+        them, so nothing downstream compares the two.
+
+        ``None`` stands for a quantity the measurement did not produce, so it
+        is passed over rather than counted.
+
+        :raises ValueError: if any per-band column disagrees with the rest.
+        """
+        require_ranks(self, l_n_t=1, l_n=1, li=1, t2=1)
+        require_same_length(self, "l_n_t", "l_n", "li", "t2")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -380,13 +425,35 @@ class FacadeInsulationResult:
     method: str = "loudspeaker"
 
     def __post_init__(self) -> None:
-        """Reject a ``method`` other than ``"loudspeaker"`` or ``"road_traffic"``."""
+        """Reject an unknown ``method``, or columns that cover different bands.
+
+        An unknown source would be rendered and rated as the loudspeaker
+        quantity ``R'45``, so it is refused first.
+
+        The band check is the one the readers cannot make. The ISO 16283-3
+        fiche reports one quantity at a time and counts that curve alone, the
+        16 core one-third-octave bands the ISO 717-1 rating needs; the columns
+        beside it are never looked at, so a result carrying seventeen values of
+        ``D2m`` next to sixteen of ``D2m,nT`` writes a clean sheet that says
+        nothing about the disagreement. The plot is what does pair them, every
+        available quantity against ``frequencies``, and all it can answer with
+        is matplotlib's shape message, which names neither the field nor the
+        result.
+
+        ``None`` stands for a quantity the measurement did not produce, so it
+        is passed over rather than counted.
+
+        :raises ValueError: if ``method`` is unknown, or a per-band column
+            disagrees with the rest.
+        """
         if self.method not in _FACADE_CORRECTION:
             msg = (
                 "'method' must be 'loudspeaker' or 'road_traffic', got "
                 f"{self.method!r}."
             )
             raise ValueError(msg)
+        require_ranks(self, d_2m=1, d_2m_nt=1, d_2m_n=1, r_prime=1, frequencies=1)
+        require_same_length(self, "d_2m", "d_2m_nt", "d_2m_n", "r_prime", "frequencies")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

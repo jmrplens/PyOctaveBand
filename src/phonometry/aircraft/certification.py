@@ -27,6 +27,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_ranks, require_same_length
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
@@ -522,6 +524,31 @@ class EPNLResult:
     duration_correction: float
     epnl: float
     band_limits: tuple[int, int]
+
+    def __post_init__(self) -> None:
+        """Reject a determination whose per-record histories disagree.
+
+        The certification sheet states PNLTM, the duration correction and the
+        10 dB-down record window over the result's own PNLT-versus-time figure,
+        and that figure draws both histories against ``times`` and shades the
+        window between ``times[kF]`` and ``times[kL]``. Let the histories
+        disagree and the sheet is not produced at all: matplotlib refuses an x
+        and a y of different first dimensions, from inside the render, naming
+        neither the field nor the axis it was counting. Raising here says which
+        of the four disagreed, and says it before a determination nobody can
+        report has been handed on as one.
+
+        ``frequencies`` is deliberately outside the group. It runs over the 24
+        one-third-octave bands the noy law is tabulated on, not over the
+        records of the flyover, and the two lengths have nothing to say to each
+        other.
+
+        :raises ValueError: if the per-record arrays disagree.
+        """
+        require_ranks(self, frequencies=1, times=1, pnl=1, tone_correction=1, pnlt=1)
+        require_same_length(
+            self, "times", "pnl", "tone_correction", "pnlt", axis="record"
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

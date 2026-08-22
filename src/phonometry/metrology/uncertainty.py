@@ -43,6 +43,12 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
 
+from .._internal.validation import (
+    require_axis_count,
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
 from .._internal.warnings import PhonometryWarning
 
 Model = Callable[..., float]
@@ -55,6 +61,9 @@ _PSD_EIGENVALUE_TOLERANCE = 1e-8
 # Minimum number of Monte Carlo trials: the reported standard uncertainty
 # is np.std(output, ddof=1), undefined for fewer than two samples.
 _MIN_TRIALS = 2
+
+#: The axis a budget runs over, one entry per quantity that feeds the result.
+_INPUT_QUANTITY_AXIS = "input quantity"
 
 
 class UncertaintyWarning(PhonometryWarning):
@@ -149,6 +158,62 @@ class UncertaintyResult:
     contributions: np.ndarray
     effective_dof: float
     names: tuple[str, ...] = field(default=())
+
+    def __post_init__(self) -> None:
+        r"""Reject a budget whose per-input quantities disagree.
+
+        A budget is read as one row per input quantity: the sensitivity
+        coefficient, the contribution :math:`\lvert c_i \rvert u(x_i)` it
+        gives and the label that says which input the row is about. Of the
+        three, only the contributions and the labels are ever read together:
+        the plot draws one bar per contribution and then sets :attr:`names`
+        as the tick labels of the bar positions, which matplotlib refuses in
+        either direction with a message about a ``FixedLocator`` and two
+        counts, naming neither the field nor the budget. The coefficients are
+        read by nobody at all -- nothing downstream compares them with the
+        contributions -- so a budget carrying a sensitivity that no
+        contribution was computed from is drawn without complaint, under a
+        combined-uncertainty line that spans the whole.
+
+        Counting the rows is not enough on its own, so the rank is pinned
+        beside the length. A coefficient array of shape
+        ``(inputs, 2)`` has the right number of inputs on its first axis and
+        agrees with the contributions on every count, and since nothing reads
+        it the second axis is never noticed at all. Give the *contributions*
+        that shape and the count still agrees, but the extra axis travels into
+        ``barh``, which refuses it from inside numpy with a message about a
+        shape mismatch between ``'width'`` and ``'y'`` -- ``'width'`` being
+        ``barh``'s own argument, not the input quantity that may well be
+        called that.
+
+        An empty :attr:`names` is not a disagreement: it is the unlabelled
+        budget the plot fills in with ``x1``, ``x2``, ... itself, which is why
+        the labels are counted only when there are some.
+
+        :raises ValueError: if the coefficients or the contributions carry
+            more than one axis, or if the coefficients, the contributions or
+            the labels span different numbers of input quantities.
+        """
+        require_ranks(self, sensitivities=1, contributions=1)
+        require_same_length(
+            self, "sensitivities", "contributions", axis=_INPUT_QUANTITY_AXIS
+        )
+        if self.names:
+            owner = type(self).__name__
+            require_equal_counts(
+                owner,
+                {
+                    "contributions": require_axis_count(
+                        self.contributions,
+                        owner,
+                        "contributions",
+                        _INPUT_QUANTITY_AXIS,
+                        rank=None,
+                    ),
+                    "names": len(self.names),
+                },
+                _INPUT_QUANTITY_AXIS,
+            )
 
     def expanded(
         self, coverage: float = 0.95, *, coverage_factor_override: float | None = None

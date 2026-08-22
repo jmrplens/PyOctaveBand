@@ -67,7 +67,12 @@ if TYPE_CHECKING:
     from ..._report.metadata import ReportMetadata
 
 
-from ..._internal.validation import require_non_negative, require_positive
+from ..._internal.validation import (
+    require_non_negative,
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 from ..._internal.warnings import PhonometryWarning
 from .mechanical_mobility import convert_frf
 
@@ -316,6 +321,29 @@ class TransferStiffnessResult:
     frequencies: np.ndarray
     transfer_stiffness: np.ndarray
     blocking_mass: float | None = None
+
+    def __post_init__(self) -> None:
+        r"""Reject a spectrum whose stiffnesses do not run over its own frequencies.
+
+        The fiche characterises the element by its low-frequency plateau: it
+        takes the lowest entry of ``frequencies`` and reads
+        :math:`|k_{2,1}|`, ``L_k`` and ``eta`` at that same position of
+        ``transfer_stiffness``, then prints them together, the level as the
+        boxed representative value and the magnitude beside it stated *at that
+        frequency*. Let the two lengths differ and a position stops meaning
+        the same measurement in both, so the sheet hangs one frequency's
+        stiffness on another frequency's label, while the frequency range in
+        the same table still spans the whole of ``frequencies``, including
+        lines the spectrum never valued. A value too many at the end is the
+        same mistake in the other direction, and just as invisible: nothing on
+        a sheet that is well formed either way says how many stiffnesses there
+        were.
+
+        :raises ValueError: if ``transfer_stiffness`` does not carry one value
+            per frequency, or either field carries an extra axis.
+        """
+        require_ranks(self, frequencies=1, transfer_stiffness=1)
+        require_same_length(self, "frequencies", "transfer_stiffness", axis="frequency")
 
     @property
     def magnitude(self) -> np.ndarray:

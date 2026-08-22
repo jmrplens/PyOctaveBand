@@ -28,6 +28,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
 from ...io._resolve import SignalInput, resolve_fs
 from ..acoustics import (
     _positive,
@@ -184,6 +185,29 @@ class StrikeSelSpectrum:
     broadband_sel: float
     fraction: int
     fs: float
+
+    def __post_init__(self) -> None:
+        """Reject a band spectrum whose levels do not match its band centres.
+
+        The two arrays state one measurement twice over -- a nominal centre
+        frequency, and the exposure the band at that frequency carries -- and
+        only position pairs them. :attr:`total_sel` is then a stored number
+        claiming to be the energy sum of exactly those bands, which no reader
+        can re-derive: a ``band_sel`` longer than ``frequencies`` keeps a
+        total that counted a band the centre list never reaches, and one
+        shorter keeps a total missing a band the table will print.
+
+        The pairing is also what the assessment downstream consumes.
+        :func:`~phonometry.underwater.bioacoustics.weighting.weighted_exposure`
+        takes both arrays and weights each band by the hearing group's
+        sensitivity at whatever centre landed opposite it; those weighting
+        curves fall by tens of decibels across a decade, so a misaligned
+        spectrum returns an injury margin that reads like any other.
+
+        :raises ValueError: if the band levels disagree with the centres.
+        """
+        require_ranks(self, frequencies=1, band_sel=1)
+        require_same_length(self, "frequencies", "band_sel")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

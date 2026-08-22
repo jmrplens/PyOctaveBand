@@ -67,7 +67,12 @@ from typing import TYPE_CHECKING, Any, Protocol, cast
 
 import numpy as np
 
-from .._internal.validation import require_choice, require_positive
+from .._internal.validation import (
+    require_choice,
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 from ..room.steady_field import room_constant
 
 #: Interior build-up correction models. The value is the additive floor inside
@@ -109,6 +114,40 @@ class EnclosureResult:
     external_area: float
     internal_area: float
     room_constant: np.ndarray
+
+    def __post_init__(self) -> None:
+        """Reject a sheet whose columns do not all run over the same bands.
+
+        The enclosure fiche prints one row per band -- nominal frequency, panel
+        ``R``, correction ``C`` and net ``IL`` side by side, with the interior
+        room constant ``R_i`` added in the verbose table -- and it sizes that
+        table from ``insertion_loss`` alone, while the boxed figures average
+        each column whole. A panel ``R`` one entry longer than the ``IL`` is
+        therefore truncated out of the printed rows and still counted in the
+        mean, so the sheet states a mean ``R`` that the column above it does
+        not average to. A column one entry *short* hides differently: an
+        ``R_i`` short of a band renders an ordinary-looking plain sheet and
+        fails only when someone asks for the verbose one.
+
+        :raises ValueError: if the per-band quantities disagree, or one of them
+            carries an extra axis.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            panel_transmission_loss=1,
+            correction=1,
+            insertion_loss=1,
+            room_constant=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "panel_transmission_loss",
+            "correction",
+            "insertion_loss",
+            "room_constant",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

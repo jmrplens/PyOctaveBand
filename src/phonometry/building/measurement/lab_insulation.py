@@ -54,6 +54,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
 from ..._internal.warnings import PhonometryWarning
 from .insulation import (
     ImpactRatingResult,
@@ -109,6 +110,23 @@ class LabAirborneInsulationResult:
     r: np.ndarray
     absorption: np.ndarray
     rating: WeightedRatingResult | None
+
+    def __post_init__(self) -> None:
+        """Reject a result whose index and absorption area span different bands.
+
+        The verbose ISO 10140-2 fiche prints ``A`` beside ``R`` in one band
+        table, and the renderer checks the reported curve against the rating
+        but never ``absorption``: the table walks the band centres and reads
+        each column at that band, so an absorption area one entry too long
+        simply loses its tail with nothing said, while one entry too short
+        reaches the reader as an ``IndexError`` from inside the table
+        builder. Either way the sheet that documents how ``R`` was formed
+        from ``A`` is the last place the mismatch could have been caught.
+
+        :raises ValueError: if ``r`` and ``absorption`` disagree.
+        """
+        require_ranks(self, r=1, absorption=1)
+        require_same_length(self, "r", "absorption")
 
     def plot(self, ax: Axes | None = None, **kwargs: Any) -> Axes:
         """Plot ``R`` against the shifted ISO 717-1 reference curve.
@@ -197,6 +215,22 @@ class LabImpactInsulationResult:
     l_n: np.ndarray
     absorption: np.ndarray
     rating: ImpactRatingResult | None
+
+    def __post_init__(self) -> None:
+        """Reject a result whose level and absorption area span different bands.
+
+        ``A`` is what normalizes ``Li`` into ``Ln``, and the verbose
+        ISO 10140-3 fiche prints the two side by side so a reader can follow
+        that step band by band. Nothing downstream keeps them aligned: the
+        renderer validates the reported curve against the rating and leaves
+        ``absorption`` alone, and the table indexes each column at the band
+        centre it is on, quietly dropping a surplus entry and raising an
+        ``IndexError`` from the table builder for a missing one.
+
+        :raises ValueError: if ``l_n`` and ``absorption`` disagree.
+        """
+        require_ranks(self, l_n=1, absorption=1)
+        require_same_length(self, "l_n", "absorption")
 
     def plot(self, ax: Axes | None = None, **kwargs: Any) -> Axes:
         """Plot ``Ln`` against the shifted ISO 717-2 reference curve.

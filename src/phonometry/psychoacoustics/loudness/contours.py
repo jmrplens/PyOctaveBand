@@ -13,6 +13,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
@@ -183,6 +185,32 @@ class EqualLoudnessContours:
     phons: tuple[float, ...]
     contours: np.ndarray
     threshold: np.ndarray
+
+    def __post_init__(self) -> None:
+        """Reject a family whose contours do not span the grid they are drawn on.
+
+        Two independent axes meet in ``contours``, and both are read by
+        position: every row is drawn against the whole of ``frequencies``,
+        and row ``i`` belongs to ``phons[i]``. A row of the wrong width, or a
+        threshold of the wrong length, cannot be drawn against that grid at
+        all, and says so from inside matplotlib, about a first dimension,
+        naming neither the field nor this result; a row count that disagrees
+        with ``phons`` pairs each contour with a level that is not its own,
+        which the chart's strict pairing catches only once someone draws it
+        and a reader indexing the two together never catches.
+
+        The two lengths are checked apart because nothing relates them: a
+        grid of eight frequencies would otherwise be taken as agreement with
+        the eight levels of the default family.
+
+        :raises ValueError: if a contour row, the threshold or the level list
+            disagrees with the axis it is drawn against.
+        """
+        require_ranks(self, frequencies=1, phons=1, contours=2, threshold=1)
+        require_same_length(
+            self, "frequencies", ("contours", 1), "threshold", axis="frequency"
+        )
+        require_same_length(self, "phons", ("contours", 0), axis="loudness level")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

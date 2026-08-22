@@ -66,6 +66,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ..._internal.levels_math import energy_sum
+from ..._internal.validation import require_ranks, require_same_length
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -365,6 +366,28 @@ class WeightedRatingResult:
     shifted_reference: np.ndarray | None = None
     quantity: str = "airborne"
 
+    def __post_init__(self) -> None:
+        """Reject a rating whose three band curves do not line up.
+
+        The three arrays are the record of which bands the single number was
+        rated over, and a fiche reads them as exactly that: ISO 717-1
+        Clause 5.3 makes it declare whether the rating came from
+        one-third-octave or octave bands, and it settles that from the length
+        of ``band_centers`` alone. The renderers do compare the three, but
+        only once a report is asked for, which can be long after the rating
+        was built and passed on; :meth:`plot` compares nothing and hands the
+        curves to matplotlib, whose complaint about first dimensions names
+        neither the field nor the type it came from.
+
+        The three arrays default to ``None`` on a rating built from the
+        single numbers alone, and an absent curve is skipped rather than read
+        as a disagreement.
+
+        :raises ValueError: if the band curves supplied disagree.
+        """
+        require_ranks(self, band_centers=1, measured=1, shifted_reference=1)
+        require_same_length(self, "band_centers", "measured", "shifted_reference")
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -466,6 +489,28 @@ class ImpactRatingResult:
     measured: np.ndarray | None = None
     shifted_reference: np.ndarray | None = None
     quantity: str = "impact"
+
+    def __post_init__(self) -> None:
+        """Reject a rating whose three band curves do not line up.
+
+        Shading the bands where the measurement rises *above* the shifted
+        reference -- the sign opposite to airborne -- is a comparison of one
+        curve against the other, band for band, and :meth:`plot` makes it
+        without first asking whether the two run over the same bands. The
+        band centres carry as much: ISO 717-2 Clause 4.4 makes the fiche
+        declare whether the rating came from one-third-octave or octave
+        bands, and their length alone settles it. The renderers refuse a
+        mismatch, but not until a report is asked for, and a rating is
+        usually built long before that.
+
+        The three arrays default to ``None`` on a rating built from the
+        single numbers alone, and an absent curve is skipped rather than read
+        as a disagreement.
+
+        :raises ValueError: if the band curves supplied disagree.
+        """
+        require_ranks(self, band_centers=1, measured=1, shifted_reference=1)
+        require_same_length(self, "band_centers", "measured", "shifted_reference")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -1010,6 +1055,26 @@ class ExtendedWeightedRatingResult:
     band_centers: np.ndarray | None = None
     measured: np.ndarray | None = None
 
+    def __post_init__(self) -> None:
+        """Reject an enlarged-range rating whose curve and bands disagree.
+
+        The Annex B plot shades from the ends of ``band_centers`` in to the
+        ends of the core 100-3150 Hz axis, to mark which part of the curve is
+        the enlarged range, and only afterwards draws ``measured`` against
+        those same centres. The shading is therefore laid down before
+        anything has compared the two lengths: centres that are not this
+        curve's own axis put the enlarged-range mark where the curve does not
+        reach, and what the caller is finally handed is matplotlib
+        complaining about first dimensions.
+
+        ``core`` is not compared here: it carries the 16 core bands whatever
+        the enlarged range is, and checks its own three curves.
+
+        :raises ValueError: if ``band_centers`` and ``measured`` disagree.
+        """
+        require_ranks(self, band_centers=1, measured=1)
+        require_same_length(self, "band_centers", "measured")
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -1058,6 +1123,25 @@ class ExtendedImpactRatingResult:
     core: ImpactRatingResult
     band_centers: np.ndarray | None = None
     measured: np.ndarray | None = None
+
+    def __post_init__(self) -> None:
+        """Reject an enlarged-range rating whose curve and bands disagree.
+
+        The band centres are the record of which bands ``CI,50-2500`` was
+        summed over, and the plot reads them a second time to mark which part
+        of ``measured`` lies outside the core 100-3150 Hz set -- shading that
+        span from the ends of the centres before it has looked at the curve
+        at all. Centres that are not this curve's own axis therefore mis-mark
+        the enlarged range first and fail second, in matplotlib's words
+        rather than the library's.
+
+        ``core`` is not compared here: it carries the 16 core bands whatever
+        the enlarged range is, and checks its own three curves.
+
+        :raises ValueError: if ``band_centers`` and ``measured`` disagree.
+        """
+        require_ranks(self, band_centers=1, measured=1)
+        require_same_length(self, "band_centers", "measured")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

@@ -7,6 +7,8 @@ pure arithmetic, independent of the implementation.
 
 from __future__ import annotations
 
+import dataclasses
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -96,6 +98,59 @@ def test_plot_smoke() -> None:
         150.0, np.linspace(40.0, 110.0, 40), 55.0, detection_threshold=8.0
     )
     assert res.plot() is not None
+
+
+_PER_LOSS = "one value per propagation loss"
+_ONE_AXIS = "must have one axis"
+
+
+def test_solution_columns_must_run_over_one_loss_axis() -> None:
+    """A solution off its own loss axis is refused when built, not when read.
+
+    ``.plot()`` sorts by propagation loss and reads the signal excess through
+    that sort order, so a short ``signal_excess`` surfaces only as numpy's
+    "index 3 is out of bounds for axis 0 with size 3" -- an axis and a size,
+    naming neither field. A long one is silent: the sort order holds one entry
+    per loss, so the tail is dropped without a word, and the tail is the half
+    that carries the negative excesses. ``snr`` reaches no figure at all and
+    is silent in both directions, yet it is read entry by entry beside
+    ``propagation_loss``. An extra axis is quieter still: an ``(n, 2)`` column
+    carries one value per loss by every count.
+    """
+    good = passive_sonar_equation(
+        150.0, np.linspace(60.0, 110.0, 6), 57.0, detection_threshold=8.0
+    )
+    cases = (
+        ("propagation_loss", good.propagation_loss[:-1], _PER_LOSS),
+        ("signal_excess", good.signal_excess[:-1], _PER_LOSS),
+        ("signal_excess", np.append(good.signal_excess, -20.0), _PER_LOSS),
+        ("snr", good.snr[:-1], _PER_LOSS),
+        ("snr", np.append(good.snr, -12.0), _PER_LOSS),
+        ("propagation_loss", np.column_stack([good.propagation_loss] * 2), _ONE_AXIS),
+        ("signal_excess", np.column_stack([good.signal_excess] * 2), _ONE_AXIS),
+        ("snr", np.column_stack([good.snr] * 2), _ONE_AXIS),
+    )
+    for field, value, fragment in cases:
+        with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+            dataclasses.replace(good, **{field: value})
+
+
+def test_entry_points_refuse_a_grid_of_losses() -> None:
+    """A two-dimensional loss input is refused where it is handed over.
+
+    The coercion only widens a scalar, so a grid passes straight through and
+    every derived quantity takes its shape: all three first axes agree and no
+    count notices. The plot's sort then indexes an ``(n, 2)`` pair into an
+    ``(n, 2, 2)`` one, and matplotlib complains about shapes that appear
+    nowhere in the result.
+    """
+    grid = np.array([[60.0, 70.0], [80.0, 90.0], [100.0, 110.0]])
+    for call in (
+        lambda: passive_sonar_equation(150.0, grid, 57.0),
+        lambda: active_sonar_equation(200.0, grid, 10.0, 50.0),
+    ):
+        with pytest.raises(ValueError, match=rf"'propagation_loss'.*{_ONE_AXIS}"):
+            call()
 
 
 # ---------------------------------------------------------------------------

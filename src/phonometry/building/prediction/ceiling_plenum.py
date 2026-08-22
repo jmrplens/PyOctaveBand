@@ -111,6 +111,8 @@ from ..._internal.validation import (
     require_choice,
     require_finite_array,
     require_positive,
+    require_ranks,
+    require_same_length,
 )
 
 if TYPE_CHECKING:
@@ -270,6 +272,36 @@ class CeilingAttenuationResult:
     max_deficiency: float
     rating: int
 
+    def __post_init__(self) -> None:
+        """Reject a rating whose curves do not share the contour band set.
+
+        ASTM E413 is a contour fitted band by band: the sum of the
+        deficiencies and the largest of them are what stop the contour rising,
+        and the plot draws the data against that fitted contour. A curve
+        shorter than the sixteen bands leaves the drawing to pair the
+        remaining values with the wrong frequencies, and the two numbers
+        printed in the title are then sums over a set that the picture beneath
+        them does not show.
+
+        :raises ValueError: if the per-band curves disagree.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            measured=1,
+            rounded=1,
+            shifted_reference=1,
+            deficiencies=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "measured",
+            "rounded",
+            "shifted_reference",
+            "deficiencies",
+        )
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -384,6 +416,38 @@ class PlenumFlankingResult:
     epsilon: float
     plenum_height: float
     ceiling_length: float
+
+    def __post_init__(self) -> None:
+        """Reject a plenum path whose spectra do not run over the same bands.
+
+        The plot shades the gap between ``RS + RR`` and ``Rcl`` to show what
+        the plenum costs, and that sum is taken with numpy's own rules: a
+        one-band ceiling on either side is stretched across the other's whole
+        axis instead of being refused, so the shaded penalty is drawn against
+        a ceiling that was only ever evaluated in one band. ``frequencies``
+        stays optional, since a result built without a band axis is not a
+        result whose bands disagree.
+
+        :raises ValueError: if the per-band spectra disagree.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            reduction_index=1,
+            transmission_factor=1,
+            reduction_index_source=1,
+            reduction_index_receiving=1,
+            penalty=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "reduction_index",
+            "transmission_factor",
+            "reduction_index_source",
+            "reduction_index_receiving",
+            "penalty",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

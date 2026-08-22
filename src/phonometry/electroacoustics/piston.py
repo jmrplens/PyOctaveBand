@@ -82,7 +82,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from scipy import special
 
-from .._internal.validation import require_positive
+from .._internal.validation import require_positive, require_ranks, require_same_length
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -207,6 +207,33 @@ class PistonDirectivity:
     ka: np.ndarray
     directivity: np.ndarray
     directivity_db: np.ndarray
+
+    def __post_init__(self) -> None:
+        """Reject a bundle whose pattern matrix does not match its two grids.
+
+        The matrix is indexed by position on both sides: :meth:`plot` loops
+        over :attr:`ka` and reads row ``i`` as the pattern of ``ka[i]``,
+        drawing its columns over :attr:`angles`. Neither pairing is recorded
+        anywhere else, and only one of the ways they can disagree is quiet.
+        A matrix one row short runs that loop off the end of it, and the row
+        that is not there comes back as an ``IndexError`` out of NumPy; a
+        column count that differs in either direction is refused by matplotlib
+        with ``x and y must have same first dimension``. Both come from inside
+        the drawing code and name no field. A matrix one row too many is the
+        silent one: the loop stops at the last ``ka``, so the extra pattern is
+        never drawn -- no curve, no legend entry and no complaint.
+
+        :raises ValueError: if the pattern matrix disagrees with either grid.
+        """
+        require_ranks(self, angles=1, ka=1, directivity=2, directivity_db=2)
+        require_same_length(self, "ka", "directivity", "directivity_db", axis="pattern")
+        require_same_length(
+            self,
+            "angles",
+            ("directivity", 1),
+            ("directivity_db", 1),
+            axis="polar angle",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -344,6 +371,53 @@ class RadiatingPistonResult:
     radius: float
     speed_of_sound: float
     density: float
+
+    def __post_init__(self) -> None:
+        """Reject a piston result whose quantities disagree along an axis.
+
+        The impedance quantities are one curve each over the same frequency
+        axis, and :meth:`plot` draws two of them against a third; the
+        directivity pattern crosses that axis with the angle grid, carrying
+        the frequencies down its rows and the angles across its columns, and
+        :meth:`plot_geometry` picks one row by ``frequency_index`` to overlay
+        the far-field lobe. That row is a positional lookup into an array that
+        states nowhere how long it ought to be, so a pattern short of the
+        frequency count draws the lobe of one frequency under the ``ka`` of
+        another, silently and to scale. The angle axis is the loud half: a
+        column count that disagrees with :attr:`angles` is already refused
+        further down, by ``'angles' and 'directivity' must match.`` from the
+        drawing helper. The check keeps it here so that one is raised at
+        construction, against the result that carries it, instead of on the
+        way to a figure.
+
+        :raises ValueError: if a per-frequency quantity, or the pattern's
+            angle axis, disagrees with the rest.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            ka=1,
+            resistance=1,
+            reactance=1,
+            radiation_resistance=1,
+            radiation_reactance=1,
+            directivity_index=1,
+            angles=1,
+            directivity=2,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "ka",
+            "resistance",
+            "reactance",
+            "radiation_resistance",
+            "radiation_reactance",
+            "directivity_index",
+            "directivity",
+            axis="frequency",
+        )
+        require_same_length(self, "angles", ("directivity", 1), axis="polar angle")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

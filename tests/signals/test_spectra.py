@@ -18,6 +18,8 @@ Bendat & Piersol's; it lives in ``test_multitaper.py``.
 
 from __future__ import annotations
 
+import dataclasses
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -474,6 +476,94 @@ def test_two_channel_functions_reject_mismatched_lengths(func) -> None:
     x = _white(13)
     with pytest.raises(ValueError, match="same length"):
         func(x, x[:-1], FS)
+
+
+def test_density_band_must_sit_on_its_own_frequency_axis() -> None:
+    """The chi-square band is refused when it does not match the density.
+
+    The plot cuts the positive-frequency mask from ``frequencies`` and
+    applies it to ``psd``, ``ci_lower`` and ``ci_upper``, so all four reach
+    the reader only as numpy's complaint about a boolean index and two axis
+    sizes, naming neither the field nor the result, and leaving an open
+    figure behind. An extra axis passes every count, so the ranks are pinned
+    too.
+    """
+    good = ph.signals.power_spectral_density(_white(40, n=4096), FS, nperseg=256)
+    per_frequency = "one value per frequency"
+    cases = (
+        ("frequencies", good.frequencies[:-1], per_frequency),
+        ("psd", good.psd[:-1], per_frequency),
+        ("psd", np.append(good.psd, good.psd[-1]), per_frequency),
+        ("ci_lower", good.ci_lower[:-1], per_frequency),
+        ("ci_upper", np.append(good.ci_upper, good.ci_upper[-1]), per_frequency),
+        ("psd", np.column_stack([good.psd] * 2), "must have one axis"),
+    )
+    for field, value, fragment in cases:
+        with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+            dataclasses.replace(good, **{field: value})
+
+
+def test_cross_spectrum_curves_must_share_one_frequency_axis() -> None:
+    """A cross-spectrum whose seven curves disagree cannot be built.
+
+    Five of them are drawn against the positive-frequency mask and surface
+    as numpy's boolean-index complaint, which names two sizes and neither
+    the field nor the result. The other two are silent: nothing plots
+    ``csd`` or ``magnitude_random_error``, so the three-panel figure comes
+    out complete and ordinary while the complex spectrum the caller reads no
+    longer lines up with the magnitude and phase taken from it.
+    """
+    x, y, _ = _known_snr_pair(8, n=4096)
+    good = ph.signals.cross_spectral_density(x, y, FS, nperseg=256)
+    per_frequency = "one value per frequency"
+    for field in (
+        "frequencies",
+        "csd",
+        "magnitude",
+        "phase",
+        "coherence",
+        "magnitude_random_error",
+        "phase_std",
+    ):
+        curve = getattr(good, field)
+        for value in (curve[:-1], np.append(curve, curve[-1])):
+            with pytest.raises(ValueError, match=rf"'{field}'.*{per_frequency}"):
+                dataclasses.replace(good, **{field: value})
+    with pytest.raises(ValueError, match=r"'coherence' must have one axis"):
+        dataclasses.replace(good, coherence=np.column_stack([good.coherence] * 2))
+
+
+def test_coherent_output_split_must_share_one_frequency_axis() -> None:
+    """The ten curves of the split are refused unless they agree.
+
+    Only ``output_psd``, ``coherent_psd``, ``noise_psd`` and ``snr_db``
+    reach the figure, so those raise from inside numpy's boolean index. The
+    remaining five - the coherence and the Eq. 9.73 and 9.75 errors - are
+    drawn by nothing at all, and a wrong length there returns the complete
+    two-panel figure without a word while the quantities quoted beside it
+    sit a bin off the axis they are quoted on.
+    """
+    x, y, _ = _known_snr_pair(9, n=4096)
+    good = ph.signals.coherent_output_spectrum(x, y, FS, nperseg=256)
+    per_frequency = "one value per frequency"
+    for field in (
+        "frequencies",
+        "output_psd",
+        "coherent_psd",
+        "noise_psd",
+        "coherence",
+        "snr",
+        "snr_db",
+        "random_error",
+        "snr_random_error",
+        "coherence_bias",
+    ):
+        curve = getattr(good, field)
+        for value in (curve[:-1], np.append(curve, curve[-1])):
+            with pytest.raises(ValueError, match=rf"'{field}'.*{per_frequency}"):
+                dataclasses.replace(good, **{field: value})
+    with pytest.raises(ValueError, match=r"'snr_db' must have one axis"):
+        dataclasses.replace(good, snr_db=np.column_stack([good.snr_db] * 2))
 
 
 def test_default_nperseg_targets_4hz_resolution() -> None:

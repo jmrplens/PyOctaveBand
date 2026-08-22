@@ -14,6 +14,7 @@ modulation depth, an unmodulated tone and silence give ~0) plus
 result-structure guards.
 """
 
+import dataclasses
 import importlib
 
 import numpy as np
@@ -295,6 +296,98 @@ def test_result_structure(
     assert np.all(res.specific_fluctuation_strength >= 0.0)
     assert np.all(res.fluctuation_strength_vs_time >= 0.0)
     assert res.field == "free"
+
+
+@pytest.mark.parametrize("trim", [True, False])
+@pytest.mark.xdist_group("ecma-fluctuation-ref")
+def test_a_trace_off_its_time_axis_is_refused(
+    ref_calibration: psychoacoustics.EcmaFluctuationStrength, trim: bool
+) -> None:
+    """The time panel is one ``plot`` call pairing ``time`` with F(l50).
+
+    A trace of another length reaches matplotlib, which raises about x and y
+    differing in their first dimension and names neither field, from a call
+    several frames below the one the caller made. Short and long fail the
+    same way, which is the only mismatch here that never passes silently.
+    """
+    trace = ref_calibration.fluctuation_strength_vs_time
+    wrong = trace[:-1] if trim else np.append(trace, trace[-1])
+    with pytest.raises(ValueError, match="'fluctuation_strength_vs_time'"):
+        dataclasses.replace(ref_calibration, fluctuation_strength_vs_time=wrong)
+
+
+@pytest.mark.xdist_group("ecma-fluctuation-ref")
+def test_a_specific_table_short_on_both_axes_is_refused(
+    ref_calibration: psychoacoustics.EcmaFluctuationStrength,
+) -> None:
+    """The one mismatch the heatmap draws instead of refusing.
+
+    A table one entry short along time *and* along the bands is exactly the
+    shape ``pcolormesh`` expects once ``shading="auto"`` reads the two axes as
+    cell corners, so the full figure draws a complete heatmap spanning the
+    whole time and Bark_HMS range, one cell coarser than the run it claims to
+    show, without a word from anywhere. Short on one axis only is refused by
+    ``pcolormesh``, but only when the caller asked for the whole figure.
+    """
+    table = ref_calibration.specific_fluctuation_strength_vs_time
+    with pytest.raises(
+        ValueError, match=r"'specific_fluctuation_strength_vs_time \(axis 1\)'"
+    ):
+        dataclasses.replace(
+            ref_calibration, specific_fluctuation_strength_vs_time=table[:-1, :-1]
+        )
+
+
+@pytest.mark.xdist_group("ecma-fluctuation-ref")
+def test_a_specific_table_that_lost_its_band_axis_is_refused(
+    ref_calibration: psychoacoustics.EcmaFluctuationStrength,
+) -> None:
+    """Counting the frames says nothing about how many axes carry them.
+
+    Averaged down to one axis the table still has one entry per 50 Hz frame,
+    so every length agrees and the time panel is drawn unharmed; only
+    ``pcolormesh`` notices, unpacking the shape into two names and reporting
+    that it got one value -- and only for the two-panel figure, since a
+    caller-supplied ``ax`` never reaches the heatmap at all.
+    """
+    flat = ref_calibration.specific_fluctuation_strength_vs_time.mean(axis=1)
+    with pytest.raises(ValueError, match="'specific_fluctuation_strength_vs_time'"):
+        dataclasses.replace(ref_calibration, specific_fluctuation_strength_vs_time=flat)
+
+
+@pytest.mark.parametrize(
+    "field", ["bark", "centre_frequencies", "specific_fluctuation_strength"]
+)
+@pytest.mark.xdist_group("ecma-fluctuation-ref")
+def test_a_band_axis_off_the_filter_bank_is_refused(
+    ref_calibration: psychoacoustics.EcmaFluctuationStrength, field: str
+) -> None:
+    """The 53 bands are the standard's filter bank, however long the signal.
+
+    ``bark`` is the heatmap's y axis, and the other two name and summarise
+    those same bands for the caller. A ``bark`` of another length makes
+    ``pcolormesh`` refuse the whole table when the full figure is drawn, and
+    nothing at all when the caller supplies an ``ax``: only the time panel is
+    drawn then, so the disagreement goes nowhere and ``plot`` returns as if
+    all were well.
+    """
+    column = np.asarray(getattr(ref_calibration, field))
+    with pytest.raises(ValueError, match=f"'{field}'"):
+        dataclasses.replace(ref_calibration, **{field: column[:-1]})
+
+
+@pytest.mark.xdist_group("ecma-fluctuation-ref")
+def test_a_time_axis_with_a_second_axis_is_refused(
+    ref_calibration: psychoacoustics.EcmaFluctuationStrength,
+) -> None:
+    """A column of times counts the frames correctly and is still not an axis.
+
+    ``plot`` broadcasts it against the trace without complaint; the shaded
+    fill underneath is what stops, with ``'x' is not 1-dimensional`` -- naming
+    matplotlib's own parameter, not the field that carried the extra axis.
+    """
+    with pytest.raises(ValueError, match="'time'"):
+        dataclasses.replace(ref_calibration, time=ref_calibration.time[:, None])
 
 
 def test_invalid_field_raises() -> None:

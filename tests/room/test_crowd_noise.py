@@ -217,22 +217,16 @@ def test_plot_draws_one_curve_per_absorption_plus_two_references() -> None:
     plt.close("all")
 
 
-def test_plot_rejects_fewer_absorption_areas_than_level_rows() -> None:
-    """The result is frozen but unchecked, so the plot enforces its own shape.
+def test_fewer_absorption_areas_than_level_rows_is_refused() -> None:
+    """One area missing draws one curve fewer, so the pairing is refused.
 
-    Nothing validates ``levels`` against ``absorption_areas`` at construction,
-    and a hand-built result with one area missing used to draw one curve fewer
-    in silence instead of saying so.
+    The refusal used to be the plot's own, which left the same result free to
+    be handed to anything else. It is refused when the result is built now,
+    which covers the plot and every other reader at once.
     """
-    matplotlib = pytest.importorskip("matplotlib")
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
     result = room.crowd_noise([20.0, 90.0, 190.0])
-    short = dataclasses.replace(result, absorption_areas=result.absorption_areas[:-1])
-    with pytest.raises(ValueError, match="absorption_areas"):
-        short.plot()
-    plt.close("all")
+    with pytest.raises(ValueError, match="'absorption_areas'"):
+        dataclasses.replace(result, absorption_areas=result.absorption_areas[:-1])
 
 
 @pytest.mark.parametrize(

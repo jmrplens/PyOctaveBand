@@ -46,6 +46,11 @@ from typing import TYPE_CHECKING, Any, Protocol
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
+from .._internal.validation import (
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
 from .ntff import ContourPhasors
 
 if TYPE_CHECKING:
@@ -1167,6 +1172,42 @@ class FDTD2D:
         return _run_recording(self, steps, record_every, decimate)
 
 
+def _require_grid_axes(
+    owner: str,
+    shape: tuple[int, int],
+    snapshots: NDArray[np.float64] | None,
+    obstacle_mask: NDArray[np.bool_] | None,
+) -> None:
+    """Require every whole-domain raster to cover the grid ``shape`` names.
+
+    Shared by the acoustic and the elastic result, which record different
+    fields over the same domain and hand them to the same snapshot renderer.
+    That renderer takes the physical extent of the picture from ``shape``
+    alone and draws the obstacle map on top of it as a second image over the
+    same extent, so a raster recorded on a different grid is stretched to fit
+    a domain it never covered, with the geometry landing on cells that were
+    never simulated. Neither imshow nor the eye objects: the frame is a
+    perfectly ordinary field plot of the wrong thing.
+
+    :param owner: Name of the result type being checked, for the message.
+    :param shape: The grid the run covered, ``(ny, nx)``.
+    :param snapshots: Recorded frames, ``(n_frames, ny, nx)``, or ``None``.
+    :param obstacle_mask: Rigid-cell map, ``(ny, nx)``, or ``None``.
+    :raises ValueError: if a raster disagrees with ``shape``.
+    """
+    ny, nx = shape
+    rows = {"shape (rows)": ny}
+    columns = {"shape (columns)": nx}
+    if snapshots is not None:
+        rows["snapshots (axis 1)"] = snapshots.shape[1]
+        columns["snapshots (axis 2)"] = snapshots.shape[2]
+    if obstacle_mask is not None:
+        rows["obstacle_mask"] = obstacle_mask.shape[0]
+        columns["obstacle_mask (axis 1)"] = obstacle_mask.shape[1]
+    require_equal_counts(owner, rows, "grid row")
+    require_equal_counts(owner, columns, "grid column")
+
+
 @dataclass(frozen=True)
 class FDTDResult:
     r"""Frozen result of a :func:`fdtd_simulation` run.
@@ -1199,6 +1240,44 @@ class FDTDResult:
     snapshots: NDArray[np.float64] | None
     snapshot_times: NDArray[np.float64] | None
     obstacle_mask: NDArray[np.bool_] | None
+
+    def __post_init__(self) -> None:
+        """Reject a run whose probes, time axis and grid do not line up.
+
+        Every reader of a run is a picture, and neither picture can defend
+        itself. The probe plot pairs each row of ``pressures`` with the label
+        built from the matching row of ``probe_positions``, so a positions
+        array of another length surfaces only at drawing time, as a zip that
+        reports two lengths and names neither array, an entire run after the
+        mistake was made. The snapshot plot does not surface it at all: it
+        stamps the frame across an extent taken from ``shape``, which turns a
+        frame recorded on a different grid into a plausible field over a
+        domain it never covered.
+
+        :raises ValueError: if the probe, time-step, snapshot or grid axes
+            disagree.
+        """
+        require_ranks(
+            self,
+            times=1,
+            pressures=2,
+            probes=2,
+            probe_positions=2,
+            snapshots=3,
+            snapshot_times=1,
+            obstacle_mask=2,
+        )
+        require_same_length(
+            self, "pressures", "probes", "probe_positions", axis="probe"
+        )
+        require_same_length(
+            self, ("probes", 1), ("probe_positions", 1), axis="coordinate"
+        )
+        require_same_length(self, "times", ("pressures", 1), axis="time step")
+        require_same_length(self, "snapshots", "snapshot_times", axis="snapshot")
+        _require_grid_axes(
+            type(self).__name__, self.shape, self.snapshots, self.obstacle_mask
+        )
 
     @property
     def size(self) -> tuple[float, float]:

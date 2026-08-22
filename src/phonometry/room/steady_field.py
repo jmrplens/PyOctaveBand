@@ -81,7 +81,12 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from .._internal.types import as_float_or_array
-from .._internal.validation import require_choice, require_positive
+from .._internal.validation import (
+    require_choice,
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -287,6 +292,42 @@ class SteadyFieldResult:
     room_constant: float
     sound_power_level: float
     directivity: float
+
+    def __post_init__(self) -> None:
+        """Reject a field whose curves do not run over its own distances.
+
+        :attr:`direct`, :attr:`reverberant` and :attr:`total` are three levels
+        sampled at the same places, and the plot draws each of them against
+        :attr:`distances` point for point, so the four arrays are one curve
+        read off by position. A level array of another length is matplotlib
+        refusing the pair -- ``x and y must have same first dimension, but
+        have shapes (30,) and (29,)`` -- in both directions, one short and one
+        long alike. That message carries two bare shapes and names neither the
+        field that slipped nor the result it came from, and it arrives partway
+        through the drawing: a caller who passed an axes of their own keeps
+        whichever curves came first, the direct field for a reverberant one
+        that has slipped, both of them for the total.
+
+        Length alone would not catch the worse mistake, so the rank is pinned
+        too. A level array of shape ``(n, 2)`` has ``n`` rows and satisfies
+        every count, and matplotlib reads each of its columns as a separate
+        line: the figure comes back with an extra curve in the same colour and
+        dash as the real one, a second identical entry in the legend, and a
+        vertical range stretched to cover it. Nothing is raised and nothing is
+        said.
+
+        The critical distance, the room constant, the source power and the
+        directivity label the whole field rather than any point of it, and are
+        left out.
+
+        :raises ValueError: if the direct, reverberant or total levels do not
+            carry one value per distance, or any of the four is not a plain
+            one-dimensional curve.
+        """
+        require_ranks(self, distances=1, direct=1, reverberant=1, total=1)
+        require_same_length(
+            self, "distances", "direct", "reverberant", "total", axis="distance"
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

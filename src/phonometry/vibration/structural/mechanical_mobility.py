@@ -82,7 +82,12 @@ if TYPE_CHECKING:
     from ..._report.metadata import ReportMetadata
 
 
-from ..._internal.validation import require_non_negative, require_positive
+from ..._internal.validation import (
+    require_non_negative,
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 
 # ---------------------------------------------------------------------------
 # FRF taxonomy (ISO 7626-1 Table 1).
@@ -298,6 +303,41 @@ class RigidMassCalibrationResult:
     quantity: str
     tolerance: float
 
+    def __post_init__(self) -> None:
+        """Reject a calibration whose per-frequency quantities disagree.
+
+        The check of 7.5.2 is a verdict on a frequency range, and
+        :attr:`within_tolerance` is what carries it frequency by frequency.
+        :meth:`plot` selects the passing points with ``frequencies[within]``
+        and colours the rest as failures, so a mask of another length is
+        numpy's complaint about a boolean index that does not match the array
+        it indexes, raised from inside the plotter and naming neither field.
+        :attr:`passed` protests less: nothing re-derives it, so a mask
+        covering part of the measured range leaves an overall pass standing
+        over the frequencies it happened to reach, and the drift the
+        calibration exists to catch sits in the ones it did not.
+
+        :raises ValueError: if the per-frequency quantities do not share one
+            frequency axis.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            measured=1,
+            expected=1,
+            deviation=1,
+            within_tolerance=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "measured",
+            "expected",
+            "deviation",
+            "within_tolerance",
+            axis="frequency",
+        )
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes | np.ndarray:
@@ -427,6 +467,24 @@ class MobilityResult:
     frequencies: np.ndarray
     mobility: np.ndarray
     driving_point: bool = True
+
+    def __post_init__(self) -> None:
+        """Reject an FRF whose mobility does not lie on its frequency axis.
+
+        The fiche boxes one number, the peak of ``|Y|``, and dates it: it
+        takes the peak out of :attr:`mobility`, reads the frequency at that
+        same index out of :attr:`frequencies`, and states the measured range
+        from :attr:`frequencies` alone. Two axes of different lengths pair a
+        peak drawn from one of them with a range drawn from the other, so the
+        boxed resonance can sit outside the range printed beside it; where
+        the peak falls past the end of the shorter axis it is instead an
+        index error out of the renderer, naming neither field.
+
+        :raises ValueError: if the mobility does not carry one value per
+            frequency.
+        """
+        require_ranks(self, frequencies=1, mobility=1)
+        require_same_length(self, "frequencies", "mobility", axis="frequency")
 
     @property
     def magnitude(self) -> np.ndarray:

@@ -1331,6 +1331,43 @@ class InSituElementResult:
     sound_reduction_index: np.ndarray
     impact_level: np.ndarray
 
+    def __post_init__(self) -> None:
+        """Reject an element whose in-situ spectra do not share a band axis.
+
+        This result is an input as much as an output:
+        :func:`airborne_flanking_path` and :func:`impact_flanking_path` take
+        the absorption length of *this* element and of another, and combine
+        the two sound reduction indices band by band into one path. A
+        spectrum that lost its band axis is stretched over its partner's
+        rather than refused, and the path that comes back is the right length
+        with the right units, so it takes its row in the sheet and its share
+        of the transmitted energy without anything having gone visibly wrong.
+
+        :raises ValueError: if the per-band spectra disagree.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            radiation_factor=1,
+            forced_radiation_factor=1,
+            total_loss_factor=1,
+            reverberation_time=1,
+            absorption_length=1,
+            sound_reduction_index=1,
+            impact_level=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "radiation_factor",
+            "forced_radiation_factor",
+            "total_loss_factor",
+            "reverberation_time",
+            "absorption_length",
+            "sound_reduction_index",
+            "impact_level",
+        )
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:

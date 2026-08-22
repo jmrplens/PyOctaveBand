@@ -83,7 +83,12 @@ if TYPE_CHECKING:
     from ..._report.metadata import ReportMetadata
 
 
-from ..._internal.validation import require_per_band, require_positive
+from ..._internal.validation import (
+    require_per_band,
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 from .flanking_transmission import total_loss_factor
 
 #: EN 15657 vibratory velocity reference ``v0`` (= ISO 1683 10^-9 m/s), m/s.
@@ -215,6 +220,30 @@ class StructureBornePowerResult:
     mass_per_area: float
     area: float
     frequencies: np.ndarray | None = None
+
+    def __post_init__(self) -> None:
+        """Reject a plate result whose per-band quantities disagree.
+
+        The EN 15657 fiche prints ``Lv``, ``eta`` and ``L_Ws`` as columns of
+        one band table whose row count comes from ``L_Ws`` alone, so a
+        companion array one entry longer is not refused, merely cut off at
+        that count. ``frequencies`` fares worse than being cut off: the
+        octave grouping the labels are printed in is inferred from the whole
+        of it, so a surplus band the sheet never shows still decides how the
+        bands it does show are named and grouped.
+
+        :raises ValueError: if any per-band quantity disagrees with the rest.
+        """
+        require_ranks(
+            self,
+            power_level=1,
+            velocity_level=1,
+            loss_factor=1,
+            frequencies=1,
+        )
+        require_same_length(
+            self, "power_level", "velocity_level", "loss_factor", "frequencies"
+        )
 
     @property
     def total_level(self) -> float:

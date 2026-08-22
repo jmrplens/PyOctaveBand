@@ -67,7 +67,12 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_choice, require_positive
+from ..._internal.validation import (
+    require_choice,
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -132,6 +137,28 @@ class RadiationEfficiencyResult:
     length_y: float
     boundary: str
     baffle: str
+
+    def __post_init__(self) -> None:
+        r"""Reject an efficiency that does not carry one value per band.
+
+        :attr:`radiation_efficiency` is only ever meaningful against the band
+        it was evaluated in: which of the three expressions of method no. 1
+        produced a given value depends on where that band sits relative to
+        :attr:`critical_frequency`, so a band axis of another length reads the
+        below-coincidence value as an above-coincidence one. :meth:`plot`
+        draws ``sigma`` against :attr:`frequencies` and marks ``fc`` on the
+        same axis, and the radiation factor that
+        :func:`~phonometry.emission.sound_power_from_vibration` takes from
+        :attr:`radiation_efficiency` is applied to a velocity level band by
+        band, so a spectrum that has slipped against its own frequencies
+        scales the plate's vibration by the efficiency of a band it was never
+        evaluated in.
+
+        :raises ValueError: if the efficiency does not carry one value per
+            band.
+        """
+        require_ranks(self, frequencies=1, radiation_efficiency=1)
+        require_same_length(self, "frequencies", "radiation_efficiency")
 
     @property
     def radiation_index(self) -> np.ndarray:

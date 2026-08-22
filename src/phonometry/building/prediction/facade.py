@@ -71,6 +71,13 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import (
+    require_axis_count,
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
@@ -204,6 +211,47 @@ class FacadePredictionResult:
     frequencies: np.ndarray | None = None
     elements: tuple[FacadeElement, ...] | None = None
 
+    def __post_init__(self) -> None:
+        """Reject a prediction whose element rows and bands do not line up.
+
+        The fiche prints one row per façade element and rates each row on its
+        own through the ISO 717-1 curve fit, which recognises a spectrum by
+        how many values it holds: a row carrying the wrong band set is still
+        rated, against a reference curve for bands the façade was not
+        predicted on, and the ``Rp,w`` it prints looks like every other row of
+        the table. The verbose sheet then gives that same row a share of the
+        transmitted energy, summed over whatever bands it holds, so a row one
+        band too long claims energy the façade never transmitted and the sheet
+        can name the wrong element as the limiting one.
+
+        ``elements`` is the geometry :meth:`plot_geometry` draws, one patch per
+        element beside the table's one row per element, so the two views must
+        describe the same façade.
+
+        :raises ValueError: if the per-band quantities disagree, if an element
+            partial index does not run over the predicted bands, or if the
+            retained geometry holds a different number of elements.
+        """
+        require_ranks(self, r_prime=1, r_45=1, r_tr_s=1, d_2m_nt=1, frequencies=1)
+        require_same_length(self, "r_prime", "r_45", "r_tr_s", "d_2m_nt", "frequencies")
+        owner = type(self).__name__
+        bands = require_axis_count(self.r_prime, owner, "r_prime", rank=None)
+        for name, partial in self.element_r.items():
+            label = f"element_r[{name!r}]"
+            require_equal_counts(
+                owner,
+                {
+                    "r_prime": bands,
+                    label: require_axis_count(partial, owner, label, rank=1),
+                },
+            )
+        if self.elements is not None:
+            require_equal_counts(
+                owner,
+                {"elements": len(self.elements), "element_r": len(self.element_r)},
+                "façade element",
+            )
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -305,6 +353,21 @@ class RadiatedPowerResult:
     r_prime: np.ndarray
     l_w_dba: float | None = None
     frequencies: np.ndarray | None = None
+
+    def __post_init__(self) -> None:
+        """Reject a radiated power whose bands and band centres disagree.
+
+        The plot draws one bar per band from ``l_w`` on a categorical axis and
+        takes the tick labels from ``frequencies``, placing one tick per label
+        rather than one per bar: a band centre too few leaves the last bars
+        anonymous, one too many hangs a centre past the end of the row. The
+        bars keep their heights either way, so the figure reads as a spectrum
+        whose levels sit at frequencies they were never computed for.
+
+        :raises ValueError: if the per-band quantities disagree.
+        """
+        require_ranks(self, l_w=1, r_prime=1, frequencies=1)
+        require_same_length(self, "l_w", "r_prime", "frequencies")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

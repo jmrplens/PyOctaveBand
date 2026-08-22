@@ -191,21 +191,18 @@ def test_verbose_shows_areas_and_times_one_page(tmp_path) -> None:
         "absorption_area_with_specimen",
     ],
 )
-def test_verbose_rejects_short_band_column(field: str, tmp_path) -> None:
-    """Every column of the verbose table must be as long as ``frequencies``.
+def test_a_short_band_column_is_refused(field: str) -> None:
+    """Every per-band column must be as long as ``frequencies``.
 
-    ``SoundAbsorptionMeasurement`` is a frozen dataclass with no validation, so
-    a hand-built result can carry a per-band column one band short. The detail
-    table would then be silently truncated, so the renderer names the offending
-    column and raises before any PDF is written.
+    A column one band short would leave the detail table silently truncated.
+    The refusal used to be the renderer's, and only on the verbose sheet; the
+    measurement refuses to exist that way now, which covers the plain sheet
+    and the plot with it.
     """
     result = _result()
-    short = replace(result, **{field: getattr(result, field)[:-1]})
-    out = tmp_path / "iso354_short.pdf"
-    metadata = _metadata()
-    with pytest.raises(ValueError, match=field):
-        short.report(str(out), metadata=metadata, verbose=True)
-    assert not out.exists()
+    one_short = getattr(result, field)[:-1]
+    with pytest.raises(ValueError, match=f"'{field}'"):
+        replace(result, **{field: one_short})
 
 
 def test_metadata_xml_specials_do_not_break(tmp_path) -> None:

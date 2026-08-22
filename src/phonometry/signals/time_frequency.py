@@ -54,6 +54,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from .._internal.validation import require_ranks, require_same_length
 from ..io._resolve import resolve_fs
 from .spectra import (
     _DEFAULT_OVERLAP,
@@ -150,6 +151,31 @@ class SpectrogramResult:
     nperseg: int
     overlap: float
     scaling: str
+
+    def __post_init__(self) -> None:
+        """Reject a display whose raster does not match the plane it is on.
+
+        :attr:`power` is drawn as a single raster image whose extent is built
+        from the ends of :attr:`frequencies` and :attr:`times` rather than
+        from the image itself, so ``imshow`` stretches whatever grid it is
+        given across those two spans without complaint. A power array with
+        the wrong number of rows therefore does not fail: it rescales, and
+        every tone in the display lands at a frequency it was never measured
+        at, on a plot that still carries a correctly labelled axis. The same
+        holds along time, where a column count that disagrees slides the
+        whole record forwards or backwards under a time axis that looks
+        right.
+
+        The two axes are pinned separately and the segment axis of
+        :attr:`power` is its second one, because the array is stored as
+        ``(frequencies, times)`` -- one row per bin, one column per segment.
+
+        :raises ValueError: if the power grid disagrees with either axis of
+            the time-frequency plane.
+        """
+        require_ranks(self, times=1, frequencies=1, power=2)
+        require_same_length(self, "frequencies", "power", axis="frequency bin")
+        require_same_length(self, "times", ("power", 1), axis="segment")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -295,6 +321,32 @@ class ZoomFFTResult:
     resolution_bandwidth: float
     window: str
     n_points: int
+
+    def __post_init__(self) -> None:
+        """Reject a zoom spectrum whose lines do not sit on its own grid.
+
+        The three spectral quantities are one measurement seen three ways:
+        :attr:`amplitude` is the modulus of :attr:`spectrum` and
+        :attr:`power` its mean square, both taken bin by bin, and all three
+        are read against :attr:`frequencies`. The whole point of the zoom is
+        that a line's position on that grid is the answer -- which of two
+        sidebands is which, how far the hum sits from the tone -- so an array
+        of another length does not merely plot short: it shifts every line
+        onto a neighbour's frequency while the axis limits, taken from the
+        first and last grid points, still say the band was covered.
+
+        :raises ValueError: if any spectral quantity disagrees with the zoom
+            grid.
+        """
+        require_ranks(self, frequencies=1, spectrum=1, amplitude=1, power=1)
+        require_same_length(
+            self,
+            "frequencies",
+            "spectrum",
+            "amplitude",
+            "power",
+            axis="grid point",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

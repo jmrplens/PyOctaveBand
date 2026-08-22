@@ -44,6 +44,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from .._internal.utils import _typesignal
+from .._internal.validation import require_ranks, require_same_length
 from ..filters.core import OctaveFilterBank
 from ..io._resolve import apply_calibration, resolve_fs
 
@@ -156,6 +157,60 @@ class RoomAcousticsResult:
     t20_valid: np.ndarray
     t30_valid: np.ndarray
     curvature: np.ndarray
+
+    def __post_init__(self) -> None:
+        """Reject a result whose parameters do not run over the same bands.
+
+        The ISO 3382 fiche prints one row per band, taking the row count from
+        ``t30`` and reading every other parameter at that row's index, with
+        the band label of the row taken from ``frequency``. A parameter one
+        entry longer than the rest is dropped off the end of the table; one
+        entry shorter raises an index error from inside reportlab, naming
+        neither the field nor the two lengths. Worse than either, the boxed
+        mid-frequency reverberation time is read by looking the 500 Hz and
+        1000 Hz bands up in ``frequency`` and taking ``t30`` at the index
+        found there, so a band axis that has slipped against the parameters
+        quotes another band's decay time under the "500-1000 Hz" label, on a
+        sheet whose verdict row then compares that number with the target.
+
+        The validity flags travel the same axis: the plot greys and hatches
+        the bars of the bands they reject, and a flag array of another length
+        greys the wrong ones.
+
+        :raises ValueError: if any per-band array disagrees with the rest.
+        """
+        require_ranks(
+            self,
+            frequency=1,
+            edt=1,
+            t20=1,
+            t30=1,
+            c50=1,
+            c80=1,
+            d50=1,
+            ts=1,
+            dynamic_range=1,
+            edt_valid=1,
+            t20_valid=1,
+            t30_valid=1,
+            curvature=1,
+        )
+        require_same_length(
+            self,
+            "frequency",
+            "edt",
+            "t20",
+            "t30",
+            "c50",
+            "c80",
+            "d50",
+            "ts",
+            "dynamic_range",
+            "edt_valid",
+            "t20_valid",
+            "t30_valid",
+            "curvature",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -437,6 +492,29 @@ class DecayCurve:
     time: np.ndarray
     level: np.ndarray
     band: float | None = None
+
+    def __post_init__(self) -> None:
+        """Reject a curve whose two halves are not the same curve.
+
+        ``time`` and ``level`` are one sampled decay read off by position:
+        the plot draws the levels against the times point for point, and each
+        straight-line fit cuts its evaluation range as a mask over ``level``
+        and indexes ``time`` with it, so a decay time is only ever as right as
+        the pairing. Nothing downstream re-establishes it, and the dataclass
+        unpacks as ``time, level = decay_curve(...)``, which sends the two
+        arrays on into code that never sees this class again. Left to be
+        discovered there, the halves are reported by matplotlib or numpy as a
+        pair of shapes, from inside whatever finally drew them, which for a
+        curve computed once and plotted later is a long way from the point
+        the two parted company.
+
+        ``band`` is a single centre frequency labelling the whole curve, not
+        an axis, and is left out.
+
+        :raises ValueError: if ``time`` and ``level`` differ in length.
+        """
+        require_ranks(self, time=1, level=1)
+        require_same_length(self, "time", "level", axis="sample")
 
     def __iter__(self) -> Iterator[np.ndarray]:
         """Yield ``time`` then ``level`` so the result unpacks like a tuple."""

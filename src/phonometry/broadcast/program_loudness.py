@@ -57,7 +57,7 @@ if TYPE_CHECKING:
 from .._internal.peaks import inter_sample_peak
 from .._internal.types import as_float_or_array
 from .._internal.utils import _typesignal
-from .._internal.validation import require_positive
+from .._internal.validation import require_positive, require_ranks, require_same_length
 
 _EMPTY_SIGNAL = "Input signal 'x' cannot be empty."
 
@@ -279,6 +279,36 @@ class KWeightingResponse:
     shelf_db: np.ndarray
     highpass_db: np.ndarray
     fs: float
+
+    def __post_init__(self) -> None:
+        """Reject a response whose curves do not all run over the same grid.
+
+        The plot lays the two stages under the combined curve on one shared
+        frequency axis, and the combined magnitude is meant to be their sum, so
+        a curve of another length is a curve read against the wrong
+        frequencies. What the reader takes from the figure are the two
+        landmarks the whole measurement is anchored to, the +4 dB shelf plateau
+        and the 0.69 dB gain at 997 Hz that the ``-0.691`` of Formula 2
+        cancels, and a shifted curve still shows both of them, just at the
+        wrong place on the axis.
+
+        :raises ValueError: if any curve disagrees with ``frequencies``.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            magnitude_db=1,
+            shelf_db=1,
+            highpass_db=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "magnitude_db",
+            "shelf_db",
+            "highpass_db",
+            axis="frequency",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -706,6 +736,47 @@ class ProgramLoudnessResult:
     true_peak_per_channel: np.ndarray
     channel_weights: np.ndarray
     fs: float
+
+    def __post_init__(self) -> None:
+        """Reject a measurement whose series or channel columns disagree.
+
+        Three independent axes run through an EBU Mode measurement and none may
+        be pinned to another: the momentary series is read over a 400 ms window
+        every 10 ms, the short-term series over a 3 s window every 100 ms, and
+        the channel columns count loudspeakers. Within each axis, though, the
+        two arrays are one set of readings seen twice, so they are checked pair
+        by pair.
+
+        The fiche prints the momentary and short-term maxima as headline
+        figures and the series themselves as the plot below, so a reading
+        without its time is a maximum taken over a stretch of programme the
+        graph does not show. The channel columns never reach the sheet at all,
+        only their maximum does, which is exactly why they are checked here: a
+        weight vector that does not cover every channel leaves a headline true
+        peak for a channel the programme loudness never counted, and no reader
+        downstream is in a position to notice.
+
+        :raises ValueError: if the two arrays of any of the three axes
+            disagree.
+        """
+        require_ranks(
+            self,
+            momentary=1,
+            momentary_time=1,
+            short_term=1,
+            short_term_time=1,
+            true_peak_per_channel=1,
+            channel_weights=1,
+        )
+        require_same_length(
+            self, "momentary", "momentary_time", axis="momentary reading"
+        )
+        require_same_length(
+            self, "short_term", "short_term_time", axis="short-term reading"
+        )
+        require_same_length(
+            self, "true_peak_per_channel", "channel_weights", axis="channel"
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

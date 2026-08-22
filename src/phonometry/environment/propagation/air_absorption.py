@@ -72,6 +72,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
 from ..._internal.warnings import PhonometryWarning
 from ...materials.absorbers.sound_absorption import attenuation_from_alpha
 
@@ -331,17 +332,49 @@ class AtmosphericAttenuation:
     distance: float | None = None
 
     def __post_init__(self) -> None:
-        """Validate the ``distance`` invariant on any construction path.
+        """Validate the ``distance`` invariant and the curve it belongs to.
 
         A propagation distance must be finite and non-negative; enforcing it
         here (rather than only in :func:`atmospheric_attenuation`) keeps direct
         construction of the frozen result and the factory consistent.
+
+        The rest of the result is a single curve: every entry of
+        :attr:`attenuation_coefficient` is Eq. (5) evaluated at the frequency
+        in the same position of :attr:`frequencies`, which is why the factory
+        derives both from the one array the caller passed. :meth:`plot` reads
+        them as that pair, in one ``semilogx`` call of alpha against the
+        frequencies, and neither way of breaking the pairing is reported in
+        those terms. Two different lengths are matplotlib's ``x and y must
+        have same first dimension, but have shapes (6,) and (3,)``, raised
+        from inside the plotter for a coefficient both shorter and longer than
+        its frequencies, naming neither field, nor this result, nor which of
+        the two shapes is the frequency axis. An extra axis is not reported at
+        all: a coefficient of shape ``(6, 2)`` -- the shape a caller lands on
+        by stacking the coefficients of two atmospheres -- is drawn silently as
+        two curves over the one frequency axis, with the single set of stored
+        conditions printed twice in the legend, once per curve; a
+        ``(6, 2)`` frequency array draws the same two curves just as quietly,
+        over limits taken from the whole of it.
+
+        A pair of nought-dimensional arrays is left alone: there is no axis
+        there to disagree about. The factory never builds one -- it stores a
+        single frequency as a length-one array -- but a direct construction
+        from a scalar evaluation does, and a scalar paired with an array is
+        still refused as a coefficient that carries no value per frequency.
+
+        :raises ValueError: if ``distance`` is negative or non-finite, or if
+            the coefficient and the frequency axis do not carry one value each
+            per frequency, or either of them carries an extra axis.
         """
         if self.distance is not None and (
             not np.isfinite(self.distance) or self.distance < 0.0
         ):
             msg = "'distance' must be a finite, non-negative number of metres."
             raise ValueError(msg)
+        require_ranks(self, frequencies=1, attenuation_coefficient=1)
+        require_same_length(
+            self, "frequencies", "attenuation_coefficient", axis="frequency"
+        )
 
     @property
     def total_attenuation(self) -> NDArray[np.float64] | None:

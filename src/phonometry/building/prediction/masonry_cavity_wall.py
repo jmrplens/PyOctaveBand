@@ -82,7 +82,12 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_finite_array, require_positive
+from ..._internal.validation import (
+    require_finite_array,
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 from ...vibration.structural.point_mobility import infinite_plate_mobility
 
 if TYPE_CHECKING:
@@ -186,6 +191,35 @@ class WallTieCouplingResult:
     ties_per_area: float
     tie_stiffness: float | None
     rigid_coupling_loss_factor: np.ndarray
+
+    def __post_init__(self) -> None:
+        """Reject spectra that do not share one frequency axis.
+
+        The figure shades the gap between ``coupling_loss_factor`` and the
+        rigid ceiling, and that shaded band is the answer the reader takes
+        away: how much isolation the resilient tie buys over a screw. A gap
+        can only be read where both curves are given at the same frequency,
+        and ``connector_mobility`` is the term that opens it, so a spectrum of
+        another length puts the comparison between different frequencies while
+        the shading still looks like an amount of isolation.
+
+        :raises ValueError: if the per-frequency spectra disagree.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            coupling_loss_factor=1,
+            connector_mobility=1,
+            rigid_coupling_loss_factor=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "coupling_loss_factor",
+            "connector_mobility",
+            "rigid_coupling_loss_factor",
+            axis="frequency",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

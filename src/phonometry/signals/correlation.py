@@ -56,6 +56,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from .._internal.validation import require_ranks, require_same_length
 from ..io._resolve import resolve_fs, resolve_pair_fs
 from ..io._signal import Signal
 from .spectra import (
@@ -168,6 +169,23 @@ class CorrelationResult:
     fs: float
     n_samples: int
     duration: float
+
+    def __post_init__(self) -> None:
+        """Reject an estimate whose three curves do not share one lag axis.
+
+        The three are read as columns of one table: :meth:`plot` draws
+        :attr:`values` against :attr:`lags`, and :meth:`random_error` turns
+        :attr:`coefficient` into an error per lag, position by position,
+        without ever looking at :attr:`lags` again. Nothing downstream can
+        catch a coefficient of another length, because what comes back is a
+        well-formed error curve; it is simply indexed by a lag axis it was
+        never measured on, and the reader pairs it with the delay that
+        Bendat & Piersol's Eq. 8.129 uncertainty is quoted for.
+
+        :raises ValueError: if the two estimates disagree with the lag axis.
+        """
+        require_ranks(self, lags=1, values=1, coefficient=1)
+        require_same_length(self, "lags", "values", "coefficient", axis="lag")
 
     def random_error(self, signal_bandwidth: float) -> NDArray[np.float64]:
         r"""Normalized random error of the estimate at each lag.
@@ -507,6 +525,24 @@ class TimeDelayResult:
     delay_interval: tuple[float, float] | None
     signal_bandwidth: float | None
     fs: float
+
+    def __post_init__(self) -> None:
+        """Reject a delay estimate whose curve does not run over its lags.
+
+        The curve is the evidence for the number: :meth:`plot` draws it
+        against :attr:`lags` and rules :attr:`delay` across it, so the figure
+        asserts that the marked delay is where the peak is. A curve of
+        another length shifts the peak away from the estimate the searcher
+        actually located, and the estimate is reported as a scalar that
+        carries no record of the axis it was found on.
+
+        :attr:`delay_interval` is left out: it holds the two ends of the
+        95 % interval, a pair rather than a curve.
+
+        :raises ValueError: if the curve disagrees with the lag axis.
+        """
+        require_ranks(self, lags=1, correlation=1)
+        require_same_length(self, "lags", "correlation", axis="lag")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -916,6 +952,23 @@ class AlignedImpulseResponseResult:
     delay: float
     delay_samples: float
     fs: float
+
+    def __post_init__(self) -> None:
+        """Reject a pair of impulse responses that are not comparable.
+
+        The point of the result is that the two records can now be read
+        sample against sample -- averaged into an ensemble, subtracted,
+        overlaid. :meth:`plot` does exactly that, building one time axis from
+        :attr:`reference` and drawing both traces on it. Two records of
+        different lengths were never comparable in the first place, and
+        :attr:`delay_samples`, a fractional shift stated in samples of a rate
+        both are supposed to share, has no meaning between them.
+
+        :raises ValueError: if the aligned record and the reference differ
+            in length.
+        """
+        require_ranks(self, aligned=1, reference=1)
+        require_same_length(self, "aligned", "reference", axis="sample")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

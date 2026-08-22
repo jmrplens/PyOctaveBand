@@ -36,6 +36,8 @@ from ..._internal.validation import (
     require_non_negative,
     require_positive,
     require_positive_array,
+    require_ranks,
+    require_same_length,
 )
 
 if TYPE_CHECKING:
@@ -138,6 +140,39 @@ class AmbientNoiseResult:
     thermal: NDArray[np.float64]
     shipping: NDArray[np.float64] | None
     wind_speed_knots: float
+
+    def __post_init__(self) -> None:
+        """Reject a spectrum whose components do not run over its frequencies.
+
+        A Wenz chart is read by where its curves meet -- the frequency at
+        which the wind curve gives way to the thermal floor is taken straight
+        off the picture -- and the composite level drawn above them is stated
+        to be the energy sum of exactly the components drawn beneath it.
+        Nothing in the result records which frequency an entry belongs to
+        except its position, so a component of another length was summed over
+        a different set of frequencies than the ones the chart puts it under.
+
+        :func:`ocean_ambient_noise` already measures ``shipping`` against the
+        frequencies it was handed, but a frozen result is a value that gets
+        rebuilt: substituting a measured shipping spectrum through
+        :func:`dataclasses.replace` re-enters this constructor and nothing
+        else, and the composite level that comes through with it was summed
+        without the curve now beside it.
+
+        :raises ValueError: if a component disagrees with the frequency axis.
+        """
+        require_ranks(
+            self, frequency=1, spectrum_level=1, wind=1, thermal=1, shipping=1
+        )
+        require_same_length(
+            self,
+            "frequency",
+            "spectrum_level",
+            "wind",
+            "thermal",
+            "shipping",
+            axis="frequency",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

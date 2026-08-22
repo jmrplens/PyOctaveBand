@@ -8,6 +8,7 @@ angle ``arccos(c1/c2)``; and total reflection (``|R| = 1``) below it.
 
 from __future__ import annotations
 
+import dataclasses
 import warnings
 
 import matplotlib as mpl
@@ -172,3 +173,65 @@ def test_seabed_reflection_no_critical_angle_for_slow_bottom() -> None:
 def test_seabed_reflection_plot_smoke() -> None:
     res = seabed_reflection(np.linspace(0.0, 90.0, 91), **_WATER, **_SAND)
     assert res.plot() is not None
+
+
+_PER_ANGLE = "one value per grazing angle"
+_ONE_AXIS = "must have one axis"
+
+
+def test_bottom_loss_columns_must_run_over_one_angle_sweep() -> None:
+    """A loss curve off its angle axis is refused when built, not when read.
+
+    ``.plot()`` draws ``reflection_loss`` against ``grazing_angle``, so that
+    half of a mismatch surfaces only as matplotlib's "x and y must have same
+    first dimension" and two bare shapes, naming neither field.
+    ``reflection_coefficient`` reaches no figure at all: a short one is drawn
+    straight past in silence, and a single-entry one is quieter still,
+    because numpy broadcasts it over every angle. An extra axis is silent
+    too: an ``(n, 2)`` column carries one value per angle by every count and
+    puts a second curve in the picture under a repeated legend row.
+    """
+    good = bottom_reflection_loss(np.linspace(0.0, 90.0, 91), **_WATER, **_SAND)
+    cases = (
+        ("grazing_angle", good.grazing_angle[:-1], _PER_ANGLE),
+        ("reflection_loss", good.reflection_loss[:-1], _PER_ANGLE),
+        ("reflection_loss", np.append(good.reflection_loss, 0.0), _PER_ANGLE),
+        ("reflection_coefficient", good.reflection_coefficient[:1], _PER_ANGLE),
+        ("grazing_angle", np.column_stack([good.grazing_angle] * 2), _ONE_AXIS),
+        ("reflection_loss", np.column_stack([good.reflection_loss] * 2), _ONE_AXIS),
+    )
+    for field, value, fragment in cases:
+        with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+            dataclasses.replace(good, **{field: value})
+
+
+def test_seabed_reflection_columns_must_run_over_one_angle_sweep() -> None:
+    """The bundled record is refused unless its four columns are one sweep.
+
+    ``.plot()`` draws only ``magnitude`` against ``grazing_angle``; the
+    complex ``R`` and the bottom loss beside them reach no figure, so a
+    ``bottom_loss`` of the wrong length lets a complete ``|R|`` curve be drawn
+    over every angle while the decibels a sonar budget spends are wrong and
+    unmentioned. An ``(n, 2)`` column passes every count and doubles the
+    curve.
+    """
+    good = seabed_reflection(np.linspace(0.0, 90.0, 91), **_WATER, **_SAND)
+    cases = (
+        ("grazing_angle", good.grazing_angle[:-1], _PER_ANGLE),
+        ("magnitude", good.magnitude[:-1], _PER_ANGLE),
+        ("bottom_loss", good.bottom_loss[:-1], _PER_ANGLE),
+        ("bottom_loss", np.append(good.bottom_loss, 0.0), _PER_ANGLE),
+        ("reflection_coefficient", good.reflection_coefficient[:1], _PER_ANGLE),
+        ("magnitude", np.column_stack([good.magnitude] * 2), _ONE_AXIS),
+        ("bottom_loss", np.column_stack([good.bottom_loss] * 2), _ONE_AXIS),
+    )
+    for field, value, fragment in cases:
+        with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+            dataclasses.replace(good, **{field: value})
+
+
+def test_scalar_angle_still_builds_both_results() -> None:
+    # A single grazing angle is one angle, not an extra axis: the rank check
+    # must not refuse the one-entry sweep the scalar entry points return.
+    assert bottom_reflection_loss(90.0, **_WATER, **_SAND).reflection_loss.shape == (1,)
+    assert seabed_reflection(90.0, **_WATER, **_SAND).magnitude.shape == (1,)

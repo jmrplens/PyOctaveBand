@@ -41,6 +41,12 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import (
+    require_axis_count,
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
 from .airport_noise import (
     AerodromeAtmosphere,
     FlightSegmentState,
@@ -175,6 +181,29 @@ class AnpNpdCurves:
     distances: NDArray[np.float64]
     levels: NDArray[np.float64]
 
+    def __post_init__(self) -> None:
+        """Reject a curve set whose level table does not match its own two axes.
+
+        The table's axes are what say which power setting and which slant
+        distance every level belongs to, and this class is where a CSV export
+        becomes one: a malformed export reaches the Doc 29 chain, the ``.plot()``
+        and :meth:`level` as a table whose entries are attached to the wrong
+        settings, and each of those reports it, if at all, as a shape it could
+        not use rather than as the aircraft whose table was short. Checking on
+        construction names the export where it was read.
+
+        The two axes are pinned separately because they are independent: the
+        bundled database holds sets of anything from two power settings to ten
+        over the same ten distances, so one count over both would reject all
+        but the handful whose two axes happen to be equally long.
+
+        :raises ValueError: if the level table disagrees with the powers or the
+            distances.
+        """
+        require_ranks(self, powers=1, distances=1, levels=2)
+        require_same_length(self, "powers", "levels", axis="power setting")
+        require_same_length(self, "distances", ("levels", 1), axis="slant distance")
+
     def level(
         self, power: float, distance: NDArray[np.float64] | list[float] | float
     ) -> NDArray[np.float64]:
@@ -222,6 +251,37 @@ class AnpProfile:
     path: NDArray[np.float64]
     ground_roll: NDArray[np.bool_]
     landing_roll: NDArray[np.bool_]
+
+    def __post_init__(self) -> None:
+        """Reject a profile whose roll masks do not cover its path's segments.
+
+        The masks are per segment and the path is per point, so an ``N``-point
+        trajectory takes masks of ``N-1``; ``path`` is the authority here and
+        the masks are what have to follow it. The figure marks the runway by
+        OR-ing the two masks and folding the result onto both endpoints of
+        every roll span, so a mask of any other length raises from numpy about
+        operands it could not broadcast, naming neither the mask nor the
+        profile it was read from. The Doc 29 chain does check the masks, but
+        against the path it was handed at the call, so it reports the trajectory
+        rather than the export the pair actually came from.
+
+        :raises ValueError: if a mask does not carry one entry per path segment.
+        """
+        require_ranks(self, path=2, ground_roll=1, landing_roll=1)
+        owner = type(self).__name__
+        require_equal_counts(
+            owner,
+            {
+                "path segments": len(self.path) - 1,
+                "ground_roll": require_axis_count(
+                    self.ground_roll, owner, "ground_roll", "segment", rank=None
+                ),
+                "landing_roll": require_axis_count(
+                    self.landing_roll, owner, "landing_roll", "segment", rank=None
+                ),
+            },
+            "segment",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

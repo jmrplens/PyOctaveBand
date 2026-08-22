@@ -54,6 +54,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
@@ -887,6 +889,55 @@ class RoadEmissionResult:
     line_power: NDArray[np.float64]
     total_line_power: NDArray[np.float64]
     source_height: float = ROAD_SOURCE_HEIGHT
+
+    def __post_init__(self) -> None:
+        """Reject an emission whose categories and bands do not line up.
+
+        Two axes have to hold. The band axis is the one the A-weighted line
+        power reads: it adds the eight weights of 2.5.5 to the spectrum
+        term by term, so a spectrum of a single band is stretched over all
+        eight by numpy and returns an ordinary-looking dB(A) figure summed
+        over seven bands that were never computed. The category axis is the
+        one the chart reads: it takes the curves from the rows of
+        ``line_power`` and their names from ``categories`` in one strict
+        zip, so a spectrum is never drawn under another category's label.
+        What that zip cannot do is say what went wrong. It raises ``zip()
+        argument 2 is longer than argument 1`` from inside the drawing code,
+        naming neither the result nor either field, and it raises only if
+        the emission is ever plotted: one read for its numbers alone carries
+        the disagreement to the end. Refusing it here names both fields, at
+        the point where the two counts were chosen.
+
+        :raises ValueError: if a per-category array disagrees with
+            ``categories``, or a per-band one with ``frequencies``.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            rolling=2,
+            propulsion=2,
+            vehicle_power=2,
+            line_power=2,
+            total_line_power=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            ("rolling", 1),
+            ("propulsion", 1),
+            ("vehicle_power", 1),
+            ("line_power", 1),
+            "total_line_power",
+        )
+        require_same_length(
+            self,
+            "categories",
+            "rolling",
+            "propulsion",
+            "vehicle_power",
+            "line_power",
+            axis="vehicle category",
+        )
 
     @property
     def a_weighted_line_power(self) -> float:

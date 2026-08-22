@@ -14,6 +14,7 @@ default ``c0 = 343 m/s`` (``k = 0.161113...``).
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import numpy as np
@@ -203,6 +204,50 @@ def test_reverberation_time_models_bundle() -> None:
         "Fitzroy",
         "Arau-Puchades",
     }
+
+
+def test_model_curves_must_run_over_one_band_axis() -> None:
+    """Curves off the band axis are refused when built, not when read.
+
+    The fiche walks ``frequencies`` and reads each curve at that band's index,
+    so a curve one entry short raises a bare index error from inside the row
+    loop and one entry long is dropped off the end of the table; ``plot()``
+    reports matplotlib's two shapes and names neither field. An extra axis is
+    the silent one: it counts one entry per band, so ``plot()`` draws the
+    column as an ordinary line and returns a figure that looks right.
+    """
+    good = room.reverberation_time_models(
+        DIMS, (0.2, 0.15, 0.3), frequencies=[125.0, 250.0, 500.0, 1000.0]
+    )
+    per_band = "one value per band"
+    curves = ("sabine", "eyring", "millington_sette", "fitzroy", "arau_puchades")
+    cases: list[tuple[str, np.ndarray, str]] = [
+        ("frequencies", good.frequencies[:-1], per_band),
+        ("frequencies", np.append(good.frequencies, 2000.0), per_band),
+        ("frequencies", np.column_stack([good.frequencies] * 2), "must have one axis"),
+    ]
+    for name in curves:
+        curve = getattr(good, name)
+        cases += [
+            (name, curve[:-1], per_band),
+            (name, np.append(curve, curve[-1]), per_band),
+            (name, np.column_stack([curve] * 2), "must have one axis"),
+        ]
+    for field, value, fragment in cases:
+        with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+            dataclasses.replace(good, **{field: value})
+
+
+def test_models_single_frequency_is_a_band_axis_of_one() -> None:
+    """A scalar ``frequencies`` labels one band, as ``None`` already does.
+
+    The five curves are made 1-D whatever is passed, so a nought-dimensional
+    band axis beside them would be a mixture the table cannot walk.
+    """
+    res = room.reverberation_time_models(DIMS, (0.2, 0.2, 0.2), frequencies=1000.0)
+    assert res.frequencies.shape == (1,)
+    assert res.frequencies[0] == pytest.approx(1000.0)
+    assert res.sabine.shape == (1,)
 
 
 def test_models_scalar_absorption_broadcasts() -> None:

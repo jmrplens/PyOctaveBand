@@ -106,6 +106,8 @@ from ..._internal.validation import (
     require_choice,
     require_finite_array,
     require_positive,
+    require_ranks,
+    require_same_length,
 )
 from ...io._resolve import SignalInput, resolve_fs, resolve_samples
 
@@ -409,6 +411,43 @@ class HeavyImpactSourceCheck:
     within_tolerance: np.ndarray
     passed: bool
 
+    def __post_init__(self) -> None:
+        """Reject a check whose measurement and printed spectrum differ in length.
+
+        The conformance figure draws the measured ``LFE`` inside a tolerance
+        band built band by band from ``nominal`` and ``tolerance``, and crosses
+        the bands ``within_tolerance`` reports as failing. Every column is
+        paired to the others by position, so one of another length holds a
+        measured band up against the printed limits of a different octave, and
+        ``passed`` beside the figure is the verdict on exactly that pairing.
+
+        The five octaves are fixed by the standard, so the check reads as a
+        band count rather than as a range; it is written here because the type
+        is exported and can be built directly from figures the tables never
+        supplied.
+
+        :raises ValueError: if any per-band column disagrees with the rest.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            measured=1,
+            nominal=1,
+            tolerance=1,
+            deviation=1,
+            within_tolerance=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "measured",
+            "nominal",
+            "tolerance",
+            "deviation",
+            "within_tolerance",
+            axis="octave band",
+        )
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -542,6 +581,36 @@ class StandardizedMaximumImpactResult:
     volume: float
     reverberation_time: np.ndarray
 
+    def __post_init__(self) -> None:
+        """Reject a standardization whose per-band columns disagree.
+
+        The figure draws ``measured`` and ``standardized`` against one
+        frequency axis and shades the standardization correction as the gap
+        between them, so a curve of another length shades the distance between
+        two different bands. The correction and the reverberation time it came
+        from are carried alongside rather than recomputed, and they are what a
+        report quotes to justify the shift, so a reader has nothing left to
+        check the pair against.
+
+        :raises ValueError: if any per-band column disagrees with the rest.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            measured=1,
+            standardized=1,
+            reverberation_correction=1,
+            reverberation_time=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "measured",
+            "standardized",
+            "reverberation_correction",
+            "reverberation_time",
+        )
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -666,6 +735,21 @@ class AWeightedMaximumImpactResult:
     corrected: np.ndarray
     unrounded: float
     rating: int
+
+    def __post_init__(self) -> None:
+        """Reject a rating whose bands and weightings do not line up.
+
+        The figure bars ``corrected`` over the band axis with the unweighted
+        ``levels`` drawn above it and the single number as a horizontal line.
+        The Table D.3 correction falls by nearly 30 dB across the rating range,
+        so a column one band out draws a contribution decibels away from the
+        band it sits over, while the line above it, summed before the result
+        was built, still reads as the right answer.
+
+        :raises ValueError: if any per-band column disagrees with the rest.
+        """
+        require_ranks(self, frequencies=1, levels=1, a_weighting=1, corrected=1)
+        require_same_length(self, "frequencies", "levels", "a_weighting", "corrected")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

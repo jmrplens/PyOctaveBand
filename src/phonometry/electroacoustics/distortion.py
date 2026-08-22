@@ -35,6 +35,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from .._internal.validation import require_ranks, require_same_length
 from ..io._resolve import apply_calibration, resolve_fs
 
 if TYPE_CHECKING:
@@ -679,6 +680,22 @@ class HarmonicDistortionResult:
     thd_r: float
     thd_plus_noise: float
     sinad_db: float
+
+    def __post_init__(self) -> None:
+        """Reject a result whose two harmonic axes are of different lengths.
+
+        The frequencies and the amplitudes are the one list of harmonics
+        written down twice, the nth frequency naming the nth amplitude. No
+        reader re-derives either from the other, so a pairing that ran short
+        goes uncontested: ``zip`` stops at the shorter of the two and the
+        table it fills loses a harmonic that the THD quoted above it summed.
+
+        :raises ValueError: if the two disagree in length.
+        """
+        require_ranks(self, harmonic_frequencies=1, harmonic_amplitudes=1)
+        require_same_length(
+            self, "harmonic_frequencies", "harmonic_amplitudes", axis="harmonic"
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

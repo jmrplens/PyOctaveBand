@@ -70,6 +70,7 @@ if TYPE_CHECKING:
 
     from ...io._signal import Signal
 
+from ..._internal.validation import require_ranks, require_same_length
 from .moore_glasberg import (
     _ERB_C1,
     _ERB_C2,
@@ -377,6 +378,44 @@ class MooreGlasbergTimeVaryingLoudness:
     percentiles: dict[float, float]
     field: str
     presentation: str
+
+    def __post_init__(self) -> None:
+        """Reject traces that do not share the frame axis they are drawn on.
+
+        The frame axis is the only thing that says when any sample happened,
+        and the chart pairs it with the short-term and the long-term traces to
+        draw them, so a trace of another length stops the figure with a
+        matplotlib complaint about a first dimension rather than anything
+        naming the field - and stops it only when someone draws it, while
+        ``n_max`` and the percentiles quoted from that trace were taken over
+        the whole of it either way.
+
+        The two loudness levels are held to the same length for a plainer
+        reason: neither is ever drawn. Each is its own trace mapped phon by
+        phon through Table 5, so one of another length is read as though it
+        still were, reporting at every index the level of a different instant,
+        with nothing anywhere to catch it.
+
+        :raises ValueError: if a trace or a level curve disagrees with the
+            frame axis.
+        """
+        require_ranks(
+            self,
+            time=1,
+            short_term_loudness=1,
+            long_term_loudness=1,
+            short_term_loudness_level=1,
+            long_term_loudness_level=1,
+        )
+        require_same_length(
+            self,
+            "time",
+            "short_term_loudness",
+            "long_term_loudness",
+            "short_term_loudness_level",
+            "long_term_loudness_level",
+            axis="frame",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

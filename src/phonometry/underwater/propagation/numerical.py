@@ -57,7 +57,11 @@ from typing import TYPE_CHECKING, Any, NamedTuple
 import numpy as np
 
 from ..._internal.rays import DynamicRays, SlopingBoundary, march_rays
-from ..._internal.validation import require_positive
+from ..._internal.validation import (
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 from .closed_form import _ABSORPTION_MODELS, _M_PER_KM, seawater_absorption
 from .seabed_reflection import reflection_coefficient
 
@@ -379,6 +383,38 @@ class NormalModeResult:
     receiver_depth: float
     source_depth: float
 
+    def __post_init__(self) -> None:
+        r"""Reject a modal solution whose three axes do not line up.
+
+        A mode is a wavenumber and a shape together. Eq. 5.17 sums
+        :math:`\Psi_m(z_\mathrm{s})\,\Psi_m(z_\mathrm{r})\,e^{i k_{rm} r}/\sqrt{k_{rm}}`
+        over ``m``, pairing each row of ``mode_functions`` with the
+        ``wavenumbers`` entry of the same index and each column of that row
+        with a ``mode_depths`` entry, and a caller re-synthesising the field
+        at some other depth pairs them the same way. The figure states the
+        mode count in its legend by measuring ``wavenumbers`` alone, which
+        makes that count a claim about ``mode_functions`` rather than about
+        the array it was read from.
+
+        The three axes are pinned separately because nothing relates them:
+        how many modes propagate, how fine the depth grid the eigenproblem
+        was discretised on is, and how many ranges the loss slice was asked
+        for are three independent sizes.
+
+        :raises ValueError: if the mode, depth or range axes disagree.
+        """
+        require_ranks(
+            self,
+            wavenumbers=1,
+            mode_depths=1,
+            mode_functions=2,
+            ranges=1,
+            propagation_loss=1,
+        )
+        require_same_length(self, "wavenumbers", "mode_functions", axis="mode")
+        require_same_length(self, "mode_depths", ("mode_functions", 1), axis="depth")
+        require_same_length(self, "ranges", "propagation_loss", axis="range")
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -675,6 +711,71 @@ class RayTraceResult:
     bathymetry_ranges: NDArray[np.float64] | None = None
     bathymetry_depths: NDArray[np.float64] | None = None
 
+    def __post_init__(self) -> None:
+        """Reject a fan whose per-ray histories do not line up.
+
+        The six history arrays are one block, one row per ray and one column
+        per range sample. The figure draws row ``i`` of ``depths`` against row
+        ``i`` of ``ranges``, and :func:`eigenrays` sorts ``launch_angles`` into
+        an order it then indexes ``depths`` with to raise its brackets, so the
+        launch fan is as much a row of that block as the histories are. A block
+        one row short makes both of those read past their array; a block with a
+        row to spare is the quieter mistake, because the drawing loop is bounded
+        by ``ranges`` alone and simply stops, leaving a ray out of the picture
+        with nothing to say it was ever traced.
+
+        ``profile_depths`` and ``profile_speeds`` are the medium itself, the
+        polyline the marcher interpolates and the one :func:`eigenrays` flies
+        fresh rays through; ``bathymetry_ranges`` and ``bathymetry_depths`` are
+        the bottom polyline on the same terms, absent together for a level
+        bottom. Four axes in all, pinned apart because rays, range samples,
+        profile nodes and bathymetry nodes are four unrelated counts.
+
+        :raises ValueError: if the ray, sample, profile or bathymetry axes
+            disagree.
+        """
+        require_ranks(
+            self,
+            launch_angles=1,
+            ranges=2,
+            depths=2,
+            travel_times=2,
+            arc_lengths=2,
+            surface_reflections=2,
+            bottom_reflections=2,
+            profile_depths=1,
+            profile_speeds=1,
+            bathymetry_ranges=1,
+            bathymetry_depths=1,
+        )
+        require_same_length(
+            self,
+            "launch_angles",
+            "ranges",
+            "depths",
+            "travel_times",
+            "arc_lengths",
+            "surface_reflections",
+            "bottom_reflections",
+            axis="ray",
+        )
+        require_same_length(
+            self,
+            ("ranges", 1),
+            ("depths", 1),
+            ("travel_times", 1),
+            ("arc_lengths", 1),
+            ("surface_reflections", 1),
+            ("bottom_reflections", 1),
+            axis="range sample",
+        )
+        require_same_length(
+            self, "profile_depths", "profile_speeds", axis="profile node"
+        )
+        require_same_length(
+            self, "bathymetry_ranges", "bathymetry_depths", axis="bathymetry node"
+        )
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -951,6 +1052,45 @@ class EigenrayResult:
     receiver_depth: float
     source_depth: float
     water_depth: float
+
+    def __post_init__(self) -> None:
+        r"""Reject an arrival list whose per-arrival arrays disagree.
+
+        Every array here is read by position against the others, as the class
+        states above: the pressure the list stands for is
+        :math:`\sum_j a_j e^{i\omega\tau_j}`, which pairs ``amplitudes``
+        with ``travel_times`` entry by entry, and the figure hangs each stem
+        at a time taken from one array, at a height taken from a second and
+        in a colour taken from the sum of two more. Where the odd array
+        carries a single value it does not fail against the rest, it
+        broadcasts into them, and what comes back is one arrival's amplitude
+        charged to the whole fan, or one arrival's boundary count colouring
+        every path in the picture.
+
+        :raises ValueError: if two of the per-arrival arrays disagree in
+            length.
+        """
+        require_ranks(
+            self,
+            launch_angles=1,
+            arrival_angles=1,
+            travel_times=1,
+            amplitudes=1,
+            surface_reflections=1,
+            bottom_reflections=1,
+            caustic_crossings=1,
+        )
+        require_same_length(
+            self,
+            "launch_angles",
+            "arrival_angles",
+            "travel_times",
+            "amplitudes",
+            "surface_reflections",
+            "bottom_reflections",
+            "caustic_crossings",
+            axis="eigenray",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -1607,6 +1747,76 @@ class GaussianBeamResult:
     water_depth: float
     bathymetry_ranges: NDArray[np.float64] | None = None
     bathymetry_depths: NDArray[np.float64] | None = None
+
+    def __post_init__(self) -> None:
+        """Reject a beam solution whose grids do not describe its field.
+
+        The field is drawn as a single raster whose extent is built from the
+        ends of ``ranges`` and ``depths`` rather than from the image, so
+        ``imshow`` stretches whatever grid it is handed across those two spans
+        without complaint. A loss field with the wrong number of columns is
+        therefore not refused but rescaled, and every caustic and shadow zone
+        in it lands at a range it was never computed at, under an axis that
+        still reads correctly. ``pressure`` is the field that loss was taken
+        from, cell for cell, and the cell-by-cell subtraction against a
+        parabolic-equation field that this class is documented to support
+        needs both of them on the grid they claim.
+
+        The beam histories are a second block on two axes of their own: one
+        row per beam of the fan, one column per marching step, with
+        ``launch_angles`` and ``initial_beam_widths`` naming the beams those
+        rows belong to. Their step grid is finer than, and independent of,
+        ``ranges``, which is exactly why it cannot be pinned to it.
+
+        :raises ValueError: if the field, beam, step or bathymetry axes
+            disagree.
+        """
+        require_ranks(
+            self,
+            ranges=1,
+            depths=1,
+            propagation_loss=2,
+            pressure=2,
+            launch_angles=1,
+            ray_ranges=2,
+            ray_depths=2,
+            beam_widths=2,
+            wavefront_curvatures=2,
+            initial_beam_widths=1,
+            bathymetry_ranges=1,
+            bathymetry_depths=1,
+        )
+        require_same_length(
+            self, "depths", "propagation_loss", "pressure", axis="receiver depth"
+        )
+        require_same_length(
+            self,
+            "ranges",
+            ("propagation_loss", 1),
+            ("pressure", 1),
+            axis="range",
+        )
+        require_same_length(
+            self,
+            "launch_angles",
+            "initial_beam_widths",
+            "ray_ranges",
+            "ray_depths",
+            "beam_widths",
+            "wavefront_curvatures",
+            axis="beam",
+        )
+        require_same_length(
+            self,
+            ("ray_ranges", 1),
+            ("ray_depths", 1),
+            ("beam_widths", 1),
+            ("wavefront_curvatures", 1),
+            axis="marching step",
+        )
+        require_same_length(
+            self, "bathymetry_ranges", "bathymetry_depths", axis="bathymetry node"
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -3360,6 +3570,24 @@ class ParabolicEquationResult:
     depths: NDArray[np.float64]
     propagation_loss: NDArray[np.float64]
     source_depth: float
+
+    def __post_init__(self) -> None:
+        """Reject a field that does not fill the grid it is labelled with.
+
+        The same raster and the same hazard as :class:`GaussianBeamResult`:
+        the drawn extent comes from the ends of ``ranges`` and ``depths`` and
+        never from the array, so a field of another shape is stretched to fit
+        and the picture stays entirely plausible while every cell in it moves.
+
+        The two axes are pinned apart because nothing ties their sizes: the
+        range grid follows ``range_step`` across ``max_range`` and the depth
+        grid follows ``n_depth_points``.
+
+        :raises ValueError: if the loss field disagrees with either grid.
+        """
+        require_ranks(self, ranges=1, depths=1, propagation_loss=2)
+        require_same_length(self, "depths", "propagation_loss", axis="depth")
+        require_same_length(self, "ranges", ("propagation_loss", 1), axis="range")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

@@ -52,7 +52,11 @@ if TYPE_CHECKING:
     from ...io._signal import Signal
 
 from ..._internal.utils import _typesignal
-from ..._internal.validation import require_1d_signal
+from ..._internal.validation import (
+    require_1d_signal,
+    require_ranks,
+    require_same_length,
+)
 from ..erb_scale import CAM_C, ERB_C1, ERB_C2, erb_bandwidth, frequency_from_cam
 
 # ---------------------------------------------------------------------------
@@ -538,6 +542,32 @@ class MooreGlasbergLoudness:
     centre_frequencies: np.ndarray
     field: str
     presentation: str
+
+    def __post_init__(self) -> None:
+        """Reject a pattern that does not run over one ERB-number grid.
+
+        The three arrays are one axis read three ways - the sample i of the
+        ERB-number scale, the centre frequency fc(i) of the auditory filter
+        sitting there, and the specific loudness N'(i) that filter produced -
+        so they mean something only index for index. The chart pairs the
+        scale with the pattern and takes the ends of the scale for its x
+        limits, so a disagreement between those two surfaces late and
+        obscurely, as a matplotlib complaint about a first dimension.
+        ``centre_frequencies`` is not drawn at all: a mismatch there reaches
+        the reader intact, naming the wrong filter for every value of the
+        pattern, and the total loudness printed in the title was integrated
+        over a grid the answer no longer describes.
+
+        :raises ValueError: if the three disagree.
+        """
+        require_ranks(self, specific=1, erb_number=1, centre_frequencies=1)
+        require_same_length(
+            self,
+            "erb_number",
+            "specific",
+            "centre_frequencies",
+            axis="auditory filter",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

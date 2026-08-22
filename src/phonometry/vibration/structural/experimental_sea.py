@@ -83,6 +83,8 @@ from ..._internal.validation import (
     require_choice,
     require_positive,
     require_positive_array,
+    require_ranks,
+    require_same_length,
 )
 
 if TYPE_CHECKING:
@@ -312,6 +314,57 @@ class PowerInjectionResult:
     modal_density1: NDArray[np.float64] | None
     modal_density2: NDArray[np.float64] | None
     method: str
+
+    def __post_init__(self) -> None:
+        """Reject a loss-factor budget whose per-band quantities disagree.
+
+        The whole budget is read band against band. :meth:`plot` draws the
+        four loss factors on one frequency axis, where it is the ordering of
+        the curves in each band that says whether the two subsystems are
+        weakly enough coupled for SEA to hold at all, and
+        :attr:`transmitted_power`, :attr:`dissipated_power`,
+        :attr:`coupling_strength` and :attr:`modal_density_ratio` multiply and
+        divide these arrays element by element. Numpy stretches a
+        single-element array over every band rather than objecting, which is
+        the shape a caller lands on by measuring one band where the spectrum
+        needed several, and the power balance that comes back reads like an
+        ordinary answer for a system nobody measured.
+
+        The modal densities are optional: the two-drive inversion determines
+        all four loss factors without them, and an absent quantity is not a
+        disagreement.
+
+        :raises ValueError: if the per-band quantities do not share one band
+            axis.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            coupling_loss_factor12=1,
+            coupling_loss_factor21=1,
+            internal_loss_factor1=1,
+            internal_loss_factor2=1,
+            energy1=1,
+            energy2=1,
+            input_power1=1,
+            input_power2=1,
+            modal_density1=1,
+            modal_density2=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "coupling_loss_factor12",
+            "coupling_loss_factor21",
+            "internal_loss_factor1",
+            "internal_loss_factor2",
+            "energy1",
+            "energy2",
+            "input_power1",
+            "input_power2",
+            "modal_density1",
+            "modal_density2",
+        )
 
     @property
     def input_power(self) -> NDArray[np.float64]:

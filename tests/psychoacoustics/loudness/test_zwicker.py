@@ -11,6 +11,7 @@ ship in ``tests/data/iso532_1/`` (see its README for provenance and ISO
 attribution); ``ISO532_1_TESTDATA`` overrides the location.
 """
 
+import dataclasses
 import json
 import os
 import pathlib
@@ -399,6 +400,52 @@ def test_time_varying_outputs() -> None:
     assert res.n5 is not None
     assert res.n10 is not None
     assert res.n5 >= res.n10
+
+
+def test_trace_that_disagrees_with_its_time_axis_is_refused() -> None:
+    """``time`` and ``loudness_vs_time`` are one axis, so they are pinned as one.
+
+    Left to the reader, either direction ends in matplotlib's "x and y must
+    have same first dimension", raised from ``Axes.plot`` about two shapes and
+    neither field name -- and ``.report()`` then writes no PDF at all.
+    """
+    res = psychoacoustics.loudness_zwicker(_tone(1000.0, 70.0, seconds=0.5), FS)
+    assert res.loudness_vs_time is not None
+    for trace in (
+        res.loudness_vs_time[:-1],
+        np.append(res.loudness_vs_time, res.loudness_vs_time[-1]),
+    ):
+        with pytest.raises(ValueError, match="'loudness_vs_time'"):
+            dataclasses.replace(res, loudness_vs_time=trace)
+
+
+def test_an_extra_axis_on_the_trace_is_refused() -> None:
+    """Counting the steps is not enough; the rank is pinned too.
+
+    A ``loudness_vs_time`` of shape ``(steps, 2)`` counts the steps right and
+    matplotlib reads its two columns as two series: the clause 7 f) panel comes
+    out with two curves both labelled N(t), and ``.report()`` renders the whole
+    fiche without a word.
+    """
+    res = psychoacoustics.loudness_zwicker(_tone(1000.0, 70.0, seconds=0.5), FS)
+    assert res.time is not None
+    assert res.loudness_vs_time is not None
+    with pytest.raises(ValueError, match="'loudness_vs_time' must have one axis"):
+        dataclasses.replace(
+            res, loudness_vs_time=np.column_stack([res.loudness_vs_time] * 2)
+        )
+    with pytest.raises(ValueError, match="'time' must have one axis"):
+        dataclasses.replace(res, time=res.time[:, None])
+
+
+def test_stationary_result_keeps_its_absent_trace() -> None:
+    """The stationary methods leave both fields ``None``, which is not a gap."""
+    for res in (
+        psychoacoustics.loudness_zwicker_from_spectrum(np.full(28, 60.0)),
+        psychoacoustics.loudness_zwicker(_tone(1000.0, 70.0), FS, stationary=True),
+    ):
+        assert res.time is None
+        assert res.loudness_vs_time is None
 
 
 # ---------------------------------------------------------------------------

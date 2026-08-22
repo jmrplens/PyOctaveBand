@@ -71,6 +71,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_ranks, require_same_length
 from ..io._resolve import resolve_fs
 from .spectra import _positive, _validate_signal
 
@@ -204,6 +205,22 @@ class CepstrumResult:
     nfft: int
     linear_phase_samples: int
 
+    def __post_init__(self) -> None:
+        """Reject a cepstrum that does not run over its own quefrency axis.
+
+        :meth:`plot` draws the pair over the unambiguous first half of the
+        axis, slicing both arrays at ``nfft // 2 + 1``, so a disagreement
+        past that point never reaches the figure at all: the curve is drawn,
+        looks ordinary, and the samples that were never paired with a
+        quefrency are simply not there. The ``nfft`` the slice is cut from is
+        recorded separately from either array, so nothing else is in a
+        position to notice.
+
+        :raises ValueError: if the two axes disagree in length.
+        """
+        require_ranks(self, quefrencies=1, cepstrum=1)
+        require_same_length(self, "quefrencies", "cepstrum", axis="quefrency")
+
     def invert(self) -> NDArray[np.float64]:
         """Reconstruct the record from a complex cepstrum.
 
@@ -334,6 +351,37 @@ class LifterResult:
     mode: str
     fs: float
     nfft: int
+
+    def __post_init__(self) -> None:
+        """Reject a split whose two panels do not run over their own axes.
+
+        The result carries two independent axes, and they are not the same
+        length: the log spectra live on the ``nfft // 2 + 1`` bins of a real
+        transform, the cepstrum on the full ``nfft`` quefrencies the lifter
+        window was applied to. Each is checked against its own companions
+        only. :meth:`plot` overlays :attr:`spectrum_db` and
+        :attr:`liftered_db` on one frequency grid to show that the two
+        modes are complementary in dB, a reading that a curve of another
+        length turns into a comparison of two different bands; and it draws
+        the cepstrum panel through the same ``nfft // 2 + 1`` slice as
+        :class:`CepstrumResult`, which hides any disagreement past the
+        midpoint rather than reporting it.
+
+        :raises ValueError: if the spectra disagree with each other, or the
+            cepstrum with its quefrency axis.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            spectrum_db=1,
+            liftered_db=1,
+            quefrencies=1,
+            cepstrum=1,
+        )
+        require_same_length(
+            self, "frequencies", "spectrum_db", "liftered_db", axis="frequency"
+        )
+        require_same_length(self, "quefrencies", "cepstrum", axis="quefrency")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -483,6 +531,27 @@ class EchoDetectionResult:
     search_range: tuple[float, float]
     fs: float
     nfft: int
+
+    def __post_init__(self) -> None:
+        """Reject a detection whose cepstrum and quefrency axis disagree.
+
+        :attr:`delay_samples` is a position in :attr:`cepstrum` and
+        :attr:`delay` is a time on :attr:`quefrencies`; the report of the
+        echo is the claim that those are the same place. :meth:`plot` states
+        it that way, marking the reflection coefficient at the interpolated
+        delay on top of a curve it slices at ``nfft // 2 + 1``, so a
+        mismatched pair puts the marker beside the peak it was read from
+        instead of on it, and past the midpoint the disagreement is cut away
+        before it can be seen.
+
+        :attr:`search_range` stays out of the check: it names the two ends
+        of the band that was searched, so its length of two belongs to the
+        pair and not to any axis.
+
+        :raises ValueError: if the two axes disagree in length.
+        """
+        require_ranks(self, quefrencies=1, cepstrum=1)
+        require_same_length(self, "quefrencies", "cepstrum", axis="quefrency")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

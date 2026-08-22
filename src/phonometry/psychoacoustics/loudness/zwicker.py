@@ -35,7 +35,11 @@ if TYPE_CHECKING:
 from scipy import signal
 
 from ..._internal.utils import _typesignal
-from ..._internal.validation import require_positive
+from ..._internal.validation import (
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 from ._zwicker_data import (
     A0_TRANSMISSION,
     DCB_ADAPTATION,
@@ -128,6 +132,45 @@ class ZwickerLoudness:
     time: np.ndarray | None = None
     loudness_vs_time: np.ndarray | None = None
     field: str | None = None
+
+    def __post_init__(self) -> None:
+        """Reject a loudness-vs-time trace that does not match its own time axis.
+
+        ``time`` and ``loudness_vs_time`` are one axis written down twice: the
+        constructor decimates the 2000 Hz weighted series to 500 Hz and builds
+        both from the same ``num_out`` (clause 6.5). Everything that reads them
+        reads them as a pair, and only as a pair, so a disagreement is never
+        arithmetic that comes out wrong -- it is a plot that stops or a panel
+        that lies.
+
+        Lengths that disagree stop the plot, but badly. Both directions end in
+        the same place, matplotlib's ``ValueError: x and y must have same first
+        dimension, but have shapes (300,) and (150,)``, raised from inside
+        ``Axes.plot`` several frames below the caller: it names the two shapes
+        and neither field, so nothing says which of the two is wrong or that
+        the object was already malformed when it was built. ``.report()`` dies
+        the same way and writes no PDF at all, the clause 7 f) panel taking the
+        whole fiche down with it. And it only stops the drawing that is
+        actually attempted: ``plot(ax=...)`` skips the time panel by
+        construction, so it returns an ordinary specific-loudness axes with its
+        title and its one line, and the broken trace goes unmentioned.
+
+        An extra axis is worse, because nothing stops at all. A
+        ``loudness_vs_time`` of shape (300, 2) has 300 rows and passes any
+        count, and matplotlib reads a two-column y as two series: the N(t)
+        panel comes out with two curves, both labelled ``$N(t)$``, and
+        ``.report()`` renders the full PDF without a word. A ``time`` of shape
+        (300, 2) does the same. Hence the rank pin beside the length one: the
+        count alone cannot tell a trace from a pair of them.
+
+        The stationary result is not affected: it leaves both fields ``None``,
+        and an absent optional quantity is passed over rather than counted.
+
+        :raises ValueError: if ``time`` and ``loudness_vs_time`` are not both
+            one-dimensional and of one length.
+        """
+        require_ranks(self, time=1, loudness_vs_time=1)
+        require_same_length(self, "time", "loudness_vs_time", axis="time step")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
