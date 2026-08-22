@@ -46,7 +46,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_equal_shapes, require_same_shape
+from .._internal.validation import (
+    require_axis_rank,
+    require_equal_shapes,
+    require_same_shape,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -439,6 +443,14 @@ def detection_range_from_curve(
     fom = _finite(figure_of_merit, "figure_of_merit")
     r = _finite_array(range_m, "range_m")
     pl = _finite_array(propagation_loss, "propagation_loss")
+    # Rank before shape: the coercion widens a scalar and never narrows a
+    # grid, so two equal two-dimensional inputs agree on their shape and reach
+    # the crossing search, where the interpolation of a bracketing pair ends in
+    # numpy's "only 0-dimensional arrays can be converted to Python scalars",
+    # which names neither the argument nor this function. A curve is 1-D, as
+    # the signature says.
+    for name, value in (("range_m", r), ("propagation_loss", pl)):
+        require_axis_rank(value, "detection_range_from_curve", name, 1)
     require_equal_shapes(
         "detection_range_from_curve",
         {"range_m": r.shape, "propagation_loss": pl.shape},
