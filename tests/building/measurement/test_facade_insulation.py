@@ -257,6 +257,7 @@ def test_surface_level_of_another_band_count_raises() -> None:
     # R' subtracts 'l2' from 'surface_level' band by band, so the message
     # names both curves and the shapes it just compared.
     outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
+    four_bands = _flat(4, 72.0)
     with pytest.raises(ValueError, match=r"'surface_level'.*'l2'.*same shape"):
         building.facade_insulation(
             outdoor,
@@ -264,7 +265,7 @@ def test_surface_level_of_another_band_count_raises() -> None:
             rt,
             area=10.0,
             volume=62.5,
-            surface_level=_flat(4, 72.0),
+            surface_level=four_bands,
         )
 
 
