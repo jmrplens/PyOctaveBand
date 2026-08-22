@@ -27,7 +27,8 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/jmrplens/phonometry"
+"Homepage" = "https://jmrp.io/docs/phonometry"
+"Author" = "https://jmrp.io/"
 "Documentation" = "https://jmrplens.github.io/phonometry/"
 
 [tool.setuptools.packages.find]
