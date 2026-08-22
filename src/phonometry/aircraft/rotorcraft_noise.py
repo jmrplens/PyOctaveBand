@@ -1109,7 +1109,7 @@ class RotorcraftNoiseContourResult:
         :raises ValueError: if the level grid disagrees with ``x`` or ``y``.
         """
         require_ranks(self, x=1, y=1, level=2)
-        require_same_length(self, "y", "level", axis="grid row")
+        require_same_length(self, "y", ("level", 0), axis="grid row")
         require_same_length(self, "x", ("level", 1), axis="grid column")
 
     def plot(

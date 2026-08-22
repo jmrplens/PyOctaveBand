@@ -1265,15 +1265,20 @@ def precision_qualification(
     # Criterion 5: 0,83 <= FS(1)/FS(2) <= 1,2.
     criterion_5: np.ndarray | None = None
     if field_nonuniformity_1 is not None and field_nonuniformity_2 is not None:
-        # Broadcast onto the band axis the way criterion 2 does with the
-        # residual index: a single FS pair states one ratio that holds for
-        # every band, and the result promises a verdict per band.
-        fs1 = np.broadcast_to(
-            np.asarray(field_nonuniformity_1, dtype=np.float64), (n_bands,)
-        )
-        fs2 = np.broadcast_to(
-            np.asarray(field_nonuniformity_2, dtype=np.float64), (n_bands,)
-        )
+        # A single FS pair states one ratio that holds for every band, so a
+        # bare number is spread onto the band axis the way criterion 2 spreads
+        # the residual index, and the result keeps its promise of a verdict per
+        # band. A pair that already carries an axis is left exactly as it came:
+        # spreading that one too would stretch a lone value over bands it was
+        # never measured on, and would hide a pair of the wrong length behind
+        # numpy's broadcast message instead of letting it reach the per-band
+        # check below, which names the criterion that disagrees.
+        fs1 = np.asarray(field_nonuniformity_1, dtype=np.float64)
+        fs2 = np.asarray(field_nonuniformity_2, dtype=np.float64)
+        if fs1.ndim == 0:
+            fs1 = np.broadcast_to(fs1, (n_bands,))
+        if fs2.ndim == 0:
+            fs2 = np.broadcast_to(fs2, (n_bands,))
         with np.errstate(divide="ignore", invalid="ignore"):
             ratio = fs1 / fs2
         criterion_5 = np.asarray(

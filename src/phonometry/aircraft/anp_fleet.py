@@ -272,7 +272,7 @@ class AnpProfile:
         require_equal_counts(
             owner,
             {
-                "path segments": len(self.path) - 1,
+                "path": max(len(self.path) - 1, 0),
                 "ground_roll": require_axis_count(
                     self.ground_roll, owner, "ground_roll", "segment", rank=None
                 ),

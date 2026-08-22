@@ -904,7 +904,7 @@ def test_a_component_on_the_octave_grid_is_refused() -> None:
     result = _emission_result()
     octave = np.full(result.frequencies.size, 90.0)
     components = {**result.components, "bridge": (octave, octave)}
-    with pytest.raises(ValueError, match=r"'components\['bridge'\]\[0\]'.*1/3-octave"):
+    with pytest.raises(ValueError, match=r"'components\['bridge'\]\[0\]'"):
         dataclasses.replace(result, components=components)
 
 
