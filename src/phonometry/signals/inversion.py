@@ -46,6 +46,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from .._internal.utils import _typesignal
+from .._internal.validation import require_ranks, require_same_length
 from ..io._resolve import apply_calibration
 from ..io._resolve import resolve_fs as _resolve_signal_fs
 from ..io._signal import Signal
@@ -109,6 +110,47 @@ class InverseFilterResult:
     fs: float
     flatness_db: float
     max_gain_db: float
+
+    def __post_init__(self) -> None:
+        r"""Reject a design whose spectra do not share one frequency grid.
+
+        The three spectra and the regularization profile are the design at
+        one frequency each, and the figure multiplies them together to make
+        its central claim: :meth:`plot` forms the equalized magnitude
+        :math:`\lvert H \, H_{\mathrm{inv}} \rvert` as an
+        elementwise product of :attr:`response_spectrum` and
+        :attr:`spectrum`, then draws it over :attr:`frequencies` with the
+        equalized band shaded and the achieved flatness in the title. Numpy
+        will broadcast a single-bin array across the whole grid without a
+        word, which is the shape a caller lands on by designing at one
+        frequency where the band needed the grid, and the flat 0 dB line
+        that comes back is precisely what the figure is meant to show.
+
+        :attr:`inverse` is deliberately left out. It is the filter in the
+        time domain, ``n_fft`` samples, while the spectra live on the
+        ``n_fft // 2 + 1`` bins of the real transform of it; the two lengths
+        are different measurements of the same design and pinning them
+        together would reject every filter the module produces.
+
+        :raises ValueError: if a spectrum or the profile disagrees with the
+            frequency grid.
+        """
+        require_ranks(
+            self,
+            inverse=1,
+            frequencies=1,
+            spectrum=1,
+            response_spectrum=1,
+            regularization=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "spectrum",
+            "response_spectrum",
+            "regularization",
+            axis="frequency",
+        )
 
     def __array__(self, dtype: Any = None) -> np.ndarray:
         """Return the inverse-filter samples as an array."""

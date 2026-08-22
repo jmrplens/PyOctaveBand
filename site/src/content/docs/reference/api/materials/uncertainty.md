@@ -84,8 +84,10 @@ AbsorptionUncertaintyResult(
 Standard and expanded uncertainty of an absorption quantity
 (ISO 12999-2).
 
-For the single-number quantities (`αw`, `DLα,NRD`) the frequency and value
-arrays are empty and the uncertainty arrays hold a single element.
+For the single-number quantities (`αw`, `DLα,NRD`) it is the frequency
+array alone that is empty; the value and the two uncertainty arrays each
+hold a single element. That empty `frequencies` is what marks a
+single-number result apart, and what `plot` refuses on.
 
 **Attributes**
 
@@ -94,7 +96,7 @@ arrays are empty and the uncertainty arrays hold a single element.
 | `quantity` | `"absorption_coefficient"`, `"equivalent_area"`, `"practical_coefficient"`, `"weighted_coefficient"` or `"single_number_rating"`. |
 | `condition` | `"reproducibility"` (`σR`) or `"repeatability"` (`σr`). |
 | `frequencies` | Band centre frequencies, in Hz (empty for single numbers). |
-| `values` | The input quantity per band (empty for single numbers). |
+| `values` | The input quantity per band (one element for single numbers). |
 | `standard_uncertainty` | Standard uncertainty `u` (`σR`/`σr`), one per band. |
 | `coverage_factor` | Coverage factor `k` (Table 3). |
 | `expanded_uncertainty` | Exact $U = k\,u$ (Formula (10)), one per band. |

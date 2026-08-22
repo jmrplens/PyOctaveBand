@@ -83,6 +83,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_ranks, require_same_length
 from ..io._resolve import resolve_fs
 from .spectra import _positive
 from .test_signals import _validate_1d_finite, fractional_delay
@@ -202,6 +203,45 @@ class SynchronousAverageResult:
     residual_rms: float
     comb_frequencies: NDArray[np.float64]
     comb_response: NDArray[np.float64]
+
+    def __post_init__(self) -> None:
+        """Reject an average whose two curves do not run over their own axis.
+
+        The figure draws two panels from two independent axes, and each one
+        is a pair. Above, the averaged waveform against :attr:`times`: the
+        panel is read as one period, so a waveform longer than its time axis
+        is not merely clipped but redraws the tail of the period on top of
+        its head. Below, the comb magnitude against :attr:`comb_frequencies`,
+        converted to orders and annotated with a harmonic line at every
+        integer up to the last one the axis reaches -- so a response of the
+        wrong length puts the teeth of McFadden Eq. 8 somewhere other than
+        the harmonics the lines mark them at, which is the whole claim the
+        panel makes.
+
+        The two axes are pinned separately because they are separate: the
+        waveform runs over :attr:`samples_per_period` samples of the sampling
+        grid, the comb over a frequency grid whose density is chosen for the
+        plot alone.
+
+        :attr:`residual` spans the whole analysed record,
+        ``n_averages * samples_per_period`` samples rather than one period,
+        so it belongs to neither pair and stays out of both.
+
+        :raises ValueError: if the waveform disagrees with its time axis, or
+            the comb response with its frequency axis.
+        """
+        require_ranks(
+            self,
+            period_waveform=1,
+            times=1,
+            residual=1,
+            comb_frequencies=1,
+            comb_response=1,
+        )
+        require_same_length(self, "times", "period_waveform", axis="period sample")
+        require_same_length(
+            self, "comb_frequencies", "comb_response", axis="comb-filter frequency"
+        )
 
     @property
     def amplitude_snr_gain(self) -> float:

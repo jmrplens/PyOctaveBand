@@ -44,7 +44,12 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_non_negative, require_positive
+from .._internal.validation import (
+    require_non_negative,
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 from .._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:
@@ -110,6 +115,42 @@ class DuctModeResult:
     mach: float
     section: str
     label: str
+
+    def __post_init__(self) -> None:
+        """Reject a ladder whose curves do not all describe the same modes.
+
+        The cut-on chart labels one tick per entry of ``modes`` and plots both
+        cut-on curves against those ticks, so the mode order a frequency is
+        read under is the order standing at its position in ``modes`` and
+        nothing else. A count that disagrees mislabels nothing: the chart is
+        the only reader that pairs the two, and it stops with matplotlib's
+        complaint about an x and a y whose first dimensions differ, which
+        names neither the curve nor the result it came from. There is no
+        fiche behind the chart to truncate a column quietly, and no reader
+        pairs :attr:`axial_wavenumber` with the modes at all, so a ladder
+        that is never plotted carries its disagreement to the caller with
+        nothing raised anywhere. The check is what names the field, and what
+        names it where the ladder was built rather than where it is drawn.
+
+        The rank half is the silent one. An extra axis still counts one entry
+        per mode on its first, so it passes every length above: a
+        ``(mode, 2)`` stack of two flow states draws one extra curve per
+        column, all of them under the same legend entry, and
+        :attr:`plane_wave_limit` minimises over the whole stack instead of
+        over the ladder it claims to describe.
+
+        :raises ValueError: if the mode orders and the per-mode arrays
+            disagree, or a per-mode array carries an extra axis.
+        """
+        require_ranks(self, cut_on=1, cut_on_no_flow=1, axial_wavenumber=1)
+        require_same_length(
+            self,
+            "modes",
+            "cut_on",
+            "cut_on_no_flow",
+            "axial_wavenumber",
+            axis="mode",
+        )
 
     @property
     def plane_wave_limit(self) -> float:

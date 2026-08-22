@@ -29,6 +29,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from .._internal.validation import require_ranks, require_same_length
 from .._internal.warnings import PhonometryWarning
 from .threshold import age_threshold
 
@@ -168,6 +169,39 @@ class NiptsResult:
     spread_upper: np.ndarray
     spread_lower: np.ndarray
 
+    def __post_init__(self) -> None:
+        """Reject a prediction whose spectra do not all cover the same frequencies.
+
+        The fiche prints one row per audiometric frequency, reading the median
+        and the fractile value at that row's position, and beneath the table it
+        boxes a representative shift averaged over the 2/3/4 kHz positions of
+        those same arrays; the plot draws the fractile band from the median and
+        the two spreads against a single frequency axis. Everything pairs by
+        position, so a spectrum one entry short stops the renderer far from
+        here, and one entry long is dropped from the table without a word, in
+        both cases after its values have been read against frequencies other
+        than the ones they were computed for.
+
+        :raises ValueError: if any spectrum disagrees with ``frequencies``.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            median=1,
+            value=1,
+            spread_upper=1,
+            spread_lower=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "median",
+            "value",
+            "spread_upper",
+            "spread_lower",
+            axis="audiometric frequency",
+        )
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -259,6 +293,30 @@ class HtlanResult:
     htla: np.ndarray
     nipts: np.ndarray
     threshold: np.ndarray
+
+    def __post_init__(self) -> None:
+        """Reject a threshold whose three components cover different frequencies.
+
+        Formula (1) combines the age component and the noise component one
+        audiometric frequency at a time, and the fiche prints that combination
+        the same way: ``H``, ``N`` and ``H'`` side by side on one row per
+        frequency, with a representative threshold boxed beneath from the
+        2/3/4 kHz positions of the combined array. Table and plot alike pair
+        the columns by position, so a component of another length sets an age
+        threshold beside a noise shift belonging to a different frequency and
+        the sheet shows a combination that was never computed.
+
+        :raises ValueError: if any component disagrees with ``frequencies``.
+        """
+        require_ranks(self, frequencies=1, htla=1, nipts=1, threshold=1)
+        require_same_length(
+            self,
+            "frequencies",
+            "htla",
+            "nipts",
+            "threshold",
+            axis="audiometric frequency",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

@@ -38,6 +38,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_same_length
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
@@ -234,6 +236,25 @@ class PropagationLossResult:
     absorption_coefficient: float
     law: str
     model: str
+
+    def __post_init__(self) -> None:
+        """Reject a loss curve whose terms do not run over the same ranges.
+
+        The three curves are one decomposition, and it is a decomposition only
+        range by range: ``pl`` is ``spreading + absorption`` at each entry of
+        ``range_m``. That is what a reader takes it apart for -- to subtract
+        the absorption and put back the one a different water would charge, or
+        to read the spreading law's exponent off its own term -- and every one
+        of those operations is elementwise. A term of another length is not
+        obviously wrong to look at, since all three are losses in dB of
+        entirely plausible size; it is wrong because each of its values then
+        answers for a range the row beside it did not come from.
+
+        :raises ValueError: if any curve disagrees with ``range_m``.
+        """
+        require_same_length(
+            self, "range_m", "pl", "spreading", "absorption", axis="range"
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

@@ -27,6 +27,7 @@ Oracles, from strongest to softest:
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import numpy as np
@@ -420,6 +421,112 @@ def test_bad_dimension_and_fs() -> None:
         room.image_source_rir(
             (5.0, 4.0, 3.0), (1.0, 2.0, 1.5), (3.0, 2.0, 1.5), 0.2, fs=0
         )
+
+
+def test_extra_axis_on_the_amplitude_table_is_refused() -> None:
+    """A third axis on ``amplitudes`` passes every count, so pin the rank.
+
+    Its bands still line up along axis 0 and its images along axis 1, and the
+    reflectogram then masks the whole table by reflection order and reports a
+    boolean index that did not match, naming no field.
+    """
+    res = room.image_source_rir(
+        (5.0, 4.0, 3.0),
+        (1.0, 1.0, 1.5),
+        (3.0, 2.5, 1.2),
+        np.array([0.1, 0.2, 0.3, 0.15]),
+        fs=8000,
+        max_order=2,
+        frequencies=[125.0, 250.0, 500.0, 1000.0],
+    )
+    paired = np.repeat(res.amplitudes[:, :, None], 2, axis=2)
+    with pytest.raises(ValueError, match="'amplitudes' must have 2 axes"):
+        dataclasses.replace(res, amplitudes=paired)
+
+
+def test_a_reflection_table_of_two_lengths_is_refused() -> None:
+    """The exact table is one row per image, ``amplitudes`` included.
+
+    The reflectogram masks the amplitudes by reflection order and reports a
+    boolean index that did not match, naming no field, and ``direct_time``
+    reports nothing at all: it takes the position of the nearest image from
+    ``distances`` and reads ``times`` there, so a ``times`` one short at the
+    front returns the first reflection as the direct sound.
+    """
+    res = room.image_source_rir(
+        (5.0, 4.0, 3.0), (1.0, 1.0, 1.5), (3.0, 2.5, 1.2), 0.2, fs=8000, max_order=2
+    )
+    for amplitudes in (res.amplitudes[:-1], np.append(res.amplitudes, 1e-3)):
+        with pytest.raises(ValueError, match="'amplitudes'"):
+            dataclasses.replace(res, amplitudes=amplitudes)
+    with pytest.raises(ValueError, match="'times'"):
+        dataclasses.replace(res, times=res.times[1:])
+    banded = room.image_source_rir(
+        (5.0, 4.0, 3.0),
+        (1.0, 1.0, 1.5),
+        (3.0, 2.5, 1.2),
+        np.array([0.1, 0.2, 0.3, 0.15]),
+        fs=8000,
+        max_order=2,
+        frequencies=[125.0, 250.0, 500.0, 1000.0],
+    )
+    with pytest.raises(ValueError, match=r"'amplitudes \(axis 1\)'"):
+        dataclasses.replace(banded, amplitudes=banded.amplitudes[:, :-1])
+
+
+def test_band_labels_must_match_the_bands_they_label() -> None:
+    """``frequencies`` names the rows of ``ir`` and of ``amplitudes``.
+
+    No reader in the library reads the labels back -- the reflectogram draws
+    band 0 and never names it -- so a label list of the wrong length is
+    silent: pairing the labels with the rows drops the band that has no
+    label, and one label too many leaves that table looking complete.
+    """
+    res = room.image_source_rir(
+        (5.0, 4.0, 3.0),
+        (1.0, 1.0, 1.5),
+        (3.0, 2.5, 1.2),
+        np.array([0.1, 0.2, 0.3, 0.15]),
+        fs=8000,
+        max_order=2,
+        frequencies=[125.0, 250.0, 500.0, 1000.0],
+    )
+    for frequencies in ([125.0, 250.0, 500.0], [125.0, 250.0, 500.0, 1000.0, 2000.0]):
+        with pytest.raises(ValueError, match="'frequencies'"):
+            dataclasses.replace(res, frequencies=np.asarray(frequencies))
+    with pytest.raises(ValueError, match="'ir'"):
+        dataclasses.replace(res, ir=res.ir[:-1])
+    with pytest.raises(ValueError, match="'amplitudes'"):
+        dataclasses.replace(res, amplitudes=res.amplitudes[:-1])
+    # A scalar frequency is the one band it names, not a missing axis.
+    single = room.image_source_rir(
+        (5.0, 4.0, 3.0),
+        (1.0, 1.0, 1.5),
+        (3.0, 2.5, 1.2),
+        0.2,
+        fs=8000,
+        max_order=2,
+        frequencies=1000.0,
+    )
+    assert np.ndim(single.frequencies) == 0
+    assert single.ir.shape[0] == 1
+
+
+def test_a_point_missing_a_coordinate_is_refused() -> None:
+    """The room, the two points and the lattice carry one coordinate count.
+
+    The reflectogram unpacks the room lengths three at a time, but the plan
+    view reads only x and y out of the lattice and out of each point, so a
+    source that lost its height draws an ordinary figure and says nothing.
+    What refuses the point is this construction check, not any reader.
+    """
+    res = room.image_source_rir(
+        (5.0, 4.0, 3.0), (1.0, 1.0, 1.5), (3.0, 2.5, 1.2), 0.2, fs=8000, max_order=2
+    )
+    with pytest.raises(ValueError, match="'source'"):
+        dataclasses.replace(res, source=(1.0, 1.0))
+    with pytest.raises(ValueError, match="'image_positions"):
+        dataclasses.replace(res, image_positions=res.image_positions[:, :2])
 
 
 def test_reflectogram_plot_smoke() -> None:

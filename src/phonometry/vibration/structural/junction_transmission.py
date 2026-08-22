@@ -172,7 +172,12 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from scipy.integrate import quad
 
-from ..._internal.validation import require_choice, require_positive
+from ..._internal.validation import (
+    require_choice,
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -682,6 +687,34 @@ class JunctionTransmissionResult:
     straight_average: float | None
     thickness1: float | None = None
     thickness2: float | None = None
+
+    def __post_init__(self) -> None:
+        r"""Reject coefficients that do not lie on the junction's angle grid.
+
+        :attr:`corner` and :attr:`straight` are :math:`\tau(\theta)` sampled
+        at :attr:`angles_deg`, and the grid is the only thing that says at
+        which angle each sample was taken: it is where the cut-off
+        :math:`\theta_\mathrm{co} = \arcsin\chi` is read off, and beyond it
+        the corner coefficient is identically zero. A curve of another length
+        therefore describes a junction transmitting at angles nobody
+        computed, and says so only when :meth:`plot` reaches matplotlib,
+        which complains about two first dimensions without naming either
+        curve. The straight section exists only for the X and T-junction (1)
+        constants, so ``None`` there is not a disagreement.
+
+        The grid is compared with nothing else the result carries: ``chi``,
+        ``psi``, the two critical frequencies and the angular averages are
+        single numbers describing the junction as a whole, and the averages in
+        particular are integrals over all incidence angles rather than samples
+        of the grid.
+
+        :raises ValueError: if the transmission coefficients do not lie on the
+            incidence-angle grid.
+        """
+        require_ranks(self, angles_deg=1, corner=1, straight=1)
+        require_same_length(
+            self, "angles_deg", "corner", "straight", axis="incidence angle"
+        )
 
     @property
     def corner_reduction_index(self) -> float:

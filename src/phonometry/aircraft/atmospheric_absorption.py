@@ -26,7 +26,12 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_non_negative, require_positive_array
+from .._internal.validation import (
+    require_non_negative,
+    require_positive_array,
+    require_ranks,
+    require_same_length,
+)
 from ..environment.propagation.air_absorption import air_attenuation
 
 if TYPE_CHECKING:
@@ -81,6 +86,36 @@ class AircraftBandAttenuation:
     temperature: float
     relative_humidity: float
     pressure: float
+
+    def __post_init__(self) -> None:
+        """Reject an attenuation whose arrays do not all run over the same bands.
+
+        Every array here is one value per one-third-octave band of the same
+        spectrum: the band attenuation the certification correction subtracts,
+        the pure-tone mid-band attenuation it was regressed from, and the
+        coefficient behind that. An array of another length either stops the
+        figure, which draws two of them against ``frequency`` on one pair of
+        axes and gets matplotlib's complaint about an x and a y that name
+        neither field, or -- where it has collapsed to a single value -- is
+        broadcast by numpy over the whole spectrum, correcting every band of a
+        measured flyover by one band's attenuation without a word.
+
+        :raises ValueError: if a per-band array disagrees with the rest.
+        """
+        require_ranks(
+            self,
+            frequency=1,
+            band_attenuation=1,
+            midband_attenuation=1,
+            coefficient=1,
+        )
+        require_same_length(
+            self,
+            "frequency",
+            "band_attenuation",
+            "midband_attenuation",
+            "coefficient",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

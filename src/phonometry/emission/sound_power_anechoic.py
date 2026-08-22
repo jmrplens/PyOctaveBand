@@ -47,6 +47,7 @@ import numpy as np
 
 from .._internal.levels_math import energy_mean, energy_sum, weighted_energy_mean
 from .._internal.types import as_float_or_array
+from .._internal.validation import require_ranks, require_same_length
 from ._shared import _S0, SoundPowerWarning, _a_weighting_corrections
 
 if TYPE_CHECKING:
@@ -287,6 +288,61 @@ class PrecisionSoundPowerResult:
     uncertainty: float
     uncertainty_bands: np.ndarray
     coverage_factor: float
+
+    def __post_init__(self) -> None:
+        """Reject a determination whose per-band quantities disagree.
+
+        The fiche takes its row count from ``sound_power_level`` and its row
+        labels from ``frequencies``, so a longer band axis labels the rows
+        with the first of its centres and drops the rest without a word,
+        while the boxed A-weighted total was summed at construction over the
+        whole spectrum and states a number for bands the table beside it does
+        not show. The meteorological ``C3`` reaches the measurement-basis
+        strip as a range rather than as a column, and a range is well formed
+        whatever set of bands it was taken over.
+
+        ``background_correction`` and ``directivity_index`` carry the
+        microphone positions on their first axis and the bands on their
+        second, so the band axis to pin is index 1. The positions are an axis
+        of their own: ``K1i`` is the correction applied to position ``i``
+        (Eq. 11) and ``DIi`` the deviation of that same position from the
+        surface average (Eq. 21), so whoever reads the surface reads the two
+        side by side, and two different position counts leave no position
+        ``i`` to read.
+
+        :raises ValueError: if any per-band quantity disagrees with the rest,
+            or the two per-position arrays cover different positions.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            sound_power_level=1,
+            surface_pressure_level=1,
+            mean_pressure_level=1,
+            background_correction=2,
+            c3=1,
+            directivity_index=2,
+            non_uniformity_index=1,
+            uncertainty_bands=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "sound_power_level",
+            "surface_pressure_level",
+            "mean_pressure_level",
+            ("background_correction", 1),
+            "c3",
+            ("directivity_index", 1),
+            "non_uniformity_index",
+            "uncertainty_bands",
+        )
+        require_same_length(
+            self,
+            "background_correction",
+            "directivity_index",
+            axis="microphone position",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

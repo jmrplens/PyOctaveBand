@@ -30,6 +30,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
 from ..._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:
@@ -217,6 +218,23 @@ class WindTurbineTonalityResult:
     has_identified_tone: bool
     frequencies: NDArray[np.float64]
     levels: NDArray[np.float64]
+
+    def __post_init__(self) -> None:
+        """Reject a spectrum whose lines and levels do not pair up.
+
+        The fiche puts the whole Formula 30 to 34 chain beside a drawing of
+        the spectrum it was taken from, and that drawing pairs the two arrays
+        line by line. The pairing is what the reader checks the numbers
+        against: it is where the tone is seen standing above the masking
+        level, inside the critical band the metrics table names. Two arrays
+        of different lengths cannot be paired, so the frequency read off the
+        drawing is not the one the tonality was computed at.
+
+        :raises ValueError: if ``frequencies`` and ``levels`` differ in
+            length, or either is not a 1-D spectrum.
+        """
+        require_ranks(self, frequencies=1, levels=1)
+        require_same_length(self, "frequencies", "levels", axis="spectral line")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

@@ -10,6 +10,7 @@ of the four-rectangular additive model (Supplement 1 Table 3, clause 9.2.3).
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import numpy as np
@@ -400,3 +401,36 @@ def test_monte_carlo_matches_supplement1_table2_gaussian() -> None:
     assert mc.standard_uncertainty == pytest.approx(2.0, abs=0.01)
     assert mc.interval[0] == pytest.approx(-GUMS1_TABLE2_INTERVAL_95, abs=0.03)
     assert mc.interval[1] == pytest.approx(GUMS1_TABLE2_INTERVAL_95, abs=0.03)
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "match"),
+    [
+        ("names", ("a",), r"'names'.*one value per input quantity"),
+        ("names", ("a", "b", "c"), r"'names'.*one value per input quantity"),
+        (
+            "sensitivities",
+            np.ones(3),
+            r"'sensitivities'.*one value per input quantity",
+        ),
+        ("sensitivities", np.ones((2, 2)), r"'sensitivities' must have one axis"),
+        ("contributions", np.ones((2, 2)), r"'contributions' must have one axis"),
+    ],
+)
+def test_budget_rows_must_line_up(field: str, value: object, match: str) -> None:
+    """A budget whose rows disagree is refused when built, not when drawn.
+
+    The plot pairs the contributions with the labels and refuses a mismatch
+    only from inside matplotlib, and it never reads the sensitivity
+    coefficients at all, so an extra or missing coefficient reaches the chart
+    unremarked.
+    """
+    good = u.combine_uncertainty(_add2, [u.Quantity(1.0, 0.1), u.Quantity(2.0, 0.2)])
+    with pytest.raises(ValueError, match=match):
+        dataclasses.replace(good, **{field: value})
+
+
+def test_unlabelled_budget_is_not_a_disagreement() -> None:
+    """An empty ``names`` is the budget the plot labels ``x1``, ``x2``, ... itself."""
+    good = u.combine_uncertainty(_add2, [u.Quantity(1.0, 0.1), u.Quantity(2.0, 0.2)])
+    assert dataclasses.replace(good, names=()).names == ()

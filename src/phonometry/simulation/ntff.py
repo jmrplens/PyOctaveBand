@@ -105,7 +105,48 @@ class ContourPhasors:
     segment: float
 
     def __post_init__(self) -> None:
-        """Check positive scalars, matched shapes and finite samples; coerce dtypes."""
+        """Reject a contour whose geometry and phasors disagree; coerce dtypes.
+
+        The four arrays are one axis written down four times: sample ``i`` of
+        ``pressure`` and of ``normal_velocity`` belongs to the point at row
+        ``i`` of ``positions``, facing along row ``i`` of ``normals``. Nothing
+        downstream carries a sample index of its own, so this is the only
+        place they can be held to one axis:
+        :func:`far_field_from_contour` multiplies the four row by row and
+        sums the products over the contour, and the sum it returns is one
+        value per observation angle, with the sample axis already gone.
+
+        A field one sample short or one long is caught, but only by numpy and
+        only from inside that sum, as a broadcast error that prints the two
+        shapes it could not reconcile and names neither array: on a contour
+        of 96 samples read at 72 angles, a ``pressure`` one short raises
+        ``operands could not be broadcast together with shapes (72,96) (95,)``
+        in the far-field branch and the same two shapes the other way round
+        in the finite-``distance`` one.
+
+        A field collapsed to a single sample is not caught at all. One value
+        computed where the contour needed one per point broadcasts over the
+        whole contour, and the pattern that comes back has exactly the
+        expected length and an entirely ordinary shape; measured on an
+        off-centre monopole enclosed by that circle, it is wrong over parts
+        of its arc by 3.7 dB when ``pressure`` collapses, 8.4 dB for
+        ``normal_velocity``, 16 dB for ``positions`` and 32 dB for
+        ``normals``. Counting samples is not the whole of it either, which is
+        why the shapes are required whole rather than compared in length: a
+        ``pressure`` of shape ``(n, 2)`` carries the right number of samples
+        on its first axis and passes any count, and nothing but the shape
+        stops the second axis travelling into the sum.
+
+        The coerced arrays are stored back, so hand-built instances (lists,
+        mixed dtypes) behave exactly like probe-built ones downstream. That
+        conversion is also why the shapes are measured on the local arrays
+        rather than on the fields: a rank read off the fields as given would
+        see one axis in the documented list form and refuse it.
+
+        :raises ValueError: for a non-positive ``frequency`` or ``segment``,
+            for arrays that do not share one sample axis in the shapes above,
+            or for a non-finite sample.
+        """
         if not np.isfinite(self.frequency) or self.frequency <= 0.0:
             msg = "frequency must be positive and finite"
             raise ValueError(msg)

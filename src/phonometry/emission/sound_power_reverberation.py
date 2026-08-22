@@ -63,6 +63,7 @@ if TYPE_CHECKING:
     from .._report.metadata import ReportMetadata
 
 from .._internal.levels_math import energy_mean, energy_sum
+from .._internal.validation import require_ranks, require_same_length
 from ._shared import (
     SoundPowerWarning,
     _a_weighting_corrections,
@@ -127,6 +128,38 @@ class ReverberationSoundPowerResult:
     speed_of_sound: float
     sound_power_level_a: float
     method: str
+
+    def __post_init__(self) -> None:
+        """Reject a determination whose per-band quantities disagree.
+
+        The fiche prints one row per band under a single header, and the row
+        count comes from ``sound_power_level`` alone: every other column
+        (``Lp``, and ``K1``, ``A``, ``Cw`` in the verbose table) is indexed
+        alongside it, and ``frequencies`` names the bands those rows are
+        labelled with. A quantity one entry short therefore cannot be read at
+        all, and one entry too long is dropped by the table without a word,
+        under a boxed ``LWA`` that was summed over the whole of it.
+
+        :raises ValueError: if any per-band quantity disagrees with the rest.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            sound_power_level=1,
+            mean_pressure_level=1,
+            absorption_area=1,
+            waterhouse_correction=1,
+            background_correction=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "sound_power_level",
+            "mean_pressure_level",
+            "absorption_area",
+            "waterhouse_correction",
+            "background_correction",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

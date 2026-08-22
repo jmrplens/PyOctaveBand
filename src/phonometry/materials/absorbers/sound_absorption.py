@@ -59,6 +59,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
 from ..._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -442,6 +443,43 @@ class SoundAbsorptionMeasurement:
     absorption_area_empty: NDArray[np.float64]
     absorption_area_with_specimen: NDArray[np.float64]
     alpha_s: NDArray[np.float64]
+
+    def __post_init__(self) -> None:
+        """Reject a measurement whose per-band quantities do not agree.
+
+        Every quantity here belongs to one one-third-octave band, and the
+        ISO 354 test report states them side by side: the verbose table of the
+        fiche prints the band, its two reverberation times, its two equivalent
+        absorption areas and its ``alpha_s`` on a single row, and :meth:`plot`
+        places ``alpha_s`` on the ``frequencies`` axis point by point. Neither
+        reading can say which column is the odd one out, and
+        :attr:`equivalent_absorption_area` cannot even say that there is one:
+        Eq. (8) is a subtraction of two of these columns, so a column carrying
+        a single value is stretched over the whole spectrum by numpy and the
+        area comes back the right length, the same figure under every band.
+
+        :raises ValueError: if any per-band quantity disagrees with the rest.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            t_empty=1,
+            t_specimen=1,
+            air_attenuation=1,
+            absorption_area_empty=1,
+            absorption_area_with_specimen=1,
+            alpha_s=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "t_empty",
+            "t_specimen",
+            "air_attenuation",
+            "absorption_area_empty",
+            "absorption_area_with_specimen",
+            "alpha_s",
+        )
 
     @property
     def equivalent_absorption_area(self) -> NDArray[np.float64]:

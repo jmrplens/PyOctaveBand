@@ -44,6 +44,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_ranks, require_same_length
 from ..io._resolve import apply_calibration, resolve_pair_fs
 
 if TYPE_CHECKING:
@@ -109,6 +110,27 @@ class STOIResult:
     band_scores: NDArray[np.float64] | None
     band_frequencies: NDArray[np.float64]
     sample_rate: int
+
+    def __post_init__(self) -> None:
+        """Reject a result whose per-band quantities disagree.
+
+        :attr:`band_scores` and :attr:`band_frequencies` are the two halves of
+        one bar chart, the bar heights and the band each bar is labelled with,
+        and every reader pairs them by position. Matplotlib does notice the
+        mismatch, but only when the chart is drawn and only as a complaint
+        about tick locations outnumbering labels, which names neither field
+        and arrives long after the result was built, returned and passed on.
+        Refusing it here puts the error where the mistake is.
+
+        :attr:`segment_scores` runs over the 384 ms analysis segments, an axis
+        no other field measures: it is pinned to one dimension and left out of
+        the band group, since the number of segments follows the length of the
+        speech and has no reason to match the fifteen bands.
+
+        :raises ValueError: if the band axes disagree.
+        """
+        require_ranks(self, segment_scores=1, band_scores=1, band_frequencies=1)
+        require_same_length(self, "band_scores", "band_frequencies")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

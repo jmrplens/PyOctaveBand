@@ -35,6 +35,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
@@ -298,6 +300,43 @@ class SoundSpeedProfile:
     sound_speed: NDArray[np.float64]
     gradient: NDArray[np.float64]
     model: str
+
+    def __post_init__(self) -> None:
+        """Reject a profile whose three columns are not one water column.
+
+        The three arrays are one depth axis written down three times:
+        :func:`sound_speed_profile` broadcasts the temperature and the salinity
+        onto ``depths``, evaluates the equation there, and hands the same array
+        to ``np.gradient``. Nothing else in the library builds this result.
+
+        The loud half of a mismatch is ``sound_speed``, which the figure draws
+        against ``depth``: matplotlib stops both a short and a long one, but
+        with its own ``x and y must have same first dimension, but have shapes
+        (120,) and (121,)``, which names neither column and arrives from the
+        drawing rather than from the profile that was wrong all along.
+
+        The quiet half is ``gradient``, which no figure reads: short or long,
+        the profile still plots without complaint. It is the column a reader
+        takes the result apart for, since the sound-channel axis is where
+        ``dc/dz`` turns from negative to positive and the ray curvature radius
+        is ``c`` over its magnitude, and both of those read an entry of
+        ``gradient`` beside the depth of the same index. Carrying the gradient
+        of the same water column sampled on 25 depths onto a 121-depth profile
+        leaves +0.017 (m/s)/m standing at 500 m where this water's own value
+        there is -0.032: rays bending up where they in fact bend down, on a
+        radius of 89 km instead of 46 km.
+
+        The ranks are pinned as well because a count alone passes an extra
+        axis on. Two scenarios stacked column-wise into ``sound_speed`` as an
+        ``(n, 2)`` array carry one value per depth by every measure, and the
+        figure quietly draws two curves under the one legend entry that names
+        a single model.
+
+        :raises ValueError: if ``sound_speed`` or ``gradient`` disagrees with
+            ``depth``, or if a column carries more than one axis.
+        """
+        require_ranks(self, depth=1, sound_speed=1, gradient=1)
+        require_same_length(self, "depth", "sound_speed", "gradient", axis="depth")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

@@ -30,6 +30,7 @@ import numpy as np
 
 # Shared Welch-core defaults and helpers (single source of truth for the
 # segment policy across the spectral estimators).
+from .._internal.validation import require_ranks, require_same_length
 from ..io._resolve import apply_calibration, resolve_pair_fs
 from ..signals.spectra import (
     _DEFAULT_OVERLAP,
@@ -109,6 +110,38 @@ class FrequencyResponseResult:
     phase: NDArray[np.float64]
     coherence: NDArray[np.float64]
     estimator: str
+
+    def __post_init__(self) -> None:
+        """Reject an estimate whose curves do not share one frequency axis.
+
+        The five fields are one Welch frequency axis and the four quantities
+        read off it, so the Bode magnitude is plotted against ``frequencies``
+        point for point and the coherence panel beneath it is the quality
+        flag of those same points. The panels select their positive-frequency
+        part with a mask cut from ``frequencies``, which turns a curve of the
+        wrong length into an index error raised from inside the plotter,
+        naming neither the field nor the two lengths; ``response``, which
+        nothing downstream re-derives, disagrees without a word.
+
+        :raises ValueError: if the five curves do not share one length.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            response=1,
+            magnitude_db=1,
+            phase=1,
+            coherence=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "response",
+            "magnitude_db",
+            "phase",
+            "coherence",
+            axis="frequency",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

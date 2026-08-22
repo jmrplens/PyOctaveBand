@@ -13,6 +13,8 @@ excess phase; ``minimum_phase`` is idempotent and phase-blind).
 
 from __future__ import annotations
 
+import dataclasses
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -229,6 +231,40 @@ def test_validation_errors() -> None:
         ph.signals.group_delay(good, -1.0)
     with pytest.raises(ValueError, match="fs"):
         ph.signals.phase_decomposition(good, 0.0)
+
+
+def test_decomposition_parts_must_lie_on_one_grid() -> None:
+    """A part off the response grid is refused when built, not when drawn.
+
+    The plot masks ``frequencies`` for DC and applies that one mask to seven
+    of the eight arrays, so a length disagreement surfaces only as numpy's
+    complaint about a boolean index and two axis sizes, naming neither field.
+    Nothing reads ``minimum_phase_response`` at all. And an extra axis counts
+    one row per bin, so it passes every length check and reaches the plot as
+    a second curve on its panel, doubling that curve's legend entry.
+    """
+    good = ph.signals.phase_decomposition(_biquad_response(), FS)
+    per_bin = "one value per frequency bin"
+    fields = (
+        "frequencies",
+        "magnitude",
+        "phase",
+        "minimum_phase",
+        "excess_phase",
+        "group_delay",
+        "excess_group_delay",
+        "minimum_phase_response",
+    )
+    for field in fields:
+        value = np.asarray(getattr(good, field))
+        cases = (
+            (value[:-1], per_bin),
+            (np.append(value, value[-1]), per_bin),
+            (np.column_stack([value] * 2), "must have one axis"),
+        )
+        for wrong, fragment in cases:
+            with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+                dataclasses.replace(good, **{field: wrong})
 
 
 def test_magnitude_zeros_are_floored_not_fatal() -> None:

@@ -77,6 +77,7 @@ from typing import TYPE_CHECKING, Any, overload
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
 from .insulation import (
     WeightedRatingResult,
     _as_band_levels,
@@ -181,6 +182,23 @@ class IntensityReductionResult:
     rating_modified: WeightedRatingResult | None
     area: float | None = None
     measurement_area: float | None = None
+
+    def __post_init__(self) -> None:
+        """Reject a result whose two indices were measured over different bands.
+
+        The verbose ISO 15186-1 fiche annexes ``RI,M`` beside ``RI`` as a
+        second column of one band table. It measures ``FpI`` and ``δpI0``
+        against the reported band count before admitting them, because the
+        caller passes those to :meth:`report`; the modified index arrives on
+        the result itself and is admitted unmeasured. So the one column that
+        invites a comparison band by band -- the same index before and after
+        the ``Kc`` adaptation -- is the one nothing lines up, and the surplus
+        entries of a longer array are dropped by the table without a word.
+
+        :raises ValueError: if ``r_i`` and ``r_i_modified`` disagree.
+        """
+        require_ranks(self, r_i=1, r_i_modified=1)
+        require_same_length(self, "r_i", "r_i_modified")
 
     def plot(self, ax: Axes | None = None, **kwargs: Any) -> Axes:
         """Plot ``RI`` against the shifted ISO 717-1 reference curve.

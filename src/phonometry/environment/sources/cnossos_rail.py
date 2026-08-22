@@ -80,6 +80,13 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import (
+    require_axis_count,
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
@@ -2369,6 +2376,83 @@ class RailwayEmissionResult:
     components: dict[str, tuple[NDArray[np.float64], NDArray[np.float64]]] = field(
         default_factory=dict
     )
+
+    def __post_init__(self) -> None:
+        """Reject an emission whose three axes do not each line up.
+
+        The same emission is carried on three axes, and every reading of it
+        pairs a position on one with a position on another: a row of
+        :attr:`line_power` with the source height that names it, a value with
+        the band it is quoted at, a component spectrum with the 1/3-octave
+        grid it was resampled onto. None of that pairing is checked where it
+        happens -- the chart lays its two marker lines over the octave bars by
+        row order, and the source breakdown is read band by band against
+        :attr:`third_octave_frequencies` -- so an axis one entry out does not
+        announce itself. It attributes the noise to the wrong band, or to the
+        wrong one of the two source heights, and the level it reports there is
+        an ordinary number in an ordinary place.
+
+        :raises ValueError: if the band, 1/3-octave or source-height axes
+            disagree.
+        """
+        require_ranks(
+            self,
+            third_octave_frequencies=1,
+            frequencies=1,
+            heights=1,
+            third_octave_line_power=2,
+            line_power=2,
+            total_line_power=1,
+        )
+        require_same_length(self, "frequencies", ("line_power", 1), "total_line_power")
+        require_same_length(
+            self,
+            "third_octave_frequencies",
+            ("third_octave_line_power", 1),
+            axis="1/3-octave band",
+        )
+        require_same_length(
+            self,
+            "heights",
+            "line_power",
+            "third_octave_line_power",
+            axis="source height",
+        )
+        owner = type(self).__name__
+        heights = require_axis_count(
+            self.heights, owner, "heights", "source height", rank=None
+        )
+        bands = require_axis_count(
+            self.third_octave_frequencies,
+            owner,
+            "third_octave_frequencies",
+            "1/3-octave band",
+            rank=None,
+        )
+        for name, pair in self.components.items():
+            label = f"components[{name!r}]"
+            require_equal_counts(
+                owner,
+                {
+                    "heights": heights,
+                    label: require_axis_count(
+                        pair, owner, label, "source height", rank=None
+                    ),
+                },
+                "source height",
+            )
+            for i, spectrum in enumerate(pair):
+                entry = f"{label}[{i}]"
+                require_equal_counts(
+                    owner,
+                    {
+                        "third_octave_frequencies": bands,
+                        entry: require_axis_count(
+                            spectrum, owner, entry, "1/3-octave band", rank=1
+                        ),
+                    },
+                    "1/3-octave band",
+                )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

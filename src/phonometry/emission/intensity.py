@@ -68,6 +68,12 @@ if TYPE_CHECKING:
 
 from .._internal.levels_math import energy_mean
 from .._internal.utils import _typesignal
+from .._internal.validation import (
+    require_axis_count,
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
 from ..filters.frequencies import _genfreqs
 from ..signals.spectra import (
     _MIN_SAMPLES,
@@ -158,6 +164,44 @@ class IntensityResult:
     max_valid_frequency: float
     spacing: float | None = None
 
+    def __post_init__(self) -> None:
+        """Reject a measurement whose per-band arrays do not share the bands.
+
+        The band figure draws Lp and LI against ``frequency`` and lays the
+        pressure-intensity index over them as one bar per band. A bar chart
+        takes a single height for a whole row of bars without objecting, so
+        an index of one value paints every band with the reactivity of one of
+        them, under a title stating the total; the lengths matplotlib does
+        object to are reported as two shapes it could not broadcast, from
+        inside the figure call, naming neither the field nor the result.
+
+        Either the band ``fraction`` was requested and all seven arrays are
+        present, or none of them is; ``None`` is not a disagreement.
+
+        :raises ValueError: if two of the per-band arrays disagree in length,
+            or one is a single number.
+        """
+        require_ranks(
+            self,
+            frequency=1,
+            intensity=1,
+            intensity_level=1,
+            pressure_level=1,
+            pressure_intensity_index=1,
+            direction=1,
+            bias_correction=1,
+        )
+        require_same_length(
+            self,
+            "frequency",
+            "intensity",
+            "intensity_level",
+            "pressure_level",
+            "pressure_intensity_index",
+            "direction",
+            "bias_correction",
+        )
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -222,6 +266,54 @@ class FieldIndicators:
     f4: float | np.ndarray
     frequency: np.ndarray | None = None
     f1: float | np.ndarray | None = None
+
+    def __post_init__(self) -> None:
+        """Reject indicators that do not all describe the same bands.
+
+        The figure draws F2 and F3 against ``frequency`` and puts F4 and F1
+        on the twin axis, where a short indicator is not read as short: F4
+        arrives as one bar per band and a bar chart takes a single height for
+        the whole row, while F1 is broadcast onto the band axis outright, so
+        one value is drawn as a flat line across every band against the
+        Table B.3 limit, and the figure shows a field qualified over the
+        whole spectrum. :meth:`field_is_stationary` answers from the same
+        array, band by band.
+
+        An indicator is a scalar for a single-band surface and an array for a
+        per-band one, the shape :func:`field_indicators` gives it following
+        its input, so a scalar is counted here as the one band it describes.
+        That is what makes a scalar F1 beside a five-band F2 the
+        disagreement it is, rather than a shape the pair is free to take.
+
+        The rank each count is taken under is pinned beside it, because an
+        indicator of shape ``(bands, 2)`` counts one value per band on its
+        first axis and so clears every count above. Matplotlib reads a
+        two-column y as two series, and F2 and F3 are drawn that way: a
+        two-column one of either comes out as a pair of curves over the same
+        band centres, entered in the legend twice under the one label, with
+        nothing raised and no sign of which curve the surface was measured
+        for. The other three stop, each somewhere else and none of them
+        naming the field or the result: the bar chart on a height it cannot
+        broadcast to the band centres, the F1 line on an operand with more
+        dimensions than the axis remapping allows, and the frequency axis on
+        tick locations that are not one-dimensional.
+
+        :raises ValueError: if two indicators, or the band centres beside
+            them, span different numbers of bands, or one of them carries an
+            extra axis.
+        """
+        owner = type(self).__name__
+        counts: dict[str, int] = {}
+        for name in ("frequency", "f1", "f2", "f3", "f4"):
+            value = getattr(self, name)
+            if value is None:
+                continue
+            counts[name] = (
+                1
+                if np.ndim(value) == 0
+                else require_axis_count(value, owner, name, rank=1)
+            )
+        require_equal_counts(owner, counts)
 
     def field_is_stationary(
         self, limit: float = TEMPORAL_VARIABILITY_LIMIT

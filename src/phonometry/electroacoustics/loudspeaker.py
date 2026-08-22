@@ -52,7 +52,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_positive
+from .._internal.validation import (
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -373,6 +377,50 @@ class LoudspeakerCharacteristics:
     polar_db: NDArray[np.float64] | None
     polar_frequency: float | None
     directivity_index_db: float | None
+
+    def __post_init__(self) -> None:
+        """Reject a data sheet whose curves do not each pair up.
+
+        The fiche draws four curves the standard treats separately -- the
+        on-axis response of Clause 21, the impedance modulus of 16.2, the
+        distortion against frequency of 24.1 and the polar pattern of 23.1 --
+        and each is a pair of arrays that has to line up point for point.
+        Each pair is checked on its own and never against another, because
+        the four are measured on grids of their own choosing: a data sheet
+        sampling the response at 120 frequencies, the impedance at 61 and the
+        pattern at 73 angles is an ordinary one, and linking them would
+        refuse it.
+
+        Nothing downstream re-establishes the pairing. The fiche decides
+        whether to print a panel from the presence of the frequency array
+        alone, and :attr:`minimum_impedance` scans the modulus through a mask
+        cut from the impedance frequencies, so a half-length curve surfaces
+        as an index error from inside a renderer rather than at the point the
+        result was assembled.
+
+        The three ``(lo, hi)`` band edges are left out of every group: they
+        state the ends of a range rather than run along one, and their length
+        of two is a property of the pair, not of any curve.
+
+        :raises ValueError: if either half of a curve disagrees with the other.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            spl_db=1,
+            impedance_frequencies=1,
+            impedance_modulus=1,
+            thd_frequencies=1,
+            thd_percent=1,
+            polar_angles_deg=1,
+            polar_db=1,
+        )
+        require_same_length(self, "frequencies", "spl_db", axis="frequency")
+        require_same_length(
+            self, "impedance_frequencies", "impedance_modulus", axis="frequency"
+        )
+        require_same_length(self, "thd_frequencies", "thd_percent", axis="frequency")
+        require_same_length(self, "polar_angles_deg", "polar_db", axis="angle")
 
     @property
     def characteristic_sensitivity_pa(self) -> float:

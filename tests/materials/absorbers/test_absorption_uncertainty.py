@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pytest
 import reference_data as ref
@@ -183,6 +185,41 @@ def test_negative_rating_raises() -> None:
 def test_non_finite_raises() -> None:
     with pytest.raises(ValueError, match="finite"):
         materials.sound_absorption_coefficient_uncertainty([np.nan], [1000])
+
+
+@pytest.mark.parametrize(
+    "field", ["values", "standard_uncertainty", "expanded_uncertainty", "frequencies"]
+)
+def test_spectra_of_unequal_length_are_refused(field: str) -> None:
+    """A band result cannot hold one spectrum shorter than the rest.
+
+    ``lower`` and ``upper`` are subtractions of two of these arrays, so a
+    one-element column would be stretched over the whole spectrum by numpy
+    and the interval would still come back the right length for the table
+    that prints it, stating a coverage the measurement never had.
+    """
+    res = materials.sound_absorption_coefficient_uncertainty(
+        ref.ISO12999_2_TABLE4_ALPHA_S, ref.ISO12999_2_TABLE4_FREQ
+    )
+    with pytest.raises(ValueError, match=f"'{field}'"):
+        dataclasses.replace(res, **{field: getattr(res, field)[:-1]})
+
+
+def test_single_number_carries_a_value_without_a_spectrum() -> None:
+    """The Clause 7 single numbers are exempt from the band-axis check.
+
+    ``frequencies`` is empty there while ``values`` holds the one number, so
+    the frequency axis is pinned only where the result has one; folding it
+    into the unconditional group would make ``αw`` unconstructible.
+    """
+    for res in (
+        materials.weighted_coefficient_uncertainty(0.7),
+        materials.single_number_rating_uncertainty(8.1),
+    ):
+        assert res.frequencies.shape == (0,)
+        assert res.values.shape == (1,)
+        assert res.standard_uncertainty.shape == (1,)
+        assert res.expanded_uncertainty.shape == (1,)
 
 
 # ---------------------------------------------------------------------------

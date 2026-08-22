@@ -37,6 +37,8 @@ from typing import TYPE_CHECKING, Any, NamedTuple
 
 import numpy as np
 
+from .._internal.validation import require_ranks, require_same_length
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
@@ -357,6 +359,26 @@ class NpdLevelResult:
     table_distances: NDArray[np.float64]
     table_levels: NDArray[np.float64]
 
+    def __post_init__(self) -> None:
+        """Reject a curve whose levels do not run over the distances beside them.
+
+        The figure draws two distance axes: the interpolated sweep, 200 points
+        wide by default, and the tabulated points of the NPD table itself, ten
+        of them in the ANP database. They are independent, so each level array
+        is pinned to the
+        distances it belongs with and never to the other's. Left unchecked, a
+        level array of the wrong length reaches ``ax.plot`` as the y of an x it
+        does not match, and matplotlib's complaint is about two shapes, naming
+        neither the field nor which of the two axes it came from.
+
+        :raises ValueError: if a level array disagrees with its own distances.
+        """
+        require_ranks(self, distance=1, level=1, table_distances=1, table_levels=1)
+        require_same_length(self, "distance", "level", axis="query distance")
+        require_same_length(
+            self, "table_distances", "table_levels", axis="tabulated distance"
+        )
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -589,6 +611,24 @@ class FlightSegmentState:
     landing_roll: NDArray[np.bool_] | list[bool] | None = None
     bank: NDArray[np.float64] | list[float] | None = None
 
+    def __post_init__(self) -> None:
+        """Reject a bundle whose fields describe different numbers of segments.
+
+        All three say something about the same segments of one path, so a
+        bundle whose fields disagree with each other is wrong for every path
+        there is, not just for the one it is eventually passed with. The event
+        entry points do compare each field against the path they were handed,
+        but one at a time and only there, so the first field they happen to
+        validate is the one blamed -- and a bundle built once and reused across
+        several paths is re-reported against each of them in turn. Checking
+        here names the two fields that disagree, at the point where they were
+        put together.
+
+        :raises ValueError: if two of the fields cover different segment counts.
+        """
+        require_ranks(self, ground_roll=1, landing_roll=1, bank=1)
+        require_same_length(self, "ground_roll", "landing_roll", "bank", axis="segment")
+
 
 #: An airborne, unbanked movement: the default of the event entry points (one
 #: shared instance, as the bundle is frozen).
@@ -610,6 +650,25 @@ class FlyoverResult:
     metric: str
     segment_levels: NDArray[np.float64]
     observer: NDArray[np.float64]
+
+    def __post_init__(self) -> None:
+        """Pin how many axes the event's two arrays have, and tie neither to the other.
+
+        They measure different things: ``segment_levels`` runs over the
+        segments of the flight path and ``observer`` over the three coordinates
+        of one receiver. The two lengths coincide for the four-point path that
+        happens to make three segments, and a check that read that coincidence
+        as a shared axis would reject every path of any other length.
+
+        The rank is worth pinning even so. The bar chart draws one bar per
+        entry of ``segment_levels``, and ``observer`` is carried through
+        untouched for the reader to place the result on a map; a second axis on
+        either passes every count there is and arrives intact at whatever draws
+        it.
+
+        :raises ValueError: if either array has more than one axis.
+        """
+        require_ranks(self, segment_levels=1, observer=1)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -1290,6 +1349,23 @@ class NoiseContourResult:
     y: NDArray[np.float64]
     level: NDArray[np.float64]
     metric: str
+
+    def __post_init__(self) -> None:
+        """Reject a contour whose level grid does not match the axes beside it.
+
+        ``contourf`` is handed ``x``, ``y`` and the grid together and reads the
+        grid as ``(len(y), len(x))``. A grid off by a row, or built the other
+        way round, raises from inside matplotlib about two shapes it cannot
+        attribute to a field, and says nothing about which axis it was that
+        disagreed. The two axes are pinned separately because they are
+        independent: a sweep asks for as many x as it likes and as many y, and
+        one count over both would reject every grid that is not square.
+
+        :raises ValueError: if the level grid disagrees with the x or y axis.
+        """
+        require_ranks(self, x=1, y=1, level=2)
+        require_same_length(self, "y", ("level", 0), axis="grid row")
+        require_same_length(self, "x", ("level", 1), axis="grid column")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

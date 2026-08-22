@@ -15,6 +15,7 @@ Oracles, all independent of this implementation:
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import numpy as np
@@ -272,3 +273,91 @@ def test_other_validation_errors() -> None:
         room.room_mode_count(-1.0, LONG_ROOM)
     with pytest.raises(ValueError, match="non-negative and finite"):
         room.room_modal_density(math.inf, LONG_ROOM)
+
+
+def _long_table_result() -> room.RoomModesResult:
+    """Long Table 8.1 as a result: six modes, four axial and two tangential."""
+    return room.room_modes(LONG_ROOM, max_frequency=61.0, speed_of_sound=LONG_C0)
+
+
+@pytest.mark.parametrize(
+    ("field", "slice_"),
+    [("orders", slice(None, -1)), ("frequencies", slice(None, -1))],
+)
+def test_a_column_short_of_a_mode_is_refused(field: str, slice_: slice) -> None:
+    """The three columns are one enumeration, and only one reader complains.
+
+    The ladder masks the frequencies with ``kinds == kind`` and raises numpy's
+    "boolean index did not match indexed array" from inside the drawing call,
+    naming no column; ``count_by_kind`` reads the kinds alone and tallies five
+    modes for a six-rung ladder without a word; and ``orders`` is read by
+    neither, so a triple table one row short leaves ``orders[-1]`` holding the
+    ``(0, 0, 1)`` triple of the 57.3 Hz mode against the 60.0 Hz frequency
+    beside it.
+    """
+    result = _long_table_result()
+    short = getattr(result, field)[slice_]
+    with pytest.raises(ValueError, match=f"'{field}'.*per mode"):
+        dataclasses.replace(result, **{field: short})
+
+
+def test_a_kind_column_of_another_length_is_refused() -> None:
+    """A kind column one long tallies seven modes on a six-mode ladder."""
+    result = _long_table_result()
+    longer = np.concatenate([result.kinds, result.kinds[:1]])
+    with pytest.raises(ValueError, match="'kinds' \\(7\\).*per mode"):
+        dataclasses.replace(result, kinds=longer)
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "match"),
+    [
+        ("orders", "stacked", "'orders' must have 2 axes"),
+        ("frequencies", "column", "'frequencies' must have one axis"),
+        ("kinds", "column", "'kinds' must have one axis"),
+    ],
+)
+def test_an_extra_axis_on_a_column_is_refused(
+    field: str, value: str, match: str
+) -> None:
+    """Counting the modes leaves an extra axis free to reach the reader.
+
+    A triple table stacked into ``(modes, 3, 2)`` keeps its six rows, so it
+    draws and tallies exactly as a sound one does, and hands ``orders[0]``
+    back as a 3 x 2 block; a frequency column of shape ``(modes, 1)`` draws
+    the ladder at the right frequencies and then fails ``float`` on a single
+    entry; a kind column of that shape tallies correctly and raises "too many
+    indices for array" from the ladder.
+    """
+    result = _long_table_result()
+    original = getattr(result, field)
+    reshaped = (
+        np.stack([original, original], axis=-1)
+        if value == "stacked"
+        else original.reshape(-1, 1)
+    )
+    with pytest.raises(ValueError, match=match):
+        dataclasses.replace(result, **{field: reshaped})
+
+
+def test_a_triple_missing_a_coordinate_is_refused() -> None:
+    """The room lengths and the width of the triple table are one count.
+
+    The rank check does not pin it: a two-column triple table has one row per
+    mode and draws and tallies in silence, and is caught only later, by
+    :func:`room_mode_frequency`, complaining about its own argument.
+    """
+    result = _long_table_result()
+    with pytest.raises(ValueError, match="'orders \\(axis 1\\)'.*per coordinate"):
+        dataclasses.replace(result, orders=result.orders[:, :2])
+    with pytest.raises(ValueError, match="'dimensions' \\(2\\).*per coordinate"):
+        dataclasses.replace(result, dimensions=(7.0, 5.0))
+
+
+def test_an_empty_enumeration_is_accepted() -> None:
+    """A limit below the fundamental leaves no modes, and that is not a slip."""
+    result = room.room_modes(LONG_ROOM, max_frequency=1.0)
+    assert result.orders.shape == (0, 3)
+    assert result.frequencies.shape == (0,)
+    assert result.kinds.shape == (0,)
+    assert result.count_by_kind() == dict.fromkeys(room.modes.MODE_KINDS, 0)

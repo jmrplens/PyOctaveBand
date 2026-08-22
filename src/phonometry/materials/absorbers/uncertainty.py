@@ -47,6 +47,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
@@ -186,14 +188,16 @@ class AbsorptionUncertaintyResult:
     r"""Standard and expanded uncertainty of an absorption quantity
     (ISO 12999-2).
 
-    For the single-number quantities (``αw``, ``DLα,NRD``) the frequency and value
-    arrays are empty and the uncertainty arrays hold a single element.
+    For the single-number quantities (``αw``, ``DLα,NRD``) it is the frequency
+    array alone that is empty; the value and the two uncertainty arrays each
+    hold a single element. That empty ``frequencies`` is what marks a
+    single-number result apart, and what :meth:`plot` refuses on.
 
     :ivar quantity: ``"absorption_coefficient"``, ``"equivalent_area"``,
         ``"practical_coefficient"``, ``"weighted_coefficient"`` or ``"single_number_rating"``.
     :ivar condition: ``"reproducibility"`` (``σR``) or ``"repeatability"`` (``σr``).
     :ivar frequencies: Band centre frequencies, in Hz (empty for single numbers).
-    :ivar values: The input quantity per band (empty for single numbers).
+    :ivar values: The input quantity per band (one element for single numbers).
     :ivar standard_uncertainty: Standard uncertainty ``u`` (``σR``/``σr``), one per band.
     :ivar coverage_factor: Coverage factor ``k`` (Table 3).
     :ivar expanded_uncertainty: Exact :math:`U = k\,u` (Formula (10)), one
@@ -207,6 +211,41 @@ class AbsorptionUncertaintyResult:
     standard_uncertainty: np.ndarray
     coverage_factor: float
     expanded_uncertainty: np.ndarray
+
+    def __post_init__(self) -> None:
+        """Reject a result whose value and uncertainty spectra disagree.
+
+        The uncertainty is reported per band and read per band: :meth:`plot`
+        draws the value curve and the ``±U`` ribbon around it point by point
+        on the ``frequencies`` axis, and :attr:`lower` and :attr:`upper` form
+        the reported interval by subtracting and adding the two arrays. Those
+        two properties are the reason a disagreement here has to be refused at
+        construction: numpy broadcasts a one-element uncertainty across the
+        whole spectrum without complaint, so an interval built from the wrong
+        band count still comes back the right length for the table that prints
+        it, stating a coverage the measurement never had.
+
+        The single-number quantities of Clause 7 (``αw``, ``DLα,NRD``) have no
+        spectrum: an empty ``frequencies`` is what marks them apart, and what
+        :meth:`plot` refuses on. The band axis is therefore pinned to the
+        frequencies only where the result has any.
+
+        :raises ValueError: if the value and uncertainty arrays disagree, or
+            if a band result carries a different number of values than
+            frequencies.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            values=1,
+            standard_uncertainty=1,
+            expanded_uncertainty=1,
+        )
+        require_same_length(
+            self, "values", "standard_uncertainty", "expanded_uncertainty"
+        )
+        if np.size(self.frequencies):
+            require_same_length(self, "frequencies", "values")
 
     @property
     def reported_expanded_uncertainty(self) -> np.ndarray:

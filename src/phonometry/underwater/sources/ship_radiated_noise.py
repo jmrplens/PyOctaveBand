@@ -28,6 +28,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
 from ..acoustics import UNDERWATER_REFERENCE_PRESSURE, _positive
 
 if TYPE_CHECKING:
@@ -158,6 +159,38 @@ class ShipSourceLevelResult:
     source_level: NDArray[np.float64]
     source_depth: float
     sound_speed: float
+
+    def __post_init__(self) -> None:
+        """Reject a source-level spectrum whose curves disagree on frequency.
+
+        ISO 17208-2 converts band by band: the source level of a band is its
+        radiated noise level plus the Lloyd's-mirror correction evaluated at
+        that band's own frequency, and it is reported per one-third-octave
+        band with the expanded uncertainty its frequency selects
+        (:func:`source_level_uncertainty` -- 5 dB, 3 dB or 4 dB by band).
+        Only position ties the three curves to :attr:`frequencies`, so a
+        curve of another length reports each level against a frequency other
+        than the one it was computed at, and quotes it with the uncertainty
+        belonging to that other band. Every number on such a sheet is inside
+        its plausible range, which is why nothing further down objects.
+
+        :raises ValueError: if a curve disagrees with the frequency axis.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            radiated_noise_level=1,
+            surface_correction=1,
+            source_level=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "radiated_noise_level",
+            "surface_correction",
+            "source_level",
+            axis="frequency",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

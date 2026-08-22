@@ -98,6 +98,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import ArrayLike, NDArray
@@ -1095,6 +1097,60 @@ class ToneAudibilityResult:
     audibilities: NDArray[np.float64]
     extended_uncertainties: NDArray[np.float64] | None = None
     group_sizes: NDArray[np.int_] | None = None
+
+    def __post_init__(self) -> None:
+        """Reject an assessment whose per-tone quantities disagree in length.
+
+        The fiche prints one row per entry of ``tone_frequencies`` under a
+        single header and reads every other quantity at that row's index, so a
+        quantity one entry short raises an ``IndexError`` from inside the table
+        builder, about an axis and a size, naming neither the tone it was on
+        nor the column it was reading.
+
+        An entry too *many* is the quiet one. The table stops at the last
+        frequency, so the extra tone is dropped from the sheet without a word,
+        while :attr:`decisive_audibility` maxes over the whole array
+        regardless. If that extra entry happens to be the loudest, the fiche
+        fails hunting for the row to emphasise and reports that an integer is
+        not in a list; if it is not the loudest, the sheet renders, reads as
+        complete, and is missing an audible tone that the assessment behind it
+        did find.
+
+        The optional quantities are skipped when absent: :func:`assess_tones`
+        builds a result from bare levels, which carries neither the per-line
+        uncertainties nor the Step 3 grouping, and that is not a disagreement.
+
+        :raises ValueError: if any per-tone quantity disagrees with the rest.
+        """
+        require_ranks(
+            self,
+            tone_frequencies=1,
+            tone_levels=1,
+            mean_narrowband_levels=1,
+            critical_bandwidths=1,
+            lower_corners=1,
+            upper_corners=1,
+            critical_band_levels=1,
+            masking_indices=1,
+            audibilities=1,
+            extended_uncertainties=1,
+            group_sizes=1,
+        )
+        require_same_length(
+            self,
+            "tone_frequencies",
+            "tone_levels",
+            "mean_narrowband_levels",
+            "critical_bandwidths",
+            "lower_corners",
+            "upper_corners",
+            "critical_band_levels",
+            "masking_indices",
+            "audibilities",
+            "extended_uncertainties",
+            "group_sizes",
+            axis="tone entry",
+        )
 
     @property
     def audible(self) -> NDArray[np.bool_]:

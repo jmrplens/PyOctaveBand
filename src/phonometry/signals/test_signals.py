@@ -57,6 +57,7 @@ from typing import TYPE_CHECKING, Any, Literal, overload
 
 import numpy as np
 
+from .._internal.validation import require_ranks, require_same_length
 from .._internal.warnings import PhonometryWarning
 from ..io._resolve import apply_calibration, like_input, resolve_fs
 from .spectra import _positive
@@ -249,6 +250,24 @@ class ToneBurstResult:
     repetition_rate: float | None
     period_samples: int | None
     duty_cycle: float | None
+
+    def __post_init__(self) -> None:
+        """Reject a burst whose gate does not cover the record it gates.
+
+        :attr:`envelope` is not an independent curve but a statement about
+        :attr:`signal`: it is ``amplitude`` exactly where the gate of Clause
+        A2.1 is open and zero everywhere else, which is what makes the record
+        readable as an integral number of full periods. The figure draws both
+        on one time axis built from the length of :attr:`signal`, mirroring
+        the envelope above and below the waveform, so an envelope of another
+        length stops describing this record: shorter, the gate appears to
+        close before the last burst has sounded; longer, it stays open over
+        silence that is not there.
+
+        :raises ValueError: if the envelope disagrees with the signal.
+        """
+        require_ranks(self, signal=1, envelope=1)
+        require_same_length(self, "signal", "envelope", axis="sample")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -487,6 +506,30 @@ class ResampledSignalResult:
     stopband_edge_hz: float
     stopband_attenuation_db: float
     transition_width: float
+
+    def __post_init__(self) -> None:
+        """Reject a record or a filter that carries an axis nobody reads.
+
+        The two arrays here measure nothing in common and are deliberately
+        left unpinned against each other: :attr:`signal` runs over the
+        resampled record, whose length follows the rate ratio, while
+        :attr:`filter_taps` runs over the Kaiser design, whose length follows
+        the transition width and the attenuation. A 24576-sample record
+        beside a 1891-tap filter is the ordinary case, and any equality
+        between the two would reject it.
+
+        What both must be is flat. :attr:`n_taps` reports ``filter_taps.size``
+        and the figure evaluates the magnitude response from the taps, so a
+        second axis on either one is counted into the total and filtered as
+        though it were more of the same filter -- a channel of a
+        multichannel record read as extra samples, a bank of designs read as
+        one long impulse response -- and both the reported tap count and the
+        plotted spec come out of a filter that was never designed.
+
+        :raises ValueError: if the record or the taps carry more than one
+            axis.
+        """
+        require_ranks(self, signal=1, filter_taps=1)
 
     @property
     def n_taps(self) -> int:

@@ -76,6 +76,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
 from .insulation import (
     ImpactRatingResult,
     WeightedRatingResult,
@@ -331,6 +332,28 @@ class VibrationReductionResult:
     k_ij: np.ndarray
     single_number: float | None
     bracketed: np.ndarray | None = None
+
+    def __post_init__(self) -> None:
+        """Reject a junction whose per-band columns do not share a band set.
+
+        The ISO 10848-1 junction fiche prints one row per band under a single
+        frequency header, brackets the rows whose modal overlap disqualifies
+        them, and states beside the boxed Annex A mean how many bands were
+        averaged and how many bracketed. Each of those steps pairs the arrays
+        by position, and each of them refuses a disagreement without naming a
+        field: the in-mean mask crosses ``bracketed`` with the Annex A range
+        and raises a broadcast error, the value table reads ``k_ij`` row by row
+        and raises an ``IndexError`` from inside its loop, and the ``Kij(f)``
+        curve the fiche embeds raises matplotlib's shape message. What none of
+        them names is the field that disagrees, and none of them questions the
+        boxed Annex A mean either: it is carried already formed, not recomputed
+        from the arrays the table prints beside it.
+
+        :raises ValueError: if the frequencies, ``Kij`` and the bracketing mask
+            do not agree on how many bands there are.
+        """
+        require_ranks(self, frequencies=1, k_ij=1, bracketed=1)
+        require_same_length(self, "frequencies", "k_ij", "bracketed")
 
     def octave_bands(self) -> VibrationReductionResult:
         r"""Combine one-third-octave ``Kij`` into octave bands.

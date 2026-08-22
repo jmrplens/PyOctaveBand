@@ -10,6 +10,7 @@ one numeric anchor the source texts print: Kuttruff's classroom example
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import numpy as np
@@ -166,6 +167,36 @@ def test_steady_field_validation() -> None:
     empty = np.array([])
     with pytest.raises(ValueError, match="'distances' must be a non-empty"):
         room.steady_state_field(90.0, 100.0, 0.2, distances=empty)
+
+
+def test_field_curves_must_run_over_one_distance_grid() -> None:
+    """Curves off the distance grid are refused when built, not when drawn.
+
+    The plot draws each level against ``distances`` point for point, so a
+    length disagreement surfaces only as matplotlib's "x and y must have same
+    first dimension" and two bare shapes, naming neither field nor result. An
+    extra axis is worse: it counts one row per distance, passes every length
+    check, and reaches the plot as a second curve in the same colour and dash,
+    under a repeated legend entry.
+    """
+    good = room.steady_state_field(90.0, 100.0, 0.2)
+    per_distance = "one value per distance"
+    cases = (
+        ("distances", good.distances[:-1], per_distance),
+        ("direct", good.direct[:-1], per_distance),
+        ("direct", np.append(good.direct, good.direct[-1]), per_distance),
+        ("reverberant", good.reverberant[:-1], per_distance),
+        ("reverberant", np.append(good.reverberant, 0.0), per_distance),
+        ("total", good.total[:-1], per_distance),
+        ("total", np.append(good.total, good.total[-1]), per_distance),
+        ("distances", np.column_stack([good.distances] * 2), "must have one axis"),
+        ("direct", np.column_stack([good.direct] * 2), "must have one axis"),
+        ("reverberant", np.column_stack([good.reverberant] * 2), "must have one axis"),
+        ("total", np.column_stack([good.total] * 2), "must have one axis"),
+    )
+    for field, value, fragment in cases:
+        with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+            dataclasses.replace(good, **{field: value})
 
 
 def test_steady_field_plot_smoke() -> None:

@@ -59,6 +59,8 @@ from .._internal.validation import (
     require_choice,
     require_positive,
     require_positive_array,
+    require_ranks,
+    require_same_length,
 )
 from .rotorcraft_propagation import (
     _C,
@@ -127,6 +129,27 @@ class RotorcraftHemisphere:
     polar: NDArray[np.float64]
     levels: NDArray[np.float64]
     distance: float = _RH
+
+    def __post_init__(self) -> None:
+        """Reject a hemisphere whose grid does not span its own axes.
+
+        Three axes meet in ``levels``, and every reader addresses one of them
+        through the axis beside it. An angle axis longer than the grid it
+        indexes runs the Eq. 13 lookup off the end of ``levels`` towards the
+        far side of the hemisphere, with an index message that names neither
+        array; one shorter clamps every query to a boundary well inside the
+        measured grid, so a direction the hemisphere does cover comes back as
+        the level of that boundary bin. The band axis fails more quietly
+        still: the directivity plot picks the band to draw by searching
+        ``frequencies``, so a band grid of the wrong length labels the curve
+        with a frequency the levels beside it were never computed at.
+
+        :raises ValueError: if the level grid disagrees with an angle or band axis.
+        """
+        require_ranks(self, frequencies=1, azimuth=1, polar=1, levels=3)
+        require_same_length(self, "azimuth", "levels", axis="azimuth angle")
+        require_same_length(self, "polar", ("levels", 1), axis="polar angle")
+        require_same_length(self, "frequencies", ("levels", 2))
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -780,6 +803,45 @@ class FlightPathKinematics:
     bank_angle: NDArray[np.float64]
     path_angle: NDArray[np.float64]
 
+    def __post_init__(self) -> None:
+        """Reject a track whose per-point quantities do not line up.
+
+        Every quantity here is a central difference taken *at* a track point,
+        so the eight arrays are eight columns of one table and mean something
+        only read row by row. The event chain reads them exactly that way,
+        and with no check of its own, because these values arrive as a result
+        rather than as user input: point ``k`` supplies the airspeed and path
+        angle that select the hemisphere and the heading and bank that orient
+        it. A column of the wrong length runs that walk off its end, or
+        leaves a tail no point of the track claims, and the profile plot pairs
+        the same columns against ``times`` to draw them.
+
+        :raises ValueError: if a per-point quantity disagrees with ``times``.
+        """
+        require_ranks(
+            self,
+            times=1,
+            positions=2,
+            ground_speed=1,
+            airspeed=1,
+            heading=1,
+            curvature=1,
+            bank_angle=1,
+            path_angle=1,
+        )
+        require_same_length(
+            self,
+            "times",
+            "positions",
+            "ground_speed",
+            "airspeed",
+            "heading",
+            "curvature",
+            "bank_angle",
+            "path_angle",
+            axis="track point",
+        )
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -958,6 +1020,47 @@ class RotorcraftEventResult:
     pnltm: float
     epnl: float
 
+    def __post_init__(self) -> None:
+        """Reject an event whose history or spectrum does not line up.
+
+        Two axes meet in ``band_levels``: one row per emission step, one
+        column per band. Every other array is per step, and the time-history
+        plot pairs ``times`` with ``a_levels`` point by point, then reads the
+        10 dB-down window back out at those same indices. A per-step quantity
+        of the wrong length shifts the geometry against the levels it was
+        computed from, so a reader that takes the step of ``LASmax`` and asks
+        for the slant distance and emission angle there is answered from
+        another instant of the flyover; a band axis of the wrong length does
+        the same to the spectrum the perceived-noise metrics were taken over.
+
+        :raises ValueError: if a per-step or per-band quantity disagrees.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            emission_times=1,
+            times=1,
+            distance=1,
+            azimuth=1,
+            polar=1,
+            band_levels=2,
+            a_levels=1,
+            pnlt=1,
+        )
+        require_same_length(self, "frequencies", ("band_levels", 1))
+        require_same_length(
+            self,
+            "emission_times",
+            "times",
+            "distance",
+            "azimuth",
+            "polar",
+            "band_levels",
+            "a_levels",
+            "pnlt",
+            axis="emission step",
+        )
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -984,6 +1087,22 @@ class RotorcraftNoiseContourResult:
     y: NDArray[np.float64]
     level: NDArray[np.float64]
     metric: str
+
+    def __post_init__(self) -> None:
+        """Reject a grid whose levels do not span its own coordinates.
+
+        The contour map takes the two coordinate axes and the level grid
+        separately and pairs them by position. Matplotlib refuses most
+        mismatches, but with a message about dimensions that names no field of
+        this result and arrives long after the grid was built; the one it
+        cannot refuse is a square grid handed over transposed, which draws a
+        plausible footprint over ground that was never evaluated.
+
+        :raises ValueError: if the level grid disagrees with ``x`` or ``y``.
+        """
+        require_ranks(self, x=1, y=1, level=2)
+        require_same_length(self, "y", "level", axis="grid row")
+        require_same_length(self, "x", ("level", 1), axis="grid column")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -1211,6 +1330,60 @@ class _EventSetup:
     band_integrated: bool
     terrain: tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]] | None
     terrain_resolution: float
+
+    def __post_init__(self) -> None:
+        """Reject a setup whose three axes do not line up.
+
+        The per-receiver pass walks all three axes by index: the Eq. 3-10
+        weights name a database condition, each track point contributes its
+        own position, orientation and offset, and the absorption coefficient
+        multiplies the source spectrum band by band. Each piece is validated
+        as it is assembled but not against the others, which leaves two holes:
+        ``path_angles`` first meets the rest of the database inside the
+        vectorised pass, and the four track-state arrays skip the per-point
+        check on the branch that derives them from the track kinematics.
+        Pinning the axes here names the one that disagrees before a single
+        step is flown.
+
+        ``ground_elevation``, ``sigma``, ``triangles`` and ``terrain`` stay
+        out of the groups: the first two are a scalar or one value per
+        *receiver*, an axis this setup does not carry; the triangulation runs
+        over its own count of triangles, three vertices to a row; and
+        ``terrain`` is an ``(x, y, z)`` triple whose grids are the elevation
+        model's own. The threes of the last two are a triangle's corners and
+        a coordinate's names, not a band count they happen to agree with.
+
+        :raises ValueError: if the database, track or band axes disagree.
+        """
+        require_ranks(
+            self,
+            airspeeds=1,
+            path_angles=1,
+            frequencies=1,
+            times=1,
+            positions=2,
+            speed=1,
+            gamma=1,
+            heading=1,
+            bank=1,
+            offsets=1,
+            alpha=1,
+        )
+        require_same_length(
+            self, "hemispheres", "airspeeds", "path_angles", axis="flight condition"
+        )
+        require_same_length(self, "frequencies", "alpha")
+        require_same_length(
+            self,
+            "times",
+            "positions",
+            "speed",
+            "gamma",
+            "heading",
+            "bank",
+            "offsets",
+            axis="track point",
+        )
 
 
 def _event_setup(

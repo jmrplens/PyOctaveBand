@@ -84,6 +84,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
+
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
@@ -374,6 +376,46 @@ class DbHrGlobalIndexResult:
     spectrum_levels: np.ndarray
     band_contributions: np.ndarray
     reference: str
+
+    def __post_init__(self) -> None:
+        """Reject an index whose four band columns do not share one band set.
+
+        Formula (A.5) is a single energy sum over the eighteen one-third-octave
+        bands 100 Hz to 5 kHz, and these four arrays are the four columns of
+        the table that sum is read off: the band centre, the insulation
+        ``X_i``, the normalised spectrum ``L_x,i`` of the Annex A table named
+        in ``reference``, and their difference. Swapping a column for one of
+        another length leaves ``value``, ``intermediate`` and ``reported``
+        alone, since the sum closed over the bands it was handed at
+        construction, so the index stops answering to the columns beside it.
+        The plot does refuse most such results, because the bars and the
+        transmitted-level curve go on positions taken from ``frequencies``
+        and matplotlib compares the lengths itself, but its refusal names
+        neither the field nor the result; and a column holding a single value
+        slips past even that, broadcast into one identical bar per band.
+        ``spectrum_levels`` is read by no plot and no sheet, so a spectrum
+        belonging to a different band set reaches the reader with nothing
+        between it and the table it is quoted under. Equal lengths are the
+        most this can ask for: four columns of eighteen values read off
+        different Annex A tables agree here, and always will.
+
+        :raises ValueError: if the four per-band columns disagree in length,
+            or if one of them carries an axis beyond the band axis.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            band_values=1,
+            spectrum_levels=1,
+            band_contributions=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "band_values",
+            "spectrum_levels",
+            "band_contributions",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

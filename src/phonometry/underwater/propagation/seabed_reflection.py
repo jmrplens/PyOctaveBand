@@ -37,7 +37,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_positive
+from ..._internal.validation import (
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -133,6 +137,54 @@ class BottomLossResult:
     reflection_coefficient: NDArray[np.complex128]
     critical_angle: float | None
 
+    def __post_init__(self) -> None:
+        r"""Reject a loss curve that does not run over its own angles.
+
+        The three arrays are one angle sweep written down three times:
+        :func:`bottom_reflection_loss` evaluates ``R`` once at the angles it
+        was handed and takes :math:`-20 \log_{10} \lvert R \rvert` of that
+        very array, so entry ``i`` of each is the same grazing angle. Nothing
+        in the result records which angle an entry belongs to except its
+        position.
+
+        Only two of the three are drawn: :func:`plot_bottom_loss` calls
+        ``ax.plot(grazing_angle, reflection_loss)``, so a disagreement
+        between those two stops the figure with matplotlib's own complaint,
+        ``x and y must have same first dimension, but have shapes (5,) and
+        (91,)`` -- shapes only, neither field named, and the reader is left to
+        work out which of the two was short. ``reflection_coefficient`` is
+        never read by the figure at all, so a short one is drawn straight past
+        in silence: the picture comes out complete over 91 angles while the
+        coefficient beside it holds 5, waiting for whoever pairs ``R`` with
+        the angles next. A single-entry ``R`` is the quietest of the lot,
+        because numpy broadcasts it: one angle's reflection coefficient
+        spreads over all 91 and the arithmetic returns a full-length answer
+        with no complaint anywhere.
+
+        The ranks are pinned because a count cannot see an extra axis. A
+        ``reflection_loss`` of shape ``(91, 2)`` -- two sediments stacked, or
+        ``(angle, value)`` pairs kept in one array -- has 91 on its first axis
+        like everything else, passes the length check, and reaches matplotlib,
+        which quietly draws both columns: the figure comes back with two
+        curves and the legend row ``Bottom loss`` printed twice.
+
+        :raises ValueError: if the three arrays disagree, or one carries an
+            axis beyond the angle sweep.
+        """
+        require_ranks(
+            self,
+            grazing_angle=1,
+            reflection_loss=1,
+            reflection_coefficient=1,
+        )
+        require_same_length(
+            self,
+            "grazing_angle",
+            "reflection_loss",
+            "reflection_coefficient",
+            axis="grazing angle",
+        )
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -222,6 +274,51 @@ class SeabedReflection:
     c1: float
     rho2: float
     c2: float
+
+    def __post_init__(self) -> None:
+        r"""Reject a reflection record whose four columns are not one sweep.
+
+        :func:`seabed_reflection` evaluates ``R`` once over the angles it was
+        given and derives ``|R|`` and the bottom loss from that same array, so
+        the four arrays are one grazing-angle sweep recorded four times and
+        entry ``i`` of each belongs to the same angle. The class carries the
+        interface parameters precisely so that the record is self-contained;
+        an angle axis that fits none of the three quantities beside it makes
+        it self-contained about the wrong sweep.
+
+        :func:`plot_seabed_reflection` draws only ``|R|``: against a
+        mismatched ``grazing_angle`` it stops with matplotlib's ``x and y must
+        have same first dimension, but have shapes (91,) and (5,)`` (the same
+        both ways round, and either way the message names shapes rather than
+        fields). The other two never reach the figure, and that is where the
+        silence is: a ``bottom_loss`` of 5 entries beside 91 angles draws a
+        complete ``|R|`` curve over all 91, and the loss in decibels -- the
+        quantity a sonar budget actually spends -- is wrong and unmentioned.
+
+        The ranks are pinned because a count passes an extra axis through. A
+        ``magnitude`` of shape ``(91, 2)`` counts 91 on its first axis exactly
+        as a single sweep does, and matplotlib draws every column it is given:
+        the figure comes back carrying two ``|R|`` curves and repeating the
+        ``$|R|$`` legend row, with nothing to say which sediment is which.
+
+        :raises ValueError: if the four arrays disagree, or one carries an
+            axis beyond the angle sweep.
+        """
+        require_ranks(
+            self,
+            grazing_angle=1,
+            reflection_coefficient=1,
+            magnitude=1,
+            bottom_loss=1,
+        )
+        require_same_length(
+            self,
+            "grazing_angle",
+            "reflection_coefficient",
+            "magnitude",
+            "bottom_loss",
+            axis="grazing angle",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

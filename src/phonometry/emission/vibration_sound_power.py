@@ -59,7 +59,11 @@ if TYPE_CHECKING:
     from .._report.metadata import ReportMetadata
 
 
-from .._internal.validation import require_positive
+from .._internal.validation import (
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 
 #: Reference vibratory velocity ``v0`` (ISO/TS 7849, Equation 3), m/s.
 REFERENCE_VELOCITY: float = 5.0e-8
@@ -274,6 +278,36 @@ class VibrationSoundPowerResult:
     radiation_factor: np.ndarray
     area: float
     frequencies: np.ndarray | None = None
+
+    def __post_init__(self) -> None:
+        """Reject a determination whose per-band quantities disagree.
+
+        The fiche prints one row per band under a single header, taking the
+        row count from ``sound_power_level`` and reading ``velocity_level``
+        (and ``radiation_factor`` in the verbose table) at the same indices,
+        so a short array cannot be read to the end of the sheet and a long one
+        is dropped by it silently. ``frequencies`` are worse than truncated:
+        they pick the A-weighting corrections that :attr:`sound_power_level_a`
+        adds band by band, and a single stray frequency broadcasts its one
+        correction across every band, boxing an ``LWA`` that no band of the
+        table supports.
+
+        :raises ValueError: if any per-band quantity disagrees with the rest.
+        """
+        require_ranks(
+            self,
+            velocity_level=1,
+            sound_power_level=1,
+            radiation_factor=1,
+            frequencies=1,
+        )
+        require_same_length(
+            self,
+            "velocity_level",
+            "sound_power_level",
+            "radiation_factor",
+            "frequencies",
+        )
 
     @property
     def total_level(self) -> float:

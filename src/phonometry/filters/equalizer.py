@@ -65,6 +65,7 @@ import numpy as np
 from scipy import signal
 
 from .._internal.utils import _sos_initial_state, _sos_state_mismatch
+from .._internal.validation import require_ranks, require_same_length
 from ..io._resolve import (
     like_input,
     refuse_foreign_rate,
@@ -444,6 +445,44 @@ class EQResponseResult:
     sos: NDArray[np.float64]
     fs: float
     sections: tuple[EQSection, ...]
+
+    def __post_init__(self) -> None:
+        """Reject a response whose curves and sections do not line up.
+
+        The response carries two independent axes, the evaluation grid and
+        the cascade, and the figure reads both by position: every curve is
+        drawn against ``frequencies``, and each row of
+        ``section_magnitude_db`` is labelled with the :class:`EQSection`
+        standing at the same place in ``sections``. A cascade taller than
+        that list therefore loses its surplus rows from the plot with no word
+        said, and one shorter than it labels a row with the parameters of a
+        biquad it was not computed from. The ``sos`` block is the third
+        reading of the same axis: it leaves here to be filtered with, so a
+        cascade of a different height is no longer the one the curves
+        describe.
+
+        :raises ValueError: if the frequency or the section axis disagrees
+            across the fields that share it.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            magnitude_db=1,
+            phase_rad=1,
+            section_magnitude_db=2,
+            sos=2,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "magnitude_db",
+            "phase_rad",
+            ("section_magnitude_db", 1),
+            axis="evaluation frequency",
+        )
+        require_same_length(
+            self, "section_magnitude_db", "sos", "sections", axis="section"
+        )
 
     def plot(
         self,

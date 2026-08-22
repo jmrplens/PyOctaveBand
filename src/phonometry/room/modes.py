@@ -67,7 +67,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from .._internal.types import as_float_or_array
-from .._internal.validation import require_positive
+from .._internal.validation import require_positive, require_ranks, require_same_length
 from .steady_field import schroeder_frequency
 
 if TYPE_CHECKING:
@@ -254,6 +254,66 @@ class RoomModesResult:
     speed_of_sound: float
     max_frequency: float
     schroeder_frequency: float | None = None
+
+    def __post_init__(self) -> None:
+        """Reject a mode table whose triples, frequencies and kinds have slipped.
+
+        The three columns are one enumeration written three ways: the lattice
+        of order triples is cut at the frequency limit and sorted, and the
+        frequency and the kind of every surviving row are measured and read
+        off that same table. A result whose columns disagree is read
+        differently by each reader, and the reader that notices is not the one
+        that answers the question.
+
+        The ladder of :meth:`plot` picks a family out with ``kinds == kind``
+        and indexes the frequencies with the result, so a kind column of
+        another length arrives at numpy as a boolean index of the wrong size.
+        On the six modes of Long's 7 x 5 x 3 m room a kind column one short
+        raised ``IndexError: boolean index did not match indexed array along
+        axis 0; size of axis is 6 but size of corresponding boolean axis is
+        5``, from inside the drawing call and naming neither column. One long
+        raises the same way, and so does a frequency column of either wrong
+        length.
+
+        :meth:`count_by_kind` reads the kind column on its own and so says
+        nothing at all. On those same six modes a kind column one short
+        tallied ``{'axial': 4, 'tangential': 1, 'oblique': 0}``, five modes,
+        and one long tallied seven: a census of a room whose ladder has six
+        rungs, silent in both directions.
+
+        ``orders`` passes both readers untouched whatever its length, since
+        neither indexes it. What a slipped triple table breaks is the pairing
+        of a mode with its own frequency, which is how the enumeration is
+        meant to be read. With the triples one row short, ``orders[-1]`` and
+        ``frequencies[-1]`` came back as ``[0 0 1]`` at 60.0 Hz, and
+        ``[0 0 1]`` is the 57.3 Hz mode: the triple names one mode and the
+        number beside it another, with nothing raised. Zipping the two columns
+        instead drops the last mode without a word.
+
+        The ranks are pinned as well as the lengths, because a column that
+        carries an extra axis satisfies every count and travels on. A triple
+        table stacked into ``(modes, 3, 2)`` keeps its six rows, draws and
+        tallies exactly as before, and hands ``orders[0]`` back as a 3 x 2
+        block that :func:`room_mode_frequency` then refuses, complaining about
+        its own argument rather than about the result. A frequency column of
+        shape ``(modes, 1)`` draws the ladder at the right frequencies and
+        then fails ``float(frequencies[0])`` with ``TypeError: only
+        0-dimensional arrays can be converted to Python scalars``. A kind
+        column of that shape tallies correctly and raises ``IndexError: too
+        many indices for array: array is 1-dimensional, but 2 were indexed``
+        from the ladder.
+
+        The room lengths and the width of the triple table are one coordinate
+        count written twice, and it is not pinned by the rank: a triple table
+        two columns wide draws and tallies in silence, and is refused only
+        later, by :func:`room_mode_frequency`, in the same words it uses for a
+        bad argument of its own.
+
+        :raises ValueError: if the mode or the coordinate axes disagree.
+        """
+        require_ranks(self, orders=2, frequencies=1, kinds=1)
+        require_same_length(self, "orders", "frequencies", "kinds", axis="mode")
+        require_same_length(self, "dimensions", ("orders", 1), axis="coordinate")
 
     @property
     def volume(self) -> float:

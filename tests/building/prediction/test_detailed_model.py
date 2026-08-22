@@ -974,3 +974,32 @@ def test_a_share_column_with_an_extra_axis_is_refused(airborne) -> None:
     three_dimensional = np.stack([values, values], axis=-1)
     with pytest.raises(ValueError, match="'fractions' must have 2 axes"):
         dataclasses.replace(airborne, fractions=three_dimensional)
+
+
+def test_a_path_without_a_share_row_is_refused_on_the_impact_result(impact) -> None:
+    """The impact result decomposes its own quantity over the same two axes.
+
+    It shares the check with the airborne result, so nothing above would go
+    red if this class stopped running it, and the path axis is the direction
+    that stays quiet: with a path appended and ``fractions`` left as it was,
+    ``plot`` drew and ``report`` wrote a sheet whose rows and whose shares
+    disagree about how many paths there are, neither of them complaining.
+    """
+    import dataclasses
+
+    extra = dataclasses.replace(impact.paths[0], label="extra")
+    with pytest.raises(ValueError, match="per transmission path"):
+        dataclasses.replace(impact, paths=(*impact.paths, extra))
+
+
+def test_an_impact_total_off_the_band_axis_is_refused(impact) -> None:
+    """``L'n`` runs over the frequencies the same paths were summed over.
+
+    One band too long, the total is drawn against the frequency axis, and
+    matplotlib refuses the two shapes it was handed without naming either
+    field: ``x and y must have same first dimension``.
+    """
+    import dataclasses
+
+    with pytest.raises(ValueError, match="'l_prime_n'"):
+        dataclasses.replace(impact, l_prime_n=np.append(impact.l_prime_n, 99.0))

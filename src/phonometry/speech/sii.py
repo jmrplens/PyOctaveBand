@@ -46,6 +46,13 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import (
+    require_axis_count,
+    require_equal_counts,
+    require_ranks,
+    require_same_length,
+)
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
@@ -516,6 +523,71 @@ class _BandProcedure:
     bandwidth_offset_db: float
     spread_decades: np.ndarray | None
 
+    def __post_init__(self) -> None:
+        """Reject a band table whose columns do not line up.
+
+        This is the table the standard prints as one of its Tables 1 to 4, and
+        the whole module reads the band count off one column of it: every
+        spectrum a caller passes is measured against ``band_importance``, while
+        the spread of masking walks ``spread_decades`` row by row over the
+        length of the *noise* vector. A masking matrix belonging to another
+        procedure is therefore never indexed past its edge; the walk reads its
+        leading block and returns an index built from another procedure's band
+        separations, in the right shape and the right units, some way off the
+        published one.
+
+        :attr:`band_edges` bounds the same bands from outside, so it carries
+        one value more than they do rather than one each, and is checked
+        against the band count with that offset applied.
+
+        :raises ValueError: if the band axes disagree.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            band_edges=1,
+            band_importance=1,
+            internal_noise=1,
+            speech_spectrum=1,
+            bandwidth_db=1,
+            spread_decades=2,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "band_importance",
+            "internal_noise",
+            "speech_spectrum",
+            "bandwidth_db",
+            "spread_decades",
+            ("spread_decades", 1),
+        )
+        _require_closing_edge(self)
+
+
+def _require_closing_edge(table: _BandProcedure | SIIProcedure) -> None:
+    """Require ``band_edges`` to bound the bands: one limit more than bands.
+
+    The band limits are the axis the band-importance step is drawn over, and
+    the step plots one importance value per limit (the last one repeated to
+    close the final band). Both procedure types carry the same pair of fields
+    with the same offset between them, so both check it here.
+
+    :param table: The band table whose two fields are compared.
+    :raises ValueError: if the limits do not bound the bands.
+    """
+    owner = type(table).__name__
+    bands = require_axis_count(
+        table.band_importance, owner, "band_importance", rank=None
+    )
+    edges = require_axis_count(
+        table.band_edges, owner, "band_edges", "band limit", rank=None
+    )
+    require_equal_counts(
+        owner,
+        {"band_importance": bands, "band_edges, less its closing limit": edges - 1},
+    )
+
 
 def _masking_geometry(edges: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     r"""Masking-slope bandwidth term and band separation from band limits.
@@ -669,6 +741,41 @@ class SIIResult:
     level_distortion: np.ndarray
     method: str = "one-third-octave"
 
+    def __post_init__(self) -> None:
+        """Reject a result whose per-band quantities disagree.
+
+        The fiche prints one row per band under a single header, walking
+        :attr:`frequencies` and reading the other spectra at the same index, so
+        the frequency column alone decides how many rows the table has. A
+        spectrum one band too long therefore loses its last band off the bottom
+        of the sheet without a word: :attr:`speech_spectrum` and
+        :attr:`disturbance` are tabulated and nothing else re-reads them, so
+        the band that vanished is nowhere on the page to contradict the boxed
+        ``SII`` beside it, and every number that did print is well formed.
+
+        :raises ValueError: if any per-band quantity disagrees with the rest.
+        """
+        require_ranks(
+            self,
+            band_audibility=1,
+            band_importance=1,
+            frequencies=1,
+            speech_spectrum=1,
+            disturbance=1,
+            masking=1,
+            level_distortion=1,
+        )
+        require_same_length(
+            self,
+            "band_audibility",
+            "band_importance",
+            "frequencies",
+            "speech_spectrum",
+            "disturbance",
+            "masking",
+            "level_distortion",
+        )
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -773,6 +880,29 @@ class StandardSpeechSpectrum:
     frequencies: np.ndarray
     vocal_efforts: tuple[str, ...]
     levels: np.ndarray
+
+    def __post_init__(self) -> None:
+        """Reject a spectrum table whose rows or columns do not line up.
+
+        :attr:`levels` is the Table 3 block itself, one row per vocal effort
+        and one column per band, and both of its axes are named by another
+        field: the plot walks the effort names, drawing row ``i`` under the
+        label of effort ``i`` over one evenly spaced position per band, with
+        :attr:`frequencies` as the tick labels of that categorical axis rather
+        than as coordinates. A surplus row is the quiet direction, and the one
+        worth catching: the walk never reaches it, so a spectrum that was
+        asked for is missing from a figure that looks complete and carries no
+        sign it was dropped. The other two ways they can disagree are loud but
+        name no field. A surplus effort name walks the loop off the end of the
+        block, and the row that is not there comes back as an ``IndexError``
+        out of NumPy; a band count that differs from the columns is refused by
+        matplotlib with ``x and y must have same first dimension``.
+
+        :raises ValueError: if the band or vocal-effort axes disagree.
+        """
+        require_ranks(self, frequencies=1, levels=2)
+        require_same_length(self, "frequencies", ("levels", 1))
+        require_same_length(self, "vocal_efforts", "levels", axis="vocal effort")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -1052,6 +1182,42 @@ class SIIProcedure:
     band_importance: np.ndarray
     internal_noise: np.ndarray
     speech_spectrum: np.ndarray
+
+    def __post_init__(self) -> None:
+        """Reject a band table whose columns do not line up.
+
+        This is one of the standard's Tables 1 to 4 handed over to be read
+        column by column: the documented way to use :attr:`band_edges` is to
+        take band ``i`` as running from ``band_edges[i]`` to
+        ``band_edges[i + 1]``, which quietly bounds the wrong band, or runs off
+        the end, as soon as the limits and the bands disagree.
+
+        The step plot refuses such a table too, but only by comparing its own
+        closed importance array against the limits, so the length it names
+        belongs to neither field and the reader is left to work out which
+        column was wrong. Both are checked here instead, :attr:`band_edges`
+        against the band count with the offset it is defined to carry: one
+        value more than the bands, because it bounds them from outside rather
+        than labelling them.
+
+        :raises ValueError: if the band axes disagree.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            band_edges=1,
+            band_importance=1,
+            internal_noise=1,
+            speech_spectrum=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "band_importance",
+            "internal_noise",
+            "speech_spectrum",
+        )
+        _require_closing_edge(self)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

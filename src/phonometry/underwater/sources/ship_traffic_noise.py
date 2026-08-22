@@ -35,7 +35,12 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_positive, require_positive_array
+from ..._internal.validation import (
+    require_positive,
+    require_positive_array,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -186,6 +191,32 @@ class ShipTrafficSpectrum:
     vessel_class: str | None
     speed_knots: float | None
     length_m: float | None
+
+    def __post_init__(self) -> None:
+        r"""Reject a predicted spectrum whose levels do not match its bands.
+
+        The two level arrays are one prediction in two units, and what
+        converts between them is the band's own centre frequency:
+        :attr:`band_level` is :attr:`source_psd` plus
+        :math:`10 \log_{10}(0.231 f)`, worth about 4 dB in the 10 Hz band and
+        about 39 dB in the 31.5 kHz band of the default set. Nothing records
+        which band a level was converted at except its position beside
+        :attr:`frequency`, so a level array of another length publishes a
+        spectral-density level and a band level that refer to different
+        bands, as one spectrum.
+
+        That spectrum is meant to travel: the module offers ``source_psd``
+        as the shipping input of
+        :func:`~phonometry.underwater.sources.ambient_noise.ocean_ambient_noise`
+        and as a source to be placed at range, and either use pairs it with
+        a frequency axis taken from the same result.
+
+        :raises ValueError: if a level array disagrees with the frequency axis.
+        """
+        require_ranks(self, frequency=1, source_psd=1, band_level=1)
+        require_same_length(
+            self, "frequency", "source_psd", "band_level", axis="frequency"
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

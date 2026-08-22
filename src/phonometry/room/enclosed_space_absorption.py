@@ -43,7 +43,12 @@ if TYPE_CHECKING:
 
 
 from .._internal.types import as_float_or_array
-from .._internal.validation import require_fraction, require_positive
+from .._internal.validation import (
+    require_fraction,
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 
 # ---------------------------------------------------------------------------
 # Normative constants.
@@ -234,6 +239,25 @@ class ReverberationResult:
     reverberation_time: np.ndarray
     volume: float
     object_fraction: float
+
+    def __post_init__(self) -> None:
+        """Reject a prediction whose bands do not line up.
+
+        The fiche walks ``frequencies`` and prints ``absorption_area`` and
+        ``reverberation_time`` at each band's index, so a spectrum longer than
+        the band axis simply stops being printed while the boxed
+        mid-frequency descriptor beneath the table -- picked by looking the
+        500 Hz and 1000 Hz bands up in ``frequencies`` and reading ``T`` and
+        ``A`` at the index found there -- states a number belonging to another
+        band under a "500-1000 Hz" label. A spectrum shorter than the band
+        axis raises an index error from inside reportlab, about neither field.
+
+        :raises ValueError: if the two spectra and the band axis disagree.
+        """
+        require_ranks(self, frequencies=1, absorption_area=1, reverberation_time=1)
+        require_same_length(
+            self, "frequencies", "absorption_area", "reverberation_time"
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

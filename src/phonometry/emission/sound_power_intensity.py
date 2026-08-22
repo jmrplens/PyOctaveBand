@@ -758,6 +758,27 @@ class PrecisionFieldIndicators:
     f_pi_signed: np.ndarray
     fs: np.ndarray
 
+    def __post_init__(self) -> None:
+        """Reject indicators that do not all span the same bands.
+
+        The four indicators are what clause 10 f) 1) has the report state,
+        band by band in the verbose table and as a range in the
+        measurement-basis strip, and they are read against each other before
+        that: :func:`precision_qualification` forms criterion 3 from the
+        difference of the two pressure-intensity indicators and criterion 4
+        from ``fs``, taking its band count from ``f_pi_signed`` alone. An
+        indicator carrying a single value is broadcast into the difference
+        for every band, so one band's reading qualifies the whole spectrum;
+        one of another length raises from inside numpy about two shapes,
+        naming neither indicator. ``ft`` is absent unless time-window
+        intensities were supplied, which is not a disagreement.
+
+        :raises ValueError: if two of the indicators span different numbers
+            of bands.
+        """
+        require_ranks(self, ft=1, f_pi_unsigned=1, f_pi_signed=1, fs=1)
+        require_same_length(self, "ft", "f_pi_unsigned", "f_pi_signed", "fs")
+
 
 @dataclass(frozen=True)
 class PrecisionCriteria:
@@ -786,6 +807,42 @@ class PrecisionCriteria:
     criterion_4: np.ndarray
     criterion_5: np.ndarray | None
     qualified: np.ndarray | None
+
+    def __post_init__(self) -> None:
+        """Reject a verdict set whose criteria do not span the same bands.
+
+        ``qualified`` is the conjunction of the others, and a conjunction is
+        taken with numpy's broadcasting: a criterion carrying a single value
+        decides every band at once, so a five-band determination can be
+        qualified, and its A-weighted total taken over the bands the fiche
+        keeps (clause 10 f) 2)), on one band's verdict. The criteria come
+        from separately measured scans and reach this type without ever
+        having been compared with each other: criterion 5 is formed from its
+        own pair of field-non-uniformity spectra, whose length nothing else
+        constrains. A criterion is ``None`` when its inputs were not
+        supplied, which is not a disagreement.
+
+        :raises ValueError: if two of the criteria span different numbers of
+            bands.
+        """
+        require_ranks(
+            self,
+            criterion_1=1,
+            criterion_2=1,
+            criterion_3=1,
+            criterion_4=1,
+            criterion_5=1,
+            qualified=1,
+        )
+        require_same_length(
+            self,
+            "criterion_1",
+            "criterion_2",
+            "criterion_3",
+            "criterion_4",
+            "criterion_5",
+            "qualified",
+        )
 
 
 def _check_report_bands(
@@ -866,6 +923,44 @@ class PrecisionIntensityResult:
     not_applicable_band: np.ndarray
     surface_area: float
     sound_power_level_a: float
+
+    def __post_init__(self) -> None:
+        """Reject a determination whose per-band quantities disagree.
+
+        The fiche prints one row per band, taking the row count from
+        ``sound_power_level`` and the labels from ``frequencies``, so a
+        longer band axis labels the rows with the first of its centres and
+        says nothing about the rest, while the boxed A-weighted total was
+        summed at construction over the whole spectrum and states a number
+        for bands the table beside it does not show. ``not_applicable_band``
+        marks the rows outside the method (clause 9.2) and joins the
+        qualification mask that drops bands from that total, a boolean array
+        combined with another: one value in it marks every band at once.
+
+        ``partial_power`` carries the partial surfaces on its first axis and
+        the bands on its second, so its band axis is index 1; the partial
+        surfaces are its own axis, shared with no other field.
+
+        :raises ValueError: if any per-band quantity disagrees with the rest.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            partial_power=2,
+            sound_power=1,
+            sound_power_level=1,
+            sound_power_level_normalized=1,
+            not_applicable_band=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            ("partial_power", 1),
+            "sound_power",
+            "sound_power_level",
+            "sound_power_level_normalized",
+            "not_applicable_band",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

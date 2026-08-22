@@ -61,6 +61,8 @@ from .._internal.validation import (
     require_non_negative,
     require_positive,
     require_positive_array,
+    require_ranks,
+    require_same_length,
 )
 
 if TYPE_CHECKING:
@@ -366,6 +368,20 @@ class MeanGroundPlaneResult:
     distances: NDArray[np.float64]
     heights: NDArray[np.float64]
 
+    def __post_init__(self) -> None:
+        """Reject a section whose vertices do not pair up.
+
+        The guidance fits one line through the whole polyline, so ``slope``
+        and ``intercept`` describe exactly the vertices carried here and no
+        others. A section with more heights than distances is a profile the
+        reported fit was never taken over, and the section plot pairs the two
+        arrays vertex by vertex to draw that profile against that same line.
+
+        :raises ValueError: if ``distances`` and ``heights`` disagree.
+        """
+        require_ranks(self, distances=1, heights=1)
+        require_same_length(self, "distances", "heights", axis="section vertex")
+
     def height(self, distance: float | NDArray[np.float64]) -> NDArray[np.float64]:
         r"""The plane height :math:`a\,d + b` at ``distance``, in metres."""
         return np.asarray(
@@ -579,6 +595,31 @@ class TerrainScreeningResult:
     receiver: tuple[float, float]
     distances: NDArray[np.float64]
     heights: NDArray[np.float64]
+
+    def __post_init__(self) -> None:
+        """Reject a section whose spectrum or profile does not line up.
+
+        Two unrelated axes meet in this result. ``adjustment`` is added to the
+        received level band by band in the Doc 32 Eq. 23 chain, where a
+        spectrum one entry short or long shifts every band against the
+        frequency its attenuation was computed at, and the shifted chain still
+        sums to a perfectly ordinary level. ``distances`` and ``heights`` are
+        the section the screening regime was decided on, which the geometry
+        plot pairs vertex by vertex to draw the terrain the line of sight was
+        tested against.
+
+        :raises ValueError: if the spectrum or the section vertices disagree.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            adjustment=1,
+            diffraction_points=2,
+            distances=1,
+            heights=1,
+        )
+        require_same_length(self, "frequencies", "adjustment")
+        require_same_length(self, "distances", "heights", axis="section vertex")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

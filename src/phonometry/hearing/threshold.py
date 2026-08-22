@@ -28,6 +28,8 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from .._internal.validation import require_ranks, require_same_length
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import ArrayLike
@@ -203,6 +205,38 @@ class AgeThresholdResult:
     spread_upper: np.ndarray
     spread_lower: np.ndarray
     threshold: np.ndarray
+
+    def __post_init__(self) -> None:
+        """Reject a distribution whose spectra do not all cover the same frequencies.
+
+        The plot draws the fractile band by adding the two spreads to the
+        median against a single frequency axis, and the age component reaches
+        the ISO 1999 combined threshold the same way, added to the noise
+        component one audiometric frequency at a time. Both pair by position,
+        so a spectrum of another length shifts the band onto frequencies it
+        was not computed for; where the mismatch does surface, it surfaces as
+        matplotlib complaining that x and y differ in size, which says nothing
+        about which of the two spectra was the wrong one.
+
+        :raises ValueError: if any spectrum disagrees with ``frequencies``.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            median=1,
+            spread_upper=1,
+            spread_lower=1,
+            threshold=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "median",
+            "spread_upper",
+            "spread_lower",
+            "threshold",
+            axis="audiometric frequency",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

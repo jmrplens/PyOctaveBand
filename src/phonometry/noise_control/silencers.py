@@ -114,7 +114,12 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from .._internal.validation import require_non_negative, require_positive
+from .._internal.validation import (
+    require_non_negative,
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 from .duct_modes import plane_wave_limit as _plane_wave_limit
 from .duct_modes import warn_above_plane_wave_limit
 
@@ -458,6 +463,50 @@ class ReactiveSilencerResult:
     geometry: dict[str, float] | None = None
     plane_wave_limit: float | None = None
     chain: SilencerChain | None = None
+
+    def __post_init__(self) -> None:
+        """Reject a device whose curves do not all run over the same grid.
+
+        The fiche of :meth:`report` sizes its table from
+        :attr:`transmission_loss` and takes the nominal frequency of each row
+        from :attr:`frequencies`, so a grid of another length relabels every
+        row of the sheet with the frequency of a different point. An
+        :attr:`insertion_loss` one value short stops the table where it runs
+        out; one value long is truncated by the same table while the boxed
+        mean above it still averages the whole of it, and the sheet then
+        states a mean insertion loss over a frequency that appears nowhere in
+        its column.
+
+        :attr:`transfer_matrix` is pinned to three axes because two of them
+        are its own: the four-pole matrix is 2x2 at every frequency, and a
+        stack that lost the frequency axis would still count two rows on its
+        first one and pass any check that only counted.
+
+        :attr:`resonances` is left out of the grid: it counts the notable
+        frequencies of the device -- one tuning frequency for a Helmholtz
+        resonator, the odd quarter-wave multiples that fall inside the range
+        for a branch tube -- and has nothing to do with how finely the
+        response was sampled.
+
+        :raises ValueError: if the curves disagree, or the matrix is not a
+            stack of four-poles over frequency.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            transmission_loss=1,
+            insertion_loss=1,
+            transfer_matrix=3,
+            resonances=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "transmission_loss",
+            "insertion_loss",
+            "transfer_matrix",
+            axis="frequency",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

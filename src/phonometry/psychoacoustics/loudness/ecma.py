@@ -59,7 +59,11 @@ if TYPE_CHECKING:
     from ...io._signal import Signal
 
 from ..._internal.utils import _typesignal
-from ..._internal.validation import require_1d_signal
+from ..._internal.validation import (
+    require_1d_signal,
+    require_ranks,
+    require_same_length,
+)
 
 # --------------------------------------------------------------------------
 # Global constants (Clause 5)
@@ -263,6 +267,44 @@ class EcmaLoudness:
     time: np.ndarray
     loudness_vs_time: np.ndarray
     field: str
+
+    def __post_init__(self) -> None:
+        """Reject a result whose band and time traces do not line up.
+
+        Two axes run through this result, and each is read by pairing arrays
+        index for index: the average specific loudness against the
+        critical-band-rate scale of the 53 auditory bands, and the
+        time-dependent loudness against its block times. Where the chart draws
+        such a pair a mismatch does stop it, but from inside matplotlib, about
+        a first dimension, whenever someone next plots; ``centre_frequencies``
+        it never draws, so a band axis that disagrees there is caught by
+        nobody and F(z) is reported for a band other than the one whose
+        loudness stands beside it.
+
+        The two axes are checked apart because nothing relates them: the band
+        count is fixed by the standard, whereas the number of 187,5 Hz blocks
+        follows the length of the recording, and a 53-block recording is no
+        evidence that either is right.
+
+        :raises ValueError: if the per-band or the per-block quantities
+            disagree among themselves.
+        """
+        require_ranks(
+            self,
+            specific_loudness=1,
+            bark=1,
+            centre_frequencies=1,
+            time=1,
+            loudness_vs_time=1,
+        )
+        require_same_length(
+            self,
+            "specific_loudness",
+            "bark",
+            "centre_frequencies",
+            axis="auditory band",
+        )
+        require_same_length(self, "time", "loudness_vs_time", axis="time block")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

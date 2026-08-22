@@ -48,6 +48,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
 from .air_absorption import air_attenuation
 
 if TYPE_CHECKING:
@@ -284,6 +285,41 @@ class OutdoorAttenuation:
     a_bar: NDArray[np.float64]
     a_total: NDArray[np.float64]
     d_omega: NDArray[np.float64]
+
+    def __post_init__(self) -> None:
+        """Reject a breakdown whose terms do not all run over the same bands.
+
+        The prediction sheet lays the terms out as columns of one table, a row
+        per entry of :attr:`frequencies`, and closes on a boxed figure taken
+        over the whole of a column: the octave-band range of the total
+        attenuation, or the A-weighted downwind level when a source emission
+        is supplied. A term shorter than the bands stops the render partway
+        down the table; a term longer is cut off by it and still counted in
+        the boxed figure underneath, so the sheet states a result over bands
+        that appear nowhere in the table above it.
+
+        :raises ValueError: if any term disagrees with ``frequencies``.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            a_div=1,
+            a_atm=1,
+            a_gr=1,
+            a_bar=1,
+            a_total=1,
+            d_omega=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "a_div",
+            "a_atm",
+            "a_gr",
+            "a_bar",
+            "a_total",
+            "d_omega",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

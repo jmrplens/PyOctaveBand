@@ -50,6 +50,8 @@ levels by less than 0.01 dB).
 
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 import pytest
 from scipy.special import hankel2
@@ -545,3 +547,66 @@ def test_contour_phasors_subtract_mismatch() -> None:
         base.subtract(harmonic)
     with pytest.raises(ValueError, match="different contours"):
         base.subtract(shifted)
+
+
+def _square_contour(n_side: int = 4) -> dict[str, Any]:
+    """Hand-built phasors on a square contour, the form the docstring invites."""
+    side = np.linspace(-0.5, 0.5, n_side)
+    positions = np.concatenate(
+        [
+            np.stack((side, np.full(n_side, -0.5)), axis=1),
+            np.stack((np.full(n_side, 0.5), side), axis=1),
+            np.stack((side[::-1], np.full(n_side, 0.5)), axis=1),
+            np.stack((np.full(n_side, -0.5), side[::-1]), axis=1),
+        ]
+    )
+    normals = np.sign(positions) * (np.abs(positions) >= 0.5)
+    n = positions.shape[0]
+    return {
+        "frequency": F0,
+        "positions": positions,
+        "normals": normals,
+        "pressure": np.exp(1j * K0 * positions[:, 0]),
+        "normal_velocity": np.full(n, 0.01 + 0j),
+        "segment": 1.0 / n_side,
+    }
+
+
+def test_contour_phasors_shape_mismatch_refused() -> None:
+    """Every sample-axis mismatch is refused at construction, both directions.
+
+    Without this the mistake reaches numpy inside the integral, which names
+    no field, or, when a quantity collapses to a single sample, reaches
+    nobody: it broadcasts over the whole contour and hands back a far-field
+    pattern of exactly the expected length.
+    """
+    fields = _square_contour()
+    assert isinstance(ContourPhasors(**fields), ContourPhasors)
+    n = fields["positions"].shape[0]
+    per_sample = ("positions", "normals", "pressure", "normal_velocity")
+    for name in per_sample:
+        good = np.asarray(fields[name])
+        for bad in (good[:-1], np.concatenate([good, good[:1]]), good[:1]):
+            with pytest.raises(ValueError, match="for the same n >= 1"):
+                ContourPhasors(**{**fields, name: bad})
+    # An extra axis carries the right number of samples past any count.
+    for name in ("pressure", "normal_velocity"):
+        with pytest.raises(ValueError, match="for the same n >= 1"):
+            ContourPhasors(**{**fields, name: np.asarray(fields[name])[np.newaxis]})
+    with pytest.raises(ValueError, match="for the same n >= 1"):
+        ContourPhasors(**{**fields, "positions": np.zeros((n, 3))})
+
+
+def test_contour_phasors_accepts_hand_built_lists() -> None:
+    """Lists coerce to the probe-built arrays, as the class docstring promises."""
+    fields = _square_contour()
+    listed = {
+        name: (value.tolist() if isinstance(value, np.ndarray) else value)
+        for name, value in fields.items()
+    }
+    built = ContourPhasors(**listed)
+    assert built.positions.dtype == np.float64
+    assert built.pressure.dtype == np.complex128
+    assert np.allclose(built.normals, fields["normals"])
+    pattern = far_field_from_contour(built, [0.0, 90.0])
+    assert pattern.shape == (2,)

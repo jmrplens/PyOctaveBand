@@ -54,6 +54,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
 from .insulation import (
     impact_improvement_adaptation_term,
     weighted_impact_improvement,
@@ -192,6 +193,24 @@ class FloorCoveringImprovementResult:
     limited: np.ndarray
     delta_lw: int | None
     ci_delta: int | None = None
+
+    def __post_init__(self) -> None:
+        """Reject an improvement spectrum whose columns cover different bands.
+
+        The ISO 16251-1 fiche prints one row per band and prefixes ``>`` to the
+        bands that only reached the 1,3 dB limit of measurement, which is the
+        difference between a measured improvement and a lower bound on one.
+        That prefix is taken from ``limited`` by position, so a mask of another
+        length claims the limit for bands that were never near it and drops it
+        from the bands that were. ``ΔLw`` is rated over the 100 Hz to 3150 Hz
+        sub-range located inside ``frequencies``, so an axis of another length
+        rates a different stretch of spectrum from the one tabulated beside it.
+
+        :raises ValueError: if the frequencies, the improvement and the
+            limit-of-measurement mask do not agree on how many bands there are.
+        """
+        require_ranks(self, frequencies=1, improvement=1, limited=1)
+        require_same_length(self, "frequencies", "improvement", "limited")
 
     def octave_bands(self) -> tuple[np.ndarray, np.ndarray]:
         """Return ``(octave_freqs, ΔLoct)`` via Formula (5) (needs 16 1/3-oct bands)."""

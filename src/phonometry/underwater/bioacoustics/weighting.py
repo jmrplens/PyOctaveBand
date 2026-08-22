@@ -61,6 +61,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
@@ -580,6 +582,23 @@ class AuditoryWeightingResult:
     group: str
     weighted_tts_onset: float
 
+    def __post_init__(self) -> None:
+        """Reject a filter whose two curves do not run over its frequencies.
+
+        ``W(f)`` and ``E(f)`` are one band-pass shape read twice against one
+        frequency axis, and the identity that ties them, :math:`E = K + C - W`,
+        holds frequency by frequency and in no other way. That is how the
+        assessment uses them: :func:`weighted_exposure` adds ``weighting`` to a
+        band spectrum term by term, so a curve offset from its own axis charges
+        each band the attenuation of a different one, quietly and without ever
+        leaving the range of plausible dB.
+
+        :raises ValueError: if either curve disagrees with ``frequencies``.
+        """
+        require_same_length(
+            self, "frequencies", "weighting", "exposure_function", axis="frequency"
+        )
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -722,6 +741,26 @@ class WeightedExposureResult:
     exceeds_tts: bool
     guidance: str
     group: str
+
+    def __post_init__(self) -> None:
+        """Reject an assessment whose band rows do not all run over the bands.
+
+        Everything this result is consulted for hangs on totals that were
+        summed over a whole array: ``cumulative_sel`` is an energy sum of every
+        entry of ``weighted_band_sel``, the margins are that number less a
+        published criterion, and ``exceeds_injury`` is the verdict those
+        margins carry. A spectrum longer than ``frequencies`` therefore lands
+        an exceedance on a band with no centre frequency to name it, and one
+        shorter drops a band from the exposure without dropping it from the
+        picture. The figure is the only reader that would object, and it
+        objects after the verdict has already been formed.
+
+        :raises ValueError: if any per-band quantity disagrees with the rest.
+        """
+        require_ranks(self, frequencies=1, band_sel=1, weighting=1, weighted_band_sel=1)
+        require_same_length(
+            self, "frequencies", "band_sel", "weighting", "weighted_band_sel"
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

@@ -48,6 +48,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_ranks, require_same_length
 from .cepstrum import _fold_causal
 
 if TYPE_CHECKING:
@@ -265,6 +266,71 @@ class PhaseDecompositionResult:
     excess_group_delay: NDArray[np.float64]
     minimum_phase_response: NDArray[np.complex128]
     fs: float
+
+    def __post_init__(self) -> None:
+        """Reject a decomposition whose parts do not lie on one frequency grid.
+
+        The eight arrays are one response written down eight times.
+        :func:`phase_decomposition` derives every one of them from the same
+        ``rfft`` grid: the axis is ``linspace(0, fs/2, response.size)``, the
+        magnitude and the measured phase are the modulus and the argument of
+        that response, the minimum phase is the argument of the cepstral
+        reconstruction read back on the same bins, the excess phase is their
+        difference, and both group delays are gradients over the same
+        spacing. No length here is anything but the response's own.
+
+        Seven of the eight are read through a single boolean mask in
+        :meth:`plot`, which drops DC by comparing :attr:`frequencies` against
+        zero and applies that one mask to every curve. A field of another
+        length stops there, in either direction, with numpy's ``IndexError``
+        about a boolean index and two axis sizes -- the two numbers swap
+        round according to which field is at fault, and the message names
+        neither the field nor the result it came from.
+        :attr:`minimum_phase_response` has no reader at all: the figure never
+        opens it, so a complex response of the wrong length raises nothing
+        anywhere and travels out whole. It is the one field of the eight a
+        caller transforms back to a record, and ``irfft`` of 256 bins is a
+        perfectly ordinary 510-sample answer where the 257 bins of the
+        decomposition meant 512 -- a record two samples short of the one it
+        claims to be the minimum-phase version of.
+
+        The rank half is the silent one throughout. A field of shape
+        ``(bin, 2)`` carries one row per bin and so satisfies every length
+        check above, and ``semilogx`` draws its second column as a second
+        curve on the same panel, under a legend that names the doubled curve
+        twice: four lines and two "Excess phase (all-pass)" entries on the
+        phase panel for an excess phase of that shape, three lines and two
+        "Group delay" entries on the group-delay panel, two lines on the
+        magnitude panel, which carries no legend at all to give it away. No
+        warning is raised in any of them.
+
+        :raises ValueError: if the frequency axis, the magnitude, the three
+            phases, the two group delays and the reconstructed response span
+            different numbers of bins, or one of them carries an extra axis.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            magnitude=1,
+            phase=1,
+            minimum_phase=1,
+            excess_phase=1,
+            group_delay=1,
+            excess_group_delay=1,
+            minimum_phase_response=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "magnitude",
+            "phase",
+            "minimum_phase",
+            "excess_phase",
+            "group_delay",
+            "excess_group_delay",
+            "minimum_phase_response",
+            axis="frequency bin",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

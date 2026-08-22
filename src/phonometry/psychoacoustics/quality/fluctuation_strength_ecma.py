@@ -109,7 +109,12 @@ if TYPE_CHECKING:
     from ...io._signal import Signal
 
 from ..._internal.utils import _typesignal
-from ..._internal.validation import require_1d_signal, require_positive
+from ..._internal.validation import (
+    require_1d_signal,
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 from ..loudness.ecma import (
     _CBF,
     _F_CENTRE,
@@ -218,6 +223,67 @@ class EcmaFluctuationStrength:
     fluctuation_strength_vs_time: np.ndarray
     specific_fluctuation_strength_vs_time: np.ndarray
     field: str
+
+    def __post_init__(self) -> None:
+        """Reject a result whose curves disagree with the axes they are drawn on.
+
+        Two independent axes meet in this result. The auditory bands are the
+        53 of the standard's filter bank whatever the signal, while the 50 Hz
+        frames are however many the signal ran to, so they are pinned
+        separately; the time-dependent specific fluctuation strength is the
+        one field measured along both.
+
+        The time trace is a single ``plot`` call pairing ``time`` with
+        ``fluctuation_strength_vs_time``. A length short or long by one
+        reaches matplotlib, which raises about x and y differing in their
+        first dimension and names neither field, from a call several frames
+        below the one the caller made.
+
+        The heatmap fails far more quietly. A caller who supplies an ``ax``
+        gets only the time trace, so a specific-fluctuation table or a
+        ``bark`` of the wrong length is drawn nowhere and ``plot`` returns as
+        if all were well -- and that is true of the short direction and the
+        long one alike. Even the full figure lets one shape through: a table
+        one entry short on *both* axes is exactly the shape ``pcolormesh``
+        expects once ``shading="auto"`` reads the two axes as cell corners, so
+        it draws a complete heatmap, spanning the whole time and Bark_HMS
+        range, one cell coarser than the run it claims to show, without a word
+        from anywhere.
+
+        Rank has to be pinned as well as length, because gaining or losing an
+        axis passes every count: the specific table averaged down to one axis
+        leaves the time trace untouched and only ``pcolormesh`` notices,
+        unpacking its shape into two names and reporting that it got one
+        value; a ``time`` of one column plots against the trace by broadcast,
+        and it is the shaded fill underneath that stops, naming matplotlib's
+        own ``'x'`` rather than the field that carried the extra axis.
+
+        :raises ValueError: if the per-band or per-frame quantities disagree.
+        """
+        require_ranks(
+            self,
+            specific_fluctuation_strength=1,
+            bark=1,
+            centre_frequencies=1,
+            time=1,
+            fluctuation_strength_vs_time=1,
+            specific_fluctuation_strength_vs_time=2,
+        )
+        require_same_length(
+            self,
+            "bark",
+            "centre_frequencies",
+            "specific_fluctuation_strength",
+            ("specific_fluctuation_strength_vs_time", 1),
+            axis="auditory band",
+        )
+        require_same_length(
+            self,
+            "time",
+            "fluctuation_strength_vs_time",
+            "specific_fluctuation_strength_vs_time",
+            axis="50 Hz frame",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

@@ -72,6 +72,7 @@ from typing import TYPE_CHECKING, Any, Literal, overload
 
 import numpy as np
 
+from ..._internal.validation import require_ranks, require_same_length
 from .insulation import (
     ImpactRatingResult,
     WeightedRatingResult,
@@ -356,6 +357,26 @@ class SurveyAirborneResult:
     rating: WeightedRatingResult | None
     r_prime_rating: WeightedRatingResult | None
 
+    def __post_init__(self) -> None:
+        """Reject a survey whose quantities do not run over one band set.
+
+        All four are the same level difference plus a correction, so they run
+        over the same bands whenever the library forms them; the check is
+        what keeps that true of a result assembled by hand or rebuilt with
+        :func:`dataclasses.replace`. Only the reported curve is read again
+        downstream: the field fiche takes exactly one of ``d_nt`` and
+        ``r_prime``, whichever :meth:`report` was asked for, and already
+        refuses a curve that disagrees with the band arrays of its rating,
+        while :meth:`plot` draws from the rating alone. ``d``, ``d_n`` and
+        the quantity left unreported are handed to the reader and never
+        looked at again, so a band too many or too few in them is a
+        disagreement nothing downstream would ever raise.
+
+        :raises ValueError: if the per-band quantities disagree.
+        """
+        require_ranks(self, d=1, d_nt=1, d_n=1, r_prime=1)
+        require_same_length(self, "d", "d_nt", "d_n", "r_prime")
+
     def plot(self, ax: Axes | None = None, **kwargs: Any) -> Axes:
         """Plot ``DnT`` against the shifted ISO 717-1 reference curve.
 
@@ -454,6 +475,25 @@ class SurveyImpactResult:
     l_n: np.ndarray | None
     rating: ImpactRatingResult | None
 
+    def __post_init__(self) -> None:
+        """Reject a survey whose impact levels do not run over one band set.
+
+        The three are the same level plus a correction and run over one band
+        set whenever the library forms them; the check is what keeps that
+        true of a result assembled by hand or rebuilt with
+        :func:`dataclasses.replace`. The impact fiche reads ``l_nt`` and
+        nothing else, and already refuses a curve that disagrees with the
+        band arrays of its ISO 717-2 rating; :meth:`plot` draws from the
+        rating alone. ``l_i`` and ``l_n`` reach neither a page nor an axis:
+        they are quantities the library forms once and hands to the reader,
+        so a band too many or too few in either is a disagreement nothing
+        downstream would ever raise.
+
+        :raises ValueError: if the per-band levels disagree.
+        """
+        require_ranks(self, l_i=1, l_nt=1, l_n=1)
+        require_same_length(self, "l_i", "l_nt", "l_n")
+
     def plot(self, ax: Axes | None = None, **kwargs: Any) -> Axes:
         """Plot ``L'nT`` against the shifted ISO 717-2 reference curve."""
         if self.rating is None:
@@ -534,6 +574,24 @@ class SurveyFacadeResult:
     d_2m_n: np.ndarray | None
     rating: WeightedRatingResult | None
 
+    def __post_init__(self) -> None:
+        """Reject a facade survey whose quantities span different band sets.
+
+        The facade fiche is the airborne sheet with ``D2m,nT`` in the column,
+        and it reads that curve alone, already refusing one that disagrees
+        with the band arrays of its rating; ``d_2m`` and ``d_2m_n`` reach
+        neither the sheet nor :meth:`plot`, which draws from the rating. The
+        library forms all
+        three over one band set, and this check is the only thing that stops
+        a result assembled by hand or rebuilt with
+        :func:`dataclasses.replace` from carrying a normalized form that
+        covered a different span of bands with nobody left to notice.
+
+        :raises ValueError: if the per-band quantities disagree.
+        """
+        require_ranks(self, d_2m=1, d_2m_nt=1, d_2m_n=1)
+        require_same_length(self, "d_2m", "d_2m_nt", "d_2m_n")
+
     def plot(self, ax: Axes | None = None, **kwargs: Any) -> Axes:
         """Plot ``D2m,nT`` against the shifted ISO 717-1 reference curve."""
         if self.rating is None:
@@ -607,6 +665,11 @@ class SurveyServiceEquipmentResult:
         the receiving-room volume was not supplied.
     """
 
+    # No __post_init__ axis check here, unlike the three insulation results
+    # above. Clause 6.3.3 admits three scalar readings as readily as three
+    # banded ones, so these quantities are a single weighted number as often
+    # as they are one value per band, and this module builds them both ways.
+    # Requiring a band axis would refuse the survey's ordinary global reading.
     l_xy: np.ndarray
     l_xy_nt: np.ndarray
     l_xy_n: np.ndarray | None

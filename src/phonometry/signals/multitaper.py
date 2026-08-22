@@ -30,6 +30,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from .._internal.validation import require_ranks, require_same_length
 from ..io._resolve import resolve_fs
 from .spectra import (
     _positive,
@@ -132,6 +133,74 @@ class MultitaperSpectralDensityResult:
     resolution_bandwidth: float
     adaptive: bool
     scaling: str
+
+    def __post_init__(self) -> None:
+        r"""Reject an estimate whose columns leave one of its two axes.
+
+        The frequency columns are one rfft grid written down several
+        times, and the four the figure draws are the only ones a mismatch
+        stops. :meth:`plot` builds a single positive-frequency mask from
+        :attr:`frequencies` and applies it to :attr:`psd`,
+        :attr:`ci_lower` and :attr:`ci_upper`, so a length that disagrees
+        raises numpy's ``boolean index did not match indexed array along
+        axis 0; size of axis is 513 but size of corresponding boolean
+        axis is 512`` -- which names sizes and never a field, and quotes
+        them for whichever array is being indexed rather than for the one
+        that is wrong, so a short :attr:`frequencies` is reported against
+        the confidence bound the mask reached first.
+
+        The rest is silent, in both directions. :attr:`degrees_of_freedom`
+        reaches the figure only as the mean of its interior bins, printed
+        in the legend beside the confidence level: hand this density the
+        dof of another estimate and the band drawn from the correct
+        :attr:`ci_lower` and :attr:`ci_upper` is labelled
+        :math:`\bar\nu` = 5.2 where the interval it shows carries 10.6, on
+        a figure that is otherwise complete. One entry too many is quieter
+        still -- the mean barely moves -- but the halved bin documented
+        above as the Nyquist one is then no longer the last.
+        :attr:`random_error` and :attr:`weights` are drawn by nothing at
+        all: they are further columns of the same table,
+        :math:`\sqrt{2/\nu}` beside its :math:`\nu` and the combination
+        that produced the density beside the density, and the reader who
+        pairs them position by position is the one that pays.
+
+        :attr:`eigenvalues` and the taper axis of :attr:`weights` are
+        pinned separately, because how many bins the record has and how
+        many tapers were averaged over it are two independent sizes. That
+        pair is silent throughout: an extra :math:`\lambda_k` changes the
+        :math:`\sum_j \lambda_j` a reader normalizes by, so the uniform
+        weights this class documents as :math:`\lambda_k / \sum_j
+        \lambda_j` come out 0.127 for *every* taper where they are 0.144,
+        the ones actually present included; an extra row of
+        :attr:`weights` makes the combination sum to 1.0009 rather than
+        the 1 its own definition asserts.
+
+        :raises ValueError: if a column disagrees with the frequency axis
+            or with the taper axis.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            psd=1,
+            ci_lower=1,
+            ci_upper=1,
+            degrees_of_freedom=1,
+            random_error=1,
+            weights=2,
+            eigenvalues=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "psd",
+            "ci_lower",
+            "ci_upper",
+            "degrees_of_freedom",
+            "random_error",
+            ("weights", 1),
+            axis="frequency bin",
+        )
+        require_same_length(self, "eigenvalues", "weights", axis="taper")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

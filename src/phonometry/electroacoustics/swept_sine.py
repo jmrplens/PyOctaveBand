@@ -60,6 +60,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from .._internal.validation import require_ranks, require_same_length
 from ..io._resolve import apply_calibration, resolve_fs
 
 if TYPE_CHECKING:
@@ -245,6 +246,61 @@ class SweptSineDistortionResult:
     duration: float
     rate: float
     method: str
+
+    def __post_init__(self) -> None:
+        """Reject a separation whose three axes disagree.
+
+        Order, frequency and excitation frequency are three different axes and
+        the readers cross them: :meth:`plot` labels row ``k`` of
+        :attr:`harmonic_responses` as order ``k + 1``, band-limits it to
+        ``[n f1, n f2]`` computed from that label, and draws the survivors over
+        :attr:`frequencies`; the THD panel pairs :attr:`thd` with
+        :attr:`thd_frequencies` point by point. A row missing from the response
+        matrix moves every higher order down one label and band-limits it to
+        the window of an order it is not, which leaves a plausible curve drawn
+        in the wrong place and nothing said anywhere. The THD pair is not
+        silent, only anonymous: it reaches matplotlib as it stands, so a curve
+        that disagrees with its abscissa raises
+        ``x and y must have same first dimension`` from inside the panel,
+        naming neither field. No panel reads :attr:`distortion_ratios` at all,
+        so a row of it that runs over other excitation frequencies arrives
+        intact at whoever draws it against :attr:`thd_frequencies` by hand.
+
+        The window length of :attr:`harmonic_irs` is deliberately not tied to
+        :attr:`frequencies`: the responses are the half-spectrum of the
+        windowed impulse responses, so the two axes differ by construction and
+        pinning them together would reject every result this module builds.
+
+        :raises ValueError: if the harmonic, frequency or excitation-frequency
+            axis disagrees across the fields that share it.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            harmonic_responses=2,
+            harmonic_irs=2,
+            delays=1,
+            thd_frequencies=1,
+            thd=1,
+            distortion_ratios=2,
+        )
+        require_same_length(
+            self, "frequencies", ("harmonic_responses", 1), axis="frequency"
+        )
+        require_same_length(
+            self,
+            "harmonic_responses",
+            "harmonic_irs",
+            "delays",
+            axis="harmonic order",
+        )
+        require_same_length(
+            self,
+            "thd_frequencies",
+            "thd",
+            ("distortion_ratios", 1),
+            axis="excitation frequency",
+        )
 
     @property
     def n_harmonics(self) -> int:

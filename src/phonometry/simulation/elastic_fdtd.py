@@ -73,6 +73,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from scipy.optimize import brentq
 
+from .._internal.validation import require_ranks, require_same_length
 from .fdtd import (
     _SIDES,
     Field2D,
@@ -81,6 +82,7 @@ from .fdtd import (
     _positive_finite,
     _positive_map,
     _probe_indices,
+    _require_grid_axes,
     _resolve_sponge_sides,
     _run_recording,
     _sigma_map,
@@ -1026,6 +1028,43 @@ class ElasticFDTDResult:
     snapshot_field: str
     obstacle_mask: NDArray[np.bool_] | None
     free_sides: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        """Reject a run whose probes, fields, time axis and grid disagree.
+
+        ``signals`` is indexed one probe and one field at a time, and neither
+        index carries a name of its own: the probe plot draws the trace at
+        ``signals[k, j]`` under the position of probe ``k`` and the symbol of
+        ``probe_fields[j]``. A field axis longer than ``probe_fields`` then
+        leaves its surplus traces out of the picture without a word, and one
+        shorter runs off the end of the array being drawn. The snapshot plot
+        stamps its frame across an extent taken from ``shape``, which turns a
+        frame recorded on a different grid into a plausible field over a
+        domain it never covered.
+
+        :raises ValueError: if the probe, field, time-step, snapshot or grid
+            axes disagree.
+        """
+        require_ranks(
+            self,
+            times=1,
+            signals=3,
+            probes=2,
+            probe_positions=2,
+            snapshots=3,
+            snapshot_times=1,
+            obstacle_mask=2,
+        )
+        require_same_length(self, "signals", "probes", "probe_positions", axis="probe")
+        require_same_length(
+            self, ("probes", 1), ("probe_positions", 1), axis="coordinate"
+        )
+        require_same_length(self, "probe_fields", ("signals", 1), axis="recorded field")
+        require_same_length(self, "times", ("signals", 2), axis="time step")
+        require_same_length(self, "snapshots", "snapshot_times", axis="snapshot")
+        _require_grid_axes(
+            type(self).__name__, self.shape, self.snapshots, self.obstacle_mask
+        )
 
     @property
     def size(self) -> tuple[float, float]:

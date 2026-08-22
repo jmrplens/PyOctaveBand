@@ -498,6 +498,22 @@ class ImpulsiveSoundResult:
     laeq: float
     adjusted_laeq: float
 
+    def __post_init__(self) -> None:
+        """Reject a trace whose levels and time axis are of different lengths.
+
+        The result holds two accounts of when its samples were taken: the
+        times, and the ``dt`` the onsets were located and timed with. The two
+        are the same account only while there is one time per level. Where
+        there is not, the figure draws the trace on one of them and marks the
+        onsets on the other, and the governing onset -- the one the category
+        and the ``KI`` adjustment come from -- is annotated at a moment the
+        curve beneath it never reaches.
+
+        :raises ValueError: if ``times`` and ``levels`` disagree.
+        """
+        require_ranks(self, times=1, levels=1)
+        require_same_length(self, "times", "levels", axis="sample")
+
     @property
     def governing_onset(self) -> ImpulseOnset | None:
         """The qualifying onset with the highest prominence, or ``None``."""
@@ -549,6 +565,21 @@ class LevelHistory:
     times: np.ndarray
     levels: np.ndarray
     dt: float
+
+    def __post_init__(self) -> None:
+        """Reject a trace whose levels and time axis are of different lengths.
+
+        The history is handed on as a pair, and it unpacks as one, so whoever
+        receives it puts the two arrays together again: a window taken as
+        ``levels[times > t]`` needs them to index alike, and the plot draws
+        one against the other. A pair whose halves disagree is not a level
+        history at all, so it is refused where it is made rather than at each
+        place it is opened.
+
+        :raises ValueError: if ``times`` and ``levels`` disagree.
+        """
+        require_ranks(self, times=1, levels=1)
+        require_same_length(self, "times", "levels", axis="sample")
 
     def __iter__(self) -> Iterator[np.ndarray]:
         """Yield ``times`` then ``levels`` so the result unpacks like a tuple."""

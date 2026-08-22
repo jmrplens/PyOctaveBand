@@ -18,6 +18,8 @@ Validation strategy (closed-form, not self-consistency):
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pytest
 from scipy import signal
@@ -188,6 +190,33 @@ def test_rejects_bad_inputs() -> None:
     non_finite = (np.array([100.0, 200.0]), np.array([0.0, np.inf]))
     with pytest.raises(ValueError, match="finite"):
         room.shaped_sweep_signal(FS, 50.0, 5000.0, 1.0, target=non_finite)
+
+
+def test_synthesis_metadata_must_lie_on_one_grid() -> None:
+    """Metadata off the synthesis grid is refused when built, not when drawn.
+
+    The plot masks ``frequencies`` for the band and applies that mask to the
+    dB curve built from ``magnitude``, so a length disagreement surfaces only
+    as numpy's complaint about a boolean index and two axis sizes, naming
+    neither field. Nothing reads ``group_delay`` at all. And an extra axis
+    counts one row per bin, so it passes every length check and reaches the
+    plot as a second dashed curve under the one "Synthesis target" label.
+    """
+    good = room.shaped_sweep_signal(FS, 100.0, 5000.0, 0.5)
+    per_bin = "one value per frequency bin"
+    cases = (
+        ("frequencies", good.frequencies[:-1], per_bin),
+        ("magnitude", good.magnitude[:-1], per_bin),
+        ("magnitude", np.append(good.magnitude, 1.0), per_bin),
+        ("group_delay", good.group_delay[:-1], per_bin),
+        ("group_delay", np.append(good.group_delay, good.group_delay[-1]), per_bin),
+        ("frequencies", np.column_stack([good.frequencies] * 2), "must have one axis"),
+        ("magnitude", np.column_stack([good.magnitude] * 2), "must have one axis"),
+        ("group_delay", np.column_stack([good.group_delay] * 2), "must have one axis"),
+    )
+    for field, value, fragment in cases:
+        with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+            dataclasses.replace(good, **{field: value})
 
 
 def test_result_behaves_like_array() -> None:

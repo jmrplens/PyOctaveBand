@@ -74,7 +74,14 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_positive
+from .._internal.validation import (
+    require_axis_count,
+    require_axis_rank,
+    require_equal_counts,
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -225,6 +232,108 @@ class ImageSourceResult:
     receiver: tuple[float, float, float]
     max_order: int
     speed_of_sound: float
+
+    def __post_init__(self) -> None:
+        """Reject a table whose images, coordinates or bands do not line up.
+
+        The reflectogram draws one stem per image, placed at that image's
+        arrival time, levelled by its amplitude, coloured by its reflection
+        order and measured against the ``1 / r`` envelope of its own distance:
+        five arrays read side by side at the same index, with the plan-view
+        lattice reading ``image_positions`` against the same ``orders``. A
+        table of two lengths stops that drawing call with a bare numpy
+        complaint -- ``boolean index did not match indexed array along axis 0;
+        size of axis is 24 but size of corresponding boolean axis is 25``
+        where the mask comes from another array, ``index 25 is out of bounds
+        for axis 0 with size 25`` where the envelope is sorted by another
+        array's order -- naming neither the field that slipped nor the result
+        it came from, one short and one long alike. :attr:`direct_time` says
+        nothing at all: it locates the nearest image in ``distances`` and
+        returns whatever ``times`` holds at that position, so a ``times`` one
+        short at the front, the arrivals being sorted, hands back the first
+        reflection at 10.7 ms as the direct sound that arrived at 7.3 ms.
+
+        The room lengths, the two points and the second axis of
+        ``image_positions`` are one coordinate count written four times, of
+        which only ``dimensions`` is read in a way that ever complains: the
+        reflectogram unpacks it three at a time for its title, so
+        a room of two lengths stops it with ``not enough values to unpack
+        (expected 3, got 2)`` and a room of four with ``too many values to
+        unpack (expected 3)``, neither of which names a field or a result.
+        The plan view reads x and y out of the lattice and takes the source
+        and the receiver the same way, so a point that lost its height and a
+        lattice that lost its height column both draw a perfectly ordinary
+        figure and say nothing; only a reader that takes the height column,
+        as the guide's plan of the images sharing the source's own height
+        does, raises ``index 2 is out of bounds for axis 1 with size 2``, and
+        a fourth column raises nothing anywhere. That silence is why the count
+        is held here rather than left to the readers. The four are held to one
+        another rather than to the number three, because three is a constant
+        of the shoebox this module builds and what a hand-edited result gets
+        wrong is one of the four, not all of them at once.
+
+        ``ir`` and ``amplitudes`` are the sampled and the exact view of the
+        same set of bands, and they grow their band axis together: both are
+        one-dimensional for a broadband model and two-dimensional for a
+        per-band one. That pairing is what is required here, rather than a
+        fixed number of axes for either. The exact table is the one asked
+        first, since the response is sampled from it, and its own shape then
+        says which of its axes carries the images; holding it in turn to the
+        response's number of axes is what bounds it, since a third axis on the
+        exact table clears every count it meets -- its bands still line up
+        along axis 0 and its images along axis 1 -- and reaches the
+        reflectogram as an amplitude per image that is really a pair, where
+        masking it by reflection order is numpy's complaint above.
+
+        A band count that disagrees, on the other hand, raises nothing at all.
+        The reflectogram draws band 0 whatever the height of the table, and
+        ``frequencies`` labels the bands without any reader in this library
+        reading it back, so a label list of the wrong length surfaces only in
+        the caller's own table: pairing the labels with the rows of ``ir``
+        drops the band that has no label -- three rows printed for a four-band
+        response, the 2 kHz energy gone with nothing to say it was ever there
+        -- while a label too many leaves that same table looking complete and
+        raises ``index 4 is out of bounds for axis 0 with size 4`` only if the
+        rows are taken by label instead. A scalar passed for ``frequencies``
+        reaches the result as a nought-dimensional array naming the single
+        band it describes, counted here as the one band it is.
+
+        :raises ValueError: if the image, coordinate or band axes disagree.
+        """
+        owner = type(self).__name__
+        require_ranks(self, times=1, distances=1, orders=1, image_positions=2)
+        require_same_length(
+            self, "times", "distances", "orders", "image_positions", axis="image"
+        )
+        require_same_length(
+            self,
+            "dimensions",
+            "source",
+            "receiver",
+            ("image_positions", 1),
+            axis="coordinate",
+        )
+        banded = np.ndim(self.amplitudes) > 1
+        require_axis_rank(self.ir, owner, "ir", 2 if banded else 1)
+        require_same_length(
+            self, "times", ("amplitudes", 1) if banded else "amplitudes", axis="image"
+        )
+        require_axis_rank(self.amplitudes, owner, "amplitudes", np.ndim(self.ir))
+        bands: dict[str, int] = {}
+        if self.frequencies is not None:
+            bands["frequencies"] = (
+                1
+                if np.ndim(self.frequencies) == 0
+                else require_axis_count(self.frequencies, owner, "frequencies", rank=1)
+            )
+        if banded:
+            bands["ir"] = require_axis_count(self.ir, owner, "ir", rank=None)
+            bands["amplitudes"] = require_axis_count(
+                self.amplitudes, owner, "amplitudes", rank=None
+            )
+        else:
+            bands["ir"] = 1
+        require_equal_counts(owner, bands)
 
     @property
     def direct_time(self) -> float:

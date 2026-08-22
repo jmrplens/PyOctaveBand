@@ -70,6 +70,8 @@ from .._internal.validation import (
     require_choice,
     require_non_negative,
     require_positive,
+    require_ranks,
+    require_same_length,
 )
 from ._criterion import (
     as_band_spectrum,
@@ -211,6 +213,55 @@ class RoomToRoomResult:
     criterion: str
     target: float | None
     label: str
+
+    def __post_init__(self) -> None:
+        """Reject a chain whose rows do not all run over the same bands.
+
+        :meth:`table` writes the chain out as one row per link under a single
+        band header, and the flanking row it inserts between them is built to
+        the length of :attr:`frequencies` alone. A spectrum of another length
+        is therefore not a row that fails to print: nothing pads it out or
+        trims it, so the sheet carries a row of one band count beside rows of
+        another and the reader lays a receiving-room level against a
+        source-room level that ran over other bands. The two spectra the
+        required row reads, :attr:`source_level` and
+        :attr:`receiving_absorption`, do stop a sheet with a target declared,
+        because :meth:`table` computes that row on its way out; but they stop
+        it on a bare ``operands could not be broadcast together`` that names
+        neither the field nor the result, and they do not stop it at all on
+        the single number of the next paragraph.
+
+        :attr:`required_transmission_loss` is the same mistake with no visible
+        seam at all. It subtracts the criterion curve, which is sampled at
+        :attr:`frequencies`, from :attr:`source_level` and divides the
+        partition area by :attr:`receiving_absorption`; with a receiving room
+        whose absorption was given as one number where the bands needed
+        several, that one number is broadcast over the whole spectrum, and the
+        property specifies a partition, band by band, against the absorption
+        the room has in a single band.
+
+        :raises ValueError: if any spectrum disagrees with ``frequencies``.
+        """
+        require_ranks(
+            self,
+            frequencies=1,
+            source_level=1,
+            transmission_loss=1,
+            receiving_absorption=1,
+            noise_reduction=1,
+            received_level=1,
+            source_power_level=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "source_level",
+            "transmission_loss",
+            "receiving_absorption",
+            "noise_reduction",
+            "received_level",
+            "source_power_level",
+        )
 
     # -- verdicts ---------------------------------------------------------
     @property

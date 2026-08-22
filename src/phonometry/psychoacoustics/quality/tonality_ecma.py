@@ -43,7 +43,11 @@ if TYPE_CHECKING:
     from ...io._signal import Signal
 
 from ..._internal.utils import _typesignal
-from ..._internal.validation import require_1d_signal
+from ..._internal.validation import (
+    require_1d_signal,
+    require_ranks,
+    require_same_length,
+)
 from ..loudness.ecma import (
     _CBF,
     _EPS,
@@ -98,6 +102,51 @@ class EcmaTonality:
     tonality_vs_time: np.ndarray
     tonal_frequency_vs_time: np.ndarray
     field: str
+
+    def __post_init__(self) -> None:
+        """Reject a result whose curves disagree with the axes they are drawn on.
+
+        The figure this result draws is two panels, and each is one call
+        pairing an axis with a curve: the average specific tonality over the
+        critical-band-rate scale, and the time-dependent tonality over time.
+        A curve of the wrong length reaches matplotlib, which raises about x
+        and y differing in their first dimension and names neither field, from
+        a call several frames below the one the caller made. Worse, a caller
+        who supplies an ``ax`` gets only the specific-tonality panel, so a time
+        axis that disagrees is drawn nowhere and goes unnoticed until somebody
+        asks for the whole figure.
+
+        The two axes are independent of each other: the auditory bands are the
+        53 of the standard's filter bank whatever the signal, while the blocks
+        are however many the signal ran to, so they are pinned separately.
+
+        :raises ValueError: if the per-band or per-block quantities disagree.
+        """
+        require_ranks(
+            self,
+            specific_tonality=1,
+            bark=1,
+            centre_frequencies=1,
+            tonal_frequencies=1,
+            time=1,
+            tonality_vs_time=1,
+            tonal_frequency_vs_time=1,
+        )
+        require_same_length(
+            self,
+            "bark",
+            "centre_frequencies",
+            "specific_tonality",
+            "tonal_frequencies",
+            axis="auditory band",
+        )
+        require_same_length(
+            self,
+            "time",
+            "tonality_vs_time",
+            "tonal_frequency_vs_time",
+            axis="time block",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

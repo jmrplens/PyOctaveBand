@@ -12,6 +12,8 @@ Equations 1.2 to 1.4, printed p. 20).
 
 from __future__ import annotations
 
+import dataclasses
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -227,6 +229,37 @@ def test_profile_gradient_and_shape() -> None:
 def test_profile_requires_increasing_depths() -> None:
     with pytest.raises(ValueError, match="increasing"):
         sound_speed_profile([0.0, 100.0, 50.0], 10.0, 35.0)
+
+
+def test_profile_columns_must_run_over_one_depth_grid() -> None:
+    """Columns off the depth grid are refused when built, not when read.
+
+    The figure draws ``sound_speed`` against ``depth``, so that half of a
+    mismatch surfaces only as matplotlib's "x and y must have same first
+    dimension" and two bare shapes, naming neither column. ``gradient``
+    reaches no figure at all and is silent in both directions, yet the depth
+    of the sound-channel axis and the ray curvature radius are read off it
+    entry by entry beside ``depth``. An extra axis is quieter still: an
+    ``(n, 2)`` column carries one value per depth by every count and draws a
+    second curve under the one legend entry that names a single model.
+    """
+    good = sound_speed_profile(np.linspace(0.0, 3000.0, 21), 12.0, 35.0)
+    per_depth = "one value per depth"
+    one_axis = "must have one axis"
+    cases = (
+        ("depth", good.depth[:-1], per_depth),
+        ("sound_speed", good.sound_speed[:-1], per_depth),
+        ("sound_speed", np.append(good.sound_speed, 1500.0), per_depth),
+        # np.diff is the obvious hand-rolled gradient, and it is one short.
+        ("gradient", np.diff(good.sound_speed) / np.diff(good.depth), per_depth),
+        ("gradient", np.append(good.gradient, 0.0), per_depth),
+        ("depth", np.column_stack([good.depth] * 2), one_axis),
+        ("sound_speed", np.column_stack([good.sound_speed] * 2), one_axis),
+        ("gradient", np.column_stack([good.gradient] * 2), one_axis),
+    )
+    for field, value, fragment in cases:
+        with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+            dataclasses.replace(good, **{field: value})
 
 
 def test_profile_plot_smoke() -> None:

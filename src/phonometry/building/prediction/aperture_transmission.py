@@ -59,7 +59,12 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from scipy.special import j1, struve
 
-from ..._internal.validation import require_choice, require_positive
+from ..._internal.validation import (
+    require_choice,
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -122,6 +127,23 @@ class ApertureTransmissionResult:
     width: float | None = None
     radius: float | None = None
     depth: float | None = None
+
+    def __post_init__(self) -> None:
+        """Reject an aperture whose coefficient and band axis disagree.
+
+        The aperture is rarely the end of the calculation: its ``R(f)`` goes
+        on to :func:`composite_transmission_loss` beside the wall it pierces,
+        or into an enclosure leak, where it is combined band by band with
+        spectra that came from elsewhere. Numpy pairs a one-element
+        coefficient with any band axis at all rather than refuse, so a
+        coefficient that lost its band axis returns a composite ``R`` that is
+        the right length, finite, and about a slit that was evaluated at one
+        frequency only.
+
+        :raises ValueError: if the two per-band arrays disagree.
+        """
+        require_ranks(self, frequencies=1, transmission_coefficient=1)
+        require_same_length(self, "frequencies", "transmission_coefficient")
 
     @property
     def transmission_loss(self) -> np.ndarray:

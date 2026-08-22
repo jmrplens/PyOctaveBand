@@ -56,7 +56,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from scipy.special import erf
 
-from ..._internal.validation import require_positive
+from ..._internal.validation import require_positive, require_ranks, require_same_length
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -464,6 +464,65 @@ class WestonPropagationResult:
     source_depth: float
     receiver_depth: float
     seabed: str
+
+    def __post_init__(self) -> None:
+        r"""Reject a column that does not run over the result's own ranges.
+
+        The nine arrays are one table indexed by ``range_m``: the composite
+        loss, the factor it was taken from, the label of the regime in force,
+        and the four regime laws evaluated at every range whether or not they
+        are in force there. A column of another length answers for ranges the
+        row beside it did not come from.
+
+        Six of the nine reach :meth:`plot`, and there the mistake stops the
+        figure without saying whose it is -- matplotlib refuses with ``x and y
+        must have same first dimension, but have shapes (40,) and (39,)``,
+        which carries two shapes and neither the field nor the result they
+        belong to, so the six are indistinguishable from it.
+
+        The other three the figure never draws, so nothing complains at all.
+        A ``regime`` column computed on a 41-point grid and handed to a
+        40-point range axis builds, plots its full seven lines, and then puts
+        the onset of mode stripping at 1075 m where the aligned result puts it
+        at 885 m. A one-element ``propagation_factor`` broadcasts rather than
+        raising: :math:`-10 \log_{10} F` checked against ``propagation_loss``
+        comes back 49 dB adrift instead of nought, and the figure is drawn in
+        full either way.
+
+        The ranks are pinned with the lengths because a range grid handed in
+        two-dimensional stays two-dimensional through every column and agrees
+        with itself on every count; it survives construction and dies in
+        :meth:`plot` on numpy's ambiguous truth value, raised while testing
+        whether a regime boundary falls inside the axis.
+
+        :raises ValueError: if a column has the wrong number of axes, or a
+            length other than ``range_m``'s.
+        """
+        require_ranks(
+            self,
+            range_m=1,
+            propagation_loss=1,
+            propagation_factor=1,
+            regime=1,
+            spherical=1,
+            cylindrical=1,
+            mode_stripping=1,
+            single_mode=1,
+            multipath=1,
+        )
+        require_same_length(
+            self,
+            "range_m",
+            "propagation_loss",
+            "propagation_factor",
+            "regime",
+            "spherical",
+            "cylindrical",
+            "mode_stripping",
+            "single_mode",
+            "multipath",
+            axis="range",
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

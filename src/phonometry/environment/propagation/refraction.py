@@ -54,7 +54,11 @@ from typing import TYPE_CHECKING, Any, Literal
 import numpy as np
 
 from ..._internal.rays import march_rays
-from ..._internal.validation import require_positive
+from ..._internal.validation import (
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -99,6 +103,22 @@ class EffectiveSoundSpeedProfile:
     heights: NDArray[np.float64]
     sound_speeds: NDArray[np.float64]
     description: str = ""
+
+    def __post_init__(self) -> None:
+        """Reject a profile with more heights than speeds, or the reverse.
+
+        A profile is a polyline: each height is a node and each sound speed is
+        the value at that node, and the atmosphere between them is whatever
+        the interpolation makes of the pair. The tracer and the solver both
+        re-derive this check on the way in, because a profile they cannot
+        interpolate is no profile at all; making it here means the profile
+        that reaches them, and the one a reader plots or samples with
+        :meth:`speed_at`, was already a polyline when it was built.
+
+        :raises ValueError: if ``heights`` and ``sound_speeds`` disagree.
+        """
+        require_ranks(self, heights=1, sound_speeds=1)
+        require_same_length(self, "heights", "sound_speeds", axis="profile node")
 
     def speed_at(self, height: ArrayLike) -> NDArray[np.float64]:
         """Piecewise-linear effective sound speed at one or more heights."""
@@ -351,6 +371,53 @@ class AtmosphericRayResult:
     ground_reflections: NDArray[np.int_]
     source_height: float
 
+    def __post_init__(self) -> None:
+        """Reject a solution whose rays and marched paths do not line up.
+
+        Two axes run through this result and neither is safe to leave open.
+        Along the first, one ray: the figure draws ray ``i`` from row ``i`` of
+        the ranges and row ``i`` of the heights, and the turning points and
+        ground reflections beside it count what happened on that same ray. An
+        array carrying a ray more than the rest is simply not drawn, and the
+        turning points and reflections of the ray nobody sees are still there
+        to be counted. Along the second, one range sample: the range and the
+        height of a sample are read as a pair, and a path traced over a
+        different number of samples than the ranges it is drawn against is not
+        a shorter path but a differently shaped one. The samples are the
+        columns the shared marcher lays down, launch point included, so the
+        axis is one longer than the steps that made it and is named for what
+        it counts, as it is on the ocean tracer this one shares that marcher
+        with.
+
+        :raises ValueError: if the per-ray or per-sample axes disagree.
+        """
+        require_ranks(
+            self,
+            launch_angles=1,
+            ranges=2,
+            heights=2,
+            travel_times=2,
+            turning_points=1,
+            ground_reflections=1,
+        )
+        require_same_length(
+            self,
+            "launch_angles",
+            "ranges",
+            "heights",
+            "travel_times",
+            "turning_points",
+            "ground_reflections",
+            axis="ray",
+        )
+        require_same_length(
+            self,
+            ("ranges", 1),
+            ("heights", 1),
+            ("travel_times", 1),
+            axis="range sample",
+        )
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -521,6 +588,24 @@ class AtmosphericPEResult:
     relative_level: NDArray[np.float64]
     source_height: float
     normalized_impedance: complex
+
+    def __post_init__(self) -> None:
+        """Reject a field that does not fit the grid it is quoted on.
+
+        The field is drawn as one image stretched over the extent of the two
+        grids, from the first range to the last and the first height to the
+        last, so a field of the wrong shape draws without complaint and every
+        level in the picture is read off at a range and a height that are not
+        its own. :meth:`level_at_height` fails the same quiet way: it picks a
+        row by searching ``heights`` and returns that row of the field, which
+        for a mismatched pair is an ordinary-looking level-versus-range curve
+        taken at some other height than the one asked for.
+
+        :raises ValueError: if the field disagrees with either grid.
+        """
+        require_ranks(self, ranges=1, heights=1, relative_level=2)
+        require_same_length(self, "heights", "relative_level", axis="height")
+        require_same_length(self, "ranges", ("relative_level", 1), axis="range")
 
     def level_at_height(self, height: float) -> NDArray[np.float64]:
         """Relative sound level versus range at the grid height nearest ``height``."""

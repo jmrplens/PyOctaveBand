@@ -21,6 +21,8 @@ on the same record.
 
 from __future__ import annotations
 
+import dataclasses
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -285,6 +287,71 @@ def test_multitaper_rejects_invalid_inputs() -> None:
         ph.signals.multitaper_psd(x, FS, scaling="bogus")  # type: ignore[arg-type]
     with pytest.raises(ValueError, match="confidence"):
         ph.signals.multitaper_psd(x, FS, confidence=1.5)
+
+
+def test_multitaper_columns_must_share_the_frequency_axis() -> None:
+    """A column off the rfft grid is refused when built, not when drawn.
+
+    The plot masks ``frequencies`` for the positive bins and applies that
+    mask to ``psd``, ``ci_lower`` and ``ci_upper``, so those three surface
+    only as numpy's complaint about a boolean index and two axis sizes,
+    naming neither the field nor the one that is wrong. The rest is silent:
+    ``degrees_of_freedom`` reaches the legend as the mean of its interior
+    bins, so a dof array from another estimate relabels the drawn band with
+    a nu-bar it does not have, and nothing reads ``random_error`` or
+    ``weights`` at all. An extra axis passes every count, so the ranks are
+    pinned too.
+    """
+    good = ph.signals.multitaper_psd(_white(39, n=1024), FS)
+    per_bin = "one value per frequency bin"
+    cases = (
+        ("frequencies", good.frequencies[:-1], per_bin),
+        ("psd", good.psd[:-1], per_bin),
+        ("psd", np.append(good.psd, good.psd[-1]), per_bin),
+        ("ci_lower", good.ci_lower[:-1], per_bin),
+        ("ci_upper", good.ci_upper[:-1], per_bin),
+        ("degrees_of_freedom", good.degrees_of_freedom[:-1], per_bin),
+        (
+            "degrees_of_freedom",
+            np.append(good.degrees_of_freedom, 999.0),
+            per_bin,
+        ),
+        ("random_error", good.random_error[:-1], per_bin),
+        ("psd", np.column_stack([good.psd] * 2), "must have one axis"),
+        ("weights", good.weights[0], "must have 2 axes"),
+    )
+    for field, value, fragment in cases:
+        with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+            dataclasses.replace(good, **{field: value})
+    for weights in (
+        good.weights[:, :-1],
+        np.hstack([good.weights, good.weights[:, :1]]),
+    ):
+        with pytest.raises(ValueError, match=rf"'weights \(axis 1\)'.*{per_bin}"):
+            dataclasses.replace(good, weights=weights)
+
+
+def test_multitaper_eigenvalues_and_weights_must_share_the_taper_axis() -> None:
+    """The per-taper pair is refused when built; no plot ever reads it.
+
+    ``lambda_k`` and the weights it drives are two columns of one table, and
+    an extra ``lambda_k`` moves the ``sum_j lambda_j`` that a reader
+    normalizes by, so the uniform limit lambda_k/sum_j lambda_j comes out
+    wrong for every taper, the ones actually present included. An extra row
+    of ``weights`` breaks the sum to unity the field's own definition
+    asserts. Neither shows on the figure.
+    """
+    good = ph.signals.multitaper_psd(_white(40, n=1024), FS)
+    per_taper = "one value per taper"
+    cases = (
+        ("eigenvalues", good.eigenvalues[:-1]),
+        ("eigenvalues", np.append(good.eigenvalues, good.eigenvalues[-1])),
+        ("weights", good.weights[:-1]),
+        ("weights", np.vstack([good.weights, good.weights[:1]])),
+    )
+    for field, value in cases:
+        with pytest.raises(ValueError, match=rf"'{field}'.*{per_taper}"):
+            dataclasses.replace(good, **{field: value})
 
 
 def test_multitaper_plot_line_and_confidence_band() -> None:
