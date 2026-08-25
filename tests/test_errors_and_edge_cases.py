@@ -102,6 +102,39 @@ def test_linkwitz_riley_invalid() -> None:
         filters.linkwitz_riley(x, 48000, freq=1000, order=3)
 
 
+@pytest.mark.parametrize("order", [0, -2])
+def test_linkwitz_riley_rejects_non_positive_order(order: int) -> None:
+    """An even order of zero used to return both bands as the untouched input."""
+    rng = np.random.default_rng(42)
+    x = rng.standard_normal(1000)
+    with pytest.raises(ValueError, match="'order' must be a positive even integer"):
+        filters.linkwitz_riley(x, 48000, freq=1000, order=order)
+
+
+@pytest.mark.parametrize("freq", [0.0, -100.0, float("nan")])
+def test_linkwitz_riley_rejects_non_positive_freq(freq: float) -> None:
+    """A bad crossover frequency used to surface as a scipy message without 'freq'."""
+    rng = np.random.default_rng(42)
+    x = rng.standard_normal(1000)
+    with pytest.raises(ValueError, match="'freq' must be positive"):
+        filters.linkwitz_riley(x, 48000, freq=freq)
+
+
+def test_linkwitz_riley_rejects_freq_at_or_above_nyquist() -> None:
+    rng = np.random.default_rng(42)
+    x = rng.standard_normal(1000)
+    with pytest.raises(ValueError, match="'freq' must be below the Nyquist frequency"):
+        filters.linkwitz_riley(x, 48000, freq=24000.0)
+
+
+def test_linkwitz_riley_rejects_non_positive_sample_rate() -> None:
+    """fs=0 used to die as ZeroDivisionError; the other entry points name it."""
+    rng = np.random.default_rng(42)
+    x = rng.standard_normal(1000)
+    with pytest.raises(ValueError, match="Sample rate 'fs' must be positive"):
+        filters.linkwitz_riley(x, 0, freq=1000)
+
+
 def test_calculate_sensitivity_silent() -> None:
     """Verify error handling for silent reference signal.
 
@@ -246,6 +279,57 @@ def test_calculate_level_invalid_mode() -> None:
 
     with pytest.raises(ValueError, match="Invalid mode\\. Use 'rms' or 'peak'\\."):
         bank._calculate_level(signal, "invalid_mode")
+
+
+def test_filter_rejects_non_string_mode() -> None:
+    """A non-string mode used to die in str.lower, deep in level calculation."""
+    bank = filters.OctaveFilterBank(48000)
+    x = np.zeros(1000)
+    with pytest.raises(TypeError, match="'mode' must be a string"):
+        bank.filter(x, mode=None)  # type: ignore[arg-type]
+
+
+def test_filter_rejects_unknown_mode_even_without_levels() -> None:
+    """A misspelled mode was accepted in silence when no levels were computed."""
+    bank = filters.OctaveFilterBank(48000)
+    x = np.zeros(1000)
+    with pytest.raises(ValueError, match="'mode' must be one of"):
+        bank.filter(x, calculate_level=False, sigbands=True, mode="bogus")
+
+
+def test_filter_rejects_three_dimensional_input() -> None:
+    """A 3-D array used to fail in numpy broadcasting, or return truncated bands."""
+    bank = filters.OctaveFilterBank(48000)
+    cube = np.zeros((2, 2, 4800))
+    with pytest.raises(ValueError, match="'x' must be a 1-D signal or a 2-D"):
+        bank.filter(cube)
+
+
+def test_octave_filter_rejects_empty_signal() -> None:
+    """An empty signal used to reach scipy's sosfilt reshape, naming nothing."""
+    empty = np.array([])
+    with pytest.raises(ValueError, match="'x' must contain at least one sample"):
+        filters.octave_filter(empty, 48000)
+
+
+@pytest.mark.parametrize("limits", [1000, ["a", 5000]])
+def test_octave_filter_rejects_malformed_limits(limits: object) -> None:
+    """Malformed limits used to die in the cache key's float(), naming nothing."""
+    x = np.zeros(1000)
+    with pytest.raises(ValueError, match="'limits' must be a pair of frequencies"):
+        filters.octave_filter(x, 48000, limits=limits)  # type: ignore[arg-type]
+
+
+def test_octave_filter_rejects_malformed_limits_on_the_plotting_path() -> None:
+    """The plot branch bypasses the design cache; it must refuse the same way."""
+    x = np.zeros(1000)
+    with pytest.raises(ValueError, match="'limits' must be a pair of frequencies"):
+        filters.octave_filter(
+            x,
+            48000,
+            limits=1000,  # type: ignore[arg-type]
+            response_plot=filters.ResponsePlot(file="unused.png"),
+        )
 
 
 def test_process_bands_without_level_calculation() -> None:

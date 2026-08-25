@@ -234,7 +234,8 @@ def plot_modulation_distortion(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the sideband marker ``plot`` call.
     :return: The axes.
-    :raises ValueError: If the result carries no sideband spectrum data.
+    :raises ValueError: If the result carries no sideband spectrum data, or its
+        sideband arrays do not carry the four products.
     """
     from .._i18n import decimal_comma, localize_axes
 
@@ -249,11 +250,18 @@ def plot_modulation_distortion(
             "from modulation_distortion()."
         )
         raise ValueError(msg)
+    sb_freqs = np.asarray(result.sideband_frequencies, dtype=np.float64)
+    sb_amps = np.asarray(result.sideband_amplitudes, dtype=np.float64)
+    if sb_freqs.shape != (4,) or sb_amps.shape != (4,):
+        msg = (
+            "'result.sideband_frequencies' and 'result.sideband_amplitudes' "
+            "must each carry the four products f2 +/- f1 and f2 +/- 2f1; got "
+            f"shapes {sb_freqs.shape} and {sb_amps.shape}."
+        )
+        raise ValueError(msg)
     ax = ax if ax is not None else _new_axes()
     tiny = np.finfo(np.float64).tiny
     carrier = float(result.carrier_amplitude)
-    sb_freqs = np.asarray(result.sideband_frequencies, dtype=np.float64)
-    sb_amps = np.asarray(result.sideband_amplitudes, dtype=np.float64)
     sb_db = 20.0 * np.log10(np.maximum(sb_amps, tiny) / carrier)
     floor = -120.0
 
@@ -540,9 +548,16 @@ def plot_piston_directivity(
         single ``ka``; ignored for a multi-``ka`` family so one user color or
         label cannot collapse the per-curve styling.
     :return: The (polar) axes.
+    :raises ValueError: If *ax* is not a polar axes.
     """
     from .._i18n import decimal_comma, localize_axes
 
+    if ax is not None and getattr(ax, "name", None) != "polar":
+        msg = (
+            "'ax' must be a polar axes (subplot_kw={'projection': 'polar'}); "
+            "pass ax=None to create one."
+        )
+        raise ValueError(msg)
     ax = ax if ax is not None else _new_polar_axes()
     theta = np.asarray(result.angles, dtype=np.float64)
     ka = np.asarray(result.ka, dtype=np.float64)
@@ -886,6 +901,12 @@ def _plot_one_quantity(
     drawer, polar, attr = table[quantity]
     if attr is not None and getattr(result, attr) is None:
         raise ValueError(missing[quantity])
+    if polar and ax is not None and getattr(ax, "name", None) != "polar":
+        msg = (
+            f"'ax' must be a polar axes for quantity {quantity!r}; "
+            "pass ax=None to create one."
+        )
+        raise ValueError(msg)
     if ax is None:
         ax = _new_polar_axes() if polar else _new_axes()
     drawer(result, ax, language=language)
@@ -918,8 +939,8 @@ def plot_loudspeaker_characteristics(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Reserved for a uniform ``.plot()`` signature; unused.
     :return: The axes the characteristic was drawn on.
-    :raises ValueError: If ``quantity`` is unknown or the result carries no data
-        for it.
+    :raises ValueError: If ``quantity`` is unknown, the result carries no data
+        for it, or *ax* is not polar for a polar quantity.
     """
     del kwargs  # each panel is a fixed datasheet artist; no primary override
     missing = {
@@ -957,8 +978,8 @@ def plot_microphone_characteristics(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Reserved for a uniform ``.plot()`` signature; unused.
     :return: The axes the characteristic was drawn on.
-    :raises ValueError: If ``quantity`` is unknown or the result carries no data
-        for it.
+    :raises ValueError: If ``quantity`` is unknown, the result carries no data
+        for it, or *ax* is not polar for a polar quantity.
     """
     del kwargs
     missing = {

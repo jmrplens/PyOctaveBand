@@ -63,6 +63,10 @@ def test_out_of_range_angle_raises() -> None:
         aircraft.verify_aircraft_noise_system(directional={4000.0: {0.0: 0.5}})
     with pytest.raises(ValueError, match="'angle' must lie in"):
         aircraft.verify_aircraft_noise_system(directional={4000.0: {160.0: 0.5}})
+    # NaN is on neither side of the range test; the guard must still catch it
+    # (a bare next() would otherwise surface it as StopIteration).
+    with pytest.raises(ValueError, match="'angle' must lie in"):
+        aircraft.verify_aircraft_noise_system(directional={4000.0: {float("nan"): 0.5}})
 
 
 def test_linearity_rejects_unknown_key() -> None:

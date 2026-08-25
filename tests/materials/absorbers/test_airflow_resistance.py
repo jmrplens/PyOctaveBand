@@ -171,6 +171,14 @@ def test_static_velocity_above_limit_warns() -> None:
             lambda: static_airflow_resistance([1e-3, -2e-3], [12.0, 24.0], 0.008),
             "All velocities must be positive",
         ),
+        (  # nan u (would otherwise die inside np.linalg.lstsq)
+            lambda: static_airflow_resistance([1e-3, np.nan], [12.0, 24.0], 0.008),
+            "'velocities' and 'pressure_drops' must contain only finite",
+        ),
+        (  # inf dp (would otherwise return a result full of NaNs)
+            lambda: static_airflow_resistance([1e-3, 2e-3], [12.0, np.inf], 0.008),
+            "'velocities' and 'pressure_drops' must contain only finite",
+        ),
         (  # area
             lambda: static_airflow_resistance([1e-3, 2e-3], [12.0, 24.0], 0.0),
             "'area' must be positive",

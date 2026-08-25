@@ -179,6 +179,13 @@ def test_practical_rejects_negative() -> None:
         practical_absorption_coefficient([-0.1] + [0.5] * 14)
 
 
+def test_weighted_rejects_negative() -> None:
+    # The octave entry point applies the same rule as the one-third-octave
+    # side; a negative alpha_p used to be silently clamped to 0.00.
+    with pytest.raises(ValueError, match="'alpha_p' must be non-negative"):
+        weighted_absorption([-0.5, -1.0, 0.6, 0.6, 0.6])
+
+
 def test_practical_wrong_length() -> None:
     with pytest.raises(ValueError, match=r"third_octave_alpha_s must have \d+ values"):
         practical_absorption_coefficient([0.5] * 14)
@@ -216,6 +223,14 @@ def test_practical_mapping_matches_sequence() -> None:
 )
 def test_absorption_class_boundaries(alpha_w: float, letter: str) -> None:
     assert absorption_class(alpha_w) == letter
+
+
+@pytest.mark.parametrize("alpha_w", [float("nan"), float("inf"), 5.0, -3.0])
+def test_absorption_class_rejects_out_of_range(alpha_w: float) -> None:
+    # NaN and infinity used to surface as math.floor's own messages, and
+    # out-of-range values were silently clamped into a class letter.
+    with pytest.raises(ValueError, match=r"'alpha_w' must be a finite value"):
+        absorption_class(alpha_w)
 
 
 # --- shift loop extremes --------------------------------------------------

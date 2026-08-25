@@ -299,6 +299,25 @@ def test_background_shape_mismatch_raises() -> None:
         )
 
 
+def test_background_band_mismatch_1d_levels_raises() -> None:
+    """A background of the wrong band count with 1D pre-averaged levels is
+    refused by name (it used to die in the K1 subtraction with numpy's
+    two-shape broadcast message).
+    """
+    freqs = np.array([100.0, 200.0, 400.0, 800.0, 1600.0])
+    with pytest.raises(
+        ValueError, match="'background_levels' must carry one value per band"
+    ):
+        emission.sound_power_reverberation(
+            np.full(5, 80.0),
+            1.0,
+            200.0,
+            210.0,
+            freqs,
+            background_levels=np.zeros(3),
+        )
+
+
 def test_preaveraged_1d_levels_keep_single_k1_path() -> None:
     """1D pre-averaged spectra carry no per-position data: a single K1 from
     the averaged spectra applies (documented approximation of 9.1.2).

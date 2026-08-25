@@ -191,6 +191,35 @@ def test_validation() -> None:
         noise_control.enclosure_insertion_loss([20.0], 6.0, 5.0, 0.3, model="hansen")
 
 
+def test_absorption_off_the_band_count_is_refused_by_name() -> None:
+    # Not numpy's "shape mismatch" from inside broadcast_arrays: the message
+    # names the absorption and the spectrum it disagrees with.
+    with pytest.raises(ValueError, match=r"'internal_absorption'.*one value per band"):
+        noise_control.enclosure_insertion_loss(
+            [20.0, 25.0, 30.0, 35.0, 40.0], 12.0, 20.0, [0.1, 0.2, 0.3]
+        )
+
+
+def test_empty_absorption_is_refused() -> None:
+    # An empty array passes every vacuous np.any/np.all test and used to
+    # come back as an empty result instead of raising.
+    with pytest.raises(ValueError, match="'internal_absorption' must be a scalar"):
+        noise_control.enclosure_insertion_loss([20.0], 12.0, 20.0, [])
+
+
+def test_half_a_panel_result_is_refused_by_name() -> None:
+    class Half:
+        transmission_loss = np.array([20.0, 25.0])
+
+    with pytest.raises(TypeError, match="'panel_transmission_loss' must be"):
+        noise_control.enclosure_insertion_loss(Half(), 12.0, 20.0, 0.2)
+
+
+def test_stray_string_panel_spectrum_is_refused_by_name() -> None:
+    with pytest.raises(TypeError, match="'panel_transmission_loss' must be"):
+        noise_control.enclosure_insertion_loss("hello", 12.0, 20.0, 0.2)
+
+
 def test_frequency_labels_off_the_band_count_are_refused() -> None:
     """The labels must run over the bands the enclosure was solved on.
 

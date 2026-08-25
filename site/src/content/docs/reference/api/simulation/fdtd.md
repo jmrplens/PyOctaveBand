@@ -290,7 +290,7 @@ cells), as a physical incident wave would be.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | For an unknown direction or non-positive `width`/`wavelength`. |
+| ValueError | For an unknown direction, a non-positive or non-finite `width`/`wavelength`, or a non-finite `center`/`amplitude`. |
 
 ### FDTD2D.add_source()
 

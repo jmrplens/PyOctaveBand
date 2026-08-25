@@ -458,7 +458,8 @@ def coupling_loss_factor(
     :param frequency: Frequency ``f``, in hertz (scalar or array, > 0).
     :param plate_area: Source-plate area ``S_i``, in m^2 (> 0).
     :return: The coupling loss factor ``eta_ij`` (broadcast of the inputs).
-    :raises ValueError: for a non-positive input.
+    :raises ValueError: for a non-positive input, or a coefficient and a
+        frequency whose shapes cannot be broadcast together.
     """
     tau = np.asarray(transmission_coefficient, dtype=np.float64)
     if np.any(tau < 0.0):
@@ -471,6 +472,17 @@ def coupling_loss_factor(
         msg = "'frequency' must be positive."
         raise ValueError(msg)
     area = require_positive(plate_area, "plate_area")
+    # Reconcile the two array arguments before the arithmetic: numpy's bare
+    # "operands could not be broadcast together" reports the shapes but not
+    # which argument carried which.
+    try:
+        np.broadcast_shapes(tau.shape, freq.shape)
+    except ValueError:
+        msg = (
+            "'transmission_coefficient' and 'frequency' must be broadcastable; "
+            f"got shapes {tau.shape} and {freq.shape}."
+        )
+        raise ValueError(msg) from None
     eta = cg * lij * tau / (2.0 * math.pi**2 * freq * area)
     return np.asarray(eta, dtype=np.float64)
 

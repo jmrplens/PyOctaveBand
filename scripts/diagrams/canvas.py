@@ -688,6 +688,9 @@ class SVG:
         mono: bool = False,
         italic: bool = False,
     ) -> None:
+        if anchor not in ("start", "middle", "end"):
+            msg = f"'anchor' must be one of ('start', 'middle', 'end'); got {anchor!r}."
+            raise ValueError(msg)
         s = self.tr(s)
         fragment = self._emit_text(
             x,
@@ -792,6 +795,9 @@ class SVG:
         dashed witness lines connect it to the measured points. With
         ``offset=0`` the caller is responsible for any witness lines.
         """
+        if label_side not in ("left", "right"):
+            msg = f"'label_side' must be one of ('left', 'right'); got {label_side!r}."
+            raise ValueError(msg)
         th = self.th
         horizontal = abs(y2 - y1) < abs(x2 - x1)
         if horizontal:

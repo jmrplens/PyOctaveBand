@@ -379,12 +379,21 @@ def tone_correction(
         Step 1). The default 2 (80 Hz) is the aeroplane procedure; helicopters
         and tilt-rotors use 0 (50 Hz).
     :return: The tone-correction factor ``C``, in dB (0 if no tones qualify).
-    :raises ValueError: If the spectrum is not 24 finite levels.
+    :raises ValueError: If the spectrum is not 24 finite levels, or
+        ``start_band`` is not an integer between 0 and 3.
     """
-    if not 0 <= int(start_band) <= _MAX_TONE_START_BAND:
-        msg = "'start_band' must be between 0 (50 Hz) and 3 (100 Hz)."
+    # An integral float (0.0, 2.0) carries the same band index and is taken;
+    # anything the index cannot be (2.9, "aeroplane", None) is refused by name
+    # rather than left to fail inside int().
+    try:
+        start = int(start_band)
+        integral = start == start_band
+    except (TypeError, ValueError, OverflowError):
+        start, integral = -1, False
+    if not integral or not 0 <= start <= _MAX_TONE_START_BAND:
+        msg = "'start_band' must be an integer between 0 (50 Hz) and 3 (100 Hz)."
         raise ValueError(msg)
-    _, excess = _tone_background(spl, start=int(start_band))
+    _, excess = _tone_background(spl, start=start)
     factors = [_tone_factor(float(excess[i]), float(NOY_BANDS[i])) for i in range(24)]
     return float(max(factors))
 

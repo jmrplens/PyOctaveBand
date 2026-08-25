@@ -387,6 +387,9 @@ def static_airflow_resistance(
     if u.size < _MIN_MEASUREMENT_STEPS:
         msg = "At least two measurement steps are required."
         raise ValueError(msg)
+    if not (np.all(np.isfinite(u)) and np.all(np.isfinite(dp))):
+        msg = "'velocities' and 'pressure_drops' must contain only finite values."
+        raise ValueError(msg)
     if bool(np.any(u <= 0.0)):
         msg = "All velocities must be positive."
         raise ValueError(msg)

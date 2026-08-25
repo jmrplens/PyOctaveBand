@@ -166,6 +166,15 @@ def test_cascade_order() -> None:
     assert np.allclose(both, whole, atol=1e-9)
 
 
+def test_cascade_refuses_what_is_not_a_four_pole_stack() -> None:
+    f = np.linspace(50.0, 500.0, 20)
+    t = sl.duct_matrix(f, 1.0, 0.05)
+    with pytest.raises(ValueError, match=r"'matrices'\[1\].*\(n_freq, 2, 2\)"):
+        sl.cascade(t, [[1.0, 0.0], [0.0, 1.0]])
+    with pytest.raises(ValueError, match=r"'matrices'\[1\].*\(n_freq, 2, 2\)"):
+        sl.cascade(t, np.ones(20, dtype=np.complex128))
+
+
 def test_extended_tube_reduces_to_expansion_chamber() -> None:
     f = np.linspace(20.0, 2000.0, 500)
     ext = sl.extended_tube_chamber(f, 0.3, 0.04, 0.01)
@@ -286,6 +295,22 @@ def test_insertion_loss_present_when_impedances_given() -> None:
     assert res.insertion_loss is not None
     plain = sl.expansion_chamber(f, 0.3, 0.04, 0.01)
     assert plain.insertion_loss is None
+
+
+def test_insertion_loss_impedance_off_the_grid_is_refused() -> None:
+    f = np.linspace(50.0, 500.0, 20)
+    with pytest.raises(
+        ValueError, match=r"'source_impedance' must be a scalar or hold one value"
+    ):
+        sl.expansion_chamber(
+            f, 0.3, 0.04, 0.01, source_impedance=np.ones(5), radiation_impedance=5e3
+        )
+    with pytest.raises(
+        ValueError, match=r"'radiation_impedance' must be a scalar or hold one value"
+    ):
+        sl.expansion_chamber(
+            f, 0.3, 0.04, 0.01, source_impedance=4e4, radiation_impedance=np.ones(5)
+        )
 
 
 def test_validation() -> None:

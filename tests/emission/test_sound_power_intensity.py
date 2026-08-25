@@ -328,6 +328,28 @@ def test_short_frequencies_raises_value_error_not_index_error() -> None:
         )
 
 
+def test_nan_frequency_raises() -> None:
+    """A NaN band centre is refused by name before the Table 2 lookup
+    rounds it to an integer.
+    """
+    areas = np.array([0.5, 0.5, 0.5, 0.5])
+    intensity = np.full((4, 3), 5.0e-4)
+    with pytest.raises(ValueError, match="'frequencies' must be finite"):
+        emission.sound_power_intensity(
+            intensity, areas, frequencies=np.array([500.0, float("nan"), 2000.0])
+        )
+
+
+def test_infinite_frequency_raises() -> None:
+    """An infinite band centre used to escape as round()'s OverflowError."""
+    areas = np.array([0.5, 0.5, 0.5, 0.5])
+    intensity = np.full((4, 3), 5.0e-4)
+    with pytest.raises(ValueError, match="'frequencies' must be finite"):
+        emission.sound_power_intensity(
+            intensity, areas, frequencies=np.array([500.0, float("inf"), 2000.0])
+        )
+
+
 def test_repeatability_uses_mean_of_two_scans_for_power() -> None:
     """Partial power uses the mean of the two scan intensities (Eq. 12)."""
     areas = np.array([0.5, 0.5, 0.5, 0.5])

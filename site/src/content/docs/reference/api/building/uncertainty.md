@@ -257,7 +257,7 @@ reproducibility standard deviation with the product-homogeneity scatter over
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | Non-positive `n` or a negative standard deviation. |
+| ValueError | A non-integer or non-positive `n`, or a negative standard deviation. |
 
 ## reduce_by_independent_measurements
 

@@ -291,26 +291,39 @@ def harmonic_distortion(
         :class:`~phonometry.io.Signal` brings its own, and an explicit value
         that disagrees with it raises instead of silently winning.
     :param fundamental: Fundamental frequency :math:`f_1`, in Hz.
-    :param order: Harmonic order ``n`` (>= 2).
+    :param order: Harmonic order ``n`` (an integer >= 2; an integral float
+        such as ``3.0`` is accepted as its integer).
     :param n_harmonics: Highest harmonic order used for the total RMS.
     :param window: FFT window (default ``'hann'``).
     :return: nth-order harmonic distortion, as a ratio.
-    :raises ValueError: If ``order`` < 2 or the inputs are invalid.
+    :raises ValueError: If ``order`` is not an integer, ``order`` < 2 or the
+        inputs are invalid.
     """
     fs = resolve_fs(signal, fs, name="signal")
     sig = _validate_signal(signal)
     fs_v = _positive(fs, "fs")
     f0 = _positive(fundamental, "fundamental")
-    if order < _MIN_HARMONIC_ORDER:
+    # ``order`` indexes the harmonic amplitudes, so a non-integral value must
+    # be refused here by name instead of dying inside numpy's indexing. An
+    # integral float is the integer it prints as (the common accident is an
+    # order computed by a division) and is accepted.
+    if isinstance(order, (int, np.integer)) or (
+        isinstance(order, (float, np.floating)) and float(order).is_integer()
+    ):
+        order_v = int(order)
+    else:
+        msg = "'order' must be an integer."
+        raise ValueError(msg)
+    if order_v < _MIN_HARMONIC_ORDER:
         msg = "'order' must be at least 2."
         raise ValueError(msg)
-    n = max(n_harmonics, order)
+    n = max(n_harmonics, order_v)
     _, amps = _harmonic_amplitudes(sig, fs_v, f0, n, window)
-    if amps.size < order or amps[0] <= 0.0:
+    if amps.size < order_v or amps[0] <= 0.0:
         msg = "The requested harmonic order exceeds the Nyquist limit."
         raise ValueError(msg)
     total_rms = float(np.sqrt(np.sum(amps**2)))
-    return float(amps[order - 1] / total_rms)
+    return float(amps[order_v - 1] / total_rms)
 
 
 def _notched_residual(

@@ -477,6 +477,112 @@ def test_invalid_surface_raises() -> None:
         emission.sound_power_pressure(levels, "sphere", radius=2.0)
 
 
+def test_k1_background_levels_length_mismatch_raises() -> None:
+    """A background spectrum of the wrong length is refused by name, not with
+    numpy's broadcast message.
+    """
+    source_three_bands = np.array([90.0, 92.0, 95.0])
+    background_two_bands = np.array([70.0, 71.0])
+    with pytest.raises(ValueError, match="'background_levels' must be a scalar"):
+        emission.background_noise_correction(source_three_bands, background_two_bands)
+
+
+def test_scalar_frequencies_with_several_bands_raises() -> None:
+    """A scalar 'frequencies' cannot span several bands: the named refusal,
+    not an IndexError from the 0-d shape.
+    """
+    levels = np.full((10, 3), 90.0)
+    with pytest.raises(ValueError, match="'frequencies' length must match"):
+        emission.sound_power_pressure(
+            levels, "hemisphere", radius=2.0, frequencies=1000.0
+        )
+
+
+def test_scalar_frequencies_with_single_band_is_accepted() -> None:
+    """One band has one centre frequency, so the scalar is that frequency
+    (at 1000 Hz the A-weighting is 0 dB and LWA = LW).
+    """
+    res = emission.sound_power_pressure(
+        np.full((10, 1), 90.0), "hemisphere", radius=2.0, frequencies=1000.0
+    )
+    assert res.sound_power_level_a == pytest.approx(float(res.sound_power_level[0]))
+
+
+def test_k2_negative_surface_area_raises() -> None:
+    with pytest.raises(ValueError, match="'surface_area' must be positive"):
+        emission.environmental_correction(-5.0, absorption_area=10.0)
+
+
+def test_k2_zero_surface_area_raises() -> None:
+    """S = 0 must not silently claim a free field (K2 = 0)."""
+    with pytest.raises(ValueError, match="'surface_area' must be positive"):
+        emission.environmental_correction(0.0, absorption_area=10.0)
+
+
+def test_negative_omc_uncertainty_raises() -> None:
+    """np.hypot squares sigma_omc, so a negative value would silently pass."""
+    levels = np.full((10, 1), 90.0)
+    with pytest.raises(ValueError, match="'omc_uncertainty' must be non-negative"):
+        emission.sound_power_pressure(
+            levels, "hemisphere", radius=2.0, omc_uncertainty=-5.0
+        )
+
+
+def test_k2_per_band_volume_array_raises() -> None:
+    """'volume' is a scalar; per-band variation belongs to the T array."""
+    per_band_t = np.array([1.2, 1.4])
+    with pytest.raises(ValueError, match="'volume' must be a scalar"):
+        emission.environmental_correction(
+            40.0, reverberation_time=per_band_t, volume=np.array([300.0, 300.0])
+        )
+
+
+def test_k2_per_band_room_surface_array_raises() -> None:
+    """'room_surface' is a scalar; per-band variation belongs to alpha."""
+    per_band_alpha = np.array([0.2, 0.3])
+    with pytest.raises(ValueError, match="'room_surface' must be a scalar"):
+        emission.environmental_correction(
+            40.0,
+            mean_absorption_coefficient=per_band_alpha,
+            room_surface=np.array([100.0, 100.0]),
+        )
+
+
+def test_box_non_sequence_dimensions_raises() -> None:
+    """A bare number for 'dimensions' is refused by name, not len()'s
+    TypeError.
+    """
+    levels = np.full((9, 1), 90.0)
+    with pytest.raises(ValueError, match="'dimensions' must be 3 positive values"):
+        emission.sound_power_pressure(levels, "box", dimensions=2.0, distance=1.0)
+
+
+def test_box_nan_dimension_raises() -> None:
+    """A NaN edge must not pass 'v <= 0' into a NaN surface area."""
+    levels = np.full((9, 1), 90.0)
+    with pytest.raises(ValueError, match="'dimensions' must be finite"):
+        emission.sound_power_pressure(
+            levels, "box", dimensions=(1.0, 2.0, float("nan")), distance=1.0
+        )
+
+
+def test_box_non_positive_distance_raises() -> None:
+    levels = np.full((9, 1), 90.0)
+    with pytest.raises(ValueError, match="'distance' must be positive"):
+        emission.sound_power_pressure(
+            levels, "box", dimensions=(1.0, 2.0, 3.0), distance=0.0
+        )
+
+
+def test_zero_band_levels_raises() -> None:
+    """An empty band axis must raise, not return empty spectra with
+    LWA = NaN.
+    """
+    no_bands = np.zeros((10, 0))
+    with pytest.raises(ValueError, match="'levels_positions' must contain at least"):
+        emission.sound_power_pressure(no_bands, "hemisphere", radius=2.0)
+
+
 def test_k2_over_validity_limit_warns() -> None:
     """K2 above 4 dB (engineering) exceeds the ISO 3744 validity limit."""
     r = 2.0

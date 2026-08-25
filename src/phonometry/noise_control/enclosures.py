@@ -312,15 +312,24 @@ def _resolve_interior(
     v = _resolve_panel_r(values, freqs, name)
 
     alpha = np.asarray(internal_absorption, dtype=np.float64)
-    if alpha.ndim > 1:
-        msg = "'internal_absorption' must be a scalar or a 1-D array."
+    if alpha.ndim > 1 or alpha.size == 0:
+        msg = "'internal_absorption' must be a scalar or a non-empty 1-D array."
         raise ValueError(msg)
     if np.any(alpha <= 0.0) or np.any(alpha >= 1.0) or not np.all(np.isfinite(alpha)):
         msg = "'internal_absorption' must lie strictly in (0, 1)."
         raise ValueError(msg)
 
     r_i = np.atleast_1d(np.asarray(room_constant(s_i, alpha), dtype=np.float64))
-    r_i_b, v_b = np.broadcast_arrays(r_i, v)
+    try:
+        r_i_b, v_b = np.broadcast_arrays(r_i, v)
+    except ValueError:
+        # numpy reports the two shapes it could not reconcile without saying
+        # which argument carried which; name the culprit in the caller's words.
+        msg = (
+            f"'internal_absorption' must be a scalar or carry one value per "
+            f"band ({v.size} in '{name}'); got shape {alpha.shape}."
+        )
+        raise ValueError(msg) from None
     if freqs is not None:
         # The band count is whatever the spectrum and the absorption broadcast
         # to, so either of them can be the one that disagrees with the labels.
@@ -385,16 +394,30 @@ def enclosure_insertion_loss(
         Equation (4.115).
     :return: An :class:`EnclosureResult`.
     """
-    if (
-        not callable(panel_transmission_loss)
-        and not isinstance(panel_transmission_loss, (np.ndarray, list, tuple))
-        and hasattr(panel_transmission_loss, "transmission_loss")
-        and hasattr(panel_transmission_loss, "frequencies")
+    if not callable(panel_transmission_loss) and not isinstance(
+        panel_transmission_loss, (np.ndarray, list, tuple)
     ):
-        result = cast("PanelTransmissionResult", panel_transmission_loss)
-        if frequencies is None:
-            frequencies = result.frequencies
-        panel_transmission_loss = np.asarray(result.transmission_loss, dtype=np.float64)
+        if hasattr(panel_transmission_loss, "transmission_loss") and hasattr(
+            panel_transmission_loss, "frequencies"
+        ):
+            result = cast("PanelTransmissionResult", panel_transmission_loss)
+            if frequencies is None:
+                frequencies = result.frequencies
+            panel_transmission_loss = np.asarray(
+                result.transmission_loss, dtype=np.float64
+            )
+        elif not isinstance(panel_transmission_loss, (int, float)) and not hasattr(
+            panel_transmission_loss, "__array__"
+        ):
+            # Anything else would fall through to numpy's float() coercion,
+            # whose message names neither the parameter nor the accepted forms.
+            msg = (
+                "'panel_transmission_loss' must be a per-band array, a callable "
+                "of the frequency array, or a panel result carrying "
+                "'transmission_loss' and 'frequencies'; got "
+                f"{type(panel_transmission_loss).__name__}."
+            )
+            raise TypeError(msg)
 
     freqs, r_b, correction, r_i_b, s_e, s_i = _resolve_interior(
         panel_transmission_loss,

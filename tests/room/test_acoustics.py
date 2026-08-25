@@ -330,6 +330,35 @@ def test_rejects_bad_input() -> None:
         room.decay_curve(silent, FS)  # silent
 
 
+def test_band_above_nyquist_is_refused_by_name() -> None:
+    # The bank trims bands above fs/2 with only a warning; the requested band
+    # must then be refused by name, not by numpy's empty-argmin message.
+    ir = exponential_ir(1.0, 1.0, fs=8000)
+    with pytest.raises(ValueError, match=r"'band'.*Nyquist"):
+        room.decay_curve(ir, 8000, band=3500.0)
+
+
+def test_limits_above_nyquist_are_refused_by_name() -> None:
+    ir = exponential_ir(1.0, 1.0, fs=8000)
+    with pytest.raises(ValueError, match=r"'limits'.*Nyquist"):
+        room.room_parameters(ir, 8000, limits=(20000.0, 22000.0))
+
+
+def test_non_positive_fraction_is_refused() -> None:
+    # fraction enters the half-width arithmetic before the bank validates it.
+    ir = exponential_ir(1.0, 1.0)
+    with pytest.raises(ValueError, match="'fraction' must be positive"):
+        room.decay_curve(ir, FS, band=1000.0, fraction=0)
+
+
+def test_non_finite_limits_are_refused() -> None:
+    ir = exponential_ir(1.0, 1.0)
+    with pytest.raises(ValueError, match="'limits' must contain only finite"):
+        room.room_parameters(ir, FS, limits=(float("nan"), 4000.0))
+    with pytest.raises(ValueError, match="'limits' must contain only finite"):
+        room.room_parameters(ir, FS, limits=(125.0, float("inf")))
+
+
 def test_parameters_off_the_band_axis_are_refused() -> None:
     """Every per-band array is pinned to the band axis when the result is built.
 

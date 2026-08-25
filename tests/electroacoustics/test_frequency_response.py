@@ -150,6 +150,46 @@ def test_rejects_bad_nperseg() -> None:
         electroacoustics.transfer_function(x, x, FS, nperseg=5000)
 
 
+def test_rejects_fractional_nperseg() -> None:
+    # int() used to truncate 64.7 to 64 silently instead of refusing.
+    x = np.zeros(1000)
+    with pytest.raises(ValueError, match="'nperseg' must be a positive integer"):
+        electroacoustics.transfer_function(x, x, FS, nperseg=64.7)  # type: ignore[arg-type]
+
+
+def test_rejects_non_finite_nperseg() -> None:
+    # Used to escape as OverflowError out of int().
+    x = np.zeros(1000)
+    with pytest.raises(ValueError, match="'nperseg' must be a positive integer"):
+        electroacoustics.transfer_function(x, x, FS, nperseg=float("inf"))  # type: ignore[arg-type]
+
+
+def test_coherence_rejects_fractional_nperseg() -> None:
+    x = np.zeros(1000)
+    with pytest.raises(ValueError, match="'nperseg' must be a positive integer"):
+        electroacoustics.coherence(x, x, FS, nperseg=64.7)  # type: ignore[arg-type]
+
+
+def test_rejects_non_numeric_overlap() -> None:
+    # Used to die as TypeError inside float().
+    x = np.zeros(1000)
+    with pytest.raises(ValueError, match=r"'overlap' must be in \[0, 1\)"):
+        electroacoustics.transfer_function(x, x, FS, overlap=None)  # type: ignore[arg-type]
+
+
+def test_coherence_rejects_non_numeric_overlap() -> None:
+    x = np.zeros(1000)
+    with pytest.raises(ValueError, match=r"'overlap' must be in \[0, 1\)"):
+        electroacoustics.coherence(x, x, FS, overlap="half")  # type: ignore[arg-type]
+
+
+def test_integral_float_nperseg_is_accepted() -> None:
+    # 64.0 IS the integer 64 to a caller who divided to get it.
+    x = np.zeros(1000)
+    res = electroacoustics.transfer_function(x, x, FS, nperseg=64.0)  # type: ignore[arg-type]
+    assert res.frequencies.size == 33
+
+
 def test_rejects_too_short_signal() -> None:
     too_short = np.zeros(10)
     with pytest.raises(ValueError, match="too short for a spectral estimate"):

@@ -296,7 +296,7 @@ def ray_curvature_radius(
     if not (np.isfinite(gradient) and abs(gradient) > 0.0):
         msg = "'gradient' must be finite and non-zero (a curved ray)."
         raise ValueError(msg)
-    if abs(launch_angle_deg) >= _VERTICAL_DEG:
+    if not np.isfinite(launch_angle_deg) or abs(launch_angle_deg) >= _VERTICAL_DEG:
         msg = "'launch_angle_deg' must be within (-90, 90) degrees."
         raise ValueError(msg)
     return float(c0 / (abs(gradient) * np.cos(np.radians(launch_angle_deg))))
@@ -725,6 +725,16 @@ def atmospheric_parabolic_equation(
         if height_step is not None
         else lam / 10.0
     )
+    # The vertical grid samples midpoints z = (j + 0.5) dz, so the first node
+    # sits at dz / 2: a step of 2 * max_height or more leaves the output band
+    # [0, zmax] without a single node, and the empty field only failed later,
+    # in whatever read it, with a message naming neither parameter.
+    if dz >= 2.0 * zmax:
+        msg = (
+            "'height_step' must be less than twice 'max_height' "
+            "(the first grid node lies at half a step above the ground)."
+        )
+        raise ValueError(msg)
     dr = require_positive(range_step, "range_step") if range_step is not None else lam
     if dr > rmax:
         msg = "'range_step' must not exceed 'max_range'."

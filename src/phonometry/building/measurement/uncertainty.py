@@ -52,7 +52,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
-from ..._internal.validation import require_equal_shapes
+from ..._internal.validation import require_choice, require_equal_shapes
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -500,17 +500,17 @@ def band_uncertainty(
     :param upper_limit: Select the ``σR95`` upper limit (airborne, situation A).
     :raises ValueError: Unknown measurand, or a situation not tabulated for it.
     """
+    # The measurand is validated on its own first, so an unknown one is
+    # refused by name instead of being misreported by the ``upper_limit``
+    # branch below as a real measurand that merely lacks a σR95 table.
+    require_choice(measurand, "measurand", tuple(sorted({m for m, _ in _BAND_TABLES})))
     try:
         frequencies, columns = _BAND_TABLES[(measurand, upper_limit)]
     except KeyError:
-        if upper_limit:
-            msg = (
-                f"No σR95 upper limit tabulated for measurand {measurand!r} "
-                "(only airborne, Annex D)."
-            )
-            raise ValueError(msg) from None
-        valid = ", ".join(sorted({m for m, _ in _BAND_TABLES}))
-        msg = f"Unknown measurand {measurand!r}. Valid: {valid}."
+        msg = (
+            f"No σR95 upper limit tabulated for measurand {measurand!r} "
+            "(only airborne, Annex D)."
+        )
         raise ValueError(msg) from None
     if situation not in columns:
         msg = (
@@ -713,9 +713,12 @@ def prediction_input_uncertainty(
     :param sigma_reproducibility: Reproducibility standard deviation ``σR``, in dB.
     :param sigma_product: Product-homogeneity standard deviation ``σ_product``, in dB.
     :param n: Number of measurements of the product (:math:`n \ge 1`).
-    :raises ValueError: Non-positive ``n`` or a negative standard deviation.
+    :raises ValueError: A non-integer or non-positive ``n``, or a negative
+        standard deviation.
     """
-    if n < 1:
+    # A fractional or NaN ``n`` sails past a bare ``n < 1`` and is divided
+    # by, so integrality is required explicitly (numpy integers included).
+    if not isinstance(n, (int, np.integer)) or n < 1:
         msg = "n must be a positive integer."
         raise ValueError(msg)
     if sigma_reproducibility < 0 or sigma_product < 0:

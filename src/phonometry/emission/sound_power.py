@@ -55,7 +55,15 @@ import numpy as np
 
 from .._internal.levels_math import energy_mean, energy_sum
 from .._internal.types import as_float_or_array
-from .._internal.validation import check_engine, require_ranks, require_same_length
+from .._internal.validation import (
+    check_engine,
+    require_non_negative,
+    require_per_band,
+    require_positive,
+    require_positive_array,
+    require_ranks,
+    require_same_length,
+)
 from ._shared import (
     _S0,
     Grade,
@@ -435,7 +443,7 @@ def background_noise_correction(
     """
     low, high = _K1_CRITERIA[_check_grade(grade)]
     src = np.asarray(source_levels, dtype=np.float64)
-    bg = np.asarray(background_levels, dtype=np.float64)
+    bg = require_per_band(background_levels, "background_levels", src, "source_levels")
     delta = src - bg
     clamped = np.maximum(delta, low)
     k1 = -10.0 * np.log10(1.0 - 10.0 ** (-0.1 * clamped))
@@ -509,12 +517,24 @@ def _room_absorption_area(
         "Eq. A.7",
     )
     if reverberation_time is not None and volume is not None:
+        if np.ndim(volume) != 0:
+            msg = (
+                "'volume' must be a scalar (m^3); only 'reverberation_time' "
+                "may vary per band."
+            )
+            raise ValueError(msg)
         t = np.asarray(reverberation_time, dtype=np.float64)
         if volume <= 0 or np.any(t <= 0.0):
             msg = "reverberation_time and volume must be > 0."
             raise ValueError(msg)
         return 0.16 * volume / t
     if mean_absorption_coefficient is not None and room_surface is not None:
+        if np.ndim(room_surface) != 0:
+            msg = (
+                "'room_surface' must be a scalar (m^2); only "
+                "'mean_absorption_coefficient' may vary per band."
+            )
+            raise ValueError(msg)
         alpha = np.asarray(mean_absorption_coefficient, dtype=np.float64)
         if room_surface <= 0 or np.any(alpha <= 0.0) or np.any(alpha > 1.0):
             msg = "mean_absorption_coefficient must be in (0, 1] and room_surface > 0."
@@ -562,6 +582,7 @@ def environmental_correction(
     :return: ``K2`` in decibels; a scalar for scalar inputs, otherwise an array
         per band.
     """
+    surface_area = require_positive(surface_area, "surface_area")
     if absorption_area is None:
         absorption_area = _room_absorption_area(
             reverberation_time, volume, mean_absorption_coefficient, room_surface
@@ -704,11 +725,14 @@ def _measurement_surface(
         if dimensions is None or distance is None:
             msg = "'dimensions' and 'distance' are required for a box."
             raise ValueError(msg)
-        if len(dimensions) != 3 or any(v <= 0 for v in dimensions) or distance <= 0:  # noqa: PLR2004
-            msg = "'dimensions' must be 3 positive values and 'distance' > 0."
+        dims = require_positive_array(dimensions, "dimensions")
+        if dims.size != 3:  # noqa: PLR2004
+            msg = "'dimensions' must be 3 positive values (l1, l2, l3)."
             raise ValueError(msg)
+        distance = require_positive(distance, "distance")
+        box = (float(dims[0]), float(dims[1]), float(dims[2]))
         return (
-            _box_area(dimensions, distance, reflecting_planes),
+            _box_area(box, distance, reflecting_planes),
             _MIN_BOX_POSITIONS[grade],
         )
     msg = "'surface' must be 'hemisphere' or 'box'."
@@ -809,7 +833,9 @@ def _a_weighted_total(
         # none supplied the A-weighted total is undefined (NaN). A single band
         # carries no weighting, so LWA = LW.
         return None, (float(lw[0]) if n_bands == 1 else float("nan"))
-    freqs = np.asarray(frequencies, dtype=np.float64)
+    # A scalar is one band's centre frequency, not a shape mistake: accept it
+    # for a single band (as 1-D) and reject it, by name, for several.
+    freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if freqs.shape[0] != n_bands:
         msg = "'frequencies' length must match the number of bands."
         raise ValueError(msg)
@@ -866,9 +892,13 @@ def sound_power_pressure(
     :return: :class:`SoundPowerResult`.
     """
     grade = _check_grade(grade)
+    omc_uncertainty = require_non_negative(omc_uncertainty, "omc_uncertainty")
     levels = np.atleast_2d(np.asarray(levels_positions, dtype=np.float64))
     if levels.ndim != 2:  # noqa: PLR2004
         msg = "'levels_positions' must be a 2D (positions, bands) array."
+        raise ValueError(msg)
+    if levels.shape[1] == 0:
+        msg = "'levels_positions' must contain at least one frequency band."
         raise ValueError(msg)
     n_positions = levels.shape[0]
 

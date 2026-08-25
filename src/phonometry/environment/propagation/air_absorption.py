@@ -387,9 +387,12 @@ class AtmosphericAttenuation:
         """
         if self.distance is None:
             return None
-        return np.asarray(
-            self.attenuation_coefficient * self.distance, dtype=np.float64
-        )
+        # Coerce before multiplying, as plot() does: the field is annotated as
+        # an array, but the frozen result can be built by hand with a plain
+        # list, and a list times a float is sequence repetition, not
+        # arithmetic.
+        alpha = np.asarray(self.attenuation_coefficient, dtype=np.float64)
+        return np.asarray(alpha * self.distance, dtype=np.float64)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

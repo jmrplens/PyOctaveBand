@@ -34,6 +34,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
+from ..._internal.validation import require_positive
 from .impedance_tube import (
     _DIAMETER_POSITIVE,
     ImpedanceTubeWarning,
@@ -73,6 +74,10 @@ _ASTM_LOWER_WAVELENGTH_FRACTION = 100.0
 #: Shared message of the ``characteristic_impedance`` validation, repeated by
 #: every entry point that takes the air characteristic impedance ``rho c``.
 _IMPEDANCE_POSITIVE = "'characteristic_impedance' must be positive."
+
+#: A load is the tuple of the four microphone transfer functions H1..H4
+#: (ASTM E2611-19, Eqs. (17)-(20)).
+_LOAD_TRANSFER_FUNCTIONS = 4
 
 __all__ = [
     "TransferMatrix",
@@ -341,6 +346,7 @@ def face_quantities(
     """
     if characteristic_impedance <= 0.0:
         raise ValueError(_IMPEDANCE_POSITIVE)
+    thickness = require_positive(thickness, "thickness")
     av = np.asarray(a, dtype=np.complex128)
     bv = np.asarray(b, dtype=np.complex128)
     cv = np.asarray(c, dtype=np.complex128)
@@ -597,6 +603,7 @@ def air_layer_transfer_matrix(
 def _face_from_loads(
     load: tuple[ArrayLike, ArrayLike, ArrayLike, ArrayLike],
     *,
+    name: str,
     l1: float,
     s1: float,
     l2: float,
@@ -605,7 +612,19 @@ def _face_from_loads(
     wavenumber: ArrayLike,
     characteristic_impedance: float,
 ) -> tuple[Complex, Complex, Complex, Complex]:
-    """Face pressures/velocities for one termination (Eqs. (17)-(21))."""
+    """Face pressures/velocities for one termination (Eqs. (17)-(21)).
+
+    ``name`` is the load parameter as the caller of the public solver typed
+    it (``load_a``, ``load_b`` or ``load``), so a load of the wrong length is
+    refused by name instead of dying in tuple indexing; a too-long load would
+    otherwise even pass, with its extra entries silently dropped.
+    """
+    if len(load) != _LOAD_TRANSFER_FUNCTIONS:
+        msg = (
+            f"'{name}' must be the four transfer functions "
+            f"(H1, H2, H3, H4); got {len(load)}."
+        )
+        raise ValueError(msg)
     a, b, c, d = wave_decomposition(
         load[0],
         load[1],
@@ -744,6 +763,7 @@ def transfer_matrix_two_load(
         )
     p0a, pda, u0a, uda = _face_from_loads(
         load_a,
+        name="load_a",
         l1=l1,
         s1=s1,
         l2=l2,
@@ -754,6 +774,7 @@ def transfer_matrix_two_load(
     )
     p0b, pdb, u0b, udb = _face_from_loads(
         load_b,
+        name="load_b",
         l1=l1,
         s1=s1,
         l2=l2,
@@ -847,6 +868,7 @@ def transfer_matrix_one_load(
         )
     p0, pd, u0, ud = _face_from_loads(
         load,
+        name="load",
         l1=l1,
         s1=s1,
         l2=l2,

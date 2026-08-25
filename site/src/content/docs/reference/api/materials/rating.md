@@ -68,6 +68,12 @@ Sound absorption class for `alpha_w` (ISO 11654 Table B.1, Annex B).
 
 **Returns:** `"A"`, `"B"`, `"C"`, `"D"`, `"E"` or `"Not classified"`.
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | if `alpha_w` is not a finite value in `[0, 1]`. |
+
 ## AbsorptionRatingResult
 
 ```python
@@ -240,6 +246,12 @@ unfavourable deviations (measured below the shifted curve) is at most
 | `alpha_p` | The five octave practical coefficients for 250, 500, 1000, 2000 and 4000 Hz (e.g. from [`practical_absorption_coefficient`](/phonometry/reference/api/materials/rating/#practical_absorption_coefficient)), as a sequence ordered low to high or a mapping keyed by band centre frequency (Hz). Inputs are snapped to the 0,05 grid of Clause 4.1. |
 
 **Returns:** A frozen [`AbsorptionRatingResult`](/phonometry/reference/api/materials/rating/#absorptionratingresult) with `alpha_w`, the shape indicators, the applied shift, the fitted reference curve and the absorption class.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | if any coefficient is negative or the wrong number of values is supplied. |
 
 ## weighted_absorption_from_third_octave
 

@@ -111,6 +111,32 @@ def test_plenum_per_band() -> None:
     assert tl.shape == (3,)
 
 
+def test_plenum_angle_endpoints_accepted() -> None:
+    # cos(pi/2) = 0: at the endpoint only the reverberant term is left.
+    grazing = hvac.plenum_attenuation(0.1, 1.0, 20.0, 0.2, angle=math.pi / 2.0)
+    head_on = hvac.plenum_attenuation(0.1, 1.0, 20.0, 0.2, angle=0.0)
+    assert grazing > head_on
+
+
+@pytest.mark.parametrize("angle", [math.nan, math.pi, -0.3], ids=["nan", "pi", "neg"])
+def test_plenum_angle_outside_range_raises(angle: float) -> None:
+    # A NaN used to come back as a NaN result and an obtuse angle drove
+    # log10 negative with only a RuntimeWarning; both refuse by name now.
+    with pytest.raises(ValueError, match=r"'angle' must lie in \[0, pi/2\]"):
+        hvac.plenum_attenuation(0.1, 1.0, 20.0, 0.2, angle=angle)
+
+
+def test_plenum_empty_absorption_raises() -> None:
+    # np.any/np.all pass vacuously on an empty array; refuse it by name.
+    with pytest.raises(ValueError, match="'mean_absorption' must be a scalar"):
+        hvac.plenum_attenuation(0.1, 1.0, 20.0, [])
+
+
+def test_plenum_two_dimensional_absorption_raises() -> None:
+    with pytest.raises(ValueError, match="'mean_absorption' must be a scalar"):
+        hvac.plenum_attenuation(0.1, 1.0, 20.0, np.full((2, 3), 0.2))
+
+
 def test_flow_noise_straight_duct_formula() -> None:
     # Bies Eq. (8.251), VDI 2081-1: note the -2 constant term.
     f = np.array([250.0])

@@ -268,6 +268,12 @@ def test_validation_errors() -> None:
         emission.sound_intensity(
             good, good, FS, spacing=SPACING, limits=[1000.0, 100.0]
         )
+    # A NaN limit fails every comparison and used to pass the guard, silently
+    # selecting no band at all.
+    with pytest.raises(ValueError, match="'limits' must be"):
+        emission.sound_intensity(
+            good, good, FS, spacing=SPACING, limits=[float("nan"), 1000.0]
+        )
     two_dimensional = np.zeros((2, 100))
     with pytest.raises(ValueError, match="1D"):
         emission.sound_intensity(two_dimensional, two_dimensional, FS, spacing=SPACING)
@@ -314,6 +320,22 @@ def test_field_indicators_validation() -> None:
     three_band_in = np.full((4, 3), 1e-3)
     with pytest.raises(ValueError, match="one entry per band"):
         emission.field_indicators(three_band_lp, three_band_in, [125.0, 250.0])
+
+
+def test_field_indicators_rejects_non_finite_pressure_levels() -> None:
+    # A NaN Lp used to turn F2 and F3 into a silent NaN instead of raising,
+    # while the sibling intensity samples were already rejected up front.
+    with pytest.raises(ValueError, match="'pressure_levels' must contain only finite"):
+        emission.field_indicators([np.nan, 90.0], [1e-3, 1e-3])
+
+
+def test_field_indicators_rejects_empty_band_axis() -> None:
+    # A (positions, 0) surface used to crash inside numpy's indexing without
+    # naming the argument.
+    no_band_lp = np.zeros((3, 0))
+    no_band_in = np.zeros((3, 0))
+    with pytest.raises(ValueError, match="'pressure_levels' must have at least one"):
+        emission.field_indicators(no_band_lp, no_band_in)
 
 
 def test_field_indicators_per_band_matches_per_column_scalars() -> None:

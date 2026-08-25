@@ -44,7 +44,12 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from .._internal.utils import _typesignal
-from .._internal.validation import check_engine, require_ranks, require_same_length
+from .._internal.validation import (
+    check_engine,
+    require_finite_array,
+    require_ranks,
+    require_same_length,
+)
 from ..filters.core import OctaveFilterBank
 from ..io._resolve import apply_calibration, resolve_fs
 
@@ -588,6 +593,9 @@ def decay_curve(
         if band <= 0.0:
             msg = "Band centre frequency 'band' must be positive."
             raise ValueError(msg)
+        if fraction <= 0:
+            msg = "Bandwidth 'fraction' must be positive."
+            raise ValueError(msg)
         half_width = 2.0 ** (1.0 / (4.0 * fraction))
         bank = OctaveFilterBank(
             fs=fs,
@@ -602,6 +610,12 @@ def decay_curve(
             calculate_level=False,
             zero_phase=zero_phase,
         )
+        if len(freqs) == 0:
+            msg = (
+                f"'band' ({band:g} Hz) has no filter at fs={fs} Hz; "
+                "its upper edge exceeds the Nyquist frequency."
+            )
+            raise ValueError(msg)
         idx = int(np.argmin(np.abs(np.asarray(freqs, dtype=np.float64) - band)))
         # np.asarray, not a cast: a bank on the default calibration hands
         # back Signals, and the squaring below is array arithmetic.
@@ -678,6 +692,7 @@ def room_parameters(
         if len(limits) != 2:  # noqa: PLR2004
             msg = "'limits' must be a (f_min, f_max) pair or None."
             raise ValueError(msg)
+        require_finite_array(limits, "limits")
         bank = OctaveFilterBank(
             fs=fs, fraction=fraction, order=6, limits=[limits[0], limits[1]]
         )
@@ -691,6 +706,12 @@ def room_parameters(
         # np.asarray, not a cast: a bank on the default calibration hands
         # back Signals, and what follows is array arithmetic.
         band_signals = [np.asarray(band) for band in bands]
+        if not band_signals:
+            msg = (
+                f"'limits' {limits} leaves no band below the Nyquist "
+                f"frequency at fs={fs} Hz."
+            )
+            raise ValueError(msg)
         frequency = np.asarray(freqs, dtype=np.float64)
 
     values = np.array([_band_parameters(sig, fs) for sig in band_signals])

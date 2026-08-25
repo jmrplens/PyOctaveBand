@@ -71,6 +71,31 @@ def test_harmonic_distortion_rejects_order_below_two() -> None:
         electroacoustics.harmonic_distortion(tone, FS, fundamental=1000.0, order=1)
 
 
+def test_harmonic_distortion_rejects_fractional_order() -> None:
+    # A fractional order used to sail past the range check and die inside
+    # numpy's indexing without naming the parameter.
+    x = _harmonic_signal()
+    with pytest.raises(ValueError, match="'order' must be an integer"):
+        electroacoustics.harmonic_distortion(x, FS, fundamental=1000.0, order=2.5)  # type: ignore[arg-type]
+
+
+def test_harmonic_distortion_rejects_non_numeric_order() -> None:
+    x = _harmonic_signal()
+    with pytest.raises(ValueError, match="'order' must be an integer"):
+        electroacoustics.harmonic_distortion(x, FS, fundamental=1000.0, order="2")  # type: ignore[arg-type]
+
+
+def test_harmonic_distortion_accepts_integral_float_order() -> None:
+    # 2.0 IS the integer 2 to a caller who divided to get it.
+    x = _harmonic_signal()
+    assert electroacoustics.harmonic_distortion(
+        x,
+        FS,
+        fundamental=1000.0,
+        order=2.0,  # type: ignore[arg-type]
+    ) == pytest.approx(ref.DISTORTION_D2, rel=1e-6)
+
+
 def test_thd_plus_noise_recovers_noise_floor() -> None:
     # Fundamental (RMS 1/sqrt2) + white noise of RMS 0.01; the notch removes
     # the fundamental, so THD+N ~ in-band noise_rms / total_rms with the
@@ -180,6 +205,22 @@ def test_modulation_distortion_iec_per_order() -> None:
     assert res.smpte == pytest.approx(smpte, rel=1e-6)
 
 
+def test_modulation_distortion_rejects_swapped_tones() -> None:
+    # A swapped pair used to return a near-zero d2/d3 (a false "no
+    # distortion" pass): the lower sideband went negative and read 0, the
+    # upper fell where nothing is.
+    tone = _tone(1000.0)
+    with pytest.raises(ValueError, match="'f_low' must be lower than 'f_high'"):
+        electroacoustics.modulation_distortion(tone, FS, f_low=8000.0, f_high=250.0)
+
+
+def test_modulation_distortion_rejects_equal_tones() -> None:
+    # Equal tones used to relabel the second-harmonic ratio as d_m,2.
+    tone = _tone(1000.0)
+    with pytest.raises(ValueError, match="'f_low' must be lower than 'f_high'"):
+        electroacoustics.modulation_distortion(tone, FS, f_low=1000.0, f_high=1000.0)
+
+
 def test_modulation_distortion_carries_sideband_spectrum() -> None:
     # The result carries the measured carrier and sideband amplitudes (the
     # data behind .plot()), in ascending frequency order:
@@ -245,6 +286,21 @@ def test_modulation_distortion_plot_marks_carrier_and_sidebands() -> None:
     bare = electroacoustics.ModulationDistortionResult(d2=0.1, d3=0.05, smpte=0.08)
     with pytest.raises(ValueError, match="no sideband spectrum"):
         bare.plot()
+    plt.close("all")
+    # Nor one whose sideband arrays are not the four annotated products (the
+    # per-order labels index fixed positions, which used to be an IndexError).
+    short = electroacoustics.ModulationDistortionResult(
+        d2=0.1,
+        d3=0.05,
+        smpte=0.08,
+        f_low=fl,
+        f_high=fh,
+        carrier_amplitude=1.0,
+        sideband_frequencies=np.array([fh - fl, fh + fl]),
+        sideband_amplitudes=np.array([0.01, 0.01]),
+    )
+    with pytest.raises(ValueError, match="must each carry the four products"):
+        short.plot()
     plt.close("all")
 
 
@@ -369,6 +425,16 @@ def test_dynamic_intermodulation_distortion() -> None:
     assert electroacoustics.dynamic_intermodulation_distortion(x, FS) == pytest.approx(
         expected, rel=1e-6
     )
+
+
+def test_dynamic_intermodulation_rejects_swapped_frequencies() -> None:
+    # A swapped pair leaves the Table 2 product set empty and used to return
+    # a perfect 0.0 for an argument pair the metric is undefined on.
+    x = _tone(15000.0) + _tone(3150.0, 0.8)
+    with pytest.raises(ValueError, match="'f_square' must be lower than 'f_sine'"):
+        electroacoustics.dynamic_intermodulation_distortion(
+            x, FS, f_sine=3150.0, f_square=15000.0
+        )
 
 
 def test_harmonic_analysis_bundle_and_plot() -> None:

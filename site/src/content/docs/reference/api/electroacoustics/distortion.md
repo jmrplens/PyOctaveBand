@@ -101,7 +101,7 @@ amplitude relative to the total RMS.
 | `signal` | Captured signal (1-D). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: this is a ratio of amplitudes drawn from the same record, so the factor divides out and the answer is the same calibrated or not. |
 | `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `fundamental` | Fundamental frequency $f_1$, in Hz. |
-| `order` | Harmonic order `n` (>= 2). |
+| `order` | Harmonic order `n` (an integer >= 2; an integral float such as `3.0` is accepted as its integer). |
 | `n_harmonics` | Highest harmonic order used for the total RMS. |
 | `window` | FFT window (default `'hann'`). |
 
@@ -111,7 +111,7 @@ amplitude relative to the total RMS.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If `order` \< 2 or the inputs are invalid. |
+| ValueError | If `order` is not an integer, `order` \< 2 or the inputs are invalid. |
 
 ## HarmonicDistortionResult
 

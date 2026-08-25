@@ -225,6 +225,14 @@ def test_empty_signal_raises() -> None:
         psychoacoustics.roughness_ecma(empty, FS)
 
 
+def test_resample_length_clamps_to_one_sample() -> None:
+    # 1 sample at 96 kHz resamples to round(1 * 48000 / 96000) = round(0.5),
+    # which banker's rounding takes to 0 samples without the clamp; the
+    # clamped 1-sample signal must process cleanly.
+    res = psychoacoustics.roughness_ecma(np.zeros(1), 96000.0)
+    assert res.roughness == 0.0
+
+
 def test_deterministic(ref_calibration: psychoacoustics.EcmaRoughness) -> None:
     again = psychoacoustics.roughness_ecma(_am_tone(1000.0, 70.0, 1.0, 60.0), FS)
     assert again.roughness == pytest.approx(ref_calibration.roughness, abs=1e-9)

@@ -64,7 +64,7 @@ def _iec61265_directional_limit(frequency: float, angle: float) -> float:
             "(50 Hz-1.6 kHz, then 2, 2.5, 3.15, 4, 5, 6.3, 8, 10 kHz)."
         )
         raise ValueError(msg)
-    if angle <= 0.0 or angle > _IEC61265_ANGLES[-1]:
+    if not np.isfinite(angle) or angle <= 0.0 or angle > _IEC61265_ANGLES[-1]:
         msg = "'angle' must lie in (0, 150] degrees."
         raise ValueError(msg)
     col = next(i for i, a in enumerate(_IEC61265_ANGLES) if a >= angle)

@@ -819,6 +819,12 @@ def combined_tone_level(
     if fts.size == 0:
         msg = "At least one tone is required."
         raise ValueError(msg)
+    if not (np.all(np.isfinite(fts)) and np.all(fts > 0.0)):
+        msg = "'tone_frequencies' must be positive and finite."
+        raise ValueError(msg)
+    if not np.all(np.isfinite(lss)):
+        msg = "'mean_narrowband_levels' must be finite."
+        raise ValueError(msg)
     marked: set[int] = set()
     for ft, ls in zip(fts, lss, strict=True):
         peak = int(np.argmin(np.abs(freq - ft)))

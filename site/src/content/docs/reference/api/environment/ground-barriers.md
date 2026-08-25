@@ -431,6 +431,12 @@ at 0 dB (a barrier never amplifies).
 
 **Returns:** Attenuation `Delta`, in decibels (>= 0), matching the input shape.
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a non-numeric or non-finite `fresnel_number`. |
+
 ## plot_barrier_geometry
 
 ```python

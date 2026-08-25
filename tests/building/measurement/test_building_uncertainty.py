@@ -545,8 +545,15 @@ def test_unknown_quantity() -> None:
 
 
 def test_unknown_measurand() -> None:
-    with pytest.raises(ValueError, match="Unknown measurand"):
+    with pytest.raises(ValueError, match="'measurand' must be one of"):
         band_uncertainty("magic", "A")  # type: ignore[arg-type]
+
+
+def test_unknown_measurand_with_upper_limit() -> None:
+    # The upper-limit branch used to misreport an unknown measurand as a
+    # real one that merely lacks a σR95 table.
+    with pytest.raises(ValueError, match="'measurand' must be one of"):
+        band_uncertainty("magic", "A", upper_limit=True)  # type: ignore[arg-type]
 
 
 def test_unknown_situation_single_number() -> None:
@@ -566,6 +573,18 @@ def test_band_uncertainty_to_arrays_roundtrip() -> None:
 def test_prediction_input_rejects_bad_n() -> None:
     with pytest.raises(ValueError, match="n must be a positive integer"):
         prediction_input_uncertainty(1.2, 1.0, 0)
+
+
+def test_prediction_input_rejects_fractional_n() -> None:
+    # A fractional n used to sail past the `n < 1` range check and be
+    # divided by, returning a wrong number without an error.
+    with pytest.raises(ValueError, match="n must be a positive integer"):
+        prediction_input_uncertainty(1.2, 1.0, 2.5)  # type: ignore[arg-type]
+
+
+def test_prediction_input_rejects_nan_n() -> None:
+    with pytest.raises(ValueError, match="n must be a positive integer"):
+        prediction_input_uncertainty(1.2, 1.0, float("nan"))  # type: ignore[arg-type]
 
 
 def test_the_bare_names_are_gone() -> None:

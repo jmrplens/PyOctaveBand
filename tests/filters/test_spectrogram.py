@@ -68,3 +68,35 @@ def test_spectrogram_invalid_params_raise() -> None:
         bank.spectrogram(one_second, overlap=1.0)
     with pytest.raises(ValueError, match="window_time"):
         bank.spectrogram(shorter_than_the_window, window_time=1.0)
+
+
+@pytest.mark.parametrize("window_time", [float("nan"), float("inf"), -1.0, 0.0])
+def test_spectrogram_rejects_non_positive_window_time(window_time: float) -> None:
+    """A non-finite window length used to die in round(), naming nothing."""
+    bank = filters.OctaveFilterBank(fs=FS, fraction=1, limits=[100, 5000])
+    one_second = np.zeros(FS)
+    with pytest.raises(ValueError, match="'window_time' must be positive"):
+        bank.spectrogram(one_second, window_time=window_time)
+
+
+def test_spectrogram_rejects_non_string_mode() -> None:
+    """A non-string mode used to die in str.lower, deep in level calculation."""
+    bank = filters.OctaveFilterBank(fs=FS, fraction=1, limits=[100, 5000])
+    one_second = np.zeros(FS)
+    with pytest.raises(TypeError, match="'mode' must be a string"):
+        bank.spectrogram(one_second, mode=None)  # type: ignore[arg-type]
+
+
+def test_spectrogram_rejects_unknown_mode() -> None:
+    bank = filters.OctaveFilterBank(fs=FS, fraction=1, limits=[100, 5000])
+    one_second = np.zeros(FS)
+    with pytest.raises(ValueError, match="'mode' must be one of"):
+        bank.spectrogram(one_second, mode="bogus")
+
+
+def test_spectrogram_rejects_three_dimensional_input() -> None:
+    """A 3-D array used to reach numpy's sliding window before any refusal."""
+    bank = filters.OctaveFilterBank(fs=FS, fraction=1, limits=[100, 5000])
+    cube = np.zeros((2, 2, FS))
+    with pytest.raises(ValueError, match="'x' must be a 1-D signal or a 2-D"):
+        bank.spectrogram(cube)

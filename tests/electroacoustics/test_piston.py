@@ -211,6 +211,21 @@ def test_directivity_pattern_plot_kwargs_single_ka_only() -> None:
     assert len(colors) == 3
 
 
+def test_directivity_pattern_plot_rejects_a_cartesian_axes() -> None:
+    # The drawer calls polar-only methods; a plain axes must be refused by
+    # name, not left to die in matplotlib's AttributeError.
+    import matplotlib as mpl
+
+    mpl.use("Agg")
+    import matplotlib.pyplot as plt
+
+    res = electroacoustics.piston_directivity_pattern([1.0, 3.0])
+    _fig, cartesian = plt.subplots()
+    with pytest.raises(ValueError, match="'ax' must be a polar axes"):
+        res.plot(ax=cartesian)
+    plt.close("all")
+
+
 def test_a_pattern_matrix_with_a_surplus_row_is_refused() -> None:
     """The matrix rows and the ``ka`` values are one enumeration, and only the
     surplus is quiet.
@@ -240,6 +255,15 @@ def test_directivity_pattern_validation() -> None:
         electroacoustics.piston_directivity_pattern(ka_one, angles=infinite_angles)
     with pytest.raises(ValueError, match="'ka' must be a non-empty"):
         electroacoustics.piston_directivity_pattern(empty_ka)
+
+
+def test_directivity_rejects_mismatched_shapes() -> None:
+    # A shape mismatch used to surface as numpy's broadcast message, which
+    # names neither argument.
+    three_ka = np.array([1.0, 2.0, 3.0])
+    two_angles = np.array([0.1, 0.2])
+    with pytest.raises(ValueError, match="'ka' and 'theta' must broadcast together"):
+        electroacoustics.piston_directivity(three_ka, two_angles)
 
 
 def test_validation() -> None:

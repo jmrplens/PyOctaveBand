@@ -79,6 +79,10 @@ _SABINE = 55.3
 _TEN_LG_E = 10.0 * math.log10(math.e)
 #: Validity range of the speed-of-sound Eq. (6), in degrees Celsius.
 _EQ6_TEMPERATURE_RANGE = (15.0, 30.0)
+#: Absolute zero in degrees Celsius, the hard floor of any air temperature.
+_KELVIN = 273.15
+#: Full-scale relative humidity (saturation), in percent.
+_MAX_RELATIVE_HUMIDITY_PERCENT = 100.0
 #: Minimum reverberation-room volume, ISO 354:2003 clause 6.1.1 (m3).
 _MIN_ROOM_VOLUME = 150.0
 #: Plane-absorber sample-area limits, ISO 354:2003 clause 6.2.1.1 (m2).
@@ -145,12 +149,19 @@ def _resolve_speed(temperature: float, speed_of_sound: float | None) -> float:
 
     Warns when the speed is derived from a temperature outside the 15..30 degC
     validity range of Eq. (6). An explicit ``speed_of_sound`` bypasses the check.
+    Rejects a physically impossible ``temperature`` outright: Eq. (6) applied
+    below absolute zero would hand back a zero or negative speed of sound.
     """
     if speed_of_sound is not None:
         if speed_of_sound <= 0.0:
             msg = "'speed_of_sound' must be positive."
             raise ValueError(msg)
         return float(speed_of_sound)
+    # `not >` rather than `<=` so a NaN temperature is refused too, instead of
+    # propagating through Eq. (6) into every derived quantity.
+    if not temperature > -_KELVIN:
+        msg = "'temperature' must be above absolute zero (-273,15 degC)."
+        raise ValueError(msg)
     lo, hi = _EQ6_TEMPERATURE_RANGE
     if not lo <= temperature <= hi:
         warnings.warn(
@@ -607,9 +618,10 @@ def measure_sound_absorption(
         (default 20). Used for the speed of sound via Eq. (6) unless
         ``speed_of_sound`` is given; a temperature outside 15..30 degC emits an
         :class:`AbsorptionWarning`.
-    :param humidity: Relative humidity during the test, in % (informational;
-        recorded on the result but not used in the computation, which sees the
-        climate only through ``m``). ``None`` leaves it unrecorded.
+    :param humidity: Relative humidity during the test, in % within
+        ``[0, 100]`` (informational; recorded on the result but not used in the
+        computation, which sees the climate only through ``m``). ``None``
+        leaves it unrecorded.
     :param speed_of_sound: Explicit speed of sound ``c``, in m/s; overrides
         ``temperature`` and Eq. (6) when supplied.
     :param m: Power attenuation coefficient of air ``m``, in 1/m (a scalar or a
@@ -618,8 +630,8 @@ def measure_sound_absorption(
         :func:`attenuation_from_alpha`.
     :return: A frozen :class:`SoundAbsorptionMeasurement`.
     :raises ValueError: If the frequency and reverberation-time arrays do not
-        share one shape, or an input is non-physical (see
-        :func:`absorption_coefficient`).
+        share one shape, ``humidity`` is not within ``[0, 100]`` %, or an
+        input is non-physical (see :func:`absorption_coefficient`).
     """
     freqs = np.asarray(frequencies, dtype=np.float64)
     t1 = np.asarray(t_empty, dtype=np.float64)
@@ -636,6 +648,18 @@ def measure_sound_absorption(
     m_arr = np.broadcast_to(np.asarray(m, dtype=np.float64), freqs.shape).astype(
         np.float64, copy=True
     )
+    if humidity is None:
+        humidity_pct: float | None = None
+    else:
+        # A non-numeric humidity becomes NaN here so that it fails the range
+        # test below and is refused by name, instead of dying inside float().
+        try:
+            humidity_pct = float(humidity)
+        except ValueError:
+            humidity_pct = math.nan
+        if not 0.0 <= humidity_pct <= _MAX_RELATIVE_HUMIDITY_PERCENT:
+            msg = "'humidity' must be within [0, 100] %."
+            raise ValueError(msg)
     # Resolve the speed once (Eq. (6)); this emits the single temperature
     # advisory. Passing the resolved speed to the reused helpers below keeps
     # every advisory to exactly one, since both measurements share the climate.
@@ -666,7 +690,7 @@ def measure_sound_absorption(
         volume=float(volume),
         area=float(area),
         temperature=float(temperature),
-        humidity=None if humidity is None else float(humidity),
+        humidity=humidity_pct,
         speed_of_sound=c,
         air_attenuation=m_arr,
         absorption_area_empty=a1,

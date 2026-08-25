@@ -118,6 +118,17 @@ def test_source_outside_the_grid_is_rejected() -> None:
         ({"sponge_width": 4, "sponge_reflection": 1.0}, "sponge_reflection"),
         ({"sponge_width": 4, "sponge_sides": ("north",)}, "sponge sides"),
         ({"sponge_width": 4, "sponge_sides": "north"}, "sponge sides"),
+        # A malformed grid shape used to be reported by somebody else: numpy,
+        # or the sponge_width guard for a zero-length side, or a message
+        # blaming c. A complex c or rho ran to completion on its real part.
+        ({"shape": (0, 10)}, "shape must be a pair of positive integers"),
+        ({"shape": (-1, 10)}, "shape must be a pair of positive integers"),
+        ({"shape": (10, 10.5)}, "shape must be a pair of positive integers"),
+        ({"shape": 10}, "shape must be a pair of positive integers"),
+        ({"shape": (10, 10, 10)}, "shape must be a pair of positive integers"),
+        ({"c": 343.0 + 50.0j}, "c must be real"),
+        ({"c": np.full((10, 10), 343.0 + 50.0j)}, "c must be real"),
+        ({"rho": 1.2 + 3.0j}, "rho must be real"),
     ],
 )
 def test_constructor_rejects_invalid_arguments(

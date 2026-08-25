@@ -147,6 +147,9 @@ _MIN_GRID_FOR_INTERIOR_MINIMUM = 3
 
 _Complex = NDArray[np.complex128]
 
+#: Rank of a four-pole stack: the frequency axis plus the two matrix axes.
+_FOUR_POLE_NDIM = 3
+
 
 def _frequencies(frequencies: ArrayLike) -> NDArray[np.float64]:
     """Validate a strictly positive, finite 1-D frequency grid (Hz)."""
@@ -158,6 +161,24 @@ def _frequencies(frequencies: ArrayLike) -> NDArray[np.float64]:
         msg = "'frequencies' must be positive and finite."
         raise ValueError(msg)
     return f
+
+
+def _per_frequency(impedance: ArrayLike, name: str, n_freq: int) -> _Complex:
+    """Coerce an impedance to one complex value per analysis frequency.
+
+    A scalar is held constant over the grid; anything else must already be
+    the ``(n_freq,)`` per-frequency array.
+    """
+    z = np.asarray(impedance, dtype=np.complex128)
+    if z.ndim == 0:
+        return np.full(n_freq, z, dtype=np.complex128)
+    if z.shape != (n_freq,):
+        msg = (
+            f"'{name}' must be a scalar or hold one value per "
+            f"analysis frequency ({n_freq} values); got shape {z.shape}."
+        )
+        raise ValueError(msg)
+    return z
 
 
 def duct_matrix(
@@ -247,16 +268,28 @@ def cascade(*matrices: _Complex) -> _Complex:
 
     :param matrices: One or more ``(n_freq, 2, 2)`` arrays sharing ``n_freq``.
     :return: The compound ``(n_freq, 2, 2)`` array.
+    :raises ValueError: If a matrix is not a ``(n_freq, 2, 2)`` array or the
+        matrices disagree on ``n_freq``.
     """
     if not matrices:
         msg = "cascade() needs at least one matrix."
         raise ValueError(msg)
-    n = matrices[0].shape[0]
-    if any(m.shape[0] != n for m in matrices[1:]):
+    arrays: list[_Complex] = []
+    for i, matrix in enumerate(matrices):
+        arr = np.asarray(matrix, dtype=np.complex128)
+        if arr.ndim != _FOUR_POLE_NDIM or arr.shape[1:] != (2, 2):
+            msg = (
+                f"'matrices'[{i}] must be a (n_freq, 2, 2) four-pole array; "
+                f"got shape {arr.shape}."
+            )
+            raise ValueError(msg)
+        arrays.append(arr)
+    n = arrays[0].shape[0]
+    if any(m.shape[0] != n for m in arrays[1:]):
         msg = "cascade() matrices must share the same frequency grid (n_freq)."
         raise ValueError(msg)
-    total = matrices[0]
-    for m in matrices[1:]:
+    total = arrays[0]
+    for m in arrays[1:]:
         total = np.matmul(total, m)
     return total
 
@@ -331,10 +364,12 @@ def insertion_loss(
     :param radiation_impedance: Termination/radiation acoustic impedance
         ``Z_r``, Pa s/m3 (scalar or per-frequency).
     :return: The insertion loss per frequency, dB.
+    :raises ValueError: If an impedance is neither a scalar nor one value per
+        analysis frequency.
     """
     n = transfer_matrix.shape[0]
-    zs = np.broadcast_to(np.asarray(source_impedance, dtype=np.complex128), (n,))
-    zr = np.broadcast_to(np.asarray(radiation_impedance, dtype=np.complex128), (n,))
+    zs = _per_frequency(source_impedance, "source_impedance", n)
+    zr = _per_frequency(radiation_impedance, "radiation_impedance", n)
     t11 = transfer_matrix[:, 0, 0]
     t12 = transfer_matrix[:, 0, 1]
     t21 = transfer_matrix[:, 1, 0]
@@ -1107,16 +1142,9 @@ class SilencerChain:
         :raises ValueError: If ``branch_impedance`` is neither a scalar nor one
             value per analysis frequency.
         """
-        zb = np.asarray(branch_impedance, dtype=np.complex128)
-        if zb.ndim == 0:
-            zb = np.full(self._frequencies.size, zb, dtype=np.complex128)
-        if zb.shape != self._frequencies.shape:
-            msg = (
-                "'branch_impedance' must be a scalar or hold one value per "
-                f"analysis frequency ({self._frequencies.size} values); got "
-                f"shape {zb.shape}."
-            )
-            raise ValueError(msg)
+        zb = _per_frequency(
+            branch_impedance, "branch_impedance", self._frequencies.size
+        )
         self._elements.append(
             SilencerChainElement(
                 matrix=shunt_matrix(zb),

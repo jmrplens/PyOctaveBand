@@ -744,13 +744,15 @@ def loudness_ecma(
     if x.size == 0:
         msg = "signal must not be empty"
         raise ValueError(msg)
+    if not np.all(np.isfinite(x)):
+        msg = "'signal_in' must be finite."
+        raise ValueError(msg)
     fs = float(fs)
     if fs <= 0.0:
         msg = "fs must be positive"
         raise ValueError(msg)
     if fs != _FS:
-        n_target = round(x.size * _FS / fs)
-        x = signal.resample(x, n_target)
+        x = signal.resample(x, max(1, round(x.size * _FS / fs)))
 
     n_tonal, n_noise, _, _, n_samples = _tonal_noise_split(x, field)
     n_single, n_spec, n_time, time = _assemble_loudness(n_tonal, n_noise, n_samples)

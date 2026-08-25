@@ -108,6 +108,20 @@ def test_hydrophone_depths_rejects_non_finite_angles() -> None:
         underwater.hydrophone_depths(100.0, angles=(np.inf,))
 
 
+def test_hydrophone_depths_rejects_a_nested_angle_grid() -> None:
+    # A pair of pairs used to come back as a 2-D "depths" array as if valid.
+    with pytest.raises(ValueError, match="'angles' must be a non-empty 1-D array"):
+        underwater.hydrophone_depths(100.0, angles=((15.0, 30.0), (45.0, 60.0)))  # type: ignore[arg-type]
+
+
+def test_hydrophone_depths_normalises_a_single_angle() -> None:
+    # A bare scalar used to come back 0-d, so the documented per-hydrophone
+    # read depths[0] died in numpy; it is normalised to one entry instead.
+    depths = underwater.hydrophone_depths(100.0, angles=45.0)  # type: ignore[arg-type]
+    assert depths.shape == (1,)
+    assert float(depths[0]) == pytest.approx(100.0)
+
+
 def test_source_level_uncertainty_bands() -> None:
     assert underwater.source_level_uncertainty(63.0) == 5.0
     assert underwater.source_level_uncertainty(100.0) == 5.0
@@ -132,3 +146,16 @@ def test_rejects_shape_mismatch() -> None:
         match=r"monopole_source_level: 'rnl'.*must all have the same shape",
     ):
         underwater.monopole_source_level(levels_2_bands, frequencies_3_bands, 8.0)
+
+
+def test_monopole_source_level_rejects_empty_frequencies() -> None:
+    # An empty array used to pass the sign and finiteness predicates vacuously
+    # and come back as a zero-band result whose .plot() died inside numpy.
+    with pytest.raises(ValueError, match="'frequency' must be a non-empty 1-D array"):
+        underwater.monopole_source_level(np.array([]), np.array([]), 8.0)
+
+
+def test_monopole_source_level_rejects_a_two_dimensional_frequency_grid() -> None:
+    grid = np.array([[100.0, 200.0], [300.0, 400.0]])
+    with pytest.raises(ValueError, match="'frequency' must be a non-empty 1-D array"):
+        underwater.monopole_source_level(grid, grid, 8.0)

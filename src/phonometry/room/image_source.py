@@ -417,11 +417,17 @@ def _resolve_band_maps(
     ``m_bands`` broadcast to ``n_bands`` bands (``banded`` False for a single
     broadband curve).
 
-    :raises ValueError: for a non-finite/negative air attenuation, or an
-        ``absorption`` / ``air_attenuation`` band count that neither is 1 nor
-        matches the resolved band count.
+    :raises ValueError: for a non-finite/negative or multi-dimensional air
+        attenuation, or an ``absorption`` / ``air_attenuation`` band count
+        that neither is 1 nor matches the resolved band count.
     """
     m = np.asarray(air_attenuation, dtype=np.float64)
+    if m.ndim > 1:
+        msg = (
+            "'air_attenuation' must be a scalar or a 1-D per-band vector; "
+            f"got shape {m.shape}."
+        )
+        raise ValueError(msg)
     if not np.all(np.isfinite(m)) or np.any(m < 0.0):
         msg = "'air_attenuation' must be finite and non-negative."
         raise ValueError(msg)
@@ -606,21 +612,27 @@ def image_source_rir(
         per-band result. When given, its length must match the band count of
         ``absorption`` (or broadcast against it).
     :return: An :class:`ImageSourceResult`.
-    :raises ValueError: for a non-positive dimension/sample-rate, a
-        source/receiver outside the room, an absorption outside ``[0, 1]`` or
-        of an unsupported shape, a negative ``air_attenuation``, or a
-        ``frequencies`` length that does not match the band count.
+    :raises ValueError: for a ``dimensions`` that is not three positive
+        lengths, a non-positive sample rate, a non-integer or negative
+        ``max_order``, a source/receiver outside the room, an absorption
+        outside ``[0, 1]`` or of an unsupported shape, a negative
+        ``air_attenuation``, or a ``frequencies`` length that does not match
+        the band count.
     """
-    lx = require_positive(float(dimensions[0]), "Lx")
-    ly = require_positive(float(dimensions[1]), "Ly")
-    lz = require_positive(float(dimensions[2]), "Lz")
+    d = np.asarray(dimensions, dtype=np.float64)
+    if d.shape != (3,):
+        msg = "'dimensions' must be a 3-vector (Lx, Ly, Lz)."
+        raise ValueError(msg)
+    lx = require_positive(float(d[0]), "Lx")
+    ly = require_positive(float(d[1]), "Ly")
+    lz = require_positive(float(d[2]), "Lz")
     dims = (lx, ly, lz)
     if fs <= 0:
         msg = "Sample rate 'fs' must be positive."
         raise ValueError(msg)
     speed_of_sound = require_positive(speed_of_sound, "speed_of_sound")
-    if max_order < 0:
-        msg = "'max_order' must be non-negative."
+    if not isinstance(max_order, (int, np.integer)) or max_order < 0:
+        msg = "'max_order' must be a non-negative integer."
         raise ValueError(msg)
     src = _validate_point(source, dims, "source")
     rcv = _validate_point(receiver, dims, "receiver")
@@ -636,6 +648,15 @@ def image_source_rir(
     n_freq: int | None = None
     if frequencies is not None:
         freq = np.asarray(frequencies, dtype=np.float64)
+        if freq.ndim > 1 or freq.size == 0:
+            msg = (
+                "'frequencies' must be a scalar or a non-empty 1-D band "
+                f"vector; got shape {freq.shape}."
+            )
+            raise ValueError(msg)
+        if not np.all(np.isfinite(freq)) or np.any(freq <= 0.0):
+            msg = "'frequencies' must be finite and strictly positive."
+            raise ValueError(msg)
         n_freq = freq.size
     reflection, n_alpha_bands = _resolve_walls(absorption, n_freq)
     reflection, m_bands, n_bands, banded = _resolve_band_maps(
@@ -681,11 +702,11 @@ def audible_image_count(max_order: int) -> int:
     audible (no visibility test needed), so this is exactly the number of
     impulses :func:`image_source_rir` sums at that order.
 
-    :param max_order: Reflection-order cut-off ``i0`` (non-negative).
+    :param max_order: Reflection-order cut-off ``i0`` (non-negative integer).
     :return: The audible image count.
     """
-    if max_order < 0:
-        msg = "'max_order' must be non-negative."
+    if not isinstance(max_order, (int, np.integer)) or max_order < 0:
+        msg = "'max_order' must be a non-negative integer."
         raise ValueError(msg)
     i0 = int(max_order)
     return (2 * (2 * i0**3 + 3 * i0**2 + 4 * i0)) // 3

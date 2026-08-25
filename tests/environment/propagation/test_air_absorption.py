@@ -291,6 +291,22 @@ def test_atmospheric_attenuation_total_over_distance() -> None:
     assert res.distance == 200.0
 
 
+def test_atmospheric_attenuation_total_coerces_list_fields() -> None:
+    # The fields are annotated as arrays, but the frozen result can be built by
+    # hand with plain lists; total_attenuation used to hand the list straight
+    # to `list * float` (sequence repetition) and die with the builtin
+    # TypeError instead of multiplying.
+    res = environment.AtmosphericAttenuation(
+        frequencies=[100.0],
+        attenuation_coefficient=[0.001],
+        temperature=20.0,
+        relative_humidity=50.0,
+        pressure=101.325,
+        distance=10.0,
+    )
+    np.testing.assert_allclose(res.total_attenuation, [0.01])
+
+
 def test_atmospheric_attenuation_zero_distance_is_allowed() -> None:
     # A zero-length path is degenerate but well defined: A = 0 everywhere.
     res = environment.atmospheric_attenuation([1000.0], 20.0, 50.0, distance=0.0)

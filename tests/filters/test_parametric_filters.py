@@ -196,6 +196,37 @@ def test_weighting_filter_class_direct_use() -> None:
         filters.WeightingFilter(fs, curve="invalid")
 
 
+def test_weighting_filter_class_rejects_non_string_curve() -> None:
+    """A non-string curve used to die in str.upper before the curve message."""
+    with pytest.raises(TypeError, match="'curve' must be a string"):
+        filters.WeightingFilter(48000, curve=5)  # type: ignore[arg-type]
+
+
+def test_weighting_filter_rejects_non_string_curve() -> None:
+    x = np.zeros(100)
+    with pytest.raises(TypeError, match="'curve' must be a string"):
+        filters.weighting_filter(x, 48000, curve=5)  # type: ignore[arg-type]
+
+
+def test_time_weighting_rejects_non_string_mode() -> None:
+    """A non-string mode used to die in str.lower before the mode message."""
+    x = np.ones(10)
+    with pytest.raises(TypeError, match="'mode' must be a string"):
+        filters.time_weighting(x, 48000, mode=5)  # type: ignore[arg-type]
+
+
+def test_time_weighting_class_rejects_non_string_mode() -> None:
+    with pytest.raises(TypeError, match="'mode' must be a string"):
+        filters.TimeWeighting(48000, mode=5)  # type: ignore[arg-type]
+
+
+def test_time_weighting_rejects_non_numeric_initial_state() -> None:
+    """A dict used to get numpy's float() message, which names nothing."""
+    x = np.ones(10)
+    with pytest.raises(TypeError, match="initial_state must be None"):
+        filters.time_weighting(x, 48000, mode="fast", initial_state={"a": 1})  # type: ignore[arg-type]
+
+
 def test_time_weighting_fast() -> None:
     r"""Verify Fast (125ms) time weighting response to a step.
 

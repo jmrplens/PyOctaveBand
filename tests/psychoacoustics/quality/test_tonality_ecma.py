@@ -221,6 +221,19 @@ def test_band_range_rejects_out_of_range_edges() -> None:
         psychoacoustics.tonality_ecma(x, FS, f_low=2000.0, f_high=500.0)
 
 
+def test_band_range_rejects_non_finite_edges() -> None:
+    # NaN fails every bare comparison and +inf passes the f_low one, so
+    # without the finiteness clause both slip through to an empty band
+    # (silent zero tonality) or a numpy reduction error naming no parameter.
+    x = _tone(1000.0, 40.0, seconds=0.5)
+    with pytest.raises(ValueError, match="'f_low' must exceed 16 Hz"):
+        psychoacoustics.tonality_ecma(x, FS, f_low=float("nan"))
+    with pytest.raises(ValueError, match="'f_low' must exceed 16 Hz"):
+        psychoacoustics.tonality_ecma(x, FS, f_low=float("inf"))
+    with pytest.raises(ValueError, match="'f_high' must be below 20 kHz"):
+        psychoacoustics.tonality_ecma(x, FS, f_high=float("nan"))
+
+
 def test_band_range_uses_edge_midpoints() -> None:
     # Formulae 56-57 select bands by the edge midpoints to the neighbours, not
     # by the centre frequency.  For an f_low that lies between band z's centre
