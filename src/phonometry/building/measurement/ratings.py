@@ -336,10 +336,6 @@ _CI_50_2500_FREQS: tuple[float, ...] = _FREQ_50_5000[:18]
 _VALUES_1D_MSG = "'values_by_band' must be one-dimensional."
 _VALUES_FINITE_MSG = "'values_by_band' must contain only finite values."
 
-#: Which ISO 717 part's Annex C report labels the rating selects: "airborne"
-#: (ISO 717-1, sound reduction) or "impact" (ISO 717-2, impact sound level).
-RatingQuantity = Literal["airborne", "impact"]
-
 
 @dataclass(frozen=True)
 class WeightedRatingResult:
@@ -361,9 +357,13 @@ class WeightedRatingResult:
         ``None``.
     :ivar shifted_reference: Table 3 reference curve after the final shift,
         in dB. Defaults to ``None``.
-    :ivar quantity: ``"airborne"`` (ISO 717-1, sound reduction index) or
-        ``"impact"`` (ISO 717-2), selecting the labels of the ISO 717
-        Annex C report. Defaults to ``"airborne"``.
+    :ivar quantity: Always ``"airborne"``: this class carries the ISO 717-1
+        airborne rating, and the renderers dispatch on this tag when handed
+        the union with :class:`ImpactRatingResult`, which carries
+        ``"impact"``. The field used to admit both values and promise that
+        ``"impact"`` would select the impact labels; it never could, since
+        the impact labels read ``ci`` off the result and this class does not
+        have one, so the promise ended in the renderer's ``AttributeError``.
     """
 
     rating: int
@@ -373,7 +373,7 @@ class WeightedRatingResult:
     band_centers: np.ndarray | None = None
     measured: np.ndarray | None = None
     shifted_reference: np.ndarray | None = None
-    quantity: RatingQuantity = "airborne"
+    quantity: Literal["airborne"] = "airborne"
 
     def __post_init__(self) -> None:
         """Reject a rating whose three band curves do not line up.

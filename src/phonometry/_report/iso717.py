@@ -35,7 +35,7 @@ from __future__ import annotations
 import html
 import math
 import re
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -137,7 +137,8 @@ def _labels(
     the style of the standard's own examples (e.g. ``41 (0; -5) dB``).
     """
     if result.quantity == "impact":
-        impact = cast("ImpactRatingResult", result)
+        # The tag proves the class: only ImpactRatingResult carries "impact".
+        impact = result
         title = t("Impact sound insulation rating", language)
         rating_part = "ISO 717-2"
         sym = _symbol_markup(symbol if symbol is not None else "Ln,w")
