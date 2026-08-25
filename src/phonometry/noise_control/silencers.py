@@ -115,6 +115,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from .._internal.validation import (
+    check_engine,
     require_non_negative,
     require_positive,
     require_ranks,
@@ -593,9 +594,7 @@ class ReactiveSilencerResult:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from .._report.silencer import render_reactive_silencer_report
 
         return render_reactive_silencer_report(

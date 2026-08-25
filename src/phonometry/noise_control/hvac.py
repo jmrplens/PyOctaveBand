@@ -74,11 +74,12 @@ end-to-end fan-to-room calculation.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
 from .._internal.validation import (
+    check_engine,
     require_choice,
     require_positive,
     require_ranks,
@@ -437,6 +438,11 @@ def _octave_slots(
     return f, idx
 
 
+#: What an HVAC spectrum holds: "attenuation" (insertion loss/attenuation, dB)
+#: or "sound_power_level" (regenerated noise, dB re 1e-12 W).
+HvacQuantity = Literal["attenuation", "sound_power_level"]
+
+
 @dataclass(frozen=True)
 class HvacSpectrumResult:
     """A per-frequency HVAC quantity (attenuation or regenerated power level).
@@ -451,7 +457,7 @@ class HvacSpectrumResult:
 
     frequencies: np.ndarray
     values: np.ndarray
-    quantity: str
+    quantity: HvacQuantity
     label: str
 
     def __post_init__(self) -> None:
@@ -544,9 +550,7 @@ class HvacSpectrumResult:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from .._report.hvac import render_hvac_report
 
         return render_hvac_report(

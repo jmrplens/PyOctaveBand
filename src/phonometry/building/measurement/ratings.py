@@ -61,12 +61,13 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
 from ..._internal.levels_math import energy_sum
 from ..._internal.validation import (
+    check_engine,
     require_equal_shapes,
     require_ranks,
     require_same_length,
@@ -335,6 +336,10 @@ _CI_50_2500_FREQS: tuple[float, ...] = _FREQ_50_5000[:18]
 _VALUES_1D_MSG = "'values_by_band' must be one-dimensional."
 _VALUES_FINITE_MSG = "'values_by_band' must contain only finite values."
 
+#: Which ISO 717 part's Annex C report labels the rating selects: "airborne"
+#: (ISO 717-1, sound reduction) or "impact" (ISO 717-2, impact sound level).
+RatingQuantity = Literal["airborne", "impact"]
+
 
 @dataclass(frozen=True)
 class WeightedRatingResult:
@@ -368,7 +373,7 @@ class WeightedRatingResult:
     band_centers: np.ndarray | None = None
     measured: np.ndarray | None = None
     shifted_reference: np.ndarray | None = None
-    quantity: str = "airborne"
+    quantity: RatingQuantity = "airborne"
 
     def __post_init__(self) -> None:
         """Reject a rating whose three band curves do not line up.
@@ -492,7 +497,7 @@ class ImpactRatingResult:
     band_centers: np.ndarray | None = None
     measured: np.ndarray | None = None
     shifted_reference: np.ndarray | None = None
-    quantity: str = "impact"
+    quantity: Literal["impact"] = "impact"
 
     def __post_init__(self) -> None:
         """Reject a rating whose three band curves do not line up.
@@ -605,9 +610,7 @@ def _render_iso717(
     from ..._i18n import check_language
 
     check_language(language)
-    if engine != "reportlab":
-        msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-        raise ValueError(msg)
+    check_engine(engine)
     if (
         result.band_centers is None
         or result.measured is None

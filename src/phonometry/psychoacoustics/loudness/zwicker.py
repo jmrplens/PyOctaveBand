@@ -36,6 +36,7 @@ from scipy import signal
 
 from ..._internal.utils import _typesignal
 from ..._internal.validation import (
+    check_engine,
     require_positive,
     require_ranks,
     require_same_length,
@@ -245,9 +246,7 @@ class ZwickerLoudness:
         from ..._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from ..._report.iso532 import render_iso532_report
 
         return render_iso532_report(

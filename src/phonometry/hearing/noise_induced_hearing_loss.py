@@ -29,7 +29,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
-from .._internal.validation import require_ranks, require_same_length
+from .._internal.validation import check_engine, require_ranks, require_same_length
 from .._internal.warnings import PhonometryWarning
 from .threshold import age_threshold
 
@@ -261,9 +261,7 @@ class NiptsResult:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from .._report.iso1999 import render_nipts_report
 
         return render_nipts_report(
@@ -384,9 +382,7 @@ class HtlanResult:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from .._report.iso1999 import render_htlan_report
 
         return render_htlan_report(

@@ -41,6 +41,8 @@ import math
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Literal
 
+from .._internal.validation import check_engine
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
@@ -323,9 +325,7 @@ class NoiseEmissionDeclaration:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from .._report.iso4871 import render_iso4871_report
 
         return render_iso4871_report(

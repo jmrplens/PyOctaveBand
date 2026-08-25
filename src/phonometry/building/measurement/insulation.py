@@ -74,6 +74,7 @@ import numpy as np
 from ..._internal.levels_math import energy_mean
 from ..._internal.types import as_float_or_array
 from ..._internal.validation import (
+    check_engine,
     require_equal_counts,
     require_equal_shapes,
     require_ranks,
@@ -540,9 +541,9 @@ class FacadeInsulationResult:
 #: The field quantities each result kind can report, mapping the ``quantity``
 #: argument of ``report()`` to the attribute holding the per-band curve and
 #: the per-band chain columns ``verbose=True`` needs.
-_FIELD_QUANTITIES: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
-    "AirborneInsulationResult": (("dnt", "r_prime"), ("l1", "l2", "t2")),
-    "ImpactInsulationResult": (("l_n_t", "l_n"), ("li", "t2")),
+_FIELD_QUANTITIES: dict[type, tuple[tuple[str, ...], tuple[str, ...]]] = {
+    AirborneInsulationResult: (("dnt", "r_prime"), ("l1", "l2", "t2")),
+    ImpactInsulationResult: (("l_n_t", "l_n"), ("li", "t2")),
 }
 
 
@@ -568,11 +569,8 @@ def _render_iso16283(
     from ..._i18n import check_language
 
     check_language(language)
-    if engine != "reportlab":
-        msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-        raise ValueError(msg)
-    kind = type(result).__name__
-    quantities, chain_attrs = _FIELD_QUANTITIES[kind]
+    check_engine(engine)
+    quantities, chain_attrs = _FIELD_QUANTITIES[type(result)]
     if quantity not in quantities:
         expected = " or ".join(repr(q) for q in quantities)
         msg = f"Unknown field quantity {quantity!r}; expected {expected}."
@@ -603,7 +601,7 @@ def _render_iso16283(
                 "impact_insulation() so they are populated."
             )
             raise ValueError(msg)
-    if kind == "ImpactInsulationResult":
+    if isinstance(result, ImpactInsulationResult):
         rating: WeightedRatingResult | ImpactRatingResult = weighted_impact_rating(
             curve
         )
@@ -649,9 +647,7 @@ def _render_iso16283_facade(
     from ..._i18n import check_language
 
     check_language(language)
-    if engine != "reportlab":
-        msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-        raise ValueError(msg)
+    check_engine(engine)
     if quantity not in _FACADE_FIELD_QUANTITIES:
         expected = " or ".join(repr(q) for q in _FACADE_FIELD_QUANTITIES)
         msg = f"Unknown facade quantity {quantity!r}; expected {expected}."

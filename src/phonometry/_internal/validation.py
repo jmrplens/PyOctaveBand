@@ -76,6 +76,25 @@ def require_choice(value: str, name: str, options: tuple[str, ...]) -> str:
     return value
 
 
+def check_engine(engine: str) -> None:
+    """Require *engine* to name the one report engine there is.
+
+    The counterpart of :func:`phonometry._i18n.check_language` for the
+    ``engine`` parameter every ``report`` entry point takes. A single-choice
+    check reads oddly until the choice is seen for what it is: ``"reportlab"``
+    is the only engine today, and the parameter is the seam a second engine
+    would arrive through. Gating it here keeps every entry point rejecting the
+    same way, with one message to update when that day comes.
+
+    :param engine: The requested report engine.
+    :raises ValueError: for any value other than ``"reportlab"``.
+    """
+    if engine == "reportlab":
+        return
+    msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
+    raise ValueError(msg)
+
+
 def require_positive_array(x: ArrayLike, name: str) -> np.ndarray:
     """Coerce *x* to a 1-D float64 array of strictly positive, finite values.
 

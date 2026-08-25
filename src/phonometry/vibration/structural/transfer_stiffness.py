@@ -68,6 +68,7 @@ if TYPE_CHECKING:
 
 
 from ..._internal.validation import (
+    check_engine,
     require_non_negative,
     require_positive,
     require_ranks,
@@ -445,9 +446,7 @@ class TransferStiffnessResult:
         from ..._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from ..._report.iso10846 import render_transfer_stiffness_report
 
         return render_transfer_stiffness_report(

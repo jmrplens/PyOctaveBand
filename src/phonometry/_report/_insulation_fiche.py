@@ -80,7 +80,7 @@ def single_number_statement(
             f"{rating_symbol} (C<sub>I</sub>) = "
             f"<b>{impact.rating} ({impact.ci:+d}) dB</b>"
         )
-    airborne = cast("WeightedRatingResult", rating)
+    airborne = rating
     return (
         f"{rating_symbol} (C; C<sub>tr</sub>) = "
         f"<b>{airborne.rating} ({airborne.c:+d}; {airborne.ctr:+d}) dB</b>"

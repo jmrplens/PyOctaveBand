@@ -55,6 +55,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ..._internal.validation import (
+    check_engine,
     require_equal_shapes,
     require_ranks,
     require_same_length,
@@ -338,9 +339,7 @@ def _render_iso10140(
     from ..._i18n import check_language
 
     check_language(language)
-    if engine != "reportlab":
-        msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-        raise ValueError(msg)
+    check_engine(engine)
     rating = result.rating
     if rating is None:
         msg = (

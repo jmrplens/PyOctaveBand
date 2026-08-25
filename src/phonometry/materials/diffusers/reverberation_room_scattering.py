@@ -32,7 +32,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_equal_shapes
+from ..._internal.validation import check_engine, require_equal_shapes
 from ..._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -440,9 +440,7 @@ class ScatteringResult:
         from ..._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from ..._report.iso17497 import render_scattering_report
 
         return render_scattering_report(

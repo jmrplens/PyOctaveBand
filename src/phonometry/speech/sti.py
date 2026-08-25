@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 from scipy import signal
 
 from .._internal.utils import _typesignal
-from .._internal.validation import require_ranks, require_same_length
+from .._internal.validation import check_engine, require_ranks, require_same_length
 from .._internal.warnings import PhonometryWarning
 from ..filters.core import OctaveFilterBank
 from ..filters.frequencies import nominal_frequencies
@@ -194,9 +194,7 @@ class STIResult:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from .._report.sti import render_sti_report
 
         return render_sti_report(

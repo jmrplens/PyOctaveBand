@@ -49,6 +49,7 @@ from .._internal.validation import (
 )
 from .airport_noise import (
     AerodromeAtmosphere,
+    EventMetric,
     FlightSegmentState,
     FlyoverResult,
     NoiseContourResult,
@@ -337,7 +338,7 @@ class AnpAircraft:
         operation: str,
         *,
         stage_length: int = 1,
-        metric: str = "exposure",
+        metric: EventMetric = "exposure",
         temperature: float = 15.0,
         pressure: float = 101.325,
     ) -> FlyoverResult:
@@ -359,7 +360,7 @@ class AnpAircraft:
         x: NDArray[np.float64] | list[float],
         y: NDArray[np.float64] | list[float],
         stage_length: int = 1,
-        metric: str = "exposure",
+        metric: EventMetric = "exposure",
         temperature: float = 15.0,
         pressure: float = 101.325,
     ) -> NoiseContourResult:
@@ -598,7 +599,7 @@ class AnpDatabase:
         operation: str,
         *,
         stage_length: int = 1,
-        metric: str = "exposure",
+        metric: EventMetric = "exposure",
         temperature: float = 15.0,
         pressure: float = 101.325,
     ) -> FlyoverResult:
@@ -642,7 +643,7 @@ class AnpDatabase:
         x: NDArray[np.float64] | list[float],
         y: NDArray[np.float64] | list[float],
         stage_length: int = 1,
-        metric: str = "exposure",
+        metric: EventMetric = "exposure",
         temperature: float = 15.0,
         pressure: float = 101.325,
     ) -> NoiseContourResult:

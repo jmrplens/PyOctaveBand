@@ -48,7 +48,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import check_engine, require_ranks, require_same_length
 from .air_absorption import air_attenuation
 
 if TYPE_CHECKING:
@@ -392,9 +392,7 @@ class OutdoorAttenuation:
         from ..._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from ..._report.iso9613 import render_outdoor_attenuation_report
 
         return render_outdoor_attenuation_report(

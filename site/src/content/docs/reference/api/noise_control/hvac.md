@@ -606,7 +606,7 @@ in dB re 1e-12 W (VDI 2081-1), for airflow speed `U` in a duct of area
 HvacSpectrumResult(
     frequencies: np.ndarray,
     values: np.ndarray,
-    quantity: str,
+    quantity: HvacQuantity,
     label: str,
 )
 ```

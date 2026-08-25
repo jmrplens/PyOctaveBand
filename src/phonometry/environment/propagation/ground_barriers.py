@@ -105,7 +105,11 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from scipy.special import fresnel, wofz
 
-from ..._internal.validation import require_positive, require_positive_array
+from ..._internal.validation import (
+    check_engine,
+    require_positive,
+    require_positive_array,
+)
 from ...materials.absorbers.porous import delany_bazley, miki
 
 if TYPE_CHECKING:
@@ -709,9 +713,7 @@ class BarrierInsertionLoss:
         from ..._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from ..._report.iso9613 import render_barrier_insertion_loss_report
 
         return render_barrier_insertion_loss_report(

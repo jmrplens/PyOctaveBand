@@ -54,6 +54,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from .._internal.validation import (
+    check_engine,
     require_axis_count,
     require_equal_counts,
     require_ranks,
@@ -423,9 +424,7 @@ class DuctPathResult:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from .._report.duct_path import render_duct_path_report
 
         return render_duct_path_report(

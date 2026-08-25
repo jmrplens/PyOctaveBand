@@ -28,6 +28,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from .._internal.validation import (
+    check_engine,
     require_equal_shapes,
     require_ranks,
     require_same_length,
@@ -617,9 +618,7 @@ class EPNLResult:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from .._report.annex16_epnl import render_annex16_epnl_report
 
         return render_annex16_epnl_report(

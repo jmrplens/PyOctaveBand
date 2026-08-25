@@ -32,7 +32,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_equal_counts, require_equal_shapes
+from ..._internal.validation import (
+    check_engine,
+    require_equal_counts,
+    require_equal_shapes,
+)
 from .reverberation_room_scattering import _positive_scalar
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -136,9 +140,7 @@ class DiffusionResult:
         from ..._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from ..._report.iso17497 import render_diffusion_polar_report
 
         return render_diffusion_polar_report(
@@ -229,9 +231,7 @@ class DiffusionSpectrum:
         from ..._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from ..._report.iso17497 import render_diffusion_spectrum_report
 
         return render_diffusion_spectrum_report(

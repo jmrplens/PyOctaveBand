@@ -60,6 +60,7 @@ if TYPE_CHECKING:
 
 
 from .._internal.validation import (
+    check_engine,
     require_equal_shapes,
     require_positive,
     require_ranks,
@@ -405,9 +406,7 @@ class VibrationSoundPowerResult:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from .._report.iso7849 import render_vibration_power_report
 
         return render_vibration_power_report(

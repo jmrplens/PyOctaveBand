@@ -224,7 +224,7 @@ ImpactRatingResult(
     band_centers: np.ndarray | None = None,
     measured: np.ndarray | None = None,
     shifted_reference: np.ndarray | None = None,
-    quantity: str = 'impact',
+    quantity: Literal['impact'] = 'impact',
 )
 ```
 
@@ -509,7 +509,7 @@ WeightedRatingResult(
     band_centers: np.ndarray | None = None,
     measured: np.ndarray | None = None,
     shifted_reference: np.ndarray | None = None,
-    quantity: str = 'airborne',
+    quantity: RatingQuantity = 'airborne',
 )
 ```
 

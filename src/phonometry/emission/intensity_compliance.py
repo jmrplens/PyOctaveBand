@@ -68,6 +68,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from .._internal.validation import (
+    check_engine,
     require_equal_counts,
     require_ranks,
     require_same_length,
@@ -553,9 +554,7 @@ class IntensityInstrumentComplianceResult:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from .._report.iec61043 import render_iec61043_report
 
         return render_iec61043_report(

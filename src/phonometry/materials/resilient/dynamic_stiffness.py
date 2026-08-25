@@ -79,7 +79,7 @@ if TYPE_CHECKING:
 
 
 from ..._internal.types import as_float_or_array
-from ..._internal.validation import require_positive
+from ..._internal.validation import check_engine, require_positive
 from ..._internal.warnings import PhonometryWarning
 
 # ---------------------------------------------------------------------------
@@ -348,9 +348,7 @@ class DynamicStiffnessResult:
         from ..._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from ..._report.iso9052 import render_dynamic_stiffness_report
 
         return render_dynamic_stiffness_report(

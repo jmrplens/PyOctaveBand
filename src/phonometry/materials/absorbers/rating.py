@@ -55,6 +55,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ..._internal.validation import (
+    check_engine,
     require_axis_count,
     require_equal_counts,
     require_ranks,
@@ -408,9 +409,7 @@ class AbsorptionRatingResult:
         from ..._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from ..._report.iso11654 import render_iso11654_report
 
         return render_iso11654_report(

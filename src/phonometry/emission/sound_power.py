@@ -55,7 +55,7 @@ import numpy as np
 
 from .._internal.levels_math import energy_mean, energy_sum
 from .._internal.types import as_float_or_array
-from .._internal.validation import require_ranks, require_same_length
+from .._internal.validation import check_engine, require_ranks, require_same_length
 from ._shared import (
     _S0,
     Grade,
@@ -331,9 +331,7 @@ class SoundPowerResult:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from .._report.iso3744 import render_sound_power_report
 
         return render_sound_power_report(

@@ -144,7 +144,7 @@ def _labels(
         statement = f"{sym} (C<sub>I</sub>) = <b>{impact.rating} ({impact.ci:d}) dB</b>"
         value_header = _band_symbol_markup(symbol) if symbol else "L<sub>n</sub>"
     else:
-        airborne = cast("WeightedRatingResult", result)
+        airborne = result
         title = t("Airborne sound insulation rating", language)
         rating_part = "ISO 717-1"
         sym = _symbol_markup(symbol if symbol is not None else "Rw")
