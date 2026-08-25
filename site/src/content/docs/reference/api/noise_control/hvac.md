@@ -789,9 +789,15 @@ with the wavelength; it underpredicts the low-frequency loss by 5-10 dB.
 | `line_of_sight` | Straight-line inlet-to-outlet distance `r`, m. |
 | `wall_area` | Total internal wall area `S_\mathrm{w}`, m2. |
 | `mean_absorption` | Mean Sabine wall absorption `alpha` in `(0, 1)` (scalar or per-band). |
-| `angle` | Angle `theta` between the inlet axis and the line to the outlet, rad (default 0). |
+| `angle` | Angle `theta` between the inlet axis and the line to the outlet, in `[0, pi/2]` rad (default 0). |
 
 **Returns:** The transmission loss, dB (float for scalar absorption, else a per-band array).
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If a dimension is not positive, `mean_absorption` leaves `(0, 1)` or `angle` leaves `[0, pi/2]`. |
 
 ## plot_plenum_geometry
 

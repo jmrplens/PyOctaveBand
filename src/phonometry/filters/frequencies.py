@@ -8,6 +8,7 @@ from functools import lru_cache
 
 import numpy as np
 
+from .._internal.validation import require_positive
 from .._internal.warnings import PhonometryWarning
 
 # IEC 61260-1 Annex E.3: a most-significant digit of 1-4 keeps three
@@ -37,7 +38,12 @@ def nominal_frequencies(
     :param fraction: Bandwidth fraction (e.g., 1, 3).
     :param limits: [f_min, f_max] limits.
     :return: Tuple of (center_freqs, lower_edges, upper_edges, nominal_labels).
+    :raises ValueError: for a non-positive or non-finite ``fraction``.
     """
+    # Zero used to reach _bandedge's division, NaN the index rounding, and a
+    # negative fraction never terminated: the band centres underflow to 0.0
+    # and the edge test stays true forever.
+    fraction = require_positive(fraction, "fraction")
     if limits is None:
         limits = [12, 20000]
 

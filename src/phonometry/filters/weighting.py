@@ -53,6 +53,7 @@ import numpy as np
 from scipy import signal
 
 from .._internal.utils import _sos_initial_state, _sos_state_mismatch
+from .._internal.validation import require_positive
 from ..io._resolve import (
     like_input,
     refuse_foreign_rate,
@@ -65,7 +66,7 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import DTypeLike
 
-#: Rejection message shared by the three entry points that take ``fs``.
+#: Rejection message shared by the four entry points that take ``fs``.
 _FS_POSITIVE = "Sample rate 'fs' must be positive."
 
 try:
@@ -74,6 +75,24 @@ except ImportError:  # pragma: no cover - depends on install extras
     # unused-ignore: with numba absent its import is Any and the ignore is
     # unnecessary; with numba installed the assignment needs it.
     _numba_jit = None  # type: ignore[assignment, unused-ignore]
+
+
+def _require_str(value: object, name: str) -> str:
+    """Require *value* to be a string before any case folding touches it.
+
+    The choice checks in this module fold case first (``curve.upper()``,
+    ``mode.lower()``), so a non-string used to die in the stdlib's attribute
+    lookup before the module's own message could name the parameter.
+
+    :param value: The value to validate.
+    :param name: Parameter name used in the error message.
+    :return: The validated string.
+    :raises TypeError: for a non-string value.
+    """
+    if not isinstance(value, str):
+        msg = f"'{name}' must be a string; got {type(value).__name__}."
+        raise TypeError(msg)
+    return value
 
 
 class WeightingFilter:
@@ -127,6 +146,7 @@ class WeightingFilter:
         """
         if fs <= 0:
             raise ValueError(_FS_POSITIVE)
+        curve = _require_str(curve, "curve")
         if high_accuracy is None:
             high_accuracy = not stateful
         if high_accuracy and stateful:
@@ -639,7 +659,13 @@ def _prepare_time_weighting_initial_state(
             return np.asarray(np.take(x_sq, 0, axis=-1), dtype=x_sq.dtype).copy()
         raise ValueError(invalid_initial_state_message)
 
-    state = np.asarray(initial_state, dtype=x_sq.dtype)
+    try:
+        state = np.asarray(initial_state, dtype=x_sq.dtype)
+    except (TypeError, ValueError):
+        # numpy refuses an object with TypeError and an unconvertible string
+        # array with ValueError; neither message names the parameter or the
+        # accepted forms, so both become the module's own TypeError.
+        raise TypeError(invalid_initial_state_message) from None
     if state.shape == ():
         return np.full(state_shape, state.item(), dtype=x_sq.dtype)
 
@@ -725,6 +751,7 @@ def time_weighting(
     x_proc = resolve_samples(x)
     if fs <= 0:
         raise ValueError(_FS_POSITIVE)
+    mode = _require_str(mode, "mode")
     x_sq = x_proc**2
     initial = _prepare_time_weighting_initial_state(x_sq, initial_state)
 
@@ -776,6 +803,7 @@ class TimeWeighting:
         """
         if fs <= 0:
             raise ValueError(_FS_POSITIVE)
+        mode = _require_str(mode, "mode")
         if mode.lower() not in ("fast", "slow", "impulse"):
             msg = "Invalid time weighting mode. Use ['fast', 'slow', 'impulse']"
             raise ValueError(msg)
@@ -854,13 +882,27 @@ def linkwitz_riley(
     """
     fs = resolve_fs(x, fs)
     x_proc = resolve_samples(x)
+    if fs <= 0:
+        raise ValueError(_FS_POSITIVE)
     if order % 2 != 0:
         msg = "Linkwitz-Riley order must be even (typically 2 or 4)."
+        raise ValueError(msg)
+    if order <= 0:
+        # An even order of zero slipped through the parity check and returned
+        # both bands as the untouched input (their sum is twice the signal).
+        msg = (
+            f"'order' must be a positive even integer (typically 2 or 4); got {order}."
+        )
+        raise ValueError(msg)
+    freq = require_positive(freq, "freq")
+    nyquist = fs / 2
+    if freq >= nyquist:
+        msg = f"'freq' must be below the Nyquist frequency ({nyquist:g} Hz); got {freq:g}."
         raise ValueError(msg)
 
     # A Linkwitz-Riley filter of order N is two Butterworth filters of order N/2 in series
     half_order = order // 2
-    wn = freq / (fs / 2)
+    wn = freq / nyquist
 
     sos_lp = signal.butter(half_order, wn, btype="low", output="sos")
     sos_hp = signal.butter(half_order, wn, btype="high", output="sos")

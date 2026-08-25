@@ -91,7 +91,7 @@ impulses [`image_source_rir`](/phonometry/reference/api/rooms/image-source/#imag
 
 | Name | Description |
 | :--- | :--- |
-| `max_order` | Reflection-order cut-off `i0` (non-negative). |
+| `max_order` | Reflection-order cut-off `i0` (non-negative integer). |
 
 **Returns:** The audible image count.
 
@@ -154,7 +154,7 @@ reproduces the Eyring reverberation time of the room (Kuttruff Equation
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | for a non-positive dimension/sample-rate, a source/receiver outside the room, an absorption outside `[0, 1]` or of an unsupported shape, a negative `air_attenuation`, or a `frequencies` length that does not match the band count. |
+| ValueError | for a `dimensions` that is not three positive lengths, a non-positive sample rate, a non-integer or negative `max_order`, a source/receiver outside the room, an absorption outside `[0, 1]` or of an unsupported shape, a negative `air_attenuation`, or a `frequencies` length that does not match the band count. |
 
 ## ImageSourceResult
 

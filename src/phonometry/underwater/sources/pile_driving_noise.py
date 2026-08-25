@@ -261,10 +261,19 @@ def strike_sel_spectrum(
     fs = resolve_fs(pressure, fs, name="pressure")
     sig = _validate_pressure(pressure, min_samples=2)
     fs_v = _positive(fs, "fs")
-    if int(fraction) not in (1, 3):
+    # The value the caller passed, not its truncation: int() would silently
+    # turn 3.9 into one-third octaves and 1.4 into octaves.
+    if fraction not in (1, 3):
         msg = "'fraction' must be 1 (octave) or 3 (one-third octave)."
         raise ValueError(msg)
-    lo, hi = (float(limits[0]), float(limits[1]))
+    # Unpacking rejects the short, the over-long and the non-iterable in one
+    # move, where indexing would escape as an IndexError or TypeError that
+    # names nothing and a third element would be silently ignored.
+    try:
+        lo, hi = (float(v) for v in limits)
+    except (TypeError, ValueError):
+        msg = "'limits' must be a (lower, upper) pair of frequencies in Hz."
+        raise ValueError(msg) from None
     if not (np.isfinite(lo) and np.isfinite(hi)) or not (0.0 < lo < hi):
         msg = "'limits' must be a finite, increasing, positive pair."
         raise ValueError(msg)

@@ -13,6 +13,18 @@ from phonometry.filters.frequencies import (
     nominal_frequencies,
 )
 
+# --- nominal_frequencies ---
+
+
+@pytest.mark.parametrize("fraction", [0, -1, float("nan")])
+def test_nominal_frequencies_rejects_non_positive_fraction(fraction: float) -> None:
+    """Zero used to divide by zero, NaN to die in index rounding, and a
+    negative fraction never terminated (the band centres underflow to 0.0).
+    """
+    with pytest.raises(ValueError, match="'fraction' must be positive"):
+        nominal_frequencies(fraction)
+
+
 # --- _iec_e3_round ---
 
 

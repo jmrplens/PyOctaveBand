@@ -16,6 +16,7 @@ from .._internal.utils import (
     _downsamplingfactor,
     _resample_to_length,
 )
+from .._internal.validation import require_choice, require_positive
 from .._internal.warnings import PhonometryWarning
 from ..io._resolve import (
     like_input,
@@ -158,6 +159,72 @@ def _validate_bank_design(
         msg = "Resampling and stateful behaviour (block processing) are not supported."
         raise ValueError(msg)
     return limits
+
+
+def _require_level_mode(mode: str) -> str:
+    """Check ``mode`` at the entry point the caller typed.
+
+    ``_calculate_level`` inspects the mode band by band, after the filtering
+    work is done and only when levels are computed at all, so a typo used to
+    surface late or, with ``calculate_level=False``, not at all. Lowercasing
+    before the membership check preserves the case-insensitivity the level
+    calculation always had.
+
+    :param mode: The requested level mode.
+    :return: The validated mode, lowercased.
+    :raises TypeError: for a non-string mode.
+    :raises ValueError: for a string that is neither ``'rms'`` nor ``'peak'``.
+    """
+    if not isinstance(mode, str):
+        msg = f"'mode' must be a string; got {type(mode).__name__}."
+        raise TypeError(msg)
+    return require_choice(mode.lower(), "mode", ("rms", "peak"))
+
+
+def _require_bank_input(x_proc: np.ndarray) -> None:
+    """Reject shapes the bank has no reading for, naming ``x``.
+
+    The shared ``require_1d_signal`` cannot be used here: this bank documents
+    2-D ``[channels, samples]`` input as legal. Anything beyond that used to
+    travel on and die in numpy broadcasting (or come back silently truncated
+    with ``sigbands=True``), and an empty signal reached scipy's ``sosfilt``
+    reshape after numpy had already warned about detrending an empty slice.
+
+    :param x_proc: The input, already resolved to an array (at least 1-D:
+        ``resolve_samples`` promotes a bare scalar).
+    :raises ValueError: for an array of more than two axes, or an input with
+        no samples.
+    """
+    if x_proc.ndim > 2:  # noqa: PLR2004
+        msg = (
+            "'x' must be a 1-D signal or a 2-D [channels, samples] array; "
+            f"got shape {x_proc.shape}."
+        )
+        raise ValueError(msg)
+    if x_proc.shape[-1] == 0:
+        msg = "'x' must contain at least one sample."
+        raise ValueError(msg)
+
+
+def _resolve_limits(limits: list[float] | None) -> list[float] | None:
+    """Check ``limits`` is a pair of numbers before it is hashed or compared.
+
+    The bank constructor owns the value checks (count, positivity, ordering,
+    and the default when ``None``); this rejects only the shapes those checks
+    would die on anonymously, in the cache key's ``float()`` coercion or in
+    ``len()``: a non-sequence, or a non-numeric entry.
+
+    :param limits: The requested frequency limits, or ``None`` for the default.
+    :return: The limits as a list of floats, or ``None``.
+    :raises ValueError: for a non-sequence or a non-numeric entry.
+    """
+    if limits is None:
+        return None
+    try:
+        return [float(f) for f in limits]
+    except (TypeError, ValueError):
+        msg = f"'limits' must be a pair of frequencies [f_min, f_max]; got {limits!r}."
+        raise ValueError(msg) from None
 
 
 class OctaveFilterBank:
@@ -416,6 +483,7 @@ class OctaveFilterBank:
         if zero_phase and self.stateful:
             msg = "zero_phase is not compatible with stateful processing."
             raise ValueError(msg)
+        mode = _require_level_mode(mode)
 
         x_proc, is_multichannel = self._prepare_signal(x, detrend)
         num_channels = x_proc.shape[0]
@@ -476,6 +544,7 @@ class OctaveFilterBank:
         """
         refuse_foreign_rate(x, self.fs, "filter bank")
         x_proc = resolve_samples(x, calibrate=self._default_calibration)
+        _require_bank_input(x_proc)
 
         if detrend:
             if self.stateful:
@@ -528,9 +597,12 @@ class OctaveFilterBank:
         if not 0 <= overlap < 1:
             msg = "overlap must be in [0, 1)."
             raise ValueError(msg)
+        mode = _require_level_mode(mode)
+        window_time = require_positive(window_time, "window_time")
 
         refuse_foreign_rate(x, self.fs, "filter bank")
         x_proc = resolve_samples(x, calibrate=self._default_calibration)
+        _require_bank_input(x_proc)
         is_multichannel = x_proc.ndim > 1
         n_samples = x_proc.shape[-1]
         win = round(window_time * self.fs)
@@ -844,6 +916,11 @@ def octave_filter(
         Tuple[np.ndarray, List[str], List[np.ndarray]]]
     """
     fs = resolve_fs(x, fs)
+    # Both branches see the same already-checked pair: without this, a
+    # malformed limits argument died in the cache key's float() coercion on
+    # one branch and in the constructor's len() on the other, with two
+    # different stdlib messages and neither naming 'limits'.
+    limits = _resolve_limits(limits)
     if response_plot.show or response_plot.file:
         # Plotting has side effects: bypass the cache.
         filter_bank = OctaveFilterBank(
@@ -857,12 +934,11 @@ def octave_filter(
         )
     else:
         # The bank is immutable in non-stateful mode: reuse the design.
-        # Pass limits through as-is (tuple for hashability); the bank
-        # constructor is the single place that validates them and owns
-        # the default when None. The option bundles are frozen dataclasses,
-        # so they are hashable and compare by value: equal options hit the
-        # same cache entry.
-        limits_key = tuple(map(float, limits)) if limits is not None else None
+        # Pass limits through (tuple for hashability); the bank constructor
+        # still owns the value checks and the default when None. The option
+        # bundles are frozen dataclasses, so they are hashable and compare
+        # by value: equal options hit the same cache entry.
+        limits_key = tuple(limits) if limits is not None else None
         filter_bank = _cached_filter_bank(
             fs, fraction, order, limits_key, design, calibration
         )

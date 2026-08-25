@@ -48,6 +48,7 @@ from numpy.typing import ArrayLike, NDArray
 
 from .._internal.validation import (
     require_equal_counts,
+    require_positive,
     require_ranks,
     require_same_length,
 )
@@ -260,6 +261,17 @@ class PlaneWaveSource:
     offset: int = 0
     amplitude: float = 1.0
 
+    def __post_init__(self) -> None:
+        """Require a callable ``waveform`` and a finite ``amplitude``.
+
+        ``direction`` and ``offset`` are checked against the grid in
+        :meth:`FDTD2D.add_source`, which is the first place a grid exists.
+        """
+        if not callable(self.waveform):
+            msg = "waveform must be callable"
+            raise ValueError(msg)  # noqa: TRY004 - ValueError keeps the module validation errors uniform
+        _finite("amplitude", self.amplitude)
+
 
 Source = GaussianPulse | CWSource | SignalSource
 
@@ -410,9 +422,21 @@ def _validated_obstacle(
 
 def _resolve_c_map(c: float | Field2D, shape: tuple[int, int] | None) -> Field2D:
     """Broadcast/validate the sound-speed spec into a positive 2D map."""
+    if np.iscomplexobj(c):
+        msg = "c must be real; a complex sound speed is not supported"
+        raise ValueError(msg)
     if np.isscalar(c):
         if shape is None:
             msg = "shape is required when c is a scalar"
+            raise ValueError(msg)
+        valid = isinstance(shape, (tuple, list)) and len(shape) == 2  # noqa: PLR2004
+        if valid:
+            valid = all(
+                not isinstance(n, bool) and isinstance(n, (int, np.integer)) and n >= 1
+                for n in shape
+            )
+        if not valid:
+            msg = f"shape must be a pair of positive integers (ny, nx); got {shape!r}"
             raise ValueError(msg)
         c_map = np.full(shape, float(np.real(c)), dtype=np.float64)
     else:
@@ -426,6 +450,9 @@ def _resolve_c_map(c: float | Field2D, shape: tuple[int, int] | None) -> Field2D
 
 def _resolve_rho_map(rho: float | Field2D, ny: int, nx: int) -> Field2D:
     """Broadcast/validate the density spec into a positive ``(ny, nx)`` map."""
+    if np.iscomplexobj(rho):
+        msg = "rho must be real; a complex density is not supported"
+        raise ValueError(msg)
     rho_map = (
         np.full((ny, nx), float(np.real(rho)), dtype=np.float64)
         if np.isscalar(rho)
@@ -929,18 +956,18 @@ class FDTD2D:
         :param amplitude: Peak pressure of the envelope, in pascals.
         :param wavelength: Optional carrier wavelength, in metres; ``None``
             gives the pure Gaussian pulse.
-        :raises ValueError: For an unknown direction or non-positive
-            ``width``/``wavelength``.
+        :raises ValueError: For an unknown direction, a non-positive or
+            non-finite ``width``/``wavelength``, or a non-finite
+            ``center``/``amplitude``.
         """
         if direction not in _SIDE_TRAVEL:
             msg = "'direction' must be 'down', 'up', 'left' or 'right'."
             raise ValueError(msg)
-        if width <= 0.0:
-            msg = "'width' must be positive."
-            raise ValueError(msg)
-        if wavelength is not None and wavelength <= 0.0:
-            msg = "'wavelength' must be positive."
-            raise ValueError(msg)
+        width = require_positive(width, "width")
+        if wavelength is not None:
+            wavelength = require_positive(wavelength, "wavelength")
+        center = _finite("center", center)
+        amplitude = _finite("amplitude", amplitude)
 
         def profile(coord: NDArray[np.floating]) -> NDArray[np.float64]:
             envelope = amplitude * np.exp(-(((coord - center) / width) ** 2))
@@ -1362,7 +1389,12 @@ def _probe_indices(
     """Validate the probe cells into an ``(n_probes, 2)`` index array."""
     ny, nx = shape
     probe_ix = np.zeros((len(probes), 2), dtype=np.int_)
-    for k, (ix, iy) in enumerate(probes):
+    for k, entry in enumerate(probes):
+        try:
+            ix, iy = entry
+        except (TypeError, ValueError):
+            msg = f"probes must hold (ix, iy) index pairs; entry {k} is {entry!r}"
+            raise ValueError(msg) from None
         ix = _integer("probe ix", ix)
         iy = _integer("probe iy", iy)
         if not (0 <= ix < nx and 0 <= iy < ny):

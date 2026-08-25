@@ -216,7 +216,7 @@ with-specimen climates differ.
 | `volume` | Reverberation-room volume `V`, in cubic metres. A volume below the 150 m3 minimum of clause 6.1.1 emits an advisory [`AbsorptionWarning`](/phonometry/reference/api/materials/sound-absorption/#absorptionwarning). |
 | `area` | Area `S` covered by the test specimen, in square metres. An area outside the clause 6.2.1.1 range (10 m2 to 12 m2, upper limit scaled by $(V/200)^{2/3}$ for $V > 200$ m3) emits an advisory [`AbsorptionWarning`](/phonometry/reference/api/materials/sound-absorption/#absorptionwarning). |
 | `temperature` | Air temperature during the test, in degrees Celsius (default 20). Used for the speed of sound via Eq. (6) unless `speed_of_sound` is given; a temperature outside 15..30 degC emits an [`AbsorptionWarning`](/phonometry/reference/api/materials/sound-absorption/#absorptionwarning). |
-| `humidity` | Relative humidity during the test, in % (informational; recorded on the result but not used in the computation, which sees the climate only through `m`). `None` leaves it unrecorded. |
+| `humidity` | Relative humidity during the test, in % within `[0, 100]` (informational; recorded on the result but not used in the computation, which sees the climate only through `m`). `None` leaves it unrecorded. |
 | `speed_of_sound` | Explicit speed of sound `c`, in m/s; overrides `temperature` and Eq. (6) when supplied. |
 | `m` | Power attenuation coefficient of air `m`, in 1/m (a scalar or a per-band array matching `frequencies`; default 0, i.e. no air correction). Obtain it from an ISO 9613-1 attenuation coefficient with [`attenuation_from_alpha`](/phonometry/reference/api/materials/sound-absorption/#attenuation_from_alpha). |
 
@@ -226,7 +226,7 @@ with-specimen climates differ.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If the frequency and reverberation-time arrays do not share one shape, or an input is non-physical (see [`absorption_coefficient`](/phonometry/reference/api/materials/sound-absorption/#absorption_coefficient)). |
+| ValueError | If the frequency and reverberation-time arrays do not share one shape, `humidity` is not within `[0, 100]` %, or an input is non-physical (see [`absorption_coefficient`](/phonometry/reference/api/materials/sound-absorption/#absorption_coefficient)). |
 
 ## SoundAbsorptionMeasurement
 

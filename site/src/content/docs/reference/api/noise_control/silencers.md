@@ -121,6 +121,12 @@ outlet), broadcast over the frequency axis.
 
 **Returns:** The compound `(n_freq, 2, 2)` array.
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If a matrix is not a `(n_freq, 2, 2)` array or the matrices disagree on `n_freq`. |
+
 ## duct_matrix
 
 ```python
@@ -344,6 +350,12 @@ $$
 | `radiation_impedance` | Termination/radiation acoustic impedance `Z_r`, Pa s/m3 (scalar or per-frequency). |
 
 **Returns:** The insertion loss per frequency, dB.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If an impedance is neither a scalar nor one value per analysis frequency. |
 
 ## plot_silencer_geometry
 

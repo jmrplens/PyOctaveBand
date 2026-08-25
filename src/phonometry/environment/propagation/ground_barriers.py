@@ -494,8 +494,18 @@ def kurze_anderson_attenuation(fresnel_number: ArrayLike) -> Real:
 
     :param fresnel_number: Fresnel number ``N`` (scalar or array).
     :return: Attenuation ``Delta``, in decibels (>= 0), matching the input shape.
+    :raises ValueError: for a non-numeric or non-finite ``fresnel_number``.
     """
-    n = np.asarray(fresnel_number, dtype=np.float64)
+    try:
+        n = np.asarray(fresnel_number, dtype=np.float64)
+    except (TypeError, ValueError) as exc:
+        msg = "'fresnel_number' must be numeric."
+        raise ValueError(msg) from exc
+    # A NaN would pass through the closed form and come back as a NaN
+    # "attenuation", silently breaking the documented >= 0 dB contract.
+    if not np.all(np.isfinite(n)):
+        msg = "'fresnel_number' must contain only finite values."
+        raise ValueError(msg)
     # The formula is only meaningful for N > -0.2 (the illuminated-zone limit of
     # Maekawa's curve); beyond it the diffraction is negligible (0 dB), so the
     # intermediate argument is clipped at -0.2 to keep it clear of the tangent
@@ -733,12 +743,24 @@ def _validate_barrier_geometry(
 
     :return: The validated ``thickness`` (positive and finite) or ``None`` for a
         thin screen.
-    :raises ValueError: on a non-positive/ordered geometry, a barrier below the
-        line of sight, or a thick barrier whose far edge reaches the receiver.
+    :raises ValueError: on a non-positive or non-finite distance, a non-finite
+        height, a mis-ordered geometry, a barrier below the line of sight, or a
+        thick barrier whose far edge reaches the receiver.
     """
-    if barrier_distance <= 0.0 or receiver_distance <= 0.0:
-        msg = "Barrier and receiver distances must be positive."
-        raise ValueError(msg)
+    # require_positive rejects NaN/inf as well as non-positive distances and
+    # names the one that was wrong; a NaN height would sail through the
+    # ordering comparisons below (every comparison against NaN is False) and
+    # come back from the diffraction maths as an all-NaN insertion loss.
+    require_positive(barrier_distance, "barrier_distance")
+    require_positive(receiver_distance, "receiver_distance")
+    for name, height in (
+        ("source_height", source_height),
+        ("barrier_height", barrier_height),
+        ("receiver_height", receiver_height),
+    ):
+        if not np.isfinite(height):
+            msg = f"'{name}' must be finite."
+            raise ValueError(msg)
     if receiver_distance <= barrier_distance:
         msg = "'receiver_distance' must exceed 'barrier_distance'."
         raise ValueError(msg)

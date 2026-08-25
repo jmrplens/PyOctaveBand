@@ -29,6 +29,12 @@ Calculate frequencies according to ANSI/IEC standards.
 
 **Returns:** Tuple of (center_freqs, lower_edges, upper_edges, nominal_labels).
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a non-positive or non-finite `fraction`. |
+
 ## normalized_frequencies
 
 ```python

@@ -382,6 +382,23 @@ def test_plot_rejects_unknown_quantity_and_missing_data() -> None:
         bare.plot(quantity="impedance")
 
 
+def test_plot_rejects_a_cartesian_axes_for_the_polar_quantity() -> None:
+    """A supplied non-polar axes is refused by name for ``directivity``.
+
+    The datasheet polar drawer calls polar-only methods, so a plain axes
+    used to die in matplotlib's AttributeError naming neither parameter.
+    """
+    matplotlib = pytest.importorskip("matplotlib")
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    result = _example_result()
+    _fig, cartesian = plt.subplots()
+    with pytest.raises(ValueError, match="'ax' must be a polar axes"):
+        result.plot(quantity="directivity", ax=cartesian)
+    plt.close("all")
+
+
 def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     result = _example_result()

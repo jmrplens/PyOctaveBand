@@ -351,7 +351,18 @@ def _background_corrected_mean(
         k1i, clamped = _k1_eq14(arr - bg, frequencies)
         corrected = energy_mean(arr - k1i, axis=0)
     else:
-        k1, clamped = _k1_eq14(raw_mean - _mean_level(background_levels), frequencies)
+        bg_mean = _mean_level(background_levels)
+        # The per-position branch's check, one axis down: a spectrum of the
+        # wrong band count used to die in the subtraction below with numpy's
+        # two-shape message, which names neither the argument nor the function.
+        if bg_mean.shape != raw_mean.shape:
+            msg = (
+                "'background_levels' must carry one value per band "
+                f"({raw_mean.size} in 'levels'); got shape "
+                f"{np.shape(background_levels)}."
+            )
+            raise ValueError(msg)
+        k1, clamped = _k1_eq14(raw_mean - bg_mean, frequencies)
         corrected = raw_mean - k1
     if clamped:
         warnings.warn(

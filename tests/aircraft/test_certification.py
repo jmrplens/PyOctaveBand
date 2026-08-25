@@ -191,6 +191,30 @@ def test_tone_correction_none_when_flat() -> None:
     assert tone_correction(np.full(24, 60.0)) == 0.0
 
 
+def test_tone_correction_start_band_must_be_an_integral_index() -> None:
+    """A non-integral or out-of-range start band is refused by name.
+
+    An integral float carries the same band index and is taken; 2.9 must not
+    be silently truncated to band 2, and a value int() cannot digest must not
+    surface as the builtin's own error.
+    """
+    spl = np.full(24, 70.0)
+    with pytest.raises(ValueError, match="'start_band' must be an integer"):
+        tone_correction(spl, start_band=2.9)
+    with pytest.raises(ValueError, match="'start_band' must be an integer"):
+        tone_correction(spl, start_band=None)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="'start_band' must be an integer"):
+        tone_correction(spl, start_band="aeroplane")  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="'start_band' must be an integer"):
+        tone_correction(spl, start_band=-0.4)
+    with pytest.raises(ValueError, match="'start_band' must be an integer"):
+        tone_correction(spl, start_band=4)
+    assert tone_correction(spl, start_band=2.0) == tone_correction(spl, start_band=2)
+    assert tone_correction(spl, start_band=np.int64(0)) == tone_correction(
+        spl, start_band=0
+    )
+
+
 def test_epnl_table_44() -> None:
     # ETM Vol. I Table 4-4: integrated-method reference EPNL = 92.61892 EPNdB,
     # PNLTM = 97.40, window records 4-28 (0-based 3-27).

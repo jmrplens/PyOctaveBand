@@ -22,13 +22,21 @@ refused according to a coincidence between its bands.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
 from phonometry._internal.validation import (
     check_engine,
+    require_1d_signal,
     require_equal_shapes,
+    require_finite_array,
+    require_per_band,
+    require_positive_array,
     require_ranks,
     require_same_length,
     require_same_shape,
@@ -231,3 +239,27 @@ def test_an_unknown_engine_is_refused_by_name() -> None:
     """
     with pytest.raises(ValueError, match="Unknown report engine 'weasyprint'"):
         check_engine("weasyprint")
+
+
+@pytest.mark.parametrize(
+    ("validator", "args"),
+    [
+        (require_positive_array, ()),
+        (require_finite_array, ()),
+        (require_per_band, (np.array([100.0, 200.0]),)),
+        (require_1d_signal, ()),
+    ],
+)
+def test_garbage_input_is_refused_naming_the_parameter(
+    validator: Callable[..., object], args: tuple[object, ...]
+) -> None:
+    """Every coercing validator names the parameter numpy could not convert.
+
+    A tuple of strings used to escape as numpy's own "could not convert
+    string to float" and an object as a bare TypeError, neither saying which
+    parameter refused; the shared conversion now answers for all four
+    validators in one voice.
+    """
+    for garbage in (("bad",), object(), {"a": 1}):
+        with pytest.raises(ValueError, match="'x' must be numeric"):
+            validator(garbage, "x", *args)

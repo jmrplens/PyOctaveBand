@@ -165,6 +165,14 @@ def piston_directivity(ka: ArrayLike, theta: ArrayLike) -> np.ndarray | float:
     if not np.all(np.isfinite(theta_arr)):
         msg = "'theta' must be finite."
         raise ValueError(msg)
+    try:
+        np.broadcast_shapes(ka_arr.shape, theta_arr.shape)
+    except ValueError:
+        msg = (
+            "'ka' and 'theta' must broadcast together; got shapes "
+            f"{ka_arr.shape} and {theta_arr.shape}."
+        )
+        raise ValueError(msg) from None
     u = ka_arr * np.sin(theta_arr)
     with np.errstate(invalid="ignore", divide="ignore"):
         out = 2.0 * special.j1(u) / u

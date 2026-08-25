@@ -213,6 +213,9 @@ def modulation_distortion(
     fs_v = _positive(fs, "fs")
     fl = _positive(f_low, "f_low")
     fh = _positive(f_high, "f_high")
+    if fl >= fh:
+        msg = "'f_low' must be lower than 'f_high'."
+        raise ValueError(msg)
     freqs, amp = _amplitude_spectrum(sig, fs_v, window)
     df = float(freqs[1] - freqs[0]) if freqs.size > 1 else 0.0
     # Sidebands are spaced f1 apart: cap the search window well inside that.
@@ -448,6 +451,12 @@ def dynamic_intermodulation_distortion(
     fs_v = _positive(fs, "fs")
     fsine = _positive(f_sine, "f_sine")
     fsq = _positive(f_square, "f_square")
+    # The Table 2 products |k f_square - f_sine| all sit below f_sine only
+    # for f_square < f_sine; a swapped pair leaves the product set empty and
+    # would return a perfect 0.0 for a signal the metric is undefined on.
+    if fsq >= fsine:
+        msg = "'f_square' must be lower than 'f_sine'."
+        raise ValueError(msg)
     freqs, amp = _amplitude_spectrum(sig, fs_v, window)
     search = fsq * _DIM_SEARCH_FACTOR
     # Reference: the output amplitude at f_s, per the 14.12.9.1 definition

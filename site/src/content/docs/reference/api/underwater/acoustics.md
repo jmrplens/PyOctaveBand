@@ -49,6 +49,12 @@ only; see [`underwater_to_in_air_spl`](/phonometry/reference/api/underwater/acou
 
 **Returns:** The same pressure expressed in dB re 1 µPa.
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the level is not a finite number. |
+
 ## peak_sound_pressure_level
 
 ```python
@@ -179,3 +185,9 @@ impedances.
 | `level` | Level in dB re 1 µPa. |
 
 **Returns:** The same pressure expressed in dB re 20 µPa.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the level is not a finite number. |

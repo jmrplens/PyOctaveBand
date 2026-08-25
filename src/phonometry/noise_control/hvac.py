@@ -73,6 +73,7 @@ end-to-end fan-to-room calculation.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -706,14 +707,24 @@ def plenum_attenuation(
     :param mean_absorption: Mean Sabine wall absorption ``alpha`` in ``(0, 1)``
         (scalar or per-band).
     :param angle: Angle ``theta`` between the inlet axis and the line to the
-        outlet, rad (default 0).
+        outlet, in ``[0, pi/2]`` rad (default 0).
     :return: The transmission loss, dB (float for scalar absorption, else a
         per-band array).
+    :raises ValueError: If a dimension is not positive, ``mean_absorption``
+        leaves ``(0, 1)`` or ``angle`` leaves ``[0, pi/2]``.
     """
     s_out = require_positive(exit_area, "exit_area")
     r = require_positive(line_of_sight, "line_of_sight")
     s_w = require_positive(wall_area, "wall_area")
+    # Past pi/2 the direct term of Eq. (8.275) turns negative, which the
+    # method does not model; a NaN fails the same comparison and is refused.
+    if not (math.isfinite(angle) and 0.0 <= angle <= math.pi / 2.0):
+        msg = "'angle' must lie in [0, pi/2] radians."
+        raise ValueError(msg)
     alpha = np.asarray(mean_absorption, dtype=np.float64)
+    if alpha.ndim > 1 or alpha.size == 0:
+        msg = "'mean_absorption' must be a scalar or a non-empty 1-D array."
+        raise ValueError(msg)
     if np.any(alpha <= 0.0) or np.any(alpha >= 1.0) or not np.all(np.isfinite(alpha)):
         msg = "'mean_absorption' must lie strictly in (0, 1)."
         raise ValueError(msg)
@@ -827,7 +838,7 @@ def blade_passing_frequency(rotational_speed: float, blades: int) -> float:
     :raises ValueError: If ``blades`` is not a positive integer.
     """
     rpm = require_positive(rotational_speed, "rotational_speed")
-    if blades <= 0:
+    if blades <= 0 or not float(blades).is_integer():
         msg = "'blades' must be a positive integer."
         raise ValueError(msg)
     return rpm * float(blades) / 60.0
@@ -1423,7 +1434,7 @@ def silencer_self_noise(
     """
     f, idx = _octave_slots(frequencies)
     v = require_positive(airway_velocity, "airway_velocity")
-    if passages <= 0:
+    if passages <= 0 or not float(passages).is_integer():
         msg = "'passages' must be a positive integer."
         raise ValueError(msg)
     h_mm = require_positive(height, "height") * 1000.0
@@ -1515,7 +1526,7 @@ def diffuser_sound_power(
     flow_cfm = require_positive(volume_flow, "volume_flow") / _M3S_PER_CFM
     drop_in_wg = require_positive(pressure_drop, "pressure_drop") / _PA_PER_IN_WG
     profile = require_choice(shape, "shape", ("rectangular", "round"))
-    if count <= 0:
+    if count <= 0 or not float(count).is_integer():
         msg = "'count' must be a positive integer."
         raise ValueError(msg)
     # Eq. 13.28: Long prints "ft/min" under U_\mathrm{G} but defines it in the same
@@ -1567,14 +1578,15 @@ def air_terminal_velocity_limit(
     """
     side = require_choice(opening, "opening", ("supply", "return"))
     table = _TERMINAL_VELOCITY_LIMIT[side]
-    key = round(design_criterion)
-    if key not in table:
+    # The finiteness test keeps a NaN or infinite criterion out of round(),
+    # whose own refusal names neither the parameter nor the tabulated values.
+    if not math.isfinite(design_criterion) or round(design_criterion) not in table:
         msg = (
             f"'design_criterion' must be one of {sorted(table)}; "
             f"got {design_criterion!r}."
         )
         raise ValueError(msg)
-    return table[key]
+    return table[round(design_criterion)]
 
 
 def air_terminal_damper_correction(
@@ -1641,6 +1653,9 @@ def room_effect(
     r = require_positive(distance, "distance")
     q = require_positive(directivity, "directivity")
     r_const = np.asarray(room_constant, dtype=np.float64)
+    if r_const.ndim > 1 or r_const.size == 0:
+        msg = "'room_constant' must be a scalar or a non-empty 1-D array."
+        raise ValueError(msg)
     if np.any(r_const <= 0.0) or not np.all(np.isfinite(r_const)):
         msg = "'room_constant' must be positive and finite."
         raise ValueError(msg)

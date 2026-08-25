@@ -139,7 +139,7 @@ arithmetic mean of Re{Y} over the contact points, Formula 16).
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | if `Re{plate_mobility}` is not positive and finite. |
+| ValueError | if `power_level` is not finite, `Re{plate_mobility}` is not positive and finite, or the two shapes do not broadcast together. |
 
 ## equivalent_free_velocity_level
 
@@ -173,7 +173,7 @@ combine through Formula (19) into $|Y_{S,eq}| = v_f / F_b$.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | if `Re{plate_mobility}` is not positive and finite. |
+| ValueError | if `power_level` is not finite, `Re{plate_mobility}` is not positive and finite, or the two shapes do not broadcast together. |
 
 ## mean_free_velocity_level
 
@@ -198,6 +198,12 @@ only the reference differs.
 | `levels` | Free velocity levels `Lvxi` at the `N` positions, in dB re 5e-8 m/s. |
 
 **Returns:** The mean free velocity level, in dB re 5e-8 m/s.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for an empty, multi-dimensional or non-finite input. |
 
 ## plate_loss_factor
 
@@ -289,6 +295,12 @@ $(10^{-9}/10^{-6})^2 = 10^{-6}$.
 
 **Returns:** The source mobility magnitude `|Y_S,eq|`, in m/(N.s).
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a non-finite level, or two shapes that do not broadcast together. |
+
 ## spatial_mean_velocity_level
 
 ```python
@@ -308,6 +320,12 @@ per-position velocity levels.
 | `levels` | Velocity levels `L_v,i` at the `N` positions, in dB. |
 
 **Returns:** The spatial mean velocity level, in dB.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for an empty, multi-dimensional or non-finite input. |
 
 ## structure_borne_power_level
 
@@ -362,7 +380,7 @@ the EN 12354-5 Annex I mobility correction
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | for a non-positive mass, area, reference, frequency or loss factor. |
+| ValueError | for a non-positive mass, area or reference, a frequency or loss factor that is not positive and finite, a non-finite velocity level, or per-band inputs whose shapes do not broadcast together. |
 
 ## StructureBornePowerResult
 

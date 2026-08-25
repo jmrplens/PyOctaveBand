@@ -484,8 +484,14 @@ def weighted_absorption(
     :returns: A frozen :class:`AbsorptionRatingResult` with ``alpha_w``, the
         shape indicators, the applied shift, the fitted reference curve and
         the absorption class.
+    :raises ValueError: if any coefficient is negative or the wrong number
+        of values is supplied.
     """
-    return _rate(_coerce(alpha_p, OCTAVE_BANDS, "alpha_p"))
+    values = _coerce(alpha_p, OCTAVE_BANDS, "alpha_p")
+    if any(v < 0.0 for v in values):
+        msg = "'alpha_p' must be non-negative."
+        raise ValueError(msg)
+    return _rate(values)
 
 
 def _rate(
@@ -578,7 +584,11 @@ def absorption_class(alpha_w: float) -> str:
         0,05 in ``[0, 1]``).
     :returns: ``"A"``, ``"B"``, ``"C"``, ``"D"``, ``"E"`` or
         ``"Not classified"``.
+    :raises ValueError: if ``alpha_w`` is not a finite value in ``[0, 1]``.
     """
+    if not math.isfinite(alpha_w) or not 0.0 <= alpha_w <= 1.0:
+        msg = "'alpha_w' must be a finite value in the range [0, 1]."
+        raise ValueError(msg)
     units = _to_units(alpha_w)
     for lowest, letter in _CLASS_TABLE:
         if units >= lowest:

@@ -252,7 +252,7 @@ source-plate bending-wave group velocity `cg_i`, the junction length
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | for a non-positive input. |
+| ValueError | for a non-positive input, or a coefficient and a frequency whose shapes cannot be broadcast together. |
 
 ## inline_transmission_coefficient
 

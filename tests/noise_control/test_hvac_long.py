@@ -121,6 +121,19 @@ def test_blade_passing_frequency_validation() -> None:
         hvac.blade_passing_frequency(1200.0, 0)
 
 
+def test_blade_passing_frequency_fractional_blades_raises() -> None:
+    # 2.5 blades used to slip past the sign check and return 50 Hz.
+    with pytest.raises(ValueError, match="'blades' must be a positive integer"):
+        hvac.blade_passing_frequency(1200.0, 2.5)  # type: ignore[arg-type]
+
+
+def test_blade_passing_frequency_integral_float_blades_accepted() -> None:
+    # 12.0 is the integer 12 to every caller who divided to get it.
+    assert hvac.blade_passing_frequency(1200.0, 12.0) == pytest.approx(  # type: ignore[arg-type]
+        240.0
+    )
+
+
 # ---------------------------------------------------------------------------
 # Straight ducts (Ch. 14)
 # ---------------------------------------------------------------------------
@@ -394,6 +407,12 @@ def test_silencer_self_noise_requires_passages() -> None:
         hvac.silencer_self_noise(None, 10.0, 0, 0.9)
 
 
+def test_silencer_self_noise_fractional_passages_raises() -> None:
+    # 2.5 passages used to slip past the sign check into 10 lg N.
+    with pytest.raises(ValueError, match="'passages' must be a positive integer"):
+        hvac.silencer_self_noise(None, 10.0, 2.5, 0.9)  # type: ignore[arg-type]
+
+
 def test_splitter_silencer_identical_airways_equal_one_passage() -> None:
     """Bies §8.10.5: identical airways give the loss of a single passage."""
     one = hvac.splitter_silencer_insertion_loss(None, 0.6, 1.5, 0.1, 0.2)
@@ -546,6 +565,7 @@ def test_diffuser_sound_power_counts_identical_devices() -> None:
         ({"pressure_drop": -1.0}, "pressure_drop"),
         ({"shape": "slot"}, "shape"),
         ({"count": 0}, "count"),
+        ({"count": 1.5}, "'count' must be a positive integer"),
     ],
 )
 def test_diffuser_sound_power_validation(kwargs: dict[str, object], match: str) -> None:
@@ -582,6 +602,16 @@ def test_air_terminal_velocity_limit_validation() -> None:
         hvac.air_terminal_velocity_limit(20)
     with pytest.raises(ValueError, match="opening"):
         hvac.air_terminal_velocity_limit(30, opening="exhaust")
+
+
+@pytest.mark.parametrize("criterion", [math.inf, math.nan], ids=["inf", "nan"])
+def test_air_terminal_velocity_limit_non_finite_criterion_raises(
+    criterion: float,
+) -> None:
+    # Both used to escape as CPython's own message from inside round():
+    # OverflowError for the infinity, an unnamed ValueError for the NaN.
+    with pytest.raises(ValueError, match="'design_criterion' must be one of"):
+        hvac.air_terminal_velocity_limit(criterion)
 
 
 @pytest.mark.parametrize(
@@ -638,3 +668,15 @@ def test_room_effect_validation() -> None:
         hvac.room_effect(0.0, 50.0)
     with pytest.raises(ValueError, match="room_constant"):
         hvac.room_effect(3.0, 0.0)
+
+
+def test_room_effect_empty_room_constant_raises() -> None:
+    # An empty array passes every vacuous np.any/np.all test and used to
+    # come back as an empty result.
+    with pytest.raises(ValueError, match="'room_constant' must be a scalar"):
+        hvac.room_effect(2.0, [])
+
+
+def test_room_effect_two_dimensional_room_constant_raises() -> None:
+    with pytest.raises(ValueError, match="'room_constant' must be a scalar"):
+        hvac.room_effect(2.0, np.full((2, 3), 50.0))

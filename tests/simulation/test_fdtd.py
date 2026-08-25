@@ -600,6 +600,10 @@ def test_two_runs_are_bit_identical() -> None:
         ({"probes": [(99, 0)]}, "outside the grid"),
         ({"probes": [(2.5, 3)]}, "probe ix must be an integer"),
         ({"probes": [(2, 3.5)]}, "probe iy must be an integer"),
+        # A malformed entry used to be reported by the interpreter's
+        # unpacking message, naming neither probes nor the entry.
+        ({"probes": [(1, 2, 3)]}, r"probes must hold \(ix, iy\) index pairs"),
+        ({"probes": [5]}, r"probes must hold \(ix, iy\) index pairs"),
         (
             {"boundaries": "absorbing", "absorbing_layer_cells": 0},
             "absorbing_layer_cells",

@@ -162,6 +162,23 @@ def test_empty_signal() -> None:
         psychoacoustics.loudness_ecma(empty, FS)
 
 
+def test_non_finite_signal_raises() -> None:
+    # A poisoned sample must raise, not silently truncate the signal at the
+    # poison index (NaN fails the half-wave rectification comparison).
+    tone = _tone(1000.0, 40.0, seconds=0.5)
+    tone[100] = np.nan
+    with pytest.raises(ValueError, match="'signal_in' must be finite"):
+        psychoacoustics.loudness_ecma(tone, FS)
+
+
+def test_resample_length_clamps_to_one_sample() -> None:
+    # 1 sample at 96 kHz resamples to round(1 * 48000 / 96000) = round(0.5),
+    # which banker's rounding takes to 0 samples without the clamp; the
+    # clamped 1-sample signal must process cleanly.
+    res = psychoacoustics.loudness_ecma(np.zeros(1), 96000.0)
+    assert res.loudness == 0.0
+
+
 @pytest.mark.xdist_group("ecma-loudness-ref")
 def test_plot_smoke(ref_1k_40: psychoacoustics.EcmaLoudness) -> None:
     import matplotlib as mpl

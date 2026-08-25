@@ -112,6 +112,12 @@ def test_ray_curvature_radius_validation() -> None:
         ValueError, match=r"'launch_angle_deg' must be within \(-90, 90\)"
     ):
         ray_curvature_radius(0.1, launch_angle_deg=90.0)
+    with pytest.raises(
+        ValueError, match=r"'launch_angle_deg' must be within \(-90, 90\)"
+    ):
+        # abs(nan) >= 90 is False, so without the finiteness check a NaN
+        # slipped the range guard and came back as a NaN radius.
+        ray_curvature_radius(0.1, launch_angle_deg=float("nan"))
 
 
 def test_shadow_zone_distance_closed_form() -> None:
@@ -495,6 +501,41 @@ def test_pe_validation() -> None:
             range_step=1e9,
             max_range=100.0,
         )
+
+
+def test_pe_rejects_height_step_beyond_output_band() -> None:
+    """The vertical grid samples midpoints (j + 0.5) dz, so a step of twice
+    'max_height' or more leaves [0, max_height] without a single node; the
+    empty field used to be returned silently and only failed downstream
+    (argmin of an empty sequence in level_at_height, IndexError in plot).
+    """
+    prof = _flat_profile()
+    with pytest.raises(
+        ValueError, match="'height_step' must be less than twice 'max_height'"
+    ):
+        atmospheric_parabolic_equation(
+            500.0,
+            prof,
+            source_height=2.0,
+            impedance=Z_GRASS,
+            max_range=20.0,
+            max_height=10.0,
+            # Exactly 2 x max_height: the first node lands on 10.0 m and
+            # searchsorted leaves the output band empty (the border case).
+            height_step=20.0,
+        )
+    # Just under the boundary the band still holds one node and the call
+    # stands: the guard rejects only the steps that empty the grid.
+    res = atmospheric_parabolic_equation(
+        500.0,
+        prof,
+        source_height=2.0,
+        impedance=Z_GRASS,
+        max_range=20.0,
+        max_height=10.0,
+        height_step=19.0,
+    )
+    assert res.heights.size > 0
 
 
 # --------------------------------------------------------------------------- #

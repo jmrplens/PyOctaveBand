@@ -23,6 +23,7 @@ to verify the implementation.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -98,6 +99,39 @@ def _spectra(
     implementation).
     """
     return _welch_pair(x, y, fs, nperseg, _noverlap_samples(nperseg, overlap))
+
+
+def _welch_params(
+    n: int, fs: float, nperseg: int | None, overlap: float
+) -> tuple[int, float]:
+    """Validated Welch segment length and overlap fraction.
+
+    The guards run before the ``int()``/``float()`` coercions, so a bad
+    value is refused by name instead of dying inside the standard library,
+    and a fractional ``nperseg`` is refused instead of silently truncated.
+    The comparisons stay in exact int/float arithmetic and only floats are
+    probed for finiteness, because ``float()`` and ``math.isfinite`` both
+    overflow on an integer beyond float range; kept exact, such an integer
+    falls through to the range check, which refuses it by name.
+    """
+    if (
+        not isinstance(overlap, (int, float, np.integer, np.floating))
+        or not 0.0 <= overlap < 1.0
+    ):
+        msg = "'overlap' must be in [0, 1)."
+        raise ValueError(msg)
+    if nperseg is not None and (
+        not isinstance(nperseg, (int, float, np.integer, np.floating))
+        or (isinstance(nperseg, (float, np.floating)) and not math.isfinite(nperseg))
+        or int(nperseg) != nperseg
+    ):
+        msg = "'nperseg' must be a positive integer."
+        raise ValueError(msg)
+    seg = _default_nperseg(n, fs) if nperseg is None else int(nperseg)
+    if seg < _MIN_SAMPLES or seg > n:
+        msg = "'nperseg' must be between 32 and the signal length."
+        raise ValueError(msg)
+    return seg, float(overlap)
 
 
 @dataclass(frozen=True)
@@ -217,15 +251,9 @@ def transfer_function(
     if estimator not in ("H1", "H2"):
         msg = "'estimator' must be 'H1' or 'H2'."
         raise ValueError(msg)
-    if not 0.0 <= float(overlap) < 1.0:
-        msg = "'overlap' must be in [0, 1)."
-        raise ValueError(msg)
-    seg = _default_nperseg(xa.size, fs_v) if nperseg is None else int(nperseg)
-    if seg < _MIN_SAMPLES or seg > xa.size:
-        msg = "'nperseg' must be between 32 and the signal length."
-        raise ValueError(msg)
+    seg, ovl = _welch_params(xa.size, fs_v, nperseg, overlap)
 
-    freqs, gxy, gxx, gyy = _spectra(xa, ya, fs_v, seg, float(overlap))
+    freqs, gxy, gxx, gyy = _spectra(xa, ya, fs_v, seg, ovl)
     if estimator == "H1":
         response = np.divide(gxy, gxx, out=np.zeros_like(gxy), where=gxx > 0.0)
     else:
@@ -291,14 +319,8 @@ def coherence(
     fs = resolve_pair_fs(x, y, fs)
     xa, ya = _validate_pair(x, y, "coherence")
     fs_v = _positive(fs, "fs")
-    if not 0.0 <= float(overlap) < 1.0:
-        msg = "'overlap' must be in [0, 1)."
-        raise ValueError(msg)
-    seg = _default_nperseg(xa.size, fs_v) if nperseg is None else int(nperseg)
-    if seg < _MIN_SAMPLES or seg > xa.size:
-        msg = "'nperseg' must be between 32 and the signal length."
-        raise ValueError(msg)
-    freqs, gxy, gxx, gyy = _spectra(xa, ya, fs_v, seg, float(overlap))
+    seg, ovl = _welch_params(xa.size, fs_v, nperseg, overlap)
+    freqs, gxy, gxx, gyy = _spectra(xa, ya, fs_v, seg, ovl)
     denom = gxx * gyy
     coh = np.divide(np.abs(gxy) ** 2, denom, out=np.zeros_like(gxx), where=denom > 0.0)
     return freqs, np.clip(coh, 0.0, 1.0)

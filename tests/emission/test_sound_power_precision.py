@@ -715,6 +715,60 @@ def test_criterion_1_without_limit_raises() -> None:
         )
 
 
+def test_criterion_1_scan_level_1_wrong_length_raises() -> None:
+    """A scan level that does not span the indicator bands is refused by
+    name, not with numpy's broadcast message.
+    """
+    ind = precision_field_indicators(np.full((4, 3), 2.0e-6), np.full((4, 3), 60.0))
+    with pytest.raises(ValueError, match="'scan_intensity_level_1' must be a scalar"):
+        precision_qualification(
+            ind,
+            scan_intensity_level_1=np.full(4, 70.0),
+            scan_intensity_level_2=np.full(4, 70.0),
+            repeatability_limit=1.0,
+        )
+
+
+def test_criterion_1_scan_level_2_wrong_length_raises() -> None:
+    """The second scan is named when it is the one that disagrees."""
+    ind = precision_field_indicators(np.full((4, 3), 2.0e-6), np.full((4, 3), 60.0))
+    with pytest.raises(ValueError, match="'scan_intensity_level_2' must be a scalar"):
+        precision_qualification(
+            ind,
+            scan_intensity_level_1=np.full(3, 70.0),
+            scan_intensity_level_2=np.full(2, 70.0),
+            repeatability_limit=1.0,
+        )
+
+
+def test_precision_frequencies_wrong_length_raises() -> None:
+    """'frequencies' short of the indicator bands is refused up front, not at
+    the criterion-1 comparison.
+    """
+    ind = precision_field_indicators(np.full((4, 3), 2.0e-6), np.full((4, 3), 60.0))
+    with pytest.raises(ValueError, match="'frequencies' must carry one value per band"):
+        precision_qualification(
+            ind,
+            scan_intensity_level_1=np.full(3, 70.0),
+            scan_intensity_level_2=np.full(3, 70.0),
+            frequencies=np.array([500.0, 1000.0]),
+        )
+
+
+def test_precision_nan_frequency_raises() -> None:
+    """A NaN band centre is refused by name before the Table 1 lookup
+    rounds it to an integer.
+    """
+    ind = precision_field_indicators(np.full((4, 3), 2.0e-6), np.full((4, 3), 60.0))
+    with pytest.raises(ValueError, match="'frequencies' must be finite"):
+        precision_qualification(
+            ind,
+            scan_intensity_level_1=np.full(3, 70.0),
+            scan_intensity_level_2=np.full(3, 70.0),
+            frequencies=np.array([500.0, float("nan"), 2000.0]),
+        )
+
+
 def test_field_indicators_shape_mismatch_raises() -> None:
     intensity = np.full((4, 1), 1e-6)
     mismatched_levels = np.full((3, 1), 60.0)
@@ -800,18 +854,19 @@ def test_a_field_indicator_off_the_band_axis_is_refused() -> None:
 def test_criteria_from_a_one_band_scan_pair_are_refused() -> None:
     """Criterion 1 comes from the scan levels, the others from the indicators.
 
-    Nothing compares the two, so a repeatability pair read on a single band
-    (Eq. C.1) would otherwise decide 'qualified' for all four of them.
+    A repeatability pair read on a single band (Eq. C.1) would otherwise
+    decide 'qualified' for all four of them; the entry point refuses it by
+    the scan level's own name.
     """
     indicators = _four_band_indicators()
     one_band_scan = np.array([70.0])
-    with pytest.raises(ValueError, match="'criterion_1'"):
+    with pytest.raises(ValueError, match="'scan_intensity_level_1' must be a scalar"):
         precision_qualification(
             indicators,
             scan_intensity_level_1=one_band_scan,
             scan_intensity_level_2=one_band_scan,
             pressure_residual_index=14.0,
-            frequencies=np.array([1000.0]),
+            frequencies=np.array([1000.0, 2000.0, 4000.0, 5000.0]),
         )
 
 

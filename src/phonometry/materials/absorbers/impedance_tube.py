@@ -37,7 +37,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from ..._internal.validation import check_engine
+from ..._internal.validation import check_engine, require_equal_shapes, require_per_band
 from ..._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:
@@ -143,6 +143,12 @@ def air_density_iso(
     """
     t = np.asarray(temperature, dtype=np.float64)
     pa = np.asarray(atmospheric_pressure, dtype=np.float64)
+    if t.ndim != 0 and pa.ndim != 0:
+        require_equal_shapes(
+            "air_density_iso",
+            {"temperature": t.shape, "atmospheric_pressure": pa.shape},
+            "measurement",
+        )
     if np.any(t <= 0.0):
         msg = "'temperature' must be positive (kelvin)."
         raise ValueError(msg)
@@ -238,12 +244,37 @@ def tube_wavenumber(
     if speed_of_sound <= 0.0:
         raise ValueError(_SPEED_OF_SOUND_POSITIVE)
     f = np.asarray(frequency, dtype=np.float64)
+    if not np.all(np.isfinite(f)) or bool(np.any(f < 0.0)):
+        msg = "'frequency' must be non-negative."
+        raise ValueError(msg)
     k_real = 2.0 * np.pi * f / speed_of_sound
     if attenuation is None:
         k_imag: NDArray[np.float64] = np.zeros_like(k_real)
     else:
-        k_imag = np.asarray(attenuation, dtype=np.float64)
+        k_imag = require_per_band(
+            attenuation, "attenuation", k_real, bands_name="frequency"
+        )
     return np.asarray(k_real - 1j * k_imag, dtype=np.complex128)
+
+
+def _require_h12_per_band(
+    h12: ArrayLike, bands: NDArray[np.float64] | Complex, bands_name: str
+) -> Complex:
+    """Coerce ``h12`` to complex128, as a scalar or one value per band.
+
+    The complex-aware twin of the shared ``require_per_band``, which coerces
+    to float64 and would silently discard the imaginary part of the measured
+    transfer function. Without it, a length mismatch dies in the arithmetic
+    as numpy's two-shapes broadcast error, naming neither argument.
+    """
+    h = np.asarray(h12, dtype=np.complex128)
+    if h.ndim != 0 and bands.ndim != 0 and h.shape != bands.shape:
+        msg = (
+            f"'h12' must be a scalar or carry one value per band "
+            f"({bands.size} in '{bands_name}'); got shape {h.shape}."
+        )
+        raise ValueError(msg)
+    return h
 
 
 # ---------------------------------------------------------------------------
@@ -284,8 +315,8 @@ def reflection_factor(
     if x1 <= 0.0:
         msg = "'x1' must be positive."
         raise ValueError(msg)
-    h = np.asarray(h12, dtype=np.complex128)
     k0 = np.asarray(wavenumber, dtype=np.complex128)
+    h = _require_h12_per_band(h12, k0, "wavenumber")
     h_i = np.exp(-1j * k0 * spacing)
     h_r = np.exp(1j * k0 * spacing)
     r = (h - h_i) / (h_r - h) * np.exp(2j * k0 * x1)
@@ -624,8 +655,9 @@ def two_microphone_impedance(
         the result).
     """
     f = np.asarray(frequency, dtype=np.float64)
+    h = _require_h12_per_band(h12, f, "frequency")
     k0 = tube_wavenumber(f, speed_of_sound, attenuation=attenuation)
-    r = reflection_factor(h12, spacing=spacing, x1=x1, wavenumber=k0)
+    r = reflection_factor(h, spacing=spacing, x1=x1, wavenumber=k0)
     canonical = _canonical_shape(shape)
     if diameter is not None:
         f_lower, f_upper = plane_wave_frequency_range(

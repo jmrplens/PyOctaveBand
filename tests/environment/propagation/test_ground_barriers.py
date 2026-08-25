@@ -226,6 +226,20 @@ def test_kurze_anderson_is_monotone_in_fresnel_number() -> None:
     assert att[-1] - att[2] == pytest.approx(10.0, abs=1.0)
 
 
+def test_kurze_anderson_rejects_non_numeric_and_nan() -> None:
+    """The Fresnel number is guarded by name: a non-numeric input used to die
+    with numpy's own coercion message (or a bare TypeError for a complex one)
+    and a NaN came back as a NaN "attenuation" against the documented
+    >= 0 dB contract.
+    """
+    with pytest.raises(ValueError, match="'fresnel_number' must be numeric"):
+        environment.kurze_anderson_attenuation("loud")
+    with pytest.raises(ValueError, match="'fresnel_number' must be numeric"):
+        environment.kurze_anderson_attenuation(1.0 + 2.0j)
+    with pytest.raises(ValueError, match="'fresnel_number' must contain only finite"):
+        environment.kurze_anderson_attenuation(float("nan"))
+
+
 def test_kurze_anderson_bright_zone_falls_below_5_db() -> None:
     # Negative Fresnel number (receiver in line of sight) -> less than 5 dB.
     assert environment.kurze_anderson_attenuation(-0.2) < 5.0
@@ -398,3 +412,20 @@ def test_barrier_rejects_bad_geometry() -> None:
                 method="exact",
                 thickness=bad,
             )
+
+
+def test_barrier_rejects_non_finite_geometry() -> None:
+    """A NaN distance or height used to sail through the ordering comparisons
+    (every comparison against NaN is False) and come back from the diffraction
+    maths as an all-NaN insertion loss; each of the five is refused by name.
+    """
+    with pytest.raises(ValueError, match="'barrier_distance' must be positive"):
+        environment.barrier_insertion_loss(_BANDS, 2.0, float("nan"), 4.0, 50.0, 1.5)
+    with pytest.raises(ValueError, match="'receiver_distance' must be positive"):
+        environment.barrier_insertion_loss(_BANDS, 2.0, 1.0, 4.0, float("nan"), 1.5)
+    with pytest.raises(ValueError, match="'barrier_height' must be finite"):
+        environment.barrier_insertion_loss(_BANDS, 2.0, 1.0, float("nan"), 50.0, 1.5)
+    with pytest.raises(ValueError, match="'source_height' must be finite"):
+        environment.barrier_insertion_loss(_BANDS, float("nan"), 1.0, 4.0, 50.0, 1.5)
+    with pytest.raises(ValueError, match="'receiver_height' must be finite"):
+        environment.barrier_insertion_loss(_BANDS, 2.0, 1.0, 4.0, 50.0, float("nan"))

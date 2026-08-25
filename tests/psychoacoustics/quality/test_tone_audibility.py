@@ -447,6 +447,30 @@ def test_combined_tone_level_rejects_length_mismatch() -> None:
         )
 
 
+def test_combined_tone_level_rejects_non_finite_values() -> None:
+    # A NaN tone frequency sends np.argmin over an all-NaN array (index 0)
+    # and a NaN level collapses the line span to the peak line: both used to
+    # return a silently wrong level instead of the documented ValueError.
+    with pytest.raises(ValueError, match="'tone_frequencies' must be positive"):
+        psychoacoustics.combined_tone_level(
+            ref.ISO20065_E1_LEVELS,
+            ref.ISO20065_E1_FREQUENCIES,
+            [float("nan")],
+            [49.22],
+        )
+    with pytest.raises(ValueError, match="'tone_frequencies' must be positive"):
+        psychoacoustics.combined_tone_level(
+            ref.ISO20065_E1_LEVELS, ref.ISO20065_E1_FREQUENCIES, [-137.3], [49.22]
+        )
+    with pytest.raises(ValueError, match="'mean_narrowband_levels' must be finite"):
+        psychoacoustics.combined_tone_level(
+            ref.ISO20065_E1_LEVELS,
+            ref.ISO20065_E1_FREQUENCIES,
+            [137.3],
+            [float("nan")],
+        )
+
+
 # ---------------------------------------------------------------------------
 # Separate evaluation of two tones below 1000 Hz (Formulae (18)/(19))
 #

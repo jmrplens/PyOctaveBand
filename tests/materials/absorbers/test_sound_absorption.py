@@ -330,6 +330,41 @@ def test_temperature_outside_eq6_range_warns() -> None:
         materials.absorption_area(3.0, 200.0, temperature=5.0)
 
 
+def test_temperature_below_absolute_zero_raises() -> None:
+    # Below -273,15 degC Eq. (6) would hand back a non-positive speed of
+    # sound; the refusal is a hard error, not the out-of-range advisory.
+    with pytest.raises(ValueError, match="'temperature' must be above absolute zero"):
+        materials.absorption_area(3.0, 200.0, temperature=-600.0)
+
+
+def test_nan_temperature_raises() -> None:
+    with pytest.raises(ValueError, match="'temperature' must be above absolute zero"):
+        materials.absorption_area(3.0, 200.0, temperature=float("nan"))
+
+
+def test_nan_speed_of_sound_raises() -> None:
+    # NaN passes a bare <= 0 comparison and would reach every derived quantity.
+    with pytest.raises(
+        ValueError, match="'speed_of_sound' must be finite and positive"
+    ):
+        materials.absorption_area(3.0, 200.0, speed_of_sound=float("nan"))
+
+
+def test_infinite_speed_of_sound_raises() -> None:
+    # Infinity is positive but zeroes the speed-dependent terms of Eq. (5).
+    with pytest.raises(
+        ValueError, match="'speed_of_sound' must be finite and positive"
+    ):
+        materials.absorption_area(3.0, 200.0, speed_of_sound=float("inf"))
+
+
+def test_non_positive_speed_of_sound_raises() -> None:
+    with pytest.raises(
+        ValueError, match="'speed_of_sound' must be finite and positive"
+    ):
+        materials.absorption_area(3.0, 200.0, speed_of_sound=-343.0)
+
+
 def test_no_temperature_warning_when_speed_supplied() -> None:
     with warnings.catch_warnings():
         warnings.simplefilter("error")
@@ -490,6 +525,37 @@ def test_measurement_carries_conditions() -> None:
     assert res.humidity == 54.0
     np.testing.assert_array_equal(res.frequencies, _FREQS)
     np.testing.assert_allclose(res.air_attenuation, np.zeros_like(_FREQS))
+
+
+def test_measurement_negative_humidity_raises() -> None:
+    with pytest.raises(ValueError, match=r"'humidity' must be within \[0, 100\]"):
+        materials.measure_sound_absorption(
+            _FREQS, _T1, _T2, volume=200.0, area=10.8, humidity=-40.0
+        )
+
+
+def test_measurement_humidity_above_saturation_raises() -> None:
+    with pytest.raises(ValueError, match=r"'humidity' must be within \[0, 100\]"):
+        materials.measure_sound_absorption(
+            _FREQS, _T1, _T2, volume=200.0, area=10.8, humidity=150.0
+        )
+
+
+def test_measurement_non_numeric_humidity_raises_by_name() -> None:
+    # Not float()'s anonymous "could not convert string to float".
+    with pytest.raises(ValueError, match=r"'humidity' must be within \[0, 100\]"):
+        materials.measure_sound_absorption(
+            _FREQS, _T1, _T2, volume=200.0, area=10.8, humidity="wet"
+        )
+
+
+def test_measurement_one_element_array_humidity_raises_by_name() -> None:
+    # float() refuses a 1-d array with TypeError, not ValueError; the guard
+    # renames that failure too instead of dying inside float().
+    with pytest.raises(ValueError, match=r"'humidity' must be within \[0, 100\]"):
+        materials.measure_sound_absorption(
+            _FREQS, _T1, _T2, volume=200.0, area=10.8, humidity=np.array([54.0])
+        )
 
 
 def test_measurement_air_attenuation_reduces_area() -> None:

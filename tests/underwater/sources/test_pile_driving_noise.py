@@ -194,6 +194,33 @@ def test_strike_sel_spectrum_validates_its_arguments() -> None:
         underwater.strike_sel_spectrum(silence, FS)
 
 
+def test_strike_sel_spectrum_rejects_a_non_integer_fraction() -> None:
+    # A non-integer fraction must be rejected, not silently truncated to int().
+    x = _pulse(50.0, 0.2)
+    with pytest.raises(ValueError, match="'fraction' must be 1"):
+        underwater.strike_sel_spectrum(x, FS, fraction=3.9)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="'fraction' must be 1"):
+        underwater.strike_sel_spectrum(x, FS, fraction=1.4)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="'fraction' must be 1"):
+        underwater.strike_sel_spectrum(x, FS, fraction=None)  # type: ignore[arg-type]
+
+
+def test_strike_sel_spectrum_rejects_a_malformed_limits_pair() -> None:
+    # Anything but a two-element pair must be refused by name, not indexed
+    # into an IndexError/TypeError or silently truncated to its first two.
+    x = _pulse(50.0, 0.2)
+    with pytest.raises(ValueError, match=r"'limits' must be a \(lower, upper\) pair"):
+        underwater.strike_sel_spectrum(x, FS, limits=(10.0,))  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match=r"'limits' must be a \(lower, upper\) pair"):
+        underwater.strike_sel_spectrum(x, FS, limits=None)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match=r"'limits' must be a \(lower, upper\) pair"):
+        underwater.strike_sel_spectrum(
+            x,
+            FS,
+            limits=(10.0, 20_000.0, 99.0),  # type: ignore[arg-type]
+        )
+
+
 def test_strike_sel_spectrum_plot_returns_axes() -> None:
     spec = underwater.strike_sel_spectrum(_pulse(50.0, 0.2), FS)
     assert spec.plot() is not None

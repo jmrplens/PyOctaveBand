@@ -56,6 +56,7 @@ IEC 61043:1993 Table 2 by
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -461,8 +462,13 @@ def _validate_band_options(fraction: int | None, limits: list[float] | None) -> 
     if fraction is not None and fraction not in (1, 3):
         msg = "'fraction' must be None, 1 (octave) or 3 (one-third octave)."
         raise ValueError(msg)
+    # NaN fails every comparison, so finiteness is tested explicitly: a NaN
+    # limit would otherwise pass and silently select no band at all.
     if limits is not None and (
-        len(limits) != 2 or limits[0] <= 0 or limits[1] <= limits[0]  # noqa: PLR2004
+        len(limits) != 2  # noqa: PLR2004
+        or not all(math.isfinite(v) for v in limits)
+        or limits[0] <= 0
+        or limits[1] <= limits[0]
     ):
         msg = "'limits' must be [f_min, f_max] with 0 < f_min < f_max."
         raise ValueError(msg)
@@ -862,6 +868,18 @@ def field_indicators(
     )
     if lp.shape[0] < _MIN_VARIATION_OBSERVATIONS:
         msg = "At least two measurement positions are required."
+        raise ValueError(msg)
+    # A NaN or infinite Lp would slip through the arithmetic and turn F2 and
+    # F3 into silent NaN, so it is rejected up front the way the intensity
+    # samples are (this argument is legitimately 2-D, so the 1-D array
+    # helpers cannot be reused).
+    if not np.all(np.isfinite(lp)):
+        msg = "'pressure_levels' must contain only finite values."
+        raise ValueError(msg)
+    # An empty band axis would leave the per-band loop below nothing to
+    # build, and the unpacking of its result dies inside numpy.
+    if lp.ndim == 2 and lp.shape[1] == 0:  # noqa: PLR2004
+        msg = "'pressure_levels' must have at least one band."
         raise ValueError(msg)
 
     n_bands = lp.shape[1] if lp.ndim == 2 else 1  # noqa: PLR2004

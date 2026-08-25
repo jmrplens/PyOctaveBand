@@ -59,6 +59,21 @@ def test_reference_conversion_round_trip() -> None:
     ) == pytest.approx(100.0)
 
 
+def test_reference_conversion_rejects_a_per_band_level_array() -> None:
+    per_band = np.array([100.0, 110.0])
+    with pytest.raises(ValueError, match="'level' must be a finite number"):
+        underwater.underwater_to_in_air_spl(per_band)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="'level' must be a finite number"):
+        underwater.in_air_to_underwater_spl([74.0, 84.0])  # type: ignore[arg-type]
+
+
+def test_reference_conversion_rejects_a_non_finite_level() -> None:
+    with pytest.raises(ValueError, match="'level' must be a finite number"):
+        underwater.underwater_to_in_air_spl(np.nan)
+    with pytest.raises(ValueError, match="'level' must be a finite number"):
+        underwater.in_air_to_underwater_spl(np.inf)
+
+
 def test_rejects_invalid_signal() -> None:
     two_dimensional = np.zeros((2, 2))
     with_nan = np.array([np.nan, 1.0])

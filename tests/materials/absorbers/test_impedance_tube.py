@@ -102,6 +102,20 @@ def test_air_property_domain_errors() -> None:
         air_density_iso(293.0, -1.0)
 
 
+def test_air_density_mismatched_arrays_raise() -> None:
+    # Two arrays of different lengths must be refused by name, not left to
+    # numpy's two-shapes broadcast error.
+    with pytest.raises(ValueError, match="'temperature'.*'atmospheric_pressure'"):
+        air_density_iso([293.0, 300.0], [101.0, 100.0, 99.0])
+
+
+def test_air_density_scalar_beside_array_still_broadcasts() -> None:
+    # One shared temperature against several pressures stays legal.
+    rho = np.asarray(air_density_iso(293.0, [101.325, 100.0]))
+    assert rho.shape == (2,)
+    assert rho[0] == pytest.approx(1.186, abs=1e-9)
+
+
 def test_characteristic_impedance_is_real_product() -> None:
     assert characteristic_impedance(RHO, C0) == pytest.approx(RC)
     with pytest.raises(
@@ -168,6 +182,60 @@ def test_reflection_factor_round_trip_with_attenuation() -> None:
     h12 = _synth_h12(reflection, np.asarray(k0), x1, spacing)
     r = reflection_factor(h12, spacing=spacing, x1=x1, wavenumber=k0)
     assert np.allclose(r, reflection, atol=1e-12)
+
+
+def test_tube_wavenumber_rejects_negative_frequency() -> None:
+    with pytest.raises(ValueError, match="'frequency' must be non-negative"):
+        tube_wavenumber(np.array([-1000.0, 500.0]), C0)
+
+
+def test_tube_wavenumber_rejects_nan_frequency() -> None:
+    with pytest.raises(ValueError, match="'frequency' must be non-negative"):
+        tube_wavenumber(np.array([500.0, np.nan]), C0)
+
+
+def test_tube_wavenumber_rejects_mismatched_attenuation() -> None:
+    # A two-band attenuation against three frequencies used to die as
+    # numpy's two-shapes broadcast error, naming neither argument.
+    with pytest.raises(ValueError, match="'attenuation' must be a scalar or carry"):
+        tube_wavenumber(np.array([100.0, 200.0, 300.0]), C0, attenuation=[0.1, 0.2])
+
+
+def test_reflection_factor_rejects_mismatched_h12() -> None:
+    with pytest.raises(ValueError, match="'h12' must be a scalar or carry"):
+        reflection_factor(
+            np.array([0.5 + 0.1j, 0.4 + 0.2j]),
+            spacing=0.03,
+            x1=0.12,
+            wavenumber=np.array([1.0, 2.0, 3.0]),
+        )
+
+
+def test_two_microphone_rejects_mismatched_h12() -> None:
+    # Through the full reduction the mismatch is reported against
+    # 'frequency', the parameter name the caller actually typed.
+    with pytest.raises(ValueError, match="'h12'.*band.*'frequency'"):
+        two_microphone_impedance(
+            np.array([0.5 + 0.1j, 0.4 + 0.2j]),
+            frequency=np.array([500.0, 1000.0, 1500.0]),
+            spacing=0.03,
+            x1=0.12,
+            speed_of_sound=C0,
+            characteristic_impedance=RC,
+        )
+
+
+def test_two_microphone_rejects_nan_frequency() -> None:
+    # A NaN frequency used to come back as a silently NaN absorption.
+    with pytest.raises(ValueError, match="'frequency' must be non-negative"):
+        two_microphone_impedance(
+            np.array([0.5 + 0.1j, 0.4 + 0.2j]),
+            frequency=np.array([-1000.0, np.nan]),
+            spacing=0.03,
+            x1=0.12,
+            speed_of_sound=C0,
+            characteristic_impedance=RC,
+        )
 
 
 def test_two_microphone_impedance_result() -> None:
@@ -557,6 +625,63 @@ def test_two_load_warns_on_singular_load_pair() -> None:
             load,
             thickness=THICKNESS,
             wavenumber=k,
+            characteristic_impedance=RC,
+            **GEOM,
+        )
+
+
+def test_two_load_rejects_short_load() -> None:
+    # A three-element load used to die in tuple indexing (IndexError),
+    # naming neither load_a nor load_b.
+    load = (1.0 + 0j, 0.9 + 0j, 0.8 + 0j, 0.7 + 0j)
+    with pytest.raises(ValueError, match="'load_a' must be the four transfer"):
+        transfer_matrix_two_load(
+            load[:3],
+            load,
+            thickness=THICKNESS,
+            wavenumber=np.array([10.0]),
+            characteristic_impedance=RC,
+            **GEOM,
+        )
+
+
+def test_one_load_rejects_long_load() -> None:
+    # A five-element load used to be accepted with the extra entry
+    # silently dropped.
+    load = (1.0 + 0j, 0.9 + 0j, 0.8 + 0j, 0.7 + 0j, 0.6 + 0j)
+    with pytest.raises(ValueError, match="'load' must be the four transfer"):
+        transfer_matrix_one_load(
+            load,
+            thickness=THICKNESS,
+            wavenumber=np.array([10.0]),
+            characteristic_impedance=RC,
+            **GEOM,
+        )
+
+
+def test_face_quantities_rejects_non_positive_thickness() -> None:
+    # The same rule the module already applies to 'thickness' elsewhere;
+    # a zero-depth specimen was accepted silently.
+    with pytest.raises(ValueError, match="'thickness' must be positive"):
+        face_quantities(
+            1.0,
+            0.5,
+            0.7,
+            0.2,
+            wavenumber=10.0,
+            thickness=0.0,
+            characteristic_impedance=RC,
+        )
+
+
+def test_one_load_rejects_zero_thickness() -> None:
+    # Both public solvers inherit the face_quantities guard.
+    load = (1.0 + 0j, 0.9 + 0j, 0.8 + 0j, 0.7 + 0j)
+    with pytest.raises(ValueError, match="'thickness' must be positive"):
+        transfer_matrix_one_load(
+            load,
+            thickness=0.0,
+            wavenumber=np.array([10.0]),
             characteristic_impedance=RC,
             **GEOM,
         )

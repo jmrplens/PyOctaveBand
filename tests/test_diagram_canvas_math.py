@@ -184,6 +184,22 @@ def test_anchor_resolves_from_the_measured_width() -> None:
     assert _uses(element, _BOLD)
 
 
+def test_unknown_anchor_raises_by_name() -> None:
+    # SVG's own vocabulary ("text-anchor: center" does not exist) is the
+    # realistic typo; it must break generation naming the parameter, not
+    # surface as a bare KeyError from the width lookup.
+    with pytest.raises(ValueError, match="'anchor' must be one of"):
+        _element("Sound level", size=15, anchor="center")
+
+
+def test_unknown_label_side_raises_instead_of_drawing_left() -> None:
+    # Every other value used to take the left branch silently, publishing a
+    # dimension label on the wrong side of the line; a typo must now fail.
+    svg = SVG(900, 400, LIGHT)
+    with pytest.raises(ValueError, match="'label_side' must be one of"):
+        svg.dim(200, 100, 200, 300, "1.20 m", 0, 15, label_side="rigth")
+
+
 def test_math_and_prose_escape_metacharacters_in_the_comment() -> None:
     element = _element("A & B $a<b$")
     assert "<!-- A &amp; B $a&lt;b$ -->" in element

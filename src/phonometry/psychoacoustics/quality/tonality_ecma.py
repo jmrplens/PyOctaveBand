@@ -190,10 +190,10 @@ def _band_range(f_low: float | None, f_high: float | None) -> tuple[int, int]:
     Enforces the Formulae 56/57 preconditions: 16 Hz < f_L, f_H < 20 kHz and
     f_L < f_H.
     """
-    if f_low is not None and f_low <= _F_LOW_MIN_HZ:
+    if f_low is not None and (not math.isfinite(f_low) or f_low <= _F_LOW_MIN_HZ):
         msg = "'f_low' must exceed 16 Hz (Formula 56)."
         raise ValueError(msg)
-    if f_high is not None and f_high >= _F_HIGH_MAX_HZ:
+    if f_high is not None and (not math.isfinite(f_high) or f_high >= _F_HIGH_MAX_HZ):
         msg = "'f_high' must be below 20 kHz (Formula 57)."
         raise ValueError(msg)
     if f_low is not None and f_high is not None and f_low >= f_high:

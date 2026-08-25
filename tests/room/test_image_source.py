@@ -423,6 +423,77 @@ def test_bad_dimension_and_fs() -> None:
         )
 
 
+def test_dimensions_must_be_three_lengths() -> None:
+    # A short room died as numpy's bare IndexError and a long one was
+    # silently truncated to its first three lengths.
+    src, rcv = (1.0, 1.0, 1.5), (3.0, 2.5, 1.2)
+    with pytest.raises(ValueError, match="'dimensions' must be a 3-vector"):
+        room.image_source_rir((5.0, 4.0), src, rcv, 0.2, fs=8000)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="'dimensions' must be a 3-vector"):
+        room.image_source_rir((5.0, 4.0, 3.0, 2.0), src, rcv, 0.2, fs=8000)  # type: ignore[arg-type]
+
+
+def test_max_order_must_be_a_non_negative_integer() -> None:
+    # A fractional or NaN order used to pass the sign check and die inside
+    # range() as the builtin TypeError, naming nothing.
+    args = ((5.0, 4.0, 3.0), (1.0, 1.0, 1.5), (3.0, 2.5, 1.2), 0.2)
+    with pytest.raises(ValueError, match="'max_order' must be a non-negative integer"):
+        room.image_source_rir(*args, fs=8000, max_order=2.5)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="'max_order' must be a non-negative integer"):
+        room.image_source_rir(*args, fs=8000, max_order=math.nan)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="'max_order' must be a non-negative integer"):
+        room.image_source_rir(*args, fs=8000, max_order=-1)
+
+
+def test_frequencies_must_be_a_positive_band_vector() -> None:
+    # An empty, 2-D, NaN or negative band axis used to be accepted silently
+    # and set the band count of the whole result.
+    args = ((5.0, 4.0, 3.0), (1.0, 1.0, 1.5), (3.0, 2.5, 1.2), 0.2)
+    with pytest.raises(
+        ValueError, match="'frequencies' must be a scalar or a non-empty 1-D"
+    ):
+        room.image_source_rir(*args, fs=8000, frequencies=[])
+    with pytest.raises(
+        ValueError, match="'frequencies' must be a scalar or a non-empty 1-D"
+    ):
+        room.image_source_rir(
+            *args, fs=8000, frequencies=[[500.0, 1000.0], [2000.0, 4000.0]]
+        )
+    with pytest.raises(
+        ValueError, match="'frequencies' must be finite and strictly positive"
+    ):
+        room.image_source_rir(*args, fs=8000, frequencies=[math.nan, 1000.0])
+    with pytest.raises(
+        ValueError, match="'frequencies' must be finite and strictly positive"
+    ):
+        room.image_source_rir(*args, fs=8000, frequencies=[-500.0, 1000.0])
+
+
+def test_air_attenuation_must_be_a_band_vector() -> None:
+    # A 2-D input whose size matched the band count used to slip through the
+    # size check and die in np.broadcast_to with numpy's axis-remapping
+    # message, naming no argument.
+    with pytest.raises(ValueError, match="'air_attenuation' must be a scalar or a 1-D"):
+        room.image_source_rir(
+            (5.0, 4.0, 3.0),
+            (1.0, 1.0, 1.5),
+            (3.0, 2.5, 1.2),
+            0.2,
+            fs=8000,
+            frequencies=[125.0, 250.0, 500.0, 1000.0],
+            air_attenuation=[[1e-3, 2e-3], [3e-3, 4e-3]],
+        )
+
+
+def test_audible_image_count_requires_an_integer_order() -> None:
+    # A fractional order used to be truncated silently (2.9 returned the
+    # order-2 count) and a non-numeric one died on the comparison itself.
+    with pytest.raises(ValueError, match="'max_order' must be a non-negative integer"):
+        room.audible_image_count(2.9)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="'max_order' must be a non-negative integer"):
+        room.audible_image_count(-1)
+
+
 def test_extra_axis_on_the_amplitude_table_is_refused() -> None:
     """A third axis on ``amplitudes`` passes every count, so pin the rank.
 

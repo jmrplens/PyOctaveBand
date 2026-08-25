@@ -339,3 +339,87 @@ def test_power_level_rejects_nonpositive_loss_factor() -> None:
         building.structure_borne_power_level(80.0, 1000.0, 10.0, 1.0, 0.0)
     with pytest.raises(ValueError, match="loss_factor"):
         building.structure_borne_power_level(80.0, 1000.0, 10.0, 1.0, [0.01, -0.01])
+
+
+def test_power_level_rejects_non_finite_frequency_and_velocity() -> None:
+    """A NaN slips past a sign check; Formula (14) refuses it by name."""
+    with pytest.raises(
+        ValueError, match="'frequency' must contain positive, finite values"
+    ):
+        building.structure_borne_power_level(80.0, float("nan"), 10.0, 1.0, 0.01)
+    with pytest.raises(
+        ValueError, match="'frequency' must contain positive, finite values"
+    ):
+        building.structure_borne_power_level(80.0, float("inf"), 10.0, 1.0, 0.01)
+    with pytest.raises(
+        ValueError, match="'velocity_level' must contain only finite values"
+    ):
+        building.structure_borne_power_level(
+            [80.0, float("nan")], [500.0, 1000.0], 10.0, 1.0, 0.01
+        )
+
+
+def test_force_and_velocity_levels_reject_non_finite_power_level() -> None:
+    """Formulae (15) and (18) refuse a NaN or infinite power level by name."""
+    for bad in (float("nan"), float("inf")):
+        with pytest.raises(
+            ValueError, match="'power_level' must contain only finite values"
+        ):
+            building.equivalent_blocked_force_level([80.0, bad], [1e-6, 2e-6])
+        with pytest.raises(
+            ValueError, match="'power_level' must contain only finite values"
+        ):
+            building.equivalent_free_velocity_level([80.0, bad], [1e-6, 2e-6])
+
+
+def test_spatial_mean_rejects_empty_nan_and_2d_input() -> None:
+    """Formula 12 refuses input its energy mean cannot honestly average."""
+    with pytest.raises(ValueError, match="'levels' must be a non-empty 1-D array"):
+        building.spatial_mean_velocity_level([])
+    with pytest.raises(ValueError, match="'levels' must contain only finite values"):
+        building.spatial_mean_velocity_level([80.0, float("nan")])
+    with pytest.raises(ValueError, match="'levels' must be a non-empty 1-D array"):
+        building.spatial_mean_velocity_level([[80.0, 82.0], [79.0, 81.0]])
+    # The ISO 9611 mean delegates and refuses the same way.
+    with pytest.raises(ValueError, match="'levels' must be a non-empty 1-D array"):
+        building.mean_free_velocity_level(np.empty(0))
+
+
+def test_power_level_rejects_mismatched_band_axes() -> None:
+    """A velocity level of the wrong band count is refused by name."""
+    with pytest.raises(
+        ValueError,
+        match="'velocity_level', 'frequency' and 'loss_factor' must broadcast",
+    ):
+        building.structure_borne_power_level(
+            [80.0, 82.0], [500.0, 1000.0, 2000.0], 10.0, 1.0, 0.01
+        )
+
+
+def test_force_and_velocity_levels_reject_mismatched_shapes() -> None:
+    """Formulae (15) and (18) name the pair a shape mismatch sits in."""
+    with pytest.raises(
+        ValueError, match="'power_level' and 'plate_mobility' must broadcast"
+    ):
+        building.equivalent_blocked_force_level([80.0, 82.0, 79.0], [1e-6, 2e-6])
+    with pytest.raises(
+        ValueError, match="'power_level' and 'plate_mobility' must broadcast"
+    ):
+        building.equivalent_free_velocity_level([80.0, 82.0, 79.0], [1e-6, 2e-6])
+
+
+def test_source_mobility_rejects_mismatch_and_nan() -> None:
+    """Formula (19) refuses a shape mismatch or a NaN level by name."""
+    with pytest.raises(
+        ValueError,
+        match="'free_velocity_level' and 'blocked_force_level' must broadcast",
+    ):
+        building.source_mobility_from_levels([80.0, 82.0, 79.0], [40.0, 41.0])
+    with pytest.raises(
+        ValueError, match="'free_velocity_level' must contain only finite values"
+    ):
+        building.source_mobility_from_levels([float("nan")], [40.0])
+    with pytest.raises(
+        ValueError, match="'blocked_force_level' must contain only finite values"
+    ):
+        building.source_mobility_from_levels([80.0], [float("nan")])

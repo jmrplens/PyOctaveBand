@@ -103,6 +103,8 @@ from .._internal.levels_math import energy_mean, weighted_energy_mean
 from .._internal.validation import (
     check_engine,
     require_equal_shapes,
+    require_per_band,
+    require_positive_array,
     require_ranks,
     require_same_length,
 )
@@ -399,12 +401,14 @@ def _validate_scan(
             f"the number of segment 'areas' ({n_seg})."
         )
         raise ValueError(msg)
-    if frequencies is not None and np.asarray(frequencies).shape != (
-        intensity.shape[1],
-    ):
+    if frequencies is not None:
         # Validate up front so a mismatched length raises the public ValueError
-        # rather than an IndexError from the Table 2 lookup during classification.
-        raise ValueError(_FREQUENCIES_BAND_COUNT_MSG)
+        # rather than an IndexError from the Table 2 lookup during
+        # classification, and a NaN or infinite band centre a named refusal
+        # rather than round()'s conversion error there.
+        if np.asarray(frequencies).shape != (intensity.shape[1],):
+            raise ValueError(_FREQUENCIES_BAND_COUNT_MSG)
+        require_positive_array(frequencies, "frequencies")
     if np.any(seg <= 0.0):
         msg = "All segment 'areas' must be positive."
         raise ValueError(msg)
@@ -1178,6 +1182,27 @@ def precision_field_indicators(
     )
 
 
+def _checked_band_centres(
+    frequencies: np.ndarray | None, f_pi_signed: np.ndarray, n_bands: int
+) -> np.ndarray | None:
+    """The band centres validated against the indicator's band axis.
+
+    Split out of :func:`precision_qualification`, which was one branch past
+    what one reader holds: the centre validation is one idea, and it reads
+    the same whether the caller supplied centres or not.
+    """
+    if frequencies is None:
+        return None
+    freqs = require_positive_array(frequencies, "frequencies")
+    if freqs.shape != f_pi_signed.shape:
+        msg = (
+            "'frequencies' must carry one value per band "
+            f"({n_bands} in 'indicators.f_pi_signed'); got shape {freqs.shape}."
+        )
+        raise ValueError(msg)
+    return freqs
+
+
 def _spread_over_bands(value: ArrayLike, n_bands: int) -> np.ndarray:
     """Put a field non-uniformity on the band axis without inventing values.
 
@@ -1244,6 +1269,8 @@ def precision_qualification(
     f_pi_signed = indicators.f_pi_signed
     n_bands = f_pi_signed.shape[0]
 
+    freqs = _checked_band_centres(frequencies, f_pi_signed, n_bands)
+
     # Criteria 3 and 4 are always available from the indicators.
     criterion_3 = np.asarray(
         (f_pi_signed - indicators.f_pi_unsigned) <= _F_PI_DIFF_LIMIT, dtype=bool
@@ -1253,14 +1280,24 @@ def precision_qualification(
     # Criterion 1: |LIn(1) - LIn(2)| <= s/2.
     criterion_1: np.ndarray | None = None
     if scan_intensity_level_1 is not None and scan_intensity_level_2 is not None:
-        l1 = np.asarray(scan_intensity_level_1, dtype=np.float64)
-        l2 = np.asarray(scan_intensity_level_2, dtype=np.float64)
+        l1 = require_per_band(
+            scan_intensity_level_1,
+            "scan_intensity_level_1",
+            f_pi_signed,
+            "indicators.f_pi_signed",
+        )
+        l2 = require_per_band(
+            scan_intensity_level_2,
+            "scan_intensity_level_2",
+            f_pi_signed,
+            "indicators.f_pi_signed",
+        )
         if repeatability_limit is not None:
             s = np.broadcast_to(
                 np.asarray(repeatability_limit, dtype=np.float64), (n_bands,)
             ).astype(np.float64)
-        elif frequencies is not None:
-            nominal = [round(float(f)) for f in np.asarray(frequencies)]
+        elif freqs is not None:
+            nominal = [round(float(f)) for f in freqs]
             s = np.array([_sigma_r0_9614_3(f) for f in nominal], dtype=np.float64)
         else:
             msg = (

@@ -460,6 +460,18 @@ def test_negative_parameters_rejected() -> None:
         vibration.junction_wave_parameters(-0.1, 3200.0, 240.0, 0.1, 3200.0, 240.0)
 
 
+def test_coupling_loss_factor_rejects_unreconcilable_shapes() -> None:
+    # A coefficient and a frequency of different lengths used to die in
+    # numpy's bare broadcast error, which names neither argument.
+    with pytest.raises(
+        ValueError,
+        match="'transmission_coefficient' and 'frequency' must be broadcastable",
+    ):
+        vibration.coupling_loss_factor(
+            [0.1, 0.2, 0.3], 100.0, 1.0, [125.0, 250.0, 500.0, 1000.0], 5.0
+        )
+
+
 def test_out_of_range_angle_rejected() -> None:
     with pytest.raises(ValueError, match=r"'angle' must lie in \[0, pi/2\]"):
         vibration.corner_transmission_coefficient(2.0, 1.0, 1.0, "X")  # > pi/2

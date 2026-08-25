@@ -55,6 +55,20 @@ def _positive(value: float, name: str) -> float:
     return scalar
 
 
+def _finite(value: float, name: str) -> float:
+    msg = f"'{name}' must be a finite number."
+    try:
+        scalar = float(value)
+    except (TypeError, ValueError):
+        # A per-band array (or anything else float() cannot take) would
+        # otherwise escape as numpy's or the built-in's TypeError, which
+        # names neither the parameter nor this function.
+        raise ValueError(msg) from None
+    if not np.isfinite(scalar):
+        raise ValueError(msg)
+    return scalar
+
+
 def _validate_pressure(
     pressure: SignalInput, *, min_samples: int = 1
 ) -> NDArray[np.float64]:
@@ -172,8 +186,9 @@ def underwater_to_in_air_spl(level: float) -> float:
 
     :param level: Level in dB re 1 µPa.
     :return: The same pressure expressed in dB re 20 µPa.
+    :raises ValueError: If the level is not a finite number.
     """
-    return float(float(level) - _REFERENCE_OFFSET_DB)
+    return float(_finite(level, "level") - _REFERENCE_OFFSET_DB)
 
 
 def in_air_to_underwater_spl(level: float) -> float:
@@ -185,5 +200,6 @@ def in_air_to_underwater_spl(level: float) -> float:
 
     :param level: Level in dB re 20 µPa.
     :return: The same pressure expressed in dB re 1 µPa.
+    :raises ValueError: If the level is not a finite number.
     """
-    return float(float(level) + _REFERENCE_OFFSET_DB)
+    return float(_finite(level, "level") + _REFERENCE_OFFSET_DB)

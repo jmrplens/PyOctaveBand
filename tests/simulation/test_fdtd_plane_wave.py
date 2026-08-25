@@ -73,10 +73,38 @@ def test_packet_validation() -> None:
     sim = FDTD2D(C0, DX, shape=(20, 20))
     with pytest.raises(ValueError, match="direction"):
         sim.add_plane_wave("north", center=0.1, width=0.02)
-    with pytest.raises(ValueError, match="width"):
+    with pytest.raises(ValueError, match="'width' must be positive"):
         sim.add_plane_wave("down", center=0.1, width=0.0)
-    with pytest.raises(ValueError, match="wavelength"):
+    with pytest.raises(ValueError, match="'wavelength' must be positive"):
         sim.add_plane_wave("down", center=0.1, width=0.02, wavelength=-1.0)
+
+
+def test_packet_rejects_non_finite_parameters() -> None:
+    # A NaN width or centre used to be accepted and silently turn the whole
+    # pressure field into NaN; an infinite width painted a uniform amplitude
+    # over the entire domain.
+    sim = FDTD2D(C0, DX, shape=(20, 20))
+    with pytest.raises(ValueError, match="'width' must be positive"):
+        sim.add_plane_wave("down", center=0.1, width=np.nan)
+    with pytest.raises(ValueError, match="'width' must be positive"):
+        sim.add_plane_wave("down", center=0.1, width=np.inf)
+    with pytest.raises(ValueError, match="'wavelength' must be positive"):
+        sim.add_plane_wave("down", center=0.1, width=0.02, wavelength=np.nan)
+    with pytest.raises(ValueError, match="center must be finite"):
+        sim.add_plane_wave("down", center=np.nan, width=0.02)
+    with pytest.raises(ValueError, match="amplitude must be finite"):
+        sim.add_plane_wave("down", center=0.1, width=0.02, amplitude=np.nan)
+    assert float(np.abs(sim.p).max()) == 0.0  # nothing landed on the field
+
+
+def test_plane_wave_source_rejects_bad_waveform_and_amplitude() -> None:
+    # A non-callable waveform used to surface from inside _inject_plane as
+    # the interpreter's "'float' object is not callable", and a NaN
+    # amplitude silently NaNed the field step by step.
+    with pytest.raises(ValueError, match="waveform must be callable"):
+        PlaneWaveSource("down", 1.0)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="amplitude must be finite"):
+        PlaneWaveSource("down", lambda t: 0.0, amplitude=np.nan)
 
 
 def test_rigid_wall_doubles_incident_pressure() -> None:
