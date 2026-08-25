@@ -7,8 +7,10 @@ their sample, mesh and carrier. The standing-wave clip is the schematic view
 of the same ISO 10534-2 apparatus.
 """
 
+from __future__ import annotations
+
 from functools import lru_cache
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -32,6 +34,9 @@ from ..theme import (
 )
 from ._core import _anim_speaker
 
+if TYPE_CHECKING:
+    from matplotlib.axes import Axes
+
 #: Virtual-tube sample: the equivalent fluid of the solver cross-checks
 #: (slower, denser, lossy; k = (omega - j sigma)/c at the real rho c).
 _VTUBE_C2, _VTUBE_RHO2, _VTUBE_SIGMA = 0.6 * 343.0, 3.6, 600.0
@@ -40,7 +45,7 @@ _VTUBE_F = 850.0  # CW inside the 100 mm plane range
 
 
 def _anim_tube_hardware(
-    ax: Any,
+    ax: Axes,
     length: float,
     *,
     bore: float = 0.1,

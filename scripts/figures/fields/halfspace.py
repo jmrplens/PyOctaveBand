@@ -205,7 +205,7 @@ def animate_elastic_halfspace_waves(output_dir: str) -> None:
     # Reserve the bottom strip for the two figure-level captions: fig.text
     # does not claim space from the constrained layout on its own, and
     # without this the material line lands on the lower axis label.
-    fig.get_layout_engine().set(rect=(0.0, 0.055, 1.0, 0.945))
+    fig.get_layout_engine().set(rect=(0.0, 0.055, 1.0, 0.945))  # type: ignore[union-attr, call-arg]  # _anim_figure: constrained engine, never None
     # Short on purpose: the Spanish of a longer title overran the canvas at
     # both ends. What the boundary has to do with it is in the panel titles.
     fig.suptitle(T("Lamb's problem: P, S and the surface wave (elastic 2D FDTD)"))

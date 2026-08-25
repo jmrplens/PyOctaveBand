@@ -201,7 +201,7 @@ def animate_elastic_plate_junction(output_dir: str) -> None:
     # fixed 16:9 canvas, so every point of vertical padding costs 2.3 of
     # panel width: the layout pads and the title pads run tight to give
     # back part of the side bands the aspect ratio forces.
-    fig.get_layout_engine().set(h_pad=0.022, w_pad=0.015, hspace=0.0, wspace=0.0)
+    fig.get_layout_engine().set(h_pad=0.022, w_pad=0.015, hspace=0.0, wspace=0.0)  # type: ignore[union-attr, call-arg]  # _anim_figure: constrained engine, never None
     fig.suptitle(
         T("Bending waves at an L-junction (elastic 2D FDTD)"),
     )
@@ -605,7 +605,7 @@ def animate_elastic_coincidence(output_dir: str) -> None:
     # no room of its own from the layout), the pads run tight, and the
     # display window is cropped on the right below so the panels use the
     # height instead.
-    fig.get_layout_engine().set(
+    fig.get_layout_engine().set(  # type: ignore[union-attr, call-arg]  # _anim_figure: constrained engine, never None
         rect=(0.0, 0.065, 1.0, 0.935), h_pad=0.015, w_pad=0.015, hspace=0.0, wspace=0.0
     )
     # Display-only crop: the run, the capture and the under-plate

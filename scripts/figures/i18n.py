@@ -11,12 +11,17 @@ The table is the module -- it is data, not code, and it is kept here so a
 translation fix never means touching a figure.
 """
 
+from __future__ import annotations
+
 import os
 import re
 import sys
-from typing import Any
+from typing import TYPE_CHECKING
 
 from . import _publish
+
+if TYPE_CHECKING:
+    from matplotlib.figure import Figure
 
 # The miss recorder sits at the top of ``scripts/``, next to the checker that
 # reads what it writes; the figures package is a subdirectory of the same
@@ -5605,7 +5610,7 @@ def _decimal_comma(s: str) -> str:
 _LEADING_SIGN_RE = re.compile(r"^(\s*)-")
 
 
-def _fmt_minus(value: Any, spec: str = "") -> str:
+def _fmt_minus(value: float, spec: str = "") -> str:
     """Format *value* for a label, with the minus sign the figures are set in.
 
     ``format`` writes a negative number with an ASCII hyphen, so a reading
@@ -5667,7 +5672,7 @@ def lookup(s: str) -> str:
     return s
 
 
-def _audit_english(fig: Any) -> None:
+def _audit_english(fig: Figure) -> None:
     """Report what the tables cannot translate, on the English pass.
 
     The English figure is correct by construction, so this walk exists only
@@ -5704,7 +5709,7 @@ def _audit_english(fig: Any) -> None:
             lookup(artist.get_text())
 
 
-def _translate_figure(fig: Any) -> None:
+def _translate_figure(fig: Figure) -> None:
     """Rewrite every Text artist of *fig* into the active language."""
     import re as _re
 

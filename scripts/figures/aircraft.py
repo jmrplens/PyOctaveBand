@@ -7,10 +7,13 @@ contours, and the rotorcraft ground effect, flyover and terrain screening of
 ICAO Doc 32. Everything here is embedded by a page under ``aircraft/``.
 """
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import matplotlib.pyplot as plt
 import numpy as np
+
+if TYPE_CHECKING:
+    from phonometry.aircraft import RotorcraftHemisphere
 
 from phonometry._plot.common import (
     format_frequency_axis,
@@ -982,7 +985,7 @@ def generate_anp_contour(output_dir: str) -> None:
 # --------------------------------------------------------------------------- #
 
 
-def _synthetic_hemisphere(masked: bool = False) -> "Any":
+def _synthetic_hemisphere(masked: bool = False) -> "RotorcraftHemisphere":
     """A helicopter-like hemisphere on the Doc 32 grid, for the figures.
 
     The library implements the method and ships no hemisphere database, so

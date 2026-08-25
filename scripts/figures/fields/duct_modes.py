@@ -193,7 +193,7 @@ def animate_fdtd_duct_cut_on(output_dir: str) -> None:
     fig = _anim_figure()
     # Reserve the bottom strip for the two-line footer: fig.text does not
     # claim space from the constrained layout on its own.
-    fig.get_layout_engine().set(rect=(0.0, 0.075, 1.0, 0.925))
+    fig.get_layout_engine().set(rect=(0.0, 0.075, 1.0, 0.925))  # type: ignore[union-attr, call-arg]  # _anim_figure: constrained engine, never None
     fig.suptitle(
         T("Duct cut-on: is one pressure enough? (2D FDTD)"),
     )

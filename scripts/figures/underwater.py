@@ -1979,7 +1979,7 @@ def generate_marine_mammal_assessment(output_dir: str) -> None:
         res.plot(ax=ax, language=_LANG)
         ax.set_title(
             f"{group}: cumulative {res.cumulative_sel:.1f} dB, "
-            f"margin {_fmt_minus(res.sel_margin, '+.1f')} dB",
+            f"margin {_fmt_minus(res.sel_margin, '+.1f')} dB",  # type: ignore[arg-type]  # NMFS 2024 impulsive: SEL threshold always set
             pad=12,
         )
     plt.tight_layout()

@@ -21,7 +21,7 @@ published ASTM E1414 laboratory reports.
 from __future__ import annotations
 
 import math
-from typing import Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 import reference_data as ref
@@ -31,6 +31,11 @@ import phonometry as ph
 
 from ..registry import Outcome, numeric, register
 from .levels import _FS
+
+if TYPE_CHECKING:
+    from numpy.typing import ArrayLike
+
+    from phonometry.building import InSituElementResult
 
 _A60 = 6.0 * math.log(10.0)
 
@@ -1192,7 +1197,9 @@ def _chk_iso9611_mean_velocity() -> Outcome:
 
 
 # --- Detailed per-band building prediction (ISO 12354-1/-2:2017) ---
-def _iso12354_detailed_situ() -> tuple[Any, dict[str, Any], np.ndarray]:
+def _iso12354_detailed_situ() -> tuple[
+    np.ndarray, dict[str, InSituElementResult], np.ndarray
+]:
     """The Annex L / Annex G building evaluated in situ, per band."""
     import iso12354_building as bld
 
@@ -1217,7 +1224,7 @@ def _chk_iso12354_annex_l_elements() -> Outcome:
     # absorption length as 10 lg of its ratio to the printed value.
     _bands, situ, _delta = _iso12354_detailed_situ()
 
-    def _ratio_db(computed: Any, printed: Any) -> float:
+    def _ratio_db(computed: ArrayLike, printed: ArrayLike) -> float:
         return float(
             np.max(np.abs(10.0 * np.log10(np.asarray(computed) / np.asarray(printed))))
         )

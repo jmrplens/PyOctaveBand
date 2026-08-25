@@ -14,7 +14,7 @@ validate against different tables.
 from __future__ import annotations
 
 import math
-from typing import Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 import reference_data as ref
@@ -23,10 +23,13 @@ import phonometry as ph
 
 from ..registry import Outcome, numeric, register
 
+if TYPE_CHECKING:
+    from phonometry.environment import RailwayEmissionResult
+
 _CNOSSOS_RAIL = "CNOSSOS-EU railway source (Directive 2002/49/EC Annex II)"
 
 
-def _cnossos_rail_case(case: dict[str, str]) -> Any:
+def _cnossos_rail_case(case: dict[str, str]) -> RailwayEmissionResult:
     """One committed workbook case through the shipped model.
 
     The Commission's source-module test set was computed with the 2015

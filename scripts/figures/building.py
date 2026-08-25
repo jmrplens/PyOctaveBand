@@ -449,7 +449,7 @@ def generate_facade_prediction(output_dir: str) -> None:
     info = [
         (
             rf"$R^{{\prime}}_\mathrm{{tr,s,w}}$ = {result.r_tr_s_w} dB"
-            rf"   ($C_\mathrm{{tr}}$ = {_fmt_minus(result.c_tr)})"
+            rf"   ($C_\mathrm{{tr}}$ = {_fmt_minus(result.c_tr)})"  # type: ignore[arg-type]  # octave layout: Ctr always computed
         ),
         rf"$D_\mathrm{{2m,nT,w}}$ = {result.d_2m_nt_w} dB",
         "air inlet limits the low bands",
@@ -1333,8 +1333,8 @@ def generate_extended_insulation_rating(output_dir: str) -> None:
             f"({_fmt_minus(ext.c, 'g')};{_fmt_minus(ext.ctr, 'g')})"
         ),
         (
-            f"$C_{{50-5000}}$ = {_fmt_minus(ext.c_50_5000, 'g')},  "
-            rf"$C_{{\mathrm{{tr}},50-5000}}$ = {_fmt_minus(ext.ctr_50_5000, 'g')}"
+            f"$C_{{50-5000}}$ = {_fmt_minus(ext.c_50_5000, 'g')},  "  # type: ignore[arg-type]  # 50-5000 Hz input: term always computed
+            rf"$C_{{\mathrm{{tr}},50-5000}}$ = {_fmt_minus(ext.ctr_50_5000, 'g')}"  # type: ignore[arg-type]  # 50-5000 Hz input: term always computed
         ),
         "rating on the core bands, terms on the full range",
     ]

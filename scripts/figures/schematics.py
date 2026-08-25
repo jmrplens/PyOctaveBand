@@ -9,8 +9,10 @@ clips that use them, ahead of the wave-field clips of :mod:`figures.fields`,
 which borrow the same vocabulary to annotate a simulated field.
 """
 
+from __future__ import annotations
+
 from functools import lru_cache
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -38,6 +40,15 @@ from .theme import (
     COLOR_TERTIARY,
     FIELD_STROKE,
 )
+
+if TYPE_CHECKING:
+    from matplotlib.artist import Artist
+    from matplotlib.axes import Axes
+    from matplotlib.collections import FillBetweenPolyCollection
+    from matplotlib.figure import Figure
+    from matplotlib.patches import Arc, FancyArrowPatch, Rectangle
+    from matplotlib.typing import ColorType
+    from numpy.typing import NDArray
 
 
 def _halo(linewidth: float = 2.4) -> list[Any]:
@@ -72,7 +83,7 @@ def _pending_ink(color: str) -> tuple[float, float, float]:
     return (0.35 * r + 0.65, 0.35 * g + 0.65, 0.35 * b + 0.65)
 
 
-def _half_width(fig: Any, ax: Any, artist: Any) -> float:
+def _half_width(fig: Figure, ax: Axes, artist: Artist) -> float:
     """Half the rendered width of *artist*, in x data units of *ax*.
 
     Several clips centre a readout on a moving glyph, or anchor an annotation
@@ -89,13 +100,13 @@ def _half_width(fig: Any, ax: Any, artist: Any) -> float:
     return float(abs(x1 - x0)) / 2.0
 
 
-def _grid_axes(ax: Any) -> None:
+def _grid_axes(ax: Axes) -> None:
     """Apply the standard documentation grid to a data axes."""
     ax.grid(True, color=COLOR_GRID, linestyle="--", alpha=0.5)
 
 
 def _schematic_axes(
-    ax: Any,
+    ax: Axes,
     xlim: tuple[float, float],
     ylim: tuple[float, float],
     *,
@@ -114,7 +125,7 @@ def _schematic_axes(
 
 
 def _draw_mic(
-    ax: Any,
+    ax: Axes,
     x: float,
     y: float,
     *,
@@ -169,7 +180,7 @@ def _draw_mic(
 
 
 def _draw_speaker(
-    ax: Any, x: float, y: float, *, size: float = 1.0, direction: int = 1
+    ax: Axes, x: float, y: float, *, size: float = 1.0, direction: int = 1
 ) -> None:
     """A loudspeaker symbol: cabinet plus cone, radiating toward
     ``direction`` (+1 = +x, -1 = -x). ``(x, y)`` is the cone mouth centre.
@@ -202,7 +213,7 @@ def _draw_speaker(
 
 
 def _make_wavefronts(
-    ax: Any,
+    ax: Axes,
     x: float,
     y: float,
     color: str,
@@ -211,7 +222,7 @@ def _make_wavefronts(
     theta1: float = 0.0,
     theta2: float = 360.0,
     lw: float = 1.6,
-) -> list[Any]:
+) -> list[Arc]:
     """``n`` expanding wavefront arcs centred on ``(x, y)``, initially hidden.
 
     Drive them with :func:`_set_wavefronts`; ``theta1``/``theta2`` restrict
@@ -231,13 +242,13 @@ def _make_wavefronts(
 
 
 def _set_wavefronts(
-    arcs: list[Any],
+    arcs: list[Arc],
     radii: list[float],
     rmax: float,
     *,
     alpha: float = 0.9,
-    color: Any = None,
-) -> list[Any]:
+    color: ColorType | None = None,
+) -> list[Arc]:
     """Resize each wavefront arc; fronts fade toward ``rmax`` and hide beyond.
 
     ``radii`` pairs with ``arcs``; non-positive radii hide the arc. Returns
@@ -256,7 +267,7 @@ def _set_wavefronts(
     return arcs
 
 
-def _polyline_point(pts: Any, frac: float) -> tuple[float, float]:
+def _polyline_point(pts: NDArray[np.float64], frac: float) -> tuple[float, float]:
     """The point a fraction ``frac`` of the arc length along a polyline.
 
     ``pts`` is an ``(N, 2)`` array of vertices; ``frac`` is clipped to
@@ -276,7 +287,7 @@ def _polyline_point(pts: Any, frac: float) -> tuple[float, float]:
 
 
 def _make_gauge(
-    ax: Any,
+    ax: Axes,
     cx: float,
     cy: float,
     r: float,
@@ -381,7 +392,7 @@ def _set_gauge(gauge: dict[str, Any], frac: float, text: str) -> tuple[Any, Any]
 
 
 def _flow_box(
-    ax: Any, cx: float, cy: float, w: float, h: float, title: str
+    ax: Axes, cx: float, cy: float, w: float, h: float, title: str
 ) -> dict[str, Any]:
     """A processing-pipeline box, dimmed until :func:`_light_box` lights it."""
     from matplotlib.colors import to_rgba
@@ -444,7 +455,7 @@ def _dim_box(box: dict[str, Any]) -> None:
     box["value"].set_text("")
 
 
-def _make_arrow(ax: Any, color: str, scale: float = 14.0) -> Any:
+def _make_arrow(ax: Axes, color: str, scale: float = 14.0) -> FancyArrowPatch:
     """An updatable arrow patch; reposition it with ``set_positions``."""
     from matplotlib.patches import FancyArrowPatch
 
@@ -462,7 +473,7 @@ def _make_arrow(ax: Any, color: str, scale: float = 14.0) -> Any:
     return arrow
 
 
-def _draw_resistor(ax: Any, x0: float, x1: float, y: float) -> None:
+def _draw_resistor(ax: Axes, x0: float, x1: float, y: float) -> None:
     """A zigzag resistor symbol on a horizontal wire from *x0* to *x1*."""
     n = 6
     xs = np.linspace(x0, x1, 2 * n + 1)
@@ -555,7 +566,7 @@ def animate_time_weighting_ballistics(output_dir: str) -> None:
         xytext=(0.6, 7.3),
         arrowprops={"arrowstyle": "-|>", "color": COLOR_FG, "lw": 1.2},
     )
-    wire = {"color": COLOR_FG, "lw": 1.4}
+    wire: dict[str, Any] = {"color": COLOR_FG, "lw": 1.4}
     ax_s.plot([0.6, 1.3], [5.6, 5.6], **wire)
     ax_s.add_patch(
         FancyBboxPatch(
@@ -1273,7 +1284,7 @@ def animate_schroeder(output_dir: str) -> None:
     sweep_max = float(t_raw[-1])  # start the front at the very end of p²
     fill_alpha = 0.5 if _FILENAME_SUFFIX else 0.35
     ax_e.plot(t_raw[ds], raw_db[ds], color="gray", alpha=0.4, lw=0.6)
-    e_fill = {"art": None}
+    e_fill: dict[str, FillBetweenPolyCollection | None] = {"art": None}
     front_e = ax_e.axvline(sweep_max, color=COLOR_FG, lw=1.3, alpha=0.55)
     # Sits well below the upper-right legend (a higher anchor ran under it).
     front_txt = ax_e.text(
@@ -2252,7 +2263,7 @@ def animate_specific_loudness(output_dir: str) -> None:
     ax.set_xlabel(T("Critical-band rate $z$ [Bark]"))
     ax.set_ylabel(T(r"Specific loudness $N^{\prime}$ [sone/Bark]"), fontsize=9)
     (line,) = ax.plot([], [], color=COLOR_PRIMARY, lw=2.2)
-    fill = {"art": None}
+    fill: dict[str, FillBetweenPolyCollection | None] = {"art": None}
     ax.axvline(8.5, color=COLOR_FG, lw=0.9, ls=":", alpha=0.6)
     ax.text(
         8.75,
@@ -2501,7 +2512,7 @@ def animate_power_two_rooms(output_dir: str) -> None:
     cr = (1.7, 1.3)
     _draw_speaker(ax_r, cr[0] - 0.05, cr[1], size=0.85)
     # bouncing ray trails (specular folding inside the rectangle)
-    rays = [
+    rays: list[dict[str, Any]] = [
         {
             "v": (2.9, 1.9),
             "trail": ax_r.plot([], [], color=COLOR_TERTIARY, lw=1.1, alpha=0.75)[0],
@@ -2911,9 +2922,9 @@ def animate_dynamic_stiffness_sweep(output_dir: str) -> None:
     f_lo, f_hi = 8.0, 60.0
     freqs = np.linspace(f_lo, f_hi, 800)
 
-    def response(f: np.ndarray | float) -> Any:
+    def response(f: np.ndarray | float) -> NDArray[np.complex128]:
         ratio = np.asarray(f, dtype=float) / f_r
-        return 1.0 / (1.0 - ratio**2 + 1j * eta * ratio)
+        return 1.0 / (1.0 - ratio**2 + 1j * eta * ratio)  # type: ignore[return-value]  # numpy stubs miss the 1j promotion to complex128
 
     mag = np.abs(response(freqs))
     phase = np.degrees(np.angle(response(freqs)))
@@ -3297,7 +3308,7 @@ def animate_modulation_transfer(output_dir: str) -> None:
             "alpha": 0.8,
         },
     )
-    floor_fill = {"art": None}
+    floor_fill: dict[str, FillBetweenPolyCollection | None] = {"art": None}
     peak_line = ax_e.axhline(0.0, color=COLOR_SECONDARY, lw=1.0, ls=":")
     dip_line = ax_e.axhline(0.0, color=COLOR_SECONDARY, lw=1.0, ls=":")
     depth = _make_arrow(ax_e, COLOR_SECONDARY, scale=9.0)
@@ -3447,7 +3458,7 @@ _GATE_RELATIVE = -10.0  # Formula (5), the integrated relative gate
 _LRA_RELATIVE = -20.0  # EBU Tech 3342, the deeper loudness-range gate
 
 
-def _energy_mean_lufs(values: Any) -> float:
+def _energy_mean_lufs(values: NDArray[np.float64]) -> float:
     """Energy (not arithmetic) mean of block loudness values, in LUFS."""
     return float(10.0 * np.log10(np.mean(10.0 ** (np.asarray(values) / 10.0))))
 
@@ -3605,7 +3616,7 @@ def animate_loudness_gating(output_dir: str) -> None:
         visible=False,
         bbox=_label_bbox,
     )
-    lra_band = {"art": None}
+    lra_band: dict[str, Rectangle | None] = {"art": None}
     ax_t.legend(loc="lower right", fontsize=7.5, framealpha=0.9)
 
     # --- top right: the distribution the second pass is computed from ----
@@ -3917,7 +3928,7 @@ def animate_epnl_flyover(output_dir: str) -> None:
         ms=2.4,
         label=T(r"$\mathrm{PNLT} = \mathrm{PNL} + C$"),
     )
-    gap = {"art": None, "win": None}
+    gap: dict[str, FillBetweenPolyCollection | None] = {"art": None, "win": None}
     thr_line = ax_h.axhline(
         threshold, color=COLOR_SECONDARY, lw=1.2, ls=":", visible=False
     )
@@ -3971,7 +3982,7 @@ def animate_epnl_flyover(output_dir: str) -> None:
     win_at = int(0.86 * sweep)  # the 10 dB-down window opens
     epnl_at = int(0.96 * sweep)  # the duration correction and the EPNL
 
-    def plane_shape(x: float, y: float) -> Any:
+    def plane_shape(x: float, y: float) -> NDArray[np.float64]:
         s_x, s_y = 0.42, 0.30
         return np.array(
             [
@@ -4335,7 +4346,7 @@ def animate_image_source_buildup(output_dir: str) -> None:
         reached = plan_t <= now
         pts = plan_xy[reached]
         lit.set_offsets(pts if pts.size else np.empty((0, 2)))
-        lit.set_facecolors([palette[o] for o in d["plan_order"][reached]])
+        lit.set_facecolors([palette[o] for o in d["plan_order"][reached]])  # type: ignore[attr-defined]  # runtime alias of set_facecolor, absent from the stubs
         rays.set_segments(
             [
                 [(float(x), float(y)), (float(_IS_RECEIVER[0]), float(_IS_RECEIVER[1]))]
@@ -4347,7 +4358,7 @@ def animate_image_source_buildup(output_dir: str) -> None:
         n = int(arrived.sum())
         xy = np.column_stack([t_ms[arrived], level[arrived]])
         dots.set_offsets(xy if n else np.empty((0, 2)))
-        dots.set_facecolors([palette[o] for o in order[arrived]])
+        dots.set_facecolors([palette[o] for o in order[arrived]])  # type: ignore[attr-defined]  # runtime alias of set_facecolor, absent from the stubs
         stems.set_segments([[(float(a), -26.0), (float(a), float(b))] for a, b in xy])
 
         shown = grid_t <= now
@@ -4527,7 +4538,7 @@ def animate_iso717_shift(output_dir: str) -> None:
         zorder=3,
         label=T("reference curve, as shifted"),
     )
-    shade = {"art": None}
+    shade: dict[str, FillBetweenPolyCollection | None] = {"art": None}
     (read_dot,) = ax_s.plot(
         [], [], color=COLOR_TERTIARY, marker="o", ms=11.0, ls="none", zorder=5
     )
@@ -4934,7 +4945,7 @@ def animate_block_vs_exponential(output_dir: str) -> None:
     ax_a.set_xlabel(T("Burst start within the block [ms]"), fontsize=8.5)
     ax_a.set_ylabel(T("Reading [dB]"), fontsize=8.5)
     ax_a.tick_params(labelsize=8)
-    corridor = {"art": None}
+    corridor: dict[str, Rectangle | None] = {"art": None}
     (exp_trace,) = ax_a.plot([], [], color=COLOR_PRIMARY, lw=2.4)
     (blk_trace,) = ax_a.plot([], [], color=COLOR_TERTIARY, lw=2.4)
     (now_dot,) = ax_a.plot(

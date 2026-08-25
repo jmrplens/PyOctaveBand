@@ -1,8 +1,10 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """The expansion chamber: a reactive muffler passing and stopping."""
 
+from __future__ import annotations
+
 from functools import lru_cache
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -15,6 +17,9 @@ from ..media import (
 )
 from ..theme import CMAP_FIELD, COLOR_FG, COLOR_GRID, COLOR_PRIMARY
 from ._core import _anim_speaker
+
+if TYPE_CHECKING:
+    from matplotlib.axes import Axes
 
 _CHAMBER_L = 0.30  # chamber length of the TL example
 _CHAMBER_M = 4.0  # expansion area ratio
@@ -270,7 +275,7 @@ def animate_fdtd_expansion_chamber(output_dir: str) -> None:
 
 
 def _anim_chamber_hardware(
-    ax: Any,
+    ax: Axes,
     length: float,
     height: float,
     pipe_y: tuple[float, float],

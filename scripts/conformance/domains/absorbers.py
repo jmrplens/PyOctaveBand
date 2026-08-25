@@ -18,7 +18,7 @@ vanishes.
 from __future__ import annotations
 
 import math
-from typing import Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 import reference_data as ref
@@ -26,6 +26,13 @@ import reference_data as ref
 import phonometry as ph
 
 from ..registry import Outcome, numeric, register
+
+if TYPE_CHECKING:
+    from phonometry.materials import (
+        BiotWavesResult,
+        PoroelasticLayer,
+        PorousMediumResult,
+    )
 
 _POROUS = "Porous & multilayer absorbers (Mechel / Bies / Cox & D'Antonio)"
 
@@ -342,14 +349,14 @@ _AA_TABLE_6_1_RHO1 = 130.0
 _AA_TABLE_6_1_SHEAR = 220.0e4 * (1.0 + 0.1j)
 
 
-def _aa_glass_wool_medium(frequency: np.ndarray) -> Any:
+def _aa_glass_wool_medium(frequency: np.ndarray) -> PorousMediumResult:
     """The rigid-frame JCA equivalent fluid of the Table 6.1 glass wool."""
     return ph.materials.johnson_champoux_allard(
         frequency, _AA_TABLE_6_1_SIGMA, **_AA_TABLE_6_1
     )
 
 
-def _aa_glass_wool_waves(frequency: np.ndarray) -> Any:
+def _aa_glass_wool_waves(frequency: np.ndarray) -> BiotWavesResult:
     return ph.materials.biot_waves(
         _aa_glass_wool_medium(frequency),
         porosity=_AA_TABLE_6_1["porosity"],
@@ -359,7 +366,9 @@ def _aa_glass_wool_waves(frequency: np.ndarray) -> Any:
     )
 
 
-def _aa_glass_wool_layer(medium: Any, thickness: float, scale: float = 1.0) -> Any:
+def _aa_glass_wool_layer(
+    medium: PorousMediumResult, thickness: float, scale: float = 1.0
+) -> PoroelasticLayer:
     """The same material as a poroelastic layer, optionally frozen stiff."""
     return ph.materials.PoroelasticLayer(
         thickness,

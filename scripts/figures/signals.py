@@ -11,7 +11,9 @@ have modules of their own (:mod:`figures.spectral_estimation`,
 the checks made around the measurement are in :mod:`figures.metrology`.
 """
 
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
@@ -37,6 +39,9 @@ from .theme import (
     measure_weighting_response,
     save_figure,
 )
+
+if TYPE_CHECKING:
+    from matplotlib.axes import Axes
 
 
 def generate_filter_type_comparison(output_dir: str) -> None:
@@ -423,10 +428,10 @@ def generate_decomposition_plot(output_dir: str) -> None:
 
 
 def _draw_weighting_curves(
-    ax: Any,
+    ax: Axes,
     fs: int,
     curves: tuple[tuple[str, str, str, str, float], ...],
-    inset: Any = None,
+    inset: Axes | None = None,
 ) -> None:
     """Draw ``(code, label, colour, linestyle, linewidth)`` curves measured at *fs*.
 

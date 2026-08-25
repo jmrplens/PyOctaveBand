@@ -77,7 +77,7 @@ def _load() -> list[dict[str, Any]]:
     return data
 
 
-def _localized(value: Any) -> str:
+def _localized(value: str | dict[str, str] | None) -> str:
     """A field that is either shared by both languages or given per language."""
     if value is None:
         return ""

@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import math
 import warnings
-from typing import Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 import reference_data as ref
@@ -27,6 +27,10 @@ from scipy import signal as sg
 import phonometry as ph
 
 from ..registry import Outcome, numeric, register
+
+if TYPE_CHECKING:
+    from phonometry.environment import ImpulseOnset
+    from phonometry.metrology import UncertaintyResult
 
 _NTA = "Impulsive-sound prominence (NT ACOU 112)"
 
@@ -50,7 +54,7 @@ def _chk_impulse_adjustment() -> Outcome:
 _ISO1996_3 = "Impulsive-sound prominence (ISO/PAS 1996-3)"
 
 
-def _iso1996_3_ramp_onset() -> Any:
+def _iso1996_3_ramp_onset() -> ImpulseOnset:
     """Detected onset of a 30 dB LpAF ramp over 0.30 s (dt = 20 ms)."""
     from phonometry.environment.assessment.impulsive_sound import detect_onsets
 
@@ -161,7 +165,7 @@ def _chk_gum_welch() -> Outcome:
     return numeric(ref.GUM_WELCH_VEFF, result.effective_dof, 1e-6, places=3)
 
 
-def _gum_h1_result() -> Any:
+def _gum_h1_result() -> UncertaintyResult:
     quantities = [
         ph.metrology.Quantity(v, unc, dof=dof) for v, unc, dof in ref.GUM_H1_INPUTS
     ]

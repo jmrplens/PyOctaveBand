@@ -13,8 +13,10 @@ lower axis where the *measured* energy flux through the seabed fills in
 behind the contact point and lands on the closed form.
 """
 
+from __future__ import annotations
+
 from functools import lru_cache
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -28,6 +30,9 @@ from ..theme import (
     COLOR_PRIMARY,
     COLOR_SECONDARY,
 )
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 _SB_C1, _SB_RHO1 = 1500.0, 1000.0  # water: the guide's own pair
 #: The two sediments. Sand is the guide's water-over-sand example, whose
@@ -80,7 +85,7 @@ def _sb_geometry() -> tuple[int, int, int, int, int]:
     return n_vis, n_rows, rows_water, ix_src, iy_src
 
 
-def _sb_front_angle(times: Any) -> Any:
+def _sb_front_angle(times: NDArray[np.float64]) -> NDArray[np.float64]:
     """Grazing angle at which the direct front meets the seabed [deg].
 
     The front is a circle of radius ``c1 (t - t0)`` about a source sitting
@@ -502,7 +507,7 @@ def animate_fdtd_critical_angle(output_dir: str) -> None:
         color=COLOR_FG,
         alpha=0.85,
     )
-    fig.get_layout_engine().set(rect=(0.0, 0.035, 1.0, 0.95))
+    fig.get_layout_engine().set(rect=(0.0, 0.035, 1.0, 0.95))  # type: ignore[union-attr, call-arg]  # _anim_figure: constrained engine, never None
 
     def update(k: int) -> tuple[Any, ...]:
         j = min(k, times.size - 1)

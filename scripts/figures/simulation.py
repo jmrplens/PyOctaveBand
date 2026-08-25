@@ -8,8 +8,10 @@ checked against. The clips these belong with live in :mod:`figures.fields`.
 Everything here is embedded by a page under ``simulation/``.
 """
 
+from __future__ import annotations
+
 from functools import cache
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -31,6 +33,9 @@ from .theme import (
     LABEL_FREQ_HZ,
     save_figure,
 )
+
+if TYPE_CHECKING:
+    from phonometry.simulation import ElasticFDTDResult
 
 
 def generate_metadiffuser_ntff_polar(output_dir: str) -> None:
@@ -248,7 +253,7 @@ def generate_elastic_halfspace_waves(output_dir: str) -> None:
 
 
 @cache
-def _scholte_interface_result() -> Any:
+def _scholte_interface_result() -> ElasticFDTDResult:
     """Water over a soft seabed, explosive shot near the contact (cached).
 
     Language/theme independent: the van Vossen (2002) benchmark media

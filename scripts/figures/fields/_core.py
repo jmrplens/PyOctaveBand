@@ -8,17 +8,30 @@ loudspeaker drawn on the clips that drive a bore, and the measure-then-slide
 pass that keeps an annotation inside its panel in either language.
 """
 
+from __future__ import annotations
+
 import sys
-from typing import Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 from ..theme import COLOR_FG
 
+if TYPE_CHECKING:
+    from matplotlib.axes import Axes
+    from matplotlib.figure import Figure
+    from matplotlib.text import Text
+    from matplotlib.transforms import Bbox
+    from numpy.typing import NDArray
+
+    from phonometry.simulation.fdtd import FDTD2D
+
 
 def _fdtd_cw_capture(
-    sim: Any, frequency: float, every: int, n_frames: int, decimate: int = 2
-) -> tuple[Any, Any, Any, Any]:
+    sim: FDTD2D, frequency: float, every: int, n_frames: int, decimate: int = 2
+) -> tuple[
+    NDArray[np.float32], NDArray[np.float32], NDArray[np.float64], NDArray[np.float64]
+]:
     """Drive a CW simulation and capture instantaneous + running-RMS frames.
 
     The running mean square uses a two-period time constant, so the RMS map
@@ -28,8 +41,8 @@ def _fdtd_cw_capture(
     """
     beta = float(np.exp(-sim.dt * frequency / 2.0))
     ms = np.zeros_like(sim.p)
-    ps: list[Any] = []
-    rs: list[Any] = []
+    ps: list[NDArray[np.float32]] = []
+    rs: list[NDArray[np.float32]] = []
     ts: list[float] = []
     for _ in range(every * n_frames):
         sim.step()
@@ -41,7 +54,9 @@ def _fdtd_cw_capture(
     return np.stack(ps), np.stack(rs), np.asarray(ts), np.sqrt(ms)
 
 
-def _rms_to_db(rms_frames: Any, *, floor: float = -40.0) -> Any:
+def _rms_to_db(
+    rms_frames: NDArray[np.float32], *, floor: float = -40.0
+) -> NDArray[np.float32]:
     """RMS frame stack -> dB re the final frame's maximum, clipped at floor."""
     ref = float(rms_frames[-1].max())
     with np.errstate(divide="ignore"):
@@ -87,7 +102,9 @@ _GAIN_STEPS = (
 )
 
 
-def _weak_field_gain(weak: Any, vmax: float, *, quantile: float = 0.999) -> float:
+def _weak_field_gain(
+    weak: NDArray[np.float32], vmax: float, *, quantile: float = 0.999
+) -> float:
     """Rounded display gain that lifts a weak field onto a readable colour.
 
     ``weak`` is the quiet region of the field (any shape), ``vmax`` the
@@ -116,7 +133,7 @@ def _gain_note(region: str, gain: float) -> str:
     return f"{region} drawn ×{gain:g} (+{20.0 * np.log10(gain):.0f} dB)"
 
 
-def _layout_box(artist: Any) -> Any:
+def _layout_box(artist: Text) -> Bbox:
     """The rendered box of a label: its background patch, or its glyphs.
 
     For a label with a background patch -- a pill -- this is the patch's own
@@ -138,7 +155,7 @@ def _layout_box(artist: Any) -> Any:
     return artist.get_window_extent()
 
 
-def _settle(fig: Any) -> None:
+def _settle(fig: Figure) -> None:
     """Draw *fig* until its constrained layout stops moving under it.
 
     The first draw of a constrained-layout figure is the one that decides
@@ -151,7 +168,7 @@ def _settle(fig: Any) -> None:
     fig.canvas.draw()
 
 
-def _text_width_x(fig: Any, ax: Any, artist: Any) -> float:
+def _text_width_x(fig: Figure, ax: Axes, artist: Text) -> float:
     """The rendered width of *artist*, in x data units of *ax*."""
     _settle(fig)
     box = _layout_box(artist)
@@ -161,7 +178,7 @@ def _text_width_x(fig: Any, ax: Any, artist: Any) -> float:
 
 
 def _fit_text_below(
-    fig: Any, ax: Any, artist: Any, other: Any, *, gap: float = 8.0
+    fig: Figure, ax: Axes, artist: Text, other: Text, *, gap: float = 8.0
 ) -> float:
     """Slide *artist* back along its own baseline until it clears *other*.
 
@@ -207,7 +224,13 @@ def _fit_text_below(
 
 
 def _fit_text_x(
-    fig: Any, ax: Any, artist: Any, x_lo: float, x_hi: float, *, margin: float = 0.0
+    fig: Figure,
+    ax: Axes,
+    artist: Text,
+    x_lo: float,
+    x_hi: float,
+    *,
+    margin: float = 0.0,
 ) -> float:
     """Slide *artist* along x until its rendered box sits inside the panel.
 
@@ -249,7 +272,7 @@ def _fit_text_x(
 
 
 def _anim_speaker(
-    ax: Any,
+    ax: Axes,
     x0: float,
     y_mid: float,
     bore: float,

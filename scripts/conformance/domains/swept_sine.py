@@ -15,7 +15,7 @@ closed forms.
 from __future__ import annotations
 
 import math
-from typing import Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 from scipy import signal as sg
@@ -24,13 +24,16 @@ import phonometry as ph
 
 from ..registry import Outcome, numeric, register
 
+if TYPE_CHECKING:
+    from phonometry.electroacoustics import SweptSineDistortionResult
+
 _SWEPT_SINE = "Swept-sine distortion & phase utilities (Farina / Novak)"
 
 #: Chebyshev oracle for y = x + a2 x^2 + a3 x^3 driven by a unit sweep.
 _SS_A2, _SS_A3 = 0.1, 0.2
 
 
-def _swept_sine_polynomial() -> Any:
+def _swept_sine_polynomial() -> SweptSineDistortionResult:
     fs, f1, f2, seconds = 48000, 20.0, 6000.0, 2.0
     x = ph.electroacoustics.synchronized_sweep_signal(fs, f1, f2, seconds)
     y = x + _SS_A2 * x**2 + _SS_A3 * x**3
@@ -39,7 +42,7 @@ def _swept_sine_polynomial() -> Any:
     )
 
 
-def _ss_response_at(res: Any, order: int, freq: float) -> complex:
+def _ss_response_at(res: SweptSineDistortionResult, order: int, freq: float) -> complex:
     idx = int(np.argmin(np.abs(res.frequencies - freq)))
     return complex(res.harmonic_responses[order - 1][idx])
 

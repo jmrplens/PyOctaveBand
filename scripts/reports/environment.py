@@ -10,8 +10,6 @@ and the RD 1367/2007 assessment of an activity against the limits binding it.
 
 from __future__ import annotations
 
-from typing import Any
-
 import numpy as np
 
 import phonometry as ph
@@ -206,7 +204,11 @@ class _WithSourceEmission:
     keeping the generator loop unchanged.
     """
 
-    def __init__(self, result: Any, emission: ph.environment.SourceEmission) -> None:
+    def __init__(
+        self,
+        result: ph.environment.OutdoorAttenuation,
+        emission: ph.environment.SourceEmission,
+    ) -> None:
         self._result = result
         self._emission = emission
 

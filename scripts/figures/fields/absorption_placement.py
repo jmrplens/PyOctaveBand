@@ -32,6 +32,7 @@ from functools import lru_cache
 from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
 
 from ..media import (
     _ANIM_PILL_BOX,
@@ -119,7 +120,9 @@ def _ap_linings() -> tuple[float, float, float, float]:
     return zeta_a, zeta_b, _ap_alpha_stat(zeta_a), a_b
 
 
-def _ap_fit_t60(t: Any, level: Any, lo: float, hi: float) -> float:
+def _ap_fit_t60(
+    t: NDArray[np.float64], level: NDArray[np.float64], lo: float, hi: float
+) -> float:
     """T60 extrapolated from a straight fit of the decay between two levels,
     the T20/T30 practice of the measurement guides.
     """
@@ -288,7 +291,7 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
         rms_axes.append(ax_r)
         for row, ax in enumerate((ax_p, ax_r)):
             ax.grid(False)
-            kwargs = (
+            kwargs: dict[str, Any] = (
                 {"cmap": CMAP_FIELD, "vmin": -vmax, "vmax": vmax}
                 if row == 0
                 else {"cmap": "magma", "vmin": -_AP_RMS_SPAN, "vmax": 0.0}
@@ -494,7 +497,7 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
         fontsize=9.5,
         color=COLOR_FG,
     )
-    fig.get_layout_engine().set(rect=(0.0, 0.03, 1.0, 0.965))
+    fig.get_layout_engine().set(rect=(0.0, 0.03, 1.0, 0.965))  # type: ignore[union-attr, call-arg]  # _anim_figure: constrained engine, never None
     fig.text(
         0.5,
         0.005,

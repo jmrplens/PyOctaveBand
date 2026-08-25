@@ -5,6 +5,7 @@ from functools import lru_cache
 from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
 
 from ..media import (
     _ANIM_FPS,
@@ -328,14 +329,14 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
 
     reveal = int(0.5 * p_all.shape[1])
 
-    def shadow_gained(col: int, k: int) -> Any:
+    def shadow_gained(col: int, k: int) -> NDArray[np.float32]:
         """Frame *k* of panel *col* with the shadow side amplified.
 
         The gain is applied frame by frame: the field stack is memoised and
         shared by the four language/theme variants, so it must not be
         rescaled in place.
         """
-        frame = p_all[col][k]
+        frame: NDArray[np.float32] = p_all[col][k]
         if gains[col] <= 1.0:
             return frame
         out = frame.copy()
