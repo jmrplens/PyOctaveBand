@@ -1182,6 +1182,27 @@ def precision_field_indicators(
     )
 
 
+def _checked_band_centres(
+    frequencies: np.ndarray | None, f_pi_signed: np.ndarray, n_bands: int
+) -> np.ndarray | None:
+    """The band centres validated against the indicator's band axis.
+
+    Split out of :func:`precision_qualification`, which was one branch past
+    what one reader holds: the centre validation is one idea, and it reads
+    the same whether the caller supplied centres or not.
+    """
+    if frequencies is None:
+        return None
+    freqs = require_positive_array(frequencies, "frequencies")
+    if freqs.shape != f_pi_signed.shape:
+        msg = (
+            "'frequencies' must carry one value per band "
+            f"({n_bands} in 'indicators.f_pi_signed'); got shape {freqs.shape}."
+        )
+        raise ValueError(msg)
+    return freqs
+
+
 def _spread_over_bands(value: ArrayLike, n_bands: int) -> np.ndarray:
     """Put a field non-uniformity on the band axis without inventing values.
 
@@ -1248,15 +1269,7 @@ def precision_qualification(
     f_pi_signed = indicators.f_pi_signed
     n_bands = f_pi_signed.shape[0]
 
-    freqs: np.ndarray | None = None
-    if frequencies is not None:
-        freqs = require_positive_array(frequencies, "frequencies")
-        if freqs.shape != f_pi_signed.shape:
-            msg = (
-                "'frequencies' must carry one value per band "
-                f"({n_bands} in 'indicators.f_pi_signed'); got shape {freqs.shape}."
-            )
-            raise ValueError(msg)
+    freqs = _checked_band_centres(frequencies, f_pi_signed, n_bands)
 
     # Criteria 3 and 4 are always available from the indicators.
     criterion_3 = np.asarray(

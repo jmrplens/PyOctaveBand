@@ -157,9 +157,9 @@ def _resolve_speed(temperature: float, speed_of_sound: float | None) -> float:
             msg = "'speed_of_sound' must be positive."
             raise ValueError(msg)
         return float(speed_of_sound)
-    # `not >` rather than `<=` so a NaN temperature is refused too, instead of
-    # propagating through Eq. (6) into every derived quantity.
-    if not temperature > -_KELVIN:
+    # NaN is named alongside the bound: a NaN temperature would otherwise
+    # propagate through Eq. (6) into every derived quantity.
+    if math.isnan(temperature) or temperature <= -_KELVIN:
         msg = "'temperature' must be above absolute zero (-273,15 degC)."
         raise ValueError(msg)
     lo, hi = _EQ6_TEMPERATURE_RANGE

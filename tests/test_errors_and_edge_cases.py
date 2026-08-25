@@ -323,12 +323,13 @@ def test_octave_filter_rejects_malformed_limits(limits: object) -> None:
 def test_octave_filter_rejects_malformed_limits_on_the_plotting_path() -> None:
     """The plot branch bypasses the design cache; it must refuse the same way."""
     x = np.zeros(1000)
+    plot = filters.ResponsePlot(file="unused.png")
     with pytest.raises(ValueError, match="'limits' must be a pair of frequencies"):
         filters.octave_filter(
             x,
             48000,
             limits=1000,  # type: ignore[arg-type]
-            response_plot=filters.ResponsePlot(file="unused.png"),
+            response_plot=plot,
         )
 
 

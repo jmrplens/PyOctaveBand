@@ -211,8 +211,9 @@ def test_half_a_panel_result_is_refused_by_name() -> None:
     class Half:
         transmission_loss = np.array([20.0, 25.0])
 
+    half = Half()
     with pytest.raises(TypeError, match="'panel_transmission_loss' must be"):
-        noise_control.enclosure_insertion_loss(Half(), 12.0, 20.0, 0.2)
+        noise_control.enclosure_insertion_loss(half, 12.0, 20.0, 0.2)
 
 
 def test_stray_string_panel_spectrum_is_refused_by_name() -> None:
