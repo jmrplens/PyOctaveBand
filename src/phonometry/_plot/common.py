@@ -1067,10 +1067,14 @@ def _sound_power_designation(
 ) -> str:
     """The standard designation matching a sound-power result's method.
 
-    Distinguishes the reverberation-room (ISO 3741) and intensity (ISO 9614)
-    determinations by their result types; every other result type falls back
-    to the enveloping-surface pressure methods' ISO 3744/3746.
+    Distinguishes the reverberation-room (ISO 3741), intensity (ISO 9614)
+    and precision anechoic (ISO 3745) determinations by their result types;
+    every other result type falls back to the enveloping-surface pressure
+    methods' ISO 3744/3746. The precision branch is the youngest: until the
+    designation helper knew the type, an ISO 3745 grade-1 determination was
+    captioned with the engineering and survey standards it exists to outrank.
     """
+    from ..emission.sound_power_anechoic import PrecisionSoundPowerResult
     from ..emission.sound_power_intensity import SoundPowerIntensityResult
     from ..emission.sound_power_reverberation import ReverberationSoundPowerResult
 
@@ -1078,6 +1082,8 @@ def _sound_power_designation(
         return "ISO 3741"
     if isinstance(result, SoundPowerIntensityResult):
         return "ISO 9614"
+    if isinstance(result, PrecisionSoundPowerResult):
+        return "ISO 3745"
     return "ISO 3744/3746"
 
 

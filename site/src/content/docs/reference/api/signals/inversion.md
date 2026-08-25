@@ -143,7 +143,7 @@ Number of samples in the inverse filter.
 
 ```python
 regularized_inverse_filter(
-    response: SignalInput,
+    response: SignalInput | TimedResponse,
     fs: float | None = None,
     *,
     f_range: tuple[float, float],

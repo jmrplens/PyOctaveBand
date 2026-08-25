@@ -41,7 +41,7 @@ out-of-band the filter gain never exceeds the
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Protocol
 
 import numpy as np
 
@@ -63,6 +63,23 @@ __all__ = [
 
 #: Fewest samples a measured impulse response must have to be inverted.
 _MIN_RESPONSE_SAMPLES = 2
+
+
+class TimedResponse(Protocol):
+    """A measured response that knows its own sample rate.
+
+    The structural face of the sweep/MLS/Golay result objects: an array view
+    of the impulse response plus the rate it was sampled at. Structural on
+    purpose, because naming :class:`phonometry.room.ImpulseResponseResult`
+    here would put a toolbox-to-domain edge in the import graph that the
+    architecture forbids; any object with these two members is accepted, and
+    that class is one of them.
+    """
+
+    @property
+    def fs(self) -> float | None: ...
+
+    def __array__(self) -> np.ndarray: ...
 
 
 @dataclass(frozen=True)
@@ -254,7 +271,7 @@ def _regularization_profile(
 
 
 def _validated_response(
-    response: SignalInput,
+    response: SignalInput | TimedResponse,
 ) -> np.ndarray:
     """Validate the measured impulse response array."""
     h = _typesignal(np.asarray(response, dtype=np.float64))
@@ -267,7 +284,13 @@ def _validated_response(
     if not np.all(np.isfinite(h)):
         msg = "'response' must be finite."
         raise ValueError(msg)
-    return apply_calibration(response, h)
+    if isinstance(response, Signal):
+        return apply_calibration(response, h)
+    # The calibration contract is Signal-scoped; every other accepted form,
+    # the plain arrays and the timed result objects, takes the same
+    # pass-through apply_calibration would give it, said here so the wider
+    # parameter type checks.
+    return h
 
 
 def _validated_band(f_range: tuple[float, float], fs: float) -> tuple[float, float]:
@@ -286,7 +309,7 @@ def _validated_band(f_range: tuple[float, float], fs: float) -> tuple[float, flo
 
 
 def _resolve_fs(
-    response: SignalInput,
+    response: SignalInput | TimedResponse,
     fs: float | None,
 ) -> float:
     """Take ``fs`` from the argument or from a result carrying one.
@@ -314,7 +337,7 @@ def _resolve_fs(
 
 
 def regularized_inverse_filter(
-    response: SignalInput,
+    response: SignalInput | TimedResponse,
     fs: float | None = None,
     *,
     f_range: tuple[float, float],
