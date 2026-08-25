@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Protocol
 
 import numpy as np
 
@@ -47,7 +47,30 @@ from ._layout import (
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+    from numpy.typing import ArrayLike
+    from reportlab.platypus import Table
+
     from .metadata import ReportMetadata
+
+    class SoundPowerLike(Protocol):
+        """A determined sound-power result, stated structurally.
+
+        The shared helpers read exactly these three members: the per-band
+        ``sound_power_level``, its A-weighted total and the band centres that
+        label the table rows. Every sound-power result class (ISO 3744/3745,
+        ISO 3741, ISO 9614 and its precision variant, ISO/TS 7849) carries
+        them; the render layer never imports those domain classes at runtime.
+        """
+
+        @property
+        def frequencies(self) -> np.ndarray | None: ...
+
+        @property
+        def sound_power_level(self) -> np.ndarray: ...
+
+        @property
+        def sound_power_level_a(self) -> float: ...
+
 
 #: Reference sound power for the sound power level, 1 pW = 10^-12 W.
 POWER_REFERENCE = "1 pW"
@@ -143,7 +166,7 @@ def range_str(values: np.ndarray, language: str = "en", decimals: int = 1) -> st
     )
 
 
-def energy_sum(levels: Any) -> float:
+def energy_sum(levels: ArrayLike) -> float:
     """Energy sum of a per-band level array, ``10 lg(sum 10^(L/10))`` dB.
 
     Non-finite bands are skipped: a band the method could not determine
@@ -157,12 +180,12 @@ def energy_sum(levels: Any) -> float:
     return float(10.0 * np.log10(np.sum(10.0 ** (finite / 10.0))))
 
 
-def total_power_level(result: Any) -> float:
+def total_power_level(result: SoundPowerLike) -> float:
     """Energy sum of the band sound-power levels, ``10 lg(sum 10^(LW/10))`` dB."""
     return energy_sum(result.sound_power_level)
 
 
-def headline_level(result: Any, level_a: float | None = None) -> float:
+def headline_level(result: SoundPowerLike, level_a: float | None = None) -> float:
     """The single number the verdict compares: ``LWA`` if defined, else total ``LW``.
 
     ``level_a`` overrides the result's own A-weighted total, for a fiche whose
@@ -196,7 +219,7 @@ def headline_level(result: Any, level_a: float | None = None) -> float:
 
 
 def power_statement(
-    result: Any, language: str = "en", *, level_a: float | None = None
+    result: SoundPowerLike, language: str = "en", *, level_a: float | None = None
 ) -> tuple[str, list[str]]:
     """The boxed sound-power result and its base extended terms.
 
@@ -235,7 +258,7 @@ def power_statement(
 
 
 def power_verdict(
-    result: Any,
+    result: SoundPowerLike,
     requirement: float,
     language: str = "en",
     *,
@@ -297,7 +320,7 @@ def level_limit_verdict(
     return text, passed
 
 
-def fraction_caption(result: Any, language: str = "en") -> str:
+def fraction_caption(result: SoundPowerLike, language: str = "en") -> str:
     """The caption declaring the analysis band set above the table."""
     freqs = getattr(result, "frequencies", None)
     n = np.asarray(result.sound_power_level, dtype=np.float64).size
@@ -314,7 +337,7 @@ def power_value_table(
     rows_data: Sequence[Sequence[Any]],
     widths: Sequence[float],
     fraction: int,
-) -> Any:
+) -> Table:
     """Build the full-width per-band table with the accredited sound-power style.
 
     ``header`` holds the (markup) column headings and ``rows_data`` the band
@@ -394,11 +417,15 @@ class FicheCopy:
 
 
 def render_sound_power_fiche(
-    result: Any,
+    # The skeleton itself reads only ``plot``, but the airborne fiches lean on
+    # the fallback verdict below, which reads the SoundPowerLike levels, while
+    # the structure-borne fiches (EN 15657, EN 12354-5) pass plot-only results
+    # with a pre-computed verdict. No one protocol covers both contracts.
+    result: Any,  # noqa: ANN401
     path: str,
     *,
     copy: FicheCopy,
-    value_table: Any,
+    value_table: Table,
     metadata: ReportMetadata | None,
     language: str,
     verdict: tuple[str, bool] | None = None,

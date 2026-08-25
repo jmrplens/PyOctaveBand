@@ -47,12 +47,14 @@ import numpy as np
 
 from .._internal.utils import _typesignal
 from .._internal.validation import require_ranks, require_same_length
-from ..io._resolve import apply_calibration
+from ..io._resolve import SignalInput, apply_calibration
 from ..io._resolve import resolve_fs as _resolve_signal_fs
 from ..io._signal import Signal
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import DTypeLike
+
 
 __all__ = [
     "InverseFilterResult",
@@ -164,7 +166,7 @@ class InverseFilterResult:
             axis="frequency",
         )
 
-    def __array__(self, dtype: Any = None) -> np.ndarray:
+    def __array__(self, dtype: DTypeLike | None = None) -> np.ndarray:
         """Return the inverse-filter samples as an array."""
         return np.asarray(self.inverse, dtype=dtype)
 
@@ -251,7 +253,9 @@ def _regularization_profile(
     return np.asarray(np.exp(log_eps))
 
 
-def _validated_response(response: Any) -> np.ndarray:
+def _validated_response(
+    response: SignalInput,
+) -> np.ndarray:
     """Validate the measured impulse response array."""
     h = _typesignal(np.asarray(response, dtype=np.float64))
     if h.ndim != 1:
@@ -281,7 +285,10 @@ def _validated_band(f_range: tuple[float, float], fs: float) -> tuple[float, flo
     return f1, f2
 
 
-def _resolve_fs(response: Any, fs: float | None) -> float:
+def _resolve_fs(
+    response: SignalInput,
+    fs: float | None,
+) -> float:
     """Take ``fs`` from the argument or from a result carrying one.
 
     A :class:`phonometry.io.Signal` goes through the library-wide resolver,
@@ -307,7 +314,7 @@ def _resolve_fs(response: Any, fs: float | None) -> float:
 
 
 def regularized_inverse_filter(
-    response: Signal | list[float] | np.ndarray | Any,
+    response: SignalInput,
     fs: float | None = None,
     *,
     f_range: tuple[float, float],

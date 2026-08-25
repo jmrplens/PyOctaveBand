@@ -39,7 +39,7 @@ if TYPE_CHECKING:
     from ...building.prediction.aperture_transmission import (
         ApertureTransmissionResult,
     )
-    from ...building.prediction.facade import FacadeElement
+    from ...building.prediction.facade import FacadeElement, FacadePredictionResult
     from ...building.prediction.panel_transmission import SoundReductionResult
 
 #: Spanish translations of the fixed strings rendered here, keyed by their
@@ -289,14 +289,14 @@ def plot_facade_elements(
 
 
 def plot_facade_result_geometry(
-    result: Any,
+    result: FacadePredictionResult,
     ax: Axes | None = None,
     *,
     language: str = "en",
     **kwargs: Any,
 ) -> Axes:
     """Facade elevation for a prediction that retained its ``elements``."""
-    if getattr(result, "elements", None) is None:
+    if result.elements is None:
         msg = (
             "This result does not retain its elements; call "
             "plot_facade_elements(elements) with the original sequence."

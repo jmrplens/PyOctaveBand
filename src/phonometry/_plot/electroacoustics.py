@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Final
+from typing import TYPE_CHECKING, Any, Final, cast
 
 import numpy as np
 
@@ -24,6 +24,7 @@ from .common import (
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from matplotlib.projections.polar import PolarAxes
 
     from ..electroacoustics.distortion import HarmonicDistortionResult
     from ..electroacoustics.frequency_response import FrequencyResponseResult
@@ -498,7 +499,7 @@ def plot_piston_impedance(
     return ax
 
 
-def _sign_theta_labels(ax: Any) -> None:
+def _sign_theta_labels(ax: PolarAxes) -> None:
     """Sign the polar angle ticks with the typographic minus U+2212.
 
     Matplotlib's polar ``ThetaFormatter`` builds its degree labels with a plain
@@ -511,7 +512,7 @@ def _sign_theta_labels(ax: Any) -> None:
 
     from .._i18n import fmt_minus
 
-    def _degrees(value: float, _pos: Any = None) -> str:
+    def _degrees(value: float, _pos: int | None = None) -> str:
         return f"{fmt_minus(round(float(np.degrees(value))), 'd')}°"
 
     ax.xaxis.set_major_formatter(FuncFormatter(_degrees))
@@ -519,7 +520,7 @@ def _sign_theta_labels(ax: Any) -> None:
 
 def plot_piston_directivity(
     result: PistonDirectivity,
-    ax: Any | None = None,
+    ax: PolarAxes | None = None,
     *,
     language: str = "en",
     **kwargs: Any,
@@ -584,8 +585,7 @@ def plot_piston_directivity(
             fontsize="small",
         )
     localize_axes(ax, language)
-    axes: Axes = ax
-    return axes
+    return ax
 
 
 # ---------------------------------------------------------------------------
@@ -707,7 +707,7 @@ def _draw_loudspeaker_thd(
 
 def _draw_datasheet_polar(
     result: LoudspeakerCharacteristics | MicrophoneCharacteristics,
-    ax: Any,
+    ax: PolarAxes,
     *,
     language: str = "en",
 ) -> None:
@@ -835,11 +835,11 @@ def _draw_microphone_distortion(
     ax.legend(loc="upper left", fontsize="small")
 
 
-def _new_polar_axes() -> Any:
+def _new_polar_axes() -> PolarAxes:
     """Create a single fresh polar figure + axes and return the axes."""
     plt = _import_pyplot()
     _fig, ax = plt.subplots(subplot_kw={"projection": "polar"})
-    return ax
+    return cast("PolarAxes", ax)
 
 
 #: The loudspeaker ``.plot()`` quantities: the panel drawer, whether the panel
@@ -862,7 +862,7 @@ _MICROPHONE_QUANTITIES: dict[str, tuple[Any, bool, str | None]] = {
 
 
 def _plot_one_quantity(
-    result: Any,
+    result: LoudspeakerCharacteristics | MicrophoneCharacteristics,
     quantity: str,
     table: dict[str, tuple[Any, bool, str | None]],
     ax: Axes | None,

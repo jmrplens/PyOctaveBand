@@ -66,6 +66,9 @@ from ._layout import (
 )
 
 if TYPE_CHECKING:
+    from matplotlib.axes import Axes
+    from reportlab.platypus import Table
+
     from ..psychoacoustics.quality.tone_audibility import ToneAudibilityResult
     from .metadata import ReportMetadata
 
@@ -147,7 +150,7 @@ def _type_label(group_size: int | None, language: str = "en") -> str:
 
 def _key_quantity_table(
     result: ToneAudibilityResult, verbose: bool = False, language: str = "en"
-) -> Any:
+) -> Table:
     """The full-width per-tone key-quantity table (ISO/PAS 20065 Table E.2 style).
 
     One row per detected tone: frequency ``f_T``, entry type (single tone or a
@@ -361,7 +364,9 @@ def render_tone_audibility_report(
 
     # Full-width, landscape level-versus-frequency analysis plot: the tone
     # levels above their critical-band masking noise (a self-scaling dB axis).
-    def _levels_plot(ax: Any = None, language: str = "en", **kwargs: Any) -> Any:
+    def _levels_plot(
+        ax: Axes | None = None, language: str = "en", **kwargs: Any
+    ) -> Axes:
         from .._plot.psychoacoustics import plot_tone_audibility_levels
 
         return plot_tone_audibility_levels(result, ax=ax, language=language, **kwargs)

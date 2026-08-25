@@ -32,7 +32,7 @@ matplotlib in ``phonometry[plot]``); each is guarded with an actionable
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -47,6 +47,8 @@ from ._noise_control_fiche import (
 )
 
 if TYPE_CHECKING:
+    from reportlab.platypus import Table
+
     from ..noise_control.enclosures import EnclosureResult
     from .metadata import ReportMetadata
 
@@ -75,7 +77,7 @@ def _prediction_statement(language: str = "en") -> str:
     )
 
 
-def _caption(result: Any, language: str = "en") -> str:
+def _caption(result: EnclosureResult, language: str = "en") -> str:
     """The caption declaring the analysis band set above the table."""
     freqs = getattr(result, "frequencies", None)
     n = np.asarray(result.insertion_loss, dtype=np.float64).size
@@ -87,7 +89,7 @@ def _caption(result: Any, language: str = "en") -> str:
     return t("One-third-octave-band insertion loss", language)
 
 
-def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
+def _value_table(result: EnclosureResult, verbose: bool, language: str = "en") -> Table:
     """Build the per-band table (nominal frequency, R, C, IL; verbose adds R_i).
 
     Called only after the renderer has imported reportlab.
@@ -134,7 +136,9 @@ def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
     return power_value_table(header, rows_data, widths, fraction)
 
 
-def _statement(result: Any, language: str = "en") -> tuple[float, str, list[str]]:
+def _statement(
+    result: EnclosureResult, language: str = "en"
+) -> tuple[float, str, list[str]]:
     """The boxed mean insertion loss and its extended enclosure terms."""
     mean_il = mean_finite(result.insertion_loss)
     mean_r = mean_finite(result.panel_transmission_loss)

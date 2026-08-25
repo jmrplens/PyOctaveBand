@@ -23,6 +23,7 @@ from .common import (
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
     from ..underwater.bioacoustics.audiograms import AudiogramResult
     from ..underwater.bioacoustics.weighting import (
@@ -704,7 +705,7 @@ def plot_ray_trace(
 
 def _draw_bathymetry(
     ax: Axes,
-    result: Any,
+    result: RayTraceResult | GaussianBeamResult,
     r_max: float,
     language: str,
     *,
@@ -939,7 +940,7 @@ def plot_gaussian_beams(
     return ax
 
 
-def _plottable(levels: Any) -> np.ndarray:
+def _plottable(levels: ArrayLike) -> np.ndarray:
     """Levels with non-finite entries as ``nan``, which matplotlib skips.
 
     Band levels carry ``-inf`` where a band holds no energy at all; drawing

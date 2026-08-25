@@ -573,7 +573,7 @@ _WEIGHTING_TRANSCRIPTIONS = frozenset(
 )
 
 
-def __getattr__(name: str) -> Any:
+def __getattr__(name: str) -> object:
     """Serve the transcriptions this module used to carry from their module."""
     if name in _WEIGHTING_TRANSCRIPTIONS:
         from . import weighting_compliance

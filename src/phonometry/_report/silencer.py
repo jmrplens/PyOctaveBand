@@ -32,7 +32,7 @@ matplotlib in ``phonometry[plot]``); each is guarded with an actionable
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -47,6 +47,8 @@ from ._noise_control_fiche import (
 )
 
 if TYPE_CHECKING:
+    from reportlab.platypus import Table
+
     from ..noise_control.silencers import ReactiveSilencerResult
     from .metadata import ReportMetadata
 
@@ -75,7 +77,7 @@ def _prediction_statement(language: str = "en") -> str:
     )
 
 
-def _caption(result: Any, language: str = "en") -> str:
+def _caption(result: ReactiveSilencerResult, language: str = "en") -> str:
     """The caption declaring the analysis band set above the table."""
     freqs = getattr(result, "frequencies", None)
     n = np.asarray(result.transmission_loss, dtype=np.float64).size
@@ -87,7 +89,7 @@ def _caption(result: Any, language: str = "en") -> str:
     return t("One-third-octave-band transmission loss", language)
 
 
-def _value_table(result: Any, language: str = "en") -> Any:
+def _value_table(result: ReactiveSilencerResult, language: str = "en") -> Table:
     """Build the per-band table (nominal frequency, TL, and IL when computed).
 
     Called only after the renderer has imported reportlab.
@@ -111,7 +113,7 @@ def _value_table(result: Any, language: str = "en") -> Any:
     return power_value_table(header, rows_data, widths, fraction)
 
 
-def _resonance_term(result: Any, language: str = "en") -> str | None:
+def _resonance_term(result: ReactiveSilencerResult, language: str = "en") -> str | None:
     """The extended term naming the resonance frequencies, or ``None``."""
     resonances = getattr(result, "resonances", None)
     if resonances is None:
@@ -124,7 +126,9 @@ def _resonance_term(result: Any, language: str = "en") -> str | None:
     return t("Resonance frequencies: {values} Hz", language).format(values=listed)
 
 
-def _statement(result: Any, language: str = "en") -> tuple[float, str, list[str]]:
+def _statement(
+    result: ReactiveSilencerResult, language: str = "en"
+) -> tuple[float, str, list[str]]:
     """The boxed mean transmission loss and its extended silencer terms."""
     tl = np.asarray(result.transmission_loss, dtype=np.float64)
     mean_tl = mean_finite(tl)

@@ -54,6 +54,8 @@ from ._layout import (
 )
 
 if TYPE_CHECKING:
+    from matplotlib.axes import Axes
+
     from ..psychoacoustics.loudness.zwicker import ZwickerLoudness
     from .metadata import ReportMetadata
 
@@ -268,7 +270,9 @@ def render_iso532_report(
         # Clause 7 f): a time-varying loudness report states "the loudness
         # time function in sones". Full-width landscape N(t) trace with the
         # N5/N10 percentile levels marked.
-        def _time_plot(ax: Any = None, language: str = "en", **kwargs: Any) -> Any:
+        def _time_plot(
+            ax: Axes | None = None, language: str = "en", **kwargs: Any
+        ) -> Axes:
             from .._plot.psychoacoustics import plot_zwicker_loudness_time
 
             return plot_zwicker_loudness_time(

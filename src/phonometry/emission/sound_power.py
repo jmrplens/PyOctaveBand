@@ -452,7 +452,11 @@ def background_noise_correction(
 
 
 def _require_room_pair(
-    first: Any, second: Any, first_name: str, second_name: str, equation: str
+    first: float | np.ndarray | None,
+    second: float | None,
+    first_name: str,
+    second_name: str,
+    equation: str,
 ) -> None:
     """Reject a half-specified room pair for the ``K2`` absorption area.
 

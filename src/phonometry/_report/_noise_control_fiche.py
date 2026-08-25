@@ -48,6 +48,11 @@ from ._layout import (
 from ._sound_power_fiche import band_labels, d1, metadata_pairs, power_value_table
 
 if TYPE_CHECKING:
+    from reportlab.platypus import Table
+
+    from ..noise_control.enclosures import EnclosureResult
+    from ..noise_control.hvac import HvacSpectrumResult
+    from ..noise_control.silencers import ReactiveSilencerResult
     from .metadata import ReportMetadata
 
 __all__ = [
@@ -123,13 +128,13 @@ def performance_verdict(
 
 
 def render_noise_control_fiche(
-    result: Any,
+    result: EnclosureResult | ReactiveSilencerResult | HvacSpectrumResult,
     path: str,
     *,
     title: str,
     basis: str,
     caption: str,
-    value_table: Any,
+    value_table: Table,
     statement: str,
     extended: list[str],
     basis_strips: list[str],

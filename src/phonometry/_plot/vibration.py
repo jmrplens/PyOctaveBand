@@ -31,7 +31,10 @@ _OP_COLORS = (_C_PRIMARY, _C_TERTIARY, _C_QUATERNARY, _C_PRIMARY_LIGHT, _C_MUTED
 _A8_COLOR = _C_EDGE
 
 if TYPE_CHECKING:
+    from typing import Protocol
+
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike, NDArray
 
     from ..vibration.human.exposure import (
         DailyVibrationExposure,
@@ -50,6 +53,21 @@ if TYPE_CHECKING:
     )
     from ..vibration.structural.radiation_efficiency import RadiationEfficiencyResult
     from ..vibration.structural.transfer_stiffness import TransferStiffnessResult
+
+    class _SpectrumLike(Protocol):
+        """A measured spectrum: anything exposing the two plotted vectors.
+
+        :class:`~phonometry.signals.envelope.EnvelopeSpectrumResult` is the
+        expected case, but the fault-line overlay only reads these two
+        array-likes, so the contract is stated structurally.
+        """
+
+        @property
+        def frequencies(self) -> ArrayLike: ...
+
+        @property
+        def amplitude(self) -> ArrayLike: ...
+
 
 #: Shared frequency-axis label of the vibration renderers.
 _FREQ_LABEL = "Frequency [Hz]"
@@ -683,8 +701,8 @@ _FAMILY_COLORS: dict[str, str] = {
 
 def _draw_measured_spectrum(
     ax: Axes,
-    frequencies: Any,
-    amplitude: Any,
+    frequencies: NDArray[np.float64] | None,
+    amplitude: NDArray[np.float64] | None,
     f_max: float,
     language: str,
     kwargs: dict[str, Any],
@@ -870,7 +888,7 @@ def plot_fault_frequencies(
     ax: Axes | None = None,
     *,
     language: str = "en",
-    spectrum: Any | None = None,
+    spectrum: _SpectrumLike | None = None,
     max_frequency: float | None = None,
     annotate: bool = True,
     **kwargs: Any,

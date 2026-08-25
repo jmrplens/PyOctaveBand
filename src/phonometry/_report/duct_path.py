@@ -57,6 +57,7 @@ from ._sound_power_fiche import metadata_pairs
 
 if TYPE_CHECKING:
     from ..noise_control.duct_path import DuctPathResult
+    from ..room.noise_criteria import NCResult, RCResult
     from .metadata import ReportMetadata
 
 #: Rows whose values are a level rather than a correction, shaded to separate
@@ -269,7 +270,7 @@ def _sheet_table(
     return table, len(rows)
 
 
-def _rating_designation(rating: Any) -> str:
+def _rating_designation(rating: NCResult | RCResult) -> str:
     """The room-criterion designation, at the display rounding of a fiche.
 
     The rating objects print their designation with ``:g``, which is right for

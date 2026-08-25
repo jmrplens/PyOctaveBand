@@ -59,6 +59,10 @@ from ._layout import (
 )
 
 if TYPE_CHECKING:
+    from reportlab.lib.colors import Color
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.platypus import Table
+
     from ..materials.absorbers.rating import AbsorptionRatingResult
     from .metadata import ReportMetadata
 
@@ -71,7 +75,7 @@ def _d2(value: float, language: str = "en") -> str:
     return format_number(value, language, decimals=2)
 
 
-def _thead_style() -> Any:
+def _thead_style() -> ParagraphStyle:
     """The shared accent table-header paragraph style (white, centred, 7.2 pt)."""
     from reportlab.lib import colors
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -87,7 +91,7 @@ def _thead_style() -> Any:
     )
 
 
-def _base_table_style(accent: Any, light: Any, n_data: int) -> list[Any]:
+def _base_table_style(accent: Color, light: Color, n_data: int) -> list[Any]:
     """The accredited-table command list shared by every left-panel table.
 
     Accent header row with a rule below it, zebra striping over the ``n_data``
@@ -151,7 +155,7 @@ def _value_table(
     deviations: np.ndarray,
     verbose: bool,
     language: str = "en",
-) -> Any:
+) -> Table:
     """Build the left-hand octave-band absorption table (accredited or evaluation).
 
     Called only after :func:`render_iso11654_report` has imported reportlab.
@@ -216,7 +220,7 @@ def _third_octave_table(
     alpha_s: np.ndarray,
     measured: np.ndarray,
     language: str = "en",
-) -> Any:
+) -> Table:
     """Build the combined one-third-octave ``f | alpha_s | alpha_p`` table.
 
     The accredited ISO 354 convention (Fellert, Mueller-BBM, Peutz): every

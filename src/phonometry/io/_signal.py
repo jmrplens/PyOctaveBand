@@ -36,7 +36,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from matplotlib.axes import Axes
-    from numpy.typing import NDArray
+    from numpy.typing import DTypeLike, NDArray
 
     from ._chunks import BroadcastMetadata
 
@@ -141,14 +141,14 @@ class Signal:
         """The array the object stands for: 1-D mono, 2-D multichannel."""
         return self.data[0] if self.data.shape[0] == 1 else self.data
 
-    def __array__(self, dtype: Any = None) -> np.ndarray:
+    def __array__(self, dtype: DTypeLike | None = None) -> np.ndarray:
         """Return the samples as an array (optionally recast)."""
         return np.asarray(self._view, dtype=dtype)
 
     def __len__(self) -> int:
         return int(self._view.shape[0])
 
-    def __getitem__(self, key: Any) -> Any:
+    def __getitem__(self, key: Any) -> Any:  # noqa: ANN401 - mirrors ndarray indexing, whose key union numpy does not export
         return self._view[key]
 
     @property

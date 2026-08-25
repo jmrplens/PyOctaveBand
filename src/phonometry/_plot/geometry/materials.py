@@ -43,17 +43,26 @@ from ._draft import (
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from matplotlib.patches import Rectangle
     from numpy.typing import ArrayLike
 
     from ...materials.absorbers.four_microphone import TransferMatrix
     from ...materials.absorbers.impedance_tube import ImpedanceTubeResult
-    from ...materials.absorbers.layered import Layer, LayeredAbsorberResult
+    from ...materials.absorbers.layered import (
+        Layer,
+        LayeredAbsorberResult,
+        MicroperforatedPlateLayer,
+        PerforatedPlateLayer,
+    )
     from ...materials.absorbers.slow_sound import (
         HelmholtzResonator,
         SlitResonatorAbsorberResult,
     )
     from ...materials.diffusers.design import DiffuserPolarResponse
-    from ...materials.diffusers.metadiffuser import MetadiffuserResult
+    from ...materials.diffusers.metadiffuser import (
+        MetadiffuserResult,
+        MetadiffuserWell,
+    )
     from ...materials.surfaces.road_absorption import InsituAbsorptionResult
 
 #: Spanish translations of the fixed strings rendered here, keyed by their
@@ -106,7 +115,7 @@ def _t(text: str, language: str = "en") -> str:
 _MEMBRANE_DRAW_FRACTION = 0.012
 
 
-def _layer_kind_and_thickness(layer: Any, total: float) -> tuple[str, float, str]:
+def _layer_kind_and_thickness(layer: Layer, total: float) -> tuple[str, float, str]:
     """Map a layer dataclass to (style kind, drawn thickness, label key).
 
     Dispatch is by the classes themselves, imported lazily so this rendering
@@ -148,7 +157,11 @@ def _stack_total_depth(layers: Sequence[Any]) -> float:
 
 
 def _draw_plate_holes(
-    ax: Axes, layer: Any, x: float, thickness: float, height: float
+    ax: Axes,
+    layer: MicroperforatedPlateLayer | PerforatedPlateLayer,
+    x: float,
+    thickness: float,
+    height: float,
 ) -> None:
     """Carve the hole pattern of a (micro)perforated plate, to scale.
 
@@ -197,6 +210,11 @@ def plot_absorber_stack(
     :param kwargs: Forwarded to the front-layer rectangle.
     :return: The axes.
     """
+    from ...materials.absorbers.layered import (
+        MicroperforatedPlateLayer,
+        PerforatedPlateLayer,
+    )
+
     _check_language(language)
     stack = list(layers) if isinstance(layers, Sequence) else [layers]
     if not stack:
@@ -217,7 +235,10 @@ def plot_absorber_stack(
         kind, drawn, label_key = dispatched
         extra = dict(kwargs) if index == 0 else {}
         _material_rect(ax, x, 0.0, drawn, height, kind, **extra)
-        if kind == "plate":
+        # The isinstance is the "plate" test: `_layer_kind_and_thickness`
+        # styles exactly these two classes "plate", and matching the classes
+        # (not the style string) hands the hole drawer a narrowed layer.
+        if isinstance(layer, (MicroperforatedPlateLayer, PerforatedPlateLayer)):
             _draw_plate_holes(ax, layer, x, drawn, height)
         label = _t(label_key, language)
         physical = float(getattr(layer, "thickness", 0.0))
@@ -267,7 +288,7 @@ def _draw_resonator(
     ax: Axes,
     x_mouth: float,
     y_mouth: float,
-    resonator: Any,
+    resonator: HelmholtzResonator,
     *,
     wall: float,
 ) -> tuple[float, float]:
@@ -626,7 +647,7 @@ def _tube_bore(
     shape: str | None,
     diameter_known: bool,
     **kwargs: Any,
-) -> Any:
+) -> Rectangle:
     """Tube walls + bore + cross-section emblem; returns the primary patch.
 
     The bore spans ``y in [0, bore]``; walls are drawn just outside it. The
@@ -995,7 +1016,11 @@ def plot_slit_absorber_result_geometry(
 
 
 def _draw_metadiffuser_well(
-    ax: Axes, well: Any, x_slit: float, depth: float, kwargs: dict[str, Any]
+    ax: Axes,
+    well: MetadiffuserWell,
+    x_slit: float,
+    depth: float,
+    kwargs: dict[str, Any],
 ) -> None:
     """One slit with its sideways resonator shelves, panel coordinates."""
     h = float(well.slit_height)

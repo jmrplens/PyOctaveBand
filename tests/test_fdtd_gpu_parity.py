@@ -21,12 +21,15 @@ from __future__ import annotations
 import os
 import pathlib
 import sys
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pytest
 
 from phonometry.simulation.fdtd import FDTD2D
+
+if TYPE_CHECKING:
+    from types import ModuleType
 
 _SCRIPTS = str(pathlib.Path(__file__).resolve().parent.parent / "scripts")
 if _SCRIPTS not in sys.path:
@@ -37,7 +40,7 @@ import fdtd_gpu_remote
 import job_runner
 
 
-def _cupy_or_none() -> Any:
+def _cupy_or_none() -> ModuleType | None:
     """CuPy with a working CUDA device, else None."""
     try:
         import cupy
@@ -52,7 +55,7 @@ def _cupy_or_none() -> Any:
 _CUPY = _cupy_or_none()
 
 
-def _remote_or_none() -> Any:
+def _remote_or_none() -> fdtd_gpu_remote.RemoteConfig | None:
     """The configured GPU host when it answers, else None.
 
     A CUDA card is not the only way to reach one. ``fdtd_gpu_remote`` already
@@ -194,7 +197,7 @@ def _assert_parity(
 @pytest.mark.parametrize(("xp", "tol"), BACKENDS)
 @pytest.mark.parametrize("direction", list(_WAVES))
 def test_plane_wave_directions_match_library(
-    xp: Any, tol: float, direction: str
+    xp: ModuleType, tol: float, direction: str
 ) -> None:
     """A plane packet in each travel direction reproduces the library."""
     wave = _WAVES[direction]
@@ -214,7 +217,7 @@ def test_plane_wave_directions_match_library(
 
 @pytest.mark.parametrize(("xp", "tol"), BACKENDS)
 @pytest.mark.parametrize("scenario", list(_scenarios()))
-def test_scenarios_match_library(xp: Any, tol: float, scenario: str) -> None:
+def test_scenarios_match_library(xp: ModuleType, tol: float, scenario: str) -> None:
     """Each engine feature (and their combination) reproduces the library."""
     kwargs = _scenarios()[scenario]
     wave = {"center": 0.15, "width": 0.06, "wavelength": 0.09}
@@ -460,7 +463,11 @@ def test_submit_falls_back_to_local_numpy_run(
     )
     monkeypatch.setattr(fdtd_gpu_remote, "remote_available", lambda config: True)
 
-    def _boom(job: dict[str, Any], config: Any, timeout: float = 0.0) -> dict[str, Any]:
+    def _boom(
+        job: dict[str, Any],
+        config: fdtd_gpu_remote.RemoteConfig,
+        timeout: float = 0.0,
+    ) -> dict[str, Any]:
         msg = "docker run failed"
         raise fdtd_gpu_remote.RemoteRunError(msg)
 

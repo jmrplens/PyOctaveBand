@@ -62,6 +62,8 @@ from ._layout import (
 )
 
 if TYPE_CHECKING:
+    from reportlab.platypus import Paragraph, Table
+
     from ..vibration.human.multiple_shock import MultipleShockResult
     from .metadata import ReportMetadata
 
@@ -181,7 +183,7 @@ def _unit_ms2() -> str:
     return "m/s<sup>2</sup>"
 
 
-def _analysis_table(result: MultipleShockResult, language: str = "en") -> Any:
+def _analysis_table(result: MultipleShockResult, language: str = "en") -> Table:
     """The dose-and-stress analysis table (Clause 5 dose and Annex C stress).
 
     One row per quantity (quantity, symbol, value with unit, clause reference):
@@ -260,7 +262,7 @@ def _analysis_table(result: MultipleShockResult, language: str = "en") -> Any:
     return table
 
 
-def _classification_table(result: MultipleShockResult, language: str = "en") -> Any:
+def _classification_table(result: MultipleShockResult, language: str = "en") -> Table:
     """The Annex C risk-classification table against the Table C.2 levels.
 
     Four rows partition the stress variable ``R`` by the Table C.2 risk levels
@@ -352,7 +354,7 @@ def _statement(result: MultipleShockResult, language: str = "en") -> str:
     )
 
 
-def _zone_row(result: MultipleShockResult, language: str = "en") -> Any:
+def _zone_row(result: MultipleShockResult, language: str = "en") -> Paragraph:
     """The classification zone row stating the Annex C risk band for ``R``."""
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 

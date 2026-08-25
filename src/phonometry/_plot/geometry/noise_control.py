@@ -43,6 +43,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from matplotlib.axes import Axes
+    from matplotlib.patches import Rectangle
 
     from ...noise_control.silencers import (
         ReactiveSilencerResult,
@@ -125,7 +126,7 @@ def _duct_walls(ax: Axes, x0: float, x1: float, d: float, wall: float) -> None:
         _material_rect(ax, x0, y, x1 - x0, wall, "plate", linewidth=0.5)
 
 
-def _draw_duct(ax: Axes, x0: float, x1: float, d: float, **kwargs: Any) -> Any:
+def _draw_duct(ax: Axes, x0: float, x1: float, d: float, **kwargs: Any) -> Rectangle:
     """A straight duct run: bore centred on y = 0, walls just outside."""
     from matplotlib.patches import Rectangle
 

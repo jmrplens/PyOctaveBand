@@ -15,14 +15,14 @@ Private module: nothing here is part of the public API.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Protocol
+from typing import TYPE_CHECKING, Protocol
 
 import numpy as np
 
 from .._internal.validation import require_choice
 
 if TYPE_CHECKING:
-    from numpy.typing import NDArray
+    from numpy.typing import ArrayLike, NDArray
 
     from ..room.noise_criteria import NCResult, RCResult
 
@@ -50,8 +50,20 @@ def validate_target(criterion: str, target: float | None) -> tuple[str, float | 
     return family, value
 
 
+class PerBandValues(Protocol):
+    """Anything carrying a per-band ``values`` array.
+
+    Structural stand-in for the spectrum results a workflow forwards whole,
+    such as :class:`~phonometry.noise_control.hvac.HvacSpectrumResult`.
+    """
+
+    @property
+    def values(self) -> ArrayLike:
+        """The per-band quantity."""
+
+
 def as_band_spectrum(
-    value: Any, n: int, name: str, *, default: float = 0.0
+    value: ArrayLike | PerBandValues | None, n: int, name: str, *, default: float = 0.0
 ) -> NDArray[np.float64]:
     """Coerce a scalar, array or spectrum result to a finite ``n``-band array.
 

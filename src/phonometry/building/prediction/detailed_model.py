@@ -1507,7 +1507,9 @@ def _path_matrix(paths: Sequence[BandPath], n_bands: int) -> np.ndarray:
     )
 
 
-def _require_paths_and_bands(result: Any, total: str) -> None:
+def _require_paths_and_bands(
+    result: DetailedAirborneResult | DetailedImpactResult, total: str
+) -> None:
     """Reject a decomposition whose paths and bands do not line up.
 
     Shared by the airborne and the impact result, which decompose different

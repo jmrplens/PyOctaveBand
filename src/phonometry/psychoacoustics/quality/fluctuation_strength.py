@@ -265,7 +265,7 @@ class FluctuationStrengthResult:
         )
 
 
-def _bandpass_envelope_filter(fs: float) -> Any:
+def _bandpass_envelope_filter(fs: float) -> NDArray[np.float64]:
     """H(fmod): band-pass on the envelope (Osses 2016 §2.1.3/3.1, re-fitted).
 
     A ``_LP_ORDER``-order low-pass and a ``_HP_ORDER``-order high-pass in cascade
@@ -316,7 +316,7 @@ _INV_GRID_HZ = np.linspace(20.0, 20000.0, 20000)
 _INV_GRID_BARK = _hz_to_bark(_INV_GRID_HZ)
 
 
-def _bark_center_hz(z: NDArray[np.float64] | float) -> Any:
+def _bark_center_hz(z: NDArray[np.float64] | float) -> NDArray[np.float64] | np.float64:
     """Approximate inverse of :func:`_hz_to_bark` for a band centre (Hz).
 
     Accepts a scalar or an array of critical-band rates and returns the matching
@@ -378,7 +378,7 @@ def _band_envelopes(
 
 
 def _modulation_depth(
-    band_env: NDArray[np.float64], env_sos: Any
+    band_env: NDArray[np.float64], env_sos: NDArray[np.float64]
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """Generalised modulation depth m* per band (Osses 2016 §2.1.3).
 

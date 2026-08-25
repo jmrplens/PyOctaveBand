@@ -53,6 +53,8 @@ from ._layout import (
 )
 
 if TYPE_CHECKING:
+    from reportlab.platypus import Table
+
     from ..speech.sii import SIIResult
     from .metadata import ReportMetadata
 
@@ -98,7 +100,7 @@ def _metadata_pairs(
     ]
 
 
-def _band_table(result: SIIResult, verbose: bool, language: str = "en") -> Any:
+def _band_table(result: SIIResult, verbose: bool, language: str = "en") -> Table:
     """Build the left-hand per-band audibility table of the procedure.
 
     The default table carries the equivalent speech spectrum level ``Ei'``, the

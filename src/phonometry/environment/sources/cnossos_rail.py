@@ -91,7 +91,7 @@ from ..._internal.validation import (
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
-    from numpy.typing import NDArray
+    from numpy.typing import ArrayLike, NDArray
 
 __all__ = [
     "AERODYNAMIC_REFERENCE_SPEED",
@@ -1737,7 +1737,7 @@ def _speed(value: float, name: str = "speed") -> float:
     return v
 
 
-def _spectrum(values: Any, name: str, size: int = 24) -> NDArray[np.float64]:
+def _spectrum(values: ArrayLike, name: str, size: int = 24) -> NDArray[np.float64]:
     array = np.asarray(values, dtype=np.float64)
     if array.shape != (size,):
         msg = (
@@ -2008,11 +2008,11 @@ def bridge_transfer(bridge: BridgeType | str) -> NDArray[np.float64]:
 
 
 def roughness_to_frequency(
-    levels: Any,
-    wavelengths: Any,
+    levels: ArrayLike,
+    wavelengths: ArrayLike,
     speed: float,
     *,
-    frequencies: Any = RAILWAY_THIRD_OCTAVE_BANDS,
+    frequencies: ArrayLike = RAILWAY_THIRD_OCTAVE_BANDS,
     interpolation: RoughnessInterpolation = RoughnessInterpolation.PROPORTIONAL,
 ) -> NDArray[np.float64]:
     r"""Resample a roughness spectrum from wavelength onto frequency.
@@ -2060,7 +2060,7 @@ def roughness_to_frequency(
 
 
 def total_effective_roughness(
-    rail: Any, wheel: Any, filter_: Any
+    rail: ArrayLike, wheel: ArrayLike, filter_: ArrayLike
 ) -> NDArray[np.float64]:
     r"""Total effective roughness ``L_R,TOT,i`` of (2.3.7), in dB.
 
@@ -2080,7 +2080,7 @@ def total_effective_roughness(
     )
 
 
-def impact_roughness(single: Any, joint_density: float) -> NDArray[np.float64]:
+def impact_roughness(single: ArrayLike, joint_density: float) -> NDArray[np.float64]:
     r"""Impact roughness ``L_R,IMPACT,i`` of (2.3.12), in dB.
 
     :math:`L_{\mathrm{R,IMPACT},i} = L_{\mathrm{R,IMPACT-SINGLE},i} + 10
@@ -2108,7 +2108,7 @@ def impact_roughness(single: Any, joint_density: float) -> NDArray[np.float64]:
 
 
 def rolling_sound_power(
-    roughness: Any, transfer: Any, axles: float
+    roughness: ArrayLike, transfer: ArrayLike, axles: float
 ) -> NDArray[np.float64]:
     r"""One rolling-noise component of (2.3.8) to (2.3.10), in dB.
 
@@ -2183,7 +2183,7 @@ def curve_squeal_excess(
 
 
 def horizontal_directivity(
-    phi: float, *, frequencies: Any = RAILWAY_THIRD_OCTAVE_BANDS
+    phi: float, *, frequencies: ArrayLike = RAILWAY_THIRD_OCTAVE_BANDS
 ) -> NDArray[np.float64]:
     r"""Horizontal directivity ``dL_W,dir,hor,i`` of (2.3.15), in dB.
 
@@ -2210,7 +2210,7 @@ def horizontal_directivity(
 def vertical_directivity(
     psi: float,
     *,
-    frequencies: Any = RAILWAY_THIRD_OCTAVE_BANDS,
+    frequencies: ArrayLike = RAILWAY_THIRD_OCTAVE_BANDS,
     height: int = 1,
     aerodynamic: bool = False,
     edition: DirectivityEdition = DirectivityEdition.CURRENT,
@@ -2253,7 +2253,7 @@ def vertical_directivity(
     return np.asarray(np.where(angle > 0.0, shape, 0.0), dtype=np.float64)
 
 
-def octave_bands_from_third_octaves(levels: Any) -> NDArray[np.float64]:
+def octave_bands_from_third_octaves(levels: ArrayLike) -> NDArray[np.float64]:
     """Energy-sum a 24-band 1/3-octave spectrum into the eight octave bands.
 
     Annex II 2.3.2 requires the directional sound power to be derived in 1/3

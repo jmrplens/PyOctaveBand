@@ -60,6 +60,10 @@ from ._layout import (
 from .iso717 import _metadata_pairs
 
 if TYPE_CHECKING:
+    from ..building.measurement.insulation import (
+        ImpactRatingResult,
+        WeightedRatingResult,
+    )
     from ..building.prediction.detailed_model import (
         DetailedAirborneResult,
         DetailedImpactResult,
@@ -137,7 +141,13 @@ def _prediction_verdict(
 
 def _render_prediction_fiche(
     *,
-    result: Any,
+    result: (
+        AirbornePredictionResult
+        | ImpactPredictionResult
+        | DetailedAirborneResult
+        | DetailedImpactResult
+        | FacadePredictionResult
+    ),
     path: str,
     title_key: str,
     basis_key: str,
@@ -382,7 +392,9 @@ _DETAILED_STATEMENT = (
 
 
 def _detailed_path_rows(
-    result: Any, verbose: bool, language: str
+    result: DetailedAirborneResult | DetailedImpactResult,
+    verbose: bool,
+    language: str,
 ) -> list[tuple[str, str]]:
     """Per-path rows of a detailed-model fiche: energy share, largest first.
 
@@ -408,7 +420,9 @@ def _detailed_path_rows(
     return rows
 
 
-def _detailed_rating(result: Any) -> Any:
+def _detailed_rating(
+    result: DetailedAirborneResult | DetailedImpactResult,
+) -> WeightedRatingResult | ImpactRatingResult:
     """Return the result's ISO 717 rating, refusing an unrated spectrum."""
     if result.rating is None:
         msg = (

@@ -17,7 +17,7 @@ from typing import Any
 import numpy as np
 
 
-def assert_same(a: Any, b: Any, path: str = "") -> None:
+def assert_same(a: Any, b: Any, path: str = "") -> None:  # noqa: ANN401 - deep-compares results of any shape: dataclasses, dicts, sequences, arrays, scalars
     """Assert two results are identical, walking result objects field by field.
 
     :param a: The result of the call under test.

@@ -145,7 +145,7 @@ class MetadiffuserResult:
 
 
 def _check_panel(
-    wells: Any, depth: float, period: float
+    wells: Sequence[MetadiffuserWell | None], depth: float, period: float
 ) -> tuple[MetadiffuserWell | None, ...]:
     """Validate the well sequence against the panel depth and period."""
     require_positive(depth, "depth")

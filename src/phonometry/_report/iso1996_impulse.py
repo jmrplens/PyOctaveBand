@@ -65,6 +65,8 @@ from ._layout import (
 )
 
 if TYPE_CHECKING:
+    from reportlab.platypus import Table
+
     from ..environment.assessment.impulsive_sound import ImpulseProminenceResult
     from .metadata import ReportMetadata
 
@@ -171,7 +173,7 @@ def _metadata_pairs(
     return [(label, value) for label, value in specs if value]
 
 
-def _per_impulse_table(result: ImpulseProminenceResult, language: str = "en") -> Any:
+def _per_impulse_table(result: ImpulseProminenceResult, language: str = "en") -> Table:
     """The full-width per-impulse table (onset rate, level difference, P).
 
     One row per candidate impulse: the onset rate (dB/s), the level difference

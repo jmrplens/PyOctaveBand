@@ -177,12 +177,12 @@ returned as an `(N, 3)` array of Cartesian `(x, y, z)` in metres.
 ```python
 plot_microphone_positions(
     positions: ArrayLike,
-    ax: Any | None = None,
+    ax: Axes3D | None = None,
     *,
     radius: float | None = None,
     language: str = 'en',
     **kwargs: Any,
-) -> Any
+) -> Axes3D
 ```
 
 Draw a microphone position array on its measurement surface, in 3-D.

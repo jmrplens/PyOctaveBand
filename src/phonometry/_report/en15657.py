@@ -39,7 +39,7 @@ guarded with an actionable :class:`ImportError`.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -55,6 +55,8 @@ from ._sound_power_fiche import (
 )
 
 if TYPE_CHECKING:
+    from reportlab.platypus import Table
+
     from ..building.measurement.structure_borne_power import StructureBornePowerResult
     from .metadata import ReportMetadata
 
@@ -69,7 +71,7 @@ def _basis(language: str = "en") -> str:
     )
 
 
-def _caption(result: Any, language: str = "en") -> str:
+def _caption(result: StructureBornePowerResult, language: str = "en") -> str:
     """The caption declaring the analysis band set above the table."""
     freqs = getattr(result, "frequencies", None)
     n = np.asarray(result.power_level, dtype=np.float64).size
@@ -88,7 +90,9 @@ def _eta_cell(value: float, language: str = "en") -> str:
     return format_number(float(value), language, decimals=4)
 
 
-def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
+def _value_table(
+    result: StructureBornePowerResult, verbose: bool, language: str = "en"
+) -> Table:
     """Build the full-width per-band table (nominal frequency, Lv, L_Ws).
 
     The default table is the ``f | Lv | L_Ws`` form; ``verbose`` inserts the
@@ -130,7 +134,9 @@ def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
     return power_value_table(header, rows_data, widths, fraction)
 
 
-def _statement(result: Any, language: str = "en") -> tuple[str, list[str]]:
+def _statement(
+    result: StructureBornePowerResult, language: str = "en"
+) -> tuple[str, list[str]]:
     """The boxed total ``L_Ws`` and its extended plate terms."""
     total = float(result.total_level)
     statement = t(

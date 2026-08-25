@@ -33,6 +33,7 @@ from ..common import (
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from matplotlib.patches import Rectangle
 
 #: Axis labels shared by the plan-view and 3-D renderers.
 _AXIS_X = "x [m]"
@@ -216,7 +217,7 @@ def _material_rect(
     height: float,
     kind: str,
     **kwargs: Any,
-) -> Any:
+) -> Rectangle:
     """A material cross-section rectangle in the house style; returns it."""
     from matplotlib.patches import Rectangle
 

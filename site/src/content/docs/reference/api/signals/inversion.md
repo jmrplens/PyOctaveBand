@@ -143,7 +143,7 @@ Number of samples in the inverse filter.
 
 ```python
 regularized_inverse_filter(
-    response: Signal | list[float] | np.ndarray | Any,
+    response: Signal | list[float] | np.ndarray | ImpulseResponseResult,
     fs: float | None = None,
     *,
     f_range: tuple[float, float],

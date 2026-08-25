@@ -822,9 +822,9 @@ class RegulationLimits:
         return {period: self[period] for period in RD1367_EVALUATION_PERIODS}
 
 
-def _limits(
-    table: Mapping[Any, tuple[float, float, float]],
-    key: Any,
+def _limits[K](
+    table: Mapping[K, tuple[float, float, float]],
+    key: K,
     *,
     index: str,
     reference: str,

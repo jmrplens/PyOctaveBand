@@ -44,6 +44,8 @@ from ._draft import (
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from matplotlib.typing import ColorType
+    from mpl_toolkits.mplot3d.axes3d import Axes3D
     from numpy.typing import ArrayLike
 
     from ...emission.intensity import IntensityResult
@@ -81,7 +83,7 @@ def _t(text: str, language: str = "en") -> str:
 # ---------------------------------------------------------------------------
 # Microphone position arrays (ISO 3744/3745/3746), 3-D.
 # ---------------------------------------------------------------------------
-def _recede_3d_scaffolding(ax: Any, foreground: str) -> None:
+def _recede_3d_scaffolding(ax: Axes3D, foreground: str) -> None:
     """Clear the 3-D panes and dim the grid so the surface is the subject.
 
     Matplotlib's 3-D panes keep their light default under the dark style, and
@@ -108,7 +110,9 @@ def _recede_3d_scaffolding(ax: Any, foreground: str) -> None:
             )
 
 
-def _number_points(ax: Any, pts: np.ndarray, colours: Any) -> None:
+def _number_points(
+    ax: Axes3D, pts: np.ndarray, colours: str | Sequence[ColorType]
+) -> None:
     """Number each point with a chip in that point's own colour.
 
     The number is a chip in its own point's colour, so it carries the series
@@ -145,12 +149,12 @@ def _number_points(ax: Any, pts: np.ndarray, colours: Any) -> None:
 
 def plot_microphone_positions(
     positions: ArrayLike,
-    ax: Any | None = None,
+    ax: Axes3D | None = None,
     *,
     radius: float | None = None,
     language: str = "en",
     **kwargs: Any,
-) -> Any:
+) -> Axes3D:
     """Draw a microphone position array on its measurement surface, in 3-D.
 
     Numbered microphone points with a wireframe of the hemisphere (or full

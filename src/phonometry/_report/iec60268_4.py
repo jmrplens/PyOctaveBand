@@ -34,7 +34,7 @@ reportlab, matplotlib and svglib are soft dependencies imported lazily
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from ._i18n import format_number, t
 from ._layout import (
@@ -62,6 +62,9 @@ from .iec60268_5 import (
 )
 
 if TYPE_CHECKING:
+    from matplotlib.projections.polar import PolarAxes
+    from reportlab.graphics.shapes import Drawing
+
     from ..electroacoustics.microphone import MicrophoneCharacteristics
     from .metadata import ReportMetadata
 
@@ -181,7 +184,7 @@ def _rated_rows(
 # --------------------------------------------------------------------------- #
 def _response_drawing(
     result: MicrophoneCharacteristics, target_width: float, language: str = "en"
-) -> Any:
+) -> Drawing:
     """Free-field response with the tolerance band and effective-range markers.
 
     Drawn by the shared :func:`phonometry._plot.electroacoustics` panel renderer
@@ -209,7 +212,7 @@ def _response_drawing(
 
 def _secondary_drawing(
     result: MicrophoneCharacteristics, target_width: float, language: str = "en"
-) -> Any | None:
+) -> Drawing | None:
     """Directional-pattern, noise-spectrum and distortion panels for the data.
 
     The panels are drawn by the shared
@@ -241,9 +244,12 @@ def _secondary_drawing(
     FigureCanvasAgg(fig)
     idx = 1
     if has_polar:
+        # `add_subplot` is typed as returning a plain Axes; the polar
+        # projection makes it a PolarAxes at runtime, which the stubs
+        # cannot express.
         _draw_datasheet_polar(
             result,
-            fig.add_subplot(1, panels, idx, projection="polar"),
+            cast("PolarAxes", fig.add_subplot(1, panels, idx, projection="polar")),
             language=language,
         )
         idx += 1

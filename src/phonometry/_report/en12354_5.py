@@ -41,7 +41,7 @@ guarded with an actionable :class:`ImportError`.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -57,6 +57,8 @@ from ._sound_power_fiche import (
 )
 
 if TYPE_CHECKING:
+    from reportlab.platypus import Table
+
     from ..building.prediction.installed_structure_borne import InstalledSourceResult
     from .metadata import ReportMetadata
 
@@ -74,7 +76,7 @@ def _basis(language: str = "en") -> str:
     )
 
 
-def _caption(result: Any, language: str = "en") -> str:
+def _caption(result: InstalledSourceResult, language: str = "en") -> str:
     """The caption declaring the analysis band set above the table."""
     freqs = getattr(result, "frequencies", None)
     total = np.atleast_1d(np.asarray(result.total_level, dtype=np.float64))
@@ -99,7 +101,9 @@ def _column_widths(n_columns: int) -> list[float]:
     return [_CONTENT_WIDTH_MM / n_columns] * n_columns
 
 
-def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
+def _value_table(
+    result: InstalledSourceResult, verbose: bool, language: str = "en"
+) -> Table:
     """Build the full-width per-band multi-path table.
 
     Columns are ``f | L_Ws,inst | L_n,s,1 ... L_n,s,P | L_n,s`` (the installed
@@ -134,7 +138,9 @@ def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
     return power_value_table(header, rows_data, widths, fraction)
 
 
-def _statement(result: Any, language: str = "en") -> tuple[str, list[str]]:
+def _statement(
+    result: InstalledSourceResult, language: str = "en"
+) -> tuple[str, list[str]]:
     """The boxed total ``L_n,s`` and its extended terms."""
     overall = float(result.overall_level)
     statement = t(

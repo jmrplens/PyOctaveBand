@@ -66,6 +66,11 @@ from ._layout import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.platypus import Table
+
     from ..room.noise_criteria import NCResult, RCResult
     from .metadata import ReportMetadata
 
@@ -73,7 +78,7 @@ if TYPE_CHECKING:
 _TITLE = "Room noise rating"
 
 
-def _thead_style() -> Any:
+def _thead_style() -> ParagraphStyle:
     """The shared white-on-accent table-header paragraph style (7.4 pt)."""
     from reportlab.lib import colors
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -133,8 +138,8 @@ def _level_cell(level: float, language: str, decimals: int = 1) -> str:
 
 def _value_table(
     columns: list[tuple[str, list[str]]],
-    col_widths: list[Any],
-) -> Any:
+    col_widths: list[float],
+) -> Table:
     """Assemble the left-hand octave-band table with the accredited styling.
 
     ``columns`` is an ordered list of ``(header_markup, cell_strings)`` pairs;
@@ -211,11 +216,11 @@ def _base_columns(levels: np.ndarray, language: str) -> list[tuple[str, list[str
 
 def _assemble_left(
     columns: list[tuple[str, list[str]]],
-    col_widths: list[Any],
+    col_widths: list[float],
     widths: tuple[float, float],
-    caption_style: Any,
+    caption_style: ParagraphStyle,
     language: str,
-) -> tuple[list[Any], list[Any]]:
+) -> tuple[list[Any], list[float]]:
     """Wrap the caption and value table into a two-panel left cell."""
     from ._layout import fiche_paragraph
 
@@ -228,8 +233,8 @@ def _assemble_left(
 
 
 def _nc_left_cell(
-    result: NCResult, verbose: bool, caption_style: Any, language: str
-) -> tuple[list[Any], list[Any]]:
+    result: NCResult, verbose: bool, caption_style: ParagraphStyle, language: str
+) -> tuple[list[Any], list[float]]:
     """The NC fiche left cell (caption + table) and its two-panel column widths."""
     from reportlab.lib.units import mm
 
@@ -250,8 +255,8 @@ def _nc_left_cell(
 
 
 def _rc_left_cell(
-    result: RCResult, verbose: bool, caption_style: Any, language: str
-) -> tuple[list[Any], list[Any]]:
+    result: RCResult, verbose: bool, caption_style: ParagraphStyle, language: str
+) -> tuple[list[Any], list[float]]:
     """The RC fiche left cell (caption + table) and its two-panel column widths."""
     from reportlab.lib.units import mm
 
@@ -439,13 +444,15 @@ def _verdict(
     return text, passed
 
 
-def _render_room_noise(
-    result: NCResult | RCResult,
+def _render_room_noise[R: NCResult | RCResult](
+    result: R,
     path: str,
     *,
     basis_template: str,
-    left_builder: Any,
-    statement_builder: Any,
+    left_builder: Callable[
+        [R, bool, ParagraphStyle, str], tuple[list[Any], list[float]]
+    ],
+    statement_builder: Callable[[R, str], tuple[str, list[str]]],
     symbol: str,
     metadata: ReportMetadata | None,
     verbose: bool,

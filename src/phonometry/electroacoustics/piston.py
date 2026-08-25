@@ -86,6 +86,7 @@ from .._internal.validation import require_positive, require_ranks, require_same
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from matplotlib.projections.polar import PolarAxes
     from numpy.typing import ArrayLike, NDArray
 
 #: First zero of the Bessel function ``J1``; the first directivity null of the
@@ -236,7 +237,7 @@ class PistonDirectivity:
         )
 
     def plot(
-        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+        self, ax: PolarAxes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
         """Plot the far-field directivity (beam) pattern on a polar axes.
 

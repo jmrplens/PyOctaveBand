@@ -31,12 +31,13 @@ from .common import (
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
     from ..room.acoustics import DecayCurve, RoomAcousticsResult
     from ..room.crowd_noise import CrowdNoiseResult
     from ..room.enclosed_space_absorption import ReverberationResult
     from ..room.image_source import ImageSourceResult
-    from ..room.impulse_response import ImpulseResponseResult
+    from ..room.impulse_response import ImpulseResponseResult, ShapedSweepResult
     from ..room.modes import RoomModesResult
     from ..room.noise_criteria import NCResult, RCResult
     from ..room.open_plan import OpenPlanResult
@@ -150,7 +151,7 @@ def _t(text: str, language: str = "en") -> str:
     return _STRINGS.get(text, text) if language == "es" else text
 
 
-def _localize_band_axes(ax: Any, language: str) -> None:
+def _localize_band_axes(ax: Axes, language: str) -> None:
     """Comma-localise the numeric y-axis of a categorical band plot.
 
     :func:`~phonometry._i18n.localize_axes` reformats only the automatic numeric
@@ -675,7 +676,7 @@ def plot_open_plan(
 
 
 def plot_excitation(
-    signal: np.ndarray | Any,
+    signal: ArrayLike,
     fs: int,
     *,
     kind: str = "sweep",
@@ -955,7 +956,10 @@ def plot_steady_field(
 
 
 def plot_shaped_sweep(
-    result: Any, ax: Axes | None = None, language: str = "en", **kwargs: Any
+    result: ShapedSweepResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes | np.ndarray:
     """Shaped-sweep waveform and its Welch spectrum against the target.
 

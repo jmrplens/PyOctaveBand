@@ -63,12 +63,16 @@ from ._layout import (
     two_panel_body,
     verdict_flow,
 )
+from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
+    from matplotlib.axes import Axes
+    from reportlab.lib.styles import ParagraphStyle, StyleSheet1
+    from reportlab.platypus import Table
+
     from ..building.measurement.floor_covering_improvement import (
         FloorCoveringImprovementResult,
     )
-    from .metadata import ReportMetadata
 
 
 def _metadata_pairs(
@@ -83,13 +87,10 @@ def _metadata_pairs(
     climate ...) come from the :class:`ReportMetadata` when one is supplied.
     Only fields that are set are returned, so empty rows never appear.
     """
-
-    def _md(name: str) -> Any:
-        return getattr(metadata, name) if metadata is not None else None
-
-    mass_per_area = _md("mass_per_area")
-    temperature = _md("temperature")
-    pressure = _md("pressure")
+    md = metadata if metadata is not None else ReportMetadata()
+    mass_per_area = md.mass_per_area
+    temperature = md.temperature
+    pressure = md.pressure
 
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     freq_range = None
@@ -100,17 +101,17 @@ def _metadata_pairs(
 
     range_label = t("Frequency range [Hz]", language)
     specs: list[tuple[str, str | None]] = [
-        (t("Client", language), _md("client")),
-        (t("Manufacturer", language), _md("manufacturer")),
-        (t("Floor covering", language), _md("specimen")),
-        (t("Mounting", language), _md("mounting")),
+        (t("Client", language), md.client),
+        (t("Manufacturer", language), md.manufacturer),
+        (t("Floor covering", language), md.specimen),
+        (t("Mounting", language), md.mounting),
         (
             t("Mass per unit area [kg/m<super>2</super>]", language),
             fmt_meta(mass_per_area, language) if mass_per_area is not None else None,
         ),
         (range_label, freq_range),
-        (t("Test facility", language), _md("test_room")),
-        (t("Date of test", language), _md("test_date")),
+        (t("Test facility", language), md.test_room),
+        (t("Date of test", language), md.test_date),
         (
             t("Temperature [&#176;C]", language),
             fmt_meta(temperature, language) if temperature is not None else None,
@@ -163,7 +164,7 @@ def _value_table(
     result: FloorCoveringImprovementResult,
     ln_r: np.ndarray | None,
     language: str = "en",
-) -> Any:
+) -> Table:
     """Build the per-band ``f | delta-L`` table.
 
     A band at the 1,3 dB limit of measurement is reported as ``> delta-L``
@@ -258,9 +259,9 @@ def _box_statement(result: FloorCoveringImprovementResult, language: str = "en")
 def _body(
     result: FloorCoveringImprovementResult,
     verbose: bool,
-    caption_style: Any,
+    caption_style: ParagraphStyle,
     language: str = "en",
-) -> Any:
+) -> Table:
     """The two-panel body: the per-band table beside the ``delta-L(f)`` curve.
 
     Called only after the renderer has imported reportlab.
@@ -283,7 +284,7 @@ def _body(
         _value_table(result, ln_r, language),
     ]
 
-    def _plot(ax: Any = None, language: str = language) -> Any:
+    def _plot(ax: Axes | None = None, language: str = language) -> Axes:
         return result.plot(ax=ax, language=language)
 
     left_width, plot_width = (66.0, 108.0) if ln_r is not None else (56.0, 118.0)
@@ -298,7 +299,7 @@ def _body(
 def _verdict_row(
     result: FloorCoveringImprovementResult,
     requirement: float,
-    styles: Any,
+    styles: StyleSheet1,
     language: str,
 ) -> list[Any]:
     """The requirement verdict: a higher weighted improvement passes."""

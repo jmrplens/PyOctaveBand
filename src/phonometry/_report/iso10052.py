@@ -32,7 +32,7 @@ matplotlib in ``phonometry[plot]``); each is guarded with an actionable
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -126,7 +126,7 @@ _AIRBORNE_QUANTITIES: dict[str, tuple[str, str, dict[str, str]]] = {
 
 
 def _render_survey(
-    result: Any,
+    result: SurveyAirborneResult | SurveyFacadeResult | SurveyImpactResult,
     rating: WeightedRatingResult | ImpactRatingResult,
     path: str,
     *,
