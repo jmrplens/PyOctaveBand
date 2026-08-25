@@ -426,7 +426,7 @@ def animate_fdtd_side_branch(output_dir: str) -> None:
         fontsize=9.5,
         color=COLOR_FG,
     )
-    fig.get_layout_engine().set(rect=(0.0, 0.03, 1.0, 0.965))
+    fig.get_layout_engine().set(rect=(0.0, 0.03, 1.0, 0.965))  # type: ignore[union-attr, call-arg]  # _anim_figure: constrained engine, never None
     fig.text(
         0.5,
         0.005,

@@ -275,7 +275,7 @@ def animate_elastic_mode_conversion(output_dir: str) -> None:
     fig = _anim_figure()
     # Reserve the bottom strip for the figure-level caption and clock:
     # fig.text does not claim space from the constrained layout on its own.
-    fig.get_layout_engine().set(rect=(0.0, 0.055, 1.0, 0.945))
+    fig.get_layout_engine().set(rect=(0.0, 0.055, 1.0, 0.945))  # type: ignore[union-attr, call-arg]  # _anim_figure: constrained engine, never None
     fig.suptitle(
         T("Mode conversion: water on steel, three incidences (elastic 2D FDTD)")
     )

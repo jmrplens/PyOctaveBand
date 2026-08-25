@@ -12,9 +12,10 @@ the figures apply to their axes, plus :func:`measure_weighting_response`, the
 measurement the weighting figures are drawn from and the tests guard.
 """
 
+from __future__ import annotations
+
 import os
-from collections.abc import Sequence
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -24,6 +25,11 @@ from phonometry._plot.common import _register_field_dark_cmap
 
 from . import _publish
 from .i18n import _LANG_SUFFIX, _translate_figure, audit_figure
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from matplotlib.axes import Axes
 
 # Constants for professional styling
 LABEL_FREQ_HZ = "Frequency [Hz]"
@@ -298,7 +304,7 @@ def save_figure(output_dir: str, filename: str, **kwargs: Any) -> None:
 
 
 def apply_axis_styling(
-    ax: Any,
+    ax: Axes,
     title: str,
     xlim: tuple[float, float] | None = None,
     ylim: tuple[float, float] | None = None,
@@ -335,7 +341,7 @@ def apply_axis_styling(
 
 
 def plot_psd(
-    ax: Any,
+    ax: Axes,
     x: np.ndarray,
     fs: int,
     label: str = "Raw Signal PSD",
@@ -367,7 +373,7 @@ def plot_psd(
 
 
 def measure_weighting_response(
-    fs: int, curve: str, freqs: "np.ndarray | None" = None
+    fs: int, curve: str, freqs: np.ndarray | None = None
 ) -> tuple[np.ndarray, np.ndarray]:
     """Measure a weighting curve the way the docs figure plots it: impulse
     response through the real filter path, evaluated with ``freqz`` (DTFT
@@ -426,7 +432,7 @@ _THIRD_OCTAVE_16 = [
 
 
 def _band_index_axis(
-    ax: Any, freqs: Sequence[float] | np.ndarray, fontsize: int = 8
+    ax: Axes, freqs: Sequence[float] | np.ndarray, fontsize: int = 8
 ) -> np.ndarray:
     """Rotated nominal band labels on an index axis (band-data figures)."""
     x = np.arange(len(freqs))

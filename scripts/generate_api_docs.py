@@ -38,7 +38,7 @@ import shutil
 import sys
 from collections.abc import Mapping
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, get_overloads
+from typing import TYPE_CHECKING, get_overloads
 
 from api_taxonomy import (
     OBJECT_MODULE_OVERRIDES,
@@ -49,6 +49,7 @@ from api_taxonomy import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from types import ModuleType
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -588,7 +589,7 @@ def _attribute_docstrings(module: ModuleType) -> dict[str, str]:
 
 def format_signature(
     name: str,
-    obj: Any,
+    obj: Callable[..., object],
     *,
     drop_first: bool = False,
     omit_return: bool = False,
@@ -619,7 +620,7 @@ def format_signature(
 
 def _format_one_signature(
     name: str,
-    obj: Any,
+    obj: Callable[..., object],
     *,
     drop_first: bool = False,
     omit_return: bool = False,
@@ -702,7 +703,7 @@ def _class_methods(
         raw = inspect.getattr_static(cls, attr_name)
         qualified = f"{name}.{attr_name}"
         kind: str
-        func: object
+        func: Callable[..., object] | None
         if isinstance(raw, staticmethod):
             kind, func = "staticmethod", raw.__func__
         elif isinstance(raw, classmethod):
@@ -715,7 +716,7 @@ def _class_methods(
             continue  # class attributes, enum members: documented via :ivar:
         doc = inspect.getdoc(func) or ""
         signature: str | None = None
-        if kind != "property":
+        if kind != "property" and func is not None:
             try:
                 signature = format_signature(
                     qualified, func, drop_first=kind != "staticmethod"
@@ -905,7 +906,11 @@ def _build_page(
 
 
 def _try_signature(
-    name: str, obj: Any, issues: list[str], *, omit_return: bool = False
+    name: str,
+    obj: Callable[..., object],
+    issues: list[str],
+    *,
+    omit_return: bool = False,
 ) -> str | None:
     try:
         return format_signature(name, obj, omit_return=omit_return)

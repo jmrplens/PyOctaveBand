@@ -8,6 +8,8 @@ alike) that scatter rather than absorb. Everything here is embedded by a page
 under ``materials/``.
 """
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any
 
 import matplotlib.pyplot as plt
@@ -35,6 +37,9 @@ from .theme import (
 )
 
 if TYPE_CHECKING:
+    from numpy.typing import NDArray
+
+    from phonometry.materials import CriticalCouplingResult, HelmholtzResonator
     from phonometry.materials.absorbers.layered import Layer
 
 
@@ -3498,7 +3503,7 @@ def generate_standing_wave_envelope(output_dir: str) -> None:
     k = 2.0 * np.pi * freq / c0
     x = np.linspace(0.0, 1.0, 2400)
 
-    def level(magnitude: Any, phi: float) -> Any:
+    def level(magnitude: float, phi: float) -> NDArray[np.float64]:
         """Envelope in decibels, which is what the analyser shows."""
         env2 = 1.0 + magnitude**2 + 2.0 * magnitude * np.cos(2 * k * x - phi)
         return 10.0 * np.log10(np.maximum(env2, 1e-6))
@@ -3989,7 +3994,7 @@ def generate_sheet_transfer_impedance(output_dir: str) -> None:
     plt.close()
 
 
-def _slit_design(target: float = 300.0) -> Any:
+def _slit_design(target: float = 300.0) -> CriticalCouplingResult:
     """The guide's 300 Hz critical-coupling design, solved once."""
     from phonometry import materials
 
@@ -4204,7 +4209,9 @@ def generate_graded_slit_absorber(output_dir: str) -> None:
     uniform = [single.resonator] * 4
 
     _fig, ax = plt.subplots(figsize=(10.5, 6.2))
-    curves = (
+    curves: tuple[
+        tuple[str, HelmholtzResonator | list[HelmholtzResonator], float, str, str], ...
+    ] = (
         (
             "one cell, $L$ = 30 mm",
             single.resonator,

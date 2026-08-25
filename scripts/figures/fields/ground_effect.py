@@ -1,8 +1,10 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """The ground effect: the direct wave and its ground bounce interfering."""
 
+from __future__ import annotations
+
 from functools import lru_cache
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -20,6 +22,9 @@ from ..theme import (
     FIELD_STROKE,
 )
 from ._core import _rms_to_db
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 _GROUND_FREQ = 400.0
 _GROUND_H = 1.5
@@ -111,7 +116,9 @@ def _ground_effect_fields(
 
     # Two-path image-source model on the same arc (2D line source: 1/sqrt(r)
     # spreading), and the predicted nulls where r2 - r1 = (m + 1/2) lambda.
-    def paths(th: Any) -> tuple[Any, Any]:
+    def paths(
+        th: NDArray[np.float64],
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         x, y = (
             _GROUND_ARC_R * np.cos(np.radians(th)),
             _GROUND_ARC_R * np.sin(np.radians(th)),

@@ -1,8 +1,10 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """The slit absorber: a critically coupled panel swallowing the wave."""
 
+from __future__ import annotations
+
 from functools import lru_cache
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -16,6 +18,11 @@ from ..media import (
 from ..theme import CMAP_FIELD, COLOR_FG, COLOR_GRID, COLOR_PRIMARY
 from ._core import _anim_speaker, _fit_text_x
 
+if TYPE_CHECKING:
+    from matplotlib.axes import Axes
+
+    from phonometry.materials import CriticalCouplingResult
+
 _SLIT_ABS_F0 = 300.0  # critical-coupling design frequency
 _SLIT_ABS_TUBE = 0.60  # air column before the panel face
 _SLIT_ABS_PERIOD = 5.0e-2  # panel period d = the tube bore
@@ -24,7 +31,7 @@ _SLIT_ABS_DETUNE = 1.7  # wide-slit factor of the alpha figure
 
 
 @lru_cache(maxsize=1)
-def _slit_absorber_design() -> Any:
+def _slit_absorber_design() -> CriticalCouplingResult:
     """The 300 Hz critical-coupling design of the slow-sound figures."""
     from phonometry import materials
 
@@ -505,7 +512,7 @@ def animate_fdtd_slit_absorber(output_dir: str) -> None:
 
 
 def _anim_slit_tube_walls(
-    ax: Any, length: float, bore: float, *, speaker: bool = True
+    ax: Axes, length: float, bore: float, *, speaker: bool = True
 ) -> None:
     """Tube walls and drive loudspeaker for the slit-absorber clip (the
     shared ``_anim_tube_hardware`` labels its termination as a plug, but

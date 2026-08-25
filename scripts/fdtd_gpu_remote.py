@@ -60,6 +60,8 @@ import fdtd_gpu
 import job_runner
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from numpy.typing import NDArray
 
 _REPO_ROOT = _SCRIPTS.parent
@@ -166,7 +168,7 @@ def build_job(
     rho: float | NDArray[np.float64] = 1.2,
     cfl: float = 0.6,
     sponge_width: int = 0,
-    sponge_sides: Any = None,
+    sponge_sides: str | Iterable[str] | None = None,
     sponge_reflection: float = 1e-4,
     damping: float | NDArray[np.float64] = 0.0,
     edge_impedance: dict[str, float | NDArray[np.float64]] | None = None,

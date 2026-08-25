@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import math
 import warnings
-from typing import Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 import reference_data as ref
@@ -29,6 +29,9 @@ from phonometry.speech.sti import _sti_from_mtf
 
 from ..registry import _DELTA_PLACES, Outcome, _fmt, numeric, register
 from .levels import _FS
+
+if TYPE_CHECKING:
+    from phonometry.signals import InverseFilterResult
 
 _NUM_STI_BANDS = 7
 _NUM_MOD_FREQS = 14
@@ -338,7 +341,7 @@ def _chk_golay_recovery() -> Outcome:
     )
 
 
-def _sysmeas_inverse() -> Any:
+def _sysmeas_inverse() -> InverseFilterResult:
     b, a = sg.butter(2, [100.0, 8000.0], btype="bandpass", fs=float(_FS))
     imp = np.zeros(1024)
     imp[0] = 1.0

@@ -1,8 +1,10 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """The SOFAR channel: sound trapped by an ocean sound-speed minimum."""
 
+from __future__ import annotations
+
 from functools import lru_cache
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -17,11 +19,14 @@ from ..theme import (
     FIELD_STROKE,
 )
 
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
+
 _DUCT_AXIS = 400.0  # channel-axis depth [m]
 _DUCT_SRC_DEPTHS = (400.0, 150.0)  # on the axis / near the surface
 
 
-def _duct_profile(z: Any) -> Any:
+def _duct_profile(z: NDArray[np.floating[Any]]) -> NDArray[np.float64]:
     """Munk-style sound-speed profile with an exaggerated gradient.
 
     The canonical SOFAR shape (Munk 1974): a minimum at the channel axis,

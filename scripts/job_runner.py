@@ -44,13 +44,17 @@ from __future__ import annotations
 import json
 import sys
 import time
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import fdtd_gpu
 import numpy as np
 
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+    from types import ModuleType
 
-def _pick_backend() -> tuple[Any, str]:
+
+def _pick_backend() -> tuple[ModuleType, str]:
     """Return (array module, name): CuPy with a usable GPU, else NumPy."""
     try:
         import cupy
@@ -62,7 +66,7 @@ def _pick_backend() -> tuple[Any, str]:
     return cupy, "cupy"
 
 
-def _build_engine(job: Any, xp: Any) -> fdtd_gpu.GpuFDTD2D:
+def _build_engine(job: Mapping[str, Any], xp: ModuleType) -> fdtd_gpu.GpuFDTD2D:
     """Instantiate the engine from the job archive on backend *xp*."""
     damping = job["damping"]
     edge_impedance: dict[str, Any] = {
@@ -119,7 +123,7 @@ def _sample_frame(
     return np.asarray(frame)
 
 
-def run_job(job: Any) -> dict[str, Any]:
+def run_job(job: Mapping[str, Any]) -> dict[str, Any]:
     """Run one job dict/archive and return the result payload."""
     xp, backend = _pick_backend()
     sim = _build_engine(job, xp)

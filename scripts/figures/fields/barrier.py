@@ -362,11 +362,14 @@ def animate_fdtd_barrier(output_dir: str) -> None:
         # separates them.
         t_txt.set_text(T(f"$t$ = {times[-1] * 1000.0:4.1f} ms"))
         _settle(fig)
+        # The ignores: ``get_fontsize`` is typed ``float | str`` for the
+        # named sizes ("small"), which this title, set from rcParams,
+        # never carries.
         while (
             sup.get_window_extent().x0 - t_txt.get_window_extent().x1 < 0.6 * fig.dpi
-            and sup.get_fontsize() > 9.0
+            and sup.get_fontsize() > 9.0  # type: ignore[operator]
         ):
-            sup.set_fontsize(sup.get_fontsize() - 0.25)
+            sup.set_fontsize(sup.get_fontsize() - 0.25)  # type: ignore[operator]
         t_txt.set_text("")
 
     def update(k: int) -> tuple[Any, ...]:

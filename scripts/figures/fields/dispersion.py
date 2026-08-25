@@ -14,6 +14,7 @@ from functools import lru_cache
 from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
 
 from ..media import _ANIM_PILL_BOX, _anim_figure, _render_clip, _translate_str
 from ..theme import (
@@ -59,7 +60,9 @@ _DISP_HOLD = round(2.0 * _DISP_FPS)
 _DISP_REVEAL = 1.5e-3
 
 
-def _disp_group_speed(cells: Any, courant: float) -> Any:
+def _disp_group_speed(
+    cells: float | NDArray[np.float64], courant: float
+) -> np.float64 | NDArray[np.float64]:
     """Exact discrete group speed / c on the grid axis.
 
     Differentiating ``sin(omega dt / 2) = S sin(k dx / 2)`` at fixed grid
@@ -72,7 +75,9 @@ def _disp_group_speed(cells: Any, courant: float) -> Any:
     return np.cos(theta) / np.sqrt(np.clip(1.0 - arg**2, 1e-12, None))
 
 
-def _disp_phase_speed(cells: Any, courant: float) -> Any:
+def _disp_phase_speed(
+    cells: float | NDArray[np.float64], courant: float
+) -> np.float64 | NDArray[np.float64]:
     """Exact discrete phase speed / c on the grid axis, in cells per
     wavelength: ``arcsin(S sin theta) / (S theta)``. This is the error the
     guide's ``(1 - S^2)(k dx)^2 / 24`` approximates.
@@ -82,7 +87,9 @@ def _disp_phase_speed(cells: Any, courant: float) -> Any:
     return np.arcsin(arg) / theta / courant
 
 
-def _disp_packet_group_speed(profile: Any, dx: float, courant: float) -> float:
+def _disp_packet_group_speed(
+    profile: NDArray[np.float64], dx: float, courant: float
+) -> float:
     """Group speed of a whole packet / c, weighted by its own spectrum.
 
     Each wavenumber carries its energy at its own ``v_g``, so the energy
@@ -356,7 +363,7 @@ def animate_fdtd_dispersion(output_dir: str) -> None:
         color=COLOR_FG,
         alpha=0.85,
     )
-    fig.get_layout_engine().set(rect=(0.0, 0.045, 1.0, 0.94))
+    fig.get_layout_engine().set(rect=(0.0, 0.045, 1.0, 0.94))  # type: ignore[union-attr, call-arg]  # _anim_figure: constrained engine, never None
 
     def update(k: int) -> tuple[Any, ...]:
         j = min(k, times.size - 1)

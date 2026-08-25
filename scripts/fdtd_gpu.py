@@ -30,10 +30,14 @@ the equation-by-equation mapping.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from numpy.typing import NDArray
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from types import ModuleType
 
 Field2D = NDArray[np.float64]
 #: Backend array: ``numpy.ndarray`` or ``cupy.ndarray`` depending on ``xp``.
@@ -127,7 +131,7 @@ def _resolve_rho_map(rho: float | Field2D, ny: int, nx: int) -> Field2D:
 
 
 def _resolve_sponge(
-    sponge_width: Any, sponge_reflection: float, ny: int, nx: int
+    sponge_width: int, sponge_reflection: float, ny: int, nx: int
 ) -> tuple[int, float]:
     """Validate the sponge configuration exactly as the library does."""
     width = _integer("sponge_width", sponge_width)
@@ -162,7 +166,7 @@ def _resolve_damping(
     return damping_map
 
 
-def _resolve_sponge_sides(sponge_sides: Any) -> tuple[str, ...]:
+def _resolve_sponge_sides(sponge_sides: str | Iterable[str] | None) -> tuple[str, ...]:
     """Normalise the sponge-side spec into a validated tuple of side names."""
     if sponge_sides is None:
         sides: tuple[str, ...] = _SIDES
@@ -259,7 +263,7 @@ class _ImpedanceEdge:
 
     def __init__(
         self,
-        xp: Any,
+        xp: ModuleType,
         side: str,
         impedance: Field2D,
         rho_edge: Field2D,
@@ -327,11 +331,11 @@ class GpuFDTD2D:
         c: float | Field2D,
         dx: float,
         *,
-        xp: Any = np,
+        xp: ModuleType = np,
         rho: float | Field2D = 1.2,
         cfl: float = 0.6,
         sponge_width: int = 0,
-        sponge_sides: Any = None,
+        sponge_sides: str | Iterable[str] | None = None,
         sponge_reflection: float = 1e-4,
         damping: float | NDArray[np.float64] = 0.0,
         shape: tuple[int, int] | None = None,

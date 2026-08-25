@@ -7,8 +7,10 @@ Table-1 geometry, so they share its pitch, period count and design
 frequency.
 """
 
+from __future__ import annotations
+
 from functools import lru_cache
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -21,6 +23,9 @@ from ..theme import (
     FIELD_INK,
     FIELD_STROKE,
 )
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 
 @lru_cache(maxsize=1)
@@ -106,7 +111,7 @@ _META_PITCH, _META_PERIODS = 0.07, 2
 _META_F0 = 2000.0
 
 
-def _metadiffuser_panel_mask(rho: Any) -> None:
+def _metadiffuser_panel_mask(rho: NDArray[np.float64]) -> None:
     """Carve the Table-1 metadiffuser (two periods) into a dense slab.
 
     The slab spans the panel depth L = 2 cm plus a 3 mm back wall under
@@ -160,7 +165,7 @@ def _meta_qrd_wells() -> list[tuple[float, float, float]]:
     return wells
 
 
-def _meta_rho(kind: str) -> Any:
+def _meta_rho(kind: str) -> NDArray[np.float64]:
     """Density map of one run: ``flat``, ``qrd``, ``meta`` or ``ref``."""
     dx, ny, nx = _META_DX, _META_NY, _META_NX
     y1 = _META_FACE
@@ -188,7 +193,7 @@ def _meta_rho(kind: str) -> Any:
     return rho
 
 
-def _meta_taper() -> Any:
+def _meta_taper() -> NDArray[np.float64]:
     """Lateral cosine taper of the incident packet (free-field edges).
 
     The wavefront is flat over the panels and dies smoothly well before

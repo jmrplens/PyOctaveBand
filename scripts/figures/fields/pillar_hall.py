@@ -6,15 +6,20 @@ is this one, and the override is computed from this clip's own mesh, stride
 and trimmed warm-up.
 """
 
+from __future__ import annotations
+
 import os
 from functools import lru_cache
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 from ..media import _ANIM_DPI, _ANIM_HOLD, _render_clip, _translate_str
 from ..theme import _FILENAME_SUFFIX, CMAP_FIELD, COLOR_FG, COLOR_GRID
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 
 def _poster_ss_for(webm: str) -> float | None:
@@ -121,7 +126,7 @@ def _pillar_layout() -> list[tuple[float, float, float]]:
     return out
 
 
-def _pillar_mask() -> Any:
+def _pillar_mask() -> NDArray[np.bool_]:
     """Rasterise the columns into the rigid-cell mask of the banner run."""
     xs = (np.arange(_PILLAR_NX) + 0.5) * _PILLAR_DX
     ys = (np.arange(_PILLAR_NY) + 0.5) * _PILLAR_DX

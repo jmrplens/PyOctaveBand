@@ -11,10 +11,11 @@ variants as WebM, extracts the deferred-loading poster still and adds the
 English GIF for the GitHub docs.
 """
 
+from __future__ import annotations
+
 import os
 import sys
-from collections.abc import Callable
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import matplotlib.pyplot as plt
 
@@ -26,6 +27,12 @@ from .i18n import (
     lookup,
 )
 from .theme import _FILENAME_SUFFIX
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from matplotlib.animation import FuncAnimation
+    from matplotlib.figure import Figure
 
 # ====================================================================# Animations (Tier 1 pilot)
 # ---------------------------------------------------------------------------
@@ -134,13 +141,13 @@ def _anim_path(output_dir: str, stem: str, ext: str) -> str:
     return os.path.join(output_dir, f"{stem}{_LANG_SUFFIX}{_FILENAME_SUFFIX}.{ext}")  # noqa: PTH118
 
 
-def _anim_figure() -> Any:
+def _anim_figure() -> Figure:
     """A fixed-size themed figure for a clip (constant canvas across frames)."""
     return plt.figure(figsize=_ANIM_FIGSIZE, dpi=_ANIM_DPI, layout="constrained")
 
 
 def _render_clip(
-    fig: Any,
+    fig: Figure,
     update: Callable[[int], tuple[Any, ...]],
     output_dir: str,
     stem: str,
@@ -322,8 +329,8 @@ ssh -o BatchMode=yes -- {q_target} "rm -f {q_dir}/$rid"
 
 
 def _save_animation(
-    anim: Any,
-    fig: Any,
+    anim: FuncAnimation,
+    fig: Figure,
     output_dir: str,
     stem: str,
     make_gif: bool = True,

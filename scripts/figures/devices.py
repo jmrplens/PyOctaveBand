@@ -9,11 +9,12 @@ under ``devices/``.
 """
 
 import re
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import Normalize
+from numpy.typing import NDArray
 from scipy import signal as scipy_signal
 
 from phonometry._plot.common import format_frequency_axis, theme_fill, theme_line
@@ -32,6 +33,13 @@ from .theme import (
     measure_weighting_response,
     save_figure,
 )
+
+if TYPE_CHECKING:
+    from phonometry.electroacoustics import (
+        LoudspeakerCharacteristics,
+        MicrophoneCharacteristics,
+    )
+    from phonometry.noise_control import EnclosureResult, RoomToRoomResult
 
 # A negative reading a library plot assembled with ``format()``: the ASCII
 # hyphen before a digit, in a position no word or bracket claims. Restated to
@@ -484,7 +492,7 @@ def generate_piston_directivity(output_dir: str) -> None:
     plt.close()
 
 
-def _loudspeaker_datasheet_example() -> Any:
+def _loudspeaker_datasheet_example() -> "LoudspeakerCharacteristics":
     """The IEC 60268-5 loudspeaker result shared by the section-7 .plot() figures."""
     from phonometry import electroacoustics
 
@@ -515,7 +523,7 @@ def _loudspeaker_datasheet_example() -> Any:
     )
 
 
-def _microphone_datasheet_example() -> Any:
+def _microphone_datasheet_example() -> "MicrophoneCharacteristics":
     """The IEC 60268-4 microphone result shared by the section-8 .plot() figures."""
     from phonometry import electroacoustics
 
@@ -3514,7 +3522,7 @@ def generate_enclosure_required_tl(output_dir: str) -> None:
     bare_floor = 2.5 * 3.5 - 1.5 * 2.5
     alpha = room.mean_absorption([(radiating, wool), (bare_floor + machine, concrete)])
 
-    def _required(model: str) -> Any:
+    def _required(model: str) -> "EnclosureResult":
         return noise_control.enclosure_required_transmission_loss(
             lp1 - nc45,
             radiating,
@@ -3708,7 +3716,7 @@ def generate_room_to_room_partitions(output_dir: str) -> None:
     plt.close()
 
 
-def _norton_plant_room_chain() -> Any:
+def _norton_plant_room_chain() -> "RoomToRoomResult":
     """Norton problem 4.18: a blower in a plant room, into the operator room.
 
     Every number is the one printed in the problem statement, so the figure
@@ -4028,10 +4036,12 @@ def generate_intermodulation_tests(output_dir: str) -> None:
     t = np.arange(n) / fs
     a2, a3 = 0.05, 0.02  # one weak non-linearity for all three
 
-    def through(x: Any) -> Any:
+    def through(x: NDArray[np.float64]) -> NDArray[np.float64]:
         return x + a2 * x**2 + a3 * x**3
 
-    def spectrum(sig: Any) -> tuple[Any, Any]:
+    def spectrum(
+        sig: NDArray[np.float64],
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         win = np.hanning(len(sig))
         mag = np.abs(np.fft.rfft(sig * win)) * 2.0 / np.sum(win)
         f = np.fft.rfftfreq(len(sig), d=1.0 / fs)
@@ -4287,7 +4297,7 @@ def generate_microphone_noise_weightings(output_dir: str) -> None:
     a_w = np.interp(noise_f, fa, wa_curve)
     w468 = np.asarray(electroacoustics.itu_r_468_weighting(noise_f), dtype=float)
 
-    def total(bands: Any, weight: Any) -> float:
+    def total(bands: NDArray[np.float64], weight: NDArray[np.float64]) -> float:
         return float(10.0 * np.log10(np.sum(10.0 ** ((bands + weight) / 10.0))))
 
     _fig, (ax_top, ax_bot) = plt.subplots(

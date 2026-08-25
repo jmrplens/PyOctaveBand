@@ -17,13 +17,16 @@ diffraction.
 from __future__ import annotations
 
 import math
-from typing import Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 import phonometry as ph
 
 from ..registry import _ROOT, Outcome, numeric, register
+
+if TYPE_CHECKING:
+    from phonometry.aircraft import RotorcraftHemisphere
 
 _AIRCRAFT = "Aircraft noise (ICAO Annex 16 / IEC 61265)"
 
@@ -355,7 +358,9 @@ def _chk_doc32_chain() -> Outcome:
     return numeric(55.87, got, 0.1, unit="dB(A)", places=3)
 
 
-def _uniform_hemisphere(level: float, bands: list[float] | None = None) -> Any:
+def _uniform_hemisphere(
+    level: float, bands: list[float] | None = None
+) -> RotorcraftHemisphere:
     """A synthetic hemisphere with one uniform level on the standard 10° grid."""
     freqs = np.asarray(bands if bands is not None else [50.0], dtype=np.float64)
     az = np.arange(-90.0, 91.0, 10.0)

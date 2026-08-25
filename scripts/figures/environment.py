@@ -11,6 +11,7 @@ from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
+from numpy.typing import NDArray
 
 from phonometry._plot.common import format_frequency_axis, theme_fill
 
@@ -2003,7 +2004,7 @@ def generate_cnossos_road_gradient(output_dir: str) -> None:
 
     weights = np.asarray(environment.CNOSSOS_A_WEIGHTING)
 
-    def a_weighted(bands: Any) -> float:
+    def a_weighted(bands: NDArray[np.float64]) -> float:
         return float(
             10.0 * np.log10(np.sum(10.0 ** ((np.asarray(bands) + weights) / 10.0)))
         )
@@ -2105,7 +2106,7 @@ def generate_cnossos_rail_components(output_dir: str) -> None:
 
     stock, track = _cnossos_rail_scene()
 
-    def total(bands: Any) -> float:
+    def total(bands: NDArray[np.float64]) -> float:
         return float(10.0 * np.log10(np.sum(10.0 ** (np.asarray(bands) / 10.0))))
 
     _fig, (left, right) = plt.subplots(1, 2, figsize=(13, 5.4))

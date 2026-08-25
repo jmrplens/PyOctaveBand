@@ -6,8 +6,10 @@ plate, but driven by a force on the plate itself rather than by an airborne
 wave, so what the air above it does is *radiation* and not transmission.
 """
 
+from __future__ import annotations
+
 from functools import lru_cache
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -24,6 +26,9 @@ from .elastic import (
     _EL_RHO0,
     _elastic_plate_bp_m2,
 )
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 # Grid. The plate, its mesh and its numerical-dispersion compensation are
 # the coincidence clip's, imported rather than restated: same 10 mm steel,
@@ -92,7 +97,7 @@ def _re_bending_wavenumber(frequency: float) -> float:
     return float((m2 * (2.0 * np.pi * frequency) ** 2 / bp) ** 0.25)
 
 
-def _re_decay_length(rms_by_row: Any, r0: int, dx: float) -> float:
+def _re_decay_length(rms_by_row: NDArray[np.float64], r0: int, dx: float) -> float:
     """e-folding height of the pressure envelope above the plate [m].
 
     A log-linear fit of the row-wise RMS between 1 and 4 cm above the
@@ -288,7 +293,7 @@ def animate_elastic_radiation_efficiency(output_dir: str) -> None:
     fig = _anim_figure()
     # Reserve the bottom strip for the two figure-level captions and the
     # clock: fig.text does not claim space from the constrained layout.
-    fig.get_layout_engine().set(rect=(0.0, 0.055, 1.0, 0.945))
+    fig.get_layout_engine().set(rect=(0.0, 0.055, 1.0, 0.945))  # type: ignore[union-attr, call-arg]  # _anim_figure: constrained engine, never None
     # Short on purpose: the Spanish of the longer title overran the canvas
     # at both ends. The solver and the plate moved to the footer.
     fig.suptitle(
