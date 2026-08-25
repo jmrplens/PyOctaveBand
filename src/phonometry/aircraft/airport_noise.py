@@ -33,7 +33,7 @@ Doc 29 5th ed. Vol 3 Part 1 reference workbook.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, NamedTuple
+from typing import TYPE_CHECKING, Any, Literal, NamedTuple, cast
 
 import numpy as np
 
@@ -647,6 +647,18 @@ class FlightSegmentState:
 #: shared instance, as the bundle is frozen).
 _AIRBORNE = FlightSegmentState()
 
+#: The single-event level reported: "exposure" (SEL) or "maximum" (LAmax).
+EventMetric = Literal["exposure", "maximum"]
+
+
+def _checked_metric(metric: str) -> EventMetric:
+    """Normalise and validate the requested event-level metric."""
+    key = metric.strip().lower()
+    if key not in ("exposure", "maximum"):
+        msg = "'metric' must be 'exposure' or 'maximum'."
+        raise ValueError(msg)
+    return cast("EventMetric", key)
+
 
 @dataclass(frozen=True)
 class FlyoverResult:
@@ -660,7 +672,7 @@ class FlyoverResult:
     """
 
     level: float
-    metric: str
+    metric: EventMetric
     segment_levels: NDArray[np.float64]
     observer: NDArray[np.float64]
 
@@ -1300,7 +1312,7 @@ def event_level(
     *,
     reference_speed: float = _VREF_MS,
     mounting: str = "wing",
-    metric: str = "exposure",
+    metric: EventMetric = "exposure",
     atmosphere: AerodromeAtmosphere = _STANDARD_ATMOSPHERE,
     segments: FlightSegmentState = _AIRBORNE,
 ) -> FlyoverResult:
@@ -1338,10 +1350,7 @@ def event_level(
     if obs.shape != (3,) or not np.all(np.isfinite(obs)):
         msg = "'observer' must be a finite (x, y, z) point."
         raise ValueError(msg)
-    key = metric.strip().lower()
-    if key not in ("exposure", "maximum"):
-        msg = "'metric' must be 'exposure' or 'maximum'."
-        raise ValueError(msg)
+    key = _checked_metric(metric)
     gr = _validate_ground_roll(segments.ground_roll, pts.shape[0])
     lr = _validate_ground_roll(segments.landing_roll, pts.shape[0])
     bk = _validate_bank(segments.bank, pts.shape[0])
@@ -1367,7 +1376,7 @@ class NoiseContourResult:
     x: NDArray[np.float64]
     y: NDArray[np.float64]
     level: NDArray[np.float64]
-    metric: str
+    metric: EventMetric
 
     def __post_init__(self) -> None:
         """Reject a contour whose level grid does not match the axes beside it.
@@ -1410,7 +1419,7 @@ def noise_contour(
     y: NDArray[np.float64] | list[float],
     reference_speed: float = _VREF_MS,
     mounting: str = "wing",
-    metric: str = "exposure",
+    metric: EventMetric = "exposure",
     atmosphere: AerodromeAtmosphere = _STANDARD_ATMOSPHERE,
     segments: FlightSegmentState = _AIRBORNE,
 ) -> NoiseContourResult:
@@ -1442,10 +1451,7 @@ def noise_contour(
         raise ValueError(msg)
     # Validate and clean the shared inputs once, not per grid point.
     pts = _validate_path(path)
-    key = metric.strip().lower()
-    if key not in ("exposure", "maximum"):
-        msg = "'metric' must be 'exposure' or 'maximum'."
-        raise ValueError(msg)
+    key = _checked_metric(metric)
     gr = _validate_ground_roll(segments.ground_roll, pts.shape[0])
     lr = _validate_ground_roll(segments.landing_roll, pts.shape[0])
     bk = _validate_bank(segments.bank, pts.shape[0])

@@ -40,7 +40,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from scipy import signal
 
-from .._internal.validation import require_ranks, require_same_length
+from .._internal.validation import check_engine, require_ranks, require_same_length
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -516,9 +516,7 @@ class FilterComplianceResult:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from .._report.iec61260 import render_iec61260_report
 
         return render_iec61260_report(

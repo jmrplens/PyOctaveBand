@@ -73,6 +73,7 @@ from typing import TYPE_CHECKING, Any, Literal, overload
 import numpy as np
 
 from ..._internal.validation import (
+    check_engine,
     require_equal_shapes,
     require_ranks,
     require_same_length,
@@ -103,9 +104,7 @@ def _validate_report_request(engine: str, language: str) -> None:
     from ..._i18n import check_language
 
     check_language(language)
-    if engine != "reportlab":
-        msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-        raise ValueError(msg)
+    check_engine(engine)
 
 
 #: Refusal raised by every survey-result ``plot()`` when the measured band set

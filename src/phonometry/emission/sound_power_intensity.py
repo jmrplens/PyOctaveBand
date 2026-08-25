@@ -101,6 +101,7 @@ if TYPE_CHECKING:
 
 from .._internal.levels_math import energy_mean, weighted_energy_mean
 from .._internal.validation import (
+    check_engine,
     require_equal_shapes,
     require_ranks,
     require_same_length,
@@ -339,9 +340,7 @@ class SoundPowerIntensityResult:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from .._report.iso9614 import render_intensity_power_report
 
         return render_intensity_power_report(
@@ -1070,9 +1069,7 @@ class PrecisionIntensityResult:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         n_bands = int(np.asarray(self.sound_power_level).size)
         _check_report_bands(indicators, criteria, residual_index, n_bands)
 

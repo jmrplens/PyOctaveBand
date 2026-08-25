@@ -34,11 +34,12 @@ from __future__ import annotations
 import math
 import warnings
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
 from .._internal.validation import (
+    check_engine,
     require_equal_shapes,
     require_ranks,
     require_same_length,
@@ -117,6 +118,13 @@ _RC_RUMBLE_LIMIT_DB = 5.0
 _RC_HISS_LIMIT_DB = 3.0
 
 
+#: How the NC designation was settled: the clause 5.2.2 NC-(SIL) curve, or
+#: the clause 5.2.3 tangency method.
+NCMethod = Literal["SIL", "tangency"]
+#: Which side of the NC-15 to NC-70 family an unratable spectrum left it on.
+NCOutOfRange = Literal["above", "below"]
+
+
 @dataclass(frozen=True)
 class NCResult:
     """Result of a Noise Criteria (NC) rating (ANSI/ASA S12.2-2019, 5.2).
@@ -153,8 +161,8 @@ class NCResult:
     levels: np.ndarray
     sil: float = float("nan")
     tangency_rating: float = float("nan")
-    method: str = "tangency"
-    out_of_range: str | None = None
+    method: NCMethod = "tangency"
+    out_of_range: NCOutOfRange | None = None
 
     def __post_init__(self) -> None:
         """Reject a rating whose spectrum and band axis disagree.
@@ -238,9 +246,7 @@ class NCResult:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from .._report.ansi_s12_2 import render_nc_report
 
         return render_nc_report(
@@ -360,9 +366,7 @@ class RCResult:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from .._report.ansi_s12_2 import render_rc_report
 
         return render_rc_report(
@@ -519,8 +523,8 @@ def noise_criterion(
         rating: float,
         governing_frequency: float,
         tangency_rating: float,
-        method: str,
-        out_of_range: str | None,
+        method: NCMethod,
+        out_of_range: NCOutOfRange | None,
     ) -> NCResult:
         return NCResult(
             rating=rating,

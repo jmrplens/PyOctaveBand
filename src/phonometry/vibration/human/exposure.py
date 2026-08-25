@@ -61,7 +61,11 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from scipy import signal as sig
 
-from ..._internal.validation import require_equal_counts, require_equal_shapes
+from ..._internal.validation import (
+    check_engine,
+    require_equal_counts,
+    require_equal_shapes,
+)
 from ..._internal.warnings import PhonometryWarning
 from ...io._resolve import SignalInput, resolve_fs, resolve_samples
 
@@ -1109,9 +1113,7 @@ class DailyVibrationExposure:
         from ..._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from ..._report.human_vibration import render_human_vibration_report
 
         return render_human_vibration_report(

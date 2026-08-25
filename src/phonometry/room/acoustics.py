@@ -44,7 +44,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from .._internal.utils import _typesignal
-from .._internal.validation import require_ranks, require_same_length
+from .._internal.validation import check_engine, require_ranks, require_same_length
 from ..filters.core import OctaveFilterBank
 from ..io._resolve import apply_calibration, resolve_fs
 
@@ -282,9 +282,7 @@ class RoomAcousticsResult:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from .._report.iso3382 import render_iso3382_report
 
         return render_iso3382_report(

@@ -60,6 +60,8 @@ from dataclasses import dataclass
 from math import isfinite, log10
 from typing import TYPE_CHECKING, Any, Literal
 
+from ..._internal.validation import check_engine
+
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
@@ -255,9 +257,7 @@ class AirbornePredictionResult:
         from ..._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from ..._report.iso12354 import render_iso12354_airborne_report
 
         return render_iso12354_airborne_report(
@@ -346,9 +346,7 @@ class ImpactPredictionResult:
         from ..._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from ..._report.iso12354 import render_iso12354_impact_report
 
         return render_iso12354_impact_report(

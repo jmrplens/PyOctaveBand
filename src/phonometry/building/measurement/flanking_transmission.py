@@ -77,11 +77,13 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ..._internal.validation import (
+    check_engine,
     require_equal_counts,
     require_equal_shapes,
     require_ranks,
     require_same_length,
 )
+from ...filters.frequencies import _OCTAVE_SPACING_MIN_RATIO
 from .insulation import (
     ImpactRatingResult,
     WeightedRatingResult,
@@ -107,9 +109,7 @@ def _validate_report_request(engine: str, language: str) -> None:
     from ..._i18n import check_language
 
     check_language(language)
-    if engine != "reportlab":
-        msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-        raise ValueError(msg)
+    check_engine(engine)
 
 
 #: Reference equivalent sound absorption area ``A0`` for the normalized
@@ -154,8 +154,11 @@ _OCTAVE_CENTRES = (31.5, 63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000
 
 #: Median consecutive-centre-frequency ratio above which a band set is classed
 #: as octave-spaced (nominal step 2) rather than one-third-octave-spaced
-#: (step 2^(1/3) ≈ 1.26); the threshold sits between the two nominal steps.
-_OCTAVE_STEP_THRESHOLD = 1.6
+#: (step 2^(1/3) ≈ 1.26). One discriminant for the whole library: the value is
+#: the geometric midpoint of the two IEC 61260 nominal steps, defined next to
+#: the band machinery it tells apart. This module used to keep its own 1.6
+#: beside the 1.5 in ``filters.frequencies`` for the same question.
+_OCTAVE_STEP_THRESHOLD = _OCTAVE_SPACING_MIN_RATIO
 
 
 def _as_1d(values: float | Sequence[float] | np.ndarray, name: str) -> np.ndarray:

@@ -126,7 +126,7 @@ event_level(
     *,
     reference_speed: float = 82.31104,
     mounting: str = 'wing',
-    metric: str = 'exposure',
+    metric: EventMetric = 'exposure',
     atmosphere: AerodromeAtmosphere = ...,
     segments: FlightSegmentState = ...,
 ) -> FlyoverResult
@@ -192,7 +192,7 @@ One entry per segment, so every field an `N`-point path fills has length
 ```python
 FlyoverResult(
     level: float,
-    metric: str,
+    metric: EventMetric,
     segment_levels: NDArray[np.float64],
     observer: NDArray[np.float64],
 )
@@ -293,7 +293,7 @@ noise_contour(
     y: NDArray[np.float64] | list[float],
     reference_speed: float = 82.31104,
     mounting: str = 'wing',
-    metric: str = 'exposure',
+    metric: EventMetric = 'exposure',
     atmosphere: AerodromeAtmosphere = ...,
     segments: FlightSegmentState = ...,
 ) -> NoiseContourResult
@@ -363,7 +363,7 @@ NoiseContourResult(
     x: NDArray[np.float64],
     y: NDArray[np.float64],
     level: NDArray[np.float64],
-    metric: str,
+    metric: EventMetric,
 )
 ```
 

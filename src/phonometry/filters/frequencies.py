@@ -16,7 +16,12 @@ _ANNEX_E3_MSD_THRESHOLD = 5.0
 
 # Adjacent mid-band centre ratio separating the two IEC 61260 band structures:
 # octave spacing (2) above it, one-third-octave spacing (2**(1/3) ~ 1.26) below.
-_OCTAVE_SPACING_MIN_RATIO = 1.5
+# The value is the geometric midpoint of those two nominal steps, equidistant
+# from both in ratio space, so a grid must err by more than half a third-octave
+# step before it is classed with the wrong structure. One constant, shared with
+# the ISO 10848 octave grouping in building.measurement.flanking_transmission:
+# the library used to hold 1.5 here and 1.6 there for the same discriminant.
+_OCTAVE_SPACING_MIN_RATIO = 2.0 ** (2.0 / 3.0)
 
 # One kilohertz in hertz: the boundary at which a nominal-frequency label
 # switches to the abbreviated "k" form, and the Hz-to-kHz divisor.

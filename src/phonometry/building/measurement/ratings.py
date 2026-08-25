@@ -61,12 +61,13 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
 from ..._internal.levels_math import energy_sum
 from ..._internal.validation import (
+    check_engine,
     require_equal_shapes,
     require_ranks,
     require_same_length,
@@ -356,9 +357,13 @@ class WeightedRatingResult:
         ``None``.
     :ivar shifted_reference: Table 3 reference curve after the final shift,
         in dB. Defaults to ``None``.
-    :ivar quantity: ``"airborne"`` (ISO 717-1, sound reduction index) or
-        ``"impact"`` (ISO 717-2), selecting the labels of the ISO 717
-        Annex C report. Defaults to ``"airborne"``.
+    :ivar quantity: Always ``"airborne"``: this class carries the ISO 717-1
+        airborne rating, and the renderers dispatch on this tag when handed
+        the union with :class:`ImpactRatingResult`, which carries
+        ``"impact"``. The field used to admit both values and promise that
+        ``"impact"`` would select the impact labels; it never could, since
+        the impact labels read ``ci`` off the result and this class does not
+        have one, so the promise ended in the renderer's ``AttributeError``.
     """
 
     rating: int
@@ -368,7 +373,7 @@ class WeightedRatingResult:
     band_centers: np.ndarray | None = None
     measured: np.ndarray | None = None
     shifted_reference: np.ndarray | None = None
-    quantity: str = "airborne"
+    quantity: Literal["airborne"] = "airborne"
 
     def __post_init__(self) -> None:
         """Reject a rating whose three band curves do not line up.
@@ -492,7 +497,7 @@ class ImpactRatingResult:
     band_centers: np.ndarray | None = None
     measured: np.ndarray | None = None
     shifted_reference: np.ndarray | None = None
-    quantity: str = "impact"
+    quantity: Literal["impact"] = "impact"
 
     def __post_init__(self) -> None:
         """Reject a rating whose three band curves do not line up.
@@ -605,9 +610,7 @@ def _render_iso717(
     from ..._i18n import check_language
 
     check_language(language)
-    if engine != "reportlab":
-        msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-        raise ValueError(msg)
+    check_engine(engine)
     if (
         result.band_centers is None
         or result.measured is None

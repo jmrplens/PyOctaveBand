@@ -53,6 +53,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from .._internal.validation import (
+    check_engine,
     require_equal_shapes,
     require_positive,
     require_ranks,
@@ -497,9 +498,7 @@ class LoudspeakerCharacteristics:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         del verbose  # uniform signature; the fiche has a single layout
         from .._report.iec60268_5 import render_iec60268_5_report
 

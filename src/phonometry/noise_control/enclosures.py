@@ -68,6 +68,7 @@ from typing import TYPE_CHECKING, Any, Protocol, cast
 import numpy as np
 
 from .._internal.validation import (
+    check_engine,
     require_choice,
     require_equal_shapes,
     require_positive,
@@ -213,9 +214,7 @@ class EnclosureResult:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from .._report.enclosure import render_enclosure_report
 
         return render_enclosure_report(

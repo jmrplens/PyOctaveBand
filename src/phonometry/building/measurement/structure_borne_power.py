@@ -84,6 +84,7 @@ if TYPE_CHECKING:
 
 
 from ..._internal.validation import (
+    check_engine,
     require_per_band,
     require_positive,
     require_ranks,
@@ -317,9 +318,7 @@ class StructureBornePowerResult:
         from ..._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from ..._report.en15657 import render_structure_borne_power_report
 
         return render_structure_borne_power_report(

@@ -52,6 +52,7 @@ from typing import TYPE_CHECKING, Any, Literal
 import numpy as np
 
 from .._internal.levels_math import energy_mean
+from .._internal.validation import check_engine
 from .._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:
@@ -432,9 +433,7 @@ class ExposureResult:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from .._report.iso9612 import render_iso9612_report
 
         return render_iso9612_report(

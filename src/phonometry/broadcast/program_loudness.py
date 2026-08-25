@@ -57,7 +57,12 @@ if TYPE_CHECKING:
 from .._internal.peaks import inter_sample_peak
 from .._internal.types import as_float_or_array
 from .._internal.utils import _typesignal
-from .._internal.validation import require_positive, require_ranks, require_same_length
+from .._internal.validation import (
+    check_engine,
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 
 _EMPTY_SIGNAL = "Input signal 'x' cannot be empty."
 
@@ -850,9 +855,7 @@ class ProgramLoudnessResult:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from .._report.broadcast import render_program_loudness_report
 
         return render_program_loudness_report(

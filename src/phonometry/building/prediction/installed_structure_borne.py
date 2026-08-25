@@ -85,6 +85,7 @@ if TYPE_CHECKING:
 
 
 from ..._internal.validation import (
+    check_engine,
     require_choice,
     require_non_negative,
     require_positive,
@@ -1097,9 +1098,7 @@ class InstalledSourceResult:
         from ..._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from ..._report.en12354_5 import render_installed_structure_borne_report
 
         return render_installed_structure_borne_report(

@@ -234,8 +234,8 @@ print(peaks.size, round(float(peaks.max()), 1), round(float(shares.max()), 1))
 # 28 30.3 98.6
 
 fig, (ax_t, ax_p) = plt.subplots(2, 1, sharex=True, figsize=(11, 7.6))
-ax_t.plot(time, seat, lw=0.9, color="#9e9e9e", label="$a_\mathrm{z}(t)$")
-ax_t.plot(time, response, lw=1.5, color="#1f77b4", label="$A_\mathrm{z}(t)$")
+ax_t.plot(time, seat, lw=0.9, color="#9e9e9e", label=r"$a_\mathrm{z}(t)$")
+ax_t.plot(time, response, lw=1.5, color="#1f77b4", label=r"$A_\mathrm{z}(t)$")
 ax_p.plot(time, response, lw=1.2, color="#1f77b4")
 ax_p.axhline(peaks.max() / 3.0, ls="--", color="#2ca02c")
 ax_t.legend(loc="upper left")

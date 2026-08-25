@@ -27,6 +27,7 @@ import numpy as np
 import pytest
 
 from phonometry._internal.validation import (
+    check_engine,
     require_equal_shapes,
     require_ranks,
     require_same_length,
@@ -215,3 +216,18 @@ def test_equal_shapes_sees_what_a_count_cannot() -> None:
     require_equal_shapes("f", {"a": (3,), "b": (3,)})
     with pytest.raises(ValueError, match="'b'"):
         require_equal_shapes("f", {"a": (3, 2), "b": (3, 4)})
+
+
+def test_the_one_engine_there_is_passes_in_silence() -> None:
+    check_engine("reportlab")
+
+
+def test_an_unknown_engine_is_refused_by_name() -> None:
+    """The single-choice gate every ``report`` entry point shares.
+
+    ``"reportlab"`` is the only engine today; the parameter is the seam a
+    second one would arrive through, and this one message is what every entry
+    point rejects with until then.
+    """
+    with pytest.raises(ValueError, match="Unknown report engine 'weasyprint'"):
+        check_engine("weasyprint")

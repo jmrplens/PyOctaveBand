@@ -109,23 +109,36 @@ _MEMBRANE_DRAW_FRACTION = 0.012
 def _layer_kind_and_thickness(layer: Any, total: float) -> tuple[str, float, str]:
     """Map a layer dataclass to (style kind, drawn thickness, label key).
 
-    Dispatch is by class name so this rendering leaf never imports the domain
-    dataclasses at runtime.
+    Dispatch is by the classes themselves, imported lazily so this rendering
+    leaf still pays nothing for the domain at import time. It used to compare
+    class names, which a rename silently breaks and no refactoring tool can
+    follow; matching the class also lets a subclass draw like its base
+    instead of falling through to the refusal below. The more derived plate
+    and porous kinds are tested before their plainer siblings so that order
+    keeps meaning something if one ever subclasses the other.
     """
-    name = type(layer).__name__
-    if name == "AirLayer":
+    from ...materials.absorbers.layered import (
+        AirLayer,
+        MembraneLayer,
+        MicroperforatedPlateLayer,
+        PerforatedPlateLayer,
+        PoroelasticLayer,
+        PorousLayer,
+    )
+
+    if isinstance(layer, AirLayer):
         return "air", float(layer.thickness), "Air"
-    if name == "PorousLayer":
-        return "porous", float(layer.thickness), "Porous"
-    if name == "PoroelasticLayer":
+    if isinstance(layer, PoroelasticLayer):
         return "porous", float(layer.thickness), "Poroelastic"
-    if name == "PerforatedPlateLayer":
-        return "plate", float(layer.thickness), "Perforated plate"
-    if name == "MicroperforatedPlateLayer":
+    if isinstance(layer, PorousLayer):
+        return "porous", float(layer.thickness), "Porous"
+    if isinstance(layer, MicroperforatedPlateLayer):
         return "plate", float(layer.thickness), "Microperforated plate"
-    if name == "MembraneLayer":
+    if isinstance(layer, PerforatedPlateLayer):
+        return "plate", float(layer.thickness), "Perforated plate"
+    if isinstance(layer, MembraneLayer):
         return "membrane", _MEMBRANE_DRAW_FRACTION * total, "Membrane"
-    msg = f"Unsupported layer type: {name!r}."
+    msg = f"Unsupported layer type: {type(layer).__name__!r}."
     raise TypeError(msg)
 
 

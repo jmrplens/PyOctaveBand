@@ -20,7 +20,7 @@ reportlab, matplotlib and svglib are soft dependencies imported lazily
 from __future__ import annotations
 
 from collections.abc import Callable, Sequence
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -75,12 +75,13 @@ def single_number_statement(
     reports the fiche mirrors).
     """
     if rating.quantity == "impact":
-        impact = cast("ImpactRatingResult", rating)
+        # The tag proves the class: only ImpactRatingResult carries "impact".
+        impact = rating
         return (
             f"{rating_symbol} (C<sub>I</sub>) = "
             f"<b>{impact.rating} ({impact.ci:+d}) dB</b>"
         )
-    airborne = cast("WeightedRatingResult", rating)
+    airborne = rating
     return (
         f"{rating_symbol} (C; C<sub>tr</sub>) = "
         f"<b>{airborne.rating} ({airborne.c:+d}; {airborne.ctr:+d}) dB</b>"

@@ -64,7 +64,7 @@ import os
 import struct
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
     from typing import BinaryIO
@@ -396,11 +396,16 @@ class Ds64Chunk:
     sample_count: int
 
 
+#: The container the RIFF prelude declares: classic 32-bit "WAV" (``RIFF``
+#: fourcc), or the 64-bit "RF64" (EBU Tech 3306) / "BW64" (ITU-R BS.2088).
+WavContainer = Literal["WAV", "RF64", "BW64"]
+
+
 @dataclass(frozen=True)
 class WavChunks:
     """Everything the walker gathered from one pass over the headers."""
 
-    container: str
+    container: WavContainer
     fmt: FormatChunk
     data_offset: int
     data_size: int
@@ -590,14 +595,18 @@ def _parse_fact(payload: bytes, path: str | Path) -> int:
     return int(fact_frames)
 
 
-def _read_wave_header(fh: BinaryIO, path: str | Path) -> str:
+def _read_wave_header(fh: BinaryIO, path: str | Path) -> WavContainer:
     """Check the 12-byte RIFF prelude and name the container it declares."""
     header = fh.read(_RIFF_PRELUDE_BYTES)
     if len(header) < _RIFF_PRELUDE_BYTES or header[8:12] != _WAVE_FORM_TYPE:
         msg = f"{path}: not a WAVE file"
         raise ValueError(msg)
     fourcc = header[:4]
-    containers = {b"RIFF": "WAV", b"RF64": "RF64", b"BW64": "BW64"}
+    containers: dict[bytes, WavContainer] = {
+        b"RIFF": "WAV",
+        b"RF64": "RF64",
+        b"BW64": "BW64",
+    }
     if fourcc not in containers:
         msg = (
             f"{path}: unknown container fourcc {fourcc!r} (expected RIFF, RF64 or BW64)"
@@ -647,7 +656,7 @@ def _read_chunk_payload(
 
 
 def _true_data_size(
-    size: int, container: str, ds64: Ds64Chunk | None, path: str | Path
+    size: int, container: WavContainer, ds64: Ds64Chunk | None, path: str | Path
 ) -> int:
     """Resolve the ``data`` size, through ``ds64`` for the RF64 sentinel."""
     if size != _RF64_SIZE_SENTINEL or container == "WAV":

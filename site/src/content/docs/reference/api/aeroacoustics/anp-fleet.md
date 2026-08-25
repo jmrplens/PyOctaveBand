@@ -79,7 +79,7 @@ AnpAircraft.event_level(
     operation: str,
     *,
     stage_length: int = 1,
-    metric: str = 'exposure',
+    metric: EventMetric = 'exposure',
     temperature: float = 15.0,
     pressure: float = 101.325,
 ) -> FlyoverResult
@@ -96,7 +96,7 @@ AnpAircraft.noise_contour(
     x: NDArray[np.float64] | list[float],
     y: NDArray[np.float64] | list[float],
     stage_length: int = 1,
-    metric: str = 'exposure',
+    metric: EventMetric = 'exposure',
     temperature: float = 15.0,
     pressure: float = 101.325,
 ) -> NoiseContourResult
@@ -171,7 +171,7 @@ AnpDatabase.event_level(
     operation: str,
     *,
     stage_length: int = 1,
-    metric: str = 'exposure',
+    metric: EventMetric = 'exposure',
     temperature: float = 15.0,
     pressure: float = 101.325,
 ) -> FlyoverResult
@@ -206,7 +206,7 @@ AnpDatabase.noise_contour(
     x: NDArray[np.float64] | list[float],
     y: NDArray[np.float64] | list[float],
     stage_length: int = 1,
-    metric: str = 'exposure',
+    metric: EventMetric = 'exposure',
     temperature: float = 15.0,
     pressure: float = 101.325,
 ) -> NoiseContourResult

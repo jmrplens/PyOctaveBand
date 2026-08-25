@@ -83,6 +83,7 @@ if TYPE_CHECKING:
 
 
 from ..._internal.validation import (
+    check_engine,
     require_equal_shapes,
     require_non_negative,
     require_positive,
@@ -572,9 +573,7 @@ class MobilityResult:
         from ..._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from ..._report.iso7626 import render_mobility_report
 
         return render_mobility_report(

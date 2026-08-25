@@ -78,6 +78,7 @@ from typing import TYPE_CHECKING, Any, overload
 import numpy as np
 
 from ..._internal.validation import (
+    check_engine,
     require_equal_counts,
     require_equal_shapes,
     require_ranks,
@@ -137,9 +138,7 @@ def _validate_intensity_report(
     from ..._i18n import check_language
 
     check_language(language)
-    if engine != "reportlab":
-        msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-        raise ValueError(msg)
+    check_engine(engine)
     if rating is None:
         msg = (
             f"The {label} report needs the ISO 717-1 single-number rating; it "

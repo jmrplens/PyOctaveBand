@@ -77,6 +77,7 @@ from numpy.typing import ArrayLike, NDArray
 
 from .._internal.types import as_float_or_array
 from .._internal.validation import (
+    check_engine,
     require_non_negative,
     require_positive,
     require_ranks,
@@ -690,9 +691,7 @@ class ReverberationModelResult:
         from .._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from .._report.reverberation import render_reverberation_models_report
 
         return render_reverberation_models_report(

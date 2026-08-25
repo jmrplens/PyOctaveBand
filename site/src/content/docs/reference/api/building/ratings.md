@@ -224,7 +224,7 @@ ImpactRatingResult(
     band_centers: np.ndarray | None = None,
     measured: np.ndarray | None = None,
     shifted_reference: np.ndarray | None = None,
-    quantity: str = 'impact',
+    quantity: Literal['impact'] = 'impact',
 )
 ```
 
@@ -509,7 +509,7 @@ WeightedRatingResult(
     band_centers: np.ndarray | None = None,
     measured: np.ndarray | None = None,
     shifted_reference: np.ndarray | None = None,
-    quantity: str = 'airborne',
+    quantity: Literal['airborne'] = 'airborne',
 )
 ```
 
@@ -526,7 +526,7 @@ Single-number weighted rating and adaptation terms (ISO 717-1).
 | `band_centers` | Band centre frequencies of the measured curve, in Hz. Defaults to `None` for backward-compatible construction. |
 | `measured` | The measured band quantities used for the rating (after the one-decimal reduction of Clause 4.4), in dB. Defaults to `None`. |
 | `shifted_reference` | Table 3 reference curve after the final shift, in dB. Defaults to `None`. |
-| `quantity` | `"airborne"` (ISO 717-1, sound reduction index) or `"impact"` (ISO 717-2), selecting the labels of the ISO 717 Annex C report. Defaults to `"airborne"`. |
+| `quantity` | Always `"airborne"`: this class carries the ISO 717-1 airborne rating, and the renderers dispatch on this tag when handed the union with [`ImpactRatingResult`](/phonometry/reference/api/building/ratings/#impactratingresult), which carries `"impact"`. The field used to admit both values and promise that `"impact"` would select the impact labels; it never could, since the impact labels read `ci` off the result and this class does not have one, so the promise ended in the renderer's `AttributeError`. |
 
 ### WeightedRatingResult.plot()
 

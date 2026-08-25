@@ -74,7 +74,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_equal_shapes
+from ..._internal.validation import check_engine, require_equal_shapes
 from ..._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:
@@ -229,9 +229,7 @@ class StaticAirflowResult:
         from ..._i18n import check_language
 
         check_language(language)
-        if engine != "reportlab":
-            msg = f"Unknown report engine {engine!r}; only 'reportlab' is supported."
-            raise ValueError(msg)
+        check_engine(engine)
         from ..._report.iso9053 import render_static_airflow_report
 
         return render_static_airflow_report(
