@@ -139,7 +139,7 @@ arithmetic mean of Re{Y} over the contact points, Formula 16).
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | if `Re{plate_mobility}` is not positive and finite, or the two shapes do not broadcast together. |
+| ValueError | if `power_level` is not finite, `Re{plate_mobility}` is not positive and finite, or the two shapes do not broadcast together. |
 
 ## equivalent_free_velocity_level
 
@@ -173,7 +173,7 @@ combine through Formula (19) into $|Y_{S,eq}| = v_f / F_b$.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | if `Re{plate_mobility}` is not positive and finite, or the two shapes do not broadcast together. |
+| ValueError | if `power_level` is not finite, `Re{plate_mobility}` is not positive and finite, or the two shapes do not broadcast together. |
 
 ## mean_free_velocity_level
 
@@ -380,7 +380,7 @@ the EN 12354-5 Annex I mobility correction
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | for a non-positive mass, area, reference, frequency or loss factor, or per-band inputs whose shapes do not broadcast together. |
+| ValueError | for a non-positive mass, area or reference, a frequency or loss factor that is not positive and finite, a non-finite velocity level, or per-band inputs whose shapes do not broadcast together. |
 
 ## StructureBornePowerResult
 
