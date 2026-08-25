@@ -45,6 +45,7 @@ from phonometry.environment.sources.cnossos_road import (
     ROAD_REFERENCE_SPEED,
     JunctionType,
     RoadEmissionCoefficients,
+    RoadEmissionResult,
     RoadSurface,
     RoadSurfaceCoefficients,
     RoadTraffic,
@@ -71,7 +72,7 @@ def _workbook_cases() -> list[dict[str, str]]:
     return ref.cnossos_road_workbook_cases()
 
 
-def _run_case(case: dict[str, str]):
+def _run_case(case: dict[str, str]) -> RoadEmissionResult:
     surfaces = _surfaces_2015()
     traffic = [
         RoadTraffic(

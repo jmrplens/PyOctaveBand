@@ -21,12 +21,16 @@ rejected engines/languages.
 from __future__ import annotations
 
 import math
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, electroacoustics
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 _R = 8.0
 _L0 = 90.0
@@ -251,7 +255,7 @@ def test_distortion_from_swept_sine_result() -> None:
 # --- rendering ---------------------------------------------------------------
 
 
-def _example_result():
+def _example_result() -> electroacoustics.LoudspeakerCharacteristics:
     f, spl = _flat_response()
     angles = np.radians(np.linspace(0.0, 90.0, 40))
     pist = electroacoustics.radiating_piston(
@@ -279,7 +283,7 @@ def _example_result():
     )
 
 
-def test_report_renders_one_page_with_rated_table(tmp_path) -> None:
+def test_report_renders_one_page_with_rated_table(tmp_path: Path) -> None:
     """The fiche renders a valid one-page PDF listing the rated characteristics."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -305,7 +309,7 @@ def test_report_renders_one_page_with_rated_table(tmp_path) -> None:
     assert "PASS" in text
 
 
-def test_report_without_optional_panels(tmp_path) -> None:
+def test_report_without_optional_panels(tmp_path: Path) -> None:
     """A response-only result (no impedance/THD/polar) still renders."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -318,7 +322,7 @@ def test_report_without_optional_panels(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """language="es" renders a one-page Spanish fiche."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -378,7 +382,7 @@ def test_plot_rejects_unknown_quantity_and_missing_data() -> None:
         bare.plot(quantity="impedance")
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     result = _example_result()
     out = str(tmp_path / "x.pdf")
@@ -386,7 +390,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         result.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     result = _example_result()
     out = str(tmp_path / "bad.pdf")
@@ -397,7 +401,7 @@ def test_unknown_language_rejected(tmp_path) -> None:
 # --------------------------------------------------------------------------
 # A response the panel cannot be drawn over
 # --------------------------------------------------------------------------
-def test_a_response_span_too_narrow_to_draw_is_refused(tmp_path) -> None:
+def test_a_response_span_too_narrow_to_draw_is_refused(tmp_path: Path) -> None:
     """The fiche scales its panel by the decades the curve spans.
 
     Two points a hair apart pass every other check on the curve and send that

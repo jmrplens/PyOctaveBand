@@ -254,7 +254,7 @@ def test_collision_census_names_each_way_a_label_can_land_wrong(
     assert kinds == {"overprint", "escapes", "struck", "painted over"}
 
 
-def test_a_panel_over_the_title_is_reported(monkeypatch) -> None:
+def test_a_panel_over_the_title_is_reported(monkeypatch: pytest.MonkeyPatch) -> None:
     """The title is painted first, so a body panel can bury it.
 
     The collision census records every element as it is drawn and reports a
@@ -265,8 +265,9 @@ def test_a_panel_over_the_title_is_reported(monkeypatch) -> None:
     lets any panel cover it. This pins the order rather than the symptom.
     """
     from diagrams import outline, registry
+    from diagrams.canvas import SVG, Theme
 
-    def build(svg, th) -> None:
+    def build(svg: SVG, th: Theme) -> None:
         # An opaque panel across the top strip, where the title is set.
         svg.rect(100, 10, 700, 60, fill=th.fg)
 

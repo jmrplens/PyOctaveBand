@@ -32,12 +32,17 @@ which is exactly why the existing 160 tests of the contract did not.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
-from phonometry.filters import parametric_eq, weighting_filter
+from phonometry.filters import EQSection, parametric_eq, weighting_filter
 from phonometry.io import Signal
 from phonometry.signals import leq
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 FS = 48000
 #: A factor big enough that a second application is unmistakable: applying it
@@ -55,10 +60,8 @@ def _record(seconds: float = 1.0, seed: int = 0) -> np.ndarray:
 _RECORD = _record()
 
 
-def _sections():
+def _sections() -> list[EQSection]:
     """One peaking section, so ``parametric_eq`` has something to do."""
-    from phonometry.filters import EQSection
-
     return [EQSection(filter_type="peaking", f0=1000.0, gain_db=3.0, q=1.0)]
 
 
@@ -72,14 +75,21 @@ TRANSFORMS = [
 IDS = [name for name, _ in TRANSFORMS]
 
 
-def _call(name, x, extra, fs=None):
+def _call(
+    name: str,
+    x: Signal | np.ndarray,
+    extra: Callable[[], dict[str, object]],
+    fs: float | None = None,
+) -> Signal | np.ndarray:
     """Call the transform by name, with or without an explicit rate."""
     func = {"weighting_filter": weighting_filter, "parametric_eq": parametric_eq}[name]
     return func(x, **extra()) if fs is None else func(x, fs, **extra())
 
 
 @pytest.mark.parametrize(("name", "extra"), TRANSFORMS, ids=IDS)
-def test_a_second_hop_does_not_apply_the_factor_again(name, extra) -> None:
+def test_a_second_hop_does_not_apply_the_factor_again(
+    name: str, extra: Callable[[], dict[str, object]]
+) -> None:
     """The defect this file exists for, asserted where it would appear.
 
     The level of the transformed record has to be the level of the
@@ -92,7 +102,9 @@ def test_a_second_hop_does_not_apply_the_factor_again(name, extra) -> None:
 
 
 @pytest.mark.parametrize(("name", "extra"), TRANSFORMS, ids=IDS)
-def test_the_returned_signal_says_its_conversion_is_done(name, extra) -> None:
+def test_the_returned_signal_says_its_conversion_is_done(
+    name: str, extra: Callable[[], dict[str, object]]
+) -> None:
     """One, not the input's factor, and not None either.
 
     None would give the same level but make ``Signal.plot()`` label a record
@@ -104,7 +116,9 @@ def test_the_returned_signal_says_its_conversion_is_done(name, extra) -> None:
 
 
 @pytest.mark.parametrize(("name", "extra"), TRANSFORMS, ids=IDS)
-def test_an_uncalibrated_record_stays_uncalibrated(name, extra) -> None:
+def test_an_uncalibrated_record_stays_uncalibrated(
+    name: str, extra: Callable[[], dict[str, object]]
+) -> None:
     """The object never invents a calibration it was not given."""
     out = _call(name, Signal(_RECORD, FS), extra)
     assert isinstance(out, Signal)
@@ -112,7 +126,9 @@ def test_an_uncalibrated_record_stays_uncalibrated(name, extra) -> None:
 
 
 @pytest.mark.parametrize(("name", "extra"), TRANSFORMS, ids=IDS)
-def test_a_bare_array_still_comes_back_bare(name, extra) -> None:
+def test_a_bare_array_still_comes_back_bare(
+    name: str, extra: Callable[[], dict[str, object]]
+) -> None:
     """The rule is conditional, so nothing that passes arrays today changes.
 
     Every call site inside the library resolves its input to an array before
@@ -124,7 +140,9 @@ def test_a_bare_array_still_comes_back_bare(name, extra) -> None:
 
 
 @pytest.mark.parametrize(("name", "extra"), TRANSFORMS, ids=IDS)
-def test_the_samples_are_the_same_ones_the_bare_call_computes(name, extra) -> None:
+def test_the_samples_are_the_same_ones_the_bare_call_computes(
+    name: str, extra: Callable[[], dict[str, object]]
+) -> None:
     """Wrapping changes what comes back, never what was computed."""
     wrapped = _call(name, Signal(_RECORD, FS), extra)
     bare = _call(name, _RECORD, extra, fs=FS)
@@ -132,7 +150,9 @@ def test_the_samples_are_the_same_ones_the_bare_call_computes(name, extra) -> No
 
 
 @pytest.mark.parametrize(("name", "extra"), TRANSFORMS, ids=IDS)
-def test_the_metadata_travels_with_the_samples(name, extra) -> None:
+def test_the_metadata_travels_with_the_samples(
+    name: str, extra: Callable[[], dict[str, object]]
+) -> None:
     """The rate and the labels are what the chain was losing."""
     labelled = Signal(
         np.stack([_RECORD, _RECORD]), FS, channel_labels=("left", "right")

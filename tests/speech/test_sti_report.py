@@ -13,13 +13,18 @@ rejected engines/languages) complete the rendering contract.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
-from phonometry.speech import sti_from_impulse_response
+from phonometry.speech import STIResult, sti_from_impulse_response
 from phonometry.speech.sti import _MOD_FREQS, _NUM_BANDS, _sti_from_mtf
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def _extract_text(path: str) -> str:
@@ -30,12 +35,12 @@ def _extract_text(path: str) -> str:
     return " ".join(raw.split())
 
 
-def _uniform_result(m: float):
+def _uniform_result(m: float) -> STIResult:
     """An STIResult from a uniform MTF (pure arithmetic, platform-stable)."""
     return _sti_from_mtf(np.full((_NUM_BANDS, _MOD_FREQS.size), m))
 
 
-def _decay_result(t60: float, fs: int = 48000, seed: int = 0):
+def _decay_result(t60: float, fs: int = 48000, seed: int = 0) -> STIResult:
     """A deterministic full-STI indirect result from an exponential decay IR."""
     rng = np.random.default_rng(seed)
     n = int(2.0 * t60 * fs)
@@ -47,7 +52,7 @@ def _decay_result(t60: float, fs: int = 48000, seed: int = 0):
 # --- exact oracle --------------------------------------------------------------
 
 
-def test_uniform_mtf_half_renders_sti_half(tmp_path) -> None:
+def test_uniform_mtf_half_renders_sti_half(tmp_path: Path) -> None:
     """m = 0.5 in every band maps to STI = 0.50 (A.3.1.2), band G."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -65,7 +70,7 @@ def test_uniform_mtf_half_renders_sti_half(tmp_path) -> None:
     assert "full STI, indirect method" in text
 
 
-def test_stipa_method_is_named(tmp_path) -> None:
+def test_stipa_method_is_named(tmp_path: Path) -> None:
     """A two-column MTF (STIPA) names the direct method in the basis line."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -79,7 +84,7 @@ def test_stipa_method_is_named(tmp_path) -> None:
 # --- verdict direction (higher is better) -------------------------------------
 
 
-def test_verdict_passes_at_or_above_requirement(tmp_path) -> None:
+def test_verdict_passes_at_or_above_requirement(tmp_path: Path) -> None:
     """STI = 0.50 passes a 0.45 minimum and fails a 0.55 minimum."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -92,7 +97,7 @@ def test_verdict_passes_at_or_above_requirement(tmp_path) -> None:
     assert "FAIL" in _extract_text(str(out_fail))
 
 
-def test_verdict_passes_exactly_at_requirement(tmp_path) -> None:
+def test_verdict_passes_exactly_at_requirement(tmp_path: Path) -> None:
     """A minimum equal to the displayed STI passes (>= boundary)."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -102,7 +107,7 @@ def test_verdict_passes_exactly_at_requirement(tmp_path) -> None:
     assert "PASS" in _extract_text(str(out))
 
 
-def test_verdict_prints_the_requirement_at_full_precision(tmp_path) -> None:
+def test_verdict_prints_the_requirement_at_full_precision(tmp_path: Path) -> None:
     """The requirement is printed at the STI's own two decimals.
 
     A one-decimal requirement would round 0.52 to "0.5" and read as a
@@ -124,7 +129,7 @@ def test_verdict_prints_the_requirement_at_full_precision(tmp_path) -> None:
     assert "0.90" in _extract_text(str(out_round))
 
 
-def test_verdict_decides_on_the_requirement_it_prints(tmp_path) -> None:
+def test_verdict_decides_on_the_requirement_it_prints(tmp_path: Path) -> None:
     """A requirement with hidden digits is judged on the value shown.
 
     0.5049 prints as "0.50"; deciding on the unrounded number would fail an
@@ -144,7 +149,7 @@ def test_verdict_decides_on_the_requirement_it_prints(tmp_path) -> None:
 # --- realistic indirect measurement -------------------------------------------
 
 
-def test_decay_measurement_renders_its_own_value(tmp_path) -> None:
+def test_decay_measurement_renders_its_own_value(tmp_path: Path) -> None:
     """A full-STI indirect fiche prints its STI, rating and a band MTI value."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -171,7 +176,7 @@ def test_decay_measurement_renders_its_own_value(tmp_path) -> None:
 # --- metadata ------------------------------------------------------------------
 
 
-def test_metadata_header_renders(tmp_path) -> None:
+def test_metadata_header_renders(tmp_path: Path) -> None:
     """Supplied metadata renders the header grid; no requirement, no verdict."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -196,7 +201,7 @@ def test_metadata_header_renders(tmp_path) -> None:
 # --- Spanish fiche -------------------------------------------------------------
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """language="es" renders the STI vocabulary and comma decimals."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -214,7 +219,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
 # --- rendering contract --------------------------------------------------------
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     res = _uniform_result(0.5)
     out = str(tmp_path / "x.pdf")
@@ -222,7 +227,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         res.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     res = _uniform_result(0.5)
     out = str(tmp_path / "bad.pdf")

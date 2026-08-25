@@ -14,6 +14,8 @@ measurement" wording and the verdict direction, like the sibling report tests.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
@@ -23,6 +25,9 @@ from report_assertions import assert_one_page
 
 import phonometry as ph
 from phonometry import ReportMetadata, environment
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 _BANDS = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
 
@@ -58,7 +63,7 @@ def _extract_text(path: str) -> str:
 # --------------------------------------------------------------------------- #
 # Attenuation prediction fiche
 # --------------------------------------------------------------------------- #
-def test_attenuation_with_emission_boxes_receiver_level(tmp_path) -> None:
+def test_attenuation_with_emission_boxes_receiver_level(tmp_path: Path) -> None:
     """With a source emission the fiche boxes the A-weighted downwind level."""
     out = tmp_path / "atten.pdf"
     assert _attenuation().report(str(out), source_emission=_emission()) == str(out)
@@ -73,7 +78,7 @@ def test_attenuation_with_emission_boxes_receiver_level(tmp_path) -> None:
     assert "47.2" in text  # LfT(DW) at 63 Hz = 100 - a_total
 
 
-def test_attenuation_without_emission_boxes_total_range(tmp_path) -> None:
+def test_attenuation_without_emission_boxes_total_range(tmp_path: Path) -> None:
     """Without a source emission the fiche boxes the total-attenuation range."""
     out = tmp_path / "bare.pdf"
     _attenuation().report(str(out))
@@ -85,7 +90,7 @@ def test_attenuation_without_emission_boxes_total_range(tmp_path) -> None:
     assert "LAT(DW)" not in text  # no receiver level without a source emission
 
 
-def test_attenuation_emission_length_mismatch_raises(tmp_path) -> None:
+def test_attenuation_emission_length_mismatch_raises(tmp_path: Path) -> None:
     """A source power that does not match the band count is rejected."""
     result = _attenuation()
     bad = environment.SourceEmission(sound_power_level=np.full(4, 100.0))
@@ -96,7 +101,7 @@ def test_attenuation_emission_length_mismatch_raises(tmp_path) -> None:
         result.report(out, source_emission=bad)
 
 
-def test_attenuation_verbose_adds_a_weighted_band(tmp_path) -> None:
+def test_attenuation_verbose_adds_a_weighted_band(tmp_path: Path) -> None:
     """``verbose=True`` adds the A-weighted band-level column."""
     result = _attenuation()
     emission = _emission()
@@ -109,7 +114,7 @@ def test_attenuation_verbose_adds_a_weighted_band(tmp_path) -> None:
     assert "dB(A)" in _extract_text(str(verbose))  # the L_A column header
 
 
-def test_attenuation_requirement_lower_is_better(tmp_path) -> None:
+def test_attenuation_requirement_lower_is_better(tmp_path: Path) -> None:
     """The downwind level passes at or below the declared limit level."""
     result = _attenuation()  # LAT(DW) = 46.5 dB with the flat 100 dB source
     emission = _emission()
@@ -130,7 +135,7 @@ def test_attenuation_requirement_lower_is_better(tmp_path) -> None:
     assert "FAIL" in _extract_text(str(failing))
 
 
-def test_attenuation_metadata_header_and_distance(tmp_path) -> None:
+def test_attenuation_metadata_header_and_distance(tmp_path: Path) -> None:
     """A populated metadata header and the recovered distance print."""
     metadata = ReportMetadata(
         specimen="Industrial fan plant",
@@ -148,7 +153,7 @@ def test_attenuation_metadata_header_and_distance(tmp_path) -> None:
     assert "200" in text  # distance d recovered from Adiv
 
 
-def test_attenuation_spanish_fiche(tmp_path) -> None:
+def test_attenuation_spanish_fiche(tmp_path: Path) -> None:
     """``language="es"`` renders the Spanish attenuation fiche."""
     import re
 
@@ -170,7 +175,7 @@ def test_attenuation_spanish_fiche(tmp_path) -> None:
 # --------------------------------------------------------------------------- #
 # Barrier insertion-loss prediction fiche
 # --------------------------------------------------------------------------- #
-def test_barrier_report_structure_and_numbers(tmp_path) -> None:
+def test_barrier_report_structure_and_numbers(tmp_path: Path) -> None:
     """The barrier fiche boxes the mean insertion loss and cites the model."""
     out = tmp_path / "bar.pdf"
     assert _barrier().report(str(out)) == str(out)
@@ -186,7 +191,7 @@ def test_barrier_report_structure_and_numbers(tmp_path) -> None:
     assert "21.0" in text  # IL at 8 kHz from the table
 
 
-def test_barrier_verbose_adds_fresnel_number(tmp_path) -> None:
+def test_barrier_verbose_adds_fresnel_number(tmp_path: Path) -> None:
     """``verbose=True`` adds the Fresnel-number column."""
     plain = tmp_path / "plain.pdf"
     _barrier().report(str(plain))
@@ -197,7 +202,7 @@ def test_barrier_verbose_adds_fresnel_number(tmp_path) -> None:
     assert "7.05" in _extract_text(str(verbose))  # N at 8 kHz
 
 
-def test_barrier_requirement_higher_is_better(tmp_path) -> None:
+def test_barrier_requirement_higher_is_better(tmp_path: Path) -> None:
     """The insertion loss passes at or above the required minimum."""
     result = _barrier()  # mean IL = 12.9 dB
     passing = tmp_path / "pass.pdf"
@@ -209,7 +214,7 @@ def test_barrier_requirement_higher_is_better(tmp_path) -> None:
     assert "FAIL" in _extract_text(str(failing))
 
 
-def test_barrier_kurze_anderson_model_cited(tmp_path) -> None:
+def test_barrier_kurze_anderson_model_cited(tmp_path: Path) -> None:
     """The Kurze-Anderson method is named in the basis line."""
     out = tmp_path / "ka.pdf"
     _barrier(method="kurze_anderson").report(str(out))
@@ -217,7 +222,7 @@ def test_barrier_kurze_anderson_model_cited(tmp_path) -> None:
     assert "Kurze-Anderson" in _extract_text(str(out))
 
 
-def test_barrier_lightweight_without_metadata(tmp_path) -> None:
+def test_barrier_lightweight_without_metadata(tmp_path: Path) -> None:
     """A barrier fiche with no metadata is still a valid one-page prediction."""
     out = tmp_path / "bare.pdf"
     _barrier().report(str(out))
@@ -225,7 +230,7 @@ def test_barrier_lightweight_without_metadata(tmp_path) -> None:
     assert "prediction" in _extract_text(str(out))
 
 
-def test_barrier_spanish_fiche(tmp_path) -> None:
+def test_barrier_spanish_fiche(tmp_path: Path) -> None:
     """``language="es"`` renders the Spanish barrier fiche."""
     out = tmp_path / "es.pdf"
     _barrier().report(str(out), language="es")
@@ -238,7 +243,7 @@ def test_barrier_spanish_fiche(tmp_path) -> None:
 # --------------------------------------------------------------------------- #
 # Shared validation
 # --------------------------------------------------------------------------- #
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError`` for both fiches."""
     attenuation = _attenuation()
     out_a = str(tmp_path / "a.pdf")
@@ -250,7 +255,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         barrier.report(out_b, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unsupported language raises ``ValueError`` for both fiches."""
     attenuation = _attenuation()
     out_a = str(tmp_path / "a.pdf")

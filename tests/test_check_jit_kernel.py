@@ -38,7 +38,9 @@ def test_guard_verdict_follows_the_environment() -> None:
 
 
 @pytest.mark.skipif(not _JITTED, reason="numba is absent or the JIT is disabled")
-def test_a_pass_is_backed_by_a_printed_signature(capsys) -> None:
+def test_a_pass_is_backed_by_a_printed_signature(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     """A pass has to name the compiled signatures, not just return zero."""
     assert check_jit_kernel.main() == 0
     out = capsys.readouterr().out

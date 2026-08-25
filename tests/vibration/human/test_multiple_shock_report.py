@@ -15,6 +15,8 @@ rejected engines/languages) complete the rendering contract.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Literal
+
 import numpy as np
 import pytest
 from report_assertions import assert_one_page
@@ -32,6 +34,11 @@ from phonometry.vibration.human.multiple_shock import (
     injury_risk,
 )
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from numpy.typing import ArrayLike
+
 
 def _extract_text(path: str) -> str:
     """Whitespace-normalized page text (PDF line wraps fold to single spaces)."""
@@ -42,7 +49,12 @@ def _extract_text(path: str) -> str:
 
 
 def _result_from_peaks(
-    peaks, *, start_age=20.0, years=20, days_per_year=120.0, sex="male"
+    peaks: ArrayLike,
+    *,
+    start_age: float = 20.0,
+    years: int = 20,
+    days_per_year: float = 120.0,
+    sex: Literal["male", "female"] = "male",
 ) -> MultipleShockResult:
     """Build a result directly from the Annex C worked-example response peaks.
 
@@ -82,7 +94,7 @@ def _annex_c_male() -> MultipleShockResult:
 # --- published oracle (ISO 2631-5 Annex C worked example) ---------------------
 
 
-def test_report_renders_annex_c_numbers(tmp_path) -> None:
+def test_report_renders_annex_c_numbers(tmp_path: Path) -> None:
     """The fiche prints the Annex C dose, stress, R and injury-probability values."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -109,7 +121,7 @@ def test_report_renders_annex_c_numbers(tmp_path) -> None:
     assert "2.17" in text
 
 
-def test_report_classifies_worked_example_as_moderate(tmp_path) -> None:
+def test_report_classifies_worked_example_as_moderate(tmp_path: Path) -> None:
     """R = 1.22 is classified in the moderate band (the standard's conclusion)."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -134,7 +146,7 @@ def test_report_classifies_worked_example_as_moderate(tmp_path) -> None:
         (75.0, "very high probability of an adverse health effect"),
     ],
 )
-def test_risk_band_tracks_table_c2(tmp_path, peak: float, band: str) -> None:
+def test_risk_band_tracks_table_c2(tmp_path: Path, peak: float, band: str) -> None:
     """The boxed classification follows the Table C.2 stress-variable bands."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -148,7 +160,7 @@ def test_risk_band_tracks_table_c2(tmp_path, peak: float, band: str) -> None:
 # --- metadata -----------------------------------------------------------------
 
 
-def test_metadata_header_renders(tmp_path) -> None:
+def test_metadata_header_renders(tmp_path: Path) -> None:
     """Supplied metadata renders the client, subject, workplace and traceability."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -176,7 +188,7 @@ def test_metadata_header_renders(tmp_path) -> None:
 # --- Spanish fiche ------------------------------------------------------------
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """language="es" renders the multiple-shock vocabulary and comma decimals."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -197,7 +209,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
 # --- rendering contract -------------------------------------------------------
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     res = _annex_c_male()
     out = str(tmp_path / "x.pdf")
@@ -205,7 +217,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         res.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     res = _annex_c_male()
     out = str(tmp_path / "bad.pdf")

@@ -52,8 +52,13 @@ DT = 0.02  # 20 ms, within the 10-25 ms range of Clause 4.
 
 
 def _ramp(
-    level_start: float, level_difference: float, rise: float, *, pre=0.2, post=0.3
-):
+    level_start: float,
+    level_difference: float,
+    rise: float,
+    *,
+    pre: float = 0.2,
+    post: float = 0.3,
+) -> np.ndarray:
     """A flat-ramp-flat ``LpAF`` history sampled at :data:`DT`.
 
     The onset spans exactly ``rise`` seconds so its onset rate is

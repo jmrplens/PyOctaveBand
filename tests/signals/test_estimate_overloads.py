@@ -21,6 +21,8 @@ be satisfied by accident.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 from signal_contract import assert_same
@@ -51,6 +53,9 @@ from phonometry.signals import (
     time_synchronous_average,
     zoom_fft,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 FS = 8000
 CAL = 3.0
@@ -101,13 +106,17 @@ PAIR_IDS = [f.__name__ for f, _ in PAIRS]
 
 
 @pytest.mark.parametrize(("func", "kwargs"), SOLO, ids=SOLO_IDS)
-def test_an_uncalibrated_signal_computes_the_bare_array_result(func, kwargs) -> None:
+def test_an_uncalibrated_signal_computes_the_bare_array_result(
+    func: Callable[..., object], kwargs: dict[str, float]
+) -> None:
     x = _record()
     assert_same(func(Signal(x, FS), **kwargs), func(x, FS, **kwargs))
 
 
 @pytest.mark.parametrize(("func", "kwargs"), SOLO, ids=SOLO_IDS)
-def test_a_conflicting_rate_is_refused_a_matching_one_is_not(func, kwargs) -> None:
+def test_a_conflicting_rate_is_refused_a_matching_one_is_not(
+    func: Callable[..., object], kwargs: dict[str, float]
+) -> None:
     sig = Signal(_record(), FS)
     with pytest.raises(ValueError, match="conflicts with the Signal's own fs"):
         func(sig, FS + 1, **kwargs)
@@ -116,14 +125,18 @@ def test_a_conflicting_rate_is_refused_a_matching_one_is_not(func, kwargs) -> No
 
 
 @pytest.mark.parametrize(("func", "kwargs"), SOLO, ids=SOLO_IDS)
-def test_a_bare_array_still_requires_fs(func, kwargs) -> None:
+def test_a_bare_array_still_requires_fs(
+    func: Callable[..., object], kwargs: dict[str, float]
+) -> None:
     x = _record()
     with pytest.raises(ValueError, match="fs is required"):
         func(x, **kwargs)
 
 
 @pytest.mark.parametrize(("func", "kwargs"), SOLO, ids=SOLO_IDS)
-def test_a_multichannel_signal_is_refused_by_name(func, kwargs) -> None:
+def test_a_multichannel_signal_is_refused_by_name(
+    func: Callable[..., object], kwargs: dict[str, float]
+) -> None:
     """These estimates are defined on one record, and say so.
 
     Reducing a multichannel Signal to a mono one -- picking a channel, or
@@ -140,7 +153,9 @@ def test_a_multichannel_signal_is_refused_by_name(func, kwargs) -> None:
 
 
 @pytest.mark.parametrize(("func", "kwargs"), SOLO, ids=SOLO_IDS)
-def test_a_calibrated_signal_is_analysed_in_pascals(func, kwargs) -> None:
+def test_a_calibrated_signal_is_analysed_in_pascals(
+    func: Callable[..., object], kwargs: dict[str, float]
+) -> None:
     x = _record()
     assert_same(
         func(Signal(x, FS, calibration_factor=CAL), **kwargs),
@@ -154,7 +169,9 @@ def test_a_calibrated_signal_is_analysed_in_pascals(func, kwargs) -> None:
 
 
 @pytest.mark.parametrize(("func", "kwargs"), PAIRS, ids=PAIR_IDS)
-def test_a_pair_takes_the_rate_from_either_side(func, kwargs) -> None:
+def test_a_pair_takes_the_rate_from_either_side(
+    func: Callable[..., object], kwargs: dict[str, float]
+) -> None:
     x, y = _record(0), _record(1)
     reference = func(x, y, FS, **kwargs)
     assert_same(func(Signal(x, FS), y, **kwargs), reference)
@@ -163,7 +180,9 @@ def test_a_pair_takes_the_rate_from_either_side(func, kwargs) -> None:
 
 
 @pytest.mark.parametrize(("func", "kwargs"), PAIRS, ids=PAIR_IDS)
-def test_two_signals_at_different_rates_are_refused(func, kwargs) -> None:
+def test_two_signals_at_different_rates_are_refused(
+    func: Callable[..., object], kwargs: dict[str, float]
+) -> None:
     """Nothing here can say which rate is the truth, so neither is chosen."""
     x, y = _record(0), _record(1)
     first, second = Signal(x, FS), Signal(y, FS // 2)
@@ -172,14 +191,18 @@ def test_two_signals_at_different_rates_are_refused(func, kwargs) -> None:
 
 
 @pytest.mark.parametrize(("func", "kwargs"), PAIRS, ids=PAIR_IDS)
-def test_a_pair_of_bare_arrays_still_requires_fs(func, kwargs) -> None:
+def test_a_pair_of_bare_arrays_still_requires_fs(
+    func: Callable[..., object], kwargs: dict[str, float]
+) -> None:
     x, y = _record(0), _record(1)
     with pytest.raises(ValueError, match="fs is required"):
         func(x, y, **kwargs)
 
 
 @pytest.mark.parametrize(("func", "kwargs"), PAIRS, ids=PAIR_IDS)
-def test_a_calibrated_pair_is_analysed_in_pascals(func, kwargs) -> None:
+def test_a_calibrated_pair_is_analysed_in_pascals(
+    func: Callable[..., object], kwargs: dict[str, float]
+) -> None:
     x, y = _record(0), _record(1)
     assert_same(
         func(

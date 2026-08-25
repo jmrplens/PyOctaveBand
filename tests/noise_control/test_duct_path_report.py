@@ -12,13 +12,18 @@ complete the rendering contract.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
-from phonometry.noise_control.duct_path import DuctElement, duct_path
+from phonometry.noise_control.duct_path import DuctElement, DuctPathResult, duct_path
 from phonometry.noise_control.hvac import OCTAVE_BANDS
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def _extract_text(path: str) -> str:
@@ -28,7 +33,7 @@ def _extract_text(path: str) -> str:
     return " ".join(raw.split())
 
 
-def _supply():
+def _supply() -> DuctPathResult:
     """The supply path of Long Table 14.9, from its published element rows."""
     return duct_path(
         OCTAVE_BANDS,
@@ -77,13 +82,13 @@ def _supply():
     )
 
 
-def _reportlab():
+def _reportlab() -> None:
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
     pytest.importorskip("matplotlib")
 
 
-def test_report_renders_the_published_sheet(tmp_path) -> None:
+def test_report_renders_the_published_sheet(tmp_path: Path) -> None:
     _reportlab()
     res = _supply()
     out = tmp_path / "duct_path.pdf"
@@ -114,7 +119,7 @@ def test_report_renders_the_published_sheet(tmp_path) -> None:
     assert "not a measurement" in text
 
 
-def test_non_verbose_sheet_drops_the_intermediate_rows(tmp_path) -> None:
+def test_non_verbose_sheet_drops_the_intermediate_rows(tmp_path: Path) -> None:
     _reportlab()
     res = _supply()
     plain = tmp_path / "plain.pdf"
@@ -135,7 +140,7 @@ def test_non_verbose_sheet_drops_the_intermediate_rows(tmp_path) -> None:
     assert verbose_text.count("Self-noise") == 3
 
 
-def test_metadata_header_and_requirement_override(tmp_path) -> None:
+def test_metadata_header_and_requirement_override(tmp_path: Path) -> None:
     _reportlab()
     res = _supply()
     out = tmp_path / "meta.pdf"
@@ -157,7 +162,7 @@ def test_metadata_header_and_requirement_override(tmp_path) -> None:
     assert "exceeded by" in text
 
 
-def test_verdict_passes_against_nc_30(tmp_path) -> None:
+def test_verdict_passes_against_nc_30(tmp_path: Path) -> None:
     _reportlab()
     res = _supply()
     out = tmp_path / "verdict.pdf"
@@ -167,7 +172,7 @@ def test_verdict_passes_against_nc_30(tmp_path) -> None:
     assert "no band exceeds NC 30" in text
 
 
-def test_spanish_sheet(tmp_path) -> None:
+def test_spanish_sheet(tmp_path: Path) -> None:
     _reportlab()
     res = _supply()
     out = tmp_path / "es.pdf"
@@ -184,7 +189,7 @@ def test_spanish_sheet(tmp_path) -> None:
     assert "Duct-borne noise path calculation" not in text
 
 
-def test_combined_paths_sheet_lists_its_contributions(tmp_path) -> None:
+def test_combined_paths_sheet_lists_its_contributions(tmp_path: Path) -> None:
     _reportlab()
     from phonometry.noise_control.duct_path import combine_duct_paths
 
@@ -208,7 +213,7 @@ def test_combined_paths_sheet_lists_its_contributions(tmp_path) -> None:
 
 
 @pytest.mark.parametrize("verbose", [False, True])
-def test_a_long_path_still_renders_on_one_page(tmp_path, verbose: bool) -> None:
+def test_a_long_path_still_renders_on_one_page(tmp_path: Path, verbose: bool) -> None:
     """A fiche is one page: a path too long for it elides its middle rows."""
     _reportlab()
     res = duct_path(
@@ -246,14 +251,14 @@ def test_a_long_path_still_renders_on_one_page(tmp_path, verbose: bool) -> None:
     assert len(res.table()) > 25
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     res = _supply()
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="engine"):
         res.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     res = _supply()
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="language"):

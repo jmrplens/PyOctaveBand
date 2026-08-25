@@ -18,6 +18,8 @@ against a 55 dB limit, so a new activity does not comply.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 pytest.importorskip("reportlab")
@@ -26,6 +28,9 @@ from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.environment.assessment import spain as rd
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def _measurements() -> dict[str, list[rd.NoisePhase]]:
@@ -59,7 +64,7 @@ def _extract_text(path: str) -> str:
     return "\n".join(page.extract_text() for page in PdfReader(path).pages)
 
 
-def test_report_writes_one_page_pdf(tmp_path) -> None:
+def test_report_writes_one_page_pdf(tmp_path: Path) -> None:
     """An activity assessment renders a one-page PDF fiche."""
     out = tmp_path / "acta.pdf"
     returned = _result().report(str(out))
@@ -67,7 +72,7 @@ def test_report_writes_one_page_pdf(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ``ValueError``."""
     result = _result()
     out = str(tmp_path / "bad.pdf")
@@ -75,7 +80,7 @@ def test_unknown_language_rejected(tmp_path) -> None:
         result.report(out, language="xx")
 
 
-def test_fiche_defaults_to_spanish(tmp_path) -> None:
+def test_fiche_defaults_to_spanish(tmp_path: Path) -> None:
     """The fiche renders in Spanish by default, the language of the regulation.
 
     Its limit row is carried on the result in English, the library's API
@@ -97,7 +102,7 @@ def test_fiche_defaults_to_spanish(tmp_path) -> None:
     assert "Noise phase" not in text
 
 
-def test_english_fiche_renders_one_page(tmp_path) -> None:
+def test_english_fiche_renders_one_page(tmp_path: Path) -> None:
     """``language="en"`` renders the same fiche in English on one page."""
     out = tmp_path / "acta_en.pdf"
     _result().report(str(out), language="en")
@@ -108,7 +113,7 @@ def test_english_fiche_renders_one_page(tmp_path) -> None:
     assert "Day" in text
 
 
-def test_report_states_the_phase_and_period_numbers(tmp_path) -> None:
+def test_report_states_the_phase_and_period_numbers(tmp_path: Path) -> None:
     """The fiche prints the corrections, the phase levels and the period result.
 
     Ejemplo 3.1 gives LKeq,Ti of 59 dB and 54 dB from LAeq,Ti of 50 dB and
@@ -133,7 +138,7 @@ def test_report_states_the_phase_and_period_numbers(tmp_path) -> None:
 
 
 def test_verdict_fails_for_a_new_activity_and_passes_for_an_existing_one(
-    tmp_path,
+    tmp_path: Path,
 ) -> None:
     """Manual Ejemplo 3.3: the same activity fails as new and passes as existing.
 
@@ -158,7 +163,7 @@ def test_verdict_fails_for_a_new_activity_and_passes_for_an_existing_one(
     assert "Article 25.2" in existing_text
 
 
-def test_spanish_verdict_labels(tmp_path) -> None:
+def test_spanish_verdict_labels(tmp_path: Path) -> None:
     """The Spanish fiche renders the verdict as CUMPLE / NO CUMPLE."""
     out = tmp_path / "verdict_es.pdf"
     _result().report(str(out))
@@ -167,7 +172,7 @@ def test_spanish_verdict_labels(tmp_path) -> None:
     assert "supera" in text
 
 
-def test_metadata_appears_and_stays_one_page(tmp_path) -> None:
+def test_metadata_appears_and_stays_one_page(tmp_path: Path) -> None:
     """A populated ReportMetadata renders one page and prints its fields."""
     md = ReportMetadata(
         specimen="Taller mecanico, horario 9 h a 21 h",
@@ -189,7 +194,9 @@ def test_metadata_appears_and_stays_one_page(tmp_path) -> None:
     assert "EXP-2026-000123" in text
 
 
-def test_report_escapes_xml_specials_in_metadata_and_phase_labels(tmp_path) -> None:
+def test_report_escapes_xml_specials_in_metadata_and_phase_labels(
+    tmp_path: Path,
+) -> None:
     """XML specials (& < >) in metadata and phase labels survive reportlab.
 
     The phase label is free text that reaches the table as a paragraph, so it
@@ -218,7 +225,7 @@ def test_report_escapes_xml_specials_in_metadata_and_phase_labels(tmp_path) -> N
     assert "R&D-1367" in text
 
 
-def test_three_period_fiche_stays_one_page(tmp_path) -> None:
+def test_three_period_fiche_stays_one_page(tmp_path: Path) -> None:
     """A fiche carrying all three evaluation periods still fits one page.
 
     The phase table grows with the number of noise phases, so the assessment
@@ -245,7 +252,7 @@ def test_three_period_fiche_stays_one_page(tmp_path) -> None:
             assert_one_page(str(out))
 
 
-def test_adjacent_premises_limit_row_renders(tmp_path) -> None:
+def test_adjacent_premises_limit_row_renders(tmp_path: Path) -> None:
     """A fiche assessed against the Table B2 adjacent-premises row renders.
 
     Its limit row description names the premises and the room type, which the

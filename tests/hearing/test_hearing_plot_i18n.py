@@ -3,12 +3,17 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from phonometry import hearing
 
+if TYPE_CHECKING:
+    from matplotlib.axes import Axes
 
-def _legend_labels(ax) -> list[str]:
+
+def _legend_labels(ax: Axes) -> list[str]:
     handles, labels = ax.get_legend_handles_labels()
     assert handles
     return labels

@@ -142,7 +142,9 @@ def _run(root: pathlib.Path, *args: str) -> int:
     return ccc.main([*args, "--root", str(root)])
 
 
-def test_check_reports_every_stale_claim(corpus, capsys):
+def test_check_reports_every_stale_claim(
+    corpus: pathlib.Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     """The read-only mode is the CI gate: it lists them all and exits 1."""
     assert _run(corpus) == 1
     errors = capsys.readouterr().err
@@ -160,7 +162,9 @@ def test_check_reports_every_stale_claim(corpus, capsys):
     assert f"claims {OLD_STANDARDS} standards, report says {STANDARDS}" in errors
 
 
-def test_write_moves_every_quoted_count(corpus, capsys):
+def test_write_moves_every_quoted_count(
+    corpus: pathlib.Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     """Every place that quotes a count is brought into line in one run."""
     assert _run(corpus, "--write") == 0
     assert "Rewrote" in capsys.readouterr().out
@@ -201,7 +205,7 @@ def test_write_moves_every_quoted_count(corpus, capsys):
     assert _run(corpus) == 0
 
 
-def test_write_leaves_the_decoys_alone(corpus):
+def test_write_leaves_the_decoys_alone(corpus: pathlib.Path) -> None:
     """A number that is not a conformance count is never touched.
 
     The decoys carry the stale counts in unrelated sentences: on their own
@@ -231,7 +235,7 @@ def test_write_leaves_the_decoys_alone(corpus):
         assert designation in zenodo["description"]
 
 
-def test_write_is_idempotent(corpus):
+def test_write_is_idempotent(corpus: pathlib.Path) -> None:
     """A second run changes nothing, byte for byte."""
     assert _run(corpus, "--write") == 0
     first = {p: p.read_bytes() for p in ccc.sources(corpus)}
@@ -239,7 +243,7 @@ def test_write_is_idempotent(corpus):
     assert {p: p.read_bytes() for p in ccc.sources(corpus)} == first
 
 
-def test_write_touches_only_the_files_that_quote_a_count(corpus):
+def test_write_touches_only_the_files_that_quote_a_count(corpus: pathlib.Path) -> None:
     """Excluded and count-free files come out byte-identical.
 
     ``stub/README.md`` is in the list for the same reason the root markdown is
@@ -258,7 +262,7 @@ def test_write_touches_only_the_files_that_quote_a_count(corpus):
     assert {p: p.read_bytes() for p in untouched} == before
 
 
-def test_a_crlf_file_stays_crlf(tmp_path):
+def test_a_crlf_file_stays_crlf(tmp_path: pathlib.Path) -> None:
     """The writer changes digits, not the file's line endings."""
     _write(tmp_path / "docs" / "CONFORMANCE.md", REPORT)
     page = tmp_path / "docs" / "getting-started.md"
@@ -275,7 +279,7 @@ def test_a_crlf_file_stays_crlf(tmp_path):
     )
 
 
-def test_line_endings_and_surrounding_prose_are_preserved():
+def test_line_endings_and_surrounding_prose_are_preserved() -> None:
     """Only the digits move: indentation, quoting and CRLF stay put."""
     expected = {"total": TOTAL, "domains": DOMAINS, "standards": STANDARDS}
     line = (
@@ -290,7 +294,7 @@ def test_line_endings_and_surrounding_prose_are_preserved():
     assert [claim.field for claim in fixed] == ["total", "standards"]
 
 
-def test_a_claim_read_two_ways_is_rejected(monkeypatch):
+def test_a_claim_read_two_ways_is_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
     """Two patterns that disagree about a number are a bug, not a coin toss."""
     import re
 
@@ -307,8 +311,10 @@ def test_a_claim_read_two_ways_is_rejected(monkeypatch):
 
 
 def test_an_ambiguous_pattern_pair_reports_instead_of_crashing(
-    corpus, monkeypatch, capsys
-):
+    corpus: pathlib.Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     """The command exits 1 with the diagnostic, not with a traceback."""
     import re
 
@@ -324,14 +330,16 @@ def test_an_ambiguous_pattern_pair_reports_instead_of_crashing(
     assert "ambiguous conformance claim" in capsys.readouterr().err
 
 
-def test_a_report_without_a_headline_is_an_error(tmp_path, capsys):
+def test_a_report_without_a_headline_is_an_error(
+    tmp_path: pathlib.Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     """A format change must fail loudly rather than rewrite prose to nothing."""
     _write(tmp_path / "docs" / "CONFORMANCE.md", "no headline here\n")
     assert _run(tmp_path, "--write") == 1
     assert "headline not found" in capsys.readouterr().err
 
 
-def test_the_real_corpus_needs_no_rewriting():
+def test_the_real_corpus_needs_no_rewriting() -> None:
     """The committed tree is already consistent, so the writer is a no-op.
 
     This is the same property the CI gate asserts, checked without touching

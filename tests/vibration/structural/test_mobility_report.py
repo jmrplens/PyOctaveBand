@@ -14,6 +14,7 @@ contract.
 from __future__ import annotations
 
 import math
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -22,6 +23,9 @@ from report_assertions import assert_one_page
 from phonometry import ReportMetadata
 from phonometry.vibration import sdof_mobility_result
 from phonometry.vibration.structural.mechanical_mobility import MobilityResult
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 _M, _K, _C = 2.0, 8000.0, 5.0
 _F0 = math.sqrt(_K / _M) / (2.0 * math.pi)  # ~10.066 Hz
@@ -49,7 +53,7 @@ def test_result_peak_oracle() -> None:
     assert peak_f == pytest.approx(_F0, abs=1e-6)
 
 
-def test_report_renders_peak_and_basis(tmp_path) -> None:
+def test_report_renders_peak_and_basis(tmp_path: Path) -> None:
     """The fiche prints the peak mobility, the resonance frequency and ISO 7626."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -69,7 +73,7 @@ def test_report_renders_peak_and_basis(tmp_path) -> None:
     assert "Peak mobility" in text
 
 
-def test_transfer_frf_labels_transfer(tmp_path) -> None:
+def test_transfer_frf_labels_transfer(tmp_path: Path) -> None:
     """A transfer FRF (driving_point=False) is named a transfer mobility."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -87,7 +91,7 @@ def test_transfer_frf_labels_transfer(tmp_path) -> None:
     assert "driving-point" not in text
 
 
-def test_metadata_header_renders(tmp_path) -> None:
+def test_metadata_header_renders(tmp_path: Path) -> None:
     """Supplied metadata renders the client, the specimen and the instrumentation."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -110,7 +114,7 @@ def test_metadata_header_renders(tmp_path) -> None:
     assert "MOB-7626" in text
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """language="es" renders the mobility vocabulary and comma decimals."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -124,7 +128,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     assert "0,2" in text
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     res = _driving_point_result()
     out = str(tmp_path / "x.pdf")
@@ -132,7 +136,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         res.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     res = _driving_point_result()
     out = str(tmp_path / "bad.pdf")

@@ -3,7 +3,7 @@ import pytest
 
 
 @pytest.mark.parametrize("block_size", [8, 256, 1024])
-def test_block_processing_matches_full_signal(block_size: int):
+def test_block_processing_matches_full_signal(block_size: int) -> None:
     from phonometry import filters
 
     """
@@ -57,7 +57,7 @@ def test_block_processing_matches_full_signal(block_size: int):
     )
 
 
-def test_resample_and_stateful():
+def test_resample_and_stateful() -> None:
     from phonometry.filters.core import (
         BlockProcessing,
         FilterDesign,
@@ -74,7 +74,7 @@ def test_resample_and_stateful():
         )
 
 
-def test_stateful_steady_ic_initialization():
+def test_stateful_steady_ic_initialization() -> None:
     from phonometry.filters.core import (
         BlockProcessing,
         FilterDesign,
@@ -112,7 +112,7 @@ def test_stateful_steady_ic_initialization():
         assert zi.shape[2] == 2
 
 
-def test_stateful_multichannel():
+def test_stateful_multichannel() -> None:
     """Test that stateful processing works with multichannel (e.g. stereo) input."""
     from phonometry.filters.core import (
         BlockProcessing,
@@ -146,7 +146,7 @@ def test_stateful_multichannel():
     assert spl2.shape[0] == n_channels
 
 
-def test_detrend_stateful_warning():
+def test_detrend_stateful_warning() -> None:
     from phonometry.filters.core import (
         BlockProcessing,
         FilterDesign,

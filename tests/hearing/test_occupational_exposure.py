@@ -33,14 +33,14 @@ from phonometry.hearing.occupational_exposure import (
 # --------------------------------------------------------------------------- #
 # Closed-form oracles.
 # --------------------------------------------------------------------------- #
-def test_single_task_85db_8h_is_85():
+def test_single_task_85db_8h_is_85() -> None:
     """A single task at 85 dB sustained for 8 h gives LEX,8h = 85 exactly."""
     result = task_based_exposure([Task(samples=(85.0, 85.0, 85.0), duration_hours=8.0)])
     assert result.lex_8h == pytest.approx(85.0, abs=1e-9)
     assert result.strategy == "task"
 
 
-def test_two_equal_half_day_tasks_equal_level():
+def test_two_equal_half_day_tasks_equal_level() -> None:
     """Two 4-h tasks at level L give LEX,8h = L (energy sum, no time normalization loss)."""
     tasks = [
         Task(samples=(88.0,), duration_hours=4.0),
@@ -50,14 +50,14 @@ def test_two_equal_half_day_tasks_equal_level():
     assert result.lex_8h == pytest.approx(88.0, abs=1e-9)
 
 
-def test_halving_duration_drops_contribution_by_3db():
+def test_halving_duration_drops_contribution_by_3db() -> None:
     """Halving a task duration lowers its LEX,8h contribution by 10*log10(2) = 3.01 dB."""
     full = task_based_exposure([Task(samples=(90.0,), duration_hours=8.0)])
     half = task_based_exposure([Task(samples=(90.0,), duration_hours=4.0)])
     assert full.lex_8h - half.lex_8h == pytest.approx(10.0 * math.log10(2.0), abs=1e-9)
 
 
-def test_coverage_factor_is_1_65():
+def test_coverage_factor_is_1_65() -> None:
     """The one-sided 95 % coverage factor is exactly 1.65 and U = 1.65*u."""
     assert COVERAGE_FACTOR == 1.65
     result = job_based_exposure([80.0, 82.0, 84.0, 81.0, 83.0], 8.0)
@@ -66,7 +66,7 @@ def test_coverage_factor_is_1_65():
     )
 
 
-def test_energy_average_single_task_matches_lex_8h_primitive():
+def test_energy_average_single_task_matches_lex_8h_primitive() -> None:
     """Task energy average agrees with 10*log10(mean(10^(0.1 L)))."""
     samples = (80.1, 82.2, 79.6)
     result = task_based_exposure([Task(samples=samples, duration_hours=8.0)])
@@ -79,7 +79,7 @@ def test_energy_average_single_task_matches_lex_8h_primitive():
 # --------------------------------------------------------------------------- #
 # Table lookups.
 # --------------------------------------------------------------------------- #
-def test_table_c4_exact_cells():
+def test_table_c4_exact_cells() -> None:
     """Exact Table C.4 cells are returned at the tabulated (N, u1) grid points."""
     assert table_c4_contribution(6, 2.0) == pytest.approx(1.4, abs=1e-9)
     assert table_c4_contribution(3, 0.5) == pytest.approx(0.6, abs=1e-9)
@@ -88,19 +88,19 @@ def test_table_c4_exact_cells():
     assert table_c4_contribution(20, 2.0) == pytest.approx(0.5, abs=1e-9)
 
 
-def test_table_c4_interpolates_annex_f_cell():
+def test_table_c4_interpolates_annex_f_cell() -> None:
     """Annex F reads N=6, u1=1.65 dB as c1*u1 = 1.0 dB (interpolated)."""
     assert table_c4_contribution(6, 1.65) == pytest.approx(1.0, abs=0.05)
 
 
-def test_table_c4_origin_and_clamp():
+def test_table_c4_origin_and_clamp() -> None:
     """u1 = 0 gives 0 dB; below/above the grid clamps to the edge behaviour."""
     assert table_c4_contribution(6, 0.0) == pytest.approx(0.0, abs=1e-9)
     # Clamp N above 30 to the N=30 row.
     assert table_c4_contribution(50, 6.0) == pytest.approx(2.0, abs=1e-9)
 
 
-def test_table_1_minimum_durations():
+def test_table_1_minimum_durations() -> None:
     """Table 1 breakpoints for the cumulative measurement duration."""
     assert minimum_cumulative_duration_hours(5) == 5.0
     assert minimum_cumulative_duration_hours(6) == 5.5
@@ -110,7 +110,7 @@ def test_table_1_minimum_durations():
     assert minimum_cumulative_duration_hours(41) == 17.0
 
 
-def test_instrument_u2_values():
+def test_instrument_u2_values() -> None:
     """Table C.5 instrument standard uncertainties."""
     assert INSTRUMENT_U2["class1"] == 0.7
     assert INSTRUMENT_U2["class2"] == 1.5
@@ -138,7 +138,7 @@ def _annex_d_tasks() -> list[Task]:
     ]
 
 
-def test_annex_d_task_levels_and_contributions():
+def test_annex_d_task_levels_and_contributions() -> None:
     """Annex D: task levels 80.8/90.1 dB and contributions 62.7/78.8/82.8 dB."""
     with pytest.warns(OccupationalExposureWarning):  # cutting/grinding spans > 3 dB
         result = task_based_exposure(_annex_d_tasks())
@@ -156,13 +156,13 @@ def test_annex_d_task_levels_and_contributions():
     )
 
 
-def test_annex_d_daily_level():
+def test_annex_d_daily_level() -> None:
     """Annex D: LEX,8h = 84.3 dB."""
     result = task_based_exposure(_annex_d_tasks(), warn=False)
     assert result.lex_8h == pytest.approx(84.3, abs=0.05)
 
 
-def test_annex_d_sampling_uncertainties_and_sensitivities():
+def test_annex_d_sampling_uncertainties_and_sensitivities() -> None:
     """Annex D: u1a = 0.8/1.2 dB, c1a = 0.28/0.71 (Eq C.6, C.4)."""
     result = task_based_exposure(_annex_d_tasks(), warn=False)
     by_label = {t.label: t for t in result.tasks}
@@ -173,7 +173,7 @@ def test_annex_d_sampling_uncertainties_and_sensitivities():
     assert by_label["planning/breaks"].c1a == pytest.approx(0.0, abs=0.01)
 
 
-def test_annex_d_duration_sensitivities():
+def test_annex_d_duration_sensitivities() -> None:
     """Annex D: c1b = 0.24 (welding) and 2.1 (cutting) [dB/h] (Eq C.5)."""
     result = task_based_exposure(_annex_d_tasks(), warn=False)
     by_label = {t.label: t for t in result.tasks}
@@ -183,7 +183,7 @@ def test_annex_d_duration_sensitivities():
     assert by_label["cutting/grinding"].c1b == pytest.approx(2.1, abs=0.05)
 
 
-def test_duration_samples_u1b_is_standard_error_of_mean():
+def test_duration_samples_u1b_is_standard_error_of_mean() -> None:
     """Eq C.7 divides by J(J-1): samples (4, 6) h give u1b = 1.0 h, not sqrt(2)."""
     result = task_based_exposure(
         [Task(samples=(85.0, 85.0), duration_hours=5.0, duration_samples=(4.0, 6.0))],
@@ -192,7 +192,7 @@ def test_duration_samples_u1b_is_standard_error_of_mean():
     assert result.tasks[0].u1b == pytest.approx(1.0, abs=1e-9)
 
 
-def test_annex_d_expanded_uncertainty_without_duration():
+def test_annex_d_expanded_uncertainty_without_duration() -> None:
     """Annex D case a: U = 2.7 dB when the duration uncertainty is omitted."""
     result = task_based_exposure(
         _annex_d_tasks(), include_duration_uncertainty=False, warn=False
@@ -203,7 +203,7 @@ def test_annex_d_expanded_uncertainty_without_duration():
     assert result.expanded_uncertainty == pytest.approx(2.7, abs=0.05)
 
 
-def test_annex_d_expanded_uncertainty_with_duration():
+def test_annex_d_expanded_uncertainty_with_duration() -> None:
     """Annex D case b: U = 3.2 dB when the duration uncertainty is included."""
     result = task_based_exposure(_annex_d_tasks(), warn=False)
     assert result.combined_standard_uncertainty**2 == pytest.approx(3.83, abs=0.07)
@@ -211,7 +211,7 @@ def test_annex_d_expanded_uncertainty_with_duration():
     assert result.upper_limit == pytest.approx(84.3 + 3.2, abs=0.1)
 
 
-def test_annex_d_spread_rule_advisory():
+def test_annex_d_spread_rule_advisory() -> None:
     """The cutting/grinding task (range > 3 dB) trips the 3 dB spread advisory."""
     result = task_based_exposure(_annex_d_tasks(), warn=False)
     by_label = {t.label: t for t in result.tasks}
@@ -223,7 +223,7 @@ def test_annex_d_spread_rule_advisory():
 # --------------------------------------------------------------------------- #
 # Annex E — job-based worked example (production line, 18 workers).
 # --------------------------------------------------------------------------- #
-def test_annex_e_job_based():
+def test_annex_e_job_based() -> None:
     """Annex E: Lp,A,eqTe = 88.4, u1 = 2.0, c1u1 = 1.4, LEX,8h = 88.1, U = 3.8 dB."""
     samples = [88.1, 86.1, 89.7, 86.5, 91.1, 86.7]
     result = job_based_exposure(
@@ -244,14 +244,14 @@ def test_annex_e_job_based():
     assert result.strategy == "job"
 
 
-def test_annex_e_table1_satisfied_no_advisory():
+def test_annex_e_table1_satisfied_no_advisory() -> None:
     """Annex E: 12 h cumulative >= 10.75 h Table 1 minimum -> no advisory."""
     samples = [88.1, 86.1, 89.7, 86.5, 91.1, 86.7]
     result = job_based_exposure(samples, 7.5, n_workers=18, sample_duration_hours=2.0)
     assert result.sampling_advisory is False
 
 
-def test_job_based_below_table1_minimum_warns():
+def test_job_based_below_table1_minimum_warns() -> None:
     """Too-short cumulative duration raises the Table 1 advisory."""
     samples = [88.0, 86.0, 89.0, 86.0, 91.0]
     with pytest.warns(OccupationalExposureWarning):
@@ -264,7 +264,7 @@ def test_job_based_below_table1_minimum_warns():
 # --------------------------------------------------------------------------- #
 # Annex F — full-day worked example (forklift drivers).
 # --------------------------------------------------------------------------- #
-def test_annex_f_full_day():
+def test_annex_f_full_day() -> None:
     """Annex F: Lp,A,eqTe = 89.5, u1 = 1.65, c1u1 = 1.0, LEX,8h = 90.1, U = 3.4 dB."""
     samples = [88.0, 91.9, 87.6, 90.4, 89.0, 88.4]
     result = full_day_exposure(
@@ -279,14 +279,14 @@ def test_annex_f_full_day():
     assert result.strategy == "full_day"
 
 
-def test_full_day_three_measurements_spread_advisory():
+def test_full_day_three_measurements_spread_advisory() -> None:
     """Three full-day measurements spanning >= 3 dB trip the Clause 11.3 advisory."""
     with pytest.warns(OccupationalExposureWarning):
         result = full_day_exposure([85.0, 89.0, 86.0], 8.0)
     assert result.sampling_advisory is True
 
 
-def test_full_day_three_close_measurements_no_advisory():
+def test_full_day_three_close_measurements_no_advisory() -> None:
     """Three full-day measurements within 3 dB need no additional measurements."""
     result = full_day_exposure([85.0, 86.0, 87.0], 8.0)
     assert result.sampling_advisory is False
@@ -295,7 +295,7 @@ def test_full_day_three_close_measurements_no_advisory():
 # --------------------------------------------------------------------------- #
 # Validation and edge cases.
 # --------------------------------------------------------------------------- #
-def test_job_based_high_spread_triggers_c4_advisory():
+def test_job_based_high_spread_triggers_c4_advisory() -> None:
     """A large sampling spread pushes c1*u1 above 3.5 dB and warns (Clause 10.4)."""
     samples = [70.0, 80.0, 90.0, 75.0, 85.0]  # wide spread, small N
     with pytest.warns(OccupationalExposureWarning):
@@ -305,36 +305,36 @@ def test_job_based_high_spread_triggers_c4_advisory():
     assert result.sampling_advisory is True
 
 
-def test_task_based_requires_tasks():
+def test_task_based_requires_tasks() -> None:
     with pytest.raises(ValueError, match="At least one task"):
         task_based_exposure([])
 
 
-def test_task_rejects_nonpositive_duration():
+def test_task_rejects_nonpositive_duration() -> None:
     # Task.__post_init__ is what rejects it: task_based_exposure never gets to
     # see an object with a non-positive duration.
     with pytest.raises(ValueError, match="'duration_hours' must be positive"):
         Task(samples=(85.0,), duration_hours=0.0)
 
 
-def test_task_rejects_empty_samples():
+def test_task_rejects_empty_samples() -> None:
     with pytest.raises(ValueError, match="sample"):
         Task(samples=(), duration_hours=8.0)
 
 
-def test_job_based_rejects_nonpositive_sample_duration():
+def test_job_based_rejects_nonpositive_sample_duration() -> None:
     with pytest.raises(ValueError, match="sample_duration_hours"):
         job_based_exposure(
             [80.0, 82.0, 81.0], 8.0, n_workers=6, sample_duration_hours=0.0
         )
 
 
-def test_job_based_requires_two_samples():
+def test_job_based_requires_two_samples() -> None:
     with pytest.raises(ValueError, match="At least two samples"):
         job_based_exposure([85.0], 8.0)
 
 
-def test_duration_range_order_validated():
+def test_duration_range_order_validated() -> None:
     reversed_range = Task(
         samples=(85.0, 85.0), duration_hours=4.0, duration_range=(6.0, 4.0)
     )
@@ -342,7 +342,7 @@ def test_duration_range_order_validated():
         task_based_exposure([reversed_range])
 
 
-def test_result_dataclasses_are_frozen():
+def test_result_dataclasses_are_frozen() -> None:
     result = job_based_exposure([80.0, 82.0, 81.0, 83.0, 80.0], 8.0)
     with pytest.raises(AttributeError):
         result.lex_8h = 0.0  # type: ignore[misc]
@@ -366,7 +366,7 @@ def test_result_dataclasses_are_frozen():
     assert isinstance(result, ExposureResult)
 
 
-def test_per_task_instrument_override():
+def test_per_task_instrument_override() -> None:
     """A per-task instrument class overrides the call-level default u2."""
     result = task_based_exposure(
         [Task(samples=(85.0, 85.0, 85.0), duration_hours=8.0, instrument="class1")],

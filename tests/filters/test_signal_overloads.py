@@ -16,6 +16,8 @@ accident.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
@@ -33,6 +35,9 @@ from phonometry.filters import (
     weighting_filter,
 )
 from phonometry.io import Signal
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 FS = 48000
 CAL = 2.0
@@ -63,7 +68,9 @@ def test_the_signals_rate_is_used_when_none_is_given() -> None:
         (parametric_eq, {"sections": EQSection("peaking", 1000.0, 3.0, 1.0)}),
     ],
 )
-def test_a_conflicting_rate_is_refused_a_matching_one_is_not(func, kwargs) -> None:
+def test_a_conflicting_rate_is_refused_a_matching_one_is_not(
+    func: Callable[..., object], kwargs: dict[str, float | EQSection]
+) -> None:
     sig = Signal(_tone(), FS)
     with pytest.raises(ValueError, match="conflicts with the Signal's own fs"):
         func(sig, FS + 1, **kwargs)
@@ -82,7 +89,9 @@ def test_a_conflicting_rate_is_refused_a_matching_one_is_not(func, kwargs) -> No
         (parametric_eq, {"sections": EQSection("peaking", 1000.0, 3.0, 1.0)}),
     ],
 )
-def test_a_bare_array_still_requires_fs(func, kwargs) -> None:
+def test_a_bare_array_still_requires_fs(
+    func: Callable[..., object], kwargs: dict[str, float | EQSection]
+) -> None:
     x = _tone()
     with pytest.raises(ValueError, match="fs is required"):
         func(x, **kwargs)
@@ -317,7 +326,11 @@ def test_the_spectrogram_returns_pascal_levels_for_a_calibrated_signal() -> None
         (lambda: TimeWeighting(FS), "process", "time weighting"),
     ],
 )
-def test_the_pre_designed_objects_refuse_a_foreign_rate(build, call, what) -> None:
+def test_the_pre_designed_objects_refuse_a_foreign_rate(
+    build: Callable[[], OctaveFilterBank | WeightingFilter | TimeWeighting],
+    call: str,
+    what: str,
+) -> None:
     obj = build()
     method = getattr(obj, call)
     foreign = Signal(_tone(), FS // 2)

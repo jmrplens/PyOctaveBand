@@ -12,6 +12,8 @@ flyover keeps the fiche test independent.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -24,8 +26,11 @@ from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, aircraft
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
-def _flyover():
+
+def _flyover() -> aircraft.EPNLResult:
     """A deterministic synthetic flyover EPNLResult (Gaussian temporal peak)."""
     k, dt = 24, 0.5
     idx = np.arange(k)
@@ -38,7 +43,7 @@ def _flyover():
     return aircraft.effective_perceived_noise_level(spectra, dt)
 
 
-def test_report_writes_one_page_pdf(tmp_path) -> None:
+def test_report_writes_one_page_pdf(tmp_path: Path) -> None:
     """A computed flyover renders a one-page certification fiche."""
     result = _flyover()
     assert np.isfinite(result.epnl)
@@ -48,7 +53,7 @@ def test_report_writes_one_page_pdf(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     result = _flyover()  # constructed outside pytest.raises (Sonar S5778)
     out = str(tmp_path / "x.pdf")
@@ -56,7 +61,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         result.report(out, engine="weasyprint")
 
 
-def test_passing_requirement_renders(tmp_path) -> None:
+def test_passing_requirement_renders(tmp_path: Path) -> None:
     """A certification limit at or above the EPNL renders a passing fiche."""
     result = _flyover()
     limit = float(result.epnl) + 3.0
@@ -65,7 +70,7 @@ def test_passing_requirement_renders(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_failing_requirement_renders(tmp_path) -> None:
+def test_failing_requirement_renders(tmp_path: Path) -> None:
     """A certification limit below the EPNL renders a failing fiche."""
     result = _flyover()
     limit = float(result.epnl) - 3.0
@@ -74,7 +79,7 @@ def test_failing_requirement_renders(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_full_metadata_renders_one_page(tmp_path) -> None:
+def test_full_metadata_renders_one_page(tmp_path: Path) -> None:
     """A populated ReportMetadata renders a one-page fiche."""
     md = ReportMetadata(
         specimen="Example twin-turbofan transport",
@@ -93,7 +98,7 @@ def test_full_metadata_renders_one_page(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_no_metadata_prediction_fiche(tmp_path) -> None:
+def test_no_metadata_prediction_fiche(tmp_path: Path) -> None:
     """With ``metadata=None`` a prediction fiche renders (no verdict row)."""
     out = tmp_path / "prediction.pdf"
     _flyover().report(str(out))
@@ -107,7 +112,7 @@ def _extract_text(path: str) -> str:
     return "\n".join(page.extract_text() for page in PdfReader(path).pages)
 
 
-def test_verdict_follows_one_decimal_epnl_at_the_limit(tmp_path) -> None:
+def test_verdict_follows_one_decimal_epnl_at_the_limit(tmp_path: Path) -> None:
     """The verdict compares the EPNL determined to one decimal place.
 
     Annex 16 determines the EPNL "to one decimal place": an unrounded
@@ -135,7 +140,7 @@ def test_verdict_follows_one_decimal_epnl_at_the_limit(tmp_path) -> None:
     assert "FAIL" in text2
 
 
-def test_reference_conditions_cite_part_ii(tmp_path) -> None:
+def test_reference_conditions_cite_part_ii(tmp_path: Path) -> None:
     """The reference-conditions strip states the Part II 3.6.1.5 conditions."""
     out = tmp_path / "refcond.pdf"
     _flyover().report(str(out))
@@ -145,7 +150,7 @@ def test_reference_conditions_cite_part_ii(tmp_path) -> None:
     assert "Part II, 3.6.1.5" in text
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """``language="es"`` renders a one-page Spanish fiche with comma decimals."""
     import re
 
@@ -158,7 +163,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     assert re.search(r"\d,\d", text) is not None  # comma decimal separator
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ``ValueError``."""
     result = _flyover()
     with pytest.raises(ValueError, match="language"):

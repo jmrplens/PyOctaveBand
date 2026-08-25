@@ -30,6 +30,8 @@ from phonometry.io._chunks import WAVE_FORMAT_IMA_ADPCM, parse_wav_chunks
 if TYPE_CHECKING:
     from pathlib import Path
 
+    from phonometry.io._chunks import BroadcastMetadata
+
 TONE = np.array([0, 8000, -8000, 32000], dtype=np.int64)
 
 
@@ -98,7 +100,7 @@ def _bext_payload(
     return buf + coding_history
 
 
-def _read_bext(tmp_path: Path, payload: bytes):
+def _read_bext(tmp_path: Path, payload: bytes | bytearray) -> BroadcastMetadata:
     image = pcm_wav(TONE, extra_chunks=chunk(b"bext", bytes(payload)))
     result = parse_wav_chunks(_write(tmp_path, image)).bext
     assert result is not None

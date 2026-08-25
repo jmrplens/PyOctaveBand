@@ -3,6 +3,7 @@
 """Basic test and usage example for phonometry."""
 
 import numpy as np
+import pytest
 
 import phonometry
 from phonometry._version import __version__
@@ -101,7 +102,7 @@ def test_detrend_acts_on_the_input_once_not_per_band() -> None:
     assert abs(float(np.mean(bands_off[0]))) < 1e-4
 
 
-def test_octave_filter_reuses_cached_bank(monkeypatch) -> None:
+def test_octave_filter_reuses_cached_bank(monkeypatch: pytest.MonkeyPatch) -> None:
     """Repeated octave_filter calls with identical params must not redesign the bank."""
     from phonometry.filters.core import OctaveFilterBank
 
@@ -109,7 +110,7 @@ def test_octave_filter_reuses_cached_bank(monkeypatch) -> None:
     calls = {"n": 0}
     original_init = OctaveFilterBank.__init__
 
-    def counting_init(self, *args, **kwargs):
+    def counting_init(self: OctaveFilterBank, *args: object, **kwargs: object) -> None:
         calls["n"] += 1
         original_init(self, *args, **kwargs)
 

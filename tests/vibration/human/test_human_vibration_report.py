@@ -16,12 +16,16 @@ from __future__ import annotations
 
 import dataclasses
 import math
+from typing import TYPE_CHECKING
 
 import pytest
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
-from phonometry.vibration import daily_vibration_exposure
+from phonometry.vibration import DailyVibrationExposure, daily_vibration_exposure
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def _extract_text(path: str) -> str:
@@ -32,7 +36,7 @@ def _extract_text(path: str) -> str:
     return " ".join(raw.split())
 
 
-def _annex_e3_result():
+def _annex_e3_result() -> DailyVibrationExposure:
     """The ISO 5349-2:2001 Annex E.3 forestry worker's hand-arm day."""
     return daily_vibration_exposure(
         [4.6, 6.0, 3.6],
@@ -56,7 +60,7 @@ def test_annex_e3_hand_oracle_values() -> None:
     assert res.assessment.zone == "action"
 
 
-def test_report_renders_annex_e3_numbers(tmp_path) -> None:
+def test_report_renders_annex_e3_numbers(tmp_path: Path) -> None:
     """The fiche prints the E.3 magnitudes, partials and combined A(8)."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -86,7 +90,7 @@ def test_report_renders_annex_e3_numbers(tmp_path) -> None:
     assert "PASS" in text
 
 
-def test_verbose_adds_energy_share_column(tmp_path) -> None:
+def test_verbose_adds_energy_share_column(tmp_path: Path) -> None:
     """verbose=True adds each operation's share of the daily vibration energy."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -115,7 +119,7 @@ def test_verbose_adds_energy_share_column(tmp_path) -> None:
     ],
 )
 def test_hav_directive_boundaries_on_displayed_value(
-    tmp_path, a_hv: float, n_exceeded: int, verdict: str
+    tmp_path: Path, a_hv: float, n_exceeded: int, verdict: str
 ) -> None:
     """The EAV/ELV rows flip on the two-decimal displayed value (8 h exposure)."""
     pytest.importorskip("reportlab")
@@ -145,7 +149,7 @@ def test_hav_directive_boundaries_on_displayed_value(
     ],
 )
 def test_boxed_zone_agrees_with_displayed_rows_and_verdict(
-    tmp_path, a_hv: float, box_phrase: str, n_exceeded: int, verdict: str
+    tmp_path: Path, a_hv: float, box_phrase: str, n_exceeded: int, verdict: str
 ) -> None:
     """The boxed zone phrase derives from the same displayed-rounded compare."""
     pytest.importorskip("reportlab")
@@ -161,7 +165,7 @@ def test_boxed_zone_agrees_with_displayed_rows_and_verdict(
     assert verdict in text
 
 
-def test_verdict_sentence_states_the_actual_relation(tmp_path) -> None:
+def test_verdict_sentence_states_the_actual_relation(tmp_path: Path) -> None:
     """The verdict sentence agrees with its PASS/FAIL banner, both directions."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -180,7 +184,7 @@ def test_verdict_sentence_states_the_actual_relation(tmp_path) -> None:
     assert "FAIL" in text
 
 
-def test_whole_body_thresholds_and_basis(tmp_path) -> None:
+def test_whole_body_thresholds_and_basis(tmp_path: Path) -> None:
     """A whole-body result names ISO 2631-1 and the 0.5 / 1.15 m/s2 values."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -204,7 +208,7 @@ def test_whole_body_thresholds_and_basis(tmp_path) -> None:
     assert "Annex Part B point 1" in text
 
 
-def test_whole_body_spanish_states_part_b_basis(tmp_path) -> None:
+def test_whole_body_spanish_states_part_b_basis(tmp_path: Path) -> None:
     """The Spanish whole-body fiche carries the translated Part B basis note."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -221,7 +225,7 @@ def test_whole_body_spanish_states_part_b_basis(tmp_path) -> None:
 # --- metadata -----------------------------------------------------------------
 
 
-def test_metadata_header_renders(tmp_path) -> None:
+def test_metadata_header_renders(tmp_path: Path) -> None:
     """Supplied metadata renders the company, worker, workplace and traceability."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -249,7 +253,7 @@ def test_metadata_header_renders(tmp_path) -> None:
 # --- Spanish fiche ------------------------------------------------------------
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """language="es" renders the vibration vocabulary and comma decimals."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -268,7 +272,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
 # --- rendering contract -------------------------------------------------------
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     res = _annex_e3_result()
     out = str(tmp_path / "x.pdf")
@@ -276,7 +280,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         res.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     res = _annex_e3_result()
     out = str(tmp_path / "bad.pdf")
@@ -285,7 +289,9 @@ def test_unknown_language_rejected(tmp_path) -> None:
 
 
 @pytest.mark.parametrize("field", ["total_values", "durations_s", "partials"])
-def test_report_rejects_per_operation_array_short_by_one(tmp_path, field: str) -> None:
+def test_report_rejects_per_operation_array_short_by_one(
+    tmp_path: Path, field: str
+) -> None:
     """A per-operation array one entry short is named in a ValueError.
 
     ``DailyVibrationExposure`` is a frozen dataclass with no ``__post_init__``,
@@ -302,7 +308,7 @@ def test_report_rejects_per_operation_array_short_by_one(tmp_path, field: str) -
     assert not out.exists()
 
 
-def test_report_rejects_fewer_labels_than_operations(tmp_path) -> None:
+def test_report_rejects_fewer_labels_than_operations(tmp_path: Path) -> None:
     """``labels`` sets the expected count, so dropping one is a mismatch too.
 
     The message names the array that disagreed rather than ``labels`` itself,
@@ -319,7 +325,7 @@ def test_report_rejects_fewer_labels_than_operations(tmp_path) -> None:
     assert not out.exists()
 
 
-def test_report_accepts_matching_per_operation_arrays(tmp_path) -> None:
+def test_report_accepts_matching_per_operation_arrays(tmp_path: Path) -> None:
     """Dropping the same operation from every array passes the guard."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")

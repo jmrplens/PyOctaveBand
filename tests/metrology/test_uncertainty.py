@@ -20,11 +20,16 @@ from reference_data import GUM_ADDITIVE_UC, GUM_COVERAGE_K99_16, GUM_WELCH_VEFF
 from phonometry.metrology import uncertainty as u
 
 
-def _add4(a, b, c, d):  # type: ignore[no-untyped-def]
+def _add4(
+    a: float | np.ndarray,
+    b: float | np.ndarray,
+    c: float | np.ndarray,
+    d: float | np.ndarray,
+) -> float | np.ndarray:
     return a + b + c + d
 
 
-def _add2(a, b):  # type: ignore[no-untyped-def]
+def _add2(a: float, b: float) -> float:
     return a + b
 
 
@@ -253,7 +258,7 @@ def test_sensitivity_step_stays_local_on_nonlinear_model() -> None:
     """
     x0, ux = 1.0e9, 1.0e-3
 
-    def model(x):
+    def model(x: float) -> float:
         return math.sin((x - 1.0e9) / 1.0e-2)
 
     result = u.combine_uncertainty(model, [u.Quantity(x0, ux)])

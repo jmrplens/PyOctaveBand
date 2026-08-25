@@ -17,6 +17,7 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from types import ModuleType
 
 import pytest
 
@@ -309,7 +310,9 @@ def test_io_imports_and_reads_without_matplotlib_and_soundfile() -> None:
     )
 
 
-def test_showfilter_raises_helpful_error_without_matplotlib(monkeypatch) -> None:
+def test_showfilter_raises_helpful_error_without_matplotlib(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Without matplotlib, plotting must fail with an actionable message."""
     import builtins
 
@@ -320,7 +323,7 @@ def test_showfilter_raises_helpful_error_without_matplotlib(monkeypatch) -> None
 
     real_import = builtins.__import__
 
-    def blocked_import(name, *args, **kwargs):
+    def blocked_import(name: str, *args: object, **kwargs: object) -> ModuleType:
         if name.startswith("matplotlib"):
             msg = "No module named 'matplotlib'"
             raise ImportError(msg)

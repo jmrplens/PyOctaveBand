@@ -9,6 +9,8 @@ refusal paths and validation, mirroring the earlier geometry test files.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
@@ -19,11 +21,14 @@ import matplotlib.pyplot as plt
 
 import phonometry as pm
 
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
 FREQ = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0])
 
 
 @pytest.fixture(autouse=True)
-def _close_figures():
+def _close_figures() -> Iterator[None]:
     yield
     plt.close("all")
 

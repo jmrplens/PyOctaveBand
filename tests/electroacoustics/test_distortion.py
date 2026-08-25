@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import dataclasses
 import math
+from typing import TYPE_CHECKING
 
 import matplotlib as mpl
 
@@ -20,6 +21,9 @@ import pytest
 import reference_data as ref
 
 from phonometry import electroacoustics
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 FS = 48000
 N = 48000  # 1 s -> 1 Hz bin resolution, every test tone lands on a bin.
@@ -411,7 +415,7 @@ def test_harmonic_result_rejects_amplitude_axis_of_another_length() -> None:
         lambda s, fs: electroacoustics.sinad(s, fs),
     ],
 )
-def test_rejects_non_finite_signal(func) -> None:  # type: ignore[no-untyped-def]
+def test_rejects_non_finite_signal(func: Callable[[np.ndarray, int], object]) -> None:
     bad = np.array([np.nan] * 100)
     with pytest.raises(ValueError, match="'signal' must be finite"):
         func(bad, FS)

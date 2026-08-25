@@ -26,12 +26,16 @@ rejected engines/languages.
 from __future__ import annotations
 
 import math
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, electroacoustics
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 _M_MV = 12.5
 _TOL = 3.0
@@ -421,7 +425,7 @@ def test_no_noise_input_gives_no_noise_rows() -> None:
 # --- rendering -------------------------------------------------------------------
 
 
-def _example_result():
+def _example_result() -> electroacoustics.MicrophoneCharacteristics:
     f, rel = _flat_response()
     angles = np.linspace(0.0, 179.0, 359)
     pattern = 20.0 * np.log10((1.0 + np.cos(np.radians(angles))) / 2.0)
@@ -450,7 +454,7 @@ def _example_result():
     )
 
 
-def test_report_renders_one_page_with_rated_table(tmp_path) -> None:
+def test_report_renders_one_page_with_rated_table(tmp_path: Path) -> None:
     """The fiche renders a valid one-page PDF listing the rated characteristics."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -476,7 +480,7 @@ def test_report_renders_one_page_with_rated_table(tmp_path) -> None:
     assert "PASS" in text
 
 
-def test_report_without_optional_panels(tmp_path) -> None:
+def test_report_without_optional_panels(tmp_path: Path) -> None:
     """A response-only result (no polar/noise/distortion) still renders."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -489,7 +493,7 @@ def test_report_without_optional_panels(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """language="es" renders a one-page Spanish fiche."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -546,7 +550,7 @@ def test_plot_rejects_unknown_quantity_and_missing_data() -> None:
         bare.plot(quantity="directivity")
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     result = _example_result()
     out = str(tmp_path / "x.pdf")
@@ -554,7 +558,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         result.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     result = _example_result()
     out = str(tmp_path / "bad.pdf")

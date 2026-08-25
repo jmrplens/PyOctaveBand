@@ -19,6 +19,7 @@ Bendat & Piersol's; it lives in ``test_multitaper.py``.
 from __future__ import annotations
 
 import dataclasses
+from typing import TYPE_CHECKING
 
 import matplotlib as mpl
 
@@ -29,6 +30,9 @@ import numpy as np
 import pytest
 
 import phonometry as ph
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 FS = 8192.0
 N = 32768
@@ -475,7 +479,9 @@ def test_psd_rejects_invalid_inputs() -> None:
     "func",
     [ph.signals.cross_spectral_density, ph.signals.coherent_output_spectrum],
 )
-def test_two_channel_functions_reject_mismatched_lengths(func) -> None:
+def test_two_channel_functions_reject_mismatched_lengths(
+    func: Callable[[np.ndarray, np.ndarray, float], object],
+) -> None:
     x = _white(13)
     with pytest.raises(
         ValueError, match=rf"{func.__name__}: 'x'.*'y'.*one value per sample"

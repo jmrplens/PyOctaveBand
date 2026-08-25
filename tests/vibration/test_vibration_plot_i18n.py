@@ -9,7 +9,7 @@ import pytest
 from phonometry import vibration
 
 
-def _result():
+def _result() -> vibration.MobilityResult:
     return vibration.sdof_mobility_result(np.linspace(1.0, 50.0, 200), 2.0, 8000.0, 5.0)
 
 

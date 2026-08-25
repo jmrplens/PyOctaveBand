@@ -21,6 +21,7 @@ import pytest
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from types import ModuleType
 
 pytest.importorskip("reportlab")
 pytest.importorskip("svglib")
@@ -33,7 +34,7 @@ _SCRIPT = (
 )
 
 
-def _load_generator():
+def _load_generator() -> ModuleType:
     spec = importlib.util.spec_from_file_location("_generate_reports", _SCRIPT)
     assert spec is not None
     assert spec.loader is not None

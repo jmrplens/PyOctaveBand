@@ -18,6 +18,7 @@ rendering contract.
 from __future__ import annotations
 
 import math
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -25,6 +26,9 @@ from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.noise_control import hvac
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 _FREQS = np.array([63, 125, 250, 500, 1000, 2000, 4000], dtype=float)
 _U = 12.0  # flow velocity, m/s
@@ -42,7 +46,7 @@ def _extract_text(path: str) -> str:
     return " ".join(raw.split())
 
 
-def _result():
+def _result() -> hvac.HvacSpectrumResult:
     return hvac.flow_noise_straight_duct(_FREQS, _U, _S)
 
 
@@ -73,7 +77,7 @@ def test_hand_oracle_matches_library() -> None:
     np.testing.assert_allclose(res.values, _oracle_lw(), atol=1e-9)
 
 
-def test_report_renders_oracle_values(tmp_path) -> None:
+def test_report_renders_oracle_values(tmp_path: Path) -> None:
     """The fiche prints the A-weighted total, the overall L_W and band values."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -106,7 +110,7 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     assert "prediction computed from the stated inputs" in text
 
 
-def test_verbose_adds_a_weighting_columns(tmp_path) -> None:
+def test_verbose_adds_a_weighting_columns(tmp_path: Path) -> None:
     """verbose=True adds the A-weighting correction and A-weighted band columns."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -127,7 +131,9 @@ def test_verbose_adds_a_weighting_columns(tmp_path) -> None:
     ("limit", "verdict"),
     [(45.0, "PASS"), (30.0, "FAIL")],
 )
-def test_power_verdict_lower_is_better(tmp_path, limit: float, verdict: str) -> None:
+def test_power_verdict_lower_is_better(
+    tmp_path: Path, limit: float, verdict: str
+) -> None:
     """A regenerated-noise limit passes at or below the A-weighted level."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -142,7 +148,7 @@ def test_power_verdict_lower_is_better(tmp_path, limit: float, verdict: str) -> 
     assert math.isfinite(_oracle_lwa())
 
 
-def test_attenuation_report_mean_and_direction(tmp_path) -> None:
+def test_attenuation_report_mean_and_direction(tmp_path: Path) -> None:
     """An attenuation spectrum boxes the mean and passes when more is better."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -162,7 +168,7 @@ def test_attenuation_report_mean_and_direction(tmp_path) -> None:
     assert mean_att >= 1.0
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """language="es" renders the HVAC vocabulary and comma decimals."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -179,7 +185,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     assert "no son una medición de una probeta" in text
 
 
-def test_spanish_report_translates_the_element_label(tmp_path) -> None:
+def test_spanish_report_translates_the_element_label(tmp_path: Path) -> None:
     """The element label's descriptive words are translated, its numbers kept."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -227,7 +233,7 @@ def test_verdict_boundary_passes_on_the_displayed_value() -> None:
     assert lower
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     res = _result()
     out = str(tmp_path / "x.pdf")
@@ -235,7 +241,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         res.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     res = _result()
     out = str(tmp_path / "bad.pdf")

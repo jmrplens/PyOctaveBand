@@ -33,6 +33,7 @@ including the ones where it is optional because it only labels an axis.
 from __future__ import annotations
 
 import warnings
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -66,6 +67,9 @@ from phonometry.vibration import (
     vibration_dose_value,
 )
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
 FS = 48000
 CAL = 5.0
 
@@ -95,7 +99,9 @@ IN_PASCALS_IDS = [f.__name__ for f, _, _ in IN_PASCALS]
 
 
 @pytest.mark.parametrize(("func", "record", "kwargs"), IN_PASCALS, ids=IN_PASCALS_IDS)
-def test_a_calibrated_signal_is_analysed_in_pascals(func, record, kwargs) -> None:
+def test_a_calibrated_signal_is_analysed_in_pascals(
+    func: Callable[..., object], record: np.ndarray, kwargs: dict[str, object]
+) -> None:
     """A calibrated Signal reads the same as the samples already in pascals."""
     assert_same(
         func(Signal(record, FS, calibration_factor=CAL), **kwargs),
@@ -105,7 +111,7 @@ def test_a_calibrated_signal_is_analysed_in_pascals(func, record, kwargs) -> Non
 
 @pytest.mark.parametrize(("func", "record", "kwargs"), IN_PASCALS, ids=IN_PASCALS_IDS)
 def test_an_uncalibrated_signal_computes_the_bare_array_result(
-    func, record, kwargs
+    func: Callable[..., object], record: np.ndarray, kwargs: dict[str, object]
 ) -> None:
     """With no factor to apply, the object and the bare array agree."""
     assert_same(func(Signal(record, FS), **kwargs), func(record, FS, **kwargs))
@@ -211,7 +217,9 @@ FULL_SCALE_IDS = [f.__name__ for f, _ in FULL_SCALE]
 
 
 @pytest.mark.parametrize(("func", "kwargs"), FULL_SCALE, ids=FULL_SCALE_IDS)
-def test_a_full_scale_reading_never_sees_the_calibration(func, kwargs) -> None:
+def test_a_full_scale_reading_never_sees_the_calibration(
+    func: Callable[..., object], kwargs: dict[str, object]
+) -> None:
     """LUFS and dBTP are counted from full scale, so pascals would shift them."""
     calibrated = func(Signal(_RECORD, FS, calibration_factor=CAL), **kwargs)
     assert_same(calibrated, func(_RECORD, FS, **kwargs))
@@ -221,7 +229,9 @@ def test_a_full_scale_reading_never_sees_the_calibration(func, kwargs) -> None:
 
 
 @pytest.mark.parametrize(("func", "kwargs"), FULL_SCALE, ids=FULL_SCALE_IDS)
-def test_a_full_scale_reading_still_resolves_the_rate(func, kwargs) -> None:
+def test_a_full_scale_reading_still_resolves_the_rate(
+    func: Callable[..., object], kwargs: dict[str, object]
+) -> None:
     """Exempt from the calibration, not from the rate: it still takes one."""
     sig = Signal(_RECORD, FS)
     assert_same(func(sig, **kwargs), func(_RECORD, FS, **kwargs))
@@ -246,7 +256,9 @@ NOT_PRESSURE_IDS = [f.__name__ for f, _ in NOT_PRESSURE]
 
 
 @pytest.mark.parametrize(("func", "kwargs"), NOT_PRESSURE, ids=NOT_PRESSURE_IDS)
-def test_a_non_pressure_record_never_sees_the_calibration(func, kwargs) -> None:
+def test_a_non_pressure_record_never_sees_the_calibration(
+    func: Callable[..., object], kwargs: dict[str, str]
+) -> None:
     """An acceleration in m/s2 and a force in N are not pascals waiting to be."""
     calibrated = func(Signal(_RECORD, FS, calibration_factor=CAL), **kwargs)
     assert_same(calibrated, func(_RECORD, FS, **kwargs))
@@ -256,7 +268,9 @@ def test_a_non_pressure_record_never_sees_the_calibration(func, kwargs) -> None:
 
 
 @pytest.mark.parametrize(("func", "kwargs"), NOT_PRESSURE, ids=NOT_PRESSURE_IDS)
-def test_a_non_pressure_record_still_resolves_the_rate(func, kwargs) -> None:
+def test_a_non_pressure_record_still_resolves_the_rate(
+    func: Callable[..., object], kwargs: dict[str, str]
+) -> None:
     """An acceleration is not a pressure, and it still needs a sample rate."""
     sig = Signal(_RECORD, FS)
     assert_same(func(sig, **kwargs), func(_RECORD, FS, **kwargs))

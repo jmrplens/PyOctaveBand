@@ -13,12 +13,17 @@ back from the PDF via pypdf text extraction.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
-from phonometry.speech import speech_intelligibility_index
+from phonometry.speech import SIIResult, speech_intelligibility_index
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def _extract_text(path: str) -> str:
@@ -29,7 +34,7 @@ def _extract_text(path: str) -> str:
     return " ".join(raw.split())
 
 
-def _example_c2():
+def _example_c2() -> SIIResult:
     """R CRAN "SII" Example C.2: SII = 0.851 (independent oracle)."""
     return speech_intelligibility_index(
         np.full(18, 54.0),
@@ -41,7 +46,7 @@ def _example_c2():
 # --- exact oracle --------------------------------------------------------------
 
 
-def test_example_c2_renders_index_and_band_importance(tmp_path) -> None:
+def test_example_c2_renders_index_and_band_importance(tmp_path: Path) -> None:
     """The Example C.2 fiche prints SII = 0.851 and a Table 3 Ii value."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -57,7 +62,7 @@ def test_example_c2_renders_index_and_band_importance(tmp_path) -> None:
     assert "0.0898" in text
 
 
-def test_standard_speech_in_quiet_renders(tmp_path) -> None:
+def test_standard_speech_in_quiet_renders(tmp_path: Path) -> None:
     """The standard normal spectrum in quiet rates to SII = 0.996."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -72,7 +77,7 @@ def test_standard_speech_in_quiet_renders(tmp_path) -> None:
 # --- verbose adds the disturbance column --------------------------------------
 
 
-def test_verbose_adds_disturbance_column(tmp_path) -> None:
+def test_verbose_adds_disturbance_column(tmp_path: Path) -> None:
     """verbose=True adds the equivalent disturbance spectrum level Di column."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -87,7 +92,7 @@ def test_verbose_adds_disturbance_column(tmp_path) -> None:
 # --- verdict direction (higher is better) -------------------------------------
 
 
-def test_verdict_passes_at_or_above_requirement(tmp_path) -> None:
+def test_verdict_passes_at_or_above_requirement(tmp_path: Path) -> None:
     """SII = 0.851 passes a 0.75 minimum and fails a 0.90 minimum."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -100,7 +105,7 @@ def test_verdict_passes_at_or_above_requirement(tmp_path) -> None:
     assert "FAIL" in _extract_text(str(out_fail))
 
 
-def test_verdict_prints_the_requirement_at_full_precision(tmp_path) -> None:
+def test_verdict_prints_the_requirement_at_full_precision(tmp_path: Path) -> None:
     """The requirement is printed at the SII's own three decimals.
 
     A one-decimal requirement would print a 0.75 minimum as "0.8", above the
@@ -121,7 +126,7 @@ def test_verdict_prints_the_requirement_at_full_precision(tmp_path) -> None:
     assert "PASS" in text
 
 
-def test_verdict_boundary_at_the_displayed_precision(tmp_path) -> None:
+def test_verdict_boundary_at_the_displayed_precision(tmp_path: Path) -> None:
     """A requirement equal to the displayed SII passes; one digit above fails."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -134,7 +139,7 @@ def test_verdict_boundary_at_the_displayed_precision(tmp_path) -> None:
     assert "FAIL" in _extract_text(str(out_over))
 
 
-def test_verdict_decides_on_the_requirement_it_prints(tmp_path) -> None:
+def test_verdict_decides_on_the_requirement_it_prints(tmp_path: Path) -> None:
     """A requirement with hidden digits is judged on the value shown.
 
     0.85104 prints as "0.851"; deciding on the unrounded number would fail an
@@ -153,7 +158,7 @@ def test_verdict_decides_on_the_requirement_it_prints(tmp_path) -> None:
 # --- metadata ------------------------------------------------------------------
 
 
-def test_metadata_header_renders(tmp_path) -> None:
+def test_metadata_header_renders(tmp_path: Path) -> None:
     """Supplied metadata renders the header grid; no requirement, no verdict."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -178,7 +183,7 @@ def test_metadata_header_renders(tmp_path) -> None:
 # --- Spanish fiche -------------------------------------------------------------
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """language="es" renders the SII vocabulary and comma decimals."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -208,7 +213,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     ],
 )
 def test_non_default_procedure_fiche_names_its_procedure(
-    tmp_path, method: str, basis: str, caption: str
+    tmp_path: Path, method: str, basis: str, caption: str
 ) -> None:
     """A fiche for a non-default procedure names it and tables its own bands.
 
@@ -235,7 +240,7 @@ def test_non_default_procedure_fiche_names_its_procedure(
     assert f"{round(proc.frequencies[-1])}" in text
 
 
-def test_non_default_procedure_fiche_renders_in_spanish(tmp_path) -> None:
+def test_non_default_procedure_fiche_renders_in_spanish(tmp_path: Path) -> None:
     """The Spanish fiche translates the procedure name in the basis line."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -248,7 +253,7 @@ def test_non_default_procedure_fiche_renders_in_spanish(tmp_path) -> None:
     assert "Audibilidad por bandas de octava" in text
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     res = _example_c2()
     out = str(tmp_path / "x.pdf")
@@ -256,7 +261,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         res.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     res = _example_c2()
     out = str(tmp_path / "bad.pdf")
