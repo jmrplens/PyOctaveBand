@@ -370,7 +370,7 @@ autocorrelation is a near-perfect periodic delta
 
 ```python
 plot_excitation(
-    signal: np.ndarray | Any,
+    signal: ArrayLike,
     fs: int,
     *,
     kind: str = 'sweep',

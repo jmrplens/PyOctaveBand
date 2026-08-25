@@ -62,6 +62,8 @@ from ._layout import (
 )
 
 if TYPE_CHECKING:
+    from reportlab.platypus import Table
+
     from ..room.acoustics import RoomAcousticsResult
     from .metadata import ReportMetadata
 
@@ -173,7 +175,7 @@ def _metadata_pairs(
     return escaped_pairs(specs)
 
 
-def _parameter_table(result: RoomAcousticsResult, language: str = "en") -> Any:
+def _parameter_table(result: RoomAcousticsResult, language: str = "en") -> Table:
     """Build the full-width per-band parameter table.
 
     Rows are the analysis bands (or a single ``Broadband`` row); the columns are

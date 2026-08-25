@@ -58,6 +58,8 @@ from ._layout import (
 )
 
 if TYPE_CHECKING:
+    from reportlab.platypus import Table
+
     from ..hearing.noise_induced_hearing_loss import HtlanResult, NiptsResult
     from .metadata import ReportMetadata
 
@@ -177,7 +179,7 @@ def _nipts_metadata_pairs(
 
 def _nipts_table(
     result: NiptsResult, verbose: bool = False, language: str = "en"
-) -> Any:
+) -> Table:
     """The per-audiometric-frequency NIPTS table (median and fractile value)."""
     from reportlab.lib.units import mm
 
@@ -360,7 +362,7 @@ def render_nipts_report(
 # --------------------------------------------------------------------------- #
 def _htlan_table(
     result: HtlanResult, verbose: bool = False, language: str = "en"
-) -> Any:
+) -> Table:
     """The per-audiometric-frequency HTLAN table (age, noise and combined)."""
     from reportlab.lib.units import mm
 

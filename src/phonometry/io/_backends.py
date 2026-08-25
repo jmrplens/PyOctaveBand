@@ -35,7 +35,7 @@ from __future__ import annotations
 import warnings
 from dataclasses import replace
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -52,6 +52,8 @@ from ._signal import Signal, SignalOrigin
 from ._wav import AudioFileInfo, read_wav, wav_info
 
 if TYPE_CHECKING:
+    from types import ModuleType
+
     from ._chunks import WavChunks
 
 
@@ -141,7 +143,7 @@ def _sniff(path: str | Path) -> str | None:
     raise ValueError(msg)
 
 
-def _import_soundfile(format_name: str) -> Any:
+def _import_soundfile(format_name: str) -> ModuleType:
     """Import python-soundfile or explain which extra provides it."""
     try:
         import soundfile
@@ -151,7 +153,9 @@ def _import_soundfile(format_name: str) -> Any:
             f"phonometry ships as the [audio] extra. {_AUDIO_EXTRA_HINT}"
         )
         raise ImportError(msg) from exc
-    return soundfile
+    # soundfile ships no py.typed, so mypy sees the import as Any; the
+    # returned object is nonetheless the module itself.
+    return soundfile  # type: ignore[no-any-return]
 
 
 def _warn_lossy(format_name: str, path: str | Path) -> None:

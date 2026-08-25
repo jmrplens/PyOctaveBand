@@ -49,6 +49,8 @@ from ._layout import (
 )
 
 if TYPE_CHECKING:
+    from reportlab.platypus import Table
+
     from ..speech.sti import STIResult
     from .metadata import ReportMetadata
 
@@ -98,7 +100,7 @@ def _metadata_pairs(
     ]
 
 
-def _band_table(result: STIResult, language: str = "en") -> Any:
+def _band_table(result: STIResult, language: str = "en") -> Table:
     """Build the left-hand per-octave-band modulation-transfer-index table.
 
     Called only after :func:`render_sti_report` has imported reportlab.

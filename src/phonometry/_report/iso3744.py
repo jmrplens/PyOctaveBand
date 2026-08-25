@@ -43,7 +43,7 @@ extra, matplotlib in ``phonometry[plot]``); each is guarded with an actionable
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -60,6 +60,10 @@ from ._sound_power_fiche import (
 )
 
 if TYPE_CHECKING:
+    from typing import TypeIs
+
+    from reportlab.platypus import Table
+
     from ..emission.sound_power import SoundPowerResult
     from ..emission.sound_power_anechoic import PrecisionSoundPowerResult
     from .metadata import ReportMetadata
@@ -72,19 +76,25 @@ _COL_LP = "L<sub>p</sub> [dB]"
 _COL_LW = "L<sub>W</sub> [dB]"
 
 
-def _is_precision(result: Any) -> bool:
+def _is_precision(
+    result: SoundPowerResult | PrecisionSoundPowerResult,
+) -> TypeIs[PrecisionSoundPowerResult]:
     """Return ``True`` for an ISO 3745 precision result, ``False`` for ISO 3744.
 
     The precision result carries the meteorological corrections ``c1``/``c2``/
     ``c3`` (and no environmental ``K2``); the surface-pressure result carries
     the per-band ``environmental_correction`` (``K2``) and a ``grade``. The
-    duck-typed check keeps this module free of a module-level import of the
-    domain classes (the render layer imports them only under TYPE_CHECKING).
+    duck-typed check keeps this module free of a runtime import of the domain
+    classes (the render layer imports them only under TYPE_CHECKING), and the
+    :class:`~typing.TypeIs` narrows each caller's branch to the method whose
+    fields it reads.
     """
     return hasattr(result, "c1") and hasattr(result, "c2") and hasattr(result, "c3")
 
 
-def _method(result: Any, language: str = "en") -> tuple[str, str]:
+def _method(
+    result: SoundPowerResult | PrecisionSoundPowerResult, language: str = "en"
+) -> tuple[str, str]:
     """Return ``(standard, grade_phrase)`` for the applied determination method.
 
     ISO 3744:2010 is the engineering method (accuracy grade 2), ISO 3746:2010
@@ -99,7 +109,9 @@ def _method(result: Any, language: str = "en") -> tuple[str, str]:
     return "ISO 3744:2010", t("engineering method, accuracy grade 2", language)
 
 
-def _basis(result: Any, language: str = "en") -> str:
+def _basis(
+    result: SoundPowerResult | PrecisionSoundPowerResult, language: str = "en"
+) -> str:
     """The standard-basis line naming the method, the surface and the grade."""
     standard, grade_phrase = _method(result, language)
     if _is_precision(result):
@@ -116,7 +128,11 @@ def _basis(result: Any, language: str = "en") -> str:
     ).format(standard=standard, grade=grade_phrase)
 
 
-def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
+def _value_table(
+    result: SoundPowerResult | PrecisionSoundPowerResult,
+    verbose: bool,
+    language: str = "en",
+) -> Table:
     """Build the full-width per-band table (nominal frequency, Lp, LW).
 
     ``verbose`` adds the energy-averaged level ``Lp'`` and, for the ISO 3744/
@@ -132,8 +148,7 @@ def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
     n = lw.size
     labels, fraction = band_labels(getattr(result, "frequencies", None), n)
 
-    precision = _is_precision(result)
-    if verbose and not precision:
+    if verbose and not _is_precision(result):
         k1 = np.asarray(result.background_correction, dtype=np.float64)
         k2 = np.asarray(result.environmental_correction, dtype=np.float64)
         header = [
@@ -156,7 +171,7 @@ def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
             ]
             for i in range(n)
         ]
-    elif verbose and precision:
+    elif verbose:
         header = [
             t(_COL_FREQUENCY, language),
             "L'<sub>p</sub> [dB]",
@@ -187,7 +202,9 @@ def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
     return power_value_table(header, rows_data, widths, fraction)
 
 
-def _statement(result: Any, language: str = "en") -> tuple[str, list[str]]:
+def _statement(
+    result: SoundPowerResult | PrecisionSoundPowerResult, language: str = "en"
+) -> tuple[str, list[str]]:
     """The boxed sound-power result and its extended terms.
 
     Delegates the ``LWA``/``LW`` box to the shared
@@ -211,7 +228,9 @@ def _statement(result: Any, language: str = "en") -> tuple[str, list[str]]:
     return statement, extended
 
 
-def _corrections_strip(result: Any, language: str = "en") -> str:
+def _corrections_strip(
+    result: SoundPowerResult | PrecisionSoundPowerResult, language: str = "en"
+) -> str:
     """The applied-corrections line for the basis strip (K1/K2 or C1/C2/C3)."""
     if _is_precision(result):
         return t(
@@ -244,7 +263,9 @@ def _corrections_strip(result: Any, language: str = "en") -> str:
     )
 
 
-def _a_weighting_strip(result: Any, language: str = "en") -> str:
+def _a_weighting_strip(
+    result: SoundPowerResult | PrecisionSoundPowerResult, language: str = "en"
+) -> str:
     """The A-weighting citation line, keyed to the method that combined LWA.
 
     The surface-pressure result combines the band levels with the ISO 3744:2010

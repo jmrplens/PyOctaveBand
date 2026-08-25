@@ -68,6 +68,8 @@ from ._layout import (
 )
 
 if TYPE_CHECKING:
+    from reportlab.platypus import Table
+
     from ..hearing.occupational_exposure import ExposureResult
     from .metadata import ReportMetadata
 
@@ -163,7 +165,7 @@ def _esc(value: str | None) -> str | None:
 
 def _task_table(
     result: ExposureResult, verbose: bool = False, language: str = "en"
-) -> Any:
+) -> Table:
     """The Clause 15 b/d work-analysis table of a task-based result.
 
     One row per task (label, mean duration ``T_m``, sample count ``I``, the
@@ -246,7 +248,7 @@ def _task_table(
     return table
 
 
-def _sampling_table(result: ExposureResult, language: str = "en") -> Any:
+def _sampling_table(result: ExposureResult, language: str = "en") -> Table:
     """The sampling summary of a job-based/full-day result (Formula (C.9) budget)."""
     from reportlab.lib.units import mm
 
@@ -339,7 +341,7 @@ def _assessment_rows(
     return rows
 
 
-def _assessment_table(result: ExposureResult, language: str = "en") -> Any:
+def _assessment_table(result: ExposureResult, language: str = "en") -> Table:
     """The Directive 2003/10/EC assessment table (exceeded / not exceeded)."""
     from reportlab.lib.units import mm
 

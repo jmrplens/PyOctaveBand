@@ -44,6 +44,8 @@ from ._layout import (
 if TYPE_CHECKING:
     import numpy as np
 
+    from ..vibration.structural.mechanical_mobility import MobilityResult
+    from ..vibration.structural.transfer_stiffness import TransferStiffnessResult
     from .metadata import ReportMetadata
 
 
@@ -89,7 +91,7 @@ def frf_metadata_pairs(
 
 
 def render_frf_fiche(
-    result: Any,
+    result: MobilityResult | TransferStiffnessResult,
     path: str,
     *,
     title: str,

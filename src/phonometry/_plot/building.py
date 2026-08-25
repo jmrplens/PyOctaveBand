@@ -1055,7 +1055,7 @@ _MAX_NAMED_PATHS = 6
 
 
 def _plot_path_shares(
-    result: Any,
+    result: DetailedAirborneResult | DetailedImpactResult,
     total: np.ndarray,
     *,
     total_label: str,

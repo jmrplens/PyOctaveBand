@@ -76,6 +76,10 @@ from ._layout import (
 )
 
 if TYPE_CHECKING:
+    from matplotlib.axes import Axes
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.platypus import Table
+
     from ..environment.assessment.spain import (
         ActivityAssessment,
         PeriodAssessment,
@@ -143,7 +147,7 @@ def _metadata_pairs(
 
 def _phase_table(
     result: ActivityAssessment, verbose: bool = False, language: str = "en"
-) -> Any:
+) -> Table:
     """The full-width *fases de ruido* table.
 
     One row per noise phase of every assessed period: the phase label, its
@@ -221,7 +225,10 @@ def _criterion_cell(
 
 
 def _result_row(
-    period: PeriodAssessment, label_style: Any, value_style: Any, language: str
+    period: PeriodAssessment,
+    label_style: ParagraphStyle,
+    value_style: ParagraphStyle,
+    language: str,
 ) -> list[Any]:
     """The six cells of one period row of the Article 25.1 b results table.
 
@@ -265,7 +272,7 @@ def _result_row(
     ]
 
 
-def _results_table(result: ActivityAssessment, language: str = "en") -> Any:
+def _results_table(result: ActivityAssessment, language: str = "en") -> Table:
     """The per-period results table against the Article 25.1 b criteria.
 
     One row per assessed period, each cell showing the assessed index against
@@ -427,7 +434,9 @@ def render_activity_report(
     flow.append(_results_table(result, language))
     flow.append(Spacer(1, 6))
 
-    def _assessment_plot(ax: Any = None, language: str = "en", **kwargs: Any) -> Any:
+    def _assessment_plot(
+        ax: Axes | None = None, language: str = "en", **kwargs: Any
+    ) -> Axes:
         from .._plot.environment import plot_activity_assessment
 
         return plot_activity_assessment(result, ax=ax, language=language, **kwargs)

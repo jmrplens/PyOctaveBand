@@ -45,6 +45,9 @@ from ._layout import (
 from .iso717 import _Y_TOP_AIRBORNE, _Y_TOP_IMPACT, _metadata_pairs
 
 if TYPE_CHECKING:
+    from matplotlib.axes import Axes
+    from reportlab.platypus import Table
+
     from ..building.measurement.insulation import (
         ImpactRatingResult,
         WeightedRatingResult,
@@ -61,7 +64,7 @@ Column = tuple[str, np.ndarray, int]
 #: the multi-column verbose table) or ``None`` (the two-column ``f | value``
 #: form, whose widths are fixed here).
 ColumnsBuilder = Callable[
-    [str, np.ndarray, bool, str], tuple[Sequence[Column], str, Any]
+    [str, np.ndarray, bool, str], tuple[Sequence[Column], str, list[float] | None]
 ]
 
 
@@ -117,8 +120,8 @@ def band_value_table(
     centers: np.ndarray,
     columns: Sequence[Column],
     language: str,
-    col_widths: Any = None,
-) -> Any:
+    col_widths: list[float] | None = None,
+) -> Table:
     """Build the left-hand per-band table.
 
     A single column following the frequency column is the recommended-form
@@ -133,6 +136,7 @@ def band_value_table(
 
     head_style = band_table_header_style()
 
+    widths: list[float] | None
     if len(columns) == 1:
         header = [
             fiche_paragraph(t("Frequency f [Hz]", language), head_style),
@@ -203,7 +207,7 @@ def iso717_columns_builder(
 
 
 def render_insulation_fiche(
-    result: Any,
+    result: object,
     rating: WeightedRatingResult | ImpactRatingResult,
     path: str,
     *,
@@ -314,7 +318,7 @@ def render_insulation_fiche(
     value_table = band_value_table(centers, columns, language, col_widths)
     left_cell = [fiche_paragraph(caption, caption_style), value_table]
 
-    def _plot(ax: Any = None, language: str = language) -> Any:
+    def _plot(ax: Axes | None = None, language: str = language) -> Axes:
         axes = rating.plot(ax=ax, language=language)
         axes.set_ylabel(t(spec["ylabel"], language))
         return axes

@@ -32,7 +32,11 @@ if TYPE_CHECKING:
         IntensityInstrumentComplianceResult,
     )
     from ..emission.sound_power import SoundPowerResult
-    from ..emission.sound_power_intensity import SoundPowerIntensityResult
+    from ..emission.sound_power_anechoic import PrecisionSoundPowerResult
+    from ..emission.sound_power_intensity import (
+        PrecisionIntensityResult,
+        SoundPowerIntensityResult,
+    )
     from ..emission.sound_power_reverberation import ReverberationSoundPowerResult
     from ..emission.vibration_sound_power import VibrationSoundPowerResult
 
@@ -96,9 +100,10 @@ def _t(text: str, language: str = "en", **fmt: Any) -> str:
 def plot_sound_power(
     result: (
         SoundPowerResult
+        | PrecisionSoundPowerResult
         | ReverberationSoundPowerResult
         | SoundPowerIntensityResult
-        | Any
+        | PrecisionIntensityResult
     ),
     ax: Axes | None = None,
     language: str = "en",
@@ -117,9 +122,7 @@ def plot_sound_power(
     non-positive (``negative_band`` / ``not_applicable_band``) are hatched and
     greyed as unusable.
 
-    :param result: A sound-power result object exposing
-        ``sound_power_level``, ``sound_power_level_a`` and (optionally)
-        ``frequencies`` and ``negative_band``.
+    :param result: One of the five sound-power results named above.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the band :meth:`~matplotlib.axes.Axes.bar`.

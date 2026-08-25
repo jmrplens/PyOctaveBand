@@ -42,7 +42,7 @@ guarded with an actionable :class:`ImportError`.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -58,6 +58,8 @@ from ._sound_power_fiche import (
 )
 
 if TYPE_CHECKING:
+    from reportlab.platypus import Table
+
     from ..emission.sound_power_reverberation import ReverberationSoundPowerResult
     from .metadata import ReportMetadata
 
@@ -69,12 +71,12 @@ _COL_LP = "L<sub>p</sub> [dB]"
 _COL_LW = "L<sub>W</sub> [dB]"
 
 
-def _is_comparison(result: Any) -> bool:
+def _is_comparison(result: ReverberationSoundPowerResult) -> bool:
     """Return ``True`` for a comparison-method result, ``False`` for direct."""
     return getattr(result, "method", "direct") == "comparison"
 
 
-def _basis(result: Any, language: str = "en") -> str:
+def _basis(result: ReverberationSoundPowerResult, language: str = "en") -> str:
     """The standard-basis line naming the reverberation-room method and grade."""
     grade = t("precision method, accuracy grade 1", language)
     if _is_comparison(result):
@@ -92,7 +94,9 @@ def _basis(result: Any, language: str = "en") -> str:
     ).format(grade=grade)
 
 
-def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
+def _value_table(
+    result: ReverberationSoundPowerResult, verbose: bool, language: str = "en"
+) -> Table:
     """Build the full-width per-band table (nominal frequency, Lp, LW).
 
     The default table is the ``f | Lp | LW`` form; ``verbose`` adds the
@@ -156,7 +160,9 @@ def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
     return power_value_table(header, rows_data, widths, fraction)
 
 
-def _statement(result: Any, language: str = "en") -> tuple[str, list[str]]:
+def _statement(
+    result: ReverberationSoundPowerResult, language: str = "en"
+) -> tuple[str, list[str]]:
     """The boxed sound-power result and its extended terms.
 
     Delegates the ``LWA``/``LW`` box to the shared
@@ -178,7 +184,9 @@ def _statement(result: Any, language: str = "en") -> tuple[str, list[str]]:
     return statement, extended
 
 
-def _corrections_strip(result: Any, language: str = "en") -> str:
+def _corrections_strip(
+    result: ReverberationSoundPowerResult, language: str = "en"
+) -> str:
     """The applied-corrections line for the basis strip (Eq. 20 or Eq. 21)."""
     c2 = format_number(float(result.c2), language, decimals=2)
     c = format_number(float(result.speed_of_sound), language, decimals=1)

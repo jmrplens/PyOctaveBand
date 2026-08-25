@@ -33,7 +33,7 @@ import html
 import os
 import tempfile
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from ._i18n import format_number, t
 from ._layout import (
@@ -54,6 +54,11 @@ from ._layout import (
 )
 
 if TYPE_CHECKING:
+    from matplotlib.axes import Axes
+    from matplotlib.figure import Figure
+    from matplotlib.projections.polar import PolarAxes
+    from reportlab.graphics.shapes import Drawing
+
     from ..electroacoustics.loudspeaker import LoudspeakerCharacteristics
     from .metadata import ReportMetadata
 
@@ -192,7 +197,9 @@ def _rated_rows(
 # --------------------------------------------------------------------------- #
 # IEC 60263 characteristic graphs
 # --------------------------------------------------------------------------- #
-def _drawing_from_figure(fig: Any, target_width: float, language: str = "en") -> Any:
+def _drawing_from_figure(
+    fig: Figure, target_width: float, language: str = "en"
+) -> Drawing:
     """Convert a matplotlib figure to a scaled, vector reportlab ``Drawing``.
 
     Mirrors :func:`phonometry._report._layout.render_figure_drawing` (SVG with
@@ -234,7 +241,7 @@ def _drawing_from_figure(fig: Any, target_width: float, language: str = "en") ->
 
 def _response_drawing(
     result: LoudspeakerCharacteristics, target_width: float, language: str = "en"
-) -> Any:
+) -> Drawing:
     """On-axis response with the tolerance band and effective-range markers.
 
     Drawn by the shared :func:`phonometry._plot.electroacoustics` panel renderer
@@ -262,7 +269,7 @@ def _response_drawing(
 
 def _secondary_drawing(
     result: LoudspeakerCharacteristics, target_width: float, language: str = "en"
-) -> Any | None:
+) -> Drawing | None:
     """Impedance, THD and polar-directivity panels for the data supplied.
 
     The panels are drawn by the shared
@@ -299,9 +306,12 @@ def _secondary_drawing(
         _thin_freq_ticklabels(ax)
         idx += 1
     if has_polar:
+        # `add_subplot` is typed as returning a plain Axes; the polar
+        # projection makes it a PolarAxes at runtime, which the stubs
+        # cannot express.
         _draw_datasheet_polar(
             result,
-            fig.add_subplot(1, panels, idx, projection="polar"),
+            cast("PolarAxes", fig.add_subplot(1, panels, idx, projection="polar")),
             language=language,
         )
         idx += 1
@@ -309,7 +319,7 @@ def _secondary_drawing(
     return _drawing_from_figure(fig, target_width, language)
 
 
-def _thin_freq_ticklabels(ax: Any, keep_every: int = 2) -> None:
+def _thin_freq_ticklabels(ax: Axes, keep_every: int = 2) -> None:
     """Blank alternate labelled frequency ticks on a narrow report panel.
 
     The shared ``.plot()`` panel drawers label every nominal octave centre

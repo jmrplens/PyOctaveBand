@@ -492,7 +492,7 @@ def predicted_diffusion_spectrum(
     frequencies: ArrayLike,
     *,
     depths: ArrayLike,
-    reflection_of: Any | None = None,
+    reflection_of: None = None,
     angles: ArrayLike = DEFAULT_POLAR_ANGLES,
     source_angle: float = 0.0,
     periods: int = 1,

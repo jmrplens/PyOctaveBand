@@ -251,7 +251,7 @@ Which text of the vertical directivity (2.3.16) to evaluate.
 horizontal_directivity(
     phi: float,
     *,
-    frequencies: Any = (50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0, 6300.0, 8000.0, 10000.0),
+    frequencies: ArrayLike = (50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0, 6300.0, 8000.0, 10000.0),
 ) -> NDArray[np.float64]
 ```
 
@@ -284,7 +284,10 @@ here to every source, as the Commission's reference module does.
 ## impact_roughness
 
 ```python
-impact_roughness(single: Any, joint_density: float) -> NDArray[np.float64]
+impact_roughness(
+    single: ArrayLike,
+    joint_density: float,
+) -> NDArray[np.float64]
 ```
 
 Impact roughness `L_R,IMPACT,i` of (2.3.12), in dB.
@@ -324,7 +327,7 @@ Directive prescribes for jointed track.
 ## octave_bands_from_third_octaves
 
 ```python
-octave_bands_from_third_octaves(levels: Any) -> NDArray[np.float64]
+octave_bands_from_third_octaves(levels: ArrayLike) -> NDArray[np.float64]
 ```
 
 Energy-sum a 24-band 1/3-octave spectrum into the eight octave bands.
@@ -584,8 +587,8 @@ REFERENCE_JOINT_DENSITY = 0.01
 
 ```python
 rolling_sound_power(
-    roughness: Any,
-    transfer: Any,
+    roughness: ArrayLike,
+    transfer: ArrayLike,
     axles: float,
 ) -> NDArray[np.float64]
 ```
@@ -653,11 +656,11 @@ than from the [`cnossos_rail`](/phonometry/reference/api/environment/cnossos-rai
 
 ```python
 roughness_to_frequency(
-    levels: Any,
-    wavelengths: Any,
+    levels: ArrayLike,
+    wavelengths: ArrayLike,
     speed: float,
     *,
-    frequencies: Any = (50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0, 6300.0, 8000.0, 10000.0),
+    frequencies: ArrayLike = (50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0, 6300.0, 8000.0, 10000.0),
     interpolation: RoughnessInterpolation = ...,
 ) -> NDArray[np.float64]
 ```
@@ -734,9 +737,9 @@ for freight wagons only.
 
 ```python
 total_effective_roughness(
-    rail: Any,
-    wheel: Any,
-    filter_: Any,
+    rail: ArrayLike,
+    wheel: ArrayLike,
+    filter_: ArrayLike,
 ) -> NDArray[np.float64]
 ```
 
@@ -978,7 +981,7 @@ Digit 1 of the vehicle descriptor, Table [2.3.a].
 vertical_directivity(
     psi: float,
     *,
-    frequencies: Any = (50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0, 6300.0, 8000.0, 10000.0),
+    frequencies: ArrayLike = (50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0, 6300.0, 8000.0, 10000.0),
     height: int = 1,
     aerodynamic: bool = False,
     edition: DirectivityEdition = ...,

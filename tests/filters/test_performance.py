@@ -2,6 +2,7 @@
 """Tests that the filter-bank design work is reused rather than repeated."""
 
 import time
+from collections.abc import Callable
 from typing import Any
 
 import numpy as np
@@ -15,11 +16,11 @@ from phonometry.filters import core
 class _DesignCounter:
     """Wraps ``_design_sos_filter`` and counts how often it is invoked."""
 
-    def __init__(self, inner: Any) -> None:
+    def __init__(self, inner: Callable[..., list[np.ndarray]]) -> None:
         self._inner = inner
         self.calls = 0
 
-    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+    def __call__(self, *args: Any, **kwargs: Any) -> list[np.ndarray]:
         self.calls += 1
         return self._inner(*args, **kwargs)
 

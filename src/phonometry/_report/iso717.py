@@ -59,6 +59,8 @@ from ._layout import (
 )
 
 if TYPE_CHECKING:
+    from reportlab.platypus import Table
+
     from ..building.measurement.insulation import (
         ImpactRatingResult,
         WeightedRatingResult,
@@ -260,7 +262,7 @@ def _value_table(
     value_header: str,
     verbose: bool,
     language: str = "en",
-) -> Any:
+) -> Table:
     """Build the left-hand one-third-octave table (accredited or Annex C).
 
     Called only after :func:`render_iso717_report` has imported reportlab.

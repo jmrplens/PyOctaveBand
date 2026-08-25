@@ -123,7 +123,7 @@ def _qualification_columns(
     return columns
 
 
-def _even_widths(n_columns: int) -> Any:
+def _even_widths(n_columns: int) -> list[float]:
     """Even column widths spanning the compact left cell, in points."""
     from reportlab.lib.units import mm
 

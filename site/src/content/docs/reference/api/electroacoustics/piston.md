@@ -203,7 +203,7 @@ plottable bundle around it.
 
 ```python
 PistonDirectivity.plot(
-    ax: Axes | None = None,
+    ax: PolarAxes | None = None,
     *,
     language: str = 'en',
     **kwargs: Any,

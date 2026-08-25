@@ -32,6 +32,12 @@ from ._i18n import format_number, t
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+    from numpy.typing import ArrayLike
+    from reportlab.graphics.shapes import Drawing
+    from reportlab.lib.colors import Color
+    from reportlab.lib.styles import ParagraphStyle, StyleSheet1
+    from reportlab.platypus import Flowable, Paragraph, Table
+
     from .metadata import ReportMetadata
 
 #: Installation hints for the three soft dependencies of the report.
@@ -86,7 +92,7 @@ _BAND_RATIO_TOLERANCE = 0.03
 _MIN_RESPONSE_SPAN = 2.0 ** (1.0 / 3.0)
 
 
-def fiche_paragraph(text: str, style: Any, **kwargs: Any) -> Any:
+def fiche_paragraph(text: str, style: ParagraphStyle, **kwargs: Any) -> Paragraph:
     """Build a reportlab ``Paragraph`` whose sub/superscripts cannot collide.
 
     Every fiche paragraph is created through this factory (the renderers
@@ -120,7 +126,7 @@ def escaped_pairs(
     ]
 
 
-def measurement_basis_style() -> Any:
+def measurement_basis_style() -> ParagraphStyle:
     """The muted footnote style for the measurement-basis strip under a fiche.
 
     The stacked-layout fiches (programme loudness, room acoustics ...) close
@@ -192,7 +198,7 @@ def render_figure_drawing(
     figsize: tuple[float, float] | None = None,
     subplot_kw: dict[str, Any] | None = None,
     language: str = "en",
-) -> Any:
+) -> Drawing:
     """Draw a result's plot as a scaled, vector reportlab ``Drawing``.
 
     ``plot_fn`` is the result's own ``plot`` method; it is called with a fresh
@@ -320,7 +326,7 @@ def render_figure_drawing(
     return drawing
 
 
-def grid_table(pairs: list[tuple[str, str]]) -> Any:
+def grid_table(pairs: list[tuple[str, str]]) -> Table:
     """Lay an ordered list of (label, value) pairs into a two-column grid.
 
     Each grid row holds up to two label/value pairs (four table cells:
@@ -382,7 +388,7 @@ def grid_table(pairs: list[tuple[str, str]]) -> Any:
     return table
 
 
-def band_table_header_style() -> Any:
+def band_table_header_style() -> ParagraphStyle:
     """The white-on-accent header-cell paragraph style of the band tables.
 
     Shared by the one-third-octave value tables of the sound-insulation
@@ -401,7 +407,7 @@ def band_table_header_style() -> Any:
     )
 
 
-def response_decades(frequencies: Any, where: str) -> float:
+def response_decades(frequencies: ArrayLike, where: str) -> float:
     """The decades a response curve spans, refusing a span too narrow to draw.
 
     The IEC 60268 fiches keep their response panel to the IEC 60263 scale by
@@ -434,7 +440,9 @@ def response_decades(frequencies: Any, where: str) -> float:
     return float(np.log10(high / low))
 
 
-def _require_column_widths(data: list[list[Any]], col_widths: Any, where: str) -> None:
+def _require_column_widths(
+    data: list[list[Any]], col_widths: list[float] | None, where: str
+) -> None:
     """Require a width list to have one entry per column of *data*.
 
     reportlab does not refuse a list of the wrong length: it takes the column
@@ -466,7 +474,7 @@ def _require_column_widths(data: list[list[Any]], col_widths: Any, where: str) -
         raise ValueError(msg)
 
 
-def _octave_grouping(band_centres: Any) -> int | None:
+def _octave_grouping(band_centres: ArrayLike | None) -> int | None:
     """Rows per octave in *band_centres*, or ``None`` when they are not bands.
 
     The thin rules of the accredited reports group a table by octave, so they
@@ -495,12 +503,12 @@ def _octave_grouping(band_centres: Any) -> int | None:
 
 def band_table(
     rows: list[list[Any]],
-    col_widths: list[Any],
+    col_widths: list[float] | None,
     n_data: int,
     extra_styles: list[Any] | None = None,
     *,
-    band_centres: Any,
-) -> Any:
+    band_centres: ArrayLike | None,
+) -> Table:
     """Assemble a band table with the accredited styling.
 
     Applies the shared look of the sound-insulation fiches: the accent header
@@ -559,7 +567,9 @@ def band_table(
     return table
 
 
-def document_styles(accent: Any) -> tuple[Any, Any, Any, Any]:
+def document_styles(
+    accent: Color,
+) -> tuple[StyleSheet1, ParagraphStyle, ParagraphStyle, ParagraphStyle]:
     """Return ``(stylesheet, title_style, basis_style, caption_style)``.
 
     The title (accent, 16 pt), the standard-basis line (muted, 9.5 pt) and the
@@ -598,12 +608,12 @@ def document_styles(accent: Any) -> tuple[Any, Any, Any, Any]:
 
 
 def two_panel_body(
-    left_cell: Any,
-    plot_drawing: Any,
+    left_cell: Flowable | list[Flowable],
+    plot_drawing: Drawing,
     *,
     left_width_mm: float = 56.0,
     plot_width_mm: float = 118.0,
-) -> Any:
+) -> Table:
     """Assemble the two-panel body: a left cell beside the result's plot.
 
     Every fiche puts a table or metrics list on the left and the result's own
@@ -634,7 +644,9 @@ def two_panel_body(
     return body
 
 
-def metrics_table(rows: list[tuple[str, str]], *, col_widths: Any = None) -> Any:
+def metrics_table(
+    rows: list[tuple[str, str]], *, col_widths: list[float] | None = None
+) -> Table:
     """A compact two-column ``metric | value`` table for a non-band fiche.
 
     The band fiches put a frequency table on the left; the single-metric fiches
@@ -691,9 +703,9 @@ def metrics_table(rows: list[tuple[str, str]], *, col_widths: Any = None) -> Any
 def compliance_table(
     rows: list[tuple[str, str, str, str]],
     *,
-    col_widths: Any = None,
+    col_widths: list[float] | None = None,
     language: str = "en",
-) -> Any:
+) -> Table:
     """A full-width 4-column ``metric | measured | target/limit | result`` table.
 
     The stacked-layout fiches (programme loudness, aircraft noise ...) check a
@@ -857,7 +869,7 @@ def exceedance_markup(exceeded: bool | None, language: str = "en") -> str:
     )
 
 
-def stacked_table(data: list[list[Any]], col_widths: list[Any]) -> Any:
+def stacked_table(data: list[list[Any]], col_widths: list[float]) -> Table:
     """A full-width table with the accredited styling (accent header, zebra rows).
 
     Shared by the exposure fiches: the accent header row, zebra body rows and a
@@ -893,10 +905,10 @@ def stacked_table(data: list[list[Any]], col_widths: list[Any]) -> Any:
 
 def result_box(
     statement: str,
-    styles: Any,
-    accent: Any,
+    styles: StyleSheet1,
+    accent: Color,
     extended: list[str] | None = None,
-) -> Any:
+) -> Table:
     """The boxed single-number result, with optional extended terms alongside.
 
     Called only after the renderer has imported reportlab.
@@ -945,7 +957,7 @@ def result_box(
 
 
 def verdict_flow(
-    text: str, passed: bool, styles: Any, language: str = "en"
+    text: str, passed: bool, styles: StyleSheet1, language: str = "en"
 ) -> list[Any]:
     """The PASS/FAIL verdict paragraph for a precomputed comparison.
 

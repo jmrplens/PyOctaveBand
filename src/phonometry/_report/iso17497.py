@@ -62,14 +62,17 @@ from ._layout import (
     result_box,
     two_panel_body,
 )
+from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.platypus import Table
+
     from ..materials.diffusers.reverberation_room_scattering import ScatteringResult
     from ..materials.diffusers.scattering_diffusion import (
         DiffusionResult,
         DiffusionSpectrum,
     )
-    from .metadata import ReportMetadata
 
 #: Header of the band centre-frequency column of every ISO 17497 table.
 _FREQUENCY_COLUMN = "f [Hz]"
@@ -108,21 +111,18 @@ def _common_metadata_pairs(
     reused across a Part 1 and a Part 2 campaign never leaks them into the
     diffusion sheet).
     """
-
-    def _md(name: str) -> Any:
-        return getattr(metadata, name) if metadata is not None else None
-
-    area = _md("area") if include_room_fields else None
-    room_volume = _md("room_volume") if include_room_fields else None
-    temperature = _md("temperature")
-    humidity = _md("relative_humidity")
-    pressure = _md("pressure")
+    md = metadata if metadata is not None else ReportMetadata()
+    area = md.area if include_room_fields else None
+    room_volume = md.room_volume if include_room_fields else None
+    temperature = md.temperature
+    humidity = md.relative_humidity
+    pressure = md.pressure
 
     freq_label = t("Frequency range [Hz]", language)
     specs: list[tuple[str, str | None]] = [
-        (t("Client", language), _md("client")),
-        (t("Manufacturer", language), _md("manufacturer")),
-        (t("Description", language), _md("specimen")),
+        (t("Client", language), md.client),
+        (t("Manufacturer", language), md.manufacturer),
+        (t("Description", language), md.specimen),
         (
             t("Sample area S [m<super>2</super>]", language),
             fmt_meta(area, language) if area is not None else None,
@@ -132,9 +132,9 @@ def _common_metadata_pairs(
             fmt_meta(room_volume, language) if room_volume is not None else None,
         ),
         (freq_label, freq_range),
-        (t("Mounting", language), _md("mounting")),
-        (t("Test room", language), _md("test_room")),
-        (t("Date of test", language), _md("test_date")),
+        (t("Mounting", language), md.mounting),
+        (t("Test room", language), md.test_room),
+        (t("Date of test", language), md.test_date),
         (
             t("Temperature [&#176;C]", language),
             fmt_meta(temperature, language) if temperature is not None else None,
@@ -185,8 +185,8 @@ def _header_flow(
     title: str,
     basis: str,
     header_pairs: list[tuple[str, str]],
-    title_style: Any,
-    basis_style: Any,
+    title_style: ParagraphStyle,
+    basis_style: ParagraphStyle,
 ) -> list[Any]:
     """The shared title/basis/metadata-grid opening of an ISO 17497 fiche."""
     from reportlab.platypus import Spacer
@@ -209,7 +209,7 @@ def _header_flow(
 # ---------------------------------------------------------------------------
 def _scattering_table(
     result: ScatteringResult, verbose: bool, language: str = "en"
-) -> Any:
+) -> Table:
     """Build the per-band ``f | alpha_s | s`` table (``alpha_spec`` if verbose)."""
     from reportlab.lib.units import mm
 
@@ -377,7 +377,7 @@ def render_scattering_report(
 # ---------------------------------------------------------------------------
 def _diffusion_table(
     result: DiffusionSpectrum, show_normalized: bool, language: str = "en"
-) -> Any:
+) -> Table:
     """Build the per-band ``f | d`` table (adds ``d_n`` when requested)."""
     from reportlab.lib.units import mm
 
@@ -518,7 +518,7 @@ def render_diffusion_spectrum_report(
 # ---------------------------------------------------------------------------
 # ISO 17497-2: single-source polar response.
 # ---------------------------------------------------------------------------
-def _polar_table(result: DiffusionResult, language: str = "en") -> Any:
+def _polar_table(result: DiffusionResult, language: str = "en") -> Table:
     """Build the corrected ``angle | reflected level`` polar-response table."""
     from reportlab.lib.units import mm
 

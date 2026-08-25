@@ -30,6 +30,7 @@ import numpy as np
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+    from types import ModuleType
 
     from matplotlib.axes import Axes
     from matplotlib.container import BarContainer
@@ -39,6 +40,13 @@ if TYPE_CHECKING:
         ImpactRatingResult,
         WeightedRatingResult,
     )
+    from ..emission.sound_power import SoundPowerResult
+    from ..emission.sound_power_anechoic import PrecisionSoundPowerResult
+    from ..emission.sound_power_intensity import (
+        PrecisionIntensityResult,
+        SoundPowerIntensityResult,
+    )
+    from ..emission.sound_power_reverberation import ReverberationSoundPowerResult
     from ..room.acoustics import RoomAcousticsResult
 
 _INSTALL_HINT = (
@@ -558,7 +566,7 @@ def _t(text: str, language: str = "en") -> str:
     return _STRINGS.get(text, text) if language == "es" else text
 
 
-def _import_pyplot() -> Any:
+def _import_pyplot() -> ModuleType:
     """Import :mod:`matplotlib.pyplot` lazily with an actionable error."""
     try:
         import matplotlib.pyplot as plt
@@ -1050,14 +1058,23 @@ def _draw_decay_times(
 # ---------------------------------------------------------------------------
 
 
-def _sound_power_designation(result: Any) -> str:
+def _sound_power_designation(
+    result: SoundPowerResult
+    | PrecisionSoundPowerResult
+    | ReverberationSoundPowerResult
+    | SoundPowerIntensityResult
+    | PrecisionIntensityResult,
+) -> str:
     """The standard designation matching a sound-power result's method.
 
-    Distinguishes the reverberation-room (ISO 3741) and intensity (ISO 9614)
-    determinations by their result types; the enveloping-surface pressure
-    methods (:class:`~phonometry.emission.sound_power.SoundPowerResult` and any other
-    duck-typed result) fall back to ISO 3744/3746.
+    Distinguishes the reverberation-room (ISO 3741), intensity (ISO 9614)
+    and precision anechoic (ISO 3745) determinations by their result types;
+    every other result type falls back to the enveloping-surface pressure
+    methods' ISO 3744/3746. The precision branch is the youngest: until the
+    designation helper knew the type, an ISO 3745 grade-1 determination was
+    captioned with the engineering and survey standards it exists to outrank.
     """
+    from ..emission.sound_power_anechoic import PrecisionSoundPowerResult
     from ..emission.sound_power_intensity import SoundPowerIntensityResult
     from ..emission.sound_power_reverberation import ReverberationSoundPowerResult
 
@@ -1065,6 +1082,8 @@ def _sound_power_designation(result: Any) -> str:
         return "ISO 3741"
     if isinstance(result, SoundPowerIntensityResult):
         return "ISO 9614"
+    if isinstance(result, PrecisionSoundPowerResult):
+        return "ISO 3745"
     return "ISO 3744/3746"
 
 

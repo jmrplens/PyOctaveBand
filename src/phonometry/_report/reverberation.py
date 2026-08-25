@@ -62,6 +62,9 @@ from ._layout import (
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+    from reportlab.lib.styles import ParagraphStyle, StyleSheet1
+    from reportlab.platypus import Table
+
     from ..room.enclosed_space_absorption import ReverberationResult
     from ..room.reverberation_prediction import ReverberationModelResult
     from .metadata import ReportMetadata
@@ -122,7 +125,7 @@ def _mid_or_first(freqs: np.ndarray, values: np.ndarray) -> tuple[float, bool]:
 
 def _octave_table(
     header_cells: list[Any], rows: list[list[Any]], col_widths: list[Any]
-) -> Any:
+) -> Table:
     """Assemble an octave-band table with the accredited accent/zebra styling.
 
     Octave-band tables have one row per octave, so (unlike the one-third-octave
@@ -154,7 +157,7 @@ def _octave_table(
     return table
 
 
-def _band_header_style() -> Any:
+def _band_header_style() -> ParagraphStyle:
     """White-on-accent header-cell paragraph style for the octave tables."""
     from reportlab.lib import colors
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -169,7 +172,7 @@ def _band_header_style() -> Any:
     )
 
 
-def _target_line(requirement: float, styles: Any, language: str) -> list[Any]:
+def _target_line(requirement: float, styles: StyleSheet1, language: str) -> list[Any]:
     """A muted reference line for a supplied target reverberation time.
 
     A room reverberation time is a target range, not a strictly
@@ -251,7 +254,7 @@ def _header_grid(
 # ---------------------------------------------------------------------------
 
 
-def _models_table(result: ReverberationModelResult, language: str) -> Any:
+def _models_table(result: ReverberationModelResult, language: str) -> Table:
     """Build the per-band table with one reverberation-time column per model."""
     from reportlab.lib.units import mm
 
@@ -410,7 +413,7 @@ def render_reverberation_models_report(
 # ---------------------------------------------------------------------------
 
 
-def _enclosed_table(result: ReverberationResult, language: str) -> Any:
+def _enclosed_table(result: ReverberationResult, language: str) -> Table:
     """Build the per-band ``f | A | T`` table of the enclosed-space fiche."""
     from reportlab.lib.units import mm
 

@@ -33,7 +33,7 @@ matplotlib in ``phonometry[plot]``); each is guarded with an actionable
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -48,6 +48,8 @@ from ._noise_control_fiche import (
 )
 
 if TYPE_CHECKING:
+    from reportlab.platypus import Table
+
     from ..noise_control.hvac import HvacSpectrumResult
     from .metadata import ReportMetadata
 
@@ -59,7 +61,7 @@ _POWER_REFERENCE = "1 pW"
 _THIRD_OCTAVE_FRACTION = 3
 
 
-def _is_power(result: Any) -> bool:
+def _is_power(result: HvacSpectrumResult) -> bool:
     """Return ``True`` for a regenerated sound power spectrum, else attenuation."""
     return getattr(result, "quantity", "") == "sound_power_level"
 
@@ -104,7 +106,7 @@ def _a_weighted_total(
     return _overall_level(weighted)
 
 
-def _basis(result: Any, language: str = "en") -> str:
+def _basis(result: HvacSpectrumResult, language: str = "en") -> str:
     """The prediction-basis line naming the quantity and the Bies chapter."""
     if _is_power(result):
         return t(
@@ -122,7 +124,7 @@ def _basis(result: Any, language: str = "en") -> str:
     )
 
 
-def _prediction_statement(result: Any, language: str = "en") -> str:
+def _prediction_statement(result: HvacSpectrumResult, language: str = "en") -> str:
     """The prediction statement printed under the boxed figure."""
     if _is_power(result):
         return t(
@@ -141,7 +143,7 @@ def _prediction_statement(result: Any, language: str = "en") -> str:
     )
 
 
-def _element_label(result: Any, language: str = "en") -> str:
+def _element_label(result: HvacSpectrumResult, language: str = "en") -> str:
     """The element label, with its descriptive words translated.
 
     The result carries a short English label built from the element kind and
@@ -163,7 +165,7 @@ def _element_label(result: Any, language: str = "en") -> str:
     return f"{t(head, language)} ({', '.join(parts)})"
 
 
-def _caption(result: Any, language: str = "en") -> str:
+def _caption(result: HvacSpectrumResult, language: str = "en") -> str:
     """The caption declaring the analysis band set above the table."""
     n = np.asarray(result.values, dtype=np.float64).size
     _, fraction = band_labels(getattr(result, "frequencies", None), n)
@@ -188,8 +190,11 @@ def _caption(result: Any, language: str = "en") -> str:
 
 
 def _value_table(
-    result: Any, verbose: bool, corrections: np.ndarray | None, language: str = "en"
-) -> Any:
+    result: HvacSpectrumResult,
+    verbose: bool,
+    corrections: np.ndarray | None,
+    language: str = "en",
+) -> Table:
     """Build the per-band table (nominal frequency and the reported quantity).
 
     A verbose regenerated-noise table adds the A-weighting correction and the
@@ -228,7 +233,9 @@ def _value_table(
 
 
 def _statement(
-    result: Any, corrections: np.ndarray | None, language: str = "en"
+    result: HvacSpectrumResult,
+    corrections: np.ndarray | None,
+    language: str = "en",
 ) -> tuple[float, bool, str, list[str]]:
     """The boxed headline figure, its pass direction and the extended terms.
 
@@ -279,7 +286,9 @@ def _statement(
 
 
 def _basis_strip(
-    result: Any, corrections: np.ndarray | None, language: str = "en"
+    result: HvacSpectrumResult,
+    corrections: np.ndarray | None,
+    language: str = "en",
 ) -> list[str]:
     """The method-basis strip(s) for the reported quantity."""
     if _is_power(result):

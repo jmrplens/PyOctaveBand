@@ -24,6 +24,7 @@ from .common import (
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
     from ..materials.absorbers.airflow_resistance import StaticAirflowResult
     from ..materials.absorbers.biot import BiotWavesResult
@@ -123,7 +124,7 @@ def _t(text: str, language: str = "en") -> str:
     return _STRINGS.get(text, text) if language == "es" else text
 
 
-def _localize_band_axes(ax: Any, language: str) -> None:
+def _localize_band_axes(ax: Axes, language: str) -> None:
     """Comma-localise the numeric y-axis of a categorical band plot.
 
     :func:`~phonometry._i18n.localize_axes` reformats only the automatic numeric
@@ -1044,7 +1045,7 @@ def plot_diffuser_polar_response(
 
 def plot_transfer_matrix(
     matrix: TransferMatrix,
-    frequency: Any,
+    frequency: ArrayLike,
     characteristic_impedance: float,
     ax: Axes | None = None,
     language: str = "en",

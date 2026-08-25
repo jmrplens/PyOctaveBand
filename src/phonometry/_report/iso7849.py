@@ -44,7 +44,7 @@ matplotlib in ``phonometry[plot]``); each is guarded with an actionable
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -60,6 +60,8 @@ from ._sound_power_fiche import (
 )
 
 if TYPE_CHECKING:
+    from reportlab.platypus import Table
+
     from ..emission.vibration_sound_power import VibrationSoundPowerResult
     from .metadata import ReportMetadata
 
@@ -69,13 +71,13 @@ if TYPE_CHECKING:
 _UNITY_TOLERANCE = 1e-9
 
 
-def _is_survey(result: Any) -> bool:
+def _is_survey(result: VibrationSoundPowerResult) -> bool:
     """Return ``True`` for the survey method (every band uses ``epsilon = 1``)."""
     eps = np.asarray(result.radiation_factor, dtype=np.float64)
     return bool(np.all(np.abs(eps - 1.0) < _UNITY_TOLERANCE))
 
 
-def _basis(result: Any, language: str = "en") -> str:
+def _basis(result: VibrationSoundPowerResult, language: str = "en") -> str:
     """The standard-basis line naming the vibration method and its part."""
     if _is_survey(result):
         return t(
@@ -92,7 +94,9 @@ def _basis(result: Any, language: str = "en") -> str:
     )
 
 
-def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
+def _value_table(
+    result: VibrationSoundPowerResult, verbose: bool, language: str = "en"
+) -> Table:
     """Build the full-width per-band table (nominal frequency, Lv, LW).
 
     The default table is the ``f | Lv | LW`` form; ``verbose`` inserts the
@@ -141,7 +145,9 @@ def _eps_cell(value: float, language: str = "en") -> str:
     return format_number(float(value), language, decimals=3)
 
 
-def _statement(result: Any, language: str = "en") -> tuple[str, list[str]]:
+def _statement(
+    result: VibrationSoundPowerResult, language: str = "en"
+) -> tuple[str, list[str]]:
     """The boxed sound-power result and its extended terms.
 
     Delegates the ``LWA``/``LW`` box to the shared
@@ -185,7 +191,7 @@ def _relation_strip(language: str = "en") -> str:
     ).format(imp=imp)
 
 
-def _factor_strip(result: Any, language: str = "en") -> str:
+def _factor_strip(result: VibrationSoundPowerResult, language: str = "en") -> str:
     """The radiation-factor / A-weighting line for the basis strip."""
     if _is_survey(result):
         factor = t(

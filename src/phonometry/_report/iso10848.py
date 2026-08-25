@@ -64,6 +64,10 @@ from ._layout import (
 from .iso717 import _metadata_pairs
 
 if TYPE_CHECKING:
+    from reportlab.lib.colors import Color
+    from reportlab.lib.styles import StyleSheet1
+    from reportlab.platypus import Table
+
     from ..building.measurement.flanking_transmission import (
         FlankingImpactLevelResult,
         FlankingLevelDifferenceResult,
@@ -315,7 +319,7 @@ def _kij_value_table(
     in_mean: np.ndarray,
     verbose: bool,
     language: str,
-) -> Any:
+) -> Table:
     """Build the per-band ``Kij`` table.
 
     Bands bracketed for poor modal overlap are printed with their value in
@@ -357,10 +361,10 @@ def _kij_result_box(
     bracketed: np.ndarray | None,
     in_mean: np.ndarray,
     band_range: tuple[float, float],
-    styles: Any,
-    accent: Any,
+    styles: StyleSheet1,
+    accent: Color,
     language: str,
-) -> Any:
+) -> Table:
     """Build the boxed single-number ``Kij`` result with its extended terms."""
     low, high = band_range
     averaged = int(np.count_nonzero(in_mean))

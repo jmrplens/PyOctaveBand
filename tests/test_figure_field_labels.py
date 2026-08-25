@@ -20,7 +20,7 @@ from __future__ import annotations
 import math
 import pathlib
 import sys
-from typing import Any
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -36,16 +36,23 @@ if _SCRIPTS not in sys.path:
 
 from figures.fields._core import _fit_text_below, _fit_text_x, _layout_box
 
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from matplotlib.axes import Axes
+    from matplotlib.figure import Figure
+    from matplotlib.text import Text
+
 GAP = 8.0
 
 
 @pytest.fixture(autouse=True)
-def _close_figures() -> Any:
+def _close_figures() -> Iterator[None]:
     yield
     plt.close("all")
 
 
-def _panel() -> tuple[Any, Any]:
+def _panel() -> tuple[Figure, Axes]:
     """A plain 10 x 10 data panel, drawn at a fixed size and resolution."""
     fig, ax = plt.subplots(figsize=(6.0, 4.0), dpi=100)
     ax.set_xlim(0.0, 10.0)
@@ -53,7 +60,7 @@ def _panel() -> tuple[Any, Any]:
     return fig, ax
 
 
-def _x_span(ax: Any, artist: Any) -> tuple[float, float]:
+def _x_span(ax: Axes, artist: Text) -> tuple[float, float]:
     """The artist's rendered box, in x data units of *ax*."""
     box = _layout_box(artist)
     inv = ax.transData.inverted()
@@ -63,7 +70,7 @@ def _x_span(ax: Any, artist: Any) -> tuple[float, float]:
 
 def _slide_below(
     rotation: float,
-) -> tuple[Any, Any, Any, Any, float, tuple[float, float]]:
+) -> tuple[Figure, Axes, Text, Text, float, tuple[float, float]]:
     """Run ``_fit_text_below`` on a label tilted *rotation* degrees.
 
     The label is anchored on top of the one it has to clear, so the pass

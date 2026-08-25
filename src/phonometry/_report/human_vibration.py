@@ -71,7 +71,9 @@ from ._layout import (
 )
 
 if TYPE_CHECKING:
-    from ..vibration.human.exposure import DailyVibrationExposure
+    from reportlab.platypus import Table
+
+    from ..vibration.human.exposure import DailyVibrationExposure, ExposureAssessment
     from .metadata import ReportMetadata
 
 #: Number of decimal places the fiche displays vibration magnitudes at. Two
@@ -164,7 +166,7 @@ def _metadata_pairs(
 
 def _operations_table(
     result: DailyVibrationExposure, verbose: bool = False, language: str = "en"
-) -> Any:
+) -> Table:
     """The per-operation exposure-analysis table (ISO 5349-1/-2 Eqs. (2)/(3)).
 
     One row per operation (label, the vibration total value, the daily exposure
@@ -284,7 +286,7 @@ def _assessment_rows(
     ]
 
 
-def _assessment_table(result: DailyVibrationExposure, language: str = "en") -> Any:
+def _assessment_table(result: DailyVibrationExposure, language: str = "en") -> Table:
     """The Directive 2002/44/EC assessment table (exceeded / not exceeded)."""
     from reportlab.lib.units import mm
 
@@ -321,7 +323,7 @@ _ZONE_LABELS: dict[str, str] = {
 }
 
 
-def _displayed_zone(assessment: Any) -> str:
+def _displayed_zone(assessment: ExposureAssessment) -> str:
     """The exposure zone evaluated on the value rounded as displayed.
 
     The assessment rows and the verdict compare ``A(8)`` rounded exactly as

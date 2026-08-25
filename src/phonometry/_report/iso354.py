@@ -57,6 +57,8 @@ from ._layout import (
 )
 
 if TYPE_CHECKING:
+    from reportlab.platypus import Table
+
     from ..materials.absorbers.sound_absorption import SoundAbsorptionMeasurement
     from .metadata import ReportMetadata
 
@@ -131,7 +133,7 @@ def _metadata_pairs(
     ]
 
 
-def _alpha_table(freqs: np.ndarray, alpha_s: np.ndarray, language: str = "en") -> Any:
+def _alpha_table(freqs: np.ndarray, alpha_s: np.ndarray, language: str = "en") -> Table:
     """Build the compact two-column ``f | alpha_s`` table (accredited default)."""
     from reportlab.lib.units import mm
 
@@ -148,7 +150,7 @@ def _alpha_table(freqs: np.ndarray, alpha_s: np.ndarray, language: str = "en") -
     return band_table(rows, [28 * mm, 28 * mm], len(freqs), band_centres=freqs)
 
 
-def _detail_table(result: SoundAbsorptionMeasurement, language: str = "en") -> Any:
+def _detail_table(result: SoundAbsorptionMeasurement, language: str = "en") -> Table:
     """Build the verbose table ``f | T1 | T2 | A1 | A2 | alpha_s`` (~102 mm wide)."""
     from reportlab.lib.units import mm
 

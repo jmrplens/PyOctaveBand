@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
 
-    from ..simulation.elastic_fdtd import ElasticFDTDResult
+    from ..simulation.elastic_fdtd import ElasticFDTDResult, ElasticSource
     from ..simulation.fdtd import FDTDResult
 
 _TIME_LABEL = "Time [ms]"
@@ -273,7 +273,7 @@ def plot_fdtd_snapshot(
 
 
 def _elastic_source_position(
-    source: Any,
+    source: ElasticSource,
     dx: float,
 ) -> tuple[float, float]:
     """Physical position of an elastic source marker."""

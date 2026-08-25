@@ -58,6 +58,7 @@ from ._layout import (
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
+    from reportlab.platypus import Table
 
     from ..environment.propagation.ground_barriers import BarrierInsertionLoss
     from ..environment.propagation.outdoor_propagation import (
@@ -183,7 +184,7 @@ def _attenuation_table(
     levels: _AttenuationLevels | None,
     verbose: bool,
     language: str,
-) -> Any:
+) -> Table:
     """The full-width per-band attenuation table (ISO 9613-2:1996, clause 7).
 
     One row per octave band: the divergence, atmospheric, ground and barrier
@@ -500,7 +501,7 @@ def _barrier_metadata_pairs(
     return [(label, value) for label, value in specs if value]
 
 
-def _barrier_table(result: BarrierInsertionLoss, verbose: bool, language: str) -> Any:
+def _barrier_table(result: BarrierInsertionLoss, verbose: bool, language: str) -> Table:
     """The per-band barrier insertion-loss table (``IL`` and, verbose, ``N``)."""
     from reportlab.lib.units import mm
 

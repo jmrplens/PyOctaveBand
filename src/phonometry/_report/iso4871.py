@@ -52,6 +52,8 @@ from ._layout import (
 )
 
 if TYPE_CHECKING:
+    from reportlab.platypus import Table
+
     from ..emission.declaration import NoiseEmissionDeclaration
     from .metadata import ReportMetadata
 
@@ -224,7 +226,7 @@ def _emission_declared_cell(value: int | None, language: str = "en") -> str:
 
 def _declaration_table(
     declaration: NoiseEmissionDeclaration, language: str = "en"
-) -> Any:
+) -> Table:
     """Reproduce the ISO 4871 Annex B declaration table (identification + values)."""
     from reportlab.lib import colors
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet

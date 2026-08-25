@@ -60,7 +60,7 @@ lazily; each is guarded with an actionable :class:`ImportError`.
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -80,6 +80,8 @@ from ._sound_power_fiche import (
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
+    from reportlab.platypus import Table
 
     from ..emission.sound_power_intensity import (
         PrecisionCriteria,
@@ -140,7 +142,7 @@ _SPLIT_ABOVE = 8
 _PRECISION_FIGSIZE = (9.2, 2.5)
 
 
-def _basis(result: Any, language: str = "en") -> str:
+def _basis(result: SoundPowerIntensityResult, language: str = "en") -> str:
     """The standard-basis line naming the scanning method and its grade."""
     grade = _GRADE_PHRASE.get(
         getattr(result, "grade", "engineering"), _GRADE_PHRASE["engineering"]
@@ -153,7 +155,9 @@ def _basis(result: Any, language: str = "en") -> str:
     ).format(grade=t(grade, language))
 
 
-def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
+def _value_table(
+    result: SoundPowerIntensityResult, verbose: bool, language: str = "en"
+) -> Table:
     """Build the full-width per-band table (nominal frequency, LW, indicators).
 
     The default table is the recommended ``f | LW`` form; ``verbose`` adds the
@@ -210,7 +214,9 @@ def _grade_cell(grade: np.ndarray | None, i: int) -> str:
     return _GRADE_CELL.get(str(grade[i]), _ABSENT)
 
 
-def _statement(result: Any, language: str = "en") -> tuple[str, list[str]]:
+def _statement(
+    result: SoundPowerIntensityResult, language: str = "en"
+) -> tuple[str, list[str]]:
     """The boxed sound-power result and its extended terms.
 
     Delegates the ``LWA``/``LW`` box to the shared
@@ -236,7 +242,7 @@ def _statement(result: Any, language: str = "en") -> tuple[str, list[str]]:
     return statement, extended
 
 
-def _indicator_strip(result: Any, language: str = "en") -> str:
+def _indicator_strip(result: SoundPowerIntensityResult, language: str = "en") -> str:
     """The partial-power / field-indicator line for the basis strip."""
     grade = getattr(result, "grade", "engineering")
     return t(
@@ -255,7 +261,7 @@ def _indicator_strip(result: Any, language: str = "en") -> str:
     )
 
 
-def _criteria_strip(result: Any, language: str = "en") -> str:
+def _criteria_strip(result: SoundPowerIntensityResult, language: str = "en") -> str:
     """The Annex B qualification / A-weighting line for the basis strip."""
     text = t(
         "A band reaches engineering grade when L<sub>d</sub> &gt; F<sub>pI</sub>"
@@ -357,7 +363,7 @@ def _precision_basis(language: str = "en") -> str:
     ).format(grade=t(_PRECISION_GRADE_PHRASE, language))
 
 
-def _band_uncertainty(result: Any) -> np.ndarray:
+def _band_uncertainty(result: PrecisionIntensityResult) -> np.ndarray:
     """Per-band expanded uncertainty ``U = 2 sigma_R0`` (Table 1), in dB.
 
     ISO 9614-3:2002 clause 4.3 states the expanded uncertainty for a coverage
@@ -438,12 +444,12 @@ def _qualified_cell(
 
 
 def _precision_value_table(
-    result: Any,
+    result: PrecisionIntensityResult,
     indicators: PrecisionFieldIndicators | None,
     criteria: PrecisionCriteria | None,
     verbose: bool,
     language: str = "en",
-) -> Any:
+) -> Table:
     """Build the per-band table of the precision fiche.
 
     The default columns are the ones clause 10 f) asks for: the band level
@@ -519,7 +525,7 @@ def _precision_value_table(
     return power_value_table(header, rows_data, widths, fraction)
 
 
-def _precision_caption(result: Any, language: str = "en") -> str:
+def _precision_caption(result: PrecisionIntensityResult, language: str = "en") -> str:
     """The band-set caption, extended with the frequency range determined.
 
     ISO 9614-3:2002 clause 4.3 covers the one-third-octave bands from 50 Hz to
@@ -538,7 +544,9 @@ def _precision_caption(result: Any, language: str = "en") -> str:
     )
 
 
-def _precision_omitted(result: Any, criteria: PrecisionCriteria | None) -> np.ndarray:
+def _precision_omitted(
+    result: PrecisionIntensityResult, criteria: PrecisionCriteria | None
+) -> np.ndarray:
     """The bands the A-weighted determination leaves out, per band.
 
     Two rules put a band here, and the sheet has to distinguish them: the
@@ -553,7 +561,7 @@ def _precision_omitted(result: Any, criteria: PrecisionCriteria | None) -> np.nd
     return omitted
 
 
-def _precision_level_a(result: Any, omitted: np.ndarray) -> float:
+def _precision_level_a(result: PrecisionIntensityResult, omitted: np.ndarray) -> float:
     """The A-weighted level the fiche boxes: the qualified bands only.
 
     The result object sums every applicable band, because it is computed
@@ -575,7 +583,7 @@ def _precision_level_a(result: Any, omitted: np.ndarray) -> float:
 
 
 def _precision_statement(
-    result: Any, level_a: float, language: str = "en"
+    result: PrecisionIntensityResult, level_a: float, language: str = "en"
 ) -> tuple[str, list[str]]:
     """The boxed precision result and its extended terms.
 
@@ -625,7 +633,7 @@ def _precision_statement(
     return statement, extended
 
 
-def _normalization_offset(result: Any) -> float:
+def _normalization_offset(result: PrecisionIntensityResult) -> float:
     """The applied meteorological normalization ``LW - LW0``, in dB (Eq. 10).
 
     The term depends only on the test atmosphere, so it is the same in every
@@ -648,7 +656,7 @@ def _dynamic_capability(
 
 
 def _precision_model_strip(
-    result: Any,
+    result: PrecisionIntensityResult,
     indicators: PrecisionFieldIndicators | None,
     residual_index: float | Sequence[float] | np.ndarray | None,
     language: str = "en",
@@ -723,7 +731,10 @@ def _failed_criteria(criteria: PrecisionCriteria | None, i: int) -> list[int]:
 
 
 def _omission_reason(
-    result: Any, criteria: PrecisionCriteria | None, i: int, language: str = "en"
+    result: PrecisionIntensityResult,
+    criteria: PrecisionCriteria | None,
+    i: int,
+    language: str = "en",
 ) -> str:
     """Why a band is out of the A-weighted determination: clause 9.2, or which criteria."""
     if bool(np.asarray(result.not_applicable_band, dtype=bool)[i]):
@@ -741,7 +752,7 @@ def _omission_reason(
 
 
 def _omitted_band_list(
-    result: Any,
+    result: PrecisionIntensityResult,
     criteria: PrecisionCriteria | None,
     omitted: np.ndarray,
     language: str = "en",
@@ -757,7 +768,7 @@ def _omitted_band_list(
 
 
 def _precision_criteria_strip(
-    result: Any,
+    result: PrecisionIntensityResult,
     criteria: PrecisionCriteria | None,
     omitted: np.ndarray,
     language: str = "en",

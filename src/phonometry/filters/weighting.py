@@ -63,6 +63,7 @@ from ..io._signal import Signal
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from numpy.typing import DTypeLike
 
 #: Rejection message shared by the three entry points that take ``fs``.
 _FS_POSITIVE = "Sample rate 'fs' must be positive."
@@ -508,15 +509,17 @@ class TimeWeightedEnvelope:
     mode: str
     calibrated: bool
 
-    def __array__(self, dtype: Any = None) -> np.ndarray:
+    def __array__(
+        self, dtype: DTypeLike | None = None, copy: bool | None = None
+    ) -> np.ndarray:
         """Return the envelope as an array (optionally recast)."""
-        return np.asarray(self.mean_square, dtype=dtype)
+        return np.asarray(self.mean_square, dtype=dtype, copy=copy)
 
     def __len__(self) -> int:
         """Length of the leading axis: channels when 2-D, samples for one channel."""
         return int(self.mean_square.shape[0])
 
-    def __getitem__(self, key: Any) -> Any:
+    def __getitem__(self, key: Any) -> Any:  # noqa: ANN401  # mirrors ndarray indexing, whose key union numpy does not export
         """Index the mean square; the result is bare values, not another envelope."""
         return self.mean_square[key]
 

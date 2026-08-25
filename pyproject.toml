@@ -183,6 +183,15 @@ select = [
     "PERF",                 # a loop whose whole body is one `append` is a
                             # comprehension, unless saying so costs more lines
                             # than it saves
+    "ANN401",               # an `Any` earns its keep or names its replacement.
+                            # A forwarding `*args`/`**kwargs` is exempt below:
+                            # matplotlib's keyword surface is an open set and
+                            # promising it closed would be the lie this rule
+                            # exists to catch. Everything else carries the type
+                            # the code actually handles, `object` when it never
+                            # looks inside, or a reasoned noqa when openness is
+                            # the point; every site was read one by one before
+                            # this went on
 ]
 ignore = [
     # TC006 quotes the first argument of `typing.cast`, which that function
@@ -217,6 +226,12 @@ ignore = [
     "D203",  # a blank line before a class docstring; D211 is the house shape
     "D213",  # the summary on the second line; D212 is the house shape
 ]
+[tool.ruff.lint.flake8-annotations]
+# The seam ANN401 needs to stay honest: a star-argument that only forwards is
+# allowed to be `Any`, because the set of keywords matplotlib and friends
+# accept is open and no TypedDict can close it truthfully.
+allow-star-arg-any = true
+
 [tool.ruff.lint.per-file-ignores]
 # `matplotlib.use("Agg")` has to run between `import matplotlib` and the first
 # `import matplotlib.pyplot`, and the scripts put the repository on `sys.path`

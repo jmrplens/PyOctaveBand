@@ -55,10 +55,13 @@ from ._layout import (
     result_box,
     two_panel_body,
 )
+from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.platypus import Table
+
     from ..materials.absorbers.impedance_tube import ImpedanceTubeResult
-    from .metadata import ReportMetadata
 
 #: Printable label for each accepted ``ReportMetadata.tube_shape`` value.
 _SHAPE_LABELS = {
@@ -88,21 +91,18 @@ def _metadata_pairs(
     millimetres. Only fields that are set are returned, so empty rows never
     appear.
     """
-
-    def _md(name: str) -> Any:
-        return getattr(metadata, name) if metadata is not None else None
-
-    client = _md("client")
-    manufacturer = _md("manufacturer")
-    specimen = _md("specimen")
-    tube_diameter = _md("tube_diameter")
-    mic_spacing = _md("mic_spacing")
-    tube_shape = _md("tube_shape")
-    mounting = _md("mounting")
-    test_room = _md("test_room")
-    test_date = _md("test_date")
-    temperature = _md("temperature")
-    pressure = _md("pressure")
+    md = metadata if metadata is not None else ReportMetadata()
+    client = md.client
+    manufacturer = md.manufacturer
+    specimen = md.specimen
+    tube_diameter = md.tube_diameter
+    mic_spacing = md.mic_spacing
+    tube_shape = md.tube_shape
+    mounting = md.mounting
+    test_room = md.test_room
+    test_date = md.test_date
+    temperature = md.temperature
+    pressure = md.pressure
 
     freqs = np.asarray(result.frequency, dtype=np.float64)
     freq_range = None
@@ -159,7 +159,7 @@ def _metadata_pairs(
 
 def _value_table(
     result: ImpedanceTubeResult, verbose: bool, language: str = "en"
-) -> Any:
+) -> Table:
     """Build the per-frequency value table (~102 mm wide).
 
     The default table lists ``f | alpha | Re z | Im z`` (the normal-incidence
@@ -263,9 +263,9 @@ def _caption(verbose: bool, language: str = "en") -> str:
 def _body(
     result: ImpedanceTubeResult,
     verbose: bool,
-    caption_style: Any,
+    caption_style: ParagraphStyle,
     language: str = "en",
-) -> Any:
+) -> Table:
     """The two-panel body: the per-frequency table beside the ``alpha(f)`` curve.
 
     Called only after the renderer has imported reportlab.

@@ -17,7 +17,10 @@ lazily and is a no-op for English, so English plots are byte-for-byte unchanged.
 from __future__ import annotations
 
 import re
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Literal
+
+if TYPE_CHECKING:
+    from matplotlib.axes import Axes
 
 #: Supported rendering languages. English is the default everywhere.
 Language = Literal["en", "es"]
@@ -108,7 +111,7 @@ def decimal_comma(value: str, language: str = "en") -> str:
     return value.replace(".", ",") if language == "es" else value
 
 
-def localize_axes(ax: Any, language: str = "en") -> None:
+def localize_axes(ax: Axes, language: str = "en") -> None:
     """Localise the tick-label decimal separator of ``ax`` for the language.
 
     For Spanish, both axes' major tick labels are reformatted so decimals use a
@@ -129,7 +132,7 @@ def localize_axes(ax: Any, language: str = "en") -> None:
         than the ``1`` and ``1,5`` a bare ``{x:g}`` would produce.
         """
 
-        def __call__(self, x: float, pos: Any = None) -> str:
+        def __call__(self, x: float, pos: int | None = None) -> str:
             return super().__call__(x, pos).replace(".", ",")
 
     for axis in (ax.xaxis, ax.yaxis):

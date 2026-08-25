@@ -9,6 +9,7 @@ import numpy as np
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from matplotlib.typing import ColorType
 
     from ..signals.cepstrum import (
         CepstrumResult,
@@ -21,6 +22,7 @@ if TYPE_CHECKING:
         TimeDelayResult,
     )
     from ..signals.envelope import EnvelopeResult, EnvelopeSpectrumResult
+    from ..signals.inversion import InverseFilterResult
     from ..signals.miso import MISOCoherenceResult
     from ..signals.multitaper import MultitaperSpectralDensityResult
     from ..signals.phase import PhaseDecompositionResult
@@ -214,7 +216,7 @@ def _plot_density_with_band(
     language: str,
     kwargs: dict[str, Any],
     *,
-    band_color: Any,
+    band_color: ColorType | None,
     band_alpha: float | None,
     band_label: str,
     line_label: str,
@@ -1460,7 +1462,11 @@ def plot_envelope_spectrum(
 
 #: Y-axis labels of the stationarity plot, keyed by the segment statistic.
 def plot_inverse_filter(
-    result: Any, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    result: InverseFilterResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Measured, inverse and equalized magnitudes of a regularized inversion.
 
