@@ -16,6 +16,8 @@ values, like the sibling report tests.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 import reference_data as ref
@@ -29,10 +31,15 @@ from phonometry.building.measurement.intensity_insulation import (
     IntensityElementNormalizedResult,
 )
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
 _A0 = 10.0
 
 
-def _levels_for_target_dine(dine, lp1, sm, n):
+def _levels_for_target_dine(
+    dine: list[float] | np.ndarray, lp1: float, sm: float, n: int
+) -> np.ndarray:
     """Receiving-side LIn that make the corrected Formula (8) return ``dine``."""
     return (
         lp1
@@ -74,7 +81,7 @@ def test_dine_equals_annex_c_curve() -> None:
     np.testing.assert_allclose(result.d_i_n_e, ref.ISO717_1_ANNEX_C_R, atol=1e-9)
 
 
-def test_fiche_rating_pinned_to_iso717_1_annex_c(tmp_path) -> None:
+def test_fiche_rating_pinned_to_iso717_1_annex_c(tmp_path: Path) -> None:
     """The DI,n,e fiche's rating is the published 30 (-2; -3) dB."""
     out = tmp_path / "dine.pdf"
     _element_result().report(str(out))
@@ -90,7 +97,7 @@ def test_fiche_rating_pinned_to_iso717_1_annex_c(tmp_path) -> None:
     assert "20.4" in text  # the 100 Hz band value
 
 
-def test_full_metadata_and_verbose_render_one_page(tmp_path) -> None:
+def test_full_metadata_and_verbose_render_one_page(tmp_path: Path) -> None:
     """A fully populated verbose fiche is one page and shows the evaluation."""
     metadata = ReportMetadata(
         specimen="Trickle ventilator in a 100 mm masonry wall",
@@ -117,7 +124,7 @@ def test_full_metadata_and_verbose_render_one_page(tmp_path) -> None:
     assert "ISO 717 evaluation" in text  # the verbose caption
 
 
-def test_requirement_verdicts_pass_and_fail(tmp_path) -> None:
+def test_requirement_verdicts_pass_and_fail(tmp_path: Path) -> None:
     """Element insulation passes at or above the requirement."""
     result = _element_result()  # DI,n,e,w = 30 dB
     failing = tmp_path / "fail.pdf"
@@ -129,7 +136,7 @@ def test_requirement_verdicts_pass_and_fail(tmp_path) -> None:
     assert "PASS" in _extract_text(str(passing))
 
 
-def test_octave_band_fiche_renders(tmp_path) -> None:
+def test_octave_band_fiche_renders(tmp_path: Path) -> None:
     """A five-octave-band element result also yields a one-page fiche."""
     result = _octave_result()
     assert result.rating is not None
@@ -139,7 +146,7 @@ def test_octave_band_fiche_renders(tmp_path) -> None:
     assert "Octave-band" in _extract_text(str(out))
 
 
-def test_spanish_fiche_renders_translated(tmp_path) -> None:
+def test_spanish_fiche_renders_translated(tmp_path: Path) -> None:
     """``language="es"`` renders the Spanish fiche with comma decimals."""
     import re
 
@@ -156,7 +163,7 @@ def test_spanish_fiche_renders_translated(tmp_path) -> None:
     assert re.search(r"\d+,\d", text)  # comma decimal separator
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     out = str(tmp_path / "x.pdf")
     result = _element_result()
@@ -164,7 +171,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         result.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unsupported language raises ``ValueError`` (shared validation path)."""
     out = str(tmp_path / "x.pdf")
     result = _element_result()
@@ -172,7 +179,7 @@ def test_unknown_language_rejected(tmp_path) -> None:
         result.report(out, language="fr")
 
 
-def test_missing_rating_rejected(tmp_path) -> None:
+def test_missing_rating_rejected(tmp_path: Path) -> None:
     """A result without the ISO 717 rating (non-core band count) is rejected."""
     l_in = _levels_for_target_dine(np.full(8, 40.0), 85.0, 12.0, 1)
     result = building.intensity_element_normalized_difference(
@@ -184,7 +191,7 @@ def test_missing_rating_rejected(tmp_path) -> None:
         result.report(out)
 
 
-def test_non_iso_band_count_rejected(tmp_path) -> None:
+def test_non_iso_band_count_rejected(tmp_path: Path) -> None:
     """A manually built 8-band result with matching rating arrays is rejected.
 
     The public API promises only the 16 one-third-octave or 5 octave bands
@@ -208,7 +215,7 @@ def test_non_iso_band_count_rejected(tmp_path) -> None:
         result.report(out)
 
 
-def test_rating_without_per_band_data_rejected(tmp_path) -> None:
+def test_rating_without_per_band_data_rejected(tmp_path: Path) -> None:
     """A manually built rating lacking the per-band arrays is rejected."""
     bare_rating = building.WeightedRatingResult(
         rating=30, c=-2, ctr=-3, unfavourable_sum=0.0

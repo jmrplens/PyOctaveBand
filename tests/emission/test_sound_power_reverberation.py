@@ -31,7 +31,14 @@ def _c2(theta: float, ps: float) -> float:
     return -10.0 * np.log10(ps / _PS0) + 15.0 * np.log10((273.15 + theta) / _THETA1)
 
 
-def _bracket(t60, volume, surface, freq, theta, ps):
+def _bracket(
+    t60: np.ndarray,
+    volume: float,
+    surface: float,
+    freq: np.ndarray,
+    theta: float,
+    ps: float,
+) -> np.ndarray:
     """Independent re-implementation of the Eq. (20) bracket, for inversion."""
     c = 20.05 * np.sqrt(273.0 + theta)
     a = (55.26 / c) * (volume / np.asarray(t60, dtype=float))

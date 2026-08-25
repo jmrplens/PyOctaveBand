@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import math
 import warnings
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -45,6 +46,9 @@ from phonometry.materials.absorbers.airflow_resistance import (
     static_airflow_resistance,
     thermal_boundary_layer_thickness,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 # --- 3.1-3.4: quantity chain and units --------------------------------------
 
@@ -103,7 +107,7 @@ def test_specific_resistance_requires_exactly_one_route() -> None:
         ),
     ],
 )
-def test_invalid_inputs_raise(call, message: str) -> None:  # type: ignore[no-untyped-def]
+def test_invalid_inputs_raise(call: Callable[[], object], message: str) -> None:
     with pytest.raises(ValueError, match=message):
         call()
 
@@ -173,7 +177,7 @@ def test_static_velocity_above_limit_warns() -> None:
         ),
     ],
 )
-def test_static_invalid_inputs_raise(call, message: str) -> None:  # type: ignore[no-untyped-def]
+def test_static_invalid_inputs_raise(call: Callable[[], object], message: str) -> None:
     with pytest.raises(ValueError, match=message):
         call()
 

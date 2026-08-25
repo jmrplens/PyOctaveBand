@@ -10,6 +10,7 @@ clear :class:`ValueError`.
 from __future__ import annotations
 
 import warnings
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pytest
@@ -50,6 +51,9 @@ from phonometry.materials.surfaces.road_absorption import (
     InsituAbsorptionResult,
 )
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
 _C0 = 343.0
 _RHO0 = 1.205
 _RC = _RHO0 * _C0
@@ -67,11 +71,11 @@ def _texts(ax_or_axes: object) -> str:
     return "\n".join(parts)
 
 
-def _weighted():
+def _weighted() -> materials.AbsorptionRatingResult:
     return weighted_absorption([0.35, 0.50, 0.65, 0.60, 0.55])
 
 
-def _measurement():
+def _measurement() -> materials.SoundAbsorptionMeasurement:
     freqs = np.array([250.0, 500.0, 1000.0, 2000.0, 4000.0])
     t1 = np.array([7.8, 7.4, 6.9, 5.8, 4.6])
     t2 = np.array([6.5, 4.2, 2.85, 2.5, 2.7])
@@ -80,28 +84,28 @@ def _measurement():
     )
 
 
-def _scattering():
+def _scattering() -> materials.ScatteringResult:
     return scattering_coefficient_spectrum(
         [250.0, 500.0, 1000.0], [0.2, 0.3, 0.5], [0.1, 0.1, 0.1]
     )
 
 
-def _diffusion():
+def _diffusion() -> materials.DiffusionResult:
     return directional_diffusion([-30.0, 0.0, 30.0], [70.0, 72.0, 69.0])
 
 
-def _insitu():
+def _insitu() -> InsituAbsorptionResult:
     return InsituAbsorptionResult(
         frequencies=np.array([250.0, 500.0, 1000.0, 2000.0]),
         absorption=np.array([0.2, 0.4, 0.6, 0.5]),
     )
 
 
-def _dynamic_stiffness():
+def _dynamic_stiffness() -> materials.DynamicStiffnessResult:
     return floating_floor_resonance(25.0, 200.0, 100.0)
 
 
-def _impedance_tube():
+def _impedance_tube() -> ImpedanceTubeResult:
     f = np.array([500.0, 1000.0, 1500.0])
     reflection = np.array([0.4 - 0.3j, 0.3 - 0.2j, 0.2 - 0.1j])
     absorption = 1.0 - np.abs(reflection) ** 2
@@ -115,26 +119,26 @@ def _impedance_tube():
     )
 
 
-def _static_airflow():
+def _static_airflow() -> materials.StaticAirflowResult:
     u = np.array([1.0e-3, 2.0e-3, 4.0e-3])
     dp = 12000.0 * u
     return static_airflow_resistance(u, dp, 0.008)
 
 
-def _uncertainty():
+def _uncertainty() -> materials.AbsorptionUncertaintyResult:
     freqs = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
     alpha = [0.15, 0.35, 0.55, 0.70, 0.80, 0.85]
     return materials.sound_absorption_coefficient_uncertainty(alpha, freqs)
 
 
-def _porous_medium():
+def _porous_medium() -> materials.PorousMediumResult:
     f = np.geomspace(100.0, 5000.0, 24)
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         return delany_bazley(f, 20000.0, air_density=_RHO0, speed_of_sound=_C0)
 
 
-def _layered():
+def _layered() -> materials.LayeredAbsorberResult:
     f = np.geomspace(100.0, 5000.0, 24)
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
@@ -142,7 +146,7 @@ def _layered():
         return layered_absorber(f, [PorousLayer(0.05, med)])
 
 
-def _diffuse():
+def _diffuse() -> materials.DiffuseFieldAbsorptionResult:
     f = np.geomspace(100.0, 5000.0, 24)
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
@@ -174,7 +178,7 @@ _CASES = [
 @pytest.mark.parametrize(
     ("name", "build", "spanish"), _CASES, ids=[c[0] for c in _CASES]
 )
-def test_plot_spanish_labels(name: str, build, spanish: str) -> None:
+def test_plot_spanish_labels(name: str, build: Callable[[], Any], spanish: str) -> None:
     result = build()
     ax = result.plot(language="es")
     assert spanish in _texts(ax)
@@ -184,7 +188,9 @@ def test_plot_spanish_labels(name: str, build, spanish: str) -> None:
 @pytest.mark.parametrize(
     ("name", "build", "spanish"), _CASES, ids=[c[0] for c in _CASES]
 )
-def test_plot_rejects_unknown_language(name: str, build, spanish: str) -> None:
+def test_plot_rejects_unknown_language(
+    name: str, build: Callable[[], Any], spanish: str
+) -> None:
     result = build()
     with pytest.raises(ValueError, match="Unknown language"):
         result.plot(language="xx")

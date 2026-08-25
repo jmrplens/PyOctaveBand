@@ -14,6 +14,8 @@ the mandatory field-method statement, like the sibling report tests.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
@@ -32,13 +34,16 @@ from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, building
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
 #: A receiving-room reverberation time equal to T0 = 0,5 s in every band:
 #: the standardized quantities then equal the raw ones exactly
 #: (10 lg(T/T0) = 0), making the fiche's rating hand-computable.
 _T_AT_T0 = np.full(16, 0.5)
 
 
-def _airborne_result(**kwargs) -> building.AirborneInsulationResult:
+def _airborne_result(**kwargs: float) -> building.AirborneInsulationResult:
     """A field airborne result whose ``DnT`` equals the ISO 717-1 Annex C curve."""
     l1 = np.full(16, 90.0)
     l2 = l1 - np.asarray(_AIRBORNE_R, dtype=np.float64)
@@ -67,7 +72,7 @@ def test_dnt_reverberation_correction_hand_computed() -> None:
     assert np.allclose(result.dnt, result.d + 10.0 * np.log10(2.0))
 
 
-def test_airborne_fiche_rating_pinned_to_iso717_1_annex_c(tmp_path) -> None:
+def test_airborne_fiche_rating_pinned_to_iso717_1_annex_c(tmp_path: Path) -> None:
     """The DnT fiche's rating is the published ISO 717-1 Annex C 30 (-2; -3) dB.
 
     ``DnT = D`` here by construction, so the fiche must print the exact
@@ -84,7 +89,7 @@ def test_airborne_fiche_rating_pinned_to_iso717_1_annex_c(tmp_path) -> None:
     assert "engineering method" in text
 
 
-def test_r_prime_fiche_hand_computed(tmp_path) -> None:
+def test_r_prime_fiche_hand_computed(tmp_path: Path) -> None:
     """R' = D + 10 lg(S T / (0,16 V)) (Formulae (4)/(5)) drives the R' fiche.
 
     With S = 10 m2, V = 50 m3 and T = 0,5 s the absorption area is
@@ -108,7 +113,7 @@ def test_impact_lnt_equals_li_at_reference_time() -> None:
     assert np.allclose(result.l_n_t, _IMPACT_LN)
 
 
-def test_impact_fiche_rating_pinned_to_iso717_2_annex_c(tmp_path) -> None:
+def test_impact_fiche_rating_pinned_to_iso717_2_annex_c(tmp_path: Path) -> None:
     """The L'nT fiche's rating is the published ISO 717-2 Annex C 79 (-11) dB."""
     result = building.impact_insulation(_IMPACT_LN, _T_AT_T0, volume=31.25)
     out = tmp_path / "lnt.pdf"
@@ -123,7 +128,7 @@ def test_impact_fiche_rating_pinned_to_iso717_2_annex_c(tmp_path) -> None:
     assert "tapping machine" in " ".join(text.split())
 
 
-def test_impact_l_n_fiche_hand_computed(tmp_path) -> None:
+def test_impact_l_n_fiche_hand_computed(tmp_path: Path) -> None:
     """L'n = Li + 10 lg(A/A0) with A = 0,16 V/T (Formulae (2)/(6)).
 
     V = 31,25 m3 and T = 0,5 s give A = 10 m2 = A0, so L'n = Li and the
@@ -140,7 +145,7 @@ def test_impact_l_n_fiche_hand_computed(tmp_path) -> None:
     assert "Normalized impact sound pressure level" in text
 
 
-def test_full_metadata_and_verbose_render_one_page(tmp_path) -> None:
+def test_full_metadata_and_verbose_render_one_page(tmp_path: Path) -> None:
     """A fully populated field fiche with the measurement chain is one page."""
     result = _airborne_result(area=12.5, volume=30.4)
     metadata = ReportMetadata(
@@ -165,7 +170,7 @@ def test_full_metadata_and_verbose_render_one_page(tmp_path) -> None:
     assert "PASS" in text  # DnT,w = 30 dB >= 25 dB
 
 
-def test_requirement_verdicts_pass_and_fail(tmp_path) -> None:
+def test_requirement_verdicts_pass_and_fail(tmp_path: Path) -> None:
     """Airborne passes at/above the requirement; impact at/below it."""
     airborne = _airborne_result()  # DnT,w = 30 dB
     failing = tmp_path / "fail.pdf"
@@ -178,7 +183,7 @@ def test_requirement_verdicts_pass_and_fail(tmp_path) -> None:
     assert "PASS" in _extract_text(str(passing))
 
 
-def test_spanish_fiche_renders_translated(tmp_path) -> None:
+def test_spanish_fiche_renders_translated(tmp_path: Path) -> None:
     """``language="es"`` renders the Spanish field fiche with comma decimals."""
     import re
 
@@ -197,7 +202,7 @@ def test_spanish_fiche_renders_translated(tmp_path) -> None:
     assert re.search(r"\d+,\d", text)  # comma decimal separator
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     result = _airborne_result()
     out = str(tmp_path / "x.pdf")
@@ -205,7 +210,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         result.report(out, engine="weasyprint")
 
 
-def test_unknown_quantity_rejected(tmp_path) -> None:
+def test_unknown_quantity_rejected(tmp_path: Path) -> None:
     """An unknown field quantity raises ``ValueError``."""
     airborne = _airborne_result()
     out = str(tmp_path / "x.pdf")
@@ -216,7 +221,7 @@ def test_unknown_quantity_rejected(tmp_path) -> None:
         impact.report(out, quantity="dnt")
 
 
-def test_missing_r_prime_rejected(tmp_path) -> None:
+def test_missing_r_prime_rejected(tmp_path: Path) -> None:
     """Requesting the R' fiche without area/volume raises ``ValueError``."""
     result = _airborne_result()
     out = str(tmp_path / "x.pdf")
@@ -224,7 +229,7 @@ def test_missing_r_prime_rejected(tmp_path) -> None:
         result.report(out, quantity="r_prime")
 
 
-def test_non_core_band_count_rejected(tmp_path) -> None:
+def test_non_core_band_count_rejected(tmp_path: Path) -> None:
     """The field fiche needs the 16 core one-third-octave bands."""
     result = building.airborne_insulation(
         np.full(5, 90.0), np.full(5, 50.0), np.full(5, 0.5)
@@ -234,7 +239,7 @@ def test_non_core_band_count_rejected(tmp_path) -> None:
         result.report(out)
 
 
-def test_verbose_needs_measurement_chain(tmp_path) -> None:
+def test_verbose_needs_measurement_chain(tmp_path: Path) -> None:
     """``verbose=True`` on a manually built result (no chain) is rejected."""
     curve = np.asarray(_AIRBORNE_R, dtype=np.float64)
     bare = building.AirborneInsulationResult(d=curve, dnt=curve, r_prime=None)
@@ -247,7 +252,7 @@ def test_verbose_needs_measurement_chain(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_manual_impact_result_renders_without_chain(tmp_path) -> None:
+def test_manual_impact_result_renders_without_chain(tmp_path: Path) -> None:
     """A backward-compatibly built impact result reports its L'nT fiche."""
     curve = np.asarray(_IMPACT_LN, dtype=np.float64)
     bare = building.ImpactInsulationResult(l_n_t=curve, l_n=None)

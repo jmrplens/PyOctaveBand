@@ -106,7 +106,7 @@ TABLE2 = {
 
 
 @pytest.mark.parametrize(("situation", "col"), [("A", 0), ("B", 1), ("C", 2)])
-def test_table2_airborne_every_band(situation, col):
+def test_table2_airborne_every_band(situation: str, col: int) -> None:
     result = band_uncertainty("airborne", situation)
     assert list(result.frequencies) == FREQ_FULL
     for f, u in zip(result.frequencies, result.uncertainties, strict=True):
@@ -141,7 +141,7 @@ TABLE4 = {
 
 
 @pytest.mark.parametrize(("situation", "col"), [("B", 0), ("C", 1)])
-def test_table4_impact_every_band(situation, col):
+def test_table4_impact_every_band(situation: str, col: int) -> None:
     result = band_uncertainty("impact", situation)
     assert list(result.frequencies) == FREQ_IMPACT
     assert 500 not in result.frequencies  # 2020 edition drops 500 Hz
@@ -149,7 +149,7 @@ def test_table4_impact_every_band(situation, col):
         assert u == pytest.approx(TABLE4[int(f)][col]), f"{situation} @ {f} Hz"
 
 
-def test_impact_has_no_situation_a():
+def test_impact_has_no_situation_a() -> None:
     with pytest.raises(ValueError, match="not tabulated"):
         band_uncertainty("impact", "A")
 
@@ -182,7 +182,7 @@ TABLE6_A = [
 ]
 
 
-def test_table6_reduction_every_band():
+def test_table6_reduction_every_band() -> None:
     result = band_uncertainty("impact_reduction", "A")
     assert list(result.frequencies) == FREQ_FULL
     for u, expected in zip(result.uncertainties, TABLE6_A, strict=True):
@@ -190,7 +190,7 @@ def test_table6_reduction_every_band():
 
 
 @pytest.mark.parametrize("situation", ["B", "C"])
-def test_reduction_only_situation_a(situation):
+def test_reduction_only_situation_a(situation: str) -> None:
     with pytest.raises(ValueError, match="not tabulated"):
         band_uncertainty("impact_reduction", situation)
 
@@ -223,7 +223,7 @@ TABLED1 = [
 ]
 
 
-def test_tabled1_sigma_r95_bands():
+def test_tabled1_sigma_r95_bands() -> None:
     result = band_uncertainty("airborne", "A", upper_limit=True)
     assert result.upper_limit is True
     assert list(result.frequencies) == FREQ_FULL
@@ -231,7 +231,7 @@ def test_tabled1_sigma_r95_bands():
         assert u == pytest.approx(expected)
 
 
-def test_sigma_r95_only_airborne():
+def test_sigma_r95_only_airborne() -> None:
     with pytest.raises(ValueError, match="σR95"):
         band_uncertainty("impact", "B", upper_limit=True)
 
@@ -239,7 +239,7 @@ def test_sigma_r95_only_airborne():
 # --------------------------------------------------------------------------- #
 # Table 1 — maximum repeatability standard deviation (Clause 5.8).
 # --------------------------------------------------------------------------- #
-def test_table1_maximum_repeatability():
+def test_table1_maximum_repeatability() -> None:
     result = maximum_repeatability_standard_deviation()
     expected = [
         4.0,
@@ -287,11 +287,13 @@ TABLE3 = {
 
 @pytest.mark.parametrize(("quantity", "values"), list(TABLE3.items()))
 @pytest.mark.parametrize(("situation", "idx"), [("A", 0), ("B", 1), ("C", 2)])
-def test_table3_single_number(quantity, values, situation, idx):
+def test_table3_single_number(
+    quantity: str, values: tuple[float, float, float], situation: str, idx: int
+) -> None:
     assert single_number_uncertainty(quantity, situation) == pytest.approx(values[idx])
 
 
-def test_airborne_aliases_share_row():
+def test_airborne_aliases_share_row() -> None:
     for alias in ("R_w", "Rprime_w", "Dn_w", "DnT_w"):
         assert single_number_uncertainty(alias, "A") == pytest.approx(1.2)
         assert single_number_uncertainty(alias, "B") == pytest.approx(0.9)
@@ -304,12 +306,14 @@ def test_airborne_aliases_share_row():
     ("quantity", "expected"),
     [("ln_w", (1.5, 1.0, 0.5)), ("ln_w+ci", (1.5, 1.0, 0.6))],
 )
-def test_table5_impact_single_number(quantity, expected):
+def test_table5_impact_single_number(
+    quantity: str, expected: tuple[float, float, float]
+) -> None:
     for situation, e in zip("ABC", expected, strict=True):
         assert single_number_uncertainty(quantity, situation) == pytest.approx(e)
 
 
-def test_impact_single_number_aliases():
+def test_impact_single_number_aliases() -> None:
     for alias in ("Lprime_n_w", "LnT_w"):
         assert single_number_uncertainty(alias, "C") == pytest.approx(0.5)
 
@@ -317,12 +321,12 @@ def test_impact_single_number_aliases():
 # --------------------------------------------------------------------------- #
 # Table 7 — reduction single-number ΔLw (situation A only).
 # --------------------------------------------------------------------------- #
-def test_table7_delta_lw():
+def test_table7_delta_lw() -> None:
     assert single_number_uncertainty("delta_lw", "A") == pytest.approx(1.1)
 
 
 @pytest.mark.parametrize("situation", ["B", "C"])
-def test_delta_lw_only_situation_a(situation):
+def test_delta_lw_only_situation_a(situation: str) -> None:
     with pytest.raises(ValueError, match="not tabulated"):
         single_number_uncertainty("delta_lw", situation)
 
@@ -344,18 +348,18 @@ TABLED2 = {
 
 
 @pytest.mark.parametrize(("quantity", "expected"), list(TABLED2.items()))
-def test_tabled2_sigma_r95_single_number(quantity, expected):
+def test_tabled2_sigma_r95_single_number(quantity: str, expected: float) -> None:
     assert single_number_uncertainty(quantity, "A", upper_limit=True) == pytest.approx(
         expected
     )
 
 
-def test_sigma_r95_single_number_requires_situation_a():
+def test_sigma_r95_single_number_requires_situation_a() -> None:
     with pytest.raises(ValueError, match="situation A only"):
         single_number_uncertainty("r_w", "B", upper_limit=True)
 
 
-def test_sigma_r95_single_number_impact_absent():
+def test_sigma_r95_single_number_impact_absent() -> None:
     with pytest.raises(ValueError, match="No σR95"):
         single_number_uncertainty("ln_w", "A", upper_limit=True)
 
@@ -374,7 +378,7 @@ def test_sigma_r95_single_number_impact_absent():
         (0.999, 3.29),
     ],
 )
-def test_table8_two_sided(confidence, k):
+def test_table8_two_sided(confidence: float, k: float) -> None:
     assert insulation_coverage_factor(confidence, one_sided=False) == pytest.approx(k)
 
 
@@ -389,16 +393,16 @@ def test_table8_two_sided(confidence, k):
         (0.9995, 3.29),
     ],
 )
-def test_table8_one_sided(confidence, k):
+def test_table8_one_sided(confidence: float, k: float) -> None:
     assert insulation_coverage_factor(confidence, one_sided=True) == pytest.approx(k)
 
 
-def test_coverage_factor_unknown_confidence():
+def test_coverage_factor_unknown_confidence() -> None:
     with pytest.raises(ValueError, match="not tabulated"):
         insulation_coverage_factor(0.925)
 
 
-def test_coverage_factors_table_is_public():
+def test_coverage_factors_table_is_public() -> None:
     import phonometry
     from phonometry.building.measurement.uncertainty import COVERAGE_FACTORS
 
@@ -408,7 +412,7 @@ def test_coverage_factors_table_is_public():
     assert COVERAGE_FACTORS[(0.95, True)] == pytest.approx(1.65)
 
 
-def test_coverage_factors_table_is_read_only():
+def test_coverage_factors_table_is_read_only() -> None:
     from phonometry.building.measurement.uncertainty import COVERAGE_FACTORS
 
     with pytest.raises(TypeError):
@@ -418,26 +422,26 @@ def test_coverage_factors_table_is_read_only():
 # --------------------------------------------------------------------------- #
 # Expansion U = k·u (Formula 2) and the k >= 1 minimum.
 # --------------------------------------------------------------------------- #
-def test_expanded_uncertainty_two_sided():
+def test_expanded_uncertainty_two_sided() -> None:
     # Rw situation A, u = 1.2 dB, 95 % two-sided -> k = 1.96.
     assert insulation_expanded_uncertainty(1.2, coverage=0.95) == pytest.approx(
         1.96 * 1.2
     )
 
 
-def test_expanded_uncertainty_one_sided():
+def test_expanded_uncertainty_one_sided() -> None:
     # Conformity check at 95 % one-sided -> k = 1.65.
     assert insulation_expanded_uncertainty(
         1.2, coverage=0.95, one_sided=True
     ) == pytest.approx(1.65 * 1.2)
 
 
-def test_coverage_minimum_k_is_one():
+def test_coverage_minimum_k_is_one() -> None:
     # 68 % two-sided is exactly k = 1; U == u.
     assert insulation_expanded_uncertainty(0.9, coverage=0.68) == pytest.approx(0.9)
 
 
-def test_expanded_uncertainty_rejects_negative():
+def test_expanded_uncertainty_rejects_negative() -> None:
     with pytest.raises(ValueError, match="Standard uncertainty u must be non-negative"):
         insulation_expanded_uncertainty(-0.1)
 
@@ -445,7 +449,7 @@ def test_expanded_uncertainty_rejects_negative():
 # --------------------------------------------------------------------------- #
 # UncertainValue convenience (value ± U) — the reporting form Y = y ± U.
 # --------------------------------------------------------------------------- #
-def test_uncertain_value_two_sided_interval():
+def test_uncertain_value_two_sided_interval() -> None:
     # Standard's example: R = (35.1 ± 1.2) dB at k = 1 (two-sided 68 %).
     uv = uncertain_value(35.1, "r_w", "A", coverage=0.68)
     assert isinstance(uv, UncertainValue)
@@ -456,7 +460,7 @@ def test_uncertain_value_two_sided_interval():
     assert uv.upper == pytest.approx(36.3)
 
 
-def test_uncertain_value_one_sided_for_conformity():
+def test_uncertain_value_one_sided_for_conformity() -> None:
     # Annex A.3: in-situ R'w, u = 0.9 dB, 84 % one-sided -> k = 1 -> U = 0.9.
     uv = uncertain_value(52.0, "rprime_w", "B", coverage=0.84, one_sided=True)
     assert uv.standard_uncertainty == pytest.approx(0.9)
@@ -467,18 +471,18 @@ def test_uncertain_value_one_sided_for_conformity():
 # --------------------------------------------------------------------------- #
 # Combination rules — Annexes A/B/C with hand-computed oracles.
 # --------------------------------------------------------------------------- #
-def test_combine_uncertainties_quadrature():
+def test_combine_uncertainties_quadrature() -> None:
     assert combine_uncertainties(3.0, 4.0) == pytest.approx(5.0)
 
 
-def test_prediction_input_uncertainty_annex_a_example():
+def test_prediction_input_uncertainty_annex_a_example() -> None:
     # Annex A: sigma_R = 1.2, sigma_product = 1.0, n = 1 -> u_input = sqrt(3.44) ~ 1.9.
     u_input = prediction_input_uncertainty(1.2, 1.0, 1)
     assert u_input == pytest.approx(math.sqrt(3.44))
     assert round(u_input, 1) == 1.9
 
 
-def test_predicted_uncertainty_annex_a_example():
+def test_predicted_uncertainty_annex_a_example() -> None:
     # Annex A: u_calc = u_input (single element), u_reality = 0.8 -> u_pred ~ 2.0.
     u_input = prediction_input_uncertainty(1.2, 1.0, 1)
     u_pred = combine_uncertainties(u_input, 0.8)
@@ -486,27 +490,27 @@ def test_predicted_uncertainty_annex_a_example():
     assert round(u_pred, 1) == 2.0
 
 
-def test_reduce_by_independent_measurements():
+def test_reduce_by_independent_measurements() -> None:
     # Formula A.7: u = 0.9 / sqrt(m).
     assert reduce_by_independent_measurements(0.9, 4) == pytest.approx(0.45)
     assert reduce_by_independent_measurements(0.9, 1) == pytest.approx(0.9)
 
 
-def test_single_number_uncorrelated_equal_weights():
+def test_single_number_uncorrelated_equal_weights() -> None:
     # Two bands with equal (L_i - R_i) => equal weights 0.5; u_i = 2.0 each.
     # u = sqrt((0.5*2)^2 + (0.5*2)^2) = sqrt(2).
     u = single_number_uncertainty_uncorrelated([2.0, 2.0], [0.0, 0.0])
     assert u == pytest.approx(math.sqrt(2.0))
 
 
-def test_single_number_uncorrelated_dominant_band():
+def test_single_number_uncorrelated_dominant_band() -> None:
     # One band dominates the reference energy (much smaller L-R gap) -> its weight
     # -> 1, so the combined uncertainty approaches that band's u.
     u = single_number_uncertainty_uncorrelated([1.0, 5.0], [0.0, -100.0])
     assert u == pytest.approx(1.0, abs=1e-6)
 
 
-def test_single_number_uncorrelated_length_mismatch():
+def test_single_number_uncorrelated_length_mismatch() -> None:
     with pytest.raises(
         ValueError,
         match=(
@@ -520,13 +524,13 @@ def test_single_number_uncorrelated_length_mismatch():
 # --------------------------------------------------------------------------- #
 # Conformity with a requirement (Formulae 4/5).
 # --------------------------------------------------------------------------- #
-def test_satisfies_lower_requirement():
+def test_satisfies_lower_requirement() -> None:
     # R'w = 54, U = 1.5 -> 52.5 > 52 required: pass.
     assert satisfies_lower_requirement(54.0, 1.5, 52.0) is True
     assert satisfies_lower_requirement(53.0, 1.5, 52.0) is False
 
 
-def test_satisfies_upper_requirement():
+def test_satisfies_upper_requirement() -> None:
     # L'n,w = 50, U = 1.0 -> 51 < 53 required: pass.
     assert satisfies_upper_requirement(50.0, 1.0, 53.0) is True
     assert satisfies_upper_requirement(52.5, 1.0, 53.0) is False
@@ -535,22 +539,22 @@ def test_satisfies_upper_requirement():
 # --------------------------------------------------------------------------- #
 # Validation of unknown quantities / situations.
 # --------------------------------------------------------------------------- #
-def test_unknown_quantity():
+def test_unknown_quantity() -> None:
     with pytest.raises(ValueError, match="Unknown single-number quantity"):
         single_number_uncertainty("nonsense", "A")
 
 
-def test_unknown_measurand():
+def test_unknown_measurand() -> None:
     with pytest.raises(ValueError, match="Unknown measurand"):
         band_uncertainty("magic", "A")  # type: ignore[arg-type]
 
 
-def test_unknown_situation_single_number():
+def test_unknown_situation_single_number() -> None:
     with pytest.raises(ValueError, match="Unknown situation"):
         single_number_uncertainty("r_w", "Z")  # type: ignore[arg-type]
 
 
-def test_band_uncertainty_to_arrays_roundtrip():
+def test_band_uncertainty_to_arrays_roundtrip() -> None:
     result = band_uncertainty("airborne", "A")
     freqs, u = result.to_arrays()
     assert isinstance(freqs, np.ndarray)
@@ -559,12 +563,12 @@ def test_band_uncertainty_to_arrays_roundtrip():
     assert u[0] == pytest.approx(6.8)
 
 
-def test_prediction_input_rejects_bad_n():
+def test_prediction_input_rejects_bad_n() -> None:
     with pytest.raises(ValueError, match="n must be a positive integer"):
         prediction_input_uncertainty(1.2, 1.0, 0)
 
 
-def test_the_bare_names_are_gone():
+def test_the_bare_names_are_gone() -> None:
     # The bare names shadowed the GUM pair at the package root. They were
     # deprecated in 3.1 and removed in 4.0; only the insulation_* names remain.
     import phonometry.building.measurement.uncertainty as bu

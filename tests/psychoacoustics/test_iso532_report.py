@@ -17,9 +17,14 @@ import pytest
 
 pytest.importorskip("reportlab")
 
+from typing import TYPE_CHECKING
+
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, psychoacoustics
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # A shaped 28-band one-third-octave spectrum (25 Hz..12.5 kHz), descending.
 _LEVELS = np.array(
@@ -57,11 +62,11 @@ _LEVELS = np.array(
 )
 
 
-def _result():
+def _result() -> psychoacoustics.ZwickerLoudness:
     return psychoacoustics.loudness_zwicker_from_spectrum(_LEVELS, field="free")
 
 
-def test_loudness_report_writes_pdf(tmp_path) -> None:
+def test_loudness_report_writes_pdf(tmp_path: Path) -> None:
     """A stationary Zwicker loudness result renders a one-page PDF fiche."""
     result = _result()
     assert result.loudness > 0.0
@@ -75,7 +80,7 @@ def test_loudness_report_writes_pdf(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     result = _result()
     out = str(tmp_path / "x.pdf")
@@ -83,7 +88,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         result.report(out, engine="weasyprint")
 
 
-def test_full_metadata_renders_one_page(tmp_path) -> None:
+def test_full_metadata_renders_one_page(tmp_path: Path) -> None:
     """A populated ReportMetadata renders a one-page loudness fiche."""
     md = ReportMetadata(
         specimen="Household appliance, steady operating noise",
@@ -101,7 +106,7 @@ def test_full_metadata_renders_one_page(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_requirement_pass_and_fail_both_render(tmp_path) -> None:
+def test_requirement_pass_and_fail_both_render(tmp_path: Path) -> None:
     """A PASS and a FAIL maximum-loudness requirement both render one page."""
     result = _result()
     n = result.loudness
@@ -113,7 +118,7 @@ def test_requirement_pass_and_fail_both_render(tmp_path) -> None:
     assert_one_page(str(failing))
 
 
-def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
+def test_report_escapes_xml_specials_in_metadata(tmp_path: Path) -> None:
     """Metadata with XML specials (& < >) renders without crashing reportlab."""
     md = ReportMetadata(
         client="Ac & Co <Ltd>",
@@ -135,7 +140,7 @@ def _extract_text(path: str) -> str:
     return "\n".join(page.extract_text() for page in PdfReader(path).pages)
 
 
-def test_stationary_fiche_states_method_and_field(tmp_path) -> None:
+def test_stationary_fiche_states_method_and_field(tmp_path: Path) -> None:
     """The fiche states the method and sound field (ISO 532-1 clause 7 c/d).
 
     Clause 7 requires a loudness report to state the method used (stationary,
@@ -152,7 +157,7 @@ def test_stationary_fiche_states_method_and_field(tmp_path) -> None:
     assert expected in text
 
 
-def test_time_varying_fiche_reports_nmax_percentiles_and_nt(tmp_path) -> None:
+def test_time_varying_fiche_reports_nmax_percentiles_and_nt(tmp_path: Path) -> None:
     """A time-varying fiche renders Nmax, N5/N10 and the N(t) trace.
 
     Clause 7 f) makes the loudness time function in sones mandatory for
@@ -183,7 +188,7 @@ def test_time_varying_fiche_reports_nmax_percentiles_and_nt(tmp_path) -> None:
     assert "Total loudness N [sone]" not in text
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """``language="es"`` renders a one-page Spanish fiche with comma decimals."""
     import re
 
@@ -201,7 +206,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     assert re.search(r"\d,\d", text) is not None  # comma decimal separator
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ``ValueError``."""
     result = _result()
     with pytest.raises(ValueError, match="language"):

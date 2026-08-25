@@ -174,7 +174,9 @@ def test_user_band_excluding_tone_lowers_tonality() -> None:
     assert restricted.tonality < 0.2
 
 
-def test_loudness_and_tonality_share_the_tonal_split(monkeypatch) -> None:
+def test_loudness_and_tonality_share_the_tonal_split(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Loudness and tonality must report the same underlying N'_tonal(l, z).
 
     Clause 8.1.1 builds the loudness on the Clause 6.2 outputs, so the two
@@ -192,7 +194,9 @@ def test_loudness_and_tonality_share_the_tonal_split(monkeypatch) -> None:
     recorded = []
     orig = L._tonal_noise_split
 
-    def spy(x, field):
+    def spy(
+        x: np.ndarray, field: str
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, int, int]:
         out = orig(x, field)
         recorded.append(out[0].copy())  # N'_tonal(l, z)
         return out

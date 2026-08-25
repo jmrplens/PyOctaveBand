@@ -351,7 +351,7 @@ def test_annex_b4_tone_pulses(case: str, num: int, level: float) -> None:
 
 
 @requires_iso_data
-def test_n5_n10_use_full_rate_series(monkeypatch) -> None:
+def test_n5_n10_use_full_rate_series(monkeypatch: pytest.MonkeyPatch) -> None:
     """N5/N10 must come from the full-rate 2000 Hz weighted-loudness series,
     not the 4x-decimated 500 Hz output trace. Decimation keeps only one of
     four phases, spreading N5 by up to ~3 % across the phases (Annex B

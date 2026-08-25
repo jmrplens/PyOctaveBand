@@ -16,15 +16,22 @@ import pytest
 matplotlib = pytest.importorskip("matplotlib")
 matplotlib.use("Agg")
 
+from typing import TYPE_CHECKING
+
 import matplotlib.pyplot as plt
 
 from phonometry import materials as m
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from matplotlib.axes import Axes
 
 FREQ = np.linspace(200.0, 2000.0, 32)
 
 
 @pytest.fixture(autouse=True)
-def _close_figures():
+def _close_figures() -> Iterator[None]:
     yield
     plt.close("all")
 
@@ -50,7 +57,7 @@ def _layers() -> list:
 # ---------------------------------------------------------------------------
 # Smoke: every renderer returns an equal-aspect Axes.
 # ---------------------------------------------------------------------------
-def _geometry_axes():
+def _geometry_axes() -> Iterator[Axes]:
     yield m.plot_absorber_stack(_layers())
     yield _resonator().plot()
     yield m.plot_slit_absorber_geometry(
@@ -265,7 +272,7 @@ def test_absorber_stack_validation() -> None:
 # ---------------------------------------------------------------------------
 # Spanish labels reach the artists.
 # ---------------------------------------------------------------------------
-def _texts(ax) -> str:
+def _texts(ax: Axes) -> str:
     return " ".join(t.get_text() for t in ax.texts) + " " + ax.get_title()
 
 

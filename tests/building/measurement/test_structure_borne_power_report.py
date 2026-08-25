@@ -16,11 +16,16 @@ the rendering contract.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, building
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 _FREQS = np.array([125, 250, 500, 1000, 2000, 4000], dtype=float)
 # Spatial mean plate velocity level Lv (dB re 1e-9 m/s) per octave band.
@@ -38,7 +43,7 @@ def _extract_text(path: str) -> str:
     return " ".join(raw.split())
 
 
-def _result():
+def _result() -> building.StructureBornePowerResult:
     return building.reception_plate_power(
         _LV, _FREQS, mass_per_area=_MASS, area=_AREA, reverberation_time=_TS
     )
@@ -71,7 +76,7 @@ def test_hand_oracle_matches_library() -> None:
     assert res.total_level == pytest.approx(_oracle_total(), abs=1e-9)
 
 
-def test_report_renders_oracle_values(tmp_path) -> None:
+def test_report_renders_oracle_values(tmp_path: Path) -> None:
     """The fiche prints the total L_Ws and a couple of band L_Ws values."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -105,7 +110,7 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     assert "Plate-specific level" in text
 
 
-def test_verbose_adds_loss_factor_column(tmp_path) -> None:
+def test_verbose_adds_loss_factor_column(tmp_path: Path) -> None:
     """verbose=True adds the plate loss factor eta column."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -120,7 +125,7 @@ def test_verbose_adds_loss_factor_column(tmp_path) -> None:
     assert f"{eta[3]:.4f}" in text
 
 
-def test_third_octave_labels_and_caption(tmp_path) -> None:
+def test_third_octave_labels_and_caption(tmp_path: Path) -> None:
     """A one-third-octave set is labelled by nominal centres and captioned."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -143,7 +148,9 @@ def test_third_octave_labels_and_caption(tmp_path) -> None:
     ("limit", "verdict"),
     [(100.0, "PASS"), (40.0, "FAIL")],
 )
-def test_verdict_against_declared_limit(tmp_path, limit: float, verdict: str) -> None:
+def test_verdict_against_declared_limit(
+    tmp_path: Path, limit: float, verdict: str
+) -> None:
     """A declared limit yields a PASS/FAIL verdict (lower is better)."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -156,7 +163,7 @@ def test_verdict_against_declared_limit(tmp_path, limit: float, verdict: str) ->
     assert "declared limit" in text
 
 
-def test_metadata_header_renders(tmp_path) -> None:
+def test_metadata_header_renders(tmp_path: Path) -> None:
     """Supplied metadata renders the source, environment and identity fields."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -181,7 +188,7 @@ def test_metadata_header_renders(tmp_path) -> None:
     assert "Acoustics lab" in text
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """language="es" renders the structure-borne vocabulary and comma decimals."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -197,7 +204,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     assert f"{_oracle_total():.1f}".replace(".", ",") in text
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     res = _result()
     out = str(tmp_path / "x.pdf")
@@ -205,7 +212,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         res.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     res = _result()
     out = str(tmp_path / "bad.pdf")

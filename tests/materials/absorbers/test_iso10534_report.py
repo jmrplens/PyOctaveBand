@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import dataclasses
 import re
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -41,12 +42,17 @@ from phonometry.materials import (
     two_microphone_impedance,
 )
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from phonometry.materials import ImpedanceTubeResult
+
 _TEMPERATURE_K = 293.15  # 20 degC
 _DIAMETER, _SPACING, _X1 = 0.100, 0.050, 0.100
 _FREQS = np.array([400, 500, 630, 800, 1000, 1250, 1600], dtype=float)
 
 
-def _result():
+def _result() -> ImpedanceTubeResult:
     c0 = float(speed_of_sound_iso(_TEMPERATURE_K))
     rho = float(air_density_iso(_TEMPERATURE_K, 101.0))
     rc = characteristic_impedance(rho, c0)
@@ -71,7 +77,7 @@ def _result():
     )
 
 
-def _metadata(**overrides) -> ReportMetadata:
+def _metadata(**overrides: object) -> ReportMetadata:
     base = {
         "specimen": "Resistive facing over an 86 mm rigidly-backed air cavity",
         "client": "Acoustic Test Client Ltd.",
@@ -100,27 +106,27 @@ def _text(path: str) -> str:
     )
 
 
-def test_report_writes_one_page_pdf(tmp_path) -> None:
+def test_report_writes_one_page_pdf(tmp_path: Path) -> None:
     out = tmp_path / "iso10534.pdf"
     returned = _result().report(str(out))
     assert returned == str(out)
     assert_one_page(str(out))
 
 
-def test_report_with_metadata_one_page(tmp_path) -> None:
+def test_report_with_metadata_one_page(tmp_path: Path) -> None:
     out = tmp_path / "iso10534_meta.pdf"
     _result().report(str(out), metadata=_metadata())
     assert_one_page(str(out))
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     result = _result()
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="engine"):
         result.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     result = _result()
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="Unknown language"):
@@ -132,7 +138,7 @@ def test_unknown_language_rejected(tmp_path) -> None:
     "field", ["frequency", "absorption", "reflection", "normalized_impedance"]
 )
 def test_short_per_frequency_array_rejected(
-    field: str, verbose: bool, tmp_path
+    field: str, verbose: bool, tmp_path: Path
 ) -> None:
     """One short per-frequency array raises before the fiche is written.
 
@@ -152,7 +158,7 @@ def test_short_per_frequency_array_rejected(
     assert not out.exists()
 
 
-def test_displayed_absorption_matches_oracle(tmp_path) -> None:
+def test_displayed_absorption_matches_oracle(tmp_path: Path) -> None:
     """The fiche prints the closed-form alpha, band labels and geometry."""
     out = tmp_path / "iso10534.pdf"
     _result().report(str(out), metadata=_metadata())
@@ -168,7 +174,7 @@ def test_displayed_absorption_matches_oracle(tmp_path) -> None:
     assert re.search(r"Microphone spacing s\s*\[mm\]:\s*50\b", text)  # s = 50 mm
 
 
-def test_verbose_shows_reflection_column_one_page(tmp_path) -> None:
+def test_verbose_shows_reflection_column_one_page(tmp_path: Path) -> None:
     """verbose=True adds the |r| column and stays one page."""
     out = tmp_path / "iso10534_verbose.pdf"
     _result().report(str(out), metadata=_metadata(), verbose=True)
@@ -177,13 +183,13 @@ def test_verbose_shows_reflection_column_one_page(tmp_path) -> None:
     assert "0.45" in text  # |r|(500 Hz) = 1/sqrt(5)
 
 
-def test_metadata_xml_specials_do_not_break(tmp_path) -> None:
+def test_metadata_xml_specials_do_not_break(tmp_path: Path) -> None:
     out = tmp_path / "iso10534_xml.pdf"
     _result().report(str(out), metadata=_metadata(specimen='Panel <A> & <B> "edge"'))
     assert_one_page(str(out))
 
 
-def test_no_metadata_still_renders(tmp_path) -> None:
+def test_no_metadata_still_renders(tmp_path: Path) -> None:
     """Without metadata the header still shows the measured frequency range."""
     out = tmp_path / "iso10534_bare.pdf"
     _result().report(str(out))
@@ -191,7 +197,7 @@ def test_no_metadata_still_renders(tmp_path) -> None:
     assert "400 to 1600" in _text(str(out))
 
 
-def test_spanish_fiche_uses_comma_decimal(tmp_path) -> None:
+def test_spanish_fiche_uses_comma_decimal(tmp_path: Path) -> None:
     out = tmp_path / "iso10534_es.pdf"
     _result().report(str(out), metadata=_metadata(), language="es")
     assert_one_page(str(out))
@@ -216,7 +222,7 @@ def test_metadata_rejects_invalid_geometry(field: str, value: float) -> None:
 # A table longer than the single page a fiche is
 # --------------------------------------------------------------------------
 @pytest.mark.parametrize("points", [38, 60], ids=["runs-on", "layout-error"])
-def test_a_table_longer_than_the_page_is_refused(tmp_path, points: int) -> None:
+def test_a_table_longer_than_the_page_is_refused(tmp_path: Path, points: int) -> None:
     """A fiche is one page, and nothing used to check that it came to one.
 
     Up to about forty rows the sheet quietly ran on, leaving page 1 with the

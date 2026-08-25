@@ -18,13 +18,18 @@ import pytest
 
 pytest.importorskip("reportlab")
 
+from typing import TYPE_CHECKING
+
 import reference_data as ref
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, environment, psychoacoustics
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
-def _result():
+
+def _result() -> psychoacoustics.ToneAudibilityResult:
     """The ISO/PAS 20065 Annex E spectrum-1 detection (three tones + FG)."""
     return psychoacoustics.analyze_spectrum(
         ref.ISO20065_E1_LEVELS, ref.ISO20065_E1_FREQUENCIES, ref.ISO20065_LINE_SPACING
@@ -37,7 +42,7 @@ def _extract_text(path: str) -> str:
     return "\n".join(page.extract_text() for page in PdfReader(path).pages)
 
 
-def test_report_writes_one_page_pdf(tmp_path) -> None:
+def test_report_writes_one_page_pdf(tmp_path: Path) -> None:
     """A detected-tone result renders a one-page PDF fiche."""
     result = _result()
     out = tmp_path / "tone.pdf"
@@ -46,7 +51,7 @@ def test_report_writes_one_page_pdf(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     result = _result()
     out = str(tmp_path / "x.pdf")
@@ -54,7 +59,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         result.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ``ValueError``."""
     result = _result()
     out = str(tmp_path / "bad.pdf")
@@ -62,7 +67,7 @@ def test_unknown_language_rejected(tmp_path) -> None:
         result.report(out, language="xx")
 
 
-def test_report_states_audibility_adjustment_and_frequency(tmp_path) -> None:
+def test_report_states_audibility_adjustment_and_frequency(tmp_path: Path) -> None:
     """The fiche states ΔL_ta, the derived K and the decisive tone frequency.
 
     The decisive audibility is the FG entry near the 137.3 Hz critical band; its
@@ -89,7 +94,7 @@ def test_report_states_audibility_adjustment_and_frequency(tmp_path) -> None:
     assert "single spectrum" in text
 
 
-def test_metadata_appears_and_one_page(tmp_path) -> None:
+def test_metadata_appears_and_one_page(tmp_path: Path) -> None:
     """A populated ReportMetadata renders one page and prints its fields."""
     md = ReportMetadata(
         specimen="Combustion engine, steady operation",
@@ -112,7 +117,7 @@ def test_metadata_appears_and_one_page(tmp_path) -> None:
     assert "ISO 1996-2" in text
 
 
-def test_requirement_pass_and_fail_both_render(tmp_path) -> None:
+def test_requirement_pass_and_fail_both_render(tmp_path: Path) -> None:
     """A PASS and a FAIL audibility limit both render one page."""
     result = _result()
     delta = result.decisive_audibility
@@ -126,7 +131,7 @@ def test_requirement_pass_and_fail_both_render(tmp_path) -> None:
     assert "FAIL" in _extract_text(str(failing)).replace("\n", " ")
 
 
-def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
+def test_report_escapes_xml_specials_in_metadata(tmp_path: Path) -> None:
     """Metadata with XML specials (& < >) renders without crashing reportlab."""
     md = ReportMetadata(
         client="Ac & Co <Ltd>",
@@ -142,7 +147,7 @@ def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """``language="es"`` renders a one-page Spanish fiche with comma decimals."""
     import re
 
@@ -161,7 +166,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     assert re.search(r"\d,\d", text) is not None  # comma decimal separator
 
 
-def test_absent_tone_reports_zero_adjustment(tmp_path) -> None:
+def test_absent_tone_reports_zero_adjustment(tmp_path: Path) -> None:
     """A weakly-audible decisive tone still renders and states its adjustment.
 
     A synthetic near-threshold tone keeps K low; the prominence note and boxed

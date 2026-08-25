@@ -20,6 +20,8 @@ columns and fix the mid-frequency descriptor T_mid = (T30@500 + T30@1000)/2.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 pytest.importorskip("reportlab")
@@ -30,6 +32,9 @@ import numpy as np
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, room
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from pathlib import Path
 
 _FS = 48000
 #: 6*ln(10): energy-decay-rate constant so exp(-A60*t/T) falls 60 dB in T s.
@@ -64,7 +69,7 @@ def _extract_text(path: str) -> str:
     )
 
 
-def _full_metadata(**overrides) -> ReportMetadata:
+def _full_metadata(**overrides: float) -> ReportMetadata:
     base = {
         "specimen": "Small auditorium, unoccupied, fully furnished",
         "client": "Acoustic Test Client Ltd.",
@@ -104,7 +109,7 @@ def test_synthetic_decay_matches_closed_form() -> None:
 # --------------------------------------------------------------------------
 # Structural rendering
 # --------------------------------------------------------------------------
-def test_report_writes_pdf(tmp_path) -> None:
+def test_report_writes_pdf(tmp_path: Path) -> None:
     """A room-acoustics result renders a PDF fiche and returns its path."""
     out = tmp_path / "room.pdf"
     returned = _result().report(str(out))
@@ -112,21 +117,21 @@ def test_report_writes_pdf(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_report_with_full_metadata_one_page(tmp_path) -> None:
+def test_report_with_full_metadata_one_page(tmp_path: Path) -> None:
     """A full ReportMetadata renders a one-page accredited room fiche."""
     out = tmp_path / "room_meta.pdf"
     _result().report(str(out), metadata=_full_metadata())
     assert_one_page(str(out))
 
 
-def test_report_bare_without_metadata(tmp_path) -> None:
+def test_report_bare_without_metadata(tmp_path: Path) -> None:
     """metadata=None renders a bare characterisation fiche (no header)."""
     out = tmp_path / "bare.pdf"
     _result().report(str(out), metadata=None)
     assert_one_page(str(out))
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     res = _result()
     out = str(tmp_path / "x.pdf")
@@ -134,7 +139,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         res.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ``ValueError``."""
     res = _result()
     out = str(tmp_path / "bad.pdf")
@@ -145,7 +150,7 @@ def test_unknown_language_rejected(tmp_path) -> None:
 # --------------------------------------------------------------------------
 # Displayed values (the oracle appears in the rendered text)
 # --------------------------------------------------------------------------
-def test_band_labels_and_reverberation_times_render(tmp_path) -> None:
+def test_band_labels_and_reverberation_times_render(tmp_path: Path) -> None:
     """Nominal band labels and the closed-form T30/EDT appear in the PDF."""
     out = tmp_path / "values.pdf"
     _result().report(str(out), metadata=_full_metadata())
@@ -161,7 +166,7 @@ def test_band_labels_and_reverberation_times_render(tmp_path) -> None:
     assert "C80" in text
 
 
-def test_mid_frequency_descriptor_and_verdict(tmp_path) -> None:
+def test_mid_frequency_descriptor_and_verdict(tmp_path: Path) -> None:
     """The boxed T_mid = 1.15 s and a PASS/FAIL verdict both render."""
     passing = tmp_path / "pass.pdf"
     failing = tmp_path / "fail.pdf"
@@ -176,7 +181,7 @@ def test_mid_frequency_descriptor_and_verdict(tmp_path) -> None:
     assert "FAIL" in _extract_text(str(failing))
 
 
-def test_report_without_requirement_has_no_verdict(tmp_path) -> None:
+def test_report_without_requirement_has_no_verdict(tmp_path: Path) -> None:
     """With no target RT the characterisation fiche omits the verdict row."""
     out = tmp_path / "noverdict.pdf"
     _result().report(str(out), metadata=_full_metadata())
@@ -216,7 +221,7 @@ def _synthetic_result(
 # --------------------------------------------------------------------------
 # Band-set variants
 # --------------------------------------------------------------------------
-def test_third_octave_report_renders(tmp_path) -> None:
+def test_third_octave_report_renders(tmp_path: Path) -> None:
     """A one-third-octave analysis renders and labels T_mid honestly.
 
     With one-third-octave data only the 500 Hz and 1 kHz one-third-octave
@@ -232,7 +237,7 @@ def test_third_octave_report_renders(tmp_path) -> None:
     assert "500-1000 Hz" not in text
 
 
-def test_band_range_without_mid_octaves_names_the_band(tmp_path) -> None:
+def test_band_range_without_mid_octaves_names_the_band(tmp_path: Path) -> None:
     """A range missing the mid bands boxes the first finite T30 band by name."""
     res = room.room_parameters(_synthetic_ir(), _FS, limits=(2000.0, 4000.0))
     assert res.frequency is not None
@@ -245,7 +250,7 @@ def test_band_range_without_mid_octaves_names_the_band(tmp_path) -> None:
     assert "T_mid" not in text
 
 
-def test_edt_label_follows_edts_own_band_coverage(tmp_path) -> None:
+def test_edt_label_follows_edts_own_band_coverage(tmp_path: Path) -> None:
     """EDT_mid vs EDT is chosen from EDT's own bands, not T30's.
 
     Here T30 is finite in both mid octaves (T_mid = 1.15 s) but the 500 Hz
@@ -263,7 +268,7 @@ def test_edt_label_follows_edts_own_band_coverage(tmp_path) -> None:
     assert "EDT (1000 Hz) = 1.00 s" in text
 
 
-def test_verdict_uses_display_rounded_values(tmp_path) -> None:
+def test_verdict_uses_display_rounded_values(tmp_path: Path) -> None:
     """T_mid = 1.1502 s prints as 1.15 s and must PASS a 1.15 s target."""
     freq = np.array([500.0, 1000.0])
     res = _synthetic_result(freq, t30=np.array([1.2004, 1.1]), edt=np.array([1.2, 1.1]))
@@ -275,7 +280,7 @@ def test_verdict_uses_display_rounded_values(tmp_path) -> None:
     assert "FAIL" not in text
 
 
-def test_single_band_is_not_labeled_broadband(tmp_path) -> None:
+def test_single_band_is_not_labeled_broadband(tmp_path: Path) -> None:
     """A narrow single-band selection is a single band, not broadband.
 
     Selecting a single octave band leaves one frequency entry (not ``None``),
@@ -292,7 +297,7 @@ def test_single_band_is_not_labeled_broadband(tmp_path) -> None:
     assert "Broadband" not in text
 
 
-def test_octave_report_many_bands_renders(tmp_path) -> None:
+def test_octave_report_many_bands_renders(tmp_path: Path) -> None:
     """A wide octave analysis (>6 bands) renders one page as an octave set.
 
     The one-third-octave triplet grouping is gated on the band structure, so a
@@ -308,7 +313,7 @@ def test_octave_report_many_bands_renders(tmp_path) -> None:
     assert "Octave-band parameters" in _extract_text(str(out))
 
 
-def test_broadband_report_renders(tmp_path) -> None:
+def test_broadband_report_renders(tmp_path: Path) -> None:
     """A broadband (single-band) analysis renders a one-page fiche."""
     res = room.room_parameters(_synthetic_ir(), _FS, limits=None)
     assert res.frequency is None
@@ -318,7 +323,7 @@ def test_broadband_report_renders(tmp_path) -> None:
     assert "Broadband" in _extract_text(str(out))
 
 
-def test_broadband_makes_no_mid_frequency_claim(tmp_path) -> None:
+def test_broadband_makes_no_mid_frequency_claim(tmp_path: Path) -> None:
     """A broadband result must NOT box a false "500-1000 Hz" T_mid.
 
     With no frequency bands there is no 500/1000 Hz averaging, so the boxed
@@ -340,7 +345,7 @@ def test_broadband_makes_no_mid_frequency_claim(tmp_path) -> None:
 # --------------------------------------------------------------------------
 # Robustness and localisation
 # --------------------------------------------------------------------------
-def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
+def test_report_escapes_xml_specials_in_metadata(tmp_path: Path) -> None:
     """Metadata with XML specials (& < >) renders without crashing reportlab."""
     md = ReportMetadata(
         client="Ac & Co <Ltd>",
@@ -356,7 +361,7 @@ def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """language="es" renders a one-page Spanish fiche with comma decimals."""
     import re
 
@@ -380,7 +385,9 @@ def test_room_volume_must_be_positive() -> None:
 
 @pytest.mark.parametrize("field", ["source_positions", "receiver_positions"])
 @pytest.mark.parametrize("bad", [0, -1, 2.5, True])
-def test_position_counts_must_be_positive_integers(field, bad) -> None:
+def test_position_counts_must_be_positive_integers(
+    field: str, bad: int | float
+) -> None:
     """A position count must be a positive integer (bools and floats rejected)."""
     with pytest.raises(ValueError, match=field):
         ReportMetadata(**{field: bad})

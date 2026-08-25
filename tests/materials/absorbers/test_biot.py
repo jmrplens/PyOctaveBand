@@ -103,7 +103,7 @@ def _glass_wool_medium(frequency: np.ndarray) -> materials.PorousMediumResult:
     )
 
 
-def _glass_wool_waves(frequency: np.ndarray):
+def _glass_wool_waves(frequency: np.ndarray) -> materials.BiotWavesResult:
     return materials.biot_waves(
         _glass_wool_medium(frequency),
         porosity=TABLE_6_1_POROSITY,
@@ -520,7 +520,7 @@ def test_transfer_matrix_composes() -> None:
 
 
 def _reference_field(
-    waves, x3: float, k_t: float, amplitudes: np.ndarray
+    waves: materials.BiotWavesResult, x3: float, k_t: float, amplitudes: np.ndarray
 ) -> np.ndarray:
     """``[v1s, v3s, v3f, s33s, s13s, s33f]`` rebuilt from the potentials.
 
@@ -552,7 +552,7 @@ def _reference_field(
     k13, k23, k33 = (np.sqrt(d**2 - k_t**2) for d in (d1, d2, d3))
     a1p, a1m, a2p, a2m, a3p, a3m = amplitudes
 
-    def potential(ap, am, kx):
+    def potential(ap: complex, am: complex, kx: complex) -> tuple[complex, complex]:
         value = ap * np.cos(kx * x3) - 1j * am * np.sin(kx * x3)
         slope = -kx * (ap * np.sin(kx * x3) + 1j * am * np.cos(kx * x3))
         return value, slope

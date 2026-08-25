@@ -16,12 +16,16 @@ from __future__ import annotations
 
 import math
 import pickle
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, emission
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def _annex_b_modes() -> tuple[
@@ -45,7 +49,7 @@ def _annex_b_modes() -> tuple[
     return mode1, mode2
 
 
-def _annex_b_declaration(**kwargs) -> emission.NoiseEmissionDeclaration:
+def _annex_b_declaration(**kwargs: str) -> emission.NoiseEmissionDeclaration:
     return emission.NoiseEmissionDeclaration(
         _annex_b_modes(),
         machine="Type 990, Model 11-TC",
@@ -240,7 +244,7 @@ def test_declare_requires_finite_lwa() -> None:
 # --- rendering ---------------------------------------------------------------
 
 
-def test_dual_number_report_renders_one_page(tmp_path) -> None:
+def test_dual_number_report_renders_one_page(tmp_path: Path) -> None:
     """A dual-number declaration renders a valid one-page fiche."""
     pytest.importorskip("reportlab")
     decl = _annex_b_declaration(noise_test_code="ISO 3746 test code")
@@ -254,7 +258,7 @@ def test_dual_number_report_renders_one_page(tmp_path) -> None:
     assert "ISO 3744" in text
 
 
-def test_single_number_report_renders_one_page(tmp_path) -> None:
+def test_single_number_report_renders_one_page(tmp_path: Path) -> None:
     """A single-number declaration renders its L_WAd table."""
     pytest.importorskip("reportlab")
     decl = _annex_b_declaration(form="single-number")
@@ -264,7 +268,7 @@ def test_single_number_report_renders_one_page(tmp_path) -> None:
     assert "DECLARED SINGLE-NUMBER" in _extract_text(str(out))
 
 
-def test_dual_number_report_follows_annex_b2_layout(tmp_path) -> None:
+def test_dual_number_report_follows_annex_b2_layout(tmp_path: Path) -> None:
     """The dual-number table states only L and K (Annex B.2): no derived
     L_WAd row, whose mix of separately rounded addends and a once-rounded sum
     is not part of the dual layout.
@@ -279,7 +283,7 @@ def test_dual_number_report_follows_annex_b2_layout(tmp_path) -> None:
     assert "Declared A-weighted sound power level" not in text
 
 
-def test_dual_number_verification_row_uses_rounded_sum(tmp_path) -> None:
+def test_dual_number_verification_row_uses_rounded_sum(tmp_path: Path) -> None:
     """A dual-number fiche verifies against L_WA + K_WA of the separately
     rounded declared values (93 + 2 = 95 for 93,4/2,4), not round(95,8) = 96.
     """
@@ -306,7 +310,7 @@ def test_dual_number_verification_row_uses_rounded_sum(tmp_path) -> None:
     assert "PASS" in text2
 
 
-def test_verification_verdict_renders_both_ways(tmp_path) -> None:
+def test_verification_verdict_renders_both_ways(tmp_path: Path) -> None:
     """A passing and a failing verification both render in the verdict table."""
     pytest.importorskip("reportlab")
     mode1 = emission.OperatingModeDeclaration(
@@ -325,7 +329,7 @@ def test_verification_verdict_renders_both_ways(tmp_path) -> None:
     assert "FAIL" in text
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """language="es" renders a one-page Spanish fiche."""
     pytest.importorskip("reportlab")
     decl = _annex_b_declaration()
@@ -337,7 +341,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     assert "DOBLE NÚMERO" in text
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     pytest.importorskip("reportlab")
     decl = _annex_b_declaration()
@@ -346,7 +350,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         decl.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     decl = _annex_b_declaration()
     with pytest.raises(ValueError, match="language"):
@@ -356,7 +360,7 @@ def test_unknown_language_rejected(tmp_path) -> None:
 # --------------------------------------------------------------------------
 # More modes than the sheet has width for
 # --------------------------------------------------------------------------
-def test_more_modes_than_the_sheet_can_print_are_refused(tmp_path) -> None:
+def test_more_modes_than_the_sheet_can_print_are_refused(tmp_path: Path) -> None:
     """The mode columns divide the page width, with nothing bounding them.
 
     A declaration is free to carry as many operating modes as the machine
@@ -375,7 +379,7 @@ def test_more_modes_than_the_sheet_can_print_are_refused(tmp_path) -> None:
         declaration.report(str(out))
 
 
-def test_six_modes_still_print(tmp_path) -> None:
+def test_six_modes_still_print(tmp_path: Path) -> None:
     """Six is the widest that still holds a three-digit level per column."""
     modes = tuple(
         emission.OperatingModeDeclaration(f"Mode {i}", 88.0, 2.0) for i in range(6)

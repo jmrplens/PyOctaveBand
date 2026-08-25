@@ -12,6 +12,8 @@ wording and the detailed model's own accuracy statement.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import iso12354_building as bld
 import numpy as np
 import pytest
@@ -27,6 +29,12 @@ from phonometry._report.iso12354 import (
     render_iso12354_detailed_impact_report,
 )
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from pathlib import Path
+
+    from matplotlib.legend import Legend
+
 _BANDS = np.asarray(ref.ISO12354_ANNEX_L_BANDS, dtype=np.float64)
 
 
@@ -39,7 +47,7 @@ def _situ() -> tuple[dict, np.ndarray]:
     return situ, delta
 
 
-def _annex_l_airborne():
+def _annex_l_airborne() -> building.DetailedAirborneResult:
     """The Annex L detailed airborne prediction (R'w = 57 dB)."""
     situ, delta = _situ()
     return building.detailed_airborne_prediction(
@@ -51,7 +59,7 @@ def _annex_l_airborne():
     )
 
 
-def _annex_g_impact():
+def _annex_g_impact() -> building.DetailedImpactResult:
     """The Annex G detailed impact prediction (L'n,w = 41 dB)."""
     situ, delta = _situ()
     return building.detailed_impact_prediction(
@@ -72,7 +80,7 @@ def _extract_text(path: str) -> str:
     )
 
 
-def test_detailed_airborne_fiche_boxes_the_annex_l_rating(tmp_path) -> None:
+def test_detailed_airborne_fiche_boxes_the_annex_l_rating(tmp_path: Path) -> None:
     """The detailed airborne fiche boxes R'w = 57 dB and names Clause 4.2."""
     out = tmp_path / "air.pdf"
     assert _annex_l_airborne().report(str(out)) == str(out)
@@ -92,7 +100,7 @@ def test_detailed_airborne_fiche_boxes_the_annex_l_rating(tmp_path) -> None:
     assert "2d" in text
 
 
-def test_detailed_impact_fiche_boxes_the_annex_g_rating(tmp_path) -> None:
+def test_detailed_impact_fiche_boxes_the_annex_g_rating(tmp_path: Path) -> None:
     """The detailed impact fiche boxes L'n,w = 41 dB and verdicts a limit."""
     out = tmp_path / "imp.pdf"
     result = _annex_g_impact()
@@ -116,7 +124,7 @@ def test_detailed_impact_fiche_boxes_the_annex_g_rating(tmp_path) -> None:
     assert "Df1" in text
 
 
-def test_spanish_detailed_fiche_renders(tmp_path) -> None:
+def test_spanish_detailed_fiche_renders(tmp_path: Path) -> None:
     """The fiches translate to Spanish like every other report."""
     out = tmp_path / "air_es.pdf"
     _annex_l_airborne().report(str(out), language="es")
@@ -132,7 +140,7 @@ def test_spanish_detailed_fiche_renders(tmp_path) -> None:
     assert "not a measurement" not in text
 
 
-def test_detailed_fiche_rejects_an_unrated_spectrum(tmp_path) -> None:
+def test_detailed_fiche_rejects_an_unrated_spectrum(tmp_path: Path) -> None:
     """Without the ISO 717 band range there is no single number to box."""
     partial = building.detailed_airborne_prediction(
         _BANDS[:5], direct_index=np.full(5, 55.0)
@@ -143,7 +151,7 @@ def test_detailed_fiche_rejects_an_unrated_spectrum(tmp_path) -> None:
         partial.report(out)
 
 
-def test_detailed_fiche_rejects_an_unknown_engine(tmp_path) -> None:
+def test_detailed_fiche_rejects_an_unknown_engine(tmp_path: Path) -> None:
     """Only the reportlab back end exists."""
     result = _annex_g_impact()
     out = str(tmp_path / "x.pdf")
@@ -163,7 +171,13 @@ def test_detailed_fiche_rejects_an_unknown_engine(tmp_path) -> None:
     ids=["airborne", "impact"],
 )
 def test_the_fiche_legend_keeps_the_curve_it_rates(
-    tmp_path, monkeypatch, build, render, rated
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    build: Callable[
+        [], building.DetailedAirborneResult | building.DetailedImpactResult
+    ],
+    render: Callable[..., str],
+    rated: str,
 ) -> None:
     """The rated curve is drawn on a twin axis and must survive the rebuild.
 
@@ -177,7 +191,7 @@ def test_the_fiche_legend_keeps_the_curve_it_rates(
     legends: list[list[str]] = []
     original = Axes.legend
 
-    def record(self, *args, **kwargs):
+    def record(self: Axes, *args: object, **kwargs: object) -> Legend:
         drawn = original(self, *args, **kwargs)
         legends.append([text.get_text() for text in drawn.get_texts()])
         return drawn

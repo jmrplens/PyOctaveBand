@@ -24,6 +24,7 @@ within ~1.5 phon.  Annex C.1 is therefore the tone oracle used.
 """
 
 import dataclasses
+from collections.abc import Callable
 
 import numpy as np
 import pytest
@@ -32,6 +33,10 @@ from phonometry import psychoacoustics
 from phonometry.psychoacoustics.loudness.moore_glasberg_time import _ALPHA_AL, _ALPHA_RL
 
 FS = 32000.0  # the Annex B/C sampling rate; keeps reference tones on FFT bins
+
+#: The memoised steady-tone analyser the ``mg_tone`` fixture returns; ``...``
+#: because ``Callable`` cannot spell its keyword-only ``field``/``presentation``.
+MgTone = Callable[..., psychoacoustics.MooreGlasbergTimeVaryingLoudness]
 
 
 def _tone(frequency: float, level_db: float, duration: float = 1.3) -> np.ndarray:
@@ -42,7 +47,7 @@ def _tone(frequency: float, level_db: float, duration: float = 1.3) -> np.ndarra
 
 
 @pytest.fixture(scope="module")
-def mg_tone():
+def mg_tone() -> MgTone:
     """Memoised steady-tone loudness, shared across the Annex C.1 checks.
 
     Several parametrised suites analyse the *same* (frequency, level, field,
@@ -79,7 +84,7 @@ def mg_tone():
 # --------------------------------------------------------------------------
 
 
-def test_anchor_1khz_40db_is_one_sone(mg_tone) -> None:
+def test_anchor_1khz_40db_is_one_sone(mg_tone: MgTone) -> None:
     """A 1 kHz tone at 40 dB SPL, binaural, free field -> 1.000 sone / 40 phon."""
     res = mg_tone(1000.0, 40.0)
     assert res.n_max == pytest.approx(1.0, abs=0.02)
@@ -125,7 +130,9 @@ _C1_1KHZ = [
 
 
 @pytest.mark.parametrize(("level_db", "sone", "phon"), _C1_1KHZ)
-def test_annex_c1_1khz_tone(mg_tone, level_db: float, sone: float, phon: float) -> None:
+def test_annex_c1_1khz_tone(
+    mg_tone: MgTone, level_db: float, sone: float, phon: float
+) -> None:
     """1 kHz tone 10-80 dB reaches the Annex C.1 peak long-term loudness."""
     res = mg_tone(1000.0, level_db)
     # Loudness level (phon) is the linear-in-perception comparison; within the
@@ -155,7 +162,7 @@ _C1_OTHER = [
     ("frequency", "level_db", "field", "presentation", "phon"), _C1_OTHER
 )
 def test_annex_c1_other_tones(
-    mg_tone,
+    mg_tone: MgTone,
     frequency: float,
     level_db: float,
     field: str,
@@ -185,7 +192,7 @@ _C1_SONE = [
     ("frequency", "field", "presentation", "level_db", "sone"), _C1_SONE
 )
 def test_annex_c1_sone_values(
-    mg_tone,
+    mg_tone: MgTone,
     frequency: float,
     field: str,
     presentation: str,
@@ -491,7 +498,7 @@ def test_invalid_inputs_raise() -> None:
         psychoacoustics.loudness_moore_glasberg_time(with_nan, FS)
 
 
-def test_level_curve_off_the_frame_axis_is_refused(mg_tone) -> None:
+def test_level_curve_off_the_frame_axis_is_refused(mg_tone: MgTone) -> None:
     """A phon curve that has lost a frame is refused at construction.
 
     Neither loudness-level curve is drawn by the chart (it plots the two sone

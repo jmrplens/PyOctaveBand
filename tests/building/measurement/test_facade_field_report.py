@@ -13,6 +13,8 @@ rating, the standard-basis line and the mandatory field-method statement.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
@@ -21,6 +23,9 @@ pytest.importorskip("reportlab")
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, building
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 #: ISO 717-1 Annex C Table C.1 measured curve; rated 30 (-2; -3) dB.
 _ANNEX_C_R = np.array(
@@ -86,7 +91,7 @@ def test_dnt_reduces_to_d2m_at_reference_time() -> None:
     np.testing.assert_allclose(result.d_2m, _ANNEX_C_R)
 
 
-def test_dnt_fiche_rating_pinned_to_iso717_1_annex_c(tmp_path) -> None:
+def test_dnt_fiche_rating_pinned_to_iso717_1_annex_c(tmp_path: Path) -> None:
     """The D2m,nT fiche's rating is the published ISO 717-1 Annex C 30 (-2; -3)."""
     out = tmp_path / "d2mnt.pdf"
     _facade_dnt().report(str(out))
@@ -99,7 +104,7 @@ def test_dnt_fiche_rating_pinned_to_iso717_1_annex_c(tmp_path) -> None:
     assert "D2m,nT" in text
 
 
-def test_r_prime_fiche(tmp_path) -> None:
+def test_r_prime_fiche(tmp_path: Path) -> None:
     """``quantity='r_prime'`` reports the apparent sound reduction index R'45."""
     result = _facade_r_prime()
     assert result.r_prime is not None
@@ -114,7 +119,7 @@ def test_r_prime_fiche(tmp_path) -> None:
     assert "30 (-2; -3) dB" in text
 
 
-def test_r_prime_road_traffic_fiche_labelled_rtrs(tmp_path) -> None:
+def test_r_prime_road_traffic_fiche_labelled_rtrs(tmp_path: Path) -> None:
     """A road-traffic result is labelled R'tr,s (Clause 3.13), never R'45."""
     # A = 0,16 x 62,5 / 1 = 10 = S, so 10 lg(S/A) = 0 and R'tr,s = L1,s - L2 - 3.
     surf = _ANNEX_C_R + 3.0
@@ -140,7 +145,7 @@ def test_r_prime_road_traffic_fiche_labelled_rtrs(tmp_path) -> None:
     assert "30 (-2; -3) dB" in text
 
 
-def test_d_2m_n_fiche(tmp_path) -> None:
+def test_d_2m_n_fiche(tmp_path: Path) -> None:
     """``quantity='d_2m_n'`` reports the normalized facade level difference."""
     result = _facade_dnt()
     assert result.d_2m_n is not None
@@ -150,7 +155,7 @@ def test_d_2m_n_fiche(tmp_path) -> None:
     assert "Normalized facade level difference" in _extract_text(str(out))
 
 
-def test_full_metadata_and_verbose_render_one_page(tmp_path) -> None:
+def test_full_metadata_and_verbose_render_one_page(tmp_path: Path) -> None:
     """A fully populated verbose facade fiche is one page and passes its target."""
     metadata = ReportMetadata(
         specimen="Dwelling facade, loudspeaker method",
@@ -173,14 +178,14 @@ def test_full_metadata_and_verbose_render_one_page(tmp_path) -> None:
     assert "Unfav. dev." in text
 
 
-def test_requirement_verdict_fail(tmp_path) -> None:
+def test_requirement_verdict_fail(tmp_path: Path) -> None:
     """A facade level difference below the requirement fails."""
     out = tmp_path / "fail.pdf"
     _facade_dnt().report(str(out), metadata=ReportMetadata(requirement=45.0))
     assert "FAIL" in _extract_text(str(out))
 
 
-def test_spanish_fiche(tmp_path) -> None:
+def test_spanish_fiche(tmp_path: Path) -> None:
     """``language='es'`` renders the Spanish facade fiche with comma decimals."""
     import re
 
@@ -197,7 +202,7 @@ def test_spanish_fiche(tmp_path) -> None:
     assert re.search(r"\d+,\d", text)
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     result = _facade_dnt()
     out = str(tmp_path / "x.pdf")
@@ -205,7 +210,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         result.report(out, engine="weasyprint")
 
 
-def test_unknown_quantity_rejected(tmp_path) -> None:
+def test_unknown_quantity_rejected(tmp_path: Path) -> None:
     """An unknown facade quantity raises ``ValueError``."""
     result = _facade_dnt()
     out = str(tmp_path / "x.pdf")
@@ -213,7 +218,7 @@ def test_unknown_quantity_rejected(tmp_path) -> None:
         result.report(out, quantity="dnt")
 
 
-def test_missing_quantity_rejected(tmp_path) -> None:
+def test_missing_quantity_rejected(tmp_path: Path) -> None:
     """Requesting d_2m_n / r_prime without their inputs raises ``ValueError``."""
     bare = building.facade_insulation(_ANNEX_C_R + 40.0, np.full(16, 40.0), _T_AT_T0)
     out = str(tmp_path / "x.pdf")
@@ -223,7 +228,7 @@ def test_missing_quantity_rejected(tmp_path) -> None:
         bare.report(out, quantity="r_prime")
 
 
-def test_non_core_band_count_rejected(tmp_path) -> None:
+def test_non_core_band_count_rejected(tmp_path: Path) -> None:
     """The facade field fiche needs the 16 core one-third-octave bands."""
     result = building.facade_insulation(
         np.full(21, 70.0), np.full(21, 30.0), np.full(21, 0.5)

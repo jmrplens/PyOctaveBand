@@ -9,7 +9,7 @@ import pytest
 from phonometry import psychoacoustics
 
 
-def _result():
+def _result() -> psychoacoustics.ZwickerLoudness:
     fs = 48000
     t = np.arange(int(fs * 0.3)) / fs
     x = np.sqrt(2.0) * 0.02 * np.sin(2.0 * np.pi * 1000.0 * t)

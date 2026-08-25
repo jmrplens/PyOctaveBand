@@ -23,9 +23,14 @@ pytest.importorskip("reportlab")
 pytest.importorskip("svglib")
 pytest.importorskip("pypdf")
 
+from typing import TYPE_CHECKING
+
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, room
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 _VOLUME = 50.0
 _SURFACES = [
@@ -48,7 +53,7 @@ def _result() -> room.ReverberationResult:
     )
 
 
-def _metadata(**overrides) -> ReportMetadata:
+def _metadata(**overrides: float) -> ReportMetadata:
     base = {
         "specimen": "Meeting room, furnished",
         "client": "Acoustic Test Client Ltd.",
@@ -74,40 +79,40 @@ def _text(path: str) -> str:
     )
 
 
-def test_report_writes_one_page_pdf(tmp_path) -> None:
+def test_report_writes_one_page_pdf(tmp_path: Path) -> None:
     out = tmp_path / "enclosed.pdf"
     returned = _result().report(str(out))
     assert returned == str(out)
     assert_one_page(str(out))
 
 
-def test_report_with_metadata_one_page(tmp_path) -> None:
+def test_report_with_metadata_one_page(tmp_path: Path) -> None:
     out = tmp_path / "enclosed_meta.pdf"
     _result().report(str(out), metadata=_metadata())
     assert_one_page(str(out))
 
 
-def test_no_metadata_still_renders(tmp_path) -> None:
+def test_no_metadata_still_renders(tmp_path: Path) -> None:
     out = tmp_path / "enclosed_bare.pdf"
     _result().report(str(out), metadata=None)
     assert_one_page(str(out))
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     res = _result()
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="engine"):
         res.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     res = _result()
     out = str(tmp_path / "bad.pdf")
     with pytest.raises(ValueError, match="Unknown language"):
         res.report(out, language="xx")
 
 
-def test_band_labels_and_area_and_time_render(tmp_path) -> None:
+def test_band_labels_and_area_and_time_render(tmp_path: Path) -> None:
     """Nominal band labels and the closed-form A and T (2 decimals) render."""
     res = _result()
     out = tmp_path / "values.pdf"
@@ -120,7 +125,7 @@ def test_band_labels_and_area_and_time_render(tmp_path) -> None:
     assert f"{res.reverberation_time[3]:.2f}" in text
 
 
-def test_mid_frequency_descriptor_renders(tmp_path) -> None:
+def test_mid_frequency_descriptor_renders(tmp_path: Path) -> None:
     """The boxed mid-frequency reverberation time appears in the text."""
     res = _result()
     out = tmp_path / "mid.pdf"
@@ -130,7 +135,7 @@ def test_mid_frequency_descriptor_renders(tmp_path) -> None:
     assert f"{t_mid:.2f}" in text
 
 
-def test_characterisation_has_no_pass_fail_verdict(tmp_path) -> None:
+def test_characterisation_has_no_pass_fail_verdict(tmp_path: Path) -> None:
     """The fiche never invents a PASS/FAIL verdict, even with a target."""
     out = tmp_path / "noverdict.pdf"
     _result().report(str(out), metadata=_metadata(requirement=0.6))
@@ -140,7 +145,7 @@ def test_characterisation_has_no_pass_fail_verdict(tmp_path) -> None:
     assert "Target reverberation time" in text
 
 
-def test_metadata_xml_specials_do_not_break(tmp_path) -> None:
+def test_metadata_xml_specials_do_not_break(tmp_path: Path) -> None:
     md = ReportMetadata(
         client="Ac & Co <Ltd>",
         specimen="room <A> & <B>",
@@ -154,7 +159,7 @@ def test_metadata_xml_specials_do_not_break(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_spanish_fiche_uses_comma_decimal(tmp_path) -> None:
+def test_spanish_fiche_uses_comma_decimal(tmp_path: Path) -> None:
     import re
 
     out = tmp_path / "enclosed_es.pdf"

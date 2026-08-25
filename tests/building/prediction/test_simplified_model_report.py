@@ -26,6 +26,8 @@ from phonometry import ReportMetadata, building
 from phonometry._i18n import fmt_minus
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from phonometry.building.prediction.facade import (
         FacadePredictionResult,
     )
@@ -95,7 +97,7 @@ def _extract_text(path: str) -> str:
     )
 
 
-def test_airborne_prediction_rating_pinned_to_annex_h3(tmp_path) -> None:
+def test_airborne_prediction_rating_pinned_to_annex_h3(tmp_path: Path) -> None:
     """The airborne fiche boxes the Annex H.3 predicted R'w = 52 dB."""
     out = tmp_path / "air.pdf"
     # report() returns the written path (part of the public contract).
@@ -117,7 +119,7 @@ def test_airborne_prediction_rating_pinned_to_annex_h3(tmp_path) -> None:
     assert "73" in text  # intwall-Ff Rij,w
 
 
-def test_impact_prediction_rating_pinned_to_annex_e3(tmp_path) -> None:
+def test_impact_prediction_rating_pinned_to_annex_e3(tmp_path: Path) -> None:
     """The impact fiche boxes the Annex E.3 predicted L'n,w = 45 dB."""
     out = tmp_path / "imp.pdf"
     assert _annex_e3_impact().report(str(out)) == str(out)
@@ -134,7 +136,7 @@ def test_impact_prediction_rating_pinned_to_annex_e3(tmp_path) -> None:
     assert "Formula (21)" in text
 
 
-def test_airborne_verbose_adds_energy_share(tmp_path) -> None:
+def test_airborne_verbose_adds_energy_share(tmp_path: Path) -> None:
     """``verbose=True`` annexes each path's share of the transmitted energy."""
     plain = tmp_path / "plain.pdf"
     _annex_h3_airborne().report(str(plain))
@@ -147,7 +149,7 @@ def test_airborne_verbose_adds_energy_share(tmp_path) -> None:
     assert "energy share" in text  # the verbose caption
 
 
-def test_airborne_requirement_verdict(tmp_path) -> None:
+def test_airborne_requirement_verdict(tmp_path: Path) -> None:
     """Airborne insulation passes at or above the requirement."""
     result = _annex_h3_airborne()  # R'w = 52 dB
     passing = tmp_path / "pass.pdf"
@@ -159,7 +161,7 @@ def test_airborne_requirement_verdict(tmp_path) -> None:
     assert "FAIL" in _extract_text(str(failing))
 
 
-def test_impact_requirement_verdict_lower_is_better(tmp_path) -> None:
+def test_impact_requirement_verdict_lower_is_better(tmp_path: Path) -> None:
     """Impact level passes at or below the requirement (lower is better)."""
     result = _annex_e3_impact()  # L'n,w = 45 dB
     passing = tmp_path / "pass.pdf"
@@ -171,7 +173,7 @@ def test_impact_requirement_verdict_lower_is_better(tmp_path) -> None:
     assert "FAIL" in _extract_text(str(failing))
 
 
-def test_metadata_header_renders(tmp_path) -> None:
+def test_metadata_header_renders(tmp_path: Path) -> None:
     """A populated metadata header prints on the fiche."""
     metadata = ReportMetadata(
         specimen="Separating wall Rs,w = 57 dB",
@@ -191,7 +193,7 @@ def test_metadata_header_renders(tmp_path) -> None:
     assert "Phonometry Reference Laboratory" in text
 
 
-def test_lightweight_fiche_without_metadata(tmp_path) -> None:
+def test_lightweight_fiche_without_metadata(tmp_path: Path) -> None:
     """A fiche with no metadata is still a valid one-page prediction report."""
     out = tmp_path / "bare.pdf"
     _annex_e3_impact().report(str(out))
@@ -199,7 +201,7 @@ def test_lightweight_fiche_without_metadata(tmp_path) -> None:
     assert "prediction" in _extract_text(str(out))
 
 
-def test_spanish_fiche_renders_translated(tmp_path) -> None:
+def test_spanish_fiche_renders_translated(tmp_path: Path) -> None:
     """``language="es"`` renders the Spanish fiche with comma decimals."""
     import re
 
@@ -218,7 +220,7 @@ def test_spanish_fiche_renders_translated(tmp_path) -> None:
     assert re.search(r"\d+,\d", text)  # comma decimal separator
 
 
-def test_impact_spanish_fiche_renders_translated(tmp_path) -> None:
+def test_impact_spanish_fiche_renders_translated(tmp_path: Path) -> None:
     """The impact fiche also renders in Spanish."""
     out = tmp_path / "es_imp.pdf"
     _annex_e3_impact().report(str(out), language="es")
@@ -228,7 +230,7 @@ def test_impact_spanish_fiche_renders_translated(tmp_path) -> None:
     assert "rmula (21)" in text  # "fórmula (21)"
 
 
-def test_facade_prediction_rating_pinned_to_annex_f(tmp_path) -> None:
+def test_facade_prediction_rating_pinned_to_annex_f(tmp_path: Path) -> None:
     """The facade fiche boxes the Annex F predicted D2m,nT,w = 33 dB."""
     out = tmp_path / "facade.pdf"
     assert _annex_f_facade().report(str(out)) == str(out)
@@ -255,7 +257,7 @@ def test_facade_prediction_rating_pinned_to_annex_f(tmp_path) -> None:
     assert "37" in text  # window Rp,w
 
 
-def test_facade_verbose_adds_energy_share(tmp_path) -> None:
+def test_facade_verbose_adds_energy_share(tmp_path: Path) -> None:
     """``verbose=True`` annexes each element's share of the transmitted energy."""
     plain = tmp_path / "plain.pdf"
     _annex_f_facade().report(str(plain))
@@ -268,7 +270,7 @@ def test_facade_verbose_adds_energy_share(tmp_path) -> None:
     assert "energy share" in text  # the verbose caption
 
 
-def test_facade_requirement_verdict(tmp_path) -> None:
+def test_facade_requirement_verdict(tmp_path: Path) -> None:
     """Facade insulation passes at or above the requirement."""
     result = _annex_f_facade()  # D2m,nT,w = 33 dB
     passing = tmp_path / "pass.pdf"
@@ -280,7 +282,7 @@ def test_facade_requirement_verdict(tmp_path) -> None:
     assert "FAIL" in _extract_text(str(failing))
 
 
-def test_facade_lightweight_fiche_without_metadata(tmp_path) -> None:
+def test_facade_lightweight_fiche_without_metadata(tmp_path: Path) -> None:
     """A facade fiche with no metadata is still a valid one-page prediction."""
     out = tmp_path / "bare.pdf"
     _annex_f_facade().report(str(out))
@@ -288,7 +290,7 @@ def test_facade_lightweight_fiche_without_metadata(tmp_path) -> None:
     assert "prediction" in _extract_text(str(out))
 
 
-def test_facade_spanish_fiche_renders_translated(tmp_path) -> None:
+def test_facade_spanish_fiche_renders_translated(tmp_path: Path) -> None:
     """``language="es"`` renders the Spanish facade fiche."""
     out = tmp_path / "es.pdf"
     _annex_f_facade().report(
@@ -305,7 +307,7 @@ def test_facade_spanish_fiche_renders_translated(tmp_path) -> None:
     assert "fachada" in text  # "facade"
 
 
-def test_facade_report_requires_single_number_ratings(tmp_path) -> None:
+def test_facade_report_requires_single_number_ratings(tmp_path: Path) -> None:
     """A facade result without the ISO 717-1 ratings cannot be reported."""
     # Three bands: not the 5 octave / 16 one-third-octave set, so no rating.
     result = building.facade_sound_reduction(
@@ -318,7 +320,7 @@ def test_facade_report_requires_single_number_ratings(tmp_path) -> None:
         result.report(out)
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     out = str(tmp_path / "x.pdf")
     result = _annex_h3_airborne()
@@ -326,7 +328,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         result.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unsupported language raises ``ValueError`` (shared validation path)."""
     out = str(tmp_path / "x.pdf")
     result = _annex_e3_impact()

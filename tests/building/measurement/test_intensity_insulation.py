@@ -12,7 +12,9 @@ import reference_data as ref
 from phonometry import building
 
 
-def _levels_for_target_ri(ri, lp1, sm, s):
+def _levels_for_target_ri(
+    ri: list[float], lp1: float, sm: float, s: float
+) -> np.ndarray:
     """Receiving-side LIn that make Formula (7) return exactly ``ri``."""
     ri = np.asarray(ri, dtype=np.float64)
     return lp1 - 6.0 - 10.0 * np.log10(sm / s) - ri
