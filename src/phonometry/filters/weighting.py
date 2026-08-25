@@ -509,9 +509,11 @@ class TimeWeightedEnvelope:
     mode: str
     calibrated: bool
 
-    def __array__(self, dtype: DTypeLike | None = None) -> np.ndarray:
+    def __array__(
+        self, dtype: DTypeLike | None = None, copy: bool | None = None
+    ) -> np.ndarray:
         """Return the envelope as an array (optionally recast)."""
-        return np.asarray(self.mean_square, dtype=dtype)
+        return np.asarray(self.mean_square, dtype=dtype, copy=copy)
 
     def __len__(self) -> int:
         """Length of the leading axis: channels when 2-D, samples for one channel."""

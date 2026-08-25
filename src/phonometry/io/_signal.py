@@ -141,9 +141,11 @@ class Signal:
         """The array the object stands for: 1-D mono, 2-D multichannel."""
         return self.data[0] if self.data.shape[0] == 1 else self.data
 
-    def __array__(self, dtype: DTypeLike | None = None) -> np.ndarray:
+    def __array__(
+        self, dtype: DTypeLike | None = None, copy: bool | None = None
+    ) -> np.ndarray:
         """Return the samples as an array (optionally recast)."""
-        return np.asarray(self._view, dtype=dtype)
+        return np.asarray(self._view, dtype=dtype, copy=copy)
 
     def __len__(self) -> int:
         return int(self._view.shape[0])

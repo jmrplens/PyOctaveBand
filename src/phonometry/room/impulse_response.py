@@ -168,9 +168,11 @@ class ImpulseResponseResult:
     fs: int | None
     method: str
 
-    def __array__(self, dtype: DTypeLike | None = None) -> np.ndarray:
+    def __array__(
+        self, dtype: DTypeLike | None = None, copy: bool | None = None
+    ) -> np.ndarray:
         """Return the impulse response as an array (optionally recast)."""
-        return np.asarray(self.ir, dtype=dtype)
+        return np.asarray(self.ir, dtype=dtype, copy=copy)
 
     def __len__(self) -> int:
         """Number of impulse-response samples (the length of ``ir``'s last axis)."""
@@ -897,9 +899,11 @@ class ShapedSweepResult:
             self, "frequencies", "magnitude", "group_delay", axis="frequency bin"
         )
 
-    def __array__(self, dtype: DTypeLike | None = None) -> np.ndarray:
+    def __array__(
+        self, dtype: DTypeLike | None = None, copy: bool | None = None
+    ) -> np.ndarray:
         """Return the sweep samples as an array (optionally recast)."""
-        return np.asarray(self.signal, dtype=dtype)
+        return np.asarray(self.signal, dtype=dtype, copy=copy)
 
     def __len__(self) -> int:
         """Number of sweep samples (the length of ``signal``'s last axis)."""

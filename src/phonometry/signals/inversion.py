@@ -79,7 +79,9 @@ class TimedResponse(Protocol):
     @property
     def fs(self) -> float | None: ...
 
-    def __array__(self) -> np.ndarray: ...
+    def __array__(
+        self, dtype: DTypeLike | None = None, copy: bool | None = None
+    ) -> np.ndarray: ...
 
 
 @dataclass(frozen=True)
@@ -183,9 +185,11 @@ class InverseFilterResult:
             axis="frequency",
         )
 
-    def __array__(self, dtype: DTypeLike | None = None) -> np.ndarray:
+    def __array__(
+        self, dtype: DTypeLike | None = None, copy: bool | None = None
+    ) -> np.ndarray:
         """Return the inverse-filter samples as an array."""
-        return np.asarray(self.inverse, dtype=dtype)
+        return np.asarray(self.inverse, dtype=dtype, copy=copy)
 
     def __len__(self) -> int:
         """Number of inverse-filter samples, the ``n_fft`` of the design."""
