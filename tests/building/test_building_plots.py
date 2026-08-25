@@ -10,7 +10,7 @@ centre frequencies, a rigid rather than resilient tie) have to be exercised.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol
 
 import matplotlib as mpl
 
@@ -292,6 +292,17 @@ def test_wall_tie_plot_forwards_kwargs() -> None:
     assert any(ln.get_linewidth() == 3.0 for ln in ax.lines)
 
 
+class _Plottable(Protocol):
+    """What the language-validation test actually uses: the shared plot seam.
+
+    ``object`` would claim the test never looks inside the result, and calling
+    ``plot`` is the whole test; a union of the six concrete types would repeat
+    the parametrize list. The protocol says exactly as much as the test needs.
+    """
+
+    def plot(self, *, language: str = ...) -> Axes: ...
+
+
 # ---------------------------------------------------------------------------
 # Language validation
 # ---------------------------------------------------------------------------
@@ -308,7 +319,7 @@ def test_wall_tie_plot_forwards_kwargs() -> None:
         lambda: _coupling(tie="butterfly"),
     ],
 )
-def test_plot_rejects_an_unknown_language(factory: Callable[[], object]) -> None:
+def test_plot_rejects_an_unknown_language(factory: Callable[[], _Plottable]) -> None:
     result = factory()
     with pytest.raises(ValueError, match="Unknown language"):
         result.plot(language="fr")
