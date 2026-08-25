@@ -1,6 +1,7 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for filter design helpers and response plotting utilities."""
 
+from pathlib import Path
 from unittest.mock import patch
 
 import matplotlib.pyplot as plt
@@ -113,7 +114,7 @@ def test_bessel_minus3db_at_band_edges(fraction: float) -> None:
         )
 
 
-def test_showfilter_saves_shows_and_noops(tmp_path) -> None:
+def test_showfilter_saves_shows_and_noops(tmp_path: Path) -> None:
     """Verify _showfilter handles save, show, and no-output branches."""
     fs = 8000
     sos = [np.array([[1, 0, 0, 1, 0, 0]])]
@@ -155,7 +156,7 @@ def test_all_filter_architectures_design() -> None:
         assert len(sos[0]) > 0
 
 
-def test_design_sos_with_internal_plot(tmp_path) -> None:
+def test_design_sos_with_internal_plot(tmp_path: Path) -> None:
     """Verify _design_sos_filter forwards plot output to _showfilter."""
     plot_path = tmp_path / "test_design_plot.png"
 

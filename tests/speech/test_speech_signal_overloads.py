@@ -21,6 +21,8 @@ not pass) and leave what it does to the definitions.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 from signal_contract import assert_same
@@ -32,6 +34,9 @@ from phonometry.speech import (
     stipa_signal,
     stoi,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 FS = 48000
 STOI_FS = 10000
@@ -66,12 +71,16 @@ SOLO_IDS = [f.__name__ for f, _ in SOLO]
 
 
 @pytest.mark.parametrize(("func", "record"), SOLO, ids=SOLO_IDS)
-def test_an_uncalibrated_signal_computes_the_bare_array_result(func, record) -> None:
+def test_an_uncalibrated_signal_computes_the_bare_array_result(
+    func: Callable[..., object], record: np.ndarray
+) -> None:
     assert_same(func(Signal(record, FS)), func(record, FS))
 
 
 @pytest.mark.parametrize(("func", "record"), SOLO, ids=SOLO_IDS)
-def test_a_conflicting_rate_is_refused_a_matching_one_is_not(func, record) -> None:
+def test_a_conflicting_rate_is_refused_a_matching_one_is_not(
+    func: Callable[..., object], record: np.ndarray
+) -> None:
     sig = Signal(record, FS)
     with pytest.raises(ValueError, match="conflicts with the Signal's own fs"):
         func(sig, FS + 1)
@@ -80,13 +89,17 @@ def test_a_conflicting_rate_is_refused_a_matching_one_is_not(func, record) -> No
 
 
 @pytest.mark.parametrize(("func", "record"), SOLO, ids=SOLO_IDS)
-def test_a_bare_array_still_requires_fs(func, record) -> None:
+def test_a_bare_array_still_requires_fs(
+    func: Callable[..., object], record: np.ndarray
+) -> None:
     with pytest.raises(ValueError, match="fs is required"):
         func(record)
 
 
 @pytest.mark.parametrize(("func", "record"), SOLO, ids=SOLO_IDS)
-def test_a_calibrated_signal_is_analysed_in_pascals(func, record) -> None:
+def test_a_calibrated_signal_is_analysed_in_pascals(
+    func: Callable[..., object], record: np.ndarray
+) -> None:
     assert_same(
         func(Signal(record, FS, calibration_factor=CAL)), func(CAL * record, FS)
     )

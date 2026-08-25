@@ -14,11 +14,16 @@ English and Spanish fiches are exercised.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.hearing import NoiseInducedHearingLossWarning, htlan, nipts
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def _extract_text(path: str) -> str:
@@ -32,7 +37,7 @@ def _extract_text(path: str) -> str:
 # --- NIPTS fiche --------------------------------------------------------------
 
 
-def test_nipts_report_renders_annex_d_values(tmp_path) -> None:
+def test_nipts_report_renders_annex_d_values(tmp_path: Path) -> None:
     """The NIPTS fiche prints the Annex D N50 and fractile shift and one page."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -52,7 +57,7 @@ def test_nipts_report_renders_annex_d_values(tmp_path) -> None:
     assert "not a clinical diagnosis" in text
 
 
-def test_nipts_verbose_adds_spread_columns(tmp_path) -> None:
+def test_nipts_verbose_adds_spread_columns(tmp_path: Path) -> None:
     """verbose=True adds the du/dl spread columns to the NIPTS table."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -66,7 +71,7 @@ def test_nipts_verbose_adds_spread_columns(tmp_path) -> None:
     assert "dl[dB]" in flat
 
 
-def test_nipts_verdict_against_requirement(tmp_path) -> None:
+def test_nipts_verdict_against_requirement(tmp_path: Path) -> None:
     """A metadata requirement adds a PASS/FAIL verdict on the representative NIPTS."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -82,7 +87,7 @@ def test_nipts_verdict_against_requirement(tmp_path) -> None:
     assert "FAIL" in _extract_text(str(out_fail))
 
 
-def test_nipts_states_iso_q_and_scope_caveat(tmp_path) -> None:
+def test_nipts_states_iso_q_and_scope_caveat(tmp_path: Path) -> None:
     """The fiche prints ISO 1999's own Q and the Scope NOTE 1 caveat."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -99,7 +104,7 @@ def test_nipts_states_iso_q_and_scope_caveat(tmp_path) -> None:
     assert "do not describe any individual person" in text
 
 
-def test_nipts_outside_domain_prints_extrapolation_caveat(tmp_path) -> None:
+def test_nipts_outside_domain_prints_extrapolation_caveat(tmp_path: Path) -> None:
     """Conditions beyond the validated domain carry the caveat on the fiche."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -118,7 +123,7 @@ def test_nipts_outside_domain_prints_extrapolation_caveat(tmp_path) -> None:
     assert "outside the validated domain" not in _extract_text(str(inside))
 
 
-def test_nipts_subset_boxes_peak_shift(tmp_path) -> None:
+def test_nipts_subset_boxes_peak_shift(tmp_path: Path) -> None:
     """Without the full 2/3/4 kHz set the fiche boxes the peak shift instead."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -133,7 +138,7 @@ def test_nipts_subset_boxes_peak_shift(tmp_path) -> None:
 # --- HTLAN fiche --------------------------------------------------------------
 
 
-def test_htlan_report_renders_components(tmp_path) -> None:
+def test_htlan_report_renders_components(tmp_path: Path) -> None:
     """The HTLAN fiche prints the combined threshold and one page."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -157,7 +162,7 @@ def test_htlan_report_renders_components(tmp_path) -> None:
     assert "ISO 7029:2017" in text
 
 
-def test_htlan_verbose_adds_compression_term(tmp_path) -> None:
+def test_htlan_verbose_adds_compression_term(tmp_path: Path) -> None:
     """verbose=True adds the H*N/120 compression column to the HTLAN table."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -170,7 +175,7 @@ def test_htlan_verbose_adds_compression_term(tmp_path) -> None:
     assert "N/120" in flat
 
 
-def test_htlan_metadata_header_renders(tmp_path) -> None:
+def test_htlan_metadata_header_renders(tmp_path: Path) -> None:
     """Supplied metadata renders the header grid identity."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -192,7 +197,7 @@ def test_htlan_metadata_header_renders(tmp_path) -> None:
 # --- Spanish fiche ------------------------------------------------------------
 
 
-def test_nipts_spanish_report(tmp_path) -> None:
+def test_nipts_spanish_report(tmp_path: Path) -> None:
     """language="es" renders the Spanish NIPTS vocabulary and comma decimals."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -208,7 +213,7 @@ def test_nipts_spanish_report(tmp_path) -> None:
     assert "Fractil poblacional Q = 10 % (fracción con peor audición)" in text
 
 
-def test_htlan_spanish_report(tmp_path) -> None:
+def test_htlan_spanish_report(tmp_path: Path) -> None:
     """language="es" renders the Spanish HTLAN vocabulary and comma decimals."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -231,7 +236,7 @@ def test_htlan_spanish_report(tmp_path) -> None:
 # --- rendering contract -------------------------------------------------------
 
 
-def test_nipts_unknown_engine_rejected(tmp_path) -> None:
+def test_nipts_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     res = nipts(90.0, 20.0, 0.9)
     out = str(tmp_path / "x.pdf")
@@ -239,7 +244,7 @@ def test_nipts_unknown_engine_rejected(tmp_path) -> None:
         res.report(out, engine="weasyprint")
 
 
-def test_htlan_unknown_language_rejected(tmp_path) -> None:
+def test_htlan_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     res = htlan(60, "male", 95.0, 30.0, 0.5)
     out = str(tmp_path / "bad.pdf")

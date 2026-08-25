@@ -1,6 +1,8 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 import os
 
+import pytest
+
 # Select a non-interactive matplotlib backend for the headless test suite.
 # The library no longer forces a backend (see issue #52), so the test harness
 # must opt into Agg itself; otherwise matplotlib picks a GUI backend (e.g.
@@ -9,7 +11,7 @@ import os
 os.environ.setdefault("MPLBACKEND", "Agg")
 
 
-def pytest_configure(config):
+def pytest_configure(config: pytest.Config) -> None:
     """Configure environment variables for the test session.
     We disable Numba JIT to allow coverage tools to trace inside the kernels.
     """
@@ -46,7 +48,9 @@ _FRONTLOADED_MODULES = (
 )
 
 
-def pytest_collection_modifyitems(config, items):
+def pytest_collection_modifyitems(
+    config: pytest.Config, items: list[pytest.Item]
+) -> None:
     """Move the known-heavy modules to the front of the dispatch order.
 
     The sort is stable, so relative order inside every module (and among all
@@ -66,7 +70,7 @@ def pytest_collection_modifyitems(config, items):
     items.sort(key=lambda item: rank[item.nodeid.split("::", 1)[0]])
 
 
-def pytest_report_header(config):
+def pytest_report_header(config: pytest.Config) -> list[str]:
     """Report which copy of every heavy oracle set this run will read.
 
     The suites in ``tests/oracle_data.DATASETS`` prefer a full local copy of

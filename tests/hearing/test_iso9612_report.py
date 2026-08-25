@@ -18,17 +18,22 @@ the rendering contract.
 from __future__ import annotations
 
 import math
+from typing import TYPE_CHECKING
 
 import pytest
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.hearing import (
+    ExposureResult,
     Task,
     full_day_exposure,
     job_based_exposure,
     task_based_exposure,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def _extract_text(path: str) -> str:
@@ -39,7 +44,7 @@ def _extract_text(path: str) -> str:
     return " ".join(raw.split())
 
 
-def _two_task_result():
+def _two_task_result() -> ExposureResult:
     """Hand-derivable oracle: 4 h at 85 dB plus 4 h at 75 dB."""
     tasks = [
         Task(samples=(85.0,), duration_hours=4.0, label="machining"),
@@ -48,7 +53,7 @@ def _two_task_result():
     return task_based_exposure(tasks, warn=False)
 
 
-def _single_task_result(level: float):
+def _single_task_result(level: float) -> ExposureResult:
     """A whole nominal day at one level: LEX,8h equals the level exactly."""
     return task_based_exposure(
         [Task(samples=(level,), duration_hours=8.0, label="task")], warn=False
@@ -73,7 +78,7 @@ def test_two_task_hand_oracle_values() -> None:
     assert res.expanded_uncertainty == pytest.approx(1.65 * expected_u, abs=1e-9)
 
 
-def test_report_renders_hand_computed_values(tmp_path) -> None:
+def test_report_renders_hand_computed_values(tmp_path: Path) -> None:
     """The fiche prints the hand-derived LEX,8h = 82.4 dB and U = 2.7 dB."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -92,7 +97,7 @@ def test_report_renders_hand_computed_values(tmp_path) -> None:
     assert "IEC 61252" in text
 
 
-def test_annex_d_example_renders_pinned_numbers(tmp_path) -> None:
+def test_annex_d_example_renders_pinned_numbers(tmp_path: Path) -> None:
     """The ISO 9612 Annex D welders' day prints 84.3 dB and U = 3.2 dB."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -135,7 +140,7 @@ def test_annex_d_example_renders_pinned_numbers(tmp_path) -> None:
     ],
 )
 def test_directive_boundaries_on_displayed_value(
-    tmp_path, level: float, n_exceeded: int, verdict: str
+    tmp_path: Path, level: float, n_exceeded: int, verdict: str
 ) -> None:
     """The 80/85/87 dB(A) rows flip on the one-decimal displayed value."""
     pytest.importorskip("reportlab")
@@ -154,7 +159,7 @@ def test_directive_boundaries_on_displayed_value(
 # --- job-based and full-day layouts -------------------------------------------
 
 
-def test_job_based_report_renders_sampling_summary(tmp_path) -> None:
+def test_job_based_report_renders_sampling_summary(tmp_path: Path) -> None:
     """A job-based result renders the sampling summary (Annex E numbers)."""
     pytest.importorskip("reportlab")
     res = job_based_exposure(
@@ -171,7 +176,7 @@ def test_job_based_report_renders_sampling_summary(tmp_path) -> None:
     assert "3.8" in text  # U
 
 
-def test_full_day_report_renders(tmp_path) -> None:
+def test_full_day_report_renders(tmp_path: Path) -> None:
     """A full-day result renders the Clause 11 basis and one page."""
     pytest.importorskip("reportlab")
     res = full_day_exposure(
@@ -189,7 +194,7 @@ def test_full_day_report_renders(tmp_path) -> None:
 # --- metadata, verbose and instrumentation ------------------------------------
 
 
-def test_metadata_header_and_instrumentation_override(tmp_path) -> None:
+def test_metadata_header_and_instrumentation_override(tmp_path: Path) -> None:
     """Supplied metadata renders the header grid; instrumentation overrides."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -215,7 +220,7 @@ def test_metadata_header_and_instrumentation_override(tmp_path) -> None:
     assert "IEC 61252" not in text
 
 
-def test_verbose_adds_annex_c_columns(tmp_path) -> None:
+def test_verbose_adds_annex_c_columns(tmp_path: Path) -> None:
     """verbose=True adds the per-task u1a/u1b/u2 columns to the task table."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -237,7 +242,7 @@ def test_instrument_class_is_threaded_to_the_result() -> None:
     assert job.instrument == "class1"
 
 
-def test_class1_fallback_names_the_sound_level_meter(tmp_path) -> None:
+def test_class1_fallback_names_the_sound_level_meter(tmp_path: Path) -> None:
     """Without metadata, the class-1 instrument prints its IEC 61672-1 name."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -254,7 +259,7 @@ def test_class1_fallback_names_the_sound_level_meter(tmp_path) -> None:
 # --- Spanish fiche -------------------------------------------------------------
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """language="es" renders the occupational vocabulary and comma decimals."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -273,7 +278,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
 # --- rendering contract --------------------------------------------------------
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     res = _two_task_result()
     out = str(tmp_path / "x.pdf")
@@ -281,7 +286,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         res.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     res = _two_task_result()
     out = str(tmp_path / "bad.pdf")

@@ -10,6 +10,8 @@ refusal paths and input validation, mirroring the materials geometry tests.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
@@ -20,11 +22,16 @@ import matplotlib.pyplot as plt
 
 import phonometry as pm
 
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from matplotlib.axes import Axes
+
 FREQ = np.linspace(50.0, 1600.0, 24)
 
 
 @pytest.fixture(autouse=True)
-def _close_figures():
+def _close_figures() -> Iterator[None]:
     yield
     plt.close("all")
 
@@ -88,7 +95,7 @@ def _chain(branch_length: float = 0.686) -> pm.noise_control.SilencerChain:
     )
 
 
-def _lengths_lettered(ax) -> set[str]:
+def _lengths_lettered(ax: Axes) -> set[str]:
     """Every measurement the drawing letters, as it letters it."""
     return {text.get_text() for text in ax.texts if text.get_text().endswith(" mm")}
 

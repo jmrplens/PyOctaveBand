@@ -23,6 +23,8 @@ is therefore the opposite of every other one here.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 from signal_contract import assert_same
@@ -46,6 +48,9 @@ from phonometry.electroacoustics import (
     weighted_thd,
 )
 from phonometry.io import Signal
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 FS = 48000
 CAL = 3.0
@@ -104,7 +109,7 @@ PAIR_IDS = [f.__name__ for f, _ in PAIRS]
     ("func", "record", "kwargs"), SOLO + FULL_SCALE, ids=SOLO_IDS + FULL_SCALE_IDS
 )
 def test_an_uncalibrated_signal_computes_the_bare_array_result(
-    func, record, kwargs
+    func: Callable[..., object], record: np.ndarray, kwargs: dict[str, float]
 ) -> None:
     assert_same(func(Signal(record, FS), **kwargs), func(record, FS, **kwargs))
 
@@ -113,7 +118,7 @@ def test_an_uncalibrated_signal_computes_the_bare_array_result(
     ("func", "record", "kwargs"), SOLO + FULL_SCALE, ids=SOLO_IDS + FULL_SCALE_IDS
 )
 def test_a_conflicting_rate_is_refused_a_matching_one_is_not(
-    func, record, kwargs
+    func: Callable[..., object], record: np.ndarray, kwargs: dict[str, float]
 ) -> None:
     sig = Signal(record, FS)
     with pytest.raises(ValueError, match="conflicts with the Signal's own fs"):
@@ -125,7 +130,9 @@ def test_a_conflicting_rate_is_refused_a_matching_one_is_not(
 @pytest.mark.parametrize(
     ("func", "record", "kwargs"), SOLO + FULL_SCALE, ids=SOLO_IDS + FULL_SCALE_IDS
 )
-def test_a_bare_array_still_requires_fs(func, record, kwargs) -> None:
+def test_a_bare_array_still_requires_fs(
+    func: Callable[..., object], record: np.ndarray, kwargs: dict[str, float]
+) -> None:
     with pytest.raises(ValueError, match="fs is required"):
         func(record, **kwargs)
 
@@ -133,7 +140,9 @@ def test_a_bare_array_still_requires_fs(func, record, kwargs) -> None:
 @pytest.mark.parametrize(
     ("func", "record", "kwargs"), SOLO + FULL_SCALE, ids=SOLO_IDS + FULL_SCALE_IDS
 )
-def test_a_multichannel_signal_is_refused_by_name(func, record, kwargs) -> None:
+def test_a_multichannel_signal_is_refused_by_name(
+    func: Callable[..., object], record: np.ndarray, kwargs: dict[str, float]
+) -> None:
     """These metrics are defined on one record, and say so."""
     block = Signal(np.stack([record, record]), FS)
     with pytest.raises(ValueError, match="one-dimensional"):
@@ -146,7 +155,9 @@ def test_a_multichannel_signal_is_refused_by_name(func, record, kwargs) -> None:
 
 
 @pytest.mark.parametrize(("func", "record", "kwargs"), SOLO, ids=SOLO_IDS)
-def test_a_calibrated_signal_is_analysed_in_pascals(func, record, kwargs) -> None:
+def test_a_calibrated_signal_is_analysed_in_pascals(
+    func: Callable[..., object], record: np.ndarray, kwargs: dict[str, float]
+) -> None:
     assert_same(
         func(Signal(record, FS, calibration_factor=CAL), **kwargs),
         func(CAL * record, FS, **kwargs),
@@ -154,7 +165,9 @@ def test_a_calibrated_signal_is_analysed_in_pascals(func, record, kwargs) -> Non
 
 
 @pytest.mark.parametrize(("func", "record", "kwargs"), FULL_SCALE, ids=FULL_SCALE_IDS)
-def test_a_full_scale_quantity_never_sees_the_calibration(func, record, kwargs) -> None:
+def test_a_full_scale_quantity_never_sees_the_calibration(
+    func: Callable[..., object], record: np.ndarray, kwargs: dict[str, float]
+) -> None:
     """The exemption, asserted from both sides.
 
     The calibrated call must equal the *bare* one, and must differ from the
@@ -173,7 +186,9 @@ def test_a_full_scale_quantity_never_sees_the_calibration(func, record, kwargs) 
 
 
 @pytest.mark.parametrize(("func", "kwargs"), PAIRS, ids=PAIR_IDS)
-def test_a_pair_takes_the_rate_from_either_side(func, kwargs) -> None:
+def test_a_pair_takes_the_rate_from_either_side(
+    func: Callable[..., object], kwargs: dict[str, float]
+) -> None:
     x, y = _HARMONIC, _MODULATION
     reference = func(x, y, FS, **kwargs)
     assert_same(func(Signal(x, FS), y, **kwargs), reference)
@@ -182,20 +197,26 @@ def test_a_pair_takes_the_rate_from_either_side(func, kwargs) -> None:
 
 
 @pytest.mark.parametrize(("func", "kwargs"), PAIRS, ids=PAIR_IDS)
-def test_two_signals_at_different_rates_are_refused(func, kwargs) -> None:
+def test_two_signals_at_different_rates_are_refused(
+    func: Callable[..., object], kwargs: dict[str, float]
+) -> None:
     first, second = Signal(_HARMONIC, FS), Signal(_MODULATION, FS // 2)
     with pytest.raises(ValueError, match="recorded at different rates"):
         func(first, second, **kwargs)
 
 
 @pytest.mark.parametrize(("func", "kwargs"), PAIRS, ids=PAIR_IDS)
-def test_a_pair_of_bare_arrays_still_requires_fs(func, kwargs) -> None:
+def test_a_pair_of_bare_arrays_still_requires_fs(
+    func: Callable[..., object], kwargs: dict[str, float]
+) -> None:
     with pytest.raises(ValueError, match="fs is required"):
         func(_HARMONIC, _MODULATION, **kwargs)
 
 
 @pytest.mark.parametrize(("func", "kwargs"), PAIRS, ids=PAIR_IDS)
-def test_a_calibrated_pair_is_analysed_in_pascals(func, kwargs) -> None:
+def test_a_calibrated_pair_is_analysed_in_pascals(
+    func: Callable[..., object], kwargs: dict[str, float]
+) -> None:
     """Two different factors, because a shared one cancels from both of these.
 
     The transfer function is a ratio of the two records and the coherence is

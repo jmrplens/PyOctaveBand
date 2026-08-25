@@ -13,6 +13,7 @@ verification itself is validated against the standard's Table 1 elsewhere
 from __future__ import annotations
 
 import pickle
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -21,6 +22,9 @@ pytest.importorskip("reportlab")
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, filters
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def _class1_bank() -> filters.OctaveFilterBank:
@@ -49,7 +53,7 @@ def test_filter_class_compliance_carries_bank_data() -> None:
     pickle.loads(pickle.dumps(result))
 
 
-def test_class1_bank_reports_complies(tmp_path) -> None:
+def test_class1_bank_reports_complies(tmp_path: Path) -> None:
     """A class-1 bank renders a valid one-page COMPLIES fiche."""
     result = filters.filter_class_compliance(_class1_bank())
     assert result.overall_class == 1
@@ -59,7 +63,7 @@ def test_class1_bank_reports_complies(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_1995_edition_reports_class0(tmp_path) -> None:
+def test_1995_edition_reports_class0(tmp_path: Path) -> None:
     """The 1995 edition keeps class 0; a high-order bank renders a Class 0 fiche."""
     bank = filters.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[250, 4000])
     result = filters.filter_class_compliance(bank, edition="1995")
@@ -76,7 +80,7 @@ def test_1995_edition_reports_class0(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_full_metadata_renders_one_page(tmp_path) -> None:
+def test_full_metadata_renders_one_page(tmp_path: Path) -> None:
     """A populated ReportMetadata renders a one-page filter-compliance fiche."""
     result = filters.filter_class_compliance(_class1_bank())
     md = ReportMetadata(
@@ -96,7 +100,7 @@ def test_full_metadata_renders_one_page(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     result = filters.filter_class_compliance(
         _class1_bank()
@@ -106,7 +110,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         result.report(out, engine="weasyprint")
 
 
-def test_required_class_pass_and_fail_both_render(tmp_path) -> None:
+def test_required_class_pass_and_fail_both_render(tmp_path: Path) -> None:
     """A PASS (class 1 meets required 1) and a FAIL (meets no class) both render."""
     result = filters.filter_class_compliance(_class1_bank())
     assert result.overall_class == 1
@@ -123,7 +127,7 @@ def test_required_class_pass_and_fail_both_render(tmp_path) -> None:
     assert_one_page(str(failing))
 
 
-def test_required_class_missing_from_edition_rejected(tmp_path) -> None:
+def test_required_class_missing_from_edition_rejected(tmp_path: Path) -> None:
     """Class 0 against a 2014-edition result raises: the class does not exist.
 
     IEC 61260-1:2014 defines only classes 1 and 2; a required class 0 verdict
@@ -137,7 +141,7 @@ def test_required_class_missing_from_edition_rejected(tmp_path) -> None:
         result.report(out, metadata=meta)
 
 
-def test_fiche_labels_bands_with_nominal_frequencies(tmp_path) -> None:
+def test_fiche_labels_bands_with_nominal_frequencies(tmp_path: Path) -> None:
     """The per-band table uses the nominal mid-band frequencies.
 
     Both editions identify the filters by their nominal frequencies
@@ -154,7 +158,7 @@ def test_fiche_labels_bands_with_nominal_frequencies(tmp_path) -> None:
     assert "3981" not in text
 
 
-def test_range_limited_verdict_prints_qualifying_note(tmp_path) -> None:
+def test_range_limited_verdict_prints_qualifying_note(tmp_path: Path) -> None:
     """A range-limited COMPLIES is qualified on the fiche.
 
     The multirate verification cannot exercise the stop-band mask beyond each
@@ -173,7 +177,7 @@ def test_range_limited_verdict_prints_qualifying_note(tmp_path) -> None:
     assert "not demonstrated" in text
 
 
-def test_non_compliant_bank_renders(tmp_path) -> None:
+def test_non_compliant_bank_renders(tmp_path: Path) -> None:
     """A low-order bank that meets no class renders its non-compliance fiche."""
     bank = filters.OctaveFilterBank(fs=48000, fraction=1, order=1, limits=[500, 2000])
     result = filters.filter_class_compliance(bank)
@@ -214,7 +218,7 @@ def _extract_text(path: str) -> str:
     return "\n".join(page.extract_text() for page in PdfReader(path).pages)
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """``language="es"`` renders a one-page Spanish fiche with comma decimals."""
     import re
 
@@ -229,7 +233,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     assert "margen" in text
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ``ValueError``."""
     result = filters.filter_class_compliance(_class1_bank())
     with pytest.raises(ValueError, match="language"):

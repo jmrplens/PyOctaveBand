@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import pathlib
 import sys
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -31,9 +32,12 @@ import check_figure_contrast as cfc
 
 from phonometry._plot.common import theme_fill
 
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
 
 @pytest.fixture(autouse=True)
-def _close_figures():
+def _close_figures() -> Iterator[None]:
     yield
     plt.close("all")
 

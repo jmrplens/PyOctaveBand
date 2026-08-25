@@ -15,12 +15,16 @@ from __future__ import annotations
 
 import pathlib
 import sys
+from typing import TYPE_CHECKING
 
 _SCRIPTS = str(pathlib.Path(__file__).resolve().parent.parent / "scripts")
 if _SCRIPTS not in sys.path:
     sys.path.insert(0, _SCRIPTS)
 
 import check_subscript_slope as css
+
+if TYPE_CHECKING:
+    import pytest
 
 
 def _write(tmp_path: pathlib.Path, name: str, text: str) -> pathlib.Path:
@@ -29,7 +33,7 @@ def _write(tmp_path: pathlib.Path, name: str, text: str) -> pathlib.Path:
     return path
 
 
-def test_one_symbol_two_slopes_in_one_file_fails(tmp_path):
+def test_one_symbol_two_slopes_in_one_file_fails(tmp_path: pathlib.Path) -> None:
     """The defect the gate exists for, with both lines named."""
     path = _write(
         tmp_path,
@@ -46,7 +50,7 @@ def test_one_symbol_two_slopes_in_one_file_fails(tmp_path):
     assert "upright on line 3" in failures[0]
 
 
-def test_two_files_may_disagree(tmp_path):
+def test_two_files_may_disagree(tmp_path: pathlib.Path) -> None:
     """The silence the file scope depends on: D_z is both, one per module."""
     outdoor = _write(tmp_path, "outdoor.md", "Screening $D_z$ from the path.\n")
     shock = _write(tmp_path, "shock.md", "Dose $D_\\mathrm{z}$ up the spine.\n")
@@ -54,7 +58,7 @@ def test_two_files_may_disagree(tmp_path):
     assert failures == []
 
 
-def test_component_of_a_compound_subscript_is_read(tmp_path):
+def test_component_of_a_compound_subscript_is_read(tmp_path: pathlib.Path) -> None:
     """Half of one formula upright and half italic is the same defect."""
     path = _write(
         tmp_path,
@@ -66,7 +70,7 @@ def test_component_of_a_compound_subscript_is_read(tmp_path):
     assert "\\alpha_s" in failures[0]
 
 
-def test_a_run_inside_one_wrapper_is_upright_throughout(tmp_path):
+def test_a_run_inside_one_wrapper_is_upright_throughout(tmp_path: pathlib.Path) -> None:
     r"""``L_\mathrm{n,w,eq}`` sets three upright components, not one."""
     path = _write(
         tmp_path,
@@ -77,7 +81,9 @@ def test_a_run_inside_one_wrapper_is_upright_throughout(tmp_path):
     assert failures == []
 
 
-def test_an_index_beside_an_upright_run_is_not_a_collision(tmp_path):
+def test_an_index_beside_an_upright_run_is_not_a_collision(
+    tmp_path: pathlib.Path,
+) -> None:
     """The index keeps its own slope where the wrapper does not cover it."""
     path = _write(
         tmp_path,
@@ -88,7 +94,7 @@ def test_an_index_beside_an_upright_run_is_not_a_collision(tmp_path):
     assert failures == []
 
 
-def test_a_translation_pattern_is_not_a_label(tmp_path):
+def test_a_translation_pattern_is_not_a_label(tmp_path: pathlib.Path) -> None:
     """A regex spells a backslash twice; nothing in it is mathematics."""
     path = _write(
         tmp_path,
@@ -102,7 +108,7 @@ def test_a_translation_pattern_is_not_a_label(tmp_path):
     assert failures == []
 
 
-def test_docstring_mathematics_is_read(tmp_path):
+def test_docstring_mathematics_is_read(tmp_path: pathlib.Path) -> None:
     """A module states its formulae in ``:math:`` roles and ``.. math::``."""
     path = _write(
         tmp_path,
@@ -121,7 +127,9 @@ def test_docstring_mathematics_is_read(tmp_path):
     assert "L_i" in failures[0]
 
 
-def test_a_declared_page_is_left_alone(tmp_path, monkeypatch):
+def test_a_declared_page_is_left_alone(
+    tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """The escape hatch, matched on the repository-relative tail of the path."""
     (tmp_path / "reference").mkdir()
     path = _write(
@@ -139,7 +147,7 @@ def test_a_declared_page_is_left_alone(tmp_path, monkeypatch):
     assert failures == []
 
 
-def test_the_excluded_trees_are_not_collected(tmp_path):
+def test_the_excluded_trees_are_not_collected(tmp_path: pathlib.Path) -> None:
     """Errata transcribe a source; drawing modules are filed by domain."""
     (tmp_path / "reference").mkdir()
     (tmp_path / "_plot").mkdir()
@@ -149,7 +157,7 @@ def test_the_excluded_trees_are_not_collected(tmp_path):
     assert collected == {"guide.md"}
 
 
-def test_the_tree_it_ships_with_passes():
+def test_the_tree_it_ships_with_passes() -> None:
     """The gate is green on this repository, which is what CI asserts."""
     root = pathlib.Path(__file__).resolve().parent.parent
     paths = css.collect([str(root / r) for r in css.DEFAULT_ROOTS])

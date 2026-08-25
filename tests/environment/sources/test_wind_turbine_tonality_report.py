@@ -13,6 +13,8 @@ same hand-derived synthetic tone so its numbers are documented.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
@@ -22,8 +24,12 @@ from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.environment.sources.wind_turbine import (
+    WindTurbineTonalityResult,
     wind_turbine_tonality,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def _synthetic_tone() -> tuple[np.ndarray, np.ndarray]:
@@ -38,7 +44,7 @@ def _synthetic_tone() -> tuple[np.ndarray, np.ndarray]:
     return levels, freqs
 
 
-def _result():
+def _result() -> WindTurbineTonalityResult:
     levels, freqs = _synthetic_tone()
     return wind_turbine_tonality(levels, freqs)
 
@@ -49,7 +55,7 @@ def _extract_text(path: str) -> str:
     return "\n".join(page.extract_text() for page in PdfReader(path).pages)
 
 
-def test_report_writes_one_page_pdf(tmp_path) -> None:
+def test_report_writes_one_page_pdf(tmp_path: Path) -> None:
     """An audible-tone result renders a one-page PDF fiche."""
     result = _result()
     out = tmp_path / "wt.pdf"
@@ -58,7 +64,7 @@ def test_report_writes_one_page_pdf(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     result = _result()
     out = str(tmp_path / "x.pdf")
@@ -66,7 +72,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         result.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ``ValueError``."""
     result = _result()
     out = str(tmp_path / "bad.pdf")
@@ -74,7 +80,7 @@ def test_unknown_language_rejected(tmp_path) -> None:
         result.report(out, language="xx")
 
 
-def test_report_states_audibility_frequency_and_decision(tmp_path) -> None:
+def test_report_states_audibility_frequency_and_decision(tmp_path: Path) -> None:
     """The fiche states ΔL_a, the tone frequency and the audibility decision."""
     result = _result()
     out = tmp_path / "wt.pdf"
@@ -89,7 +95,7 @@ def test_report_states_audibility_frequency_and_decision(tmp_path) -> None:
     assert "IEC 61400-11" in text
 
 
-def test_metadata_appears_and_one_page(tmp_path) -> None:
+def test_metadata_appears_and_one_page(tmp_path: Path) -> None:
     """A populated ReportMetadata renders one page and prints its fields."""
     md = ReportMetadata(
         specimen="Horizontal-axis wind turbine, gearbox tone",
@@ -112,7 +118,7 @@ def test_metadata_appears_and_one_page(tmp_path) -> None:
     assert "IEC 61400-11" in text
 
 
-def test_requirement_pass_and_fail_both_render(tmp_path) -> None:
+def test_requirement_pass_and_fail_both_render(tmp_path: Path) -> None:
     """A PASS and a FAIL tonal-audibility limit both render one page."""
     result = _result()
     delta = result.tonal_audibility
@@ -126,7 +132,7 @@ def test_requirement_pass_and_fail_both_render(tmp_path) -> None:
     assert "FAIL" in _extract_text(str(failing)).replace("\n", " ")
 
 
-def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
+def test_report_escapes_xml_specials_in_metadata(tmp_path: Path) -> None:
     """Metadata with XML specials (& < >) renders without crashing reportlab."""
     md = ReportMetadata(
         client="Ac & Co <Ltd>",
@@ -142,7 +148,7 @@ def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """``language="es"`` renders a one-page Spanish fiche with comma decimals."""
     import re
 
@@ -159,7 +165,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     assert re.search(r"\d,\d", text) is not None  # comma decimal separator
 
 
-def test_decision_matches_displayed_audibility_at_boundary(tmp_path) -> None:
+def test_decision_matches_displayed_audibility_at_boundary(tmp_path: Path) -> None:
     """The audibility decision reads the displayed rounded ΔL_a, not the raw flag.
 
     A raw tonal audibility of 0.03 dB is audible (> 0), but it rounds to the
@@ -178,7 +184,7 @@ def test_decision_matches_displayed_audibility_at_boundary(tmp_path) -> None:
     assert "0.0 dB" in text
 
 
-def test_no_identified_tone_reports_exclusion(tmp_path) -> None:
+def test_no_identified_tone_reports_exclusion(tmp_path: Path) -> None:
     """A spectrum with no classified tone renders and states the exclusion.
 
     A broad 33 dB bump on a 30 dB floor produces no tone line (subclause 9.5.4),

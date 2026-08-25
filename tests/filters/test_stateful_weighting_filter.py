@@ -6,7 +6,7 @@ import pytest
 @pytest.mark.parametrize("filter_type", ["A", "C", "Z"])
 def test_weighting_filter_block_processing_matches_full_signal(
     block_size: int, filter_type: str
-):
+) -> None:
     from phonometry import filters
 
     """
@@ -47,7 +47,7 @@ def test_weighting_filter_block_processing_matches_full_signal(
     )
 
 
-def test_weighting_filter_steady_ic_initialization():
+def test_weighting_filter_steady_ic_initialization() -> None:
     from phonometry import filters
 
     # Create a stateful weighting filter with steady_ic=True
@@ -64,7 +64,7 @@ def test_weighting_filter_steady_ic_initialization():
     assert wf.zi.shape == (n_sections, 2)
 
 
-def test_weighting_filter_steady_ic_initialization_multichannel():
+def test_weighting_filter_steady_ic_initialization_multichannel() -> None:
     from phonometry import filters
 
     wf = filters.WeightingFilter(fs=48000, stateful=True, steady_ic=True)
@@ -77,7 +77,7 @@ def test_weighting_filter_steady_ic_initialization_multichannel():
     assert wf.zi.shape == (n_sections, 2, 2)
 
 
-def test_weighting_filter_multichannel_to_mono_transition():
+def test_weighting_filter_multichannel_to_mono_transition() -> None:
     from phonometry import filters
 
     """zi must reinit when input switches from multichannel to 1D."""
@@ -97,7 +97,7 @@ def test_weighting_filter_multichannel_to_mono_transition():
     assert y.shape == x_mono.shape
 
 
-def test_weighting_filter_multichannel():
+def test_weighting_filter_multichannel() -> None:
     from phonometry import filters
 
     """Stateful block-wise multichannel weighting must match full-signal processing."""
@@ -124,7 +124,7 @@ def test_weighting_filter_multichannel():
     np.testing.assert_allclose(stateful_out, ref_out, rtol=1e-10, atol=1e-12)
 
 
-def test_stateful_weighting_invalid_fs_raises():
+def test_stateful_weighting_invalid_fs_raises() -> None:
     """Non-positive sample rates must be rejected at construction."""
     from phonometry import filters
 
@@ -134,7 +134,7 @@ def test_stateful_weighting_invalid_fs_raises():
         filters.WeightingFilter(fs=-48000, stateful=True)
 
 
-def test_stateful_weighting_high_accuracy_raises():
+def test_stateful_weighting_high_accuracy_raises() -> None:
     """high_accuracy resampling is incompatible with block processing."""
     from phonometry import filters
 
@@ -142,7 +142,7 @@ def test_stateful_weighting_high_accuracy_raises():
         filters.WeightingFilter(fs=48000, stateful=True, high_accuracy=True)
 
 
-def test_stateful_weighting_invalid_curve_raises():
+def test_stateful_weighting_invalid_curve_raises() -> None:
     """Unknown weighting curves must be rejected at construction."""
     from phonometry import filters
 

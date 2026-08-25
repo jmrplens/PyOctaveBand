@@ -15,6 +15,7 @@ governing prominence and adjustment are derived from Formula 1 and Formula 2.
 from __future__ import annotations
 
 import math
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -24,6 +25,9 @@ from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.environment.assessment import impulsive_sound as nt
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # The documented three-impulse pile-driving set: (onset rate dB/s, level
 # difference dB). All three qualify (onset rate > 10 dB/s); the first governs.
@@ -36,7 +40,7 @@ _P_GOVERNING = 3.0 * math.log10(1200.0) + 2.0 * math.log10(32.0)  # 12.2478...
 _KI_GOVERNING = 1.8 * (_P_GOVERNING - 5.0)  # 13.046...
 
 
-def _result():
+def _result() -> nt.ImpulseProminenceResult:
     """The documented three-impulse pile-driving prominence result."""
     return nt.impulse_prominence(_ONSET_RATES, _LEVEL_DIFFERENCES)
 
@@ -47,7 +51,7 @@ def _extract_text(path: str) -> str:
     return "\n".join(page.extract_text() for page in PdfReader(path).pages)
 
 
-def test_report_writes_one_page_pdf(tmp_path) -> None:
+def test_report_writes_one_page_pdf(tmp_path: Path) -> None:
     """An impulse set renders a one-page PDF fiche."""
     result = _result()
     out = tmp_path / "impulse.pdf"
@@ -56,7 +60,7 @@ def test_report_writes_one_page_pdf(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     result = _result()
     out = str(tmp_path / "x.pdf")
@@ -64,7 +68,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         result.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ``ValueError``."""
     result = _result()
     out = str(tmp_path / "bad.pdf")
@@ -72,7 +76,7 @@ def test_unknown_language_rejected(tmp_path) -> None:
         result.report(out, language="xx")
 
 
-def test_report_states_prominence_and_adjustment(tmp_path) -> None:
+def test_report_states_prominence_and_adjustment(tmp_path: Path) -> None:
     """The fiche states the governing P, the derived KI and the formula basis.
 
     The governing prominence is the first (highest-P) impulse; its LAeq
@@ -93,7 +97,7 @@ def test_report_states_prominence_and_adjustment(tmp_path) -> None:
     assert "Formula 2" in text
 
 
-def test_metadata_appears_and_one_page(tmp_path) -> None:
+def test_metadata_appears_and_one_page(tmp_path: Path) -> None:
     """A populated ReportMetadata renders one page and prints its fields."""
     md = ReportMetadata(
         specimen="Pile-driving site, intermittent hammering",
@@ -118,7 +122,7 @@ def test_metadata_appears_and_one_page(tmp_path) -> None:
     assert "30 min" in text
 
 
-def test_requirement_pass_and_fail_both_render(tmp_path) -> None:
+def test_requirement_pass_and_fail_both_render(tmp_path: Path) -> None:
     """A PASS and a FAIL prominence limit both render one page."""
     result = _result()
     p = result.prominence
@@ -132,7 +136,7 @@ def test_requirement_pass_and_fail_both_render(tmp_path) -> None:
     assert "FAIL" in _extract_text(str(failing)).replace("\n", " ")
 
 
-def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
+def test_report_escapes_xml_specials_in_metadata(tmp_path: Path) -> None:
     """Metadata with XML specials (& < >) is escaped, rendered and not dropped.
 
     The specials must survive reportlab's XML parser (which would otherwise
@@ -159,7 +163,7 @@ def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
     assert "R&D-112" in text  # footer report number
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """``language="es"`` renders a one-page Spanish fiche with comma decimals."""
     import re
 
@@ -176,7 +180,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     assert re.search(r"\d,\d", text) is not None  # comma decimal separator
 
 
-def test_verdict_compares_unrounded_prominence(tmp_path) -> None:
+def test_verdict_compares_unrounded_prominence(tmp_path: Path) -> None:
     """A prominence just above the requirement FAILs, not rounded to a PASS.
 
     The governing prominence 12.2478 rounds to 12.25 for display; a requirement
@@ -194,7 +198,7 @@ def test_verdict_compares_unrounded_prominence(tmp_path) -> None:
     assert "PASS" not in text
 
 
-def test_verdict_passes_at_the_requirement(tmp_path) -> None:
+def test_verdict_passes_at_the_requirement(tmp_path: Path) -> None:
     """A governing prominence at the requirement passes (``<=``)."""
     result = _result()
     out = tmp_path / "atlimit.pdf"
@@ -203,7 +207,7 @@ def test_verdict_passes_at_the_requirement(tmp_path) -> None:
     assert "PASS" in _extract_text(str(out)).replace("\n", " ")
 
 
-def test_oversized_impulse_set_stays_one_page(tmp_path) -> None:
+def test_oversized_impulse_set_stays_one_page(tmp_path: Path) -> None:
     """A large valid impulse set caps the table and stays exactly one page.
 
     Forty qualifying impulses exceed the table row cap; the fiche must keep the
@@ -268,7 +272,7 @@ def test_row_cap_force_includes_a_low_prominence_governing_impulse() -> None:
     assert governing in shown  # forced in despite its low prominence
 
 
-def test_non_prominent_impulse_reports_zero_adjustment(tmp_path) -> None:
+def test_non_prominent_impulse_reports_zero_adjustment(tmp_path: Path) -> None:
     """A qualifying but weak impulse (P <= 5) renders with a zero adjustment.
 
     A qualifying onset (rate above 10 dB/s) with a low prominence keeps KI at
@@ -286,7 +290,7 @@ def test_non_prominent_impulse_reports_zero_adjustment(tmp_path) -> None:
     assert "K = 0" in text or "0 dB" in text
 
 
-def test_non_qualifying_set_justifies_on_the_onset_gate(tmp_path) -> None:
+def test_non_qualifying_set_justifies_on_the_onset_gate(tmp_path: Path) -> None:
     """With no qualifying onset the note cites the onset gate, not P <= 5.
 
     Both gates can withhold the adjustment. Here every onset rate is at or
@@ -308,7 +312,7 @@ def test_non_qualifying_set_justifies_on_the_onset_gate(tmp_path) -> None:
     assert "No prominent impulse is present" not in text
 
 
-def test_assessment_period_reflects_the_analysed_interval(tmp_path) -> None:
+def test_assessment_period_reflects_the_analysed_interval(tmp_path: Path) -> None:
     """The header prints the analysed interval, defaulting to the 30 min default."""
     default_out = tmp_path / "default.pdf"
     _result().report(str(default_out))

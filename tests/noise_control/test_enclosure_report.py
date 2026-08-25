@@ -16,12 +16,16 @@ engines/languages) complete the rendering contract.
 from __future__ import annotations
 
 import math
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, noise_control
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 _FREQS = np.array([63, 125, 250, 500, 1000, 2000, 4000], dtype=float)
 _PANEL_R = np.array([18, 22, 28, 33, 38, 42, 45], dtype=float)
@@ -37,7 +41,7 @@ def _extract_text(path: str) -> str:
     return " ".join(raw.split())
 
 
-def _result():
+def _result() -> noise_control.EnclosureResult:
     return noise_control.enclosure_insertion_loss(
         _PANEL_R, _S_E, _S_I, _ALPHA, frequencies=_FREQS
     )
@@ -65,7 +69,7 @@ def test_hand_oracle_matches_library() -> None:
     np.testing.assert_allclose(res.insertion_loss, _oracle_il(), atol=1e-9)
 
 
-def test_report_renders_oracle_values(tmp_path) -> None:
+def test_report_renders_oracle_values(tmp_path: Path) -> None:
     """The fiche prints the mean IL and a couple of band R/C/IL values."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -105,7 +109,7 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     assert "prediction computed from the stated inputs" in text
 
 
-def test_verbose_adds_room_constant_column(tmp_path) -> None:
+def test_verbose_adds_room_constant_column(tmp_path: Path) -> None:
     """verbose=True adds the interior room constant R_i column."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -119,7 +123,7 @@ def test_verbose_adds_room_constant_column(tmp_path) -> None:
     assert f"{r_i:.1f}" in text
 
 
-def test_third_octave_labels_and_caption(tmp_path) -> None:
+def test_third_octave_labels_and_caption(tmp_path: Path) -> None:
     """A one-third-octave set is labelled by nominal centres and captioned."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -142,7 +146,9 @@ def test_third_octave_labels_and_caption(tmp_path) -> None:
     ("limit", "verdict"),
     [(20.0, "PASS"), (40.0, "FAIL")],
 )
-def test_verdict_against_declared_minimum(tmp_path, limit: float, verdict: str) -> None:
+def test_verdict_against_declared_minimum(
+    tmp_path: Path, limit: float, verdict: str
+) -> None:
     """A declared minimum yields a PASS/FAIL verdict (more insertion loss is better)."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -158,7 +164,7 @@ def test_verdict_against_declared_minimum(tmp_path, limit: float, verdict: str) 
     assert math.isfinite(_oracle_mean_il())
 
 
-def test_metadata_header_renders(tmp_path) -> None:
+def test_metadata_header_renders(tmp_path: Path) -> None:
     """Supplied metadata renders the machine, environment and identity fields."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -186,7 +192,7 @@ def test_metadata_header_renders(tmp_path) -> None:
         assert token in text
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """language="es" renders the enclosure vocabulary and comma decimals."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -202,7 +208,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     assert f"{_oracle_mean_il():.1f}".replace(".", ",") in text
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     res = _result()
     out = str(tmp_path / "x.pdf")
@@ -210,7 +216,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         res.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     res = _result()
     out = str(tmp_path / "bad.pdf")

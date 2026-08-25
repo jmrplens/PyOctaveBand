@@ -43,6 +43,7 @@ from __future__ import annotations
 
 import functools
 import warnings
+from typing import TYPE_CHECKING
 
 import matplotlib as mpl
 
@@ -55,10 +56,14 @@ from phonometry import PhonometryWarning
 from phonometry.underwater.propagation.numerical import (
     EigenrayResult,
     FluidSeabed,
+    RayTraceResult,
     _caustic_crossings,
     eigenrays,
     ray_trace,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 _C = 1500.0
 #: The isovelocity guide every image-lattice test below runs in.
@@ -104,7 +109,7 @@ def _image_arrivals(
     return out
 
 
-def _guide_trace(aperture: float = 48.0, step_deg: float = 0.5):
+def _guide_trace(aperture: float = 48.0, step_deg: float = 0.5) -> RayTraceResult:
     return ray_trace(
         [0.0, _GUIDE["depth"]],
         [_C, _C],
@@ -340,7 +345,12 @@ def _n2_speed(z: np.ndarray) -> np.ndarray:
     return np.asarray(_N2_C0 / np.sqrt(1.0 + _N2_G * z))
 
 
-def _n2_parabola(theta0_deg: float):
+def _n2_parabola(
+    theta0_deg: float,
+) -> tuple[
+    Callable[[np.ndarray | float], np.ndarray | float],
+    Callable[[np.ndarray | float], np.ndarray | float],
+]:
     """The exact ray as callables ``z(r)``, ``z'(r)`` (Eq. 3.195)."""
     th = np.radians(theta0_deg)
     n0 = np.sqrt(1.0 + _N2_G * _N2_SOURCE)

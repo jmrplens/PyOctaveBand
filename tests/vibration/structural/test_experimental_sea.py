@@ -48,6 +48,7 @@ speed ``cL = sqrt(E/(rho(1 - nu^2))) = 5432,3 m/s`` of Eq. (6.25).
 from __future__ import annotations
 
 import math
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -56,6 +57,7 @@ from phonometry.building.measurement.flanking_transmission import (
     modal_density as en12354_n,
 )
 from phonometry.vibration.structural.experimental_sea import (
+    PowerInjectionResult,
     bar_modal_density,
     beam_modal_density,
     cylindrical_shell_modal_density,
@@ -64,6 +66,9 @@ from phonometry.vibration.structural.experimental_sea import (
     power_injection_matrix,
     ring_frequency,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 # --- Norton Appendix 4, aluminium ---
 _RHO = 2700.0
@@ -98,23 +103,23 @@ class TestNortonProblem610:
     """The single-drive inversion against the printed answers."""
 
     @pytest.fixture(scope="class")
-    def result(self):  # type: ignore[no-untyped-def]
+    def result(self) -> PowerInjectionResult:
         e_1, e_2, n_1, n_2 = _problem_610_inputs()
         return power_injection_clf(_BAND, e_1, e_2, 4.4e-3, 2.4e-3, n_1, n_2)
 
-    def test_coupling_loss_factor_12(self, result) -> None:  # type: ignore[no-untyped-def]
+    def test_coupling_loss_factor_12(self, result: PowerInjectionResult) -> None:
         """Printed answer eta_12 = 4,26e-4."""
         assert float(result.coupling_loss_factor12[0]) == pytest.approx(
             4.26e-4, rel=0.005
         )
 
-    def test_coupling_loss_factor_21(self, result) -> None:  # type: ignore[no-untyped-def]
+    def test_coupling_loss_factor_21(self, result: PowerInjectionResult) -> None:
         """Printed answer eta_21 = 3,92e-4."""
         assert float(result.coupling_loss_factor21[0]) == pytest.approx(
             3.92e-4, rel=0.005
         )
 
-    def test_input_power(self, result) -> None:  # type: ignore[no-untyped-def]
+    def test_input_power(self, result: PowerInjectionResult) -> None:
         """Printed answer Pi_in = 1,31 W."""
         assert float(result.input_power[0]) == pytest.approx(1.31, rel=0.005)
 
@@ -124,7 +129,7 @@ class TestNortonProblem610:
         assert f_r == pytest.approx(1152.8, rel=1e-3)
         assert _BAND / f_r < 0.48
 
-    def test_reciprocity_holds_exactly(self, result) -> None:  # type: ignore[no-untyped-def]
+    def test_reciprocity_holds_exactly(self, result: PowerInjectionResult) -> None:
         """Eq. (6.8): ``n_1 eta_12 = n_2 eta_21``."""
         assert float((result.modal_density1 * result.coupling_loss_factor12)[0]) == (
             pytest.approx(
@@ -138,13 +143,17 @@ class TestNortonProblem610:
         _, _, n_1, n_2 = _problem_610_inputs()
         assert 3.92e-4 / 4.26e-4 == pytest.approx(n_1 / n_2, rel=0.005)
 
-    def test_input_power_equals_dissipated_power(self, result) -> None:  # type: ignore[no-untyped-def]
+    def test_input_power_equals_dissipated_power(
+        self, result: PowerInjectionResult
+    ) -> None:
         """Eq. (6.10) collapses to the total dissipation in the steady state."""
         np.testing.assert_allclose(
             result.input_power, result.dissipated_power, rtol=1e-12
         )
 
-    def test_transmitted_power_leaves_subsystem_two_in_balance(self, result) -> None:  # type: ignore[no-untyped-def]
+    def test_transmitted_power_leaves_subsystem_two_in_balance(
+        self, result: PowerInjectionResult
+    ) -> None:
         """Eq. (6.11): the power crossing the junction is dissipated in 2."""
         omega = 2.0 * np.pi * result.frequencies
         np.testing.assert_allclose(
@@ -153,7 +162,7 @@ class TestNortonProblem610:
             rtol=1e-12,
         )
 
-    def test_coupling_is_weak(self, result) -> None:  # type: ignore[no-untyped-def]
+    def test_coupling_is_weak(self, result: PowerInjectionResult) -> None:
         """``eta_12 << eta_1``: the two-subsystem model is trustworthy here."""
         assert float(result.coupling_strength[0]) < 0.15
 
@@ -425,6 +434,8 @@ class TestValidation:
             (lambda: ring_frequency(0.0, 5150.0), "'mean_radius' must be positive"),
         ],
     )
-    def test_non_positive_geometry(self, call, message: str) -> None:  # type: ignore[no-untyped-def]
+    def test_non_positive_geometry(
+        self, call: Callable[[], object], message: str
+    ) -> None:
         with pytest.raises(ValueError, match=message):
             call()

@@ -17,12 +17,16 @@ contract.
 from __future__ import annotations
 
 import warnings
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 from report_assertions import assert_one_page
 
 from phonometry import PhonometryWarning, ReportMetadata, vibration
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 _FREQS = np.array(
     [
@@ -84,7 +88,7 @@ def test_low_frequency_plateau_oracle() -> None:
     )
 
 
-def test_report_renders_plateau_and_basis(tmp_path) -> None:
+def test_report_renders_plateau_and_basis(tmp_path: Path) -> None:
     """The fiche prints the low-frequency plateau, the level and ISO 10846."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -104,7 +108,7 @@ def test_report_renders_plateau_and_basis(tmp_path) -> None:
     assert "0.010" in text
 
 
-def test_indirect_method_labels_blocking_mass(tmp_path) -> None:
+def test_indirect_method_labels_blocking_mass(tmp_path: Path) -> None:
     """The indirect method names ISO 10846-3 and prints the blocking mass."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -128,7 +132,7 @@ def test_indirect_method_labels_blocking_mass(tmp_path) -> None:
     assert "50.0" in text
 
 
-def test_metadata_header_renders(tmp_path) -> None:
+def test_metadata_header_renders(tmp_path: Path) -> None:
     """Supplied metadata renders the client, the specimen and the instrumentation."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -151,7 +155,7 @@ def test_metadata_header_renders(tmp_path) -> None:
     assert "TS-10846" in text
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """language="es" renders the transfer-stiffness vocabulary and comma decimals."""
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
@@ -165,7 +169,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     assert "baja frecuencia" in text
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     res = _direct_result()
     out = str(tmp_path / "x.pdf")
@@ -173,7 +177,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         res.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     res = _direct_result()
     out = str(tmp_path / "bad.pdf")

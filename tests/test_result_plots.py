@@ -29,6 +29,7 @@ from __future__ import annotations
 import ast
 import builtins
 import inspect
+from typing import TYPE_CHECKING
 
 import matplotlib as mpl
 
@@ -77,6 +78,13 @@ from result_factories import (
 import phonometry as ph
 from phonometry._plot import common as _plotting
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from types import ModuleType
+
+    from matplotlib.lines import Line2D
+    from matplotlib.patches import Patch
+
 
 # --------------------------------------------------------------------------
 # Soft-dependency contract: lazy import + ImportError guidance
@@ -106,11 +114,13 @@ def test_plotting_module_has_no_toplevel_matplotlib_import() -> None:
                 assert node in allowed, "matplotlib imported at runtime module scope"
 
 
-def test_plot_raises_helpful_error_without_matplotlib(monkeypatch) -> None:
+def test_plot_raises_helpful_error_without_matplotlib(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Without matplotlib, .plot() fails with an actionable message."""
     real_import = builtins.__import__
 
-    def blocked(name, *args, **kwargs):
+    def blocked(name: str, *args: object, **kwargs: object) -> ModuleType:
         if name.startswith("matplotlib"):
             msg = "No module named 'matplotlib'"
             raise ImportError(msg)
@@ -176,7 +186,9 @@ _KWARG_PLOT_CASES = [
     _KWARG_PLOT_CASES,
     ids=[c[0] for c in _KWARG_PLOT_CASES],
 )
-def test_every_plot_forwards_kwargs_to_primary_artist(name, factory, kind) -> None:
+def test_every_plot_forwards_kwargs_to_primary_artist(
+    name: str, factory: Callable[[], object], kind: str
+) -> None:
     res = factory()
     out = res.plot(linewidth=2)
     ax = out[0] if isinstance(out, np.ndarray) else out
@@ -194,7 +206,7 @@ def test_every_plot_forwards_kwargs_to_primary_artist(name, factory, kind) -> No
     artists = ax.lines if kind == "line" else ax.patches
     red = plt.matplotlib.colors.to_rgba("red")
 
-    def _is_red(artist) -> bool:
+    def _is_red(artist: Line2D | Patch) -> bool:
         if kind == "line":
             return plt.matplotlib.colors.to_rgba(artist.get_color()) == red
         return tuple(artist.get_facecolor()) == red

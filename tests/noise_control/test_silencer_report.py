@@ -15,11 +15,16 @@ complete the rendering contract.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 from report_assertions import assert_one_page
 
 from phonometry.noise_control import silencers as sl
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 _FREQS = np.array([63, 125, 250, 500, 1000, 2000, 4000], dtype=float)
 _LENGTH = 0.5
@@ -35,7 +40,7 @@ def _extract_text(path: str) -> str:
     return " ".join(raw.split())
 
 
-def _result():
+def _result() -> sl.ReactiveSilencerResult:
     return sl.expansion_chamber(_FREQS, _LENGTH, _S_EXP, _S_DUCT)
 
 
@@ -52,7 +57,7 @@ def test_hand_oracle_matches_library() -> None:
     np.testing.assert_allclose(res.transmission_loss, _oracle_tl(), atol=1e-9)
 
 
-def test_report_renders_oracle_values(tmp_path) -> None:
+def test_report_renders_oracle_values(tmp_path: Path) -> None:
     """The fiche prints the mean and peak TL and a couple of band TL values."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -86,7 +91,7 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     assert "prediction computed from the stated inputs" in text
 
 
-def test_insertion_loss_column_when_impedances_given(tmp_path) -> None:
+def test_insertion_loss_column_when_impedances_given(tmp_path: Path) -> None:
     """A result with end impedances renders the insertion-loss column."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -109,7 +114,7 @@ def test_insertion_loss_column_when_impedances_given(tmp_path) -> None:
     assert "Mean insertion loss IL" in text
 
 
-def test_resonator_reports_resonances(tmp_path) -> None:
+def test_resonator_reports_resonances(tmp_path: Path) -> None:
     """A tuned resonator lists its resonance frequencies in the boxed terms."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -128,7 +133,9 @@ def test_resonator_reports_resonances(tmp_path) -> None:
     ("limit", "verdict"),
     [(6.0, "PASS"), (12.0, "FAIL")],
 )
-def test_verdict_against_declared_minimum(tmp_path, limit: float, verdict: str) -> None:
+def test_verdict_against_declared_minimum(
+    tmp_path: Path, limit: float, verdict: str
+) -> None:
     """A declared minimum yields a PASS/FAIL verdict (more TL is better)."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -144,7 +151,7 @@ def test_verdict_against_declared_minimum(tmp_path, limit: float, verdict: str) 
     assert (float(np.mean(_oracle_tl())) >= limit) == (verdict == "PASS")
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """language="es" renders the silencer vocabulary and comma decimals."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -165,7 +172,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     assert "no son una medición de una probeta" in text
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     res = _result()
     out = str(tmp_path / "x.pdf")
@@ -173,7 +180,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         res.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     res = _result()
     out = str(tmp_path / "bad.pdf")

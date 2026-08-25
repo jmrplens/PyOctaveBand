@@ -152,7 +152,9 @@ _R418_LP2 = np.array([72.3, 60.4, 41.4, 41.0, 33.8, 30.7])
 _R418_LPA = np.array([56.2, 51.5, 38.2, 41.0, 35.0, 31.5])
 
 
-def _problem_4_18(source_model: str = "constant_volume"):  # type: ignore[no-untyped-def]
+def _problem_4_18(
+    source_model: str = "constant_volume",
+) -> noise_control.RoomToRoomResult:
     """The whole chain of problem 4.18, from the blower to the operator room."""
     # Plant room 8 x 10 x 3 m: floor and ceiling 80 m2 each, walls 108 m2.
     plant = [
@@ -321,7 +323,7 @@ def _enclosure_4_16() -> tuple[float, float, np.ndarray]:
     return external_area, external_area + bare_floor + machine, absorption
 
 
-def _problem_4_16(model: str = "norton"):  # type: ignore[no-untyped-def]
+def _problem_4_16(model: str = "norton") -> noise_control.EnclosureResult:
     """Required enclosure transmission loss of problem 4.16.
 
     ``model="norton"`` is Equation (4.115), which has no ``0.3`` floor inside

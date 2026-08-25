@@ -82,7 +82,7 @@ def _analytic_decay_sti(t60: float) -> float:
         ((5, 6), 0.302),  # 4000 + 8000 Hz
     ],
 )
-def test_weighting_factor_pairs(bands, expected):
+def test_weighting_factor_pairs(bands: tuple[int, int], expected: float) -> None:
     # m=1 -> SNR_eff clipped to +15 -> TI=1; m=0 -> -15 -> TI=0.
     mtf = _uniform_mtf(0.0)
     mtf[list(bands), :] = 1.0
@@ -111,14 +111,14 @@ def test_weighting_factor_pairs(bands, expected):
         (1.0, 1.0),
     ],
 )
-def test_m_to_sti_mapping(m, expected_sti):
+def test_m_to_sti_mapping(m: float, expected_sti: float) -> None:
     # Ed.5 A.3.1.2 pairs: uniform m across all bands and modulation
     # frequencies maps to the given STI (tol +/-0,01).
     result = _sti_from_mtf(_uniform_mtf(m))
     assert result.sti == pytest.approx(expected_sti, abs=0.01)
 
 
-def test_alpha_beta_artifact_truncated_to_one():
+def test_alpha_beta_artifact_truncated_to_one() -> None:
     # Ed.4 Table A.3 NOTE (= Ed.5 Table A.1): with the 250 Hz band knocked
     # out (TI=0) and all other bands at TI=1 the raw formula gives 1,036
     # (sum(alpha) - alpha_1 - sum(beta) + beta_0 + beta_1); it must be
@@ -143,7 +143,7 @@ def test_alpha_beta_artifact_truncated_to_one():
 # ---------------------------------------------------------------------------
 
 
-def test_delta_impulse_response_is_perfect_transmission():
+def test_delta_impulse_response_is_perfect_transmission() -> None:
     ir = np.zeros(FS // 2)
     ir[100] = 1.0
     result = speech.sti_from_impulse_response(ir, FS)
@@ -157,7 +157,7 @@ def test_delta_impulse_response_is_perfect_transmission():
     assert isinstance(result, speech.STIResult)
 
 
-def test_exponential_decay_matches_analytic_schroeder_mtf():
+def test_exponential_decay_matches_analytic_schroeder_mtf() -> None:
     fs = 24000
     stis = []
     for t60 in (0.5, 1.0, 2.0, 4.0):
@@ -168,7 +168,7 @@ def test_exponential_decay_matches_analytic_schroeder_mtf():
     assert all(a > b for a, b in pairwise(stis))
 
 
-def test_snr_degradation_on_impulse_response():
+def test_snr_degradation_on_impulse_response() -> None:
     fs = 24000
     ir = _decay_ir(1.0, fs)
     plain = speech.sti_from_impulse_response(ir, fs)
@@ -184,7 +184,7 @@ def test_snr_degradation_on_impulse_response():
     assert vec.sti == pytest.approx(zero_snr.sti, abs=1e-12)
 
 
-def test_level_corrections_reduce_sti():
+def test_level_corrections_reduce_sti() -> None:
     fs = 24000
     ir = _decay_ir(1.0, fs)
     plain = speech.sti_from_impulse_response(ir, fs)
@@ -213,11 +213,11 @@ def test_level_corrections_reduce_sti():
     ("level", "expected"),
     [(60.0, -35.0), (65.0, -29.9), (80.0, -19.8), (100.0, -10.0)],
 )
-def test_masking_amdb_control_points(level, expected):
+def test_masking_amdb_control_points(level: float, expected: float) -> None:
     assert _masking_amdb(level) == pytest.approx(expected, abs=1e-9)
 
 
-def test_masking_amdb_is_vectorized_and_continuous():
+def test_masking_amdb_is_vectorized_and_continuous() -> None:
     levels = np.array([62.999, 63.0, 66.999, 67.0, 99.999, 100.0, 120.0])
     out = _masking_amdb(levels)
     assert out.shape == levels.shape
@@ -241,7 +241,7 @@ def stipa_18s_seed1234() -> np.ndarray:
     return speech.stipa_signal(FS, seconds=18.0, seed=1234)
 
 
-def test_stipa_loopback_ideal_channel(stipa_18s_seed1234: np.ndarray):
+def test_stipa_loopback_ideal_channel(stipa_18s_seed1234: np.ndarray) -> None:
     x = stipa_18s_seed1234
     result = speech.stipa(x, FS)
     # Ideal loopback recovers STI 0.998 and min MTF 0.945 at 18 s; lock those
@@ -252,7 +252,7 @@ def test_stipa_loopback_ideal_channel(stipa_18s_seed1234: np.ndarray):
     assert np.all(result.mtf > 0.93)
 
 
-def test_stipa_short_recording_warns(stipa_18s_seed1234: np.ndarray):
+def test_stipa_short_recording_warns(stipa_18s_seed1234: np.ndarray) -> None:
     """A recording shorter than the recommended 15 s biases the recovered
     modulation depths (and STI) low; stipa should warn (IEC 60268-16 STIPA
     practice recommends 15 s to 25 s).
@@ -266,7 +266,7 @@ def test_stipa_short_recording_warns(stipa_18s_seed1234: np.ndarray):
         speech.stipa(stipa_18s_seed1234, FS)
 
 
-def test_stipa_with_noise_is_monotonic(stipa_18s_seed1234: np.ndarray):
+def test_stipa_with_noise_is_monotonic(stipa_18s_seed1234: np.ndarray) -> None:
     x = stipa_18s_seed1234
     rng = np.random.default_rng(7)
     rms = float(np.sqrt(np.mean(x**2)))
@@ -278,7 +278,7 @@ def test_stipa_with_noise_is_monotonic(stipa_18s_seed1234: np.ndarray):
     assert stis[-1] < 0.7  # 0 dB broadband SNR is clearly degraded
 
 
-def test_stipa_reference_normalization():
+def test_stipa_reference_normalization() -> None:
     x = speech.stipa_signal(FS, seconds=18.0, seed=99)
     with_nominal = speech.stipa(x, FS)
     with_reference = speech.stipa(0.25 * x, FS, reference=x)
@@ -288,7 +288,7 @@ def test_stipa_reference_normalization():
     assert with_nominal.sti == pytest.approx(with_reference.sti, abs=0.05)
 
 
-def test_stipa_signal_properties():
+def test_stipa_signal_properties() -> None:
     seconds = 18.0
     x = speech.stipa_signal(FS, seconds=seconds, seed=0)
     assert x.shape == (int(seconds * FS),)
@@ -310,7 +310,7 @@ def test_stipa_signal_properties():
 # ---------------------------------------------------------------------------
 
 
-def test_rating_letters_from_band_edges():
+def test_rating_letters_from_band_edges() -> None:
     assert _rating(0.74) == "A"
     # Compute the expected letter from the Annex F edges and assert the
     # helper is consistent across the whole scale, including boundaries.
@@ -331,7 +331,7 @@ def test_rating_letters_from_band_edges():
 # ---------------------------------------------------------------------------
 
 
-def test_invalid_inputs_raise():
+def test_invalid_inputs_raise() -> None:
     ir = np.zeros(FS // 4)
     ir[10] = 1.0
     # the signals are built outside the raises blocks, so each block holds
@@ -401,7 +401,7 @@ def test_invalid_inputs_raise():
         _sti_from_mtf(negative_mtf)
 
 
-def test_mtf_above_1_3_warns_and_truncates():
+def test_mtf_above_1_3_warns_and_truncates() -> None:
     with pytest.warns(UserWarning, match="1.3"):
         result = _sti_from_mtf(_uniform_mtf(1.4))
     assert result.sti == 1.0

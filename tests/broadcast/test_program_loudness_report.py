@@ -17,6 +17,7 @@ synthetic signal keeps the fiche test independent.
 from __future__ import annotations
 
 import dataclasses
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -27,7 +28,10 @@ from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry._report.broadcast import _verdict
-from phonometry.broadcast import program_loudness
+from phonometry.broadcast import ProgramLoudnessResult, program_loudness
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 FS = 48000
 
@@ -48,7 +52,7 @@ def _steps(segments: tuple[tuple[float, float], ...]) -> np.ndarray:
     return _stereo(np.concatenate([_sine(lvl, dur) for lvl, dur in segments]))
 
 
-def _case1_result():
+def _case1_result() -> ProgramLoudnessResult:
     """Tech 3342 Case 1 shaped steps, trimmed 0.4 dB onto the -23.0 target.
 
     The -20.4/-30.4 dBFS stereo steps keep the Case 1 loudness range near
@@ -58,7 +62,7 @@ def _case1_result():
     return program_loudness(_steps(((-20.4, 20.0), (-30.4, 20.0))), FS)
 
 
-def test_report_writes_one_page_pdf(tmp_path) -> None:
+def test_report_writes_one_page_pdf(tmp_path: Path) -> None:
     """A measured programme renders a one-page compliance fiche."""
     result = _case1_result()
     assert np.isfinite(result.integrated)
@@ -68,7 +72,7 @@ def test_report_writes_one_page_pdf(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     result = _case1_result()
     out = str(tmp_path / "x.pdf")
@@ -76,7 +80,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         result.report(out, engine="weasyprint")
 
 
-def test_full_metadata_renders_one_page(tmp_path) -> None:
+def test_full_metadata_renders_one_page(tmp_path: Path) -> None:
     """A populated ReportMetadata renders a one-page fiche."""
     md = ReportMetadata(
         specimen="Reference tone sequence",
@@ -95,7 +99,7 @@ def test_full_metadata_renders_one_page(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_compliant_programme_passes(tmp_path) -> None:
+def test_compliant_programme_passes(tmp_path: Path) -> None:
     """The trimmed signal is compliant (I within -23.0 +/-0.2 LU, TP <= -1 dBTP)."""
     result = _case1_result()
     assert abs(result.integrated - (-23.0)) <= 0.2
@@ -106,7 +110,7 @@ def test_compliant_programme_passes(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_non_compliant_true_peak_fails(tmp_path) -> None:
+def test_non_compliant_true_peak_fails(tmp_path: Path) -> None:
     """A 0 dBFS tone exceeds the -1 dBTP true-peak ceiling and fails."""
     result = program_loudness(_stereo(_sine(0.0, 10.0)), FS)
     assert result.true_peak > -1.0
@@ -117,7 +121,7 @@ def test_non_compliant_true_peak_fails(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_informational_rows_do_not_change_verdict(tmp_path) -> None:
+def test_informational_rows_do_not_change_verdict(tmp_path: Path) -> None:
     """LRA and the momentary/short-term maxima never affect the PASS verdict."""
     result = _case1_result()
     _text, passed = _verdict(result, -23.0)
@@ -155,7 +159,7 @@ def test_default_tolerance_is_qc_02_lu() -> None:
     assert passed2 is True
 
 
-def test_live_tolerance_applies_item_h_1_lu(tmp_path) -> None:
+def test_live_tolerance_applies_item_h_1_lu(tmp_path: Path) -> None:
     """``tolerance="live"`` applies the +-1.0 LU rule of R 128 item h)."""
     result = dataclasses.replace(_case1_result(), integrated=-23.8)
     _t1, qc_passed = _verdict(result, -23.0, "qc")
@@ -173,7 +177,7 @@ def test_live_tolerance_applies_item_h_1_lu(tmp_path) -> None:
     assert "live programmes" in text
 
 
-def test_unknown_tolerance_rejected(tmp_path) -> None:
+def test_unknown_tolerance_rejected(tmp_path: Path) -> None:
     """An unknown tolerance rule raises ``ValueError``."""
     result = _case1_result()
     out = str(tmp_path / "bad.pdf")
@@ -196,7 +200,7 @@ def test_verdict_follows_displayed_rounding_at_boundary() -> None:
         assert passed is expected, integrated
 
 
-def test_fiche_pins_displayed_numbers(tmp_path) -> None:
+def test_fiche_pins_displayed_numbers(tmp_path: Path) -> None:
     """The rendered fiche shows the QC tolerance, its R 128 item and the
     0.1 LU rounded measured loudness.
     """
@@ -214,7 +218,7 @@ def test_fiche_pins_displayed_numbers(tmp_path) -> None:
     assert "Quality Control (EBU R 128 item i)." in text
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """``language="es"`` renders a one-page Spanish fiche with comma decimals."""
     import re
 
@@ -227,7 +231,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     assert re.search(r"\d,\d", text) is not None  # comma decimal separator
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ``ValueError``."""
     result = _case1_result()
     with pytest.raises(ValueError, match="language"):

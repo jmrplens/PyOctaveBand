@@ -40,13 +40,15 @@ from phonometry._plot.common import (
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+    from matplotlib.axes import Axes
 
-def _axes():
+
+def _axes() -> Axes:
     _fig, ax = plt.subplots()
     return ax
 
 
-def _legend_texts(ax) -> list[str]:
+def _legend_texts(ax: Axes) -> list[str]:
     legend = ax.get_legend()
     return [] if legend is None else [t.get_text() for t in legend.get_texts()]
 

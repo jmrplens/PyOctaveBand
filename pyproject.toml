@@ -183,6 +183,12 @@ select = [
     "PERF",                 # a loop whose whole body is one `append` is a
                             # comprehension, unless saying so costs more lines
                             # than it saves
+    "ANN0", "ANN2",         # every parameter and return says its type. The
+                            # suite was the last unannotated corner, and its
+                            # fixtures were the point: a parametrize argument
+                            # is typed from the values really in its list, a
+                            # helper from what its body builds, and pytest's
+                            # own plumbing from pytest's own types
     "ANN401",               # an `Any` earns its keep or names its replacement.
                             # A forwarding `*args`/`**kwargs` is exempt below:
                             # matplotlib's keyword surface is an open set and

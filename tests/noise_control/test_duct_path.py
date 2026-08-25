@@ -28,6 +28,7 @@ from __future__ import annotations
 import dataclasses
 import re
 import warnings
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -40,6 +41,9 @@ from phonometry.noise_control.duct_path import (
     duct_path,
 )
 from phonometry.noise_control.hvac import OCTAVE_BANDS
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 #: Long Table 14.9, row 1 of both paths: the fan sound power level, dB re 1 pW.
 FAN_LW = [90.0, 86.0, 82.0, 79.0, 77.0, 75.0, 71.0, 61.0]
@@ -456,7 +460,9 @@ def test_no_room_effect_at_all_is_still_allowed() -> None:
     ],
     ids=["stage-row", "contribution", "band-axis"],
 )
-def test_a_single_number_where_a_spectrum_belongs_says_so(what, build) -> None:
+def test_a_single_number_where_a_spectrum_belongs_says_so(
+    what: str, build: Callable[[DuctPathResult], dict[str, object]]
+) -> None:
     """A scalar in a nested field is named, not left to numpy or to len().
 
     Reaching the nested rows means indexing a shape or taking a length, and
@@ -485,7 +491,9 @@ def test_a_single_number_where_a_spectrum_belongs_says_so(what, build) -> None:
     ],
     ids=["stage-row", "contribution"],
 )
-def test_a_nested_row_with_an_extra_axis_is_refused(what, build) -> None:
+def test_a_nested_row_with_an_extra_axis_is_refused(
+    what: str, build: Callable[[DuctPathResult, np.ndarray], dict[str, object]]
+) -> None:
     """The nested rows are pinned by their axes, not only by their length.
 
     A row of shape ``(bands, 2)`` counts the right number of bands on its

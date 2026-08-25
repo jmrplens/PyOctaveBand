@@ -20,15 +20,22 @@ mpl.use("Agg")
 pytest.importorskip("reportlab")
 pytest.importorskip("svglib")
 
+from typing import TYPE_CHECKING
+
 import reference_data as ref
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, emission
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
 _BANDS = [row[0] for row in ref.IEC61043_TABLE2]
 
 
-def _class1_chain(offset: float = 1.5, spacing: float = 0.025):
+def _class1_chain(
+    offset: float = 1.5, spacing: float = 0.025
+) -> emission.IntensityInstrumentComplianceResult:
     """A complete instrument that clears the class 1 minima by ``offset`` dB."""
     freqs, class1, _ = emission.residual_index_limits("instrument", spacing=spacing)
     return emission.intensity_class_compliance(class1 + offset, freqs, spacing=spacing)
@@ -50,13 +57,13 @@ def _metadata(**kwargs: object) -> ReportMetadata:
     return ReportMetadata(**base)  # type: ignore[arg-type]
 
 
-def test_compliant_chain_renders_one_page(tmp_path) -> None:
+def test_compliant_chain_renders_one_page(tmp_path: Path) -> None:
     result = _class1_chain()
     path = result.report(str(tmp_path / "iec61043.pdf"), metadata=_metadata())
     assert_one_page(path)
 
 
-def test_bare_fiche_without_metadata(tmp_path) -> None:
+def test_bare_fiche_without_metadata(tmp_path: Path) -> None:
     """A fiche without metadata still renders body, result and disclaimer."""
     result = _class1_chain()
     assert_one_page(result.report(str(tmp_path / "bare.pdf")))
@@ -70,13 +77,13 @@ def _extract_text(path: str) -> str:
     return " ".join(raw.split())
 
 
-def test_spanish_fiche_renders(tmp_path) -> None:
+def test_spanish_fiche_renders(tmp_path: Path) -> None:
     result = _class1_chain()
     path = result.report(str(tmp_path / "es.pdf"), metadata=_metadata(), language="es")
     assert_one_page(path)
 
 
-def test_spanish_fiche_translates_every_fixed_string(tmp_path) -> None:
+def test_spanish_fiche_translates_every_fixed_string(tmp_path: Path) -> None:
     """No English template survives into the Spanish fiche.
 
     ``_i18n.t`` falls back to the English text when a key is missing, so a
@@ -120,7 +127,7 @@ def test_spanish_fiche_translates_every_fixed_string(tmp_path) -> None:
         assert english not in text, english
 
 
-def test_required_class_verdict_both_ways(tmp_path) -> None:
+def test_required_class_verdict_both_ways(tmp_path: Path) -> None:
     """The verdict row renders whether the chain meets the requirement or not."""
     passing = _class1_chain()
     assert_one_page(
@@ -135,7 +142,7 @@ def test_required_class_verdict_both_ways(tmp_path) -> None:
     )
 
 
-def test_non_compliant_chain_renders(tmp_path) -> None:
+def test_non_compliant_chain_renders(tmp_path: Path) -> None:
     """A chain meeting neither class boxes a non-conformity statement."""
     freqs, _, class2 = emission.residual_index_limits("probe")
     result = emission.intensity_class_compliance(class2 - 2.0, freqs, device="probe")
@@ -143,7 +150,7 @@ def test_non_compliant_chain_renders(tmp_path) -> None:
     assert_one_page(result.report(str(tmp_path / "none.pdf"), metadata=_metadata()))
 
 
-def test_range_limited_note_renders(tmp_path) -> None:
+def test_range_limited_note_renders(tmp_path: Path) -> None:
     """A partial band set adds the clause 6.1 qualifying note."""
     bands = _BANDS[6:14]
     freqs, class1, _ = emission.residual_index_limits("processor", frequencies=bands)
@@ -153,7 +160,7 @@ def test_range_limited_note_renders(tmp_path) -> None:
 
 
 def test_range_limited_note_drops_the_class_wording_when_no_class_is_met(
-    tmp_path,
+    tmp_path: Path,
 ) -> None:
     """With no class reached there is no "stated class" for the note to qualify.
 
@@ -185,14 +192,14 @@ def test_range_limited_note_drops_the_class_wording_when_no_class_is_met(
     assert "la clase indicada acredita" not in es_text
 
 
-def test_unknown_engine_is_rejected(tmp_path) -> None:
+def test_unknown_engine_is_rejected(tmp_path: Path) -> None:
     result = _class1_chain()
     target = str(tmp_path / "engine.pdf")
     with pytest.raises(ValueError, match="Unknown report engine"):
         result.report(target, engine="weasyprint")
 
 
-def test_unknown_required_class_is_rejected(tmp_path) -> None:
+def test_unknown_required_class_is_rejected(tmp_path: Path) -> None:
     result = _class1_chain()
     target = str(tmp_path / "class0.pdf")
     metadata = _metadata(required_class=0)
@@ -200,7 +207,7 @@ def test_unknown_required_class_is_rejected(tmp_path) -> None:
         result.report(target, metadata=metadata)
 
 
-def test_unknown_language_is_rejected(tmp_path) -> None:
+def test_unknown_language_is_rejected(tmp_path: Path) -> None:
     result = _class1_chain()
     target = str(tmp_path / "xx.pdf")
     with pytest.raises(ValueError, match="Unknown language"):

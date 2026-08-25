@@ -10,7 +10,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 
-def parse_test_results(test_dir):
+def parse_test_results(test_dir: str) -> tuple[str, int, int]:
     summary = []
     total_tests = 0
     total_failures = 0
@@ -82,7 +82,7 @@ def parse_test_results(test_dir):
     return "\n".join(summary), total_tests, total_failures
 
 
-def read_conformance_report():
+def read_conformance_report() -> str:
     """Return the conformance-report Markdown, or a fallback notice."""
     report = Path("conformance_report.md")
     if report.exists():
@@ -93,7 +93,7 @@ def read_conformance_report():
     )
 
 
-def main():
+def main() -> None:
     repo = os.environ.get("GITHUB_REPOSITORY")
     run_id = os.environ.get("GITHUB_RUN_ID")
     test_dir = "test-results"

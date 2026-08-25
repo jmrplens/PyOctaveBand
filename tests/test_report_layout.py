@@ -9,7 +9,12 @@ is pinned here directly instead of through a ``report()`` call.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
+
+if TYPE_CHECKING:
+    from matplotlib.axes import Axes
 
 pytest.importorskip("reportlab")
 
@@ -107,7 +112,7 @@ def test_a_single_width_is_left_alone() -> None:
     ],
 )
 def test_the_octave_grouping_is_measured_from_the_band_centres(
-    centres, expected
+    centres: list[int] | None, expected: int | None
 ) -> None:
     """The rules group a table by octave, so they need rows that are bands.
 
@@ -134,7 +139,9 @@ def test_a_drawing_is_scaled_by_what_it_covers_not_by_what_it_declares() -> None
 
     from phonometry._report._layout import render_figure_drawing
 
-    def wide_legend(ax=None, language="en", **kwargs):
+    def wide_legend(
+        ax: Axes | None = None, language: str = "en", **kwargs: object
+    ) -> Axes:
         """A plot whose legend is far wider than its axes."""
         ax.plot([1.0, 2.0], [1.0, 2.0], label="a legend entry long enough to overhang")
         ax.legend(loc="lower left", bbox_to_anchor=(0.0, 1.005))
