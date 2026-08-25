@@ -192,6 +192,43 @@ def _target_names(target: ast.expr) -> Iterator[str]:
             yield from _target_names(element)
 
 
+class _RuntimeView(ast.NodeTransformer):
+    """A tree with everything only a type checker reads taken out.
+
+    Annotations are evaluated lazily or not at all, and no drawing code
+    introspects them, so a parameter gaining ``: Axes`` cannot move a pixel.
+    Leaving them in would break the fingerprint twice over: their expressions
+    would enter the hash, and an unquoted annotation naming a package class
+    would hand the dependency walk an edge no frame ever crosses. Both the
+    walk and the hash therefore see this view, applied once at parse time.
+
+    A bare declaration (``x: int`` with no value) binds nothing at run time
+    and is dropped whole; an assigned one keeps its assignment and loses the
+    annotation.
+    """
+
+    def visit_arg(self, node: ast.arg) -> ast.arg:
+        node.annotation = None
+        return node
+
+    def _defun(
+        self, node: ast.FunctionDef | ast.AsyncFunctionDef
+    ) -> ast.FunctionDef | ast.AsyncFunctionDef:
+        node.returns = None
+        self.generic_visit(node)
+        return node
+
+    visit_FunctionDef = _defun
+    visit_AsyncFunctionDef = _defun
+
+    def visit_AnnAssign(self, node: ast.AnnAssign) -> ast.stmt | None:
+        if node.value is None:
+            return None
+        return ast.copy_location(
+            ast.Assign(targets=[node.target], value=self.visit(node.value)), node
+        )
+
+
 class Sources:
     """Every module of the figures package, parsed once."""
 
@@ -207,9 +244,8 @@ class Sources:
             name = ".".join([_PKG_NAME, *parts])
             if path.name == "__init__.py":
                 self.packages.add(name)
-            parsed[name] = ast.parse(
-                path.read_text(encoding="utf-8"), filename=str(path)
-            )
+            tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+            parsed[name] = ast.fix_missing_locations(_RuntimeView().visit(tree))
         # Every module name has to be known before the imports are resolved:
         # ``from . import media`` reads as a module reference or as a symbol
         # depending on whether ``figures.media`` exists.
@@ -372,10 +408,33 @@ def _module_level(body: list[ast.stmt]) -> str:
         s for s in body if not (isinstance(s, ast.If) and _is_type_checking(s.test))
     ]
     imports = sorted(
-        _dump(s) for s in live if isinstance(s, (ast.Import, ast.ImportFrom))
+        _dump(s)
+        for s in live
+        if isinstance(s, (ast.Import, ast.ImportFrom)) and not _typing_only_import(s)
     )
     rest = [s for s in live if not isinstance(s, (ast.Import, ast.ImportFrom))]
     return "\x00".join([*imports, _dump(ast.Module(body=rest, type_ignores=[]))])
+
+
+def _typing_only_import(node: ast.stmt) -> bool:
+    """Is *node* an import that only a type checker reads?
+
+    ``from __future__ import annotations`` changes how annotations are
+    evaluated, and the annotations themselves are removed from the runtime
+    view before anything is hashed, so the switch controls nothing that can
+    reach a frame. ``from typing import TYPE_CHECKING`` binds the guard whose
+    whole block is already taken out above. Either statement appearing or
+    disappearing is an artefact of typing work, not of drawing work.
+
+    Only the exact single-name forms are dropped: ``from typing import
+    TYPE_CHECKING, cast`` binds ``cast``, which is a real runtime name, and
+    stays recorded whole.
+    """
+    if not isinstance(node, ast.ImportFrom):
+        return False
+    if node.module == "__future__":
+        return True
+    return node.module == "typing" and [a.name for a in node.names] == ["TYPE_CHECKING"]
 
 
 def _literals(sources: Sources, symbols: Iterable[Symbol]) -> set[str]:

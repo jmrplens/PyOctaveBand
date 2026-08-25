@@ -224,6 +224,27 @@ def test_a_change_that_reaches_a_clip_moves_its_fingerprint(
         # or changing a Spanish string must not mark every clip stale.
         ("i18n", '"otra figura cualquiera"', '"una figura distinta"'),
         ("i18n", r'r"cosa \1 no relacionada"', r'r"otra cosa \1"'),
+        # Annotations, in every position they take: a type checker reads them
+        # and a frame never does, so typing a clip's helpers must not cost a
+        # re-render. This is the hash's runtime view, not an accident of the
+        # dump: parameters and returns are stripped, an annotated assignment
+        # hashes as the plain one, and the imports that exist only to spell
+        # the annotations go with them.
+        (
+            "schematics",
+            "def _shared_label(ax):",
+            "def _shared_label(ax: object) -> None:",
+        ),
+        ("media", "_ANIM_FPS = 20", "_ANIM_FPS: int = 20"),
+        (
+            "schematics",
+            "from .media import _render_clip, _translate_str",
+            "from __future__ import annotations\n\n"
+            "from typing import TYPE_CHECKING\n"
+            "from .media import _render_clip, _translate_str\n"
+            "if TYPE_CHECKING:\n"
+            "    from matplotlib.axes import Axes",
+        ),
     ],
 )
 def test_a_change_that_cannot_reach_a_clip_leaves_it_alone(
