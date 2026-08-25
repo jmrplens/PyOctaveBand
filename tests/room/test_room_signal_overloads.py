@@ -21,6 +21,7 @@ overload heads say so and the refusal names the reason.
 from __future__ import annotations
 
 from dataclasses import fields
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -36,6 +37,16 @@ from phonometry.room import (
     mls_signal,
     room_parameters,
 )
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from collections.abc import Callable
+
+    from phonometry.room import DecayCurve, ImpulseResponseResult, RoomAcousticsResult
+
+    #: The two measurements that read time off the record (rate mandatory).
+    _TimedMeasurement = Callable[..., DecayCurve | RoomAcousticsResult]
+    #: The three deconvolutions, where the rate is only a label.
+    _Deconvolution = Callable[..., ImpulseResponseResult]
 
 FS = 8000
 CAL = 3.0
@@ -63,12 +74,16 @@ TIMED_IDS = [f.__name__ for f, _ in TIMED]
 
 
 @pytest.mark.parametrize(("func", "kwargs"), TIMED, ids=TIMED_IDS)
-def test_an_uncalibrated_signal_computes_the_bare_array_result(func, kwargs) -> None:
+def test_an_uncalibrated_signal_computes_the_bare_array_result(
+    func: _TimedMeasurement, kwargs: dict[str, tuple[float, float]]
+) -> None:
     assert_same(func(Signal(_IR, FS), **kwargs), func(_IR, FS, **kwargs))
 
 
 @pytest.mark.parametrize(("func", "kwargs"), TIMED, ids=TIMED_IDS)
-def test_a_conflicting_rate_is_refused_a_matching_one_is_not(func, kwargs) -> None:
+def test_a_conflicting_rate_is_refused_a_matching_one_is_not(
+    func: _TimedMeasurement, kwargs: dict[str, tuple[float, float]]
+) -> None:
     sig = Signal(_IR, FS)
     with pytest.raises(ValueError, match="conflicts with the Signal's own fs"):
         func(sig, FS + 1, **kwargs)
@@ -77,13 +92,17 @@ def test_a_conflicting_rate_is_refused_a_matching_one_is_not(func, kwargs) -> No
 
 
 @pytest.mark.parametrize(("func", "kwargs"), TIMED, ids=TIMED_IDS)
-def test_a_bare_array_still_requires_fs(func, kwargs) -> None:
+def test_a_bare_array_still_requires_fs(
+    func: _TimedMeasurement, kwargs: dict[str, tuple[float, float]]
+) -> None:
     with pytest.raises(ValueError, match="fs is required"):
         func(_IR, **kwargs)
 
 
 @pytest.mark.parametrize(("func", "kwargs"), TIMED, ids=TIMED_IDS)
-def test_a_calibrated_signal_is_scaled_and_then_cancels(func, kwargs) -> None:
+def test_a_calibrated_signal_is_scaled_and_then_cancels(
+    func: _TimedMeasurement, kwargs: dict[str, tuple[float, float]]
+) -> None:
     """The factor is applied and then cancels, which is not the same as ignored.
 
     Against the pre-scaled array the equality is exact: the samples really
@@ -137,7 +156,11 @@ DECONVOLUTION_IDS = [f.__name__ for f, _, _ in DECONVOLUTIONS]
 @pytest.mark.parametrize(
     ("func", "records", "kwargs"), DECONVOLUTIONS, ids=DECONVOLUTION_IDS
 )
-def test_a_deconvolution_keeps_its_rate_optional(func, records, kwargs) -> None:
+def test_a_deconvolution_keeps_its_rate_optional(
+    func: _Deconvolution,
+    records: tuple[np.ndarray, np.ndarray],
+    kwargs: dict[str, str | tuple[np.ndarray, np.ndarray]],
+) -> None:
     """The rate labels the axis; without one the recovery is still defined."""
     first, second = records
     result = func(first, second, **kwargs)
@@ -147,7 +170,11 @@ def test_a_deconvolution_keeps_its_rate_optional(func, records, kwargs) -> None:
 @pytest.mark.parametrize(
     ("func", "records", "kwargs"), DECONVOLUTIONS, ids=DECONVOLUTION_IDS
 )
-def test_a_deconvolution_takes_the_label_from_the_signal(func, records, kwargs) -> None:
+def test_a_deconvolution_takes_the_label_from_the_signal(
+    func: _Deconvolution,
+    records: tuple[np.ndarray, np.ndarray],
+    kwargs: dict[str, str | tuple[np.ndarray, np.ndarray]],
+) -> None:
     first, second = records
     assert_same(
         func(Signal(first, FS), second, **kwargs),
@@ -158,7 +185,11 @@ def test_a_deconvolution_takes_the_label_from_the_signal(func, records, kwargs) 
 @pytest.mark.parametrize(
     ("func", "records", "kwargs"), DECONVOLUTIONS, ids=DECONVOLUTION_IDS
 )
-def test_a_deconvolution_refuses_a_conflicting_rate(func, records, kwargs) -> None:
+def test_a_deconvolution_refuses_a_conflicting_rate(
+    func: _Deconvolution,
+    records: tuple[np.ndarray, np.ndarray],
+    kwargs: dict[str, str | tuple[np.ndarray, np.ndarray]],
+) -> None:
     first, second = records
     sig = Signal(first, FS)
     with pytest.raises(ValueError, match="conflicts with the Signal's own fs"):
@@ -168,7 +199,11 @@ def test_a_deconvolution_refuses_a_conflicting_rate(func, records, kwargs) -> No
 @pytest.mark.parametrize(
     ("func", "records", "kwargs"), DECONVOLUTIONS, ids=DECONVOLUTION_IDS
 )
-def test_a_calibrated_recording_deconvolves_in_pascals(func, records, kwargs) -> None:
+def test_a_calibrated_recording_deconvolves_in_pascals(
+    func: _Deconvolution,
+    records: tuple[np.ndarray, np.ndarray],
+    kwargs: dict[str, str | tuple[np.ndarray, np.ndarray]],
+) -> None:
     first, second = records
     assert_same(
         func(Signal(first, FS, calibration_factor=CAL), second, **kwargs),

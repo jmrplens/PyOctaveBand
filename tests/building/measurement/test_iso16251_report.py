@@ -19,6 +19,8 @@ and CI,delta = -11 - 0 = -11 dB.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 pytest.importorskip("reportlab")
@@ -27,6 +29,9 @@ import numpy as np
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, building
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 _FREQS = np.array(
     [
@@ -54,12 +59,12 @@ _DELTA_L = np.array(
 )
 
 
-def _result():
+def _result() -> building.FloorCoveringImprovementResult:
     bare = np.full(16, 78.0)
     return building.impact_improvement(bare, bare - _DELTA_L, _FREQS)
 
 
-def _metadata(**overrides) -> ReportMetadata:
+def _metadata(**overrides: float | str) -> ReportMetadata:
     base = {
         "specimen": "Textile floor covering (carpet), 6 mm pile",
         "client": "Acoustic Test Client Ltd.",
@@ -88,34 +93,34 @@ def _text(path: str) -> str:
     )
 
 
-def test_report_writes_one_page_pdf(tmp_path) -> None:
+def test_report_writes_one_page_pdf(tmp_path: Path) -> None:
     out = tmp_path / "iso16251.pdf"
     returned = _result().report(str(out))
     assert returned == str(out)
     assert_one_page(str(out))
 
 
-def test_report_with_metadata_one_page(tmp_path) -> None:
+def test_report_with_metadata_one_page(tmp_path: Path) -> None:
     out = tmp_path / "iso16251_meta.pdf"
     _result().report(str(out), metadata=_metadata())
     assert_one_page(str(out))
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     result = _result()
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="engine"):
         result.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     result = _result()
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="Unknown language"):
         result.report(out, language="xx")
 
 
-def test_displayed_values_match_oracle(tmp_path) -> None:
+def test_displayed_values_match_oracle(tmp_path: Path) -> None:
     """The fiche prints the weighted improvement, band labels and delta-L."""
     out = tmp_path / "iso16251.pdf"
     _result().report(str(out), metadata=_metadata())
@@ -130,7 +135,7 @@ def test_displayed_values_match_oracle(tmp_path) -> None:
     assert "100 to 3150" in text  # measured frequency range
 
 
-def test_verbose_shows_reference_floor_column_one_page(tmp_path) -> None:
+def test_verbose_shows_reference_floor_column_one_page(tmp_path: Path) -> None:
     """verbose=True adds the reference-floor L_n,r column and stays one page."""
     out = tmp_path / "iso16251_verbose.pdf"
     _result().report(str(out), metadata=_metadata(), verbose=True)
@@ -141,14 +146,14 @@ def test_verbose_shows_reference_floor_column_one_page(tmp_path) -> None:
     assert "55.5" in text
 
 
-def test_requirement_pass_verdict(tmp_path) -> None:
+def test_requirement_pass_verdict(tmp_path: Path) -> None:
     """A higher weighted improvement passes the requirement."""
     out = tmp_path / "iso16251_pass.pdf"
     _result().report(str(out), metadata=_metadata(requirement=17.0))
     assert "PASS" in _text(str(out))
 
 
-def test_requirement_boundary_verdict(tmp_path) -> None:
+def test_requirement_boundary_verdict(tmp_path: Path) -> None:
     """At equality (requirement == delta_lw) the verdict passes (>= rule)."""
     out = tmp_path / "iso16251_boundary.pdf"
     result = _result()
@@ -159,14 +164,14 @@ def test_requirement_boundary_verdict(tmp_path) -> None:
     assert "FAIL" not in text
 
 
-def test_requirement_fail_verdict(tmp_path) -> None:
+def test_requirement_fail_verdict(tmp_path: Path) -> None:
     """A weighted improvement below the requirement fails."""
     out = tmp_path / "iso16251_fail.pdf"
     _result().report(str(out), metadata=_metadata(requirement=25.0))
     assert "FAIL" in _text(str(out))
 
 
-def test_limited_band_uses_literal_greater_than(tmp_path) -> None:
+def test_limited_band_uses_literal_greater_than(tmp_path: Path) -> None:
     """A band at the 1,3 dB limit renders a literal '>' marker, not '&gt;'."""
     bare = np.full(16, 50.0)
     covering = np.full(16, 49.0)
@@ -183,7 +188,7 @@ def test_limited_band_uses_literal_greater_than(tmp_path) -> None:
     assert "≥" in text  # the >= prefix on the boxed delta-Lw
 
 
-def test_unlimited_result_not_qualified_as_lower_bound(tmp_path) -> None:
+def test_unlimited_result_not_qualified_as_lower_bound(tmp_path: Path) -> None:
     """A result with no background-limited band prints a plain delta-Lw."""
     out = tmp_path / "iso16251_plain.pdf"
     _result().report(str(out))
@@ -192,7 +197,7 @@ def test_unlimited_result_not_qualified_as_lower_bound(tmp_path) -> None:
     assert "≥" not in text
 
 
-def test_manual_result_without_ci_delta_omits_adaptation_term(tmp_path) -> None:
+def test_manual_result_without_ci_delta_omits_adaptation_term(tmp_path: Path) -> None:
     """A hand-built result lacking CI,delta must not print a fabricated (+0)."""
     from phonometry.building.measurement.floor_covering_improvement import (
         FloorCoveringImprovementResult,
@@ -213,13 +218,13 @@ def test_manual_result_without_ci_delta_omits_adaptation_term(tmp_path) -> None:
     assert "15 dB" in text
 
 
-def test_metadata_xml_specials_do_not_break(tmp_path) -> None:
+def test_metadata_xml_specials_do_not_break(tmp_path: Path) -> None:
     out = tmp_path / "iso16251_xml.pdf"
     _result().report(str(out), metadata=_metadata(specimen='Carpet <A> & <B> "edge"'))
     assert_one_page(str(out))
 
 
-def test_no_metadata_still_renders(tmp_path) -> None:
+def test_no_metadata_still_renders(tmp_path: Path) -> None:
     """Without metadata the header still shows the measured frequency range."""
     out = tmp_path / "iso16251_bare.pdf"
     _result().report(str(out))
@@ -227,14 +232,14 @@ def test_no_metadata_still_renders(tmp_path) -> None:
     assert "100 to 3150" in _text(str(out))
 
 
-def test_spanish_fiche_uses_comma_decimal(tmp_path) -> None:
+def test_spanish_fiche_uses_comma_decimal(tmp_path: Path) -> None:
     out = tmp_path / "iso16251_es.pdf"
     _result().report(str(out), metadata=_metadata(), language="es")
     assert_one_page(str(out))
     assert "15,0" in _text(str(out))  # Spanish decimal comma
 
 
-def test_characterisation_headline_without_rating_bands(tmp_path) -> None:
+def test_characterisation_headline_without_rating_bands(tmp_path: Path) -> None:
     """A spectrum without the 16 rating bands boxes a characterisation, no number."""
     result = building.impact_improvement(
         [1.0, 2.0, 3.0], [0.0, 0.0, 0.0], [500.0, 1000.0, 2000.0]

@@ -19,6 +19,7 @@ Validation strategy (closed-form, not self-consistency):
 from __future__ import annotations
 
 import dataclasses
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -26,10 +27,15 @@ from scipy import signal
 
 from phonometry import room
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
 FS = 48000
 
 
-def _welch_deviation_db(res: room.ShapedSweepResult, target_db_fn) -> float:
+def _welch_deviation_db(
+    res: room.ShapedSweepResult, target_db_fn: Callable[[np.ndarray], np.ndarray]
+) -> float:
     """Worst |Welch - target| deviation in dB over the band interior."""
     x = np.asarray(res)
     nperseg = 8192

@@ -20,12 +20,17 @@ import pytest
 
 pytest.importorskip("reportlab")
 
+from typing import TYPE_CHECKING
+
 from report_assertions import assert_one_page
 
 from phonometry import (
     ReportMetadata,
     materials,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # The committed clean-room example: the standard 8 kg load plate over the
 # 0.04 m2 specimen (m't = 200 kg/m2, Clauses 5-6), a measured resonance of
@@ -40,7 +45,7 @@ _POROSITY = 0.9
 _RESISTIVITY = 50.0
 
 
-def _result():
+def _result() -> materials.DynamicStiffnessResult:
     return materials.floating_floor_resonance(
         resonant_frequency=_FR,
         total_mass_per_area=_MT,
@@ -51,8 +56,8 @@ def _result():
     )
 
 
-def _metadata(**overrides) -> ReportMetadata:
-    base = {
+def _metadata(**overrides: object) -> ReportMetadata:
+    base: dict[str, object] = {
         "specimen": "20 mm mineral-wool resilient layer",
         "client": "Acoustic Test Client Ltd.",
         "manufacturer": "Acoustics Works Inc.",
@@ -68,7 +73,7 @@ def _metadata(**overrides) -> ReportMetadata:
         "report_id": "PHN-2026-29052",
     }
     base.update(overrides)
-    return ReportMetadata(**base)
+    return ReportMetadata(**base)  # type: ignore[arg-type]
 
 
 def _raw_text(path: str) -> str:
@@ -87,14 +92,14 @@ def _text(path: str) -> str:
 _PRIME = "′"
 
 
-def test_writes_one_page_pdf(tmp_path) -> None:
+def test_writes_one_page_pdf(tmp_path: Path) -> None:
     out = tmp_path / "dyn.pdf"
     returned = _result().report(str(out))
     assert returned == str(out)
     assert_one_page(str(out))
 
 
-def test_displayed_values_match_oracle(tmp_path) -> None:
+def test_displayed_values_match_oracle(tmp_path: Path) -> None:
     """The fiche prints s't (Formula 4), s'a, s', fr and f0, and the metadata.
 
     The oracle is derived from the standard's formulae, independent of the
@@ -126,7 +131,7 @@ def test_displayed_values_match_oracle(tmp_path) -> None:
     assert "Acoustic Test Client Ltd." in text  # metadata
 
 
-def test_metadata_fields_appear(tmp_path) -> None:
+def test_metadata_fields_appear(tmp_path: Path) -> None:
     """The mass per area m't and the loaded thickness d appear in the header."""
     out = tmp_path / "dyn.pdf"
     _result().report(str(out), metadata=_metadata())
@@ -137,14 +142,14 @@ def test_metadata_fields_appear(tmp_path) -> None:
     assert re.search(rf"m{_PRIME} \[kg/m2\]\s+110\b", raw)  # supported-floor mass
 
 
-def test_no_metadata_still_renders(tmp_path) -> None:
+def test_no_metadata_still_renders(tmp_path: Path) -> None:
     out = tmp_path / "dyn_bare.pdf"
     _result().report(str(out))
     assert_one_page(str(out))
     assert "EN 29052-1" in _text(str(out))  # standard-basis line
 
 
-def test_high_resistivity_omits_gas_term(tmp_path) -> None:
+def test_high_resistivity_omits_gas_term(tmp_path: Path) -> None:
     """For r >= 100 kPa.s/m2 the installed s' equals s't and no s'a row shows."""
     out = tmp_path / "dyn_hi.pdf"
     result = materials.floating_floor_resonance(
@@ -157,27 +162,27 @@ def test_high_resistivity_omits_gas_term(tmp_path) -> None:
     assert "Enclosed-gas stiffness" not in _text(str(out))
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     result = _result()
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="engine"):
         result.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     result = _result()
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="Unknown language"):
         result.report(out, language="xx")
 
 
-def test_metadata_xml_specials_do_not_break(tmp_path) -> None:
+def test_metadata_xml_specials_do_not_break(tmp_path: Path) -> None:
     out = tmp_path / "dyn_xml.pdf"
     _result().report(str(out), metadata=_metadata(specimen='Layer <A> & <B> "edge"'))
     assert_one_page(str(out))
 
 
-def test_spanish_uses_comma_decimal(tmp_path) -> None:
+def test_spanish_uses_comma_decimal(tmp_path: Path) -> None:
     out = tmp_path / "dyn_es.pdf"
     _result().report(str(out), metadata=_metadata(), language="es")
     assert_one_page(str(out))

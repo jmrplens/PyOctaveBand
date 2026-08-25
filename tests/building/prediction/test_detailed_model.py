@@ -259,7 +259,7 @@ def test_velocity_level_difference_is_floored_at_zero() -> None:
 # Table L.1 - the airborne chain
 # --------------------------------------------------------------------------
 @pytest.fixture(scope="module")
-def airborne(situ: dict, delta_l: np.ndarray):
+def airborne(situ: dict, delta_l: np.ndarray) -> building.DetailedAirborneResult:
     """The Annex L airborne prediction, assembled from the fixture."""
     return building.detailed_airborne_prediction(
         BANDS,
@@ -270,7 +270,9 @@ def airborne(situ: dict, delta_l: np.ndarray):
     )
 
 
-def test_table_l1_every_transmission_path(airborne) -> None:
+def test_table_l1_every_transmission_path(
+    airborne: building.DetailedAirborneResult,
+) -> None:
     """Table L.1, all thirteen direct and flanking sound reduction indices."""
     for path in airborne.paths:
         assert path.values == pytest.approx(
@@ -278,7 +280,9 @@ def test_table_l1_every_transmission_path(airborne) -> None:
         ), path.label
 
 
-def test_table_l1_apparent_index_and_rating(airborne) -> None:
+def test_table_l1_apparent_index_and_rating(
+    airborne: building.DetailedAirborneResult,
+) -> None:
     """Table L.1, the total ``R'`` per band and its ISO 717-1 rating.
 
     Table L.1 prints ``Rw = 57,8`` and the statement line ``R'w = 57,9``: both
@@ -291,7 +295,9 @@ def test_table_l1_apparent_index_and_rating(airborne) -> None:
     assert airborne.rating.rating == ref.ISO12354_ANNEX_L1_R_PRIME_W
 
 
-def test_path_fractions_sum_to_one_and_name_a_dominant_path(airborne) -> None:
+def test_path_fractions_sum_to_one_and_name_a_dominant_path(
+    airborne: building.DetailedAirborneResult,
+) -> None:
     """Every band's path shares partition the transmitted energy."""
     assert airborne.fractions.sum(axis=0) == pytest.approx(1.0)
     assert len(airborne.dominant) == BANDS.size
@@ -304,7 +310,7 @@ def test_path_fractions_sum_to_one_and_name_a_dominant_path(airborne) -> None:
 # Tables G.1 / G.4 - the impact chain
 # --------------------------------------------------------------------------
 @pytest.fixture(scope="module")
-def impact(situ: dict, delta_l: np.ndarray):
+def impact(situ: dict, delta_l: np.ndarray) -> building.DetailedImpactResult:
     """The Annex G impact prediction, assembled from the same fixture."""
     return building.detailed_impact_prediction(
         BANDS,
@@ -315,14 +321,18 @@ def impact(situ: dict, delta_l: np.ndarray):
     )
 
 
-def test_table_g4_direct_and_flanking_impact_levels(impact) -> None:
+def test_table_g4_direct_and_flanking_impact_levels(
+    impact: building.DetailedImpactResult,
+) -> None:
     """Table G.4, ``Ln,Dd`` (Formula 11) and ``Ln,Df`` (Formula 12)."""
     by_label = {p.label: p.values for p in impact.paths}
     assert by_label["Dd"] == pytest.approx(ref.ISO12354_ANNEX_G4_LN_DD, abs=TOL)
     assert by_label["Df1"] == pytest.approx(ref.ISO12354_ANNEX_G4_LN_DF, abs=TOL)
 
 
-def test_table_g1_direct_path_over_the_whole_range(impact) -> None:
+def test_table_g1_direct_path_over_the_whole_range(
+    impact: building.DetailedImpactResult,
+) -> None:
     """Table G.1, the direct column ``Ln,Dd`` over all 21 bands.
 
     The Table G.1 / G.4 disagreement recorded in docs/ERRATA.md affects only
@@ -335,7 +345,9 @@ def test_table_g1_direct_path_over_the_whole_range(impact) -> None:
 
 
 @pytest.mark.parametrize("label", ["Df1", "Df2", "Df3", "Df4"])
-def test_table_g1_flanking_paths_from_100_hz(impact, label: str) -> None:
+def test_table_g1_flanking_paths_from_100_hz(
+    impact: building.DetailedImpactResult, label: str
+) -> None:
     """Table G.1, per-element flanking impact levels, 100 Hz to 5 kHz.
 
     The 50 Hz, 63 Hz and 80 Hz cells of the four flanking columns of Table G.1
@@ -351,7 +363,7 @@ def test_table_g1_flanking_paths_from_100_hz(impact, label: str) -> None:
     )
 
 
-def test_table_g1_total_and_rating(impact) -> None:
+def test_table_g1_total_and_rating(impact: building.DetailedImpactResult) -> None:
     """Table G.1, the total ``L'n`` per band and ``L'n,w (CI)`` per ISO 717-2.
 
     The 50 Hz to 80 Hz flanking cells of Table G.1 feed its own total, so the
@@ -375,7 +387,9 @@ def test_table_g1_total_and_rating(impact) -> None:
 # --------------------------------------------------------------------------
 # Tables L.10 / G.10 - the simplified model on the same building
 # --------------------------------------------------------------------------
-def test_simplified_model_agrees_with_the_detailed_model(airborne) -> None:
+def test_simplified_model_agrees_with_the_detailed_model(
+    airborne: building.DetailedAirborneResult,
+) -> None:
     """Tables L.10 and L.1: the two models rate the same building alike.
 
     The simplified single-number model of Clause 4.4 gives ``R'w = 57,0 dB``
@@ -881,7 +895,9 @@ def test_band_count_mismatch_is_reported(situ: dict) -> None:
 # .plot() coverage
 # --------------------------------------------------------------------------
 @pytest.mark.parametrize("language", ["en", "es"])
-def test_detailed_airborne_plot_draws_bars_and_the_total(airborne, language) -> None:
+def test_detailed_airborne_plot_draws_bars_and_the_total(
+    airborne: building.DetailedAirborneResult, language: str
+) -> None:
     """The airborne renderer stacks one bar per path and overlays ``R'``."""
     plt = pytest.importorskip("matplotlib.pyplot")
     ax = airborne.plot(language=language)
@@ -894,7 +910,9 @@ def test_detailed_airborne_plot_draws_bars_and_the_total(airborne, language) -> 
 
 
 @pytest.mark.parametrize("language", ["en", "es"])
-def test_detailed_impact_plot_draws_bars_and_the_total(impact, language) -> None:
+def test_detailed_impact_plot_draws_bars_and_the_total(
+    impact: building.DetailedImpactResult, language: str
+) -> None:
     """The impact renderer is the same figure with ``L'n`` overlaid."""
     plt = pytest.importorskip("matplotlib.pyplot")
     ax = impact.plot(language=language)
@@ -906,7 +924,7 @@ def test_detailed_impact_plot_draws_bars_and_the_total(impact, language) -> None
 
 
 @pytest.mark.parametrize("language", ["en", "es"])
-def test_in_situ_element_plot_draws_both_spectra(situ: dict, language) -> None:
+def test_in_situ_element_plot_draws_both_spectra(situ: dict, language: str) -> None:
     """The element renderer draws ``Rsitu`` and ``Ln,situ``."""
     plt = pytest.importorskip("matplotlib.pyplot")
     ax = situ["floor"].plot(language=language)
@@ -915,14 +933,18 @@ def test_in_situ_element_plot_draws_both_spectra(situ: dict, language) -> None:
     plt.close(ax.get_figure())
 
 
-def test_plot_rejects_an_unknown_language(airborne) -> None:
+def test_plot_rejects_an_unknown_language(
+    airborne: building.DetailedAirborneResult,
+) -> None:
     """Only the languages the renderers translate are accepted."""
     pytest.importorskip("matplotlib.pyplot")
     with pytest.raises(ValueError, match="Unknown language"):
         airborne.plot(language="fr")
 
 
-def test_plot_pools_the_paths_beyond_the_named_set(airborne) -> None:
+def test_plot_pools_the_paths_beyond_the_named_set(
+    airborne: building.DetailedAirborneResult,
+) -> None:
     """With thirteen paths the renderer names six and pools the rest."""
     plt = pytest.importorskip("matplotlib.pyplot")
     ax = airborne.plot()
@@ -936,7 +958,9 @@ def test_plot_pools_the_paths_beyond_the_named_set(airborne) -> None:
 # --------------------------------------------------------------------------
 # Paths and bands that do not line up
 # --------------------------------------------------------------------------
-def test_a_share_column_short_of_a_path_is_refused(airborne) -> None:
+def test_a_share_column_short_of_a_path_is_refused(
+    airborne: building.DetailedAirborneResult,
+) -> None:
     """The share column is printed beside the path rows and sums to 100 %.
 
     A ``fractions`` array short of a path row leaves a sheet listing fewer
@@ -949,7 +973,9 @@ def test_a_share_column_short_of_a_path_is_refused(airborne) -> None:
         dataclasses.replace(airborne, fractions=airborne.fractions[:-1])
 
 
-def test_a_share_column_short_of_a_band_is_refused(airborne) -> None:
+def test_a_share_column_short_of_a_band_is_refused(
+    airborne: building.DetailedAirborneResult,
+) -> None:
     """``fractions`` is paths by bands: axis 1 is the one that carries bands."""
     import dataclasses
 
@@ -957,7 +983,9 @@ def test_a_share_column_short_of_a_band_is_refused(airborne) -> None:
         dataclasses.replace(airborne, fractions=airborne.fractions[:, :-1])
 
 
-def test_a_path_row_off_the_band_axis_is_refused(airborne) -> None:
+def test_a_path_row_off_the_band_axis_is_refused(
+    airborne: building.DetailedAirborneResult,
+) -> None:
     """Every path row runs over the same bands as the frequency axis."""
     import dataclasses
 
@@ -967,7 +995,9 @@ def test_a_path_row_off_the_band_axis_is_refused(airborne) -> None:
         dataclasses.replace(airborne, paths=(short, *airborne.paths[1:]))
 
 
-def test_a_share_column_with_an_extra_axis_is_refused(airborne) -> None:
+def test_a_share_column_with_an_extra_axis_is_refused(
+    airborne: building.DetailedAirborneResult,
+) -> None:
     """Counting the axes is not enough on its own: their number is pinned too.
 
     A ``fractions`` of shape ``(paths, bands, 2)`` has the right number of
@@ -983,7 +1013,9 @@ def test_a_share_column_with_an_extra_axis_is_refused(airborne) -> None:
         dataclasses.replace(airborne, fractions=three_dimensional)
 
 
-def test_a_path_without_a_share_row_is_refused_on_the_impact_result(impact) -> None:
+def test_a_path_without_a_share_row_is_refused_on_the_impact_result(
+    impact: building.DetailedImpactResult,
+) -> None:
     """The impact result decomposes its own quantity over the same two axes.
 
     It shares the check with the airborne result, so nothing above would go
@@ -999,7 +1031,9 @@ def test_a_path_without_a_share_row_is_refused_on_the_impact_result(impact) -> N
         dataclasses.replace(impact, paths=(*impact.paths, extra))
 
 
-def test_an_impact_total_off_the_band_axis_is_refused(impact) -> None:
+def test_an_impact_total_off_the_band_axis_is_refused(
+    impact: building.DetailedImpactResult,
+) -> None:
     """``L'n`` runs over the frequencies the same paths were summed over.
 
     One band too long, the total is drawn against the frequency axis, and

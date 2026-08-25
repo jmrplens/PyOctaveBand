@@ -14,6 +14,8 @@ survey-method statement.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
@@ -22,6 +24,9 @@ pytest.importorskip("reportlab")
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, building
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 #: Five octave bands (125 Hz to 2000 Hz), the ISO 10052 survey range.
 _OCTAVE = 5
@@ -63,7 +68,7 @@ def _facade() -> building.survey_facade_insulation:  # type: ignore[valid-type]
 # --------------------------------------------------------------------------- #
 # Airborne DnT / R' (ISO 10052, ISO 717-1)
 # --------------------------------------------------------------------------- #
-def test_airborne_fiche_rating_and_basis(tmp_path) -> None:
+def test_airborne_fiche_rating_and_basis(tmp_path: Path) -> None:
     """The DnT fiche boxes the ISO 717-1 rating and names ISO 10052."""
     result = _airborne()
     rating = result.rating
@@ -79,7 +84,7 @@ def test_airborne_fiche_rating_and_basis(tmp_path) -> None:
     assert "33.0" in text  # the 125 Hz DnT band value (D + k with k = 0)
 
 
-def test_airborne_r_prime_quantity(tmp_path) -> None:
+def test_airborne_r_prime_quantity(tmp_path: Path) -> None:
     """``quantity='r_prime'`` reports the apparent sound reduction index R'."""
     result = _airborne()
     assert result.r_prime_rating is not None
@@ -90,7 +95,7 @@ def test_airborne_r_prime_quantity(tmp_path) -> None:
     assert "Apparent sound reduction index" in text
 
 
-def test_airborne_one_third_octave_caption(tmp_path) -> None:
+def test_airborne_one_third_octave_caption(tmp_path: Path) -> None:
     """A 16-band one-third-octave survey report captions its own band set.
 
     The survey method also accepts the ISO 717 one-third-octave set (16 bands,
@@ -114,7 +119,7 @@ def test_airborne_one_third_octave_caption(tmp_path) -> None:
     assert "octave bands)" not in text.replace("one-third-octave bands", "")
 
 
-def test_airborne_verbose_and_verdict_pass(tmp_path) -> None:
+def test_airborne_verbose_and_verdict_pass(tmp_path: Path) -> None:
     """Verbose annexes the ISO 717 evaluation; a level difference passes above."""
     out = tmp_path / "verbose.pdf"
     _airborne().report(
@@ -126,14 +131,14 @@ def test_airborne_verbose_and_verdict_pass(tmp_path) -> None:
     assert "Unfav. dev." in text
 
 
-def test_airborne_verdict_fail(tmp_path) -> None:
+def test_airborne_verdict_fail(tmp_path: Path) -> None:
     """A level difference below the requirement fails (higher is better)."""
     out = tmp_path / "fail.pdf"
     _airborne().report(str(out), metadata=ReportMetadata(requirement=60.0))
     assert "FAIL" in _extract_text(str(out))
 
 
-def test_airborne_spanish(tmp_path) -> None:
+def test_airborne_spanish(tmp_path: Path) -> None:
     """``language='es'`` renders the Spanish survey fiche with comma decimals."""
     import re
 
@@ -154,7 +159,7 @@ def test_airborne_spanish(tmp_path) -> None:
 # --------------------------------------------------------------------------- #
 # Impact L'nT (ISO 10052, ISO 717-2)
 # --------------------------------------------------------------------------- #
-def test_impact_fiche_rating_and_basis(tmp_path) -> None:
+def test_impact_fiche_rating_and_basis(tmp_path: Path) -> None:
     """The L'nT fiche boxes the ISO 717-2 rating and names the tapping machine."""
     result = _impact()
     rating = result.rating
@@ -170,7 +175,7 @@ def test_impact_fiche_rating_and_basis(tmp_path) -> None:
     assert "PASS" in text  # L'nT,w = 58 dB <= 62 dB (a lower level is better)
 
 
-def test_impact_verdict_fail(tmp_path) -> None:
+def test_impact_verdict_fail(tmp_path: Path) -> None:
     """An impact level above the requirement fails (lower is better)."""
     out = tmp_path / "fail.pdf"
     _impact().report(str(out), metadata=ReportMetadata(requirement=50.0))
@@ -180,7 +185,7 @@ def test_impact_verdict_fail(tmp_path) -> None:
 # --------------------------------------------------------------------------- #
 # Facade D2m,nT (ISO 10052, ISO 717-1)
 # --------------------------------------------------------------------------- #
-def test_facade_fiche_rating_and_basis(tmp_path) -> None:
+def test_facade_fiche_rating_and_basis(tmp_path: Path) -> None:
     """The D2m,nT fiche boxes the ISO 717-1 rating and names ISO 10052."""
     result = _facade()
     rating = result.rating
@@ -195,7 +200,7 @@ def test_facade_fiche_rating_and_basis(tmp_path) -> None:
     assert "PASS" in text  # D2m,nT,w >= 33 dB
 
 
-def test_facade_spanish(tmp_path) -> None:
+def test_facade_spanish(tmp_path: Path) -> None:
     """``language='es'`` renders the Spanish survey facade fiche."""
     out = tmp_path / "es.pdf"
     _facade().report(str(out), language="es")
@@ -206,7 +211,7 @@ def test_facade_spanish(tmp_path) -> None:
 # --------------------------------------------------------------------------- #
 # Rendering contract
 # --------------------------------------------------------------------------- #
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError`` on every survey fiche."""
     out = str(tmp_path / "x.pdf")
     airborne, impact, facade = _airborne(), _impact(), _facade()
@@ -218,7 +223,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         facade.report(out, engine="weasyprint")
 
 
-def test_unknown_airborne_quantity_rejected(tmp_path) -> None:
+def test_unknown_airborne_quantity_rejected(tmp_path: Path) -> None:
     """An unknown airborne quantity raises ``ValueError``."""
     airborne = _airborne()
     out = str(tmp_path / "x.pdf")
@@ -226,7 +231,7 @@ def test_unknown_airborne_quantity_rejected(tmp_path) -> None:
         airborne.report(out, quantity="dn")
 
 
-def test_missing_r_prime_rating_rejected(tmp_path) -> None:
+def test_missing_r_prime_rating_rejected(tmp_path: Path) -> None:
     """Requesting R' without area/volume (no R' rating) raises ``ValueError``."""
     result = building.survey_airborne_insulation(
         np.full(_OCTAVE, 80.0), np.full(_OCTAVE, 45.0), _K0
@@ -236,7 +241,7 @@ def test_missing_r_prime_rating_rejected(tmp_path) -> None:
         result.report(out, quantity="r_prime")
 
 
-def test_missing_rating_off_band_count_rejected(tmp_path) -> None:
+def test_missing_rating_off_band_count_rejected(tmp_path: Path) -> None:
     """A band count that yields no ISO 717 rating cannot be reported."""
     airborne = building.survey_airborne_insulation(
         np.full(4, 80.0), np.full(4, 45.0), np.zeros(4)

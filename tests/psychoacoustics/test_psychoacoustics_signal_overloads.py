@@ -30,6 +30,8 @@ something the file does not.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 from signal_contract import assert_same
@@ -49,6 +51,9 @@ from phonometry.psychoacoustics import (
     tonality_ecma,
     tone_to_noise_ratio,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 FS = 48000
 CAL = 4.0
@@ -103,12 +108,16 @@ ALL_IDS = LEVELLED_IDS + RATIO_IDS
 
 
 @pytest.mark.parametrize(("func", "kwargs"), ALL, ids=ALL_IDS)
-def test_an_uncalibrated_signal_computes_the_bare_array_result(func, kwargs) -> None:
+def test_an_uncalibrated_signal_computes_the_bare_array_result(
+    func: Callable[..., object], kwargs: dict[str, bool]
+) -> None:
     assert_same(func(Signal(_TONE, FS), **kwargs), func(_TONE, FS, **kwargs))
 
 
 @pytest.mark.parametrize(("func", "kwargs"), ALL, ids=ALL_IDS)
-def test_a_conflicting_rate_is_refused_a_matching_one_is_not(func, kwargs) -> None:
+def test_a_conflicting_rate_is_refused_a_matching_one_is_not(
+    func: Callable[..., object], kwargs: dict[str, bool]
+) -> None:
     sig = Signal(_TONE, FS)
     with pytest.raises(ValueError, match="conflicts with the Signal's own fs"):
         func(sig, FS + 1, **kwargs)
@@ -117,7 +126,9 @@ def test_a_conflicting_rate_is_refused_a_matching_one_is_not(func, kwargs) -> No
 
 
 @pytest.mark.parametrize(("func", "kwargs"), ALL, ids=ALL_IDS)
-def test_a_bare_array_still_requires_fs(func, kwargs) -> None:
+def test_a_bare_array_still_requires_fs(
+    func: Callable[..., object], kwargs: dict[str, bool]
+) -> None:
     with pytest.raises(ValueError, match="fs is required"):
         func(_TONE, **kwargs)
 
@@ -128,7 +139,9 @@ def test_a_bare_array_still_requires_fs(func, kwargs) -> None:
 
 
 @pytest.mark.parametrize(("func", "kwargs"), LEVELLED, ids=LEVELLED_IDS)
-def test_a_calibrated_signal_is_analysed_in_pascals(func, kwargs) -> None:
+def test_a_calibrated_signal_is_analysed_in_pascals(
+    func: Callable[..., object], kwargs: dict[str, bool]
+) -> None:
     """And the answer moves with the factor, because the model is not a ratio."""
     record = _MODULATED if func is roughness_ecma else _TONE
     calibrated = func(Signal(record, FS, calibration_factor=CAL), **kwargs)
@@ -142,7 +155,9 @@ def test_a_calibrated_signal_is_analysed_in_pascals(func, kwargs) -> None:
 
 
 @pytest.mark.parametrize(("func", "kwargs"), RATIOS, ids=RATIO_IDS)
-def test_a_tone_ratio_does_not_move_with_the_factor(func, kwargs) -> None:
+def test_a_tone_ratio_does_not_move_with_the_factor(
+    func: Callable[..., object], kwargs: dict[str, bool]
+) -> None:
     """The factor is applied and then cancels, which is not the same as ignored."""
     calibrated = func(Signal(_TONE, FS, calibration_factor=CAL), **kwargs)
     assert_same(calibrated, func(CAL * _TONE, FS, **kwargs))
@@ -182,7 +197,9 @@ OWN_FACTOR_IDS = [f.__name__ for f, _ in OWN_FACTOR]
 
 
 @pytest.mark.parametrize(("func", "kwargs"), OWN_FACTOR, ids=OWN_FACTOR_IDS)
-def test_an_explicit_factor_wins_over_the_objects(func, kwargs) -> None:
+def test_an_explicit_factor_wins_over_the_objects(
+    func: Callable[..., object], kwargs: dict[str, bool]
+) -> None:
     """The opposite precedence to the rate's, and deliberately so.
 
     A caller who passes a factor knows something the file does not: a
@@ -245,7 +262,9 @@ def test_a_bare_array_with_no_factor_is_still_read_as_pascals() -> None:
     [fluctuation_strength, fluctuation_strength_ecma],
     ids=["fluctuation_strength", "fluctuation_strength_ecma"],
 )
-def test_the_fluctuation_models_take_the_signal_too(func) -> None:
+def test_the_fluctuation_models_take_the_signal_too(
+    func: Callable[..., object],
+) -> None:
     """They are analysed in 2 s frames, so they get their own longer record."""
     record = _tone(seconds=2.0)
     assert_same(func(Signal(record, FS)), func(record, FS))

@@ -22,6 +22,8 @@ languages) complete the rendering contract.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 from report_assertions import assert_one_page
@@ -31,6 +33,11 @@ from phonometry.emission import (
     sound_power_comparison,
     sound_power_reverberation,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from phonometry.emission import ReverberationSoundPowerResult
 
 # Standard octave-band A-weighting corrections Ck (dB), IEC 61672 / ISO 3744
 # Annex E Table E.2 (reused by ISO 3741 Annex F), at the example band centres.
@@ -62,7 +69,7 @@ def _extract_text(path: str) -> str:
     return " ".join(raw.split())
 
 
-def _result():
+def _result() -> ReverberationSoundPowerResult:
     """The direct-method determination whose LW and LWA are hand-derivable."""
     return sound_power_reverberation(
         _LP,
@@ -110,7 +117,7 @@ def test_hand_oracle_matches_library() -> None:
     assert res.sound_power_level_a == pytest.approx(_oracle_lwa(), abs=1e-9)
 
 
-def test_report_renders_oracle_values(tmp_path) -> None:
+def test_report_renders_oracle_values(tmp_path: Path) -> None:
     """The fiche prints the hand-derived LWA and a couple of band LW values."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -142,7 +149,7 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     assert "Annex F" in text
 
 
-def test_third_octave_labels_and_grouping(tmp_path) -> None:
+def test_third_octave_labels_and_grouping(tmp_path: Path) -> None:
     """A one-third-octave set is labelled by nominal centres and captioned."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -167,7 +174,7 @@ def test_third_octave_labels_and_grouping(tmp_path) -> None:
 # --- verbose (reverberation-specific columns) ---------------------------------
 
 
-def test_verbose_adds_absorption_and_waterhouse_columns(tmp_path) -> None:
+def test_verbose_adds_absorption_and_waterhouse_columns(tmp_path: Path) -> None:
     """verbose=True adds the K1, absorption area A and Waterhouse Cw columns."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -186,7 +193,7 @@ def test_verbose_adds_absorption_and_waterhouse_columns(tmp_path) -> None:
 # --- comparison method --------------------------------------------------------
 
 
-def test_comparison_method_reports_eq21(tmp_path) -> None:
+def test_comparison_method_reports_eq21(tmp_path: Path) -> None:
     """The comparison-method fiche cites Eq. 21 and the reference sound source."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -221,7 +228,9 @@ def test_comparison_method_reports_eq21(tmp_path) -> None:
     ("limit", "verdict"),
     [(110.0, "PASS"), (80.0, "FAIL")],
 )
-def test_verdict_against_declared_limit(tmp_path, limit: float, verdict: str) -> None:
+def test_verdict_against_declared_limit(
+    tmp_path: Path, limit: float, verdict: str
+) -> None:
     """A declared limit yields a PASS/FAIL verdict (lower is better)."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -237,7 +246,7 @@ def test_verdict_against_declared_limit(tmp_path, limit: float, verdict: str) ->
 # --- metadata header ----------------------------------------------------------
 
 
-def test_metadata_header_renders(tmp_path) -> None:
+def test_metadata_header_renders(tmp_path: Path) -> None:
     """Supplied metadata renders the source, environment and identity fields."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -265,7 +274,7 @@ def test_metadata_header_renders(tmp_path) -> None:
 # --- Spanish fiche ------------------------------------------------------------
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """language="es" renders the sound-power vocabulary and comma decimals."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -285,7 +294,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
 # --- rendering contract -------------------------------------------------------
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     res = _result()
     out = str(tmp_path / "x.pdf")
@@ -293,7 +302,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         res.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     res = _result()
     out = str(tmp_path / "bad.pdf")

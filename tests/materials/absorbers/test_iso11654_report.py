@@ -10,6 +10,8 @@ and the requirement verdict renders. Pixel or layout content is never inspected.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 pytest.importorskip("reportlab")
@@ -44,6 +46,9 @@ from phonometry.materials import (
     weighted_absorption_from_third_octave,
 )
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
 # Fifteen one-third-octave alpha_s (200 Hz to 5000 Hz) whose octave means are
 # the Annex A.2 practical coefficients (0.35, 1.00, 0.65, 0.60, 0.55).
 _THIRD_OCTAVE_ALPHA_S = (
@@ -65,7 +70,7 @@ _THIRD_OCTAVE_ALPHA_S = (
 )
 
 
-def test_absorption_report_writes_pdf(tmp_path) -> None:
+def test_absorption_report_writes_pdf(tmp_path: Path) -> None:
     """A weighted absorption rating renders a PDF fiche."""
     result = weighted_absorption(_A1_ALPHA_P)
     out = tmp_path / "absorption.pdf"
@@ -74,7 +79,7 @@ def test_absorption_report_writes_pdf(tmp_path) -> None:
     assert_pdf(str(out))
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     result = weighted_absorption(_A1_ALPHA_P)
     out = str(tmp_path / "x.pdf")
@@ -82,7 +87,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         result.report(out, engine="weasyprint")
 
 
-def test_fiche_reproduces_iso11654_annex_a1(tmp_path) -> None:
+def test_fiche_reproduces_iso11654_annex_a1(tmp_path: Path) -> None:
     """The fiche renders the ISO 11654 Annex A.1 example: alpha_w = 0.60, class C."""
     result = weighted_absorption(_A1_ALPHA_P)
     assert result.alpha_w == pytest.approx(_A1_ALPHA_W)
@@ -91,7 +96,7 @@ def test_fiche_reproduces_iso11654_annex_a1(tmp_path) -> None:
     assert_one_page(str(result.report(str(tmp_path / "a1.pdf"))))
 
 
-def test_fiche_reproduces_iso11654_annex_a2(tmp_path) -> None:
+def test_fiche_reproduces_iso11654_annex_a2(tmp_path: Path) -> None:
     """The fiche renders the Annex A.2 example: alpha_w = 0.60(M) shape indicator."""
     result = weighted_absorption(_A2_ALPHA_P)
     assert result.alpha_w == pytest.approx(_A2_ALPHA_W)
@@ -99,7 +104,7 @@ def test_fiche_reproduces_iso11654_annex_a2(tmp_path) -> None:
     assert_one_page(str(result.report(str(tmp_path / "a2.pdf"))))
 
 
-def test_third_octave_fiche_renders_and_round_trips(tmp_path) -> None:
+def test_third_octave_fiche_renders_and_round_trips(tmp_path: Path) -> None:
     """A rating built from one-third-octave alpha_s renders the full-table fiche.
 
     The retained alpha_s round-trips on the result, and the accredited
@@ -132,7 +137,7 @@ def test_third_octave_fiche_renders_and_round_trips(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_third_octave_fiche_with_metadata(tmp_path) -> None:
+def test_third_octave_fiche_with_metadata(tmp_path: Path) -> None:
     """The one-third-octave fiche renders one page with a full metadata header."""
     result = weighted_absorption_from_third_octave(_THIRD_OCTAVE_ALPHA_S)
     out = tmp_path / "third_octave_meta.pdf"
@@ -175,7 +180,7 @@ def test_third_octave_arrays_must_hold_three_bands_per_octave(bands: int) -> Non
         )
 
 
-def test_statement_writes_shape_indicator_without_space(tmp_path) -> None:
+def test_statement_writes_shape_indicator_without_space(tmp_path: Path) -> None:
     """The boxed rating is written ``0.60(M)``, the ISO 11654 5.3 style.
 
     The clause 5.3 example prints the shape indicator immediately after the
@@ -197,7 +202,7 @@ def test_statement_writes_shape_indicator_without_space(tmp_path) -> None:
     assert "5.3 NOTE" in text  # shape-indicator recommendation footnote
 
 
-def test_plain_rating_without_alpha_s_still_renders(tmp_path) -> None:
+def test_plain_rating_without_alpha_s_still_renders(tmp_path: Path) -> None:
     """A plain weighted_absorption result (alpha_s None) falls back and renders."""
     result = weighted_absorption(_A2_ALPHA_P)
     assert result.third_octave_alpha_s is None
@@ -206,7 +211,7 @@ def test_plain_rating_without_alpha_s_still_renders(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_verbose_renders_evaluation_table(tmp_path) -> None:
+def test_verbose_renders_evaluation_table(tmp_path: Path) -> None:
     """``verbose=True`` renders the ISO 11654 evaluation-column one-pager."""
     result = weighted_absorption(_A2_ALPHA_P)
     out = tmp_path / "verbose.pdf"
@@ -214,7 +219,7 @@ def test_verbose_renders_evaluation_table(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def _full_metadata(**overrides) -> ReportMetadata:
+def _full_metadata(**overrides: object) -> ReportMetadata:
     base = {
         "specimen": "50 mm porous absorber over a 100 mm air gap",
         "client": "Acoustic Test Client Ltd.",
@@ -235,7 +240,7 @@ def _full_metadata(**overrides) -> ReportMetadata:
     return ReportMetadata(**base)
 
 
-def test_full_metadata_renders_one_page(tmp_path) -> None:
+def test_full_metadata_renders_one_page(tmp_path: Path) -> None:
     """A full ReportMetadata renders a one-page accredited absorption fiche."""
     result = weighted_absorption(_A2_ALPHA_P)
     out = tmp_path / "meta.pdf"
@@ -243,7 +248,7 @@ def test_full_metadata_renders_one_page(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_requirement_pass_and_fail_both_render(tmp_path) -> None:
+def test_requirement_pass_and_fail_both_render(tmp_path: Path) -> None:
     """A PASS and a FAIL alpha_w requirement both render a one-page fiche."""
     result = weighted_absorption(_A1_ALPHA_P)  # alpha_w = 0.60
     passing = tmp_path / "pass.pdf"
@@ -254,7 +259,7 @@ def test_requirement_pass_and_fail_both_render(tmp_path) -> None:
     assert_one_page(str(failing))
 
 
-def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
+def test_report_escapes_xml_specials_in_metadata(tmp_path: Path) -> None:
     """Metadata with XML specials (& < >) renders without crashing reportlab."""
     result = weighted_absorption(_A1_ALPHA_P)
     md = ReportMetadata(
@@ -277,7 +282,7 @@ def _extract_text(path: str) -> str:
     return "\n".join(page.extract_text() for page in PdfReader(path).pages)
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """``language="es"`` renders a one-page Spanish fiche with comma decimals."""
     import re
 
@@ -295,7 +300,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     assert re.search(r"\d,\d", text) is not None  # comma decimal separator
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ``ValueError``."""
     result = weighted_absorption_from_third_octave(_THIRD_OCTAVE_ALPHA_S)
     with pytest.raises(ValueError, match="language"):

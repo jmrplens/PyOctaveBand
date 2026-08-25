@@ -16,11 +16,16 @@ engines/languages) complete the rendering contract.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, building
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 _S0 = 10.0
 
@@ -43,7 +48,7 @@ def _extract_text(path: str) -> str:
     return " ".join(raw.split())
 
 
-def _paths():
+def _paths() -> list[dict[str, np.ndarray | float]]:
     return [
         {
             "adjustment_term": _DSA,
@@ -58,7 +63,7 @@ def _paths():
     ]
 
 
-def _result():
+def _result() -> building.InstalledSourceResult:
     return building.installed_source_prediction(
         _LWSC, _DC, _paths(), frequencies=_BANDS
     )
@@ -104,7 +109,7 @@ def test_hand_oracle_matches_library() -> None:
     assert res.overall_level == pytest.approx(_oracle_overall(), abs=1e-9)
 
 
-def test_report_reads_as_prediction(tmp_path) -> None:
+def test_report_reads_as_prediction(tmp_path: Path) -> None:
     """The sheet is explicitly a prediction, never a measurement."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -123,7 +128,7 @@ def test_report_reads_as_prediction(tmp_path) -> None:
     assert "tested specimen" not in text.replace("not to a tested specimen", "")
 
 
-def test_report_renders_oracle_values(tmp_path) -> None:
+def test_report_renders_oracle_values(tmp_path: Path) -> None:
     """The verbose fiche prints the overall, total and per-path band values."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -150,7 +155,7 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     assert "Transmission paths: 2" in text
 
 
-def test_nonverbose_hides_path_columns(tmp_path) -> None:
+def test_nonverbose_hides_path_columns(tmp_path: Path) -> None:
     """verbose=False keeps only the installed power and the combined total."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -168,7 +173,9 @@ def test_nonverbose_hides_path_columns(tmp_path) -> None:
     ("limit", "verdict"),
     [(45.0, "PASS"), (30.0, "FAIL")],
 )
-def test_verdict_against_declared_limit(tmp_path, limit: float, verdict: str) -> None:
+def test_verdict_against_declared_limit(
+    tmp_path: Path, limit: float, verdict: str
+) -> None:
     """A declared limit yields a PASS/FAIL verdict (lower is better)."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -181,7 +188,7 @@ def test_verdict_against_declared_limit(tmp_path, limit: float, verdict: str) ->
     assert "declared limit" in text
 
 
-def test_metadata_header_renders(tmp_path) -> None:
+def test_metadata_header_renders(tmp_path: Path) -> None:
     """Supplied metadata renders the source, receiving room and identity."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -204,7 +211,7 @@ def test_metadata_header_renders(tmp_path) -> None:
     assert "Building acoustics office" in text
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """language="es" renders the prediction vocabulary and comma decimals."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -220,7 +227,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     assert f"{_oracle_overall():.1f}".replace(".", ",") in text
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     res = _result()
     out = str(tmp_path / "x.pdf")
@@ -228,7 +235,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         res.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     res = _result()
     out = str(tmp_path / "bad.pdf")
@@ -236,7 +243,7 @@ def test_unknown_language_rejected(tmp_path) -> None:
         res.report(out, language="xx")
 
 
-def test_scalar_source_level_fiche_renders(tmp_path) -> None:
+def test_scalar_source_level_fiche_renders(tmp_path: Path) -> None:
     """A single-number L_Ws,c with per-band paths renders (regression).
 
     The table prints L_Ws,inst per band, so a scalar source level used to

@@ -23,17 +23,25 @@ engines, languages and band counts) complete the rendering contract.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.emission import (
+    PrecisionCriteria,
+    PrecisionFieldIndicators,
+    PrecisionIntensityResult,
     SoundPowerWarning,
     precision_field_indicators,
     precision_qualification,
     sound_power_intensity_precision,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # Standard one-third-octave A-weighting corrections Ck (dB), IEC 61672 /
 # ISO 3744 Annex E Table E.1, at the example band centres.
@@ -120,7 +128,9 @@ def _row(label: str, *cells: str) -> str:
     return " ".join((label, *cells))
 
 
-def _determination(intensity: np.ndarray = _INTENSITY, freqs: np.ndarray = _FREQS):
+def _determination(
+    intensity: np.ndarray = _INTENSITY, freqs: np.ndarray = _FREQS
+) -> PrecisionIntensityResult:
     """A uniform-field precision determination, so LW and LW0 are derivable."""
     scan = np.tile(intensity, (_N_SEG, 1))
     return sound_power_intensity_precision(
@@ -132,7 +142,9 @@ def _determination(intensity: np.ndarray = _INTENSITY, freqs: np.ndarray = _FREQ
     )
 
 
-def _qualification(margin: np.ndarray, freqs: np.ndarray = _FREQS):
+def _qualification(
+    margin: np.ndarray, freqs: np.ndarray = _FREQS
+) -> tuple[PrecisionFieldIndicators, PrecisionCriteria]:
     """Annex B indicators and Annex C criteria for the uniform-field scan.
 
     ``margin`` is the per-band amount by which the segment pressure levels
@@ -191,7 +203,7 @@ def test_hand_oracle_matches_library() -> None:
     assert res.sound_power_level_a == pytest.approx(_oracle_lwa(), abs=1e-9)
 
 
-def test_report_renders_oracle_values(tmp_path) -> None:
+def test_report_renders_oracle_values(tmp_path: Path) -> None:
     """The fiche prints the hand-derived LWA, band LW, LW0 and Table 1 U."""
     res = _determination()
     out = tmp_path / "iso9614_3.pdf"
@@ -229,7 +241,7 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     assert f"Measurement surface S = {_SURFACE:.2f} m2" in text
 
 
-def test_uncertainty_column_follows_table_1(tmp_path) -> None:
+def test_uncertainty_column_follows_table_1(tmp_path: Path) -> None:
     """Every band prints U = 2*sigma_R0 from its ISO 9614-3 Table 1 row."""
     # Six consecutive one-third-octave bands crossing all three Table 1 tiers:
     # 160 Hz -> 2*2,0 = 4,0 dB; 200 to 315 Hz -> 2*1,5 = 3,0 dB; 400 and
@@ -255,7 +267,7 @@ def test_uncertainty_column_follows_table_1(tmp_path) -> None:
     assert "Table 1 standard deviation of reproducibility" in text
 
 
-def test_octave_bands_have_no_tabulated_uncertainty(tmp_path) -> None:
+def test_octave_bands_have_no_tabulated_uncertainty(tmp_path: Path) -> None:
     """Table 1 tabulates one-third-octave bands; an octave set prints an em dash."""
     freqs = np.array([250, 500, 1000, 2000], dtype=float)
     intensity = _INTENSITY[:4]
@@ -275,7 +287,7 @@ def test_octave_bands_have_no_tabulated_uncertainty(tmp_path) -> None:
 # --- Annex B tabulation (verbose) ---------------------------------------------
 
 
-def test_verbose_tabulates_annex_b_indicators(tmp_path) -> None:
+def test_verbose_tabulates_annex_b_indicators(tmp_path: Path) -> None:
     """verbose=True tabulates the four Annex B indicators and the qualification."""
     res = _determination()
     indicators, criteria = _qualification(np.full(_FREQS.size, 2.0))
@@ -310,7 +322,7 @@ def test_verbose_tabulates_annex_b_indicators(tmp_path) -> None:
         )
 
 
-def test_qualification_cell_separates_the_rejected_band(tmp_path) -> None:
+def test_qualification_cell_separates_the_rejected_band(tmp_path: Path) -> None:
     """The verbose cell reads no for the band Annex C rejects, yes for the rest."""
     res = _determination()
     indicators, criteria = _qualification(np.array([8.0, 2.0, 2.0, 2.0, 2.0]))
@@ -355,7 +367,7 @@ def test_qualification_cell_separates_the_rejected_band(tmp_path) -> None:
 # --- clause 10 f) 2) omission -------------------------------------------------
 
 
-def test_failing_band_is_omitted_and_named(tmp_path) -> None:
+def test_failing_band_is_omitted_and_named(tmp_path: Path) -> None:
     """A band failing criterion 2 leaves LWA and is named with its criterion."""
     res = _determination()
     # A 200 Hz pressure-intensity indicator of 8 dB exceeds the probe's
@@ -388,7 +400,7 @@ def test_failing_band_is_omitted_and_named(tmp_path) -> None:
     assert f"δpI0 = {_RESIDUAL_INDEX:.1f} dB" in text
 
 
-def test_not_applicable_band_named_with_clause_9_2(tmp_path) -> None:
+def test_not_applicable_band_named_with_clause_9_2(tmp_path: Path) -> None:
     """A net-negative band prints an em dash and is named under clause 9.2."""
     scan = np.tile(_INTENSITY, (_N_SEG, 1)).copy()
     # Drive the 250 Hz band net-negative (more energy flowing in than out).
@@ -411,7 +423,7 @@ def test_not_applicable_band_named_with_clause_9_2(tmp_path) -> None:
     assert f"{_oracle_lw()[2]:.1f}" in text
 
 
-def test_without_criteria_the_fiche_says_so(tmp_path) -> None:
+def test_without_criteria_the_fiche_says_so(tmp_path: Path) -> None:
     """No Annex C qualification: the result's own LWA, and the strip says why."""
     res = _determination()
     out = tmp_path / "unqualified.pdf"
@@ -421,7 +433,7 @@ def test_without_criteria_the_fiche_says_so(tmp_path) -> None:
     assert f"Sound power level LWA = {_oracle_lwa():.1f} dB(A) re 1 pW" in text
 
 
-def test_clause_9_2_band_is_named_without_any_qualification(tmp_path) -> None:
+def test_clause_9_2_band_is_named_without_any_qualification(tmp_path: Path) -> None:
     """A not-applicable band is named even when no Annex C data was supplied.
 
     The omission statement is the standard's, not the qualification's: a band
@@ -445,7 +457,7 @@ def test_clause_9_2_band_is_named_without_any_qualification(tmp_path) -> None:
     assert "Bands omitted from LWA: 250 Hz (clause 9.2)" in text
 
 
-def test_qualified_set_states_that_nothing_is_omitted(tmp_path) -> None:
+def test_qualified_set_states_that_nothing_is_omitted(tmp_path: Path) -> None:
     """Every band qualifying is stated too, not left to silence."""
     res = _determination()
     indicators, criteria = _qualification(np.full(_FREQS.size, 2.0))
@@ -458,7 +470,7 @@ def test_qualified_set_states_that_nothing_is_omitted(tmp_path) -> None:
 # --- the wide (one-third-octave) band set -------------------------------------
 
 
-def test_wide_band_set_is_paired_onto_one_page(tmp_path) -> None:
+def test_wide_band_set_is_paired_onto_one_page(tmp_path: Path) -> None:
     """Sixteen one-third-octave bands print in two column groups, on one page."""
     freqs = np.array(list(_CK_THIRD), dtype=float)
     intensity = np.full(freqs.size, 2.0e-5)
@@ -478,7 +490,9 @@ def test_wide_band_set_is_paired_onto_one_page(tmp_path) -> None:
 
 
 @pytest.mark.parametrize(("limit", "verdict"), [(120.0, "PASS"), (60.0, "FAIL")])
-def test_verdict_against_declared_limit(tmp_path, limit: float, verdict: str) -> None:
+def test_verdict_against_declared_limit(
+    tmp_path: Path, limit: float, verdict: str
+) -> None:
     """A declared limit yields a PASS/FAIL verdict (lower is better)."""
     res = _determination()
     out = tmp_path / f"verdict_{limit}.pdf"
@@ -488,7 +502,7 @@ def test_verdict_against_declared_limit(tmp_path, limit: float, verdict: str) ->
     assert "declared limit" in text
 
 
-def test_verdict_follows_the_boxed_level(tmp_path) -> None:
+def test_verdict_follows_the_boxed_level(tmp_path: Path) -> None:
     """The verdict compares the qualified-band LWA the fiche boxes, not the raw one."""
     res = _determination()
     indicators, criteria = _qualification(np.array([8.0, 2.0, 2.0, 2.0, 2.0]))
@@ -513,7 +527,7 @@ def test_verdict_follows_the_boxed_level(tmp_path) -> None:
 # --- metadata header ----------------------------------------------------------
 
 
-def test_metadata_header_renders(tmp_path) -> None:
+def test_metadata_header_renders(tmp_path: Path) -> None:
     """Supplied metadata renders the source, environment and identity fields."""
     res = _determination()
     metadata = ReportMetadata(
@@ -544,7 +558,7 @@ def test_metadata_header_renders(tmp_path) -> None:
 # --- Spanish fiche ------------------------------------------------------------
 
 
-def test_spanish_fiche_translates_every_fixed_string(tmp_path) -> None:
+def test_spanish_fiche_translates_every_fixed_string(tmp_path: Path) -> None:
     """No English template survives into the Spanish precision fiche.
 
     ``_i18n.t`` falls back to the English text when a key is missing, so a typo
@@ -597,7 +611,7 @@ def test_spanish_fiche_translates_every_fixed_string(tmp_path) -> None:
 # --- rendering contract -------------------------------------------------------
 
 
-def test_incomplete_qualification_is_stated_as_such(tmp_path) -> None:
+def test_incomplete_qualification_is_stated_as_such(tmp_path: Path) -> None:
     """Criteria that could not be closed are not the same as criteria withheld.
 
     ``precision_qualification`` leaves ``qualified`` unset when criterion 1 or
@@ -619,7 +633,7 @@ def test_incomplete_qualification_is_stated_as_such(tmp_path) -> None:
     assert "The Annex C qualification was not supplied" not in text
 
 
-def test_criterion_5_is_not_reported_as_a_failure(tmp_path) -> None:
+def test_criterion_5_is_not_reported_as_a_failure(tmp_path: Path) -> None:
     """A band satisfying criterion 4 is never named against criterion 5.
 
     Clause 10 f) 2) rejects a band on criteria 1 to 4, or on criteria 1 to 3
@@ -653,7 +667,7 @@ def test_criterion_5_is_not_reported_as_a_failure(tmp_path) -> None:
     assert "criteria 2, 5" not in text
 
 
-def test_frequencies_none_falls_back_to_the_band_total(tmp_path) -> None:
+def test_frequencies_none_falls_back_to_the_band_total(tmp_path: Path) -> None:
     """Without band frequencies there is no A-weighting, and the box says so."""
     scan = np.tile(_INTENSITY, (_N_SEG, 1))
     res = sound_power_intensity_precision(
@@ -672,7 +686,7 @@ def test_frequencies_none_falls_back_to_the_band_total(tmp_path) -> None:
     assert "dB(A)" not in text
 
 
-def test_odd_band_count_pairs_with_a_blank_row(tmp_path) -> None:
+def test_odd_band_count_pairs_with_a_blank_row(tmp_path: Path) -> None:
     """An odd wide band set pairs cleanly, the last right-hand row left empty."""
     freqs = np.array(list(_CK_THIRD)[:9], dtype=float)
     intensity = np.full(freqs.size, 2.0e-5)
@@ -695,7 +709,7 @@ def test_odd_band_count_pairs_with_a_blank_row(tmp_path) -> None:
         )
 
 
-def test_per_band_residual_index_is_ranged_in_the_strip(tmp_path) -> None:
+def test_per_band_residual_index_is_ranged_in_the_strip(tmp_path: Path) -> None:
     """A residual index measured band by band is stated as its range."""
     res = _determination()
     residual = np.array([12.0, 13.0, 14.0, 15.0, 16.0])
@@ -706,21 +720,21 @@ def test_per_band_residual_index_is_ranged_in_the_strip(tmp_path) -> None:
     assert "dynamic capability Ld = 2.0 to 6.0 dB" in text
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     res = _determination()
     with pytest.raises(ValueError, match="engine"):
         res.report(str(tmp_path / "x.pdf"), engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     res = _determination()
     with pytest.raises(ValueError, match="language"):
         res.report(str(tmp_path / "bad.pdf"), language="xx")
 
 
-def test_indicators_over_other_bands_rejected(tmp_path) -> None:
+def test_indicators_over_other_bands_rejected(tmp_path: Path) -> None:
     """Indicators measured over a different band set are refused, not printed."""
     res = _determination()
     other, _criteria = _qualification(np.full(3, 2.0), _FREQS[:3])
@@ -728,7 +742,7 @@ def test_indicators_over_other_bands_rejected(tmp_path) -> None:
         res.report(str(tmp_path / "mismatch.pdf"), indicators=other)
 
 
-def test_criteria_over_other_bands_rejected(tmp_path) -> None:
+def test_criteria_over_other_bands_rejected(tmp_path: Path) -> None:
     """Criteria evaluated over a different band set are refused too."""
     res = _determination()
     _indicators, other = _qualification(np.full(3, 2.0), _FREQS[:3])
@@ -736,7 +750,7 @@ def test_criteria_over_other_bands_rejected(tmp_path) -> None:
         res.report(str(tmp_path / "mismatch.pdf"), criteria=other)
 
 
-def test_residual_index_over_other_bands_rejected(tmp_path) -> None:
+def test_residual_index_over_other_bands_rejected(tmp_path: Path) -> None:
     """A per-band residual index must span the determination's bands."""
     res = _determination()
     with pytest.raises(ValueError, match="residual_index"):

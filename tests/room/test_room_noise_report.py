@@ -21,6 +21,8 @@ RC-35(R)).
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
@@ -32,6 +34,10 @@ from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.room import noise_criteria as rn
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from collections.abc import Callable
+    from pathlib import Path
 
 
 def _nc_result() -> rn.NCResult:
@@ -58,7 +64,7 @@ def _extract_text(path: str) -> str:
     )
 
 
-def _full_metadata(**overrides) -> ReportMetadata:
+def _full_metadata(**overrides: float) -> ReportMetadata:
     base = {
         "specimen": "Open-plan office, air handling at nominal flow",
         "client": "Acoustic Test Client Ltd.",
@@ -96,7 +102,7 @@ def test_example_spectra_match_standard() -> None:
 # --------------------------------------------------------------------------
 # Structural rendering
 # --------------------------------------------------------------------------
-def test_nc_report_writes_pdf(tmp_path) -> None:
+def test_nc_report_writes_pdf(tmp_path: Path) -> None:
     """An NC result renders a PDF fiche and returns its path."""
     out = tmp_path / "nc.pdf"
     returned = _nc_result().report(str(out))
@@ -104,7 +110,7 @@ def test_nc_report_writes_pdf(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_rc_report_writes_pdf(tmp_path) -> None:
+def test_rc_report_writes_pdf(tmp_path: Path) -> None:
     """An RC result renders a PDF fiche and returns its path."""
     out = tmp_path / "rc.pdf"
     returned = _rc_result().report(str(out))
@@ -112,7 +118,7 @@ def test_rc_report_writes_pdf(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_reports_with_full_metadata_one_page(tmp_path) -> None:
+def test_reports_with_full_metadata_one_page(tmp_path: Path) -> None:
     """A full ReportMetadata renders a one-page fiche for both ratings."""
     _nc_result().report(str(tmp_path / "nc_meta.pdf"), metadata=_full_metadata())
     _rc_result().report(str(tmp_path / "rc_meta.pdf"), metadata=_full_metadata())
@@ -120,7 +126,7 @@ def test_reports_with_full_metadata_one_page(tmp_path) -> None:
     assert_one_page(str(tmp_path / "rc_meta.pdf"))
 
 
-def test_reports_bare_without_metadata(tmp_path) -> None:
+def test_reports_bare_without_metadata(tmp_path: Path) -> None:
     """metadata=None renders a bare assessment fiche (no header)."""
     _nc_result().report(str(tmp_path / "nc_bare.pdf"), metadata=None)
     _rc_result().report(str(tmp_path / "rc_bare.pdf"), metadata=None)
@@ -128,7 +134,7 @@ def test_reports_bare_without_metadata(tmp_path) -> None:
     assert_one_page(str(tmp_path / "rc_bare.pdf"))
 
 
-def test_verbose_reports_one_page(tmp_path) -> None:
+def test_verbose_reports_one_page(tmp_path: Path) -> None:
     """verbose=True (NC contour / RC reference + deviation) still fits one page."""
     _nc_result().report(
         str(tmp_path / "nc_v.pdf"), metadata=_full_metadata(), verbose=True
@@ -141,7 +147,9 @@ def test_verbose_reports_one_page(tmp_path) -> None:
 
 
 @pytest.mark.parametrize("factory", [_nc_result, _rc_result])
-def test_unknown_engine_rejected(tmp_path, factory) -> None:
+def test_unknown_engine_rejected(
+    tmp_path: Path, factory: Callable[[], rn.NCResult | rn.RCResult]
+) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     out = str(tmp_path / "x.pdf")
     result = factory()
@@ -150,7 +158,9 @@ def test_unknown_engine_rejected(tmp_path, factory) -> None:
 
 
 @pytest.mark.parametrize("factory", [_nc_result, _rc_result])
-def test_unknown_language_rejected(tmp_path, factory) -> None:
+def test_unknown_language_rejected(
+    tmp_path: Path, factory: Callable[[], rn.NCResult | rn.RCResult]
+) -> None:
     """An unknown fiche language raises ``ValueError``."""
     out = str(tmp_path / "bad.pdf")
     result = factory()
@@ -161,7 +171,7 @@ def test_unknown_language_rejected(tmp_path, factory) -> None:
 # --------------------------------------------------------------------------
 # Displayed values (the oracle appears in the rendered text)
 # --------------------------------------------------------------------------
-def test_nc_rating_and_levels_render(tmp_path) -> None:
+def test_nc_rating_and_levels_render(tmp_path: Path) -> None:
     """The NC-40 rating, governing band and a couple band levels appear."""
     out = tmp_path / "nc_values.pdf"
     _nc_result().report(str(out), metadata=_full_metadata())
@@ -173,7 +183,7 @@ def test_nc_rating_and_levels_render(tmp_path) -> None:
     assert "79.0" in text  # 16 Hz level (depressed contour)
 
 
-def test_rc_rating_and_levels_render(tmp_path) -> None:
+def test_rc_rating_and_levels_render(tmp_path: Path) -> None:
     """The RC-35(R) rating, the mid-frequency average and a level appear."""
     out = tmp_path / "rc_values.pdf"
     _rc_result().report(str(out), metadata=_full_metadata())
@@ -183,7 +193,7 @@ def test_rc_rating_and_levels_render(tmp_path) -> None:
     assert "53.0" in text  # 250 Hz rumble level (45 + 8)
 
 
-def test_nc_verbose_shows_contour_column(tmp_path) -> None:
+def test_nc_verbose_shows_contour_column(tmp_path: Path) -> None:
     """The verbose NC table adds the per-band NC contour column."""
     out = tmp_path / "nc_contour.pdf"
     _nc_result().report(str(out), metadata=_full_metadata(), verbose=True)
@@ -193,7 +203,7 @@ def test_nc_verbose_shows_contour_column(tmp_path) -> None:
     assert "40.0" in text
 
 
-def test_verdict_both_ways(tmp_path) -> None:
+def test_verdict_both_ways(tmp_path: Path) -> None:
     """A target rating renders PASS at or above the rating and FAIL below it."""
     passing = tmp_path / "pass.pdf"
     failing = tmp_path / "fail.pdf"
@@ -203,7 +213,7 @@ def test_verdict_both_ways(tmp_path) -> None:
     assert "FAIL" in _extract_text(str(failing))
 
 
-def test_verdict_uses_display_rounded_values(tmp_path) -> None:
+def test_verdict_uses_display_rounded_values(tmp_path: Path) -> None:
     """A rating that displays as the target must PASS at the boundary.
 
     The fiche prints the NC rating to one decimal, so the verdict compares
@@ -223,7 +233,7 @@ def test_verdict_uses_display_rounded_values(tmp_path) -> None:
     assert "FAIL" not in text
 
 
-def test_nc_sil_designation_renders(tmp_path) -> None:
+def test_nc_sil_designation_renders(tmp_path: Path) -> None:
     """A SIL-designated spectrum (clause 5.2.2) boxes NC-(SIL), no band."""
     result = rn.noise_criterion(rn.nc_curve(40.0))
     assert result.method == "SIL"
@@ -235,7 +245,7 @@ def test_nc_sil_designation_renders(tmp_path) -> None:
     assert "Governing band" not in text
 
 
-def test_nc_out_of_range_above_renders(tmp_path) -> None:
+def test_nc_out_of_range_above_renders(tmp_path: Path) -> None:
     """A spectrum above NC-70 renders >NC-70 and fails any in-family target."""
     import numpy as np
 
@@ -249,7 +259,7 @@ def test_nc_out_of_range_above_renders(tmp_path) -> None:
     assert "FAIL" in text
 
 
-def test_nc_out_of_range_below_renders(tmp_path) -> None:
+def test_nc_out_of_range_below_renders(tmp_path: Path) -> None:
     """A spectrum below NC-15 renders <NC-15 and passes any in-family target."""
     import numpy as np
 
@@ -262,7 +272,7 @@ def test_nc_out_of_range_below_renders(tmp_path) -> None:
     assert "PASS" in text
 
 
-def test_rc_out_of_family_note_renders(tmp_path) -> None:
+def test_rc_out_of_family_note_renders(tmp_path: Path) -> None:
     """An RC rating outside RC-25 to RC-50 renders the extrapolation note."""
     result = rn.room_criterion(rn.rc_curve(55.0))
     assert result.out_of_family
@@ -271,7 +281,7 @@ def test_rc_out_of_family_note_renders(tmp_path) -> None:
     assert "Outside the tabulated RC-25 to RC-50 family" in _extract_text(str(out))
 
 
-def test_report_without_requirement_has_no_verdict(tmp_path) -> None:
+def test_report_without_requirement_has_no_verdict(tmp_path: Path) -> None:
     """With no target rating the assessment fiche omits the verdict row."""
     out = tmp_path / "noverdict.pdf"
     _rc_result().report(str(out), metadata=_full_metadata())
@@ -283,7 +293,7 @@ def test_report_without_requirement_has_no_verdict(tmp_path) -> None:
 # --------------------------------------------------------------------------
 # Robustness and localisation
 # --------------------------------------------------------------------------
-def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
+def test_report_escapes_xml_specials_in_metadata(tmp_path: Path) -> None:
     """Metadata with XML specials (& < >) renders without crashing reportlab."""
     md = ReportMetadata(
         client="Ac & Co <Ltd>",
@@ -299,7 +309,7 @@ def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_spanish_reports_render_translated(tmp_path) -> None:
+def test_spanish_reports_render_translated(tmp_path: Path) -> None:
     """language="es" renders one-page Spanish fiches with comma decimals."""
     import re
 
@@ -322,7 +332,7 @@ def test_spanish_reports_render_translated(tmp_path) -> None:
     assert "retumbe" in rc_text  # rumble spectral quality
 
 
-def test_subset_spectrum_renders_missing_bands(tmp_path) -> None:
+def test_subset_spectrum_renders_missing_bands(tmp_path: Path) -> None:
     """A subset of octave bands renders, showing an em dash for absent bands."""
     freqs = [500.0, 1000.0, 2000.0, 4000.0, 8000.0]
     levels = [40.0, 35.0, 30.0, 27.0, 22.0]

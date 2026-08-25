@@ -11,6 +11,8 @@ layout content is never inspected.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 pytest.importorskip("reportlab")
@@ -29,8 +31,11 @@ from report_assertions import assert_one_page, assert_pdf
 
 from phonometry import ReportMetadata, building
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
-def test_airborne_report_writes_pdf(tmp_path) -> None:
+
+def test_airborne_report_writes_pdf(tmp_path: Path) -> None:
     """An ISO 717-1 airborne rating renders a PDF fiche."""
     result = building.weighted_rating(_AIRBORNE_R)
     out = tmp_path / "airborne.pdf"
@@ -39,7 +44,7 @@ def test_airborne_report_writes_pdf(tmp_path) -> None:
     assert_pdf(str(out))
 
 
-def test_impact_report_writes_pdf(tmp_path) -> None:
+def test_impact_report_writes_pdf(tmp_path: Path) -> None:
     """An ISO 717-2 impact rating renders a PDF fiche."""
     result = building.weighted_impact_rating(_IMPACT_LN)
     assert result.quantity == "impact"
@@ -49,7 +54,7 @@ def test_impact_report_writes_pdf(tmp_path) -> None:
     assert_pdf(str(out))
 
 
-def test_panel_result_report_convenience(tmp_path) -> None:
+def test_panel_result_report_convenience(tmp_path: Path) -> None:
     """``SoundReductionResult.report()`` rates ``R(f)`` and writes its fiche."""
     freqs = [
         100,
@@ -77,7 +82,7 @@ def test_panel_result_report_convenience(tmp_path) -> None:
     assert_pdf(str(out))
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     result = building.weighted_rating(_AIRBORNE_R)
     out = str(tmp_path / "x.pdf")
@@ -85,7 +90,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         result.report(out, engine="weasyprint")
 
 
-def test_missing_band_data_rejected(tmp_path) -> None:
+def test_missing_band_data_rejected(tmp_path: Path) -> None:
     """A rating built without the per-band curves cannot be reported."""
     bare = building.WeightedRatingResult(rating=52, c=-1, ctr=-4, unfavourable_sum=30.0)
     assert bare.band_centers is None
@@ -94,7 +99,7 @@ def test_missing_band_data_rejected(tmp_path) -> None:
         bare.report(out)
 
 
-def test_airborne_fiche_reproduces_iso717_1_annex_c1(tmp_path) -> None:
+def test_airborne_fiche_reproduces_iso717_1_annex_c1(tmp_path: Path) -> None:
     """The airborne fiche reproduces the ISO 717-1:2020 Annex C Table C.1 example.
 
     The values printed in the standard's worked example are exactly the ones the
@@ -118,7 +123,7 @@ def test_airborne_fiche_reproduces_iso717_1_annex_c1(tmp_path) -> None:
     assert_pdf(str(result.report(str(tmp_path / "airborne_c1.pdf"))))
 
 
-def test_impact_fiche_reproduces_iso717_2_annex_c1(tmp_path) -> None:
+def test_impact_fiche_reproduces_iso717_2_annex_c1(tmp_path: Path) -> None:
     """The impact fiche reproduces the ISO 717-2 Annex C Table C.1 example.
 
     Ln,w = 79 dB, CI = -11 dB, unfavourable-deviation sum 28,0 dB (see the note
@@ -133,7 +138,7 @@ def test_impact_fiche_reproduces_iso717_2_annex_c1(tmp_path) -> None:
     assert_pdf(str(result.report(str(tmp_path / "impact_c1.pdf"))))
 
 
-def _full_metadata(**overrides) -> ReportMetadata:
+def _full_metadata(**overrides: float) -> ReportMetadata:
     """A fully populated :class:`ReportMetadata` for the accredited fiche."""
     base = {
         "specimen": "200 mm reinforced-concrete wall",
@@ -174,7 +179,7 @@ def test_metadata_rejects_out_of_range_humidity() -> None:
         ReportMetadata(relative_humidity=150.0)
 
 
-def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
+def test_report_escapes_xml_specials_in_metadata(tmp_path: Path) -> None:
     """Metadata with XML specials (& < >) renders without crashing reportlab."""
     result = building.weighted_rating(_AIRBORNE_R)
     md = ReportMetadata(
@@ -190,7 +195,7 @@ def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_full_metadata_renders_one_page(tmp_path) -> None:
+def test_full_metadata_renders_one_page(tmp_path: Path) -> None:
     """A full ReportMetadata renders a one-page accredited fiche."""
     result = building.weighted_rating(_AIRBORNE_R)
     out = tmp_path / "airborne_meta.pdf"
@@ -198,7 +203,7 @@ def test_full_metadata_renders_one_page(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_verbose_renders_annex_c_table(tmp_path) -> None:
+def test_verbose_renders_annex_c_table(tmp_path: Path) -> None:
     """``verbose=True`` renders the Annex C evaluation table one-pager."""
     result = building.weighted_rating(_AIRBORNE_R)
     out = tmp_path / "airborne_verbose.pdf"
@@ -206,7 +211,7 @@ def test_verbose_renders_annex_c_table(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_requirement_pass_and_fail_both_render(tmp_path) -> None:
+def test_requirement_pass_and_fail_both_render(tmp_path: Path) -> None:
     """A PASS and a FAIL requirement both render a one-page fiche."""
     result = building.weighted_rating(_AIRBORNE_R)  # Rw = 30 dB
     passing = tmp_path / "pass.pdf"
@@ -217,7 +222,7 @@ def test_requirement_pass_and_fail_both_render(tmp_path) -> None:
     assert_one_page(str(failing))
 
 
-def test_impact_requirement_verdict_renders(tmp_path) -> None:
+def test_impact_requirement_verdict_renders(tmp_path: Path) -> None:
     """An impact fiche with a requirement (lower is better) renders."""
     result = building.weighted_impact_rating(_IMPACT_LN)
     out = tmp_path / "impact_meta.pdf"
@@ -246,7 +251,7 @@ def _extract_text(path: str) -> str:
     return "\n".join(page.extract_text() for page in PdfReader(path).pages)
 
 
-def test_airborne_fiche_pins_displayed_rating(tmp_path) -> None:
+def test_airborne_fiche_pins_displayed_rating(tmp_path: Path) -> None:
     """The fiche prints exactly the Annex C Table C.1 numbers.
 
     Independent oracle: ISO 717-1:2020 Annex C states Rw (C; Ctr) =
@@ -263,7 +268,7 @@ def test_airborne_fiche_pins_displayed_rating(tmp_path) -> None:
     assert "31.8" in text  # Annex C unfavourable-deviation sum
 
 
-def test_octave_band_fiche_declares_octave_bands(tmp_path) -> None:
+def test_octave_band_fiche_declares_octave_bands(tmp_path: Path) -> None:
     """A 5-band octave rating is captioned as octave bands (ISO 717-2 4.4).
 
     Clause 4.4 requires stating whether the rating came from one-third-octave
@@ -280,7 +285,7 @@ def test_octave_band_fiche_declares_octave_bands(tmp_path) -> None:
     assert "One-third-octave" not in text
 
 
-def test_symbol_labels_field_quantity(tmp_path) -> None:
+def test_symbol_labels_field_quantity(tmp_path: Path) -> None:
     """``symbol="DnT,w"`` relabels the boxed result, table and verdict.
 
     A field measurement rated to a standardized level difference must not be
@@ -296,7 +301,7 @@ def test_symbol_labels_field_quantity(tmp_path) -> None:
     assert "Rw" not in text
 
 
-def test_invalid_symbol_rejected(tmp_path) -> None:
+def test_invalid_symbol_rejected(tmp_path: Path) -> None:
     """A malformed quantity symbol raises ``ValueError``."""
     result = building.weighted_rating(_AIRBORNE_R)
     out = str(tmp_path / "bad.pdf")
@@ -304,7 +309,7 @@ def test_invalid_symbol_rejected(tmp_path) -> None:
         result.report(out, symbol="not a symbol")
 
 
-def test_metadata_area_is_not_display_rounded(tmp_path) -> None:
+def test_metadata_area_is_not_display_rounded(tmp_path: Path) -> None:
     """A supplied area of 1.23 m^2 is reprinted verbatim, not reduced to 1.2."""
     result = building.weighted_rating(_AIRBORNE_R)
     out = tmp_path / "area.pdf"
@@ -314,7 +319,7 @@ def test_metadata_area_is_not_display_rounded(tmp_path) -> None:
     assert "1.2 " not in text
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """``language="es"`` renders a one-page Spanish fiche with comma decimals."""
     import re
 
@@ -328,7 +333,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     assert re.search(r"\d,\d", text) is not None  # comma decimal separator
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ``ValueError``."""
     result = building.weighted_rating(_AIRBORNE_R)
     with pytest.raises(ValueError, match="language"):

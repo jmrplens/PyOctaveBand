@@ -13,6 +13,7 @@ Pixel or layout content is never inspected.
 from __future__ import annotations
 
 from dataclasses import replace
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -23,6 +24,11 @@ from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.materials import measure_sound_absorption
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from phonometry.materials import SoundAbsorptionMeasurement
 
 # The committed clean-room example (V = 200 m3, S = 10.8 m2, 20 degC -> c = 343,
 # m = 0); alpha_s(500 Hz) = 0.33 and alpha_s(1000 Hz) = 0.61 by Eq. (8)/(9).
@@ -95,7 +101,7 @@ _T2 = np.array(
 )
 
 
-def _result():
+def _result() -> SoundAbsorptionMeasurement:
     return measure_sound_absorption(
         _FREQS,
         _T1,
@@ -107,7 +113,7 @@ def _result():
     )
 
 
-def _metadata(**overrides) -> ReportMetadata:
+def _metadata(**overrides: object) -> ReportMetadata:
     base = {
         "specimen": "50 mm porous absorber over a 100 mm air gap",
         "client": "Acoustic Test Client Ltd.",
@@ -133,34 +139,34 @@ def _text(path: str) -> str:
     )
 
 
-def test_report_writes_one_page_pdf(tmp_path) -> None:
+def test_report_writes_one_page_pdf(tmp_path: Path) -> None:
     out = tmp_path / "iso354.pdf"
     returned = _result().report(str(out))
     assert returned == str(out)
     assert_one_page(str(out))
 
 
-def test_report_with_metadata_one_page(tmp_path) -> None:
+def test_report_with_metadata_one_page(tmp_path: Path) -> None:
     out = tmp_path / "iso354_meta.pdf"
     _result().report(str(out), metadata=_metadata())
     assert_one_page(str(out))
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     result = _result()
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="engine"):
         result.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     result = _result()
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="Unknown language"):
         result.report(out, language="xx")
 
 
-def test_displayed_alpha_s_matches_oracle(tmp_path) -> None:
+def test_displayed_alpha_s_matches_oracle(tmp_path: Path) -> None:
     """The fiche prints the closed-form alpha_s and the band labels."""
     out = tmp_path / "iso354.pdf"
     _result().report(str(out), metadata=_metadata())
@@ -172,7 +178,7 @@ def test_displayed_alpha_s_matches_oracle(tmp_path) -> None:
     assert "343" in text  # speed of sound c (Eq. (6))
 
 
-def test_verbose_shows_areas_and_times_one_page(tmp_path) -> None:
+def test_verbose_shows_areas_and_times_one_page(tmp_path: Path) -> None:
     """verbose=True adds the T1/T2/A1/A2 columns and stays one page."""
     out = tmp_path / "iso354_verbose.pdf"
     _result().report(str(out), metadata=_metadata(), verbose=True)
@@ -205,13 +211,13 @@ def test_a_short_band_column_is_refused(field: str) -> None:
         replace(result, **{field: one_short})
 
 
-def test_metadata_xml_specials_do_not_break(tmp_path) -> None:
+def test_metadata_xml_specials_do_not_break(tmp_path: Path) -> None:
     out = tmp_path / "iso354_xml.pdf"
     _result().report(str(out), metadata=_metadata(specimen='Panel <A> & <B> "edge"'))
     assert_one_page(str(out))
 
 
-def test_no_metadata_still_renders(tmp_path) -> None:
+def test_no_metadata_still_renders(tmp_path: Path) -> None:
     """Without metadata the body still shows the result's physical conditions."""
     out = tmp_path / "iso354_bare.pdf"
     _result().report(str(out))
@@ -219,7 +225,7 @@ def test_no_metadata_still_renders(tmp_path) -> None:
     assert "343" in _text(str(out))  # speed of sound from the result
 
 
-def test_spanish_fiche_uses_comma_decimal(tmp_path) -> None:
+def test_spanish_fiche_uses_comma_decimal(tmp_path: Path) -> None:
     out = tmp_path / "iso354_es.pdf"
     _result().report(str(out), metadata=_metadata(), language="es")
     assert_one_page(str(out))

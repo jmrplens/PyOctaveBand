@@ -10,6 +10,8 @@ centre frequencies, a rigid rather than resilient tie) have to be exercised.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Protocol
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -19,6 +21,12 @@ import numpy as np
 import pytest
 
 import phonometry as ph
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator
+
+    from matplotlib.axes import Axes
+    from matplotlib.lines import Line2D
 
 # ISO 717-2:2020 Table D.4, the octave-band field measurement.
 _TABLE_D4 = (65.3, 64.5, 58.0, 55.8)
@@ -44,12 +52,12 @@ _ALA_DNC = (
 
 
 @pytest.fixture(autouse=True)
-def _close_figures():
+def _close_figures() -> Iterator[None]:
     yield
     plt.close("all")
 
 
-def _line_by_label(ax, needle: str):
+def _line_by_label(ax: Axes, needle: str) -> Line2D:
     """The first line whose label contains *needle*."""
     for line in ax.lines:
         if needle in line.get_label():
@@ -200,7 +208,7 @@ def test_ceiling_attenuation_plot_forwards_kwargs() -> None:
 # ---------------------------------------------------------------------------
 
 
-def _plenum(**kwargs):
+def _plenum(**kwargs: list[float]) -> ph.building.PlenumFlankingResult:
     ceiling = [17.0, 21.0, 25.0, 29.0, 32.0]
     return ph.building.plenum_flanking_reduction_index(
         ceiling, ceiling, ceiling_length=4.75, plenum_height=0.43, **kwargs
@@ -248,7 +256,7 @@ def test_plenum_plot_forwards_kwargs() -> None:
 # ---------------------------------------------------------------------------
 
 
-def _coupling(**kwargs):
+def _coupling(**kwargs: str) -> ph.building.WallTieCouplingResult:
     freq = np.logspace(np.log10(50.0), np.log10(4000.0), 24)
     return ph.building.wall_tie_coupling_loss_factor(
         freq, 150.0, 170.0, 1.0e5, 1.2e5, ties_per_area=2.5, **kwargs
@@ -284,6 +292,17 @@ def test_wall_tie_plot_forwards_kwargs() -> None:
     assert any(ln.get_linewidth() == 3.0 for ln in ax.lines)
 
 
+class _Plottable(Protocol):
+    """What the language-validation test actually uses: the shared plot seam.
+
+    ``object`` would claim the test never looks inside the result, and calling
+    ``plot`` is the whole test; a union of the six concrete types would repeat
+    the parametrize list. The protocol says exactly as much as the test needs.
+    """
+
+    def plot(self, *, language: str = ...) -> Axes: ...
+
+
 # ---------------------------------------------------------------------------
 # Language validation
 # ---------------------------------------------------------------------------
@@ -300,7 +319,7 @@ def test_wall_tie_plot_forwards_kwargs() -> None:
         lambda: _coupling(tie="butterfly"),
     ],
 )
-def test_plot_rejects_an_unknown_language(factory) -> None:
+def test_plot_rejects_an_unknown_language(factory: Callable[[], _Plottable]) -> None:
     result = factory()
     with pytest.raises(ValueError, match="Unknown language"):
         result.plot(language="fr")

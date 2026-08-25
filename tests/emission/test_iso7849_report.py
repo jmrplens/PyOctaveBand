@@ -18,12 +18,17 @@ contract.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
-from phonometry.emission import sound_power_from_vibration
+from phonometry.emission import VibrationSoundPowerResult, sound_power_from_vibration
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # Standard octave-band A-weighting corrections Ck (dB), IEC 61672 / ISO 3744
 # Annex E Table E.2, at the example band centres.
@@ -49,14 +54,14 @@ def _extract_text(path: str) -> str:
     return " ".join(raw.split())
 
 
-def _engineering_result():
+def _engineering_result() -> VibrationSoundPowerResult:
     """A Part 2 (engineering) determination with a measured radiation factor."""
     return sound_power_from_vibration(
         _LV, area=_AREA, radiation_factor=_EPS, frequencies=_FREQS
     )
 
 
-def _survey_result():
+def _survey_result() -> VibrationSoundPowerResult:
     """A Part 1 (survey) determination with the fixed radiation factor eps = 1."""
     return sound_power_from_vibration(_LV, area=_AREA, frequencies=_FREQS)
 
@@ -83,7 +88,7 @@ def test_hand_oracle_matches_library() -> None:
     assert res.sound_power_level_a == pytest.approx(_oracle_lwa(_EPS), abs=1e-9)
 
 
-def test_report_renders_oracle_values(tmp_path) -> None:
+def test_report_renders_oracle_values(tmp_path: Path) -> None:
     """The fiche prints the hand-derived LWA and a couple of band LW values."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -116,7 +121,7 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     assert "1.60" in text
 
 
-def test_survey_part1_basis_and_method(tmp_path) -> None:
+def test_survey_part1_basis_and_method(tmp_path: Path) -> None:
     """The survey method (eps = 1) names Part 1 and the upper-limit method."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -134,7 +139,7 @@ def test_survey_part1_basis_and_method(tmp_path) -> None:
     assert f"{lw[2]:.1f}" in text
 
 
-def test_broadband_result_has_no_a_weighted_claim(tmp_path) -> None:
+def test_broadband_result_has_no_a_weighted_claim(tmp_path: Path) -> None:
     """A broadband result (no frequencies) cannot be A-weighted, so no LWA."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -156,7 +161,7 @@ def test_broadband_result_has_no_a_weighted_claim(tmp_path) -> None:
     assert "declared limit" in text
 
 
-def test_third_octave_labels_and_grouping(tmp_path) -> None:
+def test_third_octave_labels_and_grouping(tmp_path: Path) -> None:
     """A one-third-octave set is labelled by nominal centres and captioned."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -176,7 +181,7 @@ def test_third_octave_labels_and_grouping(tmp_path) -> None:
 # --- verbose (radiation-factor column) ----------------------------------------
 
 
-def test_verbose_adds_radiation_factor_column(tmp_path) -> None:
+def test_verbose_adds_radiation_factor_column(tmp_path: Path) -> None:
     """verbose=True adds the radiation factor epsilon column."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -197,7 +202,9 @@ def test_verbose_adds_radiation_factor_column(tmp_path) -> None:
     ("limit", "verdict"),
     [(95.0, "PASS"), (80.0, "FAIL")],
 )
-def test_verdict_against_declared_limit(tmp_path, limit: float, verdict: str) -> None:
+def test_verdict_against_declared_limit(
+    tmp_path: Path, limit: float, verdict: str
+) -> None:
     """A declared limit yields a PASS/FAIL verdict (lower is better)."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -214,7 +221,7 @@ def test_verdict_against_declared_limit(tmp_path, limit: float, verdict: str) ->
 # --- metadata header ----------------------------------------------------------
 
 
-def test_metadata_header_renders(tmp_path) -> None:
+def test_metadata_header_renders(tmp_path: Path) -> None:
     """Supplied metadata renders the source, environment and identity fields."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -242,7 +249,7 @@ def test_metadata_header_renders(tmp_path) -> None:
 # --- Spanish fiche ------------------------------------------------------------
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """language="es" renders the sound-power vocabulary and comma decimals."""
     pytest.importorskip("reportlab")
     pytest.importorskip("svglib")
@@ -262,7 +269,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
 # --- rendering contract -------------------------------------------------------
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     res = _engineering_result()
     out = str(tmp_path / "x.pdf")
@@ -270,7 +277,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         res.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     res = _engineering_result()
     out = str(tmp_path / "bad.pdf")

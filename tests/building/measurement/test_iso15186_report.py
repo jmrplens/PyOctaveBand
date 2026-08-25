@@ -16,6 +16,8 @@ report tests.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 import reference_data as ref
@@ -28,6 +30,9 @@ from phonometry import ReportMetadata, building
 from phonometry.building.measurement.intensity_insulation import (
     IntensityReductionResult,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 _RATING_FREQS = np.array(
     [
@@ -52,7 +57,9 @@ _RATING_FREQS = np.array(
 )
 
 
-def _levels_for_target_ri(ri, lp1, sm, s):
+def _levels_for_target_ri(
+    ri: list[float] | np.ndarray, lp1: float, sm: float, s: float
+) -> np.ndarray:
     """Receiving-side LIn that make Formula (7) return exactly ``ri``."""
     return lp1 - 6.0 - 10.0 * np.log10(sm / s) - np.asarray(ri, dtype=np.float64)
 
@@ -82,7 +89,7 @@ def test_ri_equals_annex_c_curve() -> None:
     np.testing.assert_allclose(result.r_i, ref.ISO15186_1_REF_RI, atol=1e-9)
 
 
-def test_fiche_rating_pinned_to_iso717_1_annex_c(tmp_path) -> None:
+def test_fiche_rating_pinned_to_iso717_1_annex_c(tmp_path: Path) -> None:
     """The RI fiche's rating is the published ISO 717-1 Annex C 30 (-2; -3) dB."""
     out = tmp_path / "ri.pdf"
     _intensity_result().report(str(out))
@@ -98,7 +105,7 @@ def test_fiche_rating_pinned_to_iso717_1_annex_c(tmp_path) -> None:
     assert "20.4" in text  # the 100 Hz band value
 
 
-def test_full_metadata_and_verbose_render_one_page(tmp_path) -> None:
+def test_full_metadata_and_verbose_render_one_page(tmp_path: Path) -> None:
     """A fully populated fiche with the RI,M column is one page."""
     metadata = ReportMetadata(
         specimen="100 mm autoclaved aerated concrete block wall",
@@ -130,7 +137,7 @@ def test_full_metadata_and_verbose_render_one_page(tmp_path) -> None:
     assert "Kc-modified" in text  # the verbose column caption
 
 
-def test_requirement_verdicts_pass_and_fail(tmp_path) -> None:
+def test_requirement_verdicts_pass_and_fail(tmp_path: Path) -> None:
     """Intensity insulation passes at or above the requirement."""
     result = _intensity_result()  # RI,w = 30 dB
     failing = tmp_path / "fail.pdf"
@@ -153,7 +160,7 @@ def _octave_result(*, with_kc: bool = False) -> IntensityReductionResult:
     )
 
 
-def test_octave_band_fiche_renders(tmp_path) -> None:
+def test_octave_band_fiche_renders(tmp_path: Path) -> None:
     """A five-octave-band intensity result also yields a one-page fiche."""
     result = _octave_result()
     assert result.rating is not None
@@ -163,7 +170,7 @@ def test_octave_band_fiche_renders(tmp_path) -> None:
     assert "Octave-band" in _extract_text(str(out))
 
 
-def test_octave_band_verbose_declares_band_resolution(tmp_path) -> None:
+def test_octave_band_verbose_declares_band_resolution(tmp_path: Path) -> None:
     """The verbose RI,M caption still declares the octave-band resolution."""
     out = tmp_path / "octave_verbose.pdf"
     _octave_result(with_kc=True).report(str(out), verbose=True)
@@ -173,7 +180,7 @@ def test_octave_band_verbose_declares_band_resolution(tmp_path) -> None:
     assert "Kc-modified" in text  # the RI,M column is present
 
 
-def test_one_third_octave_verbose_declares_band_resolution(tmp_path) -> None:
+def test_one_third_octave_verbose_declares_band_resolution(tmp_path: Path) -> None:
     """The verbose RI,M caption declares the one-third-octave resolution."""
     out = tmp_path / "verbose_res.pdf"
     _intensity_result(with_kc=True).report(str(out), verbose=True)
@@ -183,7 +190,7 @@ def test_one_third_octave_verbose_declares_band_resolution(tmp_path) -> None:
     assert "Kc-modified" in text
 
 
-def test_spanish_fiche_renders_translated(tmp_path) -> None:
+def test_spanish_fiche_renders_translated(tmp_path: Path) -> None:
     """``language="es"`` renders the Spanish fiche with comma decimals."""
     import re
 
@@ -201,7 +208,7 @@ def test_spanish_fiche_renders_translated(tmp_path) -> None:
     assert re.search(r"\d+,\d", text)  # comma decimal separator
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     out = str(tmp_path / "x.pdf")
     result = _intensity_result()
@@ -209,7 +216,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         result.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unsupported language raises ``ValueError`` (shared validation path)."""
     out = str(tmp_path / "x.pdf")
     result = _intensity_result()
@@ -217,7 +224,7 @@ def test_unknown_language_rejected(tmp_path) -> None:
         result.report(out, language="fr")
 
 
-def test_missing_rating_rejected(tmp_path) -> None:
+def test_missing_rating_rejected(tmp_path: Path) -> None:
     """A result without the ISO 717 rating (non-core band count) is rejected."""
     l_in = _levels_for_target_ri(np.full(8, 40.0), 85.0, 12.0, 10.0)
     result = building.intensity_sound_reduction(
@@ -229,7 +236,7 @@ def test_missing_rating_rejected(tmp_path) -> None:
         result.report(out)
 
 
-def test_verbose_without_kc_renders_plain_table(tmp_path) -> None:
+def test_verbose_without_kc_renders_plain_table(tmp_path: Path) -> None:
     """``verbose=True`` with no RI,M falls back to the two-column table."""
     out = tmp_path / "plain.pdf"
     _intensity_result(with_kc=False).report(str(out), verbose=True)
@@ -239,7 +246,7 @@ def test_verbose_without_kc_renders_plain_table(tmp_path) -> None:
     assert "Kc-modified" not in text
 
 
-def test_non_iso_band_count_rejected(tmp_path) -> None:
+def test_non_iso_band_count_rejected(tmp_path: Path) -> None:
     """A manually built 8-band result with matching rating arrays is rejected.
 
     The public API promises only the 16 one-third-octave or 5 octave bands
@@ -265,7 +272,7 @@ def test_non_iso_band_count_rejected(tmp_path) -> None:
         result.report(out)
 
 
-def test_rating_without_per_band_data_rejected(tmp_path) -> None:
+def test_rating_without_per_band_data_rejected(tmp_path: Path) -> None:
     """A manually built rating lacking the per-band arrays is rejected."""
     bare_rating = building.WeightedRatingResult(
         rating=30, c=-2, ctr=-3, unfavourable_sum=0.0
@@ -281,7 +288,7 @@ def test_rating_without_per_band_data_rejected(tmp_path) -> None:
         result.report(out)
 
 
-def test_clause8_areas_stated_in_statement(tmp_path) -> None:
+def test_clause8_areas_stated_in_statement(tmp_path: Path) -> None:
     """The statement carries S and Sm when the result holds them (Clause 8 g)."""
     out = tmp_path / "areas.pdf"
     _intensity_result().report(str(out))
@@ -291,7 +298,7 @@ def test_clause8_areas_stated_in_statement(tmp_path) -> None:
     assert "Clause 8" in text
 
 
-def test_clause8_fpi_and_residual_columns(tmp_path) -> None:
+def test_clause8_fpi_and_residual_columns(tmp_path: Path) -> None:
     """Supplied FpI and dpI0 spectra are annexed as table columns (Clause 8 i)."""
     result = _intensity_result()
     fpi = np.full(16, 4.0)
@@ -310,7 +317,7 @@ def test_clause8_fpi_and_residual_columns(tmp_path) -> None:
     assert_one_page(str(out2))
 
 
-def test_clause8_fpi_wrong_band_count_rejected(tmp_path) -> None:
+def test_clause8_fpi_wrong_band_count_rejected(tmp_path: Path) -> None:
     """An FpI spectrum not matching the reported bands is rejected."""
     result = _intensity_result()
     out = str(tmp_path / "x.pdf")

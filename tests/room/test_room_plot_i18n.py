@@ -10,6 +10,7 @@ clear :class:`ValueError`.
 from __future__ import annotations
 
 import warnings
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -24,15 +25,36 @@ from phonometry import room
 from phonometry._plot.room import plot_excitation
 from phonometry.room import enclosed_space_absorption as esa
 from phonometry.room import noise_criteria as rn
-from phonometry.room.crowd_noise import crowd_noise
-from phonometry.room.image_source import image_source_rir
+from phonometry.room.crowd_noise import CrowdNoiseResult, crowd_noise
+from phonometry.room.image_source import ImageSourceResult, image_source_rir
 from phonometry.room.impulse_response import ImpulseResponseResult
-from phonometry.room.modes import room_modes
-from phonometry.room.open_plan import open_plan_metrics
+from phonometry.room.modes import RoomModesResult, room_modes
+from phonometry.room.open_plan import OpenPlanResult, open_plan_metrics
 from phonometry.room.reverberation_prediction import (
+    ReverberationModelResult,
     reverberation_time_models,
 )
-from phonometry.room.steady_field import steady_state_field
+from phonometry.room.steady_field import SteadyFieldResult, steady_state_field
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from collections.abc import Callable
+
+#: What the builders below return: every room result with a ``.plot()`` renderer.
+_RoomResult = (
+    CrowdNoiseResult
+    | ImageSourceResult
+    | ImpulseResponseResult
+    | OpenPlanResult
+    | ReverberationModelResult
+    | RoomModesResult
+    | SteadyFieldResult
+    | esa.ReverberationResult
+    | rn.NCResult
+    | rn.RCResult
+    | room.DecayCurve
+    | room.RoomAcousticsResult
+    | room.ShapedSweepResult
+)
 
 FS = 48000
 
@@ -56,25 +78,25 @@ def _texts(ax_or_axes: object) -> str:
     return "\n".join(parts)
 
 
-def _room_acoustics():
+def _room_acoustics() -> room.RoomAcousticsResult:
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         return room.room_parameters(_decaying_ir(), FS, limits=None)
 
 
-def _decay_curve():
+def _decay_curve() -> room.DecayCurve:
     return room.decay_curve(_decaying_ir(), FS)
 
 
-def _nc():
+def _nc() -> rn.NCResult:
     return rn.noise_criterion(rn.nc_curve(40.0))
 
 
-def _rc():
+def _rc() -> rn.RCResult:
     return rn.room_criterion(rn.rc_curve(35.0))
 
 
-def _enclosed():
+def _enclosed() -> esa.ReverberationResult:
     return esa.enclosed_space_reverberation(
         [(20.0, [0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70])],
         50.0,
@@ -82,43 +104,43 @@ def _enclosed():
     )
 
 
-def _models():
+def _models() -> ReverberationModelResult:
     return reverberation_time_models(
         (8.0, 5.0, 3.0), (0.2, 0.15, 0.3), frequencies=[125.0, 250.0]
     )
 
 
-def _open_plan():
+def _open_plan() -> OpenPlanResult:
     r = np.array([2.0, 4.0, 8.0, 16.0])
     lp = 70.0 - 6.0 * np.log2(r)
     sti = 0.6 - 0.02 * r
     return open_plan_metrics(r, lp, sti)
 
 
-def _impulse_response():
+def _impulse_response() -> ImpulseResponseResult:
     return ImpulseResponseResult(ir=_decaying_ir(), fs=FS, method="spectral")
 
 
-def _shaped_sweep():
+def _shaped_sweep() -> room.ShapedSweepResult:
 
     return room.shaped_sweep_signal(FS, 100.0, 5000.0, 0.4, target="pink")
 
 
-def _image_source():
+def _image_source() -> ImageSourceResult:
     return image_source_rir(
         (5.0, 4.0, 3.0), (1.2, 1.1, 1.3), (3.5, 2.6, 1.7), 0.15, fs=16000, max_order=8
     )
 
 
-def _steady_field():
+def _steady_field() -> SteadyFieldResult:
     return steady_state_field(90.0, 100.0, 0.2)
 
 
-def _room_modes():
+def _room_modes() -> RoomModesResult:
     return room_modes((7.0, 5.0, 3.0), max_frequency=120.0, reverberation_time=0.8)
 
 
-def _crowd_noise():
+def _crowd_noise() -> CrowdNoiseResult:
     return crowd_noise([20.0, 190.0])
 
 
@@ -143,7 +165,9 @@ _CASES = [
 @pytest.mark.parametrize(
     ("name", "build", "spanish"), _CASES, ids=[c[0] for c in _CASES]
 )
-def test_plot_spanish_labels(name: str, build, spanish: str) -> None:
+def test_plot_spanish_labels(
+    name: str, build: Callable[[], _RoomResult], spanish: str
+) -> None:
     result = build()
     ax = result.plot(language="es")
     assert spanish in _texts(ax)
@@ -153,7 +177,9 @@ def test_plot_spanish_labels(name: str, build, spanish: str) -> None:
 @pytest.mark.parametrize(
     ("name", "build", "spanish"), _CASES, ids=[c[0] for c in _CASES]
 )
-def test_plot_rejects_unknown_language(name: str, build, spanish: str) -> None:
+def test_plot_rejects_unknown_language(
+    name: str, build: Callable[[], _RoomResult], spanish: str
+) -> None:
     result = build()
     with pytest.raises(ValueError, match="Unknown language"):
         result.plot(language="xx")

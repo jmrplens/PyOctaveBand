@@ -13,6 +13,8 @@ decimal comma. Pixel or layout content is never inspected.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 pytest.importorskip("reportlab")
@@ -26,6 +28,9 @@ from phonometry import (
     ReportMetadata,
     materials,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # The committed clean-room example: V = 200 m3, S = 10 m2, 20 degC (c = 343.2),
 # m = 0, symmetrical base plate (T1 = T3). See scripts/generate_reports.py.
@@ -77,7 +82,7 @@ _T1 = np.array(
 _ANGLES = np.arange(-90.0, 90.5, 10.0)
 
 
-def _scattering():
+def _scattering() -> materials.ScatteringResult:
     volume, area, c = 200.0, 10.0, 343.2
     t2 = _T1 * 0.90
     t4 = t2 * (1.0 - np.linspace(0.02, 0.28, _FREQS.size))
@@ -93,14 +98,16 @@ def _scattering():
 _SOURCES = np.array([0.0, 30.0, -30.0, 60.0, -60.0])
 
 
-def _polar_energy(angles, width, peak, specular=0.0):
+def _polar_energy(
+    angles: np.ndarray, width: float, peak: float, specular: float = 0.0
+) -> np.ndarray:
     return (
         10.0 * np.log10(1.0 + peak * np.exp(-(((angles - specular) / width) ** 2)))
         + 60.0
     )
 
 
-def _diffusion_spectrum():
+def _diffusion_spectrum() -> materials.DiffusionSpectrum:
     """The committed random-incidence spectrum: source-averaged per band (8.4)."""
     widths = np.linspace(15.0, 70.0, _FREQS.size)
     peaks = np.linspace(30.0, 3.0, _FREQS.size)
@@ -126,7 +133,7 @@ def _diffusion_spectrum():
     return materials.diffusion_spectrum(_FREQS, d, normalized=d_n)
 
 
-def _polar():
+def _polar() -> materials.DiffusionResult:
     band = int(np.argmin(np.abs(_FREQS - 1000.0)))
     widths = np.linspace(15.0, 70.0, _FREQS.size)
     peaks = np.linspace(30.0, 3.0, _FREQS.size)
@@ -135,7 +142,7 @@ def _polar():
     )
 
 
-def _metadata(**overrides) -> ReportMetadata:
+def _metadata(**overrides: object) -> ReportMetadata:
     base = {
         "specimen": "Quadratic-residue diffuser (N = 7)",
         "client": "Acoustic Test Client Ltd.",
@@ -166,14 +173,14 @@ def _text(path: str) -> str:
 
 
 # --- ISO 17497-1 scattering ------------------------------------------------
-def test_scattering_writes_one_page_pdf(tmp_path) -> None:
+def test_scattering_writes_one_page_pdf(tmp_path: Path) -> None:
     out = tmp_path / "scat.pdf"
     returned = _scattering().report(str(out))
     assert returned == str(out)
     assert_one_page(str(out))
 
 
-def test_scattering_displayed_values_match_oracle(tmp_path) -> None:
+def test_scattering_displayed_values_match_oracle(tmp_path: Path) -> None:
     """The fiche prints the closed-form s (Eq. (5)) and the band labels."""
     out = tmp_path / "scat.pdf"
     _scattering().report(str(out), metadata=_metadata())
@@ -188,28 +195,28 @@ def test_scattering_displayed_values_match_oracle(tmp_path) -> None:
     assert "Room volume" in text
 
 
-def test_scattering_verbose_shows_alpha_spec_one_page(tmp_path) -> None:
+def test_scattering_verbose_shows_alpha_spec_one_page(tmp_path: Path) -> None:
     out = tmp_path / "scat_v.pdf"
     _scattering().report(str(out), metadata=_metadata(), verbose=True)
     assert_one_page(str(out))
     assert "0.13" in _text(str(out))  # alpha_spec(500 Hz) = 0.131 -> 0.13
 
 
-def test_scattering_unknown_engine_rejected(tmp_path) -> None:
+def test_scattering_unknown_engine_rejected(tmp_path: Path) -> None:
     result = _scattering()
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="engine"):
         result.report(out, engine="weasyprint")
 
 
-def test_scattering_unknown_language_rejected(tmp_path) -> None:
+def test_scattering_unknown_language_rejected(tmp_path: Path) -> None:
     result = _scattering()
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="Unknown language"):
         result.report(out, language="xx")
 
 
-def test_scattering_metadata_xml_specials_do_not_break(tmp_path) -> None:
+def test_scattering_metadata_xml_specials_do_not_break(tmp_path: Path) -> None:
     out = tmp_path / "scat_xml.pdf"
     _scattering().report(
         str(out), metadata=_metadata(specimen='Panel <A> & <B> "edge"')
@@ -217,21 +224,21 @@ def test_scattering_metadata_xml_specials_do_not_break(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_scattering_no_metadata_still_renders(tmp_path) -> None:
+def test_scattering_no_metadata_still_renders(tmp_path: Path) -> None:
     out = tmp_path / "scat_bare.pdf"
     _scattering().report(str(out))
     assert_one_page(str(out))
     assert "100 to 5000" in _text(str(out))  # measured frequency range
 
 
-def test_scattering_spanish_uses_comma_decimal(tmp_path) -> None:
+def test_scattering_spanish_uses_comma_decimal(tmp_path: Path) -> None:
     out = tmp_path / "scat_es.pdf"
     _scattering().report(str(out), metadata=_metadata(), language="es")
     assert_one_page(str(out))
     assert "0,45" in _text(str(out))  # Spanish decimal comma
 
 
-def test_scattering_short_random_incidence_rejected(tmp_path) -> None:
+def test_scattering_short_random_incidence_rejected(tmp_path: Path) -> None:
     """ScatteringResult is a frozen dataclass, so the fiche checks the lengths.
 
     A caller can hand-build one whose per-band arrays disagree; the alpha_s
@@ -248,7 +255,7 @@ def test_scattering_short_random_incidence_rejected(tmp_path) -> None:
     assert not out.exists()  # refused before the fiche is written
 
 
-def test_scattering_verbose_short_specular_rejected(tmp_path) -> None:
+def test_scattering_verbose_short_specular_rejected(tmp_path: Path) -> None:
     """The alpha_spec column is only tabulated when verbose, and so is its length."""
     result = _scattering()
     short = replace(result, specular=result.specular[:-1])
@@ -262,13 +269,13 @@ def test_scattering_verbose_short_specular_rejected(tmp_path) -> None:
 
 
 # --- ISO 17497-2 diffusion spectrum ---------------------------------------
-def test_diffusion_writes_one_page_pdf(tmp_path) -> None:
+def test_diffusion_writes_one_page_pdf(tmp_path: Path) -> None:
     out = tmp_path / "diff.pdf"
     _diffusion_spectrum().report(str(out), metadata=_metadata())
     assert_one_page(str(out))
 
 
-def test_diffusion_displayed_values_match_oracle(tmp_path) -> None:
+def test_diffusion_displayed_values_match_oracle(tmp_path: Path) -> None:
     """The fiche prints the per-band random-incidence d (Clause 8.4)."""
     out = tmp_path / "diff.pdf"
     _diffusion_spectrum().report(str(out), metadata=_metadata())
@@ -279,7 +286,7 @@ def test_diffusion_displayed_values_match_oracle(tmp_path) -> None:
     assert "4000" in text
 
 
-def test_diffusion_omits_room_fields(tmp_path) -> None:
+def test_diffusion_omits_room_fields(tmp_path: Path) -> None:
     """The free-field diffusion fiche must not show sample area / room volume."""
     out = tmp_path / "diff.pdf"
     _diffusion_spectrum().report(str(out), metadata=_metadata())
@@ -288,28 +295,28 @@ def test_diffusion_omits_room_fields(tmp_path) -> None:
     assert "Room volume" not in text
 
 
-def test_diffusion_verbose_shows_normalized_one_page(tmp_path) -> None:
+def test_diffusion_verbose_shows_normalized_one_page(tmp_path: Path) -> None:
     out = tmp_path / "diff_v.pdf"
     _diffusion_spectrum().report(str(out), metadata=_metadata(), verbose=True)
     assert_one_page(str(out))
     assert "0.35" in _text(str(out))  # d_n(500 Hz) = 0.347 -> 0.35
 
 
-def test_diffusion_unknown_engine_rejected(tmp_path) -> None:
+def test_diffusion_unknown_engine_rejected(tmp_path: Path) -> None:
     result = _diffusion_spectrum()
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="engine"):
         result.report(out, engine="weasyprint")
 
 
-def test_diffusion_spanish_uses_comma_decimal(tmp_path) -> None:
+def test_diffusion_spanish_uses_comma_decimal(tmp_path: Path) -> None:
     out = tmp_path / "diff_es.pdf"
     _diffusion_spectrum().report(str(out), metadata=_metadata(), language="es")
     assert_one_page(str(out))
     assert "0,81" in _text(str(out))
 
 
-def test_diffusion_short_normalized_rejected(tmp_path) -> None:
+def test_diffusion_short_normalized_rejected(tmp_path: Path) -> None:
     """The normalised spectrum is optional, but a present one has to be full length.
 
     The figure draws d_n whenever it is there, so the length is checked for any
@@ -326,7 +333,7 @@ def test_diffusion_short_normalized_rejected(tmp_path) -> None:
     assert not out.exists()
 
 
-def test_diffusion_short_spectrum_rejected(tmp_path) -> None:
+def test_diffusion_short_spectrum_rejected(tmp_path: Path) -> None:
     """A hand-built spectrum whose d is short would cut the fiche table."""
     result = _diffusion_spectrum()
     short = replace(result, diffusion=result.diffusion[:-1])
@@ -340,13 +347,13 @@ def test_diffusion_short_spectrum_rejected(tmp_path) -> None:
 
 
 # --- ISO 17497-2 polar response -------------------------------------------
-def test_polar_writes_one_page_pdf(tmp_path) -> None:
+def test_polar_writes_one_page_pdf(tmp_path: Path) -> None:
     out = tmp_path / "polar.pdf"
     _polar().report(str(out), metadata=_metadata())
     assert_one_page(str(out))
 
 
-def test_polar_displays_coefficient_and_angles(tmp_path) -> None:
+def test_polar_displays_coefficient_and_angles(tmp_path: Path) -> None:
     out = tmp_path / "polar.pdf"
     _polar().report(str(out), metadata=_metadata())
     text = _text(str(out))
@@ -354,14 +361,14 @@ def test_polar_displays_coefficient_and_angles(tmp_path) -> None:
     assert "90.0" in text  # receiver angle label
 
 
-def test_polar_unknown_engine_rejected(tmp_path) -> None:
+def test_polar_unknown_engine_rejected(tmp_path: Path) -> None:
     result = _polar()
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="engine"):
         result.report(out, engine="weasyprint")
 
 
-def test_polar_short_levels_rejected(tmp_path) -> None:
+def test_polar_short_levels_rejected(tmp_path: Path) -> None:
     """One level per receiver angle: a short column is refused before rendering."""
     result = _polar()
     short = replace(result, levels=result.levels[:-1])
@@ -374,7 +381,7 @@ def test_polar_short_levels_rejected(tmp_path) -> None:
     assert not out.exists()
 
 
-def test_polar_spanish_uses_comma_decimal(tmp_path) -> None:
+def test_polar_spanish_uses_comma_decimal(tmp_path: Path) -> None:
     out = tmp_path / "polar_es.pdf"
     _polar().report(str(out), metadata=_metadata(), language="es")
     assert_one_page(str(out))

@@ -16,12 +16,23 @@ from __future__ import annotations
 
 import dataclasses
 import math
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 import reference_data as ref
 
 from phonometry import room
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from collections.abc import Callable
+
+    #: The models called as ``model(volume, [(surface, alpha), ...])``.
+    _SurfaceModel = Callable[[float, list[tuple[float, float]]], np.ndarray | float]
+    #: The models called as ``model(dimensions, per_axis_alphas)``.
+    _AxialModel = Callable[
+        [tuple[float, float, float], tuple[float, float, float]], np.ndarray | float
+    ]
 
 # A shoebox 8 x 5 x 3 m: V = 120 m3, S = 2(40 + 24 + 15) = 158 m2.
 DIMS = (8.0, 5.0, 3.0)
@@ -286,7 +297,7 @@ def test_empty_surfaces_raise() -> None:
 )
 @pytest.mark.parametrize("bad", [-0.1, math.nan, math.inf])
 def test_negative_and_non_finite_alpha_rejected_by_surface_models(
-    model, bad: float
+    model: _SurfaceModel, bad: float
 ) -> None:
     """Negative and non-finite coefficients are rejected by every model."""
     with pytest.raises(ValueError, match="absorption coefficients must be"):
@@ -299,7 +310,7 @@ def test_negative_and_non_finite_alpha_rejected_by_surface_models(
 )
 @pytest.mark.parametrize("bad", [-0.1, math.nan, math.inf])
 def test_negative_and_non_finite_alpha_rejected_by_axial_models(
-    model, bad: float
+    model: _AxialModel, bad: float
 ) -> None:
     with pytest.raises(ValueError, match="absorption coefficients must be"):
         model(DIMS, (bad, 0.2, 0.2))
@@ -313,7 +324,9 @@ def test_negative_and_non_finite_alpha_rejected_by_axial_models(
         room.millington_sette_reverberation_time,
     ],
 )
-def test_alpha_above_unit_error_bound_rejected_by_surface_models(model) -> None:
+def test_alpha_above_unit_error_bound_rejected_by_surface_models(
+    model: _SurfaceModel,
+) -> None:
     """A coefficient above 2 is flagged as a probable percent-vs-fraction slip.
 
     (The axial models reject 20.0 too, but through their stricter below-1

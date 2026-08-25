@@ -15,6 +15,7 @@ is never inspected.
 from __future__ import annotations
 
 import math
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -27,6 +28,9 @@ from phonometry import (
     ReportMetadata,
     materials,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # The committed clean-room example: a 50 mm porous absorber in a 100 mm diameter
 # cell (A = pi*0.05^2 m2), stepped to 12 mm/s (below the 15 mm/s clause-7.5
@@ -45,13 +49,13 @@ _R = _RS / _AREA  # ~2062645 Pa*s/m^3
 _SIGMA = _RS / _THICKNESS  # 324000 Pa*s/m^2
 
 
-def _result():
+def _result() -> materials.StaticAirflowResult:
     u = np.array([0.5, 1.0, 2.0, 4.0, 8.0, 12.0]) * 1e-3
     dp = _A_COEFF * u + _B_COEFF * u**2
     return materials.static_airflow_resistance(u, dp, area=_AREA, thickness=_THICKNESS)
 
 
-def _metadata(**overrides) -> ReportMetadata:
+def _metadata(**overrides: object) -> ReportMetadata:
     base = {
         "specimen": "50 mm porous absorber (open-cell)",
         "client": "Acoustic Test Client Ltd.",
@@ -82,14 +86,14 @@ def _text(path: str) -> str:
     return _raw_text(path).replace("\n", " ")
 
 
-def test_writes_one_page_pdf(tmp_path) -> None:
+def test_writes_one_page_pdf(tmp_path: Path) -> None:
     out = tmp_path / "airflow.pdf"
     returned = _result().report(str(out))
     assert returned == str(out)
     assert_one_page(str(out))
 
 
-def test_displayed_values_match_oracle(tmp_path) -> None:
+def test_displayed_values_match_oracle(tmp_path: Path) -> None:
     """The fiche prints R_s (boxed), R, sigma and the evaluation velocity.
 
     The oracle is derived from the standard's clause 7.5 procedure, independent
@@ -113,7 +117,7 @@ def test_displayed_values_match_oracle(tmp_path) -> None:
     assert "Acoustic Test Client Ltd." in text  # metadata
 
 
-def test_metadata_and_fit_rows_appear(tmp_path) -> None:
+def test_metadata_and_fit_rows_appear(tmp_path: Path) -> None:
     """The specimen thickness and the through-origin fit coefficients appear."""
     out = tmp_path / "airflow.pdf"
     _result().report(str(out), metadata=_metadata())
@@ -125,14 +129,14 @@ def test_metadata_and_fit_rows_appear(tmp_path) -> None:
     assert "400000" in text  # quadratic coefficient b
 
 
-def test_no_metadata_still_renders(tmp_path) -> None:
+def test_no_metadata_still_renders(tmp_path: Path) -> None:
     out = tmp_path / "airflow_bare.pdf"
     _result().report(str(out))
     assert_one_page(str(out))
     assert "ISO 9053-1:2018" in _text(str(out))  # standard-basis line
 
 
-def test_no_thickness_omits_resistivity(tmp_path) -> None:
+def test_no_thickness_omits_resistivity(tmp_path: Path) -> None:
     """Without a thickness the fiche prints no airflow-resistivity row/term."""
     u = np.array([0.5, 1.0, 2.0, 4.0, 8.0, 12.0]) * 1e-3
     dp = _A_COEFF * u + _B_COEFF * u**2
@@ -143,27 +147,27 @@ def test_no_thickness_omits_resistivity(tmp_path) -> None:
     assert "Airflow resistivity" not in _text(str(out))
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     result = _result()
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="engine"):
         result.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     result = _result()
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="Unknown language"):
         result.report(out, language="xx")
 
 
-def test_metadata_xml_specials_do_not_break(tmp_path) -> None:
+def test_metadata_xml_specials_do_not_break(tmp_path: Path) -> None:
     out = tmp_path / "airflow_xml.pdf"
     _result().report(str(out), metadata=_metadata(specimen='Foam <A> & <B> "edge"'))
     assert_one_page(str(out))
 
 
-def test_spanish_uses_comma_decimal(tmp_path) -> None:
+def test_spanish_uses_comma_decimal(tmp_path: Path) -> None:
     out = tmp_path / "airflow_es.pdf"
     _result().report(str(out), metadata=_metadata(), language="es")
     assert_one_page(str(out))

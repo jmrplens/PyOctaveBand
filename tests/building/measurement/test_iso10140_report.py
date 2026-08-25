@@ -17,6 +17,8 @@ report tests.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
@@ -35,6 +37,9 @@ from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata, building
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
 #: Receiving-room reverberation time and volume that make the equivalent
 #: absorption area A = 0,16 V / T equal to 10 m2 in every band, so both the
 #: airborne 10 lg(S/A) (with S = 10 m2) and the impact 10 lg(A/A0) (with
@@ -43,7 +48,7 @@ _T_UNITY = np.full(16, 0.5)
 _V_UNITY = 31.25
 
 
-def _airborne_result(**kwargs) -> building.LabAirborneInsulationResult:
+def _airborne_result(**kwargs: float) -> building.LabAirborneInsulationResult:
     """A lab airborne result whose R equals the ISO 717-1 Annex C curve."""
     l1 = np.full(16, 90.0)
     l2 = l1 - np.asarray(_AIRBORNE_R, dtype=np.float64)
@@ -51,7 +56,7 @@ def _airborne_result(**kwargs) -> building.LabAirborneInsulationResult:
     return building.lab_airborne_insulation(l1, l2, _T_UNITY, **params)
 
 
-def _impact_result(**kwargs) -> building.LabImpactInsulationResult:
+def _impact_result(**kwargs: float) -> building.LabImpactInsulationResult:
     """A lab impact result whose Ln equals the ISO 717-2 Annex C curve."""
     li = np.asarray(_IMPACT_LN, dtype=np.float64)
     params = {"volume": _V_UNITY, **kwargs}
@@ -72,7 +77,7 @@ def test_r_equals_level_difference_at_unity_absorption() -> None:
     assert np.allclose(result.absorption, 10.0)
 
 
-def test_airborne_fiche_rating_pinned_to_iso717_1_annex_c(tmp_path) -> None:
+def test_airborne_fiche_rating_pinned_to_iso717_1_annex_c(tmp_path: Path) -> None:
     """The R fiche's rating is the published ISO 717-1 Annex C 30 (-2; -3) dB."""
     out = tmp_path / "r.pdf"
     _airborne_result().report(str(out))
@@ -94,7 +99,7 @@ def test_ln_equals_impact_level_at_reference_absorption() -> None:
     assert np.allclose(result.absorption, 10.0)
 
 
-def test_impact_fiche_rating_pinned_to_iso717_2_annex_c(tmp_path) -> None:
+def test_impact_fiche_rating_pinned_to_iso717_2_annex_c(tmp_path: Path) -> None:
     """The Ln fiche's rating is the published ISO 717-2 Annex C 79 (-11) dB."""
     out = tmp_path / "ln.pdf"
     _impact_result().report(str(out))
@@ -109,7 +114,7 @@ def test_impact_fiche_rating_pinned_to_iso717_2_annex_c(tmp_path) -> None:
     assert "tapping machine" in " ".join(text.split())
 
 
-def test_full_metadata_and_verbose_render_one_page(tmp_path) -> None:
+def test_full_metadata_and_verbose_render_one_page(tmp_path: Path) -> None:
     """A fully populated lab fiche with the absorption column is one page."""
     metadata = ReportMetadata(
         specimen="100 mm autoclaved aerated concrete block wall",
@@ -143,7 +148,7 @@ def test_full_metadata_and_verbose_render_one_page(tmp_path) -> None:
     assert "precision method" in text
 
 
-def test_requirement_verdicts_pass_and_fail(tmp_path) -> None:
+def test_requirement_verdicts_pass_and_fail(tmp_path: Path) -> None:
     """Airborne passes at/above the requirement; impact at/below it."""
     airborne = _airborne_result()  # Rw = 30 dB
     failing = tmp_path / "fail.pdf"
@@ -156,7 +161,7 @@ def test_requirement_verdicts_pass_and_fail(tmp_path) -> None:
     assert "PASS" in _extract_text(str(passing))
 
 
-def test_octave_band_fiche_renders(tmp_path) -> None:
+def test_octave_band_fiche_renders(tmp_path: Path) -> None:
     """A five-octave-band laboratory result also yields a one-page fiche."""
     l1 = np.full(5, 90.0)
     r = np.array([30.0, 40.0, 48.0, 52.0, 55.0])
@@ -170,7 +175,7 @@ def test_octave_band_fiche_renders(tmp_path) -> None:
     assert "Octave-band" in _extract_text(str(out))
 
 
-def test_spanish_fiche_renders_translated(tmp_path) -> None:
+def test_spanish_fiche_renders_translated(tmp_path: Path) -> None:
     """``language="es"`` renders the Spanish lab fiche with comma decimals."""
     import re
 
@@ -187,7 +192,7 @@ def test_spanish_fiche_renders_translated(tmp_path) -> None:
     assert re.search(r"\d+,\d", text)  # comma decimal separator
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     out = str(tmp_path / "x.pdf")
     airborne = _airborne_result()
@@ -198,7 +203,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         impact.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unsupported language raises ``ValueError`` (shared validation path)."""
     out = str(tmp_path / "x.pdf")
     airborne = _airborne_result()
@@ -209,7 +214,7 @@ def test_unknown_language_rejected(tmp_path) -> None:
         impact.report(out, language="fr")
 
 
-def test_missing_rating_rejected(tmp_path) -> None:
+def test_missing_rating_rejected(tmp_path: Path) -> None:
     """A result without the ISO 717 rating (non-core band count) is rejected."""
     l1 = np.full(8, 90.0)
     result = building.lab_airborne_insulation(
@@ -221,7 +226,7 @@ def test_missing_rating_rejected(tmp_path) -> None:
         result.report(out)
 
 
-def test_rating_without_per_band_data_rejected(tmp_path) -> None:
+def test_rating_without_per_band_data_rejected(tmp_path: Path) -> None:
     """A manually built rating lacking the per-band arrays is rejected."""
     # A backward-compatibly constructed rating (band_centers / measured /
     # shifted_reference default to None) would otherwise crash the table.
@@ -238,7 +243,7 @@ def test_rating_without_per_band_data_rejected(tmp_path) -> None:
         result.report(out)
 
 
-def test_manual_impact_result_renders(tmp_path) -> None:
+def test_manual_impact_result_renders(tmp_path: Path) -> None:
     """A manually built lab impact result reports its Ln fiche."""
     result = _impact_result()
     bare = building.LabImpactInsulationResult(
@@ -249,7 +254,7 @@ def test_manual_impact_result_renders(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_report_rejects_band_count_mismatch(tmp_path) -> None:
+def test_report_rejects_band_count_mismatch(tmp_path: Path) -> None:
     """A rating whose per-band arrays are shorter than the curve raises a
     ValueError naming each array and its shape (not an uncaught IndexError).
     """

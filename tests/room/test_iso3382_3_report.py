@@ -39,6 +39,8 @@ from phonometry import (
 )
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from phonometry.room import OpenPlanResult
 
 
@@ -65,7 +67,7 @@ def _extract_text(path: str) -> str:
     )
 
 
-def _full_metadata(**overrides) -> ReportMetadata:
+def _full_metadata(**overrides: float) -> ReportMetadata:
     base = {
         "specimen": "Furnished, unoccupied, background noise present",
         "client": "Acoustic Test Client Ltd.",
@@ -102,7 +104,7 @@ def test_synthetic_line_matches_closed_form() -> None:
 # --------------------------------------------------------------------------
 # Structural rendering
 # --------------------------------------------------------------------------
-def test_report_writes_pdf(tmp_path) -> None:
+def test_report_writes_pdf(tmp_path: Path) -> None:
     """An open-plan result renders a PDF fiche and returns its path."""
     out = tmp_path / "openplan.pdf"
     returned = _result().report(str(out))
@@ -110,21 +112,21 @@ def test_report_writes_pdf(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_report_with_full_metadata_one_page(tmp_path) -> None:
+def test_report_with_full_metadata_one_page(tmp_path: Path) -> None:
     """A full ReportMetadata renders a one-page accredited open-plan fiche."""
     out = tmp_path / "openplan_meta.pdf"
     _result().report(str(out), metadata=_full_metadata())
     assert_one_page(str(out))
 
 
-def test_report_bare_without_metadata(tmp_path) -> None:
+def test_report_bare_without_metadata(tmp_path: Path) -> None:
     """metadata=None renders a bare characterisation fiche (no header)."""
     out = tmp_path / "bare.pdf"
     _result().report(str(out), metadata=None)
     assert_one_page(str(out))
 
 
-def test_unknown_engine_rejected(tmp_path) -> None:
+def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     res = _result()
     out = str(tmp_path / "x.pdf")
@@ -132,7 +134,7 @@ def test_unknown_engine_rejected(tmp_path) -> None:
         res.report(out, engine="weasyprint")
 
 
-def test_unknown_language_rejected(tmp_path) -> None:
+def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ``ValueError``."""
     res = _result()
     out = str(tmp_path / "bad.pdf")
@@ -143,7 +145,7 @@ def test_unknown_language_rejected(tmp_path) -> None:
 # --------------------------------------------------------------------------
 # Displayed values (the oracle appears in the rendered text)
 # --------------------------------------------------------------------------
-def test_single_number_quantities_render(tmp_path) -> None:
+def test_single_number_quantities_render(tmp_path: Path) -> None:
     """The four single-number quantities appear in the rendered text."""
     out = tmp_path / "values.pdf"
     _result().report(str(out), metadata=_full_metadata())
@@ -158,7 +160,7 @@ def test_single_number_quantities_render(tmp_path) -> None:
     assert "Distraction distance" in text
 
 
-def test_verdict_renders_both_ways(tmp_path) -> None:
+def test_verdict_renders_both_ways(tmp_path: Path) -> None:
     """A target D2,S renders a PASS when met and a FAIL when not.
 
     The requirement is the minimum acceptable D2,S: the oracle 7.0 dB passes a
@@ -174,7 +176,7 @@ def test_verdict_renders_both_ways(tmp_path) -> None:
     assert "FAIL" in _extract_text(str(failing))
 
 
-def test_report_without_requirement_has_no_verdict(tmp_path) -> None:
+def test_report_without_requirement_has_no_verdict(tmp_path: Path) -> None:
     """With no target the characterisation fiche omits the verdict row."""
     out = tmp_path / "noverdict.pdf"
     _result().report(str(out), metadata=_full_metadata())
@@ -186,7 +188,7 @@ def test_report_without_requirement_has_no_verdict(tmp_path) -> None:
 # --------------------------------------------------------------------------
 # Robustness and localisation
 # --------------------------------------------------------------------------
-def test_degenerate_result_renders_without_plot(tmp_path) -> None:
+def test_degenerate_result_renders_without_plot(tmp_path: Path) -> None:
     """A result with no positions in 2-16 m (NaN D2,S) still renders one page.
 
     The spatial-decay regression is undefined, so its plot cannot be drawn; the
@@ -202,7 +204,7 @@ def test_degenerate_result_renders_without_plot(tmp_path) -> None:
     assert "—" in _extract_text(str(out))  # em-dash empty-cell symbol
 
 
-def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
+def test_report_escapes_xml_specials_in_metadata(tmp_path: Path) -> None:
     """Metadata with XML specials (& < >) renders without crashing reportlab."""
     md = ReportMetadata(
         client="Ac & Co <Ltd>",
@@ -218,7 +220,7 @@ def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
     assert_one_page(str(out))
 
 
-def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
+def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """language="es" renders a one-page Spanish fiche with comma decimals."""
     import re
 
