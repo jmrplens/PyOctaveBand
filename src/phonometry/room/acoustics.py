@@ -593,7 +593,7 @@ def decay_curve(
         if band <= 0.0:
             msg = "Band centre frequency 'band' must be positive."
             raise ValueError(msg)
-        if fraction <= 0:
+        if not np.isfinite(fraction) or fraction <= 0:
             msg = "Bandwidth 'fraction' must be positive."
             raise ValueError(msg)
         half_width = 2.0 ** (1.0 / (4.0 * fraction))

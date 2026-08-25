@@ -164,6 +164,22 @@ def test_rejects_non_finite_nperseg() -> None:
         electroacoustics.transfer_function(x, x, FS, nperseg=float("inf"))  # type: ignore[arg-type]
 
 
+def test_rejects_nperseg_beyond_float_range() -> None:
+    # Used to escape as OverflowError out of math.isfinite(); an integer is
+    # finite by construction, so it reaches the range check and its name.
+    x = np.zeros(1000)
+    with pytest.raises(ValueError, match="'nperseg' must be between 32"):
+        electroacoustics.transfer_function(x, x, FS, nperseg=10**10000)
+
+
+def test_rejects_overlap_beyond_float_range() -> None:
+    # Used to escape as OverflowError out of float(); the exact int/float
+    # comparison refuses it by name instead.
+    x = np.zeros(1000)
+    with pytest.raises(ValueError, match=r"'overlap' must be in \[0, 1\)"):
+        electroacoustics.transfer_function(x, x, FS, overlap=10**10000)
+
+
 def test_coherence_rejects_fractional_nperseg() -> None:
     x = np.zeros(1000)
     with pytest.raises(ValueError, match="'nperseg' must be a positive integer"):

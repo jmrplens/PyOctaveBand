@@ -661,9 +661,10 @@ def _prepare_time_weighting_initial_state(
 
     try:
         state = np.asarray(initial_state, dtype=x_sq.dtype)
-    except TypeError:
-        # numpy's float() message would name neither the parameter nor the
-        # accepted forms; the module's own message does both.
+    except (TypeError, ValueError):
+        # numpy refuses an object with TypeError and an unconvertible string
+        # array with ValueError; neither message names the parameter or the
+        # accepted forms, so both become the module's own TypeError.
         raise TypeError(invalid_initial_state_message) from None
     if state.shape == ():
         return np.full(state_shape, state.item(), dtype=x_sq.dtype)

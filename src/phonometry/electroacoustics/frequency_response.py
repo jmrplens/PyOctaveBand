@@ -109,16 +109,20 @@ def _welch_params(
     The guards run before the ``int()``/``float()`` coercions, so a bad
     value is refused by name instead of dying inside the standard library,
     and a fractional ``nperseg`` is refused instead of silently truncated.
+    The comparisons stay in exact int/float arithmetic and only floats are
+    probed for finiteness, because ``float()`` and ``math.isfinite`` both
+    overflow on an integer beyond float range; kept exact, such an integer
+    falls through to the range check, which refuses it by name.
     """
     if (
         not isinstance(overlap, (int, float, np.integer, np.floating))
-        or not 0.0 <= float(overlap) < 1.0
+        or not 0.0 <= overlap < 1.0
     ):
         msg = "'overlap' must be in [0, 1)."
         raise ValueError(msg)
     if nperseg is not None and (
         not isinstance(nperseg, (int, float, np.integer, np.floating))
-        or not math.isfinite(nperseg)
+        or (isinstance(nperseg, (float, np.floating)) and not math.isfinite(nperseg))
         or int(nperseg) != nperseg
     ):
         msg = "'nperseg' must be a positive integer."

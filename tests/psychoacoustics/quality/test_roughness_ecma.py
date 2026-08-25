@@ -225,6 +225,18 @@ def test_empty_signal_raises() -> None:
         psychoacoustics.roughness_ecma(empty, FS)
 
 
+def test_non_finite_signal_raises() -> None:
+    # A poisoned sample must raise, not silently report 0.0 asper (the NaN
+    # washes out in the envelope stages and the result looks like silence).
+    tone = _tone(1000.0, 60.0, 0.5)
+    tone[100] = np.nan
+    with pytest.raises(ValueError, match="'signal_in' must be finite"):
+        psychoacoustics.roughness_ecma(tone, FS)
+    tone[100] = np.inf
+    with pytest.raises(ValueError, match="'signal_in' must be finite"):
+        psychoacoustics.roughness_ecma(tone, FS)
+
+
 def test_resample_length_clamps_to_one_sample() -> None:
     # 1 sample at 96 kHz resamples to round(1 * 48000 / 96000) = round(0.5),
     # which banker's rounding takes to 0 samples without the clamp; the

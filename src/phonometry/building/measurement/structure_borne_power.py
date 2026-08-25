@@ -179,17 +179,22 @@ def structure_borne_power_level(
     :param loss_factor: Plate loss factor ``eta`` (scalar or per band, > 0).
     :param reference_velocity: Velocity reference ``v0`` (Default: 1e-9 m/s).
     :return: The structure-borne sound power level ``L_Ws``, in dB re 1 pW.
-    :raises ValueError: for a non-positive mass, area, reference, frequency or
-        loss factor, or per-band inputs whose shapes do not broadcast together.
+    :raises ValueError: for a non-positive mass, area or reference, a
+        frequency or loss factor that is not positive and finite, a
+        non-finite velocity level, or per-band inputs whose shapes do not
+        broadcast together.
     """
     mass_per_area = require_positive(mass_per_area, "mass_per_area")
     area = require_positive(area, "area")
     reference_velocity = require_positive(reference_velocity, "reference_velocity")
     f = np.asarray(frequency, dtype=np.float64)
-    if np.any(f <= 0.0):
-        msg = "'frequency' must be positive."
+    if not np.all(np.isfinite(f)) or np.any(f <= 0.0):
+        msg = "'frequency' must contain positive, finite values."
         raise ValueError(msg)
     lv = np.asarray(velocity_level, dtype=np.float64)
+    if not np.all(np.isfinite(lv)):
+        msg = "'velocity_level' must contain only finite values."
+        raise ValueError(msg)
     eta = np.asarray(loss_factor, dtype=np.float64)
     if not np.all(np.isfinite(eta)) or np.any(eta <= 0.0):
         msg = "'loss_factor' must contain positive, finite values."
@@ -406,10 +411,14 @@ def equivalent_blocked_force_level(
     :param plate_mobility: Equivalent plate mobility ``Y_R,low,eq`` (per
         band), in m/(N.s); complex values use their real part (Formula 16).
     :return: The equivalent blocked force level ``L_Fb,eq``, in dB re 1e-6 N.
-    :raises ValueError: if ``Re{plate_mobility}`` is not positive and finite,
-        or the two shapes do not broadcast together.
+    :raises ValueError: if ``power_level`` is not finite,
+        ``Re{plate_mobility}`` is not positive and finite, or the two shapes
+        do not broadcast together.
     """
     lw = np.asarray(power_level, dtype=np.float64)
+    if not np.all(np.isfinite(lw)):
+        msg = "'power_level' must contain only finite values."
+        raise ValueError(msg)
     y = np.asarray(plate_mobility, dtype=np.complex128)
     y_re = np.real(y)
     if (
@@ -483,10 +492,14 @@ def equivalent_free_velocity_level(
     :param plate_mobility: Equivalent plate mobility ``Y_R,high,eq`` (per
         band, complex), in m/(N.s).
     :return: The equivalent free velocity level ``L_vf,eq``, in dB re 1e-9 m/s.
-    :raises ValueError: if ``Re{plate_mobility}`` is not positive and finite,
-        or the two shapes do not broadcast together.
+    :raises ValueError: if ``power_level`` is not finite,
+        ``Re{plate_mobility}`` is not positive and finite, or the two shapes
+        do not broadcast together.
     """
     lw = np.asarray(power_level, dtype=np.float64)
+    if not np.all(np.isfinite(lw)):
+        msg = "'power_level' must contain only finite values."
+        raise ValueError(msg)
     y = np.asarray(plate_mobility, dtype=np.complex128)
     y_re = np.real(y)
     if (

@@ -153,8 +153,10 @@ def _resolve_speed(temperature: float, speed_of_sound: float | None) -> float:
     below absolute zero would hand back a zero or negative speed of sound.
     """
     if speed_of_sound is not None:
-        if speed_of_sound <= 0.0:
-            msg = "'speed_of_sound' must be positive."
+        # NaN passes a bare <= comparison and propagates into every derived
+        # quantity; infinity is positive but zeroes the speed-dependent terms.
+        if not math.isfinite(speed_of_sound) or speed_of_sound <= 0.0:
+            msg = "'speed_of_sound' must be finite and positive."
             raise ValueError(msg)
         return float(speed_of_sound)
     # NaN is named alongside the bound: a NaN temperature would otherwise
@@ -652,10 +654,11 @@ def measure_sound_absorption(
         humidity_pct: float | None = None
     else:
         # A non-numeric humidity becomes NaN here so that it fails the range
-        # test below and is refused by name, instead of dying inside float().
+        # test below and is refused by name, instead of dying inside float():
+        # ValueError for a string, TypeError for a list or a 1-d array.
         try:
             humidity_pct = float(humidity)
-        except ValueError:
+        except (TypeError, ValueError):
             humidity_pct = math.nan
         if not 0.0 <= humidity_pct <= _MAX_RELATIVE_HUMIDITY_PERCENT:
             msg = "'humidity' must be within [0, 100] %."

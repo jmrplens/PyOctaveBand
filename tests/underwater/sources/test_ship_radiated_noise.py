@@ -114,6 +114,13 @@ def test_hydrophone_depths_rejects_a_nested_angle_grid() -> None:
         underwater.hydrophone_depths(100.0, angles=((15.0, 30.0), (45.0, 60.0)))  # type: ignore[arg-type]
 
 
+def test_hydrophone_depths_rejects_a_non_numeric_angle() -> None:
+    # A string element used to escape as numpy's anonymous "could not
+    # convert string to float" instead of naming the parameter.
+    with pytest.raises(ValueError, match="'angles' must be numeric"):
+        underwater.hydrophone_depths(100.0, angles=("bad",))  # type: ignore[arg-type]
+
+
 def test_hydrophone_depths_normalises_a_single_angle() -> None:
     # A bare scalar used to come back 0-d, so the documented per-hydrophone
     # read depths[0] died in numpy; it is normalised to one entry instead.
@@ -159,3 +166,12 @@ def test_monopole_source_level_rejects_a_two_dimensional_frequency_grid() -> Non
     grid = np.array([[100.0, 200.0], [300.0, 400.0]])
     with pytest.raises(ValueError, match="'frequency' must be a non-empty 1-D array"):
         underwater.monopole_source_level(grid, grid, 8.0)
+
+
+def test_monopole_source_level_rejects_non_numeric_inputs() -> None:
+    # Both shared array guards name the parameter a conversion failure sits
+    # in, instead of letting numpy's anonymous error escape.
+    with pytest.raises(ValueError, match="'frequency' must be numeric"):
+        underwater.monopole_source_level(140.0, ("bad",), 8.0)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="'rnl' must be numeric"):
+        underwater.monopole_source_level(("bad",), 125.0, 8.0)  # type: ignore[arg-type]

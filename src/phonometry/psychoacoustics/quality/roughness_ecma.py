@@ -630,6 +630,9 @@ def roughness_ecma(
     if x.size == 0:
         msg = "signal must not be empty"
         raise ValueError(msg)
+    if not np.all(np.isfinite(x)):
+        msg = "'signal_in' must be finite."
+        raise ValueError(msg)
     fs = float(fs)
     if fs <= 0.0:
         msg = "fs must be positive"

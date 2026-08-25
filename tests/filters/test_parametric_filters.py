@@ -227,6 +227,13 @@ def test_time_weighting_rejects_non_numeric_initial_state() -> None:
         filters.time_weighting(x, 48000, mode="fast", initial_state={"a": 1})  # type: ignore[arg-type]
 
 
+def test_time_weighting_rejects_unconvertible_initial_state_array() -> None:
+    """A string array used to get numpy's ValueError, which names nothing."""
+    x = np.ones(10)
+    with pytest.raises(TypeError, match="initial_state must be None"):
+        filters.time_weighting(x, 48000, mode="fast", initial_state=["invalid"])  # type: ignore[arg-type]
+
+
 def test_time_weighting_fast() -> None:
     r"""Verify Fast (125ms) time weighting response to a step.
 

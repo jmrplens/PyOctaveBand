@@ -341,6 +341,37 @@ def test_power_level_rejects_nonpositive_loss_factor() -> None:
         building.structure_borne_power_level(80.0, 1000.0, 10.0, 1.0, [0.01, -0.01])
 
 
+def test_power_level_rejects_non_finite_frequency_and_velocity() -> None:
+    """A NaN slips past a sign check; Formula (14) refuses it by name."""
+    with pytest.raises(
+        ValueError, match="'frequency' must contain positive, finite values"
+    ):
+        building.structure_borne_power_level(80.0, float("nan"), 10.0, 1.0, 0.01)
+    with pytest.raises(
+        ValueError, match="'frequency' must contain positive, finite values"
+    ):
+        building.structure_borne_power_level(80.0, float("inf"), 10.0, 1.0, 0.01)
+    with pytest.raises(
+        ValueError, match="'velocity_level' must contain only finite values"
+    ):
+        building.structure_borne_power_level(
+            [80.0, float("nan")], [500.0, 1000.0], 10.0, 1.0, 0.01
+        )
+
+
+def test_force_and_velocity_levels_reject_non_finite_power_level() -> None:
+    """Formulae (15) and (18) refuse a NaN or infinite power level by name."""
+    for bad in (float("nan"), float("inf")):
+        with pytest.raises(
+            ValueError, match="'power_level' must contain only finite values"
+        ):
+            building.equivalent_blocked_force_level([80.0, bad], [1e-6, 2e-6])
+        with pytest.raises(
+            ValueError, match="'power_level' must contain only finite values"
+        ):
+            building.equivalent_free_velocity_level([80.0, bad], [1e-6, 2e-6])
+
+
 def test_spatial_mean_rejects_empty_nan_and_2d_input() -> None:
     """Formula 12 refuses input its energy mean cannot honestly average."""
     with pytest.raises(ValueError, match="'levels' must be a non-empty 1-D array"):

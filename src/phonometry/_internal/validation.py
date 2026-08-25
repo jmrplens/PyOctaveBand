@@ -95,16 +95,30 @@ def check_engine(engine: str) -> None:
     raise ValueError(msg)
 
 
+def _as_float64(x: ArrayLike, name: str) -> np.ndarray:
+    """Convert *x* to ``float64``, naming the parameter when numpy cannot.
+
+    A string element raises numpy's anonymous "could not convert string to
+    float", and an unconvertible object a bare ``TypeError``; both would
+    escape the array guards below without saying which parameter refused.
+    """
+    try:
+        return np.asarray(x, dtype=np.float64)
+    except (TypeError, ValueError) as exc:
+        msg = f"'{name}' must be numeric."
+        raise ValueError(msg) from exc
+
+
 def require_positive_array(x: ArrayLike, name: str) -> np.ndarray:
     """Coerce *x* to a 1-D float64 array of strictly positive, finite values.
 
     :param x: The input (scalar or 1-D array-like).
     :param name: Parameter name used in the error message.
     :return: The validated ``float64`` array (at least 1-D).
-    :raises ValueError: for an empty, multi-dimensional, non-finite or
-        non-positive input.
+    :raises ValueError: for a non-numeric, empty, multi-dimensional,
+        non-finite or non-positive input.
     """
-    arr = np.atleast_1d(np.asarray(x, dtype=np.float64))
+    arr = np.atleast_1d(_as_float64(x, name))
     if arr.ndim != 1 or arr.size == 0:
         msg = f"'{name}' must be a non-empty 1-D array."
         raise ValueError(msg)
@@ -127,9 +141,10 @@ def require_finite_array(x: ArrayLike, name: str) -> np.ndarray:
     :param x: The input (scalar or 1-D array-like).
     :param name: Parameter name used in the error message.
     :return: The validated ``float64`` array (at least 1-D).
-    :raises ValueError: for an empty, multi-dimensional or non-finite input.
+    :raises ValueError: for a non-numeric, empty, multi-dimensional or
+        non-finite input.
     """
-    arr = np.atleast_1d(np.asarray(x, dtype=np.float64))
+    arr = np.atleast_1d(_as_float64(x, name))
     if arr.ndim != 1 or arr.size == 0:
         msg = f"'{name}' must be a non-empty 1-D array."
         raise ValueError(msg)
@@ -426,7 +441,7 @@ def require_per_band(
     :return: The broadcast ``float64`` array, of ``bands.shape``.
     :raises ValueError: if *x* is neither a scalar nor of ``bands``' length.
     """
-    arr = np.asarray(x, dtype=np.float64)
+    arr = _as_float64(x, name)
     if arr.ndim != 0 and arr.shape != bands.shape:
         msg = (
             f"'{name}' must be a scalar or carry one value per band "
@@ -447,7 +462,7 @@ def require_1d_signal(x: ArrayLike, name: str = "signal") -> np.ndarray:
     :return: The validated ``float64`` array.
     :raises ValueError: for a non-1-D input.
     """
-    arr = np.asarray(x, dtype=np.float64)
+    arr = _as_float64(x, name)
     if arr.ndim != 1:
         msg = (
             f"{name} must be a 1-D time series; got shape {arr.shape}. "

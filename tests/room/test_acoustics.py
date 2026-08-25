@@ -351,6 +351,16 @@ def test_non_positive_fraction_is_refused() -> None:
         room.decay_curve(ir, FS, band=1000.0, fraction=0)
 
 
+def test_non_finite_fraction_is_refused() -> None:
+    # An infinite fraction makes the half-width exactly 1, so the bank would
+    # refuse the equal limits by their name instead of fraction's.
+    ir = exponential_ir(1.0, 1.0)
+    with pytest.raises(ValueError, match="'fraction' must be positive"):
+        room.decay_curve(ir, FS, band=1000.0, fraction=float("inf"))
+    with pytest.raises(ValueError, match="'fraction' must be positive"):
+        room.decay_curve(ir, FS, band=1000.0, fraction=float("nan"))
+
+
 def test_non_finite_limits_are_refused() -> None:
     ir = exponential_ir(1.0, 1.0)
     with pytest.raises(ValueError, match="'limits' must contain only finite"):
