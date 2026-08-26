@@ -618,7 +618,7 @@ def test_a_non_finite_response_axis_no_longer_reaches_the_fiche(
     axis[10] = float("nan")
     out = tmp_path / "non_finite_axis.pdf"
     with pytest.raises(ValueError, match=r"'frequencies' must contain only finite"):
-        dataclasses.replace(result, frequencies=axis).report(str(out))
+        dataclasses.replace(result, frequencies=axis)
     assert not out.exists()
 
 
@@ -669,7 +669,7 @@ def test_a_non_finite_sensitivity_no_longer_reaches_the_fiche(
     result = _example_result()
     out = tmp_path / "non_finite_sensitivity.pdf"
     with pytest.raises(ValueError, match=r"'sensitivity_mv_per_pa' must be finite"):
-        dataclasses.replace(result, sensitivity_mv_per_pa=float("nan")).report(str(out))
+        dataclasses.replace(result, sensitivity_mv_per_pa=float("nan"))
     assert not out.exists()
 
 
@@ -685,7 +685,7 @@ def test_a_non_finite_polar_frequency_no_longer_reaches_the_fiche(
     result = _example_result()
     out = tmp_path / "non_finite_polar_frequency.pdf"
     with pytest.raises(ValueError, match=r"'polar_frequency' must be finite"):
-        dataclasses.replace(result, polar_frequency=float("nan")).report(str(out))
+        dataclasses.replace(result, polar_frequency=float("nan"))
     assert not out.exists()
 
 
@@ -721,15 +721,12 @@ def test_a_weighting_outside_iec_60268_1_is_refused_at_construction(
     1 unclosed tags``, naming neither the field nor the result.
     """
     f, rel = _flat_response()
+    noise = electroacoustics.MicrophoneNoise(
+        equivalent_level_db=14.0, weighting=weighting
+    )
     with pytest.raises(ValueError, match=r"'noise_weighting' must be one of"):
         electroacoustics.microphone_characteristics(
-            f,
-            rel,
-            _M_MV,
-            tolerance_db=_TOL,
-            noise=electroacoustics.MicrophoneNoise(
-                equivalent_level_db=14.0, weighting=weighting
-            ),
+            f, rel, _M_MV, tolerance_db=_TOL, noise=noise
         )
 
 

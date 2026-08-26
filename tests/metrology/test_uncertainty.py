@@ -545,7 +545,6 @@ def test_monte_carlo_rejects_model_with_non_finite_output() -> None:
     def partial_model(x: np.ndarray) -> np.ndarray:
         return np.where(x < 0.0, np.nan, 0.0)
 
+    inputs = [u.Quantity(0.0, 1.0, name="x")]
     with pytest.raises(ValueError, match=r"'model' returned a non-finite output"):
-        u.monte_carlo(
-            partial_model, [u.Quantity(0.0, 1.0, name="x")], trials=2000, seed=1
-        )
+        u.monte_carlo(partial_model, inputs, trials=2000, seed=1)

@@ -700,10 +700,9 @@ def test_an_assessment_over_no_period_is_refused() -> None:
     with no rows before the figure gave up with an ``IndexError`` about
     axis 0 of size 0.
     """
+    limits = rd.activity_limits("a")
     with pytest.raises(ValueError, match="'periods' must carry at least one"):
-        rd.ActivityAssessment(
-            periods=(), limits=rd.activity_limits("a"), new_activity=False
-        )
+        rd.ActivityAssessment(periods=(), limits=limits, new_activity=False)
 
 
 def test_long_term_level_validation() -> None:

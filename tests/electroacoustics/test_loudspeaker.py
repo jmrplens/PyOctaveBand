@@ -507,7 +507,7 @@ def test_a_non_finite_response_axis_no_longer_reaches_the_fiche(
     axis[10] = float("nan")
     out = tmp_path / "non_finite_axis.pdf"
     with pytest.raises(ValueError, match=r"'frequencies' must contain only finite"):
-        dataclasses.replace(result, frequencies=axis).report(str(out))
+        dataclasses.replace(result, frequencies=axis)
     assert not out.exists()
 
 
@@ -554,9 +554,7 @@ def test_a_non_finite_sensitivity_level_no_longer_reaches_the_verdict(
     result = _example_result()
     out = tmp_path / "non_finite_sensitivity_level.pdf"
     with pytest.raises(ValueError, match=r"'sensitivity_level_db' must be finite"):
-        dataclasses.replace(result, sensitivity_level_db=float("nan")).report(
-            str(out), metadata=ReportMetadata(requirement=86.0)
-        )
+        dataclasses.replace(result, sensitivity_level_db=float("nan"))
     assert not out.exists()
 
 
@@ -572,7 +570,7 @@ def test_a_non_finite_resonance_frequency_no_longer_reaches_the_fiche(
     result = _example_result()
     out = tmp_path / "non_finite_resonance.pdf"
     with pytest.raises(ValueError, match=r"'resonance_frequency' must be finite"):
-        dataclasses.replace(result, resonance_frequency=float("nan")).report(str(out))
+        dataclasses.replace(result, resonance_frequency=float("nan"))
     assert not out.exists()
 
 
