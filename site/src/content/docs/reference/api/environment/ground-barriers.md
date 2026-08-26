@@ -478,6 +478,12 @@ difference annotated. Distances follow
 
 **Returns:** The axes.
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a height that is not finite and non-negative, a distance that is not finite and positive, a receiver no further than the barrier, or a non-positive thickness. |
+
 ## spherical_reflection_coefficient
 
 ```python

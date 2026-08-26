@@ -249,7 +249,7 @@ Requires matplotlib (`pip install phonometry[plot]`); returns the
 | Name | Description |
 | :--- | :--- |
 | `ax` | Existing axes, or `None` to create a figure. |
-| `max_order` | Highest reflection order drawn; `None` draws up to order 3 (or the result's own maximum if lower), and `0` draws the direct sound only. |
+| `max_order` | Highest reflection order drawn; `None` draws up to order 3 (or the result's own maximum if lower). |
 | `language` | Label language, `"en"` (default) or `"es"`. |
 | `kwargs` | Forwarded to the room-outline rectangle. |
 

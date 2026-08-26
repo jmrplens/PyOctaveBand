@@ -836,6 +836,12 @@ side `sqrt(S_out)`) and the wall area is annotated.
 
 **Returns:** The axes.
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | naming the first of the three that is not finite and positive, or for an angle outside `[0, pi/2)`. |
+
 ## room_effect
 
 ```python

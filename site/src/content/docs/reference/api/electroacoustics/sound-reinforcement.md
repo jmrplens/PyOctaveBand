@@ -286,4 +286,4 @@ and a listener 20 m from the loudspeaker cannot share one usable scale.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If any distance is not positive and finite. |
+| ValueError | naming the first distance that is not finite and positive. |
