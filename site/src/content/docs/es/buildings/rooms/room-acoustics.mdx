@@ -578,12 +578,15 @@ $T_{30}$ de las octavas de 500 Hz y 1000 Hz, el descriptor habitual de la sala)
 con el EDT de medias al lado, y un pie con el descargo de responsabilidad fijo.
 La ISO 3382-1/-2 son normas de **caracterización** sin cumple/no cumple intrínseco,
 por lo que solo aparece una fila de veredicto cuando se aporta un tiempo de
-reverberación de medias objetivo mediante el campo `requirement` de los
-metadatos (`ReportMetadata(requirement=...)`, leído como el $T_\text{mid}$
-máximo aceptable, la forma habitual de un límite de aula u oficina diáfana). Un
-resultado de banda ancha no tiene octavas de 500 Hz / 1000 Hz que promediar, de
-modo que su recuadro y su veredicto recurren al $T_{30}$ de banda ancha sin
-afirmación de «500-1000 Hz». Usa el mismo contenedor `ReportMetadata` y el
+reverberación objetivo mediante el campo `requirement` de los
+metadatos (`ReportMetadata(requirement=...)`, leído como el valor máximo
+aceptable del descriptor que lleve el recuadro, la forma habitual de un límite
+de aula u oficina diáfana). Un resultado de banda ancha no tiene octavas de
+500 Hz / 1000 Hz que promediar, de modo que su recuadro y su veredicto recurren
+al $T_{30}$ de banda ancha sin afirmación de «500-1000 Hz», y otro tanto le
+ocurre a un rango de bandas que no alcance esas dos octavas y a uno que sí las
+alcance con un $T_{30}$ no evaluable en alguna de ellas, que recurren a la
+primera banda cuyo $T_{30}$ haya podido evaluarse. Usa el mismo contenedor `ReportMetadata` y el
 mismo motor de
 renderizado que la
 [ficha de absorción ISO
