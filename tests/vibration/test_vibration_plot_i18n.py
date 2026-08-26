@@ -240,6 +240,40 @@ def test_a_measured_spectrum_of_two_lengths_is_refused_by_the_overlay() -> None:
         res.plot(spectrum=mismatched)
 
 
+@pytest.mark.parametrize(
+    ("label", "shape"),
+    [("empty", (0,)), ("bare numbers", ()), ("a grid", (3, 2))],
+)
+def test_a_spectrum_that_is_not_a_run_of_bins_is_refused(
+    label: str, shape: tuple[int, ...]
+) -> None:
+    """What the equal-shape pin beside this one cannot see.
+
+    That pin compares the two shapes against each other, so a pair that
+    agrees walks past it whatever the shape is: two bare numbers agree on the
+    empty shape and two grids agree on both of theirs. Only the empty pair
+    announced itself, and anonymously, as numpy's "zero-size array to
+    reduction operation maximum which has no identity" from the axis scaling.
+    The other two drew: the numbers as a single point under limits matplotlib
+    widened for being singular, the grid as one line per column over an axis
+    that was never measured on them.
+    """
+    pytest.importorskip("matplotlib")
+    import matplotlib as mpl
+
+    mpl.use("Agg")
+
+    res = vibration.bearing_fault_frequencies(
+        2000.0, 15, 6.0, 34.0, contact_angle_deg=12.96
+    )
+    malformed = SimpleNamespace(frequencies=np.zeros(shape), amplitude=np.zeros(shape))
+    with pytest.raises(
+        ValueError,
+        match=r"'spectrum\.frequencies' must be a non-empty one-dimensional",
+    ):
+        res.plot(spectrum=malformed)
+
+
 def test_the_overlay_scales_its_amplitude_axis_to_the_measured_peak() -> None:
     """The refusal sits in front of the measurement, which still sets the axis.
 

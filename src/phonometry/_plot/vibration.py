@@ -930,6 +930,22 @@ def plot_fault_frequencies(
     if spectrum is not None:
         spectrum_f = np.asarray(spectrum.frequencies, dtype=np.float64)
         spectrum_a = np.asarray(spectrum.amplitude, dtype=np.float64)
+        # A spectrum is a run of bins, and the equal-shape pin below cannot
+        # say so on its own: two bare numbers agree on the empty shape and two
+        # grids agree on both of theirs, so either pair walks past it. An
+        # empty pair then reaches ``np.max`` and stops the render with numpy's
+        # own "zero-size array to reduction operation maximum which has no
+        # identity", while a pair of numbers and a pair of grids are drawn in
+        # silence: the first as a single point under axis limits matplotlib
+        # has to widen for being singular, the second as one line per column
+        # over an axis that was never measured on them.
+        for field, values in (("frequencies", spectrum_f), ("amplitude", spectrum_a)):
+            if values.ndim != 1 or values.size == 0:
+                msg = (
+                    f"'spectrum.{field}' must be a non-empty one-dimensional "
+                    f"run of frequency bins; got shape {values.shape}."
+                )
+                raise ValueError(msg)
         # One amplitude per frequency bin, because the curve is drawn from the
         # mask ``frequencies <= f_max`` applied to both: a shorter amplitude
         # gets indexed by a mask built on the longer axis and numpy stops the
