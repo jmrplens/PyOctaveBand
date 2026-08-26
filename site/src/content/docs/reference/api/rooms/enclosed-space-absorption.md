@@ -173,6 +173,12 @@ Reverberation time from the equivalent absorption area (Formula 5).
 
 **Returns:** The reverberation time $T = \frac{55.3}{c_0} \frac{V (1 - \psi)}{A}$, s.
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | if `absorption_area` is not positive and finite. |
+
 ## ReverberationResult
 
 ```python
