@@ -884,6 +884,64 @@ def _draw_fault_lines(
     return band
 
 
+def _measured_spectrum_vectors(
+    spectrum: _SpectrumLike,
+) -> tuple[np.ndarray, np.ndarray]:
+    """The two vectors of ``spectrum``, measured before either scales an axis.
+
+    ``spectrum`` is a structural contract, anything exposing the two vectors,
+    so there is no construction of ours to pin it at and the refusals belong
+    where the caller's parameter is named. Our own producer,
+    :func:`phonometry.signals.envelope.envelope_spectrum`, satisfies all three
+    of them, which is why every mistake here is in what the caller assembled.
+
+    Each check answers a failure the next one cannot see. **A run of bins** is
+    what the equal-shape pin cannot ask for on its own, since two bare numbers
+    agree on the empty shape and two grids agree on both of theirs: an empty
+    pair then dies in the axis scaling as numpy's own "zero-size array to
+    reduction operation maximum which has no identity", while the numbers and
+    the grid are drawn in silence, the first as a single point under limits
+    matplotlib widens for being singular, the second as one line per column
+    over an axis that was never measured on them. **One amplitude per bin**,
+    because the curve is drawn from the mask ``frequencies <= f_max`` applied
+    to both, and a shorter amplitude indexed by a mask built on the longer
+    axis stops the render with "boolean index did not match indexed array".
+    **Finite throughout**, because both vectors scale an axis with ``np.max``,
+    so one non-finite sample becomes the whole limit and matplotlib refuses it
+    with "Axis limits cannot be NaN or Inf". None of those three names this
+    argument or the field inside it.
+
+    :param spectrum: The measured spectrum drawn under the fault lines.
+    :returns: Its frequency and amplitude vectors, as ``float64``.
+    :raises ValueError: if either vector is not a non-empty one-dimensional
+        run of bins, if the two disagree in shape, or if either carries a
+        non-finite sample.
+    """
+    frequencies = np.asarray(spectrum.frequencies, dtype=np.float64)
+    amplitude = np.asarray(spectrum.amplitude, dtype=np.float64)
+    vectors = (("frequencies", frequencies), ("amplitude", amplitude))
+    for field, values in vectors:
+        if values.ndim != 1 or values.size == 0:
+            msg = (
+                f"'spectrum.{field}' must be a non-empty one-dimensional "
+                f"run of frequency bins; got shape {values.shape}."
+            )
+            raise ValueError(msg)
+    require_equal_shapes(
+        "FaultFrequencyResult.plot",
+        {
+            "spectrum.frequencies": frequencies.shape,
+            "spectrum.amplitude": amplitude.shape,
+        },
+        "frequency bin",
+    )
+    for field, values in vectors:
+        if not np.all(np.isfinite(values)):
+            msg = f"'spectrum.{field}' must contain only finite values."
+            raise ValueError(msg)
+    return frequencies, amplitude
+
+
 def plot_fault_frequencies(
     result: FaultFrequencyResult,
     ax: Axes | None = None,
@@ -928,52 +986,7 @@ def plot_fault_frequencies(
     f_max = max_frequency
     spectrum_f = spectrum_a = None
     if spectrum is not None:
-        spectrum_f = np.asarray(spectrum.frequencies, dtype=np.float64)
-        spectrum_a = np.asarray(spectrum.amplitude, dtype=np.float64)
-        # A spectrum is a run of bins, and the equal-shape pin below cannot
-        # say so on its own: two bare numbers agree on the empty shape and two
-        # grids agree on both of theirs, so either pair walks past it. An
-        # empty pair then reaches ``np.max`` and stops the render with numpy's
-        # own "zero-size array to reduction operation maximum which has no
-        # identity", while a pair of numbers and a pair of grids are drawn in
-        # silence: the first as a single point under axis limits matplotlib
-        # has to widen for being singular, the second as one line per column
-        # over an axis that was never measured on them.
-        for field, values in (("frequencies", spectrum_f), ("amplitude", spectrum_a)):
-            if values.ndim != 1 or values.size == 0:
-                msg = (
-                    f"'spectrum.{field}' must be a non-empty one-dimensional "
-                    f"run of frequency bins; got shape {values.shape}."
-                )
-                raise ValueError(msg)
-        # One amplitude per frequency bin, because the curve is drawn from the
-        # mask ``frequencies <= f_max`` applied to both: a shorter amplitude
-        # gets indexed by a mask built on the longer axis and numpy stops the
-        # render with "boolean index did not match indexed array", naming
-        # neither this argument nor the field inside it. Our own producer pins
-        # the pair in EnvelopeSpectrumResult.__post_init__, so a mismatch can
-        # only arrive through the structural contract, from an object the
-        # caller assembled.
-        require_equal_shapes(
-            "FaultFrequencyResult.plot",
-            {
-                "spectrum.frequencies": spectrum_f.shape,
-                "spectrum.amplitude": spectrum_a.shape,
-            },
-            "frequency bin",
-        )
-        # Both vectors scale the axes: the frequency axis runs to the top of
-        # the measured one and the amplitude axis to its peak, taken with
-        # np.max so that a single non-finite sample becomes the whole limit.
-        # matplotlib then refuses it with "Axis limits cannot be NaN or Inf",
-        # naming neither this argument nor the field inside it. No producer
-        # emits one -- envelope_spectrum refuses a non-finite record before it
-        # transforms it -- so the mistake is always in what the caller built,
-        # and the refusal says which half of it.
-        for field, values in (("frequencies", spectrum_f), ("amplitude", spectrum_a)):
-            if not np.all(np.isfinite(values)):
-                msg = f"'spectrum.{field}' must contain only finite values."
-                raise ValueError(msg)
+        spectrum_f, spectrum_a = _measured_spectrum_vectors(spectrum)
         if f_max is None:
             f_max = float(spectrum_f.max())
     if f_max is None:
