@@ -758,22 +758,39 @@ class DbHrCheck:
     def __post_init__(self) -> None:
         """Reject a check whose verdict contradicts its own comparison.
 
-        The three derived fields are one statement made three ways: the
-        margin is the rounded value against the limit, signed by the
-        requirement's direction, and ``complies`` is that margin's sign. The
-        assessment figure colours each check by ``complies`` alone, so a
-        check built by hand with the flag inverted would not fail anywhere;
-        it would paint a value short of its limit in the compliant colour,
-        beside a stem whose very geometry says otherwise.
+        The three derived fields are one statement made three ways:
+        ``reported`` is the achieved value rounded as DB-HR prescribes for
+        the quantity, the margin is that rounded value against the limit,
+        signed by the requirement's direction, and ``complies`` is that
+        margin's sign. The assessment figure colours each check by
+        ``complies`` alone and draws its stem to ``reported``, so a check
+        built by hand with the flag inverted, or with a ``reported`` its
+        own ``value`` never rounds to, would not fail anywhere; it would
+        paint a value short of its limit in the compliant colour, beside a
+        stem whose very geometry says otherwise.
 
-        The margin comparison allows a billionth of a decibel so a caller
-        who recomputed it along another floating-point path is not refused
-        over the last bit; the compliance slack below is DB-HR's own
-        boundary, the one :func:`check_db_hr_requirement` applies.
+        The rounding and margin comparisons allow a billionth of a decibel
+        so a caller who recomputed them along another floating-point path is
+        not refused over the last bit; the compliance slack below is DB-HR's
+        own boundary, the one :func:`check_db_hr_requirement` applies.
 
-        :raises ValueError: if ``margin`` does not restate ``reported``
-            against the limit, or ``complies`` contradicts ``margin``.
+        :raises ValueError: if ``value`` is not finite, ``reported`` does not
+            round ``value`` to the requirement's decimals, ``margin`` does not
+            restate ``reported`` against the limit, or ``complies``
+            contradicts ``margin``.
         """
+        if not math.isfinite(self.value):
+            msg = f"DbHrCheck: 'value' must be finite; got {self.value!r}."
+            raise ValueError(msg)
+        rounded = _round_half_up(self.value, self.requirement.decimals)
+        if not math.isclose(self.reported, rounded, rel_tol=0.0, abs_tol=1e-9):
+            msg = (
+                "DbHrCheck: 'reported' must be 'value' rounded half-up to "
+                f"{self.requirement.decimals} decimal(s), the form DB-HR "
+                f"prescribes for the quantity; got {self.reported!r} where "
+                f"'value' {self.value!r} rounds to {rounded!r}."
+            )
+            raise ValueError(msg)
         expected = (
             self.reported - self.requirement.limit
             if self.requirement.direction == "min"

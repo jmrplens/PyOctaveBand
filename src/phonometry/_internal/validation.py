@@ -438,15 +438,37 @@ def require_finite_fields(owner: object, *fields: str) -> None:
     ``None`` fields are skipped: an absent optional quantity is not a
     non-finite one.
 
+    A complex field is measured on both of its axes. Casting one to
+    ``float64`` to run the check would drop the imaginary part on the way in,
+    so a transfer stiffness whose damping term came back ``NaN`` beside an
+    intact real part passed the guard untouched, and the phase quantities
+    computed from it -- a magnitude, a loss factor -- carried the ``NaN``
+    onward as though it had been measured. ``np.isfinite`` already reads a
+    complex number as finite only when both components are, so the cast is
+    made only for the fields that are not complex to begin with.
+
+    That cast is also what refuses a field that is not numeric at all, and it
+    is kept for the sake of it: a string or an object array reaches
+    ``np.isfinite`` as an anonymous ``TypeError`` raised from inside numpy,
+    which names neither the field nor the result and is not the
+    ``ValueError`` this guard documents.
+
     :param owner: The instance whose fields are measured.
     :param fields: Field names that must be finite throughout.
-    :raises ValueError: if a field carries a ``NaN`` or an infinity.
+    :raises ValueError: if a field carries a ``NaN`` or an infinity, or is
+        not numeric.
     """
     for name in fields:
         value = getattr(owner, name)
         if value is None:
             continue
-        array = np.asarray(value, dtype=np.float64)
+        try:
+            array = np.asarray(value)
+            if array.dtype.kind != "c":
+                array = array.astype(np.float64)
+        except (TypeError, ValueError) as exc:
+            msg = f"{type(owner).__name__}: '{name}' must be numeric."
+            raise ValueError(msg) from exc
         if np.all(np.isfinite(array)):
             continue
         what = "be finite" if array.ndim == 0 else "contain only finite values"

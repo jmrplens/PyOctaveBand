@@ -223,7 +223,7 @@ def plot_facade_elements(
 
     Each element of :func:`~phonometry.building.facade_sound_reduction` is a
     tile whose drawn area equals its real area (small-area elements without
-    an area, such as airbriks rated by ``dn_e``, get a nominal 0,1 m2 tile).
+    an area, such as airbricks rated by ``dn_e``, get a nominal 0,1 m2 tile).
 
     :param elements: The
         :class:`~phonometry.building.FacadeElement` sequence.
@@ -231,8 +231,9 @@ def plot_facade_elements(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the first element rectangle.
     :return: The axes.
-    :raises ValueError: for an empty sequence, or an element whose area is
-        not finite and positive.
+    :raises ValueError: for an empty sequence, or an element that supplies an
+        ``area`` which is not positive and finite. An element with no ``area``
+        at all is the nominal tile above, not a refusal.
     """
     _check_language(language)
     tiles = list(elements)
@@ -347,7 +348,7 @@ def plot_double_wall_geometry(
     :param kwargs: Forwarded to the leaf rectangles.
     :return: The axes.
     :raises ValueError: naming the first of the three that is not finite and
-        positive, or a non-positive resonance frequency.
+        positive, or ``resonance_frequency`` when one is passed that is not.
     """
     _check_language(language)
     require_positive(mass1, "mass1")

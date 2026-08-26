@@ -21,6 +21,7 @@ refused according to a coincidence between its bands.
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -35,6 +36,7 @@ from phonometry._internal.validation import (
     require_1d_signal,
     require_equal_shapes,
     require_finite_array,
+    require_finite_fields,
     require_per_band,
     require_positive_array,
     require_ranks,
@@ -263,3 +265,76 @@ def test_garbage_input_is_refused_naming_the_parameter(
     for garbage in (("bad",), object(), {"a": 1}):
         with pytest.raises(ValueError, match="'x' must be numeric"):
             validator(garbage, "x", *args)
+
+
+# ---------------------------------------------------------------------------
+# The finite guard reads both axes of a complex field
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize("bad", [complex(2.0, np.nan), complex(2.0, np.inf)])
+def test_a_non_finite_imaginary_part_is_refused(bad: complex) -> None:
+    """A complex field is undetermined when either of its axes is.
+
+    Casting to ``float64`` to run the check discarded the imaginary part on
+    the way in, so a value whose real part was intact passed whatever its
+    phase held. The quantities read off such a field are exactly the ones
+    that live on the discarded axis -- a magnitude, a loss factor -- and they
+    took the ``NaN`` on as a measured number.
+    """
+    result = _Result(first=np.array([complex(1.0, 1.0), bad]))
+    with pytest.raises(ValueError, match="'first' must contain only finite values"):
+        require_finite_fields(result, "first")
+
+
+@pytest.mark.parametrize("bad", [complex(2.0, np.nan), complex(2.0, np.inf)])
+def test_a_lone_complex_scalar_is_measured_on_both_axes_too(bad: complex) -> None:
+    """The nought-dimensional case takes the scalar wording, not the array one."""
+    result = _Result(first=bad)
+    with pytest.raises(ValueError, match="'first' must be finite"):
+        require_finite_fields(result, "first")
+
+
+def test_a_finite_complex_field_is_admitted_intact() -> None:
+    """The guard must not complain about the phase it now reads.
+
+    Numpy announced the discarded imaginary part as a ``ComplexWarning`` on
+    every construction, valid data included; that warning was the tell, and
+    a suite run under ``-W error`` would have caught the defect years sooner.
+    Pin its absence, so the cast cannot come back unnoticed.
+    """
+    result = _Result(first=np.array([complex(1.0, 2.0), complex(3.0, -4.0)]))
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        require_finite_fields(result, "first")
+
+
+@pytest.mark.parametrize(
+    ("label", "value"),
+    [
+        ("scalar", np.nan),
+        ("array", np.array([1.0, np.inf])),
+    ],
+)
+def test_the_real_wording_is_unchanged(label: str, value: object) -> None:
+    """The messages a hundred result types already pin, said the same way.
+
+    Only the complex branch is new; a real field must still reach the same
+    two sentences, chosen by rank, with the owning type in front of them.
+    """
+    what = "be finite" if label == "scalar" else "contain only finite values"
+    result = _Result(first=value)
+    with pytest.raises(ValueError, match=rf"_Result: 'first' must {what}\."):
+        require_finite_fields(result, "first")
+
+
+def test_a_non_numeric_field_is_refused_naming_the_field() -> None:
+    """Dropping the cast must not drop what the cast also refused.
+
+    Coercion is what kept a string or an object out, and it answered for it
+    badly: numpy's own "could not convert string to float" for the one and a
+    bare ``TypeError``, not the documented ``ValueError``, for the other,
+    neither naming the field nor the result it sits on.
+    """
+    for garbage in ("abc", np.array(["a", "b"]), object(), [object()]):
+        result = _Result(first=garbage)
+        with pytest.raises(ValueError, match="_Result: 'first' must be numeric"):
+            require_finite_fields(result, "first")

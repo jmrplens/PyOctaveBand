@@ -457,7 +457,7 @@ def test_exposure_assessment_wbv_a8_and_vdv() -> None:
 
 
 def test_exposure_assessment_invalid() -> None:
-    with pytest.raises(ValueError, match="kind"):
+    with pytest.raises(ValueError, match="kind must be 'hav' or 'wbv'"):
         hv.exposure_assessment(1.0, kind="hav", metric="vdv")
     with pytest.raises(ValueError, match="non-negative"):
         hv.exposure_assessment(-1.0, kind="hav")
@@ -640,6 +640,48 @@ def test_an_assessment_refuses_an_unknown_tag(
             exceeds_limit=False,
             zone="action",
         )
+
+
+def test_an_assessment_refuses_a_hand_arm_vdv_pair() -> None:
+    """Each tag is valid alone; the pair ``"hav"``/``"vdv"`` is not.
+
+    The vibration dose value is a whole-body quantity only, so there are no
+    hand-arm VDV action and limit values to assess against. Built directly,
+    that pair used to render a fiche headed by the hand-arm ISO standard
+    whose thresholds, zone and verdict all came from the whole-body VDV
+    values: an ``A(8)`` of 3,5 m/s2, well above the 2,5 m/s2 hand-arm EAV,
+    printed "below the exposure action value" and passed against
+    21 m/s^1,75. The entry point refuses the pair, so the dataclass must
+    refuse it with the same message.
+    """
+    # The whole-body half of the pair stays constructible: the guard pins the
+    # combination, not the metric.
+    whole_body = hv.ExposureAssessment(
+        value=3.5,
+        kind="wbv",
+        metric="vdv",
+        action_value=hv.WBV_EAV_VDV,
+        limit_value=hv.WBV_ELV_VDV,
+        exceeds_action=False,
+        exceeds_limit=False,
+        zone="below action",
+    )
+    assert whole_body.metric == "vdv"
+
+    with pytest.raises(ValueError, match="kind must be 'hav' or 'wbv'") as direct:
+        hv.ExposureAssessment(
+            value=3.5,
+            kind="hav",
+            metric="vdv",
+            action_value=hv.WBV_EAV_VDV,
+            limit_value=hv.WBV_ELV_VDV,
+            exceeds_action=False,
+            exceeds_limit=False,
+            zone="below action",
+        )
+    with pytest.raises(ValueError, match="kind must be 'hav' or 'wbv'") as entry:
+        hv.exposure_assessment(3.5, kind="hav", metric="vdv")
+    assert str(direct.value) == str(entry.value)
 
 
 @pytest.mark.parametrize("magnitude", [float("nan"), float("inf")], ids=["nan", "inf"])

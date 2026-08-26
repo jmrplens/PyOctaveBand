@@ -293,9 +293,10 @@ def test_metadiffuser_panel_geometry_refuses_a_nan_depth() -> None:
 
 
 def test_slit_absorber_geometry_refuses_a_nan_lattice_step() -> None:
+    resonator = _resonator()
     with pytest.raises(ValueError, match="'lattice_step' must be positive"):
         m.plot_slit_absorber_geometry(
-            _resonator(),
+            resonator,
             slit_height=0.002,
             lattice_step=float("nan"),
             period=0.02,

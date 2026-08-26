@@ -697,6 +697,53 @@ def test_diffusion_result_rejects_a_non_finite_coefficient() -> None:
         )
 
 
+@pytest.mark.parametrize("bad", [float("nan"), float("inf")])
+def test_diffusion_result_rejects_an_unreadable_level(bad: float) -> None:
+    """A NaN or ``+inf`` receiver level is refused at construction.
+
+    Neither is a reading: ``+inf`` is an infinite reflected energy and a NaN is
+    no measurement at all, and nothing in the module flags an undetermined
+    receiver, so neither is a sentinel to be carried. Unpinned they reach the
+    ``L`` column of the accredited polar table as the literal ``inf``/``nan``,
+    and the polar plot drops the vertex silently, drawing the lobe through the
+    wrong receivers.
+    """
+    levels = np.array([70.0, bad, 69.0])
+    with pytest.raises(
+        ValueError, match=r"DiffusionResult: 'levels' must be finite, or -inf"
+    ):
+        DiffusionResult(
+            angles=np.array([-30.0, 0.0, 30.0]),
+            levels=levels,
+            coefficient=0.5,
+        )
+
+
+def test_diffusion_result_admits_a_silent_receiver() -> None:
+    """``-inf`` is the level of a receiver with no scattered energy, so it passes.
+
+    Its energy ``10 ** (L / 10)`` is 0, the neutral element of both sums of
+    Formula (5)/(6): the coefficient stays ordinary and finite, so the guard
+    above must let this response through and the fiche must keep printing it.
+    """
+    angles = np.array([-30.0, 0.0, 30.0])
+    levels = np.array([70.0, -np.inf, 69.0])
+
+    result = directional_diffusion(angles, levels)
+
+    assert math.isfinite(result.coefficient)
+    assert result.levels[1] == -np.inf
+    # Formula (5) with p_2 = 0 collapses to p_1 p_3 / (p_1^2 + p_3^2). The
+    # silent receiver still counts in n, so this is half the value the two
+    # energetic receivers would give on their own: dropping it would be a
+    # different measurement, not the same one written shorter.
+    p_1, p_3 = 10.0**7.0, 10.0**6.9
+    assert result.coefficient == pytest.approx(p_1 * p_3 / (p_1**2 + p_3**2))
+    assert result.coefficient == pytest.approx(
+        0.5 * directional_diffusion_coefficient([70.0, 69.0])
+    )
+
+
 def test_directional_diffusion_plot_returns_axes() -> None:
     import matplotlib as mpl
 

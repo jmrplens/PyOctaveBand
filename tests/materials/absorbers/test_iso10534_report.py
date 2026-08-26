@@ -147,10 +147,11 @@ def test_short_per_frequency_array_rejected(field: str) -> None:
     at all.
     """
     result = _result()
+    short = {field: getattr(result, field)[:-1]}
     with pytest.raises(
         ValueError, match=rf"'{field}'.*must each carry one value per frequency"
     ):
-        dataclasses.replace(result, **{field: getattr(result, field)[:-1]})
+        dataclasses.replace(result, **short)
 
 
 @pytest.mark.parametrize(

@@ -219,8 +219,9 @@ def plot_open_plan_geometry(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the microphone scatter.
     :return: The axes.
-    :raises ValueError: for fewer than two positions, or a position that is
-        not a finite, strictly positive distance.
+    :raises ValueError: for an input that is not one-dimensional, for fewer
+        than two positions, or for a position that is not a finite, strictly
+        positive distance.
     """
     _check_language(language)
     # Through the shared array guard rather than a bare ``pos <= 0.0``: every
@@ -228,8 +229,11 @@ def plot_open_plan_geometry(
     # guard and came out as a span dimension reading 'nan m' with the
     # workstation blocks silently missing. ISO 3382-3 positions are measured
     # distances from the source, and the one producer,
-    # :func:`~phonometry.room.open_plan_metrics`, pins them finite already.
-    pos = np.sort(require_positive_array(np.ravel(positions), "positions"))
+    # :func:`~phonometry.room.open_plan_metrics`, pins them finite and 1-D
+    # already. The guard sees the argument as given, unflattened: a ravel
+    # ahead of it would turn a grid of shape (2, 2) into four microphones on
+    # a line that was never measured, instead of refusing the extra axis.
+    pos = np.sort(require_positive_array(positions, "positions"))
     if pos.size < 2:  # noqa: PLR2004
         msg = "'positions' needs at least two positive distances."
         raise ValueError(msg)

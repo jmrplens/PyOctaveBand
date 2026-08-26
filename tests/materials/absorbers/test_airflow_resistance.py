@@ -171,6 +171,51 @@ def test_a_non_finite_determination_quantity_is_refused(field_name: str) -> None
         dataclasses.replace(result, **{field_name: float("nan")})
 
 
+@pytest.mark.parametrize(
+    "field_name",
+    [
+        "resistance",
+        "specific_resistance",
+        "evaluation_velocity",
+        "pressure_drop",
+        "linear_coefficient",
+        "quadratic_coefficient",
+    ],
+)
+def test_an_absent_required_determination_quantity_is_refused(field_name: str) -> None:
+    """Six of the seven quantities are typed ``float`` and always determined.
+
+    A finite check has to let ``None`` past, since an absent quantity is not a
+    non-finite one, so a ``None`` in one of the six survives construction and
+    surfaces only much later: the fiche raises a bare ``TypeError: float()
+    argument must be a string or a real number, not 'NoneType'`` from inside a
+    display rounder, and the plot ``unsupported format string passed to
+    NoneType.__format__``, neither naming the field nor the result.
+    """
+    import dataclasses
+
+    u = np.array([0.5e-3, 1.0e-3, 2.0e-3, 4.0e-3])
+    result = static_airflow_resistance(u, 12000.0 * u, 0.008, 0.05)
+    with pytest.raises(
+        ValueError, match=f"StaticAirflowResult: '{field_name}' must not be None"
+    ):
+        dataclasses.replace(result, **{field_name: None})
+
+
+def test_an_absent_resistivity_is_accepted() -> None:
+    """The one quantity a determination may legitimately leave undetermined.
+
+    ``resistivity`` is typed ``float | None`` and is absent whenever no
+    specimen thickness was supplied, so the construction guard must let it
+    through where it pins the other six.
+    """
+    import dataclasses
+
+    u = np.array([0.5e-3, 1.0e-3, 2.0e-3, 4.0e-3])
+    result = static_airflow_resistance(u, 12000.0 * u, 0.008, 0.05)
+    assert dataclasses.replace(result, resistivity=None).resistivity is None
+
+
 def test_static_resistivity_is_none_without_thickness() -> None:
     u = np.array([1.0e-3, 2.0e-3, 4.0e-3])
     dp = 12000.0 * u

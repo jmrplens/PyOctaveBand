@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import numpy as np
 import pytest
 
@@ -198,6 +200,44 @@ def test_a_non_finite_measured_spectrum_is_refused_by_field(field: str) -> None:
         ValueError, match=f"'spectrum.{field}' must contain only finite"
     ):
         res.plot(spectrum=bad)
+
+
+def test_a_measured_spectrum_of_two_lengths_is_refused_by_the_overlay() -> None:
+    """One amplitude per frequency bin, named where the caller's parameter is.
+
+    The curve is drawn from ``frequencies <= max_frequency`` applied to both
+    vectors, so an amplitude shorter than its own axis is indexed by a mask
+    built on the longer one and numpy ends the render with "boolean index did
+    not match indexed array along axis 0", naming neither ``spectrum`` nor the
+    field inside it. Every sample here is finite, so the non-finite guard
+    beside this one does not cover the mistake.
+
+    ``EnvelopeSpectrumResult`` pins the pair when it is built, which is why the
+    mismatch is assembled here as a loose object: the structural contract of
+    ``spectrum`` is the only way in.
+    """
+    pytest.importorskip("matplotlib")
+    import matplotlib as mpl
+
+    mpl.use("Agg")
+
+    res = vibration.bearing_fault_frequencies(
+        2000.0, 15, 6.0, 34.0, contact_angle_deg=12.96
+    )
+    measured = _measured_envelope_spectrum()
+    frequencies = np.asarray(measured.frequencies)  # type: ignore[attr-defined]
+    amplitude = np.asarray(measured.amplitude)[:-1]  # type: ignore[attr-defined]
+    assert np.all(np.isfinite(frequencies))
+    assert np.all(np.isfinite(amplitude))
+    mismatched = SimpleNamespace(frequencies=frequencies, amplitude=amplitude)
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"'spectrum\.frequencies' \(\d+,\), 'spectrum\.amplitude' \(\d+,\) "
+            r"must all have the same shape"
+        ),
+    ):
+        res.plot(spectrum=mismatched)
 
 
 def test_the_overlay_scales_its_amplitude_axis_to_the_measured_peak() -> None:

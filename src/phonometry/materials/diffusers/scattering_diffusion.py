@@ -87,14 +87,31 @@ class DiffusionResult:
     coefficient: float
 
     def __post_init__(self) -> None:
-        """Reject a polar response whose columns disagree, or a NaN headline.
+        """Reject a polar response whose columns disagree or cannot be read.
 
         The fiche draws ``levels`` against ``angles`` one receiver at a time,
         so the two must agree on how many receivers there are, and the
         receiver angles are an axis no measurement can leave undetermined, so
-        they must be finite. ``levels`` is deliberately not pinned to finite
-        values: a level of ``-inf`` is the documented sentinel for a receiver
-        with zero scattered energy (Formula (5)/(6)).
+        they must be finite.
+
+        ``levels`` is pinned one notch looser than finite, because ``-inf`` is
+        a level this measurement legitimately produces: it is the documented
+        reading of a receiver with zero scattered energy, whose energy
+        :math:`p_i = 10^{L_i/10}` is 0 and which is simply the neutral element
+        of both sums of Formula (5)/(6) --
+        :func:`directional_diffusion_coefficient` accepts it and returns an
+        ordinary finite coefficient, refusing only the all-``-inf`` response
+        that carries no energy at all. So the guard admits ``-inf`` and refuses
+        the other two, the same reading the
+        :func:`~phonometry.underwater.bioacoustics.weighting.weighted_exposure`
+        band levels are given. A ``+inf`` level is an infinite reflected
+        energy, which no receiver measures; a ``NaN`` is no reading at all, and
+        neither is a sentinel here, since nothing in this module flags an
+        undetermined receiver or renders one as an em dash. Both reach the
+        fiche as the literal ``inf`` or ``nan`` printed in the ``L`` column of
+        an accredited polar table, and reach the polar plot as a vertex
+        matplotlib drops without a word, leaving a lobe silently drawn through
+        the wrong receivers.
 
         The coefficient must be finite. :func:`directional_diffusion` cannot
         emit a NaN one (it refuses the degenerate inputs that would produce
@@ -102,13 +119,21 @@ class DiffusionResult:
         without this pin the fiche boxes the headline ``d = nan`` on an
         otherwise normal accredited page.
 
-        :raises ValueError: if ``angles`` and ``levels`` disagree, or
-            ``angles`` / ``coefficient`` is non-finite.
+        :raises ValueError: if ``angles`` and ``levels`` disagree, if
+            ``angles`` / ``coefficient`` is non-finite, or if ``levels``
+            carries a ``NaN`` or a ``+inf``.
         """
         require_ranks(self, angles=1, levels=1)
         require_same_length(self, "angles", "levels", axis="receiver")
         if not np.all(np.isfinite(np.asarray(self.angles, dtype=np.float64))):
             msg = "DiffusionResult: 'angles' must contain only finite values."
+            raise ValueError(msg)
+        lev = np.asarray(self.levels, dtype=np.float64)
+        if np.any(np.isnan(lev)) or np.any(lev == np.inf):
+            msg = (
+                "DiffusionResult: 'levels' must be finite, or -inf for a "
+                "receiver with no scattered energy."
+            )
             raise ValueError(msg)
         if not math.isfinite(float(self.coefficient)):
             msg = (

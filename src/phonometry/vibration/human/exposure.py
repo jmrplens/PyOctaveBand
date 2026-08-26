@@ -996,6 +996,17 @@ def hav_vwf_lifetime_years(a8: float) -> float:
 # ---------------------------------------------------------------------------
 # Exposure assessment against Directive 2002/44/EC action / limit values.
 # ---------------------------------------------------------------------------
+#: Refusal for a ``kind``/``metric`` pair the Directive does not define. The
+#: vibration dose value is a whole-body quantity only: the Directive fixes
+#: hand-transmitted vibration to ``A(8)`` (Annex, Part A) and offers the VDV
+#: only as the whole-body alternative (Part B), so there are no hand-arm VDV
+#: action and limit values to assess against. Shared by the entry point and
+#: :meth:`ExposureAssessment.__post_init__` so both paths refuse identically.
+_KIND_METRIC_MSG = (
+    "kind must be 'hav' or 'wbv'; metric 'a8' (both) or 'vdv' (wbv only)."
+)
+
+
 @dataclass(frozen=True)
 class ExposureAssessment:
     """A daily exposure assessed against the Directive 2002/44/EC values.
@@ -1021,7 +1032,7 @@ class ExposureAssessment:
     zone: str
 
     def __post_init__(self) -> None:
-        """Reject an assessment whose kind or metric tag is unknown.
+        """Reject an assessment whose kind or metric tag is unknown or unpaired.
 
         The fiche routes through ``kind`` twice -- the basis line names the
         applied ISO standard by it and the operations table heads its
@@ -1030,11 +1041,22 @@ class ExposureAssessment:
         page with an empty standard name and the whole-body symbol over
         hand-arm data.
 
-        :raises ValueError: if ``kind`` is not ``"hav"``/``"wbv"`` or
-            ``metric`` is not ``"a8"``/``"vdv"``.
+        The two tags are also checked as a pair, exactly as
+        :func:`exposure_assessment` checks them: each is valid alone, but
+        ``kind="hav"`` with ``metric="vdv"`` names a quantity the Directive
+        does not define. Assessed alone, that pair used to render a fiche
+        headed by the hand-arm ISO standard whose every threshold, zone and
+        verdict came from the whole-body VDV values -- a hand-arm ``A(8)`` of
+        3,5 m/s2, well into the action zone above the 2,5 m/s2 EAV, printed
+        "below the exposure action value" and passed against 21 m/s^1,75.
+
+        :raises ValueError: if ``kind`` is not ``"hav"``/``"wbv"``, ``metric``
+            is not ``"a8"``/``"vdv"``, or the pair is ``"hav"``/``"vdv"``.
         """
         require_choice(self.kind, "kind", ("hav", "wbv"))
         require_choice(self.metric, "metric", ("a8", "vdv"))
+        if self.kind == "hav" and self.metric == "vdv":
+            raise ValueError(_KIND_METRIC_MSG)
 
 
 def exposure_assessment(
@@ -1066,8 +1088,7 @@ def exposure_assessment(
     elif kind == "wbv" and metric == "vdv":
         eav, elv = WBV_EAV_VDV, WBV_ELV_VDV
     else:
-        msg = "kind must be 'hav' or 'wbv'; metric 'a8' (both) or 'vdv' (wbv only)."
-        raise ValueError(msg)
+        raise ValueError(_KIND_METRIC_MSG)
     exceeds_action = v >= eav
     exceeds_limit = v >= elv
     if exceeds_limit:
