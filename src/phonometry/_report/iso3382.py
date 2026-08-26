@@ -20,10 +20,12 @@ evaluated by the integrated impulse-response method of ISO 3382-1:2009, 5.3.3):
   descriptor; an octave analysis averages the two octaves, a one-third-octave
   analysis averages the 500 Hz and 1 kHz one-third-octave bands and is
   labelled as such) with the mid-frequency EDT alongside;
-* an optional verdict row when a target mid-frequency reverberation time is
-  supplied (ISO 3382-1/-2 are characterisation standards with no intrinsic
-  pass/fail, so the row appears only when a requirement is given, and only
-  when a reverberation time could be evaluated to compare against it);
+* an optional verdict row when a target reverberation time is supplied,
+  compared with whichever descriptor the box carries (T_mid, or the single
+  band's T30 that stands in for it; ISO 3382-1/-2 are characterisation
+  standards with no intrinsic pass/fail, so the row appears only when a
+  requirement is given, and only when a reverberation time could be evaluated
+  to compare against it);
 * a short measurement-basis strip and a footer identity/disclaimer block.
 
 Unlike the two-panel band fiches (:mod:`.iso717`, :mod:`.iso11654`) this uses a
@@ -439,12 +441,25 @@ def _verdict(
 
     The requirement is read as the maximum acceptable reverberation time (the
     common form of a room-acoustics target, e.g. a classroom or open-plan upper
-    limit): the room passes when its measured descriptor is at or below it. The
-    verdict names T_mid only when the descriptor is the mid-frequency mean; a
-    broadband result is checked against its plain T30, with no "500-1000 Hz"
-    claim. The comparison uses both values rounded exactly as the fiche
-    displays them (two decimals, halves away from zero), so the printed
-    numbers can never contradict the verdict at the tolerance boundary.
+    limit): the room passes when its measured descriptor is at or below it.
+
+    Which descriptor that is comes from :func:`_reverberation_descriptor`, the
+    same choice the boxed statement makes, and it is the mid-frequency mean
+    only when the measurement supports one. T_mid, the mean of the 500 Hz and
+    1000 Hz band T30, is compared when the result carries frequency bands, both
+    those centres are present, and their T30 are both finite; only then does
+    the verdict name T_mid. Every other case compares a single band's T30 and
+    the verdict says plain "T30", with no "500-1000 Hz" claim: a broadband
+    result (``frequency`` is ``None``) has only its one T30, and a banded
+    result that does not reach both mid centres, or reaches them with a NaN
+    T30 in either (the ISO 3382-1:2009, 5.3.3 evaluation range was unreachable
+    in that band alone, which the per-band decay fit leaves NaN band by band),
+    is compared against the first finite T30 in band order. The verdict line
+    does not name that band; the boxed statement it sits under already does.
+
+    The comparison uses both values rounded exactly as the fiche displays them
+    (two decimals, halves away from zero), so the printed numbers can never
+    contradict the verdict at the tolerance boundary.
 
     ``None`` when no band's T30 could be evaluated: that is a documented state
     of the result (the ISO 3382-1:2009, 5.3.3 criterion clears every
@@ -490,9 +505,14 @@ def render_iso3382_report(
     :param path: Destination path of the PDF file.
     :param metadata: Optional :class:`ReportMetadata`; ``None`` produces a
         bare characterisation fiche (body + result + disclaimer, no header). A
-        supplied ``requirement`` is read as the maximum mid-frequency T; the
-        verdict row is withheld when no band's reverberation time could be
-        evaluated, since there is then no measured value to compare.
+        supplied ``requirement`` is read as the maximum acceptable
+        reverberation time and compared with the descriptor the result box
+        shows: the mid-frequency T where both the 500 Hz and 1000 Hz bands are
+        present with a finite T30, and otherwise a single band's T30 (the
+        broadband one, or the first finite band of a range that misses the mid
+        bands or has a NaN T30 in one of them). The verdict row is withheld
+        when no band's reverberation time could be evaluated, since there is
+        then no measured value to compare.
     :param verbose: Accepted for signature parity with the other fiches; the
         room table already shows every computed parameter, so it has no effect.
     :param language: Fiche language: ``"en"`` (default) or ``"es"``.

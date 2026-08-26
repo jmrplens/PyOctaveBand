@@ -269,11 +269,14 @@ plot (`.plot()`), the boxed mid-frequency reverberation time $T_\text{mid}$
 (the mean of the 500 Hz and 1000 Hz octave $T_{30}$) with the mid-frequency EDT
 alongside, and a footer with the fixed disclaimer. ISO 3382-1/-2 are
 characterisation standards with no intrinsic pass/fail, so a verdict row appears
-only when a target mid-frequency reverberation time is supplied through the
+only when a target reverberation time is supplied through the
 metadata's `requirement` field (`ReportMetadata(requirement=...)`, read as the
-maximum acceptable $T_\text{mid}$); a broadband result has no 500 Hz / 1000 Hz
-octaves to average, so its box and verdict fall back to the plain broadband
-$T_{30}$ with no "500-1000 Hz" claim. It uses the same
+maximum acceptable value of whichever descriptor the box carries); a broadband
+result has no 500 Hz / 1000 Hz octaves to average, so its box and verdict fall
+back to the plain broadband $T_{30}$ with no "500-1000 Hz" claim, and so do a
+band range that misses those two octaves and one that reaches them with a
+non-evaluable $T_{30}$ in either, which fall back to the first band whose
+$T_{30}$ could be evaluated. It uses the same
 `ReportMetadata` container as the [ISO 11654 absorption fiche](../../materials/absorbers/absorption-measurement.md#iso-11654-report-report);
 the room-specific fields `room_volume`, `source_positions` and
 `receiver_positions` populate the header (ISO 3382 requires the room volume and

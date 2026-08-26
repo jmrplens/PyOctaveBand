@@ -258,13 +258,15 @@ class RoomAcousticsResult:
         1 kHz one-third-octave bands and labels them as such), an optional
         verdict row and a footer with the fixed disclaimer. ISO 3382-1/-2 are
         characterisation standards with no intrinsic pass/fail, so the verdict
-        row appears only when a target mid-frequency T is supplied through
-        ``metadata.requirement`` (read as the maximum acceptable T_mid). A
-        broadband result (``frequency`` is ``None``) has no 500 Hz and 1000 Hz
-        bands to average, so the box and the verdict fall back to the plain
-        broadband T30 instead of a mid-frequency average, with no
-        "500-1000 Hz" label; a band range without both mid bands boxes its
-        first finite T30 band, named explicitly.
+        row appears only when a target T is supplied through
+        ``metadata.requirement`` (read as the maximum acceptable value of
+        whichever descriptor the box carries). A broadband result
+        (``frequency`` is ``None``) has no 500 Hz and 1000 Hz bands to average,
+        so the box and the verdict fall back to the plain broadband T30 instead
+        of a mid-frequency average, with no "500-1000 Hz" label; so does a
+        banded result that does not span both mid bands, or that spans them
+        with a NaN T30 in either, which box and compare the first finite T30
+        band (the box names that band, the verdict line does not).
 
         :param path: Destination path of the PDF file.
         :param metadata: Optional
@@ -272,7 +274,9 @@ class RoomAcousticsResult:
             characterisation fiche (body, result and disclaimer only). The
             room-specific fields ``room_volume``, ``source_positions`` and
             ``receiver_positions`` populate the header; ``requirement`` is read
-            as the maximum mid-frequency reverberation time.
+            as the maximum acceptable reverberation time, compared with the
+            descriptor the result box shows (the mid-frequency T where both mid
+            bands carry a finite T30, otherwise a single band's T30).
         :param engine: Rendering back end; only ``"reportlab"`` is supported.
         :param verbose: Accepted for parity with the other fiches; the room
             table already shows every computed parameter, so it has no effect.

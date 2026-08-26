@@ -226,4 +226,4 @@ the distraction and privacy distances marked on the axis when given.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | for fewer than two positions, or a position that is not a finite, strictly positive distance. |
+| ValueError | for an input that is not one-dimensional, for fewer than two positions, or for a position that is not a finite, strictly positive distance. |

@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_equal_shapes
 from .common import (
     _C_EDGE,
     _C_MUTED,
@@ -914,7 +915,7 @@ def plot_fault_frequencies(
     :param kwargs: Forwarded to the spectrum curve.
     :return: The axes.
     :raises ValueError: If the result carries no lines, or *spectrum* carries a
-        non-finite frequency or amplitude.
+        non-finite frequency or amplitude, or its two vectors disagree in shape.
     """
     from .._i18n import format_number, localize_axes
 
@@ -929,6 +930,22 @@ def plot_fault_frequencies(
     if spectrum is not None:
         spectrum_f = np.asarray(spectrum.frequencies, dtype=np.float64)
         spectrum_a = np.asarray(spectrum.amplitude, dtype=np.float64)
+        # One amplitude per frequency bin, because the curve is drawn from the
+        # mask ``frequencies <= f_max`` applied to both: a shorter amplitude
+        # gets indexed by a mask built on the longer axis and numpy stops the
+        # render with "boolean index did not match indexed array", naming
+        # neither this argument nor the field inside it. Our own producer pins
+        # the pair in EnvelopeSpectrumResult.__post_init__, so a mismatch can
+        # only arrive through the structural contract, from an object the
+        # caller assembled.
+        require_equal_shapes(
+            "FaultFrequencyResult.plot",
+            {
+                "spectrum.frequencies": spectrum_f.shape,
+                "spectrum.amplitude": spectrum_a.shape,
+            },
+            "frequency bin",
+        )
         # Both vectors scale the axes: the frequency axis runs to the top of
         # the measured one and the amplitude axis to its peak, taken with
         # np.max so that a single non-finite sample becomes the whole limit.

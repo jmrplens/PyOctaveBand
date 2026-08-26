@@ -411,6 +411,35 @@ def test_an_aperture_result_refuses_to_carry_both_shapes() -> None:
         dataclasses.replace(hole, width=0.02)
 
 
+def test_a_circular_result_refuses_a_retained_slit_width() -> None:
+    """Keeping one shape is not enough: it has to be the shape ``kind`` names.
+
+    The section is drawn from whichever of ``width``/``radius`` the result
+    kept and carries no mark of its kind, so a ``"circular"`` result holding
+    a ``width`` drew the slit section of that width -- the same figure, pixel
+    for pixel, as the slit of the same number, and half the opening of the
+    circular aperture the companion curve labels it.
+    """
+    import dataclasses
+
+    hole = pm.building.circular_aperture_transmission_coefficient(FREQ, 0.005, 0.1)
+    with pytest.raises(ValueError, match="'width' is the slit width, but 'kind' is"):
+        dataclasses.replace(hole, width=0.005, radius=None)
+
+
+def test_a_slit_result_refuses_a_retained_hole_radius() -> None:
+    """The mirror case: a ``"slit"`` carrying a ``radius`` draws the hole
+    section of the doubled opening.
+    """
+    import dataclasses
+
+    slit = pm.building.slit_transmission_coefficient(FREQ, 0.003, 0.1)
+    with pytest.raises(
+        ValueError, match="'radius' is the circular-aperture radius, but 'kind' is"
+    ):
+        dataclasses.replace(slit, radius=0.003, width=None)
+
+
 # ---------------------------------------------------------------------------
 # Baffled piston.
 # ---------------------------------------------------------------------------

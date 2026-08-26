@@ -686,7 +686,7 @@ resonance is annotated when given.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | naming the first of the three that is not finite and positive, or a non-positive resonance frequency. |
+| ValueError | naming the first of the three that is not finite and positive, or `resonance_frequency` when one is passed that is not. |
 
 ## single_panel_transmission_loss
 

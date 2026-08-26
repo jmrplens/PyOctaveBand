@@ -381,7 +381,7 @@ Draw a composite facade elevation with element areas to scale.
 
 Each element of [`facade_sound_reduction`](/phonometry/reference/api/building/facade/#facade_sound_reduction) is a
 tile whose drawn area equals its real area (small-area elements without
-an area, such as airbriks rated by `dn_e`, get a nominal 0,1 m2 tile).
+an area, such as airbricks rated by `dn_e`, get a nominal 0,1 m2 tile).
 
 **Parameters**
 
@@ -398,7 +398,7 @@ an area, such as airbriks rated by `dn_e`, get a nominal 0,1 m2 tile).
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | for an empty sequence, or an element whose area is not finite and positive. |
+| ValueError | for an empty sequence, or an element that supplies an `area` which is not positive and finite. An element with no `area` at all is the nominal tile above, not a refusal. |
 
 ## radiated_sound_power
 

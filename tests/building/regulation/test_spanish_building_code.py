@@ -748,6 +748,55 @@ def test_a_check_whose_margin_does_not_restate_its_comparison_is_refused() -> No
         hr.DbHrCheck(requirement, 45.0, 45.0, 5.0, complies=True)
 
 
+def test_a_check_whose_reported_value_is_not_its_own_rounding_is_refused() -> None:
+    """The rounded value is the achieved value, rounded, and nothing else.
+
+    Pinning the margin against ``reported`` and ``complies`` against the margin
+    anchors the chain to a number nobody checked: 45 dBA declared as a reported
+    55 against a 50 dBA minimum keeps every derived field self-consistent, and
+    the figure paints a compliant green stem reaching past a limit the
+    measurement never reached.
+    """
+    requirement = hr.DbHrRequirement(
+        "DnT,A", 50.0, "min", "dBA", 0, "DB-HR 2.1", "between dwellings"
+    )
+    with pytest.raises(ValueError, match="'reported' must be 'value' rounded"):
+        hr.DbHrCheck(requirement, 45.0, 55.0, 5.0, complies=True)
+
+
+def test_a_check_rounds_by_the_requirements_decimals() -> None:
+    """DB-HR rounds half-up, to the decimals the quantity is stated in.
+
+    A reverberation time carries one decimal and the dB quantities none, so the
+    same achieved value is a different reported value under each requirement,
+    and half of a last place rounds up rather than to even.
+    """
+    seconds = hr.DbHrRequirement("T", 0.7, "max", "s", 1, "DB-HR 2.2", "classroom")
+    decibels = hr.DbHrRequirement(
+        "DnT,A", 50.0, "min", "dBA", 0, "DB-HR 2.1", "between dwellings"
+    )
+    assert hr.check_db_hr_requirement(0.649, seconds).reported == pytest.approx(0.6)
+    assert hr.check_db_hr_requirement(50.5, decibels).reported == pytest.approx(51.0)
+    # The rounding pin accepts the same number recomputed along another path.
+    hr.DbHrCheck(decibels, 50.5, 51.0 + 5e-10, 1.0 + 5e-10, complies=True)
+    with pytest.raises(ValueError, match="'reported' must be 'value' rounded"):
+        hr.DbHrCheck(decibels, 50.5, 50.0, 0.0, complies=True)
+
+
+def test_a_check_on_an_undetermined_value_is_refused() -> None:
+    """A verdict cannot be derived from a value that is not a number.
+
+    :func:`check_db_hr_requirement` refuses a non-finite achieved value, so no
+    producer emits one; a check assembled by hand around ``nan`` would keep its
+    derived fields mutually consistent and reach the figure as a verdict.
+    """
+    requirement = hr.DbHrRequirement(
+        "DnT,A", 50.0, "min", "dBA", 0, "DB-HR 2.1", "between dwellings"
+    )
+    with pytest.raises(ValueError, match="'value' must be finite"):
+        hr.DbHrCheck(requirement, math.nan, 45.0, -5.0, complies=False)
+
+
 def test_requirement_lookup_validation() -> None:
     """Unknown uses, rooms and room-pair combinations are rejected."""
     with pytest.raises(ValueError, match="Unknown"):
