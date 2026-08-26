@@ -422,12 +422,29 @@ def response_decades(frequencies: ArrayLike, where: str) -> float:
     over 100 to 120 Hz among them, which is why this is asked here and not of
     every curve.
 
+    A non-finite frequency is refused first, and separately, because it slips
+    past the span test rather than failing it: ``min`` and ``max`` both come
+    back ``NaN``, and ``NaN <= 0`` and ``NaN < ratio`` are each False, so the
+    function that promises to refuse an undrawable span would return ``NaN``
+    as the number of decades. The panel's aspect then reaches matplotlib as a
+    ``NaN`` and dies there, naming neither this axis nor the fiche it belongs
+    to. The characteristics classes pin their own frequency axes, so this
+    guards the helper's own promise rather than a route in from the entries.
+
     :param frequencies: The response curve's frequency axis.
     :param where: The fiche's name, for the error message.
     :return: The number of decades the curve spans.
-    :raises ValueError: if the span is narrower than one-third of an octave.
+    :raises ValueError: if the axis carries a non-finite frequency, or the
+        span is narrower than one-third of an octave.
     """
     f = np.asarray(frequencies, dtype=np.float64)
+    if not np.all(np.isfinite(f)):
+        msg = (
+            f"{where}: the response frequency axis must contain only finite "
+            "values; the decades the panel is scaled by cannot be measured "
+            "from an axis carrying a NaN or an infinity."
+        )
+        raise ValueError(msg)
     low, high = float(np.min(f)), float(np.max(f))
     if low <= 0.0 or high / low < _MIN_RESPONSE_SPAN:
         msg = (

@@ -289,40 +289,30 @@ def test_unknown_language_rejected(tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize("field", ["total_values", "durations_s", "partials"])
-def test_report_rejects_per_operation_array_short_by_one(
-    tmp_path: Path, field: str
-) -> None:
-    """A per-operation array one entry short is named in a ValueError.
+def test_a_per_operation_column_short_by_one_is_refused(field: str) -> None:
+    """A per-operation column one entry short cannot be built at all.
 
-    ``DailyVibrationExposure`` is a frozen dataclass with no ``__post_init__``,
-    so a hand-built result can carry arrays that disagree with ``labels``. The
-    operations table used to run short in silence instead of complaining.
+    The exposure is refused where it is assembled, not at the sheet that
+    would print it: the operations table walks the labels and reads every
+    other column at the same index, so a short one used to cut the table
+    while the daily-total row kept summing every duration.
     """
-    pytest.importorskip("reportlab")
     res = _annex_e3_result()
-    short = dataclasses.replace(res, **{field: getattr(res, field)[:-1]})
-    out = tmp_path / f"short_{field}.pdf"
-    with pytest.raises(ValueError, match=field):
-        short.report(str(out))
-    # The guard fires before the table and the chart, so nothing is written.
-    assert not out.exists()
+    column = getattr(res, field)
+    with pytest.raises(ValueError, match=rf"'{field}' \(2\)"):
+        dataclasses.replace(res, **{field: column[:-1]})
 
 
-def test_report_rejects_fewer_labels_than_operations(tmp_path: Path) -> None:
-    """``labels`` sets the expected count, so dropping one is a mismatch too.
+def test_fewer_labels_than_operations_is_refused() -> None:
+    """``labels`` is one of the peer columns, not an authority over them.
 
-    The message names the array that disagreed rather than ``labels`` itself,
-    because ``labels`` is what the count is read from: matching both halves
-    pins that reading, where matching ``labels`` alone would pass against any
-    of the four messages this guard can raise.
+    Dropping a label leaves the three magnitude columns naming an operation
+    the sheet has no name for, so the message lists all four counts rather
+    than picking one of them as the odd one out.
     """
-    pytest.importorskip("reportlab")
     res = _annex_e3_result()
-    short = dataclasses.replace(res, labels=res.labels[:-1])
-    out = tmp_path / "short_labels.pdf"
-    with pytest.raises(ValueError, match=r"'total_values'.*\(2 in 'labels'\)"):
-        short.report(str(out))
-    assert not out.exists()
+    with pytest.raises(ValueError, match=r"'labels' \(2\)"):
+        dataclasses.replace(res, labels=res.labels[:-1])
 
 
 def test_report_accepts_matching_per_operation_arrays(tmp_path: Path) -> None:

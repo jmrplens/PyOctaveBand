@@ -56,6 +56,18 @@ def test_level_rejects_zero_stiffness() -> None:
         vibration.transfer_stiffness_level([1e6, 0.0 + 0.0j])
 
 
+@pytest.mark.parametrize("bad", [complex("nan"), complex("inf")])
+def test_level_says_non_finite_rather_than_dead_channel(bad: complex) -> None:
+    """The two mistakes are told apart, so the diagnosis is true.
+
+    A NaN compares False against the positivity bound, so folded into it a
+    stiffness that was never measured was reported as a dead channel that
+    read zero.
+    """
+    with pytest.raises(ValueError, match="non-finite magnitudes"):
+        vibration.transfer_stiffness_level([1e6, bad])
+
+
 # ---------------------------------------------------------------------------
 # Loss factor (ISO 10846-1, 3.8)
 # ---------------------------------------------------------------------------

@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING, Any, overload
 
 import numpy as np
 
-from ..._internal.validation import require_equal_shapes
+from ..._internal.validation import require_equal_shapes, require_positive
 from ..common import (
     _C_EDGE,
     _C_MUTED,
@@ -118,11 +118,12 @@ def plot_piston_geometry(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the piston rectangle.
     :return: The axes.
+    :raises ValueError: for a non-positive radius, only one of the lobe
+        pair, a lobe whose two arrays disagree, or a non-finite value in
+        either of them.
     """
     _check_language(language)
-    if radius <= 0.0:
-        msg = "'radius' must be positive."
-        raise ValueError(msg)
+    require_positive(radius, "radius")
     if (angles is None) != (directivity is None):
         msg = "Give 'angles' and 'directivity' together."
         raise ValueError(msg)
@@ -156,6 +157,17 @@ def plot_piston_geometry(
             {"angles": ang.shape, "directivity": d_lin.shape},
             "angle",
         )
+        # The lobe is scaled by its own peak, and one NaN anywhere makes that
+        # peak NaN, turns the ``peak > 0.0`` gate False and drops the whole
+        # requested lobe (and its legend) from a figure that still draws the
+        # piston. :func:`~phonometry.electroacoustics.piston_directivity`
+        # patches the on-axis 0/0 to its limit and emits nothing non-finite,
+        # and RadiatingPistonResult refuses one at construction, so this
+        # guards the direct call, not the library's own pattern.
+        for name, values in (("angles", ang), ("directivity", d_lin)):
+            if not np.all(np.isfinite(values)):
+                msg = f"'{name}' must be finite."
+                raise ValueError(msg)
         peak = float(d_lin.max())
         if peak > 0.0:
             scale = 2.8 * a / peak
@@ -244,20 +256,15 @@ def plot_sound_reinforcement_geometry(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the feedback-path ``Axes.plot``.
     :return: The axes.
-    :raises ValueError: If any distance is not positive and finite.
+    :raises ValueError: naming the first distance that is not finite and
+        positive.
     """
     from matplotlib.patches import Polygon
 
     _check_language(language)
-    lengths = (
-        float(talker_distance),
-        float(microphone_distance),
-        float(listener_distance),
-    )
-    if not all(np.isfinite(v) and v > 0.0 for v in lengths):
-        msg = "The three distances must be positive and finite."
-        raise ValueError(msg)
-    d_tm, d_hm, d_hl = lengths
+    d_tm = require_positive(talker_distance, "talker_distance")
+    d_hm = require_positive(microphone_distance, "microphone_distance")
+    d_hl = require_positive(listener_distance, "listener_distance")
     if ax is None:
         ax = _new_axes()
 

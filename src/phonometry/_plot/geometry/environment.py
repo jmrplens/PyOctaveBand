@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_non_negative, require_positive
 from ..common import (
     _C_MUTED,
     _C_PRIMARY,
@@ -90,20 +91,28 @@ def plot_barrier_geometry(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the barrier rectangle.
     :return: The axes.
+    :raises ValueError: for a height that is not finite and non-negative, a
+        distance that is not finite and positive, a receiver no further than
+        the barrier, or a non-positive thickness.
     """
     _check_language(language)
-    if min(source_height, barrier_height, receiver_height) < 0.0:
-        msg = "Heights must be non-negative."
+    # Named and finite, one parameter at a time. Every comparison against a
+    # NaN is False, so the old ``min(...) < 0.0`` and ``<= 0.0`` guards waved
+    # one through into the path lengths and drew a complete, plausible
+    # section annotated 'Path difference nan m'. The five geometry numbers
+    # are a measured set-up, and :func:`~phonometry.environment.barrier_insertion_loss`,
+    # the only producer that retains them on a result, validates each one
+    # before it computes, so no library output is refused here.
+    require_non_negative(source_height, "source_height")
+    require_non_negative(barrier_height, "barrier_height")
+    require_non_negative(receiver_height, "receiver_height")
+    require_positive(barrier_distance, "barrier_distance")
+    require_positive(receiver_distance, "receiver_distance")
+    if receiver_distance <= barrier_distance:
+        msg = "'receiver_distance' must be greater than 'barrier_distance'."
         raise ValueError(msg)
-    if barrier_distance <= 0.0 or receiver_distance <= barrier_distance:
-        msg = (
-            "'barrier_distance' must be positive and 'receiver_distance' "
-            "greater than it."
-        )
-        raise ValueError(msg)
-    if thickness is not None and thickness <= 0.0:
-        msg = "'thickness' must be positive when given."
-        raise ValueError(msg)
+    if thickness is not None:
+        require_positive(thickness, "thickness")
     if ax is None:
         ax = _new_axes()
     e = 0.0 if thickness is None else float(thickness)

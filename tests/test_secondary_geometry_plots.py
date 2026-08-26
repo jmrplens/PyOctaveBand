@@ -47,6 +47,14 @@ def test_facade_result_retains_elements_and_draws() -> None:
         pm.building.plot_facade_elements([])
 
 
+def test_a_facade_element_refuses_a_nan_area() -> None:
+    """NaN fails every comparison, so a bare ``<= 0.0`` would wave it into
+    the tile widths and render a titled, empty elevation.
+    """
+    with pytest.raises(ValueError, match="'area' must be positive"):
+        pm.building.FacadeElement("Window", area=float("nan"), r=[30.0] * 5)
+
+
 def test_double_wall_result_retains_geometry_and_draws() -> None:
     res = pm.building.double_wall_transmission_loss(FREQ, 8.8, 8.8, 0.1)
     assert res.gap == pytest.approx(0.1)
@@ -56,8 +64,18 @@ def test_double_wall_result_retains_geometry_and_draws() -> None:
     )
     with pytest.raises(ValueError, match="does not retain"):
         single.plot_geometry()
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match="'mass1' must be positive"):
         pm.building.plot_double_wall_geometry(0.0, 8.8, 0.1)
+
+
+def test_double_wall_geometry_refuses_a_nan_resonance_frequency() -> None:
+    """The annotation between the leaves would read 'f$_0$ = nan Hz' on an
+    otherwise complete section.
+    """
+    with pytest.raises(ValueError, match="'resonance_frequency' must be positive"):
+        pm.building.plot_double_wall_geometry(
+            8.8, 8.8, 0.05, resonance_frequency=float("nan")
+        )
 
 
 def test_junction_result_retains_thicknesses_and_draws() -> None:
@@ -70,6 +88,17 @@ def test_junction_result_retains_thicknesses_and_draws() -> None:
         assert pm.building.plot_junction_geometry(junction, 0.14, 0.2) is not None
     with pytest.raises(ValueError, match="junction"):
         pm.building.plot_junction_geometry("Y", 0.14, 0.2)
+
+
+def test_junction_geometry_rejects_nan_thickness() -> None:
+    """A NaN thickness would draw collapsed plates under a 'nan mm' label."""
+    with pytest.raises(ValueError, match="thickness1"):
+        pm.building.plot_junction_geometry("L", float("nan"), 0.1)
+
+
+def test_junction_geometry_rejects_nan_second_thickness() -> None:
+    with pytest.raises(ValueError, match="thickness2"):
+        pm.building.plot_junction_geometry("L", 0.14, float("nan"))
 
 
 def test_insitu_setup_defaults_and_retention() -> None:
@@ -88,8 +117,16 @@ def test_insitu_setup_defaults_and_retention() -> None:
 
 def test_dynamic_stiffness_rig_draws_and_validates() -> None:
     assert pm.materials.plot_dynamic_stiffness_rig() is not None
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match="'load_mass' must be positive"):
         pm.materials.plot_dynamic_stiffness_rig(load_mass=0.0)
+
+
+def test_dynamic_stiffness_rig_refuses_a_nan_load_mass() -> None:
+    """NaN passes a bare ``<= 0.0`` and letters 'Load plate nan kg' on an
+    otherwise correct rig.
+    """
+    with pytest.raises(ValueError, match="'load_mass' must be positive"):
+        pm.materials.plot_dynamic_stiffness_rig(load_mass=float("nan"))
 
 
 def test_goniometer_microphone_count() -> None:
@@ -103,8 +140,19 @@ def test_goniometer_microphone_count() -> None:
 def test_plate_geometry_from_result() -> None:
     res = pm.vibration.radiation_efficiency(FREQ, 1.2, 0.8, 1000.0)
     assert res.plot_geometry() is not None
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match="'length_x' must be positive"):
         pm.vibration.plot_plate_geometry(0.0, 0.8)
+
+
+def test_plate_geometry_rejects_nan_length() -> None:
+    """A NaN length would draw no plate under a 'nan m' dimension label."""
+    with pytest.raises(ValueError, match="length_x"):
+        pm.vibration.plot_plate_geometry(float("nan"), 1.2)
+
+
+def test_plate_geometry_rejects_nan_width() -> None:
+    with pytest.raises(ValueError, match="length_y"):
+        pm.vibration.plot_plate_geometry(1.2, float("nan"))
 
 
 def test_open_plan_result_retains_positions_and_draws() -> None:
@@ -117,6 +165,19 @@ def test_open_plan_result_retains_positions_and_draws() -> None:
     assert res.plot_geometry() is not None
     with pytest.raises(ValueError, match="at least two"):
         pm.room.plot_open_plan_geometry([3.0])
+
+
+def test_open_plan_geometry_refuses_a_nan_microphone_position() -> None:
+    """NaN passes ``pos <= 0.0`` and draws a line whose span dimension
+    reads 'nan m' with the workstation blocks silently missing.
+    """
+    with pytest.raises(ValueError, match="'positions' must be finite"):
+        pm.room.plot_open_plan_geometry([1.0, float("nan"), 3.0])
+
+
+def test_open_plan_geometry_refuses_an_infinite_microphone_position() -> None:
+    with pytest.raises(ValueError, match="'positions' must be finite"):
+        pm.room.plot_open_plan_geometry([1.0, float("inf")])
 
 
 def test_intensity_result_retains_spacing_and_draws() -> None:

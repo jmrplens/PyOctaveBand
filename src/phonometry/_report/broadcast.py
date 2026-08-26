@@ -32,6 +32,7 @@ svglib ship in the ``phonometry[report]`` extra, matplotlib in
 from __future__ import annotations
 
 import html
+import math
 from typing import TYPE_CHECKING, Any
 
 from ._i18n import decimal_comma, format_number, t
@@ -72,6 +73,41 @@ _TOLERANCE_CLAUSES: dict[str, str] = {"qc": "item i", "live": "item h"}
 #: EBU R 128 maximum permitted true-peak level, dBTP (item m).
 _MAX_TRUE_PEAK_DBTP = -1.0
 
+#: The em dash printed wherever the measurement leaves a reading undefined.
+#: :func:`~phonometry.broadcast.program_loudness.program_loudness` returns
+#: ``-inf`` for the integrated loudness when no gating block reaches the
+#: -70 LUFS absolute threshold (ITU-R BS.1770-5, Annex 1), and the maxima and
+#: the true peak of a digitally silent programme come back ``-inf`` with it.
+_ABSENT = "—"
+
+
+def _measured(value: float, language: str = "en") -> str:
+    """One measured level as the fiche prints it, or an em dash when undefined.
+
+    Digital silence is a programme an end user can hand this fiche, and every
+    level of it is ``-inf``: the accredited sheet states such a reading with
+    the empty-cell em dash rather than formatting an infinity, which is what
+    used to reach :func:`display_round` and abort the render with an
+    ``OverflowError`` naming no field.
+    """
+    if not math.isfinite(value):
+        return _ABSENT
+    return format_number(value, language, decimals=1)
+
+
+def _delta_lu(integrated: float, target: float) -> float | None:
+    """Displayed distance from the target in LU, or ``None`` when undefined.
+
+    The distance is evaluated on both values rounded exactly as the fiche
+    displays them (0.1 LU, EBU Tech 3341 section 2), so the printed numbers
+    can never contradict the verdict at the tolerance boundary. An integrated
+    loudness the gate left at ``-inf`` has no distance from any target: it is
+    reported as ``None`` and printed as an em dash, never as an infinity.
+    """
+    if not math.isfinite(integrated):
+        return None
+    return display_round(integrated) - display_round(target)
+
 
 def _metadata_pairs(
     metadata: ReportMetadata, language: str = "en"
@@ -110,12 +146,18 @@ def _status(
     is compared unrounded: item m) is an absolute production ceiling and the
     strict reading is the conservative one.
 
+    A gated-away integrated loudness (``-inf``) fails: no tolerance about any
+    target contains it, and the fiche says so with an em dash in the measured
+    cell rather than with a fabricated number. The true peak of the same
+    silent programme is ``-inf`` too and passes the ceiling, which is the
+    honest reading of item m).
+
     :return: ``(i_status, tp_status, passed)`` where each status is ``"pass"``
         or ``"fail"`` and ``passed`` is the conjunction (a programme complies
         only when both pass).
     """
-    delta = display_round(float(result.integrated)) - display_round(target)
-    i_pass = abs(delta) <= tolerance_lu + 1e-9
+    delta = _delta_lu(float(result.integrated), target)
+    i_pass = delta is not None and abs(delta) <= tolerance_lu + 1e-9
     tp_pass = float(result.true_peak) <= _MAX_TRUE_PEAK_DBTP
     return (
         "pass" if i_pass else "fail",
@@ -137,27 +179,33 @@ def _compliance_rows(
     informational (status ``"info"``, no pass/fail). The integrated loudness
     and its delta are displayed from the same 0.1 LU rounding that
     :func:`_status` evaluates, so the printed numbers and the verdict agree.
+    Every measured cell goes through :func:`_measured`, so a reading the
+    measurement left undefined prints the em dash beside its unit.
     """
-    integrated = display_round(float(result.integrated))
-    true_peak = float(result.true_peak)
-    delta = integrated - display_round(target)
+    raw_integrated = float(result.integrated)
+    delta = _delta_lu(raw_integrated, target)
+    integrated = raw_integrated if delta is None else display_round(raw_integrated)
     i_status, tp_status, _ = _status(result, target, tolerance_lu)
     tol = decimal_comma(f"{tolerance_lu:g}", language)
     informational = t("informational", language)
     return [
         (
             t("Integrated (Programme) Loudness", language),
-            f"{format_number(integrated, language, decimals=1)} LUFS",
+            f"{_measured(integrated, language)} LUFS",
             t("{target} LUFS &#177;{tol} LU (&#916; {delta} LU)", language).format(
                 target=format_number(target, language, decimals=1),
                 tol=tol,
-                delta=decimal_comma(f"{delta:+.1f}", language),
+                delta=(
+                    _ABSENT
+                    if delta is None
+                    else decimal_comma(f"{delta:+.1f}", language)
+                ),
             ),
             i_status,
         ),
         (
             t("Maximum True Peak", language),
-            f"{format_number(true_peak, language, decimals=1)} dBTP",
+            f"{_measured(float(result.true_peak), language)} dBTP",
             t("&#8804; {limit} dBTP", language).format(
                 limit=format_number(_MAX_TRUE_PEAK_DBTP, language, decimals=1)
             ),
@@ -165,30 +213,54 @@ def _compliance_rows(
         ),
         (
             t("Loudness Range (LRA)", language),
-            f"{format_number(float(result.loudness_range), language, decimals=1)} LU",
+            f"{_measured(float(result.loudness_range), language)} LU",
             informational,
             "info",
         ),
         (
             t("Max Momentary", language),
-            f"{format_number(float(result.max_momentary), language, decimals=1)} LUFS",
+            f"{_measured(float(result.max_momentary), language)} LUFS",
             informational,
             "info",
         ),
         (
             t("Max Short-term", language),
-            f"{format_number(float(result.max_short_term), language, decimals=1)} LUFS",
+            f"{_measured(float(result.max_short_term), language)} LUFS",
             informational,
             "info",
         ),
     ]
 
 
+def _has_undefined_reading(result: ProgramLoudnessResult) -> bool:
+    """True when any level the sheet prints came back non-finite.
+
+    The five printed readings are the integrated loudness, the maximum true
+    peak, the loudness range and the two loudness maxima; a sheet carrying an
+    em dash for any of them says on the basis strip what the glyph means.
+    """
+    return not all(
+        math.isfinite(float(value))
+        for value in (
+            result.integrated,
+            result.true_peak,
+            result.loudness_range,
+            result.max_momentary,
+            result.max_short_term,
+        )
+    )
+
+
 def _statement(result: ProgramLoudnessResult, language: str = "en") -> str:
-    """The boxed single-number statement ``I = X LUFS (LRA = Y, max TP = Z)``."""
-    integrated = format_number(float(result.integrated), language, decimals=1)
-    lra = format_number(float(result.loudness_range), language, decimals=1)
-    tp = format_number(float(result.true_peak), language, decimals=1)
+    """The boxed single-number statement ``I = X LUFS (LRA = Y, max TP = Z)``.
+
+    Each of the three readings is stated by :func:`_measured`, so a programme
+    the measurement left undefined is boxed as ``I = — LUFS`` rather than as
+    an infinity dressed up as a level.
+    """
+    integrated = _measured(float(result.integrated), language)
+    lra = _measured(float(result.loudness_range), language)
+    tp = _measured(float(result.true_peak), language)
     return f"I = <b>{integrated} LUFS</b> &nbsp; (LRA = {lra} LU, max TP = {tp} dBTP)"
 
 
@@ -356,6 +428,16 @@ def render_program_loudness_report(
             basis_strip_style,
         )
     )
+    if _has_undefined_reading(result):
+        flow.append(
+            fiche_paragraph(
+                t(
+                    "An em dash marks a reading the measurement leaves undefined: the integrated loudness of a programme no gating block of which reaches the -70 LUFS absolute threshold, and the true peak of a digitally silent one (ITU-R BS.1770-5, Annex 1).",
+                    language,
+                ),
+                basis_strip_style,
+            )
+        )
     flow.extend(footer_flow(metadata, language))
 
     return build_document(path, flow, title)

@@ -216,7 +216,7 @@ def test_impedance_tube_sample_patch_is_to_scale() -> None:
 def test_qrd_geometry_validation() -> None:
     with pytest.raises(ValueError, match="non-empty"):
         m.plot_qrd_geometry([], 0.12)
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(ValueError, match="'depths' must be non-negative"):
         m.plot_qrd_geometry([-0.01], 0.12)
     with pytest.raises(ValueError, match="well_width"):
         m.plot_qrd_geometry([0.05], 0.0)
@@ -224,12 +224,21 @@ def test_qrd_geometry_validation() -> None:
         m.plot_qrd_geometry([0.05], 0.12, periods=0)
 
 
+def test_qrd_geometry_refuses_a_nan_well_depth() -> None:
+    """NaN passes ``d < 0.0`` and poisons the drawn maximum depth into the
+    well-width fallback: the profile would be drawn to a depth scale no well
+    has, under a dimension reading the well width.
+    """
+    with pytest.raises(ValueError, match="'depths' must be finite"):
+        m.plot_qrd_geometry([0.0, 0.02, float("nan"), 0.015], 0.03)
+
+
 def test_transmission_tube_validation() -> None:
     with pytest.raises(ValueError, match="must exceed"):
         m.plot_transmission_tube_geometry(
             l1=0.1, s1=0.03, l2=0.04, s2=0.03, thickness=0.05
         )
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match="'s1' must be positive"):
         m.plot_transmission_tube_geometry(
             l1=0.1, s1=0.0, l2=0.15, s2=0.03, thickness=0.05
         )
@@ -239,8 +248,62 @@ def test_transmission_tube_validation() -> None:
         )
 
 
+def test_impedance_tube_geometry_refuses_a_nan_spacing() -> None:
+    """A NaN spacing passed the bare ``<= 0.0``, then poisoned the bore, the
+    dimension line ('s = nan mm') and the working-range note
+    ('Plane-wave range nan to nan Hz') of a drawing that still rendered.
+    """
+    with pytest.raises(ValueError, match="'spacing' must be positive"):
+        m.plot_impedance_tube_geometry(spacing=float("nan"), x1=0.1)
+
+
+def test_impedance_tube_geometry_refuses_a_nan_microphone_distance() -> None:
+    with pytest.raises(ValueError, match="'x1' must be positive"):
+        m.plot_impedance_tube_geometry(spacing=0.05, x1=float("nan"))
+
+
+def test_transmission_tube_geometry_refuses_a_nan_section_length() -> None:
+    with pytest.raises(ValueError, match="'l1' must be positive"):
+        m.plot_transmission_tube_geometry(
+            l1=float("nan"), s1=0.03, l2=0.15, s2=0.03, thickness=0.05
+        )
+
+
+def test_goniometer_geometry_refuses_a_nan_source_distance() -> None:
+    """A NaN source distance passed the bare ``<= 0.0`` and drew the arc and
+    the sample with the source star and its label silently missing.
+    """
+    with pytest.raises(ValueError, match="'source_distance' must be positive"):
+        m.plot_goniometer_geometry(source_distance=float("nan"))
+
+
+def test_insitu_geometry_refuses_a_nan_source_height() -> None:
+    """``source_height <= mic_height`` is False for a NaN, so the old guard
+    waved one into every path length of the set-up.
+    """
+    with pytest.raises(ValueError, match="'source_height' must be positive"):
+        m.plot_insitu_geometry(source_height=float("nan"))
+
+
+def test_metadiffuser_panel_geometry_refuses_a_nan_depth() -> None:
+    with pytest.raises(ValueError, match="'depth' must be positive"):
+        m.plot_metadiffuser_panel_geometry(
+            [None, None], depth=float("nan"), period=0.02
+        )
+
+
+def test_slit_absorber_geometry_refuses_a_nan_lattice_step() -> None:
+    with pytest.raises(ValueError, match="'lattice_step' must be positive"):
+        m.plot_slit_absorber_geometry(
+            _resonator(),
+            slit_height=0.002,
+            lattice_step=float("nan"),
+            period=0.02,
+        )
+
+
 def test_impedance_tube_validation() -> None:
-    with pytest.raises(ValueError, match="spacing"):
+    with pytest.raises(ValueError, match="'x1' must exceed 'spacing'"):
         m.plot_impedance_tube_geometry(spacing=0.05, x1=0.04)
     with pytest.raises(ValueError, match="diameter"):
         m.plot_impedance_tube_geometry(spacing=0.05, x1=0.15, diameter=-0.1)
@@ -252,7 +315,7 @@ def test_impedance_tube_validation() -> None:
 
 def test_slit_geometry_validation() -> None:
     resonator = _resonator()
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match="'slit_height' must be positive"):
         m.plot_slit_absorber_geometry(
             resonator, slit_height=0.0, lattice_step=0.015, period=0.02
         )

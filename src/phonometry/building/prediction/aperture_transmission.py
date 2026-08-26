@@ -141,10 +141,23 @@ class ApertureTransmissionResult:
         the right length, finite, and about a slit that was evaluated at one
         frequency only.
 
-        :raises ValueError: if the two per-band arrays disagree.
+        The retained geometry is pinned to one shape as well: a slit keeps its
+        ``width`` and a circular aperture its ``radius``, never both, and
+        :meth:`plot_geometry` draws whichever is present, testing ``width``
+        first. A result carrying both would silently render the slit section
+        for what claims to be a circular aperture.
+
+        :raises ValueError: if the two per-band arrays disagree, or the
+            result carries both a slit width and a circular radius.
         """
         require_ranks(self, frequencies=1, transmission_coefficient=1)
         require_same_length(self, "frequencies", "transmission_coefficient")
+        if self.width is not None and self.radius is not None:
+            msg = (
+                "Give at most one of 'width' (a slit) and 'radius' (a "
+                "circular aperture); this result carries both."
+            )
+            raise ValueError(msg)
 
     @property
     def transmission_loss(self) -> np.ndarray:

@@ -337,6 +337,29 @@ _VALUES_1D_MSG = "'values_by_band' must be one-dimensional."
 _VALUES_FINITE_MSG = "'values_by_band' must contain only finite values."
 
 
+def _require_finite_curves(owner: object, *fields: str) -> None:
+    """Require each named optional band curve of *owner* to be finite.
+
+    The ``__post_init__`` companion of the entry points' own finiteness
+    refusals: :func:`weighted_rating` and :func:`weighted_impact_rating`
+    refuse non-finite input by name, so no constructor ever stores a
+    non-finite band, and an instance carrying one can only have been
+    assembled by hand or through :func:`dataclasses.replace`. ``None``
+    fields (a rating built from the single numbers alone) are skipped.
+
+    :param owner: The instance whose curve fields are checked.
+    :param fields: Names of the optional per-band array fields.
+    :raises ValueError: if a present curve carries a non-finite value.
+    """
+    for name in fields:
+        value = getattr(owner, name)
+        if value is not None and not np.all(
+            np.isfinite(np.asarray(value, dtype=np.float64))
+        ):
+            msg = f"{type(owner).__name__}: '{name}' must contain only finite values."
+            raise ValueError(msg)
+
+
 @dataclass(frozen=True)
 class WeightedRatingResult:
     """Single-number weighted rating and adaptation terms (ISO 717-1).
@@ -392,10 +415,23 @@ class WeightedRatingResult:
         single numbers alone, and an absent curve is skipped rather than read
         as a disagreement.
 
-        :raises ValueError: if the band curves supplied disagree.
+        The curves must also be finite. No constructor can emit a non-finite
+        band -- :func:`weighted_rating` refuses non-finite input, the centres
+        come from the Table 1 band sets and the shifted reference is the
+        Table 3 curve plus an integer shift -- and the fiche reads them raw:
+        a NaN centre dies in a bare ``ValueError: cannot convert float NaN to
+        integer`` from ``round`` inside the band table, while a NaN measured
+        value prints a literal ``nan`` cell and, in the verbose Annex C
+        table, an em dash in the deviation column whose defined meaning is
+        "deviation below 0,05 dB" -- asserting no unfavourable deviation for
+        a band that was never determined.
+
+        :raises ValueError: if the band curves supplied disagree, or one of
+            them carries a non-finite value.
         """
         require_ranks(self, band_centers=1, measured=1, shifted_reference=1)
         require_same_length(self, "band_centers", "measured", "shifted_reference")
+        _require_finite_curves(self, "band_centers", "measured", "shifted_reference")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -516,10 +552,16 @@ class ImpactRatingResult:
         single numbers alone, and an absent curve is skipped rather than read
         as a disagreement.
 
-        :raises ValueError: if the band curves supplied disagree.
+        The curves must also be finite, for the reasons given on
+        :class:`WeightedRatingResult` (no constructor can emit a non-finite
+        band; the fiche prints them raw or crashes namelessly on them).
+
+        :raises ValueError: if the band curves supplied disagree, or one of
+            them carries a non-finite value.
         """
         require_ranks(self, band_centers=1, measured=1, shifted_reference=1)
         require_same_length(self, "band_centers", "measured", "shifted_reference")
+        _require_finite_curves(self, "band_centers", "measured", "shifted_reference")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

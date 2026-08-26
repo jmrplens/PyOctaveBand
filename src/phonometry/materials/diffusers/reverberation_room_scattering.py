@@ -32,7 +32,12 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import check_engine, require_equal_shapes
+from ..._internal.validation import (
+    check_engine,
+    require_equal_shapes,
+    require_ranks,
+    require_same_length,
+)
 from ..._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -381,6 +386,47 @@ class ScatteringResult:
     scattering: Real
     random_incidence: Real
     specular: Real
+
+    def __post_init__(self) -> None:
+        """Reject a spectrum whose columns disagree, is empty, or is non-finite.
+
+        The ISO 17497-1 fiche prints one row per entry of ``frequencies``,
+        reading the absorptions and the scattering coefficient at that row's
+        position, so the columns must agree on how many bands there are.
+
+        The spectrum must cover at least one band. Four length-0 columns agree
+        with each other, and the sheet that comes out is a complete accredited
+        page with an empty table under the fabricated headline "0 Hz to 0 Hz",
+        which the ``lo``/``hi`` fall-backs write when there is no band to take
+        a range from. :func:`scattering_coefficient_spectrum` refuses an empty
+        axis for the same reason, so an empty spectrum can only be hand-built.
+
+        Every value must also be finite. The method has no undeterminable
+        band: :func:`scattering_coefficient_spectrum` derives ``s`` from the
+        two Sabine-form absorptions of positive, finite reverberation times,
+        so a NaN can only be smuggled into a hand-built result. Without this
+        pin a NaN coefficient renders as a literal ``nan`` cell in the
+        accredited per-band table, and a NaN band centre crashes the header's
+        ``round(freqs.min())`` with a bare message naming neither the field
+        nor the result.
+
+        :raises ValueError: if the per-band columns disagree, the spectrum is
+            empty, or any value is non-finite.
+        """
+        require_ranks(self, frequencies=1, scattering=1, random_incidence=1, specular=1)
+        require_same_length(
+            self, "frequencies", "scattering", "random_incidence", "specular"
+        )
+        if np.asarray(self.frequencies).size == 0:
+            msg = (
+                "ScatteringResult: 'frequencies' must carry at least one "
+                "band; the spectrum is empty."
+            )
+            raise ValueError(msg)
+        for name in ("frequencies", "scattering", "random_incidence", "specular"):
+            if not np.all(np.isfinite(np.asarray(getattr(self, name), np.float64))):
+                msg = f"ScatteringResult: '{name}' must contain only finite values."
+                raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

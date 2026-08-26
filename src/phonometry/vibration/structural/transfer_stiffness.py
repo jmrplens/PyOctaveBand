@@ -69,6 +69,7 @@ if TYPE_CHECKING:
 
 from ..._internal.validation import (
     check_engine,
+    require_finite_fields,
     require_non_negative,
     require_positive,
     require_ranks,
@@ -108,12 +109,22 @@ def transfer_stiffness_level(
         real, scalar or array, non-zero), in N/m.
     :param reference: Reference stiffness ``k0`` (Default: 1 N/m), in N/m.
     :return: The level ``L_k``, in dB re ``k0``.
-    :raises ValueError: for a non-positive reference or a zero stiffness
-        magnitude (a dead channel has no level).
+    :raises ValueError: for a non-positive reference, a non-finite stiffness,
+        or a zero stiffness magnitude (a dead channel has no level).
     """
     reference = require_positive(reference, "reference")
     magnitude = np.abs(np.asarray(stiffness, dtype=np.complex128))
-    if not np.all(magnitude > 0.0):
+    # Two refusals, because they are two mistakes and the diagnosis has to be
+    # true: a NaN compares False against the bound below, so folded into it it
+    # was reported as a dead channel, which is a measurement that happened and
+    # read zero rather than one that did not read at all.
+    if not np.all(np.isfinite(magnitude)):
+        msg = (
+            "'stiffness' contains non-finite magnitudes; a level can only be "
+            "taken of a stiffness that was measured."
+        )
+        raise ValueError(msg)
+    if np.any(magnitude <= 0.0):
         msg = (
             "'stiffness' contains zero magnitudes; a zero (dead-channel) "
             "stiffness has no level."
@@ -348,11 +359,22 @@ class TransferStiffnessResult:
         content of a single point. Counting the entries refuses it, because one
         stiffness disagrees with three frequencies exactly as two do.
 
+        Both fields must also be finite. Neither determination can emit a
+        non-finite stiffness from valid data - the direct method refuses a
+        dead input channel and the indirect method multiplies finite
+        inertia terms by the measured transmissibility - so an ``inf`` here
+        is always an overflowed or clipped channel, not an undeterminable
+        band. Admitting it printed ``Lk = inf dB re 1 N/m`` boxed as the
+        fiche headline, with a loss factor of ``nan`` beside it and nothing
+        on the page qualifying either.
+
         :raises ValueError: if ``transfer_stiffness`` does not carry one value
-            per frequency, or either field carries an extra axis.
+            per frequency, either field carries an extra axis, or either
+            carries a non-finite value.
         """
         require_ranks(self, frequencies=1, transfer_stiffness=1)
         require_same_length(self, "frequencies", "transfer_stiffness", axis="frequency")
+        require_finite_fields(self, "frequencies", "transfer_stiffness")
 
     @property
     def magnitude(self) -> np.ndarray:

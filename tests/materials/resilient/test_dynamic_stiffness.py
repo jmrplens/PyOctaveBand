@@ -164,6 +164,57 @@ def test_non_positive_inputs_raise() -> None:
         materials.installed_dynamic_stiffness(20e6, 0.0)
 
 
+@pytest.mark.parametrize(
+    ("field_name", "message"),
+    [
+        ("apparent_stiffness", "'apparent_stiffness' must be positive"),
+        ("resonant_frequency", "'resonant_frequency' must be positive"),
+        ("floor_mass_per_area", "'floor_mass_per_area' must be positive"),
+        ("gas_stiffness", "'gas_stiffness' must be non-negative"),
+    ],
+)
+def test_a_determined_quantity_left_non_finite_is_refused(
+    field_name: str, message: str
+) -> None:
+    """The fiche prints these four unconditionally, headline included.
+
+    A NaN ``apparent_stiffness`` becomes the BOXED ``s't = nan MN/m3`` of a
+    fully rendered accredited page and a NaN ``resonant_frequency`` prints
+    ``fr = nan Hz`` in the metrics table beside it. The one producer,
+    :func:`floating_floor_resonance`, computes the apparent stiffness from a
+    positive resonance and load mass and pins the floor mass positive, so the
+    method never leaves any of the four undetermined.
+    """
+    import dataclasses
+
+    res = materials.floating_floor_resonance(25.0, 200.0, 100.0)
+    with pytest.raises(ValueError, match=message):
+        dataclasses.replace(res, **{field_name: float("nan")})
+
+
+def test_the_unresolved_installed_stiffness_is_kept_not_refused() -> None:
+    """Clause 8.2 c) cannot resolve ``s'`` for an airy specimen, and says so.
+
+    Below 10 kPa.s/m2 with a non-negligible enclosed-gas term the method has
+    no answer, so the producer hands back ``nan`` for ``s'`` and for the
+    natural frequency it derives from it. That NaN is the library's own
+    output, not a caller's mistake: refusing it at construction would refuse
+    a real measurement outcome, so both fields stay unpinned and the fiche's
+    metrics table renders the em dash for ``s'`` and omits the ``f0`` row.
+    """
+    with pytest.warns(DynamicStiffnessWarning):
+        res = materials.floating_floor_resonance(
+            25.0,
+            200.0,
+            100.0,
+            airflow_resistivity=5.0,
+            thickness=0.02,
+            porosity=0.9,
+        )
+    assert math.isnan(res.dynamic_stiffness)
+    assert math.isnan(res.natural_frequency)
+
+
 # ---------------------------------------------------------------------------
 # Plotting
 # ---------------------------------------------------------------------------

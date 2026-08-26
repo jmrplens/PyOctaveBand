@@ -85,6 +85,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ..._internal.validation import (
+    require_choice,
     require_equal_shapes,
     require_ranks,
     require_same_length,
@@ -403,9 +404,18 @@ class DbHrGlobalIndexResult:
         most this can ask for: four columns of eighteen values read off
         different Annex A tables agree here, and always will.
 
+        ``spectrum`` is pinned to the Annex A table keys because the figure
+        titles itself by looking the key up in a label table after the whole
+        page is drawn: :func:`db_hr_global_index` validates the key at the
+        call, but a result rewritten by hand reaches that lookup unchecked
+        and dies mid-render with a bare ``KeyError`` naming the key alone,
+        neither the field nor the choices it had.
+
         :raises ValueError: if the four per-band columns disagree in length,
-            or if one of them carries an axis beyond the band axis.
+            if one of them carries an axis beyond the band axis, or if
+            ``spectrum`` is not one of the Annex A table keys.
         """
+        require_choice(self.spectrum, "spectrum", tuple(DB_HR_NORMALISED_SPECTRA))
         require_ranks(
             self,
             frequencies=1,
@@ -744,6 +754,46 @@ class DbHrCheck:
     reported: float
     margin: float
     complies: bool
+
+    def __post_init__(self) -> None:
+        """Reject a check whose verdict contradicts its own comparison.
+
+        The three derived fields are one statement made three ways: the
+        margin is the rounded value against the limit, signed by the
+        requirement's direction, and ``complies`` is that margin's sign. The
+        assessment figure colours each check by ``complies`` alone, so a
+        check built by hand with the flag inverted would not fail anywhere;
+        it would paint a value short of its limit in the compliant colour,
+        beside a stem whose very geometry says otherwise.
+
+        The margin comparison allows a billionth of a decibel so a caller
+        who recomputed it along another floating-point path is not refused
+        over the last bit; the compliance slack below is DB-HR's own
+        boundary, the one :func:`check_db_hr_requirement` applies.
+
+        :raises ValueError: if ``margin`` does not restate ``reported``
+            against the limit, or ``complies`` contradicts ``margin``.
+        """
+        expected = (
+            self.reported - self.requirement.limit
+            if self.requirement.direction == "min"
+            else self.requirement.limit - self.reported
+        )
+        if not math.isclose(self.margin, expected, rel_tol=0.0, abs_tol=1e-9):
+            msg = (
+                "DbHrCheck: 'margin' must be 'reported' minus the limit for "
+                "a 'min' requirement and the limit minus 'reported' for a "
+                f"'max' one; got {self.margin!r} where the fields state "
+                f"{expected!r}."
+            )
+            raise ValueError(msg)
+        if bool(self.complies) != (self.margin >= _COMPLIANCE_SLACK):
+            msg = (
+                "DbHrCheck: 'complies' must agree with the sign of 'margin' "
+                f"(margin {self.margin!r} with complies "
+                f"{self.complies!r})."
+            )
+            raise ValueError(msg)
 
 
 @dataclass(frozen=True)

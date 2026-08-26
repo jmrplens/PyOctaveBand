@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 
+from .._internal.validation import require_equal_shapes
 from .common import (
     _ABSORPTION_QUANTITY_LABELS,
     _C_MUTED,
@@ -59,6 +60,15 @@ _SIGMA_UNFAV_LABEL = r"$\Sigma$ unfav. = "
 #: normal that the ISO 17497-2 diffusion polar covers (Clause 6.3,
 #: Figure 4); negated for the lower edge of the span.
 _POLAR_SEMICIRCLE_DEG = 90.0
+
+#: The em dash the value tables print for a missing entry, drawn here in
+#: place of the bar a band with no data would otherwise get. Same glyph in
+#: both languages, so it is not a translated string.
+_NO_DATA_MARK = "—"
+
+#: Height, on the 0..1 absorption axis, at which the em dash sits: low
+#: enough to read as a flattened bar, clear of the axis line beneath it.
+_INSITU_NO_DATA_Y = 0.05
 
 #: Spanish translations of the fixed strings rendered by the materials
 #: ``.plot()`` renderers, keyed by their verbatim English text.  ``_t`` returns
@@ -453,6 +463,14 @@ def plot_insitu_absorption(
 ) -> Axes:
     """In-situ one-third-octave absorption spectrum ``alpha(f)``.
 
+    A band with no contributing narrow-band samples is ``nan``, which
+    :func:`~phonometry.materials.surfaces.road_absorption.one_third_octave_absorption`
+    documents as "no data". It gets no bar: an em dash marks its position
+    instead, the same glyph the value tables print for a missing entry. The
+    ``nan_to_num`` this used to pass through drew a bar of height exactly
+    zero, a physically plausible reading for a road surface and
+    indistinguishable from a measured one.
+
     :param result: An
         :class:`~phonometry.materials.surfaces.road_absorption.InsituAbsorptionResult` exposing
         ``frequencies`` and ``absorption``.
@@ -467,7 +485,17 @@ def plot_insitu_absorption(
         ax, freqs, xlabel=_t(_FREQ_LABEL, language), language=language
     )
     kwargs.setdefault("color", _C_PRIMARY)
-    ax.bar(positions, np.nan_to_num(alpha), **kwargs)
+    measured = np.isfinite(alpha)
+    ax.bar(positions[measured], alpha[measured], **kwargs)
+    for position in positions[~measured]:
+        ax.text(
+            float(position),
+            _INSITU_NO_DATA_Y,
+            _NO_DATA_MARK,
+            ha="center",
+            va="center",
+            color=_C_MUTED,
+        )
     ax.set_ylabel(_t("Absorption coefficient", language))
     ax.set_ylim(0.0, 1.0)
     ax.set_title(_t("In-situ road-surface absorption (ISO 13472-1)", language))
@@ -1067,6 +1095,8 @@ def plot_transfer_matrix(
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the transmission-loss ``plot`` call.
     :return: The axes carrying the transmission-loss curve.
+    :raises ValueError: if ``frequency`` does not match the shape of the
+        spectra the four-pole entries produce.
     """
     from .._i18n import localize_axes
 
@@ -1077,6 +1107,15 @@ def plot_transfer_matrix(
     )
     alpha = np.asarray(
         matrix.absorption_hard_backed(characteristic_impedance), dtype=np.float64
+    )
+    # The four-pole entries carry no frequency axis of their own, so a
+    # hand-built matrix and the vector plotted against it can disagree.
+    # Named here under the entry point the caller typed: matplotlib would
+    # otherwise report two anonymous shapes from inside its own plot call.
+    require_equal_shapes(
+        "TransferMatrix.plot",
+        {"frequency": freqs.shape, "transmission_loss": tl.shape},
+        "frequency",
     )
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", _t(r"Transmission loss $TL_\mathrm{n}$", language))

@@ -638,6 +638,12 @@ with the sampled radius of the standard 5 ms window.
 
 **Returns:** The axes.
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a height or sampled radius that is not finite and positive, or a source no higher than the microphone. |
+
 ## power_reflection_coefficient
 
 ```python

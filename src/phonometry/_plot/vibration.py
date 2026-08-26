@@ -913,7 +913,8 @@ def plot_fault_frequencies(
     :param annotate: Label each line with its name (Default: ``True``).
     :param kwargs: Forwarded to the spectrum curve.
     :return: The axes.
-    :raises ValueError: If the result carries no lines.
+    :raises ValueError: If the result carries no lines, or *spectrum* carries a
+        non-finite frequency or amplitude.
     """
     from .._i18n import format_number, localize_axes
 
@@ -928,6 +929,18 @@ def plot_fault_frequencies(
     if spectrum is not None:
         spectrum_f = np.asarray(spectrum.frequencies, dtype=np.float64)
         spectrum_a = np.asarray(spectrum.amplitude, dtype=np.float64)
+        # Both vectors scale the axes: the frequency axis runs to the top of
+        # the measured one and the amplitude axis to its peak, taken with
+        # np.max so that a single non-finite sample becomes the whole limit.
+        # matplotlib then refuses it with "Axis limits cannot be NaN or Inf",
+        # naming neither this argument nor the field inside it. No producer
+        # emits one -- envelope_spectrum refuses a non-finite record before it
+        # transforms it -- so the mistake is always in what the caller built,
+        # and the refusal says which half of it.
+        for field, values in (("frequencies", spectrum_f), ("amplitude", spectrum_a)):
+            if not np.all(np.isfinite(values)):
+                msg = f"'spectrum.{field}' must contain only finite values."
+                raise ValueError(msg)
         if f_max is None:
             f_max = float(spectrum_f.max())
     if f_max is None:

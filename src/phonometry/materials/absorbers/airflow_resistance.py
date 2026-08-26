@@ -158,6 +158,37 @@ class StaticAirflowResult:
     linear_coefficient: float
     quadratic_coefficient: float
 
+    def __post_init__(self) -> None:
+        """Reject a determination carrying a non-finite quantity.
+
+        The one producer, :func:`static_airflow_resistance`, refuses
+        non-finite measurement steps before fitting, so every quantity it
+        hands back is finite and a NaN here is never the library's own
+        output. The fiche prints them all unconditionally: a NaN
+        ``specific_resistance`` becomes the BOXED headline ``Rs = nan
+        Pa.s/m`` with ``R = nan`` and ``sigma = nan`` beside it, on a fully
+        rendered accredited page with no warning anywhere. The fit
+        coefficients are pinned finite only: ``b`` (and with scattered steps
+        even ``a``) may come back negative from the through-origin
+        regression, and the fiche reports the fit as made.
+
+        :raises ValueError: if any quantity is not finite (``resistivity``
+            may be ``None`` when no thickness was supplied).
+        """
+        for name in (
+            "resistance",
+            "specific_resistance",
+            "resistivity",
+            "evaluation_velocity",
+            "pressure_drop",
+            "linear_coefficient",
+            "quadratic_coefficient",
+        ):
+            value = getattr(self, name)
+            if value is not None and not math.isfinite(float(value)):
+                msg = f"StaticAirflowResult: '{name}' must be finite."
+                raise ValueError(msg)
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:

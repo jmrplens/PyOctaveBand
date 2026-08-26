@@ -124,6 +124,12 @@ Plate a x b inside its baffle frame, boundary condition in the title.
 
 **Returns:** The axes.
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a side that is not positive and finite. |
+
 ## radiation_efficiency
 
 ```python

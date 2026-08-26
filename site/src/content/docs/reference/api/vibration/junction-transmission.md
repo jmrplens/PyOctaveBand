@@ -488,6 +488,12 @@ the junction type follows
 
 **Returns:** The axes.
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for an unknown junction type, or a thickness that is not positive and finite. |
+
 ## point_connection_coupling_loss_factor
 
 ```python

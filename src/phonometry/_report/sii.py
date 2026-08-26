@@ -53,13 +53,12 @@ from ._layout import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from reportlab.platypus import Table
 
     from ..speech.sii import SIIResult
     from .metadata import ReportMetadata
-
-#: The band procedure the fiche describes when the result carries no other.
-_DEFAULT_METHOD = "one-third-octave"
 
 #: Name of each ANSI S3.5-1997 band procedure as it reads in the standard-basis
 #: line, keyed by the ``method=`` name of the result.
@@ -77,6 +76,40 @@ _TABLE_CAPTIONS: dict[str, str] = {
     "one-third-octave": "One-third-octave band audibility",
     "octave": "Octave band audibility",
 }
+
+
+def _procedure_wording(table: Mapping[str, str], method: str, role: str) -> str:
+    """The fiche's wording for a band procedure, or a refusal naming it.
+
+    Both wording tables used to be read with a silent fall back to the
+    one-third-octave entry, and one-third-octave is a procedure of the
+    standard in its own right rather than a neutral placeholder: a result
+    computed over the 21 critical bands and mistyped as ``"critical band"``
+    printed a basis line claiming the one-third-octave-band method and a
+    caption reading "One-third-octave band audibility" over a table whose
+    rows were visibly the critical-band centres (150, 250, 350 Hz ...), with
+    nothing on the accredited page to contradict either. There is no wording
+    that is safe to guess here, so an unrecognised procedure is refused.
+
+    :class:`~phonometry.speech.sii.SIIResult` pins ``method`` to
+    :data:`~phonometry.speech.sii.SII_METHODS` at construction, so this is
+    the second reader of the tag agreeing with the first rather than a live
+    route; it is what would catch a fifth procedure added to that tuple
+    without the two tables here being extended with its wording.
+
+    :param table: The wording table to read, keyed by procedure name.
+    :param method: The band procedure of the result.
+    :param role: What the wording is for, named in the refusal.
+    :return: The (untranslated) wording of that procedure.
+    :raises ValueError: if ``method`` is not a procedure the table words.
+    """
+    if method not in table:
+        msg = (
+            f"The fiche has no {role} for band procedure {method!r}; "
+            f"'method' must be one of {tuple(table)}."
+        )
+        raise ValueError(msg)
+    return table[method]
 
 
 def _metadata_pairs(
@@ -247,7 +280,10 @@ def render_sii_report(
     measurement_standard = (
         metadata.measurement_standard if metadata is not None else None
     )
-    method = t(_METHOD_NAMES.get(result.method, "one-third-octave-band"), language)
+    method = t(
+        _procedure_wording(_METHOD_NAMES, result.method, "basis-line wording"),
+        language,
+    )
     if measurement_standard:
         basis = t(
             "{standard} speech intelligibility index. Rating per ANSI S3.5-1997 ({method} method).",
@@ -274,7 +310,9 @@ def render_sii_report(
     left_cell = [
         fiche_paragraph(
             t(
-                _TABLE_CAPTIONS.get(result.method, _TABLE_CAPTIONS[_DEFAULT_METHOD]),
+                _procedure_wording(
+                    _TABLE_CAPTIONS, result.method, "band-table caption"
+                ),
                 language,
             ),
             caption_style,

@@ -22,7 +22,8 @@ Clause 5.2):
 * an optional verdict row when a target spatial decay rate is supplied
   (``metadata.requirement``, read as the minimum acceptable ``D2,S``; a larger
   spatial decay is better, so the room passes at or above it), reflecting the
-  informative quality ranges of Annex A; and
+  informative quality ranges of Annex A and withheld when ``D2,S`` could not
+  be fitted; and
 * a short measurement-basis strip and a footer identity/disclaimer block.
 
 Like :mod:`.annex16_epnl` this uses a stacked layout rather than the narrow
@@ -164,7 +165,7 @@ def _statement(result: OpenPlanResult, language: str = "en") -> tuple[str, list[
 
 def _verdict(
     result: OpenPlanResult, requirement: float, language: str = "en"
-) -> tuple[str, bool]:
+) -> tuple[str, bool] | None:
     """Verdict text and PASS flag for a supplied target spatial decay rate.
 
     ISO 3382-3:2012 Annex A (informative) gives quality ranges for the spatial
@@ -173,9 +174,21 @@ def _verdict(
     measured value is at or above it. The comparison is made on the value
     rounded exactly as the fiche displays it (one decimal, halves away from
     zero), so the printed number can never contradict the verdict.
+
+    ``None`` when ``D2,S`` is not finite: :func:`~phonometry.room.open_plan
+    .open_plan_metrics` leaves it NaN when fewer than two positions fall in
+    the 2 m to 16 m range of Clause 6.2, so nothing was fitted to compare with
+    the target, and the metrics table and the boxed statement already say so
+    with the em dash. The finiteness has to be read off the raw value: rounding
+    first sent the NaN into ``display_round``, whose floor died in a bare
+    ``ValueError: cannot convert float NaN to integer`` (``OverflowError`` for
+    an infinity) that named neither the quantity nor the fiche, and no PDF was
+    written at all.
     """
-    d2s = display_round(result.d2s, 1)
-    passed = math.isfinite(d2s) and d2s >= display_round(requirement, 1)
+    d2s = float(result.d2s)
+    if not math.isfinite(d2s):
+        return None
+    passed = display_round(d2s, 1) >= display_round(requirement, 1)
     text = t(
         "D<sub>2,S</sub> = {value} dB, required &#8805; {req} dB", language
     ).format(
@@ -202,7 +215,9 @@ def render_iso3382_3_report(
     :param metadata: Optional :class:`ReportMetadata`; ``None`` produces a bare
         characterisation fiche (metrics + plot + result, no header and no
         verdict). A supplied ``requirement`` is read as the minimum acceptable
-        spatial decay rate ``D2,S`` in dB (the room passes at or above it).
+        spatial decay rate ``D2,S`` in dB (the room passes at or above it);
+        the verdict row is withheld when ``D2,S`` could not be fitted, since
+        there is then no measured value to compare.
     :param verbose: Accepted for a uniform ``.report()`` signature; the fiche
         has a single stacked body layout, so it has no effect.
     :param language: Fiche language: ``"en"`` (default) or ``"es"``.
@@ -278,8 +293,9 @@ def render_iso3382_3_report(
     statement, extended = _statement(result, language)
     flow.append(result_box(statement, styles, accent, extended))
     if metadata is not None and metadata.requirement is not None:
-        text, passed = _verdict(result, metadata.requirement, language)
-        flow.extend(verdict_flow(text, passed, styles, language))
+        verdict = _verdict(result, metadata.requirement, language)
+        if verdict is not None:
+            flow.extend(verdict_flow(verdict[0], verdict[1], styles, language))
 
     basis_strip_style = measurement_basis_style()
     flow.append(

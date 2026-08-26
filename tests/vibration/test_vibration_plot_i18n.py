@@ -154,6 +154,74 @@ def test_fault_frequency_overlay_on_a_measured_spectrum() -> None:
         empty.plot()
 
 
+def _measured_envelope_spectrum() -> object:
+    """An envelope spectrum of a modulated carrier, as the overlay is fed one."""
+    from phonometry import signals
+
+    fs = 8192.0
+    t = np.arange(int(fs)) / fs
+    signal = (1.0 + 0.5 * np.cos(2.0 * np.pi * 207.0 * t)) * np.cos(
+        2.0 * np.pi * 2000.0 * t
+    )
+    return signals.envelope_spectrum(signal, fs)
+
+
+@pytest.mark.parametrize("field", ["frequencies", "amplitude"])
+def test_a_non_finite_measured_spectrum_is_refused_by_field(field: str) -> None:
+    """Both vectors of ``spectrum`` scale an axis, so a NaN in either ends the figure.
+
+    The frequency axis runs to the top of the measured one and the amplitude
+    axis to its peak, taken with ``np.max``, so one non-finite sample becomes
+    the whole limit and matplotlib stops the render with "Axis limits cannot
+    be NaN or Inf", naming neither the argument nor the field inside it.
+    ``spectrum`` is a structural contract, anything exposing the two vectors,
+    so there is no construction of ours to pin it at and the refusal is where
+    the caller's parameter is named. No producer emits one:
+    :func:`phonometry.signals.envelope.envelope_spectrum` refuses a non-finite
+    record before it transforms it.
+    """
+    pytest.importorskip("matplotlib")
+    import dataclasses
+
+    import matplotlib as mpl
+
+    mpl.use("Agg")
+
+    res = vibration.bearing_fault_frequencies(
+        2000.0, 15, 6.0, 34.0, contact_angle_deg=12.96
+    )
+    spectrum = _measured_envelope_spectrum()
+    corrupt = np.asarray(getattr(spectrum, field)).copy()
+    corrupt[100] = np.nan
+    bad = dataclasses.replace(spectrum, **{field: corrupt})  # type: ignore[type-var]
+    with pytest.raises(
+        ValueError, match=f"'spectrum.{field}' must contain only finite"
+    ):
+        res.plot(spectrum=bad)
+
+
+def test_the_overlay_scales_its_amplitude_axis_to_the_measured_peak() -> None:
+    """The refusal sits in front of the measurement, which still sets the axis.
+
+    The y limit is the peak of the drawn part of the curve, lifted by the
+    strip the rotated line names are laid out in, so the check above cannot
+    have replaced ``np.max`` with a NaN-tolerant reading of a corrupt curve.
+    """
+    pytest.importorskip("matplotlib")
+    import matplotlib as mpl
+
+    mpl.use("Agg")
+
+    res = vibration.bearing_fault_frequencies(
+        2000.0, 15, 6.0, 34.0, contact_angle_deg=12.96
+    )
+    spectrum = _measured_envelope_spectrum()
+    ax = res.plot(spectrum=spectrum, max_frequency=600.0, annotate=False)
+    kept = np.asarray(spectrum.frequencies) <= 600.0  # type: ignore[attr-defined]
+    peak = float(np.max(np.asarray(spectrum.amplitude)[kept]))  # type: ignore[attr-defined]
+    assert ax.get_ylim() == pytest.approx((0.0, 1.03 * peak))
+
+
 def test_crowded_fault_labels_do_not_overlap() -> None:
     """Names of nearby lines are pushed apart instead of stacking up.
 

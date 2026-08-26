@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 
+from .._internal.validation import require_choice
 from .common import (
     _C_EDGE,
     _C_MUTED,
@@ -69,6 +70,10 @@ _RC_RUMBLE_MAX_HZ = 500.0
 #: Lowest octave band shaded with the +3 dB hiss tolerance in the RC Mark II
 #: plot (ANSI/ASA S12.2 Annex D, clause D.3: at and above 1000 Hz).
 _RC_HISS_MIN_HZ = 1000.0
+
+#: The excitation signals ISO 18233 covers and :func:`plot_excitation` draws,
+#: in the order the parameter documents them.
+_EXCITATION_KINDS = ("sweep", "mls")
 
 #: Spanish translations of the fixed strings rendered by the room ``.plot()``
 #: renderers, keyed by their verbatim English text.  ``_t`` returns the English
@@ -700,10 +705,17 @@ def plot_excitation(
         fresh two-panel figure.
     :param kwargs: Forwarded to the time-domain ``plot`` call.
     :return: The time-domain axes (``ax`` given) or the array of two axes.
+    :raises ValueError: for an unknown ``kind``, or an empty signal.
     """
     from .._i18n import check_language, localize_axes
 
     check_language(language)
+    # Pinned like ``language`` beside it: the branch below tests ``== "mls"``
+    # and sent every other tag to the sweep drawing, so the typo "msl" for an
+    # actual MLS array was published under the title "ISO 18233 exponential
+    # sine sweep" beside a spectrogram announcing an exponential frequency
+    # rise, with no warning.
+    require_choice(kind, "kind", _EXCITATION_KINDS)
     x = np.asarray(signal, dtype=np.float64)
     n = x.shape[-1]
     if n == 0:

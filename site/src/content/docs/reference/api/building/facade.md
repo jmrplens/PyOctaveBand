@@ -394,6 +394,12 @@ an area, such as airbriks rated by `dn_e`, get a nominal 0,1 m2 tile).
 
 **Returns:** The axes.
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for an empty sequence, or an element whose area is not finite and positive. |
+
 ## radiated_sound_power
 
 ```python

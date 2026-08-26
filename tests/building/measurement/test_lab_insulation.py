@@ -360,6 +360,33 @@ def test_absorption_with_an_extra_axis_is_refused(build: Callable[[], Any]) -> N
         dataclasses.replace(res, absorption=stacked)
 
 
+@pytest.mark.parametrize("field", ["r", "absorption"])
+def test_airborne_non_finite_band_is_refused(field: str) -> None:
+    """A NaN band cannot exist on a result the fiche will print as measured.
+
+    ``lab_airborne_insulation`` only emits finite values (its levels are
+    checked finite, ``A`` comes from a positive ``T`` and ``V``), so a NaN is
+    always a construction mistake -- and the verbose fiche printed it as a
+    measured ``A`` in the band table while the boxed ``Rw (C; Ctr)`` beside
+    it read clean.
+    """
+    res = _airborne_result()
+    bad = np.asarray(getattr(res, field), dtype=np.float64).copy()
+    bad[3] = np.nan
+    with pytest.raises(ValueError, match=rf"'{field}' must contain only finite"):
+        dataclasses.replace(res, **{field: bad})
+
+
+@pytest.mark.parametrize("field", ["l_n", "absorption"])
+def test_impact_non_finite_band_is_refused(field: str) -> None:
+    """The ISO 10140-3 sheet gets the same finiteness pin as the airborne one."""
+    res = _impact_result()
+    bad = np.asarray(getattr(res, field), dtype=np.float64).copy()
+    bad[3] = np.nan
+    with pytest.raises(ValueError, match=rf"'{field}' must contain only finite"):
+        dataclasses.replace(res, **{field: bad})
+
+
 def test_plot_without_rating_raises() -> None:
     res = building.lab_airborne_insulation(
         np.full(18, 80.0),

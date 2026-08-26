@@ -7,6 +7,7 @@ digital-filter realization of the seat-to-spine transfer function.
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import numpy as np
@@ -245,6 +246,46 @@ def test_response_peaks_rejects_2d() -> None:
     two_channels = np.zeros((2, 100))
     with pytest.raises(ValueError, match="1-D time series"):
         v.response_peaks(two_channels)
+
+
+@pytest.mark.parametrize("bad", [float("nan"), float("inf")], ids=["nan", "inf"])
+def test_a_corrupt_seat_record_is_refused_where_it_enters(bad: float) -> None:
+    """One bad sample turns the whole spinal response non-finite, and reads safe.
+
+    The response is an IIR filtering of the record, so a single NaN spreads
+    over everything after it; ``response_peaks`` then counts none, because
+    every comparison against a NaN is False, and the dose, the compression
+    and the risk all come out exactly 0.0. The figure carried the safest
+    verdict there is, "R = 0.00, P = 0 %", with no trace of the corruption
+    anywhere on it. The same record without the bad sample gives R = 0.158
+    over 1696 peaks.
+    """
+    az = np.zeros(2560)
+    az[::400] = 60.0
+    az[50] = bad
+    with pytest.raises(ValueError, match="acceleration must contain only finite"):
+        v.multiple_shock_assessment(
+            az, 256.0, start_age=20, years=20, days_per_year=120, sex="male"
+        )
+
+
+@pytest.mark.parametrize("field", ["risk", "probability"])
+def test_a_non_finite_health_risk_is_refused(field: str) -> None:
+    """The health-risk sheet prints R and P, and classifies on them.
+
+    The Formula 3 to C.5 chain emits finite values for finite, conditioned
+    input, so a NaN can only reach a hand-built result; without the pin the
+    accredited sheet printed "nan %" in the analysis row and in the boxed
+    result beside a definite risk classification, or crashed the display
+    rounding with a bare "cannot convert float NaN to integer".
+    """
+    az = np.zeros(2560)
+    az[::400] = 60.0
+    result = v.multiple_shock_assessment(
+        az, 256.0, start_age=20, years=20, days_per_year=120, sex="male"
+    )
+    with pytest.raises(ValueError, match=f"'{field}' must be finite"):
+        dataclasses.replace(result, **{field: float("nan")})
 
 
 def test_the_time_guards_reject_nan_and_infinity() -> None:

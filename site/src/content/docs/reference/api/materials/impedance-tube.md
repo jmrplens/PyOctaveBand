@@ -397,6 +397,12 @@ working range of [`plane_wave_frequency_range`](/phonometry/reference/api/materi
 
 **Returns:** The axes.
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a spacing, distance, diameter or sample thickness that is not finite and positive, or an `x1` no greater than the spacing. |
+
 ## plot_transmission_tube_geometry
 
 ```python
@@ -443,6 +449,12 @@ range of
 | `kwargs` | Forwarded to the tube-bore rectangle. |
 
 **Returns:** The axes.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | naming the first length or diameter that is not finite and positive, or an `l2` no greater than the thickness. |
 
 ## reflection_factor
 

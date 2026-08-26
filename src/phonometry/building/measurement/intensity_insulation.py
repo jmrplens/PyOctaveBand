@@ -81,6 +81,7 @@ from ..._internal.validation import (
     check_engine,
     require_equal_counts,
     require_equal_shapes,
+    require_finite_fields,
     require_ranks,
     require_same_length,
 )
@@ -199,10 +200,33 @@ class IntensityReductionResult:
         the ``Kc`` adaptation -- is the one nothing lines up, and the surplus
         entries of a longer array are dropped by the table without a word.
 
-        :raises ValueError: if ``r_i`` and ``r_i_modified`` disagree.
+        The retained areas are pinned with the same predicate
+        :func:`intensity_sound_reduction` applies to its own arguments,
+        because a manually built result skips that entry point: ``S`` and
+        ``Sm`` exist only to be printed in the Clause 8 g) statement, so a
+        NaN admitted here surfaced as "S = nan m2" in the accredited
+        sentence with no warning anywhere.
+
+        The two indices are pinned finite for the same reason. ISO 15186 has
+        no undeterminable band to flag: the only producer,
+        :func:`intensity_sound_reduction`, forms ``RI`` from levels already
+        refused non-finite by :func:`._as_band_levels` less a constant and a
+        logarithm of two positive areas, and adds an equally checked ``Kc``
+        for ``RI,M``. So a NaN band can only be a mistake, and admitting it
+        printed a bare ``nan`` as a measured index in the accredited band
+        table.
+
+        :raises ValueError: if ``r_i`` and ``r_i_modified`` disagree or carry
+            a non-finite band, or a supplied ``area``/``measurement_area`` is
+            not a positive, finite number.
         """
         require_ranks(self, r_i=1, r_i_modified=1)
         require_same_length(self, "r_i", "r_i_modified")
+        require_finite_fields(self, "r_i", "r_i_modified")
+        for name in ("area", "measurement_area"):
+            value = getattr(self, name)
+            if value is not None:
+                _positive_area(value, name)
 
     def plot(self, ax: Axes | None = None, **kwargs: Any) -> Axes:
         """Plot ``RI`` against the shifted ISO 717-1 reference curve.

@@ -213,11 +213,34 @@ class FloorCoveringImprovementResult:
         sub-range located inside ``frequencies``, so an axis of another length
         rates a different stretch of spectrum from the one tabulated beside it.
 
+        The ratings are whole decibels by construction (ISO 717-2 rounds both
+        ``ΔLw`` and ``CI,Δ`` to integers, and that is what
+        :func:`~phonometry.building.weighted_impact_improvement` and
+        :func:`~phonometry.building.impact_improvement_adaptation_term`
+        return), and the fiche prints them as integers: a float smuggled in by
+        a hand-built result would either crash the ``{ci_delta:+d}`` format
+        with a message naming no field, or print an unlocalised decimal point
+        on a comma-decimal sheet. Both are refused here by name instead.
+
         :raises ValueError: if the frequencies, the improvement and the
-            limit-of-measurement mask do not agree on how many bands there are.
+            limit-of-measurement mask do not agree on how many bands there
+            are, or if ``delta_lw`` / ``ci_delta`` is not an integer (or
+            ``None``).
         """
         require_ranks(self, frequencies=1, improvement=1, limited=1)
         require_same_length(self, "frequencies", "improvement", "limited")
+        for name in ("delta_lw", "ci_delta"):
+            value = getattr(self, name)
+            # A bool is an int in Python, so it is excluded explicitly.
+            if value is not None and (
+                isinstance(value, bool) or not isinstance(value, int)
+            ):
+                msg = (
+                    f"FloorCoveringImprovementResult: '{name}' must be an "
+                    f"integer number of decibels (ISO 717-2 ratings are "
+                    f"rounded to whole dB) or None; got {value!r}."
+                )
+                raise ValueError(msg)
 
     def octave_bands(self) -> tuple[np.ndarray, np.ndarray]:
         """Return ``(octave_freqs, ΔLoct)`` via Formula (5) (needs 16 1/3-oct bands)."""

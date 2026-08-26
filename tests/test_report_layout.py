@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import numpy as np
 import pytest
 
 if TYPE_CHECKING:
@@ -24,6 +25,7 @@ from phonometry._report._layout import (  # noqa: E402
     band_table,
     compliance_table,
     grid_table,
+    response_decades,
 )
 
 
@@ -170,3 +172,29 @@ def test_band_centres_that_are_not_the_rows_are_refused(centres: list[int]) -> N
     expected = rf"carries {len(centres)} entries for 3 band rows"
     with pytest.raises(ValueError, match=expected):
         band_table(rows, [28.0, 28.0], 3, band_centres=centres)
+
+
+# --------------------------------------------------------------------------
+# A span the helper cannot measure, as against one it can
+# --------------------------------------------------------------------------
+@pytest.mark.parametrize("bad", [float("nan"), float("inf")], ids=["nan", "inf"])
+def test_a_frequency_axis_it_cannot_measure_is_refused_not_returned(bad: float) -> None:
+    """Both refusals below it are comparisons, and a NaN loses every one.
+
+    ``low <= 0.0`` and ``high / low < ratio`` are False against a NaN, so the
+    axis walked past a refusal written to catch exactly the undrawable span it
+    produces and the helper returned ``nan`` where its whole purpose was to
+    have raised. The panel's box aspect then carried the ``nan`` into
+    matplotlib, which stopped the fiche with ``Axis limits cannot be NaN or
+    Inf`` and named neither the axis nor the result it came from.
+    """
+    axis = np.array([100.0, bad, 1000.0])
+    with pytest.raises(ValueError, match="response frequency axis must contain"):
+        response_decades(axis, "IEC 60268-4 microphone fiche")
+
+
+def test_the_decades_of_a_finite_axis_are_the_span_it_covers() -> None:
+    """The refusal is only in front of the measurement, which still stands."""
+    assert response_decades(np.geomspace(20.0, 20000.0, 50), "probe") == pytest.approx(
+        3.0
+    )

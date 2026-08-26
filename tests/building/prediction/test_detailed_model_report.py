@@ -124,6 +124,38 @@ def test_detailed_impact_fiche_boxes_the_annex_g_rating(tmp_path: Path) -> None:
     assert "Df1" in text
 
 
+@pytest.mark.parametrize(
+    "label",
+    ["ext wall <north>-Ff", "<b>ext wall</b>-Ff", "ext wall <b>east-Ff"],
+    ids=["angle-brackets", "balanced-tags", "unclosed-tag"],
+)
+def test_detailed_path_label_reaches_the_table_intact(
+    label: str, tmp_path: Path
+) -> None:
+    """A ``BandPath`` label is client free text, printed verbatim.
+
+    Both detailed fiches print ``result.paths[k].label`` through the same
+    table cell, which fed it to reportlab's paragraph parser: an
+    angle-bracketed word vanished from the accredited path row (``ext wall
+    -Ff``), balanced tags rendered the row as formatting, and an unclosed tag
+    aborted the render with a parse error naming neither the field nor the
+    path.
+    """
+    result = building.detailed_airborne_prediction(
+        _BANDS,
+        direct_index=np.linspace(40.0, 60.0, _BANDS.size),
+        flanking_paths=[
+            building.BandPath(
+                label=label, kind="Ff", values=np.linspace(50.0, 70.0, _BANDS.size)
+            )
+        ],
+    )
+    out = tmp_path / "label.pdf"
+    result.report(str(out))
+    assert_one_page(str(out))
+    assert label in _extract_text(str(out))
+
+
 def test_spanish_detailed_fiche_renders(tmp_path: Path) -> None:
     """The fiches translate to Spanish like every other report."""
     out = tmp_path / "air_es.pdf"

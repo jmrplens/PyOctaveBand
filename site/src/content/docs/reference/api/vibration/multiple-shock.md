@@ -469,6 +469,12 @@ high-pass) of $a_\mathrm{z}(t)$ before calling.
 
 **Returns:** The spinal response acceleration $A_\mathrm{z}(t)$, m/s2, same length.
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a record that is not 1-D, is empty or carries non-finite samples. |
+
 ## static_stress
 
 ```python

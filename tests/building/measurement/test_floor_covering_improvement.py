@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pytest
 import reference_data as ref
@@ -366,6 +368,24 @@ def test_octave_conversion_energy_mean() -> None:
         np.mean([10.0 ** (-6 / 10), 10.0 ** (-10 / 10), 10.0 ** (-14 / 10)])
     )
     np.testing.assert_allclose(oct_dl, [expected])
+
+
+# ---------------------------------------------------------------------------
+# Construction guards
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize("field", ["delta_lw", "ci_delta"])
+def test_a_fractional_rating_is_refused_by_name(field: str) -> None:
+    """ISO 717-2 rounds both ratings to whole decibels, and the fiche prints them so.
+
+    A float smuggled into a hand-built result crashes the boxed statement's
+    ``{ci_delta:+d}`` format with a message naming no field, no result and no
+    fiche, or prints an unlocalised decimal point on a comma-decimal sheet.
+    """
+    freqs = ref.ISO717_2_REFERENCE_FLOOR_FREQ
+    bare = np.full(16, 75.0)
+    res = building.impact_improvement(bare, bare - 5.0, freqs)
+    with pytest.raises(ValueError, match=rf"'{field}' must be an integer number"):
+        dataclasses.replace(res, **{field: -1.0})
 
 
 # ---------------------------------------------------------------------------

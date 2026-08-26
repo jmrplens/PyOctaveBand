@@ -707,6 +707,47 @@ def test_global_index_rejects_a_spectrum_of_another_band_set() -> None:
         dataclasses.replace(index, spectrum_levels=one_band_too_many)
 
 
+def test_global_index_rejects_a_spectrum_annex_a_does_not_tabulate() -> None:
+    """The figure titles itself from a label table keyed by ``spectrum``.
+
+    The entry point checks the key at the call, but a result rewritten by hand
+    reaches that lookup unchecked, after the whole page is drawn, and dies with
+    a bare ``KeyError`` naming the key alone: neither the field nor the four
+    Annex A tables it could have named.
+    """
+    index = hr.ra(_R_PRIME)
+    with pytest.raises(ValueError, match="'spectrum' must be one of"):
+        dataclasses.replace(index, spectrum="brown")
+
+
+def test_a_check_whose_verdict_contradicts_its_margin_is_refused() -> None:
+    """The lollipop colours each check by ``complies`` and nothing else.
+
+    A check reporting 45 dBA against a 50 dBA minimum, with the flag inverted,
+    would be painted in the compliant colour beside a stem whose very geometry
+    says otherwise.
+    """
+    requirement = hr.DbHrRequirement(
+        "DnT,A", 50.0, "min", "dBA", 0, "DB-HR 2.1", "between dwellings"
+    )
+    with pytest.raises(ValueError, match="'complies' must agree"):
+        hr.DbHrCheck(requirement, 45.0, 45.0, -5.0, complies=True)
+
+
+def test_a_check_whose_margin_does_not_restate_its_comparison_is_refused() -> None:
+    """The margin is the reported value against the limit, and nothing else.
+
+    The assessment figure draws the stem to ``margin`` and the fiche prints it,
+    so a margin computed against another limit reads as a comfortable pass over
+    a value that never earned it.
+    """
+    requirement = hr.DbHrRequirement(
+        "DnT,A", 50.0, "min", "dBA", 0, "DB-HR 2.1", "between dwellings"
+    )
+    with pytest.raises(ValueError, match="'margin' must be 'reported' minus"):
+        hr.DbHrCheck(requirement, 45.0, 45.0, 5.0, complies=True)
+
+
 def test_requirement_lookup_validation() -> None:
     """Unknown uses, rooms and room-pair combinations are rejected."""
     with pytest.raises(ValueError, match="Unknown"):

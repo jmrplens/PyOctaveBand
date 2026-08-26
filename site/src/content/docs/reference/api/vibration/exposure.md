@@ -167,7 +167,7 @@ whose magnitude is the Annex Part B dominant-axis value (see
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | for a negative magnitude or duration. |
+| ValueError | for a non-finite or negative magnitude or duration. |
 
 ## daily_vibration_exposure
 
@@ -209,7 +209,7 @@ Eq. (10) vector total `a_v`.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | if the inputs differ in length or `labels` mismatches. |
+| ValueError | if the inputs differ in length, carry non-finite values, or `labels` mismatches. |
 
 ## DailyVibrationExposure
 
@@ -359,7 +359,7 @@ Assess a daily exposure against Directive 2002/44/EC (Article 3).
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | for an unknown `kind`/`metric` combination or a negative `value`. |
+| ValueError | for an unknown `kind`/`metric` combination or a non-finite or negative `value`. |
 
 ## ExposureAssessment
 
@@ -570,7 +570,7 @@ whose magnitude is the Annex Part B dominant-axis value (see
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | for a negative magnitude or duration. |
+| ValueError | for a non-finite or negative magnitude or duration. |
 
 ## REFERENCE_ACCELERATION
 
@@ -786,7 +786,7 @@ comparing against the tabulated factors; a nominal label (e.g.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | if the inputs differ in length or are empty. |
+| ValueError | if the inputs differ in length, are empty or carry non-finite values. |
 
 ## WeightedSpectrum
 

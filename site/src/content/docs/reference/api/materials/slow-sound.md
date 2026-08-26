@@ -291,6 +291,12 @@ with `period` `d`; rigid back wall at the right.
 
 **Returns:** The axes.
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | naming the first of the three lengths that is not finite and positive, or for an empty resonator chain. |
+
 ## rectangular_duct_properties
 
 ```python

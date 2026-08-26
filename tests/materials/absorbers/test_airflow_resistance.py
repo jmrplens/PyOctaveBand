@@ -141,6 +141,36 @@ def test_static_regression_recovers_zero_velocity_intercept() -> None:
     assert result.pressure_drop == pytest.approx(r_s_eval * 0.5e-3)
 
 
+@pytest.mark.parametrize(
+    "field_name",
+    [
+        "resistance",
+        "specific_resistance",
+        "resistivity",
+        "evaluation_velocity",
+        "pressure_drop",
+        "linear_coefficient",
+        "quadratic_coefficient",
+    ],
+)
+def test_a_non_finite_determination_quantity_is_refused(field_name: str) -> None:
+    """The fiche prints every one of these unconditionally, headline included.
+
+    A NaN ``specific_resistance`` becomes the BOXED ``Rs = nan Pa.s/m`` of a
+    fully rendered accredited page, with ``R = nan Pa.s/m3`` and
+    ``sigma = nan Pa.s/m2`` in the terms beside it and no warning anywhere.
+    The one producer, :func:`static_airflow_resistance`, refuses non-finite
+    measurement steps before fitting, so every quantity it hands back is
+    finite and this state arrives only by direct construction or replace.
+    """
+    import dataclasses
+
+    u = np.array([0.5e-3, 1.0e-3, 2.0e-3, 4.0e-3])
+    result = static_airflow_resistance(u, 12000.0 * u, 0.008, 0.05)
+    with pytest.raises(ValueError, match=f"StaticAirflowResult: '{field_name}'"):
+        dataclasses.replace(result, **{field_name: float("nan")})
+
+
 def test_static_resistivity_is_none_without_thickness() -> None:
     u = np.array([1.0e-3, 2.0e-3, 4.0e-3])
     dp = 12000.0 * u

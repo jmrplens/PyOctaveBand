@@ -255,6 +255,25 @@ def test_weighted_acceleration_length_mismatch_raises() -> None:
         hv.weighted_acceleration([1.0, 2.0], [8.0], "Wk")
 
 
+@pytest.mark.parametrize(
+    "name", ["band_accelerations", "frequencies"], ids=["accelerations", "frequencies"]
+)
+def test_weighted_acceleration_refuses_a_non_finite_band(name: str) -> None:
+    """A NaN band leaves ``a_w`` NaN and its two bars missing from the figure.
+
+    The ISO 2631 spectrum used to render with the corrupt band drawn as
+    nothing at all, indistinguishable from a band measured at zero, under a
+    title reading "a_w = nan m/s2". The root-sum-of-squares of Eq. (9) has no
+    undeterminable band to report: every band contributes.
+    """
+    values = {"band_accelerations": [0.5, 0.4, 0.3], "frequencies": [8.0, 10.0, 12.5]}
+    values[name] = [*values[name][:1], float("nan"), *values[name][2:]]
+    with pytest.raises(ValueError, match=f"'{name}' must contain only finite"):
+        hv.weighted_acceleration(
+            values["band_accelerations"], values["frequencies"], "Wk"
+        )
+
+
 # ---------------------------------------------------------------------------
 # Time-domain metrics.
 # ---------------------------------------------------------------------------
@@ -590,3 +609,47 @@ def test_daily_vibration_exposure_plot_returns_axes() -> None:
     ax = result.plot()
     assert isinstance(ax, plt.Axes)
     plt.close("all")
+
+
+# ---------------------------------------------------------------------------
+# The tags the fiche routes through, and the magnitudes it assesses.
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize(
+    ("kind", "metric", "field"),
+    [("hand-arm", "a8", "kind"), ("hav", "A8", "metric")],
+    ids=["kind", "metric"],
+)
+def test_an_assessment_refuses_an_unknown_tag(
+    kind: str, metric: str, field: str
+) -> None:
+    """``kind`` and ``metric`` are read as tags, not as free text.
+
+    The fiche names the applied ISO standard by ``kind`` and heads its
+    magnitude column with the per-kind symbol, so an unpinned spelling used
+    to render a complete page with an empty standard name and the whole-body
+    symbol ``a_w,max`` over hand-arm data.
+    """
+    with pytest.raises(ValueError, match=f"'{field}' must be one of"):
+        hv.ExposureAssessment(
+            value=3.2,
+            kind=kind,
+            metric=metric,
+            action_value=2.5,
+            limit_value=5.0,
+            exceeds_action=True,
+            exceeds_limit=False,
+            zone="action",
+        )
+
+
+@pytest.mark.parametrize("magnitude", [float("nan"), float("inf")], ids=["nan", "inf"])
+def test_daily_exposure_refuses_a_non_finite_magnitude(magnitude: float) -> None:
+    """A non-finite magnitude passes every ``< 0`` guard and is assessed safe.
+
+    NaN fails both ``>= EAV`` comparisons, so the exposure used to come back
+    zoned "below action" and only died later inside the fiche's rounding,
+    with an exception naming no field; an infinity died there too, with an
+    ``OverflowError`` no docstring promised.
+    """
+    with pytest.raises(ValueError, match="'total_values' must contain only finite"):
+        hv.daily_vibration_exposure([magnitude, 2.5], [3600.0, 7200.0], kind="hav")

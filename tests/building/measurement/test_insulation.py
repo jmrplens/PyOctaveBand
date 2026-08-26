@@ -352,6 +352,31 @@ def test_a_chain_column_of_another_length_is_refused() -> None:
         dataclasses.replace(result, l1=longer)
 
 
+@pytest.mark.parametrize("field", ["l1", "l2", "t2"])
+def test_a_non_finite_chain_column_is_refused(field: str) -> None:
+    """The verbose ISO 16283-1 table forwards the chain raw, so it is pinned.
+
+    ``airborne_insulation`` refuses non-finite levels and reverberation times
+    on the way in, so a NaN can only reach a hand-built result; without the
+    pin it renders a literal ``nan`` cell inside the accredited field-report
+    chain table while the DnT,w rating box beside it prints normally.
+    """
+    result = building.airborne_insulation(
+        np.linspace(90.0, 96.0, 16),
+        np.linspace(50.0, 40.0, 16),
+        np.full(16, 0.6),
+        area=10.0,
+        volume=50.0,
+    )
+    column = np.asarray(getattr(result, field), dtype=np.float64).copy()
+    column[4] = np.nan
+    with pytest.raises(
+        ValueError,
+        match=f"AirborneInsulationResult: '{field}' must contain only finite",
+    ):
+        dataclasses.replace(result, **{field: column})
+
+
 def test_airborne_requires_both_area_and_volume() -> None:
     l1 = np.array([80.0])
     l2 = np.array([40.0])
@@ -632,3 +657,35 @@ def test_weighted_rating_manual_es_facade_traffic_index() -> None:
     # (0.5 dB rounding of Ctr plus 0.5 dB of the printed one-decimal value).
     res = building.weighted_rating(_MANUAL_ES_D_2M_NT)
     assert res.rating + res.ctr == pytest.approx(32.8, abs=1.0)
+
+
+@pytest.mark.parametrize("field", ["band_centers", "measured", "shifted_reference"])
+def test_rating_band_curves_must_be_finite(field: str) -> None:
+    """The ISO 717 fiche reads the stored curves raw, so they are pinned.
+
+    No constructor can emit a non-finite band: ``weighted_rating`` refuses
+    non-finite input by name, the centres come from the Table 1 band sets and
+    the shifted reference is the Table 3 curve plus an integer shift. Reading
+    one anyway, a NaN centre died in a bare ``ValueError: cannot convert float
+    NaN to integer`` from ``round`` inside the band table, and a NaN measured
+    value printed a literal ``nan`` cell beside an em dash in the Annex C
+    deviation column whose defined meaning is "deviation below 0,05 dB".
+    """
+    result = building.weighted_rating(_ANNEX_C_R)
+    curve = np.asarray(getattr(result, field), dtype=np.float64).copy()
+    curve[5] = np.nan  # 315 Hz band
+    with pytest.raises(
+        ValueError, match=f"WeightedRatingResult: '{field}' must contain only finite"
+    ):
+        dataclasses.replace(result, **{field: curve})
+
+
+def test_impact_rating_band_curves_must_be_finite() -> None:
+    """The ISO 717-2 rating carries the same curves and the same refusal."""
+    result = building.weighted_impact_rating([60.0 - k for k in range(16)])
+    measured = np.asarray(result.measured, dtype=np.float64).copy()
+    measured[5] = np.inf
+    with pytest.raises(
+        ValueError, match="ImpactRatingResult: 'measured' must contain only finite"
+    ):
+        dataclasses.replace(result, measured=measured)

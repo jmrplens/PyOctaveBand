@@ -79,7 +79,7 @@ if TYPE_CHECKING:
 
 
 from ..._internal.types import as_float_or_array
-from ..._internal.validation import check_engine, require_positive
+from ..._internal.validation import check_engine, require_non_negative, require_positive
 from ..._internal.warnings import PhonometryWarning
 
 # ---------------------------------------------------------------------------
@@ -277,6 +277,32 @@ class DynamicStiffnessResult:
     resonant_frequency: float
     floor_mass_per_area: float
     natural_frequency: float
+
+    def __post_init__(self) -> None:
+        """Reject the quantities the method can never leave undetermined.
+
+        The one producer, :func:`floating_floor_resonance`, computes the
+        apparent stiffness from a positive resonance and load mass and pins
+        the floor mass positive, so a non-finite (or non-positive) value in
+        those fields is never the library's own output, and the fiche prints
+        them unconditionally: a NaN ``apparent_stiffness`` becomes the BOXED
+        headline ``s't = nan MN/m3`` and a NaN ``resonant_frequency`` prints
+        ``fr = nan Hz``, both on a fully rendered accredited page.
+
+        :attr:`dynamic_stiffness` and :attr:`natural_frequency` are left
+        alone on purpose: EN 29052-1 clause 8.2 c) cannot resolve ``s'`` for
+        an airy specimen below 10 kPa.s/m2, the producer then hands back NaN
+        for both, and the fiche prints the em dash and omits ``f0`` for
+        exactly that state. Refusing it here would refuse the library's own
+        output.
+
+        :raises ValueError: if a determined quantity is not positive and
+            finite (the enclosed-gas term may be zero).
+        """
+        require_positive(self.apparent_stiffness, "apparent_stiffness")
+        require_non_negative(self.gas_stiffness, "gas_stiffness")
+        require_positive(self.resonant_frequency, "resonant_frequency")
+        require_positive(self.floor_mass_per_area, "floor_mass_per_area")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

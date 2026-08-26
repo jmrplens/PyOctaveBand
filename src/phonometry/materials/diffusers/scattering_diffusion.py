@@ -36,6 +36,8 @@ from ..._internal.validation import (
     check_engine,
     require_equal_counts,
     require_equal_shapes,
+    require_ranks,
+    require_same_length,
 )
 from .reverberation_room_scattering import _positive_scalar
 
@@ -83,6 +85,37 @@ class DiffusionResult:
     angles: Real
     levels: Real
     coefficient: float
+
+    def __post_init__(self) -> None:
+        """Reject a polar response whose columns disagree, or a NaN headline.
+
+        The fiche draws ``levels`` against ``angles`` one receiver at a time,
+        so the two must agree on how many receivers there are, and the
+        receiver angles are an axis no measurement can leave undetermined, so
+        they must be finite. ``levels`` is deliberately not pinned to finite
+        values: a level of ``-inf`` is the documented sentinel for a receiver
+        with zero scattered energy (Formula (5)/(6)).
+
+        The coefficient must be finite. :func:`directional_diffusion` cannot
+        emit a NaN one (it refuses the degenerate inputs that would produce
+        it), so a NaN can only be smuggled into a hand-built result, and
+        without this pin the fiche boxes the headline ``d = nan`` on an
+        otherwise normal accredited page.
+
+        :raises ValueError: if ``angles`` and ``levels`` disagree, or
+            ``angles`` / ``coefficient`` is non-finite.
+        """
+        require_ranks(self, angles=1, levels=1)
+        require_same_length(self, "angles", "levels", axis="receiver")
+        if not np.all(np.isfinite(np.asarray(self.angles, dtype=np.float64))):
+            msg = "DiffusionResult: 'angles' must contain only finite values."
+            raise ValueError(msg)
+        if not math.isfinite(float(self.coefficient)):
+            msg = (
+                "DiffusionResult: 'coefficient' must be finite; got "
+                f"{self.coefficient!r}."
+            )
+            raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -173,6 +206,49 @@ class DiffusionSpectrum:
     frequencies: Real
     diffusion: Real
     normalized: Real | None = None
+
+    def __post_init__(self) -> None:
+        """Reject a spectrum whose columns disagree, is empty, or is non-finite.
+
+        The ISO 17497-2 Clause 8.5 fiche prints one row per entry of
+        ``frequencies``, reading the diffusion coefficient (and the normalised
+        one, when it was measured) at that row's position, so the columns must
+        agree on how many bands there are.
+
+        The spectrum must cover at least one band. Three length-0 columns agree
+        with each other, and the sheet that comes out is a complete accredited
+        page with an empty table under the fabricated headline "0 Hz to 0 Hz",
+        which the ``lo``/``hi`` fall-backs write when there is no band to take a
+        range from. :func:`diffusion_spectrum` refuses an empty axis for the
+        same reason, so an empty spectrum can only be hand-built.
+
+        Every value must also be finite. The method has no undeterminable band:
+        :func:`directional_diffusion` forms ``d`` from a polar response by
+        Formula (5)/(6) and refuses the degenerate inputs that would leave it
+        undefined. Without this pin a NaN coefficient renders as a literal
+        ``nan`` cell in the accredited per-band table while the headline and
+        the curve print normally around it, and a NaN band centre crashes the
+        header's ``round(freqs.min())`` with a bare "cannot convert float NaN
+        to integer", naming neither the field nor the result.
+
+        :raises ValueError: if the per-band columns disagree, the spectrum is
+            empty, or any value is non-finite.
+        """
+        require_ranks(self, frequencies=1, diffusion=1, normalized=1)
+        require_same_length(self, "frequencies", "diffusion", "normalized")
+        if np.asarray(self.frequencies).size == 0:
+            msg = (
+                "DiffusionSpectrum: 'frequencies' must carry at least one "
+                "band; the spectrum is empty."
+            )
+            raise ValueError(msg)
+        for name in ("frequencies", "diffusion", "normalized"):
+            value = getattr(self, name)
+            if value is not None and not np.all(
+                np.isfinite(np.asarray(value, dtype=np.float64))
+            ):
+                msg = f"DiffusionSpectrum: '{name}' must contain only finite values."
+                raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

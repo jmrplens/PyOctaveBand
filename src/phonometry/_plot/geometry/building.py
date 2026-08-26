@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING, Any, overload
 
 import numpy as np
 
+from ..._internal.validation import require_positive
 from ..common import (
     _C_PRIMARY,
     _new_axes,
@@ -108,19 +109,23 @@ def plot_aperture_geometry(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the wall rectangles.
     :return: The axes.
+    :raises ValueError: for a ``depth``, ``width`` or ``radius`` that is not
+        finite and positive, or for anything other than exactly one of
+        ``width``/``radius``.
     """
     from matplotlib.patches import Arc
 
     _check_language(language)
-    if depth <= 0.0:
-        msg = "'depth' must be positive."
-        raise ValueError(msg)
-    if (width is None) == (radius is None):
+    # Through the shared guard, which rejects NaN and the infinities the bare
+    # ``<= 0.0`` waved through: a non-finite depth or opening poisons every
+    # coordinate and leaves a titled, blank section.
+    require_positive(depth, "depth")
+    if width is not None and radius is None:
+        opening = require_positive(width, "width")
+    elif radius is not None and width is None:
+        opening = 2.0 * require_positive(radius, "radius")
+    else:
         msg = "Give exactly one of 'width' or 'radius'."
-        raise ValueError(msg)
-    opening = float(width) if width is not None else 2.0 * float(radius or 0.0)
-    if opening <= 0.0:
-        msg = "The aperture size must be positive."
         raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
@@ -226,6 +231,8 @@ def plot_facade_elements(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the first element rectangle.
     :return: The axes.
+    :raises ValueError: for an empty sequence, or an element whose area is
+        not finite and positive.
     """
     _check_language(language)
     tiles = list(elements)
@@ -237,11 +244,13 @@ def plot_facade_elements(
         area = getattr(element, "area", None)
         if area is None:
             areas.append(0.1)  # nominal tile for dn_e-rated elements
-        elif float(area) <= 0.0:
-            msg = "Element areas must be positive."
-            raise ValueError(msg)
         else:
-            areas.append(float(area))
+            # Named per element, and finite: a NaN area passed the old
+            # ``<= 0.0`` into the tile widths and rendered a titled, empty
+            # elevation. :class:`~phonometry.building.FacadeElement` refuses
+            # one at construction with this same message, so a caller who
+            # duck-types the sequence gets the same refusal here.
+            areas.append(require_positive(area, "area"))
     if ax is None:
         ax = _new_axes()
     total = sum(areas)
@@ -337,11 +346,21 @@ def plot_double_wall_geometry(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the leaf rectangles.
     :return: The axes.
+    :raises ValueError: naming the first of the three that is not finite and
+        positive, or a non-positive resonance frequency.
     """
     _check_language(language)
-    if mass1 <= 0.0 or mass2 <= 0.0 or gap <= 0.0:
-        msg = "'mass1', 'mass2' and 'gap' must be positive."
-        raise ValueError(msg)
+    require_positive(mass1, "mass1")
+    require_positive(mass2, "mass2")
+    require_positive(gap, "gap")
+    # The annotation between the leaves is the one number the drawing does
+    # not derive from the geometry, and it went through unchecked: a NaN
+    # lettered 'f$_0$ = nan Hz' across an otherwise complete section. The one
+    # producer, :func:`~phonometry.building.double_wall_transmission_loss`,
+    # computes f0 from three surface densities it has already pinned
+    # positive, so nothing the library emits is refused here.
+    if resonance_frequency is not None:
+        require_positive(resonance_frequency, "resonance_frequency")
     if ax is None:
         ax = _new_axes()
     t1 = mass1 / _LEAF_DENSITY

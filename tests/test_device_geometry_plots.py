@@ -194,6 +194,43 @@ def test_silencer_free_function_validation() -> None:
         pm.noise_control.plot_silencer_geometry("Helmholtz resonator", duct_area=0.01)
 
 
+def test_silencer_geometry_refuses_a_nan_chamber_length() -> None:
+    """A NaN length passed the bare ``<= 0.0`` and drew a chamber whose
+    dimension line read 'L = nan mm' between two correctly drawn pipes.
+    """
+    with pytest.raises(ValueError, match="'length' must be positive"):
+        pm.noise_control.plot_silencer_geometry(
+            "expansion chamber",
+            length=float("nan"),
+            chamber_area=0.1,
+            pipe_area=0.01,
+        )
+
+
+def test_silencer_geometry_names_the_area_that_is_not_positive() -> None:
+    """The four areas a silencer drawing takes all reached one shared
+    "Cross-section areas must be positive." that named none of them.
+    """
+    with pytest.raises(ValueError, match="'pipe_area' must be positive"):
+        pm.noise_control.plot_silencer_geometry(
+            "expansion chamber",
+            length=0.3,
+            chamber_area=0.1,
+            pipe_area=float("nan"),
+        )
+
+
+def test_silencer_geometry_refuses_a_nan_cavity_volume() -> None:
+    with pytest.raises(ValueError, match="'cavity_volume' must be positive"):
+        pm.noise_control.plot_silencer_geometry(
+            "Helmholtz resonator",
+            duct_area=0.01,
+            neck_area=0.0005,
+            neck_length=0.02,
+            cavity_volume=float("nan"),
+        )
+
+
 # ---------------------------------------------------------------------------
 # Image-source plan.
 # ---------------------------------------------------------------------------
@@ -210,8 +247,44 @@ def test_image_source_plan_draws_and_caps_order() -> None:
     labels = [t.get_text() for t in ax.get_legend().get_texts()]
     assert any("2" in text for text in labels)
     assert not any("3" in text for text in labels)
-    with pytest.raises(ValueError, match="max_order"):
-        res.plot_geometry(max_order=0)
+
+
+def test_image_source_plan_of_a_direct_sound_result_draws_its_two_markers() -> None:
+    """``max_order=0`` is a legal cap, so the plan draws room, source and
+    receiver and no image at all, rather than blaming a parameter the caller
+    never passed.
+    """
+    res = pm.room.image_source_rir(
+        (5.0, 4.0, 3.0),
+        (1.0, 1.5, 1.2),
+        (3.5, 2.0, 1.4),
+        0.2,
+        fs=8000,
+        max_order=0,
+    )
+    ax = res.plot_geometry()
+    labels = [t.get_text() for t in ax.get_legend().get_texts()]
+    assert labels == ["Source", "Receiver"]
+    marked = [
+        line.get_xydata().tolist() for line in ax.lines if line.get_label() in labels
+    ]
+    assert marked == [[[1.0, 1.5]], [[3.5, 2.0]]]
+
+
+def test_image_source_plan_refuses_a_negative_order_cap() -> None:
+    """Below zero there is nothing to draw, and the refusal names the
+    parameter the caller did pass.
+    """
+    res = pm.room.image_source_rir(
+        (5.0, 4.0, 3.0),
+        (1.5, 1.2, 1.5),
+        (3.5, 2.8, 1.2),
+        0.3,
+        fs=8000,
+        max_order=2,
+    )
+    with pytest.raises(ValueError, match="'max_order' must be >= 0"):
+        res.plot_geometry(max_order=-1)
 
 
 # ---------------------------------------------------------------------------
@@ -237,6 +310,32 @@ def test_barrier_free_function_validation() -> None:
             barrier_height=3.0,
             receiver_distance=4.0,
             receiver_height=1.5,
+        )
+
+
+def test_barrier_geometry_refuses_a_nan_source_height() -> None:
+    """NaN fails every comparison, so a bare guard would draw a complete,
+    plausible section annotated 'Path difference nan m'.
+    """
+    with pytest.raises(ValueError, match="'source_height' must be non-negative"):
+        pm.environment.plot_barrier_geometry(
+            source_height=float("nan"),
+            barrier_distance=10.0,
+            barrier_height=3.0,
+            receiver_distance=50.0,
+            receiver_height=1.5,
+        )
+
+
+def test_barrier_geometry_refuses_a_nan_thickness() -> None:
+    with pytest.raises(ValueError, match="'thickness' must be positive"):
+        pm.environment.plot_barrier_geometry(
+            source_height=1.5,
+            barrier_distance=10.0,
+            barrier_height=3.0,
+            receiver_distance=50.0,
+            receiver_height=1.5,
+            thickness=float("nan"),
         )
 
 
@@ -275,8 +374,41 @@ def test_aperture_validation() -> None:
         pm.building.plot_aperture_geometry(0.1)
     with pytest.raises(ValueError, match="exactly one"):
         pm.building.plot_aperture_geometry(0.1, width=0.003, radius=0.005)
-    with pytest.raises(ValueError, match="depth"):
+    with pytest.raises(ValueError, match="'depth' must be positive"):
         pm.building.plot_aperture_geometry(0.0, width=0.003)
+
+
+def test_aperture_geometry_refuses_a_nan_depth() -> None:
+    """Every comparison against a NaN is False, so a bare ``<= 0.0`` waved
+    one into the wall thickness and left a titled, blank section.
+    """
+    with pytest.raises(ValueError, match="'depth' must be positive"):
+        pm.building.plot_aperture_geometry(float("nan"), width=0.003)
+
+
+def test_aperture_geometry_refuses_a_nan_slit_width() -> None:
+    with pytest.raises(ValueError, match="'width' must be positive"):
+        pm.building.plot_aperture_geometry(0.1, width=float("nan"))
+
+
+def test_aperture_geometry_refuses_a_nan_hole_radius() -> None:
+    """The refusal names ``radius``, the parameter the caller passed, not
+    the doubled opening the drawing works in.
+    """
+    with pytest.raises(ValueError, match="'radius' must be positive"):
+        pm.building.plot_aperture_geometry(0.1, radius=float("nan"))
+
+
+def test_an_aperture_result_refuses_to_carry_both_shapes() -> None:
+    """A slit keeps its width and a circular hole its radius, never both:
+    the renderer tests width first, so a result carrying both would draw the
+    slit section for what claims to be a circular aperture.
+    """
+    import dataclasses
+
+    hole = pm.building.circular_aperture_transmission_coefficient(FREQ, 0.005, 0.1)
+    with pytest.raises(ValueError, match="'width'.*'radius'.*carries both"):
+        dataclasses.replace(hole, width=0.02)
 
 
 # ---------------------------------------------------------------------------
@@ -302,16 +434,49 @@ def test_piston_geometry_with_and_without_lobe() -> None:
         )
 
 
+def test_piston_geometry_refuses_a_nan_directivity() -> None:
+    """One NaN poisons the peak the lobe is scaled by, ``peak > 0.0`` turns
+    False and the requested lobe vanishes from an otherwise normal figure.
+    """
+    angles = np.linspace(-np.pi / 2, np.pi / 2, 91)
+    lobe = np.abs(np.sinc(2.0 * np.sin(angles)))
+    lobe[40] = float("nan")
+    with pytest.raises(ValueError, match="'directivity' must be finite"):
+        pm.electroacoustics.plot_piston_geometry(0.05, angles=angles, directivity=lobe)
+
+
+def test_piston_geometry_refuses_a_nan_angle() -> None:
+    angles = np.linspace(-np.pi / 2, np.pi / 2, 91)
+    angles[3] = float("nan")
+    with pytest.raises(ValueError, match="'angles' must be finite"):
+        pm.electroacoustics.plot_piston_geometry(
+            0.05, angles=angles, directivity=np.ones(angles.size)
+        )
+
+
 # ---------------------------------------------------------------------------
 # Plenum.
 # ---------------------------------------------------------------------------
 def test_plenum_geometry_draws_and_validates() -> None:
     ax = pm.noise_control.plot_plenum_geometry(0.09, 1.2, 6.0, angle=0.35)
     assert ax.get_aspect() == 1.0
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match="'exit_area' must be positive"):
         pm.noise_control.plot_plenum_geometry(0.0, 1.2, 6.0)
     with pytest.raises(ValueError, match="angle"):
         pm.noise_control.plot_plenum_geometry(0.09, 1.2, 6.0, angle=2.0)
+
+
+def test_plenum_geometry_refuses_a_nan_wall_area() -> None:
+    """NaN passes a bare ``<= 0.0`` and letters 'S_w = nan m$^2$' under a
+    fully rendered plenum.
+    """
+    with pytest.raises(ValueError, match="'wall_area' must be positive"):
+        pm.noise_control.plot_plenum_geometry(0.09, 3.0, float("nan"))
+
+
+def test_plenum_geometry_refuses_a_nan_line_of_sight() -> None:
+    with pytest.raises(ValueError, match="'line_of_sight' must be positive"):
+        pm.noise_control.plot_plenum_geometry(0.09, float("nan"), 6.0)
 
 
 # ---------------------------------------------------------------------------

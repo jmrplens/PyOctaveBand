@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_positive_array
 from ..common import (
     _C_EDGE,
     _C_MUTED,
@@ -91,19 +92,28 @@ def plot_image_source_geometry(
         (it retains the room, the positions and the image lattice).
     :param ax: Existing axes, or ``None`` to create a figure.
     :param max_order: Highest reflection order drawn; ``None`` draws
-        ``min(result.max_order, 3)`` to keep the plan readable.
+        ``min(result.max_order, 3)`` to keep the plan readable. ``0`` draws
+        the room with its source and receiver and no image at all, which is
+        the whole of a direct-sound result.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the room-outline rectangle.
     :return: The axes.
+    :raises ValueError: for a negative ``max_order``.
     """
     from matplotlib.patches import Rectangle
 
     _check_language(language)
     from ..._i18n import localize_axes
 
+    # Zero is a cap, not an absence: :func:`~phonometry.room.image_source_rir`
+    # accepts ``max_order=0`` and returns the direct sound alone, so the
+    # default cap ``min(result.max_order, 3)`` is legitimately 0 for such a
+    # result. Refusing it here blamed 'max_order' for a value the caller had
+    # never passed; only a negative cap, which no result can carry, is
+    # refused, and then the parameter named is one the caller did pass.
     order_cap = min(int(result.max_order), 3) if max_order is None else int(max_order)
-    if order_cap < 1:
-        msg = "'max_order' must be >= 1."
+    if order_cap < 0:
+        msg = "'max_order' must be >= 0."
         raise ValueError(msg)
     if ax is None:
         ax = _new_axes()
@@ -209,10 +219,18 @@ def plot_open_plan_geometry(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the microphone scatter.
     :return: The axes.
+    :raises ValueError: for fewer than two positions, or a position that is
+        not a finite, strictly positive distance.
     """
     _check_language(language)
-    pos = np.sort(np.asarray(positions, dtype=np.float64).ravel())
-    if pos.size < 2 or np.any(pos <= 0.0):  # noqa: PLR2004
+    # Through the shared array guard rather than a bare ``pos <= 0.0``: every
+    # comparison against a NaN is False, so a NaN distance passed the old
+    # guard and came out as a span dimension reading 'nan m' with the
+    # workstation blocks silently missing. ISO 3382-3 positions are measured
+    # distances from the source, and the one producer,
+    # :func:`~phonometry.room.open_plan_metrics`, pins them finite already.
+    pos = np.sort(require_positive_array(np.ravel(positions), "positions"))
+    if pos.size < 2:  # noqa: PLR2004
         msg = "'positions' needs at least two positive distances."
         raise ValueError(msg)
     if ax is None:

@@ -6,9 +6,9 @@ a valid single-page PDF is written for each fiche (scattering ``s(f)``, the
 diffusion spectrum ``d(f)`` and the single-source polar response), the displayed
 coefficients match the documented clean-room oracle, the band/angle labels and
 metadata appear, unknown engines/languages are rejected, a hand-built result
-whose per-band arrays disagree in length is refused before the file is written,
-XML specials in metadata do not break reportlab, and the Spanish fiche uses a
-decimal comma. Pixel or layout content is never inspected.
+whose per-band arrays disagree in length is refused as it is built, XML specials
+in metadata do not break reportlab, and the Spanish fiche uses a decimal comma.
+Pixel or layout content is never inspected.
 """
 
 from __future__ import annotations
@@ -238,34 +238,22 @@ def test_scattering_spanish_uses_comma_decimal(tmp_path: Path) -> None:
     assert "0,45" in _text(str(out))  # Spanish decimal comma
 
 
-def test_scattering_short_random_incidence_rejected(tmp_path: Path) -> None:
-    """ScatteringResult is a frozen dataclass, so the fiche checks the lengths.
+def test_scattering_short_random_incidence_rejected() -> None:
+    """A hand-built spectrum whose columns disagree is refused as it is built.
 
-    A caller can hand-build one whose per-band arrays disagree; the alpha_s
-    column would then silently cut the table short, so the render refuses it.
+    The alpha_s column would otherwise cut the fiche table short, so the
+    disagreement is named at construction rather than left to the renderer.
     """
     result = _scattering()
-    short = replace(result, random_incidence=result.random_incidence[:-1])
-    out = tmp_path / "scat_short.pdf"
-    with pytest.raises(
-        ValueError,
-        match=r"ScatteringResult\.report: .*'random_incidence'.*same shape",
-    ):
-        short.report(str(out))
-    assert not out.exists()  # refused before the fiche is written
+    with pytest.raises(ValueError, match=r"'random_incidence'.*one value per band"):
+        replace(result, random_incidence=result.random_incidence[:-1])
 
 
-def test_scattering_verbose_short_specular_rejected(tmp_path: Path) -> None:
-    """The alpha_spec column is only tabulated when verbose, and so is its length."""
+def test_scattering_short_specular_rejected() -> None:
+    """The alpha_spec column is tabulated only when verbose, but pinned always."""
     result = _scattering()
-    short = replace(result, specular=result.specular[:-1])
-    out = tmp_path / "scat_short_verbose.pdf"
-    with pytest.raises(
-        ValueError,
-        match=r"ScatteringResult\.report\(verbose=True\): .*'specular'.*same shape",
-    ):
-        short.report(str(out), verbose=True)
-    assert not out.exists()
+    with pytest.raises(ValueError, match=r"'specular'.*one value per band"):
+        replace(result, specular=result.specular[:-1])
 
 
 # --- ISO 17497-2 diffusion spectrum ---------------------------------------
@@ -316,34 +304,22 @@ def test_diffusion_spanish_uses_comma_decimal(tmp_path: Path) -> None:
     assert "0,81" in _text(str(out))
 
 
-def test_diffusion_short_normalized_rejected(tmp_path: Path) -> None:
+def test_diffusion_short_normalized_rejected() -> None:
     """The normalised spectrum is optional, but a present one has to be full length.
 
-    The figure draws d_n whenever it is there, so the length is checked for any
-    hand-built DiffusionSpectrum, not only for the verbose table.
+    The figure draws d_n whenever it is there, so the length is pinned on any
+    DiffusionSpectrum, not only on the verbose table.
     """
     result = _diffusion_spectrum()
-    short = replace(result, normalized=result.normalized[:-1])
-    out = tmp_path / "diff_short.pdf"
-    with pytest.raises(
-        ValueError,
-        match=r"DiffusionSpectrum\.report: .*'normalized'.*same shape",
-    ):
-        short.report(str(out))
-    assert not out.exists()
+    with pytest.raises(ValueError, match=r"'normalized'.*one value per band"):
+        replace(result, normalized=result.normalized[:-1])
 
 
-def test_diffusion_short_spectrum_rejected(tmp_path: Path) -> None:
+def test_diffusion_short_spectrum_rejected() -> None:
     """A hand-built spectrum whose d is short would cut the fiche table."""
     result = _diffusion_spectrum()
-    short = replace(result, diffusion=result.diffusion[:-1])
-    out = tmp_path / "diff_short_d.pdf"
-    with pytest.raises(
-        ValueError,
-        match=r"DiffusionSpectrum\.report: .*'diffusion'.*same shape",
-    ):
-        short.report(str(out))
-    assert not out.exists()
+    with pytest.raises(ValueError, match=r"'diffusion'.*one value per band"):
+        replace(result, diffusion=result.diffusion[:-1])
 
 
 # --- ISO 17497-2 polar response -------------------------------------------
@@ -368,17 +344,11 @@ def test_polar_unknown_engine_rejected(tmp_path: Path) -> None:
         result.report(out, engine="weasyprint")
 
 
-def test_polar_short_levels_rejected(tmp_path: Path) -> None:
-    """One level per receiver angle: a short column is refused before rendering."""
+def test_polar_short_levels_rejected() -> None:
+    """One level per receiver angle: a short column is refused as it is built."""
     result = _polar()
-    short = replace(result, levels=result.levels[:-1])
-    out = tmp_path / "polar_short.pdf"
-    with pytest.raises(
-        ValueError,
-        match=r"DiffusionResult\.report: .*'levels'.*one value per receiver angle",
-    ):
-        short.report(str(out))
-    assert not out.exists()
+    with pytest.raises(ValueError, match=r"'levels'.*one value per receiver"):
+        replace(result, levels=result.levels[:-1])
 
 
 def test_polar_spanish_uses_comma_decimal(tmp_path: Path) -> None:

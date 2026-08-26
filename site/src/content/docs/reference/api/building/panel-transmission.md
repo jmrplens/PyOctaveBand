@@ -682,6 +682,12 @@ resonance is annotated when given.
 
 **Returns:** The axes.
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | naming the first of the three that is not finite and positive, or a non-positive resonance frequency. |
+
 ## single_panel_transmission_loss
 
 ```python

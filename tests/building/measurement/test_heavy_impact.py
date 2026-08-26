@@ -283,6 +283,19 @@ def test_check_source_rejects_a_conforming_mask_of_another_length() -> None:
         dataclasses.replace(check, within_tolerance=stretched)
 
 
+def test_check_source_rejects_a_source_name_the_standard_does_not_define() -> None:
+    """The conformance figure titles itself from a label table keyed by ``source``.
+
+    ``check_heavy_impact_source`` validates the name at the call, but a check
+    rewritten by hand reaches that lookup after everything is drawn and dies
+    with a bare ``KeyError`` naming the string alone, neither the field nor the
+    two sources it could have named.
+    """
+    check = building.check_heavy_impact_source([v for v, _ in RUBBER_BALL_LFE])
+    with pytest.raises(ValueError, match="'source' must be one of"):
+        dataclasses.replace(check, source="rubber ball")
+
+
 # ---------------------------------------------------------------------------
 # Impact force exposure level (Formula (A.1))
 # ---------------------------------------------------------------------------
@@ -622,6 +635,18 @@ def test_rating_rejects_a_stretched_a_weighting() -> None:
     stretched = np.append(res.a_weighting, 0.0)
     with pytest.raises(ValueError, match="'a_weighting'"):
         dataclasses.replace(res, a_weighting=stretched)
+
+
+def test_rating_rejects_a_band_width_outside_annex_d() -> None:
+    """The bar figure titles itself from a label table keyed by ``band``.
+
+    ``a_weighted_maximum_impact_level`` validates the tag at the call, but a
+    result rewritten by hand reaches the lookup once the bars are drawn and
+    dies mid-render with a bare ``KeyError`` naming the tag alone.
+    """
+    res = building.a_weighted_maximum_impact_level(ISO717_2_TABLE_D4_LEVELS)
+    with pytest.raises(ValueError, match="'band' must be one of"):
+        dataclasses.replace(res, band="octaves")
 
 
 def test_rating_and_standardization_compose() -> None:

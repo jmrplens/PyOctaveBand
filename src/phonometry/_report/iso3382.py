@@ -22,7 +22,8 @@ evaluated by the integrated impulse-response method of ISO 3382-1:2009, 5.3.3):
   labelled as such) with the mid-frequency EDT alongside;
 * an optional verdict row when a target mid-frequency reverberation time is
   supplied (ISO 3382-1/-2 are characterisation standards with no intrinsic
-  pass/fail, so the row appears only when a requirement is given);
+  pass/fail, so the row appears only when a requirement is given, and only
+  when a reverberation time could be evaluated to compare against it);
 * a short measurement-basis strip and a footer identity/disclaimer block.
 
 Unlike the two-panel band fiches (:mod:`.iso717`, :mod:`.iso11654`) this uses a
@@ -433,7 +434,7 @@ def _statement(
 
 def _verdict(
     result: RoomAcousticsResult, requirement: float, language: str = "en"
-) -> tuple[str, bool]:
+) -> tuple[str, bool] | None:
     """Verdict text and PASS flag for a supplied target reverberation time.
 
     The requirement is read as the maximum acceptable reverberation time (the
@@ -444,13 +445,23 @@ def _verdict(
     claim. The comparison uses both values rounded exactly as the fiche
     displays them (two decimals, halves away from zero), so the printed
     numbers can never contradict the verdict at the tolerance boundary.
+
+    ``None`` when no band's T30 could be evaluated: that is a documented state
+    of the result (the ISO 3382-1:2009, 5.3.3 criterion clears every
+    ``t30_valid`` flag and leaves the decay times NaN), and the descriptor
+    computed over it is NaN, which is not a measurement that failed the target
+    but no measurement at all. Reading it as a failure printed a red FAIL
+    badge asserting the room broke a requirement it was never measured
+    against, beside the em dash the same guard had already put in place of the
+    number; the row is withheld instead and the boxed em-dashed statement is
+    what the sheet says about that room.
     """
     t_value, is_mid, _ = _reverberation_descriptor(
         result, np.asarray(result.t30, dtype=np.float64)
     )
-    passed = math.isfinite(t_value) and display_round(t_value, 2) <= display_round(
-        requirement, 2
-    )
+    if not math.isfinite(t_value):
+        return None
+    passed = display_round(t_value, 2) <= display_round(requirement, 2)
     key = (
         "T<sub>mid</sub> = {value} s, required &#8804; {req} s"
         if is_mid
@@ -479,7 +490,9 @@ def render_iso3382_report(
     :param path: Destination path of the PDF file.
     :param metadata: Optional :class:`ReportMetadata`; ``None`` produces a
         bare characterisation fiche (body + result + disclaimer, no header). A
-        supplied ``requirement`` is read as the maximum mid-frequency T.
+        supplied ``requirement`` is read as the maximum mid-frequency T; the
+        verdict row is withheld when no band's reverberation time could be
+        evaluated, since there is then no measured value to compare.
     :param verbose: Accepted for signature parity with the other fiches; the
         room table already shows every computed parameter, so it has no effect.
     :param language: Fiche language: ``"en"`` (default) or ``"es"``.
@@ -558,8 +571,9 @@ def render_iso3382_report(
     statement, extended = _statement(result, language)
     flow.append(result_box(statement, styles, accent, extended))
     if metadata is not None and metadata.requirement is not None:
-        text, passed = _verdict(result, metadata.requirement, language)
-        flow.extend(verdict_flow(text, passed, styles, language))
+        verdict = _verdict(result, metadata.requirement, language)
+        if verdict is not None:
+            flow.extend(verdict_flow(verdict[0], verdict[1], styles, language))
 
     basis_strip_style = measurement_basis_style()
     flow.append(

@@ -418,6 +418,42 @@ def require_same_shape(owner: object, *fields: str, quantity: str = "point") -> 
     require_equal_shapes(type(owner).__name__, shapes, quantity)
 
 
+def require_finite_fields(owner: object, *fields: str) -> None:
+    """Require each named field of *owner* to carry only finite values.
+
+    The value guard beside the shape guards of a result's ``__post_init__``,
+    for the fields no producer can legitimately leave undetermined: a
+    measurement surface area, a room volume, a single-number index. Where a
+    quantity *is* legitimately undeterminable band by band, an ISO 9614 band
+    of negative net power or an A-weighted total over no bands, it is marked
+    as such by a flag and rendered as an em dash, and it must not be listed
+    here.
+
+    Shape guards alone do not cover this: a ``NaN`` has whatever shape it was
+    stored in, so it passes every count and every rank, and reaches the fiche
+    as the literal ``nan`` printed in an accredited table, or as a conversion
+    error raised from inside a display rounder that names neither the field
+    nor the result it belongs to.
+
+    ``None`` fields are skipped: an absent optional quantity is not a
+    non-finite one.
+
+    :param owner: The instance whose fields are measured.
+    :param fields: Field names that must be finite throughout.
+    :raises ValueError: if a field carries a ``NaN`` or an infinity.
+    """
+    for name in fields:
+        value = getattr(owner, name)
+        if value is None:
+            continue
+        array = np.asarray(value, dtype=np.float64)
+        if np.all(np.isfinite(array)):
+            continue
+        what = "be finite" if array.ndim == 0 else "contain only finite values"
+        msg = f"{type(owner).__name__}: '{name}' must {what}."
+        raise ValueError(msg)
+
+
 def require_per_band(
     x: ArrayLike, name: str, bands: np.ndarray, bands_name: str = "frequency"
 ) -> np.ndarray:

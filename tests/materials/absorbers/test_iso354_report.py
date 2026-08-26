@@ -5,9 +5,10 @@ The report is a rendering feature, so these tests assert only structural
 facts: a valid single-page PDF is written for a reverberation-room measurement,
 the displayed one-third-octave values match the closed-form ISO 354 oracle,
 the verbose detail table stays on one page, a hand-built result whose per-band
-columns disagree in length is rejected before anything is written, unknown
-engines are rejected, and XML specials in metadata do not break reportlab.
-Pixel or layout content is never inspected.
+columns disagree in length is rejected before anything is written, a band whose
+reverberation time could not be evaluated prints the em dash rather than a
+literal ``nan``, unknown engines are rejected, and XML specials in metadata do
+not break reportlab. Pixel or layout content is never inspected.
 """
 
 from __future__ import annotations
@@ -230,3 +231,32 @@ def test_spanish_fiche_uses_comma_decimal(tmp_path: Path) -> None:
     _result().report(str(out), metadata=_metadata(), language="es")
     assert_one_page(str(out))
     assert "0,33" in _text(str(out))  # Spanish decimal comma
+
+
+def test_non_evaluable_band_prints_the_em_dash(tmp_path: Path) -> None:
+    """A band whose decay could not be evaluated is em-dashed, never "nan".
+
+    ``measure_sound_absorption`` accepts a non-finite reverberation time by
+    design: that is how a band flagged non-evaluable by an ISO 3382-2 decay
+    analysis arrives, and refusing it here would refuse the library's own
+    output. It propagates through the Sabine inversion to ``A2`` and
+    ``alpha_s``, and the accredited table prints the house em dash for it, as
+    the sibling fiches do. The verbose sheet em-dashes all three cells of that
+    band's row (T2, A2 and alpha_s).
+    """
+    t2 = _T2.copy()
+    t2[5] = np.nan  # 315 Hz band
+    result = measure_sound_absorption(
+        _FREQS, _T1, t2, volume=200.0, area=10.8, temperature=20.0
+    )
+    assert not np.isfinite(result.alpha_s[5])
+    plain = tmp_path / "iso354_nan.pdf"
+    verbose = tmp_path / "iso354_nan_verbose.pdf"
+    result.report(str(plain))
+    result.report(str(verbose), verbose=True)
+    plain_text = _text(str(plain))
+    verbose_text = _text(str(verbose))
+    assert "nan" not in plain_text
+    assert "nan" not in verbose_text
+    assert plain_text.count("—") == 1  # the alpha_s cell of the 315 Hz band
+    assert verbose_text.count("—") == 3  # T2, A2 and alpha_s of that band

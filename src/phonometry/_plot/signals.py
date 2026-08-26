@@ -55,6 +55,11 @@ from .common import (
 #: slice would be empty, so callers fall back to the full array.
 _DC_NYQUIST_BINS = 2
 
+#: Top of the spectrogram colour range when the record is silent everywhere
+#: and no cell carries a finite level to anchor it to: 0 dB, so the 80 dB
+#: range below it holds the whole (empty) plane.
+_SILENT_SPECTROGRAM_VMAX = 0.0
+
 #: Spanish translations of the fixed strings rendered by the signal
 #: ``.plot()`` renderers, keyed by their verbatim English text. ``_t``
 #: returns the English key unchanged for any language other than ``"es"``,
@@ -633,6 +638,14 @@ def plot_spectrogram(
     the 80 dB below the strongest cell; pass ``vmin``/``vmax`` to change
     it.
 
+    A silent recording is a legal input to
+    :func:`~phonometry.signals.spectrogram`, and it has no strongest cell:
+    every cell is zero power and so ``-inf`` dB. The range is anchored at
+    0 dB there, which draws the whole plane below its floor. Taking the
+    maximum of the finite levels alone used to reduce an empty array and
+    stop the plot with numpy's "zero-size array to reduction operation
+    maximum", naming neither the field nor the result.
+
     :param result: A
         :class:`~phonometry.signals.time_frequency.SpectrogramResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
@@ -646,7 +659,8 @@ def plot_spectrogram(
     times = np.asarray(result.times, dtype=np.float64)
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     level = _db10(np.asarray(result.power, dtype=np.float64))
-    vmax = float(np.max(level[np.isfinite(level)]))
+    loudest = level[np.isfinite(level)]
+    vmax = float(np.max(loudest)) if loudest.size else _SILENT_SPECTROGRAM_VMAX
     fs = result.nperseg / result.time_resolution
     half_hop = 0.5 * result.hop / fs
     df = float(freqs[1] - freqs[0])
