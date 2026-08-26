@@ -49,7 +49,9 @@ import numpy as np
 from .._internal.validation import (
     check_engine,
     require_axis_count,
+    require_choice,
     require_equal_counts,
+    require_finite_fields,
     require_ranks,
     require_same_length,
 )
@@ -734,6 +736,8 @@ class SIIResult:
         (clause 5.7), unity until the speech spectrum level rises above the
         standard normal-effort spectrum by more than 10 dB.
     :ivar method: The band procedure used, one of :data:`SII_METHODS`.
+    :raises ValueError: If the per-band quantities disagree, ``method`` is not
+        one of :data:`SII_METHODS`, or any quantity is not finite.
     """
 
     sii: float
@@ -758,8 +762,41 @@ class SIIResult:
         the band that vanished is nowhere on the page to contradict the boxed
         ``SII`` beside it, and every number that did print is well formed.
 
-        :raises ValueError: if any per-band quantity disagrees with the rest.
+        :attr:`method` is pinned to the four procedure names for the reason
+        :class:`SIIProcedure` pins it, and one more: the fiche reads both the
+        standard-basis sentence and the band-table caption out of tables keyed
+        by it, and an unrecognised name used to fall back to the
+        one-third-octave wording. A result computed over the 21 critical
+        bands, mistyped as ``"critical band"``, then printed the
+        one-third-octave-band procedure over a table of critical bands, with
+        nothing on the page to contradict it.
+
+        :attr:`sii` is pinned finite. The index is the sum of the band
+        audibilities weighted by their importance, over spectra the entry
+        point has already refused unless finite, so no computation can
+        return a ``NaN``; one reaching the fiche crashed the boxed statement
+        inside the display rounder, as "cannot convert float NaN to integer",
+        naming neither the field nor the result type.
+
+        The per-band quantities are pinned with it, for a symptom that raises
+        nothing at all. The plot draws the importance-weighted series scaled
+        by its own peak, and a ``NaN`` anywhere in :attr:`band_audibility` or
+        :attr:`band_importance` makes that peak ``NaN``: ``peak > 0.0`` is
+        False, so the series the legend calls "(scaled)" is drawn at its raw
+        height, a tenth of the axis instead of filling it, beside a title
+        showing a perfectly finite index. A ``NaN`` in :attr:`frequencies`
+        labels a band ``nan`` on the axis and in the fiche's frequency column.
+        The same producer argument covers every one of them, and the entry
+        point is the only producer there is: each field is arithmetic over
+        spectra it has already required to be finite, and none of them is a
+        quantity a measurement can leave undeterminable, so there is nothing
+        here to flag and render as an em dash.
+
+        :raises ValueError: if any per-band quantity disagrees with the rest,
+            ``method`` is not one of :data:`SII_METHODS`, or any quantity
+            carries a non-finite value.
         """
+        require_choice(self.method, "method", SII_METHODS)
         require_ranks(
             self,
             band_audibility=1,
@@ -772,6 +809,17 @@ class SIIResult:
         )
         require_same_length(
             self,
+            "band_audibility",
+            "band_importance",
+            "frequencies",
+            "speech_spectrum",
+            "disturbance",
+            "masking",
+            "level_distortion",
+        )
+        require_finite_fields(
+            self,
+            "sii",
             "band_audibility",
             "band_importance",
             "frequencies",
@@ -973,7 +1021,13 @@ def standard_speech_spectra(
 def _as_band_vector(
     values: ArrayLike, name: str, procedure: _BandProcedure | None = None
 ) -> np.ndarray:
-    """Validate and return a band vector of the procedure's length."""
+    """Validate and return a finite band vector of the procedure's length.
+
+    Finiteness is required alongside the shape, as the STOI and STI entry
+    points already require of their inputs: one NaN band poisons the upward
+    spread of masking of every band above it, and the index, the title of the
+    plot and its bar scaling all compute through it in silence.
+    """
     proc = _PROCEDURES["one-third-octave"] if procedure is None else procedure
     expected = proc.band_importance.size
     arr = np.atleast_1d(np.asarray(values, dtype=np.float64))
@@ -987,6 +1041,9 @@ def _as_band_vector(
             f"{proc.method} band values "
             f"({centres[0]:g} Hz - {centres[-1]:g} Hz); got shape {arr.shape}."
         )
+        raise ValueError(msg)
+    if not np.all(np.isfinite(arr)):
+        msg = f"{name!r} must contain only finite values."
         raise ValueError(msg)
     return arr
 
@@ -1090,8 +1147,8 @@ def speech_intelligibility_index(
         standard's Annex B tabulates functions for specific speech test
         materials); ``None`` uses the tabulated average-speech function.
     :return: An :class:`SIIResult` with the overall index and its ``.plot()``.
-    :raises ValueError: if a spectrum has the wrong length, or the method or
-        effort name is unknown.
+    :raises ValueError: if a spectrum has the wrong length or carries a
+        non-finite value, or the method or effort name is unknown.
     """
     proc = _procedure(method)
     n_bands = proc.band_importance.size
@@ -1203,8 +1260,26 @@ class SIIProcedure:
         value more than the bands, because it bounds them from outside rather
         than labelling them.
 
-        :raises ValueError: if the band axes disagree.
+        :attr:`method` is pinned to the four procedure names, because the
+        plot's legend reads its label out of a table keyed by them: an unknown
+        name would come back as a bare ``KeyError`` naming no field, no owner
+        and none of the valid choices.
+
+        The five columns are pinned finite as well. This is a transcription of
+        one of the standard's printed tables, so no entry of it is a quantity
+        anything could leave undetermined, and :func:`sii_procedure`, the only
+        producer, copies the tabulated arrays. A ``NaN`` reaching the step
+        plot is quieter than the disagreements above: the band it belongs to
+        is simply not drawn, and the y-limit, taken from the maximum of the
+        column, is scaled to a peak that is not the table's, so a band-
+        importance function is overlaid on the others missing one of its
+        bands and stretched to the wrong height, with nothing on the axes
+        saying so.
+
+        :raises ValueError: if the band axes disagree, ``method`` is not one
+            of :data:`SII_METHODS`, or a column carries a non-finite value.
         """
+        require_choice(self.method, "method", SII_METHODS)
         require_ranks(
             self,
             frequencies=1,
@@ -1216,6 +1291,14 @@ class SIIProcedure:
         require_same_length(
             self,
             "frequencies",
+            "band_importance",
+            "internal_noise",
+            "speech_spectrum",
+        )
+        require_finite_fields(
+            self,
+            "frequencies",
+            "band_edges",
             "band_importance",
             "internal_noise",
             "speech_spectrum",

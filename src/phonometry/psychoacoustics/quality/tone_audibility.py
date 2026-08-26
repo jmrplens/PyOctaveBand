@@ -93,6 +93,7 @@ reading, matching its executable Annex J reference program; the ISO/PAS
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -1162,7 +1163,19 @@ class ToneAudibilityResult:
         builds a result from bare levels, which carries neither the per-line
         uncertainties nor the Step 3 grouping, and that is not a disagreement.
 
-        :raises ValueError: if any per-tone quantity disagrees with the rest.
+        Every quantity must also be finite. The assessment has no
+        undeterminable tone: :func:`assess_tones` refuses non-finite tone
+        frequencies, levels and masking levels on the way in and derives the
+        rest with finite arithmetic, so a NaN can only be smuggled into a
+        hand-built result. Without this pin a NaN tone level renders as a
+        literal ``nan`` cell in the accredited key-quantity table while the
+        decisive audibility and verdict print normally around it, a NaN line
+        spacing prints ``nan Hz`` in the header grid, and an all-NaN
+        audibility column crashes the statement's rounding with a bare
+        "cannot convert float NaN to integer".
+
+        :raises ValueError: if any per-tone quantity disagrees with the rest,
+            or any quantity is non-finite.
         """
         require_ranks(
             self,
@@ -1193,6 +1206,30 @@ class ToneAudibilityResult:
             "group_sizes",
             axis="tone entry",
         )
+        if not math.isfinite(float(self.line_spacing)):
+            msg = (
+                "ToneAudibilityResult: 'line_spacing' must be finite; got "
+                f"{self.line_spacing!r}."
+            )
+            raise ValueError(msg)
+        for name in (
+            "tone_frequencies",
+            "tone_levels",
+            "mean_narrowband_levels",
+            "critical_bandwidths",
+            "lower_corners",
+            "upper_corners",
+            "critical_band_levels",
+            "masking_indices",
+            "audibilities",
+            "extended_uncertainties",
+        ):
+            value = getattr(self, name)
+            if value is not None and not np.all(
+                np.isfinite(np.asarray(value, dtype=np.float64))
+            ):
+                msg = f"ToneAudibilityResult: '{name}' must contain only finite values."
+                raise ValueError(msg)
 
     @property
     def audible(self) -> NDArray[np.bool_]:

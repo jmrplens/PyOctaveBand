@@ -62,6 +62,7 @@ ISO 9614 dynamic capability :math:`L_\mathrm{d} = \delta_{pI0} - K` follows from
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -437,8 +438,25 @@ class IntensityInstrumentComplianceResult:
         of the whole instrument, so a band list short of an entry gives a
         sheet whose verdict covers a band that is nowhere in its table.
 
-        :raises ValueError: if the per-band entries disagree.
+        The device tag is pinned to the three Table 2 column groups. Two
+        readers dispatch on it -- the fiche's basis strip and the plot's
+        title -- and an unrecognised tag would send them apart: a bare
+        ``KeyError`` from one, a silently wrong "complete instrument" label
+        from the other.
+
+        The masks, the measured spectrum, the separation figures and the
+        numeric per-band verdict values are pinned finite.
+        :func:`verify_intensity_class` validates its inputs finite and every
+        derived figure with them, so no producer emits a NaN here; one
+        smuggled in through :func:`dataclasses.replace` either dies inside
+        matplotlib's axis autoscaling naming no field, or prints ``nan`` in
+        an accredited table whose boxed verdict still declares COMPLIES.
+
+        :raises ValueError: if the per-band entries disagree, the device tag
+            is not a Table 2 column group, or any numeric field is not
+            finite.
         """
+        _check_device(self.device)
         require_ranks(
             self,
             frequency=1,
@@ -454,6 +472,23 @@ class IntensityInstrumentComplianceResult:
             "limit_class1",
             "limit_class2",
         )
+        for name in ("frequency", "residual_index", "limit_class1", "limit_class2"):
+            if not np.all(np.isfinite(getattr(self, name))):
+                msg = f"'{name}' must be finite."
+                raise ValueError(msg)
+        for name in ("spacing", "spacing_offset_db"):
+            if not math.isfinite(getattr(self, name)):
+                msg = f"'{name}' must be finite."
+                raise ValueError(msg)
+        for band in self.bands:
+            for key, value in band.items():
+                if isinstance(value, float) and not math.isfinite(value):
+                    msg = (
+                        "'bands' must carry finite per-band values; the "
+                        f"{band.get('freq', math.nan):g} Hz entry has "
+                        f"{key}={value!r}."
+                    )
+                    raise ValueError(msg)
 
     def reference_class(self) -> int:
         """The class whose mask the fiche and the plot read margins against.

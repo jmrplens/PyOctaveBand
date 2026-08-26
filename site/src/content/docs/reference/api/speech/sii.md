@@ -169,6 +169,12 @@ Result of a Speech Intelligibility Index computation (ANSI S3.5-1997).
 | `level_distortion` | Per-band level-distortion factor `Li` in [0, 1] (clause 5.7), unity until the speech spectrum level rises above the standard normal-effort spectrum by more than 10 dB. |
 | `method` | The band procedure used, one of [`SII_METHODS`](/phonometry/reference/api/speech/sii/#sii_methods). |
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the per-band quantities disagree, `method` is not one of [`SII_METHODS`](/phonometry/reference/api/speech/sii/#sii_methods), or any quantity is not finite. |
+
 ### SIIResult.plot()
 
 ```python
@@ -264,7 +270,7 @@ equally-contributing critical bands or the 6 octave bands.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | if a spectrum has the wrong length, or the method or effort name is unknown. |
+| ValueError | if a spectrum has the wrong length or carries a non-finite value, or the method or effort name is unknown. |
 
 ## standard_speech_spectra
 

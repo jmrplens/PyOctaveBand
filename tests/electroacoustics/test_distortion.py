@@ -304,6 +304,28 @@ def test_modulation_distortion_plot_marks_carrier_and_sidebands() -> None:
     plt.close("all")
 
 
+def test_modulation_distortion_plot_refuses_a_result_without_its_modulator() -> None:
+    """``f_low`` is the fifth spectral field, and the title states it as fact.
+
+    Defaulted with ``float(result.f_low or 0.0)``, the figure printed
+    "$f_1$ = 0Hz" beside the SMPTE percentage it belongs to: a modulation
+    frequency no measurement produced, where the four sibling fields it is
+    checked with were refused outright.
+    """
+    import matplotlib.pyplot as plt
+
+    fl, fh = 250.0, 8000.0
+    x = _tone(fl) + _tone(fh, 0.25) + _tone(fh + fl, 0.02) + _tone(fh - fl, 0.02)
+    res = electroacoustics.modulation_distortion(x, FS, f_low=fl, f_high=fh)
+    # Stated, the tone reaches the title as the measurement's own 250 Hz.
+    assert "$f_1$ = 250Hz" in res.plot().get_title()
+    plt.close("all")
+    without_modulator = dataclasses.replace(res, f_low=None)
+    with pytest.raises(ValueError, match=r"'f_low' unset"):
+        without_modulator.plot()
+    plt.close("all")
+
+
 def test_difference_frequency_distortion_iec() -> None:
     # IEC 60268-3 14.12.8.1: equal tones f1 = 13 kHz, f2 = 14 kHz (amp 0.5);
     # 2nd-order product at f2 - f1 = 1 kHz (0.03); 3rd-order at 2f1 - f2 and

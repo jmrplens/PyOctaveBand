@@ -228,6 +228,73 @@ def test_a_stray_single_frequency_is_refused() -> None:
         dataclasses.replace(result, frequencies=one_band)
 
 
+@pytest.mark.parametrize(
+    "field_name",
+    ["velocity_level", "sound_power_level", "radiation_factor", "frequencies"],
+)
+def test_a_non_finite_band_quantity_is_refused(field_name: str) -> None:
+    """A NaN band changes which quantity the fiche boxes and compares.
+
+    ``sound_power_level_a`` sums through every band, so one NaN ``LW`` turns
+    L_WA into NaN and the sheet falls back to the unweighted total, whose
+    energy sum skips the NaN band: the box then carries a partial ``LW`` and
+    the verdict compares *that* against the declared A-weighted limit, which
+    flips the printed PASS/FAIL on unchanged physical data. An all-NaN
+    ``radiation_factor`` fails the ``epsilon = 1`` survey test, so the basis
+    line asserts an engineering-method determination whose every epsilon cell
+    is an em dash. :func:`sound_power_from_vibration` computes finite levels
+    from finite inputs, so none of these is ever the library's own output.
+    """
+    import dataclasses
+
+    result = _four_band_determination()
+    values = np.asarray(getattr(result, field_name), dtype=float).copy()
+    values[1] = float("nan")
+    with pytest.raises(ValueError, match=f"VibrationSoundPowerResult: '{field_name}'"):
+        dataclasses.replace(result, **{field_name: values})
+
+
+def test_a_non_finite_radiating_area_is_refused() -> None:
+    """A NaN area prints ``S = nan m2`` beside the boxed sound-power result.
+
+    The area is a scalar of the measurement chain, fixed by the test setup and
+    pinned positive by :func:`sound_power_from_vibration`, so no producer can
+    leave it undetermined; the fiche prints it unconditionally in the extended
+    terms of a fully rendered page.
+    """
+    import dataclasses
+
+    result = _four_band_determination()
+    with pytest.raises(ValueError, match="'area' must be positive"):
+        dataclasses.replace(result, area=float("nan"))
+
+
+def test_a_determination_covering_no_band_is_refused() -> None:
+    """Four empty columns agree, and the sheet comes out complete and blank.
+
+    Length-0 arrays satisfy every rank and count, so the fiche rendered a
+    full accredited sound-power test sheet: the ISO/TS 7849-1 basis line, an
+    empty per-band table, a boxed "Sound power level LW = — dB re 1 pW" over
+    the em dash an energy sum of no bands leaves behind, and the disclaimer
+    under it. It is reachable straight from the entry point, which read an
+    empty velocity level as a determination of nothing.
+    """
+    empty = np.array([], dtype=float)
+    with pytest.raises(
+        ValueError, match="'sound_power_level' must carry at least one band"
+    ):
+        emission.sound_power_from_vibration(empty, 1.5, frequencies=empty)
+
+
+def test_a_broadband_determination_is_not_read_as_empty() -> None:
+    """One level and no band axis is one band's worth of data, not none."""
+    result = emission.sound_power_from_vibration(100.0, 1.5)
+    assert result.frequencies is None
+    levels = np.atleast_1d(result.sound_power_level)
+    assert levels.size == 1
+    assert result.total_level == pytest.approx(float(levels[0]))
+
+
 def test_radiated_power_norton_diesel_engine_example() -> None:
     # Norton & Karczub, Fundamentals of Noise and Vibration Analysis for
     # Engineers 2e (CUP, 2003), problem 3.9 (p. 580) with the published

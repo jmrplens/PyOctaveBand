@@ -371,7 +371,8 @@ class ImageSourceResult:
 
         :param ax: Existing axes, or ``None`` to create a figure.
         :param max_order: Highest reflection order drawn; ``None`` draws up
-            to order 3 (or the result's own maximum if lower).
+            to order 3 (or the result's own maximum if lower), and ``0``
+            draws the direct sound only.
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         :param kwargs: Forwarded to the room-outline rectangle.
         """

@@ -62,7 +62,7 @@ Combined standard uncertainty by the GUM law of propagation (clause 5).
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | for no inputs or a malformed correlation matrix. |
+| ValueError | for no inputs, a malformed correlation matrix, or a model that is not finite at the estimates or one evaluation step either side of them. |
 
 ## monte_carlo
 
@@ -107,7 +107,7 @@ probabilistically symmetric one (not the 5.3.4 shortest interval).
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | for no inputs, fewer than 2 trials or bad coverage. |
+| ValueError | for no inputs, fewer than 2 trials or bad coverage, or when the model returns a non-finite output for any trial. |
 
 ## MonteCarloResult
 

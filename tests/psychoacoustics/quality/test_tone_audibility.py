@@ -732,6 +732,31 @@ def test_result_rejects_per_tone_length_mismatch(field: str) -> None:
         dataclasses.replace(good, **{field: missing})
 
 
+@pytest.mark.parametrize("field", ["tone_levels", "audibilities"])
+def test_result_rejects_a_non_finite_per_tone_column(field: str) -> None:
+    """The fiche prints the per-tone columns raw, so they are pinned finite.
+
+    :func:`assess_tones` refuses non-finite frequencies, levels and masking
+    levels on the way in, so a NaN can only reach a hand-built result; without
+    the pin a NaN ``LT`` printed a literal ``nan`` cell in the accredited
+    key-quantity table while the verdict printed normally around it, and a NaN
+    audibility crashed the statement's rounding with a bare "cannot convert
+    float NaN to integer".
+    """
+    good = _annex_e_result()
+    column = np.asarray(getattr(good, field), dtype=np.float64).copy()
+    column[0] = np.nan
+    with pytest.raises(ValueError, match=f"'{field}' must contain only finite"):
+        dataclasses.replace(good, **{field: column})
+
+
+def test_result_rejects_a_non_finite_line_spacing() -> None:
+    """The header grid prints the line spacing, so a NaN reads as "nan Hz"."""
+    good = _annex_e_result()
+    with pytest.raises(ValueError, match="'line_spacing' must be finite"):
+        dataclasses.replace(good, line_spacing=float("nan"))
+
+
 # ---------------------------------------------------------------------------
 # Table E.2 full columns: LG, av, band limits and uncertainty U
 # ---------------------------------------------------------------------------

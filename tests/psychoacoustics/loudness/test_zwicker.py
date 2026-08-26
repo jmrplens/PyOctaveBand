@@ -564,3 +564,42 @@ def test_specific_pattern_matches_reported_max() -> None:
         _tone(1000.0, 70.0, seconds=2.0, pad_ms=0.0), FS
     )
     assert float(np.sum(res.specific) * 0.1) == pytest.approx(res.loudness, rel=0.03)
+
+
+@pytest.mark.parametrize("name", ["loudness", "loudness_level", "n5", "n10"])
+@pytest.mark.parametrize("bad", [float("nan"), float("inf")], ids=["nan", "inf"])
+def test_non_finite_loudness_quantities_refused(name: str, bad: float) -> None:
+    """The scalar loudness quantities are pinned finite at construction.
+
+    No producer can emit one: both entry points refuse non-finite input, the
+    total is summed from a finite specific-loudness pattern and the
+    percentiles come off a finite trace. The ISO 532-1 fiche prints them raw,
+    so a NaN ``loudness`` used to die inside ``display_round`` in a bare
+    ``ValueError: cannot convert float NaN to integer`` naming neither the
+    field nor the type, and a NaN ``loudness_level``, ``n5`` or ``n10``
+    rendered a literal ``nan`` on the accredited sheet.
+    """
+    result = psychoacoustics.loudness_zwicker_from_spectrum(np.full(28, 60.0))
+    trace = {
+        "time": np.linspace(0.0, 1.0, 8),
+        "loudness_vs_time": np.linspace(1.0, 2.0, 8),
+        "n5": 1.9,
+        "n10": 1.8,
+    }
+    result = dataclasses.replace(result, **trace)
+    with pytest.raises(ValueError, match=f"'{name}' must be finite"):
+        dataclasses.replace(result, **{name: bad})
+
+
+def test_unknown_sound_field_tag_refused() -> None:
+    """``field`` is pinned because the fiche dispatches on it.
+
+    ISO 532-1:2017 clause 7 c)/d) makes the sound field a mandatory
+    declaration of the loudness report; a tag that is neither ``'free'`` nor
+    ``'diffuse'`` used to be read as absent, dropping that statement from the
+    sheet without a word.
+    """
+    result = psychoacoustics.loudness_zwicker_from_spectrum(np.full(28, 60.0))
+    assert result.field == "free"
+    with pytest.raises(ValueError, match="'field' must be one of"):
+        dataclasses.replace(result, field="Free")

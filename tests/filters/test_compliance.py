@@ -277,3 +277,95 @@ def test_a_filter_verdict_refuses_per_band_entries_that_disagree() -> None:
     )
     with pytest.raises(ValueError, match="'bands'"):
         dataclasses.replace(result, bands=result.bands[:-1])
+
+
+def test_a_filter_verdict_refuses_a_class_its_bands_carry_no_margins_for() -> None:
+    """Class 0 exists only in the 1995 edition, so a 2014 verdict has no
+    ``margin_class0_db`` keys; an unpinned class would die in a bare
+    ``KeyError`` halfway through the corridor figure.
+    """
+    import dataclasses
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    with pytest.raises(ValueError, match="'overall_class' must be one of"):
+        dataclasses.replace(result, overall_class=0)
+
+
+def test_a_filter_verdict_refuses_an_edition_that_disagrees_with_its_bands() -> None:
+    """A 2014 verdict relabelled 1995 would silently draw the other
+    edition's corridor under the same title.
+    """
+    import dataclasses
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    with pytest.raises(ValueError, match="'edition'"):
+        dataclasses.replace(result, edition="1995")
+
+
+def test_a_filter_verdict_refuses_a_non_finite_per_band_value() -> None:
+    """Every margin is a ``min`` over the measured attenuation against the
+    Table 1 mask, so no bank emits a NaN; one smuggled in prints
+    ``Class 1 (+nan dB)`` in the per-band table under a boxed verdict that
+    still reads COMPLIES, because the binding margin reads another band.
+    """
+    import copy
+    import dataclasses
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    bands = tuple(copy.deepcopy(band) for band in result.bands)
+    bands[0][f"margin_class{result.reference_class()}_db"] = float("nan")
+    with pytest.raises(ValueError, match=r"'bands' must carry finite per-band"):
+        dataclasses.replace(result, bands=bands)
+
+
+def test_a_filter_verdict_refuses_a_class_stated_over_no_bands() -> None:
+    """A bank with no bands in range is a real outcome, always paired with
+    ``overall_class = None``. A class stated over zero bands would print an
+    accredited verdict box above a table reportlab then refuses to build,
+    complaining about a table with no rows and naming neither the bands nor
+    the bank.
+    """
+    import dataclasses
+
+    import numpy as np
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    empty = {
+        "bands": (),
+        "sos": (),
+        "band_frequencies": np.asarray([], dtype=float),
+        "factors": (),
+    }
+    # The same emptiness with overall_class None is the producer's own output.
+    assert dataclasses.replace(result, overall_class=None, **empty).bands == ()
+    with pytest.raises(ValueError, match=r"'overall_class' is 1 but 'bands' is empty"):
+        dataclasses.replace(result, overall_class=1, **empty)
+
+
+def test_a_filter_verdict_refuses_an_unknown_edition() -> None:
+    """The edition is a pinned tag, refused by name at construction."""
+    import dataclasses
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    with pytest.raises(ValueError, match="'edition' must be one of"):
+        dataclasses.replace(result, edition="2003")

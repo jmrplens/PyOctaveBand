@@ -123,10 +123,19 @@ class CriterionCarrier(Protocol):
 
 
 def rating_of(result: CriterionCarrier) -> NCResult | RCResult:
-    """Rate the received spectrum against its criterion family."""
+    """Rate the received spectrum against its criterion family.
+
+    The family is re-checked here rather than assumed pinned upstream: an
+    unknown tag used to fall through the ``NC`` test into an RC Mark II
+    rating, so a sheet could print one family's name over the other family's
+    numbers.
+
+    :raises ValueError: if the carrier's ``criterion`` is not a known family.
+    """
     from ..room.noise_criteria import noise_criterion, room_criterion
 
-    if result.criterion == "NC":
+    family = require_choice(result.criterion, "criterion", CRITERION_FAMILIES)
+    if family == "NC":
         return noise_criterion(result.received_level, result.frequencies)
     return room_criterion(result.received_level, result.frequencies)
 

@@ -24,6 +24,7 @@ uncertainty budgets) is out of scope; these are the underlying closed forms.
 
 from __future__ import annotations
 
+import math
 import warnings
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
@@ -235,11 +236,35 @@ class WindTurbineTonalityResult:
         of different lengths cannot be paired, so the frequency read off the
         drawing is not the one the tonality was computed at.
 
+        The Formula 30 to 34 chain is pinned finite.
+        :func:`wind_turbine_tonality` validates its spectrum finite and every
+        one of these numbers descends from it by an energy sum, a logarithm
+        of a positive energy or a subtraction, so no spectrum produces a NaN
+        here -- not even the ``has_identified_tone = False`` fallback, whose
+        fields are non-standard but still numbers. One smuggled in through
+        :func:`dataclasses.replace` either prints ``Tonality ΔLtn = nan dB``
+        in the boxed result beside a confident audibility decision, or dies
+        in the fiche's rounding of the metrics table with ``cannot convert
+        float NaN to integer``, naming no field, no result and no fiche.
+
         :raises ValueError: if ``frequencies`` and ``levels`` differ in
-            length, or either is not a 1-D spectrum.
+            length, either is not a 1-D spectrum, or a metric of the
+            Formula 30 to 34 chain is not finite.
         """
         require_ranks(self, frequencies=1, levels=1)
         require_same_length(self, "frequencies", "levels", axis="spectral line")
+        for name in (
+            "tone_frequency",
+            "critical_bandwidth",
+            "tone_level",
+            "masking_level",
+            "tonality",
+            "audibility_criterion",
+            "tonal_audibility",
+        ):
+            if not math.isfinite(getattr(self, name)):
+                msg = f"'{name}' must be finite."
+                raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

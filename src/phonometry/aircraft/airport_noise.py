@@ -38,6 +38,7 @@ from typing import TYPE_CHECKING, Any, Literal, NamedTuple, cast
 import numpy as np
 
 from .._internal.validation import (
+    require_choice,
     require_equal_counts,
     require_ranks,
     require_same_length,
@@ -697,9 +698,19 @@ class FlyoverResult:
         refuses it at all; the extra axis rides out untouched to whatever the
         reader places on a map.
 
-        :raises ValueError: if either array has more than one axis.
+        ``metric`` is pinned to the two values the type states, because the
+        figure asks only one question of it: ``== "exposure"``, and anything
+        else falls into the LAmax branch. The entry points route every metric
+        through ``_checked_metric``, so an unknown tag can only be written in
+        by hand, and left unpinned it would not fail at all; it would label
+        the y-axis and the total line of a rendered figure as a maximum level
+        the result never claimed to hold.
+
+        :raises ValueError: if either array has more than one axis, or
+            ``metric`` is not ``"exposure"`` or ``"maximum"``.
         """
         require_ranks(self, segment_levels=1, observer=1)
+        require_choice(self.metric, "metric", ("exposure", "maximum"))
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -1390,11 +1401,18 @@ class NoiseContourResult:
         it likes and as many y, and one count over both would reject every grid
         that is not square.
 
-        :raises ValueError: if the level grid disagrees with the x or y axis.
+        ``metric`` is pinned for the same reason as on
+        :class:`FlyoverResult`: the colorbar reads it as ``== "exposure"``
+        with LAmax as the fallback, so an unknown tag would label a rendered
+        contour map with a metric the grid was never computed in.
+
+        :raises ValueError: if the level grid disagrees with the x or y axis,
+            or ``metric`` is not ``"exposure"`` or ``"maximum"``.
         """
         require_ranks(self, x=1, y=1, level=2)
         require_same_length(self, "y", ("level", 0), axis="grid row")
         require_same_length(self, "x", ("level", 1), axis="grid column")
+        require_choice(self.metric, "metric", ("exposure", "maximum"))
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

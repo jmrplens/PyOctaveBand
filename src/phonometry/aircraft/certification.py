@@ -569,12 +569,66 @@ class EPNLResult:
         records of the flyover, and the two lengths have nothing to say to each
         other.
 
-        :raises ValueError: if the per-record arrays disagree.
+        Finiteness is pinned on every array besides. The one producer,
+        :func:`effective_perceived_noise_level`, requires a finite spectral
+        history and computes finite PNL and tone corrections from it, so no
+        determination of the library's own carries a NaN record; one written
+        in by hand would not raise anywhere downstream, it would move the
+        figure's PNLTM marker to the NaN itself (``argmax`` of an array with
+        a NaN is the NaN's index) and leave it floating over the gap in the
+        curve, stated as the maximum without a word of complaint.
+
+        ``band_limits`` is the window those records are integrated over, and
+        it is checked against them because it is the one field a length can
+        never vouch for. An index past the last record stops the figure with
+        an ``IndexError`` that names neither this field nor this type, and a
+        negative one does something quieter and worse: Python wraps it, and
+        the 10 dB-down window is shaded over a stretch of the flyover the
+        integration never touched, with PNLTM and EPNL printed confidently
+        beside it.
+
+        :raises ValueError: if the per-record arrays disagree, an array or a
+            scalar determination carries a non-finite value, or
+            ``band_limits`` does not index the records.
         """
         require_ranks(self, frequencies=1, times=1, pnl=1, tone_correction=1, pnlt=1)
         require_same_length(
             self, "times", "pnl", "tone_correction", "pnlt", axis="record"
         )
+        for name in ("frequencies", "times", "pnl", "tone_correction", "pnlt"):
+            if not np.all(np.isfinite(getattr(self, name))):
+                msg = f"EPNLResult: '{name}' must be finite."
+                raise ValueError(msg)
+        # The scalar determinations are pinned for the same sheet: the
+        # producer floors the PNL and refuses non-finite spectra, so none of
+        # the library's own results carries a NaN here, and one written in by
+        # hand would print verbatim in the accredited metrics table ('pnltm',
+        # 'duration_correction', 'bandsharing_adjustment') or stop the boxed
+        # statement inside the display rounding with an error naming nothing
+        # ('epnl').
+        for name in ("pnltm", "bandsharing_adjustment", "duration_correction", "epnl"):
+            if not np.isfinite(float(getattr(self, name))):
+                msg = f"EPNLResult: '{name}' must be finite."
+                raise ValueError(msg)
+        limits = tuple(self.band_limits)
+        pair = 2
+        records = int(np.size(self.times))
+        if len(limits) != pair or not all(
+            isinstance(k, (int, np.integer)) for k in limits
+        ):
+            msg = (
+                "EPNLResult: 'band_limits' must be a pair of 0-based record "
+                f"indices (kF, kL); got {self.band_limits!r}."
+            )
+            raise ValueError(msg)
+        kf, kl = (int(limits[0]), int(limits[1]))
+        if not 0 <= kf <= kl < records:
+            msg = (
+                "EPNLResult: 'band_limits' must satisfy 0 <= kF <= kL < "
+                f"{records} (the record count of 'times'); got "
+                f"{self.band_limits!r}."
+            )
+            raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

@@ -365,7 +365,7 @@ output voltage, and the band spectrum that voltage was measured over.
 | :--- | :--- |
 | `voltage` | Weighted r.m.s. output voltage due to inherent noise, in V (17.2 b); the equivalent noise level is computed from it. |
 | `equivalent_level_db` | Stated equivalent sound pressure level due to inherent noise, in dB SPL (17.1), when not computed from `voltage`. |
-| `weighting` | Weighting of the inherent-noise measurement (default `"A"`, the IEC 60268-1 6.2.1 recommendation). |
+| `weighting` | Weighting of the inherent-noise measurement: `"A"` (default, the IEC 60268-1 6.2.1 A-weighted r.m.s. recommendation) or `"CCIR"` (the 6.2.2 psophometric quasi-peak measurement to CCIR Recommendation 468). These are the two weighted wide-band noise measurements IEC 60268-1 defines; the unweighted band spectrum of 6.2.3 travels in `spectrum` instead. |
 | `spectrum` | Inherent-noise spectrum as `(frequencies, band_levels_db)` in (Hz, dB SPL) (17.2 b). |
 
 ## MicrophoneOverload

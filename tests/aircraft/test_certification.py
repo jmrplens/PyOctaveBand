@@ -425,3 +425,75 @@ def test_a_history_carrying_an_extra_axis_is_refused() -> None:
     two_columns = np.column_stack([result.pnl, result.pnl])
     with pytest.raises(ValueError, match="'pnl' must have one axis"):
         dataclasses.replace(result, pnl=two_columns)
+
+
+# --------------------------------------------------------------------------
+# Determinations the certification sheet would state without a word of warning
+# --------------------------------------------------------------------------
+@pytest.mark.parametrize(
+    "field", ["frequencies", "times", "pnl", "tone_correction", "pnlt"]
+)
+def test_a_non_finite_record_is_refused(field: str) -> None:
+    """A NaN anywhere in the histories moves the PNLTM marker onto the gap.
+
+    ``argmax`` of an array carrying a NaN answers with the NaN's own index, so
+    the figure marks the maximum at a record the flyover never reached and
+    prints ``PNLTM`` beside it. Nothing downstream raises: the marker simply
+    floats over the break in the curve.
+    """
+    import dataclasses
+
+    result = _flyover()
+    values = np.asarray(getattr(result, field), dtype=np.float64).copy()
+    values[0] = np.nan
+    with pytest.raises(ValueError, match=f"'{field}' must be finite"):
+        dataclasses.replace(result, **{field: values})
+
+
+@pytest.mark.parametrize(
+    "field", ["pnltm", "bandsharing_adjustment", "duration_correction", "epnl"]
+)
+def test_a_non_finite_determination_is_refused(field: str) -> None:
+    """The scalars are what the sheet states, so a NaN reaches it as ``nan``.
+
+    Three of them are printed verbatim in the metrics table and the fourth is
+    the boxed EPNL itself, which stops inside the display rounding with an
+    error naming nothing at all.
+    """
+    import dataclasses
+
+    result = _flyover()
+    with pytest.raises(ValueError, match=f"'{field}' must be finite"):
+        dataclasses.replace(result, **{field: float("nan")})
+
+
+@pytest.mark.parametrize(
+    "limits",
+    [(-30, -1), (0, 999), (12, 4)],
+    ids=["negative", "past-the-last-record", "reversed"],
+)
+def test_a_window_that_does_not_index_the_records_is_refused(
+    limits: tuple[int, int],
+) -> None:
+    """``band_limits`` is the one field no length can vouch for.
+
+    Python wraps a negative index, so the 10 dB-down window is shaded over a
+    stretch of the flyover the integration never touched, with PNLTM and EPNL
+    printed confidently beside it; an index past the last record stops the
+    figure at ``times[kL]`` with an ``IndexError`` naming neither this field
+    nor this type.
+    """
+    import dataclasses
+
+    result = _flyover()
+    with pytest.raises(ValueError, match=r"'band_limits' must satisfy"):
+        dataclasses.replace(result, band_limits=limits)
+
+
+def test_a_window_that_is_not_a_pair_of_indices_is_refused() -> None:
+    """Three limits, or fractional ones, index nothing at all."""
+    import dataclasses
+
+    result = _flyover()
+    with pytest.raises(ValueError, match=r"'band_limits' must be a pair"):
+        dataclasses.replace(result, band_limits=(0.5, 9.5))

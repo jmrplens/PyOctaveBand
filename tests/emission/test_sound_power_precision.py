@@ -506,6 +506,16 @@ def test_intensity_nonpositive_area_raises() -> None:
         sound_power_intensity_precision(intensity, areas_with_zero)
 
 
+def test_intensity_non_finite_area_raises() -> None:
+    """A NaN partial surface passes the positivity bound and sums to a
+    measurement surface the clause 10 sheet prints as "nan".
+    """
+    intensity = np.full((2,), 1e-5)
+    areas_with_nan = np.array([1.0, float("nan")])
+    with pytest.raises(ValueError, match="All 'areas' must be finite"):
+        sound_power_intensity_precision(intensity, areas_with_nan)
+
+
 def test_intensity_single_segment_2d_input_not_transposed() -> None:
     # A genuine (1, N) single-segment, N-band array must NOT be read as N
     # segments, even when N equals a plausible segment count. One area -> one
@@ -839,6 +849,22 @@ def test_partial_power_off_the_band_axis_is_refused() -> None:
     three_bands = result.partial_power[:, :-1]
     with pytest.raises(ValueError, match=r"'partial_power \(axis 1\)'"):
         dataclasses.replace(result, partial_power=three_bands)
+
+
+@pytest.mark.parametrize("bad", [float("nan"), float("inf")])
+def test_a_non_finite_measurement_surface_is_refused(bad: float) -> None:
+    """The summed partial surfaces are pinned; the per-band levels are not.
+
+    Clause 10 has the sheet state the measurement surface area beside the
+    boxed level, and an unpinned one printed there as "nan"; ``NaN`` in
+    ``sound_power_level`` is clause 9.2's own reading of a band the method
+    does not apply to and stays.
+    """
+    import dataclasses
+
+    result = _four_band_determination()
+    with pytest.raises(ValueError, match="'surface_area' must be finite"):
+        dataclasses.replace(result, surface_area=bad)
 
 
 def test_a_field_indicator_off_the_band_axis_is_refused() -> None:

@@ -47,6 +47,7 @@ criterion of 3 dB instead of 6 dB (clause 8.4.1) and validity up to
 
 from __future__ import annotations
 
+import math
 import warnings
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal
@@ -57,6 +58,7 @@ from .._internal.levels_math import energy_mean, energy_sum
 from .._internal.types import as_float_or_array
 from .._internal.validation import (
     check_engine,
+    require_choice,
     require_non_negative,
     require_per_band,
     require_positive,
@@ -257,8 +259,44 @@ class SoundPowerResult:
         so a spectrum of another length gives a sheet whose headline number
         sums bands its own table does not show.
 
-        :raises ValueError: if any per-band quantity disagrees with the rest.
+        ``grade`` is pinned beside the shapes because the fiche names the
+        applied standard from it: a tag that is not exactly ``'survey'``
+        or ``'engineering'`` would print a survey (ISO 3746, grade 3)
+        measurement as ISO 3744 engineering grade 2, a stricter standard and
+        a better accuracy grade than the measurement had.
+
+        ``surface_area`` must be finite: no constructor can compute a
+        non-finite ``S`` (:func:`sound_power_pressure` derives it from a
+        validated positive geometry), and the boxed statement prints it as a
+        plain number, so a NaN here would reach the accredited sheet as a
+        literal ``nan``.
+
+        ``sound_power_level`` must be finite for the same reason, band by
+        band. The one producer, :func:`sound_power_pressure`, now requires
+        finite pressure levels and computes a finite ``K1`` (clamped at the
+        criterion) and ``K2`` from them, so a NaN band can only be written in
+        by hand -- and nothing downstream would refuse it: the spectrum
+        figure passes the bands through ``nan_to_num`` and would draw the NaN
+        as a fabricated 0 dB bar in the ordinary colour, while the A-weighted
+        total quietly vanishes from the title. This determination carries no
+        per-band validity flags; the intensity-scanning siblings, whose
+        standard does let a band be undeterminable, flag those bands and are
+        rendered hatched instead. ``sound_power_level_a`` stays unpinned on
+        purpose: several bands without band frequencies leave it NaN by
+        documented design.
+
+        :raises ValueError: if any per-band quantity disagrees with the rest,
+            ``grade`` is neither ``'engineering'`` nor ``'survey'``,
+            ``surface_area`` is not finite, or ``sound_power_level`` carries
+            a non-finite band.
         """
+        require_choice(self.grade, "grade", ("engineering", "survey"))
+        if not math.isfinite(self.surface_area):
+            msg = (
+                "SoundPowerResult: 'surface_area' must be finite; "
+                f"got {self.surface_area!r}."
+            )
+            raise ValueError(msg)
         require_ranks(
             self,
             frequencies=1,
@@ -279,6 +317,9 @@ class SoundPowerResult:
             "environmental_correction",
             ("directivity_index", 1),
         )
+        if not np.all(np.isfinite(self.sound_power_level)):
+            msg = "SoundPowerResult: 'sound_power_level' must be finite."
+            raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -899,6 +940,9 @@ def sound_power_pressure(
         raise ValueError(msg)
     if levels.shape[1] == 0:
         msg = "'levels_positions' must contain at least one frequency band."
+        raise ValueError(msg)
+    if not np.all(np.isfinite(levels)):
+        msg = "'levels_positions' must contain only finite values."
         raise ValueError(msg)
     n_positions = levels.shape[0]
 

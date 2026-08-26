@@ -40,6 +40,7 @@ import numpy as np
 
 from .._internal.validation import (
     check_engine,
+    require_choice,
     require_equal_shapes,
     require_ranks,
     require_same_length,
@@ -125,6 +126,33 @@ NCMethod = Literal["SIL", "tangency"]
 NCOutOfRange = Literal["above", "below"]
 
 
+def _require_table1_bands(owner: str, frequencies: np.ndarray) -> None:
+    """Require the band axis to be the ten tabulated octave bands.
+
+    ANSI/ASA S12.2-2019 defines both rating families over one fixed axis: the
+    ten octave bands 16 Hz to 8000 Hz of Table 1 (NC) and Table D.1 (RC).
+    :func:`noise_criterion` and :func:`room_criterion` always align onto that
+    axis (absent bands NaN), and the fiche prints the tabulated nominal band
+    labels, so an axis on any other bands would put every level beside the
+    wrong frequency. Nominal spellings within 3 % of a tabulated centre are
+    accepted, matching the alignment tolerance of the entry points.
+
+    :param owner: Name of the result type, for the error message.
+    :param frequencies: The band axis to check, already rank-1.
+    :raises ValueError: if the axis is not the ten tabulated octave bands.
+    """
+    freqs = np.asarray(frequencies, dtype=np.float64)
+    if freqs.shape == OCTAVE_BANDS.shape and np.all(
+        np.isclose(freqs, OCTAVE_BANDS, rtol=0.03)
+    ):
+        return
+    msg = (
+        f"{owner}: 'frequencies' must be the ten ANSI/ASA S12.2-2019 octave "
+        f"bands 16 Hz - 8000 Hz (Table 1 / Table D.1); got {freqs.tolist()}."
+    )
+    raise ValueError(msg)
+
+
 @dataclass(frozen=True)
 class NCResult:
     """Result of a Noise Criteria (NC) rating (ANSI/ASA S12.2-2019, 5.2).
@@ -165,15 +193,42 @@ class NCResult:
     out_of_range: NCOutOfRange | None = None
 
     def __post_init__(self) -> None:
-        """Reject a rating whose spectrum and band axis disagree.
+        """Reject a rating whose axis, spectrum or rating/range pair disagree.
 
         The rating names a governing band, so a spectrum of the wrong length
-        names the wrong one.
+        names the wrong one; the standard fixes the band axis itself (the ten
+        Table 1 octave bands), and the fiche prints those nominal labels, so
+        any other axis would table every level at the wrong frequency. The
+        rating and ``out_of_range`` are one statement made twice: a spectrum
+        outside the NC-15 to NC-70 family has no NC rating (``rating`` NaN),
+        and inside it the rating is a number. Left unpinned, a NaN rating with
+        ``out_of_range`` cleared boxes ``NC-nan`` on the fiche and crashes the
+        verdict.
 
-        :raises ValueError: if 'frequencies' and 'levels' differ in length.
+        :raises ValueError: if 'frequencies' and 'levels' differ in length,
+            'frequencies' is not the ten Table 1 octave bands, 'out_of_range'
+            is an unknown tag, or 'rating' and 'out_of_range' contradict each
+            other.
         """
         require_ranks(self, frequencies=1, levels=1)
         require_same_length(self, "frequencies", "levels")
+        _require_table1_bands(type(self).__name__, self.frequencies)
+        if self.out_of_range is not None:
+            require_choice(self.out_of_range, "out_of_range", ("above", "below"))
+            if not math.isnan(float(self.rating)):
+                msg = (
+                    "NCResult: 'rating' must be NaN when 'out_of_range' is "
+                    "set; a spectrum outside the NC-15 to NC-70 family has "
+                    "no NC rating (ANSI/ASA S12.2-2019, Table 1)."
+                )
+                raise ValueError(msg)
+        elif not math.isfinite(float(self.rating)):
+            msg = (
+                "NCResult: 'rating' must be finite when 'out_of_range' is "
+                "None; only a spectrum outside the NC-15 to NC-70 family "
+                "carries a NaN rating, flagged by 'out_of_range'."
+            )
+            raise ValueError(msg)
 
     @property
     def label(self) -> str:
@@ -280,16 +335,34 @@ class RCResult:
     levels: np.ndarray
 
     def __post_init__(self) -> None:
-        """Reject a rating whose spectrum, curve and band axis disagree.
+        """Reject a rating whose axis, spectrum, curve or tag disagree.
 
         The fiche draws the reference curve over the measured spectrum and
         tabulates both, so a curve of the wrong length is compared band by
-        band against the wrong bands.
+        band against the wrong bands; the standard fixes the band axis itself
+        (the ten Table D.1 octave bands), and the fiche prints those nominal
+        labels. The classification is pinned to the tags the library rates
+        with, because the fiche prints a spectral-quality sentence for each:
+        an unknown tag would be boxed verbatim over a fabricated quality. The
+        ``RV`` designation of clause D.3.4 is refused by name: it requires
+        the Table 6 vibration/rattle criterion test, which this library does
+        not implement, so it is never mapped to a neighbouring tag.
 
-        :raises ValueError: if the three do not share one length.
+        :raises ValueError: if the three per-band arrays do not share one
+            length, 'frequencies' is not the ten tabulated octave bands, or
+            'classification' is not one of ``N``, ``R``, ``H`` or ``RH``.
         """
         require_ranks(self, frequencies=1, levels=1, reference_curve=1)
         require_same_length(self, "frequencies", "levels", "reference_curve")
+        _require_table1_bands(type(self).__name__, self.frequencies)
+        if self.classification == "RV":
+            msg = (
+                "RCResult: classification 'RV' (vibration and rattle, "
+                "ANSI/ASA S12.2-2019 clause D.3.4) requires the Table 6 "
+                "criterion test, which this library does not implement."
+            )
+            raise ValueError(msg)
+        require_choice(self.classification, "classification", ("N", "R", "H", "RH"))
 
     @property
     def label(self) -> str:

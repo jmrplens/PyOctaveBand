@@ -177,3 +177,46 @@ def test_per_impulse_columns_that_disagree_are_refused(trim: bool) -> None:
     wrong = values[:-1] if trim else np.append(values, values[-1])
     with pytest.raises(ValueError, match="per impulse"):
         dataclasses.replace(result, qualifies=wrong)
+
+
+def test_an_empty_set_of_impulses_is_refused() -> None:
+    """Four length-0 columns agree with each other, and the fiche then dies.
+
+    :func:`impulse_prominence` refuses empty input, so an empty set can only be
+    hand-built; the fiche went hunting the governing row and raised numpy's
+    bare "attempt to get argmax of an empty sequence", naming neither the field
+    nor the result.
+    """
+    import dataclasses
+
+    result = nt.impulse_prominence(
+        onset_rates=[25.0, 40.0], level_differences=[8.0, 12.0]
+    )
+    empty = np.array([])
+    with pytest.raises(ValueError, match="'onset_rates' must carry at least one"):
+        dataclasses.replace(
+            result,
+            onset_rates=empty,
+            level_differences=empty,
+            per_impulse=empty,
+            qualifies=np.array([], dtype=bool),
+        )
+
+
+@pytest.mark.parametrize("field", ["prominence", "adjustment"])
+def test_a_non_finite_governing_value_is_refused(field: str) -> None:
+    """The note and the boxed result print the governing values raw.
+
+    The producer accepts only positive, finite onset rates and level
+    differences, so a NaN can only be hand-built; without the pin the note
+    affirmed "a prominent impulse is present (governing P = nan > 5)" and the
+    verdict row crashed in the display rounding with a bare "cannot convert
+    float NaN to integer".
+    """
+    import dataclasses
+
+    result = nt.impulse_prominence(
+        onset_rates=[25.0, 40.0], level_differences=[8.0, 12.0]
+    )
+    with pytest.raises(ValueError, match=f"'{field}' must be finite"):
+        dataclasses.replace(result, **{field: float("nan")})

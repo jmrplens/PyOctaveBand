@@ -1498,6 +1498,20 @@ def test_event_history_and_spectrum_must_line_up() -> None:
         dataclasses.replace(res, frequencies=extra_band)
 
 
+def test_a_non_finite_a_weighted_step_is_refused() -> None:
+    """The figure marks LASmax at ``argmax(a_levels)``, which a NaN wins.
+
+    ``argmax`` of an array carrying a NaN answers with the NaN's own index, so
+    the marker floats over the break in the curve and is labelled as the
+    maximum. ``pnlt`` is the field licensed to hold NaN, and stays exempt.
+    """
+    _t, _pos, res = _flyover(bands=[31.5], span=1000.0)
+    with_gap = np.asarray(res.a_levels, dtype=np.float64).copy()
+    with_gap[0] = np.nan
+    with pytest.raises(ValueError, match="'a_levels' must be finite"):
+        dataclasses.replace(res, a_levels=with_gap)
+
+
 def test_event_plot() -> None:
     _, _, res = _flyover(level=90.0, bands=_NORAH_BANDS, span=1000.0)
     assert res.plot() is not None
@@ -1573,6 +1587,25 @@ def test_contour_level_grid_must_span_its_coordinates() -> None:
     extra_y = np.append(res.y, 500.0)
     with pytest.raises(ValueError, match=r"'y'.*per grid row"):
         dataclasses.replace(res, y=extra_y)
+
+
+def test_contour_metric_outside_the_two_the_type_states_is_refused() -> None:
+    # The entry point checks the tag at the call, but a grid rewritten by hand
+    # reaches the colorbar, which asks only whether it is "exposure" and calls
+    # everything else LASmax: the map is labelled with a metric it was never
+    # computed in, and nothing raises.
+    hems, spd, ang, t, pos = _contour_inputs()
+    res = rotorcraft_noise_contour(
+        hems,
+        spd,
+        ang,
+        t,
+        pos,
+        x=np.array([-200.0, 0.0, 150.0]),
+        y=np.array([-300.0, 100.0]),
+    )
+    with pytest.raises(ValueError, match="'metric' must be one of"):
+        dataclasses.replace(res, metric="epnl")
 
 
 def test_contour_plot() -> None:

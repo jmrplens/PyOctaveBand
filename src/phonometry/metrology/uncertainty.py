@@ -46,6 +46,7 @@ if TYPE_CHECKING:
 from .._internal.validation import (
     require_axis_count,
     require_equal_counts,
+    require_non_negative,
     require_ranks,
     require_same_length,
 )
@@ -93,10 +94,15 @@ class Quantity:
     name: str = ""
 
     def __post_init__(self) -> None:
-        """Reject a negative uncertainty, an unrecognised PDF or non-positive dof."""
-        if self.uncertainty < 0.0:
-            msg = "uncertainty must be non-negative."
-            raise ValueError(msg)
+        """Reject a bad uncertainty, an unrecognised PDF or non-positive dof.
+
+        The uncertainty must be finite and non-negative: a bare ``< 0.0``
+        would pass NaN, which no propagation recovers from:
+        it flows through :func:`combine_uncertainty` into a NaN contribution
+        the budget plot draws as an invisible bar -- indistinguishable from a
+        zero contribution -- under a legend reading ``u_c = nan``.
+        """
+        require_non_negative(self.uncertainty, "uncertainty")
         if self.distribution not in DISTRIBUTIONS:
             msg = (
                 f"distribution must be one of {DISTRIBUTIONS}; "
@@ -190,16 +196,30 @@ class UncertaintyResult:
         budget the plot fills in with ``x1``, ``x2``, ... itself, which is why
         the labels are counted only when there are some.
 
+        The numbers of the budget must also be finite. The estimate, the
+        combined uncertainty and the per-input contributions come from
+        :func:`combine_uncertainty`, which refuses a model that is not finite
+        where clause 5.1 evaluates it, so NaN here is never the library's own
+        output; unrefused, a NaN contribution reaches the chart as a bar of
+        width NaN -- drawn nowhere, and so indistinguishable from an input
+        that contributes nothing -- beneath a combined-uncertainty line drawn
+        nowhere either and a legend reading "u_c = nan". The effective degrees
+        of freedom are the documented exception: NaN is their defined value
+        for a correlated budget with finite input dof, which is why
+        :meth:`expanded` asks for an explicit coverage factor there.
+
         :raises ValueError: if the coefficients or the contributions carry
-            more than one axis, or if the coefficients, the contributions or
-            the labels span different numbers of input quantities.
+            more than one axis, if the coefficients, the contributions or
+            the labels span different numbers of input quantities, or if the
+            estimate, the combined uncertainty, a coefficient or a
+            contribution is not finite.
         """
+        owner = type(self).__name__
         require_ranks(self, sensitivities=1, contributions=1)
         require_same_length(
             self, "sensitivities", "contributions", axis=_INPUT_QUANTITY_AXIS
         )
         if self.names:
-            owner = type(self).__name__
             require_equal_counts(
                 owner,
                 {
@@ -214,6 +234,14 @@ class UncertaintyResult:
                 },
                 _INPUT_QUANTITY_AXIS,
             )
+        for name in ("value", "combined_uncertainty"):
+            if not math.isfinite(float(getattr(self, name))):
+                msg = f"{owner}: '{name}' must be finite."
+                raise ValueError(msg)
+        for name in ("sensitivities", "contributions"):
+            if not bool(np.all(np.isfinite(np.asarray(getattr(self, name))))):
+                msg = f"{owner}: '{name}' must contain only finite values."
+                raise ValueError(msg)
 
     def expanded(
         self, coverage: float = 0.95, *, coverage_factor_override: float | None = None
@@ -437,7 +465,9 @@ def combine_uncertainty(
     :return: An :class:`UncertaintyResult` with :math:`u_\mathrm{c}(y)`, the
         sensitivity
         coefficients, the contributions and the effective degrees of freedom.
-    :raises ValueError: for no inputs or a malformed correlation matrix.
+    :raises ValueError: for no inputs, a malformed correlation matrix, or a
+        model that is not finite at the estimates or one evaluation step
+        either side of them.
     """
     if len(quantities) == 0:
         msg = "at least one input quantity is required."
@@ -445,10 +475,42 @@ def combine_uncertainty(
     values = np.array([q.value for q in quantities], dtype=np.float64)
     uncert = np.array([q.uncertainty for q in quantities], dtype=np.float64)
     n = values.size
+    labels = tuple(q.name or f"x{i + 1}" for i, q in enumerate(quantities))
 
     r = _validated_correlation(correlation, n)
 
     coeffs = _sensitivity(model, values, uncert)
+    estimate = float(model(*values))
+    # Clause 5.1 evaluates the model at the estimates and probes it one step
+    # either side of each input; a model undefined there (sqrt of an input
+    # estimated at zero, say) poisons the budget the same way an undefined
+    # model poisons a Monte Carlo run, and monte_carlo refuses that by name.
+    # Unrefused, the NaN contribution reaches the budget chart as a bar of
+    # width NaN -- drawn nowhere, so indistinguishable from an input that
+    # contributes nothing -- under a legend reading "u_c = nan".
+    if not math.isfinite(estimate):
+        msg = (
+            "'model' returned a non-finite output at the input estimates, so "
+            "the value, the combined standard uncertainty and every "
+            "contribution are undefined; check that the estimates lie inside "
+            "the model's domain."
+        )
+        raise ValueError(msg)
+    undefined = [
+        name
+        for name, coeff in zip(labels, coeffs, strict=True)
+        if not math.isfinite(coeff)
+    ]
+    if undefined:
+        msg = (
+            "'model' returned a non-finite output when probing "
+            f"{', '.join(undefined)} by the evaluation step, so the "
+            "sensitivity coefficient and the contribution of "
+            f"{'each' if len(undefined) > 1 else 'that'} input are undefined; "
+            "check that the model is defined within one standard uncertainty "
+            "of the estimates."
+        )
+        raise ValueError(msg)
     contributions = np.abs(coeffs) * uncert  # ui(y) = |ci| u(xi)
 
     correlated = r is not None and not np.allclose(r, np.eye(n))
@@ -463,12 +525,12 @@ def combine_uncertainty(
     effective_dof = _effective_dof(dofs, contributions, combined, correlated=correlated)
 
     return UncertaintyResult(
-        value=float(model(*values)),
+        value=estimate,
         combined_uncertainty=combined,
         sensitivities=coeffs,
         contributions=contributions,
         effective_dof=effective_dof,
-        names=tuple(q.name or f"x{i + 1}" for i, q in enumerate(quantities)),
+        names=labels,
     )
 
 
@@ -563,7 +625,8 @@ def monte_carlo(
         float per trial) so :meth:`MonteCarloResult.plot` can draw the
         output-distribution histogram.
     :return: A :class:`MonteCarloResult`.
-    :raises ValueError: for no inputs, fewer than 2 trials or bad coverage.
+    :raises ValueError: for no inputs, fewer than 2 trials or bad coverage,
+        or when the model returns a non-finite output for any trial.
     """
     if len(quantities) == 0:
         msg = "at least one input quantity is required."
@@ -578,6 +641,21 @@ def monte_carlo(
     rng = np.random.default_rng(seed)
     samples = [_sample(q, trials, rng) for q in quantities]
     output = np.asarray(model(*samples), dtype=np.float64)
+    # A model undefined over part of the sampled input domain (sqrt of a
+    # Gaussian straddling zero, say) poisons every statistic below: the mean,
+    # the standard deviation and both quantiles come out NaN, and the plot
+    # would draw a histogram of only the finite trials under a title reading
+    # "u(y) = nan" with an invisible coverage band. Supplement 1 assumes the
+    # model is defined wherever the input PDFs put mass; refuse and say so.
+    bad = int(np.count_nonzero(~np.isfinite(output)))
+    if bad:
+        msg = (
+            f"'model' returned a non-finite output for {bad} of {trials} "
+            "trials, so the estimate, its standard uncertainty and the "
+            "coverage interval are undefined; restrict the input PDFs to the "
+            "model's domain or fix the model."
+        )
+        raise ValueError(msg)
 
     low_q = 0.5 * (1.0 - coverage)
     high_q = 0.5 * (1.0 + coverage)

@@ -13,6 +13,8 @@ range rather than clamped to a fabricated rating.
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pytest
 from reference_data import (
@@ -320,11 +322,78 @@ def test_an_nc_rating_refuses_levels_off_the_band_axis(trim: bool) -> None:
     A spectrum of the wrong length would have the rating name a band the
     levels never had.
     """
-    import dataclasses
-
     bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
     result = rn.noise_criterion([50.0, 45.0, 40.0, 38.0, 35.0, 32.0, 30.0, 28.0], bands)
     levels = np.asarray(result.levels)
     wrong = levels[:-1] if trim else np.append(levels, levels[-1])
     with pytest.raises(ValueError, match="'levels'"):
         dataclasses.replace(result, levels=wrong)
+
+
+# --------------------------------------------------------------------------
+# The band axis the standard fixes, the spectral tag and the rating/range pair
+# --------------------------------------------------------------------------
+@pytest.mark.parametrize("family", ["nc", "rc"])
+def test_a_rating_refuses_a_band_axis_off_table_1(family: str) -> None:
+    """Both families are defined over the ten tabulated octave bands.
+
+    ANSI/ASA S12.2-2019 rates against Table 1 (NC) and Table D.1 (RC), both
+    tabulated on the fixed 16 Hz - 8000 Hz octave axis, and the fiche prints
+    those nominal labels rather than the stored axis. An axis shifted an
+    octave keeps the band count, so nothing downstream notices: every
+    measured level would be tabled against the label of its neighbour while
+    the plot on the same page draws it at its true frequency.
+    """
+    result: rn.NCResult | rn.RCResult = (
+        rn.noise_criterion(rn.nc_curve(40.0))
+        if family == "nc"
+        else rn.room_criterion(rn.rc_curve(35.0))
+    )
+    one_octave_up = rn.OCTAVE_BANDS * 2.0
+    with pytest.raises(ValueError, match="'frequencies' must be the ten"):
+        dataclasses.replace(result, frequencies=one_octave_up)
+
+
+def test_an_rc_rating_refuses_the_unimplemented_rv_tag() -> None:
+    """``RV`` is a clause D.3.5 designation this library does not rate.
+
+    The vibration/rattle tag of clause D.3.4 needs the Table 6 criterion
+    test, so it is refused by name instead of being mapped onto a
+    neighbouring letter: the fiche prints one spectral-quality sentence per
+    tag and would have boxed ``RC-nn(RV)`` over "Spectral quality: neutral".
+    """
+    result = rn.room_criterion(rn.rc_curve(35.0))
+    with pytest.raises(ValueError, match="classification 'RV'"):
+        dataclasses.replace(result, classification="RV")
+
+
+def test_an_rc_rating_refuses_an_unknown_spectral_tag() -> None:
+    """A tag outside N/R/H/RH has no spectral-quality sentence to print."""
+    result = rn.room_criterion(rn.rc_curve(35.0))
+    with pytest.raises(ValueError, match="'classification' must be one of"):
+        dataclasses.replace(result, classification="Q")
+
+
+def test_an_nc_rating_outside_the_family_keeps_its_flag() -> None:
+    """A NaN rating without ``out_of_range`` boxes ``NC-nan`` on the fiche.
+
+    The rating and the flag are one statement made twice: outside the NC-15
+    to NC-70 family of Table 1 there is no NC rating, and the fiche reads the
+    flag to print ``>NC-70`` / ``<NC-15`` instead of the number. Clearing the
+    flag alone leaves the NaN to be formatted verbatim and to crash the
+    verdict's rounding.
+    """
+    over = rn.NC_CURVES[-1].copy()
+    over[2] += 1.0  # 63 Hz, 1 dB above the highest tabulated curve
+    result = rn.noise_criterion(over)
+    assert result.out_of_range == "above"
+    with pytest.raises(ValueError, match="'rating' must be finite"):
+        dataclasses.replace(result, out_of_range=None)
+
+
+def test_an_nc_rating_inside_the_family_cannot_be_flagged_out_of_it() -> None:
+    """A flagged result carries no number: the fiche prints the flag instead."""
+    result = rn.noise_criterion(rn.nc_curve(40.0))
+    assert result.out_of_range is None
+    with pytest.raises(ValueError, match="'rating' must be NaN"):
+        dataclasses.replace(result, out_of_range="above")

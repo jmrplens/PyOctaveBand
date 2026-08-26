@@ -454,3 +454,74 @@ def test_an_instrument_verdict_refuses_per_band_entries_that_disagree() -> None:
     )
     with pytest.raises(ValueError, match="'bands'"):
         dataclasses.replace(result, bands=result.bands[:-1])
+
+
+def test_a_verdict_whose_device_is_not_a_table_2_column_is_refused() -> None:
+    """Two readers dispatch on ``device``, and neither survives an unknown tag.
+
+    :func:`verify_intensity_class` checks the tag at the call, but a verdict
+    rewritten by hand reaches the plot's title lookup once the masks are drawn
+    and dies there with a bare ``KeyError`` naming the string alone, while the
+    fiche's basis strip labels the same result as a complete instrument.
+    """
+    import dataclasses
+
+    frequencies = np.array([250.0, 500.0, 1000.0, 2000.0])
+    result = emission.intensity_class_compliance(
+        np.full(frequencies.size, 20.0),
+        frequencies,
+        device="instrument",
+        spacing=0.025,
+    )
+    with pytest.raises(ValueError, match="'device' must be"):
+        dataclasses.replace(result, device="microphone")
+
+
+@pytest.mark.parametrize(
+    "field_name", ["frequency", "residual_index", "limit_class1", "limit_class2"]
+)
+def test_a_non_finite_band_of_the_verdict_is_refused(field_name: str) -> None:
+    """A NaN band prints as ``nan`` under a boxed verdict that still complies.
+
+    Every comparison the class rests on is ``>=`` against a mask, and a NaN
+    loses each of them silently: the band is marked failing, or the figure's
+    axis autoscaling stops inside matplotlib naming no field at all.
+    """
+    import dataclasses
+
+    frequencies = np.array([250.0, 500.0, 1000.0, 2000.0])
+    result = emission.intensity_class_compliance(
+        np.full(frequencies.size, 20.0),
+        frequencies,
+        device="instrument",
+        spacing=0.025,
+    )
+    values = np.asarray(getattr(result, field_name), dtype=float).copy()
+    values[1] = float("nan")
+    with pytest.raises(ValueError, match=f"'{field_name}' must be finite"):
+        dataclasses.replace(result, **{field_name: values})
+
+
+def test_a_non_finite_per_band_verdict_value_is_refused() -> None:
+    """The certificate's table and its boxed verdict read different keys.
+
+    The per-band rows print ``residual_index_db`` and the margin taken from
+    it, while the box reads ``margin_class<n>_db``; a NaN in one of them gave
+    an accredited verification certificate reading ``nan`` and ``+nan`` in the
+    results table while still declaring ``Class 1 - COMPLIES``. Every one of
+    these numbers descends from a spectrum the verifier validated finite.
+    """
+    import copy
+    import dataclasses
+
+    frequencies = np.array([250.0, 500.0, 1000.0, 2000.0])
+    result = emission.intensity_class_compliance(
+        np.full(frequencies.size, 20.0),
+        frequencies,
+        device="instrument",
+        spacing=0.025,
+    )
+    bands = tuple(copy.deepcopy(band) for band in result.bands)
+    bands[0]["residual_index_db"] = float("nan")
+    with pytest.raises(ValueError, match=r"'bands' must carry finite per-band"):
+        dataclasses.replace(result, bands=bands)

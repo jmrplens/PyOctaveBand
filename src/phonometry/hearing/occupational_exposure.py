@@ -46,13 +46,18 @@ from __future__ import annotations
 
 import warnings
 from dataclasses import dataclass, field, replace
-from math import log10, sqrt
+from math import isfinite, log10, sqrt
 from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
 from .._internal.levels_math import energy_mean
-from .._internal.validation import check_engine
+from .._internal.validation import (
+    check_engine,
+    require_choice,
+    require_finite_array,
+    require_positive,
+)
 from .._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:
@@ -294,13 +299,18 @@ class Task:
     instrument: InstrumentClass | None = None
 
     def __post_init__(self) -> None:
-        """Reject an empty ``samples`` tuple and a non-positive ``duration_hours``."""
+        """Reject empty or non-finite ``samples`` and a bad ``duration_hours``.
+
+        Both helpers reject NaN as well: a NaN sample (or duration) would
+        pass a bare emptiness/sign check, make ``lex_8h`` NaN, and stop the
+        exposure plot inside matplotlib with "Axis limits cannot be NaN or
+        Inf" -- naming neither the task nor the sample that carried it.
+        """
         if len(self.samples) == 0:
             msg = "A Task needs at least one Lp,A,eqT sample."
             raise ValueError(msg)
-        if self.duration_hours <= 0.0:
-            msg = "'duration_hours' must be positive."
-            raise ValueError(msg)
+        require_finite_array(self.samples, "samples")
+        require_positive(self.duration_hours, "duration_hours")
 
 
 @dataclass(frozen=True)
@@ -320,6 +330,34 @@ class TaskContribution:
     c1b: float  # duration sensitivity coefficient (Eq C.5), dB/h
     u2: float  # instrument standard uncertainty (Table C.5), dB
     u3: float  # microphone-position standard uncertainty (Clause C.6), dB
+
+    def __post_init__(self) -> None:
+        """Reject a contribution carrying a non-finite term.
+
+        :func:`task_based_exposure` computes every term from a :class:`Task`
+        whose samples and duration are already pinned finite, so a NaN here is
+        never the library's own output. The fiche prints the levels through
+        the same one-decimal formatter as the daily total, whose
+        ``math.floor`` dies on NaN with "cannot convert float NaN to integer"
+        -- naming neither the field, the class nor the cause.
+
+        :raises ValueError: if any numeric term is not finite.
+        """
+        for name in (
+            "lp_aeqt",
+            "duration_hours",
+            "lex_8h_contribution",
+            "sample_range_db",
+            "u1a",
+            "c1a",
+            "u1b",
+            "c1b",
+            "u2",
+            "u3",
+        ):
+            if not isfinite(float(getattr(self, name))):
+                msg = f"TaskContribution: '{name}' must be finite."
+                raise ValueError(msg)
 
     @property
     def variance_contribution(self) -> float:
@@ -365,6 +403,85 @@ class ExposureResult:
     sampling_advisory: bool = False  # c1*u1 > 3.5 dB, or 3 dB spread on 3 samples
     instrument: InstrumentClass | None = None
     tasks: tuple[TaskContribution, ...] = field(default_factory=tuple)
+
+    def __post_init__(self) -> None:
+        """Pin the tags, the levels and the record the strategy owes the fiche.
+
+        The strategy is a tag the fiche resolves through a dict to name the
+        applied ISO 9612 clause in its basis line; unpinned, an unknown tag
+        passes construction and dies there as a bare ``KeyError`` naming
+        neither the field nor the accepted values. The instrument class is a
+        ``Literal`` with no runtime force behind it and meets the same dict.
+        Both are pinned here, by name.
+
+        The levels and uncertainties must be finite: every strategy computes
+        them from samples already pinned finite, so NaN is never the
+        library's own output, and each is printed through a formatter whose
+        ``math.floor`` dies on NaN with an anonymous "cannot convert float
+        NaN to integer".
+
+        Each strategy must also carry its work analysis, because the fiche
+        renders it unconditionally (Clause 15 b/d): a task-based result its
+        per-task contributions, a job-based or full-day result the sampling
+        summary (``N``, ``Lp,A,eqTe``, ``T_e`` and the Formula (C.9) budget
+        terms). Built bare, the sheet would print the literal string ``None``
+        for ``N`` and a fabricated 0,0 for every budget term -- an accredited
+        page stating a zero uncertainty budget nobody measured.
+
+        :raises ValueError: for an unknown strategy or instrument tag, a
+            non-finite level or uncertainty, or a result missing the work
+            analysis its strategy reports.
+        """
+        require_choice(self.strategy, "strategy", ("task", "job", "full_day"))
+        if self.instrument is not None:
+            require_choice(self.instrument, "instrument", tuple(INSTRUMENT_U2))
+        for name in (
+            "lex_8h",
+            "combined_standard_uncertainty",
+            "expanded_uncertainty",
+            "coverage_factor",
+            "lp_aeqte",
+            "effective_duration_hours",
+            "u1",
+            "c1u1",
+            "u2",
+            "u3",
+        ):
+            value = getattr(self, name)
+            if value is not None and not isfinite(float(value)):
+                msg = f"ExposureResult: '{name}' must be finite."
+                raise ValueError(msg)
+        if self.strategy == "task":
+            if not self.tasks:
+                msg = (
+                    "ExposureResult: 'tasks' is empty; a task-based result "
+                    "carries one TaskContribution per task of the nominal day "
+                    "(ISO 9612:2009 Clause 15 b)."
+                )
+                raise ValueError(msg)
+            return
+        missing = [
+            name
+            for name in (
+                "n_samples",
+                "lp_aeqte",
+                "effective_duration_hours",
+                "u1",
+                "c1u1",
+                "u2",
+                "u3",
+            )
+            if getattr(self, name) is None
+        ]
+        if missing:
+            listed = ", ".join(f"'{name}'" for name in missing)
+            msg = (
+                f"ExposureResult: {listed} must be supplied for a "
+                f"{self.strategy!r} result; the fiche prints the sampling "
+                "summary and its Formula (C.9) budget (ISO 9612:2009 "
+                "Clause 15 d)."
+            )
+            raise ValueError(msg)
 
     @property
     def upper_limit(self) -> float:

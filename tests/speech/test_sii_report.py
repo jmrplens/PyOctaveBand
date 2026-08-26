@@ -253,6 +253,55 @@ def test_non_default_procedure_fiche_renders_in_spanish(tmp_path: Path) -> None:
     assert "Audibilidad por bandas de octava" in text
 
 
+def test_a_procedure_the_fiche_has_no_wording_for_is_refused() -> None:
+    """The two wording tables refuse an unknown procedure, not default to one.
+
+    Both readings used to fall back to the one-third-octave wording, which is
+    a procedure of the standard in its own right: a 21-band critical-band
+    result mistyped as ``"critical band"`` printed a sheet claiming the
+    one-third-octave-band method over a table of critical-band rows.
+    """
+    from phonometry._report.sii import _METHOD_NAMES, _procedure_wording
+
+    with pytest.raises(ValueError, match="band procedure 'critical band'"):
+        _procedure_wording(_METHOD_NAMES, "critical band", "basis-line wording")
+
+
+def test_the_caption_table_refuses_the_same_unknown_procedure() -> None:
+    """The caption is the second reading of the tag, and it refuses too.
+
+    The basis line and the table caption are read from two tables, and both
+    fell back to the one-third-octave entry; pinning only the first would
+    have left the caption alone in claiming a procedure the sheet did not
+    follow.
+    """
+    from phonometry._report.sii import _TABLE_CAPTIONS, _procedure_wording
+
+    with pytest.raises(ValueError, match="band procedure 'critical band'"):
+        _procedure_wording(_TABLE_CAPTIONS, "critical band", "band-table caption")
+
+
+def test_every_procedure_the_result_accepts_has_its_own_wording() -> None:
+    """The refusal is not vacuous: each of the four tags words differently.
+
+    This is what the refusal is there to catch. ``SIIResult`` pins ``method``
+    to :data:`SII_METHODS`, so a fifth procedure added to that tuple without
+    wording in the two fiche tables would now be refused rather than printed
+    as one-third-octave.
+    """
+    from phonometry._report.sii import (
+        _METHOD_NAMES,
+        _TABLE_CAPTIONS,
+        _procedure_wording,
+    )
+    from phonometry.speech.sii import SII_METHODS
+
+    basis = [_procedure_wording(_METHOD_NAMES, m, "basis") for m in SII_METHODS]
+    captions = [_procedure_wording(_TABLE_CAPTIONS, m, "caption") for m in SII_METHODS]
+    assert len(set(basis)) == len(SII_METHODS)
+    assert len(set(captions)) == len(SII_METHODS)
+
+
 def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     res = _example_c2()

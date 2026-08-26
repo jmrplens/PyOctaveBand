@@ -108,6 +108,7 @@ they describe the plane-wave mode alone and a measurement will show the rest.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -457,6 +458,25 @@ def quarter_wave_impedance(
     return np.asarray(zb, dtype=np.complex128)
 
 
+#: The keys :attr:`ReactiveSilencerResult.geometry` may carry: the keyword
+#: parameters of the geometry renderer it is splatted into (the union over
+#: the four named constructors, each of which stores a subset).
+_GEOMETRY_KEYS = frozenset(
+    {
+        "length",
+        "chamber_area",
+        "pipe_area",
+        "inlet_extension",
+        "outlet_extension",
+        "duct_area",
+        "neck_area",
+        "neck_length",
+        "cavity_volume",
+        "branch_area",
+    }
+)
+
+
 @dataclass(frozen=True)
 class ReactiveSilencerResult:
     """Transmission and insertion loss of a reactive silencer over frequency.
@@ -528,9 +548,30 @@ class ReactiveSilencerResult:
         for a branch tube -- and has nothing to do with how finely the
         response was sampled.
 
-        :raises ValueError: if the curves disagree, or the matrix is not a
-            stack of four-poles over frequency.
+        :attr:`geometry` is pinned to the keyword names of
+        :func:`~phonometry._plot.geometry.noise_control.plot_silencer_geometry`,
+        because :meth:`plot_geometry` splats it straight into that call: an
+        unknown key would die there in a ``TypeError`` naming the plot
+        function's kwarg rather than the field that carried it, and a
+        non-finite value would draw a part-blank device.
+
+        :raises ValueError: if the curves disagree, the matrix is not a
+            stack of four-poles over frequency, or the retained geometry
+            carries an unknown key or a non-finite value.
         """
+        if self.geometry is not None:
+            unknown = sorted(set(self.geometry) - _GEOMETRY_KEYS)
+            if unknown:
+                msg = (
+                    f"'geometry' carries unknown keys {unknown}; it retains "
+                    "the constructor arguments plot_geometry() redraws, one "
+                    f"of {sorted(_GEOMETRY_KEYS)}."
+                )
+                raise ValueError(msg)
+            for key, value in self.geometry.items():
+                if not math.isfinite(value):
+                    msg = f"'geometry[{key!r}]' must be finite."
+                    raise ValueError(msg)
         require_ranks(
             self,
             frequencies=1,

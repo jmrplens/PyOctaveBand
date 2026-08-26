@@ -990,6 +990,30 @@ class PeakStatisticsResult:
     duration: float
     fs: float
 
+    def __post_init__(self) -> None:
+        """Reject standardized peak heights that are not sorted ascending.
+
+        The plot pairs :attr:`peak_values` positionally with the empirical
+        exceedance ``1 - rank/n``, and spans its Rice curves from the first
+        entry to the last: both readings are statements about the sorted
+        order :func:`peak_statistics` writes, not about the array as such.
+        An unsorted array is accepted by every count -- nothing changes
+        length -- and publishes a wrong exceedance under the ordinary title,
+        so the order is pinned here, where the mistake can be named.
+
+        :raises ValueError: if the peak heights carry more than one axis or
+            are not in ascending order.
+        """
+        require_ranks(self, peak_values=1)
+        values = np.asarray(self.peak_values)
+        if values.ndim == 1 and np.any(np.diff(values) < 0.0):
+            msg = (
+                "PeakStatisticsResult: 'peak_values' must be sorted "
+                "ascending; the empirical exceedance pairs each peak with "
+                "its rank."
+            )
+            raise ValueError(msg)
+
     def peak_exceedance(
         self, z: NDArray[np.float64] | list[float] | float
     ) -> NDArray[np.float64]:

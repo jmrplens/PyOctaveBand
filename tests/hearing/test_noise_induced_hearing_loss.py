@@ -269,3 +269,63 @@ def test_plots_return_axes() -> None:
     assert isinstance(m.nipts(95.0, 20.0, 0.9).plot(), plt.Axes)
     assert isinstance(m.htlan(60, "male", 95.0, 20.0, 0.9).plot(), plt.Axes)
     plt.close("all")
+
+
+def test_nipts_rejects_nan_exposure_level() -> None:
+    """A NaN L_EX,8h fires no domain warning and NaNs every spectrum.
+
+    Without the construction guard the plot draws a completely blank axes
+    under a title ending "= nan dB", with no warning of any category.
+    """
+    with pytest.raises(ValueError, match="'l_ex' must be finite"):
+        m.nipts(l_ex=float("nan"), years=10.0)
+
+
+def test_nipts_rejects_nan_years() -> None:
+    with (
+        pytest.warns(m.NoiseInducedHearingLossWarning, match="outside the 1-40"),
+        pytest.raises(ValueError, match="'years' must be finite"),
+    ):
+        m.nipts(l_ex=85.0, years=float("nan"))
+
+
+def test_nipts_rejects_an_empty_frequency_subset() -> None:
+    """An empty subset is reachable from the public entry point.
+
+    ``frequencies=[]`` meets no unknown frequency, so it selected nothing and
+    handed back five length-0 spectra that agreed with each other; the fiche
+    then went hunting the representative 2/3/4 kHz rows and raised numpy's
+    bare "attempt to get argmax of an empty sequence".
+    """
+    with pytest.raises(ValueError, match="'frequencies' must carry at least one"):
+        m.nipts(95.0, 20.0, 0.9, frequencies=[])
+
+
+def test_htlan_rejects_an_empty_frequency_subset() -> None:
+    """The combined threshold takes the same empty subset the same way."""
+    with pytest.raises(ValueError, match="'frequencies' must carry at least one"):
+        m.htlan(60, "male", 95.0, 20.0, 0.5, frequencies=[])
+
+
+@pytest.mark.parametrize("field", ["median", "value"])
+def test_nipts_rejects_a_non_finite_spectrum(field: str) -> None:
+    """Clause 6.3 emits finite shifts, and the fiche rounds every cell it prints.
+
+    A NaN can only reach a hand-built result, where it crashed the table on the
+    first cell with a bare "cannot convert float NaN to integer" naming neither
+    the field nor the result.
+    """
+    result = m.nipts(95.0, 20.0, 0.9)
+    spectrum = np.asarray(getattr(result, field), dtype=np.float64).copy()
+    spectrum[3] = np.nan  # the 3 kHz audiometric frequency
+    with pytest.raises(ValueError, match=f"'{field}' must contain only finite"):
+        dataclasses.replace(result, **{field: spectrum})
+
+
+def test_htlan_rejects_a_non_finite_component() -> None:
+    """Formula (1) combines two finite components, and the fiche rounds them."""
+    result = m.htlan(60, "male", 95.0, 20.0, 0.5)
+    threshold = np.asarray(result.threshold, dtype=np.float64).copy()
+    threshold[3] = np.nan
+    with pytest.raises(ValueError, match="'threshold' must contain only finite"):
+        dataclasses.replace(result, threshold=threshold)

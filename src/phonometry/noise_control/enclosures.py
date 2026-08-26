@@ -134,8 +134,16 @@ class EnclosureResult:
         renders an ordinary-looking plain sheet and fails only when someone
         asks for the verbose one.
 
-        :raises ValueError: if the per-band quantities disagree, or one of them
-            carries an extra axis.
+        The two area scalars are held positive and finite beside the length
+        checks: both producers (:func:`enclosure_insertion_loss` and
+        :func:`enclosure_required_transmission_loss`) validate them on the way
+        in, so a NaN here can only be planted by hand -- and the fiche would
+        print it verbatim in the accredited extended-result line
+        (``External surface area SE = nan m2``) without a word.
+
+        :raises ValueError: if the per-band quantities disagree, one of them
+            carries an extra axis, or ``external_area`` or ``internal_area``
+            is not positive and finite.
         """
         require_ranks(
             self,
@@ -153,6 +161,8 @@ class EnclosureResult:
             "insertion_loss",
             "room_constant",
         )
+        require_positive(self.external_area, "external_area")
+        require_positive(self.internal_area, "internal_area")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

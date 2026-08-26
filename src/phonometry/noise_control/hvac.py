@@ -486,11 +486,22 @@ class HvacSpectrumResult:
         ``TypeError: only 0-dimensional arrays can be converted to Python
         scalars`` raised while formatting the first row.
 
-        :raises ValueError: if ``values`` does not carry one entry per band, or
-            either field carries an extra axis.
+        The ``quantity`` tag is pinned here as well, because everything the
+        fiche says hangs off it: the basis line, the caption, the boxed
+        figure and -- decisively -- the verdict's direction. The tag is a
+        ``Literal`` for the type checker only; at run time an unexpected
+        string used to fall through every ``== "sound_power_level"`` test and
+        render a regenerated-noise spectrum as an attenuation sheet whose
+        higher-is-better verdict passed 85 dB of duct noise against a 40 dB
+        maximum.
+
+        :raises ValueError: if ``values`` does not carry one entry per band,
+            either field carries an extra axis, or ``quantity`` is not one of
+            the two tags.
         """
         require_ranks(self, frequencies=1, values=1)
         require_same_length(self, "frequencies", "values")
+        require_choice(self.quantity, "quantity", ("attenuation", "sound_power_level"))
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

@@ -427,6 +427,17 @@ class RadiatingPistonResult:
             axis="frequency",
         )
         require_same_length(self, "angles", ("directivity", 1), axis="polar angle")
+        # Finiteness is a construction invariant, not a rendering question:
+        # :func:`piston_directivity` validates its inputs and patches the
+        # on-axis 0/0 to its limit, so no producer emits a non-finite
+        # pattern; one smuggled NaN would silently drop the whole lobe from
+        # :meth:`plot_geometry` (the lobe's peak turns NaN and its `> 0`
+        # gate turns False).
+        for name in ("angles", "directivity"):
+            value = getattr(self, name)
+            if value is not None and not np.all(np.isfinite(value)):
+                msg = f"'{name}' must be finite."
+                raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

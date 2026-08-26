@@ -101,6 +101,51 @@ def test_attenuation_emission_length_mismatch_raises(tmp_path: Path) -> None:
         result.report(out, source_emission=bad)
 
 
+@pytest.mark.parametrize(
+    "field_name", ["sound_power_level", "directivity_index", "d_omega", "cmet"]
+)
+def test_a_non_finite_emission_term_is_refused(field_name: str) -> None:
+    """Eq. (3) adds every one of these into the band levels the fiche boxes.
+
+    Nothing computes a :class:`SourceEmission`; the caller builds it for the
+    report, so one NaN band of ``Lw`` (or a NaN scalar term, which reaches
+    every band) rendered a complete prediction sheet whose BOXED headline read
+    ``LAT(DW) = nan dB``, and with a declared requirement the verdict died on
+    ``display_round(nan)`` with an anonymous "cannot convert float NaN to
+    integer".
+    """
+    values: dict[str, object] = {"sound_power_level": np.full(8, 100.0)}
+    if field_name == "sound_power_level":
+        holed = np.full(8, 100.0)
+        holed[3] = float("nan")
+        values["sound_power_level"] = holed
+    else:
+        values[field_name] = float("nan")
+    with pytest.raises(ValueError, match=f"'{field_name}' must"):
+        environment.SourceEmission(**values)  # type: ignore[arg-type]
+
+
+def test_a_breakdown_covering_no_band_is_refused() -> None:
+    """Seven empty terms agree with each other, and the sheet has no bands.
+
+    Length-0 terms satisfy every rank and count, so the breakdown was built
+    and the prediction sheet died reading the first band of an axis with
+    none: numpy's "index 0 is out of bounds for axis 0 with size 0", from
+    inside the renderer, naming no field.
+    """
+    empty = np.array([], dtype=float)
+    with pytest.raises(ValueError, match="'frequencies' must carry at least one band"):
+        environment.OutdoorAttenuation(
+            frequencies=empty,
+            a_div=empty,
+            a_atm=empty,
+            a_gr=empty,
+            a_bar=empty,
+            a_total=empty,
+            d_omega=empty,
+        )
+
+
 def test_attenuation_verbose_adds_a_weighted_band(tmp_path: Path) -> None:
     """``verbose=True`` adds the A-weighted band-level column."""
     result = _attenuation()

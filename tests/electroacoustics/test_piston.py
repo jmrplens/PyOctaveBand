@@ -148,6 +148,35 @@ def test_a_directivity_index_column_of_another_length_is_refused() -> None:
         dataclasses.replace(result, directivity_index=one_frequency_short)
 
 
+def test_a_non_finite_directivity_pattern_is_refused() -> None:
+    """One NaN poisons the peak the geometry drawing scales the lobe by, its
+    ``> 0`` gate turns False, and the requested lobe disappears from an
+    otherwise complete baffled-piston figure.
+
+    ``piston_directivity`` patches the on-axis 0/0 to its limit, so no
+    producer emits a non-finite pattern.
+    """
+    result = electroacoustics.radiating_piston(
+        0.1, [200.0, 800.0], angles=np.radians(np.linspace(-90.0, 90.0, 37))
+    )
+    assert result.directivity is not None
+    poisoned = result.directivity.copy()
+    poisoned[0, 10] = np.nan
+    with pytest.raises(ValueError, match="'directivity' must be finite"):
+        dataclasses.replace(result, directivity=poisoned)
+
+
+def test_a_non_finite_angle_grid_is_refused() -> None:
+    result = electroacoustics.radiating_piston(
+        0.1, [200.0, 800.0], angles=np.radians(np.linspace(-90.0, 90.0, 37))
+    )
+    assert result.angles is not None
+    poisoned = result.angles.copy()
+    poisoned[3] = np.inf
+    with pytest.raises(ValueError, match="'angles' must be finite"):
+        dataclasses.replace(result, angles=poisoned)
+
+
 def test_directivity_pattern_result_and_properties() -> None:
     # Default grid is 361 points over the front hemisphere -90 deg .. +90 deg.
     res = electroacoustics.piston_directivity_pattern([3.0, 8.0])

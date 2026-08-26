@@ -439,6 +439,21 @@ def test_peak_statistics_validation_and_fields() -> None:
         ph.metrology.peak_statistics(constant, FS)
 
 
+def test_peak_statistics_rejects_unsorted_peak_values() -> None:
+    """The empirical exceedance pairs each peak with its rank positionally.
+
+    An unsorted array passes every count, so the order is pinned at
+    construction; unshuffled producer output keeps constructing (asserted by
+    the sorted check above).
+    """
+    rng = np.random.default_rng(9)
+    res = ph.metrology.peak_statistics(rng.standard_normal(1 << 14), FS)
+    shuffled = np.array(res.peak_values)
+    rng.shuffle(shuffled)
+    with pytest.raises(ValueError, match="'peak_values' must be sorted"):
+        dataclasses.replace(res, peak_values=shuffled)
+
+
 # ---------------------------------------------------------------------------
 # Plots (English default; ES parity lives in test_metrology_plot_i18n.py)
 # ---------------------------------------------------------------------------

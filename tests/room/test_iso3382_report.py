@@ -6,8 +6,9 @@ facts: a valid single-page PDF is written for a room-acoustics result, the
 per-band table and the mid-frequency descriptor carry the closed-form values
 of a documented synthetic decay, unknown engines/languages are rejected, XML
 specials in metadata do not break reportlab, the optional target-RT verdict
-renders both ways, and the Spanish fiche is translated with comma decimals.
-Pixel or layout content is never inspected.
+renders both ways and is withheld when no band could be evaluated, and the
+Spanish fiche is translated with comma decimals. Pixel or layout content is
+never inspected.
 
 Oracle. The impulse response is a deterministic single-slope decay: one sine
 carrier per octave band, each modulated by its own exponential energy envelope
@@ -278,6 +279,28 @@ def test_verdict_uses_display_rounded_values(tmp_path: Path) -> None:
     assert "1.15" in text
     assert "PASS" in text
     assert "FAIL" not in text
+
+
+def test_no_evaluable_band_withholds_the_verdict(tmp_path: Path) -> None:
+    """A room whose every T30 band is non-evaluable gets no PASS/FAIL badge.
+
+    Undecaying noise is the documented "could not be evaluated" state: every
+    T30 band comes back NaN with its validity flag clear. Nothing was measured
+    against the requirement, so a FAIL badge would assert a failure the room
+    never earned and a PASS the opposite; the fiche still renders, with the
+    em-dashed value in the boxed statement saying what happened.
+    """
+    noise = np.random.default_rng(20268).normal(size=_FS)
+    res = room.room_parameters(noise, _FS)
+    assert not np.any(np.isfinite(res.t30))
+    assert not np.any(res.t30_valid)
+    out = tmp_path / "no_verdict.pdf"
+    res.report(str(out), metadata=_full_metadata(requirement=1.30))
+    assert_one_page(str(out))
+    text = _extract_text(str(out))
+    assert "PASS" not in text
+    assert "FAIL" not in text
+    assert "—" in text  # the boxed T30 says there was no number
 
 
 def test_single_band_is_not_labeled_broadband(tmp_path: Path) -> None:

@@ -630,3 +630,23 @@ def test_per_band_columns_must_share_one_band_axis(field: str) -> None:
     missing = column[:-1]
     with pytest.raises(ValueError, match=rf"'{field}' \(3\).*one value per band"):
         dataclasses.replace(good, **{field: missing})
+
+
+def test_unknown_method_tag_rejected() -> None:
+    """The method tag is pinned at construction, not read with a default.
+
+    The whole ISO 3741 fiche dispatches on this one string: the basis line,
+    the Eq. 20/21 model strip and the corrections line. A tag that is not
+    exactly ``'direct'`` or ``'comparison'`` used to fall through to the
+    direct method, printing a comparison measurement under the direct
+    method's basis and its NaN ``C1`` as an applied correction.
+    """
+    good = emission.sound_power_comparison(
+        np.array([80.0, 82.0, 84.0]),
+        np.array([75.0, 76.0, 77.0]),
+        np.array([85.0, 86.0, 87.0]),
+        frequencies=np.array([500.0, 1000.0, 2000.0]),
+    )
+    assert good.method == "comparison"
+    with pytest.raises(ValueError, match="'method' must be one of"):
+        dataclasses.replace(good, method="Comparison")

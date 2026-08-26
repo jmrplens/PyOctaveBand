@@ -187,8 +187,32 @@ class NiptsResult:
         PASS/FAIL verdict read off that mean, taken from positions belonging
         to whatever grid the array was computed on.
 
-        :raises ValueError: if any spectrum disagrees with ``frequencies``.
+        The two scalars the spectra were computed from are pinned finite as
+        well: a NaN ``l_ex`` (or ``years``) sails past every domain warning
+        (no comparison fires on NaN) and turns every spectrum into NaN, so
+        the plot would draw a completely blank axes under an ordinary title
+        ending "= nan dB". ``l_ex`` deliberately has no lower bound and
+        ``years`` no upper one; only finiteness is construction's business.
+
+        The prediction must also cover at least one audiometric frequency:
+        five length-0 spectra agree with each other (``nipts(frequencies=[])``
+        selects an empty subset without meeting an unknown one), and the fiche
+        then dies hunting the representative rows in numpy's bare "argmax of
+        an empty sequence", naming neither the field nor the result. And the
+        spectra must be finite: clause 6.3 emits finite shifts for finite
+        exposure conditions, so a NaN can only be smuggled into a hand-built
+        result, where it would crash the fiche's rounding with a bare "cannot
+        convert float NaN to integer".
+
+        :raises ValueError: if any spectrum disagrees with ``frequencies``,
+            is empty or non-finite, or if ``l_ex`` or ``years`` is not finite.
         """
+        if not math.isfinite(self.l_ex):
+            msg = "'l_ex' must be finite."
+            raise ValueError(msg)
+        if not math.isfinite(self.years):
+            msg = "'years' must be finite."
+            raise ValueError(msg)
         require_ranks(
             self,
             frequencies=1,
@@ -206,6 +230,16 @@ class NiptsResult:
             "spread_lower",
             axis="audiometric frequency",
         )
+        if np.asarray(self.frequencies).size == 0:
+            msg = (
+                "NiptsResult: 'frequencies' must carry at least one "
+                "audiometric frequency; the prediction is empty."
+            )
+            raise ValueError(msg)
+        for name in ("frequencies", "median", "value", "spread_upper", "spread_lower"):
+            if not np.all(np.isfinite(np.asarray(getattr(self, name), np.float64))):
+                msg = f"NiptsResult: '{name}' must contain only finite values."
+                raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -315,7 +349,18 @@ class HtlanResult:
         place of the failure: the field that disagrees, as the result is
         built, instead of a shape mismatch raised from inside the renderer.
 
-        :raises ValueError: if any component disagrees with ``frequencies``.
+        The threshold must also cover at least one audiometric frequency:
+        four length-0 components agree with each other
+        (``htlan(..., frequencies=[])`` selects an empty subset), and the
+        fiche then dies hunting the representative rows in numpy's bare
+        "argmax of an empty sequence", naming neither the field nor the
+        result. And the components must be finite: Formula (1) combines two
+        finite components into a finite threshold, so a NaN can only be
+        smuggled into a hand-built result, where it would crash the fiche's
+        rounding with a bare "cannot convert float NaN to integer".
+
+        :raises ValueError: if any component disagrees with ``frequencies``,
+            is empty, or carries a non-finite value.
         """
         require_ranks(self, frequencies=1, htla=1, nipts=1, threshold=1)
         require_same_length(
@@ -326,6 +371,16 @@ class HtlanResult:
             "threshold",
             axis="audiometric frequency",
         )
+        if np.asarray(self.frequencies).size == 0:
+            msg = (
+                "HtlanResult: 'frequencies' must carry at least one "
+                "audiometric frequency; the prediction is empty."
+            )
+            raise ValueError(msg)
+        for name in ("frequencies", "htla", "nipts", "threshold"):
+            if not np.all(np.isfinite(np.asarray(getattr(self, name), np.float64))):
+                msg = f"HtlanResult: '{name}' must contain only finite values."
+                raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

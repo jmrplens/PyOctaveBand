@@ -235,6 +235,20 @@ def test_profile_names_the_segments_and_not_the_vertices_it_counted() -> None:
         dataclasses.replace(prof, ground_roll=surplus, landing_roll=surplus)
 
 
+def test_profile_rejects_a_path_short_of_the_five_documented_columns() -> None:
+    """The rank pin passes a two-column path; the figure dies reading column 2.
+
+    ``path`` is documented as ``(N, 5)`` and the altitude the trajectory plot
+    draws is column 2, so a path without it clears every per-segment count and
+    stops at ``path[:, 2]`` with an ``IndexError`` that names neither the field
+    nor the profile it came from.
+    """
+    prof = _DB.profile("747100", "departure")
+    flat = np.asarray(prof.path)[:, :2]
+    with pytest.raises(ValueError, match=r"'path' must have shape \(N, 5\)"):
+        dataclasses.replace(prof, path=flat)
+
+
 def test_a_profile_with_no_path_reports_no_segments_rather_than_minus_one() -> None:
     """An empty path has nought segments, which is a count and not an error."""
     prof = _DB.profile("747100", "departure")

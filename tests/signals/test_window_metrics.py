@@ -139,6 +139,21 @@ def test_window_metrics_invalid_inputs() -> None:
         ph.signals.window_metrics("hann", 8)
 
 
+def test_window_metrics_rejects_taps_of_another_length() -> None:
+    """Taps that disagree with the declared ``n`` are a different window.
+
+    Every figure of merit was computed from ``n`` samples and the waveform
+    panel draws the taps against a sample index counted out of ``n``, so a
+    mismatch used to stop inside matplotlib about first dimensions, naming
+    neither the field nor the result.
+    """
+    res = ph.signals.window_metrics("hann", N)
+    with pytest.raises(
+        ValueError, match=r"WindowMetricsResult: 'n' \(1034\), 'taps' \(1024\)"
+    ):
+        dataclasses.replace(res, n=1034)
+
+
 def test_window_metrics_plot_two_panels_and_single_axes() -> None:
     res = ph.signals.window_metrics("hann", N)
     axes = res.plot(linewidth=2)

@@ -134,9 +134,15 @@ Compliance of an activity or port infrastructure (Article 25).
 
 | Name | Description |
 | :--- | :--- |
-| `periods` | The per-period assessments, in day/evening/night order. |
+| `periods` | The per-period assessments, in day/evening/night order; at least one. |
 | `limits` | The limit table row the assessment was made against. |
 | `new_activity` | `True` when the activity is *new* in the sense of the regulation, so the annual criterion of Article 25.1 b i applies; for the inspection of an activity already in operation only the daily and phase criteria apply (Article 25.2). |
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If `periods` is empty. |
 
 ### ActivityAssessment.complies
 
@@ -657,6 +663,12 @@ The assessment of one evaluation period against its limit.
 | `phase_pass` | Whether every `LKeq,Ti` stays within `limit + 5` dB. |
 | `daily_pass` | Whether `LKeq,x` stays within `limit + 3` dB. |
 | `long_term_pass` | Whether `LK,x` stays at or below `limit`, or `None` when the criterion was not evaluated. |
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If `period` is not one of [`RD1367_EVALUATION_PERIODS`](/phonometry/reference/api/environment/spain/#rd1367_evaluation_periods). |
 
 ### PeriodAssessment.complies
 

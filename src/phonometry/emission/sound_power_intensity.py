@@ -103,6 +103,7 @@ from .._internal.levels_math import energy_mean, weighted_energy_mean
 from .._internal.validation import (
     check_engine,
     require_equal_shapes,
+    require_finite_fields,
     require_per_band,
     require_positive_array,
     require_ranks,
@@ -243,7 +244,18 @@ class SoundPowerIntensityResult:
         downstream can catch that, because a range is well formed whatever it
         was taken over.
 
-        :raises ValueError: if any per-band quantity disagrees with the rest.
+        ``surface_area`` must also be finite. The scanned surface is the sum
+        of the segment areas, every one of which the determination refuses
+        unless it is positive and finite, so no scan can hand back a surface
+        that is not a number; the per-band levels are another matter, and
+        ``sound_power_level`` and ``sound_power_level_a`` stay unpinned here
+        because clause 9.2 makes ``NaN`` their reading for a band of negative
+        net power, which the fiche prints as an em dash and leaves out of its
+        totals. An unpinned surface reached the boxed result of the sheet as
+        the literal "Measurement surface S = nan m2".
+
+        :raises ValueError: if any per-band quantity disagrees with the rest,
+            or ``surface_area`` is not finite.
         """
         require_ranks(
             self,
@@ -282,6 +294,7 @@ class SoundPowerIntensityResult:
             "repeatability",
             axis="measurement segment",
         )
+        require_finite_fields(self, "surface_area")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -409,6 +422,12 @@ def _validate_scan(
         if np.asarray(frequencies).shape != (intensity.shape[1],):
             raise ValueError(_FREQUENCIES_BAND_COUNT_MSG)
         require_positive_array(frequencies, "frequencies")
+    # NaN beside the bound, not folded into it: a NaN compares False against
+    # every bound, so the positivity test alone passes it through to a
+    # measurement surface that is not a number.
+    if not np.all(np.isfinite(seg)):
+        msg = "All segment 'areas' must be finite."
+        raise ValueError(msg)
     if np.any(seg <= 0.0):
         msg = "All segment 'areas' must be positive."
         raise ValueError(msg)
@@ -960,7 +979,15 @@ class PrecisionIntensityResult:
         the bands on its second, so its band axis is index 1; the partial
         surfaces are its own axis, shared with no other field.
 
-        :raises ValueError: if any per-band quantity disagrees with the rest.
+        ``surface_area`` must also be finite, for the reason it must be in
+        :class:`SoundPowerIntensityResult`: it is the sum of partial surfaces
+        the determination has already refused unless positive and finite, and
+        the clause 10 sheet prints it as "Measurement surface S = ... m2"
+        beside the boxed level. The per-band levels stay unpinned, ``NaN``
+        being clause 9.2's reading of a band the method does not apply to.
+
+        :raises ValueError: if any per-band quantity disagrees with the rest,
+            or ``surface_area`` is not finite.
         """
         require_ranks(
             self,
@@ -980,6 +1007,7 @@ class PrecisionIntensityResult:
             "sound_power_level_normalized",
             "not_applicable_band",
         )
+        require_finite_fields(self, "surface_area")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -1417,6 +1445,11 @@ def sound_power_intensity_precision(
             f"'partial_intensity' first axis ({intensity.shape[0]}) must match "
             f"the number of 'areas' ({n_seg})."
         )
+        raise ValueError(msg)
+    # As in the Part 2 scan: a NaN passes every bound, and the surface area
+    # summed from it reaches the clause 10 sheet as a number that is not one.
+    if not np.all(np.isfinite(seg)):
+        msg = "All 'areas' must be finite."
         raise ValueError(msg)
     if np.any(seg <= 0.0):
         msg = "All 'areas' must be positive."

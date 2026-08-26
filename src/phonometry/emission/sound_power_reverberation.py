@@ -63,7 +63,12 @@ if TYPE_CHECKING:
     from .._report.metadata import ReportMetadata
 
 from .._internal.levels_math import energy_mean, energy_sum
-from .._internal.validation import check_engine, require_ranks, require_same_length
+from .._internal.validation import (
+    check_engine,
+    require_choice,
+    require_ranks,
+    require_same_length,
+)
 from ._shared import (
     SoundPowerWarning,
     _a_weighting_corrections,
@@ -142,8 +147,16 @@ class ReverberationSoundPowerResult:
         ``LWA`` and the total beneath it come from ``LW``, so nothing on the
         sheet is summed over the surplus and the fiche renders whole.
 
-        :raises ValueError: if any per-band quantity disagrees with the rest.
+        ``method`` is pinned beside the shapes because the whole fiche
+        dispatches on it: a tag that is not exactly ``'direct'`` or
+        ``'comparison'`` would render a comparison measurement under the
+        direct method's basis line and equation, with the comparison result's
+        NaN ``c1`` printed as a correction on the accredited sheet.
+
+        :raises ValueError: if any per-band quantity disagrees with the rest,
+            or ``method`` is neither ``'direct'`` nor ``'comparison'``.
         """
+        require_choice(self.method, "method", ("direct", "comparison"))
         require_ranks(
             self,
             frequencies=1,

@@ -48,7 +48,12 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import check_engine, require_ranks, require_same_length
+from ..._internal.validation import (
+    check_engine,
+    require_finite_array,
+    require_ranks,
+    require_same_length,
+)
 from .air_absorption import air_attenuation
 
 if TYPE_CHECKING:
@@ -256,6 +261,27 @@ class SourceEmission:
     d_omega: float = 0.0
     cmet: float | None = None
 
+    def __post_init__(self) -> None:
+        """Reject an emission carrying a non-finite term.
+
+        Nothing computes a :class:`SourceEmission`; it is built by the caller
+        for :meth:`OutdoorAttenuation.report`, so a NaN here is never the
+        library's own output, and the fiche checks only that the band count
+        matches. One NaN band in ``sound_power_level`` (or a NaN scalar term,
+        which Eq. (3) adds to every band) renders a complete prediction sheet
+        whose BOXED headline reads ``LAT(DW) = nan dB``, and with a declared
+        requirement the verdict dies on ``display_round(nan)`` with an
+        anonymous "cannot convert float NaN to integer".
+
+        :raises ValueError: if any term is not finite.
+        """
+        require_finite_array(self.sound_power_level, "sound_power_level")
+        for name in ("directivity_index", "d_omega", "cmet"):
+            value = getattr(self, name)
+            if value is not None and not np.isfinite(float(value)):
+                msg = f"SourceEmission: '{name}' must be finite."
+                raise ValueError(msg)
+
 
 @dataclass(frozen=True)
 class OutdoorAttenuation:
@@ -298,7 +324,14 @@ class OutdoorAttenuation:
         the boxed figure underneath, so the sheet states a result over bands
         that appear nowhere in the table above it.
 
-        :raises ValueError: if any term disagrees with ``frequencies``.
+        The breakdown must also cover at least one band. Seven length-0 terms
+        agree with each other and satisfy every count above, and the sheet
+        then reads the first band of an axis that has none, dying inside the
+        renderer on numpy's "index 0 is out of bounds for axis 0 with size 0"
+        -- a message naming neither the field nor the result.
+
+        :raises ValueError: if any term disagrees with ``frequencies``, or
+            the breakdown covers no band.
         """
         require_ranks(
             self,
@@ -320,6 +353,12 @@ class OutdoorAttenuation:
             "a_total",
             "d_omega",
         )
+        if np.asarray(self.frequencies).size == 0:
+            msg = (
+                "OutdoorAttenuation: 'frequencies' must carry at least one "
+                "band; the breakdown is empty."
+            )
+            raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

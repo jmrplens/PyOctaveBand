@@ -212,3 +212,29 @@ def test_unknown_language_is_rejected(tmp_path: Path) -> None:
     target = str(tmp_path / "xx.pdf")
     with pytest.raises(ValueError, match="Unknown language"):
         result.report(target, language="xx")
+
+
+def test_the_fiche_refuses_a_device_tag_it_cannot_name() -> None:
+    """The certificate never labels an unidentified device as the chain.
+
+    The tag is pinned where the verdict is built, so this is the second
+    reader of it agreeing with the first. It used to hold the only silent
+    default: the phrase fell back to "complete instrument" for anything it
+    did not recognise, so the boxed "Verified as:" line and the basis strip
+    attested the Table 2 column group of the whole chain for a device the
+    fiche could not name, while the plot's own lookup of the same tag died
+    on a bare ``KeyError``.
+    """
+    from phonometry._report.iec61043 import _device_phrase
+
+    with pytest.raises(ValueError, match=r"'device' must be one of"):
+        _device_phrase("sonda", "en")
+
+
+def test_each_table_2_column_group_keeps_its_own_phrase() -> None:
+    """The refusal is not vacuous: the three tags each name a column group."""
+    from phonometry._report.iec61043 import _device_phrase
+
+    assert _device_phrase("probe", "en") == "probe"
+    assert _device_phrase("processor", "en") == "processor"
+    assert _device_phrase("instrument", "en") == "complete instrument"

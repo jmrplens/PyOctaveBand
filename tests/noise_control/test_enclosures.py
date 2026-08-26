@@ -260,3 +260,18 @@ def test_a_room_constant_off_the_band_axis_is_refused(trim: bool) -> None:
     wrong = r_i[:-1] if trim else np.append(r_i, r_i[-1])
     with pytest.raises(ValueError, match=r"'room_constant'.*one value per band"):
         dataclasses.replace(res, room_constant=wrong)
+
+
+@pytest.mark.parametrize("field", ["external_area", "internal_area"])
+def test_a_non_finite_enclosure_area_is_refused(field: str) -> None:
+    """The two areas are printed on the sheet, not only used to build ``C``.
+
+    The band table renders a missing value as an em dash, but the extended
+    result line formats these two directly: a NaN planted here would print
+    ``External surface area SE = nan m2`` on an otherwise normal fiche.
+    """
+    res = noise_control.enclosure_insertion_loss(
+        [20.0, 30.0, 40.0], 6.0, 5.0, 0.3, frequencies=[125.0, 250.0, 500.0]
+    )
+    with pytest.raises(ValueError, match=f"'{field}' must be positive"):
+        dataclasses.replace(res, **{field: float("nan")})

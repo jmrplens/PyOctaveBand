@@ -439,3 +439,113 @@ def test_unlabelled_budget_is_not_a_disagreement() -> None:
     """An empty ``names`` is the budget the plot labels ``x1``, ``x2``, ... itself."""
     good = u.combine_uncertainty(_add2, [u.Quantity(1.0, 0.1), u.Quantity(2.0, 0.2)])
     assert dataclasses.replace(good, names=()).names == ()
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "match"),
+    [
+        ("value", float("nan"), r"'value' must be finite"),
+        (
+            "combined_uncertainty",
+            float("inf"),
+            r"'combined_uncertainty' must be finite",
+        ),
+        (
+            "contributions",
+            np.array([0.1, float("nan")]),
+            r"'contributions' must contain only finite values",
+        ),
+        (
+            "sensitivities",
+            np.array([float("nan"), 1.0]),
+            r"'sensitivities' must contain only finite values",
+        ),
+    ],
+)
+def test_budget_numbers_must_be_finite(field: str, value: object, match: str) -> None:
+    """A NaN number of the budget is drawn as nothing at all.
+
+    The bar of a NaN contribution has width NaN, so matplotlib draws it
+    nowhere and the input reads as one that contributes nothing; the
+    combined-uncertainty line goes the same way, under a legend printing
+    "u_c = nan".
+    """
+    good = u.combine_uncertainty(_add2, [u.Quantity(1.0, 0.1), u.Quantity(2.0, 0.2)])
+    with pytest.raises(ValueError, match=match):
+        dataclasses.replace(good, **{field: value})
+
+
+def test_undefined_effective_dof_is_not_a_non_finite_number() -> None:
+    """NaN effective dof is the GUM's own value for a correlated budget.
+
+    Annex G.4 defines no Welch-Satterthwaite form for correlated inputs, so
+    the finiteness guard must leave that one field alone and ``expanded``
+    must keep asking for an explicit coverage factor there.
+    """
+    pair = [u.Quantity(0.0, 1.0, dof=5), u.Quantity(0.0, 1.0, dof=5)]
+    with pytest.warns(u.UncertaintyWarning, match="Welch-Satterthwaite"):
+        correlated = u.combine_uncertainty(
+            _add2, pair, correlation=np.array([[1.0, 0.5], [0.5, 1.0]])
+        )
+    assert math.isnan(correlated.effective_dof)
+    k, big = correlated.expanded(coverage_factor_override=2.0)
+    assert (k, big) == (2.0, 2.0 * correlated.combined_uncertainty)
+
+
+def test_quantity_rejects_nan_uncertainty() -> None:
+    # NaN passes a bare `< 0.0` and flows into a NaN contribution the budget
+    # plot draws as an invisible bar under a legend reading "u_c = nan".
+    with pytest.raises(ValueError, match="'uncertainty' must be non-negative"):
+        u.Quantity(2.0, float("nan"), name="length")
+
+
+def test_combine_uncertainty_rejects_model_undefined_at_the_estimates() -> None:
+    """The other producer of the NaN contribution the budget bar hides.
+
+    Pinning ``Quantity.uncertainty`` finite closes only one route: a model
+    that is not defined at its own input estimates returns NaN there and
+    leaves value, combined uncertainty and every contribution undefined.
+    """
+
+    def outside_domain(a: float, b: float) -> float:
+        return math.sqrt(a - 1.0) + b if a >= 1.0 else math.nan
+
+    inputs = [u.Quantity(0.0, 1.0, name="a"), u.Quantity(2.0, 0.1, name="b")]
+    with pytest.raises(
+        ValueError, match=r"'model' returned a non-finite output at the input estimates"
+    ):
+        u.combine_uncertainty(outside_domain, inputs)
+
+
+def test_combine_uncertainty_rejects_model_undefined_one_step_away() -> None:
+    """A model finite at the estimate but not where clause 5.1 probes it.
+
+    ``sqrt`` at an input estimated at zero is finite at the estimate and NaN
+    a step below it, so the central difference, that input's contribution and
+    the whole budget come out NaN; the chart then draws the input as a bar of
+    width NaN, indistinguishable from one contributing nothing. The refusal
+    names the input whose probe left the domain.
+    """
+
+    def half_domain(a: float, b: float) -> float:
+        return math.sqrt(a) + b if a >= 0.0 else math.nan
+
+    inputs = [u.Quantity(0.0, 1.0, name="a"), u.Quantity(2.0, 0.1, name="b")]
+    with pytest.raises(ValueError, match=r"non-finite output when probing a by"):
+        u.combine_uncertainty(half_domain, inputs)
+
+
+def test_monte_carlo_rejects_model_with_non_finite_output() -> None:
+    """A model undefined over part of the sampled domain poisons every statistic.
+
+    Without the guard the histogram shows only the finite trials under a
+    title reading "u(y) = nan" and an invisible coverage band.
+    """
+
+    def partial_model(x: np.ndarray) -> np.ndarray:
+        return np.where(x < 0.0, np.nan, 0.0)
+
+    with pytest.raises(ValueError, match=r"'model' returned a non-finite output"):
+        u.monte_carlo(
+            partial_model, [u.Quantity(0.0, 1.0, name="x")], trials=2000, seed=1
+        )

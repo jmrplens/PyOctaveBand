@@ -37,6 +37,7 @@ from scipy import signal
 from ..._internal.utils import _typesignal
 from ..._internal.validation import (
     check_engine,
+    require_choice,
     require_positive,
     require_ranks,
     require_same_length,
@@ -181,12 +182,36 @@ class ZwickerLoudness:
         ``fill_between`` rather than anything the caller passed. Both take
         ``.report()`` down with them and write no PDF at all.
 
-        :raises ValueError: if ``specific`` is not one-dimensional, or if
+        The scalar loudness quantities must be finite. No constructor can
+        emit a non-finite one -- both entry points refuse non-finite input,
+        the total/maximum loudness is summed from a finite pattern,
+        ``_sone_to_phon`` maps any finite loudness to a finite level, and the
+        percentiles come off a finite trace -- and the fiche prints them
+        raw: a NaN ``loudness`` dies inside ``display_round`` in a bare
+        ``ValueError: cannot convert float NaN to integer`` that names
+        neither the field nor the type, while a NaN ``loudness_level``,
+        ``n5`` or ``n10`` renders a literal ``nan`` on the accredited sheet.
+
+        ``field`` is one of the items clause 7 makes a loudness report state,
+        and the fiche dispatches on it: pinning it here keeps a mistyped tag
+        from silently dropping the mandatory "Sound field" declaration.
+        ``None`` (backward-compatible manual construction, sound field not
+        recorded) is allowed and stays unstated.
+
+        :raises ValueError: if ``specific`` is not one-dimensional, if
             ``time`` and ``loudness_vs_time`` are not both one-dimensional and
-            of one length.
+            of one length, if a loudness quantity is not finite, or if
+            ``field`` is given and is neither ``'free'`` nor ``'diffuse'``.
         """
         require_ranks(self, specific=1, time=1, loudness_vs_time=1)
         require_same_length(self, "time", "loudness_vs_time", axis="time step")
+        for name in ("loudness", "loudness_level", "n5", "n10"):
+            value = getattr(self, name)
+            if value is not None and not math.isfinite(float(value)):
+                msg = f"ZwickerLoudness: '{name}' must be finite; got {value!r}."
+                raise ValueError(msg)
+        if self.field is not None:
+            require_choice(self.field, "field", ("free", "diffuse"))
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

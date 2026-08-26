@@ -47,6 +47,7 @@ the report never merely repeats a manufacturer number:
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -55,6 +56,7 @@ import numpy as np
 from .._internal.validation import (
     check_engine,
     require_equal_shapes,
+    require_finite_fields,
     require_positive,
     require_ranks,
     require_same_length,
@@ -314,6 +316,39 @@ class LoudspeakerRatings:
 _DEFAULT_RATINGS = LoudspeakerRatings()
 
 
+def _require_frequency_pair(owner: object, name: str) -> None:
+    """Require the named field to be a finite ``(lo, hi)`` frequency pair.
+
+    The band edges are plain tuples no length check pins: the renderers
+    unpack them positionally (``_range_text(*pair)``), so a triple lands as a
+    ``TypeError`` about a helper's keyword argument and a reversed pair
+    prints the range backwards. Both ends must be positive frequencies, in
+    order; ``lo == hi`` is allowed because a response inside its tolerance at
+    a single sample yields a degenerate but honest range.
+
+    :param owner: The instance whose field is read.
+    :param name: Field name holding a ``(lo, hi)`` tuple or ``None``.
+    :raises ValueError: if the field is not a finite, ordered, positive pair.
+    """
+    value = getattr(owner, name)
+    if value is None:
+        return
+    owner_name = type(owner).__name__
+    if np.shape(value) != (2,):
+        msg = (
+            f"{owner_name}: '{name}' must be a (lo, hi) pair; "
+            f"got shape {np.shape(value)}."
+        )
+        raise ValueError(msg)
+    lo, hi = float(value[0]), float(value[1])
+    if not (math.isfinite(lo) and math.isfinite(hi) and 0.0 < lo <= hi):
+        msg = (
+            f"{owner_name}: '{name}' must be a finite (lo, hi) frequency pair "
+            "with 0 < lo <= hi."
+        )
+        raise ValueError(msg)
+
+
 @dataclass(frozen=True)
 class LoudspeakerCharacteristics:
     """Rated loudspeaker characteristics for an IEC 60268-5 report.
@@ -400,11 +435,32 @@ class LoudspeakerCharacteristics:
         as an index error from inside a renderer rather than at the point the
         result was assembled.
 
-        The three ``(lo, hi)`` band edges are left out of every group: they
-        state the ends of a range rather than run along one, and their length
-        of two is a property of the pair, not of any curve.
+        The three ``(lo, hi)`` band edges are left out of every length group
+        -- they state the ends of a range rather than run along one -- and are
+        pinned apart as pairs: the fiche unpacks each positionally into its
+        range text, so a tuple that is not exactly an ordered pair of finite
+        frequencies surfaces as a ``TypeError`` about a helper's keyword
+        argument, or prints the range backwards, naming nothing.
 
-        :raises ValueError: if either half of a curve disagrees with the other.
+        The rated single numbers are pinned finite for the same reason. The
+        factory computes or validates every one of them, so no producer emits
+        a NaN here; one smuggled in through :func:`dataclasses.replace` prints
+        ``nan dB`` in the rated table, the boxed result and the verdict row of
+        an accredited fiche, and a NaN frequency dies in the fiche's
+        hertz rounding with an error naming no field.
+
+        The curves themselves are pinned finite alongside them. The frequency
+        curves arrive through :func:`_as_curve` and the pattern through the
+        polar resolver, and both already refuse a non-finite value, so again
+        no producer emits one; a NaN written into the on-axis frequency axis
+        stops the sheet inside matplotlib with ``Axis limits cannot be NaN or
+        Inf`` (the response panel is scaled by the decades the axis spans,
+        which a NaN makes unmeasurable), and a NaN level leaves a gap in a
+        drawn curve that reads as a frequency the data sheet never covered.
+
+        :raises ValueError: if either half of a curve disagrees with the
+            other, a curve or a scalar field is not finite, or a band-edge
+            pair is not an ordered pair of finite frequencies.
         """
         require_ranks(
             self,
@@ -423,6 +479,31 @@ class LoudspeakerCharacteristics:
         )
         require_same_length(self, "thd_frequencies", "thd_percent", axis="frequency")
         require_same_length(self, "polar_angles_deg", "polar_db", axis="angle")
+        require_finite_fields(
+            self,
+            "frequencies",
+            "spl_db",
+            "impedance_frequencies",
+            "impedance_modulus",
+            "thd_frequencies",
+            "thd_percent",
+            "polar_angles_deg",
+            "polar_db",
+            "rated_impedance",
+            "input_voltage",
+            "distance",
+            "tolerance_db",
+            "reference_level_db",
+            "sensitivity_level_db",
+            "rated_noise_power",
+            "rated_sinusoidal_power",
+            "resonance_frequency",
+            "polar_frequency",
+            "directivity_index_db",
+        )
+        _require_frequency_pair(self, "sensitivity_band")
+        _require_frequency_pair(self, "effective_range")
+        _require_frequency_pair(self, "rated_frequency_range")
 
     @property
     def characteristic_sensitivity_pa(self) -> float:

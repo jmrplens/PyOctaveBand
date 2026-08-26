@@ -34,13 +34,19 @@ network applied to the whole signal against a design-goal response, live in
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from scipy import signal
 
-from .._internal.validation import check_engine, require_ranks, require_same_length
+from .._internal.validation import (
+    check_engine,
+    require_choice,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -419,10 +425,68 @@ class FilterComplianceResult:
         of the whole bank, so a band list short of an entry gives a sheet
         whose verdict covers a band that is nowhere in its table.
 
-        :raises ValueError: if the per-band entries disagree.
+        The edition and the class are pinned against the band verdicts they
+        summarise, because the three travel together: the plot and the fiche
+        pick the corridor from :attr:`edition` and read
+        ``margin_class<overall_class>_db`` out of :attr:`bands`. A verdict
+        whose edition disagrees with its margin keys would draw the other
+        edition's corridor under this edition's title, and an overall class
+        the bands carry no margins for dies in a bare ``KeyError`` halfway
+        through the figure.
+
+        A bank with no bands in range is an outcome
+        :func:`verify_filter_class` does produce, and it always pairs it with
+        ``overall_class = None`` so nothing is attested vacuously; the class
+        is therefore pinned against the emptiness too, because a stated class
+        over zero bands prints an accredited verdict box above a table that
+        reportlab then refuses to build, complaining about a table with no
+        rows and naming neither the bands nor the bank.
+
+        The per-band numbers are pinned finite. Every margin comes from a
+        ``min`` over the measured relative attenuation against the Table 1
+        mask, so no bank emits a NaN here; one smuggled in through
+        :func:`dataclasses.replace` prints ``Class 1 (+nan dB)`` in the
+        per-band table under a boxed verdict that still reads COMPLIES,
+        because the binding margin reads whichever band is untouched.
+
+        :raises ValueError: if the per-band entries disagree, the edition is
+            unknown or does not match the per-band margin keys, the overall
+            class is not one the bands carry margins for, a class is stated
+            over no bands at all, or a per-band value is not finite.
         """
         require_ranks(self, band_frequencies=1)
         require_same_length(self, "bands", "sos", "band_frequencies", "factors")
+        require_choice(self.edition, "edition", tuple(_FILTER_EDITIONS))
+        carried = self.available_classes()
+        expected = list(_FILTER_EDITIONS[self.edition]["classes"])
+        if self.bands and carried != sorted(expected):
+            msg = (
+                f"'edition' ({self.edition!r}) defines classes {expected}, but "
+                f"the band verdicts carry margins for classes {carried}."
+            )
+            raise ValueError(msg)
+        if self.overall_class is not None and self.overall_class not in expected:
+            msg = (
+                f"'overall_class' must be one of {expected} for edition "
+                f"{self.edition!r} (or None); got {self.overall_class!r}."
+            )
+            raise ValueError(msg)
+        if self.overall_class is not None and not self.bands:
+            msg = (
+                f"'overall_class' is {self.overall_class!r} but 'bands' is "
+                "empty: a class cannot be attested over no verified band. A "
+                "bank with no bands in range carries 'overall_class' None."
+            )
+            raise ValueError(msg)
+        for band in self.bands:
+            for key, value in band.items():
+                if isinstance(value, float) and not math.isfinite(value):
+                    msg = (
+                        "'bands' must carry finite per-band values; the "
+                        f"{band.get('freq', math.nan):g} Hz entry has "
+                        f"{key}={value!r}."
+                    )
+                    raise ValueError(msg)
 
     def available_classes(self) -> list[int]:
         """The performance classes carried by the per-band verdict dictionaries.

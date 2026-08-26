@@ -369,6 +369,84 @@ def test_barrier_result_type_and_plot() -> None:
     assert res.insertion_loss.shape == _BANDS.shape
 
 
+def test_a_barrier_method_the_library_does_not_implement_is_refused() -> None:
+    """The fiche cites the method tag as the basis of the prediction.
+
+    Both readers resolved it through a dict of model phrases with the tag
+    itself as the silent default, so any string became an accredited claim:
+    ``method="ISO 9613-2 Dz"`` printed "predicted with ISO 9613-2 Dz, a
+    wave-acoustics complement to the tabulated ISO 9613-2:1996 screening
+    term", naming as the applied model the very formula the sheet exists to
+    distinguish itself from.
+    """
+    res = environment.barrier_insertion_loss(_BANDS, 1.0, 50.0, 4.0, 100.0, 1.5)
+    with pytest.raises(ValueError, match="'method' must be one of"):
+        dataclasses.replace(res, method="ISO 9613-2 Dz")
+
+
+@pytest.mark.parametrize("field_name", ["insertion_loss", "fresnel_number"])
+@pytest.mark.parametrize("trim", [True, False], ids=["short", "long"])
+def test_a_barrier_series_off_the_frequency_axis_is_refused(
+    field_name: str, trim: bool
+) -> None:
+    """The fiche and the plot both pair these two with the frequency axis.
+
+    One entry too many crashed in the plot as matplotlib's bare "x and y must
+    have same first dimension, but have shapes (8,) and (9,)"; one too few
+    crashed in the table as "index 7 is out of bounds for axis 0 with size 7".
+    Neither names the class or a field.
+    """
+    res = environment.barrier_insertion_loss(_BANDS, 1.0, 50.0, 4.0, 100.0, 1.5)
+    values = np.asarray(getattr(res, field_name))
+    wrong = values[:-1] if trim else np.append(values, values[-1])
+    with pytest.raises(ValueError, match=f"'{field_name}'"):
+        dataclasses.replace(res, **{field_name: wrong})
+
+
+@pytest.mark.parametrize(
+    "field_name", ["frequencies", "insertion_loss", "fresnel_number"]
+)
+def test_a_non_finite_barrier_value_is_refused(field_name: str) -> None:
+    """``np.mean`` computes through a NaN, so it becomes the boxed headline.
+
+    One NaN band rendered a fiche with a ``nan`` table cell under a BOXED
+    "Mean insertion loss (63 Hz to 8 kHz) IL = nan dB", and with a declared
+    requirement the verdict then died on ``display_round(nan)``. The one
+    producer, :func:`barrier_insertion_loss`, computes the loss from a
+    geometry and frequency axis it has already pinned finite.
+    """
+    res = environment.barrier_insertion_loss(_BANDS, 1.0, 50.0, 4.0, 100.0, 1.5)
+    values = np.asarray(getattr(res, field_name), dtype=float).copy()
+    values[3] = float("nan")
+    with pytest.raises(
+        ValueError, match=f"BarrierInsertionLoss: '{field_name}' must contain"
+    ):
+        dataclasses.replace(res, **{field_name: values})
+
+
+def test_a_barrier_loss_covering_no_frequency_is_refused() -> None:
+    """Three empty axes agree, and the plot complains about values there are none of.
+
+    Length-0 axes satisfy every rank and count, so the result was built and
+    the fiche asked matplotlib to log-scale an axis with nothing on it, which
+    came back as "Data cannot be log-scaled because all values are <= 0" --
+    a complaint about values, from a result that has none.
+    :func:`barrier_insertion_loss` refuses an empty frequency axis of its
+    own, so an empty loss can only be hand-built.
+    """
+    empty = np.array([], dtype=float)
+    with pytest.raises(
+        ValueError, match="'frequencies' must carry at least one frequency"
+    ):
+        environment.BarrierInsertionLoss(
+            frequencies=empty,
+            insertion_loss=empty,
+            fresnel_number=empty,
+            method="kurze_anderson",
+            ground=False,
+        )
+
+
 def test_barrier_rejects_bad_geometry() -> None:
     with pytest.raises(ValueError, match="must exceed"):
         # barrier not taller than source/receiver -> no shadow.
