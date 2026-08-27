@@ -146,7 +146,9 @@ def test_explicit_narrowing_reports_the_accumulated_clipping(
     src = tmp_path / "hot.wav"
     write(src, x, FS, subtype="DOUBLE")
     dst = tmp_path / "narrow.wav"
-    with pytest.warns(ClippingWarning, match="10 of 1000"):
+    with pytest.warns(
+        ClippingWarning, match=r"10 of 1000 samples exceed the full-scale range"
+    ):
         convert(src, dst, subtype="PCM_16", block_size=100)
     assert np.asarray(read(dst)).max() == 32767 / 32768
 
@@ -159,7 +161,10 @@ def test_lossy_source_converts_with_the_metrology_warning(
     src = tmp_path / "note.mp3"
     sf.write(str(src), x, FS)
     dst = tmp_path / "expanded.wav"
-    with pytest.warns(LossyCompressionWarning, match="not metrologically"):
+    with pytest.warns(
+        LossyCompressionWarning,
+        match=r"is a lossy format.*not metrologically defensible",
+    ):
         result = convert(src, dst)
     # The decoder hands floats; the default keeps them as FLOAT.
     assert result.format_name == "IEEE float"
@@ -178,14 +183,14 @@ def test_lossy_targets_are_refused_before_reading_anything(
     for name in ("y.mp3", "y.ogg", "y.opus", "y.m4a"):
         with pytest.raises(ValueError, match="outside this API by policy"):
             convert(tmp_path / "never-read.wav", tmp_path / name)
-    with pytest.raises(ValueError, match="unsupported target"):
+    with pytest.raises(ValueError, match=r"unsupported target '\.xyz'"):
         convert(tmp_path / "never-read.wav", tmp_path / "y.xyz")
 
 
 def test_same_file_is_refused(tmp_path: Path) -> None:
     src = tmp_path / "self.wav"
     write(src, np.zeros(8), FS)
-    with pytest.raises(ValueError, match="same file"):
+    with pytest.raises(ValueError, match=r"source and destination are the same file"):
         convert(src, src)
 
 

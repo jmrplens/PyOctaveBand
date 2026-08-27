@@ -334,12 +334,14 @@ def test_time_weighting_initial_state_invalid() -> None:
     fs = 1000
     x = np.ones(fs)
 
-    with pytest.raises(ValueError, match="initial_state"):
+    with pytest.raises(ValueError, match=r"initial_state must be None"):
         filters.time_weighting(x, fs, mode="fast", initial_state="invalid")
 
     two_channels = np.ones((2, 10))
     mismatched_state = np.ones(3)
-    with pytest.raises(ValueError, match="broadcastable"):
+    with pytest.raises(
+        ValueError, match=r"initial_state must be scalar or broadcastable"
+    ):
         filters.time_weighting(
             two_channels, fs, mode="fast", initial_state=mismatched_state
         )
@@ -348,7 +350,7 @@ def test_time_weighting_initial_state_invalid() -> None:
 def test_time_weighting_initial_state_first_rejects_empty_input() -> None:
     """Verify initial_state='first' requires at least one sample."""
     empty = np.array([])
-    with pytest.raises(ValueError, match="initial_state"):
+    with pytest.raises(ValueError, match=r"initial_state must be None"):
         filters.time_weighting(empty, 1000, mode="fast", initial_state="first")
 
 
@@ -536,7 +538,9 @@ def test_a_weighting_48k_hf_accuracy_locked() -> None:
 
 def test_high_accuracy_incompatible_with_stateful() -> None:
     """high_accuracy resampling would break block continuity: must raise."""
-    with pytest.raises(ValueError, match="high_accuracy"):
+    with pytest.raises(
+        ValueError, match=r"high_accuracy is not compatible with stateful"
+    ):
         filters.WeightingFilter(48000, "A", stateful=True, high_accuracy=True)
 
 

@@ -255,11 +255,15 @@ def test_empty_bands_are_reported_as_minus_infinity() -> None:
 def test_strike_sel_spectrum_validates_its_arguments() -> None:
     x = _pulse(50.0, 0.2)
     silence = np.zeros(1024)
-    with pytest.raises(ValueError, match="fraction"):
+    with pytest.raises(ValueError, match=r"'fraction' must be 1"):
         underwater.strike_sel_spectrum(x, FS, fraction=6)
-    with pytest.raises(ValueError, match="limits"):
+    with pytest.raises(
+        ValueError, match=r"'limits' must be a finite, increasing, positive pair"
+    ):
         underwater.strike_sel_spectrum(x, FS, limits=(2000.0, 100.0))
-    with pytest.raises(ValueError, match="no energy"):
+    with pytest.raises(
+        ValueError, match=r"'pressure' has no energy inside the requested bands"
+    ):
         underwater.strike_sel_spectrum(silence, FS)
 
 

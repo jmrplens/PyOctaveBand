@@ -467,20 +467,27 @@ def test_default_guidance_is_the_current_one() -> None:
 def test_group_codes_are_not_portable_between_versions() -> None:
     """NMFS 2018 has MF, NMFS 2024 does not; NMFS 2024 has VHF, NMFS 2018 does not."""
     assert "MF" in hearing_groups("nmfs-2018")
-    with pytest.raises(ValueError, match="not portable"):
+    with pytest.raises(
+        ValueError, match=r"'group' must be one of .*for guidance 'nmfs-2024'"
+    ):
         auditory_weighting(1000.0, "MF", guidance="nmfs-2024")
-    with pytest.raises(ValueError, match="not portable"):
+    with pytest.raises(
+        ValueError, match=r"'group' must be one of .*for guidance 'nmfs-2018'"
+    ):
         auditory_weighting(1000.0, "VHF", guidance="nmfs-2018")
 
 
 def test_unknown_guidance_raises() -> None:
-    with pytest.raises(ValueError, match="guidance"):
+    with pytest.raises(ValueError, match=r"'guidance' must be one of"):
         auditory_weighting(1000.0, "LF", guidance="nmfs-2007")
 
 
 @pytest.mark.parametrize("frequency", [[], [0.0], [np.nan]])
 def test_invalid_frequencies_raise(frequency: list[float]) -> None:
-    with pytest.raises(ValueError, match="frequency_hz"):
+    with pytest.raises(
+        ValueError,
+        match=r"'frequency_hz' must be (finite and non-empty|strictly positive)",
+    ):
         auditory_weighting(frequency, "LF")
 
 
@@ -490,9 +497,9 @@ def test_mismatched_band_spectrum_raises() -> None:
 
 
 def test_non_finite_band_spectrum_raises() -> None:
-    with pytest.raises(ValueError, match="band_sel"):
+    with pytest.raises(ValueError, match=r"'band_sel' must be finite"):
         weighted_exposure([100.0, 200.0], [170.0, np.nan], "LF")
-    with pytest.raises(ValueError, match="band_sel"):
+    with pytest.raises(ValueError, match=r"'band_sel' must be finite"):
         weighted_exposure([100.0, 200.0], [170.0, np.inf], "LF")
 
 
@@ -519,13 +526,15 @@ def test_the_result_does_not_alias_the_caller_arrays() -> None:
 
 @pytest.mark.parametrize("n_events", [0, 1.5, -3])
 def test_invalid_event_count_raises(n_events: float) -> None:
-    with pytest.raises(ValueError, match="n_events"):
+    with pytest.raises(
+        ValueError, match=r"'n_events' must be a whole number of events"
+    ):
         weighted_exposure([1000.0], [170.0], "LF", n_events=n_events)  # type: ignore[arg-type]
 
 
 def test_non_finite_peak_spl_raises() -> None:
     not_a_number = float("nan")
-    with pytest.raises(ValueError, match="peak_spl"):
+    with pytest.raises(ValueError, match=r"'peak_spl' must be finite"):
         weighted_exposure([1000.0], [170.0], "LF", peak_spl=not_a_number)
 
 
@@ -543,7 +552,7 @@ def test_a_curve_that_does_not_run_over_the_frequencies_is_refused() -> None:
     legend row repeated once per curve.
     """
     good = auditory_weighting(np.logspace(1.0, 5.0, 64), "LF")
-    per_frequency = "one value per frequency"
+    per_frequency = "must each carry one value per frequency"
     one_axis = "must have one axis"
     cases = (
         ("frequencies", good.frequencies[:-1], per_frequency),
@@ -581,7 +590,7 @@ def test_an_exposure_row_that_does_not_run_over_the_bands_is_refused() -> None:
     the only reader that would object, is ever drawn.
     """
     good = weighted_exposure([125.0, 250.0, 500.0, 1000.0], [180.0] * 4, "LF")
-    per_band = "one value per band"
+    per_band = "must each carry one value per band"
     one_axis = "must have one axis"
     cases = (
         ("band_sel", good.band_sel[:-1], per_band),
@@ -628,7 +637,9 @@ def test_a_non_finite_peak_level_is_refused_at_construction() -> None:
     and it reaches the margin as a subtraction that quietly answers ``NaN``.
     """
     good = weighted_exposure([1000.0], [100.0], "VHF", impulsive=True, peak_spl=210.0)
-    with pytest.raises(ValueError, match=r"'peak_spl' must be finite"):
+    with pytest.raises(
+        ValueError, match=r"WeightedExposureResult: 'peak_spl' must be finite"
+    ):
         dataclasses.replace(good, peak_spl=float("nan"))
 
 

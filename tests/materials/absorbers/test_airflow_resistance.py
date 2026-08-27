@@ -167,7 +167,9 @@ def test_a_non_finite_determination_quantity_is_refused(field_name: str) -> None
 
     u = np.array([0.5e-3, 1.0e-3, 2.0e-3, 4.0e-3])
     result = static_airflow_resistance(u, 12000.0 * u, 0.008, 0.05)
-    with pytest.raises(ValueError, match=f"StaticAirflowResult: '{field_name}'"):
+    with pytest.raises(
+        ValueError, match=f"StaticAirflowResult: '{field_name}' must be finite"
+    ):
         dataclasses.replace(result, **{field_name: float("nan")})
 
 
@@ -227,7 +229,10 @@ def test_static_velocity_above_limit_warns() -> None:
     # Highest velocity 20 mm/s exceeds the 15 mm/s clause-7.5 limit.
     u = np.array([0.5e-3, 5.0e-3, 20.0e-3])
     dp = 12000.0 * u
-    with pytest.warns(AirflowResistanceWarning, match="15"):
+    with pytest.warns(
+        AirflowResistanceWarning,
+        match=r"Highest linear airflow velocity .* exceeds the .* limit of ISO 9053-1",
+    ):
         static_airflow_resistance(u, dp, 0.008)
 
 
@@ -302,7 +307,10 @@ def test_alternating_formula_matches_hand_computation() -> None:
 
 def test_alternating_validity_term_warns() -> None:
     # (h_t/h_s)*10**((L_ps-L_pt)/20) = 0.5 * 1.0 = 0.5, not < 0.3 (Formula 3).
-    with pytest.warns(AirflowResistanceWarning, match="Formula \\(3\\)"):
+    with pytest.warns(
+        AirflowResistanceWarning,
+        match=r"Validity term .* is not below .* Formula \(3\)",
+    ):
         alternating_airflow_resistance(
             70.0,
             70.0,
@@ -315,7 +323,10 @@ def test_alternating_validity_term_warns() -> None:
 
 def test_alternating_background_margin_warns() -> None:
     # L_ps - L_pb = 5 dB, not > 10 dB (Formula 4).
-    with pytest.warns(AirflowResistanceWarning, match="Formula \\(4\\)"):
+    with pytest.warns(
+        AirflowResistanceWarning,
+        match=r"Specimen-to-background margin .* is not above .* Formula \(4\)",
+    ):
         alternating_airflow_resistance(
             60.0,
             80.0,
@@ -328,7 +339,10 @@ def test_alternating_background_margin_warns() -> None:
 
 
 def test_alternating_frequency_out_of_range_warns() -> None:
-    with pytest.warns(AirflowResistanceWarning, match="6.2"):
+    with pytest.warns(
+        AirflowResistanceWarning,
+        match=r"Piston frequency .* is outside the ISO 9053-2:2020 clause 6\.2 range",
+    ):
         alternating_airflow_resistance(
             60.0,
             80.0,

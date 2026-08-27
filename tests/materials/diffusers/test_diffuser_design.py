@@ -202,53 +202,59 @@ def test_polar_response_plot_returns_polar_axes() -> None:
 
 # --- Input-validation guards --------------------------------------------------
 def test_prime_must_be_odd_prime() -> None:
-    with pytest.raises(ValueError, match="odd prime"):
+    with pytest.raises(ValueError, match=r"'prime' must be an odd prime"):
         quadratic_residue_sequence(8)
-    with pytest.raises(ValueError, match="prime"):
+    with pytest.raises(ValueError, match=r"'prime' must be prime"):
         quadratic_residue_sequence(9)
 
 
 def test_requires_exactly_one_of_depths_or_reflection() -> None:
-    with pytest.raises(ValueError, match="exactly one"):
+    with pytest.raises(
+        ValueError, match=r"Provide exactly one of 'depths' or 'reflection'"
+    ):
         predict_diffuser_polar_response(0.10, 1000.0)
     depths = np.zeros(7)
     reflection = np.ones(7)
-    with pytest.raises(ValueError, match="exactly one"):
+    with pytest.raises(
+        ValueError, match=r"Provide exactly one of 'depths' or 'reflection'"
+    ):
         predict_diffuser_polar_response(
             0.10, 1000.0, depths=depths, reflection=reflection
         )
 
 
 def test_depths_need_at_least_two_wells() -> None:
-    with pytest.raises(ValueError, match="at least two"):
+    with pytest.raises(ValueError, match=r"'depths'.*at least two"):
         predict_diffuser_polar_response(0.10, 1000.0, depths=[0.05])
 
 
 def test_negative_depth_rejected() -> None:
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(
+        ValueError, match=r"'depths' values must be finite and non-negative"
+    ):
         predict_diffuser_polar_response(0.10, 1000.0, depths=[0.05, -0.01, 0.02])
 
 
 def test_non_positive_geometry_rejected() -> None:
     depths = qrd_well_depths(7, 500.0)
-    with pytest.raises(ValueError, match="well_width"):
+    with pytest.raises(ValueError, match=r"'well_width' must be a positive, finite"):
         predict_diffuser_polar_response(0.0, 1000.0, depths=depths)
-    with pytest.raises(ValueError, match="frequency"):
+    with pytest.raises(ValueError, match=r"'frequency' must be a positive, finite"):
         predict_diffuser_polar_response(0.10, 0.0, depths=depths)
-    with pytest.raises(ValueError, match="periods"):
+    with pytest.raises(ValueError, match=r"'periods' must be an integer"):
         predict_diffuser_polar_response(0.10, 1000.0, depths=depths, periods=0)
 
 
 def test_spectrum_requires_depths() -> None:
     """Keyword-only and required: the signature says so on its own now."""
-    with pytest.raises(TypeError, match="required keyword-only argument"):
+    with pytest.raises(TypeError, match=r"required keyword-only argument: 'depths'"):
         predicted_diffusion_spectrum(0.10, [500.0])  # type: ignore[call-arg]
 
 
 def test_spectrum_reserved_reflection_argument() -> None:
     depths = np.zeros(7)
     reserved = object()
-    with pytest.raises(ValueError, match="reflection_of"):
+    with pytest.raises(ValueError, match=r"'reflection_of' is reserved .*must be None"):
         predicted_diffusion_spectrum(
             0.10, [500.0], depths=depths, reflection_of=reserved
         )

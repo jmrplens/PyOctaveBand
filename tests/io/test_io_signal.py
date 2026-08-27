@@ -120,11 +120,13 @@ def test_invalid_construction_is_rejected() -> None:
         match=r"Signal: .*'channel_labels' .* must each carry one value per channel",
     ):
         Signal(data=np.zeros((2, 10)), fs=FS, channel_labels=("FL",))
-    with pytest.raises(ValueError, match="fs"):
+    with pytest.raises(ValueError, match=r"fs must be a positive finite number"):
         Signal(data=tone, fs=0)
-    with pytest.raises(ValueError, match="calibration_factor"):
+    with pytest.raises(
+        ValueError, match=r"calibration_factor must be a positive finite number"
+    ):
         Signal(data=tone, fs=FS, calibration_factor=0.0)
-    with pytest.raises(ValueError, match="1-D or"):
+    with pytest.raises(ValueError, match=r"data must be 1-D or \(channels, samples\)"):
         Signal(data=np.zeros((2, 2, 2)), fs=FS)
 
 
@@ -192,5 +194,5 @@ def test_plot_spanish_labels() -> None:
 
 def test_plot_rejects_unknown_language() -> None:
     sig = Signal(data=_tone(), fs=FS)
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language 'fr'"):
         sig.plot(language="fr")

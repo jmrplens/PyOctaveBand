@@ -88,9 +88,9 @@ def test_decoupling_frequency_scaling() -> None:
 
 
 def test_decoupling_frequency_rejects_bad_input() -> None:
-    with pytest.raises(ValueError, match="must be positive"):
+    with pytest.raises(ValueError, match="'flow_resistivity' must be positive"):
         materials.decoupling_frequency(-1.0, porosity=0.98, frame_density=30.0)
-    with pytest.raises(ValueError, match="must not exceed 1"):
+    with pytest.raises(ValueError, match="'porosity' must not exceed 1"):
         materials.decoupling_frequency(25.0e3, porosity=1.5, frame_density=30.0)
 
 
@@ -261,9 +261,9 @@ def test_limp_frame_plot_smoke() -> None:
 
 def test_limp_frame_rejects_bad_input() -> None:
     rigid = _rigid(np.array([100.0]))
-    with pytest.raises(ValueError, match="must be positive"):
+    with pytest.raises(ValueError, match="'frame_density' must be positive"):
         materials.limp_frame(rigid, -1.0)
-    with pytest.raises(ValueError, match="must not exceed 1"):
+    with pytest.raises(ValueError, match="'porosity' must not exceed 1"):
         materials.limp_frame(rigid, 30.0, porosity=1.2)
 
 
@@ -288,7 +288,7 @@ def test_limp_frame_criteria_match_the_printed_thresholds() -> None:
 
 
 def test_limp_frame_applicable_rejects_bad_input() -> None:
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(ValueError, match=r"'frame_bulk_modulus' must be non-negative"):
         materials.limp_frame_applicable(-1.0)
     with pytest.raises(ValueError, match="'criterion' must be one of"):
         materials.limp_frame_applicable(1.0e3, criterion="panneton")

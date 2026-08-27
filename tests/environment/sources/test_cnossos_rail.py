@@ -622,10 +622,14 @@ def test_vehicle_and_track_descriptors_round_trip() -> None:
 
 def test_descriptor_rejects_bad_codes() -> None:
     for code in ("", "a4", "z4cn", "a4xn", "a4cz"):
-        with pytest.raises(ValueError, match="Table \\[2.3.a\\]"):
+        with pytest.raises(
+            ValueError, match=r"is not a Table \[2\.3\.a\] vehicle descriptor"
+        ):
             VehicleDescriptor.from_code(code)
     for code in ("BMSNN", "BMSNNNN", "ZMSNNN"):
-        with pytest.raises(ValueError, match="Table \\[2.3.b\\]"):
+        with pytest.raises(
+            ValueError, match=r"is not a Table \[2\.3\.b\] track descriptor"
+        ):
             TrackDescriptor.from_code(code)
 
 
@@ -845,11 +849,13 @@ def test_invalid_inputs() -> None:
         railway_source_power(standing, track)
     with pytest.raises(ValueError, match="non-negative number per hour"):
         railway_source_power(negative_flow, track)
-    with pytest.raises(ValueError, match="positive period"):
+    with pytest.raises(ValueError, match=r"'reference_time' must be a positive period"):
         railway_source_power(running, track, reference_time=0.0)
-    with pytest.raises(ValueError, match="positive number of metres"):
+    with pytest.raises(
+        ValueError, match=r"'length' must be a positive number of metres"
+    ):
         railway_source_power(running, zero_length)
-    with pytest.raises(ValueError, match="height"):
+    with pytest.raises(ValueError, match=r"'height' must be 1"):
         vertical_directivity(10.0, height=3)
     with pytest.raises(ValueError, match="Unknown brake type"):
         wheel_roughness("z")
@@ -871,7 +877,9 @@ def test_invalid_inputs() -> None:
         total_effective_roughness(short_roughness, roughness, roughness)
     with pytest.raises(ValueError, match="positive number of axles"):
         rolling_sound_power(roughness, roughness, 0)
-    with pytest.raises(ValueError, match="non-negative number of m"):
+    with pytest.raises(
+        ValueError, match=r"'joint_density' must be a non-negative number"
+    ):
         impact_roughness(roughness, -1.0)
     with pytest.raises(
         ValueError,
@@ -886,7 +894,9 @@ def test_invalid_inputs() -> None:
         roughness_to_frequency([1.0, 2.0], [1.0, 0.0], 50.0)
     with pytest.raises(ValueError, match="'frequencies' must all be positive"):
         roughness_to_frequency([1.0, 2.0], [1.0, 2.0], 50.0, frequencies=[0.0])
-    with pytest.raises(ValueError, match="positive number of metres"):
+    with pytest.raises(
+        ValueError, match=r"'radius' must be a positive number of metres"
+    ):
         curve_squeal_excess(0.0)
 
 
@@ -911,7 +921,9 @@ def test_a_component_on_the_octave_grid_is_refused() -> None:
     result = _emission_result()
     octave = np.full(result.frequencies.size, 90.0)
     components = {**result.components, "bridge": (octave, octave)}
-    with pytest.raises(ValueError, match=r"'components\['bridge'\]\[0\]'"):
+    with pytest.raises(
+        ValueError, match=rf"'components\['bridge'\]\[0\]' \({octave.size}\)"
+    ):
         dataclasses.replace(result, components=components)
 
 

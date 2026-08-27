@@ -83,7 +83,7 @@ def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     result = weighted_absorption(_A1_ALPHA_P)
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine 'weasyprint'"):
         result.report(out, engine="weasyprint")
 
 
@@ -172,7 +172,10 @@ def test_third_octave_arrays_must_hold_three_bands_per_octave(bands: int) -> Non
     import dataclasses
 
     result = weighted_absorption_from_third_octave(_THIRD_OCTAVE_ALPHA_S)
-    with pytest.raises(ValueError, match="'3 x band_centers'"):
+    with pytest.raises(
+        ValueError,
+        match=r"'3 x band_centers'.*must each carry one value per one-third-octave band",
+    ):
         dataclasses.replace(
             result,
             third_octave_alpha_s=np.full(bands, 0.5),
@@ -303,5 +306,5 @@ def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
 def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ``ValueError``."""
     result = weighted_absorption_from_third_octave(_THIRD_OCTAVE_ALPHA_S)
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language 'xx'"):
         result.report(str(tmp_path / "bad.pdf"), language="xx")

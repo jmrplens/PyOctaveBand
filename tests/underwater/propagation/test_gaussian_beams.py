@@ -858,11 +858,11 @@ def test_a_malformed_seabed_is_rejected() -> None:
     airy = FluidSeabed(density=-1.0, sound_speed=1700.0)
     still = FluidSeabed(density=1800.0, sound_speed=0.0)
     dry = FluidSeabed(density=1800.0, sound_speed=1700.0, water_density=0.0)
-    with pytest.raises(ValueError, match="density"):
+    with pytest.raises(ValueError, match=r"'density' must be positive"):
         gaussian_beams(200.0, *iso, source_depth=500.0, bottom=airy)
-    with pytest.raises(ValueError, match="sound_speed"):
+    with pytest.raises(ValueError, match=r"'sound_speed' must be positive"):
         gaussian_beams(200.0, *iso, source_depth=500.0, bottom=still)
-    with pytest.raises(ValueError, match="water_density"):
+    with pytest.raises(ValueError, match=r"'water_density' must be positive"):
         gaussian_beams(200.0, *iso, source_depth=500.0, bottom=dry)
 
 
@@ -1788,7 +1788,10 @@ def test_a_source_on_a_profile_kink_is_warned_about() -> None:
     c = np.array([1500.0, 1510.0, 1488.0, 1512.0])
     r = np.array([1000.0])
     fan = BeamFan(max_angle_deg=30.0, n_beams=9)
-    with pytest.warns(PhonometryWarning, match="gradient discontinuity"):
+    with pytest.warns(
+        PhonometryWarning,
+        match=r"'source_depth' sits on a gradient discontinuity of the profile",
+    ):
         gaussian_beams(
             200.0,
             z,
@@ -1844,7 +1847,10 @@ def test_a_beam_wider_than_a_quarter_of_the_channel_passes_in_silence() -> None:
 def test_a_step_that_cannot_follow_the_steepest_beam_is_warned_about() -> None:
     r = np.array([2000.0])
     steep_fan = BeamFan(max_angle_deg=85.0, n_beams=9)
-    with pytest.warns(PhonometryWarning, match="steepest beam"):
+    with pytest.warns(
+        PhonometryWarning,
+        match=r"one marching step carries the steepest beam of the fan",
+    ):
         gaussian_beams(
             200.0,
             [0.0, 400.0],
@@ -1904,27 +1910,31 @@ def test_every_warning_is_reported_against_the_line_that_caused_it() -> None:
 
 def test_invalid_inputs_rejected() -> None:
     iso = ([0.0, 1000.0], [_C, _C])
-    with pytest.raises(ValueError, match="source_depth"):
+    with pytest.raises(
+        ValueError, match=r"'source_depth' must lie within the water column"
+    ):
         gaussian_beams(200.0, *iso, source_depth=1200.0)
     vertical = BeamFan(max_angle_deg=90.0)
-    with pytest.raises(ValueError, match="max_angle_deg"):
+    with pytest.raises(ValueError, match=r"'max_angle_deg' must lie in"):
         gaussian_beams(200.0, *iso, source_depth=500.0, fan=vertical)
-    with pytest.raises(ValueError, match="bottom"):
+    with pytest.raises(ValueError, match=r"'bottom' must be one of"):
         gaussian_beams(200.0, *iso, source_depth=500.0, bottom="sandy")
-    with pytest.raises(ValueError, match="range_step"):
+    with pytest.raises(ValueError, match=r"'range_step' must not exceed 'max_range'"):
         gaussian_beams(
             200.0, *iso, source_depth=500.0, max_range=100.0, range_step=200.0
         )
     unpaired = BeamFan(n_beams=1)
-    with pytest.raises(ValueError, match="n_beams"):
+    with pytest.raises(ValueError, match=r"'n_beams' must be at least"):
         gaussian_beams(200.0, *iso, source_depth=500.0, fan=unpaired)
-    with pytest.raises(ValueError, match="ranges_m"):
+    with pytest.raises(ValueError, match=r"'ranges_m' must be finite"):
         gaussian_beams(200.0, *iso, source_depth=500.0, ranges_m=[-1.0])
-    with pytest.raises(ValueError, match="receiver_depths_m"):
+    with pytest.raises(ValueError, match=r"'receiver_depths_m' must be finite"):
         gaussian_beams(
             200.0, *iso, source_depth=500.0, ranges_m=[500.0], receiver_depths_m=[]
         )
-    with pytest.raises(ValueError, match="receiver_depths_m"):
+    with pytest.raises(
+        ValueError, match=r"'receiver_depths_m' must lie within the water column"
+    ):
         gaussian_beams(
             200.0,
             *iso,
@@ -1932,17 +1942,17 @@ def test_invalid_inputs_rejected() -> None:
             ranges_m=[500.0],
             receiver_depths_m=[1200.0],
         )  # below the seabed
-    with pytest.raises(ValueError, match="ranges_m"):
+    with pytest.raises(ValueError, match=r"'ranges_m' must not run past 'max_range'"):
         # Past the march there is no column to read a beam off, and answering
         # by extrapolating the last one would be a silent wrong answer.
         gaussian_beams(
             200.0, *iso, source_depth=500.0, max_range=1000.0, ranges_m=[2000.0]
         )
-    with pytest.raises(ValueError, match="n_depth_points"):
+    with pytest.raises(ValueError, match=r"'n_depth_points' must be at least"):
         gaussian_beams(
             200.0, *iso, source_depth=500.0, ranges_m=[500.0], n_depth_points=1
         )
-    with pytest.raises(ValueError, match="absorption"):
+    with pytest.raises(ValueError, match=r"'absorption' must name one of"):
         gaussian_beams(200.0, *iso, source_depth=500.0, absorption="mud")
 
 

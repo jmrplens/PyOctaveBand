@@ -54,7 +54,9 @@ def test_spectrogram_rejects_stateful() -> None:
         block_processing=filters.BlockProcessing(stateful=True),
     )
     silence = np.zeros(FS)
-    with pytest.raises(ValueError, match="stateful"):
+    with pytest.raises(
+        ValueError, match=r"spectrogram\(\) is not supported on stateful banks"
+    ):
         bank.spectrogram(silence)
 
 
@@ -64,9 +66,11 @@ def test_spectrogram_invalid_params_raise() -> None:
     # exactly the one call whose exception is under test
     one_second = np.zeros(FS)
     shorter_than_the_window = np.zeros(1000)
-    with pytest.raises(ValueError, match="overlap"):
+    with pytest.raises(ValueError, match=r"overlap must be in \[0, 1\)"):
         bank.spectrogram(one_second, overlap=1.0)
-    with pytest.raises(ValueError, match="window_time"):
+    with pytest.raises(
+        ValueError, match=r"window_time must be positive and shorter than the signal"
+    ):
         bank.spectrogram(shorter_than_the_window, window_time=1.0)
 
 

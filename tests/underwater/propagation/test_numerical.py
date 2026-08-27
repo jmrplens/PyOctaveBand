@@ -566,17 +566,21 @@ def test_parabolic_equation_tracks_normal_modes_trend() -> None:
 
 
 def test_invalid_inputs_rejected() -> None:
-    with pytest.raises(ValueError, match="depths"):
+    with pytest.raises(ValueError, match=r"'depths' must start at the surface"):
         normal_modes(
             20.0, [10.0, 20.0], [1500.0, 1500.0], source_depth=15.0, receiver_depth=15.0
         )  # does not start at z = 0
-    with pytest.raises(ValueError, match="bottom"):
+    with pytest.raises(ValueError, match=r"'bottom' must be one of"):
         normal_modes(20.0, *_ISO, source_depth=50.0, receiver_depth=50.0, bottom="soft")
-    with pytest.raises(ValueError, match="source_depth"):
+    with pytest.raises(
+        ValueError, match=r"'source_depth' must lie within the water column"
+    ):
         parabolic_equation(50.0, *_ISO, source_depth=150.0)
-    with pytest.raises(ValueError, match="launch_angles_deg"):
+    with pytest.raises(
+        ValueError, match=r"'launch_angles_deg' must be within .* degrees"
+    ):
         ray_trace(*_ISO, source_depth=50.0, launch_angles_deg=[90.0])  # not forward
-    with pytest.raises(ValueError, match="range_step"):
+    with pytest.raises(ValueError, match=r"'range_step' must not exceed 'max_range'"):
         parabolic_equation(
             50.0, *_ISO, source_depth=50.0, max_range=1000.0, range_step=2000.0
         )

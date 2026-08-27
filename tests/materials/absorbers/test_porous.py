@@ -125,9 +125,15 @@ class TestDelanyBazley:
         assert np.min(zs.real) < 0.0
 
     def test_warns_outside_validity(self) -> None:
-        with pytest.warns(PorousAbsorberWarning, match="fit range"):
+        with pytest.warns(
+            PorousAbsorberWarning,
+            match=r"Delany-Bazley:.*outside the published fit range",
+        ):
             delany_bazley(np.array([10.0]), 50000.0)
-        with pytest.warns(PorousAbsorberWarning, match="fit range"):
+        with pytest.warns(
+            PorousAbsorberWarning,
+            match=r"Delany-Bazley:.*outside the published fit range",
+        ):
             delany_bazley(np.array([20000.0]), 1000.0)
 
     def test_presets_and_custom_coefficients(self) -> None:
@@ -145,9 +151,11 @@ class TestDelanyBazley:
 
     def test_rejects_bad_inputs(self) -> None:
         f = np.array([100.0])
-        with pytest.raises(ValueError, match="preset"):
+        with pytest.raises(ValueError, match=r"unknown coefficient preset"):
             delany_bazley(f, 10000.0, coefficients="nope")
-        with pytest.raises(ValueError, match="8 values"):
+        with pytest.raises(
+            ValueError, match=r"'coefficients' must provide exactly 8 values"
+        ):
             delany_bazley(f, 10000.0, coefficients=(1.0, 2.0))
         with pytest.raises(ValueError, match="'flow_resistivity' must be positive"):
             delany_bazley(f, -1.0)
@@ -285,7 +293,7 @@ class TestJohnsonChampouxAllard:
 
     def test_rejects_bad_parameters(self) -> None:
         f = np.array([100.0])
-        with pytest.raises(ValueError, match="porosity"):
+        with pytest.raises(ValueError, match=r"'porosity' must not exceed 1"):
             johnson_champoux_allard(
                 f,
                 1e4,
@@ -294,7 +302,7 @@ class TestJohnsonChampouxAllard:
                 viscous_length=1e-4,
                 thermal_length=2e-4,
             )
-        with pytest.raises(ValueError, match="tortuosity"):
+        with pytest.raises(ValueError, match=r"'tortuosity' must be >= 1"):
             johnson_champoux_allard(
                 f,
                 1e4,
@@ -504,13 +512,18 @@ class TestLayeredAbsorber:
         layers = [PorousLayer(0.05, med)]
         with pytest.raises(ValueError, match="at least one layer"):
             layered_absorber(f, [])
-        with pytest.raises(ValueError, match="angle"):
+        with pytest.raises(ValueError, match=r"'angle' must satisfy 0 <= angle < pi/2"):
             layered_absorber(f, layers, angle=np.pi / 2.0)
-        with pytest.raises(ValueError, match="termination"):
+        with pytest.raises(
+            ValueError, match=r"'termination' must be .*complex impedance"
+        ):
             layered_absorber(f, layers, termination="soft")
         other = miki(_grid(100.0, 200.0, 7), 20000.0)
         mismatched = [PorousLayer(0.05, other)]
-        with pytest.raises(ValueError, match="frequency vector"):
+        with pytest.raises(
+            ValueError,
+            match=r"PorousLayer\.medium was evaluated on a different frequency vector",
+        ):
             layered_absorber(f, mismatched)
 
 
@@ -721,14 +734,20 @@ class TestResonantSheets:
         """
         f = np.array([1000.0])
         layers = [AirLayer(0.05)]
-        with pytest.raises(ValueError, match="angle"):
+        with pytest.raises(ValueError, match=r"'angle' must satisfy 0 <= angle < pi/2"):
             layered_absorber(f, layers, angle=np.pi / 2.0 - 1e-9)
 
     def test_termination_array_length_mismatch_rejected(self) -> None:
         f = np.array([500.0, 1000.0])
         layers = [AirLayer(0.05)]
         termination = np.array([800.0 + 0j] * 3)
-        with pytest.raises(ValueError, match="termination"):
+        with pytest.raises(
+            ValueError,
+            match=(
+                r"'termination' impedance array must be scalar or match the "
+                r"shape of 'frequency'"
+            ),
+        ):
             layered_absorber(f, layers, termination=termination)
 
     def test_perforated_plate_open_area_one_is_nearly_transparent(self) -> None:
@@ -823,10 +842,14 @@ class TestRandomIncidence:
         f = np.array([500.0])
         med = miki(f, 15000.0)
         layers = [PorousLayer(0.05, med)]
-        with pytest.raises(ValueError, match="angle_limit"):
+        with pytest.raises(
+            ValueError, match=r"'angle_limit' must satisfy 0 < angle_limit <= pi/2"
+        ):
             diffuse_field_absorption(f, layers, angle_limit=2.0)
-        with pytest.raises(ValueError, match="quadrature_points"):
+        with pytest.raises(ValueError, match=r"'quadrature_points' must be at least 2"):
             diffuse_field_absorption(f, layers, quadrature_points=1)
         negative_real = np.array([-1.0 + 0.5j])
-        with pytest.raises(ValueError, match="real part"):
+        with pytest.raises(
+            ValueError, match=r"'normalized_impedance' must have a positive real part"
+        ):
             statistical_absorption(negative_real)

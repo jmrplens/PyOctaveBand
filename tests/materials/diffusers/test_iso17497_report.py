@@ -205,7 +205,7 @@ def test_scattering_verbose_shows_alpha_spec_one_page(tmp_path: Path) -> None:
 def test_scattering_unknown_engine_rejected(tmp_path: Path) -> None:
     result = _scattering()
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         result.report(out, engine="weasyprint")
 
 
@@ -293,7 +293,7 @@ def test_diffusion_verbose_shows_normalized_one_page(tmp_path: Path) -> None:
 def test_diffusion_unknown_engine_rejected(tmp_path: Path) -> None:
     result = _diffusion_spectrum()
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         result.report(out, engine="weasyprint")
 
 
@@ -340,7 +340,7 @@ def test_polar_displays_coefficient_and_angles(tmp_path: Path) -> None:
 def test_polar_unknown_engine_rejected(tmp_path: Path) -> None:
     result = _polar()
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         result.report(out, engine="weasyprint")
 
 

@@ -90,7 +90,7 @@ def test_transfer_matrix_plot_spanish_and_bad_language() -> None:
     assert "ASTM E2611" in ax.get_title()
     assert "matriz de transferencia" in ax.get_title()
     plt.close("all")
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language"):
         tm.plot(f, rho_c, language="fr")
 
 

@@ -458,46 +458,48 @@ def test_every_type_designs_and_is_stable(filter_type: str) -> None:
 
 
 def test_rejects_unknown_type_and_bad_frequencies() -> None:
-    with pytest.raises(ValueError, match="filter_type"):
+    with pytest.raises(ValueError, match=r"Unknown filter_type 'bell'"):
         ph.filters.EQSection("bell", 1000.0)  # type: ignore[arg-type]
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"'f0' must be positive"):
         ph.filters.EQSection("peaking", 0.0)
     at_nyquist = ph.filters.EQSection("peaking", FS / 2, gain_db=3.0)
-    with pytest.raises(ValueError, match="Nyquist"):
+    with pytest.raises(
+        ValueError, match=r"f0 = .* must sit below the Nyquist frequency"
+    ):
         ph.filters.ParametricEQ(FS, at_nyquist)
     section = ph.filters.EQSection("peaking", 1000.0, gain_db=3.0)
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"'fs' must be positive"):
         ph.filters.ParametricEQ(0, section)
 
 
 def test_rejects_conflicting_or_misplaced_parameters() -> None:
-    with pytest.raises(ValueError, match="only one"):
+    with pytest.raises(ValueError, match=r"Give only one of 'q', 'bw' and 'slope'"):
         ph.filters.EQSection("peaking", 1000.0, gain_db=3.0, q=1.0, bw=1.0)
-    with pytest.raises(ValueError, match="slope"):
+    with pytest.raises(ValueError, match=r"'slope' applies to the shelving types"):
         ph.filters.EQSection("peaking", 1000.0, gain_db=3.0, slope=1.0)
-    with pytest.raises(ValueError, match="bw"):
+    with pytest.raises(ValueError, match=r"'bw' applies to"):
         ph.filters.EQSection("lowshelf", 1000.0, gain_db=3.0, bw=1.0)
-    with pytest.raises(ValueError, match="gain_db"):
+    with pytest.raises(ValueError, match=r"'gain_db' applies to"):
         ph.filters.EQSection("notch", 1000.0, gain_db=3.0)
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"'q' must be positive"):
         ph.filters.EQSection("peaking", 1000.0, gain_db=3.0, q=-1.0)
-    with pytest.raises(ValueError, match="at least one"):
+    with pytest.raises(ValueError, match="at least one EQSection"):
         ph.filters.ParametricEQ(FS, [])
 
 
 @pytest.mark.parametrize(
-    "kwargs",
+    ("kwargs", "offender"),
     [
-        {"f0": float("nan"), "gain_db": 3.0},
-        {"f0": float("inf"), "gain_db": 3.0},
-        {"f0": 1000.0, "gain_db": float("nan")},
-        {"f0": 1000.0, "gain_db": float("inf")},
-        {"f0": 1000.0, "gain_db": 3.0, "q": float("nan")},
-        {"f0": 1000.0, "gain_db": 3.0, "bw": float("inf")},
+        ({"f0": float("nan"), "gain_db": 3.0}, "f0"),
+        ({"f0": float("inf"), "gain_db": 3.0}, "f0"),
+        ({"f0": 1000.0, "gain_db": float("nan")}, "gain_db"),
+        ({"f0": 1000.0, "gain_db": float("inf")}, "gain_db"),
+        ({"f0": 1000.0, "gain_db": 3.0, "q": float("nan")}, "q"),
+        ({"f0": 1000.0, "gain_db": 3.0, "bw": float("inf")}, "bw"),
     ],
 )
-def test_rejects_non_finite_parameters(kwargs: dict) -> None:
-    with pytest.raises(ValueError, match="finite"):
+def test_rejects_non_finite_parameters(kwargs: dict, offender: str) -> None:
+    with pytest.raises(ValueError, match=rf"'{offender}' must be finite"):
         ph.filters.EQSection("peaking", **kwargs)
 
 
@@ -512,7 +514,9 @@ def test_extreme_finite_gain_raises_value_error(
     # 10^(gain_db/40) overflows for huge positive gains and underflows to
     # zero (then divides by zero in the designers) for huge negative ones;
     # both used to leak raw OverflowError/ZeroDivisionError.
-    with pytest.raises(ValueError, match="representable"):
+    with pytest.raises(
+        ValueError, match=r"'gain_db' = .* is outside the representable range"
+    ):
         ph.filters.EQSection(filter_type, 1000.0, gain_db=gain_db, **kwargs)
 
 
@@ -520,7 +524,7 @@ def test_shelf_slope_beyond_gain_bound_raises_informatively() -> None:
     # A = 10^(9/40): the alpha recipe is real only below
     # (A + 1/A)/(A + 1/A - 2) = 8.2869...; beyond it the raw math would
     # fail with a bare "math domain error".
-    with pytest.raises(ValueError, match="too steep"):
+    with pytest.raises(ValueError, match=r"Shelf slope 'slope' = .* is too steep"):
         ph.filters.EQSection("lowshelf", 1000.0, gain_db=9.0, slope=12.0)
     # Just below the bound the design succeeds and is strictly stable.
     section = ph.filters.EQSection("lowshelf", 1000.0, gain_db=9.0, slope=8.0)
@@ -534,7 +538,7 @@ def test_bw_overflow_near_nyquist_raises_value_error() -> None:
     # The w0/sin(w0) warping factor diverges towards Nyquist: this bw/f0
     # pair used to escape as a raw OverflowError from math.sinh.
     section = ph.filters.EQSection("notch", 23999.0, bw=1.0)
-    with pytest.raises(ValueError, match="too wide"):
+    with pytest.raises(ValueError, match=r"Bandwidth 'bw' = .* is too wide"):
         ph.filters.ParametricEQ(FS, section)
 
 
@@ -565,13 +569,13 @@ def test_response_grid_validation() -> None:
     eq = ph.filters.ParametricEQ(
         FS, ph.filters.EQSection("peaking", 1000.0, gain_db=3.0)
     )
-    with pytest.raises(ValueError, match="n_points"):
+    with pytest.raises(ValueError, match=r"'n_points' must be at least"):
         eq.response(n_points=1)
-    with pytest.raises(ValueError, match="f_min"):
+    with pytest.raises(ValueError, match=r"Need 0 < f_min < f_max <= fs/2"):
         eq.response(f_min=0.0)
-    with pytest.raises(ValueError, match="f_min"):
+    with pytest.raises(ValueError, match=r"Need 0 < f_min < f_max <= fs/2"):
         eq.response(f_min=100.0, f_max=50.0)
-    with pytest.raises(ValueError, match="f_min"):
+    with pytest.raises(ValueError, match=r"Need 0 < f_min < f_max <= fs/2"):
         eq.response(f_max=FS)
 
 
@@ -579,7 +583,7 @@ def test_response_rejects_cascade_short_of_its_sections() -> None:
     """Two rows of curves for three sections is not a response."""
     res = ph.filters.ParametricEQ(FS, _three_sections()).response(n_points=128)
     short = res.section_magnitude_db[:2]
-    with pytest.raises(ValueError, match="'section_magnitude_db'"):
+    with pytest.raises(ValueError, match=r"'section_magnitude_db' \(2\)"):
         dataclasses.replace(res, section_magnitude_db=short)
 
 
@@ -587,7 +591,7 @@ def test_response_rejects_cascade_taller_than_its_sections() -> None:
     """The silent direction: the plot loops over ``sections`` and drops the rest."""
     res = ph.filters.ParametricEQ(FS, _three_sections()).response(n_points=128)
     tall = np.vstack([res.section_magnitude_db, res.section_magnitude_db[:1]])
-    with pytest.raises(ValueError, match="'section_magnitude_db'"):
+    with pytest.raises(ValueError, match=r"'section_magnitude_db' \(4\)"):
         dataclasses.replace(res, section_magnitude_db=tall)
 
 
@@ -603,7 +607,7 @@ def test_response_rejects_sos_block_short_of_its_sections() -> None:
     """The cascade that leaves here to be filtered with must be the drawn one."""
     res = ph.filters.ParametricEQ(FS, _three_sections()).response(n_points=128)
     short_sos = res.sos[:2]
-    with pytest.raises(ValueError, match="'sos'"):
+    with pytest.raises(ValueError, match=r"'sos' \(2\)"):
         dataclasses.replace(res, sos=short_sos)
 
 
@@ -639,6 +643,6 @@ def test_plot_rejects_unknown_language() -> None:
     res = ph.filters.ParametricEQ(
         FS, ph.filters.EQSection("peaking", 1000.0, gain_db=3.0)
     ).response(n_points=64)
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language 'xx'"):
         res.plot(language="xx")
     plt.close("all")

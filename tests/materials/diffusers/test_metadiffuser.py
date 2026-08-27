@@ -215,13 +215,17 @@ def test_panel_validation() -> None:
     with pytest.raises(ValueError, match="at least two wells"):
         metadiffuser_reflection(f, [ABSORBER], depth=0.03, period=0.10)
     not_a_well = [ABSORBER, 0.01]
-    with pytest.raises(TypeError, match="MetadiffuserWell"):
+    with pytest.raises(
+        TypeError, match=r"wells\[1\] must be a MetadiffuserWell or None"
+    ):
         metadiffuser_reflection(f, not_a_well, depth=0.03, period=0.10)
     too_tall = [ABSORBER, _well(110.0, 5.0, 20.0, 4.0, 20.0)]
     with pytest.raises(ValueError, match="smaller than the period"):
         metadiffuser_reflection(f, too_tall, depth=0.03, period=0.10)
     empty_band = np.array([])
-    with pytest.raises(ValueError, match="non-empty"):
+    with pytest.raises(
+        ValueError, match=r"'frequencies' must be a non-empty 1-D sequence"
+    ):
         metadiffuser_diffusion_spectrum(
             empty_band, [ABSORBER, None], depth=0.03, period=0.10
         )
@@ -241,7 +245,7 @@ def test_square_resonator_geometry_and_validation() -> None:
         resonator_geometry="square",
     )
     assert result.reflection.shape == (2, 2)
-    with pytest.raises(ValueError, match="geometry"):
+    with pytest.raises(ValueError, match=r"'resonator_geometry' must be one of"):
         metadiffuser_reflection(
             f,
             [ABSORBER, None],
@@ -275,6 +279,6 @@ def test_result_plots_render_and_validate() -> None:
         absorption=result.absorption,
         well_absorption=result.well_absorption,
     )
-    with pytest.raises(ValueError, match="retain"):
+    with pytest.raises(ValueError, match=r"This result does not retain its geometry"):
         bare.plot_geometry()
     plt.close("all")

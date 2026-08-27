@@ -64,9 +64,9 @@ def test_enclosed_gas_true_atmosphere() -> None:
 
 
 def test_enclosed_gas_bad_porosity_raises() -> None:
-    with pytest.raises(ValueError, match="porosity"):
+    with pytest.raises(ValueError, match=r"'porosity' must be in the range"):
         materials.enclosed_gas_stiffness(0.02, 0.0)
-    with pytest.raises(ValueError, match="porosity"):
+    with pytest.raises(ValueError, match=r"'porosity' must be in the range"):
         materials.enclosed_gas_stiffness(0.02, 1.5)
 
 
@@ -105,7 +105,10 @@ def test_intermediate_resistivity_adds_gas() -> None:
 
 
 def test_low_resistivity_negligible_gas_warns_and_uses_apparent() -> None:
-    with pytest.warns(DynamicStiffnessWarning, match="disregarded"):
+    with pytest.warns(
+        DynamicStiffnessWarning,
+        match=r"s' is taken as s't with the enclosed-gas term disregarded",
+    ):
         s = materials.installed_dynamic_stiffness(
             20e6, 5.0, gas_stiffness=1e6
         )  # 5 % of s't
@@ -113,7 +116,10 @@ def test_low_resistivity_negligible_gas_warns_and_uses_apparent() -> None:
 
 
 def test_low_resistivity_significant_gas_is_unresolvable() -> None:
-    with pytest.warns(DynamicStiffnessWarning, match="cannot resolve"):
+    with pytest.warns(
+        DynamicStiffnessWarning,
+        match=r"non-negligible enclosed-gas stiffness, EN 29052-1 cannot resolve",
+    ):
         s = materials.installed_dynamic_stiffness(
             20e6, 5.0, gas_stiffness=5e6
         )  # 25 % of s't
@@ -146,7 +152,10 @@ def test_chain_high_resistivity_ignores_gas() -> None:
 
 
 def test_chain_requires_gas_inputs_below_100() -> None:
-    with pytest.raises(ValueError, match="thickness.*porosity"):
+    with pytest.raises(
+        ValueError,
+        match=r"'thickness' and 'porosity' are required for the enclosed-gas term",
+    ):
         materials.floating_floor_resonance(25.0, 200.0, 100.0, airflow_resistivity=50.0)
 
 
@@ -154,13 +163,13 @@ def test_chain_requires_gas_inputs_below_100() -> None:
 # Validation
 # ---------------------------------------------------------------------------
 def test_non_positive_inputs_raise() -> None:
-    with pytest.raises(ValueError, match="resonant_frequency"):
+    with pytest.raises(ValueError, match=r"'resonant_frequency' must be positive"):
         materials.apparent_dynamic_stiffness(0.0, 200.0)
-    with pytest.raises(ValueError, match="total_mass_per_area"):
+    with pytest.raises(ValueError, match=r"'total_mass_per_area' must be positive"):
         materials.apparent_dynamic_stiffness(25.0, 0.0)
-    with pytest.raises(ValueError, match="mass_per_area"):
+    with pytest.raises(ValueError, match=r"'mass_per_area' must be positive"):
         materials.natural_frequency(10e6, 0.0)
-    with pytest.raises(ValueError, match="airflow_resistivity"):
+    with pytest.raises(ValueError, match=r"'airflow_resistivity' must be positive"):
         materials.installed_dynamic_stiffness(20e6, 0.0)
 
 

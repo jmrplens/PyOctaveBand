@@ -71,7 +71,7 @@ def test_packet_stays_plane_and_supports_carrier() -> None:
 
 def test_packet_validation() -> None:
     sim = FDTD2D(C0, DX, shape=(20, 20))
-    with pytest.raises(ValueError, match="direction"):
+    with pytest.raises(ValueError, match=r"'direction' must be"):
         sim.add_plane_wave("north", center=0.1, width=0.02)
     with pytest.raises(ValueError, match="'width' must be positive"):
         sim.add_plane_wave("down", center=0.1, width=0.0)
@@ -143,10 +143,10 @@ def test_plane_source_steady_state_is_plane_and_one_way() -> None:
 def test_plane_source_validation_and_geometry_preview() -> None:
     sim = FDTD2D(C0, DX, shape=(40, 40))
     bad_direction = PlaneWaveSource("sideways", lambda t: 0.0)
-    with pytest.raises(ValueError, match="direction"):
+    with pytest.raises(ValueError, match=r"'direction' must be"):
         sim.add_source(bad_direction)
     bad_offset = PlaneWaveSource("down", lambda t: 0.0, offset=40)
-    with pytest.raises(ValueError, match="offset"):
+    with pytest.raises(ValueError, match=r"plane-wave offset lies outside the grid"):
         sim.add_source(bad_offset)
     sim.add_source(PlaneWaveSource("left", lambda t: 0.0, offset=2))
     assert len(sim._plane_sources) == 1
@@ -155,5 +155,7 @@ def test_plane_source_validation_and_geometry_preview() -> None:
     mask[5, 10:20] = True
     blocked = FDTD2D(C0, DX, shape=(40, 40), obstacle_mask=mask)
     on_obstacle = PlaneWaveSource("down", lambda t: 0.0, offset=5)
-    with pytest.raises(ValueError, match="obstacle"):
+    with pytest.raises(
+        ValueError, match=r"plane-wave injection line crosses an obstacle"
+    ):
         blocked.add_source(on_obstacle)

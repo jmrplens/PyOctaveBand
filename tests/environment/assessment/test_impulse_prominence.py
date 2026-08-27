@@ -81,11 +81,15 @@ def test_rating_level_energy_average() -> None:
 
 
 def test_invalid_inputs_raise() -> None:
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(
+        ValueError, match=r"onset_rate and level_difference must be positive"
+    ):
         nt.predicted_prominence(0.0, 10.0)
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(
+        ValueError, match=r"onset_rate and level_difference must be positive"
+    ):
         nt.predicted_prominence(100.0, -1.0)
-    with pytest.raises(ValueError, match="at least one"):
+    with pytest.raises(ValueError, match="at least one impulse is required"):
         nt.impulse_prominence([], [])
     with pytest.raises(
         ValueError,
@@ -97,9 +101,11 @@ def test_invalid_inputs_raise() -> None:
         match=r"rating_level: 'laeq' .*'adjustment' .*'durations' .*same shape",
     ):
         nt.rating_level([70.0, 60.0], [0.0], [30.0, 30.0], 60.0)
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(
+        ValueError, match=r"reference_time and durations must be positive"
+    ):
         nt.rating_level([70.0], [0.0], [30.0], 0.0)
-    with pytest.raises(ValueError, match="at least one"):
+    with pytest.raises(ValueError, match="at least one sub-interval is required"):
         nt.rating_level([], [], [], 60.0)
 
 
@@ -119,7 +125,10 @@ def test_onset_rate_gate_zeroes_non_qualifying_impulses() -> None:
     (clause 4.5): a 5 dB/s level rise (P = 5.30 for LD = 40 dB) must not
     yield KI > 0.
     """
-    with pytest.warns(nt.ImpulseProminenceWarning, match="10 dB/s"):
+    with pytest.warns(
+        nt.ImpulseProminenceWarning,
+        match=r"onset rates .*do not qualify as impulses",
+    ):
         res = nt.impulse_prominence([5.0], [40.0])
     assert res.qualifies.tolist() == [False]
     assert res.per_impulse[0] == pytest.approx(5.303, abs=2e-3)
@@ -154,7 +163,9 @@ def test_assessment_period_defaults_and_validates() -> None:
     assert other.prominence == pytest.approx(default.prominence)
 
     for bad in (0.0, -5.0, float("nan"), float("inf")):
-        with pytest.raises(ValueError, match="assessment_period_min"):
+        with pytest.raises(
+            ValueError, match=r"assessment_period_min must be positive and finite"
+        ):
             nt.impulse_prominence([1200.0], [32.0], assessment_period_min=bad)
 
 
@@ -175,7 +186,9 @@ def test_per_impulse_columns_that_disagree_are_refused(trim: bool) -> None:
     )
     values = np.asarray(result.qualifies)
     wrong = values[:-1] if trim else np.append(values, values[-1])
-    with pytest.raises(ValueError, match="per impulse"):
+    with pytest.raises(
+        ValueError, match=r"'qualifies' \(\d+\) must each carry one value per impulse"
+    ):
         dataclasses.replace(result, qualifies=wrong)
 
 

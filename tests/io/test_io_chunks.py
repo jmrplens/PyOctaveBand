@@ -188,7 +188,9 @@ def test_bext_unset_loudness_sentinel_reads_as_none(tmp_path: Path) -> None:
 def test_bext_shorter_than_fixed_part_is_rejected(tmp_path: Path) -> None:
     image = pcm_wav(TONE, extra_chunks=chunk(b"bext", bytes(100)))
     path = _write(tmp_path, image)
-    with pytest.raises(ValueError, match="602"):
+    with pytest.raises(
+        ValueError, match=r"bext chunk is .* bytes; the EBU Tech 3285 fixed part is 602"
+    ):
         parse_wav_chunks(path)
 
 
@@ -311,7 +313,10 @@ def test_rf64_sentinel_without_ds64_is_rejected(tmp_path: Path) -> None:
         fourcc=b"RF64",
     )
     path = _write(tmp_path, image)
-    with pytest.raises(ValueError, match="ds64"):
+    with pytest.raises(
+        ValueError,
+        match=r"RF64 data chunk defers its size to a ds64 chunk that never appeared",
+    ):
         parse_wav_chunks(path)
 
 

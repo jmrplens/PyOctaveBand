@@ -204,12 +204,12 @@ def test_surface_speed_increases_with_temperature() -> None:
 
 
 def test_unknown_model_rejected() -> None:
-    with pytest.raises(ValueError, match="model"):
+    with pytest.raises(ValueError, match=r"'model' must be one of"):
         sea_water_sound_speed(10.0, 35.0, 100.0, model="wilson")
 
 
 def test_negative_depth_rejected() -> None:
-    with pytest.raises(ValueError, match="depth"):
+    with pytest.raises(ValueError, match=r"'depth' must be non-negative"):
         sea_water_sound_speed(10.0, 35.0, -5.0)
 
 
@@ -227,7 +227,7 @@ def test_profile_gradient_and_shape() -> None:
 
 
 def test_profile_requires_increasing_depths() -> None:
-    with pytest.raises(ValueError, match="increasing"):
+    with pytest.raises(ValueError, match=r"'depths' must be strictly increasing"):
         sound_speed_profile([0.0, 100.0, 50.0], 10.0, 35.0)
 
 

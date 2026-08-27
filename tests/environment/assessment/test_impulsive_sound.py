@@ -261,7 +261,7 @@ def test_level_history_interval_within_range() -> None:
 
 def test_rejects_sample_interval_outside_range() -> None:
     sig = _tone(1000.0, 0.5, 1.0)
-    with pytest.raises(ValueError, match="10-25 ms"):
+    with pytest.raises(ValueError, match=r"dt must be within"):
         iso.sound_pressure_level_history(sig, FS, dt=0.05)
 
 
@@ -273,12 +273,12 @@ def test_rejects_non_positive_fs() -> None:
 
 def test_rejects_empty_signal() -> None:
     empty = np.array([])
-    with pytest.raises(ValueError, match="must not be empty"):
+    with pytest.raises(ValueError, match="signal must not be empty"):
         iso.sound_pressure_level_history(empty, FS)
 
 
 def test_detect_onsets_rejects_short_input() -> None:
-    with pytest.raises(ValueError, match="at least two"):
+    with pytest.raises(ValueError, match="at least two level samples are required"):
         iso.detect_onsets([40.0], DT)
 
 

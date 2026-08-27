@@ -119,7 +119,7 @@ def test_layered_result_retains_layers_and_draws() -> None:
         absorption=res.absorption,
         transfer_matrix=res.transfer_matrix,
     )
-    with pytest.raises(ValueError, match="does not retain"):
+    with pytest.raises(ValueError, match=r"does not retain its layers"):
         bare.plot_geometry()
 
 
@@ -159,7 +159,7 @@ def test_diffuser_response_retains_wells_and_draws() -> None:
         reflection=np.exp(-2j * np.pi * np.arange(7) / 7),
     )
     assert explicit.depths is None
-    with pytest.raises(ValueError, match="does not retain"):
+    with pytest.raises(ValueError, match=r"does not retain its well geometry"):
         explicit.plot_geometry()
 
 
@@ -191,7 +191,7 @@ def test_transfer_matrix_geometry_paths() -> None:
     f = np.array([500.0, 1000.0])
     k = 2.0 * np.pi * f / 343.2
     hand_built = m.air_layer_transfer_matrix(k, 0.05, 413.0)
-    with pytest.raises(ValueError, match="does not retain"):
+    with pytest.raises(ValueError, match=r"does not retain its tube geometry"):
         hand_built.plot_geometry()
 
 
@@ -214,13 +214,13 @@ def test_impedance_tube_sample_patch_is_to_scale() -> None:
 
 
 def test_qrd_geometry_validation() -> None:
-    with pytest.raises(ValueError, match="non-empty"):
+    with pytest.raises(ValueError, match=r"'depths' must be a non-empty 1-D sequence"):
         m.plot_qrd_geometry([], 0.12)
-    with pytest.raises(ValueError, match="'depths' must be non-negative"):
+    with pytest.raises(ValueError, match=r"'depths' must be non-negative"):
         m.plot_qrd_geometry([-0.01], 0.12)
-    with pytest.raises(ValueError, match="well_width"):
+    with pytest.raises(ValueError, match=r"'well_width' must be positive"):
         m.plot_qrd_geometry([0.05], 0.0)
-    with pytest.raises(ValueError, match="periods"):
+    with pytest.raises(ValueError, match=r"'periods' must be >="):
         m.plot_qrd_geometry([0.05], 0.12, periods=0)
 
 
@@ -234,7 +234,10 @@ def test_qrd_geometry_refuses_a_nan_well_depth() -> None:
 
 
 def test_transmission_tube_validation() -> None:
-    with pytest.raises(ValueError, match="must exceed"):
+    with pytest.raises(
+        ValueError,
+        match=r"'l2' is measured from the front face and must exceed 'thickness'",
+    ):
         m.plot_transmission_tube_geometry(
             l1=0.1, s1=0.03, l2=0.04, s2=0.03, thickness=0.05
         )
@@ -242,7 +245,7 @@ def test_transmission_tube_validation() -> None:
         m.plot_transmission_tube_geometry(
             l1=0.1, s1=0.0, l2=0.15, s2=0.03, thickness=0.05
         )
-    with pytest.raises(ValueError, match="diameter"):
+    with pytest.raises(ValueError, match=r"'diameter' must be positive"):
         m.plot_transmission_tube_geometry(
             l1=0.1, s1=0.03, l2=0.15, s2=0.03, thickness=0.05, diameter=-1.0
         )
@@ -306,9 +309,9 @@ def test_slit_absorber_geometry_refuses_a_nan_lattice_step() -> None:
 def test_impedance_tube_validation() -> None:
     with pytest.raises(ValueError, match="'x1' must exceed 'spacing'"):
         m.plot_impedance_tube_geometry(spacing=0.05, x1=0.04)
-    with pytest.raises(ValueError, match="diameter"):
+    with pytest.raises(ValueError, match=r"'diameter' must be positive"):
         m.plot_impedance_tube_geometry(spacing=0.05, x1=0.15, diameter=-0.1)
-    with pytest.raises(ValueError, match="sample_thickness"):
+    with pytest.raises(ValueError, match=r"'sample_thickness' must be positive"):
         m.plot_impedance_tube_geometry(spacing=0.05, x1=0.15, sample_thickness=0.0)
     with pytest.raises(ValueError, match="Unknown language"):
         m.plot_impedance_tube_geometry(spacing=0.05, x1=0.15, language="de")
@@ -320,16 +323,18 @@ def test_slit_geometry_validation() -> None:
         m.plot_slit_absorber_geometry(
             resonator, slit_height=0.0, lattice_step=0.015, period=0.02
         )
-    with pytest.raises(ValueError, match="at least one"):
+    with pytest.raises(
+        ValueError, match=r"'resonators' must contain at least one resonator"
+    ):
         m.plot_slit_absorber_geometry(
             [], slit_height=0.002, lattice_step=0.015, period=0.02
         )
 
 
 def test_absorber_stack_validation() -> None:
-    with pytest.raises(ValueError, match="at least one"):
+    with pytest.raises(ValueError, match=r"'layers' must contain at least one layer"):
         m.plot_absorber_stack([])
-    with pytest.raises(TypeError, match="Unsupported layer"):
+    with pytest.raises(TypeError, match=r"Unsupported layer type"):
         m.plot_absorber_stack([object()])
 
 

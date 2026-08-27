@@ -98,7 +98,10 @@ def test_stateful_steady_ic_initialization() -> None:
     # expected here: assert it rather than leak it to the run summary.
     from phonometry.filters.core import FilterBankWarning
 
-    with pytest.warns(FilterBankWarning, match="Detrending"):
+    with pytest.warns(
+        FilterBankWarning,
+        match=r"Detrending is not recommended during block processing",
+    ):
         bank.filter(test_signal)
 
     # Check that zi is a list of numpy arrays with the expected shape
@@ -167,5 +170,7 @@ def test_detrend_stateful_warning() -> None:
         design=FilterDesign(resample=False),
         block_processing=BlockProcessing(stateful=True),
     )
-    with pytest.warns(UserWarning, match="block processing"):
+    with pytest.warns(
+        UserWarning, match=r"Detrending is not recommended during block processing"
+    ):
         bank.filter(signal, detrend=True)

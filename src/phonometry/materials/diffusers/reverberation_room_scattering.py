@@ -197,7 +197,7 @@ def speed_of_sound(temperature: ArrayLike) -> Real:
     t = np.asarray(temperature, dtype=np.float64)
     kelvin = _T0 + t
     if np.any(kelvin <= 0.0):
-        msg = "'temperature' must exceed -273,15 degC."
+        msg = "'temperature' must exceed -273.15 degC."
         raise ValueError(msg)
     return np.asarray(_C_REF * np.sqrt(kelvin / _T_REF_K), dtype=np.float64)
 

@@ -180,10 +180,10 @@ def test_cheby2_low_attenuation_raises() -> None:
     """attenuation <= 3.01 dB has no -3 dB point: must raise, not produce NaN."""
     from phonometry.filters.design import _cheby2_transition_ratio
 
-    with pytest.raises(ValueError, match="3.01"):
+    with pytest.raises(ValueError, match=r"cheby2 'attenuation' must be greater than"):
         _cheby2_transition_ratio(order=6, attenuation=3.0)
     low_attenuation = filters.FilterDesign(filter_type="cheby2", attenuation=2.0)
-    with pytest.raises(ValueError, match="3.01"):
+    with pytest.raises(ValueError, match=r"cheby2 'attenuation' must be greater than"):
         filters.OctaveFilterBank(fs=48000, fraction=3, design=low_attenuation)
 
 

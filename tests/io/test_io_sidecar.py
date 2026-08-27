@@ -103,7 +103,7 @@ def test_foreign_json_at_the_reserved_name_is_refused(tmp_path: Path) -> None:
     audio = tmp_path / "meas.wav"
     write(audio, np.zeros(8), FS)
     sidecar_path(audio).write_text('{"unrelated": true}')
-    with pytest.raises(ValueError, match="phonometry-calibration"):
+    with pytest.raises(ValueError, match=r"not a 'phonometry-calibration' sidecar"):
         read(audio)
 
 
@@ -114,7 +114,10 @@ def test_newer_schema_versions_are_refused_by_name(tmp_path: Path) -> None:
     payload = json.loads(target.read_text())
     payload["schema_version"] = SIDECAR_VERSION + 1
     target.write_text(json.dumps(payload))
-    with pytest.raises(ValueError, match="upgrade phonometry"):
+    with pytest.raises(
+        ValueError,
+        match=r"sidecar schema version .* is newer than the version .* this phonometry",
+    ):
         read_sidecar(audio)
 
 
@@ -132,7 +135,10 @@ def test_malformed_fields_are_refused(tmp_path: Path) -> None:
     }
     for corruption, message in (
         ({"calibration_factor": "loud"}, "must be a number"),
-        ({"calibration_factor": -1.0}, "finite and positive"),
+        (
+            {"calibration_factor": -1.0},
+            "calibration_factor must be finite and positive",
+        ),
         ({"channel_labels": [1, 2]}, "array of strings"),
         ({"reference_spl": "94"}, "must be a number"),
     ):
@@ -145,17 +151,23 @@ def test_malformed_fields_are_refused(tmp_path: Path) -> None:
 
 
 def test_the_dataclass_itself_rejects_a_nonpositive_factor() -> None:
-    with pytest.raises(ValueError, match="finite and positive"):
+    with pytest.raises(
+        ValueError, match=r"calibration_factor must be finite and positive"
+    ):
         CalibrationSidecar(calibration_factor=0.0)
 
 
 def test_write_sidecar_true_requires_a_calibrated_signal(
     tmp_path: Path,
 ) -> None:
-    with pytest.raises(ValueError, match="calibration_factor"):
+    with pytest.raises(
+        ValueError, match=r"sidecar=True needs a Signal with a calibration_factor"
+    ):
         write(tmp_path / "x.wav", np.zeros(8), FS, sidecar=True)
     uncalibrated = Signal(data=np.zeros(8), fs=FS)
-    with pytest.raises(ValueError, match="calibration_factor"):
+    with pytest.raises(
+        ValueError, match=r"sidecar=True needs a Signal with a calibration_factor"
+    ):
         write(tmp_path / "x.wav", uncalibrated, sidecar=True)
 
 

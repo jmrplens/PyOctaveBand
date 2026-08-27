@@ -646,7 +646,7 @@ def test_eigenrays_declines_a_sloping_trace() -> None:
         n_steps=401,
         bathymetry=([0.0, 2000.0], [200.0, 150.0]),
     )
-    with pytest.raises(ValueError, match="sloping bottom|Snell"):
+    with pytest.raises(ValueError, match=r"'trace' was made over a sloping bottom"):
         eigenrays(trace, receiver_range=1500.0, receiver_depth=80.0)
 
 
@@ -670,13 +670,21 @@ def test_the_seabed_pair_and_a_slope_are_rejected_together() -> None:
 def test_invalid_bathymetry_is_rejected() -> None:
     """Each way a polyline can be malformed has its own message."""
     good = {"source_depth": 60.0, "launch_angles_deg": [10.0], "max_range": 1000.0}
-    with pytest.raises(ValueError, match="pair"):
+    with pytest.raises(
+        ValueError,
+        match=r"'bathymetry' must be a \(ranges_m, depths_m\) pair of arrays",
+    ):
         ray_trace([0.0, 200.0], [_C, _C], **good, bathymetry=([0.0, 1000.0],))  # type: ignore[arg-type]
     with pytest.raises(ValueError, match=r"ray_trace: 'bathymetry ranges'.*same shape"):
         ray_trace([0.0, 200.0], [_C, _C], **good, bathymetry=([0.0, 1000.0], [200.0]))
-    with pytest.raises(ValueError, match="at least two points"):
+    with pytest.raises(
+        ValueError,
+        match=r"the two halves of 'bathymetry' must carry at least two points",
+    ):
         ray_trace([0.0, 200.0], [_C, _C], **good, bathymetry=([0.0], [200.0]))
-    with pytest.raises(ValueError, match="strictly increasing"):
+    with pytest.raises(
+        ValueError, match=r"the bathymetry ranges must be strictly increasing"
+    ):
         ray_trace(
             [0.0, 200.0],
             [_C, _C],
@@ -687,7 +695,9 @@ def test_invalid_bathymetry_is_rejected() -> None:
         ray_trace(
             [0.0, 200.0], [_C, _C], **good, bathymetry=([100.0, 1000.0], [200.0, 150.0])
         )
-    with pytest.raises(ValueError, match="strictly positive"):
+    with pytest.raises(
+        ValueError, match=r"the bathymetry depths must be strictly positive"
+    ):
         ray_trace(
             [0.0, 200.0], [_C, _C], **good, bathymetry=([0.0, 1000.0], [200.0, 0.0])
         )
@@ -695,12 +705,14 @@ def test_invalid_bathymetry_is_rejected() -> None:
         ray_trace(
             [0.0, 200.0], [_C, _C], **good, bathymetry=([0.0, 1000.0], [200.0, 250.0])
         )
-    with pytest.raises(ValueError, match="must be finite"):
+    with pytest.raises(ValueError, match=r"the bathymetry must be finite"):
         ray_trace(
             [0.0, 200.0], [_C, _C], **good, bathymetry=([0.0, np.nan], [200.0, 150.0])
         )
     # A source below the local water column at r = 0 is outside the medium.
-    with pytest.raises(ValueError, match="water column"):
+    with pytest.raises(
+        ValueError, match=r"'source_depth' must lie within the water column"
+    ):
         ray_trace(
             [0.0, 200.0],
             [_C, _C],

@@ -74,17 +74,19 @@ def test_int16_codes_pass_through_flac_bit_exact(tmp_path: Path) -> None:
 
 @needs_soundfile
 def test_flac_refuses_what_it_cannot_hold(tmp_path: Path) -> None:
-    with pytest.raises(ValueError, match="24 bits"):
+    with pytest.raises(ValueError, match=r"FLAC stores integers up to 24 bits"):
         write(tmp_path / "x.flac", np.zeros(4, dtype=np.int32), FS)
     for subtype in ("PCM_32", "FLOAT", "DOUBLE"):
-        with pytest.raises(ValueError, match="24 bits"):
+        with pytest.raises(ValueError, match=r"FLAC holds integer PCM up to 24 bits"):
             write(tmp_path / "x.flac", np.zeros(4), FS, subtype=subtype)
 
 
 @needs_soundfile
 def test_flac_clipping_is_saturated_and_announced(tmp_path: Path) -> None:
     path = tmp_path / "hot.flac"
-    with pytest.warns(ClippingWarning, match="1 of 2"):
+    with pytest.warns(
+        ClippingWarning, match=r"1 of 2 samples exceed the full-scale range"
+    ):
         write(path, np.array([1.5, -0.5]), FS, subtype="PCM_16")
     assert np.asarray(read(path)).tolist() == [32767 / 32768, -0.5]
 

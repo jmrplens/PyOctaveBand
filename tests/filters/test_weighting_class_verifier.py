@@ -232,7 +232,7 @@ def test_sweep_result_reported_for_compliant_filter() -> None:
     assert set(between) == {"worst_freq", "margin_class1_db", "margin_class2_db"}
     assert between["margin_class1_db"] >= 0.0
     wf = filters.WeightingFilter(48000, "A")
-    with pytest.raises(ValueError, match="sweep_points"):
+    with pytest.raises(ValueError, match=r"'sweep_points' must be at least"):
         filters.verify_weighting_class(wf, sweep_points=8)
 
 

@@ -230,22 +230,22 @@ def test_loudness_encoding_reproduces_the_tech3285_worked_examples(
 
 def test_oversize_fields_raise_instead_of_truncating(tmp_path: Path) -> None:
     long_originator = replace(fresh_metadata(), originator="x" * 33)
-    with pytest.raises(ValueError, match="Originator"):
+    with pytest.raises(ValueError, match=r"bext Originator is \d+ bytes"):
         write(tmp_path / "x.wav", np.zeros(4), FS, bext=long_originator)
     long_umid = replace(fresh_metadata(), umid=bytes(65))
-    with pytest.raises(ValueError, match="UMID"):
+    with pytest.raises(ValueError, match=r"bext UMID is \d+ bytes"):
         write(tmp_path / "x.wav", np.zeros(4), FS, bext=long_umid)
 
 
 def test_version_gating_is_enforced_on_write(tmp_path: Path) -> None:
     umid_on_v0 = replace(fresh_metadata(), version=0, umid=bytes(64))
-    with pytest.raises(ValueError, match="version >= 1"):
+    with pytest.raises(ValueError, match=r"bext version \d+ has no UMID field"):
         write(tmp_path / "x.wav", np.zeros(4), FS, bext=umid_on_v0)
     loudness_on_v1 = replace(fresh_metadata(), version=1, loudness_value=-23.0)
-    with pytest.raises(ValueError, match="version >= 2"):
+    with pytest.raises(ValueError, match=r"bext version \d+ has no loudness fields"):
         write(tmp_path / "x.wav", np.zeros(4), FS, bext=loudness_on_v1)
 
 
 def test_unknown_bext_argument_is_refused(tmp_path: Path) -> None:
-    with pytest.raises(ValueError, match="unknown bext"):
+    with pytest.raises(ValueError, match=r"unknown bext 'auto'"):
         write(tmp_path / "x.wav", np.zeros(4), FS, bext="auto")

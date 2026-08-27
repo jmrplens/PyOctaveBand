@@ -548,7 +548,7 @@ def test_diffusion_coefficient_rejects_zero_energy() -> None:
 
 
 def test_base_plate_checker_rejects_wrong_length() -> None:
-    with pytest.raises(ValueError, match="values for bands"):
+    with pytest.raises(ValueError, match=r"scattering must have \d+ values for bands"):
         check_base_plate_scattering([0.1, 0.2, 0.3])
 
 
@@ -611,7 +611,10 @@ def test_scattering_result_rejects_an_empty_spectrum() -> None:
     write when there is no band to take a range from.
     """
     empty = np.array([])
-    with pytest.raises(ValueError, match=r"ScatteringResult: 'frequencies'"):
+    with pytest.raises(
+        ValueError,
+        match=r"ScatteringResult: 'frequencies' must carry at least one band",
+    ):
         ScatteringResult(
             frequencies=empty,
             scattering=empty,
@@ -633,7 +636,9 @@ def test_scattering_result_rejects_a_non_finite_coefficient() -> None:
 
 def test_scattering_result_rejects_a_non_finite_band_centre() -> None:
     """A NaN band centre crashes the header's round(freqs.min()) anonymously."""
-    with pytest.raises(ValueError, match=r"'frequencies' must contain only finite"):
+    with pytest.raises(
+        ValueError, match=r"ScatteringResult: 'frequencies' must contain only finite"
+    ):
         ScatteringResult(
             frequencies=np.array([250.0, np.nan, 1000.0]),
             scattering=np.array([0.1, 0.3, 0.5]),
@@ -803,7 +808,10 @@ def test_diffusion_spectrum_rejects_an_empty_spectrum() -> None:
     "0 Hz to 0 Hz".
     """
     empty = np.array([])
-    with pytest.raises(ValueError, match=r"DiffusionSpectrum: 'frequencies'"):
+    with pytest.raises(
+        ValueError,
+        match=r"DiffusionSpectrum: 'frequencies' must carry at least one band",
+    ):
         DiffusionSpectrum(frequencies=empty, diffusion=empty)
 
 
@@ -826,7 +834,9 @@ def test_diffusion_spectrum_rejects_a_non_finite_band_centre() -> None:
     The bare "cannot convert float NaN to integer" names neither the field nor
     the result, so the band axis is pinned where it is built.
     """
-    with pytest.raises(ValueError, match=r"'frequencies' must contain only finite"):
+    with pytest.raises(
+        ValueError, match=r"DiffusionSpectrum: 'frequencies' must contain only finite"
+    ):
         DiffusionSpectrum(
             frequencies=np.array([250.0, np.nan, 1000.0]),
             diffusion=np.array([0.2, 0.4, 0.7]),

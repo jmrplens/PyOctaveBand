@@ -659,9 +659,9 @@ def test_unknown_category_and_surface_are_rejected() -> None:
 
 
 def test_invalid_inputs_are_rejected() -> None:
-    with pytest.raises(ValueError, match="positive number of km/h"):
+    with pytest.raises(ValueError, match="'speed' must be a positive number of km/h"):
         road_rolling_noise("1", 0.0)
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'temperature' must be a finite number"):
         road_rolling_noise("1", 50.0, temperature=float("nan"))
     with pytest.raises(ValueError, match="at least one vehicle category"):
         road_source_power([])
@@ -672,10 +672,12 @@ def test_invalid_inputs_are_rejected() -> None:
     with pytest.raises(ValueError, match="at most one flow per vehicle category"):
         road_source_power(repeated)
     negative = RoadTraffic(RoadVehicleCategory.LIGHT, -1.0, 50.0)
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(ValueError, match=r"'flow_rate' must be a non-negative number"):
         road_source_power(negative)
     power = np.array([90.0])
-    with pytest.raises(ValueError, match="positive number of metres"):
+    with pytest.raises(
+        ValueError, match="'length' must be a positive number of metres"
+    ):
         line_source_segment_power(power, 0.0)
 
 
@@ -753,13 +755,14 @@ def test_incomplete_database_is_rejected_as_an_invalid_input() -> None:
         temperature_k={"1": ROAD_COEFFICIENTS.temperature_k["1"]},
     )
     assert road_rolling_noise("1", 70.0, coefficients=partial).shape == (8,)
+    unknown = r"coefficient database has no category '3'"
     for call in (road_rolling_noise, road_propulsion_noise):
-        with pytest.raises(ValueError, match="no category '3'"):
+        with pytest.raises(ValueError, match=unknown):
             call("3", 70.0, coefficients=partial)
-    with pytest.raises(ValueError, match="no category '3'"):
+    with pytest.raises(ValueError, match=unknown):
         road_vehicle_sound_power("3", 70.0, coefficients=partial)
     heavy = RoadTraffic(RoadVehicleCategory.HEAVY, 100.0, 70.0)
-    with pytest.raises(ValueError, match="no category '3'"):
+    with pytest.raises(ValueError, match=unknown):
         road_source_power(heavy, coefficients=partial)
 
 
@@ -786,13 +789,17 @@ def test_studded_tyre_inputs_are_range_checked() -> None:
     (2.2.8) takes a negative argument, which would silently return NaN.
     """
     for fraction in (-0.1, 1.5):
-        with pytest.raises(ValueError, match="fraction in "):
+        with pytest.raises(
+            ValueError, match=r"'studded_fraction' must be a fraction in"
+        ):
             road_rolling_noise("1", 60.0, studded_fraction=fraction, studded_months=3.0)
     for months in (-1.0, 13.0):
-        with pytest.raises(ValueError, match="months in "):
+        with pytest.raises(
+            ValueError, match=r"'studded_months' must be a number of months in"
+        ):
             road_rolling_noise("1", 60.0, studded_fraction=0.5, studded_months=months)
     # The check runs for every category, not only the one it can affect.
-    with pytest.raises(ValueError, match="fraction in "):
+    with pytest.raises(ValueError, match=r"'studded_fraction' must be a fraction in"):
         road_rolling_noise("3", 60.0, studded_fraction=2.0)
     # The two extremes themselves are valid.
     assert road_rolling_noise(

@@ -180,12 +180,12 @@ def test_unknown_condition_raises() -> None:
 
 
 def test_negative_rating_raises() -> None:
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(ValueError, match=r"'dl_alpha' must be a non-negative, finite"):
         materials.single_number_rating_uncertainty(-1.0)
 
 
 def test_non_finite_raises() -> None:
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'alpha' must contain only finite"):
         materials.sound_absorption_coefficient_uncertainty([np.nan], [1000])
 
 
@@ -204,7 +204,7 @@ def test_spectra_of_unequal_length_are_refused(field: str) -> None:
         ref.ISO12999_2_TABLE4_ALPHA_S, ref.ISO12999_2_TABLE4_FREQ
     )
     one_short = getattr(res, field)[:-1]
-    with pytest.raises(ValueError, match=f"'{field}'"):
+    with pytest.raises(ValueError, match=rf"'{field}' \({len(one_short)}\)"):
         dataclasses.replace(res, **{field: one_short})
 
 
@@ -230,7 +230,7 @@ def test_single_number_carries_a_value_without_a_spectrum() -> None:
 # ---------------------------------------------------------------------------
 def test_plot_single_number_raises() -> None:
     res = materials.weighted_coefficient_uncertainty(0.7)
-    with pytest.raises(ValueError, match="single-number"):
+    with pytest.raises(ValueError, match=r"plot\(\) needs a per-band result"):
         res.plot()
 
 

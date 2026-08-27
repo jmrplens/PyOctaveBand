@@ -143,7 +143,7 @@ def _validate(
         msg = "'frequencies' must be positive."
         raise ValueError(msg)
     if temperature <= -_KELVIN:
-        msg = "'temperature' must be above absolute zero (-273,15 degC)."
+        msg = "'temperature' must be above absolute zero (-273.15 degC)."
         raise ValueError(msg)
     if not 0.0 <= relative_humidity <= _MAX_RELATIVE_HUMIDITY_PERCENT:
         msg = "'relative_humidity' must be within [0, 100] %."

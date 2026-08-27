@@ -109,7 +109,7 @@ def test_g_stateful_holds_its_reference_at_low_fs() -> None:
 
 
 def test_invalid_curve_message_mentions_g() -> None:
-    with pytest.raises(ValueError, match="G"):
+    with pytest.raises(ValueError, match=r"Weighting curve must be .*'G'"):
         filters.WeightingFilter(FS, "Q")
 
 

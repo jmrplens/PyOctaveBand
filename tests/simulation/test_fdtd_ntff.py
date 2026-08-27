@@ -485,14 +485,18 @@ def test_contour_probe_validation() -> None:
         sim.add_contour_probe(5, 49, 5, 10, frequencies=[F0])
     with pytest.raises(ValueError, match="open cell on both sides"):
         sim.add_contour_probe(10, 5, 5, 10, frequencies=[F0])
-    with pytest.raises(ValueError, match="positive finite"):
+    with pytest.raises(
+        ValueError, match=r"frequencies must be a non-empty 1D sequence of positive"
+    ):
         sim.add_contour_probe(5, 10, 5, 10, frequencies=[])
-    with pytest.raises(ValueError, match="positive finite"):
+    with pytest.raises(
+        ValueError, match=r"frequencies must be a non-empty 1D sequence of positive"
+    ):
         sim.add_contour_probe(5, 10, 5, 10, frequencies=[0.0])
     probe = sim.add_contour_probe(5, 10, 5, 10, frequencies=[F0])
-    with pytest.raises(ValueError, match="not tracked"):
+    with pytest.raises(ValueError, match=r"frequency .* is not tracked by this probe"):
         probe.phasors(999.0)
-    with pytest.raises(ValueError, match="no samples"):
+    with pytest.raises(ValueError, match=r"no samples accumulated yet"):
         probe.phasors(F0)
 
 
@@ -500,7 +504,7 @@ def test_contour_probe_rejects_touching_obstacles() -> None:
     mask = np.zeros((40, 50), dtype=bool)
     mask[18:22, 20:30] = True
     sim = FDTD2D(C0, 0.01, shape=(40, 50), obstacle_mask=mask)
-    with pytest.raises(ValueError, match="touch obstacle"):
+    with pytest.raises(ValueError, match=r"contour faces touch obstacle cells"):
         sim.add_contour_probe(20, 35, 10, 30, frequencies=[F0])
     sim.add_contour_probe(15, 35, 10, 30, frequencies=[F0])
 
@@ -523,15 +527,17 @@ def test_far_field_input_validation() -> None:
     sim.run(4)
     phasors = probe.phasors(F0)
     not_phasors = np.zeros(4)
-    with pytest.raises(TypeError, match="ContourPhasors"):
+    with pytest.raises(TypeError, match=r"contour must be a ContourPhasors"):
         far_field_from_contour(not_phasors, [0.0])  # type: ignore[arg-type]
-    with pytest.raises(ValueError, match="angles"):
+    with pytest.raises(
+        ValueError, match=r"angles must be a non-empty 1D sequence of finite"
+    ):
         far_field_from_contour(phasors, [])
-    with pytest.raises(ValueError, match="does not clear"):
+    with pytest.raises(ValueError, match=r"does not clear the contour"):
         far_field_from_contour(phasors, [0.0], distance=0.01)
-    with pytest.raises(ValueError, match="distance"):
+    with pytest.raises(ValueError, match=r"distance must be positive and finite"):
         far_field_from_contour(phasors, [0.0], distance=-1.0)
-    with pytest.raises(ValueError, match="speed_of_sound"):
+    with pytest.raises(ValueError, match=r"speed_of_sound must be positive and finite"):
         far_field_from_contour(phasors, [0.0], speed_of_sound=0.0)
 
 
@@ -545,7 +551,9 @@ def test_contour_phasors_subtract_mismatch() -> None:
     harmonic = p1.phasors(2.0 * F0)
     longer = p2.phasors(F0)
     shifted = p3.phasors(F0)
-    with pytest.raises(ValueError, match="different frequencies"):
+    with pytest.raises(
+        ValueError, match=r"cannot subtract phasors at different frequencies"
+    ):
         base.subtract(harmonic)
     with pytest.raises(
         ValueError,
@@ -555,7 +563,9 @@ def test_contour_phasors_subtract_mismatch() -> None:
         base.subtract(longer)
     # Same sample count, one cell along: only the coordinates disagree.
     assert shifted.positions.shape == base.positions.shape
-    with pytest.raises(ValueError, match="different contours"):
+    with pytest.raises(
+        ValueError, match=r"cannot subtract phasors sampled on different contours"
+    ):
         base.subtract(shifted)
 
 
