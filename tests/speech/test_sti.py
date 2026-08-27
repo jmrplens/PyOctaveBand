@@ -415,10 +415,11 @@ def test_invalid_inputs_raise() -> None:
 
 
 def test_mtf_above_1_3_warns_and_truncates() -> None:
+    over_unity = _uniform_mtf(1.4)
     with pytest.warns(
         UserWarning, match=r"Modulation transfer values above .* detected"
     ):
-        result = _sti_from_mtf(_uniform_mtf(1.4))
+        result = _sti_from_mtf(over_unity)
     assert result.sti == 1.0
 
 
