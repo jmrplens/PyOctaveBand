@@ -107,8 +107,11 @@ from scipy.special import fresnel, wofz
 
 from ..._internal.validation import (
     check_engine,
+    require_choice,
     require_positive,
     require_positive_array,
+    require_ranks,
+    require_same_length,
 )
 from ...materials.absorbers.porous import delany_bazley, miki
 
@@ -133,6 +136,11 @@ DEFAULT_FREQUENCIES: tuple[float, ...] = (
     4000.0,
     8000.0,
 )
+#: The diffraction models :func:`barrier_insertion_loss` implements, and the
+#: only tags a :class:`BarrierInsertionLoss` may carry: the fiche and the plot
+#: both name the model from this tag, so one they do not know would be printed
+#: as the basis of a prediction the library never made.
+_BARRIER_METHODS: tuple[str, ...] = ("kurze_anderson", "exact")
 #: Tolerance on |x|, x = sqrt(2*pi*N), below which x/tanh(x) is replaced by its
 #: x -> 0 limit of 1+0j (guards the 0/0 indeterminate form at N = 0).
 _X_OVER_TANH_EPS = 1e-9
@@ -623,7 +631,9 @@ class BarrierInsertionLoss:
         p_{\text{with}} \rvert`, in decibels, per frequency.
     :ivar fresnel_number: Fresnel number ``N`` per frequency (single-edge
         geometry; the double-edge ``N`` for a thick barrier).
-    :ivar method: Diffraction model used (``"kurze_anderson"`` or ``"exact"``).
+    :ivar method: Diffraction model used, and the tag the fiche and the plot
+        name it by: ``"kurze_anderson"`` or ``"exact"``, the two models the
+        library implements. Any other tag is refused at construction.
     :ivar ground: Whether the coherent four-path ground model was applied.
     :ivar source_height: Source height the loss was computed for, in metres,
         retained (with the other five geometry fields) so
@@ -648,6 +658,65 @@ class BarrierInsertionLoss:
     receiver_distance: float | None = None
     receiver_height: float | None = None
     thickness: float | None = None
+
+    def __post_init__(self) -> None:
+        """Pin the model tag, and the loss finite on its frequency axis.
+
+        :attr:`method` names the diffraction model the sheet cites as its
+        basis, and both readers resolve it through a dict of model phrases
+        with the tag itself as the silent default. Unpinned, any string
+        passed construction and came out the other side as an accredited
+        claim: ``method="ISO 9613-2 Dz"`` printed "Barrier insertion loss IL
+        predicted with ISO 9613-2 Dz, a wave-acoustics complement to the
+        tabulated ISO 9613-2:1996 screening term", naming as the applied
+        model the very formula the fiche exists to distinguish itself from.
+        The tag is pinned here to the two models
+        :func:`barrier_insertion_loss` implements, so the dict lookups it
+        feeds cannot miss.
+
+        The fiche prints one table row per entry of :attr:`frequencies`,
+        reading :attr:`insertion_loss` (and, verbose, the Fresnel number) at
+        the same indices, and the plot draws one against the other. Neither
+        reader names a field when the lengths disagree: a loss one long
+        crashes as matplotlib's bare "x and y must have same first
+        dimension", one short as an ``IndexError`` out of the table. This
+        refusal is raised at construction and says which field is short.
+
+        The loss must also cover at least one frequency. Three length-0 axes
+        agree with each other and pass every count above, and the sheet then
+        asks matplotlib to log-scale an axis with nothing on it, which comes
+        back as "Data cannot be log-scaled because all values are <= 0" --
+        a complaint about values, from a result that has none.
+
+        Every value must also be finite. The one producer,
+        :func:`barrier_insertion_loss`, computes the loss from a geometry
+        and frequency axis it has already pinned finite, so a NaN here is
+        never the library's own output; letting one through renders a
+        ``nan`` table cell under a BOXED ``IL = nan dB`` headline
+        (``np.mean`` computes through it), and with a declared requirement
+        the verdict dies on ``display_round(nan)`` with an anonymous
+        "cannot convert float NaN to integer".
+
+        :raises ValueError: if the method is not a model the library
+            implements, the loss covers no frequency, or the per-frequency
+            fields disagree in length or carry a non-finite value.
+        """
+        require_choice(self.method, "method", _BARRIER_METHODS)
+        require_ranks(self, frequencies=1, insertion_loss=1, fresnel_number=1)
+        require_same_length(
+            self, "frequencies", "insertion_loss", "fresnel_number", axis="frequency"
+        )
+        if np.asarray(self.frequencies).size == 0:
+            msg = (
+                "BarrierInsertionLoss: 'frequencies' must carry at least one "
+                "frequency; the insertion loss is empty."
+            )
+            raise ValueError(msg)
+        for name in ("frequencies", "insertion_loss", "fresnel_number"):
+            value = np.asarray(getattr(self, name), dtype=np.float64)
+            if not np.all(np.isfinite(value)):
+                msg = f"BarrierInsertionLoss: '{name}' must contain only finite values."
+                raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -898,7 +967,7 @@ def barrier_insertion_loss(
             )
         )
     else:
-        msg = f"unknown method {method!r}; options: 'kurze_anderson', 'exact'."
+        msg = f"unknown method {method!r}; options: {_BARRIER_METHODS}."
         raise ValueError(msg)
     return BarrierInsertionLoss(
         frequencies=f,

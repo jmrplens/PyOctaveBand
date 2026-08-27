@@ -454,3 +454,173 @@ def test_an_instrument_verdict_refuses_per_band_entries_that_disagree() -> None:
     )
     with pytest.raises(ValueError, match="'bands'"):
         dataclasses.replace(result, bands=result.bands[:-1])
+
+
+def test_a_verdict_whose_device_is_not_a_table_2_column_is_refused() -> None:
+    """Two readers dispatch on ``device``, and neither survives an unknown tag.
+
+    :func:`verify_intensity_class` checks the tag at the call, but a verdict
+    rewritten by hand reaches the plot's title lookup once the masks are drawn
+    and dies there with a bare ``KeyError`` naming the string alone, while the
+    fiche's basis strip labels the same result as a complete instrument.
+    """
+    import dataclasses
+
+    frequencies = np.array([250.0, 500.0, 1000.0, 2000.0])
+    result = emission.intensity_class_compliance(
+        np.full(frequencies.size, 20.0),
+        frequencies,
+        device="instrument",
+        spacing=0.025,
+    )
+    with pytest.raises(ValueError, match="'device' must be"):
+        dataclasses.replace(result, device="microphone")
+
+
+@pytest.mark.parametrize(
+    "field_name", ["frequency", "residual_index", "limit_class1", "limit_class2"]
+)
+def test_a_non_finite_band_of_the_verdict_is_refused(field_name: str) -> None:
+    """A NaN band prints as ``nan`` under a boxed verdict that still complies.
+
+    Every comparison the class rests on is ``>=`` against a mask, and a NaN
+    loses each of them silently: the band is marked failing, or the figure's
+    axis autoscaling stops inside matplotlib naming no field at all.
+    """
+    import dataclasses
+
+    frequencies = np.array([250.0, 500.0, 1000.0, 2000.0])
+    result = emission.intensity_class_compliance(
+        np.full(frequencies.size, 20.0),
+        frequencies,
+        device="instrument",
+        spacing=0.025,
+    )
+    values = np.asarray(getattr(result, field_name), dtype=float).copy()
+    values[1] = float("nan")
+    with pytest.raises(ValueError, match=f"'{field_name}' must be finite"):
+        dataclasses.replace(result, **{field_name: values})
+
+
+def test_a_non_finite_per_band_verdict_value_is_refused() -> None:
+    """The certificate's table and its boxed verdict read different keys.
+
+    The per-band rows print ``residual_index_db`` and the margin taken from
+    it, while the box reads ``margin_class<n>_db``; a NaN in one of them gave
+    an accredited verification certificate reading ``nan`` and ``+nan`` in the
+    results table while still declaring ``Class 1 - COMPLIES``. Every one of
+    these numbers descends from a spectrum the verifier validated finite.
+    """
+    import copy
+    import dataclasses
+
+    frequencies = np.array([250.0, 500.0, 1000.0, 2000.0])
+    result = emission.intensity_class_compliance(
+        np.full(frequencies.size, 20.0),
+        frequencies,
+        device="instrument",
+        spacing=0.025,
+    )
+    bands = tuple(copy.deepcopy(band) for band in result.bands)
+    bands[0]["residual_index_db"] = float("nan")
+    with pytest.raises(ValueError, match=r"'bands' must carry finite per-band"):
+        dataclasses.replace(result, bands=bands)
+
+
+def test_a_verdict_refuses_a_class_its_own_bands_do_not_derive() -> None:
+    """The box and the table are one statement, and the box is not measured.
+
+    The certificate prints the per-band classes in its table and the class of
+    the whole instrument in its box, so a summary that does not restate the
+    rows is the sheet contradicting itself. Built by hand it did: an
+    instrument with one band meeting no class at all, whose honest summary is
+    therefore ``None``, was accepted claiming class 1 and printed ``Class 1 -
+    COMPLIES (binding margin -6.81 dB)``, a negative binding margin beside the
+    word COMPLIES.
+
+    The producer cannot emit the pair: it derives the summary from the band
+    classes in one line. Only a result assembled by hand can hold it, which is
+    why the guard is at construction.
+    """
+    import dataclasses
+
+    frequencies = np.array([100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0])
+    measured = np.full(frequencies.size, 18.0)
+    measured[4] = 9.0  # this band meets neither class
+    result = emission.intensity_class_compliance(
+        measured, frequencies, device="instrument", spacing=0.012
+    )
+    assert result.overall_class is None
+    with pytest.raises(
+        ValueError, match=r"'overall_class' must be the class the bands derive"
+    ):
+        dataclasses.replace(result, overall_class=1)
+
+
+def test_a_verdict_refuses_a_class_attested_over_no_bands() -> None:
+    """A class over nothing is not a verdict, and the readers cannot hold it.
+
+    An instrument stripped of its bands kept its class, so the certificate
+    would have boxed a compliance class with an empty results table under it;
+    :meth:`binding_margin` gave the anonymous "min() iterable argument is
+    empty" instead, naming neither the field nor the result.
+    """
+    import dataclasses
+
+    frequencies = np.array([250.0, 500.0, 1000.0, 2000.0])
+    result = emission.intensity_class_compliance(
+        np.full(frequencies.size, 20.0), frequencies, device="instrument", spacing=0.025
+    )
+    empty = np.array([])
+    with pytest.raises(ValueError, match=r"'overall_class' is 1 but 'bands' is empty"):
+        dataclasses.replace(
+            result,
+            bands=(),
+            frequency=empty,
+            residual_index=empty,
+            limit_class1=empty,
+            limit_class2=empty,
+        )
+
+
+def test_a_verdict_refuses_a_class_that_is_no_designation() -> None:
+    """A class is a label the readers splice into a key, not a number.
+
+    ``1.0`` reads as class 1 to every comparison and builds
+    ``margin_class1.0_db``, a key no band carries, so it reached the boxed
+    statement as a bare ``KeyError`` naming neither the field nor the result.
+    """
+    import dataclasses
+
+    frequencies = np.array([250.0, 500.0, 1000.0, 2000.0])
+    result = emission.intensity_class_compliance(
+        np.full(frequencies.size, 20.0), frequencies, device="instrument", spacing=0.025
+    )
+    with pytest.raises(
+        ValueError, match=r"'overall_class' must be a class of \[1, 2\] or None"
+    ):
+        dataclasses.replace(result, overall_class=1.0)
+
+
+def test_a_narrow_numpy_nan_per_band_value_is_refused() -> None:
+    """A NaN margin held as ``np.float32`` is a NaN the boxed verdict misses.
+
+    ``np.float64`` subclasses ``float`` and ``np.float32`` does not, so a
+    single-precision NaN margin used to reach :meth:`binding_margin`, where
+    :func:`min` compares it away against whichever value it meets first and
+    returns a finite binding margin for a band that has none.
+    """
+    import copy
+    import dataclasses
+
+    frequencies = np.array([250.0, 500.0, 1000.0, 2000.0])
+    result = emission.intensity_class_compliance(
+        np.full(frequencies.size, 20.0),
+        frequencies,
+        device="instrument",
+        spacing=0.025,
+    )
+    bands = tuple(copy.deepcopy(band) for band in result.bands)
+    bands[1]["margin_class1_db"] = np.float32("nan")
+    with pytest.raises(ValueError, match=r"'bands' must carry finite per-band"):
+        dataclasses.replace(result, bands=bands)

@@ -322,6 +322,20 @@ def test_task_rejects_empty_samples() -> None:
         Task(samples=(), duration_hours=8.0)
 
 
+def test_task_rejects_nan_sample() -> None:
+    # A NaN sample would pass the emptiness check, make lex_8h NaN and stop
+    # the exposure plot inside matplotlib ("Axis limits cannot be NaN or
+    # Inf"), naming neither the task nor the sample.
+    with pytest.raises(ValueError, match="'samples' must contain only finite"):
+        Task(samples=(float("nan"), 84.0, 85.2), duration_hours=4.0)
+
+
+def test_task_rejects_nan_duration() -> None:
+    # NaN passes a bare `<= 0.0`; require_positive refuses it by name.
+    with pytest.raises(ValueError, match="'duration_hours' must be positive"):
+        Task(samples=(85.0,), duration_hours=float("nan"))
+
+
 def test_job_based_rejects_nonpositive_sample_duration() -> None:
     with pytest.raises(ValueError, match="sample_duration_hours"):
         job_based_exposure(
@@ -340,6 +354,82 @@ def test_duration_range_order_validated() -> None:
     )
     with pytest.raises(ValueError, match=r"duration_range must be \(T_min, T_max\)"):
         task_based_exposure([reversed_range])
+
+
+def test_result_rejects_an_unknown_strategy_tag() -> None:
+    """The fiche resolves the strategy through a dict to name its clause.
+
+    Unpinned, ``"daily"`` passed construction and died inside the renderer as
+    a bare ``KeyError: 'daily'``, naming neither the field, the class nor the
+    three strategies ISO 9612 defines.
+    """
+    import dataclasses
+
+    result = job_based_exposure([80.0, 82.0, 81.0, 83.0, 80.0], 8.0)
+    with pytest.raises(ValueError, match="'strategy' must be one of"):
+        dataclasses.replace(result, strategy="daily")
+
+
+def test_result_rejects_an_unknown_instrument_tag() -> None:
+    """``instrument`` is a ``Literal`` with no runtime force behind it.
+
+    The fiche's instrumentation line meets the same dict lookup, so
+    ``"Class 1"`` -- the human spelling of the tag ``"class1"`` -- reached it
+    as a bare ``KeyError: 'Class 1'`` out of the middle of the render.
+    """
+    import dataclasses
+
+    result = job_based_exposure([80.0, 82.0, 81.0, 83.0, 80.0], 8.0)
+    with pytest.raises(ValueError, match="'instrument' must be one of"):
+        dataclasses.replace(result, instrument="Class 1")
+
+
+@pytest.mark.parametrize(
+    "field_name",
+    ["lex_8h", "combined_standard_uncertainty", "expanded_uncertainty", "u1", "u2"],
+)
+def test_result_rejects_a_non_finite_level(field_name: str) -> None:
+    """Every level on the fiche is printed through ``display_round``.
+
+    Its ``math.floor`` dies on a NaN with "cannot convert float NaN to
+    integer", a crash that names no field, no class and no cause. Each
+    strategy computes these from samples already pinned finite, so a NaN is
+    never the library's own output.
+    """
+    import dataclasses
+
+    result = job_based_exposure([80.0, 82.0, 81.0, 83.0, 80.0], 8.0)
+    with pytest.raises(ValueError, match=f"ExposureResult: '{field_name}' must be"):
+        dataclasses.replace(result, **{field_name: float("nan")})
+
+
+def test_a_job_result_without_its_sampling_summary_is_refused() -> None:
+    """The sampling summary is Clause 15 d), and the fiche prints it always.
+
+    Built on the field defaults, the sheet rendered the literal string
+    ``None`` for the number of samples and a fabricated 0,0 for every
+    Formula (C.9) budget term, then closed on a normal PASS verdict: an
+    accredited page stating a zero uncertainty budget nobody measured. The
+    refusal names every term that is missing.
+    """
+    with pytest.raises(ValueError, match="'n_samples'.*must be supplied for a 'job'"):
+        ExposureResult(
+            lex_8h=82.0,
+            combined_standard_uncertainty=1.2,
+            expanded_uncertainty=2.0,
+            strategy="job",
+        )
+
+
+def test_a_task_result_without_its_task_contributions_is_refused() -> None:
+    """A task-based fiche renders one row per task (Clause 15 b)."""
+    with pytest.raises(ValueError, match="'tasks' is empty"):
+        ExposureResult(
+            lex_8h=85.0,
+            combined_standard_uncertainty=1.0,
+            expanded_uncertainty=1.65,
+            strategy="task",
+        )
 
 
 def test_result_dataclasses_are_frozen() -> None:

@@ -241,6 +241,42 @@ def test_candidate_below_20hz_rejected() -> None:
         wind_turbine_tonality(levels, freqs, tone_frequency=10.0)
 
 
+@pytest.mark.parametrize(
+    "field",
+    [
+        "tone_frequency",
+        "critical_bandwidth",
+        "tone_level",
+        "masking_level",
+        "tonality",
+        "audibility_criterion",
+        "tonal_audibility",
+    ],
+)
+def test_tonality_result_refuses_a_non_finite_metric(field: str) -> None:
+    """Every Formula 30-34 metric is pinned finite, by name, at construction.
+
+    The spectrum is validated finite and each metric descends from it, so no
+    producer emits a NaN here. One reaching the fiche prints ``nan dB`` in the
+    boxed result beside a confident audibility decision, or dies in the
+    metrics table's rounding with ``cannot convert float NaN to integer``.
+    """
+    import dataclasses
+
+    res = wind_turbine_tonality(*_synthetic_tone())
+    with pytest.raises(ValueError, match=rf"'{field}' must be finite"):
+        dataclasses.replace(res, **{field: float("nan")})
+
+
+def test_tonality_result_refuses_an_infinite_metric() -> None:
+    """Infinity is refused by the same guard: it overflows the same rounding."""
+    import dataclasses
+
+    res = wind_turbine_tonality(*_synthetic_tone())
+    with pytest.raises(ValueError, match=r"'tonal_audibility' must be finite"):
+        dataclasses.replace(res, tonal_audibility=float("inf"))
+
+
 def test_slant_distance_vertical_axis() -> None:
     """Formula 2: a vertical-axis turbine measures R0 = H + D."""
     h, d = 30.0, 20.0

@@ -216,3 +216,19 @@ def test_spectrum_must_run_over_one_band_axis() -> None:
     for field, value, fragment in cases:
         with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
             dataclasses.replace(good, **{field: value})
+
+
+def test_a_spectrum_refuses_a_quantity_tag_it_cannot_report() -> None:
+    """The tag decides what the sheet says and which way the verdict runs.
+
+    ``quantity`` is a ``Literal`` for the type checker only; at run time an
+    unexpected string used to fall through every ``== "sound_power_level"``
+    test, so a regenerated-noise spectrum with a typo'd tag rendered a
+    complete attenuation sheet on which 85 dB of duct noise PASSED a 40 dB
+    maximum requirement.
+    """
+    good = hvac.elbow_insertion_loss(
+        [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0], 0.4, lined=True
+    )
+    with pytest.raises(ValueError, match="'quantity' must be one of"):
+        dataclasses.replace(good, quantity="power")  # type: ignore[arg-type]

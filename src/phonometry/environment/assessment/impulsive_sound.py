@@ -143,7 +143,20 @@ class ImpulseProminenceResult:
         taken over the whole set, so a column short of a row leaves a sheet
         whose headline covers an impulse that is not in the table.
 
-        :raises ValueError: if the per-impulse columns disagree.
+        The set must hold at least one impulse: four length-0 columns agree
+        with each other, and the fiche then dies hunting the governing row in
+        numpy's bare "argmax of an empty sequence", naming neither the field
+        nor the result. :func:`impulse_prominence` refuses empty input for the
+        same reason.
+
+        The values must be finite: the producer accepts only positive, finite
+        onset rates and level differences, so ``P`` and ``KI`` are finite by
+        construction, and a NaN smuggled into a hand-built result would
+        otherwise render an affirmative prominence note around a ``nan``
+        (or crash the verdict row anonymously when a requirement is set).
+
+        :raises ValueError: if the per-impulse columns disagree, are empty,
+            or carry a non-finite value.
         """
         require_ranks(
             self,
@@ -160,6 +173,26 @@ class ImpulseProminenceResult:
             "qualifies",
             axis="impulse",
         )
+        if np.asarray(self.onset_rates).size == 0:
+            msg = (
+                "ImpulseProminenceResult: 'onset_rates' must carry at least "
+                "one impulse; all per-impulse columns are empty."
+            )
+            raise ValueError(msg)
+        for name in ("onset_rates", "level_differences", "per_impulse"):
+            if not np.all(np.isfinite(np.asarray(getattr(self, name), np.float64))):
+                msg = (
+                    f"ImpulseProminenceResult: '{name}' must contain only "
+                    "finite values."
+                )
+                raise ValueError(msg)
+        for name in ("prominence", "adjustment"):
+            value = getattr(self, name)
+            if not math.isfinite(float(value)):
+                msg = (
+                    f"ImpulseProminenceResult: '{name}' must be finite; got {value!r}."
+                )
+                raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

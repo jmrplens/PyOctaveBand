@@ -6,9 +6,9 @@ a valid single-page PDF is written for an open-plan result, the four
 single-number quantities carry the closed-form values of a documented synthetic
 measurement line, unknown engines/languages are rejected, XML specials in
 metadata do not break reportlab, the optional target-D2,S verdict renders both
-ways, a degenerate result (no in-range positions) still renders, and the
-Spanish fiche is translated with comma decimals. Pixel or layout content is
-never inspected.
+ways and is withheld when D2,S is not finite, a degenerate result (no in-range
+positions) still renders, and the Spanish fiche is translated with comma
+decimals. Pixel or layout content is never inspected.
 
 Oracle. The A-weighted speech level is collinear in the logarithmic distance
 axis, Lp,A,S(r) = 62.0 - 7.0*log2(r) dB, so the ISO 3382-3:2012 Clause 6.2
@@ -28,6 +28,7 @@ pytest.importorskip("reportlab")
 pytest.importorskip("svglib")
 pytest.importorskip("pypdf")
 
+import dataclasses
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -202,6 +203,49 @@ def test_degenerate_result_renders_without_plot(tmp_path: Path) -> None:
     res.report(str(out), metadata=_full_metadata())
     assert_one_page(str(out))
     assert "—" in _extract_text(str(out))  # em-dash empty-cell symbol
+
+
+def test_degenerate_result_with_requirement_withholds_the_verdict(
+    tmp_path: Path,
+) -> None:
+    """A NaN ``D2,S`` plus a target renders the fiche and prints no badge.
+
+    ``display_round`` floors its argument, so the finiteness check has to come
+    before it or the fiche dies in a bare ``ValueError`` naming nothing. And
+    with fewer than two positions in the 2 m to 16 m range nothing was
+    measured against the target, so neither badge may be printed: the
+    em-dashed metrics row is what the sheet has to say.
+    """
+    near = np.array([0.5, 1.0, 1.5, 1.8])
+    res = room.open_plan_metrics(near, 60.0 - 5.0 * near, 0.7 - 0.1 * near)
+    assert not np.isfinite(res.d2s)
+    out = tmp_path / "degenerate_requirement.pdf"
+    res.report(str(out), metadata=_full_metadata(requirement=7.0))
+    assert_one_page(str(out))
+    text = _extract_text(str(out))
+    assert "PASS" not in text
+    assert "FAIL" not in text
+    assert "—" in text
+
+
+def test_infinite_decay_rate_with_requirement_withholds_the_verdict(
+    tmp_path: Path,
+) -> None:
+    """An infinite ``D2,S`` takes the same route as the NaN one.
+
+    ``display_round`` floors an infinity into an ``OverflowError`` as bare as
+    the NaN ``ValueError``, so the guard is read off the raw value and covers
+    both: the fiche renders, the em-dashed metrics row stands, and no badge
+    claims the target was met or missed.
+    """
+    res = dataclasses.replace(_result(), d2s=float("inf"))
+    out = tmp_path / "infinite_requirement.pdf"
+    res.report(str(out), metadata=_full_metadata(requirement=7.0))
+    assert_one_page(str(out))
+    text = _extract_text(str(out))
+    assert "PASS" not in text
+    assert "FAIL" not in text
+    assert "—" in text
 
 
 def test_report_escapes_xml_specials_in_metadata(tmp_path: Path) -> None:

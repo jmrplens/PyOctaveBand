@@ -45,6 +45,7 @@ if TYPE_CHECKING:
 from .._internal.types import as_float_or_array
 from .._internal.validation import (
     check_engine,
+    require_finite_fields,
     require_fraction,
     require_positive,
     require_ranks,
@@ -212,11 +213,18 @@ def reverberation_time(
         :data:`SPEED_OF_SOUND`, giving the factor ``0.16``).
     :return: The reverberation time
         :math:`T = \frac{55.3}{c_0} \frac{V (1 - \psi)}{A}`, s.
+    :raises ValueError: if ``absorption_area`` is not positive and finite.
     """
     volume = require_positive(volume, "volume")
     speed_of_sound = require_positive(speed_of_sound, "speed_of_sound")
     object_fraction = require_fraction(object_fraction, "object_fraction")
     area = np.asarray(absorption_area, dtype=np.float64)
+    # A NaN compares False against the bound below, so it has to be named
+    # separately or a band of absorption that is not a number returns a
+    # reverberation time that is not one either.
+    if not np.all(np.isfinite(area)):
+        msg = "absorption_area must be finite."
+        raise ValueError(msg)
     if np.any(area <= 0.0):
         msg = "absorption_area must be positive."
         raise ValueError(msg)
@@ -258,11 +266,30 @@ class ReverberationResult:
         dimensions; either spectrum one entry too short raises an index error
         from the table builder, about neither field by name.
 
-        :raises ValueError: if the two spectra and the band axis disagree.
+        Every field must also be finite. Clause 4 has no undeterminable
+        band: :func:`reverberation_time` refuses an absorption area that is
+        not positive and finite, and the volume and the object fraction are
+        pinned by :func:`require_positive` and :func:`require_fraction`
+        before either is used, so nothing the model computes can be ``NaN``.
+        Unpinned, a ``NaN`` band printed as the literal ``nan`` in the ``A``
+        column of the accredited table while the ``T`` cell of the same row
+        showed the deliberate em dash, and a ``NaN`` volume as
+        "Room volume V [m3]: nan" in the header grid.
+
+        :raises ValueError: if the two spectra and the band axis disagree, or
+            any field carries a non-finite value.
         """
         require_ranks(self, frequencies=1, absorption_area=1, reverberation_time=1)
         require_same_length(
             self, "frequencies", "absorption_area", "reverberation_time"
+        )
+        require_finite_fields(
+            self,
+            "frequencies",
+            "absorption_area",
+            "reverberation_time",
+            "volume",
+            "object_fraction",
         )
 
     def plot(

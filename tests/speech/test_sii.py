@@ -322,6 +322,130 @@ def test_invalid_inputs_raise() -> None:
         sii.standard_speech_spectrum("whisper")
 
 
+@pytest.mark.parametrize("bad", ["critical band", "third-octave", "CRITICAL-BAND"])
+def test_a_result_procedure_outside_the_standard_is_refused(bad: str) -> None:
+    """The procedure tag decides what the fiche says the sheet is.
+
+    Both the standard-basis sentence and the band-table caption are read out
+    of tables keyed by it, and both used to fall back to the one-third-octave
+    wording: a result computed over the 21 critical bands, mistyped, printed
+    a page claiming the one-third-octave-band procedure over a table of
+    critical-band rows.
+    """
+    result = sii.speech_intelligibility_index("normal", method="critical-band")
+    with pytest.raises(ValueError, match="'method' must be one of"):
+        dataclasses.replace(result, method=bad)
+
+
+@pytest.mark.parametrize("name", ["speech_spectrum", "noise_spectrum", "threshold"])
+def test_a_non_finite_band_vector_is_refused_by_parameter_name(name: str) -> None:
+    """One NaN band poisons every band above it through the spread of masking.
+
+    The index came back NaN, the plot's title printed "SII = nan", and the
+    weighted bars were left unscaled because ``contribution.max()`` being NaN
+    made the ``peak > 0`` test False -- so the series the legend calls
+    "(scaled)" was drawn at its raw height, indistinguishable from a low
+    score. The bands above the corrupt one simply went missing from the
+    figure. The STOI and STI entry points already refuse non-finite input;
+    this is the same refusal, naming the parameter the caller typed.
+    """
+    corrupt = sii.standard_speech_spectrum("normal").copy()
+    corrupt[9] = np.nan
+    arguments: dict[str, object] = {
+        "speech_spectrum": "normal",
+        "noise_spectrum": None,
+        "threshold": None,
+    }
+    arguments[name] = corrupt
+    with pytest.raises(ValueError, match=f"{name!r} must contain only finite"):
+        sii.speech_intelligibility_index(**arguments)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize("bad", ["critical band", "third-octave", "CRITICAL-BAND"])
+def test_a_procedure_tag_outside_the_standard_is_refused(bad: str) -> None:
+    """The band-importance plot reads its legend label out of a table keyed by it.
+
+    ``SIIProcedure`` is the object the four procedures overlay from, and its
+    renderer indexes ``_SII_METHOD_LABELS[result.method]`` directly: a tag
+    outside the four names used to reach it and come back as a bare
+    ``KeyError`` naming no field, no owner and none of the valid choices.
+    """
+    procedure = sii.sii_procedure("one-third-octave")
+    with pytest.raises(ValueError, match="'method' must be one of"):
+        dataclasses.replace(procedure, method=bad)
+
+
+@pytest.mark.parametrize("bad", [float("nan"), float("inf")])
+def test_a_non_finite_index_is_refused(bad: float) -> None:
+    """The index is a weighted sum over spectra already required to be finite.
+
+    Nothing the computation can return is a NaN, and one reaching the fiche
+    crashed its boxed statement inside the display rounder with "cannot
+    convert float NaN to integer", a message naming neither field nor owner.
+    """
+    result = sii.speech_intelligibility_index("normal")
+    with pytest.raises(ValueError, match="'sii' must be finite"):
+        dataclasses.replace(result, sii=bad)
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "band_audibility",
+        "band_importance",
+        "frequencies",
+        "speech_spectrum",
+        "disturbance",
+        "masking",
+        "level_distortion",
+    ],
+)
+def test_a_non_finite_band_quantity_is_refused_by_field_name(name: str) -> None:
+    """The index stays finite while the figure quietly stops meaning anything.
+
+    Pinning the entry point closed the way in through the spectra; a result
+    assembled or amended by hand is the other door, and the plot is where it
+    shows. The weighted series is scaled by its own peak, so one NaN band
+    makes that peak NaN, ``peak > 0.0`` False and the series the legend calls
+    "(scaled)" is drawn at its raw height: 0,0898 of the axis instead of
+    filling it, with the corrupt band missing and the title still reading
+    "SII = 0.996". A NaN in ``frequencies`` labels a band ``nan``, on the axis
+    and in the fiche's frequency column.
+    """
+    result = sii.speech_intelligibility_index("normal")
+    corrupt = np.asarray(getattr(result, name), dtype=np.float64).copy()
+    corrupt[9] = np.nan
+    with pytest.raises(ValueError, match=f"'{name}' must contain only finite"):
+        dataclasses.replace(result, **{name: corrupt})
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "frequencies",
+        "band_edges",
+        "band_importance",
+        "internal_noise",
+        "speech_spectrum",
+    ],
+)
+def test_a_non_finite_procedure_column_is_refused_by_field_name(name: str) -> None:
+    """A transcribed table has no undeterminable entry to make room for.
+
+    The step plot draws each band flat across its own width and takes its
+    headroom from the maximum of the column, so a NaN drops that band out of
+    the curve and scales the panel to a peak that is not the table's. The
+    procedures are meant to be overlaid and compared; one of them silently
+    short of a band, stretched to the wrong height, is the comparison going
+    wrong with nothing on the axes to say so.
+    """
+    procedure = sii.sii_procedure("octave")
+    corrupt = np.asarray(getattr(procedure, name), dtype=np.float64).copy()
+    corrupt[0] = np.inf
+    with pytest.raises(ValueError, match=f"'{name}' must contain only finite"):
+        dataclasses.replace(procedure, **{name: corrupt})
+
+
 def test_result_fields_present() -> None:
     result = sii.speech_intelligibility_index("normal")
     assert result.band_audibility.shape == (18,)
@@ -881,3 +1005,59 @@ def test_sii_result_plot_for_every_procedure() -> None:
         ax = result.plot()
         assert len(ax.patches) == 2 * proc.frequencies.size
         plt.close("all")
+
+
+def test_the_weighted_series_fills_the_axis_the_legend_says_it_is_scaled_to() -> None:
+    """What "(scaled)" claims, measured: the tallest bar reaches exactly 1.
+
+    This is the half of the finiteness pin that a refusal test cannot state,
+    because the poisoned result can no longer be built. The defect was never
+    an exception: with one NaN band the peak the series divides by was NaN,
+    ``peak > 0.0`` came out False and the whole series was drawn raw, topping
+    out at 0,0898 under a legend still promising "(scaled)" and a title still
+    reading a finite index. Assert the scaling itself, so that removing it
+    fails here rather than passing quietly behind an intact guard.
+    """
+    pytest.importorskip("matplotlib")
+    import matplotlib as mpl
+
+    mpl.use("Agg")
+    import matplotlib.pyplot as plt
+
+    result = sii.speech_intelligibility_index("normal")
+    bands = result.band_audibility.size
+    ax = result.plot()
+    # The audibility bars are drawn first, the weighted series second.
+    weighted = np.array([patch.get_height() for patch in ax.patches][bands:])
+    assert weighted.size == bands
+    assert np.all(np.isfinite(weighted))
+    assert weighted.max() == pytest.approx(1.0)
+    legend = [text.get_text() for text in ax.get_legend().get_texts()]
+    assert legend[1] == r"Importance-weighted $I_i\,A_i$ (scaled)"
+    assert ax.get_title() == "ANSI S3.5 SII = 0.996"
+    plt.close("all")
+
+
+def test_the_procedure_step_draws_every_band_and_its_own_headroom() -> None:
+    """The step carries the table, and the y-limit carries the table's peak.
+
+    The other half of the same pin. A NaN column entry left its band out of
+    the curve and scaled the panel to the largest of the bands that remained,
+    which for the octave procedure moved the top of the axis from 0,30452 to
+    0,275295: a band-importance function overlaid on the others short of a
+    band and stretched to a height that is not its own.
+    """
+    pytest.importorskip("matplotlib")
+    import matplotlib as mpl
+
+    mpl.use("Agg")
+    import matplotlib.pyplot as plt
+
+    procedure = sii.sii_procedure("octave")
+    ax = procedure.plot()
+    # A post-step repeats the last band's value to close the final interval.
+    expected = np.append(procedure.band_importance, procedure.band_importance[-1])
+    np.testing.assert_allclose(ax.get_lines()[0].get_ydata(), expected)
+    assert ax.get_ylim()[1] == pytest.approx(1.15 * procedure.band_importance.max())
+    assert ax.get_ylim()[1] == pytest.approx(0.30452)
+    plt.close("all")

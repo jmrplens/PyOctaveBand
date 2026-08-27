@@ -212,6 +212,46 @@ def test_absorption_area_with_an_extra_axis_is_refused() -> None:
         dataclasses.replace(result, absorption_area=stacked)
 
 
+@pytest.mark.parametrize(
+    "field_name",
+    [
+        "frequencies",
+        "absorption_area",
+        "reverberation_time",
+        "volume",
+        "object_fraction",
+    ],
+)
+def test_a_non_finite_quantity_is_refused(field_name: str) -> None:
+    """Clause 4 has no undeterminable band, so nothing here may be a NaN.
+
+    The A column printed the literal ``nan`` inside the accredited table
+    while the T cell of the same row showed the deliberate em dash, and a
+    NaN volume reached the header grid as "Room volume V [m3]: nan".
+    """
+    result = _prediction()
+    value = getattr(result, field_name)
+    bad = (
+        float("nan")
+        if np.ndim(value) == 0
+        else np.concatenate([[float("nan")], np.asarray(value)[1:]])
+    )
+    with pytest.raises(ValueError, match=f"'{field_name}' must "):
+        dataclasses.replace(result, **{field_name: bad})
+
+
+def test_a_non_finite_absorption_area_is_refused_where_the_time_is_computed() -> None:
+    """The producer conflated NaN with the positivity bound it checks.
+
+    A NaN absorption coefficient sailed through the non-negativity check, was
+    summed into the area, and compared False against ``area <= 0``, so the
+    prediction returned a reverberation time that is not a number.
+    """
+    alpha = np.array([0.10, 0.12, float("nan"), 0.18, 0.20, 0.22, 0.24])
+    with pytest.raises(ValueError, match="absorption_area must be finite"):
+        m.enclosed_space_reverberation([(20.0, alpha)], 50.0)
+
+
 def test_air_condition_requires_standard_bands() -> None:
     # The built-in Table 1 profiles cover the standard octave bands only.
     with pytest.raises(ValueError, match="OCTAVE_BANDS"):

@@ -236,10 +236,12 @@ def test_geometry_drawing_annotates_every_path() -> None:
     assert "feedback loop" in ax.get_title()
     plt.close("all")
 
-    with pytest.raises(ValueError, match="must be positive"):
+    with pytest.raises(ValueError, match="'talker_distance' must be positive"):
         electroacoustics.plot_sound_reinforcement_geometry(0.0, 4.0, 12.0)
-    with pytest.raises(ValueError, match="must be positive"):
+    with pytest.raises(ValueError, match="'microphone_distance' must be positive"):
         electroacoustics.plot_sound_reinforcement_geometry(0.3, math.inf, 12.0)
+    with pytest.raises(ValueError, match="'listener_distance' must be positive"):
+        electroacoustics.plot_sound_reinforcement_geometry(0.3, 4.0, math.nan)
 
 
 @pytest.mark.parametrize("bad", [0, -1, 2.5])

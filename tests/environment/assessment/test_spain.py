@@ -652,6 +652,59 @@ def test_assess_activity_validation() -> None:
         )
 
 
+def _one_period(period: str = "day") -> rd.PeriodAssessment:
+    """One assessed period, laid out as :func:`assess_activity` returns it."""
+    return rd.PeriodAssessment(
+        period=period,
+        phases=(rd.NoisePhase(hours=12.0, laeq=52.0, kt=3.0),),
+        duration_hours=12.0,
+        evaluation_period_level=55.2,
+        reported_level=55,
+        long_term_corrected_level=None,
+        reported_long_term=None,
+        limit=55.0,
+        max_phase_level=55.0,
+        phase_pass=True,
+        daily_pass=True,
+        long_term_pass=None,
+    )
+
+
+@pytest.mark.parametrize("bad", ["Day", "dia", "afternoon"])
+def test_a_period_the_regulation_does_not_define_is_refused(bad: str) -> None:
+    """The period is a tag read as a key, so it is pinned at construction.
+
+    The *acta* takes its period heading, and the assessment plot its bar
+    label, from tables keyed by the three names of Annex I; anything else
+    used to build a period that looked assessed and died in the renderer as
+    a bare ``KeyError: 'Day'``.
+    """
+    with pytest.raises(ValueError, match="'period' must be one of"):
+        _one_period(bad)
+
+
+def test_the_three_evaluation_periods_are_accepted() -> None:
+    """The pin admits exactly what the regulation defines, and all of it."""
+    assert [_one_period(name).period for name in rd.RD1367_EVALUATION_PERIODS] == [
+        "day",
+        "evening",
+        "night",
+    ]
+
+
+def test_an_assessment_over_no_period_is_refused() -> None:
+    """An empty assessment complied vacuously and rendered an empty acta.
+
+    ``complies`` is an ``all()`` over nothing, so it answered ``True``, and
+    the fiche printed its conclusion and PASS verdict over a phase table
+    with no rows before the figure gave up with an ``IndexError`` about
+    axis 0 of size 0.
+    """
+    limits = rd.activity_limits("a")
+    with pytest.raises(ValueError, match="'periods' must carry at least one"):
+        rd.ActivityAssessment(periods=(), limits=limits, new_activity=False)
+
+
 def test_long_term_level_validation() -> None:
     """The annual average needs at least one finite level and matching weights."""
     with pytest.raises(ValueError, match="At least one"):

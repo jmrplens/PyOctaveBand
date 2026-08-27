@@ -25,6 +25,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import (
+    require_axis_count,
+    require_equal_counts,
+    require_ranks,
+)
 from .spectra import _positive
 
 if TYPE_CHECKING:
@@ -91,6 +96,35 @@ class WindowMetricsResult:
     worst_case_processing_loss_db: float
     highest_sidelobe_db: float
     mainlobe_width_3db_bins: float
+
+    def __post_init__(self) -> None:
+        """Reject taps that disagree with the declared window length.
+
+        Every figure of merit here was computed from ``n`` samples, and the
+        waveform panel of :meth:`plot` draws :attr:`taps` against a sample
+        index counted out of the declared :attr:`n` rather than out of the
+        array beside it, so taps of another length are a different window
+        than the one the metrics rate. Matplotlib does refuse to draw the
+        two against each other, but from inside the renderer and about
+        first dimensions, naming neither the field nor the result; the
+        declared count is the authority here, and checking it at
+        construction says which one moved.
+
+        :raises ValueError: if the taps span a different number of samples
+            than the declared length.
+        """
+        require_ranks(self, taps=1)
+        owner = type(self).__name__
+        require_equal_counts(
+            owner,
+            {
+                "n": self.n,
+                "taps": require_axis_count(
+                    self.taps, owner, "taps", "sample", rank=None
+                ),
+            },
+            "sample",
+        )
 
     def enbw_hz(self, fs: float) -> float:
         """Equivalent noise bandwidth in Hz for a sample rate ``fs``.

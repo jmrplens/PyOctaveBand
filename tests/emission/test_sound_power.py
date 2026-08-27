@@ -645,3 +645,73 @@ def test_the_directivity_index_is_pinned_on_its_band_axis() -> None:
     result = _ten_position_determination()
     with pytest.raises(ValueError, match=r"'directivity_index \(axis 1\)'"):
         dataclasses.replace(result, directivity_index=result.directivity_index[:, :-1])
+
+
+def test_an_unknown_grade_tag_is_refused() -> None:
+    """The fiche names the applied standard from ``grade``, so it is pinned.
+
+    A tag that is not exactly ``'survey'`` or ``'engineering'`` used to fall
+    through to engineering, printing a survey determination as "ISO 3744:2010,
+    engineering method, accuracy grade 2": a stricter standard and a better
+    accuracy grade than the measurement had.
+    """
+    import dataclasses
+
+    result = emission.sound_power_pressure(
+        np.tile(np.array([80.0, 78.0, 76.0, 74.0]), (10, 1)),
+        "hemisphere",
+        radius=2.0,
+        frequencies=np.array([250.0, 500.0, 1000.0, 2000.0]),
+        grade="survey",
+    )
+    assert result.grade == "survey"
+    with pytest.raises(ValueError, match="'grade' must be one of"):
+        dataclasses.replace(result, grade="Survey")
+
+
+def test_a_non_finite_surface_area_is_refused() -> None:
+    """``S`` is printed as a plain number inside the boxed result.
+
+    No producer can compute a non-finite measurement surface, so a NaN here
+    could only reach the accredited sheet as a literal ``nan``.
+    """
+    import dataclasses
+
+    result = _ten_position_determination()
+    with pytest.raises(ValueError, match="'surface_area' must be finite"):
+        dataclasses.replace(result, surface_area=float("nan"))
+
+
+def test_a_non_finite_band_of_the_spectrum_is_refused() -> None:
+    """``LW`` carries no validity flags, so a NaN band cannot be marked.
+
+    The spectrum figure passes the bands through ``nan_to_num`` and would draw
+    the band as a fabricated 0 dB bar in the ordinary colour, while the
+    A-weighted total quietly vanishes from the title.
+    """
+    import dataclasses
+
+    result = _ten_position_determination()
+    spectrum = np.asarray(result.sound_power_level, dtype=np.float64).copy()
+    spectrum[2] = np.nan
+    with pytest.raises(ValueError, match="'sound_power_level' must be finite"):
+        dataclasses.replace(result, sound_power_level=spectrum)
+
+
+def test_non_finite_position_levels_are_refused() -> None:
+    """The producer refuses a non-finite band of ``levels_positions``.
+
+    It is the entry point that keeps the spectrum finite: an unevaluable
+    position band used to average straight through into ``LW``.
+    """
+    levels = np.tile(np.array([80.0, 78.0, 76.0, 74.0]), (10, 1))
+    levels[3, 2] = np.nan
+    with pytest.raises(
+        ValueError, match="'levels_positions' must contain only finite values"
+    ):
+        emission.sound_power_pressure(
+            levels,
+            "hemisphere",
+            radius=2.0,
+            frequencies=np.array([250.0, 500.0, 1000.0, 2000.0]),
+        )

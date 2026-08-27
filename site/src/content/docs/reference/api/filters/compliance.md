@@ -159,6 +159,9 @@ the edition (the 1995 edition adds class 0; the 2014 edition keeps only
 classes 1 and 2). An empty result (a bank with no bands in range)
 carries no verdicts, so this returns an empty list.
 
+The first band answers for all of them: construction pins every band
+to the same margin classes.
+
 ### FilterComplianceResult.plot()
 
 ```python

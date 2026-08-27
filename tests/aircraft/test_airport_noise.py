@@ -304,6 +304,28 @@ def test_flyover_arrays_are_refused_a_second_axis() -> None:
         dataclasses.replace(res, observer=stacked_observer)
 
 
+def test_flyover_metric_outside_the_two_the_type_states_is_refused() -> None:
+    """The figure asks one question of ``metric``, and everything else is LAmax.
+
+    Left unpinned the tag does not fail at all: the y-axis and the total line
+    of the rendered figure are labelled as a maximum level the result never
+    claimed to hold.
+    """
+    xs = np.linspace(-20000.0, 20000.0, 21)
+    path = np.column_stack(
+        [
+            xs,
+            np.zeros_like(xs),
+            np.full_like(xs, 300.0),
+            np.full_like(xs, 10000.0),
+            np.full_like(xs, _VREF),
+        ]
+    )
+    res = event_level(path, [0.0, 300.0, 0.0], _NP, _ND, _NSEL, _NMAX)
+    with pytest.raises(ValueError, match="'metric' must be one of"):
+        dataclasses.replace(res, metric="bogus")
+
+
 def test_event_level_farther_receiver_is_quieter() -> None:
     xs = np.linspace(-20000.0, 20000.0, 401)
     path = np.column_stack(
@@ -601,6 +623,35 @@ def test_noise_contour_grid_is_pinned_to_both_axes() -> None:
     flattened = res.level.ravel()
     with pytest.raises(ValueError, match=r"'level' must have 2 axes"):
         dataclasses.replace(res, level=flattened)
+
+
+def test_noise_contour_metric_outside_the_two_the_type_states_is_refused() -> None:
+    """The colorbar reads the tag one-sidedly, with LAmax as its fallback.
+
+    An unknown tag labels a rendered contour map with a metric the grid was
+    never computed in, and nothing raises.
+    """
+    xs = np.linspace(0.0, 15000.0, 12)
+    path = np.column_stack(
+        [
+            xs,
+            np.zeros_like(xs),
+            np.clip(xs * 0.1, 0.0, 2000.0),
+            np.full_like(xs, 10000.0),
+            np.full_like(xs, _VREF),
+        ]
+    )
+    res = noise_contour(
+        path,
+        _NP,
+        _ND,
+        _NSEL,
+        _NMAX,
+        x=np.linspace(-2000.0, 16000.0, 7),
+        y=np.linspace(-4000.0, 4000.0, 5),
+    )
+    with pytest.raises(ValueError, match="'metric' must be one of"):
+        dataclasses.replace(res, metric="LAeq")
 
 
 def test_event_level_invalid_inputs() -> None:

@@ -20,6 +20,7 @@ rejected engines/languages.
 
 from __future__ import annotations
 
+import dataclasses
 import math
 from typing import TYPE_CHECKING
 
@@ -451,3 +452,180 @@ def test_a_narrow_curve_is_still_fine_where_no_panel_scales_by_it() -> None:
     )
     assert result.thd_frequencies is not None
     assert result.thd_frequencies.size == 3
+
+
+# --------------------------------------------------------------------------
+# A curve the data sheet could not have measured
+# --------------------------------------------------------------------------
+@pytest.mark.parametrize(
+    ("field", "bad"),
+    [
+        ("frequencies", float("nan")),
+        ("frequencies", float("inf")),
+        ("spl_db", float("nan")),
+        ("impedance_modulus", float("nan")),
+        ("thd_percent", float("nan")),
+        ("polar_db", float("nan")),
+    ],
+)
+def test_a_non_finite_curve_is_refused_where_the_result_is_built(
+    field: str, bad: float
+) -> None:
+    """No producer emits one, and the fiche cannot say what it would mean.
+
+    Every curve reaches the result through the shared curve validator, and
+    the piston pattern floors its own non-finite levels, so a NaN here is
+    never a measurement outcome. Written in afterwards it used to travel to
+    the sheet unmeasured: a NaN frequency makes the span of the on-axis
+    response unmeasurable and the panel is scaled by the decades that span
+    covers, so the render stopped inside matplotlib with ``Axis limits cannot
+    be NaN or Inf``, naming neither the field nor this result; a NaN level or
+    modulus was quieter, drawn as a gap in a curve under rated numbers
+    computed before the gap existed.
+    """
+    result = _example_result()
+    spoilt = np.array(getattr(result, field), dtype=float)
+    spoilt[0] = bad
+    with pytest.raises(
+        ValueError,
+        match=rf"LoudspeakerCharacteristics: '{field}' must contain only finite",
+    ):
+        dataclasses.replace(result, **{field: spoilt})
+
+
+def test_a_non_finite_response_axis_no_longer_reaches_the_fiche(
+    tmp_path: Path,
+) -> None:
+    """The render that used to fail anonymously cannot now be asked for.
+
+    This is the route the sheet took: construction accepted the axis, the
+    panel scaling turned it into a ``nan`` box aspect, and matplotlib stopped
+    the fiche naming nothing. The refusal now lands before the PDF is opened.
+    """
+    result = _example_result()
+    axis = np.array(result.frequencies, dtype=float)
+    axis[10] = float("nan")
+    out = tmp_path / "non_finite_axis.pdf"
+    with pytest.raises(ValueError, match=r"'frequencies' must contain only finite"):
+        dataclasses.replace(result, frequencies=axis)
+    assert not out.exists()
+
+
+# --------------------------------------------------------------------------
+# A rated number the data sheet could not have measured
+# --------------------------------------------------------------------------
+@pytest.mark.parametrize(
+    "field",
+    [
+        "sensitivity_level_db",
+        "reference_level_db",
+        "rated_impedance",
+        "resonance_frequency",
+        "polar_frequency",
+    ],
+)
+def test_a_non_finite_rated_number_is_refused_where_the_result_is_built(
+    field: str,
+) -> None:
+    """The single numbers are pinned by name, as the curves already were.
+
+    ``require_ranks`` and ``require_same_length`` pin only the paired curves,
+    so a scalar written in afterwards reached the sheet untouched; every one
+    of them is computed or validated by :func:`loudspeaker_characteristics`,
+    so no producer emits a NaN here.
+    """
+    result = _example_result()
+    with pytest.raises(
+        ValueError,
+        match=rf"LoudspeakerCharacteristics: '{field}' must be finite",
+    ):
+        dataclasses.replace(result, **{field: float("nan")})
+
+
+def test_a_non_finite_sensitivity_level_no_longer_reaches_the_verdict(
+    tmp_path: Path,
+) -> None:
+    """The rated table, the boxed result and the verdict row all read it.
+
+    A NaN sensitivity level printed ``nan dB`` in all three, and the verdict
+    decided FAIL because ``nan >= requirement`` is False: an accredited fiche
+    failing a loudspeaker against a number it never measured.
+    """
+    result = _example_result()
+    out = tmp_path / "non_finite_sensitivity_level.pdf"
+    with pytest.raises(ValueError, match=r"'sensitivity_level_db' must be finite"):
+        dataclasses.replace(result, sensitivity_level_db=float("nan"))
+    assert not out.exists()
+
+
+def test_a_non_finite_resonance_frequency_no_longer_reaches_the_fiche(
+    tmp_path: Path,
+) -> None:
+    """The other end of the same gap: a NaN hertz killed the render outright.
+
+    The rated table rounds every stated frequency to whole hertz, so a NaN
+    resonance frequency stopped the fiche with ``cannot convert float NaN to
+    integer`` -- an error naming neither the field nor this result.
+    """
+    result = _example_result()
+    out = tmp_path / "non_finite_resonance.pdf"
+    with pytest.raises(ValueError, match=r"'resonance_frequency' must be finite"):
+        dataclasses.replace(result, resonance_frequency=float("nan"))
+    assert not out.exists()
+
+
+# --------------------------------------------------------------------------
+# A band edge that is not a pair of frequencies
+# --------------------------------------------------------------------------
+@pytest.mark.parametrize(
+    "field", ["effective_range", "sensitivity_band", "rated_frequency_range"]
+)
+def test_a_band_edge_that_is_not_a_pair_is_refused(field: str) -> None:
+    """The fiche unpacks each range positionally into its range text.
+
+    ``_range_text(*result.effective_range, language=...)`` turns a triple into
+    a ``TypeError`` about the helper's own ``language`` argument, naming
+    neither the field nor the result; the guard names the field instead.
+    """
+    result = _example_result()
+    with pytest.raises(
+        ValueError,
+        match=rf"LoudspeakerCharacteristics: '{field}' must be a \(lo, hi\) pair",
+    ):
+        dataclasses.replace(result, **{field: (45.0, 18000.0, 3.0)})
+
+
+@pytest.mark.parametrize(
+    "field", ["effective_range", "sensitivity_band", "rated_frequency_range"]
+)
+@pytest.mark.parametrize("pair", [("low", "high"), (object(), object())])
+def test_a_band_edge_that_is_not_numeric_is_refused(
+    field: str, pair: tuple[object, object]
+) -> None:
+    """A correctly shaped pair of non-numbers is refused by its own name.
+
+    The conversion to ``float`` already stopped these, but with its own
+    wording: ``could not convert string to float: 'low'`` for the strings and
+    a ``TypeError`` from inside ``float`` for the objects, neither naming the
+    field nor the result, and the second not even the documented type.
+    """
+    result = _example_result()
+    with pytest.raises(
+        ValueError,
+        match=rf"LoudspeakerCharacteristics: '{field}' must be numeric\.",
+    ):
+        dataclasses.replace(result, **{field: pair})
+
+
+def test_a_band_edge_in_the_wrong_order_is_refused() -> None:
+    """A reversed pair passes every shape check and prints the range backwards.
+
+    Nothing between the result and the printed ``45 to 18 000 Hz`` re-orders
+    the two ends, so the sheet states an effective range running downwards.
+    """
+    result = _example_result()
+    with pytest.raises(
+        ValueError,
+        match=r"LoudspeakerCharacteristics: 'effective_range' must be a finite",
+    ):
+        dataclasses.replace(result, effective_range=(18000.0, 45.0))

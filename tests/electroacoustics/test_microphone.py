@@ -25,6 +25,7 @@ rejected engines/languages.
 
 from __future__ import annotations
 
+import dataclasses
 import math
 from typing import TYPE_CHECKING
 
@@ -564,3 +565,208 @@ def test_unknown_language_rejected(tmp_path: Path) -> None:
     out = str(tmp_path / "bad.pdf")
     with pytest.raises(ValueError, match="language"):
         result.report(out, language="xx")
+
+
+# --------------------------------------------------------------------------
+# A curve the data sheet could not have measured
+# --------------------------------------------------------------------------
+@pytest.mark.parametrize(
+    ("field", "bad"),
+    [
+        ("frequencies", float("nan")),
+        ("frequencies", float("inf")),
+        ("response_db", float("nan")),
+        ("polar_db", float("nan")),
+        ("noise_band_levels_db", float("nan")),
+    ],
+)
+def test_a_non_finite_curve_is_refused_where_the_result_is_built(
+    field: str, bad: float
+) -> None:
+    """No producer emits one, and the fiche cannot say what it would mean.
+
+    Every curve reaches the result through the shared curve validator, which
+    already refuses a non-finite frequency or value, so a NaN here is never a
+    measurement outcome. Written in afterwards it used to travel to the sheet
+    unmeasured: a NaN frequency makes the span of the response unmeasurable
+    and the panel is scaled by the decades that span covers, so the render
+    stopped inside matplotlib with ``Axis limits cannot be NaN or Inf``,
+    naming neither the field nor this result; a NaN level was quieter, drawn
+    as a gap indistinguishable from a frequency never measured.
+    """
+    result = _example_result()
+    spoilt = np.array(getattr(result, field), dtype=float)
+    spoilt[0] = bad
+    with pytest.raises(
+        ValueError,
+        match=rf"MicrophoneCharacteristics: '{field}' must contain only finite",
+    ):
+        dataclasses.replace(result, **{field: spoilt})
+
+
+def test_a_non_finite_response_axis_no_longer_reaches_the_fiche(
+    tmp_path: Path,
+) -> None:
+    """The render that used to fail anonymously cannot now be asked for.
+
+    This is the route the sheet took: construction accepted the axis, the
+    panel scaling turned it into a ``nan`` box aspect, and matplotlib stopped
+    the fiche naming nothing. The refusal now lands before the PDF is opened.
+    """
+    result = _example_result()
+    axis = np.array(result.frequencies, dtype=float)
+    axis[10] = float("nan")
+    out = tmp_path / "non_finite_axis.pdf"
+    with pytest.raises(ValueError, match=r"'frequencies' must contain only finite"):
+        dataclasses.replace(result, frequencies=axis)
+    assert not out.exists()
+
+
+# --------------------------------------------------------------------------
+# A rated number the sheet could not have measured
+# --------------------------------------------------------------------------
+@pytest.mark.parametrize(
+    "field",
+    [
+        "sensitivity_mv_per_pa",
+        "sensitivity_level_db",
+        "reference_frequency",
+        "polar_frequency",
+        "equivalent_noise_level_db",
+        "tolerance_db",
+        "directivity_index_db",
+    ],
+)
+def test_a_non_finite_rated_number_is_refused_where_the_result_is_built(
+    field: str,
+) -> None:
+    """The single numbers are pinned by name, as the curves already were.
+
+    Every one of them is computed or validated by
+    :func:`microphone_characteristics`, so no producer emits a NaN here. The
+    curve guard never saw them: only the arrays were checked, and a scalar
+    written in afterwards travelled to the sheet untouched.
+    """
+    result = _example_result()
+    with pytest.raises(
+        ValueError,
+        match=rf"MicrophoneCharacteristics: '{field}' must be finite",
+    ):
+        dataclasses.replace(result, **{field: float("nan")})
+
+
+def test_a_non_finite_sensitivity_no_longer_reaches_the_fiche(
+    tmp_path: Path,
+) -> None:
+    """The rated table and the boxed result used to disagree with themselves.
+
+    A NaN sensitivity passed the shape-only guard and printed ``nan mV/Pa`` in
+    the rated-characteristics table beside a boxed headline that still gave
+    the level re 1 V/Pa to a tenth of a decibel: an accredited sheet stating
+    a sensitivity it did not have. The refusal now lands before the PDF is
+    opened.
+    """
+    result = _example_result()
+    out = tmp_path / "non_finite_sensitivity.pdf"
+    with pytest.raises(ValueError, match=r"'sensitivity_mv_per_pa' must be finite"):
+        dataclasses.replace(result, sensitivity_mv_per_pa=float("nan"))
+    assert not out.exists()
+
+
+def test_a_non_finite_polar_frequency_no_longer_reaches_the_fiche(
+    tmp_path: Path,
+) -> None:
+    """The other end of the same gap: a NaN hertz killed the render outright.
+
+    The directivity-index label rounds its frequency to whole hertz, so a NaN
+    stopped the fiche with ``cannot convert float NaN to integer`` -- an error
+    naming neither the field nor this result.
+    """
+    result = _example_result()
+    out = tmp_path / "non_finite_polar_frequency.pdf"
+    with pytest.raises(ValueError, match=r"'polar_frequency' must be finite"):
+        dataclasses.replace(result, polar_frequency=float("nan"))
+    assert not out.exists()
+
+
+def test_an_effective_range_that_is_not_a_pair_is_refused() -> None:
+    """The fiche unpacks the range positionally into its range text.
+
+    ``_range_text(*result.effective_range, language=...)`` turns a triple into
+    a ``TypeError`` about the helper's own ``language`` argument, naming
+    neither the field nor the result; the guard names the field instead.
+    """
+    result = _example_result()
+    with pytest.raises(
+        ValueError,
+        match=r"MicrophoneCharacteristics: 'effective_range' must be a \(lo, hi\) pair",
+    ):
+        dataclasses.replace(result, effective_range=(45.0, 18000.0, 3.0))
+
+
+@pytest.mark.parametrize("pair", [("low", "high"), (object(), object())])
+def test_an_effective_range_that_is_not_numeric_is_refused(
+    pair: tuple[object, object],
+) -> None:
+    """The shared guard names *this* result, not the loudspeaker it also serves.
+
+    The conversion to ``float`` already stopped these, but with its own
+    wording: ``could not convert string to float: 'low'`` for the strings and
+    a ``TypeError`` from inside ``float`` for the objects, neither naming the
+    field nor the result, and the second not even the documented type.
+    """
+    result = _example_result()
+    with pytest.raises(
+        ValueError,
+        match=r"MicrophoneCharacteristics: 'effective_range' must be numeric\.",
+    ):
+        dataclasses.replace(result, effective_range=pair)
+
+
+# --------------------------------------------------------------------------
+# A weighting the measurement standard does not define
+# --------------------------------------------------------------------------
+@pytest.mark.parametrize("weighting", ["A<b", "Z", "a"])
+def test_a_weighting_outside_iec_60268_1_is_refused_at_construction(
+    weighting: str,
+) -> None:
+    """The tag reaches the fiche inside ``dB(...)`` markup, so it is pinned.
+
+    IEC 60268-1 defines the A-weighted r.m.s. and the CCIR quasi-peak
+    wide-band inherent-noise measurements, and the fiche interpolates whatever
+    it is given between the parentheses of its noise rows and its verdict. An
+    arbitrary tag was at best a wrong accredited label; a tag-like one reached
+    reportlab's paragraph parser and ended the render with ``parse ended with
+    1 unclosed tags``, naming neither the field nor the result.
+    """
+    f, rel = _flat_response()
+    noise = electroacoustics.MicrophoneNoise(
+        equivalent_level_db=14.0, weighting=weighting
+    )
+    with pytest.raises(ValueError, match=r"'noise_weighting' must be one of"):
+        electroacoustics.microphone_characteristics(
+            f, rel, _M_MV, tolerance_db=_TOL, noise=noise
+        )
+
+
+def test_the_ccir_quasi_peak_weighting_is_accepted(tmp_path: Path) -> None:
+    """The other measurement of IEC 60268-1 6.2 still renders its own label.
+
+    The guard pins the tag to the two wide-band measurements the standard
+    defines, so the psophometric one must reach the sheet intact.
+    """
+    pytest.importorskip("reportlab")
+    pytest.importorskip("matplotlib")
+    f, rel = _flat_response()
+    result = electroacoustics.microphone_characteristics(
+        f,
+        rel,
+        _M_MV,
+        tolerance_db=_TOL,
+        noise=electroacoustics.MicrophoneNoise(
+            equivalent_level_db=14.0, weighting="CCIR"
+        ),
+    )
+    out = tmp_path / "ccir.pdf"
+    result.report(str(out))
+    assert "dB(CCIR)" in _extract_text(str(out))

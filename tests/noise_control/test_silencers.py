@@ -352,6 +352,41 @@ def test_a_four_pole_stack_that_lost_its_frequency_axis_is_refused() -> None:
         dataclasses.replace(res, transfer_matrix=one_matrix)
 
 
+def test_a_retained_geometry_with_an_unknown_key_is_refused() -> None:
+    """``plot_geometry`` splats the dict straight into the renderer, so an
+    unknown key would die there in a ``TypeError`` naming the plot
+    function's kwarg rather than the field that carried it.
+    """
+    res = sl.expansion_chamber(np.linspace(50.0, 400.0, 8), 0.3, 0.1, 0.01)
+    assert res.geometry is not None
+    with pytest.raises(
+        ValueError, match=r"'geometry' carries unknown keys \['bogus'\]"
+    ):
+        dataclasses.replace(res, geometry={**res.geometry, "bogus": 1.0})
+
+
+def test_a_retained_geometry_with_a_nan_value_is_refused() -> None:
+    """A non-finite dimension passes every ``<= 0.0`` in the renderer and
+    draws a part-blank device.
+    """
+    res = sl.expansion_chamber(np.linspace(50.0, 400.0, 8), 0.3, 0.1, 0.01)
+    assert res.geometry is not None
+    with pytest.raises(ValueError, match=r"'geometry\['length'\]' must be finite"):
+        dataclasses.replace(res, geometry={**res.geometry, "length": float("nan")})
+
+
+def test_a_retained_geometry_with_a_string_dimension_is_refused() -> None:
+    """A dimension that only looks like one never reaches the finiteness
+    check: ``math.isfinite("0.3")`` raises a ``TypeError`` from inside the
+    standard library naming neither the field nor the key.
+    """
+    res = sl.expansion_chamber(np.linspace(50.0, 400.0, 8), 0.3, 0.1, 0.01)
+    assert res.geometry is not None
+    geometry = {**res.geometry, "length": "0.3"}
+    with pytest.raises(ValueError, match=r"'geometry\['length'\]' must be numeric"):
+        dataclasses.replace(res, geometry=geometry)
+
+
 def test_chain_matches_the_hand_built_cascade() -> None:
     # The chain is the same three calls a hand-built layout makes, so its
     # compound matrix must equal the cascade of the bare matrices exactly.

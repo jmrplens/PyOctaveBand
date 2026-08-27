@@ -139,6 +139,29 @@ class TestSpectrogramValidation:
             signals.spectrogram(x, 1000.0, nperseg=2048)
 
 
+def test_silent_recording_renders_an_empty_spectrogram() -> None:
+    """A silent recording is a legal input, so its figure must draw.
+
+    Every cell is zero power and so -inf dB: the colour range has no
+    strongest cell to anchor to, and taking the maximum of the finite
+    levels used to reduce an empty array, stopping the plot with numpy's
+    "zero-size array to reduction operation maximum". The fallback anchors
+    the range at 0 dB and every cell sits below the 80 dB floor.
+    """
+    import matplotlib as mpl
+
+    mpl.use("Agg")
+    import matplotlib.pyplot as plt
+
+    res = signals.spectrogram(np.zeros(48000), fs=48000)
+    assert float(np.max(res.power)) == 0.0
+    ax = res.plot()
+    image = ax.get_images()[0]
+    assert image.get_clim() == (-80.0, 0.0)
+    assert np.all(np.isneginf(np.ma.getdata(image.get_array())))
+    plt.close("all")
+
+
 # ---------------------------------------------------------------------------
 # Zoom FFT: machine-precision oracles
 # ---------------------------------------------------------------------------

@@ -434,6 +434,35 @@ def test_a_stage_row_off_the_band_axis_is_refused(field_name: str, trim: bool) -
         dataclasses.replace(result, stages=stages)
 
 
+def test_a_sheet_refuses_a_criterion_family_it_cannot_rate() -> None:
+    """The criterion is pinned on the sheet, not only in the entry point.
+
+    The tag is read three times over: :attr:`rating` picks NC or RC by it,
+    the verdict is computed against that curve, and the basis strip
+    attributes the curve to ANSI/ASA S12.2-2019. An unpinned ``"NR"`` fell
+    through to an RC Mark II rating, so the sheet boxed an RC designation
+    under an "NR 30" criterion and credited the NR family to a standard that
+    does not define one.
+    """
+    result = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")
+    with pytest.raises(ValueError, match="'criterion' must be one of"):
+        dataclasses.replace(result, criterion="NR")
+
+
+def test_a_received_spectrum_with_a_non_finite_band_is_refused() -> None:
+    """Every band of the received spectrum is rated and compared.
+
+    Both builders derive it from spectra they hold finite, so a NaN band can
+    only be planted by hand - and it poisons the criterion rating silently
+    before crashing the verdict's rounding with an error naming no field.
+    """
+    result = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")
+    poisoned = np.asarray(result.received_level, dtype=np.float64).copy()
+    poisoned[3] = np.nan
+    with pytest.raises(ValueError, match="'received_level' must contain only finite"):
+        dataclasses.replace(result, received_level=poisoned)
+
+
 def test_a_room_effect_off_the_band_axis_is_refused() -> None:
     """The room effect is applied band by band, so it must have the bands."""
     result = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")

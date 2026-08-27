@@ -86,6 +86,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ..._internal.validation import (
+    require_choice,
     require_equal_shapes,
     require_ranks,
     require_same_length,
@@ -1056,6 +1057,8 @@ class PeriodAssessment:
     :ivar daily_pass: Whether ``LKeq,x`` stays within ``limit + 3`` dB.
     :ivar long_term_pass: Whether ``LK,x`` stays at or below ``limit``, or
         ``None`` when the criterion was not evaluated.
+    :raises ValueError: If ``period`` is not one of
+        :data:`RD1367_EVALUATION_PERIODS`.
     """
 
     period: str
@@ -1070,6 +1073,27 @@ class PeriodAssessment:
     phase_pass: bool
     daily_pass: bool
     long_term_pass: bool | None
+
+    def __post_init__(self) -> None:
+        """Pin the evaluation period to the three the regulation defines.
+
+        :attr:`period` is a tag, not free text: the *acta* reads its heading
+        out of a table keyed by ``"day"``, ``"evening"`` and ``"night"``, and
+        the assessment plot labels its bars the same way. Anything else --
+        a capitalised ``"Day"``, the Spanish ``"dia"`` -- builds a period
+        that looks assessed and dies later as a bare ``KeyError: 'Day'``,
+        naming neither the field, nor the owner, nor the three names it had
+        to be one of. :func:`assess_activity` only ever writes the canonical
+        names, so nothing the library itself produces is refused here.
+
+        The check is exact rather than case-folding, because the field is
+        read as a key and a value normalised behind the caller's back would
+        no longer be the one they passed.
+
+        :raises ValueError: if ``period`` is not one of
+            :data:`RD1367_EVALUATION_PERIODS`.
+        """
+        require_choice(self.period, "period", RD1367_EVALUATION_PERIODS)
 
     @property
     def phase_limit(self) -> float:
@@ -1093,17 +1117,46 @@ class PeriodAssessment:
 class ActivityAssessment:
     """Compliance of an activity or port infrastructure (Article 25).
 
-    :ivar periods: The per-period assessments, in day/evening/night order.
+    :ivar periods: The per-period assessments, in day/evening/night order;
+        at least one.
     :ivar limits: The limit table row the assessment was made against.
     :ivar new_activity: ``True`` when the activity is *new* in the sense of the
         regulation, so the annual criterion of Article 25.1 b i applies; for
         the inspection of an activity already in operation only the daily and
         phase criteria apply (Article 25.2).
+    :raises ValueError: If ``periods`` is empty.
     """
 
     periods: tuple[PeriodAssessment, ...]
     limits: RegulationLimits
     new_activity: bool
+
+    def __post_init__(self) -> None:
+        """Reject an assessment made over no evaluation period at all.
+
+        An empty ``periods`` is not an assessment that found nothing, it is
+        an assessment that never happened, and every reader of it says the
+        opposite: :attr:`complies` is an ``all()`` over nothing and answers
+        ``True``, and the *acta* renders its title, its limit row, its
+        conclusion and its PASS verdict over a phase table with no rows --
+        a complete inspection report of a measurement campaign that does not
+        exist. What stops the sheet, when it stops at all, is the assessment
+        figure, with ``IndexError: index 0 is out of bounds for axis 0 with
+        size 0`` from inside matplotlib.
+
+        :func:`assess_activity` already refuses an empty ``measurements``
+        mapping and a mapping whose keys name no evaluation period, so this
+        pins the same requirement on the result the function returns.
+
+        :raises ValueError: if ``periods`` is empty.
+        """
+        if not self.periods:
+            msg = (
+                "ActivityAssessment: 'periods' must carry at least one "
+                "evaluation period; an assessment over none complies "
+                "vacuously and renders an inspection report with no data."
+            )
+            raise ValueError(msg)
 
     @property
     def complies(self) -> bool:

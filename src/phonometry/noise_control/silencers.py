@@ -108,6 +108,7 @@ they describe the plane-wave mode alone and a measurement will show the rest.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -457,6 +458,51 @@ def quarter_wave_impedance(
     return np.asarray(zb, dtype=np.complex128)
 
 
+#: The keys :attr:`ReactiveSilencerResult.geometry` may carry: the keyword
+#: parameters of the geometry renderer it is splatted into (the union over
+#: the four named constructors, each of which stores a subset).
+_GEOMETRY_KEYS = frozenset(
+    {
+        "length",
+        "chamber_area",
+        "pipe_area",
+        "inlet_extension",
+        "outlet_extension",
+        "duct_area",
+        "neck_area",
+        "neck_length",
+        "cavity_volume",
+        "branch_area",
+    }
+)
+
+
+def _require_finite_dimension(key: str, value: float) -> None:
+    """Refuse a retained dimension :meth:`plot_geometry` could not draw.
+
+    Two defects, one door. A ``NaN`` or an infinity passes every ``<= 0.0``
+    in the renderer and draws a part-blank device, and ``math.isfinite``
+    reports it as ``False``. A value that is not a number at all never gets
+    that far: ``math.isfinite`` raises a ``TypeError`` from inside the
+    standard library that names neither the field nor the key it came from,
+    and the string ``"0.3"`` -- a dimension that only looks like one -- is
+    the case a caller most plausibly reaches it with. Both leave here as the
+    ``ValueError`` that names the entry.
+
+    :param key: The geometry key, used in the error message.
+    :param value: The retained dimension.
+    :raises ValueError: if *value* is not numeric, or is not finite.
+    """
+    try:
+        finite = math.isfinite(value)
+    except TypeError as exc:
+        msg = f"'geometry[{key!r}]' must be numeric."
+        raise ValueError(msg) from exc
+    if not finite:
+        msg = f"'geometry[{key!r}]' must be finite."
+        raise ValueError(msg)
+
+
 @dataclass(frozen=True)
 class ReactiveSilencerResult:
     """Transmission and insertion loss of a reactive silencer over frequency.
@@ -528,9 +574,28 @@ class ReactiveSilencerResult:
         for a branch tube -- and has nothing to do with how finely the
         response was sampled.
 
-        :raises ValueError: if the curves disagree, or the matrix is not a
-            stack of four-poles over frequency.
+        :attr:`geometry` is pinned to the keyword names of
+        :func:`~phonometry._plot.geometry.noise_control.plot_silencer_geometry`,
+        because :meth:`plot_geometry` splats it straight into that call: an
+        unknown key would die there in a ``TypeError`` naming the plot
+        function's kwarg rather than the field that carried it, and a
+        non-finite value would draw a part-blank device.
+
+        :raises ValueError: if the curves disagree, the matrix is not a
+            stack of four-poles over frequency, or the retained geometry
+            carries an unknown key or a value that is not a finite number.
         """
+        if self.geometry is not None:
+            unknown = sorted(set(self.geometry) - _GEOMETRY_KEYS)
+            if unknown:
+                msg = (
+                    f"'geometry' carries unknown keys {unknown}; it retains "
+                    "the constructor arguments plot_geometry() redraws, one "
+                    f"of {sorted(_GEOMETRY_KEYS)}."
+                )
+                raise ValueError(msg)
+            for key, value in self.geometry.items():
+                _require_finite_dimension(key, value)
         require_ranks(
             self,
             frequencies=1,

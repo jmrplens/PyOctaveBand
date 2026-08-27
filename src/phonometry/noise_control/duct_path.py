@@ -56,11 +56,13 @@ import numpy as np
 from .._internal.validation import (
     check_engine,
     require_axis_count,
+    require_choice,
     require_equal_counts,
     require_ranks,
     require_same_length,
 )
 from ._criterion import (
+    CRITERION_FAMILIES,
     as_band_spectrum,
     curve_of,
     exceedance_of,
@@ -177,7 +179,7 @@ class DuctPathResult:
     contributions: tuple[tuple[str, np.ndarray], ...] = field(default_factory=tuple)
 
     def __post_init__(self) -> None:
-        """Reject a sheet whose rows do not all run over the same bands.
+        """Reject a sheet whose rows, criterion or received spectrum lie.
 
         The calculation sheet prints one row per element under a single band
         header and a running total beneath them, so a row of the wrong length
@@ -185,8 +187,26 @@ class DuctPathResult:
         the sheet then shows a total summing a band that appears nowhere in
         the column above it.
 
-        :raises ValueError: if any spectrum disagrees with ``frequencies``.
+        The criterion family is pinned here and not only in the entry points,
+        because the sheet routes through it three times: :attr:`rating` picks
+        the rating procedure by it, the verdict is computed against its curve,
+        and the basis strip attributes that curve to ANSI/ASA S12.2-2019. An
+        unpinned tag used to fall through to an RC Mark II rating while the
+        sheet printed the unknown family's name over it.
+
+        ``received_level`` is additionally held finite: both builders derive
+        it from spectra they validate finite (:func:`duct_path` subtracts
+        finite attenuations from a finite source and energy-sums a possibly
+        ``-inf`` self-noise floor, which stays finite; ``combine_duct_paths``
+        energy-sums finite received spectra), so a non-finite band can only be
+        planted by hand -- and it would silently poison the rating and crash
+        the verdict's rounding with an error naming nothing.
+
+        :raises ValueError: if any spectrum disagrees with ``frequencies``,
+            ``criterion`` is not one of the known families, or
+            ``received_level`` carries a non-finite band.
         """
+        require_choice(self.criterion, "criterion", CRITERION_FAMILIES)
         require_ranks(
             self,
             frequencies=1,
@@ -197,6 +217,13 @@ class DuctPathResult:
         require_same_length(
             self, "frequencies", "source_level", "room_effect", "received_level"
         )
+        received = np.asarray(self.received_level, dtype=np.float64)
+        if not np.all(np.isfinite(received)):
+            msg = (
+                "DuctPathResult: 'received_level' must contain only finite "
+                "values; the criterion rating and the verdict read every band."
+            )
+            raise ValueError(msg)
         owner = type(self).__name__
         bands = require_axis_count(self.frequencies, owner, "frequencies", rank=None)
         for i, stage in enumerate(self.stages):

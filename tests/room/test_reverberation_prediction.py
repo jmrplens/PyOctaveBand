@@ -249,6 +249,23 @@ def test_model_curves_must_run_over_one_band_axis() -> None:
             dataclasses.replace(good, **{field: value})
 
 
+@pytest.mark.parametrize("field", ["frequencies", "volume", "surface_area"])
+@pytest.mark.parametrize("bad", [math.nan, math.inf])
+def test_a_non_finite_room_is_refused(field: str, bad: float) -> None:
+    """The geometry the fiche prints is pinned; the five curves are not.
+
+    Volume and surface area are products of three room lengths the bundle
+    has already required to be positive and finite, so no prediction can
+    return a room that is not a number; unpinned, a NaN volume reached the
+    header grid of the sheet as "Room volume V [m3]: nan".
+    """
+    good = room.reverberation_time_models(DIMS, (0.2, 0.15, 0.3), frequencies=1000.0)
+    value = getattr(good, field)
+    replacement = bad if np.ndim(value) == 0 else np.full_like(np.asarray(value), bad)
+    with pytest.raises(ValueError, match=f"'{field}' must "):
+        dataclasses.replace(good, **{field: replacement})
+
+
 def test_models_single_frequency_is_a_band_axis_of_one() -> None:
     """A scalar ``frequencies`` labels one band, as ``None`` already does.
 

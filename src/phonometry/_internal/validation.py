@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING, cast
 import numpy as np
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Mapping, Sequence
 
     from numpy.typing import ArrayLike
 
@@ -474,6 +474,116 @@ def require_finite_fields(owner: object, *fields: str) -> None:
         what = "be finite" if array.ndim == 0 else "contain only finite values"
         msg = f"{type(owner).__name__}: '{name}' must {what}."
         raise ValueError(msg)
+
+
+def is_class_designation(value: object, expected: Sequence[int]) -> bool:
+    """Whether *value* is one of *expected* as a designation, not merely equal.
+
+    A compliance class is a label rather than a measurement: a fiche prints it
+    verbatim into ``Class 1`` and readers splice it into the
+    ``margin_class1_db`` key they take the binding margin from. Equality with
+    a class is therefore too weak a test. ``1.0`` labels a band ``Class 1.0``
+    and builds ``margin_class1.0_db``, a key no band carries, and ``True`` is
+    an ``int`` in Python and would label one ``Class True``. NumPy integers
+    are admitted: they are the same designation and print as it.
+
+    :param value: The candidate designation.
+    :param expected: The classes the edition or standard defines.
+    :return: ``True`` when *value* designates one of *expected*.
+    """
+    if isinstance(value, bool) or not isinstance(value, (int, np.integer)):
+        return False
+    return int(value) in expected
+
+
+def require_summary_class(
+    owner: object,
+    bands: Sequence[Mapping[str, object]],
+    overall: object,
+    expected: Sequence[int],
+    *,
+    field: str = "overall_class",
+) -> None:
+    """Pin a summary class against the per-band classes it restates.
+
+    Two standards in the library derive one the same way, IEC 61260-1 for a
+    filter bank and IEC 61043 for an intensity instrument: the strictest class
+    every band meets, which is the *largest* per-band class because a band
+    meeting the stricter one meets the looser too, and ``None`` as soon as one
+    band meets no class at all. Their fiches print the two halves side by
+    side, the per-band table from ``band["class"]`` and the boxed verdict from
+    the summary, so a summary that does not restate the rows boxes ``Class 1 -
+    COMPLIES`` above a table where a band reads ``Class 2``, with that band's
+    negative margin quoted beside the word COMPLIES, and passes the instrument
+    against a required class 1.
+
+    Both the per-band classes and the summary are pinned as *designations*
+    before the derivation runs, because the derivation cannot see the
+    difference: ``1.0 == 1`` is true in Python, so a summary of ``1.0``
+    restates a class 1 bank perfectly and still builds ``margin_class1.0_db``,
+    a key no band carries, when a reader splices it.
+
+    :param owner: The result instance, named in the messages.
+    :param bands: The per-band verdict mappings.
+    :param overall: The class stated for the whole instrument, or ``None``.
+    :param expected: The classes the standard defines.
+    :param field: Name of the summary field, for the message.
+    An empty band list is refused a class of its own: a verdict attested over
+    nothing is not a verdict, and the readers that take a binding margin from
+    it die on an empty sequence instead.
+
+    :raises ValueError: if a band carries no class or one that is no
+        designation, if a class is claimed over no bands at all, or the
+        summary is not the class the bands derive.
+    """
+    who = type(owner).__name__
+    for band in bands:
+        if "class" not in band:
+            msg = (
+                f"{who}: 'bands' must carry a 'class' per band; the "
+                f"{_band_hz(band)} Hz entry has no 'class' key."
+            )
+            raise ValueError(msg)
+        band_class = band["class"]
+        if band_class is not None and not is_class_designation(band_class, expected):
+            msg = (
+                f"{who}: 'bands' must state a 'class' of {list(expected)} or "
+                f"None per band; the {_band_hz(band)} Hz entry states "
+                f"{band_class!r}."
+            )
+            raise ValueError(msg)
+    if overall is not None and not is_class_designation(overall, expected):
+        msg = (
+            f"{who}: '{field}' must be a class of {list(expected)} or None; "
+            f"got {overall!r}."
+        )
+        raise ValueError(msg)
+    if not bands:
+        if overall is not None:
+            msg = (
+                f"{who}: '{field}' is {overall!r} but 'bands' is empty: a "
+                "class cannot be attested over no verified band. An "
+                "instrument with no bands in range carries a summary of None."
+            )
+            raise ValueError(msg)
+        return
+    classes = [band["class"] for band in bands]
+    derived = None if None in classes else max(cast("list[int]", classes))
+    if overall != derived:
+        binding = next(band for band in bands if band["class"] == derived)
+        msg = (
+            f"{who}: '{field}' must be the class the bands derive, the "
+            "strictest class every band meets and None as soon as one band "
+            f"meets none; got {overall!r} where the {_band_hz(binding)} Hz "
+            f"band states {derived!r}."
+        )
+        raise ValueError(msg)
+
+
+def _band_hz(band: Mapping[str, object]) -> str:
+    """The band centre of *band* for a message, or ``?`` when it carries none."""
+    freq = band.get("freq")
+    return f"{freq:g}" if isinstance(freq, (int, float, np.number)) else "?"
 
 
 def require_per_band(

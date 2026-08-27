@@ -156,7 +156,7 @@ result can redraw itself and render an accredited fiche.
 
 | Name | Description |
 | :--- | :--- |
-| `overall_class` | The loosest class every band meets (1 or 2), or `None` when at least one band meets neither. |
+| `overall_class` | The strictest class every band meets (1 or 2), or `None` when at least one band meets neither. It is the *largest* per-band class, because a band meeting class 1 meets class 2 as well. |
 | `bands` | The per-band verdict dictionaries of [`verify_intensity_class`](/phonometry/reference/api/power/intensity-compliance/#verify_intensity_class), as an immutable tuple. |
 | `frequency` | Nominal band centre frequencies, in Hz. |
 | `residual_index` | Measured `delta_pI0` per band, in dB. |

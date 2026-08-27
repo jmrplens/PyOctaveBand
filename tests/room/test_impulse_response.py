@@ -547,3 +547,16 @@ def test_plot_excitation_short_and_empty_guards() -> None:
     empty_result = room.ImpulseResponseResult(ir=empty, fs=FS, method="spectral")
     with pytest.raises(ValueError, match="empty"):
         empty_result.plot()
+
+
+def test_plot_excitation_rejects_unknown_kind() -> None:
+    """An unknown ``kind`` must be refused, not published as a sweep.
+
+    A one-sided ``== "mls"`` sent every other tag down the sweep branch, so
+    the typo ``"msl"`` for an actual MLS array drew the sequence under the
+    title "ISO 18233 exponential sine sweep" beside a spectrogram panel
+    announcing an exponential frequency rise, with no warning.
+    """
+    mls = room.mls_signal(12).astype(float)
+    with pytest.raises(ValueError, match="'kind' must be one of"):
+        room.plot_excitation(mls, FS, kind="msl")

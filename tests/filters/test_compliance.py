@@ -277,3 +277,222 @@ def test_a_filter_verdict_refuses_per_band_entries_that_disagree() -> None:
     )
     with pytest.raises(ValueError, match="'bands'"):
         dataclasses.replace(result, bands=result.bands[:-1])
+
+
+def test_a_filter_verdict_refuses_a_class_its_bands_carry_no_margins_for() -> None:
+    """Class 0 exists only in the 1995 edition, so a 2014 verdict has no
+    ``margin_class0_db`` keys; an unpinned class would die in a bare
+    ``KeyError`` halfway through the corridor figure.
+    """
+    import dataclasses
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    with pytest.raises(ValueError, match="'overall_class' must be one of"):
+        dataclasses.replace(result, overall_class=0)
+
+
+def test_a_filter_verdict_refuses_an_edition_that_disagrees_with_its_bands() -> None:
+    """A 2014 verdict relabelled 1995 would silently draw the other
+    edition's corridor under the same title.
+    """
+    import dataclasses
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    with pytest.raises(ValueError, match="'edition'"):
+        dataclasses.replace(result, edition="1995")
+
+
+def test_a_filter_verdict_refuses_a_later_band_short_of_a_margin_key() -> None:
+    """The margin keys are read off every band, not only the first.
+
+    ``verify_filter_class`` fills each entry from the same list of classes, so
+    a band list whose entries disagree among themselves is one no bank
+    produced. Accepting it on the strength of the first band alone left the
+    ``KeyError`` for the reader: the fiche's per-band table and the plot's
+    worst-band search read ``margin_class<c>_db`` out of every band, for the
+    reference class. The key dropped here is that one, so the band list is
+    exactly the one that used to construct and then die mid-figure.
+    """
+    import copy
+    import dataclasses
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    # The producer's own bands all carry the same margin keys, so the guard
+    # cannot refuse a verdict a bank emitted.
+    assert len({frozenset(band) for band in result.bands}) == 1
+    bands = tuple(copy.deepcopy(band) for band in result.bands)
+    del bands[1][f"margin_class{result.reference_class()}_db"]
+    with pytest.raises(
+        ValueError, match=r"entry of 'bands' carries margins for classes \[2\]"
+    ):
+        dataclasses.replace(result, bands=bands)
+
+
+def test_a_filter_verdict_refuses_a_non_finite_per_band_value() -> None:
+    """Every margin is a ``min`` over the measured attenuation against the
+    Table 1 mask, so no bank emits a NaN; one smuggled in prints
+    ``Class 1 (+nan dB)`` in the per-band table under a boxed verdict that
+    still reads COMPLIES, because the binding margin reads another band.
+    """
+    import copy
+    import dataclasses
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    bands = tuple(copy.deepcopy(band) for band in result.bands)
+    bands[0][f"margin_class{result.reference_class()}_db"] = float("nan")
+    with pytest.raises(ValueError, match=r"'bands' must carry finite per-band"):
+        dataclasses.replace(result, bands=bands)
+
+
+def test_a_filter_verdict_refuses_a_class_stated_over_no_bands() -> None:
+    """A bank with no bands in range is a real outcome, always paired with
+    ``overall_class = None``. A class stated over zero bands would print an
+    accredited verdict box above a table reportlab then refuses to build,
+    complaining about a table with no rows and naming neither the bands nor
+    the bank.
+    """
+    import dataclasses
+
+    import numpy as np
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    empty = {
+        "bands": (),
+        "sos": (),
+        "band_frequencies": np.asarray([], dtype=float),
+        "factors": (),
+    }
+    # The same emptiness with overall_class None is the producer's own output.
+    assert dataclasses.replace(result, overall_class=None, **empty).bands == ()
+    with pytest.raises(ValueError, match=r"'overall_class' is 1 but 'bands' is empty"):
+        dataclasses.replace(result, overall_class=1, **empty)
+
+
+def test_a_filter_verdict_refuses_an_unknown_edition() -> None:
+    """The edition is a pinned tag, refused by name at construction."""
+    import dataclasses
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    with pytest.raises(ValueError, match="'edition' must be one of"):
+        dataclasses.replace(result, edition="2003")
+
+
+def test_a_filter_verdict_refuses_a_class_its_bands_do_not_derive() -> None:
+    """The boxed class must restate the per-band classes under it.
+
+    ``verify_filter_class`` derives the overall class from the band verdicts
+    by one rule, the strictest class every band meets, so a summary that
+    contradicts a row is one no bank produced. Unpinned, the fiche boxed
+    ``Class 1 - COMPLIES (margin -0.35 dB)`` above a table whose 1 kHz row
+    read ``Class 2 (-0.35 dB)``, and passed the bank against a required
+    class 1.
+    """
+    import copy
+    import dataclasses
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    assert result.overall_class == 1
+    bands = tuple(copy.deepcopy(band) for band in result.bands)
+    # A band that misses class 1 by a hair and meets class 2: the shape
+    # ``_verify_band`` emits for a filter just outside the tighter corridor.
+    bands[1].update({"class": 2, "margin_class1_db": -0.35})
+    with pytest.raises(
+        ValueError, match=r"'overall_class' must be the class the bands derive"
+    ):
+        dataclasses.replace(result, bands=bands, overall_class=1)
+
+
+def test_a_filter_verdict_refuses_a_class_over_a_band_that_meets_none() -> None:
+    """A band that meets no class carries ``None``, and the producer then
+    states ``None`` for the bank too: a bank is no better than its worst
+    band. A class boxed over such a table attests compliance for a band whose
+    own row reads ``none``.
+    """
+    import copy
+    import dataclasses
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    bands = tuple(copy.deepcopy(band) for band in result.bands)
+    bands[1]["class"] = None
+    # The producer's own pairing of that band list is accepted.
+    assert dataclasses.replace(result, bands=bands, overall_class=None) is not None
+    with pytest.raises(
+        ValueError, match=r"'overall_class' must be the class the bands derive"
+    ):
+        dataclasses.replace(result, bands=bands, overall_class=1)
+
+
+def test_a_filter_verdict_refuses_a_class_that_is_no_designation() -> None:
+    """The class is a designation, not a measured value.
+
+    Both halves are spliced into text and into a key: the overall class into
+    ``margin_class<c>_db``, which the boxed statement reads the binding margin
+    from, so ``1.0`` died in a bare ``KeyError`` for ``margin_class1.0_db``;
+    the per-band class into the table, which printed ``Class 1.0``. Equal to
+    a class is therefore not the same as being one.
+    """
+    import copy
+    import dataclasses
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    bands = tuple(copy.deepcopy(band) for band in result.bands)
+    bands[1]["class"] = 1.0
+    with pytest.raises(ValueError, match=r"'overall_class' must be one of"):
+        dataclasses.replace(result, overall_class=1.0)
+    with pytest.raises(ValueError, match=r"'bands' must state a 'class' of"):
+        dataclasses.replace(result, bands=bands)
+
+
+def test_a_filter_verdict_refuses_a_band_carrying_no_class_at_all() -> None:
+    """Every band verdict carries its own class, and the fiche's per-band
+    table reads it by name; a band short of the key died in a bare
+    ``KeyError`` halfway through the table.
+    """
+    import copy
+    import dataclasses
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    bands = tuple(copy.deepcopy(band) for band in result.bands)
+    del bands[1]["class"]
+    with pytest.raises(ValueError, match=r"'bands' must carry a 'class' per band"):
+        dataclasses.replace(result, bands=bands)

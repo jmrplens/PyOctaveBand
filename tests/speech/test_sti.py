@@ -505,6 +505,31 @@ def test_an_sti_result_refuses_an_mti_off_the_band_axis() -> None:
         dataclasses.replace(result, mti=result.mti[:-1])
 
 
+@pytest.mark.parametrize("bad", [float("nan"), float("inf")])
+def test_an_sti_result_refuses_a_non_finite_index(bad: float) -> None:
+    """No measurement can return an STI that is not a number.
+
+    Every path runs through the modulation-transfer validation, which refuses
+    a non-finite matrix, and the chain from there is arithmetic on values
+    clipped into [0, 1]. One built by hand used to crash the boxed statement
+    of the fiche as "cannot convert float NaN to integer", from inside the
+    display rounder, naming neither the field nor the result type.
+    """
+    import dataclasses
+
+    from phonometry.speech.sti import STIResult
+
+    result = STIResult(
+        sti=0.75,
+        mti=np.full(7, 0.75),
+        mtf=np.full((7, 2), 0.75),
+        band_levels=np.full(7, 60.0),
+        rating="B",
+    )
+    with pytest.raises(ValueError, match="'sti' must be finite"):
+        dataclasses.replace(result, sti=bad)
+
+
 def test_an_sti_result_refuses_a_bare_number_for_a_band_column() -> None:
     """One number is not seven bands, however few axes it has.
 

@@ -266,9 +266,24 @@ class AnpProfile:
         against the path it was handed at the call, so it reports the trajectory
         rather than the export the pair actually came from.
 
-        :raises ValueError: if a mask does not carry one entry per path segment.
+        The column count of ``path`` is pinned too, not only its rank: the
+        type documents shape ``(N, 5)`` and the figure reads column 2 for the
+        altitude, so a path short of it passes every per-segment count above
+        and dies at ``path[:, 2]`` with an ``IndexError`` naming neither the
+        field nor the profile.
+
+        :raises ValueError: if a mask does not carry one entry per path
+            segment, or ``path`` does not carry the five documented columns.
         """
         require_ranks(self, path=2, ground_roll=1, landing_roll=1)
+        path_columns = 5
+        if np.shape(self.path)[1] != path_columns:
+            msg = (
+                "AnpProfile: 'path' must have shape (N, 5) "
+                "(x, y, z, power, speed); got shape "
+                f"{np.shape(self.path)}."
+            )
+            raise ValueError(msg)
         owner = type(self).__name__
         require_equal_counts(
             owner,

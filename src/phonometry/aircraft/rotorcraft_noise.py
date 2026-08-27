@@ -1046,7 +1046,18 @@ class RotorcraftEventResult:
         another instant of the flyover; a band axis of the wrong length does
         the same to the spectrum the perceived-noise metrics were taken over.
 
-        :raises ValueError: if a per-step or per-band quantity disagrees.
+        ``a_levels`` is pinned finite besides. The one producer,
+        :func:`rotorcraft_event`, sums finite band levels into it, so a NaN
+        step can only be written in by hand, and it would not raise anywhere:
+        the figure places the ``LASmax`` marker at ``argmax(a_levels)``, which
+        an array with a NaN answers with the NaN's own index, so the marker
+        floats over the gap in the curve, stated as the maximum. ``pnlt`` is
+        exempt on purpose: it is the field licensed to carry NaN (a step of
+        zero total noisiness, or a band grid short of the noy bands), flagged
+        as such in its own documentation.
+
+        :raises ValueError: if a per-step or per-band quantity disagrees, or
+            ``a_levels`` carries a non-finite value.
         """
         require_ranks(
             self,
@@ -1073,6 +1084,9 @@ class RotorcraftEventResult:
             "pnlt",
             axis="emission step",
         )
+        if not np.all(np.isfinite(self.a_levels)):
+            msg = "RotorcraftEventResult: 'a_levels' must be finite."
+            raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -1115,11 +1129,19 @@ class RotorcraftNoiseContourResult:
         square grid handed over transposed: every count still agrees, and the
         footprint is drawn over ground that was never evaluated.
 
-        :raises ValueError: if the level grid disagrees with ``x`` or ``y``.
+        ``metric`` is pinned to the two values the type states because the
+        colorbar reads it one-sidedly, ``== "exposure"`` with LASmax as the
+        fallback: an unknown tag written in by hand would not fail, it would
+        label a rendered contour map with a metric the grid was never
+        computed in.
+
+        :raises ValueError: if the level grid disagrees with ``x`` or ``y``,
+            or ``metric`` is not ``"exposure"`` or ``"maximum"``.
         """
         require_ranks(self, x=1, y=1, level=2)
         require_same_length(self, "y", ("level", 0), axis="grid row")
         require_same_length(self, "x", ("level", 1), axis="grid column")
+        require_choice(self.metric, "metric", ("exposure", "maximum"))
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

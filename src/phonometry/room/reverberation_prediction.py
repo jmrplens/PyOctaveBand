@@ -78,6 +78,7 @@ from numpy.typing import ArrayLike, NDArray
 from .._internal.types import as_float_or_array
 from .._internal.validation import (
     check_engine,
+    require_finite_fields,
     require_non_negative,
     require_positive,
     require_ranks,
@@ -598,8 +599,17 @@ class ReverberationModelResult:
         arrays can be converted to Python scalars`` raised while formatting a
         table cell.
 
-        :raises ValueError: if the five curves and the band axis disagree, or
-            any of them carries an extra axis.
+        The room itself must be finite: :attr:`volume` and
+        :attr:`surface_area` are products of the three room lengths, each of
+        which :func:`_axial_geometry` has already required to be positive and
+        finite, so no prediction can hand back a geometry that is not a
+        number. The header grid of the fiche prints both without asking, and
+        a ``NaN`` volume reached the sheet as "Room volume V [m3]: nan". The
+        five curves are left unpinned: they are what the models return, and
+        the fiche prints a non-finite time as an em dash on purpose.
+
+        :raises ValueError: if the five curves and the band axis disagree,
+            any of them carries an extra axis, or the geometry is not finite.
         """
         require_ranks(
             self,
@@ -619,6 +629,7 @@ class ReverberationModelResult:
             "fitzroy",
             "arau_puchades",
         )
+        require_finite_fields(self, "frequencies", "volume", "surface_area")
 
     @property
     def models(self) -> dict[str, np.ndarray]:

@@ -69,12 +69,18 @@ import numpy as np
 
 from .._internal.validation import (
     check_engine,
+    require_choice,
     require_equal_shapes,
+    require_finite_fields,
     require_positive,
     require_ranks,
     require_same_length,
 )
-from .loudspeaker import _as_curve, _threshold_crossing
+from .loudspeaker import (
+    _as_curve,
+    _require_frequency_pair,
+    _threshold_crossing,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -286,8 +292,12 @@ class MicrophoneNoise:
     :ivar equivalent_level_db: Stated equivalent sound pressure level due to
         inherent noise, in dB SPL (17.1), when not computed from
         :attr:`voltage`.
-    :ivar weighting: Weighting of the inherent-noise measurement (default
-        ``"A"``, the IEC 60268-1 6.2.1 recommendation).
+    :ivar weighting: Weighting of the inherent-noise measurement: ``"A"``
+        (default, the IEC 60268-1 6.2.1 A-weighted r.m.s. recommendation) or
+        ``"CCIR"`` (the 6.2.2 psophometric quasi-peak measurement to CCIR
+        Recommendation 468). These are the two weighted wide-band noise
+        measurements IEC 60268-1 defines; the unweighted band spectrum of
+        6.2.3 travels in :attr:`spectrum` instead.
     :ivar spectrum: Inherent-noise spectrum as
         ``(frequencies, band_levels_db)`` in (Hz, dB SPL) (17.2 b).
     """
@@ -300,6 +310,12 @@ class MicrophoneNoise:
 
 #: No inherent-noise data supplied, A-weighted: the Clause 17 default.
 _DEFAULT_NOISE = MicrophoneNoise()
+
+#: The weighted wide-band inherent-noise measurements IEC 60268-1 defines:
+#: A-weighted r.m.s. (6.2.1) and psophometric quasi-peak to CCIR
+#: Recommendation 468 (6.2.2). The fiche prints the tag inside ``dB(...)``
+#: markup, so an arbitrary string is refused rather than interpolated.
+_NOISE_WEIGHTINGS = ("A", "CCIR")
 
 
 @dataclass(frozen=True)
@@ -459,8 +475,34 @@ class MicrophoneCharacteristics:
         a fine free-field response beside a coarse polar and a one-third-octave
         noise spectrum is the ordinary case, not a disagreement.
 
+        The rated single numbers are pinned finite, and the effective range
+        as an ordered pair of finite frequencies. The factory computes or
+        validates every one of them, so no producer emits a NaN here; one
+        smuggled in through :func:`dataclasses.replace` prints ``nan mV/Pa``
+        in the rated table and a self-contradicting boxed sensitivity, and a
+        NaN frequency dies in the fiche's hertz rounding naming no field.
+
+        The curves are pinned finite on the same grounds: the response, the
+        noise spectrum and the distortion curve reach the result through
+        :func:`_as_curve` and the pattern through :func:`_resolve_polar`,
+        and each already refuses a non-finite value. A NaN written into the
+        free-field frequency axis after the fact stops the sheet inside
+        matplotlib with ``Axis limits cannot be NaN or Inf`` -- the response
+        panel is scaled by the decades that axis spans, and a NaN makes the
+        span unmeasurable -- naming neither the field nor this result; a NaN
+        level is quieter, leaving a gap in the drawn response that reads as a
+        frequency never measured.
+
+        The noise weighting is pinned to the IEC 60268-1 measurements
+        (:data:`_NOISE_WEIGHTINGS`): the fiche interpolates the tag into its
+        ``dB(...)`` markup, where an arbitrary string is at best a wrong
+        accredited label and at worst a reportlab parse error naming neither
+        the field nor the result.
+
         :raises ValueError: if either member of a paired curve disagrees with
-            the other.
+            the other, a curve or a scalar field is not finite, the effective
+            range is not an ordered pair of finite frequencies, or the noise
+            weighting is not an IEC 60268-1 measurement.
         """
         require_ranks(
             self,
@@ -486,6 +528,31 @@ class MicrophoneCharacteristics:
             "distortion_thd_percent",
             axis="sound pressure level",
         )
+        require_finite_fields(
+            self,
+            "frequencies",
+            "response_db",
+            "distortion_spl_db",
+            "distortion_thd_percent",
+            "noise_frequencies",
+            "noise_band_levels_db",
+            "polar_angles_deg",
+            "polar_db",
+            "reference_frequency",
+            "sensitivity_mv_per_pa",
+            "sensitivity_level_db",
+            "tolerance_db",
+            "rated_impedance",
+            "minimum_load_impedance",
+            "equivalent_noise_level_db",
+            "max_spl_db",
+            "max_spl_thd_percent",
+            "polar_frequency",
+            "directivity_index_db",
+            "supply_current_ma",
+        )
+        _require_frequency_pair(self, "effective_range")
+        require_choice(self.noise_weighting, "noise_weighting", _NOISE_WEIGHTINGS)
 
     @property
     def sensitivity_v_per_pa(self) -> float:

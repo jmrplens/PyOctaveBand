@@ -218,6 +218,61 @@ def test_fiche_pins_displayed_numbers(tmp_path: Path) -> None:
     assert "Quality Control (EBU R 128 item i)." in text
 
 
+def test_gated_silence_renders_dashes_and_fails(tmp_path: Path) -> None:
+    """A programme gated to -inf LUFS is a sheet of em dashes, not a crash.
+
+    :func:`program_loudness` returns ``-inf`` when every block falls below the
+    absolute gate, which digital silence does, so the fiche has to print the
+    house missing-value em dash for the measured loudness, its delta and the
+    true peak instead of formatting an infinity - and the verdict has to read
+    the gated measurement as a failure, since no tolerance about any target
+    contains ``-inf``.
+    """
+    result = program_loudness(_stereo(np.zeros(5 * FS)), FS)
+    assert result.integrated == -np.inf
+    _text, passed = _verdict(result, -23.0)
+    assert passed is False
+    out = tmp_path / "silence.pdf"
+    result.report(str(out), metadata=ReportMetadata(requirement=-23.0))
+    assert_one_page(str(out))
+    text = _extract_text(str(out)).replace("\n", " ")
+    assert "— LUFS" in text  # the measured integrated loudness
+    assert "— LU)" in text  # its delta from the target
+    assert "I = — LUFS" in text  # the boxed single-number result
+    assert "— dBTP" in text  # the true peak of a digitally silent programme
+    # The informational maxima are gated away with it, and no reading anywhere
+    # on the sheet is printed as an infinity.
+    assert result.max_momentary == -np.inf
+    assert result.max_short_term == -np.inf
+    assert "-inf" not in text  # neither the ASCII hyphen form ...
+    assert "−inf" not in text  # ... nor the typographic minus the fiche uses
+    # The basis strip says what the glyph means, so a FAIL beside an em dash
+    # is not an unexplained verdict.
+    assert "An em dash marks a reading the measurement leaves undefined" in text
+
+
+def test_gated_silence_note_absent_from_a_measured_fiche(tmp_path: Path) -> None:
+    """A fiche with five finite readings carries no em-dash explanation."""
+    result = _case1_result()
+    assert np.isfinite(result.max_short_term)
+    out = tmp_path / "measured.pdf"
+    result.report(str(out), metadata=ReportMetadata(requirement=-23.0))
+    text = _extract_text(str(out)).replace("\n", " ")
+    assert "An em dash marks" not in text
+    assert "—" not in text
+
+
+def test_gated_silence_renders_in_spanish(tmp_path: Path) -> None:
+    """The Spanish sheet dashes the same readings and translates the note."""
+    result = program_loudness(_stereo(np.zeros(5 * FS)), FS)
+    out = tmp_path / "silence_es.pdf"
+    result.report(str(out), metadata=ReportMetadata(requirement=-23.0), language="es")
+    assert_one_page(str(out))
+    text = _extract_text(str(out)).replace("\n", " ")
+    assert "I = — LUFS" in text
+    assert "La raya indica una lectura que la medición deja indefinida" in text
+
+
 def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
     """``language="es"`` renders a one-page Spanish fiche with comma decimals."""
     import re

@@ -516,6 +516,19 @@ def test_non_positive_area_raises() -> None:
         emission.sound_power_intensity(intensity, zero_area)
 
 
+def test_non_finite_area_raises() -> None:
+    """A NaN segment area compares False against the positivity bound.
+
+    Folded into that one test it reached the determination as a measurement
+    surface that is not a number, and the fiche printed "Measurement surface
+    S = nan m2" in the boxed result.
+    """
+    intensity = np.full((4, 1), 1e-4)
+    nan_area = np.array([0.5, 0.5, 0.5, float("nan")])
+    with pytest.raises(ValueError, match="segment 'areas' must be finite"):
+        emission.sound_power_intensity(intensity, nan_area)
+
+
 def test_fewer_than_four_segments_warns() -> None:
     """Clause 8.2 requires at least 4 segments."""
     intensity = np.full((3, 1), 5e-4)
@@ -586,3 +599,32 @@ def test_a_per_segment_quantity_off_the_segment_axis_is_refused() -> None:
     result = _five_band_determination()
     with pytest.raises(ValueError, match="measurement segment"):
         dataclasses.replace(result, repeatability=result.repeatability[:-1])
+
+
+@pytest.mark.parametrize("bad", [float("nan"), float("inf")])
+def test_a_non_finite_measurement_surface_is_refused(bad: float) -> None:
+    """The scanned surface is pinned at construction, unlike the levels.
+
+    A shape check cannot see it: the surface keeps its shape whatever number
+    it holds, so the sheet rendered in full with "Measurement surface
+    S = nan m2" beside the boxed A-weighted level.
+    """
+    import dataclasses
+
+    result = _five_band_determination()
+    with pytest.raises(ValueError, match="'surface_area' must be finite"):
+        dataclasses.replace(result, surface_area=bad)
+
+
+def test_a_non_determinable_band_level_stays_a_nan() -> None:
+    """The per-band levels are not pinned: clause 9.2 reads them as NaN.
+
+    A band of negative net power is outside the method, and the fiche prints
+    the em dash the result asked it to; refusing the NaN here would refuse
+    the library's own determination.
+    """
+    intensity = np.tile(np.array([6e-4, -5e-4]), (4, 1))
+    with pytest.warns(emission.SoundPowerWarning):
+        result = emission.sound_power_intensity(intensity, np.full(4, 0.5))
+    assert np.isnan(result.sound_power_level[1])
+    assert np.isfinite(result.surface_area)

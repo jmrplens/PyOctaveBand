@@ -82,7 +82,12 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from scipy import special
 
-from .._internal.validation import require_positive, require_ranks, require_same_length
+from .._internal.validation import (
+    require_finite_fields,
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -427,6 +432,16 @@ class RadiatingPistonResult:
             axis="frequency",
         )
         require_same_length(self, "angles", ("directivity", 1), axis="polar angle")
+        # Finiteness is a construction invariant, not a rendering question:
+        # :func:`piston_directivity` validates its inputs and patches the
+        # on-axis 0/0 to its limit, so no producer emits a non-finite
+        # pattern; one smuggled NaN would silently drop the whole lobe from
+        # :meth:`plot_geometry` (the lobe's peak turns NaN and its `> 0`
+        # gate turns False). The shared guard is what runs it, so that a
+        # field holding something that is not a number at all is refused by
+        # name too, instead of reaching ``np.isfinite`` as an anonymous
+        # ``TypeError`` raised from inside numpy.
+        require_finite_fields(self, "angles", "directivity")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

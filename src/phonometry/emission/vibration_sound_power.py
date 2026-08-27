@@ -299,7 +299,33 @@ class VibrationSoundPowerResult:
         the result supports, where any other mismatched length raises from
         numpy about two shapes that name neither field.
 
-        :raises ValueError: if any per-band quantity disagrees with the rest.
+        Every quantity must also be finite, and the area positive. The one
+        producer, :func:`sound_power_from_vibration`, computes finite levels
+        from finite inputs and pins the area positive, so a non-finite value
+        here is never the library's own output; letting one through changes
+        what the fiche claims rather than crashing it. A single NaN band in
+        ``sound_power_level`` turns :attr:`sound_power_level_a` into NaN, so
+        the sheet silently swaps its boxed ``LWA`` for a partial unweighted
+        total ``LW`` (the energy sum skips the NaN band) and compares *that*
+        against the declared A-weighted limit, flipping the printed verdict;
+        a NaN ``area`` prints ``S = nan m2`` beside the boxed result; and an
+        all-NaN ``radiation_factor`` fails the ``epsilon = 1`` survey test,
+        so the basis line asserts an engineering-method determination whose
+        every epsilon cell is an em dash.
+
+        The determination must also cover at least one band. Four length-0
+        columns agree with each other, so every count and rank above is
+        satisfied, and what comes out is a complete accredited sound-power
+        test sheet: the basis line, an empty per-band table, a boxed
+        "Sound power level LW = — dB re 1 pW" over the em dash the energy sum
+        of no bands leaves behind, and the disclaimer under it. A single
+        broadband determination is not that, and is not refused here: it
+        carries one nought-dimensional level and no frequencies, which is one
+        band's worth of data on no band axis.
+
+        :raises ValueError: if any per-band quantity disagrees with the
+            rest, the determination covers no band, any quantity carries a
+            non-finite value, or the area is not a positive finite number.
         """
         require_ranks(
             self,
@@ -315,6 +341,26 @@ class VibrationSoundPowerResult:
             "radiation_factor",
             "frequencies",
         )
+        if np.asarray(self.sound_power_level).size == 0:
+            msg = (
+                "VibrationSoundPowerResult: 'sound_power_level' must carry at "
+                "least one band; the determination is empty."
+            )
+            raise ValueError(msg)
+        for name in (
+            "velocity_level",
+            "sound_power_level",
+            "radiation_factor",
+            "frequencies",
+        ):
+            value = getattr(self, name)
+            if value is not None and not np.all(np.isfinite(np.asarray(value))):
+                msg = (
+                    "VibrationSoundPowerResult: "
+                    f"'{name}' must contain only finite values."
+                )
+                raise ValueError(msg)
+        require_positive(self.area, "area")
 
     @property
     def total_level(self) -> float:

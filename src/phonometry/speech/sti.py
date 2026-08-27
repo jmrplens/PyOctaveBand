@@ -32,7 +32,12 @@ if TYPE_CHECKING:
 from scipy import signal
 
 from .._internal.utils import _typesignal
-from .._internal.validation import check_engine, require_ranks, require_same_length
+from .._internal.validation import (
+    check_engine,
+    require_finite_fields,
+    require_ranks,
+    require_same_length,
+)
 from .._internal.warnings import PhonometryWarning
 from ..filters.core import OctaveFilterBank
 from ..filters.frequencies import nominal_frequencies
@@ -136,10 +141,21 @@ class STIResult:
         ``mti`` is the per-band index the fiche tabulates beside the band
         levels and the modulation matrix, all three on the same band axis.
 
-        :raises ValueError: if the band axes disagree.
+        ``sti`` is pinned finite. Every path to a result runs through
+        :func:`_truncated_mtf`, which refuses a modulation transfer matrix
+        carrying anything that is not a finite number, and the chain from
+        there to the index is arithmetic on values clipped into [0, 1]: no
+        measurement can hand back an ``STI`` that is not a number. One built
+        by hand crashed the boxed statement of the fiche inside the display
+        rounder with "cannot convert float NaN to integer", a message naming
+        neither the field nor the result it came from.
+
+        :raises ValueError: if the band axes disagree, or ``sti`` is not
+            finite.
         """
         require_ranks(self, mti=1, mtf=2, band_levels=1)
         require_same_length(self, "mti", ("mtf", 0), "band_levels")
+        require_finite_fields(self, "sti")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
