@@ -254,6 +254,76 @@ def test_extra_axis_on_the_level_grid_is_refused() -> None:
         dataclasses.replace(result, levels=stacked)
 
 
+def test_speech_line_labelled_for_a_distance_it_was_not_computed_at() -> None:
+    """Long Equation (17.50): the signal is the geometry, not a free label.
+
+    The plot places the speech line at ``signal_level`` and captions it with
+    ``distance``, so moving the distance alone drew the 1.2 m level of
+    60.4 dB under the legend entry "Speech at 3 m", where Equation (17.50)
+    puts a talker 3 m away at 52.5 dB.
+    """
+    result = room.crowd_noise([20.0], distance=1.2)
+    with pytest.raises(ValueError, match="'signal_level' must be the direct field"):
+        dataclasses.replace(result, distance=3.0)
+
+
+def test_title_announcing_a_power_the_curves_were_not_drawn_at() -> None:
+    """The talker's power is an input, and the signal is the input restated.
+
+    ``sound_power_level`` is not pinned as a summary of anything -- it is what
+    the caller chose -- but it is one term of Equation (17.50), so a variant
+    that raises it alone no longer states its own ``signal_level``. Before
+    this, the figure was titled "Lw = 85 dB per talker" over the curves and
+    the speech line of a 70 dB talker.
+    """
+    result = room.crowd_noise([20.0])
+    with pytest.raises(ValueError, match="'signal_level' must be the direct field"):
+        dataclasses.replace(result, sound_power_level=85.0)
+
+
+def test_privacy_bound_passed_off_as_the_communication_limit() -> None:
+    """Long Equations (17.53) and (17.54) are two different lines.
+
+    The legend spells the -6 dB out, so a ``communication_level`` set to the
+    -9 dB privacy bound was drawn 3 dB high under a caption that said
+    communication limit.
+    """
+    result = room.crowd_noise([20.0])
+    privacy_bound = result.signal_level - room.PRIVACY_SNR
+    with pytest.raises(ValueError, match="'communication_level' must be the noise"):
+        dataclasses.replace(result, communication_level=privacy_bound)
+
+
+def test_undetermined_talker_power_is_refused() -> None:
+    """A talker power the producer never checked reached the title as ``nan``.
+
+    ``crowd_noise`` coerces ``sound_power_level`` with a bare ``float()``, so
+    a ``NaN`` power built a whole result of ``NaN``: a title reading
+    "Lw = nan dB per talker" over two reference lines at no height at all.
+    Nothing in this model is legitimately undetermined.
+    """
+    with pytest.raises(ValueError, match="'sound_power_level' must be finite"):
+        room.crowd_noise([20.0], sound_power_level=math.nan)
+
+
+def test_a_variant_that_restates_itself_is_accepted() -> None:
+    """The guard pins the identity, not the values: a consistent move passes.
+
+    Moving the listener to 3 m and restating both levels for that distance is
+    the sanctioned way to build a variant, and it is not refused.
+    """
+    result = room.crowd_noise([20.0], distance=1.2)
+    signal = float(np.asarray(room.speech_direct_level(3.0))[()])
+    moved = dataclasses.replace(
+        result,
+        distance=3.0,
+        signal_level=signal,
+        communication_level=signal - room.COMMUNICATION_SNR,
+    )
+    assert round(moved.signal_level, 1) == 52.5
+    assert moved.communication_level == pytest.approx(signal + 6.0)
+
+
 @pytest.mark.parametrize(
     ("call", "match"),
     [

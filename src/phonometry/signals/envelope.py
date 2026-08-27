@@ -47,6 +47,7 @@ modulation lines read low by the taper's scalloping loss.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -305,12 +306,61 @@ class EnvelopeSpectrumResult:
         end, so it is a pair rather than an axis and stays out of both
         groups.
 
+        :attr:`mean_level` is the third statement about the upper panel, and
+        it is closed over the panel's own column: it is the plain mean of
+        :attr:`envelope`, the DC that Figure 13.11's remover subtracts before
+        the transform, so ``envelope - mean_level`` is what the lines below
+        were measured on. Nothing about it is a decibel -- the detector output
+        is a linear amplitude (or its square), and the documented closed forms
+        :math:`A_0` and :math:`A_0^2 (1 + m^2/2)` are exactly the arithmetic
+        means of those two columns -- so neither a level of the column nor its
+        energy mean restates it. :meth:`plot` draws it as the labelled rule
+        across the envelope panel, where the reader takes the modulation as
+        the trace's excursion about that rule: a mean level belonging to
+        another detector, or to the same column expressed some other way,
+        lands as a rule the trace never crosses, silently stretching the
+        panel's limits to reach it.
+
+        The slack is relative and only relative, unlike the peak-rate guard
+        of :mod:`phonometry.metrology.data_qualification` and unlike the
+        decibel margins elsewhere in the tree: an envelope mean carries the
+        record's own units and no bounded scale, so a caller who recomputed
+        the mean along another summation path must not be refused over the
+        last bit, while an absolute floor would be a floor in nothing --
+        a squared detector reading a tone at the threshold of hearing means
+        some :math:`10^{-9}` Pa^2, and a floor that size would wave through
+        every statement about it, zero and negatives included.
+
+        An empty pair is left alone: it carries no mean to restate, and the
+        transform never makes one. So is an undetermined one:
+        :func:`envelope_spectrum` refuses a non-finite record, but a finite
+        one can still overflow inside the Hilbert transform and detect an
+        all-NaN envelope, and NaN is then the mean's honest restatement --
+        which no comparison of NaN with NaN can confirm. Such a column is
+        one the producer legitimately emits, so it is passed rather than
+        refused; only a column with a mean is held to it.
+
         :raises ValueError: if the spectrum disagrees with its frequency
-            axis, or the envelope with its time axis.
+            axis, the envelope with its time axis, or ``mean_level`` with the
+            envelope it is the mean of.
         """
         require_ranks(self, frequencies=1, amplitude=1, times=1, envelope=1)
         require_same_length(self, "frequencies", "amplitude", axis="frequency")
         require_same_length(self, "times", "envelope", axis="sample")
+        detector = np.asarray(self.envelope, dtype=np.float64)
+        if detector.size == 0:
+            return
+        expected = float(np.mean(detector))
+        if math.isnan(expected):
+            return
+        if not math.isclose(self.mean_level, expected, rel_tol=1e-9, abs_tol=0.0):
+            msg = (
+                "EnvelopeSpectrumResult: 'mean_level' must be the plain mean "
+                "of 'envelope', the DC removed before the transform (Bendat & "
+                f"Piersol Figure 13.11); got {self.mean_level!r} where "
+                f"'envelope' means {expected!r}."
+            )
+            raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

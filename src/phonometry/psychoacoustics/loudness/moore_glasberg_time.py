@@ -56,6 +56,7 @@ required.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -396,8 +397,39 @@ class MooreGlasbergTimeVaryingLoudness:
         still were, reporting at every index the level of a different instant,
         with nothing anywhere to catch it.
 
+        The two headline scalars are then held to the trace they summarise.
+        ``n_max`` is the maximum of the long-term loudness and nothing else
+        (clause 7.9), and ``loudness_level_max`` is that one value carried
+        through Table 5; clause 9 f) and h) ask for the pair and for the trace
+        beneath it in the same report. The figure prints both in its title and
+        rules a dashed line across the axes at ``n_max``, so a pair that
+        contradicts its own column does not merely mislabel the chart: the
+        line is drawn wherever the wrong number says, the y-axis is stretched
+        to reach it, and the long-term trace the title claims to summarise is
+        flattened against the bottom of a plot that reports a peak it never
+        attained.
+
+        Neither comparison can stand on its own, because both pass vacuously
+        on a value that is not a loudness at all. ``n_max`` is therefore
+        pinned first as a finite, non-negative sone value, exactly as the
+        steady-state ``MooreGlasbergLoudness`` of ISO 532-2 pins the total it
+        reports the same way: an all-infinite trace restates its own infinite
+        maximum, and :func:`_loudness_level` reads flat off both ends of
+        Table 5, so ``inf`` sone states 120.0 phon and every negative sone
+        states 0.0 phon - each pair agreeing with itself while the title
+        prints ``N = inf sone`` over a plot with no finite peak to draw. A
+        NaN escapes the other way, comparing equal to nothing at all. The
+        producer emits none of these: the trace is a maximum of non-negative
+        loudnesses and no entry point admits a non-finite input.
+
+        Both comparisons allow a billionth so a caller who recomputed the peak
+        or re-read Table 5 along another floating-point path is not refused
+        over the last bit.
+
         :raises ValueError: if a trace or a level curve disagrees with the
-            frame axis.
+            frame axis, if ``n_max`` is not a finite non-negative sone value
+            or is not the maximum of ``long_term_loudness``, or if
+            ``loudness_level_max`` is not ``n_max`` through Table 5.
         """
         require_ranks(
             self,
@@ -416,6 +448,32 @@ class MooreGlasbergTimeVaryingLoudness:
             "long_term_loudness_level",
             axis="frame",
         )
+        if not math.isfinite(self.n_max) or self.n_max < 0.0:
+            msg = (
+                "MooreGlasbergTimeVaryingLoudness: 'n_max' must be a finite, "
+                "non-negative peak long-term loudness in sone; got "
+                f"{self.n_max!r}."
+            )
+            raise ValueError(msg)
+        long_term = np.asarray(self.long_term_loudness, dtype=np.float64)
+        peak = float(long_term.max()) if long_term.size else 0.0
+        if not math.isclose(self.n_max, peak, rel_tol=0.0, abs_tol=1e-9):
+            msg = (
+                "MooreGlasbergTimeVaryingLoudness: 'n_max' must be the maximum "
+                "of 'long_term_loudness', the peak long-term loudness "
+                f"ISO 532-3 reports; got {self.n_max!r} where the trace peaks "
+                f"at {peak!r}."
+            )
+            raise ValueError(msg)
+        phon = float(_loudness_level(self.n_max))
+        if not math.isclose(self.loudness_level_max, phon, rel_tol=0.0, abs_tol=1e-9):
+            msg = (
+                "MooreGlasbergTimeVaryingLoudness: 'loudness_level_max' must be "
+                "'n_max' through the Table 5 sone-to-phon relationship; got "
+                f"{self.loudness_level_max!r} where 'n_max' {self.n_max!r} maps "
+                f"to {phon!r}."
+            )
+            raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

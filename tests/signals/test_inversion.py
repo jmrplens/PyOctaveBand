@@ -214,6 +214,79 @@ def test_design_must_lie_on_one_frequency_grid() -> None:
             dataclasses.replace(res, **{field: value})
 
 
+def test_flatness_must_restate_the_equalized_magnitude() -> None:
+    """The figure title cannot claim a ripple the drawn curve never shows.
+
+    ``plot_inverse_filter`` prints ``flatness_db`` in the title and draws
+    ``|H*H_inv|`` on the axes below it, so before this guard a variant built
+    with ``dataclasses.replace`` titled the figure "flatness 6.00 dB" over a
+    curve that never left 0.00 dB.
+    """
+    res = signals.regularized_inverse_filter(_biquad_ir(), FS, f_range=(500.0, 8000.0))
+    with pytest.raises(ValueError, match=r"'flatness_db' must be the largest"):
+        dataclasses.replace(res, flatness_db=6.0)
+
+
+def test_flatness_must_follow_the_spectra_it_summarises() -> None:
+    """Restating a spectrum restates the flatness, or the pair is refused."""
+    res = signals.regularized_inverse_filter(_biquad_ir(), FS, f_range=(500.0, 8000.0))
+    band = np.flatnonzero((res.frequencies >= 500.0) & (res.frequencies <= 8000.0))
+    notched = res.response_spectrum.copy()
+    notched[band[0]] = 0.0  # a null the inversion cannot fill: |H*H_inv| = 0
+    with pytest.raises(ValueError, match=r"'flatness_db' must be the largest"):
+        dataclasses.replace(res, response_spectrum=notched)
+    # The same null with the flatness it implies is a reading, not a defect:
+    # infinitely far from 0 dB is what that band is, and it is accepted.
+    with_null = dataclasses.replace(res, response_spectrum=notched, flatness_db=np.inf)
+    assert with_null.flatness_db == np.inf
+
+
+def test_flatness_needs_a_band_to_be_worst_over() -> None:
+    """A band between two bins summarises nothing, and is refused."""
+    res = signals.regularized_inverse_filter(_biquad_ir(), FS, f_range=(500.0, 8000.0))
+    step = FS / res.size  # 46.875 Hz: no bin falls in (100, 101)
+    empty = (2.0 * step + 1.0, 3.0 * step - 1.0)
+    with pytest.raises(ValueError, match=r"'f_range' must select at least one bin"):
+        dataclasses.replace(res, f_range=empty)
+
+
+def test_max_gain_is_not_determined_by_the_stored_design() -> None:
+    """Two genuine designs agree in every stored field and differ in gain.
+
+    ``max_gain_db`` is the achieved gain outside the band *padded by*
+    ``transition_octaves``, and the padding is an argument the result does not
+    keep. On a 128-bin grid (375 Hz apart) with the band reaching Nyquist, a
+    one-octave padding puts the lower edge exactly on the first positive bin
+    and a half-octave padding puts it just above: the profile is the same
+    array either way, while that bin falls outside one maximum and inside the
+    other. Nothing computable from the stored fields separates ``-inf`` from
+    ``-6.13 dB`` here, which is why ``__post_init__`` claims nothing about it.
+    """
+    b, a = signal.butter(2, 300.0, btype="highpass", fs=FS)
+    imp = np.zeros(128)
+    imp[0] = 1.0
+    h = signal.lfilter(b, a, imp)
+    design = {"f_range": (750.0, FS / 2.0), "n_fft": 128}
+    wide = signals.regularized_inverse_filter(h, FS, transition_octaves=1.0, **design)
+    narrow = signals.regularized_inverse_filter(h, FS, transition_octaves=0.5, **design)
+    for field in (
+        "inverse",
+        "frequencies",
+        "spectrum",
+        "response_spectrum",
+        "regularization",
+    ):
+        assert np.array_equal(getattr(wide, field), getattr(narrow, field)), field
+    assert (wide.f_range, wide.delay, wide.fs) == (
+        narrow.f_range,
+        narrow.delay,
+        narrow.fs,
+    )
+    assert wide.flatness_db == narrow.flatness_db
+    assert wide.max_gain_db == -np.inf
+    assert narrow.max_gain_db == pytest.approx(-6.133314, abs=1e-6)
+
+
 def test_apply_rejects_non_1d() -> None:
     h = _biquad_ir()
     res = signals.regularized_inverse_filter(h, FS, f_range=(500.0, 8000.0))

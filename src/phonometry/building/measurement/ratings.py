@@ -147,6 +147,14 @@ _MAX_UNFAVOURABLE_OCTAVE = 10.0
 #: unfavourable-deviation sum (a true multiple of 0,1 dB) to the bound.
 _SHIFT_TOLERANCE = 1e-6
 
+#: Tolerance for checking a stored unfavourable-deviation sum against the two
+#: curves it summarises, so a caller who recomputed it along another
+#: floating-point path is not refused over the last bit (the impact search
+#: runs on negated curves and reaches the same tenths by a different route).
+#: Distinct from _SHIFT_TOLERANCE, which guards the search's own comparison
+#: to the bound rather than a field against its array.
+_SUM_TOLERANCE = 1e-9
+
 #: Tolerance for checking that ``scale * step`` reconstructs exactly 1,
 #: i.e. that the reference-curve shift step divides 1 dB exactly (1.0 or
 #: 0.1 dB per ISO 717 / ISO 12999-1:2020 Annex B.2), absorbing the
@@ -360,6 +368,66 @@ def _require_finite_curves(owner: object, *fields: str) -> None:
             raise ValueError(msg)
 
 
+def _require_unfavourable_sum(
+    owner: WeightedRatingResult | ImpactRatingResult, *, impact: bool
+) -> None:
+    """Require ``unfavourable_sum`` to restate *owner*'s own two curves.
+
+    The sum of unfavourable deviations is not a number kept beside the
+    curves; it *is* those curves, added up. ISO 717-1 Clause 4.4 counts a
+    band as unfavourable where the measurement falls below the shifted
+    reference and ISO 717-2 Clause 4.3 where it rises above it -- the one
+    structural difference between the two parts, which is why the sign
+    arrives as *impact* rather than being read off a field. Neither part
+    rounds the deviations any further: Table C.1 of each 2020 edition prints
+    them in the tenths the measurement was already reduced to (Clause 4.4
+    footnote 1) and adds those tenths straight up, reaching 31,8 dB and
+    28,0 dB against bounds of 32,0 dB.
+
+    A fiche prints the contradiction twice on one page. Its verbose Annex C
+    table recomputes the deviation column from the two curves and closes it
+    with a sum row, while the plot beside it titles itself from this field:
+    a rating whose ``measured`` was swapped through
+    :func:`dataclasses.replace` keeps the aggregate the old curve earned,
+    and the page then reads a sum row of 0,0 dB under a column of em dashes
+    next to a title claiming 31,8 dB.
+
+    The em dash there is Table C.1's own mark for a band with no
+    unfavourable deviation, not for one left undetermined: both curves are
+    finite by the time this runs (:func:`_require_finite_curves` goes
+    first), so the sum is always determined. A rating built from the single
+    numbers alone carries no curves and is skipped.
+
+    :param owner: The rating whose ``unfavourable_sum`` is checked.
+    :param impact: ``True`` for the ISO 717-2 sign (measurement above the
+        reference), ``False`` for the ISO 717-1 one.
+    :raises ValueError: if ``unfavourable_sum`` is not the sum its own
+        ``measured`` and ``shifted_reference`` state.
+    """
+    measured = owner.measured
+    shifted = owner.shifted_reference
+    if measured is None or shifted is None:
+        return
+    excess = np.asarray(measured, dtype=np.float64) - np.asarray(
+        shifted, dtype=np.float64
+    )
+    expected = float(np.sum(np.maximum(excess if impact else -excess, 0.0)))
+    if not math.isclose(
+        owner.unfavourable_sum, expected, rel_tol=0.0, abs_tol=_SUM_TOLERANCE
+    ):
+        sense = (
+            "'measured' above 'shifted_reference' (ISO 717-2 Clause 4.3)"
+            if impact
+            else "'measured' below 'shifted_reference' (ISO 717-1 Clause 4.4)"
+        )
+        msg = (
+            f"{type(owner).__name__}: 'unfavourable_sum' must be the sum of "
+            f"the unfavourable deviations of its own curves, {sense}; got "
+            f"{owner.unfavourable_sum!r} where the curves sum to {expected!r}."
+        )
+        raise ValueError(msg)
+
+
 @dataclass(frozen=True)
 class WeightedRatingResult:
     """Single-number weighted rating and adaptation terms (ISO 717-1).
@@ -372,7 +440,8 @@ class WeightedRatingResult:
         (Clause 4.5). Integer.
     :ivar unfavourable_sum: Sum of unfavourable deviations at the final
         shift, in dB (Clause 4.4); at most 32,0 (16 bands) or 10,0 (5
-        bands).
+        bands). Restates ``measured`` against ``shifted_reference`` and is
+        checked against them when both are present.
     :ivar band_centers: Band centre frequencies of the measured curve, in
         Hz. Defaults to ``None`` for backward-compatible construction.
     :ivar measured: The measured band quantities used for the rating (after
@@ -426,12 +495,17 @@ class WeightedRatingResult:
         "deviation below 0,05 dB" -- asserting no unfavourable deviation for
         a band that was never determined.
 
-        :raises ValueError: if the band curves supplied disagree, or one of
-            them carries a non-finite value.
+        Last, ``unfavourable_sum`` must be the sum those same two curves
+        state, for the reasons set out on :func:`_require_unfavourable_sum`.
+
+        :raises ValueError: if the band curves supplied disagree, one of them
+            carries a non-finite value, or ``unfavourable_sum`` is not their
+            own sum of unfavourable deviations.
         """
         require_ranks(self, band_centers=1, measured=1, shifted_reference=1)
         require_same_length(self, "band_centers", "measured", "shifted_reference")
         _require_finite_curves(self, "band_centers", "measured", "shifted_reference")
+        _require_unfavourable_sum(self, impact=False)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -515,7 +589,8 @@ class ImpactRatingResult:
         Integer.
     :ivar unfavourable_sum: Sum of unfavourable deviations at the final
         shift, in dB (Clause 4.3); at most 32,0 (16 bands) or 10,0 (5
-        bands).
+        bands). Restates ``measured`` against ``shifted_reference``, with the
+        impact sign, and is checked against them when both are present.
     :ivar band_centers: Band centre frequencies of the measured curve, in
         Hz. Defaults to ``None`` for backward-compatible construction.
     :ivar measured: The measured impact levels used for the rating (after
@@ -556,12 +631,18 @@ class ImpactRatingResult:
         :class:`WeightedRatingResult` (no constructor can emit a non-finite
         band; the fiche prints them raw or crashes namelessly on them).
 
-        :raises ValueError: if the band curves supplied disagree, or one of
-            them carries a non-finite value.
+        Last, ``unfavourable_sum`` must be the sum those same two curves
+        state, taken with the impact sign of Clause 4.3; see
+        :func:`_require_unfavourable_sum`.
+
+        :raises ValueError: if the band curves supplied disagree, one of them
+            carries a non-finite value, or ``unfavourable_sum`` is not their
+            own sum of unfavourable deviations.
         """
         require_ranks(self, band_centers=1, measured=1, shifted_reference=1)
         require_same_length(self, "band_centers", "measured", "shifted_reference")
         _require_finite_curves(self, "band_centers", "measured", "shifted_reference")
+        _require_unfavourable_sum(self, impact=True)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

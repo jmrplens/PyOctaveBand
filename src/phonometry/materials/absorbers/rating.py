@@ -218,6 +218,30 @@ def _coerce(
 # --- result --------------------------------------------------------------
 
 
+def _unfavourable_deviation_sum(
+    shifted_reference: NDArray[np.float64], measured: NDArray[np.float64]
+) -> float:
+    """Sum the unfavourable deviations of Clause 4.2 over the rating bands.
+
+    A deviation is unfavourable only where the measured practical coefficient
+    falls below the shifted reference curve, and it counts as
+    ``curve - measured``; a band above the curve contributes nothing, and is
+    reported as a shape indicator instead (Clause 4.3).
+
+    The sum is arithmetic and is taken as it stands. ISO 11654 shifts a curve
+    of absorption coefficients in steps of 0,05 and rounds nothing afterwards:
+    the grid comes from the practical coefficients of Clause 4.1 and from the
+    step of the shift itself, so the whole-decibel rounding of the ISO 717
+    unfavourable sum has no counterpart here, and neither has an energy sum --
+    these are coefficients, not levels.
+
+    :param shifted_reference: The reference curve of Figure 1 after the shift.
+    :param measured: The practical coefficients rated against it.
+    :returns: The sum of the deviations, in absorption-coefficient units.
+    """
+    return float(np.sum(np.maximum(shifted_reference - measured, 0.0)))
+
+
 @dataclass(frozen=True)
 class AbsorptionRatingResult:
     r"""Weighted sound absorption rating (ISO 11654:1997).
@@ -232,7 +256,9 @@ class AbsorptionRatingResult:
     :ivar shift: Downward shift applied to the reference curve, in
         absorption units (Clause 4.2); :math:`\alpha_\mathrm{w} = 1.00 - \text{shift}`.
     :ivar unfavourable_sum: Sum of the unfavourable deviations at the final
-        shift (Clause 4.2); at most 0.10.
+        shift (Clause 4.2): ``shifted_reference - measured`` over the bands
+        where the measured coefficient falls below the curve, and nothing
+        elsewhere; at most 0.10.
     :ivar band_centers: Octave rating-band centre frequencies, in Hz
         (250 Hz to 4000 Hz).
     :ivar measured: Practical absorption coefficients ``alpha_p`` used for
@@ -303,10 +329,33 @@ class AbsorptionRatingResult:
         requirement anyway, where ``nan >= requirement`` is ``False`` and the
         page printed a definitive FAIL computed from nothing.
 
+        ``unfavourable_sum`` is not a further measurement but a sentence about
+        the two octave curves stored beside it, and the two readers of this
+        result take it from opposite ends: :meth:`plot` shades the deviations
+        it reads off the curves and prints the *field* in the title, while the
+        fiche totals the column it recomputes from those same curves. Nothing
+        held them together. A rating whose 250 Hz band is re-measured and swapped
+        in with :func:`dataclasses.replace`, leaving the rest of the rating
+        stale, is titled by the plot "unfav. = 0.05" over a band it shades
+        0,35 low, and printed by the fiche a page later with "sum 0.35" under
+        that very deviation. Both pages are definitive, neither is marked, and
+        they disagree. The comparison allows a billionth so a
+        caller who recomputed the sum along another floating-point path is not
+        refused over the last bit.
+
+        No band of this rating may be left undetermined, so neither may the
+        sum: ISO 11654 rates the whole reference range 250 Hz to 4000 Hz
+        (Clause 1) and :func:`_coerce` already refuses a non-finite
+        coefficient. The em dash the fiche prints in the deviation column is
+        not an undetermined value either; it marks a band that is *at or above*
+        the curve and therefore contributes zero.
+
         :raises ValueError: if ``alpha_w`` is not a finite value in ``[0, 1]``,
             if the octave curves disagree with each other, if the retained
-            one-third-octave ``alpha_s`` disagrees with its band centres, or
-            if it does not hold three bands per rating octave.
+            one-third-octave ``alpha_s`` disagrees with its band centres, if it
+            does not hold three bands per rating octave, or if
+            ``unfavourable_sum`` does not restate the deviations between the
+            two octave curves.
         """
         if not math.isfinite(self.alpha_w) or not 0.0 <= self.alpha_w <= 1.0:
             msg = (
@@ -358,6 +407,19 @@ class AbsorptionRatingResult:
                 },
                 _THIRD_OCTAVE_AXIS,
             )
+        stated = _unfavourable_deviation_sum(
+            np.asarray(self.shifted_reference, dtype=np.float64),
+            np.asarray(self.measured, dtype=np.float64),
+        )
+        if not math.isclose(self.unfavourable_sum, stated, rel_tol=0.0, abs_tol=1e-9):
+            msg = (
+                f"{type(self).__name__}: 'unfavourable_sum' must be the sum of "
+                "the unfavourable deviations of Clause 4.2, 'shifted_reference' "
+                "minus 'measured' at the bands where the measured coefficient "
+                f"falls below the curve; got {self.unfavourable_sum!r} where "
+                f"the two curves state {stated!r}."
+            )
+            raise ValueError(msg)
 
     @property
     def rating_label(self) -> str:

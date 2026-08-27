@@ -610,6 +610,49 @@ def test_result_rejects_weights_that_miss_a_channel() -> None:
         replace(res, channel_weights=short)
 
 
+def test_result_rejects_a_maximum_its_own_series_denies() -> None:
+    """The headline maxima are the maxima of the series stored beside them.
+
+    No reader recomputes them: the fiche prints each as an informational row
+    above a graph of the very readings that would deny it, and the ``bext``
+    writer stamps them into a broadcast WAV.
+    """
+    res = program_loudness(_steps(((-23.0, 10.0),)), FS)
+    assert res.max_momentary == pytest.approx(float(np.max(res.momentary)))
+    with pytest.raises(ValueError, match="'max_momentary'"):
+        replace(res, max_momentary=0.0)
+    with pytest.raises(ValueError, match="'max_short_term'"):
+        replace(res, max_short_term=0.0)
+
+
+def test_result_rejects_a_maximum_over_an_empty_series() -> None:
+    """An excerpt too short to fill one window holds no maximum at all."""
+    res = program_loudness(_stereo(_sine(-23.0, 0.2)), FS)
+    assert res.momentary.size == 0
+    with pytest.raises(ValueError, match="'max_momentary'"):
+        replace(res, max_momentary=-23.0)
+
+
+def test_maximum_passes_over_readings_left_undetermined() -> None:
+    """A window of digital silence reads -inf and the maximum steps over it.
+
+    EBU Tech 3341 leaves both sliding windows ungated, so the -inf readings of
+    a silent passage stay in the series; only a wholly silent programme leaves
+    the maximum itself undetermined, and the guard accepts that -inf too.
+    """
+    lead_in = _stereo(np.concatenate([np.zeros(2 * FS), _sine(-23.0, 5.0)]))
+    res = program_loudness(lead_in, FS)
+    assert np.any(np.isneginf(res.momentary))
+    assert res.max_momentary == pytest.approx(-23.0, abs=0.1)
+    silent = program_loudness(np.zeros((2, 5 * FS)), FS)
+    assert bool(np.all(np.isneginf(silent.momentary)))
+    assert silent.max_momentary == float("-inf")
+    # A caller who recomputed the maximum along another path is not refused
+    # over the last bit of floating point.
+    nudged = replace(res, max_momentary=res.max_momentary + 1e-12)
+    assert nudged.max_momentary != res.max_momentary
+
+
 def test_program_loudness_matches_integrated_loudness() -> None:
     x = _steps(((-26.0, 5.0), (-20.0, 5.0)))
     assert program_loudness(x, FS).integrated == pytest.approx(

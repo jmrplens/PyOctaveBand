@@ -7,6 +7,8 @@ is the exact energy sum, equal to SEL_ss + 10·lg(N) for identical strikes.
 
 from __future__ import annotations
 
+import dataclasses
+
 import matplotlib as mpl
 
 mpl.use("Agg")
@@ -91,6 +93,62 @@ def test_pile_strike_metrics_rejects_short_signal() -> None:
     too_short = np.array([1.0])
     with pytest.raises(ValueError, match="'pressure' must contain at least"):
         underwater.pile_strike_metrics(too_short, FS)
+
+
+def test_pile_strike_result_rejects_a_peak_level_its_trace_never_reached() -> None:
+    """``peak_spl`` is the peak of the stored trace, and the figure marks it there.
+
+    The waveform panel plots the sample at ``argmax(|pressure|)`` and labels
+    that marker with ``peak_spl``, so a level raised by 12 dB used to print
+    itself over the one sample that disproves it.
+    """
+    res = underwater.pile_strike_metrics(_pulse(100.0, 0.25), FS)
+    with pytest.raises(ValueError, match="'peak_spl' must be the zero-to-peak"):
+        dataclasses.replace(res, peak_spl=res.peak_spl + 12.0)
+
+
+def test_pile_strike_result_rejects_a_trace_the_peak_no_longer_summarises() -> None:
+    """Substituting the waveform without restating the peak is the same lie."""
+    res = underwater.pile_strike_metrics(_pulse(100.0, 0.25), FS)
+    halved = np.asarray(res.pressure) / 2.0
+    with pytest.raises(ValueError, match="'peak_spl' must be the zero-to-peak"):
+        dataclasses.replace(res, pressure=halved)
+
+
+def test_pile_strike_result_accepts_a_peak_recomputed_along_another_path() -> None:
+    """A variant that restates both halves is a legitimate result."""
+    res = underwater.pile_strike_metrics(_pulse(100.0, 0.25), FS)
+    halved = np.asarray(res.pressure) / 2.0
+    variant = dataclasses.replace(
+        res,
+        pressure=halved,
+        peak_spl=20.0 * np.log10(float(np.max(np.abs(halved))) / 1e-6),
+    )
+    assert variant.peak_spl == pytest.approx(res.peak_spl - 20.0 * np.log10(2.0))
+
+
+def test_pile_strike_result_rejects_an_empty_trace() -> None:
+    res = underwater.pile_strike_metrics(_pulse(100.0, 0.25), FS)
+    with pytest.raises(ValueError, match="'pressure' must carry at least one sample"):
+        dataclasses.replace(res, pressure=np.array([]))
+
+
+def test_pile_strike_result_accepts_a_silent_trace_peaking_at_minus_infinity() -> None:
+    """Zero pressure peaks at ``-inf`` dB, and ``-inf`` is what restates it.
+
+    The producer refuses a silent record outright, but the guard must not
+    answer an undetermined peak with a crash or a spurious contradiction: it
+    is the same neutral value ``band_sel`` carries for an empty band.
+    """
+    silent = underwater.PileStrikeResult(
+        single_strike_sel=-np.inf,
+        peak_spl=-np.inf,
+        spl=-np.inf,
+        pulse_duration=0.0,
+        pressure=np.zeros(16),
+        fs=float(FS),
+    )
+    assert silent.peak_spl == -np.inf
 
 
 # ---------------------------------------------------------------------------
@@ -226,3 +284,60 @@ def test_strike_sel_spectrum_plot_returns_axes() -> None:
     assert spec.plot() is not None
     assert spec.plot(language="es") is not None
     plt.close("all")
+
+
+def test_total_sel_rejects_a_column_it_no_longer_totals() -> None:
+    """A mitigated band column keeps the unmitigated total, and the plot draws it.
+
+    A bubble curtain taking 10 dB out of every band is substituted the
+    sanctioned way, through :func:`dataclasses.replace`. The figure rules its
+    dashed SEL_ss line at ``total_sel``, so the old total used to be drawn
+    17 dB above the loudest band in the column beneath it.
+    """
+    spec = underwater.strike_sel_spectrum(_pulse(50.0, 0.2), FS)
+    mitigated = np.asarray(spec.band_sel) - 10.0
+    with pytest.raises(ValueError, match="'total_sel' must be the energy sum"):
+        dataclasses.replace(spec, band_sel=mitigated)
+
+
+def test_total_sel_is_the_energy_sum_and_not_the_arithmetic_one() -> None:
+    """Adding the decibels themselves totals a strike at thousands of dB."""
+    spec = underwater.strike_sel_spectrum(_pulse(50.0, 0.2), FS)
+    bands = np.asarray(spec.band_sel)
+    arithmetic = float(np.sum(bands[np.isfinite(bands)]))
+    assert arithmetic > spec.total_sel + 1000.0
+    with pytest.raises(ValueError, match="'total_sel' must be the energy sum"):
+        dataclasses.replace(spec, total_sel=arithmetic)
+
+
+def test_total_sel_accepts_a_mitigated_column_restated() -> None:
+    """A uniform 10 dB attenuation moves the energy sum by exactly 10 dB."""
+    spec = underwater.strike_sel_spectrum(_pulse(50.0, 0.2), FS)
+    mitigated = np.asarray(spec.band_sel) - 10.0
+    variant = dataclasses.replace(
+        spec, band_sel=mitigated, total_sel=spec.total_sel - 10.0
+    )
+    assert variant.total_sel == pytest.approx(spec.total_sel - 10.0)
+
+
+def test_total_sel_admits_empty_bands_but_not_a_nan_one() -> None:
+    """``-inf`` is the level of zero exposure; nothing else non-finite is a level."""
+    spec = underwater.strike_sel_spectrum(_pulse(50.0, 0.2), FS)
+    assert np.any(np.isneginf(spec.band_sel))  # the guard passed them already
+    spoiled = np.asarray(spec.band_sel).copy()
+    spoiled[int(np.argmax(spoiled))] = np.nan
+    with pytest.raises(ValueError, match="'band_sel' must be finite, or -inf"):
+        dataclasses.replace(spec, band_sel=spoiled)
+
+
+def test_total_sel_of_an_all_empty_column_is_minus_infinity() -> None:
+    """Every band empty sums to ``-inf``, which is the truthful total over it."""
+    spectrum = underwater.StrikeSelSpectrum(
+        frequencies=np.array([100.0, 125.0, 160.0]),
+        band_sel=np.full(3, -np.inf),
+        total_sel=-np.inf,
+        broadband_sel=140.0,
+        fraction=3,
+        fs=float(FS),
+    )
+    assert spectrum.total_sel == -np.inf

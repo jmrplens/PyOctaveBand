@@ -170,8 +170,8 @@ Ceiling attenuation class (ASTM E1414 rated through ASTM E413).
 | `rounded` | The same data rounded to the nearest integer (clause 5.2), which is what the contour is fitted to. |
 | `shifted_reference` | The fitted reference contour, in dB. |
 | `deficiencies` | Per-band deficiency (shifted contour minus data, floored at zero), in dB. |
-| `deficiency_sum` | Sum of the deficiencies, in dB (at most 32). |
-| `max_deficiency` | Largest single deficiency, in dB (at most 8). |
+| `deficiency_sum` | Sum of `deficiencies`, in dB (at most 32). |
+| `max_deficiency` | Largest entry of `deficiencies`, in dB (at most 8). |
 | `rating` | The ceiling attenuation class CAC, read off the shifted contour at 500 Hz (clause 5.5), in dB. |
 
 ### CeilingAttenuationResult.plot()

@@ -23,14 +23,21 @@ hammer strike. ISO 18406 characterises them with:
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.levels_math import energy_sum
+from ..._internal.validation import (
+    require_finite_fields,
+    require_ranks,
+    require_same_length,
+)
 from ...io._resolve import SignalInput, resolve_fs
 from ..acoustics import (
+    UNDERWATER_REFERENCE_PRESSURE,
     _positive,
     _validate_pressure,
     peak_sound_pressure_level,
@@ -126,6 +133,44 @@ def _pulse_duration(pressure: NDArray[np.float64], fs: float) -> float:
     return float((hi - lo) / fs)
 
 
+def _peak_level(pressure: NDArray[np.float64]) -> float:
+    r"""Zero-to-peak level of *pressure*, in dB re 1 µPa.
+
+    :func:`~phonometry.underwater.acoustics.peak_sound_pressure_level` is the
+    measurement and refuses a silent record outright, which is right there and
+    wrong in a guard: what a guard has to tell apart is a level that restates
+    its trace from one that contradicts it, and an exception raised about the
+    trace answers neither. A silent trace peaks at ``-inf``, the level of zero
+    pressure -- the same neutral value :attr:`StrikeSelSpectrum.band_sel`
+    carries for a band that holds no energy, so the two guards in this module
+    treat an undetermined level the same way.
+
+    :param pressure: The strike waveform, in Pa (non-empty).
+    :return: :math:`20 \log_{10}(\max\lvert p \rvert / 1\,\mu\mathrm{Pa})`,
+        ``-inf`` for an all-zero trace.
+    """
+    peak = float(np.max(np.abs(np.asarray(pressure, dtype=np.float64))))
+    with np.errstate(divide="ignore"):
+        return float(20.0 * np.log10(peak / UNDERWATER_REFERENCE_PRESSURE))
+
+
+def _band_energy_sum(band_sel: NDArray[np.float64]) -> float:
+    r"""Energy sum of the band levels *band_sel*, in dB re 1 µPa²·s.
+
+    :math:`10 \log_{10} \sum_b 10^{\mathrm{SEL}_b/10}`, the only sum a column
+    of decibels has: adding the decibels themselves totals a strike at some
+    thousands of dB. A band at ``-inf`` contributes an exact zero, so a
+    spectrum with an empty band sums as though the band were not there; a
+    spectrum with *every* band empty sums to ``-inf``, the level of no
+    exposure at all, which is the truthful total over such a column.
+
+    :param band_sel: Per-band single-strike SELs, in dB re 1 µPa²·s.
+    :return: Their energy sum, in dB re 1 µPa²·s.
+    """
+    with np.errstate(divide="ignore"):
+        return energy_sum(np.asarray(band_sel, dtype=np.float64))
+
+
 @dataclass(frozen=True)
 class PileStrikeResult:
     """Per-strike pile-driving metrics (ISO 18406).
@@ -144,6 +189,54 @@ class PileStrikeResult:
     pulse_duration: float
     pressure: NDArray[np.float64]
     fs: float
+
+    def __post_init__(self) -> None:
+        """Reject a strike whose peak level is not the peak of its own trace.
+
+        :attr:`peak_spl` is not a measurement of its own: ISO 18406 6.4.2.1.3
+        takes it off the very waveform stored here, and
+        :func:`pile_strike_metrics` computes it as
+        :func:`~phonometry.underwater.acoustics.peak_sound_pressure_level` of
+        the trace it goes on to store beside it. The two cannot part company
+        except by hand or by :func:`dataclasses.replace`, which is how a
+        variant of a frozen result is built -- substitute a filtered or
+        de-spiked waveform and the peak level that travels through with it is
+        the old trace's.
+
+        Parted, they are still drawn together. The figure marks the sample at
+        ``argmax(|pressure|)`` and labels that marker with ``peak_spl``, so a
+        peak level from another trace prints itself over the one sample that
+        disproves it. The number is also the one half of the marine-mammal
+        dual-metric rule that is compared unweighted, against a fixed
+        peak-pressure injury threshold: a strike that clears the threshold on
+        its own waveform is failed against it, or the reverse, with the
+        waveform beneath saying otherwise.
+
+        The comparison allows a billionth of a decibel so a caller who
+        recomputed the peak along another floating-point path is not refused
+        over the last bit.
+
+        :raises ValueError: if ``pressure`` is not a non-empty, finite,
+            one-dimensional trace, or ``peak_spl`` is not its zero-to-peak
+            level.
+        """
+        require_ranks(self, pressure=1)
+        if np.asarray(self.pressure).size == 0:
+            msg = (
+                "PileStrikeResult: 'pressure' must carry at least one sample; "
+                "a strike with no waveform has no peak to state."
+            )
+            raise ValueError(msg)
+        require_finite_fields(self, "pressure")
+        peak = _peak_level(self.pressure)
+        if not math.isclose(self.peak_spl, peak, rel_tol=0.0, abs_tol=1e-9):
+            msg = (
+                "PileStrikeResult: 'peak_spl' must be the zero-to-peak level of "
+                "'pressure', 20 lg(max|p| / 1 uPa), the trace it summarises; "
+                f"got {self.peak_spl!r} where the trace peaks at {peak!r} dB "
+                "re 1 uPa."
+            )
+            raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -187,7 +280,7 @@ class StrikeSelSpectrum:
     fs: float
 
     def __post_init__(self) -> None:
-        """Reject a band spectrum whose levels do not match its band centres.
+        r"""Reject a band spectrum whose levels do not match its band centres.
 
         The two arrays state one measurement twice over -- a nominal centre
         frequency, and the exposure the band at that frequency carries -- and
@@ -204,10 +297,60 @@ class StrikeSelSpectrum:
         curves fall by tens of decibels across a decade, so a misaligned
         spectrum returns an injury margin that reads like any other.
 
-        :raises ValueError: if the band levels disagree with the centres.
+        :attr:`total_sel` is then held to the column it totals. It is the
+        *energy* sum of ``band_sel``, :math:`10 \log_{10} \sum_b
+        10^{\mathrm{SEL}_b/10}`, which is what :func:`strike_sel_spectrum`
+        computes by summing the band energies before taking the logarithm
+        once; the arithmetic sum of the same decibels totals a strike at some
+        thousands of dB and is simply a different number. The figure rules a
+        dashed line across the axes at ``total_sel`` and labels it
+        :math:`\mathrm{SEL}_{\mathrm{ss}}`, so a total kept from another
+        column -- a mitigated spectrum substituted through
+        :func:`dataclasses.replace` is exactly that -- is drawn as a broadband
+        level the bands beneath it never reach.
+
+        A band at ``-inf`` is admitted, and only ``-inf``: it is the level of
+        zero exposure this class documents for a band narrower than the FFT
+        bin spacing, and it is the neutral element of the energy sum, so it
+        passes through the total without disturbing it. Nothing else
+        non-finite is a level, and a ``NaN`` band would otherwise be reported
+        as a wrong total rather than as the wrong band it is.
+
+        :attr:`broadband_sel` is left unpinned deliberately. It is the SEL of
+        the whole record, :math:`\int p^2 dt` over the waveform, and the
+        waveform is not stored here; it exceeds ``total_sel`` by exactly the
+        energy falling outside ``limits``, which nothing in hand can measure.
+
+        The total's comparison allows a billionth of a decibel so a caller who
+        re-summed the bands along another floating-point path is not refused
+        over the last bit.
+
+        :raises ValueError: if the band levels disagree with the centres, if a
+            band is non-finite otherwise than ``-inf``, or if ``total_sel`` is
+            not the energy sum of ``band_sel``.
         """
         require_ranks(self, frequencies=1, band_sel=1)
         require_same_length(self, "frequencies", "band_sel")
+        band_sel = np.asarray(self.band_sel, dtype=np.float64)
+        undetermined = np.flatnonzero(~(np.isfinite(band_sel) | np.isneginf(band_sel)))
+        if undetermined.size:
+            i = int(undetermined[0])
+            msg = (
+                "StrikeSelSpectrum: 'band_sel' must be finite, or -inf for a "
+                "band that holds no energy at all; the "
+                f"{float(np.asarray(self.frequencies)[i]):g} Hz band states "
+                f"{float(band_sel[i])!r}."
+            )
+            raise ValueError(msg)
+        total = _band_energy_sum(band_sel)
+        if not math.isclose(self.total_sel, total, rel_tol=0.0, abs_tol=1e-9):
+            msg = (
+                "StrikeSelSpectrum: 'total_sel' must be the energy sum of "
+                "'band_sel', 10 lg(sum 10^(SEL/10)) over the bands beside it "
+                f"and not their arithmetic sum; got {self.total_sel!r} where "
+                f"the bands sum to {total!r}."
+            )
+            raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

@@ -323,6 +323,38 @@ def test_a_retained_alpha_s_off_the_octave_triple_is_refused() -> None:
         dataclasses.replace(res, third_octave_alpha_s=twelve, third_octave_bands=bands)
 
 
+def test_a_sum_contradicting_its_own_curves_is_refused() -> None:
+    """Clause 4.2 makes the sum a sentence about the two octave curves.
+
+    The readers take it from opposite ends and used to disagree in print:
+    re-measuring the 250 Hz band and swapping it in with
+    ``dataclasses.replace`` left the sum stale, and plot() titled the figure
+    "unfav. = 0.05" over a band it shaded 0,35 low while the fiche printed
+    "sum 0.35" under that very deviation, both definitive, neither marked.
+    """
+    import dataclasses
+
+    res = weighted_absorption(_ANNEX_A2_ALPHA_P)  # sum 0.05, all of it at 250 Hz
+    assert _almost(res.unfavourable_sum, 0.05)
+    remeasured = np.asarray([0.05, *_ANNEX_A2_ALPHA_P[1:]], dtype=float)
+    with pytest.raises(ValueError, match="'unfavourable_sum' must be the sum"):
+        dataclasses.replace(res, measured=remeasured)
+
+
+def test_a_sum_off_by_a_last_bit_is_kept() -> None:
+    """A caller who recomputed the sum along another float path is not refused.
+
+    The deviations live on the 0,05 grid, so a billionth of a coefficient is
+    never a disagreement about the rating; it is the last bit of a different
+    summation order.
+    """
+    import dataclasses
+
+    res = weighted_absorption(_ANNEX_A2_ALPHA_P)
+    kept = dataclasses.replace(res, unfavourable_sum=res.unfavourable_sum + 1e-12)
+    assert _almost(kept.unfavourable_sum, res.unfavourable_sum)
+
+
 def test_weighted_mapping_matches_sequence() -> None:
     mapping = dict(zip(OCTAVE_BANDS, _ANNEX_A2_ALPHA_P, strict=True))
     res_map = weighted_absorption(mapping)

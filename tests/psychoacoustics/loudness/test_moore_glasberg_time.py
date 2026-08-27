@@ -520,6 +520,120 @@ def test_level_curve_off_the_frame_axis_is_refused(mg_tone: MgTone) -> None:
         dataclasses.replace(res, short_term_loudness_level=short_term)
 
 
+def test_n_max_that_contradicts_its_trace_is_refused(mg_tone: MgTone) -> None:
+    """A peak the long-term trace never reaches is refused at construction.
+
+    ``n_max`` is the maximum of the long-term loudness (clause 7.9) and the
+    chart takes it on trust: it prints it in the title and rules a dashed line
+    across the axes at it.  Before this guard a peak of 12 sone stapled onto a
+    trace that peaks at 1.000 drew that line at 12, stretched the y-axis to
+    reach it, and flattened the trace it claimed to summarise against the
+    bottom of the plot.
+    """
+    res = mg_tone(1000.0, 40.0)
+    with pytest.raises(
+        ValueError, match="'n_max' must be the maximum of 'long_term_loudness'"
+    ):
+        dataclasses.replace(res, n_max=12.0, loudness_level_max=76.5)
+
+
+def test_n_max_left_behind_by_a_cropped_trace_is_refused(mg_tone: MgTone) -> None:
+    """Cropping every trace consistently still has to restate the peak.
+
+    The frame-axis guard passes a crop that keeps all five columns the same
+    length, so nothing else notices that the window no longer contains the
+    instant the stored peak was taken at.
+    """
+    res = mg_tone(1000.0, 40.0)
+    head = slice(0, 50)  # the attack, well below the settled peak
+    cropped = {
+        "time": res.time[head],
+        "short_term_loudness": res.short_term_loudness[head],
+        "long_term_loudness": res.long_term_loudness[head],
+        "short_term_loudness_level": res.short_term_loudness_level[head],
+        "long_term_loudness_level": res.long_term_loudness_level[head],
+    }
+    with pytest.raises(
+        ValueError, match="'n_max' must be the maximum of 'long_term_loudness'"
+    ):
+        dataclasses.replace(res, **cropped)
+
+
+def test_loudness_level_max_must_be_n_max_through_table_5(mg_tone: MgTone) -> None:
+    """The phon headline has to be the sone headline, not a second opinion.
+
+    ``loudness_level_max`` is ``n_max`` read through Table 5 and nothing else
+    (clause 9 f) and h) ask for the pair), so a phon value that belongs to a
+    different loudness is caught here or nowhere: the chart prints the two side
+    by side in one title without ever comparing them.
+    """
+    res = mg_tone(1000.0, 40.0)
+    with pytest.raises(
+        ValueError, match="'loudness_level_max' must be 'n_max' through the Table 5"
+    ):
+        dataclasses.replace(res, loudness_level_max=res.loudness_level_max + 5.0)
+
+
+@pytest.mark.parametrize(
+    ("fill", "n_max", "phon"),
+    [
+        (np.inf, np.inf, 120.0),
+        (-np.inf, -np.inf, 0.0),
+        (-5.0, -5.0, 0.0),
+        (np.nan, np.nan, 0.0),
+    ],
+    ids=["+inf", "-inf", "negative", "nan"],
+)
+def test_n_max_that_is_not_a_loudness_is_refused(
+    mg_tone: MgTone, fill: float, n_max: float, phon: float
+) -> None:
+    """A peak that is no loudness at all is refused before any restatement.
+
+    Restatement alone cannot catch these: a trace filled with the value
+    restates it as its own maximum, and ``_loudness_level`` reads flat off
+    both ends of Table 5, so ``inf`` sone maps to 120 phon and every negative
+    sone maps to 0 phon.  The first three triples below therefore agreed with
+    themselves and were admitted before this pin, titling the chart
+    ``N = inf sone (120.0 phon)`` over a trace with no finite peak to draw.
+    NaN went the other way - it compares equal to nothing, so the maximum
+    comparison already refused it, but for the wrong reason.
+    """
+    res = mg_tone(1000.0, 40.0)
+    trace = np.full(res.long_term_loudness.size, fill, dtype=np.float64)
+    with pytest.raises(ValueError, match="'n_max' must be a finite, non-negative peak"):
+        dataclasses.replace(
+            res, long_term_loudness=trace, n_max=n_max, loudness_level_max=phon
+        )
+
+
+def test_producer_pair_survives_and_an_empty_trace_peaks_at_zero(
+    mg_tone: MgTone,
+) -> None:
+    """The guard admits what the producer builds, and the empty trace it never does.
+
+    The producer never emits an empty trace - an empty signal is refused
+    outright and one sample still yields one frame - so the zero the peak
+    falls back to on an empty column is reachable only by a caller assembling
+    the result by hand.  It is pinned here so that fallback keeps stating
+    zero instead of raising on the maximum of nothing.
+    """
+    res = mg_tone(1000.0, 40.0)
+    assert res.n_max == pytest.approx(float(res.long_term_loudness.max()))
+    empty = np.empty(0, dtype=np.float64)
+    blank = dataclasses.replace(
+        res,
+        time=empty,
+        short_term_loudness=empty,
+        long_term_loudness=empty,
+        short_term_loudness_level=empty,
+        long_term_loudness_level=empty,
+        n_max=0.0,
+        loudness_level_max=0.0,
+        percentiles={},
+    )
+    assert blank.n_max == 0.0
+
+
 def test_plot_smoke() -> None:
     """The lazy .plot() renders without error when matplotlib is present."""
     matplotlib = pytest.importorskip("matplotlib")

@@ -445,3 +445,57 @@ def test_a_result_refuses_a_centre_frequency_column_of_pairs() -> None:
     pairs = np.column_stack([result.centre_frequencies, result.centre_frequencies])
     with pytest.raises(ValueError, match="'centre_frequencies'"):
         dataclasses.replace(result, centre_frequencies=pairs)
+
+
+# --------------------------------------------------------------------------
+# The one loudness the two units say
+# --------------------------------------------------------------------------
+
+
+def test_a_result_refuses_a_loudness_level_its_own_sone_value_does_not_state() -> None:
+    """The chart prints both numbers, and says nothing when they disagree.
+
+    The definitional anchor of clause 3.17 gives 1.000 sone, which Table 5
+    puts at 40 phon; a result carrying that sone value beside 100.0 phon
+    titled itself ``ISO 532-2 loudness N = 1.00 sone (100.0 phon)`` - the
+    sone of one loudness and the phon of another, each plausible alone.
+    """
+    anchor = psychoacoustics.loudness_moore_glasberg_from_spectrum([(1000.0, 40.0)])
+    assert anchor.loudness == pytest.approx(1.0, abs=1e-3)
+    with pytest.raises(ValueError, match="'loudness_level' must be 'loudness'"):
+        dataclasses.replace(anchor, loudness_level=100.0)
+
+
+def test_a_result_refuses_a_loudness_level_off_by_more_than_float_noise() -> None:
+    """The pin allows the last bit and nothing above it.
+
+    A caller who recomputes the Table 5 mapping along another floating-point
+    path keeps the result; one who rounds the phon value to the tenth the
+    title displays does not, because a tenth of a phon is a different
+    loudness level and the sone value beside it is the one that means it.
+    """
+    result = psychoacoustics.loudness_moore_glasberg_from_spectrum([(1000.0, 60.0)])
+    recomputed = dataclasses.replace(
+        result, loudness_level=result.loudness_level + 1e-12
+    )
+    assert recomputed.loudness_level == pytest.approx(result.loudness_level)
+    rounded = round(result.loudness_level, 1)
+    with pytest.raises(ValueError, match="'loudness_level' must be 'loudness'"):
+        dataclasses.replace(result, loudness_level=rounded)
+
+
+def test_a_result_refuses_a_loudness_that_is_not_a_sone_value() -> None:
+    """A NaN loudness maps to a NaN level, which restates nothing.
+
+    No calculation here can produce one - the pattern integrated is
+    non-negative everywhere and every entry point refuses non-finite input -
+    but a hand-built NaN would pass a restatement test by comparing equal to
+    nothing, and reach the title as ``N = nan sone (nan phon)``.
+    """
+    result = psychoacoustics.loudness_moore_glasberg_from_spectrum([(1000.0, 60.0)])
+    with pytest.raises(ValueError, match="'loudness' must be a finite"):
+        dataclasses.replace(result, loudness=float("nan"))
+    # Below the table Table 5 is read flat, so a negative sone value would
+    # otherwise restate 0.0 phon and pass the pin above.
+    with pytest.raises(ValueError, match="'loudness' must be a finite"):
+        dataclasses.replace(result, loudness=-1.0, loudness_level=0.0)

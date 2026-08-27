@@ -595,6 +595,153 @@ def test_an_exposure_row_that_does_not_run_over_the_bands_is_refused() -> None:
             dataclasses.replace(good, **{field: value})
 
 
+def test_a_peak_margin_that_contradicts_its_own_peak_level_is_refused() -> None:
+    """``peak_margin`` is the stored level less the stored criterion, or nothing.
+
+    Nothing downstream recomputes the subtraction, and both readers go the
+    wrong way round it: ``exceeds_injury`` is formed from the margin and never
+    looks at the level, and the guide prints the pair side by side. Before the
+    guard, raising the guide's own assessment from its 153.8 dB peak to 250 dB
+    -- 28 dB clear of the 222 dB auditory-injury criterion -- left the quiet
+    one's margin in place and printed ``peak_spl=250.0 peak_margin=-68.2
+    exceeds_injury=False``. Dropping the level to ``None`` printed a margin of
+    -68.2 dB for a peak that was not there.
+    """
+    good = weighted_exposure([1000.0], [100.0], "VHF", impulsive=True, peak_spl=210.0)
+    assert (good.peak_spl, good.peak_margin) == (210.0, 8.0)
+    cases: tuple[tuple[str, float | None], ...] = (
+        ("peak_spl", 150.0),
+        ("peak_spl", None),
+        ("peak_margin", None),
+        ("peak_margin", -8.0),
+    )
+    for field, value in cases:
+        with pytest.raises(ValueError, match=r"'peak_margin' must be 'peak_spl' minus"):
+            dataclasses.replace(good, **{field: value})
+
+
+def test_a_non_finite_peak_level_is_refused_at_construction() -> None:
+    """The entry point refuses a non-finite ``peak_spl``; so must a variant.
+
+    ``None`` is how an assessment says no peak was supplied, so a ``NaN`` is
+    never the undetermined state -- it is a level that failed to be measured,
+    and it reaches the margin as a subtraction that quietly answers ``NaN``.
+    """
+    good = weighted_exposure([1000.0], [100.0], "VHF", impulsive=True, peak_spl=210.0)
+    with pytest.raises(ValueError, match=r"'peak_spl' must be finite"):
+        dataclasses.replace(good, peak_spl=float("nan"))
+
+
+def test_the_tts_half_of_the_peak_metric_is_pinned_too() -> None:
+    """``tts_peak_margin`` is the same subtraction against the other criterion.
+
+    It has the provenance ``peak_margin`` has -- the stored level less a
+    stored criterion -- and ``exceeds_tts``, which the guide prints beside the
+    injury verdict, is formed from it and never looks at the level. Moving the
+    level and the injury margin together while leaving this one behind left a
+    200 dB peak carrying the 190 dB one's -6 dB of TTS headroom, 4 dB over the
+    196 dB TTS-onset criterion, and still reporting ``exceeds_tts=False``.
+    """
+    good = weighted_exposure([1000.0], [80.0], "VHF", impulsive=True, peak_spl=190.0)
+    assert (good.tts_peak_margin, good.exceeds_tts) == (-6.0, False)
+    named = r"'tts_peak_margin' must be 'peak_spl' minus"
+    with pytest.raises(ValueError, match=named):
+        dataclasses.replace(good, peak_spl=200.0, peak_margin=-2.0)
+    for value in (None, 0.0):
+        with pytest.raises(ValueError, match=named):
+            dataclasses.replace(good, tts_peak_margin=value)
+
+
+def test_the_peak_metric_may_be_restated_whole_or_left_out_whole() -> None:
+    """The guard pins the relations, not the presence of a peak metric.
+
+    A variant that moves the level with both its margins is the sanctioned way
+    to build one and must pass; so must an assessment with no peak at all, and
+    one whose guidance publishes no peak criteria to compare against (the
+    non-impulsive tables publish none).
+    """
+    good = weighted_exposure([1000.0], [100.0], "VHF", impulsive=True, peak_spl=210.0)
+    louder = dataclasses.replace(
+        good, peak_spl=250.0, peak_margin=48.0, tts_peak_margin=54.0
+    )
+    assert (louder.peak_margin, louder.tts_peak_margin) == (48.0, 54.0)
+    assert (louder.exceeds_injury, louder.exceeds_tts) == (True, True)
+    absent = dataclasses.replace(
+        good,
+        peak_spl=None,
+        peak_margin=None,
+        tts_peak_margin=None,
+        exceeds_injury=False,
+        exceeds_tts=False,
+    )
+    assert (absent.peak_spl, absent.peak_margin, absent.tts_peak_margin) == (
+        None,
+        None,
+        None,
+    )
+    flat = weighted_exposure([1000.0], [150.0], "LF", impulsive=False, peak_spl=250.0)
+    assert (flat.peak_margin, flat.tts_peak_margin) == (None, None)
+
+
+def test_a_total_that_does_not_sum_the_row_beside_it_is_refused() -> None:
+    """Every exposure total is an energy sum of a whole row, accumulation aside.
+
+    Nothing recomputes them: the figure draws the rows and prints the totals,
+    and the margins and both verdicts are formed from ``cumulative_sel``
+    alone. A variant that edits one row, one total or the event count it is
+    accumulated over therefore reports an exposure its own bands do not carry.
+    """
+    good = weighted_exposure([125.0, 250.0, 500.0, 1000.0], [180.0] * 4, "LF")
+    cases: tuple[tuple[str, object, str], ...] = (
+        ("weighted_band_sel", good.weighted_band_sel + 3.0, "weighted_band_sel"),
+        ("band_sel", good.band_sel - 3.0, "weighted_band_sel"),
+        ("unweighted_sel", 0.0, "unweighted_sel"),
+        ("weighted_sel", 0.0, "weighted_sel"),
+        ("cumulative_sel", good.cumulative_sel + 6.0, "cumulative_sel"),
+        ("n_events", 4, "cumulative_sel"),
+    )
+    for field, value, named in cases:
+        with pytest.raises(ValueError, match=rf"'{named}' must be"):
+            dataclasses.replace(good, **{field: value})
+
+
+def test_a_verdict_that_contradicts_its_own_margins_is_refused() -> None:
+    """The two verdicts are what the stored margins say, and the last link.
+
+    They are what an assessment is read for, and they are formed from the
+    margins and never from the levels. Before the guard, a result 28 dB over
+    the 202 dB auditory-injury peak criterion could be built reporting no
+    exceedance at all, every margin beside it still stating one.
+    """
+    over = weighted_exposure([1000.0], [100.0], "VHF", impulsive=True, peak_spl=230.0)
+    assert over.peak_margin == 28.0
+    assert (over.exceeds_injury, over.exceeds_tts) == (True, True)
+    for field in ("exceeds_injury", "exceeds_tts"):
+        with pytest.raises(ValueError, match=rf"'{field}' must be True exactly when"):
+            dataclasses.replace(over, **{field: False})
+
+
+def test_an_all_empty_spectrum_keeps_its_undetermined_totals() -> None:
+    """``band_sel`` admits ``-inf``, so the sums over it may be ``-inf`` too.
+
+    That licence is about being finite, and being finite is not what the
+    totals are held to: minus infinity less a finite criterion is minus
+    infinity, so an empty spectrum's totals restate its bands and its SEL
+    margins restate those totals exactly, and each is pinned to it like any
+    other. The peak metric is measured from the waveform, not from those
+    bands, so it stays a number.
+    """
+    with np.errstate(divide="ignore"):
+        res = weighted_exposure(
+            [100.0, 200.0], [-np.inf, -np.inf], "LF", peak_spl=200.0
+        )
+    assert (res.unweighted_sel, res.weighted_sel, res.cumulative_sel) == (-np.inf,) * 3
+    assert (res.sel_margin, res.tts_margin) == (-np.inf, -np.inf)
+    assert res.peak_margin == pytest.approx(-22.0, abs=1e-9)
+    with pytest.raises(ValueError, match=r"'cumulative_sel' must be 'weighted_sel'"):
+        dataclasses.replace(res, cumulative_sel=200.0)
+
+
 def test_plot_returns_axes() -> None:
     freqs = np.logspace(1.0, 5.5, 200)
     assert auditory_weighting(freqs, "VHF").plot() is not None
