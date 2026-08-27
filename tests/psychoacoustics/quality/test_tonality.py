@@ -168,25 +168,27 @@ def test_invalid_inputs() -> None:
     one_second = np.ones(1000)
     two_channel = np.ones((2, FS))
     too_short = np.ones(100)
-    with pytest.raises(ValueError, match="fs"):
+    with pytest.raises(ValueError, match=r"'fs' must be positive"):
         psychoacoustics.tone_to_noise_ratio(one_second, 0)
-    with pytest.raises(ValueError, match="1D"):
+    with pytest.raises(ValueError, match=r"prominence_ratio expects a 1D signal"):
         psychoacoustics.prominence_ratio(two_channel, FS)
-    with pytest.raises(ValueError, match="too short"):
+    with pytest.raises(
+        ValueError, match=r"Signal too short for the requested .* Hz resolution"
+    ):
         psychoacoustics.tone_to_noise_ratio(too_short, FS)
 
 
 def test_invalid_resolution_and_tone_freq() -> None:
     x = np.ones(FS)
-    with pytest.raises(ValueError, match="resolution_hz"):
+    with pytest.raises(ValueError, match=r"'resolution_hz' must be positive"):
         psychoacoustics.tone_to_noise_ratio(x, FS, resolution_hz=0.0)
-    with pytest.raises(ValueError, match="tone_freq"):
+    with pytest.raises(ValueError, match=r"'tone_freq' must be positive"):
         psychoacoustics.prominence_ratio(x, FS, tone_freq=-100.0)
 
 
 def test_too_coarse_resolution_raises() -> None:
     x = np.ones(FS)
-    with pytest.raises(ValueError, match="too coarse"):
+    with pytest.raises(ValueError, match=r"resolution_hz=.* is too coarse for fs="):
         psychoacoustics.tone_to_noise_ratio(x, FS, resolution_hz=FS / 4.0)
 
 
@@ -195,9 +197,10 @@ def test_coarse_resolution_warns_at_low_frequency() -> None:
     half-width, biasing the ratio; the function warns (it does not raise).
     """
     x = _tone_in_noise(250.0, 0.2, 0.02)
-    with pytest.warns(UserWarning, match="bins"):
+    coarse = r"Frequency resolution .* is coarse for the tone at"
+    with pytest.warns(UserWarning, match=coarse):
         psychoacoustics.tone_to_noise_ratio(x, FS, tone_freq=250.0, resolution_hz=4.0)
-    with pytest.warns(UserWarning, match="bins"):
+    with pytest.warns(UserWarning, match=coarse):
         psychoacoustics.prominence_ratio(x, FS, tone_freq=250.0, resolution_hz=4.0)
 
 
@@ -216,11 +219,12 @@ def test_numeric_noise_power_warns() -> None:
     """Silence and DC produce formally finite TNR/PR values with no meaning;
     the function warns that the band power is at numeric-noise level.
     """
+    numeric_noise = r"critical-band power is at numeric-noise level"
     silence = np.zeros(FS * 2)
-    with pytest.warns(UserWarning, match="numeric-noise"):
+    with pytest.warns(UserWarning, match=numeric_noise):
         psychoacoustics.tone_to_noise_ratio(silence, FS, tone_freq=1000.0)
     dc = np.full(FS * 2, 0.5)
-    with pytest.warns(UserWarning, match="numeric-noise"):
+    with pytest.warns(UserWarning, match=numeric_noise):
         psychoacoustics.prominence_ratio(dc, FS, tone_freq=1000.0)
 
 

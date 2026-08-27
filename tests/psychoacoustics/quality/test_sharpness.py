@@ -155,7 +155,7 @@ def test_annex_b_variants() -> None:
     s_a = sharpness_din_from_specific(spec, method="aures")
     s_b = sharpness_din_from_specific(spec, method="bismarck")
     assert s_a != s_b
-    with pytest.raises(ValueError, match="method"):
+    with pytest.raises(ValueError, match=r"method must be 'din'"):
         sharpness_din_from_specific(spec, method="zwicker")
 
 

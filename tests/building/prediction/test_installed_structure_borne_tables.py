@@ -194,13 +194,18 @@ def test_table_d1_rejects_a_quantity_that_does_not_describe_the_row(
 
 
 def test_table_d1_names_the_missing_describing_quantity() -> None:
-    with pytest.raises(ValueError, match="missing longitudinal_velocity"):
+    with pytest.raises(
+        ValueError, match=r"Table D\.1 row 'plate' .* missing longitudinal_velocity"
+    ):
         building.typical_element_mobility("plate", density=2300.0, thickness=0.14)
 
 
 def test_frequency_independent_rows_reject_a_frequency() -> None:
     """Two of the six expressions carry no f; passing one is an error."""
-    with pytest.raises(ValueError, match="frequency-independent"):
+    with pytest.raises(
+        ValueError,
+        match=r"Table D\.1 row 'plate' is frequency-independent; do not pass 'frequency'",
+    ):
         building.typical_element_mobility(
             "plate",
             frequency=125.0,
@@ -216,7 +221,7 @@ def test_frequency_dependent_rows_require_a_frequency() -> None:
 
 
 def test_unknown_row_is_rejected() -> None:
-    with pytest.raises(ValueError, match="structure"):
+    with pytest.raises(ValueError, match=r"'structure' must be one of"):
         building.typical_element_mobility("slab", density=1.0)
 
 
@@ -406,5 +411,5 @@ def test_clause_f1_kij_floor() -> None:
 
 
 def test_multi_junction_adjustment_rejects_zero_junctions() -> None:
-    with pytest.raises(ValueError, match="at least 1"):
+    with pytest.raises(ValueError, match=r"'junctions' must be at least"):
         building.multi_junction_adjustment(0)

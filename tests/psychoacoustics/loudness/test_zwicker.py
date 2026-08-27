@@ -181,9 +181,13 @@ def test_stationary_time_skip() -> None:
     # ~1 % residual vs the from-onset tone: that one still contains the
     # broadband onset click the skip removes.
     assert n_skip == pytest.approx(n_steady, rel=0.02)
-    with pytest.raises(ValueError, match="time_skip"):
+    with pytest.raises(
+        ValueError, match=r"'time_skip' must be a non-negative, finite time"
+    ):
         psychoacoustics.loudness_zwicker(x, FS, stationary=True, time_skip=-0.1)
-    with pytest.raises(ValueError, match="time_skip"):
+    with pytest.raises(
+        ValueError, match=r"'time_skip' must leave at least one sample of signal"
+    ):
         psychoacoustics.loudness_zwicker(x, FS, stationary=True, time_skip=2.0)
 
 
@@ -415,7 +419,9 @@ def test_trace_that_disagrees_with_its_time_axis_is_refused() -> None:
         res.loudness_vs_time[:-1],
         np.append(res.loudness_vs_time, res.loudness_vs_time[-1]),
     ):
-        with pytest.raises(ValueError, match="'loudness_vs_time'"):
+        with pytest.raises(
+            ValueError, match=r"'loudness_vs_time' \(\d+\) must each carry one value"
+        ):
             dataclasses.replace(res, loudness_vs_time=trace)
 
 
@@ -503,24 +509,29 @@ def test_annex_b5_technical_signals(num: int) -> None:
 
 def test_invalid_inputs() -> None:
     ten_bands = np.zeros(10)
-    with pytest.raises(ValueError, match="28"):
+    with pytest.raises(
+        ValueError,
+        match=r"'levels' must contain exactly 28 one-third-octave band levels",
+    ):
         psychoacoustics.loudness_zwicker_from_spectrum(ten_bands)
     levels = np.full(28, 60.0)
-    with pytest.raises(ValueError, match="field"):
+    with pytest.raises(ValueError, match=r"'field' must be 'free' or 'diffuse'"):
         psychoacoustics.loudness_zwicker_from_spectrum(levels, field="reverberant")
     x = np.ones(1000)
-    with pytest.raises(ValueError, match="fs"):
+    with pytest.raises(ValueError, match=r"'fs' must be a positive sampling rate"):
         psychoacoustics.loudness_zwicker(x, 0)
 
 
 def test_non_finite_inputs_rejected() -> None:
     levels = np.full(28, 60.0)
     levels[5] = np.nan
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'levels' must contain only finite values"):
         psychoacoustics.loudness_zwicker_from_spectrum(levels)
     x = np.ones(1000)
     x[3] = np.inf
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(
+        ValueError, match=r"Input signal 'x' must contain only finite values"
+    ):
         psychoacoustics.loudness_zwicker(x, FS)
 
 
@@ -529,7 +540,7 @@ def test_pathological_resampling_ratio_rejected() -> None:
     reject instead of hanging.
     """
     x = np.ones(1000)
-    with pytest.raises(ValueError, match="resampl"):
+    with pytest.raises(ValueError, match=r"needs an impractical resampling ratio"):
         psychoacoustics.loudness_zwicker(x, 44101)
 
 
@@ -546,7 +557,9 @@ def test_minimal_length_validation() -> None:
     of crashing on an empty percentile buffer.
     """
     too_short = np.ones(48)
-    with pytest.raises(ValueError, match="too short"):
+    with pytest.raises(
+        ValueError, match=r"Input signal is too short for the time-varying method"
+    ):
         psychoacoustics.loudness_zwicker(too_short, FS)
     res = psychoacoustics.loudness_zwicker(
         np.ones(96 * 4), FS

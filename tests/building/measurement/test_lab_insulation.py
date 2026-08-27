@@ -239,20 +239,20 @@ def test_airborne_band_count_mismatch() -> None:
 def test_airborne_t2_band_mismatch() -> None:
     l1, l2 = np.full(16, 80.0), np.full(16, 30.0)
     short_t2 = np.full(5, 0.8)
-    with pytest.raises(ValueError, match="band count"):
+    with pytest.raises(ValueError, match=r"'t2' must share the band count"):
         building.lab_airborne_insulation(l1, l2, short_t2, area=10.0, volume=50.0)
 
 
 @pytest.mark.parametrize(("area", "volume"), [(0.0, 50.0), (-1.0, 50.0)])
 def test_airborne_bad_area(area: float, volume: float) -> None:
     l1, l2, t2 = np.full(16, 80.0), np.full(16, 30.0), np.full(16, 0.8)
-    with pytest.raises(ValueError, match="area"):
+    with pytest.raises(ValueError, match=r"'area' must be positive"):
         building.lab_airborne_insulation(l1, l2, t2, area=area, volume=volume)
 
 
 def test_airborne_bad_volume() -> None:
     l1, l2, t2 = np.full(16, 80.0), np.full(16, 30.0), np.full(16, 0.8)
-    with pytest.raises(ValueError, match="volume"):
+    with pytest.raises(ValueError, match=r"'volume' must be positive"):
         building.lab_airborne_insulation(l1, l2, t2, area=10.0, volume=-5.0)
 
 
@@ -260,20 +260,20 @@ def test_airborne_bad_t2() -> None:
     l1, l2 = np.full(16, 80.0), np.full(16, 30.0)
     t2 = np.full(16, 0.8)
     t2[3] = 0.0
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"'t2' must contain positive, finite values"):
         building.lab_airborne_insulation(l1, l2, t2, area=10.0, volume=50.0)
 
 
 def test_impact_t2_band_mismatch() -> None:
     li = np.full(16, 60.0)
     short_t2 = np.full(5, 0.8)
-    with pytest.raises(ValueError, match="band count"):
+    with pytest.raises(ValueError, match=r"'t2' must share the band count"):
         building.lab_impact_insulation(li, short_t2, volume=50.0)
 
 
 def test_impact_bad_volume() -> None:
     li, t2 = np.full(16, 60.0), np.full(16, 0.8)
-    with pytest.raises(ValueError, match="volume"):
+    with pytest.raises(ValueError, match=r"'volume' must be positive"):
         building.lab_impact_insulation(li, t2, volume=0.0)
 
 
@@ -373,7 +373,10 @@ def test_airborne_non_finite_band_is_refused(field: str) -> None:
     res = _airborne_result()
     bad = np.asarray(getattr(res, field), dtype=np.float64).copy()
     bad[3] = np.nan
-    with pytest.raises(ValueError, match=rf"'{field}' must contain only finite"):
+    with pytest.raises(
+        ValueError,
+        match=rf"LabAirborneInsulationResult: '{field}' must contain only finite",
+    ):
         dataclasses.replace(res, **{field: bad})
 
 
@@ -383,7 +386,10 @@ def test_impact_non_finite_band_is_refused(field: str) -> None:
     res = _impact_result()
     bad = np.asarray(getattr(res, field), dtype=np.float64).copy()
     bad[3] = np.nan
-    with pytest.raises(ValueError, match=rf"'{field}' must contain only finite"):
+    with pytest.raises(
+        ValueError,
+        match=rf"LabImpactInsulationResult: '{field}' must contain only finite",
+    ):
         dataclasses.replace(res, **{field: bad})
 
 
@@ -395,7 +401,9 @@ def test_plot_without_rating_raises() -> None:
         area=10.0,
         volume=50.0,
     )
-    with pytest.raises(ValueError, match="rating"):
+    with pytest.raises(
+        ValueError, match=r"No single-number rating is available to plot"
+    ):
         res.plot()
 
 

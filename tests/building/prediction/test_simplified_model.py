@@ -144,7 +144,7 @@ def test_kij_lightweight_double_homogeneous_e7() -> None:
         building.junction_vibration_reduction(
             "lightweight_double_homogeneous", "double_leaf", 0.5
         )
-    with pytest.raises(ValueError, match="< 1/3"):
+    with pytest.raises(ValueError, match=r"mass_ratio = m'⊥,i/m'i < 1/3"):
         building.junction_vibration_reduction(
             "lightweight_double_homogeneous", "double_leaf", 5.0
         )
@@ -185,7 +185,7 @@ def test_kij_corner_and_thickness_change_e9() -> None:
     assert building.junction_vibration_reduction(
         "thickness_change", "through", 1.0
     ) == pytest.approx(-5.0)
-    with pytest.raises(ValueError, match="single path"):
+    with pytest.raises(ValueError, match=r"A 'corner' junction has the single path"):
         building.junction_vibration_reduction("corner", "through", 10.0)
     with pytest.raises(ValueError, match="single in-line path"):
         building.junction_vibration_reduction("thickness_change", "corner", 3.0)
@@ -672,9 +672,13 @@ def test_standardized_level_difference_annex_h3_closure() -> None:
 
 def test_equivalent_impact_level_warns_outside_envelope() -> None:
     # Annex B covers 100-600 kg/m2; outside it the closed form extrapolates.
-    with pytest.warns(UserWarning, match="100-600"):
+    with pytest.warns(
+        UserWarning, match=r"mass_per_area = .* lies outside the .* envelope"
+    ):
         building.equivalent_impact_level(50.0)
-    with pytest.warns(UserWarning, match="extrapolation"):
+    with pytest.warns(
+        UserWarning, match=r"mass_per_area = .* lies outside the .* envelope"
+    ):
         building.equivalent_impact_level(800.0)
     # Inside the envelope no warning is emitted.
     with warnings.catch_warnings():

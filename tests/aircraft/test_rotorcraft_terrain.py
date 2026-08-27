@@ -63,9 +63,11 @@ def test_mean_ground_plane_equivalent_height_is_orthogonal() -> None:
 
 
 def test_mean_ground_plane_validation_and_plot() -> None:
-    with pytest.raises(ValueError, match="strictly increasing"):
+    with pytest.raises(ValueError, match=r"'distances' must be strictly increasing"):
         aircraft.mean_ground_plane([0.0, 0.0], [1.0, 2.0])
-    with pytest.raises(ValueError, match="equal size"):
+    with pytest.raises(
+        ValueError, match=r"'distances' and 'heights' must be 1-D of equal size"
+    ):
         aircraft.mean_ground_plane([0.0, 1.0, 2.0], [1.0, 2.0])
     assert (
         aircraft.mean_ground_plane([0.0, 30.0, 100.0], [2.0, 8.0, 3.0]).plot()
@@ -236,7 +238,7 @@ def test_screening_per_segment_resistivity_uses_log_mean() -> None:
 
 def test_screening_validation_and_plot() -> None:
     f = [500.0]
-    with pytest.raises(ValueError, match="cover"):
+    with pytest.raises(ValueError, match=r"The terrain section must cover"):
         aircraft.terrain_screening_adjustment(
             f, (-10.0, 5.0), (100.0, 1.2), [0.0, 100.0], [0.0, 0.0]
         )
@@ -382,7 +384,10 @@ def test_event_and_contour_array_argument_validation() -> None:
     elevation_with_dem_ground = aircraft.RotorcraftGround(
         terrain=dem, ground_elevation=np.zeros(4)
     )
-    with pytest.raises(ValueError, match="scalar"):
+    with pytest.raises(
+        ValueError,
+        match=r"A single receiver takes scalar 'flow_resistivity' and 'ground_elevation'",
+    ):
         aircraft.rotorcraft_event_level(
             hems, spd, ang, t, pos, (0.0, 0.0), ground=vector_sigma_ground
         )
@@ -408,11 +413,15 @@ def test_event_and_contour_array_argument_validation() -> None:
             y=[0.0, 100.0],
             ground=mismatched_elevation_ground,
         )
-    with pytest.raises(ValueError, match="elevation model"):
+    with pytest.raises(
+        ValueError, match=r"'terrain' must be an \(x, y, z\) elevation model"
+    ):
         aircraft.rotorcraft_event_level(
             hems, spd, ang, t, pos, (0.0, 0.0), ground=incomplete_dem_ground
         )
-    with pytest.raises(ValueError, match="strictly increasing"):
+    with pytest.raises(
+        ValueError, match=r"'terrain' x and y must be strictly increasing"
+    ):
         aircraft.rotorcraft_event_level(
             hems, spd, ang, t, pos, (0.0, 0.0), ground=reversed_dem_ground
         )
@@ -420,7 +429,10 @@ def test_event_and_contour_array_argument_validation() -> None:
         aircraft.rotorcraft_event_level(
             hems, spd, ang, t, pos, (0.0, 0.0), ground=short_sigma_map_ground
         )
-    with pytest.raises(ValueError, match="left scalar"):
+    with pytest.raises(
+        ValueError,
+        match=r"'ground_elevation' comes from the elevation model and must be left scalar",
+    ):
         aircraft.rotorcraft_noise_contour(
             hems,
             spd,

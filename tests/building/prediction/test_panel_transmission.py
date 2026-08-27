@@ -144,7 +144,9 @@ def test_single_panel_from_bending_stiffness() -> None:
 
 
 def test_single_panel_requires_fc_or_stiffness() -> None:
-    with pytest.raises(ValueError, match="critical_frequency"):
+    with pytest.raises(
+        ValueError, match=r"provide 'critical_frequency' or 'bending_stiffness'"
+    ):
         building.single_panel_transmission_loss(BANDS, 15.0)
 
 
@@ -220,7 +222,7 @@ def test_double_wall_degenerate_f0_above_fl_is_partitioned() -> None:
 
 
 def test_double_wall_rejects_bad_input() -> None:
-    with pytest.raises(ValueError, match="gap"):
+    with pytest.raises(ValueError, match=r"'gap' must be positive"):
         building.double_wall_transmission_loss(BANDS, 10.0, 10.0, -0.1)
 
 
@@ -575,16 +577,18 @@ def test_plateau_rejects_a_height_that_underflows_point_a() -> None:
 
 def test_plateau_rejects_bad_frequency_axis() -> None:
 
-    with pytest.raises(ValueError, match="must be positive"):
+    with pytest.raises(ValueError, match=r"'frequency' must be positive"):
         building.plateau_transmission_loss(
             [100.0, -1.0], material="brick", thickness_mm=110.0
         )
-    with pytest.raises(ValueError, match="non-empty"):
+    with pytest.raises(ValueError, match=r"'frequency' must be a non-empty"):
         building.plateau_transmission_loss([], material="brick", thickness_mm=110.0)
 
 
 def test_negative_field_correction_rejected() -> None:
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(
+        ValueError, match=r"'field_correction' must be finite and non-negative"
+    ):
         building.mass_law_transmission_loss(500.0, 15.0, field_correction=-1.0)
 
 

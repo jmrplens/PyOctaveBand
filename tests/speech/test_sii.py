@@ -312,13 +312,22 @@ def test_custom_speech_spectrum_accepted() -> None:
 
 def test_invalid_inputs_raise() -> None:
     short_threshold = np.zeros(5)
-    with pytest.raises(ValueError, match="18"):
+    with pytest.raises(
+        ValueError,
+        match=r"'speech_spectrum' must be a 1-D vector of 18 one-third-octave band values",
+    ):
         sii.speech_intelligibility_index([1.0, 2.0, 3.0])
-    with pytest.raises(ValueError, match="18"):
+    with pytest.raises(
+        ValueError,
+        match=r"'noise_spectrum' must be a 1-D vector of 18 one-third-octave band values",
+    ):
         sii.speech_intelligibility_index("normal", noise_spectrum=[1.0, 2.0])
-    with pytest.raises(ValueError, match="18"):
+    with pytest.raises(
+        ValueError,
+        match=r"'threshold' must be a 1-D vector of 18 one-third-octave band values",
+    ):
         sii.speech_intelligibility_index("normal", threshold=short_threshold)
-    with pytest.raises(ValueError, match="vocal_effort"):
+    with pytest.raises(ValueError, match=r"Unknown vocal_effort"):
         sii.standard_speech_spectrum("whisper")
 
 
@@ -357,7 +366,7 @@ def test_a_non_finite_band_vector_is_refused_by_parameter_name(name: str) -> Non
         "threshold": None,
     }
     arguments[name] = corrupt
-    with pytest.raises(ValueError, match=f"{name!r} must contain only finite"):
+    with pytest.raises(ValueError, match=rf"^{name!r} must contain only finite"):
         sii.speech_intelligibility_index(**arguments)  # type: ignore[arg-type]
 
 
@@ -415,7 +424,9 @@ def test_a_non_finite_band_quantity_is_refused_by_field_name(name: str) -> None:
     result = sii.speech_intelligibility_index("normal")
     corrupt = np.asarray(getattr(result, name), dtype=np.float64).copy()
     corrupt[9] = np.nan
-    with pytest.raises(ValueError, match=f"'{name}' must contain only finite"):
+    with pytest.raises(
+        ValueError, match=f"SIIResult: '{name}' must contain only finite"
+    ):
         dataclasses.replace(result, **{name: corrupt})
 
 
@@ -442,7 +453,9 @@ def test_a_non_finite_procedure_column_is_refused_by_field_name(name: str) -> No
     procedure = sii.sii_procedure("octave")
     corrupt = np.asarray(getattr(procedure, name), dtype=np.float64).copy()
     corrupt[0] = np.inf
-    with pytest.raises(ValueError, match=f"'{name}' must contain only finite"):
+    with pytest.raises(
+        ValueError, match=f"SIIProcedure: '{name}' must contain only finite"
+    ):
         dataclasses.replace(procedure, **{name: corrupt})
 
 
@@ -491,9 +504,9 @@ def test_standard_speech_spectra_single_effort() -> None:
 
 
 def test_standard_speech_spectra_rejects_unknown_and_empty() -> None:
-    with pytest.raises(ValueError, match="vocal_effort"):
+    with pytest.raises(ValueError, match=r"Unknown vocal_effort"):
         sii.standard_speech_spectra("whisper")
-    with pytest.raises(ValueError, match="empty"):
+    with pytest.raises(ValueError, match=r"'vocal_efforts' cannot be empty"):
         sii.standard_speech_spectra([])
 
 
@@ -920,7 +933,10 @@ def test_speech_intelligibility_index_checks_band_count_per_method() -> None:
         sii.speech_intelligibility_index(
             twentyone_bands, eighteen_band_noise, method="critical-band"
         )
-    with pytest.raises(ValueError, match="band_importance"):
+    with pytest.raises(
+        ValueError,
+        match=r"'band_importance' must be a 1-D vector of 6 octave band values",
+    ):
         sii.speech_intelligibility_index(
             six_bands, method="octave", band_importance=short_importance
         )

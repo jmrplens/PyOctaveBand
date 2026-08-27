@@ -179,7 +179,7 @@ def test_detailed_fiche_rejects_an_unrated_spectrum(tmp_path: Path) -> None:
     )
     assert partial.rating is None
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="ISO 717"):
+    with pytest.raises(ValueError, match=r"needs the ISO 717 single-number rating"):
         partial.report(out)
 
 
@@ -187,7 +187,7 @@ def test_detailed_fiche_rejects_an_unknown_engine(tmp_path: Path) -> None:
     """Only the reportlab back end exists."""
     result = _annex_g_impact()
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine 'weasyprint'"):
         result.report(out, engine="weasyprint")
 
 

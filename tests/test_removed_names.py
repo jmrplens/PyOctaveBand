@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import importlib
 import inspect
+import re
 import sys
 
 import numpy as np
@@ -114,7 +115,11 @@ def test_the_canonical_names_the_3_1_aliases_pointed_at_are_all_here() -> None:
 
 def test_the_plot_renderers_moved_out_of_the_deprecated_module() -> None:
     """``phonometry._plotting`` was the 3.2 re-export; ``_plot`` is the home."""
-    with pytest.raises(ModuleNotFoundError):
+    # Naming the module matters: a module that came back carrying a broken
+    # optional import would raise ModuleNotFoundError too, about something else.
+    with pytest.raises(
+        ModuleNotFoundError, match=r"No module named 'phonometry\._plotting'"
+    ):
         importlib.import_module("phonometry._plotting")
     assert callable(importlib.import_module("phonometry._plot.room").plot_excitation)
 
@@ -137,7 +142,9 @@ _REMOVED_FLAT_MODULE_PATHS = [
 
 @pytest.mark.parametrize("path", _REMOVED_FLAT_MODULE_PATHS)
 def test_removed_flat_module_path_raises(path: str) -> None:
-    with pytest.raises(ModuleNotFoundError):
+    with pytest.raises(
+        ModuleNotFoundError, match=rf"No module named '(?:{_import_chain(path)})'"
+    ):
         importlib.import_module(path)
     assert path not in sys.modules
     # The names these modules held never moved; the package that owns each of
@@ -169,9 +176,27 @@ _REMOVED_4_0_MODULE_PATHS = [
 ]
 
 
+def _import_chain(path: str) -> str:
+    """``a.b.c`` -> a regex alternation of ``a.b.c``, ``a.b`` and ``a``.
+
+    Python reports the FIRST missing ancestor, not the path asked for: with
+    ``phonometry.environmental`` removed too, importing its ``cnossos_road``
+    submodule reports the parent. Either is a correct refusal of this path, and
+    naming the chain still excludes the failure worth catching, which is some
+    unrelated third-party import going missing underneath a module that came
+    back.
+    """
+    parts = path.split(".")
+    return "|".join(
+        re.escape(".".join(parts[: i + 1])) for i in reversed(range(len(parts)))
+    )
+
+
 @pytest.mark.parametrize("path", _REMOVED_4_0_MODULE_PATHS)
 def test_removed_4_0_module_path_raises(path: str) -> None:
-    with pytest.raises(ModuleNotFoundError):
+    with pytest.raises(
+        ModuleNotFoundError, match=rf"No module named '(?:{_import_chain(path)})'"
+    ):
         importlib.import_module(path)
     assert path not in sys.modules
 
@@ -185,13 +210,15 @@ def test_a_removed_path_is_not_served_by_its_parent_package() -> None:
     ``AttributeError``. Three exception types for one removal, which is why the
     CHANGELOG names them separately.
     """
-    with pytest.raises(ModuleNotFoundError):
+    with pytest.raises(
+        ModuleNotFoundError, match=r"No module named 'phonometry\.hearing\.sti'"
+    ):
         importlib.import_module("phonometry.hearing.sti")
-    with pytest.raises(ImportError):
+    with pytest.raises(ImportError, match=r"cannot import name 'sti'"):
         from phonometry.hearing import sti  # noqa: F401
-    with pytest.raises(AttributeError):
+    with pytest.raises(AttributeError, match=r"has no attribute 'sti'"):
         _ = ph.hearing.sti
-    with pytest.raises(AttributeError):
+    with pytest.raises(AttributeError, match=r"has no attribute 'environmental'"):
         _ = ph.environmental
 
 

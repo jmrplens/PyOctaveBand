@@ -93,7 +93,11 @@ def test_modern_aircraft_has_npd_but_no_fixed_point_profile() -> None:
     """A320-211 ships only procedural steps: NPD loads, the profile guard fires."""
     curves = _DB.npd_curves("A320-211", "departure", "SEL")
     assert curves.levels.shape[1] == 10
-    with pytest.raises(KeyError, match="procedural-step"):
+    with pytest.raises(
+        KeyError,
+        match=r"no fixed-point profile for aircraft 'A320-211'.*"
+        r"only procedural-step profiles",
+    ):
         _DB.profile("A320-211", "departure")
 
 
@@ -157,9 +161,9 @@ def test_external_directory_load(tmp_path: object) -> None:
 def test_error_paths() -> None:
     with pytest.raises(KeyError):
         _DB.aircraft("NOPE")
-    with pytest.raises(ValueError, match="metric"):
+    with pytest.raises(ValueError, match=r"'metric' must be one of"):
         _DB.npd_curves("747100", "departure", "EPNL")
-    with pytest.raises(ValueError, match="operation"):
+    with pytest.raises(ValueError, match=r"'operation' must be 'departure'"):
         _DB.npd_curves("747100", "sideways", "SEL")
     with pytest.raises(KeyError):
         _DB.profile("PA31", "departure", stage_length=9)
@@ -185,7 +189,9 @@ def test_npd_curves_reject_level_table_short_of_its_powers() -> None:
     """A level table one power row short cannot be built into a curve set."""
     curves = _DB.npd_curves("747100", "departure", "SEL")
     short = curves.levels[:-1]
-    with pytest.raises(ValueError, match="'levels'"):
+    with pytest.raises(
+        ValueError, match=r"'levels'.*must each carry one value per power setting"
+    ):
         dataclasses.replace(curves, levels=short)
 
 
@@ -209,7 +215,9 @@ def test_profile_rejects_roll_mask_missing_a_segment() -> None:
     """The roll masks are per segment, so one entry short is not a profile."""
     prof = _DB.profile("747100", "departure")
     short = prof.ground_roll[:-1]
-    with pytest.raises(ValueError, match="'ground_roll'"):
+    with pytest.raises(
+        ValueError, match=r"'ground_roll'.*must each carry one value per segment"
+    ):
         dataclasses.replace(prof, ground_roll=short)
 
 
@@ -283,7 +291,7 @@ def test_pick_ambiguous_table_raises(tmp_path: object) -> None:
     (root / "Default_fixed_point_profiles.csv").write_text(
         src.joinpath("Default_fixed_point_profiles.csv").read_text()
     )
-    with pytest.raises(ValueError, match="ambiguous"):
+    with pytest.raises(ValueError, match=r"ambiguous ANP table for 'aircraft'"):
         load_anp_database(root)
 
 
@@ -336,7 +344,7 @@ def test_plot_smoke_en_es() -> None:
     prof = _DB.profile("747100", "departure")
     ax2 = prof.plot(language="es")
     assert ax2.get_xlabel().startswith("Distancia")
-    with pytest.raises(ValueError, match="Unknown language"):
+    with pytest.raises(ValueError, match=r"Unknown language 'xx'"):
         npd.plot(language="xx")
     plt.close("all")
 
@@ -462,13 +470,19 @@ def test_ambiguous_profiles_without_default_raise(tmp_path: object) -> None:
     assert (
         db.profile("747100", "departure", 1, profile_id="LIGHT").profile_id == "LIGHT"
     )
-    with pytest.raises(KeyError, match="available profiles"):
+    with pytest.raises(
+        KeyError, match=r"no fixed-point profile 'NOPE' for aircraft '747100'"
+    ):
         db.profile("747100", "departure", 1, profile_id="NOPE")
 
 
 def test_duplicate_point_numbers_raise(tmp_path: object) -> None:
     """A malformed table with duplicate point numbers errors instead of merging."""
-    with pytest.raises(ValueError, match="point numbers"):
+    with pytest.raises(
+        ValueError,
+        match=r"fixed-point profile for aircraft '747100'.*"
+        r"duplicate or non-consecutive point numbers",
+    ):
         _synthetic_db(
             tmp_path,
             [

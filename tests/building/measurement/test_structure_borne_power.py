@@ -78,11 +78,13 @@ def test_power_level_offset_is_minus_60() -> None:
 
 
 def test_power_level_rejects_bad_inputs() -> None:
-    with pytest.raises(ValueError, match="mass_per_area"):
+    with pytest.raises(ValueError, match=r"'mass_per_area' must be positive"):
         building.structure_borne_power_level(80.0, 1000.0, 0.0, 1.0, 0.01)
-    with pytest.raises(ValueError, match="area"):
+    with pytest.raises(ValueError, match=r"'area' must be positive"):
         building.structure_borne_power_level(80.0, 1000.0, 10.0, 0.0, 0.01)
-    with pytest.raises(ValueError, match="frequency"):
+    with pytest.raises(
+        ValueError, match=r"'frequency' must contain positive, finite values"
+    ):
         building.structure_borne_power_level(80.0, 0.0, 10.0, 1.0, 0.01)
 
 
@@ -131,7 +133,9 @@ def test_reception_plate_total_level() -> None:
 
 
 def test_reception_plate_requires_eta_or_ts() -> None:
-    with pytest.raises(ValueError, match="loss_factor"):
+    with pytest.raises(
+        ValueError, match=r"either 'loss_factor' or 'reverberation_time'"
+    ):
         building.reception_plate_power(80.0, 1000.0, 25.0, 1.2)
 
 
@@ -253,7 +257,9 @@ def test_blocked_force_level_formula_15() -> None:
     # A complex plate mobility uses its real part (Formula 16).
     lfb_c = building.equivalent_blocked_force_level(61.7, 5.34e-6 + 2e-6j)
     assert float(lfb_c) == pytest.approx(float(lfb))
-    with pytest.raises(ValueError, match="positive real part"):
+    with pytest.raises(
+        ValueError, match="'plate_mobility' must be finite with a positive real part"
+    ):
         building.equivalent_blocked_force_level(61.7, -1e-6)
 
 
@@ -262,7 +268,7 @@ def test_characteristic_reception_plate_power_formula_17() -> None:
     lfb = building.equivalent_blocked_force_level(61.7, 5.34e-6)
     lwsn = building.characteristic_reception_plate_power(lfb)
     assert float(lwsn) == pytest.approx(61.7 + 10.0 * math.log10(5.0e-6 / 5.34e-6))
-    with pytest.raises(ValueError, match="characteristic_mobility"):
+    with pytest.raises(ValueError, match=r"'characteristic_mobility' must be positive"):
         building.characteristic_reception_plate_power(
             100.0, characteristic_mobility=0.0
         )
@@ -300,7 +306,9 @@ def test_free_velocity_level_formula_18_real_mobility() -> None:
     lvf = building.equivalent_free_velocity_level(70.0, y)
     assert float(lvf) == pytest.approx(expected)
     assert float(lvf) == pytest.approx(70.0 + 10.0 * math.log10(y) + 60.0)
-    with pytest.raises(ValueError, match="positive real part"):
+    with pytest.raises(
+        ValueError, match="'plate_mobility' must be finite with a positive real part"
+    ):
         building.equivalent_free_velocity_level(70.0, -1.0e-2)
 
 
@@ -354,9 +362,13 @@ def test_iso9611_mean_free_velocity_level() -> None:
 
 
 def test_power_level_rejects_nonpositive_loss_factor() -> None:
-    with pytest.raises(ValueError, match="loss_factor"):
+    with pytest.raises(
+        ValueError, match=r"'loss_factor' must contain positive, finite values"
+    ):
         building.structure_borne_power_level(80.0, 1000.0, 10.0, 1.0, 0.0)
-    with pytest.raises(ValueError, match="loss_factor"):
+    with pytest.raises(
+        ValueError, match=r"'loss_factor' must contain positive, finite values"
+    ):
         building.structure_borne_power_level(80.0, 1000.0, 10.0, 1.0, [0.01, -0.01])
 
 

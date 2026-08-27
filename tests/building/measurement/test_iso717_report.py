@@ -86,7 +86,7 @@ def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     result = building.weighted_rating(_AIRBORNE_R)
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         result.report(out, engine="weasyprint")
 
 
@@ -175,7 +175,10 @@ def test_metadata_allows_non_positive_temperature() -> None:
 
 def test_metadata_rejects_out_of_range_humidity() -> None:
     """Relative humidity outside 0..100 % is rejected."""
-    with pytest.raises(ValueError, match="humidity"):
+    with pytest.raises(
+        ValueError,
+        match=r"ReportMetadata\.relative_humidity must be a relative humidity",
+    ):
         ReportMetadata(relative_humidity=150.0)
 
 
@@ -240,7 +243,9 @@ def test_impact_requirement_verdict_renders(tmp_path: Path) -> None:
 
 def test_metadata_rejects_negative_area() -> None:
     """``ReportMetadata`` rejects a non-positive numeric field."""
-    with pytest.raises(ValueError, match="area"):
+    with pytest.raises(
+        ValueError, match=r"ReportMetadata\.area must be a finite, positive number"
+    ):
         ReportMetadata(area=-5.0)
 
 
@@ -305,7 +310,7 @@ def test_invalid_symbol_rejected(tmp_path: Path) -> None:
     """A malformed quantity symbol raises ``ValueError``."""
     result = building.weighted_rating(_AIRBORNE_R)
     out = str(tmp_path / "bad.pdf")
-    with pytest.raises(ValueError, match="symbol"):
+    with pytest.raises(ValueError, match=r"Invalid ISO 717 quantity symbol"):
         result.report(out, symbol="not a symbol")
 
 
@@ -336,5 +341,5 @@ def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
 def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ``ValueError``."""
     result = building.weighted_rating(_AIRBORNE_R)
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language"):
         result.report(str(tmp_path / "bad.pdf"), language="xx")

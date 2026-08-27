@@ -247,7 +247,9 @@ def test_surface_and_area_without_volume_raises() -> None:
     # a clear error naming 'volume' as the missing input.
     outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
     surface = _flat(3, 72.0)
-    with pytest.raises(ValueError, match="volume"):
+    with pytest.raises(
+        ValueError, match=r"'volume' is required with 'surface_level' and 'area'"
+    ):
         building.facade_insulation(
             outdoor, indoor, rt, area=10.0, surface_level=surface
         )
@@ -389,7 +391,7 @@ def test_rating_path_reproduces_known_rw() -> None:
 # --------------------------------------------------------------------------
 def test_result_is_frozen() -> None:
     res = building.facade_insulation(_flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5))
-    with pytest.raises(AttributeError):
+    with pytest.raises(dataclasses.FrozenInstanceError):
         res.d_2m = np.zeros(3)  # type: ignore[misc]
 
 

@@ -202,9 +202,11 @@ def test_bold_call_styles_math_variables_bolditalic() -> None:
 
 
 def test_mono_or_whole_string_italic_with_math_is_refused() -> None:
-    with pytest.raises(ValueError, match="mono"):
+    with pytest.raises(ValueError, match=r"mono cannot carry composed mathematics"):
         _label_runs("$L_p$", mono=True)
-    with pytest.raises(ValueError, match="italic"):
+    with pytest.raises(
+        ValueError, match=r"whole-string italic cannot carry composed mathematics"
+    ):
         _label_runs("$L_p$", italic=True)
 
 

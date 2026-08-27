@@ -167,7 +167,7 @@ def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     out = str(tmp_path / "x.pdf")
     result = _element_result()
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         result.report(out, engine="weasyprint")
 
 
@@ -175,7 +175,7 @@ def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unsupported language raises ``ValueError`` (shared validation path)."""
     out = str(tmp_path / "x.pdf")
     result = _element_result()
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language"):
         result.report(out, language="fr")
 
 
@@ -187,7 +187,7 @@ def test_missing_rating_rejected(tmp_path: Path) -> None:
     )
     assert result.rating is None
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="rating"):
+    with pytest.raises(ValueError, match=r"element-normalized report needs the"):
         result.report(out)
 
 
@@ -211,7 +211,7 @@ def test_non_iso_band_count_rejected(tmp_path: Path) -> None:
     )
     result = IntensityElementNormalizedResult(d_i_n_e=curve, rating=rating)
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="16 one-third-octave"):
+    with pytest.raises(ValueError, match=r"element-normalized report supports only"):
         result.report(out)
 
 
@@ -225,5 +225,5 @@ def test_rating_without_per_band_data_rejected(tmp_path: Path) -> None:
         rating=bare_rating,
     )
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="per-band"):
+    with pytest.raises(ValueError, match=r"per-band rating data \('band_centers'"):
         result.report(out)

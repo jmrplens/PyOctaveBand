@@ -242,9 +242,11 @@ def test_facade_shape_level_difference_does_not_apply() -> None:
         building.facade_shape_level_difference("gallery_5", line_of_sight=1.0)
     with pytest.raises(ValueError, match="Unknown facade shape"):
         building.facade_shape_level_difference("igloo")
-    with pytest.raises(ValueError, match="absorption"):
+    with pytest.raises(ValueError, match=r"'absorption' must be an αw"):
         building.facade_shape_level_difference("balcony_6", absorption=1.5)
-    with pytest.raises(ValueError, match="line_of_sight"):
+    with pytest.raises(
+        ValueError, match=r"'line_of_sight' must be a non-negative height"
+    ):
         building.facade_shape_level_difference("balcony_6", line_of_sight=-1.0)
 
 
@@ -343,7 +345,10 @@ def test_outdoor_level_scalar_broadcast() -> None:
 
 
 def test_outdoor_level_incompatible_shapes_raise() -> None:
-    with pytest.raises(ValueError, match="broadcast-compatible"):
+    with pytest.raises(
+        ValueError,
+        match=r"'l_w' and 'attenuation' must have broadcast-compatible shapes",
+    ):
         building.outdoor_level([60.0, 60.0, 60.0], [0.0, 0.0])
 
 
@@ -361,16 +366,16 @@ def test_far_field_point_source() -> None:
 
 def test_element_requires_exactly_one_quantity() -> None:
     element = building.FacadeElement(name="x", area=1.0)
-    with pytest.raises(ValueError, match="exactly one"):
+    with pytest.raises(ValueError, match=r"Element 'x': give exactly one of"):
         element.tau(10.0, 1)
     element = building.FacadeElement(name="x", area=1.0, r=[40.0], dn_e=[30.0])
-    with pytest.raises(ValueError, match="exactly one"):
+    with pytest.raises(ValueError, match=r"Element 'x': give exactly one of"):
         element.tau(10.0, 1)
 
 
 def test_area_element_requires_positive_area() -> None:
     element = building.FacadeElement(name="x", r=[40.0])
-    with pytest.raises(ValueError, match="area"):
+    with pytest.raises(ValueError, match=r"Element 'x': 'area' must be positive"):
         element.tau(10.0, 1)
 
 
@@ -419,7 +424,7 @@ def test_scalar_broadcasts_to_band_count() -> None:
 
 def test_non_finite_input_rejected() -> None:
     element = building.FacadeElement(name="x", area=1.0, r=[np.nan])
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'x \(r\)' must contain only finite"):
         element.tau(10.0, 1)
 
 
@@ -429,7 +434,7 @@ def test_duplicate_element_names_raise() -> None:
         building.FacadeElement(name="glass", area=5.0, r=[40.0]),
         building.FacadeElement(name="glass", area=5.0, r=[30.0]),
     ]
-    with pytest.raises(ValueError, match="unique"):
+    with pytest.raises(ValueError, match=r"Façade element names must be unique"):
         building.facade_sound_reduction(elements, area=10.0, volume=50.0)
 
 
@@ -490,16 +495,20 @@ def test_lp_in_length_must_match_bands() -> None:
 
 def test_tau_rejects_non_positive_total_area() -> None:
     element = building.FacadeElement(name="x", area=1.0, r=[40.0])
-    with pytest.raises(ValueError, match="total_area"):
+    with pytest.raises(
+        ValueError, match=r"'total_area' \(façade area S\) must be positive"
+    ):
         element.tau(0.0, 1)
 
 
 def test_positive_area_and_volume_required() -> None:
     elements = [building.FacadeElement(name="a", area=5.0, r=[40.0])]
-    with pytest.raises(ValueError, match="volume"):
+    with pytest.raises(ValueError, match=r"'volume' must be positive"):
         building.facade_sound_reduction(elements, area=10.0, volume=0.0)
     elements = [building.FacadeElement(name="a", area=5.0, r=[40.0])]
-    with pytest.raises(ValueError, match="area"):
+    with pytest.raises(
+        ValueError, match=r"'area' \(total façade area S\) must be positive"
+    ):
         building.facade_sound_reduction(elements, area=0.0, volume=50.0)
 
 
@@ -532,7 +541,7 @@ def test_facade_prediction_unread_spectrum_must_match_bands() -> None:
     """
     res = _annex_f_result()
     one_too_many = np.append(res.r_45, 99.0)
-    with pytest.raises(ValueError, match="'r_45'"):
+    with pytest.raises(ValueError, match=rf"'r_45' \({one_too_many.size}\)"):
         dataclasses.replace(res, r_45=one_too_many)
 
 
@@ -547,7 +556,7 @@ def test_radiated_power_frequencies_must_match_bands() -> None:
     """
     res = _annex_g_side1_with_door()
     one_too_many = np.insert(res.frequencies, 0, 31.5)
-    with pytest.raises(ValueError, match="'frequencies'"):
+    with pytest.raises(ValueError, match=rf"'frequencies' \({one_too_many.size}\)"):
         dataclasses.replace(res, frequencies=one_too_many)
 
 

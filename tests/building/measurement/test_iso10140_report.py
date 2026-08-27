@@ -197,9 +197,9 @@ def test_unknown_engine_rejected(tmp_path: Path) -> None:
     out = str(tmp_path / "x.pdf")
     airborne = _airborne_result()
     impact = _impact_result()
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         airborne.report(out, engine="weasyprint")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         impact.report(out, engine="weasyprint")
 
 
@@ -208,9 +208,9 @@ def test_unknown_language_rejected(tmp_path: Path) -> None:
     out = str(tmp_path / "x.pdf")
     airborne = _airborne_result()
     impact = _impact_result()
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language"):
         airborne.report(out, language="fr")
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language"):
         impact.report(out, language="fr")
 
 
@@ -222,7 +222,10 @@ def test_missing_rating_rejected(tmp_path: Path) -> None:
     )
     assert result.rating is None
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="rating"):
+    with pytest.raises(
+        ValueError,
+        match=r"laboratory report needs the ISO 717 single-number rating",
+    ):
         result.report(out)
 
 
@@ -239,7 +242,9 @@ def test_rating_without_per_band_data_rejected(tmp_path: Path) -> None:
         rating=bare_rating,
     )
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="per-band"):
+    with pytest.raises(
+        ValueError, match=r"report needs the ISO 717 per-band rating data"
+    ):
         result.report(out)
 
 

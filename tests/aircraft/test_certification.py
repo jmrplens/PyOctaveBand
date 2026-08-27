@@ -298,7 +298,7 @@ def test_helicopter_procedure_catches_low_frequency_rotor_tone() -> None:
 
 def test_effective_perceived_noise_level_rejects_bad_procedure() -> None:
     spectra = np.zeros((5, 24))
-    with pytest.raises(ValueError, match="procedure"):
+    with pytest.raises(ValueError, match=r"Unknown procedure"):
         effective_perceived_noise_level(spectra, procedure="rocket")
 
 
@@ -393,7 +393,7 @@ def test_a_tone_correction_off_the_record_axis_is_refused(trim: bool) -> None:
     result = _flyover()
     values = np.asarray(result.tone_correction)
     wrong = values[:-1] if trim else np.append(values, values[-1])
-    with pytest.raises(ValueError, match="'tone_correction'"):
+    with pytest.raises(ValueError, match=rf"'tone_correction' \({wrong.size}\)"):
         dataclasses.replace(result, tone_correction=wrong)
 
 
@@ -407,7 +407,7 @@ def test_a_drawn_history_off_the_record_axis_is_refused() -> None:
 
     result = _flyover()
     one_short = np.asarray(result.pnlt)[:-1]
-    with pytest.raises(ValueError, match="'pnlt'"):
+    with pytest.raises(ValueError, match=rf"'pnlt' \({one_short.size}\)"):
         dataclasses.replace(result, pnlt=one_short)
 
 

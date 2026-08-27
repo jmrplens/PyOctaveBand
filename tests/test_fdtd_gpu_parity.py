@@ -376,60 +376,69 @@ def test_job_round_trip_subsampled_frames() -> None:
 def test_build_job_validation() -> None:
     """build_job rejects inconsistent sampling and non-integer widths."""
     ok: dict[str, Any] = {"shape": (_NY, _NX), "steps": 100, "sample_steps": [50]}
-    with pytest.raises(ValueError, match="cfl"):
+    with pytest.raises(ValueError, match=r"cfl must lie in \(0, 1\)"):
         fdtd_gpu_remote.build_job(343.0, _DX, cfl=1.5, **ok)
-    with pytest.raises(ValueError, match="damping"):
+    with pytest.raises(ValueError, match=r"damping must be non-negative and finite"):
         fdtd_gpu_remote.build_job(343.0, _DX, damping=-1.0, **ok)
     bad_damping = np.zeros((_NY + 1, _NX))
-    with pytest.raises(ValueError, match="damping"):
+    with pytest.raises(
+        ValueError, match=r"damping map shape .* does not match the grid"
+    ):
         fdtd_gpu_remote.build_job(343.0, _DX, damping=bad_damping, **ok)
-    with pytest.raises(ValueError, match="impedance sides"):
+    with pytest.raises(ValueError, match=r"unknown impedance sides"):
         fdtd_gpu_remote.build_job(343.0, _DX, edge_impedance={"front": 413.0}, **ok)
-    with pytest.raises(ValueError, match="absorbing"):
+    with pytest.raises(
+        ValueError,
+        match=r"side 'top' cannot be both absorbing and an impedance boundary",
+    ):
         fdtd_gpu_remote.build_job(
             343.0, _DX, sponge_width=10, edge_impedance={"top": 413.0}, **ok
         )
     bad_profile = {"top": np.ones(_NX + 2)}
-    with pytest.raises(ValueError, match="impedance"):
+    with pytest.raises(
+        ValueError, match=r"impedance for side 'top' must be a scalar or a 1D array"
+    ):
         fdtd_gpu_remote.build_job(343.0, _DX, edge_impedance=bad_profile, **ok)
     bad_mask_shape = np.zeros((_NY + 1, _NX), np.bool_)
-    with pytest.raises(ValueError, match="obstacle_mask"):
+    with pytest.raises(ValueError, match=r"obstacle_mask must match the grid shape"):
         fdtd_gpu_remote.build_job(343.0, _DX, obstacle_mask=bad_mask_shape, **ok)
     bad_mask_dtype = np.zeros((_NY, _NX), np.int64)
-    with pytest.raises(ValueError, match="obstacle_mask"):
+    with pytest.raises(ValueError, match=r"obstacle_mask must be a boolean array"):
         fdtd_gpu_remote.build_job(343.0, _DX, obstacle_mask=bad_mask_dtype, **ok)
-    with pytest.raises(ValueError, match="sample_steps"):
+    with pytest.raises(ValueError, match=r"sample_steps must lie within \[0, steps\]"):
         fdtd_gpu_remote.build_job(
             343.0, _DX, shape=(_NY, _NX), steps=100, sample_steps=[50, 150]
         )
-    with pytest.raises(ValueError, match="sample_steps"):
+    with pytest.raises(ValueError, match=r"sample_steps must lie within \[0, steps\]"):
         fdtd_gpu_remote.build_job(
             343.0, _DX, shape=(_NY, _NX), steps=100, sample_steps=[-1, 50]
         )
-    with pytest.raises(ValueError, match="sample_stride"):
+    with pytest.raises(ValueError, match=r"sample_stride must be >= 1"):
         fdtd_gpu_remote.build_job(343.0, _DX, sample_stride=0, **ok)
-    with pytest.raises(ValueError, match="sample_stride"):
+    with pytest.raises(ValueError, match=r"sample_stride must be an integer"):
         fdtd_gpu_remote.build_job(343.0, _DX, sample_stride=2.0, **ok)
-    with pytest.raises(ValueError, match="sample_dtype"):
+    with pytest.raises(ValueError, match=r"sample_dtype must be"):
         fdtd_gpu_remote.build_job(343.0, _DX, sample_dtype="int16", **ok)
-    with pytest.raises(ValueError, match="sponge_width"):
+    with pytest.raises(ValueError, match=r"sponge_width must be an integer"):
         fdtd_gpu_remote.build_job(343.0, _DX, sponge_width=True, **ok)
-    with pytest.raises(ValueError, match="sponge_width"):
+    with pytest.raises(ValueError, match=r"sponge_width must be an integer"):
         fdtd_gpu_remote.build_job(343.0, _DX, sponge_width=3.5, **ok)
-    with pytest.raises(ValueError, match="sponge_width"):
+    with pytest.raises(ValueError, match=r"sponge_width must be an integer"):
         fdtd_gpu.GpuFDTD2D(343.0, _DX, shape=(_NY, _NX), sponge_width=2.5)
     too_wide = min(_NY, _NX)
     with pytest.raises(ValueError, match="smallest grid side"):
         fdtd_gpu_remote.build_job(343.0, _DX, sponge_width=too_wide, **ok)
-    with pytest.raises(ValueError, match="sponge_reflection"):
+    with pytest.raises(
+        ValueError, match=r"sponge_reflection must lie strictly between"
+    ):
         fdtd_gpu_remote.build_job(
             343.0, _DX, sponge_width=4, sponge_reflection=1.5, **ok
         )
     bad_scale_length = np.ones(_NX + 1)
-    with pytest.raises(ValueError, match="init_scale_x"):
+    with pytest.raises(ValueError, match=r"init_scale_x must be a 1D array of length"):
         fdtd_gpu_remote.build_job(343.0, _DX, init_scale_x=bad_scale_length, **ok)
     bad_scale_nan = np.full(_NX, np.nan)
-    with pytest.raises(ValueError, match="init_scale_x"):
+    with pytest.raises(ValueError, match=r"init_scale_x must be finite everywhere"):
         fdtd_gpu_remote.build_job(343.0, _DX, init_scale_x=bad_scale_nan, **ok)
 
 

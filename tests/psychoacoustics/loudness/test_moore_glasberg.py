@@ -429,7 +429,9 @@ def test_a_result_refuses_a_centre_frequency_per_filter_missing() -> None:
     """
     result = psychoacoustics.loudness_moore_glasberg_from_spectrum([(1000.0, 60.0)])
     one_filter_short = result.centre_frequencies[1:]
-    with pytest.raises(ValueError, match="'centre_frequencies'"):
+    with pytest.raises(
+        ValueError, match=rf"'centre_frequencies' \({one_filter_short.size}\)"
+    ):
         dataclasses.replace(result, centre_frequencies=one_filter_short)
 
 
@@ -443,7 +445,7 @@ def test_a_result_refuses_a_centre_frequency_column_of_pairs() -> None:
     """
     result = psychoacoustics.loudness_moore_glasberg_from_spectrum([(1000.0, 60.0)])
     pairs = np.column_stack([result.centre_frequencies, result.centre_frequencies])
-    with pytest.raises(ValueError, match="'centre_frequencies'"):
+    with pytest.raises(ValueError, match="'centre_frequencies' must have one axis"):
         dataclasses.replace(result, centre_frequencies=pairs)
 
 

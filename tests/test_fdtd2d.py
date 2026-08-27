@@ -96,7 +96,7 @@ def test_scalar_c_requires_shape() -> None:
 def test_source_outside_the_grid_is_rejected() -> None:
     sim = fdtd2d.FDTD2D(343.0, 0.05, shape=(10, 10))
     pulse = fdtd2d.GaussianPulse(ix=99, iy=0, width=1e-4)
-    with pytest.raises(ValueError, match="outside the grid"):
+    with pytest.raises(ValueError, match="source position lies outside the grid"):
         sim.add_source(pulse)
 
 
@@ -189,8 +189,8 @@ def test_cw_source_rejects_invalid_parameters(
     ("kwargs", "match"),
     [
         ({"steps": -1}, "steps must be non-negative"),
-        ({"steps": 1, "record_every": 0}, "record_every"),
-        ({"steps": 1, "record_every": 1, "decimate": 0}, "decimate"),
+        ({"steps": 1, "record_every": 0}, "record_every must be >= 1"),
+        ({"steps": 1, "record_every": 1, "decimate": 0}, "decimate must be >= 1"),
     ],
 )
 def test_run_rejects_invalid_recording_controls(

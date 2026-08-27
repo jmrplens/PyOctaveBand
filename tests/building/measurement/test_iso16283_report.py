@@ -206,7 +206,7 @@ def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     result = _airborne_result()
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         result.report(out, engine="weasyprint")
 
 
@@ -214,10 +214,10 @@ def test_unknown_quantity_rejected(tmp_path: Path) -> None:
     """An unknown field quantity raises ``ValueError``."""
     airborne = _airborne_result()
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="quantity"):
+    with pytest.raises(ValueError, match=r"Unknown field quantity"):
         airborne.report(out, quantity="dn")
     impact = building.impact_insulation(_IMPACT_LN, _T_AT_T0)
-    with pytest.raises(ValueError, match="quantity"):
+    with pytest.raises(ValueError, match=r"Unknown field quantity"):
         impact.report(out, quantity="dnt")
 
 
@@ -225,7 +225,7 @@ def test_missing_r_prime_rejected(tmp_path: Path) -> None:
     """Requesting the R' fiche without area/volume raises ``ValueError``."""
     result = _airborne_result()
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="r_prime"):
+    with pytest.raises(ValueError, match=r"result carries no 'r_prime' curve"):
         result.report(out, quantity="r_prime")
 
 
@@ -235,7 +235,9 @@ def test_non_core_band_count_rejected(tmp_path: Path) -> None:
         np.full(5, 90.0), np.full(5, 50.0), np.full(5, 0.5)
     )
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="16 core"):
+    with pytest.raises(
+        ValueError, match=r"field report rates the 16 core one-third-octave bands"
+    ):
         result.report(out)
 
 
@@ -244,7 +246,9 @@ def test_verbose_needs_measurement_chain(tmp_path: Path) -> None:
     curve = np.asarray(_AIRBORNE_R, dtype=np.float64)
     bare = building.AirborneInsulationResult(d=curve, dnt=curve, r_prime=None)
     rejected = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="measurement chain"):
+    with pytest.raises(
+        ValueError, match=r"verbose=True needs the per-band measurement chain"
+    ):
         bare.report(rejected, verbose=True)
     # The non-verbose form still renders from the quantity alone.
     out = tmp_path / "bare.pdf"
@@ -260,5 +264,7 @@ def test_manual_impact_result_renders_without_chain(tmp_path: Path) -> None:
     bare.report(str(out))
     assert_one_page(str(out))
     rejected = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="measurement chain"):
+    with pytest.raises(
+        ValueError, match=r"verbose=True needs the per-band measurement chain"
+    ):
         bare.report(rejected, verbose=True)

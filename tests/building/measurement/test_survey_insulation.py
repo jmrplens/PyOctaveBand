@@ -30,9 +30,9 @@ def test_reverberation_index_formula_3() -> None:
 
 
 def test_reverberation_index_rejects_nonpositive() -> None:
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"'t' must contain positive values"):
         building.reverberation_index([0.5, 0.0])
-    with pytest.raises(ValueError, match="t0"):
+    with pytest.raises(ValueError, match=r"'t0' must be positive"):
         building.reverberation_index([0.5], t0=0.0)
 
 
@@ -173,19 +173,25 @@ def test_service_equipment_banded() -> None:
 
 
 def test_service_equipment_requires_three_positions() -> None:
-    with pytest.raises(ValueError, match="exactly three"):
+    with pytest.raises(
+        ValueError,
+        match=r"'measurements' must give exactly three measurement positions",
+    ):
         building.survey_service_equipment_level([35.0, 30.0], 3.0)
 
 
 def test_service_equipment_index_shape_mismatch_raises() -> None:
-    with pytest.raises(ValueError, match="match the shape"):
+    with pytest.raises(ValueError, match=r"'reverberation_index' must match the shape"):
         # Scalar average but a per-band k.
         building.survey_service_equipment_level([35.0, 30.0, 32.0], [3.0, 2.0])
 
 
 def test_service_equipment_scalar_measurements_raises_cleanly() -> None:
     # A 0-d input must give a clean ValueError, not an IndexError.
-    with pytest.raises(ValueError, match="exactly three"):
+    with pytest.raises(
+        ValueError,
+        match=r"'measurements' must give exactly three measurement positions",
+    ):
         building.survey_service_equipment_level(35.0, 3.0)  # type: ignore[arg-type]
 
 
@@ -197,7 +203,9 @@ def test_service_equipment_scalar_measurements_raises_cleanly() -> None:
 def test_index_band_count_must_match_levels() -> None:
     source, receiving = np.full(_OCTAVE, 80.0), np.full(_OCTAVE, 45.0)
     short_index = np.zeros(3)
-    with pytest.raises(ValueError, match="one value per band"):
+    with pytest.raises(
+        ValueError, match=r"'reverberation_index' must give one value per band"
+    ):
         building.survey_airborne_insulation(source, receiving, short_index)
 
 
@@ -207,7 +215,9 @@ def test_rating_none_off_band_count() -> None:
         np.full(4, 80.0), np.full(4, 45.0), np.zeros(4)
     )
     assert res.rating is None
-    with pytest.raises(ValueError, match="5 octave"):
+    with pytest.raises(
+        ValueError, match=r"No single-number rating is available to plot"
+    ):
         res.plot()
 
 
@@ -357,14 +367,16 @@ def test_estimate_feeds_survey_functions() -> None:
 
 
 def test_estimate_rejects_bad_inputs() -> None:
-    with pytest.raises(ValueError, match="at most 150"):
+    with pytest.raises(ValueError, match=r"'volume' must be at most"):
         building.estimate_reverberation_index(200.0, "a")
     # The error names the actual volume range, not an internal index.
     with pytest.raises(ValueError, match=r"60 <= V <= 150"):
         building.estimate_reverberation_index(100.0, "kitchen")  # only V < 35
-    with pytest.raises(ValueError, match="not tabulated"):
+    with pytest.raises(
+        ValueError, match=r"'room' .* is not tabulated for the volume range"
+    ):
         building.estimate_reverberation_index(10.0, "z")
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"'volume' must be positive"):
         building.estimate_reverberation_index(0.0, "a")
 
 

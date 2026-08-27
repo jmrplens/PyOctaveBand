@@ -254,7 +254,10 @@ def test_table_d1_1600_hz_overlap_takes_the_conservative_value() -> None:
 @pytest.mark.parametrize("resonance", [20.0, 6000.0])
 def test_table_d1_rejects_untabulated_resonances(resonance: float) -> None:
     """Table D.1 covers 30 Hz to 5 000 Hz only."""
-    with pytest.raises(ValueError, match="Table D.1"):
+    with pytest.raises(
+        ValueError,
+        match=r"'resonance_frequency' must lie in .* Table D\.1 is not tabulated",
+    ):
         building.weighted_lining_improvement(resonance, 45.0)
 
 
@@ -437,9 +440,12 @@ def test_in_situ_transfer_formula_d8() -> None:
 @pytest.mark.parametrize(
     ("kwargs", "match"),
     [
-        ({"system": "studs", "glued_area": 40.0}, "glued exterior systems"),
-        ({"glued_area": 100.1}, "glued_area"),
-        ({"glued_area": 0.0}, "glued_area"),
+        (
+            {"system": "studs", "glued_area": 40.0},
+            r"'glued_area' applies to the glued exterior systems",
+        ),
+        ({"glued_area": 100.1}, r"'glued_area' is a percentage and cannot exceed"),
+        ({"glued_area": 0.0}, r"'glued_area' must be positive"),
     ],
 )
 def test_glued_area_guards(kwargs: dict[str, object], match: str) -> None:

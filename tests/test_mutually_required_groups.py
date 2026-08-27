@@ -59,7 +59,9 @@ OCTAVES = np.array([125.0, 250.0, 500.0, 1000.0])
 def test_lining_resonance_takes_one_formula_not_both() -> None:
     """D.1 and D.2 are two constructions, not two ways to say one number."""
     for kwargs in ({}, {"dynamic_stiffness": 1e7, "cavity_depth": 0.05}):
-        with pytest.raises(ValueError, match="exactly one"):
+        with pytest.raises(
+            ValueError, match=r"exactly one of 'dynamic_stiffness'.*or 'cavity_depth'"
+        ):
             lining_resonance_frequency(100.0, 10.0, **kwargs)  # type: ignore[call-overload]
     assert lining_resonance_frequency(100.0, 10.0, dynamic_stiffness=1e7) > 0.0
     assert lining_resonance_frequency(100.0, 10.0, cavity_depth=0.05) > 0.0
@@ -68,7 +70,9 @@ def test_lining_resonance_takes_one_formula_not_both() -> None:
 def test_ground_effect_takes_one_ground_description() -> None:
     both = {"flow_resistivity": 200e3, "impedance": np.ones(4, dtype=complex)}
     for kwargs in ({}, both):
-        with pytest.raises(ValueError, match="exactly one"):
+        with pytest.raises(
+            ValueError, match=r"exactly one of 'impedance' or 'flow_resistivity'"
+        ):
             ground_effect(  # type: ignore[call-overload]
                 OCTAVES, 1.0, 1.5, 10.0, **kwargs
             )
@@ -76,13 +80,15 @@ def test_ground_effect_takes_one_ground_description() -> None:
 
 def test_gaussian_residual_takes_one_percentile() -> None:
     for kwargs in ({}, {"l90": 45.0, "l95": 44.0}):
-        with pytest.raises(ValueError, match="exactly one"):
+        with pytest.raises(ValueError, match=r"exactly one of 'l90' or 'l95'"):
             gaussian_residual_level(50.0, **kwargs)  # type: ignore[call-overload]
 
 
 def test_diffuser_polar_takes_one_description() -> None:
     for kwargs in ({}, {"depths": BANDS, "reflection": BANDS}):
-        with pytest.raises(ValueError, match="exactly one"):
+        with pytest.raises(
+            ValueError, match=r"exactly one of 'depths' or 'reflection'"
+        ):
             predict_diffuser_polar_response(0.1, 500.0, **kwargs)  # type: ignore[call-overload]
 
 
@@ -93,9 +99,9 @@ def test_diffuser_polar_takes_one_description() -> None:
 
 def test_airborne_insulation_wants_area_and_volume_together() -> None:
     l1, l2, t2 = np.full(16, 80.0), np.full(16, 40.0), np.full(16, 0.5)
-    with pytest.raises(ValueError, match="together"):
+    with pytest.raises(ValueError, match=r"'area' and 'volume' must be given together"):
         airborne_insulation(l1, l2, t2, area=10.0)  # type: ignore[call-overload]
-    with pytest.raises(ValueError, match="together"):
+    with pytest.raises(ValueError, match=r"'area' and 'volume' must be given together"):
         airborne_insulation(l1, l2, t2, volume=50.0)  # type: ignore[call-overload]
 
 
@@ -108,21 +114,24 @@ def test_survey_insulation_area_needs_volume() -> None:
 
 def test_adaptation_term_wants_both_or_neither() -> None:
     """Neither is not an error here: it selects the Formula (B.2) approximation."""
-    with pytest.raises(ValueError, match="both"):
+    with pytest.raises(ValueError, match=r"both 'boundary_area' and 'volume'"):
         adaptation_term_kc(OCTAVES, boundary_area=50.0)  # type: ignore[call-overload]
     assert adaptation_term_kc(OCTAVES).shape == OCTAVES.shape
 
 
 def test_plenum_attenuations_travel_together() -> None:
     r = np.full(4, 30.0)
-    with pytest.raises(ValueError, match="together"):
+    with pytest.raises(
+        ValueError,
+        match=r"'attenuation_source' and 'attenuation_receiving' must be given together",
+    ):
         plenum_flanking_reduction_index(  # type: ignore[call-overload]
             r, r, ceiling_length=3.0, plenum_height=1.0, attenuation_source=r
         )
 
 
 def test_plateau_needs_a_complete_construction() -> None:
-    with pytest.raises(ValueError, match="mass_per_area"):
+    with pytest.raises(ValueError, match=r"plateau construction needs 'mass_per_area'"):
         plateau_transmission_loss(OCTAVES, mass_per_area=20.0)  # type: ignore[call-overload]
 
 
@@ -146,7 +155,9 @@ def test_floating_floor_pair_is_not_dropped_in_silence() -> None:
 
 
 def test_cremer_hammer_needs_its_limiting_frequency() -> None:
-    with pytest.raises(ValueError, match="limiting_frequency"):
+    with pytest.raises(
+        ValueError, match=r"'limiting_frequency' is required by model='cremer_hammer'"
+    ):
         floating_floor_improvement_spectrum(  # type: ignore[call-overload]
             BANDS, resonance_frequency=52.8, model="cremer_hammer"
         )
@@ -182,7 +193,9 @@ def test_sti_snr_and_ambient_are_two_ways_of_saying_one_thing() -> None:
     ir = np.zeros(4096)
     ir[0] = 1.0
     level, ambient = np.full(7, 60.0), np.full(7, 30.0)
-    with pytest.raises(ValueError, match="not both"):
+    with pytest.raises(
+        ValueError, match=r"either 'snr' or 'ambient' noise levels, not both"
+    ):
         sti_from_impulse_response(  # type: ignore[call-overload]
             ir, 48000, 15.0, level, ambient
         )
@@ -190,7 +203,7 @@ def test_sti_snr_and_ambient_are_two_ways_of_saying_one_thing() -> None:
 
 def test_shock_exposure_and_measurement_times_travel_together() -> None:
     a = np.random.default_rng(0).standard_normal(4096)
-    with pytest.raises(ValueError, match="both"):
+    with pytest.raises(ValueError, match=r"both exposure_time and measurement_time"):
         multiple_shock_assessment(  # type: ignore[call-overload]
             a,
             1000.0,
@@ -210,7 +223,9 @@ def test_source_room_refuses_itself_at_construction() -> None:
     the call means the complaint arrives at the line that built the object.
     """
     for kwargs in ({}, {"level": 80.0, "power_level": 90.0}):
-        with pytest.raises(ValueError, match="exactly one"):
+        with pytest.raises(
+            ValueError, match=r"exactly one of 'level'.*or 'power_level'"
+        ):
             SourceRoom(**kwargs)
     with pytest.raises(ValueError, match="'room_constant' is required"):
         SourceRoom(power_level=90.0)

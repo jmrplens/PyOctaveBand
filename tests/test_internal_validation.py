@@ -106,7 +106,7 @@ def test_a_nested_list_cannot_smuggle_an_extra_axis_past_a_one_axis_pin() -> Non
     rank sees it.
     """
     result = _Result(first=[[60.0, 1.0], [61.0, 1.0]])
-    with pytest.raises(ValueError, match="'first'"):
+    with pytest.raises(ValueError, match="'first' must have one axis; got 2"):
         require_ranks(result, first=1)
 
 
@@ -144,7 +144,7 @@ def test_a_lone_number_beside_a_spectrum_is_still_refused() -> None:
     against a missing one.
     """
     result = _Result(first=np.float64(1.0), second=np.zeros(4))
-    with pytest.raises(ValueError, match="'first'"):
+    with pytest.raises(ValueError, match="'first' must have one axis; got 0"):
         require_ranks(result, first=1, second=1)
 
 
@@ -163,7 +163,7 @@ def test_same_shape_refuses_two_grids_that_agree_on_one_axis_only() -> None:
     """
     result = _Result(first=np.zeros((3, 2)), second=np.zeros((3, 4)))
     require_same_length(result, "first", "second")
-    with pytest.raises(ValueError, match="'second'"):
+    with pytest.raises(ValueError, match="'second'.* must all have the same shape"):
         require_same_shape(result, "first", "second", quantity="cell")
 
 
@@ -193,7 +193,7 @@ def test_the_message_names_the_result_the_fields_and_the_counts() -> None:
     and neither names the field or the type it came from.
     """
     result = _Result(first=np.zeros(16), second=np.zeros(17))
-    with pytest.raises(ValueError, match="'first'") as caught:
+    with pytest.raises(ValueError, match=r"'first' \(16\)") as caught:
         require_same_length(result, "first", "second", axis="band")
     message = str(caught.value)
     assert "_Result" in message
@@ -209,7 +209,9 @@ def test_equal_shapes_names_the_entry_point_and_every_shape() -> None:
     the shape. The owner is the name the caller typed, not the private
     validator it happened to reach.
     """
-    with pytest.raises(ValueError, match="'y'") as caught:
+    with pytest.raises(
+        ValueError, match="'y'.* must all have the same shape"
+    ) as caught:
         require_equal_shapes("coherence", {"x": (3, 2), "y": (3, 4)}, "sample")
     message = str(caught.value)
     assert "coherence:" in message
@@ -224,7 +226,7 @@ def test_equal_shapes_is_quiet_when_they_agree() -> None:
 def test_equal_shapes_sees_what_a_count_cannot() -> None:
     """Two grids of the same height agree on every count a length check reads."""
     require_equal_shapes("f", {"a": (3,), "b": (3,)})
-    with pytest.raises(ValueError, match="'b'"):
+    with pytest.raises(ValueError, match="'b'.* must all have the same shape"):
         require_equal_shapes("f", {"a": (3, 2), "b": (3, 4)})
 
 

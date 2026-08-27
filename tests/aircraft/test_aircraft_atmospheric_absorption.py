@@ -102,9 +102,9 @@ def test_large_attenuation_no_nan_or_warning() -> None:
 
 
 def test_invalid_inputs_rejected() -> None:
-    with pytest.raises(ValueError, match="frequencies"):
+    with pytest.raises(ValueError, match=r"'frequencies' must be strictly positive"):
         sae_band_attenuation([-1.0], 100.0)
-    with pytest.raises(ValueError, match="path_length"):
+    with pytest.raises(ValueError, match=r"'path_length' must be non-negative"):
         sae_band_attenuation([1000.0], -5.0)
 
 
@@ -115,13 +115,13 @@ def test_per_band_arrays_must_agree() -> None:
     # band of that spectrum. The other three stop the figure instead.
     res = sae_band_attenuation([500.0, 1000.0, 2000.0, 4000.0], 1000.0)
     collapsed = res.coefficient[:1]
-    with pytest.raises(ValueError, match="'coefficient'"):
+    with pytest.raises(ValueError, match=r"'coefficient' \(1\)"):
         replace(res, coefficient=collapsed)
     scalar = float(res.coefficient[0])
-    with pytest.raises(ValueError, match="'coefficient'"):
+    with pytest.raises(ValueError, match=r"'coefficient' must have one axis"):
         replace(res, coefficient=scalar)
     short = res.band_attenuation[:-1]
-    with pytest.raises(ValueError, match="'band_attenuation'"):
+    with pytest.raises(ValueError, match=r"'band_attenuation' \(3\)"):
         replace(res, band_attenuation=short)
 
 

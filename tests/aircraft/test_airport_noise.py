@@ -112,11 +112,11 @@ def test_npd_curve_levels_are_pinned_to_their_own_distances() -> None:
 
 
 def test_invalid_table_rejected() -> None:
-    with pytest.raises(ValueError, match="shape"):
+    with pytest.raises(ValueError, match=r"'levels' must have shape"):
         npd_level(_P, _D, [[100.0, 94.0]], 1000.0, 200.0)  # wrong levels shape
-    with pytest.raises(ValueError, match="increasing"):
+    with pytest.raises(ValueError, match=r"'powers' must be strictly increasing"):
         npd_level([2000.0, 1000.0], _D, _L[::-1], 1500.0, 200.0)
-    with pytest.raises(ValueError, match="distance"):
+    with pytest.raises(ValueError, match=r"'distance' must be finite and strictly"):
         npd_level(_P, _D, _L, 1000.0, -100.0)
 
 
@@ -184,7 +184,7 @@ def test_impedance_adjustment() -> None:
     assert impedance_adjustment(15.0, 101.325) == pytest.approx(0.074, abs=5e-4)
     # Hotter, lower-pressure air is less dense: negative adjustment.
     assert impedance_adjustment(35.0, 95.0) < 0.0
-    with pytest.raises(ValueError, match="pressure"):
+    with pytest.raises(ValueError, match=r"'pressure' must be positive"):
         impedance_adjustment(15.0, 0.0)
 
 
@@ -418,9 +418,9 @@ def test_start_of_roll_directivity_properties() -> None:
     assert start_of_roll_directivity(120.0, 300.0, "prop") == pytest.approx(
         start_of_roll_directivity(120.0, 300.0, "turboprop")
     )
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"'engine' must be"):
         start_of_roll_directivity(120.0, 300.0, "rocket")
-    with pytest.raises(ValueError, match="distance_m"):
+    with pytest.raises(ValueError, match=r"'distance_m' must be positive"):
         start_of_roll_directivity(120.0, -1.0, "jet")
 
 
@@ -463,7 +463,9 @@ def test_event_level_ground_roll_applies_directivity() -> None:
     expected_delta = _dc(vref, 0.5 * (40.0 + 60.0)) - _dc(vref, 60.0)
     assert flagged_ahead - plain_ahead == pytest.approx(expected_delta, abs=1e-9)
     mismatched_roll = FlightSegmentState(ground_roll=[True, False])
-    with pytest.raises(ValueError, match="ground_roll"):
+    with pytest.raises(
+        ValueError, match=r"'ground_roll' must have length \d+ \(one per segment\)"
+    ):
         event_level(path, obs, _NP, _ND, _NSEL, _NMAX, segments=mismatched_roll)
     # The directivity is also applied on the maximum metric (Eq. 4-9a) and with
     # a propeller mounting (turboprop ΔSOR curve).
@@ -655,19 +657,19 @@ def test_noise_contour_metric_outside_the_two_the_type_states_is_refused() -> No
 
 
 def test_event_level_invalid_inputs() -> None:
-    with pytest.raises(ValueError, match="path"):
+    with pytest.raises(ValueError, match=r"'path' must have shape"):
         event_level(
             [[0.0, 0.0, 0.0, 1.0, 1.0]], [0.0, 0.0, 0.0], _NP, _ND, _NSEL, _NMAX
         )
     good = [[0.0, 0.0, 300.0, 10000.0, _VREF], [1000.0, 0.0, 300.0, 10000.0, _VREF]]
-    with pytest.raises(ValueError, match="metric"):
+    with pytest.raises(ValueError, match=r"'metric' must be 'exposure'"):
         event_level(good, [0.0, 100.0, 0.0], _NP, _ND, _NSEL, _NMAX, metric="Lden")
-    with pytest.raises(ValueError, match="lateral_m"):
+    with pytest.raises(ValueError, match=r"'lateral_m' must be non-negative"):
         lateral_attenuation(30.0, -1.0)
-    with pytest.raises(ValueError, match="mounting"):
+    with pytest.raises(ValueError, match=r"'mounting' must be"):
         engine_installation_correction(20.0, "tail")
-    # Non-finite path, negative power and non-positive speed are rejected.
-    with pytest.raises(ValueError, match="finite"):
+    # Non-finite path, negative power and zero mean speed are rejected.
+    with pytest.raises(ValueError, match=r"'path' must contain only finite"):
         event_level(
             [[0.0, 0.0, np.inf, 1e4, _VREF], good[1]],
             [0.0, 100.0, 0.0],
@@ -676,7 +678,9 @@ def test_event_level_invalid_inputs() -> None:
             _NSEL,
             _NMAX,
         )
-    with pytest.raises(ValueError, match="power"):
+    with pytest.raises(
+        ValueError, match=r"'path' power settings .*must be non-negative"
+    ):
         event_level(
             [[0.0, 0.0, 300.0, -1.0, _VREF], good[1]],
             [0.0, 100.0, 0.0],
@@ -685,7 +689,9 @@ def test_event_level_invalid_inputs() -> None:
             _NSEL,
             _NMAX,
         )
-    with pytest.raises(ValueError, match="speed"):
+    with pytest.raises(
+        ValueError, match=r"zero mean speed \(stationary segment in 'path'\)"
+    ):
         event_level(
             [[0.0, 0.0, 300.0, 1e4, 0.0], good[1]],
             [0.0, 100.0, 0.0],
@@ -699,7 +705,7 @@ def test_event_level_invalid_inputs() -> None:
 def test_impedance_adjustment_rejects_absolute_zero() -> None:
     from phonometry.aircraft.airport_noise import impedance_adjustment
 
-    with pytest.raises(ValueError, match="absolute zero"):
+    with pytest.raises(ValueError, match=r"'temperature' must be above absolute zero"):
         impedance_adjustment(-300.0, 101.325)
 
 
@@ -826,7 +832,9 @@ def test_bank_angle_side_asymmetry() -> None:
     assert port != pytest.approx(stbd)
     assert same_p == pytest.approx(same_s)
     mismatched_bank = FlightSegmentState(bank=[1.0, 2.0])
-    with pytest.raises(ValueError, match="bank"):
+    with pytest.raises(
+        ValueError, match=r"'bank' must have length \d+ \(one per segment\)"
+    ):
         event_level(
             path, [0.0, 500.0, 0.0], _NP, _ND, _NSEL, _NMAX, segments=mismatched_bank
         )
@@ -919,7 +927,9 @@ def test_noise_contour_accepts_bank() -> None:
     assert banked.level[0, 0] != pytest.approx(banked.level[1, 0])
     assert level.level[0, 0] == pytest.approx(level.level[1, 0])
     mismatched_bank = FlightSegmentState(bank=[1.0, 2.0])
-    with pytest.raises(ValueError, match="bank"):
+    with pytest.raises(
+        ValueError, match=r"'bank' must have length \d+ \(one per segment\)"
+    ):
         noise_contour(path, _NP, _ND, _NSEL, _NMAX, segments=mismatched_bank, **kw)
 
 

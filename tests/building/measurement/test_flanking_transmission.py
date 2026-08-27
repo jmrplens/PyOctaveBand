@@ -200,7 +200,9 @@ def test_octave_bands_reject_misaligned_triples() -> None:
     res = building.vibration_reduction_index(
         np.zeros(len(freqs)), 2.0, 4.0, 4.0, frequency=freqs
     )
-    with pytest.raises(ValueError, match="octave triples"):
+    with pytest.raises(
+        ValueError, match=r"octave_bands\(\) needs whole octave triples"
+    ):
         res.octave_bands()
 
 
@@ -259,7 +261,7 @@ def test_modal_overlap_propagates_to_octave_bands() -> None:
 
 
 def test_modal_overlap_rejects_nonpositive() -> None:
-    with pytest.raises(ValueError, match="modal_overlap"):
+    with pytest.raises(ValueError, match=r"'modal_overlap' must contain positive"):
         building.vibration_reduction_index(
             [5.0], 2.0, 4.0, 4.0, frequency=[500.0], modal_overlap=[0.0]
         )
@@ -428,7 +430,7 @@ def test_frequency_band_count_mismatch_raises() -> None:
 
 
 def test_nonpositive_geometry_raises() -> None:
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"'junction_length' must be a positive"):
         building.vibration_reduction_index([5.0], -2.0, 4.0, 4.0)
 
 

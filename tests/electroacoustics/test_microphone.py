@@ -309,12 +309,15 @@ def test_distortion_below_limit_gives_no_max_spl() -> None:
 
 def test_sensitivity_must_be_positive() -> None:
     f, rel = _flat_response()
-    with pytest.raises(ValueError, match="sensitivity_mv_per_pa"):
+    with pytest.raises(ValueError, match=r"'sensitivity_mv_per_pa' must be positive"):
         electroacoustics.microphone_characteristics(f, rel, 0.0)
 
 
 def test_mismatched_response_lengths_rejected() -> None:
-    with pytest.raises(ValueError, match="equal length"):
+    with pytest.raises(
+        ValueError,
+        match=r"'frequency response' frequencies and values must be 1-D and equal length",
+    ):
         electroacoustics.microphone_characteristics(
             [100.0, 200.0, 400.0], [0.0, 0.0], _M_MV
         )
@@ -322,7 +325,10 @@ def test_mismatched_response_lengths_rejected() -> None:
 
 def test_reference_frequency_outside_band_rejected() -> None:
     f, rel = _flat_response()
-    with pytest.raises(ValueError, match="reference_frequency"):
+    with pytest.raises(
+        ValueError,
+        match=r"'reference_frequency' must lie within the measured frequency band",
+    ):
         electroacoustics.microphone_characteristics(
             f, rel, _M_MV, reference_frequency=30000.0
         )
@@ -333,14 +339,20 @@ def test_noise_voltage_and_stated_level_conflict() -> None:
     conflicting_noise = electroacoustics.MicrophoneNoise(
         voltage=1e-6, equivalent_level_db=14.0
     )
-    with pytest.raises(ValueError, match="not both"):
+    with pytest.raises(
+        ValueError,
+        match=r"either 'noise\.voltage' or 'noise\.equivalent_level_db', not both",
+    ):
         electroacoustics.microphone_characteristics(
             f, rel, _M_MV, noise=conflicting_noise
         )
 
 
 def test_nonpositive_frequencies_rejected() -> None:
-    with pytest.raises(ValueError, match="positive and finite"):
+    with pytest.raises(
+        ValueError,
+        match=r"'frequency response' frequencies must be positive and finite",
+    ):
         electroacoustics.microphone_characteristics(
             [0.0, 100.0, 1000.0], [0.0, 0.0, 0.0], _M_MV
         )
@@ -349,7 +361,9 @@ def test_nonpositive_frequencies_rejected() -> None:
 def test_empty_distortion_rejected() -> None:
     f, rel = _flat_response()
     empty_distortion = electroacoustics.MicrophoneOverload(distortion=([], []))
-    with pytest.raises(ValueError, match="at least two"):
+    with pytest.raises(
+        ValueError, match="'distortion' needs at least two frequency points"
+    ):
         electroacoustics.microphone_characteristics(
             f, rel, _M_MV, overload=empty_distortion
         )
@@ -358,14 +372,16 @@ def test_empty_distortion_rejected() -> None:
 def test_empty_noise_spectrum_rejected() -> None:
     f, rel = _flat_response()
     empty_spectrum = electroacoustics.MicrophoneNoise(spectrum=([], []))
-    with pytest.raises(ValueError, match="at least two"):
+    with pytest.raises(
+        ValueError, match=r"'noise\.spectrum' needs at least two frequency points"
+    ):
         electroacoustics.microphone_characteristics(f, rel, _M_MV, noise=empty_spectrum)
 
 
 def test_empty_polar_rejected() -> None:
     f, rel = _flat_response()
     empty_polar = electroacoustics.MicrophoneDirectivity(polar=([], []))
-    with pytest.raises(ValueError, match="at least two angle points"):
+    with pytest.raises(ValueError, match="'polar' needs at least two angle points"):
         electroacoustics.microphone_characteristics(
             f, rel, _M_MV, directivity=empty_polar
         )
@@ -555,7 +571,7 @@ def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     result = _example_result()
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         result.report(out, engine="weasyprint")
 
 
@@ -563,7 +579,7 @@ def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     result = _example_result()
     out = str(tmp_path / "bad.pdf")
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language"):
         result.report(out, language="xx")
 
 
@@ -617,7 +633,10 @@ def test_a_non_finite_response_axis_no_longer_reaches_the_fiche(
     axis = np.array(result.frequencies, dtype=float)
     axis[10] = float("nan")
     out = tmp_path / "non_finite_axis.pdf"
-    with pytest.raises(ValueError, match=r"'frequencies' must contain only finite"):
+    with pytest.raises(
+        ValueError,
+        match=r"MicrophoneCharacteristics: 'frequencies' must contain only finite",
+    ):
         dataclasses.replace(result, frequencies=axis)
     assert not out.exists()
 

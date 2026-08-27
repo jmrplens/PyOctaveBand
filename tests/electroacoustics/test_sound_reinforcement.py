@@ -26,6 +26,7 @@ special cases with ``N_m = 1``.
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import pytest
@@ -184,7 +185,7 @@ def test_loop_gain_is_the_sum_of_its_parts() -> None:
 
 def test_result_is_frozen() -> None:
     result = electroacoustics.feedback_stability(-6.0, 74.0, 80.0)
-    with pytest.raises(AttributeError):
+    with pytest.raises(dataclasses.FrozenInstanceError):
         result.open_loop_gain = 0.0  # type: ignore[misc]
 
 
@@ -251,11 +252,15 @@ def test_open_microphone_validation(bad: float) -> None:
 
 
 def test_validation_errors() -> None:
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'open_loop_gain' must be finite"):
         electroacoustics.feedback_stability(math.nan, 74.0, 80.0)
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(
+        ValueError, match=r"Levels and the directivity index must be finite"
+    ):
         electroacoustics.feedback_stability(-6.0, math.inf, 80.0)
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(
+        ValueError, match=r"'stability_margin' must be finite and non-negative"
+    ):
         electroacoustics.feedback_stability(-6.0, 74.0, 80.0, stability_margin=-1.0)
     with pytest.raises(ValueError, match="integer of at least 1"):
         electroacoustics.feedback_stability(-6.0, 74.0, 80.0, open_microphones=0)

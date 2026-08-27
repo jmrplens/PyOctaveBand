@@ -312,7 +312,9 @@ def test_a_trace_off_its_time_axis_is_refused(
     """
     trace = ref_calibration.fluctuation_strength_vs_time
     wrong = trace[:-1] if trim else np.append(trace, trace[-1])
-    with pytest.raises(ValueError, match="'fluctuation_strength_vs_time'"):
+    with pytest.raises(
+        ValueError, match=rf"'fluctuation_strength_vs_time' \({wrong.size}\)"
+    ):
         dataclasses.replace(ref_calibration, fluctuation_strength_vs_time=wrong)
 
 
@@ -351,7 +353,9 @@ def test_a_specific_table_that_lost_its_band_axis_is_refused(
     caller-supplied ``ax`` never reaches the heatmap at all.
     """
     flat = ref_calibration.specific_fluctuation_strength_vs_time.mean(axis=1)
-    with pytest.raises(ValueError, match="'specific_fluctuation_strength_vs_time'"):
+    with pytest.raises(
+        ValueError, match="'specific_fluctuation_strength_vs_time' must have 2 axes"
+    ):
         dataclasses.replace(ref_calibration, specific_fluctuation_strength_vs_time=flat)
 
 
@@ -372,7 +376,7 @@ def test_a_band_axis_off_the_filter_bank_is_refused(
     all were well.
     """
     column = np.asarray(getattr(ref_calibration, field))
-    with pytest.raises(ValueError, match=f"'{field}'"):
+    with pytest.raises(ValueError, match=rf"'{field}' \({column.size - 1}\)"):
         dataclasses.replace(ref_calibration, **{field: column[:-1]})
 
 
@@ -386,7 +390,7 @@ def test_a_time_axis_with_a_second_axis_is_refused(
     fill underneath is what stops, with ``'x' is not 1-dimensional`` -- naming
     matplotlib's own parameter, not the field that carried the extra axis.
     """
-    with pytest.raises(ValueError, match="'time'"):
+    with pytest.raises(ValueError, match="'time' must have one axis"):
         dataclasses.replace(ref_calibration, time=ref_calibration.time[:, None])
 
 

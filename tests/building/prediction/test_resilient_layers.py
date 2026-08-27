@@ -1244,54 +1244,69 @@ def test_octave_bandwidth_factor() -> None:
 @pytest.mark.parametrize(
     ("call", "match"),
     [
-        (lambda: building.hammer_impact_velocity(-1.0), "drop_height"),
+        (
+            lambda: building.hammer_impact_velocity(-1.0),
+            "'drop_height' must be positive",
+        ),
         (
             lambda: building.plate_contact_stiffness(1e9, poisson_ratio=1.5),
-            "poisson_ratio",
+            "'poisson_ratio' must lie in",
         ),
-        (lambda: building.covering_contact_stiffness(1e9, 0.0), "thickness"),
+        (
+            lambda: building.covering_contact_stiffness(1e9, 0.0),
+            "'thickness' must be positive",
+        ),
         (
             lambda: building.tapping_force_spectrum([100.0], 1e6, 1e3, band="half"),
-            "band",
+            "'band' must be one of",
         ),
-        (lambda: building.force_pulse([-1.0], 1e6, 1e3), "time"),
-        (lambda: building.combined_dynamic_stiffness([]), "layers"),
+        (
+            lambda: building.force_pulse([-1.0], 1e6, 1e3),
+            "'time' must contain only finite",
+        ),
+        (
+            lambda: building.combined_dynamic_stiffness([]),
+            "'layers' must be a non-empty",
+        ),
         (
             lambda: building.weighted_floating_floor_improvement(
                 1.0, 1e6, floor="cork"
             ),
-            "floor",
+            "'floor' must be one of",
         ),
-        (lambda: building.lining_improvement(100.0, system="cork"), "system"),
+        (
+            lambda: building.lining_improvement(100.0, system="cork"),
+            "'system' must be one of",
+        ),
         (
             lambda: building.lining_resonance_frequency(50.0, 10.0),
-            "exactly one",
+            "Give exactly one of 'dynamic_stiffness'",
         ),
         (
             lambda: building.lining_resonance_frequency(
                 50.0, 10.0, dynamic_stiffness=1e6, cavity_depth=0.05
             ),
-            "exactly one",
+            "Give exactly one of 'dynamic_stiffness'",
         ),
         (
             lambda: building.floating_floor_improvement_spectrum(
                 [100.0], resonance_frequency=50.0, model="cremer_hammer"
             ),
-            "limiting_frequency",
+            "'limiting_frequency' is required by model=",
         ),
         (
             lambda: building.floating_floor_improvement_spectrum(
                 [100.0], resonance_frequency=50.0, model="ver"
             ),
-            "model",
+            "'model' must be one of",
         ),
         (
             lambda: building.weighted_lining_improvement(100.0, float("nan")),
-            "base_rating",
+            "'base_rating' must be finite",
         ),
         (
             lambda: building.lining_improvement_in_situ(float("inf"), 100.0, 50.0),
-            "finite",
+            "'base_rating_in_situ' must be finite",
         ),
     ],
 )

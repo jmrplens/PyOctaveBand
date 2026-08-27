@@ -336,12 +336,16 @@ def test_clause_5_2_rounding_breaks_ties_upward_not_to_even() -> None:
 
 
 def test_rating_rejects_a_wrong_band_count() -> None:
-    with pytest.raises(ValueError, match="16 one-third-octave values"):
+    with pytest.raises(
+        ValueError, match=r"'attenuation' must hold \d+ one-third-octave"
+    ):
         building.ceiling_attenuation_class([30.0] * 15)
 
 
 def test_rating_rejects_mismatched_frequencies() -> None:
-    with pytest.raises(ValueError, match="contour bands"):
+    with pytest.raises(
+        ValueError, match=r"'frequency' must be the 16 ASTM E413 contour bands"
+    ):
         building.ceiling_attenuation_class(
             [30.0] * 16, [100.0 * (i + 1) for i in range(16)]
         )
@@ -357,7 +361,7 @@ def test_rating_result_rejects_a_short_deficiency_column() -> None:
     """
     res = building.ceiling_attenuation_class([30.0] * 16)
     short = res.deficiencies[:-1]
-    with pytest.raises(ValueError, match="'deficiencies'"):
+    with pytest.raises(ValueError, match=r"'deficiencies' \(15\)"):
         dataclasses.replace(res, deficiencies=short)
 
 
@@ -580,7 +584,7 @@ def test_intertek_2019_normalization_reproduces_the_report_column() -> None:
 
 
 def test_normalization_rejects_a_non_positive_absorption() -> None:
-    with pytest.raises(ValueError, match="absorption_area"):
+    with pytest.raises(ValueError, match=r"'absorption_area' must be positive"):
         building.normalized_ceiling_attenuation([90.0], [50.0], 0.0)
 
 
@@ -757,7 +761,7 @@ def test_undamped_transmission_factor_above_unity_is_rejected() -> None:
     tau = eps**2 LR/(4h) = 8,3 here, i.e. Rcl = -9,2 dB. Failing loudly beats
     reporting a negative sound reduction index.
     """
-    with pytest.raises(ValueError, match="above unity"):
+    with pytest.raises(ValueError, match=r"transmission factor reaches .+ above unity"):
         building.plenum_flanking_reduction_index(
             [0.0], [0.0], ceiling_length=5.0, plenum_height=0.6
         )
@@ -867,7 +871,10 @@ def test_power_split_must_be_a_fraction(name: str) -> None:
 
 
 def test_attenuation_coefficients_must_come_in_pairs() -> None:
-    with pytest.raises(ValueError, match="together"):
+    with pytest.raises(
+        ValueError,
+        match=r"'attenuation_source' and 'attenuation_receiving' must be given together",
+    ):
         building.plenum_flanking_reduction_index(
             [30.0],
             [30.0],
@@ -884,7 +891,7 @@ def test_partition_reference_shifts_by_the_room_aspect_ratio() -> None:
 
 
 def test_plenum_model_rejects_a_non_positive_height() -> None:
-    with pytest.raises(ValueError, match="plenum_height"):
+    with pytest.raises(ValueError, match=r"'plenum_height' must be positive"):
         building.plenum_flanking_reduction_index(
             [30.0], [30.0], ceiling_length=4.75, plenum_height=0.0
         )
@@ -953,5 +960,5 @@ def test_plenum_result_rejects_a_ceiling_evaluated_in_one_band() -> None:
         plenum_height=0.43,
     )
     one_band = res.reduction_index_source[:1]
-    with pytest.raises(ValueError, match="'reduction_index_source'"):
+    with pytest.raises(ValueError, match=r"'reduction_index_source' \(1\)"):
         dataclasses.replace(res, reduction_index_source=one_band)

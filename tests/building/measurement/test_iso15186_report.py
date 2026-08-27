@@ -213,7 +213,7 @@ def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     out = str(tmp_path / "x.pdf")
     result = _intensity_result()
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         result.report(out, engine="weasyprint")
 
 
@@ -221,7 +221,7 @@ def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unsupported language raises ``ValueError`` (shared validation path)."""
     out = str(tmp_path / "x.pdf")
     result = _intensity_result()
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language"):
         result.report(out, language="fr")
 
 
@@ -233,7 +233,10 @@ def test_missing_rating_rejected(tmp_path: Path) -> None:
     )
     assert result.rating is None
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="rating"):
+    with pytest.raises(
+        ValueError,
+        match=r"The intensity report needs the ISO 717-1 single-number rating",
+    ):
         result.report(out)
 
 
@@ -269,7 +272,7 @@ def test_non_iso_band_count_rejected(tmp_path: Path) -> None:
         r_i=curve, r_i_modified=None, rating=rating, rating_modified=None
     )
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="16 one-third-octave"):
+    with pytest.raises(ValueError, match="The intensity report supports only"):
         result.report(out)
 
 
@@ -285,7 +288,7 @@ def test_rating_without_per_band_data_rejected(tmp_path: Path) -> None:
         rating_modified=None,
     )
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="per-band"):
+    with pytest.raises(ValueError, match=r"needs the ISO 717 per-band rating data"):
         result.report(out)
 
 
@@ -358,7 +361,11 @@ def test_clause8_fpi_wrong_band_count_rejected(tmp_path: Path) -> None:
     out = str(tmp_path / "x.pdf")
     fpi_5_bands = np.full(5, 4.0)
     residual_3_bands = np.full(3, 18.0)
-    with pytest.raises(ValueError, match="fpi"):
+    with pytest.raises(
+        ValueError, match=r"'fpi' must carry one value per reported band"
+    ):
         result.report(out, fpi=fpi_5_bands)
-    with pytest.raises(ValueError, match="residual_index"):
+    with pytest.raises(
+        ValueError, match=r"'residual_index' must carry one value per reported band"
+    ):
         result.report(out, residual_index=residual_3_bands)

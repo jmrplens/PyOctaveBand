@@ -258,7 +258,9 @@ def test_stipa_short_recording_warns(stipa_18s_seed1234: np.ndarray) -> None:
     practice recommends 15 s to 25 s).
     """
     short = speech.stipa_signal(FS, seconds=5.0, seed=1234)
-    with pytest.warns(UserWarning, match="15"):
+    with pytest.warns(
+        UserWarning, match=r"STIPA recording is .* shorter than the recommended"
+    ):
         speech.stipa(short, FS)
     # No warning at the recommended length.
     with warnings.catch_warnings():
@@ -339,27 +341,33 @@ def test_invalid_inputs_raise() -> None:
     two_dimensional_ir = np.zeros((2, 1000))
     silent_ir = np.zeros(FS // 4)
 
-    with pytest.raises(ValueError, match="1D"):
+    with pytest.raises(
+        ValueError, match=r"sti_from_impulse_response expects a 1D impulse response"
+    ):
         speech.sti_from_impulse_response(two_dimensional_ir, FS)
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"Sample rate 'fs' must be positive"):
         speech.sti_from_impulse_response(ir, -1)
     with pytest.raises(ValueError, match="8 kHz octave band"):
         speech.sti_from_impulse_response(ir, 16000)
-    with pytest.raises(ValueError, match="silent"):
+    with pytest.raises(ValueError, match=r"Impulse response 'ir' is silent"):
         speech.sti_from_impulse_response(silent_ir, FS)
-    with pytest.raises(ValueError, match="7 octave-band values"):
+    with pytest.raises(
+        ValueError, match=r"'level' must contain exactly .* octave-band values"
+    ):
         speech.sti_from_impulse_response(ir, FS, level=[60.0, 60.0, 60.0])
-    with pytest.raises(ValueError, match="scalar or a vector"):
+    with pytest.raises(ValueError, match="'snr' must be a scalar or a vector"):
         speech.sti_from_impulse_response(ir, FS, snr=[10.0, 10.0])
     with pytest.raises(ValueError, match="requires the speech octave-band levels"):
         speech.sti_from_impulse_response(ir, FS, ambient=[40.0] * 7)
-    with pytest.raises(ValueError, match="not both"):
+    with pytest.raises(
+        ValueError, match=r"Provide either 'snr' or 'ambient' noise levels, not both"
+    ):
         speech.sti_from_impulse_response(
             ir, FS, snr=10.0, level=[60.0] * 7, ambient=[40.0] * 7
         )
 
     two_dimensional_signal = np.zeros((2, FS))
-    with pytest.raises(ValueError, match="1D"):
+    with pytest.raises(ValueError, match=r"stipa expects a 1D signal"):
         speech.stipa(two_dimensional_signal, FS)
     half_second_clip = speech.stipa_signal(FS, seconds=18.0, seed=3)[: FS // 2]
     # The 0.5 s clip also triggers the (correct) sub-15 s STIPA warning;
@@ -368,7 +376,10 @@ def test_invalid_inputs_raise() -> None:
     # two blocks stay nested rather than combined.
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
-        with pytest.raises(ValueError, match="too short"):
+        with pytest.raises(
+            ValueError,
+            match=r"Signal too short for STIPA: it must contain at least one full period",
+        ):
             speech.stipa(half_second_clip, FS)
     with pytest.warns(STIWarning) as tone_warnings:  # noqa: PT031 - the warns block records the whole STIWarning family while running
         # A pure tone leaves other octave bands empty: those bands read
@@ -388,21 +399,25 @@ def test_invalid_inputs_raise() -> None:
     assert np.any(res_tone.mtf == 0.0)
     assert np.all(res_tone.mtf[3] < 0.01)
 
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"'seconds' must be positive"):
         speech.stipa_signal(FS, seconds=0.0)
-    with pytest.raises(ValueError, match="fs"):
+    with pytest.raises(
+        ValueError, match=r"Sample rate 'fs' must be .* half-octave carrier"
+    ):
         speech.stipa_signal(8000)
 
     wrong_shape_mtf = np.full((3, 14), 0.5)
     negative_mtf = _uniform_mtf(-0.1)
-    with pytest.raises(ValueError, match="shape"):
+    with pytest.raises(ValueError, match=r"'mtf' must have shape"):
         _sti_from_mtf(wrong_shape_mtf)
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"Modulation transfer values must be finite"):
         _sti_from_mtf(negative_mtf)
 
 
 def test_mtf_above_1_3_warns_and_truncates() -> None:
-    with pytest.warns(UserWarning, match="1.3"):
+    with pytest.warns(
+        UserWarning, match=r"Modulation transfer values above .* detected"
+    ):
         result = _sti_from_mtf(_uniform_mtf(1.4))
     assert result.sti == 1.0
 
@@ -501,7 +516,7 @@ def test_an_sti_result_refuses_an_mti_off_the_band_axis() -> None:
         band_levels=np.full(7, 60.0),
         rating="B",
     )
-    with pytest.raises(ValueError, match="'mti'"):
+    with pytest.raises(ValueError, match=r"'mti' \(6\)"):
         dataclasses.replace(result, mti=result.mti[:-1])
 
 
@@ -544,5 +559,5 @@ def test_an_sti_result_refuses_a_bare_number_for_a_band_column() -> None:
     ir = np.zeros(FS // 2)
     ir[100] = 1.0
     result = speech.sti_from_impulse_response(ir, FS)
-    with pytest.raises(ValueError, match="'mti'"):
+    with pytest.raises(ValueError, match="'mti' must have one axis; got 0"):
         dataclasses.replace(result, mti=0.75)

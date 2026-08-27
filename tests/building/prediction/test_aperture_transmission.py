@@ -93,7 +93,7 @@ def test_slit_resonances_are_half_wavelength_spaced() -> None:
 def test_slit_resonance_rejects_wide_shallow_slit() -> None:
     # A very wide, shallow slit drives the effective depth d + 2e non-positive;
     # the resonance is undefined and must raise rather than return NaN.
-    with pytest.raises(ValueError, match="too wide"):
+    with pytest.raises(ValueError, match=r"slit too wide relative to its depth"):
         building.slit_resonance_frequencies(0.001, 0.2, orders=1)
 
 
@@ -143,9 +143,9 @@ def test_circular_aperture_thin_hole_reduction_positive_at_low_f() -> None:
 # Validation.
 # ---------------------------------------------------------------------------
 def test_rejects_bad_input() -> None:
-    with pytest.raises(ValueError, match="field"):
+    with pytest.raises(ValueError, match=r"'field' must be one of"):
         building.slit_transmission_coefficient([500.0], 0.002, 0.1, field="oblique")
-    with pytest.raises(ValueError, match="width"):
+    with pytest.raises(ValueError, match=r"'width' must be positive"):
         building.slit_transmission_coefficient([500.0], -0.002, 0.1)
-    with pytest.raises(ValueError, match="tau"):
+    with pytest.raises(ValueError, match=r"'tau' must be positive"):
         building.transmission_loss_from_coefficient([-1.0])
