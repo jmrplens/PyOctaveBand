@@ -399,3 +399,100 @@ def test_a_filter_verdict_refuses_an_unknown_edition() -> None:
     )
     with pytest.raises(ValueError, match="'edition' must be one of"):
         dataclasses.replace(result, edition="2003")
+
+
+def test_a_filter_verdict_refuses_a_class_its_bands_do_not_derive() -> None:
+    """The boxed class must restate the per-band classes under it.
+
+    ``verify_filter_class`` derives the overall class from the band verdicts
+    by one rule, the strictest class every band meets, so a summary that
+    contradicts a row is one no bank produced. Unpinned, the fiche boxed
+    ``Class 1 - COMPLIES (margin -0.35 dB)`` above a table whose 1 kHz row
+    read ``Class 2 (-0.35 dB)``, and passed the bank against a required
+    class 1.
+    """
+    import copy
+    import dataclasses
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    assert result.overall_class == 1
+    bands = tuple(copy.deepcopy(band) for band in result.bands)
+    # A band that misses class 1 by a hair and meets class 2: the shape
+    # ``_verify_band`` emits for a filter just outside the tighter corridor.
+    bands[1].update({"class": 2, "margin_class1_db": -0.35})
+    with pytest.raises(
+        ValueError, match=r"'overall_class' must be the class the bands derive"
+    ):
+        dataclasses.replace(result, bands=bands, overall_class=1)
+
+
+def test_a_filter_verdict_refuses_a_class_over_a_band_that_meets_none() -> None:
+    """A band that meets no class carries ``None``, and the producer then
+    states ``None`` for the bank too: a bank is no better than its worst
+    band. A class boxed over such a table attests compliance for a band whose
+    own row reads ``none``.
+    """
+    import copy
+    import dataclasses
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    bands = tuple(copy.deepcopy(band) for band in result.bands)
+    bands[1]["class"] = None
+    # The producer's own pairing of that band list is accepted.
+    assert dataclasses.replace(result, bands=bands, overall_class=None) is not None
+    with pytest.raises(
+        ValueError, match=r"'overall_class' must be the class the bands derive"
+    ):
+        dataclasses.replace(result, bands=bands, overall_class=1)
+
+
+def test_a_filter_verdict_refuses_a_class_that_is_no_designation() -> None:
+    """The class is a designation, not a measured value.
+
+    Both halves are spliced into text and into a key: the overall class into
+    ``margin_class<c>_db``, which the boxed statement reads the binding margin
+    from, so ``1.0`` died in a bare ``KeyError`` for ``margin_class1.0_db``;
+    the per-band class into the table, which printed ``Class 1.0``. Equal to
+    a class is therefore not the same as being one.
+    """
+    import copy
+    import dataclasses
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    bands = tuple(copy.deepcopy(band) for band in result.bands)
+    bands[1]["class"] = 1.0
+    with pytest.raises(ValueError, match=r"'overall_class' must be one of"):
+        dataclasses.replace(result, overall_class=1.0)
+    with pytest.raises(ValueError, match=r"'bands' must state a 'class' of"):
+        dataclasses.replace(result, bands=bands)
+
+
+def test_a_filter_verdict_refuses_a_band_carrying_no_class_at_all() -> None:
+    """Every band verdict carries its own class, and the fiche's per-band
+    table reads it by name; a band short of the key died in a bare
+    ``KeyError`` halfway through the table.
+    """
+    import copy
+    import dataclasses
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    bands = tuple(copy.deepcopy(band) for band in result.bands)
+    del bands[1]["class"]
+    with pytest.raises(ValueError, match=r"'bands' must carry a 'class' per band"):
+        dataclasses.replace(result, bands=bands)

@@ -406,6 +406,43 @@ def test_an_rc_rating_refuses_a_non_finite_rating_average_or_curve(
         dataclasses.replace(result, **{field: replacement})
 
 
+@pytest.mark.parametrize(
+    "bad",
+    [25.5, 30.0, True],
+    ids=["fractional", "integral-float", "bool"],
+)
+def test_an_rc_rating_refuses_a_rating_that_is_not_an_integer(bad: object) -> None:
+    """Finite is too weak: the rating is a designation, not a level.
+
+    Clause D.4 rounds the mid-frequency average to the nearest decibel and
+    clause D.3.5 names the curve by that whole number, which ``label`` prints
+    verbatim. Every value here is finite, so the finite guard passes it, and
+    each one boxes a designation the standard does not define: ``RC-25.5(N)``
+    for the fractional average, ``RC-30.0(N)`` for a float that is a whole
+    number but does not print as one, and ``RC-True(N)`` for a ``bool``,
+    which is an ``int`` in Python and additionally reads out of the
+    tabulated family.
+    """
+    result = rn.room_criterion(rn.rc_curve(35.0))
+    with pytest.raises(ValueError, match="'rating' must be an integer"):
+        dataclasses.replace(result, rating=bad)
+
+
+def test_an_rc_rating_admits_a_numpy_integer_and_a_fractional_average() -> None:
+    """The integer pin belongs to the designation alone, and only to it.
+
+    ``rating`` is what the ``RC-NN(A)`` label prints, so the pin refuses
+    every value that does not print as a whole number of decibels, and
+    nothing further: a NumPy integer prints as the same designation. ``lmf``
+    is the level clause D.4 rounds *to* that designation, so it keeps its
+    tenths and must stay pinned no more tightly than finite.
+    """
+    result = rn.room_criterion(rn.rc_curve(35.0))
+    rated = dataclasses.replace(result, rating=np.int64(35), lmf=35.4)
+    assert rated.label == "RC-35(N)"
+    assert rated.lmf == pytest.approx(35.4)
+
+
 def test_an_rc_rating_keeps_the_bands_it_was_never_given() -> None:
     """The finite guard must not reach ``levels``: absent bands are ``NaN``.
 

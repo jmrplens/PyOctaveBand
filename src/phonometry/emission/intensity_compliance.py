@@ -73,6 +73,7 @@ from .._internal.validation import (
     require_equal_counts,
     require_ranks,
     require_same_length,
+    require_summary_class,
 )
 
 if TYPE_CHECKING:
@@ -402,8 +403,9 @@ class IntensityInstrumentComplianceResult:
     measured spectrum and the two Table 2 masks it was judged against, so the
     result can redraw itself and render an accredited fiche.
 
-    :ivar overall_class: The loosest class every band meets (1 or 2), or
-        ``None`` when at least one band meets neither.
+    :ivar overall_class: The strictest class every band meets (1 or 2), or
+        ``None`` when at least one band meets neither. It is the *largest*
+        per-band class, because a band meeting class 1 meets class 2 as well.
     :ivar bands: The per-band verdict dictionaries of
         :func:`verify_intensity_class`, as an immutable tuple.
     :ivar frequency: Nominal band centre frequencies, in Hz.
@@ -492,6 +494,7 @@ class IntensityInstrumentComplianceResult:
                         f"{key}={value!r}."
                     )
                     raise ValueError(msg)
+        require_summary_class(self, self.bands, self.overall_class, (1, 2))
 
     def reference_class(self) -> int:
         """The class whose mask the fiche and the plot read margins against.

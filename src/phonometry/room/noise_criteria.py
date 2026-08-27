@@ -361,20 +361,50 @@ class RCResult:
         comparison are false for a ``NaN``, so the flag reads ``True`` for
         every spectrum rather than answering for the rating.
 
-        ``levels`` is deliberately absent from that list: a spectrum may be
-        rated from a subset of the bands, and :func:`room_criterion` marks
-        each band it was not given with a ``NaN`` that the fiche renders as
-        an em dash.
+        Finite is too weak a pin for the rating alone: it is a designation
+        rather than a measured level. Clause D.4 rounds the mid-frequency
+        average to the nearest decibel and clause D.3.5 names the curve by
+        that whole number, which :attr:`label` prints verbatim, so the field
+        is typed :class:`int` and anything else is a type violation rather
+        than a value out of range. A finite fractional rating boxes
+        ``RC-25.5(N)`` on the fiche as an accredited designation; an integral
+        float is no better, since it boxes ``RC-30.0(N)``; and a ``bool``,
+        being an ``int`` in Python, boxes ``RC-True(N)`` and reads out of the
+        tabulated family. ``lmf`` carries the unrounded average for the
+        reader who wants the tenths. NumPy integers are admitted: they are
+        the same designation and print as it.
+
+        ``lmf`` and ``reference_curve`` take no such pin: the average is a
+        level in decibels, and the reference curve is the closed-form Annex D
+        rule evaluated at the rating, which :func:`rc_curve` defines for any
+        index. ``levels`` is deliberately absent from every list above: a
+        spectrum may be rated from a subset of the bands, and
+        :func:`room_criterion` marks each band it was not given with a
+        ``NaN`` that the fiche renders as an em dash.
 
         :raises ValueError: if the three per-band arrays do not share one
             length, 'frequencies' is not the ten tabulated octave bands,
-            'rating', 'lmf' or 'reference_curve' is not finite, or
-            'classification' is not one of ``N``, ``R``, ``H`` or ``RH``.
+            'rating', 'lmf' or 'reference_curve' is not finite, 'rating' is
+            not an integer, or 'classification' is not one of ``N``, ``R``,
+            ``H`` or ``RH``.
         """
         require_ranks(self, frequencies=1, levels=1, reference_curve=1)
         require_same_length(self, "frequencies", "levels", "reference_curve")
         _require_table1_bands(type(self).__name__, self.frequencies)
         require_finite_fields(self, "rating", "lmf", "reference_curve")
+        # The designation is printed verbatim into the RC-NN(A) label, so an
+        # integral float labels the curve RC-30.0(N); a bool is an int in
+        # Python, so it is excluded explicitly.
+        if isinstance(self.rating, bool) or not isinstance(
+            self.rating, (int, np.integer)
+        ):
+            msg = (
+                f"RCResult: 'rating' must be an integer number of decibels "
+                f"(ANSI/ASA S12.2-2019 clause D.4 rounds the mid-frequency "
+                f"average to the nearest decibel and clause D.3.5 designates "
+                f"the curve by that whole number); got {self.rating!r}."
+            )
+            raise ValueError(msg)
         if self.classification == "RV":
             msg = (
                 "RCResult: classification 'RV' (vibration and rattle, "

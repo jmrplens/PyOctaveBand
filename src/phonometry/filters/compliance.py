@@ -43,9 +43,11 @@ from scipy import signal
 
 from .._internal.validation import (
     check_engine,
+    is_class_designation,
     require_choice,
     require_ranks,
     require_same_length,
+    require_summary_class,
 )
 
 if TYPE_CHECKING:
@@ -470,7 +472,13 @@ class FilterComplianceResult:
         whose edition disagrees with its margin keys would draw the other
         edition's corridor under this edition's title, and an overall class
         the bands carry no margins for dies in a bare ``KeyError`` halfway
-        through the figure. Every band is checked, not just the first:
+        through the figure. The class is pinned as a designation, not merely
+        as a value equal to one: ``1.0`` and ``True`` compare equal to class 1
+        yet build ``margin_class1.0_db`` and print ``Class True``. Being one
+        of the edition's classes is not enough either, so the class is pinned
+        against the per-band classes it summarises as well; see
+        :func:`~.._internal.validation.require_summary_class`. Every band is checked, not just the
+        first:
         :func:`verify_filter_class` fills each entry from the same list of
         classes, so a band list whose entries disagree among themselves is
         one no bank produced, and it is the later band that the fiche's
@@ -493,15 +501,19 @@ class FilterComplianceResult:
 
         :raises ValueError: if the per-band entries disagree, the edition is
             unknown or does not match the per-band margin keys, the overall
-            class is not one the bands carry margins for, a class is stated
-            over no bands at all, or a per-band value is not finite.
+            class is not one the bands carry margins for or not the one the
+            per-band classes derive, a band carries no class of the edition,
+            a class is stated over no bands at all, or a per-band value is not
+            finite.
         """
         require_ranks(self, band_frequencies=1)
         require_same_length(self, "bands", "sos", "band_frequencies", "factors")
         require_choice(self.edition, "edition", tuple(_FILTER_EDITIONS))
         expected = list(_FILTER_EDITIONS[self.edition]["classes"])
         _require_margin_classes(self.bands, self.edition, expected)
-        if self.overall_class is not None and self.overall_class not in expected:
+        if self.overall_class is not None and not is_class_designation(
+            self.overall_class, expected
+        ):
             msg = (
                 f"'overall_class' must be one of {expected} for edition "
                 f"{self.edition!r} (or None); got {self.overall_class!r}."
@@ -514,6 +526,7 @@ class FilterComplianceResult:
                 "bank with no bands in range carries 'overall_class' None."
             )
             raise ValueError(msg)
+        require_summary_class(self, self.bands, self.overall_class, expected)
         for band in self.bands:
             for key, value in band.items():
                 if isinstance(value, float) and not math.isfinite(value):

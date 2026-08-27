@@ -750,11 +750,70 @@ def test_result_rejects_a_non_finite_per_tone_column(field: str) -> None:
         dataclasses.replace(good, **{field: column})
 
 
-def test_result_rejects_a_non_finite_line_spacing() -> None:
-    """The header grid prints the line spacing, so a NaN reads as "nan Hz"."""
+@pytest.mark.parametrize(
+    "bad",
+    [np.nan, np.inf, 0.0, -3.0],
+    ids=["nan", "infinity", "zero", "negative"],
+)
+def test_result_rejects_a_line_spacing_that_is_not_a_resolution(bad: float) -> None:
+    """Δf is the analysis bin width, so finite is the weaker half of it.
+
+    The accredited sheet prints the spacing twice, in the header grid and in
+    the statement beside the decisive tone, and against the unguarded library
+    each of the four prints. A NaN or an infinity reads "nan Hz" / "inf Hz" in
+    both places. Zero and negative are the quiet ones: the header grid reads
+    "Δf [Hz] = 0.0" and the statement "Δf = −3.0 Hz", an analysis resolution
+    no FFT produced, with the tone frequencies, the audibilities and the
+    verdict printing normally around it, so the sheet reads as complete.
+    """
     good = _annex_e_result()
-    with pytest.raises(ValueError, match="'line_spacing' must be finite"):
-        dataclasses.replace(good, line_spacing=float("nan"))
+    with pytest.raises(
+        ValueError,
+        match=r"ToneAudibilityResult: 'line_spacing' must be a positive, finite",
+    ):
+        dataclasses.replace(good, line_spacing=bad)
+
+
+@pytest.mark.parametrize(
+    "bad",
+    ["1.0e-3 Hz", None, 10**400],
+    ids=["string", "none", "huge-integer"],
+)
+def test_result_rejects_a_line_spacing_that_is_not_numeric(bad: object) -> None:
+    """A spacing that is not a number never reaches the resolution check.
+
+    ``float`` stops all three first, under its own wording and its own types:
+    ``could not convert string to float: '1.0e-3 Hz'``, a ``TypeError`` for
+    the ``None`` and an ``OverflowError`` for the integer too large for a
+    double. None of them names the field or the result, and two are not the
+    ``ValueError`` the guard documents.
+    """
+    good = _annex_e_result()
+    with pytest.raises(
+        ValueError, match=r"ToneAudibilityResult: 'line_spacing' must be numeric\."
+    ):
+        dataclasses.replace(good, line_spacing=bad)
+
+
+@pytest.mark.parametrize(
+    "fill",
+    ["two", object(), 10**400],
+    ids=["string", "object", "huge-integer"],
+)
+def test_result_rejects_group_sizes_that_are_not_numeric(fill: object) -> None:
+    """A tally that is not a number never reaches the count check either.
+
+    The cast to ``float64`` stops all three inside numpy: ``could not convert
+    string to float`` for the strings, a ``TypeError`` for the arbitrary
+    objects and an ``OverflowError`` for the integers too large for a double.
+    They leave under the same wording the measured columns beside them get.
+    """
+    good = _annex_e_result()
+    counts = np.array([fill] * good.tone_frequencies.size, dtype=object)
+    with pytest.raises(
+        ValueError, match=r"ToneAudibilityResult: 'group_sizes' must be numeric\."
+    ):
+        dataclasses.replace(good, group_sizes=counts)
 
 
 @pytest.mark.parametrize(

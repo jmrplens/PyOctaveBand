@@ -1109,16 +1109,32 @@ def _require_group_counts(counts: NDArray[np.int_] | None) -> None:
     count truncates past the ``<= 1`` the entry-type label tests and prints
     ``Single`` on every row, and the sheet then reads as complete.
 
+    Reaching those three at all takes a tally that is a number to begin
+    with, and the cast to ``float64`` is what settles that: a field holding
+    strings comes back from numpy as ``could not convert string to float``, a
+    field of arbitrary objects as a ``TypeError`` raised from inside it, and
+    a count written as an integer too large for a double as an
+    ``OverflowError``. None of the three names the field, none names the
+    result, and two of them are not the ``ValueError`` this guard documents,
+    so the cast is made under the same wording the shared
+    :func:`~phonometry._internal.validation.require_finite_fields` uses for
+    the measured columns beside it.
+
     ``None`` is skipped: :func:`assess_tones` builds a result from bare
     levels, which never ran Step 3, and that absence is documented.
 
     :param counts: The ``group_sizes`` field, or ``None`` when the Step 3
         combination was not performed.
-    :raises ValueError: if a count is non-finite, fractional, or below one.
+    :raises ValueError: if the field is not numeric, or a count is
+        non-finite, fractional, or below one.
     """
     if counts is None:
         return
-    values = np.asarray(counts, dtype=np.float64).ravel()
+    try:
+        values = np.asarray(counts, dtype=np.float64).ravel()
+    except (TypeError, ValueError, OverflowError) as exc:
+        msg = "ToneAudibilityResult: 'group_sizes' must be numeric."
+        raise ValueError(msg) from exc
     whole = np.isfinite(values) & (values >= 1.0) & (values == np.floor(values))
     if bool(np.all(whole)):
         return
@@ -1126,6 +1142,51 @@ def _require_group_counts(counts: NDArray[np.int_] | None) -> None:
     msg = (
         "ToneAudibilityResult: 'group_sizes' must contain whole counts of one "
         f"tone or more; entry {first} is {values[first]}."
+    )
+    raise ValueError(msg)
+
+
+def _require_line_spacing(spacing: float) -> None:
+    """Require ``line_spacing`` to be the frequency resolution it names.
+
+    ``Δf`` is the bin width of the narrow-band analysis the assessment was
+    read from, and the accredited sheet prints it twice: once in the header
+    grid and once in the statement beside the decisive tone. It is not a
+    measured quantity either, so finite is the weaker half of its contract
+    here too, and each half fails the sheet differently.
+
+    A non-finite spacing prints ``nan Hz`` in both places. A zero or a
+    negative one is the quiet failure: measured on a two-tone assessment, the
+    header grid reads ``Δf [Hz] = 0.0`` and the statement ``Δf = -3.0 Hz``,
+    an analysis resolution no FFT produced, with the tone frequencies, the
+    audibilities and the verdict printing normally around it, so the sheet
+    reads as complete. No producer emits either: :func:`assess_tones` takes
+    the spacing through ``_positive``, and :func:`analyze_spectrum` derives
+    it from the spacing of the supplied frequency axis.
+
+    A spacing that is not a number at all never reaches those checks:
+    ``float`` refuses a string with ``could not convert string to float``, a
+    ``None`` or an arbitrary object with a ``TypeError``, and an integer too
+    large for a double with an ``OverflowError``. All three are raised from
+    inside the standard library, naming neither the field nor the result, and
+    two are not the ``ValueError`` documented here, so they leave under the
+    wording the shared
+    :func:`~phonometry._internal.validation.require_finite_fields` uses.
+
+    :param spacing: The ``line_spacing`` field, in Hz.
+    :raises ValueError: if the field is not numeric, or is not a positive,
+        finite resolution.
+    """
+    try:
+        value = float(spacing)
+    except (TypeError, ValueError, OverflowError) as exc:
+        msg = "ToneAudibilityResult: 'line_spacing' must be numeric."
+        raise ValueError(msg) from exc
+    if math.isfinite(value) and value > 0.0:
+        return
+    msg = (
+        "ToneAudibilityResult: 'line_spacing' must be a positive, finite "
+        f"frequency resolution; got {spacing!r}."
     )
     raise ValueError(msg)
 
@@ -1218,15 +1279,19 @@ class ToneAudibilityResult:
         audibility column crashes the statement's rounding with a bare
         "cannot convert float NaN to integer".
 
-        ``group_sizes`` is held to more than that, because it is not a
-        measured quantity but a tally of tones, and a count that is fractional
-        or below one is as impossible as one that is ``NaN``. It gets its own
-        guard, :func:`_require_group_counts`, which says what each of the
-        three refusals catches.
+        Two of them are held to more than finite, because neither is a
+        measured quantity: ``group_sizes`` is a tally of tones, where a count
+        that is fractional or below one is as impossible as one that is
+        ``NaN``, and ``line_spacing`` is the bin width of the analysis, where
+        zero and negative are as impossible as ``NaN``. Each gets its own
+        guard, :func:`_require_group_counts` and
+        :func:`_require_line_spacing`, which say what every refusal catches
+        and what a field that is not a number at all does without them.
 
         :raises ValueError: if any per-tone quantity disagrees with the rest,
-            any quantity is non-finite, or a group size is not a whole count
-            of one tone or more.
+            any quantity is non-numeric or non-finite, the line spacing is not
+            positive, or a group size is not a whole count of one tone or
+            more.
         """
         require_ranks(
             self,
@@ -1257,12 +1322,7 @@ class ToneAudibilityResult:
             "group_sizes",
             axis="tone entry",
         )
-        if not math.isfinite(float(self.line_spacing)):
-            msg = (
-                "ToneAudibilityResult: 'line_spacing' must be finite; got "
-                f"{self.line_spacing!r}."
-            )
-            raise ValueError(msg)
+        _require_line_spacing(self.line_spacing)
         for name in (
             "tone_frequencies",
             "tone_levels",

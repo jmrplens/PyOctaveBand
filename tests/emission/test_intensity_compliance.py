@@ -527,6 +527,55 @@ def test_a_non_finite_per_band_verdict_value_is_refused() -> None:
         dataclasses.replace(result, bands=bands)
 
 
+def test_a_verdict_refuses_a_class_its_own_bands_do_not_derive() -> None:
+    """The box and the table are one statement, and the box is not measured.
+
+    The certificate prints the per-band classes in its table and the class of
+    the whole instrument in its box, so a summary that does not restate the
+    rows is the sheet contradicting itself. Built by hand it did: an
+    instrument with one band meeting no class at all, whose honest summary is
+    therefore ``None``, was accepted claiming class 1 and printed ``Class 1 -
+    COMPLIES (binding margin -6.81 dB)``, a negative binding margin beside the
+    word COMPLIES.
+
+    The producer cannot emit the pair: it derives the summary from the band
+    classes in one line. Only a result assembled by hand can hold it, which is
+    why the guard is at construction.
+    """
+    import dataclasses
+
+    frequencies = np.array([100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0])
+    measured = np.full(frequencies.size, 18.0)
+    measured[4] = 9.0  # this band meets neither class
+    result = emission.intensity_class_compliance(
+        measured, frequencies, device="instrument", spacing=0.012
+    )
+    assert result.overall_class is None
+    with pytest.raises(
+        ValueError, match=r"'overall_class' must be the class the bands derive"
+    ):
+        dataclasses.replace(result, overall_class=1)
+
+
+def test_a_verdict_refuses_a_class_that_is_no_designation() -> None:
+    """A class is a label the readers splice into a key, not a number.
+
+    ``1.0`` reads as class 1 to every comparison and builds
+    ``margin_class1.0_db``, a key no band carries, so it reached the boxed
+    statement as a bare ``KeyError`` naming neither the field nor the result.
+    """
+    import dataclasses
+
+    frequencies = np.array([250.0, 500.0, 1000.0, 2000.0])
+    result = emission.intensity_class_compliance(
+        np.full(frequencies.size, 20.0), frequencies, device="instrument", spacing=0.025
+    )
+    with pytest.raises(
+        ValueError, match=r"'overall_class' must be a class of \[1, 2\] or None"
+    ):
+        dataclasses.replace(result, overall_class=1.0)
+
+
 def test_a_narrow_numpy_nan_per_band_value_is_refused() -> None:
     """A NaN margin held as ``np.float32`` is a NaN the boxed verdict misses.
 
