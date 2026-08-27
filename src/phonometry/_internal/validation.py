@@ -528,8 +528,13 @@ def require_summary_class(
     :param overall: The class stated for the whole instrument, or ``None``.
     :param expected: The classes the standard defines.
     :param field: Name of the summary field, for the message.
+    An empty band list is refused a class of its own: a verdict attested over
+    nothing is not a verdict, and the readers that take a binding margin from
+    it die on an empty sequence instead.
+
     :raises ValueError: if a band carries no class or one that is no
-        designation, or the summary is not the class the bands derive.
+        designation, if a class is claimed over no bands at all, or the
+        summary is not the class the bands derive.
     """
     who = type(owner).__name__
     for band in bands:
@@ -554,6 +559,13 @@ def require_summary_class(
         )
         raise ValueError(msg)
     if not bands:
+        if overall is not None:
+            msg = (
+                f"{who}: '{field}' is {overall!r} but 'bands' is empty: a "
+                "class cannot be attested over no verified band. An "
+                "instrument with no bands in range carries a summary of None."
+            )
+            raise ValueError(msg)
         return
     classes = [band["class"] for band in bands]
     derived = None if None in classes else max(cast("list[int]", classes))

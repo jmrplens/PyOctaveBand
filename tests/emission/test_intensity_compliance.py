@@ -557,6 +557,32 @@ def test_a_verdict_refuses_a_class_its_own_bands_do_not_derive() -> None:
         dataclasses.replace(result, overall_class=1)
 
 
+def test_a_verdict_refuses_a_class_attested_over_no_bands() -> None:
+    """A class over nothing is not a verdict, and the readers cannot hold it.
+
+    An instrument stripped of its bands kept its class, so the certificate
+    would have boxed a compliance class with an empty results table under it;
+    :meth:`binding_margin` gave the anonymous "min() iterable argument is
+    empty" instead, naming neither the field nor the result.
+    """
+    import dataclasses
+
+    frequencies = np.array([250.0, 500.0, 1000.0, 2000.0])
+    result = emission.intensity_class_compliance(
+        np.full(frequencies.size, 20.0), frequencies, device="instrument", spacing=0.025
+    )
+    empty = np.array([])
+    with pytest.raises(ValueError, match=r"'overall_class' is 1 but 'bands' is empty"):
+        dataclasses.replace(
+            result,
+            bands=(),
+            frequency=empty,
+            residual_index=empty,
+            limit_class1=empty,
+            limit_class2=empty,
+        )
+
+
 def test_a_verdict_refuses_a_class_that_is_no_designation() -> None:
     """A class is a label the readers splice into a key, not a number.
 
