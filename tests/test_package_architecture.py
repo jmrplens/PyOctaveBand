@@ -10,6 +10,7 @@ an edge is an explicit, reviewed decision.
 from __future__ import annotations
 
 import ast
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -418,3 +419,34 @@ def test_no_public_name_is_published_by_two_domains() -> None:
 
     shared = {name: owners for name, owners in published.items() if len(owners) > 1}
     assert not shared, f"names published by more than one domain: {shared}"
+
+
+def test_no_error_message_carries_a_comma_decimal() -> None:
+    """Error messages are English prose, and English prose takes a point.
+
+    The library writes its own numbers into refusals: a temperature floor at
+    absolute zero, the thermodynamic bound on a Poisson ratio. Seven of them
+    had drifted to a comma, four of them the same -273,15, while eleven
+    comparable messages used a point and one of the two spellings of the same
+    0.5 sat in each camp.
+
+    Nothing could see it. The figure gate that does police decimal commas
+    reads drawn labels, not exceptions, because its subject is the Spanish
+    edition of a figure and a comma inside ``$...$`` sets with the wrong
+    spacing. An error message is neither drawn nor translated.
+
+    Prose that quotes a standard's own notation is a different matter and
+    keeps the separator of the source it cites, which is why this reads the
+    ``msg`` assignments the tree raises from rather than every string in it.
+    """
+    offenders: list[str] = []
+    for path in sorted(Path("src/phonometry").rglob("*.py")):
+        for number, line in enumerate(path.read_text().splitlines(), 1):
+            stripped = line.strip()
+            if not stripped.startswith("msg = "):
+                continue
+            if re.search(r"\d,\d", stripped):
+                offenders.append(f"{path}:{number}  {stripped}")
+    assert not offenders, "comma decimal in an English message:\n" + "\n".join(
+        offenders
+    )
