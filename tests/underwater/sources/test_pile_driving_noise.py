@@ -382,12 +382,9 @@ def test_restating_the_peak_alone_does_not_save_the_other_three() -> None:
     """
     res = underwater.pile_strike_metrics(_pulse(100.0, 0.25), FS)
     halved = np.asarray(res.pressure) / 2.0
+    restated_peak = underwater.peak_sound_pressure_level(halved)
     with pytest.raises(ValueError, match=r"'single_strike_sel' must be the exposure"):
-        dataclasses.replace(
-            res,
-            pressure=halved,
-            peak_spl=underwater.peak_sound_pressure_level(halved),
-        )
+        dataclasses.replace(res, pressure=halved, peak_spl=restated_peak)
 
 
 def test_a_pulse_duration_left_behind_by_a_new_shape_is_refused() -> None:
@@ -399,11 +396,10 @@ def test_a_pulse_duration_left_behind_by_a_new_shape_is_refused() -> None:
     """
     res = underwater.pile_strike_metrics(_pulse(100.0, 0.25), FS)
     reshaped = _pulse(100.0, 0.05)
+    restated = {
+        "peak_spl": underwater.peak_sound_pressure_level(reshaped),
+        "single_strike_sel": underwater.sound_exposure_level(reshaped, FS),
+        "spl": underwater.sound_pressure_level(reshaped),
+    }
     with pytest.raises(ValueError, match=r"'pulse_duration' must be the 5 % to 95 %"):
-        dataclasses.replace(
-            res,
-            pressure=reshaped,
-            peak_spl=underwater.peak_sound_pressure_level(reshaped),
-            single_strike_sel=underwater.sound_exposure_level(reshaped, FS),
-            spl=underwater.sound_pressure_level(reshaped),
-        )
+        dataclasses.replace(res, pressure=reshaped, **restated)
