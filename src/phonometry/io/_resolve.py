@@ -240,7 +240,9 @@ def resolve_samples(
     :param name: Name of the signal parameter, for the error messages.
     :return: The samples, float64.
     :raises ValueError: If *x* is ``None``, cannot be read as numbers, or
-        carries a non-finite sample.
+        carries a non-finite sample; or, for a calibrated Signal, if the
+        factor overflows the samples it scales, which neither of them is
+        answerable for on its own.
     """
     samples = _typesignal(x, name=name)
     if calibrate and isinstance(x, Signal) and x.calibration_factor is not None:
