@@ -516,6 +516,20 @@ def test_intensity_non_finite_area_raises() -> None:
         sound_power_intensity_precision(intensity, areas_with_nan)
 
 
+def test_intensity_temperature_below_absolute_zero_raises() -> None:
+    """Eq. 10 normalizes with 296,15/(273,15 + theta), an absolute temperature.
+
+    At absolute zero that denominator vanishes and below it the whole ratio
+    turns negative, so the logarithm of Eq. 10 would be handed an infinity or
+    a negative number and LW0 would be reported as a level when it is a NaN.
+    The reading is refused instead.
+    """
+    intensity = np.full((2,), 1e-5)
+    areas = np.array([1.0, 1.0])
+    with pytest.raises(ValueError, match="'temperature' must be above"):
+        sound_power_intensity_precision(intensity, areas, temperature=-300.0)
+
+
 def test_intensity_single_segment_2d_input_not_transposed() -> None:
     # A genuine (1, N) single-segment, N-band array must NOT be read as N
     # segments, even when N equals a plausible segment count. One area -> one

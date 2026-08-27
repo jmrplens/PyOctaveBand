@@ -1170,6 +1170,24 @@ def test_biot_waves_rejects_bad_input() -> None:
         materials.biot_waves(medium, **kwargs, poisson_ratio=0.5)
 
 
+@pytest.mark.parametrize("nu", [-1.5, -1.0, 0.5, 0.6])
+def test_frame_bulk_modulus_rejects_a_poisson_ratio_off_the_stability_range(
+    nu: float,
+) -> None:
+    """Both ends of the isotropic range are closed, for opposite reasons.
+
+    Eq. (6.29) reads ``Kb = 2 N (nu + 1)/(3(1 - 2 nu))``. At the upper end the
+    denominator vanishes and ``Kb`` diverges: the incompressible-solid limit.
+    At the lower end the numerator vanishes and ``Kb`` collapses to zero, a
+    frame that carries shear but no compression at all. Neither is a
+    thermodynamically stable elastic solid, so the value at either bound is
+    refused rather than returned as a modulus.
+    """
+    n_mod = 3.0e5 * (1.0 + 0.07j)
+    with pytest.raises(ValueError, match=r"'poisson_ratio' must satisfy"):
+        materials.frame_bulk_modulus(n_mod, nu)
+
+
 def test_layer_rejects_a_medium_on_another_grid() -> None:
     frequency = np.geomspace(100.0, 1000.0, 8)
     other = _glass_wool_medium(np.geomspace(100.0, 1000.0, 9))

@@ -104,6 +104,18 @@ def test_air_property_domain_errors() -> None:
         air_density_iso(293.0, -1.0)
 
 
+def test_air_density_astm_rejects_temperature_below_absolute_zero() -> None:
+    """ASTM Eq. (5) scales the reference density by 273,15/(273,15 + T).
+
+    Below absolute zero that ratio is negative, so rho would come back
+    negative and carry the sign into every rho c the four-microphone
+    reduction builds on. The temperature is refused at the door, exactly as
+    ``speed_of_sound_astm`` refuses it above.
+    """
+    with pytest.raises(ValueError, match="'temperature' must exceed"):
+        air_density_astm(-300.0, 101.325)
+
+
 def test_air_density_mismatched_arrays_raise() -> None:
     # Two arrays of different lengths must be refused by name, not left to
     # numpy's two-shapes broadcast error.

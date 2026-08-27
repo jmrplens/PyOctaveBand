@@ -470,6 +470,17 @@ def test_random_incidence_two_dimensional_weighting() -> None:
 # ---------------------------------------------------------------------------
 # Input-validation guards.
 # ---------------------------------------------------------------------------
+def test_speed_of_sound_rejects_temperature_below_absolute_zero() -> None:
+    """Eq. (2) takes the square root of (273,15 + t)/293,15.
+
+    Below absolute zero the radicand is negative and numpy's real square root
+    hands back a NaN, which would then travel silently into the Sabine
+    Eqs. (1)/(4) that consume c. The temperature is refused first.
+    """
+    with pytest.raises(ValueError, match="'temperature' must exceed"):
+        speed_of_sound(-300.0)
+
+
 def test_diffusion_requires_two_receivers() -> None:
     with pytest.raises(ValueError, match="'levels' needs at least two receivers"):
         directional_diffusion_coefficient([80.0])
