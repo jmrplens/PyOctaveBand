@@ -245,7 +245,7 @@ def test_a_non_positive_explicit_factor_is_refused() -> None:
     signal and reported an annoyance of 0.0.
     """
     for bad in (0.0, -1.0):
-        with pytest.raises(ValueError, match="calibration_factor"):
+        with pytest.raises(ValueError, match=r"'calibration_factor' must be positive"):
             psychoacoustic_annoyance_from_signal(_TONE, FS, calibration_factor=bad)
 
 

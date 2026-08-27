@@ -215,11 +215,11 @@ def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError`` on every survey fiche."""
     out = str(tmp_path / "x.pdf")
     airborne, impact, facade = _airborne(), _impact(), _facade()
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         airborne.report(out, engine="weasyprint")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         impact.report(out, engine="weasyprint")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         facade.report(out, engine="weasyprint")
 
 
@@ -227,7 +227,7 @@ def test_unknown_airborne_quantity_rejected(tmp_path: Path) -> None:
     """An unknown airborne quantity raises ``ValueError``."""
     airborne = _airborne()
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="quantity"):
+    with pytest.raises(ValueError, match=r"Unknown survey quantity"):
         airborne.report(out, quantity="dn")
 
 
@@ -237,7 +237,10 @@ def test_missing_r_prime_rating_rejected(tmp_path: Path) -> None:
         np.full(_OCTAVE, 80.0), np.full(_OCTAVE, 45.0), _K0
     )
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="rating"):
+    with pytest.raises(
+        ValueError,
+        match=r"survey airborne report needs the ISO 717-1 single-number rating",
+    ):
         result.report(out, quantity="r_prime")
 
 
@@ -252,5 +255,7 @@ def test_missing_rating_off_band_count_rejected(tmp_path: Path) -> None:
     )
     out = str(tmp_path / "x.pdf")
     for result in (airborne, impact, facade):
-        with pytest.raises(ValueError, match="rating"):
+        with pytest.raises(
+            ValueError, match=r"report needs the ISO 717-\d single-number rating"
+        ):
             result.report(out)

@@ -213,9 +213,9 @@ def test_loudness_and_tonality_share_the_tonal_split(
 def test_band_range_rejects_out_of_range_edges() -> None:
     # Formulae 56/57 preconditions: 16 Hz < f_L, f_H < 20 kHz, f_L < f_H.
     x = _tone(1000.0, 40.0, seconds=0.5)
-    with pytest.raises(ValueError, match="16 Hz"):
+    with pytest.raises(ValueError, match=r"'f_low' must exceed"):
         psychoacoustics.tonality_ecma(x, FS, f_low=10.0)
-    with pytest.raises(ValueError, match="20 kHz"):
+    with pytest.raises(ValueError, match=r"'f_high' must be below"):
         psychoacoustics.tonality_ecma(x, FS, f_high=25000.0)
     with pytest.raises(ValueError, match="below 'f_high'"):
         psychoacoustics.tonality_ecma(x, FS, f_low=2000.0, f_high=500.0)

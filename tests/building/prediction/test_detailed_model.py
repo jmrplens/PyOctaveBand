@@ -580,7 +580,11 @@ def test_impact_prediction_without_a_direct_path_sums_the_flanking_paths() -> No
     assert [p.label for p in result.paths] == ["Ff1", "Ff2"]
     assert result.l_prime_n == pytest.approx(50.0 + 10.0 * np.log10(2.0))
     assert result.fractions == pytest.approx(0.5)
-    with pytest.raises(ValueError, match="direct_level"):
+    with pytest.raises(
+        ValueError,
+        match=r"'detailed_impact_prediction' needs a 'direct_level', "
+        r"at least one flanking path",
+    ):
         building.detailed_impact_prediction(BANDS)
 
 
@@ -872,7 +876,7 @@ def test_perimeter_absorption_rejects_mismatched_lengths() -> None:
 
 def test_flanking_path_rejects_an_unknown_kind(situ: dict) -> None:
     """Only the three Annex-defined flanking paths exist."""
-    with pytest.raises(ValueError, match="kind"):
+    with pytest.raises(ValueError, match=r"'kind' must be one of"):
         building.airborne_flanking_path(
             label="x",
             kind="Dd",
@@ -887,7 +891,7 @@ def test_flanking_path_rejects_an_unknown_kind(situ: dict) -> None:
 def test_band_count_mismatch_is_reported(situ: dict) -> None:
     """A path built on a different band set cannot be combined."""
     too_short = np.zeros(5)
-    with pytest.raises(ValueError, match="one value per band"):
+    with pytest.raises(ValueError, match="'direct_index' must have one value per band"):
         building.detailed_airborne_prediction(BANDS, direct_index=too_short)
 
 

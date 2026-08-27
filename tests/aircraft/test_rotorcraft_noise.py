@@ -89,7 +89,7 @@ def test_spherical_spreading_matches_inverse_square() -> None:
     assert spherical_spreading_adjustment(60.0) == pytest.approx(0.0)
     assert spherical_spreading_adjustment(600.0) == pytest.approx(-20.0)
     assert spherical_spreading_adjustment(120.0) == pytest.approx(-20.0 * np.log10(2.0))
-    with pytest.raises(ValueError, match="distance"):
+    with pytest.raises(ValueError, match=r"'distance' must be positive"):
         spherical_spreading_adjustment(0.0)
 
 
@@ -160,9 +160,9 @@ def test_ground_effect_class_letters_and_values_agree() -> None:
 
 
 def test_ground_effect_invalid_inputs() -> None:
-    with pytest.raises(ValueError, match="horizontal_distance"):
+    with pytest.raises(ValueError, match=r"'horizontal_distance' must be positive"):
         ground_effect_adjustment([500.0], 100.0, 1.5, 0.0)
-    with pytest.raises(ValueError, match="flow_resistivity"):
+    with pytest.raises(ValueError, match=r"'flow_resistivity' class must be one of"):
         ground_effect_adjustment([500.0], 100.0, 1.5, 300.0, flow_resistivity="Z")
 
 
@@ -1009,32 +1009,34 @@ def test_hover_derived_approach2_measured_offset() -> None:
 def test_hover_helpers_validation() -> None:
     freqs = [500.0, 1000.0]
     ring = _ring(np.full(12, 80.0))
-    with pytest.raises(ValueError, match="frequencies"):
+    with pytest.raises(ValueError, match=r"'frequencies' must be strictly positive"):
         hover_ring_hemisphere([500.0, 0.0], _RING_BEARINGS, ring)
-    with pytest.raises(ValueError, match="frequencies"):
+    with pytest.raises(ValueError, match=r"'frequencies' must be strictly positive"):
         hover_ring_hemisphere([500.0, -1000.0], _RING_BEARINGS, ring)
-    with pytest.raises(ValueError, match="bearings"):
+    with pytest.raises(ValueError, match=r"'bearings' must be 1-D"):
         hover_ring_hemisphere(freqs, [0.0], [[80.0, 80.0]])
-    with pytest.raises(ValueError, match="bearings"):
+    with pytest.raises(
+        ValueError, match=r"'bearings' must be finite and strictly increasing"
+    ):
         hover_ring_hemisphere(freqs, _RING_BEARINGS[::-1], ring)
-    with pytest.raises(ValueError, match="bearings"):
+    with pytest.raises(ValueError, match=r"'bearings' must lie within"):
         hover_ring_hemisphere(freqs, _RING_BEARINGS + 200.0, ring)
-    with pytest.raises(ValueError, match="levels"):
+    with pytest.raises(ValueError, match=r"'levels' must have shape"):
         hover_ring_hemisphere(freqs, _RING_BEARINGS, ring[:, :1])
-    with pytest.raises(ValueError, match="levels"):
+    with pytest.raises(ValueError, match=r"'levels' must be finite"):
         hover_ring_hemisphere(freqs, _RING_BEARINGS, np.where(ring > 0.0, np.nan, ring))
-    with pytest.raises(ValueError, match="distance"):
+    with pytest.raises(ValueError, match=r"'distance' must be positive"):
         hover_ring_hemisphere(freqs, _RING_BEARINGS, ring, distance=0.0)
-    with pytest.raises(ValueError, match="azimuth_step"):
+    with pytest.raises(ValueError, match=r"'azimuth_step' must divide"):
         hover_ring_hemisphere(freqs, _RING_BEARINGS, ring, azimuth_step=7.0)
-    with pytest.raises(ValueError, match="polar_step"):
+    with pytest.raises(ValueError, match=r"'polar_step' must divide"):
         hover_ring_hemisphere(freqs, _RING_BEARINGS, ring, polar_step=1000.0)
-    with pytest.raises(ValueError, match="mapping"):
+    with pytest.raises(ValueError, match=r"'mapping' must be one of"):
         hover_ring_hemisphere(freqs, _RING_BEARINGS, ring, mapping="nearest")
     h = hover_ring_hemisphere(freqs, _RING_BEARINGS, ring)
-    with pytest.raises(ValueError, match="condition"):
+    with pytest.raises(ValueError, match=r"'condition' must be one of"):
         hover_derived_hemisphere(h, "hover")
-    with pytest.raises(ValueError, match="offset_db"):
+    with pytest.raises(ValueError, match=r"'offset_db' must be finite"):
         hover_derived_hemisphere(h, "full_rpm_idle", offset_db=float("nan"))
 
 
@@ -1147,13 +1149,15 @@ def test_fc_weights_validation() -> None:
         flight_condition_weights([50.0, 60.0], [0.0], 55.0, 0.0)
     with pytest.raises(ValueError, match=r"'airspeeds'.*non-empty"):
         flight_condition_weights([[50.0, 60.0]], [[0.0, 1.0]], 55.0, 0.0)
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'airspeed' and 'path_angle' must be finite"):
         flight_condition_weights([50.0, 60.0], [0.0, 0.0], np.nan, 0.0)
-    with pytest.raises(ValueError, match="shape"):
+    with pytest.raises(ValueError, match=r"'triangles' must have shape"):
         flight_condition_weights(
             [50.0, 60.0, 70.0], [0.0, 1.0, 2.0], 55.0, 0.0, triangles=[[0, 1]]
         )
-    with pytest.raises(ValueError, match="indices"):
+    with pytest.raises(
+        ValueError, match=r"'triangles' indices must address the database conditions"
+    ):
         flight_condition_weights(
             [50.0, 60.0, 70.0], [0.0, 1.0, 2.0], 55.0, 0.0, triangles=[[0, 1, 9]]
         )
@@ -1176,9 +1180,12 @@ def test_interpolated_source_level_hand_checked_blend() -> None:
 def test_interpolated_source_level_validates_band_grids() -> None:
     hems = [_uniform_hemisphere(100.0), _uniform_hemisphere(90.0, [63.0])]
     single = [_uniform_hemisphere(100.0)]
-    with pytest.raises(ValueError, match="band grid"):
+    with pytest.raises(ValueError, match=r"All hemispheres must share one band grid"):
         interpolated_source_level(hems, [50.0, 70.0], [0.0, 0.0], 60.0, 0.0, 0.0, 90.0)
-    with pytest.raises(ValueError, match="equal length"):
+    with pytest.raises(
+        ValueError,
+        match=r"'hemispheres' and the flight conditions must have equal length",
+    ):
         interpolated_source_level(
             single, [50.0, 70.0], [0.0, 0.0], 60.0, 0.0, 0.0, 90.0
         )
@@ -1265,11 +1272,11 @@ def test_kinematics_hover_is_finite() -> None:
 
 
 def test_kinematics_validation() -> None:
-    with pytest.raises(ValueError, match="strictly increasing"):
+    with pytest.raises(ValueError, match=r"'times' must be strictly increasing"):
         flight_path_kinematics([0.0, 0.0], [[0.0, 0.0, 0.0], [1.0, 0.0, 0.0]])
-    with pytest.raises(ValueError, match="shape"):
+    with pytest.raises(ValueError, match=r"'positions' must have shape"):
         flight_path_kinematics([0.0, 1.0], [[0.0, 0.0], [1.0, 0.0]])
-    with pytest.raises(ValueError, match="at least two"):
+    with pytest.raises(ValueError, match=r"'times'.*at least two"):
         flight_path_kinematics([0.0], [[0.0, 0.0, 0.0]])
 
 
@@ -1452,10 +1459,10 @@ def test_event_validation() -> None:
     hems = [_uniform_hemisphere(100.0)]
     t = np.array([0.0, 1.0])
     pos = np.array([[0.0, -50.0, 100.0], [0.0, 50.0, 100.0]])
-    with pytest.raises(ValueError, match="receiver"):
+    with pytest.raises(ValueError, match=r"'receiver' must be a finite"):
         rotorcraft_event_level(hems, [50.0], [0.0], t, pos, (0.0, 0.0, 0.0, 0.0))
     unknown_method_atmosphere = RotorcraftAtmosphere(atmospheric_method="exact")
-    with pytest.raises(ValueError, match="atmospheric_method"):
+    with pytest.raises(ValueError, match=r"'atmospheric_method' must be one of"):
         rotorcraft_event_level(
             hems,
             [50.0],
@@ -1466,7 +1473,9 @@ def test_event_validation() -> None:
             atmosphere=unknown_method_atmosphere,
         )
     mismatched_airspeed_state = RotorcraftTrackState(airspeed=[50.0, 50.0, 50.0])
-    with pytest.raises(ValueError, match="airspeed"):
+    with pytest.raises(
+        ValueError, match=r"'airspeed' must be a scalar or match the track length"
+    ):
         rotorcraft_event_level(
             hems,
             [50.0],
@@ -1476,12 +1485,14 @@ def test_event_validation() -> None:
             (0.0, 0.0),
             track_state=mismatched_airspeed_state,
         )
-    with pytest.raises(ValueError, match="level_offset"):
+    with pytest.raises(
+        ValueError, match=r"'level_offset' must be a scalar or match the track length"
+    ):
         rotorcraft_event_level(
             hems, [50.0], [0.0], t, pos, (0.0, 0.0), level_offset=[1.0, 2.0, 3.0]
         )
     nan_elevation_ground = RotorcraftGround(ground_elevation=np.nan)
-    with pytest.raises(ValueError, match="ground_elevation"):
+    with pytest.raises(ValueError, match=r"'ground_elevation' must be finite"):
         rotorcraft_event_level(
             hems, [50.0], [0.0], t, pos, (0.0, 0.0), ground=nan_elevation_ground
         )
@@ -1622,11 +1633,11 @@ def test_contour_is_symmetric_across_the_track() -> None:
 
 def test_contour_validation() -> None:
     hems, spd, ang, t, pos = _contour_inputs()
-    with pytest.raises(ValueError, match="metric"):
+    with pytest.raises(ValueError, match=r"'metric' must be one of"):
         rotorcraft_noise_contour(
             hems, spd, ang, t, pos, x=[0.0, 1.0], y=[0.0, 1.0], metric="epnl"
         )
-    with pytest.raises(ValueError, match="grid"):
+    with pytest.raises(ValueError, match=r"'x' and 'y' must each be finite"):
         rotorcraft_noise_contour(hems, spd, ang, t, pos, x=[0.0], y=[0.0, 1.0])
 
 

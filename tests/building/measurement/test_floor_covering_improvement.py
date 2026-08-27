@@ -96,14 +96,16 @@ def test_flat_improvement_shifts_delta_lw_one_for_one() -> None:
 
 def test_weighted_improvement_requires_16_bands() -> None:
     five_bands = np.zeros(5)
-    with pytest.raises(ValueError, match="16 one-third-octave"):
+    with pytest.raises(
+        ValueError, match=r"'delta_l' must give the 16 one-third-octave values"
+    ):
         building.weighted_impact_improvement(five_bands)
 
 
 def test_weighted_improvement_rejects_non_finite() -> None:
     bad = np.zeros(16)
     bad[0] = np.inf
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'delta_l' must contain only finite values"):
         building.weighted_impact_improvement(bad)
 
 
@@ -117,7 +119,7 @@ def test_acceleration_level_formula_1() -> None:
 
 
 def test_acceleration_level_rejects_nonpositive() -> None:
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"'acceleration' must be positive"):
         building.acceleration_level(0.0)
     with pytest.raises(ValueError, match="'reference' must be positive"):
         building.acceleration_level(1e-3, reference=0.0)
@@ -258,11 +260,13 @@ def test_ci_delta_zero_improvement_is_zero() -> None:
 
 def test_ci_delta_validation() -> None:
     short = np.zeros(5)
-    with pytest.raises(ValueError, match="16 one-third-octave"):
+    with pytest.raises(
+        ValueError, match=r"'delta_l' must give the 16 one-third-octave values"
+    ):
         building.impact_improvement_adaptation_term(short)
     bad = np.zeros(16)
     bad[3] = np.nan
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'delta_l' must contain only finite values"):
         building.impact_improvement_adaptation_term(bad)
 
 

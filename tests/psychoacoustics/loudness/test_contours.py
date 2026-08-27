@@ -84,9 +84,13 @@ def test_roundtrip() -> None:
 
 def test_validity_limits() -> None:
     """Clause 4.1: 20-90 phon; above 80 phon only 20 Hz - 4 kHz remains."""
-    with pytest.raises(ValueError, match="phon"):
+    with pytest.raises(
+        ValueError, match=r"ISO 226:2023 Formula \(1\) is specified for .* phon"
+    ):
         psychoacoustics.equal_loudness_contour(19.0)
-    with pytest.raises(ValueError, match="phon"):
+    with pytest.raises(
+        ValueError, match=r"ISO 226:2023 Formula \(1\) is specified for .* phon"
+    ):
         psychoacoustics.equal_loudness_contour(91.0)
     freqs80, _ = psychoacoustics.equal_loudness_contour(80.0)
     freqs81, _ = psychoacoustics.equal_loudness_contour(81.0)
@@ -98,7 +102,10 @@ def test_untabulated_frequency_raises() -> None:
     """Table 1 defines parameters only at the 29 preferred frequencies; the
     standard specifies no interpolation between them.
     """
-    with pytest.raises(ValueError, match="frequency"):
+    with pytest.raises(
+        ValueError,
+        match=r"ISO 226:2023 Table 1 defines parameters only at the .* frequencies",
+    ):
         psychoacoustics.loudness_level(60.0, 440.0)
 
 
@@ -164,12 +171,17 @@ def test_contours_frequency_subset() -> None:
 
 
 def test_contours_rejects_untabulated_frequency() -> None:
-    with pytest.raises(ValueError, match="frequency"):
+    with pytest.raises(
+        ValueError,
+        match=r"ISO 226:2023 Table 1 defines parameters only at the .* frequencies",
+    ):
         psychoacoustics.equal_loudness_contours(frequencies=(440.0,))
 
 
 def test_contours_rejects_out_of_range_phon() -> None:
-    with pytest.raises(ValueError, match="phon"):
+    with pytest.raises(
+        ValueError, match=r"ISO 226:2023 Formula \(1\) is specified for .* phon"
+    ):
         psychoacoustics.equal_loudness_contours(phons=(10.0,))
 
 

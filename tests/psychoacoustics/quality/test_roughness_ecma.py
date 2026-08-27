@@ -155,14 +155,17 @@ def test_a_time_grid_that_does_not_match_its_curves_is_refused(
     figure is drawn, and a caller who supplies an ``ax`` never draws that
     panel at all.
     """
-    with pytest.raises(ValueError, match="'time'"):
-        dataclasses.replace(ref_calibration, time=ref_calibration.time[:-1])
-    trace = ref_calibration.roughness_vs_time
-    with pytest.raises(ValueError, match="'roughness_vs_time'"):
-        dataclasses.replace(ref_calibration, roughness_vs_time=np.append(trace, 0.0))
-    heat = ref_calibration.specific_roughness_vs_time
-    with pytest.raises(ValueError, match="'specific_roughness_vs_time'"):
-        dataclasses.replace(ref_calibration, specific_roughness_vs_time=heat[:-1])
+    short_grid = ref_calibration.time[:-1]
+    with pytest.raises(ValueError, match=rf"'time' \({short_grid.size}\)"):
+        dataclasses.replace(ref_calibration, time=short_grid)
+    long_trace = np.append(ref_calibration.roughness_vs_time, 0.0)
+    with pytest.raises(ValueError, match=rf"'roughness_vs_time' \({long_trace.size}\)"):
+        dataclasses.replace(ref_calibration, roughness_vs_time=long_trace)
+    heat = ref_calibration.specific_roughness_vs_time[:-1]
+    with pytest.raises(
+        ValueError, match=rf"'specific_roughness_vs_time' \({len(heat)}\)"
+    ):
+        dataclasses.replace(ref_calibration, specific_roughness_vs_time=heat)
 
 
 def test_a_band_axis_shorter_than_the_bands_is_refused(
@@ -175,14 +178,24 @@ def test_a_band_axis_shorter_than_the_bands_is_refused(
     roughness is drawn by no panel of the built-in figure and reaches the
     documented ``plot(res.bark, res.specific_roughness)`` snippet intact.
     """
-    with pytest.raises(ValueError, match="'bark'"):
+    with pytest.raises(
+        ValueError,
+        match=r"EcmaRoughness: 'bark'.*one value per auditory band",
+    ):
         dataclasses.replace(ref_calibration, bark=ref_calibration.bark[:-1])
-    with pytest.raises(ValueError, match="'specific_roughness'"):
+    with pytest.raises(
+        ValueError,
+        match=r"EcmaRoughness: .*'specific_roughness'.*one value per auditory band",
+    ):
         dataclasses.replace(
             ref_calibration,
             specific_roughness=ref_calibration.specific_roughness[:-1],
         )
-    with pytest.raises(ValueError, match="'specific_roughness_vs_time"):
+    with pytest.raises(
+        ValueError,
+        match=r"EcmaRoughness: .*'specific_roughness_vs_time \(axis 1\)'"
+        r".*one value per auditory band",
+    ):
         dataclasses.replace(
             ref_calibration,
             specific_roughness_vs_time=ref_calibration.specific_roughness_vs_time[

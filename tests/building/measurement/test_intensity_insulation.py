@@ -110,7 +110,9 @@ def test_ri_rating_none_off_band_count() -> None:
         [80.0] * 18, [40.0] * 18, measurement_area=10.0, area=10.0
     )
     assert r.rating is None
-    with pytest.raises(ValueError, match="16"):
+    with pytest.raises(
+        ValueError, match=r"No single-number rating is available to plot"
+    ):
         r.plot()
 
 
@@ -141,9 +143,9 @@ def test_kc_decreases_with_frequency() -> None:
 
 
 def test_kc_requires_both_room_parameters() -> None:
-    with pytest.raises(ValueError, match="both"):
+    with pytest.raises(ValueError, match=r"Supply both 'boundary_area' and 'volume'"):
         building.adaptation_term_kc([500.0], boundary_area=117.0)
-    with pytest.raises(ValueError, match="both"):
+    with pytest.raises(ValueError, match=r"Supply both 'boundary_area' and 'volume'"):
         building.adaptation_term_kc([500.0], volume=81.0)
 
 
@@ -164,7 +166,9 @@ def test_element_normalized_difference_formula_8() -> None:
         [80.0], [40.0], measurement_area=10.0, n=1
     )
     assert d.d_i_n_e[0] == pytest.approx(34.0)  # Sm = A0, N = 1
-    with pytest.warns(UserWarning, match="Formula \\(8\\)"):
+    with pytest.warns(
+        UserWarning, match=r"Formula \(8\) as printed subtracts 10 lg\(N\)"
+    ):
         d2 = building.intensity_element_normalized_difference(
             [80.0], [40.0], measurement_area=10.0, n=2
         )
@@ -174,7 +178,7 @@ def test_element_normalized_difference_formula_8() -> None:
 
 
 def test_element_normalized_rejects_bad_n() -> None:
-    with pytest.raises(ValueError, match="positive integer"):
+    with pytest.raises(ValueError, match=r"'n' must be a positive integer"):
         building.intensity_element_normalized_difference(
             [80.0], [40.0], measurement_area=10.0, n=0
         )
@@ -216,13 +220,15 @@ def test_combine_subareas_area_weighting() -> None:
 
 
 def test_combine_subareas_validation() -> None:
-    with pytest.raises(ValueError, match="two-dimensional"):
+    with pytest.raises(ValueError, match=r"'l_in' must be a two-dimensional"):
         building.combine_subareas([40.0, 42.0], [5.0])
     with pytest.raises(ValueError, match=r"'measurement_area'.*one value per subarea"):
         building.combine_subareas([[40.0, 42.0], [40.0, 42.0]], [5.0])
     with pytest.raises(ValueError, match=r"'measurement_area' must be a one-dim"):
         building.combine_subareas([[40.0], [42.0]], [[5.0], [5.0]])
-    with pytest.raises(ValueError, match="non-zero"):
+    with pytest.raises(
+        ValueError, match=r"'measurement_area' must contain non-zero, finite areas"
+    ):
         building.combine_subareas([[40.0], [42.0]], [5.0, 0.0])
 
 
@@ -243,9 +249,13 @@ def test_combine_subareas_negative_direction_rule() -> None:
 
 def test_combine_subareas_reverse_flow_dominating_raises() -> None:
     # Reverse energy equal to (or exceeding) the forward flow leaves no level.
-    with pytest.raises(ValueError, match="not positive"):
+    with pytest.raises(
+        ValueError, match=r"signed subarea energy sum of Formula \(11\) is not positive"
+    ):
         building.combine_subareas([[50.0], [50.0]], [5.0, -5.0])
-    with pytest.raises(ValueError, match="not positive"):
+    with pytest.raises(
+        ValueError, match=r"signed subarea energy sum of Formula \(11\) is not positive"
+    ):
         building.combine_subareas([[50.0], [53.0]], [5.0, -5.0])
 
 
@@ -255,11 +265,11 @@ def test_combine_subareas_reverse_flow_dominating_raises() -> None:
 
 
 def test_reduction_rejects_nonpositive_areas() -> None:
-    with pytest.raises(ValueError, match="measurement_area"):
+    with pytest.raises(ValueError, match=r"'measurement_area' must be positive"):
         building.intensity_sound_reduction(
             [80.0], [40.0], measurement_area=0.0, area=10.0
         )
-    with pytest.raises(ValueError, match="area"):
+    with pytest.raises(ValueError, match=r"'area' must be positive"):
         building.intensity_sound_reduction(
             [80.0], [40.0], measurement_area=10.0, area=-1.0
         )

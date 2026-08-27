@@ -124,20 +124,20 @@ def test_input_validation() -> None:
 
     with pytest.raises(ValueError, match=r"stoi: 'clean'.*'degraded'.*same shape"):
         speech.stoi(x, shorter, FS)
-    with pytest.raises(ValueError, match="1-D"):
+    with pytest.raises(ValueError, match=r"'clean' and 'degraded' must be 1-D"):
         speech.stoi(two_d, two_d, FS)
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"'fs' must be a positive sample rate"):
         speech.stoi(x, x, 0)
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'clean' and 'degraded' must be finite"):
         speech.stoi(x, with_nan, FS)
-    with pytest.raises(ValueError, match="non-empty"):
+    with pytest.raises(ValueError, match=r"'clean' and 'degraded' must be non-empty"):
         speech.stoi(empty, empty, FS)
 
 
 def test_too_short_signal_raises() -> None:
     # Under ~0.4 s of active speech there are fewer than 30 frames to segment.
     short = _speech_like(7, seconds=0.2)
-    with pytest.raises(ValueError, match="30"):
+    with pytest.raises(ValueError, match=r"Too few short-time frames to score"):
         speech.stoi(short, short, FS)
 
 

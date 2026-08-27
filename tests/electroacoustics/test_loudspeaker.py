@@ -192,12 +192,15 @@ def test_minimum_impedance_without_rated_range_misses_out_of_band_dip() -> None:
 
 def test_rated_impedance_must_be_positive() -> None:
     f, spl = _flat_response()
-    with pytest.raises(ValueError, match="rated_impedance"):
+    with pytest.raises(ValueError, match=r"'rated_impedance' must be positive"):
         electroacoustics.loudspeaker_characteristics(f, spl, 0.0)
 
 
 def test_mismatched_response_lengths_rejected() -> None:
-    with pytest.raises(ValueError, match="equal length"):
+    with pytest.raises(
+        ValueError,
+        match=r"'on-axis response' frequencies and values must be 1-D and equal length",
+    ):
         electroacoustics.loudspeaker_characteristics(
             [100.0, 200.0, 400.0], [90.0, 90.0], _R
         )
@@ -373,13 +376,15 @@ def test_plot_rejects_unknown_quantity_and_missing_data() -> None:
     matplotlib.use("Agg")
 
     result = _example_result()
-    with pytest.raises(ValueError, match="unknown quantity"):
+    with pytest.raises(ValueError, match=r"unknown quantity 'bogus'"):
         result.plot(quantity="bogus")
     f, spl = _flat_response()
     bare = electroacoustics.loudspeaker_characteristics(
         f, spl, _R, sensitivity_band=(200.0, 4000.0)
     )
-    with pytest.raises(ValueError, match="no impedance"):
+    with pytest.raises(
+        ValueError, match=r"this result carries no impedance curve to plot"
+    ):
         bare.plot(quantity="impedance")
 
 
@@ -404,7 +409,7 @@ def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     result = _example_result()
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine 'weasyprint'"):
         result.report(out, engine="weasyprint")
 
 
@@ -412,7 +417,7 @@ def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     result = _example_result()
     out = str(tmp_path / "bad.pdf")
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language 'xx'"):
         result.report(out, language="xx")
 
 
@@ -506,7 +511,10 @@ def test_a_non_finite_response_axis_no_longer_reaches_the_fiche(
     axis = np.array(result.frequencies, dtype=float)
     axis[10] = float("nan")
     out = tmp_path / "non_finite_axis.pdf"
-    with pytest.raises(ValueError, match=r"'frequencies' must contain only finite"):
+    with pytest.raises(
+        ValueError,
+        match=r"LoudspeakerCharacteristics: 'frequencies' must contain only finite",
+    ):
         dataclasses.replace(result, frequencies=axis)
     assert not out.exists()
 

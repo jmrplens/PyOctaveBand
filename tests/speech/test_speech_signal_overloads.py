@@ -120,7 +120,9 @@ def test_stoi_takes_the_rate_from_either_side() -> None:
 def test_stoi_refuses_two_signals_at_different_rates() -> None:
     clean = Signal(_CLEAN, STOI_FS)
     degraded = Signal(_DEGRADED, STOI_FS // 2)
-    with pytest.raises(ValueError, match="recorded at different rates"):
+    with pytest.raises(
+        ValueError, match=r"'clean' and 'degraded' are Signals recorded at different"
+    ):
         stoi(clean, degraded)
 
 
@@ -170,7 +172,9 @@ def test_a_reference_at_another_rate_is_refused() -> None:
     """
     measured = Signal(_STIPA, FS)
     half = Signal(stipa_signal(FS // 2, seconds=18.0, seed=2), FS // 2)
-    with pytest.raises(ValueError, match="recorded at different rates"):
+    with pytest.raises(
+        ValueError, match=r"'x' and 'reference' are Signals recorded at different"
+    ):
         stipa(measured, reference=half)
 
 

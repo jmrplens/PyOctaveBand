@@ -378,7 +378,10 @@ def test_facade_report_requires_single_number_ratings(tmp_path: Path) -> None:
         volume=50.0,
     )
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="single-number"):
+    with pytest.raises(
+        ValueError,
+        match=r"facade prediction report needs the ISO 717-1 single-number ratings",
+    ):
         result.report(out)
 
 
@@ -386,7 +389,7 @@ def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     out = str(tmp_path / "x.pdf")
     result = _annex_h3_airborne()
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         result.report(out, engine="weasyprint")
 
 
@@ -394,5 +397,5 @@ def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unsupported language raises ``ValueError`` (shared validation path)."""
     out = str(tmp_path / "x.pdf")
     result = _annex_e3_impact()
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language"):
         result.report(out, language="fr")

@@ -133,7 +133,9 @@ def test_a_conflicting_rate_is_refused_a_matching_one_is_not(
 def test_a_bare_array_still_requires_fs(
     func: Callable[..., object], record: np.ndarray, kwargs: dict[str, float]
 ) -> None:
-    with pytest.raises(ValueError, match="fs is required"):
+    with pytest.raises(
+        ValueError, match=r"fs is required when 'signal' is a bare array"
+    ):
         func(record, **kwargs)
 
 
@@ -145,7 +147,7 @@ def test_a_multichannel_signal_is_refused_by_name(
 ) -> None:
     """These metrics are defined on one record, and say so."""
     block = Signal(np.stack([record, record]), FS)
-    with pytest.raises(ValueError, match="one-dimensional"):
+    with pytest.raises(ValueError, match=r"'signal' must be one-dimensional"):
         func(block, **kwargs)
 
 
@@ -201,7 +203,7 @@ def test_two_signals_at_different_rates_are_refused(
     func: Callable[..., object], kwargs: dict[str, float]
 ) -> None:
     first, second = Signal(_HARMONIC, FS), Signal(_MODULATION, FS // 2)
-    with pytest.raises(ValueError, match="recorded at different rates"):
+    with pytest.raises(ValueError, match=r"are Signals recorded at different rates"):
         func(first, second, **kwargs)
 
 
@@ -209,7 +211,7 @@ def test_two_signals_at_different_rates_are_refused(
 def test_a_pair_of_bare_arrays_still_requires_fs(
     func: Callable[..., object], kwargs: dict[str, float]
 ) -> None:
-    with pytest.raises(ValueError, match="fs is required"):
+    with pytest.raises(ValueError, match=r"fs is required when 'x' is a bare array"):
         func(_HARMONIC, _MODULATION, **kwargs)
 
 
@@ -272,7 +274,9 @@ def test_swept_sine_refuses_a_conflicting_rate() -> None:
 
 
 def test_swept_sine_still_requires_fs_for_a_bare_array() -> None:
-    with pytest.raises(ValueError, match="fs is required"):
+    with pytest.raises(
+        ValueError, match=r"fs is required when 'recorded' is a bare array"
+    ):
         swept_sine_distortion(_RECORDED, **_SWEEP_KWARGS)
 
 

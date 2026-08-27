@@ -194,7 +194,7 @@ def test_loudspeaker_characteristics_es() -> None:
         "Nivel de presión acústica [dB]"
     )
     plt.close("all")
-    with pytest.raises(ValueError, match="unknown quantity"):
+    with pytest.raises(ValueError, match=r"unknown quantity"):
         res.plot(quantity="bogus")
     with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
@@ -219,7 +219,7 @@ def test_microphone_characteristics_es() -> None:
         "Nivel de presión acústica [dB]"
     )
     plt.close("all")
-    with pytest.raises(ValueError, match="unknown quantity"):
+    with pytest.raises(ValueError, match=r"unknown quantity"):
         res.plot(quantity="bogus")
     with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")

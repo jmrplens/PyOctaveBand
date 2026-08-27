@@ -315,7 +315,7 @@ def _fake_batch(monkeypatch: pytest.MonkeyPatch, fails: str | None) -> list[list
     if fails is None:
         registry.generate_animations("images", variants=True)
     else:
-        with pytest.raises(RuntimeError, match="the encoder died"):
+        with pytest.raises(RuntimeError, match=r"^the encoder died$"):
             registry.generate_animations("images", variants=True)
     return stamped
 
@@ -394,7 +394,9 @@ def _fake_parallel_batch(
     if fails is None:
         registry._generate_animations_parallel("images", clips, jobs=1)
     else:
-        with pytest.raises(RuntimeError, match="the encoder died"):
+        with pytest.raises(
+            RuntimeError, match=r"(?s)animation generation failed.*the encoder died"
+        ):
             registry._generate_animations_parallel("images", clips, jobs=1)
     return stamped
 

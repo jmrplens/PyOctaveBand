@@ -48,7 +48,11 @@ def test_no_duplicate_module_assignment() -> None:
 
 
 def test_unmapped_module_raises_helpful_keyerror() -> None:
-    with pytest.raises(KeyError, match="not mapped"):
+    with pytest.raises(
+        KeyError,
+        match=r"module 'phonometry\.does_not_exist' is not mapped to any"
+        r" API-reference section",
+    ):
         api_taxonomy.module_section("phonometry.does_not_exist")
 
 

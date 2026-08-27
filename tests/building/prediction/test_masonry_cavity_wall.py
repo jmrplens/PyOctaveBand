@@ -191,7 +191,9 @@ def test_resonance_grows_as_the_square_root_of_the_tie_stiffness() -> None:
 
 
 def test_negative_tie_stiffness_is_rejected() -> None:
-    with pytest.raises(ValueError, match="tie_stiffness_per_area"):
+    with pytest.raises(
+        ValueError, match=r"'tie_stiffness_per_area' must be non-negative"
+    ):
         building.mass_spring_mass_resonance(
             140.0, 140.0, 0.075, tie_stiffness_per_area=-1.0
         )
@@ -362,7 +364,7 @@ def test_coupling_is_proportional_to_the_tie_density() -> None:
 
 
 def test_coupling_rejects_a_non_positive_tie_density() -> None:
-    with pytest.raises(ValueError, match="ties_per_area"):
+    with pytest.raises(ValueError, match=r"'ties_per_area' must be positive"):
         building.wall_tie_coupling_loss_factor(
             [100.0], 150.0, 170.0, 1.0e5, 1.2e5, ties_per_area=0.0
         )

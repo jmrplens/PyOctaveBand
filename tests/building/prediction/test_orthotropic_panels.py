@@ -409,7 +409,13 @@ def test_heckl_construction_is_continuous_at_its_four_knots() -> None:
 
 
 def test_heckl_needs_a_wide_coincidence_range() -> None:
-    with pytest.raises(ValueError, match="four times"):
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"'critical_frequency_upper' above four times "
+            r"'critical_frequency_lower'"
+        ),
+    ):
         building.orthotropic_transmission_loss(
             BANDS,
             FIG627_MASS,
@@ -616,7 +622,10 @@ def test_orthotropic_plot_shades_the_coincidence_range() -> None:
 
 
 def test_orthotropic_rejects_bad_input() -> None:
-    with pytest.raises(ValueError, match="must exceed"):
+    with pytest.raises(
+        ValueError,
+        match=r"'critical_frequency_upper' must exceed 'critical_frequency_lower'",
+    ):
         building.orthotropic_transmission_loss(
             BANDS,
             FIG627_MASS,
@@ -625,16 +634,16 @@ def test_orthotropic_rejects_bad_input() -> None:
         )
     with pytest.raises(ValueError, match="'method' must be one of"):
         _fig627(BANDS, method="heckle")
-    with pytest.raises(ValueError, match="must be positive"):
+    with pytest.raises(ValueError, match=r"'mass_per_area' must be positive"):
         building.orthotropic_transmission_loss(
             BANDS,
             -1.0,
             critical_frequency_lower=FIG627_FC1,
             critical_frequency_upper=FIG627_FC2,
         )
-    with pytest.raises(ValueError, match="limiting_angle"):
+    with pytest.raises(ValueError, match=r"'limiting_angle' must lie in"):
         _fig627(BANDS, limiting_angle=95.0)
-    with pytest.raises(ValueError, match="area"):
+    with pytest.raises(ValueError, match=r"'area' must be positive"):
         _fig627(BANDS, area=0.0)
 
 
@@ -647,18 +656,18 @@ def test_orthotropic_validates_every_argument_on_both_routes(method: str) -> Non
     one route while raising on the other is a trap for the caller, so all three
     are validated before the method branch.
     """
-    with pytest.raises(ValueError, match="area"):
+    with pytest.raises(ValueError, match=r"'area' must be positive"):
         _fig627(BANDS, method=method, area=-5.0)
-    with pytest.raises(ValueError, match="limiting_angle"):
+    with pytest.raises(ValueError, match=r"'limiting_angle' must lie in"):
         _fig627(BANDS, method=method, limiting_angle=170.0)
-    with pytest.raises(ValueError, match="loss_factor"):
+    with pytest.raises(ValueError, match=r"'loss_factor' must be positive"):
         _fig627(BANDS, method=method, loss_factor=-0.01)
 
 
 def test_orthotropic_helpers_reject_bad_input() -> None:
-    with pytest.raises(ValueError, match="must be positive"):
+    with pytest.raises(ValueError, match=r"'corrugation_amplitude' must be positive"):
         building.corrugated_plate_mass_factor(-0.01, 0.1)
-    with pytest.raises(ValueError, match="poisson_ratio"):
+    with pytest.raises(ValueError, match=r"'poisson_ratio' must lie in"):
         building.corrugated_plate_stiffness(
             1e-3, 0.01, 0.1, youngs_modulus=2.1e11, poisson_ratio=1.5
         )
@@ -673,5 +682,5 @@ def test_orthotropic_helpers_reject_bad_input() -> None:
             bending_stiffness_z=1.0,
             bending_stiffness_xz=1.0,
         )
-    with pytest.raises(ValueError, match="must be positive"):
+    with pytest.raises(ValueError, match=r"'bending_stiffness_1' must be positive"):
         building.orthotropic_critical_frequencies(7.8, 0.0, 1.0)

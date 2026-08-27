@@ -107,7 +107,7 @@ def test_response_curves_must_share_one_frequency_axis() -> None:
     """
     x, y, _, _ = _known_system()
     good = electroacoustics.transfer_function(x, y, FS)
-    per_frequency = "one value per frequency"
+    per_frequency = "must each carry one value per frequency"
     for field in ("frequencies", "response", "magnitude_db", "phase", "coherence"):
         curve = getattr(good, field)
         for value in (curve[:-1], np.append(curve, curve[-1])):
@@ -122,7 +122,7 @@ def test_rejects_mismatched_lengths() -> None:
     """Both entry points name themselves, not the validator they share."""
     x = np.zeros(1000)
     shorter_y = np.zeros(500)
-    per_sample = r"'x'.*'y'.*one value per sample"
+    per_sample = r"'x'.*'y'.*must each carry one value per sample"
     with pytest.raises(ValueError, match=rf"transfer_function: {per_sample}"):
         electroacoustics.transfer_function(x, shorter_y, FS)
     with pytest.raises(ValueError, match=rf"coherence: {per_sample}"):
@@ -146,7 +146,7 @@ def test_high_overlap_does_not_crash() -> None:
 
 def test_rejects_bad_nperseg() -> None:
     x = np.zeros(1000)
-    with pytest.raises(ValueError, match="'nperseg'"):
+    with pytest.raises(ValueError, match="'nperseg' must be between"):
         electroacoustics.transfer_function(x, x, FS, nperseg=5000)
 
 
@@ -168,7 +168,7 @@ def test_rejects_nperseg_beyond_float_range() -> None:
     # Used to escape as OverflowError out of math.isfinite(); an integer is
     # finite by construction, so it reaches the range check and its name.
     x = np.zeros(1000)
-    with pytest.raises(ValueError, match="'nperseg' must be between 32"):
+    with pytest.raises(ValueError, match="'nperseg' must be between"):
         electroacoustics.transfer_function(x, x, FS, nperseg=10**10000)
 
 

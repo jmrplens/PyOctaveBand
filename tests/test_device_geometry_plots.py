@@ -69,7 +69,7 @@ def test_silencer_hand_built_refuses() -> None:
     import dataclasses
 
     bare = dataclasses.replace(result, geometry=None)
-    with pytest.raises(ValueError, match="does not retain"):
+    with pytest.raises(ValueError, match="does not retain its geometry"):
         bare.plot_geometry()
 
 
@@ -174,14 +174,17 @@ def test_silencer_chain_without_a_duct_refuses_to_draw() -> None:
 def test_silencer_free_function_validation() -> None:
     with pytest.raises(ValueError, match="Unknown silencer kind"):
         pm.noise_control.plot_silencer_geometry("muffler")
-    with pytest.raises(ValueError, match="chamber_area"):
+    with pytest.raises(ValueError, match=r"'chamber_area' must exceed 'pipe_area'"):
         pm.noise_control.plot_silencer_geometry(
             "expansion chamber",
             length=0.3,
             chamber_area=0.004,
             pipe_area=0.005,
         )
-    with pytest.raises(ValueError, match="must not exceed"):
+    with pytest.raises(
+        ValueError,
+        match=r"'inlet_extension' \+ 'outlet_extension' must not exceed",
+    ):
         pm.noise_control.plot_silencer_geometry(
             "extended-tube chamber",
             length=0.1,
@@ -190,7 +193,9 @@ def test_silencer_free_function_validation() -> None:
             inlet_extension=0.08,
             outlet_extension=0.08,
         )
-    with pytest.raises(ValueError, match="needs"):
+    with pytest.raises(
+        ValueError, match=r"A Helmholtz resonator drawing needs 'neck_area'"
+    ):
         pm.noise_control.plot_silencer_geometry("Helmholtz resonator", duct_area=0.01)
 
 
@@ -303,7 +308,10 @@ def test_barrier_result_retains_geometry_and_draws() -> None:
 
 
 def test_barrier_free_function_validation() -> None:
-    with pytest.raises(ValueError, match="receiver_distance"):
+    with pytest.raises(
+        ValueError,
+        match=r"'receiver_distance' must be greater than 'barrier_distance'",
+    ):
         pm.environment.plot_barrier_geometry(
             source_height=1.5,
             barrier_distance=5.0,
@@ -350,9 +358,9 @@ def test_microphone_positions_hemisphere_and_sphere() -> None:
     ax = pm.emission.plot_microphone_positions(sphere)
     assert ax.name == "3d"
     bad = np.zeros((3, 2))
-    with pytest.raises(ValueError, match="shape"):
+    with pytest.raises(ValueError, match=r"'positions' must have shape \(N, 3\)"):
         pm.emission.plot_microphone_positions(bad)
-    with pytest.raises(ValueError, match="radius"):
+    with pytest.raises(ValueError, match=r"'radius' must be positive when given"):
         pm.emission.plot_microphone_positions(pos, radius=-1.0)
 
 
@@ -370,9 +378,9 @@ def test_aperture_results_retain_geometry_and_draw() -> None:
 
 
 def test_aperture_validation() -> None:
-    with pytest.raises(ValueError, match="exactly one"):
+    with pytest.raises(ValueError, match=r"Give exactly one of 'width' or 'radius'"):
         pm.building.plot_aperture_geometry(0.1)
-    with pytest.raises(ValueError, match="exactly one"):
+    with pytest.raises(ValueError, match=r"Give exactly one of 'width' or 'radius'"):
         pm.building.plot_aperture_geometry(0.1, width=0.003, radius=0.005)
     with pytest.raises(ValueError, match="'depth' must be positive"):
         pm.building.plot_aperture_geometry(0.0, width=0.003)
@@ -395,7 +403,7 @@ def test_aperture_geometry_refuses_a_nan_hole_radius() -> None:
     """The refusal names ``radius``, the parameter the caller passed, not
     the doubled opening the drawing works in.
     """
-    with pytest.raises(ValueError, match="'radius' must be positive"):
+    with pytest.raises(ValueError, match=r"'radius' must be positive\."):
         pm.building.plot_aperture_geometry(0.1, radius=float("nan"))
 
 
@@ -453,9 +461,9 @@ def test_piston_geometry_with_and_without_lobe() -> None:
     without = pm.electroacoustics.radiating_piston(0.1, np.array([500.0]))
     ax = without.plot_geometry()
     assert ax.get_legend() is None
-    with pytest.raises(ValueError, match="radius"):
+    with pytest.raises(ValueError, match=r"'radius' must be positive\."):
         pm.electroacoustics.plot_piston_geometry(0.0)
-    with pytest.raises(ValueError, match="together"):
+    with pytest.raises(ValueError, match=r"Give 'angles' and 'directivity' together"):
         pm.electroacoustics.plot_piston_geometry(0.1, angles=angles)
     with pytest.raises(ValueError, match=r"'directivity'.*same shape"):
         pm.electroacoustics.plot_piston_geometry(
@@ -491,7 +499,7 @@ def test_plenum_geometry_draws_and_validates() -> None:
     assert ax.get_aspect() == 1.0
     with pytest.raises(ValueError, match="'exit_area' must be positive"):
         pm.noise_control.plot_plenum_geometry(0.0, 1.2, 6.0)
-    with pytest.raises(ValueError, match="angle"):
+    with pytest.raises(ValueError, match=r"'angle' must be in \[0, pi/2\)"):
         pm.noise_control.plot_plenum_geometry(0.09, 1.2, 6.0, angle=2.0)
 
 
@@ -533,7 +541,7 @@ def test_fdtd_domain_preview() -> None:
     labels = [t.get_text() for t in ax.get_legend().get_texts()]
     assert len(labels) == 5
     bad_probes = np.zeros((2, 3))
-    with pytest.raises(ValueError, match="probes"):
+    with pytest.raises(ValueError, match=r"'probes' must have shape \(N, 2\)"):
         sim.plot_geometry(probes=bad_probes)
     # A plain rigid box keeps the record empty and still draws.
     plain = FDTD2D(343.0, 0.05, shape=(10, 10))

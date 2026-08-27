@@ -412,7 +412,7 @@ def test_difference_frequency_rejects_bad_args() -> None:
     tone = _tone(1000.0)
     with pytest.raises(ValueError, match="'f1' must be lower than 'f2'"):
         electroacoustics.difference_frequency_distortion(tone, FS, f1=2000.0, f2=1000.0)
-    with pytest.raises(ValueError, match="'order' must be"):
+    with pytest.raises(ValueError, match="'order' must be 2"):
         electroacoustics.difference_frequency_distortion(
             tone, FS, f1=1000.0, f2=2000.0, order=4
         )
@@ -513,7 +513,7 @@ def test_rejects_bad_fs_and_kind() -> None:
     tone = _tone(1000.0)
     with pytest.raises(ValueError, match="'fs' must be a positive"):
         electroacoustics.thd(tone, 0.0)
-    with pytest.raises(ValueError, match="'kind' must be"):
+    with pytest.raises(ValueError, match="'kind' must be 'F'"):
         electroacoustics.thd(tone, FS, 1000.0, kind="X")  # type: ignore[arg-type]
 
 
@@ -577,7 +577,9 @@ def test_itu_r_468_weighting_table_values() -> None:
     assert grid[int(np.argmax(curve))] == pytest.approx(6300.0, rel=1e-3)
     # DC blocks completely; negative/non-finite frequencies are rejected.
     assert electroacoustics.itu_r_468_weighting([0.0])[0] == -np.inf
-    with pytest.raises(ValueError, match="'frequencies' must be"):
+    with pytest.raises(
+        ValueError, match="'frequencies' must be finite and non-negative"
+    ):
         electroacoustics.itu_r_468_weighting([-100.0])
 
 
@@ -602,7 +604,7 @@ def test_weighted_thd_468_emphasises_6khz_products() -> None:
     assert w468 == pytest.approx(0.01 * 10.0 ** (12.2 / 20.0), rel=0.02)
     w_a = electroacoustics.weighted_thd(x, FS, 100.0, weighting="A")
     assert w468 / w_a == pytest.approx(10.0 ** (12.2 / 20.0), rel=0.05)
-    with pytest.raises(ValueError, match="'weighting' must be"):
+    with pytest.raises(ValueError, match="'weighting' must be '468'"):
         electroacoustics.weighted_thd(x, FS, 100.0, weighting="B")  # type: ignore[arg-type]
 
 
@@ -630,7 +632,10 @@ def test_thd_raises_when_no_harmonic_below_nyquist() -> None:
     # A 20 kHz fundamental at fs = 48 kHz has its 2nd harmonic above
     # Nyquist: the THD is undefined and must raise, not return 0.
     tone_hf = _tone(20000.0)
-    with pytest.raises(ValueError, match="Nyquist"):
+    with pytest.raises(
+        ValueError,
+        match=r"No harmonic of the fundamental lies below the Nyquist frequency",
+    ):
         electroacoustics.thd(tone_hf, FS, 20000.0)
 
 

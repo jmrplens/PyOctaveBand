@@ -206,7 +206,7 @@ def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     result = _facade_dnt()
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         result.report(out, engine="weasyprint")
 
 
@@ -214,7 +214,7 @@ def test_unknown_quantity_rejected(tmp_path: Path) -> None:
     """An unknown facade quantity raises ``ValueError``."""
     result = _facade_dnt()
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="quantity"):
+    with pytest.raises(ValueError, match=r"Unknown facade quantity"):
         result.report(out, quantity="dnt")
 
 
@@ -222,9 +222,9 @@ def test_missing_quantity_rejected(tmp_path: Path) -> None:
     """Requesting d_2m_n / r_prime without their inputs raises ``ValueError``."""
     bare = building.facade_insulation(_ANNEX_C_R + 40.0, np.full(16, 40.0), _T_AT_T0)
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="d_2m_n"):
+    with pytest.raises(ValueError, match=r"The result carries no 'd_2m_n' curve"):
         bare.report(out, quantity="d_2m_n")
-    with pytest.raises(ValueError, match="r_prime"):
+    with pytest.raises(ValueError, match=r"The result carries no 'r_prime' curve"):
         bare.report(out, quantity="r_prime")
 
 
@@ -234,5 +234,8 @@ def test_non_core_band_count_rejected(tmp_path: Path) -> None:
         np.full(21, 70.0), np.full(21, 30.0), np.full(21, 0.5)
     )
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="16 core"):
+    with pytest.raises(
+        ValueError,
+        match=r"The facade field report rates the 16 core one-third-octave bands",
+    ):
         result.report(out)

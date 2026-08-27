@@ -297,9 +297,9 @@ def test_d2m_nt_a_defaults_to_pink_noise() -> None:
 
 def test_facade_helpers_reject_each_other_s_spectra() -> None:
     """Neither helper accepts a spectrum its formula does not cover."""
-    with pytest.raises(ValueError, match="d2m_nt_a"):
+    with pytest.raises(ValueError, match=r"Formula \(A\.6\) evaluates 'D2m,nT,Atr'"):
         hr.d2m_nt_atr(_D2M_NT, spectrum="railway")
-    with pytest.raises(ValueError, match="d2m_nt_atr"):
+    with pytest.raises(ValueError, match=r"Formula \(A\.5\) evaluates 'D2m,nT,A'"):
         hr.d2m_nt_a(_D2M_NT, spectrum="traffic")
 
 
@@ -592,7 +592,7 @@ def test_party_wall_requirement_clause_2_1_1_c() -> None:
     assert (per_leaf.quantity, per_leaf.limit) == ("D2m,nT,Atr", 40.0)
     combined = hr.db_hr_party_wall_requirement("DnT,A")
     assert (combined.quantity, combined.limit) == ("DnT,A", 50.0)
-    with pytest.raises(ValueError, match="quantity"):
+    with pytest.raises(ValueError, match=r"'quantity' must be"):
         hr.db_hr_party_wall_requirement("RA")
 
 
@@ -670,18 +670,20 @@ def test_assessment_aggregates_every_check() -> None:
 # --------------------------------------------------------------------------- #
 def test_global_index_validation() -> None:
     """Wrong band counts, unknown spectra and non-finite values are rejected."""
-    with pytest.raises(ValueError, match="spectrum"):
+    with pytest.raises(ValueError, match=r"'spectrum' must be one of"):
         hr.db_hr_global_index(_R_PRIME, "white")
-    with pytest.raises(ValueError, match="eighteen"):
+    with pytest.raises(
+        ValueError, match=r"Without 'frequencies' the input must be the eighteen DB-HR"
+    ):
         hr.db_hr_global_index(_R_PRIME[:10])
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'band_values' must contain finite"):
         hr.db_hr_global_index([math.nan, *_R_PRIME[1:]])
     two_dimensional = np.zeros((2, 18))
-    with pytest.raises(ValueError, match="one-dimensional"):
+    with pytest.raises(ValueError, match=r"'band_values' must be one-dimensional"):
         hr.db_hr_global_index(two_dimensional)
     with pytest.raises(ValueError, match=r"'frequencies'.*same shape"):
         hr.db_hr_global_index(_R_PRIME, frequencies=[100.0, 125.0])
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"'frequencies' must contain positive"):
         hr.db_hr_global_index(_R_PRIME, frequencies=[0.0, *hr.DB_HR_FREQUENCIES[1:]])
 
 
@@ -703,7 +705,7 @@ def test_global_index_rejects_a_spectrum_of_another_band_set() -> None:
     """
     index = hr.ra(_R_PRIME)
     one_band_too_many = np.append(index.spectrum_levels, 99.9)
-    with pytest.raises(ValueError, match="'spectrum_levels'"):
+    with pytest.raises(ValueError, match=r"'spectrum_levels' \(19\)"):
         dataclasses.replace(index, spectrum_levels=one_band_too_many)
 
 
@@ -793,23 +795,27 @@ def test_a_check_on_an_undetermined_value_is_refused() -> None:
     requirement = hr.DbHrRequirement(
         "DnT,A", 50.0, "min", "dBA", 0, "DB-HR 2.1", "between dwellings"
     )
-    with pytest.raises(ValueError, match="'value' must be finite"):
+    with pytest.raises(ValueError, match=r"DbHrCheck: 'value' must be finite"):
         hr.DbHrCheck(requirement, math.nan, 45.0, -5.0, complies=False)
 
 
 def test_requirement_lookup_validation() -> None:
     """Unknown uses, rooms and room-pair combinations are rejected."""
-    with pytest.raises(ValueError, match="Unknown"):
+    with pytest.raises(
+        ValueError, match=r"Unknown \(building_use, room_type\) combination"
+    ):
         hr.db_hr_facade_requirement(62.0, "industrial", "bedrooms")
-    with pytest.raises(ValueError, match="dominant_noise"):
+    with pytest.raises(ValueError, match=r"'dominant_noise' must be"):
         hr.db_hr_facade_requirement(
             62.0, "residential", "bedrooms", dominant_noise="sea"
         )
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'ld' must be finite"):
         hr.db_hr_facade_requirement(math.nan, "residential", "bedrooms")
-    with pytest.raises(ValueError, match="Unknown"):
+    with pytest.raises(
+        ValueError, match=r"Unknown \(receiving_room, source_room\) combination"
+    ):
         hr.db_hr_airborne_requirement("protected", "outdoors")
-    with pytest.raises(ValueError, match="room_use"):
+    with pytest.raises(ValueError, match=r"'room_use' must be"):
         hr.db_hr_reverberation_requirement("swimming_pool")
 
 
@@ -819,7 +825,7 @@ def test_requirement_direction_is_validated() -> None:
     ``check_db_hr_requirement`` branches on "min" and treats anything else as
     "max", so the dataclass rejects any other spelling at construction.
     """
-    with pytest.raises(ValueError, match="direction"):
+    with pytest.raises(ValueError, match=r"'direction' must be"):
         hr.DbHrRequirement("D2m,nT,Atr", 32.0, "minimum", "dBA", 0, "ref", "desc")
     assert hr.DbHrRequirement("T", 0.7, "max", "s", 1, "ref", "desc").direction == "max"
 
@@ -840,12 +846,12 @@ def test_result_does_not_alias_the_caller_s_array() -> None:
 
 def test_window_size_and_assessment_validation() -> None:
     """A window needs a positive area and an assessment at least one check."""
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"'area' must be a positive"):
         hr.window_size_correction(0.0)
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"'area' must be a positive"):
         hr.window_size_correction(-2.0)
     with pytest.raises(ValueError, match="At least one"):
         hr.assess_db_hr([])
     impact_requirement = hr.db_hr_impact_requirement("protected", "other_unit")
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'value' must be finite"):
         hr.check_db_hr_requirement(math.nan, impact_requirement)

@@ -81,7 +81,7 @@ def test_path_level_hand_value() -> None:
 
 
 def test_path_level_rejects_bad_area() -> None:
-    with pytest.raises(ValueError, match="element_area"):
+    with pytest.raises(ValueError, match=r"'element_area' must be positive"):
         building.structure_borne_pressure_level_path(69.0, 5.0, 50.0, 0.0)
 
 
@@ -123,7 +123,9 @@ def test_prediction_bundle() -> None:
 
 
 def test_prediction_requires_paths() -> None:
-    with pytest.raises(ValueError, match="paths"):
+    with pytest.raises(
+        ValueError, match=r"'paths' must contain at least one transmission path"
+    ):
         building.installed_source_prediction(80.0, 10.0, [])
 
 
@@ -144,7 +146,9 @@ def test_prediction_band_count_mismatch() -> None:
             "element_area": 12.0,
         }
     ]
-    with pytest.raises(ValueError, match="flanking_reduction_index"):
+    with pytest.raises(
+        ValueError, match=r"path 0: 'flanking_reduction_index' has \d+ bands"
+    ):
         building.installed_source_prediction(power_level, coupling, short_path)
 
 
@@ -179,7 +183,7 @@ def test_prediction_scalar_source_band_mismatch_across_paths() -> None:
             "element_area": 10.0,
         }
     ]
-    with pytest.raises(ValueError, match="adjustment_term"):
+    with pytest.raises(ValueError, match=r"path 0: 'adjustment_term' has \d+ bands"):
         building.installed_source_prediction(80.0, 10.0, mismatched_path)
 
 
@@ -376,17 +380,21 @@ def test_annex_i3_cistern_full_chain_table_i9() -> None:
 
 def test_coupling_terms_validate_mobilities() -> None:
     """Re{Y_i} <= 0 or Y_s = 0 raise instead of yielding NaN/inf silently."""
-    with pytest.raises(ValueError, match="positive real part"):
+    receiver_real = r"'receiver_mobility' must be finite with a positive real part"
+    source_non_zero = r"'source_mobility' must be finite and non-zero"
+    with pytest.raises(ValueError, match=receiver_real):
         building.coupling_term(1e-4 + 0j, -1e-5 + 0j)
-    with pytest.raises(ValueError, match="positive real part"):
+    with pytest.raises(ValueError, match=receiver_real):
         building.coupling_term(1e-4 + 0j, 1e-5j)  # purely imaginary receiver
-    with pytest.raises(ValueError, match="finite and non-zero"):
+    with pytest.raises(ValueError, match=source_non_zero):
         building.coupling_term(0.0, 1e-5 + 0j)
-    with pytest.raises(ValueError, match="positive real part"):
+    with pytest.raises(ValueError, match=receiver_real):
         building.coupling_term_force_source(1e-4 + 0j, 0.0 + 0j)
-    with pytest.raises(ValueError, match="finite and non-zero"):
+    with pytest.raises(ValueError, match=source_non_zero):
         building.coupling_term_velocity_source(0.0, 1e4 + 0j)
-    with pytest.raises(ValueError, match="receiver_mobility"):
+    with pytest.raises(
+        ValueError, match=r"'receiver_mobility' must be finite and non-zero"
+    ):
         building.installed_power_from_reception_plate([60.0], 0.0)
 
 
@@ -401,7 +409,7 @@ def test_prediction_frequencies_length_mismatch() -> None:
         }
     ]
     short_frequencies = np.array([500.0, 1000.0])  # 2 vs 3 bands
-    with pytest.raises(ValueError, match="frequencies carries 2"):
+    with pytest.raises(ValueError, match=r"frequencies carries \d+ values"):
         building.installed_source_prediction(
             power_level, coupling, paths, frequencies=short_frequencies
         )
@@ -445,7 +453,8 @@ def test_a_per_band_quantity_off_the_band_axis_is_refused(
     result = _annex_i_prediction()
     values = np.asarray(getattr(result, field_name))
     wrong = values[:-1] if trim else np.append(values, values[-1])
-    with pytest.raises(ValueError, match=f"'{field_name}'"):
+    count = 5 if trim else 7  # the six-band fixture, one short or one long
+    with pytest.raises(ValueError, match=rf"'{field_name}' \({count}\)"):
         dataclasses.replace(result, **{field_name: wrong})
 
 

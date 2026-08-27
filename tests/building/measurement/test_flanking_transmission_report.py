@@ -343,9 +343,9 @@ def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError`` on every fiche."""
     out = str(tmp_path / "x.pdf")
     kij, dnf, lnf = _kij_result(), _dnf_result(), _lnf_result()
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         kij.report(out, engine="weasyprint")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         dnf.report(out, engine="weasyprint")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         lnf.report(out, engine="weasyprint")

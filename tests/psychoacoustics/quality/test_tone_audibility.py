@@ -212,7 +212,9 @@ def test_single_line_tone_audibility_flip_regression() -> None:
 
 def test_mean_narrowband_level_empty_critical_band_raises() -> None:
     # Lines far below the critical band of a 1 kHz tone (≈922-1085 Hz).
-    with pytest.raises(ValueError, match="critical band"):
+    with pytest.raises(
+        ValueError, match=r"No spectral lines fall in the critical band"
+    ):
         psychoacoustics.mean_narrowband_level(
             [50.0, 51.0, 52.0], [100.0, 110.0, 120.0], 1000.0
         )
@@ -245,7 +247,7 @@ def test_mean_narrowband_level_rejects_length_mismatch() -> None:
 
 
 def test_mean_narrowband_level_rejects_unsorted_frequencies() -> None:
-    with pytest.raises(ValueError, match="increasing"):
+    with pytest.raises(ValueError, match=r"'frequencies' must be strictly increasing"):
         psychoacoustics.mean_narrowband_level(
             [50.0, 51.0, 52.0], [100.0, 99.0, 101.0], 100.0
         )
@@ -503,7 +505,9 @@ def test_separation_frequency_grows_either_side_of_reference() -> None:
 
 
 def test_separation_frequency_rejects_bad_frequency() -> None:
-    with pytest.raises(ValueError, match="tone_frequency"):
+    with pytest.raises(
+        ValueError, match=r"'tone_frequency' must be a positive, finite number"
+    ):
         psychoacoustics.two_tone_separation_frequency(0.0)
 
 
@@ -704,7 +708,9 @@ def test_assess_tones_rejects_empty() -> None:
 
 
 def test_assess_tones_rejects_non_positive_frequency() -> None:
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(
+        ValueError, match=r"'tone_frequencies' must be positive and finite"
+    ):
         psychoacoustics.assess_tones([0.0], [60.0], [50.0], 2.7)
 
 
@@ -951,7 +957,7 @@ def test_uncertainty_constants_and_validation() -> None:
     assert COVERAGE_FACTOR_90 == 1.645
     with pytest.raises(ValueError, match="at least one line"):
         psychoacoustics.audibility_uncertainty([], [50.0], 137.3, 2.7)
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"Line levels must be finite"):
         psychoacoustics.audibility_uncertainty([60.0, np.nan], [50.0], 137.3, 2.7)
     with pytest.raises(
         ValueError,

@@ -68,13 +68,15 @@ def test_am_noise_clamped_at_zero() -> None:
 
 @pytest.mark.parametrize("bad_m", [-0.1, 1.1, math.nan])
 def test_am_noise_rejects_bad_modulation(bad_m: float) -> None:
-    with pytest.raises(ValueError, match="modulation_factor"):
+    with pytest.raises(ValueError, match=r"'modulation_factor' must be in"):
         psychoacoustics.fluctuation_strength_am_noise(60.0, bad_m, 4.0)
 
 
 @pytest.mark.parametrize("bad_f", [0.0, -1.0, math.inf])
 def test_am_noise_rejects_bad_frequency(bad_f: float) -> None:
-    with pytest.raises(ValueError, match="mod_frequency"):
+    with pytest.raises(
+        ValueError, match=r"'mod_frequency' must be positive and finite"
+    ):
         psychoacoustics.fluctuation_strength_am_noise(60.0, 1.0, bad_f)
 
 
@@ -247,7 +249,9 @@ def test_a_specific_curve_off_the_filter_axis_is_refused(
     """
     curve = reference_result.specific
     wrong = curve[:-1] if trim else np.append(curve, curve[-1])
-    with pytest.raises(ValueError, match="'specific'"):
+    # The guard names both fields whichever one was made wrong, so the count
+    # is what says which. It is the test's own: 47 filters, one added or cut.
+    with pytest.raises(ValueError, match=rf"'specific' \({wrong.size}\)"):
         dataclasses.replace(reference_result, specific=wrong)
 
 
@@ -260,7 +264,7 @@ def test_a_bark_axis_off_the_filter_axis_is_refused(
     and their two counts rather than picking a culprit.
     """
     short_axis = reference_result.bark_axis[:-1]
-    with pytest.raises(ValueError, match="'bark_axis'"):
+    with pytest.raises(ValueError, match=rf"'bark_axis' \({short_axis.size}\)"):
         dataclasses.replace(reference_result, bark_axis=short_axis)
 
 

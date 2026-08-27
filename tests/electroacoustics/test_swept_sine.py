@@ -90,19 +90,23 @@ def test_synchronized_sweep_starts_at_zero_phase() -> None:
 
 
 def test_synchronized_sweep_band_and_duration_validation() -> None:
-    with pytest.raises(ValueError, match="f2"):
+    with pytest.raises(ValueError, match=r"'f2' must be greater than 'f1'"):
         ph.electroacoustics.synchronized_sweep_signal(FS, 100.0, 50.0, SECONDS)
-    with pytest.raises(ValueError, match="Nyquist"):
+    with pytest.raises(ValueError, match=r"'f2' must not exceed the Nyquist frequency"):
         ph.electroacoustics.synchronized_sweep_signal(FS, 100.0, 30000.0, SECONDS)
-    with pytest.raises(ValueError, match="synchronize"):
+    with pytest.raises(
+        ValueError, match=r"'seconds' is too short to synchronize the sweep"
+    ):
         ph.electroacoustics.synchronized_sweep_signal(FS, 1.0, 1000.0, 0.5)
-    with pytest.raises(ValueError, match="fade"):
+    with pytest.raises(ValueError, match=r"fade must be in"):
         ph.electroacoustics.synchronized_sweep_signal(FS, F1, F2, SECONDS, fade=0.7)
 
 
 def test_synchronized_sweep_rejects_bad_amplitude() -> None:
     for bad in (0.0, -1.0, float("inf")):
-        with pytest.raises(ValueError, match="amplitude"):
+        with pytest.raises(
+            ValueError, match=r"'amplitude' must be a positive, finite number"
+        ):
             ph.electroacoustics.synchronized_sweep_signal(
                 FS, F1, F2, SECONDS, amplitude=bad
             )
@@ -112,7 +116,10 @@ def test_empty_thd_grid_raises_actionably() -> None:
     """f1 above fs/4: every order-2 product would exceed Nyquist."""
     f1, f2, seconds = 13000.0, 20000.0, 0.5
     x = ph.electroacoustics.synchronized_sweep_signal(FS, f1, f2, seconds)
-    with pytest.raises(ValueError, match="order-2 product"):
+    with pytest.raises(
+        ValueError,
+        match=r"no excitation-frequency bin has a measurable order-2 product",
+    ):
         ph.electroacoustics.swept_sine_distortion(
             x, FS, f1=f1, f2=f2, seconds=seconds, n_harmonics=2
         )
@@ -309,32 +316,41 @@ def test_validation_errors() -> None:
     x = ph.electroacoustics.synchronized_sweep_signal(FS, F1, F2, SECONDS)
     rec = _polynomial_recording(x)
     two_dimensional = rec.reshape(2, -1)
-    with pytest.raises(ValueError, match="one-dimensional"):
+    with pytest.raises(ValueError, match=r"'recorded' must be one-dimensional"):
         ph.electroacoustics.swept_sine_distortion(
             two_dimensional, FS, f1=F1, f2=F2, seconds=SECONDS
         )
     not_finite = np.full(rec.size, np.nan)
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'recorded' must be finite"):
         ph.electroacoustics.swept_sine_distortion(
             not_finite, FS, f1=F1, f2=F2, seconds=SECONDS
         )
-    with pytest.raises(ValueError, match="method"):
+    with pytest.raises(ValueError, match=r"'method' must be 'synchronized'"):
         ph.electroacoustics.swept_sine_distortion(
             rec, FS, f1=F1, f2=F2, seconds=SECONDS, method="nope"
         )  # type: ignore[arg-type]
-    with pytest.raises(ValueError, match="n_harmonics"):
+    with pytest.raises(ValueError, match=r"'n_harmonics' must be at least"):
         ph.electroacoustics.swept_sine_distortion(
             rec, FS, f1=F1, f2=F2, seconds=SECONDS, n_harmonics=1
         )
-    with pytest.raises(ValueError, match="whole sweep"):
+    with pytest.raises(
+        ValueError, match=r"'recorded' has \d+ samples but the sweep lasts"
+    ):
         ph.electroacoustics.swept_sine_distortion(
             rec[: rec.size // 2], FS, f1=F1, f2=F2, seconds=SECONDS
         )
-    with pytest.raises(ValueError, match="overlap"):
+    with pytest.raises(
+        ValueError,
+        match=r"'ir_length' \(\d+\) exceeds the \d+-sample spacing between orders",
+    ):
         ph.electroacoustics.swept_sine_distortion(
             rec, FS, f1=F1, f2=F2, seconds=SECONDS, ir_length=1 << 16
         )
-    with pytest.raises(ValueError, match="Lengthen the sweep"):
+    # "Lengthen the sweep" alone also matches the too-short-to-synchronize
+    # refusal above, which ends with the same advice.
+    with pytest.raises(
+        ValueError, match=r"the harmonic windows would be \d+ samples long"
+    ):
         # So many orders that the two closest arrivals are < 16 samples
         # apart and no usable window exists.
         ph.electroacoustics.swept_sine_distortion(
@@ -352,7 +368,10 @@ def test_farina_rejects_orders_beyond_the_sweep_ratio() -> None:
     fs, f1, f2, seconds = 48000, 1000.0, 2000.0, 1.0
     x = ph.room.sweep_signal(fs, f1, f2, seconds)
     rec = np.concatenate([x, np.zeros(4096)])
-    with pytest.raises(ValueError, match="anticausal"):
+    with pytest.raises(
+        ValueError,
+        match=r"method='farina' can only separate orders up to the sweep frequency ratio",
+    ):
         ph.electroacoustics.swept_sine_distortion(
             rec,
             fs,

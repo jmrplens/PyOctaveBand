@@ -124,9 +124,11 @@ def test_the_two_microphone_probe_takes_the_rate_from_either_side() -> None:
     assert_same(sound_intensity(Signal(p1, FS), p2, spacing=0.012), reference)
     assert_same(sound_intensity(p1, Signal(p2, FS), spacing=0.012), reference)
     first, second = Signal(p1, FS), Signal(p2, FS // 2)
-    with pytest.raises(ValueError, match="recorded at different rates"):
+    with pytest.raises(
+        ValueError, match="'p1' and 'p2' are Signals recorded at different rates"
+    ):
         sound_intensity(first, second, spacing=0.012)
-    with pytest.raises(ValueError, match="fs is required"):
+    with pytest.raises(ValueError, match=r"fs is required when 'p1' is a bare array"):
         sound_intensity(p1, p2, spacing=0.012)
 
 
@@ -235,9 +237,9 @@ def test_a_full_scale_reading_still_resolves_the_rate(
     """Exempt from the calibration, not from the rate: it still takes one."""
     sig = Signal(_RECORD, FS)
     assert_same(func(sig, **kwargs), func(_RECORD, FS, **kwargs))
-    with pytest.raises(ValueError, match="conflicts with the Signal's own fs"):
+    with pytest.raises(ValueError, match=r"fs=\d+ conflicts with the Signal's own fs"):
         func(sig, FS + 1, **kwargs)
-    with pytest.raises(ValueError, match="fs is required"):
+    with pytest.raises(ValueError, match=r"fs is required when 'x' is a bare array"):
         func(_RECORD, **kwargs)
 
 
@@ -274,9 +276,13 @@ def test_a_non_pressure_record_still_resolves_the_rate(
     """An acceleration is not a pressure, and it still needs a sample rate."""
     sig = Signal(_RECORD, FS)
     assert_same(func(sig, **kwargs), func(_RECORD, FS, **kwargs))
-    with pytest.raises(ValueError, match="conflicts with the Signal's own"):
+    with pytest.raises(
+        ValueError, match=r"(fs|sample_rate)=\d+ conflicts with the Signal's own fs"
+    ):
         func(sig, FS + 1, **kwargs)
-    with pytest.raises(ValueError, match="is required"):
+    with pytest.raises(
+        ValueError, match=r"(fs|sample_rate) is required when '\w+' is a bare array"
+    ):
         func(_RECORD, **kwargs)
 
 
@@ -310,7 +316,7 @@ def test_the_calibrator_take_gets_its_validation_from_the_object() -> None:
         warnings.simplefilter("error")
         unvalidated = sensitivity(short)
     assert from_object == pytest.approx(unvalidated)
-    with pytest.raises(ValueError, match="conflicts with the Signal's own fs"):
+    with pytest.raises(ValueError, match=r"fs=\d+ conflicts with the Signal's own fs"):
         sensitivity(take, fs=FS + 1)
 
 

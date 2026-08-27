@@ -150,7 +150,9 @@ def test_table4_impact_every_band(situation: str, col: int) -> None:
 
 
 def test_impact_has_no_situation_a() -> None:
-    with pytest.raises(ValueError, match="not tabulated"):
+    with pytest.raises(
+        ValueError, match=r"Situation 'A' is not tabulated for measurand 'impact'"
+    ):
         band_uncertainty("impact", "A")
 
 
@@ -191,7 +193,9 @@ def test_table6_reduction_every_band() -> None:
 
 @pytest.mark.parametrize("situation", ["B", "C"])
 def test_reduction_only_situation_a(situation: str) -> None:
-    with pytest.raises(ValueError, match="not tabulated"):
+    with pytest.raises(
+        ValueError, match=r"is not tabulated for measurand 'impact_reduction'"
+    ):
         band_uncertainty("impact_reduction", situation)
 
 
@@ -232,7 +236,9 @@ def test_tabled1_sigma_r95_bands() -> None:
 
 
 def test_sigma_r95_only_airborne() -> None:
-    with pytest.raises(ValueError, match="σR95"):
+    with pytest.raises(
+        ValueError, match=r"No σR95 upper limit tabulated for measurand 'impact'"
+    ):
         band_uncertainty("impact", "B", upper_limit=True)
 
 
@@ -327,7 +333,7 @@ def test_table7_delta_lw() -> None:
 
 @pytest.mark.parametrize("situation", ["B", "C"])
 def test_delta_lw_only_situation_a(situation: str) -> None:
-    with pytest.raises(ValueError, match="not tabulated"):
+    with pytest.raises(ValueError, match=r"is not tabulated for descriptor 'delta_lw'"):
         single_number_uncertainty("delta_lw", situation)
 
 
@@ -360,7 +366,7 @@ def test_sigma_r95_single_number_requires_situation_a() -> None:
 
 
 def test_sigma_r95_single_number_impact_absent() -> None:
-    with pytest.raises(ValueError, match="No σR95"):
+    with pytest.raises(ValueError, match=r"No σR95 upper limit tabulated for 'ln_w'"):
         single_number_uncertainty("ln_w", "A", upper_limit=True)
 
 
@@ -398,7 +404,10 @@ def test_table8_one_sided(confidence: float, k: float) -> None:
 
 
 def test_coverage_factor_unknown_confidence() -> None:
-    with pytest.raises(ValueError, match="not tabulated"):
+    with pytest.raises(
+        ValueError,
+        match=r"Confidence level .* is not tabulated for the two-sided test",
+    ):
         insulation_coverage_factor(0.925)
 
 
@@ -685,7 +694,13 @@ def test_annex_b_correlated_adaptation_sum_uncertainties() -> None:
 def test_uncorrelated_rejects_non_finite_reference_differences() -> None:
     nan_reference = [0.0, float("nan")]
     inf_uncertainty = [1.0, float("inf")]
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(
+        ValueError,
+        match=r"band_uncertainties and reference_differences must contain only finite",
+    ):
         single_number_uncertainty_uncorrelated([1.0, 1.0], nan_reference)
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(
+        ValueError,
+        match=r"band_uncertainties and reference_differences must contain only finite",
+    ):
         single_number_uncertainty_uncorrelated(inf_uncertainty, [0.0, 0.0])

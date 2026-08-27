@@ -496,11 +496,16 @@ def test_extended_18_band_100_5000_range() -> None:
 
 def test_extended_requires_core_bands() -> None:
 
-    with pytest.raises(ValueError, match="core"):
+    with pytest.raises(
+        ValueError, match=r"input must contain the \d+ core one-third-octave bands"
+    ):
         building.weighted_rating_extended(
             [40.0] * 10, [50, 63, 80, 100, 125, 160, 200, 250, 315, 400]
         )
-    with pytest.raises(ValueError, match="16 core"):
+    with pytest.raises(
+        ValueError,
+        match=r"Without 'frequencies' the input must be the \d+ core one-third-octave bands",
+    ):
         building.weighted_rating_extended([40.0] * 18)
 
 

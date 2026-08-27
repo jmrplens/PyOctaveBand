@@ -35,7 +35,7 @@ def test_octave_filter_bank_invalid_init() -> None:
     with pytest.raises(ValueError, match="list of two frequencies"):
         filters.OctaveFilterBank(fs=48000, limits=[1000])
 
-    with pytest.raises(ValueError, match="must be positive"):
+    with pytest.raises(ValueError, match="Limit frequencies must be positive"):
         filters.OctaveFilterBank(fs=48000, limits=[-10, 1000])
 
     with pytest.raises(ValueError, match="less than the upper limit"):
@@ -60,9 +60,7 @@ def test_weighting_filter_invalid() -> None:
     """
     rng = np.random.default_rng(42)
     x = rng.standard_normal(1000)
-    with pytest.raises(
-        ValueError, match="must be 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z'"
-    ):
+    with pytest.raises(ValueError, match="Weighting curve must be 'A'"):
         filters.weighting_filter(x, 48000, curve="E")
 
 
@@ -277,7 +275,7 @@ def test_calculate_level_invalid_mode() -> None:
 
     signal = np.array([1.0])
 
-    with pytest.raises(ValueError, match="Invalid mode\\. Use 'rms' or 'peak'\\."):
+    with pytest.raises(ValueError, match=r"Invalid mode\. Use 'rms'"):
         bank._calculate_level(signal, "invalid_mode")
 
 

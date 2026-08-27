@@ -208,7 +208,7 @@ def test_math_and_prose_escape_metacharacters_in_the_comment() -> None:
 
 
 def test_unbalanced_markup_raises() -> None:
-    with pytest.raises(ValueError, match="unbalanced"):
+    with pytest.raises(ValueError, match=r"unbalanced \$ markup in 'broken \$L_p'"):
         _element("broken $L_p")
 
 
@@ -219,7 +219,7 @@ def test_multicharacter_script_without_braces_raises() -> None:
         _element("cut-off $f_max$ of the array")
     assert "'_max'" in str(excinfo.value)
     assert "'cut-off $f_max$ of the array'" in str(excinfo.value)
-    with pytest.raises(ValueError, match="ambiguous script"):
+    with pytest.raises(ValueError, match=r"ambiguous script '_ref' in '\$p_ref\$'"):
         _element("$p_ref$")
     # An opening bracket right after the script character is the same trap,
     # but braces around the whole tail would swallow the argument into the
@@ -302,13 +302,15 @@ def test_nested_script_raises() -> None:
         _element("$L_{p_1}$")
     assert "nested script" in str(excinfo.value)
     assert "'$L_{p_1}$'" in str(excinfo.value)
-    with pytest.raises(ValueError, match="nested script"):
+    with pytest.raises(ValueError, match=r"nested script '\^2' inside a script"):
         _element("$a_{b^2}$")
 
 
 def test_empty_script_payload_raises() -> None:
     for broken in ("$L_$", "$L^$", "$L_{}$"):
-        with pytest.raises(ValueError, match="empty script"):
+        with pytest.raises(
+            ValueError, match=rf"empty script .* in {re.escape(repr(broken))}"
+        ):
             _element(broken)
 
 
@@ -392,9 +394,9 @@ def test_fit_gate_raises_on_overflow_and_passes_the_boundary() -> None:
     svg.text(900 - width + 0.4, 100, "overhang", anchor="start")
     assert svg.parts
     # Just past it: the gate names the string and the measured span.
-    with pytest.raises(ValueError, match=r"spans .* on a 900 px sheet"):
+    with pytest.raises(ValueError, match=r"label .* spans .* px sheet"):
         svg.text(900 - width + 0.6, 100, "overhang", anchor="start")
-    with pytest.raises(ValueError, match="900 px sheet"):
+    with pytest.raises(ValueError, match=r"label .* spans .* px sheet"):
         svg.text(-1, 130, "left overhang", anchor="start")
 
 
