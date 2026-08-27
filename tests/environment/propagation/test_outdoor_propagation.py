@@ -54,7 +54,7 @@ class TestGeometricDivergence:
         assert delta == pytest.approx(6.0206, abs=1e-3)
 
     def test_non_positive_raises(self) -> None:
-        with pytest.raises(ValueError, match="positive"):
+        with pytest.raises(ValueError, match=r"'distance' must be positive"):
             environment.geometric_divergence(0.0)
 
 
@@ -159,9 +159,9 @@ class TestGroundGeneral:
         assert porous[3] > hard[3]
 
     def test_invalid_ground_factor_raises(self) -> None:
-        with pytest.raises(ValueError, match=r"ground_source"):
+        with pytest.raises(ValueError, match=r"'ground_source' must be within"):
             environment.ground_attenuation(100.0, 1.0, 1.0, BANDS, 1.5, 0.0, 0.0)
-        with pytest.raises(ValueError, match=r"ground_middle"):
+        with pytest.raises(ValueError, match=r"'ground_middle' must be within"):
             environment.ground_attenuation(100.0, 1.0, 1.0, BANDS, 0.0, -0.1, 0.0)
 
     def test_default_projected_distance(self) -> None:
@@ -387,7 +387,7 @@ class TestOutdoorPropagation:
         assert gain[-2] > gain[0]
 
     def test_invalid_distance_raises(self) -> None:
-        with pytest.raises(ValueError, match="positive"):
+        with pytest.raises(ValueError, match=r"'distance' must be positive"):
             environment.outdoor_propagation_attenuation(-1.0, 1.0, 1.0)
 
 
@@ -448,28 +448,30 @@ class TestPredictedReceiverLevel:
 
 class TestInputValidation:
     def test_barrier_rejects_zero_edge_separation(self) -> None:
-        with pytest.raises(ValueError, match="edge_separation"):
+        with pytest.raises(ValueError, match=r"'edge_separation' must be positive"):
             environment.Barrier(
                 source_to_edge=50.0, edge_to_receiver=50.0, edge_separation=0.0
             )
 
     def test_barrier_rejects_negative_edge_distance(self) -> None:
-        with pytest.raises(ValueError, match="non-negative"):
+        with pytest.raises(
+            ValueError, match=r"Barrier edge distances must be non-negative"
+        ):
             environment.Barrier(source_to_edge=-1.0, edge_to_receiver=50.0)
 
     def test_ground_attenuation_rejects_nonpositive_frequency(self) -> None:
         with_zero = np.array([0.0, 500.0])
-        with pytest.raises(ValueError, match="frequencies"):
+        with pytest.raises(ValueError, match=r"'frequencies' must be positive"):
             environment.ground_attenuation(200.0, 2.0, 2.0, with_zero, 1.0, 1.0, 1.0)
 
     def test_ground_attenuation_rejects_nonpositive_distance(self) -> None:
-        with pytest.raises(ValueError, match="distance"):
+        with pytest.raises(ValueError, match=r"'distance' must be positive"):
             environment.ground_attenuation(0.0, 2.0, 2.0, BANDS, 1.0, 1.0, 1.0)
 
     def test_barrier_attenuation_rejects_nonpositive_frequency(self) -> None:
         barrier = environment.Barrier(source_to_edge=50.0, edge_to_receiver=50.0)
         with_negative = np.array([-1.0, 500.0])
-        with pytest.raises(ValueError, match="frequencies"):
+        with pytest.raises(ValueError, match=r"'frequencies' must be positive"):
             environment.barrier_attenuation(barrier, 90.0, with_negative)
 
 

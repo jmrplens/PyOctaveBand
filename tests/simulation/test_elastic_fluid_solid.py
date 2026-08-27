@@ -546,7 +546,7 @@ def test_from_regions_and_material_validation() -> None:
         )
     with pytest.raises(ValueError, match="at least 2 x 2"):
         ElasticFDTD2D.from_regions((1, 10), 0.01, background=WATER)
-    with pytest.raises(ValueError, match="must be an integer"):
+    with pytest.raises(ValueError, match=r"shape\[0\] must be an integer"):
         ElasticFDTD2D.from_regions(
             (10.5, 10),
             0.01,  # type: ignore[arg-type]

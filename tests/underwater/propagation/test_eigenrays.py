@@ -279,7 +279,11 @@ def test_the_cap_keeps_the_earliest_arrivals_and_says_so() -> None:
     about the arrivals it keeps.
     """
     trace, full = _guide_arrivals()
-    with pytest.warns(PhonometryWarning, match="11 eigenrays.*6 earliest"):
+    with pytest.warns(
+        PhonometryWarning,
+        match=r"eigenrays connect the receiver within the traced fan"
+        r".*Raise 'max_arrivals'",
+    ):
         capped = eigenrays(
             trace,
             receiver_range=_GUIDE["r"],
@@ -481,20 +485,24 @@ def test_the_trace_records_the_profile_it_flew_through() -> None:
 
 def test_invalid_inputs_rejected() -> None:
     trace, _res = _guide_arrivals()
-    with pytest.raises(ValueError, match="receiver_depth"):
+    with pytest.raises(
+        ValueError, match=r"'receiver_depth' must lie strictly inside the water column"
+    ):
         eigenrays(trace, receiver_range=500.0, receiver_depth=0.0)
-    with pytest.raises(ValueError, match="receiver_range"):
+    with pytest.raises(
+        ValueError, match=r"'receiver_range' must not run past the traced fan"
+    ):
         eigenrays(trace, receiver_range=700.0, receiver_depth=46.0)
-    with pytest.raises(ValueError, match="receiver_range"):
+    with pytest.raises(ValueError, match=r"'receiver_range' must be positive"):
         eigenrays(trace, receiver_range=0.0, receiver_depth=46.0)
-    with pytest.raises(ValueError, match="max_arrivals"):
+    with pytest.raises(ValueError, match=r"'max_arrivals' must be at least"):
         eigenrays(trace, receiver_range=500.0, receiver_depth=46.0, max_arrivals=0)
-    with pytest.raises(ValueError, match="n_steps"):
+    with pytest.raises(ValueError, match=r"'n_steps' must be at least"):
         eigenrays(trace, receiver_range=500.0, receiver_depth=46.0, n_steps=1)
     slow = FluidSeabed(density=1800.0, sound_speed=-1700.0)
-    with pytest.raises(ValueError, match="sound_speed"):
+    with pytest.raises(ValueError, match=r"'sound_speed' must be positive"):
         eigenrays(trace, receiver_range=500.0, receiver_depth=46.0, bottom=slow)
-    with pytest.raises(ValueError, match="bottom"):
+    with pytest.raises(ValueError, match=r"'bottom' must be one of"):
         eigenrays(trace, receiver_range=500.0, receiver_depth=46.0, bottom="sandy")
     lone = ray_trace(
         [0.0, 100.0],

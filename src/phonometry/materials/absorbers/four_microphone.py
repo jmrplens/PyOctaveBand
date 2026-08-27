@@ -102,7 +102,7 @@ def speed_of_sound_astm(temperature: ArrayLike) -> Real:
     """
     t = np.asarray(temperature, dtype=np.float64)
     if np.any(t <= -_ASTM_T0):
-        msg = "'temperature' must exceed -273,15 degC."
+        msg = "'temperature' must exceed -273.15 degC."
         raise ValueError(msg)
     return np.asarray(_ASTM_C_CONST * np.sqrt(_ASTM_T0 + t), dtype=np.float64)
 
@@ -122,7 +122,7 @@ def air_density_astm(
     t = np.asarray(temperature, dtype=np.float64)
     p = np.asarray(atmospheric_pressure, dtype=np.float64)
     if np.any(t <= -_ASTM_T0):
-        msg = "'temperature' must exceed -273,15 degC."
+        msg = "'temperature' must exceed -273.15 degC."
         raise ValueError(msg)
     if np.any(p <= 0.0):
         msg = "'atmospheric_pressure' must be positive (kPa)."

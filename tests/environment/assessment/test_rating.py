@@ -54,7 +54,7 @@ def test_lden_custom_periods() -> None:
 
 
 def test_lden_periods_must_sum_24() -> None:
-    with pytest.raises(ValueError, match="24"):
+    with pytest.raises(ValueError, match=r"Period durations must sum to 24 h"):
         environment.lden(60, 55, 50, hours=(12, 4, 9))
 
 
@@ -86,9 +86,11 @@ def test_composite_generalizes_lden() -> None:
 
 
 def test_composite_validation() -> None:
-    with pytest.raises(ValueError, match="24"):
+    with pytest.raises(ValueError, match=r"Period durations must sum to 24 h"):
         environment.composite_rating_level([(60.0, 10.0, 0.0)])
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(
+        ValueError, match=r"Every period duration must be a positive, finite number"
+    ):
         environment.composite_rating_level([(60.0, -1.0, 0.0), (50.0, 25.0, 0.0)])
 
 
@@ -96,12 +98,14 @@ def test_composite_accepts_generator_and_rejects_empty() -> None:
     periods = [(60.0, 12, 0.0), (55.0, 4, 5.0), (50.0, 8, 10.0)]
     from_gen = environment.composite_rating_level(p for p in periods)
     assert from_gen == pytest.approx(environment.composite_rating_level(periods))
-    with pytest.raises(ValueError, match="one period"):
+    with pytest.raises(ValueError, match=r"At least one period is required"):
         environment.composite_rating_level([])
 
 
 def test_composite_rejects_non_finite_hours() -> None:
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(
+        ValueError, match=r"Every period duration must be a positive, finite number"
+    ):
         environment.composite_rating_level(
             [(60.0, float("nan"), 0.0), (50.0, 12.0, 0.0)]
         )

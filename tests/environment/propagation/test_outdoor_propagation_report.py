@@ -292,11 +292,11 @@ def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError`` for both fiches."""
     attenuation = _attenuation()
     out_a = str(tmp_path / "a.pdf")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         attenuation.report(out_a, engine="weasyprint")
     barrier = _barrier()
     out_b = str(tmp_path / "b.pdf")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         barrier.report(out_b, engine="weasyprint")
 
 
@@ -304,9 +304,9 @@ def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unsupported language raises ``ValueError`` for both fiches."""
     attenuation = _attenuation()
     out_a = str(tmp_path / "a.pdf")
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language"):
         attenuation.report(out_a, language="fr")
     barrier = _barrier()
     out_b = str(tmp_path / "b.pdf")
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language"):
         barrier.report(out_b, language="fr")

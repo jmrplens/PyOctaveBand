@@ -92,12 +92,12 @@ def test_signal_input_supplies_fs_and_refuses_a_conflicting_one(
     path = tmp_path / "fromsignal.wav"
     write(path, sig)
     assert read(path).fs == 44100
-    with pytest.raises(ValueError, match="conflicts"):
+    with pytest.raises(ValueError, match=r"conflicts with the Signal's own fs"):
         write(path, sig, FS)
 
 
 def test_bare_array_requires_fs(tmp_path: Path) -> None:
-    with pytest.raises(ValueError, match="fs is required"):
+    with pytest.raises(ValueError, match=r"fs is required when writing a bare array"):
         write(tmp_path / "nofs.wav", np.zeros(8))
 
 
@@ -145,7 +145,9 @@ def test_integer_input_passes_codes_through_bit_exact(
 
 
 def test_integer_input_refuses_a_conflicting_subtype(tmp_path: Path) -> None:
-    with pytest.raises(ValueError, match="pass-through"):
+    with pytest.raises(
+        ValueError, match=r"integer int16 input is a bit-exact pass-through of PCM_16"
+    ):
         write(tmp_path / "c.wav", np.zeros(4, dtype=np.int16), FS, subtype="PCM_32")
 
 
@@ -237,14 +239,19 @@ def test_tpdf_dither_renders_the_mean_code_unbiased(tmp_path: Path) -> None:
 
 def test_dither_is_refused_outside_pcm16(tmp_path: Path) -> None:
     for subtype in ("PCM_24", "PCM_32", "FLOAT", "DOUBLE"):
-        with pytest.raises(ValueError, match="PCM_16"):
+        with pytest.raises(
+            ValueError,
+            match=r"dither='tpdf' applies only when quantising to PCM_16",
+        ):
             write(tmp_path / "d.wav", np.zeros(4), FS, subtype=subtype, dither="tpdf")
-    with pytest.raises(ValueError, match="dither"):
+    with pytest.raises(ValueError, match=r"unknown dither 'rectangular'"):
         write(tmp_path / "d.wav", np.zeros(4), FS, dither="rectangular")
     # rng exists to seed the dither; alone it would promise a
     # reproducibility nothing delivers.
     silence = np.zeros(4)
-    with pytest.raises(ValueError, match="rng"):
+    with pytest.raises(
+        ValueError, match=r"rng seeds the TPDF dither noise and does nothing without it"
+    ):
         write(tmp_path / "d.wav", silence, FS, rng=7)
 
 
@@ -255,7 +262,10 @@ def test_dither_is_refused_outside_pcm16(tmp_path: Path) -> None:
 
 def test_lossy_and_unknown_targets_are_refused(tmp_path: Path) -> None:
     for name in ("copy.mp3", "copy.ogg", "copy.opus", "copy.xyz"):
-        with pytest.raises(ValueError, match="WAV family"):
+        with pytest.raises(
+            ValueError,
+            match=r"unsupported target '\.\w+'; the writer produces the WAV family",
+        ):
             write(tmp_path / name, np.zeros(4), FS)
 
 
@@ -330,7 +340,10 @@ def test_streamed_count_mismatch_without_an_estimate_still_raises(
 ) -> None:
     """The exact-count contract keeps refusing a short or long stream."""
     path = tmp_path / "mismatch.wav"
-    with pytest.raises(ValueError, match="inconsistent"):
+    with pytest.raises(
+        ValueError,
+        match=r"the block stream carried 10 frames but the header promised 12",
+    ):
         write_wav_stream(path, [np.zeros((1, 10))], FS, 1, "FLOAT", 12)
 
 

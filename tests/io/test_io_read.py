@@ -266,7 +266,9 @@ def test_truncated_data_is_refused_at_every_depth(tmp_path: Path) -> None:
         )
         path = _write(tmp_path, image, f"trunc{bits}.wav")
         assert info(path).frames == 100
-        with pytest.raises(ValueError, match="truncated recording"):
+        with pytest.raises(
+            ValueError, match=r"refusing to read a truncated recording as if it were"
+        ):
             read(path)
 
 
@@ -391,7 +393,9 @@ def test_info_answers_a_giant_rf64_from_its_headers_alone(
     assert bext.max_short_term_loudness == pytest.approx(-21.10)
 
     # The proof that no sample was touched: touching them is impossible.
-    with pytest.raises(ValueError, match="truncated recording"):
+    with pytest.raises(
+        ValueError, match=r"refusing to read a truncated recording as if it were"
+    ):
         read(path)
 
 
@@ -429,9 +433,13 @@ def test_missing_audio_extra_is_named_in_the_error(
 
     mp3 = tmp_path / "note.mp3"
     mp3.write_bytes(b"ID3\x04\x00\x00\x00\x00\x00\x00" + bytes(64))
-    with pytest.raises(ImportError, match=r"pip install phonometry\[audio\]"):
+    with pytest.raises(
+        ImportError, match=r"Reading MPEG audio \(MP3\) requires python-soundfile"
+    ):
         read(mp3)
-    with pytest.raises(ImportError, match="MPEG audio"):
+    with pytest.raises(
+        ImportError, match=r"Reading MPEG audio \(MP3\) requires python-soundfile"
+    ):
         info(mp3)
 
     # A compressed WAV is recognised on the base install (the walker reads
@@ -442,7 +450,9 @@ def test_missing_audio_extra_is_named_in_the_error(
         chunk(b"data", bytes(4)),
     )
     compressed = _write(tmp_path, alaw, "compressed.wav")
-    with pytest.raises(ImportError, match=r"phonometry\[audio\]"):
+    with pytest.raises(
+        ImportError, match=r"Reading WAV A-law requires python-soundfile"
+    ):
         read(compressed)
     # info() on the same file needs no extra at all: headers are base work.
     described = info(_write(tmp_path, alaw, "compressed2.wav"))
@@ -461,7 +471,9 @@ def test_mp3_read_warns_and_stamps_lossy(tmp_path: Path) -> None:
     x = 0.4 * np.sin(2 * np.pi * 1000 * np.arange(FS // 2) / FS)
     path = tmp_path / "note.mp3"
     sf.write(str(path), x, FS)
-    with pytest.warns(LossyCompressionWarning, match="not metrologically defensible"):
+    with pytest.warns(
+        LossyCompressionWarning, match=r"MPEG audio \(MP3\).* is a lossy format"
+    ):
         sig = read(path)
     assert sig.fs == FS
     assert sig.source is not None
@@ -499,7 +511,9 @@ def test_compressed_wav_keeps_the_walker_metadata(tmp_path: Path) -> None:
     struct.pack_into("<I", raw, 4, len(raw) - 8)
     path.write_bytes(bytes(raw))
 
-    with pytest.warns(LossyCompressionWarning, match="ALAW"):
+    with pytest.warns(
+        LossyCompressionWarning, match=r"WAV A-law \(ALAW\) is a lossy format"
+    ):
         sig = read(path)
     assert sig.provenance is not None
     assert sig.provenance.originator == "logger"

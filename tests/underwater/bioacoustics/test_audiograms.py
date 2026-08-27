@@ -170,7 +170,7 @@ def test_orca_audiogram_supports_the_figure_of_merit_of_example_11_4_6() -> None
 
 @pytest.mark.parametrize("frequency", [400.0, 90e3])
 def test_orca_audiogram_rejects_frequencies_outside_the_fit(frequency: float) -> None:
-    with pytest.raises(ValueError, match="500-80000 Hz"):
+    with pytest.raises(ValueError, match=r"'frequency_hz' must lie within"):
         orca_audiogram(frequency)
 
 
@@ -179,14 +179,22 @@ def test_orca_audiogram_rejects_frequencies_outside_the_fit(frequency: float) ->
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("frequency", [[], [0.0], [-1.0], [np.nan]])
-def test_invalid_frequencies_raise(frequency: list[float]) -> None:
-    with pytest.raises(ValueError, match="frequency_hz"):
+@pytest.mark.parametrize(
+    ("frequency", "message"),
+    [
+        ([], r"'frequency_hz' must be finite and non-empty"),
+        ([0.0], r"'frequency_hz' must be strictly positive"),
+        ([-1.0], r"'frequency_hz' must be strictly positive"),
+        ([np.nan], r"'frequency_hz' must be finite and non-empty"),
+    ],
+)
+def test_invalid_frequencies_raise(frequency: list[float], message: str) -> None:
+    with pytest.raises(ValueError, match=message):
         group_audiogram(frequency, "HF")
 
 
 def test_unknown_group_raises() -> None:
-    with pytest.raises(ValueError, match="group"):
+    with pytest.raises(ValueError, match=r"'group' must be one of"):
         group_audiogram(1e3, "dolphin")
 
 
@@ -200,7 +208,7 @@ def test_an_audiogram_curve_with_an_extra_axis_is_refused(field: str) -> None:
     """
     res = group_audiogram(np.logspace(2.0, 5.0, 40), "HF")
     column = np.column_stack([getattr(res, field)] * 2)
-    with pytest.raises(ValueError, match=f"'{field}'"):
+    with pytest.raises(ValueError, match=f"'{field}' must have one axis"):
         dataclasses.replace(res, **{field: column})
 
 
@@ -208,7 +216,7 @@ def test_a_threshold_that_outruns_its_frequencies_is_refused() -> None:
     """One threshold too many would leave the last point with no frequency."""
     res = group_audiogram(np.logspace(2.0, 5.0, 40), "HF")
     longer = np.append(res.threshold, res.threshold[-1])
-    with pytest.raises(ValueError, match="'threshold'"):
+    with pytest.raises(ValueError, match=r"'threshold' \(41\)"):
         dataclasses.replace(res, threshold=longer)
 
 

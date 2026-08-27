@@ -374,21 +374,30 @@ def test_invalid_arguments_raise(kwargs: dict[str, object], message: str) -> Non
 
 @pytest.mark.parametrize("ranges", [[], [0.0], [np.nan]])
 def test_invalid_ranges_raise(ranges: list[float]) -> None:
-    with pytest.raises(ValueError, match="range_m"):
+    with pytest.raises(
+        ValueError, match=r"'range_m' must be (finite and non-empty|strictly positive)"
+    ):
         weston_propagation_loss(ranges, 250.0, 50.0)
 
 
 def test_mud_without_critical_angle_needs_an_explicit_one() -> None:
     with pytest.raises(ValueError, match="no critical angle"):
         weston_propagation_loss(1000.0, 250.0, 50.0, seabed="mud")
-    with pytest.raises(ValueError, match="critical angle"):
+    with pytest.raises(
+        ValueError, match=r"'effective_depth' needs a seabed with a critical angle"
+    ):
         effective_depth(50.0, 250.0, seabed="mud")
-    with pytest.raises(ValueError, match="critical angle"):
+    with pytest.raises(
+        ValueError,
+        match=r"'waveguide_cutoff_frequency' needs a seabed with a critical angle",
+    ):
         waveguide_cutoff_frequency(50.0, seabed="mud")
 
 
 def test_refracting_branch_requires_a_frequency() -> None:
-    with pytest.raises(ValueError, match="frequency_hz"):
+    with pytest.raises(
+        ValueError, match=r"'frequency_hz' is required for a refracting seabed"
+    ):
         reflection_loss_gradient("mud")
 
 
@@ -403,10 +412,13 @@ def test_refracting_branch_requires_a_sediment_gradient() -> None:
         loss_parameter=0.00165,
         sound_speed_gradient=0.0,
     )
-    with pytest.raises(ValueError, match="sound_speed_gradient"):
+    with pytest.raises(ValueError, match=r"needs a positive 'sound_speed_gradient'"):
         reflection_loss_gradient(flat, frequency_hz=250.0)
 
 
 def test_negative_attenuation_rejected() -> None:
-    with pytest.raises(ValueError, match="attenuation_db_per_wavelength"):
+    with pytest.raises(
+        ValueError,
+        match=r"'attenuation_db_per_wavelength' must be non-negative and finite",
+    ):
         loss_parameter(-1.0)

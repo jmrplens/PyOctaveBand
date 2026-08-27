@@ -139,7 +139,7 @@ def _require_poisson_ratio(value: float) -> float:
     """Validate a Poisson coefficient of an isotropic frame."""
     nu = float(value)
     if not -1.0 < nu < _POISSON_INCOMPRESSIBLE_LIMIT:
-        msg = "'poisson_ratio' must satisfy -1 < nu < 0,5."
+        msg = "'poisson_ratio' must satisfy -1 < nu < 0.5."
         raise ValueError(msg)
     return nu
 

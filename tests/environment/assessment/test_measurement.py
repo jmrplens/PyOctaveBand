@@ -139,7 +139,10 @@ def test_residual_correction_formula16() -> None:
 
 
 def test_residual_correction_unreliable_warns() -> None:
-    with pytest.warns(EnvironmentalMeasurementWarning, match="upper bound"):
+    with pytest.warns(
+        EnvironmentalMeasurementWarning,
+        match=r"Use reportable_upper_bound, not corrected_level",
+    ):
         res = environment.residual_sound_correction(50.0, 48.0)  # margin 2 dB <= 3
     assert not res.reliable
     # 10.4: with a margin <= 3 dB no correction is allowed; the reportable
@@ -155,7 +158,9 @@ def test_residual_correction_reports_measured_as_bound() -> None:
 
 
 def test_residual_not_below_raises() -> None:
-    with pytest.raises(ValueError, match="below"):
+    with pytest.raises(
+        ValueError, match=r"'residual_level' must be below 'measured_level'"
+    ):
         environment.residual_sound_correction(50.0, 50.0)
 
 
@@ -171,18 +176,18 @@ def test_gaussian_residual_i1_i2() -> None:
 
 
 def test_gaussian_residual_needs_one_percentile() -> None:
-    with pytest.raises(ValueError, match="exactly one"):
+    with pytest.raises(ValueError, match=r"Supply exactly one of 'l90' or 'l95'"):
         environment.gaussian_residual_level(50.0, l90=40.0, l95=38.0)
-    with pytest.raises(ValueError, match="exactly one"):
+    with pytest.raises(ValueError, match=r"Supply exactly one of 'l90' or 'l95'"):
         environment.gaussian_residual_level(50.0)
 
 
 def test_gaussian_residual_rejects_inverted_percentiles() -> None:
     # L90 > L50 is impossible (exceedance ordering): almost certainly swapped
     # arguments; the squared spread would otherwise hide the mistake.
-    with pytest.raises(ValueError, match="swapped"):
+    with pytest.raises(ValueError, match=r"'l90' exceeds 'l50'.*look swapped"):
         environment.gaussian_residual_level(40.0, l90=50.0)
-    with pytest.raises(ValueError, match="swapped"):
+    with pytest.raises(ValueError, match=r"'l95' exceeds 'l50'.*look swapped"):
         environment.gaussian_residual_level(40.0, l95=41.0)
 
 
@@ -215,7 +220,7 @@ def test_combined_uncertainty_accepts_pairs() -> None:
 
 
 def test_expanded_uncertainty_bad_confidence() -> None:
-    with pytest.raises(ValueError, match="confidence"):
+    with pytest.raises(ValueError, match=r"'confidence' must be one of"):
         environment.expanded_uncertainty(1.0, confidence=0.90)
 
 
@@ -250,14 +255,19 @@ def test_repeated_measurements_spread_levels() -> None:
     (3.944 dB for [50, 60, 70]) while the Note 2 approximation inflates to
     12.183 dB and triggers the spread warning.
     """
-    with pytest.warns(EnvironmentalMeasurementWarning, match="Formula \\(20\\)"):
+    with pytest.warns(
+        EnvironmentalMeasurementWarning,
+        match=r"Formula \(20\) approximation \(approximate_uncertainty\)",
+    ):
         res = environment.uncertainty_from_repeated_measurements([50.0, 60.0, 70.0])
     assert res.standard_uncertainty == pytest.approx(3.944, abs=2e-3)
     assert res.approximate_uncertainty == pytest.approx(12.183, abs=2e-3)
 
 
 def test_repeated_measurements_needs_two() -> None:
-    with pytest.raises(ValueError, match="at least two"):
+    with pytest.raises(
+        ValueError, match="'levels' must be a 1-D array of at least two"
+    ):
         environment.uncertainty_from_repeated_measurements([58.0])
 
 

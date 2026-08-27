@@ -19,6 +19,8 @@ physics identities:
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pytest
 
@@ -100,6 +102,18 @@ def test_air_property_domain_errors() -> None:
         speed_of_sound_astm(-300.0)
     with pytest.raises(ValueError, match="'atmospheric_pressure' must be positive"):
         air_density_iso(293.0, -1.0)
+
+
+def test_air_density_astm_rejects_temperature_below_absolute_zero() -> None:
+    """ASTM Eq. (5) scales the reference density by 273,15/(273,15 + T).
+
+    Below absolute zero that ratio is negative, so rho would come back
+    negative and carry the sign into every rho c the four-microphone
+    reduction builds on. The temperature is refused at the door, exactly as
+    ``speed_of_sound_astm`` refuses it above.
+    """
+    with pytest.raises(ValueError, match="'temperature' must exceed"):
+        air_density_astm(-300.0, 101.325)
 
 
 def test_air_density_mismatched_arrays_raise() -> None:
@@ -267,7 +281,7 @@ def test_result_is_frozen() -> None:
         speed_of_sound=C0,
         characteristic_impedance=RC,
     )
-    with pytest.raises((AttributeError, TypeError)):
+    with pytest.raises(dataclasses.FrozenInstanceError):
         res.reflection = np.array([0.0])  # type: ignore[misc]
 
 
@@ -341,9 +355,9 @@ def test_plane_wave_range_square_alias() -> None:
 
 
 def test_plane_wave_range_invalid_shape() -> None:
-    with pytest.raises(ValueError, match="shape"):
+    with pytest.raises(ValueError, match=r"'shape' must be"):
         plane_wave_frequency_range(0.03, C0, diameter=0.05, shape="oval")
-    with pytest.raises(ValueError, match="shape"):
+    with pytest.raises(ValueError, match=r"'shape' must be"):
         plane_wave_frequency_range_astm(0.03, C0, diameter=0.05, shape="oval")
 
 
@@ -369,7 +383,7 @@ def test_hydraulic_diameter_values() -> None:
     assert hydraulic_diameter(0.08, 0.04) == pytest.approx(
         4.0 * (0.08 * 0.04) / (2.0 * (0.08 + 0.04))
     )
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"'width' and 'height' must be positive"):
         hydraulic_diameter(0.0, 0.05)
 
 
@@ -619,7 +633,10 @@ def test_two_load_warns_on_singular_load_pair() -> None:
     f = np.array([500.0, 1000.0])
     k = np.asarray(tube_wavenumber(f, C0)).real.astype(np.complex128)
     load = (1.0 + 0j, 0.9 + 0j, 0.8 + 0j, 0.7 + 0j)
-    with pytest.warns(ImpedanceTubeWarning, match="near-singular"):
+    with pytest.warns(
+        ImpedanceTubeWarning,
+        match=r"transfer_matrix_two_load: the solve denominator is near-singular",
+    ):
         transfer_matrix_two_load(
             load,
             load,
@@ -779,6 +796,9 @@ def test_one_load_recovers_symmetric_specimen() -> None:
     assert np.allclose(rec.t11, rec.t22)
 
 
+_OUTSIDE_ASTM_RANGE = r"Wavenumbers outside the ASTM E2611-19 plane-wave working range"
+
+
 def test_astm_solvers_warn_outside_plane_wave_range() -> None:
     # With the tube diameter given, frequencies past the 6.2.4.1 cut-on
     # (0,586 c/d for this 10 cm circular tube ~ 2011 Hz) must be flagged.
@@ -787,7 +807,7 @@ def test_astm_solvers_warn_outside_plane_wave_range() -> None:
     tm = air_layer_transfer_matrix(k, THICKNESS, RC)
     load_a = _synth_four_mics(tm, np.asarray(k), 1.0 + 0.0j, 0.3 + 0.0j)
     load_b = _synth_four_mics(tm, np.asarray(k), 1.0 + 0.0j, -0.5 + 0.2j)
-    with pytest.warns(ImpedanceTubeWarning, match="ASTM E2611-19"):
+    with pytest.warns(ImpedanceTubeWarning, match=_OUTSIDE_ASTM_RANGE):
         transfer_matrix_two_load(
             load_a,
             load_b,
@@ -797,7 +817,7 @@ def test_astm_solvers_warn_outside_plane_wave_range() -> None:
             diameter=0.10,
             **GEOM,
         )
-    with pytest.warns(ImpedanceTubeWarning, match="ASTM E2611-19"):
+    with pytest.warns(ImpedanceTubeWarning, match=_OUTSIDE_ASTM_RANGE):
         transfer_matrix_one_load(
             load_a,
             thickness=THICKNESS,
@@ -806,7 +826,7 @@ def test_astm_solvers_warn_outside_plane_wave_range() -> None:
             diameter=0.10,
             **GEOM,
         )
-    with pytest.warns(ImpedanceTubeWarning, match="ASTM E2611-19"):
+    with pytest.warns(ImpedanceTubeWarning, match=_OUTSIDE_ASTM_RANGE):
         wave_decomposition(
             *load_a,
             wavenumber=k,
@@ -822,7 +842,7 @@ def test_astm_solvers_warn_below_lower_bound() -> None:
     k = np.asarray(tube_wavenumber(f, C0)).real.astype(np.complex128)
     tm = air_layer_transfer_matrix(k, THICKNESS, RC)
     load = _synth_four_mics(tm, np.asarray(k), 1.0 + 0.0j, 0.3 + 0.0j)
-    with pytest.warns(ImpedanceTubeWarning, match="ASTM E2611-19"):
+    with pytest.warns(ImpedanceTubeWarning, match=_OUTSIDE_ASTM_RANGE):
         wave_decomposition(*load, wavenumber=k, diameter=0.10, **GEOM)
 
 
@@ -895,7 +915,10 @@ def test_transfer_matrix_retains_measurement_context() -> None:
     bare = air_layer_transfer_matrix(k, THICKNESS, RC)
     assert bare.frequency is None
     assert bare.air_characteristic_impedance is None
-    with pytest.raises(ValueError, match="hand-built"):
+    with pytest.raises(
+        ValueError,
+        match=r"'frequency' and 'characteristic_impedance' must be supplied",
+    ):
         bare.plot()
 
 

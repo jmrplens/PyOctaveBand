@@ -128,11 +128,13 @@ def test_coarse_grid_breakpoints_evaluated_exactly() -> None:
 def test_invalid_inputs_raise() -> None:
     bank = filters.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[500, 2000])
     band_centre = np.array([1.0])
-    with pytest.raises(ValueError, match="num_points"):
+    with pytest.raises(ValueError, match=r"'num_points' must be at least"):
         filters.verify_filter_class(bank, num_points=4)
-    with pytest.raises(ValueError, match="filter_class"):
+    with pytest.raises(
+        ValueError, match=r"filter_class must be one of .* for edition '2014'"
+    ):
         class_limits(1.0, 3, band_centre)
-    with pytest.raises(ValueError, match="fraction"):
+    with pytest.raises(ValueError, match=r"'fraction' must be positive"):
         class_limits(-1.0, 1, band_centre)
 
 
@@ -233,14 +235,18 @@ def test_range_limited_flag_reports_unverifiable_stopband() -> None:
 
 def test_1995_rejects_out_of_range_class_and_bad_edition() -> None:
     band_centre = np.array([1.0])
-    with pytest.raises(ValueError, match="filter_class"):
+    with pytest.raises(
+        ValueError, match=r"filter_class must be one of .* for edition '1995'"
+    ):
         class_limits(1.0, 3, band_centre, edition="1995")
-    with pytest.raises(ValueError, match="filter_class"):
+    with pytest.raises(
+        ValueError, match=r"filter_class must be one of .* for edition '2014'"
+    ):
         class_limits(1.0, 0, band_centre)  # class 0 invalid for 2014
-    with pytest.raises(ValueError, match="edition"):
+    with pytest.raises(ValueError, match=r"edition must be '2014'"):
         class_limits(1.0, 1, band_centre, edition="2020")
     bank = filters.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[500, 2000])
-    with pytest.raises(ValueError, match="edition"):
+    with pytest.raises(ValueError, match=r"edition must be '2014'"):
         filters.verify_filter_class(bank, edition="2020")
 
 
@@ -275,8 +281,11 @@ def test_a_filter_verdict_refuses_per_band_entries_that_disagree() -> None:
     result = filters.filter_class_compliance(
         OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
     )
-    with pytest.raises(ValueError, match="'bands'"):
-        dataclasses.replace(result, bands=result.bands[:-1])
+    short = result.bands[:-1]
+    # Every field of the result is named whichever one is short, so the count
+    # is the only part that says it was 'bands'. This test set that count.
+    with pytest.raises(ValueError, match=rf"'bands' \({len(short)}\)"):
+        dataclasses.replace(result, bands=short)
 
 
 def test_a_filter_verdict_refuses_a_class_its_bands_carry_no_margins_for() -> None:
@@ -291,7 +300,9 @@ def test_a_filter_verdict_refuses_a_class_its_bands_carry_no_margins_for() -> No
     result = filters.filter_class_compliance(
         OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
     )
-    with pytest.raises(ValueError, match="'overall_class' must be one of"):
+    # 'got 0' is what separates this from the non-integer case below, which
+    # the library refuses with the same sentence.
+    with pytest.raises(ValueError, match=r"'overall_class' must be one of .*; got 0\."):
         dataclasses.replace(result, overall_class=0)
 
 
@@ -306,7 +317,7 @@ def test_a_filter_verdict_refuses_an_edition_that_disagrees_with_its_bands() -> 
     result = filters.filter_class_compliance(
         OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
     )
-    with pytest.raises(ValueError, match="'edition'"):
+    with pytest.raises(ValueError, match=r"'edition' \('1995'\) defines classes"):
         dataclasses.replace(result, edition="1995")
 
 
@@ -425,7 +436,8 @@ def test_a_filter_verdict_refuses_a_class_its_bands_do_not_derive() -> None:
     # ``_verify_band`` emits for a filter just outside the tighter corridor.
     bands[1].update({"class": 2, "margin_class1_db": -0.35})
     with pytest.raises(
-        ValueError, match=r"'overall_class' must be the class the bands derive"
+        ValueError,
+        match=r"'overall_class' must be the class the bands derive.*band states 2",
     ):
         dataclasses.replace(result, bands=bands, overall_class=1)
 
@@ -449,7 +461,8 @@ def test_a_filter_verdict_refuses_a_class_over_a_band_that_meets_none() -> None:
     # The producer's own pairing of that band list is accepted.
     assert dataclasses.replace(result, bands=bands, overall_class=None) is not None
     with pytest.raises(
-        ValueError, match=r"'overall_class' must be the class the bands derive"
+        ValueError,
+        match=r"'overall_class' must be the class the bands derive.*band states None",
     ):
         dataclasses.replace(result, bands=bands, overall_class=1)
 
@@ -473,7 +486,9 @@ def test_a_filter_verdict_refuses_a_class_that_is_no_designation() -> None:
     )
     bands = tuple(copy.deepcopy(band) for band in result.bands)
     bands[1]["class"] = 1.0
-    with pytest.raises(ValueError, match=r"'overall_class' must be one of"):
+    with pytest.raises(
+        ValueError, match=r"'overall_class' must be one of .*; got 1\.0"
+    ):
         dataclasses.replace(result, overall_class=1.0)
     with pytest.raises(ValueError, match=r"'bands' must state a 'class' of"):
         dataclasses.replace(result, bands=bands)

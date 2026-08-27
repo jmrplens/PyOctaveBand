@@ -109,16 +109,16 @@ def test_shipping_length_mismatch_rejected() -> None:
 
 
 def test_shipping_non_finite_rejected() -> None:
-    with pytest.raises(ValueError, match="shipping.*finite"):
+    with pytest.raises(ValueError, match=r"'shipping' must contain only finite"):
         ocean_ambient_noise(
             [100.0, 1000.0], wind_speed_knots=5.0, shipping=[80.0, np.nan]
         )
 
 
 def test_invalid_inputs_rejected() -> None:
-    with pytest.raises(ValueError, match="frequency"):
+    with pytest.raises(ValueError, match=r"'frequency_hz' must be strictly positive"):
         wind_noise_spectrum(-1.0, 5.0)
-    with pytest.raises(ValueError, match="wind_speed"):
+    with pytest.raises(ValueError, match=r"'wind_speed_knots' must be non-negative"):
         wind_noise_spectrum(1000.0, -1.0)
 
 

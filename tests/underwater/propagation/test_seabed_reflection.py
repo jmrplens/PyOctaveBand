@@ -69,7 +69,7 @@ def test_total_reflection_below_critical_angle() -> None:
 
 def test_no_critical_angle_for_slow_bottom() -> None:
     # A slower bottom (mud, c2 < c1) has no critical angle.
-    with pytest.raises(ValueError, match="c2 > c1"):
+    with pytest.raises(ValueError, match=r"critical angle exists only when c2 > c1"):
         critical_angle(1500.0, 1450.0)
     res = bottom_reflection_loss(45.0, rho1=1000.0, c1=1500.0, rho2=1500.0, c2=1450.0)
     assert res.critical_angle is None
@@ -127,7 +127,7 @@ def test_exact_intromission_zero_gives_inf_loss_without_warning() -> None:
 
 
 def test_grazing_angle_out_of_range_rejected() -> None:
-    with pytest.raises(ValueError, match="grazing_angle"):
+    with pytest.raises(ValueError, match=r"'grazing_angle' must be within"):
         reflection_coefficient(120.0, **_WATER, **_SAND)
 
 

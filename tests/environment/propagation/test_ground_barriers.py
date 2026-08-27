@@ -160,7 +160,9 @@ def test_ground_effect_result_is_frozen_and_has_plot() -> None:
     ],
 )
 def test_ground_effect_requires_exactly_one_impedance_source(kwargs: dict) -> None:
-    with pytest.raises(ValueError, match="exactly one"):
+    with pytest.raises(
+        ValueError, match=r"exactly one of 'impedance' or 'flow_resistivity'"
+    ):
         environment.ground_effect(_BANDS, 1.0, 1.0, 20.0, **kwargs)
 
 
@@ -174,12 +176,12 @@ def test_ground_effect_rejects_bad_geometry() -> None:
 def test_ground_effect_rejects_non_finite_impedance() -> None:
     # An infinite Z is not the hard-ground limit (that is a large finite Z); it
     # would give inf/inf = NaN in Rp, so it is rejected outright.
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'impedance' must be finite"):
         environment.ground_effect(_BANDS, 1.0, 1.0, 20.0, impedance=np.inf)
     inf_z = complex(np.inf, 0.0)
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'impedance' must be finite"):
         environment.spherical_reflection_coefficient(_BANDS, inf_z, 1.0, 1.5, 50.0)
-    with pytest.raises(ValueError, match="non-zero"):
+    with pytest.raises(ValueError, match=r"'impedance' must be non-zero"):
         environment.ground_effect(_BANDS, 1.0, 1.0, 20.0, impedance=0.0)
 
 
@@ -419,7 +421,8 @@ def test_a_barrier_series_off_the_frequency_axis_is_refused(
     res = environment.barrier_insertion_loss(_BANDS, 1.0, 50.0, 4.0, 100.0, 1.5)
     values = np.asarray(getattr(res, field_name))
     wrong = values[:-1] if trim else np.append(values, values[-1])
-    with pytest.raises(ValueError, match=f"'{field_name}'"):
+    count = 7 if trim else 9  # the eight-band fixture, one short or one long
+    with pytest.raises(ValueError, match=rf"'{field_name}' \({count}\)"):
         dataclasses.replace(res, **{field_name: wrong})
 
 
@@ -468,7 +471,10 @@ def test_a_barrier_loss_covering_no_frequency_is_refused() -> None:
 
 
 def test_barrier_rejects_bad_geometry() -> None:
-    with pytest.raises(ValueError, match="must exceed"):
+    with pytest.raises(
+        ValueError,
+        match=r"'barrier_height' must exceed the source and receiver heights",
+    ):
         # barrier not taller than source/receiver -> no shadow.
         environment.barrier_insertion_loss(_BANDS, 2.0, 50.0, 1.5, 100.0, 1.0)
     with pytest.raises(ValueError, match="exceed 'barrier_distance'"):
@@ -484,22 +490,25 @@ def test_barrier_rejects_bad_geometry() -> None:
             method="kurze_anderson",
             ground_flow_resistivity=2e5,
         )
-    with pytest.raises(ValueError, match="unknown method"):
+    with pytest.raises(ValueError, match=r"unknown method 'utd'"):
         environment.barrier_insertion_loss(
             _BANDS, 1.0, 50.0, 4.0, 100.0, 1.5, method="utd"
         )  # type: ignore[arg-type]
-    with pytest.raises(ValueError, match="barrier_distance \\+ thickness"):
+    with pytest.raises(
+        ValueError,
+        match=r"'receiver_distance' must exceed 'barrier_distance \+ thickness'",
+    ):
         # A thick barrier whose far edge lies at/beyond the receiver.
         environment.barrier_insertion_loss(
             _BANDS, 1.0, 50.0, 4.0, 100.0, 1.5, method="exact", thickness=60.0
         )
-    with pytest.raises(ValueError, match="speed_of_sound"):
+    with pytest.raises(ValueError, match=r"'speed_of_sound' must be positive"):
         environment.barrier_insertion_loss(
             _BANDS, 1.0, 50.0, 4.0, 100.0, 1.5, speed_of_sound=0.0
         )
     for bad in (float("nan"), float("inf"), -1.0):
         # thickness NaN/inf/<=0 are all rejected (NaN slips past a bare <= 0).
-        with pytest.raises(ValueError, match="thickness"):
+        with pytest.raises(ValueError, match=r"'thickness' must be positive"):
             environment.barrier_insertion_loss(
                 _BANDS,
                 1.0,

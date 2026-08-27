@@ -1455,7 +1455,7 @@ def sound_power_intensity_precision(
         msg = "All 'areas' must be positive."
         raise ValueError(msg)
     if temperature <= _ABS_ZERO_C:
-        msg = "'temperature' must be above -273,15 degrees Celsius."
+        msg = "'temperature' must be above -273.15 degrees Celsius."
         raise ValueError(msg)
     if barometric_pressure <= 0.0:
         msg = "'barometric_pressure' must be positive (Pa)."

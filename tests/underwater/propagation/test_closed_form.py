@@ -45,7 +45,9 @@ def test_practical_spreading_matches_pieces() -> None:
 
 
 def test_practical_requires_transition_range() -> None:
-    with pytest.raises(ValueError, match="transition_range"):
+    with pytest.raises(
+        ValueError, match=r"'transition_range' is required for the 'practical' law"
+    ):
         spreading_loss([100.0], law="practical")
 
 
@@ -169,7 +171,7 @@ def test_ainslie_mccolm_depth_in_km() -> None:
 
 
 def test_unknown_absorption_model_rejected() -> None:
-    with pytest.raises(ValueError, match="model"):
+    with pytest.raises(ValueError, match=r"'model' must be one of"):
         seawater_absorption(1000.0, model="fisher-simmons")
 
 
@@ -194,7 +196,7 @@ def test_propagation_loss_is_spreading_plus_absorption() -> None:
 
 
 def test_propagation_loss_rejects_nonpositive_range() -> None:
-    with pytest.raises(ValueError, match="range_m"):
+    with pytest.raises(ValueError, match=r"'range_m' must be strictly positive"):
         propagation_loss([0.0, 100.0], 1000.0)
 
 

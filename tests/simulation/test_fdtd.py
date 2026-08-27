@@ -377,14 +377,14 @@ def test_obstacle_mask_validation() -> None:
     open_source = GaussianPulse(ix=1, iy=1, width=1e-4)
     with pytest.raises(ValueError, match="match the grid shape"):
         FDTD2D(C0, 0.05, shape=(10, 12), obstacle_mask=mask)
-    with pytest.raises(ValueError, match="boolean"):
+    with pytest.raises(ValueError, match=r"obstacle_mask must be a boolean array"):
         FDTD2D(C0, 0.05, shape=(10, 10), obstacle_mask=float_mask)
-    with pytest.raises(ValueError, match="open cells"):
+    with pytest.raises(ValueError, match=r"obstacle_mask must leave open cells"):
         FDTD2D(C0, 0.05, shape=(10, 10), obstacle_mask=full_mask)
     sim = FDTD2D(C0, 0.05, shape=(10, 10), obstacle_mask=mask)
-    with pytest.raises(ValueError, match="inside an obstacle"):
+    with pytest.raises(ValueError, match="source position lies inside an obstacle"):
         sim.add_source(masked_source)
-    with pytest.raises(ValueError, match="inside an obstacle"):
+    with pytest.raises(ValueError, match=r"probe .* lies inside an obstacle"):
         fdtd_simulation(
             C0,
             0.05,
@@ -403,8 +403,8 @@ def test_obstacle_mask_validation() -> None:
     ("boundaries", "match"),
     [
         ({"north": "rigid"}, "unknown boundary sides"),
-        ({"left": "open"}, "must be one of"),
-        ("anechoic", "must be one of"),
+        ({"left": "open"}, r"boundary for side .* must be one of"),
+        ("anechoic", r"boundary for side .* must be one of"),
     ],
 )
 def test_boundary_spec_rejects_unknown_values(
@@ -436,7 +436,10 @@ def test_edge_impedance_validation(
 
 
 def test_side_cannot_be_absorbing_and_impedance() -> None:
-    with pytest.raises(ValueError, match="both absorbing"):
+    with pytest.raises(
+        ValueError,
+        match=r"side 'left' cannot be both absorbing and an impedance boundary",
+    ):
         FDTD2D(
             C0,
             0.05,
@@ -518,7 +521,9 @@ def test_unstable_or_invalid_cfl_is_rejected(cfl: float) -> None:
     # dt = cfl * dx / (c sqrt(2)); cfl is the Courant number CN of
     # Eq. (4.13) and the explicit scheme requires CN <= 1 (Eq. 4.14).
     sources = [GaussianPulse(ix=5, iy=5, width=1e-4)]
-    with pytest.raises(ValueError, match="cfl"):
+    with pytest.raises(
+        ValueError, match=r"cfl must lie in.*the leapfrog scheme is unstable"
+    ):
         fdtd_simulation(C0, 0.05, 1e-3, shape=(20, 20), cfl=cfl, sources=sources)
 
 
@@ -595,9 +600,9 @@ def test_two_runs_are_bit_identical() -> None:
         ({"sources": []}, "at least one source"),
         ({"duration": 0.0}, "duration must be positive"),
         ({"duration": 1e-9}, "at least one time step"),
-        ({"snapshot_every": 0}, "snapshot_every"),
+        ({"snapshot_every": 0}, "snapshot_every must be >= 1"),
         ({"snapshot_every": 2.5}, "snapshot_every must be an integer"),
-        ({"probes": [(99, 0)]}, "outside the grid"),
+        ({"probes": [(99, 0)]}, r"probe .* lies outside the grid"),
         ({"probes": [(2.5, 3)]}, "probe ix must be an integer"),
         ({"probes": [(2, 3.5)]}, "probe iy must be an integer"),
         # A malformed entry used to be reported by the interpreter's
@@ -606,7 +611,7 @@ def test_two_runs_are_bit_identical() -> None:
         ({"probes": [5]}, r"probes must hold \(ix, iy\) index pairs"),
         (
             {"boundaries": "absorbing", "absorbing_layer_cells": 0},
-            "absorbing_layer_cells",
+            "absorbing_layer_cells must be >= 1",
         ),
         (
             {"boundaries": "absorbing", "absorbing_layer_cells": 2.5},
@@ -681,13 +686,13 @@ def test_result_rejects_rasters_recorded_on_another_grid(
     assert small_result.snapshots is not None
     assert small_result.obstacle_mask is not None
     fewer_rows = small_result.snapshots[:, 5:-5, :]
-    with pytest.raises(ValueError, match=r"'snapshots \(axis 1\)'"):
+    with pytest.raises(ValueError, match=r"'snapshots \(axis 1\)' \(20\)"):
         replace(small_result, snapshots=fewer_rows)
     fewer_columns = small_result.snapshots[:, :, 5:-5]
     with pytest.raises(ValueError, match=r"'snapshots \(axis 2\)'"):
         replace(small_result, snapshots=fewer_columns)
     cropped_mask = small_result.obstacle_mask[5:-5, :]
-    with pytest.raises(ValueError, match="'obstacle_mask'"):
+    with pytest.raises(ValueError, match=r"'obstacle_mask' \(20\)"):
         replace(small_result, obstacle_mask=cropped_mask)
 
 
@@ -740,7 +745,7 @@ def test_plot_rejects_unknown_kind_and_missing_snapshots() -> None:
         sources=[GaussianPulse(ix=5, iy=5, width=1e-4)],
         probes=[(10, 10)],
     )
-    with pytest.raises(ValueError, match="kind"):
+    with pytest.raises(ValueError, match=r"kind must be 'probes'"):
         res.plot(kind="field")
-    with pytest.raises(ValueError, match="no snapshots"):
+    with pytest.raises(ValueError, match=r"the result holds no snapshots"):
         res.plot(kind="snapshot")

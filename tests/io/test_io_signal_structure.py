@@ -96,9 +96,9 @@ def test_crop_defaults_to_the_records_own_edges() -> None:
 def test_crop_refuses_an_empty_or_backwards_span() -> None:
     """A zero-length span, a reversed one and a negative start all raise."""
     whole = _stereo()
-    with pytest.raises(ValueError, match="greater than"):
+    with pytest.raises(ValueError, match=r"'tmax'.*must be greater than 'tmin'"):
         whole.crop(0.5, 0.5)
-    with pytest.raises(ValueError, match="greater than"):
+    with pytest.raises(ValueError, match=r"'tmax'.*must be greater than 'tmin'"):
         whole.crop(0.75, 0.25)
     with pytest.raises(ValueError, match="must not be negative"):
         whole.crop(-1.0, 0.5)

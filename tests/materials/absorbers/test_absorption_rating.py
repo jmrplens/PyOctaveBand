@@ -20,6 +20,8 @@ Validation strategy: the standard's own numbers, not self-consistency.
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pytest
 from reference_data import (
@@ -267,7 +269,7 @@ def test_curve_needing_shift_from_reference() -> None:
 def test_result_is_frozen() -> None:
     res = weighted_absorption(_ANNEX_A1_ALPHA_P)
     assert isinstance(res, AbsorptionRatingResult)
-    with pytest.raises(AttributeError):
+    with pytest.raises(dataclasses.FrozenInstanceError):
         res.alpha_w = 0.0  # type: ignore[misc]
 
 
@@ -293,7 +295,10 @@ def test_an_octave_curve_off_the_rating_axis_is_refused(field_name: str) -> None
 
     res = weighted_absorption(_ANNEX_A1_ALPHA_P)
     short = np.asarray(getattr(res, field_name), dtype=float)[:-1]
-    with pytest.raises(ValueError, match=f"'{field_name}'"):
+    with pytest.raises(
+        ValueError,
+        match=rf"'{field_name}'.*must each carry one value per octave band",
+    ):
         dataclasses.replace(res, **{field_name: short})
 
 
@@ -303,7 +308,10 @@ def test_a_single_value_reference_curve_is_refused() -> None:
 
     res = weighted_absorption(_ANNEX_A1_ALPHA_P)
     one_value = np.array([res.shifted_reference[1]])
-    with pytest.raises(ValueError, match="'shifted_reference'"):
+    with pytest.raises(
+        ValueError,
+        match=r"'shifted_reference' \(1\).*must each carry one value per octave band",
+    ):
         dataclasses.replace(res, shifted_reference=one_value)
 
 
@@ -429,15 +437,15 @@ def test_from_third_octave_rejects_wrong_length() -> None:
 def test_weighted_absorption_rejects_multidimensional_input() -> None:
     # A wrongly-shaped (3, 5) array must not be silently flattened (CodeRabbit).
     two_dimensional = np.zeros((3, 5))
-    with pytest.raises(ValueError, match="1-D"):
+    with pytest.raises(ValueError, match=r"alpha_p must be 1-D"):
         weighted_absorption(two_dimensional)
 
 
 def test_weighted_absorption_rejects_non_finite() -> None:
     # NaN/inf must fail fast with a clear message, not a cryptic downstream error.
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"alpha_p values must all be finite"):
         weighted_absorption([0.35, float("nan"), 0.65, 0.60, 0.55])
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"alpha_p values must all be finite"):
         weighted_absorption(
             {250: 0.35, 500: float("inf"), 1000: 0.65, 2000: 0.60, 4000: 0.55}
         )

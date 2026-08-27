@@ -51,7 +51,9 @@ def test_zero_phase_rejects_stateful() -> None:
         block_processing=filters.BlockProcessing(stateful=True),
     )
     silence = np.zeros(FS)
-    with pytest.raises(ValueError, match="zero_phase"):
+    with pytest.raises(
+        ValueError, match=r"zero_phase is not compatible with stateful processing"
+    ):
         bank.filter(silence, zero_phase=True)
 
 

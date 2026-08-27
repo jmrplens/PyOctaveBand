@@ -557,13 +557,13 @@ def test_source_validation() -> None:
         iy=1,  # type: ignore[arg-type]
         waveform=lambda t: 0.0,
     )
-    with pytest.raises(ValueError, match="outside the grid"):
+    with pytest.raises(ValueError, match="source position lies outside the grid"):
         sim.add_source(explosion_off_grid)
-    with pytest.raises(ValueError, match="outside the grid"):
+    with pytest.raises(ValueError, match="source position lies outside the grid"):
         sim.add_source(force_off_grid)
-    with pytest.raises(ValueError, match="inside an obstacle"):
+    with pytest.raises(ValueError, match="source position lies inside an obstacle"):
         sim.add_source(explosion_in_obstacle)
-    with pytest.raises(ValueError, match="inside an obstacle"):
+    with pytest.raises(ValueError, match="source position lies inside an obstacle"):
         sim.add_source(force_in_obstacle)
     with pytest.raises(ValueError, match="source ix must be an integer"):
         sim.add_source(explosion_bad_ix)
@@ -584,17 +584,29 @@ def test_source_validation() -> None:
             {"recording": ElasticRecording(snapshot_field="txx")},
             "snapshot_field must be one of",
         ),
-        ({"recording": ElasticRecording(snapshot_every=0)}, "snapshot_every"),
-        ({"recording": ElasticRecording(probes=[(99, 0)])}, "outside the grid"),
+        (
+            {"recording": ElasticRecording(snapshot_every=0)},
+            "snapshot_every must be >= 1",
+        ),
+        (
+            {"recording": ElasticRecording(probes=[(99, 0)])},
+            r"probe .* lies outside the grid",
+        ),
         (
             {"boundaries": ElasticBoundaries({"north": "free"})},
             "unknown boundary sides",
         ),
-        ({"boundaries": ElasticBoundaries("anechoic")}, "must be one of"),
-        ({"boundaries": ElasticBoundaries({"left": "open"})}, "must be one of"),
+        (
+            {"boundaries": ElasticBoundaries("anechoic")},
+            r"boundary for side .* must be one of",
+        ),
+        (
+            {"boundaries": ElasticBoundaries({"left": "open"})},
+            r"boundary for side .* must be one of",
+        ),
         (
             {"boundaries": ElasticBoundaries("absorbing", absorbing_layer_cells=0)},
-            "absorbing_layer_cells",
+            "absorbing_layer_cells must be >= 1",
         ),
     ],
 )
@@ -718,7 +730,7 @@ def test_orthogonal_free_sides_pin_both_corner_stresses() -> None:
 
 def test_collocated_rejects_unknown_field() -> None:
     sim = ElasticFDTD2D(6000.0, 3000.0, 0.01, rho=2700.0, shape=(10, 10))
-    with pytest.raises(ValueError, match="field must be one of"):
+    with pytest.raises(ValueError, match=r"\bfield must be one of"):
         sim.collocated("txy")
 
 
@@ -783,7 +795,9 @@ def test_plot_localizes_labels(small_result: ElasticFDTDResult) -> None:
 
 def test_plot_rejects_unknown_kind_and_missing_snapshots() -> None:
     res = _small_run(recording=replace(_SMALL_RECORDING, snapshot_every=None))
-    with pytest.raises(ValueError, match="kind"):
+    with pytest.raises(ValueError, match=r"kind must be 'probes'"):
         res.plot(kind="field")
-    with pytest.raises(ValueError, match="no snapshots"):
+    with pytest.raises(
+        ValueError, match=r"holds no snapshots; rerun .* with snapshot_every"
+    ):
         res.plot(kind="snapshot")

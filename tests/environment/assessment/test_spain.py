@@ -492,7 +492,7 @@ def test_new_activity_without_annual_information_is_refused() -> None:
     is an error rather than a silently omitted check.
     """
     periods, limits = _example_periods(), rd.activity_limits("a")
-    with pytest.raises(ValueError, match="annual index"):
+    with pytest.raises(ValueError, match=r"annual index LK,x is required"):
         rd.assess_activity(periods, limits)
 
 
@@ -538,13 +538,13 @@ def test_assess_activity_reports_only_the_periods_supplied() -> None:
 # --------------------------------------------------------------------------- #
 def test_noise_phase_validation() -> None:
     """A phase needs a positive duration, a finite level and non-negative corrections."""
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"'hours' must be a positive, finite number"):
         rd.NoisePhase(0.0, 50.0)
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"'hours' must be a positive, finite number"):
         rd.NoisePhase(-1.0, 50.0)
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'laeq' must be finite"):
         rd.NoisePhase(1.0, math.nan)
-    with pytest.raises(ValueError, match="0, 3 or 6"):
+    with pytest.raises(ValueError, match=r"'kt' must be 0"):
         rd.NoisePhase(1.0, 50.0, kt=-3.0)
 
 
@@ -558,9 +558,9 @@ def test_corrections_are_graded_zero_three_or_six() -> None:
     for step in rd.RD1367_CORRECTION_VALUES:
         assert rd.total_correction(step, step, 0.0) == min(2 * step, 9.0)
     for bad in (1.0, 4.5, 7.0, -3.0):
-        with pytest.raises(ValueError, match="0, 3 or 6"):
+        with pytest.raises(ValueError, match=r"'kt' must be 0"):
             rd.total_correction(bad)
-        with pytest.raises(ValueError, match="0, 3 or 6"):
+        with pytest.raises(ValueError, match=r"'kf' must be 0"):
             rd.corrected_level(50.0, kf=bad)
 
 
@@ -594,28 +594,34 @@ def test_tonal_correction_validation() -> None:
         rd.tonal_correction([60.0, 60.0], [100.0, 125.0, 160.0])
     with pytest.raises(ValueError, match="At least three"):
         rd.tonal_correction([60.0, 60.0], [100.0, 125.0])
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'levels' must contain finite values"):
         rd.tonal_correction([60.0, math.nan, 60.0], [100.0, 125.0, 160.0])
-    with pytest.raises(ValueError, match="strictly ascending"):
+    with pytest.raises(ValueError, match=r"'frequencies' must be strictly ascending"):
         rd.tonal_correction([60.0, 60.0, 60.0], [160.0, 125.0, 100.0])
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(
+        ValueError, match=r"'frequencies' must contain positive, finite values"
+    ):
         rd.tonal_correction([60.0, 60.0, 60.0], [0.0, 125.0, 160.0])
     two_dimensional = np.zeros((2, 3))
-    with pytest.raises(ValueError, match="one-dimensional"):
+    with pytest.raises(
+        ValueError, match=r"'levels' and 'frequencies' must be one-dimensional"
+    ):
         rd.tonal_correction(two_dimensional, two_dimensional)
 
 
 def test_limit_lookup_validation() -> None:
     """Unknown area types, room combinations and periods are rejected."""
-    with pytest.raises(ValueError, match="area_type"):
+    with pytest.raises(ValueError, match=r"'area_type' must be one of"):
         rd.activity_limits("z")
-    with pytest.raises(ValueError, match="building_use"):
+    with pytest.raises(ValueError, match=r"'building_use' must be one of"):
         rd.vibration_quality_objective("industrial")
-    with pytest.raises(ValueError, match="Unknown"):
+    with pytest.raises(
+        ValueError, match=r"Unknown \(building_use, room_type\) combination"
+    ):
         rd.indoor_quality_objectives("residential", "classrooms")
-    with pytest.raises(ValueError, match="urbanisation"):
+    with pytest.raises(ValueError, match=r"'urbanisation' must be 'existing'"):
         rd.outdoor_quality_objectives("a", urbanisation="future")
-    with pytest.raises(ValueError, match="period"):
+    with pytest.raises(ValueError, match=r"'period' must be one of"):
         rd.activity_limits("a")["afternoon"]
 
 
@@ -628,23 +634,34 @@ def test_assess_activity_validation() -> None:
     with pytest.raises(ValueError, match="no noise phases"):
         rd.assess_activity(empty_day, limits)
     afternoon = {"afternoon": [rd.NoisePhase(1.0, 50.0)]}
-    with pytest.raises(ValueError, match="evaluation period"):
+    with pytest.raises(
+        ValueError, match=r"None of the supplied keys is an evaluation period"
+    ):
         rd.assess_activity(afternoon, limits)
     day = {"day": [rd.NoisePhase(12.0, 50.0)]}
-    with pytest.raises(ValueError, match="operating_days"):
+    with pytest.raises(
+        ValueError,
+        match=r"'operating_days' must be a positive integer no larger than 'year_days'",
+    ):
         rd.assess_activity(day, limits, operating_days=400)
-    with pytest.raises(ValueError, match="year_days"):
+    with pytest.raises(
+        ValueError, match=r"'year_days' must be a positive whole number"
+    ):
         rd.assess_activity(day, limits, operating_days=10, year_days=0)
     # 'year_days' is validated even when it is the only annual input given,
     # and a fractional count of days is rejected rather than truncated.
-    with pytest.raises(ValueError, match="year_days"):
+    with pytest.raises(
+        ValueError, match=r"'year_days' must be a positive whole number"
+    ):
         rd.assess_activity(
             day,
             limits,
             long_term_levels={"day": 50.0},
             year_days=365.5,  # type: ignore[arg-type]
         )
-    with pytest.raises(ValueError, match="whole number"):
+    with pytest.raises(
+        ValueError, match=r"'operating_days' must be a whole number of days"
+    ):
         rd.assess_activity(
             day,
             limits,
@@ -707,19 +724,21 @@ def test_an_assessment_over_no_period_is_refused() -> None:
 
 def test_long_term_level_validation() -> None:
     """The annual average needs at least one finite level and matching weights."""
-    with pytest.raises(ValueError, match="At least one"):
+    with pytest.raises(ValueError, match="At least one daily level"):
         rd.long_term_corrected_level([])
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'daily_levels' must contain finite values"):
         rd.long_term_corrected_level([math.nan])
     with pytest.raises(ValueError, match=r"'daily_levels' .*'weights' .*same shape"):
         rd.long_term_corrected_level([50.0, 50.0], weights=[1.0])
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(
+        ValueError, match=r"'weights' must contain positive, finite values"
+    ):
         rd.long_term_corrected_level([50.0], weights=[0.0])
 
 
 def test_round_reported_level_rejects_non_finite() -> None:
     """Rounding a non-finite level is an error rather than a silent NaN."""
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'value' must be finite"):
         rd.round_reported_level(math.inf)
 
 
@@ -732,5 +751,5 @@ def test_a_tonal_correction_refuses_per_band_columns_that_disagree() -> None:
 
     frequencies = np.array([100.0, 125.0, 160.0, 200.0, 250.0])
     result = rd.tonal_correction(np.array([50.0, 62.0, 51.0, 50.0, 49.0]), frequencies)
-    with pytest.raises(ValueError, match="'levels'"):
+    with pytest.raises(ValueError, match=r"'levels' \(4\)"):
         dataclasses.replace(result, levels=result.levels[:-1])

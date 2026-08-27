@@ -72,7 +72,7 @@ def test_a_conflicting_rate_is_refused_a_matching_one_is_not(
     func: Callable[..., object], kwargs: dict[str, float | EQSection]
 ) -> None:
     sig = Signal(_tone(), FS)
-    with pytest.raises(ValueError, match="conflicts with the Signal's own fs"):
+    with pytest.raises(ValueError, match=r"fs=\d+ conflicts with the Signal's own fs"):
         func(sig, FS + 1, **kwargs)
     # The same number twice is agreement, not a conflict. Outside the block:
     # this call must succeed, and inside it a failure would read as a pass.
@@ -93,7 +93,7 @@ def test_a_bare_array_still_requires_fs(
     func: Callable[..., object], kwargs: dict[str, float | EQSection]
 ) -> None:
     x = _tone()
-    with pytest.raises(ValueError, match="fs is required"):
+    with pytest.raises(ValueError, match="fs is required when 'x' is a bare array"):
         func(x, **kwargs)
 
 
@@ -248,16 +248,21 @@ def test_the_arguments_behind_fs_are_keyword_only_and_required() -> None:
     """
     sig = Signal(_tone(), FS)
     section = EQSection("peaking", 1000.0, 3.0, 1.0)
-    with pytest.raises(TypeError, match="required keyword-only argument"):
+    with pytest.raises(
+        TypeError, match=r"linkwitz_riley\(\).*required keyword-only argument: 'freq'"
+    ):
         linkwitz_riley(sig)  # type: ignore[call-arg]
-    with pytest.raises(TypeError, match="required keyword-only argument"):
+    with pytest.raises(
+        TypeError,
+        match=r"parametric_eq\(\).*required keyword-only argument: 'sections'",
+    ):
         parametric_eq(sig)  # type: ignore[call-arg]
     # Required is only half of it: the slot behind fs used to accept a
     # positional value, and a call that still passes one must not be read as
     # something else (an order, a second section) rather than refused.
-    with pytest.raises(TypeError, match="positional arguments"):
+    with pytest.raises(TypeError, match=r"linkwitz_riley\(\).*positional arguments"):
         linkwitz_riley(sig, FS, 800.0)  # type: ignore[call-arg]
-    with pytest.raises(TypeError, match="positional arguments"):
+    with pytest.raises(TypeError, match=r"parametric_eq\(\).*positional arguments"):
         parametric_eq(sig, FS, section)  # type: ignore[call-arg]
 
 

@@ -115,7 +115,9 @@ def test_tonal_audibility_flat_spectrum_not_audible() -> None:
     # The flat spectrum's argmax candidate sits at the first line, whose
     # critical band extends below the supplied range: the truncation warning
     # fires alongside the (correct) no-identified-tone outcome.
-    with pytest.warns(WindTurbineNoiseWarning, match="critical band"):
+    with pytest.warns(
+        WindTurbineNoiseWarning, match=r"does not cover the whole critical band"
+    ):
         res = wind_turbine_tonality(levels, freqs)
     assert res.is_audible is False
     assert res.has_identified_tone is False
@@ -144,7 +146,7 @@ def test_tonal_audibility_rejects_mismatched_spectrum() -> None:
 
 def test_tonal_audibility_rejects_non_monotonic_frequencies() -> None:
     # A non-increasing frequency axis is not a valid narrowband spectrum.
-    with pytest.raises(ValueError, match="strictly increasing"):
+    with pytest.raises(ValueError, match=r"'frequencies' must be strictly increasing"):
         wind_turbine_tonality([30.0, 30.0, 30.0], [100.0, 98.0, 104.0])
 
 
@@ -152,7 +154,7 @@ def test_tonal_audibility_rejects_non_uniform_spacing() -> None:
     # Formulae 30-34 assume a uniform frequency resolution df. A near-miss axis
     # (2, 2, 2.4 Hz) that a loose 25 % tolerance would accept — but which biases
     # df and the ENBW/masking level — must be rejected by the tight tolerance.
-    with pytest.raises(ValueError, match="uniformly spaced"):
+    with pytest.raises(ValueError, match=r"'frequencies' must be uniformly spaced"):
         wind_turbine_tonality([30.0, 30.0, 30.0, 30.0], [100.0, 102.0, 104.0, 106.4])
 
 
@@ -228,7 +230,9 @@ def test_truncated_critical_band_warns() -> None:
     freqs = np.arange(460.0, 540.0 + df, df)  # narrower than CBW(500) = 117 Hz
     levels = np.full(freqs.size, 30.0)
     levels[int(np.argmin(np.abs(freqs - 500.0)))] = 60.0
-    with pytest.warns(WindTurbineNoiseWarning, match="critical band"):
+    with pytest.warns(
+        WindTurbineNoiseWarning, match=r"does not cover the whole critical band"
+    ):
         wind_turbine_tonality(levels, freqs, tone_frequency=500.0)
 
 
@@ -237,7 +241,7 @@ def test_candidate_below_20hz_rejected() -> None:
     freqs = np.arange(1.0, 200.0 + df, df)
     levels = np.full(freqs.size, 30.0)
     levels[int(np.argmin(np.abs(freqs - 10.0)))] = 60.0
-    with pytest.raises(ValueError, match="below 20 Hz"):
+    with pytest.raises(ValueError, match=r"The candidate tone lies below 20 Hz"):
         wind_turbine_tonality(levels, freqs, tone_frequency=10.0)
 
 
@@ -283,5 +287,5 @@ def test_slant_distance_vertical_axis() -> None:
     assert slant_distance(h, d, rotor_axis="vertical") == pytest.approx(
         np.hypot(h, h + d)
     )
-    with pytest.raises(ValueError, match="rotor_axis"):
+    with pytest.raises(ValueError, match=r"'rotor_axis' must be"):
         slant_distance(h, d, rotor_axis="diagonal")

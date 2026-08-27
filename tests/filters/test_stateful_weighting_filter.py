@@ -128,9 +128,9 @@ def test_stateful_weighting_invalid_fs_raises() -> None:
     """Non-positive sample rates must be rejected at construction."""
     from phonometry import filters
 
-    with pytest.raises(ValueError, match="must be positive"):
+    with pytest.raises(ValueError, match="'fs' must be positive"):
         filters.WeightingFilter(fs=0, stateful=True)
-    with pytest.raises(ValueError, match="must be positive"):
+    with pytest.raises(ValueError, match="'fs' must be positive"):
         filters.WeightingFilter(fs=-48000, stateful=True)
 
 
@@ -138,7 +138,9 @@ def test_stateful_weighting_high_accuracy_raises() -> None:
     """high_accuracy resampling is incompatible with block processing."""
     from phonometry import filters
 
-    with pytest.raises(ValueError, match="not compatible with stateful"):
+    with pytest.raises(
+        ValueError, match="high_accuracy is not compatible with stateful"
+    ):
         filters.WeightingFilter(fs=48000, stateful=True, high_accuracy=True)
 
 

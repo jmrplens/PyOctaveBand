@@ -295,8 +295,8 @@ def test_detection_range_from_curve_bridges_a_numerical_model() -> None:
 @pytest.mark.parametrize(
     ("kwargs", "message"),
     [
-        ({"max_range": 0.5}, "max_range"),
-        ({"n_points": 1}, "n_points"),
+        ({"max_range": 0.5}, r"'max_range' must exceed"),
+        ({"n_points": 1}, r"'n_points' must be at least"),
     ],
 )
 def test_detection_range_validates_its_arguments(
@@ -311,7 +311,7 @@ def test_detection_range_from_curve_validates_its_arguments() -> None:
         detection_range_from_curve(60.0, [1.0, 2.0], [10.0])
     with pytest.raises(ValueError, match="range_m.*strictly increasing"):
         detection_range_from_curve(60.0, [2.0, 1.0], [10.0, 20.0])
-    with pytest.raises(ValueError, match="crossing"):
+    with pytest.raises(ValueError, match=r"'crossing' must be"):
         detection_range_from_curve(60.0, [1.0, 2.0], [10.0, 20.0], crossing="middle")
 
 

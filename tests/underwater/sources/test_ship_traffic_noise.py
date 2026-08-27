@@ -139,9 +139,9 @@ def test_vessel_classes_exposed() -> None:
 
 
 def test_unknown_class_and_model_rejected() -> None:
-    with pytest.raises(ValueError, match="vessel_class"):
+    with pytest.raises(ValueError, match=r"'vessel_class' must be one of"):
         ship_source_spectrum(12.0, 100.0, vessel_class="submarine")
-    with pytest.raises(ValueError, match="model"):
+    with pytest.raises(ValueError, match=r"'model' must be one of"):
         ship_source_spectrum(12.0, 100.0, model="urick")
 
 

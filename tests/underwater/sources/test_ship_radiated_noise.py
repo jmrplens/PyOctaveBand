@@ -49,9 +49,13 @@ def test_radiated_noise_level_closed_form() -> None:
 
 
 def test_radiated_noise_level_rejects_bad_input() -> None:
-    with pytest.raises(ValueError, match="'rms_pressure'"):
+    with pytest.raises(
+        ValueError, match=r"'rms_pressure' must be a positive, finite number"
+    ):
         underwater.radiated_noise_level(0.0, 100.0)
-    with pytest.raises(ValueError, match="'distance'"):
+    with pytest.raises(
+        ValueError, match=r"'distance' must be a positive, finite number"
+    ):
         underwater.radiated_noise_level(1e-6, -1.0)
 
 
@@ -96,15 +100,15 @@ def test_hydrophone_depths() -> None:
 
 
 def test_hydrophone_depths_rejects_bad_angles() -> None:
-    with pytest.raises(ValueError, match="'angles'"):
+    with pytest.raises(ValueError, match=r"'angles' must be below"):
         underwater.hydrophone_depths(100.0, angles=(90.0,))
 
 
 def test_hydrophone_depths_rejects_non_finite_angles() -> None:
     # NaN/inf angles must be rejected, not silently yield NaN depths.
-    with pytest.raises(ValueError, match="'angles'"):
+    with pytest.raises(ValueError, match=r"'angles' must be finite"):
         underwater.hydrophone_depths(100.0, angles=(np.nan,))
-    with pytest.raises(ValueError, match="'angles'"):
+    with pytest.raises(ValueError, match=r"'angles' must be finite"):
         underwater.hydrophone_depths(100.0, angles=(np.inf,))
 
 

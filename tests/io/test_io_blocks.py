@@ -133,17 +133,24 @@ def test_lossy_sources_warn_when_streaming_begins(tmp_path: Path) -> None:
     path = tmp_path / "note.mp3"
     sf.write(str(path), x, FS)
     blocks = iter(read_blocks(path, 1024))
-    with pytest.warns(LossyCompressionWarning, match="not metrologically"):
+    with pytest.warns(
+        LossyCompressionWarning,
+        match=r"is a lossy format.*not metrologically defensible",
+    ):
         next(blocks)
 
 
 def test_invalid_geometry_is_refused(tmp_path: Path) -> None:
     path = _write(tmp_path, pcm_wav(np.zeros(8, dtype=np.int64), bits=16))
-    with pytest.raises(ValueError, match="block_size"):
+    with pytest.raises(ValueError, match=r"block_size must be at least"):
         read_blocks(path, 0)
-    with pytest.raises(ValueError, match="overlap"):
+    with pytest.raises(
+        ValueError, match=r"overlap must satisfy 0 <= overlap < block_size"
+    ):
         read_blocks(path, 4, overlap=4)
-    with pytest.raises(ValueError, match="overlap"):
+    with pytest.raises(
+        ValueError, match=r"overlap must satisfy 0 <= overlap < block_size"
+    ):
         read_blocks(path, 4, overlap=-1)
 
 
@@ -157,7 +164,7 @@ def test_a_truncated_data_chunk_fails_mid_stream(tmp_path: Path) -> None:
     path = _write(tmp_path, image)
     blocks = read_blocks(path, 8)
     next(blocks)  # frames 0-8 exist
-    with pytest.raises(ValueError, match="bytes short"):
+    with pytest.raises(ValueError, match=r"data chunk ends \d+ bytes short of frame"):
         list(blocks)
 
 

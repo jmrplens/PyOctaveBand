@@ -41,7 +41,7 @@ def test_plot_spanish_labels() -> None:
 
 def test_plot_unknown_language_raises() -> None:
     result = _result()
-    with pytest.raises(ValueError, match="Unknown language"):
+    with pytest.raises(ValueError, match=r"Unknown language 'xx'"):
         result.plot(language="xx")
     plt.close("all")
 

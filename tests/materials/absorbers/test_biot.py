@@ -844,9 +844,11 @@ def test_an_unresolvable_stack_is_refused_instead_of_exhausting_memory() -> None
         materials.PorousLayer(400.0, _dense_medium(frequency)),
         _dense_poroelastic(frequency, 0.05),
     ]
-    with pytest.raises(ValueError, match="nepers"):
+    with pytest.raises(ValueError, match=r"PoroelasticLayer attenuates by \d+ nepers"):
         materials.layered_absorber(frequency, [floppy])
-    with pytest.raises(ValueError, match="nepers"):
+    with pytest.raises(
+        ValueError, match=r"the fluid layers of the stack attenuate by \d+ nepers"
+    ):
         materials.layered_absorber(frequency, deaf_run)
 
 
@@ -1148,20 +1150,42 @@ def test_biot_waves_rejects_bad_input() -> None:
         "frame_density": TABLE_6_1_FRAME_DENSITY,
         "shear_modulus": TABLE_6_1_SHEAR_MODULUS,
     }
-    with pytest.raises(ValueError, match="must not exceed 1"):
+    with pytest.raises(ValueError, match=r"'porosity' must not exceed"):
         materials.biot_waves(medium, **{**kwargs, "porosity": 1.5})
-    with pytest.raises(ValueError, match="must be >= 1"):
+    with pytest.raises(ValueError, match=r"'tortuosity' must be >="):
         materials.biot_waves(medium, **{**kwargs, "tortuosity": 0.5})
-    with pytest.raises(ValueError, match="must be positive"):
+    with pytest.raises(ValueError, match=r"'frame_density' must be positive"):
         materials.biot_waves(medium, **{**kwargs, "frame_density": 0.0})
-    with pytest.raises(ValueError, match="positive real part"):
+    with pytest.raises(
+        ValueError, match=r"'shear_modulus' must have a positive real part"
+    ):
         materials.biot_waves(medium, **{**kwargs, "shear_modulus": -1.0})
-    with pytest.raises(ValueError, match="non-negative imaginary part"):
+    with pytest.raises(
+        ValueError, match=r"'shear_modulus' must have a non-negative imaginary part"
+    ):
         materials.biot_waves(medium, **{**kwargs, "shear_modulus": 1.0 - 1.0j})
-    with pytest.raises(ValueError, match="must be finite"):
+    with pytest.raises(ValueError, match=r"'shear_modulus' must be finite"):
         materials.biot_waves(medium, **{**kwargs, "shear_modulus": complex("nan")})
-    with pytest.raises(ValueError, match="-1 < nu < 0,5"):
+    with pytest.raises(ValueError, match=r"'poisson_ratio' must satisfy"):
         materials.biot_waves(medium, **kwargs, poisson_ratio=0.5)
+
+
+@pytest.mark.parametrize("nu", [-1.5, -1.0, 0.5, 0.6])
+def test_frame_bulk_modulus_rejects_a_poisson_ratio_off_the_stability_range(
+    nu: float,
+) -> None:
+    """Both ends of the isotropic range are closed, for opposite reasons.
+
+    Eq. (6.29) reads ``Kb = 2 N (nu + 1)/(3(1 - 2 nu))``. At the upper end the
+    denominator vanishes and ``Kb`` diverges: the incompressible-solid limit.
+    At the lower end the numerator vanishes and ``Kb`` collapses to zero, a
+    frame that carries shear but no compression at all. Neither is a
+    thermodynamically stable elastic solid, so the value at either bound is
+    refused rather than returned as a modulus.
+    """
+    n_mod = 3.0e5 * (1.0 + 0.07j)
+    with pytest.raises(ValueError, match=r"'poisson_ratio' must satisfy"):
+        materials.frame_bulk_modulus(n_mod, nu)
 
 
 def test_layer_rejects_a_medium_on_another_grid() -> None:
@@ -1175,18 +1199,21 @@ def test_layer_rejects_a_medium_on_another_grid() -> None:
         TABLE_6_1_FRAME_DENSITY,
         TABLE_6_1_SHEAR_MODULUS,
     )
-    with pytest.raises(ValueError, match="different frequency"):
+    with pytest.raises(
+        ValueError,
+        match=r"PoroelasticLayer\.medium was evaluated on a different frequency vector",
+    ):
         materials.layered_absorber(frequency, [layer])
 
 
 def test_surface_impedance_and_transfer_matrix_reject_bad_thickness() -> None:
     frequency = np.geomspace(100.0, 1000.0, 4)
     waves = _glass_wool_waves(frequency)
-    with pytest.raises(ValueError, match="must be positive"):
+    with pytest.raises(ValueError, match=r"'thickness' must be positive"):
         materials.biot_surface_impedance(waves, 0.0)
-    with pytest.raises(ValueError, match="must be positive"):
+    with pytest.raises(ValueError, match=r"'thickness' must be positive"):
         materials.poroelastic_transfer_matrix(waves, -0.01)
-    with pytest.raises(ValueError, match="must be positive"):
+    with pytest.raises(ValueError, match=r"'thickness' must be positive"):
         materials.frame_quarter_wave_resonance(
             0.0, shear_modulus=1.0, poisson_ratio=0.0, frame_density=30.0
         )
