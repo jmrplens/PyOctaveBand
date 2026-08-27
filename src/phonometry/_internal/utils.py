@@ -8,8 +8,10 @@ from typing import TYPE_CHECKING, cast
 import numpy as np
 from scipy import signal
 
+from .validation import _as_float64
+
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    from numpy.typing import ArrayLike
 
 # Rank of the cached SOS filter state ``zi`` as ``_sos_initial_state`` lays
 # it out: (n_sections, 2) for 1-D input, (n_sections, n_channels, 2) for 2-D.
@@ -17,17 +19,56 @@ _ZI_NDIM_MONO = 2
 _ZI_NDIM_MULTICHANNEL = 3
 
 
-def _typesignal(x: Sequence[float] | np.ndarray) -> np.ndarray:
+def _typesignal(x: ArrayLike, *, name: str = "x") -> np.ndarray:
     """Ensure signal is a float64 numpy array.
 
     Integer inputs (e.g. int16 audio from ``scipy.io.wavfile.read``) are
     converted to float64 to prevent silent overflow when the signal is
     squared internally. Float64 arrays are passed through without copying.
 
+    Every entry point that consumes a recording resolves its samples here or
+    through :func:`phonometry.io._resolve.resolve_samples`, which is why the
+    three refusals below live in one place rather than in each of them.
+
+    ``np.asarray`` on its own says too little and admits too much. A string
+    or a ragged list of lists comes back in numpy's own words, naming no
+    parameter, and a dict, a complex number or a plain object comes back as
+    a ``TypeError``, which is not the exception these entry points document;
+    both are re-raised as a ``ValueError`` that says which argument was
+    wrong, exactly as :func:`~phonometry._internal.validation._as_float64`
+    does for the result fields one layer up.
+
+    ``None`` it does not refuse at all. ``None`` converts, to a ``NaN``
+    array of one sample, so a call that lost its signal on the way in came
+    back with a whole spectrum of ``NaN`` and refused nothing. It is not a
+    ``Signal``, not a sequence of floats and not an array, which is what
+    ``ArrayLike`` above says and what every caller's own annotation says.
+
+    A non-finite sample is refused for the same reason one layer further
+    down: a single ``NaN`` survives every filter and poisons every band
+    computed from it, and it arrives by two routes that are the same value
+    afterwards -- a ``None`` sitting inside the sequence, and a ``NaN`` the
+    caller passed. The entry points that refused it by hand did so each in
+    its own words, and only some of them refused it at all; the check
+    belongs where every one of them passes, and they now share this one.
+
     :param x: Input signal.
+    :param name: Parameter name used in the error messages.
     :return: Numpy float64 array.
+    :raises ValueError: if *x* is ``None``, cannot be read as numbers, or
+        carries a ``NaN`` or an infinity.
     """
-    return np.atleast_1d(np.asarray(x, dtype=np.float64))
+    if x is None:
+        msg = f"'{name}' must be a signal, not None."
+        raise ValueError(msg)
+    samples = np.atleast_1d(_as_float64(x, name))
+    if not np.all(np.isfinite(samples)):
+        msg = (
+            f"'{name}' must contain only finite samples; a None inside the "
+            "sequence arrives as a NaN and is refused the same way."
+        )
+        raise ValueError(msg)
+    return samples
 
 
 def _resample_to_length(y: np.ndarray, factor: int, target_length: int) -> np.ndarray:

@@ -195,19 +195,15 @@ def spinal_response(acceleration: SignalInput, fs: float | None = None) -> np.nd
     fs = require_positive(resolve_fs(acceleration, fs, name="acceleration"), "fs")
     # calibrate=False: a Signal may carry a digital-to-pascal factor, and
     # this is an acceleration in m/s2. See phonometry.io._resolve.
-    az = np.asarray(resolve_samples(acceleration, calibrate=False), dtype=np.float64)
+    az = np.asarray(
+        resolve_samples(acceleration, calibrate=False, name="acceleration"),
+        dtype=np.float64,
+    )
     if az.ndim != 1:
         msg = "acceleration must be a 1-D time series."
         raise ValueError(msg)
     if az.size == 0:
         msg = "acceleration must not be empty."
-        raise ValueError(msg)
-    # Refuse a corrupt record outright, as the STIPA and STOI entries do: a
-    # single NaN sample turns the whole IIR spinal response NaN, every NaN
-    # comparison then counts zero peaks, and the assessment reports R = 0.0
-    # (the safest possible verdict) with no trace of the corruption.
-    if not np.all(np.isfinite(az)):
-        msg = "acceleration must contain only finite values."
         raise ValueError(msg)
     spectrum = np.fft.rfft(az)
     freq = np.fft.rfftfreq(az.size, d=1.0 / fs)

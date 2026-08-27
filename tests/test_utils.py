@@ -1,7 +1,10 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for internal utility helpers."""
 
+from typing import Any
+
 import numpy as np
+import pytest
 
 from phonometry._internal.utils import _resample_to_length, _typesignal
 
@@ -18,6 +21,88 @@ def test_typesignal_preserves_float64_without_copy() -> None:
     """float64 arrays pass through unchanged (no copy)."""
     x = np.array([1.0, 2.0])
     assert _typesignal(x) is x
+
+
+def test_typesignal_refuses_none_as_the_whole_signal() -> None:
+    """None is not a signal, and converts to a NaN array rather than raising."""
+    with pytest.raises(ValueError, match=r"'x' must be a signal, not None"):
+        _typesignal(None)
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        pytest.param("hello", id="string"),
+        pytest.param({"a": 1.0}, id="dict"),
+        pytest.param(object(), id="object"),
+        pytest.param(1 + 2j, id="complex"),
+        pytest.param([[1.0, 2.0], [3.0]], id="ragged"),
+    ],
+)
+def test_typesignal_refuses_what_is_not_numeric_by_name(bad: Any) -> None:  # noqa: ANN401 - the point is that anything at all may arrive here
+    """What numpy cannot read as numbers is refused naming the parameter.
+
+    Numpy answers a string or a ragged list in its own words and an object or
+    a dict with a TypeError, which is not the exception the entry points
+    document.
+    """
+    with pytest.raises(ValueError, match=r"'x' must be numeric"):
+        _typesignal(bad)
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        pytest.param([1.0, np.nan, 3.0], id="nan"),
+        pytest.param([1.0, np.inf, 3.0], id="inf"),
+        pytest.param([1.0, None, 3.0], id="none-inside-the-sequence"),
+    ],
+)
+def test_typesignal_refuses_a_non_finite_sample(bad: Any) -> None:  # noqa: ANN401 - a list carrying a None is not a Sequence[float]
+    """One poisoned sample is refused, whichever of the two routes it came by.
+
+    A None inside the sequence and a NaN the caller passed are the same value
+    after conversion, so the message speaks for both.
+    """
+    with pytest.raises(ValueError, match=r"'x' must contain only finite samples"):
+        _typesignal(bad)
+
+
+def test_typesignal_names_the_parameter_it_was_given() -> None:
+    """The name is the caller's, so a refusal names an argument that exists."""
+    with pytest.raises(ValueError, match=r"'reference' must be numeric"):
+        _typesignal("hello", name="reference")
+
+
+@pytest.mark.parametrize(
+    ("legal", "shape"),
+    [
+        pytest.param([], (0,), id="empty"),
+        pytest.param([1.0], (1,), id="single-sample"),
+        pytest.param(np.zeros(16), (16,), id="silent-buffer-of-exact-zeros"),
+        pytest.param(np.arange(8, dtype=np.int16), (8,), id="integer-array"),
+        pytest.param(np.zeros((2, 8)), (2, 8), id="two-dimensional"),
+        pytest.param(
+            np.ma.masked_array([1.0, 2.0, 3.0], mask=[0, 1, 0]), (3,), id="masked"
+        ),
+        pytest.param(np.asfortranarray(np.zeros((2, 8))), (2, 8), id="fortran-ordered"),
+        pytest.param(np.zeros(16)[::2], (8,), id="non-contiguous-slice"),
+    ],
+)
+def test_typesignal_still_accepts_every_legal_shape_of_signal(
+    legal: Any,  # noqa: ANN401 - the parametrization is over unrelated array-likes
+    shape: tuple[int, ...],
+) -> None:
+    """The refusals must not have narrowed what a signal is allowed to be.
+
+    A resolver under twenty-nine entry points refuses for all of them at once,
+    so an empty record, one sample, a silence of exact zeros, an int16 take
+    straight off a WAV, a (channels, samples) block, a masked array, a
+    Fortran-ordered block and a strided view all have to survive it.
+    """
+    out = _typesignal(legal)
+    assert out.shape == shape
+    assert out.dtype == np.float64
 
 
 def test_resample_to_length_padding_and_trimming() -> None:

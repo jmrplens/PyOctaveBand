@@ -375,7 +375,9 @@ def impact_force_exposure_level(
     sample_rate = resolve_fs(force, sample_rate, name="force", rate="sample_rate")
     # calibrate=False: a Signal may carry a digital-to-pascal factor and
     # this record is a force in newtons. See phonometry.io._resolve.
-    f = require_finite_array(resolve_samples(force, calibrate=False), "force")
+    f = require_finite_array(
+        resolve_samples(force, calibrate=False, name="force"), "force"
+    )
     if f.size < _MIN_TRAPEZOID_SAMPLES:
         msg = "'force' must be a 1-D record of at least two samples."
         raise ValueError(msg)

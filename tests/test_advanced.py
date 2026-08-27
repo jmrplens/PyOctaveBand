@@ -132,24 +132,29 @@ def test_nan_handling() -> None:
     """Test the behavior when the input signal contains NaN values.
 
     **Purpose:**
-    Determine if NaNs in the input propagate to the output.
+    Determine what a NaN in the input does to the output.
 
     **Verification:**
     - Create a signal with a single NaN value.
     - Process it through the filter bank.
 
     **Expectation:**
-    - Digital filters (IIR/SOS) inherently propagate NaNs because the output depends on previous inputs.
-    - The output SPL array should contain NaNs, confirming standard signal processing behavior.
+    - Refused, by the name of the parameter that carried it.
+    - This test used to assert the opposite: that the NaN propagated, on the
+      grounds that an IIR filter inherently propagates one. It does, which is
+      exactly why the propagation is not something to hand a caller. One
+      poisoned sample in 4800 came back as eight bands of NaN with nothing
+      said, so a measurement with a single dropout read as a whole ruined
+      spectrum and there was no way to tell it from a broken instrument.
+      The refusal is the resolver's, so every entry point on it answers alike.
     """
     fs = 48000
     rng = np.random.default_rng(42)
     x = rng.standard_normal(4800)
     x[100] = np.nan
 
-    spl, _ = filters.octave_filter(x, fs)
-    # Expect NaNs in SPL
-    assert np.isnan(spl).any()
+    with pytest.raises(ValueError, match=r"'x' must contain only finite samples"):
+        filters.octave_filter(x, fs)
 
 
 def test_silence() -> None:

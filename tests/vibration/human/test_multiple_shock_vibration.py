@@ -265,7 +265,9 @@ def test_a_corrupt_seat_record_is_refused_where_it_enters(bad: float) -> None:
     az = np.zeros(2560)
     az[::400] = 60.0
     az[50] = bad
-    with pytest.raises(ValueError, match="acceleration must contain only finite"):
+    with pytest.raises(
+        ValueError, match="'acceleration' must contain only finite samples"
+    ):
         v.multiple_shock_assessment(
             az, 256.0, start_age=20, years=20, days_per_year=120, sex="male"
         )

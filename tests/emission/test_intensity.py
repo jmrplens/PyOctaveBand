@@ -751,11 +751,18 @@ def test_a_non_finite_broadband_total_is_refused(field_name: str) -> None:
         dataclasses.replace(result, **{field_name: float("nan")})
 
 
-def test_a_nan_sample_is_refused_at_the_result_instead_of_titling_the_figure() -> None:
-    """The same guard catches the producer path: NaN in, refusal out."""
+def test_a_nan_sample_is_refused_at_the_probe_instead_of_titling_the_figure() -> None:
+    """The producer path refuses it first, and says which probe carried it.
+
+    The result guard above would still catch a NaN total, and it is what
+    stood between this producer and a figure titled ``nan dB``. The sample
+    no longer reaches it: the resolver refuses a non-finite sample as the
+    signal comes in, which names ``p1`` rather than the derived total the
+    caller never passed and cannot go looking for.
+    """
     p1, p2 = _plane_wave_pair(delay_s=SPACING / C)
     p1[10] = np.nan
-    with pytest.raises(ValueError, match="'total_intensity' must be finite"):
+    with pytest.raises(ValueError, match="'p1' must contain only finite samples"):
         emission.sound_intensity(p1, p2, FS, spacing=SPACING, rho=RHO, c=C, fraction=3)
 
 

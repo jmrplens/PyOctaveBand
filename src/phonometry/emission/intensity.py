@@ -660,8 +660,8 @@ def sound_intensity(
     :return: :class:`IntensityResult`.
     """
     fs = resolve_pair_fs(p1, p2, fs, names=("p1", "p2"))
-    x1 = apply_calibration(p1, _typesignal(np.asarray(p1)))
-    x2 = apply_calibration(p2, _typesignal(np.asarray(p2)))
+    x1 = apply_calibration(p1, _typesignal(p1, name="p1"))
+    x2 = apply_calibration(p2, _typesignal(p2, name="p2"))
     _validate_probe_signals(x1, x2)
     _validate_probe_medium(fs, spacing, rho, c)
     _validate_band_options(fraction, limits)

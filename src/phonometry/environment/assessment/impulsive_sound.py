@@ -681,7 +681,7 @@ def sound_pressure_level_history(
     from ...filters.weighting import time_weighting, weighting_filter
 
     fs = resolve_fs(signal, fs, name="signal")
-    x = np.asarray(resolve_samples(signal), dtype=np.float64).ravel()
+    x = np.asarray(resolve_samples(signal, name="signal"), dtype=np.float64).ravel()
     if not math.isfinite(fs) or fs <= 0.0:
         msg = "fs must be positive."
         raise ValueError(msg)
@@ -928,7 +928,7 @@ def impulsive_sound_adjustment(
     :raises ValueError: for invalid ``fs``, ``dt`` or an empty signal.
     """
     fs = resolve_fs(signal, fs, name="signal")
-    x = np.asarray(resolve_samples(signal), dtype=np.float64).ravel()
+    x = np.asarray(resolve_samples(signal, name="signal"), dtype=np.float64).ravel()
     times, levels = sound_pressure_level_history(
         x,
         fs,

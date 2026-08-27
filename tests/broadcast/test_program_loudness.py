@@ -705,9 +705,9 @@ def test_program_loudness_validation() -> None:
     # A NaN-poisoned programme must not silently measure as digital silence.
     poisoned = _stereo(_sine(-23.0, 1.0))
     poisoned[0, 100] = np.nan
-    with pytest.raises(ValueError, match=r"Input signal 'x' must be finite"):
+    with pytest.raises(ValueError, match=r"'x' must contain only finite samples"):
         program_loudness(poisoned, FS)
-    with pytest.raises(ValueError, match=r"Input signal 'x' must be finite"):
+    with pytest.raises(ValueError, match=r"'x' must contain only finite samples"):
         integrated_loudness(poisoned, FS)
 
 

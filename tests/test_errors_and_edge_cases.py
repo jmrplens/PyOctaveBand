@@ -331,6 +331,46 @@ def test_octave_filter_rejects_malformed_limits_on_the_plotting_path() -> None:
         )
 
 
+def test_octave_filter_refuses_a_missing_signal_instead_of_answering_nan() -> None:
+    """Verify that a lost signal is refused rather than measured.
+
+    **Purpose:**
+    A caller whose signal never arrived must be told so, not handed a reading.
+
+    **Verification:**
+    - Call the filter bank with None where the signal goes.
+
+    **Expectation:**
+    - A `ValueError` naming `'x'`. None used to convert to a one-sample NaN
+      array, so this call returned eight bands of NaN and refused nothing.
+    """
+    with pytest.raises(ValueError, match="'x' must be a signal, not None"):
+        filters.octave_filter(None, 48000)  # type: ignore[arg-type]
+
+
+def test_a_refusal_names_the_parameter_of_the_entry_point_that_was_called() -> None:
+    """Verify the parameter named in the message is one the caller can find.
+
+    **Purpose:**
+    The resolver sits under every entry point that consumes a recording, so a
+    message hard-coded to `'x'` would name an argument that most of them do
+    not have.
+
+    **Verification:**
+    - Reach the same refusal through `sensitivity`, whose signal parameter is
+      called `ref_signal`.
+
+    **Expectation:**
+    - The message names `'ref_signal'`, not `'x'`.
+    """
+    poisoned = np.sin(2 * np.pi * 1000.0 * np.arange(4800) / 48000.0)
+    poisoned[100] = np.nan
+    with pytest.raises(
+        ValueError, match="'ref_signal' must contain only finite samples"
+    ):
+        metrology.sensitivity(poisoned, fs=48000)
+
+
 def test_process_bands_without_level_calculation() -> None:
     """Verify internal band processing can skip level calculation."""
     bank = filters.OctaveFilterBank(48000)

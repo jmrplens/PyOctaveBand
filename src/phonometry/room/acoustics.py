@@ -473,7 +473,7 @@ def _band_parameters(x: np.ndarray, fs: int) -> tuple[float, ...]:
 
 
 def _validate_ir(ir: Signal | list[float] | np.ndarray, fs: int) -> np.ndarray:
-    x = _typesignal(np.asarray(ir))
+    x = _typesignal(ir, name="ir")
     if x.ndim != 1:
         msg = "The impulse response must be one-dimensional."
         raise ValueError(msg)

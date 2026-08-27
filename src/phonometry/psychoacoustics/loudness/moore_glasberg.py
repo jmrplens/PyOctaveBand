@@ -1035,14 +1035,9 @@ def loudness_moore_glasberg(
     """
     _validate_conditions(field, presentation)
     fs = resolve_fs(x, fs)
-    pressure = apply_calibration(
-        x, require_1d_signal(_typesignal(np.asarray(x)), name="'x'")
-    )
+    pressure = apply_calibration(x, require_1d_signal(_typesignal(x), name="'x'"))
     if pressure.size == 0:
         msg = "Input signal 'x' cannot be empty."
-        raise ValueError(msg)
-    if not np.all(np.isfinite(pressure)):
-        msg = "Input signal 'x' must contain only finite values."
         raise ValueError(msg)
     if fs <= 0.0:
         msg = f"'fs' must be a positive sampling rate, got {fs!r}."

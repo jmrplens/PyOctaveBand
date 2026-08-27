@@ -329,7 +329,7 @@ def tone_to_noise_ratio(
     :return: :class:`ToneAssessment` with ``ratio_db`` = TNR in dB.
     """
     fs = resolve_fs(x, fs)
-    x_proc = apply_calibration(x, np.atleast_1d(_typesignal(np.asarray(x))))
+    x_proc = apply_calibration(x, _typesignal(x))
     if x_proc.ndim != 1:
         msg = "tone_to_noise_ratio expects a 1D signal."
         raise ValueError(msg)
@@ -458,7 +458,7 @@ def prominence_ratio(
     :return: :class:`ToneAssessment` with ``ratio_db`` = PR in dB.
     """
     fs = resolve_fs(x, fs)
-    x_proc = apply_calibration(x, np.atleast_1d(_typesignal(np.asarray(x))))
+    x_proc = apply_calibration(x, _typesignal(x))
     if x_proc.ndim != 1:
         msg = "prominence_ratio expects a 1D signal."
         raise ValueError(msg)

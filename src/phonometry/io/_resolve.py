@@ -26,6 +26,16 @@ The rules, identical everywhere:
   only a label for the result's time axis and the computation never reads
   it, which is :func:`resolve_optional_fs` and stays callable without
   one.
+- **Samples.** What is not a signal is refused here, by the name the
+  entry point gave it, and as a ``ValueError`` because that is what the
+  entry points document: ``None``, a string, a dict, a ragged list of
+  lists, and a ``NaN`` or an infinity among the samples. The last of
+  those is a refusal rather than a passing-on because a single
+  non-finite sample survives every filter and poisons every band
+  computed from it, so a call that lost one sample comes back with a
+  whole spectrum of ``NaN`` and nothing said. See
+  :func:`phonometry._internal.utils._typesignal`, which is where all of
+  it happens.
 - **Calibration.** A calibrated Signal presents its samples in pascals.
   One rule rather than a per-function taxonomy: it is what keeps every
   surface on this contract talking about the same signal, instead of one
@@ -171,25 +181,31 @@ def resolve_calibration(x: SignalInput, calibration_factor: float | None) -> flo
     return 1.0
 
 
-def resolve_samples(x: SignalInput, *, calibrate: bool = True) -> np.ndarray:
+def resolve_samples(
+    x: SignalInput, *, calibrate: bool = True, name: str = "x"
+) -> np.ndarray:
     """The float64 samples of the input, in pascals when it can know.
 
     A :class:`~phonometry.io.Signal` contributes its array view (1-D for
     one channel, ``(channels, samples)`` for several), so a mono Signal
-    yields the same result a mono array does; bare input passes through
-    :func:`_typesignal` untouched.
+    yields the same result a mono array does. Both forms go through
+    :func:`_typesignal`, which is where an input that is not a signal at
+    all -- ``None``, a string, a ragged list, a ``NaN`` sample -- is
+    refused by the name this call gives it; only the factor below tells
+    the two apart.
 
     :param x: The signal argument, a Signal or a bare array.
     :param calibrate: Whether a calibrated Signal's factor is applied.
         ``False`` for the functions that own the factor themselves (they
         pair this with :func:`resolve_calibration`) and for the
         documented exemptions in the module docstring.
+    :param name: Name of the signal parameter, for the error messages.
     :return: The samples, float64.
+    :raises ValueError: If *x* is ``None``, cannot be read as numbers, or
+        carries a non-finite sample.
     """
-    if not isinstance(x, Signal):
-        return _typesignal(x)
-    samples = _typesignal(np.asarray(x))
-    if calibrate and x.calibration_factor is not None:
+    samples = _typesignal(x, name=name)
+    if calibrate and isinstance(x, Signal) and x.calibration_factor is not None:
         return samples * x.calibration_factor
     return samples
 

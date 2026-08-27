@@ -181,7 +181,9 @@ def test_rejects_bad_inputs() -> None:
     with pytest.raises(ValueError, match=r"'response' must be one-dimensional"):
         signals.regularized_inverse_filter(two_dim, FS, f_range=(200.0, 4000.0))
     with_nan = np.array([1.0, np.nan])
-    with pytest.raises(ValueError, match=r"'response' must be finite"):
+    with pytest.raises(
+        ValueError, match=r"'response' must contain only finite samples"
+    ):
         signals.regularized_inverse_filter(with_nan, FS, f_range=(200.0, 4000.0))
     all_zero = np.zeros(64)
     with pytest.raises(ValueError, match=r"'response' must not be identically zero"):
