@@ -226,7 +226,7 @@ def test_a_full_scale_reading_never_sees_the_calibration(
     calibrated = func(Signal(_RECORD, FS, calibration_factor=CAL), **kwargs)
     assert_same(calibrated, func(_RECORD, FS, **kwargs))
     pre_scaled = func(CAL * _RECORD, FS, **kwargs)
-    with pytest.raises(AssertionError):
+    with pytest.raises(AssertionError, match=r"result.*differs"):
         assert_same(calibrated, pre_scaled)
 
 
@@ -265,7 +265,7 @@ def test_a_non_pressure_record_never_sees_the_calibration(
     calibrated = func(Signal(_RECORD, FS, calibration_factor=CAL), **kwargs)
     assert_same(calibrated, func(_RECORD, FS, **kwargs))
     pre_scaled = func(CAL * _RECORD, FS, **kwargs)
-    with pytest.raises(AssertionError):
+    with pytest.raises(AssertionError, match=r"result.*differs"):
         assert_same(calibrated, pre_scaled)
 
 

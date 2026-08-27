@@ -28,10 +28,14 @@ from __future__ import annotations
 
 import dataclasses
 import math
+from typing import TYPE_CHECKING
 
 import pytest
 
 from phonometry import electroacoustics
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 #: Long, printed p. 697: "the desired open-loop system gain might be of the
 #: order of -6 dB", typical of an auditorium or church.
@@ -255,7 +259,7 @@ def test_validation_errors() -> None:
     with pytest.raises(ValueError, match=r"'open_loop_gain' must be finite"):
         electroacoustics.feedback_stability(math.nan, 74.0, 80.0)
     with pytest.raises(
-        ValueError, match=r"Levels and the directivity index must be finite"
+        ValueError, match=r"'level_loudspeaker_at_microphone' must be finite"
     ):
         electroacoustics.feedback_stability(-6.0, math.inf, 80.0)
     with pytest.raises(
@@ -264,3 +268,38 @@ def test_validation_errors() -> None:
         electroacoustics.feedback_stability(-6.0, 74.0, 80.0, stability_margin=-1.0)
     with pytest.raises(ValueError, match="integer of at least 1"):
         electroacoustics.feedback_stability(-6.0, 74.0, 80.0, open_microphones=0)
+
+
+@pytest.mark.parametrize(
+    ("field", "call"),
+    [
+        (
+            "level_loudspeaker_at_microphone",
+            lambda bad: electroacoustics.feedback_stability(-6.0, bad, 80.0),
+        ),
+        (
+            "level_loudspeaker_at_listener",
+            lambda bad: electroacoustics.feedback_stability(-6.0, 74.0, bad),
+        ),
+        (
+            "microphone_directivity",
+            lambda bad: electroacoustics.feedback_stability(
+                -6.0, 74.0, 80.0, microphone_directivity=bad
+            ),
+        ),
+    ],
+)
+def test_the_loop_gain_names_which_of_its_three_terms_is_not_finite(
+    field: str, call: Callable[[float], object]
+) -> None:
+    """One message for three parameters could not say which had arrived bad.
+
+    The loop gain is a difference of two separately measured levels plus a
+    directivity index, so which one is non-finite decides where the caller
+    looks: at the microphone position, at the listener position, or at the
+    microphone's own pattern. The three used to share the sentence "Levels and
+    the directivity index must be finite", true of all of them and a help with
+    none.
+    """
+    with pytest.raises(ValueError, match=rf"'{field}' must be finite"):
+        call(math.nan)
