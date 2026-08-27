@@ -225,7 +225,7 @@ def test_fewer_absorption_areas_than_level_rows_is_refused() -> None:
     which covers the plot and every other reader at once.
     """
     result = room.crowd_noise([20.0, 90.0, 190.0])
-    with pytest.raises(ValueError, match="'absorption_areas'"):
+    with pytest.raises(ValueError, match=r"'absorption_areas' \(2\)"):
         dataclasses.replace(result, absorption_areas=result.absorption_areas[:-1])
 
 
@@ -238,7 +238,7 @@ def test_fewer_talkers_than_level_columns_is_refused() -> None:
     """
     result = room.crowd_noise([20.0, 90.0, 190.0])
     short_axis = result.talkers[:-1]
-    with pytest.raises(ValueError, match="'talkers'"):
+    with pytest.raises(ValueError, match="'talkers'.* one value per talker count"):
         dataclasses.replace(result, talkers=short_axis)
 
 
@@ -327,18 +327,33 @@ def test_a_variant_that_restates_itself_is_accepted() -> None:
 @pytest.mark.parametrize(
     ("call", "match"),
     [
-        (lambda: room.crowd_noise_level(0, 20.0), "at least 1"),
-        (lambda: room.crowd_noise_level(1, 0.0), "positive and finite"),
-        (lambda: room.speech_direct_level(0.0), "positive and finite"),
+        (lambda: room.crowd_noise_level(0, 20.0), "'talkers' must be at least 1"),
+        (
+            lambda: room.crowd_noise_level(1, 0.0),
+            "'absorption_area' must be positive and finite",
+        ),
+        (
+            lambda: room.speech_direct_level(0.0),
+            "'distance' must be positive and finite",
+        ),
         (
             lambda: room.speech_direct_level(1.0, directivity=0.0),
-            "directivity",
+            "'directivity' must be positive",
         ),
-        (lambda: room.speech_to_noise_ratio(1.0, -1.0), "positive and finite"),
-        (lambda: room.absorption_per_table(1.0, math.nan), "finite"),
-        (lambda: room.crowd_noise([]), "non-empty"),
-        (lambda: room.crowd_noise(20.0, talkers=[0.5]), "at least 1"),
-        (lambda: room.crowd_noise(-1.0), "positive and finite"),
+        (
+            lambda: room.speech_to_noise_ratio(1.0, -1.0),
+            "'absorption_per_table' must be positive and finite",
+        ),
+        (
+            lambda: room.absorption_per_table(1.0, math.nan),
+            "'speech_to_noise' must be finite",
+        ),
+        (lambda: room.crowd_noise([]), "'absorption_areas' must be a non-empty"),
+        (lambda: room.crowd_noise(20.0, talkers=[0.5]), "'talkers' must be at least 1"),
+        (
+            lambda: room.crowd_noise(-1.0),
+            "'absorption_areas' must be positive and finite",
+        ),
     ],
 )
 def test_validation_errors(call: object, match: str) -> None:

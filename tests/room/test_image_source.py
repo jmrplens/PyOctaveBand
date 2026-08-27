@@ -375,7 +375,9 @@ def test_source_outside_room_rejected() -> None:
 
 
 def test_absorption_above_one_rejected() -> None:
-    with pytest.raises(ValueError, match=r"\[0, 1\]"):
+    with pytest.raises(
+        ValueError, match=r"absorption coefficients must lie in \[0, 1\]"
+    ):
         room.image_source_rir(
             (5.0, 4.0, 3.0),
             (1.0, 2.0, 1.5),
@@ -388,7 +390,9 @@ def test_absorption_above_one_rejected() -> None:
 
 def test_absorption_band_count_mismatch_rejected() -> None:
     alpha = np.full((6, 4), 0.2)  # 4 bands vs 3 frequencies
-    with pytest.raises(ValueError, match="bands but the result has"):
+    with pytest.raises(
+        ValueError, match=r"'absorption' has \d+ bands but the result has"
+    ):
         room.image_source_rir(
             (5.0, 4.0, 3.0),
             (1.0, 1.0, 1.0),
@@ -401,7 +405,9 @@ def test_absorption_band_count_mismatch_rejected() -> None:
 
 
 def test_coincident_source_receiver_rejected() -> None:
-    with pytest.raises(ValueError, match="coincide"):
+    with pytest.raises(
+        ValueError, match=r"source and receiver coincide; the direct path has zero"
+    ):
         room.image_source_rir(
             (5.0, 4.0, 3.0),
             (2.0, 2.0, 1.5),
@@ -417,7 +423,7 @@ def test_bad_dimension_and_fs() -> None:
         room.image_source_rir(
             (0.0, 4.0, 3.0), (1.0, 2.0, 1.5), (3.0, 2.0, 1.5), 0.2, fs=16000
         )
-    with pytest.raises(ValueError, match="Sample rate 'fs'"):
+    with pytest.raises(ValueError, match="Sample rate 'fs' must be positive"):
         room.image_source_rir(
             (5.0, 4.0, 3.0), (1.0, 2.0, 1.5), (3.0, 2.0, 1.5), 0.2, fs=0
         )
@@ -528,9 +534,16 @@ def test_a_reflection_table_of_two_lengths_is_refused() -> None:
         (5.0, 4.0, 3.0), (1.0, 1.0, 1.5), (3.0, 2.5, 1.2), 0.2, fs=8000, max_order=2
     )
     for amplitudes in (res.amplitudes[:-1], np.append(res.amplitudes, 1e-3)):
-        with pytest.raises(ValueError, match="'amplitudes'"):
+        with pytest.raises(
+            ValueError,
+            match=rf"'amplitudes' \({amplitudes.size}\) must each carry one value "
+            r"per image",
+        ):
             dataclasses.replace(res, amplitudes=amplitudes)
-    with pytest.raises(ValueError, match="'times'"):
+    with pytest.raises(
+        ValueError,
+        match=rf"'times' \({res.times.size - 1}\).*must each carry one value per image",
+    ):
         dataclasses.replace(res, times=res.times[1:])
     banded = room.image_source_rir(
         (5.0, 4.0, 3.0),
@@ -563,11 +576,22 @@ def test_band_labels_must_match_the_bands_they_label() -> None:
         frequencies=[125.0, 250.0, 500.0, 1000.0],
     )
     for frequencies in ([125.0, 250.0, 500.0], [125.0, 250.0, 500.0, 1000.0, 2000.0]):
-        with pytest.raises(ValueError, match="'frequencies'"):
+        with pytest.raises(
+            ValueError,
+            match=rf"'frequencies' \({len(frequencies)}\).*must each carry one value "
+            r"per band",
+        ):
             dataclasses.replace(res, frequencies=np.asarray(frequencies))
-    with pytest.raises(ValueError, match="'ir'"):
+    with pytest.raises(
+        ValueError,
+        match=rf"'ir' \({res.ir.shape[0] - 1}\).*must each carry one value per band",
+    ):
         dataclasses.replace(res, ir=res.ir[:-1])
-    with pytest.raises(ValueError, match="'amplitudes'"):
+    with pytest.raises(
+        ValueError,
+        match=rf"'amplitudes' \({res.amplitudes.shape[0] - 1}\) must each carry one "
+        r"value per band",
+    ):
         dataclasses.replace(res, amplitudes=res.amplitudes[:-1])
     # A scalar frequency is the one band it names, not a missing axis.
     single = room.image_source_rir(
@@ -594,9 +618,12 @@ def test_a_point_missing_a_coordinate_is_refused() -> None:
     res = room.image_source_rir(
         (5.0, 4.0, 3.0), (1.0, 1.0, 1.5), (3.0, 2.5, 1.2), 0.2, fs=8000, max_order=2
     )
-    with pytest.raises(ValueError, match="'source'"):
+    with pytest.raises(ValueError, match=r"'source' \(2\).*must each carry one value"):
         dataclasses.replace(res, source=(1.0, 1.0))
-    with pytest.raises(ValueError, match="'image_positions"):
+    with pytest.raises(
+        ValueError,
+        match=r"'image_positions \(axis 1\)' \(2\) must each carry one value",
+    ):
         dataclasses.replace(res, image_positions=res.image_positions[:, :2])
 
 

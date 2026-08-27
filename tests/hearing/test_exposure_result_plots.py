@@ -50,5 +50,5 @@ def test_exposure_plot_without_tasks_raises() -> None:
     levels = np.full(5, 80.0)
     res = ph.hearing.job_based_exposure(levels, 6.0)
     assert not res.tasks
-    with pytest.raises(ValueError, match="per-task"):
+    with pytest.raises(ValueError, match=r"plot\(\) needs per-task contributions"):
         res.plot()

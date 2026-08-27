@@ -143,7 +143,7 @@ def test_air_condition_none_neglects_air() -> None:
 def test_invalid_inputs_raise() -> None:
     with pytest.raises(ValueError, match="'volume' must be positive"):
         m.object_fraction([1.0], 0.0)
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(ValueError, match=r"object volumes must be non-negative"):
         m.hard_object_absorption([-1.0])
     with pytest.raises(ValueError, match="absorption_area must be positive"):
         m.reverberation_time(0.0, 30.0)
@@ -159,7 +159,7 @@ def test_invalid_inputs_raise() -> None:
 
 def test_physical_range_validation() -> None:
     # Object volumes cannot be negative nor exceed the room volume.
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(ValueError, match=r"object volumes must be non-negative"):
         m.object_fraction([-1.0], 30.0)
     with pytest.raises(ValueError, match="cannot exceed the room volume"):
         m.object_fraction([40.0], 30.0)
@@ -169,13 +169,17 @@ def test_physical_range_validation() -> None:
     with pytest.raises(ValueError, match=r"range \[0, 1\)"):
         m.reverberation_time(2.0, 30.0, object_fraction=1.0)
     # Negative attenuation, absorption coefficients, object areas or air area.
-    with pytest.raises(ValueError, match="must be non-negative"):
+    with pytest.raises(
+        ValueError, match=r"the attenuation coefficient m must be non-negative"
+    ):
         m.air_absorption_area(-1e-3, 100.0)
-    with pytest.raises(ValueError, match="absorption coefficients"):
+    with pytest.raises(
+        ValueError, match=r"absorption coefficients must be non-negative"
+    ):
         m.equivalent_absorption_area([(10.0, -0.1)])
     with pytest.raises(ValueError, match="object absorption areas"):
         m.equivalent_absorption_area([(10.0, 0.1)], objects=[-1.0])
-    with pytest.raises(ValueError, match="air_area"):
+    with pytest.raises(ValueError, match=r"air_area must be non-negative"):
         m.equivalent_absorption_area([(10.0, 0.1)], air_area=-0.5)
 
 
@@ -236,7 +240,10 @@ def test_a_non_finite_quantity_is_refused(field_name: str) -> None:
         if np.ndim(value) == 0
         else np.concatenate([[float("nan")], np.asarray(value)[1:]])
     )
-    with pytest.raises(ValueError, match=f"'{field_name}' must "):
+    predicate = (
+        "must be finite" if np.ndim(value) == 0 else "must contain only finite values"
+    )
+    with pytest.raises(ValueError, match=f"'{field_name}' {predicate}"):
         dataclasses.replace(result, **{field_name: bad})
 
 
@@ -254,7 +261,10 @@ def test_a_non_finite_absorption_area_is_refused_where_the_time_is_computed() ->
 
 def test_air_condition_requires_standard_bands() -> None:
     # The built-in Table 1 profiles cover the standard octave bands only.
-    with pytest.raises(ValueError, match="OCTAVE_BANDS"):
+    with pytest.raises(
+        ValueError,
+        match=r"air_condition profiles cover the standard OCTAVE_BANDS only",
+    ):
         m.enclosed_space_reverberation(
             [(20.0, 0.5)],
             50.0,

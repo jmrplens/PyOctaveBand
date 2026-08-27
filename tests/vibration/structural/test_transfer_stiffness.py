@@ -44,15 +44,15 @@ def test_level_custom_reference() -> None:
 
 
 def test_level_rejects_non_positive_reference() -> None:
-    with pytest.raises(ValueError, match="reference"):
+    with pytest.raises(ValueError, match=r"'reference' must be positive"):
         vibration.transfer_stiffness_level(1e6, reference=0.0)
 
 
 def test_level_rejects_zero_stiffness() -> None:
     # A dead channel (|k| = 0) has no level; -inf must not propagate silently.
-    with pytest.raises(ValueError, match="zero"):
+    with pytest.raises(ValueError, match=r"'stiffness' contains zero magnitudes"):
         vibration.transfer_stiffness_level(0.0)
-    with pytest.raises(ValueError, match="dead-channel"):
+    with pytest.raises(ValueError, match=r"'stiffness' contains zero magnitudes"):
         vibration.transfer_stiffness_level([1e6, 0.0 + 0.0j])
 
 
@@ -79,9 +79,13 @@ def test_loss_factor_is_tan_phase() -> None:
 
 def test_loss_factor_rejects_purely_imaginary_stiffness() -> None:
     # Re(k) = 0 -> eta = Im/Re is undefined, not inf.
-    with pytest.raises(ValueError, match="purely imaginary"):
+    with pytest.raises(
+        ValueError, match=r"'stiffness' contains purely imaginary values"
+    ):
         vibration.loss_factor(1j * 1e6)
-    with pytest.raises(ValueError, match="purely imaginary"):
+    with pytest.raises(
+        ValueError, match=r"'stiffness' contains purely imaginary values"
+    ):
         vibration.loss_factor([1e6 + 1e4j, 0.0 + 5e5j])
 
 
@@ -101,7 +105,7 @@ def test_direct_method_preserves_phase() -> None:
 
 def test_direct_method_rejects_zero_displacement() -> None:
     # A dead u1 channel must raise, not return an infinite stiffness.
-    with pytest.raises(ValueError, match="input_displacement"):
+    with pytest.raises(ValueError, match=r"'input_displacement' contains zeros"):
         vibration.transfer_stiffness_direct(5.0 + 0j, 0.0 + 0j)
     with pytest.raises(ValueError, match="dead input channel"):
         vibration.transfer_stiffness_direct([5.0, 4.0], [1e-6, 0.0])
@@ -137,9 +141,9 @@ def test_indirect_recovers_kelvin_voigt_at_high_frequency() -> None:
 
 
 def test_indirect_rejects_bad_inputs() -> None:
-    with pytest.raises(ValueError, match="frequency"):
+    with pytest.raises(ValueError, match=r"'frequency' must be positive"):
         vibration.transfer_stiffness_indirect(0.0, 0.01 + 0j, 10.0)
-    with pytest.raises(ValueError, match="blocking_mass"):
+    with pytest.raises(ValueError, match=r"'blocking_mass' must be positive"):
         vibration.transfer_stiffness_indirect(500.0, 0.01 + 0j, 0.0)
 
 
@@ -148,7 +152,9 @@ def test_indirect_rejects_bad_inputs() -> None:
 # ---------------------------------------------------------------------------
 def test_indirect_warns_above_transmissibility_limit() -> None:
     # |T| = 0.5 violates Inequality (2) (DeltaL1,2 < 20 dB): a warning fires.
-    with pytest.warns(PhonometryWarning, match="Inequality"):
+    with pytest.warns(
+        PhonometryWarning, match=r"ISO 10846-3 Inequality \(2\) is violated"
+    ):
         vibration.transfer_stiffness_indirect(50.0, 0.5 + 0j, 10.0)
 
 
@@ -163,7 +169,9 @@ def test_indirect_silent_within_transmissibility_limit() -> None:
 def test_result_helper_warns_above_transmissibility_limit() -> None:
     f = np.array([100.0, 200.0])
     t = np.array([0.5 + 0j, 0.02 + 0j])
-    with pytest.warns(PhonometryWarning, match="ISO 10846-3"):
+    with pytest.warns(
+        PhonometryWarning, match=r"ISO 10846-3 Inequality \(2\) is violated"
+    ):
         vibration.indirect_transfer_stiffness_result(f, t, blocking_mass=8.0)
 
 
@@ -237,7 +245,7 @@ def test_blocking_force_ratio_complex_and_validation() -> None:
     assert complex(vibration.blocking_force_ratio(k22, kt)) == pytest.approx(
         1.0 / (1.0 + k22 / kt)
     )
-    with pytest.raises(ValueError, match="termination_stiffness"):
+    with pytest.raises(ValueError, match=r"'termination_stiffness' must be non-zero"):
         vibration.blocking_force_ratio(1e5, 0.0)
 
 
@@ -283,7 +291,9 @@ def test_plot_returns_axes() -> None:
     t = vibration.base_transmissibility(f, 5.0, 1e6, 200.0)
     # The synthetic curve exceeds |T| = 0.1 near resonance, so the
     # ISO 10846-3 validity advisory is expected, as in the tests above.
-    with pytest.warns(PhonometryWarning, match="ISO 10846-3"):
+    with pytest.warns(
+        PhonometryWarning, match=r"ISO 10846-3 Inequality \(2\) is violated"
+    ):
         res = vibration.indirect_transfer_stiffness_result(f, t, blocking_mass=5.0)
     assert res.plot() is not None
 
@@ -321,7 +331,7 @@ def test_a_stiffness_short_of_its_frequencies_is_refused() -> None:
     t = np.array([0.05, 0.02, 0.008]) * np.exp(1j * 0.1)
     res = vibration.indirect_transfer_stiffness_result(f, t, blocking_mass=8.0)
     short = res.transfer_stiffness[:-1]
-    with pytest.raises(ValueError, match="'transfer_stiffness'"):
+    with pytest.raises(ValueError, match=rf"'transfer_stiffness' \({short.size}\)"):
         dataclasses.replace(res, transfer_stiffness=short)
 
 
@@ -334,7 +344,7 @@ def test_a_lone_frequency_beside_a_spectrum_is_refused() -> None:
     """
     res = vibration.indirect_transfer_stiffness_result(500.0, 0.01, blocking_mass=8.0)
     spectrum = np.full(3, complex(res.transfer_stiffness))
-    with pytest.raises(ValueError, match="'frequencies'"):
+    with pytest.raises(ValueError, match="'frequencies' must have one axis"):
         dataclasses.replace(res, transfer_stiffness=spectrum)
 
 

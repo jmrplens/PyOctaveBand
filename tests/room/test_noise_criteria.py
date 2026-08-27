@@ -126,7 +126,7 @@ def test_nc_marginal_cases_on_the_family_edges() -> None:
 
 
 def test_nc_out_of_range_curve_raises() -> None:
-    with pytest.raises(ValueError, match="tabulated range"):
+    with pytest.raises(ValueError, match=r"NC index .* is outside the tabulated range"):
         rn.nc_curve(80.0)
 
 
@@ -225,7 +225,10 @@ def test_subset_by_frequency() -> None:
 
 def test_rc_requires_mid_frequency_bands() -> None:
     # Without 500/1000/2000 Hz the RC rating cannot be computed.
-    with pytest.raises(ValueError, match="mid-frequency"):
+    with pytest.raises(
+        ValueError,
+        match=r"octave bands are required to compute the mid-frequency average",
+    ):
         rn.room_criterion([50.0, 45.0], [63.0, 125.0])
 
 
@@ -239,9 +242,11 @@ def test_invalid_inputs_raise() -> None:
     with pytest.raises(ValueError, match="not one of"):
         rn.noise_criterion([50.0], [777.0])
     two_dimensional = np.zeros((2, 10))
-    with pytest.raises(ValueError, match="1-D vector"):
+    with pytest.raises(
+        ValueError, match=r"levels must be a 1-D vector of octave-band levels"
+    ):
         rn.noise_criterion(two_dimensional)
-    with pytest.raises(ValueError, match="no valid"):
+    with pytest.raises(ValueError, match=r"no valid octave-band levels were supplied"):
         rn.noise_criterion([], [])
 
 
@@ -326,7 +331,7 @@ def test_an_nc_rating_refuses_levels_off_the_band_axis(trim: bool) -> None:
     result = rn.noise_criterion([50.0, 45.0, 40.0, 38.0, 35.0, 32.0, 30.0, 28.0], bands)
     levels = np.asarray(result.levels)
     wrong = levels[:-1] if trim else np.append(levels, levels[-1])
-    with pytest.raises(ValueError, match="'levels'"):
+    with pytest.raises(ValueError, match=rf"NCResult: .*'levels' \({wrong.size}\)"):
         dataclasses.replace(result, levels=wrong)
 
 
@@ -363,7 +368,10 @@ def test_an_rc_rating_refuses_the_unimplemented_rv_tag() -> None:
     tag and would have boxed ``RC-nn(RV)`` over "Spectral quality: neutral".
     """
     result = rn.room_criterion(rn.rc_curve(35.0))
-    with pytest.raises(ValueError, match="classification 'RV'"):
+    with pytest.raises(
+        ValueError,
+        match=r"classification 'RV'.*requires the Table 6 criterion test",
+    ):
         dataclasses.replace(result, classification="RV")
 
 
@@ -378,9 +386,12 @@ def test_an_rc_rating_refuses_an_unknown_spectral_tag() -> None:
 @pytest.mark.parametrize(
     ("field", "message"),
     [
-        ("rating", "'rating' must be finite"),
-        ("lmf", "'lmf' must be finite"),
-        ("reference_curve", "'reference_curve' must contain only finite values"),
+        ("rating", "RCResult: 'rating' must be finite"),
+        ("lmf", "RCResult: 'lmf' must be finite"),
+        (
+            "reference_curve",
+            "RCResult: 'reference_curve' must contain only finite values",
+        ),
     ],
 )
 def test_an_rc_rating_refuses_a_non_finite_rating_average_or_curve(
@@ -474,7 +485,7 @@ def test_an_nc_rating_outside_the_family_keeps_its_flag() -> None:
     over[2] += 1.0  # 63 Hz, 1 dB above the highest tabulated curve
     result = rn.noise_criterion(over)
     assert result.out_of_range == "above"
-    with pytest.raises(ValueError, match="'rating' must be finite"):
+    with pytest.raises(ValueError, match="NCResult: 'rating' must be finite"):
         dataclasses.replace(result, out_of_range=None)
 
 

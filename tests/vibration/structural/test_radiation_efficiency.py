@@ -91,9 +91,9 @@ def test_clamped_boundary_radiates_more() -> None:
 # Validation.
 # ---------------------------------------------------------------------------
 def test_rejects_bad_input() -> None:
-    with pytest.raises(ValueError, match="boundary"):
+    with pytest.raises(ValueError, match=r"'boundary' must be one of"):
         vibration.radiation_efficiency([500.0], LX, LY, 2000.0, boundary="pinned")
-    with pytest.raises(ValueError, match="critical_frequency"):
+    with pytest.raises(ValueError, match=r"'critical_frequency' must be positive"):
         vibration.radiation_efficiency([500.0], LX, LY, -1.0)
-    with pytest.raises(ValueError, match="frequency"):
+    with pytest.raises(ValueError, match=r"'frequency' must be positive"):
         vibration.radiation_efficiency([-1.0], LX, LY, 2000.0)

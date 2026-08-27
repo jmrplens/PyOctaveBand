@@ -153,7 +153,7 @@ def test_unknown_engine_rejected(
     """An unknown rendering engine raises ``ValueError``."""
     out = str(tmp_path / "x.pdf")
     result = factory()
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine 'weasyprint'"):
         result.report(out, engine="weasyprint")
 
 
@@ -164,7 +164,7 @@ def test_unknown_language_rejected(
     """An unknown fiche language raises ``ValueError``."""
     out = str(tmp_path / "bad.pdf")
     result = factory()
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language 'xx'"):
         result.report(out, language="xx")
 
 
@@ -357,7 +357,9 @@ def test_rc_result_refuses_a_reference_curve_of_another_length() -> None:
     from dataclasses import replace
 
     result = _rc_result()
-    with pytest.raises(ValueError, match="'reference_curve'"):
+    with pytest.raises(
+        ValueError, match=r"'reference_curve'.*must each carry one value per band"
+    ):
         replace(result, reference_curve=result.reference_curve[:-1])
 
 

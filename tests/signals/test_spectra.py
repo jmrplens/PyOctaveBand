@@ -181,9 +181,13 @@ def test_confidence_interval_widens_at_higher_confidence() -> None:
 def test_resolution_bias_error_closed_form() -> None:
     # Eq. 8.141: εb = -(Be/Br)²/3; quarter-bandwidth analysis -> -1/48.
     assert ph.signals.resolution_bias_error(1.0, 4.0) == pytest.approx(-1.0 / 48.0)
-    with pytest.raises(ValueError, match="resolution_bandwidth"):
+    with pytest.raises(
+        ValueError, match=r"'resolution_bandwidth' must be a positive, finite number"
+    ):
         ph.signals.resolution_bias_error(0.0, 4.0)
-    with pytest.raises(ValueError, match="half_power_bandwidth"):
+    with pytest.raises(
+        ValueError, match=r"'half_power_bandwidth' must be a positive, finite number"
+    ):
         ph.signals.resolution_bias_error(1.0, -1.0)
 
 
@@ -411,17 +415,29 @@ def test_smoothing_zero_frequency_point_is_copied() -> None:
 @pytest.mark.parametrize(
     ("kwargs", "match"),
     [
-        ({"frequencies": [[1.0, 2.0]], "values": [1.0, 2.0]}, "one-dimensional"),
+        (
+            {"frequencies": [[1.0, 2.0]], "values": [1.0, 2.0]},
+            r"'frequencies' and 'values' must be one-dimensional",
+        ),
         (
             {"frequencies": [1.0, 2.0], "values": [1.0]},
             r"'frequencies'.*'values'.*one value per frequency",
         ),
-        ({"frequencies": [1.0], "values": [1.0]}, "two frequency points"),
-        ({"frequencies": [2.0, 1.0], "values": [1.0, 1.0]}, "increasing"),
-        ({"frequencies": [1.0, np.nan], "values": [1.0, 1.0]}, "finite"),
+        (
+            {"frequencies": [1.0], "values": [1.0]},
+            r"At least two frequency points are required",
+        ),
+        (
+            {"frequencies": [2.0, 1.0], "values": [1.0, 1.0]},
+            r"'frequencies' must be strictly increasing",
+        ),
+        (
+            {"frequencies": [1.0, np.nan], "values": [1.0, 1.0]},
+            r"'frequencies' and 'values' must be finite",
+        ),
         (
             {"frequencies": [1.0, 2.0], "values": [1.0, -1.0]},
-            "non-negative",
+            r"'values' must be non-negative in the power domain",
         ),
         (
             {
@@ -429,15 +445,15 @@ def test_smoothing_zero_frequency_point_is_copied() -> None:
                 "values": [1.0, -1.0],
                 "domain": "amplitude",
             },
-            "non-negative",
+            r"'values' must be non-negative in the amplitude domain",
         ),
         (
             {"frequencies": [1.0, 2.0], "values": [1.0, 1.0], "fraction": 0.0},
-            "fraction",
+            r"'fraction' must be a positive, finite number",
         ),
         (
             {"frequencies": [1.0, 2.0], "values": [1.0, 1.0], "domain": "bad"},
-            "domain",
+            r"'domain' must be",
         ),
     ],
 )
@@ -455,23 +471,27 @@ def test_psd_rejects_invalid_inputs() -> None:
     x = _white(12)
     two_dimensional = np.stack([x, x])
     non_finite = np.full(4096, np.nan)
-    with pytest.raises(ValueError, match="one-dimensional"):
+    with pytest.raises(ValueError, match=r"'x' must be one-dimensional"):
         ph.signals.power_spectral_density(two_dimensional, FS)
-    with pytest.raises(ValueError, match="too short"):
+    with pytest.raises(ValueError, match=r"Signal too short for a spectral estimate"):
         ph.signals.power_spectral_density(x[:16], FS)
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'x' must be finite"):
         ph.signals.power_spectral_density(non_finite, FS)
-    with pytest.raises(ValueError, match="'fs'"):
+    with pytest.raises(ValueError, match=r"'fs' must be a positive, finite number"):
         ph.signals.power_spectral_density(x, 0.0)
-    with pytest.raises(ValueError, match="nperseg"):
+    with pytest.raises(
+        ValueError, match=r"'nperseg' must be between .* and the signal length"
+    ):
         ph.signals.power_spectral_density(x, FS, nperseg=16)
-    with pytest.raises(ValueError, match="nperseg"):
+    with pytest.raises(
+        ValueError, match=r"'nperseg' must be between .* and the signal length"
+    ):
         ph.signals.power_spectral_density(x, FS, nperseg=x.size + 1)
-    with pytest.raises(ValueError, match="overlap"):
+    with pytest.raises(ValueError, match=r"'overlap' must be in"):
         ph.signals.power_spectral_density(x, FS, overlap=1.0)
-    with pytest.raises(ValueError, match="confidence"):
+    with pytest.raises(ValueError, match=r"'confidence' must be in"):
         ph.signals.power_spectral_density(x, FS, confidence=1.0)
-    with pytest.raises(ValueError, match="scaling"):
+    with pytest.raises(ValueError, match=r"'scaling' must be"):
         ph.signals.power_spectral_density(x, FS, scaling="power")  # type: ignore[arg-type]
 
 
@@ -585,7 +605,7 @@ def test_default_nperseg_targets_4hz_resolution() -> None:
 
 def test_results_are_frozen() -> None:
     res = ph.signals.power_spectral_density(_white(15), FS, nperseg=1024)
-    with pytest.raises(AttributeError):
+    with pytest.raises(dataclasses.FrozenInstanceError):
         res.psd = res.psd * 2.0  # type: ignore[misc]
 
 

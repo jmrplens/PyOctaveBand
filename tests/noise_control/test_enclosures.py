@@ -74,7 +74,10 @@ def test_callable_panel_r() -> None:
 
 
 def test_callable_requires_frequencies() -> None:
-    with pytest.raises(ValueError, match="frequencies"):
+    with pytest.raises(
+        ValueError,
+        match=r"'frequencies' is required when 'panel_transmission_loss' is a callable",
+    ):
         noise_control.enclosure_insertion_loss(lambda f: f, 6.0, 5.0, 0.3)
 
 
@@ -178,7 +181,10 @@ def test_required_transmission_loss_callable_and_result_shape() -> None:
 
     mpl.use("Agg")
     assert res.plot().get_ylabel()
-    with pytest.raises(ValueError, match="frequencies"):
+    with pytest.raises(
+        ValueError,
+        match=r"'frequencies' is required when 'insertion_loss' is a callable",
+    ):
         noise_control.enclosure_required_transmission_loss(lambda f: f, 6.0, 5.0, 0.3)
 
 
@@ -187,7 +193,7 @@ def test_validation() -> None:
         noise_control.enclosure_insertion_loss([20.0], -1.0, 5.0, 0.3)
     with pytest.raises(ValueError, match="'internal_absorption' must lie strictly in"):
         noise_control.enclosure_insertion_loss([20.0], 6.0, 5.0, 1.0)
-    with pytest.raises(ValueError, match="model"):
+    with pytest.raises(ValueError, match=r"'model' must be one of"):
         noise_control.enclosure_insertion_loss([20.0], 6.0, 5.0, 0.3, model="hansen")
 
 
@@ -203,7 +209,9 @@ def test_absorption_off_the_band_count_is_refused_by_name() -> None:
 def test_empty_absorption_is_refused() -> None:
     # An empty array passes every vacuous np.any/np.all test and used to
     # come back as an empty result instead of raising.
-    with pytest.raises(ValueError, match="'internal_absorption' must be a scalar"):
+    with pytest.raises(
+        ValueError, match="'internal_absorption' must be a scalar or a non-empty"
+    ):
         noise_control.enclosure_insertion_loss([20.0], 12.0, 20.0, [])
 
 

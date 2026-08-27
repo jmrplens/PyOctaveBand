@@ -11,7 +11,7 @@ the EBU and cannot be synthesized, so they are not reproduced here.
 
 from __future__ import annotations
 
-from dataclasses import replace
+from dataclasses import FrozenInstanceError, replace
 
 import numpy as np
 import pytest
@@ -144,10 +144,10 @@ def test_k_weighting_rejects_low_rate_and_empty() -> None:
     # Below 16 kHz the bilinear warping breaks the +/-0.1 LU tolerance (the
     # 997 Hz anchor drifts to about -2.89 LKFS at 8 kHz), so such rates raise.
     for fs in (4000.0, 8000.0):
-        with pytest.raises(ValueError, match="fs >= 16000"):
+        with pytest.raises(ValueError, match=r"K-weighting redesign requires fs"):
             k_weighting_coefficients(fs)
     empty = np.empty(0)
-    with pytest.raises(ValueError, match="empty"):
+    with pytest.raises(ValueError, match=r"Input signal 'x' cannot be empty"):
         k_weighting(empty, FS)
 
 
@@ -181,11 +181,11 @@ def test_k_weighting_response_default_grid() -> None:
 
 
 def test_k_weighting_response_rejects_bad_input() -> None:
-    with pytest.raises(ValueError, match="fs >= 16000"):
+    with pytest.raises(ValueError, match=r"K-weighting redesign requires fs"):
         k_weighting_response(8000.0)
-    with pytest.raises(ValueError, match="positive integer"):
+    with pytest.raises(ValueError, match=r"n must be a positive integer"):
         k_weighting_response(48000.0, n=0)
-    with pytest.raises(ValueError, match="cannot be empty"):
+    with pytest.raises(ValueError, match=r"'frequencies' cannot be empty"):
         k_weighting_response(48000.0, frequencies=[])
     with pytest.raises(ValueError, match=r"\(0, fs/2\]"):
         k_weighting_response(48000.0, frequencies=[30000.0])
@@ -195,7 +195,9 @@ def test_k_weighting_response_rejects_curve_off_the_grid() -> None:
     """A curve of another length is refused where the response is built."""
     res = k_weighting_response(48000.0, n=64)
     short = res.shelf_db[:-1]
-    with pytest.raises(ValueError, match="'shelf_db'"):
+    with pytest.raises(
+        ValueError, match=r"'shelf_db' \(63\).*must each carry one value"
+    ):
         replace(res, shelf_db=short)
 
 
@@ -424,12 +426,12 @@ def test_true_peak_defaults_and_validation() -> None:
     x = _sine(-6.0, 0.5)
     # Explicit 4x equals the default at 48 kHz.
     assert true_peak_level(x, FS) == true_peak_level(x, FS, oversample=4)
-    with pytest.raises(ValueError, match="oversample"):
+    with pytest.raises(ValueError, match=r"oversample must be an integer"):
         true_peak_level(x, FS, oversample=0)
-    with pytest.raises(ValueError, match="oversample"):
+    with pytest.raises(ValueError, match=r"oversample must be an integer"):
         true_peak_level(x, FS, oversample=True)  # type: ignore[arg-type]
     empty = np.empty(0)
-    with pytest.raises(ValueError, match="empty"):
+    with pytest.raises(ValueError, match=r"Input signal 'x' cannot be empty"):
         true_peak_level(empty, FS)
     # Silence: -inf dBTP, no runtime warnings leak.
     assert true_peak_level(np.zeros(1000), FS) == float("-inf")
@@ -510,9 +512,13 @@ def test_annex3_table4_channel_weight(
 def test_channel_weight_arrays_and_validation() -> None:
     w = channel_weight([0.0, 90.0, 135.0], [0.0, 0.0, 0.0])
     np.testing.assert_allclose(w, [1.0, 1.41, 1.0])
-    with pytest.raises(ValueError, match="azimuth"):
+    with pytest.raises(
+        ValueError, match=r"azimuth must be within .+ and elevation within"
+    ):
         channel_weight(400.0)
-    with pytest.raises(ValueError, match="azimuth"):
+    with pytest.raises(
+        ValueError, match=r"azimuth must be within .+ and elevation within"
+    ):
         channel_weight(0.0, 95.0)
 
 
@@ -535,7 +541,7 @@ def test_default_weights_and_errors() -> None:
         integrated_loudness(x, FS)
     with pytest.raises(ValueError, match="one entry per channel"):
         integrated_loudness(x, FS, weights=[1.0, 1.0])
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(ValueError, match=r"channel weights must be non-negative"):
         integrated_loudness(x, FS, weights=[1.0, -1.0, 1.0])
     # Explicit Annex 3 weights on a 3-channel bed work. Each channel holds
     # half the power of its peak level, so three coherent channels at
@@ -591,7 +597,7 @@ def test_result_fields_and_series_geometry() -> None:
     assert res.lra_low <= res.lra_high
     assert res.loudness_range == pytest.approx(res.lra_high - res.lra_low)
     # A frozen result: attributes cannot be reassigned.
-    with pytest.raises(AttributeError):
+    with pytest.raises(FrozenInstanceError):
         res.integrated = 0.0  # type: ignore[misc]
 
 
@@ -606,7 +612,9 @@ def test_result_rejects_weights_that_miss_a_channel() -> None:
     res = program_loudness(x, FS)
     assert res.true_peak_per_channel.shape == res.channel_weights.shape
     short = res.channel_weights[:-1]
-    with pytest.raises(ValueError, match="'channel_weights'"):
+    with pytest.raises(
+        ValueError, match=r"'channel_weights' \(4\).*must each carry one value"
+    ):
         replace(res, channel_weights=short)
 
 
@@ -619,9 +627,13 @@ def test_result_rejects_a_maximum_its_own_series_denies() -> None:
     """
     res = program_loudness(_steps(((-23.0, 10.0),)), FS)
     assert res.max_momentary == pytest.approx(float(np.max(res.momentary)))
-    with pytest.raises(ValueError, match="'max_momentary'"):
+    with pytest.raises(
+        ValueError, match=r"'max_momentary' must be the maximum of 'momentary'"
+    ):
         replace(res, max_momentary=0.0)
-    with pytest.raises(ValueError, match="'max_short_term'"):
+    with pytest.raises(
+        ValueError, match=r"'max_short_term' must be the maximum of 'short_term'"
+    ):
         replace(res, max_short_term=0.0)
 
 
@@ -629,7 +641,10 @@ def test_result_rejects_a_maximum_over_an_empty_series() -> None:
     """An excerpt too short to fill one window holds no maximum at all."""
     res = program_loudness(_stereo(_sine(-23.0, 0.2)), FS)
     assert res.momentary.size == 0
-    with pytest.raises(ValueError, match="'max_momentary'"):
+    with pytest.raises(
+        ValueError,
+        match=r"'max_momentary' must be the maximum of 'momentary'.*'momentary' is empty",
+    ):
         replace(res, max_momentary=-23.0)
 
 
@@ -681,32 +696,36 @@ def test_other_sample_rates_agree_with_48k() -> None:
 def test_program_loudness_validation() -> None:
     empty = np.empty((2, 0))
     tone = _stereo(_sine(-23.0, 1.0))
-    with pytest.raises(ValueError, match="empty"):
+    with pytest.raises(ValueError, match=r"Input signal 'x' cannot be empty"):
         program_loudness(empty, FS)
-    with pytest.raises(ValueError, match="momentary_step"):
+    with pytest.raises(ValueError, match=r"'momentary_step' must be positive"):
         program_loudness(tone, FS, momentary_step=0.0)
-    with pytest.raises(ValueError, match="short_term_step"):
+    with pytest.raises(ValueError, match=r"'short_term_step' must be positive"):
         program_loudness(tone, FS, short_term_step=-1.0)
     # A NaN-poisoned programme must not silently measure as digital silence.
     poisoned = _stereo(_sine(-23.0, 1.0))
     poisoned[0, 100] = np.nan
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"Input signal 'x' must be finite"):
         program_loudness(poisoned, FS)
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"Input signal 'x' must be finite"):
         integrated_loudness(poisoned, FS)
 
 
 def test_update_rate_and_weight_validation() -> None:
     tone = _stereo(_sine(-23.0, 1.0))
-    with pytest.raises(ValueError, match="10 Hz"):
+    with pytest.raises(
+        ValueError, match=r"momentary_step and short_term_step.*meter update rate"
+    ):
         program_loudness(tone, FS, momentary_step=0.2)
-    with pytest.raises(ValueError, match="10 Hz"):
+    with pytest.raises(
+        ValueError, match=r"momentary_step and short_term_step.*meter update rate"
+    ):
         program_loudness(tone, FS, short_term_step=0.5)
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"channel weights must be finite"):
         program_loudness(tone, FS, weights=[1.0, np.nan])
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"azimuth and elevation must be finite"):
         channel_weight(np.nan)
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"azimuth and elevation must be finite"):
         channel_weight(30.0, np.inf)
 
 

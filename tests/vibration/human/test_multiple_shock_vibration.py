@@ -211,16 +211,16 @@ def test_multiple_shock_assessment_end_to_end() -> None:
 def test_invalid_inputs_raise() -> None:
     with pytest.raises(ValueError, match="'fs' must be positive"):
         v.spinal_response([1.0, 2.0], 0.0)
-    with pytest.raises(ValueError, match="empty"):
+    with pytest.raises(ValueError, match=r"acceleration must not be empty"):
         v.spinal_response([], 256.0)
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"'measurement_time' must be positive"):
         v.daily_dose(50.0, 8.0, 0.0)
     with pytest.raises(
         ValueError,
         match=r"daily_dose_multi: 'doses'.*must all have the same shape",
     ):
         v.daily_dose_multi([1.0, 2.0], [1.0], [1.0, 2.0])
-    with pytest.raises(ValueError, match="years must be"):
+    with pytest.raises(ValueError, match="years must be a positive integer"):
         v.injury_risk(1.0, start_age=20, years=0, days_per_year=120)
     with pytest.raises(ValueError, match="'sex' must be"):
         v.injury_probability(1.0, sex="other")
@@ -237,7 +237,9 @@ def test_invalid_inputs_raise() -> None:
 
 def test_injury_risk_rejects_exhausted_strength() -> None:
     # By ~age 125 the male ultimate strength minus static stress goes negative.
-    with pytest.raises(ValueError, match="non-positive"):
+    with pytest.raises(
+        ValueError, match=r"ultimate strength minus static stress is non-positive"
+    ):
         v.injury_risk(1.0, start_age=20, years=120, days_per_year=120, sex="male")
 
 

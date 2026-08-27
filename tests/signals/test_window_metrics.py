@@ -135,7 +135,7 @@ def test_window_metrics_result_is_frozen() -> None:
 def test_window_metrics_invalid_inputs() -> None:
     with pytest.raises(ValueError, match="Unknown window"):
         ph.signals.window_metrics("not-a-window", N)
-    with pytest.raises(ValueError, match="at least 16"):
+    with pytest.raises(ValueError, match=r"'n' must be at least \d+ samples"):
         ph.signals.window_metrics("hann", 8)
 
 

@@ -152,7 +152,10 @@ def test_comparison_fewer_than_six_positions_warns() -> None:
     levels = np.array([[80.0], [80.1], [79.9]])  # 3 positions, tight spread
     lp_rss = np.array([70.0])
     lw_ref = np.array([90.0])
-    with pytest.warns(emission.SoundPowerWarning, match="microphone position"):
+    with pytest.warns(
+        emission.SoundPowerWarning,
+        match=r"microphone position\(s\) were supplied; an unqualified reverberation room requires",
+    ):
         emission.sound_power_comparison(levels, lp_rss, lw_ref)
 
 
@@ -161,7 +164,10 @@ def test_comparison_interposition_std_above_criterion_warns() -> None:
     levels = np.array([[70.0], [80.0], [72.0], [78.0], [71.0], [79.0]])
     lp_rss = np.array([70.0])
     lw_ref = np.array([90.0])
-    with pytest.warns(emission.SoundPowerWarning, match="standard deviation"):
+    with pytest.warns(
+        emission.SoundPowerWarning,
+        match=r"Inter-position standard deviation exceeds the ISO 3741 sM criterion",
+    ):
         emission.sound_power_comparison(levels, lp_rss, lw_ref)
 
 
@@ -239,7 +245,10 @@ def test_background_correction_is_per_position_eq14_to_16() -> None:
     t60 = np.array([1.5])
     levels = np.array([[70.0], [68.0], [66.0], [72.0], [71.0], [69.0]])
     background = np.array([[58.0], [60.0], [59.0], [60.0], [62.0], [58.0]])
-    with pytest.warns(emission.SoundPowerWarning, match="9.1.2"):
+    with pytest.warns(
+        emission.SoundPowerWarning,
+        match=r"Background margin below the ISO 3741 criterion",
+    ):
         res = emission.sound_power_reverberation(
             levels,
             t60,
@@ -288,7 +297,10 @@ def test_background_shape_mismatch_raises() -> None:
     t60 = np.array([1.5])
     levels = np.full((6, 1), 80.0)
     mismatched_background = np.full((3, 1), 60.0)  # 3 rows against 6 positions
-    with pytest.raises(ValueError, match="background_levels"):
+    with pytest.raises(
+        ValueError,
+        match=r"'background_levels' must match the per-position 'levels' shape",
+    ):
         emission.sound_power_reverberation(
             levels,
             t60,
@@ -375,7 +387,9 @@ def test_a_weighted_total_from_bands() -> None:
 # --------------------------------------------------------------------------
 def test_invalid_volume_raises() -> None:
     lp, t60, freqs = np.array([80.0]), np.array([1.5]), np.array([1000.0])
-    with pytest.raises(ValueError, match="'volume' and 'surface_area'"):
+    with pytest.raises(
+        ValueError, match=r"'volume' and 'surface_area' must be positive"
+    ):
         emission.sound_power_reverberation(lp, t60, -1.0, 210.0, freqs)
 
 
@@ -392,7 +406,9 @@ def test_mismatched_shapes_raise() -> None:
 @pytest.mark.parametrize("theta", [-273.0, -300.0, np.inf, np.nan])
 def test_direct_method_invalid_temperature_raises(theta: float) -> None:
     lp, t60, freqs = np.array([80.0]), np.array([1.5]), np.array([1000.0])
-    with pytest.raises(ValueError, match="temperature"):
+    with pytest.raises(
+        ValueError, match=r"'temperature' must be finite and greater than"
+    ):
         emission.sound_power_reverberation(
             lp,
             t60,
@@ -406,7 +422,9 @@ def test_direct_method_invalid_temperature_raises(theta: float) -> None:
 @pytest.mark.parametrize("ps", [0.0, -1.0, np.inf, np.nan])
 def test_direct_method_invalid_pressure_raises(ps: float) -> None:
     lp, t60, freqs = np.array([80.0]), np.array([1.5]), np.array([1000.0])
-    with pytest.raises(ValueError, match="static_pressure"):
+    with pytest.raises(
+        ValueError, match=r"'static_pressure' must be finite and positive"
+    ):
         emission.sound_power_reverberation(
             lp,
             t60,
@@ -419,13 +437,17 @@ def test_direct_method_invalid_pressure_raises(ps: float) -> None:
 
 def test_comparison_method_invalid_temperature_raises() -> None:
     levels, levels_ref, lw_ref = (np.array([80.0]), np.array([70.0]), np.array([90.0]))
-    with pytest.raises(ValueError, match="temperature"):
+    with pytest.raises(
+        ValueError, match=r"'temperature' must be finite and greater than"
+    ):
         emission.sound_power_comparison(levels, levels_ref, lw_ref, temperature=-300.0)
 
 
 def test_comparison_method_invalid_pressure_raises() -> None:
     levels, levels_ref, lw_ref = (np.array([80.0]), np.array([70.0]), np.array([90.0]))
-    with pytest.raises(ValueError, match="static_pressure"):
+    with pytest.raises(
+        ValueError, match=r"'static_pressure' must be finite and positive"
+    ):
         emission.sound_power_comparison(levels, levels_ref, lw_ref, static_pressure=0.0)
 
 
@@ -437,7 +459,10 @@ def test_volume_below_table1_minimum_warns() -> None:
     freqs = np.array([100.0, 500.0])
     t60 = np.array([1.5, 1.5])
     lp = np.array([80.0, 80.0])
-    with pytest.warns(emission.SoundPowerWarning, match="Table 1"):
+    with pytest.warns(
+        emission.SoundPowerWarning,
+        match=r"Room volume .+ is below the ISO 3741 Table 1 minimum",
+    ):
         emission.sound_power_reverberation(lp, t60, 150.0, 210.0, freqs)
 
 
@@ -456,7 +481,10 @@ def test_fewer_than_six_positions_warns() -> None:
     freqs = np.array([1000.0])
     t60 = np.array([1.5])
     levels = np.array([[80.0], [80.1], [79.9]])  # 3 positions, tight spread
-    with pytest.warns(emission.SoundPowerWarning, match="microphone position"):
+    with pytest.warns(
+        emission.SoundPowerWarning,
+        match=r"microphone position\(s\) were supplied; an unqualified reverberation room requires",
+    ):
         emission.sound_power_reverberation(levels, t60, 200.0, 210.0, freqs)
 
 
@@ -466,7 +494,10 @@ def test_interposition_std_above_criterion_warns() -> None:
     t60 = np.array([1.5])
     # Six positions with a large spread -> sM > 1,5 dB.
     levels = np.array([[70.0], [80.0], [72.0], [78.0], [71.0], [79.0]])
-    with pytest.warns(emission.SoundPowerWarning, match="standard deviation"):
+    with pytest.warns(
+        emission.SoundPowerWarning,
+        match=r"Inter-position standard deviation exceeds the ISO 3741 sM criterion",
+    ):
         emission.sound_power_reverberation(levels, t60, 200.0, 210.0, freqs)
 
 
@@ -495,7 +526,7 @@ def test_comparison_wrong_frequency_length_raises_clean_error() -> None:
     lw_ref = np.array([90.0, 91.0, 92.0])
     background = np.array([50.0, 51.0, 52.0])
     short_freqs = np.array([1000.0, 2000.0])  # wrong length (2 != 3)
-    with pytest.raises(ValueError, match="length must match"):
+    with pytest.raises(ValueError, match=r"'frequencies' length must match"):
         emission.sound_power_comparison(
             levels,
             levels_ref,

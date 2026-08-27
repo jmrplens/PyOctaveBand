@@ -92,7 +92,10 @@ def test_precision_positions_invalid_surface_raises() -> None:
 
 def test_precision_positions_requires_a_radius() -> None:
     """Keyword-only and required, so Python enforces it before the body runs."""
-    with pytest.raises(TypeError, match="required keyword-only argument"):
+    with pytest.raises(
+        TypeError,
+        match=r"precision_positions\(\).*required keyword-only argument: 'radius'",
+    ):
         precision_positions("sphere")  # type: ignore[call-arg]
     with pytest.raises(ValueError, match="A positive 'radius' is required"):
         precision_positions("sphere", radius=0.0)
@@ -361,7 +364,10 @@ def test_anechoic_invalid_surface_raises() -> None:
 
 def test_anechoic_requires_a_radius() -> None:
     levels = np.full((40, 1), 70.0)
-    with pytest.raises(TypeError, match="required keyword-only argument"):
+    with pytest.raises(
+        TypeError,
+        match=r"sound_power_anechoic\(\).*required keyword-only argument: 'radius'",
+    ):
         sound_power_anechoic(levels, "sphere")  # type: ignore[call-arg]
     with pytest.raises(ValueError, match="A positive 'radius' is required"):
         sound_power_anechoic(levels, "sphere", radius=0.0)
@@ -401,7 +407,10 @@ def test_a_per_band_column_off_the_band_axis_is_refused(trim: bool) -> None:
     result = _forty_position_determination()
     values = result.uncertainty_bands
     wrong = values[:-1] if trim else np.append(values, values[-1])
-    with pytest.raises(ValueError, match="'uncertainty_bands'"):
+    with pytest.raises(
+        ValueError,
+        match=rf"'uncertainty_bands' \({wrong.size}\) must each carry one value per band",
+    ):
         dataclasses.replace(result, uncertainty_bands=wrong)
 
 
@@ -851,7 +860,10 @@ def test_a_determination_column_off_the_band_axis_is_refused(
     result = _four_band_determination()
     values = np.asarray(getattr(result, field_name))
     wrong = values[:-1] if trim else np.append(values, values[-1])
-    with pytest.raises(ValueError, match=f"'{field_name}'"):
+    with pytest.raises(
+        ValueError,
+        match=rf"'{field_name}' \({wrong.size}\).*must each carry one value per band",
+    ):
         dataclasses.replace(result, **{field_name: wrong})
 
 
@@ -887,7 +899,9 @@ def test_a_field_indicator_off_the_band_axis_is_refused() -> None:
 
     indicators = _four_band_indicators()
     one_band_fs = indicators.fs[:1]
-    with pytest.raises(ValueError, match="'fs'"):
+    with pytest.raises(
+        ValueError, match=r"'fs' \(1\) must each carry one value per band"
+    ):
         dataclasses.replace(indicators, fs=one_band_fs)
 
 
@@ -922,7 +936,9 @@ def test_criterion_5_off_the_band_axis_is_refused() -> None:
     )
     assert criteria.criterion_5 is not None
     one_band_criterion_5 = criteria.criterion_5[:1]
-    with pytest.raises(ValueError, match="'criterion_5'"):
+    with pytest.raises(
+        ValueError, match=r"'criterion_5' \(1\) must each carry one value per band"
+    ):
         dataclasses.replace(criteria, criterion_5=one_band_criterion_5)
 
 

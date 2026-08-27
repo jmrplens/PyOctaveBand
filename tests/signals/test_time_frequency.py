@@ -120,22 +120,24 @@ class TestSpectrogramCalibration:
 class TestSpectrogramValidation:
     def test_rejects_bad_overlap(self) -> None:
         x = np.ones(1024)
-        with pytest.raises(ValueError, match="overlap"):
+        with pytest.raises(ValueError, match=r"'overlap' must be in \[0, 1\)"):
             signals.spectrogram(x, 1000.0, overlap=1.0)
 
     def test_rejects_bad_scaling(self) -> None:
         x = np.ones(1024)
-        with pytest.raises(ValueError, match="scaling"):
+        with pytest.raises(ValueError, match=r"'scaling' must be 'density'"):
             signals.spectrogram(x, 1000.0, scaling="amplitude")  # type: ignore[arg-type]
 
     def test_rejects_short_signal(self) -> None:
         x = np.ones(8)
-        with pytest.raises(ValueError, match="too short"):
+        with pytest.raises(ValueError, match=r"Signal too short for a spectrogram"):
             signals.spectrogram(x, 1000.0)
 
     def test_rejects_bad_nperseg(self) -> None:
         x = np.ones(1024)
-        with pytest.raises(ValueError, match="nperseg"):
+        with pytest.raises(
+            ValueError, match=r"'nperseg' must be between .* and the signal length"
+        ):
             signals.spectrogram(x, 1000.0, nperseg=2048)
 
 
@@ -286,27 +288,33 @@ class TestZoomFFTExactness:
 class TestZoomFFTValidation:
     def test_rejects_inverted_band(self) -> None:
         x = np.ones(1024)
-        with pytest.raises(ValueError, match="zoom band"):
+        with pytest.raises(
+            ValueError, match=r"The zoom band must satisfy 0 <= f_min < f_max <= fs/2"
+        ):
             signals.zoom_fft(x, 1000.0, f_min=300.0, f_max=200.0)
 
     def test_rejects_band_above_nyquist(self) -> None:
         x = np.ones(1024)
-        with pytest.raises(ValueError, match="zoom band"):
+        with pytest.raises(
+            ValueError, match=r"The zoom band must satisfy 0 <= f_min < f_max <= fs/2"
+        ):
             signals.zoom_fft(x, 1000.0, f_min=100.0, f_max=600.0)
 
     def test_rejects_negative_f_min(self) -> None:
         x = np.ones(1024)
-        with pytest.raises(ValueError, match="zoom band"):
+        with pytest.raises(
+            ValueError, match=r"The zoom band must satisfy 0 <= f_min < f_max <= fs/2"
+        ):
             signals.zoom_fft(x, 1000.0, f_min=-10.0, f_max=200.0)
 
     def test_rejects_single_point_grid(self) -> None:
         x = np.ones(1024)
-        with pytest.raises(ValueError, match="n_points"):
+        with pytest.raises(ValueError, match=r"'n_points' must be at least 2"):
             signals.zoom_fft(x, 1000.0, f_min=100.0, f_max=200.0, n_points=1)
 
     def test_rejects_short_signal(self) -> None:
         x = np.ones(8)
-        with pytest.raises(ValueError, match="too short"):
+        with pytest.raises(ValueError, match=r"Signal too short for a zoom FFT"):
             signals.zoom_fft(x, 1000.0, f_min=100.0, f_max=200.0)
 
     def test_spectral_quantities_must_sit_on_the_zoom_grid(self) -> None:

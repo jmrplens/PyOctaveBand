@@ -171,19 +171,19 @@ def test_shaped_sweep_deconvolves_a_known_system() -> None:
 # Validation
 # --------------------------------------------------------------------------
 def test_rejects_bad_inputs() -> None:
-    with pytest.raises(ValueError, match="f1"):
+    with pytest.raises(ValueError, match=r"f1 must be positive"):
         room.shaped_sweep_signal(FS, 0.0, 5000.0, 1.0)
-    with pytest.raises(ValueError, match="f2"):
+    with pytest.raises(ValueError, match=r"f2 must be greater than f1"):
         room.shaped_sweep_signal(FS, 500.0, 100.0, 1.0)
-    with pytest.raises(ValueError, match="Nyquist"):
+    with pytest.raises(ValueError, match=r"f2 must not exceed the Nyquist"):
         room.shaped_sweep_signal(FS, 50.0, 30000.0, 1.0)
-    with pytest.raises(ValueError, match="seconds"):
+    with pytest.raises(ValueError, match=r"seconds must be positive"):
         room.shaped_sweep_signal(FS, 50.0, 5000.0, 0.0)
-    with pytest.raises(ValueError, match="amplitude"):
+    with pytest.raises(ValueError, match=r"amplitude must be positive"):
         room.shaped_sweep_signal(FS, 50.0, 5000.0, 1.0, amplitude=0.0)
-    with pytest.raises(ValueError, match="fade"):
+    with pytest.raises(ValueError, match=r"fade must be in"):
         room.shaped_sweep_signal(FS, 50.0, 5000.0, 1.0, fade=0.7)
-    with pytest.raises(ValueError, match="start_delay"):
+    with pytest.raises(ValueError, match=r"start_delay must be positive"):
         room.shaped_sweep_signal(FS, 50.0, 5000.0, 1.0, start_delay=0.0)
     with pytest.raises(ValueError, match="unknown named target"):
         room.shaped_sweep_signal(FS, 50.0, 5000.0, 1.0, target="blue")
@@ -196,10 +196,12 @@ def test_rejects_bad_inputs() -> None:
     with pytest.raises(ValueError, match=r"array target.*at least 2 points"):
         room.shaped_sweep_signal(FS, 50.0, 5000.0, 1.0, target=too_short)
     decreasing = (np.array([200.0, 100.0]), np.array([0.0, 0.0]))
-    with pytest.raises(ValueError, match="increasing"):
+    with pytest.raises(
+        ValueError, match=r"target frequencies must be positive and increasing"
+    ):
         room.shaped_sweep_signal(FS, 50.0, 5000.0, 1.0, target=decreasing)
     non_finite = (np.array([100.0, 200.0]), np.array([0.0, np.inf]))
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"target magnitudes must be finite"):
         room.shaped_sweep_signal(FS, 50.0, 5000.0, 1.0, target=non_finite)
 
 

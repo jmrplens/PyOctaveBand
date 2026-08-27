@@ -369,7 +369,10 @@ class TestValidation:
     """Invalid measurements are rejected rather than silently inverted."""
 
     def test_receiver_richer_in_modal_energy_is_rejected(self) -> None:
-        with pytest.raises(ValueError, match="modal energy"):
+        with pytest.raises(
+            ValueError,
+            match=r"driven subsystem must hold more modal energy than the receiver",
+        ):
             power_injection_clf(500.0, 1.0, 2.0, 4.4e-3, 2.4e-3, 1.0, 1.0)
 
     @pytest.mark.parametrize("bad", [0.0, -1.0])
@@ -378,7 +381,10 @@ class TestValidation:
             power_injection_clf(500.0, bad, 0.1, 4.4e-3, 2.4e-3, 1.0, 1.0)
 
     def test_band_length_mismatch(self) -> None:
-        with pytest.raises(ValueError, match="frequency bands"):
+        with pytest.raises(
+            ValueError,
+            match=r"'energy1' must be a scalar or match the \d+ frequency bands",
+        ):
             power_injection_clf(
                 [125.0, 250.0], [1.0, 0.9, 0.8], 0.1, 4.4e-3, 2.4e-3, 1.0, 1.0
             )
@@ -408,7 +414,7 @@ class TestValidation:
         """Two tests with proportional energy distributions are singular."""
         energies = np.array([[[1.0], [2.0]], [[0.5], [1.0]]])
         powers = np.ones((2, 1))
-        with pytest.raises(ValueError, match="singular"):
+        with pytest.raises(ValueError, match=r"measured energy matrix is singular"):
             power_injection_matrix(_ONE_BAND, energies, powers)
 
     def test_unknown_band(self) -> None:

@@ -170,11 +170,11 @@ def test_correlation_random_error_reproduces_example_8_5() -> None:
 
 def test_correlation_random_error_validation() -> None:
     assert ph.signals.correlation_random_error(0.0, 100.0, 5.0) == np.inf
-    with pytest.raises(ValueError, match="coefficient"):
+    with pytest.raises(ValueError, match=r"'coefficient' must be in"):
         ph.signals.correlation_random_error(1.5, 100.0, 5.0)
-    with pytest.raises(ValueError, match="signal_bandwidth"):
+    with pytest.raises(ValueError, match=r"'signal_bandwidth' must be a positive"):
         ph.signals.correlation_random_error(0.5, 0.0, 5.0)
-    with pytest.raises(ValueError, match="duration"):
+    with pytest.raises(ValueError, match=r"'duration' must be a positive"):
         ph.signals.correlation_random_error(0.5, 100.0, -1.0)
 
 
@@ -317,7 +317,7 @@ def test_ml_weighting_requires_averaged_coherence() -> None:
     """
     x = _white(23, n=2048)
     y = np.roll(x, 5)
-    with pytest.raises(ValueError, match="averaged coherence"):
+    with pytest.raises(ValueError, match=r"'ml' weighting needs an averaged coherence"):
         ph.signals.time_delay(x, y, FS, method="gcc", weighting="ml", nperseg=2048)
 
 
@@ -325,9 +325,9 @@ def test_time_delay_rejects_constant_records() -> None:
     flat = np.zeros(4096)
     x = _white(24, n=4096)
     for method in ("direct", "gcc", "phase"):
-        with pytest.raises(ValueError, match="constant"):
+        with pytest.raises(ValueError, match=r"'x' and 'y' must not be constant"):
             ph.signals.time_delay(flat, x, FS, method=method)  # type: ignore[arg-type]
-        with pytest.raises(ValueError, match="constant"):
+        with pytest.raises(ValueError, match=r"'x' and 'y' must not be constant"):
             ph.signals.time_delay(x, flat, FS, method=method)  # type: ignore[arg-type]
 
 
@@ -494,16 +494,18 @@ def test_correlation_rejects_invalid_inputs() -> None:
         ValueError, match=r"correlation: 'x'.*'y'.*one value per sample"
     ):
         ph.signals.correlation(x, x[:-1], FS)
-    with pytest.raises(ValueError, match="normalization"):
+    with pytest.raises(ValueError, match=r"'normalization' must be"):
         ph.signals.correlation(x, fs=FS, normalization="raw")  # type: ignore[arg-type]
-    with pytest.raises(ValueError, match="max_lag"):
+    with pytest.raises(
+        ValueError, match=r"'max_lag' must be at least one sample and shorter"
+    ):
         ph.signals.correlation(x, fs=FS, max_lag=10.0)
-    with pytest.raises(ValueError, match="max_lag"):
+    with pytest.raises(ValueError, match=r"'max_lag' must be a positive"):
         ph.signals.correlation(x, fs=FS, max_lag=-1.0)
-    with pytest.raises(ValueError, match="'fs'"):
+    with pytest.raises(ValueError, match=r"'fs' must be a positive"):
         ph.signals.correlation(x, fs=0.0)
     res = ph.signals.correlation(x, fs=FS)
-    with pytest.raises(ValueError, match="signal_bandwidth"):
+    with pytest.raises(ValueError, match=r"'signal_bandwidth' must be a positive"):
         res.random_error(0.0)
 
 
@@ -530,19 +532,25 @@ def test_time_delay_rejects_invalid_inputs() -> None:
     y = np.roll(x, 5)
     with pytest.raises(ValueError, match=r"time_delay: 'x'.*'y'.*one value per sample"):
         ph.signals.time_delay(x, y[:-1], FS)
-    with pytest.raises(ValueError, match="method"):
+    with pytest.raises(ValueError, match=r"'method' must be 'gcc'"):
         ph.signals.time_delay(x, y, FS, method="fft")  # type: ignore[arg-type]
-    with pytest.raises(ValueError, match="weighting"):
+    with pytest.raises(ValueError, match=r"'weighting' must be 'none'"):
         ph.signals.time_delay(x, y, FS, weighting="eckart")  # type: ignore[arg-type]
-    with pytest.raises(ValueError, match="interpolation"):
+    with pytest.raises(ValueError, match=r"'interpolation' must be"):
         ph.signals.time_delay(x, y, FS, interpolation="cubic")  # type: ignore[arg-type]
-    with pytest.raises(ValueError, match="upsample"):
+    with pytest.raises(ValueError, match=r"'upsample' must be a positive integer"):
         ph.signals.time_delay(x, y, FS, upsample=0)
-    with pytest.raises(ValueError, match="max_delay"):
+    with pytest.raises(
+        ValueError,
+        match=r"'max_delay' must be at least one sample and shorter than half",
+    ):
         ph.signals.time_delay(x, y, FS, method="gcc", nperseg=256, max_delay=1.0)
-    with pytest.raises(ValueError, match="max_delay"):
+    with pytest.raises(
+        ValueError,
+        match=r"'max_delay' must be at least one sample and shorter than the record",
+    ):
         ph.signals.time_delay(x, y, FS, method="direct", max_delay=x.size / FS)
-    with pytest.raises(ValueError, match="signal_bandwidth"):
+    with pytest.raises(ValueError, match=r"'signal_bandwidth' must be a positive"):
         ph.signals.time_delay(x, y, FS, signal_bandwidth=-100.0)
 
 
@@ -553,9 +561,9 @@ def test_ir_utilities_reject_invalid_inputs() -> None:
         match=r"align_impulse_responses: 'ir'.*'reference'.*one value per sample",
     ):
         ph.signals.align_impulse_responses(ir, ir[:-1], FS)
-    with pytest.raises(ValueError, match="upsample"):
+    with pytest.raises(ValueError, match=r"'upsample' must be a positive integer"):
         ph.signals.impulse_response_delay(ir, FS, upsample=-2)
-    with pytest.raises(ValueError, match="'fs'"):
+    with pytest.raises(ValueError, match=r"'fs' must be a positive"):
         ph.signals.impulse_response_delay(ir, 0.0)
 
 
@@ -592,10 +600,10 @@ def test_alignment_rejects_records_of_different_lengths() -> None:
 def test_results_are_frozen() -> None:
     x = _white(18, n=4096)
     res = ph.signals.correlation(x, fs=FS)
-    with pytest.raises(AttributeError):
+    with pytest.raises(dataclasses.FrozenInstanceError):
         res.values = res.values * 2.0  # type: ignore[misc]
     tde = ph.signals.time_delay(x, np.roll(x, 5), FS)
-    with pytest.raises(AttributeError):
+    with pytest.raises(dataclasses.FrozenInstanceError):
         tde.delay = 0.0  # type: ignore[misc]
 
 

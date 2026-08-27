@@ -146,7 +146,7 @@ def test_fs_is_taken_from_a_result_object() -> None:
     assert isinstance(res, signals.InverseFilterResult)
     assert res.fs == FS
     bare = np.asarray(ir)
-    with pytest.raises(ValueError, match="fs"):
+    with pytest.raises(ValueError, match=r"'fs' is required"):
         signals.regularized_inverse_filter(bare, f_range=(200.0, 10000.0))
 
 
@@ -155,32 +155,36 @@ def test_fs_is_taken_from_a_result_object() -> None:
 # --------------------------------------------------------------------------
 def test_rejects_bad_inputs() -> None:
     h = _biquad_ir()
-    with pytest.raises(ValueError, match="f_range"):
+    with pytest.raises(ValueError, match=r"f_range\[0\] must be positive"):
         signals.regularized_inverse_filter(h, FS, f_range=(0.0, 4000.0))
-    with pytest.raises(ValueError, match="f_range"):
+    with pytest.raises(
+        ValueError, match=r"f_range\[1\] must be greater than f_range\[0\]"
+    ):
         signals.regularized_inverse_filter(h, FS, f_range=(4000.0, 200.0))
-    with pytest.raises(ValueError, match="Nyquist"):
+    with pytest.raises(
+        ValueError, match=r"f_range\[1\] must not exceed the Nyquist frequency"
+    ):
         signals.regularized_inverse_filter(h, FS, f_range=(200.0, 40000.0))
-    with pytest.raises(ValueError, match="regularization"):
+    with pytest.raises(ValueError, match=r"regularization levels must be positive"):
         signals.regularized_inverse_filter(
             h, FS, f_range=(200.0, 4000.0), regularization_inside=0.0
         )
-    with pytest.raises(ValueError, match="transition"):
+    with pytest.raises(ValueError, match=r"transition_octaves must be positive"):
         signals.regularized_inverse_filter(
             h, FS, f_range=(200.0, 4000.0), transition_octaves=-1.0
         )
-    with pytest.raises(ValueError, match="n_fft"):
+    with pytest.raises(ValueError, match=r"n_fft must be at least the response length"):
         signals.regularized_inverse_filter(h, FS, f_range=(200.0, 4000.0), n_fft=16)
-    with pytest.raises(ValueError, match="delay"):
+    with pytest.raises(ValueError, match=r"delay must be in \[0, n_fft\)"):
         signals.regularized_inverse_filter(h, FS, f_range=(200.0, 4000.0), delay=-1)
     two_dim = np.zeros((2, 8))
-    with pytest.raises(ValueError, match="one-dimensional"):
+    with pytest.raises(ValueError, match=r"'response' must be one-dimensional"):
         signals.regularized_inverse_filter(two_dim, FS, f_range=(200.0, 4000.0))
     with_nan = np.array([1.0, np.nan])
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'response' must be finite"):
         signals.regularized_inverse_filter(with_nan, FS, f_range=(200.0, 4000.0))
     all_zero = np.zeros(64)
-    with pytest.raises(ValueError, match="zero"):
+    with pytest.raises(ValueError, match=r"'response' must not be identically zero"):
         signals.regularized_inverse_filter(all_zero, FS, f_range=(200.0, 4000.0))
 
 
@@ -291,5 +295,5 @@ def test_apply_rejects_non_1d() -> None:
     h = _biquad_ir()
     res = signals.regularized_inverse_filter(h, FS, f_range=(500.0, 8000.0))
     two_dim = np.zeros((2, 4))
-    with pytest.raises(ValueError, match="one-dimensional"):
+    with pytest.raises(ValueError, match=r"'x' must be one-dimensional"):
         res.apply(two_dim)

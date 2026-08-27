@@ -51,5 +51,7 @@ def test_monte_carlo_plot_without_samples_raises() -> None:
         lambda a, b, c: a + b + c, _MC_QUANTITIES, trials=200, seed=7
     )
     assert res.samples is None
-    with pytest.raises(ValueError, match="keep_samples"):
+    with pytest.raises(
+        ValueError, match=r"plot\(\) needs the Monte Carlo output samples"
+    ):
         res.plot()

@@ -235,7 +235,10 @@ def test_golay_reads_the_second_recording_too() -> None:
 def test_two_recordings_at_different_rates_are_refused() -> None:
     """Golay takes two recordings, and they have to be the same measurement."""
     first, second = Signal(_GOLAY_A, FS), Signal(_GOLAY_B, FS // 2)
-    with pytest.raises(ValueError, match="recorded at different rates"):
+    with pytest.raises(
+        ValueError,
+        match=r"'recorded_a' and 'recorded_b' are Signals recorded at different rates",
+    ):
         golay_impulse_response(first, second, pair=_PAIR)
 
 

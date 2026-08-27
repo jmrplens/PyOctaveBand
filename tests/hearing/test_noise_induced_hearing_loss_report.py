@@ -240,7 +240,7 @@ def test_nipts_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     res = nipts(90.0, 20.0, 0.9)
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine 'weasyprint'"):
         res.report(out, engine="weasyprint")
 
 
@@ -248,5 +248,5 @@ def test_htlan_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     res = htlan(60, "male", 95.0, 30.0, 0.5)
     out = str(tmp_path / "bad.pdf")
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language 'xx'"):
         res.report(out, language="xx")

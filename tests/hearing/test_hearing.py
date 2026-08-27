@@ -93,13 +93,15 @@ def test_subset_by_frequency() -> None:
 
 
 def test_invalid_inputs_raise() -> None:
-    with pytest.raises(ValueError, match="at least 18"):
+    with pytest.raises(ValueError, match=r"age must be at least \d+ years"):
         h.age_threshold(10, "male")
     with pytest.raises(ValueError, match="sex must be"):
         h.age_threshold(40, "other")
-    with pytest.raises(ValueError, match="fractile"):
+    with pytest.raises(ValueError, match=r"fractile must be in"):
         h.age_threshold(40, "male", fractile=1.0)
-    with pytest.raises(ValueError, match="audiometric frequency"):
+    with pytest.raises(
+        ValueError, match=r"frequency .* is not an ISO 7029 audiometric frequency"
+    ):
         h.age_threshold(40, "male", frequencies=[777.0])
     with pytest.raises(ValueError, match="field must be"):
         h.reference_threshold("random")
@@ -119,7 +121,10 @@ def test_a_spectrum_off_the_frequency_axis_is_refused(case: str) -> None:
         "long": np.append(result.threshold, result.threshold[-1]),
         "own-database": result.threshold[8:9],  # 4000 Hz alone
     }[case]
-    with pytest.raises(ValueError, match="'threshold'"):
+    with pytest.raises(
+        ValueError,
+        match=r"'threshold'.*must each carry one value per audiometric frequency",
+    ):
         dataclasses.replace(result, threshold=wrong)
 
 

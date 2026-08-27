@@ -426,7 +426,7 @@ def test_plot_on_given_axis_draws_spectra_panel() -> None:
 def test_rejects_single_input() -> None:
     x1 = _white(140, n=1 << 14)
     y = x1.copy()
-    with pytest.raises(ValueError, match="at least two"):
+    with pytest.raises(ValueError, match=r"'inputs' must hold at least two"):
         ph.signals.miso_coherence([x1], y, FS)
 
 
@@ -445,7 +445,7 @@ def test_rejects_bad_order() -> None:
     x1 = _white(180, n=1 << 14)
     x2 = _white(181, n=1 << 14)
     y = x1 + x2
-    with pytest.raises(ValueError, match="permutation"):
+    with pytest.raises(ValueError, match=r"'order' must be a permutation of range"):
         ph.signals.miso_coherence([x1, x2], y, FS, order=(0, 0))
 
 

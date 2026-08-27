@@ -339,7 +339,9 @@ def test_rc_criterion_family() -> None:
 
 
 def test_section_declares_the_plane_wave_limit() -> None:
-    with pytest.warns(PlaneWaveWarning, match="Supply"):
+    with pytest.warns(
+        PlaneWaveWarning, match=r"Supply: .* above the first duct cut-on frequency"
+    ):
         duct_path(
             OCTAVE_BANDS,
             FAN_LW,
@@ -359,11 +361,20 @@ def test_no_section_means_no_validity_warning() -> None:
 @pytest.mark.parametrize(
     ("kwargs", "match"),
     [
-        ({"frequencies": [], "source_level": []}, "frequencies"),
-        ({"criterion": "NR"}, "criterion"),
-        ({"target": float("nan")}, "target"),
-        ({"source_level": [1.0, 2.0]}, "source_level"),
-        ({"room_effect": [1.0, 2.0]}, "room_effect"),
+        (
+            {"frequencies": [], "source_level": []},
+            r"'frequencies' must be a non-empty 1-D array",
+        ),
+        ({"criterion": "NR"}, r"'criterion' must be one of"),
+        ({"target": float("nan")}, r"'target' must be a finite criterion value"),
+        (
+            {"source_level": [1.0, 2.0]},
+            r"'source_level' must be a scalar or have one value per band",
+        ),
+        (
+            {"room_effect": [1.0, 2.0]},
+            r"'room_effect' must be a scalar or have one value per band",
+        ),
     ],
 )
 def test_duct_path_validation(kwargs: dict[str, object], match: str) -> None:
@@ -378,18 +389,22 @@ def test_duct_path_validation(kwargs: dict[str, object], match: str) -> None:
 
 
 def test_elements_must_be_duct_elements() -> None:
-    with pytest.raises(TypeError, match="DuctElement"):
+    with pytest.raises(TypeError, match=r"'elements' must hold DuctElement entries"):
         duct_path(OCTAVE_BANDS, FAN_LW, ["not an element"])  # type: ignore[list-item]
 
 
 def test_element_spectrum_must_be_finite() -> None:
     elements = [DuctElement("Duct", [1, 2, 3, 4, 5, 6, 7, np.nan])]
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(
+        ValueError, match=r"'elements\[0\]\.attenuation' must be finite"
+    ):
         duct_path(OCTAVE_BANDS, FAN_LW, elements)
 
 
 def test_combine_requires_at_least_one_path() -> None:
-    with pytest.raises(ValueError, match="at least one"):
+    with pytest.raises(
+        ValueError, match=r"'paths' must hold at least one DuctPathResult"
+    ):
         combine_duct_paths([])
 
 
@@ -430,7 +445,10 @@ def test_a_stage_row_off_the_band_axis_is_refused(field_name: str, trim: bool) -
     # The stage itself carries no guard, so it is built outside the block:
     # what is under test is the sheet refusing to hold it.
     stages = (dataclasses.replace(stage, **{field_name: wrong}), *result.stages[1:])
-    with pytest.raises(ValueError, match=f"'stages\\[0\\]\\.{field_name}'"):
+    with pytest.raises(
+        ValueError,
+        match=f"'stages\\[0\\]\\.{field_name}'.*must each carry one value per band",
+    ):
         dataclasses.replace(result, stages=stages)
 
 
@@ -467,7 +485,9 @@ def test_a_room_effect_off_the_band_axis_is_refused() -> None:
     """The room effect is applied band by band, so it must have the bands."""
     result = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")
     one_band_short = np.zeros(len(OCTAVE_BANDS) - 1)
-    with pytest.raises(ValueError, match="'room_effect'"):
+    with pytest.raises(
+        ValueError, match=r"'room_effect'.*must each carry one value per band"
+    ):
         dataclasses.replace(result, room_effect=one_band_short)
 
 
@@ -500,7 +520,7 @@ def test_a_single_number_where_a_spectrum_belongs_says_so(
     """
     result = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")
     scalar_field = build(result)
-    with pytest.raises(ValueError, match=f"'{re.escape(what)}'"):
+    with pytest.raises(ValueError, match=f"'{re.escape(what)}' must have one axis"):
         dataclasses.replace(result, **scalar_field)
 
 

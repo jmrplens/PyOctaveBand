@@ -339,7 +339,10 @@ class TestValidation:
             bearing_fault_frequencies(**{**_P85, **kwargs})  # type: ignore[arg-type]
 
     def test_bearing_rejects_element_larger_than_pitch(self) -> None:
-        with pytest.raises(ValueError, match="smaller than"):
+        with pytest.raises(
+            ValueError,
+            match=r"'element_diameter' must be smaller than 'pitch_diameter'",
+        ):
             bearing_fault_frequencies(2000.0, 15, 40.0, 34.0)
 
     @pytest.mark.parametrize(
@@ -375,7 +378,9 @@ class TestValidation:
 
     def test_motor_rejects_supply_below_shaft_rate(self) -> None:
         """A shaft turning at or above synchronous speed is not an induction motor."""
-        with pytest.raises(ValueError, match="synchronous"):
+        with pytest.raises(
+            ValueError, match=r"the shaft rate must stay below the synchronous speed"
+        ):
             induction_motor_frequencies(3600.0, 4, 52, supply_frequency=60.0)
 
     @pytest.mark.parametrize(
@@ -393,21 +398,23 @@ class TestValidation:
 
     def test_unknown_line_name(self) -> None:
         res = bearing_fault_frequencies(**_P85)  # type: ignore[arg-type]
-        with pytest.raises(KeyError, match="BPFO"):
+        with pytest.raises(KeyError, match=r"no fault line named 'not-a-line'"):
             _ = res["not-a-line"]
 
     def test_within_rejects_inverted_span(self) -> None:
         res = bearing_fault_frequencies(**_P85)  # type: ignore[arg-type]
-        with pytest.raises(ValueError, match="greater than"):
+        with pytest.raises(ValueError, match=r"'high' must be greater than 'low'"):
             res.within(500.0, 100.0)
 
     def test_harmonics_rejects_zero_count(self) -> None:
         res = bearing_fault_frequencies(**_P85)  # type: ignore[arg-type]
-        with pytest.raises(ValueError, match="positive integer"):
+        with pytest.raises(ValueError, match=r"'count' must be a positive integer"):
             res.harmonics("BPFO", 0)
 
     def test_combine_rejects_no_results(self) -> None:
-        with pytest.raises(ValueError, match="at least one"):
+        with pytest.raises(
+            ValueError, match="'combine_fault_lines' needs at least one result"
+        ):
             combine_fault_lines()
 
     def test_combine_rejects_mismatched_shaft_rates(self) -> None:

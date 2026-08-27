@@ -102,7 +102,9 @@ def test_ln_levels_weighting_a() -> None:
 def test_ln_levels_invalid_percentile_raises() -> None:
 
     tone = _tone(1000)
-    with pytest.raises(ValueError, match="between 0 and 100"):
+    with pytest.raises(
+        ValueError, match=r"Percentile values in 'n' must be between 0 and 100"
+    ):
         signals.ln_levels(tone, FS, n=(0,))
 
 
@@ -124,20 +126,20 @@ def test_leq_dbfs_ignores_calibration_factor() -> None:
 
 def test_leq_empty_signal_raises() -> None:
     empty = np.array([])
-    with pytest.raises(ValueError, match="empty"):
+    with pytest.raises(ValueError, match=r"Input signal 'x' cannot be empty"):
         signals.leq(empty)
 
 
 def test_leq_nonpositive_calibration_raises() -> None:
     tone = _tone(1000)
-    with pytest.raises(ValueError, match="calibration_factor"):
+    with pytest.raises(ValueError, match=r"'calibration_factor' must be positive"):
         signals.leq(tone, calibration_factor=-1.0)
 
 
 def test_ln_levels_empty_signal_raises() -> None:
 
     empty = np.array([])
-    with pytest.raises(ValueError, match="empty"):
+    with pytest.raises(ValueError, match=r"Input signal 'x' cannot be empty"):
         signals.ln_levels(empty, FS)
 
 
@@ -376,16 +378,16 @@ def test_sound_exposure_defaults_to_recording_duration() -> None:
 def test_sel_invalid_fs_raises() -> None:
 
     tone = _tone(1000)
-    with pytest.raises(ValueError, match="fs"):
+    with pytest.raises(ValueError, match=r"Sample rate 'fs' must be positive"):
         signals.sel(tone, 0)
 
 
 def test_sound_exposure_rejects_nonpositive_duration() -> None:
 
     tone = _tone_at_level(90.0)
-    with pytest.raises(ValueError, match="duration_hours"):
+    with pytest.raises(ValueError, match=r"'duration_hours' must be positive"):
         signals.sound_exposure(tone, FS, duration_hours=0)
-    with pytest.raises(ValueError, match="duration_hours"):
+    with pytest.raises(ValueError, match=r"'duration_hours' must be positive"):
         signals.lex_8h(tone, FS, duration_hours=-1.0)
 
 
@@ -532,9 +534,9 @@ def test_ln_levels_and_sel_accept_every_weighting_filter_curve(curve: str) -> No
 def test_ln_levels_and_sel_reject_an_unknown_weighting() -> None:
 
     x = _tone(1000)
-    with pytest.raises(ValueError, match="Weighting curve"):
+    with pytest.raises(ValueError, match=r"Weighting curve must be"):
         signals.ln_levels(x, FS, weighting="Q")
-    with pytest.raises(ValueError, match="Weighting curve"):
+    with pytest.raises(ValueError, match=r"Weighting curve must be"):
         signals.sel(x, FS, weighting="Q")
 
 

@@ -78,11 +78,15 @@ def test_white_is_gaussian_like() -> None:
 
 
 def test_rejects_invalid_arguments() -> None:
-    with pytest.raises(ValueError, match="'fs'"):
+    with pytest.raises(ValueError, match=r"'fs' must be a positive, finite number"):
         ph.signals.noise_signal(0.0, 1.0)
-    with pytest.raises(ValueError, match="'seconds'"):
+    with pytest.raises(
+        ValueError, match=r"'seconds' must be a positive, finite number"
+    ):
         ph.signals.noise_signal(FS, -1.0)
-    with pytest.raises(ValueError, match="16 samples"):
+    with pytest.raises(
+        ValueError, match=r"'fs'\*'seconds' must give at least .* samples"
+    ):
         ph.signals.noise_signal(FS, 1e-5)
     with pytest.raises(ValueError, match="'color'"):
         ph.signals.noise_signal(FS, 1.0, color="brown")  # type: ignore[arg-type]

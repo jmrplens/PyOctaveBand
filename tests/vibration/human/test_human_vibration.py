@@ -193,7 +193,7 @@ def test_unknown_weighting_raises() -> None:
 
 
 def test_frequency_weighting_rejects_empty() -> None:
-    with pytest.raises(ValueError, match="non-empty"):
+    with pytest.raises(ValueError, match=r"'frequencies' must be a non-empty"):
         hv.frequency_weighting("Wk", [])
 
 
@@ -221,9 +221,9 @@ def test_apply_weighting_scales_sine_by_magnitude() -> None:
 
 def test_apply_weighting_validates() -> None:
     two_dimensional = np.zeros((2, 2))
-    with pytest.raises(ValueError, match="1-D"):
+    with pytest.raises(ValueError, match=r"'signal' must be a non-empty 1-D array"):
         hv.apply_weighting(two_dimensional, 1000.0, name="Wk")
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"'fs' must be a positive, finite"):
         hv.apply_weighting([1.0, 2.0], 0.0, name="Wk")
 
 
@@ -309,9 +309,9 @@ def test_running_rms_of_constant_power_signal() -> None:
 
 
 def test_running_rms_validation() -> None:
-    with pytest.raises(ValueError, match="method"):
+    with pytest.raises(ValueError, match=r"'method' must be 'linear'"):
         hv.running_rms([1.0, 2.0], 100.0, method="bogus")
-    with pytest.raises(ValueError, match="integration_time"):
+    with pytest.raises(ValueError, match=r"'integration_time' must be positive"):
         hv.running_rms([1.0, 2.0], 100.0, integration_time=0.0)
 
 
@@ -323,7 +323,7 @@ def test_crest_factor_warns_above_nine() -> None:
     # A lone spike gives crest = 10 / (10/sqrt(200)) = sqrt(200) ~ 14.1 > 9.
     x = np.zeros(200)
     x[0] = 10.0
-    with pytest.warns(hv.HumanVibrationWarning, match="exceeds 9"):
+    with pytest.warns(hv.HumanVibrationWarning, match=r"Crest factor .* exceeds"):
         cf = hv.crest_factor(x)
     assert cf > 9.0
 
@@ -360,9 +360,13 @@ def test_wbv_exposure_basis_z_axis_dominates_and_differs_from_vector_total() -> 
 
 
 def test_wbv_exposure_basis_rejects_negative_or_nonfinite() -> None:
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(
+        ValueError, match=r"axis r\.m\.s\. accelerations must be non-negative"
+    ):
         hv.wbv_exposure_basis(-0.1, 0.2, 0.3)
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(
+        ValueError, match=r"axis r\.m\.s\. accelerations must be non-negative"
+    ):
         hv.wbv_exposure_basis(0.1, math.nan, 0.3)
 
 
@@ -416,7 +420,7 @@ def test_energy_equivalent_acceleration() -> None:
 
 
 def test_energy_equivalent_rejects_negative_duration() -> None:
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(ValueError, match=r"^'durations_s' must be non-negative"):
         hv.energy_equivalent_acceleration([1.0, 2.0], [1.0, -1.0])
 
 
@@ -459,7 +463,7 @@ def test_exposure_assessment_wbv_a8_and_vdv() -> None:
 def test_exposure_assessment_invalid() -> None:
     with pytest.raises(ValueError, match="kind must be 'hav' or 'wbv'"):
         hv.exposure_assessment(1.0, kind="hav", metric="vdv")
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(ValueError, match=r"'value' must be finite and non-negative"):
         hv.exposure_assessment(-1.0, kind="hav")
 
 
@@ -511,17 +515,17 @@ def test_all_nonpositive_frequencies_return_zero_response() -> None:
 
 
 def test_apply_weighting_rejects_empty_signal() -> None:
-    with pytest.raises(ValueError, match="non-empty"):
+    with pytest.raises(ValueError, match=r"'signal' must be a non-empty"):
         hv.apply_weighting([], 1000.0, name="Wk")
 
 
 def test_running_rms_rejects_empty_signal() -> None:
-    with pytest.raises(ValueError, match="non-empty"):
+    with pytest.raises(ValueError, match=r"'signal' must be a non-empty"):
         hv.running_rms([], 1000.0)
 
 
 def test_vibration_total_value_validates() -> None:
-    with pytest.raises(ValueError, match="non-empty"):
+    with pytest.raises(ValueError, match=r"'components' must be a non-empty"):
         hv.vibration_total_value([])
     with pytest.raises(
         ValueError, match=r"vibration_total_value: 'components' .*'k' .*same shape"
@@ -530,12 +534,15 @@ def test_vibration_total_value_validates() -> None:
 
 
 def test_daily_exposure_rejects_negative() -> None:
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(
+        ValueError,
+        match=r"'total_value' and 'duration_s' must be finite and non-negative",
+    ):
         hv.daily_exposure(-1.0, 3600.0)
 
 
 def test_combine_partial_exposures_rejects_empty() -> None:
-    with pytest.raises(ValueError, match="non-empty"):
+    with pytest.raises(ValueError, match=r"'partials' must be a non-empty"):
         hv.combine_partial_exposures([])
 
 
@@ -544,7 +551,9 @@ def test_hav_daily_exposure_validates() -> None:
         ValueError, match=r"hav_daily_exposure: 'total_values' .*'durations_s' .*shape"
     ):
         hv.hav_daily_exposure([2.0, 3.0], [3600.0])
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(
+        ValueError, match=r"'total_values' and 'durations_s' must be non-negative"
+    ):
         hv.hav_daily_exposure([2.0, -3.0], [3600.0, 3600.0])
 
 
@@ -558,12 +567,12 @@ def test_energy_equivalent_rejects_length_mismatch() -> None:
 
 
 def test_energy_equivalent_rejects_zero_total_duration() -> None:
-    with pytest.raises(ValueError, match="total duration"):
+    with pytest.raises(ValueError, match=r"total duration must be positive"):
         hv.energy_equivalent_acceleration([1.0, 2.0], [0.0, 0.0])
 
 
 def test_hav_vwf_lifetime_rejects_nonpositive() -> None:
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"'a8' must be a positive daily exposure"):
         hv.hav_vwf_lifetime_years(0.0)
 
 

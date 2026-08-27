@@ -136,7 +136,7 @@ def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
     res = _result()
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         res.report(out, engine="weasyprint")
 
 
@@ -144,7 +144,7 @@ def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ``ValueError``."""
     res = _result()
     out = str(tmp_path / "bad.pdf")
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language"):
         res.report(out, language="xx")
 
 
@@ -427,7 +427,10 @@ def test_spanish_report_renders_translated_fiche(tmp_path: Path) -> None:
 # --------------------------------------------------------------------------
 def test_room_volume_must_be_positive() -> None:
     """A non-positive room volume raises ``ValueError``."""
-    with pytest.raises(ValueError, match="room_volume"):
+    with pytest.raises(
+        ValueError,
+        match=r"ReportMetadata\.room_volume must be a finite, positive number",
+    ):
         ReportMetadata(room_volume=0.0)
 
 
@@ -437,7 +440,9 @@ def test_position_counts_must_be_positive_integers(
     field: str, bad: int | float
 ) -> None:
     """A position count must be a positive integer (bools and floats rejected)."""
-    with pytest.raises(ValueError, match=field):
+    with pytest.raises(
+        ValueError, match=rf"ReportMetadata\.{field} must be a positive integer"
+    ):
         ReportMetadata(**{field: bad})
 
 
