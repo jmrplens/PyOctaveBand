@@ -29,7 +29,12 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
-from .._internal.validation import check_engine, require_ranks, require_same_length
+from .._internal.validation import (
+    check_engine,
+    require_finite_fields,
+    require_ranks,
+    require_same_length,
+)
 from .._internal.warnings import PhonometryWarning
 from .threshold import age_threshold
 
@@ -187,12 +192,20 @@ class NiptsResult:
         PASS/FAIL verdict read off that mean, taken from positions belonging
         to whatever grid the array was computed on.
 
-        The two scalars the spectra were computed from are pinned finite as
+        The three scalars the prediction is stated for are pinned finite as
         well: a NaN ``l_ex`` (or ``years``) sails past every domain warning
         (no comparison fires on NaN) and turns every spectrum into NaN, so
         the plot would draw a completely blank axes under an ordinary title
-        ending "= nan dB". ``l_ex`` deliberately has no lower bound and
-        ``years`` no upper one; only finiteness is construction's business.
+        ending "= nan dB". ``fractile`` leaves the spectra intact and so
+        reaches the fiche unopposed: it is the population the whole sheet is
+        stated for, printed as ISO 1999's own ``Q = 100 (1 - fractile)``, and
+        a NaN prints there as "Population fractile Q = nan %" under the
+        non-median gloss (no comparison places it at the median either),
+        beside an extrapolation caveat earned the same empty way. An infinity
+        prints "Q = -inf %". ``l_ex`` deliberately has no lower bound and
+        ``years`` no upper one, and the fractile's own (0, 1) interval is
+        :func:`nipts`'s to enforce; only finiteness is construction's
+        business.
 
         The prediction must also cover at least one audiometric frequency:
         five length-0 spectra agree with each other (``nipts(frequencies=[])``
@@ -205,14 +218,10 @@ class NiptsResult:
         convert float NaN to integer".
 
         :raises ValueError: if any spectrum disagrees with ``frequencies``,
-            is empty or non-finite, or if ``l_ex`` or ``years`` is not finite.
+            is empty or non-finite, or if ``l_ex``, ``years`` or ``fractile``
+            is not finite.
         """
-        if not math.isfinite(self.l_ex):
-            msg = "'l_ex' must be finite."
-            raise ValueError(msg)
-        if not math.isfinite(self.years):
-            msg = "'years' must be finite."
-            raise ValueError(msg)
+        require_finite_fields(self, "l_ex", "years", "fractile")
         require_ranks(
             self,
             frequencies=1,
@@ -236,10 +245,9 @@ class NiptsResult:
                 "audiometric frequency; the prediction is empty."
             )
             raise ValueError(msg)
-        for name in ("frequencies", "median", "value", "spread_upper", "spread_lower"):
-            if not np.all(np.isfinite(np.asarray(getattr(self, name), np.float64))):
-                msg = f"NiptsResult: '{name}' must contain only finite values."
-                raise ValueError(msg)
+        require_finite_fields(
+            self, "frequencies", "median", "value", "spread_upper", "spread_lower"
+        )
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -359,9 +367,23 @@ class HtlanResult:
         smuggled into a hand-built result, where it would crash the fiche's
         rounding with a bare "cannot convert float NaN to integer".
 
+        The four scalars are pinned finite for a different reason: nothing
+        computes with them here, so nothing downstream trips over them. They
+        are the listener and exposure conditions the prediction is stated
+        for, and the fiche prints all four verbatim - "Listener: male, age
+        nan years", an exposure line, and the population as ISO 1999's
+        ``Q = 100 (1 - fractile)`` - as does the plot title. Left unguarded
+        they publish a finished, internally consistent-looking accredited
+        sheet whose stated conditions are nonsense. As in
+        :class:`NiptsResult`, only finiteness is construction's business: the
+        age floor of ISO 7029 and the fractile's (0, 1) interval belong to
+        :func:`htlan`.
+
         :raises ValueError: if any component disagrees with ``frequencies``,
-            is empty, or carries a non-finite value.
+            is empty, or carries a non-finite value, or if ``age``, ``l_ex``,
+            ``years`` or ``fractile`` is not finite.
         """
+        require_finite_fields(self, "age", "l_ex", "years", "fractile")
         require_ranks(self, frequencies=1, htla=1, nipts=1, threshold=1)
         require_same_length(
             self,
@@ -377,10 +399,7 @@ class HtlanResult:
                 "audiometric frequency; the prediction is empty."
             )
             raise ValueError(msg)
-        for name in ("frequencies", "htla", "nipts", "threshold"):
-            if not np.all(np.isfinite(np.asarray(getattr(self, name), np.float64))):
-                msg = f"HtlanResult: '{name}' must contain only finite values."
-                raise ValueError(msg)
+        require_finite_fields(self, "frequencies", "htla", "nipts", "threshold")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

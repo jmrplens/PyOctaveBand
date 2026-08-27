@@ -329,3 +329,33 @@ def test_htlan_rejects_a_non_finite_component() -> None:
     threshold[3] = np.nan
     with pytest.raises(ValueError, match="'threshold' must contain only finite"):
         dataclasses.replace(result, threshold=threshold)
+
+
+@pytest.mark.parametrize("value", [float("nan"), float("inf")])
+def test_nipts_rejects_a_non_finite_fractile(value: float) -> None:
+    """The fractile leaves the spectra intact, so only construction catches it.
+
+    It is the population the whole sheet is stated for, printed as ISO 1999's
+    ``Q = 100 (1 - fractile)``. Unguarded, a NaN reached a finished fiche as
+    "Population fractile Q = nan %" and an infinity as "Q = -inf %", each
+    under the non-median gloss and an extrapolation caveat that no comparison
+    had actually earned.
+    """
+    result = m.nipts(95.0, 20.0, 0.9)
+    with pytest.raises(ValueError, match="'fractile' must be finite"):
+        dataclasses.replace(result, fractile=value)
+
+
+@pytest.mark.parametrize("field", ["age", "l_ex", "years", "fractile"])
+@pytest.mark.parametrize("value", [float("nan"), float("inf")])
+def test_htlan_rejects_a_non_finite_condition(field: str, value: float) -> None:
+    """Nothing here computes with the four conditions, so nothing tripped on them.
+
+    The fiche prints all four verbatim as the listener and exposure the
+    prediction is stated for, and the plot titles itself with three of them:
+    a NaN age published a complete accredited sheet headed "Listener: male,
+    age nan years" beside components that were all perfectly finite.
+    """
+    result = m.htlan(60, "male", 95.0, 20.0, 0.5)
+    with pytest.raises(ValueError, match=f"'{field}' must be finite"):
+        dataclasses.replace(result, **{field: value})

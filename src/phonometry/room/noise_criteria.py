@@ -42,6 +42,7 @@ from .._internal.validation import (
     check_engine,
     require_choice,
     require_equal_shapes,
+    require_finite_fields,
     require_ranks,
     require_same_length,
 )
@@ -348,13 +349,32 @@ class RCResult:
         the Table 6 vibration/rattle criterion test, which this library does
         not implement, so it is never mapped to a neighbouring tag.
 
+        The rating, its mid-frequency average and the reference curve are
+        pinned finite. Clause D.4 rates the average of three bands the rater
+        requires to be present, so the producer has no undetermined case to
+        express: the curve is generated from the rounded rating by the
+        closed-form -5 dB/octave rule of Annex D, which is finite in all ten
+        bands even when most of the spectrum was never measured. A ``NaN``
+        rating survives every shape guard and reaches the fiche as the
+        literal ``RC-nan(N)`` boxed as an accredited designation, and it
+        empties :attr:`out_of_family` of meaning: both sides of that chained
+        comparison are false for a ``NaN``, so the flag reads ``True`` for
+        every spectrum rather than answering for the rating.
+
+        ``levels`` is deliberately absent from that list: a spectrum may be
+        rated from a subset of the bands, and :func:`room_criterion` marks
+        each band it was not given with a ``NaN`` that the fiche renders as
+        an em dash.
+
         :raises ValueError: if the three per-band arrays do not share one
-            length, 'frequencies' is not the ten tabulated octave bands, or
+            length, 'frequencies' is not the ten tabulated octave bands,
+            'rating', 'lmf' or 'reference_curve' is not finite, or
             'classification' is not one of ``N``, ``R``, ``H`` or ``RH``.
         """
         require_ranks(self, frequencies=1, levels=1, reference_curve=1)
         require_same_length(self, "frequencies", "levels", "reference_curve")
         _require_table1_bands(type(self).__name__, self.frequencies)
+        require_finite_fields(self, "rating", "lmf", "reference_curve")
         if self.classification == "RV":
             msg = (
                 "RCResult: classification 'RV' (vibration and rattle, "

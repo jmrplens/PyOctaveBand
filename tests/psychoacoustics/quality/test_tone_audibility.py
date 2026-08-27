@@ -757,6 +757,57 @@ def test_result_rejects_a_non_finite_line_spacing() -> None:
         dataclasses.replace(good, line_spacing=float("nan"))
 
 
+@pytest.mark.parametrize(
+    "bad",
+    [np.nan, np.inf, 0.0, -3.0, 2.5],
+    ids=["nan", "infinity", "zero", "negative", "fractional"],
+)
+def test_result_rejects_a_group_size_that_is_not_a_count(bad: float) -> None:
+    """A group size tallies tones, so finite alone is the weaker half of it.
+
+    Measured on the nine Annex E tones against the unguarded library, the
+    entry-type column of the accredited key-quantity table takes each of the
+    five differently and none of them well. ``NaN`` and infinity reach
+    ``int()`` and come back as a bare "cannot convert float NaN to integer"
+    (an ``OverflowError`` for the infinity) raised from inside the row
+    builder, naming neither the field nor the tone. ``2.5`` truncates to
+    ``2`` and the sheet states ``FG (2)``, a group size no assessment
+    produced. ``0`` and ``-3`` truncate past the ``<= 1`` the label tests and
+    print ``Single`` on every row, and the sheet renders whole at the same
+    size as the intact one.
+    """
+    good = _annex_e_result()
+    counts = np.ones(good.tone_frequencies.size, dtype=np.float64)
+    counts[0] = bad
+    with pytest.raises(
+        ValueError, match="'group_sizes' must contain whole counts of one tone or more"
+    ):
+        dataclasses.replace(good, group_sizes=counts)
+
+
+def test_result_accepts_every_group_size_step_3_can_produce() -> None:
+    """The guard refuses the impossible counts without narrowing the real range.
+
+    Step 3 writes ``1`` for a tone rated on its own and ``len(group)`` for an
+    FG entry, and ``_step3_groups`` yields only clusters of two members or
+    more, so every count :func:`analyze_spectrum` emits is a whole number of
+    one or more. The absent field is legitimate too, and is the case
+    :func:`assess_tones` produces: built from bare levels, it never ran the
+    combination. A whole count handed over as a float names the same number
+    of tones and renders the same ``FG (N)`` label, so it is accepted as
+    well.
+    """
+    good = _annex_e_result()
+    assert good.group_sizes is None
+    counts = np.ones(good.tone_frequencies.size, dtype=np.int_)
+    counts[0] = 3
+    combined = dataclasses.replace(good, group_sizes=counts)
+    assert combined.group_sizes is not None
+    assert combined.group_sizes.tolist() == [3, *[1] * (counts.size - 1)]
+    as_floats = dataclasses.replace(good, group_sizes=counts.astype(np.float64))
+    assert as_floats.group_sizes is not None
+
+
 # ---------------------------------------------------------------------------
 # Table E.2 full columns: LG, av, band limits and uncertainty U
 # ---------------------------------------------------------------------------

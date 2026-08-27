@@ -1086,6 +1086,50 @@ def mean_audibility_uncertainty(
 # --------------------------------------------------------------------------- #
 # Result
 # --------------------------------------------------------------------------- #
+def _require_group_counts(counts: NDArray[np.int_] | None) -> None:
+    """Require ``group_sizes`` to be whole counts of one tone or more.
+
+    A group size is not a measured quantity but a tally: how many tones
+    :func:`analyze_spectrum` put behind an entry, ``1`` for a tone rated on
+    its own and ``N >= 2`` for the FG entry of a critical band shared by
+    ``N`` of them (Clause 5.3.8 Step 3). Nothing it counts is fractional,
+    none of it is undeterminable, and no entry stands for fewer than the one
+    tone it rates: ``_step3_groups`` yields only clusters of two members or
+    more, and every other entry is written as a literal ``1``. So the finite
+    check the measured quantities get is the weaker half of this contract,
+    and the three failures it would let through are the three the fiche
+    handles worst.
+
+    A ``NaN`` or an infinity reaches the accredited key-quantity table as
+    ``int()`` refusing it -- a bare "cannot convert float NaN to integer",
+    an ``OverflowError`` for the infinity -- raised from inside the row
+    builder, naming neither the field nor the tone it was on. A fractional
+    count is the silent one: ``2.5`` truncates to ``2`` and the table states
+    ``FG (2)``, a group size no assessment produced. A zero or a negative
+    count truncates past the ``<= 1`` the entry-type label tests and prints
+    ``Single`` on every row, and the sheet then reads as complete.
+
+    ``None`` is skipped: :func:`assess_tones` builds a result from bare
+    levels, which never ran Step 3, and that absence is documented.
+
+    :param counts: The ``group_sizes`` field, or ``None`` when the Step 3
+        combination was not performed.
+    :raises ValueError: if a count is non-finite, fractional, or below one.
+    """
+    if counts is None:
+        return
+    values = np.asarray(counts, dtype=np.float64).ravel()
+    whole = np.isfinite(values) & (values >= 1.0) & (values == np.floor(values))
+    if bool(np.all(whole)):
+        return
+    first = int(np.flatnonzero(~whole)[0])
+    msg = (
+        "ToneAudibilityResult: 'group_sizes' must contain whole counts of one "
+        f"tone or more; entry {first} is {values[first]}."
+    )
+    raise ValueError(msg)
+
+
 @dataclass(frozen=True)
 class ToneAudibilityResult:
     r"""Audibility of the tones of a narrow-band spectrum (ISO/PAS 20065).
@@ -1174,8 +1218,15 @@ class ToneAudibilityResult:
         audibility column crashes the statement's rounding with a bare
         "cannot convert float NaN to integer".
 
+        ``group_sizes`` is held to more than that, because it is not a
+        measured quantity but a tally of tones, and a count that is fractional
+        or below one is as impossible as one that is ``NaN``. It gets its own
+        guard, :func:`_require_group_counts`, which says what each of the
+        three refusals catches.
+
         :raises ValueError: if any per-tone quantity disagrees with the rest,
-            or any quantity is non-finite.
+            any quantity is non-finite, or a group size is not a whole count
+            of one tone or more.
         """
         require_ranks(
             self,
@@ -1230,6 +1281,7 @@ class ToneAudibilityResult:
             ):
                 msg = f"ToneAudibilityResult: '{name}' must contain only finite values."
                 raise ValueError(msg)
+        _require_group_counts(self.group_sizes)
 
     @property
     def audible(self) -> NDArray[np.bool_]:

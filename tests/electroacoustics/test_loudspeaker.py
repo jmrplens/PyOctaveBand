@@ -595,6 +595,28 @@ def test_a_band_edge_that_is_not_a_pair_is_refused(field: str) -> None:
         dataclasses.replace(result, **{field: (45.0, 18000.0, 3.0)})
 
 
+@pytest.mark.parametrize(
+    "field", ["effective_range", "sensitivity_band", "rated_frequency_range"]
+)
+@pytest.mark.parametrize("pair", [("low", "high"), (object(), object())])
+def test_a_band_edge_that_is_not_numeric_is_refused(
+    field: str, pair: tuple[object, object]
+) -> None:
+    """A correctly shaped pair of non-numbers is refused by its own name.
+
+    The conversion to ``float`` already stopped these, but with its own
+    wording: ``could not convert string to float: 'low'`` for the strings and
+    a ``TypeError`` from inside ``float`` for the objects, neither naming the
+    field nor the result, and the second not even the documented type.
+    """
+    result = _example_result()
+    with pytest.raises(
+        ValueError,
+        match=rf"LoudspeakerCharacteristics: '{field}' must be numeric\.",
+    ):
+        dataclasses.replace(result, **{field: pair})
+
+
 def test_a_band_edge_in_the_wrong_order_is_refused() -> None:
     """A reversed pair passes every shape check and prints the range backwards.
 

@@ -525,3 +525,27 @@ def test_a_non_finite_per_band_verdict_value_is_refused() -> None:
     bands[0]["residual_index_db"] = float("nan")
     with pytest.raises(ValueError, match=r"'bands' must carry finite per-band"):
         dataclasses.replace(result, bands=bands)
+
+
+def test_a_narrow_numpy_nan_per_band_value_is_refused() -> None:
+    """A NaN margin held as ``np.float32`` is a NaN the boxed verdict misses.
+
+    ``np.float64`` subclasses ``float`` and ``np.float32`` does not, so a
+    single-precision NaN margin used to reach :meth:`binding_margin`, where
+    :func:`min` compares it away against whichever value it meets first and
+    returns a finite binding margin for a band that has none.
+    """
+    import copy
+    import dataclasses
+
+    frequencies = np.array([250.0, 500.0, 1000.0, 2000.0])
+    result = emission.intensity_class_compliance(
+        np.full(frequencies.size, 20.0),
+        frequencies,
+        device="instrument",
+        spacing=0.025,
+    )
+    bands = tuple(copy.deepcopy(band) for band in result.bands)
+    bands[1]["margin_class1_db"] = np.float32("nan")
+    with pytest.raises(ValueError, match=r"'bands' must carry finite per-band"):
+        dataclasses.replace(result, bands=bands)

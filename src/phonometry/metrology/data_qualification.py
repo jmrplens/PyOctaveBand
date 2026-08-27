@@ -79,6 +79,7 @@ from scipy import special
 from .._internal.validation import (
     require_axis_count,
     require_equal_counts,
+    require_finite_fields,
     require_ranks,
     require_same_length,
 )
@@ -991,7 +992,7 @@ class PeakStatisticsResult:
     fs: float
 
     def __post_init__(self) -> None:
-        """Reject standardized peak heights that are not sorted ascending.
+        """Reject standardized peak heights that are not finite and sorted.
 
         The plot pairs :attr:`peak_values` positionally with the empirical
         exceedance ``1 - rank/n``, and spans its Rice curves from the first
@@ -1001,10 +1002,22 @@ class PeakStatisticsResult:
         length -- and publishes a wrong exceedance under the ordinary title,
         so the order is pinned here, where the mistake can be named.
 
-        :raises ValueError: if the peak heights carry more than one axis or
-            are not in ascending order.
+        Finiteness is pinned first, and not out of tidiness: the order check
+        is a comparison, and every comparison against a ``NaN`` is false, so
+        a ``NaN`` is not merely admitted -- it also hides the descent on
+        either side of it, which is the one thing this guard exists to catch.
+        Two equal infinities differ by a ``NaN`` and read as sorted for the
+        same reason. Either one then reaches the curves' span, a ``linspace``
+        between the first entry and the last, and the empirical exceedance is
+        published against heights that are not heights.
+        :func:`peak_statistics` cannot emit them -- the record is validated
+        finite and ``sigma`` is positive -- so nothing measurable is refused.
+
+        :raises ValueError: if the peak heights carry more than one axis,
+            are not finite throughout, or are not in ascending order.
         """
         require_ranks(self, peak_values=1)
+        require_finite_fields(self, "peak_values")
         values = np.asarray(self.peak_values)
         if values.ndim == 1 and np.any(np.diff(values) < 0.0):
             msg = (

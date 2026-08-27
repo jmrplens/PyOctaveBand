@@ -370,6 +370,44 @@ def verify_filter_class(
     return {"overall_class": overall, "range_limited": range_limited, "bands": bands}
 
 
+def _margin_classes(band: dict[str, Any]) -> list[int]:
+    """The classes one band verdict carries margins for, read off its keys."""
+    prefix, suffix = "margin_class", "_db"
+    return sorted(
+        int(key[len(prefix) : -len(suffix)])
+        for key in band
+        if key.startswith(prefix) and key.endswith(suffix)
+    )
+
+
+def _require_margin_classes(
+    bands: tuple[dict[str, Any], ...], edition: str, expected: list[int]
+) -> None:
+    """Pin the margin keys of every band to the classes the edition defines.
+
+    Two things reach here. A verdict verified against the other edition: its
+    bands carry that edition's margin keys, so the corridor would be drawn
+    from the wrong table under this edition's title. And a band list whose
+    entries disagree among themselves, which reading only the first band let
+    through: :meth:`FilterComplianceResult.plot` and the ``.report()`` fiche
+    read ``margin_class<c>_db`` out of *every* band, so one later band short
+    of the key dies in a bare ``KeyError`` halfway through the figure.
+
+    :raises ValueError: if a band carries margins for other classes than
+        ``expected`` (in any order).
+    """
+    wanted = sorted(expected)
+    for band in bands:
+        carried = _margin_classes(band)
+        if carried != wanted:
+            msg = (
+                f"'edition' ({edition!r}) defines classes {expected}, but the "
+                f"{band.get('freq', math.nan):g} Hz entry of 'bands' carries "
+                f"margins for classes {carried}."
+            )
+            raise ValueError(msg)
+
+
 @dataclass(frozen=True)
 class FilterComplianceResult:
     """IEC 61260-1 class-compliance verdict of an :class:`OctaveFilterBank`.
@@ -432,7 +470,11 @@ class FilterComplianceResult:
         whose edition disagrees with its margin keys would draw the other
         edition's corridor under this edition's title, and an overall class
         the bands carry no margins for dies in a bare ``KeyError`` halfway
-        through the figure.
+        through the figure. Every band is checked, not just the first:
+        :func:`verify_filter_class` fills each entry from the same list of
+        classes, so a band list whose entries disagree among themselves is
+        one no bank produced, and it is the later band that the fiche's
+        per-band table and the plot's worst-band search die on.
 
         A bank with no bands in range is an outcome
         :func:`verify_filter_class` does produce, and it always pairs it with
@@ -457,14 +499,8 @@ class FilterComplianceResult:
         require_ranks(self, band_frequencies=1)
         require_same_length(self, "bands", "sos", "band_frequencies", "factors")
         require_choice(self.edition, "edition", tuple(_FILTER_EDITIONS))
-        carried = self.available_classes()
         expected = list(_FILTER_EDITIONS[self.edition]["classes"])
-        if self.bands and carried != sorted(expected):
-            msg = (
-                f"'edition' ({self.edition!r}) defines classes {expected}, but "
-                f"the band verdicts carry margins for classes {carried}."
-            )
-            raise ValueError(msg)
+        _require_margin_classes(self.bands, self.edition, expected)
         if self.overall_class is not None and self.overall_class not in expected:
             msg = (
                 f"'overall_class' must be one of {expected} for edition "
@@ -495,15 +531,13 @@ class FilterComplianceResult:
         the edition (the 1995 edition adds class 0; the 2014 edition keeps only
         classes 1 and 2). An empty result (a bank with no bands in range)
         carries no verdicts, so this returns an empty list.
+
+        The first band answers for all of them: construction pins every band
+        to the same margin classes.
         """
         if not self.bands:
             return []
-        prefix, suffix = "margin_class", "_db"
-        return sorted(
-            int(key[len(prefix) : -len(suffix)])
-            for key in self.bands[0]
-            if key.startswith(prefix) and key.endswith(suffix)
-        )
+        return _margin_classes(self.bands[0])
 
     def reference_class(self) -> int:
         """The class whose corridor the fiche/plot overlays.

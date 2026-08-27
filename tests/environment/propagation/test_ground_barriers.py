@@ -27,12 +27,14 @@ Primary oracles (analytic limits + published statements):
 from __future__ import annotations
 
 import dataclasses
+import inspect
 import warnings
 
 import numpy as np
 import pytest
 
 from phonometry import environment
+from phonometry.environment.propagation import ground_barriers
 from phonometry.materials import delany_bazley
 
 _BANDS = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
@@ -382,6 +384,24 @@ def test_a_barrier_method_the_library_does_not_implement_is_refused() -> None:
     res = environment.barrier_insertion_loss(_BANDS, 1.0, 50.0, 4.0, 100.0, 1.5)
     with pytest.raises(ValueError, match="'method' must be one of"):
         dataclasses.replace(res, method="ISO 9613-2 Dz")
+
+
+def test_the_method_docstring_names_every_model_and_counts_them_right() -> None:
+    """The ``method`` prose is published verbatim as the API reference row.
+
+    ``scripts/generate_api_docs.py`` copies this ivar into the attributes
+    table of the ground-barriers page, so a stale count there is a published
+    claim about the library's coverage. Pin the sentence to
+    ``_BARRIER_METHODS``: a third model added to the tuple without a rewrite
+    of the prose fails here rather than shipping "the two models the library
+    implements" over three.
+    """
+    doc = inspect.getdoc(environment.BarrierInsertionLoss) or ""
+    prose = " ".join(doc.split())
+    assert len(ground_barriers._BARRIER_METHODS) == 2
+    for tag in ground_barriers._BARRIER_METHODS:
+        assert f'``"{tag}"``' in prose
+    assert "the two models the library implements" in prose
 
 
 @pytest.mark.parametrize("field_name", ["insertion_loss", "fresnel_number"])

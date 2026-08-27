@@ -477,6 +477,32 @@ _GEOMETRY_KEYS = frozenset(
 )
 
 
+def _require_finite_dimension(key: str, value: float) -> None:
+    """Refuse a retained dimension :meth:`plot_geometry` could not draw.
+
+    Two defects, one door. A ``NaN`` or an infinity passes every ``<= 0.0``
+    in the renderer and draws a part-blank device, and ``math.isfinite``
+    reports it as ``False``. A value that is not a number at all never gets
+    that far: ``math.isfinite`` raises a ``TypeError`` from inside the
+    standard library that names neither the field nor the key it came from,
+    and the string ``"0.3"`` -- a dimension that only looks like one -- is
+    the case a caller most plausibly reaches it with. Both leave here as the
+    ``ValueError`` that names the entry.
+
+    :param key: The geometry key, used in the error message.
+    :param value: The retained dimension.
+    :raises ValueError: if *value* is not numeric, or is not finite.
+    """
+    try:
+        finite = math.isfinite(value)
+    except TypeError as exc:
+        msg = f"'geometry[{key!r}]' must be numeric."
+        raise ValueError(msg) from exc
+    if not finite:
+        msg = f"'geometry[{key!r}]' must be finite."
+        raise ValueError(msg)
+
+
 @dataclass(frozen=True)
 class ReactiveSilencerResult:
     """Transmission and insertion loss of a reactive silencer over frequency.
@@ -557,7 +583,7 @@ class ReactiveSilencerResult:
 
         :raises ValueError: if the curves disagree, the matrix is not a
             stack of four-poles over frequency, or the retained geometry
-            carries an unknown key or a non-finite value.
+            carries an unknown key or a value that is not a finite number.
         """
         if self.geometry is not None:
             unknown = sorted(set(self.geometry) - _GEOMETRY_KEYS)
@@ -569,9 +595,7 @@ class ReactiveSilencerResult:
                 )
                 raise ValueError(msg)
             for key, value in self.geometry.items():
-                if not math.isfinite(value):
-                    msg = f"'geometry[{key!r}]' must be finite."
-                    raise ValueError(msg)
+                _require_finite_dimension(key, value)
         require_ranks(
             self,
             frequencies=1,

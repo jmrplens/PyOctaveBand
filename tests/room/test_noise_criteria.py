@@ -374,6 +374,56 @@ def test_an_rc_rating_refuses_an_unknown_spectral_tag() -> None:
         dataclasses.replace(result, classification="Q")
 
 
+@pytest.mark.parametrize("bad", [float("nan"), float("inf")], ids=["nan", "inf"])
+@pytest.mark.parametrize(
+    ("field", "message"),
+    [
+        ("rating", "'rating' must be finite"),
+        ("lmf", "'lmf' must be finite"),
+        ("reference_curve", "'reference_curve' must contain only finite values"),
+    ],
+)
+def test_an_rc_rating_refuses_a_non_finite_rating_average_or_curve(
+    field: str, message: str, bad: float
+) -> None:
+    """Clause D.4 leaves none of the three undetermined, so none may be stored.
+
+    The rater refuses a spectrum whose 500/1000/2000 Hz bands are not all
+    present, so ``LMF`` and the rating rounded from it always exist, and the
+    reference curve is generated from that rating by the closed-form
+    -5 dB/octave rule of Annex D, which is finite in all ten bands. A
+    non-finite value therefore describes no measurement, yet it clears every
+    shape guard: the fiche boxes the literal ``RC-nan(N)`` as an accredited
+    designation, and ``out_of_family`` stops being a verdict: both sides of
+    its chained comparison are false for a ``NaN``, so it reads ``True`` for
+    every spectrum rather than answering for the rating.
+    """
+    result = rn.room_criterion(rn.rc_curve(35.0))
+    curve = np.asarray(result.reference_curve, dtype=float).copy()
+    curve[3] = bad
+    replacement = curve if field == "reference_curve" else bad
+    with pytest.raises(ValueError, match=message):
+        dataclasses.replace(result, **{field: replacement})
+
+
+def test_an_rc_rating_keeps_the_bands_it_was_never_given() -> None:
+    """The finite guard must not reach ``levels``: absent bands are ``NaN``.
+
+    Clause D.4 needs only the mid-frequency bands to rate, so a spectrum may
+    be given as a subset of the ten and the rater marks every band it was not
+    handed with a ``NaN`` that the fiche renders as an em dash. That is a
+    quantity the measurement legitimately left undetermined, unlike the
+    rating and the curve derived from it, which are finite here even though
+    seven of the ten bands were never measured.
+    """
+    with pytest.warns(UserWarning, match="31.5 Hz to 4000 Hz octave bands"):
+        result = rn.room_criterion([35.0, 32.0, 30.0], [500.0, 1000.0, 2000.0])
+    absent = np.isnan(np.asarray(result.levels))
+    assert absent.sum() == 7
+    assert np.isfinite(np.asarray(result.reference_curve)).all()
+    assert np.isfinite([result.rating, result.lmf]).all()
+
+
 def test_an_nc_rating_outside_the_family_keeps_its_flag() -> None:
     """A NaN rating without ``out_of_range`` boxes ``NC-nan`` on the fiche.
 

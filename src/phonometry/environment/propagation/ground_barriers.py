@@ -632,8 +632,8 @@ class BarrierInsertionLoss:
     :ivar fresnel_number: Fresnel number ``N`` per frequency (single-edge
         geometry; the double-edge ``N`` for a thick barrier).
     :ivar method: Diffraction model used, and the tag the fiche and the plot
-        name it by: ``"kurze_anderson"`` or ``"exact"``, the two the library
-        implements. Any other tag is refused at construction.
+        name it by: ``"kurze_anderson"`` or ``"exact"``, the two models the
+        library implements. Any other tag is refused at construction.
     :ivar ground: Whether the coherent four-path ground model was applied.
     :ivar source_height: Source height the loss was computed for, in metres,
         retained (with the other five geometry fields) so

@@ -162,7 +162,9 @@ def test_a_non_finite_directivity_pattern_is_refused() -> None:
     assert result.directivity is not None
     poisoned = result.directivity.copy()
     poisoned[0, 10] = np.nan
-    with pytest.raises(ValueError, match="'directivity' must be finite"):
+    with pytest.raises(
+        ValueError, match="'directivity' must contain only finite values"
+    ):
         dataclasses.replace(result, directivity=poisoned)
 
 
@@ -173,8 +175,24 @@ def test_a_non_finite_angle_grid_is_refused() -> None:
     assert result.angles is not None
     poisoned = result.angles.copy()
     poisoned[3] = np.inf
-    with pytest.raises(ValueError, match="'angles' must be finite"):
+    with pytest.raises(ValueError, match="'angles' must contain only finite values"):
         dataclasses.replace(result, angles=poisoned)
+
+
+def test_a_non_numeric_angle_grid_is_refused_by_name() -> None:
+    """An angle grid of strings passes every rank and length check, and
+    reaches ``np.isfinite`` as a ``TypeError`` from inside numpy that names
+    neither the field nor the result it belongs to.
+    """
+    result = electroacoustics.radiating_piston(
+        0.1, [200.0, 800.0], angles=np.radians(np.linspace(-90.0, 90.0, 37))
+    )
+    assert result.angles is not None
+    lettered = np.array(["bad"] * result.angles.size, dtype=object)
+    with pytest.raises(
+        ValueError, match="RadiatingPistonResult: 'angles' must be numeric"
+    ):
+        dataclasses.replace(result, angles=lettered)
 
 
 def test_directivity_pattern_result_and_properties() -> None:

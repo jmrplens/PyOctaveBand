@@ -450,7 +450,10 @@ class IntensityInstrumentComplianceResult:
         derived figure with them, so no producer emits a NaN here; one
         smuggled in through :func:`dataclasses.replace` either dies inside
         matplotlib's axis autoscaling naming no field, or prints ``nan`` in
-        an accredited table whose boxed verdict still declares COMPLIES.
+        an accredited table whose boxed verdict still declares COMPLIES. The
+        per-band scan tests :class:`numpy.floating` alongside :class:`float`
+        because only ``np.float64`` subclasses ``float``: a narrower NumPy
+        scalar such as ``np.float32("nan")`` would otherwise pass unread.
 
         :raises ValueError: if the per-band entries disagree, the device tag
             is not a Table 2 column group, or any numeric field is not
@@ -482,7 +485,7 @@ class IntensityInstrumentComplianceResult:
                 raise ValueError(msg)
         for band in self.bands:
             for key, value in band.items():
-                if isinstance(value, float) and not math.isfinite(value):
+                if isinstance(value, (float, np.floating)) and not math.isfinite(value):
                     msg = (
                         "'bands' must carry finite per-band values; the "
                         f"{band.get('freq', math.nan):g} Hz entry has "

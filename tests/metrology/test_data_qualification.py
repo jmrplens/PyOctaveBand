@@ -184,7 +184,7 @@ def test_trend_test_validation() -> None:
     with pytest.raises(ValueError, match="one-dimensional"):
         ph.metrology.trend_test(two_dim)
     with_nan = np.r_[np.arange(19.0), np.nan]
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match="'values' must be finite"):
         ph.metrology.trend_test(with_nan)
     good = list(range(12))
     with pytest.raises(ValueError, match="method"):
@@ -342,7 +342,7 @@ def test_level_crossing_default_levels_and_validation() -> None:
     with pytest.raises(ValueError, match="levels"):
         ph.metrology.level_crossing_rate(x, FS, levels=empty_levels)
     nan_levels = [0.0, np.nan]
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match="'levels' must be finite"):
         ph.metrology.level_crossing_rate(x, FS, levels=nan_levels)
 
 
@@ -452,6 +452,34 @@ def test_peak_statistics_rejects_unsorted_peak_values() -> None:
     rng.shuffle(shuffled)
     with pytest.raises(ValueError, match="'peak_values' must be sorted"):
         dataclasses.replace(res, peak_values=shuffled)
+
+
+def test_peak_statistics_rejects_non_finite_peak_values() -> None:
+    """The order check does not catch a NaN; a NaN switches it off.
+
+    ``np.diff`` of a lone NaN is empty, and every comparison against a NaN is
+    false, so a NaN walks through the ascending check and takes the descent on
+    either side of it along -- ``[5, NaN, 1]`` reads as sorted. Two equal
+    infinities differ by a NaN and read as sorted for the same reason. Either
+    one then spans the Rice curves, ``linspace(peaks[0], peaks[-1])``, under
+    an empirical exceedance drawn against heights that are not heights.
+    """
+    res = ph.metrology.peak_statistics(
+        np.random.default_rng(9).standard_normal(1 << 14), FS
+    )
+    lone_nan = np.array([np.nan])
+    hidden_descent = np.array([5.0, np.nan, 1.0])
+    repeated_inf = np.array([1.0, np.inf, np.inf])
+    with np.errstate(invalid="ignore"):  # the order check alone admits all three
+        assert not np.any(np.diff(lone_nan) < 0.0)
+        assert not np.any(np.diff(hidden_descent) < 0.0)
+        assert not np.any(np.diff(repeated_inf) < 0.0)
+    with pytest.raises(ValueError, match="'peak_values' must contain only finite"):
+        dataclasses.replace(res, peak_values=lone_nan)
+    with pytest.raises(ValueError, match="'peak_values' must contain only finite"):
+        dataclasses.replace(res, peak_values=hidden_descent)
+    with pytest.raises(ValueError, match="'peak_values' must contain only finite"):
+        dataclasses.replace(res, peak_values=repeated_inf)
 
 
 # ---------------------------------------------------------------------------

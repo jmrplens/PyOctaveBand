@@ -310,6 +310,36 @@ def test_a_filter_verdict_refuses_an_edition_that_disagrees_with_its_bands() -> 
         dataclasses.replace(result, edition="1995")
 
 
+def test_a_filter_verdict_refuses_a_later_band_short_of_a_margin_key() -> None:
+    """The margin keys are read off every band, not only the first.
+
+    ``verify_filter_class`` fills each entry from the same list of classes, so
+    a band list whose entries disagree among themselves is one no bank
+    produced. Accepting it on the strength of the first band alone left the
+    ``KeyError`` for the reader: the fiche's per-band table and the plot's
+    worst-band search read ``margin_class<c>_db`` out of every band, for the
+    reference class. The key dropped here is that one, so the band list is
+    exactly the one that used to construct and then die mid-figure.
+    """
+    import copy
+    import dataclasses
+
+    from phonometry.filters.core import OctaveFilterBank
+
+    result = filters.filter_class_compliance(
+        OctaveFilterBank(fs=48000, fraction=1, order=4, limits=[500, 16000])
+    )
+    # The producer's own bands all carry the same margin keys, so the guard
+    # cannot refuse a verdict a bank emitted.
+    assert len({frozenset(band) for band in result.bands}) == 1
+    bands = tuple(copy.deepcopy(band) for band in result.bands)
+    del bands[1][f"margin_class{result.reference_class()}_db"]
+    with pytest.raises(
+        ValueError, match=r"entry of 'bands' carries margins for classes \[2\]"
+    ):
+        dataclasses.replace(result, bands=bands)
+
+
 def test_a_filter_verdict_refuses_a_non_finite_per_band_value() -> None:
     """Every margin is a ``min`` over the measured attenuation against the
     Table 1 mask, so no bank emits a NaN; one smuggled in prints

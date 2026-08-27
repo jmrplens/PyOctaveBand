@@ -704,6 +704,25 @@ def test_an_effective_range_that_is_not_a_pair_is_refused() -> None:
         dataclasses.replace(result, effective_range=(45.0, 18000.0, 3.0))
 
 
+@pytest.mark.parametrize("pair", [("low", "high"), (object(), object())])
+def test_an_effective_range_that_is_not_numeric_is_refused(
+    pair: tuple[object, object],
+) -> None:
+    """The shared guard names *this* result, not the loudspeaker it also serves.
+
+    The conversion to ``float`` already stopped these, but with its own
+    wording: ``could not convert string to float: 'low'`` for the strings and
+    a ``TypeError`` from inside ``float`` for the objects, neither naming the
+    field nor the result, and the second not even the documented type.
+    """
+    result = _example_result()
+    with pytest.raises(
+        ValueError,
+        match=r"MicrophoneCharacteristics: 'effective_range' must be numeric\.",
+    ):
+        dataclasses.replace(result, effective_range=pair)
+
+
 # --------------------------------------------------------------------------
 # A weighting the measurement standard does not define
 # --------------------------------------------------------------------------

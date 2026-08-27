@@ -82,7 +82,12 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from scipy import special
 
-from .._internal.validation import require_positive, require_ranks, require_same_length
+from .._internal.validation import (
+    require_finite_fields,
+    require_positive,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -432,12 +437,11 @@ class RadiatingPistonResult:
         # on-axis 0/0 to its limit, so no producer emits a non-finite
         # pattern; one smuggled NaN would silently drop the whole lobe from
         # :meth:`plot_geometry` (the lobe's peak turns NaN and its `> 0`
-        # gate turns False).
-        for name in ("angles", "directivity"):
-            value = getattr(self, name)
-            if value is not None and not np.all(np.isfinite(value)):
-                msg = f"'{name}' must be finite."
-                raise ValueError(msg)
+        # gate turns False). The shared guard is what runs it, so that a
+        # field holding something that is not a number at all is refused by
+        # name too, instead of reaching ``np.isfinite`` as an anonymous
+        # ``TypeError`` raised from inside numpy.
+        require_finite_fields(self, "angles", "directivity")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

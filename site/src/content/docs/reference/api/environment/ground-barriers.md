@@ -204,7 +204,7 @@ Per-frequency barrier insertion loss (IL vs frequency).
 | `frequencies` | Frequencies, in hertz. |
 | `insertion_loss` | Insertion loss $\mathrm{IL} = 20 \log_{10} \lvert p_{\text{without}} / p_{\text{with}} \rvert$, in decibels, per frequency. |
 | `fresnel_number` | Fresnel number `N` per frequency (single-edge geometry; the double-edge `N` for a thick barrier). |
-| `method` | Diffraction model used, and the tag the fiche and the plot name it by: `"kurze_anderson"` or `"exact"`, the two the library implements. Any other tag is refused at construction. |
+| `method` | Diffraction model used, and the tag the fiche and the plot name it by: `"kurze_anderson"` or `"exact"`, the two models the library implements. Any other tag is refused at construction. |
 | `ground` | Whether the coherent four-path ground model was applied. |
 | `source_height` | Source height the loss was computed for, in metres, retained (with the other five geometry fields) so `plot_geometry` can draw the section; appended after the original fields and `None` for hand-built results. |
 | `barrier_distance` | Source-to-barrier horizontal distance, in metres. |

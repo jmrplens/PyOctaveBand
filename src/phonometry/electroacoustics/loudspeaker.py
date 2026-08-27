@@ -326,9 +326,21 @@ def _require_frequency_pair(owner: object, name: str) -> None:
     order; ``lo == hi`` is allowed because a response inside its tolerance at
     a single sample yields a degenerate but honest range.
 
+    The conversion to ``float`` is what refuses a pair of the right shape
+    whose members are not numbers at all, and its own complaint is caught for
+    the sake of it: ``("low", "high")`` reaches the guard as a ``ValueError``
+    reading ``could not convert string to float: 'low'`` and a pair of
+    arbitrary objects as a ``TypeError`` from inside ``float`` -- neither
+    names the field, neither names the result it belongs to, and the second
+    is not the ``ValueError`` this guard documents. The helper validates
+    fields of two result types (both loudspeaker band edges and
+    ``MicrophoneCharacteristics.effective_range``), so the owner's type name
+    is what tells the two apart in the message.
+
     :param owner: The instance whose field is read.
     :param name: Field name holding a ``(lo, hi)`` tuple or ``None``.
-    :raises ValueError: if the field is not a finite, ordered, positive pair.
+    :raises ValueError: if the field is not numeric, or is not a finite,
+        ordered, positive pair.
     """
     value = getattr(owner, name)
     if value is None:
@@ -340,7 +352,11 @@ def _require_frequency_pair(owner: object, name: str) -> None:
             f"got shape {np.shape(value)}."
         )
         raise ValueError(msg)
-    lo, hi = float(value[0]), float(value[1])
+    try:
+        lo, hi = float(value[0]), float(value[1])
+    except (TypeError, ValueError) as exc:
+        msg = f"{owner_name}: '{name}' must be numeric."
+        raise ValueError(msg) from exc
     if not (math.isfinite(lo) and math.isfinite(hi) and 0.0 < lo <= hi):
         msg = (
             f"{owner_name}: '{name}' must be a finite (lo, hi) frequency pair "
