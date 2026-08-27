@@ -186,6 +186,18 @@ jobs:
         # twelve days it took to notice.
         run: pnpm run check:structured-data
         working-directory: site
+      - name: Check the identity snapshot against its canonical document
+        # The `#person` entity every page links its author to is fetched live
+        # at build time; the committed snapshot is only the fallback for a
+        # build with no network. Nothing read it, so it froze on the day it
+        # was added: by the time this step existed the canonical document had
+        # grown its Spanish half, and the snapshot was still publishing an
+        # English-only job title and description on a site that ships both
+        # locales. A stale fallback fails nothing, renders nothing wrong and
+        # is invisible in review, which is exactly why it needs a gate rather
+        # than a habit.
+        run: pnpm run identity:check
+        working-directory: site
       - name: Check every formula rendered
         # KaTeX does not fail a build on a parse error: it emits a
         # `katex-error` span and ships the page. A display block whose `$$`

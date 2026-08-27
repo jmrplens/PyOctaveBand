@@ -13,14 +13,43 @@
     "Jose Manuel Requena-Plens",
     "Jose Manuel Requena Plens"
   ],
-  "jobTitle": "R&D · Firmware & Software Engineer",
-  "description": "Firmware and software engineer in Valencia, Spain — industrial embedded systems, open-source tooling, and self-hosted infrastructure.",
+  "jobTitle": [
+    {
+      "@value": "R&D · Firmware & Software Engineer",
+      "@language": "en"
+    },
+    {
+      "@value": "I+D · Ingeniero de Firmware y Software",
+      "@language": "es"
+    }
+  ],
+  "description": [
+    {
+      "@value": "Firmware and software engineer in Valencia, Spain — industrial embedded systems, open-source tooling, and self-hosted infrastructure.",
+      "@language": "en"
+    },
+    {
+      "@value": "Ingeniero de firmware y software en Valencia — sistemas embebidos industriales, herramientas open source e infraestructura self-hosted.",
+      "@language": "es"
+    }
+  ],
+  "email": "mail@jmrp.io",
   "url": "https://jmrp.io/",
+  "mainEntityOfPage": "https://jmrp.io/about/",
+  "publishingPrinciples": "https://jmrp.io/about/#editorial",
   "image": {
     "@type": "ImageObject",
-    "url": "https://github.com/jmrplens.png",
-    "width": "460",
-    "height": "460"
+    "url": "https://jmrp.io/identity/avatar.png",
+    "width": {
+      "@type": "QuantitativeValue",
+      "value": 460,
+      "unitCode": "E37"
+    },
+    "height": {
+      "@type": "QuantitativeValue",
+      "value": 460,
+      "unitCode": "E37"
+    }
   },
   "alumniOf": [
     {
@@ -56,15 +85,49 @@
       }
     }
   ],
+  "hasOccupation": {
+    "@type": "Occupation",
+    "name": [
+      {
+        "@value": "Firmware & Software Engineer",
+        "@language": "en"
+      },
+      {
+        "@value": "Ingeniero de Firmware y Software",
+        "@language": "es"
+      }
+    ]
+  },
+  "knowsLanguage": [
+    {
+      "@type": "Language",
+      "name": "Spanish",
+      "alternateName": "es"
+    },
+    {
+      "@type": "Language",
+      "name": "English",
+      "alternateName": "en"
+    }
+  ],
+  "homeLocation": {
+    "@type": "Place",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Valencia",
+      "addressRegion": "Valencian Community",
+      "addressCountry": "ES"
+    }
+  },
   "knowsAbout": [
     {
       "@type": "Thing",
-      "name": "Embedded Systems",
+      "name": "embedded system",
       "@id": "http://www.wikidata.org/entity/Q193040"
     },
     {
       "@type": "Thing",
-      "name": "Firmware",
+      "name": "firmware",
       "@id": "http://www.wikidata.org/entity/Q104851"
     },
     {
@@ -84,22 +147,22 @@
     },
     {
       "@type": "Thing",
-      "name": "Cryptography",
+      "name": "cryptography",
       "@id": "http://www.wikidata.org/entity/Q8789"
     },
     {
       "@type": "Thing",
-      "name": "Network Security",
+      "name": "network security",
       "@id": "http://www.wikidata.org/entity/Q989632"
     },
     {
       "@type": "Thing",
-      "name": "Nginx",
+      "name": "nginx",
       "@id": "http://www.wikidata.org/entity/Q306144"
     },
     {
       "@type": "Thing",
-      "name": "MikroTik RouterOS",
+      "name": "RouterOS",
       "@id": "http://www.wikidata.org/entity/Q12036888"
     },
     {
@@ -114,12 +177,12 @@
     },
     {
       "@type": "Thing",
-      "name": "Acoustics",
+      "name": "acoustics",
       "@id": "http://www.wikidata.org/entity/Q82811"
     },
     {
       "@type": "Thing",
-      "name": "Signal Processing",
+      "name": "signal processing",
       "@id": "http://www.wikidata.org/entity/Q208163"
     },
     {
@@ -144,7 +207,7 @@
     },
     {
       "@type": "Thing",
-      "name": "Software Testing",
+      "name": "software testing",
       "@id": "http://www.wikidata.org/entity/Q188522"
     },
     {
@@ -173,6 +236,9 @@
       "@id": "https://github.com/jmrplens/TFG-TFM_EPS#software"
     },
     {
+      "@id": "https://github.com/jmrplens/portainer-mcp#software"
+    },
+    {
       "@id": "https://github.com/jmrplens/A-Lab#software"
     },
     {
@@ -186,14 +252,37 @@
     },
     {
       "@id": "https://github.com/jmrplens/FDTDexamples#software"
+    },
+    {
+      "@id": "https://github.com/jmrplens/CATT2Matlab#software"
+    },
+    {
+      "@id": "https://github.com/jmrplens/FFT2octave#software"
+    },
+    {
+      "@id": "https://github.com/jmrplens/getANSIfrequencies#software"
+    },
+    {
+      "@id": "https://github.com/jmrplens/dBFA2Matlab#software"
+    },
+    {
+      "@id": "https://github.com/jmrplens/MATLAB_Instruments#software"
+    },
+    {
+      "@id": "https://mcp.jmrp.io/gitlab#api"
+    },
+    {
+      "@id": "https://mcp.jmrp.io/libgen#api"
     }
   ],
-  "identifier": {
-    "@type": "PropertyValue",
-    "propertyID": "ORCID",
-    "value": "0000-0003-1250-6212",
-    "url": "https://orcid.org/0000-0003-1250-6212"
-  },
+  "identifier": [
+    {
+      "@type": "PropertyValue",
+      "propertyID": "ORCID",
+      "value": "0000-0003-1250-6212",
+      "url": "https://orcid.org/0000-0003-1250-6212"
+    }
+  ],
   "sameAs": [
     "https://github.com/jmrplens",
     "https://www.linkedin.com/in/jmrplens",
@@ -208,6 +297,7 @@
     "https://codeberg.org/jmrplens",
     "https://gitlab.com/jmrp",
     "https://pypi.org/user/jmrplens/",
-    "https://hub.docker.com/u/jmrplens"
+    "https://hub.docker.com/u/jmrplens",
+    "https://tangled.org/jmrp.io"
   ]
 }
