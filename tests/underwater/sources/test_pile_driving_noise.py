@@ -341,3 +341,20 @@ def test_total_sel_of_an_all_empty_column_is_minus_infinity() -> None:
         fs=float(FS),
     )
     assert spectrum.total_sel == -np.inf
+
+
+def test_a_strike_whose_trace_is_a_bare_number_is_refused() -> None:
+    """One sample is a trace; one number is not, and the peak check cannot tell.
+
+    The shared rank helper waives its pin when every field it was handed is a
+    bare number, an exemption written for the entry points that answer in
+    scalars. ``PileStrikeResult`` lists only ``pressure``, so a lone number
+    satisfied the whole set and walked past it, carrying a size of one and a
+    peak of its own that the comparison beside it was happy to confirm.
+    """
+    res = underwater.pile_strike_metrics(_pulse(100.0, 0.25), FS)
+    lone = np.float64(np.max(np.abs(res.pressure)))
+    with pytest.raises(
+        ValueError, match=r"'pressure' must be a one-dimensional waveform"
+    ):
+        dataclasses.replace(res, pressure=lone)

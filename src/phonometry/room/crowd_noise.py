@@ -335,6 +335,9 @@ class CrowdNoiseResult:
             "sound_power_level",
             "signal_level",
             "communication_level",
+            "talkers",
+            "absorption_areas",
+            "levels",
         )
         direct = float(
             speech_direct_level(

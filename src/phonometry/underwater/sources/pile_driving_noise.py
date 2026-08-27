@@ -220,8 +220,22 @@ class PileStrikeResult:
             one-dimensional trace, or ``peak_spl`` is not its zero-to-peak
             level.
         """
+        trace = np.asarray(self.pressure)
+        # The rank helper waives its pin when every field it was given is a
+        # bare number, an exemption meant for the entry points that answer in
+        # scalars. Here 'pressure' is the only field listed, so a lone number
+        # satisfies the whole set and walks past it, with a size of one and a
+        # peak of its own that the comparison below is happy to confirm. A
+        # trace of one sample is a trace; a number is not one, so the rank is
+        # pinned here in its own right.
+        if trace.ndim != 1:
+            msg = (
+                "PileStrikeResult: 'pressure' must be a one-dimensional "
+                f"waveform; got shape {trace.shape}."
+            )
+            raise ValueError(msg)
         require_ranks(self, pressure=1)
-        if np.asarray(self.pressure).size == 0:
+        if trace.size == 0:
             msg = (
                 "PileStrikeResult: 'pressure' must carry at least one sample; "
                 "a strike with no waveform has no peak to state."

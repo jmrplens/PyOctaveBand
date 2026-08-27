@@ -344,3 +344,19 @@ def test_a_variant_that_restates_itself_is_accepted() -> None:
 def test_validation_errors(call: object, match: str) -> None:
     with pytest.raises(ValueError, match=match):
         call()  # type: ignore[operator]
+
+
+@pytest.mark.parametrize("field", ["talkers", "absorption_areas", "levels"])
+def test_a_crowd_grid_carrying_a_non_finite_value_is_refused(field: str) -> None:
+    """The three arrays the figure is drawn from were the ones left unpinned.
+
+    The scalars around them were already required to be finite, so a NaN could
+    only enter through the occupancy axis, the absorption axis or the grid of
+    levels itself, and each of those is read straight into the plot and into
+    :func:`speech_to_noise_ratio`.
+    """
+    result = room.crowd_noise([50.0, 100.0, 200.0], talkers=[10, 20, 30])
+    poisoned = np.asarray(getattr(result, field), dtype=float).copy()
+    poisoned.flat[0] = np.nan
+    with pytest.raises(ValueError, match=rf"'{field}' must contain only finite values"):
+        dataclasses.replace(result, **{field: poisoned})

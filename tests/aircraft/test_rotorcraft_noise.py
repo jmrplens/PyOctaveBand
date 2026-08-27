@@ -14,6 +14,7 @@ heterogeneous event chain, is tested in ``test_rotorcraft_terrain.py``.
 from __future__ import annotations
 
 import dataclasses
+import math
 
 import matplotlib as mpl
 
@@ -22,6 +23,7 @@ import numpy as np
 import pytest
 
 from phonometry.aircraft.rotorcraft_noise import (
+    RotorcraftEventResult,
     RotorcraftHemisphere,
     hemisphere_source_level,
 )
@@ -1510,6 +1512,35 @@ def test_a_non_finite_a_weighted_step_is_refused() -> None:
     with_gap[0] = np.nan
     with pytest.raises(ValueError, match="'a_levels' must be finite"):
         dataclasses.replace(res, a_levels=with_gap)
+
+
+def test_an_empty_history_keeps_its_undetermined_peak() -> None:
+    """The exemption the docstring grants, which the guard used to take back.
+
+    A history with no records has no peak, so ``la_max`` is undetermined and
+    the producer writes a ``NaN``. Feeding the stored value back as its own
+    expectation looked like a way to pass the comparison over, but a ``NaN``
+    is close to nothing, not even to itself, so the exempt case was the one
+    the guard refused.
+    """
+    empty = np.array([])
+    result = RotorcraftEventResult(
+        frequencies=empty,
+        emission_times=empty,
+        times=empty,
+        distance=empty,
+        azimuth=empty,
+        polar=empty,
+        band_levels=np.zeros((0, 0)),
+        a_levels=empty,
+        la_max=float("nan"),
+        sel=float("nan"),
+        sel_10db=float("nan"),
+        pnlt=empty,
+        pnltm=float("nan"),
+        epnl=float("nan"),
+    )
+    assert math.isnan(result.la_max)
 
 
 def test_la_max_must_be_the_peak_of_its_own_history() -> None:

@@ -1100,8 +1100,14 @@ class RotorcraftEventResult:
         if not np.all(np.isfinite(self.a_levels)):
             msg = "RotorcraftEventResult: 'a_levels' must be finite."
             raise ValueError(msg)
-        # An empty history has no peak; nothing there restates anything.
-        peak = float(np.max(self.a_levels)) if np.size(self.a_levels) else self.la_max
+        # An empty history has no peak, so there is nothing here to restate and
+        # the comparison is skipped rather than fed the stored value back. Fed
+        # its own value it would still refuse a NaN, since a NaN is close to
+        # nothing, not even to itself, and that is the one value an exempt
+        # field is most likely to hold.
+        if np.size(self.a_levels) == 0:
+            return
+        peak = float(np.max(self.a_levels))
         if not math.isclose(self.la_max, peak, rel_tol=0.0, abs_tol=1e-9):
             msg = (
                 "RotorcraftEventResult: 'la_max' must be the maximum of "

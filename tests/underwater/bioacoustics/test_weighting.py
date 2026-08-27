@@ -735,7 +735,11 @@ def test_an_all_empty_spectrum_keeps_its_undetermined_totals() -> None:
         res = weighted_exposure(
             [100.0, 200.0], [-np.inf, -np.inf], "LF", peak_spl=200.0
         )
-    assert (res.unweighted_sel, res.weighted_sel, res.cumulative_sel) == (-np.inf,) * 3
+    assert (res.unweighted_sel, res.weighted_sel, res.cumulative_sel) == (
+        -np.inf,
+        -np.inf,
+        -np.inf,
+    )
     assert (res.sel_margin, res.tts_margin) == (-np.inf, -np.inf)
     assert res.peak_margin == pytest.approx(-22.0, abs=1e-9)
     with pytest.raises(ValueError, match=r"'cumulative_sel' must be 'weighted_sel'"):

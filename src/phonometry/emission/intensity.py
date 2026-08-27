@@ -138,11 +138,18 @@ def _expected_total_intensity_level(total_intensity: float, stored: float) -> fl
     zero total is returned as its own expectation; every other total is
     measured against the floored form the producer writes.
 
+    Both halves of that test are written as bounds rather than equalities.
+    A total of exactly zero is what ``abs(...) <= 0.0`` says, for ``-0.0`` as
+    well, and it is the only total this branch is for; an equality against
+    ``0.0`` would say the same thing while reading as the floating-point
+    comparison this is not. The infinity is tested by :func:`math.isinf` and
+    its sign, which is how the rest of the tree spells it.
+
     :param total_intensity: The broadband total the level restates, W/m^2.
     :param stored: The level the result carries, dB.
     :return: The level the two fields state together.
     """
-    if total_intensity == 0.0 and stored == -math.inf:
+    if abs(total_intensity) <= 0.0 and math.isinf(stored) and stored < 0.0:
         return stored
     return _level(abs(total_intensity), _I0)
 
