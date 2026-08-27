@@ -203,10 +203,28 @@ class AirborneInsulationResult:
         ``None`` stands for a quantity the measurement did not produce, so it
         is passed over rather than counted.
 
-        :raises ValueError: if any per-band column disagrees with the rest.
+        Every column must also be finite. No measurement here has an
+        undeterminable band: :func:`airborne_insulation` refuses non-finite
+        levels and reverberation times on the way in, so a NaN can only be
+        smuggled into a hand-built result, and without this pin it would
+        render as a literal ``nan`` cell inside the accredited chain table
+        while the rating box beside it printed normally.
+
+        :raises ValueError: if any per-band column disagrees with the rest,
+            or carries a non-finite value.
         """
         require_ranks(self, d=1, dnt=1, r_prime=1, l1=1, l2=1, t2=1)
         require_same_length(self, "d", "dnt", "r_prime", "l1", "l2", "t2")
+        for name in ("d", "dnt", "r_prime", "l1", "l2", "t2"):
+            value = getattr(self, name)
+            if value is not None and not np.all(
+                np.isfinite(np.asarray(value, dtype=np.float64))
+            ):
+                msg = (
+                    f"AirborneInsulationResult: '{name}' must contain only "
+                    "finite values."
+                )
+                raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -322,10 +340,27 @@ class ImpactInsulationResult:
         ``None`` stands for a quantity the measurement did not produce, so it
         is passed over rather than counted.
 
-        :raises ValueError: if any per-band column disagrees with the rest.
+        Every column must also be finite. No measurement here has an
+        undeterminable band: :func:`impact_insulation` refuses non-finite
+        levels and reverberation times on the way in, so a NaN can only be
+        smuggled into a hand-built result, and without this pin it would
+        render as a literal ``nan`` cell inside the accredited chain table
+        while the rating box beside it printed normally.
+
+        :raises ValueError: if any per-band column disagrees with the rest,
+            or carries a non-finite value.
         """
         require_ranks(self, l_n_t=1, l_n=1, li=1, t2=1)
         require_same_length(self, "l_n_t", "l_n", "li", "t2")
+        for name in ("l_n_t", "l_n", "li", "t2"):
+            value = getattr(self, name)
+            if value is not None and not np.all(
+                np.isfinite(np.asarray(value, dtype=np.float64))
+            ):
+                msg = (
+                    f"ImpactInsulationResult: '{name}' must contain only finite values."
+                )
+                raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pytest
 import reference_data as ref
@@ -366,6 +368,59 @@ def test_octave_conversion_energy_mean() -> None:
         np.mean([10.0 ** (-6 / 10), 10.0 ** (-10 / 10), 10.0 ** (-14 / 10)])
     )
     np.testing.assert_allclose(oct_dl, [expected])
+
+
+# ---------------------------------------------------------------------------
+# Construction guards
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize("field", ["delta_lw", "ci_delta"])
+def test_a_fractional_rating_is_refused_by_name(field: str) -> None:
+    """ISO 717-2 rounds both ratings to whole decibels, and the fiche prints them so.
+
+    A float smuggled into a hand-built result crashes the boxed statement's
+    ``{ci_delta:+d}`` format with a message naming no field, no result and no
+    fiche, or prints an unlocalised decimal point on a comma-decimal sheet.
+    """
+    freqs = ref.ISO717_2_REFERENCE_FLOOR_FREQ
+    bare = np.full(16, 75.0)
+    res = building.impact_improvement(bare, bare - 5.0, freqs)
+    with pytest.raises(ValueError, match=rf"'{field}' must be an integer number"):
+        dataclasses.replace(res, **{field: -1.0})
+
+
+def test_an_adaptation_term_without_its_rating_is_refused() -> None:
+    """``CI,delta`` and ``delta_lw`` are two readings of one rating, so both or neither.
+
+    Formula (A.4) takes ``CI,r`` from the same weighted rating of the same
+    ``Ln,r = Ln,r,0 - delta-L`` over the same 16 bands 100-3150 Hz that yields
+    ``delta_lw``, so a spectrum that leaves the rating undetermined leaves the
+    adaptation term undetermined too, and ``impact_improvement`` returns them
+    together. A hand-built result pairing them the other way used to render a
+    fiche that dropped the term without a word: the boxed statement of results
+    fell through to the unrated characterisation headline.
+    """
+    unrated = building.impact_improvement(
+        [1.0, 2.0, 3.0], [0.0, 0.0, 0.0], [500.0, 1000.0, 2000.0]
+    )
+    assert unrated.delta_lw is None
+    assert unrated.ci_delta is None
+    with pytest.raises(
+        ValueError, match=r"'ci_delta' is the adaptation term of 'delta_lw'"
+    ):
+        dataclasses.replace(unrated, ci_delta=-11)
+
+
+def test_a_rating_quoted_without_its_adaptation_term_is_allowed() -> None:
+    """The other half of the pair is a legitimate omission, not a broken relation.
+
+    ISO 16251-1 Clause 8 e) asks for ``delta-Lw (CI,delta)``, but a result
+    carrying only the rating is a rating quoted without the term, and the fiche
+    prints the bare ``delta-Lw`` instead of fabricating a ``(+0)``.
+    """
+    freqs = ref.ISO717_2_REFERENCE_FLOOR_FREQ
+    bare = np.full(16, 75.0)
+    res = building.impact_improvement(bare, bare - 5.0, freqs)
+    assert dataclasses.replace(res, ci_delta=None).delta_lw == res.delta_lw
 
 
 # ---------------------------------------------------------------------------

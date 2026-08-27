@@ -418,6 +418,64 @@ def require_same_shape(owner: object, *fields: str, quantity: str = "point") -> 
     require_equal_shapes(type(owner).__name__, shapes, quantity)
 
 
+def require_finite_fields(owner: object, *fields: str) -> None:
+    """Require each named field of *owner* to carry only finite values.
+
+    The value guard beside the shape guards of a result's ``__post_init__``,
+    for the fields no producer can legitimately leave undetermined: a
+    measurement surface area, a room volume, a single-number index. Where a
+    quantity *is* legitimately undeterminable band by band, an ISO 9614 band
+    of negative net power or an A-weighted total over no bands, it is marked
+    as such by a flag and rendered as an em dash, and it must not be listed
+    here.
+
+    Shape guards alone do not cover this: a ``NaN`` has whatever shape it was
+    stored in, so it passes every count and every rank, and reaches the fiche
+    as the literal ``nan`` printed in an accredited table, or as a conversion
+    error raised from inside a display rounder that names neither the field
+    nor the result it belongs to.
+
+    ``None`` fields are skipped: an absent optional quantity is not a
+    non-finite one.
+
+    A complex field is measured on both of its axes. Casting one to
+    ``float64`` to run the check would drop the imaginary part on the way in,
+    so a transfer stiffness whose damping term came back ``NaN`` beside an
+    intact real part passed the guard untouched, and the phase quantities
+    computed from it -- a magnitude, a loss factor -- carried the ``NaN``
+    onward as though it had been measured. ``np.isfinite`` already reads a
+    complex number as finite only when both components are, so the cast is
+    made only for the fields that are not complex to begin with.
+
+    That cast is also what refuses a field that is not numeric at all, and it
+    is kept for the sake of it: a string or an object array reaches
+    ``np.isfinite`` as an anonymous ``TypeError`` raised from inside numpy,
+    which names neither the field nor the result and is not the
+    ``ValueError`` this guard documents.
+
+    :param owner: The instance whose fields are measured.
+    :param fields: Field names that must be finite throughout.
+    :raises ValueError: if a field carries a ``NaN`` or an infinity, or is
+        not numeric.
+    """
+    for name in fields:
+        value = getattr(owner, name)
+        if value is None:
+            continue
+        try:
+            array = np.asarray(value)
+            if array.dtype.kind != "c":
+                array = array.astype(np.float64)
+        except (TypeError, ValueError) as exc:
+            msg = f"{type(owner).__name__}: '{name}' must be numeric."
+            raise ValueError(msg) from exc
+        if np.all(np.isfinite(array)):
+            continue
+        what = "be finite" if array.ndim == 0 else "contain only finite values"
+        msg = f"{type(owner).__name__}: '{name}' must {what}."
+        raise ValueError(msg)
+
+
 def require_per_band(
     x: ArrayLike, name: str, bands: np.ndarray, bands_name: str = "frequency"
 ) -> np.ndarray:

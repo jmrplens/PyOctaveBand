@@ -15,6 +15,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from ..._internal.validation import require_positive
 from ..common import _new_axes
 from ._draft import (
     _check_language,
@@ -76,17 +77,21 @@ def plot_junction_geometry(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the plate-1 rectangle.
     :return: The axes.
+    :raises ValueError: for an unknown junction type, or a thickness that is
+        not positive and finite.
     """
     _check_language(language)
     if junction not in ("L", "T1", "T2", "X"):
         msg = "'junction' must be 'L', 'T1', 'T2' or 'X'."
         raise ValueError(msg)
-    if thickness1 <= 0.0 or thickness2 <= 0.0:
-        msg = "Thicknesses must be positive."
-        raise ValueError(msg)
+    # require_positive rather than a bare ``<= 0.0``: NaN compares False
+    # against every bound, so a NaN thickness used to pass and draw plates
+    # collapsed to nothing under a dimension label reading "nan mm". Each
+    # thickness is named separately because the caller passed two.
+    h1 = require_positive(thickness1, "thickness1")
+    h2 = require_positive(thickness2, "thickness2")
     if ax is None:
         ax = _new_axes()
-    h1, h2 = float(thickness1), float(thickness2)
     arm = 5.0 * max(h1, h2)
     # Plate 1 is continuous for T1 and X (its "plates 1 and 3" are the same
     # panel); it stops against the perpendicular plate for L and T2.
@@ -162,14 +167,16 @@ def plot_plate_geometry(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the plate rectangle.
     :return: The axes.
+    :raises ValueError: for a side that is not positive and finite.
     """
     _check_language(language)
-    if length_x <= 0.0 or length_y <= 0.0:
-        msg = "'length_x' and 'length_y' must be positive."
-        raise ValueError(msg)
+    # Same reason as the junction thicknesses: a NaN side slipped past the
+    # bare ``<= 0.0`` and drew the baffle frame with no plate in it, under a
+    # dimension label reading "nan m".
+    a = require_positive(length_x, "length_x")
+    b = require_positive(length_y, "length_y")
     if ax is None:
         ax = _new_axes()
-    a, b = float(length_x), float(length_y)
     frame = 0.18 * max(a, b)
     _material_rect(ax, -frame, -frame, a + 2.0 * frame, b + 2.0 * frame, "rigid")
     _material_rect(ax, 0.0, 0.0, a, b, "plate", **kwargs)

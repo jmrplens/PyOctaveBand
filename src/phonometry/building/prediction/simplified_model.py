@@ -177,6 +177,20 @@ class PathContribution:
     r_w: float
     fraction: float
 
+    def __post_init__(self) -> None:
+        """Refuse a non-finite path index or energy share.
+
+        :func:`predicted_airborne_insulation` only forms finite contributions
+        (every term it combines is checked finite), so a NaN here is a
+        direct-construction mistake - and the fiche's path table rounds each
+        ``r_w`` for display, where ``math.floor`` answered a NaN with
+        "cannot convert float NaN to integer", naming no field.
+
+        :raises ValueError: if ``r_w`` or ``fraction`` is not finite.
+        """
+        _check_finite(self.r_w, "r_w")
+        _check_finite(self.fraction, "fraction")
+
 
 @dataclass(frozen=True)
 class AirbornePredictionResult:
@@ -193,6 +207,21 @@ class AirbornePredictionResult:
     r_direct_w: float
     paths: tuple[PathContribution, ...]
     dominant: PathContribution
+
+    def __post_init__(self) -> None:
+        """Refuse a non-finite predicted rating.
+
+        :func:`predicted_airborne_insulation` checks every input finite before
+        combining, so a NaN here is a direct-construction mistake - and the
+        fiche rounds the boxed ``R'w`` for display, where ``math.floor``
+        answered a NaN with "cannot convert float NaN to integer", naming no
+        field. The per-path values are guarded by
+        :class:`PathContribution` itself.
+
+        :raises ValueError: if ``r_prime_w`` or ``r_direct_w`` is not finite.
+        """
+        _check_finite(self.r_prime_w, "r_prime_w")
+        _check_finite(self.r_direct_w, "r_direct_w")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -280,6 +309,22 @@ class ImpactPredictionResult:
     ln_w_eq: float
     delta_l_w: float
     k_correction: float
+
+    def __post_init__(self) -> None:
+        """Refuse a non-finite predicted level or Formula (21) term.
+
+        :func:`predicted_impact_insulation` checks every term finite before
+        forming ``L'n,w``, so a NaN here is a direct-construction mistake -
+        and the fiche rounds the boxed rating for display, where
+        ``math.floor`` answered a NaN with "cannot convert float NaN to
+        integer", naming no field.
+
+        :raises ValueError: if any field is not finite.
+        """
+        _check_finite(self.l_prime_n_w, "l_prime_n_w")
+        _check_finite(self.ln_w_eq, "ln_w_eq")
+        _check_finite(self.delta_l_w, "delta_l_w")
+        _check_finite(self.k_correction, "k_correction")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

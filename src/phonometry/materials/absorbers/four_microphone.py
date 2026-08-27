@@ -71,10 +71,6 @@ _ASTM_KU_SPACING = 0.40
 #: (ASTM E2611-19, 6.2.3), i.e. ``f_l = c / (100 s)``.
 _ASTM_LOWER_WAVELENGTH_FRACTION = 100.0
 
-#: Shared message of the ``characteristic_impedance`` validation, repeated by
-#: every entry point that takes the air characteristic impedance ``rho c``.
-_IMPEDANCE_POSITIVE = "'characteristic_impedance' must be positive."
-
 #: A load is the tuple of the four microphone transfer functions H1..H4
 #: (ASTM E2611-19, Eqs. (17)-(20)).
 _LOAD_TRANSFER_FUNCTIONS = 4
@@ -344,8 +340,7 @@ def face_quantities(
     :param characteristic_impedance: Characteristic impedance ``rho c``, in rayls.
     :return: Tuple ``(p0, pd, u0, ud)`` of face pressures and velocities.
     """
-    if characteristic_impedance <= 0.0:
-        raise ValueError(_IMPEDANCE_POSITIVE)
+    require_positive(characteristic_impedance, "characteristic_impedance")
     thickness = require_positive(thickness, "thickness")
     av = np.asarray(a, dtype=np.complex128)
     bv = np.asarray(b, dtype=np.complex128)
@@ -426,8 +421,7 @@ class TransferMatrix:
         :param characteristic_impedance: Characteristic impedance ``rho c``.
         :return: Transmission loss ``TLn``, in decibels.
         """
-        if characteristic_impedance <= 0.0:
-            raise ValueError(_IMPEDANCE_POSITIVE)
+        require_positive(characteristic_impedance, "characteristic_impedance")
         rc = characteristic_impedance
         combo = self.t11 + self.t12 / rc + rc * self.t21 + self.t22
         return np.asarray(20.0 * np.log10(np.abs(combo) / 2.0), dtype=np.float64)
@@ -440,8 +434,7 @@ class TransferMatrix:
         :param characteristic_impedance: Characteristic impedance ``rho c``.
         :return: Complex reflection coefficient ``R``.
         """
-        if characteristic_impedance <= 0.0:
-            raise ValueError(_IMPEDANCE_POSITIVE)
+        require_positive(characteristic_impedance, "characteristic_impedance")
         rc = characteristic_impedance
         return np.asarray(
             (self.t11 - rc * self.t21) / (self.t11 + rc * self.t21),
@@ -582,8 +575,7 @@ def air_layer_transfer_matrix(
     :param characteristic_impedance: Characteristic impedance ``rho c``, in rayls.
     :return: The air-layer :class:`TransferMatrix`.
     """
-    if characteristic_impedance <= 0.0:
-        raise ValueError(_IMPEDANCE_POSITIVE)
+    require_positive(characteristic_impedance, "characteristic_impedance")
     if thickness <= 0.0:
         msg = "'thickness' must be positive."
         raise ValueError(msg)

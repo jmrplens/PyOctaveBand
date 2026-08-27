@@ -327,7 +327,7 @@ stiffness.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | for a non-positive reference or a zero stiffness magnitude (a dead channel has no level). |
+| ValueError | for a non-positive reference, a non-finite stiffness, or a zero stiffness magnitude (a dead channel has no level). |
 
 ## TransferStiffnessResult
 

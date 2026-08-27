@@ -63,8 +63,12 @@ from scipy import signal as sig
 
 from ..._internal.validation import (
     check_engine,
+    require_choice,
     require_equal_counts,
     require_equal_shapes,
+    require_finite_array,
+    require_ranks,
+    require_same_length,
 )
 from ..._internal.warnings import PhonometryWarning
 from ...io._resolve import SignalInput, resolve_fs, resolve_samples
@@ -511,6 +515,37 @@ class WeightedSpectrum:
     weighted: Real
     overall: float
 
+    def __post_init__(self) -> None:
+        """Reject a spectrum whose per-band columns disagree, or carry NaN.
+
+        The plot pairs the four columns by position, a band's unweighted and
+        weighted bars over the tick its centre frequency labels, and the title
+        prints :attr:`overall` beside them: a column of another length dies in
+        matplotlib naming two bare shapes and no field, and a non-finite value
+        renders as a silently absent bar under an ``a_w`` printed as ``nan``.
+        The entry point refuses non-finite input first, naming the parameter;
+        this guard covers the results built around it.
+
+        :raises ValueError: if the per-band columns disagree, or a value is
+            not finite.
+        """
+        require_ranks(
+            self, frequencies=1, band_accelerations=1, weighting_factors=1, weighted=1
+        )
+        require_same_length(
+            self, "frequencies", "band_accelerations", "weighting_factors", "weighted"
+        )
+        for name in (
+            "frequencies",
+            "band_accelerations",
+            "weighting_factors",
+            "weighted",
+            "overall",
+        ):
+            if not np.all(np.isfinite(np.asarray(getattr(self, name)))):
+                msg = f"'{name}' must contain only finite values."
+                raise ValueError(msg)
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -556,13 +591,15 @@ def weighted_acceleration(
         band values).
     :param weighting: Weighting name (one of :data:`WEIGHTING_NAMES`).
     :return: A :class:`WeightedSpectrum` with ``.plot()``.
-    :raises ValueError: if the inputs differ in length or are empty.
+    :raises ValueError: if the inputs differ in length, are empty or carry
+        non-finite values.
     """
-    accel = np.atleast_1d(np.asarray(band_accelerations, dtype=np.float64))
-    freq = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
-    if accel.ndim != 1 or accel.size == 0:
-        msg = "'band_accelerations' must be a non-empty 1-D array."
-        raise ValueError(msg)
+    # Finiteness is required of both vectors: a NaN band acceleration (or the
+    # NaN factor a NaN centre frequency weights it with) flows through the
+    # root-sum-of-squares into an a_w of NaN, and the plot then titles itself
+    # "a_w = nan" over a silently missing pair of bars.
+    accel = require_finite_array(band_accelerations, "band_accelerations")
+    freq = require_finite_array(frequencies, "frequencies")
     require_equal_shapes(
         "weighted_acceleration",
         {"band_accelerations": accel.shape, "frequencies": freq.shape},
@@ -840,12 +877,15 @@ def daily_exposure(total_value: float, duration_s: float) -> float:
     :param total_value: Vibration total value ``a_hv`` (or ``a_v``), in m/s2.
     :param duration_s: Daily exposure duration ``T``, in seconds.
     :return: The daily exposure ``A(8)``, in m/s2.
-    :raises ValueError: for a negative magnitude or duration.
+    :raises ValueError: for a non-finite or negative magnitude or duration.
     """
     a = float(total_value)
     t = float(duration_s)
-    if a < 0.0 or t < 0.0:
-        msg = "'total_value' and 'duration_s' must be non-negative."
+    # `< 0.0` alone would wave a NaN through (every NaN comparison is False)
+    # into an A(8) of NaN that the Directive assessment then reads as "below
+    # action", so finiteness is part of the refusal.
+    if not math.isfinite(a) or a < 0.0 or not math.isfinite(t) or t < 0.0:
+        msg = "'total_value' and 'duration_s' must be finite and non-negative."
         raise ValueError(msg)
     return a * math.sqrt(t / REFERENCE_DURATION_S)
 
@@ -956,6 +996,17 @@ def hav_vwf_lifetime_years(a8: float) -> float:
 # ---------------------------------------------------------------------------
 # Exposure assessment against Directive 2002/44/EC action / limit values.
 # ---------------------------------------------------------------------------
+#: Refusal for a ``kind``/``metric`` pair the Directive does not define. The
+#: vibration dose value is a whole-body quantity only: the Directive fixes
+#: hand-transmitted vibration to ``A(8)`` (Annex, Part A) and offers the VDV
+#: only as the whole-body alternative (Part B), so there are no hand-arm VDV
+#: action and limit values to assess against. Shared by the entry point and
+#: :meth:`ExposureAssessment.__post_init__` so both paths refuse identically.
+_KIND_METRIC_MSG = (
+    "kind must be 'hav' or 'wbv'; metric 'a8' (both) or 'vdv' (wbv only)."
+)
+
+
 @dataclass(frozen=True)
 class ExposureAssessment:
     """A daily exposure assessed against the Directive 2002/44/EC values.
@@ -980,6 +1031,33 @@ class ExposureAssessment:
     exceeds_limit: bool
     zone: str
 
+    def __post_init__(self) -> None:
+        """Reject an assessment whose kind or metric tag is unknown or unpaired.
+
+        The fiche routes through ``kind`` twice -- the basis line names the
+        applied ISO standard by it and the operations table heads its
+        magnitude column with the per-kind symbol -- and through ``metric``
+        for the exposure unit. An unpinned tag used to render a complete
+        page with an empty standard name and the whole-body symbol over
+        hand-arm data.
+
+        The two tags are also checked as a pair, exactly as
+        :func:`exposure_assessment` checks them: each is valid alone, but
+        ``kind="hav"`` with ``metric="vdv"`` names a quantity the Directive
+        does not define. Assessed alone, that pair used to render a fiche
+        headed by the hand-arm ISO standard whose every threshold, zone and
+        verdict came from the whole-body VDV values -- a hand-arm ``A(8)`` of
+        3,5 m/s2, well into the action zone above the 2,5 m/s2 EAV, printed
+        "below the exposure action value" and passed against 21 m/s^1,75.
+
+        :raises ValueError: if ``kind`` is not ``"hav"``/``"wbv"``, ``metric``
+            is not ``"a8"``/``"vdv"``, or the pair is ``"hav"``/``"vdv"``.
+        """
+        require_choice(self.kind, "kind", ("hav", "wbv"))
+        require_choice(self.metric, "metric", ("a8", "vdv"))
+        if self.kind == "hav" and self.metric == "vdv":
+            raise ValueError(_KIND_METRIC_MSG)
+
 
 def exposure_assessment(
     value: float,
@@ -995,11 +1073,13 @@ def exposure_assessment(
     :param metric: ``"a8"`` (default) or ``"vdv"``.
     :return: An :class:`ExposureAssessment`.
     :raises ValueError: for an unknown ``kind``/``metric`` combination or a
-        negative ``value``.
+        non-finite or negative ``value``.
     """
     v = float(value)
-    if v < 0.0:
-        msg = "'value' must be non-negative."
+    # A NaN exposure fails both `>= EAV` comparisons and would be assessed
+    # "below action"; refuse it instead of letting the verdict claim safety.
+    if not math.isfinite(v) or v < 0.0:
+        msg = "'value' must be finite and non-negative."
         raise ValueError(msg)
     if kind == "hav" and metric == "a8":
         eav, elv = HAV_EAV_A8, HAV_ELV_A8
@@ -1008,8 +1088,7 @@ def exposure_assessment(
     elif kind == "wbv" and metric == "vdv":
         eav, elv = WBV_EAV_VDV, WBV_ELV_VDV
     else:
-        msg = "kind must be 'hav' or 'wbv'; metric 'a8' (both) or 'vdv' (wbv only)."
-        raise ValueError(msg)
+        raise ValueError(_KIND_METRIC_MSG)
     exceeds_action = v >= eav
     exceeds_limit = v >= elv
     if exceeds_limit:
@@ -1048,6 +1127,39 @@ class DailyVibrationExposure:
     durations_s: Real
     partials: Real
     assessment: ExposureAssessment
+
+    def __post_init__(self) -> None:
+        """Reject an exposure whose per-operation columns disagree.
+
+        The plot walks the partials and reads the label at the same index, so
+        the label column alone decides which bar carries which operation's
+        name: a label tuple one short dies inside the legend loop as a bare
+        ``IndexError`` naming no field, and one long silently drops the
+        surplus operations' names from the legend of a figure that looks
+        complete. The fiche prints the same four columns a row at a time.
+
+        Finiteness is pinned with the lengths: every number here is a
+        magnitude the Directive verdict compares against the action and limit
+        values, and a NaN fails those comparisons into "below action". The
+        entry point refuses non-finite input first, naming the parameter; this
+        guard covers the results built around it.
+
+        :raises ValueError: if the per-operation columns disagree, or a value
+            is not finite.
+        """
+        require_ranks(self, total_values=1, durations_s=1, partials=1)
+        require_same_length(
+            self,
+            "labels",
+            "total_values",
+            "durations_s",
+            "partials",
+            axis="operation",
+        )
+        for name in ("a8", "total_values", "durations_s", "partials"):
+            if not np.all(np.isfinite(np.asarray(getattr(self, name)))):
+                msg = f"'{name}' must contain only finite values."
+                raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -1149,13 +1261,14 @@ def daily_vibration_exposure(
     :param kind: ``"hav"`` or ``"wbv"`` (selects the EAV/ELV).
     :param labels: Optional operation labels; defaults to ``op 1``, ``op 2``, ...
     :return: A :class:`DailyVibrationExposure` with ``.plot()``.
-    :raises ValueError: if the inputs differ in length or ``labels`` mismatches.
+    :raises ValueError: if the inputs differ in length, carry non-finite
+        values, or ``labels`` mismatches.
     """
-    ahv = np.atleast_1d(np.asarray(total_values, dtype=np.float64))
-    t = np.atleast_1d(np.asarray(durations_s, dtype=np.float64))
-    if ahv.ndim != 1 or ahv.size == 0:
-        msg = "'total_values' must be a non-empty 1-D array."
-        raise ValueError(msg)
+    # Finite up front, naming the parameter the caller typed: a NaN magnitude
+    # slips every `< 0.0` guard downstream and surfaces as an A(8) of NaN
+    # assessed "below action".
+    ahv = require_finite_array(total_values, "total_values")
+    t = require_finite_array(durations_s, "durations_s")
     require_equal_shapes(
         "daily_vibration_exposure",
         {"total_values": ahv.shape, "durations_s": t.shape},

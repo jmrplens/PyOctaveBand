@@ -141,10 +141,44 @@ class ApertureTransmissionResult:
         the right length, finite, and about a slit that was evaluated at one
         frequency only.
 
-        :raises ValueError: if the two per-band arrays disagree.
+        The retained geometry is pinned to one shape as well: a slit keeps its
+        ``width`` and a circular aperture its ``radius``, never both, and
+        :meth:`plot_geometry` draws whichever is present, testing ``width``
+        first. A result carrying both would silently render the slit section
+        for what claims to be a circular aperture.
+
+        The kept shape has to be the shape ``kind`` names, too. The section is
+        drawn from whichever of the two is present and nothing in it says which
+        kind it belongs to, so a ``"circular"`` result that kept a ``width``
+        draws the slit section of that width -- pixel for pixel the figure of a
+        slit, under a curve the same result labels a circular aperture -- and a
+        ``"slit"`` that kept a ``radius`` draws the hole section of the doubled
+        opening.
+
+        :raises ValueError: if the two per-band arrays disagree, if the result
+            carries both a slit width and a circular radius, or if the shape it
+            carries is not the one ``kind`` names.
         """
         require_ranks(self, frequencies=1, transmission_coefficient=1)
         require_same_length(self, "frequencies", "transmission_coefficient")
+        if self.width is not None and self.radius is not None:
+            msg = (
+                "Give at most one of 'width' (a slit) and 'radius' (a "
+                "circular aperture); this result carries both."
+            )
+            raise ValueError(msg)
+        if self.width is not None and self.kind != "slit":
+            msg = (
+                f"'width' is the slit width, but 'kind' is {self.kind!r}; give "
+                "'radius' for a circular aperture."
+            )
+            raise ValueError(msg)
+        if self.radius is not None and self.kind != "circular":
+            msg = (
+                f"'radius' is the circular-aperture radius, but 'kind' is "
+                f"{self.kind!r}; give 'width' for a slit."
+            )
+            raise ValueError(msg)
 
     @property
     def transmission_loss(self) -> np.ndarray:

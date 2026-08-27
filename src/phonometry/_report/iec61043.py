@@ -50,6 +50,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from .._internal.validation import require_choice
 from ._i18n import decimal_comma, format_number, t
 from ._layout import (
     _ACCENT_HEX,
@@ -74,8 +75,7 @@ if TYPE_CHECKING:
     )
     from .metadata import ReportMetadata
 
-#: Fiche prose for the ``"instrument"`` column of Table 2, and the fallback
-#: for an unrecognised device kind.
+#: Fiche prose for the ``"instrument"`` column of Table 2.
 _COMPLETE_INSTRUMENT = "complete instrument"
 
 #: Table 2 column group each device kind is judged against, as fiche prose.
@@ -87,8 +87,25 @@ _DEVICE_PHRASE = {
 
 
 def _device_phrase(device: str, language: str) -> str:
-    """The localised Table 2 column-group name of a device kind."""
-    return t(_DEVICE_PHRASE.get(device, _COMPLETE_INSTRUMENT), language)
+    """The localised Table 2 column-group name of a device kind.
+
+    An unrecognised tag is refused rather than labelled as a complete
+    instrument. This phrase is what the certificate says was verified, twice:
+    on the "Verified as:" line of the boxed result and in the
+    measurement-basis strip naming the Table 2 column group the minima were
+    read from. A default would attest the column group of the whole chain for
+    a device the fiche could not identify, and it would disagree with the
+    plot, which reads the same tag through a lookup carrying no default at
+    all. The result pins the tag at construction, so this refusal is the
+    second reader agreeing with the first rather than a live route.
+
+    :param device: The device kind, a Table 2 column group.
+    :param language: ``"en"`` or ``"es"``.
+    :return: The localised column-group name.
+    :raises ValueError: if ``device`` is not a Table 2 column group.
+    """
+    kind = require_choice(device, "device", tuple(_DEVICE_PHRASE))
+    return t(_DEVICE_PHRASE[kind], language)
 
 
 def _basis(metadata: ReportMetadata | None, language: str = "en") -> str:

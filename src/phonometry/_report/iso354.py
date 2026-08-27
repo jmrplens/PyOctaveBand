@@ -25,6 +25,10 @@ ISO 354 is a characterisation, so this fiche carries no pass/fail verdict and no
 weighted rating; the weighted coefficient ``alpha_w`` is an ISO 11654 quantity
 rendered by :mod:`.iso11654`.
 
+A band whose reverberation time could not be evaluated arrives as a NaN and
+carries through the Sabine inversion into ``A2`` and ``alpha_s``; every table
+cell prints the house em dash for it rather than a literal ``nan``.
+
 The quantity-independent skeleton lives in :mod:`._layout`; this module only
 holds the ISO 354 specifics. reportlab, matplotlib and svglib are soft
 dependencies imported lazily (reportlab and svglib ship in the
@@ -35,6 +39,7 @@ guarded with an actionable :class:`ImportError`.
 from __future__ import annotations
 
 import html
+import math
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -63,14 +68,32 @@ if TYPE_CHECKING:
     from .metadata import ReportMetadata
 
 
+def _cell(value: float, decimals: int, language: str) -> str:
+    """Format one table value, or an em dash when it is not finite.
+
+    A band whose decay could not be evaluated arrives here as a NaN: that is
+    how the library's own decay analysis reports one (ISO 3382-2:2008,
+    Clause 6, whose per-band validity flags leave the rejected times
+    undetermined), and ``measure_sound_absorption`` carries it through the
+    Sabine inversion into ``A2`` and ``alpha_s``. The accredited table shows
+    it as ``"—"``, the empty-cell symbol the sibling fiches already print,
+    rather than the literal ``nan`` that used to sit between two real
+    coefficients.
+    """
+    v = float(value)
+    if not math.isfinite(v):
+        return "—"
+    return format_number(v, language, decimals=decimals)
+
+
 def _a2(value: float, language: str = "en") -> str:
-    """Two decimals (``alpha_s``), locale-aware separator."""
-    return format_number(value, language, decimals=2)
+    """Two decimals (``alpha_s`` and the times), or the em dash (see :func:`_cell`)."""
+    return _cell(value, 2, language)
 
 
 def _a1(value: float, language: str = "en") -> str:
-    """One decimal (absorption areas ``A``, ISO 354 Clause 8.3), locale-aware."""
-    return format_number(value, language, decimals=1)
+    """One decimal (areas ``A``, ISO 354 Cl. 8.3), or the em dash (:func:`_cell`)."""
+    return _cell(value, 1, language)
 
 
 def _metadata_pairs(

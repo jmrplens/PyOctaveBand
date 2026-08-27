@@ -221,3 +221,9 @@ the distraction and privacy distances marked on the axis when given.
 | `kwargs` | Forwarded to the microphone scatter. |
 
 **Returns:** The axes.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for an input that is not one-dimensional, for fewer than two positions, or for a position that is not a finite, strictly positive distance. |

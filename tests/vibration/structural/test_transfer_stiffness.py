@@ -56,6 +56,18 @@ def test_level_rejects_zero_stiffness() -> None:
         vibration.transfer_stiffness_level([1e6, 0.0 + 0.0j])
 
 
+@pytest.mark.parametrize("bad", [complex("nan"), complex("inf")])
+def test_level_says_non_finite_rather_than_dead_channel(bad: complex) -> None:
+    """The two mistakes are told apart, so the diagnosis is true.
+
+    A NaN compares False against the positivity bound, so folded into it a
+    stiffness that was never measured was reported as a dead channel that
+    read zero.
+    """
+    with pytest.raises(ValueError, match="non-finite magnitudes"):
+        vibration.transfer_stiffness_level([1e6, bad])
+
+
 # ---------------------------------------------------------------------------
 # Loss factor (ISO 10846-1, 3.8)
 # ---------------------------------------------------------------------------
@@ -343,3 +355,29 @@ def test_one_stiffness_under_a_swept_frequency_is_refused() -> None:
     assert lone.ndim == 1
     with pytest.raises(ValueError, match="'transfer_stiffness' [(]1[)]"):
         dataclasses.replace(res, transfer_stiffness=lone)
+
+
+@pytest.mark.parametrize("bad", [complex(2.0e6, math.nan), complex(2.0e6, math.inf)])
+def test_a_stiffness_undetermined_only_in_its_phase_is_refused(bad: complex) -> None:
+    r"""Half a measured stiffness is not a measured stiffness.
+
+    ``k2,1`` is a phasor, and the imaginary axis is where ISO 10846-1 reads
+    the damping: the loss factor (3.8) is ``Im/Re``. A band whose real part
+    survived a bad bin while its imaginary part came back undetermined is
+    therefore a band with no loss factor, and the direct method is where such
+    a result is built, since it has no producer function of its own and the
+    caller hands ``F2,b/u1`` to the constructor themselves.
+
+    Admitted, it reached the readers as a number: ``.magnitude`` returned
+    ``nan`` N/m for the band and ``.loss_factor`` a ``nan`` eta, both without
+    a word, while ``.to("impedance")`` refused it as a *dead channel* that
+    read zero, because ``abs(nan)`` compares False against the positivity
+    bound exactly as a real zero does. Neither reader named the field, and
+    the one diagnosis offered was the wrong one.
+    """
+    f = np.array([100.0, 200.0, 400.0])
+    k = np.array([complex(1.0e6, 1.0e4), bad, complex(3.0e6, 3.0e4)])
+    with pytest.raises(
+        ValueError, match="'transfer_stiffness' must contain only finite values"
+    ):
+        vibration.TransferStiffnessResult(frequencies=f, transfer_stiffness=k)

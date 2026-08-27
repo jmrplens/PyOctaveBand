@@ -695,6 +695,52 @@ def test_impact_non_finite_rejected() -> None:
 
 
 # --------------------------------------------------------------------------
+# Direct construction of the exported result types
+# --------------------------------------------------------------------------
+#
+# The builders above refuse a non-finite input, but both results and the path
+# contribution are exported and can be built by hand, and the EN 12354 fiche
+# rounds every rating it boxes for display: ``math.floor`` answered a NaN with
+# "cannot convert float NaN to integer" from inside the renderer, naming
+# neither the field nor the result it came from.
+
+
+@pytest.mark.parametrize("field", ["r_w", "fraction"])
+def test_path_contribution_non_finite_refused(field: str) -> None:
+    """A hand-built path contribution names the field that is not finite."""
+    values = {"r_w": 55.0, "fraction": 1.0}
+    values[field] = float("nan")
+    with pytest.raises(ValueError, match=rf"'{field}' must be a finite number"):
+        building.PathContribution(label="Dd", kind="Dd", **values)
+
+
+@pytest.mark.parametrize("field", ["r_prime_w", "r_direct_w"])
+def test_airborne_result_non_finite_refused(field: str) -> None:
+    """A hand-built airborne prediction names the rating that is not finite."""
+    path = building.PathContribution(label="Dd", kind="Dd", r_w=55.0, fraction=1.0)
+    values = {"r_prime_w": 52.0, "r_direct_w": 55.0}
+    values[field] = float("nan")
+    with pytest.raises(ValueError, match=rf"'{field}' must be a finite number"):
+        building.AirbornePredictionResult(paths=(path,), dominant=path, **values)
+
+
+@pytest.mark.parametrize(
+    "field", ["l_prime_n_w", "ln_w_eq", "delta_l_w", "k_correction"]
+)
+def test_impact_result_non_finite_refused(field: str) -> None:
+    """A hand-built impact prediction names the term that is not finite."""
+    values = {
+        "l_prime_n_w": 58.0,
+        "ln_w_eq": 76.0,
+        "delta_l_w": 20.0,
+        "k_correction": 2.0,
+    }
+    values[field] = float("nan")
+    with pytest.raises(ValueError, match=rf"'{field}' must be a finite number"):
+        building.ImpactPredictionResult(**values)
+
+
+# --------------------------------------------------------------------------
 # Annex E junction Kij — independent literature oracles
 # --------------------------------------------------------------------------
 

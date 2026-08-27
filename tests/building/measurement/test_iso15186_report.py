@@ -16,6 +16,7 @@ report tests.
 
 from __future__ import annotations
 
+import dataclasses
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -296,6 +297,40 @@ def test_clause8_areas_stated_in_statement(tmp_path: Path) -> None:
     assert "S = 10" in text
     assert "= 12" in text  # Sm = 12 m2
     assert "Clause 8" in text
+
+
+@pytest.mark.parametrize("field", ["area", "measurement_area"])
+@pytest.mark.parametrize(
+    "value", [float("nan"), float("inf"), -float("inf")], ids=["nan", "inf", "-inf"]
+)
+def test_clause8_areas_reject_non_finite(field: str, value: float) -> None:
+    """S and Sm are pinned finite where the Clause 8 g) statement reads them.
+
+    ``intensity_sound_reduction`` divides by both areas, so neither entry
+    point can emit a non-finite one; the class docstring nonetheless invites a
+    manually built result, and the areas carried no guard of their own. A NaN
+    ``area`` rendered the accredited Clause 8 g) statement as
+    "S = nan m2; Sm = 12 m2" with no warning anywhere on the page.
+    """
+    result = _intensity_result()
+    with pytest.raises(ValueError, match=rf"'{field}' must be positive"):
+        dataclasses.replace(result, **{field: value})
+
+
+@pytest.mark.parametrize("field", ["r_i", "r_i_modified"])
+def test_band_indices_reject_non_finite(field: str) -> None:
+    """RI and RI,M are pinned finite where the band table prints them.
+
+    ISO 15186 has no undeterminable band to flag: the only producer,
+    ``intensity_sound_reduction``, forms both indices from levels already
+    refused non-finite, so a NaN band is always a mistake. Admitted, it
+    printed a bare ``nan`` as a measured index in the accredited band table.
+    """
+    result = _intensity_result(with_kc=True)
+    bad = np.asarray(getattr(result, field), dtype=np.float64).copy()
+    bad[3] = np.nan
+    with pytest.raises(ValueError, match=rf"'{field}' must contain only finite values"):
+        dataclasses.replace(result, **{field: bad})
 
 
 def test_clause8_fpi_and_residual_columns(tmp_path: Path) -> None:

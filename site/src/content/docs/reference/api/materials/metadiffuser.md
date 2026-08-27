@@ -274,3 +274,9 @@ at the lattice step `a = L / M` shelved sideways into the septum;
 | `kwargs` | Forwarded to the slit rectangles. |
 
 **Returns:** The axes.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a depth or period that is not finite and positive, fewer than two wells, or a slit height that is not smaller than the period. |

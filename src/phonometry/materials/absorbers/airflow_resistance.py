@@ -158,6 +158,55 @@ class StaticAirflowResult:
     linear_coefficient: float
     quadratic_coefficient: float
 
+    def __post_init__(self) -> None:
+        """Reject a determination carrying an absent or non-finite quantity.
+
+        The one producer, :func:`static_airflow_resistance`, refuses
+        non-finite measurement steps before fitting, so every quantity it
+        hands back is finite and a NaN here is never the library's own
+        output. The fiche prints them all unconditionally: a NaN
+        ``specific_resistance`` becomes the BOXED headline ``Rs = nan
+        Pa.s/m`` with ``R = nan`` and ``sigma = nan`` beside it, on a fully
+        rendered accredited page with no warning anywhere. The fit
+        coefficients are pinned finite only: ``b`` (and with scattered steps
+        even ``a``) may come back negative from the through-origin
+        regression, and the fiche reports the fit as made.
+
+        A finite check has to let ``None`` through, since an absent quantity
+        is not a non-finite one, and exactly one quantity here is absent-able:
+        ``resistivity``, undetermined when no thickness was supplied, which
+        the fiche and the boxed headline already omit row by row. The other
+        six are typed ``float`` and the through-origin fit always determines
+        them, so a ``None`` in any of them is a malformed result rather than
+        an unmeasured one, and it is pinned before the finite check that
+        would wave it past. Left unpinned it reaches the renderer as
+        ``TypeError: float() argument must be a string or a real number, not
+        'NoneType'`` from inside a display rounder, and the plotter as
+        ``unsupported format string passed to NoneType.__format__``, neither
+        of which names the field nor the result it came from.
+
+        :raises ValueError: if a required quantity is ``None``, or if any
+            quantity is not finite (``resistivity`` may be ``None`` when no
+            thickness was supplied).
+        """
+        required = (
+            "resistance",
+            "specific_resistance",
+            "evaluation_velocity",
+            "pressure_drop",
+            "linear_coefficient",
+            "quadratic_coefficient",
+        )
+        for name in required:
+            if getattr(self, name) is None:
+                msg = f"StaticAirflowResult: '{name}' must not be None."
+                raise ValueError(msg)
+        for name in (*required, "resistivity"):
+            value = getattr(self, name)
+            if value is not None and not math.isfinite(float(value)):
+                msg = f"StaticAirflowResult: '{name}' must be finite."
+                raise ValueError(msg)
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:

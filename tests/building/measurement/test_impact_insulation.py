@@ -302,6 +302,26 @@ def test_an_impact_column_of_another_length_is_refused() -> None:
         dataclasses.replace(result, li=longer)
 
 
+@pytest.mark.parametrize("field", ["li", "t2"])
+def test_a_non_finite_impact_chain_column_is_refused(field: str) -> None:
+    """The verbose ISO 16283-2 table forwards the chain raw, so it is pinned.
+
+    ``impact_insulation`` refuses non-finite impact levels and reverberation
+    times on the way in, so a NaN can only reach a hand-built result; without
+    the pin it renders a literal ``nan`` cell inside the accredited chain
+    table while the L'nT,w rating box beside it prints normally.
+    """
+    result = building.impact_insulation(
+        np.linspace(70.0, 60.0, 16), np.full(16, 0.6), volume=50.0
+    )
+    column = np.asarray(getattr(result, field), dtype=np.float64).copy()
+    column[4] = np.nan
+    with pytest.raises(
+        ValueError, match=f"ImpactInsulationResult: '{field}' must contain only finite"
+    ):
+        dataclasses.replace(result, **{field: column})
+
+
 def test_impact_rejects_bad_reverberation_time() -> None:
     li = np.array([60.0])
     zero_t2 = np.array([0.0])

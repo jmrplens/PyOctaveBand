@@ -133,6 +133,17 @@ class AirLayer(_DrawableLayer):
 
     thickness: float
 
+    def __post_init__(self) -> None:
+        """Reject a gap whose thickness is not a finite, non-negative number.
+
+        Non-negative rather than positive because the solver treats a zero
+        gap as no gap; NaN fails every comparison downstream, so an unpinned
+        layer would draw a blank stack rather than refuse.
+
+        :raises ValueError: if ``thickness`` is negative or not finite.
+        """
+        require_non_negative(self.thickness, "thickness")
+
 
 @dataclass(frozen=True)
 class PorousLayer(_DrawableLayer):

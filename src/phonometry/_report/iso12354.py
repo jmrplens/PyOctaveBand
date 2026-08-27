@@ -38,6 +38,7 @@ reportlab, matplotlib and svglib are soft dependencies imported lazily
 
 from __future__ import annotations
 
+import html
 from typing import TYPE_CHECKING, Any
 
 from ._i18n import format_number, t
@@ -287,13 +288,17 @@ def render_iso12354_airborne_report(
     :raises ImportError: If reportlab (or, for the figure, matplotlib) is not
         installed.
     """
+    # The path label is the caller's own text (it carries the flanking
+    # element's name), so it is escaped before it reaches the metrics table:
+    # a table label is Paragraph markup, which swallowed a '<north>' from the
+    # printed row and broke the parser on a '<b>'. Values are formatted here.
     metric_rows: list[tuple[str, str]] = []
     for contribution in result.paths:
         value = fmt_num(contribution.r_w, language)
         if verbose:
             share = format_number(100.0 * contribution.fraction, language, decimals=1)
             value = f"{value} &#183; {share}%"
-        metric_rows.append((contribution.label, value))
+        metric_rows.append((html.escape(contribution.label), value))
 
     caption_key = (
         "Path R<sub>ij,w</sub> [dB] and energy share"
@@ -416,7 +421,9 @@ def _detailed_path_rows(
         if verbose:
             peak = freqs[int(np.argmax(fractions[k]))]
             text = f"{text} &#183; {fmt_num(float(peak), language)} Hz"
-        rows.append((result.paths[int(k)].label, text))
+        # ``BandPath.label`` is the caller's own text; escape it, because the
+        # metrics table reads its labels as Paragraph markup.
+        rows.append((html.escape(result.paths[int(k)].label), text))
     return rows
 
 
@@ -593,7 +600,9 @@ def render_iso12354_facade_report(
         if verbose:
             share = format_number(shares[name], language, decimals=1)
             value = f"{value} &#183; {share}%"
-        metric_rows.append((name, value))
+        # ``FacadeElement.name`` is the caller's own text; escape it, because
+        # the metrics table reads its labels as Paragraph markup.
+        metric_rows.append((html.escape(name), value))
 
     caption_key = (
         "Facade element R<sub>p,w</sub> [dB] and energy share"

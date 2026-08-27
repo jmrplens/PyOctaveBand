@@ -234,8 +234,10 @@ def plot_modulation_distortion(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the sideband marker ``plot`` call.
     :return: The axes.
-    :raises ValueError: If the result carries no sideband spectrum data, or its
-        sideband arrays do not carry the four products.
+    :raises ValueError: If the result leaves any of the five spectral fields
+        the figure states unset (``f_low``, ``f_high``, ``carrier_amplitude``
+        and the two sideband arrays), or its sideband arrays do not carry the
+        four products.
     """
     from .._i18n import decimal_comma, localize_axes
 
@@ -244,10 +246,29 @@ def plot_modulation_distortion(
         or result.sideband_amplitudes is None
         or result.carrier_amplitude is None
         or result.f_high is None
+        or result.f_low is None
     ):
+        # ``f_low`` belongs in the same breath as its four siblings: the title
+        # states it as the modulating frequency of the measurement, and left
+        # to a silent default it printed "f_1 = 0 Hz" -- a tone no measurement
+        # produced -- beside the per-order percentages it labels. The message
+        # names whichever of the five the result left unset, because a result
+        # arrives here missing them one at a time (``dataclasses.replace``)
+        # rather than all together.
+        unset = ", ".join(
+            f"'{name}'"
+            for name, value in (
+                ("f_low", result.f_low),
+                ("f_high", result.f_high),
+                ("carrier_amplitude", result.carrier_amplitude),
+                ("sideband_frequencies", result.sideband_frequencies),
+                ("sideband_amplitudes", result.sideband_amplitudes),
+            )
+            if value is None
+        )
         msg = (
-            "this result carries no sideband spectrum data to plot; obtain it "
-            "from modulation_distortion()."
+            f"this result carries no sideband spectrum data to plot ({unset} "
+            "unset); obtain it from modulation_distortion()."
         )
         raise ValueError(msg)
     sb_freqs = np.asarray(result.sideband_frequencies, dtype=np.float64)
@@ -293,7 +314,7 @@ def plot_modulation_distortion(
     d2 = decimal_comma(f"{result.d2 * 100.0:.3g}", language)
     d3 = decimal_comma(f"{result.d3 * 100.0:.3g}", language)
     smpte = decimal_comma(f"{result.smpte * 100.0:.3g}", language)
-    f_low = decimal_comma(_format_freq(float(result.f_low or 0.0)), language)
+    f_low = decimal_comma(_format_freq(float(result.f_low)), language)
     f_high = decimal_comma(_format_freq(float(result.f_high)), language)
     ax.set_title(
         f"IEC 60268-3 $d_2$ = {d2}%, $d_3$ = {d3}%; SMPTE = {smpte}% "

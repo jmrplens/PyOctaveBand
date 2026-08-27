@@ -252,7 +252,16 @@ class StructureBornePowerResult:
         one-third-octave bands and rules them off in octave triplets, so a
         surplus entry at the head of it regroups every band the sheet shows.
 
-        :raises ValueError: if any per-band quantity disagrees with the rest.
+        The two plate scalars are held positive and finite beside the length
+        checks: every producer already refuses anything else
+        (:func:`reception_plate_power` routes ``mass_per_area`` and ``area``
+        through :func:`structure_borne_power_level`, which validates both), so
+        a NaN here can only be planted by hand -- and the fiche would print it
+        verbatim in the accredited extended-result line
+        (``Plate mass per area m = nan kg/m2``) without a word.
+
+        :raises ValueError: if any per-band quantity disagrees with the rest,
+            or ``mass_per_area`` or ``area`` is not positive and finite.
         """
         require_ranks(
             self,
@@ -264,6 +273,8 @@ class StructureBornePowerResult:
         require_same_length(
             self, "power_level", "velocity_level", "loss_factor", "frequencies"
         )
+        require_positive(self.mass_per_area, "mass_per_area")
+        require_positive(self.area, "area")
 
     @property
     def total_level(self) -> float:

@@ -352,3 +352,9 @@ plate.
 | `kwargs` | Forwarded to the specimen rectangle. |
 
 **Returns:** The axes.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | naming the first of the three that is not finite and positive. |

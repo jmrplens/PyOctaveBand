@@ -132,6 +132,34 @@ def test_indirect_method_labels_blocking_mass(tmp_path: Path) -> None:
     assert "50.0" in text
 
 
+@pytest.mark.parametrize("bad", [np.inf, np.nan], ids=["inf", "nan"])
+def test_non_finite_transfer_stiffness_is_refused(bad: float) -> None:
+    """An overflowed band cannot reach the fiche's headline.
+
+    Neither determination emits a non-finite stiffness from valid data: the
+    direct method refuses a dead input channel, and the indirect method
+    multiplies a finite transmissibility by a finite blocking mass. An
+    infinite bin - an overflowed or clipped channel handed straight to
+    ``indirect_transfer_stiffness_result`` - used to pass every shape and
+    length check and print ``Lk = inf dB re 1 N/m`` boxed as the headline
+    beside a ``nan`` loss factor, with nothing on the accredited page
+    qualifying either; the only build-time signal was the unrelated
+    ``|T| > 0.1`` validity advisory.
+    """
+    transmissibility = np.array([0.05 + 0.005j, 0.04 + 0.004j, 0.03 + 0.003j])
+    transmissibility[0] = complex(bad, 0.0)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", PhonometryWarning)
+        with pytest.raises(
+            ValueError, match=r"'transfer_stiffness' must contain only finite"
+        ):
+            vibration.indirect_transfer_stiffness_result(
+                np.array([10.0, 20.0, 40.0]),
+                transmissibility,
+                blocking_mass=50.0,
+            )
+
+
 def test_metadata_header_renders(tmp_path: Path) -> None:
     """Supplied metadata renders the client, the specimen and the instrumentation."""
     pytest.importorskip("reportlab")

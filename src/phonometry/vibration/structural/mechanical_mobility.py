@@ -489,11 +489,41 @@ class MobilityResult:
         This refusal is raised at construction and says which field is
         short.
 
+        Both axes must also be finite. Every producer in the library
+        (:func:`sdof_mobility_result` and the infinite-plate and
+        infinite-beam bundles of :mod:`.point_mobility`) computes a finite
+        FRF from validated inputs, so a NaN or infinity here is never the
+        library's own output, and downstream nobody checks: a single
+        non-finite ``|Y|`` bin wins ``argmax`` (NaN because every comparison
+        against it is False, infinity outright), so the fiche reports that
+        bin's frequency as the peak, displacing the true resonance, and
+        prints ``nan`` as the peak mobility; a NaN frequency turns the
+        stated frequency range into ``nan to nan``.
+
+        The FRF must also cover at least one frequency. Two length-0 axes
+        agree with each other, so the pair passes every count above, and the
+        fiche then asks numpy for the peak of nothing and dies on "attempt
+        to get argmax of an empty sequence" -- a message naming neither the
+        field nor the result. A single-frequency FRF is a different thing
+        and stays allowed: it carries nought-dimensional axes, which is one
+        frequency's worth of data rather than none.
+
         :raises ValueError: if the mobility does not carry one value per
-            frequency.
+            frequency, the FRF covers no frequency, or either field carries
+            a non-finite value.
         """
         require_ranks(self, frequencies=1, mobility=1)
         require_same_length(self, "frequencies", "mobility", axis="frequency")
+        if np.asarray(self.frequencies).size == 0:
+            msg = (
+                "MobilityResult: 'frequencies' must carry at least one "
+                "frequency; the FRF is empty."
+            )
+            raise ValueError(msg)
+        for name in ("frequencies", "mobility"):
+            if not np.all(np.isfinite(np.asarray(getattr(self, name)))):
+                msg = f"MobilityResult: '{name}' must contain only finite values."
+                raise ValueError(msg)
 
     @property
     def magnitude(self) -> np.ndarray:

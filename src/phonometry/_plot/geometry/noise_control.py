@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_non_negative, require_positive
 from ..common import (
     _C_EDGE,
     _C_PRIMARY,
@@ -57,9 +58,6 @@ _KIND_EXTENDED = "extended-tube chamber"
 _KIND_HELMHOLTZ = "Helmholtz resonator"
 _KIND_QUARTER = "quarter-wave resonator"
 _KIND_CHAIN = "element chain"
-
-#: Shared validation message for length arguments.
-_LENGTH_POSITIVE = "'length' must be positive."
 
 #: The note that keeps a chain drawing honest, rendered under it whenever it
 #: carries a branch point (see :func:`plot_silencer_chain_geometry`).
@@ -112,12 +110,16 @@ _SILENCER_KINDS = (
 )
 
 
-def _duct_diameter(area: float) -> float:
-    """Equivalent circular diameter of a duct cross-section."""
-    if area <= 0.0:
-        msg = "Cross-section areas must be positive."
-        raise ValueError(msg)
-    return float(2.0 * np.sqrt(area / np.pi))
+def _duct_diameter(area: float, name: str = "area") -> float:
+    """Equivalent circular diameter of a duct cross-section.
+
+    :param area: The cross-section area, in m2.
+    :param name: The caller's parameter name, so the refusal says which of
+        the four areas a silencer drawing takes was the bad one.
+    :return: The equivalent circular diameter, in metres.
+    :raises ValueError: for an area that is not finite and positive.
+    """
+    return float(2.0 * np.sqrt(require_positive(area, name) / np.pi))
 
 
 def _duct_walls(ax: Axes, x0: float, x1: float, d: float, wall: float) -> None:
@@ -152,8 +154,8 @@ def _draw_chamber(
     **kwargs: Any,
 ) -> None:
     """Expansion chamber (optionally with extended inlet/outlet tubes)."""
-    d_p = _duct_diameter(pipe_area)
-    d_c = _duct_diameter(chamber_area)
+    d_p = _duct_diameter(pipe_area, "pipe_area")
+    d_c = _duct_diameter(chamber_area, "chamber_area")
     if chamber_area <= pipe_area:
         msg = "'chamber_area' must exceed 'pipe_area'."
         raise ValueError(msg)
@@ -268,20 +270,18 @@ def _branch_dimensions(
                 "'neck_length' and 'cavity_volume'."
             )
             raise ValueError(msg)
-        if cavity_volume <= 0.0 or neck_length <= 0.0:
-            msg = "'cavity_volume' and 'neck_length' must be positive."
-            raise ValueError(msg)
+        require_positive(cavity_volume, "cavity_volume")
+        require_positive(neck_length, "neck_length")
         return (
-            _duct_diameter(neck_area),
+            _duct_diameter(neck_area, "neck_area"),
             neck_length,
             float(cavity_volume ** (1.0 / 3.0)),
         )
     if length is None or branch_area is None:
         msg = "A quarter-wave drawing needs 'length' and 'branch_area'."
         raise ValueError(msg)
-    if length <= 0.0:
-        raise ValueError(_LENGTH_POSITIVE)
-    return _duct_diameter(branch_area), length, 0.0
+    require_positive(length, "length")
+    return _duct_diameter(branch_area, "branch_area"), length, 0.0
 
 
 def _draw_branch_silencer(
@@ -301,7 +301,7 @@ def _draw_branch_silencer(
 
     Parameters are already validated by :func:`_validate_branch_geometry`.
     """
-    d_d = _duct_diameter(duct_area)
+    d_d = _duct_diameter(duct_area, "duct_area")
     d_b, branch_len, cavity_side = _branch_dimensions(
         kind,
         neck_area=neck_area,
@@ -390,10 +390,11 @@ def _validate_chamber_geometry(
     if length is None or chamber_area is None or pipe_area is None:
         msg = "A chamber drawing needs 'length', 'chamber_area' and 'pipe_area'."
         raise ValueError(msg)
-    if length <= 0.0:
-        raise ValueError(_LENGTH_POSITIVE)
-    _duct_diameter(pipe_area)
-    _duct_diameter(chamber_area)
+    require_positive(length, "length")
+    require_non_negative(inlet_extension, "inlet_extension")
+    require_non_negative(outlet_extension, "outlet_extension")
+    _duct_diameter(pipe_area, "pipe_area")
+    _duct_diameter(chamber_area, "chamber_area")
     if chamber_area <= pipe_area:
         msg = "'chamber_area' must exceed 'pipe_area'."
         raise ValueError(msg)
@@ -415,7 +416,7 @@ def _validate_branch_geometry(
     if duct_area is None:
         msg = "A side-branch drawing needs 'duct_area'."
         raise ValueError(msg)
-    _duct_diameter(duct_area)
+    _duct_diameter(duct_area, "duct_area")
     if kind == _KIND_HELMHOLTZ:
         if neck_area is None or neck_length is None or cavity_volume is None:
             msg = (
@@ -423,17 +424,15 @@ def _validate_branch_geometry(
                 "'neck_length' and 'cavity_volume'."
             )
             raise ValueError(msg)
-        if neck_length <= 0.0 or cavity_volume <= 0.0:
-            msg = "'cavity_volume' and 'neck_length' must be positive."
-            raise ValueError(msg)
-        _duct_diameter(neck_area)
+        require_positive(neck_length, "neck_length")
+        require_positive(cavity_volume, "cavity_volume")
+        _duct_diameter(neck_area, "neck_area")
         return
     if length is None or branch_area is None:
         msg = "A quarter-wave drawing needs 'length' and 'branch_area'."
         raise ValueError(msg)
-    if length <= 0.0:
-        raise ValueError(_LENGTH_POSITIVE)
-    _duct_diameter(branch_area)
+    require_positive(length, "length")
+    _duct_diameter(branch_area, "branch_area")
 
 
 def plot_silencer_geometry(
@@ -862,13 +861,20 @@ def plot_plenum_geometry(
     :param kwargs: Forwarded to the wall-segment ``plot`` calls
         (line properties such as ``linewidth`` or ``color``).
     :return: The axes.
+    :raises ValueError: naming the first of the three that is not finite and
+        positive, or for an angle outside ``[0, pi/2)``.
     """
     from matplotlib.patches import Rectangle
 
     _check_language(language)
-    if exit_area <= 0.0 or line_of_sight <= 0.0 or wall_area <= 0.0:
-        msg = "'exit_area', 'line_of_sight' and 'wall_area' must be positive."
-        raise ValueError(msg)
+    # One parameter at a time, and finite. The joined ``<= 0.0`` waved a NaN
+    # through: ``wall_area`` is annotation only, so the plenum rendered
+    # complete under 'S_w = nan m$^2$', while a NaN in the other two poisons
+    # the coordinates into a part-blank box. The angle check is left as it
+    # is: unlike ``<=``, ``0.0 <= angle`` is already False for a NaN.
+    require_positive(exit_area, "exit_area")
+    require_positive(line_of_sight, "line_of_sight")
+    require_positive(wall_area, "wall_area")
     if not 0.0 <= angle < 0.5 * np.pi:
         msg = "'angle' must be in [0, pi/2)."
         raise ValueError(msg)

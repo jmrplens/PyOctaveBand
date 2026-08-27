@@ -602,6 +602,46 @@ def test_scattering_spectrum_rejects_2d_input() -> None:
         scattering_coefficient_spectrum(two_d, two_d, two_d)
 
 
+def test_scattering_result_rejects_an_empty_spectrum() -> None:
+    """Four length-0 columns agree with each other, and render an empty sheet.
+
+    The producer refuses an empty axis, so this can only be hand-built; without
+    the pin the ISO 17497-1 fiche comes out complete and accredited, with an
+    empty table under the headline "0 Hz to 0 Hz" that the lo/hi fall-backs
+    write when there is no band to take a range from.
+    """
+    empty = np.array([])
+    with pytest.raises(ValueError, match=r"ScatteringResult: 'frequencies'"):
+        ScatteringResult(
+            frequencies=empty,
+            scattering=empty,
+            random_incidence=empty,
+            specular=empty,
+        )
+
+
+def test_scattering_result_rejects_a_non_finite_coefficient() -> None:
+    """A NaN s prints a literal ``nan`` cell in the accredited per-band table."""
+    with pytest.raises(ValueError, match=r"'scattering' must contain only finite"):
+        ScatteringResult(
+            frequencies=np.array([250.0, 500.0, 1000.0]),
+            scattering=np.array([0.1, np.nan, 0.5]),
+            random_incidence=np.array([0.10, 0.11, 0.12]),
+            specular=np.array([0.12, 0.25, 0.40]),
+        )
+
+
+def test_scattering_result_rejects_a_non_finite_band_centre() -> None:
+    """A NaN band centre crashes the header's round(freqs.min()) anonymously."""
+    with pytest.raises(ValueError, match=r"'frequencies' must contain only finite"):
+        ScatteringResult(
+            frequencies=np.array([250.0, np.nan, 1000.0]),
+            scattering=np.array([0.1, 0.3, 0.5]),
+            random_incidence=np.array([0.10, 0.11, 0.12]),
+            specular=np.array([0.12, 0.25, 0.40]),
+        )
+
+
 def test_scattering_spectrum_plot_returns_axes() -> None:
     import matplotlib as mpl
 
@@ -639,6 +679,69 @@ def test_directional_diffusion_length_mismatch_raises() -> None:
         ValueError, match=r"directional_diffusion: .*'levels'.*same shape"
     ):
         directional_diffusion([-30.0, 0.0, 30.0], [70.0, 72.0])
+
+
+def test_diffusion_result_rejects_a_non_finite_coefficient() -> None:
+    """The polar fiche boxes the coefficient as its headline, so it is pinned.
+
+    :func:`directional_diffusion` refuses the degenerate responses that would
+    leave ``d`` undefined, so a NaN can only reach a hand-built result; without
+    the pin the sheet boxes "Directional diffusion coefficient d = nan" over an
+    otherwise ordinary accredited page.
+    """
+    with pytest.raises(ValueError, match=r"DiffusionResult: 'coefficient' must be"):
+        DiffusionResult(
+            angles=np.array([-30.0, 0.0, 30.0]),
+            levels=np.array([70.0, 72.0, 69.0]),
+            coefficient=float("nan"),
+        )
+
+
+@pytest.mark.parametrize("bad", [float("nan"), float("inf")])
+def test_diffusion_result_rejects_an_unreadable_level(bad: float) -> None:
+    """A NaN or ``+inf`` receiver level is refused at construction.
+
+    Neither is a reading: ``+inf`` is an infinite reflected energy and a NaN is
+    no measurement at all, and nothing in the module flags an undetermined
+    receiver, so neither is a sentinel to be carried. Unpinned they reach the
+    ``L`` column of the accredited polar table as the literal ``inf``/``nan``,
+    and the polar plot drops the vertex silently, drawing the lobe through the
+    wrong receivers.
+    """
+    levels = np.array([70.0, bad, 69.0])
+    with pytest.raises(
+        ValueError, match=r"DiffusionResult: 'levels' must be finite, or -inf"
+    ):
+        DiffusionResult(
+            angles=np.array([-30.0, 0.0, 30.0]),
+            levels=levels,
+            coefficient=0.5,
+        )
+
+
+def test_diffusion_result_admits_a_silent_receiver() -> None:
+    """``-inf`` is the level of a receiver with no scattered energy, so it passes.
+
+    Its energy ``10 ** (L / 10)`` is 0, the neutral element of both sums of
+    Formula (5)/(6): the coefficient stays ordinary and finite, so the guard
+    above must let this response through and the fiche must keep printing it.
+    """
+    angles = np.array([-30.0, 0.0, 30.0])
+    levels = np.array([70.0, -np.inf, 69.0])
+
+    result = directional_diffusion(angles, levels)
+
+    assert math.isfinite(result.coefficient)
+    assert result.levels[1] == -np.inf
+    # Formula (5) with p_2 = 0 collapses to p_1 p_3 / (p_1^2 + p_3^2). The
+    # silent receiver still counts in n, so this is half the value the two
+    # energetic receivers would give on their own: dropping it would be a
+    # different measurement, not the same one written shorter.
+    p_1, p_3 = 10.0**7.0, 10.0**6.9
+    assert result.coefficient == pytest.approx(p_1 * p_3 / (p_1**2 + p_3**2))
+    assert result.coefficient == pytest.approx(
+        0.5 * directional_diffusion_coefficient([70.0, 69.0])
+    )
 
 
 def test_directional_diffusion_plot_returns_axes() -> None:
@@ -689,6 +792,55 @@ def test_diffusion_spectrum_rejects_2d_input() -> None:
 def test_diffusion_spectrum_normalized_mismatch_raises() -> None:
     with pytest.raises(ValueError, match=r"diffusion_spectrum: .*'normalized'.*shape"):
         diffusion_spectrum([250.0, 500.0], [0.3, 0.5], normalized=[0.2])
+
+
+def test_diffusion_spectrum_rejects_an_empty_spectrum() -> None:
+    """Three length-0 columns agree, and the fiche renders a sheet with no data.
+
+    :func:`diffusion_spectrum` refuses an empty axis, so an empty spectrum can
+    only be hand-built; the ISO 17497-2 Clause 8.5 fiche then prints a complete
+    accredited page whose table is empty under the fabricated headline
+    "0 Hz to 0 Hz".
+    """
+    empty = np.array([])
+    with pytest.raises(ValueError, match=r"DiffusionSpectrum: 'frequencies'"):
+        DiffusionSpectrum(frequencies=empty, diffusion=empty)
+
+
+def test_diffusion_spectrum_rejects_a_non_finite_coefficient() -> None:
+    """A NaN d prints a literal ``nan`` cell in the accredited per-band table.
+
+    The headline and the ``d(f)`` curve print normally around it, so the sheet
+    reads as a finished measurement of a coefficient nothing determined.
+    """
+    with pytest.raises(ValueError, match=r"'diffusion' must contain only finite"):
+        DiffusionSpectrum(
+            frequencies=np.array([250.0, 500.0, 1000.0]),
+            diffusion=np.array([0.2, np.nan, 0.7]),
+        )
+
+
+def test_diffusion_spectrum_rejects_a_non_finite_band_centre() -> None:
+    """A NaN band centre crashes the fiche header's round(freqs.min()).
+
+    The bare "cannot convert float NaN to integer" names neither the field nor
+    the result, so the band axis is pinned where it is built.
+    """
+    with pytest.raises(ValueError, match=r"'frequencies' must contain only finite"):
+        DiffusionSpectrum(
+            frequencies=np.array([250.0, np.nan, 1000.0]),
+            diffusion=np.array([0.2, 0.4, 0.7]),
+        )
+
+
+def test_diffusion_spectrum_rejects_a_non_finite_normalized_value() -> None:
+    """The normalised d_n is tabulated and drawn too, so it is pinned as well."""
+    with pytest.raises(ValueError, match=r"'normalized' must contain only finite"):
+        DiffusionSpectrum(
+            frequencies=np.array([250.0, 500.0, 1000.0]),
+            diffusion=np.array([0.2, 0.4, 0.7]),
+            normalized=np.array([0.1, 0.3, np.nan]),
+        )
 
 
 def test_diffusion_spectrum_plot_returns_axes() -> None:

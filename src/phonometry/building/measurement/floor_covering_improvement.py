@@ -213,11 +213,60 @@ class FloorCoveringImprovementResult:
         sub-range located inside ``frequencies``, so an axis of another length
         rates a different stretch of spectrum from the one tabulated beside it.
 
+        The ratings are whole decibels by construction (ISO 717-2 rounds both
+        ``ΔLw`` and ``CI,Δ`` to integers, and that is what
+        :func:`~phonometry.building.weighted_impact_improvement` and
+        :func:`~phonometry.building.impact_improvement_adaptation_term`
+        return), and the fiche prints them as integers: a float smuggled in by
+        a hand-built result would either crash the ``{ci_delta:+d}`` format
+        with a message naming no field, or print an unlocalised decimal point
+        on a comma-decimal sheet. Both are refused here by name instead.
+
+        An adaptation term without the rating it adapts is refused as well.
+        ``CI,Δ = CI,r,0 - CI,r`` (ISO 717-2:2020 Formula (A.4)) and ``ΔLw``
+        are the two numbers the same weighted rating returns for the same
+        reference floor with the covering, ``Ln,r = Ln,r,0 - ΔL`` over the same
+        16 bands 100 Hz to 3150 Hz, so no spectrum can determine one and leave
+        the other undetermined: ``delta_lw`` is ``None`` exactly when those
+        bands are absent, and then ``CI,Δ`` has no derivation either. The
+        opposite pairing is legitimate and stays allowed: a result that carries
+        ``delta_lw`` without ``ci_delta`` is a rating quoted without the
+        adaptation term, and the fiche then prints the bare ``ΔLw`` rather than
+        an invented ``(+0)``. Left unguarded, the refused pairing printed a
+        fiche that dropped the term in silence: the boxed statement of results
+        fell through to the unrated characterisation headline (*Reduction of
+        impact sound pressure level ΔL, 100 Hz to 3150 Hz*) with no ``CI,Δ``
+        anywhere on the sheet, under a standard-basis line still promising that
+        the statement of results carries it.
+
         :raises ValueError: if the frequencies, the improvement and the
-            limit-of-measurement mask do not agree on how many bands there are.
+            limit-of-measurement mask do not agree on how many bands there
+            are, if ``delta_lw`` / ``ci_delta`` is not an integer (or
+            ``None``), or if ``ci_delta`` is given while ``delta_lw`` is
+            ``None``.
         """
         require_ranks(self, frequencies=1, improvement=1, limited=1)
         require_same_length(self, "frequencies", "improvement", "limited")
+        for name in ("delta_lw", "ci_delta"):
+            value = getattr(self, name)
+            # A bool is an int in Python, so it is excluded explicitly.
+            if value is not None and (
+                isinstance(value, bool) or not isinstance(value, int)
+            ):
+                msg = (
+                    f"FloorCoveringImprovementResult: '{name}' must be an "
+                    f"integer number of decibels (ISO 717-2 ratings are "
+                    f"rounded to whole dB) or None; got {value!r}."
+                )
+                raise ValueError(msg)
+        if self.delta_lw is None and self.ci_delta is not None:
+            msg = (
+                f"FloorCoveringImprovementResult: 'ci_delta' is the adaptation "
+                f"term of 'delta_lw' (ISO 717-2:2020 Formula (A.4) rates the "
+                f"same 100-3150 Hz bands), so it cannot be given while "
+                f"'delta_lw' is None; got ci_delta={self.ci_delta!r}."
+            )
+            raise ValueError(msg)
 
     def octave_bands(self) -> tuple[np.ndarray, np.ndarray]:
         """Return ``(octave_freqs, ΔLoct)`` via Formula (5) (needs 16 1/3-oct bands)."""

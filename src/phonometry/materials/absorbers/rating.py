@@ -295,10 +295,25 @@ class AbsorptionRatingResult:
         one-third-octave fields are absent together for a rating built from
         octave coefficients alone, which is not a disagreement.
 
-        :raises ValueError: if the octave curves disagree with each other, if
-            the retained one-third-octave ``alpha_s`` disagrees with its band
-            centres, or if it does not hold three bands per rating octave.
+        ``alpha_w`` is checked here with the same predicate
+        :func:`absorption_class` applies, because the direct constructor never
+        runs that helper: :func:`weighted_absorption` can only produce a
+        multiple of 0,05 in ``[0, 1]``, so a NaN ``alpha_w`` is always a
+        construction mistake - and the fiche compared it against a supplied
+        requirement anyway, where ``nan >= requirement`` is ``False`` and the
+        page printed a definitive FAIL computed from nothing.
+
+        :raises ValueError: if ``alpha_w`` is not a finite value in ``[0, 1]``,
+            if the octave curves disagree with each other, if the retained
+            one-third-octave ``alpha_s`` disagrees with its band centres, or
+            if it does not hold three bands per rating octave.
         """
+        if not math.isfinite(self.alpha_w) or not 0.0 <= self.alpha_w <= 1.0:
+            msg = (
+                f"{type(self).__name__}: 'alpha_w' must be a finite value in "
+                "the range [0, 1]."
+            )
+            raise ValueError(msg)
         require_ranks(
             self,
             band_centers=1,

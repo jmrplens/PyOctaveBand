@@ -207,6 +207,25 @@ def test_reception_plate_result_refuses_a_column_one_band_too_long(
         dataclasses.replace(result, **{field: one_too_long})
 
 
+@pytest.mark.parametrize("field", ["mass_per_area", "area"])
+def test_reception_plate_result_refuses_a_non_finite_plate_scalar(field: str) -> None:
+    """The two plate scalars are printed, not only used to build the levels.
+
+    The band table renders a missing value as an em dash, but the extended
+    result line formats these two directly: a NaN planted here would print
+    ``Plate mass per area m = nan kg/m2`` on an otherwise accredited sheet.
+    """
+    result = building.reception_plate_power(
+        np.array([80.0, 82.0, 79.0]),
+        np.array([500.0, 1000.0, 2000.0]),
+        mass_per_area=25.0,
+        area=1.2,
+        loss_factor=0.01,
+    )
+    with pytest.raises(ValueError, match=f"'{field}' must be positive"):
+        dataclasses.replace(result, **{field: float("nan")})
+
+
 def test_plot_returns_axes() -> None:
     pytest.importorskip("matplotlib")
     import matplotlib as mpl

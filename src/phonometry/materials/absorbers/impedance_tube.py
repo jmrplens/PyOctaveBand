@@ -37,7 +37,13 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from ..._internal.validation import check_engine, require_equal_shapes, require_per_band
+from ..._internal.validation import (
+    check_engine,
+    require_equal_shapes,
+    require_per_band,
+    require_ranks,
+    require_same_length,
+)
 from ..._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:
@@ -527,6 +533,69 @@ class ImpedanceTubeResult:
     diameter: float | None = None
     shape: str | None = None
 
+    def __post_init__(self) -> None:
+        """Reject a result whose per-frequency arrays cannot be reported.
+
+        Everything the fiche and the figure read is checked when the result is
+        built, because nothing downstream can: the renderer's table walks the
+        frequency axis and reads every other field at each entry, so a 0-d
+        field died in its ``zip`` as numpy's "iteration over a 0-d array" and
+        an all-empty result sailed through to the figure, which stopped at
+        ``freqs.min()`` with "zero-size array to reduction operation minimum" -
+        neither message naming a field of this result. Length disagreements
+        were caught by the renderer, but only there; :meth:`plot` and any other
+        reader met them raw.
+
+        Finiteness is a construction requirement too:
+        :func:`two_microphone_impedance` computes every field from finite
+        arithmetic (a non-finite value can only arrive through a degenerate
+        ``H12``, never as a flagged undeterminable band), so a NaN here is
+        always a mistake, and admitting it printed ``nan`` as a measured
+        ``alpha`` in the accredited per-frequency table with nothing on the
+        page qualifying it.
+
+        :raises ValueError: if ``frequency`` is empty or not one-dimensional,
+            if the per-frequency fields disagree with it in rank or length, or
+            if any of them carries a non-finite value.
+        """
+        freq = np.asarray(self.frequency)
+        if freq.ndim != 1 or freq.size == 0:
+            msg = (
+                f"{type(self).__name__}: 'frequency' must be a non-empty 1-D "
+                f"array (one entry per measured frequency); got shape "
+                f"{freq.shape}."
+            )
+            raise ValueError(msg)
+        require_ranks(
+            self,
+            frequency=1,
+            reflection=1,
+            surface_impedance=1,
+            normalized_impedance=1,
+            absorption=1,
+        )
+        require_same_length(
+            self,
+            "frequency",
+            "reflection",
+            "surface_impedance",
+            "normalized_impedance",
+            "absorption",
+            axis="frequency",
+        )
+        for name in (
+            "frequency",
+            "reflection",
+            "surface_impedance",
+            "normalized_impedance",
+            "absorption",
+        ):
+            if not np.all(np.isfinite(np.asarray(getattr(self, name)))):
+                msg = (
+                    f"{type(self).__name__}: '{name}' must contain only finite values."
+                )
+                raise ValueError(msg)
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
@@ -654,7 +723,10 @@ def two_microphone_impedance(
     :return: An :class:`ImpedanceTubeResult` (the tube geometry is retained on
         the result).
     """
-    f = np.asarray(frequency, dtype=np.float64)
+    # At least 1-D: a single-frequency reduction is legitimate, and the result
+    # class pins a non-empty 1-D frequency axis so the fiche table and the
+    # figure can always walk it.
+    f = np.atleast_1d(np.asarray(frequency, dtype=np.float64))
     h = _require_h12_per_band(h12, f, "frequency")
     k0 = tube_wavenumber(f, speed_of_sound, attenuation=attenuation)
     r = reflection_factor(h, spacing=spacing, x1=x1, wavenumber=k0)

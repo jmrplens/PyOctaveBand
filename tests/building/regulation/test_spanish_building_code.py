@@ -707,6 +707,96 @@ def test_global_index_rejects_a_spectrum_of_another_band_set() -> None:
         dataclasses.replace(index, spectrum_levels=one_band_too_many)
 
 
+def test_global_index_rejects_a_spectrum_annex_a_does_not_tabulate() -> None:
+    """The figure titles itself from a label table keyed by ``spectrum``.
+
+    The entry point checks the key at the call, but a result rewritten by hand
+    reaches that lookup unchecked, after the whole page is drawn, and dies with
+    a bare ``KeyError`` naming the key alone: neither the field nor the four
+    Annex A tables it could have named.
+    """
+    index = hr.ra(_R_PRIME)
+    with pytest.raises(ValueError, match="'spectrum' must be one of"):
+        dataclasses.replace(index, spectrum="brown")
+
+
+def test_a_check_whose_verdict_contradicts_its_margin_is_refused() -> None:
+    """The lollipop colours each check by ``complies`` and nothing else.
+
+    A check reporting 45 dBA against a 50 dBA minimum, with the flag inverted,
+    would be painted in the compliant colour beside a stem whose very geometry
+    says otherwise.
+    """
+    requirement = hr.DbHrRequirement(
+        "DnT,A", 50.0, "min", "dBA", 0, "DB-HR 2.1", "between dwellings"
+    )
+    with pytest.raises(ValueError, match="'complies' must agree"):
+        hr.DbHrCheck(requirement, 45.0, 45.0, -5.0, complies=True)
+
+
+def test_a_check_whose_margin_does_not_restate_its_comparison_is_refused() -> None:
+    """The margin is the reported value against the limit, and nothing else.
+
+    The assessment figure draws the stem to ``margin`` and the fiche prints it,
+    so a margin computed against another limit reads as a comfortable pass over
+    a value that never earned it.
+    """
+    requirement = hr.DbHrRequirement(
+        "DnT,A", 50.0, "min", "dBA", 0, "DB-HR 2.1", "between dwellings"
+    )
+    with pytest.raises(ValueError, match="'margin' must be 'reported' minus"):
+        hr.DbHrCheck(requirement, 45.0, 45.0, 5.0, complies=True)
+
+
+def test_a_check_whose_reported_value_is_not_its_own_rounding_is_refused() -> None:
+    """The rounded value is the achieved value, rounded, and nothing else.
+
+    Pinning the margin against ``reported`` and ``complies`` against the margin
+    anchors the chain to a number nobody checked: 45 dBA declared as a reported
+    55 against a 50 dBA minimum keeps every derived field self-consistent, and
+    the figure paints a compliant green stem reaching past a limit the
+    measurement never reached.
+    """
+    requirement = hr.DbHrRequirement(
+        "DnT,A", 50.0, "min", "dBA", 0, "DB-HR 2.1", "between dwellings"
+    )
+    with pytest.raises(ValueError, match="'reported' must be 'value' rounded"):
+        hr.DbHrCheck(requirement, 45.0, 55.0, 5.0, complies=True)
+
+
+def test_a_check_rounds_by_the_requirements_decimals() -> None:
+    """DB-HR rounds half-up, to the decimals the quantity is stated in.
+
+    A reverberation time carries one decimal and the dB quantities none, so the
+    same achieved value is a different reported value under each requirement,
+    and half of a last place rounds up rather than to even.
+    """
+    seconds = hr.DbHrRequirement("T", 0.7, "max", "s", 1, "DB-HR 2.2", "classroom")
+    decibels = hr.DbHrRequirement(
+        "DnT,A", 50.0, "min", "dBA", 0, "DB-HR 2.1", "between dwellings"
+    )
+    assert hr.check_db_hr_requirement(0.649, seconds).reported == pytest.approx(0.6)
+    assert hr.check_db_hr_requirement(50.5, decibels).reported == pytest.approx(51.0)
+    # The rounding pin accepts the same number recomputed along another path.
+    hr.DbHrCheck(decibels, 50.5, 51.0 + 5e-10, 1.0 + 5e-10, complies=True)
+    with pytest.raises(ValueError, match="'reported' must be 'value' rounded"):
+        hr.DbHrCheck(decibels, 50.5, 50.0, 0.0, complies=True)
+
+
+def test_a_check_on_an_undetermined_value_is_refused() -> None:
+    """A verdict cannot be derived from a value that is not a number.
+
+    :func:`check_db_hr_requirement` refuses a non-finite achieved value, so no
+    producer emits one; a check assembled by hand around ``nan`` would keep its
+    derived fields mutually consistent and reach the figure as a verdict.
+    """
+    requirement = hr.DbHrRequirement(
+        "DnT,A", 50.0, "min", "dBA", 0, "DB-HR 2.1", "between dwellings"
+    )
+    with pytest.raises(ValueError, match="'value' must be finite"):
+        hr.DbHrCheck(requirement, math.nan, 45.0, -5.0, complies=False)
+
+
 def test_requirement_lookup_validation() -> None:
     """Unknown uses, rooms and room-pair combinations are rejected."""
     with pytest.raises(ValueError, match="Unknown"):

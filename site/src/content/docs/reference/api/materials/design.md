@@ -172,6 +172,12 @@ sequence.
 
 **Returns:** The axes.
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for an empty or non-1-D depth sequence, a depth that is not finite and non-negative, a non-positive well width, fewer than one period, or a negative fin width. |
+
 ## predict_diffuser_polar_response
 
 ```python

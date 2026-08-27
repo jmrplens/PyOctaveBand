@@ -125,6 +125,21 @@ class HelmholtzResonator:
     cavity_length: float
     cavity_side: float
 
+    def __post_init__(self) -> None:
+        """Reject a resonator dimension that is not a positive, finite number.
+
+        NaN fails every comparison, so an unpinned dimension would travel
+        through the impedance model and the geometry drawing as coordinate
+        poison, silently blanking parts of an otherwise normal figure.
+
+        :raises ValueError: if any of the four lengths is not positive and
+            finite.
+        """
+        require_positive(self.neck_length, "neck_length")
+        require_positive(self.neck_side, "neck_side")
+        require_positive(self.cavity_length, "cavity_length")
+        require_positive(self.cavity_side, "cavity_side")
+
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:

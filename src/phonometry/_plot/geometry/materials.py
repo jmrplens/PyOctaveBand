@@ -21,6 +21,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..._internal.validation import require_non_negative, require_positive
 from ..common import (
     _C_EDGE,
     _C_MUTED,
@@ -420,11 +421,13 @@ def plot_slit_absorber_geometry(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the slit rectangle.
     :return: The axes.
+    :raises ValueError: naming the first of the three lengths that is not
+        finite and positive, or for an empty resonator chain.
     """
     _check_language(language)
-    if slit_height <= 0.0 or lattice_step <= 0.0 or period <= 0.0:
-        msg = "'slit_height', 'lattice_step' and 'period' must be positive."
-        raise ValueError(msg)
+    require_positive(slit_height, "slit_height")
+    require_positive(lattice_step, "lattice_step")
+    require_positive(period, "period")
     chain = list(resonators) if isinstance(resonators, Sequence) else [resonators]
     if not chain:
         msg = "'resonators' must contain at least one resonator."
@@ -520,25 +523,37 @@ def plot_qrd_geometry(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the base-slab rectangle.
     :return: The axes.
+    :raises ValueError: for an empty or non-1-D depth sequence, a depth that
+        is not finite and non-negative, a non-positive well width, fewer than
+        one period, or a negative fin width.
     """
     _check_language(language)
     d = np.asarray(depths, dtype=np.float64)
     if d.ndim != 1 or d.size == 0:
         msg = "'depths' must be a non-empty 1-D sequence."
         raise ValueError(msg)
+    # Finite before non-negative: a NaN passes ``d < 0.0``, then poisons
+    # ``d.max()`` so the ``> 0.0`` fallback substitutes the well width as the
+    # drawn maximum depth. The profile came out to a depth scale no well has,
+    # dimensioned with the well width, with 'nan' in the sequence note.
+    # :func:`~phonometry.materials.qrd_well_depths` computes the sequence
+    # from a design frequency and a prime it has already validated, so it
+    # emits nothing non-finite.
+    if not np.all(np.isfinite(d)):
+        msg = "'depths' must be finite."
+        raise ValueError(msg)
     if np.any(d < 0.0):
         msg = "'depths' must be non-negative."
         raise ValueError(msg)
-    if well_width <= 0.0:
-        msg = "'well_width' must be positive."
-        raise ValueError(msg)
+    require_positive(well_width, "well_width")
     if periods < 1:
         msg = "'periods' must be >= 1."
         raise ValueError(msg)
-    fin = well_width / 12.0 if fin_width is None else float(fin_width)
-    if fin < 0.0:
-        msg = "'fin_width' must be non-negative."
-        raise ValueError(msg)
+    fin = (
+        well_width / 12.0
+        if fin_width is None
+        else require_non_negative(fin_width, "fin_width")
+    )
     if ax is None:
         ax = _new_axes()
     n = int(d.size)
@@ -746,19 +761,22 @@ def plot_impedance_tube_geometry(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the tube-bore rectangle.
     :return: The axes.
+    :raises ValueError: for a spacing, distance, diameter or sample
+        thickness that is not finite and positive, or an ``x1`` no greater
+        than the spacing.
     """
     from ...materials.absorbers.impedance_tube import plane_wave_frequency_range
 
     _check_language(language)
-    if spacing <= 0.0 or x1 <= spacing:
-        msg = "'spacing' must be positive and 'x1' > 'spacing'."
+    require_positive(spacing, "spacing")
+    require_positive(x1, "x1")
+    if x1 <= spacing:
+        msg = "'x1' must exceed 'spacing'."
         raise ValueError(msg)
-    if diameter is not None and diameter <= 0.0:
-        msg = "'diameter' must be positive when given."
-        raise ValueError(msg)
-    if sample_thickness is not None and sample_thickness <= 0.0:
-        msg = "'sample_thickness' must be positive when given."
-        raise ValueError(msg)
+    if diameter is not None:
+        require_positive(diameter, "diameter")
+    if sample_thickness is not None:
+        require_positive(sample_thickness, "sample_thickness")
     if ax is None:
         ax = _new_axes()
     bore = _nominal_bore(diameter, 1.5 * spacing)
@@ -863,16 +881,22 @@ def plot_transmission_tube_geometry(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the tube-bore rectangle.
     :return: The axes.
+    :raises ValueError: naming the first length or diameter that is not
+        finite and positive, or an ``l2`` no greater than the thickness.
     """
     from ...materials.absorbers.four_microphone import plane_wave_frequency_range_astm
 
     _check_language(language)
-    if min(l1, s1, l2, s2, thickness) <= 0.0:
-        msg = "'l1', 's1', 'l2', 's2' and 'thickness' must be positive."
-        raise ValueError(msg)
-    if diameter is not None and diameter <= 0.0:
-        msg = "'diameter' must be positive when given."
-        raise ValueError(msg)
+    for name, value in (
+        ("l1", l1),
+        ("s1", s1),
+        ("l2", l2),
+        ("s2", s2),
+        ("thickness", thickness),
+    ):
+        require_positive(value, name)
+    if diameter is not None:
+        require_positive(diameter, "diameter")
     if l2 <= thickness:
         msg = "'l2' is measured from the front face and must exceed 'thickness'."
         raise ValueError(msg)
@@ -1084,11 +1108,13 @@ def plot_metadiffuser_panel_geometry(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the slit rectangles.
     :return: The axes.
+    :raises ValueError: for a depth or period that is not finite and
+        positive, fewer than two wells, or a slit height that is not
+        smaller than the period.
     """
     _check_language(language)
-    if depth <= 0.0 or period <= 0.0:
-        msg = "'depth' and 'period' must be positive."
-        raise ValueError(msg)
+    require_positive(depth, "depth")
+    require_positive(period, "period")
     cells = list(wells)
     if len(cells) < 2:  # noqa: PLR2004
         msg = "'wells' must contain at least two wells."
@@ -1316,14 +1342,17 @@ def plot_insitu_geometry(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the surface rectangle.
     :return: The axes.
+    :raises ValueError: for a height or sampled radius that is not finite
+        and positive, or a source no higher than the microphone.
     """
     _check_language(language)
-    if mic_height <= 0.0 or source_height <= mic_height:
-        msg = "'source_height' must exceed 'mic_height' and both be positive."
+    require_positive(mic_height, "mic_height")
+    require_positive(source_height, "source_height")
+    if source_height <= mic_height:
+        msg = "'source_height' must exceed 'mic_height'."
         raise ValueError(msg)
-    if sampled_radius is not None and sampled_radius <= 0.0:
-        msg = "'sampled_radius' must be positive when given."
-        raise ValueError(msg)
+    if sampled_radius is not None:
+        require_positive(sampled_radius, "sampled_radius")
     if ax is None:
         ax = _new_axes()
     half = max(source_height, sampled_radius or 0.0) * 1.2
@@ -1444,11 +1473,13 @@ def plot_dynamic_stiffness_rig(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the specimen rectangle.
     :return: The axes.
+    :raises ValueError: naming the first of the three that is not finite and
+        positive.
     """
     _check_language(language)
-    if specimen_side <= 0.0 or specimen_thickness <= 0.0 or load_mass <= 0.0:
-        msg = "'specimen_side', 'specimen_thickness' and 'load_mass' must be positive."
-        raise ValueError(msg)
+    require_positive(specimen_side, "specimen_side")
+    require_positive(specimen_thickness, "specimen_thickness")
+    require_positive(load_mass, "load_mass")
     if ax is None:
         ax = _new_axes()
     side = float(specimen_side)
@@ -1538,17 +1569,16 @@ def plot_goniometer_geometry(
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the receiver scatter.
     :return: The axes.
+    :raises ValueError: for a distance, radius or width that is not finite
+        and positive, or an angular step outside ``(0, 90]`` degrees.
     """
     _check_language(language)
-    if source_distance <= 0.0 or receiver_radius <= 0.0:
-        msg = "'source_distance' and 'receiver_radius' must be positive."
-        raise ValueError(msg)
+    require_positive(source_distance, "source_distance")
+    require_positive(receiver_radius, "receiver_radius")
     if not 0.0 < angular_step <= _RECEIVER_ARC_HALF_SPAN_DEG:
         msg = "'angular_step' must be in (0, 90] degrees."
         raise ValueError(msg)
-    if sample_width <= 0.0:
-        msg = "'sample_width' must be positive."
-        raise ValueError(msg)
+    require_positive(sample_width, "sample_width")
     if ax is None:
         ax = _new_axes()
     angles = np.radians(np.arange(-90.0, 90.0 + 0.5 * angular_step, angular_step))

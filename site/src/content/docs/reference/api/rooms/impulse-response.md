@@ -401,6 +401,12 @@ bipolar sequence and its (flat) magnitude spectrum.
 
 **Returns:** The time-domain axes (`ax` given) or the array of two axes.
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for an unknown `kind`, or an empty signal. |
+
 ## shaped_sweep_signal
 
 ```python

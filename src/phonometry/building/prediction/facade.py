@@ -75,6 +75,7 @@ from ..._internal.validation import (
     require_axis_count,
     require_equal_counts,
     require_equal_shapes,
+    require_positive,
     require_ranks,
     require_same_length,
 )
@@ -127,6 +128,20 @@ class FacadeElement:
     r: float | Sequence[float] | np.ndarray | None = None
     dn_e: float | Sequence[float] | np.ndarray | None = None
     insertion_loss: float | Sequence[float] | np.ndarray | None = None
+
+    def __post_init__(self) -> None:
+        """Reject an element whose area is not a positive, finite number.
+
+        The area is the element's weight in the energy sum and its drawn
+        share of the elevation; NaN fails every ``<=`` comparison, so an
+        unpinned element would pass the downstream checks and render a
+        titled, empty façade with no warning.
+
+        :raises ValueError: if ``area`` is given and is not positive and
+            finite.
+        """
+        if self.area is not None:
+            require_positive(self.area, "area")
 
     def _kind(self) -> str:
         given = [

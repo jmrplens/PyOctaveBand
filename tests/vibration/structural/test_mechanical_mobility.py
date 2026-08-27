@@ -289,6 +289,50 @@ def test_a_mobility_short_of_its_frequencies_is_refused() -> None:
         dataclasses.replace(res, mobility=short)
 
 
+@pytest.mark.parametrize(
+    ("field_name", "bad"),
+    [
+        ("mobility", complex(float("nan"), 0.0)),
+        ("mobility", complex(float("inf"), 0.0)),
+        ("frequencies", float("nan")),
+    ],
+    ids=["mobility-nan", "mobility-inf", "frequencies-nan"],
+)
+def test_a_non_finite_frf_value_is_refused(field_name: str, bad: complex) -> None:
+    """One non-finite bin wins ``argmax`` and takes the fiche's peak with it.
+
+    Every comparison against a NaN is False and every comparison against an
+    infinity is True, so a single such bin of ``|Y|`` is the maximum of the
+    array whatever the resonance does: the sheet then boxes that bin's
+    frequency as the peak frequency, displacing the true resonance, and
+    prints ``nan`` (or ``inf``) as the peak mobility beside it. A NaN in
+    the frequency axis turns the stated frequency range into ``nan to nan``.
+    No producer emits either -- :func:`sdof_mobility_result` and the
+    point-mobility bundles compute a finite FRF from validated inputs -- so
+    the refusal is at construction, by field name.
+    """
+    res = vibration.sdof_mobility_result(np.linspace(1.0, 50.0, 40), M, K, C)
+    values = np.asarray(getattr(res, field_name)).copy()
+    values[20] = bad
+    with pytest.raises(ValueError, match=f"MobilityResult: '{field_name}'"):
+        dataclasses.replace(res, **{field_name: values})
+
+
+def test_an_frf_covering_no_frequency_is_refused() -> None:
+    """Two empty axes agree, and the fiche then asks for the peak of nothing.
+
+    Length-0 axes satisfy the rank and count checks, so the FRF was built and
+    the sheet died inside numpy on "attempt to get argmax of an empty
+    sequence", naming neither the field nor the result. The empty state is
+    reachable from the entry point, which took an empty frequency axis for a
+    perfectly good FRF.
+    """
+    with pytest.raises(
+        ValueError, match="'frequencies' must carry at least one frequency"
+    ):
+        vibration.sdof_mobility_result(np.array([], dtype=float), M, K, C)
+
+
 def test_plot_returns_axes() -> None:
     pytest.importorskip("matplotlib")
     import matplotlib as mpl

@@ -134,10 +134,24 @@ class LabAirborneInsulationResult:
         number and answers with a ``TypeError`` about zero-dimensional
         arrays, naming neither the field nor the result.
 
-        :raises ValueError: if ``r`` and ``absorption`` disagree.
+        Both fields must also be finite. :func:`lab_airborne_insulation` can
+        only emit finite values (its levels are checked finite and ``A``
+        comes from a positive, finite ``T`` and ``V``), so a NaN here is
+        always a construction mistake - and the fiche would have printed it
+        as a measured value in the band table, with the boxed rating beside
+        it looking untouched.
+
+        :raises ValueError: if ``r`` and ``absorption`` disagree, or either
+            carries a non-finite value.
         """
         require_ranks(self, r=1, absorption=1)
         require_same_length(self, "r", "absorption")
+        for name in ("r", "absorption"):
+            if not np.all(np.isfinite(np.asarray(getattr(self, name)))):
+                msg = (
+                    f"{type(self).__name__}: '{name}' must contain only finite values."
+                )
+                raise ValueError(msg)
 
     def plot(self, ax: Axes | None = None, **kwargs: Any) -> Axes:
         """Plot ``R`` against the shifted ISO 717-1 reference curve.
@@ -244,10 +258,24 @@ class LabImpactInsulationResult:
         number and answers with a ``TypeError`` about zero-dimensional
         arrays, naming neither the field nor the result.
 
-        :raises ValueError: if ``l_n`` and ``absorption`` disagree.
+        Both fields must also be finite. :func:`lab_impact_insulation` can
+        only emit finite values (its levels are checked finite and ``A``
+        comes from a positive, finite ``T`` and ``V``), so a NaN here is
+        always a construction mistake - and the fiche would have printed it
+        as a measured value in the band table, with the boxed rating beside
+        it looking untouched.
+
+        :raises ValueError: if ``l_n`` and ``absorption`` disagree, or either
+            carries a non-finite value.
         """
         require_ranks(self, l_n=1, absorption=1)
         require_same_length(self, "l_n", "absorption")
+        for name in ("l_n", "absorption"):
+            if not np.all(np.isfinite(np.asarray(getattr(self, name)))):
+                msg = (
+                    f"{type(self).__name__}: '{name}' must contain only finite values."
+                )
+                raise ValueError(msg)
 
     def plot(self, ax: Axes | None = None, **kwargs: Any) -> Axes:
         """Plot ``Ln`` against the shifted ISO 717-2 reference curve.

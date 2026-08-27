@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import numpy as np
 import pytest
 
@@ -152,6 +154,146 @@ def test_fault_frequency_overlay_on_a_measured_spectrum() -> None:
     empty = res.within(1.0e6, 2.0e6)
     with pytest.raises(ValueError, match="no fault lines"):
         empty.plot()
+
+
+def _measured_envelope_spectrum() -> object:
+    """An envelope spectrum of a modulated carrier, as the overlay is fed one."""
+    from phonometry import signals
+
+    fs = 8192.0
+    t = np.arange(int(fs)) / fs
+    signal = (1.0 + 0.5 * np.cos(2.0 * np.pi * 207.0 * t)) * np.cos(
+        2.0 * np.pi * 2000.0 * t
+    )
+    return signals.envelope_spectrum(signal, fs)
+
+
+@pytest.mark.parametrize("field", ["frequencies", "amplitude"])
+def test_a_non_finite_measured_spectrum_is_refused_by_field(field: str) -> None:
+    """Both vectors of ``spectrum`` scale an axis, so a NaN in either ends the figure.
+
+    The frequency axis runs to the top of the measured one and the amplitude
+    axis to its peak, taken with ``np.max``, so one non-finite sample becomes
+    the whole limit and matplotlib stops the render with "Axis limits cannot
+    be NaN or Inf", naming neither the argument nor the field inside it.
+    ``spectrum`` is a structural contract, anything exposing the two vectors,
+    so there is no construction of ours to pin it at and the refusal is where
+    the caller's parameter is named. No producer emits one:
+    :func:`phonometry.signals.envelope.envelope_spectrum` refuses a non-finite
+    record before it transforms it.
+    """
+    pytest.importorskip("matplotlib")
+    import dataclasses
+
+    import matplotlib as mpl
+
+    mpl.use("Agg")
+
+    res = vibration.bearing_fault_frequencies(
+        2000.0, 15, 6.0, 34.0, contact_angle_deg=12.96
+    )
+    spectrum = _measured_envelope_spectrum()
+    corrupt = np.asarray(getattr(spectrum, field)).copy()
+    corrupt[100] = np.nan
+    bad = dataclasses.replace(spectrum, **{field: corrupt})  # type: ignore[type-var]
+    with pytest.raises(
+        ValueError, match=f"'spectrum.{field}' must contain only finite"
+    ):
+        res.plot(spectrum=bad)
+
+
+def test_a_measured_spectrum_of_two_lengths_is_refused_by_the_overlay() -> None:
+    """One amplitude per frequency bin, named where the caller's parameter is.
+
+    The curve is drawn from ``frequencies <= max_frequency`` applied to both
+    vectors, so an amplitude shorter than its own axis is indexed by a mask
+    built on the longer one and numpy ends the render with "boolean index did
+    not match indexed array along axis 0", naming neither ``spectrum`` nor the
+    field inside it. Every sample here is finite, so the non-finite guard
+    beside this one does not cover the mistake.
+
+    ``EnvelopeSpectrumResult`` pins the pair when it is built, which is why the
+    mismatch is assembled here as a loose object: the structural contract of
+    ``spectrum`` is the only way in.
+    """
+    pytest.importorskip("matplotlib")
+    import matplotlib as mpl
+
+    mpl.use("Agg")
+
+    res = vibration.bearing_fault_frequencies(
+        2000.0, 15, 6.0, 34.0, contact_angle_deg=12.96
+    )
+    measured = _measured_envelope_spectrum()
+    frequencies = np.asarray(measured.frequencies)  # type: ignore[attr-defined]
+    amplitude = np.asarray(measured.amplitude)[:-1]  # type: ignore[attr-defined]
+    assert np.all(np.isfinite(frequencies))
+    assert np.all(np.isfinite(amplitude))
+    mismatched = SimpleNamespace(frequencies=frequencies, amplitude=amplitude)
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"'spectrum\.frequencies' \(\d+,\), 'spectrum\.amplitude' \(\d+,\) "
+            r"must all have the same shape"
+        ),
+    ):
+        res.plot(spectrum=mismatched)
+
+
+@pytest.mark.parametrize(
+    ("label", "shape"),
+    [("empty", (0,)), ("bare numbers", ()), ("a grid", (3, 2))],
+)
+def test_a_spectrum_that_is_not_a_run_of_bins_is_refused(
+    label: str, shape: tuple[int, ...]
+) -> None:
+    """What the equal-shape pin beside this one cannot see.
+
+    That pin compares the two shapes against each other, so a pair that
+    agrees walks past it whatever the shape is: two bare numbers agree on the
+    empty shape and two grids agree on both of theirs. Only the empty pair
+    announced itself, and anonymously, as numpy's "zero-size array to
+    reduction operation maximum which has no identity" from the axis scaling.
+    The other two drew: the numbers as a single point under limits matplotlib
+    widened for being singular, the grid as one line per column over an axis
+    that was never measured on them.
+    """
+    pytest.importorskip("matplotlib")
+    import matplotlib as mpl
+
+    mpl.use("Agg")
+
+    res = vibration.bearing_fault_frequencies(
+        2000.0, 15, 6.0, 34.0, contact_angle_deg=12.96
+    )
+    malformed = SimpleNamespace(frequencies=np.zeros(shape), amplitude=np.zeros(shape))
+    with pytest.raises(
+        ValueError,
+        match=r"'spectrum\.frequencies' must be a non-empty one-dimensional",
+    ):
+        res.plot(spectrum=malformed)
+
+
+def test_the_overlay_scales_its_amplitude_axis_to_the_measured_peak() -> None:
+    """The refusal sits in front of the measurement, which still sets the axis.
+
+    The y limit is the peak of the drawn part of the curve, lifted by the
+    strip the rotated line names are laid out in, so the check above cannot
+    have replaced ``np.max`` with a NaN-tolerant reading of a corrupt curve.
+    """
+    pytest.importorskip("matplotlib")
+    import matplotlib as mpl
+
+    mpl.use("Agg")
+
+    res = vibration.bearing_fault_frequencies(
+        2000.0, 15, 6.0, 34.0, contact_angle_deg=12.96
+    )
+    spectrum = _measured_envelope_spectrum()
+    ax = res.plot(spectrum=spectrum, max_frequency=600.0, annotate=False)
+    kept = np.asarray(spectrum.frequencies) <= 600.0  # type: ignore[attr-defined]
+    peak = float(np.max(np.asarray(spectrum.amplitude)[kept]))  # type: ignore[attr-defined]
+    assert ax.get_ylim() == pytest.approx((0.0, 1.03 * peak))
 
 
 def test_crowded_fault_labels_do_not_overlap() -> None:

@@ -424,6 +424,12 @@ resolution (37 microphones).
 
 **Returns:** The axes.
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a distance, radius or width that is not finite and positive, or an angular step outside `(0, 90]` degrees. |
+
 ## random_incidence_diffusion
 
 ```python

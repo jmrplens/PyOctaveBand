@@ -235,6 +235,12 @@ Give exactly one of `width`/`radius`, matching
 
 **Returns:** The axes.
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a `depth`, `width` or `radius` that is not finite and positive, or for anything other than exactly one of `width`/`radius`. |
+
 ## slit_resonance_frequencies
 
 ```python

@@ -35,6 +35,7 @@ from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
 from phonometry.materials import (
+    ImpedanceTubeResult,
     air_density_iso,
     characteristic_impedance,
     speed_of_sound_iso,
@@ -44,8 +45,6 @@ from phonometry.materials import (
 
 if TYPE_CHECKING:
     from pathlib import Path
-
-    from phonometry.materials import ImpedanceTubeResult
 
 _TEMPERATURE_K = 293.15  # 20 degC
 _DIAMETER, _SPACING, _X1 = 0.100, 0.050, 0.100
@@ -133,29 +132,92 @@ def test_unknown_language_rejected(tmp_path: Path) -> None:
         result.report(out, language="xx")
 
 
-@pytest.mark.parametrize("verbose", [False, True])
 @pytest.mark.parametrize(
     "field", ["frequency", "absorption", "reflection", "normalized_impedance"]
 )
-def test_short_per_frequency_array_rejected(
-    field: str, verbose: bool, tmp_path: Path
-) -> None:
-    """One short per-frequency array raises before the fiche is written.
+def test_short_per_frequency_array_rejected(field: str) -> None:
+    """One short per-frequency array is refused when the result is built.
 
-    ``ImpedanceTubeResult`` is a frozen dataclass with no validation, so a
-    caller can hand the renderer a result whose arrays disagree in length; the
-    value table would then be silently cut short, in the plain four-column
-    branch and in the verbose ``|r|`` branch alike. The renderer names every
-    per-frequency field beside the shape it was given, and leaves no PDF
-    behind.
+    A result whose arrays disagree in length cut the value table short, in the
+    plain four-column branch and in the verbose ``|r|`` branch alike. The
+    refusal used to wait for the renderer, so only ``.report()`` caught it and
+    :meth:`plot` and every other reader met the ragged arrays raw; it now sits
+    in ``ImpedanceTubeResult.__post_init__``, which names every per-frequency
+    field beside the count it carries, so no reader can be handed the result
+    at all.
     """
     result = _result()
-    ragged = dataclasses.replace(result, **{field: getattr(result, field)[:-1]})
-    out = tmp_path / "iso10534_ragged.pdf"
-    metadata = _metadata()
-    with pytest.raises(ValueError, match=rf"'{field}'.*same shape"):
-        ragged.report(str(out), metadata=metadata, verbose=verbose)
-    assert not out.exists()
+    short = {field: getattr(result, field)[:-1]}
+    with pytest.raises(
+        ValueError, match=rf"'{field}'.*must each carry one value per frequency"
+    ):
+        dataclasses.replace(result, **short)
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "frequency",
+        "reflection",
+        "surface_impedance",
+        "normalized_impedance",
+        "absorption",
+    ],
+)
+def test_non_finite_per_frequency_value_is_refused(field: str) -> None:
+    """A NaN cannot exist on a result the fiche prints as a measured value.
+
+    ``two_microphone_impedance`` computes every field from finite arithmetic -
+    a non-finite value can only arrive through a degenerate ``H12``, never as
+    a flagged undeterminable band - so a NaN here is always a construction
+    mistake. Admitting one printed ``nan`` as a measured ``alpha`` in the
+    accredited per-frequency table with nothing on the page qualifying it,
+    while the ``alpha(f)`` plot merely drew a gap at that frequency.
+    """
+    result = _result()
+    bad = np.asarray(getattr(result, field)).copy()
+    bad[1] = np.nan
+    with pytest.raises(ValueError, match=rf"'{field}' must contain only finite"):
+        dataclasses.replace(result, **{field: bad})
+
+
+def test_scalar_per_frequency_fields_are_refused() -> None:
+    """A single-frequency result built from plain floats is refused.
+
+    Every field was 0-d, so all shapes agreed and the renderer's own
+    all-shapes-equal check passed them through; the value table's ``zip`` then
+    died with numpy's "iteration over a 0-d array", naming no field of this
+    result and no fix.
+    """
+    with pytest.raises(ValueError, match=r"'frequency' must be a non-empty 1-D"):
+        ImpedanceTubeResult(
+            frequency=500.0,
+            reflection=0.5 + 0.1j,
+            surface_impedance=1200.0 + 300.0j,
+            normalized_impedance=2.9 + 0.7j,
+            absorption=0.74,
+        )
+
+
+def test_all_empty_result_is_refused() -> None:
+    """An all-empty result is refused instead of reaching the figure.
+
+    Every shape agreed at ``(0,)``, so the all-shapes-equal check passed and
+    the renderer's text paths defended themselves (a range reading "0 Hz to
+    0 Hz"); the embedded plot then stopped at ``freqs.min()`` with numpy's
+    "zero-size array to reduction operation minimum which has no identity",
+    an error naming nothing the caller supplied.
+    """
+    empty = np.array([])
+    empty_complex = np.array([], dtype=np.complex128)
+    with pytest.raises(ValueError, match=r"'frequency' must be a non-empty 1-D"):
+        ImpedanceTubeResult(
+            frequency=empty,
+            reflection=empty_complex,
+            surface_impedance=empty_complex,
+            normalized_impedance=empty_complex,
+            absorption=empty,
+        )
 
 
 def test_displayed_absorption_matches_oracle(tmp_path: Path) -> None:

@@ -60,6 +60,7 @@ text and is out of scope.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal, overload
 
@@ -72,6 +73,7 @@ from ..._internal.validation import (
     require_choice,
     require_equal_shapes,
     require_positive,
+    require_ranks,
 )
 from ...hearing.threshold import SEXES as _SEXES
 from ...io._resolve import SignalInput, resolve_fs, resolve_samples
@@ -187,6 +189,8 @@ def spinal_response(acceleration: SignalInput, fs: float | None = None) -> np.nd
         winning.
     :return: The spinal response acceleration :math:`A_\mathrm{z}(t)`, m/s2, same
         length.
+    :raises ValueError: for a record that is not 1-D, is empty or carries
+        non-finite samples.
     """
     fs = require_positive(resolve_fs(acceleration, fs, name="acceleration"), "fs")
     # calibrate=False: a Signal may carry a digital-to-pascal factor, and
@@ -197,6 +201,13 @@ def spinal_response(acceleration: SignalInput, fs: float | None = None) -> np.nd
         raise ValueError(msg)
     if az.size == 0:
         msg = "acceleration must not be empty."
+        raise ValueError(msg)
+    # Refuse a corrupt record outright, as the STIPA and STOI entries do: a
+    # single NaN sample turns the whole IIR spinal response NaN, every NaN
+    # comparison then counts zero peaks, and the assessment reports R = 0.0
+    # (the safest possible verdict) with no trace of the corruption.
+    if not np.all(np.isfinite(az)):
+        msg = "acceleration must contain only finite values."
         raise ValueError(msg)
     spectrum = np.fft.rfft(az)
     freq = np.fft.rfftfreq(az.size, d=1.0 / fs)
@@ -462,6 +473,37 @@ class MultipleShockResult:
     days_per_year: float
     peaks: np.ndarray
     risk_thresholds: tuple[float, float, float]
+
+    def __post_init__(self) -> None:
+        """Reject a non-finite dose chain, exposure scenario, or 2-D peaks.
+
+        The health-risk fiche prints the whole Formula 3 to C.5 chain
+        (``Dz``, ``Dzd``, ``Sd``, ``R``, ``P``) in its analysis table, boxes
+        ``R`` and ``P`` beside a definite risk classification, and lists the
+        exposure scenario in the header grid. The chain emits finite values
+        for finite, conditioned input, so a NaN here means a non-finite
+        acceleration or scenario went in (or the result was hand-built), and
+        without this pin the sheet either renders ``nan %`` next to a normal
+        classification or crashes the rounding with a bare "cannot convert
+        float NaN to integer".
+
+        :raises ValueError: if any dose, risk, probability or scenario value
+            is non-finite, or ``peaks`` is not one value per shock.
+        """
+        require_ranks(self, peaks=1)
+        for name in (
+            "acceleration_dose",
+            "daily_dose",
+            "compression_dose",
+            "risk",
+            "probability",
+            "start_age",
+            "days_per_year",
+        ):
+            value = getattr(self, name)
+            if not math.isfinite(float(value)):
+                msg = f"MultipleShockResult: '{name}' must be finite; got {value!r}."
+                raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

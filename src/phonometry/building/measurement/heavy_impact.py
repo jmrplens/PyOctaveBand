@@ -433,8 +433,17 @@ class HeavyImpactSourceCheck:
         is exported and can be built directly from figures the tables never
         supplied.
 
-        :raises ValueError: if any per-band column disagrees with the rest.
+        ``source`` is pinned to the two standard sources for the same
+        reason: :func:`check_heavy_impact_source` validates the name at the
+        call, but the figure titles itself by looking the name up in a label
+        table after everything is drawn, so a check rewritten by hand dies
+        mid-render with a bare ``KeyError`` naming the string alone, neither
+        the field nor the two names it could have held.
+
+        :raises ValueError: if any per-band column disagrees with the rest,
+            or ``source`` is not a standard source name.
         """
+        require_choice(self.source, "source", tuple(_SPECS))
         require_ranks(
             self,
             frequencies=1,
@@ -764,8 +773,16 @@ class AWeightedMaximumImpactResult:
         weighting that no longer accounts for them, off by as much as the
         nearly 30 dB the table falls across the rating range.
 
-        :raises ValueError: if any per-band column disagrees with the rest.
+        ``band`` is pinned to the two Annex D band widths because the figure
+        titles itself by looking the tag up in a label table after the bars
+        are drawn: :func:`a_weighted_maximum_impact_level` validates it at
+        the call, but a result rewritten by hand reaches the lookup unchecked
+        and dies mid-render with a bare ``KeyError`` naming the tag alone.
+
+        :raises ValueError: if any per-band column disagrees with the rest,
+            or ``band`` is not ``"third"`` or ``"octave"``.
         """
+        require_choice(self.band, "band", ("third", "octave"))
         require_ranks(self, frequencies=1, levels=1, a_weighting=1, corrected=1)
         require_same_length(self, "frequencies", "levels", "a_weighting", "corrected")
 

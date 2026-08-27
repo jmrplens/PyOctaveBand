@@ -250,6 +250,31 @@ def test_band_range_without_mid_octaves_names_the_band(tmp_path: Path) -> None:
     assert "T_mid" not in text
 
 
+def test_unevaluable_mid_band_falls_back_to_the_first_finite_band(
+    tmp_path: Path,
+) -> None:
+    """A NaN T30 in one mid band leaves no mid-frequency descriptor at all.
+
+    Both the 500 Hz and the 1000 Hz band are in range here, so the band set
+    alone would allow a T_mid; what forbids it is that the 500 Hz T30 could not
+    be evaluated. The box and the verdict then fall back to the first band with
+    a finite T30 (250 Hz, 1.30 s), not to the surviving 1000 Hz band alone
+    (1.10 s, which would have passed the 1.20 s target this fiche must fail),
+    and the verdict says plain T30 with no mid-frequency claim.
+    """
+    freq = np.array([250.0, 500.0, 1000.0])
+    t30 = np.array([1.30, np.nan, 1.10])
+    res = _synthetic_result(freq, t30=t30, edt=t30.copy())
+    out = tmp_path / "nan_mid_band.pdf"
+    res.report(str(out), metadata=_full_metadata(requirement=1.20))
+    text = _extract_text(str(out))
+    assert "T30 (250 Hz) = 1.30 s" in text  # the box names the fallback band
+    assert "T30 = 1.30 s, required ≤ 1.20 s" in text  # the verdict does not
+    assert "FAIL" in text
+    assert "Tmid" not in text
+    assert "T_mid" not in text
+
+
 def test_edt_label_follows_edts_own_band_coverage(tmp_path: Path) -> None:
     """EDT_mid vs EDT is chosen from EDT's own bands, not T30's.
 

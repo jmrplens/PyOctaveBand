@@ -13,6 +13,7 @@ couple of the model values, like the sibling report tests.
 
 from __future__ import annotations
 
+import numpy as np
 import pytest
 import reference_data as ref
 
@@ -147,6 +148,67 @@ def test_airborne_verbose_adds_energy_share(tmp_path: Path) -> None:
     text = _extract_text(str(verbose))
     assert "%" in text  # per-path energy share column
     assert "energy share" in text  # the verbose caption
+
+
+@pytest.mark.parametrize(
+    "label",
+    ["floor <north>", "wall <b>east", "slab & <A>"],
+    ids=["angle-brackets", "unclosed-tag", "ampersand"],
+)
+def test_flanking_path_label_reaches_the_table_intact(
+    label: str, tmp_path: Path
+) -> None:
+    """A path label is client free text, and the fiche prints it verbatim.
+
+    The transmission-path table feeds each label to reportlab's paragraph
+    parser, which read a ``<...>`` as markup: an angle-bracketed word was
+    silently deleted from all three rows of the accredited page (``floor -Ff``
+    for ``floor <north>-Ff``), a ``<b>`` rendered the row bold, and an
+    unclosed tag aborted the render with a parse error naming neither the
+    field nor the path.
+    """
+    paths = building.flanking_element(
+        label=label,
+        r_flanking=48.0,
+        r_separating=52.0,
+        k_ff=8.0,
+        k_fd=10.0,
+        k_df=10.0,
+        separating_area=10.0,
+        coupling_length=4.0,
+    )
+    result = building.predicted_airborne_insulation(r_direct=53.0, flanking_paths=paths)
+    out = tmp_path / "label.pdf"
+    result.report(str(out))
+    assert_one_page(str(out))
+    text = _extract_text(str(out))
+    for suffix in ("Ff", "Df", "Fd"):
+        assert f"{label}-{suffix}" in text
+
+
+@pytest.mark.parametrize(
+    "name",
+    ["Wall <east>", "<b>Wall</b>", "Door <b>north"],
+    ids=["angle-brackets", "balanced-tags", "unclosed-tag"],
+)
+def test_facade_element_name_reaches_the_table_intact(
+    name: str, tmp_path: Path
+) -> None:
+    """A facade element name is client free text, printed verbatim.
+
+    ``FacadeElement.name`` reached the same paragraph parser unescaped, so the
+    accredited element table mislabelled the element: ``Wall <east>`` printed
+    as ``Wall``, ``<b>Wall</b>`` printed as bold ``Wall``, and an unclosed tag
+    crashed the render inside reportlab's paraparser.
+    """
+    element = building.FacadeElement(
+        name=name, area=8.0, r=list(np.linspace(30.0, 45.0, 16))
+    )
+    result = building.facade_sound_reduction([element], area=10.0, volume=50.0)
+    out = tmp_path / "name.pdf"
+    result.report(str(out))
+    assert_one_page(str(out))
+    assert name in _extract_text(str(out))
 
 
 def test_airborne_requirement_verdict(tmp_path: Path) -> None:

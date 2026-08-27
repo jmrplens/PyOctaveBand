@@ -123,3 +123,56 @@ def test_static_airflow_plot_curve_through_evaluation_point() -> None:
     at_eval = float(np.interp(res.evaluation_velocity * 1e3, x, y))
     assert at_eval == pytest.approx(res.pressure_drop, rel=1e-3)
     plt.close("all")
+
+
+# --------------------------------------------------------------------------
+# Transfer matrix argument validation (ASTM E2611)
+# --------------------------------------------------------------------------
+def test_transfer_matrix_plot_rejects_mismatched_frequency() -> None:
+    # The four-pole entries carry no frequency axis, so the plot must pin the
+    # caller's vector to them by name instead of letting matplotlib report
+    # two anonymous shapes.
+    tm, f, rho_c = _transfer_matrix()
+    with pytest.raises(ValueError, match=r"TransferMatrix\.plot: 'frequency'"):
+        tm.plot(f[:-3], rho_c)
+    plt.close("all")
+
+
+def test_transfer_matrix_plot_rejects_nan_impedance() -> None:
+    # NaN passes a bare `<= 0.0` and renders both curves fully NaN (blank
+    # axes under the ASTM title); require_positive refuses it by name.
+    tm, f, _rho_c = _transfer_matrix()
+    with pytest.raises(ValueError, match="'characteristic_impedance' must be positive"):
+        tm.plot(f, float("nan"))
+    plt.close("all")
+
+
+# --------------------------------------------------------------------------
+# In-situ road-surface absorption (ISO 13472-1)
+# --------------------------------------------------------------------------
+def test_insitu_absorption_plot_renders_nan_band_as_em_dash() -> None:
+    """A NaN band is documented "no data", not a measured zero.
+
+    The bar chart must not assert alpha = 0 for it: the band gets no bar and
+    the em dash the value tables print for a missing entry marks its
+    position instead.
+    """
+    from phonometry.materials.surfaces.road_absorption import InsituAbsorptionResult
+
+    res = InsituAbsorptionResult(
+        frequencies=np.array([500.0, 630.0, 800.0, 1000.0]),
+        absorption=np.array([0.2, np.nan, 0.6, 0.5]),
+    )
+    ax = res.plot()
+    heights = [p.get_height() for p in ax.patches]
+    assert len(heights) == 3  # one bar per finite band only
+    assert np.all(np.isfinite(heights))
+    np.testing.assert_allclose(heights, [0.2, 0.6, 0.5])
+    # Dropping the NaN band must not slide the surviving bars one slot to
+    # the left: each still sits on the tick of the band it measures.
+    centres = [p.get_x() + 0.5 * p.get_width() for p in ax.patches]
+    np.testing.assert_allclose(centres, [0.0, 2.0, 3.0])
+    dashes = [t for t in ax.texts if t.get_text() == "—"]
+    assert len(dashes) == 1
+    assert dashes[0].get_position()[0] == pytest.approx(1.0)  # the NaN band
+    plt.close("all")

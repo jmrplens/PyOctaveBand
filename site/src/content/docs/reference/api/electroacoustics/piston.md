@@ -271,6 +271,12 @@ normalised far-field lobe is overlaid on the radiation side.
 
 **Returns:** The axes.
 
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a non-positive radius, only one of the lobe pair, a lobe whose two arrays disagree, or a non-finite value in either of them. |
+
 ## radiating_piston
 
 ```python
