@@ -75,6 +75,7 @@ measured levels along a line of workstations, and predicts nothing.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -82,6 +83,7 @@ import numpy as np
 
 from .._internal.types import as_float_or_array
 from .._internal.validation import (
+    require_finite_fields,
     require_positive,
     require_ranks,
     require_same_length,
@@ -260,7 +262,7 @@ class CrowdNoiseResult:
     communication_level: float
 
     def __post_init__(self) -> None:
-        """Reject a grid whose levels do not span its two axes.
+        """Reject a grid that does not span its axes, or a level that lies.
 
         :attr:`levels` is a surface over two independent axes -- one row per
         absorption area, one column per occupancy -- and the plot reads it as
@@ -281,12 +283,87 @@ class CrowdNoiseResult:
         comparing occupancies with absorption areas would refuse the ordinary
         study of twenty occupancies against three areas.
 
+        The two scalar levels are pinned to the fields they restate. Neither
+        is data: :attr:`signal_level` is Equation (17.50) evaluated at
+        :attr:`distance` for a talker of :attr:`sound_power_level` and
+        :attr:`directivity`, all three of which the result stores beside it,
+        and :attr:`communication_level` is that signal against the fixed
+        :data:`COMMUNICATION_SNR` of Equation (17.53). Both reach the reader
+        as a horizontal line whose caption is drawn from a *different* field
+        than its height: the speech line is placed at ``signal_level`` and
+        labelled with ``distance``, the limit line is placed at
+        ``communication_level`` under a legend entry that spells the -6 dB
+        out. A variant built with :func:`dataclasses.replace` that moves one
+        of those fields alone therefore prints a line captioned for a talker
+        it was never computed for -- ``distance`` reading 3 m over the 1.2 m
+        level, or a title announcing 85 dB per talker above curves drawn at
+        70 -- and a ``communication_level`` set to the -9 dB privacy bound of
+        Equation (17.54) is drawn as though it were the communication limit.
+        :meth:`speech_to_noise` subtracts the same ``signal_level`` from the
+        grid, and Equation (17.52) is independent of the talker's power only
+        while both sides carry the one power, so a signal that has drifted
+        from ``sound_power_level`` silently biases every ratio.
+
+        ``sound_power_level``, ``distance`` and ``directivity`` are inputs and
+        are pinned no further than finiteness: they are what the caller chose,
+        not summaries of anything. They are refused as ``NaN`` because the
+        producer does not check the talker's power for finiteness, and one
+        that is not finite reaches the plot as a title reading "``L_W`` = nan
+        dB per talker" over two reference lines at no height at all. Nothing
+        in this model is legitimately undetermined -- every point of the grid
+        is a closed form of finite inputs, and no quantity here is flagged and
+        rendered as an em dash -- so no field is exempt from that.
+
+        The identities allow a billionth of a decibel, so a caller who
+        recomputed them along another floating-point path is not refused over
+        the last bit.
+
         :raises ValueError: if ``levels`` is not a two-dimensional grid of one
-            row per absorption area and one column per talker count.
+            row per absorption area and one column per talker count, if a
+            scalar field is not finite, if ``signal_level`` does not restate
+            the direct field of Equation (17.50) for the stored geometry, or
+            if ``communication_level`` does not restate ``signal_level``
+            against :data:`COMMUNICATION_SNR`.
         """
         require_ranks(self, talkers=1, absorption_areas=1, levels=2)
         require_same_length(self, "absorption_areas", "levels", axis="absorption area")
         require_same_length(self, "talkers", ("levels", 1), axis="talker count")
+        require_finite_fields(
+            self,
+            "distance",
+            "directivity",
+            "sound_power_level",
+            "signal_level",
+            "communication_level",
+            "talkers",
+            "absorption_areas",
+            "levels",
+        )
+        direct = float(
+            speech_direct_level(
+                self.distance,
+                sound_power_level=self.sound_power_level,
+                directivity=self.directivity,
+            )
+        )
+        if not math.isclose(self.signal_level, direct, rel_tol=0.0, abs_tol=1e-9):
+            msg = (
+                "CrowdNoiseResult: 'signal_level' must be the direct field of "
+                "Equation (17.50) at 'distance' for a talker of "
+                "'sound_power_level' and 'directivity'; got "
+                f"{self.signal_level!r} where those fields state {direct!r}."
+            )
+            raise ValueError(msg)
+        limit = self.signal_level - COMMUNICATION_SNR
+        if not math.isclose(self.communication_level, limit, rel_tol=0.0, abs_tol=1e-9):
+            msg = (
+                "CrowdNoiseResult: 'communication_level' must be the noise "
+                "level at which the speech-to-noise ratio falls to the "
+                f"{COMMUNICATION_SNR:g} dB limit of Equation (17.53), that is "
+                f"'signal_level' minus it; got {self.communication_level!r} "
+                f"where 'signal_level' {self.signal_level!r} states {limit!r}."
+            )
+            raise ValueError(msg)
 
     def speech_to_noise(self) -> np.ndarray:
         """Speech-to-noise ratio for every point of :attr:`levels`, dB."""

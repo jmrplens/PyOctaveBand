@@ -362,8 +362,8 @@ EBU Mode loudness measurement of a programme (BS.1770-5 / EBU R 128).
 | `momentary_time` | Time of each `M` reading (window end), s. |
 | `short_term` | Short-term loudness series `S` (3 s, ungated), LUFS. |
 | `short_term_time` | Time of each `S` reading (window end), s. |
-| `max_momentary` | Maximum momentary loudness, LUFS. |
-| `max_short_term` | Maximum short-term loudness, LUFS. |
+| `max_momentary` | Maximum momentary loudness, LUFS: the largest reading of `momentary` (`-inf` when the excerpt is shorter than the 400 ms window and no reading exists). |
+| `max_short_term` | Maximum short-term loudness, LUFS: the largest reading of `short_term` (`-inf` when the excerpt is shorter than the 3 s window and no reading exists). |
 | `relative_threshold` | Relative gating threshold of the integrated measurement (10 LU below the absolute-gated loudness), LUFS. |
 | `lra_low` | Lower (10th percentile) edge of the loudness range, LUFS. |
 | `lra_high` | Upper (95th percentile) edge of the loudness range, LUFS. |

@@ -265,15 +265,17 @@ def _intensity_wide() -> ph.emission.IntensityResult:
     """
     freqs = np.array([100.0, 1000.0, 10000.0])
     n = freqs.size
+    # 1 uW/m^2 is 60 dB re 1 pW/m^2 exactly, the level the bands and the
+    # broadband total both carry here.
     return ph.emission.IntensityResult(
         frequency=freqs,
-        intensity=np.zeros(n),
+        intensity=np.full(n, 1.0e-6),
         intensity_level=np.full(n, 60.0),
         pressure_level=np.full(n, 62.0),
         pressure_intensity_index=np.full(n, 2.0),
         direction=np.ones(n),
         bias_correction=np.ones(n),
-        total_intensity=0.0,
+        total_intensity=1.0e-6,
         total_intensity_level=60.0,
         total_pressure_level=62.0,
         total_pressure_intensity_index=2.0,

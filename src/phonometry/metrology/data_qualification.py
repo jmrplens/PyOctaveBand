@@ -70,6 +70,7 @@ expectations.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -307,6 +308,98 @@ def _count_runs(flags: NDArray[np.bool_]) -> int:
 # Trend and stationarity tests
 # ---------------------------------------------------------------------------
 
+#: Where each null mean is written down, by the method that counts it. Only
+#: the two keys here yield a moment in :func:`_null_trend_mean`, so a message
+#: is only ever built for a method this maps.
+_NULL_MEAN_SOURCES = {
+    "reverse_arrangements": "B&P Eq. (4.54)",
+    "runs": "Wald & Wolfowitz 1940",
+}
+
+
+def _null_trend_mean(
+    values: NDArray[np.float64], method: str, median: float | None
+) -> float | None:
+    r"""Null mean of the trend statistic counted on *values*, or ``None``.
+
+    Restates what the producers store: ``n(n-1)/4`` over the whole sequence
+    for reverse arrangements (B&P Eq. (4.54)), and the Wald & Wolfowitz
+    ``1 + 2 n_1 n_2 / n`` for runs, counted on the values that differ from
+    *median* -- the classification median, which for a
+    :class:`TrendTestResult` is the one it kept and for a
+    :class:`StationarityTestResult` is the median of the segment sequence
+    :func:`trend_test` took itself. Re-filtering an already filtered
+    sequence removes nothing, so one form serves both.
+
+    ``None`` where no moment is determined: a ``method`` this module does
+    not count, a runs result carrying no classification median, or a runs
+    sequence with nothing on one side of it. There is no null mean to
+    measure a hand-built result against in any of those, and inventing one
+    would refuse a result the producers simply never reach.
+
+    :param values: The sequence the statistic was counted on.
+    :param method: ``"reverse_arrangements"`` or ``"runs"``.
+    :param median: Classification median for ``"runs"``, else ignored.
+    :return: The null mean, or ``None`` when it is not determined.
+    """
+    seq = np.asarray(values, dtype=np.float64)
+    if method == "reverse_arrangements":
+        return _reverse_arrangement_moments(seq.size)[0]
+    if method != "runs" or median is None:
+        return None
+    kept = seq[np.abs(seq - median) > 0.0]
+    n1 = int(np.count_nonzero(kept > median))
+    n2 = int(kept.size - n1)
+    if n1 == 0 or n2 == 0:
+        return None
+    return _runs_moments(n1, n2)[0]
+
+
+def _check_null_mean(
+    owner: str,
+    sequence: str,
+    values: NDArray[np.float64],
+    method: str,
+    median: float | None,
+    mean: float,
+) -> None:
+    """Require ``mean`` to restate the sequence it was counted on.
+
+    ``mean`` is not an average of the values beside it: it is the mean of
+    the *statistic* under the no-trend hypothesis, fixed by the method and
+    by how many observations were counted. That makes it a closed function
+    of fields the result already carries, and the one the reader divides by
+    -- ``(statistic - mean) / std`` is the standardized departure the whole
+    test is read through, and it is computed by the caller, not by any
+    renderer here, so a mean that belongs to another sequence is never
+    caught downstream. A billionth is allowed so a caller who recomputed
+    the moment along another floating-point path is not refused over the
+    last bit.
+
+    The two methods do not share a moment or a source, so the message cites
+    the one the count came from: ``n(n-1)/4`` is B&P Eq. (4.54), and
+    ``1 + 2 n_1 n_2 / n`` is Wald & Wolfowitz. Any other method leaves
+    :func:`_null_trend_mean` with nothing to state and returns above.
+
+    :param owner: Name of the result type, used in the error message.
+    :param sequence: Name of the field the statistic was counted on.
+    :param values: That sequence.
+    :param method: The trend test the count came from.
+    :param median: Classification median for ``"runs"``, else ignored.
+    :param mean: The stored null mean.
+    :raises ValueError: if the stored mean is not the null mean of the
+        statistic counted on that sequence.
+    """
+    expected = _null_trend_mean(values, method, median)
+    if expected is None or math.isclose(mean, expected, rel_tol=0.0, abs_tol=1e-9):
+        return
+    msg = (
+        f"{owner}: 'mean' must be the null mean of the {method!r} statistic "
+        f"counted on '{sequence}' ({_NULL_MEAN_SOURCES[method]}); got "
+        f"{mean!r} where that sequence states {expected!r}."
+    )
+    raise ValueError(msg)
+
 
 @dataclass(frozen=True)
 class TrendTestResult:
@@ -374,8 +467,19 @@ class TrendTestResult:
         authority here, and checking it at construction says which sequence
         moved.
 
+        :attr:`mean` is pinned for the same reason one step further in: it
+        is the null mean of the *statistic*, ``n(n-1)/4`` for reverse
+        arrangements, not an average of :attr:`values`, so it is fixed by
+        the count and the method and nothing else. Nothing here reads it --
+        the plot states the count and the bounds -- which is exactly why it
+        goes unchecked otherwise: the caller is the reader, standardizing
+        the departure as ``(statistic - mean) / std``, and a mean belonging
+        to another sequence turns an ordinary count into a flat rejection
+        with no array anywhere the wrong length.
+
         :raises ValueError: if the tested sequence spans a different number
-            of observations than the declared count.
+            of observations than the declared count, or the null mean is not
+            the one that sequence and method state.
         """
         require_ranks(self, values=1)
         owner = type(self).__name__
@@ -388,6 +492,9 @@ class TrendTestResult:
                 ),
             },
             "observation",
+        )
+        _check_null_mean(
+            owner, "values", self.values, self.method, self.median, self.mean
         )
 
     def plot(
@@ -593,8 +700,19 @@ class StationarityTestResult:
         than the one the legend rates, so the declared count is taken as the
         authority here and the two sequences have to follow it.
 
+        :attr:`mean` follows from the same sequence: it is the null mean of
+        the count, not an average of :attr:`segment_values`, and
+        :func:`stationarity_test` takes it from the trend test it ran on
+        exactly this array -- for ``"runs"``, on the values that differ from
+        the array's own median, which is the median
+        :func:`~phonometry._plot.metrology.plot_stationarity_test` draws.
+        So it is recomputable from what is stored, and worth recomputing:
+        the caller standardizes the count as ``(count - mean) / std`` and no
+        renderer here would notice a mean belonging to another record.
+
         :raises ValueError: if either per-segment sequence disagrees with the
-            other or with the declared number of segments.
+            other or with the declared number of segments, or the null mean
+            is not the one those segment values and that method state.
         """
         require_ranks(self, segment_values=1, segment_times=1)
         require_same_length(self, "segment_values", "segment_times", axis="segment")
@@ -608,6 +726,12 @@ class StationarityTestResult:
                 ),
             },
             "segment",
+        )
+        centre = (
+            float(np.median(self.segment_values)) if self.method == "runs" else None
+        )
+        _check_null_mean(
+            owner, "segment_values", self.segment_values, self.method, centre, self.mean
         )
 
     def plot(
@@ -956,6 +1080,109 @@ def _rice_peak_density(
     return np.asarray(gaussian + r * z * tail * phi_second, dtype=np.float64)
 
 
+def _check_measured_peak_rate(
+    peak_rate: float, peaks: int, duration: float, owner: str
+) -> None:
+    """Require ``peak_rate`` to count the peaks stored beside it.
+
+    The measured rate is a count over a record length, and both are in
+    hand: the count is how many entries :attr:`PeakStatisticsResult.
+    peak_values` holds -- every detected maximum is standardized and kept,
+    none are dropped -- and the length is :attr:`~PeakStatisticsResult.
+    duration`. The plot draws the empirical exceedance from that same count
+    and floors the axis at ``1/n``, so a rate that disagrees with it puts a
+    number in the caller's hands that the figure beside it contradicts,
+    with neither one wrong on its face.
+
+    The slack is relative as well as absolute here, unlike the decibel
+    margins the other guards in the tree compare: a rate has no bounded
+    scale, and a record sampled fast enough carries maxima in the millions
+    per second, where a billionth of an absolute unit is under one bit.
+
+    :param peak_rate: The stored measured rate, in 1/s.
+    :param peaks: Number of detected maxima stored on the result.
+    :param duration: Record length the rate was taken over, in seconds.
+    :param owner: Name of the result type, used in the error message.
+    :raises ValueError: if the duration is not a positive finite record
+        length, or the rate is not the peak count over it.
+    """
+    if not math.isfinite(duration) or duration <= 0.0:
+        msg = (
+            f"{owner}: 'duration' must be a positive, finite record length "
+            f"for 'peak_rate' to be a rate over it; got {duration!r}."
+        )
+        raise ValueError(msg)
+    expected = peaks / duration
+    if math.isclose(peak_rate, expected, rel_tol=1e-9, abs_tol=1e-9):
+        return
+    msg = (
+        f"{owner}: 'peak_rate' must be the number of maxima in 'peak_values' "
+        f"over 'duration'; got {peak_rate!r} where {peaks} peaks over "
+        f"{duration!r} s state {expected!r}."
+    )
+    raise ValueError(msg)
+
+
+def _check_rice_peak_rate(
+    peak_rate_rice: float,
+    zero_crossing_rate_rice: float,
+    irregularity: float,
+    owner: str,
+) -> None:
+    r"""Require ``irregularity_factor`` to restate the rates it came from.
+
+    :math:`M = \sqrt{m_4/m_2}` is a moment of a Welch autospectrum the
+    result does not store, so on its own there is nothing to measure it
+    against. It is closed all the same, because the result carries the two
+    scalars it was combined with: :func:`peak_statistics` writes
+    :math:`r = \min(1, N_0 / 2M)` (B&P Eq. (5.220), capped where the
+    Schwartz inequality is tight to the last bit), and that identity pins
+    the three of them together. The cap is reproduced rather than divided
+    away, so a narrow-band record whose ratio rounds past 1 still passes.
+
+    This is the one the reader publishes. :meth:`PeakStatisticsResult.plot`
+    labels its Rice curve with ``r`` and draws it from
+    :meth:`~PeakStatisticsResult.peak_exceedance`, itself a function of
+    ``r`` alone, so a triple that does not close paints a peak-height
+    distribution under a legend the record's own rates contradict. It is
+    the factor the message names: ``M`` and ``N0`` are read off the
+    spectrum, and ``r`` is the one of the three the producer derives.
+
+    Only a zero ``M`` is turned away before the ratio, and only because
+    the division needs it. A non-finite ``M`` is not: an amplitude large
+    enough to overflow the spectral moments has :func:`peak_statistics`
+    emitting :math:`M = \infty` beside :math:`r = 0` (and, further up,
+    ``NaN`` beside 1), and the identity closes over both -- capped, they
+    are exactly what ``min(1, N_0/2M)`` states. Refusing them would refuse
+    the producer's own output over an amplitude, which is not this guard's
+    business.
+
+    :param peak_rate_rice: Expected rate of maxima ``M``, in 1/s.
+    :param zero_crossing_rate_rice: Expected zero-crossing rate ``N0``, 1/s.
+    :param irregularity: The stored irregularity factor ``r``.
+    :param owner: Name of the result type, used in the error message.
+    :raises ValueError: if the expected maxima rate is zero or negative, or
+        the three rates do not state one irregularity factor.
+    """
+    if peak_rate_rice <= 0.0:
+        msg = (
+            f"{owner}: 'peak_rate_rice' must be a positive expected rate of "
+            f"maxima to state a ratio; got {peak_rate_rice!r}."
+        )
+        raise ValueError(msg)
+    stated = min(1.0, zero_crossing_rate_rice / (2.0 * peak_rate_rice))
+    if math.isclose(irregularity, stated, rel_tol=0.0, abs_tol=1e-9):
+        return
+    msg = (
+        f"{owner}: 'irregularity_factor' must be the r that 'peak_rate_rice' "
+        "and 'zero_crossing_rate_rice' state, r = min(1, N0 / 2M) "
+        f"(B&P Eq. (5.220)); got r {irregularity!r} where M "
+        f"{peak_rate_rice!r} beside N0 {zero_crossing_rate_rice!r} state "
+        f"{stated!r}."
+    )
+    raise ValueError(msg)
+
+
 @dataclass(frozen=True)
 class PeakStatisticsResult:
     r"""Peak (maxima) statistics of a record against the Rice expectations.
@@ -1013,8 +1240,18 @@ class PeakStatisticsResult:
         :func:`peak_statistics` cannot emit them -- the record is validated
         finite and ``sigma`` is positive -- so nothing measurable is refused.
 
+        The rates beside the heights are pinned too, each against what the
+        result already holds: :attr:`peak_rate` against the peaks it counts
+        over :attr:`duration`, and :attr:`irregularity_factor` against the
+        two expected rates it was derived from. See
+        :func:`_check_measured_peak_rate` and :func:`_check_rice_peak_rate`
+        for why each one closes.
+
         :raises ValueError: if the peak heights carry more than one axis,
-            are not finite throughout, or are not in ascending order.
+            are not finite throughout, or are not in ascending order; if the
+            measured rate is not the stored peaks over the stored duration;
+            or if the expected rates and the irregularity factor do not
+            state one another.
         """
         require_ranks(self, peak_values=1)
         require_finite_fields(self, "peak_values")
@@ -1026,6 +1263,14 @@ class PeakStatisticsResult:
                 "its rank."
             )
             raise ValueError(msg)
+        owner = type(self).__name__
+        _check_measured_peak_rate(self.peak_rate, values.size, self.duration, owner)
+        _check_rice_peak_rate(
+            self.peak_rate_rice,
+            self.zero_crossing_rate_rice,
+            self.irregularity_factor,
+            owner,
+        )
 
     def peak_exceedance(
         self, z: NDArray[np.float64] | list[float] | float

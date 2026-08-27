@@ -196,6 +196,46 @@ def test_trend_test_validation() -> None:
         ph.metrology.trend_test(constant, method="runs")
 
 
+def test_trend_test_rejects_null_mean_of_another_sequence() -> None:
+    """'mean' is the null moment of the count, not an average of 'values'.
+
+    Nothing in the library reads it: the plot states the count and the
+    bounds. The caller is the reader, standardizing the departure as
+    ``(statistic - mean) / std``, so a mean belonging to another sequence
+    turns an ordinary count into a flat rejection with no array anywhere
+    the wrong length. Before this guard, a 25-observation reverse
+    arrangement result whose null mean 150 was replaced by 10 kept its
+    A = 135 and its verdict, and handed the caller z = +5.84 where the
+    sequence states z = -0.70.
+    """
+    res = ph.metrology.trend_test(np.random.default_rng(9).standard_normal(25))
+    assert res.mean == 25 * 24 / 4  # B&P Eq. (4.54), from the count alone
+    with pytest.raises(ValueError, match=r"'mean' must be the null mean"):
+        dataclasses.replace(res, mean=10.0)
+
+
+def test_trend_test_runs_null_mean_is_recounted_about_the_median() -> None:
+    """The runs moment needs n1 and n2, neither of them a stored field.
+
+    Both are recoverable all the same: ``values`` holds what survived the
+    median filter and ``median`` the value they were classified against,
+    so ``1 + 2 n1 n2 / n`` closes over the result. The arithmetic mean of
+    the same values -- the quantity the field's name invites -- is refused
+    here; it was accepted before, giving z = +8.65 for a run count that
+    stands at z = +1.92. The refusal cites where that moment is written
+    down, which for runs is Wald & Wolfowitz and not the reverse-
+    arrangement equation the other method counts by.
+    """
+    res = ph.metrology.trend_test(
+        np.random.default_rng(9).standard_normal(40), method="runs"
+    )
+    above = int(np.count_nonzero(res.values > res.median))
+    assert res.mean == 1.0 + 2.0 * above * (res.n - above) / res.n
+    arithmetic = float(np.mean(res.values))
+    with pytest.raises(ValueError, match=r"'mean' must be the null mean.*Wolfowitz"):
+        dataclasses.replace(res, mean=arithmetic)
+
+
 # ---------------------------------------------------------------------------
 # Stationarity test (B&P Sec. 10.3.1.1)
 # ---------------------------------------------------------------------------
@@ -265,6 +305,28 @@ def test_stationarity_validation() -> None:
         ph.metrology.stationarity_test(x, FS, n_segments=4096)
     with pytest.raises(ValueError, match="fs"):
         ph.metrology.stationarity_test(x, 0.0)
+
+
+def test_stationarity_rejects_null_mean_of_another_record() -> None:
+    """The stationarity moment closes over 'segment_values' both ways.
+
+    For reverse arrangements it is fixed by the segment count alone; for
+    runs it is recounted about the median of the segment sequence, the
+    same median the plot draws as the classification line. Neither is an
+    average of the segment values, and neither is read by any renderer, so
+    a null mean from another record used to travel: the 20-segment result
+    below kept A = 94 under a mean of 0, handing the caller z = +6.10
+    where its own segments state z = -0.06.
+    """
+    rng = np.random.default_rng(9)
+    x = rng.standard_normal(1 << 14)
+    res = ph.metrology.stationarity_test(x, FS)
+    assert res.mean == res.n_segments * (res.n_segments - 1) / 4
+    with pytest.raises(ValueError, match=r"'mean' must be the null mean"):
+        dataclasses.replace(res, mean=0.0)
+    runs = ph.metrology.stationarity_test(x, FS, method="runs")
+    with pytest.raises(ValueError, match=r"'mean' must be the null mean"):
+        dataclasses.replace(runs, mean=runs.mean + 4.0)
 
 
 # ---------------------------------------------------------------------------
@@ -480,6 +542,90 @@ def test_peak_statistics_rejects_non_finite_peak_values() -> None:
         dataclasses.replace(res, peak_values=hidden_descent)
     with pytest.raises(ValueError, match="'peak_values' must contain only finite"):
         dataclasses.replace(res, peak_values=repeated_inf)
+
+
+def test_peak_statistics_rejects_rate_that_miscounts_its_peaks() -> None:
+    """A rate is a count over a duration, and both are stored here.
+
+    ``peak_values`` holds every detected maximum -- none are dropped on the
+    way in -- and ``duration`` is the record length the rate was taken
+    over, so ``peak_rate`` restates the two beside it. Halving the heights
+    used to leave the rate untouched: the figure then drew 2731 peaks and
+    floored its axis at 1/2731 = 3.662e-04, stating 1365.5833 maxima per
+    second, while ``peak_rate`` reported 2730.6667 over the very same
+    ``duration``.
+    """
+    res = ph.metrology.peak_statistics(
+        np.random.default_rng(9).standard_normal(1 << 14), FS
+    )
+    assert res.peak_rate == res.peak_values.size / res.duration
+    half = res.peak_values[::2]
+    with pytest.raises(ValueError, match=r"'peak_rate' must be the number of maxima"):
+        dataclasses.replace(res, peak_values=half)
+
+
+def test_peak_statistics_rejects_rice_rates_that_contradict_r() -> None:
+    """M is a spectral moment the result drops, but not an unpinned one.
+
+    ``peak_rate_rice`` is sqrt(m4/m2) and neither moment is stored; the
+    irregularity factor is, and ``r = min(1, N0 / 2M)`` closes the three
+    rates on each other. This is the pair the reader publishes: doubling M
+    used to leave the plot labelling its Rice curve "Rice ($r$ = 0.747)"
+    while the rates stored beside it stated r = 0.374, and that curve is a
+    function of r alone.
+    """
+    res = ph.metrology.peak_statistics(
+        np.random.default_rng(9).standard_normal(1 << 14), FS
+    )
+    stated = min(1.0, res.zero_crossing_rate_rice / (2.0 * res.peak_rate_rice))
+    assert res.irregularity_factor == stated
+    with pytest.raises(ValueError, match=r"'irregularity_factor' must be the r"):
+        dataclasses.replace(res, peak_rate_rice=res.peak_rate_rice * 2.0)
+
+
+def test_peak_statistics_rice_guard_reproduces_the_narrowband_cap() -> None:
+    """The cap is reproduced, not divided away.
+
+    ``peak_statistics`` writes ``min(1, N0 / 2M)`` because the Schwartz
+    inequality behind r <= 1 is tight for narrow-band data and floating
+    point can carry the ratio a hair past 1. Solving the identity for M
+    instead -- checking ``M == N0 / 2r`` -- would refuse exactly those
+    results. The guard applies the same cap, so a triple whose ratio
+    overshoots is accepted at r = 1, and only there.
+    """
+    fs, n = 20480.0, 1 << 16
+    res = ph.metrology.peak_statistics(
+        _bandlimited_gaussian(2, fs, n, 950.0, 1050.0), fs
+    )
+    assert res.irregularity_factor > 0.99
+    overshooting = 2.0 * res.peak_rate_rice * (1.0 + 1e-9)
+    capped = dataclasses.replace(
+        res, zero_crossing_rate_rice=overshooting, irregularity_factor=1.0
+    )
+    assert capped.irregularity_factor == 1.0
+    with pytest.raises(ValueError, match=r"'irregularity_factor' must be the r"):
+        dataclasses.replace(res, zero_crossing_rate_rice=overshooting)
+
+
+def test_peak_statistics_admits_the_rice_rates_an_overflow_produces() -> None:
+    """A non-finite M is producer output, and the identity closes over it.
+
+    An amplitude large enough to overflow the spectral moments has
+    ``peak_statistics`` writing M = inf beside r = 0, and further up a NaN
+    beside r = 1. Both are exactly what ``min(1, N0 / 2M)`` states, so the
+    guard has nothing to say about either: only a zero M is turned away,
+    and only because the ratio cannot be taken.
+    """
+    base = np.random.default_rng(0).standard_normal(1000)
+    with np.errstate(over="ignore", invalid="ignore"):
+        overflowed = ph.metrology.peak_statistics(base * 1e150, 1000.0)
+        saturated = ph.metrology.peak_statistics(base * 1e155, 1000.0)
+    assert np.isinf(overflowed.peak_rate_rice)
+    assert overflowed.irregularity_factor == 0.0
+    assert np.isnan(saturated.peak_rate_rice)
+    assert saturated.irregularity_factor == 1.0
+    with pytest.raises(ValueError, match=r"'peak_rate_rice' must be a positive"):
+        dataclasses.replace(overflowed, peak_rate_rice=0.0)
 
 
 # ---------------------------------------------------------------------------

@@ -12,6 +12,7 @@ the plain-subsampling decimation with the ECMA-internal convention.
 from __future__ import annotations
 
 import dataclasses
+import math
 
 import matplotlib as mpl
 
@@ -411,6 +412,82 @@ def test_envelope_spectrum_panels_must_lie_on_their_own_axes() -> None:
         for wrong, fragment in cases:
             with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
                 dataclasses.replace(good, **{field: wrong})
+
+
+def test_envelope_spectrum_mean_level_must_be_the_mean_of_its_own_envelope() -> None:
+    """The rule across the envelope panel is the mean of the trace beneath it.
+
+    ``mean_level`` is the DC the Figure 13.11 remover took out, so the lines
+    in the lower panel were measured on ``envelope - mean_level``; the upper
+    panel draws it as the labelled rule the reader reads the modulation
+    excursion against. Nothing about it is a decibel, and nothing about it is
+    an energy mean: for this AM tone the column means ``A0 = 2.0``, whose
+    decibel is 3.01 and whose rms is 2.06, and either lands as a rule the
+    trace (1.3 to 2.7) either never crosses or crosses in the wrong places --
+    the first stretching the panel's limits to reach it, neither failing
+    anywhere. The mean of the squared detector is the same mistake made
+    across ``kind``.
+    """
+    good = ph.signals.envelope_spectrum(_am_signal(), FS)
+    column = np.asarray(good.envelope)
+    assert good.mean_level == pytest.approx(float(np.mean(column)), rel=1e-12)
+    wrong_statements = (
+        10.0 * np.log10(float(np.mean(column))),  # a level of the column
+        float(np.sqrt(np.mean(column**2))),  # its energy mean
+        float(np.mean(column**2)),  # the squared detector's mean
+        0.0,
+    )
+    for wrong in wrong_statements:
+        with pytest.raises(
+            ValueError, match=r"'mean_level' must be the plain mean of 'envelope'"
+        ):
+            dataclasses.replace(good, mean_level=wrong)
+    # A caller who recomputed the mean along another summation path is not
+    # refused over the last bit: the slack is relative, and only relative,
+    # since the column carries the record's units and no bounded scale. A
+    # deliberate relative nudge, not a recomputation that lands bitwise back
+    # on the producer's own value, is what exercises that slack.
+    nudged = good.mean_level * (1.0 + 1e-12)
+    assert nudged != good.mean_level
+    assert dataclasses.replace(good, mean_level=nudged).mean_level == nudged
+
+
+def test_envelope_spectrum_mean_level_holds_a_column_to_its_own_scale() -> None:
+    """The rule is pinned in the column's units, which have no floor.
+
+    A squared detector is read in Pa^2, so a 1 kHz tone at the reference
+    threshold of hearing means about 1e-9 Pa^2 -- the whole column sits
+    where an absolute tolerance of that size would wave anything through,
+    zero and a negative mean of a strictly non-negative column included.
+    Band-filtered columns land further down still.
+    """
+    fs = 48000.0
+    t = np.arange(int(0.2 * fs)) / fs
+    quiet = ph.signals.envelope_spectrum(
+        20e-6 * np.sqrt(2.0) * np.sin(2.0 * np.pi * 1000.0 * t), fs, kind="squared"
+    )
+    assert quiet.mean_level < 1e-9
+    for wrong in (0.0, -1e-10, 1e-9):
+        with pytest.raises(
+            ValueError, match=r"'mean_level' must be the plain mean of 'envelope'"
+        ):
+            dataclasses.replace(quiet, mean_level=wrong)
+
+
+def test_envelope_spectrum_mean_level_restates_an_undetermined_envelope() -> None:
+    """A column the detector could not determine carries no mean to restate.
+
+    ``envelope_spectrum`` refuses a non-finite record, but a finite one can
+    still overflow inside the Hilbert transform: the detector then reads an
+    all-NaN envelope whose plain mean is NaN, which is the honest pair the
+    producer emits. No comparison of NaN with NaN can confirm it, so the
+    guard passes such a column instead of refusing what it just built.
+    """
+    overflowing = ph.signals.envelope_spectrum(np.full(4096, 1e307), 8192.0)
+    assert not np.isfinite(np.asarray(overflowing.envelope)).any()
+    assert math.isnan(overflowing.mean_level)
+    restated = dataclasses.replace(overflowing, mean_level=float("nan"))
+    assert math.isnan(restated.mean_level)
 
 
 def test_envelope_spectrum_plot_two_panels_and_external_ax() -> None:

@@ -56,6 +56,7 @@ injury = TTS + 20 dB identities.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -63,6 +64,7 @@ import numpy as np
 
 from ..._internal.validation import (
     require_equal_shapes,
+    require_finite_fields,
     require_ranks,
     require_same_length,
 )
@@ -775,12 +777,51 @@ class WeightedExposureResult:
         picture. The figure is the only reader that would object, and it
         objects after the verdict has already been formed.
 
-        :raises ValueError: if any per-band quantity disagrees with the rest.
+        The chain from those arrays to the verdict is closed link by link,
+        because every link but one restates the fields stored beside it:
+        ``weighted_band_sel`` is ``band_sel`` plus ``weighting`` band by band,
+        the two exposure totals are the energy sums of those two rows,
+        ``cumulative_sel`` adds the accumulation of ``n_events`` events to the
+        weighted one, each of the four margins is a stored level less a
+        published criterion, and the two verdicts are what those margins say.
+        An undetermined total exempts nothing: a spectrum whose every band
+        carries no energy sums to ``-inf`` and takes its SEL margins with it,
+        and the identity still holds exactly, minus infinity less a finite
+        criterion being minus infinity again. What ``-inf`` excuses is being
+        required to be finite, which is a different demand and one this result
+        makes of no total.
+
+        The one link taken as given is ``peak_spl``. It is not a summary of
+        anything stored here: it is the flat zero-to-peak level of the record
+        the spectrum came from, in dB re 1 µPa against band exposures in
+        dB re 1 µPa²·s, and no band column carries the crest factor that would
+        relate the two. It is refused only when it is not a number at all --
+        ``None``, the state the producer uses for a level that was never
+        supplied, is left alone. Its two margins *are* closed: each is that
+        stored level less a stored criterion, and ``None`` exactly when there
+        is no level to compare or no criterion published to compare it with,
+        the non-impulsive tables publishing none at all.
+
+        Nothing recomputes any of these downstream, and the readers all go the
+        wrong way round them: ``exceeds_injury`` and ``exceeds_tts`` are formed
+        from the margins and never look at the levels, and the guide prints
+        level and margin side by side. A variant built with a louder peak
+        therefore kept the quiet one's margins and was reported compliant
+        against criteria its own stored level clears.
+
+        :raises ValueError: if any per-band quantity disagrees with the rest,
+            if ``peak_spl`` is not finite, or if a band row, a total, a margin
+            or a verdict does not restate what it is formed from.
         """
         require_ranks(self, frequencies=1, band_sel=1, weighting=1, weighted_band_sel=1)
         require_same_length(
             self, "frequencies", "band_sel", "weighting", "weighted_band_sel"
         )
+        require_finite_fields(self, "peak_spl")
+        _require_rows_restate(self)
+        _require_totals_restate(self)
+        _require_margins_restate(self)
+        _require_verdicts_restate(self)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -800,6 +841,204 @@ def _energy_sum(levels: NDArray[np.float64]) -> float:
 
 def _margin(value: float, criterion: float | None) -> float | None:
     return None if criterion is None else float(value - criterion)
+
+
+def _margins_agree(margin: float | None, expected: float | None) -> bool:
+    """Whether a stored margin is the one its level and criterion imply.
+
+    :func:`_margin` read backwards, for :func:`_require_margins_restate`. An
+    absent margin and an absent expectation are the same statement -- there
+    was no level to compare, or no criterion published to compare it with --
+    and one of each is a contradiction whichever way round it falls. Where both
+    are present a billionth of a decibel is allowed, so a caller who recomputed
+    the subtraction along another floating-point path is not refused over the
+    last bit.
+
+    :param margin: The margin carried by the result, or ``None``.
+    :param expected: The margin the result's own level and criterion give, or
+        ``None``.
+    :return: Whether the two agree.
+    """
+    if margin is None or expected is None:
+        return margin is None and expected is None
+    return math.isclose(margin, expected, rel_tol=0.0, abs_tol=1e-9)
+
+
+def _require_rows_restate(result: WeightedExposureResult) -> None:
+    """Pin the weighted band row against the two rows it is formed from.
+
+    ``weighted_band_sel`` is what the energy sums, the margins and the verdict
+    are built on, and it is the row the figure draws; a band moved in it alone
+    moves the whole assessment without moving the spectrum it was weighted
+    from.
+
+    :param result: The assessment carrying all three band rows.
+    :raises ValueError: if a band of ``weighted_band_sel`` is not its
+        ``band_sel`` plus its ``weighting``.
+    """
+    with np.errstate(divide="ignore", invalid="ignore"):
+        expected = result.band_sel + result.weighting
+        disagree = np.flatnonzero(
+            ~np.isclose(result.weighted_band_sel, expected, rtol=0.0, atol=1e-9)
+        )
+    if disagree.size == 0:
+        return
+    band = int(disagree[0])
+    msg = (
+        "WeightedExposureResult: 'weighted_band_sel' must be 'band_sel' plus "
+        f"'weighting' in every band; got {float(result.weighted_band_sel[band])!r} "
+        f"in the band at {float(result.frequencies[band])!r} Hz where the two "
+        f"beside it state {float(expected[band])!r}."
+    )
+    raise ValueError(msg)
+
+
+def _require_restates(
+    result: WeightedExposureResult, field: str, expected: float, statement: str
+) -> None:
+    """Pin one total against the row or the fields it restates.
+
+    A billionth of a decibel of slack lets a caller who recomputed the total
+    along another floating-point path restate it without being refused over
+    the last bit. An undetermined total is compared like any other: ``-inf``
+    agrees with ``-inf`` and with nothing else.
+
+    :param result: The assessment carrying both the total and its sources.
+    :param field: Name of the field holding the total.
+    :param expected: The total the fields beside it state.
+    :param statement: What the field must be, completing ``'<field>' must``.
+    :raises ValueError: if ``field`` does not restate ``expected``.
+    """
+    stored = float(getattr(result, field))
+    if math.isclose(stored, expected, rel_tol=0.0, abs_tol=1e-9):
+        return
+    msg = (
+        f"WeightedExposureResult: '{field}' must {statement}; got {stored!r} "
+        f"where the fields beside it state {expected!r}."
+    )
+    raise ValueError(msg)
+
+
+def _require_totals_restate(result: WeightedExposureResult) -> None:
+    """Pin the three exposure totals against the rows they are summed over.
+
+    A band that carries no energy enters the sums as ``-inf``, which is the
+    neutral element of an energy sum and the whole sum when every band is one;
+    the recomputation is made with the divide-by-zero that spells it silenced,
+    the producer having already reported it once.
+
+    :param result: The assessment carrying the totals and their band rows.
+    :raises ValueError: if a total is not the sum of the row beside it.
+    """
+    with np.errstate(divide="ignore", invalid="ignore"):
+        unweighted = _energy_sum(result.band_sel)
+        weighted = _energy_sum(result.weighted_band_sel)
+        cumulative = result.weighted_sel + 10.0 * float(np.log10(result.n_events))
+    _require_restates(
+        result, "unweighted_sel", unweighted, "be the energy sum of 'band_sel'"
+    )
+    _require_restates(
+        result, "weighted_sel", weighted, "be the energy sum of 'weighted_band_sel'"
+    )
+    _require_restates(
+        result,
+        "cumulative_sel",
+        cumulative,
+        "be 'weighted_sel' accumulated over the 'n_events' events",
+    )
+
+
+def _require_margins_restate(result: WeightedExposureResult) -> None:
+    """Pin all four margins against the level and the criterion each restates.
+
+    Both halves of the dual metric are closed on both sides, injury and TTS
+    onset alike: a peak level raised on its own leaves ``tts_peak_margin``
+    stating the quiet one's headroom just as surely as ``peak_margin``, and
+    ``exceeds_tts`` is printed beside them from the margins alone.
+
+    :param result: The assessment carrying the margins, the levels and the
+        criteria.
+    :raises ValueError: if a margin is not its level less its criterion, or is
+        present when one of them is absent.
+    """
+    criteria = result.criteria
+    checks: tuple[tuple[str, float | None, str, float | None, str], ...] = (
+        (
+            "sel_margin",
+            result.cumulative_sel,
+            "cumulative_sel",
+            criteria.injury_sel,
+            "injury_sel",
+        ),
+        (
+            "tts_margin",
+            result.cumulative_sel,
+            "cumulative_sel",
+            criteria.tts_sel,
+            "tts_sel",
+        ),
+        (
+            "peak_margin",
+            result.peak_spl,
+            "peak_spl",
+            criteria.injury_peak_spl,
+            "injury_peak_spl",
+        ),
+        (
+            "tts_peak_margin",
+            result.peak_spl,
+            "peak_spl",
+            criteria.tts_peak_spl,
+            "tts_peak_spl",
+        ),
+    )
+    for field, level, level_name, criterion, criterion_name in checks:
+        expected = None if level is None else _margin(level, criterion)
+        stored = getattr(result, field)
+        if _margins_agree(stored, expected):
+            continue
+        msg = (
+            f"WeightedExposureResult: '{field}' must be '{level_name}' minus "
+            f"the criteria's '{criterion_name}', and None when either of them "
+            f"is None; got {stored!r} where '{level_name}' {level!r} against "
+            f"{criterion!r} gives {expected!r}."
+        )
+        raise ValueError(msg)
+
+
+def _require_verdicts_restate(result: WeightedExposureResult) -> None:
+    """Pin the two verdicts against the margins they are formed from.
+
+    They are the fields an assessment is read for and the last link of the
+    chain: a variant that keeps its margins and flips a verdict reports
+    compliance its own stored numbers deny.
+
+    :param result: The assessment carrying the verdicts and their margins.
+    :raises ValueError: if a verdict is not what its margins say.
+    """
+    verdicts: tuple[tuple[str, tuple[float | None, float | None], str], ...] = (
+        (
+            "exceeds_injury",
+            (result.sel_margin, result.peak_margin),
+            "'sel_margin' or 'peak_margin'",
+        ),
+        (
+            "exceeds_tts",
+            (result.tts_margin, result.tts_peak_margin),
+            "'tts_margin' or 'tts_peak_margin'",
+        ),
+    )
+    for field, margins, named in verdicts:
+        expected = _any_positive(*margins)
+        stored = bool(getattr(result, field))
+        if stored == expected:
+            continue
+        msg = (
+            f"WeightedExposureResult: '{field}' must be True exactly when "
+            f"{named} has reached its criterion; got {stored!r} where the "
+            f"margins beside it state {expected!r}."
+        )
+        raise ValueError(msg)
 
 
 def weighted_exposure(

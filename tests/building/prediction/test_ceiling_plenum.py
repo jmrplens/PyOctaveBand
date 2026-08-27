@@ -361,6 +361,118 @@ def test_rating_result_rejects_a_short_deficiency_column() -> None:
         dataclasses.replace(res, deficiencies=short)
 
 
+def _raised_contour_variant(
+    res: building.CeilingAttenuationResult,
+) -> tuple[np.ndarray, np.ndarray, int]:
+    """The contour of *res* lifted one decibel, with its column and rating.
+
+    The clause 5.3 loop stops at the highest admissible contour, so one more
+    decibel is always a contour ASTM E413 refuses; the deficiency column is
+    restated against it exactly as clause 5.4 defines it, over the clause 5.2
+    rounded data. Used to build results whose totals were left behind.
+    """
+    raised = res.shifted_reference + 1.0
+    column = np.maximum(raised - res.rounded, 0.0)
+    return raised, column, res.rating + 1
+
+
+def test_rating_result_rejects_a_stale_deficiency_sum() -> None:
+    """Intertek J7488.04 with its contour lifted: the printed total lags it.
+
+    ``deficiency_sum`` is what clause 5.4.1 stops the contour on, and the plot
+    prints it in the title beside the rating while drawing the data against
+    ``shifted_reference``. A variant built with ``dataclasses.replace`` that
+    restates the contour and its column but not the total drew
+    "CAC = 26 dB (sum unfav. = 24.0 dB)" over a column summing to 36 dB, past
+    the 32 dB at which a fit stops being admissible at all.
+    """
+    res = building.ceiling_attenuation_class(INTERTEK_2019_DNC)
+    raised, column, rating = _raised_contour_variant(res)
+    assert float(np.sum(column)) == pytest.approx(36.0)
+    with pytest.raises(ValueError, match="'deficiency_sum' must be the sum"):
+        dataclasses.replace(
+            res, shifted_reference=raised, deficiencies=column, rating=rating
+        )
+
+
+def test_rating_result_rejects_a_stale_max_deficiency() -> None:
+    """The same variant with only the clause 5.4.2 maximum left behind.
+
+    The total is restated here, so nothing but ``max_deficiency`` disagrees:
+    the column's largest entry is 6 dB where the field still says 5 dB.
+    """
+    res = building.ceiling_attenuation_class(INTERTEK_2019_DNC)
+    raised, column, rating = _raised_contour_variant(res)
+    total = float(np.sum(column))
+    assert float(np.max(column)) == pytest.approx(6.0)
+    assert res.max_deficiency == pytest.approx(5.0)
+    with pytest.raises(ValueError, match="'max_deficiency' must be the largest"):
+        dataclasses.replace(
+            res,
+            shifted_reference=raised,
+            deficiencies=column,
+            rating=rating,
+            deficiency_sum=total,
+        )
+
+
+def test_rating_result_rejects_an_undetermined_deficiency() -> None:
+    """A deficiency is a floored difference, never a gap.
+
+    ``ceiling_attenuation_class`` takes only finite levels and clause 5.4
+    counts a band the contour clears as a zero, so a non-finite entry is a
+    column no total can restate, and it is named rather than surfacing as a
+    total that will not compare.
+    """
+    res = building.ceiling_attenuation_class(INTERTEK_2019_DNC)
+    column = res.deficiencies.copy()
+    column[3] = np.nan
+    with pytest.raises(ValueError, match="'deficiencies' must be finite"):
+        dataclasses.replace(res, deficiencies=column)
+
+
+def test_rating_result_names_the_field_on_an_all_scalar_column() -> None:
+    """A result of bare numbers throughout is named, not indexed.
+
+    ``require_ranks`` passes over whole a result whose every pinned field is
+    nought-dimensional, so such a column reaches the totals check. Read
+    unflattened, its one band has no axis to index and the caller got
+    ``IndexError: too many indices`` naming no field at all.
+    """
+    res = building.ceiling_attenuation_class(INTERTEK_2019_DNC)
+    band = int(np.flatnonzero(res.frequencies == 500.0)[0])
+    scalars = {
+        "frequencies": np.asarray(res.frequencies[band]),
+        "measured": np.asarray(res.measured[band]),
+        "rounded": np.asarray(res.rounded[band]),
+        "shifted_reference": np.asarray(res.shifted_reference[band]),
+        "deficiencies": np.asarray(np.nan),
+    }
+    with pytest.raises(ValueError, match="'deficiencies' must be finite"):
+        dataclasses.replace(res, deficiency_sum=3.0, max_deficiency=3.0, **scalars)
+
+
+def test_rating_result_accepts_a_fully_restated_variant() -> None:
+    """The whole point is a variant that restates itself, not a frozen result.
+
+    Lifting the contour and restating all three of column, total and maximum
+    is accepted, and so is a total recomputed along another floating-point
+    path: the comparison allows a billionth of a decibel.
+    """
+    res = building.ceiling_attenuation_class(INTERTEK_2019_DNC)
+    raised, column, rating = _raised_contour_variant(res)
+    variant = dataclasses.replace(
+        res,
+        shifted_reference=raised,
+        deficiencies=column,
+        rating=rating,
+        deficiency_sum=float(sum(float(d) for d in column)) + 1e-12,
+        max_deficiency=float(np.max(column)),
+    )
+    assert variant.rating == INTERTEK_2019_CAC + 1
+    assert variant.deficiency_sum == pytest.approx(36.0)
+
+
 # ---------------------------------------------------------------------------
 # Normalization (ISO 140-9:1985 clause 3.3)
 # ---------------------------------------------------------------------------

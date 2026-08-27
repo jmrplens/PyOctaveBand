@@ -558,7 +558,34 @@ class MooreGlasbergLoudness:
         pattern, and the total loudness printed in the title was integrated
         over a grid the answer no longer describes.
 
-        :raises ValueError: if the three disagree.
+        ``loudness_level`` is not a second measurement but the same one said
+        in the other unit: clause 8.2 fixes the loudness level of a sound as
+        the level of the 1 kHz free-field binaural tone of equal calculated
+        loudness, and Table 5 tabulates that correspondence, which
+        :func:`_loudness_level` reads. Both numbers go into the chart title
+        together, so a pair that disagrees is printed side by side without a
+        word: a result carrying 1.00 sone - the loudness of 40 phon by the
+        definition of the sone - beside 100.0 phon titles itself
+        ``ISO 532-2 loudness N = 1.00 sone (100.0 phon)``, in which each
+        figure alone is a plausible reading and only the pairing is wrong.
+        The pin restates the field through the same Table 5 mapping the
+        producer used, flat extrapolation above 337.6 sone included, and
+        allows a billionth of a phon so a caller who recomputed the mapping
+        along another floating-point path is not refused over the last bit.
+
+        ``loudness`` is pinned only as a finite, non-negative sone value,
+        which is what makes the restatement above readable: the pattern it
+        integrates is non-negative everywhere and no entry point admits a
+        non-finite input, so no calculation here can produce anything else,
+        and a NaN would otherwise map to a NaN level and compare equal to
+        nothing at all. It is not pinned against ``specific``: the stored
+        pattern is one ear's, taken before binaural inhibition, and the
+        divisors of Formulae (12) and (13) that separate it from the total
+        are not among the fields the result keeps.
+
+        :raises ValueError: if the three arrays disagree, if ``loudness`` is
+            not a finite non-negative sone value, or if ``loudness_level``
+            does not restate ``loudness`` through Table 5.
         """
         require_ranks(self, specific=1, erb_number=1, centre_frequencies=1)
         require_same_length(
@@ -568,6 +595,21 @@ class MooreGlasbergLoudness:
             "centre_frequencies",
             axis="auditory filter",
         )
+        if not math.isfinite(self.loudness) or self.loudness < 0.0:
+            msg = (
+                "MooreGlasbergLoudness: 'loudness' must be a finite, "
+                f"non-negative total loudness in sone; got {self.loudness!r}."
+            )
+            raise ValueError(msg)
+        stated = _loudness_level(self.loudness)
+        if not math.isclose(self.loudness_level, stated, rel_tol=0.0, abs_tol=1e-9):
+            msg = (
+                "MooreGlasbergLoudness: 'loudness_level' must be 'loudness' "
+                "read through the loudness/loudness-level relationship of "
+                f"ISO 532-2:2017 Table 5; got {self.loudness_level!r} phon "
+                f"where 'loudness' {self.loudness!r} sone states {stated!r}."
+            )
+            raise ValueError(msg)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
