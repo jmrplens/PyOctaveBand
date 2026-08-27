@@ -115,16 +115,27 @@ def test_pile_strike_result_rejects_a_trace_the_peak_no_longer_summarises() -> N
         dataclasses.replace(res, pressure=halved)
 
 
-def test_pile_strike_result_accepts_a_peak_recomputed_along_another_path() -> None:
-    """A variant that restates both halves is a legitimate result."""
+def test_pile_strike_result_accepts_a_variant_that_restates_every_metric() -> None:
+    """A substituted waveform is legitimate once all four numbers follow it.
+
+    The peak is recomputed here along a path of its own rather than through
+    the library's, so the tolerance is exercised too: the two agree to the
+    last bit but need not, and a caller who reached the same level another way
+    must not be refused over it.
+    """
     res = underwater.pile_strike_metrics(_pulse(100.0, 0.25), FS)
     halved = np.asarray(res.pressure) / 2.0
     variant = dataclasses.replace(
         res,
         pressure=halved,
         peak_spl=20.0 * np.log10(float(np.max(np.abs(halved))) / 1e-6),
+        single_strike_sel=underwater.sound_exposure_level(halved, FS),
+        spl=underwater.sound_pressure_level(halved),
     )
     assert variant.peak_spl == pytest.approx(res.peak_spl - 20.0 * np.log10(2.0))
+    assert variant.single_strike_sel == pytest.approx(
+        res.single_strike_sel - 20.0 * np.log10(2.0)
+    )
 
 
 def test_pile_strike_result_rejects_an_empty_trace() -> None:
@@ -358,3 +369,41 @@ def test_a_strike_whose_trace_is_a_bare_number_is_refused() -> None:
         ValueError, match=r"'pressure' must be a one-dimensional waveform"
     ):
         dataclasses.replace(res, pressure=lone)
+
+
+def test_restating_the_peak_alone_does_not_save_the_other_three() -> None:
+    """The dangerous half, because it looks like diligence.
+
+    Halve a trace and the peak level follows it down by six decibels, so a
+    caller who recomputes that one sees a result agreeing with itself where
+    they looked. The exposure and the pressure level beside it are still the
+    old trace's, six decibels high, and the marine-mammal dual-metric rule is
+    decided on the peak and the exposure together.
+    """
+    res = underwater.pile_strike_metrics(_pulse(100.0, 0.25), FS)
+    halved = np.asarray(res.pressure) / 2.0
+    with pytest.raises(ValueError, match=r"'single_strike_sel' must be the exposure"):
+        dataclasses.replace(
+            res,
+            pressure=halved,
+            peak_spl=underwater.peak_sound_pressure_level(halved),
+        )
+
+
+def test_a_pulse_duration_left_behind_by_a_new_shape_is_refused() -> None:
+    """The quiet one: a ratio of energies does not move when a trace is scaled.
+
+    Only a change of shape parts it from its waveform, which is why scaling
+    tests pass it over and it needs a guard of its own rather than being
+    excused by one. Here the other three are restated and it alone is stale.
+    """
+    res = underwater.pile_strike_metrics(_pulse(100.0, 0.25), FS)
+    reshaped = _pulse(100.0, 0.05)
+    with pytest.raises(ValueError, match=r"'pulse_duration' must be the 5 % to 95 %"):
+        dataclasses.replace(
+            res,
+            pressure=reshaped,
+            peak_spl=underwater.peak_sound_pressure_level(reshaped),
+            single_strike_sel=underwater.sound_exposure_level(reshaped, FS),
+            spl=underwater.sound_pressure_level(reshaped),
+        )

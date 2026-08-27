@@ -133,6 +133,69 @@ def _pulse_duration(pressure: NDArray[np.float64], fs: float) -> float:
     return float((hi - lo) / fs)
 
 
+def _require_metrics_restate(result: PileStrikeResult) -> None:
+    """Pin all four stored metrics against the trace they were taken off.
+
+    None of them is a measurement of its own. ISO 18406 6.4.2 reads every one
+    off the waveform, and :func:`pile_strike_metrics` computes the four from
+    the same ``(pressure, fs)`` pair it goes on to store, so a result whose
+    trace was substituted, for a filtered or de-spiked one, carries three
+    numbers describing a waveform that is no longer there.
+
+    Restating the peak alone is not enough and is the more dangerous half,
+    because it looks like diligence. Halve a trace and the peak level follows
+    it down by six decibels, so a caller who recomputes that one sees a result
+    that agrees with itself where they looked, while the exposure and the
+    pressure level beside it are still the old trace's, six decibels high, and
+    the marine-mammal dual-metric rule is decided on both.
+
+    The pulse duration is the quiet one: it is a ratio of energies, so it does
+    not move when a trace is merely scaled, and only a change of shape parts
+    it from its waveform. That is precisely why it needs the guard rather than
+    being excused by it.
+
+    :param result: The strike whose stored metrics are measured.
+    :raises ValueError: if any of the four does not restate ``pressure``, or
+        ``pulse_duration`` does not restate it at ``fs``.
+    """
+    trace = result.pressure
+    # A trace carrying no energy has no exposure and no pressure level, and
+    # the two entry points that compute them say so by refusing outright. The
+    # peak and the duration do answer for it, at minus infinity and zero. So
+    # the neutral value is supplied here rather than the refusal being let
+    # through: a silent strike is a legitimate result whose three levels are
+    # all minus infinity, the same neutral this module gives an empty band,
+    # and a guard that crashed on it would refuse what it exists to protect.
+    silent = not np.any(trace)
+    for name, expected, what in (
+        ("peak_spl", _peak_level(trace), "the zero-to-peak level, 20 lg(max|p|)"),
+        (
+            "single_strike_sel",
+            -math.inf if silent else sound_exposure_level(trace, result.fs),
+            "the exposure",
+        ),
+        (
+            "spl",
+            -math.inf if silent else sound_pressure_level(trace),
+            "the pressure level",
+        ),
+        (
+            "pulse_duration",
+            _pulse_duration(trace, result.fs),
+            "the 5 % to 95 % energy duration",
+        ),
+    ):
+        stored = float(getattr(result, name))
+        if math.isclose(stored, expected, rel_tol=0.0, abs_tol=1e-9):
+            continue
+        msg = (
+            f"PileStrikeResult: '{name}' must be {what} of 'pressure', the "
+            f"trace it summarises; got {stored!r} where the trace states "
+            f"{expected!r}."
+        )
+        raise ValueError(msg)
+
+
 def _peak_level(pressure: NDArray[np.float64]) -> float:
     r"""Zero-to-peak level of *pressure*, in dB re 1 µPa.
 
@@ -191,34 +254,33 @@ class PileStrikeResult:
     fs: float
 
     def __post_init__(self) -> None:
-        """Reject a strike whose peak level is not the peak of its own trace.
+        """Reject a strike whose stored metrics are not its own trace's.
 
-        :attr:`peak_spl` is not a measurement of its own: ISO 18406 6.4.2.1.3
-        takes it off the very waveform stored here, and
-        :func:`pile_strike_metrics` computes it as
-        :func:`~phonometry.underwater.acoustics.peak_sound_pressure_level` of
-        the trace it goes on to store beside it. The two cannot part company
-        except by hand or by :func:`dataclasses.replace`, which is how a
-        variant of a frozen result is built -- substitute a filtered or
-        de-spiked waveform and the peak level that travels through with it is
-        the old trace's.
+        None of the four is a measurement of its own: ISO 18406 6.4.2 reads
+        every one off the waveform, and :func:`pile_strike_metrics` computes
+        them from the same ``(pressure, fs)`` pair it goes on to store. They
+        cannot part company except by hand or by :func:`dataclasses.replace`,
+        which is how a variant of a frozen result is built: substitute a
+        filtered or de-spiked waveform and all four numbers that travel
+        through with it are the old trace's.
 
-        Parted, they are still drawn together. The figure marks the sample at
-        ``argmax(|pressure|)`` and labels that marker with ``peak_spl``, so a
-        peak level from another trace prints itself over the one sample that
-        disproves it. The number is also the one half of the marine-mammal
-        dual-metric rule that is compared unweighted, against a fixed
-        peak-pressure injury threshold: a strike that clears the threshold on
-        its own waveform is failed against it, or the reverse, with the
-        waveform beneath saying otherwise.
+        Parted, they are still read together. The figure marks the sample at
+        ``argmax(|pressure|)`` and labels that marker with :attr:`peak_spl`,
+        so a peak level from another trace prints itself over the one sample
+        that disproves it. That level and :attr:`single_strike_sel` are also
+        the two halves of the marine-mammal dual-metric rule, one compared
+        unweighted against a peak-pressure threshold and the other summed over
+        a pile: a strike that clears the thresholds on its own waveform is
+        failed against them, or the reverse, with the waveform beneath saying
+        otherwise.
 
-        The comparison allows a billionth of a decibel so a caller who
-        recomputed the peak along another floating-point path is not refused
+        The comparisons allow a billionth of a decibel so a caller who
+        recomputed a metric along another floating-point path is not refused
         over the last bit.
 
         :raises ValueError: if ``pressure`` is not a non-empty, finite,
-            one-dimensional trace, or ``peak_spl`` is not its zero-to-peak
-            level.
+            one-dimensional trace, or any of the four stored metrics does not
+            restate it.
         """
         trace = np.asarray(self.pressure)
         # The rank helper waives its pin when every field it was given is a
@@ -242,15 +304,7 @@ class PileStrikeResult:
             )
             raise ValueError(msg)
         require_finite_fields(self, "pressure")
-        peak = _peak_level(self.pressure)
-        if not math.isclose(self.peak_spl, peak, rel_tol=0.0, abs_tol=1e-9):
-            msg = (
-                "PileStrikeResult: 'peak_spl' must be the zero-to-peak level of "
-                "'pressure', 20 lg(max|p| / 1 uPa), the trace it summarises; "
-                f"got {self.peak_spl!r} where the trace peaks at {peak!r} dB "
-                "re 1 uPa."
-            )
-            raise ValueError(msg)
+        _require_metrics_restate(self)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
