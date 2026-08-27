@@ -2450,9 +2450,17 @@ def generate_insitu_absorption(output_dir: str) -> None:
     freqs = result.frequencies
     positions = np.arange(freqs.size, dtype=float)
     _fig, ax = plt.subplots(figsize=(10, 6.3))
+    # No nan_to_num here. ISO 13472-1 leaves a band undetermined when the
+    # separated impulse responses give it no usable energy, and the producer
+    # says so with a NaN; zeroing it would draw a full-height gap as a
+    # measured alpha of zero, which reads as perfect reflection, the opposite
+    # of no reading at all. Matplotlib draws no bar for a NaN height, which is
+    # what the result's own .plot() does before marking the position with an
+    # em dash. This spectrum has no undetermined band today, so the figure is
+    # unchanged; the difference only shows on data that does.
     ax.bar(
         positions,
-        np.nan_to_num(result.absorption),
+        np.asarray(result.absorption, dtype=float),
         width=0.7,
         color=COLOR_PRIMARY,
         edgecolor=COLOR_FG,
