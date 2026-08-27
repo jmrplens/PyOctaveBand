@@ -127,9 +127,20 @@ def test_informational_rows_do_not_change_verdict(tmp_path: Path) -> None:
     _text, passed = _verdict(result, -23.0)
     assert passed is True
     # Force extreme informational values; the verdict must stay PASS because it
-    # is driven only by the integrated loudness and the maximum true peak.
+    # is driven only by the integrated loudness and the maximum true peak. Each
+    # maximum is raised through its own series, which is where the result reads
+    # it from: a maximum its column denies is refused at construction.
+    momentary = result.momentary.copy()
+    momentary[0] = 0.0
+    short_term = result.short_term.copy()
+    short_term[0] = 0.0
     tampered = dataclasses.replace(
-        result, loudness_range=999.0, max_momentary=0.0, max_short_term=0.0
+        result,
+        loudness_range=999.0,
+        momentary=momentary,
+        max_momentary=0.0,
+        short_term=short_term,
+        max_short_term=0.0,
     )
     _text2, passed2 = _verdict(tampered, -23.0)
     assert passed2 is True

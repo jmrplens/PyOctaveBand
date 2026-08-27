@@ -102,6 +102,7 @@ reads the rating off the shifted contour at 500 Hz (clause 5.5). See
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, overload
 
@@ -248,6 +249,81 @@ def normalized_ceiling_attenuation(
     return np.asarray(l1 - l2 - 10.0 * np.log10(area / a0), dtype=np.float64)
 
 
+def _require_deficiency_totals(result: CeilingAttenuationResult) -> None:
+    """Require the two totals to restate the deficiency column beside them.
+
+    ASTM E413-22 clause 5.4 counts only deficiencies, the shifted contour
+    standing above the clause 5.2 integer-rounded data, floored at zero, and
+    it stops the contour rising on two numbers read off that one column: its
+    sum (clause 5.4.1, at or below 32 dB) and its largest entry (clause 5.4.2,
+    at or below 8 dB). Both are plain arithmetic over decibel deviations, the
+    way the standard writes them, and both are closed: everything they are
+    taken over is the ``deficiencies`` array the result already stores. A
+    result whose totals disagree with that column is one whose rating was
+    fitted to a column it no longer carries, which is what
+    :func:`dataclasses.replace` leaves behind the moment a variant restates
+    the contour.
+
+    Nothing downstream catches it. The plot prints ``deficiency_sum`` in its
+    title beside the rating and draws the data against ``shifted_reference``,
+    so the stale total is read out over a gap that no longer sums to it: the
+    Intertek J7488.04 spectrum with its fitted contour lifted one decibel
+    titles the figure ``ASTM E413 CAC = 26 dB (Sigma unfav. = 24.0 dB)`` over
+    a column that sums to 36 dB, four decibels past the limit clause 5.4.1
+    sets for a fit to be admissible at all, and reports a largest deficiency
+    of 5 dB where the drawn one is 6 dB.
+
+    A deficiency is never left undetermined here: the entry point takes only
+    finite levels, and a band the contour clears is a zero, not a gap. So a
+    non-finite column is refused rather than excused, and it is refused first,
+    where it can still be named, instead of surfacing as a total that will not
+    restate anything. The column is read flat so that the band it names is a
+    position in it either way: a result whose every pinned field is a bare
+    number is passed over whole by
+    :func:`~phonometry._internal.validation.require_ranks`, and read
+    unflattened its one band has no axis to index, so naming it would raise
+    :exc:`IndexError` over the field this is here to name. An empty column is
+    passed over: no entry point makes one, and there is no total in it to
+    contradict. Both comparisons allow a
+    billionth of a decibel, so a caller who recomputed either total along
+    another floating-point path is not refused over the last bit.
+
+    :param result: The rating whose totals are checked.
+    :raises ValueError: if the column is not finite, or either total does not
+        restate it.
+    """
+    column = np.asarray(result.deficiencies, dtype=np.float64).ravel()
+    if column.size == 0:
+        return
+    finite = np.isfinite(column)
+    if not bool(np.all(finite)):
+        first = int(np.flatnonzero(~finite)[0])
+        msg = (
+            "CeilingAttenuationResult: 'deficiencies' must be finite for "
+            "'deficiency_sum' and 'max_deficiency' to restate it; got "
+            f"{column[first]!r} in band {first}."
+        )
+        raise ValueError(msg)
+    total = float(np.sum(column))
+    if not math.isclose(result.deficiency_sum, total, rel_tol=0.0, abs_tol=1e-9):
+        msg = (
+            "CeilingAttenuationResult: 'deficiency_sum' must be the sum of "
+            "'deficiencies', the total ASTM E413-22 clause 5.4.1 holds at or "
+            f"below {_MAX_DEFICIENCY_SUM:.0f} dB; got {result.deficiency_sum!r} "
+            f"where 'deficiencies' sums to {total!r}."
+        )
+        raise ValueError(msg)
+    worst = float(np.max(column))
+    if not math.isclose(result.max_deficiency, worst, rel_tol=0.0, abs_tol=1e-9):
+        msg = (
+            "CeilingAttenuationResult: 'max_deficiency' must be the largest "
+            "entry of 'deficiencies', the one ASTM E413-22 clause 5.4.2 holds "
+            f"at or below {_MAX_SINGLE_DEFICIENCY:.0f} dB; got "
+            f"{result.max_deficiency!r} where the largest is {worst!r}."
+        )
+        raise ValueError(msg)
+
+
 @dataclass(frozen=True)
 class CeilingAttenuationResult:
     """Ceiling attenuation class (ASTM E1414 rated through ASTM E413).
@@ -260,8 +336,8 @@ class CeilingAttenuationResult:
     :ivar shifted_reference: The fitted reference contour, in dB.
     :ivar deficiencies: Per-band deficiency (shifted contour minus data, floored
         at zero), in dB.
-    :ivar deficiency_sum: Sum of the deficiencies, in dB (at most 32).
-    :ivar max_deficiency: Largest single deficiency, in dB (at most 8).
+    :ivar deficiency_sum: Sum of ``deficiencies``, in dB (at most 32).
+    :ivar max_deficiency: Largest entry of ``deficiencies``, in dB (at most 8).
     :ivar rating: The ceiling attenuation class CAC, read off the shifted
         contour at 500 Hz (clause 5.5), in dB.
     """
@@ -276,7 +352,7 @@ class CeilingAttenuationResult:
     rating: int
 
     def __post_init__(self) -> None:
-        """Reject a rating whose curves do not share the contour band set.
+        """Reject a rating whose curves disagree, or whose totals contradict them.
 
         ASTM E413 is a contour fitted band by band: the sum of the
         deficiencies and the largest of them are what stop the contour rising,
@@ -286,11 +362,15 @@ class CeilingAttenuationResult:
         is drawn and in terms of two shapes it cannot put a name to. The
         other two, ``rounded`` and ``deficiencies``, no reader in the library
         opens at all: a deficiency column that has lost or gained a band is
-        paired with the frequencies by whoever prints it, ``zip`` truncates
-        the two to the shorter without a word, and the total beside it stays
-        the sum of the column as it was fitted.
+        paired with the frequencies by whoever prints it, and ``zip``
+        truncates the two to the shorter without a word.
 
-        :raises ValueError: if the per-band curves disagree.
+        The two totals are then held against that column by
+        :func:`_require_deficiency_totals`: they are what clause 5.4 stops the
+        contour on, and both are taken over the very array stored beside them.
+
+        :raises ValueError: if the per-band curves disagree, or the totals do
+            not restate the deficiency column.
         """
         require_ranks(
             self,
@@ -308,6 +388,7 @@ class CeilingAttenuationResult:
             "shifted_reference",
             "deficiencies",
         )
+        _require_deficiency_totals(self)
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any

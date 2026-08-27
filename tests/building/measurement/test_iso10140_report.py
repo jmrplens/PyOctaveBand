@@ -262,11 +262,17 @@ def test_report_rejects_band_count_mismatch(tmp_path: Path) -> None:
 
     res = _airborne_result()
     assert res.rating is not None
+    centers = res.rating.band_centers[:-1]
+    measured = res.rating.measured[:-1]
+    shifted = res.rating.shifted_reference[:-1]
     short = dataclasses.replace(
         res.rating,
-        band_centers=res.rating.band_centers[:-1],
-        measured=res.rating.measured[:-1],
-        shifted_reference=res.rating.shifted_reference[:-1],
+        band_centers=centers,
+        measured=measured,
+        shifted_reference=shifted,
+        # Dropping the top band drops its unfavourable deviation with it, and
+        # WeightedRatingResult refuses a sum its own two curves do not state.
+        unfavourable_sum=float(np.sum(np.maximum(shifted - measured, 0.0))),
     )
     bad = dataclasses.replace(res, rating=short)
     out = str(tmp_path / "x.pdf")

@@ -73,6 +73,7 @@ from .._internal.validation import (
     require_axis_count,
     require_equal_counts,
     require_equal_shapes,
+    require_finite_fields,
     require_ranks,
     require_same_length,
 )
@@ -126,6 +127,59 @@ def _finite_difference_correction(k_dr: np.ndarray) -> np.ndarray:
         return np.where(kd > 0.0, kd / np.sin(kd), 1.0)
 
 
+def _expected_total_intensity_level(total_intensity: float, stored: float) -> float:
+    r"""The level ``total_intensity_level`` must restate, in the caller's spelling.
+
+    :func:`_level` floors its argument at the smallest positive double, so a
+    broadband total of exactly zero leaves the producer as about -2957 dB
+    rather than the :math:`-\infty` that :math:`10 \lg 0` is. A result built
+    by hand from the unfloored arithmetic holds that infinity, and the two
+    spell the same absence of net intensity, so a stored ``-inf`` beside a
+    zero total is returned as its own expectation; every other total is
+    measured against the floored form the producer writes.
+
+    Both halves of that test are written as bounds rather than equalities.
+    A total of exactly zero is what ``abs(...) <= 0.0`` says, for ``-0.0`` as
+    well, and it is the only total this branch is for; an equality against
+    ``0.0`` would say the same thing while reading as the floating-point
+    comparison this is not. The infinity is tested by :func:`math.isinf` and
+    its sign, which is how the rest of the tree spells it.
+
+    :param total_intensity: The broadband total the level restates, W/m^2.
+    :param stored: The level the result carries, dB.
+    :return: The level the two fields state together.
+    """
+    if abs(total_intensity) <= 0.0 and math.isinf(stored) and stored < 0.0:
+        return stored
+    return _level(abs(total_intensity), _I0)
+
+
+def _require_total_restates(
+    result: IntensityResult, field: str, expected: float, statement: str
+) -> None:
+    """Pin one broadband total against the totals it is computed from.
+
+    A billionth of a decibel of slack lets a caller who recomputed the total
+    along another floating-point path restate it without being refused over
+    the last bit.
+
+    :param result: The result carrying both the total and the fields it
+        restates.
+    :param field: Name of the field holding the restated total.
+    :param expected: The value the fields beside it state.
+    :param statement: What the field must be, completing ``'<field>' must``.
+    :raises ValueError: if ``field`` does not restate ``expected``.
+    """
+    stored = float(getattr(result, field))
+    if math.isclose(stored, expected, rel_tol=0.0, abs_tol=1e-9):
+        return
+    msg = (
+        f"{type(result).__name__}: '{field}' must {statement}; got {stored!r} "
+        f"where the fields beside it state {expected!r}."
+    )
+    raise ValueError(msg)
+
+
 @dataclass(frozen=True)
 class IntensityResult:
     r"""Result of a p-p sound intensity measurement.
@@ -167,7 +221,7 @@ class IntensityResult:
     spacing: float | None = None
 
     def __post_init__(self) -> None:
-        """Reject a measurement whose per-band arrays do not share the bands.
+        r"""Reject a measurement whose own fields contradict one another.
 
         The band figure draws Lp and LI against ``frequency`` and lays the
         pressure-intensity index over them as one bar per band. A bar chart
@@ -180,8 +234,40 @@ class IntensityResult:
         Either the band ``fraction`` was requested and all seven arrays are
         present, or none of them is; ``None`` is not a disagreement.
 
-        :raises ValueError: if two of the per-band arrays disagree in length,
-            or one is a single number.
+        Two of the broadband totals are not measurements of their own but
+        restatements of the ones beside them: ``total_intensity_level`` is the
+        level of the magnitude of ``total_intensity`` (the sign is reported
+        separately in ``total_direction``), and
+        ``total_pressure_intensity_index`` is ``total_pressure_level`` minus
+        ``total_intensity_level``, the broadband form of the ISO 9614-1:1993
+        (A.3) indicator. A variant built with :func:`dataclasses.replace`
+        moves the field it is given and leaves the rest where they were, so a
+        result scaled by ten in intensity keeps a level ten decibels under the
+        intensity it claims to state, and an index put in by hand goes
+        straight into the band figure's title: the title carries the index and
+        nothing else, so a probe whose own two levels differ by 0.0 dB is
+        titled with a reactivity of 25 dB, past any dynamic capability an
+        instrument has, over curves that agree with neither number.
+
+        ``total_intensity`` and ``total_pressure_level`` are pinned to being
+        finite and to nothing else, in particular not to the band columns
+        beside them. Both are summed over the spectral bins of the broadband
+        range, while the columns are the same two densities integrated into
+        IEC 61260-1 bands, whose edges do not follow ``limits`` and which drop
+        any band narrower than the spectral resolution; the two sums
+        legitimately differ, by about 10 % of the intensity and 0.4 dB of the
+        pressure level on a 100 Hz to 5 kHz noise measurement, so neither
+        column is an oracle for the total over it. ``max_valid_frequency`` is
+        pinned to nothing at all: it is the usable-bandwidth bound
+        :math:`0.1 \, c / \Delta r`, not the largest band measured, and the
+        bands above it are exactly the ones ``bias_correction`` exists to
+        compensate.
+
+        :raises ValueError: if two of the per-band arrays disagree in length
+            or one is a single number; if ``total_intensity`` or
+            ``total_pressure_level`` is not finite; or if
+            ``total_intensity_level`` or ``total_pressure_intensity_index``
+            does not restate the totals it is computed from.
         """
         require_ranks(
             self,
@@ -202,6 +288,23 @@ class IntensityResult:
             "pressure_intensity_index",
             "direction",
             "bias_correction",
+        )
+        require_finite_fields(self, "total_intensity", "total_pressure_level")
+        _require_total_restates(
+            self,
+            "total_intensity_level",
+            _expected_total_intensity_level(
+                self.total_intensity, self.total_intensity_level
+            ),
+            "be the level of the magnitude of 'total_intensity' referred to "
+            "1 pW/m^2, the sign being reported in 'total_direction'",
+        )
+        _require_total_restates(
+            self,
+            "total_pressure_intensity_index",
+            self.total_pressure_level - self.total_intensity_level,
+            "be 'total_pressure_level' minus 'total_intensity_level', the "
+            "broadband form of the ISO 9614-1 (A.3) index",
         )
 
     def plot(

@@ -14,6 +14,7 @@ heterogeneous event chain, is tested in ``test_rotorcraft_terrain.py``.
 from __future__ import annotations
 
 import dataclasses
+import math
 
 import matplotlib as mpl
 
@@ -22,6 +23,7 @@ import numpy as np
 import pytest
 
 from phonometry.aircraft.rotorcraft_noise import (
+    RotorcraftEventResult,
     RotorcraftHemisphere,
     hemisphere_source_level,
 )
@@ -1510,6 +1512,67 @@ def test_a_non_finite_a_weighted_step_is_refused() -> None:
     with_gap[0] = np.nan
     with pytest.raises(ValueError, match="'a_levels' must be finite"):
         dataclasses.replace(res, a_levels=with_gap)
+
+
+def test_an_empty_history_keeps_its_undetermined_peak() -> None:
+    """The exemption the docstring grants, which the guard used to take back.
+
+    A history with no records has no peak, so ``la_max`` is undetermined and
+    the producer writes a ``NaN``. Feeding the stored value back as its own
+    expectation looked like a way to pass the comparison over, but a ``NaN``
+    is close to nothing, not even to itself, so the exempt case was the one
+    the guard refused.
+    """
+    empty = np.array([])
+    result = RotorcraftEventResult(
+        frequencies=empty,
+        emission_times=empty,
+        times=empty,
+        distance=empty,
+        azimuth=empty,
+        polar=empty,
+        band_levels=np.zeros((0, 0)),
+        a_levels=empty,
+        la_max=float("nan"),
+        sel=float("nan"),
+        sel_10db=float("nan"),
+        pnlt=empty,
+        pnltm=float("nan"),
+        epnl=float("nan"),
+    )
+    assert math.isnan(result.la_max)
+
+
+def test_la_max_must_be_the_peak_of_its_own_history() -> None:
+    """``la_max`` is ``max(a_levels)``, and the figure draws both at once.
+
+    The marker is placed at ``argmax(a_levels)`` and labelled with ``la_max``,
+    and the shaded window is ``a_levels >= la_max - 10``. Raised by 12 dB, the
+    label printed 74.0 dB(A) over a marker sitting at 62.0 dB(A) and the window
+    emptied, so the figure lost its shading without losing its legend.
+    """
+    _t, _pos, res = _flyover(bands=[31.5], span=1000.0)
+    peak = float(np.max(res.a_levels))
+    assert res.la_max == pytest.approx(peak, abs=1e-12)
+    with pytest.raises(ValueError, match="'la_max' must be the maximum of"):
+        dataclasses.replace(res, la_max=peak + 12.0)
+
+
+def test_la_max_below_its_history_is_refused() -> None:
+    # The other direction: a peak short of the curve it summarises would shade
+    # a 10 dB-down window narrower than the level history it is read from.
+    _t, _pos, res = _flyover(bands=[31.5], span=1000.0)
+    quieter = float(np.max(res.a_levels)) - 5.0
+    with pytest.raises(ValueError, match="'la_max' must be the maximum of"):
+        dataclasses.replace(res, la_max=quieter)
+
+
+def test_la_max_survives_a_recomputation_along_another_path() -> None:
+    # A caller who rebuilt the peak with numpy's own reduction is not refused
+    # over the last bit; the guard allows a billionth of a decibel.
+    _t, _pos, res = _flyover(bands=[31.5], span=1000.0)
+    nudged = dataclasses.replace(res, la_max=res.la_max + 1e-12)
+    assert nudged.la_max == pytest.approx(float(np.max(res.a_levels)), abs=1e-9)
 
 
 def test_event_plot() -> None:

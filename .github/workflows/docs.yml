@@ -312,3 +312,17 @@ jobs:
               if r.status not in (200, 202):
                   sys.exit(f"unexpected status {r.status}: {r.read()[:300]}")
           PY
+
+  identity-snapshot:
+    name: Identity snapshot
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # `site/identity/person.snapshot.json` is the offline fallback for the canonical `#person`
+      # node: the build fetches the live document and only falls back to this.
+      # jmrplens/jmrp.io propagates it automatically whenever the canonical
+      # changes, and this guard is what says so out loud if the two ever drift
+      # apart — a stale snapshot is invisible while the fetch works, and ships
+      # a Person missing several properties the moment it does not.
+      - name: Snapshot matches the canonical document
+        run: node site/scripts/sync-identity.mjs --check

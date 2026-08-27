@@ -236,7 +236,7 @@ Single-number weighted impact rating and CI (ISO 717-2).
 | :--- | :--- |
 | `rating` | Weighted impact rating (`Ln,w`, `L'n,w`, `L'nT,w`), the shifted reference read at 500 Hz, in dB (Clause 4.3; octave-band ratings include the -5 dB reduction of Clause 4.3.2). Integer. |
 | `ci` | Spectrum adaptation term `CI` (Clause A.2.1), in dB. Integer. |
-| `unfavourable_sum` | Sum of unfavourable deviations at the final shift, in dB (Clause 4.3); at most 32,0 (16 bands) or 10,0 (5 bands). |
+| `unfavourable_sum` | Sum of unfavourable deviations at the final shift, in dB (Clause 4.3); at most 32,0 (16 bands) or 10,0 (5 bands). Restates `measured` against `shifted_reference`, with the impact sign, and is checked against them when both are present. |
 | `band_centers` | Band centre frequencies of the measured curve, in Hz. Defaults to `None` for backward-compatible construction. |
 | `measured` | The measured impact levels used for the rating (after the one-decimal reduction of Clause 4.3.1), in dB. Defaults to `None`. |
 | `shifted_reference` | Table 3 impact reference curve after the final shift, in dB. Defaults to `None`. |
@@ -522,7 +522,7 @@ Single-number weighted rating and adaptation terms (ISO 717-1).
 | `rating` | Weighted rating (`Rw`, `R'w`, `DnT,w` ...), the shifted reference read at 500 Hz, in dB (Clause 4.4). Integer. |
 | `c` | Spectrum adaptation term `C` (spectrum No. 1), in dB (Clause 4.5). Integer. |
 | `ctr` | Spectrum adaptation term `Ctr` (spectrum No. 2), in dB (Clause 4.5). Integer. |
-| `unfavourable_sum` | Sum of unfavourable deviations at the final shift, in dB (Clause 4.4); at most 32,0 (16 bands) or 10,0 (5 bands). |
+| `unfavourable_sum` | Sum of unfavourable deviations at the final shift, in dB (Clause 4.4); at most 32,0 (16 bands) or 10,0 (5 bands). Restates `measured` against `shifted_reference` and is checked against them when both are present. |
 | `band_centers` | Band centre frequencies of the measured curve, in Hz. Defaults to `None` for backward-compatible construction. |
 | `measured` | The measured band quantities used for the rating (after the one-decimal reduction of Clause 4.4), in dB. Defaults to `None`. |
 | `shifted_reference` | Table 3 reference curve after the final shift, in dB. Defaults to `None`. |

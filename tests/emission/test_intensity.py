@@ -671,3 +671,124 @@ def test_an_intensity_band_quantity_off_the_band_axis_is_refused(
     wrong = values[:-1] if trim else np.append(values, values[-1])
     with pytest.raises(ValueError, match=f"'{field_name}'"):
         dataclasses.replace(result, **{field_name: wrong})
+
+
+def _broadband_result() -> emission.IntensityResult:
+    """A one-third-octave measurement of noise reaching past its own limits."""
+    p1, p2 = _plane_wave_pair(delay_s=SPACING / C, f_lo=20.0, f_hi=10000.0)
+    return emission.sound_intensity(
+        p1, p2, FS, spacing=SPACING, rho=RHO, c=C, fraction=3, limits=[100.0, 5000.0]
+    )
+
+
+def test_the_broadband_level_must_restate_the_broadband_intensity() -> None:
+    """LI is the level of the total intensity, not a number of its own.
+
+    Scaling the source by 10 dB through
+    :func:`dataclasses.replace`, the sanctioned way to build a variant, moves
+    the field it is handed and leaves the levels where they were: the result
+    then answers ``86,4`` dB to the docs snippet printing
+    ``total_intensity_level`` beside ``total_direction`` while the
+    ``total_intensity`` on the same object is 10 lg of ``96,4`` dB.
+    """
+    import dataclasses
+
+    result = _broadband_result()
+    louder = 10.0 * result.total_intensity
+    with pytest.raises(ValueError, match="'total_intensity_level' must be"):
+        dataclasses.replace(result, total_intensity=louder)
+
+
+def test_the_broadband_index_must_restate_the_two_broadband_levels() -> None:
+    r"""The index the band figure is titled with must be Lp - LI.
+
+    plot() puts ``total_pressure_intensity_index`` in the title and nothing
+    else of the totals, so before this guard an index written in by hand
+    titled the figure ``ISO 9614 $L_p$ vs $L_I$  (total $\delta_{pI}$ =
+    25.0 dB)`` -- a field so reactive no instrument would qualify for it under
+    ISO 9614-1 criterion 1 -- over a result whose own two totals differ by
+    -0,006 dB, and over band curves that agree with neither number.
+    """
+    import dataclasses
+
+    result = _broadband_result()
+    with pytest.raises(ValueError, match="'total_pressure_intensity_index' must be"):
+        dataclasses.replace(result, total_pressure_intensity_index=25.0)
+
+
+@pytest.mark.parametrize("field_name", ["total_intensity", "total_pressure_level"])
+def test_a_non_finite_broadband_total_is_refused(field_name: str) -> None:
+    """The two totals the restatements are measured against must be finite.
+
+    Nothing in IEC 61043 or ISO 9614-1 leaves a broadband total undetermined,
+    and no reader renders one as an em dash: a NaN passes every shape guard
+    and reaches the band figure's title as the literal ``nan dB``.
+    """
+    import dataclasses
+
+    result = _broadband_result()
+    with pytest.raises(ValueError, match=f"'{field_name}' must be finite"):
+        dataclasses.replace(result, **{field_name: float("nan")})
+
+
+def test_a_nan_sample_is_refused_at_the_result_instead_of_titling_the_figure() -> None:
+    """The same guard catches the producer path: NaN in, refusal out."""
+    p1, p2 = _plane_wave_pair(delay_s=SPACING / C)
+    p1[10] = np.nan
+    with pytest.raises(ValueError, match="'total_intensity' must be finite"):
+        emission.sound_intensity(p1, p2, FS, spacing=SPACING, rho=RHO, c=C, fraction=3)
+
+
+@pytest.mark.parametrize("spelling", ["floored", "infinite"])
+def test_a_zero_total_may_state_its_level_either_way(spelling: str) -> None:
+    """No net intensity has no level, and both spellings of that are accepted.
+
+    The producer floors the argument of the logarithm at the smallest positive
+    double, so a zero total leaves it as about -2957 dB; a caller who took
+    10 lg 0 along the unfloored path holds -inf. They say the same thing.
+    """
+    level = (
+        float(10.0 * np.log10(np.finfo(float).tiny / 1e-12))
+        if spelling == "floored"
+        else float("-inf")
+    )
+    result = emission.IntensityResult(
+        frequency=None,
+        intensity=None,
+        intensity_level=None,
+        pressure_level=None,
+        pressure_intensity_index=None,
+        direction=None,
+        bias_correction=None,
+        total_intensity=0.0,
+        total_intensity_level=level,
+        total_pressure_level=60.0,
+        total_pressure_intensity_index=60.0 - level,
+        total_direction=1,
+        max_valid_frequency=0.1 * C / SPACING,
+    )
+    assert result.total_intensity_level == level
+
+
+def test_the_broadband_totals_are_not_pinned_to_the_band_columns() -> None:
+    """The totals are summed over the bins, the columns over the bands.
+
+    ``limits`` clips the broadband sum at 100 Hz and 5 kHz, while the band
+    column keeps every band whose centre falls inside those limits, edges and
+    all, out to 5,6 kHz; bands narrower than the spectral resolution are
+    dropped from the column outright. The two sums are therefore different
+    quantities and disagree by 11 % of the intensity and 0,42 dB of the
+    pressure level on this measurement -- which is why no guard equates them.
+    """
+    result = _broadband_result()
+    assert result.intensity is not None
+    assert result.pressure_level is not None
+    band_sum = float(np.sum(result.intensity))
+    band_energy = 10.0 * np.log10(np.sum(10.0 ** (0.1 * result.pressure_level)))
+    assert band_sum / result.total_intensity == pytest.approx(1.11, abs=0.01)
+    assert band_energy - result.total_pressure_level == pytest.approx(0.42, abs=0.01)
+    assert result.frequency is not None
+    assert result.frequency[-1] > 5000.0
+    # And the cutoff is not the top of the band column either: the bands above
+    # it are the ones 'bias_correction' exists to compensate.
+    assert result.max_valid_frequency < result.frequency[-1]

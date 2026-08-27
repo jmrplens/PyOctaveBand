@@ -40,6 +40,7 @@ out-of-band the filter gain never exceeds the
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Protocol
 
@@ -82,6 +83,64 @@ class TimedResponse(Protocol):
     def __array__(
         self, dtype: DTypeLike | None = None, copy: bool | None = None
     ) -> np.ndarray: ...
+
+
+def _require_band_flatness(result: InverseFilterResult) -> None:
+    r"""Pin ``flatness_db`` against the equalized magnitude it summarises.
+
+    The flatness is closed over what the result already stores. The equalized
+    magnitude is the elementwise product of
+    :attr:`~InverseFilterResult.response_spectrum` and
+    :attr:`~InverseFilterResult.spectrum` -- the modeling delay carried in the
+    latter is a unit-modulus factor and cannot move a magnitude -- and the band
+    it is worst over is the part of
+    :attr:`~InverseFilterResult.frequencies` inside
+    :attr:`~InverseFilterResult.f_range`. :meth:`InverseFilterResult.plot`
+    prints the number in the figure title and draws that same product on the
+    axes below it, so a result built by hand, or by :func:`dataclasses.replace`
+    on a genuine one, can title a figure with a ripple its own curve never
+    shows.
+
+    A band the inversion cannot fill -- an equalized magnitude that touches
+    zero at some bin, where the measured response has a null -- is infinitely
+    far from 0 dB, and the design reports ``inf`` for it. That value is a
+    reading, not a defect: it is kept, and :func:`math.isclose` accepts it
+    against itself.
+
+    A billionth of a decibel of slack lets a caller who recomputed the
+    deviation along another floating-point path restate it without being
+    refused over the last bit.
+
+    :param result: The result carrying both the flatness and the spectra.
+    :raises ValueError: if ``f_range`` selects no bin of ``frequencies``, or
+        ``flatness_db`` is not the worst deviation from 0 dB that the stored
+        spectra show across that band.
+    """
+    freqs = np.asarray(result.frequencies, dtype=np.float64)
+    f1, f2 = result.f_range
+    band = (freqs >= f1) & (freqs <= f2)
+    n_band = int(np.count_nonzero(band))
+    if n_band == 0:
+        msg = (
+            "InverseFilterResult: 'f_range' must select at least one bin of "
+            "'frequencies' for 'flatness_db' to summarise; got "
+            f"({f1!r}, {f2!r}) against {freqs.size} bin(s)."
+        )
+        raise ValueError(msg)
+    equalized = np.abs(
+        np.asarray(result.response_spectrum) * np.asarray(result.spectrum)
+    )
+    with np.errstate(divide="ignore"):
+        worst = float(np.max(np.abs(20.0 * np.log10(equalized[band]))))
+    if math.isclose(result.flatness_db, worst, rel_tol=0.0, abs_tol=1e-9):
+        return
+    msg = (
+        "InverseFilterResult: 'flatness_db' must be the largest deviation "
+        "from 0 dB of the equalized magnitude 'response_spectrum' times "
+        f"'spectrum' across 'f_range'; got {result.flatness_db!r} where those "
+        f"spectra deviate by {worst!r} over the {n_band} band bin(s)."
+    )
+    raise ValueError(msg)
 
 
 @dataclass(frozen=True)
@@ -133,7 +192,7 @@ class InverseFilterResult:
     max_gain_db: float
 
     def __post_init__(self) -> None:
-        r"""Reject a design whose spectra do not share one frequency grid.
+        r"""Reject a design whose spectra, or whose flatness, disagree.
 
         The three spectra and the regularization profile are the design at
         one frequency each, but only three of the four are read by anything
@@ -165,8 +224,22 @@ class InverseFilterResult:
         every length check, draws exactly as before, and doubles the sample
         count :attr:`size` reports.
 
+        Of the two reported decibel figures only :attr:`flatness_db` is pinned,
+        by :func:`_require_band_flatness`, because only it is closed over the
+        fields stored here. :attr:`max_gain_db` is the achieved gain -- not the
+        :math:`1/(2\sqrt{\epsilon})` ceiling -- but it is the largest gain over
+        the band padded by ``transition_octaves``, and that padding is a design
+        argument the result does not keep. Two genuine designs can therefore
+        agree in every field above, profile included, and still report a
+        different :attr:`max_gain_db`: put the padded edge exactly on a bin for
+        one and just above it for the other and the profile is the same array
+        while the bin falls inside one maximum and outside the other. Nothing
+        computable from what is stored can tell the two apart, so nothing is
+        claimed about it.
+
         :raises ValueError: if a spectrum or the profile disagrees with the
-            frequency grid, or a field carries an extra axis.
+            frequency grid, a field carries an extra axis, or
+            :attr:`flatness_db` does not restate the equalized magnitude.
         """
         require_ranks(
             self,
@@ -184,6 +257,7 @@ class InverseFilterResult:
             "regularization",
             axis="frequency",
         )
+        _require_band_flatness(self)
 
     def __array__(
         self, dtype: DTypeLike | None = None, copy: bool | None = None

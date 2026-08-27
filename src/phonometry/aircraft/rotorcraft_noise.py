@@ -1056,8 +1056,21 @@ class RotorcraftEventResult:
         zero total noisiness, or a band grid short of the noy bands), flagged
         as such in its own documentation.
 
-        :raises ValueError: if a per-step or per-band quantity disagrees, or
-            ``a_levels`` carries a non-finite value.
+        ``la_max`` is that same history said once more as a number: the
+        producer takes it as ``max(a_levels)`` over the very column stored
+        here, so the two cannot part company except by hand or by
+        :func:`dataclasses.replace`. Parted, they are drawn together anyway.
+        The figure plots the marker at ``argmax(a_levels)`` and labels it
+        with ``la_max``, so a raised ``la_max`` prints itself over a point
+        the curve reaches ten decibels lower, and the 10 dB-down window,
+        read as ``a_levels >= la_max - 10``, quietly empties and stops being
+        shaded at all. A step whose level a measurement leaves undetermined
+        is refused above, so the peak of a history that exists is always a
+        number; an empty history has no peak to restate and is passed over.
+
+        :raises ValueError: if a per-step or per-band quantity disagrees,
+            ``a_levels`` carries a non-finite value, or ``la_max`` is not the
+            maximum of ``a_levels``.
         """
         require_ranks(
             self,
@@ -1086,6 +1099,21 @@ class RotorcraftEventResult:
         )
         if not np.all(np.isfinite(self.a_levels)):
             msg = "RotorcraftEventResult: 'a_levels' must be finite."
+            raise ValueError(msg)
+        # An empty history has no peak, so there is nothing here to restate and
+        # the comparison is skipped rather than fed the stored value back. Fed
+        # its own value it would still refuse a NaN, since a NaN is close to
+        # nothing, not even to itself, and that is the one value an exempt
+        # field is most likely to hold.
+        if np.size(self.a_levels) == 0:
+            return
+        peak = float(np.max(self.a_levels))
+        if not math.isclose(self.la_max, peak, rel_tol=0.0, abs_tol=1e-9):
+            msg = (
+                "RotorcraftEventResult: 'la_max' must be the maximum of "
+                f"'a_levels', the history it is the peak of; got {self.la_max!r} "
+                f"where 'a_levels' peaks at {peak!r}."
+            )
             raise ValueError(msg)
 
     def plot(

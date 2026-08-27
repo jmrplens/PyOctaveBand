@@ -27,6 +27,7 @@ import math
 import numpy as np
 import pytest
 from reference_data import ISO717_1_ANNEX_C_R as _ANNEX_C_R
+from reference_data import ISO717_2_ANNEX_C1_LN as _ANNEX_C1_LN
 
 from phonometry import building
 
@@ -689,3 +690,71 @@ def test_impact_rating_band_curves_must_be_finite() -> None:
         ValueError, match="ImpactRatingResult: 'measured' must contain only finite"
     ):
         dataclasses.replace(result, measured=measured)
+
+
+def test_rating_unfavourable_sum_must_restate_its_own_curves() -> None:
+    """The sum is the two curves added up, so it is pinned to them.
+
+    ISO 717-1:2020 Table C.1 rates its example at Rw = 30 dB with the
+    unfavourable deviations summing to 31,8 dB. Swapping ``measured`` for a
+    curve lying on the shifted reference leaves no unfavourable deviation at
+    all, and the stale 31,8 dB used to survive the swap: the verbose Annex C
+    fiche then printed an em dash in every deviation row and closed the
+    table with "sum 0,0 dB", beside a plot titled
+    ``... = 30 dB (Sigma unfav. = 31.8 dB)``.
+    """
+    result = building.weighted_rating(_ANNEX_C_R)
+    on_the_reference = np.asarray(result.shifted_reference, dtype=np.float64)
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"WeightedRatingResult: 'unfavourable_sum' must be the sum of the "
+            r"unfavourable deviations of its own curves"
+        ),
+    ):
+        dataclasses.replace(result, measured=on_the_reference)
+
+
+def test_impact_unfavourable_sum_must_restate_its_own_curves() -> None:
+    """The ISO 717-2 sum is pinned the same way, with the opposite sign.
+
+    ISO 717-2:2020 Table C.1 rates the bare heavy floor at Ln,w = 79 dB with
+    the deviations -- here where the measurement *exceeds* the reference --
+    summing to 28,0 dB. A ``measured`` curve laid on the shifted reference
+    leaves none of them, and the refusal must name the impact sense rather
+    than the airborne one.
+    """
+    result = building.weighted_impact_rating(_ANNEX_C1_LN)
+    on_the_reference = np.asarray(result.shifted_reference, dtype=np.float64)
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"ImpactRatingResult: 'unfavourable_sum' must be the sum of the "
+            r"unfavourable deviations of its own curves, 'measured' above "
+            r"'shifted_reference'"
+        ),
+    ):
+        dataclasses.replace(result, measured=on_the_reference)
+
+
+def test_unfavourable_sum_accepts_a_variant_that_keeps_its_curves() -> None:
+    """A coherent variant is not refused over floating-point slack.
+
+    Raising both curves by the same 3 dB leaves every deviation, and so the
+    sum, exactly as it was; recomputing the sum along a different path (band
+    by band in plain Python rather than one numpy reduction) must still land
+    inside the guard's tolerance.
+    """
+    result = building.weighted_rating(_ANNEX_C_R)
+    measured = np.asarray(result.measured, dtype=np.float64) + 3.0
+    shifted = np.asarray(result.shifted_reference, dtype=np.float64) + 3.0
+    recomputed = math.fsum(
+        max(0.0, r - m) for m, r in zip(measured, shifted, strict=True)
+    )
+    moved = dataclasses.replace(
+        result,
+        measured=measured,
+        shifted_reference=shifted,
+        unfavourable_sum=recomputed,
+    )
+    assert moved.unfavourable_sum == pytest.approx(31.8, abs=1e-9)

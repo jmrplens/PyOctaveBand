@@ -40,7 +40,7 @@ ITU-R BS.1770). 1 LU is equivalent to 1 dB.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from math import ceil
+from math import ceil, isclose
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -706,6 +706,45 @@ def _block_geometry(fs: float) -> tuple[int, int]:
     return n_block, step
 
 
+def _require_series_maximum(owner: object, field: str, series: str) -> None:
+    """Pin a stored maximum against the series of readings it summarises.
+
+    EBU Tech 3341 section 2.2 leaves both sliding-window measurements ungated
+    ("The measurement is not gated.", said once of the 400 ms momentary window
+    and once of the 3 s short-term one), so their maxima run over every reading
+    of the stored series and not over a gated subset of it, as the integrated
+    loudness does. A window of digital silence reads ``-inf`` and stays in the
+    series, where the maximum passes over it; the maximum is undefined only
+    when the series itself is empty, which is what an excerpt shorter than one
+    window gives, and the measurement writes ``-inf`` for it.
+
+    A billionth of a decibel of slack lets a caller who recomputed the maximum
+    along another floating-point path restate it without being refused over the
+    last bit.
+
+    :param owner: The result carrying both the maximum and its series.
+    :param field: Name of the field holding the maximum.
+    :param series: Name of the field holding the readings it summarises.
+    :raises ValueError: if ``field`` is not the maximum of ``series``.
+    """
+    readings = np.asarray(getattr(owner, series), dtype=np.float64)
+    stored = float(getattr(owner, field))
+    peak = float(np.max(readings)) if readings.size else float("-inf")
+    if isclose(stored, peak, rel_tol=0.0, abs_tol=1e-9):
+        return
+    seen = (
+        f"'{series}' is empty, leaving the maximum undefined"
+        if readings.size == 0
+        else f"'{series}' peaks at {peak!r}"
+    )
+    msg = (
+        f"{type(owner).__name__}: '{field}' must be the maximum of "
+        f"'{series}', the ungated series of EBU Tech 3341 it summarises; "
+        f"got {stored!r} where {seen}."
+    )
+    raise ValueError(msg)
+
+
 @dataclass(frozen=True)
 class ProgramLoudnessResult:
     """EBU Mode loudness measurement of a programme (BS.1770-5 / EBU R 128).
@@ -717,8 +756,12 @@ class ProgramLoudnessResult:
     :ivar momentary_time: Time of each ``M`` reading (window end), s.
     :ivar short_term: Short-term loudness series ``S`` (3 s, ungated), LUFS.
     :ivar short_term_time: Time of each ``S`` reading (window end), s.
-    :ivar max_momentary: Maximum momentary loudness, LUFS.
-    :ivar max_short_term: Maximum short-term loudness, LUFS.
+    :ivar max_momentary: Maximum momentary loudness, LUFS: the largest reading
+        of ``momentary`` (``-inf`` when the excerpt is shorter than the 400 ms
+        window and no reading exists).
+    :ivar max_short_term: Maximum short-term loudness, LUFS: the largest
+        reading of ``short_term`` (``-inf`` when the excerpt is shorter than
+        the 3 s window and no reading exists).
     :ivar relative_threshold: Relative gating threshold of the integrated
         measurement (10 LU below the absolute-gated loudness), LUFS.
     :ivar lra_low: Lower (10th percentile) edge of the loudness range, LUFS.
@@ -768,8 +811,15 @@ class ProgramLoudnessResult:
         channel renders a complete fiche without a word, carrying a headline
         true peak for a channel the programme loudness never weighted.
 
+        The two headline maxima are silent in the same way. Each is the largest
+        reading of the series stored beside it, copied verbatim by every reader
+        and recomputed by none, so a maximum that contradicts its own column
+        prints on the fiche as an informational row above a graph of the very
+        readings that deny it, and is stamped into the ``bext`` chunk of a
+        broadcast WAV as ``MaxMomentaryLoudness``. Both are pinned here.
+
         :raises ValueError: if the two arrays of any of the three axes
-            disagree.
+            disagree, or if either maximum is not the maximum of its series.
         """
         require_ranks(
             self,
@@ -789,6 +839,8 @@ class ProgramLoudnessResult:
         require_same_length(
             self, "true_peak_per_channel", "channel_weights", axis="channel"
         )
+        _require_series_maximum(self, "max_momentary", "momentary")
+        _require_series_maximum(self, "max_short_term", "short_term")
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
