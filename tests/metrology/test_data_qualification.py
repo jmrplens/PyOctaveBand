@@ -178,18 +178,18 @@ def test_runs_test_discards_median_ties() -> None:
 
 def test_trend_test_validation() -> None:
     short = [1.0] * 9
-    with pytest.raises(ValueError, match="at least 10"):
+    with pytest.raises(ValueError, match=r"'values' must hold at least"):
         ph.metrology.trend_test(short)
     two_dim = np.ones((5, 4))
-    with pytest.raises(ValueError, match="one-dimensional"):
+    with pytest.raises(ValueError, match=r"'values' must be one-dimensional"):
         ph.metrology.trend_test(two_dim)
     with_nan = np.r_[np.arange(19.0), np.nan]
     with pytest.raises(ValueError, match="'values' must be finite"):
         ph.metrology.trend_test(with_nan)
     good = list(range(12))
-    with pytest.raises(ValueError, match="method"):
+    with pytest.raises(ValueError, match=r"'method' must be one of"):
         ph.metrology.trend_test(good, method="chi2")
-    with pytest.raises(ValueError, match="alpha"):
+    with pytest.raises(ValueError, match=r"'alpha' must be inside"):
         ph.metrology.trend_test(good, alpha=1.5)
     constant = np.ones(12)
     with pytest.raises(ValueError, match="distinct from the median"):
@@ -297,13 +297,13 @@ def test_stationarity_trailing_samples_are_discarded() -> None:
 def test_stationarity_validation() -> None:
     rng = np.random.default_rng(7)
     x = rng.standard_normal(2048)
-    with pytest.raises(ValueError, match="statistic"):
+    with pytest.raises(ValueError, match=r"'statistic' must be one of"):
         ph.metrology.stationarity_test(x, FS, statistic="kurtosis")
-    with pytest.raises(ValueError, match="n_segments"):
+    with pytest.raises(ValueError, match=r"'n_segments' must be between"):
         ph.metrology.stationarity_test(x, FS, n_segments=5)
-    with pytest.raises(ValueError, match="n_segments"):
+    with pytest.raises(ValueError, match=r"'n_segments' must be between"):
         ph.metrology.stationarity_test(x, FS, n_segments=4096)
-    with pytest.raises(ValueError, match="fs"):
+    with pytest.raises(ValueError, match=r"'fs' must be a positive, finite number"):
         ph.metrology.stationarity_test(x, 0.0)
 
 
@@ -398,10 +398,10 @@ def test_level_crossing_default_levels_and_validation() -> None:
     assert res.levels[0] == pytest.approx(-3.0 * res.sigma)
     assert res.levels[-1] == pytest.approx(3.0 * res.sigma)
     constant = np.ones(4096)
-    with pytest.raises(ValueError, match="constant"):
+    with pytest.raises(ValueError, match=r"'x' must not be constant"):
         ph.metrology.level_crossing_rate(constant, FS)
     empty_levels: list[float] = []
-    with pytest.raises(ValueError, match="levels"):
+    with pytest.raises(ValueError, match=r"'levels' must be a non-empty"):
         ph.metrology.level_crossing_rate(x, FS, levels=empty_levels)
     nan_levels = [0.0, np.nan]
     with pytest.raises(ValueError, match="'levels' must be finite"):
@@ -497,7 +497,7 @@ def test_peak_statistics_validation_and_fields() -> None:
     assert np.all(np.diff(res.peak_values) >= 0.0)  # sorted
     assert res.duration == pytest.approx((x.size - 1) / FS)
     constant = np.zeros(4096)
-    with pytest.raises(ValueError, match="constant"):
+    with pytest.raises(ValueError, match=r"'x' must not be constant"):
         ph.metrology.peak_statistics(constant, FS)
 
 
@@ -699,6 +699,6 @@ def test_plots_render_and_return_axes() -> None:
 def test_peak_plot_without_maxima_raises() -> None:
     ramp_result = ph.metrology.peak_statistics(np.linspace(0.0, 1.0, 4096) ** 2, FS)
     assert ramp_result.peak_values.size == 0
-    with pytest.raises(ValueError, match="maxima"):
+    with pytest.raises(ValueError, match=r"has no local maxima to plot"):
         ramp_result.plot()
     plt.close("all")

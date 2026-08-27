@@ -200,7 +200,9 @@ def test_enumeration_refuses_an_unreasonable_lattice() -> None:
     up to 20 kHz is hundreds of millions of triples. That regime is exactly
     where Equations (8.45) and (8.46) are accurate, so the error says so.
     """
-    with pytest.raises(ValueError, match="room_mode_count"):
+    with pytest.raises(
+        ValueError, match=r"order triples, above the .+ limit\. Lower 'max_frequency'"
+    ):
         room.room_modes(LONG_ROOM, max_frequency=20000.0)
     # The smooth count answers the same question there without enumerating.
     assert float(room.room_mode_count(20000.0, LONG_ROOM)) > 8e7
@@ -209,16 +211,22 @@ def test_enumeration_refuses_an_unreasonable_lattice() -> None:
 def test_result_is_a_frozen_dataclass() -> None:
     result = room.room_modes(LONG_ROOM, max_frequency=30.0)
     assert isinstance(result, room.RoomModesResult)
-    with pytest.raises(AttributeError):
+    with pytest.raises(dataclasses.FrozenInstanceError):
         result.speed_of_sound = 340.0  # type: ignore[misc]
 
 
 @pytest.mark.parametrize(
     ("kwargs", "match"),
     [
-        ({"dimensions": (7.0, 5.0)}, "three room dimensions"),
-        ({"dimensions": (7.0, 5.0, 0.0)}, "positive and finite"),
-        ({"dimensions": (7.0, 5.0, math.nan)}, "positive and finite"),
+        (
+            {"dimensions": (7.0, 5.0)},
+            "'dimensions' must hold the three room dimensions",
+        ),
+        ({"dimensions": (7.0, 5.0, 0.0)}, "'dimensions' must be positive and finite"),
+        (
+            {"dimensions": (7.0, 5.0, math.nan)},
+            "'dimensions' must be positive and finite",
+        ),
     ],
 )
 def test_dimension_validation(kwargs: dict[str, object], match: str) -> None:
@@ -262,16 +270,16 @@ def test_other_validation_errors() -> None:
         room.room_modes(LONG_ROOM, speed_of_sound=-1.0)
     with pytest.raises(ValueError, match="'reverberation_time' must be positive"):
         room.room_modes(LONG_ROOM, reverberation_time=0.0)
-    with pytest.raises(ValueError, match="non-negative integers"):
+    with pytest.raises(ValueError, match="'orders' must be non-negative integers"):
         room.room_mode_frequency((1, -1, 0), LONG_ROOM)
-    with pytest.raises(ValueError, match="non-negative integers"):
+    with pytest.raises(ValueError, match="'orders' must be non-negative integers"):
         room.room_mode_frequency((1.5, 0, 0), LONG_ROOM)
     two_dimensional = np.zeros((2, 4))
-    with pytest.raises(ValueError, match="triple"):
+    with pytest.raises(ValueError, match=r"'orders' must be a triple \(nx, ny, nz\)"):
         room.room_mode_frequency(two_dimensional, LONG_ROOM)
-    with pytest.raises(ValueError, match="non-negative and finite"):
+    with pytest.raises(ValueError, match="'frequency' must be non-negative and finite"):
         room.room_mode_count(-1.0, LONG_ROOM)
-    with pytest.raises(ValueError, match="non-negative and finite"):
+    with pytest.raises(ValueError, match="'frequency' must be non-negative and finite"):
         room.room_modal_density(math.inf, LONG_ROOM)
 
 

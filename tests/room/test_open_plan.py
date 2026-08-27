@@ -95,7 +95,9 @@ def test_too_few_positions_raises() -> None:
     r = np.array([2.0, 4.0, 8.0])
     lp = 70.0 - 6.0 * np.log2(r)
     sti = np.array([0.6, 0.4, 0.2])
-    with pytest.raises(ValueError, match="at least 4"):
+    with pytest.raises(
+        ValueError, match=r"ISO 3382-3 requires at least \d+ measurement positions"
+    ):
         room.open_plan_metrics(r, lp, sti)
 
 
@@ -145,7 +147,9 @@ def test_nan_in_positions_raises() -> None:
     r = np.array([2.0, 4.0, np.nan, 16.0])
     lp = np.array([70.0, 64.0, 58.0, 46.0])
     sti = np.array([0.6, 0.5, 0.4, 0.3])
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(
+        ValueError, match=r"positions_m, spl_a_speech and sti_values must be finite"
+    ):
         room.open_plan_metrics(r, lp, sti)
 
 
@@ -154,7 +158,9 @@ def test_nan_in_spl_raises() -> None:
     r = np.array([2.0, 4.0, 8.0, 16.0])
     lp = np.array([70.0, np.nan, 58.0, 46.0])
     sti = np.array([0.6, 0.5, 0.4, 0.3])
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(
+        ValueError, match=r"positions_m, spl_a_speech and sti_values must be finite"
+    ):
         room.open_plan_metrics(r, lp, sti)
 
 
@@ -163,5 +169,7 @@ def test_inf_in_sti_raises() -> None:
     r = np.array([2.0, 4.0, 8.0, 16.0])
     lp = np.array([70.0, 64.0, 58.0, 46.0])
     sti = np.array([0.6, np.inf, 0.4, 0.3])
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(
+        ValueError, match=r"positions_m, spl_a_speech and sti_values must be finite"
+    ):
         room.open_plan_metrics(r, lp, sti)

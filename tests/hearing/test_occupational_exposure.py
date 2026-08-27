@@ -11,6 +11,7 @@ Table 1) anchor the remaining behaviour.
 
 from __future__ import annotations
 
+import dataclasses
 import math
 
 import pytest
@@ -318,7 +319,7 @@ def test_task_rejects_nonpositive_duration() -> None:
 
 
 def test_task_rejects_empty_samples() -> None:
-    with pytest.raises(ValueError, match="sample"):
+    with pytest.raises(ValueError, match=r"A Task needs at least one Lp,A,eqT sample"):
         Task(samples=(), duration_hours=8.0)
 
 
@@ -337,7 +338,7 @@ def test_task_rejects_nan_duration() -> None:
 
 
 def test_job_based_rejects_nonpositive_sample_duration() -> None:
-    with pytest.raises(ValueError, match="sample_duration_hours"):
+    with pytest.raises(ValueError, match=r"'sample_duration_hours' must be positive"):
         job_based_exposure(
             [80.0, 82.0, 81.0], 8.0, n_workers=6, sample_duration_hours=0.0
         )
@@ -434,7 +435,7 @@ def test_a_task_result_without_its_task_contributions_is_refused() -> None:
 
 def test_result_dataclasses_are_frozen() -> None:
     result = job_based_exposure([80.0, 82.0, 81.0, 83.0, 80.0], 8.0)
-    with pytest.raises(AttributeError):
+    with pytest.raises(dataclasses.FrozenInstanceError):
         result.lex_8h = 0.0  # type: ignore[misc]
     tc = TaskContribution(
         label="x",
@@ -451,7 +452,7 @@ def test_result_dataclasses_are_frozen() -> None:
         u2=0.7,
         u3=1.0,
     )
-    with pytest.raises(AttributeError):
+    with pytest.raises(dataclasses.FrozenInstanceError):
         tc.u1a = 1.0  # type: ignore[misc]
     assert isinstance(result, ExposureResult)
 

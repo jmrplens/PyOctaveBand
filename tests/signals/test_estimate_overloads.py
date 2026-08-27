@@ -90,13 +90,16 @@ SOLO = [
 ]
 SOLO_IDS = [f.__name__ for f, _ in SOLO]
 
-# The pairwise ones: two records that must share a rate.
-PAIRS = [
-    (cross_spectral_density, {}),
-    (coherent_output_spectrum, {}),
-    (time_delay, {}),
-    (align_impulse_responses, {}),
+# The pairwise ones: two records that must share a rate. One shared guard
+# refuses every mismatched pair, so the third field is the only thing that
+# says which pair of arguments the call asked it to check.
+_PAIRS_WITH_ARGUMENT_NAMES = [
+    (cross_spectral_density, {}, ("x", "y")),
+    (coherent_output_spectrum, {}, ("x", "y")),
+    (time_delay, {}, ("x", "y")),
+    (align_impulse_responses, {}, ("ir", "reference")),
 ]
+PAIRS = [(func, kwargs) for func, kwargs, _ in _PAIRS_WITH_ARGUMENT_NAMES]
 PAIR_IDS = [f.__name__ for f, _ in PAIRS]
 
 
@@ -143,7 +146,7 @@ def test_a_multichannel_signal_is_refused_by_name(
     averaging -- would answer a question the caller did not ask.
     """
     block = Signal(np.stack([_record(0), _record(1)]), FS)
-    with pytest.raises(ValueError, match="must be one-dimensional"):
+    with pytest.raises(ValueError, match=r"'x' must be one-dimensional"):
         func(block, **kwargs)
 
 
@@ -179,14 +182,19 @@ def test_a_pair_takes_the_rate_from_either_side(
     assert_same(func(Signal(x, FS), Signal(y, FS), **kwargs), reference)
 
 
-@pytest.mark.parametrize(("func", "kwargs"), PAIRS, ids=PAIR_IDS)
+@pytest.mark.parametrize(
+    ("func", "kwargs", "names"), _PAIRS_WITH_ARGUMENT_NAMES, ids=PAIR_IDS
+)
 def test_two_signals_at_different_rates_are_refused(
-    func: Callable[..., object], kwargs: dict[str, float]
+    func: Callable[..., object], kwargs: dict[str, float], names: tuple[str, str]
 ) -> None:
     """Nothing here can say which rate is the truth, so neither is chosen."""
     x, y = _record(0), _record(1)
     first, second = Signal(x, FS), Signal(y, FS // 2)
-    with pytest.raises(ValueError, match="recorded at different rates"):
+    with pytest.raises(
+        ValueError,
+        match=rf"'{names[0]}' and '{names[1]}' are Signals recorded at different",
+    ):
         func(first, second, **kwargs)
 
 
@@ -230,7 +238,9 @@ def test_correlation_keeps_its_rate_optional_for_bare_arrays() -> None:
     assert_same(correlation(x, y), correlation(x, y, 1.0))
     assert_same(correlation(Signal(x, FS), y), correlation(x, y, FS))
     at_fs, at_half = Signal(x, FS), Signal(y, FS // 2)
-    with pytest.raises(ValueError, match="recorded at different rates"):
+    with pytest.raises(
+        ValueError, match=r"'x' and 'y' are Signals recorded at different"
+    ):
         correlation(at_fs, at_half)
 
 
@@ -257,7 +267,9 @@ def test_miso_refuses_an_output_recorded_at_another_rate() -> None:
     a, b, out = _record(0), _record(1), _record(2)
     block = Signal(np.stack([a, b]), FS)
     at_half = Signal(out, FS // 2)
-    with pytest.raises(ValueError, match="recorded at different rates"):
+    with pytest.raises(
+        ValueError, match=r"'inputs' and 'output' are Signals recorded at different"
+    ):
         miso_coherence(block, at_half)
 
 
@@ -274,9 +286,13 @@ def test_miso_refuses_two_inputs_recorded_at_different_rates() -> None:
     first, second = Signal(a, FS), Signal(b, FS // 2)
     at_fs, at_half = Signal(out, FS), Signal(out, FS // 2)
     assert first.data.shape == second.data.shape  # the length check is blind
-    with pytest.raises(ValueError, match="different rates"):
+    with pytest.raises(
+        ValueError, match=r"'inputs' holds Signals recorded at different rates"
+    ):
         miso_coherence([first, second], at_fs)
-    with pytest.raises(ValueError, match="different rates"):
+    with pytest.raises(
+        ValueError, match=r"'inputs' holds Signals recorded at different rates"
+    ):
         miso_coherence([second, first], at_half)
 
 
@@ -296,8 +312,16 @@ def test_the_arguments_behind_fs_are_keyword_only_and_required() -> None:
     need the value, and the reader would have to run it to find out.
     """
     sig = Signal(_record(), FS)
-    for call in (zoom_fft, lifter, time_synchronous_average, resample_signal):
-        with pytest.raises(TypeError, match="required keyword-only argument"):
+    for call, missing in (
+        (zoom_fft, r"'f_min'.*'f_max'"),
+        (lifter, r"'cutoff'"),
+        (time_synchronous_average, r"'period'"),
+        (resample_signal, r"'fs_new'"),
+    ):
+        with pytest.raises(
+            TypeError,
+            match=rf"{call.__name__}\(\).*required keyword-only arguments?: {missing}",
+        ):
             call(sig)  # type: ignore[call-arg]
 
 

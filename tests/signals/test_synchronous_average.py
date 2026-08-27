@@ -271,7 +271,9 @@ def test_default_n_averages_uses_whole_record() -> None:
 
 def test_requested_n_averages_over_available_raises() -> None:
     signal = _repeat(_periodic(PERIOD, M, (1.0,)), 5)
-    with pytest.raises(ValueError, match="exceeds"):
+    with pytest.raises(
+        ValueError, match=r"'n_averages' = .* exceeds the .* whole periods available"
+    ):
         ph.signals.time_synchronous_average(signal, FS, period=PERIOD, n_averages=6)
 
 
@@ -345,9 +347,9 @@ def test_average_curves_must_run_over_their_own_axis() -> None:
 
 def test_comb_filter_response_validation() -> None:
     one = np.array([1.0])
-    with pytest.raises(ValueError, match="positive integer"):
+    with pytest.raises(ValueError, match=r"'n_averages' must be a positive integer"):
         comb_filter_response(one, PERIOD, 0)
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match=r"'period' must be a positive, finite number"):
         comb_filter_response(one, -1.0, 2)
 
 
@@ -356,9 +358,15 @@ def test_comb_filter_response_rejects_overflowing_order() -> None:
     # instead of the documented bounded response.
     huge_frequency = np.array([1e308])
     large_frequency = np.array([1e307])
-    with pytest.raises(ValueError, match="overflows"):
+    with pytest.raises(
+        ValueError,
+        match=r"'frequencies' \* 'period' .* overflows the floating-point range",
+    ):
         comb_filter_response(huge_frequency, 1e308, 3)
-    with pytest.raises(ValueError, match="overflows"):
+    with pytest.raises(
+        ValueError,
+        match=r"'frequencies' \* 'period' .* overflows the floating-point range",
+    ):
         comb_filter_response(large_frequency, 100.0, 2**40)
 
 

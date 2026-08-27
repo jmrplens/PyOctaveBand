@@ -149,22 +149,38 @@ def test_k2_no_room_data_is_free_field_zero() -> None:
 
 def test_k2_reverberation_time_without_volume_raises() -> None:
     """Half-specified room (T without V) must not silently give K2 = 0."""
-    with pytest.raises(ValueError, match="volume"):
+    with pytest.raises(
+        ValueError,
+        match=r"reverberation_time and volume must be given together.*"
+        r"'volume' is missing",
+    ):
         emission.environmental_correction(40.0, reverberation_time=1.2)
 
 
 def test_k2_volume_without_reverberation_time_raises() -> None:
-    with pytest.raises(ValueError, match="reverberation_time"):
+    with pytest.raises(
+        ValueError,
+        match=r"reverberation_time and volume must be given together.*"
+        r"'reverberation_time' is missing",
+    ):
         emission.environmental_correction(40.0, volume=300.0)
 
 
 def test_k2_mean_absorption_without_room_surface_raises() -> None:
-    with pytest.raises(ValueError, match="room_surface"):
+    with pytest.raises(
+        ValueError,
+        match=r"mean_absorption_coefficient and room_surface must be given together.*"
+        r"'room_surface' is missing",
+    ):
         emission.environmental_correction(50.0, mean_absorption_coefficient=0.2)
 
 
 def test_k2_room_surface_without_mean_absorption_raises() -> None:
-    with pytest.raises(ValueError, match="mean_absorption_coefficient"):
+    with pytest.raises(
+        ValueError,
+        match=r"mean_absorption_coefficient and room_surface must be given together.*"
+        r"'mean_absorption_coefficient' is missing",
+    ):
         emission.environmental_correction(50.0, room_surface=500.0)
 
 
@@ -172,7 +188,11 @@ def test_partial_room_data_raises_via_sound_power_pressure() -> None:
     """The partial-pair guard is enforced through sound_power_pressure too."""
     levels = np.full((10, 1), 90.0)
     half_specified_room = emission.RoomEnvironment(reverberation_time=1.2)
-    with pytest.raises(ValueError, match="volume"):
+    with pytest.raises(
+        ValueError,
+        match=r"reverberation_time and volume must be given together.*"
+        r"'volume' is missing",
+    ):
         emission.sound_power_pressure(
             levels,
             "hemisphere",
@@ -361,7 +381,9 @@ def test_background_levels_single_spectrum_broadcasts() -> None:
 def test_background_levels_wrong_length_raises() -> None:
     levels = np.tile(np.array([90.0, 92.0, 95.0]), (10, 1))
     background_two_bands = np.array([70.0, 71.0])
-    with pytest.raises(ValueError, match="background_levels"):
+    with pytest.raises(
+        ValueError, match=r"'background_levels' must match 'levels_positions' shape"
+    ):
         emission.sound_power_pressure(
             levels, "hemisphere", radius=2.0, background_levels=background_two_bands
         )
@@ -453,7 +475,10 @@ def test_sound_power_level_a_single_band_equals_level() -> None:
 def test_too_few_positions_raises() -> None:
     """Engineering hemisphere needs >= 10 positions (ISO 3744 clause 8.1.1)."""
     five_positions = np.full((5, 1), 60.0)
-    with pytest.raises(ValueError, match="microphone positions"):
+    with pytest.raises(
+        ValueError,
+        match=r"engineering hemisphere.*requires at least \d+ microphone positions",
+    ):
         emission.sound_power_pressure(five_positions, "hemisphere", radius=2.0)
 
 
@@ -634,7 +659,9 @@ def test_a_per_band_quantity_off_the_band_axis_is_refused(trim: bool) -> None:
     result = _ten_position_determination()
     values = np.asarray(result.sound_power_level)
     wrong = values[:-1] if trim else np.append(values, values[-1])
-    with pytest.raises(ValueError, match="'sound_power_level'"):
+    with pytest.raises(
+        ValueError, match=r"'sound_power_level'.*must each carry one value per band"
+    ):
         dataclasses.replace(result, sound_power_level=wrong)
 
 

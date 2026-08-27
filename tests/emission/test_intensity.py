@@ -248,23 +248,23 @@ def test_validation_errors() -> None:
         ValueError, match=r"sound_intensity: 'p1'.*'p2'.*one value per sample"
     ):
         emission.sound_intensity(good, good[:-1], FS, spacing=SPACING)
-    with pytest.raises(ValueError, match="spacing"):
+    with pytest.raises(ValueError, match=r"Microphone 'spacing' must be positive"):
         emission.sound_intensity(good, good, FS, spacing=0.0)
-    with pytest.raises(ValueError, match="spacing"):
+    with pytest.raises(ValueError, match=r"Microphone 'spacing' must be positive"):
         emission.sound_intensity(good, good, FS, spacing=-0.01)
-    with pytest.raises(ValueError, match="fs"):
+    with pytest.raises(ValueError, match=r"Sample rate 'fs' must be positive"):
         emission.sound_intensity(good, good, 0, spacing=SPACING)
-    with pytest.raises(ValueError, match="fs"):
+    with pytest.raises(ValueError, match=r"Sample rate 'fs' must be positive"):
         emission.sound_intensity(good, good, -48000, spacing=SPACING)
-    with pytest.raises(ValueError, match="rho"):
+    with pytest.raises(ValueError, match=r"Air density 'rho' must be positive"):
         emission.sound_intensity(good, good, FS, spacing=SPACING, rho=0.0)
-    with pytest.raises(ValueError, match="'c'"):
+    with pytest.raises(ValueError, match=r"'c' must be positive"):
         emission.sound_intensity(good, good, FS, spacing=SPACING, c=-1.0)
-    with pytest.raises(ValueError, match="fraction"):
+    with pytest.raises(ValueError, match=r"'fraction' must be"):
         emission.sound_intensity(good, good, FS, spacing=SPACING, fraction=2)
-    with pytest.raises(ValueError, match="limits"):
+    with pytest.raises(ValueError, match=r"'limits' must be"):
         emission.sound_intensity(good, good, FS, spacing=SPACING, limits=[100.0])
-    with pytest.raises(ValueError, match="limits"):
+    with pytest.raises(ValueError, match=r"'limits' must be"):
         emission.sound_intensity(
             good, good, FS, spacing=SPACING, limits=[1000.0, 100.0]
         )
@@ -275,9 +275,11 @@ def test_validation_errors() -> None:
             good, good, FS, spacing=SPACING, limits=[float("nan"), 1000.0]
         )
     two_dimensional = np.zeros((2, 100))
-    with pytest.raises(ValueError, match="1D"):
+    with pytest.raises(
+        ValueError, match=r"sound_intensity expects 1D pressure signals"
+    ):
         emission.sound_intensity(two_dimensional, two_dimensional, FS, spacing=SPACING)
-    with pytest.raises(ValueError, match="too short"):
+    with pytest.raises(ValueError, match=r"Signals too short for a spectral estimate"):
         emission.sound_intensity(good[:8], good[:8], FS, spacing=SPACING)
 
 
@@ -314,7 +316,11 @@ def test_field_indicators_validation() -> None:
         emission.field_indicators([90.0, 91.0], [1e-3])
     with pytest.raises(ValueError, match="two measurement positions"):
         emission.field_indicators([90.0], [1e-3])
-    with pytest.raises(ValueError, match="not positive"):
+    with pytest.raises(
+        ValueError,
+        match=r"algebraic mean normal intensity over the measurement surface "
+        r"is not positive",
+    ):
         emission.field_indicators([90.0, 90.0], [1e-3, -2e-3])
     three_band_lp = np.full((4, 3), 90.0)
     three_band_in = np.full((4, 3), 1e-3)
@@ -359,7 +365,11 @@ def test_field_indicators_per_band_matches_per_column_scalars() -> None:
     # ISO 9614-1 A.2.3 test conditions and raises, exactly as the scalar path.
     bad = i_n.copy()
     bad[:, 1] = -1.0e-5
-    with pytest.raises(ValueError, match="not positive"):
+    with pytest.raises(
+        ValueError,
+        match=r"algebraic mean normal intensity over the measurement surface "
+        r"is not positive",
+    ):
         emission.field_indicators(lp, bad, freqs)
 
 
@@ -394,7 +404,7 @@ def test_field_indicators_plot_draws_indicators_and_ld() -> None:
         ind.plot(language="xx")
     # The scalar (single-band) result has nothing per band to draw.
     single = emission.field_indicators(lp[:, 0], i_n[:, 0])
-    with pytest.raises(ValueError, match="per-band"):
+    with pytest.raises(ValueError, match=r"plot\(\) needs per-band indicators"):
         single.plot()
     plt.close("all")
 
@@ -407,7 +417,7 @@ def test_dynamic_capability_index() -> None:
     assert emission.dynamic_capability_index(
         18.0, bias_error_factor=7.0
     ) == pytest.approx(11.0)
-    with pytest.raises(ValueError, match="bias_error_factor"):
+    with pytest.raises(ValueError, match=r"'bias_error_factor' must be positive"):
         emission.dynamic_capability_index(18.0, bias_error_factor=0.0)
 
 
@@ -480,15 +490,23 @@ def test_f1_validation() -> None:
     three_dimensional = np.zeros((2, 2, 2))
     with pytest.raises(ValueError, match="1D .samples,. or 2D"):
         emission.temporal_variability_indicator(three_dimensional)
-    with pytest.raises(ValueError, match="not positive"):
+    with pytest.raises(
+        ValueError,
+        match=r"algebraic mean of the short-time normal intensity samples "
+        r"is not positive",
+    ):
         emission.temporal_variability_indicator([1.0e-5, -3.0e-5])
     # A NaN or infinite sample would otherwise slip past the positivity test
     # and turn the indicator into a silent NaN.
     with_nan = [1.0e-5, float("nan"), 1.2e-5]
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(
+        ValueError, match=r"normal intensity samples must all be finite"
+    ):
         emission.temporal_variability_indicator(with_nan)
     with_inf = [1.0e-5, float("inf"), 1.2e-5]
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(
+        ValueError, match=r"normal intensity samples must all be finite"
+    ):
         emission.temporal_variability_indicator(with_inf)
 
 
@@ -582,7 +600,7 @@ def test_field_is_stationary_against_the_table_b3_limit() -> None:
     varying = emission.field_indicators(lp, i_n, temporal_intensity=[1.0e-5, 5.0e-5])
     assert varying.field_is_stationary() is False
     without_f1 = emission.field_indicators(lp, i_n)
-    with pytest.raises(ValueError, match="no F1"):
+    with pytest.raises(ValueError, match=r"This result carries no F1"):
         without_f1.field_is_stationary()
 
 
@@ -643,7 +661,7 @@ def test_an_f1_off_the_band_axis_is_refused(kind: str) -> None:
         "short": f1[:-1],
         "long": np.append(f1, f1[-1]),
     }[kind]
-    with pytest.raises(ValueError, match="'f1'"):
+    with pytest.raises(ValueError, match=r"'f1'.*must each carry one value per band"):
         dataclasses.replace(result, f1=wrong)
 
 
@@ -669,7 +687,9 @@ def test_an_intensity_band_quantity_off_the_band_axis_is_refused(
     )
     values = np.asarray(getattr(result, field_name))
     wrong = values[:-1] if trim else np.append(values, values[-1])
-    with pytest.raises(ValueError, match=f"'{field_name}'"):
+    with pytest.raises(
+        ValueError, match=rf"'{field_name}'.*must each carry one value per band"
+    ):
         dataclasses.replace(result, **{field_name: wrong})
 
 

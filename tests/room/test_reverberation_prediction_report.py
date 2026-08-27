@@ -94,7 +94,7 @@ def test_no_metadata_still_renders(tmp_path: Path) -> None:
 def test_unknown_engine_rejected(tmp_path: Path) -> None:
     res = _result()
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine 'weasyprint'"):
         res.report(out, engine="weasyprint")
 
 

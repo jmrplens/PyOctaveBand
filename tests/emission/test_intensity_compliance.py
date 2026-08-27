@@ -112,14 +112,14 @@ def test_table2_accepts_exact_base_ten_band_centres() -> None:
 
 def test_frequency_outside_table_is_rejected() -> None:
     """A frequency that is not a tabulated band raises, it is not snapped."""
-    with pytest.raises(ValueError, match="Table 2 band"):
+    with pytest.raises(ValueError, match=r"is not an IEC 61043 Table 2 band"):
         emission.residual_index_limits("instrument", frequencies=[700.0])
-    with pytest.raises(ValueError, match="Table 2 band"):
+    with pytest.raises(ValueError, match=r"is not an IEC 61043 Table 2 band"):
         emission.residual_index_limits("instrument", frequencies=[8000.0])
 
 
 def test_unknown_device_is_rejected() -> None:
-    with pytest.raises(ValueError, match="probe"):
+    with pytest.raises(ValueError, match=r"'device' must be 'probe'"):
         emission.residual_index_limits("analyser")
 
 
@@ -158,7 +158,9 @@ def test_note1_rule_matches_the_table_values_at_50_mm() -> None:
 
 
 def test_non_positive_spacing_is_rejected() -> None:
-    with pytest.raises(ValueError, match="spacing"):
+    with pytest.raises(
+        ValueError, match=r"'spacing' must be a positive, finite distance"
+    ):
         emission.residual_index_limits("probe", spacing=0.0)
 
 
@@ -179,7 +181,9 @@ def test_instrument_class_from_components(
 
 
 def test_instrument_class_rejects_class_2x() -> None:
-    with pytest.raises(ValueError, match="2X"):
+    with pytest.raises(
+        ValueError, match=r"'probe_class' and 'processor_class' must be 1"
+    ):
         emission.instrument_class_from_components(1, 3)
 
 
@@ -321,9 +325,11 @@ def test_mismatched_lengths_and_repeats_are_rejected() -> None:
         ),
     ):
         emission.verify_intensity_class([20.0, 20.0], [1000.0])
-    with pytest.raises(ValueError, match="repeats"):
+    with pytest.raises(
+        ValueError, match=r"'frequencies' repeats an IEC 61043 Table 2 band"
+    ):
         emission.verify_intensity_class([20.0, 20.0], [1000.0, 1000.0])
-    with pytest.raises(ValueError, match="At least one"):
+    with pytest.raises(ValueError, match="At least one measurement band is required"):
         emission.verify_intensity_class([], [])
 
 
@@ -364,9 +370,9 @@ def test_result_rejects_an_unknown_class() -> None:
     result = emission.intensity_class_compliance(
         _table_column("probe", 1), _BANDS, device="probe"
     )
-    with pytest.raises(ValueError, match="must be 1 or 2"):
+    with pytest.raises(ValueError, match="'device_class' must be 1"):
         result.binding_margin(0)
-    with pytest.raises(ValueError, match="must be 1 or 2"):
+    with pytest.raises(ValueError, match="'device_class' must be 1"):
         result.failing_bands(3)
 
 
@@ -418,13 +424,17 @@ def test_index_follows_note1_when_the_spacer_changes() -> None:
 
 
 def test_phase_conversion_rejects_invalid_inputs() -> None:
-    with pytest.raises(ValueError, match="phase_mismatch"):
+    with pytest.raises(
+        ValueError, match=r"'phase_mismatch' must be finite and positive"
+    ):
         emission.residual_index_from_phase_mismatch(0.0, 1000.0, 0.025)
-    with pytest.raises(ValueError, match="spacing"):
+    with pytest.raises(
+        ValueError, match=r"'spacing' must be a positive, finite distance"
+    ):
         emission.phase_mismatch_from_residual_index(20.0, 1000.0, -0.01)
-    with pytest.raises(ValueError, match="'c'"):
+    with pytest.raises(ValueError, match=r"'c' must be a positive, finite speed"):
         emission.phase_mismatch_from_residual_index(20.0, 1000.0, 0.025, c=0.0)
-    with pytest.raises(ValueError, match="frequency"):
+    with pytest.raises(ValueError, match=r"'frequency' must be finite and positive"):
         emission.phase_mismatch_from_residual_index(20.0, 0.0, 0.025)
 
 
@@ -452,7 +462,7 @@ def test_an_instrument_verdict_refuses_per_band_entries_that_disagree() -> None:
         device="instrument",
         spacing=0.025,
     )
-    with pytest.raises(ValueError, match="'bands'"):
+    with pytest.raises(ValueError, match=r"'bands' \(3\)"):
         dataclasses.replace(result, bands=result.bands[:-1])
 
 
@@ -498,7 +508,7 @@ def test_a_non_finite_band_of_the_verdict_is_refused(field_name: str) -> None:
     )
     values = np.asarray(getattr(result, field_name), dtype=float).copy()
     values[1] = float("nan")
-    with pytest.raises(ValueError, match=f"'{field_name}' must be finite"):
+    with pytest.raises(ValueError, match=rf"'{field_name}' must be finite\."):
         dataclasses.replace(result, **{field_name: values})
 
 

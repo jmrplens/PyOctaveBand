@@ -169,11 +169,11 @@ def test_frequency_subset() -> None:
 def test_invalid_inputs_raise() -> None:
     with pytest.raises(ValueError, match="years must be positive"):
         m.nipts(90.0, 0.0)
-    with pytest.raises(ValueError, match="fractile"):
+    with pytest.raises(ValueError, match=r"fractile must be in \(0, 1\)"):
         m.nipts(90.0, 20.0, 1.5)
     with pytest.raises(ValueError, match="not an ISO 1999"):
         m.nipts(90.0, 20.0, frequencies=[1234.0])
-    with pytest.raises(ValueError, match="at least 18"):
+    with pytest.raises(ValueError, match=r"age must be at least 18 years"):
         m.htlan(10, "male", 90.0, 20.0)
 
 
@@ -212,14 +212,23 @@ def test_combine_age_and_noise_matches_htlan() -> None:
 
 def test_outside_validated_domain_warns() -> None:
     """Conditions beyond the standard's stated ranges warn (but still compute)."""
-    with pytest.warns(m.NoiseInducedHearingLossWarning, match="1-40 year"):
+    with pytest.warns(
+        m.NoiseInducedHearingLossWarning,
+        match=r"exposure duration .* is outside the 1-40 year range",
+    ):
         m.nipts(90.0, 60.0, 0.5)
-    with pytest.warns(m.NoiseInducedHearingLossWarning, match="tails"):
+    with pytest.warns(
+        m.NoiseInducedHearingLossWarning,
+        match=r"fractile .* lies in the distribution tails",
+    ):
         m.nipts(90.0, 20.0, 0.99)
     with pytest.warns(m.NoiseInducedHearingLossWarning, match="exceeds the 100 dB"):
         m.nipts(130.0, 20.0, 0.5)
     # The htlan noise component inherits the same guards.
-    with pytest.warns(m.NoiseInducedHearingLossWarning, match="1-40 year"):
+    with pytest.warns(
+        m.NoiseInducedHearingLossWarning,
+        match=r"exposure duration .* is outside the 1-40 year range",
+    ):
         m.htlan(60, "male", 90.0, 60.0, 0.5)
 
 
@@ -243,7 +252,7 @@ def test_nipts_rejects_a_fractile_spectrum_of_another_length() -> None:
     """
     result = m.nipts(95.0, 20.0)
     on_another_grid = np.append(result.value, [12.0, 9.0])
-    with pytest.raises(ValueError, match="'value'"):
+    with pytest.raises(ValueError, match=rf"'value' \({on_another_grid.size}\)"):
         dataclasses.replace(result, value=on_another_grid)
 
 
@@ -256,7 +265,7 @@ def test_htlan_rejects_a_component_of_another_length() -> None:
     """
     result = m.htlan(60, "male", 95.0, 20.0, 0.5)
     one_frequency_short = result.nipts[:-1]
-    with pytest.raises(ValueError, match="'nipts'"):
+    with pytest.raises(ValueError, match=rf"'nipts' \({one_frequency_short.size}\)"):
         dataclasses.replace(result, nipts=one_frequency_short)
 
 
@@ -283,7 +292,10 @@ def test_nipts_rejects_nan_exposure_level() -> None:
 
 def test_nipts_rejects_nan_years() -> None:
     with (
-        pytest.warns(m.NoiseInducedHearingLossWarning, match="outside the 1-40"),
+        pytest.warns(
+            m.NoiseInducedHearingLossWarning,
+            match=r"exposure duration .* is outside the 1-40 year range",
+        ),
         pytest.raises(ValueError, match="'years' must be finite"),
     ):
         m.nipts(l_ex=85.0, years=float("nan"))

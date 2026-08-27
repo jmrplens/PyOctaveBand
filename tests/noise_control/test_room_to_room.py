@@ -178,7 +178,7 @@ def test_rc_criterion_family() -> None:
     assert result.criterion_curve is not None
     # The six bands of this chain are short of the 31.5 Hz to 4 kHz span
     # clause D.4 asks for, which the rating reports as a warning.
-    with pytest.warns(UserWarning, match="D.4"):
+    with pytest.warns(UserWarning, match=r"clause D\.4 rates a spectrum that includes"):
         assert result.rating.__class__.__name__ == "RCResult"
 
 
@@ -204,46 +204,59 @@ def test_source_description_is_exclusive() -> None:
     all still raises, because the empty default is built here and rejects
     itself for the same reason.
     """
-    with pytest.raises(ValueError, match="exactly one"):
+    with pytest.raises(
+        ValueError, match=r"give exactly one of 'level'.*or 'power_level'"
+    ):
         noise_control.room_to_room_transmission(_BANDS, 40.0, 20.0, _ABSORPTION)
-    with pytest.raises(ValueError, match="exactly one"):
+    with pytest.raises(
+        ValueError, match=r"give exactly one of 'level'.*or 'power_level'"
+    ):
         noise_control.SourceRoom(level=90.0, power_level=100.0)
-    with pytest.raises(ValueError, match="room_constant"):
+    with pytest.raises(
+        ValueError, match=r"'room_constant' is required with 'power_level'"
+    ):
         noise_control.SourceRoom(power_level=100.0)
 
 
 def test_validation() -> None:
     """Malformed bands, spectra, areas, absorption and options are rejected."""
     source = noise_control.SourceRoom(level=90.0)
-    with pytest.raises(ValueError, match="non-empty 1-D"):
+    with pytest.raises(
+        ValueError, match=r"'frequencies' must be a non-empty 1-D array"
+    ):
         noise_control.room_to_room_transmission([], 40.0, 20.0, 20.0, source=source)
-    with pytest.raises(ValueError, match="one value per band"):
+    with pytest.raises(
+        ValueError,
+        match=r"'transmission_loss' must be a scalar or have one value per band",
+    ):
         noise_control.room_to_room_transmission(
             _BANDS, [40.0, 41.0], 20.0, _ABSORPTION, source=source
         )
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'transmission_loss' must be finite"):
         noise_control.room_to_room_transmission(
             _BANDS, _NAN_SPECTRUM, 20.0, _ABSORPTION, source=source
         )
-    with pytest.raises(ValueError, match="partition_area"):
+    with pytest.raises(ValueError, match=r"'partition_area' must be positive"):
         noise_control.room_to_room_transmission(
             _BANDS, 40.0, 0.0, _ABSORPTION, source=source
         )
-    with pytest.raises(ValueError, match="receiving_absorption"):
+    with pytest.raises(ValueError, match=r"'receiving_absorption' must be positive"):
         noise_control.room_to_room_transmission(
             _BANDS, 40.0, 20.0, _NO_ABSORPTION, source=source
         )
     negative_flanking = noise_control.DesignCriterion(flanking_penalty=-1.0)
-    with pytest.raises(ValueError, match="flanking_penalty"):
+    with pytest.raises(
+        ValueError, match=r"'criterion\.flanking_penalty' must be non-negative"
+    ):
         _chain(criterion=negative_flanking)
     unknown_family = noise_control.DesignCriterion(family="NR")
-    with pytest.raises(ValueError, match="criterion"):
+    with pytest.raises(ValueError, match=r"'criterion' must be one of"):
         _chain(criterion=unknown_family)
     unknown_model = noise_control.SourceRoom(level=_SOURCE, model="constant_energy")
-    with pytest.raises(ValueError, match="model"):
+    with pytest.raises(ValueError, match=r"'source\.model' must be one of"):
         _chain(source=unknown_model)
     nan_target = noise_control.DesignCriterion(target=_NAN)
-    with pytest.raises(ValueError, match="target"):
+    with pytest.raises(ValueError, match=r"'target' must be a finite criterion value"):
         _chain(criterion=nan_target)
 
 
@@ -281,7 +294,10 @@ def test_a_spectrum_off_the_band_axis_is_refused(field_name: str, trim: bool) ->
     result = _powered_chain()
     row = np.asarray(getattr(result, field_name))
     wrong = row[:-1] if trim else np.append(row, row[-1])
-    with pytest.raises(ValueError, match=f"'{field_name}'"):
+    # The guard names every field of the result, so the identifier alone would
+    # match whichever row was short. The count is the test's own: it is what
+    # this test made wrong, and it is the only thing that says so.
+    with pytest.raises(ValueError, match=rf"'{field_name}' \({wrong.size}\)"):
         dataclasses.replace(result, **{field_name: wrong})
 
 
@@ -308,7 +324,7 @@ def test_a_single_absorption_number_is_refused() -> None:
         criterion=noise_control.DesignCriterion(target=45.0),
     )
     one_number = float(graded[0])
-    with pytest.raises(ValueError, match="'receiving_absorption'"):
+    with pytest.raises(ValueError, match=r"'receiving_absorption' must have one axis"):
         dataclasses.replace(result, receiving_absorption=one_number)
 
 

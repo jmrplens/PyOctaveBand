@@ -43,7 +43,7 @@ def test_calibration_matches_hand_formula() -> None:
 
 
 def test_calibration_rejects_non_positive_frequency() -> None:
-    with pytest.raises(ValueError, match="frequency"):
+    with pytest.raises(ValueError, match=r"'frequency' must be positive"):
         emission.velocity_level_from_acceleration(9.81, 0.0)
 
 
@@ -103,7 +103,7 @@ def test_upper_limit_is_largest() -> None:
 
 
 def test_power_level_rejects_bad_area() -> None:
-    with pytest.raises(ValueError, match="area"):
+    with pytest.raises(ValueError, match=r"'area' must be positive"):
         emission.radiated_sound_power_level(80.0, 0.0)
 
 
@@ -208,7 +208,8 @@ def test_a_vibration_band_quantity_off_the_band_axis_is_refused(
     result = _four_band_determination()
     values = np.asarray(getattr(result, field_name))
     wrong = values[:-1] if trim else np.append(values, values[-1])
-    with pytest.raises(ValueError, match=f"'{field_name}'"):
+    count = 3 if trim else 5  # the four-band fixture, one short or one long
+    with pytest.raises(ValueError, match=rf"'{field_name}' \({count}\)"):
         dataclasses.replace(result, **{field_name: wrong})
 
 
@@ -224,7 +225,7 @@ def test_a_stray_single_frequency_is_refused() -> None:
 
     result = _four_band_determination()
     one_band = np.asarray(result.frequencies)[2:3]
-    with pytest.raises(ValueError, match="'frequencies'"):
+    with pytest.raises(ValueError, match=r"'frequencies' \(1\)"):
         dataclasses.replace(result, frequencies=one_band)
 
 
@@ -250,7 +251,10 @@ def test_a_non_finite_band_quantity_is_refused(field_name: str) -> None:
     result = _four_band_determination()
     values = np.asarray(getattr(result, field_name), dtype=float).copy()
     values[1] = float("nan")
-    with pytest.raises(ValueError, match=f"VibrationSoundPowerResult: '{field_name}'"):
+    with pytest.raises(
+        ValueError,
+        match=f"VibrationSoundPowerResult: '{field_name}' must contain only finite",
+    ):
         dataclasses.replace(result, **{field_name: values})
 
 

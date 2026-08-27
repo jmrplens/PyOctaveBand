@@ -261,31 +261,39 @@ def test_multitaper_defaults_and_result_fields() -> None:
     assert np.allclose(np.sum(res.weights, axis=0), 1.0)
     assert res.random_error.shape == res.degrees_of_freedom.shape
     assert np.allclose(res.random_error, np.sqrt(2.0 / res.degrees_of_freedom))
-    with pytest.raises(AttributeError):
+    with pytest.raises(AttributeError, match=r"cannot assign to field 'psd'"):
         res.psd = res.psd * 2.0  # type: ignore[misc]
 
 
 def test_multitaper_rejects_invalid_inputs() -> None:
     x = _white(37, n=1024)
     two_dimensional = np.zeros((4, 256))
-    with pytest.raises(ValueError, match="one-dimensional"):
+    with pytest.raises(ValueError, match=r"'x' must be one-dimensional"):
         ph.signals.multitaper_psd(two_dimensional, FS)
-    with pytest.raises(ValueError, match="too short"):
+    with pytest.raises(ValueError, match=r"Signal too short for a spectral estimate"):
         ph.signals.multitaper_psd(x[:16], FS)
-    with pytest.raises(ValueError, match="positive, finite"):
+    with pytest.raises(ValueError, match=r"'fs' must be a positive, finite number"):
         ph.signals.multitaper_psd(x, -1.0)
-    with pytest.raises(ValueError, match="time_half_bandwidth"):
+    with pytest.raises(ValueError, match=r"'time_half_bandwidth' must be in"):
         ph.signals.multitaper_psd(x, FS, time_half_bandwidth=0.5)
-    with pytest.raises(ValueError, match="Shannon number"):
+    # One sentence covers both ends of the range, so the rejected value is the
+    # only thing that says which end this call was on.
+    with pytest.raises(
+        ValueError,
+        match=r"'n_tapers' must be between 1 and the Shannon number.*\(got 9\)",
+    ):
         ph.signals.multitaper_psd(x, FS, n_tapers=9)
-    with pytest.raises(ValueError, match="Shannon number"):
+    with pytest.raises(
+        ValueError,
+        match=r"'n_tapers' must be between 1 and the Shannon number.*\(got 0\)",
+    ):
         ph.signals.multitaper_psd(x, FS, n_tapers=0)
     silence = np.zeros(1024)
-    with pytest.raises(ValueError, match="identically zero"):
+    with pytest.raises(ValueError, match=r"'x' must not be identically zero"):
         ph.signals.multitaper_psd(silence, FS)
-    with pytest.raises(ValueError, match="scaling"):
+    with pytest.raises(ValueError, match=r"'scaling' must be"):
         ph.signals.multitaper_psd(x, FS, scaling="bogus")  # type: ignore[arg-type]
-    with pytest.raises(ValueError, match="confidence"):
+    with pytest.raises(ValueError, match=r"'confidence' must be in"):
         ph.signals.multitaper_psd(x, FS, confidence=1.5)
 
 
@@ -350,7 +358,11 @@ def test_multitaper_eigenvalues_and_weights_must_share_the_taper_axis() -> None:
         ("weights", np.vstack([good.weights, good.weights[:1]])),
     )
     for field, value in cases:
-        with pytest.raises(ValueError, match=rf"'{field}'.*{per_taper}"):
+        # Both fields are named whichever one was made wrong, so the count is
+        # what identifies it, and the count is the one this test chose.
+        with pytest.raises(
+            ValueError, match=rf"'{field}' \({len(value)}\).*{per_taper}"
+        ):
             dataclasses.replace(good, **{field: value})
 
 

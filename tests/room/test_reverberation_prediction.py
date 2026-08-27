@@ -261,8 +261,10 @@ def test_a_non_finite_room_is_refused(field: str, bad: float) -> None:
     """
     good = room.reverberation_time_models(DIMS, (0.2, 0.15, 0.3), frequencies=1000.0)
     value = getattr(good, field)
-    replacement = bad if np.ndim(value) == 0 else np.full_like(np.asarray(value), bad)
-    with pytest.raises(ValueError, match=f"'{field}' must "):
+    per_band = np.ndim(value) != 0
+    replacement = np.full_like(np.asarray(value), bad) if per_band else bad
+    rule = "must contain only finite" if per_band else "must be finite"
+    with pytest.raises(ValueError, match=f"'{field}' {rule}"):
         dataclasses.replace(good, **{field: replacement})
 
 
@@ -312,12 +314,15 @@ def test_empty_surfaces_raise() -> None:
         room.millington_sette_reverberation_time,
     ],
 )
-@pytest.mark.parametrize("bad", [-0.1, math.nan, math.inf])
+@pytest.mark.parametrize(
+    ("bad", "rule"),
+    [(-0.1, "non-negative"), (math.nan, "finite"), (math.inf, "finite")],
+)
 def test_negative_and_non_finite_alpha_rejected_by_surface_models(
-    model: _SurfaceModel, bad: float
+    model: _SurfaceModel, bad: float, rule: str
 ) -> None:
     """Negative and non-finite coefficients are rejected by every model."""
-    with pytest.raises(ValueError, match="absorption coefficients must be"):
+    with pytest.raises(ValueError, match=f"absorption coefficients must be {rule}"):
         model(VOLUME, [(10.0, bad)])
 
 
@@ -325,11 +330,14 @@ def test_negative_and_non_finite_alpha_rejected_by_surface_models(
     "model",
     [room.fitzroy_reverberation_time, room.arau_puchades_reverberation_time],
 )
-@pytest.mark.parametrize("bad", [-0.1, math.nan, math.inf])
+@pytest.mark.parametrize(
+    ("bad", "rule"),
+    [(-0.1, "non-negative"), (math.nan, "finite"), (math.inf, "finite")],
+)
 def test_negative_and_non_finite_alpha_rejected_by_axial_models(
-    model: _AxialModel, bad: float
+    model: _AxialModel, bad: float, rule: str
 ) -> None:
-    with pytest.raises(ValueError, match="absorption coefficients must be"):
+    with pytest.raises(ValueError, match=f"absorption coefficients must be {rule}"):
         model(DIMS, (bad, 0.2, 0.2))
 
 
@@ -349,7 +357,9 @@ def test_alpha_above_unit_error_bound_rejected_by_surface_models(
     (The axial models reject 20.0 too, but through their stricter below-1
     wall-pair-mean check, exercised in the axial rejection test below.)
     """
-    with pytest.raises(ValueError, match="unit error"):
+    with pytest.raises(
+        ValueError, match=r"absorption coefficients above .* look like a unit error"
+    ):
         model(VOLUME, [(10.0, 20.0)])
 
 
@@ -357,7 +367,9 @@ def test_sabine_accepts_the_documented_upper_bound() -> None:
     """The bound is inclusive: alpha exactly 2.0 computes, 2.0 + eps raises."""
     t = room.sabine_reverberation_time(VOLUME, [(SURFACE, 2.0)])
     assert t == pytest.approx(_K * VOLUME / (SURFACE * 2.0), abs=1e-9)
-    with pytest.raises(ValueError, match="unit error"):
+    with pytest.raises(
+        ValueError, match=r"absorption coefficients above .* look like a unit error"
+    ):
         room.sabine_reverberation_time(VOLUME, [(SURFACE, 2.0000001)])
 
 
@@ -422,24 +434,28 @@ def test_mean_absorption_accepts_iso354_alphas_above_one() -> None:
 
 
 def test_perfectly_reflecting_room_raises() -> None:
-    with pytest.raises(ValueError, match="non-positive"):
+    with pytest.raises(ValueError, match=r"the total absorption is non-positive"):
         room.sabine_reverberation_time(VOLUME, [(10.0, 0.0)])
 
 
 def test_non_positive_volume_raises() -> None:
-    with pytest.raises(ValueError, match="volume"):
+    with pytest.raises(ValueError, match=r"'volume' must be positive"):
         room.sabine_reverberation_time(0.0, UNIFORM_SURFACES)
 
 
 def test_negative_air_attenuation_raises() -> None:
-    with pytest.raises(ValueError, match="air_attenuation"):
+    with pytest.raises(
+        ValueError, match=r"'air_attenuation' must be finite and non-negative"
+    ):
         room.sabine_reverberation_time(VOLUME, UNIFORM_SURFACES, air_attenuation=-1.0)
 
 
 @pytest.mark.parametrize("bad", [math.nan, math.inf])
 def test_non_finite_air_attenuation_raises(bad: float) -> None:
     """NaN used to slip through the old m < 0 comparison and return NaN."""
-    with pytest.raises(ValueError, match="air_attenuation"):
+    with pytest.raises(
+        ValueError, match=r"'air_attenuation' must be finite and non-negative"
+    ):
         room.sabine_reverberation_time(VOLUME, UNIFORM_SURFACES, air_attenuation=bad)
 
 
@@ -456,13 +472,19 @@ def test_bad_absorptions_length_raises() -> None:
 def test_mismatched_surface_band_counts_raise() -> None:
     """Per-band coefficients with different band counts get a clear error."""
     surfaces = [(40.0, [0.1, 0.2, 0.3]), (40.0, [0.1, 0.2])]
-    with pytest.raises(ValueError, match="incompatible shapes"):
+    with pytest.raises(
+        ValueError,
+        match=r"per-band surface absorption coefficients have incompatible shapes",
+    ):
         room.eyring_reverberation_time(VOLUME, surfaces)
 
 
 def test_mismatched_axis_band_counts_raise() -> None:
     """A 6-band x-pair against a 4-band y-pair is reported, not a raw NumPy error."""
-    with pytest.raises(ValueError, match="incompatible shapes"):
+    with pytest.raises(
+        ValueError,
+        match=r"per-band axis absorptions and air attenuation have incompatible shapes",
+    ):
         room.arau_puchades_reverberation_time(
             DIMS, ([0.1, 0.2, 0.3, 0.4, 0.5, 0.6], [0.1, 0.2, 0.3, 0.4], 0.2)
         )
@@ -471,7 +493,10 @@ def test_mismatched_axis_band_counts_raise() -> None:
 def test_mismatched_air_band_count_raises() -> None:
     """Air attenuation with a different band count than the surfaces is caught."""
     surfaces = [(158.0, [0.2, 0.3, 0.4])]
-    with pytest.raises(ValueError, match="incompatible shapes"):
+    with pytest.raises(
+        ValueError,
+        match=r"per-band absorption and air attenuation have incompatible shapes",
+    ):
         room.sabine_reverberation_time(VOLUME, surfaces, air_attenuation=[0.001, 0.002])
 
 

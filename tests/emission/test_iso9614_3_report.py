@@ -723,14 +723,14 @@ def test_per_band_residual_index_is_ranged_in_the_strip(tmp_path: Path) -> None:
 def test_unknown_engine_rejected(tmp_path: Path) -> None:
     """An unknown rendering engine raises ValueError."""
     res = _determination()
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         res.report(str(tmp_path / "x.pdf"), engine="weasyprint")
 
 
 def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     res = _determination()
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language"):
         res.report(str(tmp_path / "bad.pdf"), language="xx")
 
 
@@ -738,7 +738,10 @@ def test_indicators_over_other_bands_rejected(tmp_path: Path) -> None:
     """Indicators measured over a different band set are refused, not printed."""
     res = _determination()
     other, _criteria = _qualification(np.full(3, 2.0), _FREQS[:3])
-    with pytest.raises(ValueError, match="indicators"):
+    with pytest.raises(
+        ValueError,
+        match=r"'indicators\.f_pi_unsigned' must span the \d+ bands of the determination",
+    ):
         res.report(str(tmp_path / "mismatch.pdf"), indicators=other)
 
 
@@ -746,12 +749,17 @@ def test_criteria_over_other_bands_rejected(tmp_path: Path) -> None:
     """Criteria evaluated over a different band set are refused too."""
     res = _determination()
     _indicators, other = _qualification(np.full(3, 2.0), _FREQS[:3])
-    with pytest.raises(ValueError, match="criteria"):
+    with pytest.raises(
+        ValueError,
+        match=r"'criteria\.criterion_1' must span the \d+ bands of the determination",
+    ):
         res.report(str(tmp_path / "mismatch.pdf"), criteria=other)
 
 
 def test_residual_index_over_other_bands_rejected(tmp_path: Path) -> None:
     """A per-band residual index must span the determination's bands."""
     res = _determination()
-    with pytest.raises(ValueError, match="residual_index"):
+    with pytest.raises(
+        ValueError, match=r"'residual_index' must be a scalar or span the \d+ bands"
+    ):
         res.report(str(tmp_path / "mismatch.pdf"), residual_index=[15.0, 15.0])

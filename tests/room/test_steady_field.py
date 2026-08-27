@@ -34,9 +34,9 @@ def test_room_constant_per_band() -> None:
 
 
 def test_room_constant_domain() -> None:
-    with pytest.raises(ValueError, match="strictly in"):
+    with pytest.raises(ValueError, match=r"'mean_absorption' must lie strictly in"):
         room.room_constant(100.0, 1.0)
-    with pytest.raises(ValueError, match="strictly in"):
+    with pytest.raises(ValueError, match=r"'mean_absorption' must lie strictly in"):
         room.room_constant(100.0, 0.0)
     with pytest.raises(ValueError, match="'surface_area' must be positive"):
         room.room_constant(-1.0, 0.2)
@@ -160,7 +160,7 @@ def test_steady_field_validation() -> None:
         room.steady_state_spl(90.0, -1.0, 25.0)
     with pytest.raises(ValueError, match="'room_constant' must be positive"):
         room.steady_state_spl(90.0, 1.0, -25.0)
-    with pytest.raises(ValueError, match="source_model"):
+    with pytest.raises(ValueError, match=r"'source_model' must be one of"):
         room.steady_state_spl(90.0, 1.0, 25.0, source_model="constant_intensity")
     with pytest.raises(ValueError, match="'reverberation_time' must be positive"):
         room.schroeder_frequency(-1.0, 200.0)

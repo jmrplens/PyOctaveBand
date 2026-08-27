@@ -43,7 +43,9 @@ def test_stable_tone_no_warning() -> None:
 
 def test_unstable_tone_warns() -> None:
     """5% AM -> ~0.4 dB fluctuation, far beyond the 0.10 dB class 1 limit."""
-    with pytest.warns(metrology.CalibrationWarning, match="fluctuation"):
+    with pytest.warns(
+        metrology.CalibrationWarning, match=r"Calibration tone level fluctuation is"
+    ):
         metrology.sensitivity(_cal_tone(am_depth=0.05), fs=FS)
 
 
@@ -60,7 +62,9 @@ def test_validation_needs_fs_and_is_skipped_without_it() -> None:
     on the `validate` row instead of only three lines above it.
     """
     unstable = _cal_tone(am_depth=0.05)
-    with pytest.warns(metrology.CalibrationWarning, match="fluctuation"):
+    with pytest.warns(
+        metrology.CalibrationWarning, match=r"Calibration tone level fluctuation is"
+    ):
         with_fs = metrology.sensitivity(unstable, fs=FS, validate=True)
     with _assert_no_calibration_warning():
         without_fs = metrology.sensitivity(unstable, validate=True)
@@ -76,7 +80,7 @@ def test_custom_fluctuation_limit() -> None:
 
 def test_empty_reference_raises() -> None:
     empty = np.array([])
-    with pytest.raises(ValueError, match="empty"):
+    with pytest.raises(ValueError, match=r"Reference signal is empty"):
         metrology.sensitivity(empty, fs=FS)
 
 
@@ -97,7 +101,9 @@ def test_default_limit_follows_iec_60942_2017_table2() -> None:
     within the 0.20 dB limit for a 31.5-63 Hz nominal frequency (Table 2).
     """
     x = _cal_tone(am_depth=0.015)
-    with pytest.warns(metrology.CalibrationWarning, match="Table 2"):
+    with pytest.warns(
+        metrology.CalibrationWarning, match=r"Calibration tone level fluctuation is"
+    ):
         metrology.sensitivity(x, fs=FS)
     with _assert_no_calibration_warning():
         metrology.sensitivity(x, fs=FS, frequency=50.0)
@@ -110,7 +116,9 @@ def test_asymmetric_fluctuation_uses_max_min_vs_mean() -> None:
     # 200 ms one-sided level dip of ~0.2 dB in the settled region
     i0, i1 = int(3.0 * FS), int(3.2 * FS)
     dip[i0:i1] = 10 ** (-0.2 / 20)
-    with pytest.warns(metrology.CalibrationWarning, match="fluctuation"):
+    with pytest.warns(
+        metrology.CalibrationWarning, match=r"Calibration tone level fluctuation is"
+    ):
         metrology.sensitivity(x * dip, fs=FS)
 
 
@@ -170,8 +178,12 @@ def test_sensitivity_rejects_non_finite_samples() -> None:
 
     sig = np.sin(2 * np.pi * 1000.0 * np.arange(4800) / 48000.0)
     sig[100] = np.nan
-    with pytest.raises(ValueError, match="non-finite"):
+    with pytest.raises(
+        ValueError, match=r"Reference signal contains non-finite samples"
+    ):
         metrology.sensitivity(sig, fs=48000)
     sig[100] = np.inf
-    with pytest.raises(ValueError, match="non-finite"):
+    with pytest.raises(
+        ValueError, match=r"Reference signal contains non-finite samples"
+    ):
         metrology.sensitivity(sig, fs=48000)

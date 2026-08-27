@@ -126,7 +126,9 @@ def test_farina_rejects_zero_padded_reference() -> None:
     # Pad the reference to the recording length, as one would for spectral.
     n = y.size + x.size - 1
     x_padded = np.concatenate([x, np.zeros(n - x.size)])
-    with pytest.raises(ValueError, match="zero-pad|unpadded|spectral"):
+    with pytest.raises(
+        ValueError, match=r"method='farina' requires the unpadded excitation sweep"
+    ):
         room.impulse_response(y, x_padded, FS, method="farina", f_range=(f1, f2))
     # The unpadded sweep still works unchanged.
     ir = room.impulse_response(
@@ -272,7 +274,9 @@ def test_mls_short_period_aliasing_warns() -> None:
     for i in range(h.size):
         hh[i % length] += h[i]  # circular wrap into one period
     y = np.real(np.fft.ifft(np.fft.fft(a) * np.fft.fft(hh)))
-    with pytest.warns(UserWarning, match="aliases"):
+    with pytest.warns(
+        UserWarning, match=r"likely longer than one period and aliases circularly"
+    ):
         room.mls_impulse_response(y, a)
 
 
@@ -343,7 +347,7 @@ def test_invalid_arguments() -> None:
         room.sweep_signal(FS, 100.0, 100.0, 1.0)  # f1 == f2
     with pytest.raises(ValueError, match="f2 must be greater than f1"):
         room.sweep_signal(FS, 100.0, 50.0, 1.0)  # f1 > f2
-    with pytest.raises(ValueError, match="must not exceed the Nyquist frequency"):
+    with pytest.raises(ValueError, match="f2 must not exceed the Nyquist frequency"):
         room.sweep_signal(FS, 20.0, 30000.0, 1.0)  # f2 > Nyquist
     with pytest.raises(ValueError, match="order must be one of"):
         room.mls_signal(1)  # order too small
@@ -352,7 +356,7 @@ def test_invalid_arguments() -> None:
     ten = np.zeros(10)
     with pytest.raises(ValueError, match="unknown method"):
         room.impulse_response(ten, ten, FS, method="bogus")
-    with pytest.raises(ValueError, match="requires f_range"):
+    with pytest.raises(ValueError, match=r"method='farina' requires f_range"):
         room.impulse_response(ten, ten, FS, method="farina")  # no f_range
     seq = room.mls_signal(4)
     with pytest.raises(
@@ -542,10 +546,10 @@ def test_plot_excitation_short_and_empty_guards() -> None:
 
     # Empty inputs raise a clear error rather than a cryptic reduction failure.
     empty = np.array([])
-    with pytest.raises(ValueError, match="empty"):
+    with pytest.raises(ValueError, match=r"excitation signal is empty"):
         room.plot_excitation(empty, FS, kind="mls")
     empty_result = room.ImpulseResponseResult(ir=empty, fs=FS, method="spectral")
-    with pytest.raises(ValueError, match="empty"):
+    with pytest.raises(ValueError, match=r"impulse response is empty"):
         empty_result.plot()
 
 

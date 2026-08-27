@@ -166,19 +166,34 @@ def test_dual_number_verification_uses_separately_rounded_values() -> None:
 
 def test_emission_pressure_pair_must_be_given_together() -> None:
     """A lone emission-pressure level (no uncertainty) is rejected."""
-    with pytest.raises(ValueError, match="given together"):
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"emission_pressure_level and emission_pressure_uncertainty"
+            r" must be given together"
+        ),
+    ):
         emission.OperatingModeDeclaration("m", 88.0, 2.0, emission_pressure_level=78.0)
 
 
 def test_negative_uncertainty_is_rejected() -> None:
     """The uncertainty K must be finite and non-negative."""
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"OperatingModeDeclaration\.sound_power_uncertainty"
+            r" must be finite and non-negative"
+        ),
+    ):
         emission.OperatingModeDeclaration("m", 88.0, -1.0)
 
 
 def test_non_finite_level_is_rejected() -> None:
     """A non-finite sound power level is rejected."""
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(
+        ValueError,
+        match=r"OperatingModeDeclaration\.sound_power_level must be finite",
+    ):
         emission.OperatingModeDeclaration("m", math.nan, 2.0)
 
 
@@ -191,7 +206,7 @@ def test_declaration_requires_at_least_one_mode() -> None:
 def test_unknown_form_is_rejected() -> None:
     """An unknown declaration form is rejected."""
     modes = _annex_b_modes()
-    with pytest.raises(ValueError, match="dual-number"):
+    with pytest.raises(ValueError, match=r"NoiseEmissionDeclaration\.form must be"):
         emission.NoiseEmissionDeclaration(modes, form="triple")  # type: ignore[arg-type]
 
 
@@ -346,14 +361,14 @@ def test_unknown_engine_rejected(tmp_path: Path) -> None:
     pytest.importorskip("reportlab")
     decl = _annex_b_declaration()
     out = str(tmp_path / "x.pdf")
-    with pytest.raises(ValueError, match="engine"):
+    with pytest.raises(ValueError, match=r"Unknown report engine"):
         decl.report(out, engine="weasyprint")
 
 
 def test_unknown_language_rejected(tmp_path: Path) -> None:
     """An unknown fiche language raises ValueError."""
     decl = _annex_b_declaration()
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language"):
         decl.report(str(tmp_path / "bad.pdf"), language="xx")
 
 

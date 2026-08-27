@@ -165,9 +165,9 @@ def test_plate_bending_wave_speed() -> None:
 # Validation.
 # ---------------------------------------------------------------------------
 def test_rejects_non_positive() -> None:
-    with pytest.raises(ValueError, match="bending_stiffness"):
+    with pytest.raises(ValueError, match=r"'bending_stiffness' must be positive"):
         vibration.infinite_plate_impedance(-1.0, M2)
-    with pytest.raises(ValueError, match="location"):
+    with pytest.raises(ValueError, match=r"'location' must be"):
         vibration.infinite_plate_impedance(BP, M2, location="corner")
-    with pytest.raises(ValueError, match="frequency"):
+    with pytest.raises(ValueError, match=r"'frequency' must be positive"):
         vibration.infinite_beam_mobility(0.0, B_BEAM, M1)

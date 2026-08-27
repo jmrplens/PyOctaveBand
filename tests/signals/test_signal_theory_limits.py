@@ -113,7 +113,13 @@ def test_multichannel_mismatched_lengths() -> None:
     # Numpy arrays must have rectangular shape, so we test with a list of lists of different lengths
     x = [[1.0, 2.0, 3.0], [1.0, 2.0]]
     # This should probably raise an error or handle it via numpy's default behavior
-    with pytest.raises((ValueError, TypeError)):
+    # The TypeError arm never fired and is gone: a tuple arm that cannot happen
+    # only widens what the block accepts. The wording below is NUMPY's, not
+    # ours, which is the one case where pinning a foreign message is the lesser
+    # evil: nothing here refuses the ragged input itself. If the library ever
+    # validates it and raises its own ValueError, this test should fail and be
+    # rewritten around that message, because its premise will have changed.
+    with pytest.raises(ValueError, match=r"setting an array element with a sequence"):
         # type ignore because list of lists of floats is technically not what we hint, but what user might pass
         filters.octave_filter(x, fs)  # type: ignore
 

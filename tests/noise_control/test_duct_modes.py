@@ -106,12 +106,17 @@ def test_plane_wave_limit_accepts_area_and_rectangle() -> None:
 
 
 def test_plane_wave_limit_requires_a_cross_section() -> None:
-    with pytest.raises(ValueError, match="diameter"):
+    with pytest.raises(
+        ValueError, match=r"give 'diameter', or both 'width' and 'height', or 'area'"
+    ):
         duct_modes.plane_wave_limit()
 
 
 def test_warn_above_plane_wave_limit() -> None:
-    with pytest.warns(duct_modes.PlaneWaveWarning, match="264 Hz"):
+    with pytest.warns(
+        duct_modes.PlaneWaveWarning,
+        match=r"test duct: .* above the first duct cut-on frequency",
+    ):
         mask = duct_modes.warn_above_plane_wave_limit(
             [125.0, 250.0, 500.0, 1000.0], 263.6, "test duct"
         )
@@ -128,11 +133,17 @@ def test_no_warning_below_the_limit() -> None:
 @pytest.mark.parametrize(
     ("kwargs", "match"),
     [
-        ({"diameter": 0.0}, "diameter"),
-        ({"diameter": 0.2, "flow_velocity": -1.0}, "flow_velocity"),
-        ({"diameter": 0.2, "flow_velocity": 400.0}, "subsonic"),
-        ({"diameter": 0.2, "count": 0}, "count"),
-        ({"diameter": 0.2, "count": 13}, "count"),
+        ({"diameter": 0.0}, r"'diameter' must be positive"),
+        (
+            {"diameter": 0.2, "flow_velocity": -1.0},
+            r"'flow_velocity' must be non-negative",
+        ),
+        (
+            {"diameter": 0.2, "flow_velocity": 400.0},
+            r"'flow_velocity' must be subsonic",
+        ),
+        ({"diameter": 0.2, "count": 0}, r"'count' must be between"),
+        ({"diameter": 0.2, "count": 13}, r"'count' must be between"),
     ],
 )
 def test_circular_validation(kwargs: dict[str, float], match: str) -> None:
@@ -143,10 +154,13 @@ def test_circular_validation(kwargs: dict[str, float], match: str) -> None:
 @pytest.mark.parametrize(
     ("kwargs", "match"),
     [
-        ({"width": 0.0, "height": 0.4}, "width"),
-        ({"width": 0.65, "height": -0.4}, "height"),
-        ({"width": 0.65, "height": 0.4, "count": 0}, "count"),
-        ({"width": 0.65, "height": 0.4, "flow_velocity": 400.0}, "subsonic"),
+        ({"width": 0.0, "height": 0.4}, r"'width' must be positive"),
+        ({"width": 0.65, "height": -0.4}, r"'height' must be positive"),
+        ({"width": 0.65, "height": 0.4, "count": 0}, r"'count' must be at least"),
+        (
+            {"width": 0.65, "height": 0.4, "flow_velocity": 400.0},
+            r"'flow_velocity' must be subsonic",
+        ),
     ],
 )
 def test_rectangular_validation(kwargs: dict[str, float], match: str) -> None:
@@ -178,7 +192,7 @@ def test_plot_draws_both_ladders_and_shades_the_plane_wave_band() -> None:
 def test_plot_language_is_validated() -> None:
     pytest.importorskip("matplotlib")
     res = duct_modes.rectangular_duct_cut_on(0.65, 0.4)
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language 'xx'"):
         res.plot(language="xx")
 
 

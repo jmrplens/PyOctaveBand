@@ -244,6 +244,11 @@ def test_extended_tube_straight_section_excludes_the_extensions() -> None:
     assert not np.allclose(result.transmission_loss, by_hand(length), atol=1.0)
 
 
+_OVERLAPPING_EXTENSIONS = (
+    r"the inlet and outlet extensions cannot together exceed the chamber length"
+)
+
+
 def test_extended_tube_extensions_may_meet_but_not_overlap() -> None:
     # Extensions that meet leave no straight section: the cascade degenerates
     # to the two annular branches shunting the same plane, which is finite and
@@ -263,7 +268,7 @@ def test_extended_tube_extensions_may_meet_but_not_overlap() -> None:
         outlet_area=0.01,
     )
     assert meeting.transmission_loss == pytest.approx(by_hand, abs=1e-9)
-    with pytest.raises(ValueError, match="negative length"):
+    with pytest.raises(ValueError, match=_OVERLAPPING_EXTENSIONS):
         sl.extended_tube_chamber(
             f, 0.5, 0.04, 0.01, inlet_extension=0.3, outlet_extension=0.3
         )
@@ -281,7 +286,7 @@ def test_extensions_that_meet_only_in_decimal_are_still_accepted() -> None:
     assert np.all(np.isfinite(meeting.transmission_loss))
     # An overlap far below any drawn dimension, and far above the arithmetic,
     # is still an overlap.
-    with pytest.raises(ValueError, match="negative length"):
+    with pytest.raises(ValueError, match=_OVERLAPPING_EXTENSIONS):
         sl.extended_tube_chamber(
             f, 0.3, 0.04, 0.01, inlet_extension=0.1, outlet_extension=0.2 + 1e-6
         )
@@ -314,11 +319,11 @@ def test_insertion_loss_impedance_off_the_grid_is_refused() -> None:
 
 
 def test_validation() -> None:
-    with pytest.raises(ValueError, match="'frequencies' must be positive"):
+    with pytest.raises(ValueError, match="'frequencies' must be positive and finite"):
         sl.expansion_chamber([0.0], 0.3, 0.04, 0.01)
     with pytest.raises(ValueError, match="'chamber_area' must be positive"):
         sl.expansion_chamber([100.0], 0.3, -0.04, 0.01)
-    with pytest.raises(ValueError, match="must exceed"):
+    with pytest.raises(ValueError, match=r"'chamber_area' must exceed 'pipe_area'"):
         sl.extended_tube_chamber([100.0], 0.3, 0.01, 0.02)
 
 

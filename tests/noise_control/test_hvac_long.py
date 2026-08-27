@@ -106,9 +106,9 @@ def test_fan_casing_attenuation_table_13_8() -> None:
 @pytest.mark.parametrize(
     ("kwargs", "match"),
     [
-        ({"fan_type": "turbine"}, "fan_type"),
-        ({"relative_efficiency": 0.0}, "relative_efficiency"),
-        ({"relative_efficiency": 101.0}, "100"),
+        ({"fan_type": "turbine"}, r"'fan_type' must be one of"),
+        ({"relative_efficiency": 0.0}, r"'relative_efficiency' must be positive"),
+        ({"relative_efficiency": 101.0}, r"'relative_efficiency' must not exceed"),
     ],
 )
 def test_fan_sound_power_validation(kwargs: dict[str, object], match: str) -> None:
@@ -117,7 +117,7 @@ def test_fan_sound_power_validation(kwargs: dict[str, object], match: str) -> No
 
 
 def test_blade_passing_frequency_validation() -> None:
-    with pytest.raises(ValueError, match="blades"):
+    with pytest.raises(ValueError, match=r"'blades' must be a positive integer"):
         hvac.blade_passing_frequency(1200.0, 0)
 
 
@@ -332,7 +332,7 @@ def test_end_reflection_methods_agree_within_a_few_decibels() -> None:
 
 
 def test_end_reflection_unknown_method() -> None:
-    with pytest.raises(ValueError, match="method"):
+    with pytest.raises(ValueError, match=r"'method' must be one of"):
         hvac.end_reflection_loss([125.0], 0.3, method="ashrae")
 
 
@@ -363,9 +363,9 @@ def test_split_loss_eq_14_17_with_area_mismatch() -> None:
 @pytest.mark.parametrize(
     ("args", "match"),
     [
-        ((0.0, [0.1]), "main_area"),
-        ((0.6, []), "branch_areas"),
-        ((0.6, [0.1, -0.2]), "positive"),
+        ((0.0, [0.1]), r"'main_area' must be positive"),
+        ((0.6, []), r"'branch_areas' must be a non-empty"),
+        ((0.6, [0.1, -0.2]), r"'branch_areas' must be positive"),
     ],
 )
 def test_split_loss_validation(args: tuple[object, ...], match: str) -> None:
@@ -374,7 +374,7 @@ def test_split_loss_validation(args: tuple[object, ...], match: str) -> None:
 
 
 def test_split_loss_branch_index_out_of_range() -> None:
-    with pytest.raises(ValueError, match="branch"):
+    with pytest.raises(ValueError, match=r"'branch' must index 'branch_areas'"):
         hvac.split_loss(0.6, [0.3, 0.3], branch=2)
 
 
@@ -403,7 +403,7 @@ def test_silencer_self_noise_velocity_exponent() -> None:
 
 
 def test_silencer_self_noise_requires_passages() -> None:
-    with pytest.raises(ValueError, match="passages"):
+    with pytest.raises(ValueError, match=r"'passages' must be a positive integer"):
         hvac.silencer_self_noise(None, 10.0, 0, 0.9)
 
 
@@ -449,9 +449,9 @@ def test_splitter_silencer_combines_by_eq_8_241() -> None:
 @pytest.mark.parametrize(
     ("args", "match"),
     [
-        ((None, 0.6, 1.5, [], 0.2), "airway_widths"),
-        ((None, 0.6, 1.5, [0.1, 0.0], 0.2), "positive"),
-        ((None, 0.6, 1.5, 0.1, 0.0), "splitter_thickness"),
+        ((None, 0.6, 1.5, [], 0.2), r"'airway_widths' must be a non-empty"),
+        ((None, 0.6, 1.5, [0.1, 0.0], 0.2), r"'airway_widths' must be positive"),
+        ((None, 0.6, 1.5, 0.1, 0.0), r"'splitter_thickness' must be positive"),
     ],
 )
 def test_splitter_silencer_validation(args: tuple[object, ...], match: str) -> None:
@@ -560,11 +560,11 @@ def test_diffuser_sound_power_counts_identical_devices() -> None:
 @pytest.mark.parametrize(
     ("kwargs", "match"),
     [
-        ({"face_area": 0.0}, "face_area"),
-        ({"volume_flow": 0.0}, "volume_flow"),
-        ({"pressure_drop": -1.0}, "pressure_drop"),
-        ({"shape": "slot"}, "shape"),
-        ({"count": 0}, "count"),
+        ({"face_area": 0.0}, r"'face_area' must be positive"),
+        ({"volume_flow": 0.0}, r"'volume_flow' must be positive"),
+        ({"pressure_drop": -1.0}, r"'pressure_drop' must be positive"),
+        ({"shape": "slot"}, r"'shape' must be one of"),
+        ({"count": 0}, r"'count' must be a positive integer"),
         ({"count": 1.5}, "'count' must be a positive integer"),
     ],
 )
@@ -598,9 +598,9 @@ def test_air_terminal_velocity_limit_ashrae_table_9(
 
 
 def test_air_terminal_velocity_limit_validation() -> None:
-    with pytest.raises(ValueError, match="design_criterion"):
+    with pytest.raises(ValueError, match=r"'design_criterion' must be one of"):
         hvac.air_terminal_velocity_limit(20)
-    with pytest.raises(ValueError, match="opening"):
+    with pytest.raises(ValueError, match=r"'opening' must be one of"):
         hvac.air_terminal_velocity_limit(30, opening="exhaust")
 
 
@@ -635,9 +635,9 @@ def test_air_terminal_damper_correction_ashrae_table_10(
 
 
 def test_air_terminal_damper_correction_validation() -> None:
-    with pytest.raises(ValueError, match="pressure_ratio"):
+    with pytest.raises(ValueError, match=r"'pressure_ratio' must be positive"):
         hvac.air_terminal_damper_correction(0.0)
-    with pytest.raises(ValueError, match="location"):
+    with pytest.raises(ValueError, match=r"'location' must be one of"):
         hvac.air_terminal_damper_correction(3.0, location="fan")
 
 
@@ -664,9 +664,11 @@ def test_room_effect_accepts_a_per_band_room_constant() -> None:
 
 
 def test_room_effect_validation() -> None:
-    with pytest.raises(ValueError, match="distance"):
+    with pytest.raises(ValueError, match=r"'distance' must be positive"):
         hvac.room_effect(0.0, 50.0)
-    with pytest.raises(ValueError, match="room_constant"):
+    with pytest.raises(
+        ValueError, match=r"'room_constant' must be positive and finite"
+    ):
         hvac.room_effect(3.0, 0.0)
 
 

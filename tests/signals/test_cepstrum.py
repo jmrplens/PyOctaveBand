@@ -149,7 +149,7 @@ def test_complex_cepstrum_round_trip_is_exact() -> None:
 
 def test_only_the_complex_cepstrum_inverts() -> None:
     res = ph.signals.cepstrum(_impulse_echo(), FS, kind="power")
-    with pytest.raises(ValueError, match="invertible"):
+    with pytest.raises(ValueError, match=r"Only the complex cepstrum is invertible"):
         res.invert()
 
 
@@ -232,9 +232,9 @@ def test_echo_detection_search_band_is_respected() -> None:
 
 def test_echo_detection_rejects_bad_band() -> None:
     x = _impulse_echo()
-    with pytest.raises(ValueError, match="search band"):
+    with pytest.raises(ValueError, match=r"quefrency search band must satisfy"):
         ph.signals.echo_detection(x, FS, min_quefrency=0.1, max_quefrency=0.05)
-    with pytest.raises(ValueError, match="search band"):
+    with pytest.raises(ValueError, match=r"quefrency search band must satisfy"):
         ph.signals.echo_detection(x, FS, max_quefrency=1.0)
 
 
@@ -275,11 +275,11 @@ def test_lifter_modes_are_exactly_complementary() -> None:
 
 def test_lifter_validates_inputs() -> None:
     x = _impulse_echo()
-    with pytest.raises(ValueError, match="mode"):
+    with pytest.raises(ValueError, match=r"'mode' must be 'lowpass'"):
         ph.signals.lifter(x, FS, cutoff=0.01, mode="bandpass")
-    with pytest.raises(ValueError, match="cutoff"):
+    with pytest.raises(ValueError, match=r"'cutoff' must resolve to"):
         ph.signals.lifter(x, FS, cutoff=10.0)  # beyond nfft/2
-    with pytest.raises(ValueError, match="cutoff"):
+    with pytest.raises(ValueError, match=r"'cutoff' must resolve to"):
         ph.signals.lifter(x, FS, cutoff=1e-9)  # below one sample
 
 
@@ -290,25 +290,25 @@ def test_lifter_validates_inputs() -> None:
 
 def test_cepstrum_validates_inputs() -> None:
     x = _impulse_echo()
-    with pytest.raises(ValueError, match="kind"):
+    with pytest.raises(ValueError, match=r"'kind' must be one of"):
         ph.signals.cepstrum(x, FS, kind="cheese")
-    with pytest.raises(ValueError, match="nfft"):
+    with pytest.raises(ValueError, match=r"'nfft' must be at least the record length"):
         ph.signals.cepstrum(x, FS, nfft=N - 2)
-    with pytest.raises(ValueError, match="even"):
+    with pytest.raises(ValueError, match=r"'nfft' must be even"):
         ph.signals.cepstrum(x, FS, nfft=N + 1)
-    with pytest.raises(ValueError, match="fs"):
+    with pytest.raises(ValueError, match=r"'fs' must be a positive, finite number"):
         ph.signals.cepstrum(x, 0.0)
     silence = np.zeros(N)
-    with pytest.raises(ValueError, match="identically zero"):
+    with pytest.raises(ValueError, match=r"'x' must not be identically zero"):
         ph.signals.cepstrum(silence, FS)
 
 
 def test_results_are_frozen() -> None:
     res = ph.signals.cepstrum(_impulse_echo(), FS)
-    with pytest.raises(AttributeError):
+    with pytest.raises(dataclasses.FrozenInstanceError):
         res.kind = "real"  # type: ignore[misc]
     echo = ph.signals.echo_detection(_impulse_echo(), FS)
-    with pytest.raises(AttributeError):
+    with pytest.raises(dataclasses.FrozenInstanceError):
         echo.delay = 0.0  # type: ignore[misc]
 
 
@@ -486,6 +486,6 @@ def test_lifter_plot_two_panels_and_external_ax() -> None:
 
 def test_plot_rejects_unknown_language() -> None:
     res = ph.signals.cepstrum(_impulse_echo(), FS)
-    with pytest.raises(ValueError, match="language"):
+    with pytest.raises(ValueError, match=r"Unknown language"):
         res.plot(language="xx")
     plt.close("all")

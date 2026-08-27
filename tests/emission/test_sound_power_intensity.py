@@ -439,7 +439,10 @@ def test_a_weighted_total_omits_band_failing_criterion_2_engineering() -> None:
         [np.full(4, 1.0e-3), np.array([5.0e-3, -1.0e-3, 1.0e-3, -1.0e-3])]
     )
     lp = np.full((4, 2), 92.0)  # FpI ~ 2 dB in both bands: criterion 1 passes
-    with pytest.warns(emission.SoundPowerWarning, match="criterion 2"):
+    with pytest.warns(
+        emission.SoundPowerWarning,
+        match=r"criterion 2 is not satisfied and the engineering grade is not achieved",
+    ):
         res = emission.sound_power_intensity(
             intensity,
             areas,
@@ -481,7 +484,10 @@ def test_a_weighting_screening_unavailable_warns_and_sums_all() -> None:
     """
     areas = np.ones(4)
     intensity = np.column_stack([np.full(4, 1.0e-3), np.full(4, 5.0e-4)])
-    with pytest.warns(emission.SoundPowerWarning, match="10.6 b"):
+    with pytest.warns(
+        emission.SoundPowerWarning,
+        match=r"A-weighted total sums every determinable band",
+    ):
         res = emission.sound_power_intensity(
             intensity, areas, frequencies=np.array([500.0, 1000.0])
         )
@@ -588,7 +594,8 @@ def test_a_per_band_quantity_off_the_band_axis_is_refused(
     result = _five_band_determination()
     values = np.asarray(getattr(result, field_name))
     wrong = values[:-1] if trim else np.append(values, values[-1])
-    with pytest.raises(ValueError, match=f"'{field_name}'"):
+    count = 4 if trim else 6  # the five-band fixture, one short or one long
+    with pytest.raises(ValueError, match=rf"'{field_name}' \({count}\)"):
         dataclasses.replace(result, **{field_name: wrong})
 
 
@@ -597,7 +604,10 @@ def test_a_per_segment_quantity_off_the_segment_axis_is_refused() -> None:
     import dataclasses
 
     result = _five_band_determination()
-    with pytest.raises(ValueError, match="measurement segment"):
+    with pytest.raises(
+        ValueError,
+        match=r"'repeatability' \(3\)",
+    ):
         dataclasses.replace(result, repeatability=result.repeatability[:-1])
 
 

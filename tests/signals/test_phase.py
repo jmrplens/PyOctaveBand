@@ -214,22 +214,24 @@ def test_phase_referenced_to_dc() -> None:
 def test_validation_errors() -> None:
     good = _biquad_response()
     two_dimensional = good.reshape(1, -1)
-    with pytest.raises(ValueError, match="one-dimensional"):
+    with pytest.raises(ValueError, match=r"'response' must be one-dimensional"):
         ph.signals.minimum_phase(two_dimensional)
     too_short = good[:4]
-    with pytest.raises(ValueError, match="at least"):
+    with pytest.raises(
+        ValueError, match=r"'response' must have at least .* frequency bins"
+    ):
         ph.signals.minimum_phase(too_short)
     not_finite = np.full(64, np.nan + 0j)
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'response' must be finite"):
         ph.signals.minimum_phase(not_finite)
     all_zero = np.zeros(64)
-    with pytest.raises(ValueError, match="identically zero"):
+    with pytest.raises(ValueError, match=r"'response' must not be identically zero"):
         ph.signals.minimum_phase(all_zero)
-    with pytest.raises(ValueError, match="oversample"):
+    with pytest.raises(ValueError, match=r"'oversample' must be a positive integer"):
         ph.signals.minimum_phase(good, oversample=0)
-    with pytest.raises(ValueError, match="fs"):
+    with pytest.raises(ValueError, match=r"'fs' must be a positive, finite number"):
         ph.signals.group_delay(good, -1.0)
-    with pytest.raises(ValueError, match="fs"):
+    with pytest.raises(ValueError, match=r"'fs' must be a positive, finite number"):
         ph.signals.phase_decomposition(good, 0.0)
 
 

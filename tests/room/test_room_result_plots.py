@@ -152,5 +152,7 @@ def test_open_plan_plot_without_regression_raises() -> None:
     bare = ph.room.OpenPlanResult(
         d2s=float("nan"), lp_as_4m=float("nan"), rd=float("nan"), rp=float("nan")
     )
-    with pytest.raises(ValueError, match="regression"):
+    with pytest.raises(
+        ValueError, match=r"plot\(\) needs the spatial-decay regression"
+    ):
         bare.plot()

@@ -69,7 +69,7 @@ def test_golay_pair_is_bipolar() -> None:
 
 @pytest.mark.parametrize("order", [0, -3, 23])
 def test_golay_pair_rejects_bad_order(order: int) -> None:
-    with pytest.raises(ValueError, match="order"):
+    with pytest.raises(ValueError, match=r"order must be between"):
         room.golay_pair(order)
 
 
@@ -141,7 +141,10 @@ def test_alias_warning_when_ir_longer_than_period() -> None:
     pair = room.golay_pair(6)
     rec_a = _periodic_response(pair[0], b, a, periods=1)
     rec_b = _periodic_response(pair[1], b, a, periods=1)
-    with pytest.warns(ImpulseResponseWarning, match="Golay"):
+    with pytest.warns(
+        ImpulseResponseWarning,
+        match=r"Recovered Golay impulse response still has energy near the end",
+    ):
         room.golay_impulse_response(rec_a, rec_b, pair)
 
 
@@ -152,13 +155,17 @@ def test_input_validation() -> None:
     empty = np.zeros(0)
     truncated_pair = (pair[0], pair[1][:8])
     two_dim = np.zeros((2, 16))
-    with pytest.raises(ValueError, match="multiple"):
+    with pytest.raises(
+        ValueError, match=r"'recorded_a' length must be a positive multiple"
+    ):
         room.golay_impulse_response(non_multiple, valid, pair)
-    with pytest.raises(ValueError, match="multiple"):
+    with pytest.raises(
+        ValueError, match=r"'recorded_b' length must be a positive multiple"
+    ):
         room.golay_impulse_response(valid, empty, pair)
-    with pytest.raises(ValueError, match="equal-length"):
+    with pytest.raises(ValueError, match=r"'pair' must hold two equal-length codes"):
         room.golay_impulse_response(valid, valid, truncated_pair)
-    with pytest.raises(ValueError, match="one-dimensional"):
+    with pytest.raises(ValueError, match=r"'recorded_a' must be one-dimensional"):
         room.golay_impulse_response(two_dim, valid, pair)
 
 

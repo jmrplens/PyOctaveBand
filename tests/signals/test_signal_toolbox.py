@@ -124,7 +124,9 @@ def test_tone_burst_incommensurate_frequency_warns() -> None:
     only for commensurate f/fs; otherwise a warning quantifies the
     residual step at the gate edge.
     """
-    with pytest.warns(ph.PhonometryWarning, match="incommensurate") as record:
+    with pytest.warns(
+        ph.PhonometryWarning, match=r"'frequency' .* is incommensurate with fs"
+    ) as record:
         res = ph.signals.tone_burst(FS, 997.0, 10)
     assert res.burst_samples == 481
     # The warning quantifies the exact span and the residual step at the
@@ -145,7 +147,9 @@ def test_tone_burst_invalid_config_raises_before_warning() -> None:
 
     with _warnings.catch_warnings():
         _warnings.simplefilter("error", ph.PhonometryWarning)
-        with pytest.raises(ValueError, match="repetition_rate"):
+        with pytest.raises(
+            ValueError, match=r"'repetition_rate' is required when 'repetitions' > 1"
+        ):
             ph.signals.tone_burst(FS, 997.0, 10, repetitions=2)
 
 
@@ -165,17 +169,25 @@ def test_tone_burst_result_is_frozen() -> None:
 
 
 def test_tone_burst_invalid_inputs() -> None:
-    with pytest.raises(ValueError, match="positive integer"):
+    with pytest.raises(ValueError, match=r"'cycles' must be a positive integer"):
         ph.signals.tone_burst(FS, 5000.0, 0)
-    with pytest.raises(ValueError, match="Nyquist"):
+    with pytest.raises(ValueError, match=r"'frequency' must be below the Nyquist rate"):
         ph.signals.tone_burst(FS, 24000.0, 10)
-    with pytest.raises(ValueError, match="repetition_rate"):
+    with pytest.raises(
+        ValueError, match=r"'repetition_rate' is required when 'repetitions' > 1"
+    ):
         ph.signals.tone_burst(FS, 5000.0, 25, repetitions=2)
-    with pytest.raises(ValueError, match="does not fit"):
+    with pytest.raises(
+        ValueError, match=r"The burst does not fit in one repetition period"
+    ):
         ph.signals.tone_burst(FS, 5000.0, 25, repetition_rate=300.0)
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(
+        ValueError, match=r"'pre_silence' must be a non-negative, finite number"
+    ):
         ph.signals.tone_burst(FS, 5000.0, 25, pre_silence=-1.0)
-    with pytest.raises(ValueError, match="positive, finite"):
+    with pytest.raises(
+        ValueError, match=r"'amplitude' must be a positive, finite number"
+    ):
         ph.signals.tone_burst(FS, 5000.0, 25, amplitude=0.0)
 
 
@@ -201,7 +213,9 @@ def test_tone_burst_gate_must_lie_on_the_record_it_gates() -> None:
         ("signal", np.column_stack([res.signal] * 2), one_axis),
     )
     for field, value, fragment in cases:
-        with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+        with pytest.raises(
+            ValueError, match=rf"ToneBurstResult: .*'{field}'.*{fragment}"
+        ):
             dataclasses.replace(res, **{field: value})
 
 
@@ -292,18 +306,18 @@ def test_identity_ratio_returns_copy_without_filtering() -> None:
 def test_irrational_ratio_raises() -> None:
     x = ph.signals.noise_signal(FS, 0.05, seed=4)
     fs_irrational = FS * np.sqrt(2.0)
-    with pytest.raises(ValueError, match="rational"):
+    with pytest.raises(ValueError, match=r"'fs_new'/'fs' = .* is not a rational ratio"):
         ph.signals.resample_signal(x, FS, fs_new=fs_irrational)
 
 
 def test_resample_invalid_parameters() -> None:
     x = ph.signals.noise_signal(FS, 0.05, seed=4)
     two_dimensional = np.zeros((4, 4))
-    with pytest.raises(ValueError, match="at least 30"):
+    with pytest.raises(ValueError, match=r"'stopband_attenuation_db' must be at least"):
         ph.signals.resample_signal(x, FS, fs_new=32000.0, stopband_attenuation_db=10.0)
-    with pytest.raises(ValueError, match="transition_width"):
+    with pytest.raises(ValueError, match=r"'transition_width' must be in"):
         ph.signals.resample_signal(x, FS, fs_new=32000.0, transition_width=0.9)
-    with pytest.raises(ValueError, match="one-dimensional"):
+    with pytest.raises(ValueError, match=r"'x' must be one-dimensional"):
         ph.signals.resample_signal(two_dimensional, FS, fs_new=32000.0)
 
 
@@ -326,7 +340,9 @@ def test_resampled_record_and_taps_must_each_be_flat() -> None:
         ("signal", np.column_stack([res.signal] * 2), one_axis),
     )
     for field, value, fragment in cases:
-        with pytest.raises(ValueError, match=rf"'{field}'.*{fragment}"):
+        with pytest.raises(
+            ValueError, match=rf"ResampledSignalResult: .*'{field}'.*{fragment}"
+        ):
             dataclasses.replace(res, **{field: value})
 
 
@@ -429,11 +445,13 @@ def test_fractional_delay_invalid_inputs() -> None:
     x = ph.signals.noise_signal(FS, 0.05, seed=11)
     full_length = float(x.size)
     two_dimensional = np.zeros((2, 8))
-    with pytest.raises(ValueError, match="mode"):
+    with pytest.raises(ValueError, match=r"'mode' must be 'linear'"):
         ph.signals.fractional_delay(x, 1.0, mode="wrap")  # type: ignore[arg-type]
-    with pytest.raises(ValueError, match="magnitude"):
+    with pytest.raises(
+        ValueError, match=r"'delay' magnitude must be smaller than the record length"
+    ):
         ph.signals.fractional_delay(x, full_length)
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'delay' must be a finite number"):
         ph.signals.fractional_delay(x, np.nan)
-    with pytest.raises(ValueError, match="one-dimensional"):
+    with pytest.raises(ValueError, match=r"'x' must be one-dimensional"):
         ph.signals.fractional_delay(two_dimensional, 1.0)

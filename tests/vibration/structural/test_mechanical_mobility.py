@@ -138,9 +138,17 @@ def test_unknown_frf_raises() -> None:
 
 def test_zero_value_reciprocal_conversion_raises() -> None:
     # A dead channel cannot be converted through a force-per-motion reciprocal.
-    with pytest.raises(ValueError, match="dead channel"):
+    with pytest.raises(
+        ValueError,
+        match=r"'value' contains zeros \(dead channel\); converting 'mobility' to "
+        r"'impedance'",
+    ):
         vibration.convert_frf(0.0, 100.0, "mobility", "impedance")
-    with pytest.raises(ValueError, match="dead channel"):
+    with pytest.raises(
+        ValueError,
+        match=r"'value' contains zeros \(dead channel\); converting 'impedance' to "
+        r"'mobility'",
+    ):
         vibration.convert_frf([1e-3, 0.0], 100.0, "impedance", "mobility")
     # Motion-per-force to motion-per-force tolerates zeros (0 maps to 0).
     out = vibration.convert_frf(0.0, 100.0, "mobility", "accelerance")
@@ -148,11 +156,14 @@ def test_zero_value_reciprocal_conversion_raises() -> None:
 
 
 def test_non_positive_frequency_raises() -> None:
-    with pytest.raises(ValueError, match="frequency"):
+    with pytest.raises(
+        ValueError,
+        match=r"'frequency' must be positive \(mobility conversions divide by omega\)",
+    ):
         vibration.convert_frf(1.0, 0.0, "receptance", "mobility")
-    with pytest.raises(ValueError, match="mass"):
+    with pytest.raises(ValueError, match=r"'mass' must be positive"):
         vibration.sdof_receptance(100.0, 0.0, K, C)
-    with pytest.raises(ValueError, match="damping"):
+    with pytest.raises(ValueError, match=r"'damping' must be non-negative"):
         vibration.sdof_receptance(100.0, M, K, -1.0)
 
 
@@ -197,18 +208,21 @@ def test_rigid_mass_calibration_accepts_complex_frf() -> None:
 
 
 def test_rigid_mass_calibration_validation() -> None:
-    with pytest.raises(ValueError, match="quantity"):
+    with pytest.raises(ValueError, match=r"'quantity' must be 'accelerance'"):
         vibration.rigid_mass_calibration_check(
             [0.1], [100.0], 10.0, quantity="receptance"
         )
-    with pytest.raises(ValueError, match="mass"):
+    with pytest.raises(ValueError, match=r"'mass' must be positive"):
         vibration.rigid_mass_calibration_check([0.1], [100.0], 0.0)
     with pytest.raises(
         ValueError,
         match=r"rigid_mass_calibration_check: 'frf'.*'frequencies'.*same shape",
     ):
         vibration.rigid_mass_calibration_check([0.1, 0.1], [100.0], 10.0)
-    with pytest.raises(ValueError, match="frequency"):
+    with pytest.raises(
+        ValueError,
+        match=r"'frequency' must be positive \(mobility conversions divide by omega\)",
+    ):
         vibration.rigid_mass_calibration_check([0.1], [0.0], 10.0)
 
 
@@ -225,7 +239,9 @@ def test_a_tolerance_mask_short_of_its_frequencies_is_refused() -> None:
     f = np.geomspace(20.0, 2000.0, 12)
     res = vibration.rigid_mass_calibration_check(np.full(12, 0.1), f, mass=10.0)
     short = res.within_tolerance[:8]
-    with pytest.raises(ValueError, match="'within_tolerance'"):
+    with pytest.raises(
+        ValueError, match=r"'within_tolerance' \(8\).*must each carry one value"
+    ):
         dataclasses.replace(res, within_tolerance=short)
 
 
@@ -251,11 +267,11 @@ def test_random_error_scales_with_averages() -> None:
 
 
 def test_random_error_validation() -> None:
-    with pytest.raises(ValueError, match="n_averages"):
+    with pytest.raises(ValueError, match=r"'n_averages' must be at least 1"):
         vibration.random_error_percent(0.8, 0)
-    with pytest.raises(ValueError, match="coherence"):
+    with pytest.raises(ValueError, match=r"'coherence' must lie in \(0, 1\]"):
         vibration.random_error_percent(0.0, 10)
-    with pytest.raises(ValueError, match="coherence"):
+    with pytest.raises(ValueError, match=r"'coherence' must lie in \(0, 1\]"):
         vibration.random_error_percent(1.2, 10)
 
 
@@ -285,7 +301,9 @@ def test_a_mobility_short_of_its_frequencies_is_refused() -> None:
     """
     res = vibration.sdof_mobility_result(np.linspace(1.0, 50.0, 40), M, K, C)
     short = res.mobility[:-1]
-    with pytest.raises(ValueError, match="'mobility'"):
+    with pytest.raises(
+        ValueError, match=r"'mobility' \(39\).*must each carry one value"
+    ):
         dataclasses.replace(res, mobility=short)
 
 
@@ -314,7 +332,10 @@ def test_a_non_finite_frf_value_is_refused(field_name: str, bad: complex) -> Non
     res = vibration.sdof_mobility_result(np.linspace(1.0, 50.0, 40), M, K, C)
     values = np.asarray(getattr(res, field_name)).copy()
     values[20] = bad
-    with pytest.raises(ValueError, match=f"MobilityResult: '{field_name}'"):
+    with pytest.raises(
+        ValueError,
+        match=f"MobilityResult: '{field_name}' must contain only finite values",
+    ):
         dataclasses.replace(res, **{field_name: values})
 
 

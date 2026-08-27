@@ -152,15 +152,17 @@ def test_envelope_rejects_invalid_inputs() -> None:
     x, _ = _am(1000.0, 10.0, 0.5)
     two_dimensional = np.stack([x, x])
     non_finite = np.full(4096, np.nan)
-    with pytest.raises(ValueError, match="one-dimensional"):
+    with pytest.raises(ValueError, match=r"'x' must be one-dimensional"):
         ph.signals.envelope(two_dimensional, FS)
-    with pytest.raises(ValueError, match="'fs'"):
+    with pytest.raises(ValueError, match=r"'fs' must be a positive, finite number"):
         ph.signals.envelope(x, 0.0)
-    with pytest.raises(ValueError, match="decimation_factor"):
+    with pytest.raises(ValueError, match=r"'decimation_factor' must be a positive"):
         ph.signals.envelope(x, FS, decimation_factor=0)
-    with pytest.raises(ValueError, match="decimation_factor"):
+    with pytest.raises(
+        ValueError, match=r"'decimation_factor' must be smaller than the record length"
+    ):
         ph.signals.envelope(x, FS, decimation_factor=x.size)
-    with pytest.raises(ValueError, match="finite"):
+    with pytest.raises(ValueError, match=r"'x' must be finite"):
         ph.signals.envelope(non_finite, FS)
 
 
@@ -176,7 +178,7 @@ def test_short_record_antialiased_decimation_is_supported() -> None:
 
 def test_result_is_frozen() -> None:
     res = ph.signals.envelope(_tone(1000.0), FS)
-    with pytest.raises(AttributeError):
+    with pytest.raises(dataclasses.FrozenInstanceError):
         res.envelope = res.envelope * 2.0  # type: ignore[misc]
 
 
@@ -362,24 +364,26 @@ def test_envelope_spectrum_bandpass_prefilter_isolates_the_carrier() -> None:
 def test_envelope_spectrum_band_validation() -> None:
     x = _am_signal()
     for band in ((0.0, 100.0), (200.0, 100.0), (100.0, FS / 2.0)):
-        with pytest.raises(ValueError, match="band"):
+        with pytest.raises(
+            ValueError, match=r"'band' must satisfy 0 < low < high < fs/2"
+        ):
             ph.signals.envelope_spectrum(x, FS, band=band)
     # Malformed shapes: not exactly two numeric edges.
     for bad in ((700.0,), (700.0, 900.0, 1300.0), (700.0, None)):
-        with pytest.raises(ValueError, match="pair"):
+        with pytest.raises(ValueError, match=r"'band' must be a pair of numeric"):
             ph.signals.envelope_spectrum(x, FS, band=bad)  # type: ignore[arg-type]
     # A record shorter than the zero-phase padding fails informatively.
-    with pytest.raises(ValueError, match="too short"):
+    with pytest.raises(ValueError, match=r"Signal too short for an envelope spectrum"):
         ph.signals.envelope_spectrum(x[:20], FS, band=(700.0, 1300.0))
 
 
 def test_envelope_spectrum_validates_inputs() -> None:
     x = _am_signal()
-    with pytest.raises(ValueError, match="kind"):
+    with pytest.raises(ValueError, match=r"'kind' must be 'magnitude' or 'squared'"):
         ph.signals.envelope_spectrum(x, FS, kind="log")
-    with pytest.raises(ValueError, match="nfft"):
+    with pytest.raises(ValueError, match=r"'nfft' must be at least the record length"):
         ph.signals.envelope_spectrum(x, FS, nfft=100)
-    with pytest.raises(ValueError, match="fs"):
+    with pytest.raises(ValueError, match=r"'fs' must be a positive, finite number"):
         ph.signals.envelope_spectrum(x, -1.0)
 
 

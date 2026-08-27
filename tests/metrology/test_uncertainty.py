@@ -163,15 +163,15 @@ def test_monte_carlo_triangular_tiny_uncertainty() -> None:
 
 
 def test_invalid_inputs_raise() -> None:
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(ValueError, match=r"'uncertainty' must be non-negative"):
         u.Quantity(0.0, -1.0)
-    with pytest.raises(ValueError, match="distribution"):
+    with pytest.raises(ValueError, match=r"distribution must be one of"):
         u.Quantity(0.0, 1.0, "weird")
     with pytest.raises(ValueError, match="dof must be positive"):
         u.Quantity(0.0, 1.0, dof=0.0)
-    with pytest.raises(ValueError, match="at least one"):
+    with pytest.raises(ValueError, match="at least one input quantity is required"):
         u.combine_uncertainty(lambda: 0.0, [])
-    with pytest.raises(ValueError, match="coverage"):
+    with pytest.raises(ValueError, match=r"coverage must be in \(0, 1\)"):
         u.coverage_factor(1.5)
     pair = [u.Quantity(0, 1)] * 2
     wrong_shape = np.eye(3)
@@ -179,23 +179,23 @@ def test_invalid_inputs_raise() -> None:
     non_unit_diagonal = np.array([[1.0, 0.0], [0.0, 0.9]])
     # Symmetric, unit diagonal, but indefinite (|r| > 1).
     indefinite = np.array([[1.0, 1.5], [1.5, 1.0]])
-    with pytest.raises(ValueError, match="shape"):
+    with pytest.raises(ValueError, match=r"correlation must have shape"):
         u.combine_uncertainty(_add4, pair, correlation=wrong_shape)
-    with pytest.raises(ValueError, match="symmetric"):
+    with pytest.raises(ValueError, match=r"correlation matrix must be symmetric"):
         u.combine_uncertainty(_add2, pair, correlation=asymmetric)
-    with pytest.raises(ValueError, match="diagonal"):
+    with pytest.raises(ValueError, match=r"correlation matrix diagonal must be 1\.0"):
         u.combine_uncertainty(_add2, pair, correlation=non_unit_diagonal)
     with pytest.raises(ValueError, match="positive semi-definite"):
         u.combine_uncertainty(_add2, pair, correlation=indefinite)
     quantities = [u.Quantity(0, 1)]
-    with pytest.raises(ValueError, match="trials"):
+    with pytest.raises(ValueError, match=r"trials must be at least 2"):
         u.monte_carlo(_add4, quantities, trials=0)
-    with pytest.raises(ValueError, match="at least 2"):
+    with pytest.raises(ValueError, match=r"trials must be at least 2"):
         # trials=1 used to return NaN (ddof=1) with a raw numpy warning.
         u.monte_carlo(_add4, quantities, trials=1)
-    with pytest.raises(ValueError, match="coverage"):
+    with pytest.raises(ValueError, match=r"coverage must be in \(0, 1\)"):
         u.monte_carlo(_add4, quantities, coverage=2.0)
-    with pytest.raises(ValueError, match="at least one"):
+    with pytest.raises(ValueError, match="at least one input quantity is required"):
         u.monte_carlo(_add4, [])
 
 
@@ -223,7 +223,10 @@ def test_correlated_budget_requires_explicit_coverage_factor() -> None:
     """
     qs = [u.Quantity(10.0, 0.1, dof=5), u.Quantity(10.0, 0.1, dof=5)]
     r = np.array([[1.0, 0.999], [0.999, 1.0]])
-    with pytest.warns(u.UncertaintyWarning, match="Welch-Satterthwaite"):
+    with pytest.warns(
+        u.UncertaintyWarning,
+        match=r"Welch-Satterthwaite.*is defined for independent inputs",
+    ):
         result = u.combine_uncertainty(lambda a, b: a - b, qs, correlation=r)
     assert math.isnan(result.effective_dof)
     # uc = sqrt(2*(1-r)) * 0.1 ~ 0.00447; sane (was ~1e149 via the
@@ -231,7 +234,13 @@ def test_correlated_budget_requires_explicit_coverage_factor() -> None:
     assert result.combined_uncertainty == pytest.approx(
         0.1 * math.sqrt(2.0 * (1.0 - 0.999)), rel=1e-6
     )
-    with pytest.raises(ValueError, match="coverage_factor_override"):
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"effective degrees of freedom are undefined for a correlated budget"
+            r".*pass an explicit coverage_factor_override"
+        ),
+    ):
         result.expanded(0.95)
     k, big = result.expanded(coverage_factor_override=2.0)
     assert k == 2.0
@@ -483,7 +492,10 @@ def test_undefined_effective_dof_is_not_a_non_finite_number() -> None:
     must keep asking for an explicit coverage factor there.
     """
     pair = [u.Quantity(0.0, 1.0, dof=5), u.Quantity(0.0, 1.0, dof=5)]
-    with pytest.warns(u.UncertaintyWarning, match="Welch-Satterthwaite"):
+    with pytest.warns(
+        u.UncertaintyWarning,
+        match=r"Welch-Satterthwaite.*is defined for independent inputs",
+    ):
         correlated = u.combine_uncertainty(
             _add2, pair, correlation=np.array([[1.0, 0.5], [0.5, 1.0]])
         )
@@ -546,5 +558,8 @@ def test_monte_carlo_rejects_model_with_non_finite_output() -> None:
         return np.where(x < 0.0, np.nan, 0.0)
 
     inputs = [u.Quantity(0.0, 1.0, name="x")]
-    with pytest.raises(ValueError, match=r"'model' returned a non-finite output"):
+    with pytest.raises(
+        ValueError,
+        match=r"'model' returned a non-finite output for \d+ of \d+ trials",
+    ):
         u.monte_carlo(partial_model, inputs, trials=2000, seed=1)
