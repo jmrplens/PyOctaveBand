@@ -243,10 +243,14 @@ def test_non_finite_signal_raises() -> None:
     # washes out in the envelope stages and the result looks like silence).
     tone = _tone(1000.0, 60.0, 0.5)
     tone[100] = np.nan
-    with pytest.raises(ValueError, match="'signal_in' must be finite"):
+    with pytest.raises(
+        ValueError, match="'signal_in' must contain only finite samples"
+    ):
         psychoacoustics.roughness_ecma(tone, FS)
     tone[100] = np.inf
-    with pytest.raises(ValueError, match="'signal_in' must be finite"):
+    with pytest.raises(
+        ValueError, match="'signal_in' must contain only finite samples"
+    ):
         psychoacoustics.roughness_ecma(tone, FS)
 
 

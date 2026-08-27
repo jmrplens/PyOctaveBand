@@ -56,7 +56,6 @@ if TYPE_CHECKING:
 
 from .._internal.peaks import inter_sample_peak
 from .._internal.types import as_float_or_array
-from .._internal.utils import _typesignal
 from .._internal.validation import (
     check_engine,
     require_positive,
@@ -246,7 +245,7 @@ def k_weighting(x: SignalInput, fs: float | None = None) -> np.ndarray:
     :return: The K-weighted signal, same shape as the input.
     """
     fs = resolve_fs(x, fs)
-    x_proc = _typesignal(resolve_samples(x, calibrate=False))
+    x_proc = resolve_samples(x, calibrate=False)
     if x_proc.shape[-1] == 0:
         raise ValueError(_EMPTY_SIGNAL)
     (b1, a1), (b2, a2) = k_weighting_coefficients(fs)
@@ -621,7 +620,7 @@ def true_peak_level(
     ):
         msg = "oversample must be an integer >= 1."
         raise ValueError(msg)
-    x_proc = _typesignal(resolve_samples(x, calibrate=False))
+    x_proc = resolve_samples(x, calibrate=False)
     if x_proc.shape[-1] == 0:
         raise ValueError(_EMPTY_SIGNAL)
     peak = inter_sample_peak(x_proc, int(oversample))
@@ -675,18 +674,16 @@ def integrated_loudness(
 def _prepare_signal(
     x: SignalInput, weights: ArrayLike | None
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Coerce to 2D float64, reject empty/non-finite input, resolve weights.
+    """Coerce to 2D float64, reject an empty signal, resolve weights.
 
     A NaN or infinity anywhere in the signal would poison every gating
-    block, empty the gate and silently read as digital silence (-inf), so
-    non-finite input is rejected up front.
+    block, empty the gate and silently read as digital silence (-inf). The
+    refusal is :func:`~phonometry.io._resolve.resolve_samples`', one layer
+    down, where every entry point on the contract gets the same one.
     """
-    x_proc = np.atleast_2d(_typesignal(resolve_samples(x, calibrate=False)))
+    x_proc = np.atleast_2d(resolve_samples(x, calibrate=False))
     if x_proc.shape[-1] == 0:
         raise ValueError(_EMPTY_SIGNAL)
-    if not np.all(np.isfinite(x_proc)):
-        msg = "Input signal 'x' must be finite (no NaN/inf samples)."
-        raise ValueError(msg)
     return x_proc, _resolve_weights(x_proc.shape[0], weights)
 
 

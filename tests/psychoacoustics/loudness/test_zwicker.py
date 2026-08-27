@@ -529,9 +529,7 @@ def test_non_finite_inputs_rejected() -> None:
         psychoacoustics.loudness_zwicker_from_spectrum(levels)
     x = np.ones(1000)
     x[3] = np.inf
-    with pytest.raises(
-        ValueError, match=r"Input signal 'x' must contain only finite values"
-    ):
+    with pytest.raises(ValueError, match=r"'x' must contain only finite samples"):
         psychoacoustics.loudness_zwicker(x, FS)
 
 

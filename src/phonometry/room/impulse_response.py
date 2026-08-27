@@ -501,8 +501,8 @@ def impulse_response(
     fs = resolve_optional_pair_fs(
         recorded, reference, fs, names=("recorded", "reference")
     )
-    rec = apply_calibration(recorded, _typesignal(np.asarray(recorded)))
-    ref = _typesignal(np.asarray(reference))
+    rec = apply_calibration(recorded, _typesignal(recorded, name="recorded"))
+    ref = _typesignal(reference, name="reference")
     if rec.ndim != 1 or ref.ndim != 1:
         msg = "'recorded' and 'reference' must be one-dimensional."
         raise ValueError(msg)
@@ -617,8 +617,8 @@ def mls_impulse_response(
         a definitive aliasing diagnosis.
     """
     fs = resolve_optional_pair_fs(recorded, mls, fs, names=("recorded", "mls"))
-    rec = apply_calibration(recorded, _typesignal(np.asarray(recorded)))
-    seq = _typesignal(np.asarray(mls))
+    rec = apply_calibration(recorded, _typesignal(recorded, name="recorded"))
+    seq = _typesignal(mls, name="mls")
     if rec.ndim != 1 or seq.ndim != 1:
         msg = "'recorded' and 'mls' must be one-dimensional."
         raise ValueError(msg)
@@ -783,7 +783,7 @@ def golay_impulse_response(
     fs = resolve_optional_pair_fs(
         recorded_a, recorded_b, fs, names=("recorded_a", "recorded_b")
     )
-    code_a, code_b = (_typesignal(c) for c in pair)
+    code_a, code_b = (_typesignal(c, name="pair") for c in pair)
     if code_a.ndim != 1 or code_b.ndim != 1:
         msg = "both Golay codes must be one-dimensional."
         raise ValueError(msg)
@@ -799,7 +799,7 @@ def golay_impulse_response(
         ("recorded_a", recorded_a, code_a),
         ("recorded_b", recorded_b, code_b),
     ):
-        rec = apply_calibration(rec_in, _typesignal(np.asarray(rec_in)))
+        rec = apply_calibration(rec_in, _typesignal(rec_in, name=name))
         if rec.ndim != 1:
             msg = f"'{name}' must be one-dimensional."
             raise ValueError(msg)

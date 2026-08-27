@@ -352,15 +352,12 @@ def _validated_response(
     response: SignalInput | TimedResponse,
 ) -> np.ndarray:
     """Validate the measured impulse response array."""
-    h = _typesignal(np.asarray(response, dtype=np.float64))
+    h = _typesignal(response, name="response")
     if h.ndim != 1:
         msg = "'response' must be one-dimensional."
         raise ValueError(msg)
     if h.size < _MIN_RESPONSE_SAMPLES:
         msg = f"'response' must have at least {_MIN_RESPONSE_SAMPLES} samples."
-        raise ValueError(msg)
-    if not np.all(np.isfinite(h)):
-        msg = "'response' must be finite."
         raise ValueError(msg)
     if isinstance(response, Signal):
         return apply_calibration(response, h)

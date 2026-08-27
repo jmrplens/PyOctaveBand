@@ -519,7 +519,7 @@ def sti_from_impulse_response(
     :return: :class:`STIResult` with ``mtf`` of shape (7, 14).
     """
     fs = resolve_fs(ir, fs, name="ir")
-    ir_proc = apply_calibration(ir, _typesignal(np.asarray(ir)))
+    ir_proc = apply_calibration(ir, _typesignal(ir, name="ir"))
     if ir_proc.ndim != 1:
         msg = "sti_from_impulse_response expects a 1D impulse response."
         raise ValueError(msg)
@@ -720,7 +720,7 @@ def stipa(
         if reference is None
         else resolve_pair_fs(x, reference, fs, names=("x", "reference"))
     )
-    x_proc = apply_calibration(x, _typesignal(np.asarray(x)))
+    x_proc = apply_calibration(x, _typesignal(x))
     if x_proc.ndim != 1:
         msg = "stipa expects a 1D signal."
         raise ValueError(msg)
@@ -745,7 +745,9 @@ def stipa(
 
     mdr = _stipa_modulation_depths(_intensity_envelopes(x_proc, fs), fs)
     if reference is not None:
-        ref_proc = apply_calibration(reference, _typesignal(np.asarray(reference)))
+        ref_proc = apply_calibration(
+            reference, _typesignal(reference, name="reference")
+        )
         if ref_proc.ndim != 1:
             msg = "'reference' must be a 1D signal."
             raise ValueError(msg)

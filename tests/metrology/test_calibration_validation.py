@@ -179,11 +179,11 @@ def test_sensitivity_rejects_non_finite_samples() -> None:
     sig = np.sin(2 * np.pi * 1000.0 * np.arange(4800) / 48000.0)
     sig[100] = np.nan
     with pytest.raises(
-        ValueError, match=r"Reference signal contains non-finite samples"
+        ValueError, match=r"'ref_signal' must contain only finite samples"
     ):
         metrology.sensitivity(sig, fs=48000)
     sig[100] = np.inf
     with pytest.raises(
-        ValueError, match=r"Reference signal contains non-finite samples"
+        ValueError, match=r"'ref_signal' must contain only finite samples"
     ):
         metrology.sensitivity(sig, fs=48000)

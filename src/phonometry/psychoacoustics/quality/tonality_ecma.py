@@ -299,7 +299,8 @@ def tonality_ecma(
         raise ValueError(msg)
     fs = resolve_fs(signal_in, fs, name="signal_in")
     x = apply_calibration(
-        signal_in, require_1d_signal(_typesignal(np.asarray(signal_in)))
+        signal_in,
+        require_1d_signal(_typesignal(signal_in, name="signal_in")),
     )
     if x.size == 0:
         msg = "signal must not be empty"

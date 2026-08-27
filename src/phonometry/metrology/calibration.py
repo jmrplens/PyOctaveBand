@@ -136,16 +136,11 @@ def sensitivity(
     # from a calibrator take, so scaling the samples by a factor the object
     # already carries would fold the old calibration into the new one.
     signal_arr = np.asarray(
-        resolve_samples(ref_signal, calibrate=False), dtype=np.float64
+        resolve_samples(ref_signal, calibrate=False, name="ref_signal"),
+        dtype=np.float64,
     )
     if signal_arr.size == 0:
         msg = "Reference signal is empty, cannot calibrate."
-        raise ValueError(msg)
-    if not np.all(np.isfinite(signal_arr)):
-        msg = (
-            "Reference signal contains non-finite samples (NaN/inf); they "
-            "would silently corrupt the calibration factor."
-        )
         raise ValueError(msg)
     if narrowband:
         if fs is None:

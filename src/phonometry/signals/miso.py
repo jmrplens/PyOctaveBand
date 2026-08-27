@@ -164,7 +164,7 @@ def _validate_inputs(
         # calibration is applied once, here, because the rows that come out
         # are bare arrays and would otherwise reach the estimate in digital
         # units.
-        rows = list(np.atleast_2d(resolve_samples(inputs)))
+        rows = list(np.atleast_2d(resolve_samples(inputs, name="inputs")))
     elif isinstance(inputs, np.ndarray) and inputs.ndim == 2:  # noqa: PLR2004
         rows = [np.ascontiguousarray(row, dtype=np.float64) for row in inputs]
     else:

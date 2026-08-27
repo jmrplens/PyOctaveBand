@@ -926,7 +926,7 @@ def loudness_zwicker(
         raise ValueError(msg)
     factor = resolve_calibration(x, calibration_factor)
     require_positive(factor, "calibration_factor")
-    pressure = _typesignal(np.asarray(x))
+    pressure = _typesignal(x)
     if pressure.ndim != 1:
         msg = (
             "loudness_zwicker() accepts single-channel signals only, got "
@@ -935,9 +935,6 @@ def loudness_zwicker(
         raise ValueError(msg)
     if pressure.size == 0:
         msg = "Input signal 'x' cannot be empty."
-        raise ValueError(msg)
-    if not np.all(np.isfinite(pressure)):
-        msg = "Input signal 'x' must contain only finite values."
         raise ValueError(msg)
     pressure = pressure * factor
 
