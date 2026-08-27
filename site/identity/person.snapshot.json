@@ -269,6 +269,9 @@
       "@id": "https://github.com/jmrplens/MATLAB_Instruments#software"
     },
     {
+      "@id": "https://github.com/jmrplens/picoScopeMATLAB#software"
+    },
+    {
       "@id": "https://mcp.jmrp.io/gitlab#api"
     },
     {
