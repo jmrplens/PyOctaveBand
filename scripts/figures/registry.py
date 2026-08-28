@@ -28,6 +28,7 @@ from .aircraft import (
     generate_airport_sor,
     generate_anp_contour,
     generate_anp_npd,
+    generate_anp_procedural_profile,
     generate_anp_profile,
     generate_epnl,
     generate_rotorcraft_contour,
@@ -980,6 +981,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # The EASA ANP fleet database that feeds that chain for a real aircraft.
     generate_anp_npd,
     generate_anp_profile,
+    generate_anp_procedural_profile,
     generate_anp_contour,
     # Rotorcraft: the ECAC Doc 32 hemisphere source and its propagation.
     generate_rotorcraft_hemisphere,

@@ -206,6 +206,7 @@ export const apiSections = {
       'reference/api/aeroacoustics/atmospheric-absorption',
       'reference/api/aeroacoustics/airport-noise',
       'reference/api/aeroacoustics/anp-fleet',
+      'reference/api/aeroacoustics/flight-performance',
       'reference/api/aeroacoustics/rotorcraft-noise',
       'reference/api/aeroacoustics/rotorcraft-propagation',
       'reference/api/aeroacoustics/measurement-system',

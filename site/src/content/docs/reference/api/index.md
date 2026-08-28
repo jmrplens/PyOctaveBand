@@ -202,6 +202,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`aircraft.atmospheric_absorption`](/phonometry/reference/api/aeroacoustics/atmospheric-absorption/) | One-third-octave-band atmospheric absorption for aircraft noise (SAE ARP 5534). |
 | [`aircraft.airport_noise`](/phonometry/reference/api/aeroacoustics/airport-noise/) | Noise-Power-Distance (NPD) event-level interpolation (ECAC Doc 29). |
 | [`aircraft.anp_fleet`](/phonometry/reference/api/aeroacoustics/anp-fleet/) | EASA ANP fleet database bridge for the ECAC Doc 29 airport-noise chain. |
+| [`aircraft.flight_performance`](/phonometry/reference/api/aeroacoustics/flight-performance/) | ECAC Doc 29 flight performance: procedural steps into a flight profile. |
 | [`aircraft.rotorcraft_noise`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/) | Rotorcraft noise by the hemisphere method (ECAC Doc 32 / NORAH2). |
 | [`aircraft.rotorcraft_propagation`](/phonometry/reference/api/aeroacoustics/rotorcraft-propagation/) | Rotorcraft propagation, ground effect and screening (ECAC Doc 32 / NORAH2). |
 | [`aircraft.measurement_system`](/phonometry/reference/api/aeroacoustics/measurement-system/) | Aircraft-noise measurement-system tolerances (IEC 61265:1995). |

@@ -232,15 +232,15 @@ de la horquilla, así que el tramo 1 se pesa a 350 nmi y el tramo 4 a 2 200 nmi.
 No todas las aeronaves vuelan todos los tramos, y los perfiles de punto fijo que
 se distribuyen cubren las etapas 1 a 7 para despegues y solo la 1 para llegadas.
 
-Solo se leen como trayectorias listas para usar los perfiles de **punto fijo**.
-La mayoría de las entradas ANP describen sus despegues como pasos
-de procedimiento (sube a este régimen hasta tal altitud, acelera, repliega
-flaps), que hay que volar a través de un modelo de mecánica del vuelo antes de
-que sean una trayectoria. Ese modelo queda fuera de este puente, así que de las
-155 aeronaves de la base distribuida 13 tienen perfil de *despegue* de punto fijo
-y 20 perfil de *llegada* de punto fijo. Pedir uno que no existe lanza un `KeyError`
-que nombra las etapas que sí, que es además la forma de descubrir los tramos que
-una aeronave trae de verdad:
+Un perfil de **punto fijo** es una trayectoria lista para volar, y la mayoría de
+las entradas ANP no traen ninguna: describen sus despegues como pasos de
+procedimiento (sube a este régimen hasta tal altitud, acelera, repliega flaps),
+que hay que volar a través de un modelo de mecánica del vuelo antes de que sean
+una trayectoria. De las 155 aeronaves de la base distribuida solo 13 tienen
+perfil de *despegue* de punto fijo y 20 perfil de *llegada* de punto fijo; la
+sección 4 vuela el resto. Pedir un perfil de punto fijo que no existe lanza un
+`KeyError` que nombra las etapas que sí, que es además la forma de descubrir los
+tramos que una aeronave trae de verdad:
 
 ```python
 from phonometry import aircraft
@@ -255,12 +255,97 @@ for identifier, operation, stage in (("A320-232", "D", 1), ("747100", "D", 9)):
 # ... '747100', operation 'D', stage length 9 (available: [1, 2, 3, 4, 5, 6])
 ```
 
-Una lista vacía significa que el tipo no tiene ningún perfil de punto fijo y
-necesita una trayectoria sustituta; una no vacía significa que has pedido un
-tramo que esa aeronave no vuela. Las curvas NPD, en cambio, están tabuladas para
-todas las aeronaves de la base.
+Una lista vacía significa que el tipo no tiene ningún perfil de punto fijo y hay
+que volarle una trayectoria; una no vacía significa que has pedido un tramo que
+esa aeronave no vuela. Las curvas NPD, en cambio, están tabuladas para todas las
+aeronaves de la base.
 
-## 4. Directo a un nivel de evento o un contorno
+## 4. Volar un procedimiento publicado
+
+Un procedimiento no es una trayectoria, y ahí está toda la dificultad. Sus pasos
+dicen lo que hace el avión, no adónde va: sube a este régimen hasta tal altitud,
+acelera hasta tal velocidad, cambia a empuje de ascenso. Dónde lo dejan esas
+instrucciones sobre el terreno depende del campo, porque los mismos pasos
+volados desde una pista caliente y muy sobre el nivel del mar alcanzan los
+10 000 ft mucho más lejos que desde una fría junto a la costa. No hay nada que
+tabular, y por eso la base distribuye los pasos y no los puntos.
+
+`flight_profile` los vuela, con el modelo de actuaciones de vuelo del [Apéndice B
+del Vol. 2 de ECAC Doc
+29](/phonometry/es/reference/api/aeroacoustics/flight-performance/). Exige un
+`aerodrome`, porque calcula la trayectoria y esta depende del campo, mientras
+que `profile` devuelve un perfil de punto fijo ya tabulado y no necesita ese
+argumento. Trabaja en las unidades de la propia norma: pies, nudos y libras.
+
+```python
+from phonometry import aircraft
+
+sea_level = aircraft.Aerodrome(elevation_ft=0.0)
+flown = aircraft.load_anp_database().flight_profile(
+    "A320-211", "departure", aerodrome=sea_level, stage_length=1
+)
+print(len(flown.points), round(flown.distance_ft[-1]), flown.altitude_ft[-1])
+# 11 79423 10000.0
+flown.plot(language="es")
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_procedural_profile_es.svg" alt="Perfil de despegue de un Airbus A320-211 sintetizado a partir de sus pasos de procedimiento publicados: la altura sube hasta 10 000 ft frente a la distancia sobre la ruta, con el empuje neto corregido en un segundo eje cayendo durante la carrera de despegue y escalonándose en el cambio a empuje de ascenso" width="82%" />
+
+*El A320-211 no distribuye ningún perfil de despegue de punto fijo, así que esta
+es la única forma de volarlo. La banda sombreada es la carrera de despegue; la
+línea de puntos marca dónde el procedimiento pasa de empuje de despegue a empuje
+de ascenso, una caída de 3 047 lb por motor que la curva de altura apenas acusa.
+Eso es lo que da calcular el empuje frente a leer una trayectoria: nada en la
+forma del ascenso dice que se redujeron los motores, y el ruido lo dice sin
+lugar a dudas.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import aircraft
+
+db = aircraft.load_anp_database()
+airframe = db.aircraft("A320-211")
+profile = db.flight_profile(
+    "A320-211", "D", aerodrome=aircraft.Aerodrome(elevation_ft=0.0), stage_length=1
+)
+
+fig, ax = plt.subplots(figsize=(10, 6))
+profile.plot(ax=ax, language="es")
+fig.axes[-1].set_ylim(0.0, 1.35 * float(profile.corrected_net_thrust_lb.max()))
+ax.set_title(
+    f"Perfil de despegue por procedimiento (Doc 29) - {airframe.description}", pad=12
+)
+plt.show()
+```
+
+</details>
+
+`procedural_profile` cruza de vuelta a las unidades que habla la cadena de ruido
+y devuelve el mismo `AnpProfile` que una consulta de punto fijo. `event_level` y
+`noise_contour` aceptan un `aerodrome` por la misma razón, así que una aeronave
+que solo publica pasos recorre entera la cadena de Doc 29 desde su
+identificador. Son 309 de los 310 pares de aeronave y operación de la base,
+frente a los 33 que tienen trayectoria tabulada.
+
+```python
+from phonometry import aircraft
+
+hot_and_high = aircraft.Aerodrome(elevation_ft=5000.0, temperature_c=25.0)
+level = aircraft.load_anp_database().event_level(
+    "A320-211", [3000.0, 500.0, 0.0], "departure", aerodrome=hot_and_high
+)
+print(round(float(level.level), 1))    # 89.3 dB
+```
+
+Un aeródromo, una atmósfera: la temperatura y la presión del campo llegan al
+ajuste de impedancia de Doc 29 igual que al modelo de actuaciones, de modo que
+un perfil volado a 35 °C no queda corregido para 15 °C por omisión.
+`temperature` y `pressure` siguen mandando cuando las dos difieren de verdad.
+
+## 5. Directo a un nivel de evento o un contorno
 
 Con las dos mitades en el registro, la aeronave puede ejecutar ella misma la
 cadena de Doc 29. `event_level` coloca un sobrevuelo en un receptor y
@@ -385,14 +470,18 @@ contorno en malla de Doc 29 desde un identificador de aeronave con
 `event_level` y `noise_contour`.
 </ScopeClaim>
 
-<ScopeClaim status="not-covered" label="No cubierto">
+<ScopeClaim status="covered" label="Cubierto">
 Los perfiles de pasos de procedimiento, que es como describen su despegue la
-mayoría de las entradas ANP: convertirlos en una trayectoria exige el modelo
-de mecánica del vuelo de Doc 9911 de la OACI, que este puente no implementa,
-así que solo las 13 aeronaves con perfil de *despegue* de punto fijo, y las 20
-con perfil de *llegada* de punto fijo, tienen trayectoria lista para usar. La
-base además solo se lee, nunca se escribe: phonometry distribuye la versión
-2.3 y no la actualiza.
+mayoría de las entradas ANP, mediante el modelo de mecánica del vuelo del
+Apéndice B del Vol. 2 de Doc 29: `flight_profile` vuela un procedimiento
+publicado para un aeródromo y su meteorología, y `procedural_profile` entrega
+el resultado a la cadena de Doc 29 como la misma trayectoria que produce un
+perfil de punto fijo.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered" label="No cubierto">
+Nada del contenido de la propia base: solo se lee, nunca se escribe, y
+phonometry distribuye la versión 2.3 y no la actualiza.
 </ScopeClaim>
 </Scope>
 

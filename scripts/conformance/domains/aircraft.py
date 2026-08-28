@@ -715,3 +715,115 @@ def _chk_ac_iec61265() -> Outcome:
     return numeric(
         2.0, _iec61265_directional_limit(4000.0, 90.0), 1e-9, unit="dB", places=1
     )
+
+
+def _doc29_reference_jet() -> ph.aircraft.PerformanceAircraft:
+    """The JETW reference turbofan of ECAC Doc 29 5th ed. Vol 3 Part 2.
+
+    A hypothetical two-engine aeroplane invented for that volume's worked
+    examples, with the coefficients its sheets C-1 to C-4 publish. Built here
+    rather than read from a file because the volume is not redistributable, and
+    carried whole -- the three C-2 thrust ratings and all eight C-4 flap
+    configurations -- because a partial set does not fail: a procedure whose
+    flap is missing would have to be flown in some other configuration, and the
+    profile would no longer be the one the reference case names.
+    """
+    return ph.aircraft.PerformanceAircraft(
+        aircraft_id="JETW",
+        engines=2,
+        max_static_thrust_lb=25000.0,
+        max_landing_weight_lb=159222.0,
+        jet_coefficients={
+            "MaxTakeoff": ph.aircraft.JetEngineCoefficients(
+                25000.0, -25.0, 0.3, 1e-5, 0.0
+            ),
+            "MaxClimb": ph.aircraft.JetEngineCoefficients(
+                16000.0, -4.0, 0.4, -1e-5, 0.0
+            ),
+            "IdleApproach": ph.aircraft.JetEngineCoefficients(
+                1100.0, -6.5, 0.17, -1e-5, 0.0
+            ),
+        },
+        # Sheet C-4, in its own order: drag ratio R, then the ground-roll
+        # coefficient B of Eq. B-16 and the speed coefficient C/D of Eq. B-15
+        # or Eq. B-75 where the sheet prints one rather than a dash.
+        aerodynamic_coefficients={
+            ("A", "5"): ph.aircraft.AerodynamicCoefficients(0.07),
+            ("A", "15"): ph.aircraft.AerodynamicCoefficients(0.075),
+            ("A", "25"): ph.aircraft.AerodynamicCoefficients(0.1, None, 0.375),
+            ("A", "30"): ph.aircraft.AerodynamicCoefficients(0.12, None, 0.35),
+            ("A", "ZERO"): ph.aircraft.AerodynamicCoefficients(0.055),
+            ("D", "1"): ph.aircraft.AerodynamicCoefficients(0.06),
+            ("D", "5"): ph.aircraft.AerodynamicCoefficients(0.07, 0.0075, 0.4),
+            ("D", "ZERO"): ph.aircraft.AerodynamicCoefficients(0.055),
+        },
+    )
+
+
+@register(
+    _AIRCRAFT,
+    "ECAC Doc 29 Appendix B take-off ground roll",
+    "Equivalent take-off distance of reference case 6 (Eq. B-15/B-16), ft",
+)
+def _chk_doc29_takeoff_roll() -> Outcome:
+    # Doc 29 5th ed. Vol 3 Part 2 workbook, sheet D2-(Departure_Results), case 6
+    # (JETW, ICAO_A, sea level, 15 degC, 8 kt headwind): point 2 sits at
+    # 4897.5 ft, the equivalent take-off distance of Eq. B-16 at the rotation
+    # speed of Eq. B-15.
+    profile = ph.aircraft.departure_profile(
+        _doc29_reference_jet(),
+        [ph.aircraft.DepartureStep("Takeoff", "MaxTakeoff", "5")],
+        weight_lb=165347.0,
+        aerodrome=ph.aircraft.Aerodrome(
+            elevation_ft=0.0, temperature_c=15.0, headwind_kt=8.0
+        ),
+    )
+    return numeric(4897.5, profile.points[1].distance_ft, 0.05, unit="ft", places=1)
+
+
+@register(
+    _AIRCRAFT,
+    "ECAC Doc 29 Appendix B approach thrust",
+    "Corrected net thrust at the top of reference case 2A (Eq. B-40/B-48), lb",
+)
+def _chk_doc29_approach_thrust() -> Outcome:
+    # Same workbook, sheet D1-(Arrival_Results), case 2A (JETW, Descend
+    # procedure, sea level, 15 degC, no wind): point 1 is 533.1 lb per engine,
+    # the descent thrust of Eq. B-40 after the non-standard-headwind correction
+    # of Eq. B-48. The whole approach is solved backwards from the Land step,
+    # so this number also checks that anchor.
+    #
+    # The eight steps are sheet C-6.2's Descend rows for JETW, each parameter
+    # taken to the one decimal that sheet prints it to.
+    steps = [
+        ph.aircraft.ApproachStep("Descend", "ZERO", 6000.0, 250.0, 2.8),
+        ph.aircraft.ApproachStep("Descend", "5", 3000.0, 180.0, 3.0),
+        ph.aircraft.ApproachStep("Descend", "25", 1500.0, 150.0, 3.0),
+        ph.aircraft.ApproachStep("Descend", "30", 1000.0, 135.0, 3.0),
+        ph.aircraft.ApproachStep("Descend", "30", 49.9, 135.0, 3.0),
+        ph.aircraft.ApproachStep("Land", "30", touchdown_roll_ft=304.1),
+        ph.aircraft.ApproachStep(
+            "Decelerate",
+            "-NONE-",
+            start_calibrated_airspeed_kt=129.6,
+            distance_ft=3937.0,
+            start_thrust_percent=40.0,
+        ),
+        ph.aircraft.ApproachStep(
+            "Decelerate",
+            "-NONE-",
+            start_calibrated_airspeed_kt=27.0,
+            distance_ft=0.0,
+            start_thrust_percent=10.0,
+        ),
+    ]
+    profile = ph.aircraft.approach_profile(
+        _doc29_reference_jet(),
+        steps,
+        aerodrome=ph.aircraft.Aerodrome(
+            elevation_ft=0.0, temperature_c=15.0, headwind_kt=0.0
+        ),
+    )
+    return numeric(
+        533.1, profile.points[0].corrected_net_thrust_lb, 0.05, unit="lb", places=1
+    )

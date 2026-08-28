@@ -31,10 +31,11 @@ The complete v2.3 CSV tables are reproduced verbatim (155 aircraft types):
 | `Spectral_classes.csv` | Departure/approach spectral classes |
 
 The `anp_fleet` loader consumes `Aircraft.csv`, `NPD_data.csv` and
-`Default_fixed_point_profiles.csv`; the remaining tables (procedural steps,
-coefficients, spectral classes) are shipped for completeness and future use
-(procedural-step profile synthesis via the flight-mechanics performance model is
-not implemented yet).
+`Default_fixed_point_profiles.csv` for the fixed-point trajectories, and the
+engine, aerodynamic, weight and procedural-step tables for the ECAC Doc 29
+Vol. 2 Appendix B performance model in `flight_performance`, which flies a
+published procedure into a profile for aircraft that ship no fixed-point
+trajectory. `Spectral_classes.csv` is shipped for completeness and is not read.
 
 The files are the published CSVs with their upstream column layout and values
 unchanged (only the `ANP2.3_` filename prefix is dropped), so their provenance

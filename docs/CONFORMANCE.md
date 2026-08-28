@@ -15,7 +15,7 @@
 
 ## Numerical conformance report
 
-&#9989; **550/550 conformance checks pass** across 58 domains and 367 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **552/552 conformance checks pass** across 58 domains and 369 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -758,7 +758,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Aircraft noise (ICAO Annex 16 / IEC 61265)</b>: 100% (15/15)</summary>
+<summary>&#9989; <b>Aircraft noise (ICAO Annex 16 / IEC 61265)</b>: 100% (17/17)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
@@ -777,6 +777,8 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ICAO Doc 9501 ETM Vol. I Table 3-7 | Tone correction of the turbofan example, dB | 2 (+/-0) | 2 | 0 | &#9989; |
 | ICAO Doc 9501 ETM Vol. I Table 4-4 | Integrated-method reference EPNL, EPNdB | 92.619 EPNdB (+/-0.01 EPNdB) | 92.619 EPNdB | 0 EPNdB | &#9989; |
 | IEC 61265:1995 Table 1 | Directional-response tolerance at 4 kHz / 90°, dB | 2 dB (+/-0 dB) | 2 dB | 0 dB | &#9989; |
+| ECAC Doc 29 Appendix B take-off ground roll | Equivalent take-off distance of reference case 6 (Eq. B-15/B-16), ft | 4897.5 ft (+/-0.1 ft) | 4897.5 ft | 0.036 ft | &#9989; |
+| ECAC Doc 29 Appendix B approach thrust | Corrected net thrust at the top of reference case 2A (Eq. B-40/B-48), lb | 533.1 lb (+/-0.1 lb) | 533.1 lb | 0.035 lb | &#9989; |
 
 </details>
 
