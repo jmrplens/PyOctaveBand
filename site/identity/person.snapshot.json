@@ -54,11 +54,13 @@
   "alumniOf": [
     {
       "@type": "EducationalOrganization",
+      "@id": "http://www.wikidata.org/entity/Q2037040",
       "name": "University of Alicante",
       "sameAs": "https://www.wikidata.org/wiki/Q2037040"
     },
     {
       "@type": "EducationalOrganization",
+      "@id": "http://www.wikidata.org/entity/Q2003976",
       "name": "Universitat Politècnica de València",
       "sameAs": "https://www.wikidata.org/wiki/Q2003976"
     }
@@ -70,6 +72,7 @@
       "credentialCategory": "degree",
       "recognizedBy": {
         "@type": "EducationalOrganization",
+        "@id": "http://www.wikidata.org/entity/Q2037040",
         "name": "University of Alicante",
         "sameAs": "https://www.wikidata.org/wiki/Q2037040"
       }
@@ -80,6 +83,7 @@
       "credentialCategory": "degree",
       "recognizedBy": {
         "@type": "EducationalOrganization",
+        "@id": "http://www.wikidata.org/entity/Q2003976",
         "name": "Universitat Politècnica de València",
         "sameAs": "https://www.wikidata.org/wiki/Q2003976"
       }
@@ -295,12 +299,13 @@
     "https://keyoxide.org/0A993B268654DBBA52B7E8D3FCF653391E2C91FC",
     "https://scholar.google.com/citations?user=9b0kPaUAAAAJ",
     "https://orcid.org/0000-0003-1250-6212",
-    "https://www.researchgate.net/profile/Jose-Requena-Plens-2",
+    "https://www.researchgate.net/profile/Jose_Requena_Plens-2",
     "https://www.mathworks.com/matlabcentral/profile/authors/5890853",
     "https://codeberg.org/jmrplens",
     "https://gitlab.com/jmrp",
     "https://pypi.org/user/jmrplens/",
     "https://hub.docker.com/u/jmrplens",
+    "https://www.npmjs.com/~jmrpio",
     "https://community.home-assistant.io/u/jmrplens",
     "https://forum.mikrotik.com/u/jmrplens",
     "https://sifa.id/p/jmrp.io",
