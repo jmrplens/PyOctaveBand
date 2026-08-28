@@ -2203,8 +2203,14 @@ def _holds_no_deceleration(deceleration_ft_s2: float) -> bool:
     callers need to know because Eq. B-59 and Eq. B-74 both divide by it, and
     without the test the degenerate step reaches the user as a bare
     ``ZeroDivisionError`` naming neither the step nor the equation.
+
+    Written as a truth test rather than a comparison against ``0.0``: the two
+    are the same test for a float, both true for a negative zero, and this one
+    reads as the question being asked. Nowhere else in the library compares a
+    float for equality, and a lone exception here would be the odd one out
+    rather than the precedent.
     """
-    return deceleration_ft_s2 == 0.0
+    return not deceleration_ft_s2
 
 
 def _along_slope_ft_s(speed_ft_s: float, wind_ft_s: float, gamma_rad: float) -> float:
