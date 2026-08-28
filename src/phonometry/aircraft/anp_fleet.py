@@ -1270,91 +1270,163 @@ def _parse_performance(tables: Mapping[str, str]) -> _PerformanceTables:
     """
     out = _PerformanceTables()
     if (text := _optional_table("jet_engine", tables)) is not None:
-        for row in _rows(text):
-            out.jet.setdefault(row["ACFT_ID"], {})[row[_COL_THRUST_RATING]] = (
-                JetEngineCoefficients(
-                    e=float(row["E"]),
-                    f=float(row["F"]),
-                    ga=float(row["Ga"]),
-                    gb=float(row["Gb"]),
-                    h=float(row["H"]),
-                )
-            )
+        _parse_jet_engine_table(_rows(text), out)
     if (text := _optional_table("propeller_engine", tables)) is not None:
-        for row in _rows(text):
-            out.propeller.setdefault(row["ACFT_ID"], {})[row[_COL_THRUST_RATING]] = (
-                PropellerEngineCoefficients(
-                    efficiency=float(row["Propeller Efficiency"]),
-                    power_hp=float(row["Installed Net Propulsive Power (hp)"]),
-                )
-            )
+        _parse_propeller_engine_table(_rows(text), out)
     if (text := _optional_table("aerodynamic", tables)) is not None:
-        for row in _rows(text):
-            # Normalised on read, not compared raw: the column below is chosen
-            # by an exact match while PerformanceAircraft.flap folds case when
-            # it looks the row up again, so a table spelling the operation "d"
-            # would be stored with the landing coefficient and still be found
-            # by a departure. Eq. B-15 would then rotate at the wrong speed
-            # with nothing to show for it.
-            op = _operation_code(row["Op Type"])
-            # The take-off speed coefficient C and the landing one D live in
-            # separate columns, and a row fills whichever its operation flies.
-            speed = _optional(row["C"] if op == _DEPARTURE else row["D"])
-            out.aerodynamic.setdefault(row["ACFT_ID"], {})[(op, row["Flap_ID"])] = (
-                AerodynamicCoefficients(
-                    drag_ratio=float(row["R"]),
-                    ground_roll_coefficient=_optional(row["B"]),
-                    speed_coefficient=speed,
-                )
-            )
+        _parse_aerodynamic_table(_rows(text), out)
     if (text := _optional_table("weights", tables)) is not None:
-        for row in _rows(text):
-            out.weights[(row["ACFT_ID"], _stage_label(row[_COL_STAGE_LENGTH]))] = float(
-                row["Weight (lb)"]
-            )
+        _parse_weights_table(_rows(text), out)
     if (text := _optional_table("departure_procedural", tables)) is not None:
-        grouped: dict[tuple[str, str, str], list[tuple[int, DepartureStep]]] = {}
-        for row in _rows(text):
-            dkey = (
-                row["ACFT_ID"],
-                row["Profile_ID"],
-                _stage_label(row[_COL_STAGE_LENGTH]),
-            )
-            step = DepartureStep(
-                step_type=row["Step Type"],
-                thrust_rating=row[_COL_THRUST_RATING],
-                flap_id=row["Flap_ID"],
-                end_altitude_ft=_optional(row["End Point Altitude (ft)"]),
-                rate_of_climb_ft_per_min=_optional(row["Rate Of Climb (ft/min)"]),
-                end_calibrated_airspeed_kt=_optional(row["End Point CAS (kt)"]),
-                energy_share_percent=_optional(row["Accel Percentage (%)"]),
-                distance_ft=_optional(row.get(_COL_DISTANCE_FT, "")),
-            )
-            grouped.setdefault(dkey, []).append((int(float(row["Step Number"])), step))
-        for dkey, steps in grouped.items():
-            steps.sort(key=lambda e: e[0])
-            out.departure_steps[dkey] = tuple(step for _n, step in steps)
+        _parse_departure_step_table(_rows(text), out)
     if (text := _optional_table("approach_procedural", tables)) is not None:
-        by_profile: dict[tuple[str, str], list[tuple[int, ApproachStep]]] = {}
-        for row in _rows(text):
-            akey = (row["ACFT_ID"], row["Profile_ID"])
-            astep = ApproachStep(
-                step_type=row["Step Type"],
-                flap_id=row["Flap_ID"],
-                start_altitude_ft=_optional(row["Start Altitude(ft)"]),
-                start_calibrated_airspeed_kt=_optional(row["Start CAS (kt)"]),
-                descent_angle_deg=_optional(row["Descent Angle (deg)"]),
-                touchdown_roll_ft=_optional(row["Touchdown Roll (ft)"]),
-                distance_ft=_optional(row[_COL_DISTANCE_FT]),
-                start_thrust_percent=_optional(row["Start Thrust"]),
-            )
-            by_profile.setdefault(akey, []).append(
-                (int(float(row["Step Number"])), astep)
-            )
-        for akey, asteps in by_profile.items():
-            asteps.sort(key=lambda e: e[0])
-            out.approach_steps[akey] = tuple(step for _n, step in asteps)
+        _parse_approach_step_table(_rows(text), out)
     return out
+
+
+def _parse_jet_engine_table(
+    rows: list[dict[str, str]], out: _PerformanceTables
+) -> None:
+    """Collect the Eq. B-9 thrust polynomial, by aircraft and thrust rating.
+
+    One row per aeroplane and rating, carrying the ``E``, ``F``, ``Ga``, ``Gb``
+    and ``H`` that ``CNT = E + F Vc + Ga h + Gb h^2 + H T`` is summed from. A
+    turboprop appears here or in the propeller table, never in both, which is
+    what lets the thrust lookup choose between B4.1 and B4.2 by presence alone.
+    """
+    for row in rows:
+        out.jet.setdefault(row["ACFT_ID"], {})[row[_COL_THRUST_RATING]] = (
+            JetEngineCoefficients(
+                e=float(row["E"]),
+                f=float(row["F"]),
+                ga=float(row["Ga"]),
+                gb=float(row["Gb"]),
+                h=float(row["H"]),
+            )
+        )
+
+
+def _parse_propeller_engine_table(
+    rows: list[dict[str, str]], out: _PerformanceTables
+) -> None:
+    """Collect the Eq. B-12 propeller pair, by aircraft and thrust rating.
+
+    The efficiency ``eta`` and installed net propulsive power ``Pp`` that
+    ``CNT = (326 eta Pp / Vt) / delta`` reads for a piston or turboprop
+    aeroplane.
+    """
+    for row in rows:
+        out.propeller.setdefault(row["ACFT_ID"], {})[row[_COL_THRUST_RATING]] = (
+            PropellerEngineCoefficients(
+                efficiency=float(row["Propeller Efficiency"]),
+                power_hp=float(row["Installed Net Propulsive Power (hp)"]),
+            )
+        )
+
+
+def _parse_aerodynamic_table(
+    rows: list[dict[str, str]], out: _PerformanceTables
+) -> None:
+    """Collect each flap configuration's ``R``, ``B`` and speed coefficient.
+
+    Keyed by operation and flap identifier: ``R`` is the drag ratio every force
+    balance of Appendix B carries, ``B`` the ground-roll coefficient of
+    Eq. B-16, and the speed coefficient is ``C`` of Eq. B-15 on a departure and
+    ``D`` of Eq. B-75 on an arrival.
+    """
+    for row in rows:
+        # Normalised on read, not compared raw: the column below is chosen
+        # by an exact match while PerformanceAircraft.flap folds case when
+        # it looks the row up again, so a table spelling the operation "d"
+        # would be stored with the landing coefficient and still be found
+        # by a departure. Eq. B-15 would then rotate at the wrong speed
+        # with nothing to show for it.
+        op = _operation_code(row["Op Type"])
+        # The take-off speed coefficient C and the landing one D live in
+        # separate columns, and a row fills whichever its operation flies.
+        speed = _optional(row["C"] if op == _DEPARTURE else row["D"])
+        out.aerodynamic.setdefault(row["ACFT_ID"], {})[(op, row["Flap_ID"])] = (
+            AerodynamicCoefficients(
+                drag_ratio=float(row["R"]),
+                ground_roll_coefficient=_optional(row["B"]),
+                speed_coefficient=speed,
+            )
+        )
+
+
+def _parse_weights_table(rows: list[dict[str, str]], out: _PerformanceTables) -> None:
+    """Collect the departure weight of each aircraft and stage length, lb.
+
+    ``W`` of Eq. B-4, which every thrust balance of Appendix B is corrected
+    from, published once per trip-distance bin. An arrival takes no weight from
+    here: B7 flies the 90 % of maximum landing weight of folio B-31 instead.
+    """
+    for row in rows:
+        out.weights[(row["ACFT_ID"], _stage_label(row[_COL_STAGE_LENGTH]))] = float(
+            row["Weight (lb)"]
+        )
+
+
+def _parse_departure_step_table(
+    rows: list[dict[str, str]], out: _PerformanceTables
+) -> None:
+    """Collect the departure procedures of B6.1, in step-number order.
+
+    Keyed by aircraft, profile identifier and stage length, since a departure
+    procedure is published once per trip-distance bin. Each row carries its own
+    step number and the table need not arrive in that order, so the steps are
+    sorted on it before the sweep of B6 walks them out from brake release.
+    """
+    grouped: dict[tuple[str, str, str], list[tuple[int, DepartureStep]]] = {}
+    for row in rows:
+        dkey = (
+            row["ACFT_ID"],
+            row["Profile_ID"],
+            _stage_label(row[_COL_STAGE_LENGTH]),
+        )
+        step = DepartureStep(
+            step_type=row["Step Type"],
+            thrust_rating=row[_COL_THRUST_RATING],
+            flap_id=row["Flap_ID"],
+            end_altitude_ft=_optional(row["End Point Altitude (ft)"]),
+            rate_of_climb_ft_per_min=_optional(row["Rate Of Climb (ft/min)"]),
+            end_calibrated_airspeed_kt=_optional(row["End Point CAS (kt)"]),
+            energy_share_percent=_optional(row["Accel Percentage (%)"]),
+            distance_ft=_optional(row.get(_COL_DISTANCE_FT, "")),
+        )
+        grouped.setdefault(dkey, []).append((int(float(row["Step Number"])), step))
+    for dkey, steps in grouped.items():
+        steps.sort(key=lambda e: e[0])
+        out.departure_steps[dkey] = tuple(step for _n, step in steps)
+
+
+def _parse_approach_step_table(
+    rows: list[dict[str, str]], out: _PerformanceTables
+) -> None:
+    """Collect the approach procedures of B7.1, in step-number order.
+
+    Keyed by aircraft and profile identifier alone, with no stage length: an
+    approach is flown at the landing weight of folio B-31 rather than for a trip
+    distance. Sorted on the step number for the same reason as the departure
+    table, though the sweep of B7 walks the result backwards from touchdown.
+    """
+    by_profile: dict[tuple[str, str], list[tuple[int, ApproachStep]]] = {}
+    for row in rows:
+        akey = (row["ACFT_ID"], row["Profile_ID"])
+        astep = ApproachStep(
+            step_type=row["Step Type"],
+            flap_id=row["Flap_ID"],
+            start_altitude_ft=_optional(row["Start Altitude(ft)"]),
+            start_calibrated_airspeed_kt=_optional(row["Start CAS (kt)"]),
+            descent_angle_deg=_optional(row["Descent Angle (deg)"]),
+            touchdown_roll_ft=_optional(row["Touchdown Roll (ft)"]),
+            distance_ft=_optional(row[_COL_DISTANCE_FT]),
+            start_thrust_percent=_optional(row["Start Thrust"]),
+        )
+        by_profile.setdefault(akey, []).append((int(float(row["Step Number"])), astep))
+    for akey, asteps in by_profile.items():
+        asteps.sort(key=lambda e: e[0])
+        out.approach_steps[akey] = tuple(step for _n, step in asteps)
 
 
 def _optional_table(name: str, tables: Mapping[str, str]) -> str | None:

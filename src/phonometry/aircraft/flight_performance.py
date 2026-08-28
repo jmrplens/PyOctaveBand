@@ -898,65 +898,112 @@ class ApproachStep:
             "bank_angle_deg",
         )
         if kind == "land":
-            if self.touchdown_roll_ft is None:
-                msg = (
-                    "ApproachStep: 'touchdown_roll_ft' must be given for a Land "
-                    "step, which is where its Point2 sits (B7.1.5)."
-                )
-                raise ValueError(msg)
+            self._check_land()
         elif kind == "decelerate":
-            if self.distance_ft is None or self.start_thrust_percent is None:
-                msg = (
-                    "ApproachStep: 'distance_ft' and 'start_thrust_percent' "
-                    "must both be given for a Decelerate step, which reads its "
-                    "end values from the step that follows it (Eq. B-80, "
-                    f"Eq. B-81); got {self.distance_ft!r} ft and "
-                    f"{self.start_thrust_percent!r} %."
-                )
-                raise ValueError(msg)
+            self._check_decelerate()
         else:
-            if self.start_altitude_ft is None:
-                msg = (
-                    "ApproachStep: 'start_altitude_ft' must be given for an "
-                    "airborne step, which is anchored at its top rather than "
-                    f"its bottom; {self.step_type!r} got "
-                    f"{self.start_altitude_ft!r} ft."
-                )
-                raise ValueError(msg)
-            # A plain Level step is the one airborne step whose speed the table
-            # may leave out, and several ANP entries do: it holds its speed by
-            # definition, so the speed at its top is the speed at its bottom,
-            # which the step below it already fixes. Every other airborne step
-            # decelerates or changes height, and reads the start speed to say by
-            # how much.
-            if kind != "level" and self.start_calibrated_airspeed_kt is None:
-                msg = (
-                    "ApproachStep: 'start_calibrated_airspeed_kt' must be given "
-                    f"for a {self.step_type!r} step, whose true airspeed at the "
-                    "top of the step comes from it (Eq. B-39, Eq. B-49, "
-                    "Eq. B-61)."
-                )
-                raise ValueError(msg)
-            if kind.startswith("descend") and not self.descent_angle_deg:
-                msg = (
-                    "ApproachStep: 'descent_angle_deg' must be given and "
-                    f"non-zero for a {self.step_type!r} step, whose length is "
-                    "the height it loses over its tangent (Eq. B-42); got "
-                    f"{self.descent_angle_deg!r} deg."
-                )
-                raise ValueError(msg)
-            if kind in _LEVEL_STEP_TYPES and self.distance_ft is None:
-                msg = (
-                    "ApproachStep: 'distance_ft' must be given for a "
-                    f"{self.step_type!r} step, whose length is its only "
-                    "geometric input (Eq. B-64, Eq. B-68)."
-                )
-                raise ValueError(msg)
+            self._check_airborne(kind)
         if self.distance_ft is not None and self.distance_ft < 0.0:
             msg = (
                 "ApproachStep: 'distance_ft' must not be negative; a step is "
                 f"flown forwards along its own path. Got {self.distance_ft!r} "
                 "ft."
+            )
+            raise ValueError(msg)
+
+    def _check_land(self) -> None:
+        """Reject a Land step that does not say where its Point2 sits (B7.1.5).
+
+        The touchdown roll is the whole geometry of the Land step past
+        touchdown: Point1 is touchdown itself, at distance zero, and Point2 sits
+        that roll further along the runway, where the forward sweep over the
+        Decelerate steps picks the profile up again. Nothing stands in for it,
+        so a missing one would put Point2 on top of touchdown and carry the
+        whole rollout back with it.
+
+        :raises ValueError: if the touchdown roll is missing.
+        """
+        if self.touchdown_roll_ft is None:
+            msg = (
+                "ApproachStep: 'touchdown_roll_ft' must be given for a Land "
+                "step, which is where its Point2 sits (B7.1.5)."
+            )
+            raise ValueError(msg)
+
+    def _check_decelerate(self) -> None:
+        """Reject a Decelerate step that cannot be run forwards from touchdown.
+
+        The one step type of B7.1 that is not solved backwards: the rollout
+        runs forwards from touchdown, each Decelerate step placing its end its
+        own length further along the runway and reading the speed and thrust
+        there from the start values of the step that follows (Eq. B-80,
+        Eq. B-81). Both parameters are therefore needed on every step of the
+        rollout, including the terminal one that emits no point of its own --
+        which is why a length of zero passes here and a missing one does not.
+
+        :raises ValueError: if either the length or the start thrust is missing.
+        """
+        if self.distance_ft is None or self.start_thrust_percent is None:
+            msg = (
+                "ApproachStep: 'distance_ft' and 'start_thrust_percent' "
+                "must both be given for a Decelerate step, which reads its "
+                "end values from the step that follows it (Eq. B-80, "
+                f"Eq. B-81); got {self.distance_ft!r} ft and "
+                f"{self.start_thrust_percent!r} %."
+            )
+            raise ValueError(msg)
+
+    def _check_airborne(self, kind: str) -> None:
+        """Reject an airborne step the backwards sweep of B7.1 cannot place.
+
+        Every step that is neither Land nor Decelerate is solved from its own
+        top downwards, and the four guards below are that solve, read in order:
+        the start height anchors the step (Eq. B-42), the start speed fixes the
+        true airspeed there (Eq. B-39, Eq. B-49, Eq. B-61), a descent angle
+        turns the height the step loses into a length (Eq. B-42), and a level
+        step carries that length itself instead (Eq. B-64, Eq. B-68). They fire
+        in that order so the message names the first thing missing.
+
+        :param kind: The step type folded onto Doc 29's own vocabulary, as
+            :attr:`kind` gives it.
+        :raises ValueError: if the parameters the step's own type is solved from
+            are missing.
+        """
+        if self.start_altitude_ft is None:
+            msg = (
+                "ApproachStep: 'start_altitude_ft' must be given for an "
+                "airborne step, which is anchored at its top rather than "
+                f"its bottom; {self.step_type!r} got "
+                f"{self.start_altitude_ft!r} ft."
+            )
+            raise ValueError(msg)
+        # A plain Level step is the one airborne step whose speed the table
+        # may leave out, and several ANP entries do: it holds its speed by
+        # definition, so the speed at its top is the speed at its bottom,
+        # which the step below it already fixes. Every other airborne step
+        # decelerates or changes height, and reads the start speed to say by
+        # how much.
+        if kind != "level" and self.start_calibrated_airspeed_kt is None:
+            msg = (
+                "ApproachStep: 'start_calibrated_airspeed_kt' must be given "
+                f"for a {self.step_type!r} step, whose true airspeed at the "
+                "top of the step comes from it (Eq. B-39, Eq. B-49, "
+                "Eq. B-61)."
+            )
+            raise ValueError(msg)
+        if kind.startswith("descend") and not self.descent_angle_deg:
+            msg = (
+                "ApproachStep: 'descent_angle_deg' must be given and "
+                f"non-zero for a {self.step_type!r} step, whose length is "
+                "the height it loses over its tangent (Eq. B-42); got "
+                f"{self.descent_angle_deg!r} deg."
+            )
+            raise ValueError(msg)
+        if kind in _LEVEL_STEP_TYPES and self.distance_ft is None:
+            msg = (
+                "ApproachStep: 'distance_ft' must be given for a "
+                f"{self.step_type!r} step, whose length is its only "
+                "geometric input (Eq. B-64, Eq. B-68)."
             )
             raise ValueError(msg)
 
@@ -2190,13 +2237,11 @@ def _approach_point1(
 ) -> ProfilePoint:
     """The Point1 of one airborne approach step, solved from the step below it."""
     kind = step.kind
-    bank_rad = math.radians(step.bank_angle_deg)
     # An idle step's thrust is a coefficient lookup, not a force balance, so it
     # reads no drag ratio and the ANP tables leave its flap identifier empty
     # accordingly. Asking for one anyway would refuse a published procedure over
     # a configuration nothing in the step needs.
     drag_ratio = 0.0 if kind in _IDLE_STEP_TYPES else _drag_ratio(flight, step)
-    engines = flight.aircraft.engines
     height_ft = float(step.start_altitude_ft or 0.0)
     cas_kt = float(step.start_calibrated_airspeed_kt or 0.0)
     length_ft = float(step.distance_ft or 0.0)
@@ -2218,87 +2263,248 @@ def _approach_point1(
         cas_kt = flight.aerodrome.calibrated_airspeed_kt(tas_kt, altitude_ft)
     else:
         tas_kt = flight.aerodrome.true_airspeed_kt(cas_kt, altitude_ft)
-    corrected_weight_lb = flight.corrected_weight_lb(altitude_ft)
-    if kind in _LEVEL_STEP_TYPES:
-        distance_ft = anchor.point.distance_ft - length_ft
-    else:
-        gamma_rad = math.radians(float(step.descent_angle_deg or 0.0))
-        drop_ft = height_ft - anchor.point.altitude_ft
-        if drop_ft <= 0.0:
-            msg = (
-                f"a {step.step_type!r} step must start above the step below it "
-                f"(Eq. B-42); it starts at {height_ft!r} ft with the next "
-                f"point at {anchor.point.altitude_ft!r} ft."
-            )
-            raise ValueError(msg)
-        distance_ft = anchor.point.distance_ft - drop_ft / math.tan(gamma_rad)
-    if kind == "level":
-        # Eq. B-62, which is Eq. B-30 at the approach weight: departures and
-        # arrivals share one level-flight thrust law.
-        thrust_lb = corrected_weight_lb / engines * (drag_ratio / math.cos(bank_rad))
-    elif kind == "level-decel":
-        # Eq. B-63.
-        thrust_lb = (
-            corrected_weight_lb
-            / engines
-            * (
-                drag_ratio / math.cos(bank_rad)
-                + _level_deceleration_ft_s2(
-                    start_tas_kt=tas_kt,
-                    end_tas_kt=anchor.point.true_airspeed_kt,
-                    headwind_kt=flight.aerodrome.headwind_kt,
-                    length_ft=length_ft,
-                )
-                / _G_FT_S2
-            )
-        )
-    elif kind in ("descend-idle", "level-idle"):
-        thrust_lb = _idle_thrust_lb(
-            flight, altitude_ft=altitude_ft, calibrated_airspeed_kt=cas_kt
-        )
-    elif kind == "descend":
-        # Eq. B-40. The 1.03 plays the part K plays for a climb: it "accounts
-        # for the effects thrust of descending into an 8-knot headwind and the
-        # deceleration inherent in descending at constant Calibrated Airspeed",
-        # so a Descend step needs no iteration either. The deceleration between
-        # consecutive Descend steps is deliberately left out of the thrust,
-        # which the standard notes makes the result conservative.
-        gamma_rad = math.radians(float(step.descent_angle_deg or 0.0))
-        thrust_lb = corrected_weight_lb / engines * (
-            drag_ratio / math.cos(bank_rad)
-            - math.sin(gamma_rad) / _DESCENT_WIND_CONSTANT
-        ) + _headwind_thrust_correction_lb(
-            flight,
-            altitude_ft=altitude_ft,
-            gamma_rad=gamma_rad,
-            calibrated_airspeed_kt=cas_kt,
-        )
-    else:
-        # Eq. B-41, the Descend-Decel step: the deceleration is carried, and the
-        # drag term is the one Doc 29 prints with cos(gamma) on this page and
-        # without it on the page before.
-        gamma_rad = math.radians(float(step.descent_angle_deg or 0.0))
-        thrust_lb = (
-            corrected_weight_lb
-            / engines
-            * (
-                drag_ratio * math.cos(gamma_rad) / math.cos(bank_rad)
-                - math.sin(gamma_rad)
-                + _descent_deceleration_ft_s2(
-                    start_tas_kt=tas_kt,
-                    end_tas_kt=anchor.point.true_airspeed_kt,
-                    headwind_kt=flight.aerodrome.headwind_kt,
-                    gamma_rad=gamma_rad,
-                    height_drop_ft=height_ft - anchor.point.altitude_ft,
-                )
-                / _G_FT_S2
-            )
-        )
+    distance_ft = _approach_distance_ft(
+        step, anchor, height_ft=height_ft, length_ft=length_ft
+    )
+    thrust_lb = _approach_thrust_lb(
+        flight,
+        step,
+        anchor,
+        drag_ratio=drag_ratio,
+        altitude_ft=altitude_ft,
+        height_ft=height_ft,
+        calibrated_airspeed_kt=cas_kt,
+        true_airspeed_kt=tas_kt,
+        length_ft=length_ft,
+    )
     return ProfilePoint(
         distance_ft=distance_ft,
         altitude_ft=height_ft,
         true_airspeed_kt=tas_kt,
         corrected_net_thrust_lb=thrust_lb,
+    )
+
+
+def _approach_distance_ft(
+    step: ApproachStep, anchor: _Anchor, *, height_ft: float, length_ft: float
+) -> float:
+    """Where one airborne approach step's Point1 sits along the track, ft.
+
+    The backwards recursion of B7.1, counted from the Point1 of the step below:
+    a level step reaches back by its own length (Eq. B-64, Eq. B-68) and a
+    descending one by the height it loses over the tangent of its descent angle
+    (Eq. B-42). Both come out negative before touchdown, which is where Doc 29
+    measures an arrival's distance from.
+
+    :raises ValueError: if a descending step does not start above the step
+        below it. Eq. B-42 would then place its Point1 *after* the anchor and
+        the profile would double back on itself, which no reader of the
+        resulting points could tell from a genuinely short segment.
+    """
+    if step.kind in _LEVEL_STEP_TYPES:
+        return anchor.point.distance_ft - length_ft
+    gamma_rad = math.radians(float(step.descent_angle_deg or 0.0))
+    drop_ft = height_ft - anchor.point.altitude_ft
+    if drop_ft <= 0.0:
+        msg = (
+            f"a {step.step_type!r} step must start above the step below it "
+            f"(Eq. B-42); it starts at {height_ft!r} ft with the next "
+            f"point at {anchor.point.altitude_ft!r} ft."
+        )
+        raise ValueError(msg)
+    return anchor.point.distance_ft - drop_ft / math.tan(gamma_rad)
+
+
+def _approach_thrust_lb(
+    flight: _Flight,
+    step: ApproachStep,
+    anchor: _Anchor,
+    *,
+    drag_ratio: float,
+    altitude_ft: float,
+    height_ft: float,
+    calibrated_airspeed_kt: float,
+    true_airspeed_kt: float,
+    length_ft: float,
+) -> float:
+    """The corrected net thrust at one airborne approach step's Point1, lb (B7.1).
+
+    B7.1 gives each step type its own thrust law rather than one balance with
+    terms switched off, and this is the dispatch between them: level flight
+    (Eq. B-62), level flight decelerating (Eq. B-63), the idle lookup of B7.1.2
+    and B7.1.4, and the two descending forms without and with a deceleration
+    (Eq. B-40, Eq. B-41).
+
+    The height, speed and length passed in are the step's own, already moved by
+    the non-ISA adjustment where it applies, and not the tabulated ones.
+    """
+    kind = step.kind
+    bank_rad = math.radians(step.bank_angle_deg)
+    corrected_weight_lb = flight.corrected_weight_lb(altitude_ft)
+    engines = flight.aircraft.engines
+    if kind == "level":
+        return _approach_level_thrust_lb(
+            corrected_weight_lb=corrected_weight_lb,
+            engines=engines,
+            drag_ratio=drag_ratio,
+            bank_rad=bank_rad,
+        )
+    if kind == "level-decel":
+        return _level_decel_thrust_lb(
+            corrected_weight_lb=corrected_weight_lb,
+            engines=engines,
+            drag_ratio=drag_ratio,
+            bank_rad=bank_rad,
+            start_tas_kt=true_airspeed_kt,
+            end_tas_kt=anchor.point.true_airspeed_kt,
+            headwind_kt=flight.aerodrome.headwind_kt,
+            length_ft=length_ft,
+        )
+    if kind in ("descend-idle", "level-idle"):
+        return _idle_thrust_lb(
+            flight,
+            altitude_ft=altitude_ft,
+            calibrated_airspeed_kt=calibrated_airspeed_kt,
+        )
+    gamma_rad = math.radians(float(step.descent_angle_deg or 0.0))
+    if kind == "descend":
+        return _descend_thrust_lb(
+            flight,
+            corrected_weight_lb=corrected_weight_lb,
+            engines=engines,
+            drag_ratio=drag_ratio,
+            bank_rad=bank_rad,
+            gamma_rad=gamma_rad,
+            altitude_ft=altitude_ft,
+            calibrated_airspeed_kt=calibrated_airspeed_kt,
+        )
+    return _descend_decel_thrust_lb(
+        corrected_weight_lb=corrected_weight_lb,
+        engines=engines,
+        drag_ratio=drag_ratio,
+        bank_rad=bank_rad,
+        gamma_rad=gamma_rad,
+        start_tas_kt=true_airspeed_kt,
+        end_tas_kt=anchor.point.true_airspeed_kt,
+        headwind_kt=flight.aerodrome.headwind_kt,
+        height_drop_ft=height_ft - anchor.point.altitude_ft,
+    )
+
+
+def _approach_level_thrust_lb(
+    *,
+    corrected_weight_lb: float,
+    engines: int,
+    drag_ratio: float,
+    bank_rad: float,
+) -> float:
+    """Thrust of a Level approach step, lb (Eq. B-62).
+
+    Eq. B-30 at the approach weight: departures and arrivals share one
+    level-flight thrust law, and only the weight it is written at differs.
+    Named apart from :meth:`_Flight.level_thrust_lb`, which is the departure
+    side of the same pair, because the two group their factors differently and
+    a swap would move the last bits of every level approach point.
+    """
+    return corrected_weight_lb / engines * (drag_ratio / math.cos(bank_rad))
+
+
+def _level_decel_thrust_lb(
+    *,
+    corrected_weight_lb: float,
+    engines: int,
+    drag_ratio: float,
+    bank_rad: float,
+    start_tas_kt: float,
+    end_tas_kt: float,
+    headwind_kt: float,
+    length_ft: float,
+) -> float:
+    """Thrust of a Level-Decel approach step, lb (Eq. B-63).
+
+    Eq. B-62 with the deceleration the step is flown at carried alongside the
+    drag. The term is negative while the step loses speed, so a level
+    deceleration is flown at less thrust than the same segment held at speed.
+    """
+    return (
+        corrected_weight_lb
+        / engines
+        * (
+            drag_ratio / math.cos(bank_rad)
+            + _level_deceleration_ft_s2(
+                start_tas_kt=start_tas_kt,
+                end_tas_kt=end_tas_kt,
+                headwind_kt=headwind_kt,
+                length_ft=length_ft,
+            )
+            / _G_FT_S2
+        )
+    )
+
+
+def _descend_thrust_lb(
+    flight: _Flight,
+    *,
+    corrected_weight_lb: float,
+    engines: int,
+    drag_ratio: float,
+    bank_rad: float,
+    gamma_rad: float,
+    altitude_ft: float,
+    calibrated_airspeed_kt: float,
+) -> float:
+    """Thrust of a Descend step, lb (Eq. B-40).
+
+    The 1.03 plays the part K plays for a climb: it "accounts for the effects
+    thrust of descending into an 8-knot headwind and the deceleration inherent
+    in descending at constant Calibrated Airspeed", so a Descend step needs no
+    iteration either. The deceleration between consecutive Descend steps is
+    deliberately left out of the thrust, which the standard notes makes the
+    result conservative.
+    """
+    return corrected_weight_lb / engines * (
+        drag_ratio / math.cos(bank_rad) - math.sin(gamma_rad) / _DESCENT_WIND_CONSTANT
+    ) + _headwind_thrust_correction_lb(
+        flight,
+        altitude_ft=altitude_ft,
+        gamma_rad=gamma_rad,
+        calibrated_airspeed_kt=calibrated_airspeed_kt,
+    )
+
+
+def _descend_decel_thrust_lb(
+    *,
+    corrected_weight_lb: float,
+    engines: int,
+    drag_ratio: float,
+    bank_rad: float,
+    gamma_rad: float,
+    start_tas_kt: float,
+    end_tas_kt: float,
+    headwind_kt: float,
+    height_drop_ft: float,
+) -> float:
+    """Thrust of a Descend-Decel step, lb (Eq. B-41).
+
+    The deceleration is carried, unlike in Eq. B-40, and the drag term is the
+    one Doc 29 prints with cos(gamma) on this page and without it on the page
+    before.
+    """
+    return (
+        corrected_weight_lb
+        / engines
+        * (
+            drag_ratio * math.cos(gamma_rad) / math.cos(bank_rad)
+            - math.sin(gamma_rad)
+            + _descent_deceleration_ft_s2(
+                start_tas_kt=start_tas_kt,
+                end_tas_kt=end_tas_kt,
+                headwind_kt=headwind_kt,
+                gamma_rad=gamma_rad,
+                height_drop_ft=height_drop_ft,
+            )
+            / _G_FT_S2
+        )
     )
 
 
