@@ -163,7 +163,7 @@ with its own response chart, in [Special Weightings](special-weightings.md).
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | 1D or 2D array, or `Signal` | any | non-empty | 2D is `[channels, samples]` |
 | `fs` | int | Hz | > 0; taken from `x` when `x` is a `Signal` | |
-| `curve` | str | — | `'A'` (default), `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'`, `'468'` | `'G'` per ISO 7196 (infrasound), `'B'`/`'D'` historical and `'AU'` per IEC 61012 are covered in [Special Weightings](special-weightings.md); `'Z'` is a bypass; `'468'` is the ITU-R BS.468-4 programme-level curve, which needs `stateful=False` |
+| `curve` | str | — | `'A'` (default), `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'`, `'468'` | `'G'` per ISO 7196 (infrasound), `'B'`/`'D'` historical and `'AU'` per IEC 61012 are covered in [Special Weightings](special-weightings.md); `'Z'` is a bypass; `'468'` is the ITU-R BS.468-4 programme-level curve, which needs the oversampled design (`high_accuracy=True`, and so `stateful=False`, which forces it off) |
 | `high_accuracy` | bool | — | default `True` (function); class default `None` resolves to `not stateful` | Internal oversampling keeps A/C in class 1 up to 16 kHz when $f_\mathrm{s} \ge 40$ kHz; details in §5 |
 | `stateful` | bool (class only) | — | default `False` | Carries filter state across blocks (streaming) |
 | `steady_ic` | bool (class only) | — | default `False` | Steady-state initial conditions (no onset transient) |
