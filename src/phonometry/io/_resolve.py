@@ -181,6 +181,44 @@ def resolve_calibration(x: SignalInput, calibration_factor: float | None) -> flo
     return 1.0
 
 
+def _scaled(samples: np.ndarray, factor: float, name: str) -> np.ndarray:
+    """Scale *samples* by *factor*, refusing a product that leaves the doubles.
+
+    Both operands are finite by the time they reach here: the samples were
+    checked and :class:`~phonometry.io.Signal` requires a positive finite
+    factor. Their product need not be, and it used to leave as an ``inf``
+    that nothing had refused, since the finiteness check runs before the
+    multiplication and cannot see past it.
+
+    The overflow is caught in the multiplication itself rather than by
+    measuring the result, so this costs no second pass over the recording:
+    numpy already detects it and ``errstate`` only decides what to do about
+    it. Nothing legitimate reaches it. The loudest quantity acoustics
+    measures is a blast overpressure of a few bar, and a double holds
+    something like ten to the three hundred and two times that, so a product
+    that overflows is a calibration chain built wrong rather than a scale
+    that will not fit.
+
+    :param samples: The validated samples.
+    :param factor: The calibration factor, positive and finite.
+    :param name: Name of the signal parameter, for the error message.
+    :return: The scaled samples.
+    :raises ValueError: If the product overflows to infinity.
+    """
+    try:
+        with np.errstate(over="raise"):
+            return samples * factor
+    except FloatingPointError:
+        peak = float(np.max(np.abs(samples)))
+        msg = (
+            f"'{name}': the calibration factor overflows the samples it "
+            f"scales; {factor!r} times a peak of {peak!r} leaves the range a "
+            "double can hold. Both are finite on their own, so check the "
+            "chain rather than either end of it."
+        )
+        raise ValueError(msg) from None
+
+
 def resolve_samples(
     x: SignalInput, *, calibrate: bool = True, name: str = "x"
 ) -> np.ndarray:
@@ -202,15 +240,19 @@ def resolve_samples(
     :param name: Name of the signal parameter, for the error messages.
     :return: The samples, float64.
     :raises ValueError: If *x* is ``None``, cannot be read as numbers, or
-        carries a non-finite sample.
+        carries a non-finite sample; or, for a calibrated Signal, if the
+        factor overflows the samples it scales, which neither of them is
+        answerable for on its own.
     """
     samples = _typesignal(x, name=name)
     if calibrate and isinstance(x, Signal) and x.calibration_factor is not None:
-        return samples * x.calibration_factor
+        return _scaled(samples, x.calibration_factor, name)
     return samples
 
 
-def apply_calibration(x: SignalInput, samples: np.ndarray) -> np.ndarray:
+def apply_calibration(
+    x: SignalInput, samples: np.ndarray, *, name: str = "x"
+) -> np.ndarray:
     """Scale already-validated samples to pascals, if *x* carried a factor.
 
     The two-step sibling of :func:`resolve_samples`, for the functions that
@@ -222,10 +264,12 @@ def apply_calibration(x: SignalInput, samples: np.ndarray) -> np.ndarray:
 
     :param x: The signal argument as the caller passed it.
     :param samples: The validated samples derived from it.
+    :param name: Name of the signal parameter, for the error message.
     :return: The samples, in pascals when the object knew how.
+    :raises ValueError: If the factor overflows the samples it scales.
     """
     if isinstance(x, Signal) and x.calibration_factor is not None:
-        return samples * x.calibration_factor
+        return _scaled(samples, x.calibration_factor, name)
     return samples
 
 

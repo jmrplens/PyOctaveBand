@@ -126,3 +126,52 @@ def test_resample_to_length_padding_and_trimming() -> None:
     y4 = _resample_to_length(x2, 1, 8)
     assert y4.shape == (2, 8)
     np.testing.assert_array_equal(y4, x2[:, :8])
+
+
+@pytest.mark.parametrize(
+    ("entry", "field"),
+    [("resolve_samples", "x"), ("apply_calibration", "ref_signal")],
+)
+def test_a_factor_that_overflows_its_samples_is_refused(entry: str, field: str) -> None:
+    """Two finite numbers whose product is not, and nothing saw it.
+
+    The samples are checked for finiteness before the calibration factor is
+    applied, and a check cannot see past the multiplication that follows it.
+    Both operands are finite by contract, the factor because
+    :class:`~phonometry.io.Signal` requires it, so the infinity was created
+    between them and left as a value.
+
+    The refusal names both, because neither is wrong on its own: a chain that
+    overflows is built wrong somewhere along it, and saying only "non-finite"
+    would send the reader to whichever end they looked at first.
+    """
+    from phonometry.io import Signal
+    from phonometry.io._resolve import apply_calibration, resolve_samples
+
+    samples = np.full(4, 1e300)
+    signal = Signal(samples, 48000, calibration_factor=1e10)
+    call = (
+        (lambda: resolve_samples(signal))
+        if entry == "resolve_samples"
+        else (lambda: apply_calibration(signal, samples, name=field))
+    )
+    with pytest.raises(
+        ValueError, match=rf"'{field}': the calibration factor overflows"
+    ):
+        call()
+
+
+def test_a_calibration_the_instruments_actually_use_is_untouched() -> None:
+    """The headroom is not close, and the guard must not pretend otherwise.
+
+    A double reaches about 1.8e308, and the loudest quantity acoustics
+    measures is a blast overpressure of a few bar. A full-scale sample scaled
+    to pascals by a factor of 1e5 lands at 5e4, which is 1e303 short of the
+    ceiling, so nothing an instrument produces comes near this refusal.
+    """
+    from phonometry.io import Signal
+    from phonometry.io._resolve import resolve_samples
+
+    scaled = resolve_samples(Signal(np.full(4, 0.5), 48000, calibration_factor=1e5))
+    assert np.all(np.isfinite(scaled))
+    assert float(np.max(scaled)) == pytest.approx(5.0e4)

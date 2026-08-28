@@ -135,15 +135,21 @@ def feedback_loop_gain(
         :data:`CARDIOID_RELATIVE_DIRECTIVITY` for a cardioid).
     :return: The feedback-loop gain :math:`G_\mathrm{S}`, dB.
     """
-    values = (
-        float(level_loudspeaker_at_microphone),
-        float(level_loudspeaker_at_listener),
-        float(microphone_directivity),
+    named = (
+        ("level_loudspeaker_at_microphone", float(level_loudspeaker_at_microphone)),
+        ("level_loudspeaker_at_listener", float(level_loudspeaker_at_listener)),
+        ("microphone_directivity", float(microphone_directivity)),
     )
-    if not all(math.isfinite(v) for v in values):
-        msg = "Levels and the directivity index must be finite."
-        raise ValueError(msg)
-    l_hm, l_hl, d_m = values
+    # Named one at a time. The three used to share a message that said
+    # "Levels and the directivity index must be finite", which is true and
+    # useless: a reader cannot tell which of the three arrived non-finite,
+    # and the two levels are measured separately, so the answer decides
+    # where to look.
+    for name, value in named:
+        if not math.isfinite(value):
+            msg = f"'{name}' must be finite; got {value!r}."
+            raise ValueError(msg)
+    l_hm, l_hl, d_m = (value for _, value in named)
     return l_hm - l_hl + d_m
 
 
