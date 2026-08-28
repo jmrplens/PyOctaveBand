@@ -88,10 +88,11 @@ not here.
 **No aircraft is modelled from first principles.** NPD tables and noise
 hemispheres are *inputs*: the library interpolates the tables published for a
 type and does not synthesise them from engine data, and the ANP database is
-read and never written (version 2.3 ships as-is). Of the ANP entries, only
-those with fixed-point profiles have a ready-to-use trajectory, because
-turning a procedural-step departure into a flight path needs the ICAO Doc 9911
-flight-mechanics performance model, which is not implemented.
+read and never written (version 2.3 ships as-is). A trajectory, on the other
+hand, is computed: an entry that publishes procedural steps rather than fixed
+points is flown through the ECAC Doc 29 Vol. 2 Appendix B performance model,
+which turns a published procedure into a profile for the aerodrome and weather
+it is flown from.
 
 **Three specific gaps.** Rotorcraft hover, idle and taxi run on the Table 3
 derived sources, but the guidance's last resort for a type with no hover data

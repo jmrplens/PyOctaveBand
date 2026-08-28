@@ -30,6 +30,7 @@ if TYPE_CHECKING:
     from ..aircraft.anp_fleet import AnpNpdCurves, AnpProfile
     from ..aircraft.atmospheric_absorption import AircraftBandAttenuation
     from ..aircraft.certification import EPNLResult
+    from ..aircraft.flight_performance import FlightProfile
     from ..aircraft.rotorcraft_noise import (
         FlightPathKinematics,
         RotorcraftEventResult,
@@ -104,6 +105,20 @@ _STRINGS: dict[str, str] = {
     "Altitude AFE [m]": "Altitud AFE [m]",
     "ANP default profile": "Perfil por defecto ANP",
     "ground roll": "rodaje en pista",
+    # Doc 29 Vol. 2 Appendix B flight performance. The profile is in the
+    # standard's own English units, so the axis labels name feet and pounds.
+    "Along-track distance [kft]": "Distancia sobre la ruta [kft]",
+    "Height above aerodrome [ft]": "Altura sobre el aeródromo [ft]",
+    "Corrected net thrust [lb/engine]": "Empuje neto corregido [lb/motor]",
+    "Flight profile": "Perfil de vuelo",
+    "departure": "despegue",
+    "arrival": "aproximación",
+    # The two curves are read against different axes, so each legend entry says
+    # which. A bare "height" would also be too short a key for the figure
+    # pipeline's shared table, where it would attach itself by substring to
+    # every unrelated figure whose own labels mention a height.
+    "height (left axis)": "altura (eje izquierdo)",
+    "thrust (right axis)": "empuje (eje derecho)",
 }
 
 
@@ -789,4 +804,70 @@ def plot_anp_profile(
     )
     ax.grid(True, alpha=0.3)
     localize_axes(ax, language)
+    return ax
+
+
+def plot_flight_profile(
+    result: FlightProfile,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Height and corrected net thrust against distance along the ground track.
+
+    The two are drawn on twin axes because they are what a Doc 29 profile is
+    read for together: the height sets the slant distance to the receiver and
+    the thrust picks the NPD curve, and the interesting points of a procedure
+    are where one moves without the other -- a level segment at adapted thrust,
+    the 1000 ft transition after a thrust cutback.
+
+    :param result: A
+        :class:`~phonometry.aircraft.flight_performance.FlightProfile`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the height ``plot`` call.
+    :return: The height axes.
+    """
+    from .._i18n import localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    distance_kft = result.distance_ft / 1000.0
+    ax.plot(
+        distance_kft,
+        result.altitude_ft,
+        **{
+            "marker": "o",
+            "ms": 3,
+            "linewidth": 1.5,
+            "color": _C_PRIMARY,
+            "label": _t("height (left axis)", language),
+            **kwargs,
+        },
+    )
+    ax.set_xlabel(_t("Along-track distance [kft]", language))
+    ax.set_ylabel(_t("Height above aerodrome [ft]", language))
+    thrust_ax = ax.twinx()
+    thrust_ax.plot(
+        distance_kft,
+        result.corrected_net_thrust_lb,
+        marker="s",
+        ms=3,
+        lw=1.2,
+        ls="--",
+        color=_C_SECONDARY,
+        label=_t("thrust (right axis)", language),
+    )
+    thrust_ax.set_ylabel(_t("Corrected net thrust [lb/engine]", language))
+    operation = "departure" if result.operation == "D" else "arrival"
+    procedure = f" {result.procedure_id}" if result.procedure_id else ""
+    ax.set_title(
+        f"{_t('Flight profile', language)} - {result.aircraft_id}{procedure} "
+        f"({_t(operation, language)})"
+    )
+    handles = ax.get_lines()[:1] + thrust_ax.get_lines()[:1]
+    ax.legend(handles, [str(h.get_label()) for h in handles], loc=_LEGEND_UPPER_RIGHT)
+    ax.grid(True, alpha=0.3)
+    localize_axes(ax, language)
+    localize_axes(thrust_ax, language)
     return ax

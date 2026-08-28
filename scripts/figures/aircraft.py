@@ -680,6 +680,93 @@ def generate_anp_profile(output_dir: str) -> None:
     plt.close()
 
 
+def generate_anp_procedural_profile(output_dir: str) -> None:
+    """ECAC Doc 29 Vol. 2 Appendix B: an ANP procedure flown into height and thrust."""
+    print("Generating anp_procedural_profile...")
+    from phonometry import aircraft
+
+    # The other profile figure reads a tabulated trajectory; this one is
+    # computed. The aircraft's published procedural steps are flown through the
+    # Appendix B equations, which is why an aerodrome has to be given at all:
+    # the same steps give a different profile from a different field. These are
+    # the reference conditions the appendix itself works in - sea level, the
+    # standard atmosphere, and the 8 kt headwind of B4.4.
+    aircraft_id = "A320-211"
+    database = aircraft.load_anp_database()
+    airframe = database.aircraft(aircraft_id)
+    steps = database.procedural_steps(aircraft_id, "D", stage_length=1)
+    profile = database.flight_profile(
+        aircraft_id,
+        "D",
+        aerodrome=aircraft.Aerodrome(elevation_ft=0.0),
+        stage_length=1,
+    )
+
+    distance_kft = profile.distance_ft / 1000.0
+    thrust_lb = profile.corrected_net_thrust_lb
+    # Two moments of the procedure are worth naming, and both are read off the
+    # profile rather than counted off in the step list. The ground roll ends at
+    # the last point still on the runway, the equivalent take-off distance of
+    # Eq. B-16. The thrust rating changes at the largest fall in corrected net
+    # thrust once airborne -- across the 1000 ft transition segment Eq. B-34
+    # splices in for it -- which is a different fall from the larger one during
+    # the roll, where the rating holds and the speed term of Eq. B-9 is what
+    # moves.
+    end_of_roll = int(np.argmax(profile.altitude_ft > 0.0)) - 1
+    airborne = np.diff(thrust_lb)[end_of_roll:]
+    cutback = end_of_roll + int(np.argmin(airborne)) + 1
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    profile.plot(ax=ax)
+    # The result's own plot draws the thrust on a twin of the height axes, so
+    # that twin is the second and last axes of the figure. Its autoscale spans
+    # only the 8000 lb the thrust actually covers, which magnifies every ripple
+    # into a cliff; from zero the cutback is read against the thrust itself.
+    thrust_ax = fig.axes[-1]
+    thrust_ax.set_ylim(0.0, 1.35 * float(thrust_lb.max()))
+    ax.set_title(
+        f"Doc 29 Procedural Departure Profile - {airframe.description}", pad=12
+    )
+    # The climb ends at 10 000 ft, so the height curve would run into the
+    # legend the result's plot puts in the corner it climbs towards.
+    ax.set_ylim(top=12500.0)
+    ax.axvspan(0.0, distance_kft[end_of_roll], color=COLOR_TERTIARY, alpha=0.18)
+    ax.annotate(
+        "take-off ground roll",
+        xy=(0.5 * distance_kft[end_of_roll], 0.0),
+        xytext=(6.5, 400.0),
+        color=COLOR_FG,
+        fontsize=9,
+        arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.2},
+    )
+    ax.axvline(distance_kft[cutback], color=COLOR_MUTED, linestyle=":", linewidth=1.4)
+    ax.annotate(
+        f"take-off to climb thrust, {thrust_lb[cutback - 1] - thrust_lb[cutback]:.0f} lb",
+        xy=(distance_kft[cutback] + 0.3, 6100.0),
+        xytext=(18.5, 4800.0),
+        color=COLOR_FG,
+        fontsize=9,
+        arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.2},
+    )
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.text(
+        0.02,
+        0.95,
+        f"sea level, 15 °C, 8 kt headwind\n"
+        f"{len(steps)} procedural steps flown to "
+        f"{len(profile.points)} profile points",
+        transform=ax.transAxes,
+        va="top",
+        ha="left",
+        fontsize=9,
+        bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6},
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "anp_procedural_profile.svg")
+    plt.close()
+
+
 # --------------------------------------------------------------------------- #
 # The ECAC Doc 29 single event, opened up
 # --------------------------------------------------------------------------- #

@@ -272,6 +272,13 @@ _ES_EXACT = {
     "Along-track distance [km]": "Distancia sobre la ruta [km]",
     "Altitude AFE [m]": "Altitud AFE [m]",
     "ground roll": "rodaje en pista",
+    # The Appendix B profile is in the standard's own English units, so its
+    # axis labels name feet and pounds where the tabulated one names metres.
+    "Along-track distance [kft]": "Distancia sobre la ruta [kft]",
+    "Height above aerodrome [ft]": "Altura sobre el aeródromo [ft]",
+    "Corrected net thrust [lb/engine]": "Empuje neto corregido [lb/motor]",
+    "height (left axis)": "altura (eje izquierdo)",
+    "thrust (right axis)": "empuje (eje derecho)",
     "Bearing Fault Lines on a Measured Envelope Spectrum": "Líneas de fallo del rodamiento sobre un espectro de envolvente medido",
     "envelope spectrum of the 2-4 kHz band": "espectro de envolvente de la banda 2-4 kHz",
     "predicted BPFO and harmonics": "BPFO previsto y sus armónicos",
@@ -3676,6 +3683,27 @@ _ES_PATTERNS = [
     (
         r"^stage length (.+), (.+) fixed points, (.+) m at the last one$",
         r"etapa \1, \2 puntos fijos, \3 m en el último",
+    ),
+    # anp_procedural_profile: the same fleet database, but the profile is flown
+    # rather than tabulated, so the caption names the aerodrome it was flown at.
+    (
+        r"^Doc 29 Procedural Departure Profile - (.+)$",
+        r"Perfil de despegue por procedimiento (Doc 29) - \1",
+    ),
+    (
+        (
+            r"^sea level, 15 °C, 8 kt headwind\n"
+            r"(.+) procedural steps flown to (.+) profile points$"
+        ),
+        (
+            "nivel del mar, 15 °C, 8 kt de viento de frente"
+            "\n"
+            r"\1 pasos de procedimiento volados a \2 puntos de perfil"
+        ),
+    ),
+    (
+        r"^take-off to climb thrust, (.+) lb$",
+        r"de empuje de despegue a empuje de ascenso, \1 lb",
     ),
     (r"^event_level receiver: SEL (.+) dB$", r"receptor de event_level: SEL \1 dB"),
     (r"^(.+) Hz band, the most directive one$", r"banda de \1 Hz, la más directiva"),

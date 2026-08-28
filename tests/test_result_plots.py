@@ -178,6 +178,15 @@ _KWARG_PLOT_CASES = [
     ("slit_aperture", _slit_aperture, "line"),
     ("modulation_distortion", _modulation, "line"),
     ("field_indicators", _field_indicators, "line"),
+    (
+        "flight_profile",
+        lambda: ph.aircraft.load_anp_database().flight_profile(
+            "A320-211",
+            "departure",
+            aerodrome=ph.aircraft.Aerodrome(elevation_ft=0.0),
+        ),
+        "line",
+    ),
 ]
 
 
@@ -259,6 +268,9 @@ def test_single_axes_plots_accept_external_ax() -> None:
         _airborne_insulation(),
         _impact_insulation(),
         _band_uncertainty(),
+        ph.aircraft.load_anp_database().flight_profile(
+            "A320-211", "departure", aerodrome=ph.aircraft.Aerodrome(elevation_ft=0.0)
+        ),
     ):
         fig, ax = plt.subplots()
         out = res.plot(ax=ax)

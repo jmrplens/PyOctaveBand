@@ -170,6 +170,59 @@ plt.show()
 
 </details>
 
+## Flying a published procedure
+
+A procedure is not a trajectory, and that is the whole of the difficulty. Its
+steps say what the aeroplane does, not where it goes, and where those
+instructions put it over the ground depends on the field: the same steps flown
+from a hot runway high above sea level reach 10 000 ft much further out than
+from a cold one at the coast. There is nothing to tabulate, which is why the
+database ships the steps and not the points. `flight_profile` flies them,
+through the ECAC Doc 29 Vol. 2 Appendix B flight performance model, in the
+standard's own units of feet, knots and pounds.
+
+```python
+from phonometry import aircraft
+
+sea_level = aircraft.Aerodrome(elevation_ft=0.0)
+flown = aircraft.load_anp_database().flight_profile(
+    "A320-211", "departure", aerodrome=sea_level, stage_length=1
+)
+print(len(flown.points), round(flown.distance_ft[-1]), flown.altitude_ft[-1])
+# 11 79423 10000.0
+flown.plot()
+```
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_procedural_profile_dark.svg">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_procedural_profile.svg" alt="Departure profile of an Airbus A320-211 synthesised from its published procedural steps: height climbing to 10 000 ft against along-track distance, with corrected net thrust on a second axis falling through the ground roll and stepping down at the change to climb thrust" width="82%">
+</picture>
+
+The A320-211 ships no fixed-point departure profile at all, so this is the only
+way to fly it. The shaded band is the take-off ground roll and the dotted line is
+the change from take-off to climb thrust, a fall of 3 047 lb per engine that the
+height curve barely registers: nothing in the shape of the climb says the engines
+were throttled back, and the noise says it plainly.
+
+`procedural_profile` crosses back into the units the noise chain speaks, and
+`event_level` and `noise_contour` take an `aerodrome` for the same reason
+`flight_profile` does, so an aircraft that publishes only steps runs the whole
+Doc 29 chain from its identifier. That is 309 of the database's 310 aircraft and
+operation pairs, against 33 with a tabulated trajectory. The field's temperature
+and pressure reach the Doc 29 impedance adjustment as well as the performance
+model, so a profile flown on a hot day is not corrected for a standard one by
+omission.
+
+```python
+from phonometry import aircraft
+
+hot_and_high = aircraft.Aerodrome(elevation_ft=5000.0, temperature_c=35.0)
+level = aircraft.load_anp_database().event_level(
+    "A320-211", [3000.0, 500.0, 0.0], "departure", aerodrome=hot_and_high
+)
+print(round(float(level.level), 1))    # 87.8 dB
+```
+
 ## Straight to an event level or a contour
 
 With both halves in the record, the aircraft can run the Doc 29 chain itself.
@@ -230,13 +283,17 @@ the default fixed-point trajectories and their stage-length bins; and driving
 the Doc 29 single-event level and ground-grid contour from an aircraft
 identifier with `event_level` and `noise_contour`.
 
-**Not covered.** The procedural-step profiles, which is how most ANP entries
-describe a departure. Turning those into a flight path needs the ICAO Doc 9911
-flight-mechanics performance model, which this bridge does not implement, so
-only the 13 types with a fixed-point *departure* profile and the 20 with a
-fixed-point *arrival* profile come with a trajectory ready to fly. The database
-is read and never written: version 2.3 ships with the package and the package
-does not update it.
+The procedural-step profiles, which is how most ANP entries describe a
+departure, are covered too, through the ECAC Doc 29 Vol. 2 Appendix B flight
+performance model: `flight_profile` flies a published procedure for an
+aerodrome and its weather, and `procedural_profile` hands the result to the
+Doc 29 chain as the same flight path a fixed-point profile produces. A profile
+that depends on the aerodrome is not a table entry, which is why those two take
+an `Aerodrome` and `profile` does not.
+
+**Not covered.** Nothing of the database's own content: it is read and never
+written, version 2.3 ships with the package and the package does not update
+it.
 
 ## See also
 Pages elsewhere on the site that this section leans on:

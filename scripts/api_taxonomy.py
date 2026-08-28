@@ -256,6 +256,7 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.aircraft.atmospheric_absorption",
             "phonometry.aircraft.airport_noise",
             "phonometry.aircraft.anp_fleet",
+            "phonometry.aircraft.flight_performance",
             "phonometry.aircraft.rotorcraft_noise",
             "phonometry.aircraft.rotorcraft_propagation",
             "phonometry.aircraft.measurement_system",
