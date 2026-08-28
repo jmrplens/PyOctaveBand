@@ -281,7 +281,7 @@ from phonometry import electroacoustics
 
 print(electroacoustics.weighted_thd(signal, fs, 100.0))                  # ITU-R 468 network
 print(electroacoustics.weighted_thd(signal, fs, 100.0, weighting="A"))   # A-weighted variant
-print(electroacoustics.itu_r_468_weighting([6300.0]))                    # [+12.2] dB
+print(electroacoustics.itu_r_468_weighting([6300.0]))                    # [+12.2167] dB
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/itu_r_468_weighting.svg" alt="The ITU-R BS.468-4 weighting network against frequency, rising to plus 12.2 dB near 6.3 kHz and falling steeply above it, with the CCIR-RMS variant shifted down by 5.63 dB so that it is 0 dB at 2 kHz, and the A-weighting curve drawn pale as a reference; the marked points are 0 dB at 1 kHz and plus 12.2 dB at 6.3 kHz for the 468 form and minus 5.63 dB at 1 kHz for CCIR-RMS" width="82%" />

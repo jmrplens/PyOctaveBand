@@ -148,7 +148,5 @@ def test_stateful_weighting_invalid_curve_raises() -> None:
     """Unknown weighting curves must be rejected at construction."""
     from phonometry import filters
 
-    with pytest.raises(
-        ValueError, match="must be 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z'"
-    ):
+    with pytest.raises(ValueError, match=r"Weighting curve must be .*'AU'"):
         filters.WeightingFilter(fs=48000, curve="E", stateful=True)

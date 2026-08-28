@@ -137,7 +137,7 @@ from phonometry import electroacoustics
 
 print(electroacoustics.weighted_thd(signal, fs, 100.0))                  # ITU-R 468 network
 print(electroacoustics.weighted_thd(signal, fs, 100.0, weighting="A"))   # A-weighted variant
-print(electroacoustics.itu_r_468_weighting([6300.0]))                    # [+12.2] dB
+print(electroacoustics.itu_r_468_weighting([6300.0]))                    # [+12.2167] dB
 ```
 
 ### 2.2 Dynamic range and idle channel noise (AES17-2015 6.4)

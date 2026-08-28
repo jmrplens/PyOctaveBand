@@ -626,12 +626,12 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | IEC 60268-3:2013 (14.12.8.1 a) | Difference-frequency distortion d_d,2 (over U_2,ref = 2 U_2,f2) | 0.03 (+/-0.0001) | 0.03 | 0 | &#9989; |
 | IEC 60268-3:2013 (14.12.8.1 b) | Difference-frequency distortion d_d,3 (arithmetic product sum) | 0.04 (+/-0.0001) | 0.04 | 0 | &#9989; |
 | IEC 60268-3:2013 (14.12.10) | Total difference-frequency distortion (8 kHz / 11.95 kHz tones) | 0.03605551 (+/-0.0001) | 0.03605551 | 0 | &#9989; |
-| ITU-R BS.468-4 Table 1 | Weighting network response at the 6.3 kHz peak (14.12.11 network) | 12.2 dB (+/-0 dB) | 12.2 dB | 0 dB | &#9989; |
+| ITU-R BS.468-4 Table 1 | Weighting network response at the 6.3 kHz peak (14.12.11 network) | 12.2 dB (+/-0.05 dB) | 12.2167 dB | 0.017 dB | &#9989; |
 | IEC 60268-3:2013 (14.12.9) | DIM of the 15 kHz / 3.15 kHz signal (Table 2, 9 products) | 0.168819 (+/-0.0001) | 0.168819 | 0 | &#9989; |
 | Bendat & Piersol, Random Data 4e | H1 recovers a known first-order IIR gain at 1 kHz | 0.8954 (+/-2%) | 0.8954 | 0 | &#9989; |
 | Bendat & Piersol, Random Data 4e | Ordinary coherence = 1 for a noiseless LTI path | 1 (+/-0.001) | 1 | 0 | &#9989; |
 | AES17-2015 (6.4.2 / 5.2.7) | Idle channel noise, 1 kHz -20 dBFS tone (CCIR-RMS -5.63 dB offset) | -25.63 dB (+/-0.01 dB) | -25.63 dB | 0 dB | &#9989; |
-| AES17-2015 (6.4.1) | Dynamic range, full-scale reference over a -40 dBFS residual at 2 kHz | 40 dB (+/-0.6 dB) | 40.41 dB | 0.414 dB | &#9989; |
+| AES17-2015 (6.4.1) | Dynamic range, full-scale reference over a -40 dBFS residual at 2 kHz | 40 dB (+/-0.6 dB) | 40.38 dB | 0.385 dB | &#9989; |
 
 </details>
 

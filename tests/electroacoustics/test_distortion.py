@@ -550,33 +550,68 @@ def test_notch_effective_q_matches_request(q: float) -> None:
     assert q_eff == pytest.approx(q, rel=0.02)
 
 
-def test_itu_r_468_weighting_table_values() -> None:
-    # ITU-R BS.468-4 Table 1 nominal response, including the +12.2 dB peak
-    # at 6.3 kHz; interpolation between mask points is linear in dB over
-    # log-frequency per the recommendation's own tolerance rule.
+def test_itu_r_468_weighting_reproduces_every_table_1_row() -> None:
+    """All 21 rows of ITU-R BS.468-4 Table 1, to the table's own rounding.
 
-    pins = {
-        31.5: -29.9,
-        200.0: -13.8,
-        1000.0: 0.0,
-        2000.0: 5.6,
-        5000.0: 11.7,
-        6300.0: 12.2,
-        10000.0: 8.1,
-        20000.0: -22.2,
-        31500.0: -42.7,
-    }
-    for f, db in pins.items():
-        assert electroacoustics.itu_r_468_weighting([f])[0] == pytest.approx(
-            db, abs=1e-9
-        )
-    # The 6.3 kHz table point is the curve's maximum.
-    grid = np.geomspace(20.0, 31500.0, 20000)
+    The function evaluates the Fig. 1a network, which clause 1 makes the
+    nominal curve, so the table is an oracle rather than the source: each row
+    is the curve rounded to 0,1 dB and must therefore agree to half a
+    quantum (bar the 100 Hz knife-edge the bound carries). That is a real
+    check. Pinning the same rows to 1e-9, as this test used to, only asserted
+    that ``np.interp`` returns its own knots.
+    """
+    freqs = [row[0] for row in ref.ITU_R_468_TABLE1]
+    printed = np.array([row[1] for row in ref.ITU_R_468_TABLE1])
+    curve = electroacoustics.itu_r_468_weighting(freqs)
+    error = curve - printed
+    assert np.max(np.abs(error)) <= ref.ITU_R_468_NETWORK_VS_TABLE1_DB
+    # Not a slack bound met by luck: the rms sits at half the maximum, which
+    # is the signature of a rounding residual rather than a modelling one.
+    assert float(np.sqrt(np.mean(error**2))) == pytest.approx(0.0264, abs=0.001)
+
+
+def test_itu_r_468_peak_is_the_networks_own_and_not_the_table_row() -> None:
+    """The maximum is +12.22 dB near, but not at, the 6.3 kHz table row.
+
+    Table 1 prints its peak at 6 300 Hz because that is the mask frequency it
+    samples; the network peaks at 6 247 Hz, 0.84 % below it, and the two
+    readings differ by 0.001 dB. Asserting the argmax lands exactly on 6 300
+    would be a statement about the old interpolation, not about the
+    Recommendation.
+    """
+    grid = np.geomspace(5000.0, 8000.0, 200001)
     curve = electroacoustics.itu_r_468_weighting(grid)
-    assert float(np.max(curve)) == pytest.approx(12.2, abs=1e-3)
-    assert grid[int(np.argmax(curve))] == pytest.approx(6300.0, rel=1e-3)
-    # DC blocks completely; negative/non-finite frequencies are rejected.
+    peak = float(np.max(curve))
+    assert peak == pytest.approx(12.2176, abs=5e-4)
+    assert float(grid[int(np.argmax(curve))]) == pytest.approx(6247.0, rel=1e-3)
+    # The printed row is that peak rounded, and 6 300 Hz is 0.001 dB below it.
+    at_6300 = float(electroacoustics.itu_r_468_weighting([6300.0])[0])
+    assert at_6300 == pytest.approx(12.2167, abs=5e-4)
+    assert peak - at_6300 < 0.002
+
+
+def test_itu_r_468_weighting_blocks_dc() -> None:
+    """The series capacitor of Fig. 1a is a zero at the origin, not a slope."""
     assert electroacoustics.itu_r_468_weighting([0.0])[0] == -np.inf
+
+
+def test_itu_r_468_weighting_keeps_the_callers_shape() -> None:
+    """A grid in, the same grid out: the pole axis is appended, not prepended.
+
+    The docstring promises the input's shape, and the callers in this module
+    hand it a 1-D bin vector; a two-dimensional grid is what would catch a
+    product taken over the wrong axis.
+    """
+    grid = np.array([[100.0, 1000.0, 6300.0], [200.0, 2000.0, 12500.0]])
+    weighted = electroacoustics.itu_r_468_weighting(grid)
+    assert weighted.shape == grid.shape
+    assert weighted[0, 1] == pytest.approx(0.0, abs=1e-12)
+    assert weighted[1, 0] == pytest.approx(
+        float(electroacoustics.itu_r_468_weighting([200.0])[0]), abs=1e-12
+    )
+
+
+def test_itu_r_468_weighting_rejects_a_negative_frequency() -> None:
     with pytest.raises(
         ValueError, match="'frequencies' must be finite and non-negative"
     ):
@@ -584,15 +619,24 @@ def test_itu_r_468_weighting_table_values() -> None:
 
 
 def test_itu_r_468_matches_aes17_ccir_rms_table() -> None:
-    # AES17-2015 Table 1 prints the same curve shifted by -5.63 dB (the
-    # CCIR-RMS filter, unity at 2 kHz); cross-check a few rows within the
-    # 0.05 dB rounding of the AES17 print.
+    """AES17-2015 Table 1 is this curve shifted by -5,63 dB (5.2.7).
 
-    aes17 = {63.0: -29.5, 3150.0: 3.4, 8000.0: 5.8, 12500.0: -5.6}
-    for f, db in aes17.items():
-        assert electroacoustics.itu_r_468_weighting([f])[0] - 5.63 == pytest.approx(
-            db, abs=0.05
+    The tolerance crosses two independent roundings to 0,1 dB, not one: AES17
+    derived its cells from BS.468-4's rounded Table 1 rather than from the
+    curve, so ``network - 5.63`` sits up to 0.0802 dB from a printed cell.
+    Two of the four rows checked here (3 150 and 8 000 Hz) are among the five
+    where the two roundings disagree.
+    """
+    for frequency, printed in ref.ITU_R_468_AES17_ROWS:
+        shifted = (
+            float(electroacoustics.itu_r_468_weighting([frequency])[0])
+            + ref.ITU_R_468_AES17_OFFSET_DB
         )
+        assert shifted == pytest.approx(printed, abs=ref.ITU_R_468_AES17_TOL_DB)
+    # The offset itself was taken from the curve, not from the table: it is
+    # the network's 2 kHz response rounded to 0,01 dB.
+    at_2k = float(electroacoustics.itu_r_468_weighting([2000.0])[0])
+    assert at_2k == pytest.approx(-ref.ITU_R_468_AES17_OFFSET_DB, abs=0.005)
 
 
 def test_weighted_thd_468_emphasises_6khz_products() -> None:

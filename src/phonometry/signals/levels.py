@@ -141,8 +141,8 @@ def ln_levels(
     :param mode: Time weighting for the envelope: 'fast', 'slow' or 'impulse'.
     :param weighting: Optional frequency weighting, any curve accepted by
         :func:`~phonometry.filters.weighting.weighting_filter`: 'A', 'B', 'C',
-        'D', 'G', 'AU' or 'Z'. None (the default) and 'Z' both leave the
-        signal unweighted.
+        'D', 'G', 'AU', '468' or 'Z'. None (the default) and 'Z' both leave
+        the signal unweighted.
     :param calibration_factor: Multiplier converting digital units to
         Pascals. Precedence as in :func:`leq`: explicit value, then a
         calibrated Signal's own factor, then 1.0.
@@ -251,8 +251,8 @@ def sel(
         value that disagrees with it raises instead of silently winning.
     :param weighting: Optional frequency weighting, any curve accepted by
         :func:`~phonometry.filters.weighting.weighting_filter`: 'A', 'B', 'C',
-        'D', 'G', 'AU' or 'Z'. None (the default) and 'Z' both leave the
-        signal unweighted.
+        'D', 'G', 'AU', '468' or 'Z'. None (the default) and 'Z' both leave
+        the signal unweighted.
     :param calibration_factor: Multiplier converting digital units to
         Pascals. Precedence as in :func:`leq`: explicit value, then a
         calibrated Signal's own factor, then 1.0.

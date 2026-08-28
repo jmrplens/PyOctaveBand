@@ -168,13 +168,32 @@ itu_r_468_weighting(frequencies: ArrayLike) -> NDArray[np.float64]
 
 ITU-R BS.468-4 weighting response, in dB re 1 kHz.
 
-The nominal response of the Recommendation's Table 1 (identical to the
-IEC 60268-1 Appendix A network required by IEC 60268-3 14.12.11),
-interpolated linearly in dB over log-frequency -- the Recommendation's
-own rule for values between the mask frequencies -- and extrapolated
-beyond the table with the end-segment slopes. Zero frequency (DC) maps
-to `-inf` dB. AES17-2015 5.2.7 tabulates the same curve with an
-additional gain of -5,63 dB (unity at 2 kHz, the "CCIR-RMS" filter).
+Clause 1 of the Recommendation defines the nominal curve as the response
+of the passive network of Fig. 1a and prints Table 1 as "the values of
+this response at various frequencies", so the curve exists at every
+frequency and the 21 printed rows are that curve rounded to 0,1 dB. This
+is the closed-form evaluation of the same analog prototype the `'468'`
+branch of [`WeightingFilter`](/phonometry/reference/api/filters/weighting/#weightingfilter) discretises,
+
+$$
+20 \lg \left| \frac{K\,s}{D(s)} \right|_{s = 2 \pi j f},
+$$
+
+with one zero at the origin, the six poles of the Fig. 1a ladder and
+$K$ set for 0 dB at the 1 kHz reference. The value is what a
+psophometric noise meter's weighting network would add to a tone at that
+frequency: about +12.22 dB at the 6.3 kHz peak, where broadcast-chain
+noise is most audible, and -22.2 dB at 20 kHz. Zero frequency (dc) maps
+to `-inf` dB, which is the series capacitor of Fig. 1a. AES17-2015
+5.2.7 tabulates the same curve with an additional gain of -5,63 dB
+(unity at 2 kHz, the "CCIR-RMS" filter).
+
+Reading the 21 rows and interpolating between them, which is what this
+function used to do, departs from the network by up to 0.611 dB at
+11 058 Hz, where the curve turns over fastest and the table samples it
+most coarsely. (The log-frequency interpolation rule of Table 1's
+footnote (1) governs the *tolerance* column, not the response, and runs
+between six mask frequencies rather than all 21.)
 
 **Parameters**
 

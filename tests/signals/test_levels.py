@@ -478,16 +478,21 @@ def test_guide_signature_cells_match_the_code(relative_path: str) -> None:
 #: the curves. Curve letters are identifiers, so they are the same in both
 #: languages even though the prose around them is not.
 _WEIGHTING_ROW = re.compile(r"^\|\s*`weighting`\s*\|")
-_QUOTED_CURVE = re.compile(r"`'([A-Za-z]+)'`")
+_QUOTED_CURVE = re.compile(r"`'([A-Za-z0-9]+)'`")
 
 
 def _accepted_weighting_curves() -> set[str]:
-    """Every curve `weighting_filter` really takes, found by asking it."""
+    """Every curve `weighting_filter` really takes, found by asking it.
+
+    The candidate list is not just the alphabet: '468' names its own
+    Recommendation rather than a letter, so a search over letters alone would
+    have reported it as unaccepted and let the guide omit it silently.
+    """
     from phonometry import filters
 
     silence = np.zeros(256)
     accepted = set()
-    for candidate in [*string.ascii_uppercase, "AU"]:
+    for candidate in [*string.ascii_uppercase, "AU", "468"]:
         try:
             filters.weighting_filter(silence, FS, curve=candidate)
         except ValueError:
@@ -518,7 +523,7 @@ def test_guide_weighting_row_lists_every_curve_the_code_takes(
     assert documented == _accepted_weighting_curves(), sorted(documented)
 
 
-@pytest.mark.parametrize("curve", ["A", "B", "C", "D", "G", "AU", "Z"])
+@pytest.mark.parametrize("curve", ["A", "B", "C", "D", "G", "AU", "468", "Z"])
 def test_ln_levels_and_sel_accept_every_weighting_filter_curve(curve: str) -> None:
     """Both functions forward `weighting` straight to `weighting_filter`.
 
