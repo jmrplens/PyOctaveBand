@@ -361,8 +361,12 @@ class WeightingFilter:
         reads its prototype from a network and raises its own design rate, and
         because the reason for that rate takes a paragraph to state.
 
-        :return: ``(zeros, poles, gain)``, unnormalised; the caller puts 0 dB
-            at 1 kHz.
+        :return: ``(zeros, poles, gain)``, with the gain already putting 0 dB
+            at the 1 kHz reference because :func:`_itu_r_468_prototype`
+            normalises there. The shared renormalisation the caller applies to
+            every curve but G is therefore an identity here, and is left in
+            place rather than special-cased: it costs one evaluation and it
+            keeps the reference in one place for all of them.
         """
         poles, gain = _itu_r_468_prototype()
         if self.high_accuracy:
