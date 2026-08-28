@@ -206,12 +206,23 @@ def _stage_label(stage_length: int | str) -> str:
     a maximum-weight procedure, so an ``int`` key would drop every profile that
     uses it. A number is written without its decimal point either way, so
     ``1``, ``"1"`` and ``"1.0"`` all name the same bin.
+
+    :raises ValueError: for a number that falls between the bins. They are
+        whole, and truncating ``1.5`` to bin 1 would answer with a profile flown
+        at a different trip length and say nothing about the substitution.
     """
     text = str(stage_length).strip().upper()
     try:
-        return str(int(float(text)))
+        number = float(text)
     except ValueError:
         return text
+    if not number.is_integer():
+        msg = (
+            f"'stage_length' must name a whole ANP bin or 'M'; got "
+            f"{stage_length!r}, which falls between two bins."
+        )
+        raise ValueError(msg)
+    return str(int(number))
 
 
 def _optional(value: str) -> float | None:
@@ -443,7 +454,7 @@ class AnpAircraft:
         operation: str,
         *,
         aerodrome: Aerodrome | None = None,
-        stage_length: int = 1,
+        stage_length: int | str = 1,
         metric: EventMetric = "exposure",
         temperature: float | None = None,
         pressure: float | None = None,
@@ -467,7 +478,7 @@ class AnpAircraft:
         x: NDArray[np.float64] | list[float],
         y: NDArray[np.float64] | list[float],
         aerodrome: Aerodrome | None = None,
-        stage_length: int = 1,
+        stage_length: int | str = 1,
         metric: EventMetric = "exposure",
         temperature: float | None = None,
         pressure: float | None = None,
@@ -614,7 +625,7 @@ class AnpDatabase:
         self,
         aircraft_id: str,
         operation: str,
-        stage_length: int = 1,
+        stage_length: int | str = 1,
         *,
         profile_id: str | None = None,
     ) -> AnpProfile:
@@ -644,7 +655,25 @@ class AnpDatabase:
             )
             raise KeyError(msg)
         op = _operation_code(operation)
-        stage = int(stage_length)
+        # Normalised first and outside the guard below, so a number between the
+        # bins is refused as that, with its own message, rather than swept into
+        # the one for a non-numeric label.
+        label = _stage_label(stage_length)
+        try:
+            stage = int(label)
+        except ValueError:
+            # The fixed-point table is keyed by the numbered bins alone; "M" is
+            # a procedural-step label. Left to int() this arrives as a bare
+            # ValueError quoting a string and naming neither the argument nor
+            # the way in.
+            msg = (
+                f"'stage_length' {stage_length!r} names no fixed-point bin for "
+                f"aircraft {aircraft_id!r}: the fixed-point table is keyed by "
+                "the numbered trip-distance bins, and a maximum-weight "
+                "procedure is flown with flight_profile() instead, which needs "
+                "an aerodrome."
+            )
+            raise ValueError(msg) from None
         ids = sorted(
             pid
             for (a, o, pid, sl) in self._profiles
@@ -947,7 +976,7 @@ class AnpDatabase:
         self,
         aircraft_id: str,
         operation: str,
-        stage_length: int,
+        stage_length: int | str,
         aerodrome: Aerodrome | None = None,
     ) -> tuple[
         AnpAircraft,
@@ -993,7 +1022,7 @@ class AnpDatabase:
         operation: str,
         *,
         aerodrome: Aerodrome | None = None,
-        stage_length: int = 1,
+        stage_length: int | str = 1,
         metric: EventMetric = "exposure",
         temperature: float | None = None,
         pressure: float | None = None,
@@ -1044,7 +1073,7 @@ class AnpDatabase:
         x: NDArray[np.float64] | list[float],
         y: NDArray[np.float64] | list[float],
         aerodrome: Aerodrome | None = None,
-        stage_length: int = 1,
+        stage_length: int | str = 1,
         metric: EventMetric = "exposure",
         temperature: float | None = None,
         pressure: float | None = None,

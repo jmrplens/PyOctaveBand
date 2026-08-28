@@ -267,8 +267,10 @@ the database ships the steps and not the points.
 
 `flight_profile` flies them, through the [ECAC Doc 29 Vol. 2 Appendix
 B](/phonometry/reference/api/aeroacoustics/flight-performance/) flight
-performance model. It asks for the aerodrome that `profile` has no use for, and
-it works in the standard's own units: feet, knots and pounds.
+performance model. It requires an `aerodrome`, because it computes the
+trajectory and the trajectory depends on the field, where `profile` returns an
+already tabulated fixed-point one and needs no such argument. It works in the
+standard's own units: feet, knots and pounds.
 
 ```python
 from phonometry import aircraft

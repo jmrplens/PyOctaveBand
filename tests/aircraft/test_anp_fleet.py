@@ -848,6 +848,32 @@ def test_maximum_weight_stage_length_survives_the_lookup() -> None:
         "7378MAX", "departure", aerodrome=Aerodrome(elevation_ft=0.0), stage_length="M"
     )
     assert flown.points[-1].altitude_ft > 0.0
+    # And it reaches the whole Doc 29 chain, not only the profile: the label has
+    # to survive every hop, and event_level is the last one.
+    level = _DB.event_level(
+        "7378MAX",
+        [3000.0, 500.0, 0.0],
+        "departure",
+        aerodrome=Aerodrome(elevation_ft=0.0),
+        stage_length="M",
+    )
+    assert np.isfinite(level.level)
+
+
+def test_the_fixed_point_table_says_why_it_has_no_maximum_weight_bin() -> None:
+    """'M' is a procedural label, and the fixed-point table is keyed by numbers.
+
+    Left to ``int()`` this surfaced as ``invalid literal for int() with base 10:
+    'M'``, which names neither the argument nor the way in.
+    """
+    with pytest.raises(ValueError, match=r"'stage_length' 'M' names no fixed-point"):
+        _DB.profile("747100", "departure", "M")
+
+
+def test_a_stage_length_between_two_bins_is_refused_not_truncated() -> None:
+    """The bins are whole, so 1.5 is not bin 1 with a rounding error."""
+    with pytest.raises(ValueError, match=r"'stage_length' must name a whole ANP bin"):
+        _DB.profile("747100", "departure", "1.5")
 
 
 def test_flight_profile_names_the_stage_length_it_has_no_weight_for(

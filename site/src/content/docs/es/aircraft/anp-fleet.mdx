@@ -272,9 +272,10 @@ tabular, y por eso la base distribuye los pasos y no los puntos.
 
 `flight_profile` los vuela, con el modelo de actuaciones de vuelo del [Apéndice B
 del Vol. 2 de ECAC Doc
-29](/phonometry/es/reference/api/aeroacoustics/flight-performance/). Pide el
-aeródromo para el que `profile` no tiene uso, y trabaja en las unidades de la
-propia norma: pies, nudos y libras.
+29](/phonometry/es/reference/api/aeroacoustics/flight-performance/). Exige un
+`aerodrome`, porque calcula la trayectoria y esta depende del campo, mientras
+que `profile` devuelve un perfil de punto fijo ya tabulado y no necesita ese
+argumento. Trabaja en las unidades de la propia norma: pies, nudos y libras.
 
 ```python
 from phonometry import aircraft
