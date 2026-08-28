@@ -1253,12 +1253,14 @@ which segments are the takeoff ground roll or the landing rollout. The **stage
 length** selects the trip-distance bin: a longer stage means more fuel, more
 weight and a shallower climb, so the same aircraft has one profile per bin.
 
-Only the **fixed-point** profiles are read as ready-to-use trajectories. Most
-ANP entries describe their departures as procedural steps instead (climb at this
-rate to that altitude, accelerate, retract flaps), which have to be flown
-through a flight-mechanics performance model before they become a path. That
-model is outside this bridge, so of the 155 aircraft in the shipped database 13
-have a fixed-point *departure* profile and 20 a fixed-point *arrival* profile.
+A **fixed-point** profile is a trajectory ready to fly, and most ANP entries do
+not carry one: they describe their departures as procedural steps instead (climb
+at this rate to that altitude, accelerate, retract flaps), which have to be
+flown through a flight-mechanics performance model before they become a path. Of
+the 155 aircraft in the shipped database only 13 have a fixed-point *departure*
+profile and 20 a fixed-point *arrival* profile; "Flying a published procedure"
+below flies the rest.
+
 Doc 29 Vol. 2 Appendix G3.5 defines the bins by trip length in nautical miles
 (1 is 0-500, 2 is 500-1 000, 3 is 1 000-1 500, 4 is 1 500-2 500, then 1 000 nmi
 steps), and the shipped profiles cover stage lengths 1 to 7 for departures and 1
@@ -1366,11 +1368,11 @@ omission.
 ```python
 from phonometry import aircraft
 
-hot_and_high = aircraft.Aerodrome(elevation_ft=5000.0, temperature_c=35.0)
+hot_and_high = aircraft.Aerodrome(elevation_ft=5000.0, temperature_c=25.0)
 level = aircraft.load_anp_database().event_level(
     "A320-211", [3000.0, 500.0, 0.0], "departure", aerodrome=hot_and_high
 )
-print(round(float(level.level), 1))    # 87.8 dB
+print(round(float(level.level), 1))    # 89.3 dB
 ```
 
 ## Straight to an event level or a contour

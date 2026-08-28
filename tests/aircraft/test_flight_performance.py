@@ -428,30 +428,21 @@ def _point(distance_ft: float) -> ProfilePoint:
 
 
 def test_flight_profile_refuses_an_unknown_operation() -> None:
+    points = (_point(0.0), _point(1.0))
     with pytest.raises(ValueError, match=r"FlightProfile: 'operation'"):
-        FlightProfile(
-            aircraft_id="JETW",
-            operation="X",
-            procedure_id="",
-            points=(_point(0.0), _point(1.0)),
-        )
+        FlightProfile(aircraft_id="JETW", operation="X", procedure_id="", points=points)
 
 
 def test_flight_profile_refuses_a_single_point() -> None:
+    points = (_point(0.0),)
     with pytest.raises(ValueError, match=r"FlightProfile: 'points'"):
-        FlightProfile(
-            aircraft_id="JETW", operation="D", procedure_id="", points=(_point(0.0),)
-        )
+        FlightProfile(aircraft_id="JETW", operation="D", procedure_id="", points=points)
 
 
 def test_flight_profile_refuses_points_that_double_back() -> None:
+    points = (_point(0.0), _point(100.0), _point(50.0))
     with pytest.raises(ValueError, match=r"FlightProfile: 'points'"):
-        FlightProfile(
-            aircraft_id="JETW",
-            operation="D",
-            procedure_id="",
-            points=(_point(0.0), _point(100.0), _point(50.0)),
-        )
+        FlightProfile(aircraft_id="JETW", operation="D", procedure_id="", points=points)
 
 
 def test_flight_profile_columns_are_the_points_in_order() -> None:
@@ -484,6 +475,24 @@ def test_aerodrome_refuses_a_pressure_that_is_not_positive() -> None:
 def test_aerodrome_refuses_a_runway_gradient_of_one() -> None:
     with pytest.raises(ValueError, match=r"Aerodrome: 'runway_gradient'"):
         Aerodrome(elevation_ft=0.0, runway_gradient=1.0)
+
+
+def test_approach_step_refuses_a_negative_length() -> None:
+    """A step is flown forwards, so a length below zero is not a short one.
+
+    It matters beyond tidiness: the rollout skips a step with no length to
+    travel, and it can only spell that ``length <= 0`` once nothing negative can
+    reach it. Left open, a negative length would be silently skipped instead of
+    reported.
+    """
+    with pytest.raises(ValueError, match=r"ApproachStep: 'distance_ft' must not"):
+        ApproachStep(
+            "Decelerate",
+            "-NONE-",
+            start_calibrated_airspeed_kt=130.0,
+            distance_ft=-5.0,
+            start_thrust_percent=40.0,
+        )
 
 
 def test_aerodrome_refuses_an_altitude_the_atmosphere_does_not_reach() -> None:
@@ -569,8 +578,9 @@ def test_approach_weight_is_ninety_per_cent_of_the_landing_weight() -> None:
 
 
 def test_flap_lookup_names_the_configuration_it_could_not_find() -> None:
+    aircraft = _aircraft("JETW")
     with pytest.raises(KeyError, match=r"flap '40'"):
-        _aircraft("JETW").flap("D", "40")
+        aircraft.flap("D", "40")
 
 
 def test_flap_lookup_folds_case_and_padding() -> None:
@@ -704,6 +714,7 @@ _TAKEOFF = DepartureStep(step_type="Takeoff", thrust_rating="MaxTakeoff", flap_i
 
 
 def test_departure_refuses_a_procedure_that_does_not_start_on_the_runway() -> None:
+    aircraft = _aircraft("JETW")
     climb = DepartureStep(
         step_type="Climb",
         thrust_rating="MaxTakeoff",
@@ -711,49 +722,44 @@ def test_departure_refuses_a_procedure_that_does_not_start_on_the_runway() -> No
         end_altitude_ft=1000.0,
     )
     with pytest.raises(ValueError, match=r"must start with a Take-off step"):
-        departure_profile(
-            _aircraft("JETW"), [climb], weight_lb=165347.0, aerodrome=_SEA_LEVEL
-        )
+        departure_profile(aircraft, [climb], weight_lb=165347.0, aerodrome=_SEA_LEVEL)
 
 
 def test_departure_refuses_a_weight_of_zero() -> None:
+    aircraft = _aircraft("JETW")
     with pytest.raises(ValueError, match=r"'weight_lb'"):
-        departure_profile(
-            _aircraft("JETW"), [_TAKEOFF], weight_lb=0.0, aerodrome=_SEA_LEVEL
-        )
+        departure_profile(aircraft, [_TAKEOFF], weight_lb=0.0, aerodrome=_SEA_LEVEL)
 
 
 def test_takeoff_refuses_a_flap_setting_with_no_ground_roll_coefficient() -> None:
     """Eq. B-15 and Eq. B-16 both need a coefficient flap ZERO does not carry."""
+    aircraft = _aircraft("JETW")
     step = DepartureStep(
         step_type="Takeoff", thrust_rating="MaxTakeoff", flap_id="ZERO"
     )
     with pytest.raises(ValueError, match=r"Eq\. B-15 and Eq\. B-16"):
-        departure_profile(
-            _aircraft("JETW"), [step], weight_lb=165347.0, aerodrome=_SEA_LEVEL
-        )
+        departure_profile(aircraft, [step], weight_lb=165347.0, aerodrome=_SEA_LEVEL)
 
 
 def test_takeoff_refuses_a_headwind_that_reaches_the_rotation_speed() -> None:
     """Eq. B-17's ``(V_C - 8)^2`` changes sign for a strong enough tailwind."""
+    aircraft = _aircraft("JETW")
     gale = Aerodrome(elevation_ft=0.0, temperature_c=15.0, headwind_kt=200.0)
     with pytest.raises(ValueError, match=r"Eq\. B-17"):
-        departure_profile(
-            _aircraft("JETW"), [_TAKEOFF], weight_lb=165347.0, aerodrome=gale
-        )
+        departure_profile(aircraft, [_TAKEOFF], weight_lb=165347.0, aerodrome=gale)
 
 
 def test_takeoff_refuses_a_runway_too_steep_to_accelerate_along() -> None:
     """Eq. B-18's divisor ``a - g GR`` goes negative and shortens the roll."""
+    aircraft = _aircraft("JETW")
     cliff = Aerodrome(elevation_ft=0.0, temperature_c=15.0, runway_gradient=0.9)
     with pytest.raises(ValueError, match=r"Eq\. B-18"):
-        departure_profile(
-            _aircraft("JETW"), [_TAKEOFF], weight_lb=165347.0, aerodrome=cliff
-        )
+        departure_profile(aircraft, [_TAKEOFF], weight_lb=165347.0, aerodrome=cliff)
 
 
 def test_climb_refuses_a_step_the_aeroplane_has_no_thrust_for() -> None:
     """Eq. B-21 returns a sine at or below zero: that is not a climb."""
+    aircraft = _aircraft("JETW")
     steps = [
         _TAKEOFF,
         DepartureStep(
@@ -764,13 +770,12 @@ def test_climb_refuses_a_step_the_aeroplane_has_no_thrust_for() -> None:
         ),
     ]
     with pytest.raises(ValueError, match=r"Eq\. B-21"):
-        departure_profile(
-            _aircraft("JETW"), steps, weight_lb=165347.0, aerodrome=_SEA_LEVEL
-        )
+        departure_profile(aircraft, steps, weight_lb=165347.0, aerodrome=_SEA_LEVEL)
 
 
 def test_accelerate_refuses_a_step_with_too_little_thrust_to_climb_at_all() -> None:
     """B6.1.3's own abort: below a gradient of 0.01 the steps have to be revised."""
+    aircraft = _aircraft("JETW")
     steps = [
         _TAKEOFF,
         DepartureStep(
@@ -782,9 +787,7 @@ def test_accelerate_refuses_a_step_with_too_little_thrust_to_climb_at_all() -> N
         ),
     ]
     with pytest.raises(ValueError, match=r"climb gradient of"):
-        departure_profile(
-            _aircraft("JETW"), steps, weight_lb=165347.0, aerodrome=_SEA_LEVEL
-        )
+        departure_profile(aircraft, steps, weight_lb=165347.0, aerodrome=_SEA_LEVEL)
 
 
 def test_accelerate_refuses_a_step_whose_height_never_settles() -> None:
@@ -804,6 +807,7 @@ def test_accelerate_refuses_a_step_whose_height_never_settles() -> None:
     gradient never falls below 0.017, above the 0.01 floor, so it is this
     refusal that fires and not the one above it.
     """
+    aircraft = _aircraft("JETW")
     steps = [
         _TAKEOFF,
         DepartureStep(
@@ -818,12 +822,11 @@ def test_accelerate_refuses_a_step_whose_height_never_settles() -> None:
         ValueError,
         match=r"did not converge within \d+ iterations \(B6\.1\.3\); step 'Accelerate'",
     ):
-        departure_profile(
-            _aircraft("JETW"), steps, weight_lb=165347.0, aerodrome=_SEA_LEVEL
-        )
+        departure_profile(aircraft, steps, weight_lb=165347.0, aerodrome=_SEA_LEVEL)
 
 
 def test_level_accelerate_refuses_a_step_with_no_thrust_to_spare() -> None:
+    aircraft = _aircraft("JETW")
     steps = [
         _TAKEOFF,
         DepartureStep(
@@ -834,19 +837,16 @@ def test_level_accelerate_refuses_a_step_with_no_thrust_to_spare() -> None:
         ),
     ]
     with pytest.raises(ValueError, match=r"Eq\. B-31"):
-        departure_profile(
-            _aircraft("JETW"), steps, weight_lb=165347.0, aerodrome=_SEA_LEVEL
-        )
+        departure_profile(aircraft, steps, weight_lb=165347.0, aerodrome=_SEA_LEVEL)
 
 
 def test_thrust_lookup_names_the_rating_it_could_not_find() -> None:
+    aircraft = _aircraft("JETW")
     steps = [
         DepartureStep(step_type="Takeoff", thrust_rating="Afterburner", flap_id="5")
     ]
     with pytest.raises(KeyError, match=r"thrust rating 'Afterburner'"):
-        departure_profile(
-            _aircraft("JETW"), steps, weight_lb=165347.0, aerodrome=_SEA_LEVEL
-        )
+        departure_profile(aircraft, steps, weight_lb=165347.0, aerodrome=_SEA_LEVEL)
 
 
 def test_minimum_reduced_thrust_refuses_a_single_engine_aeroplane() -> None:
@@ -874,19 +874,22 @@ def test_minimum_reduced_thrust_refuses_a_single_engine_aeroplane() -> None:
 
 def test_approach_refuses_a_procedure_with_no_land_step() -> None:
     """Without a Land step nothing sits at distance zero (open item O-13)."""
+    aircraft = _aircraft("JETW")
     steps = _approach_steps("JETW", "Descend")[:5]
     with pytest.raises(ValueError, match=r"exactly one Land step"):
-        approach_profile(_aircraft("JETW"), steps, aerodrome=_SEA_LEVEL)
+        approach_profile(aircraft, steps, aerodrome=_SEA_LEVEL)
 
 
 def test_approach_refuses_a_land_step_with_nothing_to_decelerate_into() -> None:
     """Eq. B-78 and Eq. B-79 read the Land step's Point2 from the next step."""
+    aircraft = _aircraft("JETW")
     steps = _approach_steps("JETW", "Descend")[:6]
     with pytest.raises(ValueError, match=r"Eq\. B-78"):
-        approach_profile(_aircraft("JETW"), steps, aerodrome=_SEA_LEVEL)
+        approach_profile(aircraft, steps, aerodrome=_SEA_LEVEL)
 
 
 def test_approach_refuses_a_descend_step_that_starts_below_the_step_under_it() -> None:
+    aircraft = _aircraft("JETW")
     steps = _approach_steps("JETW", "Descend")
     steps[0] = ApproachStep(
         step_type="Descend",
@@ -896,11 +899,12 @@ def test_approach_refuses_a_descend_step_that_starts_below_the_step_under_it() -
         descent_angle_deg=2.8,
     )
     with pytest.raises(ValueError, match=r"must start above the step below it"):
-        approach_profile(_aircraft("JETW"), steps, aerodrome=_SEA_LEVEL)
+        approach_profile(aircraft, steps, aerodrome=_SEA_LEVEL)
 
 
 def test_land_step_refuses_a_procedure_with_no_slope_above_it() -> None:
     """Eq. B-76 takes its angle from the last descending step before touchdown."""
+    aircraft = _aircraft("JETW")
     steps = [
         ApproachStep(
             step_type="Level",
@@ -912,18 +916,20 @@ def test_land_step_refuses_a_procedure_with_no_slope_above_it() -> None:
         *_approach_steps("JETW", "Descend")[5:],
     ]
     with pytest.raises(ValueError, match=r"Eq\. B-76"):
-        approach_profile(_aircraft("JETW"), steps, aerodrome=_SEA_LEVEL)
+        approach_profile(aircraft, steps, aerodrome=_SEA_LEVEL)
 
 
 def test_land_step_refuses_a_flap_setting_with_no_landing_speed_coefficient() -> None:
+    aircraft = _aircraft("JETW")
     steps = _approach_steps("JETW", "Descend")
     steps[5] = ApproachStep(step_type="Land", flap_id="5", touchdown_roll_ft=304.1)
     with pytest.raises(ValueError, match=r"Eq\. B-75"):
-        approach_profile(_aircraft("JETW"), steps, aerodrome=_SEA_LEVEL)
+        approach_profile(aircraft, steps, aerodrome=_SEA_LEVEL)
 
 
 def test_consecutive_level_idle_steps_at_different_altitudes_warn() -> None:
     """B7.1.4 asks the system to warn rather than repair the manufacturer's table."""
+    aircraft = _aircraft("JETW")
     steps = _approach_steps("JETW", "Level_Idle")
     steps[1] = ApproachStep(
         step_type="Level-Idle",
@@ -933,10 +939,11 @@ def test_consecutive_level_idle_steps_at_different_altitudes_warn() -> None:
         distance_ft=16500.0,
     )
     with pytest.warns(UserWarning, match=r"one altitude"):
-        approach_profile(_aircraft("JETW"), steps, aerodrome=_SEA_LEVEL)
+        approach_profile(aircraft, steps, aerodrome=_SEA_LEVEL)
 
 
 def test_a_level_idle_step_that_accelerates_warns() -> None:
+    aircraft = _aircraft("JETW")
     steps = _approach_steps("JETW", "Level_Idle")
     steps[1] = ApproachStep(
         step_type="Level-Idle",
@@ -946,7 +953,7 @@ def test_a_level_idle_step_that_accelerates_warns() -> None:
         distance_ft=16500.0,
     )
     with pytest.warns(UserWarning, match=r"start CAS"):
-        approach_profile(_aircraft("JETW"), steps, aerodrome=_SEA_LEVEL)
+        approach_profile(aircraft, steps, aerodrome=_SEA_LEVEL)
 
 
 def test_non_isa_adjustment_is_an_identity_at_sea_level_isa() -> None:

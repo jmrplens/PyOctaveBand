@@ -532,7 +532,10 @@ class PropellerEngineCoefficients:
         :param pressure_ratio: ``delta`` of Eq. B-4 at the point's altitude.
         :raises ValueError: if the true airspeed is not positive.
         """
-        if not true_airspeed_kt > 0.0:
+        # Spelled out rather than as ``not v > 0``: the two differ only on NaN,
+        # which the negated comparison happens to catch, and a guard should say
+        # what it refuses instead of relying on that.
+        if not math.isfinite(true_airspeed_kt) or true_airspeed_kt <= 0.0:
             msg = (
                 "PropellerEngineCoefficients: 'true_airspeed_kt' must be "
                 "positive, since Eq. B-12 divides by it; got "
@@ -949,6 +952,13 @@ class ApproachStep:
                     "geometric input (Eq. B-64, Eq. B-68)."
                 )
                 raise ValueError(msg)
+        if self.distance_ft is not None and self.distance_ft < 0.0:
+            msg = (
+                "ApproachStep: 'distance_ft' must not be negative; a step is "
+                f"flown forwards along its own path. Got {self.distance_ft!r} "
+                "ft."
+            )
+            raise ValueError(msg)
 
     @property
     def kind(self) -> str:
@@ -1581,7 +1591,6 @@ def _climb_point(
 
 
 def _accelerate_gradient(
-    flight: _Flight,
     step: DepartureStep,
     *,
     max_acceleration_ft_s2: float,
@@ -1647,7 +1656,6 @@ def _accelerate_point(
             - drag_ratio / math.cos(bank_rad)
         )
         gradient = _accelerate_gradient(
-            flight,
             step,
             max_acceleration_ft_s2=max_acceleration_ft_s2,
             mean_tas_kt=mean_tas_kt,
@@ -2119,6 +2127,7 @@ def _isa_deceleration_ft_s2(
     Speeds are in ft/s throughout, and so is the headwind: Eq. B-58 and Eq. B-59
     declare it in knots while combining it with speeds Eq. B-57 puts in ft/s,
     and only ft/s closes the algebra in all three.
+
     """
     start_ft_s = _KT_FT_S * _ISA_SEA_LEVEL.true_airspeed_kt(
         start_cas_kt, start_height_ft
@@ -2135,6 +2144,20 @@ def _isa_deceleration_ft_s2(
         _along_slope_ft_s(end_ft_s, wind_ft_s, gamma_rad) ** 2
         - _along_slope_ft_s(start_ft_s, wind_ft_s, gamma_rad) ** 2
     ) / (2.0 * slant_ft)
+
+
+def _holds_no_deceleration(deceleration_ft_s2: float) -> bool:
+    """Whether an idle step's held deceleration is nothing at all.
+
+    Exact, and deliberately not a tolerance. The quantity is a difference of two
+    squared ground speeds, so it is 0.0 when and only when the step's start and
+    end ground speeds are the same value; any tolerance around that would
+    swallow a small but real deceleration the adjustment has to keep. The
+    callers need to know because Eq. B-59 and Eq. B-74 both divide by it, and
+    without the test the degenerate step reaches the user as a bare
+    ``ZeroDivisionError`` naming neither the step nor the equation.
+    """
+    return deceleration_ft_s2 == 0.0
 
 
 def _along_slope_ft_s(speed_ft_s: float, wind_ft_s: float, gamma_rad: float) -> float:
@@ -2320,7 +2343,7 @@ def _non_isa_adjusted(
             gamma_rad=None,
             length_ft=length_ft,
         )
-        if reference == 0.0:
+        if _holds_no_deceleration(reference):
             # Equal start and end speeds: there is no deceleration to hold, and
             # Eq. B-74 would divide by zero to say so. The tabulated length is
             # the only length there is.
@@ -2350,7 +2373,7 @@ def _non_isa_adjusted(
     next_along = _along_slope_ft_s(next_ft_s, wind_ft_s, gamma_rad)
     slant_ft = (height_ft - next_height_ft) / math.sin(gamma_rad)
     if anchor.step.kind in ("descend", "descend-idle", "descend-decel"):
-        if reference == 0.0:
+        if _holds_no_deceleration(reference):
             return height_ft, cas_kt, length_ft
         # Eq. B-59 and Eq. B-60: hold the speed, move the step's own top.
         start_ft_s = _KT_FT_S * flight.aerodrome.true_airspeed_kt(
@@ -2562,7 +2585,10 @@ def approach_profile(
     current = roll_end
     for step, following in zip(rollout, rollout[1:], strict=False):
         length_ft = float(step.distance_ft or 0.0)
-        if length_ft == 0.0:
+        # A zero-length step emits no point of its own. Written as an
+        # inequality because a negative length is refused at construction, so
+        # the two are the same test and this one carries no float equality.
+        if length_ft <= 0.0:
             continue
         current = ProfilePoint(
             distance_ft=current.distance_ft + length_ft,

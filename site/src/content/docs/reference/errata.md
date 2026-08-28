@@ -2813,7 +2813,12 @@ which is the check that enforces the rule; see
 
 - **Location:** Appendix B, section B6.1.2, the mid-step corrected net thrust
   $\overline{CNT}$ defined under Eq. (B-21), in the branch that computes it from
-  Eq. (B-12), that is for every piston and turboprop aeroplane.
+  Eq. (B-12), that is for every aeroplane the propeller coefficient table
+  carries. B4.1 and B4.2 split the turboprops between them without stating a
+  rule, so this is not the same set as "the turboprops": of the 20 in ANP v2.3,
+  11 sit in the propeller table and reach Eq. (B-12), the other 9 sit in the jet
+  table and reach Eq. (B-9), and the 8 piston aeroplanes are all in the
+  propeller table.
 - **The print:** $\overline{CNT}$ "is the Corrected Net Thrust of the aircraft
   when being located at mid-step, i.e. at the altitude
   $Alt = E_{Apt} + \left(\mathrm{Point\ 1\_Height} + \mathrm{Point\ 2\_Height}\right)/2$",

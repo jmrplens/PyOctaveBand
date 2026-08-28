@@ -108,10 +108,11 @@ una decisión de usos del suelo, y no está aquí.
 hemisferios de ruido son *datos de entrada*: la biblioteca interpola las
 tablas publicadas para un tipo y no las sintetiza a partir de datos de motor,
 y la base de datos ANP se lee y nunca se escribe (la versión 2.3 se distribuye
-tal cual). De las entradas de ANP, solo las que tienen perfiles de punto fijo
-traen una trayectoria lista para usar, porque convertir una salida por pasos
-de procedimiento en una trayectoria de vuelo exige el modelo de prestaciones
-de mecánica del vuelo del Doc 9911 de la OACI, que no está implementado.
+tal cual). Una trayectoria, en cambio, sí se calcula: una entrada que publica
+pasos de procedimiento en lugar de puntos fijos se vuela con el modelo de
+actuaciones del Apéndice B del Vol. 2 de ECAC Doc 29, que convierte un
+procedimiento publicado en un perfil para el aeródromo y la meteorología desde
+los que se vuela.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered">

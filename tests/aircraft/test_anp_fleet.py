@@ -241,13 +241,15 @@ def test_external_directory_load(tmp_path: object) -> None:
 
 
 def test_error_paths() -> None:
-    with pytest.raises(KeyError):
+    with pytest.raises(KeyError, match=r"aircraft 'NOPE' not in this ANP database"):
         _DB.aircraft("NOPE")
     with pytest.raises(ValueError, match=r"'metric' must be one of"):
         _DB.npd_curves("747100", "departure", "EPNL")
     with pytest.raises(ValueError, match=r"'operation' must be 'departure'"):
         _DB.npd_curves("747100", "sideways", "SEL")
-    with pytest.raises(KeyError):
+    with pytest.raises(
+        KeyError, match=r"no fixed-point profile for aircraft 'PA31'.*stage length 9"
+    ):
         _DB.profile("PA31", "departure", stage_length=9)
 
 
@@ -774,6 +776,70 @@ def test_a_lone_procedure_is_labelled_with_the_identifier_it_was_found_under(
     assert synthesised.profile_id == "ICAO_A"
 
 
+def test_an_export_that_spells_the_operation_in_lower_case_flies_the_same(
+    tmp_path: object,
+) -> None:
+    """``Op Type`` is normalised on read, so its spelling cannot pick a column.
+
+    The take-off speed coefficient sits in column C and the landing one in
+    column D, chosen by an exact match on the operation, while
+    ``PerformanceAircraft.flap`` folds case when it looks the row up again. An
+    export spelling the operation ``"d"`` therefore stored the landing
+    coefficient under a key a departure still finds.
+
+    What that costs depends on the export. No row of the bundled table fills
+    both columns, all 1218 of them carrying only the one their operation flies,
+    so there the wrong column is empty and the Take-off step refuses outright:
+    an aeroplane that should fly does not. It is a table filling both that
+    would take a rotation speed from the landing coefficient and say nothing,
+    and the ANP schema does not produce one. Loud on real data, then, and the
+    fixed-point table fails a third way, reporting no profile at all.
+
+    All of it is unreachable on the bundled v2.3 fleet, which spells every
+    operation ``"A"`` or ``"D"``, and reachable on any user-supplied export.
+    """
+    import pathlib
+
+    from phonometry.aircraft.flight_performance import Aerodrome
+
+    def lower_operation(text: str, column: int) -> str:
+        head, *rows = text.splitlines()
+        out = [head]
+        for line in rows:
+            cells = line.split(";")
+            if len(cells) > column:
+                cells[column] = cells[column].lower()
+            out.append(";".join(cells))
+        return "\n".join(out) + "\n"
+
+    root = pathlib.Path(str(tmp_path))
+    src = files("phonometry.aircraft.data.anp")
+    for name in (
+        "Aircraft.csv",
+        "NPD_data.csv",
+        "Jet_engine_coefficients.csv",
+        "Default_weights.csv",
+        "Default_departure_procedural_steps.csv",
+    ):
+        (root / name).write_text(src.joinpath(name).read_text())
+    # "Op Type" is the second column of both tables that carry it.
+    for name in ("Aerodynamic_coefficients.csv", "Default_fixed_point_profiles.csv"):
+        (root / name).write_text(
+            lower_operation(src.joinpath(name).read_text(), column=1)
+        )
+
+    db = load_anp_database(root)
+    aerodrome = Aerodrome(elevation_ft=0.0)
+    shouted = _DB.flight_profile("A320-211", "departure", aerodrome=aerodrome)
+    whispered = db.flight_profile("A320-211", "departure", aerodrome=aerodrome)
+    assert whispered.distance_ft == pytest.approx(shouted.distance_ft)
+    assert whispered.altitude_ft == pytest.approx(shouted.altitude_ft)
+    # And the fixed-point table is still reachable, which is the other failure.
+    assert db.profile("747100", "departure", 1).path.shape == (
+        _DB.profile("747100", "departure", 1).path.shape
+    )
+
+
 def test_maximum_weight_stage_length_survives_the_lookup() -> None:
     """The stage-length column is a label, not a number: 'M' is one of its values."""
     from phonometry.aircraft.flight_performance import Aerodrome
@@ -811,18 +877,14 @@ def test_flight_profile_names_the_stage_length_it_has_no_weight_for(
     ]
     (root / "Default_weights.csv").write_text("\n".join(kept) + "\n")
     db = load_anp_database(root)
+    aerodrome = Aerodrome(elevation_ft=0.0)
     with pytest.raises(
         KeyError, match=r"no default departure weight for aircraft 'A320-211'"
     ):
-        db.flight_profile(
-            "A320-211", "departure", aerodrome=Aerodrome(elevation_ft=0.0)
-        )
+        db.flight_profile("A320-211", "departure", aerodrome=aerodrome)
     # The same profile flies once the caller says what weight to use.
     flown = db.flight_profile(
-        "A320-211",
-        "departure",
-        aerodrome=Aerodrome(elevation_ft=0.0),
-        weight_lb=150000.0,
+        "A320-211", "departure", aerodrome=aerodrome, weight_lb=150000.0
     )
     assert flown.points[-1].altitude_ft > 0.0
 
@@ -830,15 +892,13 @@ def test_flight_profile_names_the_stage_length_it_has_no_weight_for(
 def test_unknown_stage_length_is_reported_against_the_step_table() -> None:
     from phonometry.aircraft.flight_performance import Aerodrome
 
+    aerodrome = Aerodrome(elevation_ft=0.0)
     with pytest.raises(
         KeyError,
         match=r"no procedural-step profile for aircraft 'A320-211'.*stage length 99",
     ):
         _DB.flight_profile(
-            "A320-211",
-            "departure",
-            aerodrome=Aerodrome(elevation_ft=0.0),
-            stage_length=99,
+            "A320-211", "departure", aerodrome=aerodrome, stage_length=99
         )
 
 

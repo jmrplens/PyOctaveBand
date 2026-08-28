@@ -118,6 +118,12 @@ _METRICS = ("SEL", "LAmax")
 #: The ANP database's identifier for an aircraft's default fixed-point profile,
 #: selected when the caller passes ``profile_id=None``.
 _DEFAULT_PROFILE_ID = "DEFAULT"
+#: ANP column headings read from more than one table. Named because the tables
+#: spell them exactly this way, spaces, capitals and parenthesised unit and all,
+#: and a typo in one copy of several is a table that quietly loads short.
+_COL_STAGE_LENGTH = "Stage Length"
+_COL_DISTANCE_FT = "Distance (ft)"
+_COL_THRUST_RATING = "Thrust Rating"
 
 
 def _operation_code(operation: str) -> str:
@@ -1192,12 +1198,16 @@ def _parse_profiles(
     for row in rows:
         key = (
             row["ACFT_ID"],
-            row["Op Type"],
+            # Normalised for the same reason as the aerodynamic table: the
+            # lookup compares against an already-normalised code, so a row
+            # spelling its operation "d" would simply never be found and the
+            # aeroplane would report no fixed-point profile at all.
+            _operation_code(row["Op Type"]),
             row["Profile_ID"],
-            int(float(row["Stage Length"])),
+            int(float(row[_COL_STAGE_LENGTH])),
         )
         point = int(float(row["Point Number"]))
-        x = float(row["Distance (ft)"]) * _FT_M
+        x = float(row[_COL_DISTANCE_FT]) * _FT_M
         z = float(row["Altitude AFE (ft)"]) * _FT_M
         speed = float(row["TAS (kt)"]) * _KT_MS
         power = float(row["Power Setting"])
@@ -1232,7 +1242,7 @@ def _parse_performance(tables: Mapping[str, str]) -> _PerformanceTables:
     out = _PerformanceTables()
     if (text := _optional_table("jet_engine", tables)) is not None:
         for row in _rows(text):
-            out.jet.setdefault(row["ACFT_ID"], {})[row["Thrust Rating"]] = (
+            out.jet.setdefault(row["ACFT_ID"], {})[row[_COL_THRUST_RATING]] = (
                 JetEngineCoefficients(
                     e=float(row["E"]),
                     f=float(row["F"]),
@@ -1243,7 +1253,7 @@ def _parse_performance(tables: Mapping[str, str]) -> _PerformanceTables:
             )
     if (text := _optional_table("propeller_engine", tables)) is not None:
         for row in _rows(text):
-            out.propeller.setdefault(row["ACFT_ID"], {})[row["Thrust Rating"]] = (
+            out.propeller.setdefault(row["ACFT_ID"], {})[row[_COL_THRUST_RATING]] = (
                 PropellerEngineCoefficients(
                     efficiency=float(row["Propeller Efficiency"]),
                     power_hp=float(row["Installed Net Propulsive Power (hp)"]),
@@ -1251,7 +1261,13 @@ def _parse_performance(tables: Mapping[str, str]) -> _PerformanceTables:
             )
     if (text := _optional_table("aerodynamic", tables)) is not None:
         for row in _rows(text):
-            op = row["Op Type"]
+            # Normalised on read, not compared raw: the column below is chosen
+            # by an exact match while PerformanceAircraft.flap folds case when
+            # it looks the row up again, so a table spelling the operation "d"
+            # would be stored with the landing coefficient and still be found
+            # by a departure. Eq. B-15 would then rotate at the wrong speed
+            # with nothing to show for it.
+            op = _operation_code(row["Op Type"])
             # The take-off speed coefficient C and the landing one D live in
             # separate columns, and a row fills whichever its operation flies.
             speed = _optional(row["C"] if op == _DEPARTURE else row["D"])
@@ -1264,7 +1280,7 @@ def _parse_performance(tables: Mapping[str, str]) -> _PerformanceTables:
             )
     if (text := _optional_table("weights", tables)) is not None:
         for row in _rows(text):
-            out.weights[(row["ACFT_ID"], _stage_label(row["Stage Length"]))] = float(
+            out.weights[(row["ACFT_ID"], _stage_label(row[_COL_STAGE_LENGTH]))] = float(
                 row["Weight (lb)"]
             )
     if (text := _optional_table("departure_procedural", tables)) is not None:
@@ -1273,17 +1289,17 @@ def _parse_performance(tables: Mapping[str, str]) -> _PerformanceTables:
             dkey = (
                 row["ACFT_ID"],
                 row["Profile_ID"],
-                _stage_label(row["Stage Length"]),
+                _stage_label(row[_COL_STAGE_LENGTH]),
             )
             step = DepartureStep(
                 step_type=row["Step Type"],
-                thrust_rating=row["Thrust Rating"],
+                thrust_rating=row[_COL_THRUST_RATING],
                 flap_id=row["Flap_ID"],
                 end_altitude_ft=_optional(row["End Point Altitude (ft)"]),
                 rate_of_climb_ft_per_min=_optional(row["Rate Of Climb (ft/min)"]),
                 end_calibrated_airspeed_kt=_optional(row["End Point CAS (kt)"]),
                 energy_share_percent=_optional(row["Accel Percentage (%)"]),
-                distance_ft=_optional(row.get("Distance (ft)", "")),
+                distance_ft=_optional(row.get(_COL_DISTANCE_FT, "")),
             )
             grouped.setdefault(dkey, []).append((int(float(row["Step Number"])), step))
         for dkey, steps in grouped.items():
@@ -1300,7 +1316,7 @@ def _parse_performance(tables: Mapping[str, str]) -> _PerformanceTables:
                 start_calibrated_airspeed_kt=_optional(row["Start CAS (kt)"]),
                 descent_angle_deg=_optional(row["Descent Angle (deg)"]),
                 touchdown_roll_ft=_optional(row["Touchdown Roll (ft)"]),
-                distance_ft=_optional(row["Distance (ft)"]),
+                distance_ft=_optional(row[_COL_DISTANCE_FT]),
                 start_thrust_percent=_optional(row["Start Thrust"]),
             )
             by_profile.setdefault(akey, []).append(

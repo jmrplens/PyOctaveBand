@@ -332,11 +332,11 @@ frente a los 33 que tienen trayectoria tabulada.
 ```python
 from phonometry import aircraft
 
-hot_and_high = aircraft.Aerodrome(elevation_ft=5000.0, temperature_c=35.0)
+hot_and_high = aircraft.Aerodrome(elevation_ft=5000.0, temperature_c=25.0)
 level = aircraft.load_anp_database().event_level(
     "A320-211", [3000.0, 500.0, 0.0], "departure", aerodrome=hot_and_high
 )
-print(round(float(level.level), 1))    # 87.8 dB
+print(round(float(level.level), 1))    # 89.3 dB
 ```
 
 Un aeródromo, una atmósfera: la temperatura y la presión del campo llegan al
