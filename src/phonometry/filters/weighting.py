@@ -48,7 +48,7 @@ broadband noise audible in a programme chain rather than what makes it
 loud. Clause 1 defines it as the response of the passive network of Fig. 1a,
 so it is built from that network's seven printed component values
 (:func:`_itu_r_468_prototype`) and reproduces all 21 rows of the Table 1
-sampling to 0.050 dB. Its skirt is steep enough that the design runs at a
+sampling to 0.0503 dB. Its skirt is steep enough that the design runs at a
 384 kHz target rather than the module's 144 kHz default, and the plain
 design at the input rate -- what stateful processing would use -- is
 refused rather than shipped 23 dB out at 16 kHz.
@@ -173,7 +173,7 @@ def _itu_r_468_prototype() -> tuple[tuple[complex, ...], float]:
     in Fig. 1b which is the theoretical response of the passive network shown
     in Fig. 1a. Table 1 gives the values of this response at various
     frequencies." So the nominal curve is defined at every frequency, and the
-    21 rows of Table 1 are that curve sampled and rounded to 0,1 dB, not the
+    21 rows of Table 1 are that curve sampled and rounded to 0.1 dB, not the
     definition. The network is rebuilt here from the seven printed component
     values by a polynomial ABCD chain, rather than stored as precomputed
     roots, so a reader can check the constants against the figure.
@@ -191,8 +191,8 @@ def _itu_r_468_prototype() -> tuple[tuple[complex, ...], float]:
     third state is dependent (seven reactive elements, order six). Evaluated
     in double precision the six coefficients agree with exact rational
     arithmetic over the same component values to 3.4e-16 relative, and the
-    resulting curve reproduces all 21 rows of Table 1 to 0.0502 dB maximum
-    and 0.0264 dB rms, which is the 0,05 dB rounding quantum of the printed
+    resulting curve reproduces all 21 rows of Table 1 to 0.0503 dB maximum
+    and 0.0264 dB rms, which is the 0.05 dB rounding quantum of the printed
     table (the 100 Hz row overshoots it by 0.0002 dB, a rounding tie the
     four-significant-figure component values cannot resolve).
 
@@ -248,7 +248,11 @@ class WeightingFilter:
             ultrasound), '468' (ITU-R BS.468-4 psophometric noise weighting;
             designed at a 384 kHz target and unavailable in stateful mode,
             see :func:`_itu_r_468_prototype`) or 'Z'.
-        :param stateful: If True, the weighting filter is stateful. Useful for block processing.
+        :param stateful: If True, the weighting filter is stateful. Useful for
+            block processing. Not available for ``'468'``: stateful processing
+            implies ``high_accuracy=False``, and the plain design at the input
+            rate misses the Table 1 mask by 23 dB at 16 kHz, with no lower
+            performance class to fall back to.
         :param steady_ic: If True, calculate steady state initial conditions for filter.
         :param high_accuracy: If True, design and run the filter at an internal
             oversampled rate (target >= 144 kHz) so the response stays within

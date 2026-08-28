@@ -52,7 +52,7 @@ broadband noise audible in a programme chain rather than what makes it
 loud. Clause 1 defines it as the response of the passive network of Fig. 1a,
 so it is built from that network's seven printed component values
 (`_itu_r_468_prototype`) and reproduces all 21 rows of the Table 1
-sampling to 0.050 dB. Its skirt is steep enough that the design runs at a
+sampling to 0.0503 dB. Its skirt is steep enough that the design runs at a
 384 kHz target rather than the module's 144 kHz default, and the plain
 design at the input rate -- what stateful processing would use -- is
 refused rather than shipped 23 dB out at 16 kHz.
@@ -331,7 +331,7 @@ Initialize the weighting filter.
 | :--- | :--- |
 | `fs` | Sample rate in Hz. |
 | `curve` | 'A', 'C' (IEC 61672-1), 'B' (ANSI S1.4-1983, historical: removed from the IEC sound-level-meter standards), 'D' (withdrawn IEC 537 aircraft-noise weighting), 'G' (ISO 7196 infrasound), 'AU' (IEC 61012, audible sound in the presence of ultrasound), '468' (ITU-R BS.468-4 psophometric noise weighting; designed at a 384 kHz target and unavailable in stateful mode, see `_itu_r_468_prototype`) or 'Z'. |
-| `stateful` | If True, the weighting filter is stateful. Useful for block processing. |
+| `stateful` | If True, the weighting filter is stateful. Useful for block processing. Not available for `'468'`: stateful processing implies `high_accuracy=False`, and the plain design at the input rate misses the Table 1 mask by 23 dB at 16 kHz, with no lower performance class to fall back to. |
 | `steady_ic` | If True, calculate steady state initial conditions for filter. |
 | `high_accuracy` | If True, design and run the filter at an internal oversampled rate (target >= 144 kHz) so the response stays within IEC 61672-1 class 1 tolerances up to 16 kHz, provided 16 kHz is well clear of the input Nyquist frequency (fs >= 40 kHz). At 48 kHz this oversamples x3, keeping the deviation from the design goal to -0.44 dB at the 16 kHz nominal frequency and -0.86 dB at the 20 kHz one. Oversampling cannot rescue the top of the band at low sample rates, because the resampling stages it adds around the sections carry an anti-alias transition band centred on the input Nyquist frequency: above roughly 0.9 x fs/2 the response rolls off steeply whatever the design rate. What the roll-off costs is per curve, since each is graded against its own design goal: at fs = 32 kHz the 15 848.9 Hz nominal point falls 16.2 dB below the A goal but 15.3 dB below the C one (class 1 allows -16.0 dB there, class 2 has no lower limit), so the verified class at 32 kHz is 2 for A and still 1 for C. At fs = 16 kHz the 7 943.3 Hz point falls 12.0 dB below the A goal and 13.7 dB below the C one (class 1 allows -2.5 dB, class 2 -5.0 dB), so neither curve verifies to any class there. The plain bilinear design holds class 1 for fs >= 40 kHz (-2.8 dB at the 12.5 kHz nominal frequency at 48 kHz, -3.5 dB at 44.1 kHz, inside the +2.0/-5.0 class 1 limits), degrades to class 2 between 22.05 and 32 kHz and meets no class at fs \<= 20 kHz. Defaults to True except in stateful mode (the internal FIR resampling is incompatible with block processing). The '468' curve is the one exception to the grade-and-document habit above: it has a single tolerance mask and no lower grade, so False is refused instead of described. |
 

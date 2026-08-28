@@ -282,7 +282,7 @@ to G.
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | 1D or 2D array, or `Signal` | any | non-empty | 2D is `[channels, samples]` |
 | `fs` | int | Hz | > 0; taken from `x` when `x` is a `Signal` | |
-| `curve` | str | — | `'A'` (default), `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'` | `'G'` per ISO 7196 (infrasound), `'B'`/`'D'` historical and `'AU'` per IEC 61012 are covered in [Special Weightings](/phonometry/signals/levels/special-weightings/); `'Z'` is implemented as a bypass of a response the standard specifies as flat |
+| `curve` | str | — | `'A'` (default), `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'`, `'468'` | `'G'` per ISO 7196 (infrasound), `'B'`/`'D'` historical and `'AU'` per IEC 61012 are covered in [Special Weightings](/phonometry/signals/levels/special-weightings/); `'Z'` is implemented as a bypass of a response the standard specifies as flat; `'468'` is the ITU-R BS.468-4 programme-level curve, and its skirt is steep enough that it needs `stateful=False` |
 | `high_accuracy` | bool | — | default `True` (function); class default `None` resolves to `not stateful` | Internal oversampling keeps A/C in class 1 up to 16 kHz when $f_\mathrm{s} \ge 40$ kHz; details in §5 |
 | `stateful` | bool (class only) | — | default `False` | Carries filter state across blocks (streaming) |
 | `steady_ic` | bool (class only) | — | default `False` | Steady-state initial conditions (no onset transient) |

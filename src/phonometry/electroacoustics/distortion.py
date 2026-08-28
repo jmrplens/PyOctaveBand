@@ -525,7 +525,7 @@ def itu_r_468_weighting(frequencies: ArrayLike) -> NDArray[np.float64]:
     Clause 1 of the Recommendation defines the nominal curve as the response
     of the passive network of Fig. 1a and prints Table 1 as "the values of
     this response at various frequencies", so the curve exists at every
-    frequency and the 21 printed rows are that curve rounded to 0,1 dB. This
+    frequency and the 21 printed rows are that curve rounded to 0.1 dB. This
     is the closed-form evaluation of the same analog prototype the ``'468'``
     branch of :class:`~phonometry.filters.WeightingFilter` discretises,
 
@@ -540,7 +540,9 @@ def itu_r_468_weighting(frequencies: ArrayLike) -> NDArray[np.float64]:
     noise is most audible, and -22.2 dB at 20 kHz. Zero frequency (dc) maps
     to ``-inf`` dB, which is the series capacitor of Fig. 1a. AES17-2015
     5.2.7 tabulates the same curve with an additional gain of -5,63 dB
-    (unity at 2 kHz, the "CCIR-RMS" filter).
+    (unity at 2 kHz, the "CCIR-RMS" filter). The comma is AES 17's own: the
+    decimal separator here follows the document being quoted, and BS.468-4
+    prints a point where AES 17 prints a comma.
 
     Reading the 21 rows and interpolating between them, which is what this
     function used to do, departs from the network by up to 0.611 dB at
@@ -599,7 +601,7 @@ def weighted_thd(
     before its RMS is compared with the total signal RMS, so the perceptual
     emphasis of the distortion products is accounted for. The default
     weighting is the network required by the clause -- IEC 60268-1:1985
-    Appendix A, the ITU-R BS.468-4 curve (peaking +12,2 dB near 6,3 kHz) with
+    Appendix A, the ITU-R BS.468-4 curve (peaking +12.2 dB near 6.3 kHz) with
     its standard 0 dB at 1 kHz normalization; ``'A'`` and ``'C'`` (IEC
     61672-1) are kept as explicitly labelled alternatives, not 14.12.11
     quantities.
