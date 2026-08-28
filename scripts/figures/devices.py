@@ -3991,6 +3991,8 @@ def generate_itu_r_468_weighting(output_dir: str) -> None:
         (1000.0, -5.63, COLOR_SECONDARY, "−5.63 dB at 1 kHz"),
     ):
         ax.plot([f0], [level], "o", color=col, markersize=7, zorder=6)
+        # Both 1 kHz labels sit where another curve passes, so they take the
+        # chip the rest of the corpus uses for an annotation over a line.
         ax.annotate(
             txt,
             xy=(f0, level),
@@ -3999,6 +4001,12 @@ def generate_itu_r_468_weighting(output_dir: str) -> None:
             ha="right",
             fontsize=9,
             color=col,
+            zorder=7,
+            bbox={
+                "boxstyle": "round,pad=0.3",
+                "facecolor": COLOR_PANEL,
+                "edgecolor": COLOR_GRID,
+            },
         )
 
     ax.set_xlabel(LABEL_FREQ_HZ)

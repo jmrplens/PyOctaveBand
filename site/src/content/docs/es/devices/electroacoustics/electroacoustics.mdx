@@ -299,7 +299,7 @@ from phonometry import electroacoustics
 
 print(electroacoustics.weighted_thd(signal, fs, 100.0))                  # red ITU-R 468
 print(electroacoustics.weighted_thd(signal, fs, 100.0, weighting="A"))   # variante ponderada A
-print(electroacoustics.itu_r_468_weighting([6300.0]))                    # [+12.2] dB
+print(electroacoustics.itu_r_468_weighting([6300.0]))                    # [+12.2167] dB
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/itu_r_468_weighting_es.svg" alt="La red de ponderación ITU-R BS.468-4 frente a la frecuencia, que sube hasta más 12,2 dB cerca de 6,3 kHz y cae bruscamente por encima, con la variante CCIR-RMS desplazada 5,63 dB hacia abajo para que valga 0 dB a 2 kHz, y la curva de ponderación A dibujada en tono claro como referencia; los puntos marcados son 0 dB a 1 kHz y más 12,2 dB a 6,3 kHz para la forma 468, y menos 5,63 dB a 1 kHz para la CCIR-RMS" width="82%" />

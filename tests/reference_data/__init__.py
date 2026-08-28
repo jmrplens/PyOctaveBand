@@ -335,6 +335,16 @@ from .electroacoustics import DISTORTION_D2 as DISTORTION_D2
 from .electroacoustics import DISTORTION_HARMONICS as DISTORTION_HARMONICS
 from .electroacoustics import DISTORTION_THD_F as DISTORTION_THD_F
 from .electroacoustics import DISTORTION_THD_R as DISTORTION_THD_R
+from .electroacoustics import ITU_R_468_AES17_OFFSET_DB as ITU_R_468_AES17_OFFSET_DB
+from .electroacoustics import ITU_R_468_AES17_ROWS as ITU_R_468_AES17_ROWS
+from .electroacoustics import ITU_R_468_AES17_TOL_DB as ITU_R_468_AES17_TOL_DB
+from .electroacoustics import (
+    ITU_R_468_NETWORK_VS_TABLE1_DB as ITU_R_468_NETWORK_VS_TABLE1_DB,
+)
+from .electroacoustics import ITU_R_468_TABLE1 as ITU_R_468_TABLE1
+from .electroacoustics import (
+    ITU_R_468_TABLE1_ROUNDING_DB as ITU_R_468_TABLE1_ROUNDING_DB,
+)
 from .emission import IEC61043_PHASE_FREQUENCY_HZ as IEC61043_PHASE_FREQUENCY_HZ
 from .emission import IEC61043_PHASE_INDEX_DB as IEC61043_PHASE_INDEX_DB
 from .emission import IEC61043_PHASE_MISMATCH_DEG as IEC61043_PHASE_MISMATCH_DEG

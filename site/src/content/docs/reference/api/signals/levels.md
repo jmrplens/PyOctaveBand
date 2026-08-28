@@ -161,7 +161,7 @@ distribution), L90 the level exceeded 90% of the time, etc.
 | `fs` | Sample rate in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `n` | Percentile exceedance values, e.g. (10, 50, 90). |
 | `mode` | Time weighting for the envelope: 'fast', 'slow' or 'impulse'. |
-| `weighting` | Optional frequency weighting, any curve accepted by [`weighting_filter`](/phonometry/reference/api/filters/weighting/#weighting_filter): 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z'. None (the default) and 'Z' both leave the signal unweighted. |
+| `weighting` | Optional frequency weighting, any curve accepted by [`weighting_filter`](/phonometry/reference/api/filters/weighting/#weighting_filter): 'A', 'B', 'C', 'D', 'G', 'AU', '468' or 'Z'. None (the default) and 'Z' both leave the signal unweighted. |
 | `calibration_factor` | Multiplier converting digital units to Pascals. Precedence as in [`leq`](/phonometry/reference/api/signals/levels/#leq): explicit value, then a calibrated Signal's own factor, then 1.0. |
 | `dbfs` | If True, return dBFS instead of dB SPL. |
 
@@ -193,7 +193,7 @@ reference responses, Equation 8, in the test suite).
 | :--- | :--- |
 | `x` | Input signal covering the whole event (1D or 2D), or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) read from a measurement file. |
 | `fs` | Sample rate in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
-| `weighting` | Optional frequency weighting, any curve accepted by [`weighting_filter`](/phonometry/reference/api/filters/weighting/#weighting_filter): 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z'. None (the default) and 'Z' both leave the signal unweighted. |
+| `weighting` | Optional frequency weighting, any curve accepted by [`weighting_filter`](/phonometry/reference/api/filters/weighting/#weighting_filter): 'A', 'B', 'C', 'D', 'G', 'AU', '468' or 'Z'. None (the default) and 'Z' both leave the signal unweighted. |
 | `calibration_factor` | Multiplier converting digital units to Pascals. Precedence as in [`leq`](/phonometry/reference/api/signals/levels/#leq): explicit value, then a calibrated Signal's own factor, then 1.0. |
 | `dbfs` | If True, reference digital full scale instead of 20 uPa. |
 

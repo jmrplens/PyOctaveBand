@@ -36,6 +36,7 @@ from typing import TYPE_CHECKING, Any, Literal
 import numpy as np
 
 from .._internal.validation import require_ranks, require_same_length
+from ..filters.weighting import _itu_r_468_prototype
 from ..io._resolve import apply_calibration, resolve_fs
 
 if TYPE_CHECKING:
@@ -518,45 +519,37 @@ def sinad(
     return float(-thdn_db)
 
 
-#: ITU-R BS.468-4 weighting network response (Table 1): (frequency in Hz,
-#: response in dB re 1 kHz). The recommendation's own tolerance rule
-#: interpolates between the mask frequencies linearly in dB on a logarithmic
-#: frequency axis, which is the interpolation used here.
-_ITU_R_468_TABLE: tuple[tuple[float, float], ...] = (
-    (31.5, -29.9),
-    (63.0, -23.9),
-    (100.0, -19.8),
-    (200.0, -13.8),
-    (400.0, -7.8),
-    (800.0, -1.9),
-    (1000.0, 0.0),
-    (2000.0, 5.6),
-    (3150.0, 9.0),
-    (4000.0, 10.5),
-    (5000.0, 11.7),
-    (6300.0, 12.2),
-    (7100.0, 12.0),
-    (8000.0, 11.4),
-    (9000.0, 10.1),
-    (10000.0, 8.1),
-    (12500.0, 0.0),
-    (14000.0, -5.3),
-    (16000.0, -11.7),
-    (20000.0, -22.2),
-    (31500.0, -42.7),
-)
-
-
 def itu_r_468_weighting(frequencies: ArrayLike) -> NDArray[np.float64]:
-    """ITU-R BS.468-4 weighting response, in dB re 1 kHz.
+    r"""ITU-R BS.468-4 weighting response, in dB re 1 kHz.
 
-    The nominal response of the Recommendation's Table 1 (identical to the
-    IEC 60268-1 Appendix A network required by IEC 60268-3 14.12.11),
-    interpolated linearly in dB over log-frequency -- the Recommendation's
-    own rule for values between the mask frequencies -- and extrapolated
-    beyond the table with the end-segment slopes. Zero frequency (DC) maps
-    to ``-inf`` dB. AES17-2015 5.2.7 tabulates the same curve with an
-    additional gain of -5,63 dB (unity at 2 kHz, the "CCIR-RMS" filter).
+    Clause 1 of the Recommendation defines the nominal curve as the response
+    of the passive network of Fig. 1a and prints Table 1 as "the values of
+    this response at various frequencies", so the curve exists at every
+    frequency and the 21 printed rows are that curve rounded to 0.1 dB. This
+    is the closed-form evaluation of the same analog prototype the ``'468'``
+    branch of :class:`~phonometry.filters.WeightingFilter` discretises,
+
+    .. math::
+
+       20 \lg \left| \frac{K\,s}{D(s)} \right|_{s = 2 \pi j f},
+
+    with one zero at the origin, the six poles of the Fig. 1a ladder and
+    :math:`K` set for 0 dB at the 1 kHz reference. The value is what a
+    psophometric noise meter's weighting network would add to a tone at that
+    frequency: about +12.22 dB at the 6.3 kHz peak, where broadcast-chain
+    noise is most audible, and -22.2 dB at 20 kHz. Zero frequency (dc) maps
+    to ``-inf`` dB, which is the series capacitor of Fig. 1a. AES17-2015
+    5.2.7 tabulates the same curve with an additional gain of -5,63 dB
+    (unity at 2 kHz, the "CCIR-RMS" filter). The comma is AES 17's own: the
+    decimal separator here follows the document being quoted, and BS.468-4
+    prints a point where AES 17 prints a comma.
+
+    Reading the 21 rows and interpolating between them, which is what this
+    function used to do, departs from the network by up to 0.611 dB at
+    11 058 Hz, where the curve turns over fastest and the table samples it
+    most coarsely. (The log-frequency interpolation rule of Table 1's
+    footnote (1) governs the *tolerance* column, not the response, and runs
+    between six mask frequencies rather than all 21.)
 
     :param frequencies: Frequencies, in Hz (scalar or array-like, >= 0).
     :return: Response in dB re the 1 kHz value, same shape as the input.
@@ -566,21 +559,15 @@ def itu_r_468_weighting(frequencies: ArrayLike) -> NDArray[np.float64]:
     if not np.all(np.isfinite(f)) or np.any(f < 0.0):
         msg = "'frequencies' must be finite and non-negative."
         raise ValueError(msg)
-    table_f = np.array([row[0] for row in _ITU_R_468_TABLE])
-    table_db = np.array([row[1] for row in _ITU_R_468_TABLE])
-    log_f = np.log10(np.maximum(f, np.finfo(np.float64).tiny))
-    log_table = np.log10(table_f)
-    out = np.asarray(np.interp(log_f, log_table, table_db), dtype=np.float64)
-    # Extrapolate with the end-segment slopes (dB per decade); the
-    # low-frequency slope also sends DC to -inf.
-    lo_slope = (table_db[1] - table_db[0]) / (log_table[1] - log_table[0])
-    hi_slope = (table_db[-1] - table_db[-2]) / (log_table[-1] - log_table[-2])
-    below = log_f < log_table[0]
-    above = log_f > log_table[-1]
-    out[below] = table_db[0] + lo_slope * (log_f[below] - log_table[0])
-    out[above] = table_db[-1] + hi_slope * (log_f[above] - log_table[-1])
-    out[~(f > 0.0)] = -np.inf
-    return out
+    poles, gain = _itu_r_468_prototype()
+    p = np.asarray(poles, dtype=np.complex128)
+    s = 2j * np.pi * f
+    # The pole axis is appended, so any input shape survives the product.
+    magnitude = gain * np.abs(s) / np.abs(np.prod(s[..., None] - p, axis=-1))
+    # The zero at the origin is exactly that: dc is blocked, not merely
+    # attenuated, so log10(0) -> -inf is the answer and not an edge case.
+    with np.errstate(divide="ignore"):
+        return np.asarray(20.0 * np.log10(magnitude), dtype=np.float64)
 
 
 def _weighted_rms_468(x: NDArray[np.float64], fs: float) -> float:
@@ -614,7 +601,7 @@ def weighted_thd(
     before its RMS is compared with the total signal RMS, so the perceptual
     emphasis of the distortion products is accounted for. The default
     weighting is the network required by the clause -- IEC 60268-1:1985
-    Appendix A, the ITU-R BS.468-4 curve (peaking +12,2 dB near 6,3 kHz) with
+    Appendix A, the ITU-R BS.468-4 curve (peaking +12.2 dB near 6.3 kHz) with
     its standard 0 dB at 1 kHz normalization; ``'A'`` and ``'C'`` (IEC
     61672-1) are kept as explicitly labelled alternatives, not 14.12.11
     quantities.

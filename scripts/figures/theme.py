@@ -386,7 +386,7 @@ def measure_weighting_response(
     linear phase, which does not affect the magnitude.
 
     :param fs: Sample rate in Hz.
-    :param curve: 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z'.
+    :param curve: 'A', 'B', 'C', 'D', 'G', 'AU', '468' or 'Z'.
     :param freqs: Optional exact frequencies to evaluate; defaults to a
         dense 8192-point grid for plotting.
     :return: Tuple (frequencies, magnitude in dB).
