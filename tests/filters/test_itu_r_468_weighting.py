@@ -39,13 +39,18 @@ from phonometry.filters.weighting import (
 
 #: Above this fraction of the input Nyquist frequency the ``resample_poly``
 #: anti-alias FIR of the high-accuracy path dominates, whatever the design
-#: rate: its cutoff sits on ``fs / 2``, so the transition band straddles it.
-#: Measured on this curve at 44.1 kHz, the 20 kHz row (0.907 of Nyquist) reads
-#: -2.13 dB against the network while the sections alone read -0.49 dB, and
-#: raising the oversample factor makes it worse, not better (-8.5 dB at x9,
-#: -38.9 dB at x16), because the sharper FIR attenuates 20 kHz harder. The A
-#: curve loses 2.25 dB at the same point for the same reason, so this is the
-#: module's shared range limit and not a property of this curve.
+#: rate: its cutoff sits on ``fs / 2``, so the transition band straddles it,
+#: and the signal crosses it twice. Measured on this curve at 44.1 kHz, the
+#: 20 kHz row (0.907 of Nyquist) reads -2.13 dB against the network, of which
+#: the two FIR passes are -1.66 dB and the sections only -0.49 dB. That -1.66
+#: does not move with the oversample factor: the tap count grows as 20 L while
+#: the normalised cutoff falls as 1/L, so the transition band in hertz is
+#: invariant (-3 dB at 21.17 kHz for every L from 2 to 16). Raising L improves
+#: the row, from -10.4 dB at x2 to -1.7 dB at x16, and every decibel of that is
+#: the sections decompressing; the factor is already at the module's cap of 8
+#: here, so there is no headroom left to spend. The A curve loses 2.25 dB at
+#: the same point for the same reason, so this is the module's shared range
+#: limit and not a property of this curve.
 _DEMONSTRABLE_FRACTION_OF_NYQUIST = 0.9
 
 #: Substitute for the 0 dB tolerance Table 1 prints at 6 300 Hz. The printed

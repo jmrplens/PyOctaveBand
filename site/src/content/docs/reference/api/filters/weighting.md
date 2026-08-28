@@ -60,11 +60,15 @@ refused rather than shipped 23 dB out at 16 kHz.
 One Table 1 row is out of reach at 44.1 kHz: 20 kHz sits at 0.91 of that
 rate's Nyquist frequency, inside the anti-alias transition band the
 resampling stages carry, and reads 2.1 dB low against a +/-2.0 dB
-tolerance. That ceiling belongs to the resampling path rather than to this
-curve (the A weighting loses 2.25 dB at the same point) and raising the
-design rate makes it worse, not better, because the sharper anti-alias FIR
-cuts 20 kHz harder. At 48 kHz and above every row below Nyquist is inside
-the mask, the tightest margin being the 6.3 kHz peak.
+tolerance. Of that, the two anti-alias passes are -1.66 dB and the sections
+only -0.49 dB, and the resampler's share does not move with the design rate:
+its tap count grows as 20 L while its normalised cutoff falls as 1/L, so the
+transition band in hertz is the same for every factor. Raising the factor
+improves the row, but only by decompressing the sections, and it is already
+at the module's cap of 8 at this rate. The ceiling therefore belongs to the
+resampling path rather than to this curve, and the A weighting loses 2.25 dB
+at the same point for the same reason. At 48 kHz and above every row below
+Nyquist is inside the mask, the tightest margin being the 6.3 kHz peak.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 

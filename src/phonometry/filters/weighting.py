@@ -56,11 +56,15 @@ refused rather than shipped 23 dB out at 16 kHz.
 One Table 1 row is out of reach at 44.1 kHz: 20 kHz sits at 0.91 of that
 rate's Nyquist frequency, inside the anti-alias transition band the
 resampling stages carry, and reads 2.1 dB low against a +/-2.0 dB
-tolerance. That ceiling belongs to the resampling path rather than to this
-curve (the A weighting loses 2.25 dB at the same point) and raising the
-design rate makes it worse, not better, because the sharper anti-alias FIR
-cuts 20 kHz harder. At 48 kHz and above every row below Nyquist is inside
-the mask, the tightest margin being the 6.3 kHz peak.
+tolerance. Of that, the two anti-alias passes are -1.66 dB and the sections
+only -0.49 dB, and the resampler's share does not move with the design rate:
+its tap count grows as 20 L while its normalised cutoff falls as 1/L, so the
+transition band in hertz is the same for every factor. Raising the factor
+improves the row, but only by decompressing the sections, and it is already
+at the module's cap of 8 at this rate. The ceiling therefore belongs to the
+resampling path rather than to this curve, and the A weighting loses 2.25 dB
+at the same point for the same reason. At 48 kHz and above every row below
+Nyquist is inside the mask, the tightest margin being the 6.3 kHz peak.
 """
 
 from __future__ import annotations
@@ -345,6 +349,36 @@ class WeightingFilter:
             self.zi = np.array([])
             self._steady_ic = steady_ic
 
+    def _itu_r_468_design(self) -> tuple[np.ndarray, np.ndarray, float]:
+        """Analog ZPK of the ITU-R BS.468-4 curve, and its design rate.
+
+        Clause 1 makes the Fig. 1a passive network the nominal curve, so the
+        prototype is rebuilt from its seven printed component values by
+        :func:`_itu_r_468_prototype`: one zero at the origin, because the
+        series capacitor blocks dc, and six poles.
+
+        Kept apart from the other curves because it is the only one that both
+        reads its prototype from a network and raises its own design rate, and
+        because the reason for that rate takes a paragraph to state.
+
+        :return: ``(zeros, poles, gain)``, unnormalised; the caller puts 0 dB
+            at 1 kHz.
+        """
+        poles, gain = _itu_r_468_prototype()
+        if self.high_accuracy:
+            # The 144 kHz default target is sized for the A/C action up to
+            # 16-20 kHz, where those curves are already 30 dB down and
+            # flat-ish. 468 is still turning over at 12.5 kHz and falls at
+            # about -30 dB/octave above it, so bilinear compression costs far
+            # more: measured against the exact analog response, a 144 kHz
+            # design reads -1.99 dB at the 16 kHz row of Table 1, outside its
+            # +/-1.6 dB tolerance, and eats 96 % of the +/-1.2 dB budget at
+            # 12.5 kHz. A 384 kHz target brings those to -0.27 dB and
+            # -0.16 dB, 17 % and 13 % of their budgets. At fs = 48 kHz that is
+            # x8, the module's existing cap.
+            self._oversample = min(8, max(1, math.ceil(384000 / self.fs)))
+        return np.zeros(1), np.array(poles), gain
+
     def _analog_design(self) -> tuple[np.ndarray, np.ndarray, float]:
         """Analog ZPK of the selected curve, normalised at its reference.
 
@@ -451,26 +485,7 @@ class WeightingFilter:
                     self._oversample = min(8, max(1, math.ceil(288000 / self.fs)))
 
         elif self.curve == "468":
-            # ITU-R BS.468-4 clause 1: the nominal curve is the response of
-            # the Fig. 1a passive network, rebuilt from its seven printed
-            # component values by ``_itu_r_468_prototype``. One zero at the
-            # origin (the series capacitor blocks dc) and six poles.
-            poles, gain = _itu_r_468_prototype()
-            z = np.zeros(1)
-            p = np.array(poles)
-            k = gain
-            if self.high_accuracy:
-                # The 144 kHz default target is sized for the A/C action up
-                # to 16-20 kHz, where those curves are already 30 dB down and
-                # flat-ish. 468 is still turning over at 12.5 kHz and falls at
-                # about -30 dB/octave above it, so bilinear compression costs
-                # far more: measured against the exact analog response, a
-                # 144 kHz design reads -1.99 dB at the 16 kHz row of Table 1,
-                # outside its +/-1.6 dB tolerance, and eats 96 % of the
-                # +/-1.2 dB budget at 12.5 kHz. A 384 kHz target brings those
-                # to -0.27 dB and -0.16 dB, 17 % and 13 % of their budgets. At
-                # fs = 48 kHz that is x8, the module's existing cap.
-                self._oversample = min(8, max(1, math.ceil(384000 / self.fs)))
+            z, p, k = self._itu_r_468_design()
 
         elif self.curve == "B":
             # ANSI S1.4-1983 Appendix C (C2): the B weighting is the C
