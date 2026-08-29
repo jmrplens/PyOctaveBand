@@ -6,7 +6,7 @@ Two defects, and they are not the same defect.
 **A curve drawn behind the letters.** The strokes of the letters and the
 stroke of the curve are the same weight, and on the dark page close to the
 same lightness. The answer the corpus uses, at a hundred and forty-seven
-labels under ``scripts/figures``, is an opaque chip::
+call sites under ``scripts/figures``, is an opaque chip::
 
     bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
           "edgecolor": COLOR_GRID}

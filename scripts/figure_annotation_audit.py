@@ -119,12 +119,15 @@ number gateable. The chip is drawn by ``Text.draw``, so raising the label
 raises the box with it, and a glyph mask read straight off that render is the
 chip's whole rectangle: the count would be mostly fill. Measured both ways
 across the corpus the two diverge by up to seventy-seven times:
-``rd1367_vs_iso_tonal_es`` scores 237 px of lost chip and 0 px of lost letters
--- a legend frame trimming the top-right corner of the box, every character
-perfect -- and ``ship_source_level`` 384 px against 5, a dotted line running
-along the top edge of the chip and grazing one ascender. The clean population
-reaches further up (384 px) than the real one begins, so no threshold
-separates the two, and a clipped chip corner is untidy rather than unreadable.
+``rd1367_vs_iso_tonal_es`` scores 237 px of lost chip and 0 px of lost letters:
+a legend frame trimming the top-right corner of the box, every character
+perfect. The clean population reaches further up than the real one begins, so
+no threshold separates the two, and a clipped chip corner is untidy rather
+than unreadable. (A second example stood here, ``ship_source_level`` at 384 px
+against 5. This branch then moved that formula box to the top right, where
+nothing is drawn over it, and its chip now loses nothing. The measurement that
+carried the argument is gone even though the argument holds, which is the
+hazard of a worked example naming a figure the same branch is free to move.)
 
 So the letters are found by drawing them twice, once in each of
 :data:`_INKS`, and differencing the two renders. Everything else in the figure
@@ -150,9 +153,11 @@ One thing it still cannot see, and it is worth writing down. An artist drawn
 over a label with ``alpha`` below 1 lets the letters tint the result, so the
 pixel does differ from the label-hidden render and counts as surviving: the
 same synthetic control at ``alpha=0.9`` scores zero where at 1.0 it scores
-346. Where that artist is a *stroke*, the other measure has it -- which is why
-``sii_masking_chain`` is silent here and 345 px under behind, and why both are
-kept. Where it is a translucent *fill*, neither does: the fill is a backing to
+346. Where that artist is a *stroke*, the other measure has it, which is why both
+are kept. ``sii_masking_chain`` was the example: 345 px under behind and
+silent here. It is silent under both now, because this branch handed the
+annotation to the twin axes and chipped it, so ``_candidates`` no longer
+nominates it at all. Where it is a translucent *fill*, neither does: the fill is a backing to
 the behind measure by design, so a wash laid over a label scores 0 and 0
 (measured, ``axhspan(alpha=0.55)`` over a label at a higher zorder). The corpus
 draws its washes under the labels rather than over them, so it has no instance;
@@ -176,8 +181,7 @@ pass of each is the same geometry in other colours, and it is skipped because
 the measurement costs renders and doubling them buys three pixels. Not zero
 pixels: forcing the measurement on the dark pass of ten drawings recorded 44
 labels, of which 25 came out differently, every one of them by 1 to 3 px
-(``airport_sor`` "-12" 42 light against 39 dark; ``decay_range_bias`` 0 covered
-light against 1 dark). That is anti-aliasing against a different page, not a
+(``airport_sor`` "-12" 42 light against 39 dark). That is anti-aliasing against a different page, not a
 different drawing: the behind counts all fall on the dark page and only the
 covered ones can rise, by 2 px at the most. So the skip can hide a defect
 sitting within three pixels of a threshold, and nothing further from one.
@@ -659,9 +663,12 @@ def _ink(fig: Figure) -> list[_Ink]:
     What is deliberately *not* here is the furniture the axes draws around the
     data: the gridlines (which live on the ``Axis``, not in ``ax.get_lines()``),
     the spines, and the edge of a chip. They are excluded on the measurements,
-    not by oversight. A major gridline reaches an un-chipped label on 371 of
-    the 894 drawings, and 896 of the corpus's 1386 un-chipped labels have one
-    across them, so counting them would move every threshold in the checker,
+    not by oversight. A major gridline reaches an un-chipped label on
+    something over four hundred of the 894 drawings and something over nine
+    hundred of its roughly 1390 un-chipped labels: two independent censuses
+    of the same corpus gave 371 and 382 drawings, and neither could say where
+    they parted, so the order is what this argument rests on and not the
+    figure. Counting gridlines would move every threshold in the checker,
     and what they paint is an order of magnitude below the gate: putting the
     gridlines and the spines into this list and re-measuring the one corpus
     note a spine crosses, ``sweep_distortion_separation``'s "causal part: what
@@ -974,8 +981,10 @@ def _artist_name(artist: Artist, pointers: dict[int, Text] | None = None) -> str
 
     A ``Text`` is named by what it says, because "unnamed Text" tells whoever
     reads the report nothing and one label drawn over another is a case the
-    covered measure finds (``decay_range_bias``, a rotated rule label behind a
-    corner box). An arrow is named by the annotation it leaves, for the same
+    covered measure finds. No corpus figure is that case today: the one that
+    was, ``decay_range_bias``, had its corner box moved off the rotated rule
+    label in this change, so the naming is kept for the class rather than for
+    an instance. An arrow is named by the annotation it leaves, for the same
     reason and because it has no label of its own to fall back on; *pointers*
     is :func:`_pointers` of the figure it belongs to.
     """
