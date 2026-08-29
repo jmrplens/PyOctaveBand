@@ -35,7 +35,7 @@ if _SCRIPTS not in sys.path:
 
 from generated_assets import NumericTolerance, numbers_within_tolerance
 
-from .registry import deviation_places
+from .registry import Kind, deviation_places
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -60,6 +60,13 @@ _EXACT_CHECK_FIELDS = (
     "precision",
     "verdict",
 )
+
+
+#: Decimals a record check's values are guarded at. They are stored unrounded
+#: and compared for equality, so the guard has to be tight enough to be an
+#: equality in practice while still absorbing the last-bit wobble that moving
+#: the same computation between machines produces.
+_RECORD_PLACES = 12
 
 
 def _tolerance(precision: int) -> NumericTolerance:
@@ -125,7 +132,19 @@ def _check_problems(old: Mapping[str, Any], new: Mapping[str, Any]) -> list[str]
     if old["reference"] != new["reference"]:
         problems.append(f"{where}.reference: citation split changed")
     precision = int(old["precision"])
-    for field in ("expected", "computed", "tolerance", "binding"):
+    # A record check compares its values for equality and stores them
+    # unrounded, so guarding them at the check's own precision guards nothing:
+    # `record` sets precision to zero because its *deviation* is a count of
+    # names that disagreed, and a zero-decimal tolerance is 1.0 absolute. A
+    # stored 1.0 against a computed 0.6 sat inside it, so the artefact kept a
+    # normative figure the standard does not contain and no regeneration could
+    # dislodge it, because `write` only rewrites what this function objects to.
+    side_places = _RECORD_PLACES if old.get("kind") == str(Kind.RECORD) else precision
+    for field in ("expected", "computed"):
+        problems += _mapping_problems(
+            f"{where}.{field}", old.get(field), new.get(field), side_places
+        )
+    for field in ("tolerance", "binding"):
         problems += _mapping_problems(
             f"{where}.{field}", old.get(field), new.get(field), precision
         )

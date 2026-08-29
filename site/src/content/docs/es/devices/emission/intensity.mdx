@@ -629,6 +629,12 @@ banda que el 9.2 conserva, con potencia total positiva y nivel finito, puede
 ser una que el A.2.3 rechaza. Sus indicadores del Anexo A salen `NaN` y la
 determinación avisa, porque no hay nada más en el resultado que la señale.
 
+Los dos rechazos son sobre una suma que **no es positiva**, que es más amplio
+que la palabra que usan los apartados. Una suma de exactamente cero no es
+negativa y se rechaza igual: el nivel del 9.2 sería $10 \lg 0$, y la media del
+A.2.3 es el denominador de las ecuaciones (A.7) a (A.9), así que ninguno de los
+dos tiene nada que informar ahí.
+
 El apartado 8.2 dimensiona el conjunto de posiciones: al menos una posición por
 metro cuadrado y un mínimo de diez en total, repartidas tan uniformemente como
 permitan las áreas de los segmentos. Las dos relajaciones que ofrece el

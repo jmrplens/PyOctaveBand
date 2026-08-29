@@ -2918,7 +2918,7 @@
         "record": {
           "precision (all bands)": 0.2,
           "engineering (all bands)": 0.29,
-          "survey (A-weighted)": 1.0
+          "survey (A-weighted)": 0.6
         }
       },
       "tolerance": {

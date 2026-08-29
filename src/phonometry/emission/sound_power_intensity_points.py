@@ -23,9 +23,8 @@ does; that is energy flowing inward through part of the surface, which is what
 :math:`F_3` exists to quantify, not an error to reject.
 
 A.2.3 makes a second refusal, on a different quantity: where
-:math:`\sum_i I_{\mathrm{n}i}` is negative, "las condiciones del ensayo no
-satisfacen los requerimientos de esta parte de la Norma ISO 9614 en esa banda
-de frecuencia". That sum is unweighted over the ``N`` positions, so equal
+:math:`\sum_i I_{\mathrm{n}i}` is not positive, "the test conditions do not
+satisfy the requirements of this part of ISO 9614 in that frequency band". That sum is unweighted over the ``N`` positions, so equal
 segments make the two refusals agree and unequal ones let them part company: a
 band clause 9.2 keeps, with a positive total power and a finite level, can
 still be one A.2.3 refuses. Both are reported, each in its own terms.
@@ -85,10 +84,10 @@ grade-3 figure raises rather than returning a plausible number.
 
 The uncertainty of the determination is Table 2's ``s``, with footnote 1
 placing the true value within :math:`\pm 2s` of the measured one at 95 %
-confidence. Clause 10.6 says which row of the table to read it from: "debe
-especificarse el grado de precision logrado en el ensayo final de acuerdo a la
-tabla 2", the grade **achieved** and not the grade set out for, so a band that
-only reached grade 2 carries the grade-2 figure even where grade 1 was asked
+confidence. Clause 10.6 says which row of the table to read it from: "the
+grade of accuracy attained in the final test, according to table 2, shall
+be stated", the grade **attained** and not the grade set out for, so a band
+that only reached grade 2 carries the grade-2 figure even where grade 1 was asked
 for. A band that fails criterion 2 may still be recorded, provided the 95 %
 confidence interval of equation (B.3) accompanies it (B.1.2, clause 10.5 c)
 and clause 10.6):
@@ -1201,9 +1200,12 @@ def _sampling_warnings(n_positions: int, area: float) -> None:
 def _test_conditions_met(intensity: np.ndarray) -> np.ndarray:
     r"""A.2.3's per-band verdict on the test conditions, ``True`` where met.
 
-    "Si :math:`\sum I_{\mathrm{n}i}/I_0` es negativo en alguna banda de
-    frecuencia, las condiciones del ensayo no satisfacen los requerimientos de
-    esta parte de la Norma ISO 9614 en esa banda de frecuencia." The sum is
+    "If :math:`\sum I_{\mathrm{n}i}/I_0` is negative in any frequency band,
+    the test conditions do not satisfy the requirements of this part of
+    ISO 9614 in that frequency band." The refusal here is on a sum that is not
+    *positive*, which takes in the exact zero the clause does not mention: a
+    zero mean leaves equations (A.7) to (A.9) dividing by it, so there is no
+    indicator to report either way. The sum is
     unweighted over the N positions, so for N > 0 its sign is the sign of the
     arithmetic mean of equation (A.9), the very mean :math:`F_3` and
     :math:`F_4` divide by.

@@ -464,6 +464,12 @@ finite level, can still be one A.2.3 refuses. Its Annex A indicators come back
 `NaN` and the determination warns, because nothing else in the result flags
 it.
 
+Both refusals are on a sum that is **not positive**, which is wider than the
+word the clauses use. A sum of exactly zero is not negative and is refused all
+the same: clause 9.2's level would be $10 \lg 0$, and A.2.3's mean is the
+denominator of equations (A.7) to (A.9), so neither has anything to report
+there.
+
 Clause 8.2 sizes the position set: at least one position per square metre and
 at least ten in all, distributed as evenly as the segment areas allow. Both
 relaxations the clause offers (one position per 2 m² where extraneous noise is

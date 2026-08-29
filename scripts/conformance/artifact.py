@@ -146,9 +146,21 @@ def _expected_document(outcome: Outcome) -> dict[str, Any]:
 
 
 def _computed_document(outcome: Outcome) -> dict[str, Any]:
-    """The library's side of a check, rounded to the check's precision."""
+    """The library's side of a check, rounded to the check's precision.
+
+    A ``RECORD`` check is the exception, and its record is written unrounded.
+    ``precision`` says how many decimals the *deviation* is printed to, and for
+    a record the deviation is a count of names that disagreed, so
+    :func:`~conformance.registry.record` sets it to zero. Rounding the values
+    by it turned 0.6 into 1.0 and published a normative figure the standard
+    does not contain, beside a label reading 0.6 and a verdict of pass, since
+    the comparison itself is an exact match made before any of this. The defect
+    was invisible while the only record check held the ISO 717 single numbers,
+    which the standard rounds to integers itself.
+    """
     side = outcome.computed_data
     record = side.record
+    exact_record = outcome.kind is Kind.RECORD
     return {
         "value": (
             None if side.value is None else _rounded(side.value, outcome.precision)
@@ -158,7 +170,7 @@ def _computed_document(outcome: Outcome) -> dict[str, Any]:
             None
             if record is None
             else {
-                name: _rounded(value, outcome.precision)
+                name: (value if exact_record else _rounded(value, outcome.precision))
                 for name, value in record.items()
             }
         ),
