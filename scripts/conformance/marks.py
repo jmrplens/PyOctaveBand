@@ -21,7 +21,8 @@ failing test rather than a broken image nobody notices.
 **Why a raw URL and not a relative path.** The sticky pull-request comment is
 the case that settles it: it is rendered on a different page of a different
 host, where a path relative to ``docs/`` resolves to nothing, and the report
-and the comment are built by the same two functions here. Measured against the
+and the comment build their markup separately and resolve it through the same
+``asset_url`` here, so a path that is wrong is wrong on both. Measured against the
 live repository, GitHub serves ``raw.githubusercontent.com`` for this
 repository untouched, while it rewrites ``img.shields.io`` and the other
 third-party badge hosts through ``camo.githubusercontent.com`` - so there is

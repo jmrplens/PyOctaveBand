@@ -25,10 +25,13 @@ table below names all nine and the exception, and
 paragraph. That is why the same single file is correct in every theme, which
 is also why a shields.io badge has worked in both for a decade with no theme
 variant. A per-theme pair would need a ``<picture>`` element per row instead,
-and the three options measured on the real 566-row table come out at +10.6 kB
-for a reference-style single-file mark, +58.0 kB for the same mark written
-inline, and +162.8 kB for a ``<picture>`` pair per row - 282 characters of
-markup, repeated 573 times, to say one word. The banner is the opposite case:
+and the three options measured on the real 566-row table come out at +10.0 kB
+for a reference-style single-file mark, +57.3 kB for the same mark written
+inline, and +162.2 kB for a ``<picture>`` pair per row - 282 characters of
+markup, repeated 573 times, to say one word. (Those three are measured against
+the committed report, which is what :mod:`marks` and its test also quote; an
+earlier draft cited figures taken against a baseline that had neither the
+banner nor the legend, and they were 0.6 kB higher.) The banner is the opposite case:
 once per page, so the pair costs one element, and a card wants a
 card-coloured ground that no single fill gives on both #ffffff and #0d1117.
 It therefore ships as ``…-summary.svg`` plus ``…-summary_dark.svg``, the

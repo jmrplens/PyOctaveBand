@@ -660,8 +660,10 @@ const searchable = (row: (typeof rows)[number]) =>
 	   column ended 106 px past the container, `scrollWidth - clientWidth` was 0
 	   and `scrollLeft` stayed 0, so the Used and Status columns were not drawn
 	   at all and could not be scrolled to; at 360 px the overhang was 863 px.
-	   With the rule the same box reports 106 px and 863 px of real overflow and
-	   scrolls to the last column. `width: auto` behaves exactly like the
+	   With the rule the same box reports 116 px and 863 px of real overflow and
+	   scrolls to the last column. The 116 rather than 106 is the gutter added
+	   below, which grows the table by 10 px; measure the two together or the
+	   figures look like they disagree. `width: auto` behaves exactly like the
 	   `width: 100%` it replaced, so the percentage was never the cause. */
 	.conformance table {
 		width: 100%;
@@ -723,7 +725,9 @@ const searchable = (row: (typeof rows)[number]) =>
 	   gives every `svg` `display: block`, which put the mark on a line of its
 	   own above the word it belongs to in every table cell that draws one.
 	   Measured at 1280 px, the mark's top was 20 px above the word's; with
-	   this rule they share a line box and the cell is no wider. Inside the
+	   this rule they share a line box, at no cost in English (59.8 px either
+	   way) and 4.8 px of column width in Spanish, where "Cumple" is the
+	   longer word. Inside the
 	   legend and the section headings, which are flex containers, the
 	   declaration is ignored, so the one place it changes anything is the
 	   cells. */

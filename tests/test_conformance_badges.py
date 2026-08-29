@@ -268,7 +268,7 @@ def test_every_mark_clears_three_to_one_on_every_ground_but_the_dimmed_stripe() 
     """One file per mark is only defensible if one palette really works.
 
     The alternative is a per-theme ``<picture>`` pair per row, which measures
-    +162.8 kB on the 566-row table against the +10.0 kB the reference-style
+    +162.2 kB on the 566-row table against the +10.0 kB the reference-style
     single-file mark costs, so this test is what the size decision rests on.
     Every ground in :data:`_GROUNDS` is one the
     marks are really drawn on, GitHub's two table stripes included, because

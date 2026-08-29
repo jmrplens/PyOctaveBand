@@ -91,8 +91,10 @@ def _status(verdict: str) -> str:
     The two land on separate lines, not side by side, and that was measured
     rather than intended: under GitHub's own table stylesheet the Status
     column settles at about 53.5 px of content box while a 16 px mark plus
-    the word needs about 54, so at a 1012 px viewport 563 of 566 cells wrap
-    the word under the mark and at 1400 px 493 do. A non-breaking space
+    the word needs about 54, so almost every cell wraps the word under the
+    mark: 566 of 566 at a 1012 px viewport in one harness and 563 in another.
+    The exact count moves with the width the harness gives the container, so
+    it is the wrapping and not the tally that is the finding. A non-breaking space
     between them changes nothing, because GitHub caps the table at the
     content width and the column has no room to grow into. It costs no
     height - the rows are already two lines tall from the Quantity column -
