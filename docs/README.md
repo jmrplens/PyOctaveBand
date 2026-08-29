@@ -248,6 +248,7 @@ silencers.
 **[Broadcast](devices/broadcast/index.md)**
 
 - [Programme loudness & true peak](devices/broadcast/program-loudness.md): the ITU-R BS.1770-5 programme loudness (K-weighting, gated 400 ms blocks, channel weights including the Annex 3 positions) and the oversampled true-peak level in dBTP, with the EBU R 128 −23 LUFS practice, the Tech 3341 EBU Mode momentary/short-term/integrated meters and the Tech 3342 loudness range, validated against the official EBU test signals
+- [Quasi-peak programme meter (ITU-R BS.468-4)](devices/broadcast/quasi-peak.md): the psophometric quasi-peak detector of clause 2 — eleven tone-burst acceptance windows where the Recommendation prints no time constant at all, the clause 2.6 calibration that makes a reading dBqps, and the three fitted time scales those windows identify only to within a factor of 1.61 to 2.09
 
 **[Noise control](devices/noise-control/index.md)**
 

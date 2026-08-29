@@ -762,6 +762,105 @@ def generate_k_weighting_response(output_dir: str) -> None:
     plt.close()
 
 
+def generate_quasi_peak_meter(output_dir: str) -> None:
+    """ITU-R BS.468-4 quasi-peak needle over the Table 3 burst train."""
+    print("Generating quasi_peak_meter...")
+    from phonometry import broadcast, filters, signals
+
+    fs = 48000.0
+    # The clause 2.2 stimulus itself: 5 ms (25-period) bursts of 5 kHz at 10
+    # per second, then half a second of silence so the needle can fall back.
+    # The amplitude is the one the clause specifies, by way of clause 2.6:
+    # whatever makes the *steady* 5 kHz tone read 0 dBqps. The gap between the
+    # two horizontal lines is then Table 3's 10-per-second cell drawn to
+    # scale, against which the printed reference reading is -2.3 dB.
+    steady = np.sin(2.0 * np.pi * 5000.0 * np.arange(3 * int(fs)) / fs)
+    reference = broadcast.DBQPS_REFERENCE
+    amplitude = reference / broadcast.quasi_peak_meter(steady, fs).reading
+    burst = signals.tone_burst(
+        fs,
+        5000.0,
+        25,
+        amplitude=amplitude,
+        # Sixteen bursts, not the eight that fit more comfortably: the needle
+        # is still 0.4 percentage points short of its settled value after
+        # eight, and the point of the figure is the settled Table 3 reading.
+        repetitions=16,
+        repetition_rate=10.0,
+        post_silence=0.5,
+    )
+    result = broadcast.quasi_peak_meter(burst.signal, fs)
+    weighted = filters.weighting_filter(burst.signal, round(fs), "468")
+    rectified = np.abs(np.asarray(weighted))
+
+    _fig, ax = plt.subplots(figsize=(11.0, 5.6))
+    ax.plot(
+        result.time,
+        rectified,
+        color=theme_line(COLOR_MUTED, ax, quiet=0.55),
+        linewidth=0.6,
+        label="Rectified 468-weighted signal",
+    )
+    ax.plot(
+        result.time,
+        result.trace,
+        color=COLOR_PRIMARY,
+        linewidth=2.2,
+        label="Quasi-peak detector output",
+    )
+    ax.axhline(
+        result.reading,
+        color=COLOR_SECONDARY,
+        linestyle="--",
+        linewidth=1.4,
+        label=(
+            f"Reading: {result.reading:.4f} V, "
+            f"{_fmt_minus(result.level_db, '.2f')} dBqps"
+        ),
+    )
+    ax.axhline(
+        reference,
+        color=COLOR_TERTIARY,
+        linestyle=":",
+        linewidth=1.6,
+        label="Steady 5 kHz tone: 0.775 V, 0 dBqps",
+    )
+    # The chip sits over the curves, so it takes the opaque panel: a
+    # translucent box belongs in an empty corner, not on top of a trace.
+    ax.text(
+        0.985,
+        0.955,
+        "The reading is the maximum of the needle over the record;\n"
+        "Table 3 accepts 72 to 82 % of the steady reading at this rate.\n"
+        "1.41 ms charge / 293 ms discharge / 140 ms reading device,\n"
+        "fitted to Tables 2 and 3: BS.468-4 prints no time constant",
+        transform=ax.transAxes,
+        va="top",
+        ha="right",
+        fontsize=9,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    ax.set_xlim(0.0, float(result.time[-1]))
+    ax.set_ylim(0.0, 1.95 * float(rectified.max()))
+    ax.set_xlabel("Time [s]")
+    ax.set_ylabel("Quasi-peak reading [V]")
+    ax.set_title(
+        "Quasi-peak detector (ITU-R BS.468-4): 5 ms bursts at 10 per second",
+        pad=12,
+    )
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+    plt.tight_layout()
+    save_figure(output_dir, "quasi_peak_meter.svg")
+    plt.close()
+
+
 def generate_vibration_sound_power(output_dir: str) -> None:
     """ISO/TS 7849 sound power from surface vibration: upper limit vs engineering."""
     print("Generating vibration_sound_power...")

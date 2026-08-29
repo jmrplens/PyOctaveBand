@@ -560,8 +560,9 @@ def test_cross_spectrum_curves_must_share_one_frequency_axis() -> None:
         for value in (curve[:-1], np.append(curve, curve[-1])):
             with pytest.raises(ValueError, match=rf"'{field}'.*{per_frequency}"):
                 dataclasses.replace(good, **{field: value})
+    two_axes = np.column_stack([good.coherence] * 2)
     with pytest.raises(ValueError, match=r"'coherence' must have one axis"):
-        dataclasses.replace(good, coherence=np.column_stack([good.coherence] * 2))
+        dataclasses.replace(good, coherence=two_axes)
 
 
 def test_coherent_output_split_must_share_one_frequency_axis() -> None:
@@ -593,8 +594,9 @@ def test_coherent_output_split_must_share_one_frequency_axis() -> None:
         for value in (curve[:-1], np.append(curve, curve[-1])):
             with pytest.raises(ValueError, match=rf"'{field}'.*{per_frequency}"):
                 dataclasses.replace(good, **{field: value})
+    two_axes = np.column_stack([good.snr_db] * 2)
     with pytest.raises(ValueError, match=r"'snr_db' must have one axis"):
-        dataclasses.replace(good, snr_db=np.column_stack([good.snr_db] * 2))
+        dataclasses.replace(good, snr_db=two_axes)
 
 
 def test_default_nperseg_targets_4hz_resolution() -> None:

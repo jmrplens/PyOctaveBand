@@ -1150,6 +1150,151 @@ which is the check that enforces the rule; see
   regression fixtures index both tables by their caption's spectrum.
 - **Status:** unreported.
 
+## IEC 60268-1:1985, Appendix A, Figure A1 (last shunt capacitor printed as 41.47 nF)
+
+- **Location:** Appendix A, "Noise weighting network and quasi-peak meter",
+  Figure A1 "Weighting network" (printed p. 29), drawing 0641/85. The French
+  print of the same artwork (printed p. 28) carries the same value as
+  `41,47 nF`.
+- **The print:** the last shunt capacitor of the ladder, the one across the
+  600 Ω amplifier input, is labelled **41.47 nF**.
+- **The problem:** it should be **31.47 nF**, which is what ITU-R BS.468-4
+  Figure 1a prints for the same network. Every other element of Figure A1
+  matches BS.468-4 Figure 1a exactly: 600 Ω source, 13.85 nF, 12.88 mH,
+  26.82 nF, 33.06 nF, 9.21 nF, 26.49 mH and Z = 600 Ω. The intended reading is
+  not in doubt, because the document contradicts itself: evaluated against
+  Table AI, printed two pages earlier in the same annex, the 31.47 nF ladder
+  reproduces all 21 rows to a maximum of **0.050 dB** and violates no
+  tolerance, while the 41.47 nF ladder is out by up to **2.252 dB** (at
+  31 500 Hz) with a root-mean-square error of 1.055 dB and **breaks Table AI's
+  own tolerance column at seven frequencies**, every one from 8 000 Hz to
+  20 000 Hz: −0.40 dB against ±0.40 at 8 kHz, −0.74 against ±0.60 at 9 kHz,
+  −1.16 against ±0.80 at 10 kHz, −1.85 against ±1.20 at 12.5 kHz, −1.98
+  against ±1.40 at 14 kHz, −2.05 against ±1.60 at 16 kHz and −2.12 against
+  ±2.00 at 20 kHz. Sweeping the capacitor to minimise the error against
+  Table AI lands on 31.4798 nF.
+- **Evidence:** the two ladders evaluated independently by an ABCD chain
+  product over the seven printed reactive elements between the printed 600 Ω
+  source and load, normalised at 1 kHz, and compared row by row with Table AI
+  and its tolerance column. Neither Amendment 1:1988 (which replaces Table AII
+  only) nor Amendment 2:1988 (which replaces sub-clause 12.1, on producing a
+  uniform alternating magnetic field) touches Figure A1, so the misprint
+  stands in the current document as amended. Verified on PDF page 31 (printed
+  p. 29) and PDF page 29 (printed p. 27), which carries Table AI, of IEC
+  60268-1:1985, and on PDF page 1 (printed p. 1) of Recommendation ITU-R
+  BS.468-4.
+- **Library behaviour:** unaffected. The weighting network is built from the
+  BS.468-4 Figure 1a component values in
+  [`filters/weighting.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/filters/weighting.py), with
+  31.47 nF, and the Table 1 rows are the oracle. The entry matters because IEC
+  60268-3:2013 sub-clause 14.12.11 sends a reader to "a weighting network
+  complying with Appendix A of IEC 60268-1", so a clean-room implementation
+  started from IEC 60268-3 lands on the wrong capacitor.
+- **Status:** unreported.
+
+## IEC 60268-1:1985, Appendix A, Table AII (lower-limit row slipped one column)
+
+- **Location:** Appendix A, Table AII, the tone-burst dynamic characteristic
+  of the quasi-peak meter, "Limited values — lower limit" row (printed p. 31).
+- **The print:** the lower limit (%) row reads
+  `13.5 | 22.4 | 34 | 41 | 44 | 44 | 50 | 68` for the 1, 2, 5, 10, 20, 50, 100
+  and 200 ms columns, while the (dB) row printed immediately beneath it reads
+  `−17.4 | −13.0 | −9.3 | −7.7 | −7.1 | −6.0 | −4.7 | −3.3`.
+- **The problem:** the 50 ms and 100 ms cells contradict their own dB cells.
+  −6.0 dB is 50.1 %, not 44 %, and −4.7 dB is 58.2 %, not 50 %. The percentage
+  row has slipped one column to the right from 50 ms onwards, carrying the
+  20 ms and 50 ms values into the two cells after them; the dB row and the
+  200 ms cell stayed where they belong. ITU-R BS.468-4 Table 2 prints
+  `... | 44 | 50 | 58 | 68` for the same four columns.
+- **Evidence:** the two rows of the same table read against each other, and
+  against the corresponding row of ITU-R BS.468-4 Table 2. **Corrected by
+  Amendment 1:1988-01**, whose English sheet is headed "Page 31 / Replace
+  Table AII by the following:" and prints the lower limit row as
+  `13.5 | 22.4 | 34 | 41 | 44 | 50 | 58 | 68`, matching BS.468-4; every other
+  cell of the replacement table is identical to the base print, so this row is
+  the entire substantive content of the amendment. Verified on PDF page 33
+  (printed p. 31) of IEC 60268-1:1985, on PDF page 3 (printed p. 3) of IEC
+  60268-1:1985 Amendment 1:1988, and on PDF page 4 (printed p. 4) of
+  Recommendation ITU-R BS.468-4.
+- **Library behaviour:** unaffected. The eleven acceptance windows are
+  transcribed from BS.468-4 Tables 2 and 3 in
+  [`tests/reference_data/`](https://github.com/jmrplens/phonometry/blob/main/tests/reference_data), which agree with the
+  amended IEC table. Recorded because the unamended base document is the one a
+  reader is likely to hold, and it widens the 50 ms and 100 ms acceptance
+  windows by 1.1 dB and 1.3 dB at the bottom.
+- **Status:** unreported (corrected by the issuing body in 1988).
+
+## ITU-R BS.468-4, Table 2, 5 ms upper limit (the dB cell should read −6.7)
+
+- **Location:** clause 2.1, Table 2, "Limiting values — upper limit", the 5 ms
+  column (printed p. 4). The same pair of cells is printed identically in
+  IEC 60268-1:1985 Table AII and in the Amendment 1:1988 table that replaces
+  it, so the defect is inherited from the CCIR text rather than introduced by
+  either edition.
+- **The print:** `46` in the (%) row and `−6.6` in the (dB) row.
+- **The problem:** the two disagree. 46 % is 20 lg(0.46) = **−6.745 dB**, and
+  −6.6 dB is 46.8 %. All 33 cells of Tables 2 and 3 were audited against their
+  own counterpart; 32 agree to within 0.050 dB, the rounding of a
+  two-significant-figure percentage, and this one is out by 0.145 dB. The
+  neighbouring 5 ms *lower* limit (`34`, `−9.3`) is out by 0.070 dB and is
+  benign, because 34 % as a rounded two-figure percentage covers 33.5 % to
+  34.5 %, that is −9.500 dB to −9.241 dB, and −9.3 lies inside it. The upper
+  cell is not benign: 46 % covers 45.5 % to 46.5 %, that is −6.840 dB to
+  −6.651 dB, which excludes −6.6.
+- **Which cell is wrong:** the dB one. Read as percentages, the acceptance
+  window is a very steady −1.4 dB / +1.2 dB about the reference reading for
+  every duration from 5 ms to 200 ms (+1.18 to +1.24 dB above, −1.37 to
+  −1.45 dB below). 46 % puts the 5 ms upper limit +1.214 dB above its
+  reference, on that pattern; 46.774 %, which is what −6.6 dB means, would put
+  it +1.360 dB above, off it. So 46 % is right and the dB cell should read
+  **−6.7**.
+- **Evidence:** 20 lg of each printed percentage compared with the printed dB
+  cell beside it, for all 24 cells of Table 2 and all 9 of Table 3, and the
+  upper- and lower-limit offsets about the reference row recomputed across the
+  five durations from 5 ms to 200 ms. Verified on PDF page 4 (printed p. 4) of
+  Recommendation ITU-R BS.468-4, on PDF page 33 (printed p. 31) of IEC
+  60268-1:1985, and on PDF page 3 (printed p. 3) of IEC 60268-1:1985
+  Amendment 1:1988.
+- **Library behaviour:** the percentage rows are primary and the dB rows are
+  derived from them, which is the decision this entry forces. The eleven
+  acceptance windows are stored as percentages in
+  [`tests/reference_data/`](https://github.com/jmrplens/phonometry/blob/main/tests/reference_data) and checked as
+  percentages, in the test suite and in the conformance rows "ITU-R BS.468-4
+  Table 2" and "ITU-R BS.468-4 Table 3".
+- **Status:** unreported.
+
+## IEC 60268-1:1985, Appendix A, Table AI (16 000 Hz tolerance printed as ±1.65)
+
+- **Location:** Appendix A, Table AI, the tolerance column, 16 000 Hz row
+  (printed p. 27; the French Tableau AI on printed p. 26 prints the same
+  value).
+- **The print:** `±1.65 1)`.
+- **The problem:** ITU-R BS.468-4 Table 1 and AES17-2015 Table 1 both print
+  **±1.6** for the same row, and the table's own footnote 1) is what settles
+  it: the marked tolerances "are obtained by a linear interpolation on a
+  logarithmic graph on the basis of values specified for the frequencies used
+  to define the mask, i.e. 31.5 Hz, 100 Hz, 1 000 Hz, 5 000 Hz, 6 300 Hz, and
+  20 000 Hz". Interpolated on that rule between (6 300 Hz, 0 dB) and
+  (20 000 Hz, ±2.0 dB), 16 000 Hz gives 1.6137 dB, which rounds to 1.6 at one
+  decimal and to 1.61 at two. No rounding of the rule produces 1.65, and no
+  alternative anchor pair does either: taking the 6 300 Hz to 31 500 Hz line
+  instead gives 1.6216 dB. The value is also anomalous within its own column,
+  which is quoted to one decimal everywhere else.
+- **Evidence:** the footnote rule applied to all 14 marked rows of the same
+  column, which reproduces every one of them (63 Hz 1.400, 200 Hz 0.8495,
+  400 Hz 0.6990, 800 Hz 0.5485, 3 150 and 4 000 Hz 0.5000, 7 100 Hz 0.2070,
+  8 000 Hz 0.4136, 9 000 Hz 0.6175, 10 000 Hz 0.7999, 12 500 Hz 1.1863,
+  14 000 Hz 1.3825, 31 500 Hz 2.7865) and 16 000 Hz alone disagrees with what
+  is printed. Not corrected by Amendment 1:1988 or Amendment 2:1988. Verified
+  on PDF page 29 (printed p. 27) of IEC 60268-1:1985 and on PDF page 2
+  (printed p. 2) of Recommendation ITU-R BS.468-4.
+- **Library behaviour:** none needed. The tolerance mask is taken from
+  BS.468-4 Table 1, and the realised digital curve is held to a far tighter
+  bound than the mask anyway: the mask governs a measuring instrument
+  comprising the amplifier and the network, not a filter's departure from the
+  nominal curve.
+- **Status:** unreported.
+
 ## IEC 60268-3:2013, clause 14.12.9.2 f) (DIM denominator)
 
 - **Location:** clause 14.12.9.2, item f) (printed p. 39), the formula for the

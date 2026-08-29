@@ -500,6 +500,11 @@ export default defineConfig({
         // Default right column plus the page actions, which hand this page's
         // published markdown copy to a clipboard, a tab or a chat.
         PageSidebar: './src/components/PageSidebar.astro',
+        // Default banner, shown on every page rather than only where a page
+        // asks for one, carrying the pre-release notice in both languages.
+        // Starlight's config-level banner is a single string with no locale
+        // form, and half this site is Spanish.
+        Banner: './src/components/Banner.astro',
         // Default left column with the topic switcher above it. The topics
         // plugin overrides `Sidebar` too, and its own hook spreads our
         // components last, so this wins and its override never runs: the

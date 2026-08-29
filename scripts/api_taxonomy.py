@@ -328,9 +328,12 @@ _SECTION_LIST: tuple[Section, ...] = (
     ),
     Section(
         key="broadcast",
-        label_en="Program loudness",
-        label_es="Sonoridad de programa",
-        modules=("phonometry.broadcast.program_loudness",),
+        label_en="Broadcast metering",
+        label_es="Medición en radiodifusión",
+        modules=(
+            "phonometry.broadcast.program_loudness",
+            "phonometry.broadcast.quasi_peak",
+        ),
     ),
     Section(
         key="simulation",

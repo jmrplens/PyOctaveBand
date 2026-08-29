@@ -68,3 +68,67 @@ EBU_TECH3342_LRA_CASES: list[tuple[int, tuple[float, ...], float]] = [
     (3, (-40.0, -20.0), 20.0),
     (4, (-50.0, -35.0, -20.0, -35.0, -50.0), 15.0),
 ]
+
+# ---------------------------------------------------------------------------
+# ITU-R BS.468-4 clause 2 - the quasi-peak detector's eleven acceptance
+# windows, transcribed from PDF p. 4 = printed p. 4 rendered at 300 dpi
+# whole-page and 600 dpi cropped. Clause 2 prints no time constant and no
+# transfer function, so these windows are the entire specification of the
+# dynamics, and they are an acceptance region rather than a set of values:
+# every reading inside a window conforms.
+#
+# The percentages are percentages of the reading the same 5 kHz tone gives
+# steadily, not of full scale. Table 3's 100 % upper limit at 100 bursts per
+# second settles it: under the other reading it would sit 1.94 dB above the
+# steady tone, which no peak follower can reach.
+#
+# The percentage rows are primary and the dB rows are derived from them. All
+# 33 cells were audited: exactly one is inconsistent with its own percentage,
+# Table 2's 5 ms upper limit, and it is the dB cell that is wrong (see
+# docs/ERRATA.md).
+# ---------------------------------------------------------------------------
+#: Table 2, single 5 kHz tone bursts: (burst duration ms, full 5 kHz periods,
+#: lower limit %, reference reading %, upper limit %). The 1 ms column carries
+#: the footnote "The Administration of the USSR intends to use burst duration
+#: >= 5 ms"; it is met here anyway, because it is the only constraint on the
+#: fast end of the ballistics.
+BS468_TABLE2_SINGLE_BURSTS: list[tuple[float, int, float, float, float]] = [
+    (1.0, 5, 13.5, 17.0, 21.4),
+    (2.0, 10, 22.4, 26.6, 31.6),
+    (5.0, 25, 34.0, 40.0, 46.0),
+    (10.0, 50, 41.0, 48.0, 55.0),
+    (20.0, 100, 44.0, 52.0, 60.0),
+    (50.0, 250, 50.0, 59.0, 68.0),
+    (100.0, 500, 58.0, 68.0, 78.0),
+    (200.0, 1000, 68.0, 80.0, 92.0),
+]
+
+#: Table 3, repetitive 5 ms (25-cycle) 5 kHz bursts: (bursts per second,
+#: lower limit %, reference reading %, upper limit %). Duty cycles 1, 5 and
+#: 50 %. The 100 per second window is the sharpest test in the document,
+#: 0.537 dB wide, and its upper limit is the physical ceiling: the train
+#: "may reach but not exceed the steady reading".
+BS468_TABLE3_BURST_TRAINS: list[tuple[float, float, float, float]] = [
+    (2.0, 43.0, 48.0, 53.0),
+    (10.0, 72.0, 77.0, 82.0),
+    (100.0, 94.0, 97.0, 100.0),
+]
+
+#: Carrier of every clause 2.1, 2.2 and 2.3 stimulus, in Hz.
+BS468_BURST_HZ = 5000.0
+
+#: Clause 2.6: the r.m.s. voltage of the 1 kHz sine that reads 0 dBqps.
+BS468_CALIBRATION_V = 0.775
+
+#: Clause 2.3: isolated bursts of this duration, in ms (3 whole 5 kHz
+#: periods), stepped down over 20 dB, must track within +-1 dB.
+BS468_OVERLOAD_BURST_MS = 0.6
+BS468_OVERLOAD_RANGE_DB = 20.0
+BS468_OVERLOAD_TOL_DB = 1.0
+
+#: Clause 2.4: the reading must not change by more than this when the
+#: polarity of an asymmetrical signal is reversed, tested unweighted.
+BS468_REVERSIBILITY_TOL_DB = 0.5
+
+#: Clause 2.5: momentary excess reading on a suddenly applied 1 kHz tone.
+BS468_OVERSWING_TOL_DB = 0.3

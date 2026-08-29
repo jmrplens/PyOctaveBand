@@ -30,6 +30,8 @@
  */
 import { getEntry } from 'astro:content';
 
+import { markId, sprite } from '../lib/verdict-marks.mjs';
+
 interface Props {
 	/** Locale of the page the report is rendered on. */
 	lang?: 'en' | 'es';
@@ -186,11 +188,22 @@ const weightingPanel = panels.find((panel) => panel.id === 'weighting-deviation'
 const t =
 	lang === 'es'
 		? {
-				summary: (p: number, n: number, d: number, s: number) =>
-					`${p} de ${n} comprobaciones superan su norma, en ${d} dominios y ${s} normas.`,
+				bannerCaption: 'comprobaciones de conformidad superadas',
+				bannerFailing: (n: number) => `, ${n} sin superar`,
+				bannerDomains: (n: number) => `${n} ${n === 1 ? 'dominio' : 'dominios'}`,
+				bannerStandards: (n: number) => `${n} ${n === 1 ? 'norma' : 'normas'}`,
+				legend: 'Marcas de veredicto',
+				legendNote:
+					'Cada marca acompaña a la palabra que tiene al lado, nunca la sustituye, y las siluetas se distinguen tanto como los colores, así que quien no separe los tonos las sigue diferenciando.',
+				verdicts: {
+					pass: 'Cumple',
+					fail: 'No cumple',
+					'by-design': 'Por diseño',
+					'not-applicable': 'No aplica',
+				} as Record<string, string>,
 				closest: 'Las diez comprobaciones más cerca de su límite publicado',
 				closestNote:
-					'Fracción de la tolerancia publicada que consume cada comprobación. Un valor alto no es un fallo: es el margen con el que se cumple.',
+					'Fracción de la tolerancia publicada que consume cada comprobación. El 100 % cae justo en el límite y un guion significa que el apartado no fija tolerancia de dos lados para esa magnitud, así que no hay margen que gastar. Un valor alto no es un fallo: es el margen con el que se cumple, y nunca decide el veredicto, que se resuelve a precisión completa antes de redondear.',
 				search: 'Buscar norma, magnitud o apartado',
 				allDomains: 'Todos los dominios',
 				onlyFailing: 'Solo las que no cumplen',
@@ -202,8 +215,6 @@ const t =
 				deviation: 'Desviación',
 				used: 'Consumido',
 				status: 'Estado',
-				pass: 'Cumple',
-				fail: 'No cumple',
 				noMatches: 'Ninguna comprobación coincide con el filtro.',
 				architecture: 'Arquitectura',
 				verdict: 'Veredicto',
@@ -220,11 +231,22 @@ const t =
 				headroom: 'Margen',
 			}
 		: {
-				summary: (p: number, n: number, d: number, s: number) =>
-					`${p} of ${n} checks meet their standard, across ${d} domains and ${s} standards.`,
+				bannerCaption: 'conformance checks pass',
+				bannerFailing: (n: number) => `, ${n} failing`,
+				bannerDomains: (n: number) => `${n} ${n === 1 ? 'domain' : 'domains'}`,
+				bannerStandards: (n: number) => `${n} ${n === 1 ? 'standard' : 'standards'}`,
+				legend: 'Verdict marks',
+				legendNote:
+					'Each mark accompanies the word beside it and never replaces it, and the silhouettes differ as much as the colours do, so a reader who cannot separate the hues can still tell them apart.',
+				verdicts: {
+					pass: 'Pass',
+					fail: 'Fail',
+					'by-design': 'By design',
+					'not-applicable': 'n/a',
+				} as Record<string, string>,
 				closest: 'The ten checks closest to their published limit',
 				closestNote:
-					'The fraction of its published tolerance each check consumes. A high figure is not a failure: it is the room the check passes with.',
+					'The fraction of its published tolerance each check consumes. 100 % sits exactly on the limit, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. A high figure is not a failure: it is the room the check passes with, and it never decides the verdict, which is settled at full precision before any rounding.',
 				search: 'Search standard, quantity or clause',
 				allDomains: 'All domains',
 				onlyFailing: 'Failing rows only',
@@ -236,8 +258,6 @@ const t =
 				deviation: 'Deviation',
 				used: 'Used',
 				status: 'Status',
-				pass: 'Pass',
-				fail: 'Fail',
 				noMatches: 'No check matches the filter.',
 				architecture: 'Architecture',
 				verdict: 'Class verdict',
@@ -254,6 +274,29 @@ const t =
 				headroom: 'Headroom',
 			};
 
+/**
+ * The word for a verdict, in the page's language.
+ *
+ * Four of them, not two. The status cell used to ask `verdict === 'pass'` and
+ * render everything else as a red cross announced to a screen reader as
+ * "Fail", so a `by-design` row - a filter architecture excluded from the class
+ * mask on purpose, which the Markdown mirror has always labelled "By design" -
+ * was published here as a failure. The verdict vocabulary has four members, so
+ * the lookup has four entries; an unknown fifth falls back to its own name
+ * rather than to the wrong one.
+ */
+const verdictWord = (verdict: string) => t.verdicts[verdict] ?? verdict;
+
+/** The marks the page actually draws, so the legend explains those and no others. */
+const legendVerdicts = ['pass', 'fail', 'by-design', 'not-applicable'].filter(
+	(verdict) =>
+		checks.some((check) => check.verdict === verdict) ||
+		(filterPanel?.rows ?? []).some((row: Record<string, any>) => row.verdict === verdict),
+);
+
+/** How much of the bar is green. Whole percent; the figures beside it are exact. */
+const passedShare = counts.checks ? (100 * counts.passing) / counts.checks : 100;
+
 /** Everything one row can be searched by, lowercased once at build time. */
 const searchable = (row: (typeof rows)[number]) =>
 	[
@@ -267,13 +310,56 @@ const searchable = (row: (typeof rows)[number]) =>
 ---
 
 <div class="conformance" data-conformance>
-	<p class="conformance-summary">
-		{t.summary(counts.passing, counts.checks, counts.domains, counts.standards)}
+	{/*
+		The four marks, defined once for the whole page. Hidden from layout and
+		from assistive technology: it is a definition, not a picture, and every
+		place that draws from it states the verdict in words of its own.
+	*/}
+	<svg class="mark-sprite" aria-hidden="true" focusable="false" set:html={sprite} />
+
+	{/*
+		The summary card. Its committed twin under .github/badges is a picture of
+		English words, which is right for GitHub and wrong for the Spanish page
+		and for a reader who wants to select a number; here the same lockup is
+		markup, so it translates, scales with the reader's text size and costs no
+		request.
+	*/}
+	<section class="conformance-banner">
+		<p class="banner-headline">
+			<b>{counts.passing}/{counts.checks}</b>
+			<span>
+				{t.bannerCaption}
+				{counts.failing > 0 && t.bannerFailing(counts.failing)}
+			</span>
+		</p>
+		<p class="banner-stats">
+			{t.bannerDomains(counts.domains)} · {t.bannerStandards(counts.standards)}
+		</p>
+		<div class="banner-bar" aria-hidden="true">
+			<span class="bar-pass" style={`width:${passedShare}%`}></span>
+			{counts.failing > 0 && (
+				<span class="bar-fail" style={`width:${100 - passedShare}%`}></span>
+			)}
+		</div>
+	</section>
+
+	<p class="conformance-legend">
+		<b>{t.legend}.</b>
+		{legendVerdicts.map((verdict) => (
+			<span class="legend-entry">
+				<svg class="mark" width="16" height="16" aria-hidden="true" focusable="false">
+					<use href={`#${markId(verdict)}`} />
+				</svg>
+				{verdictWord(verdict)}
+			</span>
+		))}
+		<span class="legend-note">{t.legendNote}</span>
 	</p>
+
+	<p class="note used-note">{t.closestNote}</p>
 
 	<section class="conformance-closest">
 		<h2 id="closest-to-limit">{t.closest}</h2>
-		<p class="note">{t.closestNote}</p>
 		<div class="table-scroll">
 			<table>
 				<thead>
@@ -321,8 +407,11 @@ const searchable = (row: (typeof rows)[number]) =>
 							<tr>
 								<td>{row.architecture}</td>
 								<td>
+									<svg class="mark" width="16" height="16" aria-hidden="true" focusable="false">
+										<use href={`#${markId(row.verdict)}`} />
+									</svg>
 									{row.verdict === 'by-design'
-										? `By design (${row.reason})`
+										? `${verdictWord('by-design')} (${row.reason})`
 										: row.class === undefined
 											? 'not compliant'
 											: `Class ${row.class}`}
@@ -407,9 +496,10 @@ const searchable = (row: (typeof rows)[number]) =>
 		return (
 			<details class="conformance-domain" data-domain-section={domain.id} open={!green}>
 				<summary>
-					<span class={green ? 'mark pass' : 'mark fail'} aria-hidden="true">
-						{green ? '✓' : '✗'}
-					</span>
+					{/* Decorative: the tally beside it already says how many passed. */}
+					<svg class="mark" width="16" height="16" aria-hidden="true" focusable="false">
+						<use href={`#${green ? 'cv-pass' : 'cv-fail'}`} />
+					</svg>
 					<b>{domain.title}</b>
 					<span class="tally">
 						{domain.passing}/{domain.checks}
@@ -419,6 +509,7 @@ const searchable = (row: (typeof rows)[number]) =>
 					<table>
 						<thead>
 							<tr>
+								<th class="status">{t.status}</th>
 								<th>{t.standard}</th>
 								<th>{t.quantity}</th>
 								<th>{t.expected}</th>
@@ -426,7 +517,6 @@ const searchable = (row: (typeof rows)[number]) =>
 								<th>{t.limit}</th>
 								<th>{t.deviation}</th>
 								<th>{t.used}</th>
-								<th>{t.status}</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -437,6 +527,21 @@ const searchable = (row: (typeof rows)[number]) =>
 									data-verdict={row.check.verdict}
 									data-text={searchable(row)}
 								>
+									<td class="status">
+										{/*
+											The word is drawn, not hidden. It used to sit in a
+											`visually-hidden` span, which left the silhouette as the
+											only thing a sighted reader had - and the silhouette is
+											in the last column of a table wider than the well, so
+											below 1440 px there was no verdict in the row at all.
+											The mark stays `aria-hidden`, so a screen reader still
+											hears the verdict exactly once.
+										*/}
+										<svg class="mark" width="16" height="16" aria-hidden="true" focusable="false">
+											<use href={`#${markId(row.check.verdict)}`} />
+										</svg>
+										{verdictWord(row.check.verdict)}
+									</td>
 									<td>
 										<span class="designation">{row.check.reference.designation}</span>
 										{row.check.reference.edition && (
@@ -452,14 +557,6 @@ const searchable = (row: (typeof rows)[number]) =>
 									<td class="numeric">{limitText(row.check)}</td>
 									<td class="numeric">{deviationText(row.check)}</td>
 									<td class="numeric used">{percent(row.used)}</td>
-									<td class="status">
-										<span class={row.check.verdict === 'pass' ? 'mark pass' : 'mark fail'}>
-											{row.check.verdict === 'pass' ? '✓' : '✗'}
-										</span>
-										<span class="visually-hidden">
-											{row.check.verdict === 'pass' ? t.pass : t.fail}
-										</span>
-									</td>
 								</tr>
 							))}
 						</tbody>
@@ -493,9 +590,14 @@ const searchable = (row: (typeof rows)[number]) =>
 			let shown = 0;
 			for (const row of rows) {
 				const text = row.dataset.text ?? '';
+				// "Failing" means the verdict `fail`, and not "anything that is
+				// not a pass". A `by-design` row is an architecture excluded
+				// from a class mask on purpose; listing it under a control
+				// labelled "failing rows only" is the same mistake the status
+				// cell used to make when it drew everything but a pass in red.
 				const visible =
 					(!needle || text.includes(needle)) &&
-					(!onlyFailing || row.dataset.verdict !== 'pass');
+					(!onlyFailing || row.dataset.verdict === 'fail');
 				row.hidden = !visible;
 				if (visible) shown += 1;
 			}
@@ -536,11 +638,6 @@ const searchable = (row: (typeof rows)[number]) =>
 </script>
 
 <style>
-	.conformance-summary {
-		font-size: var(--sl-text-lg);
-		margin-block: 0.5rem 1.5rem;
-	}
-
 	.conformance .note {
 		font-size: var(--sl-text-sm);
 		color: var(--sl-color-gray-3);
@@ -553,8 +650,24 @@ const searchable = (row: (typeof rows)[number]) =>
 		margin-block: 0.5rem 1rem;
 	}
 
+	/* `min-width: min-content` is what makes the box above actually scroll, and
+	   it is here because it was measured, not because it reads well. A table
+	   whose columns cannot fit is laid out at its min-content width anyway, but
+	   Chromium reports the table's border box as the containing block's width,
+	   so the scroll container sees `scrollWidth == clientWidth`, offers no
+	   scrollbar, and clips whatever hangs past its right edge with no way to
+	   reach it. Measured on this page before the rule: at 1280 px the last
+	   column ended 106 px past the container, `scrollWidth - clientWidth` was 0
+	   and `scrollLeft` stayed 0, so the Used and Status columns were not drawn
+	   at all and could not be scrolled to; at 360 px the overhang was 863 px.
+	   With the rule the same box reports 116 px and 863 px of real overflow and
+	   scrolls to the last column. The 116 rather than 106 is the gutter added
+	   below, which grows the table by 10 px; measure the two together or the
+	   figures look like they disagree. `width: auto` behaves exactly like the
+	   `width: 100%` it replaced, so the percentage was never the cause. */
 	.conformance table {
 		width: 100%;
+		min-width: min-content;
 		border-collapse: collapse;
 		font-size: var(--sl-text-sm);
 	}
@@ -593,20 +706,166 @@ const searchable = (row: (typeof rows)[number]) =>
 		color: var(--sl-color-gray-3);
 	}
 
+	/* The sprite is a definition, not a picture: out of flow and zero-sized, so
+	   it cannot open a gap at the top of the page. Taken out this way rather
+	   than with `display:none`, which is the documented way to stop a `<use>`
+	   resolving against the symbols inside it. */
+	.conformance .mark-sprite {
+		position: absolute;
+		width: 0;
+		height: 0;
+		overflow: hidden;
+	}
+
+	/* Sized in ems so the mark grows with the reader's text, and pushed a
+	   fraction below the baseline so a 16 px square sits optically centred on
+	   a line of 14 px text rather than riding above it.
+
+	   `display: inline-block` is not decoration: Starlight's content reset
+	   gives every `svg` `display: block`, which put the mark on a line of its
+	   own above the word it belongs to in every table cell that draws one.
+	   Measured at 1280 px, the mark's top was 20 px above the word's; with
+	   this rule they share a line box, at no cost in English (59.8 px either
+	   way) and 4.8 px of column width in Spanish, where "Cumple" is the
+	   longer word. Inside the
+	   legend and the section headings, which are flex containers, the
+	   declaration is ignored, so the one place it changes anything is the
+	   cells. */
 	.conformance .mark {
-		font-weight: 700;
+		display: inline-block;
+		width: 1.15em;
+		height: 1.15em;
+		vertical-align: -0.22em;
+		flex: none;
 	}
 
-	.conformance .mark.pass {
-		color: var(--sl-color-green-high, green);
+	/* A cell has no gap property to lean on, so the mark carries its own. The
+	   markup deliberately has no whitespace between the mark and the word, and
+	   that is what stops them being split. */
+	.conformance td .mark {
+		margin-inline-end: 0.3rem;
 	}
 
-	.conformance .mark.fail {
-		color: var(--sl-color-red-high, red);
+	/* The verdict leads the row and never wraps. Leading, because it is the one
+	   cell that has to be legible without scrolling: the scroll box only
+	   guarantees the first column is inside it, and this table is wider than
+	   the content well at every viewport the site is read at. Never wrapping,
+	   because "By design" broken across two lines reads as two verdicts. */
+	.conformance td.status,
+	.conformance th.status {
+		white-space: nowrap;
 	}
 
-	.conformance td.status {
-		text-align: center;
+	/* The gutter after the verdict, paid for by the column that follows it.
+	   The nowrap above lets the verdict run past its own cell where the table
+	   is squeezed, and padding on the overflowing cell cannot hold a gap open.
+	   Measured at 1280 px, "Cumple" ended 3 px from the designation beside it,
+	   which reads as one run of text rather than two columns; with this it is
+	   13 px in Spanish and 18 px in English, and the table grows by 10 px. */
+	.conformance .status + * {
+		padding-inline-start: 1.2rem;
+	}
+
+	/* The summary card. Its GitHub twin is a committed SVG pair; here the same
+	   lockup is markup, so it translates and scales with the reader's text. */
+	.conformance-banner {
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.6rem;
+		background: var(--sl-color-gray-6, var(--sl-color-black));
+		padding: 0.9rem 1.1rem;
+		margin-block: 0.5rem 1rem;
+	}
+
+	.conformance-banner .banner-headline {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.5rem;
+		margin: 0;
+	}
+
+	.conformance-banner .banner-headline b {
+		font-size: var(--sl-text-3xl);
+		font-variant-numeric: tabular-nums;
+		line-height: 1.1;
+	}
+
+	.conformance-banner .banner-headline span,
+	.conformance-banner .banner-stats {
+		color: var(--sl-color-gray-2);
+		font-size: var(--sl-text-sm);
+	}
+
+	.conformance-banner .banner-stats {
+		margin: 0.15rem 0 0;
+		font-variant-numeric: tabular-nums;
+	}
+
+	/* Flex with a gap, so the two segments are separated by a sliver of the
+	   neutral track. Green and red are within 1.02:1 of each other, which is
+	   the classic trap: to a reader who cannot separate the two hues the whole
+	   bar reads as one full run, and the failing tail disappears. The notch is
+	   the part that survives in greyscale, and the figures beside the bar say
+	   it in numbers either way. With nothing failing there is one segment and
+	   no gap to see. */
+	.conformance-banner .banner-bar {
+		display: flex;
+		gap: 2px;
+		margin-top: 0.7rem;
+		height: 0.45rem;
+		border-radius: 0.45rem;
+		overflow: hidden;
+		background: var(--sl-color-gray-5);
+	}
+
+	/* Not Starlight's --sl-color-green and --sl-color-red, and this is
+	   measured, not taste: on the light card that green comes out at 1.50:1
+	   and would be all but invisible. These are the two fills the committed
+	   marks already use. The card is --sl-color-gray-6, which this site
+	   overrides to #e7edf1 light and #1a2126 dark - both read off the built
+	   page's computed style, not off Starlight's defaults - and against those
+	   two grounds the fills measure green 3.83:1 and 3.60:1, red 3.90:1 and
+	   3.53:1, so one pair serves both themes exactly as it does for the
+	   marks. Both card colours are in `_GROUNDS` in
+	   tests/test_conformance_badges.py, so these two figures are held by a
+	   test and not only by this comment - which check-contrast.mjs cannot do,
+	   because it parses theme.css and never sees a literal written here. */
+	.conformance-banner .bar-pass,
+	.conformance-banner .bar-fail {
+		display: block;
+		height: 100%;
+	}
+
+	.conformance-banner .bar-pass {
+		background: #1f883d;
+	}
+
+	.conformance-banner .bar-fail {
+		background: #da3633;
+	}
+
+	.conformance-legend {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.3rem 0.9rem;
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-gray-2);
+		margin-block: 0 1rem;
+	}
+
+	.conformance-legend .legend-entry {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		white-space: nowrap;
+	}
+
+	/* The sentence takes the whole next line: it explains the marks rather than
+	   labelling one, and inline it reads as a fifth legend entry. */
+	.conformance-legend .legend-note {
+		flex-basis: 100%;
+		color: var(--sl-color-gray-3);
 	}
 
 	.conformance-controls {
@@ -630,12 +889,31 @@ const searchable = (row: (typeof rows)[number]) =>
 		color: var(--sl-color-white);
 	}
 
+	/* Both controls need `min-width: 0`, and the reason is the one that makes
+	   this the classic flex overflow: a flex item's automatic minimum size is
+	   its content, so `min-width: auto` refuses to shrink it below that and the
+	   row grows past the page instead of the item narrowing. A `<select>` is
+	   sized by its longest option, and the longest domain title here is "2D
+	   FDTD wave simulation (Attenborough & Van Renterghem 2021, Ch. 4)", which
+	   asks for 521 px inside a 374 px row. Measured at a 390 px viewport, that
+	   one element took the document to 542 px; with these rules it is 390. */
 	.control-search {
 		flex: 1 1 16rem;
+		min-width: 0;
 	}
 
 	.control-search input {
 		width: 100%;
+	}
+
+	.control-domain {
+		flex: 1 1 12rem;
+		min-width: 0;
+	}
+
+	.control-domain select {
+		width: 100%;
+		max-width: 100%;
 	}
 
 	.control-failing {

@@ -1164,8 +1164,9 @@ def test_biot_waves_rejects_bad_input() -> None:
         ValueError, match=r"'shear_modulus' must have a non-negative imaginary part"
     ):
         materials.biot_waves(medium, **{**kwargs, "shear_modulus": 1.0 - 1.0j})
+    with_nan = {**kwargs, "shear_modulus": complex("nan")}
     with pytest.raises(ValueError, match=r"'shear_modulus' must be finite"):
-        materials.biot_waves(medium, **{**kwargs, "shear_modulus": complex("nan")})
+        materials.biot_waves(medium, **with_nan)
     with pytest.raises(ValueError, match=r"'poisson_ratio' must satisfy"):
         materials.biot_waves(medium, **kwargs, poisson_ratio=0.5)
 

@@ -32,7 +32,9 @@ import re
 import sys
 from typing import TYPE_CHECKING, Any
 
+from . import marks
 from .artifact import ARTIFACT_PATH, load, write
+from .metrics import utilisation
 from .registry import (
     _ROOT,
     Kind,
@@ -45,13 +47,86 @@ from .registry import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Mapping, Sequence
 
 __all__ = ["_snap"]
 
 
-def _status(passed: bool) -> str:
-    return "&#9989;" if passed else "&#10060;"
+#: The four verdicts as the tables print them. A tick and a cross can only say
+#: two things, so "by design" and "not applicable" had nowhere to go and were
+#: carried in a display string instead; a word says all four, survives a
+#: plain-text diff and needs no colour to be read.
+_VERDICT_TEXT = {
+    str(Verdict.PASS): "Pass",
+    str(Verdict.FAIL): "**Fail**",
+    str(Verdict.BY_DESIGN): "By design",
+    str(Verdict.NOT_APPLICABLE): "n/a",
+}
+
+#: The ref every image in the committed report is pinned to. ``main``, because
+#: this file lives on ``main`` and is read there, on github.com and through
+#: raw: a reader browsing it has no commit in hand, and there is no commit to
+#: pin to at the moment the file is written, since the file is generated
+#: before it is committed.
+#:
+#: Two consequences to know about. A badge added on a branch 404s in this file
+#: until the branch lands; that is the same trade the README's figures already
+#: make, and the ``alt`` is the verdict, so a 404 degrades to the word. And
+#: nothing pinned this way may be a picture of a *number*, because a number on
+#: ``main`` is not the number in a branch's copy of this file - which is why
+#: the summary banner is not embedded here (see :func:`render_markdown`) while
+#: the four verdict marks, whose geometry never changes, are.
+_REF = "main"
+
+
+def _status(verdict: str) -> str:
+    """One verdict as the table prints it: the mark, then the word.
+
+    Both, and not either. The word is what survives a plain-text diff, a
+    `raw` view and an image that never arrives; the mark is what tells a
+    failing row from a passing one before anything is read. The image is
+    reference-style, so the 117-character URL is written once for the whole
+    document instead of once per row.
+
+    The two land on separate lines, not side by side, and that was measured
+    rather than intended: under GitHub's own table stylesheet the Status
+    column settles at about 53.5 px of content box while a 16 px mark plus
+    the word needs about 54, so almost every cell wraps the word under the
+    mark: 566 of 566 at a 1012 px viewport in one harness and 563 in another.
+    The exact count moves with the width the harness gives the container, so
+    it is the wrapping and not the tally that is the finding. A non-breaking space
+    between them changes nothing, because GitHub caps the table at the
+    content width and the column has no room to grow into. It costs no
+    height - the rows are already two lines tall from the Quantity column -
+    so the stack is left alone and described here instead of being fought.
+    """
+    word = _VERDICT_TEXT.get(verdict, verdict)
+    if verdict not in marks.MARK_OF:
+        return word
+    return f"{marks.mark_reference(verdict)} {word}"
+
+
+def _marked(document: Mapping[str, Any]) -> list[str]:
+    """The verdicts this report actually prints a mark for, in legend order.
+
+    Read off the document rather than listed, so the legend explains the marks
+    on the page and no others: a legend entry for a silhouette that appears
+    nowhere is a promise the report does not keep, and the day a check fails
+    the legend gains its red hexagon without anyone editing it.
+    """
+    used = {check["verdict"] for check in document["checks"]}
+    used |= {row["verdict"] for row in _panel(document, "filter-class")["rows"]}
+    return [mark.verdict for mark in marks.MARKS if mark.verdict in used]
+
+
+def _used(check: Mapping[str, Any]) -> str:
+    """How much of its published limit a check's deviation consumes.
+
+    Blank where the question has no answer, which is a check that declares no
+    tolerance or a mask bounded on one side only.
+    """
+    fraction = utilisation(check)
+    return "-" if fraction is None else f"{fraction * 100:.0f} %"
 
 
 def _cell(text: object) -> str:
@@ -76,14 +151,24 @@ def _domains(document: Mapping[str, Any] | None = None) -> list[str]:
 
 
 def _filter_verdict(row: Mapping[str, Any]) -> str:
-    """The class verdict of one showcase row, as the table prints it."""
+    """The class verdict of one showcase row, as the table prints it.
+
+    Marked like a conformance row, and this is the only table where a mark
+    other than the pass disc appears today: three of the five architectures
+    are excluded from the class mask on purpose, and a blue bar says "out of
+    scope" where a red cross would say "wrong".
+    """
     if row["verdict"] == str(Verdict.BY_DESIGN):
-        return f"By design ({row['reason']})"
-    if "class" not in row:
-        return "not compliant"
-    if row["class"] == 1:
-        return "Class 1 (default)" if row["architecture"] == "butter" else "Class 1"
-    return f"Class {row['class']}"
+        text = f"By design ({row['reason']})"
+    elif "class" not in row:
+        text = "not compliant"
+    elif row["class"] == 1:
+        text = "Class 1 (default)" if row["architecture"] == "butter" else "Class 1"
+    else:
+        text = f"Class {row['class']}"
+    if row["verdict"] not in marks.MARK_OF:
+        return text
+    return f"{marks.mark_reference(row['verdict'])} {text}"
 
 
 def _panel(document: Mapping[str, Any], panel_id: str) -> Mapping[str, Any]:
@@ -100,12 +185,11 @@ def _numerical_validation_section(document: Mapping[str, Any], filters_ok: bool)
     # Collapsed like the per-domain groups so the report stays compact by
     # default; it springs open whenever the filters/weightings domain has a
     # failing row, exactly like those groups do.
-    emoji = "&#9989;" if filters_ok else "&#10060;"
     opened = "" if filters_ok else " open"
     lines: list[str] = []
     lines.append(f"<details{opened}>")
     lines.append(
-        f"<summary>{emoji} <b>Numerical validation - filters &amp; "
+        "<summary><b>Numerical validation - filters &amp; "
         "weightings</b>: class showcase (IEC 61260-1 · IEC 61672-1 · "
         "ISO 7196)</summary>"
     )
@@ -169,6 +253,79 @@ def _numerical_validation_section(document: Mapping[str, Any], filters_ok: bool)
     lines.append("")
     lines.append("</details>")
     return "\n".join(lines)
+
+
+#: How many rows the "closest to their limit" table prints. Ten, the same as
+#: the site page, because the two are the same answer to the same question and
+#: a reader comparing them should not have to work out which was truncated.
+_CLOSEST_ROWS = 10
+
+
+def _closest_section(document: Mapping[str, Any]) -> str:
+    """The checks with the least room left, ranked.
+
+    The single most informative thing the artefact holds, and until now the
+    one thing the published report did not print: the ``Used`` column already
+    gives it per row, but spread over 566 rows inside 59 collapsed sections
+    nobody can see which rows are near their limit. The pull-request comment
+    has ranked them since it was written and the site page ranks ten of them;
+    this makes the three surfaces answer the question the same way.
+
+    A high figure is not a failure - it is the room the check passes with -
+    so the caption says so, in the same words the site uses.
+    """
+    ranked = sorted(
+        (
+            check
+            for check in document["checks"]
+            if utilisation(check) is not None  # nothing to be a fraction of
+        ),
+        key=lambda check: utilisation(check) or 0.0,
+        reverse=True,
+    )
+    if not ranked:
+        return ""
+    lines = [
+        f"**The {_CLOSEST_ROWS} checks closest to their published limit**",
+        "",
+        "<sub>The fraction of its published tolerance each check consumes. "
+        "A high figure is not a failure: it is the room the check passes "
+        "with, and it never decides the verdict, which is settled at full "
+        "precision before any rounding. These are the rows a change is most "
+        "likely to push over.</sub>",
+        "",
+        "| Standard | Quantity | Computed | &#916; | Used |",
+        "|:---|:---|:---|:---|:---:|",
+    ]
+    lines += [
+        f"| {_cell(check['reference']['cite'])} | {_cell(check['quantity'])} "
+        f"| {_cell(computed_text(check))} | {_cell(deviation_text(check))} "
+        f"| {_used(check)} |"
+        for check in ranked[:_CLOSEST_ROWS]
+    ]
+    return "\n".join(lines)
+
+
+def _verdict_legend(verdicts: Sequence[str]) -> str:
+    """The marks on this page, each beside the word it stands for.
+
+    A legend of pictures alone would only be a second puzzle, so every entry
+    pairs the mark with the word the Status column prints next to it, and the
+    sentence says the part a picture cannot: that the silhouette carries the
+    meaning as much as the colour does, which is what keeps the four apart in
+    greyscale and for a reader who cannot separate the hues.
+    """
+    entries = " · ".join(
+        f"{marks.mark_reference(verdict)} {marks.MARK_OF[verdict].alt}"
+        for verdict in verdicts
+    )
+    return (
+        f"<sub><b>Verdict marks.</b> {entries}. Every mark travels with the "
+        "verdict in words and never replaces it, so the verdict survives an "
+        "image that never arrives; the silhouettes differ as much as the "
+        "colours do, so a reader who cannot separate the hues can still tell "
+        "them apart.</sub>"
+    )
 
 
 def expected_text(check: Mapping[str, Any]) -> str:
@@ -237,18 +394,39 @@ def render_markdown(document: Mapping[str, Any] | None = None) -> tuple[str, int
         for domain in source["domains"]
         if domain["title"] == "Filters & weightings"
     )
-    headline_emoji = "&#9989;" if passed == total else "&#10060;"
+    failing = total - passed
 
     out: list[str] = []
     out.append("## Numerical conformance report")
     out.append("")
+    # No summary banner here, and this is the one place in the project that
+    # goes without one. This file is regenerated from the tree it sits in and
+    # gated byte for byte, so it claims to be *this* tree's report; the banner
+    # can only be cited at a fixed ref (see _REF), and a picture of main's
+    # count sitting above a sentence carrying the branch's count is a document
+    # arguing with itself. Any pull request that adds or removes a check would
+    # show it. The pull-request comment still leads with the banner, pinned to
+    # the head commit, where the picture and the sentence come from one tree;
+    # here the sentence carries every number the picture would, and two class
+    # claims no bar can state.
     summary = (
         f"**{passed}/{total} conformance checks pass** across "
         f"{counts['domains']} domains and {counts['standards']} standards"
     )
     if filters_ok:
         summary += " - filters class 1 - weightings within IEC 61672-1 class 1"
-    out.append(f"{headline_emoji} {summary}.")
+    out.append(f"{summary}." if not failing else f"{summary} - **{failing} failing**.")
+    out.append("")
+    out.append(
+        "<sub><b>&#916;</b> is the difference between the computed value and "
+        "the one the standard publishes. <b>Used</b> is how much of that "
+        "clause's published tolerance the difference consumes: 100 % means it "
+        "sits exactly on the limit, 5 % means it uses a twentieth of the "
+        "allowance, and a dash means the clause states no two-sided tolerance "
+        "for the quantity, so there is no budget to spend. It is reported and "
+        "never used to decide a verdict, which is settled at full precision "
+        "before any rounding.</sub>"
+    )
     out.append("")
     out.append(
         "<sub>Each row pins a standard clause to its expected normative value "
@@ -257,6 +435,13 @@ def render_markdown(document: Mapping[str, Any] | None = None) -> tuple[str, int
         "section with any failing row opens automatically.</sub>"
     )
     out.append("")
+    marked = _marked(source)
+    out.append(_verdict_legend(marked))
+    out.append("")
+    closest = _closest_section(source)
+    if closest:
+        out.append(closest)
+        out.append("")
     out.append(_numerical_validation_section(source, filters_ok))
     out.append("")
 
@@ -268,32 +453,40 @@ def render_markdown(document: Mapping[str, Any] | None = None) -> tuple[str, int
         rows = by_domain.get(domain["id"], [])
         passed_d, total_d = domain["passing"], domain["checks"]
         pct = 100.0 * passed_d / total_d if total_d else 100.0
-        emoji = "&#9989;" if passed_d == total_d else "&#10060;"
+        failing_d = total_d - passed_d
         # Each domain is a collapsible group labelled with its compliance
         # percentage (100 % = every row passes). Groups with any failing row are
         # opened by default so regressions stay visible.
         opened = " open" if passed_d != total_d else ""
         domain_html = domain["title"].replace("&", "&amp;")
         out.append(f"<details{opened}>")
+        tail = f" - <b>{failing_d} failing</b>" if failing_d else ""
         out.append(
-            f"<summary>{emoji} <b>{domain_html}</b>: {pct:.0f}% "
-            f"({passed_d}/{total_d})</summary>"
+            f"<summary><b>{domain_html}</b>: {pct:.0f}% "
+            f"({passed_d}/{total_d}){tail}</summary>"
         )
         out.append("")
         out.append(
-            "| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |"
+            "| Standard | Quantity | Expected (norm) | Computed | &#916; | Used | "
+            "Status |"
         )
-        out.append("|:---|:---|:---|:---|:---|:---:|")
+        out.append("|:---|:---|:---|:---|:---|:---:|:---:|")
         out.extend(
             f"| {_cell(check['reference']['cite'])} | {_cell(check['quantity'])} "
             f"| {_cell(expected_text(check))} | {_cell(computed_text(check))} "
-            f"| {_cell(deviation_text(check))} "
-            f"| {_status(check['verdict'] == str(Verdict.PASS))} |"
+            f"| {_cell(deviation_text(check))} | {_used(check)} "
+            f"| {_status(check['verdict'])} |"
             for check in rows
         )
         out.append("")
         out.append("</details>")
         out.append("")
+
+    # One definition per mark, at the foot of the document. A link reference
+    # resolves document-wide in CommonMark, which is what lets a row spend 16
+    # characters on its mark instead of the 117 an inline URL costs.
+    out.extend(marks.mark_definitions(marked, _REF))
+    out.append("")
 
     return "\n".join(out), passed, total
 

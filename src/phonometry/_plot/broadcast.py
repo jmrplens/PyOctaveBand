@@ -27,16 +27,21 @@ if TYPE_CHECKING:
         KWeightingResponse,
         ProgramLoudnessResult,
     )
+    from ..broadcast.quasi_peak import QuasiPeakResult
 
 #: Spanish translations of the fixed strings rendered by the broadcast
 #: ``.plot()`` renderer, keyed by their verbatim English text. ``_t``
 #: returns the English key unchanged for any language other than ``"es"``,
 #: so the English output is byte-for-byte identical to the pre-i18n
 #: renderer.
+#: The axis label both renderers on this page share; the Spanish table
+#: below is keyed by the same constant, so the label is written once.
+_TIME_LABEL = "Time [s]"
+
 _STRINGS: dict[str, str] = {
     "Momentary (400 ms)": "Momentánea (400 ms)",
     "Short-term (3 s)": "Corto plazo (3 s)",
-    "Time [s]": "Tiempo [s]",
+    _TIME_LABEL: "Tiempo [s]",
     "Loudness [LUFS]": "Sonoridad [LUFS]",
     "Programme loudness (EBU R 128)": "Sonoridad de programa (EBU R 128)",
     "Integrated": "Integrada",
@@ -46,6 +51,11 @@ _STRINGS: dict[str, str] = {
     "Stage 1: spherical-head shelf": "Etapa 1: realce de cabeza esférica",
     "Stage 2: RLB high-pass": "Etapa 2: paso alto RLB",
     "K-weighting frequency response (ITU-R BS.1770)": "Respuesta en frecuencia de la ponderación K (UIT-R BS.1770)",
+    "Quasi-peak trace": "Trayectoria cuasipico",
+    "Quasi-peak reading": "Lectura cuasipico",
+    "Reading": "Lectura",
+    "Quasi-peak reading (ITU-R BS.468-4, weighted)": "Lectura cuasipico (UIT-R BS.468-4, ponderada)",
+    "Quasi-peak reading (ITU-R BS.468-4, unweighted)": "Lectura cuasipico (UIT-R BS.468-4, sin ponderar)",
 }
 
 
@@ -125,7 +135,7 @@ def plot_program_loudness(
         low = float(np.min(finite))
         high = float(np.max(finite))
         ax.set_ylim(low - 5.0, high + 5.0)
-    ax.set_xlabel(_t("Time [s]", language))
+    ax.set_xlabel(_t(_TIME_LABEL, language))
     ax.set_ylabel(_t("Loudness [LUFS]", language))
     ax.set_title(_t("Programme loudness (EBU R 128)", language))
     ax.grid(True, alpha=0.3)
@@ -189,6 +199,64 @@ def plot_k_weighting_response(
     ax.set_ylabel(_t("Magnitude [dB]", language))
     ax.set_title(_t("K-weighting frequency response (ITU-R BS.1770)", language))
     ax.grid(True, which="both", alpha=0.3)
+    ax.legend(loc="lower right", fontsize=9)
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_quasi_peak(
+    result: QuasiPeakResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Quasi-peak needle over the record (ITU-R BS.468-4 clause 2).
+
+    Draws the reading device's output against time and marks the reading,
+    which clause 2's reading rule makes the largest excursion of that curve.
+    The shape of the rise and the decay is the whole content of clause 2:
+    the Recommendation prints no time constant and specifies the dynamics
+    only through the eleven acceptance windows of Tables 2 and 3.
+
+    :param result: A :class:`~phonometry.broadcast.QuasiPeakResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the trace ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import format_number, localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("linewidth", 1.8)
+    kwargs.setdefault("label", _t("Quasi-peak trace", language))
+    ax.plot(result.time, result.trace, **kwargs)
+    reading = format_number(result.reading, language, decimals=4)
+    level = format_number(result.level_db, language, decimals=2)
+    ax.axhline(
+        result.reading,
+        color=_C_REFERENCE,
+        linestyle="--",
+        linewidth=1.4,
+        label=f"{_t('Reading', language)} {reading} ({level} {result.level_unit})",
+    )
+    ax.set_xlabel(_t(_TIME_LABEL, language))
+    # No unit on the axis: the detector carries whatever unit the record
+    # arrived in, and the library only learns which one from the reference
+    # the caller chose, which the legend already names through ``level_unit``.
+    ax.set_ylabel(_t("Quasi-peak reading", language))
+    title = (
+        "Quasi-peak reading (ITU-R BS.468-4, weighted)"
+        if result.weighted
+        else "Quasi-peak reading (ITU-R BS.468-4, unweighted)"
+    )
+    ax.set_title(_t(title, language))
+    ax.set_ylim(bottom=0.0)
+    ax.grid(True, alpha=0.3)
+    # Lower right, not the upper right its neighbours use: the needle starts
+    # at zero and the reading line sits at the top of the axes, so the upper
+    # corners are exactly where this curve lives.
     ax.legend(loc="lower right", fontsize=9)
     localize_axes(ax, language)
     return ax

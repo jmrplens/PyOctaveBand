@@ -8,6 +8,30 @@
   padding-block: 0.25rem;
 }
 
+/* Inline math has NO scroll box here, deliberately, and the reason is measured.
+
+   KaTeX never breaks a formula across lines, so a long one written inline does
+   take the page sideways: at a 390 px viewport an acceleration formula on the
+   errata page is 1011 px wide and carries that document to 1067 px. The
+   obvious fix is the one applied to display math above, and it cannot be used,
+   because `overflow` has no effect on an inline box and making the box
+   `inline-block` changes how every formula in the corpus takes part in line
+   layout. Measured over the 991 inline formulas on the four most
+   formula-heavy pages: 990 of them move. Their x and their width are
+   untouched, but each box grows from 22 px to 24 px tall, which raises the
+   line it sits on, and on a long page the shift accumulates to 3645 px.
+
+   Every variant was tried against that measurement and none avoids it, because
+   the growth comes from `inline-block` itself and not from the overflow:
+   `vertical-align: baseline`, a negative `vertical-align`, and dropping the
+   overflow entirely all still give 24 px. `overflow: clip` does keep the
+   document height, and clips the formula instead of scrolling it, which is
+   worse than the defect.
+
+   So a formula wide enough to need a scroll box is fixed where it is written,
+   as display math, rather than by taxing the typography of every formula that
+   does not. */
+
 /* A display block stating several equations on one line is rebuilt at build
    time (rehypeWrappableMath in src/lib/wrappable-math.mjs) as one part per
    equation, with the author's \quad or \qquad carried in --katex-eq-gap.

@@ -29,6 +29,7 @@ import matplotlib as mpl
 
 mpl.use("Agg")
 import matplotlib.pyplot as plt
+import svg_text
 from matplotlib.patches import Circle, PathPatch, Rectangle
 from matplotlib.path import Path as MplPath
 
@@ -126,8 +127,7 @@ def _report(dest: Path) -> None:
 
 def _fmt(value: float) -> str:
     """Two decimals, trailing zeros stripped, so the path data stays readable."""
-    text = f"{value:.2f}".rstrip("0").rstrip(".")
-    return text if text not in ("-0", "") else "0"
+    return svg_text.two_decimals(value)
 
 
 def _normals(spine: tuple[Point, ...]) -> list[Point]:
@@ -397,18 +397,10 @@ STRAPLINE = "Conformance-tested against the standards it implements"
 def text_outline(text: str, font: Path, size: float, origin: Point) -> MplPath:
     """The glyph outlines of ``text``, in SVG coordinates.
 
-    Outlines rather than a ``<text>`` element: GitHub renders README SVGs with
-    no guarantee about available fonts, so live text falls back to whatever the
-    viewer has, or to a serif. Converted glyphs look the same everywhere and
-    need no font embedded. ``origin`` is the baseline start, as in SVG.
+    Outlines rather than a ``<text>`` element, for the reasons :mod:`svg_text`
+    sets out. ``origin`` is the baseline start, as in SVG.
     """
-    from matplotlib.font_manager import FontProperties
-    from matplotlib.textpath import TextPath
-    from matplotlib.transforms import Affine2D
-
-    tp = TextPath((0, 0), text, size=size, prop=FontProperties(fname=str(font)))
-    # matplotlib's y axis points up and SVG's points down.
-    return Affine2D().scale(1, -1).translate(*origin).transform_path(tp)
+    return svg_text.outline(text, font, size, origin)
 
 
 def text_svg_path(
@@ -421,26 +413,9 @@ def text_svg_path(
     css_class: str = "",
 ) -> str:
     """One ``<path>`` element holding the text as outlines."""
-    parts: list[str] = []
-    for verts, code in text_outline(text, font, size, origin).iter_segments():
-        if code == MplPath.MOVETO:
-            parts.append(f"M{_fmt(verts[0])} {_fmt(verts[1])}")
-        elif code == MplPath.LINETO:
-            parts.append(f"L{_fmt(verts[0])} {_fmt(verts[1])}")
-        elif code == MplPath.CURVE3:
-            parts.append(
-                f"Q{_fmt(verts[0])} {_fmt(verts[1])} {_fmt(verts[2])} {_fmt(verts[3])}"
-            )
-        elif code == MplPath.CURVE4:
-            parts.append(
-                f"C{_fmt(verts[0])} {_fmt(verts[1])}"
-                f" {_fmt(verts[2])} {_fmt(verts[3])}"
-                f" {_fmt(verts[4])} {_fmt(verts[5])}"
-            )
-        elif code == MplPath.CLOSEPOLY:
-            parts.append("Z")
+    data = svg_text.path_data(text, font, size, origin, _fmt)
     attr = f' class="{css_class}"' if css_class else ""
-    return f'<path{attr} fill="{colour}" d="{"".join(parts)}"/>'
+    return f'<path{attr} fill="{colour}" d="{data}"/>'
 
 
 def _mark_group(

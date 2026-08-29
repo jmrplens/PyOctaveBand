@@ -1,6 +1,6 @@
 ---
 title: "Radiodifusión"
-description: "La sonoridad de programa como la mide la radiodifusión: la cadena con puertas y ponderada en K de UIT-R BS.1770 en LUFS, el objetivo y el techo de pico verdadero de EBU R 128, los medidores en modo EBU de Tech 3341 y el rango de sonoridad de Tech 3342."
+description: "Los dos medidores que normalizó la radiodifusión: la cadena con puertas y ponderada en K de UIT-R BS.1770 en LUFS con el objetivo y el techo de pico verdadero de EBU R 128, y el medidor psofométrico de cuasipico de UIT-R BS.468-4 en dBqps."
 ---
 
 import Scope from '../../../../../components/Scope.astro';
@@ -44,6 +44,16 @@ rango de sonoridad. El pico verdadero se mide sobre una señal sobremuestreada
 porque un pico entre muestras puede superar el valor de todas ellas, así que un
 archivo que marca −0,2 dBFS todavía puede saturar un convertidor.
 
+La radiodifusión normalizó un segundo medidor, cuarenta años antes y para la
+pregunta contraria. La **Rec. UIT-R BS.468-4** mide el *ruido* de un circuito
+de programa y no el programa: una red de ponderación que alcanza +12,2 dB cerca
+de 6,3 kHz, leída por un detector de **cuasipico** y expresada en **dBqps**.
+Merece la pena leerlos juntos porque están construidos sobre principios
+opuestos. BS.1770 es un valor cuadrático medio con puertas y con sus
+coeficientes impresos a catorce dígitos; BS.468-4 es un seguidor de picos cuya
+dinámica se especifica solo mediante once ventanas de aceptación con ráfagas
+tonales, sin ninguna constante de tiempo impresa en todo el documento.
+
 ## Páginas de esta sección
 
 - [Sonoridad de programa (EBU R 128)](/phonometry/es/devices/broadcast/program-loudness/):
@@ -53,6 +63,11 @@ archivo que marca −0,2 dBFS todavía puede saturar un convertidor.
   Tech 3342, el pico verdadero sobremuestreado del Anexo 2 y las ponderaciones
   de canal del Anexo 3 para sistemas de sonido avanzados — validado contra las
   señales de prueba de la EBU y terminando en una ficha de informe EBU R 128.
+- [Medidor de cuasipico (UIT-R BS.468-4)](/phonometry/es/devices/broadcast/quasi-peak/):
+  el medidor psofométrico de ruido — el detector de cuasipico del apartado 2,
+  sus once ventanas de aceptación de las Tablas 2 y 3, la calibración del
+  apartado 2.6 que convierte una lectura en dBqps y las tres escalas de tiempo
+  ajustadas que esas ventanas identifican solo dentro de un factor de 1,61 a 2,09.
 
 ## Véase también
 

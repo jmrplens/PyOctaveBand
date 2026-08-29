@@ -1,0 +1,50 @@
+---
+/**
+ * Starlight's banner, carrying a standing pre-release notice in both languages.
+ *
+ * This site documents the tree as it stands, which is ahead of the release on
+ * PyPI: pages here describe modules, entry points and names that 3.3.0 does
+ * not have, and a reader who installs the published version and follows a page
+ * finds an ImportError rather than a mistake in their own code. The notice
+ * says so once, at the top of every page, instead of leaving it to be
+ * discovered.
+ *
+ * Starlight's own banner is per page, set in frontmatter, and its config-level
+ * form takes a single string with no way to vary it by locale. Half this site
+ * is Spanish, so the text is chosen here from the route's language, and a
+ * page that sets its own `banner:` in frontmatter still wins: that one is
+ * about the page, this one is about the whole site.
+ */
+const route = Astro.locals.starlightRoute;
+const { banner } = route.entry.data;
+const lang = route.lang ?? 'en';
+
+const notice = lang.startsWith('es')
+  ? 'Esta documentación describe la <strong>versión 4.0.0</strong>, todavía sin publicar. La versión actual en PyPI es la 3.3.0 y no incluye todo lo que se describe aquí.'
+  : 'This documentation describes <strong>version 4.0.0</strong>, which is not released yet. The current version on PyPI is 3.3.0 and does not carry everything described here.';
+
+const content = banner?.content ?? notice;
+---
+
+<div class="sl-banner" data-pagefind-ignore set:html={content} />
+
+<style>
+  @layer starlight.core {
+    .sl-banner {
+      --__sl-banner-text: var(--sl-color-banner-text, var(--sl-color-text-invert));
+      padding: var(--sl-nav-pad-y) var(--sl-nav-pad-x);
+      background-color: var(--sl-color-banner-bg, var(--sl-color-bg-accent));
+      color: var(--__sl-banner-text);
+      line-height: var(--sl-line-height-headings);
+      text-align: center;
+      text-wrap: balance;
+      box-shadow: var(--sl-shadow-sm);
+    }
+    .sl-banner :global(a) {
+      color: var(--__sl-banner-text);
+    }
+    .sl-banner :global(strong) {
+      font-weight: 600;
+    }
+  }
+</style>

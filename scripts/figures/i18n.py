@@ -3006,6 +3006,21 @@ _ES_EXACT = {
     "Momentary (400 ms)": "Momentánea (400 ms)",
     "Short-term (3 s)": "Corto plazo (3 s)",
     "Programme loudness (EBU R 128)": "Sonoridad de programa (EBU R 128)",
+    # quasi_peak_meter: the ITU-R BS.468-4 detector over the clause 2.2
+    # burst train. "cuasipico" is the house term, already used across the
+    # Spanish microphone pages.
+    "Rectified 468-weighted signal": "Señal ponderada 468 rectificada",
+    "Quasi-peak detector output": "Salida del detector de cuasipico",
+    "Quasi-peak reading [V]": "Lectura cuasipico [V]",
+    "Quasi-peak detector (ITU-R BS.468-4): 5 ms bursts at 10 per second": "Detector de cuasipico (UIT-R BS.468-4): ráfagas de 5 ms a 10 por segundo",
+    "Steady 5 kHz tone: 0.775 V, 0 dBqps": "Tono estacionario de 5 kHz: 0.775 V, 0 dBqps",
+    "The reading is the maximum of the needle over the record;\n"
+    "Table 3 accepts 72 to 82 % of the steady reading at this rate.\n"
+    "1.41 ms charge / 293 ms discharge / 140 ms reading device,\n"
+    "fitted to Tables 2 and 3: BS.468-4 prints no time constant": "La lectura es el máximo de la aguja sobre el registro;\n"
+    "la Tabla 3 acepta del 72 al 82 % de la lectura estacionaria a esta cadencia.\n"
+    "carga 1.41 ms / descarga 293 ms / indicador 140 ms,\n"
+    "ajustados a las Tablas 2 y 3: BS.468-4 no imprime ninguna constante de tiempo",
     # channel_weight_map: BS.1770 Annex 3 as a map of the layout
     "BS.1770 Annex 3: the weight is a property of the loudspeaker position": "Anexo 3 de BS.1770: la ponderación es una propiedad de la "
     "posición del altavoz",
@@ -4587,6 +4602,10 @@ _ES_PATTERNS = [
             "I     = \\1 LUFS\nLRA   = \\2 LU\nmáx M = \\3 LUFS\n"
             "máx S = \\4 LUFS\nTPmáx = \\5 dBTP"
         ),
+    ),
+    (
+        (r"^Reading: (\d+)\.(\d+) V, ([−-]?\d+)\.(\d+) dBqps$"),
+        r"Lectura: \1,\2 V, \3,\4 dBqps",
     ),
     (r"^sample peak (.+) dBFS$", r"pico muestral \1 dBFS"),
     (r"^true peak (.+) dBTP$", r"pico verdadero \1 dBTP"),

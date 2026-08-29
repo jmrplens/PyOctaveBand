@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 554 numerical conformance checks against 370 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 566 numerical conformance checks against 373 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 554 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 58 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 566 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 59 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -279,6 +279,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 
 - [Overview](https://jmrplens.github.io/phonometry/devices/broadcast/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-devices-broadcast.txt)
 - [Programme loudness and true peak (ITU-R BS.1770 / EBU R 128)](https://jmrplens.github.io/phonometry/devices/broadcast/program-loudness/)
+- [Quasi-peak programme meter (ITU-R BS.468-4)](https://jmrplens.github.io/phonometry/devices/broadcast/quasi-peak/)
 
 ### Noise control
 
@@ -388,6 +389,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [aeroacoustics/rotorcraft-noise](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/rotorcraft-noise/)
 - [aeroacoustics/rotorcraft-propagation](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/rotorcraft-propagation/)
 - [broadcast/program-loudness](https://jmrplens.github.io/phonometry/reference/api/broadcast/program-loudness/)
+- [broadcast/quasi-peak](https://jmrplens.github.io/phonometry/reference/api/broadcast/quasi-peak/)
 - [building/aperture-transmission](https://jmrplens.github.io/phonometry/reference/api/building/aperture-transmission/)
 - [building/ceiling-plenum](https://jmrplens.github.io/phonometry/reference/api/building/ceiling-plenum/)
 - [building/detailed-model](https://jmrplens.github.io/phonometry/reference/api/building/detailed-model/)

@@ -334,8 +334,9 @@ def test_slit_geometry_validation() -> None:
 def test_absorber_stack_validation() -> None:
     with pytest.raises(ValueError, match=r"'layers' must contain at least one layer"):
         m.plot_absorber_stack([])
+    not_a_layer = [object()]
     with pytest.raises(TypeError, match=r"Unsupported layer type"):
-        m.plot_absorber_stack([object()])
+        m.plot_absorber_stack(not_a_layer)
 
 
 # ---------------------------------------------------------------------------

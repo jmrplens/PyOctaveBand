@@ -611,8 +611,9 @@ def test_contour_phasors_shape_mismatch_refused() -> None:
                 ContourPhasors(**{**fields, name: bad})
     # An extra axis carries the right number of samples past any count.
     for name in ("pressure", "normal_velocity"):
+        extra_axis = {**fields, name: np.asarray(fields[name])[np.newaxis]}
         with pytest.raises(ValueError, match="for the same n >= 1"):
-            ContourPhasors(**{**fields, name: np.asarray(fields[name])[np.newaxis]})
+            ContourPhasors(**extra_axis)
     with pytest.raises(ValueError, match="for the same n >= 1"):
         ContourPhasors(**{**fields, "positions": np.zeros((n, 3))})
 
