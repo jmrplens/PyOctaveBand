@@ -2173,3 +2173,59 @@ def test_the_result_plots_as_a_sound_power_spectrum() -> None:
     ax = result.plot()
     assert "ISO 9614-1" in ax.get_title()
     plt.close(ax.figure)
+
+
+# ---------------------------------------------------------------------------
+# What A.2.3's refusal is, and is not, about
+# ---------------------------------------------------------------------------
+#
+# Both tests below pin a sentence rather than a number, because both sentences
+# were wrong before them and neither error could be caught by a value check.
+
+
+def test_the_temporal_indicator_survives_a_band_a_2_3_refuses() -> None:
+    """F1 is not undefined in a band whose surface mean is not positive.
+
+    Equation (A.1) is the spread of the M short-time samples at one position
+    over time. A.2.3 conditions the test on the sign of the *surface* mean and
+    says nothing about the temporal samples, so a band it refuses still has a
+    perfectly good temporal variability while the three spatial indicators
+    have none. The docstring said all four went NaN, and only three do.
+    """
+    rng = np.random.default_rng(3)
+    areas = np.array([5.0] + [0.5] * 9)
+    intensity = np.column_stack(
+        [np.array([1.0e-4] + [-5.0e-5] * 9), np.full(10, 1.0e-5)]
+    )
+    temporal = np.tile(intensity[0], (6, 1)) * (
+        1.0 + 0.05 * rng.standard_normal((6, 2))
+    )
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", emission.SoundPowerWarning)
+        result = emission.sound_power_intensity_points(
+            intensity,
+            areas,
+            pressure_levels=np.full((10, 2), 70.0),
+            pressure_residual_index=12.0,
+            temporal_intensity=temporal,
+        )
+    assert np.all(np.isfinite(np.asarray(result.f1)))
+    for indicator in (result.f2, result.f3, result.f4):
+        assert math.isnan(float(np.asarray(indicator)[0]))
+        assert math.isfinite(float(np.asarray(indicator)[1]))
+
+
+def test_the_remainder_refusal_does_not_blame_the_whole_surface() -> None:
+    """A.2.3 over the remainder is not A.2.3 over the measurement surface.
+
+    When the selected subset carries all of the outward flow, the remainder's
+    mean goes negative while the surface's stays positive. That is the
+    ordinary shape of a concentrated source, not a failed measurement, so a
+    message naming the measurement surface sends the reader to check a
+    quantity that is fine. Here the surface mean is +1.6e-5 W/m2.
+    """
+    areas = np.array([10.0, 10.0, 10.0] + [0.01] * 9)
+    intensity = np.array([1.0e-4] * 3 + [-1.2e-5] * 9)
+    assert float(np.mean(intensity)) > 0.0
+    with pytest.raises(ValueError, match=r"outside the selected subset"):
+        emission.partial_power_concentration(intensity, areas)

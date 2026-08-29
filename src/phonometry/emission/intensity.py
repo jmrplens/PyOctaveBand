@@ -749,6 +749,18 @@ _F4_NON_POSITIVE = (
     "The algebraic mean normal intensity over the measurement surface is not "
     "positive: the test conditions do not satisfy ISO 9614-1 (clause A.2.3)."
 )
+# The same clause, over a subset rather than the whole surface. It needs its
+# own wording because the surface mean can be positive while the remainder's
+# is not: that is what happens when the selected subset carries all of the
+# outward flow, which is the ordinary shape of a concentrated source and not a
+# failed measurement. Blaming "the measurement surface" there sends the reader
+# to check a quantity that is fine.
+_F4_REMAINDER_NON_POSITIVE = (
+    "The algebraic mean normal intensity over the segments outside the "
+    "selected subset is not positive, so equation (A.8) has no F4 to report "
+    "for them: the test conditions do not satisfy ISO 9614-1 (clause A.2.3) "
+    "there, whatever the mean over the whole measurement surface is."
+)
 # A.2.1 places no positivity condition on the M short-time samples at one
 # position, so F1 states the reason without attributing it to the standard:
 # F1 as defined would come out negative and the Table B.3 criterion vacuous.

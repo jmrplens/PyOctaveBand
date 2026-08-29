@@ -233,9 +233,13 @@ in a band whose total is not positive: `not_applicable_band` is `True`
 there and clause 9.2 puts the band outside the method.
 
 `f1` to `f4` are the Annex A field indicators per band, `None` when
-the inputs they need were not supplied and `NaN` in a band whose
-algebraic mean normal intensity is not positive, which A.2.3 makes a
-failure of the test conditions in that band. A.2.3's refusal is not
+the inputs they need were not supplied. `f2`, `f3` and `f4` are
+`NaN` in a band whose algebraic mean normal intensity is not positive,
+which A.2.3 makes a failure of the test conditions in that band. `f1`
+is not: equation (A.1) is the spread of the M short-time samples at one
+position over time, A.2.1 puts no positivity condition on it, and a band
+A.2.3 refuses still has a perfectly good temporal variability. Measured on
+such a band, `f1` comes back finite while the other three are `NaN`. A.2.3's refusal is not
 `not_applicable_band`, whose quantity is clause 9.2's area-weighted sum,
 and the determination warns about it separately, since a band can fail
 A.2.3 and still carry a finite level here. `criterion_1`
