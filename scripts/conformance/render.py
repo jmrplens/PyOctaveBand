@@ -33,6 +33,7 @@ import sys
 from typing import TYPE_CHECKING, Any
 
 from .artifact import ARTIFACT_PATH, load, write
+from .metrics import utilisation
 from .registry import (
     _ROOT,
     Kind,
@@ -50,8 +51,31 @@ if TYPE_CHECKING:
 __all__ = ["_snap"]
 
 
-def _status(passed: bool) -> str:
-    return "&#9989;" if passed else "&#10060;"
+#: The four verdicts as the tables print them. A tick and a cross can only say
+#: two things, so "by design" and "not applicable" had nowhere to go and were
+#: carried in a display string instead; a word says all four, survives a
+#: plain-text diff and needs no colour to be read.
+_VERDICT_TEXT = {
+    str(Verdict.PASS): "Pass",
+    str(Verdict.FAIL): "**Fail**",
+    str(Verdict.BY_DESIGN): "By design",
+    str(Verdict.NOT_APPLICABLE): "n/a",
+}
+
+
+def _status(verdict: str) -> str:
+    """One verdict as the table prints it."""
+    return _VERDICT_TEXT.get(verdict, verdict)
+
+
+def _used(check: Mapping[str, Any]) -> str:
+    """How much of its published limit a check's deviation consumes.
+
+    Blank where the question has no answer, which is a check that declares no
+    tolerance or a mask bounded on one side only.
+    """
+    fraction = utilisation(check)
+    return "-" if fraction is None else f"{fraction * 100:.0f} %"
 
 
 def _cell(text: object) -> str:
@@ -100,12 +124,11 @@ def _numerical_validation_section(document: Mapping[str, Any], filters_ok: bool)
     # Collapsed like the per-domain groups so the report stays compact by
     # default; it springs open whenever the filters/weightings domain has a
     # failing row, exactly like those groups do.
-    emoji = "&#9989;" if filters_ok else "&#10060;"
     opened = "" if filters_ok else " open"
     lines: list[str] = []
     lines.append(f"<details{opened}>")
     lines.append(
-        f"<summary>{emoji} <b>Numerical validation - filters &amp; "
+        "<summary><b>Numerical validation - filters &amp; "
         "weightings</b>: class showcase (IEC 61260-1 · IEC 61672-1 · "
         "ISO 7196)</summary>"
     )
@@ -237,7 +260,7 @@ def render_markdown(document: Mapping[str, Any] | None = None) -> tuple[str, int
         for domain in source["domains"]
         if domain["title"] == "Filters & weightings"
     )
-    headline_emoji = "&#9989;" if passed == total else "&#10060;"
+    failing = total - passed
 
     out: list[str] = []
     out.append("## Numerical conformance report")
@@ -248,7 +271,18 @@ def render_markdown(document: Mapping[str, Any] | None = None) -> tuple[str, int
     )
     if filters_ok:
         summary += " - filters class 1 - weightings within IEC 61672-1 class 1"
-    out.append(f"{headline_emoji} {summary}.")
+    out.append(f"{summary}." if not failing else f"{summary} - **{failing} failing**.")
+    out.append("")
+    out.append(
+        "<sub><b>&#916;</b> is the difference between the computed value and "
+        "the one the standard publishes. <b>Used</b> is how much of that "
+        "clause's published tolerance the difference consumes: 100 % means it "
+        "sits exactly on the limit, 5 % means it uses a twentieth of the "
+        "allowance, and a dash means the clause states no two-sided tolerance "
+        "for the quantity, so there is no budget to spend. It is reported and "
+        "never used to decide a verdict, which is settled at full precision "
+        "before any rounding.</sub>"
+    )
     out.append("")
     out.append(
         "<sub>Each row pins a standard clause to its expected normative value "
@@ -268,27 +302,29 @@ def render_markdown(document: Mapping[str, Any] | None = None) -> tuple[str, int
         rows = by_domain.get(domain["id"], [])
         passed_d, total_d = domain["passing"], domain["checks"]
         pct = 100.0 * passed_d / total_d if total_d else 100.0
-        emoji = "&#9989;" if passed_d == total_d else "&#10060;"
+        failing_d = total_d - passed_d
         # Each domain is a collapsible group labelled with its compliance
         # percentage (100 % = every row passes). Groups with any failing row are
         # opened by default so regressions stay visible.
         opened = " open" if passed_d != total_d else ""
         domain_html = domain["title"].replace("&", "&amp;")
         out.append(f"<details{opened}>")
+        tail = f" - <b>{failing_d} failing</b>" if failing_d else ""
         out.append(
-            f"<summary>{emoji} <b>{domain_html}</b>: {pct:.0f}% "
-            f"({passed_d}/{total_d})</summary>"
+            f"<summary><b>{domain_html}</b>: {pct:.0f}% "
+            f"({passed_d}/{total_d}){tail}</summary>"
         )
         out.append("")
         out.append(
-            "| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |"
+            "| Standard | Quantity | Expected (norm) | Computed | &#916; | Used | "
+            "Status |"
         )
-        out.append("|:---|:---|:---|:---|:---|:---:|")
+        out.append("|:---|:---|:---|:---|:---|:---:|:---:|")
         out.extend(
             f"| {_cell(check['reference']['cite'])} | {_cell(check['quantity'])} "
             f"| {_cell(expected_text(check))} | {_cell(computed_text(check))} "
-            f"| {_cell(deviation_text(check))} "
-            f"| {_status(check['verdict'] == str(Verdict.PASS))} |"
+            f"| {_cell(deviation_text(check))} | {_used(check)} "
+            f"| {_status(check['verdict'])} |"
             for check in rows
         )
         out.append("")

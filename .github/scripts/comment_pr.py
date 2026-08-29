@@ -323,6 +323,13 @@ def conformance_section(
         f"({counts['designations']} normative designations, {counts['sources']} "
         "further published sources).",
         "",
+        "<sub><b>Used</b> in the tables below is how much of that clause's "
+        "published tolerance the deviation consumes: 100 % sits exactly on the "
+        "limit, 5 % uses a twentieth of the allowance, and a dash means the "
+        "clause states no two-sided tolerance for the quantity, so there is no "
+        "budget to spend. It is reported and never used to decide a verdict, "
+        "which is settled at full precision before any rounding.</sub>",
+        "",
     ]
     lines += _changes(head, base)
     lines += _closest(head)
@@ -372,6 +379,9 @@ def _closest(head: dict[str, Any]) -> list[str]:
         return []
     lines = [
         f"**Closest to their published limit (top {CLOSEST_ROWS})**",
+        "",
+        "_The rows with the least room left, so the ones a change is most "
+        "likely to push over._",
         "",
         "| Standard | Quantity | Deviation | Used |",
         "|---|---|---|---|",

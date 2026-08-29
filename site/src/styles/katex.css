@@ -8,6 +8,24 @@
   padding-block: 0.25rem;
 }
 
+/* Inline math needs the same treatment, and did not have it. KaTeX never
+   breaks a formula across lines, so a long one written inline takes the whole
+   page sideways rather than wrapping: measured at a 390 px viewport, one
+   acceleration formula on the errata page is 1011 px wide and carries the
+   document to 1067 px, which is a horizontal scrollbar on every phone.
+
+   `overflow` has no effect on an inline box, so the box has to become
+   `inline-block` for `max-width` and the scroll to apply at all. That is a
+   change to how every inline formula in the corpus takes part in line layout,
+   so it was checked rather than assumed: the position and size of all 991
+   inline formulas on the four most formula-heavy pages are unchanged. */
+.sl-markdown-content :not(.katex-display) > .katex {
+  display: inline-block;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 /* A display block stating several equations on one line is rebuilt at build
    time (rehypeWrappableMath in src/lib/wrappable-math.mjs) as one part per
    equation, with the author's \quad or \qquad carried in --katex-eq-gap.

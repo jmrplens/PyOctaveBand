@@ -190,7 +190,7 @@ const t =
 					`${p} de ${n} comprobaciones superan su norma, en ${d} dominios y ${s} normas.`,
 				closest: 'Las diez comprobaciones más cerca de su límite publicado',
 				closestNote:
-					'Fracción de la tolerancia publicada que consume cada comprobación. Un valor alto no es un fallo: es el margen con el que se cumple.',
+					'Fracción de la tolerancia publicada que consume cada comprobación. El 100 % cae justo en el límite y un guion significa que el apartado no fija tolerancia de dos lados para esa magnitud, así que no hay margen que gastar. Un valor alto no es un fallo: es el margen con el que se cumple, y nunca decide el veredicto, que se resuelve a precisión completa antes de redondear.',
 				search: 'Buscar norma, magnitud o apartado',
 				allDomains: 'Todos los dominios',
 				onlyFailing: 'Solo las que no cumplen',
@@ -224,7 +224,7 @@ const t =
 					`${p} of ${n} checks meet their standard, across ${d} domains and ${s} standards.`,
 				closest: 'The ten checks closest to their published limit',
 				closestNote:
-					'The fraction of its published tolerance each check consumes. A high figure is not a failure: it is the room the check passes with.',
+					'The fraction of its published tolerance each check consumes. 100 % sits exactly on the limit, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. A high figure is not a failure: it is the room the check passes with, and it never decides the verdict, which is settled at full precision before any rounding.',
 				search: 'Search standard, quantity or clause',
 				allDomains: 'All domains',
 				onlyFailing: 'Failing rows only',
@@ -271,9 +271,10 @@ const searchable = (row: (typeof rows)[number]) =>
 		{t.summary(counts.passing, counts.checks, counts.domains, counts.standards)}
 	</p>
 
+	<p class="note used-note">{t.closestNote}</p>
+
 	<section class="conformance-closest">
 		<h2 id="closest-to-limit">{t.closest}</h2>
-		<p class="note">{t.closestNote}</p>
 		<div class="table-scroll">
 			<table>
 				<thead>
@@ -630,12 +631,31 @@ const searchable = (row: (typeof rows)[number]) =>
 		color: var(--sl-color-white);
 	}
 
+	/* Both controls need `min-width: 0`, and the reason is the one that makes
+	   this the classic flex overflow: a flex item's automatic minimum size is
+	   its content, so `min-width: auto` refuses to shrink it below that and the
+	   row grows past the page instead of the item narrowing. A `<select>` is
+	   sized by its longest option, and the longest domain title here is "2D
+	   FDTD wave simulation (Attenborough & Van Renterghem 2021, Ch. 4)", which
+	   asks for 521 px inside a 374 px row. Measured at a 390 px viewport, that
+	   one element took the document to 542 px; with these rules it is 390. */
 	.control-search {
 		flex: 1 1 16rem;
+		min-width: 0;
 	}
 
 	.control-search input {
 		width: 100%;
+	}
+
+	.control-domain {
+		flex: 1 1 12rem;
+		min-width: 0;
+	}
+
+	.control-domain select {
+		width: 100%;
+		max-width: 100%;
 	}
 
 	.control-failing {
