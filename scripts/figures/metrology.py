@@ -21,6 +21,7 @@ from .theme import (
     COLOR_FG,
     COLOR_GRID,
     COLOR_MUTED,
+    COLOR_PANEL,
     COLOR_PRIMARY,
     COLOR_SECONDARY,
     COLOR_TERTIARY,
@@ -551,6 +552,14 @@ def generate_rice_peak_distribution(output_dir: str) -> None:
         ha="right",
         fontsize=8.5,
         color=COLOR_FG,
+        # The Spanish note runs a line wider and reaches back into the three
+        # exceedance curves as they leave the top of the plot.
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
     plt.tight_layout()
     save_figure(output_dir, "rice_peak_distribution.svg")
@@ -987,6 +996,14 @@ def generate_uncertainty_gum_vs_mc(output_dir: str) -> None:
                 xytext=(0.87, ymax * 0.62),
                 fontsize=9,
                 color=COLOR_FG,
+                # It sits on the shoulder of the GUM Gaussian, which runs
+                # through both of its lines in the longer Spanish setting.
+                zorder=6,
+                bbox={
+                    "boxstyle": "round,pad=0.3",
+                    "facecolor": COLOR_PANEL,
+                    "edgecolor": COLOR_GRID,
+                },
                 arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.1},
             )
         ax.set_title(title, pad=8)

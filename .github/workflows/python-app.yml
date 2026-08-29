@@ -405,6 +405,20 @@ jobs:
       # committed baseline does not already record -- and on a baseline line
       # that has been paid off and not deleted.
       run: python scripts/check_figure_language.py
+    - name: Fail if an annotation on a figure cannot be read
+      # Two ways a label fails the reader, and nothing else can see either. A
+      # label across a curve and given no backing is hard to read: the strokes
+      # of the letters and of the curve are the same weight, and on the dark
+      # page close to the same lightness. A label something is drawn over is
+      # not there at all. The figure matches its generator, the contrast steps
+      # above measure fills and strokes rather than what overlaps what, and
+      # `svg.fonttype = "path"` means the committed file has no text node to
+      # find the label in -- so the measurement has to happen while the
+      # matplotlib artists are alive, which is what the `make graphs` above
+      # did, for both language editions. This reads it and fails on any label
+      # over the calibrated number of pixels either way, printing the band
+      # below that for a person to judge.
+      run: python scripts/check_figure_annotations.py
 
   # The Python snippets printed in the guides must run. They are the first
   # thing a reader copies, and nothing executed them until this job existed:

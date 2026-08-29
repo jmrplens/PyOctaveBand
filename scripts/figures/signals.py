@@ -610,6 +610,12 @@ def generate_g_weighting_response(output_dir: str) -> None:
         xy=(10, 0),
         xytext=(20, -18),
         fontsize=9,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
         arrowprops={"arrowstyle": "->", "lw": 0.8},
     )
     apply_axis_styling(
@@ -1638,6 +1644,12 @@ def generate_slm_third_octave(output_dir: str) -> None:
         xy=(160, 43.2),
         xytext=(60, 33.0),
         fontsize=9,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
         arrowprops={"arrowstyle": "->", "lw": 0.9},
     )
     ax.set_title("One-third-octave spectrum of the same ten seconds", pad=12)
@@ -2105,8 +2117,19 @@ def generate_ballistics_vs_duration(output_dir: str) -> None:
         f"even Impulse, with its 35 ms attack,\n"
         f"loses {abs(measured['impulse'][0]):.0f} dB on a 1 ms burst",
         xy=(1.05, measured["impulse"][0]),
-        xytext=(1.6, -10.0),
+        # High enough for the box to clear the Table 4 circle at 20 ms, which
+        # the longer Spanish edition reaches and the English one does not:
+        # F is 8.3 dB down there, right where the box used to sit, and that
+        # circle is one of the ten points the measured curve is checked
+        # against. Above it the box hides only the two curves crossing it.
+        xytext=(1.6, -6.2),
         fontsize=9,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
         arrowprops={"arrowstyle": "->", "lw": 0.9},
     )
     ax.set_title("Every detector under-reads every short event", pad=12)

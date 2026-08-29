@@ -17,6 +17,16 @@ from __future__ import annotations
 import os
 from typing import TYPE_CHECKING, Any
 
+# The annotation recorder sits at the top of ``scripts/``, next to the checker
+# that reads what it writes, exactly as the language one does. No sys.path
+# guard here, unlike the one .i18n carries: anything that can import
+# ``figures.theme`` already has ``scripts/`` on the path, because that is the
+# directory this package sits in. The guard would also cost something real --
+# a bare ``sys.path.insert(...)`` is a module-level expression, which is what
+# ``scripts/animation_fingerprint.py`` hashes to decide whether a clip has to
+# be re-rendered, so writing one here would restamp all forty-two clips for a
+# hook that cannot move a frame.
+import figure_annotation_audit as _annotations
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal as scipy_signal
@@ -228,6 +238,16 @@ def save_figure(output_dir: str, filename: str, **kwargs: Any) -> None:
     stem = os.path.splitext(filename)[0]  # noqa: PTH122
     audit_figure(stem)
     _translate_figure(plt.gcf())
+    if not _FILENAME_SUFFIX:
+        # Two passes in four, and after the translation rather than before it.
+        # The dark twin of a pass is the same drawing in other colours, so the
+        # annotation measurement -- which costs several extra renders -- is
+        # taken on the light pass only. Both languages are measured, because
+        # they are not the same drawing: Spanish prose is longer, so a label
+        # that clears a curve in English grows into it in Spanish. That is
+        # what puts this after the translation, and it is also why the record
+        # is keyed by the asset name with the language suffix on it.
+        _annotations.audit(plt.gcf(), f"{stem}{_LANG_SUFFIX}")
     ext = "webp" if stem in _RASTER_FIGURES else "svg"
     path = os.path.join(output_dir, f"{stem}{_LANG_SUFFIX}{_FILENAME_SUFFIX}.{ext}")  # noqa: PTH118
     if ext == "svg":

@@ -996,17 +996,17 @@ L 668.841094 28.318125
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="patch_7">
-    <path d="M 161.235427 98.227458 
-Q 116.209772 71.154546 72.142282 44.657758 
+    <path d="M 170.816745 147.318955 
+Q 120.839523 95.901732 71.641564 45.286226 
 " style="fill: none; stroke: #ffffff; stroke-linecap: round"/>
-    <path d="M 74.419847 48.244218 
-L 72.142282 44.657758 
-L 76.377989 44.987582 
+    <path d="M 72.927696 49.335406 
+L 71.641564 45.286226 
+L 75.652588 46.686829 
 " style="fill: none; stroke: #ffffff; stroke-linecap: round"/>
    </g>
    <g id="text_7">
     <!-- the two decays nearly coincide: -->
-    <g style="fill: #ffffff" transform="translate(109.761417 109.427954) scale(0.095 -0.095)">
+    <g style="fill: #ffffff" transform="translate(109.761417 158.925048) scale(0.095 -0.095)">
      <defs>
       <path id="DejaVuSans-4b" d="M 3513 2113 
 L 3513 0 
@@ -1161,7 +1161,7 @@ z
      <use xlink:href="#DejaVuSans-1d" transform="translate(1555.34375 0)"/>
     </g>
     <!-- 0.6 s out of 9 s -->
-    <g style="fill: #ffffff" transform="translate(109.761417 120.830551) scale(0.095 -0.095)">
+    <g style="fill: #ffffff" transform="translate(109.761417 170.327646) scale(0.095 -0.095)">
      <defs>
       <path id="DejaVuSans-11" d="M 684 794 
 L 1344 794 

@@ -120,12 +120,18 @@ def generate_ship_source_level(output_dir: str) -> None:
         r"$\Delta L = -10\,\log_{10}[(2u^4 + 14u^2)/(14 + 2u^2 + u^4)]$",
         r"$u = k\,d_\mathrm{s}$,  $d_\mathrm{s} = 0.7\,D$ = 4.2 m",
     ]
+    # Top right, not bottom right. Both levels fall the width of the plot and
+    # arrive in the bottom right corner, so the box was laid over the last
+    # five one-third-octave points of the source level and the last two of the
+    # radiated noise level: each curve read as stopping short of 20 kHz, which
+    # is the band the surface correction has finally run out at. Above 2 kHz
+    # the top of the panel is empty by forty decibels.
     ax.text(
         0.985,
-        0.03,
+        0.97,
         "\n".join(info),
         transform=ax.transAxes,
-        va="bottom",
+        va="top",
         ha="right",
         fontsize=8.5,
         color=COLOR_FG,
@@ -895,7 +901,11 @@ def generate_sound_speed_models(output_dir: str) -> None:
     ax_c.set_title("Four Equations, One Profile", pad=12)
     ax_c.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_c.set_axisbelow(True)
-    ax_c.legend(loc="lower left", fontsize=9)
+    # Upper right, not lower left: the check-point note is written into the
+    # bottom left corner further down, and the legend was printed over its
+    # first line -- its own "mackenzie" entry across the word "Mackenzie".
+    # Every profile has left the top right of this panel by 500 m.
+    ax_c.legend(loc="upper right", fontsize=9)
 
     ref = profiles["unesco"]
     for m, color in zip(models[1:], colors[1:], strict=True):
@@ -996,6 +1006,12 @@ def generate_detection_range(output_dir: str) -> None:
         textcoords="axes fraction",
         fontsize=9,
         color=COLOR_FG,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
         arrowprops={"arrowstyle": "->", "color": COLOR_MUTED, "linewidth": 1.0},
     )
     ax_m.annotate(
@@ -1059,6 +1075,12 @@ def generate_normal_modes(output_dir: str) -> None:
         transform=ax.transAxes,
         fontsize=9,
         color=COLOR_FG,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
     ax.annotate(
         "mode 4 has a null at the source depth,\nso the source does not excite it",
@@ -1067,6 +1089,12 @@ def generate_normal_modes(output_dir: str) -> None:
         textcoords="axes fraction",
         fontsize=8.5,
         color=COLOR_FG,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
         arrowprops={"arrowstyle": "->", "color": COLOR_MUTED, "linewidth": 1.0},
     )
     ax.invert_yaxis()

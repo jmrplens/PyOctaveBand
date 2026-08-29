@@ -147,24 +147,28 @@ def _register_field_dark_cmap() -> None:
     mpl.colormaps.register(LinearSegmentedColormap.from_list(_FIELD_CMAP_DARK, out))
 
 
+def page_is_dark(ax: Axes | None) -> bool:
+    """Whether the page *ax* is drawn on is a dark one.
+
+    Reads the axes patch color, so a ``dark_background`` style or any
+    explicitly dark facecolor is honoured without the caller saying so. The
+    one place that question is answered, for every artist whose colour has to
+    flip with the page.
+    """
+    r, g, b = _page_color(ax, None)
+    luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+    return luminance < _DARK_BACKGROUND_LUMINANCE_MAX
+
+
 def _field_cmap(ax: Axes) -> str:
     """Background-aware diverging colormap name for a signed wave field.
 
-    Reads the axes patch color (so a ``dark_background`` style, or any
-    explicitly dark facecolor, is honoured) and returns the map whose centre
-    matches it.  Registers :data:`_FIELD_CMAP_DARK` on first use, so the name
-    is also available for an explicit ``cmap`` override.
+    Returns the map whose centre matches the page.  Registers
+    :data:`_FIELD_CMAP_DARK` on first use, so the name is also available for
+    an explicit ``cmap`` override.
     """
-    from matplotlib.colors import to_rgb
-
     _register_field_dark_cmap()
-    r, g, b = to_rgb(ax.get_facecolor())
-    luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
-    return (
-        _FIELD_CMAP_DARK
-        if luminance < _DARK_BACKGROUND_LUMINANCE_MAX
-        else _FIELD_CMAP_LIGHT
-    )
+    return _FIELD_CMAP_DARK if page_is_dark(ax) else _FIELD_CMAP_LIGHT
 
 
 # ---------------------------------------------------------------------------

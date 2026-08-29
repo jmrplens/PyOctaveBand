@@ -1,0 +1,22 @@
+# Annotations the reader cannot read cleanly and that are kept that way, each
+# with the reason it is a decision rather than a defect. Read by
+# scripts/check_figure_annotations.py, which fails on anything it measures over
+# the threshold that is not listed here AND on a line that is no longer true:
+# an entry stops being true the moment the label is chipped, lifted, reworded
+# or removed, and then it has to be deleted, or the file rots into a list of
+# figures nobody is allowed to regress on.
+#
+# One entry per line:
+#
+#     drawing: "the label, JSON-quoted so a multi-line one stays on one line": the reason
+#
+# The drawing is the asset name with its language suffix, because the two
+# languages are two drawings and a label can be readable in one and not the
+# other: "duct_regenerated_noise" is the English figure, "duct_regenerated_noise_es"
+# the Spanish one. An entry covers that label whichever of the two defects it
+# fires (a curve drawn behind the letters, or something painted over them).
+#
+# Nothing belongs here because a chip is inconvenient. It belongs here when
+# the fix would make the figure wrong or unreadable -- a label that has to
+# show the curve continuing under it, a plate whose whole subject is the
+# uninterrupted line -- and the reason has to say which.

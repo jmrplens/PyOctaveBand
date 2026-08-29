@@ -27,6 +27,7 @@ from .theme import (
     COLOR_FG,
     COLOR_GRID,
     COLOR_MUTED,
+    COLOR_PANEL,
     COLOR_PRIMARY,
     COLOR_QUATERNARY,
     COLOR_SECONDARY,
@@ -731,12 +732,22 @@ def generate_anp_procedural_profile(output_dir: str) -> None:
     # legend the result's plot puts in the corner it climbs towards.
     ax.set_ylim(top=12500.0)
     ax.axvspan(0.0, distance_kft[end_of_roll], color=COLOR_TERTIARY, alpha=0.18)
+    # Both notes are set inside the climb, and the height curve runs through
+    # the second of them in the longer Spanish setting. They are one pair, so
+    # they take the chip together.
+    chip = {
+        "boxstyle": "round,pad=0.3",
+        "facecolor": COLOR_PANEL,
+        "edgecolor": COLOR_GRID,
+    }
     ax.annotate(
         "take-off ground roll",
         xy=(0.5 * distance_kft[end_of_roll], 0.0),
         xytext=(6.5, 400.0),
         color=COLOR_FG,
         fontsize=9,
+        zorder=6,
+        bbox=chip,
         arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.2},
     )
     ax.axvline(distance_kft[cutback], color=COLOR_MUTED, linestyle=":", linewidth=1.4)
@@ -746,6 +757,8 @@ def generate_anp_procedural_profile(output_dir: str) -> None:
         xytext=(18.5, 4800.0),
         color=COLOR_FG,
         fontsize=9,
+        zorder=6,
+        bbox=chip,
         arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.2},
     )
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -949,7 +962,22 @@ def generate_airport_segment_corrections(output_dir: str) -> None:
         )
         ax_f.plot(frac, df, color=color, lw=2.0, label=label)
     ax_f.axvspan(0.0, 1.0, color=theme_fill(COLOR_PRIMARY, ax_f), zorder=0)
-    ax_f.text(0.5, -13.0, "observer alongside", ha="center", fontsize=8, color=COLOR_FG)
+    ax_f.text(
+        0.5,
+        -13.0,
+        "observer alongside",
+        ha="center",
+        fontsize=8,
+        color=COLOR_FG,
+        # It names the band it stands in, and the 2 000 m curve crosses the
+        # words on its way down in the longer Spanish setting.
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.3",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
     ax_f.set(xlabel=r"$q/\lambda$", ylabel=r"$\Delta F$ [dB]", ylim=(-15.0, 1.0))
     ax_f.set_title(
         rf"(c) Noise fraction, $d_\lambda$ = {d_lambda:.0f} m (Eq. 4-20)", fontsize=11

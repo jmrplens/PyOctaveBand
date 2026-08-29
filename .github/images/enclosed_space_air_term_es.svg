@@ -2686,33 +2686,6 @@ L 892.96 26.8
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="patch_13">
-    <path d="M 712.798802 238.982864 
-Q 792.958655 202.950136 872.098762 167.375796 
-" style="fill: none; stroke: #000000; stroke-linecap: round"/>
-    <path d="M 868.077255 167.210014 
-L 872.098762 167.375796 
-L 869.553232 170.493532 
-" style="fill: none; stroke: #000000; stroke-linecap: round"/>
-   </g>
-   <g id="text_38">
-    <!-- −42 % a 8 kHz -->
-    <g transform="translate(663.049359 248.640719) scale(0.09 -0.09)">
-     <use xlink:href="#DejaVuSans-c9c"/>
-     <use xlink:href="#DejaVuSans-17" transform="translate(83.796875 0)"/>
-     <use xlink:href="#DejaVuSans-15" transform="translate(147.421875 0)"/>
-     <use xlink:href="#DejaVuSans-3" transform="translate(211.046875 0)"/>
-     <use xlink:href="#DejaVuSans-8" transform="translate(242.828125 0)"/>
-     <use xlink:href="#DejaVuSans-3" transform="translate(337.84375 0)"/>
-     <use xlink:href="#DejaVuSans-44" transform="translate(369.625 0)"/>
-     <use xlink:href="#DejaVuSans-3" transform="translate(430.90625 0)"/>
-     <use xlink:href="#DejaVuSans-1b" transform="translate(462.6875 0)"/>
-     <use xlink:href="#DejaVuSans-3" transform="translate(526.3125 0)"/>
-     <use xlink:href="#DejaVuSans-4e" transform="translate(558.09375 0)"/>
-     <use xlink:href="#DejaVuSans-2b" transform="translate(616 0)"/>
-     <use xlink:href="#DejaVuSans-5d" transform="translate(691.203125 0)"/>
-    </g>
-   </g>
-   <g id="patch_14">
     <path d="M 561.970991 152.554564 
 Q 627.553568 199.567106 692.227465 245.928265 
 " style="fill: none; stroke: #000000; stroke-linecap: round"/>
@@ -2721,7 +2694,7 @@ L 692.227465 245.928265
 L 688.252864 245.293799 
 " style="fill: none; stroke: #000000; stroke-linecap: round"/>
    </g>
-   <g id="text_39">
+   <g id="text_38">
     <!-- −1,7 % a 1 kHz -->
     <g transform="translate(516.382227 147.227819) scale(0.09 -0.09)">
      <use xlink:href="#DejaVuSans-c9c"/>
@@ -2740,7 +2713,7 @@ L 688.252864 245.293799
      <use xlink:href="#DejaVuSans-5d" transform="translate(722.984375 0)"/>
     </g>
    </g>
-   <g id="text_40">
+   <g id="text_39">
     <!-- La misma absorción en dos volúmenes -->
     <g transform="translate(578.043359 16.8) scale(0.12 -0.12)">
      <defs>
@@ -2820,7 +2793,7 @@ z
     </g>
    </g>
    <g id="legend_2">
-    <g id="patch_15">
+    <g id="patch_14">
      <path d="M 502.162344 339.715312 
 L 662.667344 339.715312 
 Q 664.267344 339.715312 664.267344 338.115313 
@@ -2842,7 +2815,7 @@ L 519.762344 295.791562
       <use xlink:href="#mc6338cc71e" x="511.762344" y="295.791562" style="fill: #1f77b4; stroke: #1f77b4"/>
      </g>
     </g>
-    <g id="text_41">
+    <g id="text_40">
      <!-- oficina de 60 m³ (sin aire) -->
      <g transform="translate(526.162344 298.591563) scale(0.08 -0.08)">
       <defs>
@@ -2943,7 +2916,7 @@ L 519.762344 307.792188
       <use xlink:href="#mc6338cc71e" x="511.762344" y="307.792188" style="fill: #1f77b4; stroke: #1f77b4"/>
      </g>
     </g>
-    <g id="text_42">
+    <g id="text_41">
      <!-- oficina de 60 m³ (20 °C, 50-70 %) -->
      <g transform="translate(526.162344 310.592188) scale(0.08 -0.08)">
       <use xlink:href="#DejaVuSans-52"/>
@@ -2989,7 +2962,7 @@ L 519.762344 319.792813
       <use xlink:href="#m1b7f8bbf56" x="511.762344" y="319.792813" style="fill: #d62728; stroke: #d62728"/>
      </g>
     </g>
-    <g id="text_43">
+    <g id="text_42">
      <!-- sala de 2000 m³ (sin aire) -->
      <g transform="translate(526.162344 322.592813) scale(0.08 -0.08)">
       <use xlink:href="#DejaVuSans-56"/>
@@ -3029,7 +3002,7 @@ L 519.762344 331.793437
       <use xlink:href="#m1b7f8bbf56" x="511.762344" y="331.793437" style="fill: #d62728; stroke: #d62728"/>
      </g>
     </g>
-    <g id="text_44">
+    <g id="text_43">
      <!-- sala de 2000 m³ (20 °C, 50-70 %) -->
      <g transform="translate(526.162344 334.593437) scale(0.08 -0.08)">
       <use xlink:href="#DejaVuSans-56"/>
@@ -3065,6 +3038,46 @@ L 519.762344 331.793437
       <use xlink:href="#DejaVuSans-8" transform="translate(1550.375 0)"/>
       <use xlink:href="#DejaVuSans-c" transform="translate(1645.390625 0)"/>
      </g>
+    </g>
+   </g>
+   <g id="patch_15">
+    <path d="M 831.212124 163.282368 
+Q 852.080132 164.625884 871.832416 165.897568 
+" style="fill: none; stroke: #000000; stroke-linecap: round"/>
+    <path d="M 868.355502 163.869992 
+L 871.832416 165.897568 
+L 868.124207 167.462554 
+" style="fill: none; stroke: #000000; stroke-linecap: round"/>
+   </g>
+   <g id="text_44">
+    <g id="patch_16">
+     <path d="M 758.184797 168.835694 
+L 825.116672 168.835694 
+Q 828.716672 168.835694 828.716672 165.235694 
+L 828.716672 156.234991 
+Q 828.716672 152.634991 825.116672 152.634991 
+L 758.184797 152.634991 
+Q 754.584797 152.634991 754.584797 156.234991 
+L 754.584797 165.235694 
+Q 754.584797 168.835694 758.184797 168.835694 
+z
+" style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
+    </g>
+    <!-- −42 % a 8 kHz -->
+    <g transform="translate(758.184797 163.073584) scale(0.09 -0.09)">
+     <use xlink:href="#DejaVuSans-c9c"/>
+     <use xlink:href="#DejaVuSans-17" transform="translate(83.796875 0)"/>
+     <use xlink:href="#DejaVuSans-15" transform="translate(147.421875 0)"/>
+     <use xlink:href="#DejaVuSans-3" transform="translate(211.046875 0)"/>
+     <use xlink:href="#DejaVuSans-8" transform="translate(242.828125 0)"/>
+     <use xlink:href="#DejaVuSans-3" transform="translate(337.84375 0)"/>
+     <use xlink:href="#DejaVuSans-44" transform="translate(369.625 0)"/>
+     <use xlink:href="#DejaVuSans-3" transform="translate(430.90625 0)"/>
+     <use xlink:href="#DejaVuSans-1b" transform="translate(462.6875 0)"/>
+     <use xlink:href="#DejaVuSans-3" transform="translate(526.3125 0)"/>
+     <use xlink:href="#DejaVuSans-4e" transform="translate(558.09375 0)"/>
+     <use xlink:href="#DejaVuSans-2b" transform="translate(616 0)"/>
+     <use xlink:href="#DejaVuSans-5d" transform="translate(691.203125 0)"/>
     </g>
    </g>
   </g>

@@ -11,6 +11,7 @@ noise the room is left with. Everything here is embedded by a page under
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.axes import Axes
 from scipy import signal as scipy_signal
 
 from phonometry._plot.common import format_frequency_axis, theme_fill
@@ -126,7 +127,20 @@ def generate_schroeder_decay(output_dir: str) -> None:
             alpha=0.85,
         )
 
-    ax.text(0.12, -7.0, "EDT slope", fontsize=8, color="#9467bd", rotation=0)
+    ax.text(
+        0.12,
+        -7.0,
+        "EDT slope",
+        fontsize=8,
+        color="#9467bd",
+        rotation=0,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.3",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
     facecolor = plt.rcParams["axes.facecolor"]
     ax.text(
         0.04,
@@ -458,6 +472,12 @@ def generate_sweep_distortion_separation(output_dir: str) -> None:
             color=color,
             ha="center",
             va="bottom",
+            zorder=6,
+            bbox={
+                "boxstyle": "round,pad=0.3",
+                "facecolor": COLOR_PANEL,
+                "edgecolor": COLOR_GRID,
+            },
         )
     ax.annotate(
         "causal part: what impulse_response() returns",
@@ -1229,6 +1249,15 @@ def generate_image_source_reflectogram(output_dir: str) -> None:
         ha="left",
         fontsize=8.5,
         color=COLOR_FG,
+        # The late reflections reach the floor of the plot, so the stems of
+        # the last few land in the corner the note sits in: the chip backs it
+        # and the zorder puts both above them.
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
     plt.tight_layout()
     save_figure(output_dir, "image_source_reflectogram.svg")
@@ -1413,6 +1442,24 @@ def generate_enclosed_space_absorption(output_dir: str) -> None:
     plt.close()
 
 
+def _room_criteria_axis(ax: Axes, bands: np.ndarray) -> None:
+    """The shared octave-band axis of the two noise-criteria panels.
+
+    The right limit is wider than the automatic margin so the family labels,
+    which stand outside the last band, have room for their offset and for a
+    chip where one is needed.
+    """
+    ax.set_xscale("log")
+    ax.set_xlim(bands[0] / 1.4, bands[-1] * 1.65)
+    ax.set_xticks(list(bands))
+    ax.set_xticklabels([f"{f:g}" for f in bands], rotation=45, ha="right")
+    ax.set_xlabel("Octave-band center frequency [Hz]")
+    ax.set_ylabel("Octave-band sound pressure level [dB]")
+    ax.grid(which="both", axis="y", color=COLOR_GRID, linestyle="-", alpha=0.4)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper right")
+
+
 def generate_room_noise_criteria(output_dir: str) -> None:
     """ANSI S12.2-2019: NC tangency rating and RC Mark II classification."""
     print("Generating room_noise_criteria.png...")
@@ -1428,15 +1475,28 @@ def generate_room_noise_criteria(output_dir: str) -> None:
 
     _fig, (ax_nc, ax_rc) = plt.subplots(1, 2, figsize=(12.5, 5.6))
 
+    # How a curve of either family is named, at the right-hand end of its own
+    # line. Offset clear of the point rather than sitting on it: the measured
+    # series and the reference series both end on the last band, and their
+    # markers are 6 pt across, so a label anchored there has a marker over its
+    # first digit, and the chip that answers that would hide the marker
+    # instead. Seven points puts the whole box past the marker, and
+    # _room_criteria_axis leaves the margin it needs on the right.
+    family_label = {
+        "xytext": (7, 0),
+        "textcoords": "offset points",
+        "fontsize": 7,
+        "color": "#999999",
+        "va": "center",
+    }
+
     # --- Left: NC curves + tangency rating. ---
     for row, idx in zip(NC_CURVES, NC_INDICES, strict=True):
         ax_nc.plot(OCTAVE_BANDS, row, color=COLOR_GRID, lw=0.8, zorder=1)
         ax_nc.annotate(
             f"{idx:.0f}",
             (OCTAVE_BANDS[-1], row[-1]),
-            fontsize=7,
-            color="#999999",
-            va="center",
+            **family_label,
         )
     ax_nc.plot(
         OCTAVE_BANDS, spectrum, "o-", color=COLOR_PRIMARY, zorder=3, label="Measured"
@@ -1451,15 +1511,8 @@ def generate_room_noise_criteria(output_dir: str) -> None:
         zorder=4,
         label=f"Tangent @ {nc.governing_frequency:g} Hz",
     )
-    ax_nc.set_xscale("log")
-    ax_nc.set_xticks(list(OCTAVE_BANDS))
-    ax_nc.set_xticklabels([f"{f:g}" for f in OCTAVE_BANDS], rotation=45, ha="right")
-    ax_nc.set_xlabel("Octave-band center frequency [Hz]")
-    ax_nc.set_ylabel("Octave-band sound pressure level [dB]")
     ax_nc.set_title(f"Noise Criteria — tangency method   NC-{nc.rating:g}", pad=10)
-    ax_nc.grid(which="both", axis="y", color=COLOR_GRID, linestyle="-", alpha=0.4)
-    ax_nc.set_axisbelow(True)
-    ax_nc.legend(loc="upper right")
+    _room_criteria_axis(ax_nc, OCTAVE_BANDS)
 
     # --- Right: RC Mark II family, reference + rumble/hiss tolerances. ---
     ref = rc.reference_curve
@@ -1468,15 +1521,25 @@ def generate_room_noise_criteria(output_dir: str) -> None:
     # The Table D.1 family, mirroring the NC family on the left: constant
     # -5 dB/octave keyed to the 1 kHz value, with the 55 dB low-frequency
     # floor flattening the 16/31.5 Hz end of RC-25 to RC-30.
+    # The family label stands off the right-hand end of its own line, which
+    # reads cleanly -- except on the one curve the reference series is drawn
+    # along, where the reference line runs the length of the digits. That one
+    # gets the chip; the rest have nothing behind them to hide.
+    chip = {
+        "boxstyle": "round,pad=0.3",
+        "facecolor": COLOR_PANEL,
+        "edgecolor": COLOR_GRID,
+    }
     for index in range(25, 51, 5):
         family = room.rc_curve(float(index))
         ax_rc.plot(OCTAVE_BANDS, family, color=COLOR_GRID, lw=0.8, zorder=1)
+        struck = index == int(rc.rating)
         ax_rc.annotate(
             f"{index:d}",
             (OCTAVE_BANDS[-1], family[-1]),
-            fontsize=7,
-            color="#999999",
-            va="center",
+            zorder=6 if struck else 3,
+            bbox=chip if struck else None,
+            **family_label,
         )
     ax_rc.annotate(
         "55 dB floor\n(16 Hz = 31.5 Hz)",
@@ -1485,6 +1548,12 @@ def generate_room_noise_criteria(output_dir: str) -> None:
         fontsize=8,
         color=COLOR_FG,
         ha="left",
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
         arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 0.9},
     )
     ax_rc.plot(
@@ -1514,15 +1583,8 @@ def generate_room_noise_criteria(output_dir: str) -> None:
     ax_rc.plot(
         OCTAVE_BANDS, spectrum, "o-", color=COLOR_PRIMARY, zorder=3, label="Measured"
     )
-    ax_rc.set_xscale("log")
-    ax_rc.set_xticks(list(OCTAVE_BANDS))
-    ax_rc.set_xticklabels([f"{f:g}" for f in OCTAVE_BANDS], rotation=45, ha="right")
-    ax_rc.set_xlabel("Octave-band center frequency [Hz]")
-    ax_rc.set_ylabel("Octave-band sound pressure level [dB]")
     ax_rc.set_title(f"Room Criteria Mark II   {rc.label}", pad=10)
-    ax_rc.grid(which="both", axis="y", color=COLOR_GRID, linestyle="-", alpha=0.4)
-    ax_rc.set_axisbelow(True)
-    ax_rc.legend(loc="upper right")
+    _room_criteria_axis(ax_rc, OCTAVE_BANDS)
 
     plt.tight_layout()
     save_figure(output_dir, "room_noise_criteria.png")
@@ -1873,10 +1935,22 @@ def generate_enclosed_space_air_term(output_dir: str) -> None:
     right.annotate(
         "−42 % at 8 kHz",
         xy=(8000.0, 1.24),
-        xytext=(0.42, 0.30),
+        # In the gap between the two rooms, not on the office pair. The two
+        # office curves lie on top of each other at 0.67 s, so a box set at
+        # that height covers the 1 kHz point of both at once, and 1 kHz is
+        # the band the note beside it is about. Between the pairs the panel
+        # is empty from 1.8 to 4.5 kHz, and the pointer has less far to go to
+        # the 8 kHz end it names.
+        xytext=(0.66, 0.57),
         textcoords="axes fraction",
         fontsize=9,
         color=COLOR_FG,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
         arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0},
     )
     right.annotate(
@@ -2240,12 +2314,24 @@ def generate_image_source_anisotropy(output_dir: str) -> None:
     for ratio, value, reference in zip(ratios, specular, eyring, strict=True):
         if ratio in (1.0, 3.0, 6.0):
             offset = -0.16 if ratio >= 5.0 else 0.11
+            # Beside the point it names, on the left, where the curves are
+            # not. At the first ratio the panel edge is nearer than that: the
+            # label sat half outside, its chip drawn across the left spine and
+            # breaking the frame for its own height, so that one is pulled in
+            # far enough for the box to clear the spine.
+            beside = ratio - (0.14 if ratio == ratios[0] else 0.32)
             ax.annotate(
                 f"×{value / reference:.2f}",
                 xy=(ratio, value),
-                xytext=(ratio - 0.32, value + offset),
+                xytext=(beside, value + offset),
                 fontsize=9,
                 color=COLOR_FG,
+                zorder=7,
+                bbox={
+                    "boxstyle": "round,pad=0.3",
+                    "facecolor": COLOR_PANEL,
+                    "edgecolor": COLOR_GRID,
+                },
             )
     ax.set_xlabel(r"Room elongation  $L_x : L_y = L_z$")
     ax.set_ylabel(r"Reverberation time [s]")
@@ -2336,6 +2422,10 @@ def generate_image_source_bands(output_dir: str) -> None:
         ha="left",
         fontsize=9,
         color=COLOR_FG,
+        # The high bands decay into this corner, so four of the curves cross
+        # the note. It had the chip and not the zorder, which is the case the
+        # reader loses: the curves were drawn over the box and its text alike.
+        zorder=6,
         bbox={
             "boxstyle": "round,pad=0.4",
             "facecolor": COLOR_PANEL,
@@ -2693,6 +2783,11 @@ def generate_decay_range_bias(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="center right", fontsize=9)
 
+    # Against the right edge rather than at 40 % of the width: the four rule
+    # labels are pinned to their own lines and cannot go anywhere, and the box
+    # started where "flag T30" stands, hiding it completely. The upper right
+    # of this plot is empty in both languages -- both curves have fallen to
+    # under 1 % by then.
     info = [
         "synthetic single-slope decay, $T$ = 1.0 s",
         r"white noise floor swept, $f_{\mathrm{s}}$ = 48 kHz",
@@ -2701,12 +2796,12 @@ def generate_decay_range_bias(output_dir: str) -> None:
         "below ~34 dB the fit returns NaN",
     ]
     ax.text(
-        0.40,
+        0.98,
         0.96,
         "\n".join(info),
         transform=ax.transAxes,
         va="top",
-        ha="left",
+        ha="right",
         fontsize=9,
         color=COLOR_FG,
         bbox={

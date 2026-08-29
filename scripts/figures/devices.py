@@ -2355,6 +2355,17 @@ def generate_partial_power_map(output_dir: str) -> None:
                 va="center",
                 fontsize=9,
                 color="white",
+                # A mask in the segment's own colour, not the documentation
+                # chip: the digits are white, so a light panel behind them
+                # would erase them. On the nineteen plain segments the mask is
+                # the shade it sits on and cannot be seen at all; on the
+                # hatched one it is the whole point, since the hatching is
+                # drawn in the foreground colour straight through the number.
+                bbox={
+                    "boxstyle": "round,pad=0.18",
+                    "facecolor": shade,
+                    "edgecolor": "none",
+                },
             )
         ax.add_patch(
             mpatches.Rectangle(
@@ -2558,11 +2569,23 @@ def generate_true_peak_intersample(output_dir: str) -> None:
     )
     axl.axhline(np.abs(x).max(), color=COLOR_SECONDARY, linestyle="--", linewidth=1.3)
     axl.axhline(1.0, color=COLOR_FG, linestyle="--", linewidth=1.3)
+    # A tenth of full scale above the line it names, not four hundredths. The
+    # samples sit *on* that line and are 7 pt across, half of which is 0.03 FS
+    # here, and the chip's own pad reaches further below the baseline than the
+    # words do: at the closer offset the box came down over two of the twelve
+    # dots and left them as half-discs, on a figure whose title is that every
+    # sample misses the peak.
     axl.annotate(
         f"sample peak {_fmt_minus(sample_peak, '.2f')} dBFS",
-        (0.012, np.abs(x).max() + 0.04),
+        (0.012, np.abs(x).max() + 0.10),
         fontsize=9,
         color=COLOR_SECONDARY,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.3",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
     axl.annotate(
         f"true peak {_fmt_minus(true_peak, '.2f')} dBTP", (0.012, 1.04), fontsize=9
@@ -2593,6 +2616,12 @@ def generate_true_peak_intersample(output_dir: str) -> None:
         textcoords="offset points",
         xytext=(-150, -46),
         fontsize=9,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
     axr.axvline(0.25, color=COLOR_FG, linestyle=":", linewidth=1.2)
     axr.set(
@@ -3272,9 +3301,26 @@ def generate_duct_regenerated_noise(output_dir: str) -> None:
         f"doubling of the face velocity; ASHRAE Table 9 caps\nthe "
         f"neck of an RC 30 supply outlet at {limit:.1f} m/s",
         xy=(250.0, 33.0),
-        xytext=(340.0, 12.0),
+        # Anchored where the Spanish edition fits, not where the English one
+        # would sit: the translated note is a hundred points wider, and from
+        # 340 Hz its box ran past the right spine and finished outside the
+        # panel. The English one has the room to spare.
+        #
+        # The height is chosen the same way. The three flows are the same
+        # curve shifted an octave at a time, so every one of them has a point
+        # at 15.9 dB and another at 5.9, and the box is tall enough to reach
+        # from one row to the other: at 12 dB it sat on the 15.9 dB row and
+        # swallowed one point of each curve. Between the two rows it hides
+        # only the slopes, which is what a backing is for.
+        xytext=(200.0, 8.6),
         fontsize="small",
         color=COLOR_FG,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
         arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0},
     )
     ax.set_title("Diffuser sound power (Long Eqs. 13.27-13.33)", pad=10)
@@ -3684,6 +3730,14 @@ def generate_enclosure_required_tl(output_dir: str) -> None:
         xytext=(4.4, 18.0),
         fontsize="small",
         color=COLOR_FG,
+        # It is set down among the correction bars, whose outlines cross both
+        # of its lines, so it takes the chip.
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
         arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0},
     )
     ax.set_xticks(np.arange(bands.size))
