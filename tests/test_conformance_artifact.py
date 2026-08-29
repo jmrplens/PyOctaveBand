@@ -611,7 +611,12 @@ def test_a_verdict_is_printed_and_never_re_derived() -> None:
     document = json.loads(json.dumps(FIXTURE))
     document["checks"][0]["deviation"]["value"] = 0.5
     markdown, _, _ = cr.render_markdown(document)
-    row = next(line for line in markdown.splitlines() if "| Scalar |" in line)
+    # The domain table's copy of the row, not the closest-to-its-limit table's:
+    # a check that spends ten times its allowance leads that ranking, and that
+    # table prints no verdict at all.
+    row = next(
+        line for line in markdown.splitlines() if "| Scalar |" in line and "cv-" in line
+    )
     # The mark and the word, both saying pass: the indicator is drawn from the
     # stored verdict too, so a re-derivation would show up here as a red
     # hexagon beside the word "Pass".

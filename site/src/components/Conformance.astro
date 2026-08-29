@@ -509,6 +509,7 @@ const searchable = (row: (typeof rows)[number]) =>
 					<table>
 						<thead>
 							<tr>
+								<th class="status">{t.status}</th>
 								<th>{t.standard}</th>
 								<th>{t.quantity}</th>
 								<th>{t.expected}</th>
@@ -516,7 +517,6 @@ const searchable = (row: (typeof rows)[number]) =>
 								<th>{t.limit}</th>
 								<th>{t.deviation}</th>
 								<th>{t.used}</th>
-								<th>{t.status}</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -527,6 +527,21 @@ const searchable = (row: (typeof rows)[number]) =>
 									data-verdict={row.check.verdict}
 									data-text={searchable(row)}
 								>
+									<td class="status">
+										{/*
+											The word is drawn, not hidden. It used to sit in a
+											`visually-hidden` span, which left the silhouette as the
+											only thing a sighted reader had - and the silhouette is
+											in the last column of a table wider than the well, so
+											below 1440 px there was no verdict in the row at all.
+											The mark stays `aria-hidden`, so a screen reader still
+											hears the verdict exactly once.
+										*/}
+										<svg class="mark" width="16" height="16" aria-hidden="true" focusable="false">
+											<use href={`#${markId(row.check.verdict)}`} />
+										</svg>
+										{verdictWord(row.check.verdict)}
+									</td>
 									<td>
 										<span class="designation">{row.check.reference.designation}</span>
 										{row.check.reference.edition && (
@@ -542,12 +557,6 @@ const searchable = (row: (typeof rows)[number]) =>
 									<td class="numeric">{limitText(row.check)}</td>
 									<td class="numeric">{deviationText(row.check)}</td>
 									<td class="numeric used">{percent(row.used)}</td>
-									<td class="status">
-										<svg class="mark" width="16" height="16" aria-hidden="true" focusable="false">
-											<use href={`#${markId(row.check.verdict)}`} />
-										</svg>
-										<span class="visually-hidden">{verdictWord(row.check.verdict)}</span>
-									</td>
 								</tr>
 							))}
 						</tbody>
@@ -641,8 +650,22 @@ const searchable = (row: (typeof rows)[number]) =>
 		margin-block: 0.5rem 1rem;
 	}
 
+	/* `min-width: min-content` is what makes the box above actually scroll, and
+	   it is here because it was measured, not because it reads well. A table
+	   whose columns cannot fit is laid out at its min-content width anyway, but
+	   Chromium reports the table's border box as the containing block's width,
+	   so the scroll container sees `scrollWidth == clientWidth`, offers no
+	   scrollbar, and clips whatever hangs past its right edge with no way to
+	   reach it. Measured on this page before the rule: at 1280 px the last
+	   column ended 106 px past the container, `scrollWidth - clientWidth` was 0
+	   and `scrollLeft` stayed 0, so the Used and Status columns were not drawn
+	   at all and could not be scrolled to; at 360 px the overhang was 863 px.
+	   With the rule the same box reports 106 px and 863 px of real overflow and
+	   scrolls to the last column. `width: auto` behaves exactly like the
+	   `width: 100%` it replaced, so the percentage was never the cause. */
 	.conformance table {
 		width: 100%;
+		min-width: min-content;
 		border-collapse: collapse;
 		font-size: var(--sl-text-sm);
 	}
@@ -694,16 +717,49 @@ const searchable = (row: (typeof rows)[number]) =>
 
 	/* Sized in ems so the mark grows with the reader's text, and pushed a
 	   fraction below the baseline so a 16 px square sits optically centred on
-	   a line of 14 px text rather than riding above it. */
+	   a line of 14 px text rather than riding above it.
+
+	   `display: inline-block` is not decoration: Starlight's content reset
+	   gives every `svg` `display: block`, which put the mark on a line of its
+	   own above the word it belongs to in every table cell that draws one.
+	   Measured at 1280 px, the mark's top was 20 px above the word's; with
+	   this rule they share a line box and the cell is no wider. Inside the
+	   legend and the section headings, which are flex containers, the
+	   declaration is ignored, so the one place it changes anything is the
+	   cells. */
 	.conformance .mark {
+		display: inline-block;
 		width: 1.15em;
 		height: 1.15em;
 		vertical-align: -0.22em;
 		flex: none;
 	}
 
-	.conformance td.status {
-		text-align: center;
+	/* A cell has no gap property to lean on, so the mark carries its own. The
+	   markup deliberately has no whitespace between the mark and the word, and
+	   that is what stops them being split. */
+	.conformance td .mark {
+		margin-inline-end: 0.3rem;
+	}
+
+	/* The verdict leads the row and never wraps. Leading, because it is the one
+	   cell that has to be legible without scrolling: the scroll box only
+	   guarantees the first column is inside it, and this table is wider than
+	   the content well at every viewport the site is read at. Never wrapping,
+	   because "By design" broken across two lines reads as two verdicts. */
+	.conformance td.status,
+	.conformance th.status {
+		white-space: nowrap;
+	}
+
+	/* The gutter after the verdict, paid for by the column that follows it.
+	   The nowrap above lets the verdict run past its own cell where the table
+	   is squeezed, and padding on the overflowing cell cannot hold a gap open.
+	   Measured at 1280 px, "Cumple" ended 3 px from the designation beside it,
+	   which reads as one run of text rather than two columns; with this it is
+	   13 px in Spanish and 18 px in English, and the table grows by 10 px. */
+	.conformance .status + * {
+		padding-inline-start: 1.2rem;
 	}
 
 	/* The summary card. Its GitHub twin is a committed SVG pair; here the same
@@ -759,12 +815,17 @@ const searchable = (row: (typeof rows)[number]) =>
 	}
 
 	/* Not Starlight's --sl-color-green and --sl-color-red, and this is
-	   measured, not taste: on the light card (--sl-color-gray-6, #ebedf3) that
-	   green comes out at 1.53:1 and would be all but invisible. These are the
-	   two fills the committed marks already use, chosen to clear 3:1 on every
-	   ground in the corpus; against this card they measure green 3.90:1 light
-	   and 3.34:1 dark, red 3.98:1 and 3.28:1, so one pair serves both themes
-	   exactly as it does for the marks. */
+	   measured, not taste: on the light card that green comes out at 1.50:1
+	   and would be all but invisible. These are the two fills the committed
+	   marks already use. The card is --sl-color-gray-6, which this site
+	   overrides to #e7edf1 light and #1a2126 dark - both read off the built
+	   page's computed style, not off Starlight's defaults - and against those
+	   two grounds the fills measure green 3.83:1 and 3.60:1, red 3.90:1 and
+	   3.53:1, so one pair serves both themes exactly as it does for the
+	   marks. Both card colours are in `_GROUNDS` in
+	   tests/test_conformance_badges.py, so these two figures are held by a
+	   test and not only by this comment - which check-contrast.mjs cannot do,
+	   because it parses theme.css and never sees a literal written here. */
 	.conformance-banner .bar-pass,
 	.conformance-banner .bar-fail {
 		display: block;

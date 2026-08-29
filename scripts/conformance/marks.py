@@ -18,15 +18,15 @@ comment through ``.github/scripts/comment_pr.py``, and the README by hand.
 citation of a file nothing generates, which is what turns a rename into a
 failing test rather than a broken image nobody notices.
 
-**Why a raw URL and not a relative path.** ``docs/CONFORMANCE.md`` is read on
-github.com, mirrored into the documentation site, and quoted in a comment on a
-different page of a different host; a relative path resolves in the first case
-and in neither of the others. Measured against the live repository, GitHub
-serves ``raw.githubusercontent.com`` for this repository untouched, while it
-rewrites ``img.shields.io`` and the other third-party badge hosts through
-``camo.githubusercontent.com`` - so there is no proxy cache between a reader
-and these files, and a badge regenerated on ``main`` is live within the five
-minutes raw's ``cache-control`` asks for.
+**Why a raw URL and not a relative path.** The sticky pull-request comment is
+the case that settles it: it is rendered on a different page of a different
+host, where a path relative to ``docs/`` resolves to nothing, and the report
+and the comment are built by the same two functions here. Measured against the
+live repository, GitHub serves ``raw.githubusercontent.com`` for this
+repository untouched, while it rewrites ``img.shields.io`` and the other
+third-party badge hosts through ``camo.githubusercontent.com`` - so there is
+no proxy cache between a reader and these files, and a badge regenerated on
+``main`` is live within the five minutes raw's ``cache-control`` asks for.
 """
 
 from __future__ import annotations
@@ -63,9 +63,24 @@ class Mark:
     :param filename: The committed file, under :data:`RAW_PATH`.
     :param alt: What a reader gets when the image does not arrive. It is the
         verdict in words, never the name of a picture. It is also the
-        accessible name of the link GitHub wraps every Markdown image in, so
-        it may not be empty: 566 links with no name is a worse defect than the
-        one duplicated announcement that a visible word beside the mark costs.
+        accessible name of the link GitHub wraps every Markdown image in - a
+        ``<picture>`` is the only embedding that escapes that wrapper - so it
+        may not be empty: an unnamed link announces its URL, and this document
+        would hold 569 of them.
+
+        The duplication it costs is real and was measured rather than waved
+        away. Rendered through GitHub's own renderer, the report holds 576
+        links, 569 named "Pass" and 4 "By design", and a reader with images
+        off sees the word twice in the cell. What bounds it is that the report
+        ships with all 60 of its sections collapsed, because every check
+        passes: 571 of those links sit inside a closed ``<details>``,
+        ``checkVisibility()`` is false for every one of them, and the reader
+        meets five - three documents and the two legend marks. Opening one
+        12-row domain brings the total to seventeen. Escaping the wrapper
+        instead, with a ``<picture>`` around an ``alt=""`` image on every row,
+        was measured at +73.9 kB against the +10.0 kB the reference-style mark
+        costs, to remove a duplicated word from rows a reader has to open one
+        section at a time to reach.
     :param label: The Markdown link-reference label the tables use. Reference
         style rather than inline, because a definition resolves document-wide:
         the per-row cost is the 16-character label instead of a 117-character
@@ -217,12 +232,31 @@ def banner_picture(counts: Mapping[str, Any], ref: str) -> str:
     """The summary banner as a theme-aware Markdown embedding.
 
     A ``<picture>`` whose ``<source>`` carries the dark variant is the
-    mechanism GitHub itself documents and the one the README already uses; it
-    follows the reader's GitHub theme toggle. The alternative, a ``<style>``
-    with ``prefers-color-scheme`` inside the SVG, resolves against the
-    reader's operating system instead, because GitHub loads the file through
-    an ``<img>`` - so a reader on a light GitHub page with a dark desktop
-    would get the dark palette on white.
+    mechanism GitHub itself documents and the one the README already uses.
+    What it follows depends on who renders it, and both halves of that were
+    measured across all four crossings of desktop theme and GitHub theme.
+
+    On github.com the pair follows the reader's GitHub theme. GitHub upgrades
+    every ``<picture>`` into a ``<themed-picture>`` custom element which
+    rewrites the source's ``media`` to ``not all`` to force the light file and
+    to ``(prefers-color-scheme: light),(prefers-color-scheme: dark)`` to force
+    the dark one, so a light desktop with GitHub set to dark loads the ``_dark``
+    file on a #0d1117 body, and the reverse loads the light file on white. All
+    four crossings land correctly.
+
+    Anywhere the same HTML is rendered without GitHub's JavaScript - the
+    ``/markdown`` API output under GitHub's own stylesheet, an editor preview,
+    a mirror - the element never upgrades, the ``media`` stays
+    ``(prefers-color-scheme: dark)`` and the desktop decides. Two of the four
+    crossings then serve the wrong twin.
+
+    That is survivable, and it is the real reason a pair is safe here: the
+    banner paints its own card rather than sitting on the page's ground.
+    Measured, its ink reads at 14.84:1 on the light card and 15.91:1 on the
+    dark one whatever page it lands on, and in the two mismatch cases the card
+    still separates from the page at 17.3:1 and 17.8:1. The failure mode is a
+    card of the wrong colour, never an unreadable one. A per-row mark could
+    not make that trade, because it has no card of its own.
 
     Emitted on one line: the pair sits inside a paragraph, and a hard-wrapped
     element puts a ``<`` at the start of a line, which the Markdown-hazard

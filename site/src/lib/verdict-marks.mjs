@@ -16,12 +16,16 @@
  * 566 rows come to 82 kB with no request and no flash, and the marks are in
  * the HTML that Pagefind indexes and that a reader without JavaScript sees.
  *
- * The fills come across unchanged. They were chosen against five grounds at
- * once - GitHub light, dark and dim, GitHub's table stripe, and this site's
- * own `#17181c` - precisely so that one file is right in every theme, and
- * `tests/test_conformance_badges.py` measures that rather than asserting it.
- * So there is nothing here to re-theme, and re-theming would fork a palette
- * that is currently proved correct in one place.
+ * The fills come across unchanged. They were chosen against every ground the
+ * marks land on at once - GitHub's three canvases and two table stripes, and
+ * this site's own two page colours (`#ffffff` and `#0d1114`, because
+ * `src/styles/theme.css` overrides Starlight's `--sl-color-black`) and two
+ * card colours - precisely so that one file is right in every theme, and
+ * `tests/test_conformance_badges.py` measures all nine rather than asserting
+ * them, GitHub's dimmed table stripe included, which is the single ground the
+ * fills fall short on and the one place that test names an exception. So
+ * there is nothing here to re-theme, and re-theming would fork a palette that
+ * is currently measured in one place.
  *
  * Read from the repository rather than copied into `public/`: a copy is a
  * second thing to keep in step, and `scripts/stage-media.mjs` exists for the

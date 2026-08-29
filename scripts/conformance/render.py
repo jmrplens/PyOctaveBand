@@ -65,14 +65,17 @@ _VERDICT_TEXT = {
 
 #: The ref every image in the committed report is pinned to. ``main``, because
 #: this file lives on ``main`` and is read there, on github.com and through
-#: raw: a reader browsing it has no commit in hand, and the badge on ``main``
-#: is by construction the badge for the numbers in the file, since the
-#: ``conformance`` target refuses to render a report with a failing check and
-#: CI fails a pull request whose regenerated tree differs by a byte.
+#: raw: a reader browsing it has no commit in hand, and there is no commit to
+#: pin to at the moment the file is written, since the file is generated
+#: before it is committed.
 #:
-#: The consequence to know about: a badge added on a branch 404s in this file
-#: until the branch lands. That is the same trade the README's figures already
-#: make, and the ``alt`` is the verdict, so a 404 degrades to the word.
+#: Two consequences to know about. A badge added on a branch 404s in this file
+#: until the branch lands; that is the same trade the README's figures already
+#: make, and the ``alt`` is the verdict, so a 404 degrades to the word. And
+#: nothing pinned this way may be a picture of a *number*, because a number on
+#: ``main`` is not the number in a branch's copy of this file - which is why
+#: the summary banner is not embedded here (see :func:`render_markdown`) while
+#: the four verdict marks, whose geometry never changes, are.
 _REF = "main"
 
 
@@ -80,11 +83,20 @@ def _status(verdict: str) -> str:
     """One verdict as the table prints it: the mark, then the word.
 
     Both, and not either. The word is what survives a plain-text diff, a
-    `raw` view and an image that never arrives; the mark is what makes a
-    column of 566 identical words scannable, and what tells a failing row from
-    a passing one before anything is read. The image is reference-style, so
-    the 117-character URL is written once for the whole document instead of
-    once per row.
+    `raw` view and an image that never arrives; the mark is what tells a
+    failing row from a passing one before anything is read. The image is
+    reference-style, so the 117-character URL is written once for the whole
+    document instead of once per row.
+
+    The two land on separate lines, not side by side, and that was measured
+    rather than intended: under GitHub's own table stylesheet the Status
+    column settles at about 53.5 px of content box while a 16 px mark plus
+    the word needs about 54, so at a 1012 px viewport 563 of 566 cells wrap
+    the word under the mark and at 1400 px 493 do. A non-breaking space
+    between them changes nothing, because GitHub caps the table at the
+    content width and the column has no room to grow into. It costs no
+    height - the rows are already two lines tall from the Quantity column -
+    so the stack is left alone and described here instead of being fought.
     """
     word = _VERDICT_TEXT.get(verdict, verdict)
     if verdict not in marks.MARK_OF:
@@ -241,6 +253,57 @@ def _numerical_validation_section(document: Mapping[str, Any], filters_ok: bool)
     return "\n".join(lines)
 
 
+#: How many rows the "closest to their limit" table prints. Ten, the same as
+#: the site page, because the two are the same answer to the same question and
+#: a reader comparing them should not have to work out which was truncated.
+_CLOSEST_ROWS = 10
+
+
+def _closest_section(document: Mapping[str, Any]) -> str:
+    """The checks with the least room left, ranked.
+
+    The single most informative thing the artefact holds, and until now the
+    one thing the published report did not print: the ``Used`` column already
+    gives it per row, but spread over 566 rows inside 59 collapsed sections
+    nobody can see which rows are near their limit. The pull-request comment
+    has ranked them since it was written and the site page ranks ten of them;
+    this makes the three surfaces answer the question the same way.
+
+    A high figure is not a failure - it is the room the check passes with -
+    so the caption says so, in the same words the site uses.
+    """
+    ranked = sorted(
+        (
+            check
+            for check in document["checks"]
+            if utilisation(check) is not None  # nothing to be a fraction of
+        ),
+        key=lambda check: utilisation(check) or 0.0,
+        reverse=True,
+    )
+    if not ranked:
+        return ""
+    lines = [
+        f"**The {_CLOSEST_ROWS} checks closest to their published limit**",
+        "",
+        "<sub>The fraction of its published tolerance each check consumes. "
+        "A high figure is not a failure: it is the room the check passes "
+        "with, and it never decides the verdict, which is settled at full "
+        "precision before any rounding. These are the rows a change is most "
+        "likely to push over.</sub>",
+        "",
+        "| Standard | Quantity | Computed | &#916; | Used |",
+        "|:---|:---|:---|:---|:---:|",
+    ]
+    lines += [
+        f"| {_cell(check['reference']['cite'])} | {_cell(check['quantity'])} "
+        f"| {_cell(computed_text(check))} | {_cell(deviation_text(check))} "
+        f"| {_used(check)} |"
+        for check in ranked[:_CLOSEST_ROWS]
+    ]
+    return "\n".join(lines)
+
+
 def _verdict_legend(verdicts: Sequence[str]) -> str:
     """The marks on this page, each beside the word it stands for.
 
@@ -255,11 +318,11 @@ def _verdict_legend(verdicts: Sequence[str]) -> str:
         for verdict in verdicts
     )
     return (
-        f"<sub><b>Verdict marks.</b> {entries}. Each mark accompanies the word "
-        "beside it and never replaces it, so the verdict survives an image "
-        "that never arrives; the silhouettes differ as much as the colours do, "
-        "so a reader who cannot separate the hues can still tell them "
-        "apart.</sub>"
+        f"<sub><b>Verdict marks.</b> {entries}. Every mark travels with the "
+        "verdict in words and never replaces it, so the verdict survives an "
+        "image that never arrives; the silhouettes differ as much as the "
+        "colours do, so a reader who cannot separate the hues can still tell "
+        "them apart.</sub>"
     )
 
 
@@ -334,12 +397,16 @@ def render_markdown(document: Mapping[str, Any] | None = None) -> tuple[str, int
     out: list[str] = []
     out.append("## Numerical conformance report")
     out.append("")
-    # The banner first, then the sentence: the picture carries the three counts
-    # at a glance, the sentence adds the two class claims no bar can state, and
-    # the banner's own alt is that same sentence, so a reader who never sees
-    # the image loses nothing but the glance.
-    out.append(marks.banner_picture(counts, _REF))
-    out.append("")
+    # No summary banner here, and this is the one place in the project that
+    # goes without one. This file is regenerated from the tree it sits in and
+    # gated byte for byte, so it claims to be *this* tree's report; the banner
+    # can only be cited at a fixed ref (see _REF), and a picture of main's
+    # count sitting above a sentence carrying the branch's count is a document
+    # arguing with itself. Any pull request that adds or removes a check would
+    # show it. The pull-request comment still leads with the banner, pinned to
+    # the head commit, where the picture and the sentence come from one tree;
+    # here the sentence carries every number the picture would, and two class
+    # claims no bar can state.
     summary = (
         f"**{passed}/{total} conformance checks pass** across "
         f"{counts['domains']} domains and {counts['standards']} standards"
@@ -369,6 +436,10 @@ def render_markdown(document: Mapping[str, Any] | None = None) -> tuple[str, int
     marked = _marked(source)
     out.append(_verdict_legend(marked))
     out.append("")
+    closest = _closest_section(source)
+    if closest:
+        out.append(closest)
+        out.append("")
     out.append(_numerical_validation_section(source, filters_ok))
     out.append("")
 

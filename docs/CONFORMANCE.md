@@ -19,15 +19,30 @@
 
 ## Numerical conformance report
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/badges/conformance-summary_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/badges/conformance-summary.svg" alt="All 566 conformance checks pass, across 59 domains and 373 standards"></picture>
-
 **566/566 conformance checks pass** across 59 domains and 373 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
-<sub><b>Verdict marks.</b> ![Pass][cv-pass] Pass · ![By design][cv-by-design] By design. Each mark accompanies the word beside it and never replaces it, so the verdict survives an image that never arrives; the silhouettes differ as much as the colours do, so a reader who cannot separate the hues can still tell them apart.</sub>
+<sub><b>Verdict marks.</b> ![Pass][cv-pass] Pass · ![By design][cv-by-design] By design. Every mark travels with the verdict in words and never replaces it, so the verdict survives an image that never arrives; the silhouettes differ as much as the colours do, so a reader who cannot separate the hues can still tell them apart.</sub>
+
+**The 10 checks closest to their published limit**
+
+<sub>The fraction of its published tolerance each check consumes. A high figure is not a failure: it is the room the check passes with, and it never decides the verdict, which is settled at full precision before any rounding. These are the rows a change is most likely to push over.</sub>
+
+| Standard | Quantity | Computed | &#916; | Used |
+|:---|:---|:---|:---|:---:|
+| Long 2e Table 14.9 (worked duct-borne sheet, supply path) | Fan to room, 8 octave bands -> 52/42/30/18/9/-2/-2/-1 dB at the receiver | 1 dB | 1 dB | 100 % |
+| ISO 9053-2:2020 Annex A.3 | Thermal boundary-layer thickness b | 0.00183 m | 0 m | 97 % |
+| Long, Architectural Acoustics 2e, Table 8.1 | Room modes of a 7 x 5 x 3 m room: the six printed frequencies, Hz | 42.27 Hz | -0.126 Hz | 97 % |
+| ISO 12354-2:2017 Annex C / Annex G Table G.4 | Floating floor: fo = 160 sqrt(s'/m') = 52,8 Hz, DeltaL = 30 lg(f/fo) over 21 bands, DeltaLw = 32,2 dB | 0.048 dB | 0.048 dB | 96 % |
+| ASA WG S3-79 CB_1.TST | Critical band, alternative importance | 0.41 | 0 | 95 % |
+| ASA WG S3-79 ECB_1.TST | Equally contributing, alternative importance | 0.41 | 0 | 95 % |
+| Vigran Eqs. (3.113)/(3.115), printed p. 96 | Corrugated 1 mm steel plate (H = 10 mm, L = 100 mm), f(2,2) | 102.09 Hz | 0.092 Hz | 92 % |
+| Long 2e Eqs. 13.27-13.33 (Reynolds diffuser self-noise) | 24 x 24 in rectangular diffuser, 312 cfm, 0.05 in pd -> the 33/32/29/23/15 dB row of Table 14.9 | 0.8853 dB | 0.8853 dB | 89 % |
+| Allard & Atalla 2e printed p. 254 (Doutres et al. 2007) | Limp-frame bulk-modulus limit for air, kPa | 20.27 kPa | 0.265 kPa | 88 % |
+| ISO 1996-2:2007 Annex C.5 Example 1 | Tonal audibility ΔLta (Formula C.3), 4 kHz tone | 13.66 dB | -0.044 dB | 88 % |
 
 <details>
 <summary><b>Numerical validation - filters &amp; weightings</b>: class showcase (IEC 61260-1 · IEC 61672-1 · ISO 7196)</summary>

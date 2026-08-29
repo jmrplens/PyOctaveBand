@@ -16,20 +16,24 @@ are *called*, and the URLs the documents cite them by, live one module over in
 :mod:`conformance.marks`, which the pull-request comment imports and which
 therefore may not touch matplotlib.
 
-**Light and dark, decided by measurement.** A per-row mark paints its own
-opaque ground and uses one fill that clears 3:1 on GitHub light (#ffffff),
-GitHub dark (#0d1117), GitHub dim (#22272e) and Starlight's #17181c alike, so
-the same single file is correct in every theme. This is why a shields.io badge
-has worked in both themes for a decade with no theme variant. A per-theme pair
-would need a ``<picture>`` element per row instead, and the three options
-measured on the real 566-row table come out at +10.6 kB for a reference-style
-single-file mark, +58.0 kB for the same mark written inline, and +162.8 kB for
-a ``<picture>`` pair per row - 282 characters of markup, repeated 573 times,
-to say one word. The banner is the opposite case: once per page, so the pair
-costs one element, and a card wants a card-coloured ground that no single fill
-gives on both #ffffff and #0d1117. It therefore ships as ``…-summary.svg``
-plus ``…-summary_dark.svg``, the ``_dark`` suffix the README's ``<picture>``
-blocks and ``site/src/components/ThemeImage.astro`` already pair on.
+**Light and dark, decided by measurement.** Three of the four marks paint an
+opaque silhouette; the fourth is a hollow ring, so the ground shows through
+its middle by design. Either way the file itself declares no ground, and one
+fill per verdict clears 3:1 on every ground the mark lands on but one - the
+table below names all nine and the exception, and
+``tests/test_conformance_badges.py`` measures them rather than trusting this
+paragraph. That is why the same single file is correct in every theme, which
+is also why a shields.io badge has worked in both for a decade with no theme
+variant. A per-theme pair would need a ``<picture>`` element per row instead,
+and the three options measured on the real 566-row table come out at +10.6 kB
+for a reference-style single-file mark, +58.0 kB for the same mark written
+inline, and +162.8 kB for a ``<picture>`` pair per row - 282 characters of
+markup, repeated 573 times, to say one word. The banner is the opposite case:
+once per page, so the pair costs one element, and a card wants a
+card-coloured ground that no single fill gives on both #ffffff and #0d1117.
+It therefore ships as ``…-summary.svg`` plus ``…-summary_dark.svg``, the
+``_dark`` suffix the README's ``<picture>`` blocks and
+``site/src/components/ThemeImage.astro`` already pair on.
 
 An in-SVG ``@media (prefers-color-scheme: dark)`` is deliberately not used.
 GitHub loads an SVG through ``<img>``, where the query resolves against the
@@ -88,24 +92,38 @@ _FONT_REGULAR = _FONT_DIR / "IBMPlexSans-Regular.ttf"
 
 # --- palette -----------------------------------------------------------------
 # Verdict fills, chosen against every ground the marks land on rather than
-# copied from a UI kit. Measured WCAG 2.2 contrast of each fill against the
-# five grounds, and of the white glyph against the fill itself:
+# copied from a UI kit. Every ground below was read off the surface itself -
+# the two GitHub table stripes from the live `--bgColor-muted`, the dimmed
+# pair from Primer's `dark_dimmed` tokens, the site's four from the computed
+# style of the built page - and not guessed from a theme's name. Measured WCAG
+# 2.2 contrast of each fill against all nine, and of the white glyph against
+# the fill itself:
 #
-#                    #ffffff  #f6f8fa  #0d1117  #22272e  #17181c   white on it
-#   green  #1f883d      4.52     4.24     4.19     3.33     3.93          4.52
-#   red    #da3633      4.61     4.33     4.11     3.26     3.85          4.61
-#   blue   #1f6feb      4.63     4.35     4.08     3.24     3.83          4.63
-#   grey   #6e7781      4.55     4.27     4.16     3.30     3.90          4.55
+#                        green    red   blue   grey
+#   #ffffff  gh light     4.52   4.61   4.63   4.55   canvas, and the site's
+#   #f6f8fa  gh light     4.24   4.33   4.35   4.27   even-row table stripe
+#   #0d1117  gh dark      4.19   4.11   4.08   4.16   canvas
+#   #151b23  gh dark      3.83   3.76   3.74   3.81   even-row table stripe
+#   #22272e  gh dimmed    3.33   3.26   3.24   3.30   canvas
+#   #2d333b  gh dimmed    2.82   2.76   2.75   2.80   even-row table stripe
+#   #0d1114  site dark    4.20   4.11   4.09   4.17   page
+#   #e7edf1  site light   3.83   3.90   3.92   3.85   summary card
+#   #1a2126  site dark    3.60   3.53   3.51   3.58   summary card
+#   white glyph on it     4.52   4.61   4.63   4.55
 #
-# The grounds are GitHub light, GitHub's own table stripe, GitHub dark, GitHub
-# dim and Starlight's page colour. All four fills clear 3:1 on every one of
-# them and carry the white glyph at 4.5:1, which is what makes one file per
-# mark correct in every theme and a per-row ``<picture>`` unnecessary.
+# Eight of the nine clear 3:1. GitHub's dimmed table stripe does not, and no
+# colour can fix it: clearing 3:1 on #2d333b needs a relative luminance of at
+# least 0.1972, and a white glyph reading at 4.5:1 on the fill allows at most
+# 0.1833, so the two requirements have no overlap at all. The glyph wins,
+# because it is the part of the mark that is read; every surface prints the
+# verdict in words in the same cell as the mark, so on that one theme the mark
+# is decoration next to a verdict already spelled out.
+# `test_conformance_badges.py` measures the whole table and proves the
+# emptiness of that band rather than trusting this comment.
 #
 # Dim is the ground that decides the blue. Primer's accent blue for light mode
 # (#0969da) measures 2.89 there and is rejected for it, as is Primer's danger
 # red (#cf222e, 2.81 on dim) and shields.io's green (#4c1, 2.12 under white).
-# ``test_conformance_badges.py`` measures this table rather than trusting it.
 _FILLS = {
     str(Verdict.PASS): "#1f883d",
     str(Verdict.FAIL): "#da3633",

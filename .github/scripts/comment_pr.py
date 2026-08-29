@@ -426,10 +426,21 @@ def main() -> None:
 
     conformance = conformance_section(head_document(), base_document(), sha)
     test_table, tests, failures = parse_test_results(test_dir, sha)
+    # No tests is not the same as no failures. The artefact directory is
+    # missing whenever the test jobs did not run or their upload did not
+    # arrive, and reporting that as a green "0 tests, 0 failures (all green)"
+    # states a result nothing produced - the more so now that the tick is a
+    # mark this project draws and signs rather than a font's emoji.
+    ran = tests > 0
     status = "all green" if failures == 0 else f"{failures} failing"
+    headline = (
+        f"Tests &amp; coverage: {tests} tests, {failures} failures ({status})"
+        if ran
+        else "Tests &amp; coverage: no results were uploaded for this run"
+    )
     # Raw <img>: the summary line below sits inside the <details> HTML block,
     # where Markdown image syntax ships as literal text.
-    verdict = outcome_mark(failures == 0, sha, html=True)
+    verdict = outcome_mark(ran and failures == 0, sha, html=True)
     blob = f"https://github.com/{repo}/blob/{sha}"
 
     # Hidden marker so the CI updates one sticky comment instead of posting a
@@ -440,7 +451,7 @@ def main() -> None:
 ---
 
 <details>
-<summary>{verdict} Tests &amp; coverage: {tests} tests, {failures} failures ({status})</summary>
+<summary>{verdict} {headline}</summary>
 
 {test_table}
 

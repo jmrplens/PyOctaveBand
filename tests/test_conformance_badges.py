@@ -37,9 +37,33 @@ from conformance.registry import Verdict
 
 _ROOT = pathlib.Path(__file__).resolve().parent.parent
 
-#: Every ground the marks are read on: GitHub light, GitHub dark, GitHub dim,
-#: and Starlight's page colour on the documentation site.
-_GROUNDS = ("#ffffff", "#0d1117", "#22272e", "#17181c")
+#: Every ground a mark is actually drawn on, read off the surface rather than
+#: named from a theme. GitHub stripes its Markdown tables
+#: (``tr:nth-child(2n)`` takes ``--bgColor-muted``) and forces table images
+#: transparent, so half of the report's 566 rows sit on the stripe and not on
+#: the canvas; the stripes were missing here entirely, which is how the one
+#: ground below 3:1 went unmeasured. The site's two page colours and two card
+#: colours come from the computed style of the built page: Starlight's
+#: ``--sl-color-black`` is overridden in ``site/src/styles/theme.css``, so the
+#: #17181c this tuple used to name is not a ground anywhere in this project.
+_GROUNDS = (
+    "#ffffff",  # GitHub light canvas, and the site's light page
+    "#f6f8fa",  # GitHub light table stripe
+    "#0d1117",  # GitHub dark canvas
+    "#151b23",  # GitHub dark table stripe
+    "#22272e",  # GitHub dimmed canvas
+    "#2d333b",  # GitHub dimmed table stripe
+    "#0d1114",  # the site's dark page
+    "#e7edf1",  # the site's light summary card
+    "#1a2126",  # the site's dark summary card
+)
+
+#: The one ground in :data:`_GROUNDS` no fill clears 3:1 on. Named here so the
+#: exception is a value one test pins rather than a silence in another.
+_DIMMED_STRIPE = "#2d333b"
+
+#: The four verdict fills, as the drawn marks use them.
+_FILLS = ("#1f883d", "#da3633", "#1f6feb", "#6e7781")
 
 #: The pictographic blocks, and nothing else: emoji and dingbats (U+2600-27BF,
 #: which is where the tick, the cross and the warning sign live), the symbols
@@ -78,6 +102,10 @@ def _rgb(colour: str) -> tuple[float, float, float]:
 
 def _contrast(colour: str, ground: str) -> float:
     return cfc.contrast_ratio(_rgb(colour), _rgb(ground))
+
+
+def _luminance(colour: str) -> float:
+    return cfc._relative_luminance(_rgb(colour))
 
 
 def _committed(name: str) -> str:
@@ -230,31 +258,83 @@ def test_the_bar_shows_a_failing_share_only_when_something_fails() -> None:
 # --------------------------------------------------------------------------
 
 
-def test_every_mark_clears_three_to_one_on_every_ground_it_lands_on() -> None:
+def _drawn_fills(source: str) -> list[str]:
+    """The colours one mark paints with, minus the glyph cut out of them."""
+    found = set(re.findall(r'(?:fill|stroke)="(#[0-9a-f]{6})"', source))
+    return sorted(found - {"#ffffff"})
+
+
+def test_every_mark_clears_three_to_one_on_every_ground_but_the_dimmed_stripe() -> None:
     """One file per mark is only defensible if one palette really works.
 
-    The alternative is a ``<picture>`` per row, which measures +163 kB on the
-    566-row table against +9.6 kB for a single-file mark, so this test is what
-    the size decision rests on.
+    The alternative is a per-theme ``<picture>`` pair per row, which measures
+    +162.8 kB on the 566-row table against the +10.0 kB the reference-style
+    single-file mark costs, so this test is what the size decision rests on.
+    Every ground in :data:`_GROUNDS` is one the
+    marks are really drawn on, GitHub's two table stripes included, because
+    half of the report's rows sit on a stripe rather than on the canvas.
     """
-    marks = cb.render_marks()
     poor: list[str] = []
-    for name, source in marks.items():
-        for colour in sorted(
-            set(re.findall(r'(?:fill|stroke)="(#[0-9a-f]{6})"', source))
-        ):
-            if colour == "#ffffff":  # the glyph, judged against its own fill
-                continue
+    for name, source in cb.render_marks().items():
+        for colour in _drawn_fills(source):
             poor += [
                 f"{name}: {colour} on {ground} is {_contrast(colour, ground):.2f}:1"
                 for ground in _GROUNDS
-                if _contrast(colour, ground) < 3.0
+                if ground != _DIMMED_STRIPE and _contrast(colour, ground) < 3.0
             ]
     assert poor == []
 
 
+def test_the_dimmed_table_stripe_is_the_only_ground_left_short_and_stays_close() -> (
+    None
+):
+    """The exception, pinned so it cannot quietly widen or quietly worsen.
+
+    GitHub's dimmed theme stripes its even table rows #2d333b, where the four
+    fills measure 2.75 to 2.82:1. They are left there deliberately - the next
+    test shows no colour could do better - so what this one guards is that the
+    shortfall stays confined to that one ground and stays within a fifth of
+    the target.
+    """
+    shortfalls = {
+        colour: _contrast(colour, _DIMMED_STRIPE)
+        for source in cb.render_marks().values()
+        for colour in _drawn_fills(source)
+    }
+    assert sorted(shortfalls) == sorted(_FILLS)
+    for colour, ratio in shortfalls.items():
+        assert 2.7 <= ratio < 3.0, f"{colour} on {_DIMMED_STRIPE} is {ratio:.2f}:1"
+
+
+def test_no_fill_can_clear_the_dimmed_stripe_and_still_carry_its_glyph() -> None:
+    """Why that exception is arithmetic and not an unfixed bug.
+
+    Clearing 3:1 on the dimmed stripe asks for a *brighter* fill; carrying a
+    white glyph at 4.5:1 asks for a darker one. The two windows do not
+    overlap, so the choice is which to keep, and the glyph wins because it is
+    the part of the mark that is read - and because the verdict is spelled out
+    in words beside the mark on every surface that draws one.
+    """
+    dimmest_that_clears_the_stripe = 3.0 * (_luminance(_DIMMED_STRIPE) + 0.05) - 0.05
+    brightest_that_carries_a_white_glyph = 1.05 / 4.5 - 0.05
+    assert dimmest_that_clears_the_stripe > brightest_that_carries_a_white_glyph
+    for fill in _FILLS:
+        assert _luminance(fill) <= brightest_that_carries_a_white_glyph
+
+
 def test_a_white_glyph_stays_readable_on_the_fill_under_it() -> None:
-    for fill in ("#1f883d", "#da3633", "#0969da"):
+    """The glyph is judged against the fills the marks are really drawn with.
+
+    Not against a list written beside them: an assertion about a colour the
+    tree no longer uses passes for ever and guards nothing.
+    """
+    drawn = {
+        colour
+        for source in cb.render_marks().values()
+        for colour in _drawn_fills(source)
+    }
+    assert drawn == set(_FILLS)
+    for fill in sorted(drawn):
         assert _contrast("#ffffff", fill) >= 4.5
 
 
@@ -391,13 +471,24 @@ def test_no_mark_in_the_report_stands_without_its_word() -> None:
     assert not re.search(r"!\[[^\]]*\]\[cv-[\w-]+\]\s*\|", _report())
 
 
-def test_the_report_leads_with_the_banner_for_its_own_counts() -> None:
+def test_the_report_states_its_own_counts_and_pictures_nobody_elses() -> None:
+    """The report's headline is a sentence, and deliberately not a banner.
+
+    A banner can only be cited at a fixed ref, and this file is regenerated
+    from whatever tree it sits in, so the picture would carry ``main``'s count
+    above a sentence carrying the branch's. Nothing pinned to ``main`` in this
+    file may state a number; the marks may, because their geometry never
+    changes. The pull-request comment is where the banner belongs, pinned to
+    the head commit.
+    """
     counts = artifact.load()["counts"]
     report = _report()
-    banner = cb.banner_picture(counts, "main")
-    assert banner in report
+    assert cb.BANNER not in report
+    assert cb.BANNER_DARK not in report
+    headline = f"**{counts['passing']}/{counts['checks']} conformance checks pass**"
+    assert headline in report
     # Above the first collapsible section, or it is not a summary of them.
-    assert report.index(banner) < report.index("<details>")
+    assert report.index(headline) < report.index("<details>")
 
 
 def test_the_report_legend_names_every_mark_it_draws_and_no_other() -> None:
