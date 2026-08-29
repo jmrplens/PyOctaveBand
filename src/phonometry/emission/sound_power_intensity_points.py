@@ -77,9 +77,13 @@ grade-3 figure raises rather than returning a plausible number.
 
 The uncertainty of the determination is Table 2's ``s``, with footnote 1
 placing the true value within :math:`\pm 2s` of the measured one at 95 %
-confidence. A band that fails criterion 2 may still be recorded, provided the
-95 % confidence interval of equation (B.3) accompanies it (B.1.2, clause 10.5
-c) and clause 10.6):
+confidence. Clause 10.6 says which row of the table to read it from: "debe
+especificarse el grado de precision logrado en el ensayo final de acuerdo a la
+tabla 2", the grade **achieved** and not the grade set out for, so a band that
+only reached grade 2 carries the grade-2 figure even where grade 1 was asked
+for. A band that fails criterion 2 may still be recorded, provided the 95 %
+confidence interval of equation (B.3) accompanies it (B.1.2, clause 10.5 c)
+and clause 10.6):
 
 .. math::
 
@@ -599,7 +603,10 @@ def normal_intensity_from_levels(
     :param negative: ``True`` where the printed level carried the ``(-)``
         prefix, i.e. where the flow is inward. A single bool applies to every
         level; an array broadcasts against ``levels``.
-    :return: The signed normal intensity in W/m^2, of the broadcast shape.
+    :return: The signed normal intensity in W/m^2, of the shape of ``levels``.
+        ``negative`` is broadcast onto that shape and never widens it: one flag
+        per level, or one flag for all of them, and a mask of any other shape
+        is refused rather than returning more intensities than levels went in.
     :raises ValueError: If a level is not finite, or ``negative`` cannot be
         broadcast against ``levels``.
     """
@@ -737,9 +744,13 @@ def partial_power_concentration(
     :raises ValueError: If the positions and areas disagree in length, an area
         is not positive and finite, an intensity is not finite, the total sound
         power is not positive (clause 9.2 puts the band outside the method), no
-        subset satisfies the two conditions of B.1.3, or the remainder leaves
-        no error budget for the subset. In the last two cases the procedure
-        cannot be carried out and Table B.3 action (d) applies instead.
+        subset satisfies the two conditions of B.1.3, the subset is a single
+        segment (equation (A.8) has no spread over one position, so equation
+        (B.4) is undefined), the algebraic mean normal intensity over the
+        remainder is not positive (A.2.3, which happens when the subset takes
+        all the outward flow), or the remainder leaves no error budget for the
+        subset. In the last four cases the procedure cannot be carried out and
+        Table B.3 action (d) applies instead.
     """
     grade = _check_grade(grade)
     i_n, seg = _positive_partial_powers(normal_intensity, areas)
@@ -777,6 +788,23 @@ def partial_power_concentration(
             "more than half the sound power, so the concentration test of ISO "
             "9614-1 clause 8.3.2 fails; take the alternative actions of Table "
             "B.3 (action d)."
+        )
+        raise ValueError(msg)
+    # B.1.3 bounds N_alpha from above and never from below, so one segment
+    # carrying more than half the power is legal for any N of three or more,
+    # and it is the archetypal concentrated source. Equation (B.4) is still
+    # undefined there: F4(alpha) is the Bessel-corrected spread of (A.8), which
+    # divides by N_alpha - 1. Refusing it by name beats dividing by zero and
+    # rounding the NaN up, which happens inside the constructor call below,
+    # where __post_init__ never gets to speak.
+    if subset_size < _MIN_VARIATION_OBSERVATIONS:
+        msg = (
+            "The sound power is concentrated in a single segment, and "
+            "equation (A.8) has no spread to measure over one position, so "
+            "equation (B.4) asks for the square of an undefined F4(alpha); "
+            "the optional procedure of ISO 9614-1 clause 8.3.2 cannot be "
+            "carried out, and the alternative actions of Table B.3 (action d) "
+            "apply instead."
         )
         raise ValueError(msg)
 
@@ -851,7 +879,11 @@ class DiscretePointIntensityResult:
     ``confidence_interval`` is the pair
     :math:`10 \lg (1 \pm 2 F_4 / \sqrt{N})` of equation (B.3) per band, which
     clause 10.5 c) requires beside the level of any band that failed criterion
-    2, and ``expanded_uncertainty`` the :math:`2s` of Table 2 footnote 1.
+    2, and ``expanded_uncertainty`` the :math:`2s` of Table 2 footnote 1 read
+    at the grade the band *achieved*, that being the grade clause 10.6 has a
+    report state: ``NaN`` in a band that reached no grade, for which Table 2
+    prints no ``s``, and ``None`` for the whole determination where
+    ``achieved_grade`` could not be established either.
     ``sound_power_level_a`` omits the bands outside the method and, per clause
     10.5 b), those failing criteria 1 and/or 2, which
     ``a_weighting_omitted_bands`` flags.
@@ -1140,7 +1172,6 @@ def _sampling_warnings(n_positions: int, area: float) -> None:
 def _band_indicators(
     intensity: np.ndarray,
     pressure_levels: np.ndarray | None,
-    applicable: np.ndarray,
 ) -> tuple[np.ndarray | None, np.ndarray | None, np.ndarray]:
     r"""Annex A ``F2``, ``F3`` and ``F4`` per band, ``NaN`` where undefined.
 
@@ -1148,6 +1179,14 @@ def _band_indicators(
     test conditions in that band, and F3 and F4 both divide by that mean, so
     the three indicators are ``NaN`` there rather than raising: the other bands
     of the same determination are unaffected, and the band is already flagged.
+
+    The mean A.2.3 names is the unweighted one over the N positions of
+    equation (A.9), which is not the area-weighted sum clause 9.2 puts a band
+    outside the method for, and the two part company as soon as the segments
+    differ in area. So this is the quantity the loop is guarded on: guarding on
+    the sum instead hands a column of negative mean to the coefficient of
+    variation, which raises, and one band then takes down a determination the
+    standard scopes its refusal away from ("en esa banda de frecuencia").
 
     F2 and F3 need the pressure levels and F4 does not, so a caller who
     measured only the intensity still gets the indicator criterion 2 is built
@@ -1160,9 +1199,12 @@ def _band_indicators(
     f3 = np.full(n_bands, np.nan)
     f4 = np.full(n_bands, np.nan)
     for band in range(n_bands):
-        if not applicable[band]:
-            continue
         column = intensity[:, band]
+        # ``not mean > 0`` rather than ``mean <= 0``, as at the other sites
+        # here: a mean that is not a number is a band whose test conditions
+        # were not met, not one that met them.
+        if not float(np.mean(column)) > 0.0:
+            continue
         if pressure_levels is None:
             f4[band] = _coefficient_of_variation(
                 column, non_positive_message=_F4_NON_POSITIVE
@@ -1284,18 +1326,37 @@ def _confidence_interval(f4: np.ndarray, positions: int) -> np.ndarray:
 
 
 def _expanded_uncertainty(
-    frequencies: np.ndarray | None, band_type: BandType, grade: DeterminationGrade
+    achieved: np.ndarray | None, frequencies: np.ndarray | None, band_type: BandType
 ) -> np.ndarray | None:
-    r"""Table 2 footnote 1's :math:`\pm 2s`, per band, in decibels."""
-    if frequencies is None or grade == "survey":
+    r"""Table 2 footnote 1's :math:`\pm 2s` per band, at the grade *achieved*.
+
+    Clause 10.6 is explicit about which grade a report states: "debe
+    especificarse el grado de precision logrado en el ensayo final de acuerdo a
+    la tabla 2". The grade achieved, not the grade asked for, so the row of
+    Table 2 a band is read in is the row of the grade that band reached. A band
+    that only reached grade 2 carries the wider grade-2 figure even where grade
+    1 was requested, which is the direction that matters: the alternative
+    understates the uncertainty of every band that fell short.
+
+    A band that reached no grade carries no figure at all. Table 2 tabulates
+    ``s`` against the three grades and prints no row for a determination that
+    qualified as none of them, and what clause 10.5 c) offers such a band
+    instead is the confidence interval of equation (B.3), which the result
+    carries beside this. ``None`` for the whole determination where no per-band
+    grade could be established, since there is then nothing achieved to state.
+    """
+    if achieved is None or frequencies is None:
         return None
-    return np.asarray(
-        [
-            2.0 * determination_standard_deviation(grade, float(f), band_type=band_type)
-            for f in frequencies
-        ],
-        dtype=np.float64,
-    )
+    values = np.full(frequencies.size, np.nan)
+    for band, reached in enumerate(achieved):
+        if reached == "none":
+            continue
+        values[band] = 2.0 * determination_standard_deviation(
+            cast(DeterminationGrade, reached),
+            float(frequencies[band]),
+            band_type=band_type,
+        )
+    return values
 
 
 def _a_weighted_factor(
@@ -1471,15 +1532,17 @@ def sound_power_intensity_points(
     ``F3``; ``F4`` is evaluated from the intensities alone and so is always
     present. Supplying ``pressure_residual_index`` gives the dynamic capability
     :math:`L_\mathrm{d} = \delta_{pI0} - K` and criterion 1; supplying
-    ``frequencies`` gives criterion 2 through the Table B.2 factor ``C``, the
-    Table 2 uncertainty and the A-weighted total. ``temporal_intensity``
-    carries the ``M`` short-time samples of the initial test into ``F1``.
+    ``frequencies`` gives criterion 2 through the Table B.2 factor ``C`` and
+    the A-weighted total. ``temporal_intensity`` carries the ``M`` short-time
+    samples of the initial test into ``F1``.
 
     The requested ``grade`` selects ``K``, the omission rule of clause 10.5 b)
     and the tabulated factors; the grade each band actually reaches is reported
     per band in ``achieved_grade``, and for the A-weighted sum in
     ``achieved_grade_a``. The survey grade appears only in the latter, Table
-    B.2 giving it no per-band ``C``.
+    B.2 giving it no per-band ``C``. ``expanded_uncertainty`` follows the
+    achieved grade rather than the requested one, which is the grade clause
+    10.6 has a report state, so it needs everything ``achieved_grade`` needs.
 
     :param normal_intensity: ``(N, bands)`` or ``(N,)`` signed normal
         intensity, W/m^2.
@@ -1579,7 +1642,7 @@ def sound_power_intensity_points(
     indicators_available = n_positions >= _MIN_VARIATION_OBSERVATIONS
     f1 = _temporal_indicator(temporal_intensity, n_bands)
     if indicators_available:
-        f2, f3, f4 = _band_indicators(intensity, levels, applicable)
+        f2, f3, f4 = _band_indicators(intensity, levels)
     else:
         f2, f3, f4 = None, None, None
 
@@ -1652,7 +1715,7 @@ def sound_power_intensity_points(
         minimum_positions=minimum_positions,
         achieved_grade=achieved,
         confidence_interval=interval,
-        expanded_uncertainty=_expanded_uncertainty(freqs, band_type, grade),
+        expanded_uncertainty=_expanded_uncertainty(achieved, freqs, band_type),
         surface_area=surface_area,
         positions=int(n_positions),
         sound_power_level_a=level_a,

@@ -293,6 +293,24 @@ def test_level_conversion_refuses_a_sign_mask_of_another_shape() -> None:
         emission.normal_intensity_from_levels([70.0, 65.0], negative=[True] * 3)
 
 
+def test_the_sign_mask_never_widens_the_result() -> None:
+    """The result has the shape of the levels, not of the two broadcast together.
+
+    ``negative`` carries the "(-)" of one printed level, so it is broadcast
+    onto the levels and never the other way round: three levels under a (2, 1)
+    mask are not six intensities, they are a mask that does not fit.
+    """
+    levels = np.array([70.0, 66.0, 63.0])
+    values = emission.normal_intensity_from_levels(
+        levels, negative=np.array([True, False, True])
+    )
+    assert values.shape == levels.shape
+    with pytest.raises(ValueError, match="does not broadcast"):
+        emission.normal_intensity_from_levels(
+            levels, negative=np.array([[True], [False]])
+        )
+
+
 def test_a_genuinely_negative_partial_power_is_kept_and_summed() -> None:
     """Negative partial power is normal; only the sum going negative is fatal."""
     areas = np.full(10, 1.0)
@@ -429,6 +447,48 @@ def test_f4_is_available_without_the_pressure_levels() -> None:
     np.testing.assert_allclose(result.f4, reference.f4)
 
 
+def _unequal_segments_with_a_negative_mean() -> tuple[np.ndarray, np.ndarray]:
+    """Ten segments whose first band is positive by power and negative by mean.
+
+    One large segment flowing outward against nine small ones flowing inward:
+    the area-weighted sum of clause 9.2 is positive, so the band is inside the
+    method, while the unweighted mean over the positions that A.2.3 conditions
+    the indicators on is not. The second band is ordinary, and is there to be
+    watched for collateral damage.
+    """
+    areas = np.array([5.0] + [0.5] * 9)
+    inward = np.array([1.0e-4] + [-5.0e-5] * 9)
+    return np.column_stack([inward, np.full(10, 1.0e-5)]), areas
+
+
+def test_a_band_of_negative_mean_intensity_goes_nan_on_its_own() -> None:
+    """A.2.3 refuses "en esa banda de frecuencia", not in the determination."""
+    intensity, areas = _unequal_segments_with_a_negative_mean()
+    assert float(np.sum(intensity[:, 0] * areas)) > 0.0
+    assert float(np.mean(intensity[:, 0])) < 0.0
+
+    result = emission.sound_power_intensity_points(intensity, areas)
+    assert result.f4 is not None
+    assert math.isnan(float(result.f4[0]))
+    assert float(result.f4[1]) == pytest.approx(0.0)
+    np.testing.assert_array_equal(result.not_applicable_band, [False, False])
+    assert np.all(np.isfinite(result.sound_power_level))
+
+
+def test_the_pressure_indicators_go_nan_in_that_band_too() -> None:
+    """F2 and F3 divide by the same mean, and take the same route out."""
+    intensity, areas = _unequal_segments_with_a_negative_mean()
+    result = emission.sound_power_intensity_points(
+        intensity, areas, pressure_levels=np.full((10, 2), 80.0)
+    )
+    assert result.f2 is not None
+    assert result.f3 is not None
+    assert result.f4 is not None
+    for indicator in (result.f2, result.f3, result.f4):
+        assert math.isnan(float(indicator[0]))
+        assert math.isfinite(float(indicator[1]))
+
+
 def test_f1_comes_from_the_initial_test_and_is_optional() -> None:
     """F1 is the coefficient of variation of the M short-time samples (A.1)."""
     intensity, areas = _uniform_surface()
@@ -541,6 +601,38 @@ def test_a_uniform_field_over_many_positions_reaches_the_precision_grade() -> No
     assert result.achieved_grade[0] == "precision"
 
 
+def test_too_much_inward_flow_leaves_the_band_ungraded() -> None:
+    """Figure B.1's third gate stops the grade, not only the action code.
+
+    Forty positions, thirty flowing outward at 0,94 and ten inward at 1,0
+    (arbitrary units), which puts F3 - F2 at 3,2 dB, just past the gate, while
+    holding F4 low enough that criterion 2 is comfortably satisfied at
+    grade 2: 11 x F4^2 is 38,5 against the forty positions measured. So the
+    only thing standing between this band and a grade is the inward flow, and
+    the verdict has to be "none" all the same.
+    """
+    areas = np.full(40, 1.0)
+    intensity = np.concatenate([np.full(30, 0.9394e-5), np.full(10, -1.0e-5)])
+    result = emission.sound_power_intensity_points(
+        intensity,
+        areas,
+        pressure_levels=np.full(40, 80.0),
+        pressure_residual_index=40.0,
+        frequencies=[125.0],
+        band_type="octave",
+        grade="precision",
+    )
+    assert result.f2 is not None
+    assert result.f3 is not None
+    assert result.f4 is not None
+    assert result.achieved_grade is not None
+    assert float(result.f3[0] - result.f2[0]) > 3.0
+    assert result.criterion_1 is not None
+    assert bool(result.criterion_1[0])
+    assert result.positions > 11.0 * float(result.f4[0]) ** 2
+    assert result.achieved_grade[0] == "none"
+
+
 # ---------------------------------------------------------------------------
 # Table B.3 action codes, one case per code (Figure B.1's order)
 # ---------------------------------------------------------------------------
@@ -612,6 +704,26 @@ def test_action_c_when_criterion_2_fails_with_moderate_inward_flow() -> None:
     assert result.f3 is not None
     excess = float(result.f3[0] - result.f2[0])
     assert 1.0 <= excess <= 3.0
+    assert result.criterion_2 is not None
+    assert not bool(result.criterion_2[0])
+    assert result.required_actions()[0] == (ActionCode.INCREASE_POSITION_DENSITY,)
+
+
+def test_action_c_still_holds_halfway_between_the_two_rows() -> None:
+    """The row-c and row-d split is at 1 dB, and 1,5 dB is still row c.
+
+    The case above sits at about 2 dB, which leaves the whole of 1 dB to 2 dB
+    untested and a limit anywhere in it indistinguishable from the printed one.
+    One inward position of -1,54 against nine outward of 1,0 puts F3 - F2 at
+    1,5 dB, halfway across that gap.
+    """
+    intensity = np.full(10, 1.0e-5)
+    intensity[0] = -1.5388e-5
+    result = _qualified_case(intensity)
+    assert result.f2 is not None
+    assert result.f3 is not None
+    excess = float(result.f3[0] - result.f2[0])
+    assert 1.4 < excess < 1.6
     assert result.criterion_2 is not None
     assert not bool(result.criterion_2[0])
     assert result.required_actions()[0] == (ActionCode.INCREASE_POSITION_DENSITY,)
@@ -740,21 +852,105 @@ def test_confidence_interval_lower_end_is_nan_without_an_argument() -> None:
     assert float(result.confidence_interval[0, 1]) > 0.0
 
 
-@pytest.mark.filterwarnings("ignore:The A-weighted total sums every")
+def _three_bands_of_three_different_grades() -> emission.DiscretePointIntensityResult:
+    """One determination whose bands reach grade 1, grade 2 and no grade.
+
+    Twenty unit segments over three octave bands, asked for at grade 1. The
+    250 Hz band alternates about its mean at F4 = 0,90, so 29 x F4^2 is 23,5
+    against twenty positions and criterion 2 fails at grade 1 while 19 x F4^2
+    is 15,4 and it holds at grade 2. The 1 kHz band is uniform and reaches
+    grade 1. The 2 kHz band is uniform too, but is measured in a pressure
+    field 15 dB louder, which puts F2 at 25 dB over an Ld of 20 dB and fails
+    criterion 1.
+    """
+    areas = np.full(20, 1.0)
+    alternating = 1.0e-5 * (1.0 + 0.8772 * np.array([1.0, -1.0] * 10))
+    intensity = np.column_stack([alternating, np.full(20, 1.0e-5), np.full(20, 1.0e-5)])
+    levels = np.full((20, 3), 80.0)
+    levels[:, 2] = 95.0
+    return emission.sound_power_intensity_points(
+        intensity,
+        areas,
+        pressure_levels=levels,
+        pressure_residual_index=30.0,
+        frequencies=[250.0, 1000.0, 2000.0],
+        band_type="octave",
+        grade="precision",
+    )
+
+
 def test_expanded_uncertainty_is_twice_the_table_2_standard_deviation() -> None:
     """Table 2 footnote 1: the true level lies within +/- 2s at 95 %."""
+    result = _three_bands_of_three_different_grades()
+    assert result.achieved_grade is not None
+    assert list(result.achieved_grade) == ["engineering", "precision", "none"]
+    assert result.expanded_uncertainty is not None
+    assert float(result.expanded_uncertainty[0]) == pytest.approx(
+        2.0
+        * emission.determination_standard_deviation(
+            "engineering", 250.0, band_type="octave"
+        )
+    )
+    assert float(result.expanded_uncertainty[1]) == pytest.approx(
+        2.0
+        * emission.determination_standard_deviation(
+            "precision", 1000.0, band_type="octave"
+        )
+    )
+    np.testing.assert_allclose(result.expanded_uncertainty[:2], [4.0, 2.0])
+
+
+def test_the_uncertainty_is_read_at_the_grade_the_band_achieved() -> None:
+    """Clause 10.6 states the grade *achieved*, so Table 2 is read in its row.
+
+    Grade 1 was asked for and only the 1 kHz band reached it. Reading Table 2
+    at the grade requested would give the whole spectrum the grade-1 figures
+    of 3 dB, 2 dB and 2 dB, and would understate by a decibel exactly the band
+    that fell short.
+    """
+    result = _three_bands_of_three_different_grades()
+    assert result.grade == "precision"
+    assert result.expanded_uncertainty is not None
+    requested = [
+        2.0
+        * emission.determination_standard_deviation(
+            "precision", frequency, band_type="octave"
+        )
+        for frequency in (250.0, 1000.0, 2000.0)
+    ]
+    assert float(result.expanded_uncertainty[0]) > requested[0]
+    assert float(result.expanded_uncertainty[1]) == pytest.approx(requested[1])
+
+
+def test_a_band_that_reached_no_grade_carries_no_uncertainty() -> None:
+    """Table 2 has no row for a determination that qualified as nothing.
+
+    Clause 10.5 c) gives such a band the confidence interval of Formula (B.3)
+    instead, which the result carries beside this and which stays finite.
+    """
+    result = _three_bands_of_three_different_grades()
+    assert result.achieved_grade is not None
+    assert result.achieved_grade[2] == "none"
+    assert result.expanded_uncertainty is not None
+    assert math.isnan(float(result.expanded_uncertainty[2]))
+    assert result.confidence_interval is not None
+    assert np.all(np.isfinite(result.confidence_interval[2]))
+
+
+@pytest.mark.filterwarnings("ignore:The A-weighted total sums every")
+def test_an_unqualified_determination_states_no_uncertainty_either() -> None:
+    """No criteria inputs, no achieved grade, so nothing clause 10.6 can state."""
     areas = np.full(10, 1.0)
     intensity = np.full((10, 3), 1.0e-5)
-    frequencies = [125.0, 500.0, 2000.0]
     result = emission.sound_power_intensity_points(
         intensity,
         areas,
-        frequencies=frequencies,
+        frequencies=[125.0, 500.0, 2000.0],
         band_type="octave",
         grade="engineering",
     )
-    assert result.expanded_uncertainty is not None
-    np.testing.assert_allclose(result.expanded_uncertainty, [6.0, 4.0, 3.0])
+    assert result.achieved_grade is None
+    assert result.expanded_uncertainty is None
 
 
 # ---------------------------------------------------------------------------
@@ -786,6 +982,77 @@ def test_a_weighted_total_omits_the_bands_that_failed_the_criteria() -> None:
         )
     )
     assert result.sound_power_level_a == pytest.approx(expected)
+
+
+def test_a_band_that_fails_only_criterion_2_leaves_the_sum_as_well() -> None:
+    """Clause 10.5 b) says "criteria 1 and/or 2", and the "or" half is real.
+
+    The case above omits a band on criterion 1 alone, which a screening that
+    read criterion 1 only would omit just the same. Here the instrument is
+    ample in both bands and criterion 1 holds in both, and what the low band
+    fails is criterion 2: its field alternates between 2,0 and 0,2, and
+    29 x F4^2 is 21,6 against the ten positions measured.
+    """
+    areas = np.full(10, 1.0)
+    intensity = np.column_stack(
+        [np.concatenate([np.full(5, 2.0e-5), np.full(5, 0.2e-5)]), np.full(10, 1.0e-5)]
+    )
+    result = emission.sound_power_intensity_points(
+        intensity,
+        areas,
+        pressure_levels=np.full((10, 2), 80.0),
+        pressure_residual_index=40.0,
+        frequencies=[1000.0, 2000.0],
+        band_type="octave",
+    )
+    assert result.criterion_1 is not None
+    assert result.criterion_2 is not None
+    assert result.a_weighting_omitted_bands is not None
+    np.testing.assert_array_equal(result.criterion_1, [True, True])
+    np.testing.assert_array_equal(result.criterion_2, [False, True])
+    np.testing.assert_array_equal(result.a_weighting_omitted_bands, [True, False])
+    corrections = np.array([0.0, 1.2])
+    expected = float(result.sound_power_level[1]) + corrections[1]
+    assert result.sound_power_level_a == pytest.approx(expected)
+
+
+def test_note_11_reads_c_in_the_mid_row_when_the_top_bands_are_quiet() -> None:
+    """Note 11: below half the A-weighted power up top, C comes from 200-630 Hz.
+
+    B.1.2 otherwise takes the largest C over the summed range, which the 1 kHz
+    octave sets at 57 for grade 1. Here the 1 kHz band carries 7,5 % of the
+    A-weighted power, so Note 11 sends the lookup to the row covering the
+    250 Hz and 500 Hz octaves instead, where C is 29. Twenty positions against
+    an A-weighted F4 of 0,664 clear 29 x F4^2 = 12,8 and do not clear
+    57 x F4^2 = 25,2, so the two readings hand back different grades.
+    """
+    areas = np.full(20, 1.0)
+    alternating = 1.0e-5 * (1.0 + 0.7 * np.array([1.0, -1.0] * 10))
+    intensity = np.column_stack([alternating, alternating, np.full(20, 0.05e-5)])
+    frequencies = np.array([250.0, 500.0, 1000.0])
+    result = emission.sound_power_intensity_points(
+        intensity,
+        areas,
+        pressure_levels=np.full((20, 3), 80.0),
+        pressure_residual_index=40.0,
+        frequencies=frequencies,
+        band_type="octave",
+        grade="precision",
+    )
+    assert result.a_weighting_omitted_bands is not None
+    assert not np.any(result.a_weighting_omitted_bands)
+
+    corrections = np.array([-8.6, -3.2, 0.0])
+    contributions = 10.0 ** (0.1 * (result.sound_power_level + corrections))
+    assert float(contributions[2]) < 0.5 * float(np.sum(contributions))
+
+    required = result.positions / result.field_nonuniformity_a**2
+    assert (
+        emission.position_count_factor("precision", 250.0, band_type="octave")
+        < required
+        < emission.position_count_factor("precision", 1000.0, band_type="octave")
+    )
+    assert result.achieved_grade_a == "precision"
 
 
 def test_a_weighted_screening_is_announced_when_it_cannot_be_done() -> None:
@@ -915,11 +1182,95 @@ def test_a_stricter_grade_asks_for_more_new_positions() -> None:
     assert precision.additional_positions >= engineering.additional_positions
 
 
+def test_a_non_uniform_remainder_spends_part_of_the_error_budget() -> None:
+    """Eq. (B.4) with every term of Delta_alpha alive.
+
+    A perfectly uniform remainder has F4(1 - alpha) = 0, which cancels the
+    whole ``(1 - alpha) * 2/sqrt(N_(1-alpha)) * F4(1 - alpha)`` term and leaves
+    Delta_alpha = Delta/alpha, so neither the 2 nor the square root in it is
+    pinned by such a case. Here the remainder falls away steadily instead, and
+    every factor of both formulae carries its own weight in the answer.
+    """
+    areas = np.full(12, 1.0)
+    intensity = np.array(
+        [3.0e-5, 2.4e-5, 1.8e-5, 1.4e-5]
+        + [1.2e-5, 1.0e-5, 9.0e-6, 8.0e-6, 7.0e-6, 6.0e-6, 5.0e-6, 4.0e-6]
+    )
+    outcome = emission.partial_power_concentration(
+        intensity, areas, grade="engineering"
+    )
+
+    subset, remainder = intensity[:4], intensity[4:]
+    alpha = float(np.sum(subset)) / float(np.sum(intensity))
+    f4_subset = float(np.std(subset, ddof=1) / np.mean(subset))
+    f4_remainder = float(np.std(remainder, ddof=1) / np.mean(remainder))
+    spent = (1.0 - alpha) * (2.0 / math.sqrt(remainder.size)) * f4_remainder
+    delta_alpha = (0.29 - spent) / alpha
+
+    assert outcome.subset_positions == 4
+    assert outcome.remainder_nonuniformity == pytest.approx(f4_remainder)
+    assert outcome.remainder_nonuniformity > 0.0
+    assert spent == pytest.approx(0.1027, abs=5.0e-4)
+    assert outcome.subset_error_factor == pytest.approx(delta_alpha)
+    assert outcome.additional_positions == 5
+    assert outcome.additional_positions == math.ceil(
+        4.0 * (f4_subset / delta_alpha) ** 2
+    )
+    # What the degenerate case cannot tell apart: a remainder that spends
+    # nothing asks for 2 new positions, a factor of 3 in place of the 4 asks
+    # for 4, and dropping the square root asks for 3.
+    assert outcome.additional_positions != math.ceil(
+        4.0 * (f4_subset * alpha / 0.29) ** 2
+    )
+    assert outcome.additional_positions != math.ceil(
+        3.0 * (f4_subset / delta_alpha) ** 2
+    )
+    assert outcome.additional_positions != math.ceil(
+        4.0
+        * (
+            f4_subset
+            * alpha
+            / (0.29 - (1.0 - alpha) * (2.0 / remainder.size) * f4_remainder)
+        )
+        ** 2
+    )
+
+
 def test_a_spread_out_field_has_no_concentration_to_exploit() -> None:
     """B.1.3 requires the subset to be fewer than half the segments."""
     areas = np.full(10, 1.0)
     intensity = np.full(10, 1.0e-5)
     with pytest.raises(ValueError, match="carries more than half the sound power"):
+        emission.partial_power_concentration(intensity, areas)
+
+
+def test_a_subset_of_exactly_half_the_segments_is_not_a_concentration() -> None:
+    """B.1.3 asks for fewer than half, and half is not fewer than half.
+
+    Four segments of eight at 1,9 and four at 1,0 (arbitrary units): the top
+    three carry 5,7 of the 11,6 total and so do not reach half, and it takes
+    the fourth to pass it. That is a subset of exactly N/2, which the standard
+    does not allow, with the power comparison itself well clear of the
+    boundary.
+    """
+    areas = np.full(8, 1.0)
+    intensity = np.array([1.9e-5] * 4 + [1.0e-5] * 4)
+    with pytest.raises(ValueError, match="carries more than half the sound power"):
+        emission.partial_power_concentration(intensity, areas)
+
+
+def test_a_source_concentrated_in_one_segment_is_refused_by_name() -> None:
+    """Eq. (A.8) has no spread over one position, so Eq. (B.4) is undefined.
+
+    B.1.3 bounds N_alpha from above only, so one segment of twelve carrying
+    more than half the power satisfies the condition it states and is the
+    archetypal concentrated source. The procedure still cannot be run, and
+    saying so beats dividing by ``N_alpha - 1`` and rounding up the NaN.
+    """
+    areas = np.full(12, 1.0)
+    intensity = np.array([2.0e-4] + [1.0e-5] * 11)
+    assert intensity[0] > np.sum(intensity[1:])
+    with pytest.raises(ValueError, match="concentrated in a single segment"):
         emission.partial_power_concentration(intensity, areas)
 
 
@@ -931,10 +1282,35 @@ def test_a_non_uniform_remainder_exhausts_the_error_budget() -> None:
         emission.partial_power_concentration(intensity, areas)
 
 
+def test_a_remainder_flowing_inward_has_no_field_indicator() -> None:
+    """A.2.3 again, on the remainder: the subset took all the outward flow.
+
+    Three large segments carry the whole power, and the subset that passes
+    half of it takes only two of them; what is left is one of those three
+    against nine small segments flowing inward, whose algebraic mean normal
+    intensity is negative. F4(1 - alpha) is then not defined, and (B.4) has no
+    remainder term to subtract.
+    """
+    areas = np.array([10.0, 10.0, 10.0] + [0.01] * 9)
+    intensity = np.array([1.0e-4] * 3 + [-1.2e-5] * 9)
+    assert float(np.sum(intensity * areas)) > 0.0
+    with pytest.raises(ValueError, match="algebraic mean normal intensity"):
+        emission.partial_power_concentration(intensity, areas)
+
+
 def test_the_concentration_procedure_needs_a_determinable_band() -> None:
     """Clause 9.2 first: a net-negative band has no power to concentrate."""
     areas = np.full(12, 1.0)
     intensity = np.full(12, -1.0e-6)
+    with pytest.raises(ValueError, match="not positive"):
+        emission.partial_power_concentration(intensity, areas)
+
+
+def test_a_band_of_exactly_zero_net_power_has_nothing_to_concentrate() -> None:
+    """A surface in balance is outside the method too, not merely on its edge."""
+    areas = np.full(12, 1.0)
+    intensity = np.array([1.0e-5, -1.0e-5] * 6)
+    assert float(np.sum(intensity * areas)) == 0.0
     with pytest.raises(ValueError, match="not positive"):
         emission.partial_power_concentration(intensity, areas)
 
@@ -950,6 +1326,15 @@ def test_the_concentration_procedure_works_on_one_band() -> None:
 # ---------------------------------------------------------------------------
 # Clause 8.2 sampling warnings
 # ---------------------------------------------------------------------------
+def _sound_power_warnings(recwarn: pytest.WarningsRecorder) -> list[str]:
+    """Every clause 8.2 warning a determination raised, as its text."""
+    return [
+        str(record.message)
+        for record in recwarn
+        if issubclass(record.category, emission.SoundPowerWarning)
+    ]
+
+
 def test_fewer_than_ten_positions_warns() -> None:
     """Clause 8.2 asks for a minimum of 10 positions."""
     intensity, areas = _uniform_surface(positions=6)
@@ -957,10 +1342,41 @@ def test_fewer_than_ten_positions_warns() -> None:
         emission.sound_power_intensity_points(intensity, areas)
 
 
+def test_nine_positions_is_one_short_and_ten_is_not(
+    recwarn: pytest.WarningsRecorder,
+) -> None:
+    """The printed minimum is ten, so the warning stops at ten and not at nine."""
+    nine, nine_areas = _uniform_surface(positions=9)
+    with pytest.warns(emission.SoundPowerWarning, match="at least 10"):
+        emission.sound_power_intensity_points(nine, nine_areas)
+    recwarn.clear()
+    ten, ten_areas = _uniform_surface(positions=10)
+    emission.sound_power_intensity_points(ten, ten_areas)
+    assert not _sound_power_warnings(recwarn)
+
+
 def test_a_density_below_one_position_per_square_metre_warns() -> None:
     """Clause 8.2 asks for at least one position per square metre."""
     areas = np.full(10, 4.0)
     intensity = np.full((10, 1), 1.0e-5)
+    with pytest.warns(emission.SoundPowerWarning, match="per square metre"):
+        emission.sound_power_intensity_points(intensity, areas)
+
+
+def test_one_position_per_square_metre_exactly_is_dense_enough(
+    recwarn: pytest.WarningsRecorder,
+) -> None:
+    """Clause 8.2 asks for one per square metre, which parity meets."""
+    intensity, areas = _uniform_surface(positions=10, area=1.0)
+    assert float(np.sum(areas)) == 10.0
+    emission.sound_power_intensity_points(intensity, areas)
+    assert not _sound_power_warnings(recwarn)
+
+
+def test_forty_nine_positions_are_short_of_the_clause_8_2_relaxations() -> None:
+    """Both relaxations need fifty, so forty-nine over 196 m2 still warns."""
+    areas = np.full(49, 4.0)
+    intensity = np.full((49, 1), 1.0e-5)
     with pytest.warns(emission.SoundPowerWarning, match="per square metre"):
         emission.sound_power_intensity_points(intensity, areas)
 
@@ -972,11 +1388,22 @@ def test_fifty_positions_reach_the_clause_8_2_relaxations(
     areas = np.full(50, 4.0)
     intensity = np.full((50, 1), 1.0e-5)
     emission.sound_power_intensity_points(intensity, areas)
-    assert not [
-        record
-        for record in recwarn
-        if issubclass(record.category, emission.SoundPowerWarning)
-    ]
+    assert not _sound_power_warnings(recwarn)
+
+
+def test_two_positions_are_enough_for_the_bessel_corrected_spread() -> None:
+    """(A.1) and (A.8) divide by N - 1, so two positions is the fewest that works.
+
+    Clause 8.2 wants ten and the determination says so, but the arithmetic of
+    Annex A is defined from two, and a two-position surface must come back with
+    an F4 rather than with nothing.
+    """
+    areas = np.full(2, 1.0)
+    intensity = np.array([[1.2e-5], [0.8e-5]])
+    with pytest.warns(emission.SoundPowerWarning, match="at least 10"):
+        result = emission.sound_power_intensity_points(intensity, areas)
+    assert result.f4 is not None
+    assert float(result.f4[0]) == pytest.approx(0.2 * math.sqrt(2.0))
 
 
 # ---------------------------------------------------------------------------

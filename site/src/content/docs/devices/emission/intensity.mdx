@@ -719,12 +719,17 @@ position and applies Formulae (A.8) and (A.9) to those, which is
 `field_nonuniformity_a`.
 
 The uncertainty of the result is Table 2's $s$, with footnote 1 placing the
-true level within $\pm 2s$ of the measured one at 95 % confidence; and a band
-that failed criterion 2 may still be recorded, provided the 95 % confidence
-interval of Formula (B.3) accompanies it:
+true level within $\pm 2s$ of the measured one at 95 % confidence. Clause 10.6
+says which row of the table to read it in: **the grade achieved** in the final
+test, not the grade the determination set out for, so `expanded_uncertainty`
+follows `achieved_grade` band by band. Five bands here reached grade 1 and
+carry its figures; 125 Hz reached no grade, Table 2 prints no $s$ for that, and
+what clause 10.5 c) offers such a band instead is the 95 % confidence interval
+of Formula (B.3), which is also what accompanies a band recorded after failing
+criterion 2:
 
 ```python
-print(power.expanded_uncertainty)            # [6. 4. 4. 3. 3. 3.] dB
+print(power.expanded_uncertainty)          # [nan  3.  3.  2.  2.  2.] dB
 print(np.round(power.confidence_interval[0], 1))     # [-1.7  1.2] dB
 ```
 

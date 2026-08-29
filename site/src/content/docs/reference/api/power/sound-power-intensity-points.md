@@ -88,9 +88,13 @@ grade-3 figure raises rather than returning a plausible number.
 
 The uncertainty of the determination is Table 2's `s`, with footnote 1
 placing the true value within $\pm 2s$ of the measured one at 95 %
-confidence. A band that fails criterion 2 may still be recorded, provided the
-95 % confidence interval of equation (B.3) accompanies it (B.1.2, clause 10.5
-c) and clause 10.6):
+confidence. Clause 10.6 says which row of the table to read it from: "debe
+especificarse el grado de precision logrado en el ensayo final de acuerdo a la
+tabla 2", the grade **achieved** and not the grade set out for, so a band that
+only reached grade 2 carries the grade-2 figure even where grade 1 was asked
+for. A band that fails criterion 2 may still be recorded, provided the 95 %
+confidence interval of equation (B.3) accompanies it (B.1.2, clause 10.5 c)
+and clause 10.6):
 
 $$
 10 \log_{10}\!\left( 1 \pm \frac{2 F_4}{\sqrt{N}} \right)~\text{dB} \tag{Eq. B.3}
@@ -241,7 +245,11 @@ sum, whose own field non-uniformity is `field_nonuniformity_a`
 `confidence_interval` is the pair
 $10 \lg (1 \pm 2 F_4 / \sqrt{N})$ of equation (B.3) per band, which
 clause 10.5 c) requires beside the level of any band that failed criterion
-2, and `expanded_uncertainty` the $2s$ of Table 2 footnote 1.
+2, and `expanded_uncertainty` the $2s$ of Table 2 footnote 1 read
+at the grade the band *achieved*, that being the grade clause 10.6 has a
+report state: `NaN` in a band that reached no grade, for which Table 2
+prints no `s`, and `None` for the whole determination where
+`achieved_grade` could not be established either.
 `sound_power_level_a` omits the bands outside the method and, per clause
 10.5 b), those failing criteria 1 and/or 2, which
 `a_weighting_omitted_bands` flags.
@@ -385,7 +393,7 @@ error, and only the *sum* going negative puts a band outside the method
 | `levels` | Normal intensity levels `XX` in decibels, of any shape. Each is the level of the magnitude, so it is positive for a level above the reference intensity and negative for one below it; the direction of flow is `negative`, never the sign of this number. |
 | `negative` | `True` where the printed level carried the `(-)` prefix, i.e. where the flow is inward. A single bool applies to every level; an array broadcasts against `levels`. |
 
-**Returns:** The signed normal intensity in W/m^2, of the broadcast shape.
+**Returns:** The signed normal intensity in W/m^2, of the shape of `levels`. `negative` is broadcast onto that shape and never widens it: one flag per level, or one flag for all of them, and a mask of any other shape is refused rather than returning more intensities than levels went in.
 
 **Raises**
 
@@ -447,7 +455,7 @@ budget, and the procedure cannot help.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If the positions and areas disagree in length, an area is not positive and finite, an intensity is not finite, the total sound power is not positive (clause 9.2 puts the band outside the method), no subset satisfies the two conditions of B.1.3, or the remainder leaves no error budget for the subset. In the last two cases the procedure cannot be carried out and Table B.3 action (d) applies instead. |
+| ValueError | If the positions and areas disagree in length, an area is not positive and finite, an intensity is not finite, the total sound power is not positive (clause 9.2 puts the band outside the method), no subset satisfies the two conditions of B.1.3, the subset is a single segment (equation (A.8) has no spread over one position, so equation (B.4) is undefined), the algebraic mean normal intensity over the remainder is not positive (A.2.3, which happens when the subset takes all the outward flow), or the remainder leaves no error budget for the subset. In the last four cases the procedure cannot be carried out and Table B.3 action (d) applies instead. |
 
 ## PartialPowerConcentration
 
@@ -559,15 +567,17 @@ Supplying `pressure_levels` evaluates the Annex A indicators `F2` and
 `F3`; `F4` is evaluated from the intensities alone and so is always
 present. Supplying `pressure_residual_index` gives the dynamic capability
 $L_\mathrm{d} = \delta_{pI0} - K$ and criterion 1; supplying
-`frequencies` gives criterion 2 through the Table B.2 factor `C`, the
-Table 2 uncertainty and the A-weighted total. `temporal_intensity`
-carries the `M` short-time samples of the initial test into `F1`.
+`frequencies` gives criterion 2 through the Table B.2 factor `C` and
+the A-weighted total. `temporal_intensity` carries the `M` short-time
+samples of the initial test into `F1`.
 
 The requested `grade` selects `K`, the omission rule of clause 10.5 b)
 and the tabulated factors; the grade each band actually reaches is reported
 per band in `achieved_grade`, and for the A-weighted sum in
 `achieved_grade_a`. The survey grade appears only in the latter, Table
-B.2 giving it no per-band `C`.
+B.2 giving it no per-band `C`. `expanded_uncertainty` follows the
+achieved grade rather than the requested one, which is the grade clause
+10.6 has a report state, so it needs everything `achieved_grade` needs.
 
 **Parameters**
 

@@ -748,12 +748,18 @@ una sola intensidad por posición y les aplica las ecuaciones (A.8) y (A.9), que
 es `field_nonuniformity_a`.
 
 La incertidumbre del resultado es la $s$ de la tabla 2, con la nota 1 situando
-el valor verdadero dentro de $\pm 2s$ del medido con una confianza del 95 %; y
-una banda que haya fallado el criterio 2 aún puede registrarse, siempre que la
-acompañe el intervalo de confianza del 95 % de la ecuación (B.3):
+el valor verdadero dentro de $\pm 2s$ del medido con una confianza del 95 %. El
+apartado 10.6 dice en qué fila de la tabla leerla: **el grado alcanzado** en el
+ensayo final, no el grado que la determinación se propuso, así que
+`expanded_uncertainty` sigue a `achieved_grade` banda a banda. Aquí cinco
+bandas alcanzan el grado 1 y llevan sus cifras; la de 125 Hz no alcanza
+ninguno, la tabla 2 no imprime ninguna $s$ para eso, y lo que el apartado
+10.5 c) le ofrece a una banda así es el intervalo de confianza del 95 % de la
+ecuación (B.3), que es también lo que acompaña a una banda registrada tras
+fallar el criterio 2:
 
 ```python
-print(power.expanded_uncertainty)            # [6. 4. 4. 3. 3. 3.] dB
+print(power.expanded_uncertainty)          # [nan  3.  3.  2.  2.  2.] dB
 print(np.round(power.confidence_interval[0], 1))     # [-1.7  1.2] dB
 ```
 

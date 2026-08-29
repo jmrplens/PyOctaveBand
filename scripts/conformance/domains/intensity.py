@@ -473,9 +473,18 @@ def _chk_iso9614_1_table_b3() -> Outcome:
     "New positions N* on the concentrated subset of the measurement surface",
 )
 def _chk_iso9614_1_additional_positions() -> Outcome:
-    """B.1.3 written out beside the library's own reading of it."""
+    """B.1.3 written out beside the library's own reading of it.
+
+    The remainder falls away steadily rather than sitting flat, so that
+    F4(1 - alpha) is not zero and the whole of Delta_alpha is exercised: a
+    uniform remainder cancels the term the standard spends its error budget
+    on, and N* would come out of Delta/alpha alone.
+    """
     areas = np.full(12, 1.0)
-    intensity = np.array([3.0e-5, 2.4e-5, 1.8e-5, 1.4e-5] + [8.0e-6] * 8)
+    intensity = np.array(
+        [3.0e-5, 2.4e-5, 1.8e-5, 1.4e-5]
+        + [1.2e-5, 1.0e-5, 9.0e-6, 8.0e-6, 7.0e-6, 6.0e-6, 5.0e-6, 4.0e-6]
+    )
     outcome = ph.emission.partial_power_concentration(
         intensity, areas, grade="engineering"
     )
