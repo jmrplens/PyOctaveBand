@@ -3,12 +3,12 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 566,
-    "passing": 566,
+    "checks": 572,
+    "passing": 572,
     "failing": 0,
     "domains": 59,
     "standards": 373,
-    "citations": 509,
+    "citations": 515,
     "designations": 114,
     "sources": 84
   },
@@ -114,8 +114,8 @@
     {
       "id": "intensity-sound-power",
       "title": "Intensity & sound power",
-      "checks": 10,
-      "passing": 10
+      "checks": 16,
+      "passing": 16
     },
     {
       "id": "building-prediction-uncertainty",
@@ -2830,6 +2830,189 @@
         "value": 1.42e-14
       },
       "precision": 9,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-9614-1-1993-table-b-2/criterion-2-factor-c-per-band-and-grade-and-the-a-weighted-grade-3-value",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 9614-1",
+        "edition": "1993",
+        "clause": "Table B.2",
+        "cite": "ISO 9614-1:1993 Table B.2"
+      },
+      "quantity": "Criterion-2 factor C per band and grade, and the A-weighted grade-3 value",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "59 tabulated values of C reproduced"
+      },
+      "computed": {
+        "value": 0.0,
+        "label": "max absolute deviation 0.000"
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-9614-1-1993-table-2/standard-deviation-s-of-the-determination-per-band-and-grade",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 9614-1",
+        "edition": "1993",
+        "clause": "Table 2",
+        "cite": "ISO 9614-1:1993 Table 2"
+      },
+      "quantity": "Standard deviation s of the determination per band and grade",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "59 tabulated values of s reproduced"
+      },
+      "computed": {
+        "value": 0.0,
+        "label": "max absolute deviation 0.000 dB"
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-9614-1-1993-table-b-1/error-factor-delta-0-20-and-0-29-for-all-bands-0-60-a-weighted",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 9614-1",
+        "edition": "1993",
+        "clause": "Table B.1",
+        "cite": "ISO 9614-1:1993 Table B.1"
+      },
+      "quantity": "Error factor Delta: 0,20 and 0,29 for all bands, 0,60 A-weighted",
+      "kind": "record",
+      "expected": {
+        "label": "precision (all bands) = 0.2; engineering (all bands) = 0.29; survey (A-weighted) = 0.6",
+        "record": {
+          "precision (all bands)": 0.2,
+          "engineering (all bands)": 0.29,
+          "survey (A-weighted)": 0.6
+        }
+      },
+      "computed": {
+        "label": "precision (all bands) = 0.2; engineering (all bands) = 0.29; survey (A-weighted) = 0.6",
+        "record": {
+          "precision (all bands)": 0.2,
+          "engineering (all bands)": 0.29,
+          "survey (A-weighted)": 1.0
+        }
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-9614-1-1993-eq-12/discrete-positions-tiling-a-scanned-surface-give-the-same-lw",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 9614-1",
+        "edition": "1993",
+        "clause": "Eq. (12)",
+        "cite": "ISO 9614-1:1993 Eq. (12)"
+      },
+      "quantity": "Discrete positions tiling a scanned surface give the same LW",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "0 dB error"
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 12,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-9614-1-1993-table-b-3/five-action-codes-each-reached-by-the-case-figure-b-1-routes-to-it",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 9614-1",
+        "edition": "1993",
+        "clause": "Table B.3",
+        "cite": "ISO 9614-1:1993 Table B.3"
+      },
+      "quantity": "Five action codes, each reached by the case Figure B.1 routes to it",
+      "kind": "record",
+      "expected": {
+        "label": "F1 > 0,6 -> e; F2 > Ld -> ab; (F3 - F2) > 3 dB -> ab; criterion 2, 1 dB <= (F3 - F2) <= 3 dB -> c; criterion 2, (F3 - F2) <= 1 dB -> d"
+      },
+      "computed": {
+        "label": "F1 > 0,6 -> e; F2 > Ld -> ab; (F3 - F2) > 3 dB -> ab; criterion 2, 1 dB <= (F3 - F2) <= 3 dB -> c; criterion 2, (F3 - F2) <= 1 dB -> d"
+      },
+      "deviation": {
+        "label": "0 of 5 rows disagree"
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-9614-1-1993-eq-b-4/new-positions-n-on-the-concentrated-subset-of-the-measurement-surface",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 9614-1",
+        "edition": "1993",
+        "clause": "Eq. (B.4)",
+        "cite": "ISO 9614-1:1993 Eq. (B.4)"
+      },
+      "quantity": "New positions N* on the concentrated subset of the measurement surface",
+      "kind": "scalar",
+      "expected": {
+        "value": 5.0,
+        "label": "N* = 5 positions"
+      },
+      "computed": {
+        "value": 5.0,
+        "label": "N* = 5 positions"
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
       "verdict": "pass"
     },
     {

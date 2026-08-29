@@ -1360,6 +1360,77 @@ which is the check that enforces the rule; see
   ([`tests/emission/test_intensity_compliance.py`](https://github.com/jmrplens/phonometry/blob/main/tests/emission/test_intensity_compliance.py)).
 - **Status:** unreported (national translation, not the issuing body's text).
 
+## UNE-EN ISO 9614-1:2010, clause 9.1 (the normal intensity called a magnitude inside a signed sum)
+
+- **Location:** clause 9.1, the symbol list under Formula (11)
+  $P_i = I_{\mathrm{n}i} \cdot S_i$, of UNE-EN ISO 9614-1 (March 2010), which
+  declares itself "la versión en español de la Norma Europea EN ISO
+  9614-1:2009", the European adoption of ISO 9614-1:1993.
+- **The print:** "$I_{\mathrm{n}i}$ es el **módulo** de la componente de la
+  intensidad acústica normal medida en la posición $i$ sobre la superficie de
+  medida".
+- **The problem:** a magnitude has no sign, and the sign is what the rest of
+  the method turns on. The same clause 9.1 prints, two paragraphs below that
+  line, the conversion to apply when the level of a position is written
+  $(-)\,XX$ dB: $I_{\mathrm{n}i} = -I_0 \times 10^{XX/10}$, a negative
+  $I_{\mathrm{n}i}$. Clause 3.6.1, which defines the very quantity Formula (11)
+  computes, calls $I_{\mathrm{n}i}$ "la componente normal, **con su signo**, de
+  la intensidad acústica medida en la posición $i$". And clause 9.2 makes
+  $\sum_i P_i$ *being negative* the condition that puts a frequency band
+  outside the method, which no sum of magnitudes and positive areas can ever
+  be. Read as a magnitude the method loses the one thing measurement at
+  discrete points is for: separating the energy leaving the source from the
+  energy flowing back in through part of the surface, which is what $F_3$
+  (Formulae (A.6) and (A.7)) and $F_4$ (Formulae (A.8) and (A.9)) are built to
+  quantify from the algebraic mean of the same $I_{\mathrm{n}i}$.
+- **Evidence:** the three clauses read against one another; the intended
+  reading is decidable from the document alone, since only the signed reading
+  leaves clause 9.2 and Annex A with anything to say. Verified on PDF pages 10,
+  18 and 22 (printed pp. 10, 18 and 22) of UNE-EN ISO 9614-1:2010.
+- **Library behaviour:** implements the signed reading throughout.
+  [`sound_power_intensity_points`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_intensity_points.py)
+  sums signed partial powers, flags the bands whose sum is not positive as
+  outside the method, and reports $F_3 - F_2$ as the excess the inward flow
+  produces; `normal_intensity_from_levels` carries the $(-)$ of the print as a
+  separate argument, because the printed level never holds it. Pinned by
+  `test_a_genuinely_negative_partial_power_is_kept_and_summed` and the signed
+  conversion tests in
+  [`tests/emission/test_sound_power_intensity_points.py`](https://github.com/jmrplens/phonometry/blob/main/tests/emission/test_sound_power_intensity_points.py).
+- **Status:** unreported. Whether the word originates in the ISO text or in the
+  national translation could not be established from the Spanish print alone,
+  and the contradiction it creates is internal to that print either way.
+
+## UNE-EN ISO 9614-1:2010, clauses B.1.3 and 10.5 c) (cross-references to A.2.3 and to a "chapter B.3")
+
+- **Location:** Annex B, clause B.1.3, the sentence introducing the two
+  separate evaluations of $F_4$; and clause 10.5 c), the reporting requirement
+  for a band that fails criterion 2.
+- **The print:** B.1.3 reads "Calcular el indicador $F_4$ separadamente de
+  acuerdo al apartado A.2.3 para: a) el subconjunto de segmentos $N_\alpha$ con
+  área total $S_\alpha$, y b) los segmentos restantes." Clause 10.5 c) reads
+  "Una referencia a la incertidumbre prevista en el nivel de potencia acústica
+  determinada para cada banda de frecuencia en la que no se satisfaga el
+  criterio 2 del anexo B, de acuerdo a la ecuación (véase el capítulo B.3)."
+- **The problem:** two cross-references that point at nothing. Clause A.2.3 is
+  "Indicador de potencia parcial negativa", which defines $F_3$; $F_4$ is
+  defined in A.2.4, "Indicador de no uniformidad de campo", by Formulae (A.8)
+  and (A.9). And Annex B has no clause B.3: its divisions are B.1 (with B.1.1
+  to B.1.5) and B.2. The only thing in Annex B that gives the expected
+  uncertainty of a band failing criterion 2 is Formula (B.3), the 95 %
+  confidence interval $10 \lg(1 \pm 2 F_4 / \sqrt{N})$, which B.1.2 introduces
+  with that very condition, so the reference is to the formula and its number
+  has been read as a clause number.
+- **Evidence:** the headings of A.2.3 and A.2.4 and the divisions of Annex B,
+  read directly. Verified on PDF pages 20, 22, 23, 24 and 25 (printed pp. 20,
+  22, 23, 24 and 25) of UNE-EN ISO 9614-1:2010.
+- **Library behaviour:** follows the intended targets. $F_4(\alpha)$ and
+  $F_4(1-\alpha)$ are computed per A.2.4 in
+  [`partial_power_concentration`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_intensity_points.py),
+  and the confidence interval of Formula (B.3) is reported for every band, so
+  a band that fails criterion 2 can be recorded with it as clause 10.5 c)
+  requires. Neither reference changes a number, so no other change was needed.
+- **Status:** unreported (cross-reference defects, no numerical consequence).
+
 ## ISO/PAS 1996-3:2022, Clause 5 (cross-references of r and d)
 
 - **Location:** Clause 5, Formula (2), the definitions of the symbols of the

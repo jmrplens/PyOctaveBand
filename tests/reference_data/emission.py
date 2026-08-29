@@ -83,3 +83,94 @@ IEC61043_PHASE_INDEX_DB = 20.0
 IEC61043_PHASE_FREQUENCY_HZ = 1000.0
 IEC61043_PHASE_SPACING_M = 0.025
 IEC61043_PHASE_MISMATCH_DEG = 0.26
+
+# ---------------------------------------------------------------------------
+# ISO 9614-1:1993 (UNE-EN ISO 9614-1:2010, the Spanish official version of
+# EN ISO 9614-1:2009, which adopts the 1993 ISO text unchanged). Four printed
+# tables, transcribed cell for cell from the rendered pages; the page offset of
+# this edition is zero, so PDF page N carries printed folio N.
+#
+# The three graded tables share one shape and one asymmetry: grades 1 and 2 are
+# tabulated band by band with the A-weighted cell blank, and grade 3 carries
+# only an A-weighted value with every band cell blank. A blank below is None,
+# and it is blank in the print, not zero and not "not applicable".
+# ---------------------------------------------------------------------------
+
+# Table 1, "Factor de error de desviación, K" (printed p. 11), in dB, by grade.
+ISO9614_1_TABLE_1_K: dict[str, float] = {
+    "precision": 10.0,
+    "engineering": 10.0,
+    "survey": 7.0,
+}
+
+# Rows of Table 2 and Table B.2, which share their two frequency columns:
+# (octave centre range in Hz, one-third-octave centre range in Hz). The 6 300 Hz
+# row has no octave counterpart, and the last row of each table is A-weighted
+# and has no frequency column at all.
+ISO9614_1_BAND_ROWS: list[tuple[tuple[float, float] | None, tuple[float, float]]] = [
+    ((63.0, 125.0), (50.0, 160.0)),
+    ((250.0, 500.0), (200.0, 630.0)),
+    ((1000.0, 4000.0), (800.0, 5000.0)),
+    (None, (6300.0, 6300.0)),
+]
+
+# Table 2, "Incertidumbre en la determinación de los niveles de potencia
+# sonora" (printed p. 13): the standard deviation s in dB, as
+# (grade 1, grade 2, grade 3) per row of ISO9614_1_BAND_ROWS. Footnote 1: the
+# true level lies within +/- 2s of the measured one with 95 % confidence.
+# Footnote 2 fixes the A-weighted range at 63 Hz to 4 kHz or 50 Hz to 6,3 kHz;
+# footnote 3 calls the grade-3 value tentative.
+ISO9614_1_TABLE_2_S: list[tuple[float | None, float | None, float | None]] = [
+    (2.0, 3.0, None),
+    (1.5, 2.0, None),
+    (1.0, 1.5, None),
+    (2.0, 2.5, None),
+]
+ISO9614_1_TABLE_2_S_A_WEIGHTED: tuple[float | None, float | None, float | None] = (
+    None,
+    None,
+    4.0,
+)
+
+# Table B.1, "Factor de error Delta" (printed p. 25): one row for all bands and
+# one A-weighted row, each as (grade 1, grade 2, grade 3).
+ISO9614_1_TABLE_B1_ALL_BANDS: tuple[float | None, float | None, float | None] = (
+    0.20,
+    0.29,
+    None,
+)
+ISO9614_1_TABLE_B1_A_WEIGHTED: tuple[float | None, float | None, float | None] = (
+    None,
+    None,
+    0.60,
+)
+
+# Table B.2, "Valores para el factor C" (printed p. 25): the criterion-2 factor
+# C, as (grade 1, grade 2, grade 3) per row of ISO9614_1_BAND_ROWS, then the
+# A-weighted row whose footnote reads "63 Hz a 4 kHz ó 50 Hz a 6,3 kHz".
+ISO9614_1_TABLE_B2_C: list[tuple[float | None, float | None, float | None]] = [
+    (19.0, 11.0, None),
+    (29.0, 19.0, None),
+    (57.0, 29.0, None),
+    (19.0, 14.0, None),
+]
+ISO9614_1_TABLE_B2_C_A_WEIGHTED: tuple[float | None, float | None, float | None] = (
+    None,
+    None,
+    8.0,
+)
+
+# Table B.3, "Acciones a tomar para incrementar el grado de precisión de la
+# determinación" (printed p. 26): the criterion of each row and the action code
+# or codes Figure B.1 routes it to. The second row prints "a o b", two
+# alternatives under one criterion.
+ISO9614_1_TABLE_B3: list[tuple[str, tuple[str, ...]]] = [
+    ("F1 > 0,6", ("e",)),
+    ("F2 > Ld o (F3 - F2) > 3 dB", ("a", "b")),
+    ("No se satisface el criterio 2 y 1 dB <= (F3 - F2) <= 3 dB", ("c",)),
+    (
+        "No se satisface el criterio 2, (F3 - F2) <= 1 dB y el procedimiento "
+        "del apartado 8.3.2 o bien falla, o bien no se selecciona",
+        ("d",),
+    ),
+]

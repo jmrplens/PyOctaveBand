@@ -2511,6 +2511,219 @@ table stops stepping in whole decibels (the instrument goes 14 dB at 315 Hz,
 tenth of a degree of channel mismatch is a demanding specification, and why a
 probe must be verified with the spacer it will actually be used with.
 
+## Sound power at discrete points (ISO 9614-1)
+
+Everything above qualifies a measurement. ISO 9614-1 is the part that turns it
+into a sound power level, and it is the ordinary way of using a p-p probe:
+hold it still at each of $N$ points, one per segment of a surface enclosing
+the source, and read the signed normal intensity there. The partial power of a
+segment and the sound power of the source are then (Formulae (11) and (12)):
+
+$$
+P_i = I_{\mathrm{n}i} \, S_i, \qquad
+L_W = 10 \log_{10} \frac{\sum_{i=1}^{N} P_i}{P_0},
+\qquad P_0 = 10^{-12}~\mathrm{W}
+$$
+
+Formula (12) prints without the absolute-value bars that the general
+definition (Formula (8)) carries, because clause 9.2 disposes of the negative
+case instead: **the method is not applicable to a band in which the sum is
+negative**. One segment carrying inward flow is a different matter, and is
+normal; it is what $F_3$ measures.
+
+Clause 8.2 sizes the position set: at least one position per square metre and
+at least ten in all, distributed as evenly as the segment areas allow. Both
+relaxations the clause offers (one position per 2 m² where extraneous noise is
+significant, fifty positions over a surface larger than 50 m²) end at fifty
+positions, so a sparser set than that is worth saying so about, and the
+determination warns.
+
+```python
+import numpy as np
+from phonometry import emission
+
+# Measurement surface: a 2.0 m x 1.8 m x 1.4 m box over a reflecting floor,
+# five faces and 14.24 m2 in all, sampled at 16 positions.
+segment_areas = np.array([0.9] * 4 + [0.9333] * 6 + [0.84] * 6)
+frequencies = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+
+# The field: nearly uniform pressure, a reactivity that grows towards low
+# frequency, and two positions of the 125 Hz band through which power flows
+# back in.
+rng = np.random.default_rng(9614)
+reactivity = np.array([9.5, 7.0, 5.0, 4.0, 3.2, 3.0])
+pressure_levels = 82.0 + rng.normal(0.0, 0.6, (16, 6))
+band_mean = 10.0 ** ((82.0 - reactivity) / 10.0) * 1e-12
+normal_intensity = band_mean * (1.0 + rng.normal(0.0, 0.22, (16, 6)))
+normal_intensity[:2, 0] = -0.4 * band_mean[0]
+
+power = emission.sound_power_intensity_points(
+    normal_intensity,
+    segment_areas,
+    pressure_levels=pressure_levels,
+    pressure_residual_index=19.0,
+    frequencies=frequencies,
+    band_type="octave",
+)
+print(np.round(power.sound_power_level, 1))  # [83.3 86.8 88.1 89.6 90.4 90.4]
+print(round(power.sound_power_level_a, 1))   # 96.1 dB(A)
+print(round(power.surface_area, 2), power.positions)   # 14.24 16
+```
+
+### The sign is in the print, not in the number
+
+ISO 9614-1 never prints a signed level. A normal intensity level is written
+`XX dB` when the flow through the segment is outward and `(-) XX dB` when it is
+inward, with `XX` a positive number in both cases (clause 3.5, and the two
+unnumbered equations of clauses 9.1 and A.2.3):
+
+$$
+I_{\mathrm{n}i} = I_0 \times 10^{XX/10}, \qquad
+I_{\mathrm{n}i} = -I_0 \times 10^{XX/10}, \qquad
+I_0 = 10^{-12}~\mathrm{W/m^2}
+$$
+
+So a caller reading a printed table has to carry the sign separately, which is
+what the `negative` argument is for. It broadcasts, so one position of a
+surface can flow inward while the rest flow outward:
+
+```python
+inward = emission.normal_intensity_from_levels(66.0, negative=True)
+print(f"{inward:.3e}")                       # -3.981e-06 W/m2, flowing in
+```
+
+### Which grade the determination reaches
+
+Annex B numbers **two** criteria, not three. Figure B.1 gates the
+determination on four questions, in this order, and Table B.3 says what to
+change when each one fails:
+
+| Gate | Where | Action when it fails |
+| --- | --- | --- |
+| $F_1 \le 0.6$ | Table B.3 | (e) |
+| $L_\mathrm{d} > F_2$ (criterion 1) | Formula (B.1) | (a) or (b) |
+| $F_3 - F_2 \le 3$ dB | Figure B.1 | (a) or (b) |
+| $N > C F_4^2$ (criterion 2) | Formula (B.2) | (c) or (d) |
+
+Only the first failing gate is acted on: every action box in Figure B.1
+returns to the next measurement rather than to the gate below it, so
+`required_actions()` reports one action set per band and stops there. Two
+codes mean the standard offers a choice, which is how Table B.3 prints them
+("a **or** b").
+
+```python
+print(power.dynamic_capability_index[0])     # 9.0 dB (Ld = 19 - 10)
+print(np.round(power.f2, 1))                 # [9.6 6.8 5.3 3.9 3.1 3.3]
+print(power.criterion_1)      # [False  True  True  True  True  True]
+print(list(power.achieved_grade))
+# ['none', 'precision', 'precision', 'precision', 'precision', 'precision']
+codes = ["".join(a.value for a in band) for band in power.required_actions()]
+print(codes)                                 # ['ab', '', '', '', '', '']
+print(power.required_actions()[0][0].criterion)  # F2 > Ld or (F3 - F2) > 3 dB
+```
+
+The 125 Hz band is the interesting one. Its $F_2$ of 9.6 dB sits just above the
+instrument's dynamic capability of 9 dB, so criterion 1 fails there and no
+amount of averaging will fix it: Table B.3 offers moving the surface (a) or
+shielding it (b). Clause 10.5 b) then omits that band from the A-weighted
+determination and asks for the omission to be stated, which
+`a_weighting_omitted_bands` is:
+
+```python
+print(power.a_weighting_omitted_bands)  # [ True False False False False False]
+```
+
+### Grade 3 is an A-weighted determination
+
+Table B.2 tabulates the criterion-2 factor $C$ band by band for grades 1 and 2
+and gives grade 3 one A-weighted value, 8, and no band column at all. Table
+B.1 does the same with the error factor $\Delta$ (0.20 and 0.29 for all bands,
+0.60 A-weighted) and Table 2 with the standard deviation $s$ of the
+determination. Three tables agree, so this is the standard's design rather
+than a gap in it: **a per-band determination reaches grade 1 or grade 2, and
+grade 3 is reached, if at all, by the A-weighted sum**. Asking for a per-band
+grade-3 figure raises rather than returning a plausible number.
+
+```python
+print(emission.position_count_factor("engineering", 1000.0,
+                                     band_type="octave"))   # 29.0
+print(emission.position_count_factor("survey"))             # 8.0 (A-weighted)
+print(power.achieved_grade_a, round(power.field_nonuniformity_a, 2))
+# precision 0.13
+```
+
+The A-weighted determination has a field non-uniformity of its own: B.1.2 sums
+the A-weighted band intensities of each position into one intensity per
+position and applies Formulae (A.8) and (A.9) to those, which is
+`field_nonuniformity_a`.
+
+The uncertainty of the result is Table 2's $s$, with footnote 1 placing the
+true level within $\pm 2s$ of the measured one at 95 % confidence; and a band
+that failed criterion 2 may still be recorded, provided the 95 % confidence
+interval of Formula (B.3) accompanies it:
+
+```python
+print(power.expanded_uncertainty)            # [6. 4. 4. 3. 3. 3.] dB
+print(np.round(power.confidence_interval[0], 1))     # [-1.7  1.2] dB
+```
+
+<details>
+<summary>Show the code for the sound power figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# One line — the band sound power spectrum, with the bands outside the method
+# hatched and the A-weighted total in the title:
+power.plot()
+plt.show()
+
+# By hand, from the per-band fields the result carries:
+fig, ax = plt.subplots()
+ax.bar(np.arange(power.frequencies.size), np.nan_to_num(power.sound_power_level),
+       color="#1f77b4")
+ax.set_xticks(np.arange(power.frequencies.size))
+ax.set_xticklabels([f"{f:g}" for f in power.frequencies])
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Sound power level $L_W$ [dB re 1 pW]")
+ax.set_title("ISO 9614-1 sound power spectrum "
+             f"($L_{{WA}}$ = {power.sound_power_level_a:.1f} dB(A))")
+plt.show()
+```
+
+</details>
+
+### Spending fewer new positions when the power is concentrated
+
+Where criterion 1 holds, criterion 2 does not and $F_3 - F_2 \le 1$ dB, little
+power is flowing inward, so most of it may be leaving through a minority of
+the segments. Clause 8.3.2 and B.1.3 make that testable: rank the positive
+partial powers, take the top segments until more than half the total power is
+accounted for, and require that subset to be fewer than half the segments.
+Then evaluate the field non-uniformity separately over the subset and over the
+remainder and size the new positions with Formula (B.4):
+
+$$
+N^* \ge 4 \left[ \frac{F_4(\alpha)}{\Delta_\alpha} \right]^2, \qquad
+\Delta_\alpha = \frac{1}{\alpha} \left[ \Delta - (1 - \alpha)
+\frac{2}{\sqrt{N_{1-\alpha}}} F_4(1 - \alpha) \right]
+$$
+
+$\Delta_\alpha$ is the share of the Table B.1 error budget left for the subset
+once the remainder, measured at its existing density, has taken its own, so a
+remainder too non-uniform to leave anything over exhausts the budget and the
+procedure cannot help. That case, and the case of no qualifying subset, are
+both refused with a message naming Table B.3 action (d), which is what the
+standard falls back to.
+
+```python
+# One band, twelve segments, most of the power through the first four.
+concentrated = np.array([3.0e-5, 2.4e-5, 1.8e-5, 1.4e-5] + [8.0e-6] * 8)
+subset = emission.partial_power_concentration(concentrated, np.full(12, 1.0))
+print(subset.subset_positions, round(subset.power_fraction, 2))   # 4 0.57
+print(subset.additional_positions)                                # 2
+```
+
 ### Reactive fields near sources
 
 Close to a source the field turns **reactive**: pressure and particle

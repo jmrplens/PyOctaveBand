@@ -15,14 +15,22 @@ tabulated one.
 from __future__ import annotations
 
 import math
+import warnings
+from typing import TYPE_CHECKING
 
 import numpy as np
 import reference_data as ref
 
 import phonometry as ph
 
-from ..registry import Outcome, numeric, register
+from ..registry import Outcome, numeric, record, register
 from .levels import _FS
+
+if TYPE_CHECKING:
+    from phonometry.emission.sound_power_intensity_points import (
+        BandType,
+        DeterminationGrade,
+    )
 
 
 def _plane_wave_pair(
@@ -249,3 +257,242 @@ def _chk_reverberation_lw() -> Outcome:
     )
     worst = float(np.max(np.abs(np.asarray(res.sound_power_level) - lw_target)))
     return numeric(0.0, worst, 1e-9, unit="dB", places=9, expected_label="0 dB error")
+
+
+def _iso9614_1_band_cells(
+    table: list[tuple[float | None, float | None, float | None]],
+) -> list[tuple[BandType, DeterminationGrade, float, float]]:
+    """Every printed per-band cell of an ISO 9614-1 graded table.
+
+    Yields ``(band_type, grade, frequency, value)`` for the cells the print
+    fills. Grade 3 fills none of them in any of the three graded tables, so
+    the blanks drop out here and are checked as refusals by the test suite
+    instead.
+    """
+    third = (
+        50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000,
+        1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300,
+    )  # fmt: skip
+    octave = (63, 125, 250, 500, 1000, 2000, 4000)
+    grades: tuple[DeterminationGrade, ...] = (
+        "precision",
+        "engineering",
+        "survey",
+    )
+    columns: tuple[tuple[BandType, tuple[float, float] | None, tuple[int, ...]], ...]
+    cells: list[tuple[BandType, DeterminationGrade, float, float]] = []
+    for row, values in zip(ref.ISO9614_1_BAND_ROWS, table, strict=True):
+        columns = (("octave", row[0], octave), ("third", row[1], third))
+        for band_type, span, series in columns:
+            if span is None:
+                continue
+            for frequency in (f for f in series if span[0] <= f <= span[1]):
+                for grade, value in zip(grades, values, strict=True):
+                    if value is not None:
+                        cells.append((band_type, grade, float(frequency), value))
+    return cells
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 9614-1:1993 Table B.2",
+    "Criterion-2 factor C per band and grade, and the A-weighted grade-3 value",
+)
+def _chk_iso9614_1_table_b2() -> Outcome:
+    """Every printed cell of Table B.2, in both frequency columns."""
+    cells = _iso9614_1_band_cells(ref.ISO9614_1_TABLE_B2_C)
+    worst = 0.0
+    for band_type, grade, frequency, value in cells:
+        computed = ph.emission.position_count_factor(
+            grade, frequency, band_type=band_type
+        )
+        worst = max(worst, abs(computed - value))
+    a_weighted = ref.ISO9614_1_TABLE_B2_C_A_WEIGHTED[2]
+    worst = max(worst, abs(ph.emission.position_count_factor("survey") - a_weighted))
+    # An exact printed table, so the tolerance is zero: the question is whether
+    # every cell is reproduced, not how closely.
+    return numeric(
+        0.0,
+        worst,
+        0.0,
+        places=3,
+        expected_label=f"{len(cells) + 1} tabulated values of C reproduced",
+        computed_label=f"max absolute deviation {worst:.3f}",
+    )
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 9614-1:1993 Table 2",
+    "Standard deviation s of the determination per band and grade",
+)
+def _chk_iso9614_1_table_2() -> Outcome:
+    """Every printed cell of Table 2, plus its A-weighted grade-3 value."""
+    cells = _iso9614_1_band_cells(ref.ISO9614_1_TABLE_2_S)
+    worst = 0.0
+    for band_type, grade, frequency, value in cells:
+        computed = ph.emission.determination_standard_deviation(
+            grade, frequency, band_type=band_type
+        )
+        worst = max(worst, abs(computed - value))
+    a_weighted = ref.ISO9614_1_TABLE_2_S_A_WEIGHTED[2]
+    worst = max(
+        worst,
+        abs(ph.emission.determination_standard_deviation("survey") - a_weighted),
+    )
+    return numeric(
+        0.0,
+        worst,
+        0.0,
+        unit="dB",
+        places=3,
+        expected_label=f"{len(cells) + 1} tabulated values of s reproduced",
+        computed_label=f"max absolute deviation {worst:.3f} dB",
+    )
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 9614-1:1993 Table B.1",
+    "Error factor Delta: 0,20 and 0,29 for all bands, 0,60 A-weighted",
+)
+def _chk_iso9614_1_table_b1() -> Outcome:
+    """The three cells Table B.1 fills, and only those three."""
+    expected = {
+        "precision (all bands)": ref.ISO9614_1_TABLE_B1_ALL_BANDS[0],
+        "engineering (all bands)": ref.ISO9614_1_TABLE_B1_ALL_BANDS[1],
+        "survey (A-weighted)": ref.ISO9614_1_TABLE_B1_A_WEIGHTED[2],
+    }
+    computed = {
+        "precision (all bands)": ph.emission.error_factor("precision"),
+        "engineering (all bands)": ph.emission.error_factor("engineering"),
+        "survey (A-weighted)": ph.emission.error_factor("survey", a_weighted=True),
+    }
+    return record({k: float(v) for k, v in expected.items()}, computed)
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 9614-1:1993 Eq. (12)",
+    "Discrete positions tiling a scanned surface give the same LW",
+)
+def _chk_iso9614_1_power_sum() -> Outcome:
+    """The Part 1 sum over positions and the Part 2 sum over segments agree.
+
+    Both are ``sum(In,i * Si)``, so a set of discrete positions standing for
+    the segments of an ISO 9614-2 scan, with the same intensities, must give
+    the level the scan gives. The two are separate implementations, and this
+    is the equality that keeps them one determination.
+    """
+    areas = np.array([0.5, 0.75, 1.0, 1.25, 1.5, 0.5, 0.75, 1.0, 1.25, 1.5])
+    rng = np.random.default_rng(96141)
+    intensity = 1.0e-5 * (1.0 + rng.normal(0.0, 0.2, (areas.size, 4)))
+    frequencies = np.array([250.0, 500.0, 1000.0, 2000.0])
+    with warnings.catch_warnings():
+        # Neither determination is qualified here, and both say so: the check
+        # is about the power sum alone, so the field indicators and the
+        # residual index that would drive their A-weighting screening are not
+        # supplied.
+        warnings.simplefilter("ignore", ph.emission.SoundPowerWarning)
+        points = ph.emission.sound_power_intensity_points(
+            intensity, areas, frequencies=frequencies, band_type="octave"
+        )
+        scan = ph.emission.sound_power_intensity(
+            intensity, areas, frequencies=frequencies, band_type="octave"
+        )
+    worst = float(
+        np.max(np.abs(np.asarray(points.sound_power_level) - scan.sound_power_level))
+    )
+    return numeric(0.0, worst, 1e-12, unit="dB", places=12, expected_label="0 dB error")
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 9614-1:1993 Table B.3",
+    "Five action codes, each reached by the case Figure B.1 routes to it",
+)
+def _chk_iso9614_1_table_b3() -> Outcome:
+    """The action codes a determination hands back, case by case.
+
+    Table B.3 is the part of Annex B that says what to *change*, so the check
+    drives one determination per row of the table and reads the codes back.
+    """
+    areas = np.full(10, 1.0)
+    outward = np.full(10, 1.0e-5)
+    inward = np.full(10, 1.0e-5)
+    inward[0] = -3.2e-5  # (F3 - F2) just past the 3 dB gate of Figure B.1
+    moderate = np.full(10, 1.0e-5)
+    moderate[0] = -2.04e-5  # (F3 - F2) inside the 1 dB to 3 dB band of row 3
+    concentrated = np.array(
+        [4e-5, 3e-5, 2e-5, 1e-5, 5e-6, 5e-6, 5e-6, 5e-6, 5e-6, 5e-6]
+    )
+    wandering = np.array([1.0e-5, 5.0e-5, 2.0e-6, 9.0e-5, 1.0e-6])
+
+    def codes(
+        intensity: np.ndarray,
+        residual_index: float = 30.0,
+        temporal: np.ndarray | None = None,
+    ) -> tuple[str, ...]:
+        result = ph.emission.sound_power_intensity_points(
+            intensity,
+            areas,
+            pressure_levels=np.full(10, 80.0),
+            pressure_residual_index=residual_index,
+            temporal_intensity=temporal,
+            frequencies=[1000.0],
+            grade="precision",
+        )
+        return tuple(action.value for action in result.required_actions()[0])
+
+    reached = {
+        "F1 > 0,6": codes(outward, temporal=wandering),
+        "F2 > Ld": codes(outward, residual_index=10.0),
+        "(F3 - F2) > 3 dB": codes(inward),
+        "criterion 2, 1 dB <= (F3 - F2) <= 3 dB": codes(moderate),
+        "criterion 2, (F3 - F2) <= 1 dB": codes(concentrated),
+    }
+    expected = {
+        "F1 > 0,6": ("e",),
+        "F2 > Ld": ("a", "b"),
+        "(F3 - F2) > 3 dB": ("a", "b"),
+        "criterion 2, 1 dB <= (F3 - F2) <= 3 dB": ("c",),
+        "criterion 2, (F3 - F2) <= 1 dB": ("d",),
+    }
+    wrong = [row for row, got in reached.items() if got != expected[row]]
+    return Outcome(
+        expected="; ".join(f"{row} -> {''.join(c)}" for row, c in expected.items()),
+        computed="; ".join(f"{row} -> {''.join(c)}" for row, c in reached.items()),
+        delta=f"{len(wrong)} of {len(expected)} rows disagree",
+        passed=not wrong,
+    )
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 9614-1:1993 Eq. (B.4)",
+    "New positions N* on the concentrated subset of the measurement surface",
+)
+def _chk_iso9614_1_additional_positions() -> Outcome:
+    """B.1.3 written out beside the library's own reading of it."""
+    areas = np.full(12, 1.0)
+    intensity = np.array([3.0e-5, 2.4e-5, 1.8e-5, 1.4e-5] + [8.0e-6] * 8)
+    outcome = ph.emission.partial_power_concentration(
+        intensity, areas, grade="engineering"
+    )
+    subset, remainder = intensity[:4], intensity[4:]
+    alpha = float(np.sum(subset)) / float(np.sum(intensity))
+    f4_subset = float(np.std(subset, ddof=1) / np.mean(subset))
+    f4_remainder = float(np.std(remainder, ddof=1) / np.mean(remainder))
+    delta = ref.ISO9614_1_TABLE_B1_ALL_BANDS[1]
+    delta_alpha = (
+        delta - (1.0 - alpha) * (2.0 / math.sqrt(remainder.size)) * f4_remainder
+    ) / alpha
+    expected = math.ceil(4.0 * (f4_subset / delta_alpha) ** 2)
+    return numeric(
+        float(expected),
+        float(outcome.additional_positions),
+        0.0,
+        places=0,
+        expected_label=f"N* = {expected} positions",
+        computed_label=f"N* = {outcome.additional_positions} positions",
+    )

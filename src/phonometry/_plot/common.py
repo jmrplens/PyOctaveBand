@@ -46,6 +46,9 @@ if TYPE_CHECKING:
         PrecisionIntensityResult,
         SoundPowerIntensityResult,
     )
+    from ..emission.sound_power_intensity_points import (
+        DiscretePointIntensityResult,
+    )
     from ..emission.sound_power_reverberation import ReverberationSoundPowerResult
     from ..room.acoustics import RoomAcousticsResult
 
@@ -1082,7 +1085,8 @@ def _sound_power_designation(
     | PrecisionSoundPowerResult
     | ReverberationSoundPowerResult
     | SoundPowerIntensityResult
-    | PrecisionIntensityResult,
+    | PrecisionIntensityResult
+    | DiscretePointIntensityResult,
 ) -> str:
     """The standard designation matching a sound-power result's method.
 
@@ -1092,13 +1096,22 @@ def _sound_power_designation(
     methods' ISO 3744/3746. The precision branch is the youngest: until the
     designation helper knew the type, an ISO 3745 grade-1 determination was
     captioned with the engineering and survey standards it exists to outrank.
+
+    The two intensity branches part company on the part of ISO 9614 they
+    implement, because the caption is the only place the figure says which
+    method produced the spectrum: measurement at discrete points is Part 1,
+    while both scanning results are Part 2 or Part 3 and share the bare
+    "ISO 9614" the caption has always carried for them.
     """
     from ..emission.sound_power_anechoic import PrecisionSoundPowerResult
     from ..emission.sound_power_intensity import SoundPowerIntensityResult
+    from ..emission.sound_power_intensity_points import DiscretePointIntensityResult
     from ..emission.sound_power_reverberation import ReverberationSoundPowerResult
 
     if isinstance(result, ReverberationSoundPowerResult):
         return "ISO 3741"
+    if isinstance(result, DiscretePointIntensityResult):
+        return "ISO 9614-1"
     if isinstance(result, SoundPowerIntensityResult):
         return "ISO 9614"
     if isinstance(result, PrecisionSoundPowerResult):

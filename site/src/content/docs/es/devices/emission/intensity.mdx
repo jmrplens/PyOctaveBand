@@ -598,6 +598,224 @@ También por eso una décima de grado de desfase entre canales es
 una especificación exigente, y por eso una sonda debe verificarse con el
 espaciador con el que realmente se va a usar.
 
+## Potencia acústica en puntos discretos (ISO 9614-1)
+
+Todo lo anterior cualifica una medición. ISO 9614-1 es la parte que la
+convierte en un nivel de potencia acústica, y es la forma habitual de usar una
+sonda p-p: mantenerla quieta en cada uno de $N$ puntos, uno por segmento de una
+superficie que encierra la fuente, y leer allí la intensidad normal con signo.
+La potencia parcial de un segmento y la potencia acústica de la fuente son
+entonces (ecuaciones (11) y (12)):
+
+$$
+P_i = I_{\mathrm{n}i} \, S_i, \qquad
+L_W = 10 \log_{10} \frac{\sum_{i=1}^{N} P_i}{P_0},
+\qquad P_0 = 10^{-12}~\mathrm{W}
+$$
+
+La ecuación (12) se imprime sin las barras de valor absoluto que sí lleva la
+definición general (ecuación (8)), porque el apartado 9.2 resuelve el caso
+negativo de otra manera: **el método no es aplicable a una banda en la que la
+suma resulte negativa**. Que un segmento suelto tenga flujo entrante es otra
+cosa, y es lo normal; es justo lo que mide $F_3$.
+
+El apartado 8.2 dimensiona el conjunto de posiciones: al menos una posición por
+metro cuadrado y un mínimo de diez en total, repartidas tan uniformemente como
+permitan las áreas de los segmentos. Las dos relajaciones que ofrece el
+apartado (una posición cada 2 m² cuando el ruido parásito es significativo,
+cincuenta posiciones sobre una superficie mayor de 50 m²) terminan ambas en
+cincuenta posiciones, así que un conjunto más disperso conviene hacerlo
+constar, y la determinación avisa.
+
+```python
+import numpy as np
+from phonometry import emission
+
+# Superficie de medición: una caja de 2,0 m x 1,8 m x 1,4 m sobre un suelo
+# reflectante, cinco caras y 14,24 m2 en total, muestreada en 16 posiciones.
+segment_areas = np.array([0.9] * 4 + [0.9333] * 6 + [0.84] * 6)
+frequencies = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+
+# El campo: presión casi uniforme, una reactividad que crece hacia baja
+# frecuencia y dos posiciones de la banda de 125 Hz por las que la potencia
+# vuelve a entrar.
+rng = np.random.default_rng(9614)
+reactivity = np.array([9.5, 7.0, 5.0, 4.0, 3.2, 3.0])
+pressure_levels = 82.0 + rng.normal(0.0, 0.6, (16, 6))
+band_mean = 10.0 ** ((82.0 - reactivity) / 10.0) * 1e-12
+normal_intensity = band_mean * (1.0 + rng.normal(0.0, 0.22, (16, 6)))
+normal_intensity[:2, 0] = -0.4 * band_mean[0]
+
+power = emission.sound_power_intensity_points(
+    normal_intensity,
+    segment_areas,
+    pressure_levels=pressure_levels,
+    pressure_residual_index=19.0,
+    frequencies=frequencies,
+    band_type="octave",
+)
+print(np.round(power.sound_power_level, 1))  # [83.3 86.8 88.1 89.6 90.4 90.4]
+print(round(power.sound_power_level_a, 1))   # 96.1 dB(A)
+print(round(power.surface_area, 2), power.positions)   # 14.24 16
+```
+
+### El signo está en la impresión, no en el número
+
+ISO 9614-1 nunca imprime un nivel con signo. Un nivel de intensidad normal se
+escribe `XX dB` cuando el flujo a través del segmento sale y `(-) XX dB` cuando
+entra, siendo `XX` un número positivo en ambos casos (apartado 3.5 y las dos
+ecuaciones sin numerar de los apartados 9.1 y A.2.3):
+
+$$
+I_{\mathrm{n}i} = I_0 \times 10^{XX/10}, \qquad
+I_{\mathrm{n}i} = -I_0 \times 10^{XX/10}, \qquad
+I_0 = 10^{-12}~\mathrm{W/m^2}
+$$
+
+Así que quien lea una tabla impresa tiene que llevar el signo aparte, y para
+eso está el argumento `negative`. Se difunde, de modo que una posición de la
+superficie puede tener flujo entrante mientras el resto lo tiene saliente:
+
+```python
+inward = emission.normal_intensity_from_levels(66.0, negative=True)
+print(f"{inward:.3e}")                       # -3.981e-06 W/m2, hacia dentro
+```
+
+### Qué grado alcanza la determinación
+
+El anexo B numera **dos** criterios, no tres. La figura B.1 condiciona la
+determinación a cuatro preguntas, en este orden, y la tabla B.3 dice qué
+cambiar cuando falla cada una:
+
+| Comprobación | Dónde | Acción si falla |
+| --- | --- | --- |
+| $F_1 \le 0{,}6$ | tabla B.3 | (e) |
+| $L_\mathrm{d} > F_2$ (criterio 1) | ecuación (B.1) | (a) o (b) |
+| $F_3 - F_2 \le 3$ dB | figura B.1 | (a) o (b) |
+| $N > C F_4^2$ (criterio 2) | ecuación (B.2) | (c) o (d) |
+
+Solo se actúa sobre la primera comprobación que falla: en la figura B.1 cada
+cuadro de acción vuelve a la medición siguiente, no a la comprobación de
+abajo, así que `required_actions()` da un conjunto de acciones por banda y ahí
+se detiene. Dos códigos significan que la norma ofrece una elección, que es
+como los imprime la tabla B.3 («a **o** b»).
+
+```python
+print(power.dynamic_capability_index[0])     # 9.0 dB (Ld = 19 - 10)
+print(np.round(power.f2, 1))                 # [9.6 6.8 5.3 3.9 3.1 3.3]
+print(power.criterion_1)      # [False  True  True  True  True  True]
+print(list(power.achieved_grade))
+# ['none', 'precision', 'precision', 'precision', 'precision', 'precision']
+codes = ["".join(a.value for a in band) for band in power.required_actions()]
+print(codes)                                 # ['ab', '', '', '', '', '']
+print(power.required_actions()[0][0].criterion)  # F2 > Ld or (F3 - F2) > 3 dB
+```
+
+La banda de 125 Hz es la interesante. Su $F_2$ de 9,6 dB queda justo por encima
+de la capacidad dinámica del instrumento, de 9 dB, así que allí falla el
+criterio 1 y ningún promediado lo va a arreglar: la tabla B.3 ofrece mover la
+superficie (a) o apantallarla (b). El apartado 10.5 b) omite entonces esa banda
+de la determinación ponderada A y pide que se haga constar la omisión, que es
+lo que es `a_weighting_omitted_bands`:
+
+```python
+print(power.a_weighting_omitted_bands)  # [ True False False False False False]
+```
+
+### El grado 3 es una determinación ponderada A
+
+La tabla B.2 tabula el factor $C$ del criterio 2 banda a banda para los grados
+1 y 2 y le da al grado 3 un único valor ponderado A, 8, y ninguna columna por
+bandas. La tabla B.1 hace lo mismo con el factor de error $\Delta$ (0,20 y 0,29
+para todas las bandas, 0,60 ponderado A) y la tabla 2 con la desviación típica
+$s$ de la determinación. Tres tablas coinciden, así que esto es el diseño de la
+norma y no un hueco en ella: **una determinación por bandas alcanza el grado 1
+o el grado 2, y el grado 3 se alcanza, si acaso, con la suma ponderada A**.
+Pedir una cifra por bandas del grado 3 lanza un error en lugar de devolver un
+número verosímil.
+
+```python
+print(emission.position_count_factor("engineering", 1000.0,
+                                     band_type="octave"))   # 29.0
+print(emission.position_count_factor("survey"))             # 8.0 (ponderado A)
+print(power.achieved_grade_a, round(power.field_nonuniformity_a, 2))
+# precision 0.13
+```
+
+La determinación ponderada A tiene una no uniformidad de campo propia: el
+apartado B.1.2 suma las intensidades de banda ponderadas A de cada posición en
+una sola intensidad por posición y les aplica las ecuaciones (A.8) y (A.9), que
+es `field_nonuniformity_a`.
+
+La incertidumbre del resultado es la $s$ de la tabla 2, con la nota 1 situando
+el valor verdadero dentro de $\pm 2s$ del medido con una confianza del 95 %; y
+una banda que haya fallado el criterio 2 aún puede registrarse, siempre que la
+acompañe el intervalo de confianza del 95 % de la ecuación (B.3):
+
+```python
+print(power.expanded_uncertainty)            # [6. 4. 4. 3. 3. 3.] dB
+print(np.round(power.confidence_interval[0], 1))     # [-1.7  1.2] dB
+```
+
+<details>
+<summary>Ver el código de la figura de potencia acústica</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# Una línea: el espectro de potencia acústica por bandas, con las bandas fuera
+# del método rayadas y el total ponderado A en el título:
+power.plot(language="es")
+plt.show()
+
+# A mano, a partir de los campos por banda que lleva el resultado:
+fig, ax = plt.subplots()
+ax.bar(np.arange(power.frequencies.size), np.nan_to_num(power.sound_power_level),
+       color="#1f77b4")
+ax.set_xticks(np.arange(power.frequencies.size))
+ax.set_xticklabels([f"{f:g}" for f in power.frequencies])
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Nivel de potencia acústica $L_W$ [dB re 1 pW]")
+ax.set_title("Espectro de potencia acústica ISO 9614-1 "
+             f"($L_{{WA}}$ = {power.sound_power_level_a:.1f} dB(A))")
+plt.show()
+```
+
+</details>
+
+### Gastar menos posiciones nuevas cuando la potencia está concentrada
+
+Cuando el criterio 1 se cumple, el criterio 2 no y $F_3 - F_2 \le 1$ dB, entra
+poca potencia, así que puede que la mayor parte esté saliendo por una minoría
+de los segmentos. El apartado 8.3.2 y el B.1.3 lo hacen comprobable: ordenar
+las potencias parciales positivas, tomar los segmentos de cabeza hasta reunir
+más de la mitad de la potencia total y exigir que ese subconjunto tenga menos
+de la mitad de los segmentos. Después se evalúa la no uniformidad de campo por
+separado sobre el subconjunto y sobre el resto, y se dimensionan las nuevas
+posiciones con la ecuación (B.4):
+
+$$
+N^* \ge 4 \left[ \frac{F_4(\alpha)}{\Delta_\alpha} \right]^2, \qquad
+\Delta_\alpha = \frac{1}{\alpha} \left[ \Delta - (1 - \alpha)
+\frac{2}{\sqrt{N_{1-\alpha}}} F_4(1 - \alpha) \right]
+$$
+
+$\Delta_\alpha$ es la parte del presupuesto de error de la tabla B.1 que le
+queda al subconjunto una vez que el resto, medido a la densidad que ya tiene,
+se ha llevado la suya, de modo que un resto demasiado poco uniforme agota el
+presupuesto y el procedimiento no puede ayudar. Ese caso, y el de que no exista
+subconjunto que cumpla las condiciones, se rechazan con un mensaje que nombra
+la acción (d) de la tabla B.3, que es a lo que recurre la norma.
+
+```python
+# Una banda, doce segmentos, la mayor parte de la potencia por los cuatro
+# primeros.
+concentrated = np.array([3.0e-5, 2.4e-5, 1.8e-5, 1.4e-5] + [8.0e-6] * 8)
+subset = emission.partial_power_concentration(concentrated, np.full(12, 1.0))
+print(subset.subset_positions, round(subset.power_fraction, 2))   # 4 0.57
+print(subset.additional_positions)                                # 2
+```
+
 ## Elegir la sonda
 
 Antes de tomar ningún dato hay dos decisiones: dónde se puede colocar la
