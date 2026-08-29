@@ -48,6 +48,12 @@
   "image": {
     "@type": "ImageObject",
     "url": "https://jmrp.io/identity/avatar.png",
+    "contentUrl": "https://jmrp.io/identity/avatar.png",
+    "creator": {
+      "@id": "https://jmrp.io/#person"
+    },
+    "creditText": "José Manuel Requena Plens",
+    "copyrightNotice": "© José Manuel Requena Plens",
     "width": {
       "@type": "QuantitativeValue",
       "value": 460,
