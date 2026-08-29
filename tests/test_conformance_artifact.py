@@ -452,7 +452,9 @@ def test_the_markdown_is_a_pure_function_of_the_artefact(committed: dict) -> Non
     lets docs/CONFORMANCE.md keep a byte gate while the values behind it are
     compared within a tolerance.
     """
-    assert cr.render_markdown(committed)[0] == cr.render_markdown(committed)[0]
+    first, _, _ = cr.render_markdown(committed)
+    second, _, _ = cr.render_markdown(committed)
+    assert first == second
 
 
 def test_the_committed_markdown_is_what_the_artefact_renders(committed: dict) -> None:

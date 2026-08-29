@@ -79,6 +79,7 @@ result is graded against a tolerance mask rather than integrated.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 
 import numpy as np
@@ -487,9 +488,14 @@ def _stable_factors(
     for index, value in enumerate(values):
         if taken[index] or value.imag <= 0.0:
             continue
+        # Distances materialised rather than closed over: a lambda here would
+        # capture the loop variable, and its late binding is a hazard even
+        # where, as here, it is consumed before the next iteration.
+        wanted = value.conjugate()
+        distance = [abs(other - wanted) for other in values]
         partner = min(
             (k for k in range(len(values)) if not taken[k] and k != index),
-            key=lambda k: abs(values[k] - value.conjugate()),
+            key=distance.__getitem__,
         )
         taken[index] = taken[partner] = True
         quadratic.append((-2.0 * value.real, abs(value) ** 2))
@@ -701,7 +707,10 @@ def fit_prototype(
         prototype's own degree.
     """
     low, high = band
-    if not low < high:
+    # Spelled out rather than as ``not low < high``: the two differ only on
+    # NaN, which the negated comparison happens to refuse, and a guard should
+    # say what it refuses instead of relying on that.
+    if not (math.isfinite(low) and math.isfinite(high)) or low >= high:
         msg = (
             f"'band' must span a positive frequency interval; got ({low:g}, {high:g}) "
             "Hz, which the sampling rate has closed."

@@ -517,8 +517,9 @@ def test_an_empty_band_is_refused() -> None:
     interval rather than come back as a numpy error from inside the fit.
     """
     zeros, poles, _ = _analog_weighting_zpk("A")
+    band = _fit_band("A", 16)
     with pytest.raises(ValueError, match=r"'band' must span a positive frequency"):
-        fit_prototype(zeros, poles, 16.0, _fit_band("A", 16), 4, 1000.0)
+        fit_prototype(zeros, poles, 16.0, band, 4, 1000.0)
 
 
 def test_too_few_sections_is_refused() -> None:
@@ -528,8 +529,9 @@ def test_too_few_sections_is_refused() -> None:
     drop ten of them, so it is refused with the two degrees named.
     """
     zeros, poles, _ = _analog_weighting_zpk("AU")
+    band = _fit_band("AU", 48000)
     with pytest.raises(ValueError, match=r"'sections' is too small"):
-        fit_prototype(zeros, poles, 48000.0, _fit_band("AU", 48000), 2, 1000.0)
+        fit_prototype(zeros, poles, 48000.0, band, 2, 1000.0)
 
 
 def test_the_fitted_prototype_is_readable_in_hertz() -> None:
