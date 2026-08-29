@@ -254,9 +254,11 @@ donde también pondera la THD.
 del ruido de cada cápsula: 2,4 dB para el espectro 1/f decreciente del ejemplo y
 8,3 dB para una cápsula más siseante. El resto de los 10 dB de costumbre viene
 del **detector de cuasipico** de la ITU-R 468, que lee un ruido más alto que un
-detector de valor eficaz; `itu_r_468_weighting` es solo la red, así que un nivel
-calculado con ella y una suma en valor eficaz no es una cifra en dBqps y no se
-debe comparar con una de una hoja de características.*
+detector de valor eficaz; ese detector es
+[`broadcast.quasi_peak_meter`](/phonometry/es/devices/broadcast/quasi-peak/) y
+lee un registro, mientras que `itu_r_468_weighting` es solo la red, así que un
+nivel calculado con la red y una suma en valor eficaz sigue sin ser una cifra en
+dBqps y no se debe comparar con una de una hoja de características.*
 
 El espectro de banda que ahí se dibuja es el que el fragmento de la sección 4
 pasa como `MicrophoneNoise(spectrum=...)`, ponderado con `itu_r_468_weighting`
@@ -430,8 +432,13 @@ registra qué red fue esa. Toma en silencio el valor por defecto `'A'`
 vuelve a ponderar nada, así que declarar `weighting="CCIR"` mientras se le pasa
 una tensión ponderada A produce un nivel correctamente calculado con el nombre
 equivocado encima, que es exactamente el error del que avisa la sección 3, ahora
-impreso en un informe. Dar las dos cifras de la misma cápsula es la forma
-honrada, porque son preguntas distintas y las dos son legítimas.
+impreso en un informe. Eso sigue siendo cierto ahora que existe el detector de
+cuasipico: el apartado 17 toma una tensión declarada, no un registro, así que
+aquí no hay nada sobre lo que
+[`quasi_peak_meter`](/phonometry/es/devices/broadcast/quasi-peak/) pueda correr
+y el campo sigue siendo un registro de cómo midió el fabricante. Dar las dos
+cifras de la misma cápsula es la forma honrada, porque son preguntas distintas y
+las dos son legítimas.
 
 `microphone_characteristics` devuelve un `MicrophoneCharacteristics` con el
 `sensitivity_level_db`, el `effective_range`, el `directivity_index_db`, el
@@ -624,9 +631,13 @@ cualificación, el micrófono de referencia y su certificado de calibración, la
 fuente de nivel alto que produce un campo de 140 dB y el plato giratorio. Las
 *condiciones* que esos instrumentos tienen que cumplir están en las secciones
 1.1, 3 y 3.1, porque son lo que significan los números presentados; la
-adquisición en sí no está implementada aquí, ni tampoco el detector de
-cuasipico de la ITU-R 468, así que un nivel de ruido propio calculado con
-`itu_r_468_weighting` y una suma en valor eficaz no es una cifra en dBqps. La
+adquisición en sí no está implementada aquí. El detector de cuasipico de la
+ITU-R 468 ahora sí lo está, en [Medidor de
+cuasipico](/phonometry/es/devices/broadcast/quasi-peak/), pero lee un registro y
+el apartado 17 toma una tensión o un nivel declarados, así que `weighting="CCIR"`
+en esta página sigue siendo una etiqueta sobre la cifra de un fabricante, y un
+nivel de ruido propio calculado con `itu_r_468_weighting` y una suma en valor
+eficaz sigue sin ser una cifra en dBqps. La
 edición implementada está congelada en IEC 60268-4:2014; la revisión de 2018
 que la sustituye no es la verificada. La calibración acústica de una cadena en
 uso, de la sensibilidad a pascales y dBFS, vive en [Calibración y

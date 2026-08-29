@@ -414,6 +414,7 @@ export const topics = [
           'devices/electroacoustics/swept-sine-distortion',
           { slug: 'devices/broadcast', label: 'Broadcast overview', translations: { es: 'Resumen de radiodifusión' } },
           'devices/broadcast/program-loudness',
+          'devices/broadcast/quasi-peak',
         ],
       },
       {

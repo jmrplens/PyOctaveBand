@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-&#9989; **554/554 conformance checks pass** across 58 domains and 370 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **566/566 conformance checks pass** across 59 domains and 373 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -887,6 +887,26 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | EBU Tech 3341:2023 Table 1 case 19 | True-peak level of the fs/4 sine at 1.41 FFS, dBTP | 3 dBTP (+0.2/-0.4 dB) | 3 dBTP | headroom 0.199 dBTP | &#9989; |
 | EBU Tech 3342:2023 Table 1 case 1 | Loudness range of the -20/-30 dBFS tone steps, LU | 10 LU (+/-1 LU) | 10 LU | 0 LU | &#9989; |
 | EBU Tech 3342:2023 Table 1 case 3 | Loudness range of the -40/-20 dBFS tone steps, LU | 20 LU (+/-1 LU) | 20 LU | 0 LU | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Quasi-peak meter (ITU-R BS.468-4)</b>: 100% (12/12)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ITU-R BS.468-4 Table 2 | Single 1 ms 5 kHz burst (5 periods), % of the steady reading | 13.5 to 21.4 % | 16.85 % | +1.927 dB | &#9989; |
+| ITU-R BS.468-4 Table 2 | Single 2 ms 5 kHz burst (10 periods), % of the steady reading | 22.4 to 31.6 % | 26.72 % | +1.458 dB | &#9989; |
+| ITU-R BS.468-4 Table 2 | Single 5 ms 5 kHz burst (25 periods), % of the steady reading | 34 to 46 % | 40.29 % | +1.151 dB | &#9989; |
+| ITU-R BS.468-4 Table 2 | Single 10 ms 5 kHz burst (50 periods), % of the steady reading | 41 to 55 % | 47.73 % | +1.231 dB | &#9989; |
+| ITU-R BS.468-4 Table 2 | Single 20 ms 5 kHz burst (100 periods), % of the steady reading | 44 to 60 % | 52.58 % | +1.146 dB | &#9989; |
+| ITU-R BS.468-4 Table 2 | Single 50 ms 5 kHz burst (250 periods), % of the steady reading | 50 to 68 % | 58.78 % | +1.266 dB | &#9989; |
+| ITU-R BS.468-4 Table 2 | Single 100 ms 5 kHz burst (500 periods), % of the steady reading | 58 to 78 % | 66.98 % | +1.251 dB | &#9989; |
+| ITU-R BS.468-4 Table 2 | Single 200 ms 5 kHz burst (1000 periods), % of the steady reading | 68 to 92 % | 80.41 % | +1.170 dB | &#9989; |
+| ITU-R BS.468-4 Table 3 | 5 ms 5 kHz bursts at 2 per second, % of the steady reading | 43 to 53 % | 48.11 % | +0.841 dB | &#9989; |
+| ITU-R BS.468-4 Table 3 | 5 ms 5 kHz bursts at 10 per second, % of the steady reading | 72 to 82 % | 75.70 % | +0.435 dB | &#9989; |
+| ITU-R BS.468-4 Table 3 | 5 ms 5 kHz bursts at 100 per second, % of the steady reading | 94 to 100 % | 97.11 % | +0.255 dB | &#9989; |
+| ITU-R BS.468-4 clause 2.6 | Steady 1 kHz sine at 0.775 V r.m.s., dBqps | 0 dBqps (+/-0.000001 dBqps) | 0 dBqps | 0 dBqps | &#9989; |
 
 </details>
 

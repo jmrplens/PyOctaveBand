@@ -241,9 +241,11 @@ where it also weights THD.
 that capsule's noise: 2.4 dB for the falling 1/f spectrum of the example, 8.3 dB
 for a hissier capsule. The rest of the customary 10 dB comes from the ITU-R 468
 **quasi-peak detector**, which reads a noise higher than an r.m.s. detector
-does; `itu_r_468_weighting` is the network only, so a level computed with it and
-an r.m.s. sum is not a dBqps figure and must not be compared with one from a
-datasheet.*
+does; that detector is
+[`broadcast.quasi_peak_meter`](/phonometry/devices/broadcast/quasi-peak/) and it
+reads a recording, while `itu_r_468_weighting` is the network only, so a level
+computed with the network and an r.m.s. sum is still not a dBqps figure and must
+not be compared with one from a datasheet.*
 
 The band spectrum drawn there is the one the section-4 snippet passes as
 `MicrophoneNoise(spectrum=...)`, weighted with `itu_r_468_weighting` from the
@@ -408,8 +410,12 @@ defaults silently to `'A'` (IEC 60268-1 6.2.1). The field is a *label, not a
 filter*: the function re-weights nothing, so declaring `weighting="CCIR"` while
 passing an A-weighted voltage produces a correctly computed level with the
 wrong name on it — exactly the error section 3 warns about, now printed on a
-report. Quoting both figures for the same capsule is the honest form, since
-they are different questions and both are legitimate.
+report. That stays true now that the quasi-peak detector exists: clause 17
+takes a stated voltage, not a recording, so there is nothing here for
+[`quasi_peak_meter`](/phonometry/devices/broadcast/quasi-peak/) to run on and
+the field remains a record of how the supplier measured. Quoting both figures
+for the same capsule is the honest form, since they are different questions and
+both are legitimate.
 
 `microphone_characteristics` returns a `MicrophoneCharacteristics` with the
 computed `sensitivity_level_db`, `effective_range`, `directivity_index_db`,
@@ -597,9 +603,11 @@ the reference microphone and its calibration certificate, the high-level
 source that produces a 140 dB field, and the turntable. The *conditions* those
 instruments have to satisfy are in sections 1.1, 3 and 3.1, because they are
 what the reported numbers mean; the acquisition itself is not implemented
-here, and neither is the ITU-R 468 quasi-peak detector, so an inherent-noise
-level computed from `itu_r_468_weighting` and an r.m.s. sum is not a dBqps
-figure. The implemented edition is frozen at IEC 60268-4:2014; the superseding
+here. The ITU-R 468 quasi-peak detector now is, in [Quasi-peak programme
+meter](/phonometry/devices/broadcast/quasi-peak/), but it reads a recording and
+clause 17 takes a stated voltage or level, so `weighting="CCIR"` on this page
+stays a label on a supplier's figure, and an inherent-noise level computed from
+`itu_r_468_weighting` and an r.m.s. sum is still not a dBqps figure. The implemented edition is frozen at IEC 60268-4:2014; the superseding
 2018 revision is not the one checked. Acoustic calibration of a working chain,
 sensitivity into pascals and dBFS, lives in [Calibration and
 dBFS](/phonometry/signals/metrology/calibration/).

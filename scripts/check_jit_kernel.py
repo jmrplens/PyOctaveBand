@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""Assert that the numba-jitted impulse kernel really compiles, and warm its cache.
+"""Assert that the numba-jitted kernels really compile, and warm their caches.
 
 The CI job that installs the ``perf`` extra exists to exercise the compiled
 kernel, so a silent fall back to the interpreted path (numba missing from the
@@ -45,6 +45,8 @@ def main() -> int:
     # diagnose is what broke the environment.
     import numpy as np
 
+    from phonometry.broadcast import quasi_peak as qp
+    from phonometry.broadcast.quasi_peak import quasi_peak_meter
     from phonometry.filters import weighting as pf
     from phonometry.filters.weighting import time_weighting
 
@@ -54,20 +56,30 @@ def main() -> int:
     # separate numba signature, so both have to be compiled to be cached.
     time_weighting(rng.standard_normal(256), 48_000, mode="impulse")
     time_weighting(rng.standard_normal((2, 256)), 48_000, mode="impulse")
+    # The quasi-peak chain is the second serial kernel, and it is reached
+    # through the meter rather than called directly so that the signature
+    # compiled here is the one the library really uses.
+    quasi_peak_meter(rng.standard_normal(4096), 48_000)
 
-    signatures = getattr(pf._apply_impulse_kernel, "nopython_signatures", [])
-    if not signatures:
-        print(
-            "FAIL: the kernel produced no compiled signature with numba "
-            "installed and the JIT on; the decorator is no longer being "
-            "applied and the job would exercise the interpreted path"
-        )
-        return 1
-
-    print(f"OK: {len(signatures)} compiled signature(s) for the impulse kernel")
-    for sig in signatures:
-        print(f"  {sig}")
-    return 0
+    kernels = {
+        "impulse time weighting": pf._apply_impulse_kernel,
+        "BS.468-4 quasi-peak": qp._apply_quasi_peak_kernel,
+    }
+    failed = False
+    for name, kernel in kernels.items():
+        signatures = getattr(kernel, "nopython_signatures", [])
+        if not signatures:
+            print(
+                f"FAIL: the {name} kernel produced no compiled signature with "
+                "numba installed and the JIT on; the decorator is no longer "
+                "being applied and the job would exercise the interpreted path"
+            )
+            failed = True
+            continue
+        print(f"OK: {len(signatures)} compiled signature(s) for the {name} kernel")
+        for sig in signatures:
+            print(f"  {sig}")
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":

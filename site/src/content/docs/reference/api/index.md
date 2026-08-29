@@ -263,11 +263,12 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`noise_control.enclosures`](/phonometry/reference/api/noise_control/enclosures/) | Insertion loss of a close or free-standing machine enclosure. |
 | [`noise_control.room_to_room`](/phonometry/reference/api/noise_control/room-to-room/) | Room-to-room noise reduction: source room, partition, receiving room, criterion. |
 
-## Program loudness
+## Broadcast metering
 
 | Module | Summary |
 | :--- | :--- |
 | [`broadcast.program_loudness`](/phonometry/reference/api/broadcast/program-loudness/) | Programme loudness and true-peak level (ITU-R BS.1770-5, EBU R 128). |
+| [`broadcast.quasi_peak`](/phonometry/reference/api/broadcast/quasi-peak/) | Psophometric quasi-peak programme-level meter (ITU-R BS.468-4 clause 2). |
 
 ## Wave simulation
 

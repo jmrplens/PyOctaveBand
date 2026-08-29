@@ -1,0 +1,383 @@
+---
+title: "Medidor de cuasipico (UIT-R BS.468-4)"
+description: "El detector psofométrico de cuasipico del apartado 2 de la Rec. UIT-R BS.468-4: once ventanas de aceptación con ráfagas tonales en lugar de una constante de tiempo, la calibración de 0,775 V del apartado 2.6 que convierte una lectura en dBqps, las tres escalas de tiempo ajustadas que las tablas identifican y lo que la Recomendación deja sin verificar."
+references:
+  - type: standard
+    organization: "International Telecommunication Union"
+    year: 2002
+    title: "Measurement of audio-frequency noise voltage level in sound broadcasting"
+    designation: "Recomendación UIT-R BS.468-4"
+    url: "https://www.itu.int/rec/R-REC-BS.468"
+    note: "El apartado 1 y la Fig. 1a para la red de ponderación, el apartado 2 para el detector de cuasipico (las ventanas de aceptación de las Tablas 2 y 3 y la calibración del apartado 2.6) y el apartado 3 para la unidad dBqps."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 1985
+    title: "Sound system equipment - Part 1: General"
+    designation: "IEC 60268-1:1985, Apéndice A (con la Modificación 1:1988)"
+    note: "La misma red y el mismo medidor, como Tabla AI, Fig. A1 y Tablas AII y AIII. Dos de sus celdas son erratas y solo una la corrigió la modificación; véase docs/ERRATA.md."
+  - type: standard
+    organization: "Audio Engineering Society"
+    year: 2015
+    title: "AES standard method for digital audio engineering - Measurement of digital audio equipment"
+    designation: "AES17-2015"
+    url: "https://www.aes.org/publications/standards/search.cfm?docID=21"
+    note: "El apartado 5.2.7 usa la misma curva desplazada −5,63 dB con un detector de valor eficaz y rebautiza el resultado como CCIR-RMS, que es justamente lo que no se mide en esta página."
+---
+
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+La **Rec. UIT-R BS.468-4** mide el nivel de tensión de ruido de audiofrecuencia
+en radiodifusión sonora con dos cosas en serie: la **red de ponderación** del
+apartado 1, que alcanza +12,2 dB cerca de 6,3 kHz, y el **detector de
+cuasipico** del apartado 2, que es de lo que trata esta página. El resultado se
+expresa en **dBqps** (apartado 3). La NOTA 1 del apartado 1 es rotunda sobre por
+qué hacen falta las dos mitades: leer la señal ponderada con cualquier otro
+medidor, «por ejemplo, uno de valor eficaz», da cifras de relación
+señal/ruido «que no son directamente comparables» con las que describe la
+Recomendación.
+
+La curva es
+[`weighting_filter(curve="468")`](/phonometry/es/signals/levels/weighting/). El
+detector es `broadcast.quasi_peak_meter`.
+
+## 1. Qué especifica el apartado 2 y qué no
+
+El apartado 2 no da **ninguna constante de tiempo, ningún tiempo de subida,
+ninguna ley de caída ni ninguna función de transferencia**. Su preámbulo dice
+que el comportamiento dinámico exigido «puede realizarse de diversas maneras»,
+y las palabras «constante de tiempo» aparecen una sola vez en toda la
+Recomendación, dentro de una nota informativa que propone «dos circuitos
+rectificadores de pico de constantes de tiempo distintas conectados en
+cascada» como *una disposición posible* tras la rectificación de onda completa.
+
+Lo que el apartado 2 sí da son **once ventanas de aceptación**. La Tabla 2 lee
+una sola ráfaga tonal de 5 kHz con ocho duraciones, de 1 ms a 200 ms; la
+Tabla 3 lee un tren de ráfagas de 5 ms a 2, 10 y 100 por segundo. Cada celda es
+un porcentaje de la lectura que da *el mismo* tono en régimen permanente, así
+que ambas tablas son cocientes y se cancela cualquier factor absoluto, los
++11,7 dB de la red a 5 kHz incluidos.
+
+| Estímulo | Inferior | Referencia | Superior | Ventana |
+|---|---:|---:|---:|---:|
+| ráfaga de 1 ms | 13,5 % | 17,0 % | 21,4 % | 4,00 dB |
+| ráfaga de 2 ms | 22,4 % | 26,6 % | 31,6 % | 2,99 dB |
+| ráfaga de 5 ms | 34 % | 40 % | 46 % | 2,63 dB |
+| ráfaga de 10 ms | 41 % | 48 % | 55 % | 2,55 dB |
+| ráfaga de 20 ms | 44 % | 52 % | 60 % | 2,69 dB |
+| ráfaga de 50 ms | 50 % | 59 % | 68 % | 2,67 dB |
+| ráfaga de 100 ms | 58 % | 68 % | 78 % | 2,57 dB |
+| ráfaga de 200 ms | 68 % | 80 % | 92 % | 2,63 dB |
+| 5 ms a 2/s | 43 % | 48 % | 53 % | 1,82 dB |
+| 5 ms a 10/s | 72 % | 77 % | 82 % | 1,13 dB |
+| 5 ms a 100/s | 94 % | 97 % | 100 % | 0,54 dB |
+
+De la columna de porcentajes caben gramaticalmente dos lecturas y solo una
+sobrevive: a 100 ráfagas por segundo el *límite superior es el 100 %*. Con la
+lectura «porcentaje del fondo de escala», y con el tono permanente marcando el
+80 % del fondo de escala, ese límite quedaría 1,94 dB por encima del tono
+permanente, cosa que ningún detector que siga picos puede alcanzar con un ciclo
+de trabajo del 50 % de ese mismo tono. Con la lectura «porcentaje de la lectura
+en régimen permanente» la celda dice que el tren «puede alcanzar la lectura
+permanente pero no superarla», que es el techo físico y lo natural de imprimir.
+
+Esa última fila es además el ensayo más exigente del documento: 0,54 dB de
+ancho, frente a los 4,00 dB de la ráfaga de 1 ms.
+
+## 2. Leer un registro
+
+`quasi_peak_meter` pasa el detector por todo el registro y devuelve la mayor
+excursión del indicador, que es lo que un operador anota de una aguja. Por eso
+el registro tiene que incluir la caída: una ráfaga que termina en la última
+muestra se lee antes de que la aguja haya acabado de subir.
+
+```python
+from phonometry import broadcast, signals
+
+fs = 48000
+# El estímulo del propio apartado 2.2: ráfagas de 5 ms (25 periodos) de 5 kHz
+# a 10 por segundo, con la amplitud que hace que el tono permanente marque
+# 0 dBqps.
+burst = signals.tone_burst(fs, 5000.0, 25, amplitude=0.285,
+                           repetitions=16, repetition_rate=10.0,
+                           post_silence=0.5)
+result = broadcast.quasi_peak_meter(burst.signal, fs)
+print(round(result.reading, 4))                            # 0.5872   voltios
+print(round(result.level_db, 2), result.level_unit)        # -2.41 dBqps
+```
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/quasi_peak_meter_es.svg"
+  alt="El detector de cuasipico leyendo un tren de dieciséis ráfagas de 5 milisegundos de tono de 5 kilohercios a 10 por segundo. Las barras verticales grises marcan las ráfagas ponderadas 468 rectificadas, que llegan a 1,10 voltios. La salida azul del detector sube desde cero durante el primer medio segundo, luego ondula suavemente en torno a 0,58 voltios durante el resto del tren y decae de forma continua tras la última ráfaga en 1,55 segundos, hasta 0,16 voltios en 2,1 segundos. Una línea roja discontinua marca la lectura de 0,5872 voltios, menos 2,41 dBqps, y una línea verde punteada por encima marca los 0,775 voltios que el mismo tono daría en régimen permanente, 0 dBqps"
+  width="96%"
+/>
+
+*Todo el contenido del apartado 2 en una imagen: la aguja sube durante el
+primer medio segundo, ondula en cuanto se equilibran la carga entre ráfagas y
+la caída en los huecos, y se va después de que el tren pare. La separación
+entre las dos líneas horizontales es la celda de 10 ráfagas por segundo de la
+Tabla 3, dibujada a escala: el tren marca el 75,8 % del tono permanente frente
+al 77 % impreso, dentro de la ventana del 72 al 82 %.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import broadcast, signals
+
+fs = 48000
+burst = signals.tone_burst(fs, 5000.0, 25, amplitude=0.285,
+                           repetitions=16, repetition_rate=10.0,
+                           post_silence=0.5)
+broadcast.quasi_peak_meter(burst.signal, fs).plot(language="es")
+plt.show()
+```
+
+</details>
+
+El resultado lleva la `trace` que dibuja la figura, muestra a muestra con el
+registro, así que la balística se ve en lugar de esconderse detrás de un
+escalar. Con `weighted=False` se saca la red del camino, que es lo que hace el
+apartado 2.4 y el único ensayo del apartado 2 que lo hace.
+
+## 3. La escala, y cuándo una lectura es dBqps
+
+El apartado 2.6 es la única afirmación absoluta del apartado 2, y es una
+igualdad, no una tolerancia: un tono permanente de 1 kHz a **0,775 V eficaces
+debe marcar 0,775 V**, es decir 0 dBqps. Dos consecuencias, y con la primera
+tropieza quien implementa:
+
+- **El detector lee el valor eficaz de un tono permanente, no su pico.** Un
+  medidor de cuasipico no es un medidor de pico con balística lenta; esa frase
+  fija el factor de escala.
+- **dBqps es un nivel de tensión.** phonometry mide el factor a la frecuencia
+  de muestreo de quien llama en lugar de guardar uno ajustado a 48 kHz, porque
+  la ganancia de la cadena para un tono permanente se mueve 0,0141 dB entre 32
+  y 192 kHz y el apartado 2.6 no admite ese margen.
+
+```python
+import numpy as np
+from phonometry import broadcast
+
+fs = 48000
+t = np.arange(3 * fs) / fs
+calibration = 0.775 * np.sqrt(2.0) * np.sin(2 * np.pi * 1000.0 * t)
+print(round(broadcast.quasi_peak_meter(calibration, fs).reading, 6))   # 0.775
+```
+
+Por eso un array pelado o un `Signal` sin calibrar se leen como un registro de
+tensión frente a `broadcast.DBQPS_REFERENCE`, 0,775 V. Un `Signal`
+**calibrado** presenta sus muestras en pascales, como en todo el resto de la
+biblioteca, y entonces hay que darle una `reference` propia: 0,775 V no es una
+presión, y BS.468-4 no ofrece ninguna presión que poner en su lugar, así que la
+llamada se rechaza en vez de imprimir `20 lg(p / 0,775)` bajo un nombre que el
+apartado 3 reserva para tensiones. `result.level_unit` nombra la escala que
+haya salido: `"dBqps"`, `"dB re 20 uPa"` o la propia referencia.
+
+## 4. La balística, y cuánto la fijan las tablas
+
+Las tres constantes de tiempo de `broadcast.BS468_BALLISTICS` son un **ajuste a
+las once lecturas de referencia**. No aparecen en ninguna parte de BS.468-4 y
+nunca deben atribuírsele.
+
+```python
+from phonometry import broadcast
+
+print(broadcast.BS468_BALLISTICS)
+# QuasiPeakBallistics(charge=0.0014096, discharge=0.2932, reading_device=0.13999)
+```
+
+Un rectificador de pico (carga 1,41 ms, descarga 293 ms) seguido de un
+indicador simétrico de primer orden (140 ms), sobre la salida rectificada en
+onda completa de la red de ponderación, tomando como lectura el máximo de la
+última etapa. El apartado 2.5 trata «el indicador» como un objeto aparte, y
+hace falta: un rectificador de pico solo no cumple las tablas, y su mejor
+ajuste se queda a 4,3 dB en el peor punto con solo cuatro de las once lecturas
+dentro de su ventana.
+
+Lo bien que las tablas identifican esos tres números depende de la pregunta
+que se haga, así que la pregunta se enuncia. Manteniendo los otros dos en los
+valores distribuidos y moviendo uno hasta que falle una ventana, **las once se
+cumplen de 1,014 a 1,894 ms de carga (un factor de 1,87), de 233 a 367 ms de
+descarga (1,58) y de 96 a 200 ms de indicador (2,09)**. Reoptimizar los otros
+dos en cada paso duplica aproximadamente cada intervalo. Así que el indicador,
+y no la carga, es la constante que peor fijan las tablas, y dos instrumentos
+conformes pueden diferir en un factor de dos en ella. Ninguna lectura que dé
+esta biblioteca para una señal que no sea una sinusoide enventanada de 5 kHz
+puede ser más ajustada que eso.
+
+Tres es además el orden de modelo que soportan las tablas. Una cuarta
+constante, el segundo rectificador de pico de la nota informativa, compra
+0,011 dB y queda sin identificar en un factor de 15,9. Una quinta compra
+0,036 dB en el peor punto, concentrado en las dos celdas cuya referencia
+impresa está cuantizada a ±0,064 y ±0,056 dB, y sus dos constantes centrales se
+mueven en factores de 3,0 y 2,1 al cambiar el último decimal del objetivo. Más
+allá de tres constantes el ajuste se ajusta al redondeo de la tabla.
+
+Las seis decisiones que hay detrás de los números (rectificación de onda
+completa como $|x|$, el rectificador de un polo asimétrico, el indicador
+simétrico, la regla de lectura como máximo sobre el registro, la referencia del
+tono permanente y correr la balística a la frecuencia de entrada) son
+inseparables. Cambia una y hay que reajustar las tres constantes.
+
+## 5. Conformidad
+
+`verify_quasi_peak_dynamics` construye los estímulos de los apartados 2.1 y 2.2
+tal como se especifican (una sinusoide de 5 kHz que empieza en un paso por cero
+y dura un número entero de periodos completos, a través de la red de
+ponderación) y lee cada uno frente a la lectura permanente de la misma cadena.
+
+```python
+from phonometry import broadcast
+
+report = broadcast.verify_quasi_peak_dynamics(48000.0)
+print(report["passed"], round(report["worst_margin_db"], 3))   # True 0.259
+row = report["stimuli"][0]
+print(row["stimulus"], round(row["reading_percent"], 2))       # 1 ms 16.94
+```
+
+Las once ventanas se cumplen a 32, 44,1, 48, 96 y 192 kHz. El peor margen es de
+0,259 dB, en la celda de 100 ráfagas por segundo cuyo límite superior es el
+techo físico. Entre esas cinco frecuencias ninguna lectura se mueve más de
+0,080 dB, es decir el 4,2 % de su propia ventana, y por eso no muerde aquí la
+preocupación clásica de que un seguidor de picos lea la mayor *muestra* en
+lugar del mayor valor de la forma de onda: la carga de 1,41 ms abarca catorce
+semiperiodos de la portadora de 5 kHz rectificada, así que el rizado ha
+desaparecido hace mucho antes de tomar ningún máximo.
+
+También se informa de `deviation_db`, frente a la columna de *referencia*, y el
+informe lo llama por su nombre: una cota de regresión autoimpuesta, no
+conformidad. La peor es de 0,140 dB, a 10 ráfagas por segundo. La fila de
+referencia está impresa con dos cifras significativas en nueve de las once
+celdas, así que su propio cuanto es de 0,027 a 0,108 dB y nada más ajustado que
+eso significaría algo.
+
+Otros cuatro apartados son calculables y se cumplen **por construcción** y no
+por medida, porque la rectificación, las recursiones de primer orden y un
+máximo son positivamente homogéneas y no pueden sobrepasar un escalón monótono:
+las dos variantes de atenuador del apartado 2.1, los ±1 dB sobre 20 dB de
+ráfagas de 0,6 ms del apartado 2.3, los 0,5 dB de reversibilidad del apartado
+2.4 ($|-x| = |x|$, así que la diferencia es exactamente cero) y el tope de
+0,3 dB de sobreoscilación del apartado 2.5. El resto de los apartados 2.3, 2.6
+y 2.7 no tiene nada que calcular: la capacidad de sobrecarga por encima del
+fondo de escala, la ley de una etapa logarítmica, un margen de escala calibrado
+de al menos 20 dB, una impedancia de entrada de al menos 20 kΩ y una
+terminación de 600 Ω son hardware del instrumento. También lo es el «80 % del
+fondo de escala», que restringe dónde se coloca una aguja real durante el
+ensayo y no la magnitud, y por eso esta biblioteca no modela ningún fondo de
+escala.
+
+## 6. Lo que ningún oráculo puede comprobar
+
+Las tablas usan una portadora, una forma de onda, una amplitud, ocho duraciones
+y tres cadencias de repetición, y esa es toda la especificación del detector.
+No hay implementación de referencia, ni respuesta impulsiva tabulada, ni
+ejemplo resuelto en BS.468-4, ni en el Apéndice A de IEC 60268-1:1985, ni en
+ninguna de las dos modificaciones de 1988. Por tanto:
+
+- **La respuesta al ruido no se puede verificar**, y el ruido es toda la razón
+  de ser del instrumento. Dos detectores conformes discreparán sobre ruido,
+  sobre voz y sobre material de programa en una cantidad que el documento no
+  acota. Cuánto sí se puede medir desde este lado: llevando cada constante de
+  la balística al borde de su intervalo conforme, de una en una, salen cuatro
+  detectores que cumplen las once ventanas, y ante un impulso de una muestra
+  leen **2,61 dB de diferencia**, ante un pulso de 1 ms 2,53 dB y ante una
+  ráfaga de un solo ciclo a 5 kHz 2,51 dB. Es una cota inferior, sacada de
+  esquinas de una constante cada vez, y ya es casi toda la ventana más ancha
+  que dibujan las tablas (4,00 dB) y cinco veces la más estrecha (0,54 dB). Con
+  ruido blanco esos mismos cuatro se separan 0,34 dB, y con un tono estable de
+  1 kHz 0,03 dB: lo que las tablas no fijan son los transitorios, que es justo
+  donde un medidor cuasipico se distingue de uno de valor eficaz.
+- **Tampoco la relación entre una cifra de cuasipico en dB(468) y una de valor
+  eficaz en dB(A)** para ninguna señal real. La regla de que el ruido propio de
+  un micrófono en BS.468 sale unos 10 dB por encima del ponderado A es una
+  afirmación sobre los espectros típicos de ruido de micrófono, no sobre
+  ninguna de las dos normas.
+- **Tampoco nada fuera de los estímulos tabulados**: ráfagas de menos de 0,6 ms
+  o de más de 200 ms, portadoras distintas de 5 kHz, cadencias distintas de 2,
+  10 y 100 por segundo, y cualquier cosa que no sea una sinusoide enventanada.
+
+**No hay ficha `.report()`** para esta medida, y es una decisión sobre la norma,
+no sobre el esfuerzo. BS.468-4 no prescribe formato de informe, ni formulario de
+declaración, ni ejemplo resuelto, ni apartado de expresión de resultados más
+allá de la frase del apartado 3 que nombra la unidad. Una hoja de conformidad
+en formato acreditado daría fe del filtro de esta propia biblioteca, en una
+página con línea de base normativa, con once números producidos por una
+balística que este proyecto ajustó. La evidencia de conformidad es real y está
+publicada, en [`docs/CONFORMANCE.md`](/phonometry/es/reference/conformance/), a
+través de `verify_quasi_peak_dynamics`.
+
+## Qué cubre esta guía
+
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Apartado 2 de UIT-R BS.468-4: el detector de cuasipico, sus once ventanas de
+aceptación de las Tablas 2 y 3 y la calibración del apartado 2.6 que fija la
+escala dBqps. `quasi_peak_meter` pasa el detector, `QuasiPeakResult` lleva la
+lectura y la aguja, `BS468_BALLISTICS` guarda las tres escalas de tiempo
+ajustadas y `verify_quasi_peak_dynamics` comprueba las once ventanas a
+cualquier frecuencia de muestreo. Los apartados 2.1, 2.3, 2.4 y 2.5 se
+ejercitan en la batería de pruebas como propiedades de la cadena. La red de
+ponderación del apartado 1 es `weighting_filter(curve="468")`.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered" label="No cubierto">
+La respuesta sin ponderar del Anexo 2 es una plantilla gráfica de tolerancia
+ofrecida «a título orientativo» y explícitamente fuera del alcance de la
+Recomendación; no tiene tabla, ni fórmula, ni orden de filtro, así que aquí no
+se implementa. La realización de resistencia constante del Anexo 1 es una
+construcción hardware alternativa de la misma respuesta, con devanados acoplados
+cuyos coeficientes de acoplo la figura no da, y no aporta nada que necesite una
+implementación en software. Los requisitos de instrumento de los apartados 2.3,
+2.6 y 2.7 (capacidad de sobrecarga, ley de una etapa logarítmica, margen de
+escala calibrado, impedancia de entrada y terminación de 600 Ω) son hardware y
+no se modelan. No hay ficha `.report()`, por lo que dice el apartado 6.
+</ScopeClaim>
+</Scope>
+
+## Véase también
+
+- [Sonoridad de programa y pico verdadero](/phonometry/es/devices/broadcast/program-loudness/):
+  el otro medidor UIT-R BS, y el diseño opuesto: un valor cuadrático medio con
+  puertas y coeficientes publicados donde este es un seguidor de picos sin
+  ninguno.
+- [Ponderaciones frecuenciales](/phonometry/es/signals/levels/weighting/): la
+  propia curva 468, junto a A, C y Z.
+- [Señales de prueba](/phonometry/es/signals/spectra/test-signals/):
+  `tone_burst`, el generador de IEC 60268-1 que construye los estímulos de los
+  apartados 2.1 y 2.2.
+- [Micrófonos (IEC 60268-4)](/phonometry/es/devices/electroacoustics/microphones/):
+  de dónde sale una cifra declarada de ruido propio en dB(CCIR) y por qué sigue
+  siendo una declaración.
+- [Radiodifusión](/phonometry/es/devices/broadcast/): el resumen de la sección.
+- Referencia de la API: [`broadcast.quasi_peak`](/phonometry/es/reference/api/broadcast/quasi-peak/).
+
+## Referencias
+
+- International Telecommunication Union. (2002). *Measurement of
+  audio-frequency noise voltage level in sound broadcasting* (Recomendación
+  UIT-R BS.468-4). [Publicación UIT-R](https://www.itu.int/rec/R-REC-BS.468).
+  La red de ponderación del apartado 1 y el detector de cuasipico del
+  apartado 2.
+- International Electrotechnical Commission. (1985). *Sound system equipment -
+  Part 1: General* (IEC 60268-1:1985), Apéndice A, con la Modificación 1:1988.
+  La misma red y el mismo medidor, como Tabla AI, Fig. A1 y Tablas AII y AIII.
+- Audio Engineering Society. (2015). *AES standard method for digital audio
+  engineering - Measurement of digital audio equipment* (AES17-2015),
+  apartado 5.2.7. La misma curva desplazada −5,63 dB y leída con un detector de
+  valor eficaz, rebautizada CCIR-RMS justo por eso.
+
+## Normas
+
+UIT-R BS.468-4 (1970-1974-1978-1982-1986, con modificaciones editoriales de
+2002), *Measurement of audio-frequency noise voltage level in sound
+broadcasting*: el método de cuasipico del apartado 2, las ventanas de
+aceptación de ráfaga única de la Tabla 2 y de ráfagas repetitivas de la
+Tabla 3, la calibración del apartado 2.6 a 1 kHz y 0,775 V eficaces, y la
+unidad dBqps del apartado 3. El apartado 2 no imprime ninguna constante de
+tiempo, así que la dinámica de cualquier detector conforme es una decisión de
+diseño dentro de esas once ventanas; las tres escalas de tiempo que usa esta
+biblioteca son un ajuste, identificado por las tablas solo dentro de un factor
+de 1,6 a 3,0.

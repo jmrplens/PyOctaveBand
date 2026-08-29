@@ -83,9 +83,16 @@ derived from the same equivalent noise level, and the overload sound
 pressure level (clause 15.2) bounds the usable range from above. The
 BS.468 weighting curve itself is exposed as `itu_r_468_weighting` in the
 [electroacoustics distortion set](electroacoustics.md), where it also
-weights THD. The quasi-peak detector itself is not implemented: an
-inherent-noise level computed from `itu_r_468_weighting` and an r.m.s. sum
-is not a dBqps figure.
+weights THD. The quasi-peak detector is implemented too, as
+`broadcast.quasi_peak_meter`
+([Quasi-peak programme meter](../broadcast/quasi-peak.md)), but it reads a
+*recording*, and `itu_r_468_weighting` is the network alone: an
+inherent-noise level computed from the network and an r.m.s. sum is still
+not a dBqps figure. Clause 17 has no waveform to hand it either — it takes
+the stated voltage or level from the data sheet — so
+`MicrophoneNoise(weighting="CCIR")` stays what it always was, metadata
+recording how the supplier measured their figure rather than a measurement
+this library made.
 
 ## 4. Microphone characteristics report (IEC 60268-4)
 

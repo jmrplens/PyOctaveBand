@@ -277,11 +277,12 @@ export const apiSections = {
     ],
   },
   'broadcast': {
-    label: 'Program loudness',
-    translations: { es: 'Sonoridad de programa' },
+    label: 'Broadcast metering',
+    translations: { es: 'Medición en radiodifusión' },
     collapsed: true,
     items: [
       'reference/api/broadcast/program-loudness',
+      'reference/api/broadcast/quasi-peak',
     ],
   },
   'simulation': {

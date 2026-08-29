@@ -27,6 +27,15 @@ imported in the ``pr-comment`` CI job, which installs the runtime
 requirements but not ``pytest``.
 """
 
+from .broadcast import BS468_BURST_HZ as BS468_BURST_HZ
+from .broadcast import BS468_CALIBRATION_V as BS468_CALIBRATION_V
+from .broadcast import BS468_OVERLOAD_BURST_MS as BS468_OVERLOAD_BURST_MS
+from .broadcast import BS468_OVERLOAD_RANGE_DB as BS468_OVERLOAD_RANGE_DB
+from .broadcast import BS468_OVERLOAD_TOL_DB as BS468_OVERLOAD_TOL_DB
+from .broadcast import BS468_OVERSWING_TOL_DB as BS468_OVERSWING_TOL_DB
+from .broadcast import BS468_REVERSIBILITY_TOL_DB as BS468_REVERSIBILITY_TOL_DB
+from .broadcast import BS468_TABLE2_SINGLE_BURSTS as BS468_TABLE2_SINGLE_BURSTS
+from .broadcast import BS468_TABLE3_BURST_TRAINS as BS468_TABLE3_BURST_TRAINS
 from .broadcast import BS1770_ANCHOR_997_LKFS as BS1770_ANCHOR_997_LKFS
 from .broadcast import EBU_TECH3341_CASE6_EXPECTED as EBU_TECH3341_CASE6_EXPECTED
 from .broadcast import EBU_TECH3341_CASE6_LEVELS as EBU_TECH3341_CASE6_LEVELS

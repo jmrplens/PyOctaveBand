@@ -1,6 +1,6 @@
 ---
 title: "Guías"
-description: "Las 107 guías de phonometry, agrupadas en los once temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
+description: "Las 108 guías de phonometry, agrupadas en los once temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
 head:
   - tag: script
     attrs:
@@ -104,7 +104,7 @@ hay ninguna panorámica del campo: cada página es la documentación de trabajo 
 un módulo, escrita para que un resultado se pueda defender apartado por
 apartado en lugar de darlo por bueno.
 
-Esta página es el mapa. Ciento siete guías repartidas en once temas, y cada
+Esta página es el mapa. Ciento ocho guías repartidas en once temas, y cada
 área tiene su propio índice con el relato largo de cómo encajan sus piezas. Si
 llegas sin una pregunta concreta, lee primero la
 [introducción](/phonometry/es/start/getting-started/): recorre una señal por toda la
@@ -680,6 +680,12 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 y EBU R 128.
   momentáneo y de corto plazo, el rango de sonoridad y el nivel de pico
   verdadero. La barra lateral la archiva dentro de Electroacústica; tiene su
   propio índice de sección.
+- [Medidor de cuasipico](/phonometry/es/devices/broadcast/quasi-peak/): el
+  medidor psofométrico de ruido de la UIT-R BS.468-4, cuyo apartado 2 no
+  imprime ninguna constante de tiempo y especifica el detector mediante once
+  ventanas de aceptación con ráfagas tonales, la calibración de 0,775 V que
+  convierte una lectura en dBqps y tres escalas de tiempo ajustadas que las
+  ventanas fijan solo dentro de un factor de tres.
 
 **[Control de ruido](/phonometry/es/devices/noise-control/)**
 

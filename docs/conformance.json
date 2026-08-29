@@ -3,12 +3,12 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 554,
-    "passing": 554,
+    "checks": 566,
+    "passing": 566,
     "failing": 0,
-    "domains": 58,
-    "standards": 370,
-    "citations": 506,
+    "domains": 59,
+    "standards": 373,
+    "citations": 509,
     "designations": 114,
     "sources": 84
   },
@@ -39,6 +39,7 @@
     "dB/s",
     "dBA",
     "dBTP",
+    "dBqps",
     "deg",
     "ft",
     "kPa",
@@ -355,6 +356,12 @@
       "title": "Program loudness (ITU-R BS.1770 / EBU R 128)",
       "checks": 8,
       "passing": 8
+    },
+    {
+      "id": "quasi-peak-meter-itu-r-bs-468-4",
+      "title": "Quasi-peak meter (ITU-R BS.468-4)",
+      "checks": 12,
+      "passing": 12
     },
     {
       "id": "broadcast-wave-metadata-ebu-tech-3285-itu-r-bs-2088",
@@ -13248,6 +13255,298 @@
         "value": 2.39e-11
       },
       "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "quasi-peak-meter-itu-r-bs-468-4/itu-r-bs-468-4-table-2/single-1-ms-5-khz-burst-5-periods-of-the-steady-reading",
+      "domain": "quasi-peak-meter-itu-r-bs-468-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "ITU-R BS.468-4",
+        "clause": "Table 2",
+        "cite": "ITU-R BS.468-4 Table 2"
+      },
+      "quantity": "Single 1 ms 5 kHz burst (5 periods), % of the steady reading",
+      "kind": "scalar",
+      "expected": {
+        "label": "13.5 to 21.4 %"
+      },
+      "computed": {
+        "label": "16.85 %"
+      },
+      "deviation": {
+        "value": 1.927,
+        "label": "+1.927 dB"
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "quasi-peak-meter-itu-r-bs-468-4/itu-r-bs-468-4-table-2/single-2-ms-5-khz-burst-10-periods-of-the-steady-reading",
+      "domain": "quasi-peak-meter-itu-r-bs-468-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "ITU-R BS.468-4",
+        "clause": "Table 2",
+        "cite": "ITU-R BS.468-4 Table 2"
+      },
+      "quantity": "Single 2 ms 5 kHz burst (10 periods), % of the steady reading",
+      "kind": "scalar",
+      "expected": {
+        "label": "22.4 to 31.6 %"
+      },
+      "computed": {
+        "label": "26.72 %"
+      },
+      "deviation": {
+        "value": 1.458,
+        "label": "+1.458 dB"
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "quasi-peak-meter-itu-r-bs-468-4/itu-r-bs-468-4-table-2/single-5-ms-5-khz-burst-25-periods-of-the-steady-reading",
+      "domain": "quasi-peak-meter-itu-r-bs-468-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "ITU-R BS.468-4",
+        "clause": "Table 2",
+        "cite": "ITU-R BS.468-4 Table 2"
+      },
+      "quantity": "Single 5 ms 5 kHz burst (25 periods), % of the steady reading",
+      "kind": "scalar",
+      "expected": {
+        "label": "34 to 46 %"
+      },
+      "computed": {
+        "label": "40.29 %"
+      },
+      "deviation": {
+        "value": 1.151,
+        "label": "+1.151 dB"
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "quasi-peak-meter-itu-r-bs-468-4/itu-r-bs-468-4-table-2/single-10-ms-5-khz-burst-50-periods-of-the-steady-reading",
+      "domain": "quasi-peak-meter-itu-r-bs-468-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "ITU-R BS.468-4",
+        "clause": "Table 2",
+        "cite": "ITU-R BS.468-4 Table 2"
+      },
+      "quantity": "Single 10 ms 5 kHz burst (50 periods), % of the steady reading",
+      "kind": "scalar",
+      "expected": {
+        "label": "41 to 55 %"
+      },
+      "computed": {
+        "label": "47.73 %"
+      },
+      "deviation": {
+        "value": 1.231,
+        "label": "+1.231 dB"
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "quasi-peak-meter-itu-r-bs-468-4/itu-r-bs-468-4-table-2/single-20-ms-5-khz-burst-100-periods-of-the-steady-reading",
+      "domain": "quasi-peak-meter-itu-r-bs-468-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "ITU-R BS.468-4",
+        "clause": "Table 2",
+        "cite": "ITU-R BS.468-4 Table 2"
+      },
+      "quantity": "Single 20 ms 5 kHz burst (100 periods), % of the steady reading",
+      "kind": "scalar",
+      "expected": {
+        "label": "44 to 60 %"
+      },
+      "computed": {
+        "label": "52.58 %"
+      },
+      "deviation": {
+        "value": 1.146,
+        "label": "+1.146 dB"
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "quasi-peak-meter-itu-r-bs-468-4/itu-r-bs-468-4-table-2/single-50-ms-5-khz-burst-250-periods-of-the-steady-reading",
+      "domain": "quasi-peak-meter-itu-r-bs-468-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "ITU-R BS.468-4",
+        "clause": "Table 2",
+        "cite": "ITU-R BS.468-4 Table 2"
+      },
+      "quantity": "Single 50 ms 5 kHz burst (250 periods), % of the steady reading",
+      "kind": "scalar",
+      "expected": {
+        "label": "50 to 68 %"
+      },
+      "computed": {
+        "label": "58.78 %"
+      },
+      "deviation": {
+        "value": 1.266,
+        "label": "+1.266 dB"
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "quasi-peak-meter-itu-r-bs-468-4/itu-r-bs-468-4-table-2/single-100-ms-5-khz-burst-500-periods-of-the-steady-reading",
+      "domain": "quasi-peak-meter-itu-r-bs-468-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "ITU-R BS.468-4",
+        "clause": "Table 2",
+        "cite": "ITU-R BS.468-4 Table 2"
+      },
+      "quantity": "Single 100 ms 5 kHz burst (500 periods), % of the steady reading",
+      "kind": "scalar",
+      "expected": {
+        "label": "58 to 78 %"
+      },
+      "computed": {
+        "label": "66.98 %"
+      },
+      "deviation": {
+        "value": 1.251,
+        "label": "+1.251 dB"
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "quasi-peak-meter-itu-r-bs-468-4/itu-r-bs-468-4-table-2/single-200-ms-5-khz-burst-1000-periods-of-the-steady-reading",
+      "domain": "quasi-peak-meter-itu-r-bs-468-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "ITU-R BS.468-4",
+        "clause": "Table 2",
+        "cite": "ITU-R BS.468-4 Table 2"
+      },
+      "quantity": "Single 200 ms 5 kHz burst (1000 periods), % of the steady reading",
+      "kind": "scalar",
+      "expected": {
+        "label": "68 to 92 %"
+      },
+      "computed": {
+        "label": "80.41 %"
+      },
+      "deviation": {
+        "value": 1.17,
+        "label": "+1.170 dB"
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "quasi-peak-meter-itu-r-bs-468-4/itu-r-bs-468-4-table-3/5-ms-5-khz-bursts-at-2-per-second-of-the-steady-reading",
+      "domain": "quasi-peak-meter-itu-r-bs-468-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "ITU-R BS.468-4",
+        "clause": "Table 3",
+        "cite": "ITU-R BS.468-4 Table 3"
+      },
+      "quantity": "5 ms 5 kHz bursts at 2 per second, % of the steady reading",
+      "kind": "scalar",
+      "expected": {
+        "label": "43 to 53 %"
+      },
+      "computed": {
+        "label": "48.11 %"
+      },
+      "deviation": {
+        "value": 0.841,
+        "label": "+0.841 dB"
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "quasi-peak-meter-itu-r-bs-468-4/itu-r-bs-468-4-table-3/5-ms-5-khz-bursts-at-10-per-second-of-the-steady-reading",
+      "domain": "quasi-peak-meter-itu-r-bs-468-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "ITU-R BS.468-4",
+        "clause": "Table 3",
+        "cite": "ITU-R BS.468-4 Table 3"
+      },
+      "quantity": "5 ms 5 kHz bursts at 10 per second, % of the steady reading",
+      "kind": "scalar",
+      "expected": {
+        "label": "72 to 82 %"
+      },
+      "computed": {
+        "label": "75.70 %"
+      },
+      "deviation": {
+        "value": 0.435,
+        "label": "+0.435 dB"
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "quasi-peak-meter-itu-r-bs-468-4/itu-r-bs-468-4-table-3/5-ms-5-khz-bursts-at-100-per-second-of-the-steady-reading",
+      "domain": "quasi-peak-meter-itu-r-bs-468-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "ITU-R BS.468-4",
+        "clause": "Table 3",
+        "cite": "ITU-R BS.468-4 Table 3"
+      },
+      "quantity": "5 ms 5 kHz bursts at 100 per second, % of the steady reading",
+      "kind": "scalar",
+      "expected": {
+        "label": "94 to 100 %"
+      },
+      "computed": {
+        "label": "97.11 %"
+      },
+      "deviation": {
+        "value": 0.255,
+        "label": "+0.255 dB"
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "quasi-peak-meter-itu-r-bs-468-4/itu-r-bs-468-4-clause-2-6/steady-1-khz-sine-at-0-775-v-r-m-s-dbqps",
+      "domain": "quasi-peak-meter-itu-r-bs-468-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "ITU-R BS.468-4",
+        "clause": "clause 2.6",
+        "cite": "ITU-R BS.468-4 clause 2.6"
+      },
+      "quantity": "Steady 1 kHz sine at 0.775 V r.m.s., dBqps",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": -3.28e-14
+      },
+      "unit": "dBqps",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-06
+      },
+      "deviation": {
+        "value": -3.28e-14
+      },
+      "precision": 6,
       "verdict": "pass"
     },
     {

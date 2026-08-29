@@ -38,6 +38,16 @@ the loudness range. True peak is measured on an oversampled signal because an
 inter-sample peak can exceed every sample value, so a file that reads −0.2 dBFS
 can still clip a converter.
 
+Broadcasting standardised a second meter, forty years earlier and for the
+opposite question. **ITU-R BS.468-4** measures the *noise* on a programme
+circuit rather than the programme: a weighting network peaking at +12.2 dB
+near 6.3 kHz, read by a **quasi-peak** detector, reported in **dBqps**. The
+two are worth reading side by side because they are built on opposite
+principles. BS.1770 is a gated mean square with its coefficients printed to
+fourteen digits; BS.468-4 is a peak follower whose dynamics are specified only
+by eleven tone-burst acceptance windows, with no time constant printed
+anywhere in it.
+
 ## Pages in this section
 
 - [Programme loudness (EBU R 128)](program-loudness.md):
@@ -46,6 +56,11 @@ can still clip a converter.
   integrated meters, the Tech 3342 loudness range, the Annex 2 oversampled true
   peak and the Annex 3 channel weights for advanced sound systems — validated
   against the EBU test signals and ending in an EBU R 128 report fiche.
+- [Quasi-peak programme meter (ITU-R BS.468-4)](quasi-peak.md):
+  the psophometric noise meter — the clause 2 quasi-peak detector, its eleven
+  Table 2 and Table 3 acceptance windows, the clause 2.6 calibration that makes
+  a reading dBqps, and the three fitted time scales those windows identify only
+  to within a factor of 1.6 to 3.0.
 
 ## See also
 

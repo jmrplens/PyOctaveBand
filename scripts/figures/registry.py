@@ -154,6 +154,7 @@ from .devices import (
     generate_precision_positions_arrays,
     generate_program_loudness,
     generate_quarter_wave_geometry,
+    generate_quasi_peak_meter,
     generate_radiation_efficiency,
     generate_radiation_plate_geometry,
     generate_reverberation_correction_terms,
@@ -900,6 +901,9 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # EBU R 128 with Tech 3341/3342).
     generate_program_loudness,
     generate_k_weighting_response,
+    # Broadcast: the ITU-R BS.468-4 psophometric quasi-peak meter reading
+    # the clause 2.2 burst train.
+    generate_quasi_peak_meter,
     # Correlation / time-delay estimation: GCC-PHAT vs the direct
     # correlator on a colored signal pair (Knapp & Carter 1976).
     generate_gcc_phat_delay,

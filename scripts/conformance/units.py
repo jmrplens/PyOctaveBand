@@ -68,6 +68,7 @@ UNITS: frozenset[str] = frozenset(
         "dB/s",
         "dBA",
         "dBTP",
+        "dBqps",
         "deg",
         "ft",
         "kPa",
