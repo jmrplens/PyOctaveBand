@@ -268,7 +268,10 @@ Time of each sample of `trace`, in seconds.
 ## verify_quasi_peak_dynamics
 
 ```python
-verify_quasi_peak_dynamics(fs: float = 48000.0) -> dict[str, Any]
+verify_quasi_peak_dynamics(
+    fs: float = 48000.0,
+    ballistics: QuasiPeakBallistics = ...,
+) -> dict[str, Any]
 ```
 
 Check the detector against the eleven acceptance windows of clause 2.
@@ -301,6 +304,7 @@ answer by construction.
 | Name | Description |
 | :--- | :--- |
 | `fs` | Sample rate to run the stimuli at, in Hz. At 44.1 kHz the 25-cycle burst is not sample-exact (it spans 220.5 samples) and [`tone_burst`](/phonometry/reference/api/signals/test-signals/#tone_burst) warns; the consequence measures 0.006 dB against a 2.626 dB window. |
+| `ballistics` | The chain to check, defaulting to the fitted [`BS468_BALLISTICS`](/phonometry/reference/api/broadcast/quasi-peak/#bs468_ballistics). Passing another set is how the published statement about how far each constant can move is reproduced, and the reason the chain takes them as an argument at all. |
 
 **Returns:** Dict with `fs`, `passed` (every reading inside its window), `worst_margin_db` (the smallest margin over the eleven, negative when one is outside), `worst_deviation_db` (the largest departure from a printed reference reading) and `stimuli`: eleven rows of `{"stimulus", "table", "reading_percent", "lower_percent", "reference_percent", "upper_percent", "deviation_db", "margin_db"}`.
 

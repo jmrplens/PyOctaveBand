@@ -195,13 +195,33 @@ their windows.
 
 How well the tables identify those three numbers depends on the question
 asked, so the question is stated. Holding the other two at their shipped
-values and moving one until a window fails, **all eleven are met from 1.014 to
-1.894 ms of charge (a factor of 1.87), 233 to 367 ms of discharge (1.58) and
-96 to 200 ms of reading device (2.09)**. Re-optimising the other two at each
-step roughly doubles each range. So the reading device, not the charge, is the
-constant the tables pin down least, and two conforming instruments may differ
-by a factor of two in it. No reading this library produces for any signal
-other than a gated 5 kHz sine can be tighter than that.
+values and moving one until a window fails, **all eleven are met from 1.02 to
+1.90 ms of charge (a factor of 1.88), 230 to 370 ms of discharge (1.61) and
+96 to 200 ms of reading device (2.09)**. Each of those six edges is a value
+that conforms rather than one rounded past the boundary, and
+`verify_quasi_peak_dynamics(fs, ballistics)` takes the ballistics as an
+argument precisely so the claim can be re-derived instead of believed.
+
+Two things about those ranges are easy to get wrong, and both were got wrong
+here before being measured properly.
+
+**They are marginal, not a box.** Each is measured with the other two frozen,
+so they cannot be combined: the fastest charge together with the shortest
+indicator misses by 1.11 dB, and the slowest charge with the longest indicator
+by 1.26 dB. The conforming region is a shape in three dimensions, not the
+product of three intervals.
+
+**They cannot be measured by moving the module constant.** The chain caches
+the clause 2.6 calibration factor and the steady 5 kHz reference, and until
+those caches took the ballistics into their key, changing the constants left
+them answering with a reference computed for a different instrument. The
+symptom was that the same value passed or failed depending on what order the
+probes ran in, which is how the first set of figures published here came to be
+wrong.
+
+So the reading device, not the charge, is the constant the tables pin down
+least. No reading this library produces for any signal other than a gated
+5 kHz sine can be tighter than that.
 
 Three is also the model order the tables support. A fourth constant — the
 informative Note's second peak rectifier — buys 0.011 dB and is left
@@ -272,15 +292,18 @@ amendment. So:
 - **The response to noise is unverifiable**, and noise is the instrument's
   entire purpose. Two conforming detectors will disagree on noise, on speech
   and on programme material by an amount nothing in the document bounds. How
-  much is measurable from this side: taking each ballistics constant to the
-  edge of its conforming range in turn gives four detectors that all pass all
-  eleven windows, and on a one-sample click they read **2.61 dB apart**, on a
-  1 ms pulse 2.53 dB and on a single-cycle 5 kHz burst 2.51 dB. That is a
-  lower bound from one-constant-at-a-time corners, and it is already most of
-  the widest window the tables draw (4.00 dB) and five times the narrowest
-  (0.54 dB). On white noise the same four spread 0.34 dB, and on a steady
-  1 kHz tone 0.03 dB: it is transients the tables fail to pin, which is where
-  a quasi-peak meter differs from an r.m.s. one in the first place.
+  much is measurable from this side. Sampling the three time constants inside
+  their identified ranges and keeping only the sets that meet all eleven
+  windows gives 243 conforming detectors, and on a one-sample click they read
+  **4.61 dB apart**, on a 1 ms pulse 4.61 dB and on a single-cycle 5 kHz burst
+  4.55 dB. That is more than the widest window the tables draw (4.00 dB) and
+  eight times the narrowest (0.54 dB). On white noise the same 243 spread
+  0.71 dB, and on a steady 1 kHz tone 0.00 dB, which is the clause 2.6
+  calibration doing exactly what it promises: it is transients the tables fail
+  to pin, which is where a quasi-peak meter differs from an r.m.s. one in the
+  first place. The record has to be long enough for the needle to finish
+  rising before any of this is read, or the slow sets are caught mid-climb and
+  the spread measured is the truncation instead.
 - **So is the relationship between a dB(468) quasi-peak figure and a dB(A)
   r.m.s. one** for any real signal. The rule of thumb that a microphone's
   BS.468 self-noise figure comes out about 10 dB above its A-weighted one is a
@@ -342,20 +365,6 @@ the 600 Ω termination — are hardware and are not modelled. There is no
 - [Broadcast](/phonometry/devices/broadcast/): the section overview.
 - API reference: [`broadcast.quasi_peak`](/phonometry/reference/api/broadcast/quasi-peak/).
 
-## References
-
-- International Telecommunication Union. (2002). *Measurement of
-  audio-frequency noise voltage level in sound broadcasting* (Recommendation
-  ITU-R BS.468-4). [ITU-R publication](https://www.itu.int/rec/R-REC-BS.468).
-  The weighting network of clause 1 and the quasi-peak detector of clause 2.
-- International Electrotechnical Commission. (1985). *Sound system equipment
-  - Part 1: General* (IEC 60268-1:1985), Appendix A, with Amendment 1:1988.
-  The same network and meter, as Table AI, Fig. A1 and Tables AII and AIII.
-- Audio Engineering Society. (2015). *AES standard method for digital audio
-  engineering - Measurement of digital audio equipment* (AES17-2015),
-  clause 5.2.7. The same curve shifted by −5.63 dB and read with an r.m.s.
-  detector, renamed CCIR-RMS for exactly that reason.
-
 ## Standards
 
 ITU-R BS.468-4 (1970-1974-1978-1982-1986, with 2002 editorial amendments),
@@ -365,4 +374,5 @@ repetitive-burst acceptance windows, the clause 2.6 calibration at 1 kHz and
 0.775 V r.m.s., and clause 3's unit dBqps. Clause 2 prints no time constant,
 so the dynamics of any conforming detector are a design choice inside those
 eleven windows; the three time scales this library uses are a fit, identified
-by the tables only to within a factor of 1.6 to 3.0.
+by the tables only to within a factor of 1.61 to 2.09, and least of all in
+the reading device.

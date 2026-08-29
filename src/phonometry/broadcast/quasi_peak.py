@@ -225,14 +225,20 @@ class QuasiPeakBallistics:
 #: :math:`\log_{10}(\tau)` from 48 independent starts at 48 kHz.
 #:
 #: How well the tables pin them down depends on the question asked, so the
-#: question is stated. Holding the other two at the values above and moving
-#: one until a window fails, all eleven are met from 1.014 to 1.894 ms of
-#: charge (a factor of 1.87), 233 to 367 ms of discharge (1.58) and 96 to
-#: 200 ms of reading device (2.09). Re-optimising the other two at each step
-#: roughly doubles each of those. So the reading device, not the charge, is
-#: the constant the tables pin down least, and two conforming instruments may
-#: differ by a factor of two in it. No reading this module produces for any
-#: signal other than a gated 5 kHz sine can be tighter than that.
+#: question is stated: hold the other two at the values below, move one, and
+#: find where the eleven windows stop all being met. All eleven hold from
+#: 1.02 to 1.90 ms of charge (a factor of 1.88), 230 to 370 ms of discharge
+#: (1.61) and 96 to 200 ms of reading device (2.09). Each of those six edges
+#: is a value that conforms, not one rounded past the boundary, and
+#: :func:`verify_quasi_peak_dynamics` takes the ballistics as an argument so
+#: the statement can be re-derived rather than believed.
+#:
+#: **Those three ranges are marginal, not a box.** Each is measured with the
+#: other two frozen, and moving two at once leaves the region: the fastest
+#: charge with the shortest indicator misses by 1.11 dB and the slowest charge
+#: with the longest indicator by 1.26 dB. So the reading device, not the
+#: charge, is what the tables pin down least, but no instrument is free to
+#: take all three to an edge.
 #:
 #: Three is the model order the tables support. A fourth constant (a second
 #: peak rectifier, the informative Note's own arrangement) buys 0.011 dB and
@@ -350,20 +356,37 @@ def _weighted_record(samples: np.ndarray, fs: float, *, weighted: bool) -> np.nd
     return np.asarray(weighting_filter(padded, round(fs), "468"), dtype=np.float64)
 
 
-def _detector_trace(samples: np.ndarray, fs: float, *, weighted: bool) -> np.ndarray:
+def _detector_trace(
+    samples: np.ndarray,
+    fs: float,
+    *,
+    weighted: bool,
+    ballistics: QuasiPeakBallistics = BS468_BALLISTICS,
+) -> np.ndarray:
     """The reading device's output over the record, before calibration.
+
+    The ballistics travel as an argument rather than being read from the
+    module constant, and the two cached quantities downstream are keyed by
+    them. That is not generality for its own sake: the identifiability figures
+    this module publishes are a statement about what happens when a constant
+    moves, and a cache keyed on the sample rate alone answers such a question
+    with a reading taken for different ballistics. It is right for every
+    reading in a run to be answered from one cache entry only while
+    :data:`BS468_BALLISTICS` cannot change, and wrong the moment anything
+    wants to ask what a different set would read.
 
     :param samples: The record, float64.
     :param fs: Sample rate, in Hz.
     :param weighted: Whether the ITU-R BS.468-4 network is in the path.
+    :param ballistics: The three time constants of the chain.
     :return: The trace, as long as *samples*, in the units of *samples*.
     """
     rectified = np.abs(_weighted_record(samples, fs, weighted=weighted))
     trace = _apply_quasi_peak_kernel(
         rectified,
-        _alpha(BS468_BALLISTICS.charge, fs),
-        _alpha(BS468_BALLISTICS.discharge, fs),
-        _alpha(BS468_BALLISTICS.reading_device, fs),
+        _alpha(ballistics.charge, fs),
+        _alpha(ballistics.discharge, fs),
+        _alpha(ballistics.reading_device, fs),
     )
     return np.asarray(trace[: samples.shape[-1]])
 
@@ -386,7 +409,9 @@ def _steady_tone(frequency: float, amplitude: float, fs: float) -> np.ndarray:
 
 
 @lru_cache(maxsize=32)
-def _calibration_factor(fs: float) -> float:
+def _calibration_factor(
+    fs: float, ballistics: QuasiPeakBallistics = BS468_BALLISTICS
+) -> float:
     """The scale factor clause 2.6 fixes, at this sample rate.
 
     Clause 2.6: a steady 1 kHz sine at 0.775 V r.m.s. shall read 0.775 V. The
@@ -402,10 +427,12 @@ def _calibration_factor(fs: float) -> float:
     real instrument with one scale and a switch would.
 
     :param fs: Sample rate, in Hz.
+    :param ballistics: The three time constants of the chain.
     :return: The factor that turns a raw reading into volts.
     """
     unit_rms = _steady_tone(_CALIBRATION_HZ, math.sqrt(2.0), fs)
-    return 1.0 / float(_detector_trace(unit_rms, fs, weighted=True).max())
+    trace = _detector_trace(unit_rms, fs, weighted=True, ballistics=ballistics)
+    return 1.0 / float(trace.max())
 
 
 @dataclass(frozen=True)
@@ -618,14 +645,20 @@ def quasi_peak_meter(
 
 
 @lru_cache(maxsize=32)
-def _steady_reference(fs: float) -> float:
+def _steady_reference(
+    fs: float, ballistics: QuasiPeakBallistics = BS468_BALLISTICS
+) -> float:
     """The chain's reading for the steady 5 kHz tone Tables 2 and 3 divide by."""
     tone = _steady_tone(_BURST_HZ, 1.0, fs)
-    return float(_detector_trace(tone, fs, weighted=True).max())
+    return float(_detector_trace(tone, fs, weighted=True, ballistics=ballistics).max())
 
 
 def _burst_percent(
-    fs: float, cycles: int, repetitions: int, rate: float | None
+    fs: float,
+    cycles: int,
+    repetitions: int,
+    rate: float | None,
+    ballistics: QuasiPeakBallistics = BS468_BALLISTICS,
 ) -> float:
     """Read one clause 2.1 or 2.2 stimulus, as a percentage of the steady reading.
 
@@ -633,6 +666,7 @@ def _burst_percent(
     :param cycles: Full 5 kHz periods in each burst.
     :param repetitions: Number of bursts.
     :param rate: Bursts per second, or ``None`` for a single burst.
+    :param ballistics: The three time constants of the chain.
     :return: The reading, in percent of the steady 5 kHz reading.
     """
     from ..signals.test_signals import tone_burst
@@ -645,8 +679,8 @@ def _burst_percent(
         repetition_rate=rate,
         post_silence=_BURST_TAIL_SECONDS,
     )
-    reading = float(_detector_trace(burst.signal, fs, weighted=True).max())
-    return 100.0 * reading / _steady_reference(fs)
+    trace = _detector_trace(burst.signal, fs, weighted=True, ballistics=ballistics)
+    return 100.0 * float(trace.max()) / _steady_reference(fs, ballistics)
 
 
 def _window_row(
@@ -683,7 +717,9 @@ def _window_row(
     }
 
 
-def verify_quasi_peak_dynamics(fs: float = 48000.0) -> dict[str, Any]:
+def verify_quasi_peak_dynamics(
+    fs: float = 48000.0, ballistics: QuasiPeakBallistics = BS468_BALLISTICS
+) -> dict[str, Any]:
     """Check the detector against the eleven acceptance windows of clause 2.
 
     Runs the clause 2.1 and 2.2 stimuli exactly as they are specified: a
@@ -719,6 +755,10 @@ def verify_quasi_peak_dynamics(fs: float = 48000.0) -> dict[str, Any]:
         from a printed reference reading) and ``stimuli``: eleven rows of
         ``{"stimulus", "table", "reading_percent", "lower_percent",
         "reference_percent", "upper_percent", "deviation_db", "margin_db"}``.
+    :param ballistics: The chain to check, defaulting to the fitted
+        :data:`BS468_BALLISTICS`. Passing another set is how the published
+        statement about how far each constant can move is reproduced, and
+        the reason the chain takes them as an argument at all.
     :raises ValueError: If *fs* is not positive.
     """
     fs = require_positive(fs, "fs")
@@ -726,7 +766,7 @@ def verify_quasi_peak_dynamics(fs: float = 48000.0) -> dict[str, Any]:
         _window_row(
             f"{duration:g} ms",
             2,
-            _burst_percent(fs, cycles, 1, None),
+            _burst_percent(fs, cycles, 1, None, ballistics),
             lower,
             reference,
             upper,
@@ -742,6 +782,7 @@ def verify_quasi_peak_dynamics(fs: float = 48000.0) -> dict[str, Any]:
                 _TABLE_3_CYCLES,
                 int(round(_SETTLING_SECONDS * rate)) + 1,
                 rate,
+                ballistics,
             ),
             lower,
             reference,

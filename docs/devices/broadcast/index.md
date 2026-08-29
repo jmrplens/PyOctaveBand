@@ -60,7 +60,7 @@ anywhere in it.
   the psophometric noise meter — the clause 2 quasi-peak detector, its eleven
   Table 2 and Table 3 acceptance windows, the clause 2.6 calibration that makes
   a reading dBqps, and the three fitted time scales those windows identify only
-  to within a factor of 1.6 to 3.0.
+  to within a factor of 1.61 to 2.09.
 
 ## See also
 

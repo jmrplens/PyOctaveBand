@@ -200,13 +200,33 @@ dentro de su ventana.
 Lo bien que las tablas identifican esos tres números depende de la pregunta
 que se haga, así que la pregunta se enuncia. Manteniendo los otros dos en los
 valores distribuidos y moviendo uno hasta que falle una ventana, **las once se
-cumplen de 1,014 a 1,894 ms de carga (un factor de 1,87), de 233 a 367 ms de
-descarga (1,58) y de 96 a 200 ms de indicador (2,09)**. Reoptimizar los otros
-dos en cada paso duplica aproximadamente cada intervalo. Así que el indicador,
-y no la carga, es la constante que peor fijan las tablas, y dos instrumentos
-conformes pueden diferir en un factor de dos en ella. Ninguna lectura que dé
-esta biblioteca para una señal que no sea una sinusoide enventanada de 5 kHz
-puede ser más ajustada que eso.
+cumplen de 1,02 a 1,90 ms de carga (un factor de 1,88), de 230 a 370 ms de
+descarga (1,61) y de 96 a 200 ms de indicador (2,09)**. Cada uno de esos seis
+extremos es un valor que cumple, no uno redondeado más allá del límite, y
+`verify_quasi_peak_dynamics(fs, ballistics)` recibe la balística como
+argumento justamente para que la afirmación se pueda rederivar en lugar de
+creerla.
+
+Dos cosas sobre esos intervalos son fáciles de equivocar, y aquí se
+equivocaron las dos antes de medirlas bien.
+
+**Son marginales, no una caja.** Cada uno se mide con los otros dos
+congelados, así que no se pueden combinar: la carga más rápida junto con el
+indicador más corto se queda a 1,11 dB, y la carga más lenta con el indicador
+más largo a 1,26 dB. La región conforme es una forma en tres dimensiones, no
+el producto de tres intervalos.
+
+**No se pueden medir moviendo la constante del módulo.** La cadena cachea el
+factor de calibración del apartado 2.6 y la referencia del tono permanente de
+5 kHz, y mientras esas cachés no incluyeron la balística en su clave, cambiar
+las constantes las dejaba respondiendo con una referencia calculada para otro
+instrumento. El síntoma era que un mismo valor cumplía o fallaba según el
+orden en que corrieran las sondas, que es como salieron mal las primeras
+cifras publicadas aquí.
+
+Así que el indicador, y no la carga, es la constante que peor fijan las
+tablas. Ninguna lectura que dé esta biblioteca para una señal que no sea una
+sinusoide enventanada de 5 kHz puede ser más ajustada que eso.
 
 Tres es además el orden de modelo que soportan las tablas. Una cuarta
 constante, el segundo rectificador de pico de la nota informativa, compra
@@ -280,16 +300,19 @@ ninguna de las dos modificaciones de 1988. Por tanto:
 - **La respuesta al ruido no se puede verificar**, y el ruido es toda la razón
   de ser del instrumento. Dos detectores conformes discreparán sobre ruido,
   sobre voz y sobre material de programa en una cantidad que el documento no
-  acota. Cuánto sí se puede medir desde este lado: llevando cada constante de
-  la balística al borde de su intervalo conforme, de una en una, salen cuatro
-  detectores que cumplen las once ventanas, y ante un impulso de una muestra
-  leen **2,61 dB de diferencia**, ante un pulso de 1 ms 2,53 dB y ante una
-  ráfaga de un solo ciclo a 5 kHz 2,51 dB. Es una cota inferior, sacada de
-  esquinas de una constante cada vez, y ya es casi toda la ventana más ancha
-  que dibujan las tablas (4,00 dB) y cinco veces la más estrecha (0,54 dB). Con
-  ruido blanco esos mismos cuatro se separan 0,34 dB, y con un tono estable de
-  1 kHz 0,03 dB: lo que las tablas no fijan son los transitorios, que es justo
-  donde un medidor cuasipico se distingue de uno de valor eficaz.
+  acota. Cuánto sí se puede medir desde este lado. Muestreando las tres
+  constantes de tiempo dentro de sus intervalos identificados y quedándose solo
+  con los conjuntos que cumplen las once ventanas salen 243 detectores
+  conformes, y ante un impulso de una muestra leen **4,61 dB de diferencia**,
+  ante un pulso de 1 ms 4,61 dB y ante una ráfaga de un solo ciclo a 5 kHz
+  4,55 dB. Es más que la ventana más ancha que dibujan las tablas (4,00 dB) y
+  ocho veces la más estrecha (0,54 dB). Con ruido blanco esos mismos 243 se
+  separan 0,71 dB, y con un tono estable de 1 kHz 0,00 dB, que es la
+  calibración del apartado 2.6 cumpliendo exactamente lo que promete: lo que
+  las tablas no fijan son los transitorios, que es justo donde un medidor
+  cuasipico se distingue de uno de valor eficaz. El registro tiene que ser lo
+  bastante largo para que la aguja termine de subir antes de leer nada, o los
+  conjuntos lentos se leen a media subida y lo que se mide es el truncamiento.
 - **Tampoco la relación entre una cifra de cuasipico en dB(468) y una de valor
   eficaz en dB(A)** para ninguna señal real. La regla de que el ruido propio de
   un micrófono en BS.468 sale unos 10 dB por encima del ponderado A es una
@@ -354,21 +377,6 @@ no se modelan. No hay ficha `.report()`, por lo que dice el apartado 6.
 - [Radiodifusión](/phonometry/es/devices/broadcast/): el resumen de la sección.
 - Referencia de la API: [`broadcast.quasi_peak`](/phonometry/es/reference/api/broadcast/quasi-peak/).
 
-## Referencias
-
-- International Telecommunication Union. (2002). *Measurement of
-  audio-frequency noise voltage level in sound broadcasting* (Recomendación
-  UIT-R BS.468-4). [Publicación UIT-R](https://www.itu.int/rec/R-REC-BS.468).
-  La red de ponderación del apartado 1 y el detector de cuasipico del
-  apartado 2.
-- International Electrotechnical Commission. (1985). *Sound system equipment -
-  Part 1: General* (IEC 60268-1:1985), Apéndice A, con la Modificación 1:1988.
-  La misma red y el mismo medidor, como Tabla AI, Fig. A1 y Tablas AII y AIII.
-- Audio Engineering Society. (2015). *AES standard method for digital audio
-  engineering - Measurement of digital audio equipment* (AES17-2015),
-  apartado 5.2.7. La misma curva desplazada −5,63 dB y leída con un detector de
-  valor eficaz, rebautizada CCIR-RMS justo por eso.
-
 ## Normas
 
 UIT-R BS.468-4 (1970-1974-1978-1982-1986, con modificaciones editoriales de
@@ -380,4 +388,4 @@ unidad dBqps del apartado 3. El apartado 2 no imprime ninguna constante de
 tiempo, así que la dinámica de cualquier detector conforme es una decisión de
 diseño dentro de esas once ventanas; las tres escalas de tiempo que usa esta
 biblioteca son un ajuste, identificado por las tablas solo dentro de un factor
-de 1,6 a 3,0.
+de 1,61 a 2,09, y el indicador es el que peor queda fijado.

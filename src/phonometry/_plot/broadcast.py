@@ -34,10 +34,14 @@ if TYPE_CHECKING:
 #: returns the English key unchanged for any language other than ``"es"``,
 #: so the English output is byte-for-byte identical to the pre-i18n
 #: renderer.
+#: The axis label both renderers on this page share; the Spanish table
+#: below is keyed by the same constant, so the label is written once.
+_TIME_LABEL = "Time [s]"
+
 _STRINGS: dict[str, str] = {
     "Momentary (400 ms)": "Momentánea (400 ms)",
     "Short-term (3 s)": "Corto plazo (3 s)",
-    "Time [s]": "Tiempo [s]",
+    _TIME_LABEL: "Tiempo [s]",
     "Loudness [LUFS]": "Sonoridad [LUFS]",
     "Programme loudness (EBU R 128)": "Sonoridad de programa (EBU R 128)",
     "Integrated": "Integrada",
@@ -131,7 +135,7 @@ def plot_program_loudness(
         low = float(np.min(finite))
         high = float(np.max(finite))
         ax.set_ylim(low - 5.0, high + 5.0)
-    ax.set_xlabel(_t("Time [s]", language))
+    ax.set_xlabel(_t(_TIME_LABEL, language))
     ax.set_ylabel(_t("Loudness [LUFS]", language))
     ax.set_title(_t("Programme loudness (EBU R 128)", language))
     ax.grid(True, alpha=0.3)
@@ -237,7 +241,7 @@ def plot_quasi_peak(
         linewidth=1.4,
         label=f"{_t('Reading', language)} {reading} ({level} {result.level_unit})",
     )
-    ax.set_xlabel(_t("Time [s]", language))
+    ax.set_xlabel(_t(_TIME_LABEL, language))
     # No unit on the axis: the detector carries whatever unit the record
     # arrived in, and the library only learns which one from the reference
     # the caller chose, which the legend already names through ``level_unit``.

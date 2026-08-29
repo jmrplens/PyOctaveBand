@@ -529,15 +529,17 @@ def test_a_calibrated_signal_is_read_in_pascals() -> None:
 def test_a_calibrated_signal_needs_a_reference_of_its_own() -> None:
     """0.775 V is not a pressure, so it cannot become one by default."""
     record = _steady_sine(0.775, FS, seconds=0.5)
+    calibrated = Signal(record, int(FS), calibration_factor=5.0)
     with pytest.raises(ValueError, match=r"'reference' is required for a calibrated"):
-        quasi_peak_meter(Signal(record, int(FS), calibration_factor=5.0))
+        quasi_peak_meter(calibrated)
 
 
 def test_a_signal_refuses_a_rate_that_disagrees_with_its_own() -> None:
     """Exempt from nothing about the rate: the recording knows it."""
     record = _steady_sine(0.775, FS, seconds=0.5)
+    signal = Signal(record, int(FS))
     with pytest.raises(ValueError, match=r"conflicts with the Signal's own fs"):
-        quasi_peak_meter(Signal(record, int(FS)), 44100)
+        quasi_peak_meter(signal, 44100)
 
 
 # ---------------------------------------------------------------------------
@@ -575,3 +577,84 @@ def test_a_stage_that_falls_faster_than_it_rises_is_refused() -> None:
         ValueError, match=r"'charge' .* must be shorter than 'discharge'"
     ):
         QuasiPeakBallistics(charge=0.5, discharge=0.001, reading_device=0.14)
+
+
+# ---------------------------------------------------------------------------
+# The published identifiability statement
+# ---------------------------------------------------------------------------
+#
+# The module and all three editions of its page publish how far each constant
+# can move before one of the eleven windows fails. That is a claim about the
+# standard, so it is pinned from both sides: each published edge must conform,
+# and a step beyond it must not. Without the second half the range could be
+# quietly narrowed and nothing would notice.
+#
+# These figures are only measurable because the chain takes the ballistics as
+# an argument. While ``_calibration_factor`` and ``_steady_reference`` were
+# keyed on the sample rate alone, moving the module constant left them
+# answering with a reference computed for other ballistics, and the same value
+# passed or failed depending on the order the probes ran in.
+
+
+#: Published marginal range of each constant, in seconds, and a step outside
+#: it. Marginal: measured with the other two frozen. They are not a box, which
+#: :func:`test_two_constants_at_their_edges_leave_the_region` holds down.
+_IDENTIFIED = {
+    "charge": (1.02e-3, 1.90e-3, 1.00e-3, 1.92e-3),
+    "discharge": (230.0e-3, 370.0e-3, 228.0e-3, 372.0e-3),
+    "reading_device": (96.0e-3, 200.0e-3, 94.0e-3, 202.0e-3),
+}
+
+
+@pytest.mark.parametrize("field", sorted(_IDENTIFIED), ids=sorted(_IDENTIFIED))
+def test_each_published_edge_is_a_conforming_instrument(field: str) -> None:
+    """Both edges published for *field* meet all eleven windows."""
+    low, high, _, _ = _IDENTIFIED[field]
+    for value in (low, high):
+        outcome = verify_quasi_peak_dynamics(
+            48000.0, replace(BS468_BALLISTICS, **{field: value})
+        )
+        assert outcome["passed"], (
+            f"{field} = {value * 1e3:g} ms is published as an edge of the "
+            f"identified range and does not conform: worst margin "
+            f"{outcome['worst_margin_db']:+.4f} dB"
+        )
+
+
+@pytest.mark.parametrize("field", sorted(_IDENTIFIED), ids=sorted(_IDENTIFIED))
+def test_the_published_range_is_not_quietly_wider(field: str) -> None:
+    """A step outside either published edge fails, so the range is honest."""
+    _, _, below, above = _IDENTIFIED[field]
+    for value in (below, above):
+        outcome = verify_quasi_peak_dynamics(
+            48000.0, replace(BS468_BALLISTICS, **{field: value})
+        )
+        assert not outcome["passed"], (
+            f"{field} = {value * 1e3:g} ms lies outside the published range "
+            f"and conforms, so the range is understated"
+        )
+
+
+def test_two_constants_at_their_edges_leave_the_region() -> None:
+    """The three ranges are marginal, so they do not combine into a box.
+
+    The page says so in as many words, because reading three intervals as a
+    box is the natural mistake and it is wrong by more than a decibel.
+    """
+    corner = replace(BS468_BALLISTICS, charge=1.02e-3, reading_device=96.0e-3)
+    outcome = verify_quasi_peak_dynamics(48000.0, corner)
+    assert not outcome["passed"]
+    assert outcome["worst_margin_db"] < -1.0
+
+
+def test_the_verifier_answers_for_the_ballistics_it_is_given() -> None:
+    """The caches are keyed by the ballistics, not by the sample rate alone.
+
+    Asks in the order that used to give the wrong answer: a set far outside
+    the region first, so its calibration and steady reference fill the caches,
+    then the fitted set, which must still conform.
+    """
+    outside = replace(BS468_BALLISTICS, charge=0.3e-3)
+    assert not verify_quasi_peak_dynamics(48000.0, outside)["passed"]
+    assert verify_quasi_peak_dynamics(48000.0, BS468_BALLISTICS)["passed"]
+    assert verify_quasi_peak_dynamics(48000.0)["passed"]
