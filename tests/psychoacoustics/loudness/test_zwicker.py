@@ -436,10 +436,9 @@ def test_an_extra_axis_on_the_trace_is_refused() -> None:
     res = psychoacoustics.loudness_zwicker(_tone(1000.0, 70.0, seconds=0.5), FS)
     assert res.time is not None
     assert res.loudness_vs_time is not None
+    two_axes = np.column_stack([res.loudness_vs_time] * 2)
     with pytest.raises(ValueError, match="'loudness_vs_time' must have one axis"):
-        dataclasses.replace(
-            res, loudness_vs_time=np.column_stack([res.loudness_vs_time] * 2)
-        )
+        dataclasses.replace(res, loudness_vs_time=two_axes)
     with pytest.raises(ValueError, match="'time' must have one axis"):
         dataclasses.replace(res, time=res.time[:, None])
 

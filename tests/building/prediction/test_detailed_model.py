@@ -1046,8 +1046,9 @@ def test_an_impact_total_off_the_band_axis_is_refused(
     """
     import dataclasses
 
+    one_too_many = np.append(impact.l_prime_n, 99.0)
     with pytest.raises(ValueError, match="'l_prime_n'"):
-        dataclasses.replace(impact, l_prime_n=np.append(impact.l_prime_n, 99.0))
+        dataclasses.replace(impact, l_prime_n=one_too_many)
 
 
 def test_an_in_situ_spectrum_short_of_the_band_axis_is_refused(situ: dict) -> None:

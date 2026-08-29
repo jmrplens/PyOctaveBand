@@ -576,12 +576,13 @@ def test_band_labels_must_match_the_bands_they_label() -> None:
         frequencies=[125.0, 250.0, 500.0, 1000.0],
     )
     for frequencies in ([125.0, 250.0, 500.0], [125.0, 250.0, 500.0, 1000.0, 2000.0]):
+        as_array = np.asarray(frequencies)
         with pytest.raises(
             ValueError,
             match=rf"'frequencies' \({len(frequencies)}\).*must each carry one value "
             r"per band",
         ):
-            dataclasses.replace(res, frequencies=np.asarray(frequencies))
+            dataclasses.replace(res, frequencies=as_array)
     with pytest.raises(
         ValueError,
         match=rf"'ir' \({res.ir.shape[0] - 1}\).*must each carry one value per band",

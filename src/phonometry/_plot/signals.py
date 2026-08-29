@@ -727,10 +727,6 @@ def plot_zoom_fft(
     return ax
 
 
-_LAG_LABEL = "Lag [s]"
-_TIME_LABEL = "Time [s]"
-
-
 def plot_correlation(
     result: CorrelationResult,
     ax: Axes | None = None,

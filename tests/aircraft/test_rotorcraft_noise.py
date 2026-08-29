@@ -1023,8 +1023,9 @@ def test_hover_helpers_validation() -> None:
         hover_ring_hemisphere(freqs, _RING_BEARINGS + 200.0, ring)
     with pytest.raises(ValueError, match=r"'levels' must have shape"):
         hover_ring_hemisphere(freqs, _RING_BEARINGS, ring[:, :1])
+    with_nan = np.where(ring > 0.0, np.nan, ring)
     with pytest.raises(ValueError, match=r"'levels' must be finite"):
-        hover_ring_hemisphere(freqs, _RING_BEARINGS, np.where(ring > 0.0, np.nan, ring))
+        hover_ring_hemisphere(freqs, _RING_BEARINGS, with_nan)
     with pytest.raises(ValueError, match=r"'distance' must be positive"):
         hover_ring_hemisphere(freqs, _RING_BEARINGS, ring, distance=0.0)
     with pytest.raises(ValueError, match=r"'azimuth_step' must divide"):
