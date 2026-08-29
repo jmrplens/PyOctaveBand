@@ -592,6 +592,16 @@ case instead: **the method is not applicable to a band in which the sum is
 negative**. One segment carrying inward flow is a different matter, and is
 normal; it is what $F_3$ measures.
 
+A.2.3 makes a second refusal, and on a different quantity: where
+$\sum_i I_{\mathrm{n}i}$ is negative, "the test conditions do not satisfy the
+requirements of this part of ISO 9614 in that frequency band". That sum is
+unweighted over the $N$ positions, while clause 9.2 weights each segment by
+its area, so equal segments make the two refusals agree and unequal ones let
+them part company: a band clause 9.2 keeps, with a positive total power and a
+finite level, can still be one A.2.3 refuses. Its Annex A indicators come back
+`NaN` and the determination warns, because nothing else in the result flags
+it.
+
 Clause 8.2 sizes the position set: at least one position per square metre and
 at least ten in all, distributed as evenly as the segment areas allow. Both
 relaxations the clause offers (one position per 2 m² where extraneous noise is
@@ -833,9 +843,17 @@ $$
 $\Delta_\alpha$ is the share of the Table B.1 error budget left for the subset
 once the remainder, measured at its existing density, has taken its own, so a
 remainder too non-uniform to leave anything over exhausts the budget and the
-procedure cannot help. That case, and the case of no qualifying subset, are
-both refused with a message naming Table B.3 action (d), which is what the
-standard falls back to.
+procedure cannot help. That case is refused, and so are three others: no
+subset satisfying B.1.3's two conditions, a subset of a single segment (over
+one position Formula (A.8) has no spread, so Formula (B.4) has no $F_4(\alpha)$
+to square), and a remainder whose own algebraic mean is not positive. Each
+refusal says which of the four it is. None of them names a row of Table B.3:
+where the subset cannot be found, B.1.3 asks for "alternative appropriate
+actions to increase the accuracy of sound power determination according to
+table B.3", and where the selective modification cannot be implemented, clause
+8.3.2 asks for "alternative appropriate action according to B.2 and table
+B.3". Which row applies also turns on criterion 2 and on $F_3 - F_2$, and
+`partial_power_concentration` is given neither.
 
 ```python
 # One band, twelve segments, most of the power through the first four.

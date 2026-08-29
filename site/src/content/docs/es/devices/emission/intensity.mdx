@@ -619,6 +619,16 @@ negativo de otra manera: **el método no es aplicable a una banda en la que la
 suma resulte negativa**. Que un segmento suelto tenga flujo entrante es otra
 cosa, y es lo normal; es justo lo que mide $F_3$.
 
+El apartado A.2.3 hace un segundo rechazo, y sobre otra magnitud: cuando
+$\sum_i I_{\mathrm{n}i}$ es negativo, «las condiciones del ensayo no satisfacen
+los requerimientos de esta parte de la Norma ISO 9614 en esa banda de
+frecuencia». Esa suma no está ponderada, recorre las $N$ posiciones, mientras
+que el apartado 9.2 pondera cada segmento por su área: con segmentos iguales
+los dos rechazos coinciden y con segmentos desiguales se separan, así que una
+banda que el 9.2 conserva, con potencia total positiva y nivel finito, puede
+ser una que el A.2.3 rechaza. Sus indicadores del Anexo A salen `NaN` y la
+determinación avisa, porque no hay nada más en el resultado que la señale.
+
 El apartado 8.2 dimensiona el conjunto de posiciones: al menos una posición por
 metro cuadrado y un mínimo de diez en total, repartidas tan uniformemente como
 permitan las áreas de los segmentos. Las dos relajaciones que ofrece el
@@ -866,9 +876,18 @@ $$
 $\Delta_\alpha$ es la parte del presupuesto de error de la tabla B.1 que le
 queda al subconjunto una vez que el resto, medido a la densidad que ya tiene,
 se ha llevado la suya, de modo que un resto demasiado poco uniforme agota el
-presupuesto y el procedimiento no puede ayudar. Ese caso, y el de que no exista
-subconjunto que cumpla las condiciones, se rechazan con un mensaje que nombra
-la acción (d) de la tabla B.3, que es a lo que recurre la norma.
+presupuesto y el procedimiento no puede ayudar. Ese caso se rechaza, y otros
+tres con él: que no exista subconjunto que cumpla las dos condiciones del
+B.1.3, que el subconjunto sea un único segmento (sobre una sola posición la
+ecuación (A.8) no tiene dispersión que medir, así que la ecuación (B.4) se
+queda sin $F_4(\alpha)$ que elevar al cuadrado) y que la media algebraica del
+resto no sea positiva. Cada rechazo dice cuál de los cuatro es. Ninguno nombra
+una fila de la tabla B.3: cuando no se encuentra el subconjunto, el B.1.3 pide
+«las acciones alternativas apropiadas ... de acuerdo a la tabla B.3», y cuando
+no se puede realizar la modificación selectiva, el apartado 8.3.2 las pide «de
+acuerdo con el capítulo B.2 y la tabla B.3». Qué fila corresponde depende
+además del criterio 2 y de $F_3 - F_2$, y a `partial_power_concentration` no se
+le da ninguno de los dos.
 
 ```python
 # Una banda, doce segmentos, la mayor parte de la potencia por los cuatro

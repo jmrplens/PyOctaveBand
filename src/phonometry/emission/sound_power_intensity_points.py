@@ -22,6 +22,14 @@ negative**. A single segment may still carry negative power, and normally
 does; that is energy flowing inward through part of the surface, which is what
 :math:`F_3` exists to quantify, not an error to reject.
 
+A.2.3 makes a second refusal, on a different quantity: where
+:math:`\sum_i I_{\mathrm{n}i}` is negative, "las condiciones del ensayo no
+satisfacen los requerimientos de esta parte de la Norma ISO 9614 en esa banda
+de frecuencia". That sum is unweighted over the ``N`` positions, so equal
+segments make the two refusals agree and unequal ones let them part company: a
+band clause 9.2 keeps, with a positive total power and a finite level, can
+still be one A.2.3 refuses. Both are reported, each in its own terms.
+
 The sign lives in the print, not in the number. ISO 9614-1 writes a normal
 intensity level as ``XX dB`` when the flow is outward and as ``(-) XX dB`` when
 it is inward, ``XX`` being a positive number in both cases (clause 3.5, and the
@@ -749,8 +757,12 @@ def partial_power_concentration(
         (B.4) is undefined), the algebraic mean normal intensity over the
         remainder is not positive (A.2.3, which happens when the subset takes
         all the outward flow), or the remainder leaves no error budget for the
-        subset. In the last four cases the procedure cannot be carried out and
-        Table B.3 action (d) applies instead.
+        subset. In the last four cases the selective modification cannot be
+        carried out, and clause 8.3.2 then asks for the appropriate alternative
+        actions in accordance with clause B.2 and Table B.3. Which row of that
+        table applies is not settled here: its two lower rows are conditioned
+        on criterion 2 and on :math:`F_3 - F_2`, neither of which this function
+        is given.
     """
     grade = _check_grade(grade)
     i_n, seg = _positive_partial_powers(normal_intensity, areas)
@@ -783,11 +795,15 @@ def partial_power_concentration(
     half = 0.5 * n_positions
     subset_size = int(reached[0]) + 1 if reached.size else n_positions + 1
     if subset_size >= half:
+        # This is the one case B.1.3 answers itself: "si no existe un
+        # subconjunto de elementos que satisfaga las anteriores condiciones,
+        # tomar las acciones alternativas apropiadas ... de acuerdo a la tabla
+        # B.3". It names the table and no row of it.
         msg = (
             f"No subset of fewer than half the {n_positions} segments carries "
             "more than half the sound power, so the concentration test of ISO "
-            "9614-1 clause 8.3.2 fails; take the alternative actions of Table "
-            "B.3 (action d)."
+            "9614-1 clause 8.3.2 fails; take the appropriate alternative "
+            "actions of Table B.3 (B.1.3)."
         )
         raise ValueError(msg)
     # B.1.3 bounds N_alpha from above and never from below, so one segment
@@ -799,12 +815,16 @@ def partial_power_concentration(
     # where __post_init__ never gets to speak.
     if subset_size < _MIN_VARIATION_OBSERVATIONS:
         msg = (
-            "The sound power is concentrated in a single segment, and "
-            "equation (A.8) has no spread to measure over one position, so "
-            "equation (B.4) asks for the square of an undefined F4(alpha); "
-            "the optional procedure of ISO 9614-1 clause 8.3.2 cannot be "
-            "carried out, and the alternative actions of Table B.3 (action d) "
-            "apply instead."
+            "The sound power is concentrated in a single segment, so the top "
+            "subset taken here is one segment and equation (A.8) has no "
+            "spread to measure over it, leaving equation (B.4) without an "
+            "F4(alpha). ISO 9614-1 B.1.3 asks only for a top subset carrying "
+            "more than half the total sound power and numbering fewer than "
+            "half of the N segments, and does not require the smallest such "
+            "subset, so a larger one may still be admissible; where this "
+            "selective modification cannot be carried out, clause 8.3.2 asks "
+            "for the appropriate alternative actions in accordance with "
+            "clause B.2 and Table B.3."
         )
         raise ValueError(msg)
 
@@ -830,8 +850,9 @@ def partial_power_concentration(
             f"The remaining {n_remainder} segments exhaust the ISO 9614-1 "
             f"Table B.1 error factor on their own (Delta_alpha = "
             f"{delta_alpha:.3g}), so no number of new positions on the subset "
-            "can qualify the surface; take the alternative actions of Table "
-            "B.3 (action d)."
+            "can qualify the surface; this selective modification cannot be "
+            "carried out, and clause 8.3.2 asks for the appropriate "
+            "alternative actions in accordance with clause B.2 and Table B.3."
         )
         raise ValueError(msg)
 
@@ -861,7 +882,10 @@ class DiscretePointIntensityResult:
     ``f1`` to ``f4`` are the Annex A field indicators per band, ``None`` when
     the inputs they need were not supplied and ``NaN`` in a band whose
     algebraic mean normal intensity is not positive, which A.2.3 makes a
-    failure of the test conditions in that band. ``criterion_1``
+    failure of the test conditions in that band. A.2.3's refusal is not
+    ``not_applicable_band``, whose quantity is clause 9.2's area-weighted sum,
+    and the determination warns about it separately, since a band can fail
+    A.2.3 and still carry a finite level here. ``criterion_1``
     (:math:`L_\mathrm{d} > F_2`, equation (B.1)), ``negative_power_within_limit``
     (Figure B.1's unnumbered :math:`F_3 - F_2 \le 3` dB gate) and
     ``criterion_2`` (:math:`N > C F_4^2`, equation (B.2)) are the per-band
@@ -1169,24 +1193,50 @@ def _sampling_warnings(n_positions: int, area: float) -> None:
         )
 
 
+def _test_conditions_met(intensity: np.ndarray) -> np.ndarray:
+    r"""A.2.3's per-band verdict on the test conditions, ``True`` where met.
+
+    "Si :math:`\sum I_{\mathrm{n}i}/I_0` es negativo en alguna banda de
+    frecuencia, las condiciones del ensayo no satisfacen los requerimientos de
+    esta parte de la Norma ISO 9614 en esa banda de frecuencia." The sum is
+    unweighted over the N positions, so for N > 0 its sign is the sign of the
+    arithmetic mean of equation (A.9), the very mean :math:`F_3` and
+    :math:`F_4` divide by.
+
+    That is not the area-weighted sum clause 9.2 puts a band outside the method
+    for, and the two part company as soon as the segments differ in area: a
+    band can be one the method still applies to, with a positive total power
+    and a finite level, and have been measured under conditions this part of
+    ISO 9614 does not accept.
+
+    ``mean > 0`` rather than ``not mean <= 0``, as at the other sites here: a
+    mean that is not a number answers every comparison False, and it is a band
+    whose test conditions were not met, not one that met them.
+    """
+    return np.asarray(np.mean(intensity, axis=0) > 0.0, dtype=bool)
+
+
 def _band_indicators(
     intensity: np.ndarray,
     pressure_levels: np.ndarray | None,
+    conditions_met: np.ndarray,
 ) -> tuple[np.ndarray | None, np.ndarray | None, np.ndarray]:
     r"""Annex A ``F2``, ``F3`` and ``F4`` per band, ``NaN`` where undefined.
 
     A.2.3 makes a non-positive algebraic mean normal intensity a failure of the
     test conditions in that band, and F3 and F4 both divide by that mean, so
-    the three indicators are ``NaN`` there rather than raising: the other bands
-    of the same determination are unaffected, and the band is already flagged.
+    the three indicators are ``NaN`` there rather than raising: the refusal is
+    scoped to the band ("en esa banda de frecuencia") and the other bands of
+    the same determination stand.
 
-    The mean A.2.3 names is the unweighted one over the N positions of
-    equation (A.9), which is not the area-weighted sum clause 9.2 puts a band
-    outside the method for, and the two part company as soon as the segments
-    differ in area. So this is the quantity the loop is guarded on: guarding on
-    the sum instead hands a column of negative mean to the coefficient of
-    variation, which raises, and one band then takes down a determination the
-    standard scopes its refusal away from ("en esa banda de frecuencia").
+    Being ``NaN`` is the whole of what these indicators can say about such a
+    band, and it is not enough on its own, because the band need not be flagged
+    anywhere else: guarding on the area-weighted sum of clause 9.2 instead
+    would hand a column of negative mean to the coefficient of variation, which
+    raises, but a band A.2.3 refuses can equally be one clause 9.2 keeps, with
+    ``not_applicable_band`` false and a finite level beside it. So the
+    determination announces the refusal itself; see
+    :func:`sound_power_intensity_points`.
 
     F2 and F3 need the pressure levels and F4 does not, so a caller who
     measured only the intensity still gets the indicator criterion 2 is built
@@ -1200,10 +1250,7 @@ def _band_indicators(
     f4 = np.full(n_bands, np.nan)
     for band in range(n_bands):
         column = intensity[:, band]
-        # ``not mean > 0`` rather than ``mean <= 0``, as at the other sites
-        # here: a mean that is not a number is a band whose test conditions
-        # were not met, not one that met them.
-        if not float(np.mean(column)) > 0.0:
+        if not conditions_met[band]:
             continue
         if pressure_levels is None:
             f4[band] = _coefficient_of_variation(
@@ -1528,6 +1575,14 @@ def sound_power_intensity_points(
     ``(-) XX dB`` are converted by :func:`normal_intensity_from_levels`, whose
     ``negative`` argument is that ``(-)``.
 
+    A.2.3 conditions the Annex A indicators on a different quantity, the
+    unweighted mean of the ``N`` normal intensities, and makes a band whose
+    mean is not positive a band in which the test conditions do not satisfy
+    this part of ISO 9614. Its indicators come back ``NaN`` and the
+    determination warns, because that band need not be flagged anywhere else:
+    where the segments differ in area it can be a band clause 9.2 keeps, with a
+    finite level and ``not_applicable_band`` false.
+
     Supplying ``pressure_levels`` evaluates the Annex A indicators ``F2`` and
     ``F3``; ``F4`` is evaluated from the intensities alone and so is always
     present. Supplying ``pressure_residual_index`` gives the dynamic capability
@@ -1637,12 +1692,24 @@ def sound_power_intensity_points(
             SoundPowerWarning,
             stacklevel=2,
         )
+    conditions_met = _test_conditions_met(intensity)
+    if not np.all(conditions_met):
+        warnings.warn(
+            "The algebraic mean normal intensity is not positive in one or "
+            "more bands; the test conditions do not satisfy ISO 9614-1:1993 in "
+            "those bands (A.2.3) and their Annex A field indicators are "
+            "undefined. This is not the refusal of clause 9.2: a band whose "
+            "area-weighted sum of partial powers is still positive keeps a "
+            "finite sound power level and is not flagged inapplicable.",
+            SoundPowerWarning,
+            stacklevel=2,
+        )
     _sampling_warnings(n_positions, surface_area)
 
     indicators_available = n_positions >= _MIN_VARIATION_OBSERVATIONS
     f1 = _temporal_indicator(temporal_intensity, n_bands)
     if indicators_available:
-        f2, f3, f4 = _band_indicators(intensity, levels)
+        f2, f3, f4 = _band_indicators(intensity, levels, conditions_met)
     else:
         f2, f3, f4 = None, None, None
 

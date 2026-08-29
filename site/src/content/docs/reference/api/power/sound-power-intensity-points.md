@@ -29,6 +29,14 @@ negative**. A single segment may still carry negative power, and normally
 does; that is energy flowing inward through part of the surface, which is what
 $F_3$ exists to quantify, not an error to reject.
 
+A.2.3 makes a second refusal, on a different quantity: where
+$\sum_i I_{\mathrm{n}i}$ is negative, "las condiciones del ensayo no
+satisfacen los requerimientos de esta parte de la Norma ISO 9614 en esa banda
+de frecuencia". That sum is unweighted over the `N` positions, so equal
+segments make the two refusals agree and unequal ones let them part company: a
+band clause 9.2 keeps, with a positive total power and a finite level, can
+still be one A.2.3 refuses. Both are reported, each in its own terms.
+
 The sign lives in the print, not in the number. ISO 9614-1 writes a normal
 intensity level as `XX dB` when the flow is outward and as `(-) XX dB` when
 it is inward, `XX` being a positive number in both cases (clause 3.5, and the
@@ -227,7 +235,10 @@ there and clause 9.2 puts the band outside the method.
 `f1` to `f4` are the Annex A field indicators per band, `None` when
 the inputs they need were not supplied and `NaN` in a band whose
 algebraic mean normal intensity is not positive, which A.2.3 makes a
-failure of the test conditions in that band. `criterion_1`
+failure of the test conditions in that band. A.2.3's refusal is not
+`not_applicable_band`, whose quantity is clause 9.2's area-weighted sum,
+and the determination warns about it separately, since a band can fail
+A.2.3 and still carry a finite level here. `criterion_1`
 ($L_\mathrm{d} > F_2$, equation (B.1)), `negative_power_within_limit`
 (Figure B.1's unnumbered $F_3 - F_2 \le 3$ dB gate) and
 `criterion_2` ($N > C F_4^2$, equation (B.2)) are the per-band
@@ -455,7 +466,7 @@ budget, and the procedure cannot help.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If the positions and areas disagree in length, an area is not positive and finite, an intensity is not finite, the total sound power is not positive (clause 9.2 puts the band outside the method), no subset satisfies the two conditions of B.1.3, the subset is a single segment (equation (A.8) has no spread over one position, so equation (B.4) is undefined), the algebraic mean normal intensity over the remainder is not positive (A.2.3, which happens when the subset takes all the outward flow), or the remainder leaves no error budget for the subset. In the last four cases the procedure cannot be carried out and Table B.3 action (d) applies instead. |
+| ValueError | If the positions and areas disagree in length, an area is not positive and finite, an intensity is not finite, the total sound power is not positive (clause 9.2 puts the band outside the method), no subset satisfies the two conditions of B.1.3, the subset is a single segment (equation (A.8) has no spread over one position, so equation (B.4) is undefined), the algebraic mean normal intensity over the remainder is not positive (A.2.3, which happens when the subset takes all the outward flow), or the remainder leaves no error budget for the subset. In the last four cases the selective modification cannot be carried out, and clause 8.3.2 then asks for the appropriate alternative actions in accordance with clause B.2 and Table B.3. Which row of that table applies is not settled here: its two lower rows are conditioned on criterion 2 and on $F_3 - F_2$, neither of which this function is given. |
 
 ## PartialPowerConcentration
 
@@ -562,6 +573,14 @@ it (clause 9.2).
 A single position may carry inward flow and usually does. Levels printed as
 `(-) XX dB` are converted by [`normal_intensity_from_levels`](/phonometry/reference/api/power/sound-power-intensity-points/#normal_intensity_from_levels), whose
 `negative` argument is that `(-)`.
+
+A.2.3 conditions the Annex A indicators on a different quantity, the
+unweighted mean of the `N` normal intensities, and makes a band whose
+mean is not positive a band in which the test conditions do not satisfy
+this part of ISO 9614. Its indicators come back `NaN` and the
+determination warns, because that band need not be flagged anywhere else:
+where the segments differ in area it can be a band clause 9.2 keeps, with a
+finite level and `not_applicable_band` false.
 
 Supplying `pressure_levels` evaluates the Annex A indicators `F2` and
 `F3`; `F4` is evaluated from the intensities alone and so is always
