@@ -14,9 +14,11 @@ from phonometry import signals
 FS = 48000
 
 
-def _tone(f0: float, seconds: float = 1.0, amp: float = 1.0) -> np.ndarray:
+def _tone(
+    f0: float, seconds: float = 1.0, amp: float = 1.0, phase: float = 0.0
+) -> np.ndarray:
     t = np.arange(int(FS * seconds)) / FS
-    return amp * np.sin(2 * np.pi * f0 * t)
+    return amp * np.sin(2 * np.pi * f0 * t + phase)
 
 
 def test_leq_sine_matches_rms() -> None:
@@ -273,27 +275,48 @@ def _lcpeak_analytic_steady(x: np.ndarray, fs: int) -> float:
     return float(20 * np.log10(rms / 2e-5) + 3.01)
 
 
+#: Starting phases of the 8 kHz probe tone, spanning the one third of a cycle
+#: over which the sampling grid of a 6.0 samples/cycle tone repeats. The tone's
+#: phase has to be swept rather than fixed: how far an on-grid maximum
+#: under-reads depends on where the samples fall relative to the crest, and the
+#: phase they land on is the weighting filter's phase shift plus the tone's. A
+#: test that fixed the tone's phase would therefore be measuring the filter's,
+#: and would move whenever the filter was redesigned -- which is exactly what
+#: happened when the C weighting stopped being reached through a resampler.
+_PEAK_PHASES = np.linspace(0.0, np.pi / 3.0, 13)
+
+
 def test_lc_peak_recovers_inter_sample_peak_8k_48k() -> None:
     """LCpeak must catch the inter-sample peak of a sustained 8 kHz tone at 48 kHz.
 
-    8 kHz at 48 kHz is exactly 6.0 samples/cycle, so the sampling phase is
-    locked and the on-grid maximum consistently under-reads the true peak
-    (audit N2 I-1: up to -1.15 dB worst-case over phase, -0.69 dB at phase 0).
-    Oversampled peak detection recovers the analytic sinusoid crest.
+    8 kHz at 48 kHz is exactly 6.0 samples/cycle, so the sampling grid is
+    locked to the waveform and the on-grid maximum under-reads the true peak by
+    up to 1.15 dB (audit N2 I-1). Oversampled peak detection recovers the
+    analytic sinusoid crest, and must do so at every sampling phase.
     """
-    x = _faded(_tone(8000, seconds=1.0))
-    err = signals.lc_peak(x, FS) - _lcpeak_analytic_steady(x, FS)
-    assert abs(err) < 0.5, f"LCpeak under-reads by {err:+.3f} dB (inter-sample loss)"
+    for phase in _PEAK_PHASES:
+        x = _faded(_tone(8000, seconds=1.0, phase=float(phase)))
+        err = signals.lc_peak(x, FS) - _lcpeak_analytic_steady(x, FS)
+        assert abs(err) < 0.5, (
+            f"LCpeak under-reads by {err:+.3f} dB at phase {phase:.3f} rad"
+        )
 
 
 def test_lc_peak_oversample_keyword_controls_recovery() -> None:
-    """oversample=1 reproduces the legacy on-grid under-read; the default fixes it."""
-    x = _faded(_tone(8000, seconds=1.0))
-    ref = _lcpeak_analytic_steady(x, FS)
-    legacy_err = signals.lc_peak(x, FS, oversample=1) - ref
-    fixed_err = signals.lc_peak(x, FS) - ref
-    assert legacy_err < -0.5  # legacy on-grid detection under-reads
-    assert abs(fixed_err) < abs(legacy_err)  # default oversampling recovers it
+    """oversample=1 reproduces the legacy on-grid under-read; the default fixes it.
+
+    Stated over the sampling phase rather than at one value of it: on-grid
+    detection loses more than half a decibel at its worst phase, and the
+    default oversampling holds every phase inside a twentieth of one.
+    """
+    on_grid, oversampled = [], []
+    for phase in _PEAK_PHASES:
+        x = _faded(_tone(8000, seconds=1.0, phase=float(phase)))
+        reference = _lcpeak_analytic_steady(x, FS)
+        on_grid.append(float(signals.lc_peak(x, FS, oversample=1)) - reference)
+        oversampled.append(float(signals.lc_peak(x, FS)) - reference)
+    assert min(on_grid) < -0.5, f"worst on-grid under-read {min(on_grid):+.3f} dB"
+    assert max(abs(e) for e in oversampled) < 0.05
 
 
 # ---------------------------------------------------------------------------

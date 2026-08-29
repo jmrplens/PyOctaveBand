@@ -53,9 +53,8 @@ def _response_db(
     wf: filters.WeightingFilter, freqs: "list[float] | np.ndarray"
 ) -> np.ndarray:
     """Relative response of the designed SOS in dB, normalized to 1 kHz."""
-    fs_proc = wf.fs * wf._oversample
     worn = np.concatenate([np.asarray(freqs, dtype=float), [1000.0]])
-    _, h = sg.sosfreqz(wf.sos, worN=worn, fs=fs_proc)
+    _, h = sg.sosfreqz(wf.sos, worN=worn, fs=wf.fs)
     gain = 20.0 * np.log10(np.abs(h))
     return np.asarray(gain[:-1] - gain[-1], dtype=np.float64)
 
@@ -334,11 +333,11 @@ def test_new_curves_filter_time_domain_tone(curve: str) -> None:
 
 @pytest.mark.parametrize("curve", ["B", "D", "AU"])
 def test_new_curves_support_stateful_block_processing(curve: str) -> None:
-    """Stateful block outputs equal the continuous (plain-design) result."""
+    """Stateful block outputs equal the continuous result, same design."""
     fs = 48000
     rng = np.random.default_rng(7)
     x = rng.standard_normal(fs // 2)
-    continuous = filters.WeightingFilter(fs, curve, high_accuracy=False).filter(x)
+    continuous = filters.WeightingFilter(fs, curve).filter(x)
     wf = filters.WeightingFilter(fs, curve, stateful=True)
     blocks = np.concatenate([wf.filter(part) for part in np.split(x, 4)])
     assert blocks == pytest.approx(continuous, abs=1e-12)

@@ -37,6 +37,7 @@ convention names. Deterministic: regenerate with ``make llms``.
 from __future__ import annotations
 
 import functools
+import json
 import pathlib
 import re
 import subprocess
@@ -145,20 +146,23 @@ def _version() -> str:
 
 
 def _conformance_counts() -> tuple[int, int, int]:
-    """Checks, domains and standards, from the generated report's headline."""
-    source = (DOCS / "CONFORMANCE.md").read_text(encoding="utf-8")
-    match = re.search(
-        r"\*\*\d+\s*/\s*(\d+)\s+conformance checks pass\*\*\s+across\s+(\d+)\s+"
-        r"domains\s+and\s+(\d+)\s+standards",
-        source,
-    )
-    if match is None:
+    """Checks, domains and standards, read from the conformance artefact.
+
+    These three integers used to be recovered by matching a regular expression
+    against the report's headline sentence, which is how an English sentence
+    became a wire format that three files parsed independently. They are fields
+    now.
+    """
+    source = DOCS / "conformance.json"
+    try:
+        counts = json.loads(source.read_text(encoding="utf-8"))["counts"]
+        return int(counts["checks"]), int(counts["domains"]), int(counts["standards"])
+    except (OSError, ValueError, KeyError) as error:
         msg = (
-            "docs/CONFORMANCE.md: headline not found. Regenerate it with "
-            "`make conformance`."
+            f"docs/conformance.json: cannot read the conformance counts "
+            f"({error}). Regenerate it with `make conformance`."
         )
-        raise SystemExit(msg)
-    return int(match[1]), int(match[2]), int(match[3])
+        raise SystemExit(msg) from error
 
 
 @functools.cache

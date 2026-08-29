@@ -17,7 +17,7 @@ import reference_data as ref
 
 import phonometry as ph
 
-from ..registry import _DELTA_PLACES, Outcome, _fmt, numeric, register
+from ..registry import Outcome, _fmt, mask, numeric, register
 
 _PROGRAM_LOUDNESS = "Program loudness (ITU-R BS.1770 / EBU R 128)"
 _EBU_FS = 48000
@@ -102,16 +102,21 @@ def _ebu_true_peak_case(index: int) -> tuple[float, float]:
 
 def _true_peak_outcome(expected: float, computed: float) -> Outcome:
     """Tech 3341 true-peak verdict with its asymmetric +0.2/-0.4 dB window."""
-    delta = computed - expected
-    passed = -ref.EBU_TECH3341_TP_TOL_DOWN <= delta <= ref.EBU_TECH3341_TP_TOL_UP
-    return Outcome(
+    # Tech 3341's true-peak window is asymmetric (+0.2 / -0.4 dB), which no
+    # single tolerance figure expresses: it is a two-edged band, so the check
+    # records both edges and judges the deviation by the headroom to whichever
+    # one is nearer.
+    return mask(
         expected=(
             f"{_fmt(expected, 'dBTP', 2)} "
             f"(+{ref.EBU_TECH3341_TP_TOL_UP:g}/-{ref.EBU_TECH3341_TP_TOL_DOWN:g} dB)"
         ),
         computed=_fmt(computed, "dBTP", 2),
-        delta=_fmt(delta, "dBTP", _DELTA_PLACES),
-        passed=passed,
+        deviation=computed - expected,
+        lower=-ref.EBU_TECH3341_TP_TOL_DOWN,
+        upper=ref.EBU_TECH3341_TP_TOL_UP,
+        unit="dBTP",
+        places=3,
     )
 
 

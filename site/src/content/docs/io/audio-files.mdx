@@ -374,8 +374,7 @@ for block in io.read_blocks("measurement.wav", block_size=1 << 16):
 streamed = 10 * np.log10((cal ** 2 * total_energy / total_samples)
                          / (2e-5) ** 2)
 whole = float(signals.leq(
-    filters.weighting_filter(np.asarray(sig), fs, curve="A",
-                             high_accuracy=False),
+    filters.weighting_filter(np.asarray(sig), fs, curve="A"),
     calibration_factor=cal))
 print(f"streamed {streamed:.4f} dB, whole file {whole:.4f} dB")
 # streamed 66.4200 dB, whole file 66.4200 dB
@@ -383,10 +382,10 @@ print(f"streamed {streamed:.4f} dB, whole file {whole:.4f} dB")
 
 The two numbers are not close — they are identical, to the last bit,
 because a stateful filter carries its state across block boundaries and the
-stream contributes every sample exactly once. (The single-pass comparison
-says `high_accuracy=False` because that is the filter a stateful weighting
-runs; the [weighting guide](/phonometry/signals/levels/weighting/) covers
-the distinction.) The same construction drives an `OctaveFilterBank` with
+stream contributes every sample exactly once. Both sides run the same default
+design, since block processing no longer costs the weighting filter anything
+(the [weighting guide](/phonometry/signals/levels/weighting/) has the
+detail). The same construction drives an `OctaveFilterBank` with
 `BlockProcessing(stateful=True)`, band by band.
 
 ## Writing a BWF with its provenance

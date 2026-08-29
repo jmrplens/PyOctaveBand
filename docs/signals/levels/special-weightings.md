@@ -11,18 +11,19 @@ comparisons with legacy data, and **AU** (IEC 61012), still in force like the
 G curve, keeps ultrasonic components out of an audible-exposure reading.
 
 All four share the machinery of the IEC 61672-1 curves (0 dB at 1 kHz where
-applicable, multichannel and stateful block processing), and B, D and AU also
-take the `high_accuracy` oversampling, and G takes it too: **the default G
-design oversamples toward 48 kHz**, so its 0.25 Hz to 315 Hz range stays
-within about 0.05 dB whatever the input rate, while stateful block processing
-runs the plain design at the input rate, about a decibel low at 315 Hz at
-fs = 2000 and exactly on the 0 dB reference at 10 Hz. That matters exactly where G is used — infrasound is
-often recorded at 1 kHz or 2 kHz, where 315 Hz sits close to Nyquist and the
-bilinear warping grows quadratically; at audio rates the correction is
-negligible. As with A/C/Z, `high_accuracy` cannot be combined with stateful
-processing. The A, C and Z curves themselves, where they come from, the
-`high_accuracy` design and the class verification against IEC 61672-1
-Table 3 are the subject of [Frequency Weighting](weighting.md).
+applicable, multichannel and stateful block processing), and all four take the
+same default `high_accuracy` design: the analog prototype is fitted at the
+sample rate rather than transformed blind, so the bilinear frequency warping
+never reaches the response. For G that keeps its 0.25 Hz to 315 Hz range
+within 0.0001 dB whatever the input rate, which matters exactly where G is
+used — infrasound is often recorded at 1 kHz or 2 kHz, where 315 Hz sits close
+to Nyquist and the warping grows quadratically. `high_accuracy=False` gives
+the plain bilinear design instead, about a decibel low at 315 Hz at fs = 2000
+and exactly on the 0 dB reference at 10 Hz. Unlike before, the flag is
+independent of `stateful`: block processing carries the fitted design too. The
+A, C and Z curves themselves, where they come from, the `high_accuracy` design
+and the class verification against IEC 61672-1 Table 3 are the subject of
+[Frequency Weighting](weighting.md).
 
 ## 1. Infrasound: G-weighting (ISO 7196)
 
@@ -78,9 +79,9 @@ plt.show()
 The implementation follows the ISO 7196 Table 1 pole/zero values exactly and is
 verified in CI against every Table 2 nominal response value (0.25 Hz to 315 Hz).
 `WeightingFilter(fs, "G")` supports the same multichannel and stateful block
-processing as A/C — but stateful mode cannot carry the internal oversampling
-across blocks, so if you stream G-weighting at a sample rate below 48 kHz,
-verify the response before trusting the level. Levels measured with the G
+processing as A/C, and streaming costs nothing: the design is the same cascade
+of second-order sections either way, so stitched blocks reproduce a single
+call exactly at any sample rate. Levels measured with the G
 curve are reported as $L_{p\mathrm{G}}$ (or $L_\mathrm{Geq}$ for the equivalent level over
 time).
 
@@ -207,8 +208,9 @@ print(f"LA = {la:.1f} dB   LAU = {lau:.1f} dB   audible alone = {la_ref:.1f} dB"
 
 Ultrasound only reaches a digital filter when the sample rate captures it,
 so measure at 96 kHz or more (at 48 kHz there is nothing above 24 kHz to
-reject); the AU design internally oversamples toward 288 kHz to keep the
-steep U roll-off accurate. Levels are reported as $L_\mathrm{AU}$. The
+reject); the AU design is fitted over the whole 10 Hz to 40 kHz range of
+IEC 61012 Table 1, which keeps the steep U roll-off within 0.001 dB of the
+prototype at 96 kHz. Levels are reported as $L_\mathrm{AU}$. The
 implementation follows the Table 2 pole locations exactly (they reproduce
 every Table 1 nominal value within 0.05 dB) and is verified in CI against
 the Table 1 tolerances up to 40 kHz.
@@ -220,7 +222,11 @@ The `verify_weighting_class` verifier, described in section 6 of
 of this guide that have published tolerance tables. For `B` it uses
 ANSI S1.4-1983 (Table IV design goals, Table V
 limits) and the "class" verdicts read as the standard's instrument **Types**
-1 and 2. For `AU` it uses IEC 61012:1990 Table 1 (nominal A + nominal U with
+1 and 2 — or, with `edition="1979"`, the IEC 651:1979 Table V limits, whose
+footnote makes one mask govern every weighting characteristic and which add
+the laboratory-grade Type 0 (the two Type 0 columns are *not* the same mask:
+ANSI is two-sided and stricter at 10/12.5/16 Hz where IEC 651 is upper-only).
+For `AU` it uses IEC 61012:1990 Table 1 (nominal A + nominal U with
 the separate-unit tolerances, zero at the 1 kHz reference); IEC 61012
 publishes a single tolerance set, so both margin slots agree and the verdict
 is simply complies (1) or not (`None`) — note that checking the rows above

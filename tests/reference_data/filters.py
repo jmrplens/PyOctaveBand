@@ -198,16 +198,19 @@ ANSIS14_TABLE4_B: list[tuple[float, float]] = [
 # response levels for Type 0 (laboratory), Type 1 (precision) and Type 2
 # (general purpose) instruments; they apply to every weighting. A lower
 # limit of -inf means only the upper limit applies.
-# Transcription note, 20 Hz Type 2: the standard prints a bare "+3"; read
-# as +3/upper-only (like the surrounding upper-only rows), with +/-3 a
-# plausible alternative. The realized B response there is only 0.05 dB
-# below nominal, so the reading cannot change any verdict.
+# Transcription note, 20 Hz Type 2: the standard prints a bare "+3", where
+# every one-sided cell of that same column prints "+5, -inf". Read as +/-3,
+# because IEC 651:1979 Table V - which agrees with this column at all 33
+# other rows - prints "+/-3" at exactly that cell, so the missing bar under
+# the plus sign is a defect of this print rather than a national deviation.
+# The realized B response there is only 0.05 dB below nominal, so the
+# reading cannot change any verdict of the shipped filter.
 # Row = (freq_Hz, t0_up, t0_lo, t1_up, t1_lo, t2_up, t2_lo).
 ANSIS14_TABLE5: list[tuple[float, float, float, float, float, float, float]] = [
     (10, 2.0, -5.0, 4.0, -4.0, 5.0, -INF),
     (12.5, 2.0, -4.0, 3.5, -3.5, 5.0, -INF),
     (16, 2.0, -3.0, 3.0, -3.0, 5.0, -INF),
-    (20, 2.0, -2.0, 2.5, -2.5, 3.0, -INF),
+    (20, 2.0, -2.0, 2.5, -2.5, 3.0, -3.0),
     (25, 1.5, -1.5, 2.0, -2.0, 3.0, -3.0),
     (31.5, 1.0, -1.0, 1.5, -1.5, 3.0, -3.0),
     (40, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
@@ -244,6 +247,67 @@ ANSIS14_TABLE5: list[tuple[float, float, float, float, float, float, float]] = [
 # W_B = 10 lg(K2 f^2 / (f^2 + f5^2)) + W_C (Formula C2).
 ANSIS14_F5 = 158.48932
 ANSIS14_K2 = 1.025119
+
+# ---------------------------------------------------------------------------
+# IEC 651:1979 Table V, read from the identical British adoption
+# BS 5969:1981 (standard page 8) - tolerances on the Table IV frequency
+# weightings for the four instrument types of subclause 1.2. The scan carries
+# no text layer, so the table was read from the printed page rather than from
+# extracted text.
+# The footnote makes one mask govern every weighting characteristic
+# ("Tolerances are the same for all weighting characteristics"), and
+# subclause 6.1 extends it to the D weighting when provided.
+#
+# This is not the ANSI table above under another name: Type 0 is upper-only
+# at 10/12.5/16 Hz where ANSI Type 0 is two-sided (-5/-4/-3 dB), and Type 1
+# differs at those three rows and at 20/50/63/80 Hz.
+#
+# Transcription note, the 1 kHz row: the printed Type 0 cell is +/-0.7 dB,
+# while the footnote adds that the tolerance shall be zero at the reference
+# frequency - which subclause 3.7 leaves anywhere from 200 Hz to 1 kHz, at
+# the manufacturer's choice, 1 kHz being only "preferred". The printed cell
+# is transcribed as it stands; a relative response normalized to its own
+# 1 kHz gain deviates by zero there under either reading.
+# Row = (freq_Hz, t0_up, t0_lo, t1_up, t1_lo, t2_up, t2_lo, t3_up, t3_lo).
+# ---------------------------------------------------------------------------
+IEC651_TABLE5: list[
+    tuple[float, float, float, float, float, float, float, float, float]
+] = [
+    (10, 2.0, -INF, 3.0, -INF, 5.0, -INF, 5.0, -INF),
+    (12.5, 2.0, -INF, 3.0, -INF, 5.0, -INF, 5.0, -INF),
+    (16, 2.0, -INF, 3.0, -INF, 5.0, -INF, 5.0, -INF),
+    (20, 2.0, -2.0, 3.0, -3.0, 3.0, -3.0, 5.0, -INF),
+    (25, 1.5, -1.5, 2.0, -2.0, 3.0, -3.0, 5.0, -INF),
+    (31.5, 1.0, -1.0, 1.5, -1.5, 3.0, -3.0, 4.0, -4.0),
+    (40, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0, 4.0, -4.0),
+    (50, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0, 3.0, -3.0),
+    (63, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0, 3.0, -3.0),
+    (80, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0, 3.0, -3.0),
+    (100, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 3.0, -3.0),
+    (125, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
+    (160, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
+    (200, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
+    (250, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
+    (315, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
+    (400, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
+    (500, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
+    (630, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
+    (800, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
+    (1000, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
+    (1250, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.5, -2.5),
+    (1600, 0.7, -0.7, 1.0, -1.0, 2.0, -2.0, 3.0, -3.0),
+    (2000, 0.7, -0.7, 1.0, -1.0, 2.0, -2.0, 3.0, -3.0),
+    (2500, 0.7, -0.7, 1.0, -1.0, 2.5, -2.5, 4.0, -4.0),
+    (3150, 0.7, -0.7, 1.0, -1.0, 2.5, -2.5, 4.5, -4.5),
+    (4000, 0.7, -0.7, 1.0, -1.0, 3.0, -3.0, 5.0, -5.0),
+    (5000, 1.0, -1.0, 1.5, -1.5, 3.5, -3.5, 6.0, -6.0),
+    (6300, 1.0, -1.5, 1.5, -2.0, 4.5, -4.5, 6.0, -6.0),
+    (8000, 1.0, -2.0, 1.5, -3.0, 5.0, -5.0, 6.0, -6.0),
+    (10000, 2.0, -3.0, 2.0, -4.0, 5.0, -INF, 6.0, -INF),
+    (12500, 2.0, -3.0, 3.0, -6.0, 5.0, -INF, 6.0, -INF),
+    (16000, 2.0, -3.0, 3.0, -INF, 5.0, -INF, 6.0, -INF),
+    (20000, 2.0, -3.0, 3.0, -INF, 5.0, -INF, 6.0, -INF),
+]
 
 # ---------------------------------------------------------------------------
 # IEC 61012:1990 Table 1 (standard page 11) - nominal relative response and

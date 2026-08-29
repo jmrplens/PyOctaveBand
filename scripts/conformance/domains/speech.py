@@ -27,7 +27,7 @@ from scipy import signal as sg
 import phonometry as ph
 from phonometry.speech.sti import _sti_from_mtf
 
-from ..registry import _DELTA_PLACES, Outcome, _fmt, numeric, register
+from ..registry import Outcome, _fmt, mask, numeric, register
 from .levels import _FS
 
 if TYPE_CHECKING:
@@ -253,11 +253,14 @@ def _chk_sti_filter_slope() -> Outcome:
         # Bands other than 125 Hz are legitimately (near-)empty here.
         warnings.simplefilter("ignore", UserWarning)
         m_observed = float(np.min(ph.speech.stipa(x, _FS).mtf[0]))
-    return Outcome(
+    # C.4.2 states a floor, not a band: the criterion is one-sided, so the
+    # acceptance band is bounded below at 0.5 and unbounded above.
+    return mask(
         expected="m >= 0.5 (C.4.2 pass criterion)",
         computed=_fmt(m_observed, places=4),
-        delta=_fmt(m_observed - 0.5, "", _DELTA_PLACES),
-        passed=m_observed >= 0.5,
+        deviation=m_observed,
+        lower=0.5,
+        places=3,
     )
 
 

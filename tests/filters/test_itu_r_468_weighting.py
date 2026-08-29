@@ -13,13 +13,14 @@ separate things to check, and this module keeps them apart:
   three sample rates, which is the mask a piece of measuring equipment has to
   sit inside.
 
-Two parts of that mask cannot be read literally, and both departures are
-made explicit below rather than assumed: the printed 0 at 6 300 Hz gets a
-substitute budget, because nothing satisfies a zero-width tolerance, and any
-row inside the resampler's anti-alias transition band near the input Nyquist
-frequency is dropped, because every curve in this module rolls off there.
-The dropped row is not simply forgotten: a test of its own pins what it
-costs and where the cost comes from.
+One part of that mask cannot be read literally, and the departure is made
+explicit below rather than assumed: the printed 0 at 6 300 Hz gets a
+substitute budget, because nothing satisfies a zero-width tolerance. Nothing
+else is excused. Every Table 1 row below the Nyquist frequency is checked at
+every rate, including 32 kHz, which the resampled path this design replaced
+could not reach: its anti-alias transition band sat on the input Nyquist
+frequency and put the 20 kHz row 2.1 dB below the printed cell at 44.1 kHz,
+against a +/-2.0 dB tolerance, so that row had to be dropped.
 """
 
 from __future__ import annotations
@@ -32,44 +33,23 @@ from scipy import signal as sp_signal
 from phonometry import filters
 from phonometry.electroacoustics import itu_r_468_weighting
 from phonometry.filters.weighting import (
+    _FIT_SECTIONS,
     _ITU_R_468_LADDER,
     _itu_r_468_prototype,
     _runtime_frequency_response,
 )
 
-#: Above this fraction of the input Nyquist frequency the ``resample_poly``
-#: anti-alias FIR of the high-accuracy path dominates, whatever the design
-#: rate: its cutoff sits on ``fs / 2``, so the transition band straddles it,
-#: and the signal crosses it twice. Measured on this curve at 44.1 kHz, the
-#: 20 kHz row (0.907 of Nyquist) reads -2.13 dB against the network, of which
-#: the two FIR passes are -1.66 dB and the sections only -0.49 dB. That -1.66
-#: does not move with the oversample factor: the tap count grows as 20 L while
-#: the normalised cutoff falls as 1/L, so the transition band in hertz is
-#: invariant (-3 dB at 21.17 kHz for every L from 2 to 16). Raising L improves
-#: the row, from -10.4 dB at x2 to -1.7 dB at x16, and every decibel of that is
-#: the sections decompressing; the factor is already at the module's cap of 8
-#: here, so there is no headroom left to spend. The A curve loses 2.25 dB at
-#: the same point for the same reason, so this is the module's shared range
-#: limit and not a property of this curve.
-_DEMONSTRABLE_FRACTION_OF_NYQUIST = 0.9
-
 #: Substitute for the 0 dB tolerance Table 1 prints at 6 300 Hz. The printed
 #: value is unsatisfiable: the +/-1 % component tolerance the same figure
 #: blesses already moves the peak by up to 0.11 dB, and AES17-2015 Table 1
-#: quietly replaces the row with +/-0,01 dB. Even that is out of reach for a
-#: resampled digital path, which lands 0.010 to 0.013 dB from the nominal
-#: peak depending on the rate, so this is the library's own budget: the
-#: 0,1 dB quantum the table is printed to.
+#: quietly replaces the row with +/-0,01 dB. The fitted design lands within
+#: 0.017 dB of the nominal peak at every rate here, so this stays the
+#: library's own budget: the 0,1 dB quantum the table is printed to.
 _PEAK_ROW_BUDGET_DB = ref.ITU_R_468_TABLE1_ROUNDING_DB
 
 
 def _realised_response_db(fs: int, frequencies: np.ndarray) -> np.ndarray:
-    """Response of the whole filter path, in dB re its own 1 kHz value.
-
-    The high-accuracy path does not apply its sections to the input directly,
-    so the sections alone are not the filter; this measures the interpolate /
-    filter / decimate cascade the caller actually gets.
-    """
+    """Response of the whole filter path, in dB re its own 1 kHz value."""
     wf = filters.WeightingFilter(fs, "468")
     h = _runtime_frequency_response(wf, frequencies)
     h_ref = _runtime_frequency_response(wf, np.array([1000.0]))[0]
@@ -77,9 +57,8 @@ def _realised_response_db(fs: int, frequencies: np.ndarray) -> np.ndarray:
 
 
 def _demonstrable_rows(fs: int) -> list[tuple[float, float, float]]:
-    """Table 1 rows that lie below this rate's anti-alias transition band."""
-    ceiling = _DEMONSTRABLE_FRACTION_OF_NYQUIST * fs / 2.0
-    return [row for row in ref.ITU_R_468_TABLE1 if row[0] < ceiling]
+    """Table 1 rows this rate can carry, i.e. every one below Nyquist."""
+    return [row for row in ref.ITU_R_468_TABLE1 if row[0] < fs / 2.0]
 
 
 def _row_budget(tolerance: float) -> float:
@@ -150,15 +129,17 @@ def test_prototype_reproduces_all_21_rows_of_table_1() -> None:
     assert float(np.sqrt(np.mean(error**2))) == pytest.approx(0.0264, abs=0.001)
 
 
-@pytest.mark.parametrize("fs", [44100, 48000, 96000])
+@pytest.mark.parametrize("fs", [32000, 44100, 48000, 96000])
 def test_realised_filter_sits_inside_the_table_1_mask(fs: int) -> None:
-    """Table 1 column 3, at every row this rate can demonstrate.
+    """Table 1 column 3, at every row below the Nyquist frequency.
 
     The mask constrains the measuring equipment's departure from the nominal
     curve, so the comparison is against the printed cell the reader has, with
-    the two documented departures from a literal reading: the 6 300 Hz row's
-    unsatisfiable 0 is replaced, and the rows inside the anti-alias transition
-    band are dropped rather than held to a tolerance no rate can meet there.
+    the one documented departure from a literal reading: the 6 300 Hz row's
+    unsatisfiable 0 is replaced. 32 kHz is in the list because the resampled
+    path could not carry it -- its 14 kHz top row sat inside the anti-alias
+    transition band -- and the fitted design reads 0.03 dB there against a
+    +/-0.2 dB tolerance.
     """
     rows = _demonstrable_rows(fs)
     freqs = np.array([row[0] for row in rows])
@@ -170,74 +151,68 @@ def test_realised_filter_sits_inside_the_table_1_mask(fs: int) -> None:
         )
 
 
-@pytest.mark.parametrize("fs", [44100, 48000, 96000])
+@pytest.mark.parametrize("fs", [32000, 44100, 48000, 96000])
 def test_realised_filter_tracks_the_network_far_inside_the_mask(fs: int) -> None:
     """The digital path against the nominal curve, not against its rounding.
 
     The mask above is what conformance asks for; a digital implementation
     should be held to something far tighter, and the natural way to say so is
     as a fraction of each row's own budget, which stays comparable across
-    rates while the absolute departure does not (it reaches 0.97 dB at the
-    31.5 kHz row, inside a +/-2.8 dB one). This is what the 384 kHz design
-    target buys: it spends 16 % of the 16 kHz row's +/-1.6 dB at 48 kHz, where
-    the module's 144 kHz default would read 1.99 dB low and be outside it.
+    rates while the absolute departure does not. The resampled path this
+    design replaced spent 100 % of the 20 kHz row's budget at 44.1 kHz and had
+    to have that row excused; the fit spends at most half of any row's budget
+    at any rate here. The binding row is 6 300 Hz at 32 kHz, and it binds
+    because its budget is the tightest in the table by a factor of four -- the
+    0.05 dB substitute for an unsatisfiable printed zero -- not because the
+    departure there is large: 0.024 dB, the smallest absolute departure of any
+    binding row in this file.
     """
     rows = _demonstrable_rows(fs)
     freqs = np.array([row[0] for row in rows])
     budget = np.array([_row_budget(row[2]) for row in rows])
     departure = _realised_response_db(fs, freqs) - itu_r_468_weighting(freqs)
-    assert np.max(np.abs(departure) / budget) < 0.4
+    assert np.max(np.abs(departure) / budget) < 0.5
 
 
-def test_the_20_khz_row_is_out_of_reach_at_44_1_khz_but_not_at_48() -> None:
-    """The exclusion above, stated as a measurement instead of an assumption.
+def test_the_20_khz_row_at_44_1_khz_is_no_longer_a_problem() -> None:
+    """The row the resampled path had to be excused from, measured.
 
-    A row nobody checks is a place to hide a regression, so the reason for
-    dropping it is pinned here. At 44.1 kHz the 20 kHz row sits at 0.91 of
-    Nyquist, inside the resampler's anti-alias transition band, and the
-    realised response falls about 2.1 dB below the printed cell against a
-    +/-2.0 dB tolerance. At 48 kHz the same row is at 0.83 and costs 0.4 dB.
-    The deficit belongs to the resampling path and not to the design: the
-    second-order sections alone are 0.5 dB low there, and a higher design
-    rate would make it worse, because the anti-alias FIR keeps its cutoff at
-    the input Nyquist frequency and only gets sharper.
+    At 44.1 kHz the 20 kHz row sits at 0.907 of the Nyquist frequency. The
+    interpolate / filter / decimate path put it 2.10 dB below the printed cell
+    against a +/-2.0 dB tolerance -- of which the two anti-alias passes were
+    -1.66 dB and the sections only -0.49 -- so the row had to be dropped from
+    the mask test. The fit controls the band to 0.995 of Nyquist, so the row is
+    inside what the design covers and reads within a fiftieth of its budget.
     """
     at_20k = np.array([20000.0])
     printed = next(row[1] for row in ref.ITU_R_468_TABLE1 if row[0] == 20000.0)
 
-    assert 20000.0 not in [row[0] for row in _demonstrable_rows(44100)]
-    deficit_44k1 = _realised_response_db(44100, at_20k)[0] - printed
-    assert deficit_44k1 == pytest.approx(-2.10, abs=0.05)
+    assert 20000.0 in [row[0] for row in _demonstrable_rows(44100)]
+    deviation = _realised_response_db(44100, at_20k)[0] - printed
+    assert abs(deviation) < 0.05, f"{deviation:+.4f} dB against +/-2.0 dB"
 
-    assert 20000.0 in [row[0] for row in _demonstrable_rows(48000)]
-    assert _realised_response_db(48000, at_20k)[0] - printed == pytest.approx(
-        -0.40, abs=0.05
-    )
-
-    # The sections alone, without the interpolate / decimate pair around them.
+    # The sections are the whole path now, so measuring them separately must
+    # give the same number rather than a better one.
     wf = filters.WeightingFilter(44100, "468")
-    _, h = sp_signal.sosfreqz(wf.sos, worN=at_20k, fs=44100 * wf._oversample)
-    _, h_ref = sp_signal.sosfreqz(
-        wf.sos, worN=np.array([1000.0]), fs=44100 * wf._oversample
-    )
+    _, h = sp_signal.sosfreqz(wf.sos, worN=at_20k, fs=44100)
+    _, h_ref = sp_signal.sosfreqz(wf.sos, worN=np.array([1000.0]), fs=44100)
     sections_only = 20.0 * np.log10(abs(h[0]) / abs(h_ref[0])) - printed
-    assert sections_only == pytest.approx(-0.49, abs=0.05)
-    assert sections_only > deficit_44k1 + 1.0
+    assert sections_only == pytest.approx(deviation, abs=1e-12)
 
 
-def test_design_target_is_384_khz_not_the_module_default() -> None:
-    """A -30 dB/octave skirt needs eight times oversampling at 48 kHz.
+def test_the_468_curve_keeps_the_network_order() -> None:
+    """Three biquads, the six poles of Fig. 1a, and no fourth section.
 
-    Bilinear frequency compression grows quadratically with ``f / f_design``,
-    so the 144 kHz target sized for the A and C curves is not enough here.
-    The factor is capped at the module's existing 8, which 44.1 kHz reaches:
-    the target would ask for 9 and the cap holds it at 352.8 kHz, close
-    enough that only the row inside the transition band suffers.
+    A fourth section is worth buying only when the prototype's own order is
+    what limits the fit. It is not here: the residual is set by the magnitude
+    of a real-coefficient filter having zero slope at the Nyquist frequency
+    while this curve is still falling at about -30 dB/octave, and a fourth
+    section moves the worst deviation at 48 kHz only from 0.102 to 0.083 dB.
+    So the realised filter carries exactly the network's degree.
     """
-    assert filters.WeightingFilter(48000, "468")._oversample == 8
-    assert filters.WeightingFilter(44100, "468")._oversample == 8
-    assert filters.WeightingFilter(96000, "468")._oversample == 4
-    assert filters.WeightingFilter(384000, "468")._oversample == 1
+    assert _FIT_SECTIONS["468"] == 3
+    assert filters.WeightingFilter(48000, "468").sos.shape == (3, 6)
+    assert len(_itu_r_468_prototype()[0]) == 6
 
 
 def test_weighting_filter_emphasises_the_6_khz_band_of_a_record() -> None:
@@ -259,20 +234,32 @@ def test_weighting_filter_emphasises_the_6_khz_band_of_a_record() -> None:
     assert 20.0 * np.log10(at_6k3 / at_1k) == pytest.approx(12.2167, abs=0.05)
 
 
-def test_stateful_468_is_refused() -> None:
-    """Block processing runs the plain design at the input rate: 23 dB out.
+def test_stateful_468_is_now_available() -> None:
+    """The refusal was about the resampler, and the resampler is gone.
+
+    Block processing used to imply ``high_accuracy=False``, which for this
+    curve meant the plain bilinear design and 23 dB of error at 16 kHz, so it
+    was refused rather than shipped. The fitted design is a plain cascade at
+    the input rate, so block processing costs this curve nothing -- and must
+    reproduce a single call exactly.
+    """
+    fs = 48000
+    x = np.random.default_rng(468).standard_normal(fs)
+    blocks = filters.WeightingFilter(fs, "468", stateful=True)
+    stitched = np.concatenate([blocks.filter(part) for part in np.split(x, 5)])
+    np.testing.assert_array_equal(
+        stitched, np.asarray(filters.WeightingFilter(fs, "468").filter(x))
+    )
+
+
+def test_plain_bilinear_468_is_refused() -> None:
+    """``high_accuracy=False`` is the design the Recommendation cannot grade.
 
     Every other curve degrades gracefully and is documented rather than
     refused, because IEC 61672-1 grades A and C into classes. BS.468-4 prints
     one mask and no lower grade, so there is nothing honest to return here.
     """
-    with pytest.raises(ValueError, match=r"'468' needs the oversampled design"):
-        filters.WeightingFilter(48000, "468", stateful=True)
-
-
-def test_plain_bilinear_468_is_refused() -> None:
-    """``high_accuracy=False`` is the same filter stateful mode would build."""
-    with pytest.raises(ValueError, match=r"'468' needs the oversampled design"):
+    with pytest.raises(ValueError, match=r"'468' needs the fitted design"):
         filters.WeightingFilter(48000, "468", high_accuracy=False)
 
 

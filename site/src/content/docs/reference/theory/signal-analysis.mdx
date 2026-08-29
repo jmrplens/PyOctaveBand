@@ -382,8 +382,10 @@ $$
 
 The digital filter is obtained from the analog poles/zeros via the bilinear
 transform. Because the bilinear transform compresses frequencies near Nyquist,
-the default `high_accuracy` mode designs and runs the filter at an internally
-oversampled rate (≥ 144 kHz); see [Frequency Weighting](/phonometry/signals/levels/weighting/).
+the default `high_accuracy` mode does not apply that transform to the printed
+prototype: it fits a prototype of the same structure whose response *at the
+warped frequencies* is the printed one's response at the true frequencies, and
+transforms that; see [Frequency Weighting](/phonometry/signals/levels/weighting/).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses.svg" alt="A, C and Z frequency weighting curves of IEC 61672-1 with a zoom showing the positive region of the A curve (+1.27 dB at 2.5 kHz)" width="80%" />
 
@@ -456,7 +458,7 @@ that fence the curve off below 1 Hz and above 20 Hz.*
 
 Infrasound needs its own curve because near the hearing threshold the perceived loudness of very-low-frequency tones grows much more steeply with sound pressure level than at mid frequencies (a small dB increase above threshold produces a large loudness jump), so the A curve (anchored at 1 kHz) grossly misrepresents infrasonic annoyance.
 
-Since G acts on 0.25 Hz – 315 Hz, far below the Nyquist frequency at audio rates, the frequency warping of the plain bilinear transform (applied without prewarping) is negligible there: about 0.014 % at 315 Hz for $f_\mathrm{s} = 48$ kHz, under 0.01 dB on the response. The internal oversampling used for the A/C designs (whose action extends to 16 kHz) is therefore not applied.
+Since G acts on 0.25 Hz – 315 Hz, far below the Nyquist frequency at audio rates, the frequency warping of the plain bilinear transform (applied without prewarping) is negligible there: about 0.014 % at 315 Hz for $f_\mathrm{s} = 48$ kHz, under 0.01 dB on the response. The default design still fits the prototype at the sample rate as it does for A and C, which costs nothing here and matters at the low rates infrasound is often recorded at, where 315 Hz approaches Nyquist.
 
 See the [Special Weightings guide](/phonometry/signals/levels/special-weightings/) for usage.
 

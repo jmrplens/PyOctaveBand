@@ -235,8 +235,11 @@ def test_streamed_stateful_laeq_equals_the_single_pass(
     The stream drives the existing block machinery exactly as the
     block-processing guide prescribes (fresh frames only into the
     filter, state carried across calls); the reference is the same
-    bilinear design run over the whole file in one call, which the
-    guide promises is bit-identical to the concatenated stream.
+    design run over the whole file in one call, which the guide
+    promises is bit-identical to the concatenated stream. Both sides
+    take the default: streaming used to force the plain bilinear
+    design, so the reference had to ask for it, and the comparison
+    could not be made against the filter a caller actually gets.
     """
     x = _long_synthetic()
     path = tmp_path / "night.wav"
@@ -252,9 +255,7 @@ def test_streamed_stateful_laeq_equals_the_single_pass(
     streamed = 10 * np.log10((total / frames) / (2e-5) ** 2)
 
     offline = signals.leq(
-        filters.WeightingFilter(FS, "A", high_accuracy=False).filter(
-            np.asarray(read(path))
-        )
+        filters.WeightingFilter(FS, "A").filter(np.asarray(read(path)))
     )
     assert streamed == pytest.approx(offline, abs=1e-9)
 

@@ -21,7 +21,7 @@ import reference_data as ref
 
 import phonometry as ph
 
-from ..registry import Outcome, numeric, register
+from ..registry import Outcome, count, numeric, register
 
 _CNOSSOS_ROAD = "CNOSSOS-EU road source (Directive 2002/49/EC Annex II)"
 
@@ -116,12 +116,10 @@ def _chk_cnossos_road_table_f1() -> Outcome:
         bad += sum(
             1 for got, want in pairs for a, b in zip(got, want, strict=True) if a != b
         )
-    return numeric(
-        0.0,
-        float(bad),
-        0.0,
-        unit="mismatches",
-        places=0,
+    return count(
+        160 - bad,
+        160,
+        subject="coefficients",
         expected_label="160 coefficients identical",
     )
 
@@ -144,12 +142,10 @@ def _chk_cnossos_road_table_f4() -> Outcome:
                 if a != b
             )
             bad += int(row.beta[category] != expected[key][1])
-    return numeric(
-        0.0,
-        float(bad),
-        0.0,
-        unit="mismatches",
-        places=0,
+    return count(
+        675 - bad,
+        675,
+        subject="stored coefficients",
         expected_label="675 stored coefficients identical",
     )
 
@@ -180,12 +176,10 @@ def _chk_cnossos_road_tables_f2_f3() -> Outcome:
             ph.environment.ROAD_COEFFICIENTS.junction_c[category]
             != (expected[1], expected[2])
         )
-    return numeric(
-        0.0,
-        float(bad),
-        0.0,
-        unit="mismatches",
-        places=0,
+    return count(
+        36 - bad,
+        36,
+        subject="coefficients",
         expected_label="36 coefficients identical",
     )
 
@@ -238,12 +232,10 @@ def _chk_cnossos_a_weighting() -> Outcome:
         )
         if a != b
     )
-    return numeric(
-        0.0,
-        float(bad),
-        0.0,
-        unit="mismatches",
-        places=0,
+    return count(
+        8 - bad,
+        8,
+        subject="values",
         expected_label="8 values identical",
     )
 

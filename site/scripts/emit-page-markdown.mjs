@@ -58,6 +58,17 @@ function stripMdx(text) {
  */
 const routeOfFile = (file) => routeOf(relative(contentDir, file));
 
+// The two generated evidence documents live at the repository root of the
+// mirror and are published at these routes. Both the link rewriter and the
+// source lookup need the mapping: the conformance page is now MDX that renders
+// its rows from `docs/conformance.json` through a component, so stripping the
+// MDX out of the page source would leave an agent with the introduction and no
+// evidence. `docs/CONFORMANCE.md` is the text copy of the same rows.
+const TRANSPLANTED = {
+  CONFORMANCE: "reference/conformance",
+  ERRATA: "reference/errata",
+};
+
 /**
  * Rewrite links that only work inside the docs/ folder.
  *
@@ -87,9 +98,7 @@ function absolutize(text, fromRoute) {
       const resolved = parts.join("/").replace(/\/index$/, "");
       // The two generated documents live at the repository root in the mirror
       // and are transplanted into these routes on the site.
-      const route =
-        { CONFORMANCE: "reference/conformance", ERRATA: "reference/errata" }[resolved] ??
-        resolved;
+      const route = TRANSPLANTED[resolved] ?? resolved;
       return `](${SITE_URL}/${route}/${anchor})`;
     });
 }
@@ -99,8 +108,8 @@ function absolutize(text, fromRoute) {
 const docsMirror = new Map();
 if (existsSync(docsDir)) {
   for (const name of await Array.fromAsync(glob("**/*.md", { cwd: docsDir }))) {
-    const route = name.replace(/\\/g, "/").replace(/\.md$/, "").replace(/\/index$/, "");
-    docsMirror.set(route, join(docsDir, name));
+    const bare = name.replace(/\\/g, "/").replace(/\.md$/, "").replace(/\/index$/, "");
+    docsMirror.set(TRANSPLANTED[bare] ?? bare, join(docsDir, name));
   }
 }
 

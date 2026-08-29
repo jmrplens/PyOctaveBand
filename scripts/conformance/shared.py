@@ -133,11 +133,10 @@ def _weighting_deviation(curve: str, fs: int) -> WeightingDeviation:
     the binding-frequency compliance margin.
 
     The weighting filter is evaluated over the whole path a signal travels
-    through ``filter()`` - the designed SOS *and* the resampling stages the
-    default high-accuracy mode wraps around them, whose anti-alias filter
-    dominates the response above roughly 0.9 x fs/2 - against the standard's
-    nominal response. For A/C the normative band is the IEC 61672-1 Table 3
-    class-1 acceptance limits; for G it is the ISO 7196 Annex A.3 +/-1 dB
+    through ``filter()``, which the default mode now designs at the input rate
+    as one cascade of second-order sections, against the standard's nominal
+    response. For A/C the normative band is the IEC 61672-1 Table 3 class-1
+    acceptance limits; for G it is the ISO 7196 Annex A.3 +/-1 dB
     instrumentation tolerance.
     """
     wf = filters.WeightingFilter(fs, curve)

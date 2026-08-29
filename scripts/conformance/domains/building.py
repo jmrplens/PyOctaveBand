@@ -29,7 +29,7 @@ from scipy import signal as sg
 
 import phonometry as ph
 
-from ..registry import Outcome, numeric, register
+from ..registry import Outcome, numeric, record, register
 from .levels import _FS
 
 if TYPE_CHECKING:
@@ -101,12 +101,18 @@ def _chk_iso18233_sweep_deconvolution() -> Outcome:
 def _chk_iso717_rw() -> Outcome:
     exp = ref.ISO717_1_ANNEX_C_EXPECTED
     res = ph.building.weighted_rating(ref.ISO717_1_ANNEX_C_R)
-    ok = res.rating == exp["rw"] and res.c == exp["c"] and res.ctr == exp["ctr"]
-    return Outcome(
-        expected=f"Rw {exp['rw']} (C {exp['c']}; Ctr {exp['ctr']})",
-        computed=f"Rw {res.rating} (C {res.c}; Ctr {res.ctr})",
-        delta=f"sum {res.unfavourable_sum:.1f} dB",
-        passed=ok,
+    # Three integers read off one printed table, compared exactly: the standard
+    # does the rounding itself, so a tolerance here would be a second opinion
+    # about a number the standard has already settled. The unfavourable sum is
+    # a second quantity, not a deviation, so it travels as one.
+    return record(
+        {"Rw": exp["rw"], "C": exp["c"], "Ctr": exp["ctr"]},
+        {"Rw": res.rating, "C": res.c, "Ctr": res.ctr},
+        label=f"Rw {exp['rw']} (C {exp['c']}; Ctr {exp['ctr']})",
+        computed_label=(
+            f"Rw {res.rating} (C {res.c}; Ctr {res.ctr}), "
+            f"unfavourable sum {res.unfavourable_sum:.1f} dB"
+        ),
     )
 
 
@@ -148,6 +154,10 @@ def _chk_iso717_1_extended() -> Outcome:
         and res.c_50_5000 == exp["c_50_5000"]
         and res.ctr_50_5000 == exp["ctr_50_5000"]
     )
+    # Not a `record` check, unlike its Table C.1 sibling above: the two
+    # enlarged-range terms are optional in the result type, and a `None` there
+    # is a different failure from a wrong number. Converting it means giving
+    # that its own verdict first.
     return Outcome(
         expected=(
             f"Rw {exp['rw']} (C {exp['c']}; Ctr {exp['ctr']}; "

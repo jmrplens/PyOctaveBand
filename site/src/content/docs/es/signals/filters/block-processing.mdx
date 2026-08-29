@@ -42,15 +42,16 @@ Las clases `OctaveFilterBank`, `WeightingFilter` (cualquier curva de
 ponderación: A, C, Z y las especiales B, D, G y AU) y `TimeWeighting` admiten
 procesado por bloques (streaming): el estado interno del filtro se conserva
 entre llamadas, de modo que las salidas concatenadas por bloques coinciden con
-una única pasada sobre la señal completa. El streaming usa siempre el diseño
-bilineal clásico de las ponderaciones — la vía `high_accuracy`, sobremuestreada,
-remuestrea internamente y no se puede partir en bloques —, así que una
-ponderación A en streaming arrastra el error en altas frecuencias del diseño
-simple que describe
-[Ponderación frecuencial](/phonometry/es/signals/levels/weighting/), y una
-ponderación G en streaming a una frecuencia de muestreo baja pierde el
-sobremuestreo interno que su diseño aplica normalmente (ver
+una única pasada sobre la señal completa. Al streaming los filtros de
+ponderación no le cuestan nada: su diseño exacto `high_accuracy` es una
+cascada simple de secciones de segundo orden a la frecuencia de entrada, así
+que una ponderación A en streaming es el mismo filtro que ejecuta una llamada
+offline, a cualquier frecuencia de muestreo (ver
+[Ponderación frecuencial](/phonometry/es/signals/levels/weighting/) y
 [Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/)).
+Antes llegaba a sus secciones a través de una etapa de interpolación y otra de
+diezmado, que no se pueden partir en bloques, así que el streaming tenía que
+recurrir al diseño bilineal simple.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/block_processing_continuity_es.svg" alt="Procesado por bloques con estado igual al resultado continuo frente a bloques independientes que reinician el transitorio" width="80%" />
 
@@ -313,10 +314,9 @@ def to_db(env):
     return 10 * np.log10(np.maximum(env, 1e-16) / (2e-5) ** 2)
 
 
-# La referencia tiene que usar el diseño que puede usar el streaming:
-# high_accuracy=False.
+# Ambos lados usan el mismo diseño por defecto; el streaming no cede nada.
 reference = to_db(filters.time_weighting(
-    filters.weighting_filter(x, fs, curve="A", high_accuracy=False), fs,
+    filters.weighting_filter(x, fs, curve="A"), fs,
     mode="fast"))
 
 aw = filters.WeightingFilter(fs, "A", stateful=True)
@@ -373,15 +373,16 @@ percentil.
 
 El streaming prohíbe todo lo que necesite la señal completa o lo que recalcule
 algo en cada bloque. Cada fila de la tabla se hace cumplir con una excepción, no
-se ignora en silencio, salvo `high_accuracy`, que se resuelve al diseño clásico
-a menos que pases `True` explícitamente.
+se ignora en silencio. `high_accuracy` ya no está entre ellas: antes se
+resolvía al diseño bilineal simple en modo con estado y lanzaba una excepción
+si se pasaba `True`, y ahora significa lo mismo en ambos modos.
 
 | Opción | Comportamiento con estado | Motivo |
 | :--- | :--- | :--- |
 | `detrend` | debe ser `False` | La eliminación de tendencia por bloque crea discontinuidades en las fronteras |
 | `resample` | debe ser `False` | El remuestreador no conserva estado |
 | `zero_phase` | no admitido | El filtrado bidireccional necesita la señal completa |
-| `high_accuracy` (ponderación) | por defecto se resuelve a `False` (el diseño bilineal clásico, consulta [Ponderación frecuencial](/phonometry/es/signals/levels/weighting/)); pasar `True` explícito lanza `ValueError` | El remuestreo polifásico interno es incompatible con bloques |
+| `high_accuracy` (ponderación) | sin restricción: por defecto `True` como en todas partes (consulta [Ponderación frecuencial](/phonometry/es/signals/levels/weighting/)) | El diseño exacto es una cascada simple de secciones de segundo orden a la frecuencia de entrada, así que conserva estado como cualquier otro |
 | `steady_ic` | opcional | Arranca los filtros en el régimen permanente de la respuesta al escalón |
 
 ## Qué cubre esta guía
@@ -404,12 +405,12 @@ propio; solo demuestra y documenta esa equivalencia.
 <ScopeClaim status="not-covered" label="No cubierto">
 El filtrado bidireccional `zero_phase` necesita la señal completa, así que no
 se admite en modo con estado; usa la vía offline de [Bancos de
-filtros](/phonometry/es/signals/filters/filter-banks/) en su lugar. El diseño
-`high_accuracy` de ponderación se resuelve al filtro bilineal clásico en modo
-con estado (pasar `True` explícitamente lanza `ValueError`), porque su etapa
-de remuestreo polifásico no es compatible con bloques; consulta [Ponderación
-frecuencial](/phonometry/es/signals/levels/weighting/) para el diseño de alta
-precisión offline. Los estadísticos de rango como $L_{90}$ tampoco admiten
+filtros](/phonometry/es/signals/filters/filter-banks/) en su lugar. Lo que
+cuesta el propio diseño exacto de ponderación, y la banda sobre la que se
+ajusta, corresponden a [Ponderación
+frecuencial](/phonometry/es/signals/levels/weighting/) y no a esta página, que
+solo demuestra que el streaming lo reproduce. Los estadísticos de rango como
+$L_{90}$ tampoco admiten
 streaming: procesa la envolvente en streaming y calcula los percentiles una
 vez sobre el resultado conjunto, como describe [Niveles integrados y
 estadísticos](/phonometry/es/signals/levels/levels/).

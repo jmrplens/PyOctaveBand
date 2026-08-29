@@ -502,56 +502,68 @@ def test_a_weighting_class1_high_frequencies(fs: int) -> None:
     **Purpose:**
     The plain bilinear design compresses the response near Nyquist: at
     fs=48000 the error at 12.5 kHz was -2.67 dB (class 1 limit: -2.5 dB).
-    With high_accuracy (internal oversampling to >= 96 kHz) the error
-    drops below -0.6 dB.
+    The default design fits the prototype at the sample rate instead, which
+    removes the compression rather than shrinking it.
 
     **Verification:**
     - Errors vs the analytic curve stay within class 1 tolerances
       (12.5 kHz: +2.0/-2.5 dB; 16 kHz: +2.5/-16 dB, tightened here).
     """
     wf = filters.WeightingFilter(fs, "A")  # high_accuracy defaults to True
-    # Tightened to lock the 144 kHz oversample-target fit (audit N1 A6): with
-    # the target raised from 96 to 144 kHz both 44.1k and 48k oversample enough
-    # to keep the HF error within +/-0.7 dB of the analytic curve up to 16 kHz.
+    # Held to a tenth of the tightest class 1 tolerance in the range rather
+    # than to the tolerance: what the fit delivers here is 0.01 dB, and a
+    # bound of 0.7 would not notice the design regressing seventyfold.
     for f0, tol_lo, tol_hi in [
-        (8000, -0.7, 0.7),
-        (12500, -0.7, 0.7),
-        (16000, -0.7, 0.7),
+        (8000, -0.07, 0.07),
+        (12500, -0.07, 0.07),
+        (16000, -0.07, 0.07),
     ]:
         err = _measured_gain_db(wf, fs, f0) - _analytic_a_weight_db(f0)
-        assert tol_lo < err < tol_hi, f"{f0} Hz: error {err:.2f} dB at fs={fs}"
+        assert tol_lo < err < tol_hi, f"{f0} Hz: error {err:.3f} dB at fs={fs}"
 
 
 def test_a_weighting_48k_hf_accuracy_locked() -> None:
-    """Lock the 144 kHz oversample-target HF fit at 48 kHz (audit N1 A6).
+    """Lock the high-frequency fit at 48 kHz, where the old path was weakest.
 
-    The former 96 kHz target oversampled 48 kHz only x2, leaving -1.11 dB @16k
-    and -2.10 dB @20k vs the analytic A curve. Raising the internal target to
-    144 kHz oversamples x3, halving those residuals to about -0.44 / -0.85 dB.
+    The oversampled path this design replaced left -0.44 dB at the 16 kHz
+    nominal frequency and -0.86 dB at the 20 kHz one, which was the best its
+    144 kHz internal target could do. Both are now inside a hundredth of a
+    decibel, so the bounds are set there: a regression to the old path would
+    fail this by a factor of forty.
     """
     fs = 48000
     wf = filters.WeightingFilter(fs, "A")
-    for f0, bound in [(16000, 0.6), (20000, 1.0)]:
+    for f0, bound in [(16000, 0.01), (20000, 0.01)]:
         err = _measured_gain_db(wf, fs, f0) - _analytic_a_weight_db(f0)
-        assert abs(err) < bound, f"{f0} Hz: error {err:+.2f} dB at fs={fs}"
+        assert abs(err) < bound, f"{f0} Hz: error {err:+.4f} dB at fs={fs}"
 
 
-def test_high_accuracy_incompatible_with_stateful() -> None:
-    """high_accuracy resampling would break block continuity: must raise."""
-    with pytest.raises(
-        ValueError, match=r"high_accuracy is not compatible with stateful"
-    ):
-        filters.WeightingFilter(48000, "A", stateful=True, high_accuracy=True)
+def test_high_accuracy_is_orthogonal_to_stateful() -> None:
+    """The two used to exclude each other; neither now constrains the other.
+
+    ``high_accuracy`` meant resampling stages around the sections, which block
+    processing cannot drive, so asking for both raised. Both designs are now a
+    cascade of second-order sections at the input rate, so all four
+    combinations build, and the accurate one is what a stateful caller gets by
+    default.
+    """
+    for stateful in (False, True):
+        for accurate in (False, True):
+            wf = filters.WeightingFilter(
+                48000, "A", stateful=stateful, high_accuracy=accurate
+            )
+            assert wf.high_accuracy is accurate
+    assert filters.WeightingFilter(48000, "A", stateful=True).high_accuracy is True
 
 
-def test_stateful_defaults_to_legacy_mode() -> None:
-    """Stateful filters keep the plain bilinear design (no oversampling)."""
-    wf = filters.WeightingFilter(48000, "A", stateful=True)
-    assert wf._oversample == 1
+def test_stateful_defaults_to_the_fitted_design() -> None:
+    """A stateful filter carries the same sections as a single-shot one."""
+    stateful = filters.WeightingFilter(48000, "A", stateful=True)
+    np.testing.assert_array_equal(stateful.sos, filters.WeightingFilter(48000, "A").sos)
 
 
 def test_high_accuracy_preserves_length_and_shape() -> None:
-    """Oversample+decimate round trip must preserve the input shape."""
+    """The filter must preserve the input shape."""
     x = np.random.default_rng(0).standard_normal((2, 12345))
     y = filters.WeightingFilter(48000, "A").filter(x)
     assert y.shape == x.shape
@@ -584,7 +596,7 @@ def test_c_weighting_class1_high_frequencies(fs: int) -> None:
 
 
 def test_weighting_filter_empty_signal_high_accuracy() -> None:
-    """Empty input must pass through (resample_poly rejects zero-length input)."""
+    """Empty input must pass through (``sosfilt`` rejects zero-length input)."""
     wf = filters.WeightingFilter(48000, "A")
     y = wf.filter(np.array([]))
     assert y.shape == (0,)

@@ -256,7 +256,10 @@ allow-star-arg-any = true
 # has no way to fix it. The quotation stays, so the rule stands down in tests
 # and holds `src`, where it finds nothing.
 "tests/**" = ["E402", "T201", "INP001", "D210", "PLR2004"]
-".github/**" = ["T201", "INP001"]
+# The PR-comment script reads the committed conformance artefact through
+# `scripts/conformance/metrics.py`, so it puts `scripts/` on `sys.path` before
+# importing from it - the same import-after-statement the scripts themselves do.
+".github/**" = ["E402", "T201", "INP001"]
 # The PyOctaveBand transition shim exists to re-export the whole package under
 # the old name; the star import is the point of the file.
 "stub/src/pyoctaveband/__init__.py" = ["F403"]

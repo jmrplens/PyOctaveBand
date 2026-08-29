@@ -264,17 +264,27 @@ reports:
 	mv "$$old"/current "$$old"/replaced; \
 	rm -rf "$$old"
 
-# Regenerate the committed, versioned numerical conformance report, then bring
-# every count quoted from it into line. The --file-header flag prepends the
-# "do not hand-edit" note; the body is exactly what the CI PR-comment harness
-# computes. The second step rewrites the counts in the prose that has no build
-# step to interpolate them through (.zenodo.json, the plain-markdown mirror
-# under docs/, the site frontmatter); the Astro page bodies import them from
-# site/src/data/conformance-stats.mjs and need nothing. CI fails if either
-# output drifts (see the `conformance` job in python-app.yml).
+# Regenerate the committed numerical conformance evidence, then bring every
+# count quoted from it into line. The chain is: the checks write
+# docs/conformance.json, docs/CONFORMANCE.md is rendered from that document, and
+# the counts quoted in prose are read from it too.
+#
+# The artefact is rewritten only when a fresh run differs from it by more than
+# the numeric tolerance, so a value that wobbles in its last digit across BLAS
+# builds leaves the committed bytes alone - which is what lets the Markdown keep
+# a byte diff, being a pure function of bytes that are themselves committed.
+#
+# The --file-header flag prepends the "do not hand-edit" note. The claims step
+# rewrites the counts in the prose that has no build step to interpolate them
+# through (.zenodo.json, the plain-markdown mirror under docs/, the site
+# frontmatter); the Astro page bodies import them from
+# site/src/data/conformance-stats.mjs and need nothing. The last step is the
+# read-only validation CI also runs. CI fails if any output drifts (see the
+# `conformance` job in python-app.yml).
 conformance:
 	$(PYTHON) scripts/conformance_report.py --file-header > docs/CONFORMANCE.md
 	$(PYTHON) scripts/check_conformance_claims.py --write
+	$(PYTHON) scripts/check_conformance_artifact.py
 
 # Optional convenience: install a git pre-commit hook that regenerates
 # docs/CONFORMANCE.md when the library source or the report generator changes.

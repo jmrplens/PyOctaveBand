@@ -52,23 +52,39 @@ broadband noise audible in a programme chain rather than what makes it
 loud. Clause 1 defines it as the response of the passive network of Fig. 1a,
 so it is built from that network's seven printed component values
 (`_itu_r_468_prototype`) and reproduces all 21 rows of the Table 1
-sampling to 0.0503 dB. Its skirt is steep enough that the design runs at a
-384 kHz target rather than the module's 144 kHz default, and the plain
-design at the input rate -- what stateful processing would use -- is
-refused rather than shipped 23 dB out at 16 kHz.
+sampling to 0.0503 dB. Its skirt is steep enough that the plain bilinear
+design at the input rate reads 23 dB out at 16 kHz, so `high_accuracy=False`
+is refused for this curve rather than shipped: the Recommendation prints one
+mask and no lower grade to fall back to.
 
-One Table 1 row is out of reach at 44.1 kHz: 20 kHz sits at 0.91 of that
-rate's Nyquist frequency, inside the anti-alias transition band the
-resampling stages carry, and reads 2.1 dB low against a +/-2.0 dB
-tolerance. Of that, the two anti-alias passes are -1.66 dB and the sections
-only -0.49 dB, and the resampler's share does not move with the design rate:
-its tap count grows as 20 L while its normalised cutoff falls as 1/L, so the
-transition band in hertz is the same for every factor. Raising the factor
-improves the row, but only by decompressing the sections, and it is already
-at the module's cap of 8 at this rate. The ceiling therefore belongs to the
-resampling path rather than to this curve, and the A weighting loses 2.25 dB
-at the same point for the same reason. At 48 kHz and above every row below
-Nyquist is inside the mask, the tightest margin being the 6.3 kHz peak.
+**How the prototypes become filters.** Every curve above is a set of poles and
+zeros in the s plane, and the bilinear transform that turns those into a
+digital filter is exact in magnitude but wrong in frequency: it puts the
+prototype's response at `2 f_s tan(pi f / f_s)` instead of at `2 pi f`,
+which costs 0.86 dB at 20 kHz for A at 48 kHz and 61 dB at 15 848.9 Hz when
+fs = 32 kHz. The library used to hide that by interpolating, filtering at
+three to eight times the rate and decimating back. It no longer does: the
+prototype is fitted at the sample rate instead
+(`phonometry.filters._weighting_design`), and what runs is one cascade of
+second-order sections. Three consequences worth stating in one place, because
+each of them used to be a documented limitation of this module:
+
+* the anti-alias filter of those resampling stages had its transition band on
+  the input Nyquist frequency and the signal crossed it twice, which put a
+  floor of about 1.7 dB on everything above 0.9 of Nyquist whatever the design
+  rate. That floor is gone, so the rows near Nyquist -- the 15 848.9 Hz row at
+  32 kHz, the 20 kHz row of BS.468-4 Table 1 at 44.1 kHz -- are inside their
+  masks instead of over them, and A and C verify to class 1 at every sample
+  rate from 8 kHz up;
+* block processing was incompatible with the accurate design, because a
+  resampler cannot be driven block by block. It no longer is: `stateful` and
+  `high_accuracy` are independent, and stitched blocks reproduce a single
+  call exactly; and
+* one minute of 44.1 kHz audio costs about 18 ms instead of 377 ms for A and
+  775 ms for 468, and holds 21 MB of intermediates instead of 169 MB
+  (measured back to back in one process, mean of five runs). The design
+  itself costs about 70 ms and is cached, so even a first call is quicker
+  than the path it replaces.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -308,7 +324,7 @@ Apply a frequency weighting to a signal.
 | `x` | Input signal, or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) read from a measurement file. A calibrated Signal is weighted in pascals, so the weighted samples come back in pascals too; a bare array keeps whatever unit it arrived in. |
 | `fs` | Sample rate. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `curve` | 'A', 'C' (IEC 61672-1), 'B' (ANSI S1.4-1983, historical), 'D' (withdrawn IEC 537 aircraft-noise weighting), 'G' (ISO 7196 infrasound), 'AU' (IEC 61012), '468' (ITU-R BS.468-4 psophometric noise weighting) or 'Z' (bypass). |
-| `high_accuracy` | Use internal oversampling for IEC 61672-1 class 1 accuracy at high frequencies (default True). The '468' curve requires it and refuses False. |
+| `high_accuracy` | Design the filter by fitting the analog prototype at *fs* (default True), rather than by the plain bilinear transform, which warps frequency and loses class 1 below 44.1 kHz. See [`WeightingFilter.__init__`](/phonometry/reference/api/filters/weighting/#weightingfilter) for what each design costs. The '468' curve requires the fitted design and refuses False. |
 
 **Returns:** The weighted record. A bare array in gives a bare array back; a [`Signal`](/phonometry/reference/api/io/io/#signal) gives a Signal, whose samples are already in pascals and whose factor therefore reads 1.0.
 
@@ -334,10 +350,10 @@ Initialize the weighting filter.
 | Name | Description |
 | :--- | :--- |
 | `fs` | Sample rate in Hz. |
-| `curve` | 'A', 'C' (IEC 61672-1), 'B' (ANSI S1.4-1983, historical: removed from the IEC sound-level-meter standards), 'D' (withdrawn IEC 537 aircraft-noise weighting), 'G' (ISO 7196 infrasound), 'AU' (IEC 61012, audible sound in the presence of ultrasound), '468' (ITU-R BS.468-4 psophometric noise weighting; designed at a 384 kHz target and unavailable in stateful mode, see `_itu_r_468_prototype`) or 'Z'. |
-| `stateful` | If True, the weighting filter is stateful. Useful for block processing. Not available for `'468'`: stateful processing implies `high_accuracy=False`, and the plain design at the input rate misses the Table 1 mask by 23 dB at 16 kHz, with no lower performance class to fall back to. |
+| `curve` | 'A', 'C' (IEC 61672-1), 'B' (ANSI S1.4-1983, historical: removed from the IEC sound-level-meter standards), 'D' (withdrawn IEC 537 aircraft-noise weighting), 'G' (ISO 7196 infrasound), 'AU' (IEC 61012, audible sound in the presence of ultrasound), '468' (ITU-R BS.468-4 psophometric noise weighting, see `_itu_r_468_prototype`) or 'Z'. |
+| `stateful` | If True, carry the section state between calls, so concatenated blocks equal one continuous call. Available for every curve and independent of `high_accuracy`: both designs are a plain cascade of second-order sections at the input rate, and `sosfilt` with a carried `zi` reproduces a single call bit for bit. |
 | `steady_ic` | If True, calculate steady state initial conditions for filter. |
-| `high_accuracy` | If True, design and run the filter at an internal oversampled rate (target >= 144 kHz) so the response stays within IEC 61672-1 class 1 tolerances up to 16 kHz, provided 16 kHz is well clear of the input Nyquist frequency (fs >= 40 kHz). At 48 kHz this oversamples x3, keeping the deviation from the design goal to -0.44 dB at the 16 kHz nominal frequency and -0.86 dB at the 20 kHz one. Oversampling cannot rescue the top of the band at low sample rates, because the resampling stages it adds around the sections carry an anti-alias transition band centred on the input Nyquist frequency: above roughly 0.9 x fs/2 the response rolls off steeply whatever the design rate. What the roll-off costs is per curve, since each is graded against its own design goal: at fs = 32 kHz the 15 848.9 Hz nominal point falls 16.2 dB below the A goal but 15.3 dB below the C one (class 1 allows -16.0 dB there, class 2 has no lower limit), so the verified class at 32 kHz is 2 for A and still 1 for C. At fs = 16 kHz the 7 943.3 Hz point falls 12.0 dB below the A goal and 13.7 dB below the C one (class 1 allows -2.5 dB, class 2 -5.0 dB), so neither curve verifies to any class there. The plain bilinear design holds class 1 for fs >= 40 kHz (-2.8 dB at the 12.5 kHz nominal frequency at 48 kHz, -3.5 dB at 44.1 kHz, inside the +2.0/-5.0 class 1 limits), degrades to class 2 between 22.05 and 32 kHz and meets no class at fs \<= 20 kHz. Defaults to True except in stateful mode (the internal FIR resampling is incompatible with block processing). The '468' curve is the one exception to the grade-and-document habit above: it has a single tolerance mask and no lower grade, so False is refused instead of described. |
+| `high_accuracy` | Which of the two designs to build, both of them second-order sections at the input rate. `True` (the default) fits the analog prototype at *fs*, undoing the bilinear frequency warping instead of tolerating it (`phonometry.filters._weighting_design`). Measured against the prototype over the standard's own band, the worst deviation is 0.008 dB for A at 32 kHz and 0.0003 dB at 48 kHz, and at most 0.06 dB for any curve at any rate in this corpus -- the 0.06 belonging to the 468 curve at 44.1 and 48 kHz, where a -30 dB/octave skirt has to flatten inside the last half percent below the Nyquist frequency. A and C verify to class 1 at every sample rate from 8 kHz up, and at every Table 3 row their deviation stays inside the 0.05 dB the table itself is rounded to. The design is fitted over the interval `_fit_band` returns and is not claimed outside it. `False` is the plain bilinear transform of the printed prototype: the closed-form design a reader can check against the standard term by term, at the cost of the warping. That cost grows quadratically toward the Nyquist frequency -- for A at 48 kHz it reads 15.7 dB below the design goal at the 19 952.6 Hz row, which the class 1 mask does not see because its lower limit there is -inf, and 61.4 dB below it at 15 848.9 Hz when fs = 32 kHz, which it does. So it verifies to class 1 for fs >= 44 100 Hz, degrades to class 2 at 32 000 and 22 050 Hz, and meets no class at 16 000 Hz. It is refused for the '468' curve, whose skirt puts it 23 dB out at 16 kHz with no lower grade in the Recommendation to fall back to. Defaults to True (`None` selects the default too, which is what it used to mean in every mode but the stateful one). |
 
 ### WeightingFilter.filter()
 

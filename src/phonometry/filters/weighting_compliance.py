@@ -7,11 +7,21 @@ and the class 1 and class 2 upper/lower limits at the 34 nominal frequencies
 from 10 Hz to 20 kHz. A lower limit of ``-inf`` means only the upper limit
 applies (subclause 5.5.6 checks measured deviations at the nominal frequencies).
 
+IEC 61672-1:2013 defines only classes 1 and 2. **Type 0**, the tightest of the
+four instrument types, lives in the superseded **IEC 651:1979 Table V**, held
+here as the identical British adoption BS 5969:1981. Its four masks differ
+numerically from the 2013 edition (e.g. Type 0 is +2/-3 dB at both 16 and
+20 kHz where class 1 is +2.5/-16 and +3/-inf), so the two editions are kept as
+separate mask tables selected by the ``edition`` argument (``"2013"`` default
+-> classes 1/2; ``"1979"`` -> Types 0/1/2/3, offered as classes 0-3).
+
 The historical **B weighting** is verified against ANSI S1.4-1983: design
 goals from the B column of **Table IV** (whose A and C columns equal IEC
 61672-1:2013 Table 3 digit for digit) and tolerance limits from **Table V**,
-whose instrument Types 1 and 2 fill the class 1 / class 2 verdict slots (the
-stricter laboratory Type 0 mask is exercised by the CI conformance report).
+whose instrument Types 1 and 2 fill the class 1 / class 2 verdict slots. The
+ANSI Type 0 column is a *different* mask from the IEC 651 one - two-sided and
+stricter at 10/12.5/16 Hz where IEC 651 is upper-only - so the two are carried
+as the two editions they are and never merged.
 The **AU weighting** is verified against IEC 61012:1990: design goals are the
 sum of the nominal A response and the **Table 1** nominal U response (with the
 subclause 2.2 explicit AU values at 25/31.5/40 kHz), checked against the
@@ -92,6 +102,102 @@ _WEIGHTING_TABLE3: list[tuple[float, float, float, float, float, float, float]] 
 _WEIGHTING_COL = {"A": 1, "C": 2, "Z": None}
 
 # ---------------------------------------------------------------------------
+# IEC 651:1979 - the superseded edition, and the only one that publishes a
+# Type 0 mask for the frequency weightings.
+# ---------------------------------------------------------------------------
+
+# IEC 651:1979 Table V, read from the identical British adoption
+# BS 5969:1981 (Table V, standard page 8): tolerances on the Table IV
+# frequency weightings for each of the four instrument types of subclause 1.2,
+# in decibels, at the same 34 nominal frequencies as IEC 61672-1:2013 Table 3.
+# The scan carries no text layer, so the table was read from the printed page
+# rather than from extracted text.
+#
+# Type 0 is the tightest grade: subclause 1.3 says the four types share the
+# same centre values and differ only in the tolerances allowed, which broaden
+# as the type number rises. The table's footnote makes it govern *every*
+# weighting, not one of them - "Tolerances are the same for all weighting
+# characteristics" - which is why B is checked against these limits under this
+# edition rather than against the ANSI table. Subclause 6.1 says the same of
+# the D weighting when provided, but D is not offered here: IEC 651 leaves its
+# design goals to IEC 537, and that table is not in this module.
+#
+# Transcription note, the 1 kHz row: the printed cell is +/-0.7 dB for Type 0,
+# while the footnote adds "The tolerance shall be zero at the reference
+# frequency (see Sub-clause 3.7)" - and 3.7 puts the reference frequency
+# anywhere from 200 Hz to 1 kHz, at the manufacturer's choice, with 1 kHz only
+# "preferred". The printed cell is transcribed as it stands. The two readings
+# cannot disagree here: the response is normalized to its own 1 kHz gain, so
+# the deviation at 1 kHz is identically zero and sits inside a +/-0.7 dB cell
+# and on a zero-width one alike.
+#
+# Row = (nominal Hz, T0 upper, T0 lower, T1 upper, T1 lower, T2 upper,
+# T2 lower, T3 upper, T3 lower); a lower limit of -inf is the "+n; -inf" cell
+# of the print, meaning only the upper limit applies.
+_IEC651_TABLE5: list[
+    tuple[float, float, float, float, float, float, float, float, float]
+] = [
+    (10.0, 2.0, -_INF, 3.0, -_INF, 5.0, -_INF, 5.0, -_INF),
+    (12.5, 2.0, -_INF, 3.0, -_INF, 5.0, -_INF, 5.0, -_INF),
+    (16.0, 2.0, -_INF, 3.0, -_INF, 5.0, -_INF, 5.0, -_INF),
+    (20.0, 2.0, -2.0, 3.0, -3.0, 3.0, -3.0, 5.0, -_INF),
+    (25.0, 1.5, -1.5, 2.0, -2.0, 3.0, -3.0, 5.0, -_INF),
+    (31.5, 1.0, -1.0, 1.5, -1.5, 3.0, -3.0, 4.0, -4.0),
+    (40.0, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0, 4.0, -4.0),
+    (50.0, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0, 3.0, -3.0),
+    (63.0, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0, 3.0, -3.0),
+    (80.0, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0, 3.0, -3.0),
+    (100.0, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 3.0, -3.0),
+    (125.0, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
+    (160.0, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
+    (200.0, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
+    (250.0, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
+    (315.0, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
+    (400.0, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
+    (500.0, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
+    (630.0, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
+    (800.0, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
+    (1000.0, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.0, -2.0),
+    (1250.0, 0.7, -0.7, 1.0, -1.0, 1.5, -1.5, 2.5, -2.5),
+    (1600.0, 0.7, -0.7, 1.0, -1.0, 2.0, -2.0, 3.0, -3.0),
+    (2000.0, 0.7, -0.7, 1.0, -1.0, 2.0, -2.0, 3.0, -3.0),
+    (2500.0, 0.7, -0.7, 1.0, -1.0, 2.5, -2.5, 4.0, -4.0),
+    (3150.0, 0.7, -0.7, 1.0, -1.0, 2.5, -2.5, 4.5, -4.5),
+    (4000.0, 0.7, -0.7, 1.0, -1.0, 3.0, -3.0, 5.0, -5.0),
+    (5000.0, 1.0, -1.0, 1.5, -1.5, 3.5, -3.5, 6.0, -6.0),
+    (6300.0, 1.0, -1.5, 1.5, -2.0, 4.5, -4.5, 6.0, -6.0),
+    (8000.0, 1.0, -2.0, 1.5, -3.0, 5.0, -5.0, 6.0, -6.0),
+    (10000.0, 2.0, -3.0, 2.0, -4.0, 5.0, -_INF, 6.0, -_INF),
+    (12500.0, 2.0, -3.0, 3.0, -6.0, 5.0, -_INF, 6.0, -_INF),
+    (16000.0, 2.0, -3.0, 3.0, -_INF, 5.0, -_INF, 6.0, -_INF),
+    (20000.0, 2.0, -3.0, 3.0, -_INF, 5.0, -_INF, 6.0, -_INF),
+]
+
+# Per-edition mask spec, in the shape `filters.compliance` uses for the two
+# band-filter editions: the ordered classes (strictest -> loosest), the curves
+# the edition defines, the tolerance table and the (upper, lower) column index
+# of each class within its rows. ``b_from_ansi`` says whether the B weighting
+# has to borrow its mask from ANSI S1.4-1983 Table V: IEC 61672-1 dropped B
+# and publishes no limits for it, while IEC 651:1979 Table V governs B along
+# with every other weighting characteristic.
+_WEIGHTING_EDITIONS: dict[str, dict[str, Any]] = {
+    "2013": {
+        "classes": (1, 2),
+        "curves": ("A", "B", "C", "AU", "Z"),
+        "table": _WEIGHTING_TABLE3,
+        "col": {1: (3, 4), 2: (5, 6)},
+        "b_from_ansi": True,
+    },
+    "1979": {
+        "classes": (0, 1, 2, 3),
+        "curves": ("A", "B", "C"),
+        "table": _IEC651_TABLE5,
+        "col": {0: (1, 2), 1: (3, 4), 2: (5, 6), 3: (7, 8)},
+        "b_from_ansi": False,
+    },
+}
+
+# ---------------------------------------------------------------------------
 # ANSI S1.4-1983 - historical B weighting (dropped when IEC 61672-1 replaced
 # the older sound-level-meter standards).
 # ---------------------------------------------------------------------------
@@ -144,15 +250,18 @@ _ANSI_S14_TABLE4_B: list[tuple[float, float]] = [
 # conformance report.) Row = (nominal Hz, type1 upper, type1 lower,
 # type2 upper, type2 lower); a -inf lower limit means upper-only.
 # Transcription note, 20 Hz Type 2: the standard prints a bare "+3" there,
-# read here as +3/upper-only (matching the surrounding upper-only rows); a
-# plausible alternative reading is +/-3. The B-weighting response at 20 Hz
-# sits only 0.05 dB below nominal, so either reading yields the same
-# verdict.
+# where every one-sided cell of that same column prints "+5, -inf". The cell
+# is read as +/-3, because IEC 651:1979 Table V - which agrees with this
+# column at all 33 other rows - prints "+/-3" at exactly that cell, so the
+# missing bar under the plus sign is a defect of this print and not a national
+# deviation. The reading is also the strict one, and it cannot change the
+# verdict of the realized B filter: its response at 20 Hz sits 0.05 dB below
+# nominal.
 _ANSI_S14_TABLE5_12: list[tuple[float, float, float, float, float]] = [
     (10.0, 4.0, -4.0, 5.0, -_INF),
     (12.5, 3.5, -3.5, 5.0, -_INF),
     (16.0, 3.0, -3.0, 5.0, -_INF),
-    (20.0, 2.5, -2.5, 3.0, -_INF),
+    (20.0, 2.5, -2.5, 3.0, -3.0),
     (25.0, 2.0, -2.0, 3.0, -3.0),
     (31.5, 1.5, -1.5, 3.0, -3.0),
     (40.0, 1.5, -1.5, 2.0, -2.0),
@@ -324,87 +433,150 @@ def _analytic_weighting_db(curve: str, frequencies: np.ndarray) -> np.ndarray:
     return np.asarray(20.0 * np.log10(gain(f) / ref), dtype=np.float64)
 
 
+def _edition_spec(edition: str) -> dict[str, Any]:
+    """The mask spec of *edition*, refusing an unknown one.
+
+    :raises ValueError: if ``edition`` names no published edition.
+    """
+    spec = _WEIGHTING_EDITIONS.get(edition)
+    if spec is None:
+        msg = "edition must be '2013' or '1979'."
+        raise ValueError(msg)
+    return spec
+
+
+def _quoted_list(items: tuple[str, ...]) -> str:
+    """Render ``("A", "B", "C")`` as ``"'A', 'B' or 'C'"``."""
+    quoted = [f"'{item}'" for item in items]
+    return f"{', '.join(quoted[:-1])} or {quoted[-1]}"
+
+
+def _edition_masks(spec: dict[str, Any]) -> dict[int, tuple[np.ndarray, np.ndarray]]:
+    """One ``(lower, upper)`` acceptance mask per class of the edition.
+
+    Keyed strictest class first, so the verdict functions can take the first
+    class that passes and be taking the tightest one.
+    """
+    table = spec["table"]
+    return {
+        cls: (
+            np.array([row[lo_col] for row in table], dtype=np.float64),
+            np.array([row[up_col] for row in table], dtype=np.float64),
+        )
+        for cls, (up_col, lo_col) in spec["col"].items()
+    }
+
+
 def weighting_class_limits(
-    weighting_class: int,
+    weighting_class: int, *, edition: str = "2013"
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """IEC 61672-1:2013 Table 3 acceptance limits for a performance class.
+    """Acceptance limits of one performance class of a weighting standard.
 
-    The limits apply to every IEC 61672-1 weighting (A, C, Z); they qualify
-    the deviation of the measured relative response from the design goal at
-    each nominal frequency, not the response itself. (The B and AU masks that
-    ``verify_weighting_class`` uses come from ANSI S1.4-1983 Table V and
-    IEC 61012:1990 Table 1 instead and are not returned here.)
+    The limits apply to every weighting the edition defines; they qualify the
+    deviation of the measured relative response from the design goal at each
+    nominal frequency, not the response itself. Under ``edition="2013"`` they
+    come from IEC 61672-1:2013 Table 3 and govern A, C and Z (the B and AU
+    masks that ``verify_weighting_class`` uses come from ANSI S1.4-1983
+    Table V and IEC 61012:1990 Table 1 instead and are not returned here).
+    Under ``edition="1979"`` they come from IEC 651:1979 Table V, whose
+    footnote makes one mask govern every weighting characteristic, B included.
 
-    :param weighting_class: 1 or 2 (IEC 61672-1:2013 performance class).
+    :param weighting_class: Performance class: 1 or 2 for ``edition="2013"``;
+        0, 1, 2 or 3 for ``edition="1979"``, where class N is the standard's
+        instrument Type N.
+    :param edition: ``"2013"`` (IEC 61672-1:2013, classes 1/2) or ``"1979"``
+        (IEC 651:1979, which adds the stricter Type 0 and a Type 3).
     :return: Tuple ``(frequencies, lower, upper)`` of the 34 nominal
         frequencies (Hz) and the lower/upper deviation limits in dB. A lower
         limit of ``-inf`` means only the upper limit applies.
+    :raises ValueError: if the edition is unknown or does not define the
+        requested class.
     """
-    if weighting_class not in (1, 2):
-        msg = "weighting_class must be 1 or 2."
+    spec = _edition_spec(edition)
+    if weighting_class not in spec["classes"]:
+        msg = (
+            f"weighting_class must be one of {spec['classes']} for edition '{edition}'."
+        )
         raise ValueError(msg)
-    up_col, lo_col = (3, 4) if weighting_class == 1 else (5, 6)
-    freqs = np.array([row[0] for row in _WEIGHTING_TABLE3], dtype=np.float64)
-    upper = np.array([row[up_col] for row in _WEIGHTING_TABLE3], dtype=np.float64)
-    lower = np.array([row[lo_col] for row in _WEIGHTING_TABLE3], dtype=np.float64)
+    up_col, lo_col = spec["col"][weighting_class]
+    table = spec["table"]
+    freqs = np.array([row[0] for row in table], dtype=np.float64)
+    upper = np.array([row[up_col] for row in table], dtype=np.float64)
+    lower = np.array([row[lo_col] for row in table], dtype=np.float64)
     return freqs, lower, upper
 
 
-def _curve_design_and_limits(
-    curve: str,
-) -> tuple[
-    np.ndarray,
-    np.ndarray,
-    tuple[np.ndarray, np.ndarray],
-    tuple[np.ndarray, np.ndarray],
-]:
-    """Nominal frequencies, design goals and the two acceptance masks.
+def _design_goal_db(curve: str) -> np.ndarray:
+    """Design-goal relative response at the 34 nominal frequencies, in dB.
 
-    A/C/Z read IEC 61672-1:2013 Table 3 (classes 1 and 2). B reads ANSI
-    S1.4-1983 Table IV (design goals) and Table V (Types 1 and 2 fill the
-    two mask slots). AU reads IEC 61012:1990 Table 1: the design goal is
-    nominal A + nominal U (with the subclause 2.2 explicit values above
-    20 kHz) and the single Table 1 tolerance set fills both mask slots.
+    A and C come from IEC 61672-1:2013 Table 3, B from ANSI S1.4-1983
+    Table IV, Z is flat. The same three columns serve the IEC 651:1979
+    edition: the A, B and C columns of BS 5969:1981 Table IV (standard
+    page 7, read rendered) equal these digit for digit at all 34 rows.
     """
-    if curve in _WEIGHTING_COL:
-        col = _WEIGHTING_COL[curve]
-        nominal = np.array([row[0] for row in _WEIGHTING_TABLE3], dtype=np.float64)
-        design = (
-            np.zeros_like(nominal)
-            if col is None
-            else np.array([row[col] for row in _WEIGHTING_TABLE3], dtype=np.float64)
-        )
-        _, lower1, upper1 = weighting_class_limits(1)
-        _, lower2, upper2 = weighting_class_limits(2)
-    elif curve == "B":
-        nominal = np.array([row[0] for row in _ANSI_S14_TABLE4_B], dtype=np.float64)
-        design = np.array([row[1] for row in _ANSI_S14_TABLE4_B], dtype=np.float64)
+    if curve == "B":
+        return np.array([row[1] for row in _ANSI_S14_TABLE4_B], dtype=np.float64)
+    col = _WEIGHTING_COL[curve]
+    if col is None:
+        return np.zeros(len(_WEIGHTING_TABLE3), dtype=np.float64)
+    return np.array([row[col] for row in _WEIGHTING_TABLE3], dtype=np.float64)
+
+
+def _au_design_and_limits() -> tuple[
+    np.ndarray, np.ndarray, dict[int, tuple[np.ndarray, np.ndarray]]
+]:
+    """IEC 61012:1990 Table 1 nominal frequencies, AU design goals and mask.
+
+    The design goal is nominal A + nominal U (with the subclause 2.2 explicit
+    values above 20 kHz) and the single Table 1 tolerance set for the filter
+    as a separate unit fills both class slots.
+    """
+    a_design = {row[0]: row[1] for row in _WEIGHTING_TABLE3}
+    nominal = np.array([row[0] for row in _IEC61012_TABLE1], dtype=np.float64)
+    design = np.array(
+        [
+            _IEC61012_AU_HF.get(row[0], a_design.get(row[0], 0.0) + row[1])
+            for row in _IEC61012_TABLE1
+        ],
+        dtype=np.float64,
+    )
+    upper = np.array([row[2] for row in _IEC61012_TABLE1], dtype=np.float64)
+    lower = np.array([row[3] for row in _IEC61012_TABLE1], dtype=np.float64)
+    return nominal, design, {1: (lower, upper), 2: (lower, upper)}
+
+
+def _curve_design_and_limits(
+    curve: str, spec: dict[str, Any]
+) -> tuple[np.ndarray, np.ndarray, dict[int, tuple[np.ndarray, np.ndarray]]]:
+    """Nominal frequencies, design goals and one acceptance mask per class.
+
+    The mask is the edition's own tolerance table, with one exception: under
+    the 2013 edition B has no mask of its own there (IEC 61672-1 dropped the
+    weighting), so it borrows ANSI S1.4-1983 Table V, whose Types 1 and 2 fill
+    the class 1 / class 2 slots. Under the 1979 edition B needs no exception -
+    the Table V footnote makes that one mask govern every weighting
+    characteristic.
+    """
+    if curve == "AU":
+        return _au_design_and_limits()
+    nominal = np.array([row[0] for row in _WEIGHTING_TABLE3], dtype=np.float64)
+    design = _design_goal_db(curve)
+    if curve == "B" and spec["b_from_ansi"]:
         upper1 = np.array([row[1] for row in _ANSI_S14_TABLE5_12], dtype=np.float64)
         lower1 = np.array([row[2] for row in _ANSI_S14_TABLE5_12], dtype=np.float64)
         upper2 = np.array([row[3] for row in _ANSI_S14_TABLE5_12], dtype=np.float64)
         lower2 = np.array([row[4] for row in _ANSI_S14_TABLE5_12], dtype=np.float64)
-    else:  # AU
-        a_design = {row[0]: row[1] for row in _WEIGHTING_TABLE3}
-        nominal = np.array([row[0] for row in _IEC61012_TABLE1], dtype=np.float64)
-        design = np.array(
-            [
-                _IEC61012_AU_HF.get(row[0], a_design.get(row[0], 0.0) + row[1])
-                for row in _IEC61012_TABLE1
-            ],
-            dtype=np.float64,
-        )
-        upper1 = np.array([row[2] for row in _IEC61012_TABLE1], dtype=np.float64)
-        lower1 = np.array([row[3] for row in _IEC61012_TABLE1], dtype=np.float64)
-        upper2, lower2 = upper1, lower1
-    return nominal, design, (lower1, upper1), (lower2, upper2)
+        return nominal, design, {1: (lower1, upper1), 2: (lower2, upper2)}
+    return nominal, design, _edition_masks(spec)
 
 
 def _weighting_response_db(wf: WeightingFilter, frequencies: np.ndarray) -> np.ndarray:
     """Relative steady-state response of *wf* in dB, normalized to 1 kHz.
 
-    Measured over the whole path the signal takes, resampling stages
-    included (see :func:`_runtime_frequency_response`), not over the
-    second-order sections alone.
+    Measured over the whole path the signal takes (see
+    :func:`_runtime_frequency_response`), which is now the second-order
+    sections and nothing else, so that a verdict describes the filter the
+    caller runs.
     """
     if wf.curve == "Z" or wf.sos.size == 0:
         return np.zeros_like(frequencies)
@@ -414,65 +586,54 @@ def _weighting_response_db(wf: WeightingFilter, frequencies: np.ndarray) -> np.n
     return np.asarray(gain_db[:-1] - gain_db[-1], dtype=np.float64)  # relative to 1 kHz
 
 
-def _band_class(margin1: float, margin2: float) -> int | None:
-    """Narrowest class the band still meets, or ``None`` if it meets neither.
+def _band_class(margins: dict[int, float]) -> int | None:
+    """Narrowest class the band still meets, or ``None`` if it meets none.
 
-    :param margin1: Distance to the nearer class 1 limit, in decibels.
-    :param margin2: Distance to the nearer class 2 limit, in decibels.
-    :return: ``1``, ``2`` or ``None``.
+    :param margins: Distance to the nearer limit of each class, in decibels,
+        keyed strictest class first.
+    :return: The first class whose margin is not negative, or ``None``.
     """
-    if margin1 >= 0:
-        return 1
-    if margin2 >= 0:
-        return 2
-    return None
+    return next((cls for cls, margin in margins.items() if margin >= 0), None)
 
 
 def _weighting_band_verdicts(
     freqs_nom: np.ndarray,
     deviation: np.ndarray,
-    limits1: tuple[np.ndarray, np.ndarray],
-    limits2: tuple[np.ndarray, np.ndarray],
+    masks: dict[int, tuple[np.ndarray, np.ndarray]],
 ) -> list[dict[str, Any]]:
-    """Per-band class verdicts against the Table 3 acceptance limits.
+    """Per-band class verdicts against the edition's acceptance limits.
 
     Margin = distance to the nearer limit; a -inf lower limit makes that side
     non-binding (its term is +inf), i.e. an upper-only limit.
     """
-    lower1, upper1 = limits1
-    lower2, upper2 = limits2
     bands: list[dict[str, Any]] = []
     for i, fm in enumerate(freqs_nom):
-        m1 = min(upper1[i] - deviation[i], deviation[i] - lower1[i])
-        m2 = min(upper2[i] - deviation[i], deviation[i] - lower2[i])
-        band_class = _band_class(m1, m2)
-        bands.append(
-            {
-                "freq": float(fm),
-                "class": band_class,
-                "deviation_db": float(deviation[i]),
-                "margin_class1_db": float(m1),
-                "margin_class2_db": float(m2),
-            }
-        )
+        margins = {
+            cls: float(min(upper[i] - deviation[i], deviation[i] - lower[i]))
+            for cls, (lower, upper) in masks.items()
+        }
+        band: dict[str, Any] = {
+            "freq": float(fm),
+            "class": _band_class(margins),
+            "deviation_db": float(deviation[i]),
+        }
+        band.update({f"margin_class{cls}_db": m for cls, m in margins.items()})
+        bands.append(band)
     return bands
 
 
 def _between_nominals_sweep(
     wf: WeightingFilter,
     freqs_exact: np.ndarray,
-    limits1: tuple[np.ndarray, np.ndarray],
-    limits2: tuple[np.ndarray, np.ndarray],
+    masks: dict[int, tuple[np.ndarray, np.ndarray]],
     sweep_points: int,
 ) -> dict[str, float]:
     """Subclause 5.5.7 sweep between adjacent exact nominal frequencies.
 
     The acceptance limits between two adjacent nominal frequencies are the
-    larger of the two adjacent Table 3 limits; the design goal there is the
+    larger of the two adjacent tabulated limits; the design goal there is the
     analytic Annex E response.
     """
-    lower1, upper1 = limits1
-    lower2, upper2 = limits2
     grid = np.geomspace(freqs_exact[0], freqs_exact[-1], sweep_points)
     sweep_dev = _weighting_response_db(wf, grid) - _analytic_weighting_db(
         wf.curve, grid
@@ -480,22 +641,39 @@ def _between_nominals_sweep(
     seg = np.clip(
         np.searchsorted(freqs_exact, grid, side="right") - 1, 0, freqs_exact.size - 2
     )
-    up1 = np.maximum(upper1[seg], upper1[seg + 1])
-    lo1 = np.minimum(lower1[seg], lower1[seg + 1])
-    up2 = np.maximum(upper2[seg], upper2[seg + 1])
-    lo2 = np.minimum(lower2[seg], lower2[seg + 1])
-    sweep_m1 = np.minimum(up1 - sweep_dev, sweep_dev - lo1)
-    sweep_m2 = np.minimum(up2 - sweep_dev, sweep_dev - lo2)
-    worst = int(np.argmin(sweep_m1))
-    return {
-        "worst_freq": float(grid[worst]),
-        "margin_class1_db": float(np.min(sweep_m1)),
-        "margin_class2_db": float(np.min(sweep_m2)),
-    }
+    sweep_margins: dict[int, np.ndarray] = {}
+    for cls, (lower, upper) in masks.items():
+        up = np.maximum(upper[seg], upper[seg + 1])
+        lo = np.minimum(lower[seg], lower[seg + 1])
+        sweep_margins[cls] = np.minimum(up - sweep_dev, sweep_dev - lo)
+    # The worst frequency is read off the strictest class, the first key.
+    worst = int(np.argmin(next(iter(sweep_margins.values()))))
+    between: dict[str, float] = {"worst_freq": float(grid[worst])}
+    between.update(
+        {f"margin_class{cls}_db": float(np.min(m)) for cls, m in sweep_margins.items()}
+    )
+    return between
+
+
+def _overall_class(
+    bands: list[dict[str, Any]],
+    between: dict[str, float],
+    classes_ordered: tuple[int, ...],
+) -> int | None:
+    """Strictest class met at every nominal frequency *and* across the sweep.
+
+    Both readings have to hold: a filter that clears every tabulated row but
+    dips outside the mask between two of them has not met the class.
+    """
+    for cls in classes_ordered:
+        key = f"margin_class{cls}_db"
+        if all(band[key] >= 0.0 for band in bands) and between[key] >= 0.0:
+            return cls
+    return None
 
 
 def verify_weighting_class(
-    wf: WeightingFilter, *, sweep_points: int = 4096
+    wf: WeightingFilter, *, sweep_points: int = 4096, edition: str = "2013"
 ) -> dict[str, Any]:
     r"""Verify a frequency-weighting filter against its standard's tolerances.
 
@@ -514,6 +692,19 @@ def verify_weighting_class(
     IEC 537 did not survive it; the conformance report pins the D response
     against its published transfer function and tabulated curve).
 
+    ``edition="1979"`` swaps in the tolerance table of the superseded
+    IEC 651:1979 instead, whose **Table V** publishes the laboratory-grade
+    **Type 0** mask that IEC 61672-1 has no equivalent for, and three further
+    types. Class N is then the standard's instrument Type N, so an
+    ``overall_class`` of 0 reads "IEC 651:1979 Type 0". That edition covers
+    ``A``, ``B`` and ``C`` (the weightings of subclause 3.2, whose Table IV
+    design goals equal the ones used above digit for digit): its Table V
+    footnote makes one mask govern every weighting characteristic, so ``B``
+    does not borrow the ANSI limits there. It is a genuinely different mask,
+    not a rename - Type 0 is +2/-3 dB at 16 kHz and at 20 kHz, where class 1
+    is +2.5/-16 and +3/-inf, so an error class 1 cannot see is visible under
+    Type 0.
+
     The filter's relative response (normalized to its 1 kHz gain) is evaluated
     at the *exact* base-10 frequency behind each nominal label below
     the Nyquist frequency (IEC 61672-1 Table 3 NOTE: the design goals are
@@ -531,25 +722,27 @@ def verify_weighting_class(
     formulas for B, the A response cascaded with the IEC 61012 Table 2 poles
     for AU) must stay within the *larger* of the two adjacent limits. Without
     it a resonance or notch between the nominal frequencies would go
-    unnoticed (for B and AU the sweep is applied as the analogous engineering
-    check). Both the per-frequency verdicts and the sweep must pass for
+    unnoticed (for B, for AU and under the 1979 edition, whose tables are
+    tabulated at the nominal frequencies and nowhere else, the sweep is
+    applied as the analogous engineering check). Both the per-frequency
+    verdicts and the sweep must pass for
     ``overall_class``. The sweep samples ``sweep_points`` grid frequencies; a
     violation narrower than the grid spacing could in principle fall between
     samples, so raise ``sweep_points`` for higher-Q suspects (the verdict
     attests the sampled grid, not a continuous proof).
 
     The response is taken over the whole path a signal travels through
-    :meth:`~phonometry.WeightingFilter.filter`, not over the designed
-    second-order sections alone: with ``high_accuracy`` the sections are
-    reached through an interpolation and a decimation stage, and the
-    anti-alias filter of those stages has its transition band on the input
-    Nyquist frequency, so it dominates the response above roughly
-    ``0.9 * fs / 2``. Whenever the highest checked row falls there (the
-    8 kHz row of a 16 kHz system, the 16 kHz row of a 32 kHz one) a verdict
-    read from the sections alone would attest a filter the user never runs.
-    The response is still computed in closed form (the L folded spectral
-    images of the cascade), so it stays exact and deterministic. The ``Z``
-    weighting is a flat bypass and always complies.
+    :meth:`~phonometry.WeightingFilter.filter`, which is one cascade of
+    second-order sections at the input rate for every curve and in both
+    stateful and single-shot use. It used to be more than that: the sections
+    were reached through an interpolation and a decimation stage whose
+    anti-alias filter had its transition band on the input Nyquist frequency
+    and dominated the response above roughly ``0.9 * fs / 2``, so a verdict
+    read from the sections alone attested a filter the user never ran. That is
+    why the verdict is measured through :func:`_runtime_frequency_response`
+    rather than through ``sosfreqz`` here, and it stays that way so the next
+    stage added to the path cannot go unmodelled. The ``Z`` weighting is a
+    flat bypass and always complies.
 
     When rows that carry a *finite lower* acceptance limit fall at or
     above the Nyquist frequency (e.g. the 8-16 kHz class 1 rows of a 16 kHz
@@ -559,27 +752,35 @@ def verify_weighting_class(
     over the standard's full frequency range.
 
     :param wf: The weighting filter to verify (``A``, ``B``, ``C``, ``AU``
-        or ``Z``).
+        or ``Z``; ``A``, ``B`` or ``C`` for ``edition="1979"``).
     :param sweep_points: Number of points of the 5.5.7 between-nominals sweep
         (>= 64).
-    :return: Dict with ``overall_class`` (1, 2 or None), ``range_limited``
-        (see above), ``bands``: a list of ``{"freq", "class", "deviation_db",
-        "margin_class1_db", "margin_class2_db"}`` where ``freq`` is the
-        nominal label, a positive margin means the limits are met with that
-        much room, and ``between_nominals``: ``{"worst_freq",
-        "margin_class1_db", "margin_class2_db"}`` for the sweep.
+    :param edition: ``"2013"`` (IEC 61672-1:2013, classes 1/2) or ``"1979"``
+        (IEC 651:1979, Types 0/1/2/3 offered as classes 0-3).
+    :return: Dict with ``overall_class`` (the strictest class of the edition
+        that every checked frequency and the sweep meet, or ``None``),
+        ``range_limited`` (see above), ``bands``: a list of ``{"freq",
+        "class", "deviation_db", "margin_class<c>_db"}`` for each class ``c``
+        of the edition, where ``freq`` is the nominal label and a positive
+        margin means the limits are met with that much room, and
+        ``between_nominals``: ``{"worst_freq", "margin_class<c>_db"}`` for the
+        sweep.
+    :raises ValueError: if the edition is unknown, the edition does not define
+        the filter's curve, or ``sweep_points`` is below 64.
     """
-    if wf.curve not in _WEIGHTING_COL and wf.curve not in ("B", "AU"):
-        msg = "Weighting curve must be 'A', 'B', 'C', 'AU' or 'Z'."
+    spec = _edition_spec(edition)
+    if wf.curve not in spec["curves"]:
+        msg = (
+            f"Weighting curve must be {_quoted_list(spec['curves'])} "
+            f"for edition '{edition}'."
+        )
         raise ValueError(msg)
     if sweep_points < _MIN_SWEEP_POINTS:
         msg = "'sweep_points' must be at least 64."
         raise ValueError(msg)
 
     nyquist = wf.fs / 2.0
-    nominal, design_all, limits1_all, limits2_all = _curve_design_and_limits(wf.curve)
-    lower1_all, upper1_all = limits1_all
-    lower2_all, upper2_all = limits2_all
+    nominal, design_all, masks_all = _curve_design_and_limits(wf.curve, spec)
     exact = _exact_base10(nominal)
     in_range = exact < nyquist
 
@@ -595,12 +796,12 @@ def verify_weighting_class(
     response = _weighting_response_db(wf, freqs_exact)
     deviation = response - design
 
-    lower1, upper1 = lower1_all[in_range], upper1_all[in_range]
-    lower2, upper2 = lower2_all[in_range], upper2_all[in_range]
+    masks = {
+        cls: (lower[in_range], upper[in_range])
+        for cls, (lower, upper) in masks_all.items()
+    }
 
-    bands = _weighting_band_verdicts(
-        freqs_nom, deviation, (lower1, upper1), (lower2, upper2)
-    )
+    bands = _weighting_band_verdicts(freqs_nom, deviation, masks)
 
     if not bands:
         return {
@@ -610,20 +811,10 @@ def verify_weighting_class(
             "between_nominals": None,
         }
 
-    between = _between_nominals_sweep(
-        wf, freqs_exact, (lower1, upper1), (lower2, upper2), sweep_points
-    )
-
-    classes = [band["class"] for band in bands]
-    if all(c == 1 for c in classes) and between["margin_class1_db"] >= 0.0:
-        overall: int | None = 1
-    elif all(c in (1, 2) for c in classes) and between["margin_class2_db"] >= 0.0:
-        overall = 2
-    else:
-        overall = None
+    between = _between_nominals_sweep(wf, freqs_exact, masks, sweep_points)
 
     return {
-        "overall_class": overall,
+        "overall_class": _overall_class(bands, between, tuple(masks)),
         "range_limited": range_limited,
         "bands": bands,
         "between_nominals": between,

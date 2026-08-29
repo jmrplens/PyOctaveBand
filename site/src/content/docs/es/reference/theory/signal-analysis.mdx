@@ -410,8 +410,10 @@ $$
 
 El filtro digital se obtiene de los polos/ceros analógicos mediante la
 transformación bilineal. Como esta comprime las frecuencias cerca de Nyquist, el
-modo `high_accuracy` por defecto diseña y ejecuta el filtro a una frecuencia
-interna sobremuestreada (≥ 144 kHz); consulta
+modo `high_accuracy` por defecto no aplica esa transformación al prototipo
+impreso: ajusta un prototipo de la misma estructura cuya respuesta *en las
+frecuencias deformadas* es la del impreso en las verdaderas, y transforma ese;
+consulta
 [Ponderación frecuencial](/phonometry/es/signals/levels/weighting/).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es.svg" alt="Curvas de ponderación A, C y Z de IEC 61672-1 con zoom de la región positiva de la curva A (+1,27 dB a 2,5 kHz)" width="80%" />
@@ -490,7 +492,7 @@ encima de 20 Hz.*
 
 Los infrasonidos necesitan su propia curva porque, cerca del umbral de audición, la sonoridad percibida de los tonos de muy baja frecuencia crece con el nivel de presión acústica mucho más abruptamente que a frecuencias medias (un pequeño incremento en dB sobre el umbral produce un gran salto de sonoridad), de modo que la curva A (anclada en 1 kHz) distorsiona por completo la molestia infrasónica.
 
-Como G actúa sobre 0,25 Hz – 315 Hz, muy por debajo de la frecuencia de Nyquist a las frecuencias de muestreo de audio, la deformación en frecuencia de la transformación bilineal simple (aplicada sin precompensación) es despreciable en ese rango: en torno al 0,014 % a 315 Hz con $f_\mathrm{s} = 48$ kHz, menos de 0,01 dB en la respuesta. Por eso no se aplica el sobremuestreo interno usado en los diseños A/C (cuya acción se extiende hasta 16 kHz).
+Como G actúa sobre 0,25 Hz – 315 Hz, muy por debajo de la frecuencia de Nyquist a las frecuencias de muestreo de audio, la deformación en frecuencia de la transformación bilineal simple (aplicada sin precompensación) es despreciable en ese rango: en torno al 0,014 % a 315 Hz con $f_\mathrm{s} = 48$ kHz, menos de 0,01 dB en la respuesta. El diseño por defecto ajusta igualmente el prototipo a la frecuencia de muestreo, como hace con A y C: aquí no cuesta nada y sí importa a las frecuencias bajas a las que se suele grabar infrasonido, donde 315 Hz se acerca a Nyquist.
 
 Consulta la [guía de ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/) para su uso.
 

@@ -21,7 +21,7 @@ import reference_data as ref
 
 import phonometry as ph
 
-from ..registry import _DELTA_PLACES, Outcome, _fmt, numeric, register
+from ..registry import Outcome, numeric, register
 from .levels import _FS
 
 
@@ -98,11 +98,16 @@ def _chk_iec61043_table2() -> Outcome:
                 abs(float(class2[i]) - row[col2]),
             )
     n = len(ref.IEC61043_TABLE2) * len(columns) * 2
-    return Outcome(
-        expected=f"{n} tabulated minima reproduced",
-        computed=f"max absolute deviation {worst:.3f} dB",
-        delta=_fmt(worst, "dB", _DELTA_PLACES),
-        passed=worst == 0.0,
+    # Table 2 is a table of exact minima, so the tolerance is zero: the check
+    # asks whether every tabulated figure is reproduced, not how closely.
+    return numeric(
+        0.0,
+        worst,
+        0.0,
+        unit="dB",
+        places=3,
+        expected_label=f"{n} tabulated minima reproduced",
+        computed_label=f"max absolute deviation {worst:.3f} dB",
     )
 
 

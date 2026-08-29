@@ -44,19 +44,22 @@ def test_weighting_class_limits_shape_and_known_values() -> None:
     assert (lower1[i16k], upper1[i16k]) == (-16.0, 2.5)
 
 
-# The class each default (high-accuracy) filter actually earns, per curve and
-# sample rate. Oversampling fixes the bilinear warping but not the anti-alias
-# transition band the resampling stages put on the input Nyquist frequency, so
-# at 16 and 32 kHz the top Table 3 row below Nyquist is judged inside it: A
-# lands 12.0 dB low at 16 kHz (no class) and 16.2 dB low at 32 kHz (class 2),
-# C lands 13.7 dB low at 16 kHz (no class) and 15.3 dB low at 32 kHz, still
-# inside its -16.0 dB class 1 limit. Z is a bypass and is always class 1.
+# The class each default (fitted) filter earns, per curve and sample rate.
+# Every entry is 1, including the two rates that used to be the hard ones: the
+# resampled path this design replaced put its anti-alias transition band on the
+# input Nyquist frequency, so the top Table 3 row below Nyquist fell inside it
+# and A landed 12.0 dB low at 16 kHz (no class at all) and 16.2 dB low at
+# 32 kHz (class 2, against a -16.0 dB class 1 limit), while C landed 15.3 dB
+# low at 32 kHz and cleared the same limit by 0.674 dB. The table is kept as a
+# table rather than collapsed to a constant because the point of the test is
+# the verdict per curve and rate, and a future rate that cannot make class 1
+# should have to be written down here.
 _EXPECTED_CLASS: dict[tuple[str, int], int | None] = {
-    ("A", 16000): None,
-    ("A", 32000): 2,
+    ("A", 16000): 1,
+    ("A", 32000): 1,
     ("A", 48000): 1,
     ("A", 96000): 1,
-    ("C", 16000): None,
+    ("C", 16000): 1,
     ("C", 32000): 1,
     ("C", 48000): 1,
     ("C", 96000): 1,
@@ -84,41 +87,37 @@ def test_high_accuracy_weighting_verdicts(fs: int, curve: str) -> None:
         assert off[0]["freq"] == max(b["freq"] for b in result["bands"])
 
 
-def test_high_accuracy_docstring_states_the_32_khz_verdict_per_curve() -> None:
-    """The ``high_accuracy`` paragraph serves every curve, so a verdict stated
-    in it without naming one reads as a verdict for all of them, and at 32 kHz
-    the curves do not agree: the same -16.0 dB class 1 lower limit that the A
-    response misses the C response clears. Each verdict the paragraph states
-    for that rate must therefore name its curve and match what the verifier
-    measures for it, so the prose cannot drift from the code.
+def test_high_accuracy_docstring_states_what_the_plain_design_earns() -> None:
+    """The ``high_accuracy`` paragraph grades ``False`` by sample rate.
+
+    A paragraph that offers the reader a cheaper design has to say what it
+    costs, and the cost here is a performance class that depends on the rate.
+    The three claims it makes are checked against the verifier, so the prose
+    cannot drift from the code.
     """
     doc = inspect.getdoc(filters.WeightingFilter.__init__) or ""
     assert ":param high_accuracy:" in doc
     # ``high_accuracy`` is the last parameter, so the rest of the docstring is
     # its paragraph; collapse the wrapping so phrases survive a line break.
     paragraph = " ".join(doc.split(":param high_accuracy:", 1)[1].split())
+    assert "class 1 for fs >= 44 100 Hz" in paragraph
+    assert "class 2 at 32 000 and 22 050 Hz" in paragraph
+    assert "meets no class at 16 000 Hz" in paragraph
 
-    verdicts = {
-        curve: filters.verify_weighting_class(filters.WeightingFilter(32000, curve))[
-            "overall_class"
-        ]
-        for curve in ("A", "C")
-    }
-    # The premise of the check: at 32 kHz the verdict depends on the curve.
-    assert verdicts["A"] != verdicts["C"]
-    for curve, verdict in verdicts.items():
-        assert f"{verdict} for {curve}" in paragraph, (
-            f"the 32 kHz verdict of the {curve} curve is class {verdict}, which "
-            f"the high_accuracy paragraph does not state for it: {paragraph}"
-        )
-    # At 16 kHz the two curves do agree, so one unqualified verdict is honest.
-    assert all(
-        filters.verify_weighting_class(filters.WeightingFilter(16000, curve))[
-            "overall_class"
-        ]
-        is None
-        for curve in ("A", "C")
-    )
+    def plain(fs: int, curve: str) -> int | None:
+        wf = filters.WeightingFilter(fs, curve, high_accuracy=False)
+        verdict: int | None = filters.verify_weighting_class(wf)["overall_class"]
+        return verdict
+
+    for curve in ("A", "C"):
+        assert plain(44100, curve) == 1
+        assert plain(48000, curve) == 1
+        assert plain(32000, curve) == 2
+        assert plain(22050, curve) == 2
+        assert plain(16000, curve) is None
+        # And the fitted design earns class 1 where the plain one cannot.
+        wf = filters.WeightingFilter(16000, curve)
+        assert filters.verify_weighting_class(wf)["overall_class"] == 1
 
 
 def test_z_weighting_zero_deviation() -> None:
@@ -185,16 +184,18 @@ def test_deviation_evaluated_at_exact_base10_frequency() -> None:
 @pytest.mark.parametrize(
     ("fs", "label"), [(16000, 8000.0), (32000, 16000.0), (48000, 16000.0)]
 )
-def test_verdict_measures_the_resampled_path(fs: int, label: float) -> None:
+def test_verdict_measures_the_path_a_signal_takes(fs: int, label: float) -> None:
     """The row nearest Nyquist is judged on what ``filter()`` really does.
 
-    With the default ``high_accuracy`` the sections are reached through an
-    interpolation and a decimation stage, whose anti-alias filter has its
-    transition band on the input Nyquist frequency. Reading the response
-    from the sections alone put the 7 943.3 Hz row of a 16 kHz system
-    0.08 dB off its design goal when a tone through ``filter()`` measures
-    12.0 dB off, and certified class 1 for a filter that meets neither
-    class there.
+    The verdict comes from :func:`_runtime_frequency_response` and not from
+    ``sosfreqz``, so that it describes the whole path however many stages that
+    path has. It used to have three: the sections were reached through an
+    interpolation and a decimation stage whose anti-alias filter had its
+    transition band on the input Nyquist frequency, and reading the response
+    from the sections alone put the 7 943.3 Hz row of a 16 kHz system 0.08 dB
+    off its design goal where a tone through ``filter()`` measured 12.0 dB off,
+    certifying class 1 for a filter that met no class there. The two agree now
+    because there is one stage; a tone is still what this test believes.
     """
     wf = filters.WeightingFilter(fs, "A")
     band = next(
@@ -215,8 +216,7 @@ def test_notch_between_nominals_fails_the_sweep() -> None:
     from scipy import signal as sg
 
     wf = filters.WeightingFilter(48000, "A")
-    fs_proc = wf.fs * wf._oversample
-    b, a = sg.iirnotch(900.0, 30.0, fs=fs_proc)
+    b, a = sg.iirnotch(900.0, 30.0, fs=wf.fs)
     wf.sos = np.vstack([wf.sos, sg.tf2sos(b, a)])
     result = filters.verify_weighting_class(wf)
     assert all(bd["class"] == 1 for bd in result["bands"])

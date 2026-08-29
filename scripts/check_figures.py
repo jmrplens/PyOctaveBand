@@ -42,8 +42,10 @@ if str(_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS))
 
 from generated_assets import (
+    NumericTolerance,
     RasterTolerance,
     committed_bytes,
+    numbers_within_tolerance,
     raster_problem,
     tracked_files,
 )
@@ -53,8 +55,7 @@ IMG_DIR = ".github/images"
 # Numeric tokens differing by less than this (absolute, in SVG user units, or
 # relative for large magnitudes) are treated as equal. A 1-ULP coordinate
 # wobble is ~1e-6; a real edit moves a coordinate by whole units.
-SVG_ABS_TOL = 1e-2
-SVG_REL_TOL = 1e-4
+SVG_TOL = NumericTolerance(absolute=1e-2, relative=1e-4)
 
 # A pixel counts as "meaningfully changed" if any channel differs by more than
 # ``level`` (0..255). Cross-CPU drift perturbs a coordinate by ~1e-6 units,
@@ -102,13 +103,10 @@ def _svg_within_tolerance(old: bytes, new: bytes) -> bool:
     new_nums = _TOKEN.findall(new)
     if len(old_nums) != len(new_nums):
         return False
-    for o_tok, n_tok in zip(old_nums, new_nums, strict=True):
-        o_val = float(o_tok)
-        n_val = float(n_tok)
-        limit = max(SVG_ABS_TOL, SVG_REL_TOL * max(abs(o_val), abs(n_val)))
-        if abs(o_val - n_val) > limit:
-            return False
-    return True
+    return all(
+        numbers_within_tolerance(float(o_tok), float(n_tok), SVG_TOL)
+        for o_tok, n_tok in zip(old_nums, new_nums, strict=True)
+    )
 
 
 def main() -> int:

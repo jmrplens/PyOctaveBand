@@ -82,8 +82,8 @@ físico (recuperación de sobrecarga, linealidad, las magnitudes de influencia
 ambientales) se aplican a un instrumento y no están implementados, así que un
 veredicto de clase de aquí es una afirmación sobre el diseño y no sobre un
 aparato. Cerca de Nyquist la transformada bilineal deforma el eje de
-frecuencia y el banco no lleva ninguna corrección para ello, a diferencia de
-la opción `high_accuracy` de los filtros de ponderación: la banda atenuada más
+frecuencia y el banco no lleva ninguna corrección para ello, a diferencia del
+diseño ajustado `high_accuracy` de los filtros de ponderación: la banda atenuada más
 allá del Nyquist de procesado se informa como `range_limited` en lugar de
 verificarse, así que mantén el borde de banda superior holgadamente por debajo
 de Nyquist o sube `fs`. Dos operaciones no admiten streaming: el filtrado de

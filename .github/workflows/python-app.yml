@@ -113,9 +113,9 @@ jobs:
     - name: Fail if the built metadata does not cap phonometry below the next major
       run: python scripts/check_stub_metadata.py
 
-  # Fast gate (~12 s harness, runtime deps only, no pytest): the committed
-  # docs/CONFORMANCE.md, and every count quoted from it, must equal a fresh
-  # `make conformance` run.
+  # Fast gate (runtime deps only, no pytest): the committed
+  # docs/conformance.json, the docs/CONFORMANCE.md rendered from it, and every
+  # count quoted from either must equal a fresh `make conformance` run.
   conformance:
     name: Conformance report up to date
     runs-on: ubuntu-latest
@@ -133,7 +133,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -e .
-    - name: Regenerate docs/CONFORMANCE.md and the counts quoted from it
+    - name: Regenerate the conformance artefact, the report and the quoted counts
       run: make conformance
     # `make conformance` now writes as well as reads: it regenerates the report
     # and rewrites the counts quoted in .zenodo.json, the docs/ mirror and the
@@ -143,8 +143,14 @@ jobs:
     # the stale numbers.
     - name: Fail if the committed report or any quoted count is stale
       run: |
-        if ! git diff --exit-code; then
-          echo "::error::The conformance report or a count quoted from it is out of date - run 'make conformance' and commit the result."
+        # --porcelain rather than `git diff`, because a diff is blind to an
+        # untracked file and the artefact is one of the things this regenerates.
+        # docs/conformance.json arrived untracked once and the job went green
+        # while a fresh checkout could not build the site at all.
+        if [ -n "$(git status --porcelain)" ]; then
+          git status --porcelain
+          git diff
+          echo "::error::The conformance artefact, the report or a count quoted from either is out of date, or a generated file is untracked - run 'make conformance' and commit the result."
           exit 1
         fi
     # Belt and braces, and the command to run locally: the read-only check on
@@ -153,6 +159,13 @@ jobs:
     # release behind.
     - name: Fail if any page quotes a stale conformance count
       run: python scripts/check_conformance_claims.py
+    # The artefact is committed, so it can be wrong in ways a regeneration
+    # diff cannot see: a count that no longer matches its rows, a numpy scalar
+    # where a float belongs, a citation whose split no longer rebuilds it, a
+    # dead line in the override ratchet. This reads what is committed and says
+    # which one.
+    - name: Fail if the committed artefact is not internally consistent
+      run: python scripts/check_conformance_artifact.py
 
   # Drift gate for the generated Starlight API reference: the committed pages
   # under site/src/content/docs/reference/api and the sidebar fragment must
@@ -224,10 +237,12 @@ jobs:
           exit 1
         fi
 
-  # Drift gate for the evidence pages the site renders from docs/: the bodies
-  # of docs/CONFORMANCE.md and docs/ERRATA.md are transplanted into the four
-  # reference/{conformance,errata} pages (EN + ES), so the site can never show
-  # a hand-copied or stale version of either document.
+  # Drift gate for the evidence pages the site renders from docs/: the body of
+  # docs/ERRATA.md is transplanted into the two reference/errata pages (EN +
+  # ES), so the site can never show a hand-copied or stale version of it. The
+  # conformance pages are no longer transplanted - they render from
+  # docs/conformance.json through src/components/Conformance.astro, which the
+  # `conformance` job gates instead.
   site-reports:
     name: Generated evidence pages up to date
     runs-on: ubuntu-latest
@@ -242,7 +257,7 @@ jobs:
       with:
         python-version: "3.13"
     # Stdlib-only generator: no project install needed, it only reshapes text.
-    - name: Check the transplanted conformance and errata pages
+    - name: Check the transplanted errata pages
       run: python scripts/generate_site_reports.py --check
 
   # Evidence gate for docs/ERRATA.md. Each entry there is a permanent public
@@ -665,23 +680,25 @@ jobs:
       pull-requests: write
       issues: write
     steps:
+    # Full history: the comment is a diff of the committed conformance artefact
+    # against the same file on the base branch, and a checkout at the default
+    # depth has only the merge commit to show for it. A missing baseline is not
+    # an error - the comment falls back to totals and says so - but it makes
+    # every pull request look like it changed nothing.
     - uses: actions/checkout@v7
-    
+      with:
+        fetch-depth: 0
+
     - name: Set up Python 3.13
       uses: actions/setup-python@v7
       with:
         python-version: "3.13"
-        
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install -e .
-        
-    - name: Generate numerical conformance report
-      # Never block the comment: if a check regresses the harness exits
-      # non-zero, but we still want the report (with the failing rows) posted.
-      run: python scripts/conformance_report.py || true
+
+    # Stdlib only. The comment reads two committed JSON files and joins them;
+    # it does not run the checks. It used to install the whole scientific stack
+    # and spend 45 s regenerating a report the `conformance` job has already
+    # proven current, which meant a stale artefact was reported twice and
+    # fixed by neither.
 
     - name: Download Test Results
       uses: actions/download-artifact@v8
@@ -695,6 +712,11 @@ jobs:
       env:
         GITHUB_REPOSITORY: ${{ github.repository }}
         GITHUB_RUN_ID: ${{ github.run_id }}
+        # The branch the artefact is diffed against, and the commit the two
+        # "full report" links are permalinks to. `github.sha` on a pull request
+        # is the merge commit, which is not a commit anyone can browse.
+        GITHUB_BASE_REF: ${{ github.base_ref }}
+        GITHUB_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
 
     - name: Post PR Comment
       uses: actions/github-script@v9
