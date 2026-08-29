@@ -1850,9 +1850,11 @@ A(f) = 20 \log_{10}(R_\mathrm{A}(f)) + 2.00
 $$
 
 The digital filter is obtained from the analog poles/zeros via the bilinear
-transform. Because the bilinear transform compresses frequencies near Nyquist,
-the default `high_accuracy` mode designs and runs the filter at an internally
-oversampled rate (≥ 144 kHz); see [Frequency Weighting](https://jmrplens.github.io/phonometry/signals/levels/weighting/).
+transform. That transform compresses frequencies near Nyquist, so the default
+`high_accuracy` mode does not apply it to the printed prototype: it fits a
+prototype of the same structure whose response *at the warped frequencies* is
+the printed one's response at the true frequencies, and transforms that. See
+[Frequency Weighting](https://jmrplens.github.io/phonometry/signals/levels/weighting/).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses.svg" alt="A, C and Z frequency weighting curves of IEC 61672-1 with a zoom showing the positive region of the A curve (+1.27 dB at 2.5 kHz)" width="80%"></picture>
 
@@ -1905,7 +1907,7 @@ Table 2 nominal values: 0 dB at the 10 Hz anchor, the +12 dB/octave climb
 through the infrasound decade below it, and the two 24 dB/octave roll-offs
 that fence the curve off below 1 Hz and above 20 Hz.*
 
-Since G acts on 0.25 Hz – 315 Hz, far below the Nyquist frequency at audio rates, the frequency warping of the plain bilinear transform (applied without prewarping) is negligible there: about 0.014 % at 315 Hz for $f_\mathrm{s} = 48$ kHz, under 0.01 dB on the response. The internal oversampling used for the A/C designs (whose action extends to 16 kHz) is therefore not applied.
+Since G acts on 0.25 Hz – 315 Hz, far below the Nyquist frequency at audio rates, the frequency warping of the plain bilinear transform (applied without prewarping) is negligible there: about 0.014 % at 315 Hz for $f_\mathrm{s} = 48$ kHz, under 0.01 dB on the response. The default design still fits the prototype at the sample rate as it does for A and C, which costs nothing here and matters at the low rates infrasound is often recorded at, where 315 Hz approaches Nyquist.
 
 See the [Special Weightings guide](https://jmrplens.github.io/phonometry/signals/levels/special-weightings/) for usage.
 

@@ -1,0 +1,28 @@
+# Citations whose document cannot be recovered from the citation string alone.
+#
+# One line per citation, tab-separated:
+#   cite <TAB> kind <TAB> designation <TAB> edition <TAB> clause
+# with "-" for an absent edition or clause.
+#
+# This file is a ratchet: tests/test_conformance_artifact.py fails on a line
+# whose citation no check registers any more, and on a line the parser in
+# scripts/conformance/references.py has caught up with. Paying one off means
+# improving the parser and deleting the line, never adding one to silence it.
+#
+# The CNOSSOS-EU rows are the case the parser cannot solve in principle: the
+# citation names a clause of Annex II and the document it belongs to appears
+# only in the domain title ("CNOSSOS-EU railway source (Directive 2002/49/EC
+# Annex II)"), so no reading of the string alone can attribute it.
+Annex II 2.3.2, formula (2.3.12)	standard	Directive 2002/49/EC	-	Annex II 2.3.2, formula (2.3.12)
+Annex II 2.3.2, formulae (2.3.13) and (2.3.14)	standard	Directive 2002/49/EC	-	Annex II 2.3.2, formulae (2.3.13) and (2.3.14)
+Annex II 2.3.2, formula (2.3.15)	standard	Directive 2002/49/EC	-	Annex II 2.3.2, formula (2.3.15)
+# The NORAH2 guidance is a published report whose title carries no clause word
+# the parser recognises, so the split falls to the whole string.
+NORAH2 guidance mean ground plane (Eq. 36-40)	report	NORAH2 guidance	-	mean ground plane (Eq. 36-40)
+NORAH2 guidance mean flow resistivity (Eq. 41)	report	NORAH2 guidance	-	mean flow resistivity (Eq. 41)
+NORAH2 guidance diffraction at grazing (Eq. 42)	report	NORAH2 guidance	-	diffraction at grazing (Eq. 42)
+NORAH2 guidance screening path difference (§A.4.5)	report	NORAH2 guidance	-	screening path difference (§A.4.5)
+# The CNOSSOS-EU test sets are datasets published on the Commission's CIRCABC
+# repository, not clauses of a document.
+CIRCABC CNOSSOS-EU road emission test set	web	CIRCABC CNOSSOS-EU	-	road emission test set
+CIRCABC CNOSSOS-EU railway emission test set	web	CIRCABC CNOSSOS-EU	-	railway emission test set

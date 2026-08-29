@@ -134,7 +134,7 @@ sample from the metrology core:
 | IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-552 numerical conformance checks across 58 domains and 369 standards, covering
+554 numerical conformance checks across 58 domains and 370 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise
@@ -149,8 +149,9 @@ standards-first mindset shows up in the numerics: filter banks place their
 architecture (including Chebyshev II and Bessel, where scipy's raw
 parametrization would not), the default Butterworth bank is checked against
 the stricter class 0 of the withdrawn IEC 61260:1995 / ANSI S1.11-2004 edition
-as well as the current class 1, and A/C weighting stays within class 1
-tolerances up to 16 kHz at common audio rates via internal oversampling (see
+as well as the current class 1, and A/C weighting holds class 1 at every
+sample rate from 8 kHz up, because the analog prototype is fitted at the
+sample rate rather than transformed blind (see
 [Frequency Weighting](../signals/levels/weighting.md)).
 
 ## When the source is what is wrong

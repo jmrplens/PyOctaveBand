@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 552 numerical conformance checks against 369 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 554 numerical conformance checks against 370 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 552 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 58 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 554 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 58 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -23260,8 +23260,7 @@ for block in io.read_blocks("measurement.wav", block_size=1 << 16):
 streamed = 10 * np.log10((cal ** 2 * total_energy / total_samples)
                          / (2e-5) ** 2)
 whole = float(signals.leq(
-    filters.weighting_filter(np.asarray(sig), fs, curve="A",
-                             high_accuracy=False),
+    filters.weighting_filter(np.asarray(sig), fs, curve="A"),
     calibration_factor=cal))
 print(f"streamed {streamed:.4f} dB, whole file {whole:.4f} dB")
 # streamed 66.4200 dB, whole file 66.4200 dB
@@ -23269,10 +23268,10 @@ print(f"streamed {streamed:.4f} dB, whole file {whole:.4f} dB")
 
 The two numbers are not close — they are identical, to the last bit,
 because a stateful filter carries its state across block boundaries and the
-stream contributes every sample exactly once. (The single-pass comparison
-says `high_accuracy=False` because that is the filter a stateful weighting
-runs; the [weighting guide](https://jmrplens.github.io/phonometry/signals/levels/weighting/) covers
-the distinction.) The same construction drives an `OctaveFilterBank` with
+stream contributes every sample exactly once. Both sides run the same default
+design, since block processing no longer costs the weighting filter anything
+(the [weighting guide](https://jmrplens.github.io/phonometry/signals/levels/weighting/) has the
+detail). The same construction drives an `OctaveFilterBank` with
 `BlockProcessing(stateful=True)`, band by band.
 
 ## Writing a BWF with its provenance
@@ -32957,8 +32956,8 @@ documents, one page per module.
 | `BlockProcessing` | `dataclass` | **Filter state carried between calls.**<br>• `stateful`: Carry filter state between calls (Default: False)<br>• `steady_ic`: Steady-state initial conditions (Default: False) | `OctaveFilterBank(48000, 1, design=filters.FilterDesign(resample=False), block_processing=filters.BlockProcessing(stateful=True))` |
 | `ResponsePlot` | `dataclass` | **Response plot drawn while designing.**<br>• `show`: Show the plot (Default: False)<br>• `file`: Path to save the plot (Default: None) | `OctaveFilterBank(48000, 3, response_plot=filters.ResponsePlot(show=True))` |
 | `OctaveFilterBank.spectrogram` | `method` | **Band levels over time.**<br>• `x`: Signal array (1D or 2D)<br>• `window_time`: Window length [s] (Default: 0.125)<br>• `overlap`: Fraction in [0, 1) (Default: 0.5)<br>• `mode`: 'rms' or 'peak'<br>• `zero_phase`: Group-delay-free frames (Default: False) | `levels, freq, times = bank.spectrogram(x)`<br><br>• `levels`: (bands, frames) or (channels, bands, frames)<br>• `times`: window centers [s] |
-| `weighting_filter` | `function` | **Acoustic weighting.**<br>• `x`: Signal array<br>• `fs`: Sample rate [Hz]<br>• `curve`: 'A', 'C' (IEC 61672-1), 'B' (ANSI S1.4-1983, historical), 'D' (withdrawn IEC 537, aircraft), 'G' (ISO 7196 infrasound), 'AU' (IEC 61012), '468' (ITU-R BS.468-4 psophometric) or 'Z' (Default: 'A')<br>• `high_accuracy`: IEC class 1 HF accuracy via internal oversampling (Default: True; '468' requires it) | `y = filters.weighting_filter(x, fs, curve='A')`<br><br>• `y`: weighted signal |
-| `WeightingFilter` | `class` | **Reusable weighting filter.**<br>• `fs`: Sample rate [Hz]<br>• `curve`: 'A', 'B', 'C', 'D', 'G', 'AU', '468' or 'Z'<br>• `stateful`: Block processing (Default: False)<br>• `steady_ic`: Steady-state initial conditions (Default: False)<br>• `high_accuracy`: Defaults to True except stateful ('468' refuses False) | `wf = filters.WeightingFilter(fs, 'A')`<br>`y = wf.filter(x)` |
+| `weighting_filter` | `function` | **Acoustic weighting.**<br>• `x`: Signal array<br>• `fs`: Sample rate [Hz]<br>• `curve`: 'A', 'C' (IEC 61672-1), 'B' (ANSI S1.4-1983, historical), 'D' (withdrawn IEC 537, aircraft), 'G' (ISO 7196 infrasound), 'AU' (IEC 61012), '468' (ITU-R BS.468-4 psophometric) or 'Z' (Default: 'A')<br>• `high_accuracy`: fit the analog prototype at `fs` instead of transforming it blind, for IEC class 1 accuracy at every rate (Default: True; '468' requires it) | `y = filters.weighting_filter(x, fs, curve='A')`<br><br>• `y`: weighted signal |
+| `WeightingFilter` | `class` | **Reusable weighting filter.**<br>• `fs`: Sample rate [Hz]<br>• `curve`: 'A', 'B', 'C', 'D', 'G', 'AU', '468' or 'Z'<br>• `stateful`: Block processing (Default: False)<br>• `steady_ic`: Steady-state initial conditions (Default: False)<br>• `high_accuracy`: Fitted design, independent of `stateful` (Default: True; '468' refuses False) | `wf = filters.WeightingFilter(fs, 'A')`<br>`y = wf.filter(x)` |
 | `time_weighting` | `function` | **Energy capture.**<br>• `x`: Raw signal array (squared internally; time is the last axis)<br>• `fs`: Sample rate [Hz]<br>• `mode`: 'fast', 'slow', or 'impulse'<br>• `initial_state`: None, 'zero', 'first', scalar, or array (Default: None) | `env = filters.time_weighting(x, fs, mode='fast')`<br><br>• `env`: energy envelope (Mean Square), same shape as `x` |
 | `TimeWeightedEnvelope` | `dataclass` | **Exponentially averaged mean square of a record, with its rate.**<br>• `mean_square` [Pa² when calibrated], `fs` [Hz], `mode`, `calibrated`<br>• stands in for the bare array it replaced (`np.asarray`, indexing, `shape`)<br>• returned by `time_weighting`/`TimeWeighting.process` for a `Signal` input; a mean square is not a pressure record, so it is not a `Signal` | `env = filters.time_weighting(filters.weighting_filter(sig, curve='A'), mode='fast')`<br>`env.plot()`  # the L_pAF trace in dB |
 | `TimeWeighting` | `class` | **Stateful time weighting.**<br>• `fs`: Sample rate [Hz]<br>• `mode`: 'fast', 'slow', 'impulse' (Default: 'fast') | `tw = filters.TimeWeighting(fs, mode='fast')`<br>`env = tw.process(block)` per block<br>`tw.reset()` to start over |
@@ -33114,8 +33113,8 @@ documents, one page per module.
 | `filter_class_compliance` | `function` | **IEC 61260 class check as a report result.**<br>Same verification as `verify_filter_class`, returned as a `FilterComplianceResult` with `.plot()` and `.report()`.<br>• `bank`: an `OctaveFilterBank`<br>• `num_points`: frequency grid points per band (Default: 32768)<br>• `edition`: `'2014'` (default) or `'1995'` (adds class 0) | `result = filters.filter_class_compliance(bank, edition="1995")`<br>`result.report("iec61260.pdf", metadata=ReportMetadata(required_class=0))` |
 | `FilterComplianceResult` | `dataclass` | **IEC 61260 filter class-compliance result.**<br>• `overall_class`: strictest class every band meets: 1/2 (`'2014'`), 0/1/2 (`'1995'`), or `None`<br>• `bands`: per-band verdict dictionaries<br>• `range_limited`: stop-band mask beyond the processing Nyquist not exercised<br>• `.available_classes()` / `.reference_class()`: the edition's classes and the fiche's reference class<br>• `.plot()`: measured relative attenuation over the class corridor<br>• `.report(path, *, metadata=None, required_class via metadata)`: one-page PDF fiche | `filter_class_compliance(bank).report("iec61260.pdf")` |
 | `class_limits` | `function` | **IEC 61260 Table 1 acceptance limits.**<br>• `fraction`: bandwidth designator denominator b (1, 3, ...)<br>• `filter_class`: 1 or 2 (`'2014'`); 0, 1 or 2 (`'1995'`)<br>• `omega`: normalized frequencies f/fm<br>• `edition`: `'2014'` (default) or `'1995'` | `lo, hi = filters.class_limits(3, 0, omega, edition="1995")`<br><br>• `lo` / `hi`: min/max relative attenuation [dB] (`hi` is `inf` outside the pass-band) |
-| `verify_weighting_class` | `function` | **Weighting tolerance check** against IEC 61672-1:2013 Table 3 (A/C/Z), ANSI S1.4-1983 Tables IV/V (B, Types as classes) or IEC 61012:1990 Table 1 (AU), at the exact base-10 frequencies, plus the 5.5.7 between-nominals sweep.<br>• `wf`: a `WeightingFilter` (A, B, C, AU or Z)<br>• `sweep_points` (Default: 4096) | `result = filters.verify_weighting_class(wf)`<br><br>• `result["overall_class"]`: 1, 2 or None<br>• `result["range_limited"]`: finite-lower-limit rows beyond Nyquist<br>• `result["bands"]`: per-frequency class, deviation and margins [dB]<br>• `result["between_nominals"]`: 5.5.7 sweep margins |
-| `weighting_class_limits` | `function` | **IEC 61672-1:2013 Table 3 acceptance limits.**<br>• `weighting_class`: 1 or 2 | `f, lo, hi = filters.weighting_class_limits(1)`<br><br>• `f`: 34 nominal frequencies [Hz]<br>• `lo` / `hi`: lower/upper deviation limits [dB] (`lo` is `-inf` where one-sided) |
+| `verify_weighting_class` | `function` | **Weighting tolerance check** against IEC 61672-1:2013 Table 3 (A/C/Z), ANSI S1.4-1983 Tables IV/V (B, Types as classes) or IEC 61012:1990 Table 1 (AU), at the exact base-10 frequencies, plus the 5.5.7 between-nominals sweep. `edition="1979"` grades against IEC 651:1979 Table V instead, which publishes the laboratory-grade Type 0 (A, B and C).<br>• `wf`: a `WeightingFilter` (A, B, C, AU or Z)<br>• `sweep_points` (Default: 4096)<br>• `edition` (Default: `"2013"`; `"1979"` for Types 0-3) | `result = filters.verify_weighting_class(wf)`<br><br>• `result["overall_class"]`: 1, 2 or None (0-3 or None for `"1979"`)<br>• `result["range_limited"]`: finite-lower-limit rows beyond Nyquist<br>• `result["bands"]`: per-frequency class, deviation and margins [dB]<br>• `result["between_nominals"]`: 5.5.7 sweep margins |
+| `weighting_class_limits` | `function` | **IEC 61672-1:2013 Table 3 acceptance limits**, or the IEC 651:1979 Table V ones with `edition="1979"`.<br>• `weighting_class`: 1 or 2 (0-3 for `"1979"`, where class N is instrument Type N)<br>• `edition` (Default: `"2013"`) | `f, lo, hi = filters.weighting_class_limits(1)`<br><br>• `f`: 34 nominal frequencies [Hz]<br>• `lo` / `hi`: lower/upper deviation limits [dB] (`lo` is `-inf` where one-sided) |
 | `nominal_frequencies` | `function` | **ANSI Frequency generator.**<br>• `fraction`: 1, 3, etc. (Required)<br>• `limits`: [f_min, f_max] (Default: [12, 20000]) | `f_cen, f_low, f_high, labels = filters.nominal_frequencies(fraction=3)`<br><br>• `f_cen`: List of center frequencies [Hz]<br>• `f_low`: List of lower edges [Hz]<br>• `f_high`: List of upper edges [Hz]<br>• `labels`: IEC nominal frequency labels |
 | `normalized_frequencies` | `function` | **Standard IEC Frequencies.**<br>• `fraction`: 1 or 3 | `freqs = filters.normalized_frequencies(fraction=3)`<br><br>• `freqs`: List of standard center frequencies [Hz] |
 | `sweep_signal` | `function` | **ESS excitation (ISO 18233 Annex B).**<br>• `fs`: Sample rate [Hz]<br>• `f1`: Start frequency [Hz]<br>• `f2`: Stop frequency [Hz] (≤ fs/2)<br>• `seconds`: Duration [s]<br>• `amplitude`: Peak (Default: 1.0)<br>• `fade`: Half-Hann fraction (Default: 0.01) | `s = room.sweep_signal(48000, 20, 20000, 3.0)`<br><br>• 1D exponential sine sweep |
@@ -37745,9 +37744,11 @@ A(f) = 20 \log_{10}(R_\mathrm{A}(f)) + 2.00
 $$
 
 The digital filter is obtained from the analog poles/zeros via the bilinear
-transform. Because the bilinear transform compresses frequencies near Nyquist,
-the default `high_accuracy` mode designs and runs the filter at an internally
-oversampled rate (≥ 144 kHz); see [Frequency Weighting](https://jmrplens.github.io/phonometry/signals/levels/weighting/).
+transform. That transform compresses frequencies near Nyquist, so the default
+`high_accuracy` mode does not apply it to the printed prototype: it fits a
+prototype of the same structure whose response *at the warped frequencies* is
+the printed one's response at the true frequencies, and transforms that. See
+[Frequency Weighting](https://jmrplens.github.io/phonometry/signals/levels/weighting/).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses.svg" alt="A, C and Z frequency weighting curves of IEC 61672-1 with a zoom showing the positive region of the A curve (+1.27 dB at 2.5 kHz)" width="80%"></picture>
 
@@ -37800,7 +37801,7 @@ Table 2 nominal values: 0 dB at the 10 Hz anchor, the +12 dB/octave climb
 through the infrasound decade below it, and the two 24 dB/octave roll-offs
 that fence the curve off below 1 Hz and above 20 Hz.*
 
-Since G acts on 0.25 Hz – 315 Hz, far below the Nyquist frequency at audio rates, the frequency warping of the plain bilinear transform (applied without prewarping) is negligible there: about 0.014 % at 315 Hz for $f_\mathrm{s} = 48$ kHz, under 0.01 dB on the response. The internal oversampling used for the A/C designs (whose action extends to 16 kHz) is therefore not applied.
+Since G acts on 0.25 Hz – 315 Hz, far below the Nyquist frequency at audio rates, the frequency warping of the plain bilinear transform (applied without prewarping) is negligible there: about 0.014 % at 315 Hz for $f_\mathrm{s} = 48$ kHz, under 0.01 dB on the response. The default design still fits the prototype at the sample rate as it does for A and C, which costs nothing here and matters at the low rates infrasound is often recorded at, where 315 Hz approaches Nyquist.
 
 See the [Special Weightings guide](https://jmrplens.github.io/phonometry/signals/levels/special-weightings/) for usage.
 
@@ -38345,7 +38346,7 @@ for x in audio_stream(block):            # your capture callback
 | `detrend` | must be `False` | Per-block detrending creates boundary discontinuities |
 | `resample` | must be `False` | The resampler is not stateful |
 | `zero_phase` | unsupported | Forward-backward filtering needs the whole signal |
-| `high_accuracy` (weighting) | resolves to `False` by default (the legacy bilinear design, see [Frequency Weighting](https://jmrplens.github.io/phonometry/signals/levels/weighting/)); explicitly passing `True` raises `ValueError` | The polyphase resampling inside is block-incompatible |
+| `high_accuracy` (weighting) | no constraint: defaults to `True` as everywhere else (see [Frequency Weighting](https://jmrplens.github.io/phonometry/signals/levels/weighting/)) | The accurate design is a plain cascade of second-order sections at the input rate, so it carries state like any other |
 | `steady_ic` | optional | Starts the filters in step-response steady state |
 
 ## See also
@@ -38471,8 +38472,9 @@ capture chain delivered:
   the native rate: every phonometry function takes `fs` directly.
 - **Bands near Nyquist.** A band whose upper edge approaches $f_\mathrm{s}/2$ cannot
   realize its design response: the bilinear transform compresses the
-  frequency axis there (the same effect the weighting filters counter with
-  `high_accuracy`). Keep the top band edge comfortably below Nyquist or raise
+  frequency axis there (the same warping the weighting filters cancel by
+  fitting their prototype at the sample rate, which the bank does not do).
+  Keep the top band edge comfortably below Nyquist or raise
   `fs`, and let `verify_filter_class` report how much margin is left.
 
 ### How long must the record be?
@@ -39678,7 +39680,7 @@ overload recovery, linearity, the environmental influence quantities — apply
 to an instrument and are not implemented, so a class verdict here is a
 statement about the design and not about a device. Near Nyquist the bilinear
 transform warps the frequency axis and the bank carries no correction for it,
-unlike the `high_accuracy` option of the weighting filters: the stopband
+unlike the fitted `high_accuracy` design of the weighting filters: the stopband
 beyond the processing Nyquist is reported as `range_limited` rather than
 verified, so keep the top band edge comfortably below Nyquist or raise `fs`.
 Two operations do not stream: zero-phase forward-backward filtering needs the
@@ -40741,18 +40743,19 @@ comparisons with legacy data, and **AU** (IEC 61012), still in force like the
 G curve, keeps ultrasonic components out of an audible-exposure reading.
 
 All four share the machinery of the IEC 61672-1 curves (0 dB at 1 kHz where
-applicable, multichannel and stateful block processing), and B, D and AU also
-take the `high_accuracy` oversampling, and G takes it too: **the default G
-design oversamples toward 48 kHz**, so its 0.25 Hz to 315 Hz range stays
-within about 0.05 dB whatever the input rate, while stateful block processing
-runs the plain design at the input rate, about a decibel low at 315 Hz at
-fs = 2000 and exactly on the 0 dB reference at 10 Hz. That matters exactly where G is used — infrasound is
-often recorded at 1 kHz or 2 kHz, where 315 Hz sits close to Nyquist and the
-bilinear warping grows quadratically; at audio rates the correction is
-negligible. As with A/C/Z, `high_accuracy` cannot be combined with stateful
-processing. The A, C and Z curves themselves, where they come from, the
-`high_accuracy` design and the class verification against IEC 61672-1
-Table 3 are the subject of [Frequency Weighting](https://jmrplens.github.io/phonometry/signals/levels/weighting/).
+applicable, multichannel and stateful block processing), and all four take the
+same default `high_accuracy` design: the analog prototype is fitted at the
+sample rate rather than transformed blind, so the bilinear frequency warping
+never reaches the response. For G that keeps its 0.25 Hz to 315 Hz range
+within 0.0001 dB whatever the input rate, which matters exactly where G is
+used — infrasound is often recorded at 1 kHz or 2 kHz, where 315 Hz sits close
+to Nyquist and the warping grows quadratically. `high_accuracy=False` gives
+the plain bilinear design instead, about a decibel low at 315 Hz at fs = 2000
+and exactly on the 0 dB reference at 10 Hz. Unlike before, the flag is
+independent of `stateful`: block processing carries the fitted design too. The
+A, C and Z curves themselves, where they come from, the `high_accuracy` design
+and the class verification against IEC 61672-1 Table 3 are the subject of
+[Frequency Weighting](https://jmrplens.github.io/phonometry/signals/levels/weighting/).
 
 ## 1. Infrasound: G-weighting (ISO 7196)
 
@@ -40808,9 +40811,9 @@ plt.show()
 The implementation follows the ISO 7196 Table 1 pole/zero values exactly and is
 verified in CI against every Table 2 nominal response value (0.25 Hz to 315 Hz).
 `WeightingFilter(fs, "G")` supports the same multichannel and stateful block
-processing as A/C — but stateful mode cannot carry the internal oversampling
-across blocks, so if you stream G-weighting at a sample rate below 48 kHz,
-verify the response before trusting the level. Levels measured with the G
+processing as A/C, and streaming costs nothing: the design is the same cascade
+of second-order sections either way, so stitched blocks reproduce a single
+call exactly at any sample rate. Levels measured with the G
 curve are reported as $L_{p\mathrm{G}}$ (or $L_\mathrm{Geq}$ for the equivalent level over
 time).
 
@@ -40937,8 +40940,9 @@ print(f"LA = {la:.1f} dB   LAU = {lau:.1f} dB   audible alone = {la_ref:.1f} dB"
 
 Ultrasound only reaches a digital filter when the sample rate captures it,
 so measure at 96 kHz or more (at 48 kHz there is nothing above 24 kHz to
-reject); the AU design internally oversamples toward 288 kHz to keep the
-steep U roll-off accurate. Levels are reported as $L_\mathrm{AU}$. The
+reject); the AU design is fitted over the whole 10 Hz to 40 kHz range of
+IEC 61012 Table 1, which keeps the steep U roll-off within 0.001 dB of the
+prototype at 96 kHz. Levels are reported as $L_\mathrm{AU}$. The
 implementation follows the Table 2 pole locations exactly (they reproduce
 every Table 1 nominal value within 0.05 dB) and is verified in CI against
 the Table 1 tolerances up to 40 kHz.
@@ -40950,7 +40954,11 @@ The `verify_weighting_class` verifier, described in section 6 of
 of this guide that have published tolerance tables. For `B` it uses
 ANSI S1.4-1983 (Table IV design goals, Table V
 limits) and the "class" verdicts read as the standard's instrument **Types**
-1 and 2. For `AU` it uses IEC 61012:1990 Table 1 (nominal A + nominal U with
+1 and 2 — or, with `edition="1979"`, the IEC 651:1979 Table V limits, whose
+footnote makes one mask govern every weighting characteristic and which add
+the laboratory-grade Type 0 (the two Type 0 columns are *not* the same mask:
+ANSI is two-sided and stricter at 10/12.5/16 Hz where IEC 651 is upper-only).
+For `AU` it uses IEC 61012:1990 Table 1 (nominal A + nominal U with
 the separate-unit tolerances, zero at the 1 kHz reference); IEC 61012
 publishes a single tolerance set, so both margin slots agree and the verdict
 is simply complies (1) or not (`None`) — note that checking the rows above
@@ -41502,8 +41510,8 @@ with its own response chart, in [Special Weightings](https://jmrplens.github.io/
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | 1D or 2D array, or `Signal` | any | non-empty | 2D is `[channels, samples]` |
 | `fs` | int | Hz | > 0; taken from `x` when `x` is a `Signal` | |
-| `curve` | str | — | `'A'` (default), `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'`, `'468'` | `'G'` per ISO 7196 (infrasound), `'B'`/`'D'` historical and `'AU'` per IEC 61012 are covered in [Special Weightings](https://jmrplens.github.io/phonometry/signals/levels/special-weightings/); `'Z'` is a bypass; `'468'` is the ITU-R BS.468-4 programme-level curve, which needs the oversampled design (`high_accuracy=True`, and so `stateful=False`, which forces it off) |
-| `high_accuracy` | bool | — | default `True` (function); class default `None` resolves to `not stateful` | Internal oversampling keeps A/C in class 1 up to 16 kHz when $f_\mathrm{s} \ge 40$ kHz; details in §5 |
+| `curve` | str | — | `'A'` (default), `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'`, `'468'` | `'G'` per ISO 7196 (infrasound), `'B'`/`'D'` historical and `'AU'` per IEC 61012 are covered in [Special Weightings](https://jmrplens.github.io/phonometry/signals/levels/special-weightings/); `'Z'` is a bypass; `'468'` is the ITU-R BS.468-4 programme-level curve, which needs the fitted design and refuses `high_accuracy=False` |
+| `high_accuracy` | bool | — | default `True` | Fit the analog prototype at $f_\mathrm{s}$ instead of transforming it blind; keeps A/C in class 1 at every sample rate. Details in §5 |
 | `stateful` | bool (class only) | — | default `False` | Carries filter state across blocks (streaming) |
 | `steady_ic` | bool (class only) | — | default `False` | Steady-state initial conditions (no onset transient) |
 
@@ -41527,37 +41535,46 @@ for recording in batch:
 
 ## 5. High-frequency accuracy (`high_accuracy`)
 
-A plain bilinear-transform design compresses the response near Nyquist: at
-$f_\mathrm{s} = 48$ kHz the A-curve error at 12.5 kHz reaches −2.7 dB, outside the IEC
-61672-1 **class 1** tolerance (+2.0/−2.5 dB).
+The curves of §1 are analog: poles and zeros in the $s$ plane. Turning them
+into a digital filter with the bilinear transform is exact in magnitude and
+wrong in frequency — it puts the prototype's response at
+$2 f_\mathrm{s} \tan(\pi f / f_\mathrm{s})$ instead of at $2 \pi f$ — and the
+error grows quadratically toward Nyquist. At $f_\mathrm{s} = 48$ kHz that plain
+design reads 15.7 dB below the A design goal at the 19 952.6 Hz row, and at
+$f_\mathrm{s} = 32$ kHz it reads 61.4 dB below it at 15 848.9 Hz.
 
-By default (`high_accuracy=True`), phonometry designs and runs the weighting
-filter at an internally oversampled rate (up to 8×, reaching ≥ 144 kHz at
-common audio rates; a 96 kHz input runs ×2) and decimates back, keeping
-the response within class 1 tolerances up to 16 kHz (error ≈ −0.5 dB at
-12.5 kHz for $f_\mathrm{s} = 48$ kHz).
+By default (`high_accuracy=True`) phonometry does not transform the prototype
+blind: it **fits** an analog prototype of the same structure whose response
+*at the warped frequencies* is the printed prototype's response at the true
+ones, and transforms that. What runs is one cascade of second-order sections
+at the input rate, with nothing around it. Measured against the printed
+prototype over each standard's own band:
 
-Oversampling repairs the bilinear warping, not the sample rate. The
-interpolation and decimation stages it adds around the filter carry an
-anti-alias filter whose transition band sits on the *input* Nyquist
-frequency, so above roughly 90 % of that frequency the response rolls off
-however high the internal design rate is. That only bites when a Table 3 row
-lands there, which is what happens below 40 kHz: at $f_\mathrm{s} = 32$ kHz
-the 15 848.9 Hz row falls 16.2 dB below the A design goal (class 1 allows
-−16.0 dB there, class 2 sets no lower limit) and at $f_\mathrm{s} = 16$ kHz
-the 7 943.3 Hz row falls 12.0 dB below it (class 1 allows −2.5 dB, class 2
-−5.0 dB). `verify_weighting_class` measures that whole path, so for A it
-reports class 2 at 32 kHz and no class at all at 16 kHz rather than a grade
-the filter cannot deliver. The verdict is per curve, each graded against its
-own design goal: the C response lands 15.3 dB low at 32 kHz, inside that
-same −16.0 dB limit, so C keeps class 1 there, and 13.7 dB low at 16 kHz,
-where it meets no class either. Sample at 44.1 kHz or above for a class 1
-A-weighting across the full table.
+| Curve | 32 kHz | 44.1 kHz | 48 kHz | 96 kHz |
+| :--- | ---: | ---: | ---: | ---: |
+| A | 0.008 dB | 0.003 dB | 0.0003 dB | 0.00001 dB |
+| C | 0.002 dB | 0.002 dB | 0.0004 dB | 0.00001 dB |
+| AU | 0.003 dB | 0.005 dB | 0.004 dB | 0.001 dB |
+| 468 | 0.041 dB | 0.052 dB | 0.060 dB | 0.00002 dB |
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_accuracy_hf_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_accuracy_hf.svg" alt="A-weighting high-frequency accuracy at 48 kHz: analytic curve versus plain bilinear versus oversampled design, with error subplot" width="80%"></picture>
+A and C therefore verify to **class 1 at every sample rate from 8 kHz up**, and
+at every Table 3 row their deviation stays inside the 0.05 dB the table itself
+is rounded to.
+
+The band the fit controls is the curve's own standardised range, clipped at
+the top to 99.5 % of the Nyquist frequency — enough to contain every frequency
+these standards state a requirement at, the closest approach being Table 3's
+15 848.9 Hz row at 0.9906 of Nyquist when $f_\mathrm{s} = 32$ kHz. Above that
+last half percent the response is not claimed: no digital filter can track an
+analog curve past Nyquist, and the magnitude of a real-coefficient filter has
+zero slope there. That is where the 468 row of the table above comes from —
+its skirt is still falling at about $-30$ dB/octave where the band ends — and
+it is 3 % of that curve's $\pm 2$ dB tolerance, not an accuracy shortfall.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_accuracy_hf_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_accuracy_hf.svg" alt="A-weighting high-frequency accuracy at 48 kHz: analytic curve versus plain bilinear versus the design fitted at the sample rate, with error subplot" width="80%"></picture>
 
 *The plain bilinear design (red) crosses the class 1 tolerance near 12.5 kHz;
-the oversampled design (blue) stays close to the analytic curve.*
+the fitted design (blue) sits on the analytic curve.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -41585,7 +41602,7 @@ analytic = 20 * np.log10(gain / gain[np.argmin(np.abs(freqs - 1000))])
 fig, ax = plt.subplots(figsize=(9, 5))
 ax.semilogx(freqs, analytic, "k--", label="Analytic (IEC 61672-1)")
 for high_accuracy, label in ((False, "Plain bilinear"),
-                             (True, "Oversampled (default)")):
+                             (True, "Fitted at fs (default)")):
     weighted = filters.weighting_filter(impulse, fs, curve="A",
                                 high_accuracy=high_accuracy)
     response = 20 * np.log10(np.abs(np.fft.rfft(weighted))
@@ -41600,15 +41617,22 @@ plt.show()
 
 </details>
 
-- `high_accuracy=False` restores the legacy plain-bilinear behavior.
-- For `'G'` the flag works like the others': the default design is
-  oversampled toward 48 kHz, which is what keeps infrasound rates accurate;
-  `high_accuracy=False` runs the plain design at the input rate, costing about
-  a decibel at 315 Hz at fs = 2000 and nothing at the 10 Hz reference (see
-  [Special Weightings](https://jmrplens.github.io/phonometry/signals/levels/special-weightings/)).
-- **Stateful (block) processing** always uses the legacy design: the internal
-  FIR resampling is incompatible with block continuity. Passing
-  `high_accuracy=True` together with `stateful=True` raises a `ValueError`.
+- `high_accuracy=False` gives the plain bilinear design: the closed form a
+  reader can check against the standard term by term, at the cost above. It
+  verifies to class 1 for $f_\mathrm{s} \ge 44\,100$ Hz, degrades to class 2 at
+  32 000 and 22 050 Hz, and meets no class at 16 000 Hz.
+- The `'468'` curve refuses `high_accuracy=False`: its skirt puts the plain
+  design 23 dB out at 16 kHz, and ITU-R BS.468-4 prints one tolerance mask and
+  no lower grade to fall back to.
+- **Stateful (block) processing** carries no penalty. Both designs are plain
+  second-order sections at the input rate, so `stateful` and `high_accuracy`
+  are independent, stateful defaults to the fitted design like everything
+  else, and stitched blocks reproduce a single call exactly.
+- The fit costs about 70 ms and is cached per curve and sample rate, so it is
+  paid once. Even including it, weighting one minute of 44.1 kHz audio is
+  faster than it used to be: 85 ms against 377 ms for A, and 92 ms against
+  775 ms for the 468 curve. Once the design is cached the filtering alone is
+  about 18 ms, and it holds 21 MB of intermediates instead of 169 MB.
 
 ```python
 import numpy as np
@@ -41618,10 +41642,10 @@ from phonometry import filters
 fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
-# Explicit legacy behavior
+# The closed-form bilinear design, explicitly
 y = filters.weighting_filter(recording, fs, curve="A", high_accuracy=False)
 
-# Stateful block processing (legacy design, state carried between blocks)
+# Stateful block processing (same fitted design, state carried between blocks)
 wf = filters.WeightingFilter(fs, "A", stateful=True)
 blocks = [recording]                 # your sequence of recording blocks
 for block in blocks:
@@ -41663,9 +41687,36 @@ returns the 34 nominal frequencies with the lower/upper deviation limits (a
 lower limit of `-inf` means only the upper limit applies). The limits qualify
 the *deviation* from the design goal, so they are the same for A, C and Z.
 
+**The laboratory grade lives in the superseded edition.** IEC 61672-1:2013
+publishes classes 1 and 2 only; **Type 0**, the tightest of the four
+instrument types of **IEC 651:1979**, survives in that standard's Table V.
+Pass `edition="1979"` to grade against it, exactly as `verify_filter_class`
+reaches the IEC 61260:1995 class 0. Class *N* is then the standard's
+instrument Type *N*, and every band and the sweep carry one margin per type,
+`margin_class0_db` through `margin_class3_db`:
+
+```python
+from phonometry import filters
+
+result = filters.verify_weighting_class(
+    filters.WeightingFilter(48000, "A"), edition="1979"
+)
+print(result["overall_class"])                             # 0
+print(min(b["margin_class0_db"] for b in result["bands"])) # 0.650...
+```
+
+It is a different mask, not a rename, and it sees errors class 1 cannot:
+Type 0 holds +2/-3 dB at both 16 kHz and 20 kHz, where class 1 opens to
++2.5/-16 dB and +3/-inf. The undersampled `high_accuracy=False` design at
+48 kHz droops 15.7 dB at the 20 kHz row and still earns class 1 for it; under
+Table V that row is refused and the filter is graded Type 1. The 1979 edition
+covers A, B and C, the weightings IEC 651 defines: its Table V footnote makes
+one mask govern every weighting characteristic, so B is held to the same
+limits there rather than borrowing the ANSI ones.
+
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_class_mask_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_class_mask.svg" alt="A and C weighting deviations at 48 kHz threading within the IEC 61672-1 Table 3 class 1 acceptance corridor, with the wider class 2 limits dotted" width="80%"></picture>
 
-*The oversampled A and C designs (blue, purple) stay near zero deviation,
+*The fitted A and C designs (blue, purple) stay near zero deviation,
 well inside the class 1 corridor (shaded); the wider class 2 limits are
 dotted. The corridor widens at the band extremes where only a one-sided
 limit applies.*
@@ -41712,7 +41763,7 @@ Use C-weighting for peak sound pressure and high-level noise, and use the differ
 
 ### Is A-weighting accurate near 16 kHz at a 48 kHz sample rate?
 
-Not with a plain bilinear design: at $f_\mathrm{s} = 48$ kHz the A-curve error reaches −2.7 dB at 12.5 kHz, outside the IEC 61672-1 class 1 tolerance (+2.0/−2.5 dB). The default `high_accuracy=True` oversamples internally (up to 8×, reaching 144 kHz or more at common audio rates) and keeps the response within class 1 tolerances up to 16 kHz, with an error of about −0.5 dB at 12.5 kHz. That holds while 16 kHz stays clear of Nyquist, so from about $f_\mathrm{s} = 40$ kHz upwards; §5 covers what the resampler's anti-alias transition band costs below that.
+Not with a plain bilinear design: at $f_\mathrm{s} = 48$ kHz the A-curve error reaches −2.7 dB at 12.5 kHz, outside the IEC 61672-1 class 1 tolerance (+2.0/−2.5 dB). The default `high_accuracy=True` fits the prototype at the sample rate instead, which leaves 0.0003 dB anywhere in the table at 48 kHz and 0.008 dB at 32 kHz, so class 1 holds at every sample rate from 8 kHz up. §5 has the numbers and the band the fit controls.
 
 ## See also
 
@@ -41720,7 +41771,7 @@ Not with a plain bilinear design: at $f_\mathrm{s} = 48$ kHz the A-curve error r
   the infrasound G curve, the historical B and D, and AU for audible sound
   in the presence of ultrasound.
 - API reference: [`filters.weighting`](https://jmrplens.github.io/phonometry/reference/api/filters/weighting/) and [`filters.compliance`](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/).
-- Theory: [Weighting Curves (IEC 61672-1)](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/#weighting-curves-iec-61672-1): the pole-zero definition of the A, C and Z curves and the bilinear design the oversampling repairs.
+- Theory: [Weighting Curves (IEC 61672-1)](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/#weighting-curves-iec-61672-1): the pole-zero definition of the A, C and Z curves and the bilinear warping the fitted design cancels.
 
 ## References
 
@@ -41745,8 +41796,8 @@ Not with a plain bilinear design: at $f_\mathrm{s} = 48$ kHz the A-curve error r
 IEC 61672-1:2013, *Electroacoustics — Sound level meters —
 Part 1: Specifications*: the A, C and Z frequency-weighting curves (the
 Annex E analytic definition from four corner frequencies, normalized to 0 dB
-at 1 kHz), the class 1 tolerances the `high_accuracy` design keeps up to
-16 kHz at 44.1 kHz and above, and the Table 3 class 1/class 2 acceptance
+at 1 kHz), the class 1 tolerances the `high_accuracy` design keeps at every
+sample rate from 8 kHz up, and the Table 3 class 1/class 2 acceptance
 limits checked by
 `verify_weighting_class`; the special G, B, D and AU curves are covered in
 [Special Weightings](https://jmrplens.github.io/phonometry/signals/levels/special-weightings/).
@@ -48169,7 +48220,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 552 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 554 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -48412,7 +48463,7 @@ sample from the metrology core:
 | IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-552 numerical conformance checks across 58 domains and 369 standards, covering
+554 numerical conformance checks across 58 domains and 370 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise
@@ -48427,8 +48478,9 @@ standards-first mindset shows up in the numerics: filter banks place their
 architecture (including Chebyshev II and Bessel, where scipy's raw
 parametrization would not), the default Butterworth bank is checked against
 the stricter class 0 of the withdrawn IEC 61260:1995 / ANSI S1.11-2004 edition
-as well as the current class 1, and A/C weighting stays within class 1
-tolerances up to 16 kHz at common audio rates via internal oversampling (see
+as well as the current class 1, and A/C weighting holds class 1 at every
+sample rate from 8 kHz up, because the analog prototype is fitted at the
+sample rate rather than transformed blind (see
 [Frequency Weighting](https://jmrplens.github.io/phonometry/signals/levels/weighting/)).
 
 ## When the source is what is wrong

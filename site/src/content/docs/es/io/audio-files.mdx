@@ -388,8 +388,7 @@ for block in io.read_blocks("measurement.wav", block_size=1 << 16):
 streamed = 10 * np.log10((cal ** 2 * total_energy / total_samples)
                          / (2e-5) ** 2)
 whole = float(signals.leq(
-    filters.weighting_filter(np.asarray(sig), fs, curve="A",
-                             high_accuracy=False),
+    filters.weighting_filter(np.asarray(sig), fs, curve="A"),
     calibration_factor=cal))
 print(f"por bloques {streamed:.4f} dB, archivo entero {whole:.4f} dB")
 # por bloques 66.4200 dB, archivo entero 66.4200 dB
@@ -397,11 +396,11 @@ print(f"por bloques {streamed:.4f} dB, archivo entero {whole:.4f} dB")
 
 Los dos números no se parecen: son idénticos, hasta el último bit, porque
 un filtro con estado arrastra su estado a través de las fronteras de bloque
-y el flujo aporta cada muestra exactamente una vez. (La comparación de una
-pasada dice `high_accuracy=False` porque ese es el filtro que ejecuta una
-ponderación con estado; la
-[guía de ponderación](/phonometry/es/signals/levels/weighting/) cubre la
-distinción.) La misma construcción alimenta un `OctaveFilterBank` con
+y el flujo aporta cada muestra exactamente una vez. Ambos lados usan el mismo
+diseño por defecto, ya que el procesado por bloques ya no le cuesta nada al
+filtro de ponderación (la
+[guía de ponderación](/phonometry/es/signals/levels/weighting/) tiene el
+detalle). La misma construcción alimenta un `OctaveFilterBank` con
 `BlockProcessing(stateful=True)`, banda a banda.
 
 ## Escribir un BWF con su procedencia

@@ -1,8 +1,8 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """The conformance-count writer rewrites claims and nothing else.
 
-``scripts/check_conformance_claims.py`` reads the headline of the generated
-``docs/CONFORMANCE.md`` and makes every sentence in the corpus that quotes a
+``scripts/check_conformance_claims.py`` reads the ``counts`` of the generated
+``docs/conformance.json`` and makes every sentence in the corpus that quotes a
 count say the same thing. Two properties matter more than the happy path:
 
 * it must move the number wherever it is quoted, in either language, in
@@ -35,14 +35,28 @@ if _SCRIPTS not in sys.path:
 
 import check_conformance_claims as ccc
 
-#: What the generated report says: the authoritative counts.
+#: What the generated artefact says: the authoritative counts.
 TOTAL, DOMAINS, STANDARDS = 501, 55, 338
 #: What the prose still says, one release behind, everywhere.
 OLD_TOTAL, OLD_DOMAINS, OLD_STANDARDS = 462, 53, 303
 
+#: A miniature artefact carrying only what the writer reads out of it.
 REPORT = (
-    f"&#9989; **{TOTAL}/{TOTAL} conformance checks pass** across {DOMAINS} "
-    f"domains and {STANDARDS} standards - filters class 1.\n"
+    json.dumps(
+        {
+            "counts": {
+                "checks": TOTAL,
+                "passing": TOTAL,
+                "failing": 0,
+                "domains": DOMAINS,
+                "standards": STANDARDS,
+                "citations": STANDARDS,
+                "designations": 107,
+                "sources": 84,
+            }
+        }
+    )
+    + "\n"
 )
 
 #: Sentences using the stale counts for something that is not a conformance
@@ -68,7 +82,7 @@ def corpus(tmp_path: pathlib.Path) -> pathlib.Path:
     would fail every assertion below.
     """
     root = tmp_path / "repo"
-    _write(root / "docs" / "CONFORMANCE.md", REPORT)
+    _write(root / "docs" / "conformance.json", REPORT)
     # The two most-read pages of prose, and the two that were outside the walk
     # for as long as it started at docs/. README_PYPI.md is the PyPI long
     # description, which PyPI freezes at upload.
@@ -254,7 +268,7 @@ def test_write_touches_only_the_files_that_quote_a_count(corpus: pathlib.Path) -
         corpus / "CHANGELOG.md",
         corpus / "docs" / "ERRATA.md",
         corpus / "docs" / "superpowers" / "notes.md",
-        corpus / "docs" / "CONFORMANCE.md",
+        corpus / "docs" / "conformance.json",
         corpus / "stub" / "README.md",
     ]
     before = {p: p.read_bytes() for p in untouched}
@@ -264,7 +278,7 @@ def test_write_touches_only_the_files_that_quote_a_count(corpus: pathlib.Path) -
 
 def test_a_crlf_file_stays_crlf(tmp_path: pathlib.Path) -> None:
     """The writer changes digits, not the file's line endings."""
-    _write(tmp_path / "docs" / "CONFORMANCE.md", REPORT)
+    _write(tmp_path / "docs" / "conformance.json", REPORT)
     page = tmp_path / "docs" / "getting-started.md"
     _write(
         page,
@@ -330,13 +344,22 @@ def test_an_ambiguous_pattern_pair_reports_instead_of_crashing(
     assert "ambiguous conformance claim" in capsys.readouterr().err
 
 
-def test_a_report_without_a_headline_is_an_error(
+def test_an_unreadable_artefact_is_an_error(
     tmp_path: pathlib.Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    """A format change must fail loudly rather than rewrite prose to nothing."""
-    _write(tmp_path / "docs" / "CONFORMANCE.md", "no headline here\n")
+    """A missing or broken artefact must fail loudly, not rewrite to nothing."""
+    _write(tmp_path / "docs" / "conformance.json", "{ not json\n")
     assert _run(tmp_path, "--write") == 1
-    assert "headline not found" in capsys.readouterr().err
+    assert "cannot read the conformance counts" in capsys.readouterr().err
+
+
+def test_an_artefact_missing_a_count_names_the_field(
+    tmp_path: pathlib.Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A schema change fails on the field, not on the sentence that used it."""
+    _write(tmp_path / "docs" / "conformance.json", json.dumps({"counts": {}}) + "\n")
+    assert _run(tmp_path, "--write") == 1
+    assert "counts is missing checks" in capsys.readouterr().err
 
 
 def test_the_real_corpus_needs_no_rewriting() -> None:

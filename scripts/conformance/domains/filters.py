@@ -86,6 +86,48 @@ def _chk_butter_class0_1995() -> Outcome:
     )
 
 
+def _weighting_type0_check(curve: str, fs: int) -> Outcome:
+    """Grade one weighting against the IEC 651:1979 Table V Type 0 mask.
+
+    Type 0 is the tightest of the four instrument types of subclause 1.2 and
+    has no equivalent in IEC 61672-1:2013, whose class 1 opens to +2.5/-16 dB
+    at 16 kHz and +3/-inf at 20 kHz where Type 0 holds +2/-3 at both.
+    """
+    wf = filters.WeightingFilter(fs, curve)
+    result = ph.filters.verify_weighting_class(wf, edition="1979")
+    margin = min(b["margin_class0_db"] for b in result["bands"])
+    ok = result["overall_class"] == 0
+    return Outcome(
+        expected="Type 0",
+        computed=(
+            f"Type {result['overall_class']}"
+            if result["overall_class"] is not None
+            else "none"
+        )
+        + f" (margin {margin:+.3f} dB)",
+        delta=f"{margin:+.3f} dB",
+        passed=ok,
+    )
+
+
+@register(
+    "Filters & weightings",
+    "IEC 651:1979 Table V (via BS 5969:1981)",
+    "Type 0 (strictest) A-weighting tolerance mask (fs=48 kHz)",
+)
+def _chk_a_weighting_type0_1979() -> Outcome:
+    return _weighting_type0_check("A", 48000)
+
+
+@register(
+    "Filters & weightings",
+    "IEC 651:1979 Table V (via BS 5969:1981)",
+    "Type 0 (strictest) C-weighting tolerance mask (fs=48 kHz)",
+)
+def _chk_c_weighting_type0_1979() -> Outcome:
+    return _weighting_type0_check("C", 48000)
+
+
 @register(
     "Filters & weightings",
     "IEC 61260-1:2014 Table F.1",

@@ -479,6 +479,7 @@ from .filters import ANSIS14_K2 as ANSIS14_K2
 from .filters import ANSIS14_TABLE4_B as ANSIS14_TABLE4_B
 from .filters import ANSIS14_TABLE5 as ANSIS14_TABLE5
 from .filters import IEC537_NASA_TABLE_SLD1 as IEC537_NASA_TABLE_SLD1
+from .filters import IEC651_TABLE5 as IEC651_TABLE5
 from .filters import IEC61012_AU_HF as IEC61012_AU_HF
 from .filters import IEC61012_TABLE1 as IEC61012_TABLE1
 from .filters import IEC61012_TABLE2_POLES_HZ as IEC61012_TABLE2_POLES_HZ

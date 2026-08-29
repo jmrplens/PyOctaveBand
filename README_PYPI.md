@@ -36,7 +36,7 @@ materials, vibration, environmental, aircraft and underwater acoustics,
 electroacoustics and wave simulation. Every metric is implemented from its
 governing standard and numerically checked against it: the auto-generated
 [conformance report](https://github.com/jmrplens/phonometry/blob/v3.3.0/docs/CONFORMANCE.md)
-runs 552 conformance checks across 58 domains and 369 standards, each pinning
+runs 554 conformance checks across 58 domains and 370 standards, each pinning
 an expected normative value to the value the library computes, and CI
 regenerates it on every pull request. Filters are class 1 per
 **IEC 61260-1:2014 / ANSI S1.11-2004** and weightings and levels class 1 per

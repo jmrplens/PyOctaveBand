@@ -41,14 +41,15 @@ must behave exactly as if they had seen the whole signal at once.
 The `OctaveFilterBank`, `WeightingFilter` (any weighting curve: A, C, Z and
 the special B, D, G and AU) and `TimeWeighting` classes support block
 (streaming) processing: the internal filter state is carried between calls, so
-concatenated block outputs match a single full-signal pass. Streaming always
-uses the legacy bilinear weighting design — the oversampled `high_accuracy`
-path resamples internally and cannot be split across blocks — so a streamed
-A-weighting carries the plain-design high-frequency error described in
-[Frequency Weighting](/phonometry/signals/levels/weighting/), and a streamed
-G-weighting at a low sample rate loses the internal oversampling its design
-normally applies (see
-[Special Weightings](/phonometry/signals/levels/special-weightings/)).
+concatenated block outputs match a single full-signal pass. Streaming costs
+the weighting filters nothing: their accurate `high_accuracy` design is a
+plain cascade of second-order sections at the input rate, so a streamed
+A-weighting is the same filter an offline call runs, at any sample rate (see
+[Frequency Weighting](/phonometry/signals/levels/weighting/) and
+[Special Weightings](/phonometry/signals/levels/special-weightings/)). It used
+to reach its sections through an interpolation and a decimation stage, which
+cannot be split across blocks, so streaming had to fall back to the plain
+bilinear design.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/block_processing_continuity.svg" alt="Stateful block processing matching the continuous result versus independent blocks restarting the filter transient at each boundary" width="80%" />
 
@@ -301,9 +302,9 @@ def to_db(env):
     return 10 * np.log10(np.maximum(env, 1e-16) / (2e-5) ** 2)
 
 
-# The reference has to use the design streaming can use: high_accuracy=False.
+# Both sides run the same default design; streaming needs no concession.
 reference = to_db(filters.time_weighting(
-    filters.weighting_filter(x, fs, curve="A", high_accuracy=False), fs,
+    filters.weighting_filter(x, fs, curve="A"), fs,
     mode="fast"))
 
 aw = filters.WeightingFilter(fs, "A", stateful=True)
@@ -358,15 +359,16 @@ Slow), which must be excluded from any maximum or percentile.
 
 Streaming forbids anything that needs the whole signal or that recomputes
 something per block. Each row below is enforced with an exception rather than
-silently ignored, except `high_accuracy`, which resolves to the legacy design
-unless you pass `True` explicitly.
+silently ignored. `high_accuracy` is no longer among them: it used to resolve
+to the plain bilinear design in stateful mode and to raise when passed `True`,
+and now it means the same thing either way.
 
 | Option | Stateful behavior | Why |
 | :--- | :--- | :--- |
 | `detrend` | must be `False` | Per-block detrending creates boundary discontinuities |
 | `resample` | must be `False` | The resampler is not stateful |
 | `zero_phase` | unsupported | Forward-backward filtering needs the whole signal |
-| `high_accuracy` (weighting) | resolves to `False` by default (the legacy bilinear design, see [Frequency Weighting](/phonometry/signals/levels/weighting/)); explicitly passing `True` raises `ValueError` | The polyphase resampling inside is block-incompatible |
+| `high_accuracy` (weighting) | no constraint: defaults to `True` as everywhere else (see [Frequency Weighting](/phonometry/signals/levels/weighting/)) | The accurate design is a plain cascade of second-order sections at the input rate, so it carries state like any other |
 | `steady_ic` | optional | Starts the filters in step-response steady state |
 
 ## What this guide covers
@@ -388,12 +390,11 @@ equivalence.
 <ScopeClaim status="not-covered" label="Not covered">
 `zero_phase` forward-backward filtering needs the whole signal, so it is
 unsupported in stateful mode; use the offline path of [Filter
-Banks](/phonometry/signals/filters/filter-banks/) instead. `high_accuracy`
-weighting design resolves to the legacy bilinear filter in stateful mode
-(passing `True` explicitly raises `ValueError`), because its polyphase
-resampling stage is not block-compatible; see [Frequency
-Weighting](/phonometry/signals/levels/weighting/) for the offline
-high-accuracy design. Rank statistics such as $L_{90}$ do not stream either:
+Banks](/phonometry/signals/filters/filter-banks/) instead. What the accurate
+weighting design itself costs, and the band it is fitted over, belong to
+[Frequency Weighting](/phonometry/signals/levels/weighting/) rather than here:
+this page only shows that streaming reproduces it. Rank statistics such as
+$L_{90}$ do not stream either:
 stream the envelope and compute percentiles once on the pooled result, as
 [Integrated and Statistical Levels](/phonometry/signals/levels/levels/)
 describes.

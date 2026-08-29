@@ -81,7 +81,7 @@ def test_g_multichannel_and_stateful() -> None:
     wf = filters.WeightingFilter(FS, "G", stateful=True)
     blocks = [wf.filter(x[:, i : i + 4800]) for i in range(0, FS, 4800)]
     y_blocks = np.concatenate(blocks, axis=-1)
-    y_ref = filters.WeightingFilter(FS, "G", high_accuracy=False).filter(x)
+    y_ref = filters.WeightingFilter(FS, "G").filter(x)
     np.testing.assert_allclose(y_blocks, y_ref, atol=1e-12)
 
 
@@ -89,9 +89,10 @@ def test_g_stateful_holds_its_reference_at_low_fs() -> None:
     """Stateful G at infrasound rates must keep 0 dB at 10 Hz (ISO 7196
     clause 4). The design once oversampled toward 48 kHz unconditionally
     while stateful filtering ran at the input rate, so an SOS built for
-    fs * 24 was applied at fs = 2000 and the reference read -36 dB. The
-    existing stateful test could not see it: at 48 kHz the oversample
-    factor is one and both paths coincide.
+    fs * 24 was applied at fs = 2000 and the reference read -36 dB. Nothing
+    is designed at another rate any more, but the rate at which the
+    reference goes wrong is still worth a test of its own: the default
+    48 kHz case cannot see a rate-dependent design fault.
     """
     fs = 2000
     t = np.arange(fs * 8) / fs
@@ -103,8 +104,8 @@ def test_g_stateful_holds_its_reference_at_low_fs() -> None:
     gain = 20 * np.log10(np.std(y[s]) / np.std(x[s]))
     assert gain == pytest.approx(0.0, abs=0.1)
 
-    # And block processing still matches the one-shot plain design exactly.
-    y_ref = filters.WeightingFilter(fs, "G", high_accuracy=False).filter(x)
+    # And block processing still matches the one-shot call exactly.
+    y_ref = filters.WeightingFilter(fs, "G").filter(x)
     np.testing.assert_allclose(y, y_ref, atol=1e-12)
 
 

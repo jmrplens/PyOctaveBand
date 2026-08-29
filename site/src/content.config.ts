@@ -105,7 +105,124 @@ const references = z
     }
   });
 
+// The conformance artefact, `docs/conformance.json`, validated on its way into
+// the build. It is generated and committed by `make conformance`, and the site
+// only ever reads it -- generating it here would couple every documentation
+// build to a 45-second run of the full scientific stack, and would let the site
+// publish numbers no reviewer had seen. Declaring it as a collection is what
+// turns a malformed field into a build error that names the field's path
+// instead of a stack trace inside a component.
+const conformanceSide = z.object({
+  /** One number. Never set together with `record`. */
+  value: z.number().optional(),
+  /** Prose shown instead of the formatted number, when a figure is not the answer. */
+  label: z.string().optional(),
+  /** Named values compared exactly, e.g. `{ Rw: 52, C: -1, Ctr: -5 }`. */
+  record: z.record(z.string(), z.number()).optional(),
+});
+
+const conformanceCheck = z
+  .object({
+    /** `domain/citation/quantity`, slugged. The join key and the row anchor. */
+    id: z.string().min(1),
+    domain: z.string().min(1),
+    reference: z.object({
+      // Same vocabulary as the page bibliographies above, plus `derivation`
+      // for a check whose reference is a closed form and not a document.
+      kind: z.enum(['standard', 'book', 'article', 'report', 'web', 'derivation']),
+      designation: z.string().min(1),
+      /** A string, so it can hold "2014", "2e", "2020 + AMD1:2023", "(2010)". */
+      edition: z.string().min(1).optional(),
+      clause: z.string().min(1).optional(),
+      /** The citation exactly as the check registered it. */
+      cite: z.string().min(1),
+    }),
+    quantity: z.string().min(1),
+    /** Dotted path to the symbol under test. Not populated yet. */
+    implements: z.string().min(1).optional(),
+    kind: z.enum(['scalar', 'mask', 'record', 'count']),
+    expected: conformanceSide,
+    computed: conformanceSide,
+    unit: z.string().min(1).optional(),
+    tolerance: z
+      .object({
+        mode: z.enum(['absolute', 'relative', 'mask']),
+        value: z.number().optional(),
+      })
+      .optional(),
+    deviation: z.object({
+      value: z.number().optional(),
+      label: z.string().optional(),
+    }),
+    binding: z
+      .object({
+        frequency_hz: z.number().optional(),
+        lower: z.number().optional(),
+        upper: z.number().optional(),
+      })
+      .optional(),
+    precision: z.number().int().min(0),
+    verdict: z.enum(['pass', 'fail', 'by-design', 'not-applicable']),
+  })
+  .superRefine((check, ctx) => {
+    for (const side of ['expected', 'computed'] as const) {
+      if (check[side].value !== undefined && check[side].record !== undefined) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [side],
+          message: `${check.id}: a side is one number or a set of named ones, not both`,
+        });
+      }
+    }
+  });
+
+const conformanceSchema = z.object({
+  /** Bumped only on a shape change a reader cannot ignore. */
+  schema: z.literal(1),
+  library: z.string().min(1),
+  generator: z.string().min(1),
+  counts: z.object({
+    checks: z.number().int(),
+    passing: z.number().int(),
+    failing: z.number().int(),
+    domains: z.number().int(),
+    /** Citation groups, the figure the project publishes. */
+    standards: z.number().int(),
+    citations: z.number().int(),
+    /** Distinct normative documents, from the split citation. */
+    designations: z.number().int(),
+    /** Distinct further cited works. */
+    sources: z.number().int(),
+  }),
+  /** The closed unit vocabulary every row's `unit` must come from. */
+  units: z.array(z.string().min(1)),
+  domains: z.array(
+    z.object({
+      id: z.string().min(1),
+      title: z.string().min(1),
+      checks: z.number().int(),
+      passing: z.number().int(),
+    }),
+  ),
+  panels: z.array(
+    z.object({
+      id: z.string().min(1),
+      title: z.string().min(1),
+      unit: z.string().min(1).optional(),
+      rows: z.array(z.record(z.string(), z.unknown())),
+    }),
+  ),
+  checks: z.array(conformanceCheck),
+});
+
 export const collections = {
+  conformance: defineCollection({
+    loader: async () => {
+      const { report } = await import('./data/conformance-stats.mjs');
+      return [{ id: 'report', ...report }];
+    },
+    schema: conformanceSchema,
+  }),
   docs: defineCollection({
     loader: docsLoader(),
     schema: docsSchema({

@@ -10,11 +10,18 @@ GitHub's runner fleet is hardware-heterogeneous and the same pinned stack
 computes a few plotted coordinates ~1 ULP apart depending on which CPU
 microarchitecture the run lands on.
 
+``docs/conformance.json`` (:mod:`scripts.check_conformance_artifact`) is
+regenerated and compared the same way and for the same reason, so the scalar
+predicate the SVG comparison is built on lives here too rather than in one of
+the three checkers.
+
 What they share lives here: reading the committed bytes, listing what is
-tracked, and comparing two rasters within a tolerance. What differs stays in
-each checker, because the tolerances are not the same: a documentation figure
-is a raster of a plot, a fiche preview is a rasterized document page whose
-rendering runs through a pinned binary rasterizer and is markedly quieter.
+tracked, comparing two numbers within a tolerance, and comparing two rasters
+within one. What differs stays in each checker, because the tolerances are not
+the same: a documentation figure is a raster of a plot, a fiche preview is a
+rasterized document page whose rendering runs through a pinned binary
+rasterizer and is markedly quieter, and a conformance value is rounded to the
+precision its own check declares.
 """
 
 from __future__ import annotations
@@ -47,6 +54,35 @@ class RasterTolerance:
     level: float
     max_sig_pixels: int
     rms: float
+
+
+@dataclass(frozen=True)
+class NumericTolerance:
+    """How far two computations of the same number may drift and still match.
+
+    The absolute term carries the floor - for a raster coordinate it is a
+    fraction of a pixel, for a conformance value it is one quantum of the
+    precision the check reports at - and the relative term keeps the same
+    judgement meaningful on a value of 10 000 as on a value of 0.001.
+
+    :param absolute: Smallest difference always tolerated.
+    :param relative: Difference tolerated as a fraction of the larger value.
+    """
+
+    absolute: float
+    relative: float
+
+
+def numbers_within_tolerance(old: float, new: float, tol: NumericTolerance) -> bool:
+    """True if two computations of one number agree within ``tol``.
+
+    :param old: The committed value.
+    :param new: The freshly computed one.
+    :param tol: The tolerance to judge them by.
+    :return: Whether the difference is within the larger of the two terms.
+    """
+    limit = max(tol.absolute, tol.relative * max(abs(old), abs(new)))
+    return abs(old - new) <= limit
 
 
 def committed_bytes(path: str) -> bytes | None:

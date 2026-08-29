@@ -48,23 +48,39 @@ broadband noise audible in a programme chain rather than what makes it
 loud. Clause 1 defines it as the response of the passive network of Fig. 1a,
 so it is built from that network's seven printed component values
 (:func:`_itu_r_468_prototype`) and reproduces all 21 rows of the Table 1
-sampling to 0.0503 dB. Its skirt is steep enough that the design runs at a
-384 kHz target rather than the module's 144 kHz default, and the plain
-design at the input rate -- what stateful processing would use -- is
-refused rather than shipped 23 dB out at 16 kHz.
+sampling to 0.0503 dB. Its skirt is steep enough that the plain bilinear
+design at the input rate reads 23 dB out at 16 kHz, so ``high_accuracy=False``
+is refused for this curve rather than shipped: the Recommendation prints one
+mask and no lower grade to fall back to.
 
-One Table 1 row is out of reach at 44.1 kHz: 20 kHz sits at 0.91 of that
-rate's Nyquist frequency, inside the anti-alias transition band the
-resampling stages carry, and reads 2.1 dB low against a +/-2.0 dB
-tolerance. Of that, the two anti-alias passes are -1.66 dB and the sections
-only -0.49 dB, and the resampler's share does not move with the design rate:
-its tap count grows as 20 L while its normalised cutoff falls as 1/L, so the
-transition band in hertz is the same for every factor. Raising the factor
-improves the row, but only by decompressing the sections, and it is already
-at the module's cap of 8 at this rate. The ceiling therefore belongs to the
-resampling path rather than to this curve, and the A weighting loses 2.25 dB
-at the same point for the same reason. At 48 kHz and above every row below
-Nyquist is inside the mask, the tightest margin being the 6.3 kHz peak.
+**How the prototypes become filters.** Every curve above is a set of poles and
+zeros in the s plane, and the bilinear transform that turns those into a
+digital filter is exact in magnitude but wrong in frequency: it puts the
+prototype's response at ``2 f_s tan(pi f / f_s)`` instead of at ``2 pi f``,
+which costs 0.86 dB at 20 kHz for A at 48 kHz and 61 dB at 15 848.9 Hz when
+fs = 32 kHz. The library used to hide that by interpolating, filtering at
+three to eight times the rate and decimating back. It no longer does: the
+prototype is fitted at the sample rate instead
+(:mod:`phonometry.filters._weighting_design`), and what runs is one cascade of
+second-order sections. Three consequences worth stating in one place, because
+each of them used to be a documented limitation of this module:
+
+* the anti-alias filter of those resampling stages had its transition band on
+  the input Nyquist frequency and the signal crossed it twice, which put a
+  floor of about 1.7 dB on everything above 0.9 of Nyquist whatever the design
+  rate. That floor is gone, so the rows near Nyquist -- the 15 848.9 Hz row at
+  32 kHz, the 20 kHz row of BS.468-4 Table 1 at 44.1 kHz -- are inside their
+  masks instead of over them, and A and C verify to class 1 at every sample
+  rate from 8 kHz up;
+* block processing was incompatible with the accurate design, because a
+  resampler cannot be driven block by block. It no longer is: ``stateful`` and
+  ``high_accuracy`` are independent, and stitched blocks reproduce a single
+  call exactly; and
+* one minute of 44.1 kHz audio costs about 18 ms instead of 377 ms for A and
+  775 ms for 468, and holds 21 MB of intermediates instead of 169 MB
+  (measured back to back in one process, mean of five runs). The design
+  itself costs about 70 ms and is cached, so even a first call is quicker
+  than the path it replaces.
 """
 
 from __future__ import annotations
@@ -86,6 +102,7 @@ from ..io._resolve import (
     resolve_samples,
 )
 from ..io._signal import Signal
+from ._weighting_design import design_sos
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -229,6 +246,294 @@ def _itu_r_468_prototype() -> tuple[tuple[complex, ...], float]:
     )
 
 
+#: The curves that have an analog prototype, i.e. everything but the ``Z``
+#: bypass. Used to reject an unknown name before anything is designed.
+_PROTOTYPE_CURVES = ("A", "B", "C", "D", "G", "AU", "468")
+
+#: Frequency at which each curve's own standard fixes the response to 0 dB:
+#: 1 kHz for every audio-band weighting (IEC 61672-1 for A/C, ANSI S1.4-1983
+#: for B, IEC 537 for D, IEC 61012 for AU, ITU-R BS.468-4 Table 1's zero row),
+#: 10 Hz for G (ISO 7196 clause 4).
+_REFERENCE_HZ: dict[str, float] = {"G": 10.0}
+
+#: The frequency interval each standard states its curve over, which is the
+#: interval the design is fitted on and the only one over which the realised
+#: response is claimed. A/B/C/Z: IEC 61672-1:2013 Table 3 and ANSI S1.4-1983
+#: Table IV, 10 Hz to 20 kHz. D: the same span, the withdrawn IEC 537 having
+#: left no range of its own (the tabulated curve republished as NASA CR-3406
+#: Table SLD-I covers 50 Hz to 10 kHz, well inside). G: ISO 7196:1995 Table 2,
+#: 0.25 Hz to 315 Hz. AU: IEC 61012:1990 Table 1, 10 Hz to 40 kHz. 468:
+#: ITU-R BS.468-4 Table 1, 31.5 Hz to 31.5 kHz.
+_STANDARD_BAND_HZ: dict[str, tuple[float, float]] = {
+    "A": (10.0, 20000.0),
+    "B": (10.0, 20000.0),
+    "C": (10.0, 20000.0),
+    "D": (10.0, 20000.0),
+    "G": (0.25, 315.0),
+    "AU": (10.0, 40000.0),
+    "468": (31.5, 31500.0),
+}
+
+#: Fraction of the Nyquist frequency the fit band is allowed to reach.
+#: Chosen as the smallest single value that keeps every frequency any standard
+#: in this corpus states a requirement at inside the fit band at every sample
+#: rate the library serves: the binding case is IEC 61672-1 Table 3's 16 kHz
+#: row, whose exact frequency 15 848.9 Hz sits at 0.9906 of the Nyquist
+#: frequency when fs = 32 kHz. One fraction for eight curves rather than eight
+#: tables, and it leaves no undeclared band except the top half percent. It is
+#: not free: the magnitude of a real-coefficient filter has zero slope at the
+#: Nyquist frequency, so a curve still falling steeply there has to flatten
+#: inside the last half percent of the band, which costs about 0.1 dB on the
+#: steepest curve in the corpus (BS.468-4, -30 dB/octave, at 44.1 and 48 kHz,
+#: against a +/-2 dB mask) and about 0.01 dB on A and C.
+_FIT_NYQUIST_FRACTION = 0.995
+
+#: Biquad sections per curve. The floor is the prototype's own degree; the
+#: question each row answers is whether one more section buys accuracy the
+#: prototype's own order cannot reach. Measured against the analog prototype
+#: over the standard's band at 48 kHz, it does for the four curves whose poles
+#: are all real and split between the ends of a three-decade band -- A
+#: 0.037 -> 0.00027 dB, B 0.015 -> 0.00024, C 0.035 -> 0.00024, D 0.112 ->
+#: 0.00023 -- and it does not for the other three, whose residual is set by the
+#: flattening at the Nyquist frequency rather than by their order: 468 with a
+#: fourth section moves 0.102 to 0.083 dB and AU with a seventh moves 0.108 to
+#: 0.089, so both keep the order the standard prints. G needs nothing: its
+#: eight poles act below 315 Hz, where the warp is negligible at any audio
+#: rate, and four sections land within 1e-7 dB.
+_FIT_SECTIONS: dict[str, int] = {
+    "A": 4,
+    "B": 4,
+    "C": 3,
+    "D": 3,
+    "G": 4,
+    "AU": 6,
+    "468": 3,
+}
+
+
+def _fit_band(curve: str, fs: int) -> tuple[float, float]:
+    """The interval the design is fitted over, in Hz, and claimed over.
+
+    The curve's own standardised range, with the top clipped to
+    :data:`_FIT_NYQUIST_FRACTION` of the Nyquist frequency because no digital
+    filter can track an analog curve past it.
+
+    :param curve: An upper-case curve name with a prototype.
+    :param fs: Sample rate in Hz.
+    :return: ``(low, high)`` in Hz.
+    """
+    low, high = _STANDARD_BAND_HZ[curve]
+    return low, min(high, _FIT_NYQUIST_FRACTION * fs / 2.0)
+
+
+def _a_weighting_zpk() -> tuple[np.ndarray, np.ndarray, float]:
+    """Analog A weighting, IEC 61672-1:2013 Annex E (E.4.2).
+
+    ``f1`` and ``f4`` are shared with C (and, through C, with B); ANSI
+    S1.4-1983 Appendix C prints the same poles to fewer digits
+    (f1 = 20.598997, f4 = 12194.22).
+    """
+    f1, f2, f3, f4 = 20.598997, 107.65265, 737.86223, 12194.217
+    poles = -2 * np.pi * np.array([f1, f1, f4, f4, f2, f3])
+    return np.zeros(4), poles, 3.5174303309e13
+
+
+def _u_poles() -> np.ndarray:
+    """IEC 61012:1990 Table 2: the six poles of the U low-pass, in rad/s.
+
+    A double real pole at -12 200 Hz and complex-conjugate pairs at
+    -7 850 +/- j8 800 Hz and -2 900 +/- j12 150 Hz. Cascaded with A they make
+    the AU weighting of subclause 2.2, for measuring audible sound in the
+    presence of ultrasound.
+    """
+    return (
+        2
+        * np.pi
+        * np.array(
+            [
+                -12200.0,
+                -12200.0,
+                -7850.0 + 8800.0j,
+                -7850.0 - 8800.0j,
+                -2900.0 + 12150.0j,
+                -2900.0 - 12150.0j,
+            ]
+        )
+    )
+
+
+def _c_weighting_zpk() -> tuple[np.ndarray, np.ndarray, float]:
+    """Analog C weighting, IEC 61672-1:2013 Annex E (E.4.1)."""
+    f1, f4 = 20.598997, 12194.217
+    poles = -2 * np.pi * np.array([f1, f1, f4, f4])
+    return np.zeros(2), poles, 5.91797e8
+
+
+def _b_weighting_zpk() -> tuple[np.ndarray, np.ndarray, float]:
+    """Analog B weighting, ANSI S1.4-1983 Appendix C, Formula (C2).
+
+    The C weighting times ``f^2 / (f^2 + f5^2)`` in power, i.e. one more zero
+    at the origin and one extra real pole at ``f5 = 158.48932`` Hz. Historical:
+    B was dropped when IEC 61672-1 replaced the older meter standards, and it
+    is kept for legacy data only.
+    """
+    f1, f4, f5 = 20.598997, 12194.217, 158.48932
+    poles = -2 * np.pi * np.array([f1, f1, f4, f4, f5])
+    return np.zeros(3), poles, 1.0
+
+
+def _d_weighting_zpk() -> tuple[np.ndarray, np.ndarray, float]:
+    """Analog D weighting, withdrawn IEC 537:1976, from the published form.
+
+    Zeros at the origin and at the roots of ``s^2 + 6532 s + 4.0975e7``; poles
+    at -1776.3, -7288.5 and the roots of ``s^2 + 21514 s + 3.8836e8``, all in
+    rad/s (module docstring). The complex pairs are expanded with the quadratic
+    formula so the design is exact and deterministic. Corroborated against SQAT
+    and librosa, two independent implementations.
+    """
+    zero_real = -6532.0 / 2.0
+    zero_imag = math.sqrt(4.0975e7 - zero_real**2)
+    pole_real = -21514.0 / 2.0
+    pole_imag = math.sqrt(3.8836e8 - pole_real**2)
+    zeros = np.array(
+        [0.0, complex(zero_real, zero_imag), complex(zero_real, -zero_imag)]
+    )
+    poles = np.array(
+        [
+            -1776.3,
+            -7288.5,
+            complex(pole_real, pole_imag),
+            complex(pole_real, -pole_imag),
+        ]
+    )
+    return zeros, poles, 1.0
+
+
+def _g_weighting_zpk() -> tuple[np.ndarray, np.ndarray, float]:
+    """Analog G weighting, ISO 7196:1995 Table 1 (p. 2).
+
+    Nominal pole/zero coordinates in the complex frequency plane, in Hz: four
+    zeros at the origin and four complex-conjugate pole pairs. The curve is
+    defined with 0 dB gain at 10 Hz (clause 4), which is why G is the one curve
+    whose reference frequency is not 1 kHz.
+    """
+    pole_coords_hz = np.array(
+        [
+            -0.707 + 0.707j,
+            -0.707 - 0.707j,
+            -19.27 + 5.16j,
+            -19.27 - 5.16j,
+            -14.11 + 14.11j,
+            -14.11 - 14.11j,
+            -5.16 + 19.27j,
+            -5.16 - 19.27j,
+        ]
+    )
+    return np.zeros(4), 2 * np.pi * pole_coords_hz, 1.0
+
+
+def _itu_r_468_zpk() -> tuple[np.ndarray, np.ndarray, float]:
+    """Analog 468 weighting, ITU-R BS.468-4 clause 1 via Fig. 1a.
+
+    One zero at the origin, because the series capacitor blocks dc, and the six
+    poles :func:`_itu_r_468_prototype` reads off the network's seven printed
+    component values. Its gain already puts 0 dB at 1 kHz, so the shared
+    renormalisation below is an identity here; it is left in place rather than
+    special-cased, because it costs one evaluation and keeps the reference in
+    one place for every curve.
+    """
+    poles, gain = _itu_r_468_prototype()
+    return np.zeros(1), np.array(poles), gain
+
+
+def _analog_weighting_zpk(curve: str) -> tuple[np.ndarray, np.ndarray, float]:
+    """Analog prototype of *curve*, normalised to 0 dB at its reference.
+
+    :param curve: An upper-case name in :data:`_PROTOTYPE_CURVES`.
+    :return: ``(zeros, poles, gain)`` in rad/s.
+    """
+    if curve == "AU":
+        zeros, poles, gain = _a_weighting_zpk()
+        poles = np.concatenate([poles.astype(complex), _u_poles()])
+    else:
+        builders = {
+            "A": _a_weighting_zpk,
+            "B": _b_weighting_zpk,
+            "C": _c_weighting_zpk,
+            "D": _d_weighting_zpk,
+            "G": _g_weighting_zpk,
+            "468": _itu_r_468_zpk,
+        }
+        zeros, poles, gain = builders[curve]()
+    w_ref = 2 * np.pi * _REFERENCE_HZ.get(curve, 1000.0)
+    response = gain * np.prod(1j * w_ref - zeros) / np.prod(1j * w_ref - poles)
+    return zeros, poles, gain / float(np.abs(response))
+
+
+@lru_cache(maxsize=64)
+def _cached_weighting_sos(curve: str, fs: int, high_accuracy: bool) -> np.ndarray:
+    """The shared, read-only design behind :func:`_weighting_sos`."""
+    zeros, poles, gain = _analog_weighting_zpk(curve)
+    if high_accuracy:
+        sos = design_sos(
+            zeros,
+            poles,
+            float(fs),
+            _fit_band(curve, fs),
+            _FIT_SECTIONS[curve],
+            _REFERENCE_HZ.get(curve, 1000.0),
+        )
+    else:
+        sos = signal.zpk2sos(*signal.bilinear_zpk(zeros, poles, gain, fs))
+    shared = np.array(sos, dtype=np.float64)
+    shared.flags.writeable = False
+    return shared
+
+
+def _weighting_sos(curve: str, fs: int, high_accuracy: bool) -> np.ndarray:
+    """Second-order sections of *curve* at *fs*, cached on the three inputs.
+
+    Two designs live here, and ``high_accuracy`` picks between them:
+
+    * ``True`` (the default) fits the prototype at the sample rate with
+      :func:`~phonometry.filters._weighting_design.design_sos`, which is the
+      accurate realisation and the one the library grades itself on.
+    * ``False`` is the plain bilinear transform of the printed prototype: the
+      closed-form design a reader can check line by line against the standard,
+      at the cost of the frequency warping the fit exists to remove.
+
+    One comparison is worth stating because it looks like a regression and is
+    not. Against the *sections* the oversampled design used to produce, the fit
+    is worse at 494 of the 8047 (curve, rate) pairs swept from 2 Hz to 200 kHz,
+    all but two of them below 2 kHz, worst 6.2 dB for AU at 34 Hz. Against what
+    that design *delivered*, it is better at every one of the 8047, because the
+    sections were never the whole path: the signal crossed the resampler's
+    anti-alias FIR twice, and measured end to end the old median error is
+    7.68 dB against this one's 0.0012 dB. So the old sections are a filter this
+    library never actually applied, and the rates where they win are ones no
+    standard in the corpus places a requirement at.
+
+    The fit costs about 70 ms, which is why it is cached: it is paid once per
+    (curve, rate, mode), and it is already a fifth of what the resampled path
+    it replaces spent *filtering* one minute of audio. Where the first start
+    does not land close enough, the routine works through the other starts of
+    :func:`~phonometry.filters._weighting_design._spare_placements` and the
+    design takes about 0.6 s instead. That is common below about 2 kHz, and it
+    also happens at scattered rates inside the audio band: measured over every
+    rate from 2 Hz to 200 kHz, 52 of them at or above 2 kHz take the retry, of
+    which five are at or above 8 kHz -- 468 at nine rates between 45 and
+    64 kHz, AU at two near 34 kHz. None of the thirteen standard rates does,
+    and where it fires it always improves the fit. It is the same cache and the
+    same once.
+
+    :return: A fresh copy each call. ``WeightingFilter.sos`` is a public
+        attribute and a caller may edit it in place (a test in this tree
+        appends a notch section to one), so what the cache holds must not be
+        the same array.
+    """
+    return _cached_weighting_sos(curve, fs, high_accuracy).copy()
+
+
 class WeightingFilter:
     """Class-based frequency weighting filter (A, B, C, D, G, AU, 468, Z).
     Allows pre-calculating and reusing filter coefficients.
@@ -249,64 +554,63 @@ class WeightingFilter:
             historical: removed from the IEC sound-level-meter standards),
             'D' (withdrawn IEC 537 aircraft-noise weighting), 'G' (ISO 7196
             infrasound), 'AU' (IEC 61012, audible sound in the presence of
-            ultrasound), '468' (ITU-R BS.468-4 psophometric noise weighting;
-            designed at a 384 kHz target and unavailable in stateful mode,
+            ultrasound), '468' (ITU-R BS.468-4 psophometric noise weighting,
             see :func:`_itu_r_468_prototype`) or 'Z'.
-        :param stateful: If True, the weighting filter is stateful. Useful for
-            block processing. Not available for ``'468'``: stateful processing
-            implies ``high_accuracy=False``, and the plain design at the input
-            rate misses the Table 1 mask by 23 dB at 16 kHz, with no lower
-            performance class to fall back to.
+        :param stateful: If True, carry the section state between calls, so
+            concatenated blocks equal one continuous call. Available for every
+            curve and independent of ``high_accuracy``: both designs are a
+            plain cascade of second-order sections at the input rate, and
+            ``sosfilt`` with a carried ``zi`` reproduces a single call bit for
+            bit.
         :param steady_ic: If True, calculate steady state initial conditions for filter.
-        :param high_accuracy: If True, design and run the filter at an internal
-            oversampled rate (target >= 144 kHz) so the response stays within
-            IEC 61672-1 class 1 tolerances up to 16 kHz, provided 16 kHz is
-            well clear of the input Nyquist frequency (fs >= 40 kHz). At
-            48 kHz this oversamples x3, keeping the deviation from the design
-            goal to -0.44 dB at the 16 kHz nominal frequency and -0.86 dB at
-            the 20 kHz one. Oversampling cannot rescue the top of the band at
-            low sample rates, because the resampling stages it adds around
-            the sections carry an anti-alias transition band centred on the
-            input Nyquist frequency: above roughly 0.9 x fs/2 the response
-            rolls off steeply whatever the design rate. What the roll-off
-            costs is per curve, since each is graded against its own design
-            goal: at fs = 32 kHz the 15 848.9 Hz nominal point falls 16.2 dB
-            below the A goal but 15.3 dB below the C one (class 1 allows
-            -16.0 dB there, class 2 has no lower limit), so the verified
-            class at 32 kHz is 2 for A and still 1 for C. At fs = 16 kHz the
-            7 943.3 Hz point falls 12.0 dB below the A goal and 13.7 dB below
-            the C one (class 1 allows -2.5 dB, class 2 -5.0 dB), so neither
-            curve verifies to any class there. The plain bilinear
-            design holds class 1 for fs >= 40 kHz (-2.8 dB at the 12.5 kHz
-            nominal frequency at 48 kHz, -3.5 dB at 44.1 kHz, inside the
-            +2.0/-5.0 class 1 limits), degrades to class 2 between 22.05 and
-            32 kHz and meets no class at fs <= 20 kHz. Defaults to True
-            except in stateful mode (the internal FIR resampling is
-            incompatible with block processing). The '468' curve is the one
-            exception to the grade-and-document habit above: it has a single
-            tolerance mask and no lower grade, so False is refused instead of
-            described.
+        :param high_accuracy: Which of the two designs to build, both of them
+            second-order sections at the input rate.
+
+            ``True`` (the default) fits the analog prototype at *fs*, undoing
+            the bilinear frequency warping instead of tolerating it
+            (:mod:`phonometry.filters._weighting_design`). Measured against
+            the prototype over the standard's own band, the worst deviation is
+            0.008 dB for A at 32 kHz and 0.0003 dB at 48 kHz, and at most
+            0.06 dB for any curve at any rate in this corpus -- the 0.06
+            belonging to the 468 curve at 44.1 and 48 kHz, where a
+            -30 dB/octave skirt has to flatten inside the last half percent
+            below the Nyquist frequency. A and C verify to class 1 at every
+            sample rate from 8 kHz up, and at every Table 3 row their
+            deviation stays inside the 0.05 dB the table itself is rounded to.
+            The design is fitted over the interval :func:`_fit_band` returns
+            and is not claimed outside it.
+
+            ``False`` is the plain bilinear transform of the printed
+            prototype: the closed-form design a reader can check against the
+            standard term by term, at the cost of the warping. That cost grows
+            quadratically toward the Nyquist frequency -- for A at 48 kHz it
+            reads 15.7 dB below the design goal at the 19 952.6 Hz row, which
+            the class 1 mask does not see because its lower limit there is
+            -inf, and 61.4 dB below it at 15 848.9 Hz when fs = 32 kHz, which
+            it does. So it verifies to class 1 for fs >= 44 100 Hz, degrades to
+            class 2 at 32 000 and 22 050 Hz, and meets no class at 16 000 Hz.
+            It is refused for the '468' curve, whose skirt puts it 23 dB out at
+            16 kHz with no lower grade in the Recommendation to fall back to.
+
+            Defaults to True (``None`` selects the default too, which is
+            what it used to mean in every mode but the stateful one).
         """
         if fs <= 0:
             raise ValueError(_FS_POSITIVE)
         curve = _require_str(curve, "curve")
         if high_accuracy is None:
-            high_accuracy = not stateful
-        if high_accuracy and stateful:
-            msg = "high_accuracy is not compatible with stateful processing."
-            raise ValueError(msg)
+            # ``None`` used to mean "True unless stateful", because the two
+            # were mutually exclusive. They are not any more, so it resolves
+            # to the accurate design in every mode. The sentinel is kept
+            # rather than replaced by a plain ``True`` default so that a
+            # caller still passing ``None`` gets the default rather than a
+            # value that reads as false.
+            high_accuracy = True
 
         self.fs = fs
         self.curve = curve.upper()
         self.stateful = stateful
         self.high_accuracy = high_accuracy
-        # Oversample target 144 kHz: fs=48k -> x3, fs=44.1k -> x4, fs=96k -> x2,
-        # fs=128k -> x2, fs>=144k -> x1.
-        # A 96 kHz target left the common 48 kHz rate at only x2 (-1.1 dB @16k /
-        # -2.1 dB @20k vs analytic); 144 kHz halves that residual (audit N1 A6).
-        self._oversample = (
-            min(8, max(1, math.ceil(144000 / fs))) if high_accuracy else 1
-        )
 
         if self.curve == "Z":
             self.sos = np.array([])
@@ -314,33 +618,27 @@ class WeightingFilter:
                 self.zi = np.array([])
             return
 
-        if self.curve not in ["A", "B", "C", "D", "G", "AU", "468"]:
+        if self.curve not in _PROTOTYPE_CURVES:
             msg = "Weighting curve must be 'A', 'B', 'C', 'D', 'G', 'AU', '468' or 'Z'"
             raise ValueError(msg)
 
         if self.curve == "468" and not self.high_accuracy:
-            # Without the resampling the sections run at the input rate, and
-            # the bilinear frequency compression is quadratic in f / fs over a
-            # skirt falling at about -30 dB/octave: at 48 kHz that reads
-            # -23.2 dB at the 16 kHz row of ITU-R BS.468-4 Table 1, whose
+            # The plain bilinear design compresses frequency quadratically in
+            # f / fs over a skirt falling at about -30 dB/octave: at 48 kHz it
+            # reads -23.2 dB at the 16 kHz row of ITU-R BS.468-4 Table 1, whose
             # tolerance there is +/-1.6 dB. Unlike A and C, the Recommendation
             # prints one mask and no class-2 grade to degrade to, so this is
-            # refused rather than documented. Stateful mode is the same plain
-            # design (it forces ``high_accuracy`` off), so it is refused here
-            # too.
+            # refused rather than documented. Stateful processing no longer
+            # implies it, so stateful '468' is now available.
             msg = (
-                "Weighting curve '468' needs the oversampled design path: "
-                "high_accuracy=False (which stateful processing implies) puts "
-                "the response 23 dB below the ITU-R BS.468-4 Table 1 nominal "
-                "at 16 kHz for fs = 48000 Hz, against a +/-1.6 dB tolerance."
+                "Weighting curve '468' needs the fitted design: "
+                "high_accuracy=False puts the response 23 dB below the "
+                "ITU-R BS.468-4 Table 1 nominal at 16 kHz for fs = 48000 Hz, "
+                "against a +/-1.6 dB tolerance."
             )
             raise ValueError(msg)
 
-        z, p, k = self._analog_design()
-
-        design_fs = self.fs * self._oversample
-        zd, pd, kd = signal.bilinear_zpk(z, p, k, design_fs)
-        self.sos = signal.zpk2sos(zd, pd, kd)
+        self.sos = _weighting_sos(self.curve, fs, self.high_accuracy)
 
         # Initialize filter state for stateful block-wise processing.
         # Uses lazy allocation: zi is sized on first filter() call so that
@@ -348,201 +646,6 @@ class WeightingFilter:
         if self.stateful:
             self.zi = np.array([])
             self._steady_ic = steady_ic
-
-    def _itu_r_468_design(self) -> tuple[np.ndarray, np.ndarray, float]:
-        """Analog ZPK of the ITU-R BS.468-4 curve, and its design rate.
-
-        Clause 1 makes the Fig. 1a passive network the nominal curve, so the
-        prototype is rebuilt from its seven printed component values by
-        :func:`_itu_r_468_prototype`: one zero at the origin, because the
-        series capacitor blocks dc, and six poles.
-
-        Kept apart from the other curves because it is the only one that both
-        reads its prototype from a network and raises its own design rate, and
-        because the reason for that rate takes a paragraph to state.
-
-        :return: ``(zeros, poles, gain)``, with the gain already putting 0 dB
-            at the 1 kHz reference because :func:`_itu_r_468_prototype`
-            normalises there. The shared renormalisation the caller applies to
-            every curve but G is therefore an identity here, and is left in
-            place rather than special-cased: it costs one evaluation and it
-            keeps the reference in one place for all of them.
-        """
-        poles, gain = _itu_r_468_prototype()
-        if self.high_accuracy:
-            # The 144 kHz default target is sized for the A/C action up to
-            # 16-20 kHz, where those curves are already 30 dB down and
-            # flat-ish. 468 is still turning over at 12.5 kHz and falls at
-            # about -30 dB/octave above it, so bilinear compression costs far
-            # more: measured against the exact analog response, a 144 kHz
-            # design reads -1.99 dB at the 16 kHz row of Table 1, outside its
-            # +/-1.6 dB tolerance, and eats 96 % of the +/-1.2 dB budget at
-            # 12.5 kHz. A 384 kHz target brings those to -0.27 dB and
-            # -0.16 dB, 17 % and 13 % of their budgets. At fs = 48 kHz that is
-            # x8, the module's existing cap.
-            self._oversample = min(8, max(1, math.ceil(384000 / self.fs)))
-        return np.zeros(1), np.array(poles), gain
-
-    def _analog_design(self) -> tuple[np.ndarray, np.ndarray, float]:
-        """Analog ZPK of the selected curve, normalised at its reference.
-
-        Also adjusts ``self._oversample`` for the curves whose action extends
-        beyond the default design target (G toward low sample rates, AU's U
-        roll-off toward 40 kHz).
-        """
-        # Analog ZPK for the A and C weightings.
-        # f1, f2, f3, f4 constants as per IEC 61672-1. ANSI S1.4-1983
-        # Appendix C prints the same poles to fewer digits (f1 = 20.598997,
-        # f4 = 12194.22), so the B weighting below shares them.
-        f1 = 20.598997
-        f4 = 12194.217
-
-        if self.curve == "G":
-            # ISO 7196:1995 Table 1 (p. 2): nominal pole/zero coordinates in
-            # the complex frequency plane, in Hz. Four zeros at the origin
-            # and four complex-conjugate pole pairs. The curve is defined
-            # with 0 dB gain at 10 Hz (clause 4).
-            z = np.zeros(4)
-            pole_coords_hz = np.array(
-                [
-                    -0.707 + 0.707j,
-                    -0.707 - 0.707j,
-                    -19.27 + 5.16j,
-                    -19.27 - 5.16j,
-                    -14.11 + 14.11j,
-                    -14.11 - 14.11j,
-                    -5.16 + 19.27j,
-                    -5.16 - 19.27j,
-                ]
-            )
-            p = 2 * np.pi * pole_coords_hz
-            # Normalize to 0 dB at 10 Hz.
-            w = 2 * np.pi * 10.0
-            k = 1.0 / np.abs(np.prod(1j * w - z) / np.prod(1j * w - p))
-            # G acts on 0.25 Hz - 315 Hz, far below Nyquist at audio rates:
-            # the bilinear warping (no prewarping) is negligible there
-            # (~0.014% at 315 Hz for fs = 48 kHz, under 0.01 dB), so the
-            # high-accuracy oversampling used for A/C (whose action extends
-            # to 16 kHz) is unnecessary. At the low sample rates common for
-            # infrasound recordings, however, 315 Hz approaches Nyquist and
-            # the warping grows quadratically; oversample the design toward
-            # 48 kHz so the response stays within ~0.05 dB regardless of fs.
-            # Guarded like AU's target doubling below: only the high-accuracy
-            # path resamples around the filter, so only it may design above
-            # the input rate. Stateful mode filters block by block at self.fs,
-            # and an SOS designed for a higher rate applied at the input rate
-            # read -36 dB at G's own 10 Hz reference at fs = 2000. Stateful
-            # therefore runs the plain design at the input rate, which is
-            # what its documentation always said it did.
-            if self.high_accuracy:
-                self._oversample = min(8, max(1, math.ceil(48000 / self.fs)))
-        elif self.curve in ("A", "AU"):
-            f2 = 107.65265
-            f3 = 737.86223
-            # Zeros at 0 Hz
-            z = np.array([0, 0, 0, 0])
-            # Poles
-            p = np.array(
-                [
-                    -2 * np.pi * f1,
-                    -2 * np.pi * f1,
-                    -2 * np.pi * f4,
-                    -2 * np.pi * f4,
-                    -2 * np.pi * f2,
-                    -2 * np.pi * f3,
-                ]
-            )
-            # k chosen to give 0 dB at 1000 Hz
-            k = 3.5174303309e13
-            if self.curve == "AU":
-                # IEC 61012:1990 subclause 2.2: the AU weighting is the A
-                # weighting cascaded with the U low-pass filter, whose six
-                # poles are prescribed in Table 2 (in Hz, no zeros):
-                # a double real pole at -12 200 and complex-conjugate pairs
-                # at -7 850 +/- j8 800 and -2 900 +/- j12 150. The gain is
-                # renormalized to 0 dB at the 1 kHz reference frequency
-                # below (Table 1 note: zero tolerance at the reference
-                # frequency of IEC 651 subclause 3.7).
-                p_u = (
-                    2
-                    * np.pi
-                    * np.array(
-                        [
-                            -12200.0,
-                            -12200.0,
-                            -7850.0 + 8800.0j,
-                            -7850.0 - 8800.0j,
-                            -2900.0 + 12150.0j,
-                            -2900.0 - 12150.0j,
-                        ]
-                    )
-                )
-                p = np.concatenate([p.astype(complex), p_u])
-                if self.high_accuracy:
-                    # The U poles act up to 40 kHz, twice as high as the A/C
-                    # action (16-20 kHz) the 144 kHz design target was sized
-                    # for, so double the target to keep the same relative
-                    # bilinear-warping accuracy over the U roll-off. At
-                    # fs = 48 kHz this designs at 288 kHz and keeps the
-                    # 16 kHz deviation within about -0.7 dB of the IEC 61012
-                    # Table 1 nominal (+/-3 dB tolerance there).
-                    self._oversample = min(8, max(1, math.ceil(288000 / self.fs)))
-
-        elif self.curve == "468":
-            z, p, k = self._itu_r_468_design()
-
-        elif self.curve == "B":
-            # ANSI S1.4-1983 Appendix C (C2): the B weighting is the C
-            # weighting times f^2 / (f^2 + f5^2) in power, i.e. one more
-            # zero at the origin and one extra real pole at f5. Historical:
-            # B was dropped when IEC 61672-1 replaced the older meter
-            # standards; keep it for legacy data only.
-            f5 = 158.48932
-            z = np.array([0, 0, 0])
-            p = np.array(
-                [
-                    -2 * np.pi * f1,
-                    -2 * np.pi * f1,
-                    -2 * np.pi * f4,
-                    -2 * np.pi * f4,
-                    -2 * np.pi * f5,
-                ]
-            )
-            k = 1.0
-
-        elif self.curve == "D":
-            # Withdrawn IEC 537:1976 aircraft-noise weighting, from the
-            # published rational transfer function (module docstring):
-            # zeros at the origin and at the roots of s^2 + 6532 s
-            # + 4.0975e7; poles at -1776.3, -7288.5 and the roots of
-            # s^2 + 21514 s + 3.8836e8 (all in rad/s). The complex pairs
-            # are expanded with the quadratic formula so the design is
-            # exact and deterministic. Corroborated against SQAT and
-            # librosa (independent implementations).
-            zr = -6532.0 / 2.0
-            zi = math.sqrt(4.0975e7 - zr**2)
-            pr = -21514.0 / 2.0
-            pi = math.sqrt(3.8836e8 - pr**2)
-            z = np.array([0.0, complex(zr, zi), complex(zr, -zi)])
-            p = np.array([-1776.3, -7288.5, complex(pr, pi), complex(pr, -pi)])
-            k = 1.0
-
-        else:  # C weighting
-            z = np.array([0, 0])
-            p = np.array(
-                [-2 * np.pi * f1, -2 * np.pi * f1, -2 * np.pi * f4, -2 * np.pi * f4]
-            )
-            k = 5.91797e8
-
-        if self.curve != "G":
-            # Recalculate k to ensure 0 dB at 1 kHz, the reference frequency
-            # shared by every audio-band weighting (IEC 61672-1 for A/C,
-            # ANSI S1.4-1983 for B, IEC 537 for D, IEC 61012 for AU).
-            w = 2 * np.pi * 1000
-            h = k * np.prod(1j * w - z) / np.prod(1j * w - p)
-            k = k / np.abs(h)
-
-        return z, p, k
 
     def _init_filter_state(self, x_proc: np.ndarray) -> None:
         """Allocate or reallocate ``zi`` to match the input shape."""
@@ -569,69 +672,37 @@ class WeightingFilter:
         """
         refuse_foreign_rate(x, self.fs, "weighting filter")
         x_proc = resolve_samples(x)
-        if self.curve == "Z":
+        if self.curve == "Z" or x_proc.shape[-1] == 0:
+            # ``sosfilt`` refuses a record with no samples, and there is
+            # nothing to weight in one: hand it back in the shape it arrived
+            # in, leaving any carried state where it was.
             return like_input(x, x_proc)
 
         if self.stateful:
             if self._needs_zi_reinit(x_proc):
                 self._init_filter_state(x_proc)
             y, self.zi = signal.sosfilt(self.sos, x_proc, axis=-1, zi=self.zi)
-        elif self._oversample > 1:
-            if x_proc.shape[-1] == 0:
-                return like_input(x, x_proc)  # resample_poly rejects empty input
-            up = signal.resample_poly(x_proc, self._oversample, 1, axis=-1)
-            y_up = signal.sosfilt(self.sos, up, axis=-1)
-            y = signal.resample_poly(y_up, 1, self._oversample, axis=-1)
         else:
             y = signal.sosfilt(self.sos, x_proc, axis=-1)
 
         return like_input(x, cast(np.ndarray, y))
 
 
-def _resample_poly_fir(rate: int) -> np.ndarray:
-    """Anti-alias FIR that ``resample_poly`` designs for a 1:*rate* ratio.
-
-    ``scipy.signal.resample_poly`` documents (and implements) its default
-    filter as ``firwin(2 * half_len + 1, f_c, window=('kaiser', 5.0))`` with
-    ``half_len = 10 * max(up, down)`` and ``f_c = 1 / max(up, down)``
-    relative to Nyquist, then scales it by ``up``. Both stages of the
-    high-accuracy path use ``max(up, down) = rate``, so they share these taps;
-    the ``up`` scaling of the interpolation stage exactly offsets the energy
-    lost to zero-stuffing and is left out here, giving unit passband gain.
-    The cutoff lands on the *input* Nyquist frequency, so the transition band
-    straddles ``fs / 2``.
-    """
-    return np.asarray(
-        signal.firwin(2 * (10 * rate) + 1, 1.0 / rate, window=("kaiser", 5.0)),
-        dtype=np.float64,
-    )
-
-
 def _runtime_frequency_response(
     wf: WeightingFilter, frequencies: np.ndarray
 ) -> np.ndarray:
-    r"""Complex steady-state response of the *whole* filter path.
+    """Complex steady-state response of the *whole* filter path.
 
-    A non-stateful ``WeightingFilter`` with ``high_accuracy`` does not apply
-    its second-order sections to the input directly: it interpolates by
-    ``L = _oversample``, filters at ``L * fs`` and decimates back, so the
-    signal passes the ``resample_poly`` anti-alias FIR twice as well. That
-    cascade is linear and time-invariant at the input rate (interpolating by
-    L, filtering, then decimating by L convolves the input with
-    ``h[nL]``), and its response is the sum of the L spectral images that
-    the decimation folds onto each output frequency,
-
-    .. math::
-
-       G(f) = \sum_{k=0}^{L-1} H_\mathrm{FIR}^2(f - k f_s)\,
-              H_\mathrm{SOS}(f - k f_s),
-
-    evaluated at the ``L * fs`` design rate (the transfer functions are
-    periodic there, so images beyond the design Nyquist frequency need no
-    wrapping, and Hermitian symmetry gives the negative ones). Only the
-    ``k = 0`` term matters until the image at ``fs - f`` enters the
-    anti-alias transition band, which is exactly what happens as *f*
-    approaches ``fs / 2``.
+    The path is one cascade of second-order sections at the input rate, for
+    every curve and in both stateful and single-shot use, so this is a
+    ``sosfreqz`` and nothing else. It stays a function of its own because it is
+    what :mod:`phonometry.filters.weighting_compliance` and the conformance
+    report measure, and a verdict must describe the filter the caller runs. The
+    library used to reach its sections through an interpolation and a
+    decimation stage, and this function had to fold the images those stages
+    aliased back; with the design fitted at the input rate
+    (:mod:`phonometry.filters._weighting_design`) there is nothing left between
+    the input and the sections to model.
 
     :param wf: The weighting filter whose path is measured.
     :param frequencies: Frequencies in Hz, below the input Nyquist frequency.
@@ -640,36 +711,21 @@ def _runtime_frequency_response(
     f = np.asarray(frequencies, dtype=np.float64)
     if wf.curve == "Z" or wf.sos.size == 0:
         return np.ones_like(f, dtype=np.complex128)
-
-    fs_proc = wf.fs * wf._oversample
-    if wf._oversample == 1:
-        # Nothing is resampled, so the sections are the whole path. This also
-        # covers stateful mode, which is rejected at construction time
-        # together with ``high_accuracy`` and therefore always has an
-        # oversample factor of 1.
-        _, h = signal.sosfreqz(wf.sos, worN=f, fs=fs_proc)
-        return np.asarray(h, dtype=np.complex128)
-
-    images = f[None, :] - np.arange(wf._oversample)[:, None] * float(wf.fs)
-    flat = np.abs(images).ravel()
-    _, h_sos = signal.sosfreqz(wf.sos, worN=flat, fs=fs_proc)
-    _, h_fir = signal.freqz(_resample_poly_fir(wf._oversample), worN=flat, fs=fs_proc)
-    terms = (h_sos * h_fir**2).reshape(images.shape)
-    terms = np.where(images < 0.0, np.conj(terms), terms)
-    return np.asarray(terms.sum(axis=0), dtype=np.complex128)
+    _, h = signal.sosfreqz(wf.sos, worN=f, fs=wf.fs)
+    return np.asarray(h, dtype=np.complex128)
 
 
 @lru_cache(maxsize=32)
 def _cached_weighting_filter(
     fs: int, curve: str, high_accuracy: bool
 ) -> WeightingFilter:
-    """Reuse the (immutable, non-stateful) weighting-filter design.
+    """Reuse the (immutable, non-stateful) weighting-filter object.
 
     A non-stateful ``WeightingFilter`` never mutates its SOS in ``filter()``,
-    so the design (bilinear + zpk2sos, ~0.9 ms) can be cached and shared across
-    repeated ``weighting_filter()`` calls at the same rate/curve. The
-    high-accuracy filtering cost itself (oversample -> sosfilt -> decimate) is
-    inherent to IEC 61672-1 class 1 accuracy and is not cached.
+    so the object can be shared across repeated ``weighting_filter()`` calls at
+    the same rate and curve. The coefficients behind it are cached separately
+    by :func:`_weighting_sos`, which is where the design cost actually sits, so
+    a caller that builds the class directly does not pay the fit twice either.
     """
     return WeightingFilter(fs, curve, high_accuracy=high_accuracy)
 
@@ -822,9 +878,11 @@ def weighting_filter(
         'D' (withdrawn IEC 537 aircraft-noise weighting), 'G' (ISO 7196
         infrasound), 'AU' (IEC 61012), '468' (ITU-R BS.468-4 psophometric
         noise weighting) or 'Z' (bypass).
-    :param high_accuracy: Use internal oversampling for IEC 61672-1 class 1
-        accuracy at high frequencies (default True). The '468' curve requires
-        it and refuses False.
+    :param high_accuracy: Design the filter by fitting the analog prototype at
+        *fs* (default True), rather than by the plain bilinear transform, which
+        warps frequency and loses class 1 below 44.1 kHz. See
+        :meth:`WeightingFilter.__init__` for what each design costs. The '468'
+        curve requires the fitted design and refuses False.
     :return: The weighted record. A bare array in gives a bare array back; a
         :class:`~phonometry.io.Signal` gives a Signal, whose samples are
         already in pascals and whose factor therefore reads 1.0.

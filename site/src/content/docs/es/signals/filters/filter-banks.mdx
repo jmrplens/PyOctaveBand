@@ -222,8 +222,9 @@ que la cadena de captura le entrega:
   phonometry aceptan `fs` directamente.
 - **Bandas cerca de Nyquist.** Una banda cuyo borde superior se acerca a
   $f_\mathrm{s}/2$ no puede realizar su respuesta de diseño: la transformada bilineal
-  comprime allí el eje de frecuencias (el mismo efecto que los filtros de
-  ponderación contrarrestan con `high_accuracy`). Mantén el borde de la banda
+  comprime allí el eje de frecuencias (la misma deformación que los filtros de
+  ponderación cancelan ajustando su prototipo a la frecuencia de muestreo, cosa
+  que el banco no hace). Mantén el borde de la banda
   superior holgadamente por debajo de Nyquist o sube `fs`, y deja que
   `verify_filter_class` informe del margen restante.
 
@@ -643,7 +644,7 @@ aceptación de clase de la Tabla 1 y su verificación se han trasladado a
 [Verificación de clase de
 filtros](/phonometry/es/signals/filters/filter-compliance/). Cerca de Nyquist,
 la transformada bilineal deforma el eje de frecuencia y el banco no tiene
-corrección para ello (a diferencia de la opción `high_accuracy` de
+corrección para ello (a diferencia del diseño ajustado `high_accuracy` de
 `WeightingFilter`): mantén el borde superior de banda con margen cómodo
 respecto a Nyquist, o sube `fs`, y confirma el margen con
 `verify_filter_class`.

@@ -23,10 +23,11 @@ def test_weighting_filter_block_processing_matches_full_signal(
     # Random signal (deterministic via seed)
     signal = rng.standard_normal(n_samples)
 
-    # high_accuracy=False: the reference must use the same plain bilinear
-    # design as the stateful filter (this test verifies state continuity,
-    # not absolute response accuracy).
-    stateless_wf = filters.WeightingFilter(fs, filter_type, high_accuracy=False)
+    # Both sides run the default fitted design: with the resampling gone,
+    # stateful and single-shot are the same cascade of second-order sections
+    # at the input rate, so this compares state continuity against the very
+    # filter a caller gets, not against a lesser design kept for the purpose.
+    stateless_wf = filters.WeightingFilter(fs, filter_type)
     stateless_output = stateless_wf.filter(signal)
 
     stateful_wf = filters.WeightingFilter(fs, filter_type, stateful=True)
@@ -109,8 +110,8 @@ def test_weighting_filter_multichannel() -> None:
 
     x = rng.standard_normal((n_channels, n_samples))
 
-    # Full-signal reference (stateless, same plain bilinear design as stateful)
-    ref_wf = filters.WeightingFilter(fs, "A", high_accuracy=False)
+    # Full-signal reference: the same fitted design the stateful filter runs
+    ref_wf = filters.WeightingFilter(fs, "A")
     ref_out = ref_wf.filter(x)
 
     # Block-wise stateful
@@ -134,14 +135,22 @@ def test_stateful_weighting_invalid_fs_raises() -> None:
         filters.WeightingFilter(fs=-48000, stateful=True)
 
 
-def test_stateful_weighting_high_accuracy_raises() -> None:
-    """high_accuracy resampling is incompatible with block processing."""
+def test_stateful_weighting_keeps_the_accurate_design() -> None:
+    """Block processing no longer costs the caller the accurate design.
+
+    The two used to be mutually exclusive because ``high_accuracy`` meant an
+    interpolation and a decimation stage around the sections, and a resampler
+    cannot be driven block by block. The fitted design is a plain cascade at
+    the input rate, so the combination is now ordinary -- and the default, so a
+    caller who asks for block processing and nothing else gets the same
+    response as one who does not.
+    """
     from phonometry import filters
 
-    with pytest.raises(
-        ValueError, match="high_accuracy is not compatible with stateful"
-    ):
-        filters.WeightingFilter(fs=48000, stateful=True, high_accuracy=True)
+    stateful = filters.WeightingFilter(fs=48000, stateful=True)
+    assert stateful.high_accuracy is True
+    single = filters.WeightingFilter(fs=48000)
+    np.testing.assert_array_equal(stateful.sos, single.sos)
 
 
 def test_stateful_weighting_invalid_curve_raises() -> None:

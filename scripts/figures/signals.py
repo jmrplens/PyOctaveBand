@@ -927,7 +927,7 @@ def generate_zero_phase_comparison(output_dir: str) -> None:
 
 
 def generate_weighting_accuracy_hf(output_dir: str) -> None:
-    """Compare A-weighting HF accuracy: analytic vs bilinear vs high_accuracy."""
+    """Compare A-weighting HF accuracy: analytic vs bilinear vs the fitted design."""
     print("Generating weighting_accuracy_hf.png...")
     fs = 48000
 
@@ -975,7 +975,7 @@ def generate_weighting_accuracy_hf(output_dir: str) -> None:
         accurate,
         color=COLOR_PRIMARY,
         linestyle="-.",
-        label="Oversampled (high_accuracy=True)",
+        label="Fitted at the sample rate (high_accuracy=True)",
     )
     ax.set_title(
         rf"A-Weighting High-Frequency Accuracy @ $f_{{\mathrm{{s}}}}$ = {fs // 1000} kHz",
@@ -996,7 +996,7 @@ def generate_weighting_accuracy_hf(output_dir: str) -> None:
         accurate - reference,
         color=COLOR_PRIMARY,
         linestyle="-.",
-        label="high_accuracy error",
+        label="Fitted-design error",
     )
     ax_err.axhline(
         -2.5, color="gray", linestyle=":", label="Class 1 lower limit @ 12.5 kHz"
@@ -2552,12 +2552,13 @@ def generate_streaming_level_seams(output_dir: str) -> None:
     def to_db(env: np.ndarray) -> np.ndarray:
         return np.asarray(10 * np.log10(np.maximum(env, 1e-16) / (2e-5) ** 2))
 
-    # The reference must use the *same* weighting design streaming can use:
-    # the oversampled high_accuracy path is not block-compatible, so a
-    # comparison against it would show a design difference, not a state one.
+    # Every path here takes the default design: with the resampling gone,
+    # streaming and single-shot weighting are the same cascade of sections at
+    # the input rate, so what the figure shows is a state difference and
+    # nothing else.
     continuous = to_db(
         filters.time_weighting(
-            filters.weighting_filter(x, fs, curve="A", high_accuracy=False),
+            filters.weighting_filter(x, fs, curve="A"),
             fs,
             mode="fast",
         )
@@ -2580,7 +2581,6 @@ def generate_streaming_level_seams(output_dir: str) -> None:
                         x[i * block : (i + 1) * block],
                         fs,
                         curve="A",
-                        high_accuracy=False,
                     ),
                     fs,
                     mode="fast",

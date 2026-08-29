@@ -88,8 +88,9 @@ capture chain delivered:
   the native rate: every phonometry function takes `fs` directly.
 - **Bands near Nyquist.** A band whose upper edge approaches $f_\mathrm{s}/2$ cannot
   realize its design response: the bilinear transform compresses the
-  frequency axis there (the same effect the weighting filters counter with
-  `high_accuracy`). Keep the top band edge comfortably below Nyquist or raise
+  frequency axis there (the same warping the weighting filters cancel by
+  fitting their prototype at the sample rate, which the bank does not do).
+  Keep the top band edge comfortably below Nyquist or raise
   `fs`, and let `verify_filter_class` report how much margin is left.
 
 ### How long must the record be?

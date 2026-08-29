@@ -75,7 +75,7 @@ overload recovery, linearity, the environmental influence quantities — apply
 to an instrument and are not implemented, so a class verdict here is a
 statement about the design and not about a device. Near Nyquist the bilinear
 transform warps the frequency axis and the bank carries no correction for it,
-unlike the `high_accuracy` option of the weighting filters: the stopband
+unlike the fitted `high_accuracy` design of the weighting filters: the stopband
 beyond the processing Nyquist is reported as `range_limited` rather than
 verified, so keep the top band edge comfortably below Nyquist or raise `fs`.
 Two operations do not stream: zero-phase forward-backward filtering needs the

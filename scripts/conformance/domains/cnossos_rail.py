@@ -21,7 +21,7 @@ import reference_data as ref
 
 import phonometry as ph
 
-from ..registry import Outcome, numeric, register
+from ..registry import Outcome, count, numeric, register
 
 if TYPE_CHECKING:
     from phonometry.environment import RailwayEmissionResult
@@ -140,12 +140,10 @@ def _chk_cnossos_rail_roughness_tables() -> Outcome:
     for cls, expected in (("E", ref.CNOSSOS_RAIL_G1B_E), ("M", ref.CNOSSOS_RAIL_G1B_M)):
         _, levels = ph.environment.rail_roughness(cls)
         bad += sum(1 for a, b in zip(levels, expected, strict=True) if a != b)
-    return numeric(
-        0.0,
-        float(bad),
-        0.0,
-        unit="mismatches",
-        places=0,
+    return count(
+        166 - bad,
+        166,
+        subject="coefficients",
         expected_label="166 coefficients identical",
     )
 
@@ -160,12 +158,10 @@ def _chk_cnossos_rail_table_g2() -> Outcome:
     for key, expected in ref.CNOSSOS_RAIL_G2.items():
         _, levels = ph.environment.contact_filter(key)
         bad += sum(1 for a, b in zip(levels, expected, strict=True) if a != b)
-    return numeric(
-        0.0,
-        float(bad),
-        0.0,
-        unit="mismatches",
-        places=0,
+    return count(
+        175 - bad,
+        175,
+        subject="coefficients",
         expected_label="175 coefficients identical",
     )
 
@@ -200,12 +196,10 @@ def _chk_cnossos_rail_table_g3() -> Outcome:
         )
         if a != b
     )
-    return numeric(
-        0.0,
-        float(bad),
-        0.0,
-        unit="mismatches",
-        places=0,
+    return count(
+        312 - bad,
+        312,
+        subject="coefficients",
         expected_label="312 coefficients identical",
     )
 
@@ -234,12 +228,10 @@ def _chk_cnossos_rail_source_tables() -> Outcome:
             for a, b in zip(ph.environment.bridge_transfer(key), expected, strict=True)
             if a != b
         )
-    return numeric(
-        0.0,
-        float(bad),
-        0.0,
-        unit="mismatches",
-        places=0,
+    return count(
+        371 - bad,
+        371,
+        subject="coefficients",
         expected_label="371 coefficients identical",
     )
 

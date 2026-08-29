@@ -76,7 +76,7 @@ overload recovery, linearity, the environmental influence quantities — apply
 to an instrument and are not implemented, so a class verdict here is a
 statement about the design and not about a device. Near Nyquist the bilinear
 transform warps the frequency axis and the bank carries no correction for it,
-unlike the `high_accuracy` option of the weighting filters: the stopband
+unlike the fitted `high_accuracy` design of the weighting filters: the stopband
 beyond the processing Nyquist is reported as `range_limited` rather than
 verified, so keep the top band edge comfortably below Nyquist or raise `fs`.
 Two operations do not stream: zero-phase forward-backward filtering needs the
@@ -180,8 +180,9 @@ capture chain delivered:
   the native rate: every phonometry function takes `fs` directly.
 - **Bands near Nyquist.** A band whose upper edge approaches $f_\mathrm{s}/2$ cannot
   realize its design response: the bilinear transform compresses the
-  frequency axis there (the same effect the weighting filters counter with
-  `high_accuracy`). Keep the top band edge comfortably below Nyquist or raise
+  frequency axis there (the same warping the weighting filters cancel by
+  fitting their prototype at the sample rate, which the bank does not do).
+  Keep the top band edge comfortably below Nyquist or raise
   `fs`, and let `verify_filter_class` report how much margin is left.
 
 ### How long must the record be?
@@ -1509,7 +1510,7 @@ for x in audio_stream(block):            # your capture callback
 | `detrend` | must be `False` | Per-block detrending creates boundary discontinuities |
 | `resample` | must be `False` | The resampler is not stateful |
 | `zero_phase` | unsupported | Forward-backward filtering needs the whole signal |
-| `high_accuracy` (weighting) | resolves to `False` by default (the legacy bilinear design, see [Frequency Weighting](https://jmrplens.github.io/phonometry/signals/levels/weighting/)); explicitly passing `True` raises `ValueError` | The polyphase resampling inside is block-incompatible |
+| `high_accuracy` (weighting) | no constraint: defaults to `True` as everywhere else (see [Frequency Weighting](https://jmrplens.github.io/phonometry/signals/levels/weighting/)) | The accurate design is a plain cascade of second-order sections at the input rate, so it carries state like any other |
 | `steady_ic` | optional | Starts the filters in step-response steady state |
 
 ## See also

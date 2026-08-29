@@ -69,6 +69,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `verify_weighting_class(wf, edition="1979")` grades a frequency weighting
+  against IEC 651:1979 Table V, which publishes the laboratory-grade **Type 0**
+  mask that IEC 61672-1:2013 has no equivalent for, plus Types 1, 2 and 3. The
+  argument is the one `verify_filter_class` already takes to reach the
+  IEC 61260:1995 class 0, and `weighting_class_limits` takes it too; class `N`
+  is the standard's instrument Type `N`, so a verdict carries a
+  `margin_class0_db` through `margin_class3_db` per band and for the
+  between-nominals sweep. The default stays `"2013"` and its output is
+  unchanged.
+
+  The two masks are not the same mask wearing different names, which is the
+  reason for carrying both. Type 0 holds +2/-3 dB at 16 kHz and at 20 kHz,
+  where class 1 opens to +2.5/-16 dB and imposes no lower limit at all: the
+  plain bilinear A design at 48 kHz sits 15.7 dB low at the 20 kHz row, earns
+  class 1 for it, and is refused Type 0. The fitted A and C designs earn
+  Type 0 at 32, 44.1, 48, 96 and 192 kHz, binding on the +/-0.7 dB pass-band
+  cells with about 0.65 dB to spare. The edition covers A, B and C, the
+  weightings IEC 651 defines; its Table V footnote makes one mask govern every
+  weighting characteristic, so B is held to those limits rather than borrowing
+  the ANSI ones. The IEC 651 and ANSI S1.4-1983 Type 0 columns stay two
+  separate transcriptions: they disagree at 10, 12.5 and 16 Hz, where ANSI is
+  two-sided and stricter and IEC 651 is upper-only.
+
 - `Signal.pick` and `Signal.crop` narrow a recording to a set of channels or
   to a span of seconds and keep it a recording. Indexing a `Signal` yields its
   samples, which is what makes it a drop-in for the array it replaced, and the
@@ -98,6 +121,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the way `DecayCurve` replaced its own tuple return.
 
 ### Fixed
+
+- The ANSI S1.4-1983 Table V Type 2 cell at 20 Hz is read as +/-3 dB. It
+  prints a bare "+3" where every one-sided cell of that same column prints
+  "+5, -inf", and the transcription had taken it as upper-only with the
+  alternative reading noted. IEC 651:1979 Table V, which agrees with the
+  column at all thirty-three other rows, prints "+/-3" at exactly that cell,
+  so the missing bar under the plus sign is a defect of the ANSI print rather
+  than a national deviation. The B weighting sits 0.05 dB below nominal there,
+  so no shipped verdict moves; what moves is that a filter with a real fault
+  at 20 Hz can no longer pass by falling through a limit that was never
+  published.
 
 - The ISO 12354 detailed fiches drew the curve they rate without a legend
   entry. The sheet moves the legend above the axes, which means removing the
@@ -223,6 +257,81 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   across parallel front ends. A guard that cannot fire today is not always
   dead weight. One that genuinely was, an early-out in `ecma` whose condition
   the two branches above had already taken, is gone.
+
+### Changed
+
+- The frequency weightings are designed at the sample rate instead of being
+  outrun at eight times it. Every curve in `filters.weighting` starts as poles
+  and zeros in the s plane, and the bilinear transform that makes a digital
+  filter of them is exact in magnitude and wrong in frequency: it puts the
+  prototype's response at `2 fs tan(pi f / fs)` rather than at `2 pi f`. The
+  library used to hide that by interpolating, filtering at three to eight
+  times the rate and decimating back. `high_accuracy=True` now means something
+  else: a design routine fits an analog prototype of the same structure whose
+  response *at the warped frequencies* is the printed prototype's response at
+  the true ones, and transforms that. What runs is one cascade of second-order
+  sections at the input rate, with nothing around it.
+
+  Three limitations went with the resampling. The anti-alias filter of those
+  stages had its transition band on the input Nyquist frequency and the signal
+  crossed it twice, which put a floor of about 1.7 dB on everything above 0.9
+  of Nyquist whatever the design rate: at 32 kHz the A weighting read 16.2 dB
+  low at the 15 848.9 Hz row of IEC 61672-1 Table 3, over the -16.0 dB class 1
+  limit, and verified only to class 2; the AU weighting read 16.3 dB low at the
+  same point against a +/-3.0 dB tolerance and verified to no class at all; and
+  the 20 kHz row of ITU-R BS.468-4 Table 1 read 2.1 dB low at 44.1 kHz against
+  a +/-2.0 dB tolerance and had to be excused from its own test. Those three
+  now read -0.008, -0.012 and -0.019 dB. A and C verify to class 1 at every
+  sample rate from 8 kHz up, and at every Table 3 row their deviation stays
+  inside the 0.05 dB the table itself is rounded to.
+
+  Block processing was the second: a resampler cannot be driven block by
+  block, so `stateful=True` forced `high_accuracy=False` and asking for both
+  raised. They are independent now, `stateful` defaults to the accurate design
+  like everything else, and stitched blocks reproduce a single call bit for
+  bit. `WeightingFilter(fs, "468", stateful=True)` built and refused for that
+  reason; it builds. `high_accuracy=False` is still refused for that curve,
+  because the plain bilinear design is 23 dB out at 16 kHz and BS.468-4 prints
+  one mask with no lower grade.
+
+  The third was speed. Weighting one minute of 44.1 kHz audio costs about
+  18 ms where it cost 377 ms for A and 775 ms for 468, and holds 21 MB of
+  intermediates instead of 169 MB. The design itself costs about 70 ms and is
+  cached per curve, rate and mode, so even a first call is quicker than the
+  path it replaces: 85 ms against 377 for A, 92 against 775 for 468.
+
+  `high_accuracy=False` keeps its old meaning: the plain bilinear transform of
+  the printed prototype, the closed form a reader can check against the
+  standard term by term. It verifies to class 1 for fs >= 44 100 Hz, degrades
+  to class 2 at 32 000 and 22 050 Hz, and meets no class at 16 000 Hz.
+
+  What is shipped is the routine, not a table of coefficients: nothing between
+  the standard's constants and the sections a caller runs is stored, and a test
+  re-derives every filter in the library from the printed prototype and pins
+  the residual against it. Each factor is `s^2 + exp(t1) s + exp(t0)`, whose
+  Routh-Hurwitz condition holds for any real `t`, so no step of the search can
+  produce an unstable filter; the work is a fixed budget of Levenberg-Marquardt
+  steps and Lawson reweighting rounds, with no random state and no dependence
+  on wall clock or thread count.
+
+  Sample rates below twice the reference frequency are designed too, and they
+  need saying because they are the one place the routine does something other
+  than fit. There is no digital frequency to read 0 dB at when the frequency
+  the standard normalises at is past the Nyquist frequency, and asking the
+  bilinear warp `2 fs tan(pi f / fs)` for it anyway does not fail: it answers
+  with the alias, which is dc whenever the rate divides the reference
+  frequency, and dc is where every one of these curves has a zero. Both the
+  fit and the realised cascade are anchored at the middle of the fit band
+  instead, and pinned there to the printed curve's own level rather than to
+  0 dB, so the absolute gain is still the standard's: a 200 Hz tone reads the
+  same decibels at `fs = 903` as at 48 kHz. Where a first fit comes back more
+  than 0.2 dB from the printed curve, which happens well below the audio band
+  and nowhere in it, the spare factors of the padded prototype are restarted
+  from other corners and the best result is kept. Measured over fifteen
+  thousand curve and rate pairs from 2 Hz to 200 kHz, every design is finite,
+  and over the ten rates from 100 Hz to 2 kHz the worst deviation from the
+  printed curve is 0.31 dB against the 0.45 dB the oversampled path reached
+  over the same seventy pairs.
 
 ### Changed
 

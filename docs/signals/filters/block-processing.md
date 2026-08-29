@@ -191,7 +191,7 @@ for x in audio_stream(block):            # your capture callback
 | `detrend` | must be `False` | Per-block detrending creates boundary discontinuities |
 | `resample` | must be `False` | The resampler is not stateful |
 | `zero_phase` | unsupported | Forward-backward filtering needs the whole signal |
-| `high_accuracy` (weighting) | resolves to `False` by default (the legacy bilinear design, see [Frequency Weighting](../levels/weighting.md)); explicitly passing `True` raises `ValueError` | The polyphase resampling inside is block-incompatible |
+| `high_accuracy` (weighting) | no constraint: defaults to `True` as everywhere else (see [Frequency Weighting](../levels/weighting.md)) | The accurate design is a plain cascade of second-order sections at the input rate, so it carries state like any other |
 | `steady_ic` | optional | Starts the filters in step-response steady state |
 
 ## See also
