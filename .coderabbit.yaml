@@ -12,8 +12,15 @@ reviews:
   # default left exactly the part that most needs reading unreviewed and
   # answered with a note about checking this file.
   auto_review:
+    enabled: true
     base_branches:
       - ".*"
+    # A bot commit carries no reviewable intent: dependabot bumps a pin and
+    # github-actions stamps a generated artifact, and neither is a decision
+    # anyone needs read back to them.
+    ignore_usernames:
+      - "github-actions[bot]"
+      - "dependabot[bot]"
   path_instructions:
     - path: "docs/**"
       instructions: >-
