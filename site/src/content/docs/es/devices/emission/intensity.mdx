@@ -757,27 +757,84 @@ print(power.expanded_uncertainty)            # [6. 4. 4. 3. 3. 3.] dB
 print(np.round(power.confidence_interval[0], 1))     # [-1.7  1.2] dB
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/discrete_point_qualification_es.svg" alt="Dos paneles apilados sobre seis bandas de octava de 125 Hz a 4 kHz para un muestreo de dieciséis posiciones. Arriba, las posiciones que exige el criterio 2, C por F4 al cuadrado, como una pareja de barras por banda para el grado 1 y el grado 2, frente a una línea discontinua en las dieciséis posiciones medidas: la exigencia crece con la frecuencia, la barra del grado 1 pasa la línea en 2 kHz y llega a 30 en 4 kHz, la del grado 2 se queda por debajo en todas las bandas, y la pareja de 125 Hz aparece en gris porque el criterio 1 ya falló ahí. Una etiqueta sobre cada banda nombra el grado alcanzado: sin grado, grado 1, grado 1, grado 1, grado 2, grado 2. Abajo, el intervalo de confianza del 95 % de la fórmula B.3 banda a banda, que se ensancha desde unos más menos medio decibelio en 125 Hz hasta más 1,3 y menos 1,9 decibelios en 4 kHz" width="92%" />
+
+*El grado es un presupuesto de posiciones, y se gasta banda a banda. El
+muestreo dibujado aquí es un segundo, de una máquina que radia de forma
+desigual, y una sola magnitud gobierna sus dos paneles: la no uniformidad de
+campo $F_4$ decide cuántas posiciones pide el criterio 2 y cuánto abre el
+intervalo la fórmula (B.3). Su campo se vuelve menos uniforme con la
+frecuencia, como le pasa a una fuente cuya radiación se hace directiva, así que
+las dos bandas altas piden más de las dieciséis posiciones medidas para el
+grado 1 y se conforman con el grado 2, mientras que la de 125 Hz ni siquiera
+llega al criterio 2: su $F_2$ ya está por encima de la $L_\mathrm{d}$ del
+instrumento, y la figura B.1 la manda a una casilla de acción. El grado 3 no
+sale en ninguno de los dos paneles, porque la tabla B.2 no le da ninguna $C$
+por bandas que dibujar.*
+
 <details>
-<summary>Ver el código de la figura de potencia acústica</summary>
+<summary>Ver el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import emission
+
+# El muestreo propio de la figura, que no es el ejemplo de arriba: dieciséis
+# posiciones sobre una máquina de 1,2 m x 0,8 m x 1,0 m apoyada en un suelo
+# reflectante, medidas a los 0,5 m que pide la norma, así que la caja mide
+# 2,2 m x 1,8 m x 1,5 m y suma 15,96 m2. El campo se escribe desde sus dos
+# indicadores en vez de sortearse. F2 se ensancha hacia baja frecuencia según
+# el campo se vuelve reactivo; F4 se ensancha hacia alta frecuencia según la
+# radiación se hace directiva y el flujo se concentra en parte de la
+# superficie, que es el crecimiento del que trata el criterio 2.
+freqs = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+areas = np.concatenate([np.full(4, 3.96 / 4),    # cara superior, 2,2 m x 1,8 m
+                        np.full(6, 3.3 / 3),     # los dos laterales largos
+                        np.full(6, 2.7 / 3)])    # los dos testeros
+surface_pressure = 84.0
+nonuniformity = np.array([0.25, 0.30, 0.38, 0.45, 0.58, 0.72])   # F4 objetivo
+pressure_intensity = np.array([11.5, 8.0, 6.0, 4.5, 3.5, 3.0])   # F2 objetivo
+rng = np.random.default_rng(9614)
+spread = rng.normal(0.0, 1.0, (areas.size, freqs.size))
+spread = (spread - spread.mean(axis=0)) / spread.std(axis=0, ddof=1)
+mean_intensity = 10.0 ** ((surface_pressure - pressure_intensity) / 10.0) * 1e-12
+normal_intensity = mean_intensity * (1.0 + nonuniformity * spread)
+
+survey = emission.sound_power_intensity_points(
+    normal_intensity, areas,
+    pressure_levels=np.full((areas.size, freqs.size), surface_pressure),
+    pressure_residual_index=20.0,    # Ld = 20 - 10 = 10 dB (tabla 1, octavas)
+    frequencies=freqs, band_type="octave",
+)
 
 # Una línea: el espectro de potencia acústica por bandas, con las bandas fuera
 # del método rayadas y el total ponderado A en el título:
-power.plot(language="es")
+survey.plot(language="es")
 plt.show()
 
-# A mano, a partir de los campos por banda que lleva el resultado:
-fig, ax = plt.subplots()
-ax.bar(np.arange(power.frequencies.size), np.nan_to_num(power.sound_power_level),
-       color="#1f77b4")
-ax.set_xticks(np.arange(power.frequencies.size))
-ax.set_xticklabels([f"{f:g}" for f in power.frequencies])
-ax.set_xlabel("Frecuencia [Hz]")
-ax.set_ylabel("Nivel de potencia acústica $L_W$ [dB re 1 pW]")
-ax.set_title("Espectro de potencia acústica ISO 9614-1 "
-             f"($L_{{WA}}$ = {power.sound_power_level_a:.1f} dB(A))")
+# La figura de calificación de arriba, a mano, a partir de los campos que lleva
+# el resultado y del factor de la tabla B.2 que expone el módulo.
+bands = np.arange(freqs.size)
+required = {
+    grade: np.array([emission.position_count_factor(grade, float(f),
+                                                    band_type="octave")
+                     for f in freqs]) * survey.f4 ** 2
+    for grade in ("precision", "engineering")
+}
+fig, (axt, axb) = plt.subplots(2, 1, sharex=True)
+for offset, grade, color in ((-0.18, "precision", "#1f77b4"),
+                             (+0.18, "engineering", "#2ca02c")):
+    axt.bar(bands + offset, required[grade], width=0.36, color=color)
+axt.axhline(survey.positions, color="#d62728", linestyle="--")
+axt.set_ylabel("Posiciones necesarias, $C F_4^2$")
+interval = survey.confidence_interval
+axb.errorbar(bands, np.zeros_like(bands, dtype=float),
+             yerr=np.vstack([-interval[:, 0], interval[:, 1]]), fmt="o", capsize=6)
+axb.set_ylabel("Intervalo del 95 % [dB]")
+axb.set_xticks(bands)
+axb.set_xticklabels([f"{f:g}" for f in freqs])
+axb.set_xlabel("Frecuencia [Hz]")
 plt.show()
 ```
 
@@ -948,19 +1005,20 @@ $\delta_{pI0}$ y desfase en ambos sentidos. ISO 9614-1:1993 para los
 indicadores de campo del Anexo A $F_1$ a $F_4$
 (`temporal_variability_indicator`, `field_indicators`) con el límite de la
 tabla B.3 sobre $F_1$, y el criterio de capacidad dinámica del Anexo B
-(`dynamic_capability_index`).
+(`dynamic_capability_index`); y su propia determinación de potencia acústica
+en puntos discretos, apartados 8 y 9, que suma las potencias parciales
+$I_{\mathrm{n}i} \cdot S_i$ hasta $L_W$ (fórmulas (11) y (12)) y la califica
+frente al Anexo B: el criterio 1, la puerta de flujo entrante de la figura B.1
+y el criterio 2 con el factor $C$ de la tabla B.2, las acciones de la tabla
+B.3, el intervalo de confianza de la fórmula (B.3), la incertidumbre de la
+tabla 2 y el procedimiento opcional de concentración del apartado 8.3.2
+(`sound_power_intensity_points`, `position_count_factor`,
+`determination_standard_deviation`, `error_factor`,
+`normal_intensity_from_levels`, `partial_power_concentration`).
 </ScopeClaim>
 
 <ScopeClaim status="not-covered" label="No cubierto">
-La propia determinación de potencia acústica de ISO 9614-1, apartados 8 y 9,
-que suma las potencias parciales $I_i \cdot S_i$ de los puntos de medida
-discretos hasta $L_W$, no está implementada como función aquí:
-`sound_intensity` y `field_indicators` informan de la intensidad y la calidad
-de campo, no de una potencia sumada. Las vías de barrido que sí calculan $L_W$
-a partir de la intensidad (ISO 9614-2 e ISO 9614-3) están en la guía de
-[potencia acústica por barrido de
-intensidad](/phonometry/es/devices/emission/sound-power-intensity/). El propio
-*ensayo* de intensidad residual de IEC 61043 tampoco lo realiza la biblioteca:
+El *ensayo* de intensidad residual de IEC 61043 no lo realiza la biblioteca:
 $\delta_{pI0}$ es un valor que quien mide obtiene en su propia cadena
 sonda-analizador, con el espaciador que va a montar, y aporta — el
 procedimiento está en *Medir el índice residual*, más arriba, y lo que

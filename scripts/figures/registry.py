@@ -105,6 +105,7 @@ from .correlation_analysis import (
 )
 from .devices import (
     generate_channel_weight_map,
+    generate_discrete_point_qualification,
     generate_distortion,
     generate_duct_attenuation_elements,
     generate_duct_mode_cut_on,
@@ -782,6 +783,9 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_sound_power_pressure_result,
     generate_sound_power_reverberation_result,
     generate_sound_power_intensity_result,
+    # ISO 9614-1 discrete points: the criterion-2 position budget per band and
+    # the Formula (B.3) interval the same F4 opens.
+    generate_discrete_point_qualification,
     # Human vibration (ISO 8041-1, ISO 2631-1/-2/-4, ISO 5349-1/-2,
     # Directive 2002/44/EC): frequency weighting, weighted a_w, daily A(8)
     generate_vibration_weighting,

@@ -1309,10 +1309,13 @@ def _a_weighted_factor(
     B.1.2 asks for "the largest value of C in the frequency range comprised by
     this sum for the required grade", and Note 11 qualifies it: where the
     800 Hz to 5 kHz one-third-octave bands contribute less than half of the
-    A-weighted level, the C values of the 200 Hz to 630 Hz bands are used
-    instead. The Note is written for one-third octaves; the octave row covering
-    the same decade (1 kHz to 4 kHz) is treated the same way, since it is the
-    same row of Table B.2 read in the other column.
+    A-weighted sound *power*, the C values of the 200 Hz to 630 Hz bands are
+    used instead. The comparison is of powers, not of levels: the Spanish print
+    says "menos de la mitad del nivel total", which is not a defined operation,
+    and the ISO text it translates says "less than half the total power" (see
+    ``docs/ERRATA.md``). The Note is written for one-third octaves; the octave
+    row covering the same decade (1 kHz to 4 kHz) is treated the same way,
+    since it is the same row of Table B.2 read in the other column.
     """
     if grade == "survey":
         return position_count_factor(grade)

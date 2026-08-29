@@ -92,6 +92,7 @@ from figures.correlation_analysis import (
     generate_tsa_noise_reduction,
 )
 from figures.devices import (
+    generate_discrete_point_qualification,
     generate_distortion,
     generate_duct_mode_cut_on,
     generate_duct_path_cascade,
@@ -525,6 +526,7 @@ __all__ = [
     "generate_diffuser_prediction",
     "generate_diffusion_goniometer_geometry",
     "generate_diffusion_polar",
+    "generate_discrete_point_qualification",
     "generate_distortion",
     "generate_double_wall_geometry",
     "generate_duct_mode_cut_on",

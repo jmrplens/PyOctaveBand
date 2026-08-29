@@ -1068,6 +1068,25 @@ _ES_EXACT = {
     "Partial power level per segment [dB re 1 pW], the box unfolded": "Nivel de potencia parcial por segmento [dB re 1 pW], "
     "la caja desplegada",
     "Face total [dB]": "Total por cara [dB]",
+    # discrete_point_qualification: the ISO 9614-1 criterion-2 position budget
+    # and the Formula (B.3) interval. The grade names are Table B.2's own
+    # Spanish column headings (precisión / peritaje / control).
+    "Discrete-point sound power (ISO 9614-1): criterion 2 band by band": "Potencia acústica en puntos discretos (ISO 9614-1): "
+    "criterio 2 banda a banda",
+    "Positions required, $C F_4^2$": "Posiciones necesarias, $C F_4^2$",
+    "Positions measured, $N$": "Posiciones medidas, $N$",
+    "Grade 1 (precision)": "Grado 1 (precisión)",
+    "Grade 2 (engineering)": "Grado 2 (peritaje)",
+    "Grade 1": "Grado 1",
+    "Grade 2": "Grado 2",
+    "No grade": "Sin grado",
+    "95 % interval [dB]": "Intervalo del 95 % [dB]",
+    "125 Hz never reaches criterion 2:\n"
+    "$F_2 > L_\\mathrm{d}$ sends it to action a or b": "La banda de 125 Hz no llega al criterio 2:\n"
+    "$F_2 > L_\\mathrm{d}$ la manda a la acción a o b",
+    "Formula (B.3): $10\\lg(1 \\pm 2 F_4/\\sqrt{N})$,\n"
+    "the sampling part of the band uncertainty": "Fórmula (B.3): $10\\lg(1 \\pm 2 F_4/\\sqrt{N})$,\n"
+    "la parte de muestreo de la incertidumbre de la banda",
     # spacer_bandwidth: what each p-p spacer costs at both ends (the decimal
     # comma inside the mathtext is baked in with the brace-guarded {,} form)
     "High end: the finite-difference bias, and "

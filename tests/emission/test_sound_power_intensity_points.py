@@ -629,6 +629,31 @@ def test_action_d_when_criterion_2_fails_with_little_inward_flow() -> None:
     assert result.required_actions()[0] == (ActionCode.INCREASE_DISTANCE_OR_POSITIONS,)
 
 
+def test_action_d_is_the_action_at_exactly_one_decibel() -> None:
+    """Table B.3's rows c and d overlap at F3 - F2 = 1 dB; Figure B.1 gives it to d.
+
+    The action-c row is conditioned on ``1 dB <= (F3 - F2) <= 3 dB`` and the
+    action-d row on ``(F3 - F2) <= 1 dB``, so the printed table prescribes two
+    different actions for that one state (see ``docs/ERRATA.md``). Figure B.1
+    settles it: the "(F3 - F2) <= 1 dB ?" diamond sends its Yes branch to the
+    optional procedure and to action d. The boundary is set on the result
+    rather than tuned into the intensities, because 1 dB has to be exactly
+    1 dB for the case to be the one the two rows disagree about.
+    """
+    import dataclasses
+
+    intensity = np.array([4e-5, 3e-5, 2e-5, 1e-5, 5e-6, 5e-6, 5e-6, 5e-6, 5e-6, 5e-6])
+    result = _qualified_case(intensity)
+    assert result.criterion_2 is not None
+    assert not bool(result.criterion_2[0])
+    on_the_boundary = dataclasses.replace(
+        result, f2=np.array([5.0]), f3=np.array([6.0])
+    )
+    assert on_the_boundary.required_actions()[0] == (
+        ActionCode.INCREASE_DISTANCE_OR_POSITIONS,
+    )
+
+
 def test_a_qualified_band_calls_for_no_action() -> None:
     """Figure B.1's "final result" branch: every gate passed, nothing to change."""
     intensity, areas = _uniform_surface(positions=20)
