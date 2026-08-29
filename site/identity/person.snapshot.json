@@ -37,6 +37,14 @@
   "url": "https://jmrp.io/",
   "mainEntityOfPage": "https://jmrp.io/about/",
   "publishingPrinciples": "https://jmrp.io/about/#editorial",
+  "potentialAction": {
+    "@type": "DonateAction",
+    "name": "Sponsor this work on GitHub",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://github.com/sponsors/jmrplens"
+    }
+  },
   "image": {
     "@type": "ImageObject",
     "url": "https://jmrp.io/identity/avatar.png",
