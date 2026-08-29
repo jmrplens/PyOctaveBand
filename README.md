@@ -30,6 +30,8 @@ regenerates it on every pull request. Filters are class 1 per
 **IEC 61260-1:2014 / ANSI S1.11-2004** and weightings and levels class 1 per
 **IEC 61672-1:2013**.
 
+<a href="https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/badges/conformance-summary_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/badges/conformance-summary.svg" alt="All 566 conformance checks pass, across 59 domains and 373 standards"></picture></a>
+
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_pillar_hall_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_pillar_hall.gif" alt="Animation: an 800 Hz plane wavefront sweeps through a hall of rigid columns in a 2D FDTD simulation; every column diffracts the front and the scattered wavelets interfere until the whole hall is filled" width="100%"></picture>
 
 *An 800 Hz wavefront threading a hall of columns, computed with the library's

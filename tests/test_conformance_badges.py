@@ -41,6 +41,18 @@ _ROOT = pathlib.Path(__file__).resolve().parent.parent
 #: and Starlight's page colour on the documentation site.
 _GROUNDS = ("#ffffff", "#0d1117", "#22272e", "#17181c")
 
+#: The pictographic blocks, and nothing else: emoji and dingbats (U+2600-27BF,
+#: which is where the tick, the cross and the warning sign live), the symbols
+#: and arrows block that holds the stars (U+2B00-2BFF), the supplementary
+#: planes (U+1F000-1FAFF), and the variation selector that turns a character
+#: into its emoji presentation.
+#:
+#: Deliberately narrower than "everything above U+2190". A conformance report
+#: is full of mathematics - the quantities in it print √, ≤, ≫, ⟨⟩, ∂, ∞ - and
+#: a class that swept from the arrows to the end of the symbol blocks reported
+#: a square root as an emoji.
+EMOJI = re.compile("[\U0001f000-\U0001faff☀-➿⬀-⯿️]")
+
 #: A whole artefact, cut down to what the indicators read. Counts unlike the
 #: real ones on purpose: a generator that hard-codes 566 passes against the
 #: committed document and fails here.
@@ -263,6 +275,12 @@ def test_the_marks_ship_as_one_file_each_with_no_theme_variant() -> None:
 def test_the_banner_ships_as_a_pair_on_the_naming_the_repository_pairs_on() -> None:
     """``ThemeImage.astro`` derives the dark URL by this exact substitution."""
     assert cb.BANNER_DARK == cb.BANNER.replace(".svg", "_dark.svg")
+    # The drawing side and the citing side name the same two files. If the dark
+    # palette's suffix ever drifted from the pairing rule, the writer's sweep
+    # would delete the committed dark banner as an orphan while every document
+    # went on citing it.
+    assert cb.banner_name(cb.LIGHT) == cb.BANNER
+    assert cb.banner_name(cb.DARK) == cb.BANNER_DARK
 
 
 def test_no_asset_asks_the_reader_operating_system_what_theme_to_use() -> None:
@@ -309,11 +327,10 @@ def test_a_mark_alt_is_the_verdict_and_not_the_name_of_a_picture() -> None:
 
 def test_nothing_generated_contains_an_emoji() -> None:
     """The defect this whole exercise exists to end, guarded at the source."""
-    emoji = re.compile("[\U0001f000-\U0001faff←-⯿️⭐❌✅⚠]")
     for name, source in cb.assets().items():
-        assert not emoji.search(source), name
+        assert not EMOJI.search(source), name
     for mark in cb.MARKS:
-        assert not emoji.search(mark.alt), mark.filename
+        assert not EMOJI.search(mark.alt), mark.filename
 
 
 # --------------------------------------------------------------------------
@@ -338,3 +355,73 @@ def test_a_mark_is_small_enough_to_repeat_on_every_row() -> None:
     """566 rows will cite these; a heavy mark is 566 heavy requests."""
     for mark in cb.MARKS:
         assert len(_committed(mark.filename).encode("utf8")) < 1024
+
+
+# --------------------------------------------------------------------------
+# The documents that cite them
+# --------------------------------------------------------------------------
+
+
+def _report() -> str:
+    return (_ROOT / "docs" / "CONFORMANCE.md").read_text(encoding="utf8")
+
+
+def test_every_reference_in_the_report_has_a_definition() -> None:
+    """A reference with no definition is published as its own source text.
+
+    Nothing fails: the row still renders, the table still lines up, and the
+    Status cell reads ``![Pass][cv-pass]``. Both halves come off one list in
+    the renderer, so they cannot disagree - which is exactly the kind of
+    invariant that stops being true the first time someone edits one of them.
+    """
+    report = _report()
+    used = set(re.findall(r"!\[[^\]]*\]\[([\w-]+)\]", report))
+    defined = set(re.findall(r"^\[([\w-]+)\]:\s", report, flags=re.MULTILINE))
+    assert used, "the report cites no verdict mark at all"
+    assert used == defined
+
+
+def test_no_mark_in_the_report_stands_without_its_word() -> None:
+    """The picture illustrates the verdict; the word is the verdict.
+
+    A cell holding only an image says nothing to a reader whose images did not
+    arrive, and nothing in a plain-text diff of a generated file. Caught by
+    looking for a mark that runs straight into the end of its cell.
+    """
+    assert not re.search(r"!\[[^\]]*\]\[cv-[\w-]+\]\s*\|", _report())
+
+
+def test_the_report_leads_with_the_banner_for_its_own_counts() -> None:
+    counts = artifact.load()["counts"]
+    report = _report()
+    banner = cb.banner_picture(counts, "main")
+    assert banner in report
+    # Above the first collapsible section, or it is not a summary of them.
+    assert report.index(banner) < report.index("<details>")
+
+
+def test_the_report_legend_names_every_mark_it_draws_and_no_other() -> None:
+    """A legend entry for a silhouette that appears nowhere is a false promise."""
+    report = _report()
+    legend = next(line for line in report.splitlines() if "Verdict marks." in line)
+    cited = r"!\[[^\]]*\]\[([\w-]+)\]"
+    assert set(re.findall(cited, legend)) == set(re.findall(cited, report))
+
+
+def test_the_report_carries_no_emoji() -> None:
+    """The defect this exercise began with, checked where it was published."""
+    assert not EMOJI.search(_report())
+
+
+def test_the_readme_banner_says_the_committed_counts_in_words() -> None:
+    """The README is also the PyPI page, and PyPI freezes what it is given.
+
+    The counts inside the ``alt`` are kept current by
+    ``check_conformance_claims.py --write``, which ``make conformance`` runs;
+    this is what fails if that sentence is ever worded so the rewriter cannot
+    find the numbers in it.
+    """
+    readme = (_ROOT / "README.md").read_text(encoding="utf8")
+    assert f'alt="{cb.banner_alt(artifact.load()["counts"])}"' in readme
+    assert f"{cb.RAW_PATH}/{cb.BANNER}" in readme
+    assert f"{cb.RAW_PATH}/{cb.BANNER_DARK}" in readme

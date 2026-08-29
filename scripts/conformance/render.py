@@ -32,6 +32,7 @@ import re
 import sys
 from typing import TYPE_CHECKING, Any
 
+from . import marks
 from .artifact import ARTIFACT_PATH, load, write
 from .metrics import utilisation
 from .registry import (
@@ -46,7 +47,7 @@ from .registry import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Mapping, Sequence
 
 __all__ = ["_snap"]
 
@@ -62,10 +63,46 @@ _VERDICT_TEXT = {
     str(Verdict.NOT_APPLICABLE): "n/a",
 }
 
+#: The ref every image in the committed report is pinned to. ``main``, because
+#: this file lives on ``main`` and is read there, on github.com and through
+#: raw: a reader browsing it has no commit in hand, and the badge on ``main``
+#: is by construction the badge for the numbers in the file, since the
+#: ``conformance`` target refuses to render a report with a failing check and
+#: CI fails a pull request whose regenerated tree differs by a byte.
+#:
+#: The consequence to know about: a badge added on a branch 404s in this file
+#: until the branch lands. That is the same trade the README's figures already
+#: make, and the ``alt`` is the verdict, so a 404 degrades to the word.
+_REF = "main"
+
 
 def _status(verdict: str) -> str:
-    """One verdict as the table prints it."""
-    return _VERDICT_TEXT.get(verdict, verdict)
+    """One verdict as the table prints it: the mark, then the word.
+
+    Both, and not either. The word is what survives a plain-text diff, a
+    `raw` view and an image that never arrives; the mark is what makes a
+    column of 566 identical words scannable, and what tells a failing row from
+    a passing one before anything is read. The image is reference-style, so
+    the 117-character URL is written once for the whole document instead of
+    once per row.
+    """
+    word = _VERDICT_TEXT.get(verdict, verdict)
+    if verdict not in marks.MARK_OF:
+        return word
+    return f"{marks.mark_reference(verdict)} {word}"
+
+
+def _marked(document: Mapping[str, Any]) -> list[str]:
+    """The verdicts this report actually prints a mark for, in legend order.
+
+    Read off the document rather than listed, so the legend explains the marks
+    on the page and no others: a legend entry for a silhouette that appears
+    nowhere is a promise the report does not keep, and the day a check fails
+    the legend gains its red hexagon without anyone editing it.
+    """
+    used = {check["verdict"] for check in document["checks"]}
+    used |= {row["verdict"] for row in _panel(document, "filter-class")["rows"]}
+    return [mark.verdict for mark in marks.MARKS if mark.verdict in used]
 
 
 def _used(check: Mapping[str, Any]) -> str:
@@ -100,14 +137,24 @@ def _domains(document: Mapping[str, Any] | None = None) -> list[str]:
 
 
 def _filter_verdict(row: Mapping[str, Any]) -> str:
-    """The class verdict of one showcase row, as the table prints it."""
+    """The class verdict of one showcase row, as the table prints it.
+
+    Marked like a conformance row, and this is the only table where a mark
+    other than the pass disc appears today: three of the five architectures
+    are excluded from the class mask on purpose, and a blue bar says "out of
+    scope" where a red cross would say "wrong".
+    """
     if row["verdict"] == str(Verdict.BY_DESIGN):
-        return f"By design ({row['reason']})"
-    if "class" not in row:
-        return "not compliant"
-    if row["class"] == 1:
-        return "Class 1 (default)" if row["architecture"] == "butter" else "Class 1"
-    return f"Class {row['class']}"
+        text = f"By design ({row['reason']})"
+    elif "class" not in row:
+        text = "not compliant"
+    elif row["class"] == 1:
+        text = "Class 1 (default)" if row["architecture"] == "butter" else "Class 1"
+    else:
+        text = f"Class {row['class']}"
+    if row["verdict"] not in marks.MARK_OF:
+        return text
+    return f"{marks.mark_reference(row['verdict'])} {text}"
 
 
 def _panel(document: Mapping[str, Any], panel_id: str) -> Mapping[str, Any]:
@@ -194,6 +241,28 @@ def _numerical_validation_section(document: Mapping[str, Any], filters_ok: bool)
     return "\n".join(lines)
 
 
+def _verdict_legend(verdicts: Sequence[str]) -> str:
+    """The marks on this page, each beside the word it stands for.
+
+    A legend of pictures alone would only be a second puzzle, so every entry
+    pairs the mark with the word the Status column prints next to it, and the
+    sentence says the part a picture cannot: that the silhouette carries the
+    meaning as much as the colour does, which is what keeps the four apart in
+    greyscale and for a reader who cannot separate the hues.
+    """
+    entries = " · ".join(
+        f"{marks.mark_reference(verdict)} {marks.MARK_OF[verdict].alt}"
+        for verdict in verdicts
+    )
+    return (
+        f"<sub><b>Verdict marks.</b> {entries}. Each mark accompanies the word "
+        "beside it and never replaces it, so the verdict survives an image "
+        "that never arrives; the silhouettes differ as much as the colours do, "
+        "so a reader who cannot separate the hues can still tell them "
+        "apart.</sub>"
+    )
+
+
 def expected_text(check: Mapping[str, Any]) -> str:
     """The Expected column of one row.
 
@@ -265,6 +334,12 @@ def render_markdown(document: Mapping[str, Any] | None = None) -> tuple[str, int
     out: list[str] = []
     out.append("## Numerical conformance report")
     out.append("")
+    # The banner first, then the sentence: the picture carries the three counts
+    # at a glance, the sentence adds the two class claims no bar can state, and
+    # the banner's own alt is that same sentence, so a reader who never sees
+    # the image loses nothing but the glance.
+    out.append(marks.banner_picture(counts, _REF))
+    out.append("")
     summary = (
         f"**{passed}/{total} conformance checks pass** across "
         f"{counts['domains']} domains and {counts['standards']} standards"
@@ -290,6 +365,9 @@ def render_markdown(document: Mapping[str, Any] | None = None) -> tuple[str, int
         "collapsible and stays collapsed while all of its rows pass; a "
         "section with any failing row opens automatically.</sub>"
     )
+    out.append("")
+    marked = _marked(source)
+    out.append(_verdict_legend(marked))
     out.append("")
     out.append(_numerical_validation_section(source, filters_ok))
     out.append("")
@@ -330,6 +408,12 @@ def render_markdown(document: Mapping[str, Any] | None = None) -> tuple[str, int
         out.append("")
         out.append("</details>")
         out.append("")
+
+    # One definition per mark, at the foot of the document. A link reference
+    # resolves document-wide in CommonMark, which is what lets a row spend 16
+    # characters on its mark instead of the 117 an inline URL costs.
+    out.extend(marks.mark_definitions(marked, _REF))
+    out.append("")
 
     return "\n".join(out), passed, total
 

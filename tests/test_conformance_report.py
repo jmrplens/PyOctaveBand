@@ -223,8 +223,12 @@ def test_render_markdown_is_well_formed() -> None:
     assert markdown.count("|:---") >= len(cr._domains())
     # The redesigned filters table labels non-compliant architectures as
     # "By design" (not a scary "none") and shows the measured value vs limit.
-    assert "By design" in markdown
-    assert "none" not in markdown
+    # Asserted on that table's own rows rather than across the document:
+    # "none" is an ordinary English word, and a whole-document substring scan
+    # fires on any sentence of prose that happens to use it.
+    filter_table = markdown.split("| Architecture |", 1)[1].split("\n\n", 1)[0]
+    assert "By design" in filter_table
+    assert "none" not in filter_table
     assert "Measured rel. atten." in markdown
     assert "Class-1 limit" in markdown
     # The weightings table separates the informational max deviation from the

@@ -11,20 +11,25 @@ module puts a picture back beside the word, one the repository owns.
 Four marks and one banner, all drawn here as geometry and committed under
 ``.github/badges``. That directory rather than ``.github/images`` because
 ``make graphs`` deletes every ``*.svg`` there before regenerating, so a badge
-parked beside the figures would vanish on the next figure run.
+parked beside the figures would vanish on the next figure run. What the files
+are *called*, and the URLs the documents cite them by, live one module over in
+:mod:`conformance.marks`, which the pull-request comment imports and which
+therefore may not touch matplotlib.
 
 **Light and dark, decided by measurement.** A per-row mark paints its own
 opaque ground and uses one fill that clears 3:1 on GitHub light (#ffffff),
 GitHub dark (#0d1117), GitHub dim (#22272e) and Starlight's #17181c alike, so
 the same single file is correct in every theme. This is why a shields.io badge
-has worked in both themes for a decade with no theme variant. A per-theme
-pair would need a ``<picture>`` element per row, and 566 of those add 163 kB to
-``docs/CONFORMANCE.md`` against 9.6 kB for reference-style images of a
-single-file mark. The banner is the opposite case: once per page, so the pair
-costs 278 characters, and a card wants a card-coloured ground that no single
-fill gives on both. It therefore ships as ``…-summary.svg`` plus
-``…-summary_dark.svg``, the ``_dark`` suffix the README's ``<picture>`` blocks
-and ``site/src/components/ThemeImage.astro`` already pair on.
+has worked in both themes for a decade with no theme variant. A per-theme pair
+would need a ``<picture>`` element per row instead, and the three options
+measured on the real 566-row table come out at +10.6 kB for a reference-style
+single-file mark, +58.0 kB for the same mark written inline, and +162.8 kB for
+a ``<picture>`` pair per row - 282 characters of markup, repeated 573 times,
+to say one word. The banner is the opposite case: once per page, so the pair
+costs one element, and a card wants a card-coloured ground that no single fill
+gives on both #ffffff and #0d1117. It therefore ships as ``…-summary.svg``
+plus ``…-summary_dark.svg``, the ``_dark`` suffix the README's ``<picture>``
+blocks and ``site/src/components/ThemeImage.astro`` already pair on.
 
 An in-SVG ``@media (prefers-color-scheme: dark)`` is deliberately not used.
 GitHub loads an SVG through ``<img>``, where the query resolves against the
@@ -62,23 +67,17 @@ from typing import TYPE_CHECKING, Any
 import svg_text
 
 from .artifact import load
+from .marks import BANNER, MARKS, RAW_PATH, banner_alt, dark_variant, plural
 from .registry import _ROOT, Verdict
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
-#: Where the marks and the banner are committed. Not ``.github/images``: the
-#: ``graphs`` target empties that directory of SVGs before every figure run.
-BADGE_DIR = _ROOT / ".github" / "badges"
-
-#: Prefix for the absolute URLs the documents will point at. GitHub serves a
-#: raw URL from this repository directly; only third-party image hosts are
-#: rewritten through ``camo.githubusercontent.com``. Kept here so the Markdown
-#: renderer, the README and the pull-request comment all spell it one way.
-RAW_BASE = "https://raw.githubusercontent.com/jmrplens/phonometry"
-
-#: Path fragment under a ref, e.g. ``.../main/{RAW_PATH}/verdict-pass.svg``.
-RAW_PATH = ".github/badges"
+#: Where the marks and the banner are committed, derived from the URL fragment
+#: the documents cite so the two cannot name different directories. Not
+#: ``.github/images``: the ``graphs`` target empties that directory of SVGs
+#: before every figure run.
+BADGE_DIR = _ROOT.joinpath(*RAW_PATH.split("/"))
 
 #: The two committed faces, as the brand assets use them: a display grotesque
 #: for figures, a text grotesque for words.
@@ -86,38 +85,6 @@ _FONT_DIR = _ROOT / ".github" / "brand" / "fonts"
 _FONT_DISPLAY = _FONT_DIR / "FamiljenGrotesk-Bold.ttf"
 _FONT_REGULAR = _FONT_DIR / "IBMPlexSans-Regular.ttf"
 
-
-@dataclass(frozen=True)
-class Mark:
-    """One verdict's indicator: the file, the word, and how to cite it.
-
-    :param verdict: The verdict string the artefact stores.
-    :param filename: The committed file, under :data:`BADGE_DIR`.
-    :param alt: What a reader gets when the image does not arrive. It is the
-        verdict in words, never the name of a picture.
-    :param label: The Markdown link-reference label the tables use. Reference
-        style rather than inline: a definition resolves document-wide, which
-        turns a 117-character inline tag into a 16-character reference and is
-        what keeps 566 illustrated rows to +9.6 kB.
-    """
-
-    verdict: str
-    filename: str
-    alt: str
-    label: str
-
-
-#: The four marks, in the order a legend should read them.
-MARKS: tuple[Mark, ...] = (
-    Mark(str(Verdict.PASS), "verdict-pass.svg", "Pass", "cv-pass"),
-    Mark(str(Verdict.FAIL), "verdict-fail.svg", "Fail", "cv-fail"),
-    Mark(str(Verdict.BY_DESIGN), "verdict-by-design.svg", "By design", "cv-by-design"),
-    Mark(str(Verdict.NOT_APPLICABLE), "verdict-not-applicable.svg", "n/a", "cv-na"),
-)
-
-#: The summary banner's light variant, and the name the dark one is derived
-#: from. ``BANNER_DARK`` is below, once the palettes exist to name it.
-BANNER = "conformance-summary.svg"
 
 # --- palette -----------------------------------------------------------------
 # Verdict fills, chosen against every ground the marks land on rather than
@@ -207,16 +174,12 @@ DARK = Palette(
 def banner_name(palette: Palette) -> str:
     """The file one palette's banner is committed as.
 
-    The pairing rule is written once, here, because two other places already
-    depend on it being exactly this substitution: the ``<picture>`` blocks in
-    the README, and ``ThemeImage.astro``, which is handed only the light URL
-    and derives the dark one by inserting ``_dark`` before the extension.
+    The pairing rule itself lives in :func:`~conformance.marks.dark_variant`,
+    because the README's ``<picture>`` blocks and ``ThemeImage.astro`` already
+    depend on it being exactly that substitution; what belongs here is only
+    which palette gets the suffix.
     """
-    return BANNER.replace(".svg", f"{palette.suffix}.svg")
-
-
-#: The dark twin of :data:`BANNER`, by that rule.
-BANNER_DARK = banner_name(DARK)
+    return BANNER if not palette.suffix else dark_variant(BANNER)
 
 
 def _svg(
@@ -352,6 +315,10 @@ _BASELINE = 42.0
 _BAR_Y = 59.0
 _BAR_H = 7.0
 _RUN_GAP = 6.0
+#: Track left showing between the passing and the failing segment, and the
+#: shortest failing tail worth cutting into to do it. See :func:`_bar`.
+_BAR_GAP = 2.0
+_BAR_MIN_TAIL = 3.0
 
 
 def _units(value: float) -> str:
@@ -392,22 +359,20 @@ def _runs_width(pieces: Sequence[tuple[str, pathlib.Path, float, str]]) -> float
     return sum(inks) + _RUN_GAP * (len(inks) - 1)
 
 
-def _plural(count: int, singular: str) -> str:
-    """``singular`` agreeing with ``count``.
-
-    Both nouns the banner names take a plain ``-s``. The banner is read by
-    people, and a fixture with one domain in it should not be captioned
-    "1 domains" in the sentence a screen reader gets.
-    """
-    return singular if count == 1 else f"{singular}s"
-
-
 def _bar(passed: int, total: int, palette: Palette) -> str:
     """The pass-fraction bar.
 
     Plain rectangles inside a rounded clip, so the boundary between the passing
     and the failing part is a straight edge in the middle of the bar rather
     than a rounded cap that would read as the end of the bar.
+
+    A sliver of track is left between the two segments, and that is not
+    decoration. The green and the red are within 1.02:1 of each other, so to a
+    reader who cannot separate the two hues an unbroken bar reads as one full
+    run and the failing tail disappears; the notch is what survives in
+    greyscale. It is dropped when the failing tail is too short to spend two
+    pixels on, where a red tick at the end of the bar is all there is to show
+    and the caption beside it carries the count regardless.
 
     The clip's ``id`` needs no prefix. Every consumer loads this file through
     an ``<img>`` or a ``<picture>``, which makes it its own document; it is
@@ -426,35 +391,14 @@ def _bar(passed: int, total: int, palette: Palette) -> str:
         f'height="{_u(_BAR_H)}" fill="{palette.passing}"/>',
     ]
     if passed < total:
+        remaining = width - filled
+        gap = _BAR_GAP if remaining >= _BAR_GAP + _BAR_MIN_TAIL else 0.0
         parts.append(
-            f'<rect x="{_u(_PAD + filled)}" y="{_u(_BAR_Y)}" '
-            f'width="{_u(width - filled)}" height="{_u(_BAR_H)}" '
+            f'<rect x="{_u(_PAD + filled + gap)}" y="{_u(_BAR_Y)}" '
+            f'width="{_u(remaining - gap)}" height="{_u(_BAR_H)}" '
             f'fill="{palette.failing}"/>'
         )
     return f'{clip}<g clip-path="url(#bar)">{"".join(parts)}</g>'
-
-
-def banner_alt(counts: Mapping[str, Any]) -> str:
-    """What the banner says, in words.
-
-    The banner is a picture of four numbers; this is the same four numbers as a
-    sentence, and it is what a reader gets when the image does not load. It is
-    the text alternative for the ``<title>`` here and for the Markdown ``alt``
-    wherever the banner is embedded, so the two cannot drift apart.
-    """
-    passed, total = counts["passing"], counts["checks"]
-    failing = total - passed
-    verdict = (
-        f"{passed} of {total} conformance checks pass"
-        if failing
-        else f"All {total} conformance checks pass"
-    )
-    tail = f", {failing} failing" if failing else ""
-    domains, standards = counts["domains"], counts["standards"]
-    return (
-        f"{verdict}{tail}, across {domains} {_plural(domains, 'domain')} "
-        f"and {standards} {_plural(standards, 'standard')}"
-    )
 
 
 def render_banner(counts: Mapping[str, Any], palette: Palette) -> str:
@@ -475,10 +419,10 @@ def render_banner(counts: Mapping[str, Any], palette: Palette) -> str:
     domains, standards = counts["domains"], counts["standards"]
     stats: tuple[tuple[str, pathlib.Path, float, str], ...] = (
         (str(domains), _FONT_DISPLAY, _STAT_FIGURE_SIZE, palette.ink),
-        (_plural(domains, "domain"), _FONT_REGULAR, _STAT_WORD_SIZE, palette.muted),
+        (plural(domains, "domain"), _FONT_REGULAR, _STAT_WORD_SIZE, palette.muted),
         ("·", _FONT_REGULAR, _STAT_WORD_SIZE, palette.muted),
         (str(standards), _FONT_DISPLAY, _STAT_FIGURE_SIZE, palette.ink),
-        (_plural(standards, "standard"), _FONT_REGULAR, _STAT_WORD_SIZE, palette.muted),
+        (plural(standards, "standard"), _FONT_REGULAR, _STAT_WORD_SIZE, palette.muted),
     )
 
     headline_width = svg_text.ink_width(headline, _FONT_DISPLAY, _HEADLINE_SIZE)

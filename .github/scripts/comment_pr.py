@@ -42,6 +42,7 @@ _SCRIPTS = Path(__file__).resolve().parents[2] / "scripts"
 if str(_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS))
 
+from conformance.marks import banner_picture, outcome_mark
 from conformance.metrics import utilisation
 
 #: Hard ceiling on the body, asserted before the file is written. The API's
@@ -58,7 +59,13 @@ CLOSEST_ROWS = 5
 ARTIFACT = "docs/conformance.json"
 
 
-def parse_test_results(test_dir: str) -> tuple[str, int, int]:
+def parse_test_results(test_dir: str, ref: str) -> tuple[str, int, int]:
+    """The per-version test table, its total and its failure count.
+
+    :param test_dir: Directory the workflow downloaded the JUnit XML into.
+    :param ref: Commit to pin the pass and fail marks to, as everywhere else
+        in this comment.
+    """
     summary = []
     total_tests = 0
     total_failures = 0
@@ -117,7 +124,12 @@ def parse_test_results(test_dir: str) -> tuple[str, int, int]:
                 except Exception:  # noqa: BLE001 - degrade gracefully if the coverage artifact is malformed
                     coverage_pct = "error"
 
-            status = "✅ Passed" if failures == 0 else "❌ Failed"
+            # The mark, then the word. The word is what a reader gets if the
+            # image never arrives, and this table is read on a page where an
+            # image can 404: a fork's head commit is not always servable from
+            # this repository's raw host.
+            passed = failures == 0
+            status = f"{outcome_mark(passed, ref)} {'Passed' if passed else 'Failed'}"
             summary.append(
                 f"| {version} | {tests} | {failures} | {coverage_pct} | {status} |"
             )
@@ -125,7 +137,7 @@ def parse_test_results(test_dir: str) -> tuple[str, int, int]:
             total_tests += tests
             total_failures += failures
         except Exception as e:  # noqa: BLE001 - degrade gracefully if the coverage artifact is malformed
-            summary.append(f"| {f_name} | - | - | - | ⚠️ Error parsing: {e} |")
+            summary.append(f"| {f_name} | - | - | - | Error parsing: {e} |")
 
     return "\n".join(summary), total_tests, total_failures
 
@@ -304,21 +316,36 @@ def _split_renames(
 
 
 def conformance_section(
-    head: dict[str, Any] | None, base: dict[str, Any] | None
+    head: dict[str, Any] | None, base: dict[str, Any] | None, ref: str
 ) -> str:
-    """The body's lead: the headline, then only what changed."""
+    """The body's lead: the headline, then only what changed.
+
+    :param head: The artefact committed at this head, or ``None``.
+    :param base: The same file on the base branch, or ``None``.
+    :param ref: The commit the banner is pinned to. This is the whole point of
+        drawing a banner in a pull-request comment rather than linking the one
+        on ``main``: a raw link to ``main`` renders ``main``'s count on every
+        branch, which is worse than no banner because it looks live and is
+        not. The workflow passes ``github.event.pull_request.head.sha``, and
+        the same 40-character URL shape is what the "full report" links below
+        already resolve with.
+    """
     if head is None:
         return (
             "## Numerical conformance\n\n"
-            f"⚠️ `{ARTIFACT}` is missing from this checkout, so nothing can be "
-            "compared. Run `make conformance` and commit the result."
+            f"**No artefact.** `{ARTIFACT}` is missing from this checkout, so "
+            "nothing can be compared. Run `make conformance` and commit the "
+            "result."
         )
     counts = head["counts"]
-    mark = "✅" if counts["failing"] == 0 else "❌"
     lines = [
         "## Numerical conformance",
         "",
-        f"{mark} **{counts['passing']}/{counts['checks']} checks pass** across "
+        # Pinned to this head, so the picture is the one this branch generated
+        # and the numbers on it are the numbers in the tables below it.
+        banner_picture(counts, ref),
+        "",
+        f"**{counts['passing']}/{counts['checks']} checks pass** across "
         f"{counts['domains']} domains and {counts['standards']} standards "
         f"({counts['designations']} normative designations, {counts['sources']} "
         "further published sources).",
@@ -397,9 +424,12 @@ def main() -> None:
     sha = os.environ.get("GITHUB_HEAD_SHA") or os.environ.get("GITHUB_SHA") or "main"
     test_dir = "test-results"
 
-    conformance = conformance_section(head_document(), base_document())
-    test_table, tests, failures = parse_test_results(test_dir)
-    status = "✅ all green" if failures == 0 else f"❌ {failures} failing"
+    conformance = conformance_section(head_document(), base_document(), sha)
+    test_table, tests, failures = parse_test_results(test_dir, sha)
+    status = "all green" if failures == 0 else f"{failures} failing"
+    # Raw <img>: the summary line below sits inside the <details> HTML block,
+    # where Markdown image syntax ships as literal text.
+    verdict = outcome_mark(failures == 0, sha, html=True)
     blob = f"https://github.com/{repo}/blob/{sha}"
 
     # Hidden marker so the CI updates one sticky comment instead of posting a
@@ -410,7 +440,7 @@ def main() -> None:
 ---
 
 <details>
-<summary>Tests &amp; coverage — {tests} tests, {failures} failures ({status})</summary>
+<summary>{verdict} Tests &amp; coverage: {tests} tests, {failures} failures ({status})</summary>
 
 {test_table}
 
