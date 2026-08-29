@@ -8,23 +8,29 @@
   padding-block: 0.25rem;
 }
 
-/* Inline math needs the same treatment, and did not have it. KaTeX never
-   breaks a formula across lines, so a long one written inline takes the whole
-   page sideways rather than wrapping: measured at a 390 px viewport, one
-   acceleration formula on the errata page is 1011 px wide and carries the
-   document to 1067 px, which is a horizontal scrollbar on every phone.
+/* Inline math has NO scroll box here, deliberately, and the reason is measured.
 
-   `overflow` has no effect on an inline box, so the box has to become
-   `inline-block` for `max-width` and the scroll to apply at all. That is a
-   change to how every inline formula in the corpus takes part in line layout,
-   so it was checked rather than assumed: the position and size of all 991
-   inline formulas on the four most formula-heavy pages are unchanged. */
-.sl-markdown-content :not(.katex-display) > .katex {
-  display: inline-block;
-  max-width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
+   KaTeX never breaks a formula across lines, so a long one written inline does
+   take the page sideways: at a 390 px viewport an acceleration formula on the
+   errata page is 1011 px wide and carries that document to 1067 px. The
+   obvious fix is the one applied to display math above, and it cannot be used,
+   because `overflow` has no effect on an inline box and making the box
+   `inline-block` changes how every formula in the corpus takes part in line
+   layout. Measured over the 991 inline formulas on the four most
+   formula-heavy pages: 990 of them move. Their x and their width are
+   untouched, but each box grows from 22 px to 24 px tall, which raises the
+   line it sits on, and on a long page the shift accumulates to 3645 px.
+
+   Every variant was tried against that measurement and none avoids it, because
+   the growth comes from `inline-block` itself and not from the overflow:
+   `vertical-align: baseline`, a negative `vertical-align`, and dropping the
+   overflow entirely all still give 24 px. `overflow: clip` does keep the
+   document height, and clips the formula instead of scrolling it, which is
+   worse than the defect.
+
+   So a formula wide enough to need a scroll box is fixed where it is written,
+   as display math, rather than by taxing the typography of every formula that
+   does not. */
 
 /* A display block stating several equations on one line is rebuilt at build
    time (rehypeWrappableMath in src/lib/wrappable-math.mjs) as one part per
