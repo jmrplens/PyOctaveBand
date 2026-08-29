@@ -274,15 +274,19 @@ reports:
 # builds leaves the committed bytes alone - which is what lets the Markdown keep
 # a byte diff, being a pure function of bytes that are themselves committed.
 #
-# The --file-header flag prepends the "do not hand-edit" note. The claims step
-# rewrites the counts in the prose that has no build step to interpolate them
-# through (.zenodo.json, the plain-markdown mirror under docs/, the site
-# frontmatter); the Astro page bodies import them from
-# site/src/data/conformance-stats.mjs and need nothing. The last step is the
-# read-only validation CI also runs. CI fails if any output drifts (see the
+# The --file-header flag prepends the "do not hand-edit" note. The badges step
+# redraws the verdict marks and the summary banner under .github/badges from the
+# same artefact, so the count on the banner is always the tree's own; it is
+# deliberately not under `graphs`, which empties .github/images of SVGs before
+# every figure run. The claims step rewrites the counts in the prose that has no
+# build step to interpolate them through (.zenodo.json, the plain-markdown
+# mirror under docs/, the site frontmatter); the Astro page bodies import them
+# from site/src/data/conformance-stats.mjs and need nothing. The last step is
+# the read-only validation CI also runs. CI fails if any output drifts (see the
 # `conformance` job in python-app.yml).
 conformance:
 	$(PYTHON) scripts/conformance_report.py --file-header > docs/CONFORMANCE.md
+	$(PYTHON) scripts/conformance_badges.py
 	$(PYTHON) scripts/check_conformance_claims.py --write
 	$(PYTHON) scripts/check_conformance_artifact.py
 

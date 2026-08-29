@@ -612,7 +612,7 @@ def test_a_verdict_is_printed_and_never_re_derived() -> None:
     document["checks"][0]["deviation"]["value"] = 0.5
     markdown, _, _ = cr.render_markdown(document)
     row = next(line for line in markdown.splitlines() if "| Scalar |" in line)
-    assert row.endswith("| &#9989; |")
+    assert row.endswith("| Pass |")
 
 
 def test_a_missing_panel_is_named() -> None:
