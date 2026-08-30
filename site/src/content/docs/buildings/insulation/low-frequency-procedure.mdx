@@ -365,6 +365,8 @@ procedure = building.LowFrequencyProcedure(
 field = building.airborne_insulation(l1, l2, t2, area=6.48, volume=23.3,
                                      frequencies=freqs,
                                      receiver_low_frequency=procedure)
+# Deliberately without the procedure, to have the two side by side. This is
+# the call the library warns about, and the warning is the point of the page.
 plain = building.airborne_insulation(l1, l2, t2, area=6.48, volume=23.3,
                                      frequencies=freqs)
 chain = field.receiver_low_frequency

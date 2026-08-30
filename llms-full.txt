@@ -9253,6 +9253,8 @@ plt.show()
 # The whole spectrum, by hand, against the default procedure alone. This call
 # raises a LowFrequencyWarning, and it is right to: the room triggers and no
 # procedure was passed. Here that is the point of the call.
+# Deliberately without the procedure, to have the two side by side. This is
+# the call the library warns about, and the warning is the point of the page.
 plain = building.airborne_insulation(l1, l2, t2, area=6.48, volume=23.3,
                                      frequencies=freqs)
 x = np.arange(len(freqs))

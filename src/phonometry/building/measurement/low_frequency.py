@@ -247,16 +247,27 @@ def _low_frequency_bands_are_present(frequencies: ArrayLike) -> bool:
     caller who does supply a procedure gets the proper message from the other
     one.
 
+    ANY of the three is enough, not all three. A room under 25 m3 that reports
+    only 50 Hz and 63 Hz is as much outside ISO 16283 as one reporting all
+    three, and requiring the full set let a partially measured low range answer
+    in silence, which is the very thing this check exists to stop. A band axis
+    naming none of them describes a measurement the clause does not reach, and
+    that is the only case that stays quiet.
+
     :param frequencies: Band centre frequencies, in Hz.
-    :return: ``True`` when 50 Hz, 63 Hz and 80 Hz are each named exactly once.
+    :return: ``True`` when at least one of 50 Hz, 63 Hz and 80 Hz is named, and
+        none of the three is named more than once.
     """
     centres = np.asarray(frequencies, dtype=np.float64)
     if centres.ndim != 1:
         return False
-    return all(
-        np.count_nonzero(np.isclose(centres, target, rtol=_BAND_MATCH_RTOL)) == 1
+    counts = [
+        np.count_nonzero(np.isclose(centres, target, rtol=_BAND_MATCH_RTOL))
         for target in LOW_FREQUENCY_BANDS
-    )
+    ]
+    if any(count > 1 for count in counts):
+        return False
+    return any(counts)
 
 
 def _warn_when_the_procedure_is_required(

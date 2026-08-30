@@ -384,6 +384,8 @@ procedure = building.LowFrequencyProcedure(
 field = building.airborne_insulation(l1, l2, t2, area=6.48, volume=23.3,
                                      frequencies=freqs,
                                      receiver_low_frequency=procedure)
+# A propósito sin el procedimiento, para tener los dos al lado. Es la llamada
+# sobre la que la biblioteca avisa, y el aviso es de lo que trata esta página.
 plain = building.airborne_insulation(l1, l2, t2, area=6.48, volume=23.3,
                                      frequencies=freqs)
 chain = field.receiver_low_frequency
