@@ -1220,10 +1220,14 @@ def _forget_after_fork() -> None:
     happens after the child has cleared the registry, which is why it
     survives where the inherited one does not.
 
-    No fork in the corpus reaches this today: the generation run renders on
-    spawned workers, and the one fork -- the four language/theme variants of
-    an animation clip -- draws no figure, so nothing there calls
-    :func:`audit`. It is registered anyway because the cost is one call at
+    No fork in the corpus reaches this today, and the reason is the second
+    clause rather than the first: the one fork, the four language/theme
+    variants of an animation clip, draws no figure, so nothing there calls
+    :func:`audit`. The parallel figure run does use spawned workers, which
+    start from a pristine interpreter and register for themselves, but that is
+    not what makes the case unreachable: at ``--jobs 1``, and on any machine
+    with two cores or fewer where the default resolves to one, every figure is
+    rendered in the parent and there are no workers at all. It is registered anyway because the cost is one call at
     import and the alternative is a silent under-measurement.
     """
     global _REGISTERED

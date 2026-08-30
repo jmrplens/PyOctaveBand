@@ -5,17 +5,23 @@ Two defects, and they are not the same defect.
 
 **A curve drawn behind the letters.** The strokes of the letters and the
 stroke of the curve are the same weight, and on the dark page close to the
-same lightness. The answer the corpus uses, at a hundred and forty-seven
-call sites under ``scripts/figures``, is an opaque chip::
+same lightness. The answer the corpus uses, at well over a hundred call sites under
+``scripts/figures``, is an opaque chip::
 
     bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
           "edgecolor": COLOR_GRID}
 
 which is *not* the translucent one a text box in an empty corner takes
 (``{"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6}``): over a line
-that one loses its contrast on the dark page. ``pad`` follows the neighbours --
-0.5 at seventy-two of them, 0.4 at fifty-three, 0.3 for a small label pinned
-near a point -- and the chip is given a ``zorder`` above the curves.
+that one loses its contrast on the dark page. ``pad`` follows the neighbours: 0.5
+for most, 0.4 where the box is tight against something, 0.3 for a small label
+pinned near a point. The chip is given a ``zorder`` above the curves.
+
+(Neither of those is given as a figure on purpose. Both were, twice, and both
+were wrong both times, because the count moves with every label edited and
+depends on whether a bare ``facecolor=COLOR_PANEL`` keyword counts beside the
+dict literals. A number nobody can recompute the same way twice is worse than
+the rule it was standing in for.)
 
 A chip is not free, and where it can be avoided it should be. It is opaque, so
 whatever it lands on is gone: a curve or a filled band passing behind it reads
@@ -69,13 +75,16 @@ sitting at 44 px included. Floating-point drift changes where a curve is by a
 fraction of a pixel; a struck-pixel count changes when it moves by one.
 
 **Covered** gates lower, at **20 px**, and has no advisory band, because it
-separates where the other one interleaves. Exactly 40 labels in the corpus lose
-any letter ink at all; the 19 at or above 21 px are all real, the largest clean
-one scores 18, and nothing lands in between. The two ends of that boundary,
-looked at twice: ``two_tone_separation_es`` at 21 px prints a black note
-straight over the red "Hz" of "212 Hz" and destroys it, while
-``detailed_impact_paths`` at 18 px is a grey dotted rule clipping the "t" of
-"paths", which reads. Twenty is the round number inside the gap, with two
+separates where the other one interleaves. When the threshold was chosen, the
+labels losing any letter ink at all fell into two groups with nothing between
+them: every one at or above 21 px was real, and the largest clean one scored
+18. Both ends were looked at twice. ``detailed_impact_paths`` at 18 px is a
+grey dotted rule clipping the "t" of "paths", and it reads; the label that sat
+at 21 px, ``two_tone_separation_es``, printed a black note straight over the
+red "Hz" of "212 Hz" and destroyed it. That one has since been moved by this
+branch and now records clean, which is why the group counts are not quoted
+here: they described the corpus as it was before the gate was applied to it.
+Twenty is the round number inside the gap, with two
 pixels of margin over the largest clean example -- wider than behind's one.
 
 It gates lower because it is a different measurement, not a stricter mood:

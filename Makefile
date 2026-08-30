@@ -42,7 +42,7 @@ FIGURE_LANGUAGE_ENV = PHONOMETRY_FIGURE_LANGUAGE_AUDIT=$(FIGURE_LANGUAGE_DIR)
 # each language is drawn a few more times, with pieces taken away, to count
 # the pixels. It cannot change a rendered byte -- every artist it hides,
 # unstrokes or lifts is put back before the figure is written, and the whole
-# corpus regenerates to the same 2380 files -- and the directory is under
+# corpus regenerates byte for byte -- and the directory is under
 # build/, which is gitignored.
 FIGURE_ANNOTATION_DIR = build/figure-annotations
 FIGURE_ANNOTATION_ENV = PHONOMETRY_FIGURE_ANNOTATION_AUDIT=$(FIGURE_ANNOTATION_DIR)
