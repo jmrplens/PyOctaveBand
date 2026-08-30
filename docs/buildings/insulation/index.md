@@ -34,6 +34,10 @@ and the two material measurements a floor design consumes.
 [Field Insulation Measurement (ISO 16283)](insulation-field.md)
 covers the engineering-grade airborne and impact measurement in the building,
 its Clause 14 test report and the ISO 12999-1 uncertainty that qualifies it.
+Below 25 m³ the same standard makes a second, corner-based measurement
+mandatory in the three lowest bands, and
+[Small Rooms: the ISO 16283 Low-Frequency Procedure](low-frequency-procedure.md)
+is that procedure in full, shared by all three parts.
 The same standard specifies two more impact sources, a rubber ball and a bang
 machine, for the slow low-frequency thumps a tapping machine says nothing
 about;
@@ -68,6 +72,9 @@ related EN 12354-5, lives in
 - [Field Insulation Measurement (ISO 16283)](insulation-field.md):
   ISO 16283-1/2 field measurement, its test report and the ISO 12999-1
   uncertainty.
+- [Small Rooms: the ISO 16283 Low-Frequency Procedure](low-frequency-procedure.md):
+  the 25 m³ trigger, the corner level of Formula (12), the Formula (13)
+  combination and the 63 Hz octave reverberation time of Clause 10.4.
 - [Laboratory Insulation Measurement](insulation-lab.md):
   the ISO 10140 characterisation of an element with flanking suppressed.
 - [Sound Insulation by Intensity (ISO 15186)](insulation-intensity.md):

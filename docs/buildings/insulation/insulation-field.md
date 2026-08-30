@@ -162,7 +162,7 @@ measurement in the room corners. It is **not optional**: Part 1 Clause 8.1,
 Part 2 Clause 8.1 and Part 3 Clause 7.3.1 all say the procedure *shall* be
 used for the 50 Hz, 63 Hz and 80 Hz one-third-octave bands once the room
 volume, calculated to the nearest cubic metre, is smaller than 25 m³. Most
-bedrooms and bathrooms are under that line.
+bedrooms and every bathroom are under that line.
 
 With the source running, the corner sound pressure level is the highest of the
 measured corners, taken band by band (the three bands may come from three
@@ -179,11 +179,7 @@ $$
 
 Under the same trigger, Clause 10.4 (Clause 8.4 in Part 3) stops the 50 Hz,
 63 Hz and 80 Hz one-third-octave reverberation times being measured at all and
-puts one **63 Hz octave band** value in their place, used for all three. That
-is a prescription about what to measure rather than a claim that the values
-are equal: in a small room a one-third-octave decay rarely has enough modes to
-be single-sloped, and in timber or steel frame construction it can be shorter
-than the analyser's own one-third-octave filter.
+puts one **63 Hz octave band** value in their place, used for all three.
 
 ```python
 import numpy as np
@@ -222,30 +218,11 @@ print(np.round(res.dnt, 1))          # [36.6 34.8 36.3 39.5 41.2 41.8]
 ```
 
 `impact_insulation()` and `facade_insulation()` take the same object under a
-`low_frequency=` keyword and run the same code: Formula (16) of Part 2 and
-Formula (5) of Part 3 are Formula (13) with different subscripts. Two
-differences between the parts are real and enforced. Part 1 tests the source
-and receiving rooms **independently** ("in the source and/or receiving room
-when *its* volume is smaller than 25 m³"), so `airborne_insulation()` takes a
-`source_low_frequency=` as well, and a small source room beside a large
-receiving room moves $L_1$ and leaves $L_2$ and $T$ as measured — Clause 10.4
-is a receiving-room clause in all three parts. Part 3 confines the procedure
-to the element and global **loudspeaker** methods (Clause 6 NOTE 1: there is
-no experience of running it with traffic as the source), so passing it with
-`method="road_traffic"` raises.
-
-### `LowFrequencyProcedure` parameters
-
-| Parameter | Type | Units | Range / default | Notes |
-| :--- | :--- | :--- | :--- | :--- |
-| `volume` | float | m³ | must round below 25 | Volume of *this* room; the trigger of Clause 8.1 / 7.3.1 |
-| `corner_levels` | 2D or 3D array | dB | `(corners, 3)` or `(positions, corners, 3)` | Corners at 50/63/80 Hz, background-corrected; ≥ 4 corners per source position |
-| `reverberation_63_octave` | float, optional | s | > 0 | 63 Hz octave $T$ (Clause 10.4 / 8.4); required for the receiving room, refused for the source room |
-
-The volume is rounded half away from zero, so $V = 24.5$ m³ becomes 25 m³ and
-does **not** trigger; the effective threshold is $V < 24.5$ m³. Rooms at or
-above the line are refused rather than answered, because no part of ISO 16283
-says what a corner measurement means there.
+`low_frequency=` keyword and run the same code. The corner geometry, the
+sampling requirements, the differences between the three parts and a worked
+measurement with its rating are all in a guide of their own:
+[Small Rooms: the ISO 16283 Low-Frequency
+Procedure](low-frequency-procedure.md).
 
 ## ISO 16283 field test report (`.report()`)
 

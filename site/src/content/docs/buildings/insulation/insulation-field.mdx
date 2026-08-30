@@ -301,21 +301,9 @@ average is neither repeatable nor representative of what an occupant hears. A
 modal pressure maximum always sits in a corner, so corner measurements bound
 the field from above.
 
-**How a corner measurement is taken (Clauses 8.3 and 8.4).** A fixed
-microphone, 0.3 m to 0.4 m from *each* of the three boundaries forming the
-corner (the three distances need not be equal), at least 1.0 m from any
-loudspeaker — which in practice rules out the corner the loudspeaker occupies.
-Measure at least **four** corners, two at floor level and two at ceiling level,
-adjacent to the partition or not; each corner must be formed by three mutually
-perpendicular surfaces of at least 0.5 m², with no furniture within 0.5 m. Where
-that is impossible, corners with pair angles between 45° and 135°, or with an
-object such as a cupboard forming one surface, are admitted. Average at least
-15 s per position. With a single loudspeaker moved between positions, take the
-four corners again for each position.
-
 **How the corners enter the result (Clause 8.5).** For each of the three bands
-independently, take the **highest** of the measured corners — which may be a
-different corner in each band — as $L_\text{Corner}$; with several loudspeaker
+independently, take the **highest** of the measured corners, which may be a
+different corner in each band, as $L_\text{Corner}$; with several loudspeaker
 positions, energy-average those per-position maxima (Formula (12)). Then
 combine with the default-procedure average $L$ in a 1:2 weighting
 (Formula (13)):
@@ -324,26 +312,10 @@ $$
 L_\mathrm{LF} = 10\log_{10}\left[\frac{10^{0.1 L_\text{Corner}} + 2 \cdot 10^{0.1 L}}{3}\right].
 $$
 
-$L_\mathrm{LF}$ replaces $L$ in those three bands, and $D_\mathrm{nT}$ or $R'$ is then formed
-exactly as before. Because $L_\text{Corner}$ can exceed $L$ by several
-decibels, the procedure raises the source-room level and the receiving-room
-level alike — the effect on the level *difference* is whatever the two rooms do
-not have in common, which is precisely the information the default procedure
-throws away. Clause 9.1 adds the consequence for background noise: a background
-measurement is required **in each corner used**, because each band may have
-come from a different corner and so may need its own correction.
-
-**Clause 10.4: the reverberation time as well.** Under the same trigger the
-50 Hz, 63 Hz and 80 Hz one-third-octave reverberation times stop being measured
-and one **63 Hz octave band** value takes their place for all three. It is a
-prescription about what to measure, not a claim that the values are equal: in a
-small room a one-third-octave decay rarely has enough modes to be
-single-sloped, and in timber or steel frame construction it can be shorter than
-the analyser's own one-third-octave filter. Below the trigger there is nothing
-to fall back on either, because Clause 10.3 confines the default
-reverberation-time procedure to 100 Hz and above once the room is that small.
-The clause is a *receiving-room* clause in all three parts, even in Part 1
-where the corner procedure itself also admits the source room.
+$L_\mathrm{LF}$ replaces $L$ in those three bands, and $D_\mathrm{nT}$ or $R'$ is then
+formed exactly as before. Under the same trigger, Clause 10.4 also stops the
+50 Hz, 63 Hz and 80 Hz one-third-octave reverberation times being measured and
+puts one **63 Hz octave band** value in their place.
 
 ```python
 # `np` and `building` are the imports of the blocks above.
@@ -372,38 +344,11 @@ print(building.low_frequency_procedure_applies(25.4))   # False, rounds to 25
 
 In a whole measurement the two halves travel together in a
 `LowFrequencyProcedure`, which `airborne_insulation()` applies to the band
-vector for you: it rewrites the three bands with $L_\mathrm{LF}$ and puts the
-63 Hz octave value over the same three reverberation times, leaving 100 Hz and
-above untouched.
-
-```python
-# 50, 63, 80 Hz plus the first three core bands, so the substitution is visible.
-freqs = np.array([50.0, 63.0, 80.0, 100.0, 125.0, 160.0])
-l1_lf = np.array([88.4, 90.1, 87.6, 85.2, 84.7, 84.1])
-l2_lf = np.array([49.5, 51.2, 48.6, 45.6, 43.2, 41.8])
-t2_lf = np.array([0.62, 0.58, 0.54, 0.49, 0.47, 0.45])
-
-receiving = building.LowFrequencyProcedure(
-    volume=22.0,
-    corner_levels=corners,
-    reverberation_63_octave=0.72,         # Clause 10.4
-)
-small = building.airborne_insulation(l1_lf, l2_lf, t2_lf, frequencies=freqs,
-                                     receiver_low_frequency=receiving)
-print(np.round(small.l2, 1))              # [51.9 54.  50.4 45.6 43.2 41.8]
-print(small.t2)                           # [0.72 0.72 0.72 0.49 0.47 0.45]
-```
-
-`impact_insulation()` and `facade_insulation()` take the same object under a
-`low_frequency=` keyword and reach the same code: Formula (16) of Part 2 and
-Formula (5) of Part 3 are Formula (13) with different subscripts. Two
-differences between the parts are real and enforced. Part 1 tests the two rooms
-independently, so `airborne_insulation()` also takes a `source_low_frequency=`,
-and a small source room beside a large receiving room moves $L_1$ and leaves
-$L_2$ and $T$ as measured. Part 3 confines the procedure to the element and
-global **loudspeaker** methods (Clause 6 NOTE 1 records that there is no
-experience of running it with traffic as the source), so passing it with
-`method="road_traffic"` raises rather than answering.
+vector for you, and `impact_insulation()` and `facade_insulation()` take the
+same object under a `low_frequency=` keyword. The corner geometry, the
+sampling requirements, the differences between the three parts and a worked
+measurement with its rating are all in a guide of their own:
+[Small Rooms: the ISO 16283 Low-Frequency Procedure](/phonometry/buildings/insulation/low-frequency-procedure/).
 
 ## Field impact insulation (ISO 16283-2)
 
@@ -776,7 +721,7 @@ measurement](#taking-the-measurement-iso-16283-1-clauses-7-and-9) — are
 documented here and checked nowhere: energy-averaging happens once positions
 are supplied, but nothing verifies how many were taken or where. The
 low-frequency procedure of [Small
-rooms](#small-rooms-the-low-frequency-procedure-clause-8) *is* implemented —
+rooms](/phonometry/buildings/insulation/low-frequency-procedure/) *is* implemented —
 the 25 m³ trigger, Formula (12), Formula (13) and the 63 Hz octave
 reverberation time of Clause 10.4 — but it too is fed corner levels the
 operator measured, and the only sampling requirement it enforces is a warning

@@ -358,6 +358,9 @@ ANSI/ASA S12.2 y ASTM E413/E1414.
 - [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/):
   el aislamiento a ruido aéreo y de impactos medido en el edificio, su informe de
   ensayo y la incertidumbre de ISO 12999-1 que lo cualifica.
+- [Recintos pequeños: procedimiento de baja frecuencia](/phonometry/es/buildings/insulation/low-frequency-procedure/):
+  la medición en esquinas que ISO 16283 hace obligatoria por debajo de 25 m³, y
+  el tiempo de reverberación de la octava de 63 Hz que la acompaña.
 - [Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/):
   la caracterización ISO 10140 de un elemento con los flancos suprimidos.
 - [Aislamiento acústico por intensidad (ISO 15186)](/phonometry/es/buildings/insulation/insulation-intensity/):

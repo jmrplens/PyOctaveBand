@@ -341,6 +341,9 @@ ISO 12999-1, ISO 10052, ANSI/ASA S12.2 and ASTM E413/E1414.
 - [Field Insulation Measurement (ISO 16283)](/phonometry/buildings/insulation/insulation-field/):
   airborne and impact insulation measured in the building, its test report and
   the ISO 12999-1 uncertainty that qualifies it.
+- [Small Rooms: the ISO 16283 Low-Frequency Procedure](/phonometry/buildings/insulation/low-frequency-procedure/):
+  the corner measurement ISO 16283 makes mandatory below 25 m³, and the 63 Hz
+  octave reverberation time that comes with it.
 - [Laboratory Insulation Measurement](/phonometry/buildings/insulation/insulation-lab/):
   the ISO 10140 characterisation of an element with flanking suppressed.
 - [Sound Insulation by Intensity (ISO 15186)](/phonometry/buildings/insulation/insulation-intensity/):

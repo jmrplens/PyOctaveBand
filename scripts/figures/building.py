@@ -20,6 +20,7 @@ from .theme import (
     _THIRD_OCTAVE_16,
     COLOR_FG,
     COLOR_GRID,
+    COLOR_MUTED,
     COLOR_PANEL,
     COLOR_PRIMARY,
     COLOR_SECONDARY,
@@ -2868,4 +2869,280 @@ def generate_intensity_field_indicator(output_dir: str) -> None:
 
     plt.tight_layout()
     save_figure(output_dir, "intensity_field_indicator.png")
+    plt.close()
+
+
+#: The receiving bedroom of the low-frequency figure, in metres: 3,6 m by
+#: 2,7 m by 2,4 m is 23,3 m³, which rounds to 23 m³ and so falls under the
+#: 25 m³ trigger of ISO 16283-1 Clause 8.1. The separating wall is one short
+#: wall of it, 2,7 m by 2,4 m.
+_LF_ROOM = (3.6, 2.7, 2.4)
+
+
+def generate_low_frequency_procedure(output_dir: str) -> None:
+    """ISO 16283 Clause 8: the corners, the combination and what it costs."""
+    print("Generating low_frequency_procedure...")
+    from phonometry import building
+
+    # The optional low range of Clause 5 measured alongside the 16 core bands,
+    # which is the only case in which the corner procedure has anything to do.
+    freqs = np.array(
+        [50.0, 63.0, 80.0, *_THIRD_OCTAVE_16],
+        dtype=float,
+    )
+    # Bedroom to bedroom across one short wall. The source room is 31 m³ and
+    # takes the default procedure; the receiving room is the small one.
+    l1 = np.array(
+        [
+            88.6, 90.4, 89.1, 87.3, 88.0, 87.4, 86.9, 86.5, 86.2, 85.8,
+            85.5, 85.1, 84.7, 84.2, 83.6, 82.9, 82.1, 81.2, 80.1,
+        ]
+    )  # fmt: skip
+    l2 = np.array(
+        [
+            54.7, 57.9, 53.2, 49.6, 47.1, 44.3, 41.0, 38.2, 35.6, 33.1,
+            31.0, 29.2, 27.6, 26.1, 24.9, 23.8, 23.0, 22.4, 22.1,
+        ]
+    )  # fmt: skip
+    t2 = np.array(
+        [
+            0.74, 0.69, 0.63, 0.58, 0.55, 0.53, 0.51, 0.50, 0.49, 0.48,
+            0.47, 0.46, 0.46, 0.45, 0.44, 0.43, 0.42, 0.41, 0.40,
+        ]
+    )  # fmt: skip
+    # Four corners per loudspeaker position (Clause 8.3, two of them at floor
+    # level and two at ceiling level) and two positions (Clause 8.1), at
+    # 50 / 63 / 80 Hz, which is the whole corner sheet.
+    corners = np.array(
+        [
+            [
+                [60.2, 63.8, 58.4],
+                [58.9, 65.1, 57.2],
+                [61.4, 62.6, 60.1],
+                [57.8, 64.2, 59.3],
+            ],
+            [
+                [59.6, 64.9, 59.8],
+                [60.8, 63.4, 58.1],
+                [58.3, 65.6, 60.7],
+                [61.1, 62.9, 57.6],
+            ],
+        ]
+    )
+    depth, width, height = _LF_ROOM
+    volume = depth * width * height
+    procedure = building.LowFrequencyProcedure(
+        volume=volume,
+        corner_levels=corners,
+        reverberation_63_octave=0.66,  # Clause 10.4, the 63 Hz octave band
+    )
+    default = building.airborne_insulation(
+        l1, l2, t2, area=width * height, volume=volume, frequencies=freqs
+    )
+    required = building.airborne_insulation(
+        l1,
+        l2,
+        t2,
+        area=width * height,
+        volume=volume,
+        frequencies=freqs,
+        receiver_low_frequency=procedure,
+    )
+    chain = required.receiver_low_frequency
+    assert chain is not None
+    w_default = building.weighted_rating_extended(default.dnt, freqs)
+    w_required = building.weighted_rating_extended(required.dnt, freqs)
+    # Present because `freqs` carries the whole 50 Hz to 3150 Hz range the
+    # Annex B term sums over; the terms are optional on the result because a
+    # core-range-only input has no enlarged range to form them from.
+    c50_default, c50_required = w_default.c_50_3150, w_required.c_50_3150
+    assert c50_default is not None
+    assert c50_required is not None
+
+    _fig, (ax_lf, ax_dnt) = plt.subplots(1, 2, figsize=(13.0, 5.8))
+
+    # -- Left: the three bands the procedure touches -----------------------
+    low = np.asarray(chain.low_frequency_bands, dtype=float)
+    x = _band_index_axis(ax_lf, low, fontsize=9)
+    ax_lf.fill_between(
+        x,
+        chain.l_default,
+        chain.l_lf,
+        color=theme_fill(COLOR_TERTIARY, ax_lf),
+        zorder=1,
+    )
+    # Every corner measurement, so the reader sees the maximum being picked
+    # out of a set rather than read off one microphone. One column per
+    # loudspeaker position, jogged either side of the band centre: on the
+    # centre the lowest corner of the 50 Hz band sits under the reported
+    # marker and stops being a datum. One `plot` call per column, so the
+    # legend carries one entry and not eight.
+    for position in range(corners.shape[0]):
+        ax_lf.plot(
+            np.tile(x + (position - 0.5) * 0.17, corners.shape[1]),
+            corners[position].ravel(),
+            ls="",
+            marker="o",
+            markersize=5,
+            markerfacecolor="none",
+            markeredgewidth=1.2,
+            color=COLOR_MUTED,
+            zorder=3,
+            label="the measured corners, per loudspeaker position"
+            if position == 0
+            else None,
+        )
+    ax_lf.plot(
+        x,
+        chain.l_corner,
+        "-s",
+        color=COLOR_SECONDARY,
+        linewidth=2.2,
+        markersize=6,
+        zorder=5,
+        label=r"$L_\mathrm{Corner}$, Formula (12)",
+    )
+    ax_lf.plot(
+        x,
+        chain.l_default,
+        "--o",
+        color=COLOR_PRIMARY,
+        linewidth=2.0,
+        markersize=6,
+        zorder=5,
+        label="$L$, default procedure",
+    )
+    ax_lf.plot(
+        x,
+        chain.l_lf,
+        "-D",
+        color=COLOR_FG,
+        linewidth=2.6,
+        markersize=6,
+        zorder=6,
+        label=r"$L_\mathrm{LF}$, Formula (13): reported",
+    )
+    lift = np.asarray(chain.l_lf) - np.asarray(chain.l_default)
+    # No leader: every route from clear ground to the shaded band crosses the
+    # default curve. The band is between the two curves the legend names, and
+    # the reading says what it is worth, which is what the leader was for.
+    ax_lf.text(
+        0.035,
+        0.04,
+        "the shaded band is what Formula (13) adds:\n"
+        + " / ".join(_fmt_minus(value, "+.1f") for value in lift)
+        + " dB, one third corner against two thirds default",
+        transform=ax_lf.transAxes,
+        fontsize=9,
+        color=COLOR_FG,
+        va="bottom",
+        ha="left",
+        zorder=8,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    ax_lf.set_ylabel("Sound pressure level [dB]")
+    ax_lf.set_title("In the corners of the receiving room (Clause 8)", pad=10)
+    # Headroom for the legend above the corner level, which peaks at 65 dB.
+    ax_lf.set_ylim(48.0, 73.0)
+    ax_lf.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax_lf.set_axisbelow(True)
+    ax_lf.legend(loc="upper right", fontsize=9)
+
+    # -- Right: the whole spectrum, and the single number ------------------
+    xf = _band_index_axis(ax_dnt, freqs, fontsize=8)
+    ax_dnt.fill_between(
+        xf,
+        default.dnt,
+        required.dnt,
+        color=theme_fill(COLOR_SECONDARY, ax_dnt),
+        zorder=1,
+    )
+    ax_dnt.plot(
+        xf,
+        default.dnt,
+        "--o",
+        color=COLOR_PRIMARY,
+        linewidth=2.0,
+        markersize=4,
+        zorder=4,
+        label=r"$D_\mathrm{nT}$, default procedure alone",
+    )
+    ax_dnt.plot(
+        xf,
+        required.dnt,
+        "-s",
+        color=COLOR_FG,
+        linewidth=2.4,
+        markersize=4,
+        zorder=5,
+        label=r"$D_\mathrm{nT}$, with the low-frequency procedure",
+    )
+    # Stopped below the reading, so the divider is not a line disappearing
+    # behind an opaque chip.
+    ax_dnt.axvline(
+        2.5, ymax=0.80, color=COLOR_MUTED, linewidth=1.2, linestyle=":", zorder=2
+    )
+    # Upper left is clear ground here: the curve climbs from 32 dB at 50 Hz to
+    # 58 dB at 3150 Hz, so nothing is drawn above the first bands.
+    ax_dnt.text(
+        0.03,
+        0.97,
+        "Clause 8 and Clause 10.4\nreach only these three bands",
+        transform=ax_dnt.transAxes,
+        va="top",
+        ha="left",
+        fontsize=9,
+        color=COLOR_FG,
+        zorder=8,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    ax_dnt.text(
+        0.975,
+        0.045,
+        "\n".join(
+            [
+                (
+                    r"$D_\mathrm{nT,w}$ = "
+                    f"{w_required.rating} dB either way (100 Hz to 3150 Hz)"
+                ),
+                (
+                    "$C_{50‐3150}$ = "
+                    f"{_fmt_minus(c50_default)} dB "
+                    r"$\rightarrow$ "
+                    f"{_fmt_minus(c50_required)} dB"
+                ),
+            ]
+        ),
+        transform=ax_dnt.transAxes,
+        va="bottom",
+        ha="right",
+        fontsize=9.5,
+        color=COLOR_FG,
+        zorder=8,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    ax_dnt.set_ylabel("Level difference [dB]")
+    ax_dnt.set_title("What the reported spectrum and its rating do", pad=10)
+    ax_dnt.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax_dnt.set_axisbelow(True)
+    ax_dnt.legend(loc="center right", fontsize=9)
+
+    plt.suptitle(
+        f"The ISO 16283 low-frequency procedure in a bedroom of {volume:.0f} m³",
+        y=0.985,
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "low_frequency_procedure.svg")
     plt.close()

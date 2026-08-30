@@ -313,19 +313,6 @@ zona central no es ni repetible ni representativo de lo que oye un ocupante. Un
 máximo de presión modal siempre queda en una esquina, así que las mediciones en
 esquina acotan el campo por arriba.
 
-**Cómo se toma una medición en esquina (apartados 8.3 y 8.4).** Un micrófono
-fijo, de 0,3 m a 0,4 m de *cada* uno de los tres paramentos que forman la
-esquina (las tres distancias no tienen por qué ser iguales), a 1,0 m como
-mínimo de cualquier altavoz, lo que en la práctica descarta la esquina que
-ocupa el altavoz. Mide al menos **cuatro** esquinas, dos a nivel de suelo y dos
-a nivel de techo, contiguas o no al elemento separador; cada esquina debe estar
-formada por tres superficies mutuamente perpendiculares de 0,5 m² como mínimo,
-sin mobiliario a menos de 0,5 m. Cuando eso sea imposible, se admiten esquinas
-con ángulos entre pares de superficies de 45° a 135°, o con un objeto, por
-ejemplo un armario, formando una de las superficies. Promedia al menos 15 s por
-posición. Con un único altavoz desplazado entre posiciones, repite las cuatro
-esquinas en cada posición.
-
 **Cómo entran las esquinas en el resultado (apartado 8.5).** Para cada una de
 las tres bandas por separado, toma la **más alta** de las esquinas medidas, que
 puede ser una esquina distinta en cada banda, como $L_\text{Corner}$; con
@@ -338,28 +325,10 @@ L_\mathrm{LF} = 10\log_{10}\left[\frac{10^{0,1 L_\text{Corner}} + 2 \cdot 10^{0,
 $$
 
 $L_\mathrm{LF}$ sustituye a $L$ en esas tres bandas, y $D_\mathrm{nT}$ o $R'$ se forman
-después exactamente igual que antes. Como $L_\text{Corner}$ puede superar a $L$
-en varios decibelios, el procedimiento sube por igual el nivel del recinto
-emisor y el del receptor: el efecto sobre la *diferencia* de niveles es lo que
-los dos recintos no tienen en común, que es justo la información que tira el
-procedimiento por defecto. El apartado 9.1 añade la consecuencia para el ruido
-de fondo: hace falta una medición de fondo **en cada esquina utilizada**,
-porque cada banda puede venir de una esquina distinta y necesitar por tanto su
-propia corrección.
-
-**Apartado 10.4: también el tiempo de reverberación.** Con el mismo
-disparador, los tiempos de reverberación de tercio de octava de 50 Hz, 63 Hz y
-80 Hz dejan de medirse y un único valor de la banda de **octava de 63 Hz** los
-sustituye en las tres. Es una prescripción sobre qué medir, no una afirmación
-de que los valores sean iguales: en un recinto pequeño una caída de tercio de
-octava rara vez tiene modos suficientes para ser de pendiente única, y en
-construcción con entramado de madera o acero puede ser más corta que la propia
-caída del filtro de tercio de octava del analizador. Por debajo del disparador
-tampoco hay a qué recurrir, porque el apartado 10.3 limita el procedimiento por
-defecto del tiempo de reverberación a 100 Hz y por encima en cuanto el recinto
-es así de pequeño. El apartado es del recinto **receptor** en las tres partes,
-incluso en la parte 1, donde el procedimiento de esquinas admite además el
-recinto emisor.
+después exactamente igual que antes. Con el mismo disparador, el apartado 10.4
+deja además de medir los tiempos de reverberación de tercio de octava de
+50 Hz, 63 Hz y 80 Hz y pone en su lugar un único valor de la banda de **octava
+de 63 Hz**.
 
 ```python
 # `np` y `building` son los imports de los bloques de arriba.
@@ -388,40 +357,11 @@ print(building.low_frequency_procedure_applies(25.4))   # False, redondea a 25
 
 En una medición completa las dos mitades viajan juntas en un
 `LowFrequencyProcedure`, que `airborne_insulation()` aplica por ti al vector de
-bandas: reescribe las tres bandas con $L_\mathrm{LF}$ y pone el valor de la
-octava de 63 Hz sobre esos mismos tres tiempos de reverberación, dejando
-intactas las bandas de 100 Hz en adelante.
-
-```python
-# 50, 63 y 80 Hz más las tres primeras bandas del rango básico, para que se vea
-# la sustitución.
-freqs = np.array([50.0, 63.0, 80.0, 100.0, 125.0, 160.0])
-l1_lf = np.array([88.4, 90.1, 87.6, 85.2, 84.7, 84.1])
-l2_lf = np.array([49.5, 51.2, 48.6, 45.6, 43.2, 41.8])
-t2_lf = np.array([0.62, 0.58, 0.54, 0.49, 0.47, 0.45])
-
-receiving = building.LowFrequencyProcedure(
-    volume=22.0,
-    corner_levels=corners,
-    reverberation_63_octave=0.72,         # apartado 10.4
-)
-small = building.airborne_insulation(l1_lf, l2_lf, t2_lf, frequencies=freqs,
-                                     receiver_low_frequency=receiving)
-print(np.round(small.l2, 1))              # [51.9 54.  50.4 45.6 43.2 41.8]
-print(small.t2)                           # [0.72 0.72 0.72 0.49 0.47 0.45]
-```
-
-`impact_insulation()` y `facade_insulation()` reciben el mismo objeto bajo el
-argumento `low_frequency=` y llegan al mismo código: la Fórmula (16) de la
-parte 2 y la Fórmula (5) de la parte 3 son la Fórmula (13) con otros
-subíndices. Dos diferencias entre las partes son reales y se exigen. La parte 1
-evalúa los dos recintos por separado, así que `airborne_insulation()` acepta
-además un `source_low_frequency=`, y un recinto emisor pequeño junto a un
-receptor grande mueve $L_1$ y deja $L_2$ y $T$ tal como se midieron. La parte 3
-limita el procedimiento a los métodos de **altavoz** por elementos y global (la
-NOTA 1 del apartado 6 deja constancia de que no hay experiencia de aplicarlo
-con tráfico como fuente), de modo que pasarlo con `method="road_traffic"` da
-error en vez de una respuesta.
+bandas, y que `impact_insulation()` y `facade_insulation()` reciben bajo el
+argumento `low_frequency=`. La geometría de las esquinas, los requisitos de
+muestreo, las diferencias entre las tres partes y una medición resuelta con su
+valoración están en una guía propia:
+[Recintos pequeños: procedimiento de baja frecuencia](/phonometry/es/buildings/insulation/low-frequency-procedure/).
 
 ## Aislamiento a ruido de impactos en campo (ISO 16283-2)
 
@@ -809,7 +749,7 @@ posición de la ISO 16283-1/-2 (los recuentos, las distancias y la colocación d
 comprueban en ninguna parte: el promediado en energía ocurre una vez que se
 proporcionan las posiciones, pero nada verifica cuántas se tomaron ni dónde. El
 procedimiento de baja frecuencia de [Recintos
-pequeños](#recintos-pequenos-apartado-8) *sí* está implementado (el disparador
+pequeños](/phonometry/es/buildings/insulation/low-frequency-procedure/) *sí* está implementado (el disparador
 de los 25 m³, la Fórmula (12), la Fórmula (13) y el tiempo de reverberación de
 la octava de 63 Hz del apartado 10.4), pero también recibe niveles de esquina
 que midió el operador, y el único requisito de muestreo que exige es un aviso

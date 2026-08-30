@@ -204,6 +204,7 @@ export const topics = [
         items: [
           { slug: 'buildings/insulation', label: 'Overview', translations: { es: 'Resumen' } },
           'buildings/insulation/insulation-field',
+          'buildings/insulation/low-frequency-procedure',
           'buildings/insulation/insulation-lab',
           'buildings/insulation/insulation-intensity',
           'buildings/insulation/insulation-survey',
