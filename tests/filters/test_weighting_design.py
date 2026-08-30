@@ -10,11 +10,12 @@ three things that makes it a design rather than an optimiser's leftovers:
 * the response it produces is pinned against the analog prototype, per curve
   and per rate, far tighter than any standard's mask; and
 * it is deterministic -- the same call gives the same bits, in this process, in
-  another process, and under another BLAS thread count.
+  another process, under another BLAS thread count, and on another CPU.
 """
 
 from __future__ import annotations
 
+import math
 import os
 import subprocess
 import sys
@@ -29,9 +30,15 @@ from scipy import signal as sg
 from phonometry import filters
 from phonometry.filters._weighting_design import (
     _CORNER_DECADES,
+    _cascade_magnitude,
+    _ordered_sum,
+    _solve_dense,
     design_sos,
     fit_prototype,
     fitted_prototype_hz,
+)
+from phonometry.filters._weighting_design import (
+    _analog_db as _shipped_analog_db,
 )
 from phonometry.filters.weighting import (
     _FIT_NYQUIST_FRACTION,
@@ -60,29 +67,37 @@ _RATES = (32000, 44100, 48000, 88200, 96000, 192000)
 #: half a percent below it.
 #:
 #: What they are *not* is the measurement on this machine rounded up. That is
-#: the natural way to write a table like this and it does not survive contact
-#: with another one: the design ends in a sequence of small dense solves, a
-#: different BLAS reassociates their reductions, and a step whose gain sits
-#: near :data:`~phonometry.filters._weighting_design._LM_ACCEPT_MARGIN` is
-#: taken on one machine and skipped on the other. Perturbing every solve by a
-#: relative 1e-12 -- generous beside the 1e-15 a reassociation in a solve this
-#: small is worth, and generous on purpose -- moves the C row from 0.00243 dB
-#: to 0.00313 and the 468 row from 0.05974 to 0.06290. Rounded up, those two
-#: rows read 0.003 and 0.065, so a gate written that way is already failing on
-#: a machine that has not run it yet.
+#: the natural way to write a table like this, and what it does not survive is
+#: the next change to the arithmetic underneath it. The design ends in a
+#: sequence of small dense solves, and Levenberg-Marquardt in a shallow valley
+#: amplifies a last-bit difference in one of them by four orders of magnitude
+#: before the budget runs out. Nothing in the library reassociates those
+#: reductions any more, and nothing on the path fuses a multiply into an add
+#: either, which is what makes the design the same on every CPU; see
+#: :func:`~phonometry.filters._weighting_design._ordered_sum` and
+#: :func:`~phonometry.filters._weighting_design._log_distance2`. What is left
+#: is numpy's own ``exp`` and ``log``, and a release that retunes one of them
+#: still moves the last bit, so this table has to outlive that. Perturbing
+#: every solve by a relative 1e-12 moves the C row from 0.00220 dB to 0.00324
+#: and the AU row from 0.00590 to 0.00666. Rounded up, those two rows read
+#: 0.003 and 0.006, so a gate written that way is already failing on a release
+#: that has not happened yet.
 #:
 #: Each bound is therefore at least half again above what the routine reaches
 #: under that perturbation, and still inside 2.5 times the unperturbed
 #: measurement so that :func:`test_the_bound_is_not_slack` keeps biting from
-#: the other side. That leaves them regression guards without making them
-#: coin flips.
+#: the other side. Measured against both, the tightest row on the first count
+#: is C at 1.54 times its perturbed worst and the loosest on the second is C
+#: again at 2.27 times its unperturbed one, so every row is inside the band
+#: and no row is at its edge.
 #:
-#: AU is the row that tests the rule rather than following it. Its fit is
-#: visibly multi-modal across seeds, reaching 0.004289 to 0.007164 dB under the
-#: same 1e-12 perturbation where every other curve barely moves, so 0.009 left
-#: it at 1.26 times its own worst case and broke the invariant above. 0.011
-#: restores 1.54 times, and is still 2.08 times the unperturbed 0.005282, so
-#: the guard on the other side keeps biting.
+#: The bounds are left where they were rather than pulled down onto
+#: measurements that have just moved. Several rows did move: the fit is
+#: multi-modal, a change to the arithmetic underneath it lands it in a
+#: different mode, and the 468 row went from 0.0597 dB to 0.0624 without
+#: anything about the search changing. That is the whole reason a bound here is
+#: a band and not a pinned number, and a bound retuned every time the fit lands
+#: somewhere else would not be a guard at all.
 _WORST_DEVIATION_DB = {
     "A": 0.013,
     "B": 0.0035,
@@ -121,16 +136,17 @@ _LOW_RATES = (100, 125, 200, 250, 400, 500, 903, 1000, 1500, 2000)
 #: Nyquist frequency; eight of the seventy pairs are over 0.1 dB and the median
 #: is 0.0013. The bound is set well clear of that rather than just above it,
 #: because these are the designs that reach for a second start, and which start
-#: wins is the kind of thing another BLAS could decide differently. What the
-#: number has to beat is the design this branch replaced: the oversampled path
-#: reached 0.446 dB over the same seventy pairs, at the same G row.
+#: wins is decided on an achieved residual that the last bit of the arithmetic
+#: can still move. What the number has to beat is the design this branch
+#: replaced: the oversampled path reached 0.446 dB over the same seventy
+#: pairs, at the same G row.
 #:
 #: That last worry turns out not to apply to the row that sets the number. Under
 #: the same perturbation of every linear solve the table above is sized against,
 #: the seventy-pair maximum does not move at all: 0.30706 dB at G, fs = 500, to
 #: five decimals, at 1e-12 and at 1e-10 and across seeds. It is set by the
 #: zero slope a real-coefficient filter has at the Nyquist frequency and not by
-#: where the search stopped, so there is nothing in it for a reassociated
+#: where the search stopped, so there is nothing in it for a perturbed
 #: reduction to decide. The bound therefore sits at 1.43 times a measurement
 #: that does not wander, which is tighter than any row of the audio table above
 #: and is not the coin flip that ratio would be if the measurement did.
@@ -163,9 +179,9 @@ _CLASS_1_RATES = (8000, 16000, 22050, 32000, 44100, 48000, 96000, 192000)
 #: stage, and a ``sosfreqz`` of its sections said nothing whatever about what a
 #: tone would read.
 #:
-#: The measurement is 0.0068 dB (A at 32 kHz, the 15 848.9 Hz row), of which at
+#: The measurement is 0.0081 dB (A at 32 kHz, the 316.2 Hz row), of which at
 #: most 0.0015 dB anywhere in the sweep is the RMS estimator rather than the
-#: filter. Sized like the table above: at least half again above the 0.0080 dB
+#: filter. Sized like the table above: at least half again above the 0.0079 dB
 #: the same sweep reaches when every linear solve is perturbed by a relative
 #: 1e-10, and inside 2.5 times the unperturbed measurement so that
 #: :func:`test_the_tone_bound_is_not_slack` keeps biting from the other side.
@@ -245,6 +261,21 @@ def _table3_frequencies(fs: int) -> list[float]:
     return sorted(f for f in exact | {20000.0} if f < 0.5 * fs)
 
 
+def _cascade_magnitude_at_higher_precision(
+    sos: np.ndarray, frequency: float, fs: float
+) -> np.longdouble:
+    """``|H|`` again, in whatever precision above double this machine has."""
+    angle = np.longdouble(2.0) * np.longdouble(np.pi) * np.longdouble(frequency)
+    z = np.exp(-1j * np.clongdouble(angle / np.longdouble(fs)))
+    magnitude = np.longdouble(1.0)
+    for section in sos:
+        coefficients = [np.longdouble(value) for value in section]
+        top = coefficients[0] + coefficients[1] * z + coefficients[2] * z * z
+        bottom = coefficients[3] + coefficients[4] * z + coefficients[5] * z * z
+        magnitude *= abs(top) / abs(bottom)
+    return magnitude
+
+
 def _worst_tone_deviation_db(curve: str, fs: int) -> tuple[float, float]:
     """Worst ``(deviation, frequency)`` of a tone from the printed curve at *fs*."""
     zeros, poles, _ = _analog_weighting_zpk(curve)
@@ -272,6 +303,21 @@ def test_the_bound_is_not_slack(curve: str) -> None:
     Each entry of :data:`_WORST_DEVIATION_DB` has to stay close to what the
     routine actually delivers, or the table above stops being a regression
     guard and becomes decoration.
+
+    Written as a floor under the measurement, which with
+    :func:`test_realised_filter_tracks_its_printed_prototype` above it makes
+    the pair a range: each curve has to land between 0.4 and 1.0 of its bound.
+    It is worth saying why the floor stays, because it is the half that used to
+    fail. Before the design was made machine independent, AU came back at
+    0.00413 dB on four of the OpenBLAS kernel sets against the 0.0044 this
+    floor needs, so ``tests/filters`` failed on eleven of the twenty-one
+    selectable kernels -- for landing on a *better* filter. The answer to that
+    is not to drop the floor. A design that quietly improves and leaves its
+    bound where it was is precisely when the bound stops measuring anything,
+    and the floor is the only thing that asks for it to be retightened. What
+    was wrong was that the measurement was not a function of the source, and
+    that is what has been fixed; see
+    :func:`test_the_design_does_not_depend_on_the_blas_kernel`.
     """
     worst = max(float(np.max(np.abs(_deviation_db(curve, fs)))) for fs in _RATES)
     assert worst >= 0.4 * _WORST_DEVIATION_DB[curve], (
@@ -336,15 +382,25 @@ def test_the_reference_frequency_carries_no_error(curve: str) -> None:
     IEC 61012 Table 1 prints a zero tolerance there outright, and the others
     define their curve as a level relative to it, so an error at the reference
     frequency is an error at every other one.
+
+    Read back at a precision above the one the cascade is stored in, and not
+    with :func:`scipy.signal.sosfreqz`, which is not accurate enough to see
+    whether this holds. G's reference frequency is 10 Hz, which at 48 kHz is
+    2.6e-6 of the Nyquist frequency, and evaluating a numerator with zeros at
+    ``z = 1`` there costs ``sosfreqz`` ten significant digits to cancellation:
+    it reads this filter 1.1e-9 dB from 0 where the filter is 1.4e-13 dB from
+    it. That mattered less when the cascade was normalised by ``sosfreqz`` too,
+    because then the same error appeared on both sides and cancelled, and this
+    assertion measured only that a number had been divided by itself. It does
+    not cancel now (see
+    :func:`~phonometry.filters._weighting_design._cascade_magnitude`), which is
+    what makes the pin worth asserting rather than tautological.
     """
     reference = _REFERENCE_HZ.get(curve, 1000.0)
     for fs in (44100, 48000):
-        _, response = sg.sosfreqz(
-            filters.WeightingFilter(fs, curve).sos,
-            worN=np.array([reference]),
-            fs=fs,
-        )
-        assert 20.0 * np.log10(abs(response[0])) == pytest.approx(0.0, abs=1e-12)
+        sos = filters.WeightingFilter(fs, curve).sos
+        wider = _cascade_magnitude_at_higher_precision(sos, reference, float(fs))
+        assert 20.0 * float(np.log10(wider)) == pytest.approx(0.0, abs=1e-12)
 
 
 def test_the_fit_band_covers_every_row_the_standards_state() -> None:
@@ -361,6 +417,140 @@ def test_the_fit_band_covers_every_row_the_standards_state() -> None:
     assert _fit_band("A", 32000)[1] > exact_16k
     # And at a rate that does not clip, the band is the standard's own.
     assert _fit_band("A", 192000) == _STANDARD_BAND_HZ["A"]
+
+
+def test_the_reduction_is_pairwise_and_not_a_running_total() -> None:
+    r"""What replaces ``ddot`` has to be at least as accurate, not just as fixed.
+
+    A running total accumulates :math:`O(\varepsilon n)` of rounding and
+    folding in half accumulates :math:`O(\varepsilon \log n)`, so on a
+    conditioned sum the fold has to land nearer the exactly rounded answer
+    than the loop does. Measured against :func:`math.fsum`, which is that
+    answer.
+    """
+    rng = np.random.default_rng(20260830)
+    terms = rng.normal(size=4096) * rng.lognormal(sigma=8.0, size=4096)
+    exact = math.fsum(terms.tolist())
+    folded = abs(float(_ordered_sum(terms)) - exact)
+    running = abs(float(np.cumsum(terms)[-1]) - exact)
+    assert folded <= running
+
+    # The leftover of an odd count is carried, not dropped.
+    for count in (1, 2, 3, 5, 257, 1000):
+        assert float(_ordered_sum(np.ones(count))) == pytest.approx(count, abs=0)
+    # And an empty stack sums to a zero of the right shape.
+    assert _ordered_sum(np.zeros((0, 4))).shape == (4,)
+
+
+def test_the_solver_matches_lapack_and_refuses_rather_than_diverges() -> None:
+    """The elimination done here, against the one it replaced.
+
+    The point of writing it out is the reduction order, not a different
+    answer, so on systems that have one it has to agree with
+    :func:`numpy.linalg.solve` to the conditioning and no worse. The two
+    degenerate inputs are the reason the pivot test is spelled as a magnitude:
+    a singular system and one that has gone to NaN both have to come back as a
+    step of zeros, which the accept test then rejects, rather than as an
+    exception or as NaN in the parameters.
+    """
+    rng = np.random.default_rng(20260830)
+    worst = 0.0
+    for _ in range(200):
+        order = int(rng.integers(1, 25))
+        square = rng.normal(size=(order, order))
+        spd = square @ square.T + 1e-3 * np.eye(order)
+        right = rng.normal(size=order)
+        mine = _solve_dense(spd, right)
+        theirs = np.linalg.solve(spd, right)
+        worst = max(worst, float(np.max(np.abs(mine - theirs))))
+    assert worst < 1e-6, f"worst disagreement with LAPACK: {worst:.3e}"
+
+    np.testing.assert_array_equal(_solve_dense(np.ones((5, 5)), np.arange(5.0)), 0.0)
+    np.testing.assert_array_equal(
+        _solve_dense(np.full((4, 4), np.nan), np.ones(4)), 0.0
+    )
+
+
+@pytest.mark.parametrize("curve", _PROTOTYPE_CURVES)
+def test_the_printed_curve_is_the_same_curve_written_in_real_arithmetic(
+    curve: str,
+) -> None:
+    r"""The target the fit aims at, against the complex spelling it replaced.
+
+    :func:`~phonometry.filters._weighting_design._analog_db` sums logarithms of
+    :math:`(\Re r)^2 + (\Omega - \Im r)^2` where it used to take the
+    magnitude of a product of complex factors, because the complex kernels are
+    dispatched on what the CPU can do and the real ones are not. That is a
+    change of arithmetic, not of function, so it has to agree with the thing it
+    replaced over the whole band -- and be the better conditioned of the two,
+    since a product of a dozen factors at 384 kHz is within a decade of
+    overflowing where a sum of logarithms is nowhere near it.
+    """
+    zeros, poles, _ = _analog_weighting_zpk(curve)
+    reference = _REFERENCE_HZ.get(curve, 1000.0)
+    grid = np.geomspace(1.0, 200000.0, 4001)
+
+    s = 2j * np.pi * grid
+    s_ref = 2j * np.pi * reference
+
+    def complex_magnitude(argument: np.ndarray) -> np.ndarray:
+        top = (
+            np.prod(argument[:, None] - zeros[None, :], axis=1)
+            if zeros.size
+            else np.ones_like(argument)
+        )
+        return np.abs(top / np.prod(argument[:, None] - poles[None, :], axis=1))
+
+    expected = 20.0 * np.log10(
+        complex_magnitude(s) / complex_magnitude(np.array([s_ref]))[0]
+    )
+    np.testing.assert_allclose(
+        _shipped_analog_db(zeros, poles, grid, reference),
+        expected,
+        atol=1e-11,
+        rtol=0.0,
+    )
+
+
+def test_the_cascade_is_read_back_no_worse_than_sosfreqz_reads_it() -> None:
+    """The gain the shipped filter is normalised by, against scipy's own.
+
+    Same argument as the curve above: writing the read-back out in real
+    arithmetic is worth doing only if it is the same number. Checked on every
+    curve at a rate where the anchor is the reference frequency and at one
+    where it is not, and away from the anchor as well, so that what is compared
+    is a magnitude and not one coincidence at 1 kHz.
+
+    Graded against a wider-precision evaluation of the same cascade rather than
+    against ``sosfreqz`` directly, because the two disagree by 3e-7 relative at
+    the bottom of the G weighting's band and neither is wrong there: at 0.25 Hz
+    and 48 kHz the numerator of a section is a difference of ``O(1)``
+    coefficients that comes out at 4e-5, so five significant digits are lost to
+    cancellation before either method starts. What the test has to establish is
+    that the arithmetic written out here does not lose more of them than the
+    library call did, and at the worst point in the sweep it loses fewer
+    (1.3e-7 against 1.9e-7).
+    """
+    if np.finfo(np.longdouble).eps >= np.finfo(np.float64).eps:
+        pytest.skip("no precision above double to grade against here")
+    mine_worst, theirs_worst, agreement = 0.0, 0.0, 0.0
+    for curve in _PROTOTYPE_CURVES:
+        for fs in (903, 48000):
+            sos = filters.WeightingFilter(fs, curve).sos
+            probes = np.geomspace(*_fit_band(curve, fs), 40)
+            _, response = sg.sosfreqz(sos, worN=probes, fs=fs)
+            for probe, theirs in zip(probes, np.abs(response), strict=True):
+                mine = _cascade_magnitude(sos, float(probe), float(fs))
+                wider = _cascade_magnitude_at_higher_precision(
+                    sos, float(probe), float(fs)
+                )
+                mine_worst = max(mine_worst, float(abs(mine - wider) / wider))
+                theirs_worst = max(theirs_worst, float(abs(theirs - wider) / wider))
+                agreement = max(agreement, float(abs(mine - theirs) / wider))
+    assert agreement < 1e-6, f"disagreement with sosfreqz: {agreement:.3e}"
+    assert mine_worst <= theirs_worst, (
+        f"written out: {mine_worst:.3e}, sosfreqz: {theirs_worst:.3e}"
+    )
 
 
 def test_repeated_designs_are_bit_identical() -> None:
@@ -402,6 +592,99 @@ def test_the_design_does_not_depend_on_the_blas_thread_count() -> None:
         ).stdout.strip()
 
     assert digest("1") == digest("4")
+
+
+#: Kernel sets ``OPENBLAS_CORETYPE`` can select that reach different code in a
+#: ``DYNAMIC_ARCH`` build without needing instructions a 64-bit x86 machine
+#: might not have. Deliberately not the AVX-512 sets: those fault outright on a
+#: CPU that does not implement them, and nothing here is worth a SIGILL.
+_KERNEL_SETS = ("Prescott", "Nehalem", "Sandybridge", "Haswell")
+
+
+def test_the_design_does_not_depend_on_the_blas_kernel() -> None:
+    """The same filter on every CPU, which is the harder half of determinism.
+
+    The thread count above is the easy half. This is the one that bit: numpy
+    here sits on an OpenBLAS built ``DYNAMIC_ARCH``, which picks its kernels
+    from what the CPU reports at load time, and each set is free to reassociate
+    a reduction differently. When the fit's reductions were BLAS calls, that
+    was enough to hand back a different filter: 0.5904875 against 0.5905175
+    against 0.5904705 in the leading coefficient of A at 48 kHz, from the same
+    source on the same machine, with only this variable changed.
+
+    ``OPENBLAS_CORETYPE`` is how a single machine can be asked for another
+    machine's kernels. It is honoured only by a ``DYNAMIC_ARCH`` OpenBLAS, so
+    on a build that ignores it every subprocess agrees for the wrong reason and
+    this test passes without having looked at anything -- which is why the
+    determinism it is guarding is a property of the routine (see
+    :func:`~phonometry.filters._weighting_design._ordered_sum`) rather than of
+    what this test can see. A kernel set the CPU cannot run is skipped rather
+    than failed, because refusing to start is not disagreement.
+    """
+    script = textwrap.dedent(
+        """
+        from phonometry import filters
+        print(filters.WeightingFilter(48000, "A").sos.tobytes().hex())
+        """
+    )
+    digests = {}
+    for kernel in _KERNEL_SETS:
+        environment = dict(os.environ, OPENBLAS_CORETYPE=kernel)
+        finished = subprocess.run(  # noqa: S603  # fixed argv, no shell, no user input
+            [sys.executable, "-c", script],
+            check=False,
+            capture_output=True,
+            text=True,
+            env=environment,
+        )
+        if finished.returncode == 0:
+            digests[kernel] = finished.stdout.strip()
+    if len(digests) < 2:
+        pytest.skip("no two OpenBLAS kernel sets are selectable here")
+    assert len(set(digests.values())) == 1, {k: v[:32] for k, v in digests.items()}
+
+
+def test_the_design_does_not_depend_on_the_numpy_kernel() -> None:
+    """The other half of the same question, and the half that lasted longer.
+
+    ``OPENBLAS_CORETYPE`` above varies the library numpy calls. This varies
+    numpy's own: it is built with a baseline every x86-64 machine has and a set
+    of feature groups it dispatches to at import, and ``NPY_DISABLE_CPU_FEATURES``
+    turns a group off, which is what a CPU that does not implement it does by
+    itself. The kernels that moved were the complex ones -- complex multiply
+    and complex absolute value fuse a multiply into an add where the
+    instruction exists -- and with the fit's reductions already fixed they were
+    still enough to move all ninety-one designs in the corpus, because the
+    curve the fit aims at was computed through them. Hence
+    :func:`~phonometry.filters._weighting_design._log_distance2` and
+    :func:`~phonometry.filters._weighting_design._cascade_magnitude`.
+
+    The whole dispatchable set is turned off at once rather than one group at a
+    time: what matters is that the baseline answer and the tuned answer agree,
+    not which group carried the difference. As with the kernel test above, a
+    build with nothing to disable passes without having looked at anything.
+    """
+    script = textwrap.dedent(
+        """
+        from phonometry import filters
+        print(filters.WeightingFilter(48000, "A").sos.tobytes().hex())
+        """
+    )
+    digests = {}
+    for disabled in ("", "X86_V3 X86_V4 AVX512_ICL AVX512_SPR"):
+        environment = dict(os.environ, NPY_DISABLE_CPU_FEATURES=disabled)
+        finished = subprocess.run(  # noqa: S603  # fixed argv, no shell, no user input
+            [sys.executable, "-c", script],
+            check=False,
+            capture_output=True,
+            text=True,
+            env=environment,
+        )
+        if finished.returncode == 0:
+            digests[disabled or "everything"] = finished.stdout.strip()
+    if len(digests) < 2:
+        pytest.skip("numpy's dispatched kernels are not selectable here")
+    assert len(set(digests.values())) == 1, {k: v[:32] for k, v in digests.items()}
 
 
 @pytest.mark.parametrize("fs", _LOW_RATES)
@@ -627,7 +910,7 @@ def test_a_tone_reads_the_printed_curve_through_the_filter(curve: str, fs: int) 
     row's goal is -13.4 dB where the curve is at -13.3504 -- and a bound drawn
     around the printed goal is spent on that rounding before the filter is
     measured at all. Against the curve itself the whole sweep is inside
-    0.0068 dB.
+    0.0081 dB.
     """
     worst, where = _worst_tone_deviation_db(curve, fs)
     assert abs(worst) <= _WORST_TONE_DB, (
@@ -648,8 +931,8 @@ def test_the_20_khz_reading_at_44_1_khz_is_the_published_one() -> None:
     """The one high-frequency number the changelog quotes, measured.
 
     A weighting at the commonest consumer rate, at the top of the audio band:
-    a 20 kHz tone through a 44.1 kHz filter reads -9.3446 dB against the
-    prototype's own -9.3469, 0.0023 dB out. Every part of that is load
+    a 20 kHz tone through a 44.1 kHz filter reads -9.3443 dB against the
+    prototype's own -9.3469, 0.0026 dB out. Every part of that is load
     bearing. The frequency is 0.907 of the Nyquist frequency, where the warp
     this design exists to undo does its worst; 44.1 kHz is not one of the rates
     the Table 3 files sweep; and the oversampled path this branch replaced read
@@ -657,15 +940,16 @@ def test_the_20_khz_reading_at_44_1_khz_is_the_published_one() -> None:
     The closed-form design that still ships as ``high_accuracy=False`` reads
     -33.884 dB, which is the size of the thing the fit is for.
 
-    Pinned to 0.005 dB rather than to the four decimals it is quoted at,
-    because the last of those decimals is a property of one machine's BLAS and
-    the first three are a property of the design.
+    Pinned to 0.005 dB rather than to the four decimals it is quoted at. The
+    first three are a property of the design and hold on every machine; the
+    fourth is a property of the arithmetic the fit ran on, which is fixed
+    across CPUs but not across numpy releases.
     """
     reading = _tone_gain_db("A", 44100, 20000.0)
     zeros, poles, _ = _analog_weighting_zpk("A")
     printed = _analog_db(zeros, poles, np.array([20000.0]), 1000.0)[0]
     assert printed == pytest.approx(-9.3469, abs=1e-4)
-    assert reading == pytest.approx(-9.3446, abs=0.005)
+    assert reading == pytest.approx(-9.3443, abs=0.005)
     assert reading == pytest.approx(printed, abs=0.005)
 
 
@@ -693,7 +977,7 @@ def test_a_and_c_earn_class_1_at_every_rate_the_library_claims(
 def test_the_design_is_paid_for_once_per_curve_rate_and_mode() -> None:
     """The fit runs once and is shared, which is what makes it affordable.
 
-    It costs about 80 ms, against 0.007 ms to hand back a cached copy, so a
+    It costs about 150 ms, against 0.007 ms to hand back a cached copy, so a
     caller that constructs a filter per block would pay four orders of
     magnitude more for the same coefficients. A rate no other test uses, so
     the counters mean what they say however this file is sharded.

@@ -79,7 +79,7 @@ each of them used to be a documented limitation of this module:
 * one minute of 44.1 kHz audio costs about 18 ms instead of 377 ms for A and
   775 ms for 468, and holds 21 MB of intermediates instead of 169 MB
   (measured back to back in one process, mean of five runs). The design
-  itself costs about 70 ms and is cached, so even a first call is quicker
+  itself costs about 130 ms and is cached, so even a first call is quicker
   than the path it replaces.
 """
 
@@ -513,12 +513,12 @@ def _weighting_sos(curve: str, fs: int, high_accuracy: bool) -> np.ndarray:
     library never actually applied, and the rates where they win are ones no
     standard in the corpus places a requirement at.
 
-    The fit costs about 70 ms, which is why it is cached: it is paid once per
+    The fit costs about 130 ms, which is why it is cached: it is paid once per
     (curve, rate, mode), and it is already a fifth of what the resampled path
     it replaces spent *filtering* one minute of audio. Where the first start
     does not land close enough, the routine works through the other starts of
     :func:`~phonometry.filters._weighting_design._spare_placements` and the
-    design takes about 0.6 s instead. That is common below about 2 kHz, and it
+    design takes about 1.2 s instead. That is common below about 2 kHz, and it
     also happens at scattered rates inside the audio band: measured over every
     rate from 2 Hz to 200 kHz, 52 of them at or above 2 kHz take the retry, of
     which five are at or above 8 kHz -- 468 at nine rates between 45 and
