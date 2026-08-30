@@ -22,6 +22,7 @@ Standard anchors:
 from __future__ import annotations
 
 import math
+import unittest.mock
 import warnings
 
 import numpy as np
@@ -2229,3 +2230,25 @@ def test_the_remainder_refusal_does_not_blame_the_whole_surface() -> None:
     assert float(np.mean(intensity)) > 0.0
     with pytest.raises(ValueError, match=r"outside the selected subset"):
         emission.partial_power_concentration(intensity, areas)
+
+
+def test_every_intensity_result_is_captioned_with_its_own_part() -> None:
+    """The caption is the only place a figure says which method it came from.
+
+    ``PrecisionIntensityResult`` does not inherit from the Part 2 result, so
+    with no test of its own it fell past every branch of the designation
+    helper to the enveloping-surface fallback, and an ISO 9614-3 determination
+    was captioned with the pressure methods it exists to outrank.
+    """
+    from phonometry._plot.common import _sound_power_designation
+    from phonometry.emission.sound_power_intensity import (
+        PrecisionIntensityResult,
+        SoundPowerIntensityResult,
+    )
+
+    scanning = unittest.mock.Mock(spec=SoundPowerIntensityResult)
+    precision = unittest.mock.Mock(spec=PrecisionIntensityResult)
+    points = unittest.mock.Mock(spec=emission.DiscretePointIntensityResult)
+    assert _sound_power_designation(points) == "ISO 9614-1"
+    assert _sound_power_designation(scanning) == "ISO 9614"
+    assert _sound_power_designation(precision) == "ISO 9614"

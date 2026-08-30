@@ -1097,14 +1097,23 @@ def _sound_power_designation(
     designation helper knew the type, an ISO 3745 grade-1 determination was
     captioned with the engineering and survey standards it exists to outrank.
 
-    The two intensity branches part company on the part of ISO 9614 they
+    The intensity branches part company on the part of ISO 9614 they
     implement, because the caption is the only place the figure says which
     method produced the spectrum: measurement at discrete points is Part 1,
-    while both scanning results are Part 2 or Part 3 and share the bare
-    "ISO 9614" the caption has always carried for them.
+    and the two scanning results share the bare "ISO 9614" the caption has
+    always carried for them, since one of them covers Part 2's two grades and
+    the other is Part 3.
+
+    ``PrecisionIntensityResult`` needs its own test and does not inherit from
+    the Part 2 result, so without one it fell past every branch to the
+    enveloping-surface fallback and an ISO 9614-3 determination was captioned
+    with the pressure methods it is not.
     """
     from ..emission.sound_power_anechoic import PrecisionSoundPowerResult
-    from ..emission.sound_power_intensity import SoundPowerIntensityResult
+    from ..emission.sound_power_intensity import (
+        PrecisionIntensityResult,
+        SoundPowerIntensityResult,
+    )
     from ..emission.sound_power_intensity_points import DiscretePointIntensityResult
     from ..emission.sound_power_reverberation import ReverberationSoundPowerResult
 
@@ -1112,7 +1121,7 @@ def _sound_power_designation(
         return "ISO 3741"
     if isinstance(result, DiscretePointIntensityResult):
         return "ISO 9614-1"
-    if isinstance(result, SoundPowerIntensityResult):
+    if isinstance(result, (SoundPowerIntensityResult, PrecisionIntensityResult)):
         return "ISO 9614"
     if isinstance(result, PrecisionSoundPowerResult):
         return "ISO 3745"
