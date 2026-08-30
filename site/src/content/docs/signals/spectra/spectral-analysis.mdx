@@ -51,6 +51,7 @@ references:
 
 import Scope from '../../../../components/Scope.astro';
 import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import SeeAlso from '../../../../components/SeeAlso.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 A spectrum without its uncertainty is half a measurement. This page covers the
@@ -832,6 +833,8 @@ against.
 </ScopeClaim>
 </Scope>
 
+<SeeAlso>
+
 ## See also
 
 - [Data qualification](/phonometry/signals/metrology/data-qualification/): the stationarity every chi-square interval on this page assumes.
@@ -841,3 +844,5 @@ against.
 - [Levels](/phonometry/signals/levels/levels/): the band-level side of the density/band conversion of section 4.
 - API reference: [`signals.spectra`](/phonometry/reference/api/signals/spectra/), [`signals.windows`](/phonometry/reference/api/signals/windows/) and [`signals.multitaper`](/phonometry/reference/api/signals/multitaper/).
 - Theory: [Frequency Resolution vs FFT Bin Spacing](/phonometry/reference/theory/signal-analysis/#frequency-resolution-vs-fft-bin-spacing): why the bin spacing of an FFT is not the resolution of the estimate, and what the window does to both.
+
+</SeeAlso>

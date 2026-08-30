@@ -1,47 +1,56 @@
 /* ------------------------------------------------------------------ *
  * "See also", as a panel.
  *
- * Ninety-one guides end with a `## See also` section (`## Véase también` in
- * Spanish), always a heading followed by a list of links. Set in the body
- * typography it is indistinguishable from the sections that carry the actual
- * argument, so a reader scrolling to the end of a long page meets three
- * identically weighted H2s in a row.
+ * Guides end with a `## See also` section (`## Véase también` in Spanish),
+ * a heading, sometimes a sentence introducing it, and a list of links to
+ * related pages. Set in the body typography it is indistinguishable from the
+ * sections that carry the actual argument, so a reader scrolling to the end of
+ * a long page meets three identically weighted H2s in a row.
  *
- * Starlight's own answer would be an aside (`:::note`), and it is the wrong one
- * here: an aside's title is a plain <p>, so the section would drop out of the
- * table of contents and lose its anchor, and 182 pages of authored markdown
- * would have to be rewritten to get there. This keeps the markup exactly as it
- * is, heading and list, and styles the pair into one panel: the heading is
- * still an H2 with its own id, its hover anchor and its line in "On this page",
- * and the two elements are joined by giving the heading the top of the box and
- * the list the bottom.
+ * Starlight's own answer would be an aside (`:::note`), and it is the wrong
+ * one here: an aside's title is a plain <p>, so the section would drop out of
+ * the table of contents and lose its anchor. The heading therefore stays
+ * authored markdown, with its own id, its hover anchor and its line in "On
+ * this page", and src/components/SeeAlso.astro wraps the section so that the
+ * whole of it — heading, framing sentence and list — sits inside one element
+ * this sheet can draw a box around.
  *
- * Selected by heading id, which is derived from the heading text and so is
- * stable per language; both are listed. A page that says it another way simply
- * keeps the default rendering.
+ * It used to draw that box in two halves, giving the heading wrapper the top
+ * and an adjacent `+ ul` the bottom, which is why it only ever closed on the
+ * pages whose list ran straight on from the heading. The component records
+ * why that could not be fixed in CSS. Selecting the panel by class rather
+ * than by the heading's slug also drops this sheet's dependence on the two
+ * language-specific ids it used to list.
  *
  * The label is set like the rest of the instrument chrome, small and
  * monospaced, rather than at heading size: the panel itself is what announces
  * the section now, and a heading-sized title on a box of links is the weight
- * the complaint was about.
+ * the complaint was about. It is the same treatment as the legend in
+ * scope.css, so the two panels read as one family.
+ *
+ * All selectors are unlayered, so they win over Starlight's layered styles —
+ * including the `* + *` flow margins, which would otherwise space the panel's
+ * children as if they were still loose in the article.
  * ------------------------------------------------------------------ */
+
+.sl-markdown-content .see-also {
+  margin-top: 2.5rem;
+  padding: 0.7rem 1rem 0.85rem;
+  background: var(--ph-surface);
+  border: 1px solid var(--ph-border);
+  border-radius: var(--ph-radius);
+}
 
 /* The size goes on the wrapper, not on the heading: Starlight sizes the hover
    anchor icon in the wrapper's em, so a heading shrunk on its own gets an icon
    drawn for the size it used to be, sitting on top of its own last word. */
-.sl-markdown-content .sl-heading-wrapper:has(> h2#see-also),
-.sl-markdown-content .sl-heading-wrapper:has(> h2#véase-también) {
-  margin-top: 2.5rem;
-  padding: 0.7rem 1rem 0.1rem;
+.sl-markdown-content .see-also .sl-heading-wrapper {
+  margin-top: 0;
   font-size: var(--sl-text-xs);
-  background: var(--ph-surface);
-  border: 1px solid var(--ph-border);
-  border-bottom: 0;
-  border-radius: var(--ph-radius) var(--ph-radius) 0 0;
 }
 
-.sl-markdown-content .sl-heading-wrapper:has(> h2#see-also) > h2,
-.sl-markdown-content .sl-heading-wrapper:has(> h2#véase-también) > h2 {
+.sl-markdown-content .see-also .sl-heading-wrapper > h2 {
+  margin-top: 0;
   font-family: var(--ph-mono);
   font-size: inherit;
   font-weight: 600;
@@ -50,21 +59,25 @@
   color: var(--sl-color-gray-3);
 }
 
-.sl-markdown-content .sl-heading-wrapper:has(> h2#see-also) + ul,
-.sl-markdown-content .sl-heading-wrapper:has(> h2#véase-también) + ul {
-  margin-top: 0;
-  padding: 0.55rem 1rem 0.85rem 2.2rem;
-  background: var(--ph-surface);
-  border: 1px solid var(--ph-border);
-  border-top: 0;
-  border-radius: 0 0 var(--ph-radius) var(--ph-radius);
+/* The sentence some pages open the section with, and the list. One gap for
+   both, and it is the gap the panel had before the box became one element:
+   the label used to carry 0.1rem of padding below it and the list 0.55rem
+   above, so 0.65rem here leaves the two hundred and fourteen panels that
+   already closed correctly rendering pixel for pixel as they did. */
+.sl-markdown-content .see-also > p,
+.sl-markdown-content .see-also > ul {
+  margin-top: 0.65rem;
 }
 
-.sl-markdown-content .sl-heading-wrapper:has(> h2#see-also) + ul > li,
-.sl-markdown-content .sl-heading-wrapper:has(> h2#véase-también) + ul > li {
+.sl-markdown-content .see-also > ul {
+  margin-bottom: 0;
+  padding-inline-start: 1.2rem;
+}
+
+.sl-markdown-content .see-also > ul > li {
   line-height: 1.5;
 }
-.sl-markdown-content .sl-heading-wrapper:has(> h2#see-also) + ul > li + li,
-.sl-markdown-content .sl-heading-wrapper:has(> h2#véase-también) + ul > li + li {
+
+.sl-markdown-content .see-also > ul > li + li {
   margin-top: 0.5rem;
 }

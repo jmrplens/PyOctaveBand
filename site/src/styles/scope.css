@@ -33,10 +33,11 @@
  * panel label in see-also.css, so the two panels read as one family.
  *
  * The section HEADING stays in the markdown, above the component and
- * outside it, for the reason see-also.css records: a heading that moves
- * into a component drops out of the table of contents and loses its
- * anchor. Framing prose that introduces the claims stays in the markdown
- * too. Everything INSIDE the component is a claim, and nothing else is;
+ * outside it, for the reason Scope.astro records: a heading a component
+ * RENDERS drops out of the table of contents and loses its anchor. One a
+ * component merely wraps keeps both, which is what lets SeeAlso.astro take
+ * its heading inside. Framing prose that introduces the claims stays in the
+ * markdown too. Everything INSIDE the component is a claim, and nothing else is;
  * that is the contract scripts/list_coverage_claims.py enumerates.
  *
  * All selectors are unlayered, so they win over Starlight's layered styles

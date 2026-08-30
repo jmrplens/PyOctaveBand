@@ -35,6 +35,7 @@ references:
 import ReportPreview from '../../../../components/ReportPreview.astro';
 import Scope from '../../../../components/Scope.astro';
 import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import SeeAlso from '../../../../components/SeeAlso.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
 
@@ -842,15 +843,17 @@ above 500 m of altitude or below 10 °C (clause 8.2.5), is not applied either:
 `sound_power_pressure` takes no temperature or pressure argument. The $C_3$
 meteorological correction of ISO 3745 needs an air-absorption coefficient the
 caller supplies (`air_absorption_coefficient=`); this module does not compute
-it from ISO 9613-1 itself. Choosing among the seven routes, and the ISO 4871
+it from ISO 9613-1 itself. Choosing among the six routes, and the ISO 4871
 declaration a result feeds, live in [Sound
 Power](/phonometry/devices/emission/sound-power/).
 </ScopeClaim>
 </Scope>
 
+<SeeAlso>
+
 ## See also
 
-- [Sound Power](/phonometry/devices/emission/sound-power/): choosing among the seven
+- [Sound Power](/phonometry/devices/emission/sound-power/): choosing among the five
   determination routes, the accuracy grades and the ISO 4871 noise-emission
   declaration.
 - [Sound Power in the Reverberation Room (ISO 3741)](/phonometry/devices/emission/sound-power-reverberation/):
@@ -867,3 +870,5 @@ Power](/phonometry/devices/emission/sound-power/).
   and $C_1$/$C_2$ derivations.
 - API reference: [`emission.sound_power`](/phonometry/reference/api/power/sound-power/).
 - Theory: [Sound power determination](/phonometry/reference/theory/environment-transport/#sound-power-determination-iso-374437453746-iso-3741-iso-9614-123): the enveloping-surface derivation of ISO 3744/3746 and the environmental correction it needs.
+
+</SeeAlso>

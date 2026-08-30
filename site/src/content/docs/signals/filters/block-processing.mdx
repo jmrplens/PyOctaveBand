@@ -28,6 +28,7 @@ references:
 
 import Scope from '../../../../components/Scope.astro';
 import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import SeeAlso from '../../../../components/SeeAlso.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Some measurements never fit in memory: an hour-long environmental recording,
@@ -401,6 +402,8 @@ describes.
 </ScopeClaim>
 </Scope>
 
+<SeeAlso>
+
 ## See also
 
 - [Filter Banks](/phonometry/signals/filters/filter-banks/): the offline bank streaming reproduces bit for bit, and the `zero_phase` mode streaming cannot use.
@@ -409,3 +412,5 @@ describes.
 - [Integrated and Statistical Levels](/phonometry/signals/levels/levels/): which metrics accumulate across blocks and which must be recomputed on the pooled envelope.
 - API reference: [`filters.weighting`](/phonometry/reference/api/filters/weighting/) and [`filters.core`](/phonometry/reference/api/filters/core/).
 - Theory: [Filter Bank Design and Numerical Stability](/phonometry/reference/theory/signal-analysis/#filter-bank-design--numerical-stability): why a bank is designed as second-order sections and decimated per band, which is what makes streaming state possible at all.
+
+</SeeAlso>
