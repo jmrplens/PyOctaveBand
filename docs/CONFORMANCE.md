@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**580/580 conformance checks pass** across 59 domains and 374 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**581/581 conformance checks pass** across 59 domains and 374 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -108,7 +108,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>Room &amp; building acoustics</b>: 100% (80/80)</summary>
+<summary><b>Room &amp; building acoustics</b>: 100% (81/81)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -129,10 +129,11 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 16283-3:2016 Clause 3.12 | Facade R'45 isolates the -1.5 dB incidence correction (S=A) | 38.5 dB (+/-0 dB) | 38.5 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 16283-1:2014 Clause 8.1 / -2:2020 Clause 8.1 / -3:2016 Clause 7.3.1 | Low-frequency trigger: V < 25 m³ to the nearest cubic metre | 7/7 room volumes on either side of 25 m³ | 7/7 room volumes on either side of 25 m³ | exact | 0 % | ![Pass][cv-pass] Pass |
 | ISO 16283-1:2014 Clause 5 / -2:2020 Clause 5.1 / -3:2016 Clause 5 | Low-frequency band set is 50 Hz, 63 Hz and 80 Hz | band 1 = 50 Hz; band 2 = 63 Hz; band 3 = 80 Hz | band 1 = 50 Hz; band 2 = 63 Hz; band 3 = 80 Hz | exact | 0 % | ![Pass][cv-pass] Pass |
-| ISO 16283-1:2014 Formula (12) / -2:2020 Formula (15) | Corner level is the highest corner per band, energy-averaged over q | Formula (12) over q = 2 positions | max deviation 0.000000000 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
-| ISO 16283-1:2014 Formula (13) / -2:2020 (16) / -3:2016 (5) | L_LF combines the corner and default levels one third to two thirds | the printed Formula (13) | max deviation 0.000000000 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
-| ISO 16283-1:2014 Formula (13) / -2:2020 (16) / -3:2016 (5) | L_LF degenerates to L when the corner level equals it | L_LF = L for L_Corner = L | max deviation 0.000000000000 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
-| ISO 16283-1:2014 Formula (13) / -2:2020 (16) / -3:2016 (5) | L_LF floor at 10 lg(2/3) below L as the corners fall silent | 48.239087 dB (+/-0 dB) | 48.239087 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 16283-1:2014 Formula (12) / -2:2020 Formula (15) | Corner level is the highest corner per band, energy-averaged over q | Formula (12) over q = 2 positions (closed form) | max deviation 0.000000000 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 16283-1:2014 Formula (13) / -2:2020 (16) / -3:2016 (5) | L_LF combines the corner and default levels one third to two thirds | the printed Formula (13) (closed form) | max deviation 0.000000000 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 16283-1:2014 Formula (13) / -2:2020 (16) / -3:2016 (5) | L_LF degenerates to L when the corner level equals it | L_LF = L for L_Corner = L (closed form) | max deviation 0.000000000000 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 16283-1:2014 Formula (13) / -2:2020 (16) / -3:2016 (5) | L_LF floor at 10 lg(2/3) below L as the corners fall silent | 48.239087 dB (+/-1e-09 dB, closed form) | 48.239087 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 16283-1:2014 Formula (13) / -2:2020 (16) / -3:2016 (5) | L_LF rises strictly with the corner level, over 80 dB of it | 400/400 steps rising with the corner level (closed form) | 400/400 steps rising with the corner level | exact | 0 % | ![Pass][cv-pass] Pass |
 | ISO 16283-1:2014 Clause 10.4 / -2:2020 Clause 10.4 / -3:2016 Clause 8.4 | 63 Hz octave T replaces exactly the 50 Hz, 63 Hz and 80 Hz bands | 5/5 reverberation-time bands | 5/5 reverberation-time bands | exact | 0 % | ![Pass][cv-pass] Pass |
 | ISO 16283-1:2014 (13) / -2:2020 (16) / -3:2016 (5) | Airborne, impact and facade run one low-frequency implementation | 3/3 parts reaching the same L_LF | 3/3 parts reaching the same L_LF | exact | 0 % | ![Pass][cv-pass] Pass |
 | ISO 10140-2:2010 Formula (2) | Lab airborne R on the ISO 717-1 reference shape -> Rw = 54 | Rw 54 dB | Rw 54 dB | +0 dB | - | ![Pass][cv-pass] Pass |

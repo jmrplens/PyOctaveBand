@@ -851,6 +851,46 @@ which is the check that enforces the rule; see
   ambiguity noted.
 - **Status:** unreported.
 
+## ISO 16283-1:2014, Clause 6 (a source-room reverberation time)
+
+- **Location:** Clause 6 "General", the paragraph on the reverberation time
+  (printed p. 6).
+- **The print:** "For the reverberation time, the low-frequency procedure
+  shall be used for the 50 Hz, 63 Hz, and 80 Hz one-third octave bands in
+  **the source and/or receiving room** when its volume is smaller than 25 m³
+  (calculated to the nearest cubic metre)."
+- **The problem:** ISO 16283-1 measures no source-room reverberation time, so
+  there is nothing in the source room for a reverberation-time procedure to be
+  used on. The first paragraph of the same clause, three paragraphs earlier,
+  lists the required measurements as "the sound pressure levels in both rooms
+  with the source(s) operating, the background noise in the receiving room ...
+  and the reverberation times **in the receiving room**". Clause 10, which is
+  where the reverberation-time procedures are actually specified, says the same
+  thing four times over: its heading is "Reverberation time **in the receiving
+  room** (default and low-frequency procedure)", its Clause 10.1 scopes the
+  whole clause to "the receiving room", its Clause 10.3 branches on whether
+  "the receiving room has a volume larger than or equal to 25 m³", and its
+  Clause 10.4 applies the low-frequency procedure "when **the receiving room**
+  volume is smaller than 25 m³". The phrase is correct one paragraph above,
+  where it belongs: the *sound pressure level* really is measured in both rooms
+  and its low-frequency procedure really does apply to either. It was carried
+  down into the reverberation-time sentence, where only one room exists. The
+  other two parts print the same sentence with one room: ISO 16283-2:2020
+  Clause 6 and ISO 16283-3:2016 Clause 6 both read "in the receiving room when
+  its volume is smaller than 25 m³", so Part 1 is the outlier of the three.
+- **Evidence:** the sentence on PDF page 12 (printed p. 6) of ISO 16283-1:2014,
+  identical on PDF page 14 (printed p. 6) of BS EN ISO 16283-1:2014; Clause 10
+  and its subclauses on PDF pages 23 and 24 (printed pp. 17 and 18) of the same
+  document; and the one-room version of the sentence on PDF page 13 (printed p.
+  7) of ISO 16283-2:2020 and PDF page 16 (printed p. 10) of ISO 16283-3:2016.
+- **Library behaviour:** the 63 Hz octave substitution is a receiving-room
+  operation in every part, following Clause 10; a source-room procedure that
+  carries a 63 Hz octave reverberation time is refused, and a source-room call
+  takes no reverberation times at all. The corner procedure for the *level*,
+  which is the paragraph the phrase belongs to, does admit both rooms in
+  ISO 16283-1 and the airborne entry point offers both.
+- **Status:** unreported.
+
 ## ISO 16283-2:2020, Clause 8.3 (a source room in an impact measurement)
 
 - **Location:** Clause 8.3 "Microphone positions", last paragraph (printed p.
@@ -895,11 +935,15 @@ which is the check that enforces the rule; see
   the trigger of Clause 8.1 and Clause 10.4 is "smaller than 25 m³" in all
   three parts, so 25 m³ belongs to the larger branch and takes the full 50 Hz
   to 5 000 Hz default range.
-- **Evidence:** PDF page 24 (printed p. 18) of ISO 16283-2:2020, which the
-  ISO/DIS text on PDF page 26 (printed p. 18) of BSI DPC 13/30269186 DC already
-  read the same way, against PDF page 24 (printed p. 18) of ISO 16283-1:2014
-  and PDF page 24 (printed p. 18) of ISO 16283-3:2016, both of which carry the
-  "or equal to".
+- **Evidence:** PDF page 24 (printed p. 18) of ISO 16283-2:2020, against PDF
+  page 24 (printed p. 18) of ISO 16283-1:2014 and PDF page 24 (printed p. 18)
+  of ISO 16283-3:2016, both of which carry the "or equal to". The gap is not a
+  2020 slip and not an artefact of a draft: the ISO/DIS text on PDF page 26
+  (printed p. 18) of BSI DPC 13/30269186 DC already read the same way, and so
+  does the published previous edition, whose Clause 10.3 on PDF page 25
+  (printed p. 25) of UNE-EN ISO 16283-2:2016, the Spanish translation of
+  ISO 16283-2:2015, reads "un volumen **superior a** 25 m³" with no "o igual
+  a". The wording has stood unchanged across two editions and one revision.
 - **Library behaviour:** the trigger predicate is the strict "smaller than
   25 m³" the three parts share, so a room of exactly 25 m³ takes the default
   procedure in every part and no gap exists.

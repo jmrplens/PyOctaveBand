@@ -345,7 +345,13 @@ print(building.low_frequency_procedure_applies(25.4))   # False, rounds to 25
 In a whole measurement the two halves travel together in a
 `LowFrequencyProcedure`, which `airborne_insulation()` applies to the band
 vector for you, and `impact_insulation()` and `facade_insulation()` take the
-same object under a `low_frequency=` keyword. The corner geometry, the
+same object under a `low_frequency=` keyword.
+
+All three warn when you forget. A `volume` that rounds below 25 m³ beside a
+`frequencies` vector naming the three bands tells the function that Clause 8.1
+is in force, and with no procedure to run it says so with a
+`LowFrequencyWarning` rather than returning a number that is not the ISO 16283
+one. The corner geometry, the
 sampling requirements, the differences between the three parts and a worked
 measurement with its rating are all in a guide of their own:
 [Small Rooms: the ISO 16283 Low-Frequency Procedure](/phonometry/buildings/insulation/low-frequency-procedure/).

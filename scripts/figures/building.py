@@ -10,6 +10,8 @@ a regulation quotes. Everything here is embedded by a page under
 ``buildings/insulation/``.
 """
 
+import warnings
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -2936,9 +2938,16 @@ def generate_low_frequency_procedure(output_dir: str) -> None:
         corner_levels=corners,
         reverberation_63_octave=0.66,  # Clause 10.4, the 63 Hz octave band
     )
-    default = building.airborne_insulation(
-        l1, l2, t2, area=width * height, volume=volume, frequencies=freqs
-    )
+    # The left-hand curve of the right panel is the answer the default
+    # procedure gives on its own, which is the whole point of the comparison
+    # and is also exactly what `LowFrequencyWarning` exists to complain about.
+    # Caught rather than printed: the figure is drawing the warning, not
+    # ignoring it.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", building.LowFrequencyWarning)
+        default = building.airborne_insulation(
+            l1, l2, t2, area=width * height, volume=volume, frequencies=freqs
+        )
     required = building.airborne_insulation(
         l1,
         l2,

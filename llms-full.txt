@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 580 numerical conformance checks against 374 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 581 numerical conformance checks against 374 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 580 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 59 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 581 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 59 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -7186,9 +7186,15 @@ print(np.round(res.dnt, 1))          # [36.6 34.8 36.3 39.5 41.2 41.8]
 ```
 
 `impact_insulation()` and `facade_insulation()` take the same object under a
-`low_frequency=` keyword and run the same code. The corner geometry, the
-sampling requirements, the differences between the three parts and a worked
-measurement with its rating are all in a guide of their own:
+`low_frequency=` keyword and run the same code.
+
+All three warn when you forget. A `volume` that rounds below 25 m³ beside a
+`frequencies` vector naming the three bands tells the function that Clause 8.1
+is in force, and with no procedure to run it says so with a
+`LowFrequencyWarning` rather than returning a number that is not the ISO 16283
+one. The corner geometry, the sampling requirements, the differences between
+the three parts and a worked measurement with its rating are all in a guide of
+its own:
 [Small Rooms: the ISO 16283 Low-Frequency
 Procedure](https://jmrplens.github.io/phonometry/buildings/insulation/low-frequency-procedure/).
 
@@ -8386,6 +8392,17 @@ $C_{\mathrm{I},50\text{–}2500}$). With `one_decimal=True` the reference curve 
 prescribes "for the expression of uncertainty" and ISO 12999-1 Annex B
 requires when stating the uncertainty of a single-number value.
 
+Where those extra bands come from matters as much as what the term does with
+them. In a room whose volume, to the nearest cubic metre, is under 25 m³,
+ISO 16283 does not let the 50 Hz, 63 Hz and 80 Hz bands be measured with the
+default procedure alone: the corner procedure is mandatory there, and it moves
+those three bands by several decibels, which is enough to move
+$C_{50\text{–}3150}$ by a whole one. So a requirement written as
+$D_\mathrm{nT,w} + C_{50\text{–}3150}$ is judged on the corner procedure
+whether the report mentions it or not. See
+[Small Rooms: the ISO 16283 Low-Frequency
+Procedure](https://jmrplens.github.io/phonometry/buildings/insulation/low-frequency-procedure/).
+
 ```python
 from phonometry import building
 
@@ -8942,6 +8959,56 @@ Above the line the library **refuses** rather than answers: constructing a
 ISO 16283 says what a corner measurement means there, and answering anyway
 would silently move the reported level.
 
+### Below the line the library says so
+
+The trigger is a *shall*, so the three measurement entry points do not wait to
+be asked. When you give one of them a receiving-room `volume` that rounds below
+25 m³ and a `frequencies` vector that names the 50 Hz, 63 Hz and 80 Hz bands,
+it has been told everything it needs to know that Clause 8.1 is in force. If no
+`LowFrequencyProcedure` came with them, it computes those three bands from the
+default procedure alone, which is not the ISO 16283 quantity, and raises a
+`LowFrequencyWarning` saying so.
+
+```python
+import warnings
+
+import numpy as np
+from phonometry import building
+
+# A bathroom, 2.0 m by 1.7 m by 2.4 m, so 8 m3 to the nearest cubic metre, and
+# the optional low range of Clause 5 was measured. Nothing in the call mentions
+# the low-frequency procedure.
+freqs_lf = np.array([50.0, 63.0, 80.0, 100.0, 125.0])
+li_lf = np.array([66.9, 69.4, 67.2, 64.8, 63.1])
+t_lf = np.array([0.74, 0.69, 0.63, 0.58, 0.55])
+
+with warnings.catch_warnings(record=True) as caught:
+    warnings.simplefilter("always")
+    building.impact_insulation(li_lf, t_lf, volume=8.16, frequencies=freqs_lf)
+
+print(caught[0].category.__name__)                    # LowFrequencyWarning
+print("rounds to 8 m³" in str(caught[0].message))     # True
+```
+
+It **warns** rather than refuses, for two reasons. The corner measurements may
+genuinely not exist: a survey taken before ISO 16283, or one where the corners
+were skipped, is still worth reporting as long as the report says what it is.
+And the default-procedure spectrum is the thing a reader compares the ISO 16283
+one against, which is exactly what the figure further down this page does, so
+refusing to compute it would take away the comparison. The warning is silent
+when you did run the procedure, when no `volume` was given (there is then no
+trigger to test), when the room does not trigger, when `frequencies` was not
+given, and when the optional low range was not measured at all: the 16 core
+bands from 100 Hz to 3150 Hz are a complete ISO 16283 measurement in a room of
+any size. It is also silent for `facade_insulation(method="road_traffic")`,
+because ISO 16283-3 Clause 6 gives the traffic methods the default procedure
+and nothing else.
+
+Only the receiving room. `airborne_insulation` takes one `volume`, the
+receiving room's, so that is the room it can speak about; a source room small
+enough to trigger Clause 8.1 on its own is something you have to declare
+through `source_low_frequency`.
+
 ### Which room, and which method
 
 The three parts do not all apply the procedure to the same room or to the same
@@ -8957,7 +9024,13 @@ Two consequences are easy to miss. First, Part 1 tests the two rooms
 *independently*, so an 18 m³ source room beside a 40 m³ receiving room gets the
 corner treatment on $L_1$ alone; but Clause 10.4 is a receiving-room clause in
 every part, Part 1 included, so that measurement's reverberation times stay as
-measured. Second, Part 3 Clause 6 says that "for the element and global road
+measured. (Part 1 Clause 6 does say the reverberation-time procedure applies
+"in the source and/or receiving room", contradicting its own Clause 10, which
+is headed "Reverberation time in the receiving room" and names that room again
+in 10.1, 10.3 and 10.4. ISO 16283-1 measures no source-room reverberation time
+at all, and Parts 2 and 3 print the same sentence with one room. That is a
+defect of the print, recorded in the [errata registry](https://jmrplens.github.io/phonometry/reference/errata/).)
+Second, Part 3 Clause 6 says that "for the element and global road
 traffic methods, only the default procedure shall be used", and its NOTE 1
 gives the reason: "at present, there is no experience using the low-frequency
 procedure with road traffic (or air or railway traffic) as a sound source". So
@@ -9030,23 +9103,34 @@ Average at least 15 s per position, and with a single loudspeaker moved
 between positions take the four corners again at each one.
 
 The corner measurement carries sampling requirements the arithmetic above does
-not depend on, and the library enforces only the one that can be read off the
-data it is given.
+not depend on, and of those the library enforces one: the corner count, which
+is the only one a corner sheet carries the evidence for.
 
 | Requirement | Where | Enforced? |
 | :--- | :--- | :--- |
-| A minimum of four corners per source position | Part 1 and Part 2 Clause 8.3, Part 3 Clause 7.3.2 | warned (`LowFrequencyWarning`) |
+| A minimum of four corners | Part 1 and Part 2 Clause 8.3 (per source position), Part 3 Clause 7.3.2 | warned (`LowFrequencyWarning`) |
 | Two of them at floor level and two at ceiling level | same clauses, as a *should* | no |
 | Microphone 0.3 m to 0.4 m from each boundary forming the corner | same clauses | no |
 | At least two source positions | Part 1 Clause 8.1, Part 2 Clause 8.2.2 | no |
 | Averaging time at least 15 s per position | Part 1 Clause 8.4 | no |
-| A background measurement in **every** corner used | Part 1 Clause 9.1, Part 3 Clause 7.4.1 | no |
+| A background measurement in **every** corner used | Part 1 Clause 9.1, Part 2 Clause 9.1, Part 3 Clause 7.4.1 | no |
 
-The levels handed in are assumed already corrected for background noise, which
-ISO 16283-2 states inside Formula (15)'s own where-list. The per-band point
-returns here too: because the three bands may come from three different
-corners, "each band can require an individual correction to the signal level
-for background noise" (the NOTE under Part 1 Clause 9.1).
+The source-position count is the one omission worth naming, because a 2-D
+`(corners, 3)` sheet does say $q = 1$ on its face. It is not warned about,
+because $q = 1$ is a conforming reading in two of the three parts: Part 1
+Clause 8.5 gives it to loudspeakers operated simultaneously, and it is the
+whole of Part 3. Only Part 2, whose Clause 8.2.2 asks for the tapping machine
+in "at least two of the same positions" and admits no simultaneous case, would
+be entitled to complain, and one part out of three is a poor bargain for a
+warning.
+
+The levels handed in are assumed already corrected for background noise. All
+three parts require that correction in every corner used, in their
+background-noise clause; ISO 16283-2 says it a second time inside Formula
+(15)'s own where-list. The per-band point returns here too: because the three
+bands may come from three different corners, "each band can require an
+individual correction to the signal level for background noise" (the NOTE
+under Part 1 Clause 9.1, printed word for word in Part 2 Clause 9.1).
 
 ## Combining the two (Formula (13))
 
@@ -9106,6 +9190,14 @@ There is no default value to fall back on below the trigger either: Clause 10.3
 without a 63 Hz octave time is refused rather than guessed at, and so is a
 source-room one that carries one.
 
+That has one consequence for the caller. A conforming measurement in a small
+room has no one-third-octave reverberation time at 50 Hz, 63 Hz or 80 Hz to
+report, but the entry points validate the whole `t2` vector before the
+substitution happens and want a positive, finite value in every band. Put any
+positive placeholder in those three columns: the procedure overwrites all three
+with the 63 Hz octave value and the placeholders never reach a result. Copying
+the 100 Hz value up is the least surprising choice.
+
 ## Running it: one implementation, three entry points
 
 `airborne_insulation`, `impact_insulation` and `facade_insulation` all reach
@@ -9158,7 +9250,9 @@ chain = field.receiver_low_frequency
 chain.plot()
 plt.show()
 
-# The whole spectrum, by hand, against the default procedure alone:
+# The whole spectrum, by hand, against the default procedure alone. This call
+# raises a LowFrequencyWarning, and it is right to: the room triggers and no
+# procedure was passed. Here that is the point of the call.
 plain = building.airborne_insulation(l1, l2, t2, area=6.48, volume=23.3,
                                      frequencies=freqs)
 x = np.arange(len(freqs))
@@ -9217,6 +9311,7 @@ impact_corners = np.array([[[73.1, 76.4, 72.0], [71.8, 77.2, 70.6],
 impact_procedure = building.LowFrequencyProcedure(
     volume=23.3, corner_levels=impact_corners, reverberation_63_octave=0.66)
 
+# Warns, for the same reason and to the same purpose as the airborne one above.
 plain_impact = building.impact_insulation(li, t2, volume=23.3, frequencies=freqs)
 impact = building.impact_insulation(li, t2, volume=23.3, frequencies=freqs,
                                     low_frequency=impact_procedure)
@@ -9242,26 +9337,35 @@ ISO 16283 publishes no numeric example of this procedure anywhere. Annex B of
 Part 1 and Annex C of Part 2 are blank recording forms, and the "Examples" of
 Annexes D and E are loudspeaker-position drawings. So this module joins the
 register of quantities anchored in closed form rather than in a tabulated
-result. The eight rows this module carries in the
-[conformance report](https://jmrplens.github.io/phonometry/reference/conformance/) judge printed numbers and closed
-forms rather than a published result. What stands in for an oracle, one row at
-a time:
+result. It carries nine rows in the
+[conformance report](https://jmrplens.github.io/phonometry/reference/conformance/), and every one of them judges a
+printed number or a closed form rather than a published result. What stands in
+for an oracle:
 
-- **The printed numbers.** The 25 m³ trigger and its strictness, the rounding
-  on the boundary, and the 50 / 63 / 80 Hz band set are exact quantities read
-  off the page, and are pinned as such.
-- **The closed forms of Formula (13).** Degeneracy at
-  $L_\mathrm{Corner} = L$, strict monotonicity in $L_\mathrm{Corner}$, and the
-  $10 \log_{10}(2/3) + L$ floor that is approached and never crossed.
-- **The reason Clause 10.4 gives, measured rather than asserted.** A known
-  single-sloped decay is put through the reverberation machinery already in
-  this library, and the 63 Hz octave band recovers it with a smaller error
-  than the three one-third-octave bands do, which is NOTE 1 turned into a
-  measurement.
-- **One implementation, proved and not claimed.** A conformance row asserts
+- **The printed numbers**, three rows. The 25 m³ trigger with its strictness
+  and its rounding on the boundary, the 50 / 63 / 80 Hz band set, and the
+  63 Hz octave value landing on exactly those three bands and no others are
+  exact quantities read off the page, and are pinned as such.
+- **The closed forms**, five rows. Formula (13) against the printed expression
+  transcribed independently, its degeneracy at $L_\mathrm{Corner} = L$, its
+  strict monotonicity in $L_\mathrm{Corner}$ over 80 dB of it, the
+  $10 \log_{10}(2/3) + L$ floor that is approached and never crossed, and
+  Formula (12) against the energy mean over $q = 2$ source positions written
+  out by hand. Each of those five says "closed form" in its expected-value
+  cell, which is how the report marks a row with no published result behind
+  it.
+- **One implementation, proved and not claimed**, the ninth row. It asserts
   that the airborne, impact and façade entry points reach the same
   $L_\mathrm{LF}$ from identical inputs, 3 parts of 3, so "the same procedure"
   is a checked fact rather than a sentence on this page.
+
+One thing the conformance report does not carry, because it is a comparison
+between two methods rather than a value: **the reason Clause 10.4 gives,
+measured rather than asserted**. A known single-sloped decay is put through the
+reverberation machinery already in this library, and the 63 Hz octave band
+recovers it with a smaller error than the three one-third-octave bands do, on
+average and at worst. That is NOTE 1 turned into a measurement, and it lives in
+the test suite rather than in the report.
 
 ## Quick answers
 
@@ -9271,6 +9375,21 @@ No. The volume is taken to the nearest cubic metre first, and 24.5 rounds to
 25 m³, which is not "smaller than 25 m³". The effective threshold is
 $V < 24.5$ m³, and a room of exactly 25 m³ takes the default procedure in
 every part of ISO 16283.
+
+### I got a `LowFrequencyWarning` about a room under 25 m³. What do I do?
+
+Three answers, and which one is right depends on what you measured. If the
+corners were measured, pass them: build a `LowFrequencyProcedure` with the
+corner sheet and the 63 Hz octave reverberation time and hand it to the entry
+point. If they were not, and you only need the core range, leave the 50 Hz,
+63 Hz and 80 Hz columns out of the call: the 16 bands from 100 Hz to 3150 Hz
+are a complete ISO 16283 measurement in a room of any size, and the warning
+goes with them. If you want the low bands anyway, as a comparison or because a
+legacy survey is all you have, keep them and silence the warning deliberately,
+with `warnings.filterwarnings` on the message rather than on the class, so the
+corner-count complaint still reaches you. What the warning will not let you do
+is report those three bands as ISO 16283 quantities without noticing that they
+are not.
 
 ### Why is the reverberation time measured in the 63 Hz octave band?
 
@@ -34386,7 +34505,7 @@ documents, one page per module.
 | `CrowdNoiseResult` | `dataclass` | **Crowd self-noise result.**<br>• `talkers`, `absorption_areas`, `levels` [dB] (areas × talkers)<br>• `signal_level` [dB], `communication_level` [dB], `distance`, `sound_power_level`, `directivity`<br>• `speech_to_noise()` [dB]<br>• `.plot()`: level vs occupancy per absorption | `c.levels, c.signal_level`<br>`c.plot()` |
 | `speech_direct_level` / `crowd_noise_level` / `speech_to_noise_ratio` / `absorption_per_table` | `function` | **Crowd-noise building blocks (Long Eqs. 17.50–17.54).**<br>• `speech_direct_level(r)` = `Lw + 10 lg(Q/4πr²)` [dB]<br>• `crowd_noise_level(N, A)` = `Lw + 10 lg N + 10 lg(4/A)` [dB]<br>• `speech_to_noise_ratio(r, A_tab)` [dB]<br>• `absorption_per_table(r, L_SN)` [m²]: the inverse | `crowd_noise_level(20, 20.0)  # 76`<br>`absorption_per_table(1.0, -6.0)  # 6.31` |
 | `NORMAL_VOICE_POWER_LEVEL` / `TALKER_DIRECTIVITY` / `COMMUNICATION_SNR` / `PRIVACY_SNR` | `constant` | **Crowd-noise defaults (Long Ch. 17).**<br>• 70 dB re 1 pW per talker, Q = 2<br>• −6 dB communication limit (Eq. 17.53), −9 dB privacy limit (Eq. 17.54) | `absorption_per_table(1.0, COMMUNICATION_SNR)` |
-| `airborne_insulation` | `function` | **Field airborne insulation (ISO 16283-1).**<br>• `l1`/`l2`: Source/receiving levels [dB], 1D or (positions, bands)<br>• `t2`: Receiving-room T per band [s]<br>• `area`: Partition S [m²] (for R')<br>• `volume`: Receiving V [m³] (for R')<br>• `t0`: Reference T0 [s] (Default: 0.5) | `ins = building.airborne_insulation(l1, l2, t2, area=10, volume=50)`<br><br>• `AirborneInsulationResult` |
+| `airborne_insulation` | `function` | **Field airborne insulation (ISO 16283-1).**<br>• `l1`/`l2`: Source/receiving levels [dB], 1D or (positions, bands)<br>• `t2`: Receiving-room T per band [s]<br>• `area`: Partition S [m²] (for R')<br>• `volume`: Receiving V [m³] (for R')<br>• `t0`: Reference T0 [s] (Default: 0.5)<br>• `frequencies` [Hz] (required with either low-frequency argument)<br>• `source_low_frequency` / `receiver_low_frequency`: `LowFrequencyProcedure` per room (ISO 16283-1 Clause 8)<br>• Warns (`LowFrequencyWarning`) when `volume` rounds below 25 m³, `frequencies` names 50/63/80 Hz and no `receiver_low_frequency` is given | `ins = building.airborne_insulation(l1, l2, t2, area=10, volume=50)`<br><br>• `AirborneInsulationResult` |
 | `weighted_rating` | `function` | **Single-number rating + C/Ctr (ISO 717-1).**<br>• `values_by_band`: 16 thirds or 5 octaves [dB]<br>• `bands`: 'third-octave', 'octave' or None | `w = building.weighted_rating(R)`<br><br>• `WeightedRatingResult` (Rw, C, Ctr) |
 | `weighted_rating_extended` | `function` | **Rating + enlarged-range terms (ISO 717-1 Annex B).**<br>• `values_by_band` [dB] with `frequencies` [Hz] (None = the 16 core bands)<br>• `one_decimal`: 0.1 dB shift + one-decimal reductions for uncertainty statements (Default: False) | `ext = building.weighted_rating_extended(r, freqs)`<br><br>• `ExtendedWeightedRatingResult` (rating, c, ctr, c_50_3150 … ctr_100_5000) |
 | `ExtendedWeightedRatingResult` | `dataclass` | **Weighted rating with the enlarged-range adaptation terms (ISO 717-1 Annex B).**<br>• `rating` + `c`, `ctr`<br>• `c_50_3150`, `c_50_5000`, `c_100_5000` and the `ctr_` twins<br>• `core`: the base `WeightedRatingResult` | `res = building.weighted_rating_extended(freqs, r)` |
@@ -34411,9 +34530,9 @@ documents, one page per module.
 | `assess_db_hr` | `function` | **Check a set of (value, requirement) pairs.**<br>• `items` | `assess_db_hr([(33.0, req)])`<br><br>• `DbHrAssessment` |
 | `DbHrAssessment` | `dataclass` | **A set of DB-HR requirement checks.**<br>• `checks`; `.complies`<br>• `.plot()` | `a.complies` |
 | `energy_average_level` | `function` | **Energy-average level (ISO 16283-1 (9)).**<br>• `levels`: Levels [dB] to average<br>• `axis`: Averaging axis (Default: -1) | `L = building.energy_average_level([60, 66])`<br><br>• `10 lg( mean(10^(Li/10)) )` |
-| `AirborneInsulationResult` | `dataclass` | **Field insulation per band.**<br>• `d`: Level difference D [dB]<br>• `dnt`: Standardized DnT [dB]<br>• `r_prime`: Apparent R' [dB] or None<br>• `l1`, `l2`, `t2`, `t0`: retained measurement chain (or None)<br>• `.report(path, quantity='dnt'/'r_prime', ...)`: ISO 16283-1 field test report (Annex B form) with the ISO 717-1 rating → PDF | `res.report("DnTw.pdf", metadata=ReportMetadata(requirement=50.0))` |
+| `AirborneInsulationResult` | `dataclass` | **Field insulation per band.**<br>• `d`: Level difference D [dB]<br>• `dnt`: Standardized DnT [dB]<br>• `r_prime`: Apparent R' [dB] or None<br>• `l1`, `l2`, `t2`, `t0`: retained measurement chain (or None)<br>• `source_low_frequency`, `receiver_low_frequency`: `LowFrequencyResult` or None<br>• `.report(path, quantity='dnt'/'r_prime', ...)`: ISO 16283-1 field test report (Annex B form) with the ISO 717-1 rating → PDF | `res.report("DnTw.pdf", metadata=ReportMetadata(requirement=50.0))` |
 | `WeightedRatingResult` | `dataclass` | **Weighted rating result.**<br>• `rating`: Rw/DnT,w … [dB], int<br>• `c`: Spectrum term C, int<br>• `ctr`: Spectrum term Ctr, int<br>• `unfavourable_sum`: [dB]<br>• `band_centers`: Measured-curve centres [Hz] or None<br>• `measured`: Measured band values [dB] or None<br>• `shifted_reference`: Shifted Table 3 reference [dB] or None | `w.rating, w.c, w.ctr` |
-| `impact_insulation` | `function` | **Field impact insulation (ISO 16283-2).**<br>• `li`: Impact SPL [dB], 1D or (positions, bands)<br>• `t2`: Receiving-room T per band [s]<br>• `volume`: Receiving V [m³] (for L'n)<br>• `t0`: Reference T0 [s] (Default: 0.5) | `imp = building.impact_insulation(li, t2, volume=50)`<br><br>• `ImpactInsulationResult` (`l_n_t`, `l_n`) |
+| `impact_insulation` | `function` | **Field impact insulation (ISO 16283-2).**<br>• `li`: Impact SPL [dB], 1D or (positions, bands)<br>• `t2`: Receiving-room T per band [s]<br>• `volume`: Receiving V [m³] (for L'n)<br>• `t0`: Reference T0 [s] (Default: 0.5)<br>• `frequencies` [Hz] (required with `low_frequency`)<br>• `low_frequency`: receiving-room `LowFrequencyProcedure` (ISO 16283-2 Clause 8)<br>• Warns (`LowFrequencyWarning`) when `volume` rounds below 25 m³, `frequencies` names 50/63/80 Hz and no `low_frequency` is given | `imp = building.impact_insulation(li, t2, volume=50)`<br><br>• `ImpactInsulationResult` (`l_n_t`, `l_n`) |
 | `weighted_impact_rating` | `function` | **Single-number impact rating + CI (ISO 717-2).**<br>• `values_by_band`: 16 thirds (100-3150 Hz) or 5 octaves (125-2000 Hz) [dB]<br>• `bands`: 'third-octave', 'octave' or None | `r = building.weighted_impact_rating(imp.l_n_t)`<br><br>• `ImpactRatingResult` (Ln,w, CI); octave rating carries the -5 dB rule |
 | `weighted_impact_rating_extended` | `function` | **Impact rating + CI,50-2500 (ISO 717-2:2020 A.2.1 NOTE).**<br>• `values_by_band` [dB] with `frequencies` [Hz] (None = the 16 core bands)<br>• `one_decimal`: 0.1 dB shift (reproduces Ln,r,0,w = 77.6, CI,r,0 = -10.3 of A.2.2) (Default: False) | `ext = building.weighted_impact_rating_extended(ln, freqs)`<br><br>• `ExtendedImpactRatingResult` (rating, ci, ci_50_2500) |
 | `ExtendedImpactRatingResult` | `dataclass` | **Weighted impact rating with CI,50-2500 (ISO 717-2:2020 A.2.1).**<br>• `rating`, `ci`, `ci_50_2500`<br>• `core`: the base `ImpactRatingResult` | `res = building.weighted_impact_rating_extended(freqs, ln)` |
@@ -34424,11 +34543,11 @@ documents, one page per module.
 | `background_corrected_level` | `function` | **Background correction (ISO 16251-1 Formula 2).**<br>• `signal_and_background`, `background` [dB] | `L, limited = building.background_corrected_level(lp, lb)`<br><br>• (corrected [dB], limit-of-measurement mask) |
 | `improvement_octave_bands` | `function` | **Thirds → octaves for ΔL (ISO 16251-1 Formula 5).**<br>• `improvement`, `frequencies` (whole octave triplets) | `f_oct, dl_oct = building.improvement_octave_bands(dl, f)` |
 | `FloorCoveringImprovementResult` | `dataclass` | **Floor-covering improvement (ISO 16251-1).**<br>• `improvement` ΔL [dB], `delta_lw`, `ci_delta` (or None)<br>• `limited`: > ΔL mask; `.octave_bands()`, `.plot()` | `res.delta_lw, res.ci_delta` |
-| `ImpactInsulationResult` | `dataclass` | **Impact insulation per band.**<br>• `l_n_t`: Standardized L'nT [dB]<br>• `l_n`: Normalized L'n [dB] or None<br>• `li`, `t2`, `t0`: retained measurement chain (or None)<br>• `.report(path, quantity='l_n_t'/'l_n', ...)`: ISO 16283-2 field test report (Annex C form) with the ISO 717-2 rating → PDF | `imp.report("LnTw.pdf", metadata=ReportMetadata(requirement=58.0))` |
+| `ImpactInsulationResult` | `dataclass` | **Impact insulation per band.**<br>• `l_n_t`: Standardized L'nT [dB]<br>• `l_n`: Normalized L'n [dB] or None<br>• `li`, `t2`, `t0`: retained measurement chain (or None)<br>• `low_frequency`: `LowFrequencyResult` or None<br>• `.report(path, quantity='l_n_t'/'l_n', ...)`: ISO 16283-2 field test report (Annex C form) with the ISO 717-2 rating → PDF | `imp.report("LnTw.pdf", metadata=ReportMetadata(requirement=58.0))` |
 | `ImpactRatingResult` | `dataclass` | **Weighted impact rating.**<br>• `rating`: Ln,w/L'n,w/L'nT,w [dB], int<br>• `ci`: Spectrum term CI, int<br>• `unfavourable_sum`: [dB]<br>• `band_centers`: Measured-curve centres [Hz] or None<br>• `measured`: Measured impact levels [dB] or None<br>• `shifted_reference`: Shifted impact reference [dB] or None | `r.rating, r.ci` |
 | `ReportMetadata` | `dataclass` | **Metadata for the accredited ISO 717 `.report()` PDF fiche.**<br>• All fields optional; only the supplied ones render<br>• `specimen`, `client`, `manufacturer`, `test_room`, `instrumentation`, `calibration`, `mounting`, `measurement_standard`, `test_date`<br>• numeric (finite, positive): `area`, `mass_per_area`, `source_volume`, `receiving_volume`, `temperature`, `relative_humidity`, `pressure`, `requirement`<br>• `laboratory`, `operator`, `report_id`, `notes` | `w.report("f.pdf", metadata=ReportMetadata(area=10.0, requirement=52.0))` |
-| `facade_insulation` | `function` | **Field façade insulation (ISO 16283-3).**<br>• `l1_2m`/`l2`: Level 2 m in front / receiving levels [dB], 1D or (positions, bands)<br>• `t2`: Receiving-room T per band [s]<br>• `area`: Element S [m²], `volume`: Receiving V [m³], `surface_level`: L1,s [dB] (all three for R')<br>• `method`: 'loudspeaker' (−1.5 dB) / 'road_traffic' (−3 dB)<br>• `t0`: Reference T0 [s] (Default: 0.5)<br>• `frequencies` [Hz] | `fac = building.facade_insulation(l1_2m, l2, t2, volume=50, area=11.5, surface_level=ls)`<br><br>• `FacadeInsulationResult` |
-| `FacadeInsulationResult` | `dataclass` | **Façade insulation per band.**<br>• `d_2m`: Level difference D2m [dB]<br>• `d_2m_nt`: Standardized D2m,nT [dB]<br>• `d_2m_n`: Normalized D2m,n [dB] or None<br>• `r_prime`: Apparent R'45°/R'tr,s [dB] or None<br>• `frequencies` [Hz] or None<br>• `.plot()` | `fac.d_2m_nt, fac.r_prime` |
+| `facade_insulation` | `function` | **Field façade insulation (ISO 16283-3).**<br>• `l1_2m`/`l2`: Level 2 m in front / receiving levels [dB], 1D or (positions, bands)<br>• `t2`: Receiving-room T per band [s]<br>• `area`: Element S [m²], `volume`: Receiving V [m³], `surface_level`: L1,s [dB] (all three for R')<br>• `method`: 'loudspeaker' (−1.5 dB) / 'road_traffic' (−3 dB)<br>• `t0`: Reference T0 [s] (Default: 0.5)<br>• `frequencies` [Hz] (required with `low_frequency`)<br>• `low_frequency`: receiving-room `LowFrequencyProcedure` (ISO 16283-3 Clause 7.3); loudspeaker methods only<br>• Warns (`LowFrequencyWarning`) when a loudspeaker-method `volume` rounds below 25 m³, `frequencies` names 50/63/80 Hz and no `low_frequency` is given | `fac = building.facade_insulation(l1_2m, l2, t2, volume=50, area=11.5, surface_level=ls)`<br><br>• `FacadeInsulationResult` |
+| `FacadeInsulationResult` | `dataclass` | **Façade insulation per band.**<br>• `d_2m`: Level difference D2m [dB]<br>• `d_2m_nt`: Standardized D2m,nT [dB]<br>• `d_2m_n`: Normalized D2m,n [dB] or None<br>• `r_prime`: Apparent R'45°/R'tr,s [dB] or None<br>• `frequencies` [Hz] or None<br>• `method`: the incidence correction used<br>• `low_frequency`: `LowFrequencyResult` or None<br>• `.plot()` | `fac.d_2m_nt, fac.r_prime` |
 | `LowFrequencyProcedure` | `dataclass` | **ISO 16283 low-frequency measurements of one room (Clause 8 / 7.3).**<br>• `volume`: Room V [m³]; must round below 25 m³<br>• `corner_levels`: (corners, 3) or (positions, corners, 3) at 50/63/80 Hz [dB]<br>• `reverberation_63_octave`: 63 Hz octave T [s] (receiving room, Clause 10.4 / 8.4) | `lf = building.LowFrequencyProcedure(volume=18.0, corner_levels=c, reverberation_63_octave=0.72)` |
 | `low_frequency_procedure_applies` | `function` | **The printed 25 m³ trigger.**<br>• `volume`: Room V [m³], rounded to the nearest cubic metre (half away from zero)<br>• True only for a rounded volume strictly below 25 m³ | `building.low_frequency_procedure_applies(18.0)  # True` |
 | `corner_level` | `function` | **Corner level L_Corner (ISO 16283-1 (12) / -2 (15)).**<br>• `corner_levels`: (corners, bands) or (positions, corners, bands) [dB]<br>• Highest corner per band, then energy-averaged over source positions | `lc = building.corner_level(corners)` |
@@ -34437,7 +34556,7 @@ documents, one page per module.
 | `LowFrequencyResult` | `dataclass` | **What the procedure did to one room.**<br>• `level`, `reverberation_time`: full band vectors after substitution<br>• `l_default`, `l_corner`, `l_lf`: the three-band chain [dB]<br>• `low_frequency_bands` [Hz], `volume` [m³], `reverberation_63_octave` [s]<br>• `.plot()` | `res.l_lf, res.reverberation_time` |
 | `LOW_FREQUENCY_BANDS` | `tuple` | **The three one-third-octave bands the procedure covers** (50, 63, 80 Hz). | `building.LOW_FREQUENCY_BANDS` |
 | `LOW_FREQUENCY_VOLUME_LIMIT` | `float` | **Room volume the procedure stops at**, 25 m³ to the nearest cubic metre, strictly. | `building.LOW_FREQUENCY_VOLUME_LIMIT  # 25.0` |
-| `LowFrequencyWarning` | `warning` | **Fewer corners than ISO 16283 asks for** (four per source position); the arithmetic is unaffected. | `warnings.simplefilter('error', building.LowFrequencyWarning)` |
+| `LowFrequencyWarning` | `warning` | **An ISO 16283 low-frequency requirement the measurement does not meet.**<br>• Fewer corners than the printed minimum of four; the arithmetic is unaffected<br>• A room under the 25 m³ trigger whose 50/63/80 Hz bands are about to be answered from the default procedure alone, which Clause 8.1 forbids and which does move the number<br>• Filter the two apart by message, not by class | `warnings.simplefilter('error', building.LowFrequencyWarning)` |
 | `lab_airborne_insulation` | `function` | **Laboratory airborne insulation (ISO 10140-2).**<br>• `l1`/`l2`: Source/receiving levels [dB], 1D or (positions, bands)<br>• `t2`: Receiving-room T per band [s]<br>• `area`: Free test-opening S [m²]<br>• `volume`: Receiving V [m³] | `lab = building.lab_airborne_insulation(l1, l2, t2, area=10, volume=50)`<br><br>• `LabAirborneInsulationResult` |
 | `lab_impact_insulation` | `function` | **Laboratory impact insulation (ISO 10140-3).**<br>• `li`: Tapping-machine impact SPL [dB], 1D or (positions, bands)<br>• `t2`: Receiving-room T per band [s]<br>• `volume`: Receiving V [m³] | `imp = building.lab_impact_insulation(li, t2, volume=50)`<br><br>• `LabImpactInsulationResult` |
 | `intensity_sound_reduction` | `function` | **Intensity sound reduction index RI (ISO 15186-1 Formula (7)).**<br>• `lp1`: Source-room level [dB], 1D or (positions, bands)<br>• `l_in`: Normal intensity level over the surface [dB]<br>• `measurement_area`: Surface Sm [m²], `area`: Specimen S [m²]<br>• `kc`: Adaptation term per band [dB] for RI,M (Default: None) | `res = building.intensity_sound_reduction(lp1, l_in, measurement_area=12, area=10)`<br><br>• `IntensityReductionResult` (`r_i`, `r_i_modified`, `rating`, `rating_modified`) |
@@ -49514,7 +49633,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 580 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 581 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -49757,7 +49876,7 @@ sample from the metrology core:
 | IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-580 numerical conformance checks across 59 domains and 374 standards, covering
+581 numerical conformance checks across 59 domains and 374 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise

@@ -358,7 +358,13 @@ print(building.low_frequency_procedure_applies(25.4))   # False, redondea a 25
 En una medición completa las dos mitades viajan juntas en un
 `LowFrequencyProcedure`, que `airborne_insulation()` aplica por ti al vector de
 bandas, y que `impact_insulation()` y `facade_insulation()` reciben bajo el
-argumento `low_frequency=`. La geometría de las esquinas, los requisitos de
+argumento `low_frequency=`.
+
+Los tres avisan cuando se te olvida. Un `volume` que redondea por debajo de
+25 m³ junto a un vector `frequencies` que nombra las tres bandas le dice a la
+función que el apartado 8.1 está en vigor, y sin procedimiento que ejecutar lo
+dice con un `LowFrequencyWarning` en lugar de devolver un número que no es el
+de ISO 16283. La geometría de las esquinas, los requisitos de
 muestreo, las diferencias entre las tres partes y una medición resuelta con su
 valoración están en una guía propia:
 [Recintos pequeños: procedimiento de baja frecuencia](/phonometry/es/buildings/insulation/low-frequency-procedure/).

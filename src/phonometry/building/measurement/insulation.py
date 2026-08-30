@@ -57,14 +57,23 @@ The façade quantity is airborne, so its single-number rating uses the
 bands, 100 Hz to 3150 Hz (Part 1 and Part 3 Clause 5, Part 2 Clause 5.1), and
 make the low range 50 Hz to 80 Hz and the high range 4000 Hz to 5000 Hz
 optional additions. The functions below evaluate whatever bands they are given
-and impose no range of their own; it is the ISO 717 rating and the
-``report()`` fiche that need exactly the 16 core bands, and they say so. When
-the optional low range **is** measured, the low-frequency procedure of
+and impose no range of their own; it is
+:mod:`~phonometry.building.measurement.ratings` that fixes a range, taking
+either those 16 one-third-octave bands or the 5 octave bands from 125 Hz to
+2000 Hz, and the ``report()`` fiche that needs exactly the 16.
+
+When the optional low range **is** measured, the low-frequency procedure of
 :mod:`phonometry.building.measurement.low_frequency` becomes mandatory for the
 50 Hz, 63 Hz and 80 Hz bands in any room whose volume, to the nearest cubic
-metre, is under 25 m³; each function below takes it through its
-``low_frequency`` arguments, and computing those three bands from the default
-procedure alone in a room that small is not the ISO 16283 quantity.
+metre, is under 25 m³. Each function below takes it through a
+:class:`~.low_frequency.LowFrequencyProcedure`: ``source_low_frequency`` and
+``receiver_low_frequency`` for the airborne pair of rooms, ``low_frequency``
+for the single receiving room of the other two. Computing those three bands
+from the default procedure alone in a room that small is not the ISO 16283
+quantity, so a function handed the volume and the band centres without a
+procedure raises a :class:`~.low_frequency.LowFrequencyWarning` rather than
+answering silently. The one exception is the road-traffic façade, which
+ISO 16283-3 Clause 6 gives the default procedure and nothing else.
 
 The single-number rating of any of these curves is the subject of
 :mod:`phonometry.building.measurement.ratings`, which implements ISO 717-1
@@ -89,7 +98,11 @@ from ..._internal.validation import (
     require_ranks,
     require_same_length,
 )
-from .low_frequency import LowFrequencyProcedure, apply_low_frequency_procedure
+from .low_frequency import (
+    LowFrequencyProcedure,
+    _warn_when_the_procedure_is_required,
+    apply_low_frequency_procedure,
+)
 from .ratings import (
     _FREQ_THIRD_OCTAVE,
     ImpactRatingResult,
@@ -941,6 +954,14 @@ def airborne_insulation(
     measured. Note 4 to entry of Clause 3.14 records that ``R'`` determined
     this way no longer maps exactly onto the sound-power ratio of Formula (3).
 
+    Clause 8.1 is a *shall*, so a receiving room that rounds below 25 m³ and a
+    ``frequencies`` vector naming the three bands are together enough to know
+    the procedure was owed. When ``receiver_low_frequency`` is then absent this
+    function computes ``D`` from the default procedure alone and raises a
+    :class:`~.low_frequency.LowFrequencyWarning` saying that those three bands
+    are not the ISO 16283 quantity. Only the receiving room, because only its
+    volume is an argument here.
+
     :param l1: Source-room sound pressure levels, in dB.
     :param l2: Receiving-room sound pressure levels, in dB.
     :param t2: Receiving-room reverberation time per band, in seconds.
@@ -964,11 +985,15 @@ def airborne_insulation(
     :raises ValueError: If the band counts of ``l1``, ``l2`` and ``t2``
         differ, if only one of ``area``/``volume`` is supplied, if
         ``t2``/``t0`` are not positive, if inputs are non-finite, if a
-        low-frequency argument is given without ``frequencies``, if a room
-        offering corner measurements does not round below 25 m³, if ``volume``
+        low-frequency argument is given without ``frequencies``, if ``volume``
         disagrees with the receiving-room procedure, or if the 63 Hz octave
         reverberation time is missing from the receiving room or present on the
-        source room.
+        source room. A room that does not round below 25 m³ is refused where
+        the corner measurements are described, by
+        :class:`~.low_frequency.LowFrequencyProcedure` itself.
+    :warns LowFrequencyWarning: when the receiving room rounds below 25 m³ and
+        ``frequencies`` names the three bands but no ``receiver_low_frequency``
+        answers Clause 8.1.
     """
     l1_bands = _as_band_levels(l1, "l1")
     l2_bands = _as_band_levels(l2, "l2")
@@ -1027,6 +1052,17 @@ def airborne_insulation(
         absorption = 0.16 * volume / t
         r_prime = d + 10.0 * np.log10(area / absorption)
 
+    # Only the receiving room, because only its volume is an argument here:
+    # Clause 8.1 tests the two rooms on their own volumes and a source room
+    # small enough to trigger is something the caller has to declare.
+    _warn_when_the_procedure_is_required(
+        volume,
+        frequencies,
+        receiver_low_frequency,
+        owner="airborne_insulation",
+        argument="receiver_low_frequency",
+    )
+
     return AirborneInsulationResult(
         d=d,
         dnt=dnt,
@@ -1077,6 +1113,13 @@ def impact_insulation(
     which is the only impact source this function models; the rubber ball is
     :mod:`phonometry.building.measurement.heavy_impact`.
 
+    Clause 8.1 is a *shall*, so a ``volume`` that rounds below 25 m³ beside a
+    ``frequencies`` vector naming the three bands is enough to know the
+    procedure was owed. With no ``low_frequency`` to run it, this function
+    answers from the default procedure alone and raises a
+    :class:`~.low_frequency.LowFrequencyWarning` saying that those three bands
+    are not the ISO 16283 quantity.
+
     :param li: Energy-average impact sound pressure levels, in dB.
     :param t2: Receiving-room reverberation time per band, in seconds.
     :param volume: Receiving-room volume ``V``, in m³ (optional; required
@@ -1094,8 +1137,13 @@ def impact_insulation(
     :raises ValueError: If the band counts of ``li`` and ``t2`` differ, if
         ``t2``/``t0``/``volume`` are not positive, if inputs are
         non-finite, if ``low_frequency`` is given without ``frequencies``, if
-        the room does not round below 25 m³, if ``volume`` disagrees with the
-        procedure, or if the 63 Hz octave reverberation time is missing.
+        ``volume`` disagrees with the procedure, or if the 63 Hz octave
+        reverberation time is missing. A room that does not round below 25 m³
+        is refused where the corner measurements are described, by
+        :class:`~.low_frequency.LowFrequencyProcedure` itself.
+    :warns LowFrequencyWarning: when ``volume`` rounds below 25 m³ and
+        ``frequencies`` names the three bands but no ``low_frequency`` answers
+        Clause 8.1.
     """
     li_bands = _as_band_levels(li, "li")
     t = np.asarray(t2, dtype=np.float64)
@@ -1130,6 +1178,14 @@ def impact_insulation(
             raise ValueError(msg)
         absorption = 0.16 * volume / t
         l_n = li_bands + 10.0 * np.log10(absorption / _A0_IMPACT)
+
+    _warn_when_the_procedure_is_required(
+        volume,
+        frequencies,
+        low_frequency,
+        owner="impact_insulation",
+        argument="low_frequency",
+    )
 
     return ImpactInsulationResult(
         l_n_t=l_n_t,
@@ -1214,6 +1270,17 @@ def facade_insulation(
     curve (Annex F); pass the desired 16-band quantity to
     :func:`weighted_rating`.
 
+    **Rooms under 25 m³.** Clause 7.3.1 makes the low-frequency procedure
+    mandatory for the 50 Hz, 63 Hz and 80 Hz bands in the receiving room once
+    its volume, to the nearest cubic metre, is under 25 m³, and Clause 8.4 puts
+    one 63 Hz octave reverberation time in place of the three one-third-octave
+    ones. Pass both through ``low_frequency``. A loudspeaker-method call whose
+    ``volume`` rounds below the line and whose ``frequencies`` names the three
+    bands, with no ``low_frequency`` to run the procedure, answers from the
+    default procedure alone and raises a
+    :class:`~.low_frequency.LowFrequencyWarning` saying that those three bands
+    are not the ISO 16283 quantity.
+
     :param l1_2m: Outdoor sound pressure levels 2 m in front of the façade,
         in dB.
     :param l2: Receiving-room sound pressure levels, in dB.
@@ -1234,7 +1301,10 @@ def facade_insulation(
         on the result for plotting; required with ``low_frequency``.
     :param low_frequency: Receiving-room corner measurements, volume and 63 Hz
         octave reverberation time (Clause 7.3 and Clause 8.4). Loudspeaker
-        methods only.
+        methods only: Clause 6 says that for the element and global road
+        traffic methods "only the default procedure shall be used", so a small
+        room measured against traffic is conforming without corners and is
+        neither refused nor warned about.
     :return: :class:`FacadeInsulationResult` with ``d_2m``, ``d_2m_nt``,
         ``d_2m_n`` (``None`` unless ``volume`` is given) and ``r_prime``
         (``None`` unless ``surface_level``, ``area`` and ``volume`` are all
@@ -1245,11 +1315,15 @@ def facade_insulation(
         given without ``volume``, if ``frequencies`` is given with a shape
         that differs from the band axis, if inputs are non-finite, if
         ``low_frequency`` is given without ``frequencies`` or with
-        ``method="road_traffic"``, if the room does not round below 25 m³, if
-        ``volume`` disagrees with the procedure, or if the 63 Hz octave
-        reverberation time is missing.
+        ``method="road_traffic"``, if ``volume`` disagrees with the procedure,
+        or if the 63 Hz octave reverberation time is missing. A room that does
+        not round below 25 m³ is refused where the corner measurements are
+        described, by :class:`~.low_frequency.LowFrequencyProcedure` itself.
         Supplying ``surface_level`` alone is not an error: ``r_prime`` simply
         stays ``None``.
+    :warns LowFrequencyWarning: when a loudspeaker-method ``volume`` rounds
+        below 25 m³ and ``frequencies`` names the three bands but no
+        ``low_frequency`` answers Clause 7.3.1.
     """
     if method not in _FACADE_CORRECTION:
         msg = f"'method' must be 'loudspeaker' or 'road_traffic', got {method!r}."
@@ -1327,6 +1401,20 @@ def facade_insulation(
             {"l1_2m": l1_bands.shape, "frequencies": freqs.shape},
             "band",
         )
+
+    # Loudspeaker methods only. Clause 6 says "for the element and global road
+    # traffic methods, only the default procedure shall be used", so a small
+    # room measured against traffic is conforming without corners and there is
+    # nothing to warn about.
+    if method == _FACADE_LOUDSPEAKER:
+        _warn_when_the_procedure_is_required(
+            volume,
+            frequencies,
+            low_frequency,
+            owner="facade_insulation",
+            argument="low_frequency",
+        )
+
     return FacadeInsulationResult(
         d_2m=d_2m,
         d_2m_nt=d_2m_nt,

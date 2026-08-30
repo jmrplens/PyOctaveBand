@@ -212,6 +212,17 @@ $C_{\mathrm{I},50\text{–}2500}$). With `one_decimal=True` the reference curve 
 prescribes "for the expression of uncertainty" and ISO 12999-1 Annex B
 requires when stating the uncertainty of a single-number value.
 
+Where those extra bands come from matters as much as what the term does with
+them. In a room whose volume, to the nearest cubic metre, is under 25 m³,
+ISO 16283 does not let the 50 Hz, 63 Hz and 80 Hz bands be measured with the
+default procedure alone: the corner procedure is mandatory there, and it moves
+those three bands by several decibels, which is enough to move
+$C_{50\text{–}3150}$ by a whole one. So a requirement written as
+$D_\mathrm{nT,w} + C_{50\text{–}3150}$ is judged on the corner procedure
+whether the report mentions it or not. See
+[Small Rooms: the ISO 16283 Low-Frequency
+Procedure](low-frequency-procedure.md).
+
 ```python
 from phonometry import building
 

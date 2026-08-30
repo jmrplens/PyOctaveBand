@@ -103,6 +103,58 @@ construir un `LowFrequencyProcedure` con un volumen de 25 m³ o más lanza una
 excepción. Ninguna parte de ISO 16283 dice qué significa allí una medición en
 esquina, y contestar de todos modos movería en silencio el nivel declarado.
 
+### Por debajo de la línea la biblioteca lo dice
+
+El disparador es un «debe», así que los tres puntos de entrada de medición no
+esperan a que se les pregunte. Cuando le das a uno de ellos un `volume` de
+recinto receptor que redondea por debajo de 25 m³ y un vector `frequencies` que
+nombra las bandas de 50 Hz, 63 Hz y 80 Hz, ya sabe todo lo que hace falta para
+saber que el apartado 8.1 está en vigor. Si no vino con ellos ningún
+`LowFrequencyProcedure`, calcula esas tres bandas solo con el procedimiento por
+defecto, que no es la magnitud de ISO 16283, y lanza un `LowFrequencyWarning`
+que lo dice.
+
+```python
+import warnings
+
+import numpy as np
+from phonometry import building
+
+# Un baño de 2,0 m por 1,7 m por 2,4 m, o sea 8 m3 al metro cúbico más próximo,
+# con el rango bajo opcional del apartado 5 medido. Nada en la llamada menciona
+# el procedimiento de baja frecuencia.
+freqs_lf = np.array([50.0, 63.0, 80.0, 100.0, 125.0])
+li_lf = np.array([66.9, 69.4, 67.2, 64.8, 63.1])
+t_lf = np.array([0.74, 0.69, 0.63, 0.58, 0.55])
+
+with warnings.catch_warnings(record=True) as caught:
+    warnings.simplefilter("always")
+    building.impact_insulation(li_lf, t_lf, volume=8.16, frequencies=freqs_lf)
+
+print(caught[0].category.__name__)                    # LowFrequencyWarning
+print("rounds to 8 m³" in str(caught[0].message))     # True
+```
+
+**Avisa** en lugar de negarse, por dos razones. Puede que las mediciones en
+esquina sencillamente no existan: un ensayo anterior a ISO 16283, o uno en el
+que se omitieron las esquinas, sigue mereciendo un informe siempre que el
+informe diga lo que es. Y el espectro del procedimiento por defecto es aquello
+contra lo que se compara el de ISO 16283, que es justo lo que hace la figura
+más abajo en esta página, de modo que negarse a calcularlo eliminaría la
+comparación. El aviso calla cuando sí ejecutaste el procedimiento, cuando no se
+dio ningún `volume` (no hay entonces disparador que evaluar), cuando el recinto
+no dispara, cuando no se dio `frequencies` y cuando el rango bajo opcional no
+se midió en absoluto: las 16 bandas centrales de 100 Hz a 3150 Hz son una
+medición ISO 16283 completa en un recinto de cualquier tamaño. También calla
+para `facade_insulation(method="road_traffic")`, porque el apartado 6 de
+ISO 16283-3 da a los métodos con tráfico el procedimiento por defecto y ningún
+otro.
+
+Solo el recinto receptor. `airborne_insulation` toma un único `volume`, el del
+receptor, así que ese es el recinto del que puede hablar; un recinto emisor lo
+bastante pequeño como para disparar por sí solo el apartado 8.1 es algo que
+tienes que declarar mediante `source_low_frequency`.
+
 ### Qué recinto, y qué método
 
 Las tres partes no aplican el procedimiento al mismo recinto ni a la misma
@@ -119,7 +171,15 @@ los dos recintos de forma *independiente*, así que un recinto emisor de 18 m³
 junto a un receptor de 40 m³ recibe el tratamiento en esquinas solo sobre
 $L_1$; pero el apartado 10.4 es un apartado del recinto receptor en las tres
 partes, la Parte 1 incluida, de modo que los tiempos de reverberación de esa
-medición se quedan como se midieron. La segunda: el apartado 6 de ISO 16283-3
+medición se quedan como se midieron. (El apartado 6 de la Parte 1 sí dice que
+el procedimiento para el tiempo de reverberación se aplica «en el recinto
+emisor o en el receptor», contradiciendo a su propio apartado 10, que se titula
+«Tiempo de reverberación en el recinto receptor» y vuelve a nombrar ese recinto
+en 10.1, 10.3 y 10.4. ISO 16283-1 no mide ningún tiempo de reverberación en el
+recinto emisor, y las Partes 2 y 3 imprimen la misma frase con un solo recinto.
+Es un defecto del impreso, registrado en el
+[registro de erratas](/phonometry/es/reference/errata/).) La segunda: el
+apartado 6 de ISO 16283-3
 dice que «para los métodos de elemento y global con tráfico rodado solo se
 debe utilizar el procedimiento por defecto», y su NOTA 1 da la razón: «en este
 momento no hay experiencia en el uso del procedimiento de baja frecuencia con
@@ -196,24 +256,35 @@ con un único altavoz movido entre posiciones, vuelve a tomar las cuatro
 esquinas en cada una.
 
 La medición en esquinas lleva requisitos de muestreo de los que la aritmética
-anterior no depende, y la biblioteca impone solo el que puede leerse de los
-datos que recibe.
+anterior no depende, y de ellos la biblioteca impone uno: el recuento de
+esquinas, el único del que una hoja de esquinas trae la prueba.
 
 | Requisito | Dónde | ¿Impuesto? |
 | :--- | :--- | :--- |
-| Un mínimo de cuatro esquinas por posición de fuente | apartado 8.3 de las Partes 1 y 2, apartado 7.3.2 de la Parte 3 | avisa (`LowFrequencyWarning`) |
+| Un mínimo de cuatro esquinas | apartado 8.3 de las Partes 1 y 2 (por posición de fuente), apartado 7.3.2 de la Parte 3 | avisa (`LowFrequencyWarning`) |
 | Dos de ellas a nivel de suelo y dos a nivel de techo | los mismos apartados, como recomendación | no |
 | Micrófono de 0,3 m a 0,4 m de cada superficie que forma la esquina | los mismos apartados | no |
 | Al menos dos posiciones de fuente | apartado 8.1 de la Parte 1, apartado 8.2.2 de la Parte 2 | no |
 | Tiempo de promediado de al menos 15 s por posición | apartado 8.4 de la Parte 1 | no |
-| Una medición de fondo en **cada** esquina utilizada | apartado 9.1 de la Parte 1, apartado 7.4.1 de la Parte 3 | no |
+| Una medición de fondo en **cada** esquina utilizada | apartado 9.1 de la Parte 1, apartado 9.1 de la Parte 2, apartado 7.4.1 de la Parte 3 | no |
 
-Los niveles que se entregan se suponen ya corregidos por ruido de fondo, cosa
-que ISO 16283-2 enuncia dentro de la propia lista de símbolos de la Fórmula
-(15). Aquí vuelve el detalle de banda a banda: como las tres bandas pueden
-venir de tres esquinas distintas, «cada banda puede requerir una corrección
-individual del nivel de señal por ruido de fondo» (la NOTA bajo el apartado
-9.1 de la Parte 1).
+El recuento de posiciones de fuente es la única omisión que merece nombrarse,
+porque una hoja 2-D `(esquinas, 3)` sí declara $q = 1$ en su propia forma. No
+se avisa de ella porque $q = 1$ es una lectura conforme en dos de las tres
+partes: el apartado 8.5 de la Parte 1 se la concede a los altavoces operados
+simultáneamente, y es la Parte 3 entera. Solo la Parte 2, cuyo apartado 8.2.2
+pide la máquina de impactos en «al menos dos de las mismas posiciones» y no
+admite el caso simultáneo, tendría derecho a quejarse, y una parte de tres es
+mal negocio para un aviso.
+
+Los niveles que se entregan se suponen ya corregidos por ruido de fondo. Las
+tres partes exigen esa corrección en cada esquina utilizada, en su apartado de
+ruido de fondo; ISO 16283-2 lo dice una segunda vez dentro de la propia lista
+de símbolos de la Fórmula (15). Aquí vuelve el detalle de banda a banda: como
+las tres bandas pueden venir de tres esquinas distintas, «cada banda puede
+requerir una corrección individual del nivel de señal por ruido de fondo» (la
+NOTA bajo el apartado 9.1 de la Parte 1, impresa palabra por palabra en el
+apartado 9.1 de la Parte 2).
 
 ## Combinar las dos (Fórmula (13))
 
@@ -277,6 +348,15 @@ tiempo de reverberación a 100 Hz y por encima en cuanto el recinto está por
 debajo de 25 m³. Por eso un procedimiento de recinto receptor sin tiempo de
 octava de 63 Hz se rechaza en vez de adivinarse, y también se rechaza uno de
 recinto emisor que lo lleve.
+
+Eso tiene una consecuencia para quien llama. Una medición conforme en un
+recinto pequeño no tiene ningún tiempo de reverberación de tercio de octava en
+50 Hz, 63 Hz ni 80 Hz que declarar, pero los puntos de entrada validan el
+vector `t2` entero antes de que ocurra la sustitución y quieren un valor
+positivo y finito en cada banda. Pon cualquier marcador positivo en esas tres
+columnas: el procedimiento sobrescribe las tres con el valor de octava de 63 Hz
+y los marcadores no llegan a ningún resultado. Copiar hacia arriba el valor de
+100 Hz es la opción menos sorprendente.
 
 ## En marcha: una implementación, tres puntos de entrada
 
@@ -368,7 +448,9 @@ chain = field.receiver_low_frequency
 chain.plot(language="es")
 plt.show()
 
-# Todo el espectro, a mano, contra el procedimiento por defecto solo:
+# Todo el espectro, a mano, contra el procedimiento por defecto solo. Esta
+# llamada lanza un LowFrequencyWarning, y hace bien: el recinto dispara y no se
+# pasó ningún procedimiento. Aquí eso es justo lo que se busca.
 plain = building.airborne_insulation(l1, l2, t2, area=6.48, volume=23.3,
                                      frequencies=freqs)
 x = np.arange(len(freqs))
@@ -422,6 +504,7 @@ impact_corners = np.array([[[73.1, 76.4, 72.0], [71.8, 77.2, 70.6],
 impact_procedure = building.LowFrequencyProcedure(
     volume=23.3, corner_levels=impact_corners, reverberation_63_octave=0.66)
 
+# Avisa, por la misma razón y con el mismo fin que la de ruido aéreo de arriba.
 plain_impact = building.impact_insulation(li, t2, volume=23.3, frequencies=freqs)
 impact = building.impact_insulation(li, t2, volume=23.3, frequencies=freqs,
                                     low_frequency=impact_procedure)
@@ -447,28 +530,37 @@ ISO 16283 no publica en ninguna parte un ejemplo numérico de este
 procedimiento. El Anexo B de la Parte 1 y el Anexo C de la Parte 2 son
 formularios de registro en blanco, y los «Ejemplos» de los Anexos D y E son
 dibujos de posiciones de altavoz. Así que este módulo se suma al registro de
-magnitudes ancladas en forma cerrada en lugar de en un resultado tabulado. Las
-ocho filas que este módulo lleva en el
-[informe de conformidad](/phonometry/es/reference/conformance/) juzgan números
-impresos y formas cerradas, no un resultado publicado. Lo que hace de oráculo,
-fila a fila:
+magnitudes ancladas en forma cerrada en lugar de en un resultado tabulado.
+Lleva nueve filas en el
+[informe de conformidad](/phonometry/es/reference/conformance/), y todas y cada
+una juzgan un número impreso o una forma cerrada, no un resultado publicado. Lo
+que hace de oráculo:
 
-- **Los números impresos.** El umbral de 25 m³ y su carácter estricto, el
-  redondeo en la frontera y el conjunto de bandas 50 / 63 / 80 Hz son
-  magnitudes exactas leídas de la página, y se fijan como tales.
-- **Las formas cerradas de la Fórmula (13).** La degeneración en
-  $L_\mathrm{Corner} = L$, la monotonía estricta en $L_\mathrm{Corner}$ y el
-  suelo $10 \log_{10}(2/3) + L$, al que se llega sin cruzarlo nunca.
-- **La razón que da el apartado 10.4, medida en lugar de afirmada.** Una caída
-  de una sola pendiente conocida se pasa por la maquinaria de reverberación ya
-  presente en esta biblioteca, y la banda de octava de 63 Hz la recupera con
-  menos error que las tres de tercio de octava, que es la NOTA 1 convertida en
-  una medición.
-- **Una implementación, demostrada y no afirmada.** Una fila de conformidad
-  comprueba que los puntos de entrada de ruido aéreo, impactos y fachada
-  llegan al mismo $L_\mathrm{LF}$ a partir de entradas idénticas, 3 partes de
-  3, así que «el mismo procedimiento» es un hecho comprobado y no una frase de
-  esta página.
+- **Los números impresos**, tres filas. El umbral de 25 m³ con su carácter
+  estricto y su redondeo en la frontera, el conjunto de bandas 50 / 63 / 80 Hz
+  y el valor de octava de 63 Hz cayendo exactamente en esas tres bandas y en
+  ninguna otra son magnitudes exactas leídas de la página, y se fijan como
+  tales.
+- **Las formas cerradas**, cinco filas. La Fórmula (13) contra la expresión
+  impresa transcrita de forma independiente, su degeneración en
+  $L_\mathrm{Corner} = L$, su monotonía estricta en $L_\mathrm{Corner}$ a lo
+  largo de 80 dB, el suelo $10 \log_{10}(2/3) + L$ al que se llega sin
+  cruzarlo nunca, y la Fórmula (12) contra la media energética sobre $q = 2$
+  posiciones de fuente escrita a mano. Cada una de esas cinco dice «closed
+  form» en su celda de valor esperado, que es como el informe marca una fila
+  sin resultado publicado detrás.
+- **Una implementación, demostrada y no afirmada**, la novena fila. Comprueba
+  que los puntos de entrada de ruido aéreo, impactos y fachada llegan al mismo
+  $L_\mathrm{LF}$ a partir de entradas idénticas, 3 partes de 3, así que «el
+  mismo procedimiento» es un hecho comprobado y no una frase de esta página.
+
+Hay algo que el informe de conformidad no lleva, porque es una comparación
+entre dos métodos y no un valor: **la razón que da el apartado 10.4, medida en
+lugar de afirmada**. Una caída de una sola pendiente conocida se pasa por la
+maquinaria de reverberación ya presente en esta biblioteca, y la banda de
+octava de 63 Hz la recupera con menos error que las tres de tercio de octava,
+de media y en el peor caso. Eso es la NOTA 1 convertida en una medición, y vive
+en la suite de tests y no en el informe.
 
 ## Respuestas rápidas
 
@@ -478,6 +570,21 @@ No. El volumen se lleva primero al metro cúbico más próximo, y 24,5 redondea 
 25 m³, que no es «menor que 25 m³». El umbral efectivo es $V < 24{,}5$ m³, y
 un recinto de exactamente 25 m³ usa el procedimiento por defecto en todas las
 partes de ISO 16283.
+
+### Me ha saltado un `LowFrequencyWarning` por un recinto de menos de 25 m³. ¿Y ahora?
+
+Tres respuestas, y cuál es la correcta depende de lo que hayas medido. Si se
+midieron las esquinas, pásalas: construye un `LowFrequencyProcedure` con la
+hoja de esquinas y el tiempo de reverberación de octava de 63 Hz y entrégaselo
+al punto de entrada. Si no se midieron y solo necesitas el rango central, deja
+las columnas de 50 Hz, 63 Hz y 80 Hz fuera de la llamada: las 16 bandas de
+100 Hz a 3150 Hz son una medición ISO 16283 completa en un recinto de cualquier
+tamaño, y el aviso se va con ellas. Si quieres las bandas bajas de todos modos,
+como comparación o porque un ensayo antiguo es todo lo que tienes, consérvalas
+y silencia el aviso a propósito, con `warnings.filterwarnings` sobre el mensaje
+y no sobre la clase, para que la queja por el recuento de esquinas te siga
+llegando. Lo que el aviso no te va a dejar hacer es declarar esas tres bandas
+como magnitudes de ISO 16283 sin darte cuenta de que no lo son.
 
 ### ¿Por qué se mide el tiempo de reverberación en la banda de octava de 63 Hz?
 

@@ -3,8 +3,8 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 580,
-    "passing": 580,
+    "checks": 581,
+    "passing": 581,
     "failing": 0,
     "domains": 59,
     "standards": 374,
@@ -85,8 +85,8 @@
     {
       "id": "room-building-acoustics",
       "title": "Room & building acoustics",
-      "checks": 80,
-      "passing": 80
+      "checks": 81,
+      "passing": 81
     },
     {
       "id": "room-acoustics",
@@ -3378,7 +3378,7 @@
       "kind": "scalar",
       "expected": {
         "value": 0.0,
-        "label": "Formula (12) over q = 2 positions"
+        "label": "Formula (12) over q = 2 positions (closed form)"
       },
       "computed": {
         "value": 1.42e-14,
@@ -3409,7 +3409,7 @@
       "kind": "scalar",
       "expected": {
         "value": 0.0,
-        "label": "the printed Formula (13)"
+        "label": "the printed Formula (13) (closed form)"
       },
       "computed": {
         "value": 0.0,
@@ -3440,7 +3440,7 @@
       "kind": "scalar",
       "expected": {
         "value": 0.0,
-        "label": "L_LF = L for L_Corner = L"
+        "label": "L_LF = L for L_Corner = L (closed form)"
       },
       "computed": {
         "value": 0.0,
@@ -3470,7 +3470,8 @@
       "quantity": "L_LF floor at 10 lg(2/3) below L as the corners fall silent",
       "kind": "scalar",
       "expected": {
-        "value": 48.23908740944319
+        "value": 48.23908740944319,
+        "label": "48.239087 dB (+/-1e-09 dB, closed form)"
       },
       "computed": {
         "value": 48.239087
@@ -3484,6 +3485,36 @@
         "value": 0.0
       },
       "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-16283-1-2014-formula-13-2-2020-16-3-2016-5/l-lf-rises-strictly-with-the-corner-level-over-80-db-of-it",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 16283-1",
+        "edition": "2014",
+        "clause": "Formula (13) / -2:2020 (16) / -3:2016 (5)",
+        "cite": "ISO 16283-1:2014 Formula (13) / -2:2020 (16) / -3:2016 (5)"
+      },
+      "quantity": "L_LF rises strictly with the corner level, over 80 dB of it",
+      "kind": "count",
+      "expected": {
+        "value": 400.0,
+        "label": "400/400 steps rising with the corner level (closed form)"
+      },
+      "computed": {
+        "value": 400.0,
+        "label": "400/400 steps rising with the corner level"
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
       "verdict": "pass"
     },
     {

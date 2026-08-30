@@ -55,8 +55,23 @@ receiving room when *its* volume" is under the line, so a 18 m³ source room
 next to a 40 m³ receiving room gets the corner treatment on :math:`L_1` alone.
 Parts 2 and 3 have only a receiving room to treat. The 63 Hz octave
 substitution is keyed to the **receiving** room in all three parts, Part 1
-included, so that asymmetry is real and this module encodes it: a source-room
-procedure that carries a 63 Hz octave reverberation time is refused.
+included: its Clause 10 is headed "Reverberation time in the receiving room",
+its Clause 10.1 scopes the whole clause to that room and its Clause 10.4 names
+it again. So that asymmetry is real and this module encodes it: a source-room
+procedure that carries a 63 Hz octave reverberation time is refused. Part 1
+Clause 6 does contradict its own Clause 10 on this and asks for the
+reverberation-time procedure "in the source and/or receiving room"; that is a
+defect of the printed text, registered in ``docs/ERRATA.md``.
+
+**Not optional, and not silent.** Clause 8.1 (Part 3: Clause 7.3.1) says the
+procedure *shall* be used, so the three entry points that consume this module
+do not simply wait to be asked. When the room volume and the band centres are
+both in hand, a room that rounds below the trigger and names the three bands
+without bringing a :class:`LowFrequencyProcedure` gets a
+:class:`LowFrequencyWarning` rather than a quiet answer several decibels away
+from the ISO 16283 one. They warn rather than refuse: the corner measurements
+may genuinely not exist, and the default-procedure spectrum is what a reader
+compares the ISO 16283 one against.
 
 **Which methods.** Part 3 restricts the whole procedure to the element and
 global *loudspeaker* methods; Clause 6 NOTE 1 records that there is no
@@ -106,12 +121,20 @@ __all__ = [
 
 
 class LowFrequencyWarning(PhonometryWarning):
-    """A low-frequency measurement that falls short of a sampling requirement.
+    """An ISO 16283 low-frequency requirement the measurement does not meet.
 
-    Raised for the corner count of Part 1 Clause 8.3, Part 2 Clause 8.3 and
-    Part 3 Clause 7.3.2, which the arithmetic of Formula (12) does not depend
-    on: four corners and three give the same maximum-then-average, and it is
-    the report that has to say the room was undersampled.
+    Two conditions raise it, and the message says which.
+
+    The corner count of Part 1 Clause 8.3, Part 2 Clause 8.3 and Part 3
+    Clause 7.3.2, which the arithmetic of Formula (12) does not depend on: four
+    corners and three give the same maximum-then-average, and it is the report
+    that has to say the room was undersampled.
+
+    A room under the 25 m³ trigger whose 50 Hz, 63 Hz and 80 Hz bands are about
+    to be answered from the default procedure alone, which Clause 8.1 (Part 3:
+    Clause 7.3.1) says *shall* not happen. That one does change the number, by
+    several decibels, so it is worth filtering the two apart by message rather
+    than silencing the class.
     """
 
 
@@ -126,8 +149,11 @@ LOW_FREQUENCY_BANDS: Final[tuple[float, float, float]] = (50.0, 63.0, 80.0)
 #: does not trigger.
 LOW_FREQUENCY_VOLUME_LIMIT: Final = 25.0
 
-#: Corners the standards require per source position (Part 1 Clause 8.3,
-#: Part 2 Clause 8.3, Part 3 Clause 7.3.2, all "a minimum of four corners").
+#: Corners the standards require: "a minimum of four corners" in Part 1
+#: Clause 8.3, Part 2 Clause 8.3 and Part 3 Clause 7.3.2 alike. Parts 1 and 2
+#: ask for them again at each source position ("for each loudspeaker position",
+#: "for each impact source position"); Part 3 prints the sentence without that
+#: qualifier, and has no second position to repeat them at.
 _MIN_CORNERS: Final = 4
 
 #: How far a supplied band centre may sit from the nominal 50 / 63 / 80 Hz and
@@ -210,6 +236,93 @@ def _require_volume_triggers(volume: float, name: str) -> None:
         raise ValueError(msg)
 
 
+def _low_frequency_bands_are_present(frequencies: ArrayLike) -> bool:
+    """Whether a band-centre vector names all three low-frequency bands.
+
+    The non-raising half of :func:`_low_frequency_indices`, and the question
+    :func:`_warn_when_the_procedure_is_required` has to answer before it can
+    say anything. Every vector the raising version would refuse comes back
+    ``False`` here, an ambiguous duplicate centre included: a warning about a
+    missing procedure is not the place to report a malformed band axis, and the
+    caller who does supply a procedure gets the proper message from the other
+    one.
+
+    :param frequencies: Band centre frequencies, in Hz.
+    :return: ``True`` when 50 Hz, 63 Hz and 80 Hz are each named exactly once.
+    """
+    centres = np.asarray(frequencies, dtype=np.float64)
+    if centres.ndim != 1:
+        return False
+    return all(
+        np.count_nonzero(np.isclose(centres, target, rtol=_BAND_MATCH_RTOL)) == 1
+        for target in LOW_FREQUENCY_BANDS
+    )
+
+
+def _warn_when_the_procedure_is_required(
+    volume: float | None,
+    frequencies: ArrayLike | None,
+    supplied: LowFrequencyProcedure | None,
+    *,
+    owner: str,
+    argument: str,
+) -> None:
+    """Say so when a room under the trigger is answered without the procedure.
+
+    Clause 8.1 (Part 3: Clause 7.3.1) is a *shall*, not an option, so the
+    50 Hz, 63 Hz and 80 Hz bands of a room that rounds below 25 m³ are not the
+    ISO 16283 quantity unless the corner measurements went into them. The
+    measurement functions cannot supply the corners themselves and refusing
+    would take away the default-procedure spectrum the reader needs to compare
+    against, so they say it and answer.
+
+    Everything the test needs is already in hand for other reasons: the volume
+    sizes the Sabine absorption area and the band centres label the spectrum.
+    That is also the limit of it. The warning stays silent when the caller ran
+    the procedure, when no volume was given, when the room does not trigger,
+    when the band centres were not given, and when the optional low range of
+    Clause 5 was not measured, because in none of those cases is there anything
+    the library can be sure went wrong.
+
+    :param volume: Receiving-room volume ``V``, in m³, or ``None``.
+    :param frequencies: Band centre frequencies, in Hz, or ``None``.
+    :param supplied: The procedure the caller passed for that room, if any.
+    :param owner: Function name, for the message.
+    :param argument: Name of the argument the procedure would arrive through.
+    """
+    if supplied is not None or volume is None or frequencies is None:
+        return
+    value = float(volume)
+    # `low_frequency_procedure_applies` raises on a volume that is not one, and
+    # a warning is the wrong voice for that: every entry point has its own
+    # complaint about a non-positive volume, so this check stands aside and
+    # lets it be made. Ordered as in that function, and for the same reason.
+    if not math.isfinite(value) or value <= 0.0:
+        return
+    if not low_frequency_procedure_applies(value):
+        return
+    if not _low_frequency_bands_are_present(frequencies):
+        return
+    rounded = math.floor(value + 0.5)
+    warnings.warn(
+        f"{owner}: the receiving room is {value:g} m³, which rounds to "
+        f"{rounded} m³, and 'frequencies' names the 50 Hz, 63 Hz and 80 Hz "
+        "bands, so ISO 16283 requires the low-frequency procedure there "
+        "(ISO 16283-1 and -2 Clause 8.1, ISO 16283-3 Clause 7.3.1, all "
+        f"'shall'). Without '{argument}' those three bands carry the default "
+        "procedure alone, which is not the ISO 16283 quantity: Formula (13) "
+        "weighs a corner measurement into the level and Clause 10.4 (Clause "
+        "8.4 in ISO 16283-3) puts the 63 Hz octave reverberation time in place "
+        "of the three one-third-octave ones. Pass a LowFrequencyProcedure as "
+        f"'{argument}', or leave the optional low range of Clause 5 out and "
+        "report 100 Hz to 3150 Hz alone.",
+        LowFrequencyWarning,
+        # Three frames out: this helper, the entry point that called it, and
+        # the caller's own line, which is the one worth pointing at.
+        stacklevel=3,
+    )
+
+
 def corner_level(corner_levels: ArrayLike) -> np.ndarray:
     r"""Corner sound pressure level :math:`L_\mathrm{Corner}` per band.
 
@@ -230,10 +343,11 @@ def corner_level(corner_levels: ArrayLike) -> np.ndarray:
     because :math:`p^2/p_0^2 = 10^{L/10}`, and the ``(corners, bands)`` shape
     is the same formula at ``q = 1``.
 
-    Corner levels are assumed already corrected for background noise, which
-    Part 2 Formula (15) states in its own where-list and Parts 1 and 3 place in
-    their background-noise clause (Part 1 Clause 9.1, Part 3 Clause 7.4.1, both
-    requiring a background measurement in every corner used).
+    Corner levels are assumed already corrected for background noise. All
+    three parts require a background measurement in **every** corner used, in
+    their background-noise clause (Part 1 Clause 9.1, Part 2 Clause 9.1,
+    Part 3 Clause 7.4.1), and Part 2 says it a second time in Formula (15)'s
+    own where-list.
 
     :param corner_levels: Corner sound pressure levels, in dB, as
         ``(corners, bands)`` or ``(positions, corners, bands)``.

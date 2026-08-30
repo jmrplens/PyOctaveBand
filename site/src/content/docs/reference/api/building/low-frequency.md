@@ -59,8 +59,23 @@ receiving room when *its* volume" is under the line, so a 18 m³ source room
 next to a 40 m³ receiving room gets the corner treatment on $L_1$ alone.
 Parts 2 and 3 have only a receiving room to treat. The 63 Hz octave
 substitution is keyed to the **receiving** room in all three parts, Part 1
-included, so that asymmetry is real and this module encodes it: a source-room
-procedure that carries a 63 Hz octave reverberation time is refused.
+included: its Clause 10 is headed "Reverberation time in the receiving room",
+its Clause 10.1 scopes the whole clause to that room and its Clause 10.4 names
+it again. So that asymmetry is real and this module encodes it: a source-room
+procedure that carries a 63 Hz octave reverberation time is refused. Part 1
+Clause 6 does contradict its own Clause 10 on this and asks for the
+reverberation-time procedure "in the source and/or receiving room"; that is a
+defect of the printed text, registered in `docs/ERRATA.md`.
+
+**Not optional, and not silent.** Clause 8.1 (Part 3: Clause 7.3.1) says the
+procedure *shall* be used, so the three entry points that consume this module
+do not simply wait to be asked. When the room volume and the band centres are
+both in hand, a room that rounds below the trigger and names the three bands
+without bringing a [`LowFrequencyProcedure`](/phonometry/reference/api/building/low-frequency/#lowfrequencyprocedure) gets a
+[`LowFrequencyWarning`](/phonometry/reference/api/building/low-frequency/#lowfrequencywarning) rather than a quiet answer several decibels away
+from the ISO 16283 one. They warn rather than refuse: the corner measurements
+may genuinely not exist, and the default-procedure spectrum is what a reader
+compares the ISO 16283 one against.
 
 **Which methods.** Part 3 restricts the whole procedure to the element and
 global *loudspeaker* methods; Clause 6 NOTE 1 records that there is no
@@ -153,10 +168,11 @@ written in levels rather than in mean-square pressures. The two forms agree
 because $p^2/p_0^2 = 10^{L/10}$, and the `(corners, bands)` shape
 is the same formula at `q = 1`.
 
-Corner levels are assumed already corrected for background noise, which
-Part 2 Formula (15) states in its own where-list and Parts 1 and 3 place in
-their background-noise clause (Part 1 Clause 9.1, Part 3 Clause 7.4.1, both
-requiring a background measurement in every corner used).
+Corner levels are assumed already corrected for background noise. All
+three parts require a background measurement in **every** corner used, in
+their background-noise clause (Part 1 Clause 9.1, Part 2 Clause 9.1,
+Part 3 Clause 7.4.1), and Part 2 says it a second time in Formula (15)'s
+own where-list.
 
 **Parameters**
 
@@ -331,9 +347,17 @@ Requires matplotlib (`pip install phonometry[plot]`); returns the
 
 ## LowFrequencyWarning
 
-A low-frequency measurement that falls short of a sampling requirement.
+An ISO 16283 low-frequency requirement the measurement does not meet.
 
-Raised for the corner count of Part 1 Clause 8.3, Part 2 Clause 8.3 and
-Part 3 Clause 7.3.2, which the arithmetic of Formula (12) does not depend
-on: four corners and three give the same maximum-then-average, and it is
-the report that has to say the room was undersampled.
+Two conditions raise it, and the message says which.
+
+The corner count of Part 1 Clause 8.3, Part 2 Clause 8.3 and Part 3
+Clause 7.3.2, which the arithmetic of Formula (12) does not depend on: four
+corners and three give the same maximum-then-average, and it is the report
+that has to say the room was undersampled.
+
+A room under the 25 m³ trigger whose 50 Hz, 63 Hz and 80 Hz bands are about
+to be answered from the default procedure alone, which Clause 8.1 (Part 3:
+Clause 7.3.1) says *shall* not happen. That one does change the number, by
+several decibels, so it is worth filtering the two apart by message rather
+than silencing the class.

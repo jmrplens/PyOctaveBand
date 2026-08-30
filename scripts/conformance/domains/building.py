@@ -367,7 +367,7 @@ def _chk_iso16283_corner_level() -> Outcome:
         1e-9,
         unit="dB",
         places=9,
-        expected_label="Formula (12) over q = 2 positions",
+        expected_label="Formula (12) over q = 2 positions (closed form)",
         computed_label=f"max deviation {worst:.9f} dB",
     )
 
@@ -394,7 +394,7 @@ def _chk_iso16283_low_frequency_level() -> Outcome:
         1e-9,
         unit="dB",
         places=9,
-        expected_label="the printed Formula (13)",
+        expected_label="the printed Formula (13) (closed form)",
         computed_label=f"max deviation {worst:.9f} dB",
     )
 
@@ -416,7 +416,7 @@ def _chk_iso16283_low_frequency_degenerate() -> Outcome:
         1e-12,
         unit="dB",
         places=12,
-        expected_label="L_LF = L for L_Corner = L",
+        expected_label="L_LF = L for L_Corner = L (closed form)",
         computed_label=f"max deviation {worst:.12f} dB",
     )
 
@@ -432,7 +432,40 @@ def _chk_iso16283_low_frequency_floor() -> Outcome:
     default = 50.0
     floor_db = 10.0 * math.log10(2.0 / 3.0) + default
     computed = float(ph.building.low_frequency_level([default], [-200.0])[0])
-    return numeric(floor_db, computed, 1e-9, unit="dB", places=6)
+    return numeric(
+        floor_db,
+        computed,
+        1e-9,
+        unit="dB",
+        places=6,
+        expected_label=f"{floor_db:.6f} dB (+/-1e-09 dB, closed form)",
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 16283-1:2014 Formula (13) / -2:2020 (16) / -3:2016 (5)",
+    "L_LF rises strictly with the corner level, over 80 dB of it",
+)
+def _chk_iso16283_low_frequency_monotonic() -> Outcome:
+    # The third closed form the guide page names, and the one that says a
+    # louder corner is never averaged away: sweeping L_Corner from 40 dB below
+    # the default level to 40 dB above it in 0,2 dB steps, every step is a rise.
+    # The 1/3 weight makes the rise very small at the quiet end - about 1e-6 dB
+    # per step at L_Corner = L - 40 dB - and float64 still resolves it.
+    default = 50.0
+    corners = np.arange(default - 40.0, default + 40.2, 0.2)
+    computed = ph.building.low_frequency_level(np.full(corners.size, default), corners)
+    steps = corners.size - 1
+    rising = int(np.count_nonzero(np.diff(computed) > 0.0))
+    return count(
+        rising,
+        steps,
+        subject="steps rising with the corner level",
+        expected_label=(
+            f"{steps}/{steps} steps rising with the corner level (closed form)"
+        ),
+    )
 
 
 @register(
