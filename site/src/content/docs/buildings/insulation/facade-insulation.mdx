@@ -726,10 +726,12 @@ but not checked: nothing verifies the 45° ± 5° incidence, the 5 m / 7 m slant
 distances, the 3→10 microphone escalation and its recess special case, the 50
 pass-bys and the simultaneity of a traffic measurement, or that the method
 chosen matches the question asked. The low-frequency corner procedure of
-Clause 7 (the façade counterpart of the [ISO 16283-1
+Clause 7.3 (the façade counterpart of the [ISO 16283-1
 procedure](/phonometry/buildings/insulation/insulation-field/#small-rooms-the-low-frequency-procedure-clause-8),
-triggered by the same 25 m³ receiving-room threshold) is not implemented
-either, and neither are the railway and aircraft methods of Annex E. The EN
+triggered by the same 25 m³ receiving-room threshold) is implemented and
+reached through `facade_insulation`'s `low_frequency=` argument, for the
+loudspeaker methods Clause 6 confines it to; the railway and aircraft methods
+of Annex E are not. The EN
 12354-3 and EN 12354-4 worked examples of the 2000 editions carry small
 internal rounding inconsistencies at the higher octave bands, noted where they
 appear: the implementation follows the formulas rather than the printed rows.

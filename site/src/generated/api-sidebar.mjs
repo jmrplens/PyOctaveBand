@@ -117,6 +117,7 @@ export const apiSections = {
     collapsed: true,
     items: [
       'reference/api/building/insulation',
+      'reference/api/building/low-frequency',
       'reference/api/building/ratings',
       'reference/api/building/panel-transmission',
       'reference/api/building/masonry-cavity-wall',

@@ -816,6 +816,60 @@ which is the check that enforces the rule; see
   ambiguity noted.
 - **Status:** unreported.
 
+## ISO 16283-2:2020, Clause 8.3 (a source room in an impact measurement)
+
+- **Location:** Clause 8.3 "Microphone positions", last paragraph (printed p.
+  15).
+- **The print:** "For the 50 Hz, 63 Hz and 80 Hz one-third octave bands,
+  calculate the low-frequency energy-average sound pressure level **for the
+  source and/or receiving room** according to 8.5."
+- **The problem:** an impact measurement has no source-room sound pressure
+  level to calculate. Every other statement of the same procedure in the same
+  part names one room: Clause 6 introduces it as used "in the receiving room
+  when its volume is smaller than 25 m³" (printed p. 6), Clause 8.1 repeats "in
+  the receiving room" (printed p. 14), Clause 8.5 builds
+  $L_\text{i,Corner}$ from corners of the receiving room (printed p. 16), and
+  Formulae (1) and (3), which the same sentence sends the reader to, are
+  written in $L_\text{i}$, the energy-average impact sound pressure level in
+  the receiving room. The phrase is correct where it comes from: ISO 16283-1
+  Clause 8.3 says "for the source and/or receiving room" of an airborne
+  measurement, where both rooms do carry a level. It was carried across into
+  the impact part and survived the revision unchanged.
+- **Evidence:** the sentence on PDF page 21 (printed p. 15) of ISO 16283-2:2020
+  beside the same sentence on PDF page 23 (printed p. 15) of the ISO/DIS
+  16283-2 text circulated as BSI DPC 13/30269186 DC, and the airborne original
+  on PDF page 21 (printed p. 15) of ISO 16283-1:2014.
+- **Library behaviour:** the impact entry point takes a receiving-room
+  low-frequency procedure and nothing else, following Clause 6, 8.1 and 8.5;
+  only the airborne entry point, where ISO 16283-1 Clause 8.1 really does admit
+  both rooms, offers a source-room one.
+- **Status:** unreported.
+
+## ISO 16283-2:2020, Clause 10.3 (a receiving room of exactly 25 m³)
+
+- **Location:** Clause 10.3 "Default procedure" for the reverberation time
+  (printed p. 18).
+- **The print:** "for all one-third octave bands between 50 Hz and 5 000 Hz
+  when the receiving room has a volume **larger than** 25 m³ (calculated to the
+  nearest cubic metre) and between 100 Hz and 5 000 Hz when the receiving room
+  has a volume smaller than 25 m³ (calculated to the nearest cubic metre)".
+- **The problem:** a receiving room that rounds to exactly 25 m³ falls in
+  neither branch, so the clause states no frequency range for it. The other two
+  parts print "larger than **or equal to** 25 m³" in the otherwise identical
+  sentence, which closes the boundary. The intended reading is not in doubt:
+  the trigger of Clause 8.1 and Clause 10.4 is "smaller than 25 m³" in all
+  three parts, so 25 m³ belongs to the larger branch and takes the full 50 Hz
+  to 5 000 Hz default range.
+- **Evidence:** PDF page 24 (printed p. 18) of ISO 16283-2:2020, which the
+  ISO/DIS text on PDF page 26 (printed p. 18) of BSI DPC 13/30269186 DC already
+  read the same way, against PDF page 24 (printed p. 18) of ISO 16283-1:2014
+  and PDF page 24 (printed p. 18) of ISO 16283-3:2016, both of which carry the
+  "or equal to".
+- **Library behaviour:** the trigger predicate is the strict "smaller than
+  25 m³" the three parts share, so a room of exactly 25 m³ takes the default
+  procedure in every part and no gap exists.
+- **Status:** unreported.
+
 ## ISO 17208-2:2019, Clause 5 uncertainty band coverage
 
 - **Location:** Clause 5 (representative expanded uncertainties), printed p.

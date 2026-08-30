@@ -59,6 +59,7 @@ from result_factories import (
     _intensity,
     _intensity_power_negative,
     _layered_absorber,
+    _low_frequency_procedure,
     _modulation,
     _monte_carlo,
     _open_plan,
@@ -171,6 +172,7 @@ _KWARG_PLOT_CASES = [
     ("impact_prediction", _impact_prediction, "bar"),
     ("airborne_insulation", _airborne_insulation, "line"),
     ("impact_insulation", _impact_insulation, "line"),
+    ("low_frequency_procedure", _low_frequency_procedure, "line"),
     ("band_uncertainty", _band_uncertainty, "line"),
     ("radiation_efficiency", _radiation_efficiency, "line"),
     ("single_panel", _single_panel, "line"),
@@ -267,6 +269,7 @@ def test_single_axes_plots_accept_external_ax() -> None:
         _impact_prediction(),
         _airborne_insulation(),
         _impact_insulation(),
+        _low_frequency_procedure(),
         _band_uncertainty(),
         ph.aircraft.load_anp_database().flight_profile(
             "A320-211", "departure", aerodrome=ph.aircraft.Aerodrome(elevation_ft=0.0)

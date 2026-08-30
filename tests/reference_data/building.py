@@ -85,6 +85,47 @@ ISO16283_3_R45_REVERB_TIME_S = 1.0
 ISO16283_3_R45_EXPECTED_DB = 38.5
 
 # ---------------------------------------------------------------------------
+# ISO 16283 low-frequency procedure. Neither part publishes a worked example
+# of it (Annex B of Part 1 and Annex C of Part 2 are blank recording forms and
+# the "Examples" of Annexes D and E are loudspeaker-position drawings), so what
+# is tabulated here is the printed trigger, the printed band set, and one
+# corner sheet whose combination is recomputed from the printed Formula (13)
+# rather than read out of a table.
+#
+# The trigger is "smaller than 25 m3 (calculated to the nearest cubic metre)",
+# printed in ISO 16283-1:2014 Clause 8.1 and 10.4, ISO 16283-2:2020 Clause 6,
+# 8.1 and 10.4, and ISO 16283-3:2016 Clause 6, 7.3.1 and 8.4. Rounded half away
+# from zero, the last volume that triggers is 24,49 m3 and the first that does
+# not is 24,5 m3.
+# ---------------------------------------------------------------------------
+ISO16283_LF_BANDS_HZ: list[float] = [50.0, 63.0, 80.0]
+ISO16283_LF_VOLUME_LIMIT_M3 = 25.0
+#: (volume in m3, whether the low-frequency procedure is required).
+ISO16283_LF_TRIGGER_CASES: list[tuple[float, bool]] = [
+    (8.0, True),
+    (24.0, True),
+    (24.49, True),
+    (24.5, False),
+    (25.0, False),
+    (25.4, False),
+    (40.0, False),
+]
+#: Four corners by the three low-frequency bands, in dB. The highest corner is
+#: a different one in each band, which is what the NOTE under Formula (12)
+#: allows ("the values for LCorner may be associated with different corners").
+ISO16283_LF_CORNER_LEVELS: list[list[float]] = [
+    [56.0, 58.0, 54.0],
+    [55.0, 60.0, 53.0],
+    [54.0, 57.0, 56.0],
+    [53.0, 56.0, 55.0],
+]
+ISO16283_LF_CORNER_MAXIMA: list[float] = [56.0, 60.0, 56.0]
+#: Energy-average levels from the default procedure at the same three bands.
+ISO16283_LF_DEFAULT_LEVELS: list[float] = [50.0, 52.0, 49.0]
+#: Reverberation time measured in the 63 Hz octave band, in s (Clause 10.4).
+ISO16283_LF_T63_OCTAVE_S = 0.72
+
+# ---------------------------------------------------------------------------
 # ISO 10140-2:2010 laboratory airborne sound reduction index R (Formula (2)):
 # R = L1 - L2 + 10 lg(S/A), A = 0,16 V/T. The reference-curve construction lays
 # R exactly on the ISO 717-1 Table 3 shape (100-3150 Hz) by choosing S = A

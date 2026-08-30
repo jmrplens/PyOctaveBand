@@ -29,7 +29,7 @@ from scipy import signal as sg
 
 import phonometry as ph
 
-from ..registry import Outcome, numeric, record, register
+from ..registry import Outcome, count, numeric, record, register
 from .levels import _FS
 
 if TYPE_CHECKING:
@@ -291,6 +291,216 @@ def _chk_facade_r45() -> Outcome:
     assert expected == ref.ISO16283_3_R45_EXPECTED_DB
     computed = float(np.asarray(res.r_prime)[0])
     return numeric(expected, computed, 1e-9, unit="dB", places=6)
+
+
+# --- ISO 16283 low-frequency procedure (Clause 8 / 7.3 and Clause 10.4 / 8.4)
+#
+# No part of ISO 16283 publishes a worked example of this procedure: Annex B of
+# Part 1 and Annex C of Part 2 are blank recording forms and the "Examples" of
+# Annexes D and E are loudspeaker-position drawings. The checks below therefore
+# judge the printed numbers (the 25 m3 trigger, the three bands) and the closed
+# forms of Formula (13), never a tabulated result, and the combination is
+# recomputed here from the printed expression rather than from the library.
+
+
+def _printed_formula_13(default: float, corner: float) -> float:
+    """Formula (13) as printed, transcribed here and not read from the library."""
+    return 10.0 * math.log10(
+        (10.0 ** (0.1 * corner) + (2.0 * 10.0 ** (0.1 * default))) / 3.0
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 16283-1:2014 Clause 8.1 / -2:2020 Clause 8.1 / -3:2016 Clause 7.3.1",
+    "Low-frequency trigger: V < 25 m³ to the nearest cubic metre",
+)
+def _chk_iso16283_low_frequency_trigger() -> Outcome:
+    # "smaller than 25 m3 (calculated to the nearest cubic metre)", strictly:
+    # rounding half away from zero, 24,49 m3 is the last volume that triggers
+    # and 24,5 m3 the first that does not, and 25 m3 exactly never does.
+    agree = sum(
+        ph.building.low_frequency_procedure_applies(volume) is required
+        for volume, required in ref.ISO16283_LF_TRIGGER_CASES
+    )
+    return count(
+        agree,
+        len(ref.ISO16283_LF_TRIGGER_CASES),
+        subject="room volumes on either side of 25 m³",
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 16283-1:2014 Clause 5 / -2:2020 Clause 5.1 / -3:2016 Clause 5",
+    "Low-frequency band set is 50 Hz, 63 Hz and 80 Hz",
+)
+def _chk_iso16283_low_frequency_bands() -> Outcome:
+    printed = ref.ISO16283_LF_BANDS_HZ
+    computed = list(ph.building.LOW_FREQUENCY_BANDS)
+    return record(
+        {f"band {i + 1}": v for i, v in enumerate(printed)},
+        {f"band {i + 1}": v for i, v in enumerate(computed)},
+        unit="Hz",
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 16283-1:2014 Formula (12) / -2:2020 Formula (15)",
+    "Corner level is the highest corner per band, energy-averaged over q",
+)
+def _chk_iso16283_corner_level() -> Outcome:
+    # Two source positions, the second 6 dB louder than the first, so the
+    # energy mean of Formula (12) is exercised as well as the per-band maximum.
+    first = np.asarray(ref.ISO16283_LF_CORNER_LEVELS, dtype=float)
+    positions = np.stack([first, first + 6.0])
+    computed = ph.building.corner_level(positions)
+    maxima = np.asarray(ref.ISO16283_LF_CORNER_MAXIMA, dtype=float)
+    expected = 10.0 * np.log10(
+        (10.0 ** (0.1 * maxima) + 10.0 ** (0.1 * (maxima + 6.0))) / 2.0
+    )
+    worst = float(np.max(np.abs(computed - expected)))
+    return numeric(
+        0.0,
+        worst,
+        1e-9,
+        unit="dB",
+        places=9,
+        expected_label="Formula (12) over q = 2 positions",
+        computed_label=f"max deviation {worst:.9f} dB",
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 16283-1:2014 Formula (13) / -2:2020 (16) / -3:2016 (5)",
+    "L_LF combines the corner and default levels one third to two thirds",
+)
+def _chk_iso16283_low_frequency_level() -> Outcome:
+    computed = ph.building.low_frequency_level(
+        ref.ISO16283_LF_DEFAULT_LEVELS, ref.ISO16283_LF_CORNER_MAXIMA
+    )
+    expected = [
+        _printed_formula_13(d, c)
+        for d, c in zip(
+            ref.ISO16283_LF_DEFAULT_LEVELS, ref.ISO16283_LF_CORNER_MAXIMA, strict=True
+        )
+    ]
+    worst = float(np.max(np.abs(np.asarray(computed) - np.asarray(expected))))
+    return numeric(
+        0.0,
+        worst,
+        1e-9,
+        unit="dB",
+        places=9,
+        expected_label="the printed Formula (13)",
+        computed_label=f"max deviation {worst:.9f} dB",
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 16283-1:2014 Formula (13) / -2:2020 (16) / -3:2016 (5)",
+    "L_LF degenerates to L when the corner level equals it",
+)
+def _chk_iso16283_low_frequency_degenerate() -> Outcome:
+    # The weights are 1/3 and 2/3 and sum to one, so equal inputs come back
+    # unchanged. No worked example exists; this closed form stands in for one.
+    level = np.asarray(ref.ISO16283_LF_DEFAULT_LEVELS, dtype=float)
+    computed = ph.building.low_frequency_level(level, level)
+    worst = float(np.max(np.abs(computed - level)))
+    return numeric(
+        0.0,
+        worst,
+        1e-12,
+        unit="dB",
+        places=12,
+        expected_label="L_LF = L for L_Corner = L",
+        computed_label=f"max deviation {worst:.12f} dB",
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 16283-1:2014 Formula (13) / -2:2020 (16) / -3:2016 (5)",
+    "L_LF floor at 10 lg(2/3) below L as the corners fall silent",
+)
+def _chk_iso16283_low_frequency_floor() -> Outcome:
+    # Two thirds of the default energy survives whatever the corners do, so the
+    # combination is bounded below by 10 lg(2/3) + L = L - 1,76 dB.
+    default = 50.0
+    floor_db = 10.0 * math.log10(2.0 / 3.0) + default
+    computed = float(ph.building.low_frequency_level([default], [-200.0])[0])
+    return numeric(floor_db, computed, 1e-9, unit="dB", places=6)
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 16283-1:2014 Clause 10.4 / -2:2020 Clause 10.4 / -3:2016 Clause 8.4",
+    "63 Hz octave T replaces exactly the 50 Hz, 63 Hz and 80 Hz bands",
+)
+def _chk_iso16283_63_hz_octave_substitution() -> Outcome:
+    freqs = [*ref.ISO16283_LF_BANDS_HZ, 100.0, 125.0]
+    times = [0.60, 0.55, 0.50, 0.45, 0.40]
+    levels = [*ref.ISO16283_LF_DEFAULT_LEVELS, 45.0, 44.0]
+    result = ph.building.apply_low_frequency_procedure(
+        levels,
+        freqs,
+        ph.building.LowFrequencyProcedure(
+            volume=18.0,
+            corner_levels=ref.ISO16283_LF_CORNER_LEVELS,
+            reverberation_63_octave=ref.ISO16283_LF_T63_OCTAVE_S,
+        ),
+        reverberation_time=times,
+    )
+    substituted = result.reverberation_time
+    if substituted is None:  # pragma: no cover - the receiving call always sets it
+        msg = "the receiving-room call returned no substituted reverberation time"
+        raise RuntimeError(msg)
+    wanted = [ref.ISO16283_LF_T63_OCTAVE_S] * 3 + times[3:]
+    agree = sum(
+        abs(float(got) - want) < 1e-12
+        for got, want in zip(substituted, wanted, strict=True)
+    )
+    return count(agree, len(wanted), subject="reverberation-time bands")
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 16283-1:2014 (13) / -2:2020 (16) / -3:2016 (5)",
+    "Airborne, impact and facade run one low-frequency implementation",
+)
+def _chk_iso16283_low_frequency_shared() -> Outcome:
+    freqs = [*ref.ISO16283_LF_BANDS_HZ, 100.0, 125.0]
+    times = [0.60, 0.55, 0.50, 0.45, 0.40]
+    l2 = [*ref.ISO16283_LF_DEFAULT_LEVELS, 45.0, 44.0]
+    l1 = [80.0, 82.0, 79.0, 75.0, 74.0]
+    procedure = ph.building.LowFrequencyProcedure(
+        volume=18.0,
+        corner_levels=ref.ISO16283_LF_CORNER_LEVELS,
+        reverberation_63_octave=ref.ISO16283_LF_T63_OCTAVE_S,
+    )
+    records = [
+        ph.building.airborne_insulation(
+            l1, l2, times, frequencies=freqs, receiver_low_frequency=procedure
+        ).receiver_low_frequency,
+        ph.building.impact_insulation(
+            l2, times, frequencies=freqs, low_frequency=procedure
+        ).low_frequency,
+        ph.building.facade_insulation(
+            l1, l2, times, frequencies=freqs, low_frequency=procedure
+        ).low_frequency,
+    ]
+    reference = records[0]
+    if reference is None:  # pragma: no cover - the call above always sets it
+        msg = "the airborne call produced no low-frequency record"
+        raise RuntimeError(msg)
+    agree = sum(
+        other is not None and bool(np.array_equal(other.l_lf, reference.l_lf))
+        for other in records
+    )
+    return count(agree, len(records), subject="parts reaching the same L_LF")
 
 
 @register(

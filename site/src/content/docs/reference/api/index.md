@@ -120,7 +120,8 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 
 | Module | Summary |
 | :--- | :--- |
-| [`building.measurement.insulation`](/phonometry/reference/api/building/insulation/) | Field measurement of sound insulation: airborne (ISO 16283-1:2014), impact (ISO 16283-2) and facade (ISO 16283-3:2016). |
+| [`building.measurement.insulation`](/phonometry/reference/api/building/insulation/) | Field measurement of sound insulation: airborne (ISO 16283-1:2014), impact (ISO 16283-2:2020) and facade (ISO 16283-3:2016). |
+| [`building.measurement.low_frequency`](/phonometry/reference/api/building/low-frequency/) | Low-frequency procedure of ISO 16283, shared by all three parts. |
 | [`building.measurement.ratings`](/phonometry/reference/api/building/ratings/) | Single-number weighted ratings of sound insulation and their spectrum adaptation terms (ISO 717-1 airborne, ISO 717-2 impact). |
 | [`building.prediction.panel_transmission`](/phonometry/reference/api/building/panel-transmission/) | Predicted airborne sound reduction index of panels (Bies, Hansen & Howard 2017, Engineering Noise Control 5e, Section 7.2; Sharp 1973). |
 | [`building.prediction.masonry_cavity_wall`](/phonometry/reference/api/building/masonry-cavity-wall/) | Wall ties in masonry cavity walls: the structural bridge across the cavity (Hopkins 2007, Sections 3.11.3.2 and 4.3.5.4.1). |

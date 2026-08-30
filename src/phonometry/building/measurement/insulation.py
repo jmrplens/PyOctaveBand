@@ -1,6 +1,6 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 r"""Field measurement of sound insulation: airborne (ISO 16283-1:2014), impact
-(ISO 16283-2) and facade (ISO 16283-3:2016).
+(ISO 16283-2:2020) and facade (ISO 16283-3:2016).
 
 **Field quantities (ISO 16283-1:2014).** From the energy-average sound
 pressure levels in the source and receiving rooms this module forms the
@@ -12,25 +12,22 @@ Formula (2)), and the apparent sound reduction index
 :math:`A = 0.16 V / T` (Clause 3.14/3.15, Formula (4) and (5)). Source and
 receiving levels may be supplied already averaged (one value per band) or
 as several microphone positions, which are then energy-averaged with
-:math:`10 \log_{10}\left( \frac{1}{n} \sum 10^{L_j/10} \right)` (Clause 7.8,
-Formula (9)). All
-quantities are evaluated per one-third-octave band over the core range
-100 Hz to 3150 Hz (Clause 5), the caller having already applied any
-background-noise correction (Clause 9.2).
+:math:`10 \log_{10}\left( \frac{1}{n} \sum 10^{L_j/10} \right)` (Clause 7.8.1,
+Formula (9)). The quantities are evaluated per one-third-octave band, the
+caller having already applied any background-noise correction (Clause 9.2).
 
-**Field impact quantities (ISO 16283-2).** With the tapping machine as the
-impact source this module forms, from the energy-average impact sound
+**Field impact quantities (ISO 16283-2:2020).** With the tapping machine as
+the impact source this module forms, from the energy-average impact sound
 pressure level ``Li`` in the receiving room, the standardized impact sound
 pressure level :math:`L'_\mathrm{nT} = L_\mathrm{i} - 10 \log_{10}(T/T_0)` with
 :math:`T_0 = 0.5` s (Clause
 3.13, Formula (1)) and the normalized impact sound pressure level
 :math:`L'_\mathrm{n} = L_\mathrm{i} + 10 \log_{10}(A/A_0)` with the Sabine absorption area
-:math:`A = 0.16 V/T`
-and the reference area :math:`A_0 = 10` m² (Clause 3.14, Formula (2)).
+:math:`A = 0.16 V/T` (Clause 3.14, Formula (2))
+and the reference area :math:`A_0 = 10` m² (Clause 3.15, Formula (3)).
 Levels
 may be supplied already averaged or as several microphone positions, then
-energy-averaged (Clause 7.8, Formula (10)), over the core one-third-octave
-range 100 Hz to 3150 Hz (Clause 5.1).
+energy-averaged (Clause 7.8.1, Formula (11)).
 
 **Field façade quantities (ISO 16283-3:2016).** With an outdoor sound
 source this module forms, from the level 2 m in front of the façade
@@ -52,11 +49,22 @@ the
 road-traffic element method (Clause 3.13). These quantities are defined by
 unnumbered formulas inline in the Clause 3 terms; positions are
 energy-averaged with the surface-level formula (Clause 9.5.1, Formula (7)).
-Quantities are evaluated over the core one-third-octave range 100 Hz to
-3150 Hz (Clause 5), optionally extended to 50-5000 Hz. The façade quantity
-is airborne, so its single-number rating uses the **ISO 717-1 airborne**
-reference curve and method (Clause 2, Annex F) via :func:`weighted_rating`
-unchanged.
+The façade quantity is airborne, so its single-number rating uses the
+**ISO 717-1 airborne** reference curve and method (Clause 2, Annex F) via
+:func:`weighted_rating` unchanged.
+
+**Frequency range.** The three parts require the same 16 core one-third-octave
+bands, 100 Hz to 3150 Hz (Part 1 and Part 3 Clause 5, Part 2 Clause 5.1), and
+make the low range 50 Hz to 80 Hz and the high range 4000 Hz to 5000 Hz
+optional additions. The functions below evaluate whatever bands they are given
+and impose no range of their own; it is the ISO 717 rating and the
+``report()`` fiche that need exactly the 16 core bands, and they say so. When
+the optional low range **is** measured, the low-frequency procedure of
+:mod:`phonometry.building.measurement.low_frequency` becomes mandatory for the
+50 Hz, 63 Hz and 80 Hz bands in any room whose volume, to the nearest cubic
+metre, is under 25 m³; each function below takes it through its
+``low_frequency`` arguments, and computing those three bands from the default
+procedure alone in a room that small is not the ISO 16283 quantity.
 
 The single-number rating of any of these curves is the subject of
 :mod:`phonometry.building.measurement.ratings`, which implements ISO 717-1
@@ -66,6 +74,7 @@ box the rating on the field report form.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, overload
 
@@ -80,6 +89,7 @@ from ..._internal.validation import (
     require_ranks,
     require_same_length,
 )
+from .low_frequency import LowFrequencyProcedure, apply_low_frequency_procedure
 from .ratings import (
     _FREQ_THIRD_OCTAVE,
     ImpactRatingResult,
@@ -94,6 +104,7 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
     from ..._report.metadata import ReportMetadata
+    from .low_frequency import LowFrequencyResult
 
 # The ISO 717 rating machinery now lives in :mod:`.ratings`. Until every caller
 # in the tree reads it from there, the names this module used to define stay
@@ -128,6 +139,7 @@ __all__ = [
     "FacadeInsulationResult",
     "ImpactInsulationResult",
     "ImpactRatingResult",
+    "LowFrequencyProcedure",
     "WeightedRatingResult",
     "airborne_insulation",
     "energy_average_level",
@@ -141,7 +153,7 @@ __all__ = [
     "weighted_rating_extended",
 ]
 
-#: Reference absorption area A0 for the normalized level (Clause 3.14).
+#: Reference absorption area A0 for the normalized impact level (Clause 3.15).
 _A0_IMPACT = 10.0
 
 # --- ISO 16283-3 façade sound insulation ---------------------------------
@@ -149,10 +161,15 @@ _A0_IMPACT = 10.0
 #: Reference absorption area A0 for D2m,n (Clause 3.16, dwellings).
 _A0_FACADE = 10.0
 
+#: The façade source ISO 16283-3 admits the low-frequency procedure for
+#: (Clause 6 and the heading of Clause 7.3, "element or global loudspeaker
+#: methods").
+_FACADE_LOUDSPEAKER = "loudspeaker"
+
 #: Angle-of-incidence corrections in the apparent sound reduction index:
 #: -1,5 dB for the loudspeaker method at 45° (Clause 3.12) and -3 dB for
 #: the road-traffic method with all-angle incidence (Clause 3.13).
-_FACADE_CORRECTION = {"loudspeaker": 1.5, "road_traffic": 3.0}
+_FACADE_CORRECTION = {_FACADE_LOUDSPEAKER: 1.5, "road_traffic": 3.0}
 
 
 @dataclass(frozen=True)
@@ -171,10 +188,15 @@ class AirborneInsulationResult:
         to ``None`` for backward-compatible construction.
     :ivar l2: Energy-average receiving-room levels, in dB. Defaults to
         ``None``.
-    :ivar t2: Receiving-room reverberation time per band, in seconds.
-        Defaults to ``None``.
+    :ivar t2: Receiving-room reverberation time per band, in seconds, after any
+        63 Hz octave substitution. Defaults to ``None``.
     :ivar t0: Reference reverberation time ``T0`` used for ``DnT``, in
         seconds. Defaults to ``None``.
+    :ivar source_low_frequency: What the ISO 16283-1 Clause 8 low-frequency
+        procedure did to ``l1``, or ``None`` when the source room was not under
+        25 m³ or carried no corner measurements.
+    :ivar receiver_low_frequency: The same for ``l2`` and, through Clause 10.4,
+        for ``t2``.
     """
 
     d: np.ndarray
@@ -184,6 +206,8 @@ class AirborneInsulationResult:
     l2: np.ndarray | None = None
     t2: np.ndarray | None = None
     t0: float | None = None
+    source_low_frequency: LowFrequencyResult | None = None
+    receiver_low_frequency: LowFrequencyResult | None = None
 
     def __post_init__(self) -> None:
         """Reject a measurement whose per-band columns cover different bands.
@@ -310,12 +334,15 @@ class ImpactInsulationResult:
         supplied.
     :ivar li: Energy-average impact sound pressure levels the quantities
         were formed from, in dB (after any position averaging,
-        Formula (10)). Defaults to ``None`` for backward-compatible
+        Formula (11)). Defaults to ``None`` for backward-compatible
         construction.
-    :ivar t2: Receiving-room reverberation time per band, in seconds.
-        Defaults to ``None``.
+    :ivar t2: Receiving-room reverberation time per band, in seconds, after any
+        63 Hz octave substitution. Defaults to ``None``.
     :ivar t0: Reference reverberation time ``T0`` used for ``L'nT``, in
         seconds. Defaults to ``None``.
+    :ivar low_frequency: What the ISO 16283-2 Clause 8 low-frequency procedure
+        did to ``li`` and, through Clause 10.4, to ``t2``; ``None`` when the
+        receiving room was not under 25 m³ or carried no corner measurements.
     """
 
     l_n_t: np.ndarray
@@ -323,6 +350,7 @@ class ImpactInsulationResult:
     li: np.ndarray | None = None
     t2: np.ndarray | None = None
     t0: float | None = None
+    low_frequency: LowFrequencyResult | None = None
 
     def __post_init__(self) -> None:
         """Reject a measurement whose per-band columns cover different bands.
@@ -456,6 +484,10 @@ class FacadeInsulationResult:
         (45° incidence) or ``"road_traffic"``. It selects which apparent
         index ``r_prime`` is (``R'45`` or ``R'tr,s``) and how the report
         labels it.
+    :ivar low_frequency: What the ISO 16283-3 Clause 7.3 low-frequency
+        procedure did to ``L2`` and, through Clause 8.4, to the reverberation
+        time; ``None`` when the receiving room was not under 25 m³ or carried
+        no corner measurements.
     """
 
     d_2m: np.ndarray
@@ -464,6 +496,7 @@ class FacadeInsulationResult:
     r_prime: np.ndarray | None
     frequencies: np.ndarray | None = None
     method: str = "loudspeaker"
+    low_frequency: LowFrequencyResult | None = None
 
     def __post_init__(self) -> None:
         """Reject an unknown ``method``, or columns that cover different bands.
@@ -597,7 +630,8 @@ def _render_iso16283(
     Shared by :meth:`AirborneInsulationResult.report` and
     :meth:`ImpactInsulationResult.report`: it rejects unknown engines and
     quantities, requires the 16 core one-third-octave bands (100 Hz to
-    3150 Hz, ISO 16283-1/-2 Clause 5) so the ISO 717 rating is defined,
+    3150 Hz, ISO 16283-1 Clause 5 and ISO 16283-2 Clause 5.1) so the
+    ISO 717 rating is defined,
     evaluates that rating, and calls the reportlab renderer (which raises a
     clear :class:`ImportError` when reportlab is absent).
     """
@@ -622,8 +656,8 @@ def _render_iso16283(
     if curve.shape != (len(_FREQ_THIRD_OCTAVE),):
         msg = (
             "The field report rates the 16 core one-third-octave bands "
-            f"(100 Hz to 3150 Hz, ISO 16283 Clause 5); got {curve.shape} "
-            "band values."
+            "(100 Hz to 3150 Hz, ISO 16283-1 Clause 5 and ISO 16283-2 "
+            f"Clause 5.1); got {curve.shape} band values."
         )
         raise ValueError(msg)
     if verbose:
@@ -787,6 +821,57 @@ def _validate_reverberation(t: np.ndarray, t0: float) -> None:
         raise ValueError(msg)
 
 
+def _require_frequencies(
+    frequencies: Sequence[float] | np.ndarray | None, owner: str
+) -> np.ndarray:
+    """Demand the band centres the low-frequency procedure needs to place itself.
+
+    The measurement functions are otherwise band-agnostic: they map whatever
+    band vector they are handed. The low-frequency procedure is not, because it
+    rewrites three named bands and leaves the rest alone, so it has to be told
+    which columns those are.
+
+    :param frequencies: Band centre frequencies, in Hz, or ``None``.
+    :param owner: Function name, for the message.
+    :return: The frequencies as a float array.
+    :raises ValueError: If ``frequencies`` is ``None``.
+    """
+    if frequencies is None:
+        msg = (
+            f"{owner}: the ISO 16283 low-frequency procedure rewrites the "
+            "50 Hz, 63 Hz and 80 Hz bands only, so 'frequencies' must be given "
+            "with the low-frequency arguments to say which bands those are."
+        )
+        raise ValueError(msg)
+    return np.asarray(frequencies, dtype=np.float64)
+
+
+def _check_low_frequency_volume(
+    procedure: LowFrequencyProcedure, volume: float | None, owner: str
+) -> None:
+    """Reject a receiving-room volume given twice with two different values.
+
+    ``volume`` sizes the Sabine absorption area and the procedure's own volume
+    decides the 25 m³ trigger; they are the same measured room, so a
+    disagreement is a caller mistake that would otherwise normalise one
+    quantity against a room the trigger never saw.
+
+    :param procedure: The receiving-room low-frequency procedure.
+    :param volume: The receiving-room volume passed alongside it, or ``None``.
+    :param owner: Function name, for the message.
+    :raises ValueError: If both are given and they differ.
+    """
+    if volume is None:
+        return
+    if not math.isclose(float(volume), float(procedure.volume), rel_tol=1e-12):
+        msg = (
+            f"{owner}: 'volume' is {float(volume):g} m³ and the receiving-room "
+            f"low-frequency procedure says {float(procedure.volume):g} m³; "
+            "they describe the same room and must agree."
+        )
+        raise ValueError(msg)
+
+
 @overload
 def airborne_insulation(
     l1: Sequence[float] | np.ndarray,
@@ -796,6 +881,9 @@ def airborne_insulation(
     area: float,
     volume: float,
     t0: float = ...,
+    frequencies: Sequence[float] | np.ndarray | None = ...,
+    source_low_frequency: LowFrequencyProcedure | None = ...,
+    receiver_low_frequency: LowFrequencyProcedure | None = ...,
 ) -> AirborneInsulationResult: ...
 
 
@@ -806,6 +894,9 @@ def airborne_insulation(
     t2: Sequence[float] | np.ndarray,
     *,
     t0: float = ...,
+    frequencies: Sequence[float] | np.ndarray | None = ...,
+    source_low_frequency: LowFrequencyProcedure | None = ...,
+    receiver_low_frequency: LowFrequencyProcedure | None = ...,
 ) -> AirborneInsulationResult: ...
 
 
@@ -817,6 +908,9 @@ def airborne_insulation(
     area: float | None = None,
     volume: float | None = None,
     t0: float = 0.5,
+    frequencies: Sequence[float] | np.ndarray | None = None,
+    source_low_frequency: LowFrequencyProcedure | None = None,
+    receiver_low_frequency: LowFrequencyProcedure | None = None,
 ) -> AirborneInsulationResult:
     r"""Field airborne sound insulation per ISO 16283-1:2014.
 
@@ -834,6 +928,19 @@ def airborne_insulation(
     positions are energy-averaged with Formula (9). The band levels are
     assumed already corrected for background noise (Clause 9.2).
 
+    **Rooms under 25 m³.** Clause 8.1 makes the low-frequency procedure
+    mandatory for the 50 Hz, 63 Hz and 80 Hz bands "in the source and/or
+    receiving room when *its* volume is smaller than 25 m³ (calculated to the
+    nearest cubic metre)", so the two rooms are tested independently and either
+    may carry a :class:`~.low_frequency.LowFrequencyProcedure`. Whichever room
+    carries one has its level at those three bands replaced by
+    :math:`L_\mathrm{LF}` (Formula (13)) before ``D`` is formed. Clause 10.4 is
+    a receiving-room clause alone, so the 63 Hz octave reverberation time is
+    taken from ``receiver_low_frequency`` and required there: a small source
+    room beside a large receiving room changes ``L1`` and leaves ``t2`` as
+    measured. Note 4 to entry of Clause 3.14 records that ``R'`` determined
+    this way no longer maps exactly onto the sound-power ratio of Formula (3).
+
     :param l1: Source-room sound pressure levels, in dB.
     :param l2: Receiving-room sound pressure levels, in dB.
     :param t2: Receiving-room reverberation time per band, in seconds.
@@ -843,12 +950,25 @@ def airborne_insulation(
         together with ``area`` for ``R'``).
     :param t0: Reference reverberation time ``T0``, in seconds (default
         0,5 s for dwellings, Clause 3.13).
+    :param frequencies: Band centre frequencies, in Hz; required with either
+        low-frequency argument, ignored otherwise (the result carries no band
+        axis of its own).
+    :param source_low_frequency: Source-room corner measurements and volume
+        (Clause 8). Must not carry a 63 Hz octave reverberation time.
+    :param receiver_low_frequency: Receiving-room corner measurements and
+        volume (Clause 8), which must also carry the 63 Hz octave reverberation
+        time of Clause 10.4.
     :return: :class:`AirborneInsulationResult` with ``d``, ``dnt`` and
         ``r_prime`` (the latter ``None`` unless ``area`` and ``volume``
-        are both given).
+        are both given), plus whichever low-frequency records were produced.
     :raises ValueError: If the band counts of ``l1``, ``l2`` and ``t2``
         differ, if only one of ``area``/``volume`` is supplied, if
-        ``t2``/``t0`` are not positive, or if inputs are non-finite.
+        ``t2``/``t0`` are not positive, if inputs are non-finite, if a
+        low-frequency argument is given without ``frequencies``, if a room
+        offering corner measurements does not round below 25 m³, if ``volume``
+        disagrees with the receiving-room procedure, or if the 63 Hz octave
+        reverberation time is missing from the receiving room or present on the
+        source room.
     """
     l1_bands = _as_band_levels(l1, "l1")
     l2_bands = _as_band_levels(l2, "l2")
@@ -864,6 +984,34 @@ def airborne_insulation(
         "band",
     )
     _validate_reverberation(t, t0)
+
+    source_lf: LowFrequencyResult | None = None
+    receiver_lf: LowFrequencyResult | None = None
+    if source_low_frequency is not None or receiver_low_frequency is not None:
+        freqs = _require_frequencies(frequencies, "airborne_insulation")
+        if source_low_frequency is not None:
+            source_lf = apply_low_frequency_procedure(
+                l1_bands, freqs, source_low_frequency, room="source"
+            )
+            l1_bands = source_lf.level
+        if receiver_low_frequency is not None:
+            _check_low_frequency_volume(
+                receiver_low_frequency, volume, "airborne_insulation"
+            )
+            receiver_lf = apply_low_frequency_procedure(
+                l2_bands,
+                freqs,
+                receiver_low_frequency,
+                reverberation_time=t,
+                room="receiving",
+            )
+            l2_bands = receiver_lf.level
+            # `reverberation_time=` was passed, so the substituted vector is
+            # never None on this branch; the test narrows the type rather than
+            # guarding against a case the call above has already excluded.
+            substituted = receiver_lf.reverberation_time
+            if substituted is not None:
+                t = substituted
 
     d = l1_bands - l2_bands
     dnt = d + 10.0 * np.log10(t / t0)
@@ -887,6 +1035,8 @@ def airborne_insulation(
         l2=l2_bands,
         t2=t,
         t0=t0,
+        source_low_frequency=source_lf,
+        receiver_low_frequency=receiver_lf,
     )
 
 
@@ -899,22 +1049,33 @@ def impact_insulation(
     *,
     volume: float | None = None,
     t0: float = 0.5,
+    frequencies: Sequence[float] | np.ndarray | None = None,
+    low_frequency: LowFrequencyProcedure | None = None,
 ) -> ImpactInsulationResult:
-    r"""Field impact sound insulation per ISO 16283-2 (tapping machine).
+    r"""Field impact sound insulation per ISO 16283-2:2020 (tapping machine).
 
     Computes, per frequency band, the standardized impact sound pressure
     level :math:`L'_\mathrm{nT} = L_\mathrm{i} - 10 \log_{10}(T/T_0)` (Formula (1)) and, when the
     receiving-room volume is given, the normalized impact sound pressure
-    level :math:`L'_\mathrm{n} = L_\mathrm{i} + 10 \log_{10}(A/A_0)` with the Sabine equivalent
-    absorption
-    area :math:`A = 0.16\,V/T` (Formula (6)) and the reference absorption
+    level :math:`L'_\mathrm{n} = L_\mathrm{i} + 10 \log_{10}(A/A_0)` (Formula (3)) with the
+    Sabine equivalent absorption
+    area :math:`A = 0.16\,V/T` (Formula (2)) and the reference absorption
     area
-    :math:`A_0 = 10` m² (Formula (2)).
+    :math:`A_0 = 10` m².
 
     ``li`` may be one value per band (already energy-averaged) or a
     two-dimensional ``(positions, bands)`` array, in which case the
-    positions are energy-averaged with Formula (10). The band levels are
+    positions are energy-averaged with Formula (11). The band levels are
     assumed already corrected for background noise (Clause 9).
+
+    **Rooms under 25 m³.** Clause 8.1 makes the low-frequency procedure
+    mandatory for the 50 Hz, 63 Hz and 80 Hz bands in the receiving room once
+    its volume, to the nearest cubic metre, is under 25 m³, and Clause 10.4
+    puts one 63 Hz octave reverberation time in place of the three
+    one-third-octave ones. Pass both through ``low_frequency``. Part 2 confines
+    the corner procedure to the tapping machine (the heading of its Clause 8),
+    which is the only impact source this function models; the rubber ball is
+    :mod:`phonometry.building.measurement.heavy_impact`.
 
     :param li: Energy-average impact sound pressure levels, in dB.
     :param t2: Receiving-room reverberation time per band, in seconds.
@@ -922,11 +1083,19 @@ def impact_insulation(
         for ``L'n``).
     :param t0: Reference reverberation time ``T0``, in seconds (default
         0,5 s for dwellings, Clause 3.13).
+    :param frequencies: Band centre frequencies, in Hz; required with
+        ``low_frequency``, ignored otherwise (the result carries no band axis
+        of its own).
+    :param low_frequency: Receiving-room corner measurements, volume and 63 Hz
+        octave reverberation time (Clause 8 and Clause 10.4).
     :return: :class:`ImpactInsulationResult` with ``l_n_t`` and ``l_n``
-        (the latter ``None`` unless ``volume`` is given).
+        (the latter ``None`` unless ``volume`` is given), plus the
+        low-frequency record when one was produced.
     :raises ValueError: If the band counts of ``li`` and ``t2`` differ, if
-        ``t2``/``t0``/``volume`` are not positive, or if inputs are
-        non-finite.
+        ``t2``/``t0``/``volume`` are not positive, if inputs are
+        non-finite, if ``low_frequency`` is given without ``frequencies``, if
+        the room does not round below 25 m³, if ``volume`` disagrees with the
+        procedure, or if the 63 Hz octave reverberation time is missing.
     """
     li_bands = _as_band_levels(li, "li")
     t = np.asarray(t2, dtype=np.float64)
@@ -939,6 +1108,18 @@ def impact_insulation(
         "impact_insulation", {"li": li_bands.size, "t2": t.size}, "band"
     )
     _validate_reverberation(t, t0)
+
+    low_frequency_result: LowFrequencyResult | None = None
+    if low_frequency is not None:
+        freqs = _require_frequencies(frequencies, "impact_insulation")
+        _check_low_frequency_volume(low_frequency, volume, "impact_insulation")
+        low_frequency_result = apply_low_frequency_procedure(
+            li_bands, freqs, low_frequency, reverberation_time=t, room="receiving"
+        )
+        li_bands = low_frequency_result.level
+        substituted = low_frequency_result.reverberation_time
+        if substituted is not None:
+            t = substituted
 
     l_n_t = li_bands - 10.0 * np.log10(t / t0)
 
@@ -956,6 +1137,7 @@ def impact_insulation(
         li=li_bands,
         t2=t,
         t0=t0,
+        low_frequency=low_frequency_result,
     )
 
 
@@ -1001,6 +1183,7 @@ def facade_insulation(
     method: str = "loudspeaker",
     t0: float = 0.5,
     frequencies: Sequence[float] | np.ndarray | None = None,
+    low_frequency: LowFrequencyProcedure | None = None,
 ) -> FacadeInsulationResult:
     r"""Field façade sound insulation per ISO 16283-3:2016.
 
@@ -1048,16 +1231,23 @@ def facade_insulation(
     :param t0: Reference reverberation time ``T0``, in seconds (default
         0,5 s for dwellings, Clause 3.15).
     :param frequencies: Optional band centre frequencies, in Hz, carried
-        on the result for plotting.
+        on the result for plotting; required with ``low_frequency``.
+    :param low_frequency: Receiving-room corner measurements, volume and 63 Hz
+        octave reverberation time (Clause 7.3 and Clause 8.4). Loudspeaker
+        methods only.
     :return: :class:`FacadeInsulationResult` with ``d_2m``, ``d_2m_nt``,
         ``d_2m_n`` (``None`` unless ``volume`` is given) and ``r_prime``
         (``None`` unless ``surface_level``, ``area`` and ``volume`` are all
-        given).
+        given), plus the low-frequency record when one was produced.
     :raises ValueError: If band counts differ, if ``method`` is unknown, if
         ``t2``/``t0``/``area``/``volume`` are not positive, if ``area`` is
         given without ``surface_level``, if ``surface_level`` and ``area`` are
         given without ``volume``, if ``frequencies`` is given with a shape
-        that differs from the band axis, or if inputs are non-finite.
+        that differs from the band axis, if inputs are non-finite, if
+        ``low_frequency`` is given without ``frequencies`` or with
+        ``method="road_traffic"``, if the room does not round below 25 m³, if
+        ``volume`` disagrees with the procedure, or if the 63 Hz octave
+        reverberation time is missing.
         Supplying ``surface_level`` alone is not an error: ``r_prime`` simply
         stays ``None``.
     """
@@ -1079,6 +1269,27 @@ def facade_insulation(
         "band",
     )
     _validate_reverberation(t, t0)
+
+    low_frequency_result: LowFrequencyResult | None = None
+    if low_frequency is not None:
+        if method != _FACADE_LOUDSPEAKER:
+            msg = (
+                "ISO 16283-3 Clause 6 confines the low-frequency procedure to "
+                "the element and global loudspeaker methods, its NOTE 1 "
+                "recording that there is no experience of running it with "
+                "traffic as the source; 'low_frequency' cannot be combined "
+                f"with method={method!r}."
+            )
+            raise ValueError(msg)
+        freqs_lf = _require_frequencies(frequencies, "facade_insulation")
+        _check_low_frequency_volume(low_frequency, volume, "facade_insulation")
+        low_frequency_result = apply_low_frequency_procedure(
+            l2_bands, freqs_lf, low_frequency, reverberation_time=t, room="receiving"
+        )
+        l2_bands = low_frequency_result.level
+        substituted = low_frequency_result.reverberation_time
+        if substituted is not None:
+            t = substituted
 
     d_2m = l1_bands - l2_bands
     d_2m_nt = d_2m + 10.0 * np.log10(t / t0)
@@ -1123,4 +1334,5 @@ def facade_insulation(
         r_prime=r_prime,
         frequencies=freqs,
         method=method,
+        low_frequency=low_frequency_result,
     )

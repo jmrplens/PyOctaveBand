@@ -101,9 +101,9 @@ and energy-average them for you; the heavy-impact standardization, the
 flanking indices, the ISO 717 ratings and the background-noise helpers take
 their per-band input already formed. Either way, nothing verifies how the
 measurement was made: not the number and placement of the source and
-microphone positions behind those spectra, not the low-frequency procedures
-of ISO 16283-1/-2, and not the test-facility and mounting requirements of
-ISO 10140-1. Those are the operator's responsibility and the report's, and
+microphone positions behind those spectra, not the corner positions the
+ISO 16283 low-frequency procedure is fed from, and not the test-facility and
+mounting requirements of ISO 10140-1. Those are the operator's responsibility and the report's, and
 they are what makes the numbers here mean something. Background noise is the
 one correction genuinely left to the caller: field levels must arrive already
 corrected, their 6 dB signal-to-background floor checked by the operator,
