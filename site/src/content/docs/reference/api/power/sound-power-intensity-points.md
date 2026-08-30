@@ -586,9 +586,10 @@ where the segments differ in area it can be a band clause 9.2 keeps, with a
 finite level and `not_applicable_band` false.
 
 Supplying `pressure_levels` evaluates the Annex A indicators `F2` and
-`F3`; `F4` is evaluated from the intensities alone and so is always
-present. Supplying `pressure_residual_index` gives the dynamic capability
-$L_\mathrm{d} = \delta_{pI0} - K$ and criterion 1; supplying
+`F3`; `F4` is evaluated from the intensities alone, and so is present
+in any determination of at least two positions, the fewest equation (A.8)
+has a spread over. Supplying `pressure_residual_index` gives the dynamic
+capability $L_\mathrm{d} = \delta_{pI0} - K$ and criterion 1; supplying
 `frequencies` gives criterion 2 through the Table B.2 factor `C` and
 the A-weighted total. `temporal_intensity` carries the `M` short-time
 samples of the initial test into `F1`.

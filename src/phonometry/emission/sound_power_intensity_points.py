@@ -1102,26 +1102,37 @@ def _band_actions(
     criterion_2: bool | None,
     low_inward_flow: bool,
 ) -> tuple[ActionCode, ...]:
-    """One band's Table B.3 actions, walking Figure B.1 top to bottom."""
+    """One band's Table B.3 actions, walking Figure B.1 top to bottom.
+
+    The gates are exclusive, because each action box of the figure returns to
+    the next measurement rather than to the gate below it: the band leaves with
+    the actions of the first gate it failed, and with none at all where it
+    passed every gate that could be put to it.
+    """
+    actions: list[ActionCode] = []
     # ``not (f1 <= limit)`` rather than ``f1 > limit`` so a NaN F1, which every
     # comparison answers False, is treated as a field that failed to qualify
     # rather than as one that passed.
     if f1 is not None and not f1 <= TEMPORAL_VARIABILITY_LIMIT:
-        return (ActionCode.REDUCE_TEMPORAL_VARIABILITY,)
-    if not criterion_1 or not inward_flow_ok:
-        return (
-            ActionCode.ADJUST_MEASUREMENT_DISTANCE,
-            ActionCode.SHIELD_OR_REDUCE_REFLECTIONS,
+        actions.append(ActionCode.REDUCE_TEMPORAL_VARIABILITY)
+    elif not criterion_1 or not inward_flow_ok:
+        actions.extend(
+            (
+                ActionCode.ADJUST_MEASUREMENT_DISTANCE,
+                ActionCode.SHIELD_OR_REDUCE_REFLECTIONS,
+            )
         )
-    if criterion_2 is None or criterion_2:
-        return ()
-    # Table B.3's last two rows split on the same 1 dB: above it the inward
-    # flow is what stops criterion 2 being met by density alone (action c),
-    # below it the power may be concentrated, and action d is what remains once
-    # the optional procedure of 8.3.2 is not taken.
-    if low_inward_flow:
-        return (ActionCode.INCREASE_DISTANCE_OR_POSITIONS,)
-    return (ActionCode.INCREASE_POSITION_DENSITY,)
+    elif criterion_2 is not None and not criterion_2:
+        # Table B.3's last two rows split on the same 1 dB: above it the inward
+        # flow is what stops criterion 2 being met by density alone (action c),
+        # below it the power may be concentrated, and action d is what remains
+        # once the optional procedure of 8.3.2 is not taken.
+        actions.append(
+            ActionCode.INCREASE_DISTANCE_OR_POSITIONS
+            if low_inward_flow
+            else ActionCode.INCREASE_POSITION_DENSITY
+        )
+    return tuple(actions)
 
 
 def _validate_positions(
@@ -1152,10 +1163,46 @@ def _validate_positions(
         raise ValueError(msg)
 
 
-def _as_position_band_grid(
-    values: ArrayLike, name: str, n_positions: int, n_bands: int
-) -> np.ndarray:
-    """Put a per-position (per-band) input on the ``(positions, bands)`` grid."""
+def _position_grid(
+    normal_intensity: ArrayLike, areas: ArrayLike
+) -> tuple[np.ndarray, np.ndarray]:
+    """The measured intensities as ``(positions, bands)``, with their areas.
+
+    The rank of the input as supplied is what tells one band at ``N`` positions
+    from ``N`` bands at one position, so it is read before the array is widened:
+    a 1-D input is unambiguously the first, and reading the rank afterwards
+    would take a genuine one-position row for a column of positions whenever
+    the two counts happen to agree. A pair that cannot be a survey at all is
+    refused here, before any of it is measured against the standard.
+    """
+    raw = np.asarray(normal_intensity, dtype=np.float64)
+    seg = np.atleast_1d(np.asarray(areas, dtype=np.float64))
+    if raw.ndim not in (1, 2):
+        msg = (
+            "'normal_intensity' must be 1D (positions,) for a single band or "
+            "2D (positions, bands)."
+        )
+        raise ValueError(msg)
+    if seg.ndim != 1:
+        msg = "'areas' must be a 1D array of segment areas."
+        raise ValueError(msg)
+    intensity = raw.reshape(-1, 1) if raw.ndim == 1 else raw
+    _validate_positions(intensity, seg, intensity_name="normal_intensity")
+    return intensity, seg
+
+
+def _checked_position_band_grid(
+    values: ArrayLike | None, name: str, n_positions: int, n_bands: int
+) -> np.ndarray | None:
+    """A per-position (per-band) input on the ``(positions, bands)`` grid.
+
+    ``None`` for an input that was not supplied, which is how every optional
+    array of this determination is carried through to the end. Anything
+    supplied has to span the same grid as the intensities and be finite
+    throughout, since it is a measured quantity of the same survey.
+    """
+    if values is None:
+        return None
     raw = np.asarray(values, dtype=np.float64)
     grid = raw.reshape(-1, 1) if raw.ndim == 1 else np.atleast_2d(raw)
     if grid.shape != (n_positions, n_bands):
@@ -1164,7 +1211,52 @@ def _as_position_band_grid(
             f"'normal_intensity'; got {grid.shape}."
         )
         raise ValueError(msg)
+    if not np.all(np.isfinite(grid)):
+        msg = f"'{name}' must contain only finite values."
+        raise ValueError(msg)
     return grid
+
+
+def _checked_frequencies(
+    frequencies: ArrayLike | None, n_bands: int, band_type: BandType
+) -> np.ndarray | None:
+    """The supplied band centres, one per band and each one a tabulated band.
+
+    Read here rather than at the first lookup so that a band count that does
+    not match the intensities, or a frequency that labels no row of Tables B.2
+    and 2, is refused before any indicator has been computed against it.
+    """
+    if frequencies is None:
+        return None
+    freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
+    if freqs.shape != (n_bands,):
+        msg = (
+            f"'frequencies' must carry one value per band ({n_bands}); got "
+            f"shape {freqs.shape}."
+        )
+        raise ValueError(msg)
+    for value in freqs:
+        _nominal_band(float(value), band_type)
+    return freqs
+
+
+def _checked_residual_index(
+    pressure_residual_index: float | ArrayLike | None, n_bands: int
+) -> np.ndarray | None:
+    r"""The instrument's :math:`\delta_{pI0}` as one finite value per band.
+
+    A scalar is the usual form and stands for the whole spectrum, so it is
+    broadcast rather than required per band.
+    """
+    if pressure_residual_index is None:
+        return None
+    residual = np.broadcast_to(
+        np.asarray(pressure_residual_index, dtype=np.float64), (n_bands,)
+    ).astype(np.float64)
+    if not np.all(np.isfinite(residual)):
+        msg = "'pressure_residual_index' must be finite."
+        raise ValueError(msg)
+    return residual
 
 
 def _sampling_warnings(n_positions: int, area: float) -> None:
@@ -1227,8 +1319,13 @@ def _band_indicators(
     intensity: np.ndarray,
     pressure_levels: np.ndarray | None,
     conditions_met: np.ndarray,
-) -> tuple[np.ndarray | None, np.ndarray | None, np.ndarray]:
+) -> tuple[np.ndarray | None, np.ndarray | None, np.ndarray | None]:
     r"""Annex A ``F2``, ``F3`` and ``F4`` per band, ``NaN`` where undefined.
+
+    All three are ``None``, and not merely ``NaN``, below the two positions the
+    Bessel-corrected spread of equations (A.1) and (A.8) is defined from: a
+    single position measures no spread at all, so the determination carries no
+    Annex A indicators rather than a spectrum of blanks.
 
     A.2.3 makes a non-positive algebraic mean normal intensity a failure of the
     test conditions in that band, and F3 and F4 both divide by that mean, so
@@ -1251,7 +1348,9 @@ def _band_indicators(
     :func:`~phonometry.emission.field_indicators`, so this module and the
     library's own Annex A implementation cannot drift apart.
     """
-    n_bands = intensity.shape[1]
+    n_positions, n_bands = intensity.shape
+    if n_positions < _MIN_VARIATION_OBSERVATIONS:
+        return None, None, None
     f2 = np.full(n_bands, np.nan)
     f3 = np.full(n_bands, np.nan)
     f4 = np.full(n_bands, np.nan)
@@ -1411,6 +1510,32 @@ def _expanded_uncertainty(
             band_type=band_type,
         )
     return values
+
+
+def _a_weighting_omission(
+    criterion_1: np.ndarray | None,
+    criterion_2: np.ndarray | None,
+    applicable: np.ndarray,
+) -> np.ndarray | None:
+    """The bands clause 10.5 b) keeps out of the A-weighted sum.
+
+    The clause omits "the bands failing criteria 1 and/or 2" and asks for the
+    omission to be stated, which is what this is. A criterion that was never
+    put is not one that failed, so criterion 2 narrows the set only where it
+    was evaluated, and a determination carrying no criterion 1 at all has no
+    omission to state rather than an empty one: ``None``, and its A-weighted
+    sum goes unscreened.
+
+    Bands outside the method are not marked here. Clause 9.2 has already taken
+    them out of the sum, and marking them again would report one exclusion as
+    two.
+    """
+    if criterion_1 is None:
+        return None
+    fails = ~criterion_1
+    if criterion_2 is not None:
+        fails = fails | ~criterion_2
+    return np.asarray(fails & applicable, dtype=bool)
 
 
 def _a_weighted_factor(
@@ -1591,9 +1716,10 @@ def sound_power_intensity_points(
     finite level and ``not_applicable_band`` false.
 
     Supplying ``pressure_levels`` evaluates the Annex A indicators ``F2`` and
-    ``F3``; ``F4`` is evaluated from the intensities alone and so is always
-    present. Supplying ``pressure_residual_index`` gives the dynamic capability
-    :math:`L_\mathrm{d} = \delta_{pI0} - K` and criterion 1; supplying
+    ``F3``; ``F4`` is evaluated from the intensities alone, and so is present
+    in any determination of at least two positions, the fewest equation (A.8)
+    has a spread over. Supplying ``pressure_residual_index`` gives the dynamic
+    capability :math:`L_\mathrm{d} = \delta_{pI0} - K` and criterion 1; supplying
     ``frequencies`` gives criterion 2 through the Table B.2 factor ``C`` and
     the A-weighted total. ``temporal_intensity`` carries the ``M`` short-time
     samples of the initial test into ``F1``.
@@ -1630,53 +1756,13 @@ def sound_power_intensity_points(
     grade = _check_grade(grade)
     band_type = _check_band_type(band_type)
 
-    raw = np.asarray(normal_intensity, dtype=np.float64)
-    seg = np.atleast_1d(np.asarray(areas, dtype=np.float64))
-    if raw.ndim not in (1, 2):
-        msg = (
-            "'normal_intensity' must be 1D (positions,) for a single band or "
-            "2D (positions, bands)."
-        )
-        raise ValueError(msg)
-    if seg.ndim != 1:
-        msg = "'areas' must be a 1D array of segment areas."
-        raise ValueError(msg)
-    # A 1-D input is unambiguously one band at N positions; keying off the
-    # original rank avoids reading a genuine one-position, N-band row as N
-    # positions when the two counts happen to agree.
-    intensity = raw.reshape(-1, 1) if raw.ndim == 1 else raw
-    _validate_positions(intensity, seg, intensity_name="normal_intensity")
+    intensity, seg = _position_grid(normal_intensity, areas)
     n_positions, n_bands = intensity.shape
-
-    freqs: np.ndarray | None = None
-    if frequencies is not None:
-        freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
-        if freqs.shape != (n_bands,):
-            msg = (
-                f"'frequencies' must carry one value per band ({n_bands}); got "
-                f"shape {freqs.shape}."
-            )
-            raise ValueError(msg)
-        for value in freqs:
-            _nominal_band(float(value), band_type)
-
-    levels: np.ndarray | None = None
-    if pressure_levels is not None:
-        levels = _as_position_band_grid(
-            pressure_levels, "pressure_levels", n_positions, n_bands
-        )
-        if not np.all(np.isfinite(levels)):
-            msg = "'pressure_levels' must contain only finite values."
-            raise ValueError(msg)
-
-    residual: np.ndarray | None = None
-    if pressure_residual_index is not None:
-        residual = np.broadcast_to(
-            np.asarray(pressure_residual_index, dtype=np.float64), (n_bands,)
-        ).astype(np.float64)
-        if not np.all(np.isfinite(residual)):
-            msg = "'pressure_residual_index' must be finite."
-            raise ValueError(msg)
+    freqs = _checked_frequencies(frequencies, n_bands, band_type)
+    levels = _checked_position_band_grid(
+        pressure_levels, "pressure_levels", n_positions, n_bands
+    )
+    residual = _checked_residual_index(pressure_residual_index, n_bands)
 
     partial_power = intensity * seg[:, None]  # Eq. (11)
     sound_power = np.sum(partial_power, axis=0)  # the sum of Eq. (12)
@@ -1713,12 +1799,8 @@ def sound_power_intensity_points(
         )
     _sampling_warnings(n_positions, surface_area)
 
-    indicators_available = n_positions >= _MIN_VARIATION_OBSERVATIONS
     f1 = _temporal_indicator(temporal_intensity, n_bands)
-    if indicators_available:
-        f2, f3, f4 = _band_indicators(intensity, levels, conditions_met)
-    else:
-        f2, f3, f4 = None, None, None
+    f2, f3, f4 = _band_indicators(intensity, levels, conditions_met)
 
     ld = None if residual is None else _dynamic_capability(residual, grade)
     criterion_1 = None if ld is None or f2 is None else np.asarray(ld > f2, dtype=bool)
@@ -1741,13 +1823,7 @@ def sound_power_intensity_points(
     )
     interval = None if f4 is None else _confidence_interval(f4, n_positions)
 
-    omitted: np.ndarray | None = None
-    if criterion_1 is not None:
-        fails = ~criterion_1
-        if criterion_2 is not None:
-            fails = fails | ~criterion_2
-        omitted = np.asarray(fails & applicable, dtype=bool)
-
+    omitted = _a_weighting_omission(criterion_1, criterion_2, applicable)
     if omitted is None and freqs is not None and n_bands > 1:
         warnings.warn(
             "The A-weighted total sums every applicable band without the ISO "
