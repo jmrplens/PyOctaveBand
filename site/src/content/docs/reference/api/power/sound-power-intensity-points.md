@@ -585,10 +585,12 @@ determination warns, because that band need not be flagged anywhere else:
 where the segments differ in area it can be a band clause 9.2 keeps, with a
 finite level and `not_applicable_band` false.
 
-Supplying `pressure_levels` evaluates the Annex A indicators `F2` and
-`F3`; `F4` is evaluated from the intensities alone, and so is present
-in any determination of at least two positions, the fewest equation (A.8)
-has a spread over. Supplying `pressure_residual_index` gives the dynamic
+Supplying `pressure_levels` evaluates the spatial Annex A indicators
+`F2` and `F3`; `F4` is evaluated from the intensities alone. All
+three are spatial, so all three need at least two positions, which is the
+fewest equation (A.8) has a spread over, and all three are absent below
+that however much else was supplied. `F1` is the temporal one and does
+not take part in that: see `temporal_intensity` below. Supplying `pressure_residual_index` gives the dynamic
 capability $L_\mathrm{d} = \delta_{pI0} - K$ and criterion 1; supplying
 `frequencies` gives criterion 2 through the Table B.2 factor `C` and
 the A-weighted total. `temporal_intensity` carries the `M` short-time

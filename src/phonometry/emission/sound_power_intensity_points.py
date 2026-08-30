@@ -1323,9 +1323,17 @@ def _band_indicators(
     r"""Annex A ``F2``, ``F3`` and ``F4`` per band, ``NaN`` where undefined.
 
     All three are ``None``, and not merely ``NaN``, below the two positions the
-    Bessel-corrected spread of equations (A.1) and (A.8) is defined from: a
-    single position measures no spread at all, so the determination carries no
-    Annex A indicators rather than a spectrum of blanks.
+    Bessel-corrected spread of equation (A.8) is defined from: one position
+    measures no spread ACROSS THE SURFACE, so there is no F2, F3 or F4 to
+    report rather than a spectrum of blanks.
+
+    Not "no Annex A indicators": F1 is one, and it survives. Equation (A.1) is
+    the spread of the M short-time samples at ONE position over time, so a
+    one-position determination has a perfectly good F1 beside three absent
+    spatial indicators. That confusion has now been written into this module
+    three times and corrected three times, which is why it is spelled out here
+    rather than left to the reader: F1 is temporal, F2 to F4 are spatial, and
+    every statement about "the indicators" has to say which it means.
 
     A.2.3 makes a non-positive algebraic mean normal intensity a failure of the
     test conditions in that band, and F3 and F4 both divide by that mean, so
@@ -1715,10 +1723,12 @@ def sound_power_intensity_points(
     where the segments differ in area it can be a band clause 9.2 keeps, with a
     finite level and ``not_applicable_band`` false.
 
-    Supplying ``pressure_levels`` evaluates the Annex A indicators ``F2`` and
-    ``F3``; ``F4`` is evaluated from the intensities alone, and so is present
-    in any determination of at least two positions, the fewest equation (A.8)
-    has a spread over. Supplying ``pressure_residual_index`` gives the dynamic
+    Supplying ``pressure_levels`` evaluates the spatial Annex A indicators
+    ``F2`` and ``F3``; ``F4`` is evaluated from the intensities alone. All
+    three are spatial, so all three need at least two positions, which is the
+    fewest equation (A.8) has a spread over, and all three are absent below
+    that however much else was supplied. ``F1`` is the temporal one and does
+    not take part in that: see ``temporal_intensity`` below. Supplying ``pressure_residual_index`` gives the dynamic
     capability :math:`L_\mathrm{d} = \delta_{pI0} - K` and criterion 1; supplying
     ``frequencies`` gives criterion 2 through the Table B.2 factor ``C`` and
     the A-weighted total. ``temporal_intensity`` carries the ``M`` short-time
