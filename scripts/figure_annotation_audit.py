@@ -1203,6 +1203,38 @@ def _register() -> None:
     _REGISTERED = True
 
 
+def _forget_after_fork() -> None:
+    """Drop the parent's recording so a forked child records only its own.
+
+    ``os.fork`` copies ``_FOUND`` and ``_REGISTERED`` into the child but not
+    the handler that reads them: ``multiprocessing.popen_fork`` empties the
+    whole ``atexit`` registry in the child before the target runs, and puts
+    its own ``_exit_function`` in place of it. A child that inherited
+    ``_REGISTERED = True`` would therefore never re-register, and everything
+    it went on to measure would be dropped at exit -- a partial recording,
+    which the checker's coverage rule turns into "not a full run" rather than
+    into a pass, but only after a whole generation run has been paid for.
+
+    Clearing both leaves the child where a spawned worker starts, and its
+    first :func:`audit` registers a handler of its own. That registration
+    happens after the child has cleared the registry, which is why it
+    survives where the inherited one does not.
+
+    No fork in the corpus reaches this today: the generation run renders on
+    spawned workers, and the one fork -- the four language/theme variants of
+    an animation clip -- draws no figure, so nothing there calls
+    :func:`audit`. It is registered anyway because the cost is one call at
+    import and the alternative is a silent under-measurement.
+    """
+    global _REGISTERED
+    _FOUND.clear()
+    _REGISTERED = False
+
+
+if hasattr(os, "register_at_fork"):  # POSIX only; Windows has no fork
+    os.register_at_fork(after_in_child=_forget_after_fork)
+
+
 def _dump() -> None:
     """Write this process's fragment. Registered on the first :func:`audit`."""
     directory = audit_dir()

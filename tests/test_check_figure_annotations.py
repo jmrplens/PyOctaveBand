@@ -31,6 +31,8 @@ from __future__ import annotations
 
 import io
 import json
+import multiprocessing
+import os
 import pathlib
 import sys
 from typing import TYPE_CHECKING, Any
@@ -1278,3 +1280,82 @@ def test_the_command_fails_on_an_exemption_that_stopped_being_true(
 def test_the_committed_exemption_file_parses() -> None:
     """The file CI reads is read here too, so a typo in it fails a test."""
     assert isinstance(check.read_exemptions(check.EXEMPTIONS), dict)
+
+
+# --------------------------------------------------------------------------
+# One process, one fragment -- including a process that arrived by fork.
+
+
+def _record_in_child(key: str) -> None:
+    """A forked child's whole job: measure one figure and exit normally."""
+    audit.audit(plt.figure(), key)
+
+
+@pytest.mark.skipif(
+    "fork" not in multiprocessing.get_all_start_methods(),
+    reason="the inherited state this pins exists only where os.fork does",
+)
+def test_a_child_forked_after_the_parent_recorded_still_writes_its_own_fragment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A fork child records for itself, or the gate measures less than the corpus.
+
+    ``os.fork`` copies the tally and the "handler is registered" flag into the
+    child, but ``multiprocessing`` empties the child's ``atexit`` registry
+    before the target runs. A child that trusted the inherited flag would
+    therefore never register a handler of its own, and everything it measured
+    would go unwritten -- a recording short of the corpus, which is a defect
+    the gate never sees.
+
+    The fragment holds the child's drawing and not the parent's: each process
+    writes what it measured, so :func:`audit.load` merging the two cannot
+    credit one process with the other's work.
+    """
+    directory = pathlib.Path(os.environ[audit.AUDIT_ENV])
+    monkeypatch.setattr(audit, "_REGISTERED", False)
+    audit.audit(plt.figure(), "drawn_in_the_parent")
+    assert audit._REGISTERED, "the parent has to have registered for this to bite"
+
+    child = multiprocessing.get_context("fork").Process(
+        target=_record_in_child, args=("drawn_in_the_child",)
+    )
+    child.start()
+    child.join()
+
+    assert child.exitcode == 0
+    fragment = directory / f"{child.pid}.json"
+    assert fragment.exists(), "the child measured a drawing and wrote nothing down"
+    assert json.loads(fragment.read_text(encoding="utf-8")) == {
+        "drawn_in_the_child": []
+    }
+
+
+def test_a_recording_one_fragment_short_is_refused_rather_than_passed(
+    capsys: pytest.CaptureFixture[str], tmp_path: pathlib.Path
+) -> None:
+    """The failure mode a lost fragment would produce, and what it costs.
+
+    A process whose fragment never lands takes its drawings out of the
+    recording, and the coverage rule is what stands between that and a green
+    gate: the same directory passes whole and is refused with one fragment
+    removed. So the worst a lost fragment can do is stop the run, not let a
+    defect through.
+    """
+    directory = tmp_path / "rec"
+    directory.mkdir()
+    drawings = sorted(check.committed_figures())
+    half = len(drawings) // 2
+    for name, keys in (("1.json", drawings[:half]), ("2.json", drawings[half:])):
+        (directory / name).write_text(
+            json.dumps(dict.fromkeys(keys, [])), encoding="utf-8"
+        )
+
+    assert check.main(["--audit", str(directory)]) == 0
+    assert "No unreadable annotation" in capsys.readouterr().out
+
+    (directory / "2.json").unlink()
+
+    assert check.main(["--audit", str(directory)]) == 1
+    printed = capsys.readouterr().out
+    assert "is not a full run" in printed
+    assert "make graphs" in printed

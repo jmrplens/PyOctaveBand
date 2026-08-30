@@ -100,6 +100,32 @@ def _register() -> None:
     _REGISTERED = True
 
 
+def _forget_after_fork() -> None:
+    """Drop the parent's recording so a forked child records only its own.
+
+    The module docstring says each forked animation variant writes its own
+    fragment, and without this that holds only while the parent has not
+    recorded anything before it forks. ``os.fork`` copies :data:`_PASSES` and
+    ``_REGISTERED`` into the child but not the handler that reads them:
+    ``multiprocessing.popen_fork`` empties the ``atexit`` registry in the
+    child before the target runs, so a child that inherited
+    ``_REGISTERED = True`` would never re-register and would drop everything
+    it recorded. Clearing both puts the child where a spawned worker starts,
+    and its first :func:`visit` registers a handler of its own -- after the
+    child cleared the registry, which is why that one survives.
+    """
+    global _REGISTERED, _CURRENT, _PASS
+    for pass_ in _PASSES.values():
+        pass_.clear()
+    _CURRENT = ""
+    _PASS = "english"
+    _REGISTERED = False
+
+
+if hasattr(os, "register_at_fork"):  # POSIX only; Windows has no fork
+    os.register_at_fork(after_in_child=_forget_after_fork)
+
+
 def _dump() -> None:
     """Write this process's fragment. Registered on the first :func:`visit`."""
     directory = audit_dir()
