@@ -95,7 +95,9 @@ order; the first match names the standard.
    calls for precision (grade 1); a first walk-through of a noisy plant
    tolerates survey grade (grade 3). Grade 1 exists only in a qualified
    laboratory room (ISO 3741, ISO 3745) or via the precision intensity
-   methods (ISO 9614-1 at discrete points, ISO 9614-3 by scanning).
+   methods, both of which are here: ISO 9614-1 at discrete points in
+   [Sound Intensity (p-p)](intensity.md), ISO 9614-3 by scanning in
+   [Sound Power by Intensity Scanning](sound-power-intensity.md).
 2. **Can the source travel to a laboratory?** ISO 3741 wants the source
    small next to the room (volume no more than about 2 % of the room volume)
    and its noise steady; ISO 3745 wants it inside a qualified anechoic or
@@ -292,14 +294,12 @@ ISO 4871:1996, *Acoustics — Declaration and verification of noise emission
 values of machinery and equipment*: the dual-number and single-number
 declaration forms, the declared value $L_{W\mathrm{Ad}} = L_{W\mathrm{A}} + K_{W\mathrm{A}}$ and the
 clause 6.2 verification. The basic determination standards (ISO 3744/3746,
-ISO 3741, ISO 3745, ISO 9614-2/-3) are covered in their method guides.
+ISO 3741, ISO 3745, ISO 9614-1/-2/-3) are covered in their method guides.
 
 **Not covered.** Three members of the ISO 3740 family are not implemented at
 all — ISO 3743-1, ISO 3743-2 and ISO 3747 — and neither is the sound *energy*
-level $L_J$ of a single event. ISO 9614-1's own discrete-point power summation
-is absent as well; only its field indicators exist, in
-[Sound Intensity (p-p)](intensity.md). The emission sound pressure level
-$L_{p\mathrm{A}}$ that stands beside $L_{W\mathrm{A}}$ in a declaration is consumed here, never
+level $L_J$ of a single event. The emission sound pressure level $L_{p\mathrm{A}}$
+that stands beside $L_{W\mathrm{A}}$ in a declaration is consumed here, never
 determined: ISO 11201, ISO 11202 and ISO 11204 are outside the library. Of
 ISO 4871, only the clause 6.2 single-machine verification is evaluated; the
 batch criteria of clause 6.3 are not, and the batch statistics beyond the

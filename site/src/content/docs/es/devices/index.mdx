@@ -39,8 +39,8 @@ La emisión acústica total de una fuente, y el flujo de potencia sobre el que
 se construye.
 
 - [Intensidad acústica (p-p)](/phonometry/es/devices/emission/intensity/): intensidad
-  acústica con dos micrófonos según IEC 61043 con los indicadores de campo de
-  ISO 9614-1.
+  acústica con dos micrófonos según IEC 61043, con los indicadores de campo de
+  ISO 9614-1 y su determinación de potencia acústica en puntos discretos.
 - [Potencia acústica](/phonometry/es/devices/emission/sound-power/): la elección del
   método de determinación y la declaración de emisión de ruido según
   ISO 4871.
@@ -117,12 +117,10 @@ medición son práctica de laboratorio que esta biblioteca supone.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered">
-Conviene conocer tres ausencias concretas antes de planificar un trabajo. La
-suma de potencia en puntos fijos discretos de ISO 9614-1 **no está
-implementada en absoluto**: sí lo están solo sus indicadores de campo,
-reutilizados por las vías de barrido. Los silenciadores disipativos de
-conducto revestido **no se modelan a partir de las propiedades del
-revestimiento** en ningún sitio: los elementos reactivos se calculan
+Conviene conocer dos ausencias concretas antes de planificar un trabajo. Los
+silenciadores disipativos de conducto revestido **no se modelan a partir de
+las propiedades del revestimiento** en ningún sitio: los elementos reactivos
+se calculan
 exactamente dentro del modelo de onda plana sin flujo, y la cifra de codo
 revestido es una lectura de tabla (la Tabla 8.11 de Bies) y la atenuación del
 plenum la forma cerrada de Wells gobernada por una absorción media declarada — ninguno de los

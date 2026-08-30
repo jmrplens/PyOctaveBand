@@ -50,7 +50,8 @@ judged against.
 ## Pages in this section
 
 - [Sound Intensity (p-p)](intensity.md): two-microphone
-  sound intensity per IEC 61043 with the ISO 9614-1 field indicators.
+  sound intensity per IEC 61043, with the ISO 9614-1 field indicators and its
+  sound power determination at discrete points.
 - [Sound Power](sound-power.md): choosing the determination
   method and declaring the noise emission per ISO 4871.
 - [Sound Power by Pressure Methods](sound-power-pressure.md):
@@ -79,12 +80,10 @@ yourself. The C₃ meteorological correction of ISO 3745 likewise needs an
 air-absorption coefficient you supply; it is not computed from ISO 9613-1
 here.
 
-One route is absent by design: **ISO 9614-1's discrete fixed-point power
-summation is not implemented at all**, and only its Annex A field indicators
-are, reused by the two scanning parts. On the vibration route, the measurement
+One route stops short of its standard: on the vibration route, the measurement
 clauses 5 to 7 of both parts of ISO/TS 7849 are laboratory practice rather
 than code, and only the single-machine radiation factor of Formula 8 is
 implemented, so a batch or family determination needs an already-averaged
-value. Finally, nothing here reduces a machine's emission: quieting a source
-is [Noise control](../noise-control/index.md), and a declared
+value. And nothing here reduces a machine's emission: quieting a source is
+[Noise control](../noise-control/index.md), and a declared
 emission value is the input to that work, not its result.

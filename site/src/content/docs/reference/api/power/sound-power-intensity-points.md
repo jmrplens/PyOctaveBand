@@ -623,4 +623,4 @@ achieved grade rather than the requested one, which is the grade clause
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If the positions and areas disagree in length, the position set is empty, an area is not positive and finite, an input is not finite, the optional arrays do not span the same positions or bands, or a frequency is not a band of Tables B.2 and 2. |
+| ValueError | If `grade` is none of the three grades of Table 1, or `band_type` is neither `'octave'` nor `'third'`; if `normal_intensity` is neither 1D nor 2D, or `areas` is not 1D; if the position set is empty, the positions and areas disagree in length, or an area is not positive and finite; if an input is not finite; if the optional arrays do not span the same positions or bands; if a frequency is not a band of Tables B.2 and 2; or if `temporal_intensity` is neither 1D nor 2D, carries fewer than two samples, or holds a band whose mean is not positive and so leaves `F1` nothing to normalize by. |

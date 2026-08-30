@@ -57,7 +57,8 @@ judged against.
 ## Pages in this section
 
 - [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/): two-microphone
-  sound intensity per IEC 61043 with the ISO 9614-1 field indicators.
+  sound intensity per IEC 61043, with the ISO 9614-1 field indicators and its
+  sound power determination at discrete points.
 - [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): choosing the determination
   method and declaring the noise emission per ISO 4871.
 - [Sound Power by Pressure Methods](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/):
@@ -86,14 +87,12 @@ yourself. The C₃ meteorological correction of ISO 3745 likewise needs an
 air-absorption coefficient you supply; it is not computed from ISO 9613-1
 here.
 
-One route is absent by design: **ISO 9614-1's discrete fixed-point power
-summation is not implemented at all**, and only its Annex A field indicators
-are, reused by the two scanning parts. On the vibration route, the measurement
+One route stops short of its standard: on the vibration route, the measurement
 clauses 5 to 7 of both parts of ISO/TS 7849 are laboratory practice rather
 than code, and only the single-machine radiation factor of Formula 8 is
 implemented, so a batch or family determination needs an already-averaged
-value. Finally, nothing here reduces a machine's emission: quieting a source
-is [Noise control](https://jmrplens.github.io/phonometry/devices/noise-control/), and a declared
+value. And nothing here reduces a machine's emission: quieting a source is
+[Noise control](https://jmrplens.github.io/phonometry/devices/noise-control/), and a declared
 emission value is the input to that work, not its result.
 
 ---
@@ -197,7 +196,9 @@ order; the first match names the standard.
    calls for precision (grade 1); a first walk-through of a noisy plant
    tolerates survey grade (grade 3). Grade 1 exists only in a qualified
    laboratory room (ISO 3741, ISO 3745) or via the precision intensity
-   methods (ISO 9614-1 at discrete points, ISO 9614-3 by scanning).
+   methods, both of which are here: ISO 9614-1 at discrete points in
+   [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/), ISO 9614-3 by scanning in
+   [Sound Power by Intensity Scanning](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/).
 2. **Can the source travel to a laboratory?** ISO 3741 wants the source
    small next to the room (volume no more than about 2 % of the room volume)
    and its noise steady; ISO 3745 wants it inside a qualified anechoic or
@@ -394,14 +395,12 @@ ISO 4871:1996, *Acoustics — Declaration and verification of noise emission
 values of machinery and equipment*: the dual-number and single-number
 declaration forms, the declared value $L_{W\mathrm{Ad}} = L_{W\mathrm{A}} + K_{W\mathrm{A}}$ and the
 clause 6.2 verification. The basic determination standards (ISO 3744/3746,
-ISO 3741, ISO 3745, ISO 9614-2/-3) are covered in their method guides.
+ISO 3741, ISO 3745, ISO 9614-1/-2/-3) are covered in their method guides.
 
 **Not covered.** Three members of the ISO 3740 family are not implemented at
 all — ISO 3743-1, ISO 3743-2 and ISO 3747 — and neither is the sound *energy*
-level $L_J$ of a single event. ISO 9614-1's own discrete-point power summation
-is absent as well; only its field indicators exist, in
-[Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/). The emission sound pressure level
-$L_{p\mathrm{A}}$ that stands beside $L_{W\mathrm{A}}$ in a declaration is consumed here, never
+level $L_J$ of a single event. The emission sound pressure level $L_{p\mathrm{A}}$
+that stands beside $L_{W\mathrm{A}}$ in a declaration is consumed here, never
 determined: ISO 11201, ISO 11202 and ISO 11204 are outside the library. Of
 ISO 4871, only the clause 6.2 single-machine verification is evaluated; the
 batch criteria of clause 6.3 are not, and the batch statistics beyond the
@@ -1265,10 +1264,8 @@ extraneous noise that would defeat any pressure method. This guide covers
 the two of them: the ISO 9614-2 engineering/survey determination with its
 field indicators and per-band achieved grade, the ISO 9614-3 precision
 (grade 1) scan with its tighter criteria, and the accredited-style test
-fiche. ISO 9614-1, the discrete fixed-point method, is not one of the routes
-here: its power determination is not implemented at all, and only its field
-indicators are reused. The probe itself, its finite-difference bias and
-those ISO 9614-1 indicators live in [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/);
+fiche. The probe itself, its finite-difference bias and the ISO 9614-1
+discrete-point method live in [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/);
 which route fits which job is weighed in [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/).
 
 ## 1. Intensity scanning (ISO 9614-2)

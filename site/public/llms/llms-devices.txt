@@ -40,7 +40,8 @@ level a programme, go to
 The total acoustic emission of a source, and the power flux it is built on.
 
 - [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/): two-microphone
-  sound intensity per IEC 61043 with the ISO 9614-1 field indicators.
+  sound intensity per IEC 61043, with the ISO 9614-1 field indicators and its
+  sound power determination at discrete points.
 - [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): choosing the determination
   method and declaring the noise emission per ISO 4871.
 - [Sound Power by Pressure Methods](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/):
@@ -110,10 +111,9 @@ how to acquire them, and through ISO/TS 7849, whose clauses 5 to 7 on
 instrumentation, installation and measurement positions are laboratory
 practice this library assumes.
 
-Three specific absences are worth knowing before you plan a job. ISO 9614-1's
-discrete fixed-point power summation is **not implemented at all** — only its
-field indicators are, reused by the scanning routes. Dissipative duct-lining
-silencers are **not modelled from liner properties** anywhere: the reactive
+Two specific absences are worth knowing before you plan a job. Dissipative
+duct-lining silencers are **not modelled from liner properties** anywhere:
+the reactive
 elements are computed exactly within the no-flow plane-wave model, and the
 lined-elbow figure is a table lookup (Bies Table 8.11) and the plenum
 attenuation Wells' closed form driven by a declared mean absorption — neither is a liner model.
