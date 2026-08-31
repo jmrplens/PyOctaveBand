@@ -593,6 +593,73 @@ def _low_frequency_indices(frequencies: np.ndarray) -> np.ndarray:
     return np.asarray(indices, dtype=np.intp)
 
 
+def _substituted_reverberation(
+    room: str,
+    procedure: LowFrequencyProcedure,
+    reverberation_time: ArrayLike | None,
+    levels: np.ndarray,
+    indices: np.ndarray,
+) -> np.ndarray | None:
+    """Clause 10.4's reverberation times, or ``None`` where it does not apply.
+
+    Clause 10.4 of ISO 16283-1 and -2, and Clause 8.4 of ISO 16283-3, put the
+    63 Hz octave reverberation time in place of the 50 Hz, 63 Hz and 80 Hz
+    one-third-octave values. It is a receiving-room substitution and only that,
+    which is the whole reason this is one function: the source room takes
+    neither argument and has nothing to substitute, so it returns ``None``, and
+    every refusal on either side lives here beside the clause it comes from
+    rather than inside the determination.
+
+    :param room: Which room the levels belong to.
+    :param procedure: The corner measurements and the 63 Hz octave time.
+    :param reverberation_time: Measured one-third-octave times, or ``None``.
+    :param levels: The default-procedure levels, for the shape they must match.
+    :param indices: Positions of the three low-frequency bands.
+    :return: The substituted times, or ``None`` for a source room.
+    :raises ValueError: If a source-room call carries either reverberation
+        argument, if a receiving-room call is missing either of them, or if the
+        times and the levels cover different shapes.
+    """
+    t63 = procedure.reverberation_63_octave
+    if room == _SOURCE_ROOM:
+        if t63 is not None or reverberation_time is not None:
+            msg = (
+                "Clause 10.4 (Clause 8.4 in ISO 16283-3) substitutes the 63 Hz "
+                "octave reverberation time in the receiving room and in no "
+                "other, so a source-room call takes neither "
+                "'reverberation_63_octave' nor 'reverberation_time'."
+            )
+            raise ValueError(msg)
+        return None
+    if t63 is None:
+        msg = (
+            "A receiving room under 25 m³ needs the 63 Hz octave "
+            "reverberation time: ISO 16283-1 and -2 Clause 10.4 and "
+            "ISO 16283-3 Clause 8.4 require it in place of the 50 Hz, "
+            "63 Hz and 80 Hz one-third-octave values, and below the "
+            "trigger Clause 10.3 (8.3) leaves no default value there to "
+            "fall back on. Set 'reverberation_63_octave' on the procedure."
+        )
+        raise ValueError(msg)
+    if reverberation_time is None:
+        msg = (
+            "A receiving-room call needs 'reverberation_time', the "
+            "measured one-third-octave values, because Clause 10.4 "
+            "replaces three of them and leaves the rest as they are."
+        )
+        raise ValueError(msg)
+    times = np.asarray(reverberation_time, dtype=np.float64)
+    if times.shape != levels.shape:
+        msg = (
+            f"The {room}-room reverberation times cover {times.shape} and "
+            f"the levels cover {levels.shape}; they must match."
+        )
+        raise ValueError(msg)
+    substituted = times.copy()
+    substituted[indices] = float(t63)
+    return substituted
+
+
 def apply_low_frequency_procedure(
     level: ArrayLike,
     frequencies: ArrayLike,
@@ -667,44 +734,10 @@ def apply_low_frequency_procedure(
     corrected = levels.copy()
     corrected[indices] = l_lf
 
+    substituted = _substituted_reverberation(
+        room, procedure, reverberation_time, levels, indices
+    )
     t63 = procedure.reverberation_63_octave
-    substituted: np.ndarray | None = None
-    if room == _SOURCE_ROOM:
-        if t63 is not None or reverberation_time is not None:
-            msg = (
-                "Clause 10.4 (Clause 8.4 in ISO 16283-3) substitutes the 63 Hz "
-                "octave reverberation time in the receiving room and in no "
-                "other, so a source-room call takes neither "
-                "'reverberation_63_octave' nor 'reverberation_time'."
-            )
-            raise ValueError(msg)
-    else:
-        if t63 is None:
-            msg = (
-                "A receiving room under 25 m³ needs the 63 Hz octave "
-                "reverberation time: ISO 16283-1 and -2 Clause 10.4 and "
-                "ISO 16283-3 Clause 8.4 require it in place of the 50 Hz, "
-                "63 Hz and 80 Hz one-third-octave values, and below the "
-                "trigger Clause 10.3 (8.3) leaves no default value there to "
-                "fall back on. Set 'reverberation_63_octave' on the procedure."
-            )
-            raise ValueError(msg)
-        if reverberation_time is None:
-            msg = (
-                "A receiving-room call needs 'reverberation_time', the "
-                "measured one-third-octave values, because Clause 10.4 "
-                "replaces three of them and leaves the rest as they are."
-            )
-            raise ValueError(msg)
-        times = np.asarray(reverberation_time, dtype=np.float64)
-        if times.shape != levels.shape:
-            msg = (
-                f"The {room}-room reverberation times cover {times.shape} and "
-                f"the levels cover {levels.shape}; they must match."
-            )
-            raise ValueError(msg)
-        substituted = times.copy()
-        substituted[indices] = float(t63)
 
     return LowFrequencyResult(
         frequencies=freqs,

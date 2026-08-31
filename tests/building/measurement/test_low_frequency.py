@@ -404,26 +404,29 @@ def test_the_callers_own_arrays_come_back_unchanged() -> None:
 def test_a_missing_low_frequency_band_is_refused() -> None:
     """The procedure is stated for the three together; two is not a reading."""
     freqs = np.array([50.0, 63.0, 100.0, 125.0])
+    procedure = _receiving_procedure()
     with pytest.raises(ValueError, match="missing 80 Hz"):
         apply_low_frequency_procedure(
-            _L2[:4], freqs, _receiving_procedure(), reverberation_time=_T2[:4]
+            _L2[:4], freqs, procedure, reverberation_time=_T2[:4]
         )
 
 
 def test_a_duplicated_band_centre_is_refused() -> None:
     """Two columns answering to 63 Hz leave the target column undecidable."""
     freqs = np.array([50.0, 62.5, 63.0, 80.0])
+    procedure = _receiving_procedure()
     with pytest.raises(ValueError, match="cannot be identified"):
         apply_low_frequency_procedure(
-            _L2[:4], freqs, _receiving_procedure(), reverberation_time=_T2[:4]
+            _L2[:4], freqs, procedure, reverberation_time=_T2[:4]
         )
 
 
 def test_level_and_frequency_band_counts_must_agree() -> None:
     """The band axis is what places the procedure, so it has to line up."""
+    procedure = _receiving_procedure()
     with pytest.raises(ValueError, match="band"):
         apply_low_frequency_procedure(
-            _L2[:4], _FREQS, _receiving_procedure(), reverberation_time=_T2[:4]
+            _L2[:4], _FREQS, procedure, reverberation_time=_T2[:4]
         )
 
 
@@ -445,15 +448,17 @@ def test_source_room_carrying_a_63_hz_octave_time_is_refused() -> None:
 
 def test_receiving_room_without_the_measured_times_is_refused() -> None:
     """Clause 10.4 replaces three values and leaves the rest as measured."""
+    procedure = _receiving_procedure()
     with pytest.raises(ValueError, match="needs 'reverberation_time'"):
-        apply_low_frequency_procedure(_L2, _FREQS, _receiving_procedure())
+        apply_low_frequency_procedure(_L2, _FREQS, procedure)
 
 
 def test_an_unknown_room_is_refused() -> None:
     """Only two rooms exist in ISO 16283, and only one of them takes 10.4."""
+    procedure = _receiving_procedure()
     with pytest.raises(ValueError, match="'room' must be"):
         apply_low_frequency_procedure(
-            _L2, _FREQS, _receiving_procedure(), reverberation_time=_T2, room="kitchen"
+            _L2, _FREQS, procedure, reverberation_time=_T2, room="kitchen"
         )
 
 
@@ -588,6 +593,7 @@ def test_impact_level_uses_the_substituted_reverberation_time() -> None:
 
 def test_facade_refuses_the_procedure_with_a_traffic_source() -> None:
     """ISO 16283-3 Clause 6 confines it to the loudspeaker methods."""
+    procedure = _receiving_procedure()
     with pytest.raises(ValueError, match="loudspeaker methods"):
         building.facade_insulation(
             _L1,
@@ -595,7 +601,7 @@ def test_facade_refuses_the_procedure_with_a_traffic_source() -> None:
             _T2,
             frequencies=_FREQS,
             method="road_traffic",
-            low_frequency=_receiving_procedure(),
+            low_frequency=procedure,
         )
 
 
