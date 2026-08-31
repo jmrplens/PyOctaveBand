@@ -217,6 +217,12 @@ def test_corner_level_rejects_a_rank_it_cannot_read() -> None:
         corner_level(np.array([50.0, 51.0, 52.0, 53.0]))
 
 
+def test_corner_level_rejects_an_empty_sheet() -> None:
+    """No corner was measured, so there is no maximum to take per band."""
+    with pytest.raises(ValueError, match="must not be empty"):
+        corner_level(np.empty((0, 3)))
+
+
 def test_corner_level_rejects_non_finite_values() -> None:
     """A NaN corner would propagate silently into the reported band."""
     corners = _CORNERS.copy()
@@ -287,6 +293,22 @@ def test_combination_is_bounded_below_by_two_thirds_of_the_default() -> None:
     assert low_frequency_level(np.array([default]), np.array([-200.0]))[
         0
     ] == pytest.approx(floor_db, abs=1e-9)
+
+
+def test_combination_rejects_empty_band_axes() -> None:
+    """Formula 13 combines a band with its corner; with no bands there is none."""
+    with pytest.raises(ValueError, match="must not be empty"):
+        low_frequency_level(np.empty(0), np.empty(0))
+
+
+@pytest.mark.parametrize("which", ["level", "corner"])
+def test_combination_rejects_non_finite_values(which: str) -> None:
+    """A NaN on either side would survive the logarithm as a NaN level."""
+    default = np.zeros(3)
+    highest = np.zeros(3)
+    (default if which == "level" else highest)[1] = np.nan
+    with pytest.raises(ValueError, match="only finite values"):
+        low_frequency_level(default, highest)
 
 
 def test_combination_rejects_mismatched_band_axes() -> None:
@@ -401,6 +423,15 @@ def test_the_callers_own_arrays_come_back_unchanged() -> None:
     assert np.array_equal(times, times_before)
 
 
+def test_a_level_axis_with_more_than_one_dimension_is_refused() -> None:
+    """One level per band is the contract; a spectrogram is not that."""
+    procedure = _receiving_procedure()
+    with pytest.raises(ValueError, match="one-dimensional"):
+        apply_low_frequency_procedure(
+            _L2[np.newaxis, :], _FREQS, procedure, reverberation_time=_T2
+        )
+
+
 def test_a_missing_low_frequency_band_is_refused() -> None:
     """The procedure is stated for the three together; two is not a reading."""
     freqs = np.array([50.0, 63.0, 100.0, 125.0])
@@ -444,6 +475,15 @@ def test_source_room_carrying_a_63_hz_octave_time_is_refused() -> None:
     procedure = _receiving_procedure()
     with pytest.raises(ValueError, match="source-room call takes neither"):
         apply_low_frequency_procedure(_L2, _FREQS, procedure, room="source")
+
+
+def test_reverberation_times_must_cover_the_same_bands_as_the_levels() -> None:
+    """Substituting by band index needs the two arrays on one band axis."""
+    procedure = _receiving_procedure()
+    with pytest.raises(ValueError, match="they must match"):
+        apply_low_frequency_procedure(
+            _L2, _FREQS, procedure, reverberation_time=_T2[:-1]
+        )
 
 
 def test_receiving_room_without_the_measured_times_is_refused() -> None:
