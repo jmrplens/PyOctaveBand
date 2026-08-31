@@ -70,9 +70,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
 
 - The ISO 16283 low-frequency procedure, which the standard makes **mandatory**
-  and not optional whenever the receiving room is under 25 m3. That is most
-  bedrooms and bathrooms in real dwellings, and until now the field-measurement
-  entry points answered for those rooms without it. `LowFrequencyProcedure`
+  and not optional when the receiving room is under 25 m3, taking the volume
+  rounded to the nearest cubic metre with halves going up, so 24.4 m3 triggers
+  it while 24.5 m3 and 25 m3 exactly do not. That is most bedrooms and
+  bathrooms in real dwellings, and until now the field-measurement entry points
+  answered for those rooms without it. The one exception is a road-traffic
+  facade: Clause 6 of ISO 16283-3 gives those methods the default procedure and
+  nothing else, with no corner measurement at any volume.
+  `LowFrequencyProcedure`
   carries the corner measurements and the 63 Hz octave reverberation time,
   `apply_low_frequency_procedure` returns a `LowFrequencyResult`, and
   `airborne_insulation`, `impact_insulation` and `facade_insulation` each take
