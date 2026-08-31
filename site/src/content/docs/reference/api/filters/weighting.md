@@ -83,7 +83,7 @@ each of them used to be a documented limitation of this module:
 * one minute of 44.1 kHz audio costs about 18 ms instead of 377 ms for A and
   775 ms for 468, and holds 21 MB of intermediates instead of 169 MB
   (measured back to back in one process, mean of five runs). The design
-  itself costs about 70 ms and is cached, so even a first call is quicker
+  itself costs about 130 ms and is cached, so even a first call is quicker
   than the path it replaces.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
