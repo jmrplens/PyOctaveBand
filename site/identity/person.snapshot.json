@@ -54,6 +54,8 @@
     },
     "creditText": "José Manuel Requena Plens",
     "copyrightNotice": "© José Manuel Requena Plens",
+    "license": "https://jmrp.io/license/#portrait",
+    "acquireLicensePage": "https://jmrp.io/license/#permission",
     "width": {
       "@type": "QuantitativeValue",
       "value": 460,
