@@ -360,11 +360,15 @@ En una medición completa las dos mitades viajan juntas en un
 bandas, y que `impact_insulation()` y `facade_insulation()` reciben bajo el
 argumento `low_frequency=`.
 
-Los tres avisan cuando se te olvida. Un `volume` que redondea por debajo de
-25 m³ junto a un vector `frequencies` que nombra las tres bandas le dice a la
-función que el apartado 8.1 está en vigor, y sin procedimiento que ejecutar lo
-dice con un `LowFrequencyWarning` en lugar de devolver un número que no es el
-de ISO 16283. La geometría de las esquinas, los requisitos de
+Avisan cuando se te olvida, allí donde el procedimiento está permitido: aéreo,
+de impactos y los métodos de fachada con altavoz. Una fachada de tráfico
+rodado no dice nada, porque el apartado 6 de ISO 16283-3 le da el
+procedimiento por defecto y ninguno más, así que no hay nada que se haya
+podido olvidar. Un `volume` que redondea por debajo de 25 m³ junto a un vector
+`frequencies` que nombra las tres bandas le dice a la función que el apartado
+8.1 está en vigor, y sin procedimiento que ejecutar lo dice con un
+`LowFrequencyWarning` en lugar de devolver un número que no es el de
+ISO 16283. La geometría de las esquinas, los requisitos de
 muestreo, las diferencias entre las tres partes y una medición resuelta con su
 valoración están en una guía propia:
 [Recintos pequeños: procedimiento de baja frecuencia](/phonometry/es/buildings/insulation/low-frequency-procedure/).

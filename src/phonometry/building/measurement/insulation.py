@@ -22,9 +22,11 @@ pressure level ``Li`` in the receiving room, the standardized impact sound
 pressure level :math:`L'_\mathrm{nT} = L_\mathrm{i} - 10 \log_{10}(T/T_0)` with
 :math:`T_0 = 0.5` s (Clause
 3.13, Formula (1)) and the normalized impact sound pressure level
-:math:`L'_\mathrm{n} = L_\mathrm{i} + 10 \log_{10}(A/A_0)` with the Sabine absorption area
-:math:`A = 0.16 V/T` (Clause 3.14, Formula (2))
-and the reference area :math:`A_0 = 10` m² (Clause 3.15, Formula (3)).
+:math:`L'_\mathrm{n} = L_\mathrm{i} + 10 \log_{10}(A/A_0)` (Clause 3.15,
+Formula (3)) with the Sabine absorption area :math:`A = 0.16 V/T`
+(Clause 3.14, Formula (2)) and the reference area :math:`A_0 = 10` m², which
+Clause 3.15 defines as a term of that formula rather than giving it one of
+its own.
 Levels
 may be supplied already averaged or as several microphone positions, then
 energy-averaged (Clause 7.8.1, Formula (11)).
@@ -342,8 +344,8 @@ class ImpactInsulationResult:
         :math:`L'_\mathrm{nT} = L_\mathrm{i} - 10 \log_{10}(T/T_0)` per band, in dB (Clause 3.13,
         Formula (1)).
     :ivar l_n: Normalized impact sound pressure level
-        :math:`L'_\mathrm{n} = L_\mathrm{i} + 10 \log_{10}(A/A_0)` per band, in dB (Clause 3.14,
-        Formula (2)), or ``None`` when the receiving-room volume was not
+        :math:`L'_\mathrm{n} = L_\mathrm{i} + 10 \log_{10}(A/A_0)` per band, in dB (Clause 3.15,
+        Formula (3)), or ``None`` when the receiving-room volume was not
         supplied.
     :ivar li: Energy-average impact sound pressure levels the quantities
         were formed from, in dB (after any position averaging,

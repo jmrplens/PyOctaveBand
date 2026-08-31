@@ -217,6 +217,17 @@ def test_corner_level_rejects_a_rank_it_cannot_read() -> None:
         corner_level(np.array([50.0, 51.0, 52.0, 53.0]))
 
 
+@pytest.mark.parametrize(
+    "shape", [(3,), (2, 2, 4, 3)], ids=["one-vector", "four-dimensional"]
+)
+def test_the_procedure_refuses_a_rank_it_will_not_be_able_to_read(
+    shape: tuple[int, ...],
+) -> None:
+    """The refusal belongs where the caller built the object, not later."""
+    with pytest.raises(ValueError, match="corners x bands"):
+        LowFrequencyProcedure(volume=23.0, corner_levels=np.zeros(shape))
+
+
 def test_corner_level_rejects_an_empty_sheet() -> None:
     """No corner was measured, so there is no maximum to take per band."""
     with pytest.raises(ValueError, match="must not be empty"):

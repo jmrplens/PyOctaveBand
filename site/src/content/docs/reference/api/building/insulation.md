@@ -28,9 +28,11 @@ pressure level `Li` in the receiving room, the standardized impact sound
 pressure level $L'_\mathrm{nT} = L_\mathrm{i} - 10 \log_{10}(T/T_0)$ with
 $T_0 = 0.5$ s (Clause
 3.13, Formula (1)) and the normalized impact sound pressure level
-$L'_\mathrm{n} = L_\mathrm{i} + 10 \log_{10}(A/A_0)$ with the Sabine absorption area
-$A = 0.16 V/T$ (Clause 3.14, Formula (2))
-and the reference area $A_0 = 10$ m² (Clause 3.15, Formula (3)).
+$L'_\mathrm{n} = L_\mathrm{i} + 10 \log_{10}(A/A_0)$ (Clause 3.15,
+Formula (3)) with the Sabine absorption area $A = 0.16 V/T$
+(Clause 3.14, Formula (2)) and the reference area $A_0 = 10$ m², which
+Clause 3.15 defines as a term of that formula rather than giving it one of
+its own.
 Levels
 may be supplied already averaged or as several microphone positions, then
 energy-averaged (Clause 7.8.1, Formula (11)).
@@ -574,7 +576,7 @@ Per-band field impact sound insulation (ISO 16283-2).
 | Name | Description |
 | :--- | :--- |
 | `l_n_t` | Standardized impact sound pressure level $L'_\mathrm{nT} = L_\mathrm{i} - 10 \log_{10}(T/T_0)$ per band, in dB (Clause 3.13, Formula (1)). |
-| `l_n` | Normalized impact sound pressure level $L'_\mathrm{n} = L_\mathrm{i} + 10 \log_{10}(A/A_0)$ per band, in dB (Clause 3.14, Formula (2)), or `None` when the receiving-room volume was not supplied. |
+| `l_n` | Normalized impact sound pressure level $L'_\mathrm{n} = L_\mathrm{i} + 10 \log_{10}(A/A_0)$ per band, in dB (Clause 3.15, Formula (3)), or `None` when the receiving-room volume was not supplied. |
 | `li` | Energy-average impact sound pressure levels the quantities were formed from, in dB (after any position averaging, Formula (11)). Defaults to `None` for backward-compatible construction. |
 | `t2` | Receiving-room reverberation time per band, in seconds, after any 63 Hz octave substitution. Defaults to `None`. |
 | `t0` | Reference reverberation time `T0` used for `L'nT`, in seconds. Defaults to `None`. |

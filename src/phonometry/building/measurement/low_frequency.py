@@ -471,19 +471,30 @@ class LowFrequencyProcedure:
         """Check the volume, the band axis and the 63 Hz octave time.
 
         The arithmetic of the corner levels is left to :func:`corner_level`;
-        what is checked here is the band axis, which is fixed at three by the
-        procedure itself, and the two scalars, because a non-positive volume or
-        reverberation time would otherwise reach :func:`math.floor` and
-        :func:`numpy.log10` and come back as an exception naming neither.
+        what is checked here is the shape, and the two scalars, because a
+        non-positive volume or reverberation time would otherwise reach
+        :func:`math.floor` and :func:`numpy.log10` and come back as an
+        exception naming neither. The shape is checked for the same reason:
+        the rank this holds to is the one :func:`corner_level` reads, so a
+        sheet of any other rank would build here and only be refused later,
+        by a function the caller never named.
 
         :raises ValueError: If ``volume`` does not trigger the procedure, if
-            ``corner_levels`` does not carry exactly the three low-frequency
-            bands, or if ``reverberation_63_octave`` is given and is not
-            positive and finite.
+            ``corner_levels`` is not a corner sheet of the rank the procedure
+            reads, if it does not carry exactly the three low-frequency bands,
+            or if ``reverberation_63_octave`` is given and is not positive and
+            finite.
         """
         _require_volume_triggers(self.volume, "volume")
         corners = np.asarray(self.corner_levels, dtype=np.float64)
-        if corners.ndim < 1 or corners.shape[-1] != len(LOW_FREQUENCY_BANDS):
+        if corners.ndim not in (_SINGLE_POSITION_RANK, _SINGLE_POSITION_RANK + 1):
+            msg = (
+                "'corner_levels' must be 2-D (corners x bands) for one source "
+                "position or 3-D (positions x corners x bands) for several; "
+                f"got {corners.ndim} dimension(s)."
+            )
+            raise ValueError(msg)
+        if corners.shape[-1] != len(LOW_FREQUENCY_BANDS):
             msg = (
                 "'corner_levels' must carry exactly the three low-frequency "
                 "bands (50 Hz, 63 Hz, 80 Hz) on its last axis; got shape "
