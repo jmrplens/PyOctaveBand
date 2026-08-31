@@ -261,6 +261,27 @@ def _table3_frequencies(fs: int) -> list[float]:
     return sorted(f for f in exact | {20000.0} if f < 0.5 * fs)
 
 
+#: How close to 0 dB the reference-frequency read-back can be resolved here.
+#:
+#: The read-back below evaluates a numerator whose zeros sit at ``z = 1`` at a
+#: frequency very close to it, and that cancellation costs about ten
+#: significant digits: at G's 10 Hz reference and 44.1 kHz the terms are of
+#: order 1 and their sum is of order 1e-6. So what the assertion can see is set
+#: by the arithmetic available, not by the filter.
+#:
+#: ``np.longdouble`` is 80-bit on x86-64 Linux and plain ``float64`` on
+#: Windows and on Apple silicon, where there is no wider type to promote to.
+#: Measured on the same shipped coefficients: with the wider type G reads
+#: -2.8e-13 dB at 44.1 kHz, and with double it reads -7.8e-10 dB. The filter is
+#: the same one in both; only the instrument changed. Asserting 1e-12
+#: everywhere would therefore fail on two of the three platforms this is tested
+#: on, for a defect in the reading rather than in the design, so the bound
+#: follows the precision instead of the other way round.
+_REFERENCE_TOLERANCE_DB = (
+    1e-12 if np.finfo(np.longdouble).eps < np.finfo(np.float64).eps else 1e-8
+)
+
+
 def _cascade_magnitude_at_higher_precision(
     sos: np.ndarray, frequency: float, fs: float
 ) -> np.longdouble:
@@ -400,7 +421,9 @@ def test_the_reference_frequency_carries_no_error(curve: str) -> None:
     for fs in (44100, 48000):
         sos = filters.WeightingFilter(fs, curve).sos
         wider = _cascade_magnitude_at_higher_precision(sos, reference, float(fs))
-        assert 20.0 * float(np.log10(wider)) == pytest.approx(0.0, abs=1e-12)
+        assert 20.0 * float(np.log10(wider)) == pytest.approx(
+            0.0, abs=_REFERENCE_TOLERANCE_DB
+        )
 
 
 def test_the_fit_band_covers_every_row_the_standards_state() -> None:
