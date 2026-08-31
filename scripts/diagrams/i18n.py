@@ -906,16 +906,24 @@ _ES: dict[str, str] = {
     "$r ≥ 2 d_0$ , qualified free field": "$r ≥ 2 d_0$ , campo libre cualificado",
     "Sound intensity · scanning, tighter": "Intensidad acústica · barrido, más exigente",
     "five Annex C criteria per band": "cinco criterios del anexo C por banda",
+    "Grade 1 / 2 per band, 3 on $L_{WA}$": "Grado 1 / 2 por banda, 3 en $L_{WA}$",
+    "Sound intensity · discrete points": "Intensidad acústica · puntos discretos",
+    "no non-positive bands · two criteria (Annex B)": "sin bandas no positivas · dos criterios (anexo B)",
     "Any — no acoustic measurement": "Cualquiera — sin medida acústica",
     "Upper limit ($ε = 1$) / engineering": "Límite superior ($ε = 1$) / peritaje",
     "Surface velocity · accelerometers": "Velocidad superficial · acelerómetros",
     "$ε$ assumed (-1) or measured (-2)": "$ε$ supuesto (-1) o medido (-2)",
+    # The rails that name what each row of the plate measures.
+    "Sound pressure": "Presión acústica",
+    "Sound intensity": "Intensidad acústica",
+    "Surface velocity": "Velocidad superficial",
     "Method": "Método",
     "Environment": "Entorno",
     "Accuracy": "Exactitud",
-    # The two headline relations read the same in Spanish (log10/lg are
+    # The three headline relations read the same in Spanish (log10/lg are
     # shared notation); only "log"/"lg" trip the language check.
-    "$L_W = 10 log_{10} |Σ I_i·S_i| / W_0$": "$L_W = 10 log_{10} |Σ I_i·S_i| / W_0$",
+    "$L_W = 10 log_{10} Σ I_i·S_i / P_0$": "$L_W = 10 log_{10} Σ I_i·S_i / P_0$",
+    "$L_W = 10 log_{10} |Σ I_i·S_i| / P_0$": "$L_W = 10 log_{10} |Σ I_i·S_i| / P_0$",
     "$L_{WA} = L_{vA} + 10 lg(S/S_0) + 10 lg ε$": "$L_{WA} = L_{vA} + 10 lg(S/S_0) + 10 lg ε$",
     # d13 - EN 12354 direct and flanking transmission paths
     "Direct and flanking transmission paths (EN 12354)": "Caminos de transmisión directa y por flancos (EN 12354)",

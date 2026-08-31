@@ -248,7 +248,7 @@ DIAGRAMS = {
         "The ISO 10052 survey sweep (Clauses 6.2 and 6.3)",
         560,
     ),
-    "sound_power_methods": (_d_methods, "Sound power methods compared", 700),
+    "sound_power_methods": (_d_methods, "Sound power methods compared", 944),
     "diagram_flanking_paths": (
         _d_flanking,
         "Direct and flanking transmission paths (EN 12354)",

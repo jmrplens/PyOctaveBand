@@ -420,7 +420,7 @@ normalized levels, the per-band uncertainty and the Annex C omission stated.*
 
 ## See also
 
-- [Sound Power](sound-power.md): choosing among the five determination
+- [Sound Power](sound-power.md): choosing among the seven determination
   routes, what the accuracy grades promise, and the ISO 4871 noise-emission
   declaration a measured $L_{W\mathrm{A}}$ feeds.
 - [Sound Intensity (p-p)](intensity.md): the two-microphone probe, its
