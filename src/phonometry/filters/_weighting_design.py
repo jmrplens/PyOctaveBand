@@ -82,8 +82,21 @@ output:
   :func:`_cascade_magnitude`, because complex multiplication and complex
   magnitude are dispatched on what the CPU can do in exactly the same way a
   BLAS reduction is. Every design in the corpus is then bit-identical under
-  every OpenBLAS kernel set, every numpy SIMD kernel set, every thread count
-  and every hash seed. The one thing that is not fixed is how many *starts*
+  every OpenBLAS kernel set that can be selected here, over all 91 (curve,
+  rate) pairs, and under every thread count and hash seed.
+
+  What that does **not** yet cover, and this is measured rather than assumed:
+  a machine whose numpy dispatches to AVX512. Continuous integration prints
+  two different digests for the A weighting at 48 kHz on one such runner,
+  depending only on whether numpy's dispatchable kernels are enabled, and the
+  disabled one is byte for byte what a machine without AVX512 produces. So the
+  claim above is bounded by the kernels a developer machine can reach, and the
+  AVX512 case is open. It is what closed the last two library-ordered
+  reductions in :func:`_quadratic_group` and :func:`_linear_group`, which had
+  been left outside :func:`_ordered_sum`; whether that was the whole of it is
+  a question only that runner can answer.
+
+  The one thing that is not fixed is how many *starts*
   get that budget: a fit that comes back more than :data:`_FIT_FAILED_DB` from
   the printed curve has not produced a filter at all, and the remaining
   entries of :func:`_spare_placements` are tried before the best is kept. That
@@ -354,7 +367,7 @@ def _quadratic_group(
     b0 = coefficients[:, 1][None, :]
     offset = b0 - omega2[:, None]
     denominator = offset * offset + (b1 * omega[:, None]) ** 2
-    total = np.log(denominator).sum(axis=1)
+    total = _ordered_sum(np.log(denominator).T)
     if not grad:
         return total, np.zeros((omega.size, 0))
     d_b1 = 2.0 * b1 * b1 * omega2[:, None] / denominator
@@ -368,7 +381,7 @@ def _linear_group(
     """``sum log|s + b1|^2`` at ``s = j omega``, and its gradient in ``log b1``."""
     b1 = np.exp(block)[None, :]
     denominator = omega2[:, None] + b1 * b1
-    total = np.log(denominator).sum(axis=1)
+    total = _ordered_sum(np.log(denominator).T)
     if not grad:
         return total, np.zeros((omega2.size, 0))
     return total, 2.0 * b1 * b1 / denominator

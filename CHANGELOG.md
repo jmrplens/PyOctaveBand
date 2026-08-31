@@ -142,8 +142,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   published verdict changes. What moved is that the same call gave different
   numbers on two machines, so a measurement could not be reproduced exactly
   anywhere else, and a plotted curve shifted by 0.0225 pt against a figure
-  tolerance of 0.0175, which is what made the documentation figure job fail
-  intermittently on unchanged drawing code.
+  tolerance of 0.0175. The documentation figure job has also been failing
+  intermittently on unchanged drawing code, and the figures it fails on are
+  drawn from this design, but that the one causes the other is inference: it
+  was never watched happening, and the failure could not be reproduced on a
+  developer machine under any kernel set selectable there.
 
   The test suite went with it. `tests/filters` failed on sixteen of those
   twenty-five settings, at the guard that stops an accuracy bound going slack,
