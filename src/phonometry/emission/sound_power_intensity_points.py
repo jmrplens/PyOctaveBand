@@ -415,20 +415,32 @@ def _nominal_band(frequency: float, band_type: BandType) -> float:
 def _row_for(
     table: tuple[_BandRow, ...], frequency: float, band_type: BandType
 ) -> tuple[float, float]:
-    """The (grade 1, grade 2) pair of the table row covering one band centre."""
+    """The (grade 1, grade 2) pair of the table row covering one band centre.
+
+    A band that reaches here always has a row. :func:`_nominal_band` refuses
+    anything that is not a tabulated centre of its own band type first, and
+    every centre it does admit is spanned by a row of both tables, which
+    ``test_every_tabulated_band_has_a_row_in_both_tables`` holds them to. The
+    ``None`` span is the 6 300 Hz row, printed for one-third-octave bands only,
+    and it is skipped rather than matched because 6 300 Hz is not an octave
+    centre and so never arrives asking for one.
+
+    :raises LookupError: If a band centre admitted by :func:`_nominal_band` is
+        spanned by no row, which means the band lists and the tables have
+        drifted apart in the source rather than that the caller asked for
+        anything wrong.
+    """
     nominal = _nominal_band(frequency, band_type)
     for octave_range, third_range, grade1, grade2 in table:
         span = octave_range if band_type == "octave" else third_range
-        if span is None:
-            continue
-        if span[0] <= nominal <= span[1]:
+        if span is not None and span[0] <= nominal <= span[1]:
             return grade1, grade2
     msg = (
-        f"ISO 9614-1 tabulates no value at {nominal:g} Hz ({band_type} bands); "
-        "the 6 300 Hz row of Tables B.2 and 2 is printed for one-third-octave "
-        "bands only."
+        f"No row of this ISO 9614-1 table spans {nominal:g} Hz "
+        f"({band_type} bands), although it is a tabulated centre. The band "
+        "lists and the tables in this module disagree."
     )
-    raise ValueError(msg)
+    raise LookupError(msg)
 
 
 def _per_band_or_raise(

@@ -30,7 +30,12 @@ import pytest
 import reference_data as ref
 
 from phonometry import emission
-from phonometry.emission.sound_power_intensity_points import ActionCode
+from phonometry.emission.sound_power_intensity_points import (
+    _TABLE_2_S,
+    _TABLE_B2,
+    ActionCode,
+    _row_for,
+)
 
 _P0 = 1.0e-12
 _I0 = 1.0e-12
@@ -253,6 +258,44 @@ def test_6300_hz_row_has_no_octave_counterpart() -> None:
     ) == pytest.approx(19.0)
     with pytest.raises(ValueError, match="not a band of ISO 9614-1"):
         emission.position_count_factor("precision", 6300.0, band_type="octave")
+
+
+def test_every_tabulated_band_has_a_row_in_both_tables() -> None:
+    """What makes the lookup's own refusal unreachable, and should keep it so.
+
+    The centres come from this module's own transcription of the printed
+    tables, not from the lists the code keeps, so this checks the code against
+    the standard rather than against itself.
+
+    `_nominal_band` admits only a tabulated centre of the band type asked for,
+    and every centre it admits is spanned by a row of Table B.2 and of
+    Table 2 alike, so `_row_for` cannot fail on anything a caller can reach it
+    with. That is a property of two lists and two tables agreeing, not of the
+    lookup, and this is where it is held: add a band without its row and this
+    fails, rather than a `LookupError` surfacing to a user who did nothing
+    wrong.
+    """
+    for band_type, bands in (
+        ("octave", _OCTAVE_BANDS),
+        ("third", _THIRD_BANDS),
+    ):
+        for centre in bands:
+            for table in (_TABLE_B2, _TABLE_2_S):
+                grade1, grade2 = _row_for(table, float(centre), band_type)  # type: ignore[arg-type]
+                assert math.isfinite(grade1)
+                assert math.isfinite(grade2)
+
+
+def test_one_position_reports_no_across_surface_indicators() -> None:
+    """F2, F3 and F4 are a spread over positions, and one position has none."""
+    result = emission.sound_power_intensity_points(
+        np.full((1, 3), 1e-6),
+        np.full(1, 0.1),
+        frequencies=np.array([250.0, 500.0, 1000.0]),
+    )
+    assert result.f2 is None
+    assert result.f3 is None
+    assert result.f4 is None
 
 
 def test_exact_base_ten_centre_designates_its_nominal_label() -> None:
