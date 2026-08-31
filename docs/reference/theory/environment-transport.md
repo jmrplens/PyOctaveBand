@@ -215,11 +215,18 @@ to cross an action value on its own.*
 See the [Outdoor Propagation guide](../../environment/propagation/outdoor-propagation.md) and the
 [Occupational Noise Exposure guide](../../perception/hearing/occupational-exposure.md) for usage.
 
-## Sound power determination (ISO 3744/3745/3746, ISO 3741, ISO 9614-2/3)
+## Sound power determination (ISO 3744/3745/3746, ISO 3741, ISO 9614-1/2/3)
 
 The sound power level $L_W = 10 \log_{10}(P/P_0)$ ($P_0 = 1$ pW) is an
 *emission* quantity: unlike a pressure level it does not depend on the receiver
-distance or the room. Three families of methods recover it.
+distance or the room. Three families of methods recover it, one per measured
+quantity: a **sound pressure** over an enveloping surface (ISO 3744/3746, and
+ISO 3745 when the room is anechoic) or in a diffuse field (ISO 3741), a **sound
+intensity** held at discrete points (ISO 9614-1) or scanned over that same
+surface (ISO 9614-2 and ISO 9614-3), and the **surface velocity** of the
+radiating casing, which takes no acoustic measurement at all: ISO/TS 7849, whose
+radiation factor is the radiation efficiency derived in the
+[vibration reference](vibration.md#point-mobilities-and-radiation-efficiency-cremer-5-hopkins-29).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods.svg" alt="The seven sound power routes, one row for each measured quantity, every cell carrying the same five attributes. The sound pressure row: the ISO 3744/3746 hemispherical enveloping surface over a reflecting plane, the ISO 3745 fixed microphone array in a wedge-lined anechoic room, and the ISO 3741 diffuse field of a reverberation room. The sound intensity row: the ISO 9614-1 measurement surface cut into ten segments with the probe held still at a point in each, the ISO 9614-2 serpentine scan swept over that same surface, and the tighter ISO 9614-3 precision scan. The surface velocity row carries one route across the full width, ISO/TS 7849 with an accelerometer on a radiating casing and no microphone at all" width="92%"></picture>
 

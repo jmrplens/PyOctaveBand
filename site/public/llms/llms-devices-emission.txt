@@ -25,14 +25,14 @@ for the direct and comparison methods of ISO 3741, and
 [Sound Power by Intensity Scanning](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/)
 for the on-site scanning of ISO 9614-2 and its ISO 9614-3 precision grade.
 
-A fourth route does not measure sound at all.
+One route does not measure sound at all.
 [Sound power from surface vibration (ISO/TS 7849)](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/)
 estimates the radiated power from the surface-averaged velocity level and a
 radiation factor, which is what remains when the machine cannot be moved to a
 qualified room and its environment is too noisy for an enveloping surface:
 Part 1 gives an upper-limit value from the velocity alone, Part 2 an
 engineering value once the radiation factor has been estimated properly. It
-also answers a slightly different question from the four acoustic routes — it
+also answers a slightly different question from the acoustic routes — it
 characterises what the *structure* radiates, and stays blind to sound escaping
 through openings, intakes and outlets — and it is the natural bridge to the
 structure-borne pages, since the same surface velocity is what

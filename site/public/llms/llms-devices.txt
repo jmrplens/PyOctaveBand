@@ -136,7 +136,7 @@ pair, so the calibration, weighting and filtering behind them are in [Signal
 analysis](https://jmrplens.github.io/phonometry/signals/), and [Build a sound level
 meter](https://jmrplens.github.io/phonometry/signals/sound-level-meter/) runs that chain end to end on
 one runnable page. The derivations are split by physics rather than by topic:
-[sound power determination](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/#sound-power-determination-iso-374437453746-iso-3741-iso-9614-23)
+[sound power determination](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/#sound-power-determination-iso-374437453746-iso-3741-iso-9614-123)
 is under Environment and transport, and [sound intensity](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/#sound-intensity-iec-61043)
 under Signal analysis. The electroacoustics and noise-control pages carry their
 derivations inline.

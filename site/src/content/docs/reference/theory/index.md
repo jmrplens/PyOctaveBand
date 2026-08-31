@@ -126,7 +126,7 @@ ISO 9612 occupational-exposure uncertainty.
 - [Impulsive-sound prominence (NT ACOU 112)](/phonometry/reference/theory/environment-transport/#impulsive-sound-prominence-nt-acou-112)
 - [Outdoor propagation (ISO 9613-1/2)](/phonometry/reference/theory/environment-transport/#outdoor-propagation-iso-9613-12)
 - [Occupational noise exposure (ISO 9612)](/phonometry/reference/theory/environment-transport/#occupational-noise-exposure-iso-9612)
-- [Sound power determination (ISO 3744/3745/3746, ISO 3741, ISO 9614-2/3)](/phonometry/reference/theory/environment-transport/#sound-power-determination-iso-374437453746-iso-3741-iso-9614-23)
+- [Sound power determination (ISO 3744/3745/3746, ISO 3741, ISO 9614-1/2/3)](/phonometry/reference/theory/environment-transport/#sound-power-determination-iso-374437453746-iso-3741-iso-9614-123)
 
 ## [Vibration](/phonometry/reference/theory/vibration/)
 

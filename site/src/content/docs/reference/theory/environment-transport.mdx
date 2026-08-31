@@ -430,20 +430,25 @@ to cross an action value on its own.*
 See the [Outdoor Propagation guide](/phonometry/environment/propagation/outdoor-propagation/) and the
 [Occupational Noise Exposure guide](/phonometry/perception/hearing/occupational-exposure/) for usage.
 
-## Sound power determination (ISO 3744/3745/3746, ISO 3741, ISO 9614-2/3)
+## Sound power determination (ISO 3744/3745/3746, ISO 3741, ISO 9614-1/2/3)
 
 The sound power level $L_W = 10 \log_{10}(P/P_0)$ ($P_0 = 1$ pW) is an
 *emission* quantity: unlike a pressure level it does not depend on the receiver
-distance or the room. Three families recover it, and the choice is dictated by
-the room available. **Pressure over an enveloping surface** in a free field
-above a reflecting plane assumes the intensity normal to that surface is the
-mean-square pressure divided by $\rho c$: ISO 3744 (engineering) and ISO 3746
-(survey) below, and ISO 3745 (precision) when the room is anechoic.
-**Pressure in a diffuse field** turns the room's own absorption into the
-calibration instead: ISO 3741. **Intensity** measures the flux
-directly and needs no qualified room at all, at the price of a two-channel probe
-and the field indicators that police it: ISO 9614-1 at discrete points, and
-ISO 9614-2 (engineering) and ISO 9614-3 (precision) by scanning.
+distance or the room. Three families recover it, one per measured quantity, and
+the choice is dictated by the room available. **Sound pressure** over an
+enveloping surface in a free field above a reflecting plane assumes the
+intensity normal to that surface is the mean-square pressure divided by
+$\rho c$: ISO 3744 (engineering) and ISO 3746 (survey) below, and ISO 3745
+(precision) when the room is anechoic; read in a diffuse field instead, that
+same pressure turns the room's own absorption into the calibration, which is
+ISO 3741. **Sound intensity** measures the flux directly and needs no qualified
+room at all, at the price of a two-channel probe and the field indicators that
+police it: ISO 9614-1 at discrete points, and ISO 9614-2 (engineering) and
+ISO 9614-3 (precision) by scanning. **Surface velocity** reads the radiating
+casing with an accelerometer and takes no acoustic measurement at all, paying
+for that freedom with a radiation factor: that is ISO/TS 7849, whose factor is
+the radiation efficiency derived in the
+[vibration reference](/phonometry/reference/theory/vibration/#point-mobilities-and-radiation-efficiency-cremer-5-hopkins-29).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods.svg" alt="The seven sound power routes, one row for each measured quantity, every cell carrying the same five attributes. The sound pressure row: the ISO 3744/3746 hemispherical enveloping surface over a reflecting plane, the ISO 3745 fixed microphone array in a wedge-lined anechoic room, and the ISO 3741 diffuse field of a reverberation room. The sound intensity row: the ISO 9614-1 measurement surface cut into ten segments with the probe held still at a point in each, the ISO 9614-2 serpentine scan swept over that same surface, and the tighter ISO 9614-3 precision scan. The surface velocity row carries one route across the full width, ISO/TS 7849 with an accelerometer on a radiating casing and no microphone at all" width="92%" />
 
