@@ -16,7 +16,10 @@ of ISO 3745,
 [Sound Power in the Reverberation Room](sound-power-reverberation.md)
 for the direct and comparison methods of ISO 3741, and
 [Sound Power by Intensity Scanning](sound-power-intensity.md)
-for the on-site scanning of ISO 9614-2 and its ISO 9614-3 precision grade.
+for the on-site scanning of ISO 9614-2 and its ISO 9614-3 precision grade, and
+[Sound Intensity](intensity.md)
+for the discrete-point power summation of ISO 9614-1, which stands still at
+each position rather than sweeping the surface.
 
 One route does not measure sound at all.
 [Sound power from surface vibration (ISO/TS 7849)](vibration-sound-power.md)
