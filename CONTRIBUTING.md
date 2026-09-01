@@ -266,6 +266,15 @@ python scripts/check_errata_evidence.py --ratios # only the irrational-ratio lin
    a dpi figure, or the word render. That belongs here, not in a public
    statement about someone else's document.
 
+A Spanish edition of the registry lives in
+[`docs/ERRATA.es.md`](docs/ERRATA.es.md), translated entry for entry. A new or
+removed entry must land in both files: `make site-reports` (and its CI job)
+fails while the two editions differ in entry count, order, or the document
+each heading names. Quoted print, mathematics, printed values and decimal
+separators stay exactly as the cited source prints them, in both editions; the
+English wording is the authoritative one and the three checks above run on it
+alone.
+
 A second script is a contributor tool rather than a gate:
 
 ```bash

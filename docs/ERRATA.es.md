@@ -1,45 +1,6 @@
----
-title: "Erratas de las fuentes publicadas"
-description: "Defectos encontrados en las normas, los documentos de guía y los libros de los que parte la biblioteca: erratas de imprenta, ejemplos resueltos que contradicen su propio articulado y qué hace la biblioteca con cada uno."
----
+← [Índice de la documentación](README.md)
 
-Implementar una norma en sala limpia significa volver a deducir cada fórmula,
-constante y ejemplo resuelto a partir del documento fuente y no del código de
-otra persona. Hecho sobre cientos de documentos, ese proceso encuentra
-defectos en las propias fuentes: un ejemplo resuelto que contradice su
-articulado, una constante a la que la composición tipográfica le comió un
-dígito, una referencia cruzada que apunta a la ecuación equivocada.
-
-Esta página es el registro de esos hallazgos. Cada entrada nombra la edición
-impresa y el punto exacto, cita lo que dice el documento, muestra por qué no
-puede ser correcto, aporta la evidencia independiente y declara qué lectura
-implementa la biblioteca y qué test de regresión la fija. Un defecto listado
-aquí nunca es un defecto del *método*: en todos los casos la lectura
-pretendida se ha podido establecer a partir del propio documento o de la
-física.
-
-Léela junto al
-[informe de conformidad](/phonometry/es/reference/conformance/), que muestra
-los números que calcula la biblioteca; esta página explica el puñado de sitios
-donde lo que está mal es el valor esperado impreso.
-
-:::note
-Esta página reproduce la edición española del registro, traducida entrada a
-entrada. La redacción autoritativa es la inglesa, que es la que se ha
-comunicado o se comunicará a los organismos emisores; las citas textuales, las
-matemáticas y los valores impresos se reproducen sin traducir, tal como los
-imprime cada fuente.
-:::
-
-El registro vive en
-[`docs/ERRATA.md`](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md)
-con su edición española en
-[`docs/ERRATA.es.md`](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.es.md),
-y esta última se trasplanta aquí en tiempo de compilación con
-`make site-reports`, que además exige que las dos ediciones lleven las mismas
-entradas en el mismo orden, así que ninguna pareja puede discrepar.
-
-<!-- BEGIN GENERATED BODY - transplanted from docs/ERRATA.es.md by scripts/generate_site_reports.py (`make site-reports`). Edit the source document, never the text below. -->
+# Erratas encontradas en las fuentes publicadas
 
 Durante la implementación en sala limpia de esta biblioteca, cada fórmula,
 constante y ejemplo resuelto se vuelve a deducir y a recalcular de forma
@@ -77,12 +38,12 @@ desplazamiento de páginas de cada documento se establece empíricamente, porque
 difiere entre documentos y deriva entre capítulos de un mismo libro. Las
 entradas que descansan en otra cosa, un recálculo o la comparación de dos
 frases, lo dicen en un aviso inicial o figuran en la lista de excepciones de
-[`scripts/check_errata_evidence.py`](https://github.com/jmrplens/phonometry/blob/main/scripts/check_errata_evidence.py),
+[`scripts/check_errata_evidence.py`](../scripts/check_errata_evidence.py),
 que es la comprobación que hace cumplir la regla; véase
-[CONTRIBUTING.md](https://github.com/jmrplens/phonometry/blob/main/CONTRIBUTING.md#6-filing-an-errata-entry).
+[CONTRIBUTING.md](../CONTRIBUTING.md#6-filing-an-errata-entry).
 
 Esta edición española traduce la prosa del registro entrada a entrada. La
-redacción autoritativa es la inglesa de [ERRATA.md](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md), que es la que
+redacción autoritativa es la inglesa de [ERRATA.md](ERRATA.md), que es la que
 se ha comunicado o se comunicará a los organismos emisores; las citas
 textuales, las matemáticas y los valores impresos se reproducen aquí sin
 traducir, tal como los imprime cada fuente. `make site-reports` mantiene las
@@ -117,7 +78,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   página 22 del PDF (p. 14 impresa) de ISO 717-2:2013.
 - **Comportamiento de la biblioteca:** implementa A.2.1 tal como está escrito
   y fija $C_I = -11$ con el impreso de 2013 como oráculo
-  ([`tests/reference_data/`](https://github.com/jmrplens/phonometry/blob/main/tests/reference_data), comprobación de
+  ([`tests/reference_data/`](../tests/reference_data/), comprobación de
   conformidad «ISO 717-2 Annex C, Table C.1»).
 - **Estado:** sin notificar.
 
@@ -320,11 +281,11 @@ dos ediciones con las mismas entradas y en el mismo orden.
 - **Comportamiento de la biblioteca:** no le afecta. Ningún camino de código
   implementa la forma reducida: el modelo de fachada calcula $D_{2m,nT}$
   desde la Fórmula (13)
-  ([`facade.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/building/prediction/facade.py)), y el
+  ([`facade.py`](../src/phonometry/building/prediction/facade.py)), y el
   método de inspección convierte con la forma sin reducir
   $D_{2m,n} = D_{2m} + k + 10\log_{10}[A_0 T_0/(0{,}16 V)]$ del apartado 3.15
   de ISO 10052
-  ([`survey_insulation.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/building/measurement/survey_insulation.py)).
+  ([`survey_insulation.py`](../src/phonometry/building/measurement/survey_insulation.py)).
   Las dos constantes de estandarización que *sí* están pre-plegadas en otros
   puntos de la biblioteca son ambas correctas: $0{,}032$ para la forma de
   impacto de la Parte 2 y $0{,}32$ para la forma aérea de la Parte 1,
@@ -521,7 +482,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   $\sum l_k \alpha_k$ como entrada y `perimeter_absorption_coefficient`
   implementa la Fórmula (C.4); la fixture del Anexo L deduce las cinco sumas
   por esa vía en lugar de usar el bloque impreso, y lo dice
-  ([`tests/building/prediction/test_detailed_model.py`](https://github.com/jmrplens/phonometry/blob/main/tests/building/prediction/test_detailed_model.py)).
+  ([`tests/building/prediction/test_detailed_model.py`](../tests/building/prediction/test_detailed_model.py)).
 - **Estado:** sin notificar.
 
 ## ISO 12354-1:2017 Tabla L.3 / ISO 12354-2:2017 Tabla G.3 (ηint de la pared exterior)
@@ -733,7 +694,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
 - **Comportamiento de la biblioteca:** `weighted_lining_improvement` devuelve
   los -10 dB más conservadores exactamente a 1 600 Hz y -5 dB por encima, la
   lectura de 2000, con la ambigüedad nombrada en el docstring y fijada en
-  [`tests/building/prediction/test_resilient_layers.py`](https://github.com/jmrplens/phonometry/blob/main/tests/building/prediction/test_resilient_layers.py).
+  [`tests/building/prediction/test_resilient_layers.py`](../tests/building/prediction/test_resilient_layers.py).
 - **Estado:** sin notificar.
 
 - **Relacionado, no una errata:** la NOTA 1 de la misma tabla pone un suelo
@@ -910,7 +871,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   $\alpha_p$. Verificado en la página 13 del PDF (p. 7 impresa) y la página
   11 del PDF (p. 5 impresa) de ISO 12999-2:2020.
 - **Comportamiento de la biblioteca:** `_TABLE2` en
-  [`uncertainty.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/materials/absorbers/uncertainty.py)
+  [`uncertainty.py`](../src/phonometry/materials/absorbers/uncertainty.py)
   está indexada por frecuencia central de *octava*, siguiendo la Tabla 2 y la
   definición de $\alpha_p$ de ISO 11654 y no el encabezado de la Tabla 5.
 - **Estado:** sin notificar.
@@ -1097,7 +1058,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
 - **Comportamiento de la biblioteca:** usa el rango internamente consistente
   de $89{,}1\ \text{Hz}$ a 11 200 Hz (extremo superior exclusivo según las
   fórmulas), con una nota en el código en
-  [`tonality.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/psychoacoustics/quality/tonality.py).
+  [`tonality.py`](../src/phonometry/psychoacoustics/quality/tonality.py).
 - **Estado:** sin notificar.
 
 ## ECMA-418-1:2024 (3.ª edición), Fórmula (21) (término constante repetido)
@@ -1122,7 +1083,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
 - **Comportamiento de la biblioteca:** implementa la lectura con $C_{L,1}$,
   que es la única que devuelve un borde de banda usable, con una nota en el
   código en
-  [`tonality.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/psychoacoustics/quality/tonality.py).
+  [`tonality.py`](../src/phonometry/psychoacoustics/quality/tonality.py).
 - **Estado:** sin notificar.
 
 ## ECMA-418-1:2024 (3.ª edición), apartado 11.3 (referencias de campo sin resolver)
@@ -1166,7 +1127,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   apartado 7 ($1\ \text{asper}$) a $0{,}9999$.
 - **Comportamiento de la biblioteca:** implementa la lectura a ras del final
   con una nota en el código en
-  [`roughness_ecma.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/psychoacoustics/quality/roughness_ecma.py).
+  [`roughness_ecma.py`](../src/phonometry/psychoacoustics/quality/roughness_ecma.py).
 - **Estado:** sin notificar.
 
 ## ECMA-418-2:2025 (4.ª edición), apartado 9.1.4, Fórmula (127) (fase del núcleo HSA)
@@ -1294,7 +1255,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   20065:2016 y la página 14 del PDF (p. 14 impresa) de DIN 45681:2005-03.
 - **Comportamiento de la biblioteca:** sigue la lectura DIN/$\sqrt{2}$ (casa
   con la única referencia ejecutable), con la elección registrada en
-  [`tone_audibility.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/psychoacoustics/quality/tone_audibility.py).
+  [`tone_audibility.py`](../src/phonometry/psychoacoustics/quality/tone_audibility.py).
 - **Estado:** sin notificar.
 
 ## DIN 45681:2005-03, Anhang I, Tabelle I.6, fila «6 FG»
@@ -1410,7 +1371,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   Recomendación ITU-R BS.468-4.
 - **Comportamiento de la biblioteca:** no le afecta. La red de ponderación se
   construye desde los valores de componentes de la Figura 1a de BS.468-4 en
-  [`filters/weighting.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/filters/weighting.py), con
+  [`filters/weighting.py`](../src/phonometry/filters/weighting.py), con
   31.47 nF, y las filas de la Table 1 son el oráculo. La entrada importa
   porque el subapartado 14.12.11 de IEC 60268-3:2013 remite al lector a «a
   weighting network complying with Appendix A of IEC 60268-1», así que una
@@ -1447,7 +1408,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   impresa) de la Recomendación ITU-R BS.468-4.
 - **Comportamiento de la biblioteca:** no le afecta. Las once ventanas de
   aceptación están transcritas de las Tables 2 y 3 de BS.468-4 en
-  [`tests/reference_data/`](https://github.com/jmrplens/phonometry/blob/main/tests/reference_data), que concuerdan con la
+  [`tests/reference_data/`](../tests/reference_data/), que concuerdan con la
   tabla IEC enmendada. Se registra porque el documento base sin enmendar es
   el que probablemente tenga un lector, y ensancha las ventanas de aceptación
   de 50 ms y 100 ms en 1.1 dB y 1.3 dB por abajo.
@@ -1488,7 +1449,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
 - **Comportamiento de la biblioteca:** las filas de porcentajes son primarias
   y las filas en dB se derivan de ellas, que es la decisión que esta entrada
   fuerza. Las once ventanas de aceptación se almacenan como porcentajes en
-  [`tests/reference_data/`](https://github.com/jmrplens/phonometry/blob/main/tests/reference_data) y se comprueban como
+  [`tests/reference_data/`](../tests/reference_data/) y se comprueban como
   porcentajes, en la suite de tests y en las filas de conformidad «ITU-R
   BS.468-4 Table 2» y «ITU-R BS.468-4 Table 3».
 - **Estado:** sin notificar.
@@ -1555,7 +1516,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
 - **Comportamiento de la biblioteca:** sigue la definición de 14.12.9.1
   (referencia = la amplitud de salida a $f_s$), con un comentario en el
   código junto a la medición de referencia en
-  [`distortion.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/electroacoustics/distortion.py).
+  [`distortion.py`](../src/phonometry/electroacoustics/distortion.py).
 - **Estado:** sin notificar.
 
 ## IEC 60268-16:2011, Table M.1 (la fila beta declara el término de redundancia equivocado)
@@ -1593,7 +1554,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   IEC 60268-16:2011.
 - **Comportamiento de la biblioteca:** implementa A.5.6 con el término de
   redundancia tal como allí está impreso, en
-  [`_index_from_corrected_mtf`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/speech/sti.py); el test de
+  [`_index_from_corrected_mtf`](../src/phonometry/speech/sti.py); el test de
   factores de ponderación por pares de A.2.2 lo fija de forma independiente,
   y las filas de conformidad «IEC 60268-16:2020 A.2.2» e «IEC 60268-16 Annex
   M» leen ambas el índice que produce.
@@ -1631,8 +1592,8 @@ dos ediciones con las mismas entradas y en el mismo orden.
   IEC 60268-16:2011.
 - **Comportamiento de la biblioteca:** lleva las tres cantidades en una sola
   escala, la razón simple a $p_0^2 = (20\ \mu\text{Pa})^2$, en la corrección
-  de [`sti.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/speech/sti.py); la transcripción en
-  [`tests/reference_data/`](https://github.com/jmrplens/phonometry/blob/main/tests/reference_data) conserva las celdas
+  de [`sti.py`](../src/phonometry/speech/sti.py); la transcripción en
+  [`tests/reference_data/`](../tests/reference_data/) conserva las celdas
   impresas al pie de la letra y nombra el $10^{6}$ por el que las reescala, y
   la fila de conformidad «IEC 60268-16 Annex M» lee el ajuste que alimentan.
 - **Estado:** sin notificar.
@@ -1664,7 +1625,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   (p. 64 impresa) de IEC 60268-16:2011.
 - **Comportamiento de la biblioteca:** calcula $I_{am,k}$ desde el factor de
   enmascaramiento sin redondear. La transcripción en
-  [`tests/reference_data/`](https://github.com/jmrplens/phonometry/blob/main/tests/reference_data) conserva la celda
+  [`tests/reference_data/`](../tests/reference_data/) conserva la celda
   impresa y el test
   `test_annex_m_step3_masking_intensity_at_250_hz_is_the_printed_erratum`
   afirma el valor calculado contra 2 858 804 y contra el impreso, para que la
@@ -1701,12 +1662,12 @@ dos ediciones con las mismas entradas y en el mismo orden.
   octava»), aparta los procesadores de solo octavas como caso especial. Ambas
   son redundantes si todo procesador de clase 2 es de bandas de octava.
 - **Comportamiento de la biblioteca:** implementa la lectura EN/IEC.
-  [`verify_intensity_class`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/intensity_compliance.py)
+  [`verify_intensity_class`](../src/phonometry/emission/intensity_compliance.py)
   trata el conjunto completo de 22 bandas de tercio de octava como
   acreditación de cualquiera de las dos clases, y el conjunto de 7 bandas de
   octava (63 Hz a 4 kHz) como alternativa de clase 2 que nunca acredita la
   clase 1, con ambas ramas fijadas por tests de regresión
-  ([`tests/emission/test_intensity_compliance.py`](https://github.com/jmrplens/phonometry/blob/main/tests/emission/test_intensity_compliance.py)).
+  ([`tests/emission/test_intensity_compliance.py`](../tests/emission/test_intensity_compliance.py)).
 - **Estado:** sin notificar (traducción nacional, no el texto del organismo
   emisor).
 
@@ -1746,7 +1707,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   está presente.
 - **Comportamiento de la biblioteca:** implementa la lectura con signo en
   todo el recorrido, que es el texto ISO.
-  [`sound_power_intensity_points`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_intensity_points.py)
+  [`sound_power_intensity_points`](../src/phonometry/emission/sound_power_intensity_points.py)
   suma potencias parciales con signo, marca las bandas cuya suma no es
   positiva como fuera del método, y reporta $F_3 - F_2$ como el exceso que
   produce el flujo entrante; `normal_intensity_from_levels` lleva el $(-)$
@@ -1754,7 +1715,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   contiene. Fijado por
   `test_a_genuinely_negative_partial_power_is_kept_and_summed` y los tests de
   conversión con signo en
-  [`tests/emission/test_sound_power_intensity_points.py`](https://github.com/jmrplens/phonometry/blob/main/tests/emission/test_sound_power_intensity_points.py).
+  [`tests/emission/test_sound_power_intensity_points.py`](../tests/emission/test_sound_power_intensity_points.py).
 - **Estado:** sin notificar (traducción nacional, no el texto del organismo
   emisor: un lector que trabaje desde la edición ISO no tiene nada que
   sortear).
@@ -1783,7 +1744,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   impresa) de ISO 9614-1:1993.
 - **Comportamiento de la biblioteca:** no hizo falta ninguno.
   `field_indicators` en
-  [`intensity.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/intensity.py) forma $F_3$ desde
+  [`intensity.py`](../src/phonometry/emission/intensity.py) forma $F_3$ desde
   la media algebraica de la Fórmula (A.7) y $F_2$ desde el módulo medio de la
   Fórmula (A.5), que es lo que hace de $F_3 - F_2$ el exceso de flujo
   entrante sobre el que está escrita la compuerta del Anexo B. Registrado
@@ -1815,7 +1776,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   UNE-EN ISO 9614-1:2010.
 - **Comportamiento de la biblioteca:** sigue el destino pretendido.
   $F_4(\alpha)$ y $F_4(1-\alpha)$ se calculan según A.2.4 en
-  [`partial_power_concentration`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_intensity_points.py).
+  [`partial_power_concentration`](../src/phonometry/emission/sound_power_intensity_points.py).
   La referencia no cambia ningún número que la biblioteca reporte, así que no
   hizo falta ningún otro cambio.
 - **Estado:** sin notificar (defecto de referencia cruzada, sin consecuencia
@@ -1849,7 +1810,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   (B.3) para todas las bandas, así que la declaración que pide el apartado
   10.5 c) puede hacerse sobre cualquier banda que la necesite.
   `confidence_interval` en
-  [`DiscretePointIntensityResult`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_intensity_points.py)
+  [`DiscretePointIntensityResult`](../src/phonometry/emission/sound_power_intensity_points.py)
   lleva el par, y `criterion_2` dice a qué bandas aplica el requisito. El
   defecto no cambia ningún número, solo adónde se manda al lector a buscar la
   fórmula.
@@ -1882,11 +1843,11 @@ dos ediciones con las mismas entradas y en el mismo orden.
   y 17 del PDF (pp. 26, 27 y 17 impresas) de UNE-EN ISO 9614-1:2010.
 - **Comportamiento de la biblioteca:** sigue la Figura B.1 y el apartado
   8.3.2. `required_actions` en
-  [`DiscretePointIntensityResult`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_intensity_points.py)
+  [`DiscretePointIntensityResult`](../src/phonometry/emission/sound_power_intensity_points.py)
   responde a una banda que falla el criterio 2 con la acción c por encima de
   1 dB y la acción d a 1 dB y por debajo, fijado en el propio límite por
   `test_action_d_is_the_action_at_exactly_one_decibel` en
-  [`tests/emission/test_sound_power_intensity_points.py`](https://github.com/jmrplens/phonometry/blob/main/tests/emission/test_sound_power_intensity_points.py).
+  [`tests/emission/test_sound_power_intensity_points.py`](../tests/emission/test_sound_power_intensity_points.py).
 - **Estado:** sin notificar.
 
 ## ISO 9614-1:1993, ecuaciones (A.1) y (A.8) (la intensidad normalizadora sin su barra)
@@ -1917,7 +1878,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   (pp. 21 y 22 impresas) de UNE-EN ISO 9614-1:2010.
 - **Comportamiento de la biblioteca:** no hizo falta ninguno. El coeficiente
   de variación tras `field_indicators` y `temporal_variability_indicator` en
-  [`intensity.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/intensity.py) divide por la
+  [`intensity.py`](../src/phonometry/emission/intensity.py) divide por la
   media algebraica, y rechaza una media que no sea positiva en lugar de
   dividir por ella. Registrado como defecto tipográfico.
 - **Estado:** sin notificar (tipográfico).
@@ -1951,7 +1912,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   aplica la sustitución siempre que la condición se cumple en lugar de
   dejarla al llamante, lo que satisface ambos impresos. `_a_weighted_factor`
   en
-  [`sound_power_intensity_points.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_intensity_points.py)
+  [`sound_power_intensity_points.py`](../src/phonometry/emission/sound_power_intensity_points.py)
   compara la contribución ponderada A sumada de las bandas de 800 Hz a 5 kHz
   con la mitad de la contribución total y lee la fila de 200 Hz a 630 Hz de
   la Tabla B.2 cuando se queda corta.
@@ -1983,7 +1944,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
 - **Comportamiento de la biblioteca:** implementa la lectura desarrollada,
   ponderando la velocidad de aparición por 3 y la diferencia de niveles por 2
   (`predicted_prominence` en
-  [`impulsive_sound.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/environment/assessment/impulsive_sound.py)),
+  [`impulsive_sound.py`](../src/phonometry/environment/assessment/impulsive_sound.py)),
   que es además la forma de NT ACOU 112:2002 que el PAS arrastra.
 - **Estado:** sin notificar.
 
@@ -2009,7 +1970,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
 - **Comportamiento de la biblioteca:** no le afecta. La biblioteca nunca lee
   la Tabla 2: calcula $A_\text{atm}$ desde la fórmula de ISO 9613-1
   directamente
-  ([`air_absorption.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/environment/propagation/air_absorption.py)),
+  ([`air_absorption.py`](../src/phonometry/environment/propagation/air_absorption.py)),
   así que da $4{,}15\ \text{dB/km}$ para esta condición.
 - **Estado:** sin notificar.
 
@@ -2062,7 +2023,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
 - **Comportamiento de la biblioteca:** no le afecta; la biblioteca calcula
   los valores corregidos desde los apartados normativos y siempre lo hizo.
   Sus anclas del Anexo C.2
-  ([`tests/reference_data/`](https://github.com/jmrplens/phonometry/blob/main/tests/reference_data),
+  ([`tests/reference_data/`](../tests/reference_data/),
   `ANSIS3_5_ANNEX_C1*` y `ANSIS3_5_ANNEX_C2*`) fijan la cadena consistente
   con las erratas de ambos ejemplos, contrastada a doble precisión con la
   propia implementación de referencia del grupo de trabajo `SII.C` y sus
@@ -2113,7 +2074,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   `speech_spectrum` ($U_i$) e `internal_noise` ($X_i$), y el umbral de
   audición sigue siendo el argumento `threshold=` de
   `speech_intelligibility_index`
-  ([`src/phonometry/speech/sii.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/speech/sii.py)).
+  ([`src/phonometry/speech/sii.py`](../src/phonometry/speech/sii.py)).
 - **Estado:** corrección publicada por el grupo de trabajo emisor; nada que
   notificar aguas arriba.
 
@@ -2373,7 +2334,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
 - **Comportamiento de la biblioteca:** implementa $0.76 \cdot 10^{-3}$ con
   una nota junto a la fórmula; el test de barrido de frecuencia portadora
   cazaría una regresión al valor impreso
-  ([`fluctuation_strength.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/psychoacoustics/quality/fluctuation_strength.py)).
+  ([`fluctuation_strength.py`](../src/phonometry/psychoacoustics/quality/fluctuation_strength.py)).
 - **Estado:** sin notificar (artículo de congreso, no una norma).
 
 ## Medwin & Clay, Fundamentals of Acoustical Oceanography (1998), Ec. (3.4.30) (coeficiente del ácido bórico)
@@ -2482,7 +2443,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   los artículos (Ec. (6)) solo con 64.
 - **Comportamiento de la biblioteca:** implementa 64 con una nota en el
   docstring; los límites están fijados en
-  [`tests/materials/absorbers/test_slow_sound.py`](https://github.com/jmrplens/phonometry/blob/main/tests/materials/absorbers/test_slow_sound.py)
+  [`tests/materials/absorbers/test_slow_sound.py`](../tests/materials/absorbers/test_slow_sound.py)
   y la comprobación de conformidad «Poiseuille limit (Stinson 1991)».
 - **Estado:** sin notificar (artículo de revista, no una norma).
 
@@ -2513,7 +2474,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   el término impreso exactamente igual que conjuga la serie de conducto de
   Stinson de los artículos; dirección y pico están fijados por
   ``test_slit_radiation_correction_lowers_resonance`` en
-  [`tests/materials/absorbers/test_slow_sound.py`](https://github.com/jmrplens/phonometry/blob/main/tests/materials/absorbers/test_slow_sound.py).
+  [`tests/materials/absorbers/test_slow_sound.py`](../tests/materials/absorbers/test_slow_sound.py).
 - **Estado:** sin notificar (artículos de revista, no normas).
 
 ## Attenborough & Van Renterghem, Predicting Outdoor Sound 2e (2021), Tabla 5.1
@@ -2603,10 +2564,10 @@ dos ediciones con las mismas entradas y en el mismo orden.
   reproduce el clásico de la expansión brusca (0.512 dB, en ambos sentidos) y
   es recíproca.
 - **Comportamiento de la biblioteca:** `transmission_loss` en
-  [`silencers.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/noise_control/silencers.py) implementa
+  [`silencers.py`](../src/phonometry/noise_control/silencers.py) implementa
   la Ec. (3.27) de Munjal, con el límite de expansión brusca y la
   reciprocidad de la TL fijados por tests de regresión
-  ([`tests/noise_control/test_silencers.py`](https://github.com/jmrplens/phonometry/blob/main/tests/noise_control/test_silencers.py))
+  ([`tests/noise_control/test_silencers.py`](../tests/noise_control/test_silencers.py))
   y una nota defensiva junto a la fórmula.
 - **Estado:** sin notificar (libro, no una norma).
 
@@ -2652,10 +2613,10 @@ dos ediciones con las mismas entradas y en el mismo orden.
   Ninguno de los dos casos particulares es recuperable desde la Ec. (18.24)
   impresa.
 - **Comportamiento de la biblioteca:** `feedback_stability` en
-  [`sound_reinforcement.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/electroacoustics/sound_reinforcement.py)
+  [`sound_reinforcement.py`](../src/phonometry/electroacoustics/sound_reinforcement.py)
   implementa el signo de la Ec. (18.20), con una nota junto al criterio.
   Ambos casos particulares de Long están fijados por tests de regresión
-  ([`tests/electroacoustics/test_sound_reinforcement.py`](https://github.com/jmrplens/phonometry/blob/main/tests/electroacoustics/test_sound_reinforcement.py))
+  ([`tests/electroacoustics/test_sound_reinforcement.py`](../tests/electroacoustics/test_sound_reinforcement.py))
   y por las comprobaciones de conformidad «Long, Architectural Acoustics 2e,
   Eq. (18.21)» y «Eq. (18.22)».
 - **Estado:** sin notificar (libro, no una norma, así que no normativo).
@@ -2690,11 +2651,11 @@ dos ediciones con las mismas entradas y en el mismo orden.
   esa conversión como corroboración. Verificado en la página 665 del PDF
   (p. 666 impresa) de Long, Architectural Acoustics 2e (2014).
 - **Comportamiento de la biblioteca:** `absorption_per_table` en
-  [`crowd_noise.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/room/crowd_noise.py) calcula la cota
+  [`crowd_noise.py`](../src/phonometry/room/crowd_noise.py) calcula la cota
   desde la Ec. (17.52) en lugar de cablear ninguna de las dos constantes, así
   que ambas cotas se mantienen mutuamente consistentes; el valor 6.313 y el
   3.16 impreso están fijados por tests de regresión
-  ([`tests/room/test_crowd_noise.py`](https://github.com/jmrplens/phonometry/blob/main/tests/room/test_crowd_noise.py)) y
+  ([`tests/room/test_crowd_noise.py`](../tests/room/test_crowd_noise.py)) y
   la constante 3.16 por la comprobación de conformidad «Long, Architectural
   Acoustics 2e, Eq. (17.54)».
 - **Estado:** sin notificar (libro, no una norma, así que no normativo);
@@ -2728,10 +2689,10 @@ dos ediciones con las mismas entradas y en el mismo orden.
   correcto. Verificado en la página 542 del PDF (p. 541 impresa) y la página
   541 del PDF (p. 540 impresa) de Long, Architectural Acoustics 2e (2014).
 - **Comportamiento de la biblioteca:** `elbow_insertion_loss` en
-  [`hvac.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/noise_control/hvac.py) lleva la columna
+  [`hvac.py`](../src/phonometry/noise_control/hvac.py) lleva la columna
   redonda de seis filas con 3 dB en la banda que falta, fijada por
   `test_elbow_tables_by_frequency_width_product`
-  ([`tests/noise_control/test_hvac_long.py`](https://github.com/jmrplens/phonometry/blob/main/tests/noise_control/test_hvac_long.py)).
+  ([`tests/noise_control/test_hvac_long.py`](../tests/noise_control/test_hvac_long.py)).
 - **Estado:** sin notificar (libro, no una norma).
 
 ## Long, Architectural Acoustics 2e (2014), Ec. 13.28 (unidades de U_G)
@@ -2771,10 +2732,10 @@ dos ediciones con las mismas entradas y en el mismo orden.
   Verificado en la página 522 del PDF (p. 521 impresa) de Long, Architectural
   Acoustics 2e (2014).
 - **Comportamiento de la biblioteca:** `diffuser_sound_power` en
-  [`hvac.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/noise_control/hvac.py) lee $U_G$ en ft/s
+  [`hvac.py`](../src/phonometry/noise_control/hvac.py) lee $U_G$ en ft/s
   internamente (SI en la interfaz), con la fila de la Tabla 14.9 fijada por
   `test_diffuser_sound_power_reproduces_the_table_14_9_row`
-  ([`tests/noise_control/test_hvac_long.py`](https://github.com/jmrplens/phonometry/blob/main/tests/noise_control/test_hvac_long.py))
+  ([`tests/noise_control/test_hvac_long.py`](../tests/noise_control/test_hvac_long.py))
   y la comprobación de conformidad «Long 2e Eqs. 13.27-13.33».
 - **Estado:** sin notificar (libro, no una norma).
 
@@ -2845,10 +2806,10 @@ dos ediciones con las mismas entradas y en el mismo orden.
   Vibration Analysis for Engineers 2e:2003.
 - **Comportamiento de la biblioteca:**
   `point_connection_coupling_loss_factor` en
-  [`junction_transmission.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/vibration/structural/junction_transmission.py)
+  [`junction_transmission.py`](../src/phonometry/vibration/structural/junction_transmission.py)
   implementa la forma al cuadrado, con la columna impresa fijada por un test
   de regresión
-  ([`tests/vibration/structural/test_junction_transmission.py`](https://github.com/jmrplens/phonometry/blob/main/tests/vibration/structural/test_junction_transmission.py))
+  ([`tests/vibration/structural/test_junction_transmission.py`](../tests/vibration/structural/test_junction_transmission.py))
   y una nota junto a la fórmula.
 - **Estado:** sin notificar (libro, no una norma).
 
@@ -2876,7 +2837,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
 - **Comportamiento de la biblioteca:** las columnas de $\eta_{12}$ se usan
   como oráculo de regresión; $\eta_{21}$ se obtiene de la Ec. (6.8) con las
   densidades modales completas, y un test fija la razón 2.292 explícitamente
-  ([`tests/vibration/structural/test_junction_transmission.py`](https://github.com/jmrplens/phonometry/blob/main/tests/vibration/structural/test_junction_transmission.py)).
+  ([`tests/vibration/structural/test_junction_transmission.py`](../tests/vibration/structural/test_junction_transmission.py)).
 - **Estado:** sin notificar (libro, no una norma).
 
 ## Norton & Karczub 2e (2003), problema 6.10 (área de la plataforma)
@@ -2907,10 +2868,10 @@ dos ediciones con las mismas entradas y en el mismo orden.
   enunciado y sus dimensiones, y la página 637 del PDF (p. 617 impresa), que
   lleva las tres respuestas, de Norton & Karczub 2e:2003.
 - **Comportamiento de la biblioteca:** `power_injection_clf` en
-  [`experimental_sea.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/vibration/structural/experimental_sea.py)
+  [`experimental_sea.py`](../src/phonometry/vibration/structural/experimental_sea.py)
   implementa la inversión tal como está publicada; el test de regresión usa
   el área libre de la plataforma y documenta la discrepancia
-  ([`tests/vibration/structural/test_experimental_sea.py`](https://github.com/jmrplens/phonometry/blob/main/tests/vibration/structural/test_experimental_sea.py)).
+  ([`tests/vibration/structural/test_experimental_sea.py`](../tests/vibration/structural/test_experimental_sea.py)).
 - **Estado:** sin notificar (libro, no una norma).
 
 ## Norton & Karczub 2e (2003), problema 3.14 (factor de pérdida estructural)
@@ -2937,7 +2898,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   Karczub 2e (2003).
 - **Comportamiento de la biblioteca:** el test de regresión usa
   $\eta = 1.5 \cdot 10^{-3}$, el valor que las respuestas impresas exigen
-  ([`tests/building/prediction/test_panel_transmission.py`](https://github.com/jmrplens/phonometry/blob/main/tests/building/prediction/test_panel_transmission.py)).
+  ([`tests/building/prediction/test_panel_transmission.py`](../tests/building/prediction/test_panel_transmission.py)).
 - **Estado:** sin notificar (libro, no una norma).
 
 ---
@@ -2986,7 +2947,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   mientras el exponente de la misma expresión lleva el $m'_R$ con prima de la
   Ec. (9.17).
 - **Comportamiento de la biblioteca:** `plenum_flanking_reduction_index` en
-  [`ceiling_plenum.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/building/prediction/ceiling_plenum.py)
+  [`ceiling_plenum.py`](../src/phonometry/building/prediction/ceiling_plenum.py)
   implementa el $m'_R$ deducido en el exponente y en el denominador, con la
   lectura documentada junto a la fórmula, y rechaza un factor de transmisión
   por encima de la unidad en lugar de reportar un índice de reducción sonora
@@ -2995,7 +2956,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   fuga de la Ec. (9.17) en un techo realista) y la única propiedad que separa
   las dos lecturas: un plénum desnudo no peor que el valor sin amortiguar de
   la Ec. (9.20)
-  ([`tests/building/prediction/test_ceiling_plenum.py`](https://github.com/jmrplens/phonometry/blob/main/tests/building/prediction/test_ceiling_plenum.py)).
+  ([`tests/building/prediction/test_ceiling_plenum.py`](../tests/building/prediction/test_ceiling_plenum.py)).
 - **Estado:** sin notificar (libro, no una norma). El artículo original de
   Mechel de 1980, que Vigran reproduce, no estuvo disponible para comprobar
   si la errata se origina allí.
@@ -3021,7 +2982,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   la que el «>» de ambas filas centrales es inequívoco contra los glifos
   «<=» de la misma celda.
 - **Comportamiento de la biblioteca:**
-  [`low_frequency_correction`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/environment/assessment/spain.py)
+  [`low_frequency_correction`](../src/phonometry/environment/assessment/spain.py)
   e `impulsive_correction` implementan $10 < L \le 15$, con un test de
   regresión fijando las tres ramas en los límites de 10 dB y 15 dB.
 - **Estado:** sin notificar (reglamento nacional, no un organismo de
@@ -3055,7 +3016,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   (p. L 168/4 impresa) y la página 124 del PDF (p. L 168/124 impresa) de la
   Directiva para el rango conforme.
 - **Comportamiento de la biblioteca:**
-  [`cnossos_road`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/environment/sources/cnossos_road.py)
+  [`cnossos_road`](../src/phonometry/environment/sources/cnossos_road.py)
   trabaja sobre la rejilla corregida de 63 Hz a 8 kHz
   (`ROAD_OCTAVE_BANDS`), fijada por
   `test_octave_bands_are_the_corrected_range` y por los casos del libro de
@@ -3125,7 +3086,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   (p. 453 impresa) y la página 487 del PDF (p. 457 impresa) de Ainslie,
   Principles of Sonar Performance Modelling (2010).
 - **Comportamiento de la biblioteca:** `weston_regime_boundaries` en
-  [`propagation/weston_regimes.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/underwater/propagation/weston_regimes.py)
+  [`propagation/weston_regimes.py`](../src/phonometry/underwater/propagation/weston_regimes.py)
   implementa el $k^2H_e^2H/(9\pi\eta)$ consistente con la deducción, que es
   además lo que mantiene $\theta_\text{eff}$ definido con $H$ en todos los
   puntos donde el módulo evalúa la Ec. (9.47). La regla de igualación está
@@ -3135,7 +3096,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   implementación, y la definición compartida de $\theta_\text{eff}$ por
   `test_composite_loss_and_the_boundary_use_the_same_effective_angle` (ambos
   en
-  [`tests/underwater/propagation/test_weston_regimes.py`](https://github.com/jmrplens/phonometry/blob/main/tests/underwater/propagation/test_weston_regimes.py)).
+  [`tests/underwater/propagation/test_weston_regimes.py`](../tests/underwater/propagation/test_weston_regimes.py)).
 - **Estado:** sin notificar (libro, no una norma).
 
 ---
@@ -3168,7 +3129,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   página 46 del PDF (p. 35 impresa) de NMFS Updated Technical Guidance
   v3.0:2024, las tres llevando 1.37 con la nota idéntica.
 - **Comportamiento de la biblioteca:**
-  [`bioacoustics/weighting.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/underwater/bioacoustics/weighting.py)
+  [`bioacoustics/weighting.py`](../src/phonometry/underwater/bioacoustics/weighting.py)
   implementa 1.36 y mantiene el 1.37 impreso disponible como
   `WeightingParameters.c_db_as_printed`, para que una evaluación que deba
   reproducir la tabla publicada al pie de la letra aún pueda. Fijado por
@@ -3252,7 +3213,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   / 161 y OCA 146 / 170 / 161 / 176.
 - **Comportamiento de la biblioteca:** los valores corregidos por las erratas
   son los implementados en
-  [`bioacoustics/weighting.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/underwater/bioacoustics/weighting.py),
+  [`bioacoustics/weighting.py`](../src/phonometry/underwater/bioacoustics/weighting.py),
   fijados por `test_southall_table_7_errata_values_are_implemented`, con la
   propia regla de +159 dB comprobada contra el audiograma en
   `test_southall_impulsive_peak_spl_is_threshold_at_f0_plus_159_db` para los
@@ -3785,7 +3746,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   página 10 del PDF (p. 8 impresa, marcada «[IEC page 19]») de BS 5969:1981,
   la adopción británica idéntica de IEC 651:1979.
 - **Comportamiento de la biblioteca:** `_ANSI_S14_TABLE5_12` en
-  [`weighting_compliance.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/filters/weighting_compliance.py)
+  [`weighting_compliance.py`](../src/phonometry/filters/weighting_compliance.py)
   y su gemela de `reference_data` llevan −3 dB como límite inferior de tipo 2
   a 20 Hz, la más estricta de las dos lecturas, con la nota al lado.
   `test_b_masks_match_reference_data` fija las dos transcripciones una contra
@@ -3877,10 +3838,8 @@ concordancia con las fuentes publicadas:
   biblioteca implementa las ecuaciones y tablas impresas, y usa la hoja solo
   para lo que fija de verdad, la aritmética de la cascada; sus filas de
   elementos se introducen tal como están publicadas en
-  [`tests/noise_control/test_duct_path.py`](https://github.com/jmrplens/phonometry/blob/main/tests/noise_control/test_duct_path.py).
+  [`tests/noise_control/test_duct_path.py`](../tests/noise_control/test_duct_path.py).
   El propio redondeo de la hoja tampoco es siempre autoconsistente (la fila 3
   de impulsión imprime un *Sum* de 49 dB a 500 Hz donde $76 - 28 = 48$, y
   después un *Combined* consistente con 48), que es por lo que la comparación
   corre al 1 dB que la hoja impresa lleva.
-
-<!-- END GENERATED BODY -->

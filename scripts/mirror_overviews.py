@@ -182,9 +182,10 @@ def render(page: Path) -> tuple[Path, str]:
 
 
 #: Mirror files that legitimately do not open with the index backlink: the
-#: README is the index, and the other two are generated elsewhere and start
-#: with an HTML comment.
-_NO_BACKLINK = {"README.md", "CONFORMANCE.md", "ERRATA.md"}
+#: README is the index, two are generated elsewhere and start with an HTML
+#: comment, and the Spanish errata edition carries the same backlink in
+#: Spanish.
+_NO_BACKLINK = {"README.md", "CONFORMANCE.md", "ERRATA.md", "ERRATA.es.md"}
 
 _BACKLINK = "← [Documentation index]("
 
