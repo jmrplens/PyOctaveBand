@@ -916,7 +916,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
-| ITU-R BS.468-4 Table 2 | Single 1 ms 5 kHz burst (5 periods), % of the steady reading | 13.5 to 21.4 % | 16.85 % | +1.927 dB | - | ![Pass][cv-pass] Pass |
+| ITU-R BS.468-4 Table 2 | Single 1 ms 5 kHz burst (5 periods), % of the steady reading | 13.5 to 21.4 % | 16.85 % | +1.928 dB | - | ![Pass][cv-pass] Pass |
 | ITU-R BS.468-4 Table 2 | Single 2 ms 5 kHz burst (10 periods), % of the steady reading | 22.4 to 31.6 % | 26.72 % | +1.458 dB | - | ![Pass][cv-pass] Pass |
 | ITU-R BS.468-4 Table 2 | Single 5 ms 5 kHz burst (25 periods), % of the steady reading | 34 to 46 % | 40.29 % | +1.151 dB | - | ![Pass][cv-pass] Pass |
 | ITU-R BS.468-4 Table 2 | Single 10 ms 5 kHz burst (50 periods), % of the steady reading | 41 to 55 % | 47.73 % | +1.231 dB | - | ![Pass][cv-pass] Pass |
@@ -924,7 +924,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ITU-R BS.468-4 Table 2 | Single 50 ms 5 kHz burst (250 periods), % of the steady reading | 50 to 68 % | 58.78 % | +1.266 dB | - | ![Pass][cv-pass] Pass |
 | ITU-R BS.468-4 Table 2 | Single 100 ms 5 kHz burst (500 periods), % of the steady reading | 58 to 78 % | 66.98 % | +1.251 dB | - | ![Pass][cv-pass] Pass |
 | ITU-R BS.468-4 Table 2 | Single 200 ms 5 kHz burst (1000 periods), % of the steady reading | 68 to 92 % | 80.41 % | +1.170 dB | - | ![Pass][cv-pass] Pass |
-| ITU-R BS.468-4 Table 3 | 5 ms 5 kHz bursts at 2 per second, % of the steady reading | 43 to 53 % | 48.11 % | +0.841 dB | - | ![Pass][cv-pass] Pass |
+| ITU-R BS.468-4 Table 3 | 5 ms 5 kHz bursts at 2 per second, % of the steady reading | 43 to 53 % | 48.11 % | +0.840 dB | - | ![Pass][cv-pass] Pass |
 | ITU-R BS.468-4 Table 3 | 5 ms 5 kHz bursts at 10 per second, % of the steady reading | 72 to 82 % | 75.70 % | +0.435 dB | - | ![Pass][cv-pass] Pass |
 | ITU-R BS.468-4 Table 3 | 5 ms 5 kHz bursts at 100 per second, % of the steady reading | 94 to 100 % | 97.11 % | +0.255 dB | - | ![Pass][cv-pass] Pass |
 | ITU-R BS.468-4 clause 2.6 | Steady 1 kHz sine at 0.775 V r.m.s., dBqps | 0 dBqps (+/-0.000001 dBqps) | 0 dBqps | 0 dBqps | 0 % | ![Pass][cv-pass] Pass |

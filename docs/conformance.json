@@ -13275,8 +13275,8 @@
         "label": "16.85 %"
       },
       "deviation": {
-        "value": 1.927,
-        "label": "+1.927 dB"
+        "value": 1.928,
+        "label": "+1.928 dB"
       },
       "precision": 4,
       "verdict": "pass"
@@ -13467,8 +13467,8 @@
         "label": "48.11 %"
       },
       "deviation": {
-        "value": 0.841,
-        "label": "+0.841 dB"
+        "value": 0.84,
+        "label": "+0.840 dB"
       },
       "precision": 4,
       "verdict": "pass"
@@ -13536,7 +13536,7 @@
         "value": 0.0
       },
       "computed": {
-        "value": -3.28e-14
+        "value": -5.88e-14
       },
       "unit": "dBqps",
       "tolerance": {
@@ -13544,7 +13544,7 @@
         "value": 1e-06
       },
       "deviation": {
-        "value": -3.28e-14
+        "value": -5.88e-14
       },
       "precision": 6,
       "verdict": "pass"

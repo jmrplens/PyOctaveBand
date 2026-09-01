@@ -122,6 +122,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- The weighting filter design gave different coefficients on different CPUs.
+  The fit that removes the bilinear warp reaches its answer through a sequence
+  of small dense solves, and the reductions inside them, the normal equations,
+  their right-hand side and the cost the step test compares, were library
+  calls. A BLAS built for many microarchitectures reassociates a reduction to
+  suit the vector registers it finds when it loads, and Levenberg-Marquardt in
+  a shallow valley turns that last bit into a visible difference: on the A
+  weighting at 48 kHz, two kernel sets agreed on every accept decision for
+  thirty-nine consecutive steps while the costs they were comparing drifted
+  from 3e-13 to 1e-4 apart, and the filters they ended on differ by 5.1e-5 in
+  the leading coefficient. Over the whole corpus, seven curves at thirteen
+  rates, not one design was the same on all twenty-five kernel sets that could
+  produce one here, and every one of them split the same four ways, twelve
+  settings against five against four against four.
+
+  Nothing graded moved. The responses agree to 0.010 dB at worst, A and C earn
+  IEC 61672-1 class 1 at all eight rates the library claims either way, and no
+  published verdict changes. What moved is that the same call gave different
+  numbers on two machines, so a measurement could not be reproduced exactly
+  anywhere else, and a plotted curve shifted by 0.0225 pt against a figure
+  tolerance of 0.0175. The documentation figure job has also been failing
+  intermittently on unchanged drawing code, and the figures it fails on are
+  drawn from this design, but that the one causes the other is inference: it
+  was never watched happening, and the failure could not be reproduced on a
+  developer machine under any kernel set selectable there.
+
+  The test suite went with it. `tests/filters` failed on sixteen of those
+  twenty-five settings, at the guard that stops an accuracy bound going slack,
+  because the AU weighting came out better there, 0.0041 or 0.0042 dB against
+  the 0.0044 the guard asks for, than the bound was sized against. The guard
+  is right and the measurement it read was not a function of the source.
+
+  The fit no longer asks a library to add anything up. Its reductions fold
+  their operands in half and add the halves elementwise, in an order the
+  module fixes, and the dozen-by-dozen system at the heart of each step is
+  eliminated in the module rather than by LAPACK. Two more places had the same
+  problem for a different reason: the printed curve the fit aims at, and the
+  single read-back that sets the shipped gain, were complex expressions, and a
+  complex multiply or magnitude fuses a multiply into an add where the CPU
+  offers the instruction. Both are now written out in real arithmetic, where
+  every step is one operation on two doubles that IEEE 754 rounds to one
+  answer. That last pair matters as much as the first: with the reductions
+  already fixed, dropping numpy to its baseline kernels still moved all
+  ninety-one designs.
+
+  Every design in the corpus is now identical bit for bit across sixty-five
+  configurations: all twenty-seven OpenBLAS kernel sets, with and without
+  numpy's dispatched kernels, six thread counts and five hash seeds. Two of
+  those kernel sets used to fault outright.
+
+  The accuracy is where the design already reached. Five of the seven curves
+  move by less than 0.0003 dB, two of them downwards, and AU reads 0.0059 dB
+  against 0.0053. The BS.468-4 row reads 0.0624 dB where this machine read
+  0.0597,
+  which is the number the same code already produced on four of the kernel
+  sets, and it is 62 % of the bound that row ships with. A and C earn IEC
+  61672-1 class 1 at all eight rates the library claims, with the same
+  0.700 dB binding margin, and the low-rate worst case does not move at all.
+
+  Reading the cascade back in real arithmetic also made the 0 dB pin at the
+  reference frequency real rather than circular. It used to be normalised and
+  checked with the same function, so the check could not see an error in it;
+  measured against a wider precision, the pin is now good to 1.6e-14 relative
+  and `sosfreqz` is the thing that cannot read it, being out by 1.3e-10 at the
+  G weighting's 10 Hz reference frequency. A design costs about 150 ms, paid
+  once per curve, rate and mode.
+
 - The ANSI S1.4-1983 Table V Type 2 cell at 20 Hz is read as +/-3 dB. It
   prints a bare "+3" where every one-sided cell of that same column prints
   "+5, -inf", and the transcription had taken it as upper-only with the
