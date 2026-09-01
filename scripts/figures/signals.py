@@ -1086,6 +1086,11 @@ def generate_tone_burst_iec(output_dir: str) -> None:
         env_db = 10 * np.log10(
             np.maximum(filters.time_weighting(burst, fs, mode="fast") / ref, 1e-6)
         )
+        # The Error column of the guide's results table, reproducible from here.
+        print(
+            f"  {duration * 1000:g} ms: max {env_db.max():+.2f} dB, "
+            f"error {env_db.max() - target:+.2f} dB vs target {target:+.1f}"
+        )
 
         ax.plot(
             t_all, env_db, color=COLOR_PRIMARY, linewidth=1.3, label="FAST envelope"

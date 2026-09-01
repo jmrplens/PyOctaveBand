@@ -48704,9 +48704,11 @@ different questions:
 A pole on the negative real axis corresponds to a decaying exponential impulse
 response ($h(t) \propto e^{-t/\tau}$), exactly what "exponential time
 weighting" means: past events are forgotten exponentially. An implementation
-that instead places the pole on the positive real axis and resets the filter
-state every $\tau$ seconds has built the block integrator, whatever it is
-called: the reset hides the growth, and it changes the measurement's nature.
+that instead accumulates energy and resets every $\tau$ seconds has built
+the block integrator, whatever it is called, and one that puts the pole on
+the positive real axis before the same reset adds a growing weight inside
+each block on top: neither is the time weighting, because the reset changes
+the measurement's nature.
 
 That equation is also where the reference numbers of the next section come
 from, which is worth doing once rather than taking Table 4 on faith. Integrate
@@ -48727,9 +48729,11 @@ transcription of the table is itself checked rather than trusted.
 
 The consequence carries the rest of this page. Because the response is a smooth
 function of $T_\mathrm{b}/\tau$, a detector that really solves the equation
-tracks the whole column at once; a detector that averages over fixed 125 ms
-blocks has no $T_\mathrm{b}$ in it at all, and can only be right where the
-burst happens to fill a block.
+tracks the whole column at once; a detector that averages over fixed
+125 ms blocks answers with the burst's energy share of whichever blocks it
+lands in, which moves with duration and alignment alike but carries nothing
+of the $T_\mathrm{b}/\tau$ response, and it can only be right where the burst
+happens to fill a block.
 
 ## Verification against IEC 61672-1 (tone bursts)
 
@@ -48740,7 +48744,7 @@ level.
 ### How the check is run
 
 Table 4 fixes the excitation but not the plumbing, so here is the plumbing. A
-4 kHz sine is generated at 48 kHz for 3 s. The **reference** is the steady Fast
+4 kHz sine is generated at 48 kHz for 2 s. The **reference** is the steady Fast
 level of that continuous sine, averaged over its last half second — once the
 integrator has settled, this is $L_\mathrm{A}$ in the standard's notation. The
 burst of the stated duration is then cut out of *the same* sine, so its phase
@@ -48765,7 +48769,8 @@ $L_{\mathrm{A}E}$ column.
 | 1 ms | −21.0 | +1.0 / −2.0 | −20.99 | +0.01 | Pass |
 
 The exponential detector stays within 0.05 dB of the Table 4 reference at
-every duration, under 5 % of the class 1 budget, because a detector that
+every duration, and no row spends more than 4 % of its own class 1
+allowance, because a detector that
 solves the defining equation has no free parameter left to get wrong. A block
 integrator can also sit inside class 1 at a favourable alignment, but what it
 spends of the budget is set by how the burst happens to straddle a 125 ms
@@ -48800,8 +48805,8 @@ level, 1.0 dB above the target.
 [Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_block_vs_exponential.webm)
 
 *The exponential trace is flat because $10\lg(1-e^{-T_\mathrm{b}/\tau})$
-contains $T_\mathrm{b}$ and nothing about the clock; the block trace is a
-picture of the alignment and nothing else. Both readings are computed here
+contains $T_\mathrm{b}$ and nothing about the clock; the block trace, at this fixed
+duration, is a picture of the alignment and nothing else. Both readings are computed here
 with `time_weighting(x, fs, mode="fast")` and with `leq` over consecutive
 125 ms slices, against the same steady-tone reference the procedure above
 defines.*
@@ -48847,7 +48852,7 @@ sample from the metrology core:
 | ECMA-418-1:2024 | TNR/PR tone prominence: critical bandwidths, proximity spacing and prominence criteria against the worked examples in clauses 10–12 | `tests/psychoacoustics/quality/test_tonality.py` |
 | ISO 1996-1:2016 | `lden()`, `ldn()` and `composite_rating_level()` against hand-computed formula values | `tests/environment/assessment/test_rating.py` |
 | IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
-| IEC 61252:1993 | The personal sound exposure quantities, `sound_exposure()` and the normalized 8 h level `lex_8h()` | `tests/signals/test_levels.py` |
+| IEC 61252:1993 | The personal sound exposure quantities, `sound_exposure()` and the normalized 8 h level `lex_8h()`; IEC 61252:2025 has since superseded this print, and the transcription still targets the 1993+A2 text | `tests/signals/test_levels.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
 566 numerical conformance checks across 59 domains and 373 standards, covering
@@ -48869,8 +48874,9 @@ is stated with its measured cost on
 [Filter Banks](https://jmrplens.github.io/phonometry/signals/filters/filter-banks/). The default Butterworth
 bank is checked against the stricter class 0 of the withdrawn IEC 61260:1995 /
 ANSI S1.11-2004 edition as well as the current class 1. And A/C weighting
-holds class 1 at every sample rate from 8 kHz up, because the analog prototype
-is fitted at the sample rate rather than transformed blind (see
+earns class 1 at each of the eight rates the suite grades it at, from 8 to
+192 kHz, at every Table 3 frequency below that rate's Nyquist, because the
+analog prototype is fitted at the sample rate rather than transformed blind (see
 [Frequency Weighting](https://jmrplens.github.io/phonometry/signals/levels/weighting/)).
 
 ## When the source is what is wrong

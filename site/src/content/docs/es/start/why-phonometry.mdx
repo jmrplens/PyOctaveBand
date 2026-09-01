@@ -41,10 +41,12 @@ facilidad y responden a preguntas distintas:
 Un polo en el eje real negativo corresponde a una respuesta al impulso
 exponencial decreciente ($h(t) \propto e^{-t/\tau}$), exactamente lo que
 significa «ponderación temporal exponencial»: los eventos pasados se olvidan
-exponencialmente. Una implementación que en cambio coloque el polo en el eje
-real positivo y reinicie el estado del filtro cada $\tau$ segundos ha
-construido el integrador por bloques, se llame como se llame: el reinicio
-oculta el crecimiento, y cambia la naturaleza de la medición.
+exponencialmente. Una implementación que en cambio
+acumule energía y se reinicie cada $\tau$ segundos ha construido el
+integrador por bloques, se llame como se llame, y una que coloque el polo en
+el eje real positivo antes del mismo reinicio añade además un peso creciente
+dentro de cada bloque: ninguna de las dos es la ponderación temporal, porque
+el reinicio cambia la naturaleza de la medición.
 
 De esa ecuación salen además los valores de referencia del apartado siguiente, y
 vale la pena deducirlos una vez en lugar de dar por buena la Tabla 4. Intégrala
@@ -67,8 +69,10 @@ modo que la transcripción de la tabla está comprobada y no dada por buena.
 La consecuencia sostiene el resto de esta página. Como la respuesta es una
 función suave de $T_\mathrm{b}/\tau$, un detector que resuelva de verdad la ecuación
 sigue la columna entera de una vez; un detector que promedia sobre bloques fijos
-de 125 ms no contiene ningún $T_\mathrm{b}$, y solo puede acertar allí donde la ráfaga
-llene un bloque por casualidad.
+de 125 ms responde con la parte de la energía de la ráfaga que caiga en cada
+bloque, que se mueve con la duración y con la alineación por igual pero no
+lleva nada de la respuesta $T_\mathrm{b}/\tau$, y solo puede acertar allí
+donde la ráfaga llene un bloque por casualidad.
 
 ## Verificación frente a IEC 61672-1 (ráfagas tonales)
 
@@ -79,7 +83,7 @@ al nivel de régimen estacionario.
 ### Cómo se ejecuta la comprobación
 
 La Tabla 4 fija la excitación pero no el montaje, así que aquí va el montaje. Se
-genera una sinusoide de 4 kHz a 48 kHz durante 3 s. La **referencia** es el nivel
+genera una sinusoide de 4 kHz a 48 kHz durante 2 s. La **referencia** es el nivel
 Fast estacionario de esa sinusoide continua, promediado sobre su último medio
 segundo: una vez asentado el integrador, este es el $L_\mathrm{A}$ en la notación de la
 norma. Después se recorta de *esa misma* sinusoide la ráfaga de la duración
@@ -104,7 +108,9 @@ mismos valores de referencia están transcritos en
 | 1 ms | −21,0 | +1,0 / −2,0 | −20,99 | +0,01 | Cumple |
 
 El detector exponencial se mantiene a menos de 0,05 dB de la referencia de la
-Tabla 4 en todas las duraciones, menos del 5 % del margen de clase 1, porque a
+Tabla 4 en
+todas las duraciones, y ninguna fila gasta más del 4 % de su propio margen
+de clase 1, porque a
 un detector que resuelve la ecuación que define la magnitud no le queda ningún
 parámetro libre que equivocar. Un integrador por bloques también puede quedar
 dentro de clase 1 con una alineación favorable, pero lo que gasta del margen
@@ -145,8 +151,8 @@ estacionario, 1,0 dB por encima del objetivo.
 />
 
 *La traza exponencial es plana porque $10\lg(1-e^{-T_\mathrm{b}/\tau})$ contiene $T_\mathrm{b}$
-y nada del reloj; la traza por bloques es un retrato de la alineación y de
-nada más. Las dos lecturas se calculan aquí con
+y nada del reloj; la traza por bloques, a esta duración
+fija, es un retrato de la alineación y de nada más. Las dos lecturas se calculan aquí con
 `time_weighting(x, fs, mode="fast")` y con `leq` sobre segmentos consecutivos
 de 125 ms, frente a la misma referencia de tono estacionario que define el
 procedimiento de arriba.*
@@ -196,7 +202,7 @@ metrología:
 | ECMA-418-1:2024 | Prominencia tonal TNR/PR: anchos de banda críticos, separación de proximidad y criterios de prominencia frente a los ejemplos resueltos de los apartados 10–12 | `tests/psychoacoustics/quality/test_tonality.py` |
 | ISO 1996-1:2016 | `lden()`, `ldn()` y `composite_rating_level()` frente a valores calculados a mano con las fórmulas | `tests/environment/assessment/test_rating.py` |
 | IEC 60942:2017 Tabla 2 | Límites de estabilidad a corto plazo del calibrador (dependientes de la frecuencia, clase 1) en `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
-| IEC 61252:1993 | Las magnitudes de exposición sonora personal, `sound_exposure()` y el nivel normalizado a 8 h `lex_8h()` | `tests/signals/test_levels.py` |
+| IEC 61252:1993 | Las magnitudes de exposición sonora personal, `sound_exposure()` y el nivel normalizado a 8 h `lex_8h()`; IEC 61252:2025 ha sustituido desde entonces esa impresión, y la transcripción sigue apuntando al texto de 1993+A2 | `tests/signals/test_levels.py` |
 
 La misma disciplina se aplica mucho más allá del núcleo de metrología: hoy la
 batería ejecuta {totalChecks} comprobaciones numéricas de conformidad en
@@ -220,9 +226,11 @@ borde de banda de paso con rizado constante, algo que se declara con su coste
 medido en [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/). El
 banco Butterworth por defecto se verifica también frente a la clase 0, más
 estricta, de la edición retirada IEC 61260:1995 / ANSI S1.11-2004 además de
-frente a la clase 1 vigente. Y la ponderación A/C mantiene la clase 1 a todas
-las frecuencias de muestreo desde 8 kHz, porque el prototipo analógico se
-ajusta a la frecuencia de muestreo en lugar de transformarse a ciegas
+frente a la clase 1 vigente. Y la ponderación A/C obtiene la
+clase 1 en cada una de las ocho frecuencias de muestreo a las que la batería
+la califica, de 8 a 192 kHz, en todas las frecuencias de la Tabla 3 por
+debajo del Nyquist de cada una, porque el prototipo analógico se ajusta a la
+frecuencia de muestreo en lugar de transformarse a ciegas
 (consulta [Ponderación
 frecuencial](/phonometry/es/signals/levels/weighting/)).
 
