@@ -303,6 +303,7 @@ The theory pages travel in their own shard (https://jmrplens.github.io/phonometr
 
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/)
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/)
+- [Same bits on every machine](https://jmrplens.github.io/phonometry/reference/determinism/)
 - [Glossary](https://jmrplens.github.io/phonometry/reference/glossary/)
 - [Theoretical Background](https://jmrplens.github.io/phonometry/reference/theory/)
 - [Theory: Environment and Transport](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/)
