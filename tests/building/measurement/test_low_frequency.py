@@ -1140,20 +1140,27 @@ def test_a_small_source_room_alone_still_leaves_the_receiver_warned() -> None:
         )
 
 
-def test_a_volume_that_is_not_a_volume_leaves_the_complaint_to_its_owner() -> None:
-    """A non-finite volume is somebody else's error, and never this warning.
+def test_a_volume_that_is_not_a_volume_is_refused_by_its_owner() -> None:
+    """A non-finite volume is the entry point's error, and never this warning.
 
     ``low_frequency_procedure_applies`` raises on NaN rather than answering, so
     the trigger test has to be reached only for a volume that is one. The
-    facade entry point accepts a non-finite volume today and reports NaN; that
-    is a separate defect and this check must not turn it into a crash.
+    facade entry point used to accept a NaN volume and report NaN levels,
+    because ``NaN <= 0`` answers False; it refuses on entry now, so the
+    warning's own guard is never the one that speaks.
     """
-    with warnings.catch_warnings():
-        warnings.simplefilter("error", LowFrequencyWarning)
-        result = building.facade_insulation(
+    with pytest.raises(ValueError, match=r"'volume' must be positive"):
+        building.facade_insulation(
             _L1, _L2, _T2, volume=float("nan"), frequencies=_FREQS
         )
-    assert result.d_2m_n is not None
+
+
+def test_an_infinite_volume_is_refused_by_name() -> None:
+    """Infinity passes ``> 0``, so it takes its own refusal."""
+    with pytest.raises(ValueError, match=r"'volume' must be finite"):
+        building.facade_insulation(
+            _L1, _L2, _T2, volume=float("inf"), frequencies=_FREQS
+        )
 
 
 # --- Why the 63 Hz octave band, measured rather than asserted -------------

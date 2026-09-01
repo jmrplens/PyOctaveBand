@@ -58,8 +58,8 @@ road-traffic element method (Clause 3.13). These quantities are defined by
 unnumbered formulas inline in the Clause 3 terms; positions are
 energy-averaged with the surface-level formula (Clause 9.5.1, Formula (7)).
 The façade quantity is airborne, so its single-number rating uses the
-**ISO 717-1 airborne** reference curve and method (Clause 2, Annex F) via
-[`weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) unchanged.
+**ISO 717-1 airborne** reference curve and method (Clause 2, Annex F)
+unchanged, via [`weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating).
 
 **Frequency range.** The three parts require the same 16 core one-third-octave
 bands, 100 Hz to 3150 Hz (Part 1 and Part 3 Clause 5, Part 2 Clause 5.1), and

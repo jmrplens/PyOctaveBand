@@ -177,7 +177,8 @@ L_\mathrm{LF} = 10 \log_{10} \left[ \frac{10^{0.1 L_\mathrm{Corner}} +
 2 \cdot 10^{0.1 L}}{3} \right].
 $$
 
-Under the same trigger, Clause 10.4 (Clause 8.4 in Part 3) stops the 50 Hz,
+Under the receiving room's own trigger, Clause 10.4 (Clause 8.4 in Part 3)
+stops the 50 Hz,
 63 Hz and 80 Hz one-third-octave reverberation times being measured at all and
 puts one **63 Hz octave band** value in their place, used for all three.
 

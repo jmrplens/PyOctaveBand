@@ -52,8 +52,8 @@ road-traffic element method (Clause 3.13). These quantities are defined by
 unnumbered formulas inline in the Clause 3 terms; positions are
 energy-averaged with the surface-level formula (Clause 9.5.1, Formula (7)).
 The façade quantity is airborne, so its single-number rating uses the
-**ISO 717-1 airborne** reference curve and method (Clause 2, Annex F) via
-:func:`weighted_rating` unchanged.
+**ISO 717-1 airborne** reference curve and method (Clause 2, Annex F)
+unchanged, via :func:`weighted_rating`.
 
 **Frequency range.** The three parts require the same 16 core one-third-octave
 bands, 100 Hz to 3150 Hz (Part 1 and Part 3 Clause 5, Part 2 Clause 5.1), and
@@ -1091,8 +1091,14 @@ def airborne_insulation(
         raise ValueError(msg)
     r_prime: np.ndarray | None = None
     if area is not None and volume is not None:
-        if area <= 0.0 or volume <= 0.0:
+        # `not x > 0` rather than `x <= 0`: NaN answers False to both
+        # comparisons, so the plain form let a NaN geometry through and the
+        # result carried it. Infinity passes `> 0` and is refused by name.
+        if not area > 0.0 or not volume > 0.0:
             msg = "'area' and 'volume' must be positive."
+            raise ValueError(msg)
+        if math.isinf(area) or math.isinf(volume):
+            msg = "'area' and 'volume' must be finite."
             raise ValueError(msg)
         absorption = 0.16 * volume / t
         r_prime = d + 10.0 * np.log10(area / absorption)
@@ -1222,8 +1228,11 @@ def impact_insulation(
 
     l_n: np.ndarray | None = None
     if volume is not None:
-        if volume <= 0.0:
+        if not volume > 0.0:
             msg = "'volume' must be positive."
+            raise ValueError(msg)
+        if math.isinf(volume):
+            msg = "'volume' must be finite."
             raise ValueError(msg)
         absorption = 0.16 * volume / t
         l_n = li_bands + 10.0 * np.log10(absorption / _A0_IMPACT)
@@ -1257,11 +1266,17 @@ def _validate_facade_geometry(
     sound reduction index needs the surface level, the element area and the
     receiving-room volume together.
     """
-    if volume is not None and volume <= 0.0:
+    if volume is not None and not volume > 0.0:
         msg = "'volume' must be positive."
         raise ValueError(msg)
-    if area is not None and area <= 0.0:
+    if volume is not None and math.isinf(volume):
+        msg = "'volume' must be finite."
+        raise ValueError(msg)
+    if area is not None and not area > 0.0:
         msg = "'area' must be positive."
+        raise ValueError(msg)
+    if area is not None and math.isinf(area):
+        msg = "'area' must be finite."
         raise ValueError(msg)
     if area is not None and surface_level is None:
         msg = (
