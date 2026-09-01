@@ -9,7 +9,7 @@ las definen — ISO, IEC, ANSI y ASTM, el anexo CNOSSOS-EU de la Directiva
 el apartado que implementa. Qué te aporta eso, y cómo se comprueba, está en
 [Por qué phonometry](/phonometry/es/start/why-phonometry/).
 
-Cinco páginas breves, pensadas para leerse una vez antes que nada. Cada una
+Seis páginas breves, pensadas para leerse una vez antes que nada. Cada una
 responde a una pregunta, y están en el orden en que llegan las preguntas.
 
 **¿Puedo instalarla y sacar un número?**

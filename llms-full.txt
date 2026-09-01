@@ -49888,7 +49888,7 @@ define them — ISO, IEC, ANSI and ASTM, the CNOSSOS-EU annex to Directive
 the clause it implements. What that buys you, and how it is checked, is
 [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/).
 
-Five short pages, meant to be read once before anything else. Each answers one
+Six short pages, meant to be read once before anything else. Each answers one
 question, and they are in the order the questions arrive.
 
 **Can I install it and get a number out?**
@@ -50016,8 +50016,9 @@ Each entry has survived the whole acquisition effort: my own library, the
 official stores, the open-access indexes and every other legitimate channel I
 could find, re-checked on the date shown. Three routes help:
 
-- **Fund the purchase.** A one-off sponsorship naming the document; the
-  official store price is on each linked page.
+- **Fund the purchase.** A one-off sponsorship naming the document; where a
+  link goes to an official store, the price is on that page, and for the rest
+  name the item and I will quote it in the issue.
 - **Verify against your licensed copy.** If your lab or employer already
   holds one, you can check the implementation and its reference values
   against your copy without sending me anything. The repository never
@@ -50038,12 +50039,12 @@ clean.
 | Widmann (1992), *Ein Modell der psychoakustischen Lästigkeit von Schallen*, TUM doctoral thesis | The primary source of the psychoacoustic-annoyance model. The model is implemented from Fastl & Zwicker (2006); the thesis, 116 printed pages that predate electronic deposit, would let the register cite the origin at first hand | 2026-09-01 |
 | Bowdler & Leventhall (eds.), *Wind Turbine Noise* (Multi-Science, 2011) | The standard reference behind the wind-turbine noise guide; only its book reviews circulate | 2026-09-01 |
 | Crispin, Blasco, Ingelaere & Van Damme, *The vibration reduction index Kij: laboratory measurements versus predictions EN 12354-1* ([doi:10.1201/9781003078852-125](https://doi.org/10.1201/9781003078852-125)) | Measured junction Kij values as an independent oracle for the ISO 10848 and EN 12354-1 implementations | 2026-09-01 |
-| Hopkins, *Sound insulation measurements with intensity techniques: flanking transmission* (IoA 1997, [doi:10.25144/19134](https://doi.org/10.25144/19134)) | Intensity-measured flanking data beside the ISO 15186 implementation; the publisher's own link has been dead for years | 2026-09-01 |
+| Hopkins, *Sound insulation measurements with intensity techniques: flanking transmission* (IoA 1997, doi 10.25144/19134) | Intensity-measured flanking data beside the ISO 15186 implementation; the publisher's own link has been dead for years | 2026-09-01 |
 
-Two Spanish print classics would also make a difference to the Spanish
-guides, and both exist only on paper: Recuero, *Ingeniería acústica*, and
-Arau, *ABC de la acústica arquitectónica* (CEAC, 2007). Second-hand copies
-count, through the same routes.
+| Recuero, *Ingeniería acústica* (Paraninfo) | Canonical Spanish textbook; print only, and it would enrich the terminology and worked examples of the Spanish guides | 2026-09-01 |
+| Arau, *ABC de la acústica arquitectónica* (CEAC, 2007) | Spanish room-acoustics authority behind the Arau-Puchades formula the library implements; print only | 2026-09-01 |
+
+Second-hand print copies count, through the same routes.
 
 ---
 
