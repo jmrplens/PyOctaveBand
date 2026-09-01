@@ -12,14 +12,14 @@
 # pins its dependencies cannot be installed alongside anything else.
 matplotlib==3.11.1
 numpy==2.5.2
-scipy==1.18.0
+scipy==1.18.1
 
 # matplotlib's own chain, pinned with it: they decide SVG text layout and WebP
 # encoding, which is what scripts/check_figures.py compares.
 contourpy==1.3.3
 cycler==0.12.1
 fonttools==4.63.0
-kiwisolver==1.5.0
+kiwisolver==1.5.1
 packaging==26.3
 pillow==12.3.0
 pyparsing==3.3.2

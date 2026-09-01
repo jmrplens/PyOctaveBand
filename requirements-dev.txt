@@ -9,7 +9,7 @@
 # reportlab and svglib than the committed fiches were rendered with, so a
 # developer running `make reports` saw drift in fiches nobody had touched.
 # The versions here are the versions there; bump them together.
-ruff==0.16.4
+ruff==0.16.5
 mypy==2.3.1
 bandit==1.9.4
 types-setuptools==84.0.0.20260812
@@ -21,7 +21,7 @@ pytest-xdist==3.8.0  # parallel test execution (`pytest -n auto`); coverage is c
 matplotlib==3.11.1  # required by the result-object .plot() tests
 reportlab==5.0.1  # required by the result-object .report() tests (ISO 717 PDF fiche)
 svglib==2.2.0
-pypdf==6.16.1  # one-page assertion in the ISO 717 report tests
+pypdf==6.16.2  # one-page assertion in the ISO 717 report tests
 pypdfium2==5.13.0  # rasterizes the .report() PDFs to committed WebP previews (scripts/generate_reports.py); no system Poppler needed
 
 pystoi==0.4.1  # test-only external cross-check for STOI/ESTOI (reproduces the authors' MATLAB); the library reimplements from the papers and never imports it at runtime
