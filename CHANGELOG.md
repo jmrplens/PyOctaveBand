@@ -69,6 +69,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The ISO 16283 low-frequency procedure, which the standard makes **mandatory**
+  and not optional when the receiving room is under 25 m3, taking the volume
+  rounded to the nearest cubic metre with halves going up, so 24.4 m3 triggers
+  it while 24.5 m3 and 25 m3 exactly do not. That is most bedrooms and
+  bathrooms in real dwellings, and until now the field-measurement entry points
+  answered for those rooms without it. The one exception is a road-traffic
+  facade: Clause 6 of ISO 16283-3 gives those methods the default procedure and
+  nothing else, with no corner measurement at any volume.
+  `LowFrequencyProcedure`
+  carries the corner measurements and the 63 Hz octave reverberation time,
+  `apply_low_frequency_procedure` returns a `LowFrequencyResult`, and
+  `impact_insulation` and `facade_insulation` take it through a
+  `low_frequency` argument, while `airborne_insulation` takes one per room of
+  the pair, `source_low_frequency` and `receiver_low_frequency`.
+
+  ISO 16283-1 Clause 8.5, ISO 16283-2 Clause 8.5 and ISO 16283-3 Clause 7.3.4
+  print the same procedure, so it is implemented once, and the four places the
+  parts genuinely differ are kept apart rather than flattened: which rooms it
+  applies to, which methods may use it (Part 3 Clause 6 confines it to the
+  loudspeaker methods), whether the energy mean over source positions is a
+  numbered formula, and which quantities the 63 Hz octave time feeds.
+
+  A room that triggers the procedure but is measured without it now warns
+  instead of answering silently. It warns rather than refuses because the
+  default-procedure spectrum is what the ISO 16283 one is compared against: the
+  standard says the measurement shall include the corners, not that a
+  calculator must refuse arithmetic. On the guide's 23 m3 bedroom the silence
+  was worth 3.9, 4.2 and 3.6 dB and moved C_50-3150 from -1 to -2, so it
+  changed the rating.
+
 - `verify_weighting_class(wf, edition="1979")` grades a frequency weighting
   against IEC 651:1979 Table V, which publishes the laboratory-grade **Type 0**
   mask that IEC 61672-1:2013 has no equivalent for, plus Types 1, 2 and 3. The

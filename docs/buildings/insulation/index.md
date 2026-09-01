@@ -34,6 +34,12 @@ and the two material measurements a floor design consumes.
 [Field Insulation Measurement (ISO 16283)](insulation-field.md)
 covers the engineering-grade airborne and impact measurement in the building,
 its Clause 14 test report and the ISO 12999-1 uncertainty that qualifies it.
+Below 25 m³, to the nearest cubic metre, the same standard makes a second,
+corner-based measurement
+mandatory in the three lowest bands, and
+[Small Rooms: the ISO 16283 Low-Frequency Procedure](low-frequency-procedure.md)
+is that procedure in full, shared by all three parts (Part 3 confines it to
+its loudspeaker methods; the road-traffic method keeps the default procedure).
 The same standard specifies two more impact sources, a rubber ball and a bang
 machine, for the slow low-frequency thumps a tapping machine says nothing
 about;
@@ -68,6 +74,10 @@ related EN 12354-5, lives in
 - [Field Insulation Measurement (ISO 16283)](insulation-field.md):
   ISO 16283-1/2 field measurement, its test report and the ISO 12999-1
   uncertainty.
+- [Small Rooms: the ISO 16283 Low-Frequency Procedure](low-frequency-procedure.md):
+  the 25 m³ trigger, the corner level of Formula (12), the Formula (13)
+  combination and the 63 Hz octave reverberation time of Clause 10.4
+  (Clause 8.4 in Part 3).
 - [Laboratory Insulation Measurement](insulation-lab.md):
   the ISO 10140 characterisation of an element with flanking suppressed.
 - [Sound Insulation by Intensity (ISO 15186)](insulation-intensity.md):
@@ -101,9 +111,10 @@ and energy-average them for you; the heavy-impact standardization, the
 flanking indices, the ISO 717 ratings and the background-noise helpers take
 their per-band input already formed. Either way, nothing verifies how the
 measurement was made: not the number and placement of the source and
-microphone positions behind those spectra, not the low-frequency procedures
-of ISO 16283-1/-2, and not the test-facility and mounting requirements of
-ISO 10140-1. Those are the operator's responsibility and the report's, and
+microphone positions behind those spectra, not the corner positions the
+ISO 16283 low-frequency procedure is fed from, and not the test-facility and
+mounting requirements of ISO 10140-1. Those are the operator's
+responsibility and the report's, and
 they are what makes the numbers here mean something. Background noise is the
 one correction genuinely left to the caller: field levels must arrive already
 corrected, their 6 dB signal-to-background floor checked by the operator,

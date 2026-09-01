@@ -413,6 +413,17 @@ todas las reducciones conservan un decimal: la variante que ISO 717 prescribe
 «para la expresión de la incertidumbre» y que el Anexo B de ISO 12999-1 exige
 al declarar la incertidumbre de un valor único.
 
+De dónde salen esas bandas extra importa tanto como lo que el término hace con
+ellas. En un recinto cuyo volumen, al metro cúbico más próximo, esté por debajo
+de 25 m³, ISO 16283 no permite medir las bandas de 50 Hz, 63 Hz y 80 Hz solo
+con el procedimiento por defecto: allí el procedimiento en esquinas es
+obligatorio, y puede mover esas tres bandas varios decibelios, lo bastante
+para poder mover
+$C_{50\text{–}3150}$ un decibelio entero. Así que una exigencia escrita como
+$D_\mathrm{nT,w} + C_{50\text{–}3150}$ se juzga con el procedimiento en
+esquinas lo mencione o no el informe. Véase
+[Recintos pequeños: procedimiento de baja frecuencia](/phonometry/es/buildings/insulation/low-frequency-procedure/).
+
 ```python
 from phonometry import building
 

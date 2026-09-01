@@ -53,6 +53,7 @@ if TYPE_CHECKING:
         ImpactRatingResult,
         WeightedRatingResult,
     )
+    from ..building.measurement.low_frequency import LowFrequencyResult
     from ..building.measurement.structure_borne_power import StructureBornePowerResult
     from ..building.measurement.uncertainty import BandUncertainty
     from ..building.prediction.aperture_transmission import ApertureTransmissionResult
@@ -114,6 +115,11 @@ _IMPACT_LEVEL_LABEL = "Impact sound pressure level [dB]"
 #: reduction indices on the same axis.
 _LEVEL_DIFFERENCE_LABEL = "Level difference / reduction index [dB]"
 
+#: Y-axis label and title of the ISO 16283 low-frequency figure, which plots
+#: room levels rather than a difference between two of them.
+_SPL_LABEL = "Sound pressure level [dB]"
+_LOW_FREQUENCY_TITLE = "Low-frequency procedure (ISO 16283)"
+
 #: Shared y-axis label of the path-contribution figures (the simplified
 #: single-number bars and the two detailed per-band ones).
 _SHARE_LABEL = "Share of transmitted energy [%]"
@@ -143,6 +149,8 @@ _STRINGS: dict[str, str] = {
     "impact rating": "índice de impacto",
     _IMPACT_LEVEL_LABEL: "Nivel de presión acústica de impactos [dB]",
     _LEVEL_DIFFERENCE_LABEL: "Diferencia de nivel / índice de reducción [dB]",
+    _SPL_LABEL: "Nivel de presión acústica [dB]",
+    _LOW_FREQUENCY_TITLE: "Procedimiento de baja frecuencia (ISO 16283)",
     "Façade sound insulation (ISO 16283-3)": "Aislamiento acústico de fachada (ISO 16283-3)",
     "Reduction index / level difference [dB]": "Índice de reducción / diferencia de nivel [dB]",
     "Façade insulation prediction (EN 12354-3)": "Predicción del aislamiento de fachada (EN 12354-3)",
@@ -1341,6 +1349,52 @@ def plot_impact_insulation(
         language=language,
         **kwargs,
     )
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_low_frequency_procedure(
+    result: LowFrequencyResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    r"""The three low-frequency bands of ISO 16283, default against corner.
+
+    Draws the combined low-frequency level :math:`L_\mathrm{LF}` first (the
+    reported quantity), then the two levels it was built from: the
+    default-procedure level ``L`` and the corner level
+    :math:`L_\mathrm{Corner}`. Only the 50 Hz, 63 Hz and 80 Hz bands are
+    drawn, because they are the only ones the procedure touches.
+
+    :param result: A
+        :class:`~phonometry.building.measurement.low_frequency.LowFrequencyResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the primary :math:`L_\mathrm{LF}` curve.
+    :return: The axes.
+    """
+    from .._i18n import localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    bands = np.asarray(result.low_frequency_bands, dtype=np.float64)
+    x = _facade_x_axis(ax, bands, bands.size, language=language)
+    curves = (
+        (r"$L_\mathrm{LF}$", np.asarray(result.l_lf, dtype=np.float64)),
+        (r"$L$", np.asarray(result.l_default, dtype=np.float64)),
+        (r"$L_\mathrm{Corner}$", np.asarray(result.l_corner, dtype=np.float64)),
+    )
+    # User kwargs style the reported L_LF curve only, the way every other
+    # building renderer forwards them to its primary curve.
+    for index, (label, y) in enumerate(curves):
+        opts: dict[str, Any] = {"label": label}
+        if index == 0:
+            opts.update(kwargs)
+        ax.plot(x, y, "o-", **opts)
+    ax.set_ylabel(_t(_SPL_LABEL, language))
+    ax.set_title(_t(_LOW_FREQUENCY_TITLE, language))
+    ax.legend(loc="best", fontsize="small")
+    ax.grid(True, alpha=0.3)
     localize_axes(ax, language)
     return ax
 

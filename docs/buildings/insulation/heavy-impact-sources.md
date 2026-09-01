@@ -204,9 +204,13 @@ ISO 717-2:2020 Annex D with the Table D.3 corrections, via
 `building.a_weighted_maximum_impact_level`.
 
 **Not covered.** The field measurement procedure itself (the four or more
-drop positions of ISO 10140-3 Annex A, the microphone positions and the
-low-frequency corner procedure) is not automated: the functions consume levels
-that were already energy-averaged over positions. There is no prediction model
+drop positions of ISO 10140-3 Annex A and the microphone positions) is not
+automated: the functions consume levels that were already energy-averaged over
+positions. The ISO 16283-2 low-frequency corner procedure covers the
+tapping machine alone, which is what its Clause 8 heading says and what
+NOTE 2 to Clause 6 explains; the 63 Hz octave reverberation time of Clause 10.4
+does reach $L'_{\mathrm{i,Fmax},V,T}$, and arrives here as the band values the
+caller supplies. There is no prediction model
 that takes a floor construction to a heavy-impact level; Hopkins states
 plainly that the complexity of the input force and the use of a
 time-weighted maximum leave no simple counterpart to the tapping-machine

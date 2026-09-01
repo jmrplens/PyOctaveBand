@@ -242,6 +242,29 @@ def test_nonpositive_area_volume_raises() -> None:
         )
 
 
+def test_infinite_area_raises() -> None:
+    """Infinity passes the positivity gate and is refused by name."""
+    outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
+    surface = _flat(3, 72.0)
+    with pytest.raises(ValueError, match="'area' must be finite"):
+        building.facade_insulation(
+            outdoor,
+            indoor,
+            rt,
+            area=float("inf"),
+            volume=50.0,
+            surface_level=surface,
+        )
+
+
+def test_area_without_surface_level_raises() -> None:
+    # area + volume but no surface_level: R' cannot be formed, so raise a
+    # clear error naming 'surface_level' as the missing input.
+    outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
+    with pytest.raises(ValueError, match=r"'area' requires 'surface_level' to compute"):
+        building.facade_insulation(outdoor, indoor, rt, area=10.0, volume=50.0)
+
+
 def test_surface_and_area_without_volume_raises() -> None:
     # surface_level + area but no volume: R' would silently be None, so raise
     # a clear error naming 'volume' as the missing input.
@@ -330,21 +353,26 @@ def test_nonfinite_raises() -> None:
 
 
 def test_frequencies_length_mismatch_raises() -> None:
-    # 'frequencies' shorter than the band count must fail clearly here rather
-    # than deferring a confusing matplotlib shape error to plot().
+    # 'frequencies' shorter than the band count must fail clearly on entry
+    # rather than deferring a confusing matplotlib shape error to plot(), or
+    # letting the low-frequency warning read columns the data does not have.
     outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
-    with pytest.raises(ValueError, match=r"'frequencies'.*same shape"):
+    with pytest.raises(
+        ValueError, match=r"'frequencies' must carry one band centre per"
+    ):
         building.facade_insulation(outdoor, indoor, rt, frequencies=[125.0, 250.0])
 
 
 def test_frequencies_with_an_extra_axis_raises() -> None:
     """A `frequencies` of the right count but the wrong shape is named.
 
-    The counts agree here, so the old count-by-count message read "got 3 for
-    3 bands"; the shapes are what disagree, and they are what is reported.
+    The counts agree here, so a count-by-count message would read "got 3 for
+    3 bands"; the refusal reports the shape instead.
     """
     outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
-    with pytest.raises(ValueError, match=r"'frequencies'.*same shape"):
+    with pytest.raises(
+        ValueError, match=r"'frequencies' must carry one band centre per"
+    ):
         building.facade_insulation(
             outdoor, indoor, rt, frequencies=np.full((1, 3), 125.0)
         )

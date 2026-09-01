@@ -386,6 +386,33 @@ def test_airborne_requires_both_area_and_volume() -> None:
         building.airborne_insulation(l1, l2, t2, area=10.0)
 
 
+@pytest.mark.parametrize("name", ["area", "volume"])
+@pytest.mark.parametrize("bad", [0.0, -1.0, float("nan")])
+def test_airborne_rejects_a_geometry_that_is_not_positive(
+    name: str, bad: float
+) -> None:
+    """Zero, negative and NaN all fail the same positivity gate.
+
+    NaN answers False to ``> 0`` just as zero does, so the ``not x > 0``
+    spelling catches all three without a separate finiteness question.
+    """
+    geometry = {"area": 10.0, "volume": 50.0, name: bad}
+    with pytest.raises(ValueError, match="'area' and 'volume' must be positive"):
+        building.airborne_insulation(
+            np.array([80.0]), np.array([40.0]), np.array([0.5]), **geometry
+        )
+
+
+@pytest.mark.parametrize("name", ["area", "volume"])
+def test_airborne_rejects_an_infinite_geometry(name: str) -> None:
+    """Infinity passes the positivity gate and is refused by name."""
+    geometry = {"area": 10.0, "volume": 50.0, name: float("inf")}
+    with pytest.raises(ValueError, match="'area' and 'volume' must be finite"):
+        building.airborne_insulation(
+            np.array([80.0]), np.array([40.0]), np.array([0.5]), **geometry
+        )
+
+
 def test_field_rating_pipeline_dnt_w() -> None:
     """DnT per band (T = 0,5 s) fed to weighted_rating gives DnT,w."""
     l2 = np.array([float(80 - r) for r in _REF_THIRD])  # D = ref

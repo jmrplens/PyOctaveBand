@@ -111,6 +111,7 @@ predicted.
 **[Sound insulation](buildings/insulation/index.md)**
 
 - [Field Insulation Measurement (ISO 16283)](buildings/insulation/insulation-field.md): field airborne and impact insulation (ISO 16283-1/2), the Clause 14 test report and the measurement uncertainty that qualifies it (ISO 12999-1)
+- [Small Rooms: the ISO 16283 Low-Frequency Procedure](buildings/insulation/low-frequency-procedure.md): the corner procedure ISO 16283-1/-2/-3 make mandatory below 25 m³: the 25 m³ trigger with its rounding, the corner level of Formula (12), the Formula (13) combination and the 63 Hz octave reverberation time of Clause 10.4
 - [Laboratory Insulation Measurement](buildings/insulation/insulation-lab.md): the ISO 10140 laboratory sound reduction index and normalized impact level, measured with flanking suppressed, with the background-noise correction and the accredited test fiches
 - [Sound Insulation by Intensity (ISO 15186)](buildings/insulation/insulation-intensity.md): the ISO 15186-1/-2 sound reduction index from the intensity scanned over the radiating face, for the whole element or element by element
 - [Sound Insulation Survey Method (ISO 10052)](buildings/insulation/insulation-survey.md): the ISO 10052 octave-band control method: the reverberation index and its room-class estimate, the airborne, impact, façade and service-equipment quantities and their survey reports

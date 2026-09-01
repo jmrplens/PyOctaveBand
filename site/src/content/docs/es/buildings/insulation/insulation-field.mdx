@@ -300,7 +300,7 @@ print(round(float(naive.dnt[0]), 1), building.weighted_rating(naive.dnt).rating)
 Este es fácil de pasar por alto y es **obligatorio**. Cuando el recinto emisor
 o el receptor, o los dos, tiene un volumen menor que 25 m³, calculado al metro
 cúbico más próximo, de modo que un dormitorio de 25,4 m³ no lo activa y uno de
-24,6 m³ sí, las bandas de tercio de octava de 50 Hz, 63 Hz y 80 Hz deben
+24,4 m³ sí, las bandas de tercio de octava de 50 Hz, 63 Hz y 80 Hz deben
 medirse además en las esquinas de ese recinto (apartados 6 y 8.1). La mayoría
 de los dormitorios europeos y todos los baños quedan por debajo del umbral, así
 que este es el caso normal cuando se trabaja en vivienda, no un caso límite. Va
@@ -312,19 +312,6 @@ recinto pequeño es modal, la variación espacial es grande, y el promedio de la
 zona central no es ni repetible ni representativo de lo que oye un ocupante. Un
 máximo de presión modal siempre queda en una esquina, así que las mediciones en
 esquina acotan el campo por arriba.
-
-**Cómo se toma una medición en esquina (apartados 8.3 y 8.4).** Un micrófono
-fijo, de 0,3 m a 0,4 m de *cada* uno de los tres paramentos que forman la
-esquina (las tres distancias no tienen por qué ser iguales), a 1,0 m como
-mínimo de cualquier altavoz, lo que en la práctica descarta la esquina que
-ocupa el altavoz. Mide al menos **cuatro** esquinas, dos a nivel de suelo y dos
-a nivel de techo, contiguas o no al elemento separador; cada esquina debe estar
-formada por tres superficies mutuamente perpendiculares de 0,5 m² como mínimo,
-sin mobiliario a menos de 0,5 m. Cuando eso sea imposible, se admiten esquinas
-con ángulos entre pares de superficies de 45° a 135°, o con un objeto, por
-ejemplo un armario, formando una de las superficies. Promedia al menos 15 s por
-posición. Con un único altavoz desplazado entre posiciones, repite las cuatro
-esquinas en cada posición.
 
 **Cómo entran las esquinas en el resultado (apartado 8.5).** Para cada una de
 las tres bandas por separado, toma la **más alta** de las esquinas medidas, que
@@ -338,14 +325,11 @@ L_\mathrm{LF} = 10\log_{10}\left[\frac{10^{0,1 L_\text{Corner}} + 2 \cdot 10^{0,
 $$
 
 $L_\mathrm{LF}$ sustituye a $L$ en esas tres bandas, y $D_\mathrm{nT}$ o $R'$ se forman
-después exactamente igual que antes. Como $L_\text{Corner}$ puede superar a $L$
-en varios decibelios, el procedimiento sube por igual el nivel del recinto
-emisor y el del receptor: el efecto sobre la *diferencia* de niveles es lo que
-los dos recintos no tienen en común, que es justo la información que tira el
-procedimiento por defecto. El apartado 9.1 añade la consecuencia para el ruido
-de fondo: hace falta una medición de fondo **en cada esquina utilizada**,
-porque cada banda puede venir de una esquina distinta y necesitar por tanto su
-propia corrección.
+después exactamente igual que antes. Con el disparador del propio recinto
+receptor, el apartado 10.4
+deja además de medir los tiempos de reverberación de tercio de octava de
+50 Hz, 63 Hz y 80 Hz y pone en su lugar un único valor de la banda de **octava
+de 63 Hz**.
 
 ```python
 # `np` y `building` son los imports de los bloques de arriba.
@@ -360,13 +344,36 @@ corners = np.array([                      # filas: esquinas, columnas: las 3 ban
 ])
 l_default = np.array([49.5, 51.2, 48.6])
 
-l_corner = corners.max(axis=0)            # apartado 8.5: la esquina más alta, por banda
+# Apartado 8.5: la esquina más alta, banda a banda (Fórmula (12) con q = 1).
+l_corner = building.corner_level(corners)
 print(l_corner)                           # [54.6 56.9 52.7]  (tres esquinas distintas)
 
-l_lf = 10 * np.log10((10 ** (0.1 * l_corner) + 2 * 10 ** (0.1 * l_default)) / 3)
+l_lf = building.low_frequency_level(l_default, l_corner)   # Fórmula (13)
 print(np.round(l_lf, 1))                  # [51.9 54.  50.4]
 print(np.round(l_lf - l_default, 1))      # [2.4 2.8 1.8]  dB por encima del valor por defecto
+
+print(building.low_frequency_procedure_applies(22.0))   # True
+print(building.low_frequency_procedure_applies(25.4))   # False, redondea a 25
 ```
+
+En una medición completa las dos mitades viajan juntas en un
+`LowFrequencyProcedure`, que `airborne_insulation()` aplica por ti al vector de
+bandas, y que `impact_insulation()` y `facade_insulation()` reciben bajo el
+argumento `low_frequency=`.
+
+Avisan cuando se te olvida, allí donde el procedimiento está permitido: aéreo,
+de impactos y los métodos de fachada con altavoz. Una fachada de tráfico
+rodado no dice nada, porque el apartado 6 de ISO 16283-3 le da el
+procedimiento por defecto y ninguno más, así que no hay nada que se haya
+podido olvidar. Un `volume` que redondea por debajo de 25 m³ junto a un vector
+`frequencies` que nombra cualquiera de las tres bandas le dice a la función que el apartado
+8.1 (el 7.3.1 para la fachada con altavoz) está en vigor, y sin
+procedimiento que ejecutar lo dice con un
+`LowFrequencyWarning` en lugar de devolver un número que no es el de
+ISO 16283. La geometría de las esquinas, los requisitos de
+muestreo, las diferencias entre las tres partes y una medición resuelta con su
+valoración están en una guía propia:
+[Recintos pequeños: procedimiento de baja frecuencia](/phonometry/es/buildings/insulation/low-frequency-procedure/).
 
 ## Aislamiento a ruido de impactos en campo (ISO 16283-2)
 
@@ -749,15 +756,17 @@ dB; la corrección en sí son tres líneas de NumPy, escritas en [Corrección po
 ruido de fondo](#correccion-por-ruido-de-fondo) más arriba.
 (`building.background_correction` es la variante de *laboratorio* de ISO
 10140-4 y no coincide con los umbrales de campo.) Los propios requisitos de
-posición y procedimiento de la ISO 16283-1/-2 (los recuentos, las distancias y
-el promediado de [La medición](#la-medicion-iso-16283-1) y las mediciones en
-esquina de [Recintos pequeños](#recintos-pequenos-apartado-8)) están
-documentados aquí y no se comprueban en ninguna parte: el promediado en
-energía ocurre una vez que se proporcionan las posiciones, pero nada verifica
-cuántas se tomaron, dónde, ni que se haya llegado a comprobar el umbral de los
-25 m³. La combinación de las Fórmulas (12) y (13) del procedimiento de baja
-frecuencia son las dos líneas de NumPy impresas más arriba, no una función de
-la biblioteca. Los demás miembros de la familia están cubiertos por sus
+posición de la ISO 16283-1/-2 (los recuentos, las distancias y la colocación de
+[La medición](#la-medicion-iso-16283-1)) están documentados aquí y no se
+comprueban en ninguna parte: el promediado en energía ocurre una vez que se
+proporcionan las posiciones, pero nada verifica cuántas se tomaron ni dónde. El
+procedimiento de baja frecuencia de [Recintos
+pequeños](/phonometry/es/buildings/insulation/low-frequency-procedure/) *sí* está implementado (el disparador
+de los 25 m³, la Fórmula (12), la Fórmula (13) y el tiempo de reverberación de
+la octava de 63 Hz del apartado 10.4), pero también recibe niveles de esquina
+que midió el operador, y el único requisito de muestreo que exige es un aviso
+por debajo de las cuatro esquinas por posición de fuente que pide el apartado
+8.3. Los demás miembros de la familia están cubiertos por sus
 propias guías: la parte de fachada ISO 16283-3 ([Aislamiento acústico de
 fachadas](/phonometry/es/buildings/insulation/facade-insulation/)), el método
 de control ISO 10052 ([Método de control del

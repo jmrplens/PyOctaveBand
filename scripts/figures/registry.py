@@ -65,6 +65,7 @@ from .building import (
     generate_intensity_insulation,
     generate_lab_insulation_result,
     generate_lab_versus_field_insulation,
+    generate_low_frequency_procedure,
     generate_radiated_power_outdoor,
     generate_survey_impact_insulation,
     generate_survey_insulation,
@@ -1045,6 +1046,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # the wave-approach junction Kij and the ISO 7626 mobility lines.
     generate_extended_insulation_rating,
     generate_field_airborne_insulation,
+    generate_low_frequency_procedure,
     generate_facade_field_insulation,
     generate_survey_impact_insulation,
     generate_lab_insulation_result,

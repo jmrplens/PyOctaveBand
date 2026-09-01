@@ -3,13 +3,13 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 572,
-    "passing": 572,
+    "checks": 581,
+    "passing": 581,
     "failing": 0,
     "domains": 59,
-    "standards": 373,
-    "citations": 515,
-    "designations": 114,
+    "standards": 374,
+    "citations": 521,
+    "designations": 115,
     "sources": 84
   },
   "units": [
@@ -55,6 +55,7 @@
     "modes/Hz",
     "ms",
     "m²",
+    "m³",
     "m·Hz",
     "nm",
     "ohm",
@@ -84,8 +85,8 @@
     {
       "id": "room-building-acoustics",
       "title": "Room & building acoustics",
-      "checks": 72,
-      "passing": 72
+      "checks": 81,
+      "passing": 81
     },
     {
       "id": "room-acoustics",
@@ -3292,6 +3293,288 @@
         "value": 0.0
       },
       "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-16283-1-2014-clause-8-1-2-2020-clause-8-1-3-2016-clause-7-3-1/low-frequency-trigger-v-25-m-to-the-nearest-cubic-metre",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 16283-1",
+        "edition": "2014",
+        "clause": "Clause 8.1 / -2:2020 Clause 8.1 / -3:2016 Clause 7.3.1",
+        "cite": "ISO 16283-1:2014 Clause 8.1 / -2:2020 Clause 8.1 / -3:2016 Clause 7.3.1"
+      },
+      "quantity": "Low-frequency trigger: V < 25 m³ to the nearest cubic metre",
+      "kind": "count",
+      "expected": {
+        "value": 7.0,
+        "label": "7/7 room volumes on either side of 25 m³"
+      },
+      "computed": {
+        "value": 7.0,
+        "label": "7/7 room volumes on either side of 25 m³"
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-16283-1-2014-clause-5-2-2020-clause-5-1-3-2016-clause-5/low-frequency-band-set-is-50-hz-63-hz-and-80-hz",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 16283-1",
+        "edition": "2014",
+        "clause": "Clause 5 / -2:2020 Clause 5.1 / -3:2016 Clause 5",
+        "cite": "ISO 16283-1:2014 Clause 5 / -2:2020 Clause 5.1 / -3:2016 Clause 5"
+      },
+      "quantity": "Low-frequency band set is 50 Hz, 63 Hz and 80 Hz",
+      "kind": "record",
+      "expected": {
+        "label": "band 1 = 50 Hz; band 2 = 63 Hz; band 3 = 80 Hz",
+        "record": {
+          "band 1": 50.0,
+          "band 2": 63.0,
+          "band 3": 80.0
+        }
+      },
+      "computed": {
+        "label": "band 1 = 50 Hz; band 2 = 63 Hz; band 3 = 80 Hz",
+        "record": {
+          "band 1": 50.0,
+          "band 2": 63.0,
+          "band 3": 80.0
+        }
+      },
+      "unit": "Hz",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-16283-1-2014-formula-12-2-2020-formula-15/corner-level-is-the-highest-corner-per-band-energy-averaged-over-q",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 16283-1",
+        "edition": "2014",
+        "clause": "Formula (12) / -2:2020 Formula (15)",
+        "cite": "ISO 16283-1:2014 Formula (12) / -2:2020 Formula (15)"
+      },
+      "quantity": "Corner level is the highest corner per band, energy-averaged over q",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "Formula (12) over q = 2 positions (closed form)"
+      },
+      "computed": {
+        "value": 1.42e-14,
+        "label": "max deviation 0.000000000 dB"
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 1.42e-14
+      },
+      "precision": 9,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-16283-1-2014-formula-13-2-2020-16-3-2016-5/l-lf-combines-the-corner-and-default-levels-one-third-to-two-thirds",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 16283-1",
+        "edition": "2014",
+        "clause": "Formula (13) / -2:2020 (16) / -3:2016 (5)",
+        "cite": "ISO 16283-1:2014 Formula (13) / -2:2020 (16) / -3:2016 (5)"
+      },
+      "quantity": "L_LF combines the corner and default levels one third to two thirds",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "the printed Formula (13) (closed form)"
+      },
+      "computed": {
+        "value": 0.0,
+        "label": "max deviation 0.000000000 dB"
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 9,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-16283-1-2014-formula-13-2-2020-16-3-2016-5/l-lf-degenerates-to-l-when-the-corner-level-equals-it",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 16283-1",
+        "edition": "2014",
+        "clause": "Formula (13) / -2:2020 (16) / -3:2016 (5)",
+        "cite": "ISO 16283-1:2014 Formula (13) / -2:2020 (16) / -3:2016 (5)"
+      },
+      "quantity": "L_LF degenerates to L when the corner level equals it",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "L_LF = L for L_Corner = L (closed form)"
+      },
+      "computed": {
+        "value": 0.0,
+        "label": "max deviation 0.000000000000 dB"
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 12,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-16283-1-2014-formula-13-2-2020-16-3-2016-5/l-lf-floor-at-10-lg-2-3-below-l-as-the-corners-fall-silent",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 16283-1",
+        "edition": "2014",
+        "clause": "Formula (13) / -2:2020 (16) / -3:2016 (5)",
+        "cite": "ISO 16283-1:2014 Formula (13) / -2:2020 (16) / -3:2016 (5)"
+      },
+      "quantity": "L_LF floor at 10 lg(2/3) below L as the corners fall silent",
+      "kind": "scalar",
+      "expected": {
+        "value": 48.23908740944319,
+        "label": "48.239087 dB (+/-1e-09 dB, closed form)"
+      },
+      "computed": {
+        "value": 48.239087
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-16283-1-2014-formula-13-2-2020-16-3-2016-5/l-lf-rises-strictly-with-the-corner-level-over-80-db-of-it",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 16283-1",
+        "edition": "2014",
+        "clause": "Formula (13) / -2:2020 (16) / -3:2016 (5)",
+        "cite": "ISO 16283-1:2014 Formula (13) / -2:2020 (16) / -3:2016 (5)"
+      },
+      "quantity": "L_LF rises strictly with the corner level, over 80 dB of it",
+      "kind": "count",
+      "expected": {
+        "value": 400.0,
+        "label": "400/400 steps rising with the corner level (closed form)"
+      },
+      "computed": {
+        "value": 400.0,
+        "label": "400/400 steps rising with the corner level"
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-16283-1-2014-clause-10-4-2-2020-clause-10-4-3-2016-clause-8-4/63-hz-octave-t-replaces-exactly-the-50-hz-63-hz-and-80-hz-bands",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 16283-1",
+        "edition": "2014",
+        "clause": "Clause 10.4 / -2:2020 Clause 10.4 / -3:2016 Clause 8.4",
+        "cite": "ISO 16283-1:2014 Clause 10.4 / -2:2020 Clause 10.4 / -3:2016 Clause 8.4"
+      },
+      "quantity": "63 Hz octave T replaces exactly the 50 Hz, 63 Hz and 80 Hz bands",
+      "kind": "count",
+      "expected": {
+        "value": 5.0,
+        "label": "5/5 reverberation-time bands"
+      },
+      "computed": {
+        "value": 5.0,
+        "label": "5/5 reverberation-time bands"
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-16283-1-2014-13-2-2020-16-3-2016-5/airborne-impact-and-facade-run-one-low-frequency-implementation",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 16283-1",
+        "edition": "2014",
+        "clause": "(13) / -2:2020 (16) / -3:2016 (5)",
+        "cite": "ISO 16283-1:2014 (13) / -2:2020 (16) / -3:2016 (5)"
+      },
+      "quantity": "Airborne, impact and facade run one low-frequency implementation",
+      "kind": "count",
+      "expected": {
+        "value": 3.0,
+        "label": "3/3 parts reaching the same L_LF"
+      },
+      "computed": {
+        "value": 3.0,
+        "label": "3/3 parts reaching the same L_LF"
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
       "verdict": "pass"
     },
     {

@@ -287,7 +287,7 @@ print(round(float(naive.dnt[0]), 1), building.weighted_rating(naive.dnt).rating)
 
 This one is easy to miss and it is **mandatory**. When the source and/or
 receiving room has a volume smaller than 25 m³ — calculated to the nearest
-cubic metre, so a 25.4 m³ bedroom does not trigger it and a 24.6 m³ one does —
+cubic metre, so a 25.4 m³ bedroom does not trigger it and a 24.4 m³ one does —
 the 50 Hz, 63 Hz and 80 Hz one-third-octave bands must additionally be measured
 in the corners of that room (Clause 6 and Clause 8.1). Most European bedrooms
 and every bathroom fall under the threshold, so this is the normal case in
@@ -301,21 +301,9 @@ average is neither repeatable nor representative of what an occupant hears. A
 modal pressure maximum always sits in a corner, so corner measurements bound
 the field from above.
 
-**How a corner measurement is taken (Clauses 8.3 and 8.4).** A fixed
-microphone, 0.3 m to 0.4 m from *each* of the three boundaries forming the
-corner (the three distances need not be equal), at least 1.0 m from any
-loudspeaker — which in practice rules out the corner the loudspeaker occupies.
-Measure at least **four** corners, two at floor level and two at ceiling level,
-adjacent to the partition or not; each corner must be formed by three mutually
-perpendicular surfaces of at least 0.5 m², with no furniture within 0.5 m. Where
-that is impossible, corners with pair angles between 45° and 135°, or with an
-object such as a cupboard forming one surface, are admitted. Average at least
-15 s per position. With a single loudspeaker moved between positions, take the
-four corners again for each position.
-
 **How the corners enter the result (Clause 8.5).** For each of the three bands
-independently, take the **highest** of the measured corners — which may be a
-different corner in each band — as $L_\text{Corner}$; with several loudspeaker
+independently, take the **highest** of the measured corners, which may be a
+different corner in each band, as $L_\text{Corner}$; with several loudspeaker
 positions, energy-average those per-position maxima (Formula (12)). Then
 combine with the default-procedure average $L$ in a 1:2 weighting
 (Formula (13)):
@@ -324,14 +312,11 @@ $$
 L_\mathrm{LF} = 10\log_{10}\left[\frac{10^{0.1 L_\text{Corner}} + 2 \cdot 10^{0.1 L}}{3}\right].
 $$
 
-$L_\mathrm{LF}$ replaces $L$ in those three bands, and $D_\mathrm{nT}$ or $R'$ is then formed
-exactly as before. Because $L_\text{Corner}$ can exceed $L$ by several
-decibels, the procedure raises the source-room level and the receiving-room
-level alike — the effect on the level *difference* is whatever the two rooms do
-not have in common, which is precisely the information the default procedure
-throws away. Clause 9.1 adds the consequence for background noise: a background
-measurement is required **in each corner used**, because each band may have
-come from a different corner and so may need its own correction.
+$L_\mathrm{LF}$ replaces $L$ in those three bands, and $D_\mathrm{nT}$ or $R'$ is then
+formed exactly as before. Under the receiving room's own trigger, Clause 10.4
+also stops the
+50 Hz, 63 Hz and 80 Hz one-third-octave reverberation times being measured and
+puts one **63 Hz octave band** value in their place.
 
 ```python
 # `np` and `building` are the imports of the blocks above.
@@ -346,13 +331,36 @@ corners = np.array([                      # rows: corners, columns: the 3 bands
 ])
 l_default = np.array([49.5, 51.2, 48.6])
 
-l_corner = corners.max(axis=0)            # Clause 8.5: the loudest corner, per band
+# Clause 8.5: the loudest corner, band by band (Formula (12) at q = 1).
+l_corner = building.corner_level(corners)
 print(l_corner)                           # [54.6 56.9 52.7]  (three different corners)
 
-l_lf = 10 * np.log10((10 ** (0.1 * l_corner) + 2 * 10 ** (0.1 * l_default)) / 3)
+l_lf = building.low_frequency_level(l_default, l_corner)   # Formula (13)
 print(np.round(l_lf, 1))                  # [51.9 54.  50.4]
 print(np.round(l_lf - l_default, 1))      # [2.4 2.8 1.8]  dB above the default
+
+print(building.low_frequency_procedure_applies(22.0))   # True
+print(building.low_frequency_procedure_applies(25.4))   # False, rounds to 25
 ```
+
+In a whole measurement the two halves travel together in a
+`LowFrequencyProcedure`, which `airborne_insulation()` applies to the band
+vector for you, and `impact_insulation()` and `facade_insulation()` take the
+same object under a `low_frequency=` keyword.
+
+They warn when you forget, everywhere the procedure is allowed: airborne,
+impact, and the loudspeaker façade methods. A road-traffic façade stays silent
+because Clause 6 of ISO 16283-3 gives it the default procedure and nothing
+else, so there is nothing to have forgotten. A `volume` that rounds below
+25 m³ beside a `frequencies` vector naming any of the three bands tells
+the function
+that Clause 8.1 (Clause 7.3.1 for the loudspeaker façade) is in force, and
+with no procedure to run it says so with a
+`LowFrequencyWarning` rather than returning a number that is not the ISO 16283
+one. The corner geometry, the
+sampling requirements, the differences between the three parts and a worked
+measurement with its rating are all in a guide of their own:
+[Small Rooms: the ISO 16283 Low-Frequency Procedure](/phonometry/buildings/insulation/low-frequency-procedure/).
 
 ## Field impact insulation (ISO 16283-2)
 
@@ -719,16 +727,17 @@ operator's job, and nothing here verifies that the 6 dB floor was met; the
 correction itself is three lines of NumPy, written out under [Correcting for
 background noise](#correcting-for-background-noise-clause-92) above.
 (`building.background_correction` is the ISO 10140-4 *laboratory* variant and
-does not match the field thresholds.) ISO 16283-1/-2's own position and
-procedure requirements — the counts, distances and averaging of [Taking the
-measurement](#taking-the-measurement-iso-16283-1-clauses-7-and-9) and the
-corner measurements of [Small
-rooms](#small-rooms-the-low-frequency-procedure-clause-8) — are documented
-here and checked nowhere: energy-averaging happens once positions are
-supplied, but nothing verifies how many were taken, where, or that the 25 m³
-trigger was even tested for. The Formula (12) and (13) combination of the
-low-frequency procedure is the two lines of NumPy printed above, not a library
-function. The other members of the family are covered by their own guides: the
+does not match the field thresholds.) ISO 16283-1/-2's own position
+requirements — the counts, distances and placements of [Taking the
+measurement](#taking-the-measurement-iso-16283-1-clauses-7-and-9) — are
+documented here and checked nowhere: energy-averaging happens once positions
+are supplied, but nothing verifies how many were taken or where. The
+low-frequency procedure of [Small
+rooms](/phonometry/buildings/insulation/low-frequency-procedure/) *is* implemented —
+the 25 m³ trigger, Formula (12), Formula (13) and the 63 Hz octave
+reverberation time of Clause 10.4 — but it too is fed corner levels the
+operator measured, and the only sampling requirement it enforces is a warning
+below the four corners per source position Clause 8.3 asks for. The other members of the family are covered by their own guides: the
 façade part ISO 16283-3 ([Façade Sound
 Insulation](/phonometry/buildings/insulation/facade-insulation/)), the survey
 method ISO 10052 ([Sound Insulation Survey

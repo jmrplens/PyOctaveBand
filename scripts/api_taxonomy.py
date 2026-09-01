@@ -167,6 +167,7 @@ _SECTION_LIST: tuple[Section, ...] = (
         label_es="Acústica de la edificación",
         modules=(
             "phonometry.building.measurement.insulation",
+            "phonometry.building.measurement.low_frequency",
             "phonometry.building.measurement.ratings",
             "phonometry.building.prediction.panel_transmission",
             "phonometry.building.prediction.masonry_cavity_wall",

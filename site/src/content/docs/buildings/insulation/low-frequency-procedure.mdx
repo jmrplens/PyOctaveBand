@@ -1,0 +1,643 @@
+---
+title: "Small Rooms: the ISO 16283 Low-Frequency Procedure"
+description: "The corner procedure ISO 16283 makes mandatory below 25 m³: the Formula (12) corner level, the Formula (13) combination, the 63 Hz octave reverberation time of Clause 10.4, and the one implementation airborne, impact and façade all reach."
+references:
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2014
+    title: "Acoustics — Field measurement of sound insulation in buildings and of building elements — Part 1: Airborne sound insulation"
+    designation: "ISO 16283-1:2014"
+    url: "https://www.iso.org/standard/55997.html"
+    note: "Clause 8 (the corner procedure, Formulae (12) and (13)) and Clause 10.4 (the 63 Hz octave reverberation time). The only part whose corner procedure admits the source room as well as the receiving one."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2020
+    title: "Acoustics — Field measurement of sound insulation in buildings and of building elements — Part 2: Impact sound insulation"
+    designation: "ISO 16283-2:2020"
+    url: "https://www.iso.org/standard/74162.html"
+    note: "Clause 8, whose heading confines the procedure to the tapping machine, with Formulae (15) and (16); Clause 10.4 repeats the reverberation-time substitution. Two defects of this print are in the errata registry."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2016
+    title: "Acoustics — Field measurement of sound insulation in buildings and of building elements — Part 3: Façade sound insulation"
+    designation: "ISO 16283-3:2016"
+    url: "https://www.iso.org/standard/55998.html"
+    note: "Clause 7.3, which numbers no corner formula and defines the corner level in prose, with Formula (5) for the combination; Clause 6 restricts the whole procedure to the loudspeaker methods and Clause 8.4 carries the reverberation-time substitution."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2020
+    title: "Acoustics — Rating of sound insulation in buildings and of building elements — Part 1: Airborne sound insulation"
+    designation: "ISO 717-1:2020"
+    url: "https://www.iso.org/standard/77435.html"
+    note: "Annex B, whose enlarged-range adaptation term C50-3150 is the single number these three bands feed. The core rating over 100 Hz to 3150 Hz never sees them."
+  - type: book
+    authors: ["Hopkins, C."]
+    year: 2007
+    title: "Sound insulation"
+    publisher: "Butterworth-Heinemann"
+    doi: "10.4324/9780080550473"
+    note: "The modal behaviour of small rooms below 100 Hz that the corner procedure exists to sample, and the statistics of rooms behind every field quantity here. ISBN 978-0-7506-6526-1."
+---
+
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
+
+Below 100 Hz a bedroom-sized room has too few modes for microphones in its
+central zone to stand for the whole volume, so ISO 16283 adds a second
+measurement in the room corners and combines the two. It is **not optional**.
+ISO 16283-1 Clause 8.1, ISO 16283-2 Clause 8.1 and ISO 16283-3 Clause 7.3.1
+all say the procedure *shall* be used for the 50 Hz, 63 Hz and 80 Hz
+one-third-octave bands once the room volume, calculated to the nearest cubic
+metre, is smaller than 25 m³. Most bedrooms and every bathroom are under that
+line, which is the case a field engineer opens this library for.
+
+This page is the whole of it: the trigger, the corner level, the combination,
+the reverberation time that changes with them, and the differences between the
+three parts that are real. The two-room measurement it sits inside is
+[Field Insulation Measurement (ISO 16283)](/phonometry/buildings/insulation/insulation-field/), the envelope
+version is [Façade Sound Insulation](/phonometry/buildings/insulation/facade-insulation/), and the
+single-number ratings these bands feed are in
+[Insulation Ratings (ISO 717)](/phonometry/buildings/insulation/insulation-ratings/).
+
+## When it applies: the 25 m³ trigger
+
+The condition is printed identically in all three parts, and it is worth
+reading one word at a time: the volume, "calculated to the nearest cubic
+metre", must be "smaller than 25 m³". Two decisions follow from those words
+and the library makes both of them explicit.
+
+**The comparison is strict.** A room of exactly 25 m³ takes the default
+procedure. ISO 16283-1 Clause 10.3 and ISO 16283-3 Clause 8.3 confirm it from
+the other side: they give the full 50 Hz to 5000 Hz default range to a room
+"larger than **or equal to** 25 m³". (ISO 16283-2 Clause 10.3 drops the "or
+equal to" and leaves a room of exactly 25 m³ in neither branch. That is a
+defect of the print, recorded in the
+[errata registry](/phonometry/reference/errata/); the intended reading is not
+in doubt.)
+
+**The rounding is half away from zero**, `floor(V + 0.5)`, which is how the
+rest of this library rounds a printed quantity; the standards give no tie rule
+of their own. It matters exactly on the boundary. A room of 24.5 m³ rounds to
+25 m³ and does **not** trigger, where Python's own `round`, which is
+half-to-even, would answer 24 and would. The effective threshold is therefore
+$V < 24.5$ m³.
+
+```python
+from phonometry import building
+
+print(building.LOW_FREQUENCY_VOLUME_LIMIT)              # 25.0
+print(building.LOW_FREQUENCY_BANDS)                     # (50.0, 63.0, 80.0)
+print(building.low_frequency_procedure_applies(23.3))   # True
+print(building.low_frequency_procedure_applies(24.4))   # True   (rounds to 24)
+print(building.low_frequency_procedure_applies(24.5))   # False  (rounds to 25)
+print(building.low_frequency_procedure_applies(25.0))   # False  ("smaller than")
+```
+
+Above the line the library **refuses** rather than answers: constructing a
+`LowFrequencyProcedure` with a volume of 25 m³ or more raises. No part of
+ISO 16283 says what a corner measurement means there, and answering anyway
+would silently move the reported level.
+
+### Below the line the library says so
+
+The trigger is a *shall*, so the three measurement entry points do not wait to
+be asked. When you give one of them a receiving-room `volume` that rounds below
+25 m³ and a `frequencies` vector that names any of the 50 Hz, 63 Hz and 80 Hz
+bands,
+it has been told everything it needs to know that Clause 8.1 (Clause 7.3.1
+for the Part 3 loudspeaker façade) is in force. If no
+`LowFrequencyProcedure` came with them, it computes those three bands from the
+default procedure alone, which is not the ISO 16283 quantity, and raises a
+`LowFrequencyWarning` saying so.
+
+```python
+import warnings
+
+import numpy as np
+from phonometry import building
+
+# A bathroom, 2.0 m by 1.7 m by 2.4 m, so 8 m3 to the nearest cubic metre, and
+# the optional low range of Clause 5 was measured. Nothing in the call mentions
+# the low-frequency procedure.
+freqs_lf = np.array([50.0, 63.0, 80.0, 100.0, 125.0])
+li_lf = np.array([66.9, 69.4, 67.2, 64.8, 63.1])
+t_lf = np.array([0.74, 0.69, 0.63, 0.58, 0.55])
+
+with warnings.catch_warnings(record=True) as caught:
+    warnings.simplefilter("always")
+    building.impact_insulation(li_lf, t_lf, volume=8.16, frequencies=freqs_lf)
+
+print(caught[0].category.__name__)                    # LowFrequencyWarning
+print("rounds to 8 m³" in str(caught[0].message))     # True
+```
+
+It **warns** rather than refuses, for two reasons. The corner measurements may
+genuinely not exist: a survey taken before ISO 16283, or one where the corners
+were skipped, is still worth reporting as long as the report says what it is.
+And the default-procedure spectrum is the thing a reader compares the ISO 16283
+one against, which is exactly what the figure further down this page does, so
+refusing to compute it would take away the comparison. The warning is silent
+when you did run the procedure, when no `volume` was given (there is then no
+trigger to test), when the room does not trigger, when `frequencies` was not
+given, and when the optional low range was not measured at all: the 16 core
+bands from 100 Hz to 3150 Hz are a complete ISO 16283 measurement in a room of
+any size. It is also silent for `facade_insulation(method="road_traffic")`,
+because ISO 16283-3 Clause 6 gives the traffic methods the default procedure
+and nothing else.
+
+Only the receiving room. `airborne_insulation` takes one `volume`, the
+receiving room's, so that is the room it can speak about; a source room small
+enough to trigger Clause 8.1 on its own is something you have to declare
+through `source_low_frequency`.
+
+### Which room, and which method
+
+The three parts do not all apply the procedure to the same room or to the same
+source, and those differences are enforced rather than flattened.
+
+| | Corner procedure applies to | Source it is stated for | The Clause 10.4 substitution |
+| :--- | :--- | :--- | :--- |
+| **Part 1**, airborne | the source **and/or** receiving room, "when *its* volume" is under the line | loudspeaker(s), at least two positions | receiving room only |
+| **Part 2**, impact | the receiving room | the tapping machine (its Clause 8 heading) | receiving room only |
+| **Part 3**, façade | the receiving room | the element and global **loudspeaker** methods only | receiving room only |
+
+Two consequences are easy to miss. First, Part 1 tests the two rooms
+*independently*, so an 18 m³ source room beside a 40 m³ receiving room gets the
+corner treatment on $L_1$ alone; but Clause 10.4 is a receiving-room clause in
+every part, Part 1 included, so that measurement's reverberation times stay as
+measured. (Part 1 Clause 6 does say the reverberation-time procedure applies
+"in the source and/or receiving room", contradicting its own Clause 10, which
+is headed "Reverberation time in the receiving room" and names that room again
+in 10.1, 10.3 and 10.4. ISO 16283-1 measures no source-room reverberation time
+at all, and Parts 2 and 3 print the same sentence with one room. That is a
+defect of the print, recorded in the
+[errata registry](/phonometry/reference/errata/).)
+Second, Part 3 Clause 6 says that "for the element and global road
+traffic methods, only the default procedure shall be used", and its NOTE 1
+gives the reason: "at present, there is no experience using the low-frequency
+procedure with road traffic (or air or railway traffic) as a sound source". So
+`facade_insulation(method="road_traffic", low_frequency=...)` raises.
+
+## The corner level (Clause 8)
+
+A modal pressure maximum always sits in a corner, which is what makes the
+corners the right place to look: they bound the field from above where the
+central zone cannot even bound it from the middle.
+
+With the source running, the corner sound pressure level is the **highest** of
+the measured corners, taken band by band. The NOTE under Formula (12) makes the
+"band by band" load-bearing: "for each of the 50 Hz, 63 Hz and 80 Hz bands, the
+values for $L_\mathrm{Corner}$ may be associated with different corners in the
+room". Where a single loudspeaker or tapping machine is moved between $q$
+positions, those $q$ maxima are then energy-averaged:
+
+$$
+L_\mathrm{Corner} = 10 \log_{10}
+\frac{p^2_\mathrm{Corner,1} + p^2_\mathrm{Corner,2} + \cdots +
+p^2_\mathrm{Corner,q}}{q\,p_0^2}.
+$$
+
+That is ISO 16283-1 Formula (12) and ISO 16283-2 Formula (15), written in
+mean-square pressures. ISO 16283-3 numbers no such formula at all: its
+Clause 7.3.4 defines $L_\mathrm{2,Corner}$ in prose as the maximum over
+corners, which is the $q = 1$ case of the same expression, so one function
+answers all three.
+
+Note what the energy mean over positions does, because it is the step a reader
+skips. $L_\mathrm{Corner}$ is **not** the loudest corner measurement of the
+whole campaign: the maximum is taken *inside* each source position and the
+positions are then averaged, so a single very loud corner at one position is
+diluted by the others.
+
+```python
+import numpy as np
+from phonometry import building
+
+# Four corners per loudspeaker position, two positions, 50/63/80 Hz only:
+# that is the whole corner sheet, because no other band is measured there.
+corners = np.array([[[60.2, 63.8, 58.4], [58.9, 65.1, 57.2],
+                     [61.4, 62.6, 60.1], [57.8, 64.2, 59.3]],
+                    [[59.6, 64.9, 59.8], [60.8, 63.4, 58.1],
+                     [58.3, 65.6, 60.7], [61.1, 62.9, 57.6]]])
+
+l_corner = building.corner_level(corners)
+print(np.round(l_corner, 1))            # [61.3 65.4 60.4]
+print(round(float(corners.max()), 1))   # 65.6  the loudest single corner, higher
+```
+
+`corner_level` also accepts a plain `(corners, bands)` sheet, which is the
+$q = 1$ case: loudspeakers operated simultaneously (ISO 16283-1 Clause 8.5,
+first paragraph) and the whole of Part 3.
+
+### What the standard asks of the measurement, and what the library checks
+
+**How a corner measurement is taken (Clauses 8.3 and 8.4).** A fixed
+microphone, 0.3 m to 0.4 m from *each* of the three boundaries forming the
+corner, and the three distances need not be equal; at least 1.0 m from any
+loudspeaker, which in practice rules out the corner a loudspeaker occupies. At
+least **four** corners, two at floor level and two at ceiling level, whether
+or not they are adjacent to the partition; each is to be formed by three
+mutually perpendicular surfaces of at least 0.5 m², with no furniture within
+0.5 m. Where that is impossible the standard admits corners whose surface
+pairs meet at between 45° and 135°, corners with objects close to the three
+surfaces, and corners one of whose surfaces is something like a cupboard.
+Average at least 15 s per position, and with a single loudspeaker moved
+between positions take the four corners again at each one.
+
+The corner measurement carries sampling requirements the arithmetic above does
+not depend on, and of those the library enforces one: the corner count, which
+is the only one a corner sheet carries the evidence for.
+
+| Requirement | Where | Enforced? |
+| :--- | :--- | :--- |
+| A minimum of four corners | Part 1 and Part 2 Clause 8.3 (per source position), Part 3 Clause 7.3.2 | warned (`LowFrequencyWarning`) |
+| Two of them at floor level and two at ceiling level | same clauses, as a *should* | no |
+| Microphone 0.3 m to 0.4 m from each boundary forming the corner | same clauses | no |
+| At least two source positions | Part 1 Clause 8.1, Part 2 Clause 8.2.2 | no |
+| Averaging time at least 15 s per position | Part 1 Clause 8.4 | no |
+| A background measurement in **every** corner used | Part 1 Clause 9.1, Part 2 Clause 9.1, Part 3 Clause 7.4.1 | no |
+
+The source-position count is the one omission worth naming, because a 2-D
+`(corners, 3)` sheet does say $q = 1$ on its face. It is not warned about,
+because $q = 1$ is a conforming reading in two of the three parts: Part 1
+Clause 8.5 gives it to loudspeakers operated simultaneously, and it is the
+whole of Part 3. Only Part 2, whose Clause 8.2.2 asks for the tapping machine
+in "at least two of the same positions" and admits no simultaneous case, would
+be entitled to complain, and one part out of three is a poor bargain for a
+warning.
+
+The levels handed in are assumed already corrected for background noise. All
+three parts require that correction in every corner used, in their
+background-noise clause; ISO 16283-2 says it a second time inside Formula
+(15)'s own where-list. The per-band point
+returns here too: because the three bands may come from three different
+corners, "each band can require an individual correction to the signal level
+for background noise" (the NOTE under Part 1 Clause 9.1).
+
+## Combining the two (Formula (13))
+
+The reported low-frequency level weighs the corner level one third against two
+thirds of the default-procedure level. ISO 16283-1 Formula (13),
+ISO 16283-2 Formula (16) and ISO 16283-3 Formula (5) print it identically, only
+the subscripts of the level symbols changing:
+
+$$
+L_\mathrm{LF} = 10 \log_{10} \left[
+\frac{10^{0.1 L_\mathrm{Corner}} + \left(2 \cdot 10^{0.1 L}\right)}{3}
+\right].
+$$
+
+Three properties of that expression are worth stating, because with no worked
+example published anywhere in ISO 16283 they are most of what a reader can
+check an implementation against.
+
+| Property | What it says |
+| :--- | :--- |
+| Degeneracy | $L_\mathrm{Corner} = L$ gives $L_\mathrm{LF} = L$ exactly: corners that agree with the room change nothing |
+| Monotonicity | $L_\mathrm{LF}$ rises with $L_\mathrm{Corner}$, strictly and without bound |
+| A floor | $L_\mathrm{LF} > 10 \log_{10}(2/3) + L = L - 1.76$ dB, however quiet the corners are |
+
+The floor is the useful one in practice. A room corner is a pressure antinode
+of every mode of the room, so at these frequencies the measured corners come
+out above the central-zone average, and the combination **raises** the level of
+whichever room it is applied to. Applied to the receiving room, as it is in
+every part, that **lowers** the reported insulation; applied to a Part 1 source
+room it raises it.
+
+```python
+print(np.round(building.low_frequency_level([54.7, 57.9, 53.2], l_corner), 1))
+# [58.1 61.9 57. ]   L_LF, one third corner against two thirds default
+```
+
+## The reverberation time (Clause 10.4)
+
+Under the same 25 m³ trigger, ISO 16283-1 and ISO 16283-2 Clause 10.4 and
+ISO 16283-3 Clause 8.4 stop the 50 Hz, 63 Hz and 80 Hz one-third-octave
+reverberation times being measured at all and put **one 63 Hz octave band**
+value in their place, "used to represent the 50 Hz, 63 Hz and 80 Hz bands".
+
+That is a prescription about what to measure, not a claim that the octave value
+equals the three one-third-octave ones. Each part gives the same two reasons
+underneath it. NOTE 1: "in small room volumes there are relatively few room
+modes that determine the decay curve in the 50 Hz, 63 Hz and 80 Hz bands", so
+20 dB and 30 dB evaluation ranges "are prone to error because single-slope
+decay curves usually only occur when there are many modes in each frequency
+band". NOTE 2: in timber or steel frame buildings the decay in those bands "can
+be sufficiently short that the decay curve is affected by the decay time of the
+one-third octave band filters in the analyser", which a wider filter avoids.
+
+There is no default value to fall back on below the trigger either: Clause 10.3
+(Clause 8.3 in Part 3) confines the default reverberation-time procedure to
+100 Hz and above once the room is under 25 m³. So a receiving-room procedure
+without a 63 Hz octave time is refused rather than guessed at, and so is a
+source-room one that carries one.
+
+That has one consequence for the caller. A conforming measurement in a small
+room has no one-third-octave reverberation time at 50 Hz, 63 Hz or 80 Hz to
+report, but the entry points validate the whole `t2` vector before the
+substitution happens and want a positive, finite value in every band. Put any
+positive placeholder in those three columns: the procedure overwrites all three
+with the 63 Hz octave value and the placeholders never reach a result. Copying
+the 100 Hz value up is the least surprising choice.
+
+## Running it: one implementation, three entry points
+
+`airborne_insulation`, `impact_insulation` and `facade_insulation` all reach
+the same code through a `LowFrequencyProcedure`, which describes **one room**:
+its volume, its corner sheet and, for a receiving room, its 63 Hz octave
+reverberation time.
+
+One measurement, and the chain the procedure leaves on it. The figure
+below reads its numbers off exactly these:
+
+```python
+freqs = np.array([50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0, 250.0, 315.0,
+                  400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0, 1600.0, 2000.0,
+                  2500.0, 3150.0])
+l1 = np.array([88.6, 90.4, 89.1, 87.3, 88.0, 87.4, 86.9, 86.5, 86.2, 85.8,
+               85.5, 85.1, 84.7, 84.2, 83.6, 82.9, 82.1, 81.2, 80.1])
+l2 = np.array([54.7, 57.9, 53.2, 49.6, 47.1, 44.3, 41.0, 38.2, 35.6, 33.1,
+               31.0, 29.2, 27.6, 26.1, 24.9, 23.8, 23.0, 22.4, 22.1])
+t2 = np.array([0.74, 0.69, 0.63, 0.58, 0.55, 0.53, 0.51, 0.50, 0.49, 0.48,
+               0.47, 0.46, 0.46, 0.45, 0.44, 0.43, 0.42, 0.41, 0.40])
+
+procedure = building.LowFrequencyProcedure(
+    volume=23.3, corner_levels=corners, reverberation_63_octave=0.66)
+field = building.airborne_insulation(l1, l2, t2, area=6.48, volume=23.3,
+                                     frequencies=freqs,
+                                     receiver_low_frequency=procedure)
+# Deliberately without the procedure, to have the two side by side. This is
+# the call the library warns about, and the warning is the point of the page.
+plain = building.airborne_insulation(l1, l2, t2, area=6.48, volume=23.3,
+                                     frequencies=freqs)
+chain = field.receiver_low_frequency
+
+print(np.round(chain.l_default, 1))     # [54.7 57.9 53.2]  the default procedure
+print(np.round(chain.l_corner, 1))      # [61.3 65.4 60.4]  Formula (12)
+print(np.round(chain.l_lf, 1))          # [58.1 61.9 57. ]  Formula (13)
+print(field.t2[:4])                     # [0.66 0.66 0.66 0.58]  Clause 10.4
+print(np.round(plain.dnt[:3], 1))       # [35.6 33.9 36.9]  default alone
+print(np.round(field.dnt[:3], 1))       # [31.7 29.7 33.3]  as ISO 16283 requires
+
+# The core rating never sees these bands; the enlarged-range term does.
+before = building.weighted_rating_extended(plain.dnt, freqs)
+after = building.weighted_rating_extended(field.dnt, freqs)
+print(before.rating, before.c_50_3150)  # 56 -1
+print(after.rating, after.c_50_3150)    # 56 -2
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/low_frequency_procedure.svg" alt="Two panels for one field measurement in a 23 cubic metre bedroom. Left: the 50, 63 and 80 Hz bands with eight corner measurements as open circles in two columns per band, the corner level above them, the default-procedure level below, and the reported combination shaded between the two about one third of the way up. Right: the standardized level difference over nineteen one-third-octave bands, the default-procedure curve and the ISO 16283 curve separating only in the three lowest bands, with the weighted rating unchanged at 56 dB and the enlarged-range adaptation term moving from minus 1 to minus 2 decibels" width="94%" />
+
+*One bedroom, 3.6 m by 2.7 m by 2.4 m, so 23 m³ to the nearest cubic metre and
+under the line. On the left the corners run 6 dB to 8 dB above the central-zone
+average, and Formula (13) carries about half of that gap into the reported
+level: +3.4, +4.0 and +3.8 dB. On the right that lift, together with the 63 Hz
+octave reverberation time replacing the three measured ones, takes about 4 dB
+off $D_\mathrm{nT}$ in each of the three bands. The weighted rating does not
+move, because ISO 717-1 reads it over 100 Hz to 3150 Hz and never sees these
+bands; the enlarged-range term that does see them, $C_{50\text{–}3150}$, moves
+by a whole decibel.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# The optional low range of Clause 5 measured alongside the 16 core bands.
+freqs = np.array([50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0, 250.0, 315.0,
+                  400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0, 1600.0, 2000.0,
+                  2500.0, 3150.0])
+l1 = np.array([88.6, 90.4, 89.1, 87.3, 88.0, 87.4, 86.9, 86.5, 86.2, 85.8,
+               85.5, 85.1, 84.7, 84.2, 83.6, 82.9, 82.1, 81.2, 80.1])
+l2 = np.array([54.7, 57.9, 53.2, 49.6, 47.1, 44.3, 41.0, 38.2, 35.6, 33.1,
+               31.0, 29.2, 27.6, 26.1, 24.9, 23.8, 23.0, 22.4, 22.1])
+t2 = np.array([0.74, 0.69, 0.63, 0.58, 0.55, 0.53, 0.51, 0.50, 0.49, 0.48,
+               0.47, 0.46, 0.46, 0.45, 0.44, 0.43, 0.42, 0.41, 0.40])
+
+procedure = building.LowFrequencyProcedure(
+    volume=23.3,                      # 3.6 x 2.7 x 2.4 m, so 23 m3 rounded
+    corner_levels=corners,            # the sheet built above
+    reverberation_63_octave=0.66,     # Clause 10.4, the 63 Hz octave band
+)
+field = building.airborne_insulation(l1, l2, t2, area=6.48, volume=23.3,
+                                     frequencies=freqs,
+                                     receiver_low_frequency=procedure)
+chain = field.receiver_low_frequency
+
+# One line - the three-band chain the procedure produced:
+chain.plot()
+plt.show()
+
+# The whole spectrum, by hand, against the default procedure alone. This call
+# raises a LowFrequencyWarning, and it is right to: the room triggers and no
+# procedure was passed. Here that is the point of the call.
+plain = building.airborne_insulation(l1, l2, t2, area=6.48, volume=23.3,
+                                     frequencies=freqs)
+x = np.arange(len(freqs))
+fig, ax = plt.subplots(figsize=(9, 5))
+ax.fill_between(x, plain.dnt, field.dnt, alpha=0.2, color="tab:red")
+ax.plot(x, plain.dnt, "--o", label="DnT, default procedure alone")
+ax.plot(x, field.dnt, "-s", color="black",
+        label="DnT, with the low-frequency procedure")
+ax.set_xticks(x, [f"{f:g}" for f in freqs], rotation=45)
+ax.set(xlabel="Frequency [Hz]", ylabel="Level difference [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+
+### `LowFrequencyProcedure` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `volume` | float | m³ | must round below 25 | Volume of *this* room; the trigger of Clause 8.1 / 7.3.1 |
+| `corner_levels` | 2D or 3D array | dB | `(corners, 3)` or `(positions, corners, 3)` | Corners at 50/63/80 Hz, background-corrected |
+| `reverberation_63_octave` | float, optional | s | > 0 | 63 Hz octave $T$ (Clause 10.4 / 8.4); required for the receiving room, refused for the source room |
+
+The band axis is fixed at three because only three bands are measured in the
+corners at all: the corner sheet is three columns wide whatever range the
+default procedure covered. The bands are located in the `frequencies` vector by
+nominal centre within 3 %, so a caller who labels them 49.6 / 62.5 / 79.4 Hz is
+understood as well as one who writes 50 / 63 / 80.
+
+### The other two entry points
+
+`impact_insulation` and `facade_insulation` take the same object under a
+`low_frequency=` keyword and run the same code, which is what makes Formula
+(16) of Part 2 and Formula (5) of Part 3 the same function call as Formula (13)
+of Part 1. `airborne_insulation` alone offers two, `source_low_frequency=` and
+`receiver_low_frequency=`, because Part 1 alone tests two rooms.
+
+```python
+# Impact: the tapping machine on the floor above the same bedroom, with its
+# own corner sheet (the corners are measured with the source that is running).
+li = np.array([66.9, 69.4, 67.2, 64.8, 63.1, 62.0, 61.2, 60.5, 59.8, 59.0,
+               58.1, 57.0, 55.6, 53.8, 51.4, 48.5, 45.2, 41.6, 37.9])
+impact_corners = np.array([[[73.1, 76.4, 72.0], [71.8, 77.2, 70.6],
+                            [74.3, 75.1, 73.5], [70.9, 76.8, 72.7]],
+                           [[72.6, 77.0, 73.2], [74.0, 75.6, 71.4],
+                            [71.2, 77.5, 73.9], [73.8, 74.9, 70.8]]])
+impact_procedure = building.LowFrequencyProcedure(
+    volume=23.3, corner_levels=impact_corners, reverberation_63_octave=0.66)
+
+# Warns, for the same reason and to the same purpose as the airborne one above.
+plain_impact = building.impact_insulation(li, t2, volume=23.3, frequencies=freqs)
+impact = building.impact_insulation(li, t2, volume=23.3, frequencies=freqs,
+                                    low_frequency=impact_procedure)
+print(np.round(plain_impact.l_n_t[:3], 1))   # [65.2 68.  66.2]  default alone
+print(np.round(impact.l_n_t[:3], 1))         # [69.6 72.6 69.3]  Formula (16)
+
+# Airborne, the other way round: an 18 m3 source room beside a 40 m3 receiving
+# room. Only L1 moves, because Clause 10.4 is a receiving-room clause.
+source_corners = np.array([[93.4, 95.8, 94.1], [92.6, 96.5, 93.3],
+                           [94.7, 94.9, 95.2], [91.9, 96.1, 94.6]])
+source_procedure = building.LowFrequencyProcedure(
+    volume=18.0, corner_levels=source_corners)   # no 63 Hz octave time here
+asymmetric = building.airborne_insulation(
+    l1, l2, t2, area=6.48, volume=40.0, frequencies=freqs,
+    source_low_frequency=source_procedure)
+print(np.round(asymmetric.source_low_frequency.l_lf, 1))   # [91.7 93.5 92.2]
+print(asymmetric.t2[:3])                                   # [0.74 0.69 0.63]
+```
+
+## Verifying it without a worked example
+
+ISO 16283 publishes no numeric example of this procedure anywhere. Annex B of
+Part 1 and Annex C of Part 2 are blank recording forms, and the "Examples" of
+Annexes D and E are loudspeaker-position drawings. So this module joins the
+register of quantities anchored in closed form rather than in a tabulated
+result. It carries nine rows in the
+[conformance report](/phonometry/reference/conformance/), and every one of them
+judges a printed number or a closed form rather than a published result. What
+stands in for an oracle:
+
+- **The printed numbers**, three rows. The 25 m³ trigger with its strictness
+  and its rounding on the boundary, the 50 / 63 / 80 Hz band set, and the
+  63 Hz octave value landing on exactly those three bands and no others are
+  exact quantities read off the page, and are pinned as such.
+- **The closed forms**, five rows. Formula (13) against the printed expression
+  transcribed independently, its degeneracy at $L_\mathrm{Corner} = L$, its
+  strict monotonicity in $L_\mathrm{Corner}$ over 80 dB of it, the
+  $10 \log_{10}(2/3) + L$ floor that is approached and never crossed, and
+  Formula (12) against the energy mean over $q = 2$ source positions written
+  out by hand. Each of those five says "closed form" in its expected-value
+  cell, which is how the report marks a row with no published result behind
+  it.
+- **One implementation, proved and not claimed**, the ninth row. It asserts
+  that the airborne, impact and façade entry points reach the same
+  $L_\mathrm{LF}$ from identical inputs, 3 parts of 3, so "the same procedure"
+  is a checked fact rather than a sentence on this page.
+
+One thing the conformance report does not carry, because it is a comparison
+between two methods rather than a value: **the reason Clause 10.4 gives,
+measured rather than asserted**. A known single-sloped decay is put through the
+reverberation machinery already in this library, and the 63 Hz octave band
+recovers it with a smaller error than the three one-third-octave bands do, on
+average and at worst. That is NOTE 1 turned into a measurement, and it lives in
+the test suite rather than in the report.
+
+## Quick answers
+
+### Does a 24.5 m³ room need the low-frequency procedure?
+
+No. The volume is taken to the nearest cubic metre first, and 24.5 rounds to
+25 m³, which is not "smaller than 25 m³". The effective threshold is
+$V < 24.5$ m³, and a room of exactly 25 m³ takes the default procedure in
+every part of ISO 16283.
+
+### I got a `LowFrequencyWarning` about a room under 25 m³. What do I do?
+
+Three answers, and which one is right depends on what you measured. If the
+corners were measured, pass them: build a `LowFrequencyProcedure` with the
+corner sheet and the 63 Hz octave reverberation time and hand it to the entry
+point. If they were not, and you only need the core range, leave the 50 Hz,
+63 Hz and 80 Hz columns out of the call: the 16 bands from 100 Hz to 3150 Hz
+are a complete ISO 16283 measurement in a room of any size, and the warning
+goes with them. If you want the low bands anyway, as a comparison or because a
+legacy survey is all you have, keep them and silence the warning deliberately,
+with `warnings.filterwarnings` on the message rather than on the class, so the
+corner-count complaint still reaches you. What the warning will not let you do
+is report those three bands as ISO 16283 quantities without noticing that they
+are not.
+
+### Why is the reverberation time measured in the 63 Hz octave band?
+
+Because a one-third-octave decay in a small room usually is not single-sloped:
+there are too few modes in each band for a 20 dB or 30 dB evaluation range to
+be reliable (Clause 10.4 NOTE 1). In timber or steel frame construction there
+is a second reason, that the decay can be shorter than the analyser's own
+one-third-octave filter (NOTE 2). One 63 Hz octave value replaces all three
+one-third-octave ones, and below the trigger there is no default value there to
+fall back on.
+
+### Does the corner procedure change the weighted rating?
+
+Usually not the core one. ISO 717-1 and ISO 717-2 read $R'_\mathrm{w}$,
+$D_\mathrm{nT,w}$ and $L'_\mathrm{nT,w}$ over 100 Hz to 3150 Hz, and the
+procedure reaches no band in that range. What it does change is the
+enlarged-range spectrum adaptation terms of ISO 717-1 Annex B and ISO 717-2
+Annex A, $C_{50\text{–}3150}$, $C_{50\text{–}5000}$ and
+$C_{\mathrm{I},50\text{–}2500}$: those sum over the 50 Hz band upwards, so a
+requirement written as $D_\mathrm{nT,w} + C_{50\text{–}3150}$ is judged on the
+corner procedure whether the report mentions it or not.
+
+## Standards
+
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The complete low-frequency procedure of ISO 16283-1:2014 Clause 8 and
+Clause 10.4, ISO 16283-2:2020 Clause 8 and Clause 10.4, and ISO 16283-3:2016
+Clause 7.3 and Clause 8.4: the 25 m³ trigger with its rounding and its strict
+comparison, the corner level of Formula (12) / Formula (15) / Clause 7.3.4
+including the energy mean over source positions and the per-band choice of
+corner, the combination of Formula (13) / (16) / (5), and the substitution of
+the 63 Hz octave reverberation time for the three one-third-octave values.
+Written once in `building.measurement.low_frequency` and reached by
+`airborne_insulation`, `impact_insulation` and `facade_insulation` alike, with
+the differences between the parts enforced: the source-room asymmetry of
+Part 1, the receiving-room-only scope of Clause 10.4, and Part 3's restriction
+to the loudspeaker methods.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered" label="Not covered">
+The procedural requirements of the corner measurement are documented above and
+checked only in one place: the corner count per source position raises a
+`LowFrequencyWarning` below four, and nothing verifies the 0.3 m to 0.4 m
+microphone distances, the two-at-floor-and-two-at-ceiling recommendation, the
+minimum of two source positions, the 15 s averaging time, or that a background
+measurement was made in every corner used. Corner levels are taken as already
+corrected for background noise. No numeric oracle exists for the procedure in
+any part of ISO 16283, so nothing here is checked against a published worked
+example; what is checked instead is listed under
+[Verifying it without a worked
+example](#verifying-it-without-a-worked-example). The rubber-ball quantities
+of ISO 16283-2 have no corner procedure at all (its Clause 8 heading names the
+tapping machine), though the Clause 10.4 reverberation time feeds them; and
+the railway and aircraft methods of ISO 16283-3 Annex E are outside the
+procedure by Clause 6.
+</ScopeClaim>
+</Scope>
+
+## See also
+
+- [Field Insulation Measurement (ISO 16283)](/phonometry/buildings/insulation/insulation-field/): the
+  two-room airborne and impact measurement this procedure sits inside.
+- [Façade Sound Insulation](/phonometry/buildings/insulation/facade-insulation/): the third part of
+  ISO 16283, whose Clause 7.3 is the same procedure under the loudspeaker
+  methods.
+- [Insulation Ratings (ISO 717)](/phonometry/buildings/insulation/insulation-ratings/): the reference-curve
+  engine, and the enlarged-range adaptation terms these three bands feed.
+- [Room Acoustics](/phonometry/buildings/rooms/room-acoustics/): the reverberation-time
+  machinery the 63 Hz octave value comes out of.
+- [Errata found in published sources](/phonometry/reference/errata/): the two
+  defects of ISO 16283-2 that this procedure runs into.
+- API reference:
+  [`building.measurement.low_frequency`](/phonometry/reference/api/building/low-frequency/)
+  and
+  [`building.measurement.insulation`](/phonometry/reference/api/building/insulation/).

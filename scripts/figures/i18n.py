@@ -2787,6 +2787,30 @@ _ES_EXACT = {
     "unfavourable deviations": "desviaciones desfavorables",
     "ISO 16283-1 Field Airborne Insulation": "Aislamiento a ruido aéreo in situ ISO 16283-1",
     "ISO 16283-3 Field Facade Insulation": "Aislamiento de fachada in situ ISO 16283-3",
+    # low_frequency_procedure: the ISO 16283 corner procedure of Clause 8 and
+    # the Clause 10.4 substitution. The Spanish terms are those of
+    # UNE-EN ISO 16283-2 ("procedimiento de baja frecuencia", "esquina",
+    # "recinto receptor"); the symbols are identifiers and stay as printed.
+    "The ISO 16283 low-frequency procedure in a bedroom of 23 m³": "El procedimiento de baja frecuencia de ISO 16283 en un dormitorio de 23 m³",
+    "In the corners of the receiving room (Clause 8)": "En las esquinas del recinto receptor (apartado 8)",
+    "What the reported spectrum and its rating do": "Lo que le hacen al espectro declarado y a su valoración",
+    "the measured corners, per loudspeaker position": "las esquinas medidas, por posición de altavoz",
+    r"$L_\mathrm{Corner}$, Formula (12)": r"$L_\mathrm{Corner}$, Fórmula (12)",
+    "$L$, default procedure": "$L$, procedimiento por defecto",
+    r"$L_\mathrm{LF}$, Formula (13): reported": r"$L_\mathrm{LF}$, Fórmula (13): declarado",
+    "the shaded band is what Formula (13) adds:\n"
+    "+3.4 / +4.0 / +3.8 dB, one third corner against two thirds "
+    "default": "la banda sombreada es lo que añade la Fórmula (13):\n"
+    "+3,4 / +4,0 / +3,8 dB, un tercio de esquina contra dos tercios "
+    "por defecto",
+    r"$D_\mathrm{nT}$, default procedure alone": r"$D_\mathrm{nT}$, solo el procedimiento por defecto",
+    r"$D_\mathrm{nT}$, with the low-frequency procedure": r"$D_\mathrm{nT}$, con el procedimiento de baja frecuencia",
+    "Clause 8 and Clause 10.4\nreach only these three bands": "Los apartados 8 y 10.4\nsolo alcanzan estas tres bandas",
+    r"$D_\mathrm{nT,w}$ = 56 dB either way (100 Hz to 3150 Hz)"
+    "\n"
+    r"$C_{50‐3150}$ = −1 dB $\rightarrow$ −2 dB": r"$D_\mathrm{nT,w}$ = 56 dB en ambos casos (100 Hz a 3150 Hz)"
+    "\n"
+    r"$C_{50‐3150}$ = −1 dB $\rightarrow$ −2 dB",
     r"$D_\mathrm{2m,nT}$ (standardized)": r"$D_\mathrm{2m,nT}$ (estandarizada)",
     r"$D_\mathrm{2m,n}$ (normalized)": r"$D_\mathrm{2m,n}$ (normalizada)",
     r"$R^{\prime}_{45°}$ (element)": r"$R^{\prime}_{45°}$ (elemento)",

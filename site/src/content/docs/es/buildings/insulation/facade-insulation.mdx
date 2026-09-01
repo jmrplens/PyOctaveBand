@@ -749,12 +749,13 @@ comprueban: nada verifica la incidencia de 45° ± 5°, las distancias oblicuas
 de 5 m y 7 m, la escalada de 3 a 10 posiciones de micrófono y su caso especial
 del retranqueo, los 50 pasos de vehículo ni la simultaneidad de una medición
 con tráfico, ni que el método elegido corresponda a la pregunta planteada. El
-procedimiento de esquina en baja frecuencia del apartado 7 (la contraparte de
+procedimiento de esquina en baja frecuencia del apartado 7.3 (la contraparte de
 fachada del [procedimiento de ISO
-16283-1](/phonometry/es/buildings/insulation/insulation-field/#recintos-pequenos-apartado-8),
-activado por el mismo umbral de 25 m³ del recinto receptor) tampoco está
-implementado, y tampoco lo están los métodos de ferrocarril y aeronaves del
-Anexo E. Los ejemplos resueltos de EN 12354-3 y EN 12354-4 de las ediciones de
+16283-1](/phonometry/es/buildings/insulation/low-frequency-procedure/),
+activado por el mismo umbral de 25 m³ del recinto receptor) sí está
+implementado y se alcanza con el argumento `low_frequency=` de
+`facade_insulation`, para los métodos de altavoz a los que lo limita el
+apartado 6; los métodos de ferrocarril y aeronaves del Anexo E no lo están. Los ejemplos resueltos de EN 12354-3 y EN 12354-4 de las ediciones de
 2000 llevan pequeñas inconsistencias internas de redondeo en las bandas de
 octava altas, señaladas donde aparecen: la implementación sigue las fórmulas y
 no las filas impresas.

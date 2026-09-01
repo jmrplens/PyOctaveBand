@@ -255,6 +255,25 @@ def _impact_insulation() -> ph.building.ImpactInsulationResult:
     )
 
 
+def _low_frequency_procedure() -> ph.building.LowFrequencyResult:
+    """The ISO 16283 corner procedure in a 18 m3 receiving room."""
+    return ph.building.apply_low_frequency_procedure(
+        [50.0, 52.0, 49.0],
+        [50.0, 63.0, 80.0],
+        ph.building.LowFrequencyProcedure(
+            volume=18.0,
+            corner_levels=[
+                [56.0, 58.0, 54.0],
+                [55.0, 60.0, 53.0],
+                [54.0, 57.0, 56.0],
+                [53.0, 56.0, 55.0],
+            ],
+            reverberation_63_octave=0.72,
+        ),
+        reverberation_time=[0.60, 0.55, 0.50],
+    )
+
+
 def _band_uncertainty() -> ph.building.BandUncertainty:
     return ph.building.band_uncertainty("airborne", "B")
 

@@ -61,6 +61,9 @@ laboratory, and predicted from element data.
 - [Field Insulation Measurement (ISO 16283)](insulation/insulation-field.md):
   ISO 16283-1/2 field measurement, the Clause 14 report and the ISO 12999-1
   uncertainty that qualifies it.
+- [Small Rooms: the ISO 16283 Low-Frequency Procedure](insulation/low-frequency-procedure.md):
+  the corner measurement that becomes mandatory below 25 m³, and the 63 Hz
+  octave reverberation time that comes with it.
 - [Laboratory Insulation Measurement](insulation/insulation-lab.md):
   the ISO 10140 laboratory characterisation of an element.
 - [Sound Insulation by Intensity (ISO 15186)](insulation/insulation-intensity.md):
@@ -111,8 +114,9 @@ and from the physics of the element itself.
 the measurement side, position averaging happens once positions are supplied
 — the insulation functions energy-average per-position spectra for you — but
 nothing verifies how the measurement was made: the position counts and
-placements, the low-frequency procedures and the test-facility qualifications
-of ISO 16283, ISO 10140 and ISO 3382 are the operator's job. So is measuring
+placements, the corner positions the ISO 16283 low-frequency procedure is fed
+from and the test-facility qualifications of ISO 16283, ISO 10140 and ISO 3382
+are the operator's job. So is measuring
 the background noise: only the ISO 10140-4 laboratory correction is
 implemented, warning when its 6 dB floor is broken, and field levels must
 arrive already corrected. On the prediction side, the element ratings, the
