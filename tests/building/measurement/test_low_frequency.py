@@ -53,6 +53,7 @@ from phonometry.building.measurement.low_frequency import (
     LOW_FREQUENCY_VOLUME_LIMIT,
     LowFrequencyProcedure,
     LowFrequencyWarning,
+    _named_low_frequency_bands,
     apply_low_frequency_procedure,
     corner_level,
     low_frequency_level,
@@ -941,6 +942,17 @@ def test_a_full_low_range_is_told_to_pass_the_procedure_directly() -> None:
     message = str(caught[0].message)
     assert "names the 50 Hz, 63 Hz and 80 Hz bands" in message
     assert "complete the low range" not in message
+
+
+def test_the_band_lister_answers_empty_for_a_two_dimensional_axis() -> None:
+    """The helper's own rank guard, now behind the entry points' refusal.
+
+    The entry points refuse a ``(1, bands)`` axis before this helper runs, so
+    the guard is unreachable from them; it stays because the helper is the
+    module's answer to "which low bands does this axis name" and a caller from
+    a future path must get the same empty answer, not a broadcast accident.
+    """
+    assert _named_low_frequency_bands(np.array([[50.0, 63.0, 80.0]])) == []
 
 
 def test_a_non_finite_band_centre_is_refused_by_name() -> None:
