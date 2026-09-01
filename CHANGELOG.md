@@ -455,10 +455,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the other way round, and it is an improvement: Apple's and musl's `log`
   round a handful of inputs to the other neighbouring double, so the retired
   `math.log` loop silently returned different designs on macOS than on
-  Linux. The pinned routine returns its own bits everywhere, so the designs
-  are now identical across platforms as well as across CPUs; on a non-glibc
-  platform they moved by that last ulp once, onto the values every other
-  platform already shipped.
+  Linux. The pinned routine returns its own bits everywhere, so `log` no longer
+  separates the platforms. The handful of transcendentals a design still
+  takes from the C library once per design do: the three CI platforms design
+  three different byte strings for the same filter, measured and pinned per
+  platform in the test suite and written up in the determinism guide.
+  Spelling those calls the way the logarithm is spelled is the remaining
+  step.
 
 - The frequency weightings are designed at the sample rate instead of being
   outrun at eight times it. Every curve in `filters.weighting` starts as poles

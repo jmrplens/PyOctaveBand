@@ -1,16 +1,19 @@
 ---
 title: "Los mismos bits en cualquier máquina"
-description: "Por qué la coma flotante deriva entre hosts, qué fija phonometry para que un filtro diseñado sea el mismo filtro byte a byte en cualquier CPU, BLAS, número de hilos o plataforma, y la evidencia medida tras la afirmación."
+description: "Por qué la coma flotante deriva entre hosts, qué fija phonometry para que un filtro diseñado sea el mismo filtro byte a byte en cualquier CPU, BLAS o número de hilos, qué separa todavía a las plataformas, y la evidencia medida tras la afirmación."
 ---
 
 Un filtro de ponderación diseñado por phonometry es el mismo filtro, byte a
-byte, en cualquier máquina: cualquier CPU, con o sin AVX-512; cualquier juego
-de kernels BLAS; cualquier número de hilos; cualquier semilla de hash; y,
-desde que se fijó el logaritmo, la biblioteca C de cada plataforma que corre
-la matriz de tests, Linux, macOS y Windows. Los coeficientes que diseña un
-portátil son los que diseña un clúster, así que un veredicto de conformidad,
-una figura publicada o un filtro embarcado en una cadena de medida es un
-artefacto reproducible y no el relato de una máquina sobre sí misma.
+byte, en cualquier máquina que comparta biblioteca C: cualquier CPU, con o
+sin AVX-512; cualquier juego de kernels BLAS; cualquier número de hilos;
+cualquier semilla de hash. Entre bibliotecas C todavía no: Linux, macOS y
+Windows diseñan cada uno sus propios bytes para el mismo filtro, porque un
+puñado de trascendentes sigue saliendo del `math` de la plataforma una vez
+por diseño, y esta página las nombra y mide lo que hacen. Dentro de una
+plataforma, los coeficientes que diseña un portátil son los que diseña un
+clúster, así que un veredicto de conformidad, una figura publicada o un
+filtro embarcado en una cadena de medida es un artefacto reproducible y no
+el relato de una máquina sobre sí misma.
 
 Esa frase no es el comportamiento normal del Python científico, y esta página
 registra lo que costó, con los números.
@@ -50,7 +53,9 @@ bajo AVX-512, y todos los pasos aguas abajo la heredaban.
 hasta cerca de media ulp, lo que significa que en un puñado de entradas
 redondean legítimamente a vecinos *opuestos*, así que un bucle de diseño
 construido sobre `math.log` devolvía filtros distintos en macOS y en Linux
-sin nada en ningún sitio que lo dijera.
+sin nada en ningún sitio que lo dijera. Lo mismo vale para cualquier otra
+trascendente que traiga la biblioteca C, y por eso la evidencia de abajo
+sigue encontrando tres juegos de bytes.
 
 ## Qué fija phonometry
 
@@ -71,11 +76,12 @@ El camino de diseño determinista responde a cada puerta en su terreno, en
   están escritos en aritmética real.
 - **Trascendentes fijadas.** Fuera de la iteración, cada trascendente se
   toma de la biblioteca C una vez por diseño. Esas pocas llamadas, un `exp`,
-  una `tan`, una `atan`, una `pow` y un par de `sin`, son el único punto por
-  el que la libm de la plataforma sigue entrando en un diseño; el digest de
-  la ponderación A publicada está fijado como test que corre en Linux, macOS
-  y Windows, y eso las sujeta a los mismos bytes como medida, no como
-  demostración. Dentro, el logaritmo corre
+  una `tan`, una `atan`, una `pow`, un par de `log10` y un par de `sin`,
+  son el único punto por el que la libm de la plataforma sigue entrando en
+  un diseño, y bastan para separar las plataformas: la evidencia de abajo
+  trae los tres digests. Deletrearlas en numpy fijado como está deletreado
+  el logaritmo es el paso que falta para un único digest en todas partes.
+  Dentro de la iteración, el logaritmo corre
   tres cuartos de millón de veces por diseño, y el bucle que lo fijaba costó
   un factor cuatro; ahora es el propio algoritmo de `log` de glibc, el de
   tablas, deletreado en operaciones numpy que IEEE&nbsp;754 fija
@@ -112,12 +118,17 @@ corren en CI:
   este host y el mismo host bajo emulación AVX-512, bajo cada juego de
   kernels de OpenBLAS seleccionable, cada número de hilos y cada semilla de
   hash; las comparaciones entorno contra entorno están fijadas como tests.
-- **Idénticos entre plataformas.** Con el logaritmo fijado, los diseños de
-  macOS se movieron esa última ulp una sola vez, hasta los valores que las
-  demás plataformas ya publicaban, y la diferencia silenciosa entre Linux y
-  macOS desapareció. El digest de la ponderación A que imprime el ejemplo de
-  abajo es un test en la matriz de Linux, macOS y Windows, así que una
-  plataforma que derive pone el CI en rojo en vez de publicar otro filtro.
+- **Cada plataforma sus bytes, medidos.** Con el logaritmo fijado, un diseño
+  ya no depende de qué `log` traiga la biblioteca C, pero las llamadas de una
+  vez por diseño sí, y bastan: la ponderación A a 48&nbsp;kHz da
+  `991833ff389afe91` en Linux (glibc, x86-64), `4efa1818bd80e23a` en macOS
+  (arm64) y `79852a57e60961c8` en Windows (x86-64), el mismo valor con
+  Python 3.13 y 3.14 en cada una. Los tres digests están fijados como test
+  en la matriz de CI, así que una plataforma que derive de su propio valor
+  pone el CI en rojo. Los tests de respuesta que corren en esas tres
+  plataformas sujetan el diseño A a 0,013&nbsp;dB de su prototipo analógico
+  en toda su banda de ajuste, lo que acota en cuánto pueden diferir en
+  respuesta los tres juegos de bytes.
 
 ## Compruébalo tú
 
@@ -130,19 +141,22 @@ from phonometry import filters
 una = filters.WeightingFilter(48000, "A").sos
 otra = filters.WeightingFilter(48000, "A").sos
 print(una.tobytes() == otra.tobytes())                   # True
-print(hashlib.sha256(una.tobytes()).hexdigest()[:16])   # 991833ff389afe91
+digest = hashlib.sha256(una.tobytes()).hexdigest()
+print(digest[:16])                                       # 991833ff389afe91 en Linux
 ```
 
 La segunda línea es la clave: esos dieciséis dígitos hexadecimales, la
 cabeza del SHA-256, no son «lo que salió en mi máquina», son el digest de la
-ponderación A a 48&nbsp;kHz de esta versión en cualquier máquina. Si una
+ponderación A a 48&nbsp;kHz de esta versión en cualquier máquina Linux, y la
+evidencia de arriba da los valores que esperar en macOS y Windows. Si una
 versión futura mueve un coeficiente a propósito, el digest se mueve con ella
 y el cambio es un suceso documentado, nunca una propiedad de tu hardware.
 
 ## Alcance
 
 La garantía cubre el camino de diseño determinista de ponderaciones de punta
-a punta, y el procesamiento por bloques compone con ella: una cascada con
+a punta dentro de una plataforma, y el procesamiento por bloques compone con
+ella: una cascada con
 estado alimentada bloque a bloque es bit-idéntica a una sola pasada sobre el
 registro entero, así que el streaming no gasta la garantía. Las funciones de
 análisis generales construidas sobre numpy y SciPy en su forma corriente
