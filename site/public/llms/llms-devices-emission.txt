@@ -2899,8 +2899,8 @@ factor and the boxed LWA.*
 
 ## See also
 
-- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): the route chooser
-  this method is the seventh entry of, the accuracy grades and the ISO 4871
+- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): the route chooser this method is the seventh
+  entry of, what the accuracy grades promise, and the ISO 4871 noise-emission
   declaration a result feeds.
 - [Sound Power by Intensity Scanning (ISO 9614)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/):
   the determination that produces the $P_j$ behind a Part 2 radiation factor.

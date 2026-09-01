@@ -17362,8 +17362,8 @@ factor and the boxed LWA.*
 
 ## See also
 
-- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): the route chooser
-  this method is the seventh entry of, the accuracy grades and the ISO 4871
+- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): the route chooser this method is the seventh
+  entry of, what the accuracy grades promise, and the ISO 4871 noise-emission
   declaration a result feeds.
 - [Sound Power by Intensity Scanning (ISO 9614)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/):
   the determination that produces the $P_j$ behind a Part 2 radiation factor.
@@ -36861,6 +36861,33 @@ reference source of known power measured in the same room,
 $L_W = L_{W(\text{RSS})} + (\bar{L}_p - \bar{L}_{p,\text{RSS}} + C_2)$, so the
 absorption-area, Waterhouse and $C_1$ terms cancel and the room need not be
 characterised.
+
+### Discrete-point intensity (ISO 9614-1)
+
+Part 1 holds the probe still. One position stands for each segment of the
+measurement surface, so the partial power is $P_i = I_{\mathrm{n}i} S_i$
+(Eq. 11) and the sound power is $L_W = 10 \log_{10}(\sum_i P_i / P_0)$
+(Eq. 12). That sum is printed without the absolute-value bars of the general
+definition because clause 9.2 disposes of the negative case instead: a band
+whose $\sum_i P_i$ comes out negative is outside the method rather than a band
+with a level to report. One segment carrying negative power is ordinary, and is
+what $F_3$ exists to quantify.
+
+What separates Part 1 from a scan is not the integral but what decides whether
+it was sampled finely enough, and with a fixed set of positions the surface has
+to answer that itself. The Annex A indicators average over positions without
+area weighting: $F_1$ is the temporal variability (Eq. A.1),
+$F_2 = L_p - L_{|I_\mathrm{n}|}$ and $F_3 = L_p - L_{I_\mathrm{n}}$ are the
+reactivity and recirculation indicators (Eqs. A.3 to A.7), and
+$F_4 = \frac{1}{|\overline{I_\mathrm{n}}|} \sqrt{\sum_i (I_{\mathrm{n}i} - \overline{I_\mathrm{n}})^2 / (N - 1)}$
+is the field non-uniformity (Eqs. A.8 and A.9), which is Part 1's own. Annex B
+turns it into a position count: criterion 2 asks $N > C F_4^2$ (Eq. B.2) with
+$C$ from Table B.2, so a surface that radiates unevenly demands more positions,
+band by band, and the grade a band earns is the grade whose $C$ that inequality
+still satisfies. Criterion 1, $L_\mathrm{d} > F_2$ (Eq. B.1), puts the probe
+against the field before any of that, and no amount of averaging rescues a band
+that fails it. The gate figure in the next subsection is drawn in exactly these
+names, because they are Part 1's.
 
 ### Intensity scanning (ISO 9614-2)
 
