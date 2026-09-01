@@ -132,8 +132,13 @@ pres = emission.sound_power_pressure(np.tile(lw_true - 14.0, (10, 1)),
                                      "hemisphere", radius=2.0,
                                      frequencies=freqs)
 # ISO 9614-2: intensidad normal uniforme barrida sobre seis segmentos de 0.5 m2.
+# En este campo libre Lp lee el nivel de intensidad, y el delta_pI0 = 18 dB
+# de la sonda hace evaluable el cribado del apartado 10.6 b.
 i_n = np.tile(10.0 ** (lw_true / 10.0) * 1e-12 / 3.0, (6, 1))
+lp = np.tile(lw_true - 10.0 * np.log10(3.0), (6, 1))
 inten = emission.sound_power_intensity(i_n, np.full(6, 0.5),
+                                       pressure_levels=lp,
+                                       pressure_residual_index=18.0,
                                        frequencies=freqs, band_type="octave")
 # ISO 3741: comparación con una fuente de referencia de LW = 84 dB conocido por banda.
 comp = emission.sound_power_comparison(lw_true - 20.0, np.full(6, 64.0),

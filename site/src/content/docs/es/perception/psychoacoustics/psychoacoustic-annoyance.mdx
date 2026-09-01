@@ -303,13 +303,29 @@ for fm in fm_noise:
     f_noise.append(psychoacoustics.fluctuation_strength(am, float(fs)).fluctuation_strength)
 print(round(f_noise[3], 1), round(f_bbn[np.argmin(np.abs(fmod - 4.0))], 1))   # 5.5 3.7
 
-fig, ax = plt.subplots()
+# Panel derecho, el modelo de señal sobre el tono AM para el que se calibró:
+# 1 kHz a 70 dB, con el mismo barrido de modulación.
+t = np.arange(int(2.0 * fs)) / fs
+carrier = np.sin(2 * np.pi * 1000.0 * t)
+f_tone = []
+for fm in fm_noise:
+    am = (1.0 + np.sin(2 * np.pi * fm * t)) * carrier
+    am = am / np.sqrt(np.mean(am ** 2)) * 2e-5 * 10 ** (70 / 20)
+    f_tone.append(psychoacoustics.fluctuation_strength(am, float(fs)).fluctuation_strength)
+print(round(max(f_tone), 2))   # 1.09, en el punto de 4 Hz
+
+fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 ax.semilogx(fmod, f_bbn, label="forma cerrada, Ec. 10.2")
 ax.semilogx(fm_noise, f_noise, "s--", label="modelo de señal de Osses 2016")
 ax.axvline(4.0, ls="--", color="0.4")
 ax.set_xlabel("Frecuencia de modulación f_mod [Hz]")
 ax.set_ylabel("Intensidad de fluctuación F [vacil]")
+ax.set_title("Los dos modelos, ruido de banda ancha AM a 60 dB")
 ax.legend(loc="upper right")
+ax2.semilogx(fm_noise, f_tone, "s--", color="tab:green")
+ax2.axvline(4.0, ls="--", color="0.4")
+ax2.set_xlabel("Frecuencia de modulación f_mod [Hz]")
+ax2.set_title("Modelo de señal, tono AM a 70 dB")
 plt.show()
 ```
 

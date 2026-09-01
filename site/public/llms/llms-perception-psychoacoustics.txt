@@ -2007,7 +2007,7 @@ definition, a 1 kHz tone at 60 dB,
 Fastl & Zwicker models; the normative Sottek-model fluctuation strength of
 ECMA-418-2 Clause 9 lives in [Sound Quality Metrics](https://jmrplens.github.io/phonometry/perception/psychoacoustics/sound-quality/).
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength.svg" alt="Fluctuation strength versus modulation frequency on a log axis: the closed-form AM broadband-noise curve and the AM-tone signal-model sweep both show a band-pass characteristic peaking at 4 Hz" width="82%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength.svg" alt="Left: the closed-form and signal-model fluctuation strength of the same amplitude-modulated broadband noise at 60 dB against modulation frequency, both band-pass around 4 Hz, the signal model peaking at 5.5 vacil against the closed form's 3.7, a factor 1.5 overshoot at 4 Hz. Right: the signal model on the amplitude-modulated 1 kHz tone at 70 dB it was calibrated for, peaking at 1.09 vacil at 4 Hz" width="82%"></picture>
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -2017,31 +2017,46 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import psychoacoustics
 
-# Exact closed form (Eq. 10.2), AM broadband noise at 60 dB, 100 % modulation:
+# Left panel, the two models on the same stimulus: AM broadband noise at
+# 60 dB, 100 % modulation.
+fs = 48000
 fmod = np.logspace(np.log10(0.5), np.log10(32.0), 240)
 f_bbn = [psychoacoustics.fluctuation_strength_am_noise(60.0, 1.0, fm) for fm in fmod]
 
-# Osses 2016 signal model on a 1 kHz / 70 dB AM tone over the same sweep:
-fs = 48000
+rng = np.random.default_rng(3)
+tn = np.arange(int(4.0 * fs)) / fs
+noise = rng.standard_normal(tn.size)
+fm_noise = [0.5, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
+f_noise = []
+for fm in fm_noise:
+    am = (1.0 + np.sin(2 * np.pi * fm * tn)) * noise
+    am = am / np.sqrt(np.mean(am ** 2)) * 2e-5 * 10 ** (60 / 20)
+    f_noise.append(psychoacoustics.fluctuation_strength(am, float(fs)).fluctuation_strength)
+print(round(f_noise[3], 1), round(f_bbn[np.argmin(np.abs(fmod - 4.0))], 1))   # 5.5 3.7
+
+# Right panel, the signal model on the AM tone it was calibrated for:
+# 1 kHz at 70 dB, over the same modulation sweep.
 t = np.arange(int(2.0 * fs)) / fs
-carrier = np.sin(2 * np.pi * 1000 * t)
-fm_tone = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
+carrier = np.sin(2 * np.pi * 1000.0 * t)
 f_tone = []
-for fm in fm_tone:
+for fm in fm_noise:
     am = (1.0 + np.sin(2 * np.pi * fm * t)) * carrier
     am = am / np.sqrt(np.mean(am ** 2)) * 2e-5 * 10 ** (70 / 20)
     f_tone.append(psychoacoustics.fluctuation_strength(am, float(fs)).fluctuation_strength)
+print(round(max(f_tone), 2))   # 1.09, at the 4 Hz point
 
-fig, ax = plt.subplots()
-ax.semilogx(fmod, f_bbn, label="AM broadband noise (closed form)")
-ax2 = ax.twinx()
-ax2.plot(fm_tone, f_tone, "s--", color="tab:green", label="AM tone (signal model)")
+fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+ax.semilogx(fmod, f_bbn, label="closed form, Eq. 10.2")
+ax.semilogx(fm_noise, f_noise, "s--", label="Osses 2016 signal model")
 ax.axvline(4.0, ls="--", color="0.4")
 ax.set_xlabel("Modulation frequency f_mod [Hz]")
 ax.set_ylabel("Fluctuation strength F [vacil]")
-h1, l1 = ax.get_legend_handles_labels()
-h2, l2 = ax2.get_legend_handles_labels()
-ax.legend(h1 + h2, l1 + l2, loc="upper right")
+ax.set_title("Both models, AM broadband noise at 60 dB")
+ax.legend(loc="upper right")
+ax2.semilogx(fm_noise, f_tone, "s--", color="tab:green")
+ax2.axvline(4.0, ls="--", color="0.4")
+ax2.set_xlabel("Modulation frequency f_mod [Hz]")
+ax2.set_title("Signal model, AM tone at 70 dB")
 plt.show()
 ```
 

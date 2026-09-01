@@ -287,13 +287,29 @@ for fm in fm_noise:
     f_noise.append(psychoacoustics.fluctuation_strength(am, float(fs)).fluctuation_strength)
 print(round(f_noise[3], 1), round(f_bbn[np.argmin(np.abs(fmod - 4.0))], 1))   # 5.5 3.7
 
-fig, ax = plt.subplots()
+# Right panel, the signal model on the AM tone it was calibrated for:
+# 1 kHz at 70 dB, over the same modulation sweep.
+t = np.arange(int(2.0 * fs)) / fs
+carrier = np.sin(2 * np.pi * 1000.0 * t)
+f_tone = []
+for fm in fm_noise:
+    am = (1.0 + np.sin(2 * np.pi * fm * t)) * carrier
+    am = am / np.sqrt(np.mean(am ** 2)) * 2e-5 * 10 ** (70 / 20)
+    f_tone.append(psychoacoustics.fluctuation_strength(am, float(fs)).fluctuation_strength)
+print(round(max(f_tone), 2))   # 1.09, at the 4 Hz point
+
+fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 ax.semilogx(fmod, f_bbn, label="closed form, Eq. 10.2")
 ax.semilogx(fm_noise, f_noise, "s--", label="Osses 2016 signal model")
 ax.axvline(4.0, ls="--", color="0.4")
 ax.set_xlabel("Modulation frequency f_mod [Hz]")
 ax.set_ylabel("Fluctuation strength F [vacil]")
+ax.set_title("Both models, AM broadband noise at 60 dB")
 ax.legend(loc="upper right")
+ax2.semilogx(fm_noise, f_tone, "s--", color="tab:green")
+ax2.axvline(4.0, ls="--", color="0.4")
+ax2.set_xlabel("Modulation frequency f_mod [Hz]")
+ax2.set_title("Signal model, AM tone at 70 dB")
 plt.show()
 ```
 
