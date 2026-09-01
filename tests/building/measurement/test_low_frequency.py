@@ -943,6 +943,20 @@ def test_a_full_low_range_is_told_to_pass_the_procedure_directly() -> None:
     assert "complete the low range" not in message
 
 
+def test_a_non_finite_band_centre_is_refused_by_name() -> None:
+    """NaN answers False to every band comparison, so it would skip the warning.
+
+    A small room whose band axis carries a NaN would silently lose the
+    clause 8.1 warning, and a facade result would carry the NaN as a plot
+    coordinate. Refused on entry instead.
+    """
+    freqs = np.array([50.0, 63.0, math.nan, 100.0, 125.0])
+    with pytest.raises(
+        ValueError, match=r"'frequencies' must contain only finite band centres"
+    ):
+        building.impact_insulation(_L2, _T2, volume=_SMALL_VOLUME, frequencies=freqs)
+
+
 def test_a_wrong_length_band_axis_is_refused_before_the_warning() -> None:
     """A vector that does not describe the measured bands decides nothing.
 

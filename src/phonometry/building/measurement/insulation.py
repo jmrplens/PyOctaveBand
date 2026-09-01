@@ -864,6 +864,12 @@ def _checked_frequency_axis(
             f"band ({band_count}); got shape {axis.shape}."
         )
         raise ValueError(msg)
+    if not np.all(np.isfinite(axis)):
+        # A NaN centre answers False to every band comparison, so it would
+        # slip past the warning's band test in silence, which is the failure
+        # mode this whole check exists to close.
+        msg = f"{owner}: 'frequencies' must contain only finite band centres."
+        raise ValueError(msg)
     return axis
 
 
@@ -989,11 +995,11 @@ def airborne_insulation(
     this way no longer maps exactly onto the sound-power ratio of Formula (3).
 
     Clause 8.1 is a *shall*, so a receiving room that rounds below 25 m³ and a
-    ``frequencies`` vector naming the three bands are together enough to know
-    the procedure was owed. When ``receiver_low_frequency`` is then absent this
-    function computes ``D`` from the default procedure alone and raises a
-    :class:`~.low_frequency.LowFrequencyWarning` saying that those three bands
-    are not the ISO 16283 quantity. Only the receiving room, because only its
+    ``frequencies`` vector naming any of the three bands are together enough
+    to know the procedure was owed. When ``receiver_low_frequency`` is then
+    absent this function computes ``D`` from the default procedure alone and
+    raises a :class:`~.low_frequency.LowFrequencyWarning` naming the bands it
+    found. Only the receiving room, because only its
     volume is an argument here.
 
     :param l1: Source-room sound pressure levels, in dB.
@@ -1153,11 +1159,10 @@ def impact_insulation(
     :mod:`phonometry.building.measurement.heavy_impact`.
 
     Clause 8.1 is a *shall*, so a ``volume`` that rounds below 25 m³ beside a
-    ``frequencies`` vector naming the three bands is enough to know the
-    procedure was owed. With no ``low_frequency`` to run it, this function
+    ``frequencies`` vector naming any of the three bands is enough to know
+    the procedure was owed. With no ``low_frequency`` to run it, this function
     answers from the default procedure alone and raises a
-    :class:`~.low_frequency.LowFrequencyWarning` saying that those three bands
-    are not the ISO 16283 quantity.
+    :class:`~.low_frequency.LowFrequencyWarning` naming the bands it found.
 
     :param li: Energy-average impact sound pressure levels, in dB.
     :param t2: Receiving-room reverberation time per band, in seconds.
