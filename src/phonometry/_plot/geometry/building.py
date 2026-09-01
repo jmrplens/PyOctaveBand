@@ -24,6 +24,7 @@ from ..common import (
 )
 from ._draft import (
     _check_language,
+    _chip,
     _dim,
     _finish_geometry_axes,
     _incidence_arrow,
@@ -280,6 +281,12 @@ def plot_facade_elements(
             ha="center",
             va="center",
             rotation=90 if width < 0.35 * height else 0,
+            zorder=6,
+            # Every element is named across the middle of its own tile, and
+            # the hatched fills draw straight through the word. The chip goes
+            # on all of them, not only the hatched ones, so the row of names
+            # reads as one row.
+            bbox=_chip(ax, 0.2),
         )
         ax.text(
             x + 0.5 * width,

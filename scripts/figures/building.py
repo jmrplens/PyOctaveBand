@@ -2251,7 +2251,10 @@ def generate_insulation_adaptation_terms(output_dir: str) -> None:
     ax_spec.set_title("Same weighted rating, different spectrum", pad=10)
     ax_spec.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax_spec.set_axisbelow(True)
-    ax_spec.legend(loc="lower right", fontsize=9)
+    # Upper left, not lower right: the resonance note is anchored to the first
+    # band, low and to the left, and a legend in that corner covers its last
+    # words. Both curves climb away from the top left, which is empty.
+    ax_spec.legend(loc="upper left", fontsize=9)
 
     groups = (
         r"$R_\mathrm{w}$",
@@ -2304,6 +2307,14 @@ def generate_insulation_adaptation_terms(output_dir: str) -> None:
         fontsize=10,
         fontweight="bold",
         color=COLOR_FG,
+        # Set down between the second pair of bars, whose outlines run through
+        # both of its lines.
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
         arrowprops={"arrowstyle": "->", "lw": 1.2},
     )
     ax_bar.set_xticks(xb)
@@ -2460,12 +2471,23 @@ def generate_fast_reverberation_correction(output_dir: str) -> None:
     ax.axvline(
         1.7275, color=COLOR_FG, linewidth=1.0, linestyle=":", alpha=0.7, zorder=2
     )
+    # All three read across the two curves, and the Spanish set is the longer
+    # one: the first note grows far enough right for the energy-average curve
+    # to run through its second line. The chip goes on the whole set, so the
+    # three notes stay a set.
+    chip = {
+        "boxstyle": "round,pad=0.3",
+        "facecolor": COLOR_PANEL,
+        "edgecolor": COLOR_GRID,
+    }
     ax.annotate(
         "$T = T_0$ = 0,5 s\nboth terms vanish",
         xy=(0.5, 0.0),
         xytext=(0.62, 4.4),
         fontsize=9,
         color=COLOR_FG,
+        zorder=6,
+        bbox=chip,
         arrowprops={"arrowstyle": "->", "lw": 1.0},
     )
     ax.annotate(
@@ -2474,6 +2496,8 @@ def generate_fast_reverberation_correction(output_dir: str) -> None:
         xytext=(1.95, 1.1),
         fontsize=9,
         color=COLOR_FG,
+        zorder=6,
+        bbox=chip,
         arrowprops={"arrowstyle": "->", "lw": 1.0},
     )
     ax.annotate(
@@ -2485,6 +2509,8 @@ def generate_fast_reverberation_correction(output_dir: str) -> None:
         fontsize=9,
         va="bottom",
         color=COLOR_FG,
+        zorder=6,
+        bbox=chip,
         arrowprops={"arrowstyle": "->", "lw": 1.0},
     )
     ax.set_xlim(0.2, 5.0)

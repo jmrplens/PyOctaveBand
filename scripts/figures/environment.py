@@ -862,6 +862,20 @@ def generate_impulsive_sound_onsets(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     res.plot(ax=ax, language=_LANG)
+    # The level-difference readout is anchored on the governing onset, which
+    # is where the history is steepest: the curve, the fitted onset line and
+    # the double-headed arrow all cross the letters. Back it with the
+    # documentation chip.
+    for label in ax.texts:
+        if label.get_text().strip():
+            label.set_zorder(6)
+            label.set_bbox(
+                {
+                    "boxstyle": "round,pad=0.3",
+                    "facecolor": COLOR_PANEL,
+                    "edgecolor": COLOR_GRID,
+                }
+            )
     plt.tight_layout()
     save_figure(output_dir, "impulsive_sound_onsets.svg")
     plt.close()
@@ -950,6 +964,12 @@ def generate_atmospheric_ray_fan(output_dir: str) -> None:
         ha="right",
         fontsize=9,
         color=COLOR_FG,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)

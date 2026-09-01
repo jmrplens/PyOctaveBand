@@ -26,6 +26,7 @@ from ..common import (
 from ._draft import (
     _LEGEND_LOC,
     _check_language,
+    _chip,
     _dim,
     _finish_geometry_axes,
     _material_rect,
@@ -138,6 +139,10 @@ def plot_barrier_geometry(
         fontsize=8,
         ha="left",
         va="center",
+        zorder=6,
+        # Named from inside the band it names, so the hatching runs through
+        # the word; the chip is what keeps it a word (see :func:`_chip`).
+        bbox=_chip(ax, 0.2),
     )
     _material_rect(ax, barrier_distance, 0.0, drawn_e, top, "plate", **kwargs)
     # Paths.

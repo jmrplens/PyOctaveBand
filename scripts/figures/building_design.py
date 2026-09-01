@@ -1681,6 +1681,12 @@ def generate_coupling_term_regimes(output_dir: str) -> None:
         ha="center",
         fontsize=9,
         color=COLOR_FG,
+        zorder=7,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
         arrowprops={"arrowstyle": "->", "lw": 1.0},
     )
 
@@ -1720,6 +1726,10 @@ def generate_coupling_term_regimes(output_dir: str) -> None:
         ha="right",
         fontsize=9,
         color=COLOR_FG,
+        # The velocity-source limit falls away through this corner and was
+        # being drawn over the box and its first line alike: the chip was
+        # there, the zorder was not, and the chip is no use underneath.
+        zorder=8,
         bbox={
             "boxstyle": "round,pad=0.5",
             "facecolor": COLOR_PANEL,
@@ -1834,6 +1844,10 @@ def generate_tapping_force_spectrum(output_dir: str) -> None:
         ha="right",
         fontsize=9,
         color=COLOR_FG,
+        # The concrete curve and the rebound bound both run along the top of
+        # the plot, straight through this box: it had the chip and not the
+        # zorder, so the two lines were painted over the note's own two.
+        zorder=6,
         bbox={
             "boxstyle": "round,pad=0.5",
             "facecolor": COLOR_PANEL,
@@ -2197,15 +2211,30 @@ def generate_structure_borne_conversion(output_dir: str) -> None:
         xytext=(0, l_wsn[0]),
         arrowprops={"arrowstyle": "<->", "lw": 1.6},
     )
+    # Above the head of the arrow, not beside its middle. Two lines this wide
+    # reach the 125 Hz band, and there the installed level and the cross that
+    # marks the same quantity coming back through Formula (19) agree to a
+    # hundredth of a decibel, so they are drawn one on top of the other: a
+    # chip set in the gap swallows both, and the corner note about the wall
+    # contact markers reproducing the printed Table I.8 columns stops being
+    # something the reader can check. Four decibels above the top of the
+    # arrow clears the marker there and leaves the box under the
+    # characteristic curve well past the band the arrow is drawn in.
     ax.text(
         0.12,
-        0.5 * (l_wsn[0] + installed[0]),
+        installed[0] + 4.0,
         f"+{installed[0] - l_wsn[0]:.1f} dB = "
         "$10\\,\\mathrm{lg}(24.1/5.0)$:\n"
         "a lighter receiver accepts more power",
         fontsize=9,
         color=COLOR_FG,
         va="center",
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
 
     _band_index_axis(ax, bands)

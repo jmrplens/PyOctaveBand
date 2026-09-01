@@ -120,6 +120,30 @@ make graphs   # runs both: python scripts/generate_graphs.py && python scripts/g
 make figures  # the same generation, then the legibility and staleness checks CI runs
 ```
 
+A label drawn across a curve gets the opaque chip the corpus uses everywhere
+else, with a `zorder` above the curves and the `pad` its neighbours use:
+
+```python
+bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL, "edgecolor": COLOR_GRID}
+```
+
+That is not the translucent box a note in an empty corner takes
+(`{"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6}`), which loses its
+contrast over a line on the dark page. The `zorder` is half of the convention
+and not a detail: a chip drawn under the curve is painted over with the letters
+it was meant to back.
+
+`make figures` measures both halves, on the English figure and on the Spanish
+one, because Spanish prose is longer and grows into curves the English strings
+clear. For every label it counts how many of its glyph pixels a stroke paints
+underneath and how many never reach the page at all, and fails on the ones a
+reader would struggle with. The two counts carry their own thresholds, because
+they are two measurements: a struck pixel is a character still fully drawn and
+merely competing with a curve, while a covered one is ink the reader never
+receives. See `scripts/check_figure_annotations.py` for both numbers and for
+the exemption file, which is where an annotation that must stay as it is gets
+recorded with its reason.
+
 When adding a feature with visual output, write its `generate_*` function in the
 package the two commands are a front end for, not in the command itself:
 

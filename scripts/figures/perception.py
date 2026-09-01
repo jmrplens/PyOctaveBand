@@ -48,12 +48,32 @@ def _hms(unit: str) -> str:
 def generate_equal_loudness_contours(output_dir: str) -> None:
     """Plot the ISO 226:2023 normal equal-loudness-level contours."""
     print("Generating equal_loudness_contours.png...")
+    from matplotlib.text import Annotation
+
     from phonometry import psychoacoustics
 
     _, ax = plt.subplots(figsize=(10, 7))
     # The result's own .plot() draws the contour family plus the hearing
     # threshold on a 1k/2k-labelled log frequency axis (ISO 226:2023 Formula 1).
     psychoacoustics.equal_loudness_contours().plot(ax=ax)
+    # Each contour is labelled at its own 1 kHz crossing, where SPL = phon by
+    # definition, so the line runs straight through the middle of the letters
+    # that name it. Back those with the documentation chip -- the pad is the
+    # small one, because the box has to fit between two contours a few phon
+    # apart. The contour labels are the annotations anchored on their own
+    # curve; the renderer's footnote is a plain Text over empty page, and is
+    # left as it is.
+    for label in ax.texts:
+        if not isinstance(label, Annotation):
+            continue
+        label.set_zorder(6)
+        label.set_bbox(
+            {
+                "boxstyle": "round,pad=0.2",
+                "facecolor": COLOR_PANEL,
+                "edgecolor": COLOR_GRID,
+            }
+        )
     ax.set_ylim(-10, 130)
     ax.set_title("Normal Equal-Loudness-Level Contours (ISO 226:2023)", pad=12)
     save_figure(output_dir, "equal_loudness_contours.png")
@@ -626,6 +646,12 @@ def generate_sharpness_pair_and_targets(output_dir: str) -> None:
             xytext=(centroid + 0.7, 0.06),
             fontsize=9,
             color=color,
+            zorder=6,
+            bbox={
+                "boxstyle": "round,pad=0.3",
+                "facecolor": COLOR_PANEL,
+                "edgecolor": COLOR_GRID,
+            },
         )
     ax.set_xlabel("Critical-band rate $z$ [Bark]")
     ax.set_ylabel(r"Specific loudness $N^{\prime}$ [sone/Bark]")
@@ -861,9 +887,13 @@ def generate_two_tone_separation(output_dir: str) -> None:
         arrowprops={"arrowstyle": "->", "lw": 1.0, "color": COLOR_TERTIARY},
     )
     ax.text(600.0, 62.0, "rated separately", fontsize=11, color=COLOR_FG, ha="center")
+    # Lower in the region than its twin is in the upper one, and for a reason:
+    # the note on the minimum is anchored to the point at 212 Hz and cannot go
+    # anywhere, while this one names a region and can. In Spanish the region
+    # name is long enough to reach back over "212 Hz" at the old height.
     ax.text(
         600.0,
-        12.0,
+        6.0,
         "energy-summed into one FG entry",
         fontsize=11,
         color=COLOR_FG,
@@ -1684,8 +1714,13 @@ def generate_fluctuation_strength(output_dir: str) -> None:
         r"$F = 5.8\,(1.25\,m - 0.25)(0.05\,L - 1)$",
         r"      $/\,[(f_{\mathrm{mod}}/5)^2 + 4/f_{\mathrm{mod}} + 1.5]$  vacil",
     ]
+    # Clear of the corner the sweep starts in. The signal model's first point
+    # is at 0.5 Hz, which is the left edge of the axis, and it is low enough
+    # to be inside a box written into that corner: the series then read as
+    # beginning at 1 Hz, a point short of the range the closed form is drawn
+    # over. The formula wants the empty floor, not the corner.
     ax.text(
-        0.015,
+        0.075,
         0.03,
         "\n".join(info),
         transform=ax.transAxes,
@@ -2928,6 +2963,14 @@ def generate_exposure_budget(output_dir: str) -> None:
     ax_n.axhline(
         float(expanded(0.0, 0.7)), color="#ff7f0e", linewidth=1.4, linestyle=":"
     )
+    # One label per floor line, drawn just above it, and both take the chip:
+    # only the upper one has a curve through it, but a pair of labels that
+    # says the same kind of thing in the same place should look the same.
+    chip = {
+        "boxstyle": "round,pad=0.4",
+        "facecolor": COLOR_PANEL,
+        "edgecolor": COLOR_GRID,
+    }
     ax_n.text(
         3.4,
         float(expanded(0.0)) + 0.10,
@@ -2935,6 +2978,8 @@ def generate_exposure_budget(output_dir: str) -> None:
         fontsize=10,
         ha="left",
         color=COLOR_TERTIARY,
+        zorder=6,
+        bbox=chip,
     )
     ax_n.text(
         3.4,
@@ -2943,6 +2988,8 @@ def generate_exposure_budget(output_dir: str) -> None:
         fontsize=10,
         ha="left",
         color="#ff7f0e",
+        zorder=6,
+        bbox=chip,
     )
     ax_n.set_ylim(1.6, 7.0)
     ax_n.set_xlabel("Samples per task ($I$) or per group ($N$)")
@@ -3009,13 +3056,23 @@ def generate_stoi_segment_scores(output_dir: str) -> None:
             zorder=0,
         )
     ax_w.axvspan(1.6, 1.95, color=theme_fill(COLOR_TERTIARY, ax_w), lw=0, zorder=0)
+    # Two thirds of the way up rather than at the top, and chipped: the note
+    # below runs the full width of the panel at the top, and the two words
+    # were printed one over the other. The band name is the one with somewhere
+    # to go, and where it goes the waveform is, hence the chip.
     ax_w.text(
         1.775,
-        0.92 * float(np.max(clean)),
+        0.66 * float(np.max(clean)),
         "dropout",
         fontsize=10,
         ha="center",
         color=COLOR_TERTIARY,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.3",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
     dropped = int(np.count_nonzero(~keep))
     ax_w.text(
@@ -3125,17 +3182,31 @@ def generate_sii_masking_chain(output_dir: str) -> None:
         label="equivalent disturbance $D_i$",
     )
     k = 8  # the 1 kHz band
-    ax.annotate(
+    ax2 = ax.twinx()
+    ax2.plot(pos, res.band_audibility, "-", color="#ff7f0e", linewidth=2.4, alpha=0.9)
+    # Drawn by the twin, positioned by the host. The band-audibility curve
+    # runs through all three lines of this note, and it is on the twin, which
+    # the figure draws after the host: a zorder cannot lift a host annotation
+    # over it, because an axes is drawn whole. Handing the annotation to the
+    # twin and its coordinates to the host puts the letters above the curve
+    # and leaves them at the same place on the page, to the pixel.
+    ax2.annotate(
         f"at 1 kHz there is no noise in this band,\n"
         f"yet $Z_i$ = {res.masking[k]:.0f} dB: the masking is spread up\n"
         "from the low bands, not made here",
         xy=(pos[k], res.masking[k]),
+        xycoords=ax.transData,
         xytext=(pos[k] + 0.6, 54.0),
+        textcoords=ax.transData,
         fontsize=10,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
         arrowprops={"arrowstyle": "->", "lw": 1.0},
     )
-    ax2 = ax.twinx()
-    ax2.plot(pos, res.band_audibility, "-", color="#ff7f0e", linewidth=2.4, alpha=0.9)
     ax2.set_ylabel("Band audibility $A_i$", color="#ff7f0e")
     ax2.set_ylim(0.0, 1.0)
     ax2.tick_params(axis="y", colors="#ff7f0e")
@@ -3193,6 +3264,12 @@ def generate_sii_octave_masking_blindness(output_dir: str) -> None:
         xy=(levels[-1], 0.5 * (curves["octave"][-1] + curves["one-third-octave"][-1])),
         xytext=(62.0, 0.52),
         fontsize=11,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
         arrowprops={"arrowstyle": "->", "lw": 1.0},
     )
     ax.annotate(
@@ -3253,14 +3330,27 @@ def generate_sti_mtf_curves(output_dir: str) -> None:
         ax_t.semilogx(mod, closed, "--", color=color, linewidth=1.2, alpha=0.8)
     for f_stipa in (_STIPA_F1[band], _STIPA_F2[band]):
         ax_t.axvline(f_stipa, color=COLOR_FG, linewidth=1.0, linestyle=":")
+    # Along the top of the panel, not along the floor of it. The note is as
+    # wide as the span it names, so at the bottom it lay across the tail of
+    # the 2,5 s curve and its backing swallowed the 10 Hz point whole -- the
+    # one band where that curve has all but run out of modulation, which is
+    # the thing the panel is showing. Above the family there is nothing to
+    # hide, and the two rules it names run the whole height of the panel, so
+    # it names them from the top as well as it did from the bottom.
     ax_t.text(
         np.sqrt(_STIPA_F1[band] * _STIPA_F2[band]),
-        0.04,
+        1.02,
         "STIPA probes only these two $F$ in this band",
         fontsize=10,
         ha="center",
         va="bottom",
         color=COLOR_FG,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
     ax_t.set_title("Reverberation: a low-pass corner that moves", pad=10)
     ax_t.legend(loc="lower left", fontsize=10)
@@ -3294,9 +3384,20 @@ def generate_sti_mtf_curves(output_dir: str) -> None:
     ax_n.annotate(
         r"$\times\,1/(1 + 10^{-\mathrm{SNR}/10})$: flat in $F$",
         xy=(1.25, 0.47),
-        xytext=(5.0, 0.10),
+        # Over the family rather than under it. Under it the box lay along
+        # the 8 and 10 Hz end of the SNR = 0 dB curve, which is where that
+        # curve is nearest the others and where its points are the ones worth
+        # reading; above the 20 dB curve the panel is empty from 2 Hz on, and
+        # the pointer still leaves the box for the curve the factor scales.
+        xytext=(5.0, 0.90),
         fontsize=11,
         ha="center",
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
         arrowprops={"arrowstyle": "->", "lw": 1.0},
     )
     ax_n.set_title("Steady noise: the same curve, scaled down", pad=10)
@@ -3305,7 +3406,11 @@ def generate_sti_mtf_curves(output_dir: str) -> None:
     for ax in (ax_t, ax_n):
         ax.set_xlabel("Modulation frequency $F$ [Hz]")
         ax.set_ylabel("Modulation transfer $m$ (1 kHz band)")
-        ax.set_ylim(0.0, 1.05)
+        # The headroom the left panel's note stands in. The highest point
+        # either panel plots is m = 0.996, so nothing before 1.05 was the
+        # data's; the extra five hundredths is the height of a line of text
+        # and its box.
+        ax.set_ylim(0.0, 1.10)
         ax.set_xticks([0.63, 1.0, 2.0, 4.0, 8.0, 12.5])
         ax.set_xticklabels(["0.63", "1", "2", "4", "8", "12.5"])
         ax.xaxis.set_minor_formatter(mticker.NullFormatter())

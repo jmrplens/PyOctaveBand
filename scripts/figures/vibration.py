@@ -326,7 +326,13 @@ def generate_transfer_stiffness(output_dir: str) -> None:
         r"$L_{k,\mathrm{ind}} - L_{k,\mathrm{true}}$ [dB]", color=COLOR_TERTIARY
     )
     twin.tick_params(axis="y", colors=COLOR_TERTIARY)
-    twin.text(
+    # Drawn by the host, positioned by the twin. The host is deliberately
+    # raised above the twin a few lines up, so the |T| curve is painted over
+    # anything the twin draws, this label included; a zorder on a twin artist
+    # cannot answer that, because an axes is drawn whole. Handing the label to
+    # the host leaves it exactly where it was on the page and puts it above
+    # the curve, and the chip then keeps the curve out of the letters.
+    mid.text(
         0.985,
         0.06,
         "the ±1 dB the criterion buys",
@@ -335,6 +341,12 @@ def generate_transfer_stiffness(output_dir: str) -> None:
         ha="right",
         fontsize=9.5,
         color=COLOR_TERTIARY,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
 
     low.semilogx(
@@ -359,6 +371,12 @@ def generate_transfer_stiffness(output_dir: str) -> None:
         ha="right",
         fontsize=9.5,
         color=COLOR_FG,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
     fig.align_ylabels()
     plt.tight_layout()
@@ -807,13 +825,28 @@ def generate_vibration_weighting_family(output_dir: str) -> None:
     # The band each part of the family is tabulated over, drawn above the
     # curves: ISO 2631-1 Table 3 (0,5-80 Hz, band-limited 0,4/100 Hz),
     # its Wf column (0,1-0,5 Hz, band-limited 0,08/0,63 Hz) and ISO 5349-1
-    # Table A.2 (6,3-1250 Hz, band-limited 6,31/1258,9 Hz).
+    # Table A.2 (6,3-1250 Hz, band-limited 6,31/1258,9 Hz). Each carries the
+    # frequency its label is centred on, which is the middle of the band for
+    # the first two and is not for the third: the hand-arm range begins under
+    # the whole-body band drawn above it, so a chip centred on 6,3-1250 Hz
+    # sits on the 80 Hz end of that bar and hides it, leaving the bar
+    # apparently stopping in mid-air at the very frequency the label beside it
+    # states. Centred over 80-1250 Hz -- the part of the range that is the
+    # hand-arm band's alone -- the chip clears that end by a decade and still
+    # stands over what it names.
     bands = (
-        (0.1, 0.5, 11.0, COLOR_TERTIARY, "Wf: 0.1–0.5 Hz"),
-        (0.5, 80.0, 7.5, COLOR_PRIMARY, "whole body: 0.5–80 Hz"),
-        (6.3, 1250.0, 4.0, COLOR_SECONDARY, "hand-arm Wh: 6.3–1250 Hz"),
+        (0.1, 0.5, 11.0, COLOR_TERTIARY, "Wf: 0.1–0.5 Hz", np.sqrt(0.1 * 0.5)),
+        (0.5, 80.0, 7.5, COLOR_PRIMARY, "whole body: 0.5–80 Hz", np.sqrt(0.5 * 80.0)),
+        (
+            6.3,
+            1250.0,
+            4.0,
+            COLOR_SECONDARY,
+            "hand-arm Wh: 6.3–1250 Hz",
+            np.sqrt(80.0 * 1250.0),
+        ),
     )
-    for low, high, level, colour, label in bands:
+    for low, high, level, colour, label, centre in bands:
         ax.plot(
             [low, high],
             [level, level],
@@ -831,13 +864,19 @@ def generate_vibration_weighting_family(output_dir: str) -> None:
                 zorder=4,
             )
         ax.text(
-            np.sqrt(low * high),
+            centre,
             level + 1.6,
             label,
             fontsize=8.5,
             color=colour,
             ha="center",
             va="bottom",
+            zorder=6,
+            bbox={
+                "boxstyle": "round,pad=0.3",
+                "facecolor": COLOR_PANEL,
+                "edgecolor": COLOR_GRID,
+            },
         )
 
     ax.annotate(
@@ -1085,15 +1124,32 @@ def generate_hav_vwf_lifetime(output_dir: str) -> None:
         color=COLOR_FG,
         alpha=0.75,
         va="center",
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
+    # High in the band rather than through the middle of it: the two threshold
+    # labels stand on the floor of the same band, just right of their rules,
+    # and the Spanish note is long enough to be printed straight over the
+    # first of them. The band is the note's to move inside; the labels are
+    # pinned to their lines.
     ax.text(
         1.15,
-        0.42,
+        0.80,
         "extrapolation beyond Table C.1",
         fontsize=9,
         color=COLOR_FG,
         alpha=0.75,
         va="center",
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
     ax.loglog(
         a8,
@@ -1588,7 +1644,11 @@ def generate_experimental_sea_clf(output_dir: str) -> None:
     colours = [COLOR_FG, COLOR_MUTED, COLOR_PRIMARY, COLOR_SECONDARY]
     ax.bar(labels, values, color=colours, edgecolor=COLOR_FG, linewidth=0.8)
     ax.set_yscale("log")
-    ax.set_ylim(1.0e-4, 1.0e-2)
+    # Headroom for the note that runs along the top: at a decade of it the
+    # note reached down to the tallest bar and printed over the value written
+    # above it, which in Spanish left the reader "4,40" and no exponent. The
+    # note spans the full width of the panel and has nowhere else to go.
+    ax.set_ylim(1.0e-4, 2.0e-2)
     ax.set_ylabel("Loss factor")
     ax.set_title("Measured: Power Injection, 500 Hz Octave", pad=10)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, axis="y", which="both")
@@ -2218,6 +2278,12 @@ def generate_mobility_random_error(output_dir: str) -> None:
         ha="left",
         fontsize=9.5,
         color=COLOR_FG,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
     plt.tight_layout()
     save_figure(output_dir, "mobility_random_error.svg")

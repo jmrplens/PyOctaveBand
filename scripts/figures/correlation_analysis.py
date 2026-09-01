@@ -18,6 +18,7 @@ from phonometry._plot.common import format_frequency_axis, theme_fill
 from .theme import (
     COLOR_FG,
     COLOR_GRID,
+    COLOR_PANEL,
     COLOR_PRIMARY,
     COLOR_SECONDARY,
     COLOR_TERTIARY,
@@ -294,6 +295,14 @@ def generate_synchronous_average(output_dir: str) -> None:
         ha="left",
         fontsize=8.5,
         color=COLOR_FG,
+        # The single noisy period swings through this corner, and the longer
+        # Spanish setting reaches far enough right to meet it.
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
 
     # Panel (b): comb filter, node selection at 32.05 orders.
@@ -340,6 +349,12 @@ def generate_synchronous_average(output_dir: str) -> None:
         ha="left",
         fontsize=8.5,
         color=COLOR_FG,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
 
     plt.tight_layout()

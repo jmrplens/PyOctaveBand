@@ -1063,17 +1063,17 @@ L 670.516094 28.798125
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="patch_7">
-    <path d="M 158.174061 98.295511 
-Q 115.504158 71.444775 73.780528 45.189497 
+    <path d="M 167.492797 147.388214 
+Q 119.99829 96.192552 73.264169 45.816532 
 " style="fill: none; stroke: #ffffff; stroke-linecap: round"/>
-    <path d="M 75.984812 48.821456 
-L 73.780528 45.189497 
-L 78.008666 45.605245 
+    <path d="M 74.455679 49.894559 
+L 73.264169 45.816532 
+L 77.241497 47.31014 
 " style="fill: none; stroke: #ffffff; stroke-linecap: round"/>
    </g>
    <g id="text_7">
     <!-- las dos caídas casi coinciden: -->
-    <g style="fill: #ffffff" transform="translate(111.436417 109.907954) scale(0.095 -0.095)">
+    <g style="fill: #ffffff" transform="translate(111.436417 159.405048) scale(0.095 -0.095)">
      <defs>
       <path id="DejaVuSans-4f" d="M 603 4863 
 L 1178 4863 
@@ -1144,7 +1144,7 @@ z
      <use xlink:href="#DejaVuSans-1d" transform="translate(1440.578125 0)"/>
     </g>
     <!-- 0,6 s de 9 s -->
-    <g style="fill: #ffffff" transform="translate(111.436417 121.310551) scale(0.095 -0.095)">
+    <g style="fill: #ffffff" transform="translate(111.436417 170.807646) scale(0.095 -0.095)">
      <defs>
       <path id="DejaVuSans-f" d="M 750 794 
 L 1409 794 

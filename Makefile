@@ -34,6 +34,19 @@ FIGURE_ENV = OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
 FIGURE_LANGUAGE_DIR = build/figure-language
 FIGURE_LANGUAGE_ENV = PHONOMETRY_FIGURE_LANGUAGE_AUDIT=$(FIGURE_LANGUAGE_DIR)
 
+# Where the generators write down which annotations cannot be read -- a curve
+# drawn behind the letters, or something painted over them -- for `make
+# figure-annotations` to read afterwards (see
+# scripts/figure_annotation_audit.py). Recording only happens when this is
+# set, because unlike the language one it costs renders: the light pass of
+# each language is drawn a few more times, with pieces taken away, to count
+# the pixels. It cannot change a rendered byte -- every artist it hides,
+# unstrokes or lifts is put back before the figure is written, and the whole
+# corpus regenerates byte for byte -- and the directory is under
+# build/, which is gitignored.
+FIGURE_ANNOTATION_DIR = build/figure-annotations
+FIGURE_ANNOTATION_ENV = PHONOMETRY_FIGURE_ANNOTATION_AUDIT=$(FIGURE_ANNOTATION_DIR)
+
 # `[full]` rather than a bare `-e .`: a development environment wants every
 # optional path importable, numba included, so `make test-perf` can exercise
 # the jitted kernel here the way the tests-perf job does in CI. numba stays out
@@ -78,7 +91,11 @@ graphs:
 	# the directory here so `make figure-language` cannot be answered by an
 	# older, partial run.
 	rm -rf $(FIGURE_LANGUAGE_DIR)
-	$(FIGURE_ENV) $(FIGURE_LANGUAGE_ENV) $(PYTHON) scripts/generate_graphs.py
+	# Same reasoning for the annotation measurement: it is per run, and a
+	# leftover fragment would let `make figure-annotations` answer about a
+	# figure this run never drew.
+	rm -rf $(FIGURE_ANNOTATION_DIR)
+	$(FIGURE_ENV) $(FIGURE_LANGUAGE_ENV) $(FIGURE_ANNOTATION_ENV) $(PYTHON) scripts/generate_graphs.py
 	$(FIGURE_ENV) $(FIGURE_LANGUAGE_ENV) $(PYTHON) scripts/generate_diagrams.py
 
 # Every shaded region has to be visible against the page it is drawn on, on
@@ -132,6 +149,19 @@ decimal-comma:
 figure-language:
 	$(PYTHON) scripts/check_figure_language.py --audit $(FIGURE_LANGUAGE_DIR)
 
+# A label drawn across a curve with nothing behind it is hard to read, and a
+# label something is painted over cannot be read at all. No other gate can see
+# either: the figure matches its generator, its colours pass the contrast
+# checks, and `svg.fonttype = "path"` means the committed file has no text node
+# to look for the label in. The generation run above counts, for every label of
+# both language editions, how many of its glyph pixels a stroke paints under
+# them and how many never reach the page; this fails on any at or above the
+# calibrated threshold and prints the band below it for a person to judge.
+# Needs a `make graphs` first; it is answering about that run, not about the
+# tree.
+figure-annotations:
+	$(PYTHON) scripts/check_figure_annotations.py --audit $(FIGURE_ANNOTATION_DIR)
+
 # What to run locally before committing a figure change: regenerate, then
 # verify legibility and staleness the way CI does, each as its own step.
 # Recipe lines rather than prerequisites: prerequisites are free to run
@@ -146,6 +176,7 @@ figures:
 	$(MAKE) graphs
 	$(MAKE) figure-contrast
 	$(MAKE) figure-language
+	$(MAKE) figure-annotations
 	$(PYTHON) scripts/check_figures.py
 
 # Regenerate the Tier-1 documentation animations (WebM for the site, GIF for
@@ -334,7 +365,8 @@ test-gpu:
 
 check: lint security test
 
-.PHONY: install lint format security snyk sonar graphs figure-contrast figure-language figures reports \
+.PHONY: install lint format security snyk sonar graphs figure-contrast figure-language \
+	figure-annotations figures reports \
 	animations animation-freshness posters brand lighthouse \
 	llms pypi-readme api-docs site-reports conformance install-hooks test test-perf test-gpu coverage check \
 	snippets snippets-static claims subscripts

@@ -458,8 +458,22 @@ def generate_fdtd_plane_wave_launch(output_dir: str) -> None:
         fontsize=9,
         color=FIELD_INK,
     )
-    ax_f.text(0.04, 0.5 * sponge * dx, "sponge", fontsize=9, color=FIELD_INK)
-    ax_f.text(0.04, (ny - 0.5 * sponge) * dx, "sponge", fontsize=9, color=FIELD_INK)
+    # Both sponge bands are named from inside their own hatching, which is
+    # drawn in the same ink as the word: the chip is what separates the two.
+    for y_word in (0.5 * sponge * dx, (ny - 0.5 * sponge) * dx):
+        ax_f.text(
+            0.04,
+            y_word,
+            "sponge",
+            fontsize=9,
+            color=FIELD_INK,
+            zorder=6,
+            bbox={
+                "boxstyle": "round,pad=0.3",
+                "facecolor": COLOR_PANEL,
+                "edgecolor": COLOR_GRID,
+            },
+        )
     ax_f.set(xlabel="$x$ [m]", ylabel="$y$ [m]")
     ax_f.set_title("Settled field, 1 kHz CW", pad=10)
 

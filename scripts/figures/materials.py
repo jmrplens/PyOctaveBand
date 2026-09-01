@@ -155,6 +155,12 @@ def generate_floating_floor_transmissibility(output_dir: str) -> None:
         color=COLOR_FG,
         ha="left",
         va="top",
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
     ax_l.set_xlim(rig[0], rig[-1])
     ax_l.set_xlabel(LABEL_FREQ_HZ)
@@ -323,6 +329,12 @@ def generate_enclosed_gas_stiffness(output_dir: str) -> None:
         color=COLOR_FG,
         ha="left",
         va="center",
+        zorder=7,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
     ax.set_xlabel("Loaded thickness $d$ [mm]")
     ax.set_ylabel("Dynamic stiffness per unit area [MN/m³]")
@@ -660,6 +672,12 @@ def generate_airflow_resistance(output_dir: str) -> None:
         xy=(u_ref * 1e3, result.pressure_drop),
         xytext=(2.0, result.pressure_drop + 40),
         fontsize=10,
+        zorder=7,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
         arrowprops={"arrowstyle": "->", "lw": 1.0},
     )
 
@@ -752,6 +770,12 @@ def generate_impedance_tube(output_dir: str) -> None:
         xy=(dl_anchor, 0.75),
         xytext=(15.0, 0.44),
         fontsize=10,
+        zorder=7,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
         arrowprops={"arrowstyle": "->", "lw": 1.0},
     )
 
@@ -998,6 +1022,14 @@ def generate_limp_frame_effective_density(output_dir: str) -> None:
         ha="left",
         fontsize=8.5,
         color=COLOR_FG,
+        # One line in English and one long line in Spanish, which reaches the
+        # rigid-frame imaginary part and the decoupling rule in this corner.
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
     plt.tight_layout()
     save_figure(output_dir, "limp_frame_effective_density.svg")
@@ -3134,10 +3166,17 @@ def generate_sound_absorption_inversion(output_dir: str) -> None:
     ax_t.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_t.set_axisbelow(True)
     ax_t.legend(loc="lower left", fontsize=10)
+    # Under both decays rather than along $T_2$. The note is five bands wide,
+    # so where it used to sit it lay on the steep part of that curve and its
+    # backing swallowed the 315 Hz square whole: the curve read as stopping at
+    # 250 Hz and starting again at 400, and the shaded difference the panel is
+    # about had an opaque bite out of it. Below $T_2$ the panel is empty for
+    # the whole width of the box, so the words need no backing at all, and the
+    # pointer still lands where the two decays meet.
     ax_t.annotate(
         "the two decays nearly coincide:\n0.6 s out of 9 s",
         xy=(0.0, 8.7),
-        xytext=(1.2, 5.4),
+        xytext=(1.2, 3.3),
         fontsize=9.5,
         color=COLOR_FG,
         arrowprops={"arrowstyle": "->", "lw": 1.0, "color": COLOR_FG},
@@ -3560,6 +3599,12 @@ def generate_standing_wave_envelope(output_dir: str) -> None:
         xytext=(0.27, -14.6),
         fontsize=9.5,
         color=COLOR_FG,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
         arrowprops={"arrowstyle": "->", "lw": 1.0, "color": COLOR_FG},
     )
 
@@ -3589,8 +3634,24 @@ def generate_standing_wave_envelope(output_dir: str) -> None:
         fontsize=9.5,
         color=COLOR_FG,
     )
+    # Clear of the frame on both sides by the size of its own chip: at
+    # (0,005, -19,4) the box hung over the bottom of the panel and took the
+    # x-axis line and the 0,0 tick with it, and over the left spine as well,
+    # which is a worse loss than the rigid-wall curve the chip is there to
+    # keep out of the words.
     ax.text(
-        0.005, -19.4, "specimen face  $x$ = 0", ha="left", fontsize=9.5, color=COLOR_FG
+        0.012,
+        -18.3,
+        "specimen face  $x$ = 0",
+        ha="left",
+        fontsize=9.5,
+        color=COLOR_FG,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
 
     ax.set_xlabel("Distance from the specimen face $x$ [m]  (towards the source)")
@@ -3664,6 +3725,12 @@ def generate_porous_model_comparison(output_dir: str) -> None:
         ha="center",
         fontsize=10,
         color=COLOR_FG,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
     format_frequency_axis(ax_z, 20.0, 20000.0)
     ax_z.set_xlabel(LABEL_FREQ_HZ)
@@ -3986,6 +4053,12 @@ def generate_sheet_transfer_impedance(output_dir: str) -> None:
         xytext=(freq[peak] * 1.5, 3.2),
         fontsize=10,
         color=COLOR_FG,
+        zorder=7,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
         arrowprops={"arrowstyle": "->", "lw": 1.0, "color": COLOR_FG},
     )
     ax.axvline(freq[peak], color=COLOR_GRID, linestyle=":", linewidth=1.4)
@@ -4109,6 +4182,17 @@ def generate_critical_coupling_impedance(output_dir: str) -> None:
             fontsize=8.5,
             color=color,
             va="center",
+            zorder=7,
+            # The label names a point on the locus, so it is clipped with the
+            # locus: the over-damped curve reaches 300 Hz below the bottom of
+            # these axes, and an unclipped label for it is drawn outside them,
+            # across the title.
+            clip_on=True,
+            bbox={
+                "boxstyle": "round,pad=0.3",
+                "facecolor": COLOR_PANEL,
+                "edgecolor": COLOR_GRID,
+            },
         )
     ax_l.scatter([1.0], [0.0], color=COLOR_FG, s=90, zorder=6, marker="x")
     ax_l.text(1.12, 0.18, r"matched  $1 + 0\mathrm{j}$", fontsize=10, color=COLOR_FG)
@@ -4183,6 +4267,12 @@ def generate_slow_sound_dispersion(output_dir: str) -> None:
         xytext=(330.0, 0.62),
         fontsize=10,
         color=COLOR_FG,
+        zorder=7,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
         arrowprops={"arrowstyle": "->", "lw": 1.0, "color": COLOR_FG},
     )
     ax.text(

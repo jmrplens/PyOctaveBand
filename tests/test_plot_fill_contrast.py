@@ -11,6 +11,8 @@ distance on both pages.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
@@ -28,10 +30,15 @@ from phonometry._plot.common import (
     _FILL_DELTA_E,
     _FILL_WEIGHT_STEPS,
     _srgb_to_lab,
+    contrast_ratio,
     delta_e_2000,
+    page_is_dark,
     theme_fill,
     theme_fill_alpha,
 )
+
+if TYPE_CHECKING:
+    from matplotlib.axes import Axes
 
 # CIE 142-2001 reference pairs for CIEDE2000, as published with Sharma, Wu and
 # Dalal (2005), *The CIEDE2000 color-difference formula: implementation notes,
@@ -151,6 +158,13 @@ def test_theme_fill_moves_away_from_the_page_in_both_directions() -> None:
     assert sum(dark) > 0.0, "a wash on the dark page must be lighter than it"
 
 
+def _axes_on(page: str) -> Axes:
+    """A bare axes whose patch is *page*, which is where the page is read from."""
+    _fig, ax = plt.subplots()
+    ax.set_facecolor(page)
+    return ax
+
+
 def test_theme_fill_reads_the_page_from_the_axes() -> None:
     """A dark axes patch yields the dark wash without an explicit background."""
     _fig, ax = plt.subplots()
@@ -158,6 +172,53 @@ def test_theme_fill_reads_the_page_from_the_axes() -> None:
     assert theme_fill(_C_PRIMARY, ax) == theme_fill(_C_PRIMARY, background="#000000")
     ax.set_facecolor("#ffffff")
     assert theme_fill(_C_PRIMARY, ax) == theme_fill(_C_PRIMARY, background="#ffffff")
+    plt.close("all")
+
+
+@pytest.mark.parametrize(
+    "page",
+    [
+        "#ffffff",
+        "#f0f2f5",
+        "#b0b0b0",
+        "#808080",
+        "#767676",
+        "#4d4d4d",
+        "#000000",
+        "#0d1117",
+        "#161b22",
+        "#1c2128",
+    ],
+)
+def test_a_page_is_dark_exactly_where_white_ink_beats_black_ink(page: str) -> None:
+    """The rule is the crossover, not a threshold picked for the look of it.
+
+    ``page_is_dark`` decides which of two fixed answers a drawing gets: the
+    black-centred wave-field colormap or the white-centred one, the dark chip
+    behind a label or the light one. So the honest boundary is the luminance
+    at which white ink and black ink on that page have the same contrast
+    ratio, and the classification has to agree with the ratios themselves at
+    every page, including the mid greys where a weighted sum of the raw sRGB
+    channels and the gamma-corrected luminance part company.
+    """
+    rgb = to_rgb(page)
+    white = contrast_ratio(rgb, (1.0, 1.0, 1.0))
+    black = contrast_ratio(rgb, (0.0, 0.0, 0.0))
+    assert page_is_dark(_axes_on(page)) is (white > black)
+    plt.close("all")
+
+
+def test_a_mid_grey_page_takes_black_ink_and_is_not_a_dark_page() -> None:
+    """The case that separates relative luminance from a raw channel average.
+
+    ``#808080`` is halfway along the sRGB scale and nowhere near halfway up
+    the luminance one: its relative luminance is 0.216, which leaves black on
+    it well ahead of white. Reading it as a dark page would put the dark chip
+    and the black-centred field map on a light grey drawing.
+    """
+    rgb = to_rgb("#808080")
+    assert contrast_ratio(rgb, (0.0, 0.0, 0.0)) > contrast_ratio(rgb, (1.0, 1.0, 1.0))
+    assert not page_is_dark(_axes_on("#808080"))
     plt.close("all")
 
 

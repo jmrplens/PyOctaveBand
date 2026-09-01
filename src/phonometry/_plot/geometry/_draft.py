@@ -28,6 +28,7 @@ from ..common import (
     _C_PRIMARY_LIGHT,
     _C_SECONDARY,
     _C_SECONDARY_LIGHT,
+    page_is_dark,
     theme_fill_alpha,
 )
 
@@ -92,6 +93,38 @@ def _metres(value: float, language: str) -> str:
     return (
         format_number(value, language, decimals=2, trim=True) + " " + _t("m", language)
     )
+
+
+#: Fill and edge of the chip a label wears when it is drawn over the drawing,
+#: on a light page and on a dark one. A drafting plate is hatched material
+#: with the dimensions written across it, so the letters and the hatch land on
+#: each other; the answer both CAD and this corpus use is to mask the text
+#: rather than to move it. The fill is a shade off the page rather than the
+#: page itself, so the box reads as a panel and its edge is not the only thing
+#: separating it from the drawing.
+#:
+#: Literal pairs rather than shades derived from the page the way
+#: ``theme_fill`` derives a wash, and the reason is in the numbers: these
+#: are the two the documentation corpus uses, and their distance from their own
+#: page is not one distance. The fill is dE00 3,1 from the white page and 9,0
+#: from the black one, the edge 6,5 and 24,5 -- the dark outline is
+#: deliberately several times the contrast of the light one, because a hairline
+#: at the light one's distance disappears into a dark drawing. One derived
+#: target cannot produce both, and two targets are the same two magic numbers
+#: written less legibly.
+_CHIP_LIGHT: Final = ("#f0f2f5", "#e0e0e0")
+_CHIP_DARK: Final = ("#1c2128", "#555555")
+
+
+def _chip(ax: Axes, pad: float) -> dict[str, Any]:
+    """The opaque backing for a label written over the drawing.
+
+    Which pair to use is read off the page the drawing is on, the same way the
+    wave-field colormap and the derived fills read it, so a plate drawn under
+    ``dark_background`` gets the dark pair without the caller having to say so.
+    """
+    face, edge = _CHIP_DARK if page_is_dark(ax) else _CHIP_LIGHT
+    return {"boxstyle": f"round,pad={pad}", "facecolor": face, "edgecolor": edge}
 
 
 # ---------------------------------------------------------------------------
@@ -162,6 +195,7 @@ def _dim(
         rotation=rotation,
         rotation_mode="anchor",
         zorder=6,
+        bbox=_chip(ax, 0.2),
     )
 
 

@@ -207,6 +207,12 @@ def generate_shaped_sweep(output_dir: str) -> None:
         ha="right",
         fontsize=8.5,
         color=COLOR_FG,
+        zorder=6,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
     )
 
     posw = freqs_w > 0.0

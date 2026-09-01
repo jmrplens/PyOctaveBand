@@ -113,9 +113,14 @@ _FIELD_CMAP_LIGHT: Final = "RdBu_r"
 #: Diverging wave-field colormap of a dark axes background (black centre).
 _FIELD_CMAP_DARK: Final = "phonometry_field_dark"
 
-#: Midpoint of the 0-1 luminance scale: an axes facecolor whose luminance
-#: falls below it counts as a dark background and gets the dark-centre map.
-_DARK_BACKGROUND_LUMINANCE_MAX: Final = 0.5
+#: Where a page stops taking black ink and starts taking white, in WCAG 2.2
+#: relative luminance. Derived rather than chosen: the contrast of white on a
+#: page of luminance ``Y`` is ``1.05 / (Y + 0.05)`` and that of black on it is
+#: ``(Y + 0.05) / 0.05``, and the two are equal at
+#: ``sqrt(1.05 * 0.05) - 0.05``. Below it white reads better than black, which
+#: is exactly what "a dark page" has to mean to the two things that ask: the
+#: centre of the wave-field colormap, and the chip a label is written on.
+_DARK_BACKGROUND_LUMINANCE_MAX: Final = float(np.sqrt(1.05 * 0.05) - 0.05)
 
 
 def _register_field_dark_cmap() -> None:
@@ -147,24 +152,38 @@ def _register_field_dark_cmap() -> None:
     mpl.colormaps.register(LinearSegmentedColormap.from_list(_FIELD_CMAP_DARK, out))
 
 
+def page_is_dark(ax: Axes | None) -> bool:
+    """Whether the page *ax* is drawn on is a dark one.
+
+    Reads the axes patch color, so a ``dark_background`` style or any
+    explicitly dark facecolor is honoured without the caller saying so. The
+    one place that question is answered, for every artist whose colour has to
+    flip with the page.
+
+    Through :func:`relative_luminance`, which linearises the sRGB channels
+    before weighting them, and against a threshold derived from that same
+    scale (:data:`_DARK_BACKGROUND_LUMINANCE_MAX`). Applying the weights to
+    the gamma-encoded channels instead -- Rec. 709 luma, which is what stood
+    here -- and comparing against a flat 0.5 answers a slightly different
+    question with a threshold picked for the look of it. The two agree on
+    every page in the corpus and disagree on about a seventh of the sRGB
+    cube; where they part, this one is right by construction. A mid grey is
+    the case to hold on to: ``#808080`` has a relative luminance of 0.216, so
+    black on it out-contrasts white 5.3 to 4.0, and it is a light page under
+    both rules.
+    """
+    return relative_luminance(_page_color(ax, None)) < _DARK_BACKGROUND_LUMINANCE_MAX
+
+
 def _field_cmap(ax: Axes) -> str:
     """Background-aware diverging colormap name for a signed wave field.
 
-    Reads the axes patch color (so a ``dark_background`` style, or any
-    explicitly dark facecolor, is honoured) and returns the map whose centre
-    matches it.  Registers :data:`_FIELD_CMAP_DARK` on first use, so the name
-    is also available for an explicit ``cmap`` override.
+    Returns the map whose centre matches the page.  Registers
+    :data:`_FIELD_CMAP_DARK` on first use, so the name is also available for
+    an explicit ``cmap`` override.
     """
-    from matplotlib.colors import to_rgb
-
     _register_field_dark_cmap()
-    r, g, b = to_rgb(ax.get_facecolor())
-    luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
-    return (
-        _FIELD_CMAP_DARK
-        if luminance < _DARK_BACKGROUND_LUMINANCE_MAX
-        else _FIELD_CMAP_LIGHT
-    )
+    return _FIELD_CMAP_DARK if page_is_dark(ax) else _FIELD_CMAP_LIGHT
 
 
 # ---------------------------------------------------------------------------
