@@ -1407,10 +1407,10 @@ octave_filter = filters.OctaveFilterBank(
 )
 afilter = filters.WeightingFilter(fs, "A", stateful=True)
 
-for block in sf.blocks("measurement.wav", blocksize=256, overlap=0):
+for frame in sf.blocks("measurement.wav", blocksize=256, overlap=0):
 
     # Apply A-filter
-    weighted = afilter.filter(block)
+    weighted = afilter.filter(frame)
 
     # Split into octave bands
     block_spl, _, block_output = octave_filter.filter(weighted, sigbands=True, detrend=False)
@@ -1500,7 +1500,7 @@ env = filters.TimeWeighting(fs, mode="fast")  # the class is inherently stateful
 for x in audio_stream(block):            # your capture callback
     y = env.process(aw.filter(x))
     spl = 10 * np.log10(y[..., -1] / (2e-5) ** 2)  # instantaneous LAF
-    display(spl)
+    print(spl)  # your display update
 ```
 
 ### Stateful-mode constraints

@@ -1945,7 +1945,7 @@ returns the annoyance together with the two intermediate weightings:
 from phonometry import psychoacoustics
 
 res = psychoacoustics.psychoacoustic_annoyance(30.0, 2.0, 0.5, 0.3)   # N5, S, F, R
-print(round(res.annoyance, 4))   # 37.0478
+print(round(res.annoyance, 4))   # 37.0477
 print(round(res.w_s, 4), round(res.w_fr, 4))   # 0.1001 0.2125
 
 res.plot()   # PA beside its wS and wFR weightings (needs matplotlib)
@@ -1972,10 +1972,19 @@ signal
 model.
 
 ```python
+import numpy as np
 from phonometry import psychoacoustics
 
+# A raw recording plus its calibration so the guide runs standalone. There is
+# no calibration_factor argument here, so x must already be in pascals.
+fs = 48000
+t = np.arange(int(5.0 * fs)) / fs
+x = (1.0 + 0.8 * np.sin(2 * np.pi * 4.0 * t)) * np.sin(2 * np.pi * 1000 * t)
+x *= 2e-5 * 10 ** (70 / 20) / np.sqrt(np.mean(x**2))   # calibrated to 70 dB SPL
+
 res = psychoacoustics.psychoacoustic_annoyance_from_signal(x, fs, field="free")
-print(res.annoyance, res.n5, res.sharpness, res.roughness, res.fluctuation_strength)
+print(f"PA = {res.annoyance:.1f}  (N5 = {res.n5:.1f} sone, S = {res.sharpness:.2f} acum,"
+      f" R = {res.roughness:.2f} asper, F = {res.fluctuation_strength:.2f} vacil)")
 
 res.plot()   # the same PA / wS / wFR view, now from the four derived sensations
 ```
@@ -2074,7 +2083,7 @@ trace.
 from phonometry import psychoacoustics
 
 res = psychoacoustics.fluctuation_strength(x, fs)
-print(res.fluctuation_strength)   # vacil
+print(round(res.fluctuation_strength, 2))   # 0.65 vacil for the signal above
 res.plot()   # specific fluctuation strength F′(z) over the Bark axis (needs matplotlib)
 ```
 

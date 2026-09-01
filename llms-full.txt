@@ -583,7 +583,7 @@ $$
 ```python
 from phonometry import aircraft
 
-noys = aircraft.perceived_noisiness(spl)      # per-band noys (spl = 24 band levels, dB)
+noys = aircraft.perceived_noisiness(spl)      # spl: your measured half-second of unweighted third-octave levels (24 bands, dB)
 pnl = aircraft.perceived_noise_level(spl)      # PNdB
 ```
 
@@ -629,7 +629,15 @@ so $\mathrm{EPNL} = \mathrm{PNLTM} + D$ with the duration correction $D$.
 import numpy as np
 from phonometry import aircraft
 
-# spectra: a (K, 24) array of one-third-octave band levels sampled every dt s
+# spectra: a (K, 24) array of one-third-octave band levels sampled every dt s,
+# here the synthetic flyover of the figure above
+k, dt = 41, 0.5
+idx = np.arange(k)
+shape = 15.0 * np.exp(-((np.log10(aircraft.NOY_BANDS) - np.log10(400.0)) ** 2) / 0.5)
+gain = 30.0 * np.exp(-((idx - 20.0) ** 2) / (2 * 5.0**2)) - 5.0
+spectra = (55.0 + shape)[None, :] + gain[:, None]
+spectra[:, 17] += 12.0 * np.exp(-((idx - 20.0) ** 2) / (2 * 6.0**2))  # 2500 Hz fan tone
+
 res = aircraft.effective_perceived_noise_level(spectra, dt=0.5)
 print(res.epnl, res.pnltm, res.duration_correction, res.band_limits)
 res.plot()   # PNL/PNLT time history (needs matplotlib)
@@ -647,15 +655,6 @@ duration/limit machinery directly from a $\mathrm{PNLT}$ series.
 <summary>Show the code for this figure</summary>
 
 ```python
-import numpy as np
-from phonometry import aircraft
-
-k, dt = 41, 0.5
-idx = np.arange(k)
-shape = 15.0 * np.exp(-((np.log10(aircraft.NOY_BANDS) - np.log10(400.0)) ** 2) / 0.5)
-gain = 30.0 * np.exp(-((idx - 20.0) ** 2) / (2 * 5.0**2)) - 5.0
-spectra = (55.0 + shape)[None, :] + gain[:, None]
-spectra[:, 17] += 12.0 * np.exp(-((idx - 20.0) ** 2) / (2 * 6.0**2))  # 2500 Hz fan tone
 aircraft.effective_perceived_noise_level(spectra, dt).plot()
 ```
 
@@ -1646,8 +1645,13 @@ continuous with their measured corners.
 import numpy as np
 from phonometry import aircraft
 
-# A hemisphere: band levels of shape (azimuth, polar, frequency) at 60 m.
-h = aircraft.RotorcraftHemisphere(frequencies=freqs, azimuth=phi, polar=theta, levels=levels)
+# A hemisphere: band levels of shape (azimuth, polar, frequency) at 60 m. The
+# band centres and the angle grid are the NORAH format's; the (19, 19, 31)
+# block of levels is the campaign's own.
+freqs = 1000.0 * 10.0 ** (np.arange(-20, 11) / 10.0)   # 10 Hz-10 kHz thirds
+phi, theta = np.arange(-90.0, 91.0, 10.0), np.arange(0.0, 181.0, 10.0)
+h = aircraft.RotorcraftHemisphere(frequencies=freqs, azimuth=phi, polar=theta,
+                                  levels=measured_levels)
 h.plot()                                   # fore-aft directivity (needs matplotlib)
 lv = aircraft.hemisphere_source_level(h, 0.0, 90.0)   # level per band abeam-below
 ```
@@ -1684,16 +1688,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import aircraft
 
-freqs = 1000.0 * 10.0 ** (np.arange(-13, 11) / 10.0)   # 50 Hz-10 kHz thirds
+f_thirds = 1000.0 * 10.0 ** (np.arange(-13, 11) / 10.0)   # 50 Hz-10 kHz thirds
 hs, hr, dp = 150.0, 1.5, 500.0                          # overflight geometry
-grass = aircraft.ground_effect_adjustment(freqs, hs, hr, dp, flow_resistivity="D")
-asphalt = aircraft.ground_effect_adjustment(freqs, hs, hr, dp, flow_resistivity="G")
+grass = aircraft.ground_effect_adjustment(f_thirds, hs, hr, dp, flow_resistivity="D")
+asphalt = aircraft.ground_effect_adjustment(f_thirds, hs, hr, dp, flow_resistivity="G")
 
 fig, ax = plt.subplots()
 ax.axhline(0.0, color="0.5", linewidth=1.0)
-ax.semilogx(freqs, asphalt, marker="o", markersize=3,
+ax.semilogx(f_thirds, asphalt, marker="o", markersize=3,
             label="Hard (asphalt/concrete, class G)")
-ax.semilogx(freqs, grass, marker="s", markersize=3,
+ax.semilogx(f_thirds, grass, marker="s", markersize=3,
             label="Soft (grass/pasture, class D)")
 ax.set(xlabel="One-third-octave-band centre frequency [Hz]",
        ylabel="Ground-effect adjustment ΔLg [dB]",
@@ -1706,10 +1710,8 @@ plt.show()
 </details>
 
 ```python
-import numpy as np
 from phonometry import aircraft
 
-freqs = 1000.0 * 10.0 ** (np.arange(-13, 11) / 10.0)   # 50 Hz-10 kHz thirds
 r = 500.0
 received = (lv
             + aircraft.spherical_spreading_adjustment(r)
@@ -2402,8 +2404,37 @@ Assembling the direct path and all twelve flanking paths gives the apparent
 index per band, its energy split and the ISO 717-1 rating in one call:
 
 ```python
-# `paths` holds the twelve flanking paths of the four elements, built the
-# way `d1` was above; the code block under the figure builds all of them.
+# The other three flanking elements, built the way `wall` was above, each with
+# its own area and perimeter sum (Formula C.4); `situ` then holds all five.
+specs = (("ext2", 13.75, 5.0, 2.75, 219.0, 92.6, 0.0125, 2.548, 600.0, 1900.0),
+         ("int1", 11.0, 4.0, 2.75, 360.0, 128.4, 0.01, 1.636, 1800.0, 2500.0),
+         ("int2", 13.75, 5.0, 2.75, 360.0, 128.4, 0.01, 1.839, 1800.0, 2500.0))
+situ = {"floor": el, "ext1": wall}
+for spec in specs:
+    situ[spec[0]] = building.in_situ_element(
+        building.HomogeneousElement(*spec), bands)
+
+# The twelve flanking paths, three per flanking element, each built the way
+# `d1` was above.
+paths = []
+for tag, name, lij in (("1", "ext1", 4.0), ("2", "ext2", 5.0),
+                       ("3", "int1", 4.0), ("4", "int2", 5.0)):
+    flank = situ[name]
+    cross = k_floor_ext if name.startswith("ext") else k_floor_int
+    through = k_ext_ext if name.startswith("ext") else k_int_int
+    paths += [
+        building.airborne_flanking_path(label=f"D{tag}", kind="Df", element_i=situ["floor"],
+                                        element_j=flank, vibration_reduction_index=cross,
+                                        coupling_length=lij, separating_area=20.0,
+                                        delta_r_i=delta),
+        building.airborne_flanking_path(label=f"{tag}d", kind="Fd", element_i=flank,
+                                        element_j=situ["floor"], vibration_reduction_index=cross,
+                                        coupling_length=lij, separating_area=20.0),
+        building.airborne_flanking_path(label=f"{tag}{tag}", kind="Ff", element_i=flank,
+                                        element_j=flank, vibration_reduction_index=through,
+                                        coupling_length=lij, separating_area=20.0),
+    ]
+
 res = building.detailed_airborne_prediction(
     bands, direct_index=building.direct_reduction_index(el.sound_reduction_index,
                                                         delta_r_source=delta),
@@ -2504,11 +2535,13 @@ The impact side of the same building runs on the same `situ` dictionary:
 ```python
 from phonometry import building
 
+k_floor_ext = building.junction_vibration_reduction("rigid_t", "corner", 484.0 / 219.0)
+k_floor_int = building.junction_vibration_reduction("rigid_cross", "corner", 360.0 / 484.0)
 direct = building.direct_impact_level(situ["floor"].impact_level, delta_l=delta)
 flanking = [
     building.impact_flanking_path(label=f"Df{tag}", floor=situ["floor"], element_j=situ[name],
                                   vibration_reduction_index=(
-                             k["floor-ext"] if name.startswith("ext") else k["floor-int"]),
+                             k_floor_ext if name.startswith("ext") else k_floor_int),
                                   coupling_length=lij, delta_l=delta)
     for tag, name, lij in (("1", "ext1", 4.0), ("2", "ext2", 5.0),
                            ("3", "int1", 4.0), ("4", "int2", 5.0))
@@ -2546,6 +2579,11 @@ flanking impact level $L_\mathrm{n,f}$.
 from phonometry import building
 
 # ISO 12354-1 L.2.1: a wood frame building, floor 20 m2, junction 4 m.
+r_wall_leaf = ...   # measured R of the inner leaf per band, dB (ISO 10140-2)
+dv_n = ...          # normalized junction velocity level difference, dB (ISO 10848-2)
+dnf_13 = ...        # laboratory normalized flanking level difference Dn,f, dB
+lnf_13 = ...        # laboratory normalized flanking impact level Ln,f, dB
+
 r_star = building.resonant_sound_reduction_index(r_wall_leaf, bands,
                                                  critical_frequency=2200.0)   # +8 dB below fc
 r_ff = building.flanking_reduction_index_from_normalized_difference(
@@ -6381,8 +6419,15 @@ shifted contour at 500 Hz (clause 5.5).
 ```python
 from phonometry import building
 
-# ASTM E1414 normalizes to A0 = 12 m2, ISO 140-9 to A0 = 10 m2.
-dnc = building.normalized_ceiling_attenuation(l1, l2, absorption, reference_area=12.0)
+# Dn,c from the measured pair: source- and receiving-room levels over the
+# common plenum and the receiving room's absorption area, per band. ASTM E1414
+# normalizes to A0 = 12 m2, ISO 140-9 to A0 = 10 m2.
+l1_c = [80.0] * 16                       # source room, per band
+l2_c = [45.0] * 16                       # receiving room, over the plenum path
+absorption = [12.0] * 16                 # receiving-room A per band (m2)
+astm = building.normalized_ceiling_attenuation(l1_c, l2_c, absorption, reference_area=12.0)
+iso140_9 = building.normalized_ceiling_attenuation(l1_c, l2_c, absorption)
+print(round(float(astm[0]), 2), round(float(iso140_9[0]), 2))   # 35.0 34.21
 
 # A 28 mm perforated plaster acoustic tile, measured to ASTM E1414 (CAC 34).
 dnc = [14.4, 18.6, 21.7, 24.1, 23.4, 30.3, 33.7, 35.2,
@@ -13597,15 +13642,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import electroacoustics
 
-fs = 48000
-n = fs                     # 1 s -> 1 Hz bins; harmonics land on bins
-t = np.arange(n) / fs
+fs_hd = 48000
+n = fs_hd                  # 1 s -> 1 Hz bins; harmonics land on bins
+t = np.arange(n) / fs_hd
 f0 = 1000.0
 amps = {1: 1.0, 2: 0.02, 3: 0.012, 4: 0.006, 5: 0.003}
 sig = sum(a * np.sin(2 * np.pi * k * f0 * t) for k, a in amps.items())
 sig = sig + np.random.default_rng(2026).standard_normal(n) * 1.2e-2
 
-res = electroacoustics.harmonic_analysis(sig, fs, f0, n_harmonics=len(amps))
+res = electroacoustics.harmonic_analysis(sig, fs_hd, f0, n_harmonics=len(amps))
 res.plot()
 plt.show()
 ```
@@ -13683,7 +13728,7 @@ from phonometry import electroacoustics
 # is digital full scale.
 dr = electroacoustics.dynamic_range(output, fs, 997.0)     # dB CCIR-RMS
 # Idle channel noise: capture the output with a digital-zero input.
-idle = electroacoustics.idle_channel_noise(idle_output, fs)  # dBFS CCIR-RMS
+icn = electroacoustics.idle_channel_noise(idle_output, fs)  # dBFS CCIR-RMS
 ```
 
 Both reuse the notch and the ITU-R 468 curve of the THD+N chain, and both are
@@ -13751,12 +13796,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import electroacoustics
 
-fs = 48000
-t = np.arange(fs) / fs                        # 1 s -> tones land on FFT bins
-x = np.sin(2 * np.pi * 60.0 * t) + 0.25 * np.sin(2 * np.pi * 7000.0 * t)
-signal = x + 0.04 * x**2 + 0.012 * x**3       # weakly non-linear device output
+fs_md = 48000
+t = np.arange(fs_md) / fs_md                  # 1 s -> tones land on FFT bins
+src = np.sin(2 * np.pi * 60.0 * t) + 0.25 * np.sin(2 * np.pi * 7000.0 * t)
+sig = src + 0.04 * src**2 + 0.012 * src**3    # weakly non-linear device output
 
-md = electroacoustics.modulation_distortion(signal, fs, f_low=60.0, f_high=7000.0)
+md = electroacoustics.modulation_distortion(sig, fs_md, f_low=60.0, f_high=7000.0)
 md.plot()
 plt.show()
 ```
@@ -13805,15 +13850,15 @@ import numpy as np
 from scipy import signal as sp
 from phonometry import electroacoustics
 
-fs = 48000
+fs_fr = 48000
 n = 400000
 rng = np.random.default_rng(7)
-x = rng.standard_normal(n)
-b, a = sp.butter(2, [400.0, 4000.0], btype="band", fs=fs)   # device under test
-y = sp.lfilter(b, a, x)
-y = y + rng.standard_normal(n) * np.sqrt(np.mean(y ** 2)) * 0.05   # output noise
+src = rng.standard_normal(n)
+b, a = sp.butter(2, [400.0, 4000.0], btype="band", fs=fs_fr)   # device under test
+sig = sp.lfilter(b, a, src)
+sig = sig + rng.standard_normal(n) * np.sqrt(np.mean(sig ** 2)) * 0.05  # output noise
 
-res = electroacoustics.transfer_function(x, y, fs, estimator="H1")
+res = electroacoustics.transfer_function(src, sig, fs_fr, estimator="H1")
 res.plot()
 plt.show()
 ```
@@ -14904,6 +14949,7 @@ from phonometry import electroacoustics
 fs, f1, f2, seconds = 48000, 20.0, 6000.0, 4.0
 x = electroacoustics.synchronized_sweep_signal(fs, f1, f2, seconds)   # play this...
 # ... record the device response into `y` (include the decay tail) ...
+y = x + 0.12 * x**2 + 0.08 * x**3     # a memoryless cubic stands in for the recording
 res = electroacoustics.swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3)
 
 res.harmonic_responses    # complex H1..H3 on res.frequencies
@@ -15009,6 +15055,7 @@ filter.
 from phonometry import electroacoustics, room
 
 x = room.sweep_signal(fs, f1, f2, seconds)          # the ISO 18233 ESS
+y = x + 0.12 * x**2 + 0.08 * x**3                   # the same cubic, recorded from the ESS
 res = electroacoustics.swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, method="farina")
 res.plot()   # same |Hn| + THD(f) panels as the synchronized method (needs matplotlib)
 ```
@@ -15038,7 +15085,17 @@ all-pass parts:
 
 ```python
 import numpy as np
+from scipy import signal as sp_signal
 from phonometry import signals
+
+gain_a = 10.0 ** (6.0 / 40.0)          # the measured device: a +6 dB peaking EQ
+w0 = 2.0 * np.pi * 1000.0 / fs         # at 1 kHz, Q = 1, through a 2.5 ms latency
+alpha = np.sin(w0) / 2.0
+b = np.array([1 + alpha * gain_a, -2 * np.cos(w0), 1 - alpha * gain_a])
+a = np.array([1 + alpha / gain_a, -2 * np.cos(w0), 1 - alpha / gain_a])
+imp = np.zeros(16384)
+imp[int(0.0025 * fs)] = 1.0
+ir = sp_signal.lfilter(b / a[0], a / a[0], imp)
 
 H = np.fft.rfft(ir)                    # one-sided response, DC..Nyquist
 h_min = signals.minimum_phase(np.abs(H))       # phase from the magnitude alone
@@ -15497,6 +15554,19 @@ back **per band**, and the result is plottable in one line, the form in which
 the criteria are actually checked (each band passes or fails on its own):
 
 ```python
+# The scan the figure below is drawn from: ten positions over six octave
+# bands, a nearly uniform surface pressure, and a normal intensity per band
+# that turns the field reactive towards low frequency, with two inward-flowing
+# positions in the 125 Hz band (rescaled so the band mean keeps its target).
+freqs = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+delta_pi = np.array([10.5, 8.5, 6.0, 4.5, 3.5, 3.0])   # target Lp − L|In|
+rng = np.random.default_rng(9614)
+lp_bands = 78.0 + rng.normal(0.0, 0.4, (10, freqs.size))
+i_mean = 10.0 ** ((78.0 - delta_pi) / 10.0) * 1.0e-12
+in_bands = i_mean[None, :] * (1.0 + rng.normal(0.0, 0.18, (10, freqs.size)))
+in_bands[:2, 0] = -0.35 * i_mean[0]
+in_bands[2:, 0] *= (10.0 * i_mean[0] - in_bands[:2, 0].sum()) / in_bands[2:, 0].sum()
+
 fi = emission.field_indicators(lp_bands, in_bands, freqs)   # (positions, bands)
 fi.plot(dynamic_capability=ld)   # F2/F3 per band vs Ld, F4 on a twin axis (needs matplotlib)
 ```
@@ -15610,17 +15680,17 @@ masks band by band and returns the class the chain actually meets:
 the loosest class every band clears, or `None` when some band clears neither:
 
 ```python
-from phonometry import metrology
+from phonometry import emission
 
 # The band centres Table 2 is defined on, and the measured residual index of
 # the chain: one value per band, taken with the spacer that will be fitted in
 # the field. Replace the placeholder with your own residual-intensity test.
-freqs, _, _ = metrology.residual_index_limits("instrument", spacing=0.012)
+freqs, _, _ = emission.residual_index_limits("instrument", spacing=0.012)
 measured_delta_pi0 = [11.0, 11.9, 11.2, 10.0, 13.2, 15.9, 17.0, 18.0,
                       19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 24.0, 24.0,
                       24.0, 24.0, 24.0, 24.0, 24.0, 24.0]   # dB, 22 bands
 
-res = metrology.intensity_class_compliance(measured_delta_pi0, freqs,
+res = emission.intensity_class_compliance(measured_delta_pi0, freqs,
                                            device="instrument", spacing=0.012)
 print(res.overall_class)          # 2: one band misses the class 1 minimum
 print(res.binding_margin())       # smallest per-band margin to that class [dB]
@@ -15645,7 +15715,7 @@ whole chain is graded class 2.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import metrology
+from phonometry import emission
 
 # A complete instrument with the common 12 mm spacer. The measured index is
 # modelled from the physics behind Table 2: a residual phase mismatch φs reads
@@ -15653,13 +15723,13 @@ from phonometry import metrology
 # climbs 10 dB per decade, and above 1 kHz the mismatch of a real chain grows
 # with frequency, so the index levels off.
 spacing = 0.012
-freqs, _, _ = metrology.residual_index_limits("instrument", spacing=spacing)
+freqs, _, _ = emission.residual_index_limits("instrument", spacing=spacing)
 phase_mismatch = 0.05 * np.maximum(1.0, freqs / 1000.0)          # degrees
-measured = metrology.residual_index_from_phase_mismatch(phase_mismatch, freqs,
+measured = emission.residual_index_from_phase_mismatch(phase_mismatch, freqs,
                                                         spacing)
 measured = measured - 4.0 * np.exp(-((np.log(freqs / 100.0) / 0.25) ** 2))
 
-res = metrology.intensity_class_compliance(measured, freqs, spacing=spacing)
+res = emission.intensity_class_compliance(measured, freqs, spacing=spacing)
 res.plot()
 plt.show()
 ```
@@ -15696,14 +15766,14 @@ $$
 and the two conversions run both ways:
 
 ```python
-from phonometry import metrology
+from phonometry import emission
 
 # 20 dB of residual index at 1 kHz over a 25 mm spacer:
-phi = metrology.phase_mismatch_from_residual_index(20.0, 1000.0, 0.025)
+phi = emission.phase_mismatch_from_residual_index(20.0, 1000.0, 0.025)
 print(round(float(phi), 2))     # 0.26 degrees, a hundredth of kd
 
 # And back, for a chain whose channels are matched to 0.05°:
-print(round(float(metrology.residual_index_from_phase_mismatch(
+print(round(float(emission.residual_index_from_phase_mismatch(
     0.05, 1000.0, 0.012)), 1))  # 24.0 dB
 ```
 
@@ -17637,11 +17707,12 @@ and renders the ISO 4871 fiche through `.report()`. The quickest route is to
 
 ```python
 import numpy as np
-import phonometry as ph
+from phonometry import emission
 from phonometry import ReportMetadata
 
-# ... a measured LWA from ISO 3744 ...
-result = ph.sound_power_pressure(levels, "hemisphere", radius=1.0,
+# ISO 3744: SPL at 10 positions on a hemisphere, r = 1 m (10 lg(S/S0) = 8 dB).
+levels = np.tile(lw_true - 8.0, (10, 1))
+result = emission.sound_power_pressure(levels, "hemisphere", radius=1.0,
                                  frequencies=freqs)
 
 declaration = result.declare(
@@ -17662,17 +17733,17 @@ Or build the declaration directly, reproducing the ISO 4871 Annex B example
 declared $L_{W\mathrm{Ad}} = 90$ and 97 dB):
 
 ```python
-mode1 = ph.OperatingModeDeclaration(
+mode1 = emission.OperatingModeDeclaration(
     "Operating mode 1", sound_power_level=88.0, sound_power_uncertainty=2.0,
     emission_pressure_level=78.0, emission_pressure_uncertainty=2.0,
     verification_level=89.0,          # passes: 89 <= 90
 )
-mode2 = ph.OperatingModeDeclaration(
+mode2 = emission.OperatingModeDeclaration(
     "Operating mode 2", sound_power_level=95.0, sound_power_uncertainty=2.0,
     emission_pressure_level=86.0, emission_pressure_uncertainty=2.0,
     verification_level=98.0,          # fails: 98 > 97
 )
-ph.NoiseEmissionDeclaration(
+emission.NoiseEmissionDeclaration(
     (mode1, mode2), machine="Type 990, Model 11-TC",
     basic_standards=("ISO 3744", "ISO 11202"), form="dual-number",
 ).report("iso4871.pdf")
@@ -20866,25 +20937,11 @@ print(round(onset.prominence, 2))                              # 8.95
 From a calibrated time signal (in pascal) the whole chain runs end to end:
 
 ```python
-result = environment.impulsive_sound_adjustment(signal, fs)
-print(result.category)                  # e.g. 'highly impulsive'
-print(round(result.adjustment, 1))      # KI in dB (0.0 to about 9 dB in typical cases)
-print(round(result.adjusted_laeq, 1))   # LAeq + KI
-
-result.plot()   # the LpAF history with the detected onsets (needs matplotlib)
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulsive_sound_onsets_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulsive_sound_onsets.svg" alt="A-weighted Fast level history of three hammer strikes over a 55 dB(A) background across six seconds: each strike rises from about 52 dB to 89 dB, the detected onset start and end points are marked with the least-squares onset line, the governing level difference of 36.8 dB is annotated, and the title reports a prominence of 11.34 with an adjustment of 11.42 dB, category highly impulsive" width="90%"></picture>
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
 import numpy as np
-import matplotlib.pyplot as plt
 from phonometry import environment
 
-# Three hammer strikes over a 55 dB(A) background, 6 s at 48 kHz.
+# Three hammer strikes over a 55 dB(A) background, 6 s at 48 kHz, in place of
+# a calibrated recording.
 fs = 48000
 rng = np.random.default_rng(7)
 t = np.arange(int(6.0 * fs)) / fs
@@ -20898,13 +20955,29 @@ for onset_time in (1.0, 2.6, 4.2):
     strike *= 2e-5 * 10 ** (95 / 20) / np.sqrt(np.mean(strike[window] ** 2))
     signal += strike
 
-res = environment.impulsive_sound_adjustment(signal, fs)
-print(res.category, round(res.prominence, 2), round(res.adjustment, 2))
-# highly impulsive 11.34 11.42
+result = environment.impulsive_sound_adjustment(signal, fs)
+print(result.category)                  # 'highly impulsive'
+print(round(result.adjustment, 1))      # 11.4  dB (KI, uncapped; typical cases fall between 0.0 and 9 dB)
+print(round(result.adjusted_laeq, 1))   # 91.1  dB (LAeq + KI)
+
+result.plot()   # the LpAF history with the detected onsets (needs matplotlib)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulsive_sound_onsets_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulsive_sound_onsets.svg" alt="A-weighted Fast level history of three hammer strikes over a 55 dB(A) background across six seconds: each strike rises from about 52 dB to 89 dB, the detected onset start and end points are marked with the least-squares onset line, the governing level difference of 36.9 dB is annotated, and the title reports a prominence of 11.31 with an adjustment of 11.36 dB, category highly impulsive" width="90%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# `result` is the three-strike chain of this section.
+print(result.category, round(result.prominence, 2), round(result.adjustment, 2))
+# highly impulsive 11.31 11.36
 
 # One line: the level history with the onsets, the fitted onset lines and
 # the governing level difference.
-res.plot()
+result.plot()
 plt.show()
 ```
 
@@ -26128,19 +26201,45 @@ fiche embeds, matplotlib (`pip install "phonometry[report,plot]"`); only
 `language="es"` for a Spanish fiche (translated fixed strings and a comma
 decimal separator).
 
+The block below is the specimen of the fiche underneath it: a resistive facing
+of normalised flow resistance $\theta = 1$ over an 86 mm rigidly-backed air
+cavity, whose surface impedance $z = \theta - \mathrm{j}\cot(k_0 L)$ is known
+in closed form, so the printed $\alpha$ can be checked by hand: 1.00 at the
+1 kHz quarter-wave resonance, where the matched screen gives $z = 1$ and
+$r = 0$; 0.80 at 500 Hz, where $k_0 L = \pi/4$ and $z = 1 - \mathrm{j}$.
+
 ```python
+import numpy as np
 from phonometry import materials, ReportMetadata
 
-result = materials.two_microphone_impedance(
-    h12, frequency=freqs, spacing=0.05, x1=0.10,
-    speed_of_sound=c0, characteristic_impedance=rho_c, diameter=0.10,
+# 100 mm tube, s = 50 mm, far microphone at x1 = 100 mm, 20 degC / 101 kPa.
+c0 = float(materials.speed_of_sound_iso(293.15))                    # 343.29 m/s
+rho_c = materials.characteristic_impedance(
+    float(materials.air_density_iso(293.15, 101.0)), c0)            # 405.6 Pa.s/m
+diameter, spacing, x1 = 0.100, 0.050, 0.100
+theta, cavity = 1.0, c0 / (4.0 * 1000.0)          # quarter-wave at 1 kHz: 86 mm
+freqs = np.array([400, 500, 630, 800, 1000, 1250, 1600], dtype=float)
+
+# The transfer function the tube would measure, synthesised from the known r.
+k0 = materials.tube_wavenumber(freqs, c0)
+z = theta - 1j / np.tan(2 * np.pi * freqs / c0 * cavity)
+r_known = (z - 1.0) / (z + 1.0)
+x2 = x1 - spacing
+h12_fiche = (np.exp(1j*k0*x2) + r_known*np.exp(-1j*k0*x2)) / \
+            (np.exp(1j*k0*x1) + r_known*np.exp(-1j*k0*x1))
+
+fiche = materials.two_microphone_impedance(
+    h12_fiche, frequency=freqs, spacing=spacing, x1=x1,
+    speed_of_sound=c0, characteristic_impedance=rho_c, diameter=diameter,
 )
-result.report(
+print(np.round(fiche.absorption, 2))    # [0.68 0.8  0.9  0.97 1.   0.96 0.68]
+
+fiche.report(
     "alpha_fiche.pdf",
     metadata=ReportMetadata(
         specimen="Resistive facing over an 86 mm rigidly-backed air cavity",
-        tube_diameter=0.10,            # m (printed as 100 mm)
-        mic_spacing=0.05,              # m (printed as 50 mm)
+        tube_diameter=diameter,        # m (printed as 100 mm)
+        mic_spacing=spacing,           # m (printed as 50 mm)
         measurement_standard="ISO 10534-2",
         laboratory="Phonometry Reference Laboratory",
     ),
@@ -31656,7 +31755,7 @@ returns the annoyance together with the two intermediate weightings:
 from phonometry import psychoacoustics
 
 res = psychoacoustics.psychoacoustic_annoyance(30.0, 2.0, 0.5, 0.3)   # N5, S, F, R
-print(round(res.annoyance, 4))   # 37.0478
+print(round(res.annoyance, 4))   # 37.0477
 print(round(res.w_s, 4), round(res.w_fr, 4))   # 0.1001 0.2125
 
 res.plot()   # PA beside its wS and wFR weightings (needs matplotlib)
@@ -31683,10 +31782,19 @@ signal
 model.
 
 ```python
+import numpy as np
 from phonometry import psychoacoustics
 
+# A raw recording plus its calibration so the guide runs standalone. There is
+# no calibration_factor argument here, so x must already be in pascals.
+fs = 48000
+t = np.arange(int(5.0 * fs)) / fs
+x = (1.0 + 0.8 * np.sin(2 * np.pi * 4.0 * t)) * np.sin(2 * np.pi * 1000 * t)
+x *= 2e-5 * 10 ** (70 / 20) / np.sqrt(np.mean(x**2))   # calibrated to 70 dB SPL
+
 res = psychoacoustics.psychoacoustic_annoyance_from_signal(x, fs, field="free")
-print(res.annoyance, res.n5, res.sharpness, res.roughness, res.fluctuation_strength)
+print(f"PA = {res.annoyance:.1f}  (N5 = {res.n5:.1f} sone, S = {res.sharpness:.2f} acum,"
+      f" R = {res.roughness:.2f} asper, F = {res.fluctuation_strength:.2f} vacil)")
 
 res.plot()   # the same PA / wS / wFR view, now from the four derived sensations
 ```
@@ -31785,7 +31893,7 @@ trace.
 from phonometry import psychoacoustics
 
 res = psychoacoustics.fluctuation_strength(x, fs)
-print(res.fluctuation_strength)   # vacil
+print(round(res.fluctuation_strength, 2))   # 0.65 vacil for the signal above
 res.plot()   # specific fluctuation strength F′(z) over the Bark axis (needs matplotlib)
 ```
 
@@ -39891,10 +39999,10 @@ octave_filter = filters.OctaveFilterBank(
 )
 afilter = filters.WeightingFilter(fs, "A", stateful=True)
 
-for block in sf.blocks("measurement.wav", blocksize=256, overlap=0):
+for frame in sf.blocks("measurement.wav", blocksize=256, overlap=0):
 
     # Apply A-filter
-    weighted = afilter.filter(block)
+    weighted = afilter.filter(frame)
 
     # Split into octave bands
     block_spl, _, block_output = octave_filter.filter(weighted, sigbands=True, detrend=False)
@@ -39984,7 +40092,7 @@ env = filters.TimeWeighting(fs, mode="fast")  # the class is inherently stateful
 for x in audio_stream(block):            # your capture callback
     y = env.process(aw.filter(x))
     spl = 10 * np.log10(y[..., -1] / (2e-5) ** 2)  # instantaneous LAF
-    display(spl)
+    print(spl)  # your display update
 ```
 
 ### Stateful-mode constraints
@@ -42850,18 +42958,20 @@ tone = np.sin(2 * np.pi * 4000 * t)
 # Steady-state Fast reference of the continuous tone
 reference = filters.time_weighting(tone, fs, mode='fast')[int(1.5 * fs):].mean()
 
-# 200 ms burst of the same tone (IEC 61672-1 Table 4 target: -1.0 dB)
-burst = np.zeros_like(t)
-burst[int(0.5 * fs):int(0.7 * fs)] = tone[int(0.5 * fs):int(0.7 * fs)]
-envelope = filters.time_weighting(burst, fs, mode='fast')
-env_db = 10 * np.log10(np.maximum(envelope / reference, 1e-6))
-
-plt.figure()
-plt.plot(t, env_db, label='Fast envelope')
-plt.axhline(-1.0, linestyle='--', label='IEC target −1.0 dB')
-plt.xlabel('Time [s]')
-plt.ylabel('Level re steady state [dB]')
-plt.legend()
+# The three Table 4 rows the published figure draws, with their targets
+cases = [(0.200, -1.0), (0.050, -4.8), (0.010, -11.1)]
+fig, axes = plt.subplots(len(cases), 1, sharey=True, figsize=(8, 8))
+for ax, (t_b, target) in zip(axes, cases):
+    burst = np.zeros_like(t)
+    stop = int(0.5 * fs) + int(t_b * fs)
+    burst[int(0.5 * fs):stop] = tone[int(0.5 * fs):stop]
+    envelope = filters.time_weighting(burst, fs, mode='fast')
+    env_db = 10 * np.log10(np.maximum(envelope / reference, 1e-6))
+    ax.plot(t, env_db, label=f'Fast envelope, {t_b * 1e3:.0f} ms burst')
+    ax.axhline(target, linestyle='--', label=f'IEC target {target} dB')
+    ax.set_ylabel('Level re steady state [dB]')
+    ax.legend(loc='upper right')
+axes[-1].set_xlabel('Time [s]')
 plt.show()
 ```
 
@@ -45522,6 +45632,12 @@ $y(t) = \alpha\,x(t-\tau_0) + n(t)$ the estimate peaks at $\tau = +\tau_0$
 import numpy as np
 from phonometry import signals
 
+fs = 8192.0
+delay = 102                                  # 12.45 ms
+x = signals.noise_signal(fs, 2.0, seed=4)
+interference = signals.noise_signal(fs, 2.0, rms=0.5, seed=5)
+y = 0.8 * np.concatenate([np.zeros(delay), x[:-delay]]) + interference
+
 res = signals.correlation(x, y, fs, normalization="coefficient", max_lag=0.05)
 peak = np.argmax(res.values)
 print(res.lags[peak], res.values[peak])   # delay and its coefficient
@@ -45687,7 +45803,16 @@ $$
 $$
 
 ```python
+import numpy as np
+from scipy import signal as sp_signal
 from phonometry import signals
+
+fs = 8192.0
+delay = 20  # samples
+b, a = sp_signal.butter(2, 800.0 / (fs / 2.0))   # colored common signal
+s = sp_signal.lfilter(b, a, signals.noise_signal(fs, 4.0, color="white", seed=10))
+x = s + signals.noise_signal(fs, 4.0, color="white", rms=0.02, seed=11)
+y = np.roll(s, delay) + signals.noise_signal(fs, 4.0, color="white", rms=0.02, seed=12)
 
 res = signals.time_delay(x, y, fs, method="gcc", weighting="ml",
                          nperseg=2048, upsample=16, signal_bandwidth=1000.0)
@@ -45712,9 +45837,17 @@ stationary records, so the direct correlator is used rather than the
 Welch-averaged GCC):
 
 ```python
+import numpy as np
+from scipy import signal as sp_signal
 from phonometry import signals
 
-t_arrival = signals.impulse_response_delay(ir, fs)              # seconds from t = 0
+fs = 48000.0
+t = np.arange(int(0.03 * fs)) / fs
+# Band-limited reference pulse: a 2 kHz Gaussian tone burst at 5 ms.
+ir_a = sp_signal.gausspulse(t - 0.005, fc=2000.0, bw=0.5)
+ir_b = signals.fractional_delay(ir_a, 7.37)[: ir_a.size]
+
+t_arrival = signals.impulse_response_delay(ir_b, fs)            # seconds from t = 0
 dt = signals.impulse_response_delay(ir_b, fs, reference=ir_a)   # pair delay
 
 res = signals.align_impulse_responses(ir_b, ir_a, fs)  # remove the estimated delay
@@ -45790,7 +45923,12 @@ recovered AM envelope and the Table 13.1 pair $\cos \to \sin$ at the
 1e-9 level, and the instantaneous frequency of a chirp tracks its sweep.
 
 ```python
+import numpy as np
 from phonometry import signals
+
+fs = 8192.0
+t = np.arange(int(0.4 * fs)) / fs
+x = np.exp(-t / 0.1) * np.sin(2 * np.pi * 250.0 * t)   # a struck mode
 
 res = signals.envelope(x, fs)
 print(res.envelope, res.instantaneous_frequency)
@@ -46264,9 +46402,12 @@ The ordinary and multiple coherences do not depend on the conditioning order,
 but the partial coherences and the coherent-output decomposition do: each
 input is conditioned on whatever precedes it. Absent a physical ordering,
 Bendat & Piersol (Section 7.2.4) recommend ordering the inputs by descending
-ordinary coherence with the output. Pass `order` to choose:
+ordinary coherence with the output. Suppose a third, weakly coupled source is
+recorded alongside the two above, coherent with neither. Pass `order` to
+choose:
 
 ```python
+x3 = signals.noise_signal(fs, 32.0, color="white", seed=4)   # the third, weak source
 res = signals.miso_coherence([x1, x2, x3], y, fs, order=(2, 0, 1))
 res.order            # (2, 0, 1): the order actually applied
 res.plot()           # the two panels, recomputed in the applied order
@@ -46388,7 +46529,11 @@ freedom and a correspondingly wider interval.
 ```python
 from phonometry import signals
 
-res = signals.power_spectral_density(signal, fs)          # Hann, 50 % overlap, 95 % CI
+# record: one channel of a calibrated capture, in pascals (see the Calibration
+#   guide below); in dBFS work it is the raw [-1, 1] array and the result is
+#   FS^2/Hz.
+fs = 48000.0                                      # its sample rate in Hz
+res = signals.power_spectral_density(record, fs)          # Hann, 50 % overlap, 95 % CI
 print(res.n_averages, res.random_error)           # nd and 1/sqrt(nd)
 print(res.ci_lower[10], res.psd[10], res.ci_upper[10])
 res.plot()                                        # PSD in dB with the CI band
@@ -46472,8 +46617,12 @@ delay path the phase is linear and that slope reads the propagation delay
 directly.
 
 ```python
+import numpy as np
 from phonometry import signals
 
+delay = int(0.002 * fs)                                     # a 2 ms delay path
+noise = signals.noise_signal(fs, 20.0, rms=0.3, seed=9)     # uncorrelated noise
+y = 0.9 * np.concatenate([np.zeros(delay), x[:-delay]]) + noise
 res = signals.cross_spectral_density(x, y, fs)
 print(res.magnitude_random_error[100], res.phase_std[100])  # bin 100 errors
 res.plot()   # magnitude, phase with ±sigma band, coherence
@@ -46636,12 +46785,17 @@ squared first, dB levels converted and back), so band power is conserved
 rather than amplitude, and a flat spectrum passes through exactly unchanged.
 
 ```python
+import numpy as np
 from phonometry import signals
 
-smooth_psd = signals.fractional_octave_smoothing(res.frequencies, res.psd, 3.0)
-smooth_mag = signals.fractional_octave_smoothing(freqs, np.abs(response), 6.0,
+res = signals.power_spectral_density(record, fs)   # the section 1 estimate
+freqs = res.frequencies
+smooth_psd = signals.fractional_octave_smoothing(freqs, res.psd, 3.0)
+magnitude = np.sqrt(res.psd)               # any linear |H| would do here
+smooth_mag = signals.fractional_octave_smoothing(freqs, magnitude, 6.0,
                                                  domain="amplitude")  # an FRF |H|
-smooth_db = signals.fractional_octave_smoothing(freqs, levels, 3.0, domain="db")  # dB curve
+levels = 10.0 * np.log10(res.psd)          # any dB curve would do here
+smooth_db = signals.fractional_octave_smoothing(freqs, levels, 3.0, domain="db")
 ```
 
 A single spectral line with PSD ordinate $P$ (units²/Hz) in a bin of width
@@ -46761,7 +46915,7 @@ Larger $NW$ admits more tapers (lower variance) at the cost of resolution.
 ```python
 from phonometry import signals
 
-res = signals.multitaper_psd(signal, fs)                 # NW = 4, K = 7, adaptive
+res = signals.multitaper_psd(record, fs)                 # NW = 4, K = 7, adaptive
 print(res.degrees_of_freedom.mean())             # ~2K from one record
 print(res.eigenvalues)                           # taper concentrations
 res.plot()                                       # density with the CI band
@@ -47969,7 +48123,15 @@ Welch-module scaling with no detrending, three identities hold:
   the conformance checks).
 
 ```python
+import numpy as np
 from phonometry import signals
+
+# The 70 dB SPL siren of the figure below, in pascals.
+fs = 16000.0
+t = np.arange(int(4.0 * fs)) / fs
+x = 2e-5 * 10.0 ** (70.0 / 20.0) * np.sqrt(2.0) * np.cos(
+    2.0 * np.pi * 900.0 * t - 600.0 * np.cos(np.pi * t)
+)
 
 res = signals.spectrogram(x, fs, nperseg=1024, overlap=0.75, scaling="spectrum")
 print(res.power.shape)             # (frequencies, times)
@@ -50811,7 +50973,12 @@ squared pressure over the record (Formulae 3–4); the peak level is the
 zero-to-peak value.
 
 ```python
+import numpy as np
 from phonometry import underwater
+
+# A captured hydrophone record (here a synthetic 250 Hz tone of 1 s).
+fs = 48000
+pressure = 0.5 * np.sin(2 * np.pi * 250.0 * np.arange(fs) / fs)
 
 spl = underwater.sound_pressure_level(pressure)        # dB re 1 µPa
 sel = underwater.sound_exposure_level(pressure, fs)     # dB re 1 µPa²·s
@@ -50867,11 +51034,21 @@ res.plot()
 </details>
 
 ```python
+import numpy as np
 from phonometry import underwater
 
-lrn = underwater.radiated_noise_level(2e-6, 100.0)   # p_rms = 2 µPa, r = 100 m
-res = underwater.monopole_source_level(lrn, 200.0, draught=6.0)
-print(res.source_level, res.surface_correction, res.source_depth)
+# Band r.m.s. pressures measured at 100 m from a merchant ship, in pascals.
+freqs = np.array([31.5, 63.0, 125.0, 250.0, 500.0, 1000.0])
+p_rms = np.array([4.3, 2.8, 1.9, 1.2, 0.8, 0.54])
+rnl = np.array([underwater.radiated_noise_level(float(x), 100.0) for x in p_rms])
+print(np.round(rnl, 1))   # [172.7 168.9 165.6 161.6 158.1 154.6] dB re 1 uPa.m
+
+# The surface correction is frequency-dependent, so the conversion is normally
+# run on the whole band vector at once.
+res = underwater.monopole_source_level(rnl, freqs, draught=6.0)
+print(np.round(res.source_level, 1))       # [177.8 168.4 161.7 157.8 154.8 151.6]
+print(np.round(res.surface_correction, 2))  # [ 5.15 -0.51 -3.86 -3.78 -3.27 -3.08]
+print(round(res.source_depth, 2))           # 4.2 m = 0.7 x draught
 res.plot()   # RNL, Ls and ΔL vs frequency (needs matplotlib)
 ```
 
@@ -50928,8 +51105,8 @@ from phonometry import underwater
 fs = 48000
 t = np.arange(int(0.3 * fs)) / fs
 envelope = np.where(t < 0.01, t / 0.01, np.exp(-(t - 0.01) / 0.04))
-pressure = 8000.0 * envelope * np.sin(2 * np.pi * 180.0 * t)
-res = underwater.pile_strike_metrics(pressure, fs)
+strike_pressure = 8000.0 * envelope * np.sin(2 * np.pi * 180.0 * t)
+res = underwater.pile_strike_metrics(strike_pressure, fs)
 res.plot()
 ```
 

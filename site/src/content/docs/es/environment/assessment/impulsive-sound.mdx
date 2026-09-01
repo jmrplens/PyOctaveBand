@@ -222,10 +222,28 @@ Desde una señal temporal calibrada (en pascales) la cadena completa se ejecuta
 de principio a fin:
 
 ```python
+import numpy as np
+from phonometry import environment
+
+# Tres golpes de martillo sobre un fondo de 55 dB(A), 6 s a 48 kHz, en lugar de
+# una grabación calibrada.
+fs = 48000
+rng = np.random.default_rng(7)
+t = np.arange(int(6.0 * fs)) / fs
+background = rng.standard_normal(t.size)
+background *= 2e-5 * 10 ** (55 / 20) / np.sqrt(np.mean(background ** 2))
+signal = background.copy()
+for onset_time in (1.0, 2.6, 4.2):
+    decay = np.exp(-(t - onset_time) / 0.08) * (t >= onset_time)
+    strike = decay * rng.standard_normal(t.size)
+    window = (t >= onset_time) & (t < onset_time + 0.1)
+    strike *= 2e-5 * 10 ** (95 / 20) / np.sqrt(np.mean(strike[window] ** 2))
+    signal += strike
+
 result = environment.impulsive_sound_adjustment(signal, fs)
-print(result.category)                  # p. ej. 'highly impulsive'
-print(round(result.adjustment, 1))      # KI en dB (de 0,0 a unos 9 dB en casos típicos)
-print(round(result.adjusted_laeq, 1))   # LAeq + KI
+print(result.category)                  # 'highly impulsive'
+print(round(result.adjustment, 1))      # 11.4  dB (KI, sin tope; los casos típicos caen entre 0,0 y unos 9 dB)
+print(round(result.adjusted_laeq, 1))   # 91.1  dB (LAeq + KI)
 
 result.plot()   # el historial de LpAF con los arranques detectados (necesita matplotlib)
 ```
@@ -250,7 +268,7 @@ como un arranque del propio procesado.
 
 <ThemeImage
   src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulsive_sound_onsets_es.svg"
-  alt="Historial de nivel con ponderación A y constante F de tres golpes de martillo sobre un fondo de 55 dB(A) a lo largo de seis segundos: cada golpe sube de unos 52 dB a 89 dB, se marcan los puntos de inicio y fin del crecimiento detectado con la recta de mínimos cuadrados, se anota la diferencia de nivel determinante de 36,8 dB y el título indica una prominencia de 11,34 con un ajuste de 11,42 dB, categoría altamente impulsiva"
+  alt="Historial de nivel con ponderación A y constante F de tres golpes de martillo sobre un fondo de 55 dB(A) a lo largo de seis segundos: cada golpe sube de unos 52 dB a 89 dB, se marcan los puntos de inicio y fin del crecimiento detectado con la recta de mínimos cuadrados, se anota la diferencia de nivel determinante de 36,9 dB y el título indica una prominencia de 11,31 con un ajuste de 11,36 dB, categoría altamente impulsiva"
   width="90%"
 />
 
@@ -264,31 +282,15 @@ más tendida sobre un flanco visiblemente empinado.*
 <summary>Mostrar el código de esta figura</summary>
 
 ```python
-import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import environment
 
-# Tres golpes de martillo sobre un fondo de 55 dB(A), 6 s a 48 kHz.
-fs = 48000
-rng = np.random.default_rng(7)
-t = np.arange(int(6.0 * fs)) / fs
-background = rng.standard_normal(t.size)
-background *= 2e-5 * 10 ** (55 / 20) / np.sqrt(np.mean(background ** 2))
-signal = background.copy()
-for onset_time in (1.0, 2.6, 4.2):
-    decay = np.exp(-(t - onset_time) / 0.08) * (t >= onset_time)
-    strike = decay * rng.standard_normal(t.size)
-    window = (t >= onset_time) & (t < onset_time + 0.1)
-    strike *= 2e-5 * 10 ** (95 / 20) / np.sqrt(np.mean(strike[window] ** 2))
-    signal += strike
-
-res = environment.impulsive_sound_adjustment(signal, fs)
-print(res.category, round(res.prominence, 2), round(res.adjustment, 2))
-# highly impulsive 11.34 11.42
+# `result` es la cadena de los tres golpes de esta sección.
+print(result.category, round(result.prominence, 2), round(result.adjustment, 2))
+# highly impulsive 11.31 11.36
 
 # En una línea: el historial de nivel con los arranques, las rectas ajustadas y
 # la diferencia de nivel determinante.
-res.plot(language="es")
+result.plot(language="es")
 plt.show()
 ```
 

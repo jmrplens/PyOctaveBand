@@ -73,15 +73,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import electroacoustics
 
-fs = 48000
-n = fs                     # 1 s -> 1 Hz bins; harmonics land on bins
-t = np.arange(n) / fs
+fs_hd = 48000
+n = fs_hd                  # 1 s -> 1 Hz bins; harmonics land on bins
+t = np.arange(n) / fs_hd
 f0 = 1000.0
 amps = {1: 1.0, 2: 0.02, 3: 0.012, 4: 0.006, 5: 0.003}
 sig = sum(a * np.sin(2 * np.pi * k * f0 * t) for k, a in amps.items())
 sig = sig + np.random.default_rng(2026).standard_normal(n) * 1.2e-2
 
-res = electroacoustics.harmonic_analysis(sig, fs, f0, n_harmonics=len(amps))
+res = electroacoustics.harmonic_analysis(sig, fs_hd, f0, n_harmonics=len(amps))
 res.plot()
 plt.show()
 ```
@@ -159,7 +159,7 @@ from phonometry import electroacoustics
 # is digital full scale.
 dr = electroacoustics.dynamic_range(output, fs, 997.0)     # dB CCIR-RMS
 # Idle channel noise: capture the output with a digital-zero input.
-idle = electroacoustics.idle_channel_noise(idle_output, fs)  # dBFS CCIR-RMS
+icn = electroacoustics.idle_channel_noise(idle_output, fs)  # dBFS CCIR-RMS
 ```
 
 Both reuse the notch and the ITU-R 468 curve of the THD+N chain, and both are
@@ -227,12 +227,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import electroacoustics
 
-fs = 48000
-t = np.arange(fs) / fs                        # 1 s -> tones land on FFT bins
-x = np.sin(2 * np.pi * 60.0 * t) + 0.25 * np.sin(2 * np.pi * 7000.0 * t)
-signal = x + 0.04 * x**2 + 0.012 * x**3       # weakly non-linear device output
+fs_md = 48000
+t = np.arange(fs_md) / fs_md                  # 1 s -> tones land on FFT bins
+src = np.sin(2 * np.pi * 60.0 * t) + 0.25 * np.sin(2 * np.pi * 7000.0 * t)
+sig = src + 0.04 * src**2 + 0.012 * src**3    # weakly non-linear device output
 
-md = electroacoustics.modulation_distortion(signal, fs, f_low=60.0, f_high=7000.0)
+md = electroacoustics.modulation_distortion(sig, fs_md, f_low=60.0, f_high=7000.0)
 md.plot()
 plt.show()
 ```
@@ -281,15 +281,15 @@ import numpy as np
 from scipy import signal as sp
 from phonometry import electroacoustics
 
-fs = 48000
+fs_fr = 48000
 n = 400000
 rng = np.random.default_rng(7)
-x = rng.standard_normal(n)
-b, a = sp.butter(2, [400.0, 4000.0], btype="band", fs=fs)   # device under test
-y = sp.lfilter(b, a, x)
-y = y + rng.standard_normal(n) * np.sqrt(np.mean(y ** 2)) * 0.05   # output noise
+src = rng.standard_normal(n)
+b, a = sp.butter(2, [400.0, 4000.0], btype="band", fs=fs_fr)   # device under test
+sig = sp.lfilter(b, a, src)
+sig = sig + rng.standard_normal(n) * np.sqrt(np.mean(sig ** 2)) * 0.05  # output noise
 
-res = electroacoustics.transfer_function(x, y, fs, estimator="H1")
+res = electroacoustics.transfer_function(src, sig, fs_fr, estimator="H1")
 res.plot()
 plt.show()
 ```

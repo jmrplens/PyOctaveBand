@@ -30,7 +30,7 @@ $$
 ```python
 from phonometry import aircraft
 
-noys = aircraft.perceived_noisiness(spl)      # per-band noys (spl = 24 band levels, dB)
+noys = aircraft.perceived_noisiness(spl)      # spl: your measured half-second of unweighted third-octave levels (24 bands, dB)
 pnl = aircraft.perceived_noise_level(spl)      # PNdB
 ```
 
@@ -76,7 +76,15 @@ so $\mathrm{EPNL} = \mathrm{PNLTM} + D$ with the duration correction $D$.
 import numpy as np
 from phonometry import aircraft
 
-# spectra: a (K, 24) array of one-third-octave band levels sampled every dt s
+# spectra: a (K, 24) array of one-third-octave band levels sampled every dt s,
+# here the synthetic flyover of the figure above
+k, dt = 41, 0.5
+idx = np.arange(k)
+shape = 15.0 * np.exp(-((np.log10(aircraft.NOY_BANDS) - np.log10(400.0)) ** 2) / 0.5)
+gain = 30.0 * np.exp(-((idx - 20.0) ** 2) / (2 * 5.0**2)) - 5.0
+spectra = (55.0 + shape)[None, :] + gain[:, None]
+spectra[:, 17] += 12.0 * np.exp(-((idx - 20.0) ** 2) / (2 * 6.0**2))  # 2500 Hz fan tone
+
 res = aircraft.effective_perceived_noise_level(spectra, dt=0.5)
 print(res.epnl, res.pnltm, res.duration_correction, res.band_limits)
 res.plot()   # PNL/PNLT time history (needs matplotlib)
@@ -94,15 +102,6 @@ duration/limit machinery directly from a $\mathrm{PNLT}$ series.
 <summary>Show the code for this figure</summary>
 
 ```python
-import numpy as np
-from phonometry import aircraft
-
-k, dt = 41, 0.5
-idx = np.arange(k)
-shape = 15.0 * np.exp(-((np.log10(aircraft.NOY_BANDS) - np.log10(400.0)) ** 2) / 0.5)
-gain = 30.0 * np.exp(-((idx - 20.0) ** 2) / (2 * 5.0**2)) - 5.0
-spectra = (55.0 + shape)[None, :] + gain[:, None]
-spectra[:, 17] += 12.0 * np.exp(-((idx - 20.0) ** 2) / (2 * 6.0**2))  # 2500 Hz fan tone
 aircraft.effective_perceived_noise_level(spectra, dt).plot()
 ```
 

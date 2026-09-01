@@ -260,9 +260,18 @@ $\mathrm{EPNL}$ = 114,01 EPNdB cae *por debajo* del máximo. Un sobrevuelo más
 lento con el mismo máximo puntuaría por encima.*
 
 ```python
+import numpy as np
 from phonometry import aircraft
 
-# spectra: un array (K, 24) de niveles de tercio de octava muestreado cada dt s
+# spectra: un array (K, 24) de niveles de tercio de octava muestreado cada dt s,
+# aquí el sobrevuelo sintético de la figura de arriba
+k, dt = 41, 0.5
+idx = np.arange(k)
+shape = 15.0 * np.exp(-((np.log10(aircraft.NOY_BANDS) - np.log10(400.0)) ** 2) / 0.5)
+gain = 30.0 * np.exp(-((idx - 20.0) ** 2) / (2 * 5.0**2)) - 5.0
+spectra = (55.0 + shape)[None, :] + gain[:, None]
+spectra[:, 17] += 12.0 * np.exp(-((idx - 20.0) ** 2) / (2 * 6.0**2))  # tono de ventilador 2500 Hz
+
 res = aircraft.effective_perceived_noise_level(spectra, dt=0.5)
 print(res.epnl, res.pnltm, res.duration_correction, res.band_limits)
 res.plot()   # historia temporal PNL/PNLT (requiere matplotlib)
@@ -284,15 +293,6 @@ $\mathrm{EPNL} = 92{,}6\ \text{EPNdB}$.
 <summary>Mostrar el código de esta figura</summary>
 
 ```python
-import numpy as np
-from phonometry import aircraft
-
-k, dt = 41, 0.5
-idx = np.arange(k)
-shape = 15.0 * np.exp(-((np.log10(aircraft.NOY_BANDS) - np.log10(400.0)) ** 2) / 0.5)
-gain = 30.0 * np.exp(-((idx - 20.0) ** 2) / (2 * 5.0**2)) - 5.0
-spectra = (55.0 + shape)[None, :] + gain[:, None]
-spectra[:, 17] += 12.0 * np.exp(-((idx - 20.0) ** 2) / (2 * 6.0**2))  # tono de ventilador 2500 Hz
 aircraft.effective_perceived_noise_level(spectra, dt).plot(language="es")
 ```
 

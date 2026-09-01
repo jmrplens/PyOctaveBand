@@ -58,7 +58,11 @@ freedom and a correspondingly wider interval.
 ```python
 from phonometry import signals
 
-res = signals.power_spectral_density(signal, fs)          # Hann, 50 % overlap, 95 % CI
+# record: one channel of a calibrated capture, in pascals (see the Calibration
+#   guide below); in dBFS work it is the raw [-1, 1] array and the result is
+#   FS^2/Hz.
+fs = 48000.0                                      # its sample rate in Hz
+res = signals.power_spectral_density(record, fs)          # Hann, 50 % overlap, 95 % CI
 print(res.n_averages, res.random_error)           # nd and 1/sqrt(nd)
 print(res.ci_lower[10], res.psd[10], res.ci_upper[10])
 res.plot()                                        # PSD in dB with the CI band
@@ -142,8 +146,12 @@ delay path the phase is linear and that slope reads the propagation delay
 directly.
 
 ```python
+import numpy as np
 from phonometry import signals
 
+delay = int(0.002 * fs)                                     # a 2 ms delay path
+noise = signals.noise_signal(fs, 20.0, rms=0.3, seed=9)     # uncorrelated noise
+y = 0.9 * np.concatenate([np.zeros(delay), x[:-delay]]) + noise
 res = signals.cross_spectral_density(x, y, fs)
 print(res.magnitude_random_error[100], res.phase_std[100])  # bin 100 errors
 res.plot()   # magnitude, phase with ±sigma band, coherence
@@ -306,12 +314,17 @@ squared first, dB levels converted and back), so band power is conserved
 rather than amplitude, and a flat spectrum passes through exactly unchanged.
 
 ```python
+import numpy as np
 from phonometry import signals
 
-smooth_psd = signals.fractional_octave_smoothing(res.frequencies, res.psd, 3.0)
-smooth_mag = signals.fractional_octave_smoothing(freqs, np.abs(response), 6.0,
+res = signals.power_spectral_density(record, fs)   # the section 1 estimate
+freqs = res.frequencies
+smooth_psd = signals.fractional_octave_smoothing(freqs, res.psd, 3.0)
+magnitude = np.sqrt(res.psd)               # any linear |H| would do here
+smooth_mag = signals.fractional_octave_smoothing(freqs, magnitude, 6.0,
                                                  domain="amplitude")  # an FRF |H|
-smooth_db = signals.fractional_octave_smoothing(freqs, levels, 3.0, domain="db")  # dB curve
+levels = 10.0 * np.log10(res.psd)          # any dB curve would do here
+smooth_db = signals.fractional_octave_smoothing(freqs, levels, 3.0, domain="db")
 ```
 
 A single spectral line with PSD ordinate $P$ (units²/Hz) in a bin of width
@@ -431,7 +444,7 @@ Larger $NW$ admits more tapers (lower variance) at the cost of resolution.
 ```python
 from phonometry import signals
 
-res = signals.multitaper_psd(signal, fs)                 # NW = 4, K = 7, adaptive
+res = signals.multitaper_psd(record, fs)                 # NW = 4, K = 7, adaptive
 print(res.degrees_of_freedom.mean())             # ~2K from one record
 print(res.eigenvalues)                           # taper concentrations
 res.plot()                                       # density with the CI band

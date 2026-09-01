@@ -249,8 +249,15 @@ shifted contour at 500 Hz (clause 5.5).
 ```python
 from phonometry import building
 
-# ASTM E1414 normalizes to A0 = 12 m2, ISO 140-9 to A0 = 10 m2.
-dnc = building.normalized_ceiling_attenuation(l1, l2, absorption, reference_area=12.0)
+# Dn,c from the measured pair: source- and receiving-room levels over the
+# common plenum and the receiving room's absorption area, per band. ASTM E1414
+# normalizes to A0 = 12 m2, ISO 140-9 to A0 = 10 m2.
+l1_c = [80.0] * 16                       # source room, per band
+l2_c = [45.0] * 16                       # receiving room, over the plenum path
+absorption = [12.0] * 16                 # receiving-room A per band (m2)
+astm = building.normalized_ceiling_attenuation(l1_c, l2_c, absorption, reference_area=12.0)
+iso140_9 = building.normalized_ceiling_attenuation(l1_c, l2_c, absorption)
+print(round(float(astm[0]), 2), round(float(iso140_9[0]), 2))   # 35.0 34.21
 
 # A 28 mm perforated plaster acoustic tile, measured to ASTM E1414 (CAC 34).
 dnc = [14.4, 18.6, 21.7, 24.1, 23.4, 30.3, 33.7, 35.2,

@@ -41,7 +41,15 @@ Welch-module scaling with no detrending, three identities hold:
   the conformance checks).
 
 ```python
+import numpy as np
 from phonometry import signals
+
+# The 70 dB SPL siren of the figure below, in pascals.
+fs = 16000.0
+t = np.arange(int(4.0 * fs)) / fs
+x = 2e-5 * 10.0 ** (70.0 / 20.0) * np.sqrt(2.0) * np.cos(
+    2.0 * np.pi * 900.0 * t - 600.0 * np.cos(np.pi * t)
+)
 
 res = signals.spectrogram(x, fs, nperseg=1024, overlap=0.75, scaling="spectrum")
 print(res.power.shape)             # (frequencies, times)

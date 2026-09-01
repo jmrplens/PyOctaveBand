@@ -156,25 +156,11 @@ print(round(onset.prominence, 2))                              # 8.95
 From a calibrated time signal (in pascal) the whole chain runs end to end:
 
 ```python
-result = environment.impulsive_sound_adjustment(signal, fs)
-print(result.category)                  # e.g. 'highly impulsive'
-print(round(result.adjustment, 1))      # KI in dB (0.0 to about 9 dB in typical cases)
-print(round(result.adjusted_laeq, 1))   # LAeq + KI
-
-result.plot()   # the LpAF history with the detected onsets (needs matplotlib)
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulsive_sound_onsets_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulsive_sound_onsets.svg" alt="A-weighted Fast level history of three hammer strikes over a 55 dB(A) background across six seconds: each strike rises from about 52 dB to 89 dB, the detected onset start and end points are marked with the least-squares onset line, the governing level difference of 36.8 dB is annotated, and the title reports a prominence of 11.34 with an adjustment of 11.42 dB, category highly impulsive" width="90%"></picture>
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
 import numpy as np
-import matplotlib.pyplot as plt
 from phonometry import environment
 
-# Three hammer strikes over a 55 dB(A) background, 6 s at 48 kHz.
+# Three hammer strikes over a 55 dB(A) background, 6 s at 48 kHz, in place of
+# a calibrated recording.
 fs = 48000
 rng = np.random.default_rng(7)
 t = np.arange(int(6.0 * fs)) / fs
@@ -188,13 +174,29 @@ for onset_time in (1.0, 2.6, 4.2):
     strike *= 2e-5 * 10 ** (95 / 20) / np.sqrt(np.mean(strike[window] ** 2))
     signal += strike
 
-res = environment.impulsive_sound_adjustment(signal, fs)
-print(res.category, round(res.prominence, 2), round(res.adjustment, 2))
-# highly impulsive 11.34 11.42
+result = environment.impulsive_sound_adjustment(signal, fs)
+print(result.category)                  # 'highly impulsive'
+print(round(result.adjustment, 1))      # 11.4  dB (KI, uncapped; typical cases fall between 0.0 and 9 dB)
+print(round(result.adjusted_laeq, 1))   # 91.1  dB (LAeq + KI)
+
+result.plot()   # the LpAF history with the detected onsets (needs matplotlib)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulsive_sound_onsets_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulsive_sound_onsets.svg" alt="A-weighted Fast level history of three hammer strikes over a 55 dB(A) background across six seconds: each strike rises from about 52 dB to 89 dB, the detected onset start and end points are marked with the least-squares onset line, the governing level difference of 36.9 dB is annotated, and the title reports a prominence of 11.31 with an adjustment of 11.36 dB, category highly impulsive" width="90%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# `result` is the three-strike chain of this section.
+print(result.category, round(result.prominence, 2), round(result.adjustment, 2))
+# highly impulsive 11.31 11.36
 
 # One line: the level history with the onsets, the fitted onset lines and
 # the governing level difference.
-res.plot()
+result.plot()
 plt.show()
 ```
 

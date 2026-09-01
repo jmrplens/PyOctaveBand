@@ -61,6 +61,12 @@ $\tau = +\tau_0$ (ecuación 5.21). Hay tres normalizaciones disponibles:
 import numpy as np
 from phonometry import signals
 
+fs = 8192.0
+delay = 102                                  # 12,45 ms
+x = signals.noise_signal(fs, 2.0, seed=4)
+interference = signals.noise_signal(fs, 2.0, rms=0.5, seed=5)
+y = 0.8 * np.concatenate([np.zeros(delay), x[:-delay]]) + interference
+
 res = signals.correlation(x, y, fs, normalization="coefficient", max_lag=0.05)
 peak = np.argmax(res.values)
 print(res.lags[peak], res.values[peak])   # retardo y su coeficiente
@@ -307,7 +313,16 @@ $$
 $$
 
 ```python
+import numpy as np
+from scipy import signal as sp_signal
 from phonometry import signals
+
+fs = 8192.0
+delay = 20  # muestras
+b, a = sp_signal.butter(2, 800.0 / (fs / 2.0))   # señal común coloreada
+s = sp_signal.lfilter(b, a, signals.noise_signal(fs, 4.0, color="white", seed=10))
+x = s + signals.noise_signal(fs, 4.0, color="white", rms=0.02, seed=11)
+y = np.roll(s, delay) + signals.noise_signal(fs, 4.0, color="white", rms=0.02, seed=12)
 
 res = signals.time_delay(x, y, fs, method="gcc", weighting="ml",
                          nperseg=2048, upsample=16, signal_bandwidth=1000.0)
@@ -334,9 +349,17 @@ registros estacionarios, así que se usa el correlador directo en lugar de
 la GCC promediada por Welch):
 
 ```python
+import numpy as np
+from scipy import signal as sp_signal
 from phonometry import signals
 
-t_arrival = signals.impulse_response_delay(ir, fs)              # segundos desde t = 0
+fs = 48000.0
+t = np.arange(int(0.03 * fs)) / fs
+# Pulso de referencia de banda limitada: ráfaga tonal gaussiana de 2 kHz en 5 ms.
+ir_a = sp_signal.gausspulse(t - 0.005, fc=2000.0, bw=0.5)
+ir_b = signals.fractional_delay(ir_a, 7.37)[: ir_a.size]
+
+t_arrival = signals.impulse_response_delay(ir_b, fs)            # segundos desde t = 0
 dt = signals.impulse_response_delay(ir_b, fs, reference=ir_a)   # retardo del par
 
 res = signals.align_impulse_responses(ir_b, ir_a, fs)  # elimina el retardo estimado
@@ -438,7 +461,12 @@ conformidad fija la envolvente AM recuperada y el par $\cos \to \sin$ de
 la Tabla 13.1 al nivel de 1e-9, y la frecuencia instantánea de un barrido sigue su rampa.
 
 ```python
+import numpy as np
 from phonometry import signals
+
+fs = 8192.0
+t = np.arange(int(0.4 * fs)) / fs
+x = np.exp(-t / 0.1) * np.sin(2 * np.pi * 250.0 * t)   # un modo golpeado
 
 res = signals.envelope(x, fs)
 print(res.envelope, res.instantaneous_frequency)

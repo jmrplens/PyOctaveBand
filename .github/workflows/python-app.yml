@@ -285,6 +285,30 @@ jobs:
     - name: Check the errata evidence
       run: python scripts/check_errata_evidence.py
 
+  # The Python fences of a page form one sequential example: a later fence may
+  # use names an earlier fence defined, never the reverse. One shipped page
+  # used names its own figure block defined further down, while a same-named
+  # variable from a different room sat in scope, so reading top to bottom gave
+  # numbers that were not the annotated ones. Reader-owned placeholders (the
+  # reader's measurement, never invented by the page) are registered in the
+  # script. See scripts/check_fence_names.py and CONTRIBUTING.md.
+  fence-names:
+    name: Documentation fences read in order
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v7
+      with:
+        python-version: "3.13"
+    # Stdlib-only checker: it parses the fences and imports nothing else.
+    - name: Check the fence reading order
+      run: python scripts/check_fence_names.py
+
   # Coverage gate for the curated quick table in docs/reference/api/index.md: every
   # phonometry.__all__ name must have a table row (extra rows such as methods
   # or namespace entries are fine). See scripts/check_api_reference.py.

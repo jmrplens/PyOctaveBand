@@ -728,8 +728,37 @@ Assembling the direct path and all twelve flanking paths gives the apparent
 index per band, its energy split and the ISO 717-1 rating in one call:
 
 ```python
-# `paths` holds the twelve flanking paths of the four elements, built the
-# way `d1` was above; the code block under the figure builds all of them.
+# The other three flanking elements, built the way `wall` was above, each with
+# its own area and perimeter sum (Formula C.4); `situ` then holds all five.
+specs = (("ext2", 13.75, 5.0, 2.75, 219.0, 92.6, 0.0125, 2.548, 600.0, 1900.0),
+         ("int1", 11.0, 4.0, 2.75, 360.0, 128.4, 0.01, 1.636, 1800.0, 2500.0),
+         ("int2", 13.75, 5.0, 2.75, 360.0, 128.4, 0.01, 1.839, 1800.0, 2500.0))
+situ = {"floor": el, "ext1": wall}
+for spec in specs:
+    situ[spec[0]] = building.in_situ_element(
+        building.HomogeneousElement(*spec), bands)
+
+# The twelve flanking paths, three per flanking element, each built the way
+# `d1` was above.
+paths = []
+for tag, name, lij in (("1", "ext1", 4.0), ("2", "ext2", 5.0),
+                       ("3", "int1", 4.0), ("4", "int2", 5.0)):
+    flank = situ[name]
+    cross = k_floor_ext if name.startswith("ext") else k_floor_int
+    through = k_ext_ext if name.startswith("ext") else k_int_int
+    paths += [
+        building.airborne_flanking_path(label=f"D{tag}", kind="Df", element_i=situ["floor"],
+                                        element_j=flank, vibration_reduction_index=cross,
+                                        coupling_length=lij, separating_area=20.0,
+                                        delta_r_i=delta),
+        building.airborne_flanking_path(label=f"{tag}d", kind="Fd", element_i=flank,
+                                        element_j=situ["floor"], vibration_reduction_index=cross,
+                                        coupling_length=lij, separating_area=20.0),
+        building.airborne_flanking_path(label=f"{tag}{tag}", kind="Ff", element_i=flank,
+                                        element_j=flank, vibration_reduction_index=through,
+                                        coupling_length=lij, separating_area=20.0),
+    ]
+
 res = building.detailed_airborne_prediction(
     bands, direct_index=building.direct_reduction_index(el.sound_reduction_index,
                                                         delta_r_source=delta),
@@ -830,11 +859,13 @@ The impact side of the same building runs on the same `situ` dictionary:
 ```python
 from phonometry import building
 
+k_floor_ext = building.junction_vibration_reduction("rigid_t", "corner", 484.0 / 219.0)
+k_floor_int = building.junction_vibration_reduction("rigid_cross", "corner", 360.0 / 484.0)
 direct = building.direct_impact_level(situ["floor"].impact_level, delta_l=delta)
 flanking = [
     building.impact_flanking_path(label=f"Df{tag}", floor=situ["floor"], element_j=situ[name],
                                   vibration_reduction_index=(
-                             k["floor-ext"] if name.startswith("ext") else k["floor-int"]),
+                             k_floor_ext if name.startswith("ext") else k_floor_int),
                                   coupling_length=lij, delta_l=delta)
     for tag, name, lij in (("1", "ext1", 4.0), ("2", "ext2", 5.0),
                            ("3", "int1", 4.0), ("4", "int2", 5.0))
@@ -872,6 +903,11 @@ flanking impact level $L_\mathrm{n,f}$.
 from phonometry import building
 
 # ISO 12354-1 L.2.1: a wood frame building, floor 20 m2, junction 4 m.
+r_wall_leaf = ...   # measured R of the inner leaf per band, dB (ISO 10140-2)
+dv_n = ...          # normalized junction velocity level difference, dB (ISO 10848-2)
+dnf_13 = ...        # laboratory normalized flanking level difference Dn,f, dB
+lnf_13 = ...        # laboratory normalized flanking impact level Ln,f, dB
+
 r_star = building.resonant_sound_reduction_index(r_wall_leaf, bands,
                                                  critical_frequency=2200.0)   # +8 dB below fc
 r_ff = building.flanking_reduction_index_from_normalized_difference(

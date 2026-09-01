@@ -26,7 +26,12 @@ squared pressure over the record (Formulae 3–4); the peak level is the
 zero-to-peak value.
 
 ```python
+import numpy as np
 from phonometry import underwater
+
+# A captured hydrophone record (here a synthetic 250 Hz tone of 1 s).
+fs = 48000
+pressure = 0.5 * np.sin(2 * np.pi * 250.0 * np.arange(fs) / fs)
 
 spl = underwater.sound_pressure_level(pressure)        # dB re 1 µPa
 sel = underwater.sound_exposure_level(pressure, fs)     # dB re 1 µPa²·s
@@ -82,11 +87,21 @@ res.plot()
 </details>
 
 ```python
+import numpy as np
 from phonometry import underwater
 
-lrn = underwater.radiated_noise_level(2e-6, 100.0)   # p_rms = 2 µPa, r = 100 m
-res = underwater.monopole_source_level(lrn, 200.0, draught=6.0)
-print(res.source_level, res.surface_correction, res.source_depth)
+# Band r.m.s. pressures measured at 100 m from a merchant ship, in pascals.
+freqs = np.array([31.5, 63.0, 125.0, 250.0, 500.0, 1000.0])
+p_rms = np.array([4.3, 2.8, 1.9, 1.2, 0.8, 0.54])
+rnl = np.array([underwater.radiated_noise_level(float(x), 100.0) for x in p_rms])
+print(np.round(rnl, 1))   # [172.7 168.9 165.6 161.6 158.1 154.6] dB re 1 uPa.m
+
+# The surface correction is frequency-dependent, so the conversion is normally
+# run on the whole band vector at once.
+res = underwater.monopole_source_level(rnl, freqs, draught=6.0)
+print(np.round(res.source_level, 1))       # [177.8 168.4 161.7 157.8 154.8 151.6]
+print(np.round(res.surface_correction, 2))  # [ 5.15 -0.51 -3.86 -3.78 -3.27 -3.08]
+print(round(res.source_depth, 2))           # 4.2 m = 0.7 x draught
 res.plot()   # RNL, Ls and ΔL vs frequency (needs matplotlib)
 ```
 
@@ -143,8 +158,8 @@ from phonometry import underwater
 fs = 48000
 t = np.arange(int(0.3 * fs)) / fs
 envelope = np.where(t < 0.01, t / 0.01, np.exp(-(t - 0.01) / 0.04))
-pressure = 8000.0 * envelope * np.sin(2 * np.pi * 180.0 * t)
-res = underwater.pile_strike_metrics(pressure, fs)
+strike_pressure = 8000.0 * envelope * np.sin(2 * np.pi * 180.0 * t)
+res = underwater.pile_strike_metrics(strike_pressure, fs)
 res.plot()
 ```
 

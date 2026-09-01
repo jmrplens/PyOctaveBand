@@ -138,10 +138,10 @@ octave_filter = filters.OctaveFilterBank(
 )
 afilter = filters.WeightingFilter(fs, "A", stateful=True)
 
-for block in sf.blocks("measurement.wav", blocksize=256, overlap=0):
+for frame in sf.blocks("measurement.wav", blocksize=256, overlap=0):
 
     # Apply A-filter
-    weighted = afilter.filter(block)
+    weighted = afilter.filter(frame)
 
     # Split into octave bands
     block_spl, _, block_output = octave_filter.filter(weighted, sigbands=True, detrend=False)
@@ -180,7 +180,7 @@ The band version is the same accumulator with a vector on the left:
 ```python
 band_squares = np.zeros(bank.num_bands)   # from your stateful OctaveFilterBank
 
-for x in audio_stream(block):
+for x in audio_stream(block):        # your capture callback
     _, _, bands = bank.filter(x, sigbands=True, detrend=False,
                               calculate_level=False)
     band_squares += np.sum(np.square(bands), axis=-1)
@@ -343,7 +343,7 @@ for x in audio_stream(block):            # your capture callback
     y = env.process(aw.filter(x))
     spl = 10 * np.log10(y[..., -1] / (2e-5) ** 2)  # instantaneous LAF
     laf_max = max(laf_max, 10 * np.log10(y.max() / (2e-5) ** 2))
-    display(spl)
+    print(spl)  # your display update
 ```
 
 `y[..., -1]` is the detector output *at the instant the block ends*, so the

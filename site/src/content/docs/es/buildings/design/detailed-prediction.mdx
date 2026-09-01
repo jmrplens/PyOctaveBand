@@ -201,21 +201,37 @@ calculado.
 
 Los cuatro nombres de abajo (`laboratory_total_loss_factor`,
 `structural_reverberation_time`, `in_situ_reduction_index` e
-`in_situ_impact_level`) son nombres de primer nivel de `phonometry`; añádelos al
-bloque de importación de la sección anterior para ejecutar esto.
+`in_situ_impact_level`) viven en el mismo módulo `building` que el resto de la
+página, y el bloque parte de tus propios espectros medidos.
 
 ```python
-# Un R y un Ln de laboratorio medidos para el forjado separador de 220 mm,
-# trasladados al edificio. `el` es el elemento in situ de la sección de arriba,
-# cuyo `reverberation_time` es Ts,situ.
-eta_lab = laboratory_total_loss_factor(bands, mass_per_area=484.0,
-                                       internal_loss_factor=0.005)   # (C.3)
-ts_lab = structural_reverberation_time(bands, eta_lab)               # (C.1)
+import numpy as np
+from phonometry import building
+
+bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630,
+                  800, 1000, 1250, 1600, 2000, 2500, 3150], float)
+
+# El forjado separador de 220 mm in situ, el elemento que la sección siguiente
+# arma a partir de sus uniones: su suma de perímetro es 2,659 m (fórmula C.4) y
+# su `reverberation_time` es Ts,situ.
+el = building.in_situ_element(building.HomogeneousElement(
+    "floor", 20.0, 5.0, 4.0, 484.0, 76.8, 0.005, 2.659, 2200.0, 3800.0), bands)
+
+# Un R y un Ln de laboratorio medidos para ese mismo forjado, trasladados al
+# edificio.
+r_measured = ...    # R medido por banda, dB (informe de ensayo ISO 10140-2)
+ln_measured = ...   # Ln medido por banda, dB (informe de ensayo ISO 10140-3)
+
+eta_lab = building.laboratory_total_loss_factor(
+    bands, mass_per_area=484.0, internal_loss_factor=0.005)   # (C.3)
+ts_lab = building.structural_reverberation_time(bands, eta_lab)  # (C.1)
 print(np.round(ts_lab[[0, 10]], 3))                    # [0.301 0.089] s
 print(np.round(el.reverberation_time[[0, 10]], 3))     # [0.53  0.152] s, in situ
 
-r_situ = in_situ_reduction_index(r_measured, el.reverberation_time, ts_lab)
-ln_situ = in_situ_impact_level(ln_measured, el.reverberation_time, ts_lab)
+r_situ = building.in_situ_reduction_index(r_measured, el.reverberation_time,
+                                          ts_lab)
+ln_situ = building.in_situ_impact_level(ln_measured, el.reverberation_time,
+                                        ts_lab)
 # Este forjado está *menos* amortiguado en el edificio que en el marco de ensayo
 # (Ts,situ es el mayor de los dos), así que la fórmula (9) le quita de 2,0 a
 # 2,5 dB de índice en todo el rango y la fórmula (5) de la parte 2 se los suma a
@@ -223,7 +239,8 @@ ln_situ = in_situ_impact_level(ln_measured, el.reverberation_time, ts_lab)
 
 # Una trayectoria por flancos toma la forma de transmisión resonante únicamente
 # de ese mismo índice medido; la directa, no.
-r_flanking = resonant_sound_reduction_index(r_situ, bands, critical_frequency=76.8)
+r_flanking = building.resonant_sound_reduction_index(r_situ, bands,
+                                                     critical_frequency=76.8)
 ```
 
 ### Qué necesitas antes de empezar
@@ -327,9 +344,38 @@ aparente por bandas, su reparto de energía y la valoración ISO 717-1 en una
 sola llamada:
 
 ```python
-# `paths` contiene las doce trayectorias por flancos de los cuatro elementos,
-# construidas como `d1` más arriba; el bloque de código bajo la figura las
-# construye todas.
+# Los otros tres elementos de flanco, construidos como `wall` más arriba, cada
+# uno con su superficie y su suma de perímetro (fórmula C.4); `situ` contiene
+# entonces los cinco.
+specs = (("ext2", 13.75, 5.0, 2.75, 219.0, 92.6, 0.0125, 2.548, 600.0, 1900.0),
+         ("int1", 11.0, 4.0, 2.75, 360.0, 128.4, 0.01, 1.636, 1800.0, 2500.0),
+         ("int2", 13.75, 5.0, 2.75, 360.0, 128.4, 0.01, 1.839, 1800.0, 2500.0))
+situ = {"floor": el, "ext1": wall}
+for spec in specs:
+    situ[spec[0]] = building.in_situ_element(
+        building.HomogeneousElement(*spec), bands)
+
+# Las doce trayectorias por flancos, tres por cada elemento de flanco, cada una
+# construida como `d1` más arriba.
+paths = []
+for tag, name, lij in (("1", "ext1", 4.0), ("2", "ext2", 5.0),
+                       ("3", "int1", 4.0), ("4", "int2", 5.0)):
+    flank = situ[name]
+    cross = k_floor_ext if name.startswith("ext") else k_floor_int
+    through = k_ext_ext if name.startswith("ext") else k_int_int
+    paths += [
+        building.airborne_flanking_path(label=f"D{tag}", kind="Df", element_i=situ["floor"],
+                                        element_j=flank, vibration_reduction_index=cross,
+                                        coupling_length=lij, separating_area=20.0,
+                                        delta_r_i=delta),
+        building.airborne_flanking_path(label=f"{tag}d", kind="Fd", element_i=flank,
+                                        element_j=situ["floor"], vibration_reduction_index=cross,
+                                        coupling_length=lij, separating_area=20.0),
+        building.airborne_flanking_path(label=f"{tag}{tag}", kind="Ff", element_i=flank,
+                                        element_j=flank, vibration_reduction_index=through,
+                                        coupling_length=lij, separating_area=20.0),
+    ]
+
 res = building.detailed_airborne_prediction(
     bands, direct_index=building.direct_reduction_index(el.sound_reduction_index,
                                                         delta_r_source=delta),
@@ -432,11 +478,13 @@ La parte de impactos del mismo edificio se apoya en el mismo diccionario
 ```python
 from phonometry import building
 
+k_floor_ext = building.junction_vibration_reduction("rigid_t", "corner", 484.0 / 219.0)
+k_floor_int = building.junction_vibration_reduction("rigid_cross", "corner", 360.0 / 484.0)
 direct = building.direct_impact_level(situ["floor"].impact_level, delta_l=delta)
 flanking = [
     building.impact_flanking_path(label=f"Df{tag}", floor=situ["floor"], element_j=situ[name],
                                   vibration_reduction_index=(
-                             k["floor-ext"] if name.startswith("ext") else k["floor-int"]),
+                             k_floor_ext if name.startswith("ext") else k_floor_int),
                                   coupling_length=lij, delta_l=delta)
     for tag, name, lij in (("1", "ext1", 4.0), ("2", "ext2", 5.0),
                            ("3", "int1", 4.0), ("4", "int2", 5.0))
@@ -597,8 +645,8 @@ necesitan la valoración ISO 717, así que el espectro debe cubrir de 100 Hz a
 3150 Hz (o de 125 Hz a 2000 Hz en bandas de octava).
 
 ```python
-airborne.report("prediccion-aereo.pdf", language="es")   # R'w, trece trayectorias
-impact.report("prediccion-impactos.pdf", language="es")  # L'n,w, cinco trayectorias
+res.report("prediccion-aereo.pdf", language="es")       # R'w, trece trayectorias
+imp.report("prediccion-impactos.pdf", language="es")    # L'n,w, cinco trayectorias
 ```
 
 Las fichas de ejemplo se regeneran con `make reports` y se mantienen
