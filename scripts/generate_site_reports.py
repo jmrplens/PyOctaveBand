@@ -160,6 +160,14 @@ PAGES: tuple[Page, ...] = (
 #: "ISO 717-2:2020, Annex C, example C.1" and "ISO 717-2:2020, Anexo C,
 #: ejemplo C.1" alike to ``717-2:2020``, and survives headings whose prose is
 #: reordered in translation (``NORAH2``, ``S3.5-1997``, ``2015/996``).
+#:
+#: Deliberately excluded: the space-separated issuer word, because translation
+#: moves and translates it ("Commission Directive (EU) 2015/996" is "Directiva
+#: (UE) 2015/996 de la Comisión"), so requiring it would fail correct pairs.
+#: The residual blind spot is a swap of two entries that share the numeric
+#: token -- which, designations being what they are, means two entries about
+#: the same document -- and such a swap cannot pair a heading with the wrong
+#: source. ``tests/test_generate_site_reports.py`` pins both sides of this.
 _DESIGNATION_RE = re.compile(r"[A-Za-z]*\d[\dA-Za-z.:/-]*")
 
 
@@ -186,11 +194,17 @@ def check_edition_parity(english: pathlib.Path, spanish: pathlib.Path) -> None:
         lines = path.read_text(encoding="utf8").splitlines()
         return [line for line in lines if line.startswith("## ")]
 
+    def shown(path: pathlib.Path) -> str:
+        try:
+            return str(path.relative_to(ROOT))
+        except ValueError:
+            return str(path)
+
     en, es = headings(english), headings(spanish)
     if len(en) != len(es):
         sys.exit(
-            f"{spanish.relative_to(ROOT)}: {len(es)} entries against "
-            f"{len(en)} in {english.relative_to(ROOT)}. Translate the "
+            f"{shown(spanish)}: {len(es)} entries against "
+            f"{len(en)} in {shown(english)}. Translate the "
             "missing entry (or delete the stale one) so the editions match."
         )
     pairs = zip(en, es, strict=True)
@@ -201,8 +215,8 @@ def check_edition_parity(english: pathlib.Path, spanish: pathlib.Path) -> None:
         token_es = match_es.group(0) if match_es else None
         if token_en != token_es:
             sys.exit(
-                f"{spanish.relative_to(ROOT)}: entry {index} names "
-                f"{token_es!r} where {english.relative_to(ROOT)} names "
+                f"{shown(spanish)}: entry {index} names "
+                f"{token_es!r} where {shown(english)} names "
                 f"{token_en!r}:\n  {heading_en}\n  {heading_es}\n"
                 "The editions are out of order or an entry was mistranslated."
             )
