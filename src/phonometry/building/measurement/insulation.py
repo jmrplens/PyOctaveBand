@@ -925,6 +925,37 @@ def _check_low_frequency_volume(
         raise ValueError(msg)
 
 
+def _apparent_reduction_index(
+    d: np.ndarray,
+    t: np.ndarray,
+    area: float | None,
+    volume: float | None,
+) -> np.ndarray | None:
+    r"""``R'`` of Formula (4) and (5), or ``None`` without the geometry.
+
+    ``area`` and ``volume`` travel together: one without the other is a
+    caller mistake to refuse, not a partial answer to give. Both must be
+    positive and finite, and the equivalent absorption area is
+    :math:`A = 0.16\,V/T` per band.
+    """
+    if (area is None) != (volume is None):
+        msg = "'area' and 'volume' must be given together to compute R'."
+        raise ValueError(msg)
+    if area is None or volume is None:
+        return None
+    # `not x > 0` rather than `x <= 0`: NaN answers False to both
+    # comparisons, so the plain form let a NaN geometry through and the
+    # result carried it. Infinity passes `> 0` and is refused by name.
+    if not area > 0.0 or not volume > 0.0:
+        msg = "'area' and 'volume' must be positive."
+        raise ValueError(msg)
+    if math.isinf(area) or math.isinf(volume):
+        msg = "'area' and 'volume' must be finite."
+        raise ValueError(msg)
+    absorption = 0.16 * volume / t
+    return d + 10.0 * np.log10(area / absorption)
+
+
 @overload
 def airborne_insulation(
     l1: Sequence[float] | np.ndarray,
@@ -1085,23 +1116,7 @@ def airborne_insulation(
 
     d = l1_bands - l2_bands
     dnt = d + 10.0 * np.log10(t / t0)
-
-    if (area is None) != (volume is None):
-        msg = "'area' and 'volume' must be given together to compute R'."
-        raise ValueError(msg)
-    r_prime: np.ndarray | None = None
-    if area is not None and volume is not None:
-        # `not x > 0` rather than `x <= 0`: NaN answers False to both
-        # comparisons, so the plain form let a NaN geometry through and the
-        # result carried it. Infinity passes `> 0` and is refused by name.
-        if not area > 0.0 or not volume > 0.0:
-            msg = "'area' and 'volume' must be positive."
-            raise ValueError(msg)
-        if math.isinf(area) or math.isinf(volume):
-            msg = "'area' and 'volume' must be finite."
-            raise ValueError(msg)
-        absorption = 0.16 * volume / t
-        r_prime = d + 10.0 * np.log10(area / absorption)
+    r_prime = _apparent_reduction_index(d, t, area, volume)
 
     # Only the receiving room, because only its volume is an argument here:
     # Clause 8.1 tests the two rooms on their own volumes and a source room

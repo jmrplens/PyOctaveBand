@@ -54,6 +54,7 @@ from phonometry.building.measurement.low_frequency import (
     LowFrequencyProcedure,
     LowFrequencyWarning,
     _named_low_frequency_bands,
+    _warn_when_the_procedure_is_required,
     apply_low_frequency_procedure,
     corner_level,
     low_frequency_level,
@@ -1040,6 +1041,25 @@ def test_a_volume_the_library_was_not_given_raises_nothing() -> None:
         building.airborne_insulation(_L1, _L2, _T2, frequencies=_FREQS)
         building.impact_insulation(_L2, _T2, frequencies=_FREQS)
         building.facade_insulation(_L1, _L2, _T2, frequencies=_FREQS)
+
+
+@pytest.mark.parametrize("bad", [float("nan"), 0.0])
+def test_the_warning_stands_aside_for_a_volume_that_is_not_one(bad: float) -> None:
+    """A volume that is not a volume is the entry point's complaint to make.
+
+    Every entry point rejects it before this helper runs, so the helper's own
+    guard is reachable only directly; it stands aside rather than warn about a
+    trigger no valid room ever pulled.
+    """
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", LowFrequencyWarning)
+        _warn_when_the_procedure_is_required(
+            bad,
+            _FREQS,
+            None,
+            owner="airborne_insulation",
+            argument="receiver_low_frequency",
+        )
 
 
 def test_a_room_at_or_above_the_trigger_raises_nothing() -> None:

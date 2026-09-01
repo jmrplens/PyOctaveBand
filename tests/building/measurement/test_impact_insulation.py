@@ -235,6 +235,21 @@ def test_lnt_decreases_with_reverberation_time() -> None:
     np.testing.assert_allclose(res.l_n_t, [50.0])
 
 
+@pytest.mark.parametrize("bad", [0.0, -1.0, float("nan")])
+def test_impact_rejects_a_volume_that_is_not_positive(bad: float) -> None:
+    """Zero, negative and NaN all fail the same ``not x > 0`` gate."""
+    with pytest.raises(ValueError, match="'volume' must be positive"):
+        building.impact_insulation(np.array([60.0]), np.array([0.5]), volume=bad)
+
+
+def test_impact_rejects_an_infinite_volume() -> None:
+    """Infinity passes the positivity gate and is refused by name."""
+    with pytest.raises(ValueError, match="'volume' must be finite"):
+        building.impact_insulation(
+            np.array([60.0]), np.array([0.5]), volume=float("inf")
+        )
+
+
 def test_normalized_level_formula2() -> None:
     """Formula (2): A = 0,16 V / T = A0 = 10 => 10 lg(A/A0) = 0 => L'n = Li."""
     li = np.array([60.0, 62.0])

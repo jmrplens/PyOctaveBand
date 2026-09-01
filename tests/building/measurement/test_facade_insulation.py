@@ -242,6 +242,29 @@ def test_nonpositive_area_volume_raises() -> None:
         )
 
 
+def test_infinite_area_raises() -> None:
+    """Infinity passes the positivity gate and is refused by name."""
+    outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
+    surface = _flat(3, 72.0)
+    with pytest.raises(ValueError, match="'area' must be finite"):
+        building.facade_insulation(
+            outdoor,
+            indoor,
+            rt,
+            area=float("inf"),
+            volume=50.0,
+            surface_level=surface,
+        )
+
+
+def test_area_without_surface_level_raises() -> None:
+    # area + volume but no surface_level: R' cannot be formed, so raise a
+    # clear error naming 'surface_level' as the missing input.
+    outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
+    with pytest.raises(ValueError, match=r"'area' requires 'surface_level' to compute"):
+        building.facade_insulation(outdoor, indoor, rt, area=10.0, volume=50.0)
+
+
 def test_surface_and_area_without_volume_raises() -> None:
     # surface_level + area but no volume: R' would silently be None, so raise
     # a clear error naming 'volume' as the missing input.
