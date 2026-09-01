@@ -6,11 +6,11 @@ description: "Por qué la coma flotante deriva entre hosts, qué fija phonometry
 Un filtro de ponderación diseñado por phonometry es el mismo filtro, byte a
 byte, en cualquier máquina: cualquier CPU, con o sin AVX-512; cualquier juego
 de kernels BLAS; cualquier número de hilos; cualquier semilla de hash; y,
-desde que se fijó el logaritmo, la biblioteca C de cualquier plataforma. Los
-coeficientes que diseña un portátil son los que diseña un clúster, así que un
-veredicto de conformidad, una figura publicada o un filtro embarcado en una
-cadena de medida es un artefacto reproducible y no el relato de una máquina
-sobre sí misma.
+desde que se fijó el logaritmo, la biblioteca C de cada plataforma que corre
+la matriz de tests, Linux, macOS y Windows. Los coeficientes que diseña un
+portátil son los que diseña un clúster, así que un veredicto de conformidad,
+una figura publicada o un filtro embarcado en una cadena de medida es un
+artefacto reproducible y no el relato de una máquina sobre sí misma.
 
 Esa frase no es el comportamiento normal del Python científico, y esta página
 registra lo que costó, con los números.
@@ -70,7 +70,12 @@ El camino de diseño determinista responde a cada puerta en su terreno, en
   los dos puntos donde el camino entregaba a numpy una expresión compleja
   están escritos en aritmética real.
 - **Trascendentes fijadas.** Fuera de la iteración, cada trascendente se
-  toma de la biblioteca C una vez por diseño. Dentro, el logaritmo corre
+  toma de la biblioteca C una vez por diseño. Esas pocas llamadas, un `exp`,
+  una `tan`, una `atan`, una `pow` y un par de `sin`, son el único punto por
+  el que la libm de la plataforma sigue entrando en un diseño; el digest de
+  la ponderación A publicada está fijado como test que corre en Linux, macOS
+  y Windows, y eso las sujeta a los mismos bytes como medida, no como
+  demostración. Dentro, el logaritmo corre
   tres cuartos de millón de veces por diseño, y el bucle que lo fijaba costó
   un factor cuatro; ahora es el propio algoritmo de `log` de glibc, el de
   tablas, deletreado en operaciones numpy que IEEE&nbsp;754 fija
@@ -110,7 +115,9 @@ corren en CI:
 - **Idénticos entre plataformas.** Con el logaritmo fijado, los diseños de
   macOS se movieron esa última ulp una sola vez, hasta los valores que las
   demás plataformas ya publicaban, y la diferencia silenciosa entre Linux y
-  macOS desapareció.
+  macOS desapareció. El digest de la ponderación A que imprime el ejemplo de
+  abajo es un test en la matriz de Linux, macOS y Windows, así que una
+  plataforma que derive pone el CI en rojo en vez de publicar otro filtro.
 
 ## Compruébalo tú
 
@@ -118,20 +125,19 @@ Dos diseños son el mismo diseño, y los bytes tienen nombre:
 
 ```python
 import hashlib
-import numpy as np
 from phonometry import filters
 
 una = filters.WeightingFilter(48000, "A").sos
 otra = filters.WeightingFilter(48000, "A").sos
-print(np.array_equal(una, otra))                        # True
+print(una.tobytes() == otra.tobytes())                   # True
 print(hashlib.sha256(una.tobytes()).hexdigest()[:16])   # 991833ff389afe91
 ```
 
-La segunda línea es la clave: ese digest no es «lo que salió en mi máquina»,
-es el digest de la ponderación A a 48&nbsp;kHz de esta versión en cualquier
-máquina. Si una versión futura mueve un coeficiente a propósito, el digest se
-mueve con ella y el cambio es un suceso documentado, nunca una propiedad de
-tu hardware.
+La segunda línea es la clave: esos dieciséis dígitos hexadecimales, la
+cabeza del SHA-256, no son «lo que salió en mi máquina», son el digest de la
+ponderación A a 48&nbsp;kHz de esta versión en cualquier máquina. Si una
+versión futura mueve un coeficiente a propósito, el digest se mueve con ella
+y el cambio es un suceso documentado, nunca una propiedad de tu hardware.
 
 ## Alcance
 

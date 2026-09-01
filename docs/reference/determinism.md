@@ -4,8 +4,9 @@
 
 A weighting filter designed by phonometry is the same filter, byte for byte,
 on every machine: any CPU, with or without AVX-512; any BLAS kernel set; any
-thread count; any hash seed; and, since the logarithm was pinned, any
-platform's C library. The coefficients a laptop designs are the coefficients
+thread count; any hash seed; and, since the logarithm was pinned, the C
+library of every platform the test matrix runs, Linux, macOS and Windows.
+The coefficients a laptop designs are the coefficients
 a cluster designs, so a conformance verdict, a published figure or a filter
 shipped inside a measurement chain is a reproducible artifact rather than one
 machine's account of itself.
@@ -63,7 +64,12 @@ The deterministic design path answers each door in kind, in
   places the path handed numpy a complex expression are written out in real
   arithmetic.
 - **Pinned transcendentals.** Outside the iteration, each transcendental is
-  taken from the C library once per design. Inside it, the logarithm runs
+  taken from the C library once per design. Those few calls, an `exp`, a
+  `tan`, an `atan`, a `pow` and a `sin` or two, are the one place a
+  platform's libm still enters a design; the digest of the shipped A
+  weighting is pinned as a test that runs on Linux, macOS and Windows,
+  which holds them to the same bytes as a measurement, not a proof. Inside
+  it, the logarithm runs
   three quarters of a million times per design, and the loop that once pinned
   it cost a factor of four; it is now glibc's own table-driven `log`
   algorithm spelled in numpy operations IEEE&nbsp;754 fixes exactly, plain
@@ -99,7 +105,10 @@ run in CI:
   the environment-versus-environment comparisons are pinned as tests.
 - **Identical across platforms.** With the logarithm pinned, macOS designs
   moved by that last ulp once, onto the values every other platform already
-  shipped, and the silent Linux-versus-macOS difference is gone.
+  shipped, and the silent Linux-versus-macOS difference is gone. The
+  A-weighting digest the example below prints is a test in the Linux, macOS
+  and Windows matrix, so a platform that drifts turns CI red instead of
+  shipping a different filter.
 
 ## See it yourself
 
@@ -107,19 +116,19 @@ Two designs are the same design, and the bytes have a name:
 
 ```python
 import hashlib
-import numpy as np
 from phonometry import filters
 
 once = filters.WeightingFilter(48000, "A").sos
 again = filters.WeightingFilter(48000, "A").sos
-print(np.array_equal(once, again))                       # True
+print(once.tobytes() == again.tobytes())                 # True
 print(hashlib.sha256(once.tobytes()).hexdigest()[:16])   # 991833ff389afe91
 ```
 
-The second line is the point: that digest is not "what my machine got", it is
-the digest of this release's A weighting at 48&nbsp;kHz on any machine. If a
-future release moves a coefficient deliberately, the digest moves with it and
-the change is a documented event, never a property of your hardware.
+The second line is the point: those sixteen hex digits, the head of the
+SHA-256, are not "what my machine got", they are the digest of this release's
+A weighting at 48&nbsp;kHz on any machine. If a future release moves a
+coefficient deliberately, the digest moves with it and the change is a
+documented event, never a property of your hardware.
 
 ## Scope
 
@@ -132,13 +141,13 @@ bits across CPUs, which is the normal condition of scientific Python; the
 deterministic treatment is applied where a filter's identity matters.
 
 The full engineering account lives with the code, in the module docstrings of
-[`filters/_weighting_design.py`](../../src/phonometry/filters/_weighting_design.py)
+[`filters/_weighting_design.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/filters/_weighting_design.py)
 and
-[`filters/_pinned_log.py`](../../src/phonometry/filters/_pinned_log.py),
+[`filters/_pinned_log.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/filters/_pinned_log.py),
 and the tests that hold it are in
-[`tests/filters/test_weighting_design.py`](../../tests/filters/test_weighting_design.py)
+[`tests/filters/test_weighting_design.py`](https://github.com/jmrplens/phonometry/blob/main/tests/filters/test_weighting_design.py)
 and
-[`tests/filters/test_pinned_log.py`](../../tests/filters/test_pinned_log.py).
+[`tests/filters/test_pinned_log.py`](https://github.com/jmrplens/phonometry/blob/main/tests/filters/test_pinned_log.py).
 
 ## See also
 
