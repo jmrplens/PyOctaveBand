@@ -330,21 +330,26 @@ def test_nonfinite_raises() -> None:
 
 
 def test_frequencies_length_mismatch_raises() -> None:
-    # 'frequencies' shorter than the band count must fail clearly here rather
-    # than deferring a confusing matplotlib shape error to plot().
+    # 'frequencies' shorter than the band count must fail clearly on entry
+    # rather than deferring a confusing matplotlib shape error to plot(), or
+    # letting the low-frequency warning read columns the data does not have.
     outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
-    with pytest.raises(ValueError, match=r"'frequencies'.*same shape"):
+    with pytest.raises(
+        ValueError, match=r"'frequencies' must carry one band centre per"
+    ):
         building.facade_insulation(outdoor, indoor, rt, frequencies=[125.0, 250.0])
 
 
 def test_frequencies_with_an_extra_axis_raises() -> None:
     """A `frequencies` of the right count but the wrong shape is named.
 
-    The counts agree here, so the old count-by-count message read "got 3 for
-    3 bands"; the shapes are what disagree, and they are what is reported.
+    The counts agree here, so a count-by-count message would read "got 3 for
+    3 bands"; the refusal reports the shape instead.
     """
     outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
-    with pytest.raises(ValueError, match=r"'frequencies'.*same shape"):
+    with pytest.raises(
+        ValueError, match=r"'frequencies' must carry one band centre per"
+    ):
         building.facade_insulation(
             outdoor, indoor, rt, frequencies=np.full((1, 3), 125.0)
         )

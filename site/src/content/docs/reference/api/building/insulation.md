@@ -165,7 +165,7 @@ volume is an argument here.
 | `area` | Area `S` of the common partition, in m² (optional; required together with `volume` for `R'`). |
 | `volume` | Receiving-room volume `V`, in m³ (optional; required together with `area` for `R'`). |
 | `t0` | Reference reverberation time `T0`, in seconds (default 0,5 s for dwellings, Clause 3.13). |
-| `frequencies` | Band centre frequencies, in Hz; required with either low-frequency argument. Without one it still matters: naming the 50 Hz, 63 Hz and 80 Hz bands beside a small `volume` is what tells this function the procedure was owed, and what it warns about. The result carries no band axis of its own. |
+| `frequencies` | Band centre frequencies, in Hz; required with either low-frequency argument. Without one it still matters: naming any of the 50 Hz, 63 Hz and 80 Hz bands beside a small `volume` is what tells this function the procedure was owed, and what it warns about. The result carries no band axis of its own. |
 | `source_low_frequency` | Source-room corner measurements and volume (Clause 8). Must not carry a 63 Hz octave reverberation time. |
 | `receiver_low_frequency` | Receiving-room corner measurements and volume (Clause 8), which must also carry the 63 Hz octave reverberation time of Clause 10.4. |
 
@@ -181,7 +181,7 @@ volume is an argument here.
 
 | Warning | When |
 | :--- | :--- |
-| LowFrequencyWarning | when the receiving room rounds below 25 m³ and `frequencies` names the three bands but no `receiver_low_frequency` answers Clause 8.1. |
+| LowFrequencyWarning | when the receiving room rounds below 25 m³ and `frequencies` names any of the three bands but no `receiver_low_frequency` answers Clause 8.1. |
 
 ## AirborneInsulationResult
 
@@ -358,7 +358,7 @@ mandatory for the 50 Hz, 63 Hz and 80 Hz bands in the receiving room once
 its volume, to the nearest cubic metre, is under 25 m³, and Clause 8.4 puts
 one 63 Hz octave reverberation time in place of the three one-third-octave
 ones. Pass both through `low_frequency`. A loudspeaker-method call whose
-`volume` rounds below the line and whose `frequencies` names the three
+`volume` rounds below the line and whose `frequencies` names any of the three
 bands, with no `low_frequency` to run the procedure, answers from the
 default procedure alone and raises a
 [`LowFrequencyWarning`](/phonometry/reference/api/building/low-frequency/#lowfrequencywarning) saying that those three bands
@@ -385,13 +385,13 @@ are not the ISO 16283 quantity.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If band counts differ, if `method` is unknown, if `t2`/`t0`/`area`/`volume` are not positive, if `area` is given without `surface_level`, if `surface_level` and `area` are given without `volume`, if `frequencies` is given with a shape that differs from the band axis, if inputs are non-finite, if `low_frequency` is given without `frequencies` or with `method="road_traffic"`, if `volume` disagrees with the procedure, or if the 63 Hz octave reverberation time is missing. A room that does not round below 25 m³ is refused where the corner measurements are described, by [`LowFrequencyProcedure`](/phonometry/reference/api/building/low-frequency/#lowfrequencyprocedure) itself. Supplying `surface_level` alone is not an error: `r_prime` simply stays `None`. |
+| ValueError | If band counts differ, if `method` is unknown, if `t2`/`t0`/`area`/`volume` are not positive, if `area` is given without `surface_level`, if `surface_level` and `area` are given without `volume`, if `frequencies` does not carry one band centre per measured band, if inputs are non-finite, if `low_frequency` is given without `frequencies` or with `method="road_traffic"`, if `volume` disagrees with the procedure, or if the 63 Hz octave reverberation time is missing. A room that does not round below 25 m³ is refused where the corner measurements are described, by [`LowFrequencyProcedure`](/phonometry/reference/api/building/low-frequency/#lowfrequencyprocedure) itself. Supplying `surface_level` alone is not an error: `r_prime` simply stays `None`. |
 
 **Warns**
 
 | Warning | When |
 | :--- | :--- |
-| LowFrequencyWarning | when a loudspeaker-method `volume` rounds below 25 m³ and `frequencies` names the three bands but no `low_frequency` answers Clause 7.3.1. |
+| LowFrequencyWarning | when a loudspeaker-method `volume` rounds below 25 m³ and `frequencies` names any of the three bands but no `low_frequency` answers Clause 7.3.1. |
 
 ## FacadeInsulationResult
 
@@ -539,7 +539,7 @@ are not the ISO 16283 quantity.
 | `t2` | Receiving-room reverberation time per band, in seconds. |
 | `volume` | Receiving-room volume `V`, in m³ (optional; required for `L'n`). |
 | `t0` | Reference reverberation time `T0`, in seconds (default 0,5 s for dwellings, Clause 3.13). |
-| `frequencies` | Band centre frequencies, in Hz; required with `low_frequency`. Without it it still matters: naming the 50 Hz, 63 Hz and 80 Hz bands beside a small `volume` is what tells this function the procedure was owed, and what it warns about. The result carries no band axis of its own. |
+| `frequencies` | Band centre frequencies, in Hz; required with `low_frequency`. Without it it still matters: naming any of the 50 Hz, 63 Hz and 80 Hz bands beside a small `volume` is what tells this function the procedure was owed, and what it warns about. The result carries no band axis of its own. |
 | `low_frequency` | Receiving-room corner measurements, volume and 63 Hz octave reverberation time (Clause 8 and Clause 10.4). |
 
 **Returns:** [`ImpactInsulationResult`](/phonometry/reference/api/building/insulation/#impactinsulationresult) with `l_n_t` and `l_n` (the latter `None` unless `volume` is given), plus the low-frequency record when one was produced.
@@ -554,7 +554,7 @@ are not the ISO 16283 quantity.
 
 | Warning | When |
 | :--- | :--- |
-| LowFrequencyWarning | when `volume` rounds below 25 m³ and `frequencies` names the three bands but no `low_frequency` answers Clause 8.1. |
+| LowFrequencyWarning | when `volume` rounds below 25 m³ and `frequencies` names any of the three bands but no `low_frequency` answers Clause 8.1. |
 
 ## ImpactInsulationResult
 

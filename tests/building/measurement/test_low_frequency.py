@@ -916,6 +916,48 @@ def test_all_three_parts_say_the_procedure_is_required(part: str) -> None:
         call()
 
 
+def test_a_partial_low_range_is_warned_about_by_its_own_bands() -> None:
+    """The warning says what was measured, and advice that would be refused.
+
+    With only 50 Hz and 63 Hz named, the room is as much outside ISO 16283 as
+    with all three, so the warning fires; but a message claiming all three
+    bands were named would be false, and telling the caller to pass a
+    ``LowFrequencyProcedure`` would send them straight into the refusal of the
+    band-axis check, which runs on the three together. The message names the
+    two bands and says to complete the set first.
+    """
+    freqs = np.array([50.0, 63.0, 100.0, 125.0, 160.0])
+    with pytest.warns(
+        LowFrequencyWarning, match=r"names the 50 Hz and 63 Hz bands"
+    ) as caught:
+        building.impact_insulation(_L2, _T2, volume=_SMALL_VOLUME, frequencies=freqs)
+    assert "complete the low range to 50 Hz, 63 Hz and 80 Hz" in str(caught[0].message)
+
+
+def test_a_full_low_range_is_told_to_pass_the_procedure_directly() -> None:
+    """With all three bands named, the advice is the procedure itself."""
+    with pytest.warns(LowFrequencyWarning) as caught:
+        building.impact_insulation(_L2, _T2, volume=_SMALL_VOLUME, frequencies=_FREQS)
+    message = str(caught[0].message)
+    assert "names the 50 Hz, 63 Hz and 80 Hz bands" in message
+    assert "complete the low range" not in message
+
+
+def test_a_wrong_length_band_axis_is_refused_before_the_warning() -> None:
+    """A vector that does not describe the measured bands decides nothing.
+
+    Five measured bands and a three-entry vector naming the low range: without
+    the entry check the warning would fire keyed on columns the measurement
+    does not have.
+    """
+    with pytest.raises(
+        ValueError, match=r"'frequencies' must carry one band centre per"
+    ):
+        building.impact_insulation(
+            _L2, _T2, volume=_SMALL_VOLUME, frequencies=[50.0, 63.0, 80.0]
+        )
+
+
 def _room_that_triggers_with_the_procedure(part: str) -> Callable[[], object]:
     """The same three calls, with the procedure the warning asks for."""
     procedure = _receiving_procedure()
@@ -1018,16 +1060,18 @@ def test_unnamed_bands_raise_nothing() -> None:
         building.impact_insulation(_L2, _T2, volume=_SMALL_VOLUME)
 
 
-def test_a_band_axis_with_an_extra_dimension_raises_nothing() -> None:
+def test_a_band_axis_with_an_extra_dimension_is_refused_on_entry() -> None:
     """A band vector has to be one, and a ``(1, bands)`` array is not.
 
-    ``numpy`` would broadcast it and find one match per nominal centre, so
-    without the rank test the warning would fire and point the caller at a
-    procedure the band-axis check then refuses.
+    This used to pass in silence: the warning's rank test kept it from firing,
+    and nothing else looked at the axis. Silence was the wrong answer, because
+    the vector exists to describe the measured bands and this one does not, so
+    the entry points refuse it by name before either use.
     """
     freqs = np.array([[50.0, 63.0, 80.0, 100.0, 125.0]])
-    with warnings.catch_warnings():
-        warnings.simplefilter("error", LowFrequencyWarning)
+    with pytest.raises(
+        ValueError, match=r"'frequencies' must carry one band centre per"
+    ):
         building.impact_insulation(_L2, _T2, volume=_SMALL_VOLUME, frequencies=freqs)
 
 

@@ -836,6 +836,37 @@ def _validate_reverberation(t: np.ndarray, t0: float) -> None:
         raise ValueError(msg)
 
 
+def _checked_frequency_axis(
+    frequencies: Sequence[float] | np.ndarray | None, band_count: int, owner: str
+) -> np.ndarray | None:
+    """The band-centre vector, checked against the measured band count.
+
+    ``frequencies`` exists for the low-frequency procedure alone, but it is
+    read even when no procedure is passed: naming any of the three
+    low-frequency bands beside a small room is what makes the entry point
+    warn. A vector of the wrong length or shape would make that decision about
+    columns the measurement does not have, so it is refused here, before
+    either use, with the counts named.
+
+    :param frequencies: Band centre frequencies, in Hz, or ``None``.
+    :param band_count: Number of measured bands.
+    :param owner: Function name, for the message.
+    :return: The frequencies as a 1-D float array, or ``None``.
+    :raises ValueError: If the vector is not one-dimensional or its length is
+        not ``band_count``.
+    """
+    if frequencies is None:
+        return None
+    axis = np.asarray(frequencies, dtype=np.float64)
+    if axis.ndim != 1 or axis.size != band_count:
+        msg = (
+            f"{owner}: 'frequencies' must carry one band centre per measured "
+            f"band ({band_count}); got shape {axis.shape}."
+        )
+        raise ValueError(msg)
+    return axis
+
+
 def _require_frequencies(
     frequencies: Sequence[float] | np.ndarray | None, owner: str
 ) -> np.ndarray:
@@ -846,7 +877,8 @@ def _require_frequencies(
     rewrites three named bands and leaves the rest alone, so it has to be told
     which columns those are.
 
-    :param frequencies: Band centre frequencies, in Hz, or ``None``.
+    :param frequencies: Band centre frequencies as checked by
+        :func:`_checked_frequency_axis`, or ``None``.
     :param owner: Function name, for the message.
     :return: The frequencies as a float array.
     :raises ValueError: If ``frequencies`` is ``None``.
@@ -974,10 +1006,10 @@ def airborne_insulation(
     :param t0: Reference reverberation time ``T0``, in seconds (default
         0,5 s for dwellings, Clause 3.13).
     :param frequencies: Band centre frequencies, in Hz; required with either
-        low-frequency argument. Without one it still matters: naming the
-        50 Hz, 63 Hz and 80 Hz bands beside a small ``volume`` is what tells
-        this function the procedure was owed, and what it warns about. The
-        result carries no band axis of its own.
+        low-frequency argument. Without one it still matters: naming any of
+        the 50 Hz, 63 Hz and 80 Hz bands beside a small ``volume`` is what
+        tells this function the procedure was owed, and what it warns about.
+        The result carries no band axis of its own.
     :param source_low_frequency: Source-room corner measurements and volume
         (Clause 8). Must not carry a 63 Hz octave reverberation time.
     :param receiver_low_frequency: Receiving-room corner measurements and
@@ -996,7 +1028,7 @@ def airborne_insulation(
         the corner measurements are described, by
         :class:`~.low_frequency.LowFrequencyProcedure` itself.
     :warns LowFrequencyWarning: when the receiving room rounds below 25 m³ and
-        ``frequencies`` names the three bands but no ``receiver_low_frequency``
+        ``frequencies`` names any of the three bands but no ``receiver_low_frequency``
         answers Clause 8.1.
     """
     l1_bands = _as_band_levels(l1, "l1")
@@ -1013,11 +1045,14 @@ def airborne_insulation(
         "band",
     )
     _validate_reverberation(t, t0)
+    checked_frequencies = _checked_frequency_axis(
+        frequencies, l2_bands.size, "airborne_insulation"
+    )
 
     source_lf: LowFrequencyResult | None = None
     receiver_lf: LowFrequencyResult | None = None
     if source_low_frequency is not None or receiver_low_frequency is not None:
-        freqs = _require_frequencies(frequencies, "airborne_insulation")
+        freqs = _require_frequencies(checked_frequencies, "airborne_insulation")
         if source_low_frequency is not None:
             source_lf = apply_low_frequency_procedure(
                 l1_bands, freqs, source_low_frequency, room="source"
@@ -1061,7 +1096,7 @@ def airborne_insulation(
     # small enough to trigger is something the caller has to declare.
     _warn_when_the_procedure_is_required(
         volume,
-        frequencies,
+        checked_frequencies,
         receiver_low_frequency,
         owner="airborne_insulation",
         argument="receiver_low_frequency",
@@ -1131,10 +1166,10 @@ def impact_insulation(
     :param t0: Reference reverberation time ``T0``, in seconds (default
         0,5 s for dwellings, Clause 3.13).
     :param frequencies: Band centre frequencies, in Hz; required with
-        ``low_frequency``. Without it it still matters: naming the 50 Hz,
-        63 Hz and 80 Hz bands beside a small ``volume`` is what tells this
-        function the procedure was owed, and what it warns about. The result
-        carries no band axis of its own.
+        ``low_frequency``. Without it it still matters: naming any of the
+        50 Hz, 63 Hz and 80 Hz bands beside a small ``volume`` is what tells
+        this function the procedure was owed, and what it warns about. The
+        result carries no band axis of its own.
     :param low_frequency: Receiving-room corner measurements, volume and 63 Hz
         octave reverberation time (Clause 8 and Clause 10.4).
     :return: :class:`ImpactInsulationResult` with ``l_n_t`` and ``l_n``
@@ -1148,7 +1183,7 @@ def impact_insulation(
         is refused where the corner measurements are described, by
         :class:`~.low_frequency.LowFrequencyProcedure` itself.
     :warns LowFrequencyWarning: when ``volume`` rounds below 25 m³ and
-        ``frequencies`` names the three bands but no ``low_frequency`` answers
+        ``frequencies`` names any of the three bands but no ``low_frequency`` answers
         Clause 8.1.
     """
     li_bands = _as_band_levels(li, "li")
@@ -1162,10 +1197,13 @@ def impact_insulation(
         "impact_insulation", {"li": li_bands.size, "t2": t.size}, "band"
     )
     _validate_reverberation(t, t0)
+    checked_frequencies = _checked_frequency_axis(
+        frequencies, li_bands.size, "impact_insulation"
+    )
 
     low_frequency_result: LowFrequencyResult | None = None
     if low_frequency is not None:
-        freqs = _require_frequencies(frequencies, "impact_insulation")
+        freqs = _require_frequencies(checked_frequencies, "impact_insulation")
         _check_low_frequency_volume(low_frequency, volume, "impact_insulation")
         low_frequency_result = apply_low_frequency_procedure(
             li_bands, freqs, low_frequency, reverberation_time=t, room="receiving"
@@ -1187,7 +1225,7 @@ def impact_insulation(
 
     _warn_when_the_procedure_is_required(
         volume,
-        frequencies,
+        checked_frequencies,
         low_frequency,
         owner="impact_insulation",
         argument="low_frequency",
@@ -1281,7 +1319,7 @@ def facade_insulation(
     its volume, to the nearest cubic metre, is under 25 m³, and Clause 8.4 puts
     one 63 Hz octave reverberation time in place of the three one-third-octave
     ones. Pass both through ``low_frequency``. A loudspeaker-method call whose
-    ``volume`` rounds below the line and whose ``frequencies`` names the three
+    ``volume`` rounds below the line and whose ``frequencies`` names any of the three
     bands, with no ``low_frequency`` to run the procedure, answers from the
     default procedure alone and raises a
     :class:`~.low_frequency.LowFrequencyWarning` saying that those three bands
@@ -1318,8 +1356,8 @@ def facade_insulation(
     :raises ValueError: If band counts differ, if ``method`` is unknown, if
         ``t2``/``t0``/``area``/``volume`` are not positive, if ``area`` is
         given without ``surface_level``, if ``surface_level`` and ``area`` are
-        given without ``volume``, if ``frequencies`` is given with a shape
-        that differs from the band axis, if inputs are non-finite, if
+        given without ``volume``, if ``frequencies`` does not carry one band
+        centre per measured band, if inputs are non-finite, if
         ``low_frequency`` is given without ``frequencies`` or with
         ``method="road_traffic"``, if ``volume`` disagrees with the procedure,
         or if the 63 Hz octave reverberation time is missing. A room that does
@@ -1328,7 +1366,7 @@ def facade_insulation(
         Supplying ``surface_level`` alone is not an error: ``r_prime`` simply
         stays ``None``.
     :warns LowFrequencyWarning: when a loudspeaker-method ``volume`` rounds
-        below 25 m³ and ``frequencies`` names the three bands but no
+        below 25 m³ and ``frequencies`` names any of the three bands but no
         ``low_frequency`` answers Clause 7.3.1.
     """
     if method not in _FACADE_CORRECTION:
@@ -1349,6 +1387,9 @@ def facade_insulation(
         "band",
     )
     _validate_reverberation(t, t0)
+    checked_frequencies = _checked_frequency_axis(
+        frequencies, l2_bands.size, "facade_insulation"
+    )
 
     low_frequency_result: LowFrequencyResult | None = None
     if low_frequency is not None:
@@ -1361,7 +1402,7 @@ def facade_insulation(
                 f"with method={method!r}."
             )
             raise ValueError(msg)
-        freqs_lf = _require_frequencies(frequencies, "facade_insulation")
+        freqs_lf = _require_frequencies(checked_frequencies, "facade_insulation")
         _check_low_frequency_volume(low_frequency, volume, "facade_insulation")
         low_frequency_result = apply_low_frequency_procedure(
             l2_bands, freqs_lf, low_frequency, reverberation_time=t, room="receiving"
@@ -1398,15 +1439,9 @@ def facade_insulation(
             - _FACADE_CORRECTION[method]
         )
 
-    freqs = (
-        np.asarray(frequencies, dtype=np.float64) if frequencies is not None else None
-    )
-    if freqs is not None:
-        require_equal_shapes(
-            "facade_insulation",
-            {"l1_2m": l1_bands.shape, "frequencies": freqs.shape},
-            "band",
-        )
+    # The band axis was already checked against the measured bands on entry,
+    # by _checked_frequency_axis, which is the one place that complaint lives.
+    freqs = checked_frequencies
 
     # Loudspeaker methods only. Clause 6 says "for the element and global road
     # traffic methods, only the default procedure shall be used", so a small
@@ -1415,7 +1450,7 @@ def facade_insulation(
     if method == _FACADE_LOUDSPEAKER:
         _warn_when_the_procedure_is_required(
             volume,
-            frequencies,
+            checked_frequencies,
             low_frequency,
             owner="facade_insulation",
             argument="low_frequency",

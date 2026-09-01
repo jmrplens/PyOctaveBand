@@ -80,8 +80,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `LowFrequencyProcedure`
   carries the corner measurements and the 63 Hz octave reverberation time,
   `apply_low_frequency_procedure` returns a `LowFrequencyResult`, and
-  `airborne_insulation`, `impact_insulation` and `facade_insulation` each take
-  it through a `low_frequency` argument.
+  `impact_insulation` and `facade_insulation` take it through a
+  `low_frequency` argument, while `airborne_insulation` takes one per room of
+  the pair, `source_low_frequency` and `receiver_low_frequency`.
 
   ISO 16283-1 Clause 8.5, ISO 16283-2 Clause 8.5 and ISO 16283-3 Clause 7.3.4
   print the same procedure, so it is implemented once, and the four places the

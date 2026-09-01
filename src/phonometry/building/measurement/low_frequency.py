@@ -236,38 +236,42 @@ def _require_volume_triggers(volume: float, name: str) -> None:
         raise ValueError(msg)
 
 
-def _low_frequency_bands_are_present(frequencies: ArrayLike) -> bool:
-    """Whether a band-centre vector names all three low-frequency bands.
+def _named_low_frequency_bands(frequencies: ArrayLike) -> list[float]:
+    """The low-frequency bands a band-centre vector names, in 50/63/80 order.
 
     The non-raising half of :func:`_low_frequency_indices`, and the question
     :func:`_warn_when_the_procedure_is_required` has to answer before it can
     say anything. Every vector the raising version would refuse comes back
-    ``False`` here, an ambiguous duplicate centre included: a warning about a
+    empty here, an ambiguous duplicate centre included: a warning about a
     missing procedure is not the place to report a malformed band axis, and the
     caller who does supply a procedure gets the proper message from the other
     one.
 
-    ANY of the three is enough, not all three. A room under 25 m3 that reports
-    only 50 Hz and 63 Hz is as much outside ISO 16283 as one reporting all
-    three, and requiring the full set let a partially measured low range answer
-    in silence, which is the very thing this check exists to stop. A band axis
-    naming none of them describes a measurement the clause does not reach, and
-    that is the only case that stays quiet.
+    ANY of the three is enough to warn, not all three. A room under 25 m3 that
+    reports only 50 Hz and 63 Hz is as much outside ISO 16283 as one reporting
+    all three, and requiring the full set let a partially measured low range
+    answer in silence, which is the very thing this check exists to stop. A
+    band axis naming none of them describes a measurement the clause does not
+    reach, and that is the only case that stays quiet. The warning needs the
+    list rather than a yes, because what it can honestly say and what it can
+    honestly advise both depend on which of the three were named.
 
     :param frequencies: Band centre frequencies, in Hz.
-    :return: ``True`` when at least one of 50 Hz, 63 Hz and 80 Hz is named, and
-        none of the three is named more than once.
+    :return: The named bands among 50 Hz, 63 Hz and 80 Hz, or an empty list
+        for a vector naming none of them or naming one more than once.
     """
     centres = np.asarray(frequencies, dtype=np.float64)
     if centres.ndim != 1:
-        return False
+        return []
     counts = [
         np.count_nonzero(np.isclose(centres, target, rtol=_BAND_MATCH_RTOL))
         for target in LOW_FREQUENCY_BANDS
     ]
     if any(count > 1 for count in counts):
-        return False
-    return any(counts)
+        return []
+    return [
+        band for band, count in zip(LOW_FREQUENCY_BANDS, counts, strict=True) if count
+    ]
 
 
 def _warn_when_the_procedure_is_required(
@@ -312,21 +316,40 @@ def _warn_when_the_procedure_is_required(
         return
     if not low_frequency_procedure_applies(value):
         return
-    if not _low_frequency_bands_are_present(frequencies):
+    named = _named_low_frequency_bands(frequencies)
+    if not named:
         return
     rounded = math.floor(value + 0.5)
+    labels = [f"{band:g} Hz" for band in named]
+    named_text = (
+        labels[0] if len(labels) == 1 else ", ".join(labels[:-1]) + " and " + labels[-1]
+    )
+    plural = "band" if len(named) == 1 else "bands"
+    # The advice has to fit what was measured: the procedure itself refuses a
+    # band axis that does not carry all three (see _low_frequency_indices), so
+    # telling a caller with a partial low range to pass one would send them
+    # into a refusal. They have to complete the set first, or drop it.
+    remedy = (
+        f"Pass a LowFrequencyProcedure as '{argument}', or leave the optional "
+        "low range of Clause 5 out and report 100 Hz to 3150 Hz alone."
+        if len(named) == len(LOW_FREQUENCY_BANDS)
+        else (
+            "The procedure runs on the three bands together, so complete the "
+            "low range to 50 Hz, 63 Hz and 80 Hz and pass a "
+            f"LowFrequencyProcedure as '{argument}', or leave the optional low "
+            "range of Clause 5 out and report 100 Hz to 3150 Hz alone."
+        )
+    )
     warnings.warn(
         f"{owner}: the receiving room is {value:g} m³, which rounds to "
-        f"{rounded} m³, and 'frequencies' names the 50 Hz, 63 Hz and 80 Hz "
-        "bands, so ISO 16283 requires the low-frequency procedure there "
+        f"{rounded} m³, and 'frequencies' names the {named_text} {plural}, "
+        "so ISO 16283 requires the low-frequency procedure there "
         "(ISO 16283-1 and -2 Clause 8.1, ISO 16283-3 Clause 7.3.1, all "
-        f"'shall'). Without '{argument}' those three bands carry the default "
+        f"'shall'). Without '{argument}' the named {plural} carry the default "
         "procedure alone, which is not the ISO 16283 quantity: Formula (13) "
         "weighs a corner measurement into the level and Clause 10.4 (Clause "
         "8.4 in ISO 16283-3) puts the 63 Hz octave reverberation time in place "
-        "of the three one-third-octave ones. Pass a LowFrequencyProcedure as "
-        f"'{argument}', or leave the optional low range of Clause 5 out and "
-        "report 100 Hz to 3150 Hz alone.",
+        f"of the three one-third-octave ones. {remedy}",
         LowFrequencyWarning,
         # Three frames out: this helper, the entry point that called it, and
         # the caller's own line, which is the one worth pointing at.

@@ -852,7 +852,8 @@ which is the check that enforces the rule; see
   (calculated to the nearest cubic metre)."
 - **The problem:** ISO 16283-1 measures no source-room reverberation time, so
   there is nothing in the source room for a reverberation-time procedure to be
-  used on. The first paragraph of the same clause, five paragraphs and a NOTE earlier,
+  used on. The first paragraph of the same clause, five paragraphs and a
+  NOTE earlier,
   lists the required measurements as "the sound pressure levels in both rooms
   with the source(s) operating, the background noise in the receiving room ...
   and the reverberation times **in the receiving room**". Clause 10, which is
@@ -862,7 +863,8 @@ which is the check that enforces the rule; see
   whole clause to "the receiving room", its Clause 10.3 branches on whether
   "the receiving room has a volume larger than or equal to 25 m³", and its
   Clause 10.4 applies the low-frequency procedure "when **the receiving room**
-  volume is smaller than 25 m³". The phrase is correct two paragraphs above, one of them the NOTE,
+  volume is smaller than 25 m³". The phrase is correct two paragraphs
+  above, one of them the NOTE,
   where it belongs: the *sound pressure level* really is measured in both rooms
   and its low-frequency procedure really does apply to either. It was carried
   down into the reverberation-time sentence, where only one room exists. The

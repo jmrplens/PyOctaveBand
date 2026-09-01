@@ -224,7 +224,8 @@ They warn when you forget, everywhere the procedure is allowed: airborne,
 impact, and the loudspeaker façade methods. A road-traffic façade stays silent
 because Clause 6 of ISO 16283-3 gives it the default procedure and nothing
 else, so there is nothing to have forgotten. A `volume` that rounds below
-25 m³ beside a `frequencies` vector naming the three bands tells the function
+25 m³ beside a `frequencies` vector naming any of the three bands tells
+the function
 that Clause 8.1 (Clause 7.3.1 for the loudspeaker façade) is in force, and
 with no procedure to run it says so with a
 `LowFrequencyWarning` rather than returning a number that is not the ISO 16283

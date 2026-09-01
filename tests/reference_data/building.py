@@ -106,7 +106,8 @@ ISO16283_LF_TRIGGER_CASES: list[tuple[float, bool]] = [
     (24.0, True),
     (24.49, True),
     (24.5, False),
-    (25.0, False),
+    # "smaller than", strictly: the printed limit itself never triggers.
+    (ISO16283_LF_VOLUME_LIMIT_M3, False),
     (25.4, False),
     (40.0, False),
 ]
