@@ -43,6 +43,7 @@ references:
     note: "Por qué el dither opcional es triangular de un LSB, por qué se ofrece solo al cuantizar a 16 bits, y por qué es opcional para datos que van a análisis numérico."
 ---
 
+import SeeAlso from '../../../../components/SeeAlso.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Un WAV de medición solo es interpretable junto a tres cosas que las muestras
@@ -539,6 +540,8 @@ incluidos los de 24 bits, el multicanal EXTENSIBLE y los RF64 de más de
 comprimidas de escucha — y empaqueta libsndfile bajo LGPL, que la
 instalación base evita a propósito.
 
+<SeeAlso>
+
 ## Véase también
 
 - [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/): de dónde sale el factor de sensibilidad, y la disciplina de campo a su alrededor.
@@ -547,3 +550,5 @@ instalación base evita a propósito.
 - [Sonoridad de programa](/phonometry/es/devices/broadcast/program-loudness/): la implementación de la BS.1770 tras `bext="loudness"`.
 - [Construye un sonómetro](/phonometry/es/signals/sound-level-meter/): la cadena completa en la que entran y de la que salen los archivos de esta página.
 - Referencia de la API: [`phonometry.io`](/phonometry/es/reference/api/io/io/).
+
+</SeeAlso>

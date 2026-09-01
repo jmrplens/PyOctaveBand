@@ -1,0 +1,76 @@
+---
+/**
+ * The "See also" panel that closes a guide: its heading, the sentence that
+ * sometimes introduces it, and the list of links to related pages, drawn as
+ * ONE box.
+ *
+ * WHY THIS IS A COMPONENT AND NOT A STYLE RULE. The panel used to be painted
+ * in two halves by src/styles/see-also.css — the heading wrapper drew the top
+ * (border with no bottom side, top corners rounded) and a `+ ul` sibling
+ * selector drew the bottom. `+` is the ADJACENT sibling, so the bottom half
+ * appeared only where the list happened to follow the heading immediately. On
+ * the twenty-eight pages that open the section with a sentence the adjacent
+ * sibling is a <p>, nothing matched, and the reader met a box drawn around the
+ * title alone with its border hanging open and the links spilling out below.
+ *
+ * The rule could not be repaired in place. `+ :is(p, ul)` only moves the
+ * defect — the paragraph closes the box and the list falls outside instead —
+ * and CSS has no "until the next heading" combinator, `:has()` included, so
+ * nothing in a stylesheet can bracket a run of markdown siblings. An opening
+ * and a closing tag can, and they bound the section by construction: whatever
+ * an author puts between them is inside the box, and the question of what the
+ * box contains stops being a guess made by a selector.
+ *
+ * THE HEADING STAYS IN THE MARKDOWN, and unlike <Scope> it now sits INSIDE
+ * this element rather than above it. It has to stay authored markdown for the
+ * reason Scope.astro records: a heading RENDERED BY a component never reaches
+ * the table of contents, which Astro collects from the
+ * MDX syntax tree at compile time, and it would lose the id and hover anchor
+ * that Starlight's own pipeline gives it. Markdown inside this element is part
+ * of that syntax tree, so `## See also` keeps its "On this page" line, its
+ * `see-also` / `véase-también` id and its anchor link exactly as before.
+ *
+ * Injecting the entry afterwards, the way src/routeData.ts does for the
+ * bibliography, is not available here: the bibliography is always last, while
+ * seventy of the two hundred and forty-two pages carry further H2s after this
+ * section, so an appended entry would list "See also" below headings it comes
+ * before on the page.
+ *
+ * WHY <nav>. The panel is a list of links to other pages and nothing else,
+ * which is what the element is defined for, and naming it promotes it to a
+ * landmark a screen reader user can jump to — worth having at the foot of a
+ * guide that runs to several thousand words. The name comes from the visible
+ * heading through `aria-labelledby`, so the two cannot drift apart and nothing
+ * is restated: a bare <section> would need a role and a name to say what the
+ * <h2> inside it already says. Starlight names its own two table-of-contents
+ * navs the same way, off a heading id, so this is the site's existing pattern
+ * rather than a new one.
+ *
+ * The computed name comes out uppercased, "SEE ALSO" and "VÉASE TAMBIÉN",
+ * because the accessible-name calculation takes the RENDERED text and the
+ * label is set in caps by the stylesheet. That is measured, not assumed, and
+ * it is left alone deliberately: it is exactly how the heading itself has
+ * always been announced, and an `aria-label` in title case would buy nicer
+ * pronunciation by making the landmark's name disagree with the words on the
+ * screen.
+ *
+ * Styled by src/styles/see-also.css, which now keys on this element's class
+ * instead of on the heading's slug.
+ */
+
+/**
+ * The heading id per language, which is the slug Starlight derives from the
+ * section title and the anchor the rest of the site links to. Keyed here
+ * because `aria-labelledby` has to name an element this component does not
+ * render; the corpus titles every one of these sections with the same two
+ * words, which is the same assumption the stylesheet made before it.
+ */
+const HEADING_ID = { en: 'see-also', es: 'véase-también' } as const;
+
+const { lang } = Astro.locals.starlightRoute;
+const headingId = lang.startsWith('es') ? HEADING_ID.es : HEADING_ID.en;
+---
+
+<nav class="see-also" aria-labelledby={headingId}>
+	<slot />
+</nav>

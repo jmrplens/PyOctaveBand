@@ -28,6 +28,7 @@ references:
 import ReportPreview from '../../../../components/ReportPreview.astro';
 import Scope from '../../../../components/Scope.astro';
 import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import SeeAlso from '../../../../components/SeeAlso.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 IEC 61400-11 measures the acoustic emission of a wind turbine. This page covers
@@ -403,9 +404,13 @@ G-weighted infrasound level.
 </ScopeClaim>
 </Scope>
 
+<SeeAlso>
+
 ## See also
 
 - [Environmental noise levels](/phonometry/environment/assessment/environmental-levels/): the ISO 1996-2 rating adjustment this page's $\Delta L_\mathrm{a}$ feeds.
 - [Tone audibility](/phonometry/perception/psychoacoustics/tone-audibility/): the same tonal-audibility idea outside the wind-turbine context.
 - [Outdoor Sound Propagation](/phonometry/environment/propagation/outdoor-propagation/): the chain that carries $L_{W\mathrm{A}}$ from the rotor to a dwelling.
 - API reference: [`environment.sources.wind_turbine`](/phonometry/reference/api/environment/wind-turbine/).
+
+</SeeAlso>

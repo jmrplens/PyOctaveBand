@@ -9,10 +9,12 @@
  * any framing sentence that introduces the claims. Two reasons, and the
  * second is the important one:
  *
- *  - a heading emitted by a component is invisible to Starlight's table of
- *    contents, which is built from the markdown AST, so moving it in here
- *    would drop the section from "On this page" and lose its anchor (the
- *    same trap src/styles/see-also.css records);
+ *  - a heading RENDERED BY a component is invisible to Starlight's table of
+ *    contents, which is built from the markdown AST, so writing one in here
+ *    would drop the section from "On this page" and lose its anchor. Note
+ *    what this does not say: a heading that stays authored markdown keeps
+ *    both even when a component WRAPS it, which is how SeeAlso.astro bounds
+ *    its own section;
  *  - it makes the contract exact. EVERYTHING INSIDE THIS ELEMENT IS A
  *    CLAIM, AND NOTHING ELSE IS. That is what makes the corpus countable.
  *

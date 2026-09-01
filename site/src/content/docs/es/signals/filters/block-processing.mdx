@@ -28,6 +28,7 @@ references:
 
 import Scope from '../../../../../components/Scope.astro';
 import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import SeeAlso from '../../../../../components/SeeAlso.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Algunas mediciones nunca caben en memoria: una grabación ambiental de una hora,
@@ -417,6 +418,8 @@ estadísticos](/phonometry/es/signals/levels/levels/).
 </ScopeClaim>
 </Scope>
 
+<SeeAlso>
+
 ## Véase también
 
 - [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/): el banco offline que el streaming reproduce bit a bit, y el modo `zero_phase` que el streaming no puede usar.
@@ -425,3 +428,5 @@ estadísticos](/phonometry/es/signals/levels/levels/).
 - [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/): qué métricas se acumulan entre bloques y cuáles hay que recalcular sobre la envolvente conjunta.
 - Referencia de la API: [`filters.weighting`](/phonometry/es/reference/api/filters/weighting/) y [`filters.core`](/phonometry/es/reference/api/filters/core/).
 - Teoría: [Diseño del banco y estabilidad numérica](/phonometry/es/reference/theory/signal-analysis/#diseño-del-banco-y-estabilidad-numérica): por qué un banco se diseña como secciones de segundo orden y se diezma por banda, que es lo que hace posible el estado en streaming.
+
+</SeeAlso>

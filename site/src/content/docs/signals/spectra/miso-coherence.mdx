@@ -14,6 +14,7 @@ references:
 
 import Scope from '../../../../components/Scope.astro';
 import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import SeeAlso from '../../../../components/SeeAlso.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 When several partially correlated sources drive one response, the ordinary
@@ -332,9 +333,13 @@ outputs needs one `miso_coherence` call per output.
 </ScopeClaim>
 </Scope>
 
+<SeeAlso>
+
 ## See also
 
 - [Spectral analysis](/phonometry/signals/spectra/spectral-analysis/): the single-input coherent output spectrum this page generalizes, and the shared Welch core.
 - [Correlation and delay](/phonometry/signals/spectra/correlation-delay/): estimating and removing the bulk delays that bias coherence low.
 - [Multichannel and Performance](/phonometry/signals/filters/multichannel/): the per-channel path this cross-channel analysis complements.
 - API reference: [`signals.miso`](/phonometry/reference/api/signals/miso/).
+
+</SeeAlso>

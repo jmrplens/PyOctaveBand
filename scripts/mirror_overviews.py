@@ -146,7 +146,9 @@ def _rewrite_links(body: str, route: str) -> str:
 #: The component wrappers an overview may use, and the import lines that bring
 #: them in. The mirror is plain markdown for GitHub, which renders neither, so
 #: both are removed and the children are kept: a <ScopeClaim> holds nothing but
-#: the prose of one claim, so dropping the tag leaves the paragraph it wraps.
+#: the prose of one claim, so dropping the tag leaves the paragraph it wraps,
+#: and a <SeeAlso> holds the heading, the sentence that sometimes introduces it
+#: and the list of links, all of which the mirror wants.
 #: The claim's `label` is not recovered here — the overviews are the pages that
 #: carry no label, because every claim under "What this section does not cover"
 #: is on the same side of the boundary and the heading already says which.
@@ -156,7 +158,7 @@ def _rewrite_links(body: str, route: str) -> str:
 #: to the heading below it. Both were visible in the first generated mirror.
 _IMPORT = re.compile(r"^import\s+\w+\s+from\s+'[^']*';[ \t]*$\n?", re.MULTILINE)
 _COMPONENT = re.compile(
-    r"^</?(?:Scope|ScopeClaim)(?:\s[^>]*)?>[ \t]*$\n?", re.MULTILINE
+    r"^</?(?:Scope|ScopeClaim|SeeAlso)(?:\s[^>]*)?>[ \t]*$\n?", re.MULTILINE
 )
 _BLANK_RUN = re.compile(r"\n{3,}")
 

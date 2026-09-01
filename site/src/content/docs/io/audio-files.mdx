@@ -43,6 +43,7 @@ references:
     note: "Why the optional dither is triangular-PDF at one LSB, why it is offered only when quantising to 16 bits, and why it stays opt-in for data that faces numerical analysis."
 ---
 
+import SeeAlso from '../../../components/SeeAlso.astro';
 import ThemeImage from '../../../components/ThemeImage.astro';
 
 A measurement WAV is only interpretable together with three things the
@@ -518,6 +519,8 @@ multichannel and RF64 files past 4 GiB. The extra is for FLAC archives,
 AIFF/Ogg/Opus/MP3, and the compressed WAV listening copies — and it bundles
 libsndfile under the LGPL, which the base install deliberately avoids.
 
+<SeeAlso>
+
 ## See also
 
 - [Calibration and dBFS](/phonometry/signals/metrology/calibration/): where the sensitivity factor comes from, and the field discipline around it.
@@ -526,3 +529,5 @@ libsndfile under the LGPL, which the base install deliberately avoids.
 - [Programme loudness](/phonometry/devices/broadcast/program-loudness/): the BS.1770 implementation behind `bext="loudness"`.
 - [Build a sound level meter](/phonometry/signals/sound-level-meter/): the whole chain this page's files enter and leave.
 - API reference: [`phonometry.io`](/phonometry/reference/api/io/io/).
+
+</SeeAlso>
