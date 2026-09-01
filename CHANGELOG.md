@@ -213,7 +213,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   checked with the same function, so the check could not see an error in it;
   measured against a wider precision, the pin is now good to 1.6e-14 relative
   and `sosfreqz` is the thing that cannot read it, being out by 1.3e-10 at the
-  G weighting's 10 Hz reference frequency. A design costs about 150 ms, paid
+  G weighting's 10 Hz reference frequency. A design costs about 260 ms, paid
   once per curve, rate and mode.
 
 - The ANSI S1.4-1983 Table V Type 2 cell at 20 Hz is read as +/-3 dB. It
@@ -390,9 +390,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
   The third was speed. Weighting one minute of 44.1 kHz audio costs about
   18 ms where it cost 377 ms for A and 775 ms for 468, and holds 21 MB of
-  intermediates instead of 169 MB. The design itself costs about 70 ms and is
+  intermediates instead of 169 MB. The design itself costs about 260 ms and is
   cached per curve, rate and mode, so even a first call is quicker than the
-  path it replaces: 85 ms against 377 for A, 92 against 775 for 468.
+  path it replaces: about 280 ms against 377 for A, 285 against 775 for 468.
 
   `high_accuracy=False` keeps its old meaning: the plain bilinear transform of
   the printed prototype, the closed form a reader can check against the

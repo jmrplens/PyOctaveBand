@@ -152,10 +152,10 @@ _GRID_POINTS = 257
 #: Both are fixed budgets rather than convergence tests, so the routine always
 #: does the same arithmetic, and they are set where the accuracy curve
 #: flattens: measured over this corpus, raising them to 40 by 12 -- 2.4 times
-#: the work, about 310 ms per design instead of 130 -- moves the worst
-#: deviation of any (curve, rate) by at most 0.007 dB, and that one case (A at
-#: 32 kHz, 0.008 dB to 0.001 dB) is already two orders of magnitude inside the
-#: 0.05 dB its table is printed to.
+#: the work, about 610 ms per design instead of 260 -- moves no (curve, rate)
+#: fit by more than 0.013 dB (the largest, D at 12 kHz, from 0.020 to 0.008)
+#: and moves the corpus's worst, BS.468-4 at 48 kHz, from 0.062 only to 0.060,
+#: so the extra work buys nothing where the budget actually binds.
 _LM_STEPS = 25
 _LAWSON_ROUNDS = 8
 
@@ -1097,17 +1097,18 @@ def fit_prototype(
     are tried only if what comes back is further than :data:`_FIT_FAILED_DB`
     from the printed curve. Trying every start and keeping the lowest peak was
     measured and rejected, which is worth recording because on the face of it
-    it should win: the first start is beaten somewhere by a later one in 72 of
+    it should win: the first start is beaten somewhere by a later one in 74 of
     the 91 (curve, rate) pairs, and taking the best of all eight takes the peak
     deviation over the fit band from 0.062 dB to 0.035 across the corpus.
 
     What that criterion minimises is the wrong thing. The peak over the band
     weights every frequency alike; the masks these curves are graded against do
     not. BS.468-4's 6.3 kHz row is allowed 0.05 dB where its neighbours are
-    allowed ten to forty times as much, and at 44.1 kHz the lower-peak design
-    spends 62 % of that row against the 50 % this library holds itself to,
-    where the design kept here spends 13 % of it and 23 % of its worst row
-    anywhere. A criterion that cannot see the mask does not get the last word
+    allowed ten to forty times as much, and at 44.1 kHz that row is the worst
+    row of both designs: the lower-peak design spends 29 % of it where the
+    design kept here spends 21 %, so the start that wins the flat criterion
+    loses the one row the mask makes hardest. A criterion that cannot see the
+    mask does not get the last word
     over one that was chosen against it. It costs eight times the work as well,
     but that is not why it was refused.
 

@@ -426,11 +426,12 @@ plt.show()
   `high_accuracy` son independientes, stateful usa por defecto el diseño
   ajustado como todo lo demás, y los bloques concatenados reproducen
   exactamente una llamada única.
-- El ajuste cuesta unos 70 ms y se cachea por curva y frecuencia de muestreo,
-  así que se paga una sola vez. Incluso contándolo, ponderar un minuto de
-  audio a 44,1 kHz es más rápido que antes: 85 ms frente a 377 ms para la A y
-  92 ms frente a 775 ms para la 468. Con el diseño ya cacheado, el filtrado
-  solo son unos 18 ms, y retiene 21 MB de intermedios en vez de 169 MB.
+- El ajuste cuesta unos 260 ms y se cachea por curva y frecuencia de
+  muestreo, así que se paga una sola vez. Incluso contándolo, ponderar un
+  minuto de audio a 44,1 kHz es más rápido que antes: unos 280 ms frente a
+  377 ms para la A y 285 ms frente a 775 ms para la 468. Con el diseño ya
+  cacheado, el filtrado solo son unos 18 ms, y retiene 21 MB de intermedios
+  en vez de 169 MB.
 
 ```python
 import numpy as np
