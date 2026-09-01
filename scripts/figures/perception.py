@@ -1644,7 +1644,7 @@ def generate_fluctuation_strength(output_dir: str) -> None:
     bbn_peak = int(np.argmax(f_bbn))
 
     # The Osses 2016 signal model on the same AM broadband noise, and on the
-    # AM tone it was calibrated for.
+    # 70 dB AM tone of its Table 1 literature cross-check.
     fm_noise, f_noise = _fluctuation_am_noise_sweep()
     fm_tone, f_tone = _fluctuation_am_tone_sweep()
     tone_peak = int(np.argmax(f_tone))
@@ -1735,7 +1735,7 @@ def generate_fluctuation_strength(output_dir: str) -> None:
         },
     )
 
-    # The stimulus the signal model was calibrated on, on its own axes.
+    # The 70 dB AM tone of the literature cross-check, on its own axes.
     ax2.semilogx(
         fm_tone,
         f_tone,
