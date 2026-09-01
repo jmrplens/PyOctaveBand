@@ -79,8 +79,8 @@ each of them used to be a documented limitation of this module:
 * one minute of 44.1 kHz audio costs about 18 ms instead of 377 ms for A and
   775 ms for 468, and holds 21 MB of intermediates instead of 169 MB
   (measured back to back in one process, mean of five runs). The design
-  itself costs about 260 ms and is cached, so even a first call is quicker
-  than the path it replaces: about 280 ms against 377 for A, 285 against
+  itself costs about 200 ms and is cached, so even a first call is quicker
+  than the path it replaces: about 215 ms against 377 for A, 220 against
   775 for 468.
 """
 
@@ -514,10 +514,10 @@ def _weighting_sos(curve: str, fs: int, high_accuracy: bool) -> np.ndarray:
     library never actually applied, and the rates where they win are ones no
     standard in the corpus places a requirement at.
 
-    The fit costs about 260 ms, which is why it is cached: it is paid once per
-    (curve, rate, mode), and it is still a third of the 775 ms the resampled
+    The fit costs about 200 ms, which is why it is cached: it is paid once per
+    (curve, rate, mode), and it is about a quarter of the 775 ms the resampled
     path it replaces spent *filtering* one minute of 468-weighted audio, and
-    about 70 % of the A curve's 377. Where the first start
+    about half of the A curve's 377. Where the first start
     does not land close enough, the routine works through the other starts of
     :func:`~phonometry.filters._weighting_design._spare_placements` and the
     design takes about 3 s instead. That is common below about 2 kHz, and it

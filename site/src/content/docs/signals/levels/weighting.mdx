@@ -413,9 +413,9 @@ plt.show()
   second-order sections at the input rate, so `stateful` and `high_accuracy`
   are independent, stateful defaults to the fitted design like everything
   else, and stitched blocks reproduce a single call exactly.
-- The fit costs about 260 ms and is cached per curve and sample rate, so it
+- The fit costs about 200 ms and is cached per curve and sample rate, so it
   is paid once. Even including it, weighting one minute of 44.1 kHz audio is
-  faster than it used to be: about 280 ms against 377 ms for A, and 285 ms
+  faster than it used to be: about 215 ms against 377 ms for A, and 220 ms
   against 775 ms for the 468 curve. Once the design is cached the filtering
   alone is about 18 ms, and it holds 21 MB of intermediates instead of 169 MB.
 
