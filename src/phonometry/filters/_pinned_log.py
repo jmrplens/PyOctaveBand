@@ -398,6 +398,11 @@ _NEAR_SPAN = (
 #: Smallest normal double, as a bit pattern.
 _TINY = np.uint64(0x0010000000000000)
 
+#: ``1.0`` as a bit pattern: the C routine fixes ``log(1.0)`` to ``+0.0`` by
+#: comparing ``asuint64(x)``, and so does this one -- an integer comparison,
+#: not a floating-point one.
+_ONE = np.uint64(0x3FF0000000000000)
+
 
 def _two_product(
     a: np.ndarray, b: np.ndarray | np.float64
@@ -548,7 +553,7 @@ def _near_one_path(x: np.ndarray) -> np.ndarray:
     lo = (_B[0] * r_lo) * (r_hi + r) + lo
     y = _fused_multiply_add(r3, head, lo)
     y = y + hi
-    return np.where(x == 1.0, 0.0, y)
+    return np.where(x.view(np.uint64) == _ONE, 0.0, y)
 
 
 def pinned_log(values: np.ndarray) -> np.ndarray:
