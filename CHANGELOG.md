@@ -282,7 +282,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   checked with the same function, so the check could not see an error in it;
   measured against a wider precision, the pin is now good to 1.6e-14 relative
   and `sosfreqz` is the thing that cannot read it, being out by 1.3e-10 at the
-  G weighting's 10 Hz reference frequency. A design costs about 260 ms, paid
+  G weighting's 10 Hz reference frequency. A design costs about 200 ms, paid
   once per curve, rate and mode.
 
 - The ANSI S1.4-1983 Table V Type 2 cell at 20 Hz is read as +/-3 dB. It
@@ -423,6 +423,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The weighting fit takes its logarithms from `filters._pinned_log` instead of
+  from a `math.log` loop, and a cold design costs about 200 ms where it had
+  come to cost about 260. The loop was the price of determinism: numpy's `log`
+  is dispatched on what the CPU offers and its AVX512 kernels disagree with
+  the rest in the last bit, so every transcendental on the design path was
+  taken from `math` one element at a time, and `log` -- the one that runs
+  inside the Levenberg-Marquardt iteration, three quarters of a million calls
+  per design -- carried almost all of the cost. The new module spells the C
+  library's own `log`, the table-driven routine from ARM's optimized-routines
+  that glibc ships, in numpy operations IEEE 754 pins exactly: plain
+  arithmetic, integer bit work and table takes, with the routine's fused
+  multiply-adds emulated through error-free transformations. Verified bit for
+  bit against `math.log` over the 91 658 333 distinct values the whole design
+  corpus evaluates and over a hundred million adversarial draws, zero
+  mismatches, and the corpus of designs is byte-identical before and after:
+  no shipped coefficient, figure or conformance value moved. The fit also
+  batches each evaluation's logarithms into one call and reuses the normal
+  equations' index pattern across steps, which is where the rest of the
+  recovery comes from; the transcendentals outside the iteration stay on the
+  `math` loop, where a design pays them once.
+
 - The frequency weightings are designed at the sample rate instead of being
   outrun at eight times it. Every curve in `filters.weighting` starts as poles
   and zeros in the s plane, and the bilinear transform that makes a digital
@@ -459,9 +480,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
   The third was speed. Weighting one minute of 44.1 kHz audio costs about
   18 ms where it cost 377 ms for A and 775 ms for 468, and holds 21 MB of
-  intermediates instead of 169 MB. The design itself costs about 260 ms and is
+  intermediates instead of 169 MB. The design itself costs about 200 ms and is
   cached per curve, rate and mode, so even a first call is quicker than the
-  path it replaces: about 280 ms against 377 for A, 285 against 775 for 468.
+  path it replaces: about 215 ms against 377 for A, 220 against 775 for 468.
 
   `high_accuracy=False` keeps its old meaning: the plain bilinear transform of
   the printed prototype, the closed form a reader can check against the

@@ -128,11 +128,14 @@ result is graded against a tolerance mask rather than integrated.
 
 from __future__ import annotations
 
+import functools
 import math
 from dataclasses import dataclass
 
 import numpy as np
 from scipy import signal
+
+from ._pinned_log import pinned_log
 
 #: Decibels per natural log unit of a squared magnitude: ``10 / ln 10``.
 _DB_PER_LOG = 10.0 / np.log(10.0)
@@ -152,7 +155,7 @@ _GRID_POINTS = 257
 #: Both are fixed budgets rather than convergence tests, so the routine always
 #: does the same arithmetic, and they are set where the accuracy curve
 #: flattens: measured over this corpus, raising them to 40 by 12 -- 2.4 times
-#: the work, about 610 ms per design instead of 260 -- moves no (curve, rate)
+#: the work, about 480 ms per design instead of 200 -- moves no (curve, rate)
 #: fit by more than 0.013 dB (the largest, D at 12 kHz, from 0.020 to 0.008)
 #: and moves the corpus's worst, BS.468-4 at 48 kHz, from 0.062 only to 0.060,
 #: so the extra work buys nothing where the budget actually binds.
@@ -369,36 +372,35 @@ def _anchor_hz(fs: float, band: tuple[float, float], f_ref: float) -> float:
 def _quadratic_group(
     block: np.ndarray, omega: np.ndarray, omega2: np.ndarray, grad: bool
 ) -> tuple[np.ndarray, np.ndarray]:
-    r"""``sum log|s^2 + b1 s + b0|^2`` at ``s = j omega``, and its gradient.
+    r"""``|s^2 + b1 s + b0|^2`` per factor at ``s = j omega``, and the gradient.
 
     With :math:`b_1 = e^{\theta_1}` and :math:`b_0 = e^{\theta_0}` the squared
     magnitude is :math:`(b_0 - \Omega^2)^2 + (b_1 \Omega)^2`, and the
-    derivatives with respect to the *logs* of the coefficients are
-    :math:`2 b_1^2 \Omega^2 / D` and :math:`2 b_0 (b_0 - \Omega^2) / D`.
+    derivatives of its ``log`` with respect to the *logs* of the coefficients
+    are :math:`2 b_1^2 \Omega^2 / D` and :math:`2 b_0 (b_0 - \Omega^2) / D`.
+    The logarithm itself is taken by the caller, batched.
     """
     coefficients = _scalar_exp(block)
     b1 = coefficients[:, 0][None, :]
     b0 = coefficients[:, 1][None, :]
     offset = b0 - omega2[:, None]
     denominator = offset * offset + (b1 * omega[:, None]) ** 2
-    total = _scalar_log(denominator).sum(axis=1)
     if not grad:
-        return total, np.zeros((omega.size, 0))
+        return denominator, np.zeros((omega.size, 0))
     d_b1 = 2.0 * b1 * b1 * omega2[:, None] / denominator
     d_b0 = 2.0 * b0 * offset / denominator
-    return total, np.stack([d_b1, d_b0], axis=2).reshape(omega.size, -1)
+    return denominator, np.stack([d_b1, d_b0], axis=2).reshape(omega.size, -1)
 
 
 def _linear_group(
     block: np.ndarray, omega2: np.ndarray, grad: bool
 ) -> tuple[np.ndarray, np.ndarray]:
-    """``sum log|s + b1|^2`` at ``s = j omega``, and its gradient in ``log b1``."""
+    """``|s + b1|^2`` per factor at ``s = j omega``, and the ``log`` gradient."""
     b1 = _scalar_exp(block)[None, :]
     denominator = omega2[:, None] + b1 * b1
-    total = _scalar_log(denominator).sum(axis=1)
     if not grad:
-        return total, np.zeros((omega2.size, 0))
-    return total, 2.0 * b1 * b1 / denominator
+        return denominator, np.zeros((omega2.size, 0))
+    return denominator, 2.0 * b1 * b1 / denominator
 
 
 def _log_mag2(
@@ -410,10 +412,21 @@ def _log_mag2(
     the standard's reference frequency, so only the shape is fitted and the
     residual at that frequency is identically zero by construction rather than
     by luck.
+
+    Every logarithm of the evaluation is taken in one :func:`_scalar_log`
+    call: the squared magnitude of each factor of each group, and
+    :math:`\Omega^2` for the zeros at the origin, side by side in one matrix.
+    The call used to be per group -- three or four per evaluation, eight
+    hundred a design -- and the fixed cost of entering the pinned ``log``
+    was most of what it spent. Batching moves no bit: the function is
+    elementwise, each group's column span is summed over the same columns in
+    the same order, and the group totals join ``total`` in the order the
+    group tuple fixes.
     """
     omega2 = omega * omega
     num_quad, num_lin, den_quad, den_lin = layout.blocks(theta)
-    total = layout.zeros_at_origin * _scalar_log(omega2)
+    pieces = [omega2[:, None]]
+    spans: list[tuple[int, int, float]] = []
     columns = []
     groups = (
         (num_quad, 1.0, True),
@@ -421,15 +434,22 @@ def _log_mag2(
         (den_quad, -1.0, True),
         (den_lin, -1.0, False),
     )
+    start = 1
     for block, sign, quadratic in groups:
         if block.size == 0:
             continue
         if quadratic:
-            value, jacobian = _quadratic_group(block, omega, omega2, grad)
+            denominator, jacobian = _quadratic_group(block, omega, omega2, grad)
         else:
-            value, jacobian = _linear_group(block, omega2, grad)
-        total = total + sign * value
+            denominator, jacobian = _linear_group(block, omega2, grad)
+        pieces.append(denominator)
+        spans.append((start, start + denominator.shape[1], sign))
+        start += denominator.shape[1]
         columns.append(sign * jacobian)
+    logs = _scalar_log(np.hstack(pieces))
+    total = layout.zeros_at_origin * logs[:, 0]
+    for begin, end, sign in spans:
+        total = total + sign * logs[:, begin:end].sum(axis=1)
     if not grad:
         return total, np.zeros((omega.size, 0))
     return total, np.hstack(columns)
@@ -513,29 +533,35 @@ def _scalar_pow(values: np.ndarray, exponent: float) -> np.ndarray:
 
 
 def _scalar_log(values: np.ndarray) -> np.ndarray:
-    """``log`` applied one element at a time, so a vector unit cannot change it.
+    """``log`` in pinned arithmetic, so a vector unit cannot change it.
 
     numpy's ``log``, ``exp`` and ``tan`` are dispatched on what the CPU offers,
     and their AVX512 kernels do not agree to the last bit with the ones a
     machine without AVX512 runs. Measured under Intel SDE emulating Skylake-X
     against this host: every one of those three returns a different digest over
     4096 samples, while :func:`math.log`, :func:`math.exp` and :func:`math.tan`
-    applied element by element return the same digest on both. So the fit calls
-    those, and the last machine-dependent step on the path is gone.
+    applied element by element return the same digest on both. So the fit
+    first took every one of them from :mod:`math`, one element at a time, and
+    the last machine-dependent step on the path was gone.
 
-    This costs the vectorisation, and it buys the whole point of the module. It
-    changes no value: on a host without AVX512 the loop and the ufunc agree bit
-    for bit, so the shipped coefficients, the figure corpus and the conformance
-    report are untouched by the switch.
+    For ``log`` the loop then went too, because ``log`` is the one
+    transcendental *inside* the iteration -- once per grid point per factor
+    per Levenberg-Marquardt step, three quarters of a million calls per
+    design -- and the interpreter overhead of taking it elementwise had
+    multiplied the cost of a design by about four.
+    :func:`~phonometry.filters._pinned_log.pinned_log` spells the C library's
+    own routine in numpy operations IEEE 754 pins exactly, and returns
+    :func:`math.log`'s own bits on every input the fit produces: verified
+    over the 91 658 333 distinct values the whole corpus evaluates, zero
+    mismatches, so the shipped coefficients, the figure corpus and the
+    conformance report are untouched by the switch. The transcendentals
+    outside the iteration stay on the :mod:`math` loop, where a design pays
+    them once.
 
-    :param values: Any real array.
+    :param values: Any real array of positive values.
     :return: Its natural logarithm, elementwise, in the same shape.
     """
-    flat = np.asarray(values, dtype=np.float64).reshape(-1)
-    out = np.empty(flat.size, dtype=np.float64)
-    for index in range(flat.size):
-        out[index] = math.log(flat[index])
-    return out.reshape(np.shape(values))
+    return pinned_log(values)
 
 
 def _scalar_exp(values: np.ndarray) -> np.ndarray:
@@ -668,6 +694,22 @@ def _solve_dense(matrix: np.ndarray, vector: np.ndarray) -> np.ndarray:
     return solution
 
 
+@functools.lru_cache(maxsize=8)
+def _upper_triangle(order: int) -> tuple[np.ndarray, np.ndarray]:
+    """The upper-triangle index pair of an ``order`` by ``order`` matrix.
+
+    Cached because :func:`_damped_step` asks for the same pattern at every
+    step of a fit; the arrays are frozen so a cached copy cannot be edited.
+
+    :param order: The matrix side.
+    :return: The row and column indices of the upper triangle.
+    """
+    rows, columns = np.triu_indices(order)
+    rows.setflags(write=False)
+    columns.setflags(write=False)
+    return rows, columns
+
+
 def _damped_step(
     jacobian: np.ndarray, residual: np.ndarray, weights: np.ndarray, damping: float
 ) -> np.ndarray:
@@ -682,9 +724,11 @@ def _damped_step(
     reduction handed to a library. Only its upper triangle is formed and the
     lower one is mirrored from it, which halves the work and makes the matrix
     exactly symmetric rather than symmetric to within a rounding; the
-    elimination that follows reads both halves.
+    elimination that follows reads both halves. The triangle's index pattern
+    depends only on the parameter count, so it is built once per size rather
+    than once per step.
     """
-    rows, columns = np.triu_indices(jacobian.shape[1])
+    rows, columns = _upper_triangle(jacobian.shape[1])
     products = jacobian[:, rows] * jacobian[:, columns]
     products *= weights[:, None]
     upper = _ordered_sum(products)
