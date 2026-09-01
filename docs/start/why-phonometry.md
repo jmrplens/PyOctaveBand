@@ -21,20 +21,46 @@ $$
 $$
 
 which corresponds to a stable first-order low-pass filter with a pole in the
-left half-plane ($s = -1/\tau$).
+left half-plane ($s = -1/\tau$). It is worth setting that detector beside the
+other thing a Fast reading is sometimes computed with, an energy average
+restarted every $\tau$ seconds, because the two are easy to confuse and answer
+different questions:
 
-| | phonometry | python-acoustics |
+| | Exponential detector (IEC 61672-1) | Block integrator |
 | :--- | :--- | :--- |
-| Output | Continuous time-weighted envelope (one value per sample) | Stepped output (one value every $\tau$ seconds) |
-| Input units | Raw sound pressure (Pa); squared internally | Energetic quantity (Pa²) expected as input |
-| Filter | Stable exponential averaging (pole at $s=-1/\tau$) | Theoretically unstable design (pole in the right half-plane) stabilized by resetting the filter state every $\tau$ seconds |
-| Behavior | True IEC time weighting | Closer to a block integrator ($L_{\mathrm{eq},\tau}$) |
+| Output | Continuous time-weighted envelope, one value per sample | Stepped, one value per block |
+| Mechanism | Stable exponential averaging, pole at $s=-1/\tau$ | An energy average restarted every $\tau$ seconds; $\tau$ is in its clock, not in its response |
+| What it measures | The standard's Fast/Slow/Impulse level | $L_{\mathrm{eq},\tau}$, energy per interval |
 
 A pole on the negative real axis corresponds to a decaying exponential impulse
 response ($h(t) \propto e^{-t/\tau}$), exactly what "exponential time
-weighting" means: past events are forgotten exponentially. A pole on the
-positive real axis grows without bound; block-resetting hides this but changes
-the measurement's nature.
+weighting" means: past events are forgotten exponentially. An implementation
+that instead places the pole on the positive real axis and resets the filter
+state every $\tau$ seconds has built the block integrator, whatever it is
+called: the reset hides the growth, and it changes the measurement's nature.
+
+That equation is also where the reference numbers of the next section come
+from, which is worth doing once rather than taking Table 4 on faith. Integrate
+it from rest over a burst of duration $T_\mathrm{b}$ and the envelope reaches
+$(1-e^{-T_\mathrm{b}/\tau})$ of the steady value the same tone would eventually
+produce, so the maximum time-weighted level relative to steady state is
+
+$$
+\delta_{\text{ref}} = 10\lg\!\left(1 - e^{-T_\mathrm{b}/\tau}\right)
+$$
+
+which is IEC 61672-1:2013 Equation (7). With $\tau_\mathrm{F} = 0.125$ s that
+gives −0.98 dB at 200 ms, −4.82 dB at 50 ms, −11.14 dB at 10 ms and −20.99 dB
+at 1 ms: the whole "IEC target" column of Table 4, to the standard's own
+rounding. CI asserts the identity for every Fast and Slow row
+(`test_delta_ref_equation7_consistency`, to within 0.15 dB), so the
+transcription of the table is itself checked rather than trusted.
+
+The consequence carries the rest of this page. Because the response is a smooth
+function of $T_\mathrm{b}/\tau$, a detector that really solves the equation
+tracks the whole column at once; a detector that averages over fixed 125 ms
+blocks has no $T_\mathrm{b}$ in it at all, and can only be right where the
+burst happens to fill a block.
 
 ## Verification against IEC 61672-1 (tone bursts)
 
@@ -42,65 +68,74 @@ The rigorous test for time weighting is the **Tone Burst Response**
 (IEC 61672-1, Table 4), using a 4 kHz sine burst referenced to the steady-state
 level.
 
-**phonometry results (FAST):**
+### How the check is run
 
-| Burst duration | IEC target (dB) | phonometry (dB) | Error (dB) | Status |
-| :--- | :--- | :--- | :--- | :--- |
-| 200 ms | −1.0 | −0.98 | +0.02 | ✅ PASS |
-| 50 ms | −4.8 | −4.82 | −0.02 | ✅ PASS |
-| 10 ms | −11.1 | −11.14 | −0.04 | ✅ PASS |
-| 1 ms | −21.0 | −20.99 | +0.01 | ✅ PASS |
+Table 4 fixes the excitation but not the plumbing, so here is the plumbing. A
+4 kHz sine is generated at 48 kHz for 3 s. The **reference** is the steady Fast
+level of that continuous sine, averaged over its last half second — once the
+integrator has settled, this is $L_\mathrm{A}$ in the standard's notation. The
+burst of the stated duration is then cut out of *the same* sine, so its phase
+and amplitude are identical to the reference tone's, and zeros surround it. The
+**response** is the maximum of the Fast envelope of that burst, expressed
+relative to the reference: $10\log_{10}(\max \text{env} / \text{ref})$, which
+is the standard's $L_\mathrm{AFmax} - L_\mathrm{A}$. Note what this does and
+does not verify: IEC 61672-1 states these limits for the electrical input
+facility over a defined range of steady levels with no overload indicated
+(clauses 5.9.5-5.9.6), so the numbers below verify the *ballistics*, not a
+complete instrument. The same reference values are transcribed in
+`tests/filters/test_iec_compliance.py` for F and S and for the
+$L_{\mathrm{A}E}$ column.
 
-**python-acoustics results (FAST, squared signal passed as required by that
-library):**
+**phonometry results (Fast weighting):**
 
-| Burst duration | IEC target (dB) | python-acoustics (dB) | Error (dB) | Status |
-| :--- | :--- | :--- | :--- | :--- |
-| 200 ms | −1.0 | −0.97 | +0.03 | ✅ PASS |
-| 50 ms | −4.8 | −3.93 | **+0.87** | ⚠️ FAIL |
-| 10 ms | −11.1 | −10.90 | +0.20 | ✅ PASS |
-| 1 ms | −21.0 | −20.90 | +0.10 | ✅ PASS |
+| Burst duration | IEC target (dB) | Class 1 limit (dB) | phonometry (dB) | Error (dB) | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 200 ms | −1.0 | ±0.5 | −0.98 | +0.02 | Pass |
+| 50 ms | −4.8 | ±1.0 | −4.82 | −0.02 | Pass |
+| 10 ms | −11.1 | ±1.0 | −11.14 | −0.04 | Pass |
+| 1 ms | −21.0 | +1.0 / −2.0 | −20.99 | +0.01 | Pass |
 
-phonometry maintains high precision across all test cases. The block-based
-approach deviates significantly (> 0.8 dB) for the 50 ms burst because 125 ms
-blocks cannot resolve short transient events accurately; the result depends on
-how the burst aligns with the block boundaries.
+The exponential detector stays within 0.05 dB of the Table 4 reference at
+every duration, under 5 % of the class 1 budget, because a detector that
+solves the defining equation has no free parameter left to get wrong. A block
+integrator can also sit inside class 1 at a favourable alignment, but what it
+spends of the budget is set by how the burst happens to straddle a 125 ms
+block, which is luck rather than design — and the first column of Table 4
+tightens to ±0.5 dB for bursts of 200 ms and longer, where there is little
+margin left to lose.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_iec_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_iec.svg" alt="Fast envelope responses to 200, 50 and 10 ms tone bursts peaking exactly at the IEC 61672-1 Table 4 reference values" width="80%"></picture>
 
 *Measured Fast envelopes (blue) matching the Table 4 reference values
 (dashed) within 0.1 dB for 200/50/10 ms bursts.*
 
-<details>
-<summary>Show the code for this figure</summary>
+The generator behind this figure is
+`scripts/figures/signals.py::generate_tone_burst_iec`, and it is the procedure
+described above with three of the Table 4 rows: it prints
+`env_db.max() - target`, which is the Error column of the table, so the
+rows can be reproduced directly.
 
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import filters
+The figure fixes the burst at one place in time, which is the one thing the
+block integrator's answer depends on and the exponential detector's does not.
+Slide the same burst across a 125 ms block boundary and the two behave quite
+differently: the exponential reading is pinned at −4.82 dB whatever the
+alignment, a spread of 0.001 dB, while the block reading swings over 2.94 dB
+and spends 12 % of the alignments outside the class 1 corridor. At 200 ms,
+where Table 4 tightens to ±0.5 dB, the block integrator is outside the
+corridor for 81 % of them, because a 200 ms burst always fills at least part
+of a block and often fills one completely, and a full block reads the steady
+level, 1.0 dB above the target.
 
-# 4 kHz tone bursts vs the IEC 61672-1 Table 4 reference maxima (FAST)
-fs = 48000
-t = np.arange(2 * fs) / fs
-steady = np.sin(2 * np.pi * 4000 * t)
-ref = filters.time_weighting(steady, fs, mode="fast")[int(1.5 * fs):].mean()
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_block_vs_exponential_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_block_vs_exponential.gif" alt="Animation: a 4 kHz tone burst slides across a 125 ms block boundary; the exponential Fast envelope peaks at the same level at every alignment while the block Leq staircase rises and falls with where the burst lands, and a reading-against-alignment panel builds both traces against the shaded class 1 corridor" width="640" height="360" loading="lazy"></picture>
 
-fig, axes = plt.subplots(1, 3, figsize=(12, 4), sharey=True)
-for ax, (duration, target) in zip(axes, [(0.2, -1.0), (0.05, -4.8), (0.01, -11.1)]):
-    burst = np.zeros_like(t)
-    start, n = int(0.5 * fs), round(duration * fs)
-    burst[start:start + n] = steady[start:start + n]
-    env = filters.time_weighting(burst, fs, mode="fast")
-    ax.plot(t, 10 * np.log10(np.maximum(env / ref, 1e-6)), label="FAST envelope")
-    ax.axhline(target, linestyle="--", label=f"IEC target {target} dB")
-    ax.set(xlim=(0.4, 1.4), ylim=(-30, 3), xlabel="Time [s]",
-           title=f"{duration * 1000:g} ms burst")
-    ax.legend()
-axes[0].set_ylabel("Level re steady state [dB]")
-plt.show()
-```
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_block_vs_exponential.webm)
 
-</details>
+*The exponential trace is flat because $10\lg(1-e^{-T_\mathrm{b}/\tau})$
+contains $T_\mathrm{b}$ and nothing about the clock; the block trace is a
+picture of the alignment and nothing else. Both readings are computed here
+with `time_weighting(x, fs, mode="fast")` and with `leq` over consecutive
+125 ms slices, against the same steady-tone reference the procedure above
+defines.*
 
 ## What this means in practice
 
@@ -115,6 +150,17 @@ plt.show()
   against a block integrator, not from an implementation error.
 
 ## Conformance testing across the library
+
+A word on what a **performance class** is, since every verdict on this page is
+one. In IEC 61672-1 and IEC 61260-1 a class is not a grade of accuracy but a
+named tolerance corridor around a nominal response: class 1 is the narrow
+corridor intended for precision work, class 2 the wider one for general survey
+use, and both widen at the extremes of the frequency range, where they are
+hardest to meet. Class 0 was a narrower corridor still, in the withdrawn 1995
+edition of IEC 61260, and is kept here as a voluntary extra target for the
+default Butterworth bank. So a pass on this page means the computed response
+never leaves the corridor the standard draws; it does not mean the error is
+zero, and the size of the margin is the interesting number.
 
 The tone-burst case above is not an isolated check. For each standard the
 library implements, the reference values and acceptance limits are transcribed
@@ -132,6 +178,7 @@ sample from the metrology core:
 | ECMA-418-1:2024 | TNR/PR tone prominence: critical bandwidths, proximity spacing and prominence criteria against the worked examples in clauses 10–12 | `tests/psychoacoustics/quality/test_tonality.py` |
 | ISO 1996-1:2016 | `lden()`, `ldn()` and `composite_rating_level()` against hand-computed formula values | `tests/environment/assessment/test_rating.py` |
 | IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
+| IEC 61252:1993 | The personal sound exposure quantities, `sound_exposure()` and the normalized 8 h level `lex_8h()` | `tests/signals/test_levels.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
 566 numerical conformance checks across 59 domains and 373 standards, covering
@@ -143,15 +190,18 @@ numerical report (the expected value and the value the library computes for
 every check, regenerated on every pull request) is published as
 [CONFORMANCE.md](../CONFORMANCE.md).
 
-Beyond IEC 61252-style noise dose (`sound_exposure()`, `lex_8h()`), the same
-standards-first mindset shows up in the numerics: filter banks place their
-−3 dB points on the **ANSI S1.11 / IEC 61260-1** band edges for every
-architecture (including Chebyshev II and Bessel, where scipy's raw
-parametrization would not), the default Butterworth bank is checked against
-the stricter class 0 of the withdrawn IEC 61260:1995 / ANSI S1.11-2004 edition
-as well as the current class 1, and A/C weighting holds class 1 at every
-sample rate from 8 kHz up, because the analog prototype is fitted at the
-sample rate rather than transformed blind (see
+The same standards-first habit shows up below the level of whole metrics, in
+the numerics. Filter banks place their −3 dB points on the **ANSI S1.11 /
+IEC 61260-1** band edges for the three architectures whose parametrization
+allows it, Butterworth, Chebyshev II and Bessel, the last two through
+corrections scipy's raw parametrization would not apply; Chebyshev I and
+elliptic read the same edges as their equiripple passband edge instead, which
+is stated with its measured cost on
+[Filter Banks](../signals/filters/filter-banks.md). The default Butterworth
+bank is checked against the stricter class 0 of the withdrawn IEC 61260:1995 /
+ANSI S1.11-2004 edition as well as the current class 1. And A/C weighting
+holds class 1 at every sample rate from 8 kHz up, because the analog prototype
+is fitted at the sample rate rather than transformed blind (see
 [Frequency Weighting](../signals/levels/weighting.md)).
 
 ## When the source is what is wrong
@@ -181,32 +231,29 @@ nothing in the port ever notices.
 
 ## Where phonometry fits in the Python ecosystem
 
-- **python-acoustics** was archived in February 2024 and is no longer
-  maintained. Its comparison above reflects the last released code.
-- **acoustic-toolbox**, the community successor to python-acoustics, builds
-  its IEC 61672-1 time and frequency weighting on `pyoctaveband`, the former
-  name of this library, which since 2.1.0 is a shim over phonometry. It is only
-  the filters that it takes from here: its own `weighting.py` still carries
-  hard-coded one-third-octave A and C weighting tables.
-- **MoSQITo** focuses on psychoacoustic sound-quality metrics and covers a
-  good part of that ground already: Zwicker loudness, ECMA-418-2 loudness and
-  roughness, DIN 45692 sharpness, ECMA-74 tone-to-noise and prominence ratio,
-  and the ANSI S3.5 speech intelligibility index. phonometry implements the
-  same family, and adds ISO 532-2 and ISO 532-3 loudness, ECMA-418-2 tonality,
-  fluctuation strength and the Fastl & Zwicker annoyance model, none of which
-  MoSQITo exports. What differs most is the setting. Here those metrics sit in
-  the same conformance harness as the metrology core and compose directly with
-  the weighting filters, ballistics, band filtering and calibration that feed
-  them.
-- **pyroomacoustics** simulates room impulse responses for audio and machine
-  learning pipelines (image sources, ray tracing, beamforming, direction of
-  arrival), and it does reach the measurement side too, with sweep-based
-  impulse-response acquisition and an RT60 estimator. What it does not carry is
-  the ISO 3382 parameter set. phonometry's image-source and FDTD solvers are
-  pinned to published closed forms, and the image-source impulse response goes
-  through the same `room_parameters` analysis (EDT, T20, T30, C50, C80, D50,
-  Ts, per band, with the ISO 3382 decay-range validity flags) as a measured
-  one.
+Several Python projects share ground with phonometry, and the honest way to
+place them is by what each is built for rather than by racing them:
+
+- **acoustic-toolbox** is the community successor to python-acoustics, which
+  was archived in February 2024. It is a general acoustics toolkit, and its
+  IEC 61672-1 time and frequency weighting builds on `pyoctaveband`, the
+  former name of this library, which since 2.1.0 is a shim over phonometry.
+- **MoSQITo** is the reference open implementation for psychoacoustic
+  sound-quality metrics: Zwicker loudness, ECMA-418-2 loudness and roughness,
+  DIN 45692 sharpness, ECMA-74 tone-to-noise and prominence ratio, the
+  ANSI S3.5 speech intelligibility index. phonometry implements the same
+  family, adds ISO 532-2 and ISO 532-3 loudness, ECMA-418-2 tonality,
+  fluctuation strength and the Fastl & Zwicker annoyance model, and sits them
+  in the same conformance harness as the metrology core, composed directly
+  with the weighting filters, ballistics, band filtering and calibration that
+  feed them.
+- **pyroomacoustics** is built for simulating rooms in audio and machine
+  learning pipelines: image sources, ray tracing, beamforming, direction of
+  arrival, plus sweep-based impulse-response acquisition. phonometry's room
+  side is the measurement one: its image-source and FDTD solvers are pinned
+  to published closed forms, and a simulated impulse response goes through
+  the same `room_parameters` analysis (EDT, T20, T30, C50, C80, D50, Ts, per
+  band, with the ISO 3382 decay-range validity flags) as a measured one.
 
 If your work needs numbers you can defend against a standard's tolerance
 table, whether for measurement reports, environmental assessments or
