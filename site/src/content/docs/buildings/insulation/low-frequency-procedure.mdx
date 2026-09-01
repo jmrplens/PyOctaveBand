@@ -104,7 +104,8 @@ would silently move the reported level.
 The trigger is a *shall*, so the three measurement entry points do not wait to
 be asked. When you give one of them a receiving-room `volume` that rounds below
 25 m³ and a `frequencies` vector that names the 50 Hz, 63 Hz and 80 Hz bands,
-it has been told everything it needs to know that Clause 8.1 is in force. If no
+it has been told everything it needs to know that Clause 8.1 (Clause 7.3.1
+for the Part 3 loudspeaker façade) is in force. If no
 `LowFrequencyProcedure` came with them, it computes those three bands from the
 default procedure alone, which is not the ISO 16283 quantity, and raises a
 `LowFrequencyWarning` saying so.

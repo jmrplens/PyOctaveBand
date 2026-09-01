@@ -974,8 +974,10 @@ def airborne_insulation(
     :param t0: Reference reverberation time ``T0``, in seconds (default
         0,5 s for dwellings, Clause 3.13).
     :param frequencies: Band centre frequencies, in Hz; required with either
-        low-frequency argument, ignored otherwise (the result carries no band
-        axis of its own).
+        low-frequency argument. Without one it still matters: naming the
+        50 Hz, 63 Hz and 80 Hz bands beside a small ``volume`` is what tells
+        this function the procedure was owed, and what it warns about. The
+        result carries no band axis of its own.
     :param source_low_frequency: Source-room corner measurements and volume
         (Clause 8). Must not carry a 63 Hz octave reverberation time.
     :param receiver_low_frequency: Receiving-room corner measurements and
@@ -1129,8 +1131,10 @@ def impact_insulation(
     :param t0: Reference reverberation time ``T0``, in seconds (default
         0,5 s for dwellings, Clause 3.13).
     :param frequencies: Band centre frequencies, in Hz; required with
-        ``low_frequency``, ignored otherwise (the result carries no band axis
-        of its own).
+        ``low_frequency``. Without it it still matters: naming the 50 Hz,
+        63 Hz and 80 Hz bands beside a small ``volume`` is what tells this
+        function the procedure was owed, and what it warns about. The result
+        carries no band axis of its own.
     :param low_frequency: Receiving-room corner measurements, volume and 63 Hz
         octave reverberation time (Clause 8 and Clause 10.4).
     :return: :class:`ImpactInsulationResult` with ``l_n_t`` and ``l_n``

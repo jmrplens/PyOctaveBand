@@ -165,7 +165,7 @@ volume is an argument here.
 | `area` | Area `S` of the common partition, in m² (optional; required together with `volume` for `R'`). |
 | `volume` | Receiving-room volume `V`, in m³ (optional; required together with `area` for `R'`). |
 | `t0` | Reference reverberation time `T0`, in seconds (default 0,5 s for dwellings, Clause 3.13). |
-| `frequencies` | Band centre frequencies, in Hz; required with either low-frequency argument, ignored otherwise (the result carries no band axis of its own). |
+| `frequencies` | Band centre frequencies, in Hz; required with either low-frequency argument. Without one it still matters: naming the 50 Hz, 63 Hz and 80 Hz bands beside a small `volume` is what tells this function the procedure was owed, and what it warns about. The result carries no band axis of its own. |
 | `source_low_frequency` | Source-room corner measurements and volume (Clause 8). Must not carry a 63 Hz octave reverberation time. |
 | `receiver_low_frequency` | Receiving-room corner measurements and volume (Clause 8), which must also carry the 63 Hz octave reverberation time of Clause 10.4. |
 
@@ -539,7 +539,7 @@ are not the ISO 16283 quantity.
 | `t2` | Receiving-room reverberation time per band, in seconds. |
 | `volume` | Receiving-room volume `V`, in m³ (optional; required for `L'n`). |
 | `t0` | Reference reverberation time `T0`, in seconds (default 0,5 s for dwellings, Clause 3.13). |
-| `frequencies` | Band centre frequencies, in Hz; required with `low_frequency`, ignored otherwise (the result carries no band axis of its own). |
+| `frequencies` | Band centre frequencies, in Hz; required with `low_frequency`. Without it it still matters: naming the 50 Hz, 63 Hz and 80 Hz bands beside a small `volume` is what tells this function the procedure was owed, and what it warns about. The result carries no band axis of its own. |
 | `low_frequency` | Receiving-room corner measurements, volume and 63 Hz octave reverberation time (Clause 8 and Clause 10.4). |
 
 **Returns:** [`ImpactInsulationResult`](/phonometry/reference/api/building/insulation/#impactinsulationresult) with `l_n_t` and `l_n` (the latter `None` unless `volume` is given), plus the low-frequency record when one was produced.
