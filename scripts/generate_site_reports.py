@@ -23,8 +23,13 @@ timestamps, no environment-dependent text), so CI can diff a fresh run against
 the committed pages exactly like it does for the generated API reference (see
 the ``site-reports`` job in .github/workflows/python-app.yml).
 
-The Spanish page carries the same generated body: the registry is generated
-English text, and the Spanish prose above the marker says so.
+The Spanish page transplants ``docs/ERRATA.es.md``, the hand-maintained
+entry-for-entry translation of the registry. The English wording stays the
+authoritative one (it is what has been or will be communicated to the issuing
+bodies; both introductions say so), and this script holds the two editions
+together: same number of ``##`` entries, same order, and each pair of headings
+naming the same source document. A run fails before writing anything when the
+editions drift.
 
 Stdlib only. Regenerate with ``make site-reports``.
 """
@@ -144,11 +149,63 @@ PAGES: tuple[Page, ...] = (
         start=re.compile(r"^During the clean-room implementation"),
     ),
     Page(
-        source=DOCS / "ERRATA.md",
+        source=DOCS / "ERRATA.es.md",
         target="es/reference/errata.md",
-        start=re.compile(r"^During the clean-room implementation"),
+        start=re.compile(r"^Durante la implementación en sala limpia"),
     ),
 )
+
+#: First designation-like token of a heading: an optional alphabetic run glued
+#: to its first digit, plus the digits and punctuation that follow. It reduces
+#: "ISO 717-2:2020, Annex C, example C.1" and "ISO 717-2:2020, Anexo C,
+#: ejemplo C.1" alike to ``717-2:2020``, and survives headings whose prose is
+#: reordered in translation (``NORAH2``, ``S3.5-1997``, ``2015/996``).
+_DESIGNATION_RE = re.compile(r"[A-Za-z]*\d[\dA-Za-z.:/-]*")
+
+
+def check_edition_parity(english: pathlib.Path, spanish: pathlib.Path) -> None:
+    """Refuse to render while the Spanish edition drifts from the registry.
+
+    ``docs/ERRATA.es.md`` is a hand-maintained, entry-for-entry translation of
+    ``docs/ERRATA.md``. Three structural invariants survive translation and
+    are enforced here: the two documents carry the same number of ``##``
+    headings, in the same order, and each pair of headings names the same
+    source document (its first designation token, :data:`_DESIGNATION_RE`).
+    The wording of each entry is deliberately not compared: the English text
+    is the authoritative one and the translation tracks it by hand.
+
+    :param english: The English registry, ``docs/ERRATA.md``.
+    :type english: pathlib.Path
+    :param spanish: The Spanish edition, ``docs/ERRATA.es.md``.
+    :type spanish: pathlib.Path
+    :raises SystemExit: If the heading counts differ or any pair of headings
+        disagrees on its designation token.
+    """
+
+    def headings(path: pathlib.Path) -> list[str]:
+        lines = path.read_text(encoding="utf8").splitlines()
+        return [line for line in lines if line.startswith("## ")]
+
+    en, es = headings(english), headings(spanish)
+    if len(en) != len(es):
+        sys.exit(
+            f"{spanish.relative_to(ROOT)}: {len(es)} entries against "
+            f"{len(en)} in {english.relative_to(ROOT)}. Translate the "
+            "missing entry (or delete the stale one) so the editions match."
+        )
+    pairs = zip(en, es, strict=True)
+    for index, (heading_en, heading_es) in enumerate(pairs, start=1):
+        match_en = _DESIGNATION_RE.search(heading_en)
+        match_es = _DESIGNATION_RE.search(heading_es)
+        token_en = match_en.group(0) if match_en else None
+        token_es = match_es.group(0) if match_es else None
+        if token_en != token_es:
+            sys.exit(
+                f"{spanish.relative_to(ROOT)}: entry {index} names "
+                f"{token_es!r} where {english.relative_to(ROOT)} names "
+                f"{token_en!r}:\n  {heading_en}\n  {heading_es}\n"
+                "The editions are out of order or an entry was mistranslated."
+            )
 
 
 def render(page: Page) -> str:
@@ -190,6 +247,8 @@ def main(argv: list[str] | None = None) -> int:
         help="do not write; exit non-zero if any page is out of date",
     )
     args = parser.parse_args(argv)
+
+    check_edition_parity(DOCS / "ERRATA.md", DOCS / "ERRATA.es.md")
 
     stale: list[str] = []
     for page in PAGES:

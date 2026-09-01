@@ -282,7 +282,7 @@ field itself on a finite-difference grid.
 - [Glossary](reference/glossary.md): every quantity the guides compute, grouped by domain, each with its symbol, a one-sentence definition, its unit, the standard and clause that defines it and the guide that implements it, plus the table of symbols that collide across domains
 - [Bibliography](reference/bibliography.md): the books and papers behind the guides, grouped by domain, every entry with a verified DOI or official publisher link
 - [Conformance report](CONFORMANCE.md): auto-generated numerical validation: every check pins a standard clause's expected value against the library's computed value, regenerated in CI
-- [Standards errata](ERRATA.md): defects found in the published standards themselves during implementation: misprints, examples contradicting their own normative text, ambiguous wording, each with evidence and the library's disposition
+- [Standards errata](ERRATA.md): defects found in the published standards themselves during implementation: misprints, examples contradicting their own normative text, ambiguous wording, each with evidence and the library's disposition; a Spanish edition, translated entry for entry, lives in [ERRATA.es.md](ERRATA.es.md)
 
 ## Development
 

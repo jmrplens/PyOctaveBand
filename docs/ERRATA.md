@@ -39,6 +39,12 @@ either in a leading notice or on the allowlist of
 which is the check that enforces the rule; see
 [CONTRIBUTING.md](../CONTRIBUTING.md#6-filing-an-errata-entry).
 
+A Spanish edition of this registry, translated entry for entry, is maintained
+in [ERRATA.es.md](ERRATA.es.md). The wording here is the authoritative one,
+and quoted print, mathematics and printed values are reproduced there
+untranslated; `make site-reports` holds the two editions to the same entries
+in the same order.
+
 
 ---
 

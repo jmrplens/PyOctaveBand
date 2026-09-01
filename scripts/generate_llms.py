@@ -89,7 +89,7 @@ DOI = "10.5281/zenodo.21215280"
 SHARD_LIMIT_BYTES = 200_000
 
 #: Markdown files under docs/ that are not documentation pages.
-NOT_PAGES = frozenset({"README", "CONFORMANCE", "ERRATA"})
+NOT_PAGES = frozenset({"README", "CONFORMANCE", "ERRATA", "ERRATA.es"})
 
 #: The documented topics, in the order the landing page lists them. Each is a
 #: folder of `content/docs/` whose `index` page links the guides inside it, so
@@ -737,6 +737,7 @@ def _absolutize_links(content: str, md_name: str) -> str:
         "README": "",
         "CONFORMANCE": "reference/conformance",
         "ERRATA": "reference/errata",
+        "ERRATA.es": "es/reference/errata",
     }
 
     def repl(match: re.Match[str]) -> str:
