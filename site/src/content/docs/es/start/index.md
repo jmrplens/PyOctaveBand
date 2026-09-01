@@ -46,6 +46,10 @@ aceptación.
 [Acerca de](/phonometry/es/start/about/) dice quién la mantiene, cómo citarla y
 bajo qué licencia.
 
+[Apoya el proyecto](/phonometry/es/start/support/) lista las maneras de
+ayudar, empezando por las fuentes primarias que aún le faltan a la
+biblioteca.
+
 ## Dos cosas que conviene resolver antes de que ninguna guía funcione
 
 **En qué marco de referencia está un nivel.** Un nivel es o bien *físico*, en

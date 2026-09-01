@@ -192,3 +192,6 @@ measure?](/phonometry/start/tasks/) finds the page for a particular job, and
 by topic. If you arrived to check a number rather than to install anything, the
 [conformance report](/phonometry/reference/conformance/) and the [errata
 registry](/phonometry/reference/errata/) are the two pages that answer that.
+And if the project is useful to you,
+[Support the project](/phonometry/start/support/) says how to help, starting
+with the sources it still lacks.

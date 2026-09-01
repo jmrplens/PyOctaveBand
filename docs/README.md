@@ -9,10 +9,12 @@ Every guide in the library, grouped by the folder it lives in. Each group
 heading links the overview page that says what the area is for and what it
 deliberately leaves out; each bold line links a section overview inside it.
 
-Before any of them, [Start](start/index.md) is the four pages meant to be read
+Before any of them, [Start](start/index.md) is the five pages meant to be read
 once: [Getting Started](start/getting-started.md) installs the library and runs
 a first calibrated analysis, [Why phonometry](start/why-phonometry.md) shows
-how a metric is checked against its standard, and [About](start/about.md) says
+how a metric is checked against its standard,
+[Support the project](start/support.md) lists the ways to help, starting with
+the sources the library still lacks, and [About](start/about.md) says
 who maintains it, how to report an error and how to cite it.
 
 ### [Signal analysis](signals/index.md)

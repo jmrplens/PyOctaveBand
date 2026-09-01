@@ -113,7 +113,12 @@ AREAS: tuple[tuple[str, str], ...] = (
 #: absolute URL from the provenance section instead. It used to be listed
 #: without a mirror and silently dropped, which is why an unresolvable entry is
 #: fatal now.
-START_ROUTES = ("start/getting-started", "start/why-phonometry", "start/about")
+START_ROUTES = (
+    "start/getting-started",
+    "start/why-phonometry",
+    "start/about",
+    "start/support",
+)
 
 
 def _check_areas_cover_the_tree() -> None:

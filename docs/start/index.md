@@ -43,6 +43,9 @@ tone-burst check worked through against the acceptance limits.
 [About](about.md) states who maintains it, how to cite it and
 under what licence.
 
+[Support the project](support.md) lists the ways to help,
+starting with the primary sources the library still lacks.
+
 ## Two things to settle before any guide works
 
 **Which reference frame a level is in.** A level is either *physical*, in

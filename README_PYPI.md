@@ -197,6 +197,16 @@ The repository ships a
 [`CITATION.cff`](https://github.com/jmrplens/phonometry/blob/v3.3.0/CITATION.cff),
 so GitHub's *Cite this repository* button produces BibTeX and APA entries.
 
+## 💚 Support the project
+
+phonometry is one person's work, and its main cost is the primary sources:
+every metric is implemented from the governing standard's paid text. You can
+[sponsor the project on GitHub](https://github.com/sponsors/jmrplens), and the
+documentation keeps a live list of the
+[sources that resisted every legitimate acquisition route](https://jmrplens.github.io/phonometry/start/support/),
+with three ways to help get them: fund the purchase, verify against your own
+licensed copy, or point at a channel that was missed.
+
 ## 🧪 Development
 
 ```bash
