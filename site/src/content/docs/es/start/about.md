@@ -94,7 +94,7 @@ confiar en él de forma general.
 Infórmalo, por favor. Un número equivocado del que nadie me avisa se queda
 equivocado.
 
-Abre una incidencia en
+Abre una issue en
 [github.com/jmrplens/phonometry/issues](https://github.com/jmrplens/phonometry/issues).
 El informe más útil me indica la norma y el apartado contra el que estás
 comprobando, el valor esperado, el valor que ha dado phonometry y un fragmento
