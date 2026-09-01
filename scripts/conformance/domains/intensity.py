@@ -488,7 +488,16 @@ def _chk_iso9614_1_additional_positions() -> Outcome:
     outcome = ph.emission.partial_power_concentration(
         intensity, areas, grade="engineering"
     )
-    subset, remainder = intensity[:4], intensity[4:]
+    # B.1.3's own ranking, transcribed rather than sliced: partial powers in
+    # decreasing order, kept until more than half the total is accounted for.
+    # On these equal areas the partial powers order as the intensities do, and
+    # deriving the split here keeps the check honest if the list above is ever
+    # reordered: a hard [:4] would then verify a subset B.1.3 never names.
+    order = np.argsort(intensity * areas)[::-1]
+    cumulative = np.cumsum((intensity * areas)[order])
+    count = int(np.searchsorted(cumulative, 0.5 * cumulative[-1], side="right")) + 1
+    subset = intensity[order[:count]]
+    remainder = intensity[order[count:]]
     alpha = float(np.sum(subset)) / float(np.sum(intensity))
     f4_subset = float(np.std(subset, ddof=1) / np.mean(subset))
     f4_remainder = float(np.std(remainder, ddof=1) / np.mean(remainder))

@@ -117,7 +117,7 @@ def plot_sound_power(
 
     Works for :class:`~phonometry.emission.sound_power.SoundPowerResult`,
     :class:`~phonometry.emission.sound_power_anechoic.PrecisionSoundPowerResult`,
-    :class:`~phonometry.emission.sound_power_reverberation.ReverberationSoundPowerResult`
+    :class:`~phonometry.emission.sound_power_reverberation.ReverberationSoundPowerResult`,
     the two intensity-scanning results,
     :class:`~phonometry.emission.sound_power_intensity.SoundPowerIntensityResult`
     and

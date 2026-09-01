@@ -69,9 +69,18 @@ _EXACT_CHECK_FIELDS = (
 _RECORD_PLACES = 12
 
 
-def _tolerance(precision: int) -> NumericTolerance:
-    """The tolerance for a value stored at ``precision`` decimals."""
-    return NumericTolerance(absolute=10.0**-precision, relative=_RELATIVE)
+def _tolerance(precision: int, relative: float = _RELATIVE) -> NumericTolerance:
+    """The tolerance for a value stored at ``precision`` decimals.
+
+    :param precision: Decimals the value is stored at.
+    :param relative: Fraction of the larger value also tolerated. A record
+        side passes zero: its guard is the last bit and nothing else, and the
+        default relative floor would swallow it whole. At ``_RECORD_PLACES``
+        the absolute term is 1e-12, while 1e-9 of a stored 0.6 is 6e-10, six
+        hundred times looser than the guard is written to be.
+    :return: The tolerance.
+    """
+    return NumericTolerance(absolute=10.0**-precision, relative=relative)
 
 
 def _as_number(value: object) -> float | None:
@@ -86,12 +95,19 @@ def _as_number(value: object) -> float | None:
     return float(value)
 
 
-def _number_problem(where: str, old: object, new: object, precision: int) -> str | None:
+def _number_problem(
+    where: str,
+    old: object,
+    new: object,
+    precision: int,
+    relative: float = _RELATIVE,
+) -> str | None:
     """Compare one leaf that may be a number, absent, or a string."""
     old_number, new_number = _as_number(old), _as_number(new)
     if old_number is None or new_number is None:
         return None if old == new else f"{where}: {old!r} -> {new!r}"
-    if numbers_within_tolerance(old_number, new_number, _tolerance(precision)):
+    tolerance = _tolerance(precision, relative)
+    if numbers_within_tolerance(old_number, new_number, tolerance):
         return None
     return f"{where}: {old!r} -> {new!r} (beyond {precision}-decimal tolerance)"
 
@@ -101,6 +117,7 @@ def _mapping_problems(
     old: Mapping[str, Any] | None,
     new: Mapping[str, Any] | None,
     precision: int,
+    relative: float = _RELATIVE,
 ) -> list[str]:
     """Compare two nested mappings of leaves, key set included."""
     if old is None or new is None:
@@ -112,10 +129,12 @@ def _mapping_problems(
         inner_old, inner_new = old[key], new[key]
         if isinstance(inner_old, dict) or isinstance(inner_new, dict):
             problems += _mapping_problems(
-                f"{where}.{key}", inner_old, inner_new, precision
+                f"{where}.{key}", inner_old, inner_new, precision, relative
             )
             continue
-        problem = _number_problem(f"{where}.{key}", inner_old, inner_new, precision)
+        problem = _number_problem(
+            f"{where}.{key}", inner_old, inner_new, precision, relative
+        )
         if problem is not None:
             problems.append(problem)
     return problems
@@ -139,10 +158,16 @@ def _check_problems(old: Mapping[str, Any], new: Mapping[str, Any]) -> list[str]
     # stored 1.0 against a computed 0.6 sat inside it, so the artefact kept a
     # normative figure the standard does not contain and no regeneration could
     # dislodge it, because `write` only rewrites what this function objects to.
-    side_places = _RECORD_PLACES if old.get("kind") == str(Kind.RECORD) else precision
+    is_record = old.get("kind") == str(Kind.RECORD)
+    side_places = _RECORD_PLACES if is_record else precision
+    side_relative = 0.0 if is_record else _RELATIVE
     for field in ("expected", "computed"):
         problems += _mapping_problems(
-            f"{where}.{field}", old.get(field), new.get(field), side_places
+            f"{where}.{field}",
+            old.get(field),
+            new.get(field),
+            side_places,
+            side_relative,
         )
     for field in ("tolerance", "binding"):
         problems += _mapping_problems(

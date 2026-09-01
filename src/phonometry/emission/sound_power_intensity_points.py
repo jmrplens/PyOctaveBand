@@ -1262,9 +1262,15 @@ def _checked_residual_index(
     """
     if pressure_residual_index is None:
         return None
-    residual = np.broadcast_to(
-        np.asarray(pressure_residual_index, dtype=np.float64), (n_bands,)
-    ).astype(np.float64)
+    supplied = np.asarray(pressure_residual_index, dtype=np.float64)
+    try:
+        residual = np.broadcast_to(supplied, (n_bands,)).astype(np.float64)
+    except ValueError:
+        msg = (
+            "'pressure_residual_index' must be a scalar or carry one value "
+            f"per frequency band ({n_bands}); got shape {supplied.shape}."
+        )
+        raise ValueError(msg) from None
     if not np.all(np.isfinite(residual)):
         msg = "'pressure_residual_index' must be finite."
         raise ValueError(msg)
@@ -1621,7 +1627,12 @@ def _a_weighted_determination(
     criterion 2 uses the single A-weighted ``C`` of Table B.2.
     """
     if frequencies is None:
-        single = applicable.size == 1 and bool(applicable[0])
+        # Clause 10.5 b) screens the one band here for the same reason it
+        # screens a set of them below: a band the criteria threw out is not a
+        # band whose level can stand as the A-weighted result. Without this the
+        # single-band call published what the frequency-carrying call omits.
+        kept = applicable if omitted is None else applicable & ~omitted
+        single = kept.size == 1 and bool(kept[0])
         return (
             float(sound_power_level[0]) if single else float("nan"),
             float("nan"),

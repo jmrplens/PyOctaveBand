@@ -922,8 +922,8 @@ _ES: dict[str, str] = {
     "Accuracy": "Exactitud",
     # The three headline relations read the same in Spanish (log10/lg are
     # shared notation); only "log"/"lg" trip the language check.
-    "$L_W = 10 log_{10} Σ I_i·S_i / P_0$": "$L_W = 10 log_{10} Σ I_i·S_i / P_0$",
-    "$L_W = 10 log_{10} |Σ I_i·S_i| / P_0$": "$L_W = 10 log_{10} |Σ I_i·S_i| / P_0$",
+    "$L_W = 10 log_{10}(Σ I_i·S_i / P_0)$": "$L_W = 10 log_{10}(Σ I_i·S_i / P_0)$",
+    "$L_W = 10 log_{10}(|Σ I_i·S_i| / P_0)$": "$L_W = 10 log_{10}(|Σ I_i·S_i| / P_0)$",
     "$L_{WA} = L_{vA} + 10 lg(S/S_0) + 10 lg ε$": "$L_{WA} = L_{vA} + 10 lg(S/S_0) + 10 lg ε$",
     # d13 - EN 12354 direct and flanking transmission paths
     "Direct and flanking transmission paths (EN 12354)": "Caminos de transmisión directa y por flancos (EN 12354)",

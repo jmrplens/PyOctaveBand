@@ -1654,6 +1654,30 @@ def test_a_single_band_without_frequencies_is_its_own_a_weighted_total() -> None
     assert result.achieved_grade_a is None
 
 
+def test_a_single_band_the_criteria_threw_out_is_not_the_a_weighted_total() -> None:
+    """Clause 10.5 b) omits it, so there is no level left to report.
+
+    The band stands alone, but standing alone does not exempt it: a band that
+    failed criterion 1 is omitted from the A-weighted determination whether it
+    had company or not.
+    """
+    positions = 6
+    intensity = np.full((positions, 1), 3e-6)
+    intensity[1, 0] = 3.2e-6
+    areas = np.full(positions, 0.5)
+    result = emission.sound_power_intensity_points(
+        intensity,
+        areas,
+        pressure_levels=np.full((positions, 1), 90.0),
+        pressure_residual_index=8.0,
+    )
+    assert not bool(result.criterion_1[0])
+    assert result.a_weighting_omitted_bands is not None
+    assert bool(result.a_weighting_omitted_bands[0])
+    assert math.isfinite(result.sound_power_level[0])
+    assert math.isnan(result.sound_power_level_a)
+
+
 def test_a_single_band_needs_no_clause_10_5_b_warning() -> None:
     """Clause 10.5 b) screens a sum, and one band is not summed with anything.
 

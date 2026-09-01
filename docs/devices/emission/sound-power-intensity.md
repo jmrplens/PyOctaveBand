@@ -424,8 +424,8 @@ normalized levels, the per-band uncertainty and the Annex C omission stated.*
   routes, what the accuracy grades promise, and the ISO 4871 noise-emission
   declaration a measured $L_{W\mathrm{A}}$ feeds.
 - [Sound Intensity (p-p)](intensity.md): the two-microphone probe, its
-  finite-difference bias and the ISO 9614-1 field indicators behind the
-  scanning methods.
+  finite-difference bias, the ISO 9614-1 field indicators behind the scanning
+  methods and the discrete-point determination those indicators qualify.
 - [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](sound-power-pressure.md):
   the enveloping-surface and anechoic routes for quiet sites.
 - [Sound Power in the Reverberation Room (ISO 3741)](sound-power-reverberation.md):

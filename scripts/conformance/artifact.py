@@ -113,13 +113,17 @@ def _rounded(value: float, precision: int) -> float:
 
 
 def _exact(value: float) -> float:
-    """Store a published number as authored, with negative zero normalised.
+    """Store a number as it is, with negative zero normalised.
 
     Expected values and tolerances come off a printed table; they are not
-    measurements and are not rounded to a display precision.
+    measurements and are not rounded to a display precision. A record check's
+    computed side goes through here too, because a record compares its values
+    for equality and rounding them is the one thing that could make that
+    comparison lie. The two guards still apply either way: ``Infinity`` is not
+    JSON, and ``-0.0`` is a sign in a byte comparison that nothing put there.
     """
     if not math.isfinite(value):
-        msg = f"non-finite published value {value!r} cannot be stored."
+        msg = f"non-finite value {value!r} cannot be stored in the artefact."
         raise ValueError(msg)
     return float(value) + 0.0
 
@@ -170,7 +174,11 @@ def _computed_document(outcome: Outcome) -> dict[str, Any]:
             None
             if record is None
             else {
-                name: (value if exact_record else _rounded(value, outcome.precision))
+                name: (
+                    _exact(value)
+                    if exact_record
+                    else _rounded(value, outcome.precision)
+                )
                 for name, value in record.items()
             }
         ),
