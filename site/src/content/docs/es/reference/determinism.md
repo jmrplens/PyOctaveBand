@@ -91,8 +91,9 @@ corren en CI:
   corpus de diseño entero pasa a su logaritmo se capturó y se comparó bit a
   bit contra el `log` de glibc: idéntico en todos, más alrededor de cien
   millones de sorteos adversariales sobre el rango completo de exponentes,
-  la banda cercana a uno, los números subnormales y los bordes de las ramas. Una
-  búsqueda adversarial encontró también el límite honesto: en torno a una
+  la banda cercana a uno, los números subnormales (los «denormalizados» de
+  la literatura clásica) y los bordes de las ramas. Una búsqueda
+  adversarial encontró también el límite honesto: en torno a una
   entrada de cada treinta millones, en una banda estrecha, cuyo logaritmo
   verdadero queda a media ulp de ambos vecinos y donde las dos
   implementaciones se separan en el último bit. Ninguna puede alcanzar un
