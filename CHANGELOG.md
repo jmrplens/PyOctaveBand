@@ -444,6 +444,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   recovery comes from; the transcendentals outside the iteration stay on the
   `math` loop, where a design pays them once.
 
+  On platforms whose C library is not glibc the byte-for-byte clause reads
+  the other way round, and it is an improvement: Apple's and musl's `log`
+  round a handful of inputs to the other neighbouring double, so the retired
+  `math.log` loop silently returned different designs on macOS than on
+  Linux. The pinned routine returns its own bits everywhere, so the designs
+  are now identical across platforms as well as across CPUs; on a non-glibc
+  platform they moved by that last ulp once, onto the values every other
+  platform already shipped.
+
 - The frequency weightings are designed at the sample rate instead of being
   outrun at eight times it. Every curve in `filters.weighting` starts as poles
   and zeros in the s plane, and the bilinear transform that makes a digital

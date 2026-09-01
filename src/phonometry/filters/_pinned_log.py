@@ -52,6 +52,17 @@ million in the near-one band, two million subnormals and the window edges,
 this function and ``math.log`` return identical bit patterns on every input
 -- zero exceptions. ``tests/filters/test_pinned_log.py`` pins a deterministic
 slice of that comparison, including the inputs an actual design evaluates.
+
+One consequence is worth stating plainly. ``math.log`` is whatever ``log``
+the platform's C library ships, and only glibc ships this routine: Apple's
+and musl's round a handful of inputs to the other neighbour, never further
+(both are within about half an ulp of the true logarithm, so the two answers
+are floating-point neighbours wherever they part). The elementwise loop this
+module replaces therefore returned *different designs on macOS than on
+Linux*, silently. This function returns its own bits everywhere, so the
+designs are now identical across platforms as well as across CPUs -- on a
+non-glibc platform they moved by that last ulp once, to the values every
+other platform already shipped.
 """
 
 from __future__ import annotations
