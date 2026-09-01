@@ -1,6 +1,6 @@
 ---
 title: "Por qué phonometry"
-description: "La filosofía de diseño basada en conformidad: un caso de estudio de ponderación temporal IEC 61672-1, la batería numérica de conformidad, el registro de defectos encontrados en las propias normas publicadas y cómo se compara phonometry con otras bibliotecas de Python."
+description: "La filosofía de diseño basada en conformidad: un caso de estudio de ponderación temporal IEC 61672-1, la batería numérica de conformidad, el registro de defectos encontrados en las propias normas publicadas y dónde encaja phonometry en el ecosistema Python."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -27,20 +27,26 @@ $$
 $$
 
 que corresponde a un filtro paso bajo estable de primer orden con un polo en el
-semiplano izquierdo ($s = -1/\tau$).
+semiplano izquierdo ($s = -1/\tau$). Vale la pena poner ese detector al lado de
+la otra cosa con la que a veces se calcula una lectura Fast, un promedio de
+energía que se reinicia cada $\tau$ segundos, porque los dos se confunden con
+facilidad y responden a preguntas distintas:
 
-| | phonometry | python-acoustics |
+| | Detector exponencial (IEC 61672-1) | Integrador por bloques |
 | :--- | :--- | :--- |
-| Salida | Envolvente continua con ponderación temporal (un valor por muestra) | Salida escalonada (un valor cada $\tau$ segundos) |
-| Unidades de entrada | Presión acústica en bruto (Pa); se eleva al cuadrado internamente | Se espera la magnitud energética (Pa²) como entrada |
-| Filtro | Promediado exponencial estable (polo en $s=-1/\tau$) | Diseño teóricamente inestable (polo en el semiplano derecho) estabilizado reiniciando el estado cada $\tau$ segundos |
-| Comportamiento | Verdadera ponderación temporal IEC | Más cercano a un integrador por bloques ($L_{\mathrm{eq},\tau}$) |
+| Salida | Envolvente continua con ponderación temporal, un valor por muestra | Escalonada, un valor por bloque |
+| Mecanismo | Promediado exponencial estable, polo en $s=-1/\tau$ | Un promedio de energía reiniciado cada $\tau$ segundos; $\tau$ está en su reloj, no en su respuesta |
+| Qué mide | El nivel Fast/Slow/Impulse de la norma | $L_{\mathrm{eq},\tau}$, energía por intervalo |
 
 Un polo en el eje real negativo corresponde a una respuesta al impulso
 exponencial decreciente ($h(t) \propto e^{-t/\tau}$), exactamente lo que
 significa «ponderación temporal exponencial»: los eventos pasados se olvidan
-exponencialmente. Un polo en el eje real positivo crece sin límite; el reinicio
-por bloques lo oculta, pero cambia la naturaleza de la medición.
+exponencialmente. Una implementación que en cambio
+acumule energía y se reinicie cada $\tau$ segundos ha construido el
+integrador por bloques, se llame como se llame, y una que coloque el polo en
+el eje real positivo antes del mismo reinicio añade además un peso creciente
+dentro de cada bloque: ninguna de las dos es la ponderación temporal, porque
+el reinicio cambia la naturaleza de la medición.
 
 De esa ecuación salen además los valores de referencia del apartado siguiente, y
 vale la pena deducirlos una vez en lugar de dar por buena la Tabla 4. Intégrala
@@ -63,8 +69,10 @@ modo que la transcripción de la tabla está comprobada y no dada por buena.
 La consecuencia sostiene el resto de esta página. Como la respuesta es una
 función suave de $T_\mathrm{b}/\tau$, un detector que resuelva de verdad la ecuación
 sigue la columna entera de una vez; un detector que promedia sobre bloques fijos
-de 125 ms no contiene ningún $T_\mathrm{b}$, y solo puede acertar allí donde la ráfaga
-llene un bloque por casualidad.
+de 125 ms responde con la parte de la energía de la ráfaga que caiga en cada
+bloque, que se mueve con la duración y con la alineación por igual pero no
+lleva nada de la respuesta $T_\mathrm{b}/\tau$, y solo puede acertar allí
+donde la ráfaga llene un bloque por casualidad.
 
 ## Verificación frente a IEC 61672-1 (ráfagas tonales)
 
@@ -75,7 +83,7 @@ al nivel de régimen estacionario.
 ### Cómo se ejecuta la comprobación
 
 La Tabla 4 fija la excitación pero no el montaje, así que aquí va el montaje. Se
-genera una sinusoide de 4 kHz a 48 kHz durante 3 s. La **referencia** es el nivel
+genera una sinusoide de 4 kHz a 48 kHz durante 2 s. La **referencia** es el nivel
 Fast estacionario de esa sinusoide continua, promediado sobre su último medio
 segundo: una vez asentado el integrador, este es el $L_\mathrm{A}$ en la notación de la
 norma. Después se recorta de *esa misma* sinusoide la ráfaga de la duración
@@ -94,32 +102,21 @@ mismos valores de referencia están transcritos en
 
 | Duración de la ráfaga | Objetivo IEC (dB) | Límite clase 1 (dB) | phonometry (dB) | Error (dB) | Estado |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| 200 ms | −1,0 | ±0,5 | −0,98 | +0,02 | ✅ CUMPLE |
-| 50 ms | −4,8 | ±1,0 | −4,82 | −0,02 | ✅ CUMPLE |
-| 10 ms | −11,1 | ±1,0 | −11,14 | −0,04 | ✅ CUMPLE |
-| 1 ms | −21,0 | +1,0 / −2,0 | −20,99 | +0,01 | ✅ CUMPLE |
+| 200 ms | −1,0 | ±0,5 | −0,98 | +0,02 | Cumple |
+| 50 ms | −4,8 | ±1,0 | −4,82 | −0,02 | Cumple |
+| 10 ms | −11,1 | ±1,0 | −11,14 | −0,04 | Cumple |
+| 1 ms | −21,0 | +1,0 / −2,0 | −20,99 | +0,01 | Cumple |
 
-**Resultados de python-acoustics (ponderación Fast, pasando la señal al cuadrado
-como requiere esa biblioteca):**
-
-| Duración de la ráfaga | Objetivo IEC (dB) | Límite clase 1 (dB) | python-acoustics (dB) | Error (dB) | Estado |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| 200 ms | −1,0 | ±0,5 | −0,97 | +0,03 | ✅ CUMPLE |
-| 50 ms | −4,8 | ±1,0 | −3,93 | **+0,87** | ✅ CUMPLE |
-| 10 ms | −11,1 | ±1,0 | −10,90 | +0,20 | ✅ CUMPLE |
-| 1 ms | −21,0 | +1,0 / −2,0 | −20,90 | +0,10 | ✅ CUMPLE |
-
-**Las dos bibliotecas pasan todas las filas mostradas**, y decir lo contrario
-sería exagerar: lo que importa aquí es la *forma* del error, no un
-incumplimiento. phonometry se mantiene a menos de 0,05 dB de la referencia de la
-Tabla 4 en todas las duraciones, menos del 5 % del margen de clase 1, porque a
-un detector exponencial continuo no le queda ningún parámetro libre que
-equivocar. El integrador por bloques también se queda dentro de clase 1, pero
-gasta 0,87 de los 1,0 dB disponibles a 50 ms, y los gasta por un motivo que es
-suerte y no diseño: cómo se reparte la ráfaga a caballo de un bloque de 125 ms.
-Lee las dos tablas junto a la primera columna de la Tabla 4, que se estrecha a
-±0,5 dB para ráfagas de 200 ms y más largas: en ese extremo a un integrador por
-bloques no le queda margen que perder.
+El detector exponencial se mantiene a menos de 0,05 dB de la referencia de la
+Tabla 4 en
+todas las duraciones, y ninguna fila gasta más del 4 % de su propio margen
+de clase 1, porque a
+un detector que resuelve la ecuación que define la magnitud no le queda ningún
+parámetro libre que equivocar. Un integrador por bloques también puede quedar
+dentro de clase 1 con una alineación favorable, pero lo que gasta del margen
+lo decide cómo se reparta la ráfaga a caballo de un bloque de 125 ms, que es
+suerte y no diseño; y la primera columna de la Tabla 4 se estrecha a ±0,5 dB
+para ráfagas de 200 ms y más largas, donde queda poco margen que perder.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_iec_es.svg" alt="Respuestas de la envolvente Fast a ráfagas de 200, 50 y 10 ms alcanzando exactamente los valores de referencia de la Tabla 4 de IEC 61672-1" width="80%" loading="eager" />
 
@@ -130,8 +127,8 @@ de la Tabla 4 (discontinua) con un margen de 0,1 dB para ráfagas de
 El generador que hay detrás de esta figura es
 `scripts/figures/signals.py::generate_tone_burst_iec`, y es el procedimiento
 descrito arriba con tres de las filas de la Tabla 4: imprime
-`env_db.max() - target`, que es la columna Error de la primera tabla, de modo
-que las filas de phonometry se pueden reproducir directamente.
+`env_db.max() - target`, que es la columna Error de la tabla, de modo
+que las filas se pueden reproducir directamente.
 
 La figura fija la ráfaga en un instante concreto, que es justo aquello de lo
 que depende la respuesta del integrador por bloques y no la del detector
@@ -154,8 +151,8 @@ estacionario, 1,0 dB por encima del objetivo.
 />
 
 *La traza exponencial es plana porque $10\lg(1-e^{-T_\mathrm{b}/\tau})$ contiene $T_\mathrm{b}$
-y nada del reloj; la traza por bloques es un retrato de la alineación y de
-nada más. Las dos lecturas se calculan aquí con
+y nada del reloj; la traza por bloques, a esta duración
+fija, es un retrato de la alineación y de nada más. Las dos lecturas se calculan aquí con
 `time_weighting(x, fs, mode="fast")` y con `leq` sobre segmentos consecutivos
 de 125 ms, frente a la misma referencia de tono estacionario que define el
 procedimiento de arriba.*
@@ -183,7 +180,7 @@ y la clase 2 el ancho, para reconocimientos generales, y los dos se ensanchan en
 los extremos del rango de frecuencias, que es donde más cuesta cumplirlos. La
 clase 0 era un corredor todavía más estrecho, de la edición retirada de 1995 de
 IEC 61260, y aquí se mantiene como objetivo adicional voluntario para el banco
-Butterworth por defecto. Así que un CUMPLE en esta página significa que la
+Butterworth por defecto. Así que «cumple» en esta página significa que la
 respuesta calculada no se sale nunca del corredor que dibuja la norma; no
 significa que el error sea cero, y el tamaño del margen es el número
 interesante.
@@ -205,7 +202,7 @@ metrología:
 | ECMA-418-1:2024 | Prominencia tonal TNR/PR: anchos de banda críticos, separación de proximidad y criterios de prominencia frente a los ejemplos resueltos de los apartados 10–12 | `tests/psychoacoustics/quality/test_tonality.py` |
 | ISO 1996-1:2016 | `lden()`, `ldn()` y `composite_rating_level()` frente a valores calculados a mano con las fórmulas | `tests/environment/assessment/test_rating.py` |
 | IEC 60942:2017 Tabla 2 | Límites de estabilidad a corto plazo del calibrador (dependientes de la frecuencia, clase 1) en `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
-| IEC 61252:1993 | Las magnitudes de exposición sonora personal, `sound_exposure()` y el nivel normalizado a 8 h `lex_8h()` | `tests/signals/test_levels.py` |
+| IEC 61252:1993 | Las magnitudes de exposición sonora personal, `sound_exposure()` y el nivel normalizado a 8 h `lex_8h()`; IEC 61252:2025 ha sustituido desde entonces esa impresión, y la transcripción sigue apuntando al texto de 1993+A2 | `tests/signals/test_levels.py` |
 
 La misma disciplina se aplica mucho más allá del núcleo de metrología: hoy la
 batería ejecuta {totalChecks} comprobaciones numéricas de conformidad en
@@ -229,9 +226,12 @@ borde de banda de paso con rizado constante, algo que se declara con su coste
 medido en [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/). El
 banco Butterworth por defecto se verifica también frente a la clase 0, más
 estricta, de la edición retirada IEC 61260:1995 / ANSI S1.11-2004 además de
-frente a la clase 1 vigente. Y la ponderación A/C se mantiene dentro de las
-tolerancias de clase 1 hasta 16 kHz a las frecuencias de muestreo habituales
-gracias al sobremuestreo interno (consulta [Ponderación
+frente a la clase 1 vigente. Y la ponderación A/C obtiene la
+clase 1 en cada una de las ocho frecuencias de muestreo a las que la batería
+la califica, de 8 a 192 kHz, en todas las frecuencias de la Tabla 3 por
+debajo del Nyquist de cada una, porque el prototipo analógico se ajusta a la
+frecuencia de muestreo en lugar de transformarse a ciegas
+(consulta [Ponderación
 frecuencial](/phonometry/es/signals/levels/weighting/)).
 
 ## Cuando lo que está mal es la fuente
@@ -262,35 +262,33 @@ desde otra implementación hereda lo que la errata le hiciera hacer, y nada en
 
 ## Dónde encaja phonometry en el ecosistema Python
 
-- **python-acoustics** se archivó en febrero de 2024 y ya no se mantiene; la
-  comparación de arriba se ejecutó contra su última versión publicada.
-- **acoustic-toolbox**, el sucesor comunitario de python-acoustics, construye
-  sus ponderaciones temporal y frecuencial de IEC 61672-1 sobre `pyoctaveband`,
-  el nombre anterior de esta biblioteca, que desde la 2.1.0 es un envoltorio
-  sobre phonometry. Solo toma de aquí los filtros: su propio `weighting.py`
-  sigue llevando tablas de ponderación A y C por tercios de octava escritas
-  directamente en el código.
-- **MoSQITo** se centra en métricas psicoacústicas de calidad sonora y ya
-  cubre buena parte de ese terreno: sonoridad de Zwicker, sonoridad y aspereza
+Varios proyectos de Python comparten terreno con phonometry, y la manera
+honesta de situarlos es por aquello para lo que está construido cada uno, no
+echando carreras entre ellos:
+
+- **acoustic-toolbox** es el sucesor comunitario de python-acoustics, que se
+  archivó en febrero de 2024. Es un conjunto de herramientas de acústica
+  general, y sus ponderaciones temporal y frecuencial de IEC 61672-1 se
+  apoyan en `pyoctaveband`, el nombre anterior de esta biblioteca, que desde
+  la 2.1.0 es un envoltorio sobre phonometry.
+- **MoSQITo** es la implementación abierta de referencia de las métricas
+  psicoacústicas de calidad sonora: sonoridad de Zwicker, sonoridad y aspereza
   de ECMA-418-2, agudeza de DIN 45692, relaciones tono-ruido y de prominencia
-  de ECMA-74 y el índice de inteligibilidad del habla de ANSI S3.5. phonometry
-  implementa esa misma familia y añade la sonoridad de ISO 532-2 e ISO 532-3,
+  de ECMA-74, el índice de inteligibilidad del habla de ANSI S3.5. phonometry
+  implementa esa misma familia, añade la sonoridad de ISO 532-2 e ISO 532-3,
   la tonalidad de ECMA-418-2, la intensidad de fluctuación y el modelo de
-  molestia psicoacústica de Fastl y Zwicker, que MoSQITo no expone. Lo que más
-  cambia es el entorno. Aquí esas métricas viven en la misma batería de
-  conformidad que el núcleo de metrología y se componen directamente con los
+  molestia psicoacústica de Fastl y Zwicker, y las asienta en la misma batería
+  de conformidad que el núcleo de metrología, compuestas directamente con los
   filtros de ponderación, la balística, el filtrado por bandas y la
   calibración que las alimentan.
-- **pyroomacoustics** simula respuestas al impulso de salas para cadenas de
-  audio y aprendizaje automático (fuentes imagen, trazado de rayos,
-  conformación de haz, estimación de la dirección de llegada), y también llega
-  al lado de la medición, con adquisición de la respuesta al impulso por barrido
-  y un estimador de RT60. Lo que no lleva es el juego de parámetros de
-  ISO 3382. Los modelos de fuentes imagen y FDTD de phonometry están fijados a
-  formas cerradas publicadas, y la respuesta al impulso de fuentes imagen pasa
-  por el mismo análisis de `room_parameters` (EDT, T20, T30, C50, C80, D50, Ts,
-  por bandas, con los indicadores de validez del rango de decaimiento de
-  ISO 3382) que una medida.
+- **pyroomacoustics** está construido para simular salas en cadenas de audio
+  y aprendizaje automático: fuentes imagen, trazado de rayos, conformación de
+  haz, estimación de la dirección de llegada, más la adquisición de respuestas
+  al impulso por barrido. El lado de salas de phonometry es el de la medición:
+  sus modelos de fuentes imagen y FDTD están fijados a formas cerradas
+  publicadas, y una respuesta al impulso simulada pasa por el mismo análisis
+  de `room_parameters` (EDT, T20, T30, C50, C80, D50, Ts, por bandas, con los
+  indicadores de validez del rango de decaimiento de ISO 3382) que una medida.
 
 Si tu trabajo necesita números que puedas defender frente a la tabla de
 tolerancias de una norma, ya sea para informes de medición, evaluaciones
