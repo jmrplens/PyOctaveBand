@@ -522,7 +522,9 @@ ANSIS3_5_WG_FLAT_CASES = (
 # calculation" (Ed.4, 2011, printed pp. 64-66): a measured STI adjusted to
 # simulate occupancy noise and a different speech level. The annex walks four
 # numbered steps and prints every intermediate, so each row below is one
-# printed row of that table, transcribed verbatim.
+# printed row of that table, transcribed verbatim. The one row two steps
+# print differently, the reception-threshold intensity at 250 Hz, is noted
+# where it is defined.
 #
 #   step 1  the signal and background-noise octave-band levels present during
 #           the measurement, and the MTF matrix measured with the noise,
@@ -731,7 +733,7 @@ IEC60268_16_ANNEX_M_OPERATIONAL_MASKING_MILLI = (
     0.363,
 )
 #: I_am,k of step 3. The 250 Hz cell is printed 2 850 000 where the quantity
-#: it names is 2 858 700; see docs/ERRATA.md, "IEC 60268-16:2011, Table M.1,
+#: it names is 2 858 804; see docs/ERRATA.md, "IEC 60268-16:2011, Table M.1,
 #: step 3 I_am,k at 250 Hz".
 IEC60268_16_ANNEX_M_OPERATIONAL_INTENSITY_MASKING = (
     0.0,
@@ -779,7 +781,12 @@ IEC60268_16_ANNEX_M_OPERATIONAL_MTF = (
 )
 
 # Step 4: process the MTF matrix to yield the STI (4a effective SNRs, 4b the
-# +/-15 dB clamp, 4c the transmission indices and the band MTIs).
+# +/-15 dB clamp, 4c the transmission indices and the band MTIs). The printed
+# 4b and 4c matrices are deliberately not transcribed: the annex derives them
+# by rounding the 4a print and clamping it, a display chain, while clauses
+# A.5.4 to A.5.5 define them from the unrounded SNRs, so they are not oracles
+# for a library that never rounds mid-chain. The 4a matrix, the band MTIs and
+# the STI below are what the computation is checked against.
 IEC60268_16_ANNEX_M_EFFECTIVE_SNR = (
     (17.21, 12.44, 12.42, 13.09, 15.21, 15.93, 21.01),
     (14.55, 10.73, 11.04, 11.83, 13.90, 14.83, 20.02),

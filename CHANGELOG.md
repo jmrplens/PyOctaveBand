@@ -126,13 +126,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   within one unit of the last printed place, every scalar row on the way to
   them reproduces at the precision it is printed to, the effective SNRs agree
   within 0.08 dB, the band MTI row is exact at the annex's own two decimals and
-  the index rounds to the printed 0.76. Three defects that reading turned up in
+  the index rounds to the printed 0.76. The only prints not used as oracles are
+  the step 4 clamp and transmission-index matrices, which the annex derives
+  from its own rounded SNR print. Three defects that reading turned up in
   the printed table are recorded in `docs/ERRATA.md`.
 
   What is implemented is the Edition 4 (2011) procedure. The Edition 5 foreword
-  records that Annex M was expanded with alternative noise and level
-  adjustments, and that text could not be obtained, so the guides say exactly
-  that instead of implying coverage of an edition nobody read.
+  says greater information is given in Annex M about these adjustments, and its
+  table of contents grows the annex from three printed pages to ten; the body
+  of the Edition 5 annex could not be obtained, so the guides say exactly that
+  instead of implying coverage of an edition nobody read.
 
 - `verify_weighting_class(wf, edition="1979")` grades a frequency weighting
   against IEC 651:1979 Table V, which publishes the laboratory-grade **Type 0**

@@ -22,10 +22,11 @@ the male test-signal spectrum (A.6.1).
 
 The level adjustment of [`sti_adjusted_for_levels`](/phonometry/reference/api/speech/sti/#sti_adjusted_for_levels) is the four-step
 procedure of Ed.4 (2011) Annex M, verified against the printed
-intermediates of its Table M.1. The Ed.5 foreword (item g) records that
-Annex M was expanded with alternative noise and level adjustments; the
-Ed.5 text could not be obtained, so whether it prints further methods
-beside this one is unknown here.
+intermediates of its Table M.1. The Ed.5 foreword (item g) says greater
+information is given in Annex M about these adjustments, and its table of
+contents grows the annex from three printed pages to ten and adds a flow
+chart of the steps; the body of the Ed.5 annex could not be obtained, so
+what those pages add beside this procedure is unknown here.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -68,15 +69,16 @@ rest of the module uses.
 
 What is implemented is the Ed.4 (2011) Annex M procedure, verified
 against the printed intermediates of its Table M.1 worked example. The
-Ed.5 foreword (item g) records that Annex M was expanded with
-alternative noise and level adjustments, and the Ed.5 text could not be
-obtained, so whether the current edition prints further methods beside
-this one is unknown here.
+Ed.5 foreword (item g) says greater information is given in Annex M
+about these adjustments, and its table of contents grows the annex from
+three printed pages to ten; the body of the Ed.5 annex could not be
+obtained, so what those pages add beside this procedure is unknown
+here.
 
 :::note
 `mtf` is the matrix *as measured*, with the noise, masking
-and threshold of the measurement still in it, which is what a meter
-reports and what [`STIResult.mtf`](/phonometry/reference/api/speech/sti/#stiresult) holds after a measurement run
+and threshold of the measurement still in it, which is what
+[`STIResult.mtf`](/phonometry/reference/api/speech/sti/#stiresult) holds after a measurement run
 with `level` and `ambient`. Feeding a matrix that never had them
 applied removes what was never added and lowers the result.
 [`STIResult.adjusted_for_levels`](/phonometry/reference/api/speech/sti/#stiresultadjusted_for_levels) takes the measurement levels

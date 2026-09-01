@@ -16,10 +16,11 @@ the male test-signal spectrum (A.6.1).
 
 The level adjustment of :func:`sti_adjusted_for_levels` is the four-step
 procedure of Ed.4 (2011) Annex M, verified against the printed
-intermediates of its Table M.1. The Ed.5 foreword (item g) records that
-Annex M was expanded with alternative noise and level adjustments; the
-Ed.5 text could not be obtained, so whether it prints further methods
-beside this one is unknown here.
+intermediates of its Table M.1. The Ed.5 foreword (item g) says greater
+information is given in Annex M about these adjustments, and its table of
+contents grows the annex from three printed pages to ten and adds a flow
+chart of the steps; the body of the Ed.5 annex could not be obtained, so
+what those pages add beside this procedure is unknown here.
 """
 
 from __future__ import annotations
@@ -346,11 +347,14 @@ def _validate_band_vector(
     return arr
 
 
-def _truncated_mtf(mtf: np.ndarray) -> np.ndarray:
+def _truncated_mtf(mtf: np.ndarray, *, stacklevel: int = 4) -> np.ndarray:
     """Validate the modulation transfer matrix and truncate it to 1,0.
 
     Ed.4 A.5.3 NOTE 1 (= Ed.5): a value above 1,3 means the measurement is
     invalid, and every value is truncated to 1,0 before the chain runs.
+    ``stacklevel`` points the warning at the caller's caller: the default 4
+    fits the public functions that route through :func:`_sti_from_mtf`, and
+    :func:`sti_adjusted_for_levels`, which calls here directly, passes 3.
     """
     m = np.array(mtf, dtype=np.float64)
     if m.ndim != 2 or m.shape[0] != _NUM_BANDS:  # noqa: PLR2004
@@ -367,7 +371,7 @@ def _truncated_mtf(mtf: np.ndarray) -> np.ndarray:
             "Modulation transfer values above 1.3 detected: the measurement "
             "is likely invalid (IEC 60268-16 A.5.3). Values truncated to 1.0.",
             STIWarning,
-            stacklevel=4,
+            stacklevel=stacklevel,
         )
     return np.minimum(m, 1.0)
 
@@ -613,14 +617,15 @@ def sti_adjusted_for_levels(
 
     What is implemented is the Ed.4 (2011) Annex M procedure, verified
     against the printed intermediates of its Table M.1 worked example. The
-    Ed.5 foreword (item g) records that Annex M was expanded with
-    alternative noise and level adjustments, and the Ed.5 text could not be
-    obtained, so whether the current edition prints further methods beside
-    this one is unknown here.
+    Ed.5 foreword (item g) says greater information is given in Annex M
+    about these adjustments, and its table of contents grows the annex from
+    three printed pages to ten; the body of the Ed.5 annex could not be
+    obtained, so what those pages add beside this procedure is unknown
+    here.
 
     .. note:: ``mtf`` is the matrix *as measured*, with the noise, masking
-       and threshold of the measurement still in it, which is what a meter
-       reports and what :attr:`STIResult.mtf` holds after a measurement run
+       and threshold of the measurement still in it, which is what
+       :attr:`STIResult.mtf` holds after a measurement run
        with ``level`` and ``ambient``. Feeding a matrix that never had them
        applied removes what was never added and lowers the result.
        :meth:`STIResult.adjusted_for_levels` takes the measurement levels
@@ -656,8 +661,8 @@ def sti_adjusted_for_levels(
     )
     # Step 2 leaves the channel alone and may exceed 1,0; step 3 puts the
     # operational condition back, and only then is the matrix truncated.
-    source = _truncated_mtf(mtf) / measured.factor[:, np.newaxis]
-    adjusted = _truncated_mtf(source * operational.factor[:, np.newaxis])
+    source = _truncated_mtf(mtf, stacklevel=3) / measured.factor[:, np.newaxis]
+    adjusted = _truncated_mtf(source * operational.factor[:, np.newaxis], stacklevel=3)
     return _index_from_corrected_mtf(
         adjusted, operational.speech_level, operational.ambient_level
     )

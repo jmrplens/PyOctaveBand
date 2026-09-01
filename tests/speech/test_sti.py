@@ -16,6 +16,7 @@ Validation vectors:
 
 import warnings
 from itertools import pairwise
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -72,6 +73,9 @@ from phonometry.speech.sti import (
     _sti_from_mtf,
     _truncated_mtf,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 FS = 48000
 
@@ -694,15 +698,15 @@ def test_annex_m_step3_masking_intensity_at_250_hz_is_the_printed_erratum() -> N
     """The one printed cell of Table M.1 that names a value it is not.
 
     I_am,k at 250 Hz of step 3 is amf x I_k of the 125 Hz band below it,
-    2 858 700 on the printed levels, which the table prints as 2 850 000.
-    The 500 Hz cell beside it, 2 852 100, prints as 2 850 000 correctly, and
+    2 858 804 on the printed levels, which the table prints as 2 850 000.
+    The 500 Hz cell beside it, 2 852 252, prints as 2 850 000 correctly, and
     step 2 prints the two neighbours apart (508 000 and 507 000), so the
     defect is this cell rather than the annex's rounding. It moves the
-    masking and threshold correction of the band by 4 parts in a million and
-    changes no printed result. See docs/ERRATA.md.
+    masking and threshold correction of the band by 44 parts in a million
+    and changes no printed result. See docs/ERRATA.md.
     """
     correction = _annex_m_operational_correction()
-    assert correction.intensity_masking[1] == pytest.approx(2_858_700.0, rel=0.0005)
+    assert correction.intensity_masking[1] == pytest.approx(2_858_803.8, abs=1.0)
     assert correction.intensity_masking[1] != pytest.approx(
         IEC60268_16_ANNEX_M_OPERATIONAL_INTENSITY_MASKING[1], rel=0.001
     )
@@ -802,8 +806,8 @@ def test_annex_m_adjustment_from_a_measured_result() -> None:
     """``STIResult.adjusted_for_levels`` takes the measured condition itself.
 
     Closing the annex's own loop: the printed step 2 matrix put back through
-    the measurement condition is the printed step 1 matrix, i.e. what a
-    meter reports in that room, and a result of that measurement carries the
+    the measurement condition is the printed step 1 matrix, and a result of
+    that measurement carries the
     two spectra the adjustment needs. Moving it to the operational condition
     then needs only that condition, and lands on the printed step 3 matrix
     and STI. Passing all four spectra to the module function must give the
@@ -856,17 +860,24 @@ def test_annex_m_needs_the_levels_the_measurement_was_corrected_with() -> None:
         )
 
 
-def test_annex_m_adjustment_rejects_a_level_vector_of_the_wrong_length() -> None:
+@pytest.mark.parametrize(
+    "name",
+    ["measured_level", "measured_ambient", "operational_level", "operational_ambient"],
+)
+def test_annex_m_adjustment_rejects_a_level_vector_of_the_wrong_length(
+    name: str,
+) -> None:
     """Each of the four spectra is seven octave bands, named when it is not."""
     measured = _annex_m_matrix(IEC60268_16_ANNEX_M_MEASURED_MTF)
+    spectra: dict[str, Sequence[float]] = {
+        "measured_level": IEC60268_16_ANNEX_M_MEASURED_LEVEL,
+        "operational_level": IEC60268_16_ANNEX_M_OPERATIONAL_LEVEL,
+        name: [70.0, 70.0],
+    }
     with pytest.raises(
-        ValueError, match=r"'operational_level' must contain exactly 7 octave-band"
+        ValueError, match=rf"'{name}' must contain exactly 7 octave-band"
     ):
-        speech.sti_adjusted_for_levels(
-            measured,
-            measured_level=IEC60268_16_ANNEX_M_MEASURED_LEVEL,
-            operational_level=[70.0, 70.0],
-        )
+        speech.sti_adjusted_for_levels(measured, **spectra)
 
 
 def test_an_sti_result_refuses_noise_levels_without_speech_levels() -> None:

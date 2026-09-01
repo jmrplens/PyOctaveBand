@@ -1514,7 +1514,7 @@ which is the check that enforces the rule; see
 - **The problem:** the cell does not round from the quantity it names. With
   the operational levels printed two rows above, $I_{am,k}$ at 250 Hz is the
   auditory masking factor of the 125 Hz band times that band's combined
-  intensity, $0{,}0146351 \times 195\,339\,273 = 2\,858\,804$, which at the
+  intensity, $0{,}01463507 \times 195\,339\,273 = 2\,858\,804$, which at the
   three significant figures the row is printed to reads 2 860 000. The 500 Hz
   cell is correct: its 2 852 252 does print as 2 850 000. The two cells are
   reproduced together only by carrying the *rounded* $amf \times 1000 = 14{,}6$
@@ -1531,7 +1531,7 @@ which is the check that enforces the rule; see
   The transcription in [`tests/reference_data/`](https://github.com/jmrplens/phonometry/blob/main/tests/reference_data)
   keeps the printed cell and the test
   `test_annex_m_step3_masking_intensity_at_250_hz_is_the_printed_erratum`
-  asserts the computed value against 2 858 800 and against the print, so the
+  asserts the computed value against 2 858 804 and against the print, so the
   one cell of the table that is not an oracle cannot quietly become one.
 - **Status:** unreported.
 
