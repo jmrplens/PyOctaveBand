@@ -86,7 +86,12 @@ rarefactional peaks be reported separately (Clause 8.4.2). A computed
 external threshold uses before subtracting one from the other.
 
 ```python
+import numpy as np
 from phonometry import underwater
+
+# A captured hydrophone record (here a synthetic 250 Hz tone of 1 s).
+fs = 48000
+pressure = 0.5 * np.sin(2 * np.pi * 250.0 * np.arange(fs) / fs)
 
 spl = underwater.sound_pressure_level(pressure)        # dB re 1 µPa
 sel = underwater.sound_exposure_level(pressure, fs)     # dB re 1 µPa²·s
@@ -310,8 +315,8 @@ from phonometry import underwater
 fs = 48000
 t = np.arange(int(0.3 * fs)) / fs
 envelope = np.where(t < 0.01, t / 0.01, np.exp(-(t - 0.01) / 0.04))
-pressure = 8000.0 * envelope * np.sin(2 * np.pi * 180.0 * t)
-res = underwater.pile_strike_metrics(pressure, fs)
+strike_pressure = 8000.0 * envelope * np.sin(2 * np.pi * 180.0 * t)
+res = underwater.pile_strike_metrics(strike_pressure, fs)
 res.plot()
 ```
 

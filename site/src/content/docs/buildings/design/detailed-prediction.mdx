@@ -186,28 +186,45 @@ resonant_only=True)` does the same on a calculated element.
 
 The four names below (`laboratory_total_loss_factor`,
 `structural_reverberation_time`, `in_situ_reduction_index` and
-`in_situ_impact_level`) are top-level `phonometry` names; add them to the import
-block of the previous section to run this.
+`in_situ_impact_level`) live in the same `building` module as the rest of the
+page, and the block starts from your own measured spectra.
 
 ```python
-# A measured laboratory R and Ln for the 220 mm separating floor, transferred to
-# the building. `el` is the in-situ element of the section above, whose
+import numpy as np
+from phonometry import building
+
+bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630,
+                  800, 1000, 1250, 1600, 2000, 2500, 3150], float)
+
+# The 220 mm separating floor in situ, the element the next section assembles
+# from its junctions: its perimeter sum is 2.659 m (Formula C.4) and its
 # `reverberation_time` is Ts,situ.
-eta_lab = laboratory_total_loss_factor(bands, mass_per_area=484.0,
-                                       internal_loss_factor=0.005)   # (C.3)
-ts_lab = structural_reverberation_time(bands, eta_lab)               # (C.1)
+el = building.in_situ_element(building.HomogeneousElement(
+    "floor", 20.0, 5.0, 4.0, 484.0, 76.8, 0.005, 2.659, 2200.0, 3800.0), bands)
+
+# A measured laboratory R and Ln for that same floor, transferred to the
+# building.
+r_measured = ...    # measured R per band, dB (ISO 10140-2 test report)
+ln_measured = ...   # measured Ln per band, dB (ISO 10140-3 test report)
+
+eta_lab = building.laboratory_total_loss_factor(
+    bands, mass_per_area=484.0, internal_loss_factor=0.005)   # (C.3)
+ts_lab = building.structural_reverberation_time(bands, eta_lab)  # (C.1)
 print(np.round(ts_lab[[0, 10]], 3))                    # [0.301 0.089] s
 print(np.round(el.reverberation_time[[0, 10]], 3))     # [0.53  0.152] s, in situ
 
-r_situ = in_situ_reduction_index(r_measured, el.reverberation_time, ts_lab)
-ln_situ = in_situ_impact_level(ln_measured, el.reverberation_time, ts_lab)
+r_situ = building.in_situ_reduction_index(r_measured, el.reverberation_time,
+                                          ts_lab)
+ln_situ = building.in_situ_impact_level(ln_measured, el.reverberation_time,
+                                        ts_lab)
 # This floor is *less* damped in the building than in the test frame (Ts,situ is
 # the longer of the two), so Formula (9) takes 2.0 to 2.5 dB off its index across
 # the range and Part 2 Formula (5) adds the same to its impact level.
 
 # A flanking path takes the resonant-only form of the same measured index;
 # the direct path does not.
-r_flanking = resonant_sound_reduction_index(r_situ, bands, critical_frequency=76.8)
+r_flanking = building.resonant_sound_reduction_index(r_situ, bands,
+                                                     critical_frequency=76.8)
 ```
 
 ### What you need before you start
@@ -308,8 +325,37 @@ Assembling the direct path and all twelve flanking paths gives the apparent
 index per band, its energy split and the ISO 717-1 rating in one call:
 
 ```python
-# `paths` holds the twelve flanking paths of the four elements, built the
-# way `d1` was above; the code block under the figure builds all of them.
+# The other three flanking elements, built the way `wall` was above, each with
+# its own area and perimeter sum (Formula C.4); `situ` then holds all five.
+specs = (("ext2", 13.75, 5.0, 2.75, 219.0, 92.6, 0.0125, 2.548, 600.0, 1900.0),
+         ("int1", 11.0, 4.0, 2.75, 360.0, 128.4, 0.01, 1.636, 1800.0, 2500.0),
+         ("int2", 13.75, 5.0, 2.75, 360.0, 128.4, 0.01, 1.839, 1800.0, 2500.0))
+situ = {"floor": el, "ext1": wall}
+for spec in specs:
+    situ[spec[0]] = building.in_situ_element(
+        building.HomogeneousElement(*spec), bands)
+
+# The twelve flanking paths, three per flanking element, each built the way
+# `d1` was above.
+paths = []
+for tag, name, lij in (("1", "ext1", 4.0), ("2", "ext2", 5.0),
+                       ("3", "int1", 4.0), ("4", "int2", 5.0)):
+    flank = situ[name]
+    cross = k_floor_ext if name.startswith("ext") else k_floor_int
+    through = k_ext_ext if name.startswith("ext") else k_int_int
+    paths += [
+        building.airborne_flanking_path(label=f"D{tag}", kind="Df", element_i=situ["floor"],
+                                        element_j=flank, vibration_reduction_index=cross,
+                                        coupling_length=lij, separating_area=20.0,
+                                        delta_r_i=delta),
+        building.airborne_flanking_path(label=f"{tag}d", kind="Fd", element_i=flank,
+                                        element_j=situ["floor"], vibration_reduction_index=cross,
+                                        coupling_length=lij, separating_area=20.0),
+        building.airborne_flanking_path(label=f"{tag}{tag}", kind="Ff", element_i=flank,
+                                        element_j=flank, vibration_reduction_index=through,
+                                        coupling_length=lij, separating_area=20.0),
+    ]
+
 res = building.detailed_airborne_prediction(
     bands, direct_index=building.direct_reduction_index(el.sound_reduction_index,
                                                         delta_r_source=delta),
@@ -410,11 +456,13 @@ The impact side of the same building runs on the same `situ` dictionary:
 ```python
 from phonometry import building
 
+k_floor_ext = building.junction_vibration_reduction("rigid_t", "corner", 484.0 / 219.0)
+k_floor_int = building.junction_vibration_reduction("rigid_cross", "corner", 360.0 / 484.0)
 direct = building.direct_impact_level(situ["floor"].impact_level, delta_l=delta)
 flanking = [
     building.impact_flanking_path(label=f"Df{tag}", floor=situ["floor"], element_j=situ[name],
                                   vibration_reduction_index=(
-                             k["floor-ext"] if name.startswith("ext") else k["floor-int"]),
+                             k_floor_ext if name.startswith("ext") else k_floor_int),
                                   coupling_length=lij, delta_l=delta)
     for tag, name, lij in (("1", "ext1", 4.0), ("2", "ext2", 5.0),
                            ("3", "int1", 4.0), ("4", "int2", 5.0))
@@ -566,8 +614,8 @@ which each path peaks. Both need the ISO 717 rating, so the spectrum must cover
 100 Hz to 3150 Hz (or 125 Hz to 2000 Hz in octaves).
 
 ```python
-airborne.report("airborne-prediction.pdf")   # R'w, thirteen paths
-impact.report("impact-prediction.pdf")       # L'n,w, five paths
+res.report("airborne-prediction.pdf")   # R'w, thirteen paths
+imp.report("impact-prediction.pdf")     # L'n,w, five paths
 ```
 
 The example fiches are regenerated with `make reports` and kept rendered in the

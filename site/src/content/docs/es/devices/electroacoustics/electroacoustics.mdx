@@ -200,15 +200,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import electroacoustics
 
-fs = 48000
-n = fs                     # 1 s -> bins de 1 Hz; los armónicos caen en bins
-t = np.arange(n) / fs
+fs_hd = 48000
+n = fs_hd                  # 1 s -> bins de 1 Hz; los armónicos caen en bins
+t = np.arange(n) / fs_hd
 f0 = 1000.0
 amps = {1: 1.0, 2: 0.02, 3: 0.012, 4: 0.006, 5: 0.003}
 sig = sum(a * np.sin(2 * np.pi * k * f0 * t) for k, a in amps.items())
 sig = sig + np.random.default_rng(2026).standard_normal(n) * 1.2e-2
 
-res = electroacoustics.harmonic_analysis(sig, fs, f0, n_harmonics=len(amps))
+res = electroacoustics.harmonic_analysis(sig, fs_hd, f0, n_harmonics=len(amps))
 res.plot(language="es")
 plt.show()
 ```
@@ -358,7 +358,7 @@ from phonometry import electroacoustics
 # de modo que 1.0 sea plena escala digital.
 dr = electroacoustics.dynamic_range(output, fs, 997.0)     # dB CCIR-RMS
 # Ruido de canal en reposo: captura la salida con entrada de cero digital.
-idle = electroacoustics.idle_channel_noise(idle_output, fs)  # dBFS CCIR-RMS
+icn = electroacoustics.idle_channel_noise(idle_output, fs)  # dBFS CCIR-RMS
 ```
 
 Ambas se miden a través de la banda AES17 (un paso alto de 20 Hz más el paso
@@ -480,12 +480,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import electroacoustics
 
-fs = 48000
-t = np.arange(fs) / fs                        # 1 s -> los tonos caen en bins de la FFT
-x = np.sin(2 * np.pi * 60.0 * t) + 0.25 * np.sin(2 * np.pi * 7000.0 * t)
-signal = x + 0.04 * x**2 + 0.012 * x**3       # salida de un dispositivo débilmente no lineal
+fs_md = 48000
+t = np.arange(fs_md) / fs_md                  # 1 s -> los tonos caen en bins de la FFT
+src = np.sin(2 * np.pi * 60.0 * t) + 0.25 * np.sin(2 * np.pi * 7000.0 * t)
+sig = src + 0.04 * src**2 + 0.012 * src**3    # salida de un dispositivo débilmente no lineal
 
-md = electroacoustics.modulation_distortion(signal, fs, f_low=60.0, f_high=7000.0)
+md = electroacoustics.modulation_distortion(sig, fs_md, f_low=60.0, f_high=7000.0)
 md.plot(language="es")
 plt.show()
 ```
@@ -517,11 +517,11 @@ import numpy as np
 # `electroacoustics` importado arriba; 96 kHz para que los productos DIM sigan en banda.
 fs_im = 96000
 t = np.arange(fs_im) / fs_im                 # 1 s -> cada tono cae en un bin
-x = 0.5 * (np.sin(2 * np.pi * 13000.0 * t) + np.sin(2 * np.pi * 14000.0 * t))
-y = x + 0.05 * x**2 + 0.02 * x**3            # la misma no linealidad débil
+src = 0.5 * (np.sin(2 * np.pi * 13000.0 * t) + np.sin(2 * np.pi * 14000.0 * t))
+sig = src + 0.05 * src**2 + 0.02 * src**3    # la misma no linealidad débil
 print(
     electroacoustics.difference_frequency_distortion(
-        y, fs_im, f1=13e3, f2=14e3, order=2
+        sig, fs_im, f1=13e3, f2=14e3, order=2
     )
 )
 ```
@@ -608,11 +608,11 @@ import numpy as np
 from scipy import signal as sp
 from phonometry import electroacoustics
 
-fs = 48000
+fs_fr = 48000
 n = 400000
 rng = np.random.default_rng(7)
 clean_x = rng.standard_normal(n)
-b, a = sp.butter(2, [400.0, 4000.0], btype="band", fs=fs)   # dispositivo bajo ensayo
+b, a = sp.butter(2, [400.0, 4000.0], btype="band", fs=fs_fr)   # dispositivo bajo ensayo
 clean_y = sp.lfilter(b, a, clean_x)
 
 # Las dos columnas: el mismo camino, con el ruido pasado de un canal al otro.
@@ -627,9 +627,9 @@ cases = (("Ruido en la salida: H1 es insesgado", clean_x, y_out),
 fig, axes = plt.subplots(2, 2, figsize=(11.4, 7.6), sharex=True,
                          gridspec_kw={"height_ratios": [2.0, 1.0]})
 for col, (title, xx, yy) in enumerate(cases):
-    h1 = electroacoustics.transfer_function(xx, yy, fs, estimator="H1")
-    h2 = electroacoustics.transfer_function(xx, yy, fs, estimator="H2")
-    _, h_true = sp.freqz(b, a, worN=h1.frequencies, fs=fs)
+    h1 = electroacoustics.transfer_function(xx, yy, fs_fr, estimator="H1")
+    h2 = electroacoustics.transfer_function(xx, yy, fs_fr, estimator="H2")
+    _, h_true = sp.freqz(b, a, worN=h1.frequencies, fs=fs_fr)
     pos = h1.frequencies > 0.0
     freqs = h1.frequencies[pos]
 
@@ -649,7 +649,7 @@ for col, (title, xx, yy) in enumerate(cases):
     ax_coh.semilogx(freqs, h1.coherence[pos], label="medida")
     ax_coh.semilogx(freqs, snr / (1.0 + snr), ":", label="SNR / (1 + SNR)")
     ax_coh.axhline(0.9, ls="--", lw=1.0)
-    ax_coh.set(xlabel="Frecuencia [Hz]", ylim=(0.0, 1.05), xlim=(20.0, fs / 2))
+    ax_coh.set(xlabel="Frecuencia [Hz]", ylim=(0.0, 1.05), xlim=(20.0, fs_fr / 2))
     ax_coh.legend(fontsize=8)
 axes[0][0].set_ylabel("Magnitud [dB]")
 axes[1][0].set_ylabel("Coherencia")

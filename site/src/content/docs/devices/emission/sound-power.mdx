@@ -319,11 +319,12 @@ measured sound power:
 
 ```python
 import numpy as np
-import phonometry as ph
+from phonometry import emission
 from phonometry import ReportMetadata
 
-# ... a measured LWA from ISO 3744 ...
-result = ph.sound_power_pressure(levels, "hemisphere", radius=1.0,
+# ISO 3744: SPL at 10 positions on a hemisphere, r = 1 m (10 lg(S/S0) = 8 dB).
+levels = np.tile(lw_true - 8.0, (10, 1))
+result = emission.sound_power_pressure(levels, "hemisphere", radius=1.0,
                                  frequencies=freqs)
 
 declaration = result.declare(
@@ -344,17 +345,17 @@ Or build the declaration directly, reproducing the ISO 4871 Annex B example
 declared $L_{W\mathrm{Ad}} = 90$ and 97 dB):
 
 ```python
-mode1 = ph.OperatingModeDeclaration(
+mode1 = emission.OperatingModeDeclaration(
     "Operating mode 1", sound_power_level=88.0, sound_power_uncertainty=2.0,
     emission_pressure_level=78.0, emission_pressure_uncertainty=2.0,
     verification_level=89.0,          # passes: 89 <= 90
 )
-mode2 = ph.OperatingModeDeclaration(
+mode2 = emission.OperatingModeDeclaration(
     "Operating mode 2", sound_power_level=95.0, sound_power_uncertainty=2.0,
     emission_pressure_level=86.0, emission_pressure_uncertainty=2.0,
     verification_level=98.0,          # fails: 98 > 97
 )
-ph.NoiseEmissionDeclaration(
+emission.NoiseEmissionDeclaration(
     (mode1, mode2), machine="Type 990, Model 11-TC",
     basic_standards=("ISO 3744", "ISO 11202"), form="dual-number",
 ).report("iso4871.pdf")

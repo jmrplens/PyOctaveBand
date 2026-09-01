@@ -177,18 +177,20 @@ tone = np.sin(2 * np.pi * 4000 * t)
 # Steady-state Fast reference of the continuous tone
 reference = filters.time_weighting(tone, fs, mode='fast')[int(1.5 * fs):].mean()
 
-# 200 ms burst of the same tone (IEC 61672-1 Table 4 target: -1.0 dB)
-burst = np.zeros_like(t)
-burst[int(0.5 * fs):int(0.7 * fs)] = tone[int(0.5 * fs):int(0.7 * fs)]
-envelope = filters.time_weighting(burst, fs, mode='fast')
-env_db = 10 * np.log10(np.maximum(envelope / reference, 1e-6))
-
-plt.figure()
-plt.plot(t, env_db, label='Fast envelope')
-plt.axhline(-1.0, linestyle='--', label='IEC target −1.0 dB')
-plt.xlabel('Time [s]')
-plt.ylabel('Level re steady state [dB]')
-plt.legend()
+# The three Table 4 rows the published figure draws, with their targets
+cases = [(0.200, -1.0), (0.050, -4.8), (0.010, -11.1)]
+fig, axes = plt.subplots(len(cases), 1, sharey=True, figsize=(8, 8))
+for ax, (t_b, target) in zip(axes, cases):
+    burst = np.zeros_like(t)
+    stop = int(0.5 * fs) + int(t_b * fs)
+    burst[int(0.5 * fs):stop] = tone[int(0.5 * fs):stop]
+    envelope = filters.time_weighting(burst, fs, mode='fast')
+    env_db = 10 * np.log10(np.maximum(envelope / reference, 1e-6))
+    ax.plot(t, env_db, label=f'Fast envelope, {t_b * 1e3:.0f} ms burst')
+    ax.axhline(target, linestyle='--', label=f'IEC target {target} dB')
+    ax.set_ylabel('Level re steady state [dB]')
+    ax.legend(loc='upper right')
+axes[-1].set_xlabel('Time [s]')
 plt.show()
 ```
 

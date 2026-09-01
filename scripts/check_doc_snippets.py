@@ -70,22 +70,15 @@ _SKIP: dict[str, str] = {
     # one an earlier block still relies on. Reading order and running order
     # are not the same thing on these pages, and that is the author's call.
     "aircraft-noise": "excerpt: starts from the spl of the prose",
-    "correlation-delay": "excerpt: starts from the record of the prose",
-    "detailed-prediction": "excerpt: starts from the paths of the prose",
+    "detailed-prediction": "excerpt: starts from the measured spectra of the prose",
     "electroacoustics": "excerpt: starts from the captured signal of the prose",
-    "impulsive-sound": "excerpt: starts from the recording of the prose",
-    "intensity": "excerpt: starts from the band levels of the prose",
     "panel-sound-insulation": "excerpt: two scenarios share a variable name",
     "room-to-room": "excerpt: two scenarios share the band vector name",
     "rotorcraft-noise": "excerpt: starts from the measured spectrum",
-    "sound-power": "excerpt: starts from the surface levels of the prose",
     "spectral-analysis": "excerpt: starts from the record of the prose",
-    "swept-sine-distortion": "excerpt: starts from the captured response",
     "synchronous-averaging": "excerpt: a later block shortens the record an "
     "earlier one averages",
-    "time-frequency": "excerpt: starts from the record of the prose",
     "time-weighting": "excerpt: starts from the block stream of the prose",
-    "underwater-acoustics": "excerpt: starts from the hydrophone record",
 }
 
 #: Timeout per page, generous enough for the FDTD and ECMA pages.

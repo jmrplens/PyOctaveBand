@@ -382,6 +382,41 @@ by standard: one plotting module holds the figures of a dozen of them, so the
 file is not the scope in which a letter has one meaning. The guide that embeds
 the figure is, and its snippets are read here.
 
+### 8. Writing the code fences of a documentation page
+
+The Python fences of one page form **one sequential example**: a later fence
+may use names an earlier fence defined, so a page can build a result step by
+step without repeating a prelude in every block. Two rules keep that
+readable, and the first is enforced in CI by
+[`scripts/check_fence_names.py`](scripts/check_fence_names.py)
+(`make fence-names`):
+
+1. **A fence may only use names defined by an earlier fence of the same
+   page** — never a later one, never another page. One shipped page used
+   names its own figure block defined further down, while a same-named
+   variable from a different room sat in scope, so reading the page top to
+   bottom produced numbers that were not the annotated ones, with no visible
+   error. That is the failure mode the gate exists for.
+2. **When a value carries an annotated output** (`# 62.9 dB`), the fence
+   that annotates should define it itself or stand right after the fence
+   that does, not a section away. This one is editorial: no script can tell
+   which values matter.
+
+Names the reader owns — their measurement, their recording, their stream —
+are deliberately never defined by the page, because inventing a value would
+replace the reader's data with the page's. Register each one in the
+`PLACEHOLDERS` table at the top of the script, keyed by the page's route
+with the `es/` prefix stripped, so the Spanish twin is held to the same set;
+the page must introduce the name as the reader's own, in prose or in the
+fence's own marker comment (`# audio_blocks: successive frames of your
+microphone recording`), which travels with the code wherever the fence is
+copied. Binding the name to `...` (Ellipsis) with the same comment is the
+older idiom and also valid: it defines the name, so no registry line is
+needed, at the price of a fence that cannot run. A page's language twins
+(site English, site Spanish, `docs/` mirror) are fixed together, never one
+at a time; the `docs/` mirror is hand-written for GitHub and may carry fewer
+examples, but what it does carry follows the same rules.
+
 ## 🏷️ Naming Conventions
 
 All identifiers follow PEP 8 with the project-specific rules below (validated

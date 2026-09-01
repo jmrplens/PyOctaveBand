@@ -41,8 +41,13 @@ continuous with their measured corners.
 import numpy as np
 from phonometry import aircraft
 
-# A hemisphere: band levels of shape (azimuth, polar, frequency) at 60 m.
-h = aircraft.RotorcraftHemisphere(frequencies=freqs, azimuth=phi, polar=theta, levels=levels)
+# A hemisphere: band levels of shape (azimuth, polar, frequency) at 60 m. The
+# band centres and the angle grid are the NORAH format's; the (19, 19, 31)
+# block of levels is the campaign's own.
+freqs = 1000.0 * 10.0 ** (np.arange(-20, 11) / 10.0)   # 10 Hz-10 kHz thirds
+phi, theta = np.arange(-90.0, 91.0, 10.0), np.arange(0.0, 181.0, 10.0)
+h = aircraft.RotorcraftHemisphere(frequencies=freqs, azimuth=phi, polar=theta,
+                                  levels=measured_levels)
 h.plot()                                   # fore-aft directivity (needs matplotlib)
 lv = aircraft.hemisphere_source_level(h, 0.0, 90.0)   # level per band abeam-below
 ```
@@ -79,16 +84,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import aircraft
 
-freqs = 1000.0 * 10.0 ** (np.arange(-13, 11) / 10.0)   # 50 Hz-10 kHz thirds
+f_thirds = 1000.0 * 10.0 ** (np.arange(-13, 11) / 10.0)   # 50 Hz-10 kHz thirds
 hs, hr, dp = 150.0, 1.5, 500.0                          # overflight geometry
-grass = aircraft.ground_effect_adjustment(freqs, hs, hr, dp, flow_resistivity="D")
-asphalt = aircraft.ground_effect_adjustment(freqs, hs, hr, dp, flow_resistivity="G")
+grass = aircraft.ground_effect_adjustment(f_thirds, hs, hr, dp, flow_resistivity="D")
+asphalt = aircraft.ground_effect_adjustment(f_thirds, hs, hr, dp, flow_resistivity="G")
 
 fig, ax = plt.subplots()
 ax.axhline(0.0, color="0.5", linewidth=1.0)
-ax.semilogx(freqs, asphalt, marker="o", markersize=3,
+ax.semilogx(f_thirds, asphalt, marker="o", markersize=3,
             label="Hard (asphalt/concrete, class G)")
-ax.semilogx(freqs, grass, marker="s", markersize=3,
+ax.semilogx(f_thirds, grass, marker="s", markersize=3,
             label="Soft (grass/pasture, class D)")
 ax.set(xlabel="One-third-octave-band centre frequency [Hz]",
        ylabel="Ground-effect adjustment ΔLg [dB]",
@@ -101,10 +106,8 @@ plt.show()
 </details>
 
 ```python
-import numpy as np
 from phonometry import aircraft
 
-freqs = 1000.0 * 10.0 ** (np.arange(-13, 11) / 10.0)   # 50 Hz-10 kHz thirds
 r = 500.0
 received = (lv
             + aircraft.spherical_spreading_adjustment(r)

@@ -57,6 +57,7 @@ from phonometry import electroacoustics
 fs, f1, f2, seconds = 48000, 20.0, 6000.0, 4.0
 x = electroacoustics.synchronized_sweep_signal(fs, f1, f2, seconds)   # play this...
 # ... record the device response into `y` (include the decay tail) ...
+y = x + 0.12 * x**2 + 0.08 * x**3     # a memoryless cubic stands in for the recording
 res = electroacoustics.swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3)
 
 res.harmonic_responses    # complex H1..H3 on res.frequencies
@@ -162,6 +163,7 @@ filter.
 from phonometry import electroacoustics, room
 
 x = room.sweep_signal(fs, f1, f2, seconds)          # the ISO 18233 ESS
+y = x + 0.12 * x**2 + 0.08 * x**3                   # the same cubic, recorded from the ESS
 res = electroacoustics.swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, method="farina")
 res.plot()   # same |Hn| + THD(f) panels as the synchronized method (needs matplotlib)
 ```
@@ -191,7 +193,17 @@ all-pass parts:
 
 ```python
 import numpy as np
+from scipy import signal as sp_signal
 from phonometry import signals
+
+gain_a = 10.0 ** (6.0 / 40.0)          # the measured device: a +6 dB peaking EQ
+w0 = 2.0 * np.pi * 1000.0 / fs         # at 1 kHz, Q = 1, through a 2.5 ms latency
+alpha = np.sin(w0) / 2.0
+b = np.array([1 + alpha * gain_a, -2 * np.cos(w0), 1 - alpha * gain_a])
+a = np.array([1 + alpha / gain_a, -2 * np.cos(w0), 1 - alpha / gain_a])
+imp = np.zeros(16384)
+imp[int(0.0025 * fs)] = 1.0
+ir = sp_signal.lfilter(b / a[0], a / a[0], imp)
 
 H = np.fft.rfft(ir)                    # one-sided response, DC..Nyquist
 h_min = signals.minimum_phase(np.abs(H))       # phase from the magnitude alone

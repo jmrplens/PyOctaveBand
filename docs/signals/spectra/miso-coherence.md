@@ -162,9 +162,12 @@ The ordinary and multiple coherences do not depend on the conditioning order,
 but the partial coherences and the coherent-output decomposition do: each
 input is conditioned on whatever precedes it. Absent a physical ordering,
 Bendat & Piersol (Section 7.2.4) recommend ordering the inputs by descending
-ordinary coherence with the output. Pass `order` to choose:
+ordinary coherence with the output. Suppose a third, weakly coupled source is
+recorded alongside the two above, coherent with neither. Pass `order` to
+choose:
 
 ```python
+x3 = signals.noise_signal(fs, 32.0, color="white", seed=4)   # the third, weak source
 res = signals.miso_coherence([x1, x2, x3], y, fs, order=(2, 0, 1))
 res.order            # (2, 0, 1): the order actually applied
 res.plot()           # the two panels, recomputed in the applied order

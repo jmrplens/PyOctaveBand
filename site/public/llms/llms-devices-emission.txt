@@ -285,11 +285,12 @@ and renders the ISO 4871 fiche through `.report()`. The quickest route is to
 
 ```python
 import numpy as np
-import phonometry as ph
+from phonometry import emission
 from phonometry import ReportMetadata
 
-# ... a measured LWA from ISO 3744 ...
-result = ph.sound_power_pressure(levels, "hemisphere", radius=1.0,
+# ISO 3744: SPL at 10 positions on a hemisphere, r = 1 m (10 lg(S/S0) = 8 dB).
+levels = np.tile(lw_true - 8.0, (10, 1))
+result = emission.sound_power_pressure(levels, "hemisphere", radius=1.0,
                                  frequencies=freqs)
 
 declaration = result.declare(
@@ -310,17 +311,17 @@ Or build the declaration directly, reproducing the ISO 4871 Annex B example
 declared $L_{W\mathrm{Ad}} = 90$ and 97 dB):
 
 ```python
-mode1 = ph.OperatingModeDeclaration(
+mode1 = emission.OperatingModeDeclaration(
     "Operating mode 1", sound_power_level=88.0, sound_power_uncertainty=2.0,
     emission_pressure_level=78.0, emission_pressure_uncertainty=2.0,
     verification_level=89.0,          # passes: 89 <= 90
 )
-mode2 = ph.OperatingModeDeclaration(
+mode2 = emission.OperatingModeDeclaration(
     "Operating mode 2", sound_power_level=95.0, sound_power_uncertainty=2.0,
     emission_pressure_level=86.0, emission_pressure_uncertainty=2.0,
     verification_level=98.0,          # fails: 98 > 97
 )
-ph.NoiseEmissionDeclaration(
+emission.NoiseEmissionDeclaration(
     (mode1, mode2), machine="Type 990, Model 11-TC",
     basic_standards=("ISO 3744", "ISO 11202"), form="dual-number",
 ).report("iso4871.pdf")
@@ -1961,6 +1962,19 @@ back **per band**, and the result is plottable in one line, the form in which
 the criteria are actually checked (each band passes or fails on its own):
 
 ```python
+# The scan the figure below is drawn from: ten positions over six octave
+# bands, a nearly uniform surface pressure, and a normal intensity per band
+# that turns the field reactive towards low frequency, with two inward-flowing
+# positions in the 125 Hz band (rescaled so the band mean keeps its target).
+freqs = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+delta_pi = np.array([10.5, 8.5, 6.0, 4.5, 3.5, 3.0])   # target Lp − L|In|
+rng = np.random.default_rng(9614)
+lp_bands = 78.0 + rng.normal(0.0, 0.4, (10, freqs.size))
+i_mean = 10.0 ** ((78.0 - delta_pi) / 10.0) * 1.0e-12
+in_bands = i_mean[None, :] * (1.0 + rng.normal(0.0, 0.18, (10, freqs.size)))
+in_bands[:2, 0] = -0.35 * i_mean[0]
+in_bands[2:, 0] *= (10.0 * i_mean[0] - in_bands[:2, 0].sum()) / in_bands[2:, 0].sum()
+
 fi = emission.field_indicators(lp_bands, in_bands, freqs)   # (positions, bands)
 fi.plot(dynamic_capability=ld)   # F2/F3 per band vs Ld, F4 on a twin axis (needs matplotlib)
 ```
@@ -2074,17 +2088,17 @@ masks band by band and returns the class the chain actually meets:
 the loosest class every band clears, or `None` when some band clears neither:
 
 ```python
-from phonometry import metrology
+from phonometry import emission
 
 # The band centres Table 2 is defined on, and the measured residual index of
 # the chain: one value per band, taken with the spacer that will be fitted in
 # the field. Replace the placeholder with your own residual-intensity test.
-freqs, _, _ = metrology.residual_index_limits("instrument", spacing=0.012)
+freqs, _, _ = emission.residual_index_limits("instrument", spacing=0.012)
 measured_delta_pi0 = [11.0, 11.9, 11.2, 10.0, 13.2, 15.9, 17.0, 18.0,
                       19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 24.0, 24.0,
                       24.0, 24.0, 24.0, 24.0, 24.0, 24.0]   # dB, 22 bands
 
-res = metrology.intensity_class_compliance(measured_delta_pi0, freqs,
+res = emission.intensity_class_compliance(measured_delta_pi0, freqs,
                                            device="instrument", spacing=0.012)
 print(res.overall_class)          # 2: one band misses the class 1 minimum
 print(res.binding_margin())       # smallest per-band margin to that class [dB]
@@ -2109,7 +2123,7 @@ whole chain is graded class 2.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import metrology
+from phonometry import emission
 
 # A complete instrument with the common 12 mm spacer. The measured index is
 # modelled from the physics behind Table 2: a residual phase mismatch φs reads
@@ -2117,13 +2131,13 @@ from phonometry import metrology
 # climbs 10 dB per decade, and above 1 kHz the mismatch of a real chain grows
 # with frequency, so the index levels off.
 spacing = 0.012
-freqs, _, _ = metrology.residual_index_limits("instrument", spacing=spacing)
+freqs, _, _ = emission.residual_index_limits("instrument", spacing=spacing)
 phase_mismatch = 0.05 * np.maximum(1.0, freqs / 1000.0)          # degrees
-measured = metrology.residual_index_from_phase_mismatch(phase_mismatch, freqs,
+measured = emission.residual_index_from_phase_mismatch(phase_mismatch, freqs,
                                                         spacing)
 measured = measured - 4.0 * np.exp(-((np.log(freqs / 100.0) / 0.25) ** 2))
 
-res = metrology.intensity_class_compliance(measured, freqs, spacing=spacing)
+res = emission.intensity_class_compliance(measured, freqs, spacing=spacing)
 res.plot()
 plt.show()
 ```
@@ -2160,14 +2174,14 @@ $$
 and the two conversions run both ways:
 
 ```python
-from phonometry import metrology
+from phonometry import emission
 
 # 20 dB of residual index at 1 kHz over a 25 mm spacer:
-phi = metrology.phase_mismatch_from_residual_index(20.0, 1000.0, 0.025)
+phi = emission.phase_mismatch_from_residual_index(20.0, 1000.0, 0.025)
 print(round(float(phi), 2))     # 0.26 degrees, a hundredth of kd
 
 # And back, for a chain whose channels are matched to 0.05°:
-print(round(float(metrology.residual_index_from_phase_mismatch(
+print(round(float(emission.residual_index_from_phase_mismatch(
     0.05, 1000.0, 0.012)), 1))  # 24.0 dB
 ```
 

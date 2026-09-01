@@ -306,6 +306,20 @@ forma en la que realmente se comprueban los criterios (cada banda aprueba o
 falla por sí sola):
 
 ```python
+# El barrido del que sale la figura de abajo: diez posiciones sobre seis
+# bandas de octava, con la presión de superficie casi uniforme y una
+# intensidad normal por banda que vuelve reactivo el campo hacia baja
+# frecuencia, con dos posiciones de flujo entrante en la banda de 125 Hz
+# (reescaladas para que la media de la banda conserve su objetivo).
+freqs = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+delta_pi = np.array([10.5, 8.5, 6.0, 4.5, 3.5, 3.0])   # objetivo Lp − L|In|
+rng = np.random.default_rng(9614)
+lp_bands = 78.0 + rng.normal(0.0, 0.4, (10, freqs.size))
+i_mean = 10.0 ** ((78.0 - delta_pi) / 10.0) * 1.0e-12
+in_bands = i_mean[None, :] * (1.0 + rng.normal(0.0, 0.18, (10, freqs.size)))
+in_bands[:2, 0] = -0.35 * i_mean[0]
+in_bands[2:, 0] *= (10.0 * i_mean[0] - in_bands[:2, 0].sum()) / in_bands[2:, 0].sum()
+
 fi = emission.field_indicators(lp_bands, in_bands, freqs)   # (posiciones, bandas)
 fi.plot(dynamic_capability=ld)   # F2/F3 por banda frente a Ld, F4 en eje gemelo (requiere matplotlib)
 ```
@@ -482,17 +496,17 @@ lleva la clase que la cadena cumple realmente: la clase más laxa que superan
 todas las bandas, o `None` cuando alguna banda no supera ninguna de las dos.
 
 ```python
-from phonometry import metrology
+from phonometry import emission
 
 # Las frecuencias centrales sobre las que se define la tabla 2, y el índice
 # residual medido de la cadena: un valor por banda, tomado con el espaciador que
 # se montará en campo. Sustituye el marcador por tu propio ensayo residual.
-freqs, _, _ = metrology.residual_index_limits("instrument", spacing=0.012)
+freqs, _, _ = emission.residual_index_limits("instrument", spacing=0.012)
 measured_delta_pi0 = [11.0, 11.9, 11.2, 10.0, 13.2, 15.9, 17.0, 18.0,
                       19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 24.0, 24.0,
                       24.0, 24.0, 24.0, 24.0, 24.0, 24.0]   # dB, 22 bandas
 
-res = metrology.intensity_class_compliance(measured_delta_pi0, freqs,
+res = emission.intensity_class_compliance(measured_delta_pi0, freqs,
                                            device="instrument", spacing=0.012)
 print(res.overall_class)          # 2: una banda no llega al mínimo de clase 1
 print(res.binding_margin())       # menor margen por banda hasta esa clase [dB]
@@ -519,7 +533,7 @@ clase 2.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import metrology
+from phonometry import emission
 
 # Un instrumento completo con el espaciador habitual de 12 mm. El índice medido
 # se modela a partir de la física que hay tras la tabla 2: un desfase residual
@@ -527,13 +541,13 @@ from phonometry import metrology
 # grados ya sube 10 dB por década y, por encima de 1 kHz, el desfase de una
 # cadena real crece con la frecuencia y el índice se aplana.
 spacing = 0.012
-freqs, _, _ = metrology.residual_index_limits("instrument", spacing=spacing)
+freqs, _, _ = emission.residual_index_limits("instrument", spacing=spacing)
 phase_mismatch = 0.05 * np.maximum(1.0, freqs / 1000.0)          # grados
-measured = metrology.residual_index_from_phase_mismatch(phase_mismatch, freqs,
+measured = emission.residual_index_from_phase_mismatch(phase_mismatch, freqs,
                                                         spacing)
 measured = measured - 4.0 * np.exp(-((np.log(freqs / 100.0) / 0.25) ** 2))
 
-res = metrology.intensity_class_compliance(measured, freqs, spacing=spacing)
+res = emission.intensity_class_compliance(measured, freqs, spacing=spacing)
 res.plot()
 plt.show()
 ```
@@ -577,14 +591,14 @@ $$
 y las dos conversiones funcionan en ambos sentidos:
 
 ```python
-from phonometry import metrology
+from phonometry import emission
 
 # 20 dB de índice residual a 1 kHz con un espaciador de 25 mm:
-phi = metrology.phase_mismatch_from_residual_index(20.0, 1000.0, 0.025)
+phi = emission.phase_mismatch_from_residual_index(20.0, 1000.0, 0.025)
 print(round(float(phi), 2))     # 0.26 grados, una centésima de kd
 
 # Y a la inversa, para una cadena con los canales emparejados a 0,05°:
-print(round(float(metrology.residual_index_from_phase_mismatch(
+print(round(float(emission.residual_index_from_phase_mismatch(
     0.05, 1000.0, 0.012)), 1))  # 24.0 dB
 ```
 

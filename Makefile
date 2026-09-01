@@ -139,6 +139,15 @@ subscripts:
 decimal-comma:
 	$(PYTHON) scripts/check_decimal_comma.py
 
+# The Python fences of a documentation page form one sequential example, and
+# one shipped page used names its own figure block defined further down --
+# while a same-named variable from a different room sat in scope, so reading
+# top to bottom produced numbers that were not the annotated ones. This reads
+# every page's fences in order and fails on a name no earlier fence defined,
+# unless the page registers it as a reader-owned placeholder. Stdlib only.
+fence-names:
+	$(PYTHON) scripts/check_fence_names.py
+
 # The Spanish variant of a figure is the English one with its strings looked
 # up in a table at save time, so a string nobody added to the table ships in
 # English inside `X_es.svg` and every other gate stays green: the page is
@@ -369,4 +378,4 @@ check: lint security test
 	figure-annotations figures reports \
 	animations animation-freshness posters brand lighthouse \
 	llms pypi-readme api-docs site-reports conformance install-hooks test test-perf test-gpu coverage check \
-	snippets snippets-static claims subscripts
+	snippets snippets-static claims subscripts fence-names decimal-comma
