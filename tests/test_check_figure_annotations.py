@@ -1331,7 +1331,9 @@ def test_a_child_forked_after_the_parent_recorded_still_writes_its_own_fragment(
 
 
 def test_a_recording_one_fragment_short_is_refused_rather_than_passed(
-    capsys: pytest.CaptureFixture[str], tmp_path: pathlib.Path
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: pathlib.Path,
 ) -> None:
     """The failure mode a lost fragment would produce, and what it costs.
 
@@ -1340,7 +1342,15 @@ def test_a_recording_one_fragment_short_is_refused_rather_than_passed(
     gate: the same directory passes whole and is refused with one fragment
     removed. So the worst a lost fragment can do is stop the run, not let a
     defect through.
+
+    Isolated from the committed exemptions file: a full audit marks every
+    exemption without hits stale, and these synthetic fragments hit nothing,
+    so the first legitimate entry in that file would otherwise fail a test
+    that is about fragments.
     """
+    empty = tmp_path / "exemptions.txt"
+    empty.write_text("", encoding="utf-8")
+    monkeypatch.setattr(check, "EXEMPTIONS", empty)
     directory = tmp_path / "rec"
     directory.mkdir()
     drawings = sorted(check.committed_figures())
