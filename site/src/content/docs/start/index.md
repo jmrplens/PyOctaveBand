@@ -9,7 +9,7 @@ define them — ISO, IEC, ANSI and ASTM, the CNOSSOS-EU annex to Directive
 the clause it implements. What that buys you, and how it is checked, is
 [Why phonometry](/phonometry/start/why-phonometry/).
 
-Five short pages, meant to be read once before anything else. Each answers one
+Six short pages, meant to be read once before anything else. Each answers one
 question, and they are in the order the questions arrive.
 
 **Can I install it and get a number out?**
@@ -43,6 +43,9 @@ tone-burst check worked through against the acceptance limits.
 **Who is answerable for it, and how do I cite it?**
 [About](/phonometry/start/about/) states who maintains it, how to cite it and
 under what licence.
+
+[Support the project](/phonometry/start/support/) lists the ways to help,
+starting with the primary sources the library still lacks.
 
 ## Two things to settle before any guide works
 

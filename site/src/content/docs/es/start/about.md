@@ -201,4 +201,6 @@ biblioteca entera agrupada por temas. Si has venido a comprobar un número y no
 a instalar nada, el [informe de
 conformidad](/phonometry/es/reference/conformance/) y el [registro de
 erratas](/phonometry/es/reference/errata/) son las dos páginas que responden a
-eso.
+eso. Y si el proyecto te resulta útil,
+[Apoya el proyecto](/phonometry/es/start/support/) cuenta cómo ayudar,
+empezando por las fuentes que aún le faltan.

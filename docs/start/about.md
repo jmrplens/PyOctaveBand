@@ -179,4 +179,6 @@ substitute for buying the documents.
 calibrated analysis, and [All guides](../README.md) is the map of the whole
 library grouped by topic. To check a number rather than install anything, the
 [conformance report](../CONFORMANCE.md) and the [errata registry](../ERRATA.md)
-are the two pages that answer that.
+are the two pages that answer that. And if the project is useful to you,
+[Support the project](support.md) says how to help, starting with the sources
+it still lacks.

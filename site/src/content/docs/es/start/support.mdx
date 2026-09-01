@@ -1,0 +1,70 @@
+---
+title: "Apoya el proyecto"
+description: "Cómo apoyar phonometry: reportar números que no cuadren, patrocinar el trabajo y ayudar a conseguir las fuentes primarias que han resistido todas las vías legítimas de adquisición."
+---
+
+phonometry lo mantiene una persona, y su coste real no es el alojamiento ni
+las herramientas: son las fuentes primarias. Cada métrica de la biblioteca se
+implementa a partir del propio texto de la norma que la rige, y las normas son
+documentos de pago que se descatalogan, se sustituyen y a veces resisten todas
+las vías legítimas de adquisición que existen. Esta página lista las maneras
+de ayudar, de la gratuita a la concreta.
+
+## Úsala, y dime cuándo un número no cuadra
+
+El apoyo más barato es usar la biblioteca y reportar el número que no coincide
+con tu referencia. Un reporte que nombre una norma y un apartado es la
+incidencia más valiosa que recibe este proyecto: el
+[registro de erratas](/phonometry/es/reference/errata/) existe porque las
+fuentes se leen con lupa, y varias de sus entradas empezaron como la ceja
+levantada de un usuario.
+[Abre una incidencia](https://github.com/jmrplens/phonometry/issues) con lo
+que mediste y lo que esperabas.
+
+## Patrocina
+
+[GitHub Sponsors](https://github.com/sponsors/jmrplens) financia el proyecto
+directamente, y el dinero va a donde está el coste: comprar las normas y
+ediciones de las que se escriben las implementaciones. Un patrocinio puntual
+que nombre uno de los documentos de abajo compra exactamente ese documento, y
+la entrada sale de la tabla cuando llega.
+
+## Las fuentes que no he podido conseguir
+
+Todo lo de abajo se interpone entre la biblioteca y trabajo que de otro modo
+haría. Cada entrada ha sobrevivido al esfuerzo de adquisición completo: mi
+propia biblioteca, las tiendas oficiales, los índices de acceso abierto y
+todos los demás canales legítimos que he encontrado, revisado de nuevo en la
+fecha indicada. Ayudan tres vías:
+
+- **Financiar la compra.** Un patrocinio puntual que nombre el documento;
+  donde un enlace va a una tienda oficial, el precio está en esa página, y
+  para el resto nombra el ítem y te doy el precio en la incidencia.
+- **Verificar contra tu copia con licencia.** Si tu laboratorio o tu empresa
+  ya tiene una, puedes cotejar la implementación y sus valores de referencia
+  contra tu copia sin enviarme nada. El repositorio nunca redistribuye
+  documentos; lo que entra en el árbol son los valores numéricos derivados,
+  que es como está construida la
+  [batería de conformidad](/phonometry/es/reference/conformance/).
+- **Señalarme un canal que se me haya escapado.** Una biblioteca de préstamo,
+  la copia del propio autor de una tesis, un archivo de actas que de verdad
+  resuelva.
+  [Abre una incidencia](https://github.com/jmrplens/phonometry/issues).
+
+Hay una vía que no ayuda: enviar escaneos o PDF de documentos de pago. No
+puedo aceptarlos, y la credibilidad del proyecto descansa en que sus fuentes
+estén limpias.
+
+| Fuente | Qué desbloquearía | Última revisión |
+| :--- | :--- | :--- |
+| [IEC 60268-16:2020 (Ed. 5)](https://webstore.iec.ch/en/publication/26771) | La edición vigente del STI. La biblioteca implementa la cadena de la Ed. 4, numéricamente idéntica, y tiene las vistas previas de tienda de la Ed. 5 y el Corrigendum 1:2025; el texto completo permitiría verificar, en vez de describir, los cuatro anexos nuevos y las diez páginas del Anexo M | 2026-09-01 |
+| [IEC 61252:2025](https://webstore.iec.ch/en/publication/68929) | La edición que sustituyó a IEC 61252:1993+A1+A2 el 17 de octubre de 2025. La batería transcribe el texto 1993+A2 para `sound_exposure()` y `lex_8h()`; el texto de 2025 hace falta para revisar el delta | 2026-09-01 |
+| Widmann (1992), *Ein Modell der psychoakustischen Lästigkeit von Schallen*, tesis doctoral de la TUM | La fuente primaria del modelo de molestia psicoacústica. El modelo está implementado desde Fastl y Zwicker (2006); la tesis, 116 páginas impresas anteriores al depósito electrónico, permitiría al registro citar el origen de primera mano | 2026-09-01 |
+| Bowdler y Leventhall (eds.), *Wind Turbine Noise* (Multi-Science, 2011) | La referencia estándar detrás de la guía de ruido de aerogeneradores; solo circulan sus reseñas | 2026-09-01 |
+| Crispin, Blasco, Ingelaere y Van Damme, *The vibration reduction index Kij: laboratory measurements versus predictions EN 12354-1* ([doi:10.1201/9781003078852-125](https://doi.org/10.1201/9781003078852-125)) | Valores medidos de Kij de unión como oráculo independiente para las implementaciones de ISO 10848 y EN 12354-1 | 2026-09-01 |
+| Hopkins, *Sound insulation measurements with intensity techniques: flanking transmission* (IoA 1997, doi 10.25144/19134) | Datos de flancos medidos por intensidad junto a la implementación de ISO 15186; el enlace del propio editor lleva años muerto | 2026-09-01 |
+
+| Recuero, *Ingeniería acústica* (Paraninfo) | Manual canónico en español; solo existe impreso, y enriquecería la terminología y los ejemplos resueltos de las guías en español | 2026-09-01 |
+| Arau, *ABC de la acústica arquitectónica* (CEAC, 2007) | La autoridad española de acústica de salas detrás de la fórmula de Arau-Puchades que la biblioteca implementa; solo impreso | 2026-09-01 |
+
+Las copias impresas de segunda mano cuentan, por las mismas vías.

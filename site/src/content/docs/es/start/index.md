@@ -9,7 +9,7 @@ las definen — ISO, IEC, ANSI y ASTM, el anexo CNOSSOS-EU de la Directiva
 el apartado que implementa. Qué te aporta eso, y cómo se comprueba, está en
 [Por qué phonometry](/phonometry/es/start/why-phonometry/).
 
-Cinco páginas breves, pensadas para leerse una vez antes que nada. Cada una
+Seis páginas breves, pensadas para leerse una vez antes que nada. Cada una
 responde a una pregunta, y están en el orden en que llegan las preguntas.
 
 **¿Puedo instalarla y sacar un número?**
@@ -45,6 +45,10 @@ aceptación.
 **¿Quién responde de ella y cómo la cito?**
 [Acerca de](/phonometry/es/start/about/) dice quién la mantiene, cómo citarla y
 bajo qué licencia.
+
+[Apoya el proyecto](/phonometry/es/start/support/) lista las maneras de
+ayudar, empezando por las fuentes primarias que aún le faltan a la
+biblioteca.
 
 ## Dos cosas que conviene resolver antes de que ninguna guía funcione
 

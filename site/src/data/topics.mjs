@@ -56,6 +56,7 @@ export const topics = [
       { slug: 'start/guides', label: 'All guides', translations: { es: 'Todas las guías' } },
       'start/why-phonometry',
       'start/about',
+      'start/support',
     ],
   },
   {
