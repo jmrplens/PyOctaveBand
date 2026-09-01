@@ -435,10 +435,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   that glibc ships, in numpy operations IEEE 754 pins exactly: plain
   arithmetic, integer bit work and table takes, with the routine's fused
   multiply-adds emulated through error-free transformations. Verified bit for
-  bit against `math.log` over the 91 658 333 distinct values the whole design
-  corpus evaluates and over a hundred million adversarial draws, zero
-  mismatches, and the corpus of designs is byte-identical before and after:
-  no shipped coefficient, figure or conformance value moved. The fit also
+  bit against glibc's `log` over the 91 658 333 distinct values the whole
+  design corpus evaluates, zero mismatches, and the corpus of designs is
+  byte-identical before and after: no shipped coefficient, figure or
+  conformance value moved. Beyond the corpus the agreement with glibc is
+  statistical rather than structural: an adversarial search found about one
+  input in thirty million, in the narrow band just outside the near-one
+  window, whose true logarithm falls almost exactly between two doubles and
+  where the compiled binary's own compiler-fused pairs round the other way;
+  a further hundred million draws found no other kind of divergence, and
+  none of it can reach a design, since the pinned routine is the definition
+  on the design path. The fit also
   batches each evaluation's logarithms into one call and reuses the normal
   equations' index pattern across steps, which is where the rest of the
   recovery comes from; the transcendentals outside the iteration stay on the

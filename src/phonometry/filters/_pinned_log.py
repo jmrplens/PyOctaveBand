@@ -29,11 +29,12 @@ replacement:
   :math:`[1 - 2^{-7}, 1 + 2^{-7}]`, Sterbenz's lemma makes ``p - 1.0`` exact,
   so ``(p - 1.0) + e`` rounds the very real number the fused operation rounds,
   once.
-* The four multiply-adds the compiler fused in the near-one polynomial
-  (``x`` within :math:`[1 - 2^{-4}, 1 + 0x1.09p{-4}]`). Those are emulated
-  exactly by :func:`_fused_multiply_add`, the error-free-transformation
-  emulation: split the product, sum with the addend through two exact sums,
-  and the two roundings that remain land on the fused result.
+* The multiply-adds the compiler fused on its own in the near-one
+  polynomial (``x`` within :math:`[1 - 2^{-4}, 1 + 0x1.09p{-4}]`). The four
+  sites observed to move the result -- found by searching the space of
+  contraction choices against the shipped binary's own answers -- are
+  emulated exactly by :func:`_fused_multiply_add`; the remaining sites agree
+  as plain pairs on every input thrown at them.
 * The table lookups, which are numpy takes.
 
 The tables and polynomial coefficients are copied digit for digit from ARM's
@@ -47,11 +48,24 @@ exactly.
 What "without touching a single output bit" rests on, measured on this
 project's own corpus rather than asserted: over the 91 658 333 distinct
 values the weighting fit feeds its logarithm across 133 (curve, rate)
-designs, plus twenty million draws over the full exponent range, forty
-million in the near-one band, two million subnormals and the window edges,
-this function and ``math.log`` return identical bit patterns on every input
--- zero exceptions. ``tests/filters/test_pinned_log.py`` pins a deterministic
-slice of that comparison, including the inputs an actual design evaluates.
+designs, this function and glibc's ``log`` return identical bit patterns --
+zero exceptions, and that is the fact the shipped designs stand on. Beyond
+the corpus the agreement is statistical rather than structural. The compiled
+binary carries multiply-adds the compiler fused on its own, which this
+module spells as plain pairs where they were never observed to matter, and
+an adversarial search of the band just outside the near-one window -- where
+the logarithm is smallest and the final rounding tightest -- found about one
+input in thirty million whose true logarithm falls almost exactly between
+two doubles and the two implementations part by that last ulp: the first
+found is ``0x1.1fa63fbb5acd3p+0``, whose true logarithm sits 0.491 ulp from
+one answer and 0.509 from the other, both inside the routine's documented
+0.519 ulp worst case. A further hundred million draws over the full exponent
+range, the near-one band, the subnormals and the window edges found no other
+kind of divergence. None of it can reach a design: on the design path this
+function is the definition, and its own bits are the same on every
+conforming machine. ``tests/filters/test_pinned_log.py`` pins a
+deterministic slice of the comparison, including the inputs an actual design
+evaluates and the found boundary inputs held to one ulp.
 
 One consequence is worth stating plainly. ``math.log`` is whatever ``log``
 the platform's C library ships, and only glibc ships this routine: Apple's
@@ -434,12 +448,14 @@ def _fused_multiply_add(
     b: np.ndarray | np.float64,
     c: np.ndarray | np.float64,
 ) -> np.ndarray:
-    """``fl(a * b + c)`` with one rounding, in plain IEEE 754 operations.
+    """``fl(a * b + c)`` emulated in plain IEEE 754 operations.
 
     The error-free-transformation emulation: the product and the first sum
-    are made exact, and the two roundings that remain reproduce the fused
-    result. Verified bit for bit against :func:`math.fma` over eighty million
-    draws covering this module's three call sites and a general
+    are made exact, and the two roundings that remain land on the fused
+    result. Not correctly rounded for *every* triple -- a doubly-tied case
+    can land one ulp off the true fused answer -- but exact on the domains of
+    this module's call sites: verified bit for bit against :func:`math.fma`
+    over eighty million draws covering them and a general
     :math:`[-1, 1]^3` sweep, with zero mismatches; the sites' operands are
     comfortably inside the no-underflow range the transformation needs.
 
@@ -464,9 +480,12 @@ def _main_path(x: np.ndarray) -> np.ndarray:
     ``x = 2^k z`` with ``z`` in ``[0x1.6p-1, 0x1.6p0)``; the subinterval table
     gives ``1/c`` and ``log c``, and ``log x = k ln2 + log c + log1p(r)`` with
     ``r = z/c - 1`` small enough for a degree-five polynomial. ``r`` is the
-    one fused operation of the C routine's fast path, and it needs no
+    one fused operation the C source spells explicitly, and it needs no
     emulation: ``z * invc`` lands within :math:`2^{-7}` of one, so Sterbenz
-    makes ``p - 1.0`` exact and ``(p - 1.0) + e`` is the fused result.
+    makes ``p - 1.0`` exact and ``(p - 1.0) + e`` is the fused result. The
+    compiler fuses further sites of this path on its own; those are spelled
+    as plain pairs here, which is where the roughly one-in-thirty-million
+    boundary divergence the module docstring bounds comes from.
 
     :param x: Positive normal doubles.
     :type x: np.ndarray
@@ -539,8 +558,8 @@ def pinned_log(values: np.ndarray) -> np.ndarray:
     time: same bits on every input the weighting fit produces (and on every
     positive double thrown at it in validation), two orders of magnitude
     less interpreter overhead. Domain errors follow :func:`math.log`: any
-    non-positive finite element raises :class:`ValueError`; ``inf`` and
-    ``nan`` propagate.
+    non-positive finite element raises :class:`ValueError`; ``inf``
+    propagates and ``nan`` propagates canonicalised.
 
     :param values: Any real array-like of positive values.
     :type values: np.ndarray

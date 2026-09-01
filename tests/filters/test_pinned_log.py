@@ -190,7 +190,17 @@ def test_within_one_ulp_of_the_local_libm_everywhere() -> None:
     every platform, and no platform's ``math.log`` is ever more than one ulp
     away from them.
     """
-    probe = _probe()
+    boundary = np.array(
+        [
+            # Found by adversarial search where |log x| is smallest on the
+            # table path: the true logarithm sits almost exactly between two
+            # doubles and glibc's compiled binary rounds the other way.
+            float.fromhex("0x1.1fa63fbb5acd3p+0"),
+            float.fromhex("0x1.182b33f9e413cp+0"),
+            float.fromhex("0x1.19e84ba4c5ba6p+0"),
+        ]
+    )
+    probe = np.concatenate([_probe(), boundary])
     mine = pinned_log(probe)
     reference = _reference(probe)
     ordered_mine = mine.view(np.int64)
