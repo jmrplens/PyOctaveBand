@@ -7,15 +7,20 @@ sound **power** does not. The sound power level $L_W$ is the total acoustic
 energy per second a source radiates, referenced to $P_0 = 1\ \text{pW}$, and it is
 the device-independent **emission** descriptor that goes on a datasheet,
 feeds a room prediction (EN 12354) or is checked against a noise-emission
-limit. phonometry implements five standardised routes to it, split across
-three method guides: an enveloping *pressure* surface in the field
+limit. phonometry implements seven standardised routes to it, split across
+five guides: an enveloping *pressure* surface in the field
 (ISO 3744/3746) and the precision grade in an *anechoic room* (ISO 3745),
 covered in [Sound Power by Pressure Methods](sound-power-pressure.md); the
 diffuse field of a *reverberation room* (ISO 3741), covered in
-[Sound Power in the Reverberation Room](sound-power-reverberation.md); and
-*intensity* scanning over a surface (ISO 9614-2), with its precision
+[Sound Power in the Reverberation Room](sound-power-reverberation.md);
+*intensity* read at discrete points over a surface (ISO 9614-1), covered in
+[Sound Intensity (p-p)](intensity.md); the same intensity *scanned* over that
+surface (ISO 9614-2), with its precision
 counterpart (ISO 9614-3), covered in
-[Sound Power by Intensity Scanning](sound-power-intensity.md). This page is
+[Sound Power by Intensity Scanning](sound-power-intensity.md); and the
+*surface velocity* of the machine's own casing (ISO/TS 7849-1 and -2), the one
+route that needs no acoustic measurement at all, covered in
+[Sound power from surface vibration](vibration-sound-power.md). This page is
 the front door: how to choose among them, what the accuracy grades actually
 promise, and how a measured $L_W$ becomes the ISO 4871 noise-emission
 declaration a datasheet prints.
@@ -34,17 +39,20 @@ constraints.
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | Enveloping surface | **ISO 3744** (engineering) / **ISO 3746** (survey) | Sound pressure on a hemisphere or box | Essentially free field over one or more reflecting planes | Grade 2 ($\sigma_{\mathrm{R}0} \approx 1.5\ \text{dB}$) / grade 3 ($\approx 3.0\ \text{dB}$) | In situ or a large room; no special test facility available |
 | Reverberation room | **ISO 3741** | Sound pressure in the diffuse field | Qualified hard-walled reverberation room | Grade 1 (precision) | Highest accuracy for steady, broadband sources in a lab |
+| Intensity at discrete points | **ISO 9614-1** | Normal sound intensity held at each of $N$ points, one per segment | Almost any, tolerant of steady extraneous noise | Grade 1 or 2 per band from the Annex B criteria; grade 3 on the A-weighted total | On-site where the probe stands still at each point rather than sweeping the surface |
 | Intensity scanning | **ISO 9614-2** | Normal sound intensity scanned over a surface | Almost any, tolerant of steady extraneous noise | Grade 2 / 3 (from per-band field indicators) | On-site with background noise, or one machine among many |
 | Anechoic room | **ISO 3745** | Sound pressure on a fixed microphone array | Qualified anechoic or hemi-anechoic room | Grade 1 (precision) | Reference-grade emission in a free-field laboratory |
 | Precision intensity scanning | **ISO 9614-3** | Scanned normal intensity, tighter criteria | Almost any, tolerant of steady extraneous noise | Grade 1 (precision) | Precision on-site, with the ISO 9614-3 field-indicator checks |
+| Surface vibration | **ISO/TS 7849-1** (survey) / **-2** (engineering) | Surface-averaged velocity level and a radiation factor | Any; no acoustic measurement | Upper limit ($\varepsilon = 1$) / engineering | The machine cannot be quietened, enclosed or approached with a microphone |
 
 The pressure methods correct the surface level for the room ($K_2$) and for
 background noise ($K_1$); the reverberation method needs a *qualified* room
 but reaches precision grade; intensity rejects steady background energy at
-the cost of a two-microphone probe and a per-band validity check. Each
-method guide walks its routes in turn.
+the cost of a two-microphone probe and a per-band validity check; the
+surface-velocity route abandons the microphone altogether and pays for it with
+a radiation factor. Each method guide walks its routes in turn.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods.svg" alt="The three sound power routes side by side: an enveloping pressure surface over a reflecting plane (ISO 3744/3746), a source in a reverberation room sampled by microphones (ISO 3741) and an intensity probe scanning a surface around the source (ISO 9614-2)" width="92%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods.svg" alt="The seven sound power routes, one row for each measured quantity, every cell carrying the same five attributes. The sound pressure row: the ISO 3744/3746 hemispherical enveloping surface over a reflecting plane, the ISO 3745 fixed microphone array in a wedge-lined anechoic room, and the ISO 3741 diffuse field of a reverberation room. The sound intensity row: the ISO 9614-1 measurement surface cut into ten segments with the probe held still at a point in each, the ISO 9614-2 serpentine scan swept over that same surface, and the tighter ISO 9614-3 precision scan. The surface velocity row carries one route across the full width, ISO/TS 7849 with an accelerometer on a radiating casing and no microphone at all" width="92%"></picture>
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -95,7 +103,9 @@ order; the first match names the standard.
    calls for precision (grade 1); a first walk-through of a noisy plant
    tolerates survey grade (grade 3). Grade 1 exists only in a qualified
    laboratory room (ISO 3741, ISO 3745) or via the precision intensity
-   methods (ISO 9614-1 at discrete points, ISO 9614-3 by scanning).
+   methods, both of which are here: ISO 9614-1 at discrete points in
+   [Sound Intensity (p-p)](intensity.md), ISO 9614-3 by scanning in
+   [Sound Power by Intensity Scanning](sound-power-intensity.md).
 2. **Can the source travel to a laboratory?** ISO 3741 wants the source
    small next to the room (volume no more than about 2 % of the room volume)
    and its noise steady; ISO 3745 wants it inside a qualified anechoic or
@@ -110,10 +120,19 @@ order; the first match names the standard.
    degrade gracefully to ISO 3746 at survey grade.
 4. **Is the background the problem?** When neighbouring machines cannot be
    switched off, or the margin is outright negative, the pressure methods
-   are out. Intensity scanning (ISO 9614-2, or ISO 9614-3 for grade 1)
-   tolerates steady extraneous noise even some 10 dB *above* the source,
-   because only the net energy flux through the surface counts; the
-   per-band field indicators then decide the grade actually achieved.
+   are out. Intensity (ISO 9614-1 at discrete points, ISO 9614-2 by scanning,
+   ISO 9614-3 for grade 1 by scanning) tolerates steady extraneous noise even
+   some 10 dB *above* the source, because only the net energy flux through the
+   surface counts; the per-band field indicators then decide the grade
+   actually achieved.
+5. **Can you put a microphone there at all?** A machine that cannot be stopped,
+   an environment that destroys a capsule, an enclosure with no room for a
+   surface: when no acoustic measurement is possible, the surface-velocity route
+   estimates the same quantity from accelerometers on the casing
+   (ISO/TS 7849-1 and -2). It answers a subtly different question — it
+   characterises what the *structure* radiates, and stays blind to sound
+   escaping through openings, intakes and gaps — and it costs a radiation factor
+   you must either assume (Part 1, an upper limit) or measure once (Part 2).
 
 ### What the accuracy grades mean
 
@@ -224,8 +243,10 @@ the clause 6.2 verification verdict.*
 - [Sound Power by Intensity Scanning (ISO 9614-2 / ISO 9614-3)](sound-power-intensity.md):
   the routes that tolerate steady background noise, qualified by their field
   indicators.
-- [Sound Intensity (p-p)](intensity.md): the two-microphone probe behind the
-  scanning methods.
+- [Sound power from surface vibration (ISO/TS 7849)](vibration-sound-power.md):
+  the seventh route, for a machine no microphone can approach.
+- [Sound Intensity (p-p)](intensity.md): the two-microphone probe behind every
+  intensity route, and the ISO 9614-1 determination at discrete points.
 - [Room Acoustics](../../buildings/rooms/room-acoustics.md): the reverberation time and equivalent
   absorption area that feed the room corrections.
 - [Levels](../../signals/levels/levels.md): energy averaging and the A-weighting behind $L_{W\mathrm{A}}$.
@@ -240,8 +261,8 @@ Sound pressure depends on where you stand and on the room; sound power does
 not. The sound power level $L_W$ is the total acoustic energy per second a
 source radiates, referenced to $P_0 = 1\ \text{pW}$, and it is the device-independent
 emission descriptor that goes on a datasheet or is checked against a
-noise-emission limit; ISO 3744, ISO 3741, ISO 9614-2, ISO 3745 and
-ISO 9614-3 all determine it.
+noise-emission limit; ISO 3744, ISO 3741, ISO 9614-1, ISO 9614-2, ISO 3745,
+ISO 9614-3 and ISO/TS 7849 all determine it.
 
 ### What do the accuracy grades in sound power measurement mean?
 
@@ -255,12 +276,12 @@ indistinguishable.
 
 ### How do I measure sound power when background noise cannot be switched off?
 
-Use intensity scanning: ISO 9614-2 (grade 2 or 3) or ISO 9614-3 (grade 1,
-precision). Because sound intensity is the net energy flux through the
-measurement surface, steady extraneous noise even some 10 dB above the
-source is tolerated, whereas the ISO 3744 pressure method needs the
-background at least 6 dB below the source. The per-band field indicators
-then decide the grade actually achieved.
+Use intensity: ISO 9614-1 at discrete points, ISO 9614-2 by scanning (grade 2
+or 3) or ISO 9614-3 by precision scanning (grade 1). Because sound intensity
+is the net energy flux through the measurement surface, steady extraneous
+noise even some 10 dB above the source is tolerated, whereas the ISO 3744
+pressure method needs the background at least 6 dB below the source. The
+per-band field indicators then decide the grade actually achieved.
 
 
 ## References
@@ -292,14 +313,13 @@ ISO 4871:1996, *Acoustics — Declaration and verification of noise emission
 values of machinery and equipment*: the dual-number and single-number
 declaration forms, the declared value $L_{W\mathrm{Ad}} = L_{W\mathrm{A}} + K_{W\mathrm{A}}$ and the
 clause 6.2 verification. The basic determination standards (ISO 3744/3746,
-ISO 3741, ISO 3745, ISO 9614-2/-3) are covered in their method guides.
+ISO 3741, ISO 3745, ISO 9614-1/-2/-3, ISO/TS 7849-1/-2) are covered in their
+method guides.
 
 **Not covered.** Three members of the ISO 3740 family are not implemented at
 all — ISO 3743-1, ISO 3743-2 and ISO 3747 — and neither is the sound *energy*
-level $L_J$ of a single event. ISO 9614-1's own discrete-point power summation
-is absent as well; only its field indicators exist, in
-[Sound Intensity (p-p)](intensity.md). The emission sound pressure level
-$L_{p\mathrm{A}}$ that stands beside $L_{W\mathrm{A}}$ in a declaration is consumed here, never
+level $L_J$ of a single event. The emission sound pressure level $L_{p\mathrm{A}}$
+that stands beside $L_{W\mathrm{A}}$ in a declaration is consumed here, never
 determined: ISO 11201, ISO 11202 and ISO 11204 are outside the library. Of
 ISO 4871, only the clause 6.2 single-machine verification is evaluated; the
 batch criteria of clause 6.3 are not, and the batch statistics beyond the

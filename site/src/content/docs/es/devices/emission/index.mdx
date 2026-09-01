@@ -21,9 +21,12 @@ anecoico de ISO 3745,
 [Potencia acústica en cámara reverberante](/phonometry/es/devices/emission/sound-power-reverberation/)
 para los métodos directo y de comparación de ISO 3741, y
 [Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/)
-para el barrido in situ de ISO 9614-2 y su grado de precisión ISO 9614-3.
+para el barrido in situ de ISO 9614-2 y su grado de precisión ISO 9614-3, y
+[Intensidad acústica](/phonometry/es/devices/emission/intensity/)
+para la suma de potencia en puntos discretos de ISO 9614-1, que se detiene en
+cada posición en vez de barrer la superficie.
 
-Una cuarta ruta no mide sonido en absoluto.
+Una de las rutas no mide sonido en absoluto.
 [Potencia acústica desde la vibración superficial (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/)
 estima la potencia radiada a partir del nivel de velocidad promediado en la
 superficie y un factor de radiación, que es lo que queda cuando la máquina no
@@ -31,8 +34,8 @@ puede llevarse a una sala cualificada y su entorno es demasiado ruidoso para una
 superficie envolvente: la Parte 1 da un valor de límite superior solo con la
 velocidad, y la Parte 2 un valor de ingeniería una vez estimado como es debido
 el factor de radiación. Además responde a una pregunta algo distinta de la de
-las cuatro rutas acústicas — caracteriza lo que radia la *estructura*, y queda
-ciega al sonido que escapa por aberturas, tomas y salidas — y es el puente
+las rutas acústicas — caracteriza lo que radia la *estructura*, y queda ciega
+al sonido que escapa por aberturas, tomas y salidas — y es el puente
 natural con las páginas de ruido estructural, porque esa misma velocidad
 superficial es la que mide [Vibración y ruido
 estructural](/phonometry/es/vibration/).
@@ -57,8 +60,8 @@ referencia contra la que se juzgan las medidas correctoras de las páginas de
 ## Páginas de esta sección
 
 - [Intensidad acústica (p-p)](/phonometry/es/devices/emission/intensity/): intensidad
-  acústica con dos micrófonos según IEC 61043 con los indicadores de campo de
-  ISO 9614-1.
+  acústica con dos micrófonos según IEC 61043, con los indicadores de campo de
+  ISO 9614-1 y su determinación de potencia acústica en puntos discretos.
 - [Potencia acústica](/phonometry/es/devices/emission/sound-power/): la elección del
   método de determinación y la declaración de emisión de ruido según
   ISO 4871.
@@ -93,15 +96,13 @@ del aire que aportas tú; aquí no se calcula a partir de ISO 9613-1.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered">
-Una vía falta a propósito: **la suma de potencia en puntos fijos discretos de
-ISO 9614-1 no está implementada en absoluto**, y sí lo están solo sus
-indicadores de campo del Anexo A, reutilizados por las dos partes de barrido.
-En la vía de vibración, los apartados de medición 5 a 7 de ambas partes de
-ISO/TS 7849 son práctica de laboratorio y no código, y solo está implementado
-el factor de radiación de una sola máquina de la Fórmula 8, así que una
-determinación de lote o de familia necesita un valor ya promediado. Por
-último, aquí no se reduce la emisión de ninguna máquina: silenciar una fuente
-es [Control de ruido](/phonometry/es/devices/noise-control/), y un valor de
+Una vía se queda a medio camino de su norma: en la vía de vibración, los
+apartados de medición 5 a 7 de ambas partes de ISO/TS 7849 son práctica de
+laboratorio y no código, y solo está implementado el factor de radiación de
+una sola máquina de la Fórmula 8, así que una determinación de lote o de
+familia necesita un valor ya promediado. Y aquí no se reduce la emisión de
+ninguna máquina: silenciar una fuente es
+[Control de ruido](/phonometry/es/devices/noise-control/), y un valor de
 emisión declarado es la entrada de ese trabajo, no su resultado.
 </ScopeClaim>
 </Scope>

@@ -30,8 +30,13 @@ reviews:
         repository on GitHub and for the llms.txt artifacts built from it. Each
         guide deliberately exists twice, as `docs/<path>.md` and as
         `site/src/content/docs/<path>.md` or `.mdx`, and the two are written
-        differently on purpose: the mirror carries no frontmatter, no Astro
-        components and no images. Review changes here as ordinary prose, and
+        differently on purpose: the mirror carries no frontmatter and no Astro
+        components. It DOES carry figures, as a plain `<picture>` with absolute
+        raw.githubusercontent.com URLs, because GitHub resolves nothing else;
+        116 of its 160 pages have one, so an added figure there is the
+        convention and not a mistake. What it does not carry is the site's
+        `<ThemeImage>` component, which is how the same figure is written on
+        the other side. Review changes here as ordinary prose, and
         expect a guide edit to touch the English page, its Spanish twin under
         `site/src/content/docs/es/` and this mirror together. Flag it when one
         of the three is missing.

@@ -631,3 +631,55 @@ def test_a_missing_panel_is_named() -> None:
 def test_a_missing_artefact_says_how_to_make_one(tmp_path: pathlib.Path) -> None:
     with pytest.raises(SystemExit, match="make conformance"):
         artifact.load(tmp_path / "conformance.json")
+
+
+# ---------------------------------------------------------------------------
+# A record check keeps its own values
+# ---------------------------------------------------------------------------
+#
+# `record` sets precision to zero because its deviation is a count of names
+# that disagreed, not a decimal figure. Two separate places then read that
+# zero as "round these values to integers", and between them the artefact
+# published 1.0 where ISO 9614-1 Table B.1 prints 0,60: the serialiser rounded
+# it, and the comparison that decides whether to rewrite the file tolerated the
+# 0.4 that made, so no regeneration could dislodge it and no gate objected.
+# The label beside it still read 0.6 and the verdict still read pass.
+
+
+def test_a_record_check_publishes_its_values_unrounded() -> None:
+    """A fractional record value survives serialisation.
+
+    The values of a record check are compared for equality, so the check's
+    precision says nothing about how many decimals they carry.
+    """
+    outcome = registry.record(
+        {"precision (all bands)": 0.2, "survey (A-weighted)": 0.6},
+        {"precision (all bands)": 0.2, "survey (A-weighted)": 0.6},
+    )
+    document = artifact._computed_document(outcome)
+    assert document["record"] == {
+        "precision (all bands)": 0.2,
+        "survey (A-weighted)": 0.6,
+    }
+
+
+def test_a_record_value_that_moved_is_not_tolerated_away() -> None:
+    """The rewrite guard sees a record value move, whatever the precision.
+
+    Without this the artefact could hold a value the harness never produced:
+    a zero-decimal tolerance is 1.0 absolute, which swallows the whole
+    difference between a published 0,60 and a stored 1.0.
+    """
+    outcome = registry.record({"survey": 0.6}, {"survey": 0.6})
+    fresh = {
+        "id": "x",
+        "kind": str(registry.Kind.RECORD),
+        "precision": 0,
+        "reference": {},
+        "expected": {"record": {"survey": 0.6}},
+        "computed": {"record": {"survey": 0.6}},
+    }
+    stale = {**fresh, "computed": {"record": {"survey": 1.0}}}
+    assert outcome.kind is registry.Kind.RECORD
+    problems = compare._check_problems(stale, fresh)
+    assert any("computed.record.survey" in problem for problem in problems), problems

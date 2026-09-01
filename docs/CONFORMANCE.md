@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**566/566 conformance checks pass** across 59 domains and 373 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**572/572 conformance checks pass** across 59 domains and 373 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -265,7 +265,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>Intensity &amp; sound power</b>: 100% (10/10)</summary>
+<summary><b>Intensity &amp; sound power</b>: 100% (16/16)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -279,6 +279,12 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 4871:1996 clause 3.15 / Annex B | Declared L_WAd = L_WA + K_WA (Annex B, L_WA=88, K_WA=2) | 90 dB (+/-0 dB) | 90 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 4871:1996 clause 6.2 | Single-machine verification boundary L_1 <= L_WAd | L_1=90 verified, L_1=91 rejected (L_WAd=90) | 90->True, 91->False | boundary L_1 = L_WAd | - | ![Pass][cv-pass] Pass |
 | ISO 3741:2010 Eq. 20 | Reverberation-room method inverts to a known LW | 0 dB error | 0 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 9614-1:1993 Table B.2 | Criterion-2 factor C per band and grade, and the A-weighted grade-3 value | 59 tabulated values of C reproduced | max absolute deviation 0.000 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 9614-1:1993 Table 2 | Standard deviation s of the determination per band and grade | 59 tabulated values of s reproduced | max absolute deviation 0.000 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 9614-1:1993 Table B.1 | Error factor Delta: 0,20 and 0,29 for all bands, 0,60 A-weighted | precision (all bands) = 0.2; engineering (all bands) = 0.29; survey (A-weighted) = 0.6 | precision (all bands) = 0.2; engineering (all bands) = 0.29; survey (A-weighted) = 0.6 | exact | 0 % | ![Pass][cv-pass] Pass |
+| ISO 9614-1:1993 Eq. (12) | Discrete positions tiling a scanned surface give the same LW | 0 dB error | 0 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 9614-1:1993 Table B.3 | Five action codes, each reached by the case Figure B.1 routes to it | F1 > 0,6 -> e; F2 > Ld -> ab; (F3 - F2) > 3 dB -> ab; criterion 2, 1 dB <= (F3 - F2) <= 3 dB -> c; criterion 2, (F3 - F2) <= 1 dB -> d | F1 > 0,6 -> e; F2 > Ld -> ab; (F3 - F2) > 3 dB -> ab; criterion 2, 1 dB <= (F3 - F2) <= 3 dB -> c; criterion 2, (F3 - F2) <= 1 dB -> d | 0 of 5 rows disagree | - | ![Pass][cv-pass] Pass |
+| ISO 9614-1:1993 Eq. (B.4) | New positions N* on the concentrated subset of the measurement surface | N* = 5 positions | N* = 5 positions | 0 | 0 % | ![Pass][cv-pass] Pass |
 
 </details>
 

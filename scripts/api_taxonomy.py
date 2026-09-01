@@ -290,6 +290,7 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.emission.sound_power",
             "phonometry.emission.sound_power_anechoic",
             "phonometry.emission.sound_power_intensity",
+            "phonometry.emission.sound_power_intensity_points",
             "phonometry.emission.sound_power_reverberation",
             "phonometry.emission.intensity",
             "phonometry.emission.intensity_compliance",
@@ -421,6 +422,9 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     # standards share it; documented with the free-field method that raises it
     # most often.
     "SoundPowerWarning": "phonometry.emission.sound_power",
+    # The ISO 9614-1 Table B.3 limit on F1, defined beside the F1 it bounds and
+    # imported by the discrete-point determination that gates on it.
+    "TEMPORAL_VARIABILITY_LIMIT": "phonometry.emission.intensity",
     # A typing.Literal alias, so it reports "typing" as its module; documented
     # with the declaration whose `form` argument it types.
     "DeclarationForm": "phonometry.emission.declaration",

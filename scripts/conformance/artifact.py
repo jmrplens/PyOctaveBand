@@ -113,13 +113,17 @@ def _rounded(value: float, precision: int) -> float:
 
 
 def _exact(value: float) -> float:
-    """Store a published number as authored, with negative zero normalised.
+    """Store a number as it is, with negative zero normalised.
 
     Expected values and tolerances come off a printed table; they are not
-    measurements and are not rounded to a display precision.
+    measurements and are not rounded to a display precision. A record check's
+    computed side goes through here too, because a record compares its values
+    for equality and rounding them is the one thing that could make that
+    comparison lie. The two guards still apply either way: ``Infinity`` is not
+    JSON, and ``-0.0`` is a sign in a byte comparison that nothing put there.
     """
     if not math.isfinite(value):
-        msg = f"non-finite published value {value!r} cannot be stored."
+        msg = f"non-finite value {value!r} cannot be stored in the artefact."
         raise ValueError(msg)
     return float(value) + 0.0
 
@@ -146,9 +150,21 @@ def _expected_document(outcome: Outcome) -> dict[str, Any]:
 
 
 def _computed_document(outcome: Outcome) -> dict[str, Any]:
-    """The library's side of a check, rounded to the check's precision."""
+    """The library's side of a check, rounded to the check's precision.
+
+    A ``RECORD`` check is the exception, and its record is written unrounded.
+    ``precision`` says how many decimals the *deviation* is printed to, and for
+    a record the deviation is a count of names that disagreed, so
+    :func:`~conformance.registry.record` sets it to zero. Rounding the values
+    by it turned 0.6 into 1.0 and published a normative figure the standard
+    does not contain, beside a label reading 0.6 and a verdict of pass, since
+    the comparison itself is an exact match made before any of this. The defect
+    was invisible while the only record check held the ISO 717 single numbers,
+    which the standard rounds to integers itself.
+    """
     side = outcome.computed_data
     record = side.record
+    exact_record = outcome.kind is Kind.RECORD
     return {
         "value": (
             None if side.value is None else _rounded(side.value, outcome.precision)
@@ -158,7 +174,11 @@ def _computed_document(outcome: Outcome) -> dict[str, Any]:
             None
             if record is None
             else {
-                name: _rounded(value, outcome.precision)
+                name: (
+                    _exact(value)
+                    if exact_record
+                    else _rounded(value, outcome.precision)
+                )
                 for name, value in record.items()
             }
         ),

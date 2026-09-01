@@ -16,16 +16,19 @@ of ISO 3745,
 [Sound Power in the Reverberation Room](sound-power-reverberation.md)
 for the direct and comparison methods of ISO 3741, and
 [Sound Power by Intensity Scanning](sound-power-intensity.md)
-for the on-site scanning of ISO 9614-2 and its ISO 9614-3 precision grade.
+for the on-site scanning of ISO 9614-2 and its ISO 9614-3 precision grade, and
+[Sound Intensity](intensity.md)
+for the discrete-point power summation of ISO 9614-1, which stands still at
+each position rather than sweeping the surface.
 
-A fourth route does not measure sound at all.
+One route does not measure sound at all.
 [Sound power from surface vibration (ISO/TS 7849)](vibration-sound-power.md)
 estimates the radiated power from the surface-averaged velocity level and a
 radiation factor, which is what remains when the machine cannot be moved to a
 qualified room and its environment is too noisy for an enveloping surface:
 Part 1 gives an upper-limit value from the velocity alone, Part 2 an
 engineering value once the radiation factor has been estimated properly. It
-also answers a slightly different question from the four acoustic routes — it
+also answers a slightly different question from the acoustic routes — it
 characterises what the *structure* radiates, and stays blind to sound escaping
 through openings, intakes and outlets — and it is the natural bridge to the
 structure-borne pages, since the same surface velocity is what
@@ -50,7 +53,8 @@ judged against.
 ## Pages in this section
 
 - [Sound Intensity (p-p)](intensity.md): two-microphone
-  sound intensity per IEC 61043 with the ISO 9614-1 field indicators.
+  sound intensity per IEC 61043, with the ISO 9614-1 field indicators and its
+  sound power determination at discrete points.
 - [Sound Power](sound-power.md): choosing the determination
   method and declaring the noise emission per ISO 4871.
 - [Sound Power by Pressure Methods](sound-power-pressure.md):
@@ -79,12 +83,10 @@ yourself. The C₃ meteorological correction of ISO 3745 likewise needs an
 air-absorption coefficient you supply; it is not computed from ISO 9613-1
 here.
 
-One route is absent by design: **ISO 9614-1's discrete fixed-point power
-summation is not implemented at all**, and only its Annex A field indicators
-are, reused by the two scanning parts. On the vibration route, the measurement
+One route stops short of its standard: on the vibration route, the measurement
 clauses 5 to 7 of both parts of ISO/TS 7849 are laboratory practice rather
 than code, and only the single-machine radiation factor of Formula 8 is
 implemented, so a batch or family determination needs an already-averaged
-value. Finally, nothing here reduces a machine's emission: quieting a source
-is [Noise control](../noise-control/index.md), and a declared
+value. And nothing here reduces a machine's emission: quieting a source is
+[Noise control](../noise-control/index.md), and a declared
 emission value is the input to that work, not its result.

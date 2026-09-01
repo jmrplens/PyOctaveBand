@@ -461,24 +461,30 @@ acción.*
 Consulta la [guía de Propagación en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/)
 y la [guía de exposición al ruido en el trabajo](/phonometry/es/perception/hearing/occupational-exposure/) para su uso.
 
-## Determinación de la potencia acústica (ISO 3744/3745/3746, ISO 3741, ISO 9614-2/3)
+## Determinación de la potencia acústica (ISO 3744/3745/3746, ISO 3741, ISO 9614-1/2/3)
 
 El nivel de potencia acústica $L_W = 10 \log_{10}(P/P_0)$ ($P_0 = 1$ pW) es una
 magnitud de *emisión*: a diferencia de un nivel de presión, no depende de la
-distancia al receptor ni de la sala. Tres familias lo recuperan, y la elección la
-dicta la sala de la que se disponga. La **presión sobre una superficie
-envolvente** en campo libre sobre un plano reflectante supone que la intensidad
-normal a esa superficie es la presión cuadrática media dividida por $\rho c$:
-ISO 3744 (ingeniería) e ISO 3746 (inspección), abajo, e ISO 3745 (precisión)
-cuando la sala es anecoica. La **presión en campo difuso** convierte la propia
-absorción de la sala en la calibración: ISO 3741. El **barrido de intensidad**
-mide el flujo directamente y no necesita ninguna sala cualificada, al precio de
-una sonda de dos canales y de los indicadores de campo que la vigilan:
-ISO 9614-2 (ingeniería) e ISO 9614-3 (precisión).
+distancia al receptor ni de la sala. Tres familias lo recuperan, una por magnitud
+medida, y la elección la dicta la sala de la que se disponga. La **presión
+acústica** sobre una superficie envolvente en campo libre sobre un plano
+reflectante supone que la intensidad normal a esa superficie es la presión
+cuadrática media dividida por $\rho c$: ISO 3744 (ingeniería) e ISO 3746
+(inspección), abajo, e ISO 3745 (precisión) cuando la sala es anecoica; leída en
+campo difuso, esa misma presión convierte la propia absorción de la sala en la
+calibración, que es la ISO 3741. La **intensidad acústica** mide el flujo
+directamente y no necesita ninguna sala cualificada, al precio de una sonda de
+dos canales y de los indicadores de campo que la vigilan: ISO 9614-1 en puntos
+discretos, e ISO 9614-2 (ingeniería) e ISO 9614-3 (precisión) por barrido. La
+**velocidad superficial** lee la carcasa radiante con un acelerómetro y no toma
+medición acústica alguna, y paga esa libertad con un factor de radiación: es la
+ISO/TS 7849, cuyo factor es la eficiencia de radiación que deduce la
+[referencia de vibración](/phonometry/es/reference/theory/vibration/#movilidades-puntuales-y-eficiencia-de-radiación-cremer-5-hopkins-29).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_es.svg" alt="Las tres vías de potencia acústica en paralelo: una superficie envolvente de presión sobre un plano reflectante (ISO 3744/3746), una fuente en una cámara reverberante muestreada por micrófonos (ISO 3741) y una sonda de intensidad barriendo una superficie alrededor de la fuente (ISO 9614-2)" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_es.svg" alt="Las siete vías de potencia acústica, una fila por cada magnitud medida y todas las celdas con los mismos cinco atributos. La fila de presión acústica: la superficie envolvente hemisférica de ISO 3744/3746 sobre un plano reflectante, la malla fija de micrófonos de ISO 3745 en una cámara anecoica revestida de cuñas y el campo difuso de una cámara reverberante de ISO 3741. La fila de intensidad acústica: la superficie de medición de ISO 9614-1 dividida en diez segmentos con la sonda detenida en un punto de cada uno, el barrido serpenteante de ISO 9614-2 sobre esa misma superficie y el barrido de precisión más estricto de ISO 9614-3. La fila de velocidad superficial lleva una sola vía a todo lo ancho, ISO/TS 7849 con un acelerómetro sobre una carcasa radiante y sin micrófono alguno" width="92%" />
 
-*Las tres vías hacia $L_W$: superficie envolvente de presión, cámara reverberante y barrido de intensidad.*
+*Las siete vías hacia $L_W$, una fila por magnitud medida: una presión acústica,
+una intensidad acústica o la velocidad superficial de la carcasa.*
 
 ### Presión sobre superficie envolvente (ISO 3744/3746)
 
@@ -577,6 +583,36 @@ $L_W = L_{W(\text{RSS})} + (\bar{L}_p - \bar{L}_{p,\text{RSS}} + C_2)$, de modo
 que los términos de área de absorción, Waterhouse y $C_1$ se cancelan y la sala
 no necesita caracterizarse.
 
+### Intensidad en puntos discretos (ISO 9614-1)
+
+La parte 1 mantiene la sonda quieta. Cada posición representa un segmento de la
+superficie de medida, así que la potencia parcial es
+$P_i = I_{\mathrm{n}i} S_i$ (Ec. 11) y la potencia acústica es
+$L_W = 10 \log_{10}(\sum_i P_i / P_0)$ (Ec. 12). Esa suma se imprime sin las
+barras de valor absoluto de la definición general porque el apartado 9.2
+resuelve el caso negativo de otro modo: una banda cuya $\sum_i P_i$ salga
+negativa queda fuera del método, no es una banda con un nivel que declarar. Que
+un segmento aislado lleve potencia negativa es lo corriente, y es justo lo que
+$F_3$ existe para cuantificar.
+
+Lo que separa a la parte 1 de un barrido no es la integral, sino qué decide si
+se muestreó con la finura suficiente, y con un conjunto fijo de posiciones esa
+respuesta la tiene que dar la superficie misma. Los indicadores del anexo A
+promedian sobre las posiciones sin ponderar por áreas: $F_1$ es la variabilidad
+temporal (Ec. A.1), $F_2 = L_p - L_{|I_\mathrm{n}|}$ y
+$F_3 = L_p - L_{I_\mathrm{n}}$ son los indicadores de reactividad y de
+recirculación (Ecs. A.3 a A.7), y
+$F_4 = \frac{1}{|\overline{I_\mathrm{n}}|} \sqrt{\sum_i (I_{\mathrm{n}i} - \overline{I_\mathrm{n}})^2 / (N - 1)}$
+es la falta de uniformidad del campo (Ecs. A.8 y A.9), propia de la parte 1. El
+anexo B la convierte en un número de posiciones: el criterio 2 pide
+$N > C F_4^2$ (Ec. B.2) con la $C$ de la tabla B.2, de modo que una superficie
+que radia de forma desigual exige más posiciones, banda a banda, y el grado que
+alcanza una banda es aquel cuya $C$ sigue satisfaciendo esa desigualdad. El
+criterio 1, $L_\mathrm{d} > F_2$ (Ec. B.1), enfrenta la sonda con el campo antes
+de todo eso, y ningún promediado rescata a una banda que lo incumpla. La figura
+de la puerta de la subsección siguiente está dibujada con estos mismos nombres,
+porque son los de la parte 1.
+
 ### Barrido de intensidad (ISO 9614-2)
 
 La intensidad acústica es el flujo neto de energía $\vec{I} = \overline{p\ \vec{u}}$,
@@ -660,6 +696,8 @@ segmente la superficie.
 Consulta la [guía de potencia acústica](/phonometry/es/devices/emission/sound-power/)
 para la elección de método, y las guías de
 [métodos de presión](/phonometry/es/devices/emission/sound-power-pressure/),
-[cámara reverberante](/phonometry/es/devices/emission/sound-power-reverberation/) y
-[barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/) para su
+[cámara reverberante](/phonometry/es/devices/emission/sound-power-reverberation/),
+[barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/),
+[intensidad en puntos discretos](/phonometry/es/devices/emission/intensity/) y
+[vibración superficial](/phonometry/es/devices/emission/vibration-sound-power/) para su
 uso.

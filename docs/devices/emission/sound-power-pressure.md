@@ -470,7 +470,7 @@ the reproducibility one.*
 
 ## See also
 
-- [Sound Power](sound-power.md): choosing among the five determination
+- [Sound Power](sound-power.md): choosing among the seven determination
   routes, what the accuracy grades promise, and the ISO 4871 noise-emission
   declaration a measured $L_{W\mathrm{A}}$ feeds.
 - [Sound Power in the Reverberation Room (ISO 3741)](sound-power-reverberation.md):

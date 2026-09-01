@@ -620,7 +620,7 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 and EBU R 128.
 - [Sound Power by Intensity Scanning](/phonometry/devices/emission/sound-power-intensity/):
   the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade.
 - [Sound power from surface vibration (ISO/TS 7849)](/phonometry/devices/emission/vibration-sound-power/):
-  the fourth determination route, for the machine that cannot be moved into a
+  the seventh determination route, for the machine that cannot be moved into a
   qualified room: the radiated power from the surface-averaged velocity level
   and the radiation factor, with the Part 1 upper limit and the Part 2
   engineering value. Also listed under Vibration.

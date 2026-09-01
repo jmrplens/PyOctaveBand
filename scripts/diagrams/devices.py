@@ -11,7 +11,8 @@ diagram draws what is done to a device once it has been graded.
 from __future__ import annotations
 
 import itertools
-from typing import TYPE_CHECKING
+import math
+from typing import TYPE_CHECKING, NamedTuple
 
 from .parts import _accel, _box_solid, _box_wire, _motion_arrows, _rot_arrow
 
@@ -137,172 +138,328 @@ def _d_surfaces(s: SVG, th: Theme) -> None:
 # ---------------------------------------------------------------------------
 
 
-def _d_methods(s: SVG, th: Theme) -> None:
-    """All six determination routes, two rows of three.
+class _Method(NamedTuple):
+    """One determination route as the sound power plate draws it.
 
-    Every cell carries the same five attributes -- environment, grade, measured
-    quantity, headline relation and the limit that binds it -- so the columns
-    can be read across. The sixth is ISO/TS 7849, the only route that takes no
-    acoustic measurement at all.
+    The designation goes in the header; the five attributes after it are the
+    five every cell carries, in the order the cell prints them, so two cells
+    of a row can be read against each other line by line.
     """
-    cols = [
-        (
-            "ISO 3744 / 3746",
-            "Free field over a reflecting plane",
-            "Grade 2 / 3 (engineering / survey)",
-            "Sound pressure · enveloping surface",
-            "$L_W = L̄′_p + 10 log_{10}(S/S_0) − K_1 − K_2$",
-            "$K_{2A}$ ≤ 4 dB (3744) / ≤ 7 dB (3746)",
-            th.primary,
-            "hemi",
-        ),
-        (
-            "ISO 3745",
-            "Qualified anechoic / hemi-anechoic room",
-            "Grade 1 (precision)",
-            "Sound pressure · fixed 20 / 40 array",
-            "$L_W = L̄_p + 10 log_{10}(S/S_0) + C_1+C_2+C_3$",
-            "$r ≥ 2 d_0$ , qualified free field",
-            th.primary,
-            "anech",
-        ),
-        (
-            "ISO 3741",
-            "Reverberation test room",
-            "Grade 1 (precision)",
-            "Sound pressure · diffuse field",
-            "$L_W ← L̄_p , A , V , S , f$",
-            "$V$ ≥ 200 m³ , source ≤ 2 % of $V$",
-            th.accent,
-            "reverb",
-        ),
-        (
-            "ISO 9614-2",
-            "In situ — any environment",
-            "Grade 2 / 3 (engineering / survey)",
-            "Sound intensity · scanning",
-            "$L_W = 10 log_{10} |Σ I_i·S_i| / W_0$",
-            "no non-positive bands · $F_{pI} < L_d$",
-            th.secondary,
-            "probe",
-        ),
-        (
-            "ISO 9614-3",
-            "In situ — any environment",
-            "Grade 1 (precision)",
-            "Sound intensity · scanning, tighter",
-            "$L_W = 10 log_{10} |Σ I_i·S_i| / W_0$",
-            "five Annex C criteria per band",
-            th.secondary,
-            "probe",
-        ),
-        (
-            "ISO/TS 7849-1 / -2",
-            "Any — no acoustic measurement",
-            "Upper limit ($ε = 1$) / engineering",
-            "Surface velocity · accelerometers",
-            "$L_{WA} = L_{vA} + 10 lg(S/S_0) + 10 lg ε$",
-            "$ε$ assumed (-1) or measured (-2)",
-            th.fg,
-            "accel",
-        ),
-    ]
-    cw, ch, gap = 286.0, 300.0, 12.0
-    x0 = (900 - (3 * cw + 2 * gap)) / 2
-    for i, (name, env, grade, method, formula, note, col, pic) in enumerate(cols):
-        x = x0 + (i % 3) * (cw + gap)
-        ctop = 56.0 + (i // 3) * (ch + 20.0)
-        cxc, cbot = x + cw / 2, ctop + ch
-        s.rect(x, ctop, cw, ch, th.panel, col, rx=12, sw=2.2)
-        s.rect(x, ctop, cw, 38, col, col, rx=12, sw=0)
-        s.rect(x, ctop + 19, cw, 19, col, "none")  # square off header bottom
-        s.text(cxc, ctop + 27, name, 16, th.bg, bold=True)
 
-        # Mini-pictogram band, centred on py.
-        py = ctop + 92.0
-        if pic == "hemi":
-            R = 44.0
-            s.ellipse(cxc, py + 22, R, R * 0.3, "none", th.muted, 1.2, dash="4,3")
-            s.path(
-                f"M {cxc - R} {py + 22} A {R} {R} 0 0 1 {cxc + R} {py + 22}",
-                stroke=col,
-                sw=2.2,
-            )
-            s.line(cxc - R, py + 22, cxc + R, py + 22, th.muted, 1.4)
-            _box_solid(s, th, cxc, py + 22, 10, 8, 13, stroke=col)
-            for ang in (35, 90, 145):
-                import math
+    name: str
+    environment: str
+    grade: str
+    quantity: str
+    relation: str
+    limit: str
+    color: str
+    pictogram: str
 
-                a = math.radians(ang)
-                s.circle(
-                    cxc + R * math.cos(a), py + 22 - R * math.sin(a), 4.0, th.secondary
-                )
-        elif pic == "anech":
-            s.rect(cxc - 56, py - 24, 112, 68, th.bg, th.fg, rx=4, sw=1.8)
-            for k in range(6):
-                wx = cxc - 56 + k * 19
-                s.path(
-                    f"M {wx} {py - 24} L {wx + 19} {py - 24} L {wx + 9.5} {py - 12} Z",
-                    fill=th.muted,
-                    stroke="none",
-                )
-            s.line(cxc - 56, py + 44, cxc + 56, py + 44, th.fg, 2.0)
-            _box_solid(s, th, cxc, py + 44, 10, 8, 13, stroke=col)
-            for ang in (30, 90, 150):
-                import math
 
-                a = math.radians(ang)
-                s.circle(
-                    cxc + 42 * math.cos(a),
-                    py + 44 - 42 * math.sin(a),
-                    4.0,
+#: Geometry of the sound power plate. Three cells of ``_METHOD_CW`` and the
+#: two gutters between them fill the 900 px sheet; the one-route row is
+#: shorter than a cell because its picture sits beside its text rather than
+#: above it.
+_METHOD_CW = 286.0
+_METHOD_CH = 300.0
+_METHOD_GAP = 12.0
+_METHOD_BAND_H = 152.0
+
+
+def _d_methods(s: SVG, th: Theme) -> None:
+    """All seven determination routes, one row per measured quantity.
+
+    Every cell carries the same five attributes -- environment, grade,
+    measured quantity, headline relation and the limit that binds it -- so a
+    row can be read across. The rows are the quantity the instrument actually
+    reads: three routes read a sound pressure, three read a sound intensity,
+    and one reads the surface velocity of the machine's own casing and takes
+    no acoustic measurement at all. The last row therefore holds one route,
+    and it spans the three columns rather than sitting in the first of them
+    with two empty beside it: the row is the family, and this family has one
+    member.
+    """
+    rows = (
+        (
+            "Sound pressure",
+            (
+                _Method(
+                    "ISO 3744 / 3746",
+                    "Free field over a reflecting plane",
+                    "Grade 2 / 3 (engineering / survey)",
+                    "Sound pressure · enveloping surface",
+                    "$L_W = L̄′_p + 10 log_{10}(S/S_0) − K_1 − K_2$",
+                    "$K_{2A}$ ≤ 4 dB (3744) / ≤ 7 dB (3746)",
+                    th.primary,
+                    "hemi",
+                ),
+                _Method(
+                    "ISO 3745",
+                    "Qualified anechoic / hemi-anechoic room",
+                    "Grade 1 (precision)",
+                    "Sound pressure · fixed 20 / 40 array",
+                    "$L_W = L̄_p + 10 log_{10}(S/S_0) + C_1+C_2+C_3$",
+                    "$r ≥ 2 d_0$ , qualified free field",
+                    th.primary,
+                    "anech",
+                ),
+                _Method(
+                    "ISO 3741",
+                    "Reverberation test room",
+                    "Grade 1 (precision)",
+                    "Sound pressure · diffuse field",
+                    "$L_W ← L̄_p , A , V , S , f$",
+                    "$V$ ≥ 200 m³ , source ≤ 2 % of $V$",
+                    th.accent,
+                    "reverb",
+                ),
+            ),
+        ),
+        (
+            "Sound intensity",
+            (
+                _Method(
+                    "ISO 9614-1",
+                    "In situ — any environment",
+                    "Grade 1 / 2 per band, 3 on $L_{WA}$",
+                    "Sound intensity · discrete points",
+                    "$L_W = 10 log_{10}(Σ I_i·S_i / P_0)$",
+                    "no non-positive bands · two criteria (Annex B)",
                     th.secondary,
-                )
-        elif pic == "reverb":
-            s.rect(cxc - 50, py - 22, 100, 68, "none", col, rx=6, sw=2.2)
-            for k in range(3):
-                yy = py - 10 + k * 18
-                s.path(
-                    f"M {cxc - 38} {yy} q 10 -10 20 0 q 10 10 20 0 q 10 -10 20 0",
-                    stroke=th.muted,
-                    sw=1.5,
-                )
-            s.circle(cxc - 34, py + 36, 5, th.secondary)
-        elif pic == "accel":
-            s.rect(cxc - 50, py + 6, 100, 34, th.panel, col, rx=3, sw=2.0)
-            _accel(s, cxc + 18, py + 6)
-            _motion_arrows(s, cxc - 20, py - 4, 12, th.secondary)
-            for r in (18, 30):
-                s.path(
-                    f"M {cxc + 44 + r * 0.3:.1f} {py + 6 - r:.1f} "
-                    f"A {r} {r} 0 0 1 {cxc + 44 + r:.1f} {py + 6 - r * 0.3:.1f}",
-                    stroke=th.accent,
-                    sw=1.5,
-                )
-        else:  # probe scanning a surface
-            s.rect(cxc - 46, py - 26, 92, 76, "none", col, rx=6, sw=2.0)
-            s.path(
-                f"M {cxc - 36} {py - 14} L {cxc + 32} {py - 14} "
-                f"L {cxc + 32} {py + 2} L {cxc - 36} {py + 2} "
-                f"L {cxc - 36} {py + 18} L {cxc + 32} {py + 18}",
-                stroke=th.accent,
-                sw=1.7,
-            )
-            s.circle(cxc + 32, py + 18, 5, th.secondary)
-            s.text(cxc, py + 44, "$I⊥$", 14, col, bold=True)
+                    "points",
+                ),
+                _Method(
+                    "ISO 9614-2",
+                    "In situ — any environment",
+                    "Grade 2 / 3 (engineering / survey)",
+                    "Sound intensity · scanning",
+                    "$L_W = 10 log_{10}(|Σ I_i·S_i| / P_0)$",
+                    "no non-positive bands · $F_{pI} < L_d$",
+                    th.secondary,
+                    "scan",
+                ),
+                _Method(
+                    "ISO 9614-3",
+                    "In situ — any environment",
+                    "Grade 1 (precision)",
+                    "Sound intensity · scanning, tighter",
+                    "$L_W = 10 log_{10}(|Σ I_i·S_i| / P_0)$",
+                    "five Annex C criteria per band",
+                    th.secondary,
+                    "scan",
+                ),
+            ),
+        ),
+        (
+            "Surface velocity",
+            (
+                _Method(
+                    "ISO/TS 7849-1 / -2",
+                    "Any — no acoustic measurement",
+                    "Upper limit ($ε = 1$) / engineering",
+                    "Surface velocity · accelerometers",
+                    "$L_{WA} = L_{vA} + 10 lg(S/S_0) + 10 lg ε$",
+                    "$ε$ assumed (-1) or measured (-2)",
+                    th.fg,
+                    "accel",
+                ),
+            ),
+        ),
+    )
+    width = 3 * _METHOD_CW + 2 * _METHOD_GAP
+    x0 = (900 - width) / 2
+    y = 44.0
+    for label, routes in rows:
+        _methods_rail(s, th, x0, y, x0 + width, label)
+        y += 26.0
+        if len(routes) == 1:
+            _methods_band(s, th, x0, y, width, routes[0])
+            y += _METHOD_BAND_H + 28.0
+        else:
+            for i, route in enumerate(routes):
+                _methods_card(s, th, x0 + i * (_METHOD_CW + _METHOD_GAP), y, route)
+            y += _METHOD_CH + 28.0
 
-        # Attribute rows.
-        for yy, txt, cc, bold in (
-            (py + 78, env, th.fg, False),
-            (py + 100, grade, col, True),
-            (py + 122, method, th.muted, False),
-        ):
-            s.text(cxc, yy, txt, 11, cc, bold=bold)
 
-        # Headline relation in a boxed footer, then the binding limit.
-        s.rect(x + 6, cbot - 66, cw - 12, 36, "none", col, rx=8, dash="5,4")
-        s.text(cxc, cbot - 43, formula, 10, th.fg, bold=True)
-        s.text(cxc, cbot - 12, note, 11, th.muted)
+def _methods_rail(
+    s: SVG, th: Theme, x: float, y: float, right: float, label: str
+) -> None:
+    """The measured quantity a row shares, and a rule out to the margin."""
+    s.text(x, y + 14, label, 13, th.muted, anchor="start", bold=True)
+    s.line(
+        x + s.text_width(label, 13, bold=True) + 12.0,
+        y + 10,
+        right,
+        y + 10,
+        th.muted,
+        1.0,
+    )
+
+
+def _methods_header(
+    s: SVG, th: Theme, x: float, top: float, w: float, m: _Method
+) -> None:
+    """Panel, coloured title bar and designation, shared by cell and band."""
+    s.rect(x, top, w, 38, m.color, m.color, rx=12, sw=0)
+    s.rect(x, top + 19, w, 19, m.color, "none")  # square off header bottom
+    s.text(x + w / 2, top + 27, m.name, 16, th.bg, bold=True)
+
+
+def _methods_relation(s: SVG, th: Theme, cx: float, top: float, m: _Method) -> None:
+    """Headline relation in its dashed box, then the limit that binds it."""
+    s.rect(cx - 137, top, 274, 36, "none", m.color, rx=8, dash="5,4")
+    s.text(cx, top + 23, m.relation, 10, th.fg, bold=True)
+    s.text(cx, top + 54, m.limit, 11, th.muted)
+
+
+def _methods_attributes(s: SVG, th: Theme, cx: float, top: float, m: _Method) -> None:
+    """Environment, grade and measured quantity, one line each."""
+    for yy, txt, cc, bold in (
+        (top, m.environment, th.fg, False),
+        (top + 22, m.grade, m.color, True),
+        (top + 44, m.quantity, th.muted, False),
+    ):
+        s.text(cx, yy, txt, 11, cc, bold=bold)
+
+
+def _methods_card(s: SVG, th: Theme, x: float, ctop: float, m: _Method) -> None:
+    """One route in a column: picture above, attributes below, relation last."""
+    cxc = x + _METHOD_CW / 2
+    s.rect(x, ctop, _METHOD_CW, _METHOD_CH, th.panel, m.color, rx=12, sw=2.2)
+    _methods_header(s, th, x, ctop, _METHOD_CW, m)
+    _methods_pictogram(s, th, cxc, ctop + 92.0, m)
+    _methods_attributes(s, th, cxc, ctop + 170.0, m)
+    _methods_relation(s, th, cxc, ctop + _METHOD_CH - 66.0, m)
+
+
+def _methods_band(
+    s: SVG, th: Theme, x: float, top: float, w: float, m: _Method
+) -> None:
+    """The sole route of its row, laid across the three columns.
+
+    The same five attributes, turned on their side: the picture takes the
+    first third, the three attribute lines the second and the relation with
+    its limit the third.
+    """
+    third = w / 3.0
+    s.rect(x, top, w, _METHOD_BAND_H, th.panel, m.color, rx=12, sw=2.2)
+    _methods_header(s, th, x, top, w, m)
+    _methods_pictogram(s, th, x + third / 2 - 12.0, top + 87.0, m)
+    _methods_attributes(s, th, x + w / 2, top + 73.0, m)
+    _methods_relation(s, th, x + w - third / 2, top + 65.0, m)
+
+
+def _methods_pictogram(s: SVG, th: Theme, cxc: float, py: float, m: _Method) -> None:
+    """The mini-drawing of a route, centred on ``(cxc, py)``."""
+    draw = {
+        "hemi": _methods_pic_hemi,
+        "anech": _methods_pic_anech,
+        "reverb": _methods_pic_reverb,
+        "accel": _methods_pic_accel,
+        "points": _methods_pic_points,
+        "scan": _methods_pic_scan,
+    }[m.pictogram]
+    draw(s, th, cxc, py, m.color)
+
+
+def _methods_pic_hemi(s: SVG, th: Theme, cxc: float, py: float, col: str) -> None:
+    """Hemispherical measurement surface over a reflecting plane."""
+    r = 44.0
+    s.ellipse(cxc, py + 22, r, r * 0.3, "none", th.muted, 1.2, dash="4,3")
+    s.path(
+        f"M {cxc - r} {py + 22} A {r} {r} 0 0 1 {cxc + r} {py + 22}",
+        stroke=col,
+        sw=2.2,
+    )
+    s.line(cxc - r, py + 22, cxc + r, py + 22, th.muted, 1.4)
+    _box_solid(s, th, cxc, py + 22, 10, 8, 13, stroke=col)
+    for ang in (35, 90, 145):
+        a = math.radians(ang)
+        s.circle(cxc + r * math.cos(a), py + 22 - r * math.sin(a), 4.0, th.secondary)
+
+
+def _methods_pic_anech(s: SVG, th: Theme, cxc: float, py: float, col: str) -> None:
+    """Wedge-lined room with the source on the reflecting plane."""
+    s.rect(cxc - 56, py - 24, 112, 68, th.bg, th.fg, rx=4, sw=1.8)
+    for k in range(6):
+        wx = cxc - 56 + k * 19
+        s.path(
+            f"M {wx} {py - 24} L {wx + 19} {py - 24} L {wx + 9.5} {py - 12} Z",
+            fill=th.muted,
+            stroke="none",
+        )
+    s.line(cxc - 56, py + 44, cxc + 56, py + 44, th.fg, 2.0)
+    _box_solid(s, th, cxc, py + 44, 10, 8, 13, stroke=col)
+    for ang in (30, 90, 150):
+        a = math.radians(ang)
+        s.circle(cxc + 42 * math.cos(a), py + 44 - 42 * math.sin(a), 4.0, th.secondary)
+
+
+def _methods_pic_reverb(s: SVG, th: Theme, cxc: float, py: float, col: str) -> None:
+    """Reverberation room: a hard-walled box carrying a diffuse field."""
+    s.rect(cxc - 50, py - 22, 100, 68, "none", col, rx=6, sw=2.2)
+    for k in range(3):
+        yy = py - 10 + k * 18
+        s.path(
+            f"M {cxc - 38} {yy} q 10 -10 20 0 q 10 10 20 0 q 10 -10 20 0",
+            stroke=th.muted,
+            sw=1.5,
+        )
+    s.circle(cxc - 34, py + 36, 5, th.secondary)
+
+
+def _methods_pic_accel(s: SVG, th: Theme, cxc: float, py: float, col: str) -> None:
+    """Radiating casing carrying an accelerometer, and no microphone."""
+    s.rect(cxc - 50, py + 6, 100, 34, th.panel, col, rx=3, sw=2.0)
+    _accel(s, cxc + 18, py + 6)
+    _motion_arrows(s, cxc - 20, py - 4, 12, th.secondary)
+    for r in (18, 30):
+        s.path(
+            f"M {cxc + 44 + r * 0.3:.1f} {py + 6 - r:.1f} "
+            f"A {r} {r} 0 0 1 {cxc + 44 + r:.1f} {py + 6 - r * 0.3:.1f}",
+            stroke=th.accent,
+            sw=1.5,
+        )
+
+
+def _methods_pic_points(s: SVG, th: Theme, cxc: float, py: float, col: str) -> None:
+    """Measurement surface cut into segments, one held position in each.
+
+    Ten of them, which is the floor clause 8.2 puts under the position set,
+    and the drawn contrast with the scanning cells beside it: dots at rest in
+    their own segments rather than one path swept over the whole surface.
+    """
+    cols, rows = 5, 2
+    left, top, w, h = cxc - 46, py - 26, 92.0, 52.0
+    s.rect(left, top, w, 76, "none", col, rx=6, sw=2.0)
+    for k in range(1, cols):
+        s.line(left + k * w / cols, top, left + k * w / cols, top + h, th.muted, 1.0)
+    # The mid rule divides the two rows; the one below closes the grid off from
+    # the strip that carries the label, so no divider ends in mid-panel.
+    for k in (1, 2):
+        s.line(left, top + k * h / rows, left + w, top + k * h / rows, th.muted, 1.0)
+    for j, i in itertools.product(range(cols), range(rows)):
+        s.circle(
+            left + (j + 0.5) * w / cols,
+            top + (i + 0.5) * h / rows,
+            2.8,
+            th.accent,
+        )
+    s.text(cxc, py + 44, "$I⊥$", 14, col, bold=True)
+
+
+def _methods_pic_scan(s: SVG, th: Theme, cxc: float, py: float, col: str) -> None:
+    """Probe swept over the measurement surface along a serpentine path."""
+    s.rect(cxc - 46, py - 26, 92, 76, "none", col, rx=6, sw=2.0)
+    s.path(
+        f"M {cxc - 36} {py - 14} L {cxc + 32} {py - 14} "
+        f"L {cxc + 32} {py + 2} L {cxc - 36} {py + 2} "
+        f"L {cxc - 36} {py + 18} L {cxc + 32} {py + 18}",
+        stroke=th.accent,
+        sw=1.7,
+    )
+    s.circle(cxc + 32, py + 18, 5, th.secondary)
+    s.text(cxc, py + 44, "$I⊥$", 14, col, bold=True)
 
 
 # ---------------------------------------------------------------------------
@@ -2402,8 +2559,6 @@ def _d_loudspeaker_polar(s: SVG, th: Theme) -> None:
     the drive is retrimmed per band so that the on-axis pressure is held
     constant. The inset is the same cut on the IEC 60263 reference circle.
     """
-    import math
-
     cx, cy, r = 292.0, 300.0, 176.0
 
     # Anechoic boundary.
@@ -2544,8 +2699,6 @@ def _d_microphone_references(s: SVG, th: Theme) -> None:
     small against the wavelength and separate once it is not, which is the
     whole reason the *type* has to be quoted with the number.
     """
-    import math
-
     tops, w = (34.0, 320.0, 606.0), 260.0
     heads = ("Free field (11.2.1)", "Diffuse field (11.2.2)", "Pressure (11.2.4)")
     for x0, head in zip(tops, heads, strict=True):

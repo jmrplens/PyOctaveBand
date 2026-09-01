@@ -53,7 +53,7 @@ Several areas keep their theory **inside their guides** instead, because the der
 - [Environmental descriptors (ISO 1996-1)](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/#environmental-descriptors-iso-1996-1)
 - [Impulsive-sound prominence (NT ACOU 112)](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/#impulsive-sound-prominence-nt-acou-112)
 - [Outdoor propagation and occupational exposure (ISO 9613-1/2, ISO 9612)](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/#outdoor-propagation-and-occupational-exposure-iso-9613-12-iso-9612)
-- [Sound power determination (ISO 3744/3745/3746, ISO 3741, ISO 9614-2/3)](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/#sound-power-determination-iso-374437453746-iso-3741-iso-9614-23)
+- [Sound power determination (ISO 3744/3745/3746, ISO 3741, ISO 9614-1/2/3)](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/#sound-power-determination-iso-374437453746-iso-3741-iso-9614-123)
 
 ## [Vibration](https://jmrplens.github.io/phonometry/reference/theory/vibration/)
 
@@ -282,15 +282,23 @@ to cross an action value on its own.*
 See the [Outdoor Propagation guide](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/) and the
 [Occupational Noise Exposure guide](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/) for usage.
 
-## Sound power determination (ISO 3744/3745/3746, ISO 3741, ISO 9614-2/3)
+## Sound power determination (ISO 3744/3745/3746, ISO 3741, ISO 9614-1/2/3)
 
 The sound power level $L_W = 10 \log_{10}(P/P_0)$ ($P_0 = 1$ pW) is an
 *emission* quantity: unlike a pressure level it does not depend on the receiver
-distance or the room. Three families of methods recover it.
+distance or the room. Three families of methods recover it, one per measured
+quantity: a **sound pressure** over an enveloping surface (ISO 3744/3746, and
+ISO 3745 when the room is anechoic) or in a diffuse field (ISO 3741), a **sound
+intensity** held at discrete points (ISO 9614-1) or scanned over that same
+surface (ISO 9614-2 and ISO 9614-3), and the **surface velocity** of the
+radiating casing, which takes no acoustic measurement at all: ISO/TS 7849, whose
+radiation factor is the radiation efficiency derived in the
+[vibration reference](https://jmrplens.github.io/phonometry/reference/theory/vibration/#point-mobilities-and-radiation-efficiency-cremer-5-hopkins-29).
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods.svg" alt="The three sound power routes side by side: an enveloping pressure surface over a reflecting plane (ISO 3744/3746), a source in a reverberation room sampled by microphones (ISO 3741) and an intensity probe scanning a surface around the source (ISO 9614-2)" width="92%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods.svg" alt="The seven sound power routes, one row for each measured quantity, every cell carrying the same five attributes. The sound pressure row: the ISO 3744/3746 hemispherical enveloping surface over a reflecting plane, the ISO 3745 fixed microphone array in a wedge-lined anechoic room, and the ISO 3741 diffuse field of a reverberation room. The sound intensity row: the ISO 9614-1 measurement surface cut into ten segments with the probe held still at a point in each, the ISO 9614-2 serpentine scan swept over that same surface, and the tighter ISO 9614-3 precision scan. The surface velocity row carries one route across the full width, ISO/TS 7849 with an accelerometer on a radiating casing and no microphone at all" width="92%"></picture>
 
-*The three routes to $L_W$: enveloping pressure surface, reverberation room and intensity scan.*
+*The seven routes to $L_W$, one row per measured quantity: a sound pressure, a
+sound intensity, or the surface velocity of the casing.*
 
 ### Enveloping-surface pressure (ISO 3744/3746)
 
@@ -351,6 +359,33 @@ reference source of known power measured in the same room,
 $L_W = L_{W(\text{RSS})} + (\bar{L}_p - \bar{L}_{p,\text{RSS}} + C_2)$, so the
 absorption-area, Waterhouse and $C_1$ terms cancel and the room need not be
 characterised.
+
+### Discrete-point intensity (ISO 9614-1)
+
+Part 1 holds the probe still. One position stands for each segment of the
+measurement surface, so the partial power is $P_i = I_{\mathrm{n}i} S_i$
+(Eq. 11) and the sound power is $L_W = 10 \log_{10}(\sum_i P_i / P_0)$
+(Eq. 12). That sum is printed without the absolute-value bars of the general
+definition because clause 9.2 disposes of the negative case instead: a band
+whose $\sum_i P_i$ comes out negative is outside the method rather than a band
+with a level to report. One segment carrying negative power is ordinary, and is
+what $F_3$ exists to quantify.
+
+What separates Part 1 from a scan is not the integral but what decides whether
+it was sampled finely enough, and with a fixed set of positions the surface has
+to answer that itself. The Annex A indicators average over positions without
+area weighting: $F_1$ is the temporal variability (Eq. A.1),
+$F_2 = L_p - L_{|I_\mathrm{n}|}$ and $F_3 = L_p - L_{I_\mathrm{n}}$ are the
+reactivity and recirculation indicators (Eqs. A.3 to A.7), and
+$F_4 = \frac{1}{|\overline{I_\mathrm{n}}|} \sqrt{\sum_i (I_{\mathrm{n}i} - \overline{I_\mathrm{n}})^2 / (N - 1)}$
+is the field non-uniformity (Eqs. A.8 and A.9), which is Part 1's own. Annex B
+turns it into a position count: criterion 2 asks $N > C F_4^2$ (Eq. B.2) with
+$C$ from Table B.2, so a surface that radiates unevenly demands more positions,
+band by band, and the grade a band earns is the grade whose $C$ that inequality
+still satisfies. Criterion 1, $L_\mathrm{d} > F_2$ (Eq. B.1), puts the probe
+against the field before any of that, and no amount of averaging rescues a band
+that fails it. The gate figure in the next subsection is drawn in exactly these
+names, because they are Part 1's.
 
 ### Intensity scanning (ISO 9614-2)
 

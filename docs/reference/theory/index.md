@@ -46,7 +46,7 @@ Several areas keep their theory **inside their guides** instead, because the der
 - [Environmental descriptors (ISO 1996-1)](environment-transport.md#environmental-descriptors-iso-1996-1)
 - [Impulsive-sound prominence (NT ACOU 112)](environment-transport.md#impulsive-sound-prominence-nt-acou-112)
 - [Outdoor propagation and occupational exposure (ISO 9613-1/2, ISO 9612)](environment-transport.md#outdoor-propagation-and-occupational-exposure-iso-9613-12-iso-9612)
-- [Sound power determination (ISO 3744/3745/3746, ISO 3741, ISO 9614-2/3)](environment-transport.md#sound-power-determination-iso-374437453746-iso-3741-iso-9614-23)
+- [Sound power determination (ISO 3744/3745/3746, ISO 3741, ISO 9614-1/2/3)](environment-transport.md#sound-power-determination-iso-374437453746-iso-3741-iso-9614-123)
 
 ## [Vibration](vibration.md)
 

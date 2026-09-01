@@ -290,8 +290,8 @@ factor and the boxed LWA.*
 
 ## See also
 
-- [Sound Power](sound-power.md): the route chooser
-  this method is the sixth entry of, the accuracy grades and the ISO 4871
+- [Sound Power](sound-power.md): the route chooser this method is the seventh
+  entry of, what the accuracy grades promise, and the ISO 4871 noise-emission
   declaration a result feeds.
 - [Sound Power by Intensity Scanning (ISO 9614)](sound-power-intensity.md):
   the determination that produces the $P_j$ behind a Part 2 radiation factor.

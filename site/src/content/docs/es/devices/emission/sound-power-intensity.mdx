@@ -752,14 +752,13 @@ que rechazan los criterios del Anexo C.
 
 <ScopeClaim status="not-covered" label="No cubierto">
 ISO 9614-1, el método de intensidad de puntos fijos discretos, no es una de
-las vías de aquí: solo se reutilizan sus indicadores de campo, y la
-determinación de potencia por puntos discretos no está implementada en
-absoluto; la [guía de intensidad
-acústica](/phonometry/es/devices/emission/intensity/) cubre la sonda y los
-indicadores de campo del Anexo A que ambas partes comparten. El sesgo por
+las vías de aquí: mantiene la sonda quieta en cada posición en vez de
+barrerla, y tanto su determinación de potencia como los indicadores de campo
+del Anexo A que reutilizan las dos partes de barrido están en la [guía de
+intensidad acústica](/phonometry/es/devices/emission/intensity/). El sesgo por
 diferencias finitas de la sonda y el índice de intensidad residual de presión
 son propiedades medidas del instrumento, cubiertas en la misma guía. La
-elección entre las seis vías, y la declaración ISO 4871 que un resultado
+elección entre las siete vías, y la declaración ISO 4871 que un resultado
 alimenta, viven en [Potencia
 acústica](/phonometry/es/devices/emission/sound-power/).
 </ScopeClaim>
@@ -768,11 +767,12 @@ acústica](/phonometry/es/devices/emission/sound-power/).
 ## Véase también
 
 - [Potencia acústica](/phonometry/es/devices/emission/sound-power/): la elección entre
-  las cinco vías de determinación, los grados de precisión y la declaración
+  las siete vías de determinación, los grados de precisión y la declaración
   de emisión sonora de ISO 4871.
 - [Intensidad acústica (p-p)](/phonometry/es/devices/emission/intensity/): la sonda de
-  dos micrófonos, su sesgo por diferencias finitas y los indicadores de
-  campo de ISO 9614-1 que sustentan los métodos de barrido.
+  dos micrófonos, su sesgo por diferencias finitas, los indicadores de campo
+  de ISO 9614-1 que sustentan los métodos de barrido y la determinación en
+  puntos discretos que esos indicadores cualifican.
 - [Potencia acústica por métodos de presión (ISO 3744 / ISO 3746 / ISO 3745)](/phonometry/es/devices/emission/sound-power-pressure/):
   las vías de superficie envolvente y anecoica para emplazamientos
   silenciosos.
@@ -782,4 +782,4 @@ acústica](/phonometry/es/devices/emission/sound-power/).
 - [Teoría](/phonometry/es/reference/theory/environment-transport/): las
   derivaciones de los indicadores de campo.
 - Referencia de la API: [`emission.sound_power_intensity`](/phonometry/es/reference/api/power/sound-power-intensity/).
-- Teoría: [Determinación de la potencia acústica](/phonometry/es/reference/theory/environment-transport/#determinación-de-la-potencia-acústica-iso-374437453746-iso-3741-iso-9614-23): la derivación del barrido de la ISO 9614 y los indicadores de campo que la cualifican.
+- Teoría: [Determinación de la potencia acústica](/phonometry/es/reference/theory/environment-transport/#determinación-de-la-potencia-acústica-iso-374437453746-iso-3741-iso-9614-123): la derivación del barrido de la ISO 9614 y los indicadores de campo que la cualifican.

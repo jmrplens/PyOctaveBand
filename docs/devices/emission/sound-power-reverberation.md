@@ -253,7 +253,7 @@ $C_1$/$C_2$ corrections and the boxed $L_{W\mathrm{A}}$.*
 
 ## See also
 
-- [Sound Power](sound-power.md): choosing among the five determination
+- [Sound Power](sound-power.md): choosing among the seven determination
   routes, what the accuracy grades promise, and the ISO 4871 noise-emission
   declaration a measured $L_{W\mathrm{A}}$ feeds.
 - [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](sound-power-pressure.md):

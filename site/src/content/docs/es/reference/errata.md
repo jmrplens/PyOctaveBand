@@ -1369,6 +1369,230 @@ which is the check that enforces the rule; see
   ([`tests/emission/test_intensity_compliance.py`](https://github.com/jmrplens/phonometry/blob/main/tests/emission/test_intensity_compliance.py)).
 - **Status:** unreported (national translation, not the issuing body's text).
 
+## UNE-EN ISO 9614-1:2010, clause 9.1 (the sign dropped from "signed magnitude" in translation)
+
+- **Location:** clause 9.1, the symbol list under Formula (11)
+  $P_i = I_{\mathrm{n}i} \cdot S_i$, of UNE-EN ISO 9614-1 (March 2010), which
+  declares itself "la versión en español de la Norma Europea EN ISO
+  9614-1:2009", the European adoption of ISO 9614-1:1993.
+- **The print:** "$I_{\mathrm{n}i}$ es el **módulo** de la componente de la
+  intensidad acústica normal medida en la posición $i$ sobre la superficie de
+  medida". The ISO original reads "$I_{\mathrm{n}i}$ is the **signed
+  magnitude** of the normal sound intensity component measured at position $i$
+  on the measurement surface".
+- **The problem:** *módulo* is the absolute value, so the qualifier that
+  carried the sign is gone, and the sign is what the rest of the method turns
+  on. The Spanish print then contradicts itself twice over. The same clause 9.1
+  gives, two paragraphs below that line, the conversion to apply when the level
+  of a position is written $(-)\,XX$ dB:
+  $I_{\mathrm{n}i} = -I_0 \times 10^{XX/10}$, a negative $I_{\mathrm{n}i}$.
+  Clause 3.6.1, which defines the very quantity Formula (11) computes, calls
+  $I_{\mathrm{n}i}$ "la componente normal, **con su signo**, de la intensidad
+  acústica medida en la posición $i$", and A.2.3 calls it "el **valor
+  algebraico** de la componente de intensidad acústica normal". And clause 9.2
+  makes $\sum_i P_i$ *being negative* the condition that puts a frequency band
+  outside the method, which no sum of magnitudes and positive areas can ever
+  be. Read as a magnitude the method loses the one thing measurement at
+  discrete points is for: separating the energy leaving the source from the
+  energy flowing back in through part of the surface, which is what $F_3$
+  (Formulae (A.6) and (A.7)) and $F_4$ (Formulae (A.8) and (A.9)) are built to
+  quantify from the algebraic mean of the same $I_{\mathrm{n}i}$.
+- **Evidence:** the two prints of the same symbol list, set side by side, and
+  the three Spanish clauses read against one another. PDF pages 10, 18 and 22
+  (printed pp. 10, 18 and 22) of UNE-EN ISO 9614-1:2010; PDF page 12 (printed
+  p. 7) of ISO 9614-1:1993, where the qualifier is present.
+- **Library behaviour:** implements the signed reading throughout, which is the
+  ISO text.
+  [`sound_power_intensity_points`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_intensity_points.py)
+  sums signed partial powers, flags the bands whose sum is not positive as
+  outside the method, and reports $F_3 - F_2$ as the excess the inward flow
+  produces; `normal_intensity_from_levels` carries the $(-)$ of the print as a
+  separate argument, because the printed level never holds it. Pinned by
+  `test_a_genuinely_negative_partial_power_is_kept_and_summed` and the signed
+  conversion tests in
+  [`tests/emission/test_sound_power_intensity_points.py`](https://github.com/jmrplens/phonometry/blob/main/tests/emission/test_sound_power_intensity_points.py).
+- **Status:** unreported (national translation, not the issuing body's text: a
+  reader working from the ISO edition has nothing to work around).
+
+## UNE-EN ISO 9614-1:2010, clause A.2.3 (modulus bars on the algebraic intensity level)
+
+- **Location:** Annex A, clause A.2.3, the "donde" list under Formula (A.6)
+  $F_3 = \overline{L_p} - \overline{L_{I_\mathrm{n}}}$.
+- **The print:** the second entry of the list is typeset
+  $\overline{L_{|I_\mathrm{n}|}}$, with the absolute-value bars, and reads "es
+  el valor algebraico del nivel de intensidad acústica superficial, en
+  decibelios, calculado a partir de la ecuación (A.7)". Formula (A.7), three
+  lines below on the same page, is labelled $\overline{L_{I_\mathrm{n}}}$,
+  without the bars.
+- **The problem:** the barred symbol is A.2.2's, the level of the mean
+  *magnitude* of Formula (A.5), which is exactly what $F_2$ subtracts. With the
+  bars, $F_3$ and $F_2$ would be the same indicator and the whole of A.2.3
+  would be redundant; the sentence beside the symbol says "valor algebraico"
+  and points at (A.7), which takes the algebraic mean. The ISO original prints
+  the same entry without the bars and describes it as "the surface normal
+  signed intensity level", so the bars are the translation's own typesetting.
+- **Evidence:** the symbol as set in the two editions, and the barless (A.7) on
+  the same page as the barred entry. PDF page 22 (printed p. 22) of UNE-EN ISO
+  9614-1:2010; PDF page 15 (printed p. 10) of ISO 9614-1:1993.
+- **Library behaviour:** none required. `field_indicators` in
+  [`intensity.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/intensity.py) forms $F_3$ from
+  the algebraic mean of Formula (A.7) and $F_2$ from the mean magnitude of
+  Formula (A.5), which is what makes $F_3 - F_2$ the inward-flow excess the
+  Annex B gate is written on. Registered as a label defect.
+- **Status:** unreported (national translation, not the issuing body's text).
+
+## ISO 9614-1:1993, clause B.1.3 ($F_4$ cross-referenced to A.2.3, which defines $F_3$)
+
+- **Location:** Annex B, clause B.1.3, the sentence introducing the two
+  separate evaluations of $F_4$ that Formula (B.4) consumes.
+- **The print:** "Calculate indicator $F_4$ separately according to **A.2.3**",
+  over the two items "a) for the segment subset $N_\alpha$ having total area
+  $S_\alpha$, and" and "b) for the remaining segments". The Spanish edition
+  renders the same clause number: "Calcular el indicador $F_4$ separadamente
+  de acuerdo al apartado A.2.3 para: a) el subconjunto de segmentos $N_\alpha$
+  con área total $S_\alpha$, y b) los segmentos restantes."
+- **The problem:** A.2.3 is "Negative partial power indicator", which defines
+  $F_3$ by Formulae (A.6) and (A.7). $F_4$ is A.2.4, "Field non-uniformity
+  indicator", Formulae (A.8) and (A.9). Followed as printed, the reference
+  computes the wrong indicator for $F_4(\alpha)$ and $F_4(1-\alpha)$, and those
+  are what size the new positions in Formula (B.4). Both editions carry the
+  same clause numbering, so the defect is the issuing body's.
+- **Evidence:** the reference and the headings of A.2.3 and A.2.4 read against
+  each other. PDF pages 18 and 15 to 16 (printed pp. 13 and 10 to 11) of ISO
+  9614-1:1993; the same sentence at PDF page 24 (printed p. 24) of UNE-EN ISO
+  9614-1:2010.
+- **Library behaviour:** follows the intended target. $F_4(\alpha)$ and
+  $F_4(1-\alpha)$ are computed per A.2.4 in
+  [`partial_power_concentration`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_intensity_points.py).
+  The reference changes no number the library reports, so no other change was
+  needed.
+- **Status:** unreported (cross-reference defect, no numerical consequence).
+
+## UNE-EN ISO 9614-1:2010, clause 10.5 c) (an equation number replaced by a chapter that is not there)
+
+- **Location:** clause 10.5 c), "Datos acústicos", the reporting requirement
+  that accompanies the level of a band which does not satisfy criterion 2.
+- **The print:** "Una referencia a la incertidumbre prevista en el nivel de
+  potencia acústica determinada para cada banda de frecuencia en la que no se
+  satisfaga el criterio 2 del anexo B, **de acuerdo a la ecuación (véase el
+  capítulo B.3)**." The ISO original reads "A statement of the predicted
+  uncertainty in the sound power level determined for each frequency band, in
+  which criterion 2 of annex B is not satisfied, **according to equation
+  (B.3)**."
+- **The problem:** the number that identified the equation has been moved into
+  a cross-reference and changed on the way. "De acuerdo a la ecuación ( )"
+  names no equation, and what the parenthesis names instead is not part of the
+  document: Annex B divides into B.1, with B.1.1 to B.1.5, and B.2, and stops
+  there, so there is no chapter B.3 to look up. The requirement is unusable as
+  printed unless the reader recognises Formula (B.3), the 95 % confidence
+  interval $10 \lg (1 \pm 2 F_4 / \sqrt{N})$, which clause B.1.2 introduces
+  with this very condition attached to it.
+- **Evidence:** the two prints of the same item, and the divisions of Annex B
+  as its headings run. PDF pages 20 and 23 to 26 (printed pp. 20 and 23 to 26)
+  of UNE-EN ISO 9614-1:2010; PDF page 14 (printed p. 9) of ISO 9614-1:1993,
+  where the equation number is present.
+- **Library behaviour:** reports the interval of Formula (B.3) for every band,
+  so the statement clause 10.5 c) asks for can be made about any band that
+  needs it. `confidence_interval` on
+  [`DiscretePointIntensityResult`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_intensity_points.py)
+  carries the pair, and `criterion_2` says which bands the requirement applies
+  to. The defect changes no number, only where a reader is sent to find the
+  formula.
+- **Status:** unreported (national translation, not the issuing body's text).
+
+## ISO 9614-1:1993, Table B.3 (actions c and d both claim $F_3 - F_2 = 1$ dB)
+
+- **Location:** Table B.3, "Actions to be taken to increase grade of accuracy
+  of determination", the criterion cells of the action-c and action-d rows.
+- **The print:** action c is conditioned on "Criterion 2 not satisfied and
+  1 dB $\leq (F_3 - F_2) \leq$ 3 dB"; action d on "Criterion 2 not satisfied
+  and $(F_3 - F_2) \leq$ 1 dB, and the procedure of 8.3.2 either fails or is
+  not selected". Both inequalities are printed non-strict, in both editions.
+- **The problem:** the two rows overlap at exactly $F_3 - F_2 = 1$ dB, where
+  the table prescribes two different actions for one state: increase the
+  density of positions uniformly (c), or move the surface out and keep the
+  positions (d). A normative decision table is not implementable while that
+  holds. The document settles it elsewhere: Figure B.1's fifth decision diamond
+  is "$(F_3 - F_2) \leq$ 1 dB ?", and its **Yes** branch is the one that leads
+  to the optional procedure and to action d, so 1 dB belongs to d and c begins
+  above it. Clause 8.3.2 agrees, opening the optional procedure "if
+  $F_3 - F_2 \leq$ 1 dB".
+- **Evidence:** the two criterion cells, the diamond and its branches, and the
+  clause 8.3.2 condition. PDF pages 19, 20 and 12 (printed pp. 14, 15 and 7) of
+  ISO 9614-1:1993; the same three places at PDF pages 26, 27 and 17 (printed
+  pp. 26, 27 and 17) of UNE-EN ISO 9614-1:2010.
+- **Library behaviour:** follows Figure B.1 and clause 8.3.2. `required_actions`
+  on
+  [`DiscretePointIntensityResult`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_intensity_points.py)
+  answers a band that fails criterion 2 with action c above 1 dB and action d
+  at 1 dB and below, pinned at the boundary itself by
+  `test_action_d_is_the_action_at_exactly_one_decibel` in
+  [`tests/emission/test_sound_power_intensity_points.py`](https://github.com/jmrplens/phonometry/blob/main/tests/emission/test_sound_power_intensity_points.py).
+- **Status:** unreported.
+
+## ISO 9614-1:1993, equations (A.1) and (A.8) (the normalizing intensity without its overbar)
+
+- **Location:** Annex A, clause A.2.1, equation (A.1) for the temporal
+  variability indicator $F_1$, and clause A.2.4, equation (A.8) for the field
+  non-uniformity indicator $F_4$.
+- **The print:** both equations open with the factor $1/I_\mathrm{n}$, an
+  unbarred symbol, while the deviation inside the sum is written against a
+  clearly overbarred $\overline{I_\mathrm{n}}$:
+  $F_1 = \frac{1}{I_\mathrm{n}} \sqrt{\frac{1}{M-1}\sum_k (I_{\mathrm{n}k} -
+  \overline{I_\mathrm{n}})^2}$ and
+  $F_4 = \frac{1}{I_\mathrm{n}} \sqrt{\frac{1}{N-1}\sum_i (I_{\mathrm{n}i} -
+  \overline{I_\mathrm{n}})^2}$. Both editions set them the same way.
+- **The problem:** the symbol lists that follow define only the overbarred one
+  ("$\overline{I_\mathrm{n}}$ is the mean value of $I_\mathrm{n}$ for $M$
+  short-time-average samples", A.2.1; "$\overline{I_\mathrm{n}}$ is the surface
+  normal sound intensity calculated from equation (A.9)", A.2.4). The unbarred
+  $I_\mathrm{n}$ is clause 3.4's normal intensity at a point, so as printed a
+  coefficient of variation is divided by an unspecified single value rather
+  than by the mean its own numerator is taken about. Both indicators are
+  coefficients of variation and admit no other normalization.
+- **Evidence:** the two equations and the symbol lists beneath them, where the
+  bar is absent above the divisor and unbroken above the symbol inside the sum.
+  PDF pages 15 and 16 (printed pp. 10 and 11) of ISO 9614-1:1993; the same two
+  equations at PDF pages 21 and 22 (printed pp. 21 and 22) of UNE-EN ISO
+  9614-1:2010.
+- **Library behaviour:** none required. The coefficient of variation behind
+  `field_indicators` and `temporal_variability_indicator` in
+  [`intensity.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/intensity.py) divides by the
+  algebraic mean, and refuses a mean that is not positive rather than dividing
+  by it. Registered as a typographic defect.
+- **Status:** unreported (typographic).
+
+## UNE-EN ISO 9614-1:2010, Note 11 to clause B.1.3 (half a level, and a recommendation made a requirement)
+
+- **Location:** Note 11, immediately after the Formula (B.4) block of clause
+  B.1.3, which qualifies the choice of the Table B.2 factor $C$ for an
+  A-weighted determination.
+- **The print:** "Si la contribución total al **nivel de** potencia acústica
+  ponderado A de las bandas de tercio de octava en el margen de frecuencias de
+  800 Hz a 5 000 Hz es menos de la mitad del **nivel total**, entonces **deben**
+  usarse los valores de $C$ para las bandas de tercio de octava de 200 Hz a
+  630 Hz." The ISO original reads "If the total contribution to the A-weighted
+  sound **power** from the one-third-octave bands in the frequency range 800 Hz
+  to 5 000 Hz is less than half the total **power**, then the values of $C$ for
+  the one-third-octave band 200 Hz to 630 Hz **should** be used."
+- **The problem:** two departures in one sentence. Half of a *level* is not a
+  defined operation, so the Spanish print states a condition that cannot be
+  evaluated as written; the original conditions on half the *power*, which is a
+  contribution 3 dB or more below the total and is decidable. And *should*, a
+  recommendation under the ISO/IEC drafting rules, becomes *deben*, which reads
+  as a requirement, so the two prints do not even agree on whether the
+  substitution is optional.
+- **Evidence:** the two prints of the same note. PDF page 25 (printed p. 25) of
+  UNE-EN ISO 9614-1:2010; PDF page 18 (printed p. 13) of ISO 9614-1:1993.
+- **Library behaviour:** implements the power reading, and applies the
+  substitution whenever the condition holds rather than leaving it to the
+  caller, which satisfies both prints. `_a_weighted_factor` in
+  [`sound_power_intensity_points.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_intensity_points.py)
+  compares the summed A-weighted contribution of the 800 Hz to 5 kHz bands with
+  half the total contribution and reads the 200 Hz to 630 Hz row of Table B.2
+  when it falls short.
+- **Status:** unreported (national translation, not the issuing body's text).
+
 ## ISO/PAS 1996-3:2022, Clause 5 (cross-references of r and d)
 
 - **Location:** Clause 5, Formula (2), the definitions of the symbols of the

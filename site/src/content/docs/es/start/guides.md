@@ -653,7 +653,7 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 y EBU R 128.
 - [Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/):
   el barrido in situ de ISO 9614-2 y el grado de precisión ISO 9614-3.
 - [Potencia acústica a partir de la vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/):
-  la cuarta ruta de determinación, para la máquina que no se puede llevar a un
+  la séptima ruta de determinación, para la máquina que no se puede llevar a un
   recinto cualificado: la potencia radiada a partir del nivel de velocidad
   promediado en la superficie y el factor de radiación, con el límite superior de
   la Parte 1 y el valor de ingeniería de la Parte 2. Listada también en

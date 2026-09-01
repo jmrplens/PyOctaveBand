@@ -84,7 +84,7 @@ guide you think you need:
 - [Which filter architecture should I choose?](/phonometry/signals/filters/filter-gallery/#which-filter-architecture-should-i-choose) — Butterworth against the four alternatives, and what each trades away.
 - [Choosing a criterion: NC, RC Mark II or NR](/phonometry/buildings/rooms/room-noise/#3-choosing-a-criterion-nc-rc-mark-ii-or-nr).
 - [Choosing a model, and when every model fails](/phonometry/buildings/rooms/reverberation-prediction/#4-choosing-a-model-and-when-every-model-fails) — Sabine, Eyring, Millington, Fitzroy, Arau.
-- [Choosing a method](/phonometry/devices/emission/sound-power/#choosing-a-method) — the four routes to sound power and what each facility allows.
+- [Choosing a method](/phonometry/devices/emission/sound-power/#choosing-a-method) — the seven routes to sound power and what each facility allows.
 - [Choosing a loudness model](/phonometry/perception/psychoacoustics/advanced-loudness/#choosing-a-loudness-model) — Zwicker, Moore-Glasberg and Sottek.
 - [Which measure, and when](/phonometry/perception/speech/objective-intelligibility/#4-which-measure-and-when) — STI against the intrusive and non-intrusive measures.
 - [Which tonality metric, and when](/phonometry/perception/psychoacoustics/tone-prominence/#3-which-tonality-metric-and-when).

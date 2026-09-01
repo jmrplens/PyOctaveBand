@@ -1367,6 +1367,209 @@ def generate_sound_power_intensity_result(output_dir: str) -> None:
     plt.close()
 
 
+def generate_discrete_point_qualification(output_dir: str) -> None:
+    """ISO 9614-1: the criterion-2 position budget and the Formula (B.3) interval."""
+    print("Generating discrete_point_qualification.svg...")
+    from phonometry import emission
+
+    # A 1,2 m x 0,8 m x 1,0 m machine standing on a reflecting floor, measured
+    # over a box surface at the 0,5 m the standard asks for: 2,2 m x 1,8 m x
+    # 1,5 m, five faces, 15,96 m2, sampled at 16 positions - one per square
+    # metre and comfortably over the ten of clause 8.2.
+    freqs = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+    areas = np.concatenate(
+        [
+            np.full(4, 3.96 / 4),  # top, 2,2 m x 1,8 m
+            np.full(3, 3.3 / 3),  # long side, 2,2 m x 1,5 m
+            np.full(3, 3.3 / 3),  # the other long side
+            np.full(3, 2.7 / 3),  # end, 1,8 m x 1,5 m
+            np.full(3, 2.7 / 3),  # the other end
+        ]
+    )
+    # The field the figure turns on, set by its two indicators rather than
+    # drawn at random: the pressure-intensity gap F2 widens towards low
+    # frequency as the field turns reactive, and the spatial non-uniformity F4
+    # widens towards high frequency as the radiation grows directional and the
+    # intensity concentrates on part of the surface. Writing
+    # In_i = In_bar (1 + F4 z_i) with z of zero mean and unit sample standard
+    # deviation makes F4 exactly the target, so the bars below are the printed
+    # C times a number the reader can check. F2 lands on its target the same
+    # way everywhere except 4 kHz, where an F4 of 0,72 turns a few positions
+    # inward and the mean of magnitudes A.2.2 asks for reads 2,8 dB instead of
+    # 3,0 - which is the indicator behaving as defined, not the field drifting.
+    surface_pressure = 84.0
+    nonuniformity = np.array([0.25, 0.30, 0.38, 0.45, 0.58, 0.72])
+    pressure_intensity = np.array([11.5, 8.0, 6.0, 4.5, 3.5, 3.0])
+    rng = np.random.default_rng(9614)
+    deviation = rng.normal(0.0, 1.0, (areas.size, freqs.size))
+    deviation = (deviation - deviation.mean(axis=0)) / deviation.std(axis=0, ddof=1)
+    mean_intensity = 10.0 ** ((surface_pressure - pressure_intensity) / 10.0) * 1.0e-12
+    normal_intensity = mean_intensity[None, :] * (
+        1.0 + nonuniformity[None, :] * deviation
+    )
+    result = emission.sound_power_intensity_points(
+        normal_intensity,
+        areas,
+        pressure_levels=np.full((areas.size, freqs.size), surface_pressure),
+        pressure_residual_index=20.0,  # Ld = 20 - 10 = 10 dB (Table 1, octaves)
+        frequencies=freqs,
+        band_type="octave",
+    )
+    f4 = np.asarray(result.f4)
+    criterion_1 = np.asarray(result.criterion_1)
+    interval = np.asarray(result.confidence_interval)
+    required = {
+        grade: np.array(
+            [
+                emission.position_count_factor(grade, float(f), band_type="octave")
+                for f in freqs
+            ]
+        )
+        * f4**2
+        for grade in ("precision", "engineering")
+    }
+
+    fig, (axt, axb) = plt.subplots(
+        2, 1, figsize=(10, 7.6), height_ratios=(2.1, 1.0), sharex=True
+    )
+    x = np.arange(freqs.size, dtype=float)
+    width = 0.36
+    # A band that already failed criterion 1 never reaches criterion 2: Figure
+    # B.1 sends it straight to an action box. Its bars are recoloured to the
+    # neutral grey the corpus uses for context rather than data, because the
+    # number is computable but carries no verdict. Recolouring the individual
+    # patches after the call, rather than passing a list of colours, is what
+    # keeps the legend swatch the colour of the series.
+    from matplotlib.patches import Patch
+
+    handles: list[Any] = []
+    for offset, grade, color, label in (
+        (-width / 2, "precision", COLOR_PRIMARY, "Grade 1 (precision)"),
+        (+width / 2, "engineering", COLOR_TERTIARY, "Grade 2 (engineering)"),
+    ):
+        bars = axt.bar(
+            x + offset,
+            required[grade],
+            width=width,
+            color=color,
+            edgecolor=COLOR_FG,
+            linewidth=0.7,
+            zorder=3,
+        )
+        for patch, qualified in zip(bars.patches, criterion_1, strict=True):
+            if not qualified:
+                patch.set_facecolor(COLOR_MUTED)
+        # The swatch is built rather than taken from the container: the
+        # container's is its first patch, which is the grey 125 Hz bar.
+        handles.append(
+            Patch(facecolor=color, edgecolor=COLOR_FG, linewidth=0.7, label=label)
+        )
+    handles.append(
+        axt.axhline(
+            float(result.positions),
+            color=COLOR_SECONDARY,
+            linestyle="--",
+            linewidth=1.8,
+            zorder=4,
+            label="Positions measured, $N$",
+        )
+    )
+    # The grade strip: one chip per band, so the verdict is read off the
+    # figure and not inferred from which bar pokes above the line.
+    grade_text = {
+        "precision": "Grade 1",
+        "engineering": "Grade 2",
+        "none": "No grade",
+    }
+    for band, verdict in enumerate(np.asarray(result.achieved_grade)):
+        axt.text(
+            x[band],
+            37.0,
+            grade_text[str(verdict)],
+            ha="center",
+            va="center",
+            fontsize=9,
+            color=COLOR_FG,
+            bbox={
+                "boxstyle": "round,pad=0.28",
+                "facecolor": COLOR_PANEL,
+                "edgecolor": COLOR_GRID,
+            },
+        )
+    axt.annotate(
+        (
+            "125 Hz never reaches criterion 2:\n"
+            "$F_2 > L_\\mathrm{d}$ sends it to action a or b"
+        ),
+        xy=(x[0] + width / 2, float(required["engineering"][0]) + 0.4),
+        xytext=(x[0] + 0.45, 20.5),
+        ha="left",
+        va="center",
+        fontsize=9.5,
+        color=COLOR_FG,
+        arrowprops={"arrowstyle": "->", "color": COLOR_FG, "linewidth": 1.0},
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    axt.set_ylabel("Positions required, $C F_4^2$")
+    axt.set_ylim(0.0, 40.0)
+    axt.set_title(
+        "Discrete-point sound power (ISO 9614-1): criterion 2 band by band",
+        pad=12,
+    )
+    axt.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    axt.set_axisbelow(True)
+    axt.legend(
+        handles=handles, loc="upper left", bbox_to_anchor=(0.01, 0.87), fontsize=9
+    )
+
+    axb.errorbar(
+        x,
+        np.zeros_like(x),
+        yerr=np.vstack([-interval[:, 0], interval[:, 1]]),
+        fmt="o",
+        markersize=5,
+        color=COLOR_PRIMARY,
+        ecolor=COLOR_PRIMARY,
+        elinewidth=1.8,
+        capsize=6,
+        zorder=3,
+    )
+    axb.axhline(0.0, color=COLOR_GRID, linewidth=1.0, zorder=1)
+    axb.set_ylabel("95 % interval [dB]")
+    axb.set_ylim(-2.6, 2.6)
+    axb.text(
+        0.015,
+        0.95,
+        (
+            "Formula (B.3): $10\\lg(1 \\pm 2 F_4/\\sqrt{N})$,\n"
+            "the sampling part of the band uncertainty"
+        ),
+        transform=axb.transAxes,
+        ha="left",
+        va="top",
+        fontsize=9.5,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.4",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    axb.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    axb.set_axisbelow(True)
+    axb.set_xticks(x)
+    axb.set_xticklabels([f"{f:g}" for f in freqs])
+    axb.set_xlabel(LABEL_FREQ_HZ)
+    axb.set_xlim(-0.6, freqs.size - 0.4)
+    fig.tight_layout()
+    save_figure(output_dir, "discrete_point_qualification.svg")
+    plt.close()
+
+
 def generate_precision_anechoic_power(output_dir: str) -> None:
     """ISO 3745: precision LW spectrum from a hemisphere pressure measurement."""
     print("Generating precision_anechoic_power.png...")

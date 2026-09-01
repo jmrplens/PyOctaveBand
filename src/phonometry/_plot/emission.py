@@ -37,6 +37,9 @@ if TYPE_CHECKING:
         PrecisionIntensityResult,
         SoundPowerIntensityResult,
     )
+    from ..emission.sound_power_intensity_points import (
+        DiscretePointIntensityResult,
+    )
     from ..emission.sound_power_reverberation import ReverberationSoundPowerResult
     from ..emission.vibration_sound_power import VibrationSoundPowerResult
 
@@ -104,6 +107,7 @@ def plot_sound_power(
         | ReverberationSoundPowerResult
         | SoundPowerIntensityResult
         | PrecisionIntensityResult
+        | DiscretePointIntensityResult
     ),
     ax: Axes | None = None,
     language: str = "en",
@@ -113,16 +117,18 @@ def plot_sound_power(
 
     Works for :class:`~phonometry.emission.sound_power.SoundPowerResult`,
     :class:`~phonometry.emission.sound_power_anechoic.PrecisionSoundPowerResult`,
-    :class:`~phonometry.emission.sound_power_reverberation.ReverberationSoundPowerResult`
-    and the two intensity-scanning results,
+    :class:`~phonometry.emission.sound_power_reverberation.ReverberationSoundPowerResult`,
+    the two intensity-scanning results,
     :class:`~phonometry.emission.sound_power_intensity.SoundPowerIntensityResult`
     and
-    :class:`~phonometry.emission.sound_power_intensity.PrecisionIntensityResult`;
-    for the intensity (scanning) variants the bands where the net power is
+    :class:`~phonometry.emission.sound_power_intensity.PrecisionIntensityResult`,
+    and the discrete-point one,
+    :class:`~phonometry.emission.sound_power_intensity_points.DiscretePointIntensityResult`;
+    for the three intensity variants the bands where the net power is
     non-positive (``negative_band`` / ``not_applicable_band``) are hatched and
     greyed as unusable.
 
-    :param result: One of the five sound-power results named above.
+    :param result: One of the six sound-power results named above.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the band :meth:`~matplotlib.axes.Axes.bar`.

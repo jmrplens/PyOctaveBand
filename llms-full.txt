@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 566 numerical conformance checks against 373 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 572 numerical conformance checks against 373 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 566 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 59 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 572 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 59 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -264,8 +264,8 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/)
 - [Sound Power in the Reverberation Room (ISO 3741)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/)
 - [Sound Power by Intensity Scanning (ISO 9614-2 / ISO 9614-3)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/)
-- [Sound power from surface vibration (ISO/TS 7849)](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/)
 - [Sound Intensity (p-p method)](https://jmrplens.github.io/phonometry/devices/emission/intensity/)
+- [Sound power from surface vibration (ISO/TS 7849)](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/)
 
 ### Electroacoustics
 
@@ -474,6 +474,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [power/sound-power](https://jmrplens.github.io/phonometry/reference/api/power/sound-power/)
 - [power/sound-power-anechoic](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-anechoic/)
 - [power/sound-power-intensity](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-intensity/)
+- [power/sound-power-intensity-points](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-intensity-points/)
 - [power/sound-power-reverberation](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-reverberation/)
 - [power/vibration-sound-power](https://jmrplens.github.io/phonometry/reference/api/power/vibration-sound-power/)
 - [psychoacoustics/annoyance](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/annoyance/)
@@ -14485,16 +14486,19 @@ of ISO 3745,
 [Sound Power in the Reverberation Room](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/)
 for the direct and comparison methods of ISO 3741, and
 [Sound Power by Intensity Scanning](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/)
-for the on-site scanning of ISO 9614-2 and its ISO 9614-3 precision grade.
+for the on-site scanning of ISO 9614-2 and its ISO 9614-3 precision grade, and
+[Sound Intensity](https://jmrplens.github.io/phonometry/devices/emission/intensity/)
+for the discrete-point power summation of ISO 9614-1, which stands still at
+each position rather than sweeping the surface.
 
-A fourth route does not measure sound at all.
+One route does not measure sound at all.
 [Sound power from surface vibration (ISO/TS 7849)](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/)
 estimates the radiated power from the surface-averaged velocity level and a
 radiation factor, which is what remains when the machine cannot be moved to a
 qualified room and its environment is too noisy for an enveloping surface:
 Part 1 gives an upper-limit value from the velocity alone, Part 2 an
 engineering value once the radiation factor has been estimated properly. It
-also answers a slightly different question from the four acoustic routes — it
+also answers a slightly different question from the acoustic routes — it
 characterises what the *structure* radiates, and stays blind to sound escaping
 through openings, intakes and outlets — and it is the natural bridge to the
 structure-borne pages, since the same surface velocity is what
@@ -14519,7 +14523,8 @@ judged against.
 ## Pages in this section
 
 - [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/): two-microphone
-  sound intensity per IEC 61043 with the ISO 9614-1 field indicators.
+  sound intensity per IEC 61043, with the ISO 9614-1 field indicators and its
+  sound power determination at discrete points.
 - [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): choosing the determination
   method and declaring the noise emission per ISO 4871.
 - [Sound Power by Pressure Methods](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/):
@@ -14548,14 +14553,12 @@ yourself. The C₃ meteorological correction of ISO 3745 likewise needs an
 air-absorption coefficient you supply; it is not computed from ISO 9613-1
 here.
 
-One route is absent by design: **ISO 9614-1's discrete fixed-point power
-summation is not implemented at all**, and only its Annex A field indicators
-are, reused by the two scanning parts. On the vibration route, the measurement
+One route stops short of its standard: on the vibration route, the measurement
 clauses 5 to 7 of both parts of ISO/TS 7849 are laboratory practice rather
 than code, and only the single-machine radiation factor of Formula 8 is
 implemented, so a batch or family determination needs an already-averaged
-value. Finally, nothing here reduces a machine's emission: quieting a source
-is [Noise control](https://jmrplens.github.io/phonometry/devices/noise-control/), and a declared
+value. And nothing here reduces a machine's emission: quieting a source is
+[Noise control](https://jmrplens.github.io/phonometry/devices/noise-control/), and a declared
 emission value is the input to that work, not its result.
 
 ---
@@ -14998,6 +15001,303 @@ table stops stepping in whole decibels (the instrument goes 14 dB at 315 Hz,
 tenth of a degree of channel mismatch is a demanding specification, and why a
 probe must be verified with the spacer it will actually be used with.
 
+## Sound power at discrete points (ISO 9614-1)
+
+Everything above qualifies a measurement. ISO 9614-1 is the part that turns it
+into a sound power level, and it is the ordinary way of using a p-p probe:
+hold it still at each of $N$ points, one per segment of a surface enclosing
+the source, and read the signed normal intensity there. The partial power of a
+segment and the sound power of the source are then (Formulae (11) and (12)):
+
+$$
+P_i = I_{\mathrm{n}i} \, S_i, \qquad
+L_W = 10 \log_{10} \frac{\sum_{i=1}^{N} P_i}{P_0},
+\qquad P_0 = 10^{-12}~\mathrm{W}
+$$
+
+Formula (12) prints without the absolute-value bars that the general
+definition (Formula (8)) carries, because clause 9.2 disposes of the negative
+case instead: **the method is not applicable to a band in which the sum is
+negative**. One segment carrying inward flow is a different matter, and is
+normal; it is what $F_3$ measures.
+
+A.2.3 makes a second refusal, and on a different quantity: where
+$\sum_i I_{\mathrm{n}i}$ is negative, "the test conditions do not satisfy the
+requirements of this part of ISO 9614 in that frequency band". That sum is
+unweighted over the $N$ positions, while clause 9.2 weights each segment by
+its area, so equal segments make the two refusals agree and unequal ones let
+them part company: a band clause 9.2 keeps, with a positive total power and a
+finite level, can still be one A.2.3 refuses. Its Annex A indicators come back
+`NaN` and the determination warns, because nothing else in the result flags
+it.
+
+Both refusals are on a sum that is **not positive**, which is wider than the
+word the clauses use. A sum of exactly zero is not negative and is refused all
+the same: clause 9.2's level would be $10 \lg 0$, and A.2.3's mean is the
+denominator of equations (A.7) to (A.9), so neither has anything to report
+there.
+
+Clause 8.2 sizes the position set: at least one position per square metre and
+at least ten in all, distributed as evenly as the segment areas allow. Both
+relaxations the clause offers (one position per 2 m² where extraneous noise is
+significant, fifty positions over a surface larger than 50 m²) end at fifty
+positions, so a sparser set than that is worth saying so about, and the
+determination warns.
+
+```python
+import numpy as np
+from phonometry import emission
+
+# Measurement surface: a 2.0 m x 1.8 m x 1.4 m box over a reflecting floor,
+# five faces and 14.24 m2 in all, sampled at 16 positions.
+segment_areas = np.array([0.9] * 4 + [0.9333] * 6 + [0.84] * 6)
+frequencies = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+
+# The field: nearly uniform pressure, a reactivity that grows towards low
+# frequency, and two positions of the 125 Hz band through which power flows
+# back in.
+rng = np.random.default_rng(9614)
+reactivity = np.array([9.5, 7.0, 5.0, 4.0, 3.2, 3.0])
+pressure_levels = 82.0 + rng.normal(0.0, 0.6, (16, 6))
+band_mean = 10.0 ** ((82.0 - reactivity) / 10.0) * 1e-12
+normal_intensity = band_mean * (1.0 + rng.normal(0.0, 0.22, (16, 6)))
+normal_intensity[:2, 0] = -0.4 * band_mean[0]
+
+power = emission.sound_power_intensity_points(
+    normal_intensity,
+    segment_areas,
+    pressure_levels=pressure_levels,
+    pressure_residual_index=19.0,
+    frequencies=frequencies,
+    band_type="octave",
+)
+print(np.round(power.sound_power_level, 1))  # [83.3 86.8 88.1 89.6 90.4 90.4]
+print(round(power.sound_power_level_a, 1))   # 96.1 dB(A)
+print(round(power.surface_area, 2), power.positions)   # 14.24 16
+```
+
+### The sign is in the print, not in the number
+
+ISO 9614-1 never prints a signed level. A normal intensity level is written
+`XX dB` when the flow through the segment is outward and `(-) XX dB` when it is
+inward, with `XX` a positive number in both cases (clause 3.5, and the two
+unnumbered equations of clauses 9.1 and A.2.3):
+
+$$
+I_{\mathrm{n}i} = I_0 \times 10^{XX/10}, \qquad
+I_{\mathrm{n}i} = -I_0 \times 10^{XX/10}, \qquad
+I_0 = 10^{-12}~\mathrm{W/m^2}
+$$
+
+So a caller reading a printed table has to carry the sign separately, which is
+what the `negative` argument is for. It broadcasts, so one position of a
+surface can flow inward while the rest flow outward:
+
+```python
+inward = emission.normal_intensity_from_levels(66.0, negative=True)
+print(f"{inward:.3e}")                       # -3.981e-06 W/m2, flowing in
+```
+
+### Which grade the determination reaches
+
+Annex B numbers **two** criteria, not three. Figure B.1 gates the
+determination on four questions, in this order, and Table B.3 says what to
+change when each one fails:
+
+| Gate | Where | Action when it fails |
+| --- | --- | --- |
+| $F_1 \le 0.6$ | Table B.3 | (e) |
+| $L_\mathrm{d} > F_2$ (criterion 1) | Formula (B.1) | (a) or (b) |
+| $F_3 - F_2 \le 3$ dB | Figure B.1 | (a) or (b) |
+| $N > C F_4^2$ (criterion 2) | Formula (B.2) | (c) or (d) |
+
+Only the first failing gate is acted on: every action box in Figure B.1
+returns to the next measurement rather than to the gate below it, so
+`required_actions()` reports one action set per band and stops there. Two
+codes mean the standard offers a choice, which is how Table B.3 prints them
+("a **or** b").
+
+```python
+print(power.dynamic_capability_index[0])     # 9.0 dB (Ld = 19 - 10)
+print(np.round(power.f2, 1))                 # [9.6 6.8 5.3 3.9 3.1 3.3]
+print(power.criterion_1)      # [False  True  True  True  True  True]
+print(list(power.achieved_grade))
+# ['none', 'precision', 'precision', 'precision', 'precision', 'precision']
+codes = ["".join(a.value for a in band) for band in power.required_actions()]
+print(codes)                                 # ['ab', '', '', '', '', '']
+print(power.required_actions()[0][0].criterion)  # F2 > Ld or (F3 - F2) > 3 dB
+```
+
+The 125 Hz band is the interesting one. Its $F_2$ of 9.6 dB sits just above the
+instrument's dynamic capability of 9 dB, so criterion 1 fails there and no
+amount of averaging will fix it: Table B.3 offers moving the surface (a) or
+shielding it (b). Clause 10.5 b) then omits that band from the A-weighted
+determination and asks for the omission to be stated, which
+`a_weighting_omitted_bands` is:
+
+```python
+print(power.a_weighting_omitted_bands)  # [ True False False False False False]
+```
+
+### Grade 3 is an A-weighted determination
+
+Table B.2 tabulates the criterion-2 factor $C$ band by band for grades 1 and 2
+and gives grade 3 one A-weighted value, 8, and no band column at all. Table
+B.1 does the same with the error factor $\Delta$ (0.20 and 0.29 for all bands,
+0.60 A-weighted) and Table 2 with the standard deviation $s$ of the
+determination. Three tables agree, so this is the standard's design rather
+than a gap in it: **a per-band determination reaches grade 1 or grade 2, and
+grade 3 is reached, if at all, by the A-weighted sum**. Asking for a per-band
+grade-3 figure raises rather than returning a plausible number.
+
+```python
+print(emission.position_count_factor("engineering", 1000.0,
+                                     band_type="octave"))   # 29.0
+print(emission.position_count_factor("survey"))             # 8.0 (A-weighted)
+print(power.achieved_grade_a, round(power.field_nonuniformity_a, 2))
+# precision 0.13
+```
+
+The A-weighted determination has a field non-uniformity of its own: B.1.2 sums
+the A-weighted band intensities of each position into one intensity per
+position and applies Formulae (A.8) and (A.9) to those, which is
+`field_nonuniformity_a`.
+
+The uncertainty of the result is Table 2's $s$, with footnote 1 placing the
+true level within $\pm 2s$ of the measured one at 95 % confidence. Clause 10.6
+says which row of the table to read it in: **the grade achieved** in the final
+test, not the grade the determination set out for, so `expanded_uncertainty`
+follows `achieved_grade` band by band. Five bands here reached grade 1 and
+carry its figures; 125 Hz reached no grade, Table 2 prints no $s$ for that, and
+what clause 10.5 c) offers such a band instead is the 95 % confidence interval
+of Formula (B.3), which is also what accompanies a band recorded after failing
+criterion 2:
+
+```python
+print(power.expanded_uncertainty)          # [nan  3.  3.  2.  2.  2.] dB
+print(np.round(power.confidence_interval[0], 1))     # [-1.7  1.2] dB
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/discrete_point_qualification_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/discrete_point_qualification.svg" alt="Two stacked panels over six octave bands from 125 Hz to 4 kHz for a sixteen-position survey. Above, the positions criterion 2 requires, C times F4 squared, as a pair of bars per band for grade 1 and grade 2, against a dashed line at the sixteen positions measured: the requirement grows with frequency, the grade-1 bar passes the line at 2 kHz and reaches 30 at 4 kHz, the grade-2 bar stays under it in every band, and the 125 Hz pair is greyed out because criterion 1 already failed there. A chip over each band names the grade reached: no grade, grade 1, grade 1, grade 1, grade 2, grade 2. Below, the 95 per cent confidence interval of Formula B.3 band by band, widening from about plus or minus half a decibel at 125 Hz to plus 1.3 and minus 1.9 decibels at 4 kHz" width="92%"></picture>
+
+*The grade is a position budget, and it is spent band by band. The survey
+drawn here is a second one, of a machine that radiates unevenly, and one
+quantity sets both of its panels: the field non-uniformity $F_4$ decides how
+many positions criterion 2 asks for, and how wide Formula (B.3) opens the
+interval. Its field grows less uniform with frequency, as a source whose
+radiation turns directional will, so the top two bands ask more than the
+sixteen positions measured at grade 1 and settle for grade 2, while 125 Hz
+never reaches criterion 2 at all: its $F_2$ is already above the instrument's
+$L_\mathrm{d}$, and Figure B.1 sends it to an action box instead. Grade 3 is on
+neither panel, because Table B.2 gives it no per-band $C$ to draw.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import emission
+
+# The figure's own survey, which is not the example above: sixteen positions
+# over a 1.2 m x 0.8 m x 1.0 m machine on a reflecting floor, measured at the
+# 0.5 m the standard asks for, so the box is 2.2 m x 1.8 m x 1.5 m and
+# 15.96 m2. The field is written from its two indicators rather than drawn at
+# random. F2 widens towards low frequency as the field turns reactive; F4
+# widens towards high frequency as the radiation grows directional and the
+# flow concentrates on part of the surface, which is the growth criterion 2 is
+# about.
+freqs = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+areas = np.concatenate([np.full(4, 3.96 / 4),    # top, 2.2 m x 1.8 m
+                        np.full(6, 3.3 / 3),     # the two long sides
+                        np.full(6, 2.7 / 3)])    # the two ends
+surface_pressure = 84.0
+nonuniformity = np.array([0.25, 0.30, 0.38, 0.45, 0.58, 0.72])   # target F4
+pressure_intensity = np.array([11.5, 8.0, 6.0, 4.5, 3.5, 3.0])   # target F2
+rng = np.random.default_rng(9614)
+spread = rng.normal(0.0, 1.0, (areas.size, freqs.size))
+spread = (spread - spread.mean(axis=0)) / spread.std(axis=0, ddof=1)
+mean_intensity = 10.0 ** ((surface_pressure - pressure_intensity) / 10.0) * 1e-12
+normal_intensity = mean_intensity * (1.0 + nonuniformity * spread)
+
+survey = emission.sound_power_intensity_points(
+    normal_intensity, areas,
+    pressure_levels=np.full((areas.size, freqs.size), surface_pressure),
+    pressure_residual_index=20.0,    # Ld = 20 - 10 = 10 dB (Table 1, octaves)
+    frequencies=freqs, band_type="octave",
+)
+
+# One line — the band sound power spectrum, with the bands outside the method
+# hatched and the A-weighted total in the title:
+survey.plot()
+plt.show()
+
+# The qualification figure above, by hand, from the fields the result carries
+# and the Table B.2 factor the module exposes.
+bands = np.arange(freqs.size)
+required = {
+    grade: np.array([emission.position_count_factor(grade, float(f),
+                                                    band_type="octave")
+                     for f in freqs]) * survey.f4 ** 2
+    for grade in ("precision", "engineering")
+}
+fig, (axt, axb) = plt.subplots(2, 1, sharex=True)
+for offset, grade, color in ((-0.18, "precision", "#1f77b4"),
+                             (+0.18, "engineering", "#2ca02c")):
+    axt.bar(bands + offset, required[grade], width=0.36, color=color)
+axt.axhline(survey.positions, color="#d62728", linestyle="--")
+axt.set_ylabel("Positions required, $C F_4^2$")
+interval = survey.confidence_interval
+axb.errorbar(bands, np.zeros_like(bands, dtype=float),
+             yerr=np.vstack([-interval[:, 0], interval[:, 1]]), fmt="o", capsize=6)
+axb.set_ylabel("95 % interval [dB]")
+axb.set_xticks(bands)
+axb.set_xticklabels([f"{f:g}" for f in freqs])
+axb.set_xlabel("Frequency [Hz]")
+plt.show()
+```
+
+</details>
+
+### Spending fewer new positions when the power is concentrated
+
+Where criterion 1 holds, criterion 2 does not and $F_3 - F_2 \le 1$ dB, little
+power is flowing inward, so most of it may be leaving through a minority of
+the segments. Clause 8.3.2 and B.1.3 make that testable: rank the positive
+partial powers, take the top segments until more than half the total power is
+accounted for, and require that subset to be fewer than half the segments.
+Then evaluate the field non-uniformity separately over the subset and over the
+remainder and size the new positions with Formula (B.4):
+
+$$
+N^* \ge 4 \left[ \frac{F_4(\alpha)}{\Delta_\alpha} \right]^2, \qquad
+\Delta_\alpha = \frac{1}{\alpha} \left[ \Delta - (1 - \alpha)
+\frac{2}{\sqrt{N_{1-\alpha}}} F_4(1 - \alpha) \right]
+$$
+
+$\Delta_\alpha$ is the share of the Table B.1 error budget left for the subset
+once the remainder, measured at its existing density, has taken its own, so a
+remainder too non-uniform to leave anything over exhausts the budget and the
+procedure cannot help. That case is refused, and so are three others: no
+subset satisfying B.1.3's two conditions, a subset of a single segment (over
+one position Formula (A.8) has no spread, so Formula (B.4) has no $F_4(\alpha)$
+to square), and a remainder whose own algebraic mean is not positive. Each
+refusal says which of the four it is. None of them names a row of Table B.3:
+where the subset cannot be found, B.1.3 asks for "alternative appropriate
+actions to increase the accuracy of sound power determination according to
+table B.3", and where the selective modification cannot be implemented, clause
+8.3.2 asks for "alternative appropriate action according to B.2 and table
+B.3". Which row applies also turns on criterion 2 and on $F_3 - F_2$, and
+`partial_power_concentration` is given neither.
+
+```python
+# One band, twelve segments, most of the power through the first four.
+concentrated = np.array([3.0e-5, 2.4e-5, 1.8e-5, 1.4e-5] + [8.0e-6] * 8)
+subset = emission.partial_power_concentration(concentrated, np.full(12, 1.0))
+print(subset.subset_positions, round(subset.power_fraction, 2))   # 4 0.57
+print(subset.additional_positions)                                # 2
+```
+
 ### Reactive fields near sources
 
 Close to a source the field turns **reactive**: pressure and particle
@@ -15108,15 +15408,16 @@ Measurement at discrete points*: the pressure-intensity index, the Annex A
 field indicators $F_1$ (equations (A.1)–(A.2), evaluated in the initial test
 of clause 8.2 and again per Annex B, B.1.4), $F_2$, $F_3$ and $F_4$, the
 Table B.3
-temporal-variability limit and the dynamic-capability criterion (Annex B).
+temporal-variability limit and the dynamic-capability criterion (Annex B);
+and the discrete-point sound-power determination of clauses 8 and 9, which
+sums the partial powers $I_{\mathrm{n}i} S_i$ into $L_W$ (equations (11) and
+(12)) and qualifies it against Annex B: criterion 1, the inward-flow gate of
+Figure B.1 and criterion 2 with the Table B.2 factor $C$, the Table B.3
+actions, the equation (B.3) confidence interval, the Table 2 uncertainty and
+the optional concentration procedure of clause 8.3.2.
 
-**Not covered.** ISO 9614-1's own sound-power determination, clauses 8 and 9,
-which sums the partial powers $I_i S_i$ over the discrete points into $L_W$, is
-not implemented: `sound_intensity` and `field_indicators` report intensity and
-field quality, not a summed power. The scanning routes that do compute $L_W$
-from intensity, ISO 9614-2 and **ISO 9614-3**, are in
-[Sound power by intensity scanning](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/). The residual-
-intensity *test* of IEC 61043 is not performed here either: $\delta_{pI0}$ is a
+**Not covered.** The residual-intensity *test* of IEC 61043 is not performed
+here: $\delta_{pI0}$ is a
 value the caller measures on their own probe-and-analyser chain, with the
 spacer that will be fitted, and supplies — what the library does with the
 number is grade it against Table 2. The before-use check of clause 14 and the
@@ -15139,10 +15440,8 @@ extraneous noise that would defeat any pressure method. This guide covers
 the two of them: the ISO 9614-2 engineering/survey determination with its
 field indicators and per-band achieved grade, the ISO 9614-3 precision
 (grade 1) scan with its tighter criteria, and the accredited-style test
-fiche. ISO 9614-1, the discrete fixed-point method, is not one of the routes
-here: its power determination is not implemented at all, and only its field
-indicators are reused. The probe itself, its finite-difference bias and
-those ISO 9614-1 indicators live in [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/);
+fiche. The probe itself, its finite-difference bias and the ISO 9614-1
+discrete-point method live in [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/);
 which route fits which job is weighed in [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/).
 
 ## 1. Intensity scanning (ISO 9614-2)
@@ -15550,12 +15849,12 @@ normalized levels, the per-band uncertainty and the Annex C omission stated.*
 
 ## See also
 
-- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): choosing among the five determination
+- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): choosing among the seven determination
   routes, what the accuracy grades promise, and the ISO 4871 noise-emission
   declaration a measured $L_{W\mathrm{A}}$ feeds.
 - [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/): the two-microphone probe, its
-  finite-difference bias and the ISO 9614-1 field indicators behind the
-  scanning methods.
+  finite-difference bias, the ISO 9614-1 field indicators behind the scanning
+  methods and the discrete-point determination those indicators qualify.
 - [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/):
   the enveloping-surface and anechoic routes for quiet sites.
 - [Sound Power in the Reverberation Room (ISO 3741)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/):
@@ -16071,7 +16370,7 @@ the reproducibility one.*
 
 ## See also
 
-- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): choosing among the five determination
+- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): choosing among the seven determination
   routes, what the accuracy grades promise, and the ISO 4871 noise-emission
   declaration a measured $L_{W\mathrm{A}}$ feeds.
 - [Sound Power in the Reverberation Room (ISO 3741)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/):
@@ -16397,7 +16696,7 @@ $C_1$/$C_2$ corrections and the boxed $L_{W\mathrm{A}}$.*
 
 ## See also
 
-- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): choosing among the five determination
+- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): choosing among the seven determination
   routes, what the accuracy grades promise, and the ISO 4871 noise-emission
   declaration a measured $L_{W\mathrm{A}}$ feeds.
 - [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/):
@@ -16448,15 +16747,20 @@ sound **power** does not. The sound power level $L_W$ is the total acoustic
 energy per second a source radiates, referenced to $P_0 = 1\ \text{pW}$, and it is
 the device-independent **emission** descriptor that goes on a datasheet,
 feeds a room prediction (EN 12354) or is checked against a noise-emission
-limit. phonometry implements five standardised routes to it, split across
-three method guides: an enveloping *pressure* surface in the field
+limit. phonometry implements seven standardised routes to it, split across
+five guides: an enveloping *pressure* surface in the field
 (ISO 3744/3746) and the precision grade in an *anechoic room* (ISO 3745),
 covered in [Sound Power by Pressure Methods](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/); the
 diffuse field of a *reverberation room* (ISO 3741), covered in
-[Sound Power in the Reverberation Room](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/); and
-*intensity* scanning over a surface (ISO 9614-2), with its precision
+[Sound Power in the Reverberation Room](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/);
+*intensity* read at discrete points over a surface (ISO 9614-1), covered in
+[Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/); the same intensity *scanned* over that
+surface (ISO 9614-2), with its precision
 counterpart (ISO 9614-3), covered in
-[Sound Power by Intensity Scanning](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/). This page is
+[Sound Power by Intensity Scanning](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/); and the
+*surface velocity* of the machine's own casing (ISO/TS 7849-1 and -2), the one
+route that needs no acoustic measurement at all, covered in
+[Sound power from surface vibration](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/). This page is
 the front door: how to choose among them, what the accuracy grades actually
 promise, and how a measured $L_W$ becomes the ISO 4871 noise-emission
 declaration a datasheet prints.
@@ -16475,17 +16779,20 @@ constraints.
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | Enveloping surface | **ISO 3744** (engineering) / **ISO 3746** (survey) | Sound pressure on a hemisphere or box | Essentially free field over one or more reflecting planes | Grade 2 ($\sigma_{\mathrm{R}0} \approx 1.5\ \text{dB}$) / grade 3 ($\approx 3.0\ \text{dB}$) | In situ or a large room; no special test facility available |
 | Reverberation room | **ISO 3741** | Sound pressure in the diffuse field | Qualified hard-walled reverberation room | Grade 1 (precision) | Highest accuracy for steady, broadband sources in a lab |
+| Intensity at discrete points | **ISO 9614-1** | Normal sound intensity held at each of $N$ points, one per segment | Almost any, tolerant of steady extraneous noise | Grade 1 or 2 per band from the Annex B criteria; grade 3 on the A-weighted total | On-site where the probe stands still at each point rather than sweeping the surface |
 | Intensity scanning | **ISO 9614-2** | Normal sound intensity scanned over a surface | Almost any, tolerant of steady extraneous noise | Grade 2 / 3 (from per-band field indicators) | On-site with background noise, or one machine among many |
 | Anechoic room | **ISO 3745** | Sound pressure on a fixed microphone array | Qualified anechoic or hemi-anechoic room | Grade 1 (precision) | Reference-grade emission in a free-field laboratory |
 | Precision intensity scanning | **ISO 9614-3** | Scanned normal intensity, tighter criteria | Almost any, tolerant of steady extraneous noise | Grade 1 (precision) | Precision on-site, with the ISO 9614-3 field-indicator checks |
+| Surface vibration | **ISO/TS 7849-1** (survey) / **-2** (engineering) | Surface-averaged velocity level and a radiation factor | Any; no acoustic measurement | Upper limit ($\varepsilon = 1$) / engineering | The machine cannot be quietened, enclosed or approached with a microphone |
 
 The pressure methods correct the surface level for the room ($K_2$) and for
 background noise ($K_1$); the reverberation method needs a *qualified* room
 but reaches precision grade; intensity rejects steady background energy at
-the cost of a two-microphone probe and a per-band validity check. Each
-method guide walks its routes in turn.
+the cost of a two-microphone probe and a per-band validity check; the
+surface-velocity route abandons the microphone altogether and pays for it with
+a radiation factor. Each method guide walks its routes in turn.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods.svg" alt="The three sound power routes side by side: an enveloping pressure surface over a reflecting plane (ISO 3744/3746), a source in a reverberation room sampled by microphones (ISO 3741) and an intensity probe scanning a surface around the source (ISO 9614-2)" width="92%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods.svg" alt="The seven sound power routes, one row for each measured quantity, every cell carrying the same five attributes. The sound pressure row: the ISO 3744/3746 hemispherical enveloping surface over a reflecting plane, the ISO 3745 fixed microphone array in a wedge-lined anechoic room, and the ISO 3741 diffuse field of a reverberation room. The sound intensity row: the ISO 9614-1 measurement surface cut into ten segments with the probe held still at a point in each, the ISO 9614-2 serpentine scan swept over that same surface, and the tighter ISO 9614-3 precision scan. The surface velocity row carries one route across the full width, ISO/TS 7849 with an accelerometer on a radiating casing and no microphone at all" width="92%"></picture>
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -16536,7 +16843,9 @@ order; the first match names the standard.
    calls for precision (grade 1); a first walk-through of a noisy plant
    tolerates survey grade (grade 3). Grade 1 exists only in a qualified
    laboratory room (ISO 3741, ISO 3745) or via the precision intensity
-   methods (ISO 9614-1 at discrete points, ISO 9614-3 by scanning).
+   methods, both of which are here: ISO 9614-1 at discrete points in
+   [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/), ISO 9614-3 by scanning in
+   [Sound Power by Intensity Scanning](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/).
 2. **Can the source travel to a laboratory?** ISO 3741 wants the source
    small next to the room (volume no more than about 2 % of the room volume)
    and its noise steady; ISO 3745 wants it inside a qualified anechoic or
@@ -16551,10 +16860,19 @@ order; the first match names the standard.
    degrade gracefully to ISO 3746 at survey grade.
 4. **Is the background the problem?** When neighbouring machines cannot be
    switched off, or the margin is outright negative, the pressure methods
-   are out. Intensity scanning (ISO 9614-2, or ISO 9614-3 for grade 1)
-   tolerates steady extraneous noise even some 10 dB *above* the source,
-   because only the net energy flux through the surface counts; the
-   per-band field indicators then decide the grade actually achieved.
+   are out. Intensity (ISO 9614-1 at discrete points, ISO 9614-2 by scanning,
+   ISO 9614-3 for grade 1 by scanning) tolerates steady extraneous noise even
+   some 10 dB *above* the source, because only the net energy flux through the
+   surface counts; the per-band field indicators then decide the grade
+   actually achieved.
+5. **Can you put a microphone there at all?** A machine that cannot be stopped,
+   an environment that destroys a capsule, an enclosure with no room for a
+   surface: when no acoustic measurement is possible, the surface-velocity route
+   estimates the same quantity from accelerometers on the casing
+   (ISO/TS 7849-1 and -2). It answers a subtly different question — it
+   characterises what the *structure* radiates, and stays blind to sound
+   escaping through openings, intakes and gaps — and it costs a radiation factor
+   you must either assume (Part 1, an upper limit) or measure once (Part 2).
 
 ### What the accuracy grades mean
 
@@ -16665,8 +16983,10 @@ the clause 6.2 verification verdict.*
 - [Sound Power by Intensity Scanning (ISO 9614-2 / ISO 9614-3)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/):
   the routes that tolerate steady background noise, qualified by their field
   indicators.
-- [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/): the two-microphone probe behind the
-  scanning methods.
+- [Sound power from surface vibration (ISO/TS 7849)](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/):
+  the seventh route, for a machine no microphone can approach.
+- [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/): the two-microphone probe behind every
+  intensity route, and the ISO 9614-1 determination at discrete points.
 - [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the reverberation time and equivalent
   absorption area that feed the room corrections.
 - [Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/): energy averaging and the A-weighting behind $L_{W\mathrm{A}}$.
@@ -16681,8 +17001,8 @@ Sound pressure depends on where you stand and on the room; sound power does
 not. The sound power level $L_W$ is the total acoustic energy per second a
 source radiates, referenced to $P_0 = 1\ \text{pW}$, and it is the device-independent
 emission descriptor that goes on a datasheet or is checked against a
-noise-emission limit; ISO 3744, ISO 3741, ISO 9614-2, ISO 3745 and
-ISO 9614-3 all determine it.
+noise-emission limit; ISO 3744, ISO 3741, ISO 9614-1, ISO 9614-2, ISO 3745,
+ISO 9614-3 and ISO/TS 7849 all determine it.
 
 ### What do the accuracy grades in sound power measurement mean?
 
@@ -16696,12 +17016,12 @@ indistinguishable.
 
 ### How do I measure sound power when background noise cannot be switched off?
 
-Use intensity scanning: ISO 9614-2 (grade 2 or 3) or ISO 9614-3 (grade 1,
-precision). Because sound intensity is the net energy flux through the
-measurement surface, steady extraneous noise even some 10 dB above the
-source is tolerated, whereas the ISO 3744 pressure method needs the
-background at least 6 dB below the source. The per-band field indicators
-then decide the grade actually achieved.
+Use intensity: ISO 9614-1 at discrete points, ISO 9614-2 by scanning (grade 2
+or 3) or ISO 9614-3 by precision scanning (grade 1). Because sound intensity
+is the net energy flux through the measurement surface, steady extraneous
+noise even some 10 dB above the source is tolerated, whereas the ISO 3744
+pressure method needs the background at least 6 dB below the source. The
+per-band field indicators then decide the grade actually achieved.
 
 
 ## References
@@ -16733,14 +17053,13 @@ ISO 4871:1996, *Acoustics — Declaration and verification of noise emission
 values of machinery and equipment*: the dual-number and single-number
 declaration forms, the declared value $L_{W\mathrm{Ad}} = L_{W\mathrm{A}} + K_{W\mathrm{A}}$ and the
 clause 6.2 verification. The basic determination standards (ISO 3744/3746,
-ISO 3741, ISO 3745, ISO 9614-2/-3) are covered in their method guides.
+ISO 3741, ISO 3745, ISO 9614-1/-2/-3, ISO/TS 7849-1/-2) are covered in their
+method guides.
 
 **Not covered.** Three members of the ISO 3740 family are not implemented at
 all — ISO 3743-1, ISO 3743-2 and ISO 3747 — and neither is the sound *energy*
-level $L_J$ of a single event. ISO 9614-1's own discrete-point power summation
-is absent as well; only its field indicators exist, in
-[Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/). The emission sound pressure level
-$L_{p\mathrm{A}}$ that stands beside $L_{W\mathrm{A}}$ in a declaration is consumed here, never
+level $L_J$ of a single event. The emission sound pressure level $L_{p\mathrm{A}}$
+that stands beside $L_{W\mathrm{A}}$ in a declaration is consumed here, never
 determined: ISO 11201, ISO 11202 and ISO 11204 are outside the library. Of
 ISO 4871, only the clause 6.2 single-machine verification is evaluated; the
 batch criteria of clause 6.3 are not, and the batch statistics beyond the
@@ -17043,8 +17362,8 @@ factor and the boxed LWA.*
 
 ## See also
 
-- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): the route chooser
-  this method is the sixth entry of, the accuracy grades and the ISO 4871
+- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): the route chooser this method is the seventh
+  entry of, what the accuracy grades promise, and the ISO 4871 noise-emission
   declaration a result feeds.
 - [Sound Power by Intensity Scanning (ISO 9614)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/):
   the determination that produces the $P_j$ behind a Part 2 radiation factor.
@@ -17136,7 +17455,8 @@ level a programme, go to
 The total acoustic emission of a source, and the power flux it is built on.
 
 - [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/): two-microphone
-  sound intensity per IEC 61043 with the ISO 9614-1 field indicators.
+  sound intensity per IEC 61043, with the ISO 9614-1 field indicators and its
+  sound power determination at discrete points.
 - [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): choosing the determination
   method and declaring the noise emission per ISO 4871.
 - [Sound Power by Pressure Methods](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/):
@@ -17206,10 +17526,9 @@ how to acquire them, and through ISO/TS 7849, whose clauses 5 to 7 on
 instrumentation, installation and measurement positions are laboratory
 practice this library assumes.
 
-Three specific absences are worth knowing before you plan a job. ISO 9614-1's
-discrete fixed-point power summation is **not implemented at all** — only its
-field indicators are, reused by the scanning routes. Dissipative duct-lining
-silencers are **not modelled from liner properties** anywhere: the reactive
+Two specific absences are worth knowing before you plan a job. Dissipative
+duct-lining silencers are **not modelled from liner properties** anywhere:
+the reactive
 elements are computed exactly within the no-flow plane-wave model, and the
 lined-elbow figure is a table lookup (Bies Table 8.11) and the plenum
 attenuation Wells' closed form driven by a declared mean absorption — neither is a liner model.
@@ -17232,7 +17551,7 @@ pair, so the calibration, weighting and filtering behind them are in [Signal
 analysis](https://jmrplens.github.io/phonometry/signals/), and [Build a sound level
 meter](https://jmrplens.github.io/phonometry/signals/sound-level-meter/) runs that chain end to end on
 one runnable page. The derivations are split by physics rather than by topic:
-[sound power determination](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/#sound-power-determination-iso-374437453746-iso-3741-iso-9614-23)
+[sound power determination](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/#sound-power-determination-iso-374437453746-iso-3741-iso-9614-123)
 is under Environment and transport, and [sound intensity](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/#sound-intensity-iec-61043)
 under Signal analysis. The electroacoustics and noise-control pages carry their
 derivations inline.
@@ -33697,7 +34016,16 @@ documents, one page per module.
 | `sound_power_comparison` | `function` | **Reverberation-room LW, comparison (ISO 3741).**<br>• `levels`, `levels_ref`: room SPL [dB]<br>• `lw_ref`: reference-source LW [dB]<br>• `frequencies` [Hz]<br>• `background_levels`, `background_levels_ref`<br>• `temperature`, `static_pressure` | `cmp = emission.sound_power_comparison(lp, lp_ref, lw_ref)`<br><br>• `ReverberationSoundPowerResult` (method='comparison') |
 | `ReverberationSoundPowerResult` | `dataclass` | **Reverberation-room sound power.**<br>• `frequencies` [Hz] (or `None`)<br>• `sound_power_level` [dB]<br>• `mean_pressure_level` [dB]<br>• `absorption_area` [m²]<br>• `waterhouse_correction` [dB]<br>• `background_correction`, `c1`, `c2` [dB]<br>• `speed_of_sound` [m/s]<br>• `sound_power_level_a` [dB]<br>• `method` | `rev.sound_power_level, rev.waterhouse_correction` |
 | `sound_power_intensity` | `function` | **Sound power by intensity scanning (ISO 9614-2).**<br>• `normal_intensity`: (N_seg, N_bands) [W/m²]<br>• `areas`: segment Si [m²]<br>• `normal_intensity_2`: 2nd sweep (criterion 3)<br>• `pressure_levels`: for FpI<br>• `pressure_residual_index`: δpI0 [dB]<br>• `frequencies` [Hz]<br>• `band_type`: 'third' (Default)/'octave'<br>• `grade`: 'engineering'/'survey'<br>• `repeatability_limit`: override s | `ir = emission.sound_power_intensity(scan1, areas, frequencies=f, band_type='octave')`<br><br>• `SoundPowerIntensityResult` |
-| `SoundPowerIntensityResult` | `dataclass` | **Scanning sound power.**<br>• `partial_power`, `partial_power_level`<br>• `sound_power`, `sound_power_level` [dB] (NaN where `negative_band`)<br>• `negative_band`: per-band bool (True where P ≤ 0)<br>• `surface_pressure_intensity_index` (FpI)<br>• `negative_partial_power_index` (F+/-)<br>• `repeatability`, `dynamic_capability_index` (Ld)<br>• `achieved_grade`<br>• `surface_area`, `sound_power_level_a`, `grade` | `ir.sound_power_level, ir.achieved_grade` |
+| `SoundPowerIntensityResult` | `dataclass` | **Scanning sound power.**<br>• `partial_power`, `partial_power_level`<br>• `sound_power` [W], `sound_power_level` [dB] (NaN where `negative_band`)<br>• `negative_band`: per-band bool (True where P ≤ 0)<br>• `surface_pressure_intensity_index` (FpI)<br>• `negative_partial_power_index` (F+/-)<br>• `repeatability`, `dynamic_capability_index` (Ld)<br>• `achieved_grade`<br>• `surface_area`, `sound_power_level_a`, `grade` | `ir.sound_power_level, ir.achieved_grade` |
+| `sound_power_intensity_points` | `function` | **Sound power at discrete points (ISO 9614-1).**<br>• `normal_intensity`: (N, N_bands) signed Ini [W/m²]<br>• `areas`: segment Si [m²]<br>• `pressure_levels`: Lpi for F2/F3<br>• `pressure_residual_index`: δpI0 [dB] (criterion 1)<br>• `temporal_intensity`: M short-time samples (F1)<br>• `frequencies` [Hz] (criterion 2, Table B.2)<br>• `band_type`: 'third' (Default)/'octave'<br>• `grade`: 'precision'/'engineering' (Default)/'survey' | `dp = emission.sound_power_intensity_points(i_n, areas, frequencies=f, band_type='octave')`<br><br>• `DiscretePointIntensityResult` |
+| `DiscretePointIntensityResult` | `dataclass` | **Discrete-point sound power.**<br>• `partial_power` Pi = Ini·Si (Eq. 11)<br>• `sound_power` [W], `sound_power_level` [dB] (NaN where `not_applicable_band`, clause 9.2)<br>• `f1`…`f4`: Annex A indicators<br>• `dynamic_capability_index` (Ld), `criterion_1`, `negative_power_within_limit`, `criterion_2`, `minimum_positions` (C·F4²)<br>• `achieved_grade` per band ('precision'/'engineering'/'none')<br>• `confidence_interval` (Eq. B.3), `expanded_uncertainty` (2s at the grade achieved, clause 10.6; NaN where none was)<br>• `surface_area`, `positions`, `sound_power_level_a`, `a_weighting_omitted_bands`<br>• `field_nonuniformity_a`, `achieved_grade_a`, `grade`<br>• `.required_actions()` → Table B.3 codes, `.plot()` | `dp.achieved_grade, dp.required_actions()` |
+| `ActionCode` | `enum` | **ISO 9614-1 Table B.3 corrective actions.**<br>• `.value`: the printed letter `a`…`e`<br>• `.criterion`: the Table B.3 row<br>• `.action`: what to change | `[a.value for a in dp.required_actions()[0]]` |
+| `position_count_factor` | `function` | **Criterion-2 factor C (ISO 9614-1 Table B.2).**<br>• `grade`: 'precision'/'engineering'/'survey'<br>• `frequency` [Hz], or `None` for the A-weighted row (grade 3 only)<br>• `band_type`: 'third' (Default)/'octave' | `C = emission.position_count_factor('engineering', 1000.0)`<br><br>• per-band C for grades 1/2; grade 3 raises (A-weighted only) |
+| `determination_standard_deviation` | `function` | **Standard deviation s (ISO 9614-1 Table 2).**<br>• `grade`, `frequency` (or `None` for A-weighted), `band_type`<br>• footnote 1: the true LW lies within ±2s at 95 % | `s = emission.determination_standard_deviation('precision', 1000.0)` |
+| `error_factor` | `function` | **Error factor Δ (ISO 9614-1 Table B.1).**<br>• `grade`<br>• `a_weighted`: read the A-weighted row (grade 3 only) (Default: False) | `d = emission.error_factor('engineering')`<br><br>• 0.20 / 0.29 / 0.60 |
+| `normal_intensity_from_levels` | `function` | **Signed Ini from printed levels (ISO 9614-1 clause 9.1).**<br>• `levels`: XX [dB]<br>• `negative`: the `(-)` of the print, broadcast per position | `i_n = emission.normal_intensity_from_levels(lvl, negative=mask)`<br><br>• Ini = ±I0·10^(XX/10) [W/m²] |
+| `partial_power_concentration` | `function` | **Optional procedure of ISO 9614-1 8.3.2/B.1.3.**<br>• `normal_intensity`, `areas`: one band<br>• `grade`: selects Δ (Table B.1) | `c = emission.partial_power_concentration(i_n, areas)`<br><br>• `PartialPowerConcentration` |
+| `PartialPowerConcentration` | `dataclass` | **Concentrated positive partial power.**<br>• `positions` N, `subset_positions` Nα, `subset_area` Sα<br>• `power_fraction` α, `subset_nonuniformity` F4(α), `remainder_nonuniformity` F4(1−α)<br>• `error_factor` Δ, `subset_error_factor` Δα<br>• `additional_positions` N* (Eq. B.4) | `c.additional_positions` |
 | `absorption_area` | `function` | **Equivalent absorption area (ISO 354 Eq. 5/7).**<br>• `t60`: T [s]<br>• `volume` V [m³]<br>• `temperature` [°C] (Default: 20)<br>• `speed_of_sound` [m/s] (overrides temperature)<br>• `m`: air attenuation [1/m] (Default: 0) | `A = materials.absorption_area(t60, volume=200)`<br><br>• A [m²] |
 | `absorption_coefficient` | `function` | **Sound absorption coefficient (ISO 354 Eq. 9).**<br>• `t1`, `t2`: empty / with-specimen T [s]<br>• `volume` V [m³]<br>• `sample_area` S [m²]<br>• `temperature1`/`temperature2` [°C]<br>• `speed_of_sound1`/`2`, `m1`/`m2` | `a = materials.absorption_coefficient(t1, t2, 200, 10.8)`<br><br>• α_s (unclamped, may exceed 1) |
 | `attenuation_from_alpha` | `function` | **ISO 9613-1 α → m (ISO 354 8.1.2.1).**<br>• `alpha`: attenuation [dB/m] | `m = materials.attenuation_from_alpha(0.01)`<br><br>• m = α/(10 lg e) [1/m] |
@@ -36456,15 +36784,23 @@ to cross an action value on its own.*
 See the [Outdoor Propagation guide](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/) and the
 [Occupational Noise Exposure guide](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/) for usage.
 
-## Sound power determination (ISO 3744/3745/3746, ISO 3741, ISO 9614-2/3)
+## Sound power determination (ISO 3744/3745/3746, ISO 3741, ISO 9614-1/2/3)
 
 The sound power level $L_W = 10 \log_{10}(P/P_0)$ ($P_0 = 1$ pW) is an
 *emission* quantity: unlike a pressure level it does not depend on the receiver
-distance or the room. Three families of methods recover it.
+distance or the room. Three families of methods recover it, one per measured
+quantity: a **sound pressure** over an enveloping surface (ISO 3744/3746, and
+ISO 3745 when the room is anechoic) or in a diffuse field (ISO 3741), a **sound
+intensity** held at discrete points (ISO 9614-1) or scanned over that same
+surface (ISO 9614-2 and ISO 9614-3), and the **surface velocity** of the
+radiating casing, which takes no acoustic measurement at all: ISO/TS 7849, whose
+radiation factor is the radiation efficiency derived in the
+[vibration reference](https://jmrplens.github.io/phonometry/reference/theory/vibration/#point-mobilities-and-radiation-efficiency-cremer-5-hopkins-29).
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods.svg" alt="The three sound power routes side by side: an enveloping pressure surface over a reflecting plane (ISO 3744/3746), a source in a reverberation room sampled by microphones (ISO 3741) and an intensity probe scanning a surface around the source (ISO 9614-2)" width="92%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods.svg" alt="The seven sound power routes, one row for each measured quantity, every cell carrying the same five attributes. The sound pressure row: the ISO 3744/3746 hemispherical enveloping surface over a reflecting plane, the ISO 3745 fixed microphone array in a wedge-lined anechoic room, and the ISO 3741 diffuse field of a reverberation room. The sound intensity row: the ISO 9614-1 measurement surface cut into ten segments with the probe held still at a point in each, the ISO 9614-2 serpentine scan swept over that same surface, and the tighter ISO 9614-3 precision scan. The surface velocity row carries one route across the full width, ISO/TS 7849 with an accelerometer on a radiating casing and no microphone at all" width="92%"></picture>
 
-*The three routes to $L_W$: enveloping pressure surface, reverberation room and intensity scan.*
+*The seven routes to $L_W$, one row per measured quantity: a sound pressure, a
+sound intensity, or the surface velocity of the casing.*
 
 ### Enveloping-surface pressure (ISO 3744/3746)
 
@@ -36525,6 +36861,33 @@ reference source of known power measured in the same room,
 $L_W = L_{W(\text{RSS})} + (\bar{L}_p - \bar{L}_{p,\text{RSS}} + C_2)$, so the
 absorption-area, Waterhouse and $C_1$ terms cancel and the room need not be
 characterised.
+
+### Discrete-point intensity (ISO 9614-1)
+
+Part 1 holds the probe still. One position stands for each segment of the
+measurement surface, so the partial power is $P_i = I_{\mathrm{n}i} S_i$
+(Eq. 11) and the sound power is $L_W = 10 \log_{10}(\sum_i P_i / P_0)$
+(Eq. 12). That sum is printed without the absolute-value bars of the general
+definition because clause 9.2 disposes of the negative case instead: a band
+whose $\sum_i P_i$ comes out negative is outside the method rather than a band
+with a level to report. One segment carrying negative power is ordinary, and is
+what $F_3$ exists to quantify.
+
+What separates Part 1 from a scan is not the integral but what decides whether
+it was sampled finely enough, and with a fixed set of positions the surface has
+to answer that itself. The Annex A indicators average over positions without
+area weighting: $F_1$ is the temporal variability (Eq. A.1),
+$F_2 = L_p - L_{|I_\mathrm{n}|}$ and $F_3 = L_p - L_{I_\mathrm{n}}$ are the
+reactivity and recirculation indicators (Eqs. A.3 to A.7), and
+$F_4 = \frac{1}{|\overline{I_\mathrm{n}}|} \sqrt{\sum_i (I_{\mathrm{n}i} - \overline{I_\mathrm{n}})^2 / (N - 1)}$
+is the field non-uniformity (Eqs. A.8 and A.9), which is Part 1's own. Annex B
+turns it into a position count: criterion 2 asks $N > C F_4^2$ (Eq. B.2) with
+$C$ from Table B.2, so a surface that radiates unevenly demands more positions,
+band by band, and the grade a band earns is the grade whose $C$ that inequality
+still satisfies. Criterion 1, $L_\mathrm{d} > F_2$ (Eq. B.1), puts the probe
+against the field before any of that, and no amount of averaging rescues a band
+that fails it. The gate figure in the next subsection is drawn in exactly these
+names, because they are Part 1's.
 
 ### Intensity scanning (ISO 9614-2)
 
@@ -36713,7 +37076,7 @@ Several areas keep their theory **inside their guides** instead, because the der
 - [Environmental descriptors (ISO 1996-1)](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/#environmental-descriptors-iso-1996-1)
 - [Impulsive-sound prominence (NT ACOU 112)](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/#impulsive-sound-prominence-nt-acou-112)
 - [Outdoor propagation and occupational exposure (ISO 9613-1/2, ISO 9612)](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/#outdoor-propagation-and-occupational-exposure-iso-9613-12-iso-9612)
-- [Sound power determination (ISO 3744/3745/3746, ISO 3741, ISO 9614-2/3)](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/#sound-power-determination-iso-374437453746-iso-3741-iso-9614-23)
+- [Sound power determination (ISO 3744/3745/3746, ISO 3741, ISO 9614-1/2/3)](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/#sound-power-determination-iso-374437453746-iso-3741-iso-9614-123)
 
 ## [Vibration](https://jmrplens.github.io/phonometry/reference/theory/vibration/)
 
@@ -48560,7 +48923,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 566 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 572 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -48803,7 +49166,7 @@ sample from the metrology core:
 | IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-566 numerical conformance checks across 59 domains and 373 standards, covering
+572 numerical conformance checks across 59 domains and 373 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise

@@ -33,7 +33,8 @@ level a programme, go to
 The total acoustic emission of a source, and the power flux it is built on.
 
 - [Sound Intensity (p-p)](emission/intensity.md): two-microphone
-  sound intensity per IEC 61043 with the ISO 9614-1 field indicators.
+  sound intensity per IEC 61043, with the ISO 9614-1 field indicators and its
+  sound power determination at discrete points.
 - [Sound Power](emission/sound-power.md): choosing the determination
   method and declaring the noise emission per ISO 4871.
 - [Sound Power by Pressure Methods](emission/sound-power-pressure.md):
@@ -103,10 +104,9 @@ how to acquire them, and through ISO/TS 7849, whose clauses 5 to 7 on
 instrumentation, installation and measurement positions are laboratory
 practice this library assumes.
 
-Three specific absences are worth knowing before you plan a job. ISO 9614-1's
-discrete fixed-point power summation is **not implemented at all** — only its
-field indicators are, reused by the scanning routes. Dissipative duct-lining
-silencers are **not modelled from liner properties** anywhere: the reactive
+Two specific absences are worth knowing before you plan a job. Dissipative
+duct-lining silencers are **not modelled from liner properties** anywhere:
+the reactive
 elements are computed exactly within the no-flow plane-wave model, and the
 lined-elbow figure is a table lookup (Bies Table 8.11) and the plenum
 attenuation Wells' closed form driven by a declared mean absorption — neither is a liner model.
@@ -129,7 +129,7 @@ pair, so the calibration, weighting and filtering behind them are in [Signal
 analysis](../signals/index.md), and [Build a sound level
 meter](../signals/sound-level-meter.md) runs that chain end to end on
 one runnable page. The derivations are split by physics rather than by topic:
-[sound power determination](../reference/theory/environment-transport.md#sound-power-determination-iso-374437453746-iso-3741-iso-9614-23)
+[sound power determination](../reference/theory/environment-transport.md#sound-power-determination-iso-374437453746-iso-3741-iso-9614-123)
 is under Environment and transport, and [sound intensity](../reference/theory/signal-analysis.md#sound-intensity-iec-61043)
 under Signal analysis. The electroacoustics and noise-control pages carry their
 derivations inline.
