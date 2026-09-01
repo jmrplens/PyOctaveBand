@@ -174,9 +174,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   anywhere else, and a plotted curve shifted by 0.0225 pt against a figure
   tolerance of 0.0175. The documentation figure job has also been failing
   intermittently on unchanged drawing code, and the figures it fails on are
-  drawn from this design, but that the one causes the other is inference: it
-  was never watched happening, and the failure could not be reproduced on a
-  developer machine under any kernel set selectable there.
+  drawn from this design. The coefficient difference behind that is reproduced
+  exactly, digest for digest, under emulated AVX512; what remains inference is
+  only the last step, because the same difference stays inside the image
+  comparison tolerance on a developer machine and crosses it on the runner.
 
   The test suite went with it. `tests/filters` failed on sixteen of those
   twenty-five settings, at the guard that stops an accuracy bound going slack,
@@ -184,10 +185,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the 0.0044 the guard asks for, than the bound was sized against. The guard
   is right and the measurement it read was not a function of the source.
 
-  The fit no longer asks a library to add anything up. Its reductions fold
-  their operands in half and add the halves elementwise, in an order the
-  module fixes, and the dozen-by-dozen system at the heart of each step is
-  eliminated in the module rather than by LAPACK. Two more places had the same
+  The fit no longer asks a library to add up anything that was found to move.
+  The reductions that feed each step fold their operands in half and add the
+  halves elementwise, in an order the module fixes, and the dozen-by-dozen
+  system at the heart of each step is eliminated in the module rather than by
+  LAPACK. The two sums that collect a factor group are still numpy's, because
+  they were measured not to differ on any kernel set including AVX512, and
+  taking them over moved all ninety-one designs for nothing. Two more places
+  had the same
   problem for a different reason: the printed curve the fit aims at, and the
   single read-back that sets the shipped gain, were complex expressions, and a
   complex multiply or magnitude fuses a multiply into an add where the CPU
@@ -197,10 +202,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   already fixed, dropping numpy to its baseline kernels still moved all
   ninety-one designs.
 
+  That was still not the whole of it, and finding the rest needed a processor
+  nobody here has. AMD does not ship AVX512 before Zen 4 and Intel dropped it
+  from the 12th generation onward, so the case that fails could not be run on
+  either machine this was developed on, and every measurement of it had been
+  taken on hardware that cannot fail that way. Intel's Software Development
+  Emulator runs it in software, and under it this machine returns the
+  continuous integration runner's digest byte for byte. Measured there,
+  numpy's `log`, `exp`, `tan`, `power`, `arctan`, `sin` and `log1p` each
+  answer differently from the same host running natively, while the standard
+  library's do not. Every transcendental on the design path is now taken from
+  `math` one element at a time.
+
+  The root of it then turned out to sit one line before the fit rather than
+  anywhere inside it. `numpy.geomspace` is `10 ** linspace(...)`, so the grid
+  every residual is evaluated on came out different and each step inherited
+  it. The grid is now built from numpy's own formula, term for term, with the
+  power taken elementwise and the endpoints pinned as `geomspace` pins them,
+  which returns the identical array where AVX512 is absent and therefore moved
+  no coefficient, figure or published value.
+
   Every design in the corpus is now identical bit for bit across sixty-five
   configurations: all twenty-seven OpenBLAS kernel sets, with and without
   numpy's dispatched kernels, six thread counts and five hash seeds. Two of
-  those kernel sets used to fault outright.
+  those kernel sets used to fault outright. It is also identical between this
+  machine and the same machine under emulated AVX512, which is the comparison
+  that had been failing.
 
   The accuracy is where the design already reached. Five of the seven curves
   move by less than 0.0003 dB, two of them downwards, and AU reads 0.0059 dB
@@ -216,7 +243,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   checked with the same function, so the check could not see an error in it;
   measured against a wider precision, the pin is now good to 1.6e-14 relative
   and `sosfreqz` is the thing that cannot read it, being out by 1.3e-10 at the
-  G weighting's 10 Hz reference frequency. A design costs about 150 ms, paid
+  G weighting's 10 Hz reference frequency. A design costs about 260 ms, paid
   once per curve, rate and mode.
 
 - The ANSI S1.4-1983 Table V Type 2 cell at 20 Hz is read as +/-3 dB. It
@@ -393,9 +420,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
   The third was speed. Weighting one minute of 44.1 kHz audio costs about
   18 ms where it cost 377 ms for A and 775 ms for 468, and holds 21 MB of
-  intermediates instead of 169 MB. The design itself costs about 70 ms and is
+  intermediates instead of 169 MB. The design itself costs about 260 ms and is
   cached per curve, rate and mode, so even a first call is quicker than the
-  path it replaces: 85 ms against 377 for A, 92 against 775 for 468.
+  path it replaces: about 280 ms against 377 for A, 285 against 775 for 468.
 
   `high_accuracy=False` keeps its old meaning: the plain bilinear transform of
   the printed prototype, the closed form a reader can check against the
