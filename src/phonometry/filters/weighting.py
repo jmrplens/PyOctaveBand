@@ -515,8 +515,9 @@ def _weighting_sos(curve: str, fs: int, high_accuracy: bool) -> np.ndarray:
     standard in the corpus places a requirement at.
 
     The fit costs about 260 ms, which is why it is cached: it is paid once per
-    (curve, rate, mode), and it is still a third of what the resampled path
-    it replaces spent *filtering* one minute of audio. Where the first start
+    (curve, rate, mode), and it is still a third of the 775 ms the resampled
+    path it replaces spent *filtering* one minute of 468-weighted audio, and
+    about 70 % of the A curve's 377. Where the first start
     does not land close enough, the routine works through the other starts of
     :func:`~phonometry.filters._weighting_design._spare_placements` and the
     design takes about 3 s instead. That is common below about 2 kHz, and it
