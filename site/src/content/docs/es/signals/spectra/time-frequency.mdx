@@ -246,7 +246,7 @@ import numpy as np
 from phonometry import signals
 
 fs = 8192.0
-t = np.arange(8192) / fs                 # registro de 1 s: resolución de 1 Hz
+t = np.arange(8192) / fs                 # registro de 1 s: espaciado de bins de 1 Hz
 x = (0.8 * np.cos(2.0 * np.pi * 997.0 * t)
      + 0.5 * np.cos(2.0 * np.pi * 1000.0 * t))
 
@@ -321,7 +321,7 @@ from scipy import signal
 from phonometry import signals
 
 fs = 8192.0
-t = np.arange(8192) / fs                 # registro de 1 s: resolución de 1 Hz
+t = np.arange(8192) / fs                 # registro de 1 s: espaciado de bins de 1 Hz
 x = (0.8 * np.cos(2.0 * np.pi * 997.0 * t)
      + 0.5 * np.cos(2.0 * np.pi * 1000.0 * t))
 

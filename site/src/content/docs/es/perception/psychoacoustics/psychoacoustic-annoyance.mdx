@@ -270,14 +270,14 @@ ECMA-418-2), en vacil_HMS, está en
 ojo con que la unidad de esta página es el vacil y la de aquella el vacil_HMS,
 así que las dos no son el mismo número para el mismo sonido.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength_es.svg" alt="A la izquierda, la intensidad de fluctuación de forma cerrada y la del modelo de señal para el mismo ruido de banda ancha modulado en amplitud a 60 dB frente a la frecuencia de modulación, ambas de paso de banda en torno a 4 Hz, con el modelo de señal alcanzando 5,5 vacil frente a los 3,7 de la forma cerrada, un exceso de factor 1,5 a 4 Hz. A la derecha, el modelo de señal sobre el tono de 1 kHz a 70 dB modulado en amplitud para el que se calibró, con máximo de 1,09 vacil a 4 Hz" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength_es.svg" alt="A la izquierda, la intensidad de fluctuación de forma cerrada y la del modelo de señal para el mismo ruido de banda ancha modulado en amplitud a 60 dB frente a la frecuencia de modulación, ambas de paso de banda en torno a 4 Hz, con el modelo de señal alcanzando 5,5 vacil frente a los 3,7 de la forma cerrada, un exceso de factor 1,5 a 4 Hz. A la derecha, el modelo de señal sobre el tono de 1 kHz a 70 dB modulado en amplitud de su contraste bibliográfico de la Tabla 1, con máximo de 1,09 vacil a 4 Hz" width="88%" />
 
 *Los dos modelos sobre el mismo estímulo, que es la comparación que el aviso de
 abajo convierte en regla. Los dos son pasos de banda centrados cerca de 4 Hz,
 pero sobre ruido de banda ancha AM el modelo de señal supera a la forma
 cerrada en alrededor de la mitad, porque acumula la modulación banda a banda a
-lo largo de todo el eje de Bark. Sobre el tono AM para el que se calibró, a la
-derecha, se porta bien.*
+lo largo de todo el eje de Bark. Sobre el tono AM a 70 dB de su contraste
+bibliográfico, a la derecha, se porta bien.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -303,8 +303,9 @@ for fm in fm_noise:
     f_noise.append(psychoacoustics.fluctuation_strength(am, float(fs)).fluctuation_strength)
 print(round(f_noise[3], 1), round(f_bbn[np.argmin(np.abs(fmod - 4.0))], 1))   # 5.5 3.7
 
-# Panel derecho, el modelo de señal sobre el tono AM para el que se calibró:
-# 1 kHz a 70 dB, con el mismo barrido de modulación.
+# Panel derecho, el modelo de señal sobre el tono AM de su contraste
+# bibliográfico (Osses 2016, Tabla 1): 1 kHz a 70 dB, con el mismo barrido
+# de modulación.
 t = np.arange(int(2.0 * fs)) / fs
 carrier = np.sin(2 * np.pi * 1000.0 * t)
 f_tone = []

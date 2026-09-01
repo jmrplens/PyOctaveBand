@@ -142,7 +142,7 @@ definition, a 1 kHz tone at 60 dB,
 Fastl & Zwicker models; the normative Sottek-model fluctuation strength of
 ECMA-418-2 Clause 9 lives in [Sound Quality Metrics](sound-quality.md).
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength.svg" alt="Left: the closed-form and signal-model fluctuation strength of the same amplitude-modulated broadband noise at 60 dB against modulation frequency, both band-pass around 4 Hz, the signal model peaking at 5.5 vacil against the closed form's 3.7, a factor 1.5 overshoot at 4 Hz. Right: the signal model on the amplitude-modulated 1 kHz tone at 70 dB it was calibrated for, peaking at 1.09 vacil at 4 Hz" width="82%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength.svg" alt="Left: the closed-form and signal-model fluctuation strength of the same amplitude-modulated broadband noise at 60 dB against modulation frequency, both band-pass around 4 Hz, the signal model peaking at 5.5 vacil against the closed form's 3.7, a factor 1.5 overshoot at 4 Hz. Right: the signal model on the amplitude-modulated 1 kHz tone at 70 dB of its Table 1 literature cross-check, peaking at 1.09 vacil at 4 Hz" width="82%"></picture>
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -169,8 +169,8 @@ for fm in fm_noise:
     f_noise.append(psychoacoustics.fluctuation_strength(am, float(fs)).fluctuation_strength)
 print(round(f_noise[3], 1), round(f_bbn[np.argmin(np.abs(fmod - 4.0))], 1))   # 5.5 3.7
 
-# Right panel, the signal model on the AM tone it was calibrated for:
-# 1 kHz at 70 dB, over the same modulation sweep.
+# Right panel, the signal model on the AM tone of its literature cross-check
+# (Osses 2016 Table 1): 1 kHz at 70 dB, over the same modulation sweep.
 t = np.arange(int(2.0 * fs)) / fs
 carrier = np.sin(2 * np.pi * 1000.0 * t)
 f_tone = []
