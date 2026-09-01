@@ -155,7 +155,8 @@ _GRID_POINTS = 257
 #: Both are fixed budgets rather than convergence tests, so the routine always
 #: does the same arithmetic, and they are set where the accuracy curve
 #: flattens: measured over this corpus, raising them to 40 by 12 -- 2.4 times
-#: the work, about 480 ms per design instead of 200 -- moves no (curve, rate)
+#: the work, about 480 ms per design against the shipped budget's 200 --
+#: moves no (curve, rate)
 #: fit by more than 0.013 dB (the largest, D at 12 kHz, from 0.020 to 0.008)
 #: and moves the corpus's worst, BS.468-4 at 48 kHz, from 0.062 only to 0.060,
 #: so the extra work buys nothing where the budget actually binds.
