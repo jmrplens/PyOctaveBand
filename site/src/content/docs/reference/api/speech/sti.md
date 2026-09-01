@@ -9,9 +9,10 @@ Speech Transmission Index (STI) per IEC 60268-16:2020 (Edition 5).
 
 Implements the full-STI indirect method from impulse responses (Schroeder
 modulation transfer function), the direct STIPA method on recorded signals
-(Annex B) and an Ed.5-conformant STIPA test-signal generator (clauses A.4
-and A.6.1). Only the male speech option exists: Edition 5 removed the
-female spectrum and weighting factors (foreword, item d).
+(Annex B), an Ed.5-conformant STIPA test-signal generator (clauses A.4
+and A.6.1) and the Annex M adjustment of a measured result to other speech
+and occupancy-noise levels. Only the male speech option exists: Edition 5
+removed the female spectrum and weighting factors (foreword, item d).
 
 The computation chain (octave-band MTF -> auditory masking and reception
 threshold correction -> effective SNR clipped to +/-15 dB -> transmission
@@ -19,7 +20,88 @@ indices -> band MTI -> weighted STI) is numerically identical between
 Ed.4 (2011) clauses A.5.2-A.5.6 and Ed.5; the only Ed.5 numeric change is
 the male test-signal spectrum (A.6.1).
 
+The level adjustment of [`sti_adjusted_for_levels`](/phonometry/reference/api/speech/sti/#sti_adjusted_for_levels) is the four-step
+procedure of Ed.4 (2011) Annex M, verified against the printed
+intermediates of its Table M.1. The Ed.5 foreword (item g) says greater
+information is given in Annex M about these adjustments, and its table of
+contents grows the annex from three printed pages to ten and adds a flow
+chart of the steps; the body of the Ed.5 annex could not be obtained, so
+what those pages add beside this procedure is unknown here.
+
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
+
+## sti_adjusted_for_levels
+
+```python
+sti_adjusted_for_levels(
+    mtf: np.ndarray,
+    *,
+    measured_level: Sequence[float] | np.ndarray,
+    measured_ambient: Sequence[float] | np.ndarray | None = None,
+    operational_level: Sequence[float] | np.ndarray,
+    operational_ambient: Sequence[float] | np.ndarray | None = None,
+) -> STIResult
+```
+
+STI of a measured MTF matrix moved to other speech and noise levels.
+
+A room is measured empty, at whatever level the test signal ran; the
+question is what the STI would be with the room occupied and the talker
+at the operational level. The four steps of IEC 60268-16 Annex M answer
+it without measuring again:
+
+1. acquire the modulation transfer matrix together with the speech and
+   background-noise octave-band levels that were present during the
+   measurement (`mtf`, `measured_level`, `measured_ambient`);
+2. divide out the correction those levels produced, which removes the
+   background noise, the auditory masking and the reception threshold
+   and leaves the matrix of the transmission channel alone;
+3. multiply by the correction the operational levels produce, putting
+   the occupancy noise, masking and threshold of the simulated
+   condition back in;
+4. process the resulting matrix into the index by the usual A.5.4 to
+   A.5.6 chain.
+
+Steps 2 and 3 run the one level-dependent correction of clause A.5.3
+that the forward chain applies, once inverted and once as it stands, so
+the adjustment cannot drift from the masking and threshold model the
+rest of the module uses.
+
+What is implemented is the Ed.4 (2011) Annex M procedure, verified
+against the printed intermediates of its Table M.1 worked example. The
+Ed.5 foreword (item g) says greater information is given in Annex M
+about these adjustments, and its table of contents grows the annex from
+three printed pages to ten; the body of the Ed.5 annex could not be
+obtained, so what those pages add beside this procedure is unknown
+here.
+
+:::note
+`mtf` is the matrix *as measured*, with the noise, masking
+and threshold of the measurement still in it, which is what
+[`STIResult.mtf`](/phonometry/reference/api/speech/sti/#stiresult) holds after a measurement run
+with `level` and `ambient`. Feeding a matrix that never had them
+applied removes what was never added and lowers the result.
+[`STIResult.adjusted_for_levels`](/phonometry/reference/api/speech/sti/#stiresultadjusted_for_levels) takes the measurement levels
+from the result itself and is the safe route.
+:::
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `mtf` | Measured modulation transfer matrix, shape (7, n_modulation_frequencies). |
+| `measured_level` | Speech octave-band levels during the measurement, dB SPL (7 values). |
+| `measured_ambient` | Background-noise octave-band levels during the measurement, dB SPL (7 values); `None` for a measurement whose matrix carries masking and threshold but no noise. |
+| `operational_level` | Speech octave-band levels of the condition being simulated, dB SPL (7 values). |
+| `operational_ambient` | Occupancy-noise octave-band levels of that condition, dB SPL (7 values); `None` simulates a silent room. |
+
+**Returns:** [`STIResult`](/phonometry/reference/api/speech/sti/#stiresult) at the operational levels, carrying them in `band_levels` and `ambient_levels`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | if a level vector is not 7 finite values, or `mtf` is not a (7, n) matrix of finite non-negative values. |
 
 ## sti_from_impulse_response
 
@@ -198,6 +280,7 @@ STIResult(
     mtf: np.ndarray,
     band_levels: np.ndarray | None,
     rating: str,
+    ambient_levels: np.ndarray | None = None,
 )
 ```
 
@@ -207,10 +290,49 @@ Result of a Speech Transmission Index computation.
 transmission indices, i.e. after the optional SNR / masking /
 reception-threshold corrections and after clipping to [0, 1]; its
 shape is (7, 14) for full STI and (7, 2) for STIPA. `mti` is the
-per-band modulation transfer index (7,), `band_levels` echoes the
-speech octave-band levels used for the level-dependent corrections
-(None when they were skipped) and `rating` is the Annex F
-qualification letter (`A+` .. `U`).
+per-band modulation transfer index (7,), `band_levels` and
+`ambient_levels` echo the speech and background-noise octave-band
+levels used for the level-dependent corrections (None when they were
+skipped) and `rating` is the Annex F qualification letter
+(`A+` .. `U`).
+
+The two level spectra are what `adjusted_for_levels` reads to
+undo the corrections they produced, so a result that carries them can
+be moved to another speech and occupancy-noise condition.
+
+### STIResult.adjusted_for_levels()
+
+```python
+STIResult.adjusted_for_levels(
+    *,
+    operational_level: Sequence[float] | np.ndarray,
+    operational_ambient: Sequence[float] | np.ndarray | None = None,
+) -> STIResult
+```
+
+This result moved to another speech and noise condition (Annex M).
+
+The measurement condition is the one this result already carries in
+`band_levels` and `ambient_levels`, so only the target condition
+is passed: what the room would have scored occupied, or with the
+talker raised to the operational level. See
+[`sti_adjusted_for_levels`](/phonometry/reference/api/speech/sti/#sti_adjusted_for_levels), which does the work and states the
+edition the procedure comes from.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `operational_level` | Speech octave-band levels of the condition being simulated, in dB SPL (7 values). |
+| `operational_ambient` | Occupancy-noise octave-band levels of that condition, in dB SPL (7 values); `None` simulates a silent room. |
+
+**Returns:** A new [`STIResult`](/phonometry/reference/api/speech/sti/#stiresult) at the operational levels.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | if this result carries no speech band levels, i.e. it was computed without the level-dependent corrections and its modulation transfer matrix holds nothing to undo. |
 
 ### STIResult.plot()
 

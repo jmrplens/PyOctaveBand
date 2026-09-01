@@ -1425,6 +1425,110 @@ which is the check that enforces the rule; see
   in [`distortion.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/electroacoustics/distortion.py).
 - **Status:** unreported.
 
+## IEC 60268-16:2011, Table M.1 (the beta row states the wrong redundancy term)
+
+- **Location:** Annex M, Table M.1 "Example calculation", step 4, the row
+  labelled "Sum of beta\*$MTI$ = $MTI_k$ $\times$ beta weighting" (printed
+  p. 67), directly below the matching alpha row.
+- **The print:** the label reads $MTI_k \times \beta_k$, and the seven cells
+  of the row read 0,059 | 0,052 | 0,045 | 0,008 | 0,037 | 0,081 | 0,000,
+  summed on the next page as $\sum \text{beta*}MTI = 0{,}282$.
+- **The problem:** the label and the cells state different quantities, and the
+  label is the one that is wrong. Clause A.5.6 of the same edition (printed
+  p. 47) defines the index as
+  $STI = \sum_{k=1}^{7} \alpha_k \times MTI_k -
+  \sum_{k=1}^{6} \beta_k \times \sqrt{MTI_k \times MTI_{k+1}}$: the redundancy
+  term is the *geometric mean of two adjacent bands*, not the band's own
+  $MTI_k$. Read against the table's own MTI row, $\beta_k \times MTI_k$ gives
+  0,062 | 0,051 | 0,044 | 0,008 | 0,036 | 0,076, summing to 0,277, which
+  disagrees with five of the six printed cells and with the printed total.
+  $\beta_k\sqrt{MTI_k MTI_{k+1}}$ reproduces all six cells and the 0,282
+  total. The seventh cell is not part of either reading: the redundancy sum
+  stops at $k = 6$ because the 8 kHz band has no band above it to pair with,
+  so its 0,000 is the placeholder of a column with no redundancy partner, not
+  a term. The alpha row above it, labelled the same way, is
+  correct, because there the label and A.5.6 do agree.
+- **Evidence:** both readings recomputed from the table's own step 4c MTI row
+  and compared cell by cell with the printed row and with its printed total;
+  A.5.6 read against the label. The defect does not move this example's
+  answer, since $1{,}040 - 0{,}277 = 0{,}763$ and $1{,}040 - 0{,}282 =
+  0{,}758$ both print as the STI 0,76 the table ends on, which is how a label
+  contradicting the normative formula survives a worked example. Verified on
+  PDF page 69 (printed p. 67) and PDF page 49 (printed p. 47) of
+  IEC 60268-16:2011.
+- **Library behaviour:** implements A.5.6 with the redundancy term as printed
+  there, in
+  [`_index_from_corrected_mtf`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/speech/sti.py); the pairwise
+  weighting-factor test of A.2.2 pins it independently, and the conformance
+  rows "IEC 60268-16:2020 A.2.2" and "IEC 60268-16 Annex M" both read the
+  index it produces.
+- **Status:** unreported.
+
+## IEC 60268-16:2011, Table M.1 (I_k tabulated a million times its neighbours)
+
+- **Location:** Annex M, Table M.1, the row "Combined squared sound pressure
+  $I_k$, MPa$^2$" of step 2 (printed p. 64) and of step 3 (printed p. 65),
+  read with the $I_{am,k}$ and $I_{rt,k}$ rows below it.
+- **The print:** for the 77,9 dB signal of the 125 Hz band, step 2 prints
+  $I_k$ = 61,7, and four rows below it prints $I_{rt,k}$ = 40 000 for the
+  46 dB reception threshold of the same band.
+- **The problem:** two defects in one row. The unit is impossible: at 77,9 dB
+  re 20 µPa the squared sound pressure is $0{,}0247\ \text{Pa}^2$, so the cell
+  cannot be 61,7 MPa$^2$ under any reading of the prefix. What the row
+  actually tabulates is the dimensionless intensity ratio
+  $10^{L/10} = 61\,722\,596$ divided by $10^{6}$. And that divisor is not
+  applied to the two quantities the standard adds to $I_k$ in the very next
+  rows: $I_{am,k}$ and $I_{rt,k}$ are tabulated as the plain ratio, 40 000
+  being $10^{4,6} = 39\,811$ rounded, undivided. A reader who forms
+  $I_k + I_{am,k} + I_{rt,k}$ from the cells as printed understates its first
+  term by $10^{6}$. The printed "adjustment to remove masking and
+  threshold" row is the check: 1,019 at 500 Hz is
+  $(I_k + I_{am,k} + I_{rt,k})/I_k$ only once $I_k$ is restored to
+  26 305 192; formed from the cells as printed the same expression reads
+  19 279.
+- **Evidence:** every cell of both $I_k$ rows recomputed as $10^{L/10}$ from
+  the combined levels printed above them, and every cell of the $I_{am,k}$ and
+  $I_{rt,k}$ rows recomputed as $amf_k \times I_{k-1}$ and $10^{ART_k/10}$;
+  the first set reproduces at $10^{-6}$ of the computed value and the second
+  two at $10^{0}$. Verified on PDF page 66 (printed p. 64) and PDF page 67
+  (printed p. 65) of IEC 60268-16:2011.
+- **Library behaviour:** carries all three quantities on one scale, the plain
+  ratio to $p_0^2 = (20\ \mu\text{Pa})^2$, in the correction of
+  [`sti.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/speech/sti.py); the transcription in
+  [`tests/reference_data/`](https://github.com/jmrplens/phonometry/blob/main/tests/reference_data) keeps the printed cells
+  verbatim and names the $10^{6}$ it rescales them by, and the conformance row
+  "IEC 60268-16 Annex M" reads the adjustment they feed.
+- **Status:** unreported.
+
+## IEC 60268-16:2011, Table M.1 (step 3 I_am,k at 250 Hz)
+
+- **Location:** Annex M, Table M.1, step 3, the $I_{am,k}$ row, 250 Hz column
+  (printed p. 65).
+- **The print:** 2 850 000, the same value as the 500 Hz cell beside it.
+- **The problem:** the cell does not round from the quantity it names. With
+  the operational levels printed two rows above, $I_{am,k}$ at 250 Hz is the
+  auditory masking factor of the 125 Hz band times that band's combined
+  intensity, $0{,}01463507 \times 195\,339\,273 = 2\,858\,804$, which at the
+  three significant figures the row is printed to reads 2 860 000. The 500 Hz
+  cell is correct: its 2 852 252 does print as 2 850 000. The two cells are
+  reproduced together only by carrying the *rounded* $amf \times 1000 = 14{,}6$
+  of the row above instead of the factor itself, and step 2 shows that is not
+  what the table does, since its two corresponding cells are printed apart, as
+  508 000 and 507 000, which only the unrounded factor gives.
+- **Evidence:** both cells recomputed from the printed operational speech and
+  noise levels, and the step 2 pair recomputed the same way as a control. The
+  defect changes nothing downstream: the masking and threshold correction of
+  the band is 0,985552 with the correct value against 0,985596 with the
+  printed one, and the row prints 0,986 either way. Verified on PDF page 67
+  (printed p. 65) and PDF page 66 (printed p. 64) of IEC 60268-16:2011.
+- **Library behaviour:** computes $I_{am,k}$ from the unrounded masking factor.
+  The transcription in [`tests/reference_data/`](https://github.com/jmrplens/phonometry/blob/main/tests/reference_data)
+  keeps the printed cell and the test
+  `test_annex_m_step3_masking_intensity_at_250_hz_is_the_printed_erratum`
+  asserts the computed value against 2 858 804 and against the print, so the
+  one cell of the table that is not an oracle cannot quietly become one.
+- **Status:** unreported.
+
 ## UNE-EN 61043:1999, clause 6.1 (class 2 frequency range dropped in translation)
 
 - **Location:** clause 6.1 "Rango de frecuencias", the class 2 sentence, of

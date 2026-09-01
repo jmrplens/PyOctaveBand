@@ -3814,3 +3814,93 @@ def generate_sti_band_mti(output_dir: str) -> None:
     res.plot(ax=ax, language=_LANG)
     plt.tight_layout()
     save_figure(output_dir, "sti_band_mti.svg")
+
+
+def generate_sti_occupancy_adjustment(output_dir: str) -> None:
+    """IEC 60268-16 Annex M: the empty hall answered for the full one."""
+    print("Generating sti_occupancy_adjustment...")
+    from phonometry import speech
+    from phonometry.speech.sti import _SPEECH_SPECTRUM_ED5
+
+    # The reverberant hall of sti_band_mti, measured out of hours: the male
+    # test-signal spectrum of A.6.1 at 68 dB overall against the ventilation.
+    fs = 48000
+    rng = np.random.default_rng(0)
+    n = np.arange(fs)
+    ir = rng.standard_normal(fs) * np.exp(-6.9078 * n / fs / 0.9)
+    shape = np.asarray(_SPEECH_SPECTRUM_ED5)
+    talker = shape - 10.0 * np.log10(np.sum(10.0 ** (shape / 10.0))) + 68.0
+    empty_noise = np.array([42.0, 36.0, 31.0, 28.0, 25.0, 23.0, 21.0])
+    full_noise = np.array([54.0, 50.0, 47.0, 44.0, 40.0, 35.0, 30.0])
+
+    measured = speech.sti_from_impulse_response(
+        ir, fs, level=talker, ambient=empty_noise
+    )
+    occupied = measured.adjusted_for_levels(
+        operational_level=talker, operational_ambient=full_noise
+    )
+    louder = measured.adjusted_for_levels(
+        operational_level=talker + 6.0, operational_ambient=full_noise
+    )
+
+    series = (
+        (measured, "Measured empty", COLOR_PRIMARY),
+        (occupied, "Adjusted, audience in", COLOR_SECONDARY),
+        (louder, "Adjusted, audience in and talker +6 dB", COLOR_TERTIARY),
+    )
+    positions = np.arange(len(measured.mti), dtype=float)
+    width = 0.27
+
+    # Two panels because the two questions have incompatible scales. The MTIs
+    # differ by hundredths on a [0, 1] index, so bars drawn from zero (the only
+    # honest baseline for a bar) put every difference inside a few pixels; the
+    # lower panel is those differences on their own axis, which is where the
+    # band-by-band story is legible without a truncated scale telling it.
+    fig, (ax, ax_delta) = plt.subplots(
+        2,
+        1,
+        figsize=(10, 7.6),
+        sharex=True,
+        gridspec_kw={"height_ratios": [2.1, 1.0], "hspace": 0.12},
+    )
+    for i, (result, label, color) in enumerate(series):
+        ax.bar(
+            positions + (i - 1) * width,
+            result.mti,
+            width=width,
+            color=color,
+            edgecolor=COLOR_FG,
+            linewidth=0.5,
+            label=f"{label}: STI {result.sti:.2f} ({result.rating})",
+        )
+    ax.set_ylabel("Modulation transfer index MTI")
+    ax.set_ylim(0.0, 0.95)
+    ax.set_title(
+        "Annex M: what the empty hall would score with the audience in",
+        pad=12,
+    )
+    ax.grid(True, axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+
+    for i, (result, _label, color) in enumerate(series[1:]):
+        ax_delta.bar(
+            positions + (i - 0.5) * width,
+            np.asarray(result.mti) - np.asarray(measured.mti),
+            width=width,
+            color=color,
+            edgecolor=COLOR_FG,
+            linewidth=0.5,
+        )
+    ax_delta.axhline(0.0, color=COLOR_FG, linewidth=1.0)
+    ax_delta.set_xticks(positions)
+    ax_delta.set_xticklabels(["125", "250", "500", "1k", "2k", "4k", "8k"])
+    ax_delta.set_xlabel(LABEL_FREQ_HZ)
+    ax_delta.set_ylabel("Change from the\nmeasured MTI")
+    ax_delta.grid(True, axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax_delta.set_axisbelow(True)
+
+    fig.align_ylabels((ax, ax_delta))
+    plt.tight_layout()
+    save_figure(output_dir, "sti_occupancy_adjustment.svg")
+    plt.close()

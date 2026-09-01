@@ -8,7 +8,7 @@ references:
     title: "Sound system equipment — Part 16: Objective rating of speech intelligibility by speech transmission index"
     designation: "IEC 60268-16:2020 (Edición 5)"
     url: "https://webstore.iec.ch/en/publication/26771"
-    note: "La función de transferencia de modulación y la correspondencia m ↔ STI, la señal de ensayo STIPA y el método directo, el método indirecto desde la respuesta al impulso, el enmascaramiento auditivo y el umbral de recepción (Tablas A.2/A.3), el espectro de habla masculina revisado (apartado A.6.1) y las letras de valoración del Anexo F. El PDF normativo de la Edición 4 es la base y cada cambio de la Ed. 5 está atribuido a su fuente, siendo el único delta numérico el espectro de habla masculina revisado del apartado A.6.1."
+    note: "La función de transferencia de modulación y la correspondencia m ↔ STI, la señal de ensayo STIPA y el método directo, el método indirecto desde la respuesta al impulso, el enmascaramiento auditivo y el umbral de recepción (Tablas A.2/A.3), el espectro de habla masculina revisado (apartado A.6.1), las letras de valoración del Anexo F y el ajuste del Anexo M por ruido de ocupación y nivel de habla. El PDF normativo de la Edición 4 es la base y cada cambio de la Ed. 5 está atribuido a su fuente, siendo el único delta numérico el espectro de habla masculina revisado del apartado A.6.1."
   - type: article
     authors: ["Houtgast, T.", "Steeneken, H. J. M."]
     year: 1985
@@ -485,7 +485,9 @@ Cada vía tiene modos de fallo que la norma hace explícitos:
   operación del sistema (la práctica del Anexo J de la norma la fija 3 dB por
   encima del $L_\mathrm{Aeq}$ del habla continua en la posición) y pasa `level=` y
   `ambient=` para que el análisis los incluya; una respuesta al impulso medida
-  a nivel alto y reescalada después pierde estos efectos por completo.
+  a nivel alto y reescalada después pierde estos efectos por completo. La
+  sección 3 lleva una medición hecha en una condición de nivel y ruido a
+  otra distinta.
 - **Ruido de fondo impulsivo y fluctuante.** Una herramienta que cae o un
   murmullo durante una medición directa corrompe las profundidades de
   modulación medidas (apartado 7.13). El remedio de la norma es la vía
@@ -555,7 +557,9 @@ plt.show()
 | `reference` | array 1D, opcional (`stipa`) | — | por defecto `None` | Señal de la fuente medida en lugar del $m = 0{,}55$ nominal |
 
 Ambas devuelven `STIResult`: `sti`, `mti` (7 bandas), `mtf` (7×14 o 7×2),
-`band_levels`, `rating` (letra del Anexo F, `A+`…`U`).
+`band_levels` y `ambient_levels` (los dos espectros que usaron las
+correcciones, y lo que lee la sección 3 para llevar el resultado a otra
+condición), `rating` (letra del Anexo F, `A+`…`U`).
 
 ### Informe IEC 60268-16 (`.report()`)
 
@@ -602,6 +606,232 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 	caption="Ficha de índice de transmisión del habla (STIResult.report), STI con la banda del Anexo F."
 />
 
+## 3. Ruido de ocupación y otro nivel de habla
+
+Una sala se mide fuera de horario, vacía, con la señal de ensayo al nivel al
+que estuviera puesto el amplificador. La valoración que tiene que cumplir es
+la de la sala en uso: el público en las butacas y el aviso a su nivel
+operativo. El Anexo M de la IEC 60268-16 traslada la medición a esa condición
+por aritmética, en cuatro pasos y sin una segunda visita:
+
+1. **Adquirir.** La matriz de transferencia de modulación tal y como se midió,
+   todavía con el ruido, el enmascaramiento y el umbral de la medición dentro,
+   junto con los niveles por bandas de octava de habla y de ruido de fondo que
+   había mientras se hacía.
+2. **Eliminar.** Dividir por la corrección que producen esos niveles, lo que
+   saca de nuevo el ruido de fondo, el enmascaramiento auditivo de la Tabla
+   A.2 y el umbral de recepción de la Tabla A.3, y deja solo el canal de
+   transmisión.
+3. **Volver a aplicar.** Multiplicar por la corrección que producen los
+   niveles operativos, con lo que entran el ruido de ocupación, el
+   enmascaramiento y el umbral de la condición simulada.
+4. **Procesar.** Pasar la matriz resultante por la cadena A.5.4 a A.5.6 hasta
+   el índice.
+
+Sacar la condición vieja antes de meter la nueva no es ceremonia, y tampoco es
+una aproximación. La matriz medida es el producto de dos cosas, y solo una
+sobrevive al traslado: el canal de transmisión, la caída de la sala y la
+respuesta del sistema, es lo que tienen en común la medición en vacío y la
+predicción con público, mientras que el ruido, el enmascaramiento y el umbral
+pertenecen a la condición de escucha y se van con ella. Esos tres tampoco se
+pueden actualizar a partir de cuánto se han movido los niveles, porque ninguno
+es función de la variación. El enmascaramiento auditivo es una función a tramos
+del nivel combinado *absoluto* de la banda inferior, que cambia de pendiente en
+63 dB y otra vez en 67 dB y en 100 dB, y el umbral de recepción de la Tabla A.3
+es una intensidad absoluta que no se mueve en absoluto. Los dos hay que
+volver a deducirlos en los niveles nuevos, y dividir por la corrección vieja es
+lo que deja algo sobre lo que deducirlos.
+
+El atajo que estos dos pasos existen para prohibir es el tentador: volver a
+pasar la corrección de ruido sobre la matriz medida con los niveles de
+ocupación cuenta el ruido dos veces, porque el ruido de la propia medición ya
+está dentro. El canal que recupera el
+paso 2 puede superar 1,0 en una banda cuya corrección fuera fuerte, y no se
+acota entre pasos: el truncamiento de $m > 1$ de la NOTA 1 de A.5.3 es de la
+matriz que va a procesarse, que es la que produce el paso 3. El propio ejemplo
+del anexo no llega a probarlo, porque su matriz recuperada llega como mucho a
+0,997, pero una medición con una corrección más fuerte sí lo haría.
+
+Para la biblioteca los dos pasos son además un mismo trozo de código, que es la
+otra razón para mantenerlos separados. El paso 2 divide por el mismo factor del
+apartado A.5.3 por el que multiplica una medición directa, y el paso 3
+multiplica por él, así que el enmascaramiento de la Tabla A.2 y el umbral de la
+Tabla A.3 tienen una única implementación y el ajuste no puede separarse de la
+medición que ajusta.
+
+```python
+import numpy as np
+
+from phonometry import speech
+
+# La sala reverberante de esta sección, medida vacía: una caída de 0,9 s a
+# 48 kHz hace de respuesta al impulso medida.
+fs = 48000
+rng = np.random.default_rng(0)
+ir = rng.standard_normal(fs) * np.exp(-6.9078 * np.arange(fs) / fs / 0.9)
+
+# El espectro de habla masculina de la Ed.5 del apartado A.6.1 a 68 dB
+# globales, y el ruido de la propia ventilación de la sala vacía, ambos en
+# dB SPL por banda de octava.
+band_shape = np.array([-2.5, 0.5, 0.0, -6.0, -12.0, -18.0, -24.0])
+speech_empty = band_shape - 10 * np.log10(np.sum(10 ** (band_shape / 10))) + 68.0
+noise_empty = np.array([42.0, 36.0, 31.0, 28.0, 25.0, 23.0, 21.0])
+
+empty = speech.sti_from_impulse_response(
+    ir, fs, level=speech_empty, ambient=noise_empty
+)
+print(f"{empty.sti:.2f} ({empty.rating})")            # 0.60 (D)
+
+# Con el público dentro y el aviso donde estaba.
+noise_occupied = np.array([54.0, 50.0, 47.0, 44.0, 40.0, 35.0, 30.0])
+occupied = empty.adjusted_for_levels(
+    operational_level=speech_empty, operational_ambient=noise_occupied
+)
+print(f"{occupied.sti:.2f} ({occupied.rating})")      # 0.56 (F)
+
+# La misma sala con el aviso 6 dB más alto.
+louder = empty.adjusted_for_levels(
+    operational_level=speech_empty + 6.0, operational_ambient=noise_occupied
+)
+print(f"{louder.sti:.2f} ({louder.rating})")          # 0.59 (E)
+```
+
+El ruido de ocupación cuesta dos letras de valoración, y seis decibelios más
+del locutor recuperan una. Ese es el argumento para hacer esto antes de la entrega
+y no después de la queja: la sala vacía cumplía.
+
+`STIResult.adjusted_for_levels()` lee la condición de medición del propio
+resultado, por eso solo necesita la operativa y por eso rechaza un resultado
+calculado sin `level=`: ese resultado lleva como mucho el factor plano de
+ruido de `snr=`, nada del enmascaramiento ni del umbral dependientes del
+nivel, y ningún espectro del que volver a deducirlos, así que dividir por la
+corrección completa bajaría la respuesta en silencio. Cuando la
+matriz viene de otro sitio, `speech.sti_adjusted_for_levels()` acepta los
+cuatro espectros junto a ella.
+
+Todo resultado que devuelve el ajuste es un `STIResult` corriente, así que la
+lectura por bandas de la sección 2 se le aplica igual, y merece la pena hacerla.
+El número único dice que la sala perdió dos letras; las bandas dicen dónde las
+perdió:
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_occupancy_adjustment_es.svg"
+  alt="Índice de transferencia de modulación por banda de octava de la misma sala en tres condiciones: medida en vacío (STI 0,60, calificación D), ajustada con público (STI 0,56, calificación F) y ajustada con público y el locutor 6 dB más alto (STI 0,59, calificación E); un panel inferior muestra la variación respecto del índice medido, máxima en 125 Hz, donde la condición ocupada pierde 0,07"
+  width="88%"
+/>
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import speech
+
+fs = 48000
+rng = np.random.default_rng(0)
+n = np.arange(fs)
+ir = rng.standard_normal(fs) * np.exp(-6.9078 * n / fs / 0.9)
+
+shape = np.array([-2.5, 0.5, 0.0, -6.0, -12.0, -18.0, -24.0])
+talker = shape - 10 * np.log10(np.sum(10 ** (shape / 10))) + 68.0
+empty_noise = np.array([42.0, 36.0, 31.0, 28.0, 25.0, 23.0, 21.0])
+full_noise = np.array([54.0, 50.0, 47.0, 44.0, 40.0, 35.0, 30.0])
+
+measured = speech.sti_from_impulse_response(ir, fs, level=talker, ambient=empty_noise)
+occupied = measured.adjusted_for_levels(
+    operational_level=talker, operational_ambient=full_noise
+)
+louder = measured.adjusted_for_levels(
+    operational_level=talker + 6.0, operational_ambient=full_noise
+)
+
+# En una línea: el resultado ajustado es un STIResult, así que dibuja sus barras.
+occupied.plot()
+plt.show()
+
+# A mano, las tres condiciones sobre un mismo eje de bandas:
+positions = np.arange(7)
+fig, ax = plt.subplots()
+for i, res in enumerate((measured, occupied, louder)):
+    ax.bar(positions + (i - 1) * 0.27, res.mti, width=0.27,
+           label=f"STI {res.sti:.2f} ({res.rating})")
+ax.set_xticks(positions)
+ax.set_xticklabels(["125", "250", "500", "1k", "2k", "4k", "8k"])
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Índice de transferencia de modulación MTI")
+ax.set_ylim(0.0, 0.95)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+La banda de 125 Hz es la que más cede, porque es donde el público suena más
+fuerte y donde el locutor tiene menos margen: unos 7 dB de relación
+habla-ruido ahí frente a 16 dB en 500 Hz. Los 6 dB de más devuelven entonces
+más donde más se perdió, casi nueve décimas de la pérdida de 125 Hz frente a
+alrededor de la mitad de la de 1 kHz. Ninguna de las dos cosas se ve en el
+índice.
+
+### Qué no puede decirte el ajuste
+
+- **Traslada la condición de escucha, no la sala.** El canal que recupera el
+  paso 2 se arrastra intacto, así que nada de lo que el público le hace a la
+  acústica está en la respuesta. Los cuerpos y la ropa absorben: el tiempo de
+  reverberación con la sala ocupada es más corto que en vacío, y el canal
+  ocupado es en realidad *mejor* que el medido. Una medición en vacío es
+  pesimista con la reverberación y optimista con el ruido, y esto solo corrige
+  lo segundo. Cuando el público cambia la absorción de forma apreciable, la vía
+  honesta es una respuesta al impulso de la sala ocupada, medida o predicha, y
+  aplicar el ajuste sobre ella.
+- **El nivel de habla operativo es un dato de entrada, no un pronóstico.** El
+  anexo dice cuál sería el STI si el locutor o el amplificador entregasen esos
+  niveles por banda. Si lo van a hacer es otra cuestión: un locutor real levanta
+  la voz con ruido, una cadena con limitador o con control automático de
+  ganancia no escala sin más, y un sistema al que se le piden 6 dB más puede
+  recortar en lugar de darlos, momento en el cual ya no es el canal lineal que
+  representa la matriz medida.
+- **El ruido que modela es estacionario.** El ruido de ocupación es murmullo:
+  fluctúa y, al tener forma espectral de habla, enmascara de maneras que una
+  intensidad sumada por banda de octava no representa. La advertencia de la
+  norma sobre el ruido fluctuante (apartado 7.13) vale para la condición que se
+  simula tanto como para la que se mide.
+- **Los espectros de la propia medición son lo que quita el paso 2.** Un
+  `measured_level` o un `measured_ambient` equivocados sacan la corrección
+  equivocada, y el paso 3 no tiene forma de notarlo; la matriz ajustada queda
+  entonces mal en una dirección que nada aguas abajo informa. Por eso
+  `STIResult.adjusted_for_levels()` los lee del propio resultado en vez de
+  volver a pedirlos.
+- **Sigue siendo una única posición de escucha.** Todos sus espectros son los
+  del micrófono, así que un resultado ajustado por ocupación responde por esa
+  butaca y por ninguna otra.
+
+### Parámetros de `sti_adjusted_for_levels()`
+
+| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `mtf` | array (7, n) | — | ≥ 0, finito | La matriz tal y como se midió, ruido y enmascaramiento incluidos; los valores por encima de 1 se truncan a 1, y por encima de 1,3 avisan de que la medición es probablemente inválida (NOTA 1 de A.5.3) |
+| `measured_level` | vector de 7 | dB SPL | obligatorio | Niveles de banda del habla durante la medición |
+| `measured_ambient` | vector de 7, opcional | dB SPL | por defecto `None` | Niveles de banda del ruido de fondo durante la medición |
+| `operational_level` | vector de 7 | dB SPL | obligatorio | Niveles de banda del habla de la condición simulada |
+| `operational_ambient` | vector de 7, opcional | dB SPL | por defecto `None` | Niveles de banda del ruido de ocupación de esa condición |
+
+:::caution
+**De qué edición se trata.** Lo que implementa la biblioteca es el
+procedimiento del Anexo M de la Edición 4 (2011), verificado contra los
+resultados intermedios impresos de su ejemplo de la Tabla M.1 y no solo contra
+el STI en el que termina: las dos matrices MTF de 98 valores, cada fila
+escalar del camino hasta ellas, las relaciones señal-ruido efectivas, la fila
+de MTI por banda y el índice. Las únicas impresiones que no se usan como
+oráculo son las matrices del paso 4 de recorte y de índices de transmisión,
+que el anexo deriva de su propia impresión redondeada de las SNR. El preámbulo
+de la Edición 5 dice que el Anexo M da mayor información sobre estos ajustes
+(punto g), y su índice hace crecer el anexo de tres páginas impresas a diez;
+no se ha podido conseguir el cuerpo del anexo de la Edición 5, así que aquí no
+se sabe qué añaden esas páginas además de este procedimiento.
+:::
+
 ## Qué cubre esta guía
 
 <Scope>
@@ -614,8 +844,10 @@ completo desde una respuesta al impulso medida mediante
 mediante `speech.stipa_signal()` y `speech.stipa()`, el espectro de la señal
 de ensayo masculina de la Ed.5 del apartado A.6.1, las correcciones de
 enmascaramiento auditivo dependiente del nivel y de umbral de recepción de las
-Tablas A.2 y A.3 (`level=` y `ambient=`), y las letras de valoración del Anexo
-F devueltas como `STIResult.rating`.
+Tablas A.2 y A.3 (`level=` y `ambient=`), las letras de valoración del Anexo
+F devueltas como `STIResult.rating`, y el ajuste del Anexo M de la Edición 4
+de un resultado medido a ruido de ocupación y a otro nivel de habla mediante
+`speech.sti_adjusted_for_levels()` y `STIResult.adjusted_for_levels()`.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered" label="No cubierto">
@@ -626,7 +858,9 @@ implementada: solo están disponibles la señal directa STIPA
 (`stipa_signal`/`stipa`) y el cálculo indirecto de STI completo desde una
 respuesta al impulso. La opción de habla femenina no falta en la biblioteca:
 la propia Edición 5 la eliminó (preámbulo, punto d), así que no queda nada por
-implementar.
+implementar. Lo que la Edición 5 añadiera al Anexo M (preámbulo, punto g:
+ajustes alternativos de ruido y de nivel) ni se cubre ni se descarta, porque no
+se ha podido conseguir ese texto.
 </ScopeClaim>
 </Scope>
 

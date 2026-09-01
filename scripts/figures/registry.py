@@ -378,6 +378,7 @@ from .perception import (
     generate_sti_curve,
     generate_sti_level_dependence,
     generate_sti_mtf_curves,
+    generate_sti_occupancy_adjustment,
     generate_stoi_band_scores,
     generate_stoi_intelligibility,
     generate_stoi_segment_scores,
@@ -1081,6 +1082,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_sti_band_mti,
     generate_sti_mtf_curves,
     generate_sti_level_dependence,
+    generate_sti_occupancy_adjustment,
     # Atmospheric refraction (profiles, ray fan, GFPE range cut) and
     # wave-theoretic barrier insertion loss.
     generate_atmospheric_sound_speed_profiles,

@@ -18,19 +18,21 @@ from __future__ import annotations
 
 import math
 import warnings
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NamedTuple
 
 import numpy as np
 import reference_data as ref
 from scipy import signal as sg
 
 import phonometry as ph
-from phonometry.speech.sti import _sti_from_mtf
+from phonometry.speech.sti import _ART_DB, _level_correction, _sti_from_mtf
 
 from ..registry import Outcome, _fmt, mask, numeric, register
 from .levels import _FS
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from phonometry.signals import InverseFilterResult
 
 _NUM_STI_BANDS = 7
@@ -67,11 +69,11 @@ def _chk_sti_uniform() -> Outcome:
 )
 def _chk_sti_annex_m() -> Outcome:
     """End-to-end A.5.3-A.5.6 chain on the annex's own worked example."""
-    mtf = np.asarray(ref.IEC60268_16_ANNEX_M_MTF, dtype=float).T
+    mtf = np.asarray(ref.IEC60268_16_ANNEX_M_SOURCE_MTF, dtype=float).T
     result = _sti_from_mtf(
         mtf,
-        level=np.asarray(ref.IEC60268_16_ANNEX_M_LEVEL, dtype=float),
-        ambient=np.asarray(ref.IEC60268_16_ANNEX_M_AMBIENT, dtype=float),
+        level=np.asarray(ref.IEC60268_16_ANNEX_M_OPERATIONAL_LEVEL, dtype=float),
+        ambient=np.asarray(ref.IEC60268_16_ANNEX_M_OPERATIONAL_AMBIENT, dtype=float),
     )
     mti_delta = float(
         np.max(
@@ -87,6 +89,355 @@ def _chk_sti_annex_m() -> Outcome:
         computed=f"STI {result.sti:.3f} (max MTI dev {mti_delta:.2f})",
         delta=outcome.delta,
         passed=outcome.passed and mti_delta <= 0.01,
+    )
+
+
+#: One unit in the last place the Annex M matrices are printed to. The step 1
+#: matrix is given to three decimals, so up to 0,0005 of its rounding travels
+#: through the adjustment into every later cell.
+_ANNEX_M_MTF_TOL = 0.001
+
+
+@register(
+    "Speech transmission (IEC 60268-16)",
+    "IEC 60268-16 Annex M",
+    "Occupancy-noise adjustment: measured MTF and four level spectra -> STI",
+)
+def _chk_sti_annex_m_adjustment() -> Outcome:
+    """The four steps of Table M.1, from the matrix as measured.
+
+    Undoes the noise, masking and threshold of the measurement condition,
+    applies those of the operational condition and processes the result into
+    the index, checking both printed matrices on the way.
+    """
+    result = ph.speech.sti_adjusted_for_levels(
+        np.asarray(ref.IEC60268_16_ANNEX_M_MEASURED_MTF, dtype=float).T,
+        measured_level=ref.IEC60268_16_ANNEX_M_MEASURED_LEVEL,
+        measured_ambient=ref.IEC60268_16_ANNEX_M_MEASURED_AMBIENT,
+        operational_level=ref.IEC60268_16_ANNEX_M_OPERATIONAL_LEVEL,
+        operational_ambient=ref.IEC60268_16_ANNEX_M_OPERATIONAL_AMBIENT,
+    )
+    mtf_delta = float(
+        np.max(
+            np.abs(
+                result.mtf
+                - np.asarray(ref.IEC60268_16_ANNEX_M_OPERATIONAL_MTF, dtype=float).T
+            )
+        )
+    )
+    outcome = numeric(ref.IEC60268_16_ANNEX_M_STI, float(result.sti), 0.005, places=3)
+    return Outcome(
+        expected=f"STI {ref.IEC60268_16_ANNEX_M_STI} (step 3 matrix, step 4 STI)",
+        computed=f"STI {result.sti:.3f} (max MTF dev {mtf_delta:.4f})",
+        delta=outcome.delta,
+        passed=outcome.passed and mtf_delta <= _ANNEX_M_MTF_TOL,
+    )
+
+
+class _PrintedRow(NamedTuple):
+    """One printed row of Table M.1 beside what the library computes.
+
+    ``limit`` is the rounding the annex's own printing of the row allows:
+    half of one unit in the last place, as an absolute step for a row given
+    to decimals. A row given to significant figures instead carries
+    ``figures``, the printed figure count of each cell, and its allowance is
+    half a unit in each cell's own last place; a flat fraction of the value
+    was measured to admit five times the printed rounding at a
+    leading-digit-5 cell. A row that stays inside its allowance has
+    reproduced.
+    """
+
+    label: str
+    printed: Sequence[float] | np.ndarray
+    computed: np.ndarray
+    limit: float = 0.0
+    figures: tuple[int, ...] | None = None
+    carry: float = 0.0
+
+
+#: What the annex's own rounding of the combined level can move the amf rows
+#: by, as a fraction of the value. The amf x 1000 rows are derived from the
+#: combined-level row above them, which is printed to two decimals, and the
+#: A.5.3 masking slope at these levels is 0,5 dB per dB, so up to
+#: 0,5 x 0,005 = 0,0025 dB of hidden rounding rides into them: measured at
+#: 250 Hz of step 2, the annex's 77,90 gives 8,222 where the unrounded
+#: 77,90444 gives 8,227, and only the former prints the tabulated 8,22.
+_ANNEX_M_AMF_CARRY = 10.0 ** (0.5 * 0.005 / 10.0) - 1.0
+
+
+def _row_allowance(row: _PrintedRow) -> np.ndarray:
+    """Half of one unit in the last printed place of each cell of *row*.
+
+    ``carry`` widens it by the rounding the annex's own upstream print
+    carries into the row, stated as a fraction of the printed value.
+    """
+    printed = np.asarray(row.printed, dtype=float)
+    if row.figures is None:
+        base = np.full_like(printed, row.limit)
+    else:
+        exponents = np.floor(np.log10(np.abs(printed))) - (
+            np.asarray(row.figures, dtype=float) - 1.0
+        )
+        base = 0.5 * 10.0**exponents
+    return base + row.carry * np.abs(printed)
+
+
+def _worst_printed_row(rows: Sequence[_PrintedRow]) -> tuple[str, float]:
+    """The row of *rows* that eats most of its own printed precision.
+
+    Reported as a fraction of that precision rather than in the units of
+    any one row, because the rows of Table M.1 are decibels, intensity
+    ratios and bare factors at once and a single worst deviation across
+    them would mean nothing.
+    """
+    worst_label, worst = "none", 0.0
+    for row in rows:
+        printed = np.asarray(row.printed, dtype=float)
+        used = float(np.max(np.abs(row.computed - printed) / _row_allowance(row)))
+        if used > worst:
+            worst_label, worst = row.label, used
+    return worst_label, worst
+
+
+def _annex_m_masked(printed: Sequence[float | None]) -> tuple[np.ndarray, np.ndarray]:
+    """The bands of a masking row that carry a value, and those values.
+
+    The two auditory-masking rows print "not applicable" at 125 Hz, which
+    has no band below it to be masked by.
+    """
+    bands = np.array([k for k, cell in enumerate(printed) if cell is not None])
+    values = np.array([cell for cell in printed if cell is not None], dtype=float)
+    return bands, values
+
+
+def _annex_m_rows_outcome(step: str, rows: Sequence[_PrintedRow]) -> Outcome:
+    """An Outcome over one step's printed rows, judged row by row."""
+    label, worst = _worst_printed_row(rows)
+    return numeric(
+        0.0,
+        worst,
+        1.0,
+        places=2,
+        expected_label=f"every printed row of {step} rounds as tabulated",
+        computed_label=f"worst row: {label}, {worst:.2f} of its last printed place",
+    )
+
+
+@register(
+    "Speech transmission (IEC 60268-16)",
+    "IEC 60268-16 Annex M",
+    "Step 2 printed intermediates: the measurement condition, row by row",
+)
+def _chk_sti_annex_m_step2_rows() -> Outcome:
+    """The A.5.3 chain of the measurement condition, as Table M.1 prints it.
+
+    Signal-to-noise ratio, m_k(f) for noise only and its reciprocal, the
+    combined speech and noise level, the auditory masking factor in dB and
+    as amf x 1000, the combined squared sound pressure I_k, I_am,k, the
+    absolute reception threshold and I_rt,k, the masking and threshold
+    adjustment and the combined adjustment. Step 2 prints reciprocals,
+    because here the correction is undone rather than applied.
+    """
+    correction = _level_correction(
+        np.asarray(ref.IEC60268_16_ANNEX_M_MEASURED_LEVEL, dtype=float),
+        np.asarray(ref.IEC60268_16_ANNEX_M_MEASURED_AMBIENT, dtype=float),
+    )
+    assert correction.snr is not None
+    masked_db, printed_db = _annex_m_masked(ref.IEC60268_16_ANNEX_M_MEASURED_MASKING_DB)
+    masked_milli, printed_milli = _annex_m_masked(
+        ref.IEC60268_16_ANNEX_M_MEASURED_MASKING_MILLI
+    )
+    rows = (
+        _PrintedRow("SNR", ref.IEC60268_16_ANNEX_M_MEASURED_SNR, correction.snr, 0.005),
+        _PrintedRow(
+            "m_k(f) noise only",
+            ref.IEC60268_16_ANNEX_M_MEASURED_NOISE_TRANSFER,
+            correction.noise_transfer,
+            0.0005,
+        ),
+        _PrintedRow(
+            "adjustment to remove the noise",
+            ref.IEC60268_16_ANNEX_M_MEASURED_NOISE_ADJUSTMENT,
+            1.0 / correction.noise_transfer,
+            0.0005,
+        ),
+        _PrintedRow(
+            "combined speech and noise level",
+            ref.IEC60268_16_ANNEX_M_MEASURED_COMBINED_LEVEL,
+            correction.combined_level,
+            0.005,
+        ),
+        _PrintedRow("amf in dB", printed_db, correction.masking_db[masked_db], 0.05),
+        _PrintedRow(
+            "amf x 1000",
+            printed_milli,
+            1000.0 * 10.0 ** (correction.masking_db[masked_milli] / 10.0),
+            figures=(3, 3, 3, 3, 3, 3),
+            carry=_ANNEX_M_AMF_CARRY,
+        ),
+        _PrintedRow(
+            "I_k",
+            ref.IEC60268_16_ANNEX_M_MEASURED_INTENSITY,
+            correction.intensity / ref.IEC60268_16_ANNEX_M_INTENSITY_SCALE,
+            figures=(3, 3, 3, 3, 3, 3, 3),
+        ),
+        _PrintedRow(
+            "I_am,k",
+            ref.IEC60268_16_ANNEX_M_MEASURED_INTENSITY_MASKING[1:],
+            correction.intensity_masking[1:],
+            figures=(3, 3, 3, 3, 3, 3),
+        ),
+        _PrintedRow("ART", ref.IEC60268_16_ANNEX_M_ART_DB, _ART_DB, 0.05),
+        # Four of the seven I_rt,k cells are printed to two figures (4,5 for
+        # 10^0,65 = 4,4668), and 40 000 for 10^4,6 = 39 811 is two as well.
+        _PrintedRow(
+            "I_rt,k",
+            ref.IEC60268_16_ANNEX_M_INTENSITY_THRESHOLD,
+            correction.intensity_threshold,
+            figures=(2, 3, 3, 2, 2, 2, 3),
+        ),
+        _PrintedRow(
+            "adjustment to remove masking and threshold",
+            ref.IEC60268_16_ANNEX_M_MEASURED_MASKING_THRESHOLD_ADJUSTMENT,
+            1.0 / correction.masking_threshold_transfer,
+            0.0005,
+        ),
+        _PrintedRow(
+            "combined adjustment",
+            ref.IEC60268_16_ANNEX_M_MEASURED_COMBINED_ADJUSTMENT,
+            1.0 / correction.factor,
+            0.0005,
+        ),
+    )
+    return _annex_m_rows_outcome("step 2", rows)
+
+
+@register(
+    "Speech transmission (IEC 60268-16)",
+    "IEC 60268-16 Annex M",
+    "Step 3 printed intermediates: the operational condition, row by row",
+)
+def _chk_sti_annex_m_step3_rows() -> Outcome:
+    """The same chain at the operational speech and occupancy-noise levels.
+
+    Printed as transfer factors rather than as their reciprocals, because
+    here the correction is applied instead of undone. The 250 Hz cell of the
+    I_am,k row is the one printed value of the table that does not reproduce
+    from the quantity it names; it is recorded in docs/ERRATA.md and left
+    out of this comparison rather than absorbed by a widened tolerance.
+    """
+    correction = _level_correction(
+        np.asarray(ref.IEC60268_16_ANNEX_M_OPERATIONAL_LEVEL, dtype=float),
+        np.asarray(ref.IEC60268_16_ANNEX_M_OPERATIONAL_AMBIENT, dtype=float),
+    )
+    assert correction.snr is not None
+    masked_db, printed_db = _annex_m_masked(
+        ref.IEC60268_16_ANNEX_M_OPERATIONAL_MASKING_DB
+    )
+    masked_milli, printed_milli = _annex_m_masked(
+        ref.IEC60268_16_ANNEX_M_OPERATIONAL_MASKING_MILLI
+    )
+    rows = (
+        _PrintedRow(
+            "SNR", ref.IEC60268_16_ANNEX_M_OPERATIONAL_SNR, correction.snr, 0.005
+        ),
+        _PrintedRow(
+            "m_k(f) noise only",
+            ref.IEC60268_16_ANNEX_M_OPERATIONAL_NOISE_TRANSFER,
+            correction.noise_transfer,
+            0.0005,
+        ),
+        _PrintedRow(
+            "combined speech and noise level",
+            ref.IEC60268_16_ANNEX_M_OPERATIONAL_COMBINED_LEVEL,
+            correction.combined_level,
+            0.05,
+        ),
+        _PrintedRow("amf in dB", printed_db, correction.masking_db[masked_db], 0.05),
+        _PrintedRow(
+            "amf x 1000",
+            printed_milli,
+            1000.0 * 10.0 ** (correction.masking_db[masked_milli] / 10.0),
+            figures=(3, 3, 3, 3, 3, 3),
+            carry=_ANNEX_M_AMF_CARRY,
+        ),
+        _PrintedRow(
+            "I_k",
+            ref.IEC60268_16_ANNEX_M_OPERATIONAL_INTENSITY,
+            correction.intensity / ref.IEC60268_16_ANNEX_M_INTENSITY_SCALE,
+            figures=(3, 3, 3, 3, 3, 3, 3),
+        ),
+        # The 480 cell is two figures: the unrounded product is 479.2, which
+        # three figures would print 479.
+        _PrintedRow(
+            "I_am,k (250 Hz excluded, see ERRATA)",
+            ref.IEC60268_16_ANNEX_M_OPERATIONAL_INTENSITY_MASKING[2:],
+            correction.intensity_masking[2:],
+            figures=(3, 3, 3, 3, 2),
+        ),
+        _PrintedRow(
+            "I_rt,k",
+            ref.IEC60268_16_ANNEX_M_INTENSITY_THRESHOLD,
+            correction.intensity_threshold,
+            figures=(2, 3, 3, 2, 2, 2, 3),
+        ),
+        _PrintedRow(
+            "masking and threshold correction",
+            ref.IEC60268_16_ANNEX_M_OPERATIONAL_MASKING_THRESHOLD_TRANSFER,
+            correction.masking_threshold_transfer,
+            0.0005,
+        ),
+        _PrintedRow(
+            "combined adjustment",
+            ref.IEC60268_16_ANNEX_M_OPERATIONAL_COMBINED_ADJUSTMENT,
+            correction.factor,
+            0.0005,
+        ),
+    )
+    return _annex_m_rows_outcome("step 3", rows)
+
+
+#: The printed effective SNRs are two decimals of a quantity whose slope
+#: d/dm of 10 lg(m/(1-m)) reaches ~220 dB per unit m at the m ~ 0,98 of the
+#: first modulation frequencies, so the 0,0005 of hidden rounding in the
+#: step 1 matrix is worth about 0,11 dB here. This is the tighter figure the
+#: chain actually achieves.
+_ANNEX_M_SNR_TOL = 0.08
+
+
+@register(
+    "Speech transmission (IEC 60268-16)",
+    "IEC 60268-16 Annex M",
+    "Step 4a printed intermediates: 98 effective signal-to-noise ratios",
+)
+def _chk_sti_annex_m_step4_effective_snr() -> Outcome:
+    """The effective SNRs the annex prints between the MTF and the TIs.
+
+    Step 4a of Table M.1 tabulates all 98 of them, which is the last printed
+    intermediate before the transmission indices collapse the matrix into
+    seven band MTIs and one number. They are tabulated before the +/-15 dB
+    limits of A.5.4, which is why several cells of the 8 kHz column print
+    above 15 dB, so the comparison is made before the clamp too.
+    """
+    result = ph.speech.sti_adjusted_for_levels(
+        np.asarray(ref.IEC60268_16_ANNEX_M_MEASURED_MTF, dtype=float).T,
+        measured_level=ref.IEC60268_16_ANNEX_M_MEASURED_LEVEL,
+        measured_ambient=ref.IEC60268_16_ANNEX_M_MEASURED_AMBIENT,
+        operational_level=ref.IEC60268_16_ANNEX_M_OPERATIONAL_LEVEL,
+        operational_ambient=ref.IEC60268_16_ANNEX_M_OPERATIONAL_AMBIENT,
+    )
+    with np.errstate(divide="ignore"):
+        snr_eff = 10.0 * np.log10(result.mtf / (1.0 - result.mtf))
+    printed = np.asarray(ref.IEC60268_16_ANNEX_M_EFFECTIVE_SNR, dtype=float).T
+    worst = float(np.max(np.abs(snr_eff - printed)))
+    return numeric(
+        0.0,
+        worst,
+        _ANNEX_M_SNR_TOL,
+        unit="dB",
+        places=3,
+        expected_label="all 98 printed effective SNRs",
+        computed_label=f"worst cell {worst:.3f} dB from its printed value",
     )
 
 

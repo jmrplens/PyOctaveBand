@@ -14,7 +14,14 @@ from .sii import (
     standard_speech_spectra,
     standard_speech_spectrum,
 )
-from .sti import STIResult, STIWarning, sti_from_impulse_response, stipa, stipa_signal
+from .sti import (
+    STIResult,
+    STIWarning,
+    sti_adjusted_for_levels,
+    sti_from_impulse_response,
+    stipa,
+    stipa_signal,
+)
 
 __all__ = [
     "SII_METHODS",
@@ -28,6 +35,7 @@ __all__ = [
     "speech_intelligibility_index",
     "standard_speech_spectra",
     "standard_speech_spectrum",
+    "sti_adjusted_for_levels",
     "sti_from_impulse_response",
     "stipa",
     "stipa_signal",
