@@ -192,7 +192,8 @@ every metric is implemented from the governing standard's paid text. You can
 [sponsor the project on GitHub](https://github.com/sponsors/jmrplens), and the
 documentation keeps a live list of the
 [sources that resisted every legitimate acquisition route](https://jmrplens.github.io/phonometry/start/support/),
-with three ways to help get them: fund the purchase, verify against your own
+with four ways to help get them: fund the purchase, send a copy privately
+(whatever its origin, it is never republished), verify against your own
 licensed copy, or point at a channel that was missed.
 
 ## 🧪 Development

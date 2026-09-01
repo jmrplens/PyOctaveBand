@@ -32,23 +32,22 @@ leaves the table when it lands.
 Everything below stands between the library and work it would otherwise do.
 Each entry has survived the whole acquisition effort: my own library, the
 official stores, the open-access indexes and every other legitimate channel I
-could find, re-checked on the date shown. Three routes help:
+could find, re-checked on the date shown. Four routes help:
 
 - **Fund the purchase.** A one-off sponsorship naming the document; where a
   link goes to an official store, the price is on that page, and for the rest
   name the item and I will quote it in the issue.
+- **Send me a copy.** Whatever its origin. It stays private, it is used only
+  to implement and to verify, and it is never republished: the repository
+  only ever carries the derived numeric values. Write to
+  [mail@jmrp.io](mailto:mail@jmrp.io).
 - **Verify against your licensed copy.** If your lab or employer already
   holds one, you can check the implementation and its reference values
-  against your copy without sending me anything. The repository never
-  redistributes documents; what lands in the tree are the derived numeric
-  values, which is how the [conformance suite](../CONFORMANCE.md) is built.
+  against your copy. What lands in the tree are the derived numeric values,
+  which is how the [conformance suite](../CONFORMANCE.md) is built.
 - **Point me at a channel I missed.** A lending library, an author's own
   copy of a thesis, a proceedings archive that actually resolves.
   [Open an issue](https://github.com/jmrplens/phonometry/issues).
-
-One route does not help: sending scans or PDFs of paywalled documents. I
-cannot accept them, and the project's credibility rests on its sources being
-clean.
 
 | Source | What it would unlock | Last checked |
 | :--- | :--- | :--- |
