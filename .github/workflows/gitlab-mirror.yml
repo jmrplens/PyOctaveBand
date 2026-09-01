@@ -35,7 +35,13 @@ jobs:
   repository:
     name: Mirror repository
     runs-on: ubuntu-latest
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    # Pushes made by Dependabot run with Dependabot secrets, not Actions
+    # secrets, so the SSH key below arrives empty and the guard fails the
+    # job on every dependabot/* branch. Skip those pushes: the merge commit
+    # on main and the six-hourly schedule keep the mirror current.
+    if: >-
+      github.actor != 'dependabot[bot]' &&
+      (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
     steps:
       - name: Configure GitLab SSH key
         env:
