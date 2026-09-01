@@ -344,6 +344,9 @@ def _validate_band_vector(
             f"(125 Hz - 8 kHz), got shape {arr.shape}."
         )
         raise ValueError(msg)
+    if not np.all(np.isfinite(arr)):
+        msg = f"'{name}' must contain only finite dB values."
+        raise ValueError(msg)
     return arr
 
 
@@ -644,7 +647,7 @@ def sti_adjusted_for_levels(
         condition, dB SPL (7 values); ``None`` simulates a silent room.
     :return: :class:`STIResult` at the operational levels, carrying them in
         ``band_levels`` and ``ambient_levels``.
-    :raises ValueError: if a level vector is not 7 values, or ``mtf`` is not
+    :raises ValueError: if a level vector is not 7 finite values, or ``mtf`` is not
         a (7, n) matrix of finite non-negative values.
     """
     measured = _level_correction(

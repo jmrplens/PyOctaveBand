@@ -3,8 +3,8 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 581,
-    "passing": 581,
+    "checks": 585,
+    "passing": 585,
     "failing": 0,
     "domains": 59,
     "standards": 374,
@@ -103,8 +103,8 @@
     {
       "id": "speech-transmission-iec-60268-16",
       "title": "Speech transmission (IEC 60268-16)",
-      "checks": 10,
-      "passing": 10
+      "checks": 14,
+      "passing": 14
     },
     {
       "id": "system-measurement-golay-kirkeby-mueller-massarani",
@@ -2203,6 +2203,118 @@
         "label": "-0.002"
       },
       "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "speech-transmission-iec-60268-16/iec-60268-16-annex-m/occupancy-noise-adjustment-measured-mtf-and-four-level-spectra-sti",
+      "domain": "speech-transmission-iec-60268-16",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60268-16",
+        "clause": "Annex M",
+        "cite": "IEC 60268-16 Annex M"
+      },
+      "quantity": "Occupancy-noise adjustment: measured MTF and four level spectra -> STI",
+      "kind": "scalar",
+      "expected": {
+        "label": "STI 0.76 (step 3 matrix, step 4 STI)"
+      },
+      "computed": {
+        "label": "STI 0.758 (max MTF dev 0.0009)"
+      },
+      "deviation": {
+        "value": -0.002,
+        "label": "-0.002"
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "speech-transmission-iec-60268-16/iec-60268-16-annex-m/step-2-printed-intermediates-the-measurement-condition-row-by-row",
+      "domain": "speech-transmission-iec-60268-16",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60268-16",
+        "clause": "Annex M",
+        "cite": "IEC 60268-16 Annex M"
+      },
+      "quantity": "Step 2 printed intermediates: the measurement condition, row by row",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "every printed row of step 2 rounds as tabulated"
+      },
+      "computed": {
+        "value": 0.99,
+        "label": "worst row: amf in dB, 0.99 of its last printed place"
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1.0
+      },
+      "deviation": {
+        "value": 0.993
+      },
+      "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "speech-transmission-iec-60268-16/iec-60268-16-annex-m/step-3-printed-intermediates-the-operational-condition-row-by-row",
+      "domain": "speech-transmission-iec-60268-16",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60268-16",
+        "clause": "Annex M",
+        "cite": "IEC 60268-16 Annex M"
+      },
+      "quantity": "Step 3 printed intermediates: the operational condition, row by row",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "every printed row of step 3 rounds as tabulated"
+      },
+      "computed": {
+        "value": 0.99,
+        "label": "worst row: amf in dB, 0.99 of its last printed place"
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1.0
+      },
+      "deviation": {
+        "value": 0.987
+      },
+      "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "speech-transmission-iec-60268-16/iec-60268-16-annex-m/step-4a-printed-intermediates-98-effective-signal-to-noise-ratios",
+      "domain": "speech-transmission-iec-60268-16",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60268-16",
+        "clause": "Annex M",
+        "cite": "IEC 60268-16 Annex M"
+      },
+      "quantity": "Step 4a printed intermediates: 98 effective signal-to-noise ratios",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "all 98 printed effective SNRs"
+      },
+      "computed": {
+        "value": 0.074,
+        "label": "worst cell 0.074 dB from its printed value"
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.08
+      },
+      "deviation": {
+        "value": 0.074
+      },
+      "precision": 3,
       "verdict": "pass"
     },
     {

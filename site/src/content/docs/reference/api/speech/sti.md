@@ -101,7 +101,7 @@ from the result itself and is the safe route.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | if a level vector is not 7 values, or `mtf` is not a (7, n) matrix of finite non-negative values. |
+| ValueError | if a level vector is not 7 finite values, or `mtf` is not a (7, n) matrix of finite non-negative values. |
 
 ## sti_from_impulse_response
 

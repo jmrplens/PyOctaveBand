@@ -1443,7 +1443,10 @@ which is the check that enforces the rule; see
   0,062 | 0,051 | 0,044 | 0,008 | 0,036 | 0,076, summing to 0,277, which
   disagrees with five of the six printed cells and with the printed total.
   $\beta_k\sqrt{MTI_k MTI_{k+1}}$ reproduces all six cells and the 0,282
-  total. The alpha row above it, labelled the same way, is
+  total. The seventh cell is not part of either reading: the redundancy sum
+  stops at $k = 6$ because the 8 kHz band has no band above it to pair with,
+  so its 0,000 is the placeholder of a column with no redundancy partner, not
+  a term. The alpha row above it, labelled the same way, is
   correct, because there the label and A.5.6 do agree.
 - **Evidence:** both readings recomputed from the table's own step 4c MTI row
   and compared cell by cell with the printed row and with its printed total;

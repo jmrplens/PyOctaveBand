@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**581/581 conformance checks pass** across 59 domains and 374 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**585/585 conformance checks pass** across 59 domains and 374 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -34,15 +34,15 @@
 | Standard | Quantity | Computed | &#916; | Used |
 |:---|:---|:---|:---|:---:|
 | Long 2e Table 14.9 (worked duct-borne sheet, supply path) | Fan to room, 8 octave bands -> 52/42/30/18/9/-2/-2/-1 dB at the receiver | 1 dB | 1 dB | 100 % |
+| IEC 60268-16 Annex M | Step 2 printed intermediates: the measurement condition, row by row | worst row: amf in dB, 0.99 of its last printed place | 0.993 | 99 % |
+| IEC 60268-16 Annex M | Step 3 printed intermediates: the operational condition, row by row | worst row: amf in dB, 0.99 of its last printed place | 0.987 | 99 % |
 | ISO 9053-2:2020 Annex A.3 | Thermal boundary-layer thickness b | 0.00183 m | 0 m | 97 % |
 | Long, Architectural Acoustics 2e, Table 8.1 | Room modes of a 7 x 5 x 3 m room: the six printed frequencies, Hz | 42.27 Hz | -0.126 Hz | 97 % |
 | ISO 12354-2:2017 Annex C / Annex G Table G.4 | Floating floor: fo = 160 sqrt(s'/m') = 52,8 Hz, DeltaL = 30 lg(f/fo) over 21 bands, DeltaLw = 32,2 dB | 0.048 dB | 0.048 dB | 96 % |
 | ASA WG S3-79 CB_1.TST | Critical band, alternative importance | 0.41 | 0 | 95 % |
 | ASA WG S3-79 ECB_1.TST | Equally contributing, alternative importance | 0.41 | 0 | 95 % |
+| IEC 60268-16 Annex M | Step 4a printed intermediates: 98 effective signal-to-noise ratios | worst cell 0.074 dB from its printed value | 0.074 dB | 92 % |
 | Vigran Eqs. (3.113)/(3.115), printed p. 96 | Corrugated 1 mm steel plate (H = 10 mm, L = 100 mm), f(2,2) | 102.09 Hz | 0.092 Hz | 92 % |
-| Long 2e Eqs. 13.27-13.33 (Reynolds diffuser self-noise) | 24 x 24 in rectangular diffuser, 312 cfm, 0.05 in pd -> the 33/32/29/23/15 dB row of Table 14.9 | 0.8853 dB | 0.8853 dB | 89 % |
-| Allard & Atalla 2e printed p. 254 (Doutres et al. 2007) | Limp-frame bulk-modulus limit for air, kPa | 20.27 kPa | 0.265 kPa | 88 % |
-| ISO 1996-2:2007 Annex C.5 Example 1 | Tonal audibility ΔLta (Formula C.3), 4 kHz tone | 13.66 dB | -0.044 dB | 88 % |
 
 <details>
 <summary><b>Numerical validation - filters &amp; weightings</b>: class showcase (IEC 61260-1 · IEC 61672-1 · ISO 7196)</summary>
@@ -243,13 +243,17 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>Speech transmission (IEC 60268-16)</b>: 100% (10/10)</summary>
+<summary><b>Speech transmission (IEC 60268-16)</b>: 100% (14/14)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
 | IEC 60268-16:2020 A.2.2 | STI weighting-factor pair (500 Hz + 1 kHz bands) | 0.398 (+/-0.001) | 0.398 | 0 | 0 % | ![Pass][cv-pass] Pass |
 | IEC 60268-16:2020 A.3.1.2 | Uniform MTF m=0.5 maps to STI=0.5 | 0.5 (+/-0.01) | 0.5 | 0 | 0 % | ![Pass][cv-pass] Pass |
 | IEC 60268-16 Annex M | Full-STI worked example: printed MTF + speech/noise spectra -> STI | STI 0.76 (MTI row of step 4c) | STI 0.758 (max MTI dev 0.00) | -0.002 | - | ![Pass][cv-pass] Pass |
+| IEC 60268-16 Annex M | Occupancy-noise adjustment: measured MTF and four level spectra -> STI | STI 0.76 (step 3 matrix, step 4 STI) | STI 0.758 (max MTF dev 0.0009) | -0.002 | - | ![Pass][cv-pass] Pass |
+| IEC 60268-16 Annex M | Step 2 printed intermediates: the measurement condition, row by row | every printed row of step 2 rounds as tabulated | worst row: amf in dB, 0.99 of its last printed place | 0.993 | 99 % | ![Pass][cv-pass] Pass |
+| IEC 60268-16 Annex M | Step 3 printed intermediates: the operational condition, row by row | every printed row of step 3 rounds as tabulated | worst row: amf in dB, 0.99 of its last printed place | 0.987 | 99 % | ![Pass][cv-pass] Pass |
+| IEC 60268-16 Annex M | Step 4a printed intermediates: 98 effective signal-to-noise ratios | all 98 printed effective SNRs | worst cell 0.074 dB from its printed value | 0.074 dB | 92 % | ![Pass][cv-pass] Pass |
 | IEC 60268-16:2020 C.3.2 | STIPA direct method, Formula (C.1) signal at m=0.2 | 0.3 (+/-0.01) | 0.2992 | -0.0008 | 8 % | ![Pass][cv-pass] Pass |
 | IEC 60268-16:2020 C.3.2 | STIPA direct method, Formula (C.1) signal at m=0.5 | 0.5 (+/-0.01) | 0.4998 | -0.0002 | 2 % | ![Pass][cv-pass] Pass |
 | IEC 60268-16:2020 C.3.2 | STIPA direct method, Formula (C.1) signal at m=0.8 | 0.7 (+/-0.01) | 0.7002 | 0.0002 | 2 % | ![Pass][cv-pass] Pass |

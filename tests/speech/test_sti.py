@@ -880,6 +880,24 @@ def test_annex_m_adjustment_rejects_a_level_vector_of_the_wrong_length(
         speech.sti_adjusted_for_levels(measured, **spectra)
 
 
+@pytest.mark.parametrize("bad", [float("nan"), float("inf"), float("-inf")])
+def test_annex_m_adjustment_rejects_a_non_finite_level(bad: float) -> None:
+    """A dB level is finite by definition, and the refusal names the vector.
+
+    NaN would otherwise ride through the exponentiation into every band the
+    masking couples, and an infinity into an intensity no room has.
+    """
+    measured = _annex_m_matrix(IEC60268_16_ANNEX_M_MEASURED_MTF)
+    with pytest.raises(
+        ValueError, match=r"'operational_level' must contain only finite dB"
+    ):
+        speech.sti_adjusted_for_levels(
+            measured,
+            measured_level=IEC60268_16_ANNEX_M_MEASURED_LEVEL,
+            operational_level=[70.0] * 6 + [bad],
+        )
+
+
 def test_an_sti_result_refuses_noise_levels_without_speech_levels() -> None:
     """Half of the level pair is not a condition the adjustment can undo.
 

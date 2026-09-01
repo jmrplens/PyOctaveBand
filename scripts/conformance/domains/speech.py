@@ -138,16 +138,48 @@ class _PrintedRow(NamedTuple):
     """One printed row of Table M.1 beside what the library computes.
 
     ``limit`` is the rounding the annex's own printing of the row allows:
-    an absolute step for a row given to decimals, and a fraction of the
-    printed value (``relative``) for one given to significant figures. A
-    row that stays inside its own limit has reproduced.
+    half of one unit in the last place, as an absolute step for a row given
+    to decimals. A row given to significant figures instead carries
+    ``figures``, the printed figure count of each cell, and its allowance is
+    half a unit in each cell's own last place; a flat fraction of the value
+    was measured to admit five times the printed rounding at a
+    leading-digit-5 cell. A row that stays inside its allowance has
+    reproduced.
     """
 
     label: str
     printed: Sequence[float] | np.ndarray
     computed: np.ndarray
-    limit: float
-    relative: bool = False
+    limit: float = 0.0
+    figures: tuple[int, ...] | None = None
+    carry: float = 0.0
+
+
+#: What the annex's own rounding of the combined level can move the amf rows
+#: by, as a fraction of the value. The amf x 1000 rows are derived from the
+#: combined-level row above them, which is printed to two decimals, and the
+#: A.5.3 masking slope at these levels is 0,5 dB per dB, so up to
+#: 0,5 x 0,005 = 0,0025 dB of hidden rounding rides into them: measured at
+#: 250 Hz of step 2, the annex's 77,90 gives 8,222 where the unrounded
+#: 77,90444 gives 8,227, and only the former prints the tabulated 8,22.
+_ANNEX_M_AMF_CARRY = 10.0 ** (0.5 * 0.005 / 10.0) - 1.0
+
+
+def _row_allowance(row: _PrintedRow) -> np.ndarray:
+    """Half of one unit in the last printed place of each cell of *row*.
+
+    ``carry`` widens it by the rounding the annex's own upstream print
+    carries into the row, stated as a fraction of the printed value.
+    """
+    printed = np.asarray(row.printed, dtype=float)
+    if row.figures is None:
+        base = np.full_like(printed, row.limit)
+    else:
+        exponents = np.floor(np.log10(np.abs(printed))) - (
+            np.asarray(row.figures, dtype=float) - 1.0
+        )
+        base = 0.5 * 10.0**exponents
+    return base + row.carry * np.abs(printed)
 
 
 def _worst_printed_row(rows: Sequence[_PrintedRow]) -> tuple[str, float]:
@@ -161,8 +193,7 @@ def _worst_printed_row(rows: Sequence[_PrintedRow]) -> tuple[str, float]:
     worst_label, worst = "none", 0.0
     for row in rows:
         printed = np.asarray(row.printed, dtype=float)
-        scale = np.abs(printed) if row.relative else np.ones_like(printed)
-        used = float(np.max(np.abs(row.computed - printed) / (row.limit * scale)))
+        used = float(np.max(np.abs(row.computed - printed) / _row_allowance(row)))
         if used > worst:
             worst_label, worst = row.label, used
     return worst_label, worst
@@ -241,32 +272,29 @@ def _chk_sti_annex_m_step2_rows() -> Outcome:
             "amf x 1000",
             printed_milli,
             1000.0 * 10.0 ** (correction.masking_db[masked_milli] / 10.0),
-            0.005,
-            relative=True,
+            figures=(3, 3, 3, 3, 3, 3),
+            carry=_ANNEX_M_AMF_CARRY,
         ),
         _PrintedRow(
             "I_k",
             ref.IEC60268_16_ANNEX_M_MEASURED_INTENSITY,
             correction.intensity / ref.IEC60268_16_ANNEX_M_INTENSITY_SCALE,
-            0.005,
-            relative=True,
+            figures=(3, 3, 3, 3, 3, 3, 3),
         ),
         _PrintedRow(
             "I_am,k",
             ref.IEC60268_16_ANNEX_M_MEASURED_INTENSITY_MASKING[1:],
             correction.intensity_masking[1:],
-            0.005,
-            relative=True,
+            figures=(3, 3, 3, 3, 3, 3),
         ),
         _PrintedRow("ART", ref.IEC60268_16_ANNEX_M_ART_DB, _ART_DB, 0.05),
         # Four of the seven I_rt,k cells are printed to two figures (4,5 for
-        # 10^0,65 = 4,4668), which is what sets this row's limit.
+        # 10^0,65 = 4,4668), and 40 000 for 10^4,6 = 39 811 is two as well.
         _PrintedRow(
             "I_rt,k",
             ref.IEC60268_16_ANNEX_M_INTENSITY_THRESHOLD,
             correction.intensity_threshold,
-            0.01,
-            relative=True,
+            figures=(2, 3, 3, 2, 2, 2, 3),
         ),
         _PrintedRow(
             "adjustment to remove masking and threshold",
@@ -330,29 +358,28 @@ def _chk_sti_annex_m_step3_rows() -> Outcome:
             "amf x 1000",
             printed_milli,
             1000.0 * 10.0 ** (correction.masking_db[masked_milli] / 10.0),
-            0.005,
-            relative=True,
+            figures=(3, 3, 3, 3, 3, 3),
+            carry=_ANNEX_M_AMF_CARRY,
         ),
         _PrintedRow(
             "I_k",
             ref.IEC60268_16_ANNEX_M_OPERATIONAL_INTENSITY,
             correction.intensity / ref.IEC60268_16_ANNEX_M_INTENSITY_SCALE,
-            0.005,
-            relative=True,
+            figures=(3, 3, 3, 3, 3, 3, 3),
         ),
+        # The 480 cell is two figures: the unrounded product is 479.2, which
+        # three figures would print 479.
         _PrintedRow(
             "I_am,k (250 Hz excluded, see ERRATA)",
             ref.IEC60268_16_ANNEX_M_OPERATIONAL_INTENSITY_MASKING[2:],
             correction.intensity_masking[2:],
-            0.005,
-            relative=True,
+            figures=(3, 3, 3, 3, 2),
         ),
         _PrintedRow(
             "I_rt,k",
             ref.IEC60268_16_ANNEX_M_INTENSITY_THRESHOLD,
             correction.intensity_threshold,
-            0.01,
-            relative=True,
+            figures=(2, 3, 3, 2, 2, 2, 3),
         ),
         _PrintedRow(
             "masking and threshold correction",

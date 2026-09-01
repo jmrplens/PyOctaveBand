@@ -435,7 +435,16 @@ of Table A.2 and the threshold of Table A.3 have a single implementation and
 the adjustment cannot drift away from the measurement it adjusts.
 
 ```python
-# `ir` and `fs` are the reverberant hall of this section, measured empty.
+import numpy as np
+
+from phonometry import speech
+
+# The reverberant hall of this section, measured empty: a 0,9 s decay at
+# 48 kHz stands in for the measured impulse response.
+fs = 48000
+rng = np.random.default_rng(0)
+ir = rng.standard_normal(fs) * np.exp(-6.9078 * np.arange(fs) / fs / 0.9)
+
 # The Ed.5 male speech spectrum of clause A.6.1 at 68 dB overall, and the
 # empty hall's own ventilation noise, both in dB SPL per octave band.
 band_shape = np.array([-2.5, 0.5, 0.0, -6.0, -12.0, -18.0, -24.0])

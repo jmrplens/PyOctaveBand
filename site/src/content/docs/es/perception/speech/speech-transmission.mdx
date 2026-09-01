@@ -645,7 +645,7 @@ lo que deja algo sobre lo que deducirlos.
 El atajo que estos dos pasos existen para prohibir es el tentador: volver a
 pasar la corrección de ruido sobre la matriz medida con los niveles de
 ocupación cuenta el ruido dos veces, porque el ruido de la propia medición ya
-está dentro. Conviene añadir dónde va el truncamiento. El canal que recupera el
+está dentro. El canal que recupera el
 paso 2 puede superar 1,0 en una banda cuya corrección fuera fuerte, y no se
 acota entre pasos: el truncamiento de $m > 1$ de la NOTA 1 de A.5.3 es de la
 matriz que va a procesarse, que es la que produce el paso 3. El propio ejemplo
@@ -660,7 +660,16 @@ Tabla A.3 tienen una única implementación y el ajuste no puede separarse de la
 medición que ajusta.
 
 ```python
-# `ir` y `fs` son la sala reverberante de esta sección, medida vacía.
+import numpy as np
+
+from phonometry import speech
+
+# La sala reverberante de esta sección, medida vacía: una caída de 0,9 s a
+# 48 kHz hace de respuesta al impulso medida.
+fs = 48000
+rng = np.random.default_rng(0)
+ir = rng.standard_normal(fs) * np.exp(-6.9078 * np.arange(fs) / fs / 0.9)
+
 # El espectro de habla masculina de la Ed.5 del apartado A.6.1 a 68 dB
 # globales, y el ruido de la propia ventilación de la sala vacía, ambos en
 # dB SPL por banda de octava.
