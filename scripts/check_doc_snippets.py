@@ -72,7 +72,6 @@ _SKIP: dict[str, str] = {
     "aircraft-noise": "excerpt: starts from the spl of the prose",
     "detailed-prediction": "excerpt: starts from the measured spectra of the prose",
     "electroacoustics": "excerpt: starts from the captured signal of the prose",
-    "intensity": "excerpt: starts from the band levels of the prose",
     "panel-sound-insulation": "excerpt: two scenarios share a variable name",
     "room-to-room": "excerpt: two scenarios share the band vector name",
     "rotorcraft-noise": "excerpt: starts from the measured spectrum",
