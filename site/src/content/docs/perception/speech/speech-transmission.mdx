@@ -667,7 +667,8 @@ louder = empty.adjusted_for_levels(
 print(f"{louder.sti:.2f} ({louder.rating})")          # 0.59 (E)
 ```
 
-The occupancy noise costs two rating letters, and six decibels of talker buys
+The occupancy noise costs two rating letters, and six decibels more from the
+talker buys
 one of them back. That is the argument for doing this before the handover
 rather than after the complaint: the empty hall passed.
 
@@ -777,7 +778,7 @@ one. Neither of those is visible in the index.
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| `mtf` | (7, n) array | — | 0 to 1 | The matrix as measured, noise and masking included |
+| `mtf` | (7, n) array | — | ≥ 0, finite | The matrix as measured, noise and masking included; values above 1 are truncated to 1, and above 1.3 warn that the measurement is likely invalid (A.5.3 NOTE 1) |
 | `measured_level` | 7-vector | dB SPL | required | Speech band levels during the measurement |
 | `measured_ambient` | 7-vector, optional | dB SPL | default `None` | Background-noise band levels during the measurement |
 | `operational_level` | 7-vector | dB SPL | required | Speech band levels of the condition simulated |

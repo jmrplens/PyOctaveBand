@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 581 numerical conformance checks against 374 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 585 numerical conformance checks against 374 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 581 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 59 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 585 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 59 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -34302,7 +34302,8 @@ louder = empty.adjusted_for_levels(
 print(f"{louder.sti:.2f} ({louder.rating})")          # 0.59 (E)
 ```
 
-The occupancy noise costs two rating letters, and six decibels of talker buys
+The occupancy noise costs two rating letters, and six decibels more from the
+talker buys
 one of them back. That is the argument for doing this before the handover
 rather than after the complaint: the empty hall passed.
 
@@ -34408,7 +34409,7 @@ one. Neither of those is visible in the index.
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| `mtf` | (7, n) array | — | 0 to 1 | The matrix as measured, noise and masking included |
+| `mtf` | (7, n) array | — | ≥ 0, finite | The matrix as measured, noise and masking included; values above 1 are truncated to 1, and above 1.3 warn that the measurement is likely invalid (A.5.3 NOTE 1) |
 | `measured_level` | 7-vector | dB SPL | required | Speech band levels during the measurement |
 | `measured_ambient` | 7-vector, optional | dB SPL | default `None` | Background-noise band levels during the measurement |
 | `operational_level` | 7-vector | dB SPL | required | Speech band levels of the condition simulated |
@@ -34611,7 +34612,7 @@ documents, one page per module.
 | `sti_from_impulse_response` | `function` | **Full STI, indirect method (IEC 60268-16 Ed. 5).**<br>• `ir`: Impulse response (1D)<br>• `fs`: Sample rate [Hz] (>= 22500)<br>• `snr`: SNR [dB], scalar or 7 bands (Default: None)<br>• `level`: 7 speech band levels [dB SPL]; enables masking + reception threshold (Default: None)<br>• `ambient`: 7 noise band levels [dB SPL]; requires `level` | `res = speech.sti_from_impulse_response(ir, fs, snr=25.0)`<br><br>• `STIResult` with `mtf` (7×14) |
 | `stipa` | `function` | **STIPA direct method (Annex B).**<br>• `x`: Recorded STIPA signal (1D), 15-25 s<br>• `fs`: Sample rate [Hz] (>= 22500)<br>• `reference`: Measured source signal instead of the nominal m = 0.55 (Default: None)<br>• `level` / `ambient`: as `sti_from_impulse_response`<br>• warns (`UserWarning`) if the recording is < 15 s (STI biased low) | `res = speech.stipa(recording, fs)`<br><br>• `STIResult` with `mtf` (7×2) |
 | `stipa_signal` | `function` | **STIPA test-signal generator (A.4/A.6.1).**<br>• `fs`: Sample rate [Hz] (>= 22500)<br>• `seconds`: Duration [s] (Default: 18.0)<br>• `level_db`: RMS level [dB SPL] (Default: None → RMS 0.1)<br>• `seed`: Pink-noise seed (Default: None) | `sig = speech.stipa_signal(48000, seconds=18.0)`<br><br>• 1D test signal, Ed. 5 male spectrum |
-| `sti_adjusted_for_levels` | `function` | **Occupancy-noise and speech-level adjustment (Ed. 4 Annex M).**<br>• `mtf`: measured m matrix (7×n), noise and masking included<br>• `measured_level` / `measured_ambient`: 7 band levels [dB SPL] during the measurement<br>• `operational_level` / `operational_ambient`: 7 band levels [dB SPL] of the condition simulated | `res = speech.sti_adjusted_for_levels(mtf, measured_level=lm, measured_ambient=nm, operational_level=lo, operational_ambient=no)`<br><br>• `STIResult` at the operational levels |
+| `sti_adjusted_for_levels` | `function` | **Occupancy-noise and speech-level adjustment (Ed. 4 Annex M).**<br>• `mtf`: measured m matrix (7×n), noise and masking included<br>• `measured_level`: 7 band levels [dB SPL] during the measurement<br>• `measured_ambient`: same, background noise (Default: None)<br>• `operational_level`: 7 band levels [dB SPL] of the condition simulated<br>• `operational_ambient`: same, occupancy noise (Default: None) | `res = speech.sti_adjusted_for_levels(mtf, measured_level=lm, measured_ambient=nm, operational_level=lo, operational_ambient=no)`<br><br>• `STIResult` at the operational levels |
 | `STIResult` | `dataclass` | **STI result.**<br>• `sti`: 0 to 1<br>• `mti`: band indices (7,)<br>• `mtf`: corrected m values (7×14 or 7×2)<br>• `band_levels` / `ambient_levels`: levels used or None<br>• `rating`: Annex F letter 'A+'…'U'<br>• `.adjusted_for_levels(operational_level=…, operational_ambient=…)`: the same result at another condition (Annex M) | `res = speech.stipa(x, fs)`<br>`print(res.sti, res.rating)` |
 | `sound_intensity` | `function` | **p-p sound intensity (IEC 61043).**<br>• `p1`, `p2`: Microphone signals [Pa], equal length<br>• `fs`: Sample rate [Hz]<br>• `spacing`: Microphone separation Δr [m]<br>• `rho`: Air density (Default: 1.204)<br>• `c`: Speed of sound (Default: 343.0)<br>• `fraction`: None, 1 or 3 (Default: None)<br>• `limits`: [f_min, f_max] (Default: [12, 20000])<br>• `bias_correct`: undo finite-difference under-read of band/broadband totals near `max_valid_frequency` (Default: False) | `res = emission.sound_intensity(p1, p2, fs, spacing=0.012, fraction=3)`<br><br>• `IntensityResult` |
 | `plot_pp_probe_geometry` | `function` | **Face-to-face p-p probe to scale.**<br>• `spacing` dr [m] (Default: 12 mm)<br>• `language` | `plot_pp_probe_geometry()`<br><br>• Also `IntensityResult.plot_geometry()` |
@@ -49864,7 +49865,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 581 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 585 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -50107,7 +50108,7 @@ sample from the metrology core:
 | IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-581 numerical conformance checks across 59 domains and 374 standards, covering
+585 numerical conformance checks across 59 domains and 374 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise
