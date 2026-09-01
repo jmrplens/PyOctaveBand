@@ -46,7 +46,8 @@ Esta edición española traduce la prosa del registro entrada a entrada. La
 redacción autoritativa es la inglesa de [ERRATA.md](ERRATA.md), que es la que
 se ha comunicado o se comunicará a los organismos emisores; las citas
 textuales, las matemáticas y los valores impresos se reproducen aquí sin
-traducir, tal como los imprime cada fuente.
+traducir, tal como los imprime cada fuente. `make site-reports` mantiene las
+dos ediciones con las mismas entradas y en el mismo orden.
 
 
 ---
@@ -78,7 +79,7 @@ traducir, tal como los imprime cada fuente.
 - **Comportamiento de la biblioteca:** implementa A.2.1 tal como está escrito
   y fija $C_I = -11$ con el impreso de 2013 como oráculo
   ([`tests/reference_data/`](../tests/reference_data/), comprobación de
-  conformidad "ISO 717-2 Annex C, Table C.1").
+  conformidad «ISO 717-2 Annex C, Table C.1»).
 - **Estado:** sin notificar.
 
 ## ISO 717-2:2020, Anexo C, ejemplo C.2 (suelo revestido: valor de 800 Hz y cadena del CI)
@@ -105,7 +106,7 @@ traducir, tal como los imprime cada fuente.
   32,0 dB, así que $L_{n,w,r} = 63\ \text{dB}$ y
   $\Delta L_w = 15\ \text{dB}$ en cualquier caso. (b) Los 75,2527 dB impresos
   son exactamente la suma energética de la *columna equivocada sobre el rango
-  equivocado*: el suelo medido «con revestimiento» sobre las dieciséis bandas
+  equivocado*: el suelo medido «with covering» sobre las dieciséis bandas
   de 100 Hz a 3150 Hz. A.2.1 define $C_I$ desde el suelo de referencia con
   revestimiento (la columna $L_{n,r,0} - \Delta L$) de 100 Hz a 2500 Hz (15
   bandas), lo que da 75,674 dB (cadena impresa) o 75,710 dB (celda de 800 Hz
@@ -902,7 +903,7 @@ traducir, tal como los imprime cada fuente.
   apartado, cinco párrafos y una NOTA antes, lista las mediciones requeridas
   como «the sound pressure levels in both rooms with the source(s) operating,
   the background noise in the receiving room ... and the reverberation times
-  **in the receiving room»**. El apartado 10, que es donde de verdad se
+  **in the receiving room**». El apartado 10, que es donde de verdad se
   especifican los procedimientos de tiempo de reverberación, dice lo mismo
   cuatro veces: su título es «Reverberation time **in the receiving room**
   (default and low-frequency procedure)», su apartado 10.1 acota todo el
@@ -1243,7 +1244,7 @@ traducir, tal como los imprime cada fuente.
   revés y describía el flanco superior como «a la mitad», cuando en realidad
   el divisor falta, no está a la mitad. Los tonos límite con pendiente de un
   solo flanco entre $24/\sqrt{2} = 17$ y
-  $24 \cdot \sqrt{2} = 34\ \text{dB/octava}$ cambian de clasificación entre
+  $24 \cdot \sqrt{2} = 34\ \text{dB/octave}$ cambian de clasificación entre
   las dos lecturas.
 - **Evidencia:** comparación lado a lado del impreso ISO, el impreso de
   DIN 45681 y el programa del Anhang J de DIN. Los radicales de DIN son
