@@ -477,8 +477,10 @@ rather than after the complaint: the empty hall passed.
 
 `STIResult.adjusted_for_levels()` reads the measurement condition off the
 result, which is why it needs only the operational one and why it refuses a
-result computed without `level=`: such a result carries no correction to undo,
-and dividing one out anyway would silently lower the answer. Where the matrix
+result computed without `level=`: such a result carries at most the flat
+`snr=` noise factor, none of the level-dependent masking and threshold, and
+no spectra to re-derive them from, so dividing the full correction out would
+silently lower the answer. Where the matrix
 comes from somewhere else, `speech.sti_adjusted_for_levels()` takes all four
 spectra beside it.
 

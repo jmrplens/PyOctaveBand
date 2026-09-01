@@ -111,8 +111,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   The method form takes only the target condition, because the result now
   carries the measurement condition itself: `STIResult` gained
   `ambient_levels` beside the `band_levels` it always echoed, and it refuses a
-  result computed without `level=` rather than dividing out a correction that
-  was never applied. The function form takes the matrix and all four spectra,
+  result computed without `level=`, which carries at most the flat `snr=`
+  noise factor and none of the spectra the level-dependent corrections must
+  be re-derived from. The function form takes the matrix and all four spectra,
   for a matrix that came from somewhere else.
 
   Steps 2 and 3 of the annex are one clause A.5.3 correction, inverted and then

@@ -702,8 +702,10 @@ y no después de la queja: la sala vacía cumplía.
 
 `STIResult.adjusted_for_levels()` lee la condición de medición del propio
 resultado, por eso solo necesita la operativa y por eso rechaza un resultado
-calculado sin `level=`: ese resultado no lleva ninguna corrección que deshacer,
-y dividir por una de todos modos bajaría la respuesta en silencio. Cuando la
+calculado sin `level=`: ese resultado lleva como mucho el factor plano de
+ruido de `snr=`, nada del enmascaramiento ni del umbral dependientes del
+nivel, y ningún espectro del que volver a deducirlos, así que dividir por la
+corrección completa bajaría la respuesta en silencio. Cuando la
 matriz viene de otro sitio, `speech.sti_adjusted_for_levels()` acepta los
 cuatro espectros junto a ella.
 
