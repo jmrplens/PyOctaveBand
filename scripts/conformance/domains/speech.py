@@ -67,11 +67,11 @@ def _chk_sti_uniform() -> Outcome:
 )
 def _chk_sti_annex_m() -> Outcome:
     """End-to-end A.5.3-A.5.6 chain on the annex's own worked example."""
-    mtf = np.asarray(ref.IEC60268_16_ANNEX_M_MTF, dtype=float).T
+    mtf = np.asarray(ref.IEC60268_16_ANNEX_M_SOURCE_MTF, dtype=float).T
     result = _sti_from_mtf(
         mtf,
-        level=np.asarray(ref.IEC60268_16_ANNEX_M_LEVEL, dtype=float),
-        ambient=np.asarray(ref.IEC60268_16_ANNEX_M_AMBIENT, dtype=float),
+        level=np.asarray(ref.IEC60268_16_ANNEX_M_OPERATIONAL_LEVEL, dtype=float),
+        ambient=np.asarray(ref.IEC60268_16_ANNEX_M_OPERATIONAL_AMBIENT, dtype=float),
     )
     mti_delta = float(
         np.max(
@@ -87,6 +87,48 @@ def _chk_sti_annex_m() -> Outcome:
         computed=f"STI {result.sti:.3f} (max MTI dev {mti_delta:.2f})",
         delta=outcome.delta,
         passed=outcome.passed and mti_delta <= 0.01,
+    )
+
+
+#: One unit in the last place the Annex M matrices are printed to. The step 1
+#: matrix is given to three decimals, so up to 0,0005 of its rounding travels
+#: through the adjustment into every later cell.
+_ANNEX_M_MTF_TOL = 0.001
+
+
+@register(
+    "Speech transmission (IEC 60268-16)",
+    "IEC 60268-16 Annex M",
+    "Occupancy-noise adjustment: measured MTF and four level spectra -> STI",
+)
+def _chk_sti_annex_m_adjustment() -> Outcome:
+    """The four steps of Table M.1, from the matrix as measured.
+
+    Undoes the noise, masking and threshold of the measurement condition,
+    applies those of the operational condition and processes the result into
+    the index, checking both printed matrices on the way.
+    """
+    result = ph.speech.sti_adjusted_for_levels(
+        np.asarray(ref.IEC60268_16_ANNEX_M_MEASURED_MTF, dtype=float).T,
+        measured_level=ref.IEC60268_16_ANNEX_M_MEASURED_LEVEL,
+        measured_ambient=ref.IEC60268_16_ANNEX_M_MEASURED_AMBIENT,
+        operational_level=ref.IEC60268_16_ANNEX_M_OPERATIONAL_LEVEL,
+        operational_ambient=ref.IEC60268_16_ANNEX_M_OPERATIONAL_AMBIENT,
+    )
+    mtf_delta = float(
+        np.max(
+            np.abs(
+                result.mtf
+                - np.asarray(ref.IEC60268_16_ANNEX_M_OPERATIONAL_MTF, dtype=float).T
+            )
+        )
+    )
+    outcome = numeric(ref.IEC60268_16_ANNEX_M_STI, float(result.sti), 0.005, places=3)
+    return Outcome(
+        expected=f"STI {ref.IEC60268_16_ANNEX_M_STI} (step 3 matrix, step 4 STI)",
+        computed=f"STI {result.sti:.3f} (max MTF dev {mtf_delta:.4f})",
+        delta=outcome.delta,
+        passed=outcome.passed and mtf_delta <= _ANNEX_M_MTF_TOL,
     )
 
 

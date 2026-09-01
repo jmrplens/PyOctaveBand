@@ -20,25 +20,57 @@ from itertools import pairwise
 import numpy as np
 import pytest
 from reference_data import (
-    IEC60268_16_ANNEX_M_AMBIENT,
-    IEC60268_16_ANNEX_M_LEVEL,
-    IEC60268_16_ANNEX_M_MTF,
+    IEC60268_16_ANNEX_M_ART_DB,
+    IEC60268_16_ANNEX_M_EFFECTIVE_SNR,
+    IEC60268_16_ANNEX_M_INTENSITY_SCALE,
+    IEC60268_16_ANNEX_M_INTENSITY_THRESHOLD,
+    IEC60268_16_ANNEX_M_MEASURED_AMBIENT,
+    IEC60268_16_ANNEX_M_MEASURED_COMBINED_ADJUSTMENT,
+    IEC60268_16_ANNEX_M_MEASURED_COMBINED_LEVEL,
+    IEC60268_16_ANNEX_M_MEASURED_INTENSITY,
+    IEC60268_16_ANNEX_M_MEASURED_INTENSITY_MASKING,
+    IEC60268_16_ANNEX_M_MEASURED_LEVEL,
+    IEC60268_16_ANNEX_M_MEASURED_MASKING_DB,
+    IEC60268_16_ANNEX_M_MEASURED_MASKING_MILLI,
+    IEC60268_16_ANNEX_M_MEASURED_MASKING_THRESHOLD_ADJUSTMENT,
+    IEC60268_16_ANNEX_M_MEASURED_MTF,
+    IEC60268_16_ANNEX_M_MEASURED_NOISE_ADJUSTMENT,
+    IEC60268_16_ANNEX_M_MEASURED_NOISE_TRANSFER,
+    IEC60268_16_ANNEX_M_MEASURED_SNR,
     IEC60268_16_ANNEX_M_MTI,
+    IEC60268_16_ANNEX_M_OPERATIONAL_AMBIENT,
+    IEC60268_16_ANNEX_M_OPERATIONAL_COMBINED_ADJUSTMENT,
+    IEC60268_16_ANNEX_M_OPERATIONAL_COMBINED_LEVEL,
+    IEC60268_16_ANNEX_M_OPERATIONAL_INTENSITY,
+    IEC60268_16_ANNEX_M_OPERATIONAL_INTENSITY_MASKING,
+    IEC60268_16_ANNEX_M_OPERATIONAL_LEVEL,
+    IEC60268_16_ANNEX_M_OPERATIONAL_MASKING_DB,
+    IEC60268_16_ANNEX_M_OPERATIONAL_MASKING_MILLI,
+    IEC60268_16_ANNEX_M_OPERATIONAL_MASKING_THRESHOLD_TRANSFER,
+    IEC60268_16_ANNEX_M_OPERATIONAL_MTF,
+    IEC60268_16_ANNEX_M_OPERATIONAL_NOISE_TRANSFER,
+    IEC60268_16_ANNEX_M_OPERATIONAL_SNR,
+    IEC60268_16_ANNEX_M_SOURCE_MTF,
     IEC60268_16_ANNEX_M_STI,
 )
 
 from phonometry import speech
 from phonometry.speech.sti import (
     _ALPHA_MALE,
+    _ART_DB,
     _BETA_MALE,
     _MOD_FREQS,
     _NUM_BANDS,
     _RATING_EDGES,
     _RATING_LETTERS,
+    STIResult,
     STIWarning,
+    _level_correction,
+    _LevelCorrection,
     _masking_amdb,
     _rating,
     _sti_from_mtf,
+    _truncated_mtf,
 )
 
 FS = 48000
@@ -470,31 +502,385 @@ def test_stipa_direct_method_modulation_depth_staircase(i: int) -> None:
     assert res.sti == pytest.approx(_C32_STI_STAIRCASE[i], abs=0.05)
 
 
-def test_annex_m_full_sti_worked_example() -> None:
-    """Reproduce the IEC 60268-16 Annex M full-STI worked example.
+# ---------------------------------------------------------------------------
+# Annex M: adjusting a measured result to occupancy noise and other speech
+# levels. Oracle: IEC 60268-16 Ed.4 (2011), Annex M, Table M.1 "Example
+# calculation" (printed pp. 64-66), which walks the four steps of the
+# procedure over one measurement and prints every intermediate on the way.
+#
+# Two tolerances recur below and both come from the same place: the step 1
+# matrix is printed to three decimals, so every cell of it carries up to
+# 0,0005 of hidden rounding. Propagated through the adjustment that is one
+# unit in the last printed place of an MTF cell (0,001), and, because
+# d/dm of 10 lg(m/(1-m)) reaches ~220 dB per unit m at the m ~ 0,98 of the
+# first modulation frequencies, up to ~0,11 dB of an effective SNR.
+# ---------------------------------------------------------------------------
+_ANNEX_M_MTF_TOL = 0.001
+_ANNEX_M_SNR_TOL = 0.08
 
-    The annex prints the adjusted MTF matrix before noise, masking and
-    threshold are applied, together with the operational speech and ambient
-    noise spectra; combining them must give back its printed MTI row (step 4c)
-    and STI. This is an independent oracle for the whole A.5.3 to A.5.6 chain:
-    auditory masking, the reception threshold, the SNR clamp, the per-band MTI
-    average and the alpha/beta band weighting.
+
+def _annex_m_matrix(rows: tuple[tuple[float, ...], ...]) -> np.ndarray:
+    """One printed MTF block as a (7 bands, 14 modulation frequencies) array.
+
+    Table M.1 prints the modulation frequencies down the page and the octave
+    bands across it, the transpose of the library's matrix.
     """
-    mtf = np.asarray(IEC60268_16_ANNEX_M_MTF, dtype=float).T  # bands x mod freqs
-    assert mtf.shape == (_NUM_BANDS, _MOD_FREQS.size)
-    result = _sti_from_mtf(
-        mtf,
-        level=np.asarray(IEC60268_16_ANNEX_M_LEVEL, dtype=float),
-        ambient=np.asarray(IEC60268_16_ANNEX_M_AMBIENT, dtype=float),
+    matrix = np.asarray(rows, dtype=float).T
+    assert matrix.shape == (_NUM_BANDS, _MOD_FREQS.size)
+    return matrix
+
+
+def _annex_m_measured_correction() -> _LevelCorrection:
+    """The A.5.3 correction of the measurement condition (step 2 of Table M.1)."""
+    return _level_correction(
+        np.asarray(IEC60268_16_ANNEX_M_MEASURED_LEVEL, dtype=float),
+        np.asarray(IEC60268_16_ANNEX_M_MEASURED_AMBIENT, dtype=float),
     )
-    # Exact at the annex's own two decimals: a tolerance of 0,01 on top of the
-    # rounding would accept the neighbouring cent (0,75 for a printed 0,76).
+
+
+def _annex_m_operational_correction() -> _LevelCorrection:
+    """The A.5.3 correction of the operational condition (step 3 of Table M.1)."""
+    return _level_correction(
+        np.asarray(IEC60268_16_ANNEX_M_OPERATIONAL_LEVEL, dtype=float),
+        np.asarray(IEC60268_16_ANNEX_M_OPERATIONAL_AMBIENT, dtype=float),
+    )
+
+
+def _annex_m_result() -> speech.STIResult:
+    """The adjusted result of Table M.1, from step 1 to step 4."""
+    return speech.sti_adjusted_for_levels(
+        _annex_m_matrix(IEC60268_16_ANNEX_M_MEASURED_MTF),
+        measured_level=IEC60268_16_ANNEX_M_MEASURED_LEVEL,
+        measured_ambient=IEC60268_16_ANNEX_M_MEASURED_AMBIENT,
+        operational_level=IEC60268_16_ANNEX_M_OPERATIONAL_LEVEL,
+        operational_ambient=IEC60268_16_ANNEX_M_OPERATIONAL_AMBIENT,
+    )
+
+
+def _masked_bands(printed: tuple[float | None, ...]) -> tuple[np.ndarray, np.ndarray]:
+    """The bands of a printed row that carry a value, and those values.
+
+    The auditory masking rows print "not applicable" in the 125 Hz band,
+    which has no band below it to be masked by.
+    """
+    bands = np.array([k for k, cell in enumerate(printed) if cell is not None])
+    values = np.array([cell for cell in printed if cell is not None], dtype=float)
+    return bands, values
+
+
+def test_annex_m_step2_prints_the_measurement_correction() -> None:
+    """Every printed intermediate of Table M.1 step 2, band by band.
+
+    Step 2 removes the background noise, the auditory masking and the
+    reception threshold that the measurement condition put into the matrix,
+    and the annex prints the whole chain: the signal-to-noise ratio, m_k(f)
+    for noise only and its reciprocal, the combined speech and noise level,
+    the auditory masking factor in dB and as amf x 1000, the combined
+    squared sound pressure I_k, I_am,k, the absolute reception threshold and
+    I_rt,k, the masking and threshold adjustment, and the combined
+    adjustment. Reproducing them one at a time is what tells a chain that
+    lands on the right STI through two compensating errors from one that is
+    right all the way down.
+    """
+    correction = _annex_m_measured_correction()
+
+    assert correction.snr == pytest.approx(IEC60268_16_ANNEX_M_MEASURED_SNR, abs=0.005)
+    assert correction.noise_transfer == pytest.approx(
+        IEC60268_16_ANNEX_M_MEASURED_NOISE_TRANSFER, abs=0.0005
+    )
+    assert 1.0 / correction.noise_transfer == pytest.approx(
+        IEC60268_16_ANNEX_M_MEASURED_NOISE_ADJUSTMENT, abs=0.0005
+    )
+    assert correction.combined_level == pytest.approx(
+        IEC60268_16_ANNEX_M_MEASURED_COMBINED_LEVEL, abs=0.005
+    )
+
+    bands, printed_masking = _masked_bands(IEC60268_16_ANNEX_M_MEASURED_MASKING_DB)
+    assert correction.masking_db[bands] == pytest.approx(printed_masking, abs=0.05)
+    assert np.isneginf(correction.masking_db[0])
+    bands, printed_milli = _masked_bands(IEC60268_16_ANNEX_M_MEASURED_MASKING_MILLI)
+    assert 1000.0 * 10.0 ** (correction.masking_db[bands] / 10.0) == pytest.approx(
+        printed_milli, rel=0.005
+    )
+
+    assert correction.intensity / IEC60268_16_ANNEX_M_INTENSITY_SCALE == pytest.approx(
+        IEC60268_16_ANNEX_M_MEASURED_INTENSITY, rel=0.005
+    )
+    assert correction.intensity_masking[1:] == pytest.approx(
+        IEC60268_16_ANNEX_M_MEASURED_INTENSITY_MASKING[1:], rel=0.005
+    )
+    assert correction.intensity_masking[0] == 0.0
+    np.testing.assert_array_equal(_ART_DB, IEC60268_16_ANNEX_M_ART_DB)
+    # The I_rt,k row is printed to two figures in four of its seven cells
+    # (4,5 for 10^0,65 = 4,4668), which is what sets this tolerance.
+    assert correction.intensity_threshold == pytest.approx(
+        IEC60268_16_ANNEX_M_INTENSITY_THRESHOLD, rel=0.01
+    )
+
+    assert 1.0 / correction.masking_threshold_transfer == pytest.approx(
+        IEC60268_16_ANNEX_M_MEASURED_MASKING_THRESHOLD_ADJUSTMENT, abs=0.0005
+    )
+    assert 1.0 / correction.factor == pytest.approx(
+        IEC60268_16_ANNEX_M_MEASURED_COMBINED_ADJUSTMENT, abs=0.0005
+    )
+
+
+def test_annex_m_step2_recovers_the_printed_source_matrix() -> None:
+    """The measured matrix divided by the measurement correction (step 2).
+
+    The result is the modulation transfer of the transmission channel
+    alone, printed in the annex as the "adjusted MTF matrix without noise,
+    masking and threshold". All 98 cells land within one unit in the last
+    printed place.
+    """
+    measured = _truncated_mtf(_annex_m_matrix(IEC60268_16_ANNEX_M_MEASURED_MTF))
+    source = measured / _annex_m_measured_correction().factor[:, np.newaxis]
+    np.testing.assert_allclose(
+        source,
+        _annex_m_matrix(IEC60268_16_ANNEX_M_SOURCE_MTF),
+        atol=_ANNEX_M_MTF_TOL,
+        rtol=0.0,
+    )
+
+
+def test_annex_m_step3_prints_the_operational_correction() -> None:
+    """Every printed intermediate of Table M.1 step 3, band by band.
+
+    The same chain as step 2 at the operational speech and occupancy-noise
+    levels, printed as transfer factors rather than as their reciprocals
+    because here the correction is applied instead of undone. The 250 Hz
+    cell of the I_am,k row is the one printed value of the whole table that
+    does not reproduce; it is asserted separately below against the quantity
+    it names, and recorded in docs/ERRATA.md.
+    """
+    correction = _annex_m_operational_correction()
+
+    assert correction.snr == pytest.approx(
+        IEC60268_16_ANNEX_M_OPERATIONAL_SNR, abs=0.005
+    )
+    assert correction.noise_transfer == pytest.approx(
+        IEC60268_16_ANNEX_M_OPERATIONAL_NOISE_TRANSFER, abs=0.0005
+    )
+    assert correction.combined_level == pytest.approx(
+        IEC60268_16_ANNEX_M_OPERATIONAL_COMBINED_LEVEL, abs=0.05
+    )
+
+    bands, printed_masking = _masked_bands(IEC60268_16_ANNEX_M_OPERATIONAL_MASKING_DB)
+    assert correction.masking_db[bands] == pytest.approx(printed_masking, abs=0.05)
+    bands, printed_milli = _masked_bands(IEC60268_16_ANNEX_M_OPERATIONAL_MASKING_MILLI)
+    assert 1000.0 * 10.0 ** (correction.masking_db[bands] / 10.0) == pytest.approx(
+        printed_milli, rel=0.005
+    )
+
+    assert correction.intensity / IEC60268_16_ANNEX_M_INTENSITY_SCALE == pytest.approx(
+        IEC60268_16_ANNEX_M_OPERATIONAL_INTENSITY, rel=0.005
+    )
+    assert correction.intensity_masking[2:] == pytest.approx(
+        IEC60268_16_ANNEX_M_OPERATIONAL_INTENSITY_MASKING[2:], rel=0.005
+    )
+    assert correction.intensity_threshold == pytest.approx(
+        IEC60268_16_ANNEX_M_INTENSITY_THRESHOLD, rel=0.01
+    )
+
+    assert correction.masking_threshold_transfer == pytest.approx(
+        IEC60268_16_ANNEX_M_OPERATIONAL_MASKING_THRESHOLD_TRANSFER, abs=0.0005
+    )
+    assert correction.factor == pytest.approx(
+        IEC60268_16_ANNEX_M_OPERATIONAL_COMBINED_ADJUSTMENT, abs=0.0005
+    )
+
+
+def test_annex_m_step3_masking_intensity_at_250_hz_is_the_printed_erratum() -> None:
+    """The one printed cell of Table M.1 that names a value it is not.
+
+    I_am,k at 250 Hz of step 3 is amf x I_k of the 125 Hz band below it,
+    2 858 700 on the printed levels, which the table prints as 2 850 000.
+    The 500 Hz cell beside it, 2 852 100, prints as 2 850 000 correctly, and
+    step 2 prints the two neighbours apart (508 000 and 507 000), so the
+    defect is this cell rather than the annex's rounding. It moves the
+    masking and threshold correction of the band by 4 parts in a million and
+    changes no printed result. See docs/ERRATA.md.
+    """
+    correction = _annex_m_operational_correction()
+    assert correction.intensity_masking[1] == pytest.approx(2_858_700.0, rel=0.0005)
+    assert correction.intensity_masking[1] != pytest.approx(
+        IEC60268_16_ANNEX_M_OPERATIONAL_INTENSITY_MASKING[1], rel=0.001
+    )
+
+
+def test_annex_m_adjustment_reproduces_the_worked_example() -> None:
+    """The whole of Table M.1: measured matrix and levels in, STI out.
+
+    Step 3's printed matrix, step 4a's effective SNRs, step 4c's per-band
+    MTI row and the STI, from the step 1 matrix and the four printed level
+    spectra. The MTI row is checked at the annex's own two decimals rather
+    than with a tolerance on top of them, which would accept the
+    neighbouring cent.
+    """
+    result = _annex_m_result()
+
+    np.testing.assert_allclose(
+        result.mtf,
+        _annex_m_matrix(IEC60268_16_ANNEX_M_OPERATIONAL_MTF),
+        atol=_ANNEX_M_MTF_TOL,
+        rtol=0.0,
+    )
+    with np.errstate(divide="ignore"):
+        effective_snr = 10.0 * np.log10(result.mtf / (1.0 - result.mtf))
+    np.testing.assert_allclose(
+        effective_snr,
+        _annex_m_matrix(IEC60268_16_ANNEX_M_EFFECTIVE_SNR),
+        atol=_ANNEX_M_SNR_TOL,
+        rtol=0.0,
+    )
     np.testing.assert_array_equal(
-        np.round(result.mti, 2),
-        np.asarray(IEC60268_16_ANNEX_M_MTI, dtype=float),
+        np.round(result.mti, 2), np.asarray(IEC60268_16_ANNEX_M_MTI, dtype=float)
     )
     assert result.sti == pytest.approx(IEC60268_16_ANNEX_M_STI, abs=0.005)
     assert round(result.sti, 2) == IEC60268_16_ANNEX_M_STI
+    assert result.band_levels == pytest.approx(IEC60268_16_ANNEX_M_OPERATIONAL_LEVEL)
+    assert result.ambient_levels == pytest.approx(
+        IEC60268_16_ANNEX_M_OPERATIONAL_AMBIENT
+    )
+
+
+def test_annex_m_step4_from_the_printed_effective_snrs() -> None:
+    """Step 4b to 4c on the annex's own effective SNRs.
+
+    Inverting step 4a exactly, m = 1/(1 + 10^(-SNR/10)), feeds the printed
+    step 4a table straight into the library's +/-15 dB clamp, transmission
+    indices, band MTI average and alpha/beta weighting. It pins that tail of
+    the chain to the annex without going through the modulation matrix, so a
+    defect in the adjustment and a compensating one in the weighting cannot
+    both hide here.
+    """
+    printed_snr = _annex_m_matrix(IEC60268_16_ANNEX_M_EFFECTIVE_SNR)
+    result = _sti_from_mtf(1.0 / (1.0 + 10.0 ** (-printed_snr / 10.0)))
+    np.testing.assert_array_equal(
+        np.round(result.mti, 2), np.asarray(IEC60268_16_ANNEX_M_MTI, dtype=float)
+    )
+    assert round(result.sti, 2) == IEC60268_16_ANNEX_M_STI
+
+
+def test_annex_m_forward_chain_on_the_printed_source_matrix() -> None:
+    """The forward A.5.3 chain agrees with the adjustment on step 3.
+
+    Applying the operational levels to the printed step 2 matrix through the
+    ordinary measurement entry point must give the same index as running the
+    adjustment from step 1, because both multiply by the one correction of
+    the module. Any second implementation of the masking and threshold model
+    would show up as a difference here.
+    """
+    forward = _sti_from_mtf(
+        _annex_m_matrix(IEC60268_16_ANNEX_M_SOURCE_MTF),
+        level=np.asarray(IEC60268_16_ANNEX_M_OPERATIONAL_LEVEL, dtype=float),
+        ambient=np.asarray(IEC60268_16_ANNEX_M_OPERATIONAL_AMBIENT, dtype=float),
+    )
+    assert round(forward.sti, 2) == IEC60268_16_ANNEX_M_STI
+    assert forward.sti == pytest.approx(_annex_m_result().sti, abs=0.002)
+
+
+def test_annex_m_adjustment_to_the_same_levels_is_the_measurement() -> None:
+    """Adjusting to the condition already measured returns the measurement.
+
+    Step 2 and step 3 are then the same correction undone and reapplied, so
+    the matrix has to come back unchanged: the round trip is what says the
+    two directions use one model rather than two that nearly agree.
+    """
+    measured = _annex_m_matrix(IEC60268_16_ANNEX_M_MEASURED_MTF)
+    unmoved = speech.sti_adjusted_for_levels(
+        measured,
+        measured_level=IEC60268_16_ANNEX_M_MEASURED_LEVEL,
+        measured_ambient=IEC60268_16_ANNEX_M_MEASURED_AMBIENT,
+        operational_level=IEC60268_16_ANNEX_M_MEASURED_LEVEL,
+        operational_ambient=IEC60268_16_ANNEX_M_MEASURED_AMBIENT,
+    )
+    np.testing.assert_allclose(unmoved.mtf, measured, atol=1e-12, rtol=0.0)
+
+
+def test_annex_m_adjustment_from_a_measured_result() -> None:
+    """``STIResult.adjusted_for_levels`` takes the measured condition itself.
+
+    Closing the annex's own loop: the printed step 2 matrix put back through
+    the measurement condition is the printed step 1 matrix, i.e. what a
+    meter reports in that room, and a result of that measurement carries the
+    two spectra the adjustment needs. Moving it to the operational condition
+    then needs only that condition, and lands on the printed step 3 matrix
+    and STI. Passing all four spectra to the module function must give the
+    same number.
+    """
+    measured = _sti_from_mtf(
+        _annex_m_matrix(IEC60268_16_ANNEX_M_SOURCE_MTF),
+        level=np.asarray(IEC60268_16_ANNEX_M_MEASURED_LEVEL, dtype=float),
+        ambient=np.asarray(IEC60268_16_ANNEX_M_MEASURED_AMBIENT, dtype=float),
+    )
+    np.testing.assert_allclose(
+        measured.mtf,
+        _annex_m_matrix(IEC60268_16_ANNEX_M_MEASURED_MTF),
+        atol=_ANNEX_M_MTF_TOL,
+        rtol=0.0,
+    )
+    occupied = measured.adjusted_for_levels(
+        operational_level=IEC60268_16_ANNEX_M_OPERATIONAL_LEVEL,
+        operational_ambient=IEC60268_16_ANNEX_M_OPERATIONAL_AMBIENT,
+    )
+    np.testing.assert_allclose(
+        occupied.mtf,
+        _annex_m_matrix(IEC60268_16_ANNEX_M_OPERATIONAL_MTF),
+        atol=_ANNEX_M_MTF_TOL,
+        rtol=0.0,
+    )
+    assert round(occupied.sti, 2) == IEC60268_16_ANNEX_M_STI
+    by_hand = speech.sti_adjusted_for_levels(
+        measured.mtf,
+        measured_level=IEC60268_16_ANNEX_M_MEASURED_LEVEL,
+        measured_ambient=IEC60268_16_ANNEX_M_MEASURED_AMBIENT,
+        operational_level=IEC60268_16_ANNEX_M_OPERATIONAL_LEVEL,
+        operational_ambient=IEC60268_16_ANNEX_M_OPERATIONAL_AMBIENT,
+    )
+    assert occupied.sti == pytest.approx(by_hand.sti, abs=1e-12)
+
+
+def test_annex_m_needs_the_levels_the_measurement_was_corrected_with() -> None:
+    """A result without band levels has nothing to undo.
+
+    Its matrix never had the masking, threshold and noise of a measurement
+    condition applied, so dividing them out would remove what was never
+    there and hand back a lower STI with no warning.
+    """
+    result = _sti_from_mtf(_annex_m_matrix(IEC60268_16_ANNEX_M_SOURCE_MTF))
+    assert result.band_levels is None
+    with pytest.raises(ValueError, match="needs the speech band levels"):
+        result.adjusted_for_levels(
+            operational_level=IEC60268_16_ANNEX_M_OPERATIONAL_LEVEL
+        )
+
+
+def test_annex_m_adjustment_rejects_a_level_vector_of_the_wrong_length() -> None:
+    """Each of the four spectra is seven octave bands, named when it is not."""
+    measured = _annex_m_matrix(IEC60268_16_ANNEX_M_MEASURED_MTF)
+    with pytest.raises(
+        ValueError, match=r"'operational_level' must contain exactly 7 octave-band"
+    ):
+        speech.sti_adjusted_for_levels(
+            measured,
+            measured_level=IEC60268_16_ANNEX_M_MEASURED_LEVEL,
+            operational_level=[70.0, 70.0],
+        )
+
+
+def test_an_sti_result_refuses_noise_levels_without_speech_levels() -> None:
+    """Half of the level pair is not a condition the adjustment can undo.
+
+    Noise levels only enter the chain against a speech spectrum; a result
+    holding them alone would let the adjustment divide out a correction that
+    was never applied.
+    """
+    import dataclasses
+
+    result = _sti_from_mtf(_annex_m_matrix(IEC60268_16_ANNEX_M_SOURCE_MTF))
+    with pytest.raises(ValueError, match="'ambient_levels' needs the speech"):
+        dataclasses.replace(result, ambient_levels=np.full(7, 40.0))
 
 
 # --------------------------------------------------------------------------
@@ -507,8 +893,6 @@ def test_an_sti_result_refuses_an_mti_off_the_band_axis() -> None:
     another length is a table whose rows no longer describe one band each.
     """
     import dataclasses
-
-    from phonometry.speech.sti import STIResult
 
     result = STIResult(
         sti=0.75,
@@ -532,8 +916,6 @@ def test_an_sti_result_refuses_a_non_finite_index(bad: float) -> None:
     display rounder, naming neither the field nor the result type.
     """
     import dataclasses
-
-    from phonometry.speech.sti import STIResult
 
     result = STIResult(
         sti=0.75,

@@ -313,7 +313,8 @@ Each route has failure modes the standard is explicit about:
   standard's Annex J practice sets it 3 dB above the $L_\mathrm{Aeq}$ of continuous
   speech at the position) and pass `level=` and `ambient=` so the analysis
   includes them; an impulse response measured loud and rescaled afterwards
-  misses these effects entirely.
+  misses these effects entirely. Section 3 moves a measurement made at one
+  level and noise condition to another.
 - **Impulsive and fluctuating background noise.** A dropped tool or babble
   during a direct measurement corrupts the measured modulation depths
   (clause 7.13). The standard's remedy is the indirect route: average the
@@ -339,7 +340,9 @@ Each route has failure modes the standard is explicit about:
 | `reference` | 1D array, optional (`stipa`) | — | default `None` | Measured source signal instead of the nominal $m = 0.55$ |
 
 Both return `STIResult`: `sti`, `mti` (7 bands), `mtf` (7×14 or 7×2),
-`band_levels`, `rating` (Annex F letter `A+`…`U`).
+`band_levels` and `ambient_levels` (the two spectra the corrections used, and
+what section 3 reads to move the result to another condition), `rating`
+(Annex F letter `A+`…`U`).
 
 ### IEC 60268-16 report (`.report()`)
 
@@ -381,6 +384,87 @@ repository. Click the preview to open the PDF:
 
 *Speech transmission index fiche (`STIResult.report`), STI with the Annex F band.*
 
+## 3. Occupancy noise and a different speech level
+
+A hall is measured out of hours, empty, with the test signal at whatever level
+the amplifier happened to be set to. The rating it has to meet is for the hall
+in use: an audience in the seats, and the announcement at its operational
+level. Annex M of IEC 60268-16 moves the measurement to that condition
+arithmetically, in four steps and without a second visit:
+
+1. **Acquire.** The modulation transfer matrix as measured, with the noise,
+   masking and threshold of the measurement still in it, together with the
+   speech and background-noise octave-band levels present while it was made.
+2. **Remove.** Divide out the correction those levels produce, stripping the
+   background noise, the auditory masking of Table A.2 and the reception
+   threshold of Table A.3 back out and leaving the transmission channel alone.
+3. **Reapply.** Multiply by the correction the operational levels produce,
+   putting the occupancy noise, masking and threshold of the simulated
+   condition in.
+4. **Process.** Run the resulting matrix through the A.5.4 to A.5.6 chain
+   into the index.
+
+Steps 2 and 3 are one correction inverted and then applied, which is what
+keeps the adjustment from drifting away from the masking and threshold model
+the forward measurement uses: it is that model, run backwards and then
+forwards.
+
+```python
+# `ir` and `fs` are the reverberant hall of this section, measured empty.
+# The Ed.5 male speech spectrum of clause A.6.1 at 68 dB overall, and the
+# empty hall's own ventilation noise, both in dB SPL per octave band.
+band_shape = np.array([-2.5, 0.5, 0.0, -6.0, -12.0, -18.0, -24.0])
+speech_empty = band_shape - 10 * np.log10(np.sum(10 ** (band_shape / 10))) + 68.0
+noise_empty = np.array([42.0, 36.0, 31.0, 28.0, 25.0, 23.0, 21.0])
+
+empty = speech.sti_from_impulse_response(
+    ir, fs, level=speech_empty, ambient=noise_empty
+)
+print(f"{empty.sti:.2f} ({empty.rating})")            # 0.60 (D)
+
+# The audience in, and the announcement left where it was.
+noise_occupied = np.array([54.0, 50.0, 47.0, 44.0, 40.0, 35.0, 30.0])
+occupied = empty.adjusted_for_levels(
+    operational_level=speech_empty, operational_ambient=noise_occupied
+)
+print(f"{occupied.sti:.2f} ({occupied.rating})")      # 0.56 (F)
+
+# The same room with the announcement 6 dB louder.
+louder = empty.adjusted_for_levels(
+    operational_level=speech_empty + 6.0, operational_ambient=noise_occupied
+)
+print(f"{louder.sti:.2f} ({louder.rating})")          # 0.59 (E)
+```
+
+The occupancy noise costs two rating letters, and six decibels of talker buys
+one of them back. That is the argument for doing this before the handover
+rather than after the complaint: the empty hall passed.
+
+`STIResult.adjusted_for_levels()` reads the measurement condition off the
+result, which is why it needs only the operational one and why it refuses a
+result computed without `level=`: such a result carries no correction to undo,
+and dividing one out anyway would silently lower the answer. Where the matrix
+comes from somewhere else, `speech.sti_adjusted_for_levels()` takes all four
+spectra beside it.
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `mtf` | (7, n) array | — | 0 to 1 | The matrix as measured, noise and masking included |
+| `measured_level` | 7-vector | dB SPL | required | Speech band levels during the measurement |
+| `measured_ambient` | 7-vector, optional | dB SPL | default `None` | Background-noise band levels during the measurement |
+| `operational_level` | 7-vector | dB SPL | required | Speech band levels of the condition simulated |
+| `operational_ambient` | 7-vector, optional | dB SPL | default `None` | Occupancy-noise band levels of that condition |
+
+> [!IMPORTANT]
+> **Which edition this is.** What the library implements is the Edition 4 (2011)
+> Annex M procedure, verified against the printed intermediates of its Table M.1
+> worked example rather than only against the STI it ends on: both 98-value MTF
+> matrices, every scalar row on the way to them, the effective SNRs, the band
+> MTI row and the index. The Edition 5 foreword records that Annex M was
+> *expanded* with alternative noise and level adjustments (item g), and the
+> Edition 5 text could not be obtained, so whether the current edition prints
+> further methods beside this one is not known here.
+
 ## See also
 
 - [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the measured impulse response the
@@ -410,7 +494,9 @@ Part 16: Objective rating of speech intelligibility by speech transmission
 index*: the modulation transfer function and the $m$ ↔ STI mapping, the STIPA
 test signal and direct method, the indirect method from the impulse response,
 auditory masking and the reception threshold (Tables A.2/A.3), the revised
-male speech spectrum (clause A.6.1) and the Annex F rating letters.
+male speech spectrum (clause A.6.1), the Annex F rating letters and, from the
+Edition 4 print, the Annex M adjustment of a measured result to occupancy
+noise and another speech level.
 
 ---
 

@@ -518,18 +518,136 @@ ANSIS3_5_WG_FLAT_CASES = (
 )
 
 # ---------------------------------------------------------------------------
-# Speech transmission index - IEC 60268-16 Annex M worked example (the "full
-# STI" calculation of a public-address system in a reverberant space). The
-# annex prints the adjusted MTF matrix without noise, masking and threshold
-# (step 2; rows are the 14 modulation frequencies 0,63 Hz to 12,5 Hz, columns
-# the 7 octave bands 125 Hz to 8 kHz), the operational speech and ambient
-# noise spectra it is combined with, and the resulting per-band modulation
-# transfer indices (step 4c) and STI. Reproducing the printed MTI row and STI
-# from the printed MTF exercises the whole clause A.5.3 to A.5.6 chain
-# (auditory masking, reception threshold, the SNR clamp, the MTI average and
-# the alpha/beta weighting).
+# Speech transmission index - IEC 60268-16 Annex M, Table M.1 "Example
+# calculation" (Ed.4, 2011, printed pp. 64-66): a measured STI adjusted to
+# simulate occupancy noise and a different speech level. The annex walks four
+# numbered steps and prints every intermediate, so each row below is one
+# printed row of that table, transcribed verbatim.
+#
+#   step 1  the signal and background-noise octave-band levels present during
+#           the measurement, and the MTF matrix measured with the noise,
+#           masking and threshold in it (rows are the 14 modulation
+#           frequencies 0,63 Hz to 12,5 Hz, columns the 7 octave bands 125 Hz
+#           to 8 kHz);
+#   step 2  the same correction the forward chain applies, divided out, which
+#           leaves the transmission channel alone;
+#   step 3  the correction of the operational speech and occupancy-noise
+#           levels, applied;
+#   step 4  the A.5.4 to A.5.6 processing into effective SNRs, band MTIs and
+#           the STI.
+#
+# Two scale conventions of the printed table matter when these rows are read
+# against a computed quantity, and both are recorded in docs/ERRATA.md. The
+# combined squared sound pressure I_k is tabulated in units of
+# IEC60268_16_ANNEX_M_INTENSITY_SCALE (a row labelled "MPa2"), while
+# I_am,k and I_rt,k in the same sum are tabulated unscaled; and the auditory
+# masking factor has no value in the 125 Hz band, which has no band below it
+# to be masked by, where the table prints "not applicable" and these rows
+# carry None.
 # ---------------------------------------------------------------------------
-IEC60268_16_ANNEX_M_MTF = (
+#: Units the "Combined squared sound pressure I_k" row is printed in, as a
+#: ratio to p0^2 = (20 uPa)^2. The rows it is added to are printed unscaled.
+IEC60268_16_ANNEX_M_INTENSITY_SCALE = 1e6
+
+# Step 1: acquire measurement data.
+IEC60268_16_ANNEX_M_MEASURED_LEVEL = (77.9, 77.9, 74.2, 68.2, 62.2, 56.2, 50.2)
+IEC60268_16_ANNEX_M_MEASURED_AMBIENT = (48.0, 40.0, 34.0, 30.0, 27.0, 25.0, 23.0)
+IEC60268_16_ANNEX_M_MEASURED_MTF = (
+    (0.982, 0.952, 0.960, 0.969, 0.979, 0.983, 0.994),
+    (0.966, 0.928, 0.941, 0.954, 0.969, 0.976, 0.992),
+    (0.945, 0.897, 0.914, 0.933, 0.955, 0.965, 0.989),
+    (0.919, 0.862, 0.881, 0.908, 0.939, 0.952, 0.984),
+    (0.884, 0.819, 0.836, 0.873, 0.915, 0.932, 0.978),
+    (0.850, 0.784, 0.793, 0.838, 0.890, 0.911, 0.971),
+    (0.815, 0.750, 0.749, 0.799, 0.862, 0.888, 0.961),
+    (0.772, 0.715, 0.716, 0.760, 0.832, 0.863, 0.950),
+    (0.740, 0.678, 0.691, 0.730, 0.800, 0.836, 0.938),
+    (0.724, 0.623, 0.665, 0.721, 0.772, 0.811, 0.926),
+    (0.713, 0.553, 0.643, 0.708, 0.745, 0.785, 0.913),
+    (0.669, 0.515, 0.611, 0.664, 0.720, 0.764, 0.901),
+    (0.590, 0.479, 0.545, 0.603, 0.693, 0.748, 0.890),
+    (0.553, 0.442, 0.513, 0.602, 0.678, 0.736, 0.881),
+)
+
+# Step 2: remove background noise, masking and threshold factors. The two
+# "adjustment" rows are reciprocals of the corresponding transfer factors,
+# which is how the annex writes a correction it is undoing.
+IEC60268_16_ANNEX_M_MEASURED_SNR = (29.90, 37.90, 40.20, 38.20, 35.20, 31.20, 27.20)
+IEC60268_16_ANNEX_M_MEASURED_NOISE_TRANSFER = (
+    0.999,
+    1.000,
+    1.000,
+    1.000,
+    1.000,
+    0.999,
+    0.998,
+)
+IEC60268_16_ANNEX_M_MEASURED_NOISE_ADJUSTMENT = (
+    1.001,
+    1.000,
+    1.000,
+    1.000,
+    1.000,
+    1.001,
+    1.002,
+)
+IEC60268_16_ANNEX_M_MEASURED_COMBINED_LEVEL = (
+    77.90,
+    77.90,
+    74.20,
+    68.20,
+    62.20,
+    56.20,
+    50.21,
+)
+IEC60268_16_ANNEX_M_MEASURED_MASKING_DB = (
+    None,
+    -20.8,
+    -20.8,
+    -22.7,
+    -25.7,
+    -33.9,
+    -36.9,
+)
+IEC60268_16_ANNEX_M_MEASURED_INTENSITY = (61.7, 61.7, 26.3, 6.61, 1.66, 0.417, 0.105)
+IEC60268_16_ANNEX_M_MEASURED_MASKING_MILLI = (
+    None,
+    8.22,
+    8.22,
+    5.37,
+    2.69,
+    0.407,
+    0.204,
+)
+IEC60268_16_ANNEX_M_MEASURED_INTENSITY_MASKING = (
+    0.0,
+    508_000.0,
+    507_000.0,
+    141_000.0,
+    17_800.0,
+    676.0,
+    85.2,
+)
+IEC60268_16_ANNEX_M_MEASURED_MASKING_THRESHOLD_ADJUSTMENT = (
+    1.001,
+    1.008,
+    1.019,
+    1.021,
+    1.011,
+    1.002,
+    1.001,
+)
+IEC60268_16_ANNEX_M_MEASURED_COMBINED_ADJUSTMENT = (
+    1.002,
+    1.008,
+    1.019,
+    1.022,
+    1.011,
+    1.002,
+    1.003,
+)
+#: Adjusted MTF matrix without noise, masking and threshold (step 2 output).
+IEC60268_16_ANNEX_M_SOURCE_MTF = (
     (0.983, 0.960, 0.978, 0.990, 0.990, 0.986, 0.997),
     (0.968, 0.936, 0.959, 0.974, 0.980, 0.979, 0.995),
     (0.947, 0.904, 0.931, 0.953, 0.966, 0.968, 0.992),
@@ -545,7 +663,138 @@ IEC60268_16_ANNEX_M_MTF = (
     (0.591, 0.483, 0.556, 0.615, 0.701, 0.749, 0.893),
     (0.554, 0.446, 0.523, 0.614, 0.685, 0.737, 0.884),
 )
-IEC60268_16_ANNEX_M_LEVEL = (82.9, 82.9, 79.2, 73.2, 67.2, 61.2, 55.2)
-IEC60268_16_ANNEX_M_AMBIENT = (55.5, 47.5, 41.5, 37.5, 34.5, 32.5, 30.5)
+
+#: Absolute speech reception threshold ART_k, printed once per step with the
+#: same values (Table A.2 of the same edition), and the intensity it becomes.
+#: The step 3 print of the 250 Hz cell reads 500 where step 2 reads 501; both
+#: are roundings of 10^2,7 = 501,19, at three and at two significant figures.
+IEC60268_16_ANNEX_M_ART_DB = (46.0, 27.0, 12.0, 6.5, 7.5, 8.0, 12.0)
+IEC60268_16_ANNEX_M_INTENSITY_THRESHOLD = (
+    40_000.0,
+    501.0,
+    15.8,
+    4.5,
+    5.6,
+    6.3,
+    15.8,
+)
+
+# Step 3: adjust for operational speech and occupancy-noise levels. The annex
+# prints these two as transfer factors, not as reciprocals, because here the
+# correction is being applied rather than undone.
+IEC60268_16_ANNEX_M_OPERATIONAL_LEVEL = (82.9, 82.9, 79.2, 73.2, 67.2, 61.2, 55.2)
+IEC60268_16_ANNEX_M_OPERATIONAL_AMBIENT = (55.5, 47.5, 41.5, 37.5, 34.5, 32.5, 30.5)
+IEC60268_16_ANNEX_M_OPERATIONAL_SNR = (27.40, 35.40, 37.70, 35.70, 32.70, 28.70, 24.70)
+IEC60268_16_ANNEX_M_OPERATIONAL_NOISE_TRANSFER = (
+    0.998,
+    1.000,
+    1.000,
+    1.000,
+    0.999,
+    0.999,
+    0.997,
+)
+IEC60268_16_ANNEX_M_OPERATIONAL_COMBINED_LEVEL = (
+    82.9,
+    82.9,
+    79.2,
+    73.2,
+    67.2,
+    61.2,
+    55.2,
+)
+IEC60268_16_ANNEX_M_OPERATIONAL_MASKING_DB = (
+    None,
+    -18.3,
+    -18.3,
+    -20.2,
+    -23.2,
+    -26.2,
+    -34.4,
+)
+IEC60268_16_ANNEX_M_OPERATIONAL_INTENSITY = (
+    195.0,
+    195.0,
+    83.2,
+    20.9,
+    5.25,
+    1.32,
+    0.332,
+)
+IEC60268_16_ANNEX_M_OPERATIONAL_MASKING_MILLI = (
+    None,
+    14.6,
+    14.6,
+    9.55,
+    4.79,
+    2.40,
+    0.363,
+)
+#: I_am,k of step 3. The 250 Hz cell is printed 2 850 000 where the quantity
+#: it names is 2 858 700; see docs/ERRATA.md, "IEC 60268-16:2011, Table M.1,
+#: step 3 I_am,k at 250 Hz".
+IEC60268_16_ANNEX_M_OPERATIONAL_INTENSITY_MASKING = (
+    0.0,
+    2_850_000.0,
+    2_850_000.0,
+    795_000.0,
+    100_000.0,
+    12_600.0,
+    480.0,
+)
+IEC60268_16_ANNEX_M_OPERATIONAL_MASKING_THRESHOLD_TRANSFER = (
+    1.000,
+    0.986,
+    0.967,
+    0.963,
+    0.981,
+    0.991,
+    0.999,
+)
+IEC60268_16_ANNEX_M_OPERATIONAL_COMBINED_ADJUSTMENT = (
+    0.998,
+    0.985,
+    0.967,
+    0.963,
+    0.981,
+    0.989,
+    0.995,
+)
+#: Adjusted MTF matrix for operational levels, masking and threshold.
+IEC60268_16_ANNEX_M_OPERATIONAL_MTF = (
+    (0.981, 0.946, 0.946, 0.953, 0.971, 0.975, 0.992),
+    (0.966, 0.922, 0.927, 0.938, 0.961, 0.968, 0.990),
+    (0.945, 0.891, 0.900, 0.918, 0.947, 0.957, 0.987),
+    (0.919, 0.856, 0.868, 0.893, 0.931, 0.944, 0.982),
+    (0.884, 0.814, 0.823, 0.859, 0.907, 0.925, 0.976),
+    (0.850, 0.779, 0.781, 0.824, 0.882, 0.904, 0.969),
+    (0.814, 0.745, 0.738, 0.786, 0.855, 0.881, 0.959),
+    (0.772, 0.710, 0.706, 0.747, 0.825, 0.856, 0.948),
+    (0.739, 0.674, 0.681, 0.718, 0.793, 0.829, 0.936),
+    (0.724, 0.619, 0.656, 0.709, 0.765, 0.804, 0.924),
+    (0.713, 0.549, 0.634, 0.696, 0.739, 0.778, 0.911),
+    (0.668, 0.512, 0.602, 0.653, 0.714, 0.757, 0.900),
+    (0.589, 0.476, 0.537, 0.593, 0.687, 0.741, 0.889),
+    (0.553, 0.439, 0.505, 0.592, 0.672, 0.729, 0.880),
+)
+
+# Step 4: process the MTF matrix to yield the STI (4a effective SNRs, 4b the
+# +/-15 dB clamp, 4c the transmission indices and the band MTIs).
+IEC60268_16_ANNEX_M_EFFECTIVE_SNR = (
+    (17.21, 12.44, 12.42, 13.09, 15.21, 15.93, 21.01),
+    (14.55, 10.73, 11.04, 11.83, 13.90, 14.83, 20.02),
+    (12.34, 9.13, 9.56, 10.47, 12.52, 13.50, 18.86),
+    (10.52, 7.74, 8.17, 9.22, 11.31, 12.30, 17.41),
+    (8.82, 6.41, 6.69, 7.84, 9.91, 10.88, 16.13),
+    (7.52, 5.47, 5.52, 6.71, 8.76, 9.73, 14.98),
+    (6.42, 4.66, 4.51, 5.64, 7.70, 8.69, 13.72),
+    (5.29, 3.89, 3.80, 4.71, 6.73, 7.75, 12.64),
+    (4.53, 3.16, 3.30, 4.06, 5.84, 6.87, 11.68),
+    (4.19, 2.11, 2.79, 3.87, 5.14, 6.12, 10.87),
+    (3.95, 0.85, 2.38, 3.60, 4.51, 5.44, 10.13),
+    (3.04, 0.21, 1.80, 2.74, 3.97, 4.94, 9.52),
+    (1.57, -0.42, 0.65, 1.63, 3.42, 4.57, 9.02),
+    (0.92, -1.06, 0.10, 1.61, 3.12, 4.31, 8.64),
+)
 IEC60268_16_ANNEX_M_MTI = (0.73, 0.66, 0.67, 0.71, 0.77, 0.80, 0.92)
 IEC60268_16_ANNEX_M_STI = 0.76
