@@ -99,6 +99,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   was worth 3.9, 4.2 and 3.6 dB and moved C_50-3150 from -1 to -2, so it
   changed the rating.
 
+- `speech.sti_adjusted_for_levels()` and `STIResult.adjusted_for_levels()`
+  answer what a hall measured empty would have scored with the audience in it
+  and the announcement at its operational level. A room is measured out of
+  hours at whatever level the test signal ran, and the rating it has to meet is
+  the one for the room in use; this is the four-step procedure of
+  IEC 60268-16 Annex M, which moves the measurement to that condition without a
+  second visit. The result is an ordinary `STIResult`, so `.plot()`,
+  `.report()` and `.rating` all read it.
+
+  The method form takes only the target condition, because the result now
+  carries the measurement condition itself: `STIResult` gained
+  `ambient_levels` beside the `band_levels` it always echoed, and it refuses a
+  result computed without `level=` rather than dividing out a correction that
+  was never applied. The function form takes the matrix and all four spectra,
+  for a matrix that came from somewhere else.
+
+  Steps 2 and 3 of the annex are one clause A.5.3 correction, inverted and then
+  applied, so the auditory masking of Table A.2 and the reception threshold of
+  Table A.3 keep the single implementation the forward chain already used and
+  the adjustment cannot drift away from the measurement it adjusts. A round
+  trip to the levels already measured returns the matrix.
+
+  Checked against the printed intermediates of the annex's Table M.1 worked
+  example rather than only the STI it ends on: both 98-value MTF matrices land
+  within one unit of the last printed place, every scalar row on the way to
+  them reproduces at the precision it is printed to, the effective SNRs agree
+  within 0.08 dB, the band MTI row is exact at the annex's own two decimals and
+  the index rounds to the printed 0.76. Three defects that reading turned up in
+  the printed table are recorded in `docs/ERRATA.md`.
+
+  What is implemented is the Edition 4 (2011) procedure. The Edition 5 foreword
+  records that Annex M was expanded with alternative noise and level
+  adjustments, and that text could not be obtained, so the guides say exactly
+  that instead of implying coverage of an edition nobody read.
+
 - `verify_weighting_class(wf, edition="1979")` grades a frequency weighting
   against IEC 651:1979 Table V, which publishes the laboratory-grade **Type 0**
   mask that IEC 61672-1:2013 has no equivalent for, plus Types 1, 2 and 3. The

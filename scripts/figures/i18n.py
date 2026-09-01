@@ -1161,6 +1161,16 @@ _ES_EXACT = {
     "Analytic Schroeder MTF (closed form)": "MTF de Schroeder anal\u00edtica (forma cerrada)",
     "Measured (sti_from_impulse_response)": "Medido (sti_from_impulse_response)",
     "Annex F rating": "Calificaci\u00f3n del Anexo F",
+    # sti_occupancy_adjustment: the Annex M adjustment of an empty-hall
+    # measurement, three conditions on one band axis. The STI of each is
+    # computed, so a legend entry that stops matching here is the language
+    # gate reporting that the figure moved.
+    "Annex M: what the empty hall would score with the audience in": "Anexo M: qu\u00e9 puntuar\u00eda la sala vac\u00eda con el p\u00fablico dentro",
+    "Modulation transfer index MTI": "\u00cdndice de transferencia de modulaci\u00f3n MTI",
+    "Measured empty: STI 0.60 (D)": "Medida en vac\u00edo: STI 0,60 (D)",
+    "Adjusted, audience in: STI 0.56 (F)": "Ajustada, con p\u00fablico: STI 0,56 (F)",
+    "Adjusted, audience in and talker +6 dB: STI 0.59 (E)": "Ajustada, con p\u00fablico y locutor +6 dB: STI 0,59 (E)",
+    "Change from the\nmeasured MTI": "Variaci\u00f3n respecto\nal MTI medido",
     "Measured": "Medido",
     "Octave-band center frequency [Hz]": "Frecuencia central de banda de octava [Hz]",
     "Octave-band sound pressure level [dB]": "Nivel de presi\u00f3n ac\u00fastica por banda de octava [dB]",

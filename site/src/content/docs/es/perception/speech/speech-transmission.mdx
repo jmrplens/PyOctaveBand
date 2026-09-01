@@ -628,10 +628,36 @@ por aritmética, en cuatro pasos y sin una segunda visita:
 4. **Procesar.** Pasar la matriz resultante por la cadena A.5.4 a A.5.6 hasta
    el índice.
 
-Los pasos 2 y 3 son una misma corrección invertida y después aplicada, que es
-lo que impide que el ajuste se separe del modelo de enmascaramiento y umbral
-que usa la medición directa: es ese modelo, recorrido hacia atrás y luego
-hacia delante.
+Sacar la condición vieja antes de meter la nueva no es ceremonia, y tampoco es
+una aproximación. La matriz medida es el producto de dos cosas, y solo una
+sobrevive al traslado: el canal de transmisión, la caída de la sala y la
+respuesta del sistema, es lo que tienen en común la medición en vacío y la
+predicción con público, mientras que el ruido, el enmascaramiento y el umbral
+pertenecen a la condición de escucha y se van con ella. Esos tres tampoco se
+pueden actualizar a partir de cuánto se han movido los niveles, porque ninguno
+es función de la variación. El enmascaramiento auditivo es una función a tramos
+del nivel combinado *absoluto* de la banda inferior, que cambia de pendiente en
+63 dB y otra vez en 67 dB y en 100 dB, y el umbral de recepción de la Tabla A.3
+es una intensidad absoluta que no se mueve en absoluto. Los dos hay que
+volver a deducirlos en los niveles nuevos, y dividir por la corrección vieja es
+lo que deja algo sobre lo que deducirlos.
+
+El atajo que estos dos pasos existen para prohibir es el tentador: volver a
+pasar la corrección de ruido sobre la matriz medida con los niveles de
+ocupación cuenta el ruido dos veces, porque el ruido de la propia medición ya
+está dentro. Conviene añadir dónde va el truncamiento. El canal que recupera el
+paso 2 puede superar 1,0 en una banda cuya corrección fuera fuerte, y no se
+acota entre pasos: el truncamiento de $m > 1$ de la NOTA 1 de A.5.3 es de la
+matriz que va a procesarse, que es la que produce el paso 3. El propio ejemplo
+del anexo no llega a probarlo, porque su matriz recuperada llega como mucho a
+0,997, pero una medición con una corrección más fuerte sí lo haría.
+
+Para la biblioteca los dos pasos son además un mismo trozo de código, que es la
+otra razón para mantenerlos separados. El paso 2 divide por el mismo factor del
+apartado A.5.3 por el que multiplica una medición directa, y el paso 3
+multiplica por él, así que el enmascaramiento de la Tabla A.2 y el umbral de la
+Tabla A.3 tienen una única implementación y el ajuste no puede separarse de la
+medición que ajusta.
 
 ```python
 # `ir` y `fs` son la sala reverberante de esta sección, medida vacía.
@@ -671,6 +697,106 @@ calculado sin `level=`: ese resultado no lleva ninguna corrección que deshacer,
 y dividir por una de todos modos bajaría la respuesta en silencio. Cuando la
 matriz viene de otro sitio, `speech.sti_adjusted_for_levels()` acepta los
 cuatro espectros junto a ella.
+
+Todo resultado que devuelve el ajuste es un `STIResult` corriente, así que la
+lectura por bandas de la sección 2 se le aplica igual, y merece la pena hacerla.
+El número único dice que la sala perdió dos letras; las bandas dicen dónde las
+perdió:
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_occupancy_adjustment_es.svg"
+  alt="Índice de transferencia de modulación por banda de octava de la misma sala en tres condiciones: medida en vacío (STI 0,60, calificación D), ajustada con público (STI 0,56, calificación F) y ajustada con público y el locutor 6 dB más alto (STI 0,59, calificación E); un panel inferior muestra la variación respecto del índice medido, máxima en 125 Hz, donde la condición ocupada pierde 0,07"
+  width="88%"
+/>
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import speech
+
+fs = 48000
+rng = np.random.default_rng(0)
+n = np.arange(fs)
+ir = rng.standard_normal(fs) * np.exp(-6.9078 * n / fs / 0.9)
+
+shape = np.array([-2.5, 0.5, 0.0, -6.0, -12.0, -18.0, -24.0])
+talker = shape - 10 * np.log10(np.sum(10 ** (shape / 10))) + 68.0
+empty_noise = np.array([42.0, 36.0, 31.0, 28.0, 25.0, 23.0, 21.0])
+full_noise = np.array([54.0, 50.0, 47.0, 44.0, 40.0, 35.0, 30.0])
+
+measured = speech.sti_from_impulse_response(ir, fs, level=talker, ambient=empty_noise)
+occupied = measured.adjusted_for_levels(
+    operational_level=talker, operational_ambient=full_noise
+)
+louder = measured.adjusted_for_levels(
+    operational_level=talker + 6.0, operational_ambient=full_noise
+)
+
+# En una línea: el resultado ajustado es un STIResult, así que dibuja sus barras.
+occupied.plot()
+plt.show()
+
+# A mano, las tres condiciones sobre un mismo eje de bandas:
+positions = np.arange(7)
+fig, ax = plt.subplots()
+for i, res in enumerate((measured, occupied, louder)):
+    ax.bar(positions + (i - 1) * 0.27, res.mti, width=0.27,
+           label=f"STI {res.sti:.2f} ({res.rating})")
+ax.set_xticks(positions)
+ax.set_xticklabels(["125", "250", "500", "1k", "2k", "4k", "8k"])
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Índice de transferencia de modulación MTI")
+ax.set_ylim(0.0, 0.95)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+La banda de 125 Hz es la que más cede, porque es donde el público suena más
+fuerte y donde el locutor tiene menos margen: unos 7 dB de relación
+habla-ruido ahí frente a 16 dB en 500 Hz. Los 6 dB de más devuelven entonces
+más donde más se perdió, casi nueve décimas de la pérdida de 125 Hz frente a
+alrededor de la mitad de la de 1 kHz. Ninguna de las dos cosas se ve en el
+índice.
+
+### Qué no puede decirte el ajuste
+
+- **Traslada la condición de escucha, no la sala.** El canal que recupera el
+  paso 2 se arrastra intacto, así que nada de lo que el público le hace a la
+  acústica está en la respuesta. Los cuerpos y la ropa absorben: el tiempo de
+  reverberación con la sala ocupada es más corto que en vacío, y el canal
+  ocupado es en realidad *mejor* que el medido. Una medición en vacío es
+  pesimista con la reverberación y optimista con el ruido, y esto solo corrige
+  lo segundo. Cuando el público cambia la absorción de forma apreciable, la vía
+  honesta es una respuesta al impulso de la sala ocupada, medida o predicha, y
+  aplicar el ajuste sobre ella.
+- **El nivel de habla operativo es un dato de entrada, no un pronóstico.** El
+  anexo dice cuál sería el STI si el locutor o el amplificador entregasen esos
+  niveles por banda. Si lo van a hacer es otra cuestión: un locutor real levanta
+  la voz con ruido, una cadena con limitador o con control automático de
+  ganancia no escala sin más, y un sistema al que se le piden 6 dB más puede
+  recortar en lugar de darlos, momento en el cual ya no es el canal lineal que
+  representa la matriz medida.
+- **El ruido que modela es estacionario.** El ruido de ocupación es murmullo:
+  fluctúa y, al tener forma espectral de habla, enmascara de maneras que una
+  intensidad sumada por banda de octava no representa. La advertencia de la
+  norma sobre el ruido fluctuante (apartado 7.13) vale para la condición que se
+  simula tanto como para la que se mide.
+- **Los espectros de la propia medición son lo que quita el paso 2.** Un
+  `measured_level` o un `measured_ambient` equivocados sacan la corrección
+  equivocada, y el paso 3 no tiene forma de notarlo; la matriz ajustada queda
+  entonces mal en una dirección que nada aguas abajo informa. Por eso
+  `STIResult.adjusted_for_levels()` los lee del propio resultado en vez de
+  volver a pedirlos.
+- **Sigue siendo una única posición de escucha.** Todos sus espectros son los
+  del micrófono, así que un resultado ajustado por ocupación responde por esa
+  butaca y por ninguna otra.
+
+### Parámetros de `sti_adjusted_for_levels()`
 
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |

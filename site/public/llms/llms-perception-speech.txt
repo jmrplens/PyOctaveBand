@@ -404,10 +404,35 @@ arithmetically, in four steps and without a second visit:
 4. **Process.** Run the resulting matrix through the A.5.4 to A.5.6 chain
    into the index.
 
-Steps 2 and 3 are one correction inverted and then applied, which is what
-keeps the adjustment from drifting away from the masking and threshold model
-the forward measurement uses: it is that model, run backwards and then
-forwards.
+Taking the old condition out before putting the new one in is not ceremony,
+and it is not an approximation either. The measured matrix is a product of two
+things, and only one of them survives the move: the transmission channel, the
+room's decay and the system's response, is what the empty measurement and the
+occupied prediction have in common, while the noise, the masking and the
+threshold belong to the listening condition and go with it. Those three cannot
+be updated from how far the levels moved, either, because none of them is a
+function of the change. Auditory masking is a piecewise function of the
+*absolute* combined level of the band below, changing slope at 63 dB and again
+at 67 dB and 100 dB, and the reception threshold of Table A.3 is an absolute
+intensity that does not move at all. Both have to be re-derived at the new
+levels, and dividing the old correction out is what leaves something to derive
+them for.
+
+The shortcut the two steps exist to forbid is the tempting one: running the
+noise correction over the measured matrix again with the occupancy levels
+counts the noise twice, because the measurement's own noise is already in
+there. Note also where the truncation goes. The channel step 2 recovers can
+exceed 1.0 in a band whose correction was strong, and it is not clamped between
+the steps: the $m > 1$ truncation of A.5.3 NOTE 1 is for the matrix about to be
+processed, which is the one step 3 produces. The annex's own example never
+tests that, its recovered matrix peaking at 0.997, but a measurement whose
+correction bites harder would.
+
+For the library the two steps are also one piece of code, which is the other
+reason to keep them apart. Step 2 divides by the same clause A.5.3 factor a
+forward measurement multiplies by and step 3 multiplies by it, so the masking
+of Table A.2 and the threshold of Table A.3 have a single implementation and
+the adjustment cannot drift away from the measurement it adjusts.
 
 ```python
 # `ir` and `fs` are the reverberant hall of this section, measured empty.
@@ -446,6 +471,99 @@ result computed without `level=`: such a result carries no correction to undo,
 and dividing one out anyway would silently lower the answer. Where the matrix
 comes from somewhere else, `speech.sti_adjusted_for_levels()` takes all four
 spectra beside it.
+
+Every result the adjustment returns is an ordinary `STIResult`, so the per-band
+reading of section 2 applies to it, and it is worth taking. The single number
+says the hall lost two letters; the bands say where it lost them:
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_occupancy_adjustment_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_occupancy_adjustment.svg" alt="Modulation transfer index per octave band for the same hall in three conditions: measured empty (STI 0.60, rating D), adjusted for the audience (STI 0.56, rating F) and adjusted for the audience with the talker 6 dB louder (STI 0.59, rating E); a lower panel shows the change from the measured index, largest at 125 Hz where the occupied condition loses 0.07" width="88%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import speech
+
+fs = 48000
+rng = np.random.default_rng(0)
+n = np.arange(fs)
+ir = rng.standard_normal(fs) * np.exp(-6.9078 * n / fs / 0.9)
+
+shape = np.array([-2.5, 0.5, 0.0, -6.0, -12.0, -18.0, -24.0])
+talker = shape - 10 * np.log10(np.sum(10 ** (shape / 10))) + 68.0
+empty_noise = np.array([42.0, 36.0, 31.0, 28.0, 25.0, 23.0, 21.0])
+full_noise = np.array([54.0, 50.0, 47.0, 44.0, 40.0, 35.0, 30.0])
+
+measured = speech.sti_from_impulse_response(ir, fs, level=talker, ambient=empty_noise)
+occupied = measured.adjusted_for_levels(
+    operational_level=talker, operational_ambient=full_noise
+)
+louder = measured.adjusted_for_levels(
+    operational_level=talker + 6.0, operational_ambient=full_noise
+)
+
+# One line: the adjusted result is an STIResult, so it draws its own bars.
+occupied.plot()
+plt.show()
+
+# By hand, the three conditions on one band axis:
+positions = np.arange(7)
+fig, ax = plt.subplots()
+for i, res in enumerate((measured, occupied, louder)):
+    ax.bar(positions + (i - 1) * 0.27, res.mti, width=0.27,
+           label=f"STI {res.sti:.2f} ({res.rating})")
+ax.set_xticks(positions)
+ax.set_xticklabels(["125", "250", "500", "1k", "2k", "4k", "8k"])
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Modulation transfer index MTI")
+ax.set_ylim(0.0, 0.95)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+The 125 Hz band gives up the most, because that is where the audience is
+loudest and the talker has least margin: about 7 dB of speech-to-noise there
+against 16 dB at 500 Hz. The extra 6 dB then gives back most where most was
+lost, nearly nine tenths of the 125 Hz loss against about half of the 1 kHz
+one. Neither of those is visible in the index.
+
+### What the adjustment cannot tell you
+
+- **It moves the listening condition, not the room.** The channel step 2
+  recovers is carried through untouched, so nothing an audience does to the
+  acoustics is in the answer. Bodies and clothing absorb: the occupied
+  reverberation time is shorter than the empty one, and the occupied channel is
+  in truth *better* than the one measured. An empty-hall measurement is
+  pessimistic about the reverberation and optimistic about the noise, and this
+  corrects only the second. Where the audience changes the absorption
+  materially, the honest route is an impulse response for the occupied room,
+  measured or predicted, with the adjustment applied to that.
+- **The operational speech level is an input, not a forecast.** The annex says
+  what the STI would be if the talker or the amplifier delivered those band
+  levels. Whether they will is a different question: a live talker lifts their
+  voice in noise, a chain with a limiter or automatic gain control does not
+  simply scale, and a system asked for 6 dB more may clip instead of delivering
+  it, at which point it is no longer the linear channel the measured matrix
+  stands for.
+- **The noise it models is steady.** Occupancy noise is babble, which
+  fluctuates and, being speech-shaped, masks in ways an intensity added per
+  octave band does not represent. The standard's caution about fluctuating
+  noise (clause 7.13) applies to the condition being simulated as much as to
+  the one being measured.
+- **The measurement's own spectra are what step 2 removes.** A wrong
+  `measured_level` or `measured_ambient` takes out the wrong correction, and
+  step 3 has no way to notice; the adjusted matrix is then wrong in a direction
+  nothing downstream reports. That is why `STIResult.adjusted_for_levels()`
+  reads them off the result instead of asking again.
+- **It is still one listener position.** Every spectrum in it is the one at the
+  microphone, so an occupancy-adjusted result answers for that seat and no
+  other.
+
+### `sti_adjusted_for_levels()` parameters
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
