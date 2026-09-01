@@ -39,9 +39,9 @@ output:
   fit did is legible. The corners the standard places low, where the warp is
   negligible, come back where they were printed: at 48 kHz the A weighting's
   double real pole at 20.598997 Hz comes back as a pair at
-  :math:`-20.5981 \pm 0.1905\,\mathrm{j}` Hz -- the same corner to five
+  :math:`-20.5981 \pm 0.1871\,\mathrm{j}` Hz -- the same corner to five
   digits, with a whisker of damping -- beside 107.657 for the printed
-  107.65265 and 737.268 for 737.86223. The corners near the top of the band
+  107.65265 and 737.269 for 737.86223. The corners near the top of the band
   move much further, and moving them is the whole point: that displacement is
   the warp being cancelled.
 * **The residual is in decibels.** The response enters only as
