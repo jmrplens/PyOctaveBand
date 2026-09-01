@@ -2109,6 +2109,26 @@ def test_a_non_finite_intensity_is_refused() -> None:
         emission.sound_power_intensity_points(intensity, areas)
 
 
+def test_a_wrong_length_residual_index_is_refused_by_name() -> None:
+    """The refusal names the field, not numpy's broadcast machinery.
+
+    Two values against three bands cannot broadcast, and the caller should be
+    told which argument is the wrong length and what length was expected,
+    rather than shown a shape error from an internal ``broadcast_to``.
+    """
+    areas = np.full(10, 1.0)
+    intensity = np.full((10, 3), 1.0e-5)
+    with pytest.raises(
+        ValueError, match=r"'pressure_residual_index' must be a scalar or carry"
+    ):
+        emission.sound_power_intensity_points(
+            intensity,
+            areas,
+            pressure_levels=np.full((10, 3), 80.0),
+            pressure_residual_index=np.array([18.0, 18.0]),
+        )
+
+
 def test_a_non_finite_pressure_level_is_refused() -> None:
     """The same for the levels F2 and F3 are built from."""
     areas = np.full(10, 1.0)
