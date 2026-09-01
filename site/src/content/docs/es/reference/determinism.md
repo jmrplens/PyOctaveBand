@@ -147,8 +147,9 @@ print(digest[:16])                                       # 991833ff389afe91 en L
 
 La segunda línea es la clave: esos dieciséis dígitos hexadecimales, la
 cabeza del SHA-256, no son «lo que salió en mi máquina», son el digest de la
-ponderación A a 48&nbsp;kHz de esta versión en cualquier máquina Linux, y la
-evidencia de arriba da los valores que esperar en macOS y Windows. Si una
+ponderación A a 48&nbsp;kHz de esta versión en cualquier máquina Linux con
+glibc en x86-64, la pata que fija la matriz de CI, y la evidencia de arriba da
+los valores que esperar en macOS y Windows. Si una
 versión futura mueve un coeficiente a propósito, el digest se mueve con ella
 y el cambio es un suceso documentado, nunca una propiedad de tu hardware.
 

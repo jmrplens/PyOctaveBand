@@ -1019,16 +1019,18 @@ def test_the_design_is_paid_for_once_per_curve_rate_and_mode() -> None:
 
 
 #: The head of the SHA-256 of the A weighting designed at 48 kHz, per platform
-#: the CI matrix runs, keyed by ``platform.system()`` and ``platform.machine()``.
-#: Within a platform the bytes are the same on every machine, which is what the
-#: rest of this module pins; across platforms they differ, because a handful of
-#: transcendentals are still taken from the C library once per design, and this
-#: table is that measurement. The Linux value is the one the determinism guide
-#: prints.
+#: the CI matrix runs, keyed by ``platform.system()``, ``platform.machine()`` and
+#: the C library ``platform.libc_ver()`` names (glibc on the Linux image; the
+#: other two report no name). Within one C library the bytes are the same on
+#: every machine, which is what the rest of this module pins; across C libraries
+#: they differ, because a handful of transcendentals are still taken from the
+#: C library once per design, and this table is that measurement. A musl Linux
+#: is not in the table and skips rather than being held to glibc's value. The
+#: Linux value is the one the determinism guide prints.
 _DOCUMENTED_A48K_DIGESTS = {
-    ("Linux", "x86_64"): "991833ff389afe91",
-    ("Darwin", "arm64"): "4efa1818bd80e23a",
-    ("Windows", "AMD64"): "79852a57e60961c8",
+    ("Linux", "x86_64", "glibc"): "991833ff389afe91",
+    ("Darwin", "arm64", ""): "4efa1818bd80e23a",
+    ("Windows", "AMD64", ""): "79852a57e60961c8",
 }
 
 
@@ -1039,7 +1041,7 @@ def test_the_documented_a_weighting_digest_is_the_platforms_own() -> None:
     the design still takes from the C library, and that is worth a red build
     rather than a silently different filter.
     """
-    key = (platform.system(), platform.machine())
+    key = (platform.system(), platform.machine(), platform.libc_ver()[0])
     if key not in _DOCUMENTED_A48K_DIGESTS:
         pytest.skip(f"no pinned digest for {key}")
     sos = filters.WeightingFilter(48000, "A").sos

@@ -137,8 +137,9 @@ print(digest[:16])                                       # 991833ff389afe91 on L
 
 The second line is the point: those sixteen hex digits, the head of the
 SHA-256, are not "what my machine got", they are the digest of this release's
-A weighting at 48&nbsp;kHz on any Linux machine, and the evidence above gives
-the macOS and Windows values to expect. If a future release moves a
+A weighting at 48&nbsp;kHz on any glibc Linux machine on x86-64, the leg the
+CI matrix pins, and the evidence above gives the macOS and Windows values to
+expect. If a future release moves a
 coefficient deliberately, the digest moves with it and the change is a
 documented event, never a property of your hardware.
 
