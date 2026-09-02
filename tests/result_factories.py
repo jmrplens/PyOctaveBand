@@ -84,6 +84,24 @@ def _reverb_power() -> ph.emission.ReverberationSoundPowerResult:
     return ph.emission.sound_power_reverberation(lp, t60, 200.0, 220.0, freqs)
 
 
+def _sound_energy() -> ph.emission.SoundEnergyResult:
+    freqs = np.array([250.0, 500.0, 1000.0, 2000.0])
+    r = 2.0
+    s = 2.0 * np.pi * r**2
+    lj_bands = np.array([100.0, 102.0, 105.0, 103.0])
+    levels = np.tile(lj_bands - 10.0 * np.log10(s), (10, 1))
+    return ph.emission.sound_energy_pressure(
+        levels, "hemisphere", radius=r, frequencies=freqs
+    )
+
+
+def _reverb_energy() -> ph.emission.ReverberationSoundEnergyResult:
+    freqs = np.array([250.0, 500.0, 1000.0, 2000.0])
+    t60 = np.array([1.6, 1.5, 1.4, 1.1])
+    le = np.tile(np.array([90.0, 92.0, 94.0, 91.0]), (6, 1))
+    return ph.emission.sound_energy_reverberation(le, t60, 200.0, 220.0, freqs)
+
+
 def _intensity_power_negative() -> ph.emission.SoundPowerIntensityResult:
     areas = np.array([0.5, 0.5, 0.5, 0.5])
     # band 0 positive net, band 1 all-negative net (external source).

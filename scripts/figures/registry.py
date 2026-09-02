@@ -169,6 +169,7 @@ from .devices import (
     generate_silencer_insertion_loss,
     generate_silencer_selection,
     generate_silencer_side_branch,
+    generate_sound_energy_burst,
     generate_sound_power_grades_declaration,
     generate_sound_power_intensity_result,
     generate_sound_power_pressure_result,
@@ -784,6 +785,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # (ISO 3744 enveloping surface, ISO 3741 reverberation room,
     # ISO 9614-2 intensity scanning)
     generate_sound_power_pressure_result,
+    generate_sound_energy_burst,
     generate_sound_power_reverberation_result,
     generate_sound_power_intensity_result,
     # ISO 9614-1 discrete points: the criterion-2 position budget per band and

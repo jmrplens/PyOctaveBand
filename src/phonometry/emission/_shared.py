@@ -295,4 +295,4 @@ def _background_exposure(
     if not np.all(np.isfinite(bg)):
         msg = "'background_levels' must contain only finite values."
         raise ValueError(msg)
-    return bg + 10.0 * np.log10(t / _T0)
+    return np.asarray(bg + 10.0 * np.log10(t / _T0), dtype=np.float64)
