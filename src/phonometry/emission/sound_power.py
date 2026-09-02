@@ -247,6 +247,12 @@ _MIN_HEMI_POSITIONS: dict[str, dict[int, int]] = {
 #: positions for rectangular partial areas); ISO 3746 clause C.1, Figure C.7 (4
 #: positions for a floor-standing source on one reflecting plane).
 _MIN_BOX_POSITIONS: dict[str, int] = {"engineering": 9, "survey": 4}
+
+#: Refusal for the number of reflecting planes bounding the measurement
+#: surface. Named because the three entry points that take it must refuse it
+#: in the same words: a caller who reads one message and then meets another
+#: for the same mistake has to work out whether it is the same mistake.
+_REFLECTING_PLANES_MSG = "'reflecting_planes' must be 1, 2 or 3."
 #: Typical A-weighted reproducibility standard deviation sigma_R0, in dB.
 #: ISO 3744 Table 2 (1,5); ISO 3746 Table 1 (3,0, tone-free). Table 2 states
 #: its values "for sound power levels and sound energy levels" alike, and
@@ -758,7 +764,7 @@ def measurement_positions(
         msg = "A positive 'radius' is required for a hemisphere."
         raise ValueError(msg)
     if reflecting_planes not in (1, 2, 3):
-        msg = "'reflecting_planes' must be 1, 2 or 3."
+        msg = _REFLECTING_PLANES_MSG
         raise ValueError(msg)
     grade = _check_grade(grade)
     table, index = _hemisphere_position_table(grade, reflecting_planes, tones)
@@ -1001,7 +1007,7 @@ def sound_power_pressure(
 
     # --- measurement surface area -----------------------------------------
     if reflecting_planes not in (1, 2, 3):
-        msg = "'reflecting_planes' must be 1, 2 or 3."
+        msg = _REFLECTING_PLANES_MSG
         raise ValueError(msg)
     area, min_positions = _measurement_surface(
         surface, radius, dimensions, distance, reflecting_planes, grade
@@ -1476,7 +1482,7 @@ def sound_energy_pressure(
 
     # --- measurement surface area (clause 7.2, as for LW) -----------------
     if reflecting_planes not in (1, 2, 3):
-        msg = "'reflecting_planes' must be 1, 2 or 3."
+        msg = _REFLECTING_PLANES_MSG
         raise ValueError(msg)
     area, min_positions = _measurement_surface(
         surface, radius, dimensions, distance, reflecting_planes, grade
