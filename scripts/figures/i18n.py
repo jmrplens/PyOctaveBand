@@ -1067,6 +1067,24 @@ _ES_EXACT = {
     "$A$ known to ±20 %": "$A$ conocida a ±20 %",
     # reverberation_correction_terms: ISO 3741 Eq. 20, term by term
     "The five terms of ISO 3741 Eq. 20": "Los cinco términos de la Ec. 20 de ISO 3741",
+    # in_duct_flow_correction and sound_power_in_duct_result: ISO 5136,
+    # the sampling-tube correction and the in-duct spectrum of a fan.
+    "Correction $C_{3,4}$ [dB]": "Corrección $C_{3,4}$ [dB]",
+    "Sampling-tube correction $C_{3,4}$ (ISO 5136), $d$ = 0.5 m": "Corrección del tubo de muestreo $C_{3,4}$ (ISO 5136), $d$ = 0,5 m",
+    "The same correction against the flow velocity": "La misma corrección frente a la velocidad del flujo",
+    "Mean flow velocity $U$ [m/s]": "Velocidad media del flujo $U$ [m/s]",
+    "Outlet, $U$ = +5 m/s": "Impulsión, $U$ = +5 m/s",
+    "Outlet, $U$ = +15 m/s": "Impulsión, $U$ = +15 m/s",
+    "Outlet, $U$ = +30 m/s": "Impulsión, $U$ = +30 m/s",
+    "Inlet, $U$ = \u22125 m/s": "Aspiración, $U$ = \u22125 m/s",
+    "Inlet, $U$ = \u221215 m/s": "Aspiración, $U$ = \u221215 m/s",
+    "Inlet, $U$ = \u221230 m/s": "Aspiración, $U$ = \u221230 m/s",
+    "12.5 kHz to 20 kHz:\nfor information only": "12,5 kHz a 20 kHz:\nsolo a título informativo",
+    "Nose cone and foam ball, Eq. (8)": "Cono aerodinámico y bola de espuma, Ec. (8)",
+    "Inlet side": "Lado de aspiración",
+    "Outlet side": "Lado de impulsión",
+    "Sound power level $L_W$": "Nivel de potencia acústica $L_W$",
+    "Measured in-duct level, before the corrections": "Nivel medido en el conducto, antes de las correcciones",
     "Contribution to $L_W - \\bar{L}_p$ [dB]": "Aportación a $L_W - \\bar{L}_p$ [dB]",
     "Waterhouse": "Waterhouse",
     "the Waterhouse term rules the low bands\n"
@@ -4567,6 +4585,16 @@ _ES_PATTERNS = [
         ),
         (
             r"Potencia acústica de precisión (ISO 3745)  "
+            r"$L_{W\\!\\mathrm{A}}$ = \1,\2 dB(A)"
+        ),
+    ),
+    (
+        (
+            r"^In-duct sound power \(ISO 5136\)  "
+            r"\$L_\{W\\!\\mathrm\{A\}\}\$ = (\d+)\.(\d+) dB\(A\)$"
+        ),
+        (
+            r"Potencia acústica en conducto (ISO 5136)  "
             r"$L_{W\\!\\mathrm{A}}$ = \1,\2 dB(A)"
         ),
     ),

@@ -235,7 +235,11 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`emission.sound_power_intensity`](/phonometry/reference/api/power/sound-power-intensity/) | Sound power level of a noise source by sound-intensity **scanning**: ISO 9614-2:1996 (engineering, grade 2; survey/control, grade 3) and ISO 9614-3:2002 (precision, grade 1). |
 | [`emission.sound_power_intensity_points`](/phonometry/reference/api/power/sound-power-intensity-points/) | Sound power level of a noise source from sound intensity measured at **discrete points**: ISO 9614-1:1993. |
 | [`emission.sound_power_reverberation`](/phonometry/reference/api/power/sound-power-reverberation/) | Sound power level of a noise source measured in a reverberation test room: ISO 3741:2010 (precision method, accuracy grade 1). |
+<<<<<<< HEAD
 | [`emission.sound_power_in_situ`](/phonometry/reference/api/power/sound-power-in-situ/) | Sound power and sound energy levels of a noise source determined in situ by comparison with a reference sound source: ISO 3747:2010 (engineering grade 2 and survey grade 3). |
+=======
+| [`emission.sound_power_in_duct`](/phonometry/reference/api/power/sound-power-in-duct/) | Sound power radiated into a duct by a fan, in-duct method: ISO 5136:2003. |
+>>>>>>> 3543f9990 (Draw the sampling-tube correction and the in-duct spectrum, and count the new checks)
 | [`emission.intensity`](/phonometry/reference/api/power/intensity/) | Two-microphone (p-p) sound intensity per IEC 61043:1993 and the ISO 9614-1:1993 field indicators. |
 | [`emission.intensity_compliance`](/phonometry/reference/api/power/intensity-compliance/) | IEC 61043:1993 sound-intensity instrument class verification. |
 | [`emission.vibration_sound_power`](/phonometry/reference/api/power/vibration-sound-power/) | Airborne sound power from surface vibration (ISO/TS 7849-1/-2:2009). |

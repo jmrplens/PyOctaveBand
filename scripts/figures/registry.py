@@ -124,6 +124,7 @@ from .devices import (
     generate_helmholtz_branch_geometry,
     generate_hvac_elbow_flow_noise,
     generate_hvac_end_reflection,
+    generate_in_duct_flow_correction,
     generate_in_situ_sound_power,
     generate_intensity_class,
     generate_intensity_demo,
@@ -171,6 +172,7 @@ from .devices import (
     generate_silencer_side_branch,
     generate_sound_energy_burst,
     generate_sound_power_grades_declaration,
+    generate_sound_power_in_duct_result,
     generate_sound_power_intensity_result,
     generate_sound_power_pressure_result,
     generate_sound_power_reverberation_result,
@@ -790,6 +792,10 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_sound_power_intensity_result,
     # ISO 9614-1 discrete points: the criterion-2 position budget per band and
     # the Formula (B.3) interval the same F4 opens.
+    # ISO 5136 in-duct method: the sampling-tube correction C3,4 against
+    # frequency and flow velocity, and the LW spectrum of a ducted fan.
+    generate_in_duct_flow_correction,
+    generate_sound_power_in_duct_result,
     generate_discrete_point_qualification,
     # ISO 3747 in situ comparison: the per-position levels of both sources
     # after K1, and the LW they yield with the RSS calibration beside it.
