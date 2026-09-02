@@ -3605,7 +3605,6 @@ in the same order.
 
 ---
 
-<<<<<<< HEAD
 ## ISO 3747:2010, E.4.2.6.2 (the sign of the direct-field level)
 
 - **Location:** Annex E (informative), E.4.2.6.2 "Excess sound pressure,
@@ -3755,7 +3754,7 @@ in the same order.
 - **Library behaviour:** the Annex E uncertainty budget is not modelled, so no
   library number depends on it. Recorded so that a future reader chasing the
   derivation is not sent to the wrong equation.
-=======
+
 ## ISO 5136:2003, Table A.5, 5 000 Hz row (the leading digit of $a_3$ is missing)
 
 - **Location:** Annex A, Table A.5, "Values of coefficients $a_i$ for the
@@ -3929,7 +3928,6 @@ in the same order.
   scope the standard states for itself (0,15 m to 2 m) and are not
   implemented; a duct above 2 m is refused. Recorded so that an
   implementation of Annex I does not carry the exponents as printed.
->>>>>>> c39554cb2 (Explain the in-duct method, and file what its print gets wrong)
 - **Status:** unreported.
 
 ## Related source properties that are not errata
@@ -4010,7 +4008,6 @@ published sources:
   3 prints a *Sum* of 49 dB at 500 Hz where $76 - 28 = 48$, then a *Combined*
   consistent with 48), which is why the comparison runs at the 1 dB the
   printed sheet carries.
-<<<<<<< HEAD
 - **ISO 3747:2010 Table E.1, the accuracy-grade labels:** the informative
   table of worked $\sigma_\mathrm{tot}$ examples labels its three rows
   "0,5 (accuracy grade 1)", "1,5 (accuracy grade 2)" and "3 (accuracy
@@ -4049,7 +4046,7 @@ published sources:
   Eq. (14) as printed by default and offers `integration_time` on
   [`sound_energy_in_situ`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_in_situ.py)
   to carry the background to the event's interval first.
-=======
+
 - **ISO 5136:2003, clause 5.3.4.3, the sign of Equation (8):** the clause
   says the corrections of the nose cone and the foam ball "are estimated to
   be negative and of small magnitude", and then prints
@@ -4071,6 +4068,5 @@ published sources:
   implements as printed and `test_eq8_omnidirectional_shields` in
   [`tests/emission/test_sound_power_in_duct.py`](https://github.com/jmrplens/phonometry/blob/main/tests/emission/test_sound_power_in_duct.py)
   pins.
->>>>>>> bdeca2b98 (Refuse the corner of Annex A that has no coefficients, and put the page right)
 
 <!-- END GENERATED BODY -->

@@ -3,22 +3,13 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-<<<<<<< HEAD
-    "checks": 600,
-    "passing": 600,
+    "checks": 606,
+    "passing": 606,
     "failing": 0,
     "domains": 59,
-    "standards": 375,
-    "citations": 536,
-=======
-    "checks": 591,
-    "passing": 591,
-    "failing": 0,
-    "domains": 59,
-    "standards": 375,
-    "citations": 527,
->>>>>>> 3543f9990 (Draw the sampling-tube correction and the in-duct spectrum, and count the new checks)
-    "designations": 116,
+    "standards": 376,
+    "citations": 542,
+    "designations": 117,
     "sources": 84
   },
   "units": [
@@ -124,13 +115,8 @@
     {
       "id": "intensity-sound-power",
       "title": "Intensity & sound power",
-<<<<<<< HEAD
-      "checks": 31,
-      "passing": 31
-=======
-      "checks": 22,
-      "passing": 22
->>>>>>> 3543f9990 (Draw the sampling-tube correction and the in-duct spectrum, and count the new checks)
+      "checks": 37,
+      "passing": 37
     },
     {
       "id": "building-prediction-uncertainty",
@@ -3290,7 +3276,6 @@
       "verdict": "pass"
     },
     {
-<<<<<<< HEAD
       "id": "intensity-sound-power/iso-3747-2010-9-5-example/expanded-uncertainty-u-2-sqrt-1-5-2-2-2-db-grade-2-with-sigma-omc-2-0-db",
       "domain": "intensity-sound-power",
       "reference": {
@@ -3376,57 +3361,6 @@
       },
       "computed": {
         "value": 0.0
-=======
-      "id": "intensity-sound-power/iso-5136-2003-table-d-1/c3-4-of-the-sampling-tube-for-d-0-5-m-at-u-5-15-30-m-s-27-bands",
-      "domain": "intensity-sound-power",
-      "reference": {
-        "kind": "standard",
-        "designation": "ISO 5136",
-        "edition": "2003",
-        "clause": "Table D.1",
-        "cite": "ISO 5136:2003 Table D.1"
-      },
-      "quantity": "C3,4 of the sampling tube for d = 0,5 m at U = +/-5, +/-15, +/-30 m/s, 27 bands",
-      "kind": "scalar",
-      "expected": {
-        "value": 0.0,
-        "label": "162 tabulated values reproduced to the printed 0,1 dB"
-      },
-      "computed": {
-        "value": 0.049,
-        "label": "max absolute deviation 0.049 dB"
-      },
-      "unit": "dB",
-      "tolerance": {
-        "mode": "absolute",
-        "value": 0.05
-      },
-      "deviation": {
-        "value": 0.049
-      },
-      "precision": 3,
-      "verdict": "pass"
-    },
-    {
-      "id": "intensity-sound-power/iso-5136-2003-eqs-d-2-d-3/worked-example-c3-4-1-85-0-038-u-db-at-1-khz-u-15-and-15-m-s",
-      "domain": "intensity-sound-power",
-      "reference": {
-        "kind": "standard",
-        "designation": "ISO 5136",
-        "edition": "2003",
-        "clause": "Eqs (D.2)/(D.3)",
-        "cite": "ISO 5136:2003 Eqs (D.2)/(D.3)"
-      },
-      "quantity": "Worked example: C3,4 = (1,85 + 0,038 U) dB at 1 kHz, U = +15 and -15 m/s",
-      "kind": "scalar",
-      "expected": {
-        "value": 0.0,
-        "label": "2,42 dB at +15 m/s and 1,28 dB at -15 m/s reproduced"
-      },
-      "computed": {
-        "value": 0.0,
-        "label": "max absolute deviation 0.0e+00 dB"
->>>>>>> 3543f9990 (Draw the sampling-tube correction and the in-duct spectrum, and count the new checks)
       },
       "unit": "dB",
       "tolerance": {
@@ -3440,7 +3374,6 @@
       "verdict": "pass"
     },
     {
-<<<<<<< HEAD
       "id": "intensity-sound-power/iso-3747-2010-eq-11-vs-iso-3741-2010-eq-21/in-situ-comparison-plus-c2-equals-the-reverberation-room-comparison-closed-form",
       "domain": "intensity-sound-power",
       "reference": {
@@ -3458,24 +3391,6 @@
       },
       "computed": {
         "value": 1.42e-14
-=======
-      "id": "intensity-sound-power/iso-5136-2003-eq-8/nose-cone-foam-ball-correction-10-lg-1-1-u-c-2-at-u-20-m-s-c-340-m-s",
-      "domain": "intensity-sound-power",
-      "reference": {
-        "kind": "standard",
-        "designation": "ISO 5136",
-        "edition": "2003",
-        "clause": "Eq. (8)",
-        "cite": "ISO 5136:2003 Eq. (8)"
-      },
-      "quantity": "Nose-cone / foam-ball correction 10 lg[1/(1 - U/c)^2] at U = 20 m/s, c = 340 m/s",
-      "kind": "scalar",
-      "expected": {
-        "value": 0.5265787744469831
-      },
-      "computed": {
-        "value": 0.52658
->>>>>>> 3543f9990 (Draw the sampling-tube correction and the in-duct spectrum, and count the new checks)
       },
       "unit": "dB",
       "tolerance": {
@@ -3483,7 +3398,6 @@
         "value": 1e-09
       },
       "deviation": {
-<<<<<<< HEAD
         "value": 1.42e-14
       },
       "precision": 9,
@@ -3507,35 +3421,10 @@
       },
       "computed": {
         "value": 0.0
-=======
-        "value": -2.22e-16
-      },
-      "precision": 5,
-      "verdict": "pass"
-    },
-    {
-      "id": "intensity-sound-power/iso-5136-2003-eq-12/plane-wave-relation-lw-lp-10-lg-s-s0-10-lg-rho-c-400-d-0-5-m",
-      "domain": "intensity-sound-power",
-      "reference": {
-        "kind": "standard",
-        "designation": "ISO 5136",
-        "edition": "2003",
-        "clause": "Eq. (12)",
-        "cite": "ISO 5136:2003 Eq. (12)"
-      },
-      "quantity": "Plane-wave relation LW - Lp = 10 lg(S/S0) - 10 lg(rho c/400), d = 0,5 m",
-      "kind": "scalar",
-      "expected": {
-        "value": -7.211274684563609
-      },
-      "computed": {
-        "value": -7.2113
->>>>>>> 3543f9990 (Draw the sampling-tube correction and the in-duct spectrum, and count the new checks)
       },
       "unit": "dB",
       "tolerance": {
         "mode": "absolute",
-<<<<<<< HEAD
         "value": 1e-09
       },
       "deviation": {
@@ -3628,18 +3517,11 @@
       },
       "deviation": {
         "value": 0.0
-=======
-        "value": 1e-06
-      },
-      "deviation": {
-        "value": -1.07e-14
->>>>>>> 3543f9990 (Draw the sampling-tube correction and the in-duct spectrum, and count the new checks)
       },
       "precision": 4,
       "verdict": "pass"
     },
     {
-<<<<<<< HEAD
       "id": "intensity-sound-power/iso-3747-2010-table-d-1-eq-d-1/lwa-of-a-flat-90-db-octave-spectrum-63-hz-to-8-khz-with-the-printed-ck",
       "domain": "intensity-sound-power",
       "reference": {
@@ -3656,7 +3538,168 @@
       },
       "computed": {
         "value": 96.9871
-=======
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": -1.42e-14
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-3747-2010-eq-a-1/excess-over-the-spherical-free-field-lp-lw-11-20-lg-r-r0-a-level-7-db-above-it-reads-dlf-7-db",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3747",
+        "edition": "2010",
+        "clause": "Eq. A.1",
+        "cite": "ISO 3747:2010 Eq. A.1"
+      },
+      "quantity": "Excess over the spherical free field Lp = LW - 11 - 20 lg(r/r0): a level 7 dB above it reads dLf = 7 dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 7.0
+      },
+      "computed": {
+        "value": 7.0
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": -1.78e-15
+      },
+      "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-5136-2003-table-d-1/c3-4-of-the-sampling-tube-for-d-0-5-m-at-u-5-15-30-m-s-27-bands",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 5136",
+        "edition": "2003",
+        "clause": "Table D.1",
+        "cite": "ISO 5136:2003 Table D.1"
+      },
+      "quantity": "C3,4 of the sampling tube for d = 0,5 m at U = +/-5, +/-15, +/-30 m/s, 27 bands",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "162 tabulated values reproduced to the printed 0,1 dB"
+      },
+      "computed": {
+        "value": 0.049,
+        "label": "max absolute deviation 0.049 dB"
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.049
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-5136-2003-eqs-d-2-d-3/worked-example-c3-4-1-85-0-038-u-db-at-1-khz-u-15-and-15-m-s",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 5136",
+        "edition": "2003",
+        "clause": "Eqs (D.2)/(D.3)",
+        "cite": "ISO 5136:2003 Eqs (D.2)/(D.3)"
+      },
+      "quantity": "Worked example: C3,4 = (1,85 + 0,038 U) dB at 1 kHz, U = +15 and -15 m/s",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "2,42 dB at +15 m/s and 1,28 dB at -15 m/s reproduced"
+      },
+      "computed": {
+        "value": 0.0,
+        "label": "max absolute deviation 0.0e+00 dB"
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 9,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-5136-2003-eq-8/nose-cone-foam-ball-correction-10-lg-1-1-u-c-2-at-u-20-m-s-c-340-m-s",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 5136",
+        "edition": "2003",
+        "clause": "Eq. (8)",
+        "cite": "ISO 5136:2003 Eq. (8)"
+      },
+      "quantity": "Nose-cone / foam-ball correction 10 lg[1/(1 - U/c)^2] at U = 20 m/s, c = 340 m/s",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.5265787744469831
+      },
+      "computed": {
+        "value": 0.52658
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": -2.22e-16
+      },
+      "precision": 5,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-5136-2003-eq-12/plane-wave-relation-lw-lp-10-lg-s-s0-10-lg-rho-c-400-d-0-5-m",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 5136",
+        "edition": "2003",
+        "clause": "Eq. (12)",
+        "cite": "ISO 5136:2003 Eq. (12)"
+      },
+      "quantity": "Plane-wave relation LW - Lp = 10 lg(S/S0) - 10 lg(rho c/400), d = 0,5 m",
+      "kind": "scalar",
+      "expected": {
+        "value": -7.211274684563609
+      },
+      "computed": {
+        "value": -7.2113
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-06
+      },
+      "deviation": {
+        "value": -1.07e-14
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
       "id": "intensity-sound-power/iso-5136-2003-table-2-table-3/reproducibility-sigma-r-per-band-50-hz-to-10-khz-and-the-extrapolated-12-5-to-20-khz",
       "domain": "intensity-sound-power",
       "reference": {
@@ -3706,7 +3749,6 @@
       "computed": {
         "value": 5.77e-15,
         "label": "max absolute deviation 5.8e-15 dB"
->>>>>>> 3543f9990 (Draw the sampling-tube correction and the in-duct spectrum, and count the new checks)
       },
       "unit": "dB",
       "tolerance": {
@@ -3714,44 +3756,9 @@
         "value": 1e-09
       },
       "deviation": {
-<<<<<<< HEAD
-        "value": -1.42e-14
-      },
-      "precision": 4,
-      "verdict": "pass"
-    },
-    {
-      "id": "intensity-sound-power/iso-3747-2010-eq-a-1/excess-over-the-spherical-free-field-lp-lw-11-20-lg-r-r0-a-level-7-db-above-it-reads-dlf-7-db",
-      "domain": "intensity-sound-power",
-      "reference": {
-        "kind": "standard",
-        "designation": "ISO 3747",
-        "edition": "2010",
-        "clause": "Eq. A.1",
-        "cite": "ISO 3747:2010 Eq. A.1"
-      },
-      "quantity": "Excess over the spherical free field Lp = LW - 11 - 20 lg(r/r0): a level 7 dB above it reads dLf = 7 dB",
-      "kind": "scalar",
-      "expected": {
-        "value": 7.0
-      },
-      "computed": {
-        "value": 7.0
-      },
-      "unit": "dB",
-      "tolerance": {
-        "mode": "absolute",
-        "value": 1e-12
-      },
-      "deviation": {
-        "value": -1.78e-15
-      },
-      "precision": 6,
-=======
         "value": 5.77e-15
       },
       "precision": 9,
->>>>>>> 3543f9990 (Draw the sampling-tube correction and the in-duct spectrum, and count the new checks)
       "verdict": "pass"
     },
     {

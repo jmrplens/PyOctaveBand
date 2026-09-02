@@ -243,11 +243,8 @@ export const apiSections = {
       'reference/api/power/sound-power-intensity',
       'reference/api/power/sound-power-intensity-points',
       'reference/api/power/sound-power-reverberation',
-<<<<<<< HEAD
       'reference/api/power/sound-power-in-situ',
-=======
       'reference/api/power/sound-power-in-duct',
->>>>>>> 3543f9990 (Draw the sampling-tube correction and the in-duct spectrum, and count the new checks)
       'reference/api/power/intensity',
       'reference/api/power/intensity-compliance',
       'reference/api/power/vibration-sound-power',

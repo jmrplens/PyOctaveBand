@@ -19,11 +19,7 @@
 
 ## Numerical conformance report
 
-<<<<<<< HEAD
-**600/600 conformance checks pass** across 59 domains and 375 standards - filters class 1 - weightings within IEC 61672-1 class 1.
-=======
-**591/591 conformance checks pass** across 59 domains and 375 standards - filters class 1 - weightings within IEC 61672-1 class 1.
->>>>>>> 3543f9990 (Draw the sampling-tube correction and the in-duct spectrum, and count the new checks)
+**606/606 conformance checks pass** across 59 domains and 376 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -282,11 +278,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<<<<<<< HEAD
-<summary><b>Intensity &amp; sound power</b>: 100% (31/31)</summary>
-=======
-<summary><b>Intensity &amp; sound power</b>: 100% (22/22)</summary>
->>>>>>> 3543f9990 (Draw the sampling-tube correction and the in-duct spectrum, and count the new checks)
+<summary><b>Intensity &amp; sound power</b>: 100% (37/37)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -311,7 +303,6 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 9614-1:1993 Eq. (12) | Discrete positions tiling a scanned surface give the same LW | 0 dB error | 0 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 9614-1:1993 Table B.3 | Five action codes, each reached by the case Figure B.1 routes to it | F1 > 0,6 -> e; F2 > Ld -> ab; (F3 - F2) > 3 dB -> ab; criterion 2, 1 dB <= (F3 - F2) <= 3 dB -> c; criterion 2, (F3 - F2) <= 1 dB -> d | F1 > 0,6 -> e; F2 > Ld -> ab; (F3 - F2) > 3 dB -> ab; criterion 2, 1 dB <= (F3 - F2) <= 3 dB -> c; criterion 2, (F3 - F2) <= 1 dB -> d | 0 of 5 rows disagree | - | ![Pass][cv-pass] Pass |
 | ISO 9614-1:1993 Eq. (B.4) | New positions N* on the concentrated subset of the measurement surface | N* = 5 positions | N* = 5 positions | 0 | 0 % | ![Pass][cv-pass] Pass |
-<<<<<<< HEAD
 | ISO 3747:2010 9.5 EXAMPLE | Expanded uncertainty U = 2 sqrt(1,5^2 + 2^2) dB, grade 2 with sigma_omc = 2,0 dB | 5 dB (+/-0 dB) | 5 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 3747:2010 Table 2 / Eq. 22 | sigma_R0 by grade: 1,5 dB (grade 2) and 4,0 dB (grade 3), sigma_tot of Table E.1 row 2 | sigma_R0 grade 2 = 1.5 dB; sigma_R0 grade 3 = 4 dB; sigma_tot (1,5; 4) = 4.3 dB | sigma_R0 grade 2 = 1.5 dB; sigma_R0 grade 3 = 4 dB; sigma_tot (1,5; 4) = 4.3 dB | exact | 0 % | ![Pass][cv-pass] Pass |
 | ISO 3747:2010 Eq. 7 / 8.1 | K1 at the 6 dB validity margin, -10 lg(1 - 10^-0,6) = 1,2563 dB, and the 1,3 dB cap below it | K1(6 dB) = 1,2563 dB, K1(2 dB) = 1,3 dB, 4 kHz flagged | 0 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
@@ -322,14 +313,12 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 3747:2010 Eq. C.2 | Static pressure at 500 m, 101,325 (1 - 2,2560e-5 x 500)^5,2553 kPa | 95.4609 kPa (+/-0 kPa) | 95.4609 kPa | 0 kPa | 0 % | ![Pass][cv-pass] Pass |
 | ISO 3747:2010 Table D.1 / Eq. D.1 | LWA of a flat 90 dB octave spectrum, 63 Hz to 8 kHz, with the printed Ck | 96.9871 dB (+/-0 dB) | 96.9871 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 3747:2010 Eq. A.1 | Excess over the spherical free field Lp = LW - 11 - 20 lg(r/r0): a level 7 dB above it reads dLf = 7 dB | 7 dB (+/-0 dB) | 7 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
-=======
 | ISO 5136:2003 Table D.1 | C3,4 of the sampling tube for d = 0,5 m at U = +/-5, +/-15, +/-30 m/s, 27 bands | 162 tabulated values reproduced to the printed 0,1 dB | max absolute deviation 0.049 dB | 0.049 dB | 98 % | ![Pass][cv-pass] Pass |
 | ISO 5136:2003 Eqs (D.2)/(D.3) | Worked example: C3,4 = (1,85 + 0,038 U) dB at 1 kHz, U = +15 and -15 m/s | 2,42 dB at +15 m/s and 1,28 dB at -15 m/s reproduced | max absolute deviation 0.0e+00 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 5136:2003 Eq. (8) | Nose-cone / foam-ball correction 10 lg[1/(1 - U/c)^2] at U = 20 m/s, c = 340 m/s | 0.52658 dB (+/-0 dB) | 0.52658 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 5136:2003 Eq. (12) | Plane-wave relation LW - Lp = 10 lg(S/S0) - 10 lg(rho c/400), d = 0,5 m | -7.2113 dB (+/-0 dB) | -7.2113 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 5136:2003 Table 2 / Table 3 | Reproducibility sigma_R per band, 50 Hz to 10 kHz, and the extrapolated 12,5 to 20 kHz | 27 tabulated values of sigma_R reproduced | max absolute deviation 0.000 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 5136:2003 Annex C Table C.1 | A-weighting C_j of the 27 bands, read back as LWA - LW of one band at a time | 27 tabulated values of C_j reproduced | max absolute deviation 5.8e-15 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
->>>>>>> 3543f9990 (Draw the sampling-tube correction and the in-duct spectrum, and count the new checks)
 
 </details>
 

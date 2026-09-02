@@ -3920,7 +3920,6 @@ dos ediciones con las mismas entradas y en el mismo orden.
 
 ---
 
-<<<<<<< HEAD
 ## ISO 3747:2010, E.4.2.6.2 (el signo del nivel de campo directo)
 
 - **Ubicación:** Anexo E (informativo), E.4.2.6.2 «Excess sound pressure,
@@ -4078,7 +4077,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   Anexo E no está modelado, así que ningún número de la biblioteca depende de
   él. Se registra para que un lector futuro que siga la deducción no acabe en
   la ecuación equivocada.
-=======
+
 ## ISO 5136:2003, Tabla A.5, fila de 5 000 Hz (falta el primer dígito de $a_3$)
 
 - **Ubicación:** Anexo A, Tabla A.5, «Values of coefficients $a_i$ for the
@@ -4264,7 +4263,6 @@ dos ediciones con las mismas entradas y en el mismo orden.
   implementan; un conducto de más de 2 m se rechaza. Se registra para que
   una implementación del Anexo I no arrastre los exponentes tal como están
   impresos.
->>>>>>> c39554cb2 (Explain the in-duct method, and file what its print gets wrong)
 - **Estado:** sin notificar.
 
 ## Propiedades de las fuentes, relacionadas, que no son erratas
@@ -4352,7 +4350,6 @@ concordancia con las fuentes publicadas:
   de impulsión imprime un *Sum* de 49 dB a 500 Hz donde $76 - 28 = 48$, y
   después un *Combined* consistente con 48), que es por lo que la comparación
   corre al 1 dB que la hoja impresa lleva.
-<<<<<<< HEAD
 - **ISO 3747:2010 Tabla E.1, las etiquetas de grado de precisión:** la tabla
   informativa de ejemplos de $\sigma_\mathrm{tot}$ etiqueta sus tres filas
   «0,5 (accuracy grade 1)», «1,5 (accuracy grade 2)» y «3 (accuracy
@@ -4395,7 +4392,7 @@ concordancia con las fuentes publicadas:
   `integration_time` en
   [`sound_energy_in_situ`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_in_situ.py)
   para llevar antes el ruido de fondo al intervalo del suceso.
-=======
+
 - **ISO 5136:2003, apartado 5.3.4.3, el signo de la Ecuación (8):** el
   apartado dice que las correcciones del cono aerodinámico y la bola de
   espuma «are estimated to be negative and of small magnitude», y a
@@ -4418,6 +4415,5 @@ concordancia con las fuentes publicadas:
   implementa tal como está impresa y que fija
   `test_eq8_omnidirectional_shields` en
   [`tests/emission/test_sound_power_in_duct.py`](https://github.com/jmrplens/phonometry/blob/main/tests/emission/test_sound_power_in_duct.py).
->>>>>>> bdeca2b98 (Refuse the corner of Annex A that has no coefficients, and put the page right)
 
 <!-- END GENERATED BODY -->
