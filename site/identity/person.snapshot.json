@@ -39,7 +39,19 @@
   "publishingPrinciples": "https://jmrp.io/about/#editorial",
   "potentialAction": {
     "@type": "DonateAction",
-    "name": "Sponsor this work on GitHub",
+    "name": [
+      {
+        "@value": "Sponsor this work on GitHub",
+        "@language": "en"
+      },
+      {
+        "@value": "Patrocina este trabajo en GitHub",
+        "@language": "es"
+      }
+    ],
+    "recipient": {
+      "@id": "https://jmrp.io/#person"
+    },
     "target": {
       "@type": "EntryPoint",
       "urlTemplate": "https://github.com/sponsors/jmrplens"
