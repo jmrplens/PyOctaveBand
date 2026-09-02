@@ -354,11 +354,11 @@ result to be carried to reference conditions per **Annex G, which is
 normative** — the same kind of term the ISO 3741 and ISO 3745 sections write out
 explicitly as $C_1$ and $C_2$. The size of it: clause H.4.2.7 states that below
 500 m no meteorological or radiation-impedance correction is required, that at
-120 m and 23 °C the correction is zero, and that at 500 m it reaches 0,6 dB.
+120 m and 23 °C the correction is zero, and that at 500 m it reaches 0.6 dB.
 Two of those three hold. Annex G, which is the normative text that same clause
-points at, puts the correction at 0,394 dB at 500 m and 23,0 °C, and the zero at
+points at, puts the correction at 0.394 dB at 500 m and 23.0 °C, and the zero at
 120 m comes out exact, which is what shows its equations are being read as the
-standard intends. The 0,6 dB is a misprint, and it is recorded with the
+standard intends. The 0.6 dB is a misprint, and it is recorded with the
 arithmetic in the [errata registry](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md).
 `sound_power_pressure` implements no such term and takes no temperature or
 pressure argument at all, so a determination at a mountain plant or outdoors in
@@ -1024,7 +1024,7 @@ print(round(ten_seconds.sound_energy_level_a - steady.sound_power_level_a, 6))  
 
 Eq. 23 holds for the meteorological conditions of the test, and above 500 m of
 altitude or below 10 °C clause 8.3.6 requires the level to be carried to the
-reference 101,325 kPa and 23,0 °C by Annex G, $L_{J\mathrm{ref,atm}} = L_J + C_1 + C_2$
+reference 101.325 kPa and 23.0 °C by Annex G, $L_{J\mathrm{ref,atm}} = L_J + C_1 + C_2$
 (Eq. G.3), with
 
 $$

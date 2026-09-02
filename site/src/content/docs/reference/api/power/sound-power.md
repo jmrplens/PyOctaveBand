@@ -295,7 +295,7 @@ A sound power or sound energy level determined by Eq. (18) or Eq. (23)
 holds for the meteorological conditions at the time and place of the test.
 Above 500 m of altitude or below 10 degrees C the standard requires it to
 be carried to the reference static pressure 101.325 kPa and air
-temperature 23,0 degrees C (clauses 8.2.5 and 8.3.6) by adding
+temperature 23.0 degrees C (clauses 8.2.5 and 8.3.6) by adding
 
 $$
 C_1 = -10 \log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s},0}} + 5 \log_{10}\frac{273.15 + \theta}{\theta_0}, \qquad C_2 = -10 \log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s},0}} + 15 \log_{10}\frac{273.15 + \theta}{\theta_1}

@@ -76,6 +76,7 @@ alike for the two quantities.
 
 from __future__ import annotations
 
+import math
 import warnings
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
@@ -524,9 +525,19 @@ class _DirectTerms:
 def _room_inputs(
     volume: float, surface_area: float, temperature: float, static_pressure: float
 ) -> None:
-    """Refuse a room or a climate the direct method cannot be evaluated in."""
-    if volume <= 0 or surface_area <= 0:
-        msg = "'volume' and 'surface_area' must be positive."
+    """Refuse a room or a climate the direct method cannot be evaluated in.
+
+    Finiteness is tested first because a comparison against zero lets ``NaN``
+    through: ``nan <= 0`` is ``False``, so the room would pass here and the
+    determination would return ``NaN`` bands with nothing said about why.
+    """
+    if (
+        not math.isfinite(volume)
+        or not math.isfinite(surface_area)
+        or volume <= 0
+        or surface_area <= 0
+    ):
+        msg = "'volume' and 'surface_area' must be positive and finite."
         raise ValueError(msg)
     _validate_meteorology(temperature, static_pressure)
 
@@ -540,8 +551,13 @@ def _band_inputs(
     if freqs.shape != (n_bands,):
         msg = "'frequencies' length must match the number of bands."
         raise ValueError(msg)
-    if np.any(t60_arr <= 0.0):
-        msg = "'t60' values must be positive."
+    if not np.all(np.isfinite(t60_arr)) or np.any(t60_arr <= 0.0):
+        # As above: NaN slips past the comparison, and an infinite T60 drives
+        # the absorption area to zero and the level to -inf.
+        msg = "'t60' values must be positive and finite."
+        raise ValueError(msg)
+    if not np.all(np.isfinite(freqs)):
+        msg = "'frequencies' must contain only finite values."
         raise ValueError(msg)
     if np.any(freqs <= 0.0):
         msg = "'frequencies' must be positive."
@@ -1210,6 +1226,11 @@ def octave_band_levels(
         raise ValueError(msg)
     if not np.all(np.isfinite(arr)):
         msg = "'levels' must contain only finite values."
+        raise ValueError(msg)
+    if not np.all(np.isfinite(freqs)):
+        # Checked before the loop below rounds each one: round(inf) raises
+        # OverflowError, which is not the ValueError this function documents.
+        msg = "'frequencies' must contain only finite values."
         raise ValueError(msg)
     columns: dict[int, list[int]] = {}
     for column, f in enumerate(freqs):

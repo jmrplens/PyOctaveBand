@@ -609,11 +609,21 @@ def build_llms_txt(version: str, shard_slugs: tuple[str, ...]) -> str:
         # therefore which shard, each run of guides belongs to: a client that
         # wants the full text of one part should not have to infer the shard
         # from the URL path.
-        seen_groups: set[str] = set()
+        #
+        # The runs are emitted shard by shard rather than in the folder's own
+        # reading order, because a heading claims everything under it until the
+        # next one. Walking the reading order and switching heading on first
+        # sight of a new shard put a guide of the parent shard under a carved
+        # out heading whenever the carve-out was not the tail of that order,
+        # which is how the surface-velocity route came to sit under a heading
+        # about sound intensity. Within each run the reading order is kept.
+        grouped: dict[str, list[str]] = {}
         for route in routes:
-            group = shard_of.get(route, slug)
-            if group != slug and group not in seen_groups:
-                seen_groups.add(group)
+            grouped.setdefault(shard_of.get(route, slug), []).append(route)
+        for group in [slug, *(g for g in grouped if g != slug)]:
+            if group not in grouped:
+                continue
+            if group != slug:
                 folder = _shard_folders().get(group, group)
                 lines += [
                     "",
@@ -624,8 +634,9 @@ def build_llms_txt(version: str, shard_slugs: tuple[str, ...]) -> str:
                         f"[full text]({SITE_URL}/llms/llms-{group}.txt)"
                     ),
                 ]
-            if entry := link(route):
-                lines.append(entry)
+            for route in grouped[group]:
+                if entry := link(route):
+                    lines.append(entry)
         lines.append("")
 
     lines += [

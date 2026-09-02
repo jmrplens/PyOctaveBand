@@ -393,6 +393,50 @@ def test_invalid_volume_raises() -> None:
         emission.sound_power_reverberation(lp, t60, -1.0, 210.0, freqs)
 
 
+def test_non_finite_room_and_band_inputs_are_refused() -> None:
+    """A comparison against zero is not a guard: ``nan <= 0`` is ``False``.
+
+    So a room or a reverberation time given as ``NaN`` used to walk past the
+    positive-only checks and come back as ``NaN`` bands, and an infinite
+    ``T60`` drove the absorption area to zero and every level to ``-inf``.
+    Both are bad inputs, and the caller is told so rather than handed a
+    result that carries the mistake forward.
+    """
+    lp, t60, freqs = np.array([80.0]), np.array([1.5]), np.array([1000.0])
+    not_a_number = float("nan")
+    infinity = float("inf")
+    with pytest.raises(
+        ValueError, match=r"'volume' and 'surface_area' must be positive"
+    ):
+        emission.sound_power_reverberation(lp, t60, not_a_number, 210.0, freqs)
+    with pytest.raises(
+        ValueError, match=r"'volume' and 'surface_area' must be positive"
+    ):
+        emission.sound_power_reverberation(lp, t60, 200.0, infinity, freqs)
+    with pytest.raises(ValueError, match=r"'t60' values must be positive"):
+        emission.sound_power_reverberation(
+            lp, np.array([infinity]), 200.0, 210.0, freqs
+        )
+    with pytest.raises(ValueError, match=r"'t60' values must be positive"):
+        emission.sound_power_reverberation(
+            lp, np.array([not_a_number]), 200.0, 210.0, freqs
+        )
+    with pytest.raises(ValueError, match=r"'frequencies' must contain only finite"):
+        emission.sound_power_reverberation(
+            lp, t60, 200.0, 210.0, np.array([not_a_number])
+        )
+
+
+def test_octave_band_levels_refuses_a_non_finite_frequency() -> None:
+    """``round(inf)`` raises ``OverflowError``, which this function does not
+    document: a non-finite band centre is a bad input like any other.
+    """
+    infinity = float("inf")
+    thirds = np.array([infinity, 1000.0, 1250.0])
+    with pytest.raises(ValueError, match=r"'frequencies' must contain only finite"):
+        emission.octave_band_levels(np.full(3, 80.0), thirds)
+
+
 def test_mismatched_shapes_raise() -> None:
     two_bands = np.array([80.0, 81.0])  # 2 levels against 1 band of T60/freq
     t60, freqs = np.array([1.5]), np.array([1000.0])
