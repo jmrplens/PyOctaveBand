@@ -69,6 +69,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The sound power of a machine where it works, by comparison with a reference
+  sound source: `emission.sound_power_in_situ` implements ISO 3747:2010 in
+  octave bands, correcting the background at every microphone position with
+  Eq. 7 and the three rules of clause 8.1 (nothing above a 15 dB margin,
+  Eq. 7 between 6 dB and 15 dB, a 1,3 dB cap below 6 dB that turns the band
+  into an upper bound the result flags band by band), energy-averaging the
+  corrected levels (Eq. 8 to 10) and taking the difference to the calibrated
+  power of the reference source for one location (Eq. 11) or for several,
+  each energy-averaged first (Eq. 12). An impulsive source goes the same way
+  to a sound energy level through `emission.sound_energy_in_situ`, from
+  events measured one at a time (Eq. 13 to 15) or once over N of them
+  (Eq. 16, 17), averaged over the positions (Eq. 18) and compared (Eq. 19,
+  20); Eq. 14 is applied as the whole ISO 3740 family prints it, with an
+  `integration_time` to carry the time-averaged background to the event's
+  interval where a margin is wanted like for like. The result carries the
+  Table 2 grade with its typical reproducibility (1,5 dB engineering, 4,0 dB
+  survey), the clause 9 uncertainty (Eq. 22, 23, pinned to the 9.5 EXAMPLE's
+  U = 5 dB), the Annex C radiation-impedance correction shared with ISO 3741
+  and the Annex D A-weighted total from the Table D.1 corrections, which are
+  the ISO 3744 Annex E octave values digit for digit.
+  `emission.excess_sound_pressure_level` evaluates the Annex A indicator that
+  decides the grade and `emission.static_pressure_from_altitude` Eq. C.2. Two
+  defects of the informative Annex E join the errata registry: the sign of
+  the direct-field level in E.4.2.6.2 and the 0,6 dB altitude correction of
+  E.4.2.5 that Annex C's own equation puts at 0,26 dB.
+
 - The ISO 16283 low-frequency procedure, which the standard makes **mandatory**
   and not optional when the receiving room is under 25 m3, taking the volume
   rounded to the nearest cubic metre with halves going up, so 24.4 m3 triggers

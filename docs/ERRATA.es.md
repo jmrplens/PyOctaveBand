@@ -3758,6 +3758,74 @@ dos ediciones con las mismas entradas y en el mismo orden.
 
 ---
 
+## ISO 3747:2010, E.4.2.6.2 (el signo del nivel de campo directo)
+
+- **Ubicación:** Anexo E (informativo), E.4.2.6.2 «Excess sound pressure,
+  measurement distance effect, $\delta_r$», la frase que da la presión
+  radiada directamente y las dos frases que se construyen sobre ella.
+- **El impreso:** «the directly radiated pressure is approximately
+  $L_{p,\mathrm{direct}} = L_W + 10 \lg(2\pi r^2/r_0^2)$ dB. Rearranging
+  Equation (A.1) using $L_{p,\mathrm{direct}}$, gives
+  $L_{p(\mathrm{RSS}),r} = L_{p,\mathrm{direct}} + \Delta L_f - 3$ dB», y el
+  coeficiente de sensibilidad que sigue,
+  $c_r = 10^{-0{,}1(\Delta L_f - 3\ \mathrm{dB})}\,8{,}7/r$.
+- **El problema:** el campo directo de una fuente sobre un plano reflectante
+  decae con la distancia, $L_{p,\mathrm{direct}} = L_W - 10 \lg(2\pi
+  r^2/r_0^2)$ dB; el signo más impreso lo hace crecer. Las dos frases
+  siguientes solo se sostienen con el signo menos. Sustituyendo
+  $L_{p,\mathrm{direct}} = L_W - 20 \lg(r/r_0) - 8$ dB en la Ec. (A.1)
+  reordenada, $L_{p(\mathrm{RSS}),r} = L_{W(\mathrm{RSS})} + \Delta L_f - 11 -
+  20 \lg(r/r_0)$ dB, sale el $L_{p,\mathrm{direct}} + \Delta L_f - 3$ dB
+  impreso, mientras que el signo más da
+  $L_{p,\mathrm{direct}} + \Delta L_f - 19\ \mathrm{dB} - 40 \lg(r/r_0)$; y el
+  $8{,}7/r$ del coeficiente de sensibilidad es $20/(r \ln 10)$, la derivada de
+  $-20 \lg r$, así que el $c_r$ impreso es la derivada de la forma con signo
+  menos. Una errata de signo en un anexo informativo.
+- **Evidencia:** las tres frases consecutivas de E.4.2.6.2 leídas una contra
+  otra y contra la Ec. (A.1). Verificado en la página 47 del PDF (p. 38
+  impresa) y en la página 30 del PDF (p. 21 impresa) de BS EN ISO 3747:2010.
+- **Comportamiento de la biblioteca:** el presupuesto de incertidumbre del
+  Anexo E no está modelado; la biblioteca evalúa la Ec. (A.1) tal como está
+  impresa
+  ([`excess_sound_pressure_level`](../src/phonometry/emission/sound_power_in_situ.py)),
+  a la que la errata no afecta. No cambia ningún número.
+- **Estado:** sin notificar.
+
+## ISO 3747:2010, E.4.2.5 (la corrección por altitud citada contra el Anexo C)
+
+- **Ubicación:** Anexo E (informativo), E.4.2.5 «Radiation impedance
+  correction, $C_2$», las frases que dimensionan $u_{C_2}$.
+- **El impreso:** «For altitudes less than 500 m above sea level, no
+  meteorological correction is required. At 120 m altitude and 23 °C, the
+  correction is 0 dB and at 500 m altitude, the correction is 0,6 dB.
+  Assuming a triangular distribution for this uncertainty, the standard
+  deviation is $u_{C_2} = 0{,}6/\sqrt{6} = 0{,}3$ dB.»
+- **El problema:** el Anexo C, normativo, define la corrección como
+  $C_2 = -10 \lg(p_\mathrm{s}/p_{\mathrm{s},0}) + 15 \lg[(273{,}15 +
+  \theta)/\theta_\mathrm{ref}]$ con la presión estática de la Ec. (C.2),
+  $p_\mathrm{s} = p_{\mathrm{s},0}\,(1 - aH_\mathrm{a})^b$. A 23 °C eso da
+  0,06 dB a 120 m ($p_\mathrm{s}$ = 99,88 kPa) y 0,26 dB a 500 m
+  ($p_\mathrm{s}$ = 95,46 kPa), no los 0,6 dB impresos, y la aritmética
+  impresa a continuación tampoco cierra: $0{,}6/\sqrt{6} = 0{,}245$, impreso
+  0,3. En el Anexo C no aparece ninguna altitud por debajo de la cual «no se
+  requiera corrección meteorológica». El ejemplo informativo es inconsistente
+  con el anexo normativo que cita.
+- **Evidencia:** recálculo de la Ec. (C.2) y de $C_2$ a partir de las
+  constantes impresas ($a$ = 2,2560 × 10⁻⁵ m⁻¹, $b$ = 5,255 3,
+  $p_{\mathrm{s},0}$ = 1,013 25 × 10⁵ Pa, $\theta_\mathrm{ref}$ = 296 K).
+  Verificado en la página 46 del PDF (p. 37 impresa) y en la página 36 del
+  PDF (p. 27 impresa) de BS EN ISO 3747:2010.
+- **Comportamiento de la biblioteca:** implementa el Anexo C tal como está
+  impreso:
+  [`static_pressure_from_altitude`](../src/phonometry/emission/sound_power_in_situ.py)
+  evalúa la Ec. (C.2) y el `c2` del resultado la corrección, así que un
+  emplazamiento a 500 m recibe los 0,26 dB que da el anexo. El presupuesto
+  del Anexo E no está modelado. Fijado por
+  `test_static_pressure_from_altitude_eq_c2` en
+  [`tests/emission/test_sound_power_in_situ.py`](../tests/emission/test_sound_power_in_situ.py)
+  y por la comprobación de conformidad «ISO 3747:2010 Eq. C.2».
+- **Estado:** sin notificar.
+
 ## Propiedades de las fuentes, relacionadas, que no son erratas
 
 Registradas aquí para prevenir futuros «arreglos» que romperían la
@@ -3843,3 +3911,29 @@ concordancia con las fuentes publicadas:
   de impulsión imprime un *Sum* de 49 dB a 500 Hz donde $76 - 28 = 48$, y
   después un *Combined* consistente con 48), que es por lo que la comparación
   corre al 1 dB que la hoja impresa lleva.
+- **ISO 3747:2010 Anexo C, $\theta_\mathrm{ref}$ = 296 K:** el anexo imprime
+  la temperatura de referencia de la corrección de impedancia de radiación
+  como 296 K junto a una condición de referencia de 23,0 °C, que son
+  296,15 K, así que exactamente en las condiciones de referencia
+  $C_2 = 15 \lg(296{,}15/296) = +0{,}003\,3$ dB y no cero. El apartado 9.1.4
+  de ISO 3741:2010 e ISO 3744:2010 imprimen el mismo $\theta_1$ = 296 K, así
+  que es el redondeo de la familia y no una errata de una parte; la
+  biblioteca conserva los 296 K en el `C2` compartido de
+  [`sound_power_reverberation.py`](../src/phonometry/emission/sound_power_reverberation.py)
+  y fija el residuo (comprobación de conformidad «ISO 3747:2010 Annex C»).
+  No «corregirlo» a 296,15 K.
+- **ISO 3747:2010 Ec. (14), el margen de ruido de fondo del suceso aislado:**
+  $\Delta L_{Ei} = L'_{Ei,q(\mathrm{ST})} - L_{pi(\mathrm{B})}$ resta un nivel
+  de ruido de fondo promediado en el tiempo de un nivel de suceso aislado
+  integrado en el tiempo, pidiendo solo que ambos se midan con el mismo
+  tiempo de integración $T$. La diferencia es un margen verdadero para
+  $T$ = 1 s; para un $T$ mayor el ruido de fondo contiene $10 \lg(T/T_0)$ dB
+  más energía sobre el intervalo del suceso (apartado 3.4, NOTA 1). La
+  Ec. (25) de ISO 3741:2010 y el apartado 8.3.4 de ISO 3744:2010 imprimen la
+  misma línea, verificado en la página 23 del PDF (p. 14 impresa) de BS EN
+  ISO 3747:2010 y en las páginas correspondientes de las dos normas hermanas,
+  así que es la convención de la familia y no se registra contra una parte.
+  La biblioteca aplica la Ec. (14) tal como está impresa por defecto y ofrece
+  `integration_time` en
+  [`sound_energy_in_situ`](../src/phonometry/emission/sound_power_in_situ.py)
+  para llevar antes el ruido de fondo al intervalo del suceso.

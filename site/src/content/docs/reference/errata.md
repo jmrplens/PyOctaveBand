@@ -3487,6 +3487,70 @@ in the same order.
 
 ---
 
+## ISO 3747:2010, E.4.2.6.2 (the sign of the direct-field level)
+
+- **Location:** Annex E (informative), E.4.2.6.2 "Excess sound pressure,
+  measurement distance effect, $\delta_r$", the sentence giving the directly
+  radiated pressure and the two sentences that build on it.
+- **The print:** "the directly radiated pressure is approximately
+  $L_{p,\mathrm{direct}} = L_W + 10 \lg(2\pi r^2/r_0^2)$ dB. Rearranging
+  Equation (A.1) using $L_{p,\mathrm{direct}}$, gives
+  $L_{p(\mathrm{RSS}),r} = L_{p,\mathrm{direct}} + \Delta L_f - 3$ dB", and the
+  sensitivity coefficient that follows,
+  $c_r = 10^{-0{,}1(\Delta L_f - 3\ \mathrm{dB})}\,8{,}7/r$.
+- **The problem:** the direct field of a source over a reflecting plane falls
+  with distance, $L_{p,\mathrm{direct}} = L_W - 10 \lg(2\pi r^2/r_0^2)$ dB; the
+  printed plus sign makes it grow. The two sentences that follow hold only
+  with the minus sign. Substituting
+  $L_{p,\mathrm{direct}} = L_W - 20 \lg(r/r_0) - 8$ dB into Eq. (A.1)
+  rearranged, $L_{p(\mathrm{RSS}),r} = L_{W(\mathrm{RSS})} + \Delta L_f - 11 -
+  20 \lg(r/r_0)$ dB, gives the printed $L_{p,\mathrm{direct}} + \Delta L_f - 3$
+  dB, whereas the plus sign gives
+  $L_{p,\mathrm{direct}} + \Delta L_f - 19\ \mathrm{dB} - 40 \lg(r/r_0)$; and
+  the $8{,}7/r$ of the sensitivity coefficient is $20/(r \ln 10)$, the
+  derivative of $-20 \lg r$, so the printed $c_r$ is the derivative of the
+  minus-sign form. A sign misprint in an informative annex.
+- **Evidence:** the three consecutive sentences of E.4.2.6.2 read against each
+  other and against Eq. (A.1). Verified on PDF page 47 (printed p. 38) and PDF
+  page 30 (printed p. 21) of BS EN ISO 3747:2010.
+- **Library behaviour:** the Annex E uncertainty budget is not modelled; the
+  library evaluates Eq. (A.1) as printed
+  ([`excess_sound_pressure_level`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_in_situ.py)),
+  which the misprint does not touch. No number changes.
+- **Status:** unreported.
+
+## ISO 3747:2010, E.4.2.5 (the altitude correction quoted against Annex C)
+
+- **Location:** Annex E (informative), E.4.2.5 "Radiation impedance
+  correction, $C_2$", the sentences that size $u_{C_2}$.
+- **The print:** "For altitudes less than 500 m above sea level, no
+  meteorological correction is required. At 120 m altitude and 23 °C, the
+  correction is 0 dB and at 500 m altitude, the correction is 0,6 dB.
+  Assuming a triangular distribution for this uncertainty, the standard
+  deviation is $u_{C_2} = 0{,}6/\sqrt{6} = 0{,}3$ dB."
+- **The problem:** the normative Annex C defines the correction as
+  $C_2 = -10 \lg(p_\mathrm{s}/p_{\mathrm{s},0}) + 15 \lg[(273{,}15 +
+  \theta)/\theta_\mathrm{ref}]$ with the static pressure of Eq. (C.2),
+  $p_\mathrm{s} = p_{\mathrm{s},0}\,(1 - aH_\mathrm{a})^b$. At 23 °C that gives
+  0,06 dB at 120 m ($p_\mathrm{s}$ = 99,88 kPa) and 0,26 dB at 500 m
+  ($p_\mathrm{s}$ = 95,46 kPa), not the printed 0,6 dB, and the arithmetic
+  printed after it does not close either: $0{,}6/\sqrt{6} = 0{,}245$, printed
+  0,3. No altitude below which "no meteorological correction is required"
+  appears in Annex C. The informative example is inconsistent with the
+  normative annex it cites.
+- **Evidence:** recomputation of Eq. (C.2) and $C_2$ from the printed
+  constants ($a$ = 2,2560 × 10⁻⁵ m⁻¹, $b$ = 5,255 3, $p_{\mathrm{s},0}$ =
+  1,013 25 × 10⁵ Pa, $\theta_\mathrm{ref}$ = 296 K). Verified on PDF page 46
+  (printed p. 37) and PDF page 36 (printed p. 27) of BS EN ISO 3747:2010.
+- **Library behaviour:** implements Annex C as printed:
+  [`static_pressure_from_altitude`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_in_situ.py)
+  evaluates Eq. (C.2) and the result's `c2` the correction, so a site at
+  500 m gets the 0,26 dB the annex gives. The Annex E budget is not
+  modelled. Pinned by `test_static_pressure_from_altitude_eq_c2` in
+  [`tests/emission/test_sound_power_in_situ.py`](https://github.com/jmrplens/phonometry/blob/main/tests/emission/test_sound_power_in_situ.py)
+  and by the conformance check "ISO 3747:2010 Eq. C.2".
+- **Status:** unreported.
+
 ## Related source properties that are not errata
 
 Recorded here to prevent future "fixes" that would break agreement with the
@@ -3565,5 +3629,28 @@ published sources:
   3 prints a *Sum* of 49 dB at 500 Hz where $76 - 28 = 48$, then a *Combined*
   consistent with 48), which is why the comparison runs at the 1 dB the
   printed sheet carries.
+- **ISO 3747:2010 Annex C, $\theta_\mathrm{ref}$ = 296 K:** the annex prints
+  the reference temperature of the radiation-impedance correction as 296 K
+  beside a reference condition of 23,0 °C, which is 296,15 K, so at exactly
+  the reference conditions $C_2 = 15 \lg(296{,}15/296) = +0{,}003\,3$ dB
+  rather than zero. ISO 3741:2010 clause 9.1.4 and ISO 3744:2010 print the
+  same $\theta_1$ = 296 K, so it is the family's rounding and not a misprint
+  of one part; the library keeps 296 K in the shared `C2` of
+  [`sound_power_reverberation.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_reverberation.py)
+  and pins the residual (conformance check "ISO 3747:2010 Annex C"). Do not
+  "correct" it to 296,15 K.
+- **ISO 3747:2010 Eq. (14), the single-event background margin:**
+  $\Delta L_{Ei} = L'_{Ei,q(\mathrm{ST})} - L_{pi(\mathrm{B})}$ subtracts a
+  time-averaged background level from a time-integrated single event level,
+  asking only that both be measured over the same integration time $T$. The
+  difference is a true margin for $T$ = 1 s; for a longer $T$ the background
+  holds $10 \lg(T/T_0)$ dB more energy over the event's interval (clause 3.4,
+  NOTE 1). ISO 3741:2010 Eq. (25) and ISO 3744:2010 clause 8.3.4 print the
+  same line, verified on PDF page 23 (printed p. 14) of BS EN ISO 3747:2010
+  and on the corresponding pages of the two siblings, so it is the family's
+  convention and is not registered against one part. The library applies
+  Eq. (14) as printed by default and offers `integration_time` on
+  [`sound_energy_in_situ`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_in_situ.py)
+  to carry the background to the event's interval first.
 
 <!-- END GENERATED BODY -->

@@ -3,13 +3,13 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 585,
-    "passing": 585,
+    "checks": 595,
+    "passing": 595,
     "failing": 0,
     "domains": 59,
-    "standards": 374,
-    "citations": 521,
-    "designations": 115,
+    "standards": 375,
+    "citations": 531,
+    "designations": 116,
     "sources": 84
   },
   "units": [
@@ -115,8 +115,8 @@
     {
       "id": "intensity-sound-power",
       "title": "Intensity & sound power",
-      "checks": 16,
-      "passing": 16
+      "checks": 26,
+      "passing": 26
     },
     {
       "id": "building-prediction-uncertainty",
@@ -3126,6 +3126,310 @@
         "value": 0.0
       },
       "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-3747-2010-9-5-example/expanded-uncertainty-u-2-sqrt-1-5-2-2-2-db-grade-2-with-sigma-omc-2-0-db",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3747",
+        "edition": "2010",
+        "clause": "9.5 EXAMPLE",
+        "cite": "ISO 3747:2010 9.5 EXAMPLE"
+      },
+      "quantity": "Expanded uncertainty U = 2 sqrt(1,5^2 + 2^2) dB, grade 2 with sigma_omc = 2,0 dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 5.0
+      },
+      "computed": {
+        "value": 5.0
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-3747-2010-table-2-eq-22/sigma-r0-by-grade-1-5-db-grade-2-and-4-0-db-grade-3-sigma-tot-of-table-e-1-row-2",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3747",
+        "edition": "2010",
+        "clause": "Table 2 / Eq. 22",
+        "cite": "ISO 3747:2010 Table 2 / Eq. 22"
+      },
+      "quantity": "sigma_R0 by grade: 1,5 dB (grade 2) and 4,0 dB (grade 3), sigma_tot of Table E.1 row 2",
+      "kind": "record",
+      "expected": {
+        "label": "sigma_R0 grade 2 = 1.5 dB; sigma_R0 grade 3 = 4 dB; sigma_tot (1,5; 4) = 4.3 dB",
+        "record": {
+          "sigma_R0 grade 2": 1.5,
+          "sigma_R0 grade 3": 4.0,
+          "sigma_tot (1,5; 4)": 4.3
+        }
+      },
+      "computed": {
+        "label": "sigma_R0 grade 2 = 1.5 dB; sigma_R0 grade 3 = 4 dB; sigma_tot (1,5; 4) = 4.3 dB",
+        "record": {
+          "sigma_R0 grade 2": 1.5,
+          "sigma_R0 grade 3": 4.0,
+          "sigma_tot (1,5; 4)": 4.3
+        }
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-3747-2010-eq-7-8-1/k1-at-the-6-db-validity-margin-10-lg-1-10-0-6-1-2563-db-and-the-1-3-db-cap-below-it",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3747",
+        "edition": "2010",
+        "clause": "Eq. 7 / 8.1",
+        "cite": "ISO 3747:2010 Eq. 7 / 8.1"
+      },
+      "quantity": "K1 at the 6 dB validity margin, -10 lg(1 - 10^-0,6) = 1,2563 dB, and the 1,3 dB cap below it",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "K1(6 dB) = 1,2563 dB, K1(2 dB) = 1,3 dB, 4 kHz flagged"
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 9,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-3747-2010-eq-11-vs-iso-3741-2010-eq-21/in-situ-comparison-plus-c2-equals-the-reverberation-room-comparison-closed-form",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3747",
+        "edition": "2010",
+        "clause": "Eq. 11 vs ISO 3741:2010 Eq. 21",
+        "cite": "ISO 3747:2010 Eq. 11 vs ISO 3741:2010 Eq. 21"
+      },
+      "quantity": "In situ comparison plus C2 equals the reverberation-room comparison (closed form)",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "0 dB difference"
+      },
+      "computed": {
+        "value": 1.42e-14
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 1.42e-14
+      },
+      "precision": 9,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-3747-2010-eq-12-eq-20/m-identical-reference-source-locations-collapse-to-eq-11-eq-19-closed-form",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3747",
+        "edition": "2010",
+        "clause": "Eq. 12 / Eq. 20",
+        "cite": "ISO 3747:2010 Eq. 12 / Eq. 20"
+      },
+      "quantity": "m identical reference-source locations collapse to Eq. 11 / Eq. 19 (closed form)",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "0 dB difference"
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 9,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-3747-2010-eq-15-eq-17/n-events-one-at-a-time-and-one-measurement-over-n-events-agree-closed-form",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3747",
+        "edition": "2010",
+        "clause": "Eq. 15 / Eq. 17",
+        "cite": "ISO 3747:2010 Eq. 15 / Eq. 17"
+      },
+      "quantity": "N events one at a time and one measurement over N events agree (closed form)",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "0 dB difference"
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 9,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-3747-2010-annex-c/c2-at-101-325-kpa-and-23-0-degc-is-15-lg-296-15-296-0-003-300-db-theta-ref-296-k",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3747",
+        "edition": "2010",
+        "clause": "Annex C",
+        "cite": "ISO 3747:2010 Annex C"
+      },
+      "quantity": "C2 at 101,325 kPa and 23,0 degC is 15 lg(296,15/296) = 0,003 300 dB (theta_ref = 296 K)",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.003300388770355855
+      },
+      "computed": {
+        "value": 0.0033
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-3747-2010-eq-c-2/static-pressure-at-500-m-101-325-1-2-2560e-5-x-500-5-2553-kpa",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3747",
+        "edition": "2010",
+        "clause": "Eq. C.2",
+        "cite": "ISO 3747:2010 Eq. C.2"
+      },
+      "quantity": "Static pressure at 500 m, 101,325 (1 - 2,2560e-5 x 500)^5,2553 kPa",
+      "kind": "scalar",
+      "expected": {
+        "value": 95.46087854811667
+      },
+      "computed": {
+        "value": 95.4609
+      },
+      "unit": "kPa",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-3747-2010-table-d-1-eq-d-1/lwa-of-a-flat-90-db-octave-spectrum-63-hz-to-8-khz-with-the-printed-ck",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3747",
+        "edition": "2010",
+        "clause": "Table D.1 / Eq. D.1",
+        "cite": "ISO 3747:2010 Table D.1 / Eq. D.1"
+      },
+      "quantity": "LWA of a flat 90 dB octave spectrum, 63 Hz to 8 kHz, with the printed Ck",
+      "kind": "scalar",
+      "expected": {
+        "value": 96.98713148119768
+      },
+      "computed": {
+        "value": 96.9871
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": -1.42e-14
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-3747-2010-eq-a-1/excess-of-sound-pressure-level-is-zero-in-the-spherical-free-field-lp-lw-11-20-lg-r-r0",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3747",
+        "edition": "2010",
+        "clause": "Eq. A.1",
+        "cite": "ISO 3747:2010 Eq. A.1"
+      },
+      "quantity": "Excess of sound pressure level is zero in the spherical free field, Lp = LW - 11 - 20 lg(r/r0)",
+      "kind": "scalar",
+      "expected": {
+        "value": 7.0
+      },
+      "computed": {
+        "value": 7.0
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": -1.78e-15
+      },
+      "precision": 6,
       "verdict": "pass"
     },
     {
