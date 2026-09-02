@@ -283,6 +283,7 @@ field itself on a finite-difference grid.
 - [Bibliography](reference/bibliography.md): the books and papers behind the guides, grouped by domain, every entry with a verified DOI or official publisher link
 - [Conformance report](CONFORMANCE.md): auto-generated numerical validation: every check pins a standard clause's expected value against the library's computed value, regenerated in CI
 - [Standards errata](ERRATA.md): defects found in the published standards themselves during implementation: misprints, examples contradicting their own normative text, ambiguous wording, each with evidence and the library's disposition; a Spanish edition, translated entry for entry, lives in [ERRATA.es.md](ERRATA.es.md)
+- [Same bits on every machine](reference/determinism.md): why floating point drifts between hosts, what the deterministic weighting design pins, and the measured evidence that a designed filter is byte-identical on any CPU, BLAS or thread count, and what still separates the platforms
 
 ## Development
 

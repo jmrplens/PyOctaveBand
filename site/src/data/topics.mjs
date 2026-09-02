@@ -475,6 +475,14 @@ export const topics = [
         label: 'Errata in published sources',
         translations: { es: 'Erratas de las fuentes publicadas' },
       },
+      // The third leg of the evidence story: conformance says what the
+      // numbers are checked against, errata where the print is wrong, and
+      // this one why the numbers read the same on every machine.
+      {
+        slug: 'reference/determinism',
+        label: 'Same bits on every machine',
+        translations: { es: 'Los mismos bits en cualquier máquina' },
+      },
       'reference/bibliography',
       'reference/glossary',
     ],
