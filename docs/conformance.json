@@ -3,13 +3,13 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 600,
-    "passing": 600,
+    "checks": 606,
+    "passing": 606,
     "failing": 0,
     "domains": 59,
-    "standards": 375,
-    "citations": 536,
-    "designations": 116,
+    "standards": 376,
+    "citations": 542,
+    "designations": 117,
     "sources": 84
   },
   "units": [
@@ -115,8 +115,8 @@
     {
       "id": "intensity-sound-power",
       "title": "Intensity & sound power",
-      "checks": 31,
-      "passing": 31
+      "checks": 37,
+      "passing": 37
     },
     {
       "id": "building-prediction-uncertainty",
@@ -3577,6 +3577,188 @@
         "value": -1.78e-15
       },
       "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-5136-2003-table-d-1/c3-4-of-the-sampling-tube-for-d-0-5-m-at-u-5-15-30-m-s-27-bands",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 5136",
+        "edition": "2003",
+        "clause": "Table D.1",
+        "cite": "ISO 5136:2003 Table D.1"
+      },
+      "quantity": "C3,4 of the sampling tube for d = 0,5 m at U = +/-5, +/-15, +/-30 m/s, 27 bands",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "162 tabulated values reproduced to the printed 0,1 dB"
+      },
+      "computed": {
+        "value": 0.049,
+        "label": "max absolute deviation 0.049 dB"
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.049
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-5136-2003-eqs-d-2-d-3/worked-example-c3-4-1-85-0-038-u-db-at-1-khz-u-15-and-15-m-s",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 5136",
+        "edition": "2003",
+        "clause": "Eqs (D.2)/(D.3)",
+        "cite": "ISO 5136:2003 Eqs (D.2)/(D.3)"
+      },
+      "quantity": "Worked example: C3,4 = (1,85 + 0,038 U) dB at 1 kHz, U = +15 and -15 m/s",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "2,42 dB at +15 m/s and 1,28 dB at -15 m/s reproduced"
+      },
+      "computed": {
+        "value": 0.0,
+        "label": "max absolute deviation 0.0e+00 dB"
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 9,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-5136-2003-eq-8/nose-cone-foam-ball-correction-10-lg-1-1-u-c-2-at-u-20-m-s-c-340-m-s",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 5136",
+        "edition": "2003",
+        "clause": "Eq. (8)",
+        "cite": "ISO 5136:2003 Eq. (8)"
+      },
+      "quantity": "Nose-cone / foam-ball correction 10 lg[1/(1 - U/c)^2] at U = 20 m/s, c = 340 m/s",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.5265787744469831
+      },
+      "computed": {
+        "value": 0.52658
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": -2.22e-16
+      },
+      "precision": 5,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-5136-2003-eq-12/plane-wave-relation-lw-lp-10-lg-s-s0-10-lg-rho-c-400-d-0-5-m",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 5136",
+        "edition": "2003",
+        "clause": "Eq. (12)",
+        "cite": "ISO 5136:2003 Eq. (12)"
+      },
+      "quantity": "Plane-wave relation LW - Lp = 10 lg(S/S0) - 10 lg(rho c/400), d = 0,5 m",
+      "kind": "scalar",
+      "expected": {
+        "value": -7.211274684563609
+      },
+      "computed": {
+        "value": -7.2113
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-06
+      },
+      "deviation": {
+        "value": -1.07e-14
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-5136-2003-table-2-table-3/reproducibility-sigma-r-per-band-50-hz-to-10-khz-and-the-extrapolated-12-5-to-20-khz",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 5136",
+        "edition": "2003",
+        "clause": "Table 2 / Table 3",
+        "cite": "ISO 5136:2003 Table 2 / Table 3"
+      },
+      "quantity": "Reproducibility sigma_R per band, 50 Hz to 10 kHz, and the extrapolated 12,5 to 20 kHz",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "27 tabulated values of sigma_R reproduced"
+      },
+      "computed": {
+        "value": 0.0,
+        "label": "max absolute deviation 0.000 dB"
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-5136-2003-annex-c-table-c-1/a-weighting-c-j-of-the-27-bands-read-back-as-lwa-lw-of-one-band-at-a-time",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 5136",
+        "edition": "2003",
+        "clause": "Annex C Table C.1",
+        "cite": "ISO 5136:2003 Annex C Table C.1"
+      },
+      "quantity": "A-weighting C_j of the 27 bands, read back as LWA - LW of one band at a time",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "27 tabulated values of C_j reproduced"
+      },
+      "computed": {
+        "value": 5.77e-15,
+        "label": "max absolute deviation 5.8e-15 dB"
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 5.77e-15
+      },
+      "precision": 9,
       "verdict": "pass"
     },
     {

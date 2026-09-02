@@ -3728,6 +3728,180 @@ in the same order.
 - **Library behaviour:** the Annex E uncertainty budget is not modelled, so no
   library number depends on it. Recorded so that a future reader chasing the
   derivation is not sent to the wrong equation.
+
+## ISO 5136:2003, Table A.5, 5 000 Hz row (the leading digit of $a_3$ is missing)
+
+- **Location:** Annex A, Table A.5, "Values of coefficients $a_i$ for the
+  determination of the combined mean flow velocity and modal correction
+  $C_{3,4}$ of the sampling tube for duct diameters 0,8 m $\le d <$ 1,25 m",
+  row 5 000 Hz, column $a_3$.
+- **The print:** $- ,24 \times 10^{-05}$: a minus sign, a space, a decimal
+  comma and two digits, with no digit before the comma. Every other cell of
+  the twelve coefficient tables of Annexes A, H and I prints one digit before
+  the comma.
+- **The problem:** the coefficient cannot be read from the document, and the
+  row is inside the normative range of the standard (5 000 Hz,
+  $|U| \le 40$ m/s). The $a_3$ of the same band in the two neighbouring
+  tables is $-1{,}17 \times 10^{-5}$ (Table A.4, 0,5 m to 0,8 m) and
+  $-1{,}27 \times 10^{-5}$ (Table A.6, 1,25 m to 2 m), which brackets
+  $-1{,}24 \times 10^{-5}$; a leading digit of 2 or more would move
+  $C_{3,4}$ at 40 m/s by 0,64 dB per unit of the digit
+  ($a_3 U^3$ with $U^3 = 6{,}4 \times 10^4$), which no neighbouring band or
+  table supports.
+- **Evidence:** the cell as printed. PDF page 39 (printed p. 29) of
+  ISO 5136:2003, against the same cell of Table A.4 on PDF page 38 (printed
+  p. 28) and of Table A.6 on PDF page 40 (printed p. 30).
+- **Library behaviour:** reads $-1{,}24 \times 10^{-5}$, the value the
+  neighbours bracket, in `_TABLE_A5` of
+  [`sound_power_in_duct.py`](../src/phonometry/emission/sound_power_in_duct.py).
+  The table's comment and
+  `test_table_a5_5000_hz_reads_the_missing_digit_as_one` in
+  [`tests/emission/test_sound_power_in_duct.py`](../tests/emission/test_sound_power_in_duct.py)
+  say that it is a reading and not the print; a copy of the standard in
+  which the digit survived would settle it.
+- **Status:** unreported.
+
+## ISO 5136:2003, Annex D, Annex H and Annex I ($C_{3,4}$ "according to Equation (3)")
+
+- **Location:** the first sentence of Annex D, and the sentence of Annex H
+  and of Annex I that introduces their coefficient tables.
+- **The print:** "For $d$ = 0,5 m, the values of the coefficients $a_i$ for
+  the calculation of $C_{3,4}$ according to Equation (3) are given in Table
+  A.4" (Annex D); "Values for the coefficients $a_i$ necessary to compute the
+  mean flow velocity-modal corrections $C_{3,4}$ according to Equation (3)
+  are given in Tables H.1 to H.3" (Annex H) and "... in Tables I.1 to I.3"
+  (Annex I).
+- **The problem:** Equation (3) is the cut-on frequency of the first cross
+  mode, $f_{1,0} = 0{,}586\,(c/D)\sqrt{1 - (U/c)^2}$, in the definition of
+  3.10. The polynomial in $U$ whose coefficients the tables hold is Equation
+  (7) of clause 5.3.3.4. The same wrong number is printed three times.
+- **Evidence:** PDF pages 45, 64 and 68 (printed pp. 35, 54 and 58) of
+  ISO 5136:2003, against Equation (3) on PDF page 16 (printed p. 6) and
+  Equation (7) on PDF page 28 (printed p. 18).
+- **Library behaviour:** evaluates Equation (7);
+  [`flow_modal_correction`](../src/phonometry/emission/sound_power_in_duct.py)
+  cites it. No number changes.
+- **Status:** unreported (cross-reference defect, no numerical consequence).
+
+## ISO 5136:2003, Annex B, B.2 step 4 ($\Delta L_{\max}$ "given in Table C.1")
+
+- **Location:** Annex B, clause B.2, "Comparative procedure using a
+  microphone fitted with a nose cone and a microphone fitted with a sampling
+  tube", Step 4.
+- **The print:** "Check whether the difference between the circumferentially
+  averaged sound pressure levels obtained with the nose cone and the sampling
+  tube ($\overline{L_{p\mathrm{NC}}} - \overline{L_{p\mathrm{ST}}}$) is
+  smaller than or equal to the maximum allowable difference $\Delta L_{\max}$
+  given in Table C.1."
+- **The problem:** Table C.1 is the A-weighting $C_j$ of Annex C and holds no
+  $\Delta L_{\max}$. The table of the maximum allowable difference against the
+  turbulence noise suppression $\Delta L_\mathrm{t}$ of the sampling tube is
+  Table B.1, on the page after the step, and the paragraph two above the
+  steps already sends the reader to it ("see Table B.1").
+- **Evidence:** PDF page 41 (printed p. 31) of ISO 5136:2003, with Table B.1
+  on PDF page 42 (printed p. 32) and Table C.1 on PDF page 44 (printed
+  p. 34).
+- **Library behaviour:** the signal-to-noise procedure of Annex B is a
+  qualification of the measurement, not a term of $L_W$, and is not
+  implemented. No change was needed.
+- **Status:** unreported (cross-reference defect, no numerical consequence).
+
+## ISO 5136:2003, Annex B, B.1 ("the determination of the combined mean flow velocity")
+
+- **Location:** Annex B, clause B.1, "General", the first sentence.
+- **The print:** "Two procedures for the determination of the combined mean
+  flow velocity are given in B.2 and B.3."
+- **The problem:** the annex is titled "Determination of the signal-to-noise
+  ratio of sound vs. turbulent pressure fluctuation in the test duct", and
+  B.2 and B.3 determine that ratio; nothing in the annex determines a "combined
+  mean flow velocity", a phrase that is a fragment of the "combined mean flow
+  velocity and modal correction" of clause 5.3.3.4. The sentence also counts
+  two procedures where the annex, by the coherence method it closes with,
+  gives three.
+- **Evidence:** PDF page 41 (printed p. 31) of ISO 5136:2003, the annex
+  title and the sentence on the same page, and the coherence procedure on
+  PDF page 43 (printed p. 33).
+- **Library behaviour:** Annex B is not implemented; nothing to change.
+- **Status:** unreported (wording defect).
+
+## ISO 5136:2003, clause 7.4 NOTE (the "hydraulic diameter" $D_\mathrm{h} = \sqrt{S_{\mathrm{f}2}/\pi}$)
+
+- **Location:** clause 7.4, the NOTE that follows the outlet-duct rule for
+  large fans in installation category D.
+- **The print:** "The hydraulic diameter of the fan outlet area, $S_{\mathrm{f}2}$,
+  is given by $D_\mathrm{h} = \sqrt{S_{\mathrm{f}2}/\pi}$".
+- **The problem:** $\sqrt{S/\pi}$ is the radius of the circle of area $S$;
+  its diameter is $\sqrt{4S/\pi} = 2\sqrt{S/\pi}$. Followed as printed, the
+  "2 $D_\mathrm{h}$" the clause asks the outlet duct to be is one equivalent
+  diameter long, not two, and whether the rule intended is two diameters or
+  two radii cannot be settled from the document.
+- **Evidence:** PDF page 33 (printed p. 23) of ISO 5136:2003.
+- **Library behaviour:** the duct lengths of clauses 5.2 and 7.4 are facility
+  geometry and are not computed; nothing to change.
+- **Status:** unreported.
+
+## ISO 5136:2003, Table A.2, coefficient header (the $a_9$ column heads $a9_0$)
+
+- **Location:** Annex A, Table A.2, "Values of coefficients $a_i$ for the
+  determination of the combined mean flow velocity and modal correction
+  $C_{3,4}$ of the sampling tube for duct diameters 0,2 m $\le d <$ 0,3 m",
+  the header row of the coefficient columns, tenth column.
+- **The print:** an italic $a$, an italic 9 on the baseline and a subscript
+  0, between an $a_8$ and an $a_{10}$ of the same row that both carry their
+  index as a subscript.
+- **The problem:** a stray subscript zero on a column that is $a_9$. The same
+  column is headed $a_9$ in Tables A.1 and A.3 to A.6, the NOTE under every
+  one of them sums $a_i U^i$ from $i = 0$ to $i = 10$ over the eleven columns
+  the row has, and the single cell this one holds, the
+  $4{,}09 \times 10^{-14}$ of the 20 000 Hz row, is the coefficient of
+  $U^9$: an $a_{90}$ would have no place in that sum at all.
+- **Evidence:** PDF page 36 (printed p. 26) of ISO 5136:2003, against the
+  header row of Table A.1 on PDF page 35 (printed p. 25).
+- **Library behaviour:** the column is read as $a_9$. `_TABLE_A2` in
+  [`sound_power_in_duct.py`](../src/phonometry/emission/sound_power_in_duct.py)
+  carries the 20 000 Hz row as the ten coefficients $a_0$ to $a_9$, and
+  `test_table_a2_20_khz_row_reads_the_last_column_as_a9` in
+  [`tests/emission/test_sound_power_in_duct.py`](../tests/emission/test_sound_power_in_duct.py)
+  multiplies the row out. No coefficient value changes.
+- **Status:** unreported (typographic, no numerical consequence).
+
+## ISO 5136:2003, Table A.6, 16 000 Hz row ($a_1$ printed with a doubled multiplication sign)
+
+- **Location:** Annex A, Table A.6, "... for duct diameters 1,25 m $\le d \le$
+  2 m", row 16 000 Hz, column $a_1$.
+- **The print:** $4{,}52 \times\!\times 10^{-01}$, two multiplication signs
+  where every other cell prints one.
+- **The problem:** typographic only; the mantissa and the exponent are
+  legible and the value is $4{,}52 \times 10^{-1}$, in line with the
+  $4{,}51 \times 10^{-1}$ of Table A.5 and the $4{,}52 \times 10^{-1}$ of
+  Table I.1 at the same band. The row is in the informative range above
+  10 kHz.
+- **Evidence:** PDF page 40 (printed p. 30) of ISO 5136:2003.
+- **Library behaviour:** $4{,}52 \times 10^{-1}$ in `_TABLE_A6` of
+  [`sound_power_in_duct.py`](../src/phonometry/emission/sound_power_in_duct.py).
+- **Status:** unreported (typographic, no numerical consequence).
+
+## ISO 5136:2003, Table I.2 (continued), 20 000 Hz row (the exponents of $a_8$ and $a_9$)
+
+- **Location:** Annex I, Table I.2, "... for duct diameters 3,55 m $\le d
+  \le$ 5 m", the continuation page, row 20 000 Hz, columns $a_8$ and $a_9$.
+- **The print:** $a_8 = -5{,}88 \times 10^{-10}$ and
+  $a_9 = 2{,}25 \times 10^{-10}$.
+- **The problem:** at $U$ = 40 m/s the printed $a_9$ alone contributes
+  $2{,}25 \times 10^{-10} \times 40^9 \approx 5{,}9 \times 10^4$ dB to
+  $C_{3,4}$, which no correction can be. The same row of the neighbouring
+  tables prints $a_8 = -5{,}90 \times 10^{-12}$ and
+  $a_9 = 2{,}25 \times 10^{-13}$ (Table I.1) and
+  $a_9 = 2{,}25 \times 10^{-13}$ (Table I.3), so the exponents are
+  $-12$ and $-13$ and the print is short by two and three decades. Annex I
+  is informative and the row is in the informative range above 10 kHz.
+- **Evidence:** PDF page 72 (printed p. 62) of ISO 5136:2003, against the
+  same row of Table I.1 on PDF page 70 (printed p. 60) and of Table I.3 on
+  PDF page 74 (printed p. 64).
+- **Library behaviour:** the informative Annexes H and I are outside the
+  scope the standard states for itself (0,15 m to 2 m) and are not
+  implemented; a duct above 2 m is refused. Recorded so that an
+  implementation of Annex I does not carry the exponents as printed.
 - **Status:** unreported.
 
 ## Related source properties that are not errata
@@ -3846,3 +4020,25 @@ published sources:
   Eq. (14) as printed by default and offers `integration_time` on
   [`sound_energy_in_situ`](../src/phonometry/emission/sound_power_in_situ.py)
   to carry the background to the event's interval first.
+
+- **ISO 5136:2003, clause 5.3.4.3, the sign of Equation (8):** the clause
+  says the corrections of the nose cone and the foam ball "are estimated to
+  be negative and of small magnitude", and then prints
+  $C_{3,4} = 10 \lg[1/(1 - U/c)^2]$ dB, which is positive whenever $U > 0$:
+  at the 20 m/s the nose cone is allowed, with $c$ = 340 m/s, $+0{,}53$ dB on
+  the outlet side and $-0{,}50$ dB on the inlet side. The equation's sign is
+  the one the convected plane wave gives, the energy flux of a wave
+  travelling with the flow being $(1 + M)^2$ times $p^2/\rho c$, so for a
+  given pressure the power is higher downstream and lower upstream. It is not
+  registered as an erratum because the closing sentence of the same paragraph
+  reconciles the two: "With this simplification, the sound power level
+  obtained by using the nose cone or foam ball is expected to be higher than
+  the true sound power level." The negative correction is the modal one,
+  which is unavailable and is dropped; Equation (8) is the convective part
+  that is kept, and the standard says in the same breath that what is left
+  biases $L_W$ high. Read on PDF page 29 (printed p. 19) of ISO 5136:2003.
+  Registered here so that nobody "corrects" the sign of Equation (8), which
+  [`flow_modal_correction`](../src/phonometry/emission/sound_power_in_duct.py)
+  implements as printed and `test_eq8_omnidirectional_shields` in
+  [`tests/emission/test_sound_power_in_duct.py`](../tests/emission/test_sound_power_in_duct.py)
+  pins.

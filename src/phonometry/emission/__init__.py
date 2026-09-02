@@ -53,6 +53,12 @@ from .sound_power_anechoic import (
     precision_uncertainty,
     sound_power_anechoic,
 )
+from .sound_power_in_duct import (
+    InDuctSoundPowerResult,
+    flow_modal_correction,
+    in_duct_reproducibility,
+    sound_power_in_duct,
+)
 from .sound_power_in_situ import (
     GradeConditions,
     InSituSoundPowerResult,
@@ -113,6 +119,7 @@ __all__ = [
     "DiscretePointIntensityResult",
     "FieldIndicators",
     "GradeConditions",
+    "InDuctSoundPowerResult",
     "InSituSoundPowerResult",
     "IntensityInstrumentComplianceResult",
     "IntensityResult",
@@ -141,6 +148,8 @@ __all__ = [
     "excess_sound_pressure_level",
     "extraneous_velocity_correction",
     "field_indicators",
+    "flow_modal_correction",
+    "in_duct_reproducibility",
     "instrument_class_from_components",
     "intensity_class_compliance",
     "mean_single_event_level",
@@ -172,6 +181,7 @@ __all__ = [
     "sound_power_anechoic",
     "sound_power_comparison",
     "sound_power_from_vibration",
+    "sound_power_in_duct",
     "sound_power_in_situ",
     "sound_power_intensity",
     "sound_power_intensity_points",

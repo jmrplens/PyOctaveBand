@@ -1,6 +1,6 @@
 ---
 title: "Guías"
-description: "Las 110 guías de phonometry, agrupadas en los once temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
+description: "Las 111 guías de phonometry, agrupadas en los once temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
 head:
   - tag: script
     attrs:
@@ -104,7 +104,7 @@ hay ninguna panorámica del campo: cada página es la documentación de trabajo 
 un módulo, escrita para que un resultado se pueda defender apartado por
 apartado en lugar de darlo por bueno.
 
-Esta página es el mapa. Ciento diez guías repartidas en once temas, y cada
+Esta página es el mapa. Ciento once guías repartidas en once temas, y cada
 área tiene su propio índice con el relato largo de cómo encajan sus piezas. Si
 llegas sin una pregunta concreta, lee primero la
 [introducción](/phonometry/es/start/getting-started/): recorre una señal por toda la
@@ -656,6 +656,11 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 y EBU R 128.
 - [Potencia acústica in situ por comparación](/phonometry/es/devices/emission/sound-power-in-situ/):
   la comparación de ISO 3747 con una fuente sonora de referencia donde trabaja
   la máquina, con el nivel de energía acústica de una fuente impulsiva.
+
+- [Potencia acústica en conducto](/phonometry/es/devices/emission/sound-power-in-duct/):
+  el método en conducto de ISO 5136 para ventiladores, con la corrección de
+  flujo y modal del tubo de muestreo del Anexo A y la relación de onda plana
+  del apartado 8.
 - [Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/):
   el barrido in situ de ISO 9614-2 y el grado de precisión ISO 9614-3.
 - [Potencia acústica a partir de la vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/):

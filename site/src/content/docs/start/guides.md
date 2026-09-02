@@ -1,6 +1,6 @@
 ---
 title: "Guides"
-description: "The 110 guides of phonometry, grouped into the eleven topics the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
+description: "The 111 guides of phonometry, grouped into the eleven topics the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
 head:
   - tag: script
     attrs:
@@ -103,7 +103,7 @@ makes, then runnable code and the figure it draws. Nothing here is a survey of
 the field; each page is the working documentation of a module, written so that
 a result can be defended clause by clause rather than trusted.
 
-This page is the map. A hundred and ten guides sit in eleven topics, and each topic has its
+This page is the map. A hundred and eleven guides sit in eleven topics, and each topic has its
 own overview page with the longer story of how its pieces fit together. If you
 are arriving without a specific question, read
 [Getting Started](/phonometry/start/getting-started/) first: it runs one signal
@@ -623,6 +623,10 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 and EBU R 128.
 - [Sound Power in Situ by Comparison](/phonometry/devices/emission/sound-power-in-situ/):
   the ISO 3747 comparison against a reference sound source where the machine
   works, with the sound energy level of an impulsive source.
+
+- [Sound Power in a Duct](/phonometry/devices/emission/sound-power-in-duct/):
+  the ISO 5136 in-duct method for fans, with the sampling-tube flow and modal
+  correction of Annex A and the plane-wave relation of clause 8.
 - [Sound Power by Intensity Scanning](/phonometry/devices/emission/sound-power-intensity/):
   the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade.
 - [Sound power from surface vibration (ISO/TS 7849)](/phonometry/devices/emission/vibration-sound-power/):

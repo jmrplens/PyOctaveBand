@@ -17,7 +17,9 @@ of ISO 3745,
 for the direct and comparison methods of ISO 3741,
 [Sound Power in Situ by Comparison](sound-power-in-situ.md)
 for the ISO 3747 comparison against a reference sound source where the
-machine works, and
+machine works,
+[Sound Power in a Duct](sound-power-in-duct.md)
+for the ISO 5136 in-duct method that measures a fan inside its own test duct, and
 [Sound Power by Intensity Scanning](sound-power-intensity.md)
 for the on-site scanning of ISO 9614-2 and its ISO 9614-3 precision grade, and
 [Sound Intensity](intensity.md)
@@ -71,6 +73,9 @@ judged against.
   the ISO 3747 engineering and survey comparison against a reference sound
   source in a reverberant environment, for the machine that cannot leave its
   installation, with the sound energy level of an impulsive source.
+- [Sound Power in a Duct](sound-power-in-duct.md):
+  the ISO 5136 in-duct method for fans, with the sampling-tube flow and
+  modal correction of Annex A and the plane-wave relation.
 - [Sound power from surface vibration (ISO/TS 7849)](vibration-sound-power.md):
   the radiated power from the surface-averaged velocity level and the
   radiation factor, with the Part 1 upper limit and the Part 2 engineering

@@ -34,6 +34,7 @@ if TYPE_CHECKING:
     )
     from ..emission.sound_power import SoundEnergyResult, SoundPowerResult
     from ..emission.sound_power_anechoic import PrecisionSoundPowerResult
+    from ..emission.sound_power_in_duct import InDuctSoundPowerResult
     from ..emission.sound_power_in_situ import InSituSoundPowerResult
     from ..emission.sound_power_intensity import (
         PrecisionIntensityResult,
@@ -126,6 +127,7 @@ def plot_sound_power(
         | SoundPowerIntensityResult
         | PrecisionIntensityResult
         | DiscretePointIntensityResult
+        | InDuctSoundPowerResult
     ),
     ax: Axes | None = None,
     language: str = "en",
@@ -140,13 +142,15 @@ def plot_sound_power(
     :class:`~phonometry.emission.sound_power_intensity.SoundPowerIntensityResult`
     and
     :class:`~phonometry.emission.sound_power_intensity.PrecisionIntensityResult`,
-    and the discrete-point one,
-    :class:`~phonometry.emission.sound_power_intensity_points.DiscretePointIntensityResult`;
+    the discrete-point one,
+    :class:`~phonometry.emission.sound_power_intensity_points.DiscretePointIntensityResult`,
+    and the in-duct one,
+    :class:`~phonometry.emission.sound_power_in_duct.InDuctSoundPowerResult`;
     for the three intensity variants the bands where the net power is
     non-positive (``negative_band`` / ``not_applicable_band``) are hatched and
     greyed as unusable.
 
-    :param result: One of the six sound-power results named above.
+    :param result: One of the seven sound-power results named above.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the band :meth:`~matplotlib.axes.Axes.bar`.

@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**600/600 conformance checks pass** across 59 domains and 375 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**606/606 conformance checks pass** across 59 domains and 376 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -36,13 +36,13 @@
 | Long 2e Table 14.9 (worked duct-borne sheet, supply path) | Fan to room, 8 octave bands -> 52/42/30/18/9/-2/-2/-1 dB at the receiver | 1 dB | 1 dB | 100 % |
 | IEC 60268-16 Annex M | Step 2 printed intermediates: the measurement condition, row by row | worst row: amf in dB, 0.99 of its last printed place | 0.993 | 99 % |
 | IEC 60268-16 Annex M | Step 3 printed intermediates: the operational condition, row by row | worst row: amf in dB, 0.99 of its last printed place | 0.987 | 99 % |
+| ISO 5136:2003 Table D.1 | C3,4 of the sampling tube for d = 0,5 m at U = +/-5, +/-15, +/-30 m/s, 27 bands | max absolute deviation 0.049 dB | 0.049 dB | 98 % |
 | ISO 9053-2:2020 Annex A.3 | Thermal boundary-layer thickness b | 0.00183 m | 0 m | 97 % |
 | Long, Architectural Acoustics 2e, Table 8.1 | Room modes of a 7 x 5 x 3 m room: the six printed frequencies, Hz | 42.27 Hz | -0.126 Hz | 97 % |
 | ISO 12354-2:2017 Annex C / Annex G Table G.4 | Floating floor: fo = 160 sqrt(s'/m') = 52,8 Hz, DeltaL = 30 lg(f/fo) over 21 bands, DeltaLw = 32,2 dB | 0.048 dB | 0.048 dB | 96 % |
 | ASA WG S3-79 CB_1.TST | Critical band, alternative importance | 0.41 | 0 | 95 % |
 | ASA WG S3-79 ECB_1.TST | Equally contributing, alternative importance | 0.41 | 0 | 95 % |
 | IEC 60268-16 Annex M | Step 4a printed intermediates: 98 effective signal-to-noise ratios | worst cell 0.074 dB from its printed value | 0.074 dB | 92 % |
-| Vigran Eqs. (3.113)/(3.115), printed p. 96 | Corrugated 1 mm steel plate (H = 10 mm, L = 100 mm), f(2,2) | 102.09 Hz | 0.092 Hz | 92 % |
 
 <details>
 <summary><b>Numerical validation - filters &amp; weightings</b>: class showcase (IEC 61260-1 · IEC 61672-1 · ISO 7196)</summary>
@@ -278,7 +278,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>Intensity &amp; sound power</b>: 100% (31/31)</summary>
+<summary><b>Intensity &amp; sound power</b>: 100% (37/37)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -313,6 +313,12 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 3747:2010 Eq. C.2 | Static pressure at 500 m, 101,325 (1 - 2,2560e-5 x 500)^5,2553 kPa | 95.4609 kPa (+/-0 kPa) | 95.4609 kPa | 0 kPa | 0 % | ![Pass][cv-pass] Pass |
 | ISO 3747:2010 Table D.1 / Eq. D.1 | LWA of a flat 90 dB octave spectrum, 63 Hz to 8 kHz, with the printed Ck | 96.9871 dB (+/-0 dB) | 96.9871 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 3747:2010 Eq. A.1 | Excess over the spherical free field Lp = LW - 11 - 20 lg(r/r0): a level 7 dB above it reads dLf = 7 dB | 7 dB (+/-0 dB) | 7 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 5136:2003 Table D.1 | C3,4 of the sampling tube for d = 0,5 m at U = +/-5, +/-15, +/-30 m/s, 27 bands | 162 tabulated values reproduced to the printed 0,1 dB | max absolute deviation 0.049 dB | 0.049 dB | 98 % | ![Pass][cv-pass] Pass |
+| ISO 5136:2003 Eqs (D.2)/(D.3) | Worked example: C3,4 = (1,85 + 0,038 U) dB at 1 kHz, U = +15 and -15 m/s | 2,42 dB at +15 m/s and 1,28 dB at -15 m/s reproduced | max absolute deviation 0.0e+00 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 5136:2003 Eq. (8) | Nose-cone / foam-ball correction 10 lg[1/(1 - U/c)^2] at U = 20 m/s, c = 340 m/s | 0.52658 dB (+/-0 dB) | 0.52658 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 5136:2003 Eq. (12) | Plane-wave relation LW - Lp = 10 lg(S/S0) - 10 lg(rho c/400), d = 0,5 m | -7.2113 dB (+/-0 dB) | -7.2113 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 5136:2003 Table 2 / Table 3 | Reproducibility sigma_R per band, 50 Hz to 10 kHz, and the extrapolated 12,5 to 20 kHz | 27 tabulated values of sigma_R reproduced | max absolute deviation 0.000 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 5136:2003 Annex C Table C.1 | A-weighting C_j of the 27 bands, read back as LWA - LW of one band at a time | 27 tabulated values of C_j reproduced | max absolute deviation 5.8e-15 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 
 </details>
 

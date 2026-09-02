@@ -26,6 +26,7 @@ from .theme import (
     COLOR_MUTED,
     COLOR_PANEL,
     COLOR_PRIMARY,
+    COLOR_QUATERNARY,
     COLOR_SECONDARY,
     COLOR_TERTIARY,
     LABEL_FREQ_HZ,
@@ -1436,6 +1437,265 @@ def generate_sound_energy_burst(output_dir: str) -> None:
     axr.set_axisbelow(True)
     plt.tight_layout()
     save_figure(output_dir, "sound_energy_burst.svg")
+    plt.close()
+
+
+def generate_in_duct_flow_correction(output_dir: str) -> None:
+    """ISO 5136: the sampling-tube correction C3,4 against frequency and flow."""
+    print("Generating in_duct_flow_correction.svg...")
+    from phonometry import emission
+
+    # A 0,5 m test duct, the middle of the method's range, seen from both
+    # sides of the fan: the outlet duct carries the flow away from it
+    # (U > 0) and the inlet duct brings the flow in (U < 0). Eq. (7) is a
+    # polynomial with both even and odd powers, so the same speed corrects
+    # the two sides by different amounts, and the gap widens with frequency
+    # as the modal part of the correction grows.
+    diameter = 0.5
+    bands = np.array(
+        [
+            50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000,
+            1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500,
+            16000, 20000,
+        ],
+        dtype=float,
+    )  # fmt: skip
+    fig, (axf, axu) = plt.subplots(1, 2, figsize=(12.5, 5.6))
+    for speed, color in (
+        (5.0, COLOR_PRIMARY),
+        (15.0, COLOR_TERTIARY),
+        (30.0, COLOR_SECONDARY),
+    ):
+        for sign, style, marker, label in (
+            (1.0, "-", "o", f"Outlet, $U$ = +{speed:.0f} m/s"),
+            (-1.0, "--", "s", f"Inlet, $U$ = −{speed:.0f} m/s"),
+        ):
+            c34 = emission.flow_modal_correction(bands, sign * speed, diameter)
+            axf.semilogx(
+                bands,
+                c34,
+                style,
+                color=color,
+                linewidth=1.8,
+                marker=marker,
+                markersize=3.8,
+                markerfacecolor="white",
+                markeredgewidth=1.1,
+                label=label,
+                zorder=3,
+            )
+    # Above 10 kHz the coefficients are printed for information only. The
+    # callout sits inside the axes, right of the boundary it explains: the
+    # decade past it is only a tenth of the width, so anchoring the box there
+    # from the left would run it over the right spine and its ticks.
+    boundary = float(np.sqrt(10000.0 * 12500.0))
+    axf.axvline(boundary, color=COLOR_MUTED, linestyle=":", linewidth=1.4, zorder=2)
+    axf.text(
+        0.985,
+        0.035,
+        "12.5 kHz to 20 kHz:\nfor information only",
+        transform=axf.transAxes,
+        ha="right",
+        va="bottom",
+        fontsize=9,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.35",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+        zorder=5,
+    )
+    axf.axhline(0.0, color=COLOR_GRID, linewidth=1.0, zorder=1)
+    format_frequency_axis(axf, 45.0, 24000.0)
+    axf.set_xlim(45.0, 24000.0)
+    axf.set_ylim(-3.0, 25.0)
+    axf.set_xlabel(LABEL_FREQ_HZ)
+    axf.set_ylabel("Correction $C_{3,4}$ [dB]")
+    axf.set_title("Sampling-tube correction $C_{3,4}$ (ISO 5136), $d$ = 0.5 m", pad=12)
+    axf.grid(True, which="major", color=COLOR_GRID, linestyle="--", alpha=0.5)
+    axf.set_axisbelow(True)
+    axf.legend(loc="upper left", fontsize=9, ncol=2)
+
+    # The same correction read the other way: against the flow velocity in
+    # three bands, over the normative +/-40 m/s, with the frequency-
+    # independent convective term of the omni-directional shields beside it.
+    speeds = np.linspace(-40.0, 40.0, 161)
+    for band, color in (
+        (1000.0, COLOR_PRIMARY),
+        (4000.0, COLOR_TERTIARY),
+        (10000.0, COLOR_SECONDARY),
+    ):
+        c34 = np.array(
+            [
+                float(emission.flow_modal_correction([band], u, diameter)[0])
+                for u in speeds
+            ]
+        )
+        axu.plot(
+            speeds,
+            c34,
+            color=color,
+            linewidth=1.9,
+            label=f"{band / 1000:g} kHz",
+            zorder=3,
+        )
+    # The omni-directional shields stop at their own scope, 20 m/s for the
+    # nose cone (clause 1.1), so Eq. (8) is drawn no further.
+    cone_speeds = np.linspace(-20.0, 20.0, 81)
+    cone = np.array(
+        [
+            float(
+                emission.flow_modal_correction(
+                    [1000.0], u, diameter, shield="nose-cone"
+                )[0]
+            )
+            for u in cone_speeds
+        ]
+    )
+    axu.plot(
+        cone_speeds,
+        cone,
+        color=COLOR_QUATERNARY,
+        linestyle="--",
+        linewidth=1.7,
+        label="Nose cone and foam ball, Eq. (8)",
+        zorder=3,
+    )
+    axu.axhline(0.0, color=COLOR_GRID, linewidth=1.0, zorder=1)
+    axu.axvline(0.0, color=COLOR_GRID, linewidth=1.0, zorder=1)
+    axu.text(
+        -38.0,
+        23.2,
+        "Inlet side",
+        ha="left",
+        va="top",
+        fontsize=9.5,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.3",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    axu.text(
+        38.0,
+        23.2,
+        "Outlet side",
+        ha="right",
+        va="top",
+        fontsize=9.5,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.3",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    axu.set_xlim(-40.0, 40.0)
+    axu.set_ylim(-3.0, 25.0)
+    axu.set_xlabel("Mean flow velocity $U$ [m/s]")
+    axu.set_ylabel("Correction $C_{3,4}$ [dB]")
+    axu.set_title("The same correction against the flow velocity", pad=12)
+    axu.grid(True, color=COLOR_GRID, linestyle="--", alpha=0.5)
+    axu.set_axisbelow(True)
+    axu.legend(loc="upper left", bbox_to_anchor=(0.01, 0.9), fontsize=9)
+    fig.tight_layout()
+    save_figure(output_dir, "in_duct_flow_correction.svg")
+    plt.close()
+
+
+def _in_duct_fan_example() -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """The ducted-fan measurement the in-duct guide runs, as four arrays.
+
+    A 630 mm axial fan on its outlet test duct at 12 m/s, about 3,7 m3/s,
+    read with a sampling tube at three circumferential positions in the 24
+    bands from 50 Hz to 10 kHz: the broadband hump of an axial fan around
+    250 Hz to 500 Hz with the blade-passage tone of six blades at
+    1 450 r/min, 145 Hz, in the 160 Hz band; the microphone's free-field
+    correction C1 and the sampling tube's own response C2 from their
+    calibration sheets, both growing towards the top of the range.
+    Returns ``(frequencies, levels, c1, c2)``.
+    """
+    freqs = np.array(
+        [
+            50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000,
+            1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000,
+        ],
+        dtype=float,
+    )  # fmt: skip
+    mean = np.array(
+        [
+            78.0, 79.5, 81.0, 82.5, 84.0, 88.0, 85.5, 86.0, 86.5, 86.0, 85.0, 84.0,
+            83.0, 82.0, 80.5, 79.0, 77.5, 76.0, 74.0, 72.0, 70.0, 67.5, 65.0, 62.0,
+        ]
+    )  # fmt: skip
+    # Three positions 120 degrees apart, each a few tenths off the mean.
+    spread = np.array([[0.4], [-0.3], [-0.1]]) + 0.3 * np.sin(
+        np.arange(freqs.size) * np.array([[1.0], [1.7], [2.3]])
+    )
+    levels = mean + spread
+    c1 = np.array([0.0] * 19 + [0.1, 0.2, 0.4, 0.7, 1.1])
+    c2 = np.array(
+        [0.0] * 11 + [0.2, 0.3, 0.5, 0.6, 0.8, 1.0, 1.2, 1.5, 1.9, 2.3, 2.8, 3.4, 4.0]
+    )
+    return freqs, levels, c1, c2
+
+
+def generate_sound_power_in_duct_result(output_dir: str) -> None:
+    """ISO 5136: in-duct LW spectrum of a ducted fan, sampling tube, outlet side."""
+    print("Generating sound_power_in_duct_result.png...")
+    from phonometry.emission import sound_power_in_duct
+
+    freqs, levels, c1, c2 = _in_duct_fan_example()
+    result = sound_power_in_duct(
+        levels,
+        freqs,
+        0.63,
+        12.0,
+        microphone_correction=c1,
+        shield_correction=c2,
+    )
+    lw = result.sound_power_level
+    lwa = result.sound_power_level_a
+    positions = np.arange(freqs.size, dtype=float)
+    _fig, ax = plt.subplots(figsize=(10, 6.3))
+    ax.bar(
+        positions,
+        lw,
+        width=0.7,
+        color=COLOR_PRIMARY,
+        edgecolor=COLOR_FG,
+        linewidth=0.7,
+        zorder=3,
+        label="Sound power level $L_W$",
+    )
+    ax.plot(
+        positions,
+        result.mean_pressure_level,
+        "o--",
+        color=COLOR_SECONDARY,
+        linewidth=1.5,
+        markersize=4.5,
+        markerfacecolor="white",
+        markeredgewidth=1.2,
+        zorder=4,
+        label="Measured in-duct level, before the corrections",
+    )
+    ax.set_xticks(positions)
+    ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
+    ax.set_title(
+        f"In-duct sound power (ISO 5136)  $L_{{W\\!\\mathrm{{A}}}}$ = {lwa:.1f} dB(A)",
+        pad=12,
+    )
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Level [dB]")
+    ax.set_ylim(0.0, float(np.nanmax(levels)) + 10.0)
+    ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper right", fontsize=9)
+    plt.tight_layout()
+    save_figure(output_dir, "sound_power_in_duct_result.png")
     plt.close()
 
 
