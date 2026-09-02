@@ -56,6 +56,7 @@ from result_factories import (
     _impact_prediction,
     _impact_rating,
     _impedance_tube,
+    _in_situ_power,
     _intensity,
     _intensity_power_negative,
     _layered_absorber,
@@ -144,6 +145,7 @@ _KWARG_PLOT_CASES = [
     ("room", lambda: _room([250, 2000]), "bar"),
     ("sound_power", _sound_power, "bar"),
     ("reverb_power", _reverb_power, "bar"),
+    ("in_situ_power", _in_situ_power, "bar"),
     ("intensity_power", _intensity_power_negative, "bar"),
     ("intensity", _intensity, "line"),
     (

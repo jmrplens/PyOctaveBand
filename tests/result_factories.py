@@ -491,3 +491,28 @@ def _transfer_matrix() -> tuple[ph.materials.TransferMatrix, np.ndarray, float]:
     k = 2.0 * np.pi * f / 343.2
     tm = ph.materials.air_layer_transfer_matrix(k, 0.05, rho_c)
     return tm, f, rho_c
+
+
+def _in_situ_power() -> ph.emission.InSituSoundPowerResult:
+    """ISO 3747 in situ comparison at four positions, one band an upper bound."""
+    freqs = np.array([250.0, 500.0, 1000.0, 2000.0])
+    st = np.array(
+        [
+            [83.4, 85.0, 84.2, 81.0],
+            [82.8, 84.6, 83.9, 80.4],
+            [84.0, 85.9, 85.0, 81.9],
+            [83.1, 85.3, 84.5, 81.3],
+        ]
+    )
+    rss = np.array(
+        [
+            [81.9, 83.7, 84.9, 84.8],
+            [81.2, 83.1, 84.3, 84.1],
+            [82.6, 84.4, 85.5, 85.4],
+            [82.1, 83.9, 85.0, 85.0],
+        ]
+    )
+    background = np.array([70.0, 72.0, 71.0, 78.0])  # 2 kHz margin below 6 dB
+    return ph.emission.sound_power_in_situ(
+        st, rss, np.array([90.5, 92.5, 93.8, 94.0]), freqs, background_levels=background
+    )
