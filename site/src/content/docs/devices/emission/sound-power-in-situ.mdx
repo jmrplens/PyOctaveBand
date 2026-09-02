@@ -331,7 +331,7 @@ grade 2, $\sigma_\mathrm{omc}$ = 2,0 dB, $k$ = 2.
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `event_levels` | 3D or 2D array | dB | `(n, N, bands)` or `(n, bands)` | $L'_{Ei,q(\mathrm{ST})}$ per event, or $L'_{Ei,N(\mathrm{ST})}$ of one measurement over $N$ events |
-| `events` | int | | $\ge 1$ | $N$ for the 2D form (Eq. 17); must be `None` with the 3D form |
+| `events` | int | | $\ge 1$ | $N$ for the 2D form (Eq. 17); must be `None` with the 3D form. Clause 7.6 asks for at least five events, so fewer than five warns and the determination is nonconforming, on either form |
 | `integration_time` | float | s | $> 0$ | $T$ of the event measurement; `None` applies Eq. 14 as printed |
 | `levels_ref`, `lw_ref`, `frequencies`, `background_levels`, `background_levels_ref`, `temperature`, `static_pressure`, `excess_levels`, `directivity_range`, `sigma_omc`, `coverage_factor` | | | | As in `sound_power_in_situ()` |
 

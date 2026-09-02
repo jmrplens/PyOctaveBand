@@ -343,7 +343,7 @@ $\sigma_\mathrm{omc}$ = 2,0 dB, $k$ = 2.
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `event_levels` | array 3D o 2D | dB | `(n, N, bandas)` o `(n, bandas)` | $L'_{Ei,q(\mathrm{ST})}$ por suceso, o $L'_{Ei,N(\mathrm{ST})}$ de una medición sobre $N$ sucesos |
-| `events` | int | | $\ge 1$ | $N$ para la forma 2D (Ec. 17); debe ser `None` con la forma 3D |
+| `events` | int | | $\ge 1$ | $N$ para la forma 2D (Ec. 17); debe ser `None` con la forma 3D. El apartado 7.6 pide al menos cinco sucesos, así que menos de cinco avisa y la determinación no es conforme, en cualquiera de las dos formas |
 | `integration_time` | float | s | $> 0$ | $T$ de la medición del suceso; `None` aplica la Ec. 14 tal como está impresa |
 | `levels_ref`, `lw_ref`, `frequencies`, `background_levels`, `background_levels_ref`, `temperature`, `static_pressure`, `excess_levels`, `directivity_range`, `sigma_omc`, `coverage_factor` | | | | Como en `sound_power_in_situ()` |
 

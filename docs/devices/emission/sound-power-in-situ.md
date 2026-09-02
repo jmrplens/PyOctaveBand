@@ -27,7 +27,10 @@ reference source stands alongside the machine, never closer than 0,5 m to
 its reference box, and where the machine is long it is run at several
 locations along the sides (clause 7.3). Both sources and the background are
 read at the same positions, the reference source for 30 s (clause 7.5), in
-**octave bands from 125 Hz to 8 kHz** (clause 3.11).
+**octave bands from 125 Hz to 8 kHz** (clause 3.11); Table D.1 tabulates a
+63 Hz row besides, for use only where the environment and the instrumentation
+are satisfactory there (footnote a), which is why the API accepts that band
+too.
 
 The background is corrected **position by position** before anything is
 averaged (clause 8.1, Eq. 7):
@@ -256,7 +259,7 @@ the inputs are the same: grade 2, $\sigma_\mathrm{omc}$ = 2,0 dB, $k$ = 2.
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `event_levels` | 3D or 2D array | dB | `(n, N, bands)` or `(n, bands)` | $L'_{Ei,q(\mathrm{ST})}$ per event, or $L'_{Ei,N(\mathrm{ST})}$ of one measurement over $N$ events |
-| `events` | int | | $\ge 1$ | $N$ for the 2D form (Eq. 17); must be `None` with the 3D form |
+| `events` | int | | $\ge 1$ | $N$ for the 2D form (Eq. 17); must be `None` with the 3D form. Clause 7.6 asks for at least five events, so fewer than five warns and the determination is nonconforming, on either form |
 | `integration_time` | float | s | $> 0$ | $T$ of the event measurement; `None` applies Eq. 14 as printed |
 | `levels_ref`, `lw_ref`, `frequencies`, `background_levels`, `background_levels_ref`, `temperature`, `static_pressure`, `excess_levels`, `directivity_range`, `sigma_omc`, `coverage_factor` | | | | As in `sound_power_in_situ()` |
 
