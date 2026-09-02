@@ -144,7 +144,7 @@ def air_density_iso(
 
     :param temperature: Air temperature ``T``, in **kelvin**.
     :param atmospheric_pressure: Atmospheric pressure ``pa``, in kilopascals
-        (default 101,325 kPa).
+        (default 101.325 kPa).
     :return: Air density ``rho``, in kilograms per cubic metre.
     """
     t = np.asarray(temperature, dtype=np.float64)

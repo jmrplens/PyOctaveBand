@@ -73,7 +73,7 @@ kg/m3, $T_0 = 293$ K and $p_0 = 101.325$ kPa.
 | Name | Description |
 | :--- | :--- |
 | `temperature` | Air temperature `T`, in **kelvin**. |
-| `atmospheric_pressure` | Atmospheric pressure `pa`, in kilopascals (default 101,325 kPa). |
+| `atmospheric_pressure` | Atmospheric pressure `pa`, in kilopascals (default 101.325 kPa). |
 
 **Returns:** Air density `rho`, in kilograms per cubic metre.
 

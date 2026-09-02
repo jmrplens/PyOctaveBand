@@ -69,7 +69,12 @@ judged against.
   method and declaring the noise emission per ISO 4871.
 - [Sound Power by Pressure Methods](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/):
   the enveloping surface of ISO 3744/3746 and the precision anechoic grade of
+<<<<<<< HEAD
   ISO 3745.
+=======
+  ISO 3745, and the sound energy level of a burst over the ISO 3744/3746
+  enveloping surface.
+>>>>>>> 3f5add376 (Say which background carries a window, and which route is whose)
 - [Sound Power in the Reverberation Room](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/):
   the direct and comparison methods of ISO 3741.
 - [Sound Power in Situ by Comparison](https://jmrplens.github.io/phonometry/devices/emission/sound-power-in-situ/):
@@ -483,8 +488,17 @@ and clean the surface level with the background-noise correction $K_1$ and
 the environmental correction $K_2$. The **precision method** of ISO 3745
 moves the same idea into a qualified anechoic or hemi-anechoic room, where a
 fixed microphone array samples the free field directly and the grade-1
+<<<<<<< HEAD
 corrections are meteorological rather than environmental. The closing
 section renders the determination as the accredited-style test fiche. Which
+=======
+corrections are meteorological rather than environmental. Section 3 renders
+the determination as the accredited-style test fiche, and section 4 turns the
+enveloping surface of ISO 3744 and ISO 3746 on a source that does not run
+steadily at all, the noise burst whose descriptor is the sound energy level
+$L_J$ of clause 8.3. That route is theirs alone: ISO 3745 defines no sound
+energy level. Which
+>>>>>>> 3f5add376 (Say which background carries a window, and which route is whose)
 route fits which job, and the reverberation-room and intensity alternatives,
 are weighed in [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/).
 

@@ -2007,8 +2007,11 @@ dos ediciones con las mismas entradas y en el mismo orden.
 - **Comportamiento de la biblioteca:** `sound_energy_pressure`,
   `sound_energy_reverberation` y `sound_energy_comparison` comparan el fondo
   como su exposición sobre el mismo intervalo,
-  $L_{p(\mathrm{B})} + 10 \lg(T/T_0)$, y exigen `integration_time` siempre que
-  se da un fondo; los criterios y el tope de 8.2.3 (y de 9.1.2 en ISO 3741) se
+  $L_{p(\mathrm{B})} + 10 \lg(T/T_0)$, y exigen `integration_time` con el fondo
+  de la fuente bajo ensayo, que es el que se compara contra un nivel de suceso.
+  La fuente de referencia de `sound_energy_comparison` es estacionaria, así que
+  `background_levels_ref` se corrige con la regla promediada en el tiempo de
+  9.1.2 y no lleva ventana; los criterios y el tope de 8.2.3 (y de 9.1.2 en ISO 3741) se
   aplican entonces a ese margen. `tests/emission/test_sound_energy.py` fija
   $K_1 = 1{,}2563$ dB para una ráfaga de 78 dB sobre un fondo de 62 dB en una
   ventana de 10 s, y $L_J = L_W + 10 \lg(T/T_0)$ campo a campo en ambas

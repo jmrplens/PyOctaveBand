@@ -564,7 +564,7 @@ print(np.round(lj_octave, 1))         # 99.8 dB down to 87.7 dB, three thirds su
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `levels` | 1D, 2D or 3D array | dB | per band, `(NM, NB)` or `(Ne, NM, NB)` | Single event levels: per event on the first axis (Eq. 22), one reading of `events` events (Eq. 23), or the mean of one event |
-| `t60`, `volume`, `surface_area`, `frequencies` | as in section 1 | | | Direct method only; `frequencies` is required by both |
+| `t60`, `volume`, `surface_area`, `frequencies` | as in section 1 | | | Direct method only. `frequencies` is required there; the comparison method takes it only when `background_levels` is given, since the correction is per band |
 | `levels_ref`, `lw_ref`, `background_levels_ref` | as in section 2 | | | Comparison method only; the reference source is steady and keeps the 9.1.2 correction |
 | `events` | int or None | | `>= 1`, default `None` | $N_\mathrm{e}$ encompassed by one reading (Eq. 23); at least 5 without a warning |
 | `background_levels` | 1D or 2D array | dB | matches `levels` | Time-averaged background over the same window; per-position $K_{1i}$ (Eq. 25/26) |

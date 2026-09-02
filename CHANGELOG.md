@@ -132,7 +132,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   \cdot 1$ s), which is a ratio of energies only when $T = 1$ s. The library
   compares the background as its exposure over the same window,
   $L_{p(\mathrm{B})} + 10 \lg(T/T_0)$, so that the identity above holds for
-  every $T$, and asks for `integration_time` whenever a background is given;
+  every $T$, and asks for `integration_time` with the background of the source
+  under test, the only one that is an event level; the reference source of the
+  comparison method is steady, so its own background is corrected by the
+  time-averaged rule of 9.1.2 and needs no window;
   the errata registry records the reading, for ISO 3744 Eq. 21 and the same
   construction in ISO 3741 Eq. 25.
 

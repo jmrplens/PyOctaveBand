@@ -592,7 +592,7 @@ print(np.round(lj_octave, 1))         # de 99.8 dB a 87.7 dB, tres tercios sumad
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `levels` | array 1D, 2D o 3D | dB | por banda, `(NM, NB)` o `(Ne, NM, NB)` | Niveles de suceso aislado: por suceso en el primer eje (Ec. 22), una lectura de `events` sucesos (Ec. 23), o la media de un suceso |
-| `t60`, `volume`, `surface_area`, `frequencies` | como en la sección 1 | | | Solo método directo; `frequencies` lo exigen ambos |
+| `t60`, `volume`, `surface_area`, `frequencies` | como en la sección 1 | | | Solo método directo. Ahí `frequencies` es obligatorio; el método de comparación lo pide solo cuando se da `background_levels`, porque la corrección es por banda |
 | `levels_ref`, `lw_ref`, `background_levels_ref` | como en la sección 2 | | | Solo método de comparación; la fuente de referencia es estacionaria y conserva la corrección de 9.1.2 |
 | `events` | int o None | | `>= 1`, por defecto `None` | $N_\mathrm{e}$ abarcados por una lectura (Ec. 23); al menos 5 sin aviso |
 | `background_levels` | array 1D o 2D | dB | coincide con `levels` | Fondo promediado en el tiempo sobre la misma ventana; $K_{1i}$ por posición (Ec. 25/26) |

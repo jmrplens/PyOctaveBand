@@ -1841,7 +1841,10 @@ in the same order.
 - **Library behaviour:** `sound_energy_pressure`, `sound_energy_reverberation`
   and `sound_energy_comparison` compare the background as its exposure over
   the same interval, $L_{p(\mathrm{B})} + 10 \lg(T/T_0)$, and require
-  `integration_time` whenever a background is given; the criteria and the
+  `integration_time` with the background of the source under test, which is
+  the one compared against an event level. The reference source of
+  `sound_energy_comparison` is steady, so `background_levels_ref` is corrected
+  by the time-averaged rule of 9.1.2 instead and takes no window; the criteria and the
   clamp of 8.2.3 (and of 9.1.2 in ISO 3741) are then applied to that margin.
   `tests/emission/test_sound_energy.py` pins $K_1 = 1{,}2563$ dB for a 78 dB
   burst over a 62 dB background in a 10 s window, and
