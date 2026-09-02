@@ -63,6 +63,9 @@ In the order the chain runs.
 - **Damage** — [Noise-induced hearing loss (ISO 1999)](noise-induced-hearing-loss.md):
   NIPTS and its population distribution, and the combination with age into
   HTLAN.
+- **Protection** — [Hearing Protectors (ISO 4869-2)](hearing-protectors.md):
+  the octave-band, HML and SNR methods that say what a protector actually
+  leaves at the ear, and the assumed protection value all three start from.
 
 ## What this section does not cover
 

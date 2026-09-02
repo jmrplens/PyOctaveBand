@@ -1,0 +1,256 @@
+---
+title: "Hearing Protectors (ISO 4869-2)"
+description: "The three ISO 4869-2 methods that turn a hearing protector's measured attenuation into the effective A-weighted level left at the ear: the octave-band method, the HML values and the single number rating, all built on the assumed protection value."
+references:
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2018
+    title: "Acoustics — Hearing protectors — Part 2: Estimation of effective A-weighted sound pressure levels when hearing protectors are worn"
+    designation: "ISO 4869-2:2018"
+    url: "https://www.iso.org/standard/70090.html"
+    note: "The implemented standard: the assumed protection value of Clause 5, the octave-band method of Clause 6, the HML method of Clause 7 and the SNR method of Clause 8, validated against the worked examples of Annexes A to D."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2018
+    title: "Acoustics — Hearing protectors — Part 1: Subjective method for the measurement of sound attenuation"
+    designation: "ISO 4869-1:2018"
+    url: "https://www.iso.org/standard/69233.html"
+    note: "Where the per-subject attenuation values come from: the real-ear attenuation at threshold measured on at least 16 subjects, which is the input every method here starts from."
+---
+
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import SeeAlso from '../../../../components/SeeAlso.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
+
+A hearing protector is not measured on a coupler. ISO 4869-1 seats it on at
+least sixteen people and records the threshold shift each of them gets, so what
+comes back from the laboratory is a **distribution**: one attenuation per
+subject per octave band, with a spread that is often a third of the mean.
+ISO 4869-2 is the standard that turns that distribution into a number someone
+can act on, and the first thing it does is refuse to use the mean.
+
+## The distribution first (Clause 5)
+
+Every method starts from the assumed protection value, the mean attenuation
+reduced by a multiple of its own spread:
+
+$$
+APV_{fx} = m_f - \alpha\, s_f
+$$
+
+$\alpha$ is the inverse standard normal cumulative distribution at the
+protection performance $x$ (Table 1), so $APV_{f84}$ with $\alpha = 1$ is the
+attenuation 84 % of wearers reach or beat, and $APV_{f98}$ with $\alpha = 2$ is
+what all but one in fifty reach. Quoting a protector at its mean would describe
+a wearer who does not exist.
+
+```python
+import numpy as np
+from phonometry import hearing
+
+# ISO 4869-1 attenuation of one protector: 16 subjects, eight octave bands
+# from 63 Hz to 8 kHz. This is the example Annexes A to D of ISO 4869-2 are
+# worked on end to end.
+attenuation = np.array([
+    [4, 8, 13, 18, 20, 30, 35, 30],   [6, 12, 16, 21, 29, 35, 47, 35],
+    [10, 16, 17, 23, 25, 32, 48, 37], [3, 7, 12, 18, 20, 25, 33, 30],
+    [8, 10, 16, 16, 25, 27, 43, 32],  [4, 7, 10, 15, 19, 32, 35, 31],
+    [5, 5, 9, 16, 20, 25, 30, 28],    [15, 15, 21, 26, 25, 38, 46, 38],
+    [5, 6, 10, 13, 19, 22, 29, 28],   [9, 9, 10, 19, 20, 27, 37, 31],
+    [9, 16, 18, 24, 25, 35, 44, 39],  [5, 6, 11, 12, 17, 20, 28, 28],
+    [7, 10, 17, 22, 25, 35, 41, 44],  [6, 8, 16, 18, 19, 19, 30, 33],
+    [10, 12, 17, 25, 28, 33, 45, 40], [12, 13, 17, 27, 29, 38, 49, 41],
+], dtype=float)
+
+apv = hearing.assumed_protection_value(attenuation)          # x = 84 % by default
+print(np.round(apv.mean_attenuation, 1))    # [ 7.4 10.  14.4 19.6 22.8 29.6 38.8 34.1]
+print(np.round(apv.standard_deviation, 1))  # [3.3 3.6 3.6 4.6 4.  6.2 7.4 5.2]
+print(np.round(apv.apv, 1))                 # [ 4.1  6.4 10.7 14.9 18.8 23.4 31.3 28.9]
+
+# A stricter performance subtracts more of the same spread.
+strict = hearing.assumed_protection_value(attenuation, performance=98)
+print(np.round(apv.apv - strict.apv, 1))    # [3.3 3.6 3.6 4.6 4.  6.2 7.4 5.2]
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hearing_protector_methods.svg" alt="Left: the mean sound attenuation of a hearing protector across the eight octave bands from 63 Hz to 8 kHz, with its standard deviation shaded either side and the assumed protection value for 84 % of wearers drawn a full standard deviation below the mean. Right: the predicted noise level reduction as a function of the difference between the C-weighted and A-weighted levels of the noise, drawn as two straight segments through the H, M and L anchors, with the eight reference noises scattered at their own differences and the three methods' answers for one noise boxed" width="92%" loading="eager" />
+
+*Left, the protector: the assumed protection value sits a full standard
+deviation below the mean, and the gap is widest where the spread is, at 4 kHz.
+Right, the method: the HML line and the eight reference noises it was fitted
+on, with the three methods' answers for the same noise.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# apv is the AssumedProtectionResult computed above. One line:
+apv.plot()   # mean, its spread shaded, and the assumed protection on top
+plt.show()
+
+# The HML side, by hand.
+hml = hearing.hml_rating(attenuation)
+high, medium, low = hml.reported
+left, right = np.array([-4.0, 2.0]), np.array([2.0, 12.0])
+fig, ax = plt.subplots()
+ax.plot(left, medium - (high - medium) / 4 * (left - 2), color="#1f77b4")
+ax.plot(right, medium - (medium - low) / 8 * (right - 2), color="#1f77b4")
+ax.plot([-2, 2, 10], [high, medium, low], "o", color="#d62728", label="H, M, L")
+differences = np.asarray(hearing.HML_REFERENCE_C_MINUS_A)
+ax.plot(np.repeat(differences, 16), hml.predicted_reduction.T.reshape(-1), ".",
+        color="#2ca02c", alpha=0.5, label="reference noises")
+ax.set(xlabel="LpC - LpA [dB]", ylabel="Predicted noise level reduction [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## Three methods, in decreasing order of what they need
+
+### The octave-band method (Clause 6)
+
+The most faithful, and the only one that sees the shape of the noise: subtract
+the assumed protection value band by band from the A-weighted spectrum and sum
+what is left.
+
+$$
+L'_{p,Ax} = 10 \lg \sum_{k=1}^{8} 10^{0,1\left(L_{p,f(k)} + A_{f(k)} - APV_{f(k)x}\right)}\ \mathrm{dB}
+$$
+
+```python
+# Annex B's noise: octave-band levels of a machine hall, LpA = 104 dB.
+noise = [75.0, 84.0, 86.0, 88.0, 97.0, 99.0, 97.0, 96.0]
+octave = hearing.octave_band_protected_level(noise, apv)
+print(round(octave.effective_level, 1))   # 81.4
+print(octave.reported_level)              # 81
+print(round(octave.noise_reduction, 1))   # 22.6
+```
+
+The summation runs over the eight octaves from 63 Hz, or over seven from
+125 Hz when either the noise or the protector has no 63 Hz data. Clause 6
+rounds the result to the nearest integer, which is what `reported_level` does;
+`effective_level` keeps the unrounded value.
+
+### The HML method (Clause 7)
+
+Three numbers instead of a spectrum. $H$, $M$ and $L$ are the predicted noise
+level reduction this protector gives for reference noises whose
+$(L_{p,C} - L_{p,A})$ is $-2$, $+2$ and $+10$ dB, fitted across the eight
+reference spectra of Table 2. Applying them needs only the C- and A-weighted
+levels of the real noise:
+
+$$
+PNR_x = M_x - \frac{H_x - M_x}{4}\left(L_{p,C} - L_{p,A} - 2\right)
+\quad\text{for } (L_{p,C} - L_{p,A}) \leq 2\ \mathrm{dB}
+$$
+
+$$
+PNR_x = M_x - \frac{M_x - L_x}{8}\left(L_{p,C} - L_{p,A} - 2\right)
+\quad\text{otherwise},\qquad L'_{p,Ax} = L_{p,A} - PNR_x
+$$
+
+```python
+hml = hearing.hml_rating(attenuation)
+print(hml.reported)                       # (24, 18, 13)
+
+by_hml = hearing.hml_protected_level(104.0, 103.0, hml)
+print(round(by_hml.noise_reduction, 1))   # 22.5
+print(by_hml.reported_level)              # 82
+```
+
+Both branches meet at $+2$ dB, which is where $M$ itself is defined, so the
+line has a corner and no step. The values that enter them are the **rounded**
+ones: Clause 7.2 rounds $H$, $M$ and $L$ to the nearest integer, which is what
+a protector is published with, so that is what the application consumes.
+
+### The SNR method (Clause 8)
+
+One number, against a pink noise, subtracted from the C-weighted level.
+
+$$
+L'_{p,Ax} = L_{p,C} - SNR_x
+$$
+
+```python
+snr = hearing.snr_rating(attenuation)
+print(snr.reported)                       # 21
+
+by_snr = hearing.snr_protected_level(snr, l_p_c=103.0)
+print(by_snr.reported_level)              # 82
+
+# When only the A-weighted level was recorded, Formula (24) reassembles the
+# C-weighted one from an estimate of the difference and lands in the same place.
+print(hearing.snr_protected_level(snr, l_p_a=104.0, c_minus_a=-1.0).reported_level)  # 82
+```
+
+Because the reference noise is fixed, the rating says nothing about the shape
+of the noise it will meet, which is exactly what the HML method's three values
+recover.
+
+## Which number to believe
+
+The three methods answer the same question and rarely agree exactly. On the
+worked example above the same protector in the same noise gives **81 dB, 82 dB
+and 82 dB**, and Clause 1's own NOTE puts differences of 3 dB or less between
+comparable protectors below the resolution of the exercise. The ordering is
+not a ranking: the octave-band method uses more information and is the one to
+prefer when the spectrum is available, while HML and SNR exist precisely for
+when it is not.
+
+All three computations begin at 125 Hz. Formula (2) may start at 63 Hz when
+both the noise and the protector have data there, but the HML and SNR
+computations always start at 125 Hz regardless, which is why the reference
+spectra of Tables 2 and 3 begin there.
+
+One caution about the reference spectra: Annex C reprints Table 2 as its
+Table C.1 and the reprint disagrees with the original in two cells. Table 2 is
+the one that reproduces the annex's own worked results, and it is the one this
+library carries; the discrepancy is registered in
+[ERRATA](/phonometry/reference/errata/).
+
+## What this guide covers
+
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+ISO 4869-2:2018's assumed protection value (Clause 5, Formula (1), with all
+seven protection performances of Table 1), the octave-band method (Clause 6,
+Formula (2)), the HML method (Clause 7, Formulae (3) to (18), including the
+eight reference noises and the empirical weights of Table 2) and the SNR
+method (Clause 8, Formulae (19) to (24), against the pink noise of Table 3),
+via `hearing.assumed_protection_value`,
+`hearing.octave_band_protected_level`, `hearing.hml_rating`,
+`hearing.hml_protected_level`, `hearing.snr_rating` and
+`hearing.snr_protected_level`. Every printed number of the worked example that
+runs through Annexes A to D is reproduced in the test suite and in the
+conformance report.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered" label="Not covered">
+The measurement that produces the attenuation values is ISO 4869-1's and is not
+implemented: the real-ear attenuation at threshold, its subject panel, its
+fitting procedure and its own uncertainty are all taken as given, and this
+library starts from the resulting grid. ISO 4869-2's Annex E uncertainty
+treatment of attenuation values and ratings is not implemented either. Nothing
+here models the difference between laboratory attenuation and what a protector
+achieves in the field, which is the subject of ISO/TR 4869-5 and is
+consistently large; a derating factor is a policy decision this library does
+not make for you.
+</ScopeClaim>
+</Scope>
+
+<SeeAlso>
+
+## See also
+
+- [Occupational Noise Exposure (ISO 9612)](/phonometry/perception/hearing/occupational-exposure/):
+  the daily exposure level the protected level feeds into.
+- [Noise-induced hearing loss (ISO 1999)](/phonometry/perception/hearing/noise-induced-hearing-loss/):
+  what the exposure the protector did not stop does over a working life.
+- [Hearing threshold (age and reference zero)](/phonometry/perception/hearing/hearing-threshold/):
+  the baseline any protected exposure is judged against.
+- API reference: [`hearing.hearing_protectors`](/phonometry/reference/api/hearing/hearing-protectors/).
+
+</SeeAlso>

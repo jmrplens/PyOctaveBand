@@ -4323,6 +4323,37 @@ dos ediciones con las mismas entradas y en el mismo orden.
   impresos.
 - **Estado:** sin notificar.
 
+## ISO 4869-2:2018, Tabla C.1 (la reimpresión que contradice a la tabla que reimprime)
+
+- **Ubicación:** anexo C (informativo), Tabla C.1, «A-weighted octave-band
+  sound pressure levels, $L_{p,\mathrm{A}f(k)i}$, **from Table 2**», página 17
+  del PDF (p. 11 impresa), frente a la Tabla 2 normativa que cita, página 11
+  del PDF (p. 5 impresa).
+- **El impreso:** las dos tablas traen los mismos ocho ruidos de referencia
+  sobre las mismas siete bandas de octava, y siete de las ocho filas coinciden
+  dígito a dígito. La sexta dice 82,0 / **89,3** / **93,3** / 95,6 / 93,0 /
+  90,1 / 83,0 en la Tabla 2 y 82,0 / **89,4** / **93,5** / 95,6 / 93,0 / 90,1 /
+  83,0 en la Tabla C.1. Difieren las celdas de 250 Hz y 500 Hz; ninguna más.
+- **El problema:** la Tabla C.1 declara en su propio encabezado que procede de
+  la Tabla 2, así que una de las dos está mal, y los resultados del propio
+  anexo dicen cuál. La Fórmula (15) aplicada a los dieciséis valores de
+  atenuación de la Tabla A.1 con la fila de la Tabla 2 reproduce exactos los
+  dieciséis $PNR_{j6}$ de la Tabla C.2; con la fila de la Tabla C.1, trece de
+  los dieciséis se quedan 0,1 dB cortos. La Tabla 2 es, por tanto, la lectura
+  con la que se calculó el ejemplo, y además es la normativa, siendo la
+  Tabla C.1 una reimpresión informativa. Quien tome los espectros de
+  referencia del anexo C, donde están junto al ejemplo trabajado, obtiene los
+  valores $H$ y $M$ de un protector una décima de decibelio por debajo.
+- **Evidencia:** Fórmula (15), página 11 del PDF (p. 5 impresa), evaluada
+  sobre la Tabla A.1, página 15 del PDF (p. 9 impresa), contra la sexta fila
+  de la Tabla C.2, página 18 del PDF (p. 12 impresa), todo ello de la
+  ISO 4869-2:2018.
+- **Comportamiento de la biblioteca:** `HML_REFERENCE_NOISES` lleva la
+  Tabla 2. La suite de tests calcula esa misma fila con los valores de la
+  Tabla C.1 y comprueba que falla trece de los dieciséis impresos, de modo que
+  las dos lecturas no pueden intercambiarse en silencio.
+- **Estado:** sin notificar.
+
 ## Propiedades de las fuentes, relacionadas, que no son erratas
 
 Registradas aquí para prevenir futuros «arreglos» que romperían la

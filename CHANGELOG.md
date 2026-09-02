@@ -69,6 +69,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `hearing.assumed_protection_value()`, `hearing.octave_band_protected_level()`,
+  `hearing.hml_rating()`, `hearing.hml_protected_level()`,
+  `hearing.snr_rating()` and `hearing.snr_protected_level()` estimate what a
+  hearing protector leaves at the ear, by the three methods of ISO 4869-2:2018.
+
+  A protector is measured on people rather than on a coupler, so what
+  ISO 4869-1 returns is a distribution: one attenuation per subject per octave
+  band, with a spread often a third of the mean. Clause 5 refuses to quote the
+  mean and every method here starts from the assumed protection value, the mean
+  reduced by a multiple of its own spread, with all seven protection
+  performances of Table 1 available. The octave-band method subtracts it band
+  by band from the A-weighted spectrum; the HML method collapses the protector
+  to the three attenuation values a reference noise of stated C minus A gives,
+  and applies them through two straight segments meeting where the medium value
+  is defined; the SNR method collapses it to one number against a pink noise.
+  The two rating methods consume their ratings as the standard publishes them,
+  rounded to the nearest integer, which is what makes the worked example's
+  predicted reduction come out at 22,5 dB rather than at the unrounded fit, and
+  the reported levels round halves away from zero rather than to even.
+
+  The four informative annexes are one example carried through all three
+  methods, and every printed number of it is reproduced: the per-band mean and
+  spread of Annex A, the band table and 81 dB of Annex B, all sixteen HML
+  triples with their statistics and the 82 dB of Annex C, and all sixteen
+  single-number ratings with both applications of Annex D. Annex A's own
+  assumed-protection row is the difference of the rounded intermediates it
+  displays and sits 0,1 dB from the formula applied to the data in three of its
+  eight bands, which the documentation states and the suite pins both ways.
+
+  One defect of the printed standard joins the errata registry: Annex C
+  reprints the normative Table 2 as its Table C.1 and the reprint disagrees in
+  two cells. Table 2 is the reading that reproduces the annex's own results,
+  and the suite computes the same row from the reprint to show it missing
+  thirteen of the sixteen printed values.
+
 - `building.low_frequency_intensity_reduction()` measures sound insulation
   with sound intensity down to 50 Hz by the method of ISO 15186-3:2002, where
   the source room is too modal for a space average to describe the field

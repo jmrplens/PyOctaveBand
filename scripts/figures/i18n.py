@@ -641,6 +641,17 @@ _ES_EXACT = {
     "Sound reduction index [dB]": "Índice de reducción acústica [dB]",
     r"$K_\mathrm{c}$ adaptation": r"Adaptación $K_\mathrm{c}$",
     r"$R_\mathrm{I}$ (intensity)": r"$R_\mathrm{I}$ (intensidad)",
+    # hearing_protector_methods figure (ISO 4869-2)
+    "What 84 % of wearers get (Clause 5)": "Lo que obtiene el 84 % de los usuarios (apartado 5)",
+    "The same protector, judged three ways": "El mismo protector, juzgado de tres maneras",
+    "Sound attenuation [dB]": "Atenuación acústica [dB]",
+    "Predicted noise level reduction [dB]": "Reducción prevista del nivel de ruido [dB]",
+    r"mean attenuation $m_f$": r"atenuación media $m_f$",
+    r"$PNR_{84}$ from $H$=24, $M$=18, $L$=13 dB": r"$PNR_{84}$ a partir de $H$=24, $M$=18, $L$=13 dB",
+    r"$H$, $M$, $L$ anchors": r"anclas $H$, $M$, $L$",
+    "the 8 reference noises, per subject": "los 8 ruidos de referencia, por sujeto",
+    "this noise, $L_{p,C} - L_{p,A}$ = \u22121 dB": "este ruido, $L_{p,C} - L_{p,A}$ = \u22121 dB",
+    "octave band: $L'_{p,A84}$ = 81 dB\nHML: 82 dB\nSNR (21 dB): 82 dB": "bandas de octava: $L'_{p,A84}$ = 81 dB\nHML: 82 dB\nSNR (21 dB): 82 dB",
     # low_frequency_intensity figure (ISO 15186-3)
     "Low-frequency index and its field indicator": "Índice a baja frecuencia y su indicador de campo",
     "Qualifying the facility on a limp panel": "Calificación de la instalación con un panel flexible",
