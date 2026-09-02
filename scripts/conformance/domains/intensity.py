@@ -514,3 +514,233 @@ def _chk_iso9614_1_additional_positions() -> Outcome:
         expected_label=f"N* = {expected} positions",
         computed_label=f"N* = {outcome.additional_positions} positions",
     )
+
+
+# --- ISO 3747:2010: in situ comparison with a reference sound source ---------
+# The standard prints one worked number (the 9.5 EXAMPLE) and three tables the
+# library reads or reproduces (Table 2, Table D.1, Table E.1); everything else
+# is closed form, anchored here to the printed equations.
+
+_ISO3747_FREQS = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+_ISO3747_LW_RSS = np.array([87.0, 90.5, 92.5, 93.8, 94.0, 93.0, 90.0])
+_ISO3747_ST = np.array(
+    [
+        [80.1, 83.4, 85.0, 84.2, 81.0, 76.5, 70.2],
+        [79.0, 82.8, 84.6, 83.9, 80.4, 75.8, 69.5],
+        [81.2, 84.0, 85.9, 85.0, 81.9, 77.1, 70.9],
+        [80.5, 83.1, 85.3, 84.5, 81.3, 76.2, 70.0],
+    ]
+)
+_ISO3747_RSS = np.array(
+    [
+        [78.5, 81.9, 83.7, 84.9, 84.8, 83.5, 79.8],
+        [77.9, 81.2, 83.1, 84.3, 84.1, 82.9, 79.2],
+        [79.3, 82.6, 84.4, 85.5, 85.4, 84.1, 80.3],
+        [78.8, 82.1, 83.9, 85.0, 85.0, 83.7, 79.9],
+    ]
+)
+#: The four excesses and the directivity range that earn grade 2 (Table 2).
+_ISO3747_EXCESS_GRADE2 = [8.0, 9.5, 7.2, 8.8]
+_ISO3747_DIRECTIVITY_GRADE2 = 3.0
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 3747:2010 9.5 EXAMPLE",
+    "Expanded uncertainty U = 2 sqrt(1,5^2 + 2^2) dB, grade 2 with sigma_omc = 2,0 dB",
+)
+def _chk_iso3747_example_uncertainty() -> Outcome:
+    res = ph.emission.sound_power_in_situ(
+        _ISO3747_ST, _ISO3747_RSS, _ISO3747_LW_RSS, _ISO3747_FREQS,
+        sigma_omc=2.0,
+        conditions=ph.emission.GradeConditions(excess_levels=_ISO3747_EXCESS_GRADE2, directivity_range=_ISO3747_DIRECTIVITY_GRADE2),
+    )  # fmt: skip
+    return numeric(5.0, float(res.expanded_uncertainty), 1e-12, unit="dB", places=6)
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 3747:2010 Table 2 / Eq. 22",
+    "sigma_R0 by grade: 1,5 dB (grade 2) and 4,0 dB (grade 3), sigma_tot of Table E.1 row 2",
+)
+def _chk_iso3747_table2_and_e1() -> Outcome:
+    grade2 = ph.emission.sound_power_in_situ(
+        _ISO3747_ST, _ISO3747_RSS, _ISO3747_LW_RSS, _ISO3747_FREQS,
+        sigma_omc=4.0,
+        conditions=ph.emission.GradeConditions(excess_levels=_ISO3747_EXCESS_GRADE2, directivity_range=_ISO3747_DIRECTIVITY_GRADE2),
+    )  # fmt: skip
+    grade3 = ph.emission.sound_power_in_situ(
+        _ISO3747_ST, _ISO3747_RSS, _ISO3747_LW_RSS, _ISO3747_FREQS,
+        conditions=ph.emission.GradeConditions(excess_levels=[8.0, 6.9, 7.2, 8.8], directivity_range=3.0)
+    )  # fmt: skip
+    # Table E.1, sigma_R0 = 1,5 dB row at sigma_omc = 4 dB: sqrt(18,25) = 4,27 -> 4,3.
+    return record(
+        {"sigma_R0 grade 2": 1.5, "sigma_R0 grade 3": 4.0, "sigma_tot (1,5; 4)": 4.3},
+        {
+            "sigma_R0 grade 2": float(grade2.sigma_r0),
+            "sigma_R0 grade 3": float(grade3.sigma_r0),
+            "sigma_tot (1,5; 4)": round(float(grade2.sigma_tot), 1),
+        },
+        unit="dB",
+    )
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 3747:2010 Eq. 7 / 8.1",
+    "K1 at the 6 dB validity margin, -10 lg(1 - 10^-0,6) = 1,2563 dB, and the 1,3 dB cap below it",
+)
+def _chk_iso3747_k1_margin_and_cap() -> Outcome:
+    background = np.full_like(_ISO3747_ST, 40.0)
+    background[1, 3] = _ISO3747_ST[1, 3] - 6.0  # exactly at the validity margin
+    background[2, 5] = _ISO3747_ST[2, 5] - 2.0  # far below it: the cap
+    res = ph.emission.sound_power_in_situ(
+        _ISO3747_ST, _ISO3747_RSS, _ISO3747_LW_RSS, _ISO3747_FREQS,
+        background_levels=background,
+    )  # fmt: skip
+    expected_edge = -10.0 * math.log10(1.0 - 10.0**-0.6)
+    worst = max(
+        abs(float(res.background_correction[1, 3]) - expected_edge),
+        abs(float(res.background_correction[2, 5]) - 1.3),
+    )
+    flagged = not bool(res.background_requirement_met[5]) and bool(
+        res.background_requirement_met[3]
+    )
+    return numeric(
+        0.0,
+        worst if flagged else float("inf"),
+        1e-9,
+        unit="dB",
+        places=9,
+        expected_label="K1(6 dB) = 1,2563 dB, K1(2 dB) = 1,3 dB, 4 kHz flagged",
+    )
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 3747:2010 Eq. 11 vs ISO 3741:2010 Eq. 21",
+    "In situ comparison plus C2 equals the reverberation-room comparison (closed form)",
+)
+def _chk_iso3747_eq11_vs_iso3741() -> Outcome:
+    with warnings.catch_warnings():  # four positions trip the ISO 3741 advisory
+        warnings.simplefilter("ignore", ph.emission.SoundPowerWarning)
+        room = ph.emission.sound_power_comparison(
+            _ISO3747_ST, _ISO3747_RSS, _ISO3747_LW_RSS,
+            frequencies=_ISO3747_FREQS, temperature=20.0, static_pressure=100.0,
+        )  # fmt: skip
+    res = ph.emission.sound_power_in_situ(
+        _ISO3747_ST, _ISO3747_RSS, _ISO3747_LW_RSS, _ISO3747_FREQS,
+        temperature=20.0, static_pressure=100.0,
+    )  # fmt: skip
+    worst = float(np.max(np.abs(res.sound_power_level_ref - room.sound_power_level)))
+    return numeric(
+        0.0, worst, 1e-9, unit="dB", places=9, expected_label="0 dB difference"
+    )
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 3747:2010 Eq. 12 / Eq. 20",
+    "m identical reference-source locations collapse to Eq. 11 / Eq. 19 (closed form)",
+)
+def _chk_iso3747_locations_collapse() -> Outcome:
+    one = ph.emission.sound_power_in_situ(
+        _ISO3747_ST, _ISO3747_RSS, _ISO3747_LW_RSS, _ISO3747_FREQS
+    )
+    three = ph.emission.sound_power_in_situ(
+        _ISO3747_ST,
+        np.stack([_ISO3747_RSS] * 3),
+        np.stack([_ISO3747_LW_RSS] * 3),
+        _ISO3747_FREQS,
+    )
+    events = np.repeat(_ISO3747_ST[:, None, :], 5, axis=1)
+    one_j = ph.emission.sound_energy_in_situ(
+        events, _ISO3747_RSS, _ISO3747_LW_RSS, _ISO3747_FREQS
+    )
+    two_j = ph.emission.sound_energy_in_situ(
+        events, np.stack([_ISO3747_RSS] * 2), _ISO3747_LW_RSS, _ISO3747_FREQS
+    )
+    worst = max(
+        float(np.max(np.abs(three.sound_power_level - one.sound_power_level))),
+        float(np.max(np.abs(two_j.sound_energy_level - one_j.sound_energy_level))),
+    )
+    return numeric(
+        0.0, worst, 1e-9, unit="dB", places=9, expected_label="0 dB difference"
+    )
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 3747:2010 Eq. 15 / Eq. 17",
+    "N events one at a time and one measurement over N events agree (closed form)",
+)
+def _chk_iso3747_event_forms() -> Outcome:
+    n_events = 8
+    one_at_a_time = ph.emission.sound_energy_in_situ(
+        np.repeat(_ISO3747_ST[:, None, :], n_events, axis=1),
+        _ISO3747_RSS, _ISO3747_LW_RSS, _ISO3747_FREQS,
+    )  # fmt: skip
+    encompassing = ph.emission.sound_energy_in_situ(
+        _ISO3747_ST + 10.0 * math.log10(n_events),
+        _ISO3747_RSS, _ISO3747_LW_RSS, _ISO3747_FREQS, events=n_events,
+    )  # fmt: skip
+    worst = float(
+        np.max(
+            np.abs(encompassing.sound_energy_level - one_at_a_time.sound_energy_level)
+        )
+    )
+    return numeric(
+        0.0, worst, 1e-9, unit="dB", places=9, expected_label="0 dB difference"
+    )
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 3747:2010 Annex C",
+    "C2 at 101,325 kPa and 23,0 degC is 15 lg(296,15/296) = 0,003 300 dB (theta_ref = 296 K)",
+)
+def _chk_iso3747_c2_reference_conditions() -> Outcome:
+    res = ph.emission.sound_power_in_situ(
+        _ISO3747_ST, _ISO3747_RSS, _ISO3747_LW_RSS, _ISO3747_FREQS
+    )
+    expected = 15.0 * math.log10(296.15 / 296.0)
+    return numeric(expected, float(res.c2), 1e-9, unit="dB", places=6)
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 3747:2010 Eq. C.2",
+    "Static pressure at 500 m, 101,325 (1 - 2,2560e-5 x 500)^5,2553 kPa",
+)
+def _chk_iso3747_altitude_pressure() -> Outcome:
+    expected = 101.325 * (1.0 - 2.2560e-5 * 500.0) ** 5.2553
+    computed = ph.emission.static_pressure_from_altitude(500.0)
+    return numeric(expected, computed, 1e-9, unit="kPa", places=4)
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 3747:2010 Table D.1 / Eq. D.1",
+    "LWA of a flat 90 dB octave spectrum, 63 Hz to 8 kHz, with the printed Ck",
+)
+def _chk_iso3747_a_weighted_total() -> Outcome:
+    freqs = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+    ck = np.array([-26.2, -16.1, -8.6, -3.2, 0.0, 1.2, 1.0, -1.1])  # Table D.1
+    flat = np.full((3, freqs.size), 80.0)
+    lw_rss = np.full(freqs.size, 90.0)
+    # Equal levels for both sources: LW = LW(RSS) = 90 dB in every band.
+    res = ph.emission.sound_power_in_situ(flat, flat, lw_rss, freqs)
+    expected = 90.0 + 10.0 * math.log10(float(np.sum(10.0 ** (0.1 * ck))))
+    return numeric(expected, float(res.sound_power_level_a), 1e-9, unit="dB", places=4)
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 3747:2010 Eq. A.1",
+    "Excess over the spherical free field Lp = LW - 11 - 20 lg(r/r0): a level 7 dB above it reads dLf = 7 dB",
+)
+def _chk_iso3747_excess_level() -> Outcome:
+    lw, r = 92.0, 4.0
+    free = lw - 11.0 - 20.0 * math.log10(r)
+    computed = ph.emission.excess_sound_pressure_level(free + 7.0, lw, r)
+    return numeric(7.0, float(computed), 1e-12, unit="dB", places=6)

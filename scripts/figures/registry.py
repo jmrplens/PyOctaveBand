@@ -124,6 +124,7 @@ from .devices import (
     generate_helmholtz_branch_geometry,
     generate_hvac_elbow_flow_noise,
     generate_hvac_end_reflection,
+    generate_in_situ_sound_power,
     generate_intensity_class,
     generate_intensity_demo,
     generate_intensity_scan_power,
@@ -788,6 +789,9 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # ISO 9614-1 discrete points: the criterion-2 position budget per band and
     # the Formula (B.3) interval the same F4 opens.
     generate_discrete_point_qualification,
+    # ISO 3747 in situ comparison: the per-position levels of both sources
+    # after K1, and the LW they yield with the RSS calibration beside it.
+    generate_in_situ_sound_power,
     # Human vibration (ISO 8041-1, ISO 2631-1/-2/-4, ISO 5349-1/-2,
     # Directive 2002/44/EC): frequency weighting, weighted a_w, daily A(8)
     generate_vibration_weighting,

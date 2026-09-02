@@ -42,6 +42,9 @@ The total acoustic emission of a source, and the power flux it is built on.
   ISO 3745.
 - [Sound Power in the Reverberation Room](emission/sound-power-reverberation.md):
   the direct and comparison methods of ISO 3741.
+- [Sound Power in Situ by Comparison](emission/sound-power-in-situ.md):
+  the ISO 3747 comparison against a reference sound source where the machine
+  works.
 - [Sound Power by Intensity Scanning](emission/sound-power-intensity.md):
   the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade.
 - [Sound power from surface vibration (ISO/TS 7849)](emission/vibration-sound-power.md):

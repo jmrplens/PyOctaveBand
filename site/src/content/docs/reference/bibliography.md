@@ -1318,6 +1318,13 @@ implementation is validated against.
   Cited by [Sound Power in the Reverberation Room](/phonometry/devices/emission/sound-power-reverberation/).
 - International Organization for Standardization. (2010). *Acoustics —
   Determination of sound power levels and sound energy levels of noise
+  sources using sound pressure — Engineering/survey methods for use in situ
+  in a reverberant environment* (ISO 3747:2010).
+  [iso.org catalogue](https://www.iso.org/standard/46426.html).
+  The in situ comparison against a reference sound source.
+  Cited by [Sound Power in Situ by Comparison](/phonometry/devices/emission/sound-power-in-situ/).
+- International Organization for Standardization. (2010). *Acoustics —
+  Determination of sound power levels and sound energy levels of noise
   sources using sound pressure — Engineering methods for an essentially free
   field over a reflecting plane* (ISO 3744:2010).
   [iso.org catalogue](https://www.iso.org/standard/52055.html).

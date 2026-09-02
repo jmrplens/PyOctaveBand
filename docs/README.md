@@ -238,6 +238,7 @@ silencers.
 - [Sound Power](devices/emission/sound-power.md): choosing the determination method for a source and declaring the noise emission (ISO 4871)
 - [Sound power by pressure methods](devices/emission/sound-power-pressure.md): the enveloping surface of ISO 3744/3746 and the precision anechoic grade of ISO 3745
 - [Sound power in the reverberation room](devices/emission/sound-power-reverberation.md): the direct and comparison methods of ISO 3741
+- [Sound power in situ by comparison](devices/emission/sound-power-in-situ.md): the ISO 3747 comparison against a reference sound source where the machine works, with the sound energy level of an impulsive source
 - [Sound power by intensity scanning](devices/emission/sound-power-intensity.md): the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade
 - [Sound power from surface vibration](devices/emission/vibration-sound-power.md): the ISO/TS 7849 estimation of a machine's radiated airborne sound power from its surface vibratory velocity and a radiation factor: the velocity level and calibration, the surface mean, and the Part 1 upper limit ($\varepsilon = 1$) versus the Part 2 engineering value
 

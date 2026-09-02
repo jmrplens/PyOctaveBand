@@ -3461,6 +3461,157 @@ in the same order.
 
 ---
 
+## ISO 3747:2010, E.4.2.6.2 (the sign of the direct-field level)
+
+- **Location:** Annex E (informative), E.4.2.6.2 "Excess sound pressure,
+  measurement distance effect, $\delta_r$", the sentence giving the directly
+  radiated pressure and the two sentences that build on it.
+- **The print:** "the directly radiated pressure is approximately
+  $L_{p,\mathrm{direct}} = L_W + 10 \lg(2\pi r^2/r_0^2)$ dB. Rearranging
+  Equation (A.1) using $L_{p,\mathrm{direct}}$, gives
+  $L_{p(\mathrm{RSS}),r} = L_{p,\mathrm{direct}} + \Delta L_f - 3$ dB", and the
+  sensitivity coefficient that follows,
+  $c_r = 10^{-0{,}1(\Delta L_f - 3\ \mathrm{dB})}\,8{,}7/r$.
+- **The problem:** the direct field of a source over a reflecting plane falls
+  with distance, $L_{p,\mathrm{direct}} = L_W - 10 \lg(2\pi r^2/r_0^2)$ dB; the
+  printed plus sign makes it grow. The two sentences that follow hold only
+  with the minus sign. Substituting
+  $L_{p,\mathrm{direct}} = L_W - 20 \lg(r/r_0) - 8$ dB into Eq. (A.1)
+  rearranged, $L_{p(\mathrm{RSS}),r} = L_{W(\mathrm{RSS})} + \Delta L_f - 11 -
+  20 \lg(r/r_0)$ dB, gives the printed $L_{p,\mathrm{direct}} + \Delta L_f - 3$
+  dB, whereas the plus sign gives
+  $L_{p,\mathrm{direct}} + \Delta L_f - 19\ \mathrm{dB} - 40 \lg(r/r_0)$; and
+  the $8{,}7/r$ of the sensitivity coefficient is $20/(r \ln 10)$, the
+  derivative of $-20 \lg r$, so the printed $c_r$ is the derivative of the
+  minus-sign form. A sign misprint in an informative annex.
+- **Evidence:** the three consecutive sentences of E.4.2.6.2 read against each
+  other and against Eq. (A.1). Verified on PDF page 47 (printed p. 38) and PDF
+  page 30 (printed p. 21) of BS EN ISO 3747:2010.
+- **Library behaviour:** the Annex E uncertainty budget is not modelled; the
+  library evaluates Eq. (A.1) as printed
+  ([`excess_sound_pressure_level`](../src/phonometry/emission/sound_power_in_situ.py)),
+  which the misprint does not touch. No number changes.
+- **Status:** unreported.
+
+## ISO 3747:2010, E.4.2.5 (the altitude correction quoted against Annex C)
+
+- **Location:** Annex E (informative), E.4.2.5 "Radiation impedance
+  correction, $C_2$", the sentences that size $u_{C_2}$.
+- **The print:** "For altitudes less than 500 m above sea level, no
+  meteorological correction is required. At 120 m altitude and 23 °C, the
+  correction is 0 dB and at 500 m altitude, the correction is 0,6 dB.
+  Assuming a triangular distribution for this uncertainty, the standard
+  deviation is $u_{C_2} = 0{,}6/\sqrt{6} = 0{,}3$ dB."
+- **The problem:** the normative Annex C defines the correction as
+  $C_2 = -10 \lg(p_\mathrm{s}/p_{\mathrm{s},0}) + 15 \lg[(273{,}15 +
+  \theta)/\theta_\mathrm{ref}]$ with the static pressure of Eq. (C.2),
+  $p_\mathrm{s} = p_{\mathrm{s},0}\,(1 - aH_\mathrm{a})^b$. At 23 °C that gives
+  0,07 dB at 120 m ($p_\mathrm{s}$ = 99,89 kPa, of which the pressure term
+  $-10 \lg(p_\mathrm{s}/p_{\mathrm{s},0})$ is 0,06 dB) and 0,26 dB at 500 m
+  ($p_\mathrm{s}$ = 95,46 kPa), not the printed 0,6 dB, and the arithmetic
+  printed after it does not close either: $0{,}6/\sqrt{6} = 0{,}245$, printed
+  0,3. No altitude below which "no meteorological correction is required"
+  appears in Annex C. The informative example is inconsistent with the
+  normative annex it cites.
+- **Evidence:** recomputation of Eq. (C.2) and $C_2$ from the printed
+  constants ($a$ = 2,2560 × 10⁻⁵ m⁻¹, $b$ = 5,255 3, $p_{\mathrm{s},0}$ =
+  1,013 25 × 10⁵ Pa, $\theta_\mathrm{ref}$ = 296 K). Verified on PDF page 46
+  (printed p. 37) and PDF page 36 (printed p. 27) of BS EN ISO 3747:2010.
+- **Library behaviour:** implements Annex C as printed:
+  [`static_pressure_from_altitude`](../src/phonometry/emission/sound_power_in_situ.py)
+  evaluates Eq. (C.2) and the result's `c2` the correction, so a site at
+  500 m gets the 0,26 dB the annex gives. The Annex E budget is not
+  modelled. Pinned by `test_static_pressure_from_altitude_eq_c2` in
+  [`tests/emission/test_sound_power_in_situ.py`](../tests/emission/test_sound_power_in_situ.py)
+  and by the conformance check "ISO 3747:2010 Eq. C.2".
+- **Status:** unreported.
+
+## ISO 3747:2010, Table E.2 (the excess that lost its delta)
+
+- **Location:** Annex E (informative), Table E.2 "Uncertainty budget for
+  determinations of $\sigma_{R0}$...", the sensitivity-coefficient cell of the
+  $\delta_r$ (measurement distance) row.
+- **The print:** $c_i = 10^{-0{,}1(L_f - 3)}\,8{,}7/r$.
+- **The problem:** the quantity in the exponent is the *excess* of sound
+  pressure level over the free field, $\Delta L_f$ of Eq. (A.1), not a level
+  $L_f$; no quantity called $L_f$ is defined anywhere in the standard.
+  E.4.2.6.2, which derives this very coefficient, prints it as
+  $c_r = 10^{-0{,}1(\Delta L_f - 3\ \mathrm{dB})}\,8{,}7/r$, and its worked
+  extreme ($\Delta L_f$ = 7,1 dB, $r$ = 6 m) reproduces the 0,6 quoted there
+  only with the excess in the exponent ($10^{-0{,}41} \times 8{,}7/6 =
+  0{,}564$). The delta was dropped in the table.
+- **Evidence:** the table cell read against the text that derives it, verified
+  on PDF page 44 (printed p. 35) and PDF page 47 (printed p. 38) of BS EN ISO
+  3747:2010. Table E.2 is specific to this part: the corresponding row of
+  ISO 3744:2010 carries the free-field coefficient $c_S = 8{,}7/r$ with no
+  excess factor at all, so the slip is not inherited from the family.
+- **Library behaviour:** the Annex E uncertainty budget is not modelled, and
+  the excess itself is evaluated from Eq. (A.1) by
+  [`excess_sound_pressure_level`](../src/phonometry/emission/sound_power_in_situ.py).
+  No number changes.
+- **Status:** unreported.
+
+## ISO 3747:2010, Table E.2 (the sampling coefficient its own clause contradicts)
+
+- **Location:** Annex E (informative), Table E.2 "Uncertainty budget for
+  determinations of $\sigma_{R0}$...", the sensitivity-coefficient cell of the
+  $\delta_\mathrm{mic}$ (sampling) row.
+- **The print:** $c_i = 0{,}5$.
+- **The problem:** E.4.2.6.3, the clause that derives that very row, prints the
+  opposite together with its reason: "Sampling directly affects the total
+  uncertainty so $c_\mathrm{mic} = 1$". The budget of E.4.2.12 sides with the
+  clause and not with the table: its sixth term is $0{,}7^2$, which is the
+  0,7 dB contribution E.4.2.6.3 quotes taken at $c_\mathrm{mic} = 1$. The
+  neighbouring row settles that 0,5 is no blanket convention for instrument
+  rows, because E.4.2.7 sets $c_\mathrm{slm} = 0{,}5$ *and earns it*: repeated
+  readings on one meter let the systematic errors cancel, which halves the
+  coefficient, and the clause then reproduces the budget's own term
+  ($0{,}5 \times 0{,}5 = 0{,}25$ dB, quoted there as 0,3 dB for each of the two
+  sources, and $\sqrt{0{,}3^2 + 0{,}3^2} = 0{,}42$ dB, the 0,4 that E.4.2.12
+  sums). The sampling row carries no such derivation, and cannot carry one:
+  $\delta_\mathrm{mic}$ is defined on the *difference*
+  $\Delta L'_{p(\mathrm{ST-RSS})} = L'_{p(\mathrm{ST})} - L'_{p(\mathrm{RSS})}$,
+  which already spans both sources, so there is no second contribution to
+  halve. The family agrees with the clause: the corresponding
+  $\delta_\mathrm{mic}$ row of Table H.2 in ISO 3744:2010 carries $c_i = 1$,
+  and its H.4.2.9 prints $c_\mathrm{mic} = 1$ as well.
+- **Evidence:** the table cell, the clause that derives it and the budget that
+  sums it, read on PDF pages 44, 47 and 50 (printed pp. 35, 38 and 41) of
+  BS EN ISO 3747:2010; the family comparison on PDF pages 79 and 82 (printed
+  pp. 70 and 73) of BS EN ISO 3744:2010.
+- **Library behaviour:** the Annex E uncertainty budget is not modelled. The
+  reproducibility the library reports is the tabulated $\sigma_{R0}$ of Table 2,
+  read by accuracy grade. No number changes.
+- **Status:** unreported.
+
+## ISO 3747:2010, E.4.2.3 (the equation the derivative is taken of)
+
+- **Location:** Annex E (informative), E.4.2.3 "Sound pressure measurement
+  repeatability, $\overline{L'_{p(\mathrm{ST})}}$", the sentence introducing
+  the sensitivity coefficient $c_{L'_{p(\mathrm{ST})}}$.
+- **The print:** "It is obtained from the derivative of
+  $L_{W\mathrm{ref,atm}}$ [Equation (E.1)], with respect to
+  $\overline{L'_{p(\mathrm{ST})}}$."
+- **The problem:** Equation (E.1) is the standard deviation of the operating
+  and mounting conditions, $\sigma_\mathrm{omc} = \sqrt{\frac{1}{N-1}\sum
+  (L_{p,j} - L_{p\mathrm{av}})^2}$, which contains no
+  $L_{W\mathrm{ref,atm}}$ and cannot be differentiated with respect to
+  $\overline{L'_{p(\mathrm{ST})}}$. The model that carries
+  $L_{W\mathrm{ref,atm}}$ is Equation (E.2), printed on the facing page, and
+  differentiating it (with $K_1$ substituted from Eq. 7) does give the
+  printed $c_{L'_{p(\mathrm{ST})}} = 1 + 1/(10^{0,1\Delta L_p} - 1)$. A
+  cross-reference misprint: (E.1) for (E.2).
+- **Evidence:** verified on PDF page 45 (printed p. 36), which carries the
+  sentence and the coefficient, against PDF page 41 (printed p. 32) for
+  Eq. (E.1) and PDF page 42 (printed p. 33) for Eq. (E.2), of BS EN ISO
+  3747:2010. ISO 3741:2010 prints the same coefficient as "the derivative of
+  $L_W$ with respect to $L'_{p(\mathrm{ST})}$" with no equation number, so
+  the wrong number is this part's own.
+- **Library behaviour:** the Annex E uncertainty budget is not modelled, so no
+  library number depends on it. Recorded so that a future reader chasing the
+  derivation is not sent to the wrong equation.
+- **Status:** unreported.
+
 ## Related source properties that are not errata
 
 Recorded here to prevent future "fixes" that would break agreement with the
@@ -3539,3 +3690,41 @@ published sources:
   3 prints a *Sum* of 49 dB at 500 Hz where $76 - 28 = 48$, then a *Combined*
   consistent with 48), which is why the comparison runs at the 1 dB the
   printed sheet carries.
+- **ISO 3747:2010 Table E.1, the accuracy-grade labels:** the informative
+  table of worked $\sigma_\mathrm{tot}$ examples labels its three rows
+  "0,5 (accuracy grade 1)", "1,5 (accuracy grade 2)" and "3 (accuracy
+  grade 3)", while the normative Table 2 of this part gives
+  $\sigma_{R0}$ = 4,0 dB for survey grade 3 and the scope of ISO 3747 covers
+  grades 2 and 3 only. It is the ISO 3740 family's shared illustration, not a
+  statement about this method: ISO 3744:2010 Table H.1 prints the identical
+  table, rows, labels and $\sigma_\mathrm{tot}$ cells alike, and ISO 3744
+  covers grade 2 only. Verified on PDF page 42 (printed p. 33) and PDF page
+  27 (printed p. 18) of BS EN ISO 3747:2010. The library reads
+  $\sigma_{R0}$ from the normative Table 2 (1,5 dB and 4,0 dB, conformance
+  check "ISO 3747:2010 Table 2 / Eq. 22") and uses Table E.1 only for its
+  $\sigma_\mathrm{tot}$ = 1,6 / 2,5 / 4,3 row against $\sigma_{R0}$ = 1,5 dB,
+  where the two tables agree. Do not "correct" the 3 dB row to 4,0 dB: it
+  belongs to the family's illustration, not to this part's Table 2.
+- **ISO 3747:2010 Annex C, $\theta_\mathrm{ref}$ = 296 K:** the annex prints
+  the reference temperature of the radiation-impedance correction as 296 K
+  beside a reference condition of 23,0 °C, which is 296,15 K, so at exactly
+  the reference conditions $C_2 = 15 \lg(296{,}15/296) = +0{,}003\,3$ dB
+  rather than zero. ISO 3741:2010 clause 9.1.4 and ISO 3744:2010 print the
+  same $\theta_1$ = 296 K, so it is the family's rounding and not a misprint
+  of one part; the library keeps 296 K in the shared `C2` of
+  [`sound_power_reverberation.py`](../src/phonometry/emission/sound_power_reverberation.py)
+  and pins the residual (conformance check "ISO 3747:2010 Annex C"). Do not
+  "correct" it to 296,15 K.
+- **ISO 3747:2010 Eq. (14), the single-event background margin:**
+  $\Delta L_{Ei} = L'_{Ei,q(\mathrm{ST})} - L_{pi(\mathrm{B})}$ subtracts a
+  time-averaged background level from a time-integrated single event level,
+  asking only that both be measured over the same integration time $T$. The
+  difference is a true margin for $T$ = 1 s; for a longer $T$ the background
+  holds $10 \lg(T/T_0)$ dB more energy over the event's interval (clause 3.4,
+  NOTE 1). ISO 3741:2010 Eq. (25) and ISO 3744:2010 clause 8.3.4 print the
+  same line, verified on PDF page 23 (printed p. 14) of BS EN ISO 3747:2010
+  and on the corresponding pages of the two siblings, so it is the family's
+  convention and is not registered against one part. The library applies
+  Eq. (14) as printed by default and offers `integration_time` on
+  [`sound_energy_in_situ`](../src/phonometry/emission/sound_power_in_situ.py)
+  to carry the background to the event's interval first.

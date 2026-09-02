@@ -3797,6 +3797,165 @@ dos ediciones con las mismas entradas y en el mismo orden.
 
 ---
 
+## ISO 3747:2010, E.4.2.6.2 (el signo del nivel de campo directo)
+
+- **Ubicación:** Anexo E (informativo), E.4.2.6.2 «Excess sound pressure,
+  measurement distance effect, $\delta_r$», la frase que da la presión
+  radiada directamente y las dos frases que se construyen sobre ella.
+- **El impreso:** «the directly radiated pressure is approximately
+  $L_{p,\mathrm{direct}} = L_W + 10 \lg(2\pi r^2/r_0^2)$ dB. Rearranging
+  Equation (A.1) using $L_{p,\mathrm{direct}}$, gives
+  $L_{p(\mathrm{RSS}),r} = L_{p,\mathrm{direct}} + \Delta L_f - 3$ dB», y el
+  coeficiente de sensibilidad que sigue,
+  $c_r = 10^{-0{,}1(\Delta L_f - 3\ \mathrm{dB})}\,8{,}7/r$.
+- **El problema:** el campo directo de una fuente sobre un plano reflectante
+  decae con la distancia, $L_{p,\mathrm{direct}} = L_W - 10 \lg(2\pi
+  r^2/r_0^2)$ dB; el signo más impreso lo hace crecer. Las dos frases
+  siguientes solo se sostienen con el signo menos. Sustituyendo
+  $L_{p,\mathrm{direct}} = L_W - 20 \lg(r/r_0) - 8$ dB en la Ec. (A.1)
+  reordenada, $L_{p(\mathrm{RSS}),r} = L_{W(\mathrm{RSS})} + \Delta L_f - 11 -
+  20 \lg(r/r_0)$ dB, sale el $L_{p,\mathrm{direct}} + \Delta L_f - 3$ dB
+  impreso, mientras que el signo más da
+  $L_{p,\mathrm{direct}} + \Delta L_f - 19\ \mathrm{dB} - 40 \lg(r/r_0)$; y el
+  $8{,}7/r$ del coeficiente de sensibilidad es $20/(r \ln 10)$, la derivada de
+  $-20 \lg r$, así que el $c_r$ impreso es la derivada de la forma con signo
+  menos. Una errata de signo en un anexo informativo.
+- **Evidencia:** las tres frases consecutivas de E.4.2.6.2 leídas una contra
+  otra y contra la Ec. (A.1). Verificado en la página 47 del PDF (p. 38
+  impresa) y en la página 30 del PDF (p. 21 impresa) de BS EN ISO 3747:2010.
+- **Comportamiento de la biblioteca:** el presupuesto de incertidumbre del
+  Anexo E no está modelado; la biblioteca evalúa la Ec. (A.1) tal como está
+  impresa
+  ([`excess_sound_pressure_level`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_in_situ.py)),
+  a la que la errata no afecta. No cambia ningún número.
+- **Estado:** sin notificar.
+
+## ISO 3747:2010, E.4.2.5 (la corrección por altitud citada contra el Anexo C)
+
+- **Ubicación:** Anexo E (informativo), E.4.2.5 «Radiation impedance
+  correction, $C_2$», las frases que dimensionan $u_{C_2}$.
+- **El impreso:** «For altitudes less than 500 m above sea level, no
+  meteorological correction is required. At 120 m altitude and 23 °C, the
+  correction is 0 dB and at 500 m altitude, the correction is 0,6 dB.
+  Assuming a triangular distribution for this uncertainty, the standard
+  deviation is $u_{C_2} = 0{,}6/\sqrt{6} = 0{,}3$ dB.»
+- **El problema:** el Anexo C, normativo, define la corrección como
+  $C_2 = -10 \lg(p_\mathrm{s}/p_{\mathrm{s},0}) + 15 \lg[(273{,}15 +
+  \theta)/\theta_\mathrm{ref}]$ con la presión estática de la Ec. (C.2),
+  $p_\mathrm{s} = p_{\mathrm{s},0}\,(1 - aH_\mathrm{a})^b$. A 23 °C eso da
+  0,07 dB a 120 m ($p_\mathrm{s}$ = 99,89 kPa, de los que el término de
+  presión $-10 \lg(p_\mathrm{s}/p_{\mathrm{s},0})$ son 0,06 dB) y 0,26 dB a
+  500 m ($p_\mathrm{s}$ = 95,46 kPa), no los 0,6 dB impresos, y la aritmética
+  impresa a continuación tampoco cierra: $0{,}6/\sqrt{6} = 0{,}245$, impreso
+  0,3. En el Anexo C no aparece ninguna altitud por debajo de la cual «no se
+  requiera corrección meteorológica». El ejemplo informativo es inconsistente
+  con el anexo normativo que cita.
+- **Evidencia:** recálculo de la Ec. (C.2) y de $C_2$ a partir de las
+  constantes impresas ($a$ = 2,2560 × 10⁻⁵ m⁻¹, $b$ = 5,255 3,
+  $p_{\mathrm{s},0}$ = 1,013 25 × 10⁵ Pa, $\theta_\mathrm{ref}$ = 296 K).
+  Verificado en la página 46 del PDF (p. 37 impresa) y en la página 36 del
+  PDF (p. 27 impresa) de BS EN ISO 3747:2010.
+- **Comportamiento de la biblioteca:** implementa el Anexo C tal como está
+  impreso:
+  [`static_pressure_from_altitude`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_in_situ.py)
+  evalúa la Ec. (C.2) y el `c2` del resultado la corrección, así que un
+  emplazamiento a 500 m recibe los 0,26 dB que da el anexo. El presupuesto
+  del Anexo E no está modelado. Fijado por
+  `test_static_pressure_from_altitude_eq_c2` en
+  [`tests/emission/test_sound_power_in_situ.py`](https://github.com/jmrplens/phonometry/blob/main/tests/emission/test_sound_power_in_situ.py)
+  y por la comprobación de conformidad «ISO 3747:2010 Eq. C.2».
+- **Estado:** sin notificar.
+
+## ISO 3747:2010, Tabla E.2 (el exceso que perdió su delta)
+
+- **Ubicación:** Anexo E (informativo), Tabla E.2 «Uncertainty budget for
+  determinations of $\sigma_{R0}$...», la celda del coeficiente de
+  sensibilidad de la fila $\delta_r$ (distancia de medición).
+- **El impreso:** $c_i = 10^{-0{,}1(L_f - 3)}\,8{,}7/r$.
+- **El problema:** la magnitud del exponente es el *exceso* de nivel de
+  presión acústica sobre el campo libre, el $\Delta L_f$ de la Ec. (A.1), no
+  un nivel $L_f$; ninguna magnitud llamada $L_f$ está definida en la norma.
+  El apartado E.4.2.6.2, que deduce ese mismo coeficiente, lo imprime como
+  $c_r = 10^{-0{,}1(\Delta L_f - 3\ \mathrm{dB})}\,8{,}7/r$, y su caso extremo
+  resuelto ($\Delta L_f$ = 7,1 dB, $r$ = 6 m) reproduce el 0,6 que allí se
+  cita solo con el exceso en el exponente ($10^{-0{,}41} \times 8{,}7/6 =
+  0{,}564$). En la tabla se perdió la delta.
+- **Evidencia:** la celda de la tabla leída contra el texto que la deduce,
+  verificado en la página 44 del PDF (p. 35 impresa) y en la página 47 del PDF
+  (p. 38 impresa) de BS EN ISO 3747:2010. La Tabla E.2 es propia de esta
+  parte: la fila correspondiente de ISO 3744:2010 lleva el coeficiente de
+  campo libre $c_S = 8{,}7/r$ sin factor de exceso alguno, así que el desliz
+  no viene heredado de la familia.
+- **Comportamiento de la biblioteca:** el presupuesto de incertidumbre del
+  Anexo E no está modelado, y el exceso se evalúa desde la Ec. (A.1) en
+  [`excess_sound_pressure_level`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_in_situ.py).
+  No cambia ningún número.
+- **Estado:** sin notificar.
+
+## ISO 3747:2010, Tabla E.2 (el coeficiente de muestreo que su propio apartado contradice)
+
+- **Ubicación:** Anexo E (informativo), Tabla E.2 «Uncertainty budget for
+  determinations of $\sigma_{R0}$...», la celda del coeficiente de
+  sensibilidad de la fila $\delta_\mathrm{mic}$ (muestreo).
+- **El impreso:** $c_i = 0{,}5$.
+- **El problema:** el apartado E.4.2.6.3, que deduce esa misma fila, imprime lo
+  contrario junto con su razón: «Sampling directly affects the total
+  uncertainty so $c_\mathrm{mic} = 1$». El presupuesto de E.4.2.12 se pone del
+  lado del apartado y no de la tabla: su sexto término es $0{,}7^2$, que es la
+  contribución de 0,7 dB que cita E.4.2.6.3 tomada con $c_\mathrm{mic} = 1$. La
+  fila vecina zanja que el 0,5 no es una convención general de las filas de
+  instrumentación, porque E.4.2.7 fija $c_\mathrm{slm} = 0{,}5$ *y se lo gana*:
+  las lecturas repetidas con un mismo sonómetro dejan que los errores
+  sistemáticos se cancelen, lo que reduce el coeficiente a la mitad, y el
+  apartado reproduce entonces el término que la propia tabla suma
+  ($0{,}5 \times 0{,}5 = 0{,}25$ dB, citado allí como 0,3 dB para cada una de
+  las dos fuentes, y $\sqrt{0{,}3^2 + 0{,}3^2} = 0{,}42$ dB, el 0,4 que suma
+  E.4.2.12). La fila de muestreo no lleva deducción semejante, y no puede
+  llevarla: $\delta_\mathrm{mic}$ está definido sobre la *diferencia*
+  $\Delta L'_{p(\mathrm{ST-RSS})} = L'_{p(\mathrm{ST})} - L'_{p(\mathrm{RSS})}$,
+  que ya abarca las dos fuentes, así que no hay una segunda contribución que
+  partir por la mitad. La familia da la razón al apartado: la fila
+  $\delta_\mathrm{mic}$ correspondiente de la Tabla H.2 de ISO 3744:2010 lleva
+  $c_i = 1$, y su H.4.2.9 imprime también $c_\mathrm{mic} = 1$.
+- **Evidencia:** la celda de la tabla, el apartado que la deduce y el
+  presupuesto que la suma, leídos en las páginas 44, 47 y 50 del PDF (pp. 35,
+  38 y 41 impresas) de BS EN ISO 3747:2010; la comparación con la familia en
+  las páginas 79 y 82 del PDF (pp. 70 y 73 impresas) de BS EN ISO 3744:2010.
+- **Comportamiento de la biblioteca:** el presupuesto de incertidumbre del
+  Anexo E no está modelado. La reproducibilidad que publica la biblioteca es
+  el $\sigma_{R0}$ tabulado de la Tabla 2, leído por grado de exactitud.
+  No cambia ningún número.
+- **Estado:** sin notificar.
+
+## ISO 3747:2010, E.4.2.3 (la ecuación de la que se toma la derivada)
+
+- **Ubicación:** Anexo E (informativo), E.4.2.3 «Sound pressure measurement
+  repeatability, $\overline{L'_{p(\mathrm{ST})}}$», la frase que introduce el
+  coeficiente de sensibilidad $c_{L'_{p(\mathrm{ST})}}$.
+- **El impreso:** «It is obtained from the derivative of
+  $L_{W\mathrm{ref,atm}}$ [Equation (E.1)], with respect to
+  $\overline{L'_{p(\mathrm{ST})}}$.»
+- **El problema:** la Ecuación (E.1) es la desviación típica de las
+  condiciones de funcionamiento y montaje, $\sigma_\mathrm{omc} =
+  \sqrt{\frac{1}{N-1}\sum (L_{p,j} - L_{p\mathrm{av}})^2}$, que no contiene
+  ningún $L_{W\mathrm{ref,atm}}$ y no puede derivarse respecto de
+  $\overline{L'_{p(\mathrm{ST})}}$. El modelo que lleva
+  $L_{W\mathrm{ref,atm}}$ es la Ecuación (E.2), impresa en la página
+  siguiente, y derivarla (con $K_1$ sustituido desde la Ec. 7) sí da el
+  $c_{L'_{p(\mathrm{ST})}} = 1 + 1/(10^{0,1\Delta L_p} - 1)$ impreso. Una
+  errata de referencia cruzada: (E.1) por (E.2).
+- **Evidencia:** verificado en la página 45 del PDF (p. 36 impresa), que lleva
+  la frase y el coeficiente, contra la página 41 del PDF (p. 32 impresa) para
+  la Ec. (E.1) y la página 42 del PDF (p. 33 impresa) para la Ec. (E.2), de
+  BS EN ISO 3747:2010. ISO 3741:2010 imprime el mismo coeficiente como «la
+  derivada de $L_W$ respecto de $L'_{p(\mathrm{ST})}$», sin número de
+  ecuación, así que el número equivocado es propio de esta parte.
+- **Comportamiento de la biblioteca:** el presupuesto de incertidumbre del
+  Anexo E no está modelado, así que ningún número de la biblioteca depende de
+  él. Se registra para que un lector futuro que siga la deducción no acabe en
+  la ecuación equivocada.
+- **Estado:** sin notificar.
+
 ## Propiedades de las fuentes, relacionadas, que no son erratas
 
 Registradas aquí para prevenir futuros «arreglos» que romperían la
@@ -3882,5 +4041,47 @@ concordancia con las fuentes publicadas:
   de impulsión imprime un *Sum* de 49 dB a 500 Hz donde $76 - 28 = 48$, y
   después un *Combined* consistente con 48), que es por lo que la comparación
   corre al 1 dB que la hoja impresa lleva.
+- **ISO 3747:2010 Tabla E.1, las etiquetas de grado de precisión:** la tabla
+  informativa de ejemplos de $\sigma_\mathrm{tot}$ etiqueta sus tres filas
+  «0,5 (accuracy grade 1)», «1,5 (accuracy grade 2)» y «3 (accuracy
+  grade 3)», mientras que la Tabla 2, normativa, de esta parte da
+  $\sigma_{R0}$ = 4,0 dB para el grado 3 de control y el campo de aplicación
+  de ISO 3747 cubre solo los grados 2 y 3. Es la ilustración compartida de la
+  familia ISO 3740, no una afirmación sobre este método: ISO 3744:2010 imprime
+  en su Tabla H.1 la tabla idéntica, con las mismas filas, etiquetas y celdas
+  de $\sigma_\mathrm{tot}$, e ISO 3744 cubre solo el grado 2. Verificado en la
+  página 42 del PDF (p. 33 impresa) y en la página 27 del PDF (p. 18 impresa)
+  de BS EN ISO 3747:2010. La biblioteca lee $\sigma_{R0}$ de la Tabla 2
+  normativa (1,5 dB y 4,0 dB, comprobación de conformidad «ISO 3747:2010
+  Table 2 / Eq. 22») y usa la Tabla E.1 solo por su fila
+  $\sigma_\mathrm{tot}$ = 1,6 / 2,5 / 4,3 frente a $\sigma_{R0}$ = 1,5 dB,
+  donde ambas tablas coinciden. No «corregir» la fila de 3 dB a 4,0 dB:
+  pertenece a la ilustración de la familia, no a la Tabla 2 de esta parte.
+- **ISO 3747:2010 Anexo C, $\theta_\mathrm{ref}$ = 296 K:** el anexo imprime
+  la temperatura de referencia de la corrección de impedancia de radiación
+  como 296 K junto a una condición de referencia de 23,0 °C, que son
+  296,15 K, así que exactamente en las condiciones de referencia
+  $C_2 = 15 \lg(296{,}15/296) = +0{,}003\,3$ dB y no cero. El apartado 9.1.4
+  de ISO 3741:2010 e ISO 3744:2010 imprimen el mismo $\theta_1$ = 296 K, así
+  que es el redondeo de la familia y no una errata de una parte; la
+  biblioteca conserva los 296 K en el `C2` compartido de
+  [`sound_power_reverberation.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_reverberation.py)
+  y fija el residuo (comprobación de conformidad «ISO 3747:2010 Annex C»).
+  No «corregirlo» a 296,15 K.
+- **ISO 3747:2010 Ec. (14), el margen de ruido de fondo del suceso aislado:**
+  $\Delta L_{Ei} = L'_{Ei,q(\mathrm{ST})} - L_{pi(\mathrm{B})}$ resta un nivel
+  de ruido de fondo promediado en el tiempo de un nivel de suceso aislado
+  integrado en el tiempo, pidiendo solo que ambos se midan con el mismo
+  tiempo de integración $T$. La diferencia es un margen verdadero para
+  $T$ = 1 s; para un $T$ mayor el ruido de fondo contiene $10 \lg(T/T_0)$ dB
+  más energía sobre el intervalo del suceso (apartado 3.4, NOTA 1). La
+  Ec. (25) de ISO 3741:2010 y el apartado 8.3.4 de ISO 3744:2010 imprimen la
+  misma línea, verificado en la página 23 del PDF (p. 14 impresa) de BS EN
+  ISO 3747:2010 y en las páginas correspondientes de las dos normas hermanas,
+  así que es la convención de la familia y no se registra contra una parte.
+  La biblioteca aplica la Ec. (14) tal como está impresa por defecto y ofrece
+  `integration_time` en
+  [`sound_energy_in_situ`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_in_situ.py)
+  para llevar antes el ruido de fondo al intervalo del suceso.
 
 <!-- END GENERATED BODY -->
