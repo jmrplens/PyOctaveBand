@@ -1383,7 +1383,7 @@ def generate_sound_energy_burst(output_dir: str) -> None:
     axl.annotate(
         "burst: all of its $L_E$ = 90.0 dB\nis in the first second",
         xy=(onset + 1.0, float(np.interp(onset + 1.0, t, burst_le))),
-        xytext=(4.2, 84.5),
+        xytext=(3.9, 82.0),
         ha="left",
         va="center",
         fontsize=9.5,
@@ -1393,8 +1393,8 @@ def generate_sound_energy_burst(output_dir: str) -> None:
     )
     axl.annotate(
         "steady: $L_E$ = $L_p$ + 10 lg($T/T_0$)\n= 80 + 10 = 90.0 dB at $T$",
-        xy=(8.0, float(np.interp(8.0, t, steady_le))),
-        xytext=(5.6, 70.5),
+        xy=(9.0, float(np.interp(9.0, t, steady_le))),
+        xytext=(7.7, 73.0),
         ha="center",
         va="center",
         fontsize=9.5,

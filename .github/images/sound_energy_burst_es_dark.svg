@@ -1162,30 +1162,30 @@ z
     </g>
    </g>
    <g id="patch_7">
-    <path d="M 234.979105 95.875171 
-Q 198.924982 81.43019 163.908697 67.401015 
+    <path d="M 238.906707 117.597923 
+Q 200.796612 92.470776 163.619926 67.959055 
 " style="fill: none; stroke: #ffffff; stroke-linecap: round"/>
-    <path d="M 166.729495 70.577979 
-L 163.908697 67.401015 
-L 168.142747 67.050556 
+    <path d="M 165.746557 71.637021 
+L 163.619926 67.959055 
+L 167.838278 68.464529 
 " style="fill: none; stroke: #ffffff; stroke-linecap: round"/>
    </g>
    <g id="text_17">
     <g id="patch_8">
-     <path d="M 209.050691 128.284323 
-L 344.900691 128.284323 
-Q 348.700691 128.284323 348.700691 124.484323 
-L 348.700691 100.917643 
-Q 348.700691 97.117643 344.900691 97.117643 
-L 209.050691 97.117643 
-Q 205.250691 97.117643 205.250691 100.917643 
-L 205.250691 124.484323 
-Q 205.250691 128.284323 209.050691 128.284323 
+     <path d="M 197.04188 150.363529 
+L 332.89188 150.363529 
+Q 336.69188 150.363529 336.69188 146.563529 
+L 336.69188 122.99685 
+Q 336.69188 119.19685 332.89188 119.19685 
+L 197.04188 119.19685 
+Q 193.24188 119.19685 193.24188 122.99685 
+L 193.24188 146.563529 
+Q 193.24188 150.363529 197.04188 150.363529 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
     <!-- ráfaga: todo su $L_E$ = 90,0 dB -->
-    <g style="fill: #ffffff" transform="translate(209.050691 109.468571) scale(0.095 -0.095)">
+    <g style="fill: #ffffff" transform="translate(197.04188 131.547777) scale(0.095 -0.095)">
      <defs>
       <path id="DejaVuSans-55" d="M 2631 2963 
 Q 2534 3019 2420 3045 
@@ -1372,7 +1372,7 @@ z
      <use xlink:href="#DejaVuSans-25" transform="translate(1361.171875 0.015625)"/>
     </g>
     <!-- está en el primer segundo -->
-    <g style="fill: #ffffff" transform="translate(209.050691 121.251169) scale(0.095 -0.095)">
+    <g style="fill: #ffffff" transform="translate(197.04188 143.330375) scale(0.095 -0.095)">
      <defs>
       <path id="DejaVuSans-51" d="M 3513 2113 
 L 3513 0 
@@ -1422,30 +1422,30 @@ z
     </g>
    </g>
    <g id="patch_9">
-    <path d="M 275.487052 218.63462 
-Q 317.818093 146.517111 359.583171 75.363805 
+    <path d="M 355.518553 196.394055 
+Q 378.019889 133.216835 400.146106 71.092842 
 " style="fill: none; stroke: #ffffff; stroke-linecap: round"/>
-    <path d="M 356.020991 77.67916 
-L 359.583171 75.363805 
-L 359.298147 79.602763 
+    <path d="M 397.081277 74.03509 
+L 400.146106 71.092842 
+L 400.661007 75.310054 
 " style="fill: none; stroke: #ffffff; stroke-linecap: round"/>
    </g>
    <g id="text_18">
     <g id="patch_10">
-     <path d="M 183.819307 251.832506 
-L 346.364307 251.832506 
-Q 350.164307 251.832506 350.164307 248.032506 
-L 350.164307 224.656569 
-Q 350.164307 220.856569 346.364307 220.856569 
-L 183.819307 220.856569 
-Q 180.019307 220.856569 180.019307 224.656569 
-L 180.019307 248.032506 
-Q 180.019307 251.832506 183.819307 251.832506 
+     <path d="M 267.88098 229.7533 
+L 430.42598 229.7533 
+Q 434.22598 229.7533 434.22598 225.9533 
+L 434.22598 202.577363 
+Q 434.22598 198.777363 430.42598 198.777363 
+L 267.88098 198.777363 
+Q 264.08098 198.777363 264.08098 202.577363 
+L 264.08098 225.9533 
+Q 264.08098 229.7533 267.88098 229.7533 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
     <!-- estacionaria: $L_E$ = $L_p$ + 10 lg($T/T_0$) -->
-    <g style="fill: #ffffff" transform="translate(183.819307 232.827496) scale(0.095 -0.095)">
+    <g style="fill: #ffffff" transform="translate(267.88098 210.74829) scale(0.095 -0.095)">
      <defs>
       <path id="DejaVuSans-Oblique-53" d="M 3175 2156 
 Q 3175 2616 2975 2859 
@@ -1539,7 +1539,7 @@ z
      <use xlink:href="#DejaVuSans-c" transform="translate(1671.088867 0.015625)"/>
     </g>
     <!-- = 80 + 10 = 90,0 dB en $T$ -->
-    <g style="fill: #ffffff" transform="translate(203.294307 244.799352) scale(0.095 -0.095)">
+    <g style="fill: #ffffff" transform="translate(287.35598 222.720146) scale(0.095 -0.095)">
      <use xlink:href="#DejaVuSans-20" transform="translate(0 0.015625)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(83.789062 0.015625)"/>
      <use xlink:href="#DejaVuSans-1b" transform="translate(115.576172 0.015625)"/>
