@@ -682,6 +682,106 @@ def _chk_intensity_kc_annexb() -> Outcome:
 
 @register(
     "Room & building acoustics",
+    "ISO 15186-3:2002 Annex A, Table A.1",
+    "Limp-panel qualification: the printed plaster-board column",
+)
+def _chk_low_frequency_limp_panel() -> Outcome:
+    # Annex A is normative and Table A.1 is the only worked calculation in
+    # the document. Its plaster-board column (10 kg/m2 over a 10 m2 test
+    # opening, 1 013 hPa, 23 degC) is the oracle of Formulas (A.1) to (A.5).
+    # The steel-sandwich column of the same table is NOT used: it cannot be
+    # reproduced from the inputs printed beside it (see docs/ERRATA.md).
+    calculated = ph.building.limp_panel_reduction_index(
+        ref.ISO15186_3_ANNEX_A_BANDS,
+        surface_mass=ref.ISO15186_3_PLASTER_SURFACE_MASS,
+        area=ref.ISO15186_3_PLASTER_AREA,
+        temperature=ref.ISO15186_3_ANNEX_A_TEMPERATURE,
+        static_pressure=ref.ISO15186_3_ANNEX_A_PRESSURE,
+    )
+    printed = np.asarray(ref.ISO15186_3_PLASTER_TABLE_A1, dtype=float)
+    worst = float(np.max(np.abs(calculated - printed)))
+    return Outcome(
+        expected="max abs(R - Table A.1) <= 0,05 dB (1 dp print)",
+        computed=f"{worst:.3f} dB over 50 Hz to 160 Hz",
+        delta=f"{worst:.3f} dB",
+        passed=worst <= 0.05,
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 15186-3:2002 Formula (7)",
+    "Low-frequency RI subtracts 9 dB, three more than part 1",
+)
+def _chk_low_frequency_intensity_ri() -> Outcome:
+    # Hand-computed anchor: LpS = 84, LIn = 60, Sm = S -> RI = 84 - 9 - 60
+    # = 15 dB exactly. The same levels through part 1 give 18 dB, and the
+    # 3 dB between them is the pressure doubling at the surface of the
+    # specimen, which is the whole difference between the two parts.
+    part3 = ph.building.low_frequency_intensity_reduction(
+        [84.0], [60.0], measurement_area=10.0, area=10.0, l_p=[68.0]
+    )
+    part1 = ph.building.intensity_sound_reduction(
+        [84.0], [60.0], measurement_area=10.0, area=10.0
+    )
+    # Clause 6.4.2: FpI = 68 - 60 = 8 dB, within the 10 dB of a reflecting
+    # specimen and outside the 6 dB of an absorbing one.
+    absorbing = ph.building.low_frequency_intensity_reduction(
+        [84.0],
+        [60.0],
+        measurement_area=10.0,
+        area=10.0,
+        l_p=[68.0],
+        absorbing_specimen_surface=True,
+    )
+    assert part3.qualified is not None
+    assert absorbing.qualified is not None
+    ri = float(part3.r_i[0])
+    gap = float(part1.r_i[0]) - ri
+    passed = (
+        abs(ri - 15.0) <= 1e-9
+        and abs(gap - 3.0) <= 1e-9
+        and bool(part3.qualified[0])
+        and not bool(absorbing.qualified[0])
+    )
+    return Outcome(
+        expected="RI = 15 dB, 3 dB below part 1; FpI = 8 dB qualifies at 10 not 6",
+        computed=f"RI = {ri:g} dB, part 1 - part 3 = {gap:g} dB",
+        delta=f"{ri - 15.0:+.3f} dB",
+        passed=passed,
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 15186-3:2002 Clause 3.9, Formula (8)",
+    "Low-frequency DI,n,e; the series' own +10 lg N sign",
+)
+def _chk_low_frequency_element() -> Outcome:
+    # Sm = A0 = 10 m2 and N = 1 leave DI,n,e = LpS - 9 - LIn = 21 dB. The
+    # unit count then enters as +10 lg N, which is the sign ISO 15186-1
+    # prints subtracted (see docs/ERRATA.md) and this part prints the other
+    # way round; the two parts disagree on the page.
+    single = ph.building.low_frequency_element_normalized_difference(
+        [90.0], [60.0], measurement_area=10.0
+    )
+    four = ph.building.low_frequency_element_normalized_difference(
+        [90.0], [60.0], measurement_area=10.0, elements=4
+    )
+    base = float(single.d_i_n_e[0])
+    lift = float(four.d_i_n_e[0]) - base
+    expected_lift = 10.0 * np.log10(4.0)
+    passed = abs(base - 21.0) <= 1e-9 and abs(lift - expected_lift) <= 1e-9
+    return Outcome(
+        expected=f"DI,n,e = 21 dB; N = 4 adds {expected_lift:.3f} dB",
+        computed=f"{base:g} dB; N = 4 adds {lift:.3f} dB",
+        delta=f"{lift - expected_lift:+.3e} dB",
+        passed=passed,
+    )
+
+
+@register(
+    "Room & building acoustics",
     "ISO 10052:2021 Clause 3.6",
     "Survey R' applies the V/7,5 minimum-area rule",
 )

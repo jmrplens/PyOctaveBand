@@ -755,9 +755,134 @@ a leaky junction) carries the transmitted power, which no pressure-based
 field method can resolve. Qualify each scan with the same
 pressure-intensity indicator, and expect the probe's own limits (the
 [spacer phase error](https://jmrplens.github.io/phonometry/devices/emission/intensity/)) to set the usable low-frequency range.
-Part 2's own field procedure (the loudspeaker positions, the façade cases) and
-the low-frequency Part 3 variant are not implemented: the formulas here apply
-unchanged to field data, but nothing checks how that data was acquired.
+Part 2's own field procedure (the loudspeaker positions, the façade cases) is
+not implemented: the formulas here apply unchanged to field data, but nothing
+checks how that data was acquired.
+
+## Low frequencies: the pressure on the specimen (ISO 15186-3)
+
+Both parts above put the source microphone in the *room*, and below 100 Hz
+that is exactly where a source room stops being able to answer. A room a
+laboratory can build has too few modes down there for a space average to
+describe the field driving the specimen: move the microphones and the average
+moves with them. ISO 15186-3 keeps the intensity probe on the receiving side
+and changes the other end of the measurement — the source-room level is read
+**on the surface of the test specimen itself**, from fixed microphones no more
+than 50 mm from it (Clause 6.3):
+
+$$
+R_\mathrm{I} = L_{p\mathrm{S}} - 9 - \left[ L_{I\mathrm{n}} + 10\lg\frac{S_\mathrm{m}}{S} \right]\ \mathrm{dB}
+$$
+
+**Nine decibels, not six.** That single constant is the whole difference from
+Part 1. Close to a rigid boundary a diffuse field carries twice the
+mean-square pressure it carries away from one, so a microphone 50 mm from the
+specimen reads 3 dB above the room average of the same field. Part 1's room
+average carries no such build-up and subtracts 6; the surface average carries
+it and subtracts 9. A NOTE under Formula (7) bounds the assumption: it holds
+for a specimen with a reflecting surface in the source room, still works
+behind 100 mm of porous absorber, should be read only from 50 Hz to 80 Hz
+behind 100 mm to 200 mm of it, and is not valid behind anything thicker.
+
+Clause 6.6 requires filters at 50 Hz, 63 Hz and 80 Hz and allows 100 Hz,
+125 Hz and 160 Hz to be added; the ceiling is Clause 1.1's, which applies this
+part over 50 Hz to 160 Hz and says it is mainly intended for 50 Hz to 80 Hz.
+Six bands is the whole method, which is why no single-number rating comes out
+of it, and Clause 1.1 says what to do instead: combine these results with
+ISO 140-3 and ISO 15186-1 into one curve over 50 Hz to 5000 Hz. The Clause 6.4.2
+indicator $F_{pI} = L_p - L_{I\mathrm{n}}$ is the same as everywhere else in the
+series, and both of its levels are read on the measurement surface in the
+*receiving* room — not the surface level Formula (7) is built from. Its two
+limits distinguish the specimen: $F_{pI} > 10$ dB refuses a sound-reflecting one
+and $F_{pI} > 6$ dB one presenting a sound-absorbing surface in the receiving
+room. Since the standard asks for that second pressure measurement only "if
+possible", `l_p` is optional and its absence leaves the verdict unanswered
+rather than guessed.
+
+```python
+import numpy as np
+from phonometry import building
+
+# A light partition, 10 m2, scanned over a 12.6 m2 box surface.
+freqs = [50.0, 63.0, 80.0, 100.0, 125.0, 160.0]
+res = building.low_frequency_intensity_reduction(
+    np.array([88.4, 89.1, 90.3, 91.0, 91.4, 91.8]),
+    np.array([61.6, 60.9, 59.8, 57.9, 56.0, 53.9]),
+    measurement_area=12.6, area=10.0,
+    l_p=np.array([74.0, 72.0, 69.4, 66.1, 63.1, 60.3]),
+    frequencies=freqs,
+)
+print(np.round(res.r_i, 1))                         # [16.8 18.2 20.5 23.1 25.4 27.9]
+print(np.round(res.surface_pressure_intensity, 1))  # [12.4 11.1  9.6  8.2  7.1  6.4]
+print(res.qualified.tolist())    # [False, False, True, True, True, True]
+```
+
+A refused band is flagged, not dropped: the standard's answer to an indicator
+over the limit is to improve the measurement environment, so the index is
+still computed and the verdict travels beside it.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/low_frequency_intensity_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/low_frequency_intensity.svg" alt="Left: the low-frequency intensity sound reduction index per one-third-octave band from 50 Hz to 160 Hz as bars, with the 50 Hz and 63 Hz bands hatched because their surface pressure-intensity indicator exceeds 10 dB, and the indicator drawn as a curve on a twin axis against its 10 dB limit line. Right: the calculated limp-panel sound reduction index of Annex A with the 4 dB tolerance the annex allows shaded around it and a measured curve staying inside" width="92%"></picture>
+
+*Left, the measurement: the index rises through the six bands while the
+indicator falls past its limit, so the two lowest bands are computed but not
+qualified. Right, the facility: Annex A's calculated limp-panel curve and the
+4 dB either side of it that a measurement has to stay within.*
+
+### Small elements, and a sign the series disagrees on
+
+Formula (8) normalizes a small element to $A_0 = 10$ m² as Part 1 does, with
+the 9 dB of the surface measurement in place of 6:
+
+$$
+D_{I\mathrm{n,e}} = L_{p\mathrm{S}} - 9 - \left[ L_{I\mathrm{n}} - 10\lg\frac{A_0}{S_\mathrm{m}} - 10\lg N \right]\ \mathrm{dB}
+$$
+
+The $10\lg N$ inside the bracket is subtracted, so it reaches $D_{I\mathrm{n,e}}$
+**added** — the sign this library derives, and the opposite of what
+ISO 15186-1 prints for the same quantity. Two parts of one series print the
+two signs; this is the one that agrees with the physics and with
+ISO 10140-2 Formula (6). The Part 1 print is registered in
+[ERRATA](https://jmrplens.github.io/phonometry/reference/errata/).
+
+```python
+# Four identical trickle ventilators inside one 2.0 m2 measurement surface.
+element = building.low_frequency_element_normalized_difference(
+    np.full(6, 90.0), np.array([62.0, 61.0, 60.0, 58.0, 57.0, 55.0]),
+    measurement_area=2.0, elements=4, frequencies=freqs,
+)
+print(np.round(element.d_i_n_e, 1))     # [32. 33. 34. 36. 37. 39.]
+```
+
+### Qualifying the facility (Annex A)
+
+Annex A is normative: measure a limp panel of more than 1 m², calculate what
+it should read, and require the two to agree within **4,0 dB** from 50 Hz to
+160 Hz. The calculated half is forced transmission alone — mass law reduced by
+the radiation efficiency of a plate driven by a diffuse field,
+
+$$
+R = R_0 - 10\lg 2\sigma_\mathrm{d}, \qquad
+R_0 = 20\lg\frac{\pi f m}{\rho c}, \qquad
+\sigma_\mathrm{d} = \tfrac{1}{2}\left[0{,}20 + \ln\left(2\pi\frac{f}{c}\sqrt{S}\right)\right]
+$$
+
+with the air taken at the climate of the test,
+$\rho c = 427\sqrt{273/(273+\theta)}\cdot B/B_0$ and $c = 331 + 0{,}6\,\theta$.
+
+```python
+# Annex A, Table A.1: 12,5 mm plaster board, 10 kg/m2, over a 10 m2 opening.
+calc = building.limp_panel_reduction_index(
+    freqs, surface_mass=10.0, area=10.0,
+    temperature=23.0, static_pressure=101300.0,
+)
+print(np.round(calc, 1))    # [10.7 11.9 13.4 14.8 16.3 17.9]
+```
+
+Those six values are the printed table, band for band, and they anchor all
+five formulas. The steel-sandwich column beside them is not an oracle: no reading
+of the inputs printed next to it reproduces it, and the one that would takes an
+area and a surface mass moved together, the mass landing heavier than solid
+steel of the stated thickness. It too is in [ERRATA](https://jmrplens.github.io/phonometry/reference/errata/).
 
 ## References
 
@@ -779,6 +904,14 @@ unchanged to field data, but nothing checks how that data was acquired.
   [iso.org catalogue](https://www.iso.org/standard/30105.html).
   The field counterpart, giving the apparent index $R'_\mathrm{I}$ of the installed
   element.
+- International Organization for Standardization (2002). *Acoustics —
+  Measurement of sound insulation in buildings and of building elements
+  using sound intensity — Part 3: Laboratory measurements at low
+  frequencies* (ISO 15186-3:2002).
+  [iso.org catalogue](https://www.iso.org/standard/33962.html).
+  The low-frequency variant: the source level is read on the surface of the
+  specimen and 9 dB is subtracted instead of 6, with the normative limp-panel
+  qualification of Annex A.
 
 ## Standards
 
@@ -786,7 +919,10 @@ ISO 15186-1:2000, which defines the intensity sound reduction index $R_\mathrm{I
 its $K_\mathrm{c}$-modified form $R_\mathrm{I,M}$ (Annex B), the element normalized level
 difference $D_\mathrm{I,n,e}$ and the surface pressure-intensity indicator;
 ISO 15186-2:2003, which carries the same quantities into the field as the
-apparent $R'_\mathrm{I}$. The single-number ratings reuse ISO 717-1.
+apparent $R'_\mathrm{I}$; and ISO 15186-3:2002, which reads the source level on the
+surface of the specimen so the method reaches 50 Hz, and qualifies the
+facility on a limp panel (Annex A). The single-number ratings reuse ISO 717-1,
+which Part 3's six bands cannot feed.
 
 ## See also
 

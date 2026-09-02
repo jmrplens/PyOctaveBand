@@ -3,13 +3,13 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 606,
-    "passing": 606,
+    "checks": 609,
+    "passing": 609,
     "failing": 0,
     "domains": 59,
-    "standards": 376,
-    "citations": 542,
-    "designations": 117,
+    "standards": 377,
+    "citations": 545,
+    "designations": 118,
     "sources": 84
   },
   "units": [
@@ -85,8 +85,8 @@
     {
       "id": "room-building-acoustics",
       "title": "Room & building acoustics",
-      "checks": 81,
-      "passing": 81
+      "checks": 84,
+      "passing": 84
     },
     {
       "id": "room-acoustics",
@@ -4439,6 +4439,81 @@
       "deviation": {
         "value": 0.047,
         "label": "0.047 dB"
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-15186-3-2002-annex-a-table-a-1/limp-panel-qualification-the-printed-plaster-board-column",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 15186-3",
+        "edition": "2002",
+        "clause": "Annex A, Table A.1",
+        "cite": "ISO 15186-3:2002 Annex A, Table A.1"
+      },
+      "quantity": "Limp-panel qualification: the printed plaster-board column",
+      "kind": "scalar",
+      "expected": {
+        "label": "max abs(R - Table A.1) <= 0,05 dB (1 dp print)"
+      },
+      "computed": {
+        "label": "0.050 dB over 50 Hz to 160 Hz"
+      },
+      "deviation": {
+        "value": 0.05,
+        "label": "0.050 dB"
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-15186-3-2002-formula-7/low-frequency-ri-subtracts-9-db-three-more-than-part-1",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 15186-3",
+        "edition": "2002",
+        "clause": "Formula (7)",
+        "cite": "ISO 15186-3:2002 Formula (7)"
+      },
+      "quantity": "Low-frequency RI subtracts 9 dB, three more than part 1",
+      "kind": "scalar",
+      "expected": {
+        "label": "RI = 15 dB, 3 dB below part 1; FpI = 8 dB qualifies at 10 not 6"
+      },
+      "computed": {
+        "label": "RI = 15 dB, part 1 - part 3 = 3 dB"
+      },
+      "deviation": {
+        "value": 0.0,
+        "label": "+0.000 dB"
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-15186-3-2002-clause-3-9-formula-8/low-frequency-di-n-e-the-series-own-10-lg-n-sign",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 15186-3",
+        "edition": "2002",
+        "clause": "Clause 3.9, Formula (8)",
+        "cite": "ISO 15186-3:2002 Clause 3.9, Formula (8)"
+      },
+      "quantity": "Low-frequency DI,n,e; the series' own +10 lg N sign",
+      "kind": "scalar",
+      "expected": {
+        "label": "DI,n,e = 21 dB; N = 4 adds 6.021 dB"
+      },
+      "computed": {
+        "label": "21 dB; N = 4 adds 6.021 dB"
+      },
+      "deviation": {
+        "value": 8.88e-16,
+        "label": "+8.882e-16 dB"
       },
       "precision": 4,
       "verdict": "pass"

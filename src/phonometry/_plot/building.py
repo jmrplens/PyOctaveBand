@@ -53,6 +53,10 @@ if TYPE_CHECKING:
         ImpactRatingResult,
         WeightedRatingResult,
     )
+    from ..building.measurement.intensity_insulation import (
+        LowFrequencyElementResult,
+        LowFrequencyIntensityResult,
+    )
     from ..building.measurement.low_frequency import LowFrequencyResult
     from ..building.measurement.structure_borne_power import StructureBornePowerResult
     from ..building.measurement.uncertainty import BandUncertainty
@@ -128,6 +132,24 @@ _SHARE_LABEL = "Share of transmitted energy [%]"
 #: measurement and the two resilient-layer predictions).
 _IMPROVEMENT_LABEL = r"Improvement of impact sound insulation $\Delta L$ [dB]"
 
+#: Symbols and labels of the ISO 15186-3 low-frequency figure. The index and
+#: the field indicator share one figure, so the indicator gets a twin axis and
+#: its own spelled-out label.
+_R_INTENSITY = "$R_I$"
+_D_INTENSITY_ELEMENT = "$D_{I\\mathrm{n,e}}$"
+_F_PI = "$F_{pI}$"
+_INDICATOR_LABEL = "Surface pressure-intensity indicator [dB]"
+
+#: Bar width of the ISO 15186-3 figure, shared by the index bars and the
+#: hatch that overlays the bands Clause 6.4.2 refuses so the two coincide.
+_BAR_WIDTH = 0.7
+_LOW_FREQUENCY_INTENSITY_TITLE = (
+    "Low-frequency intensity sound insulation (ISO 15186-3)"
+)
+_LOW_FREQUENCY_ELEMENT_TITLE = (
+    "Low-frequency element normalized level difference (ISO 15186-3)"
+)
+
 #: Spanish translations of the fixed labels/titles/legends rendered by the
 #: building-domain ``.plot()`` renderers, keyed by their verbatim English
 #: text. ``_t`` returns the English key unchanged for any language other
@@ -151,6 +173,11 @@ _STRINGS: dict[str, str] = {
     _LEVEL_DIFFERENCE_LABEL: "Diferencia de nivel / índice de reducción [dB]",
     _SPL_LABEL: "Nivel de presión acústica [dB]",
     _LOW_FREQUENCY_TITLE: "Procedimiento de baja frecuencia (ISO 16283)",
+    _INDICATOR_LABEL: "Indicador presión-intensidad superficial [dB]",
+    _LOW_FREQUENCY_INTENSITY_TITLE: "Aislamiento acústico por intensidad a baja frecuencia (ISO 15186-3)",
+    _LOW_FREQUENCY_ELEMENT_TITLE: "Diferencia de niveles normalizada de elemento a baja frecuencia (ISO 15186-3)",
+    "not qualified (6.4.2)": "no cualificada (6.4.2)",
+    "limit": "límite",
     "Façade sound insulation (ISO 16283-3)": "Aislamiento acústico de fachada (ISO 16283-3)",
     "Reduction index / level difference [dB]": "Índice de reducción / diferencia de nivel [dB]",
     "Façade insulation prediction (EN 12354-3)": "Predicción del aislamiento de fachada (EN 12354-3)",
@@ -2223,3 +2250,163 @@ def plot_lining_improvement(
     format_frequency_axis(ax, float(sweep.min()), float(sweep.max()))
     localize_axes(ax, language)
     return ax
+
+
+def _plot_low_frequency(
+    result: LowFrequencyIntensityResult | LowFrequencyElementResult,
+    values: np.ndarray,
+    *,
+    symbol: str,
+    title: str,
+    ax: Axes | None,
+    language: str,
+    kwargs: dict[str, Any],
+) -> Axes:
+    """One band figure for either ISO 15186-3 quantity.
+
+    The index and the element-normalized level difference are read the same
+    way, band by band against the Clause 6.4.2 verdict, so they are drawn by
+    one renderer and differ only in the symbol on the bars and the title.
+    """
+    from .._i18n import localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    r_i = np.asarray(values, dtype=np.float64)
+    # Categorical positions, not a log frequency axis: the standard fixes the
+    # band set at three to six bands, and bars over so short a span read
+    # better evenly spaced. Without centres the bands are labelled by order.
+    band_word = _t("Band", language)
+    labels: Sequence[str] | np.ndarray = (
+        result.frequencies
+        if result.frequencies is not None
+        else [f"{band_word} {i + 1}" for i in range(r_i.size)]
+    )
+    positions = _band_axis(
+        ax,
+        labels,
+        xlabel=_FREQ_LABEL if result.frequencies is not None else "Band",
+        language=language,
+    )
+    qualified = (
+        np.ones(r_i.size, dtype=bool)
+        if result.qualified is None
+        else np.asarray(result.qualified, dtype=bool)
+    )
+
+    bar_kwargs = dict(kwargs)
+    bar_kwargs.setdefault("label", symbol)
+    bar_kwargs.setdefault("color", _C_PRIMARY)
+    bar_kwargs.setdefault("edgecolor", "none")
+    bar_kwargs.setdefault("zorder", 0)
+    ax.bar(positions, r_i, width=_BAR_WIDTH, **bar_kwargs)
+    # Hatch on top of the bar rather than recolouring it: the refused bands
+    # still carry a computed index, the hatch says it is not qualified.
+    if not qualified.all():
+        ax.bar(
+            positions[~qualified],
+            r_i[~qualified],
+            width=_BAR_WIDTH,
+            facecolor="none",
+            edgecolor=_C_REFERENCE,
+            hatch="///",
+            lw=1.0,
+            zorder=1,
+            label=_t("not qualified (6.4.2)", language),
+        )
+    ax.set_ylabel(_t(_REDUCTION_INDEX_LABEL, language))
+    ax.set_title(_t(title, language))
+
+    handles, texts = ax.get_legend_handles_labels()
+    # The indicator only exists where the receiving-side pressure was measured
+    # alongside the intensity, so the twin axis is drawn only then.
+    if result.surface_pressure_intensity is not None:
+        limit = result.indicator_limit
+        twin = ax.twinx()
+        twin.plot(
+            positions,
+            np.asarray(result.surface_pressure_intensity, dtype=np.float64),
+            color=_C_SECONDARY,
+            lw=2.0,
+            marker="o",
+            ms=4,
+            label=_F_PI,
+            zorder=3,
+        )
+        twin.axhline(
+            limit,
+            color=_C_REFERENCE,
+            ls="--",
+            lw=1.2,
+            label=f"{_F_PI} {_t('limit', language)} = {limit:.0f} dB",
+            zorder=2,
+        )
+        twin.set_ylabel(_t(_INDICATOR_LABEL, language))
+        extra_handles, extra_texts = twin.get_legend_handles_labels()
+        handles += extra_handles
+        texts += extra_texts
+        localize_axes(twin, language)
+    ax.legend(handles, texts, loc="best", fontsize="small")
+    ax.grid(True, axis="y", alpha=0.3)
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_low_frequency_intensity(
+    result: LowFrequencyIntensityResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Low-frequency intensity sound reduction index (ISO 15186-3).
+
+    Draws ``RI`` per band as bars, hatching any band the Clause 6.4.2 field
+    indicator refuses, and overlays the indicator ``FpI`` with its applicable
+    limit on a twin axis. Works for
+    :class:`~phonometry.building.measurement.intensity_insulation.LowFrequencyIntensityResult`.
+
+    :param result: A low-frequency result exposing ``r_i``,
+        ``surface_pressure_intensity``, ``qualified`` and ``frequencies``.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the ``RI`` bar call.
+    :return: The axes.
+    """
+    return _plot_low_frequency(
+        result,
+        result.r_i,
+        symbol=_R_INTENSITY,
+        title=_LOW_FREQUENCY_INTENSITY_TITLE,
+        ax=ax,
+        language=language,
+        kwargs=kwargs,
+    )
+
+
+def plot_low_frequency_element(
+    result: LowFrequencyElementResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Low-frequency element normalized level difference (ISO 15186-3).
+
+    The same figure as :func:`plot_low_frequency_intensity` for the
+    small-element quantity of Formula (8). Works for
+    :class:`~phonometry.building.measurement.intensity_insulation.LowFrequencyElementResult`.
+
+    :param result: An element result exposing ``d_i_n_e``,
+        ``surface_pressure_intensity``, ``qualified`` and ``frequencies``.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the ``DI,n,e`` bar call.
+    :return: The axes.
+    """
+    return _plot_low_frequency(
+        result,
+        result.d_i_n_e,
+        symbol=_D_INTENSITY_ELEMENT,
+        title=_LOW_FREQUENCY_ELEMENT_TITLE,
+        ax=ax,
+        language=language,
+        kwargs=kwargs,
+    )

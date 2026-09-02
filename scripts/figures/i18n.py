@@ -641,6 +641,16 @@ _ES_EXACT = {
     "Sound reduction index [dB]": "Índice de reducción acústica [dB]",
     r"$K_\mathrm{c}$ adaptation": r"Adaptación $K_\mathrm{c}$",
     r"$R_\mathrm{I}$ (intensity)": r"$R_\mathrm{I}$ (intensidad)",
+    # low_frequency_intensity figure (ISO 15186-3)
+    "Low-frequency index and its field indicator": "Índice a baja frecuencia y su indicador de campo",
+    "Qualifying the facility on a limp panel": "Calificación de la instalación con un panel flexible",
+    "Surface pressure-intensity indicator [dB]": "Indicador presión-intensidad superficial [dB]",
+    r"$R_\mathrm{I}$ (ISO 15186-3)": r"$R_\mathrm{I}$ (ISO 15186-3)",
+    "not qualified (6.4.2)": "no cualificada (6.4.2)",
+    "$F_{pI}$ limit = 10 dB": "límite de $F_{pI}$ = 10 dB",
+    "4.0 dB tolerance (Annex A)": "tolerancia de 4,0 dB (anexo A)",
+    "calculated (A.1)": "calculado (A.1)",
+    "largest deviation = 2.9 dB": "desviación mayor = 2,9 dB",
     # intensity_element_insulation info box: rating and formula, symbols only.
     "$D_{I,\\mathrm{n,e,w}}$($C$;$C_\\mathrm{tr}$) = 29(−1;−2) dB\n"
     "$D_{I,\\mathrm{n,e}} = L_{p1} - 6 - [L_{I\\mathrm{n}}"

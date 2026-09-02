@@ -23,6 +23,13 @@ references:
     designation: "ISO 15186-2:2003"
     url: "https://www.iso.org/standard/30105.html"
     note: "La contraparte en campo del método por intensidad, que da el índice aparente R'_I."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2002
+    title: "Acoustics — Measurement of sound insulation in buildings and of building elements using sound intensity — Part 3: Laboratory measurements at low frequencies"
+    designation: "ISO 15186-3:2002"
+    url: "https://www.iso.org/standard/33962.html"
+    note: "La variante de baja frecuencia: el nivel del recinto emisor se lee sobre la superficie del elemento y se restan 9 dB en lugar de 6 (apartado 3.8), con la cualificación normativa por panel flexible del anexo A."
 ---
 
 import ReportPreview from '../../../../../components/ReportPreview.astro';
@@ -509,6 +516,253 @@ con que los límites de la propia sonda (el
 [error de fase del espaciador](/phonometry/es/devices/emission/intensity/)) fijen el
 rango útil en baja frecuencia.
 
+## Baja frecuencia: la presión sobre el elemento de ensayo (ISO 15186-3)
+
+Las dos partes anteriores ponen el micrófono emisor en el *recinto*, y por
+debajo de 100 Hz ahí es justo donde un recinto emisor deja de poder responder.
+Un recinto que un laboratorio pueda construir tiene demasiado pocos modos a
+esas frecuencias para que un promedio espacial describa el campo que excita al
+elemento: se mueven los micrófonos y se mueve el promedio con ellos. La ISO
+15186-3 mantiene la sonda de intensidad en el lado receptor y cambia el otro
+extremo de la medición: el nivel del recinto emisor se lee **sobre la propia
+superficie del elemento de ensayo**, con micrófonos fijos a menos de 50 mm de
+ella (apartado 6.3):
+
+$$
+R_\mathrm{I} = L_{p\mathrm{S}} - 9 - \left[ L_{I\mathrm{n}} + 10\lg\frac{S_\mathrm{m}}{S} \right]\ \mathrm{dB}
+$$
+
+**Nueve decibelios, no seis.** Esa sola constante es toda la diferencia con la
+parte 1. Cerca de una frontera rígida un campo difuso lleva el doble de
+presión cuadrática media que lejos de ella, así que un micrófono a 50 mm del
+elemento lee 3 dB por encima del promedio de recinto de ese mismo campo. El
+promedio de recinto de la parte 1 no arrastra esa acumulación y resta 6; el
+promedio de superficie sí la arrastra y resta 9. Todo lo demás de la fórmula
+—la razón de áreas, el signo de la intensidad, la combinación de subáreas— es
+el método que ya se tiene.
+
+El precio es una condición de validez que la parte 1 no tiene. La duplicación
+solo vale 3 dB si la superficie refleja, así que una NOTA bajo la Fórmula (7)
+la acota: la fórmula vale para un elemento con superficie reflectante en el
+recinto emisor, sigue funcionando con superficies moderadamente absorbentes
+(100 mm de absorbente poroso), conviene leerla solo de 50 Hz a 80 Hz tras 100
+a 200 mm de absorbente, y no es válida tras nada más grueso. La biblioteca no
+ve el elemento, así que esto queda de tu lado.
+
+**Cuántos micrófonos (apartado 6.3).** Repartidos de manera uniforme pero
+*asimétrica* por toda la superficie, bordes y esquinas incluidos, con al menos
+30 s de integración cada uno:
+
+| Elemento de ensayo | Mínimo de posiciones fijas de micrófono |
+| :--- | :--- |
+| Elementos constructivos pequeños (ISO 140-10) | 2 por cada elemento montado en la pared de ensayo |
+| Otros elementos de hasta 3 m² | 6 |
+| Los demás | 12 |
+
+**Las bandas.** El apartado 6.6 exige filtros en 50 Hz, 63 Hz y 80 Hz y admite
+añadir 100 Hz, 125 Hz y 160 Hz; el techo es del apartado 1.1, que aplica esta
+parte de 50 Hz a 160 Hz y dice que está pensada sobre todo para el rango de
+50 Hz a 80 Hz. Seis bandas son todo el método, y por eso de él no sale ningún
+índice global: ISO 717-1 necesita dieciséis. Pasar una banda fuera de ese
+rango se rechaza en lugar de extrapolarse, y el apartado 1.1 dice qué hacer en
+su lugar: combinar estos resultados con los de la ISO 140-3 y la ISO 15186-1
+en una sola curva de 50 Hz a 5000 Hz.
+
+**Cualificar la superficie (apartado 6.4.2).** El indicador es el mismo
+$F_{pI} = L_p - L_{I\mathrm{n}}$ que en el resto de la serie, y sus dos niveles se
+leen sobre la superficie de medición en el recinto *receptor*: no es el nivel
+de superficie con el que se construye la Fórmula (7). Los límites distinguen
+el elemento, no el recinto: $F_{pI} > 10$ dB rechaza un elemento reflectante y
+$F_{pI} > 6$ dB uno que presenta una superficie absorbente en el recinto
+receptor, que es el caso de dos caras absorbentes, porque un elemento
+absorbente por una sola cara se monta con esa cara hacia el emisor (apartado
+5.3). El recinto receptor lleva siempre un absorbente eficaz en la pared
+opuesta al elemento; eso es un requisito de la instalación, no un caso. El
+apartado 6.5 añade el margen de 10 dB sobre el ruido de fondo y su propia
+prueba: con $F_{pI} < 10$ dB, se baja la fuente 10 dB, y si $F_{pI}$ cambia menos
+de 1 dB el requisito se cumple.
+
+Como la norma solo pide esa segunda medición de presión «si es posible», aquí
+`l_p` es opcional. Sin ella no hay indicador ni veredicto, y el resultado lo
+dice en vez de suponerlo:
+
+```python
+import numpy as np
+from phonometry import building
+
+# Un tabique ligero, 10 m2, barrido sobre una superficie de caja de 12,6 m2.
+# LpS es el promedio sobre la superficie del elemento en el recinto emisor;
+# LIn y Lp se leen juntos sobre la superficie de medición en el receptor.
+freqs = [50.0, 63.0, 80.0, 100.0, 125.0, 160.0]
+lp_superficie = np.array([88.4, 89.1, 90.3, 91.0, 91.4, 91.8])
+l_in = np.array([61.6, 60.9, 59.8, 57.9, 56.0, 53.9])
+l_p = np.array([74.0, 72.0, 69.4, 66.1, 63.1, 60.3])
+
+res = building.low_frequency_intensity_reduction(
+    lp_superficie, l_in, measurement_area=12.6, area=10.0,
+    l_p=l_p, frequencies=freqs,
+)
+print(np.round(res.r_i, 1))                         # [16.8 18.2 20.5 23.1 25.4 27.9]
+print(np.round(res.surface_pressure_intensity, 1))  # [12.4 11.1  9.6  8.2  7.1  6.4]
+print(res.qualified.tolist())   # [False, False, True, True, True, True]
+print(res.indicator_limit)      # 10.0
+
+# Sin la presión del lado receptor no hay respuesta del 6.4.2 en absoluto.
+desnudo = building.low_frequency_intensity_reduction(
+    lp_superficie, l_in, measurement_area=12.6, area=10.0, frequencies=freqs,
+)
+print(desnudo.surface_pressure_intensity, desnudo.qualified)   # None None
+```
+
+Una banda rechazada se marca, no se descarta. La respuesta de la norma a un
+$F_{pI}$ por encima del límite es mejorar el entorno de medición —aumentar
+primero la distancia de medición entre 5 y 10 cm, luego reducir los flancos o
+mejorar el absorbente opuesto—, así que el índice se calcula igual y el
+veredicto viaja a su lado.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/low_frequency_intensity_es.svg" alt="Izquierda: el índice de reducción acústica por intensidad a baja frecuencia por banda de tercio de octava de 50 Hz a 160 Hz en barras, con las bandas de 50 y 63 Hz rayadas porque su indicador presión-intensidad superficial supera los 10 dB, y el indicador dibujado como curva en un eje gemelo frente a su línea de límite de 10 dB. Derecha: el índice de reducción acústica calculado del panel flexible del anexo A con la tolerancia de 4 dB que el anexo admite sombreada a su alrededor y una curva medida que se mantiene dentro" width="92%" />
+
+*A la izquierda, la medición: el índice sube a lo largo de las seis bandas
+mientras el indicador cae por debajo de su límite, así que las dos bandas más
+bajas se calculan pero no quedan cualificadas. A la derecha, la instalación:
+la curva calculada del panel flexible del anexo A y los 4 dB a cada lado
+dentro de los que ha de quedar una medición.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# res es el LowFrequencyIntensityResult calculado arriba. Una línea:
+res.plot(language="es")   # barras de RI, bandas rechazadas rayadas, FpI y su límite
+plt.show()
+
+# A mano, y el panel del anexo A al lado.
+calculado = building.limp_panel_reduction_index(
+    freqs, surface_mass=10.0, area=10.0, temperature=23.0,
+)
+medido = calculado + np.array([2.6, -1.8, 1.1, -2.9, 0.7, -1.4])
+x = np.arange(len(freqs))
+fig, (axi, axd) = plt.subplots(1, 2, figsize=(13.0, 5.6))
+barras = axi.bar(x, res.r_i, width=0.68)
+for barra, ok in zip(barras, res.qualified, strict=True):
+    if not ok:
+        barra.set_hatch("///")
+axi.set_xticks(x, [f"{f:g}" for f in freqs])
+axi.set(xlabel="Frecuencia [Hz]", ylabel="Índice de reducción acústica [dB]")
+gemelo = axi.twinx()
+gemelo.plot(x, res.surface_pressure_intensity, "-o", color="#2ca02c", label="FpI")
+gemelo.axhline(res.indicator_limit, ls="--", color="#d62728", label="límite de FpI")
+gemelo.set_ylabel("Indicador presión-intensidad superficial [dB]")
+gemelo.legend()
+axd.fill_between(x, calculado - 4.0, calculado + 4.0, alpha=0.2,
+                 label="tolerancia de 4,0 dB (anexo A)")
+axd.plot(x, calculado, "-o", label="calculado (A.1)")
+axd.plot(x, medido, "--s", label="medido")
+axd.set_xticks(x, [f"{f:g}" for f in freqs])
+axd.set(xlabel="Frecuencia [Hz]", ylabel="Índice de reducción acústica [dB]")
+axd.legend()
+plt.show()
+```
+
+</details>
+
+### Elementos pequeños a baja frecuencia, y un signo en el que la serie se contradice
+
+La Fórmula (8) normaliza un elemento pequeño al área de absorción de
+referencia $A_0 = 10$ m² igual que la parte 1, con los 9 dB de la medición de
+superficie en lugar de 6:
+
+$$
+D_{I\mathrm{n,e}} = L_{p\mathrm{S}} - 9 - \left[ L_{I\mathrm{n}} - 10\lg\frac{A_0}{S_\mathrm{m}} - 10\lg N \right]\ \mathrm{dB}
+$$
+
+Conviene leer el corchete con cuidado. El $10\lg N$ de dentro va *restado*, así
+que el término llega a $D_{I\mathrm{n,e}}$ **sumado**, que es el signo que deduce esta
+biblioteca y el contrario del que imprime la ISO 15186-1 para la misma
+magnitud. Dos partes de una misma serie imprimen los dos signos; este es el
+que concuerda con la física (instalar $N$ unidades eleva la potencia
+transmitida en $10\lg N$, así que recuperar la cifra por unidad tiene que
+volver a sumarlo) y con la Fórmula (6) de la ISO 10140-2, basada en presión.
+Lo impreso en la parte 1 está registrado en
+[ERRATA](/phonometry/es/reference/errata/), y su implementación avisa siempre
+que $N > 1$ la enfrenta a su propia página. Aquí no avisa nada, porque aquí la
+página y la física coinciden.
+
+```python
+# Cuatro aireadores idénticos dentro de una superficie de medición de 2,0 m2.
+elemento = building.low_frequency_element_normalized_difference(
+    np.full(6, 90.0), np.array([62.0, 61.0, 60.0, 58.0, 57.0, 55.0]),
+    measurement_area=2.0, elements=4, frequencies=freqs,
+)
+print(np.round(elemento.d_i_n_e, 1))     # [32. 33. 34. 36. 37. 39.]
+print(elemento.elements)                 # 4
+```
+
+### Cualificar la instalación (anexo A)
+
+El anexo A es normativo, y es lo que hace un laboratorio antes de informar de
+nada: medir un panel flexible de más de 1 m², calcular lo que debería leer y
+exigir que ambos concuerden dentro de **4,0 dB** de 50 Hz a 160 Hz. La mitad
+calculada es transmisión forzada y nada más: ley de masa reducida por la
+eficiencia de radiación de una placa excitada por un campo difuso,
+
+$$
+R = R_0 - 10\lg 2\sigma_\mathrm{d}, \qquad
+R_0 = 20\lg\frac{\pi f m}{\rho c}, \qquad
+\sigma_\mathrm{d} = \tfrac{1}{2}\left[0{,}20 + \ln\left(2\pi\frac{f}{c}\sqrt{S}\right)\right]
+$$
+
+con el aire tomado en el clima del ensayo,
+$\rho c = 427\sqrt{273/(273+\theta)}\cdot B/B_0$ y $c = 331 + 0{,}6\,\theta$. El
+panel es flexible *por hipótesis*. El techo de 160 Hz no es del anexo: el
+apartado 1.1 aplica toda esta parte de 50 Hz a 160 Hz, y dice que está pensada
+sobre todo para el rango de 50 Hz a 80 Hz.
+
+```python
+# Anexo A, Tabla A.1: cartón-yeso de 12,5 mm, 10 kg/m2, sobre un hueco de
+# 10 m2, a 1 013 hPa y 23 grados Celsius.
+calc = building.limp_panel_reduction_index(
+    freqs, surface_mass=10.0, area=10.0,
+    temperature=23.0, static_pressure=101300.0,
+)
+print(np.round(calc, 1))    # [10.7 11.9 13.4 14.8 16.3 17.9]
+```
+
+Esos seis valores son la tabla impresa, banda por banda, y son el ancla de
+conformidad de las cinco fórmulas. La columna del sándwich de acero que va a
+su lado en la misma tabla no lo es: ninguna lectura de los datos impresos junto
+a ella la reproduce, y la que lo haría mueve a la vez un área y una masa
+superficial, y esa masa sale mayor que la del acero macizo del espesor
+declarado. Está registrada en
+[ERRATA](/phonometry/es/reference/errata/) y a propósito no se usa como
+oráculo.
+
+### Parámetros de `low_frequency_intensity_reduction()` / `limp_panel_reduction_index()`
+
+| Parámetro | Tipo | Unidades | Rango / defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `lp_surface` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Presión sobre la superficie del elemento, $L_{p\mathrm{S}}$ |
+| `l_in` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Nivel de intensidad normal sobre la superficie de medición |
+| `measurement_area` | float | m² | > 0 | Área de la superficie de medición $S_\mathrm{m}$ |
+| `area` | float | m² | > 0 | Área del elemento $S$; el panel flexible del anexo A exige $S \\geq 1$ m² |
+| `l_p` | array 1D o 2D | dB | uno/banda / `None` | Presión del lado receptor sobre la superficie de medición, para la Fórmula (5) |
+| `frequencies` | array 1D | Hz | 50 a 160 / `None` | Frecuencias centrales; el apartado 6.6 no admite otras |
+| `absorbing_specimen_surface` | bool | — | defecto `False` | `True` estrecha el límite del 6.4.2 a 6 dB |
+| `elements` | int | unidades | ≥ 1, defecto `1` | Número $N$ de unidades (solo `low_frequency_element_normalized_difference`) |
+| `surface_mass` | float | kg/m² | > 0 | Masa superficial $m$ del panel flexible (`limp_panel_reduction_index`) |
+| `temperature` / `static_pressure` | float | °C / Pa | defecto 23 °C, 101 300 Pa | El clima de las Fórmulas (A.4) y (A.5) |
+
+`low_frequency_intensity_reduction()` devuelve un
+`LowFrequencyIntensityResult` (`r_i`, `surface_pressure_intensity`,
+`qualified`, `indicator_limit`),
+`low_frequency_element_normalized_difference()` un
+`LowFrequencyElementResult` (`d_i_n_e` y los tres mismos), y
+`limp_panel_reduction_index()` un array a secas. Ninguno de los dos resultados
+lleva índice global: el apartado 7 pide el índice con un decimal junto al
+indicador, y seis bandas no dan de comer a la ISO 717-1.
+
 ## Qué cubre esta guía
 
 <Scope>
@@ -521,7 +775,15 @@ mediante `building.intensity_sound_reduction`, `building.adaptation_term_kc`,
 `building.intensity_element_normalized_difference`,
 `building.surface_pressure_intensity_indicator` y `building.combine_subareas`;
 los índices globales reutilizan el motor verificado de ISO 717-1, y ambos
-resultados escriben la ficha de ensayo de una página con `.report()`.
+resultados escriben la ficha de ensayo de una página con `.report()`. También
+está cubierta la variante de baja frecuencia de ISO 15186-3:2002: el índice de
+superficie $R_\mathrm{I}$ de la Fórmula (7), la $D_{I\mathrm{n,e}}$ normalizada de
+elemento de la Fórmula (8), la cualificación del apartado 6.4.2 contra sus dos
+límites, el rango de bandas del 6.6 y la cualificación normativa por panel
+flexible del anexo A, mediante
+`building.low_frequency_intensity_reduction`,
+`building.low_frequency_element_normalized_difference` y
+`building.limp_panel_reduction_index`.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered" label="No cubierto">
@@ -535,10 +797,17 @@ adquisición del apartado 6.4 documentada más arriba: la separación de 0,1 a
 0,3 m, la velocidad de barrido de 0,1 a 0,3 m/s, el segundo barrido girado 90°
 y su prueba de validez de 1,0 dB, el margen de 10 dB sobre el ruido de fondo.
 Un solo barrido produce un número igual de fácilmente que una pareja
-cualificada. Tampoco están implementados el procedimiento de campo propio de
-ISO 15186-2 (posiciones de altavoz, los casos de fachada) ni la variante de
-baja frecuencia de la parte 3: las fórmulas de esta página se aplican sin
-cambios a datos de campo, pero nada comprueba cómo se adquirieron.
+cualificada. Tampoco está implementado el procedimiento de campo propio de
+ISO 15186-2 (posiciones de altavoz, los casos de fachada): las fórmulas de
+esta página se aplican sin cambios a datos de campo, pero nada comprueba cómo
+se adquirieron. Lo mismo vale para el procedimiento de la parte 3: los
+recuentos de micrófonos de su Tabla 1, la separación de 50 mm, los dos
+barridos girados 90° y su prueba de concordancia de 2,0 dB / 1,0 dB, el margen
+de 10 dB sobre el fondo y los límites de absorción del recinto emisor bajo la
+Fórmula (7) están documentados más arriba y no se imponen en ninguna parte.
+Los resultados de la parte 3 no llevan índice global ni ficha `.report()`,
+porque seis bandas no dan de comer a la ISO 717-1 y el informe de su apartado
+8 no tiene aquí forma trabajada.
 </ScopeClaim>
 </Scope>
 

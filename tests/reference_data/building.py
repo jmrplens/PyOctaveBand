@@ -535,6 +535,27 @@ ISO15186_1_KC_BANDS = tuple(f for f, _ in ISO15186_1_KC_TABLE_B1)
 ISO15186_1_KC_B1_PRINTED = [kc for _, kc in ISO15186_1_KC_TABLE_B1]
 
 # ---------------------------------------------------------------------------
+# ISO 15186-3:2002 - sound insulation at low frequencies measured with sound
+# intensity. Annex A is normative and carries the only worked numbers in the
+# document: Table A.1 gives the calculated sound reduction index of two limp
+# panels at 1 013 hPa and 23 degC, over the six one-third octaves 50 Hz to
+# 160 Hz. The plaster-board column is the oracle of Formulas (A.1) to (A.5)
+# and is reproduced from its own stated inputs (10 kg/m2 over a 10 m2 test
+# opening) to within the 0,05 dB of its printed resolution.
+#
+# The steel-sandwich column is NOT an oracle and is deliberately not used as
+# one: it cannot be reproduced from the inputs printed beside it. See
+# docs/ERRATA.md, ISO 15186-3:2002 Table A.1.
+# ---------------------------------------------------------------------------
+ISO15186_3_ANNEX_A_BANDS = (50.0, 63.0, 80.0, 100.0, 125.0, 160.0)
+ISO15186_3_ANNEX_A_TEMPERATURE = 23.0  # degC, stated in the table caption
+ISO15186_3_ANNEX_A_PRESSURE = 101300.0  # Pa, 1 013 hPa, likewise
+ISO15186_3_PLASTER_SURFACE_MASS = 10.0  # kg/m2, 12,5 mm plaster board
+ISO15186_3_PLASTER_AREA = 10.0  # m2, the stated wall opening
+#: Printed Table A.1, plaster-board column, in dB.
+ISO15186_3_PLASTER_TABLE_A1 = [10.7, 11.9, 13.4, 14.8, 16.3, 17.9]
+
+# ---------------------------------------------------------------------------
 # ISO 16251-1:2014 - impact sound improvement of floor coverings (mock-up).
 # The standard's Annex B "Table B.1" is a blank report form (no numeric worked
 # example), so the conformance anchor is the ISO 717-2:2020 reference floor:

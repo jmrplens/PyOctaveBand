@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**606/606 conformance checks pass** across 59 domains and 376 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**609/609 conformance checks pass** across 59 domains and 377 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -108,7 +108,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>Room &amp; building acoustics</b>: 100% (81/81)</summary>
+<summary><b>Room &amp; building acoustics</b>: 100% (84/84)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -141,6 +141,9 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 10140-5:2010+A1 Annex C, Table C.1 | Reference floors end-to-end: printed Ln,t,r,0,w (CI) of both | Ln,t,r,0,w(CI) = 72(0) / 75(-3) | 72(0) / 75(-3) | exact | - | ![Pass][cv-pass] Pass |
 | ISO 15186-1:2000 Formula (7) | Intensity RI on the ISO 717-1 reference shape -> RI,w = 30 | RI,w 30 dB (scalar anchor RI = 34 dB) | RI,w 30 dB (RI = 34 dB) | +0 dB | - | ![Pass][cv-pass] Pass |
 | ISO 15186-1:2000 Annex B, Table B.1 | Adaptation term Kc: all 21 printed rows; (B.1) reduces to (B.2) | max abs(Kc - Table B.1) <= 0,05 dB (1 dp print) | 0.047 dB (B.1 vs B.2: 4.33e-04 dB) | 0.047 dB | - | ![Pass][cv-pass] Pass |
+| ISO 15186-3:2002 Annex A, Table A.1 | Limp-panel qualification: the printed plaster-board column | max abs(R - Table A.1) <= 0,05 dB (1 dp print) | 0.050 dB over 50 Hz to 160 Hz | 0.050 dB | - | ![Pass][cv-pass] Pass |
+| ISO 15186-3:2002 Formula (7) | Low-frequency RI subtracts 9 dB, three more than part 1 | RI = 15 dB, 3 dB below part 1; FpI = 8 dB qualifies at 10 not 6 | RI = 15 dB, part 1 - part 3 = 3 dB | +0.000 dB | - | ![Pass][cv-pass] Pass |
+| ISO 15186-3:2002 Clause 3.9, Formula (8) | Low-frequency DI,n,e; the series' own +10 lg N sign | DI,n,e = 21 dB; N = 4 adds 6.021 dB | 21 dB; N = 4 adds 6.021 dB | +8.882e-16 dB | - | ![Pass][cv-pass] Pass |
 | ISO 10052:2021 Clause 3.6 | Survey R' applies the V/7,5 minimum-area rule | 26.197888 dB (+/-0 dB) | 26.197888 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 10052:2021 Clause 3.16 | Service-equipment LXY is the 3-position energy average | 32.823329 dB (+/-0 dB) | 32.823329 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 10052:2021 Table 4 | Reverberation-index estimate (35 <= V < 60, type g) | k = [4.5, 5.0, 5.5, 5.5, 5.5] dB | k = [4.5, 5.0, 5.5, 5.5, 5.5] dB | exact | - | ![Pass][cv-pass] Pass |

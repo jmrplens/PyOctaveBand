@@ -612,6 +612,164 @@ def generate_intensity_insulation(output_dir: str) -> None:
     plt.close()
 
 
+def generate_low_frequency_intensity(output_dir: str) -> None:
+    """ISO 15186-3: the low-frequency index, and the Annex A qualification."""
+    print("Generating low_frequency_intensity...")
+    from phonometry import building
+
+    freqs = np.array([50.0, 63.0, 80.0, 100.0, 125.0, 160.0])
+    _fig, (ax_ri, ax_qual) = plt.subplots(1, 2, figsize=(13.0, 5.6))
+
+    # Left: the index of a light partition, with the indicator that says
+    # whether the measurement surface qualifies at all (Clause 6.4.2).
+    lp_surface = np.array([88.4, 89.1, 90.3, 91.0, 91.4, 91.8])
+    l_in = np.array([61.6, 60.9, 59.8, 57.9, 56.0, 53.9])
+    # Read on the measurement surface alongside the intensity, which is what
+    # Formula (5) subtracts: the indicator comes within its 10 dB limit at
+    # 80 Hz and stays there.
+    l_p = np.array([74.0, 72.0, 69.4, 66.1, 63.1, 60.3])
+    result = building.low_frequency_intensity_reduction(
+        lp_surface,
+        l_in,
+        measurement_area=12.6,
+        area=10.0,
+        l_p=l_p,
+        frequencies=freqs,
+    )
+    assert result.qualified is not None
+    x = _band_index_axis(ax_ri, freqs)
+    ax_ri.bar(
+        x,
+        result.r_i,
+        width=0.68,
+        color=COLOR_PRIMARY,
+        zorder=2,
+        label=r"$R_\mathrm{I}$ (ISO 15186-3)",
+    )
+    if not result.qualified.all():
+        ax_ri.bar(
+            x[~result.qualified],
+            result.r_i[~result.qualified],
+            width=0.68,
+            facecolor="none",
+            edgecolor=COLOR_SECONDARY,
+            hatch="///",
+            linewidth=1.4,
+            zorder=3,
+            label="not qualified (6.4.2)",
+        )
+    ax_ri.set_ylabel("Sound reduction index [dB]")
+    # Headroom on both scales so the legend clears the bars and the indicator:
+    # the bars top out at 28 dB and the indicator at 12,4 dB.
+    ax_ri.set_ylim(0.0, 36.0)
+    ax_ri.set_title("Low-frequency index and its field indicator", pad=12)
+    ax_ri.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax_ri.set_axisbelow(True)
+
+    twin = ax_ri.twinx()
+    twin.plot(
+        x,
+        result.surface_pressure_intensity,
+        "-o",
+        color=COLOR_TERTIARY,
+        linewidth=2.4,
+        markersize=6,
+        zorder=5,
+        label=r"$F_{pI}$",
+    )
+    twin.axhline(
+        result.indicator_limit,
+        color=COLOR_SECONDARY,
+        linestyle="--",
+        linewidth=1.6,
+        zorder=4,
+        label=rf"$F_{{pI}}$ limit = {result.indicator_limit:.0f} dB",
+    )
+    # Tinted so the two "[dB]" scales cannot be confused, and ranged so the
+    # limit line lands between the left axis's gridlines rather than on one.
+    twin.set_ylabel("Surface pressure-intensity indicator [dB]", color=COLOR_TERTIARY)
+    twin.tick_params(axis="y", colors=COLOR_TERTIARY)
+    twin.set_ylim(0.0, 26.0)
+    # The dark style turns axes.grid on, so the twin draws a second set of
+    # gridlines over everything, the legend included. One grid, on the left.
+    twin.grid(visible=False)
+    handles, texts = ax_ri.get_legend_handles_labels()
+    twin_handles, twin_texts = twin.get_legend_handles_labels()
+    # Opaque patches: on the dark page the default lets a gridline through the
+    # legend and strikes its last row out.
+    ax_ri.legend(
+        handles + twin_handles,
+        texts + twin_texts,
+        loc="upper left",
+        fontsize=9,
+        framealpha=1.0,
+        facecolor=COLOR_PANEL,
+    )
+
+    # Right: Annex A. The calculated limp-panel curve, the 4,0 dB the annex
+    # allows either side of it, and a measurement that stays inside.
+    calculated = building.limp_panel_reduction_index(
+        freqs, surface_mass=10.0, area=10.0, temperature=23.0
+    )
+    measured = calculated + np.array([2.6, -1.8, 1.1, -2.9, 0.7, -1.4])
+    xq = _band_index_axis(ax_qual, freqs)
+    ax_qual.fill_between(
+        xq,
+        calculated - 4.0,
+        calculated + 4.0,
+        color=theme_fill(COLOR_PRIMARY, ax_qual),
+        zorder=1,
+        label="4.0 dB tolerance (Annex A)",
+    )
+    ax_qual.plot(
+        xq,
+        calculated,
+        "-",
+        color=COLOR_PRIMARY,
+        linewidth=2.6,
+        marker="o",
+        markersize=6,
+        zorder=5,
+        label="calculated (A.1)",
+    )
+    ax_qual.plot(
+        xq,
+        measured,
+        "--",
+        color=COLOR_TERTIARY,
+        linewidth=2.2,
+        marker="s",
+        markersize=6,
+        zorder=5,
+        label="measured",
+    )
+    ax_qual.set_ylabel("Sound reduction index [dB]")
+    ax_qual.set_title("Qualifying the facility on a limp panel", pad=12)
+    ax_qual.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax_qual.set_axisbelow(True)
+    ax_qual.legend(loc="upper left", fontsize=9, framealpha=1.0, facecolor=COLOR_PANEL)
+
+    worst = float(np.abs(measured - calculated).max())
+    ax_qual.text(
+        0.985,
+        0.03,
+        f"largest deviation = {worst:.1f} dB",
+        transform=ax_qual.transAxes,
+        va="bottom",
+        ha="right",
+        fontsize=11,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "low_frequency_intensity.png")
+    plt.close()
+
+
 def generate_survey_insulation(output_dir: str) -> None:
     """ISO 10052 survey method: the reverberation-index correction D -> DnT."""
     print("Generating survey_insulation...")
