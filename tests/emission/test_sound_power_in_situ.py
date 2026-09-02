@@ -477,13 +477,47 @@ def test_conforming_shapes_raise_no_warning() -> None:
         warnings.simplefilter("error")
         _power(background_levels=BACKGROUND)
         emission.sound_energy_in_situ(
-            np.repeat(ST[:, None, :], 5, axis=1), RSS, LW_RSS, FREQS
+            np.repeat(ST[:, None, :], 5, axis=1),
+            RSS,
+            LW_RSS,
+            FREQS,
+            background_levels=BACKGROUND,
         )
 
 
 def test_fewer_than_three_positions_warns() -> None:
     with pytest.warns(emission.SoundPowerWarning, match="7.4.1"):
-        emission.sound_power_in_situ(ST[:2], RSS[:2], LW_RSS, FREQS)
+        emission.sound_power_in_situ(
+            ST[:2], RSS[:2], LW_RSS, FREQS, background_levels=BACKGROUND
+        )
+
+
+def test_more_than_four_positions_warns() -> None:
+    """7.4.1 bounds the count on both sides: "in total, three or four
+    microphone positions are to be used", so a six-position traverse is as
+    far outside the procedure as a two-position one.
+    """
+    six = np.vstack([ST, ST[:2]])
+    with pytest.warns(emission.SoundPowerWarning, match="7.4.1"):
+        emission.sound_power_in_situ(
+            six, np.vstack([RSS, RSS[:2]]), LW_RSS, FREQS, background_levels=BACKGROUND
+        )
+
+
+def test_no_background_warns_and_meets_nothing() -> None:
+    """7.5 has the background obtained once at each microphone position and
+    8.1 declares the measurement valid only where the margin over it is at
+    least 6 dB, so a determination with no background reading at all cannot
+    report the requirement as met in any band.
+    """
+    with pytest.warns(emission.SoundPowerWarning, match="7.5"):
+        res = _power()
+    assert not bool(np.any(res.background_requirement_met))
+    with pytest.warns(emission.SoundPowerWarning, match="7.5"):
+        energy = emission.sound_energy_in_situ(
+            np.repeat(ST[:, None, :], 5, axis=1), RSS, LW_RSS, FREQS
+        )
+    assert not bool(np.any(energy.background_requirement_met))
 
 
 def test_fewer_than_five_events_warns() -> None:
@@ -518,6 +552,17 @@ def test_lw_ref_must_match_bands_or_locations() -> None:
     three_powers = np.stack([LW_RSS] * 3)
     with pytest.raises(ValueError, match="'lw_ref' must be one spectrum, or one per"):
         emission.sound_power_in_situ(ST, two_locations, three_powers, FREQS)
+
+
+def test_frequencies_must_be_distinct_and_ascending() -> None:
+    """Eq. (D.1) sums over k = kmin..kmax, one distinct band per k, so a
+    duplicated or reversed frequency vector would weight the A-weighted total
+    with the wrong Ck and mislabel the plot's axis.
+    """
+    with pytest.raises(ValueError, match="'frequencies' must be distinct"):
+        emission.sound_power_in_situ(ST, RSS, LW_RSS, np.full(FREQS.size, 1000.0))
+    with pytest.raises(ValueError, match="'frequencies' must be distinct"):
+        emission.sound_power_in_situ(ST, RSS, LW_RSS, FREQS[::-1])
 
 
 def test_frequencies_must_be_table_d1_octaves() -> None:
@@ -570,6 +615,30 @@ def test_grade_indicators_are_validated() -> None:
         _power(excess_levels=[8.0, 9.0, 8.0, 8.0], directivity_range=-1.0)
 
 
+def test_each_grade_indicator_is_validated_on_its_own() -> None:
+    """Table 2 reads the two indicators together, but a mis-shaped or
+    nonsensical one is a bad input whether or not its partner arrived: it
+    must be refused, not silently downgraded to survey with sigma_R0 = 4 dB.
+    """
+    not_a_number = float("nan")
+    with pytest.raises(
+        ValueError, match="'excess_levels' must carry one finite value per"
+    ):
+        _power(excess_levels=[8.0, 9.0])
+    with pytest.raises(
+        ValueError, match="'excess_levels' must carry one finite value per"
+    ):
+        _power(excess_levels=[not_a_number] * 4)
+    with pytest.raises(
+        ValueError, match="'directivity_range' must be finite and non-negative"
+    ):
+        _power(directivity_range=-5.0)
+    with pytest.raises(
+        ValueError, match="'directivity_range' must be finite and non-negative"
+    ):
+        _power(directivity_range=not_a_number)
+
+
 def test_uncertainty_inputs_are_validated() -> None:
     with pytest.raises(ValueError, match="'sigma_omc' must be finite and non-negative"):
         _power(sigma_omc=-0.5)
@@ -608,6 +677,10 @@ def test_altitude_is_validated() -> None:
     not_a_number = float("nan")
     with pytest.raises(ValueError, match="'altitude' must be finite and below"):
         emission.static_pressure_from_altitude(not_a_number)
+    with pytest.raises(ValueError, match="'altitude' must be a single value"):
+        emission.static_pressure_from_altitude(np.array([0.0, 500.0]))  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="'altitude' must be numeric"):
+        emission.static_pressure_from_altitude("high")  # type: ignore[arg-type]
 
 
 def test_excess_level_inputs_are_validated() -> None:
@@ -619,6 +692,12 @@ def test_excess_level_inputs_are_validated() -> None:
         emission.excess_sound_pressure_level(not_a_number, 92.0, 2.0)
     with pytest.raises(ValueError, match="'lw_ref' must be finite"):
         emission.excess_sound_pressure_level(70.0, unbounded, 2.0)
+    with pytest.raises(ValueError, match="'level' must not be empty"):
+        emission.excess_sound_pressure_level([], [], [])
+    with pytest.raises(
+        ValueError, match="'level', 'lw_ref' and 'distance' must broadcast"
+    ):
+        emission.excess_sound_pressure_level([70.0, 71.0, 72.0], [90.0, 91.0], 2.0)
 
 
 def test_result_refuses_disagreeing_shapes() -> None:
@@ -658,7 +737,9 @@ def test_plot_draws_one_bar_per_band_and_hatches_upper_bounds() -> None:
 
 def test_plot_of_an_energy_result_labels_lj_in_spanish() -> None:
     events = np.repeat(ST[:, None, :], 5, axis=1)
-    res = emission.sound_energy_in_situ(events, RSS, LW_RSS, FREQS)
+    res = emission.sound_energy_in_situ(
+        events, RSS, LW_RSS, FREQS, background_levels=BACKGROUND
+    )
     ax = res.plot(language="es")
     assert "$L_J$" in ax.get_ylabel()
     assert "energía" in ax.get_ylabel()

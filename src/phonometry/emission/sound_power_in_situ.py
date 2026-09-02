@@ -30,7 +30,10 @@ position for background noise (clause 8.1),
 with three rules around it: a margin above 15 dB needs no correction, a
 margin between 6 dB and 15 dB takes Eq. (7), and a margin below 6 dB caps
 the correction at 1,3 dB and turns the band into an upper bound that the
-report must flag as not meeting the background requirement. When the RSS is
+report must flag as not meeting the background requirement. A determination
+that carries no background reading at all cannot meet that requirement
+either, since 8.1 declares a measurement valid only where the margin is at
+least 6 dB and 7.5 has the background obtained once at each position. When the RSS is
 run at ``m`` locations around a large source the calibrated powers and the
 per-location means are each energy-averaged over the locations before the
 subtraction (clause 8.3.2, Eq. 12).
@@ -73,6 +76,7 @@ from __future__ import annotations
 
 import warnings
 from dataclasses import dataclass
+from itertools import pairwise
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -83,14 +87,22 @@ if TYPE_CHECKING:
 
 from .._internal.levels_math import energy_mean, energy_sum
 from .._internal.validation import (
+    _as_float64,
     require_choice,
     require_equal_counts,
     require_positive,
     require_ranks,
     require_same_length,
 )
-from ._shared import _CK_OCTAVE, Grade, SoundPowerWarning, _a_weighting_corrections
-from .sound_power_reverberation import _c2_correction, _validate_meteorology
+from ._shared import (
+    _CK_OCTAVE,
+    _PS0,
+    Grade,
+    SoundPowerWarning,
+    _a_weighting_corrections,
+    _c2_correction,
+    _validate_meteorology,
+)
 
 #: Background margin at or above which the measurement is valid (ISO 3747:2010, 8.1).
 _K1_VALID_DB = 6.0
@@ -113,16 +125,16 @@ _COVERAGE_TWO_SIDED = 2.0
 _R0_M = 1.0
 #: Spherical-spreading constant of Eq. (A.1), in decibels.
 _SPHERICAL_CONSTANT_DB = 11.0
-#: Reference static pressure of Annex C, in kilopascals (1,013 25 x 10^5 Pa).
-_PS0_KPA = 101.325
 #: Altitude coefficients of Eq. (C.2): ``a`` in reciprocal metres, ``b``
 #: dimensionless (Annex C).
 _ALTITUDE_A_PER_M = 2.2560e-5
 _ALTITUDE_B = 5.2553
 #: Reference duration of the single event level, in seconds (3.4, NOTE 1).
 _T0_S = 1.0
-#: Fewest microphone positions the procedure uses (7.4.1: three or four).
+#: Fewest and most microphone positions the procedure uses (7.4.1: "in total,
+#: three or four microphone positions are to be used").
 _MIN_POSITIONS = 3
+_MAX_POSITIONS = 4
 #: Fewest single events of an impulsive determination (7.6: N >= 5).
 _MIN_EVENTS = 5
 
@@ -154,9 +166,13 @@ class InSituSoundPowerResult:
     time it is the per-position shift the per-event corrections of Eq. 13
     produce in the mean of Eq. 15), ``background_correction_ref`` the same for
     the reference source at each location (Eq. 9, 10), and
-    ``background_requirement_met`` is ``False`` in every band where some
-    margin fell below 6 dB, so that the level there is an upper bound to be
-    reported as such (8.1).
+    ``background_requirement_met`` is ``True`` only where clause 8.1 declares
+    the measurement valid: a background level reached every position (7.5)
+    and every margin over it was at least 6 dB. It is ``False`` in a band
+    where some margin fell below 6 dB, and ``False`` throughout when no
+    background levels were supplied at all, since nothing was measured
+    against; either way the level is an upper bound to be reported as such
+    (8.1).
 
     ``grade`` is the accuracy grade Table 2 grants (``'engineering'`` or
     ``'survey'``) and ``sigma_r0`` its typical reproducibility; ``sigma_omc``,
@@ -302,19 +318,24 @@ def static_pressure_from_altitude(altitude: float) -> float:
     the formula stops meaning anything where the base reaches zero, some
     44 km up, and that is refused.
 
-    :param altitude: Altitude of the test site ``Ha``, in metres.
+    :param altitude: Altitude of the test site ``Ha``, in metres, one site at
+        a time.
     :return: The static pressure ``ps``, in kilopascals.
-    :raises ValueError: if ``altitude`` is not finite or ``1 - a Ha`` is not
-        positive.
+    :raises ValueError: if ``altitude`` is not a single finite number or
+        ``1 - a Ha`` is not positive.
     """
-    base = 1.0 - _ALTITUDE_A_PER_M * altitude
-    if not np.isfinite(altitude) or base <= 0.0:
+    height = _as_float64(altitude, "altitude")
+    if height.ndim != 0:
+        msg = "'altitude' must be a single value, the altitude of the test site."
+        raise ValueError(msg)
+    base = 1.0 - _ALTITUDE_A_PER_M * float(height)
+    if not np.isfinite(height) or base <= 0.0:
         msg = (
             "'altitude' must be finite and below the height where Eq. (C.2) "
             "vanishes (about 44 300 m)."
         )
         raise ValueError(msg)
-    return float(_PS0_KPA * base**_ALTITUDE_B)
+    return float(_PS0 * base**_ALTITUDE_B)
 
 
 def excess_sound_pressure_level(
@@ -345,12 +366,17 @@ def excess_sound_pressure_level(
         source, in metres.
     :return: The excess ``dLf(r)``, in decibels, as a float for scalar input
         or an array of the broadcast shape.
-    :raises ValueError: if any input is not finite or any ``distance`` is
-        not positive.
+    :raises ValueError: if any input is empty or not finite, any ``distance``
+        is not positive, or the three shapes do not broadcast against each
+        other.
     """
-    lp = np.asarray(level, dtype=np.float64)
-    lw = np.asarray(lw_ref, dtype=np.float64)
-    r = np.asarray(distance, dtype=np.float64)
+    lp = _as_float64(level, "level")
+    lw = _as_float64(lw_ref, "lw_ref")
+    r = _as_float64(distance, "distance")
+    for arr, name in ((lp, "level"), (lw, "lw_ref"), (r, "distance")):
+        if arr.size == 0:
+            msg = f"'{name}' must not be empty."
+            raise ValueError(msg)
     if not np.all(np.isfinite(lp)):
         msg = "'level' must be finite."
         raise ValueError(msg)
@@ -360,6 +386,14 @@ def excess_sound_pressure_level(
     if not np.all(np.isfinite(r)) or np.any(r <= 0.0):
         msg = "'distance' must be finite and positive."
         raise ValueError(msg)
+    try:
+        np.broadcast_shapes(lp.shape, lw.shape, r.shape)
+    except ValueError as exc:
+        msg = (
+            "'level', 'lw_ref' and 'distance' must broadcast against each "
+            f"other; got shapes {lp.shape}, {lw.shape} and {r.shape}."
+        )
+        raise ValueError(msg) from exc
     excess = lp - lw + _SPHERICAL_CONSTANT_DB + 20.0 * np.log10(r / _R0_M)
     if excess.ndim == 0:
         return float(excess)
@@ -415,6 +449,16 @@ def _checked_frequencies(frequencies: ArrayLike, n_bands: int) -> np.ndarray:
         msg = (
             "'frequencies' must be nominal octave mid-band frequencies from "
             "63 Hz to 8 kHz (ISO 3747:2010, Table D.1)."
+        )
+        raise ValueError(msg)
+    # Eq. (D.1) sums over k = kmin..kmax, one distinct band per k, so a
+    # repeated or out-of-order centre would weight the A-weighted total wrong
+    # (Annex D, Table D.1).
+    nominal = [round(float(f)) for f in freqs]
+    if any(b <= a for a, b in pairwise(nominal)):
+        msg = (
+            "'frequencies' must be distinct octave mid-band frequencies in "
+            "ascending order (ISO 3747:2010, Annex D)."
         )
         raise ValueError(msg)
     return freqs
@@ -481,19 +525,28 @@ def _accuracy_grade(
     """The grade Table 2 grants: engineering only with the excess of sound
     pressure level at least 7 dB at every position and a directivity range
     within 7 dB; survey whenever either indicator fails or was not determined.
+
+    Each indicator is checked on its own as soon as it is supplied, so a
+    mis-shaped or nonsensical one is refused rather than silently downgrading
+    the determination to grade 3; only a genuinely undetermined indicator
+    (``None``) falls through to survey.
     """
-    if excess_levels is None or directivity_range is None:
-        return "survey"
-    excess = np.asarray(excess_levels, dtype=np.float64)
-    if excess.shape != (n_positions,) or not np.all(np.isfinite(excess)):
-        msg = (
-            "'excess_levels' must carry one finite value per microphone "
-            f"position ({n_positions})."
-        )
-        raise ValueError(msg)
-    if not np.isfinite(directivity_range) or directivity_range < 0.0:
+    excess: np.ndarray | None = None
+    if excess_levels is not None:
+        excess = _as_float64(excess_levels, "excess_levels")
+        if excess.shape != (n_positions,) or not np.all(np.isfinite(excess)):
+            msg = (
+                "'excess_levels' must carry one finite value per microphone "
+                f"position ({n_positions})."
+            )
+            raise ValueError(msg)
+    if directivity_range is not None and (
+        not np.isfinite(directivity_range) or directivity_range < 0.0
+    ):
         msg = "'directivity_range' must be finite and non-negative."
         raise ValueError(msg)
+    if excess is None or directivity_range is None:
+        return "survey"
     reverberant = bool(np.all(excess >= _EXCESS_LEVEL_MIN_DB))
     if reverberant and directivity_range <= _DIRECTIVITY_RANGE_MAX_DB:
         return "engineering"
@@ -518,12 +571,33 @@ def _uncertainty(
 
 
 def _position_advisory(n_positions: int) -> None:
-    """Warn when fewer positions than the procedure uses were measured."""
-    if n_positions < _MIN_POSITIONS:
+    """Warn when the number of positions is outside the three or four the
+    procedure uses (7.4.1 bounds the count on both sides).
+    """
+    if not _MIN_POSITIONS <= n_positions <= _MAX_POSITIONS:
         warnings.warn(
-            f"Only {n_positions} microphone position(s) were supplied; the "
+            f"{n_positions} microphone position(s) were supplied; the "
             "procedure uses three or four, distributed as evenly as possible "
             "around the source (ISO 3747:2010, 7.4.1).",
+            SoundPowerWarning,
+            stacklevel=3,
+        )
+
+
+def _background_advisory(background_levels: ArrayLike | None) -> None:
+    """Warn when no background levels reached the determination at all.
+
+    Clause 7.5 has the background obtained once at each microphone position,
+    and 8.1 declares the measurement valid only where the margin over it is
+    at least 6 dB. With nothing measured no band can be shown to meet that
+    requirement, so ``background_requirement_met`` is ``False`` throughout.
+    """
+    if background_levels is None:
+        warnings.warn(
+            "No background levels were supplied; the procedure obtains them "
+            "once at each microphone position (ISO 3747:2010, 7.5), so no "
+            "band can be reported as meeting the background requirement of "
+            "8.1 and every level is returned as an upper bound.",
             SoundPowerWarning,
             stacklevel=3,
         )
@@ -563,8 +637,9 @@ def _determine(
     if bg_ref is None:
         bg_ref = background_levels
     if bg_ref is None:
+        # Nothing was measured, so 8.1 cannot declare the band valid (7.5).
         k1_ref = np.zeros((m, n_positions, n_bands), dtype=np.float64)
-        met_ref = np.ones(n_bands, dtype=bool)
+        met_ref = np.zeros(n_bands, dtype=bool)
     else:
         # Eq. (10) prints K1i(RSS) without the location index, but the margin
         # it comes from is per location: evaluated per (j, i).
@@ -654,7 +729,10 @@ def sound_power_in_situ(
         from 63 Hz to 8 kHz (Table D.1), in hertz.
     :param background_levels: Octave-band time-averaged background levels
         ``Lpi(B)``, ``(n, bands)`` or one ``(bands,)`` spectrum for every
-        position, in decibels; ``None`` applies no correction.
+        position, in decibels; ``None`` applies no correction, warns, and
+        leaves ``background_requirement_met`` ``False`` in every band, since
+        7.5 has the background measured at each position and 8.1 needs the
+        margin to declare the measurement valid.
     :param background_levels_ref: Background for the reference-source
         measurement, same shapes; ``None`` reuses ``background_levels``,
         since the procedure takes one background reading (7.5).
@@ -676,17 +754,18 @@ def sound_power_in_situ(
         ``levels_ref``, ``lw_ref`` or either background does not match it,
         ``frequencies`` are not the octave centres of Table D.1,
         ``temperature`` or ``static_pressure`` is out of range,
-        ``excess_levels`` is not one finite value per position,
-        ``directivity_range`` or ``sigma_omc`` is negative, or
-        ``coverage_factor`` is not positive.
+        ``excess_levels`` is supplied and is not one finite value per
+        position, ``directivity_range`` or ``sigma_omc`` is supplied and is
+        negative, or ``coverage_factor`` is not positive.
     """
     arr = _finite_grid(levels, "levels", (2,))
     n_positions, n_bands = arr.shape
     _position_advisory(n_positions)
+    _background_advisory(background_levels)
     bg = _background_grid(background_levels, "background_levels", n_positions, n_bands)
     if bg is None:
         k1 = np.zeros_like(arr)
-        met = np.ones(n_bands, dtype=bool)
+        met = np.zeros(n_bands, dtype=bool)
     else:
         k1, met_grid = _background_correction(arr - bg)
         met = np.all(met_grid, axis=0)
@@ -760,7 +839,9 @@ def sound_energy_in_situ(
     :param events: The number ``N`` of events a 2D ``event_levels`` contains
         (Eq. 17); must be ``None`` with the 3D form, which counts them.
     :param background_levels: Octave-band time-averaged background levels
-        ``Lpi(B)``, ``(n, bands)`` or ``(bands,)``, in decibels.
+        ``Lpi(B)``, ``(n, bands)`` or ``(bands,)``, in decibels; ``None``
+        applies no correction, warns, and leaves
+        ``background_requirement_met`` ``False`` in every band (7.5, 8.1).
     :param background_levels_ref: Background for the reference-source
         measurement; ``None`` reuses ``background_levels`` (7.5).
     :param integration_time: The integration time ``T`` of the event
@@ -814,12 +895,13 @@ def sound_energy_in_situ(
             SoundPowerWarning,
             stacklevel=2,
         )
+    _background_advisory(background_levels)
     bg = _background_grid(background_levels, "background_levels", n_positions, n_bands)
     if integration_time is not None:
         require_positive(integration_time, "integration_time")
     if bg is None:
         k1 = np.zeros((n_positions, n_bands), dtype=np.float64)
-        met = np.ones(n_bands, dtype=bool)
+        met = np.zeros(n_bands, dtype=bool)
         per_position = arr if not one_at_a_time else energy_mean(arr, axis=1)
     else:
         bg_event = bg

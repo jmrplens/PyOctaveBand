@@ -19,6 +19,20 @@ and the other standards adopt that same table by reference for their own
 A-weighted totals (ISO 3741:2010 Annex F Eq. F.2, ISO 3745:2012 Annex C
 Eq. C.1, ISO 9614-2:1996 clause 10.6 b). One table, transcribed once.
 
+The radiation-impedance correction :math:`C_2` that carries a band level to
+the reference meteorological conditions is shared the same way. ISO 3741:2010
+clause 9.1.4 and ISO 3747:2010 Annex C print the same expression,
+
+.. math::
+
+   C_2 = -10 \log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s},0}}
+   + 15 \log_{10}\frac{273{,}15 + \theta}{\theta_1},
+   \qquad p_{\mathrm{s},0} = 101{,}325\ \mathrm{kPa},
+   \quad \theta_1 = 296\ \mathrm{K}
+
+digit for digit, so the guard on the two meteorological inputs and the
+correction itself live here once.
+
 The reference area :math:`S_0 = 1` m^2 of the :math:`10 \log_{10}(S/S_0)`
 surface term, the two accuracy grades the methods share (``'engineering'``,
 grade 2 of ISO 3744 and ISO 9614-2, and ``'survey'``, grade 3 of ISO 3746 and
@@ -37,6 +51,15 @@ import numpy as np
 from .._internal.warnings import PhonometryWarning
 
 _S0 = 1.0  #: Reference area, in square metres (ISO 3744, 8.2.5).
+#: Reference static pressure of the ISO 3740 family, in kilopascals
+#: (ISO 3741:2010 clause 4; ISO 3747:2010 Annex C prints 1,013 25 x 10^5 Pa).
+_PS0 = 101.325
+#: Reference temperature of the C2 radiation-impedance correction, in kelvin
+#: (ISO 3741:2010 clause 9.1.4, ISO 3747:2010 Annex C).
+_THETA1 = 296.0
+#: Temperature floor in degC: sqrt(273 + theta) of the speed-of-sound formula
+#: c = 20.05*sqrt(273 + theta) is zero or complex at or below it (ISO 3741, 9.1.4).
+_ROUNDED_ABS_ZERO_C = -273.0
 
 Grade = Literal["engineering", "survey"]
 
@@ -117,6 +140,32 @@ def _a_weighting_corrections(frequencies: np.ndarray) -> np.ndarray:
             raise ValueError(msg)
         ck.append(table[freq])
     return np.asarray(ck, dtype=np.float64)
+
+
+def _validate_meteorology(temperature: float, static_pressure: float) -> None:
+    r"""Guard the meteorological inputs before the log10/sqrt of C1/C2 and c.
+
+    A non-finite or :math:`\le -273` degC temperature makes
+    :math:`\sqrt{273 + \theta}` complex/zero, and a non-finite or non-positive
+    static pressure makes :math:`\log_{10}(p_\mathrm{s}/p_{\mathrm{s}0})` undefined; both are rejected
+    with a clean ``ValueError``.
+    """
+    if not np.isfinite(temperature) or temperature <= _ROUNDED_ABS_ZERO_C:
+        msg = "'temperature' must be finite and greater than -273 degC."
+        raise ValueError(msg)
+    if not np.isfinite(static_pressure) or static_pressure <= 0.0:
+        msg = "'static_pressure' must be finite and positive."
+        raise ValueError(msg)
+
+
+def _c2_correction(temperature: float, static_pressure: float) -> float:
+    """Radiation-impedance correction ``C2`` (ISO 3741:2010 clause 9.1.4,
+    ISO 3747:2010 Annex C, Eq. C.1/C.3).
+    """
+    return float(
+        -10.0 * np.log10(static_pressure / _PS0)
+        + 15.0 * np.log10((273.15 + temperature) / _THETA1)
+    )
 
 
 def _check_grade(grade: str) -> Grade:

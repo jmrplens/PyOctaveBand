@@ -1099,9 +1099,11 @@ _ES_EXACT = {
     "Reference source, corrected $L_{pi(\\mathrm{RSS})}$": "Fuente de referencia, corregido $L_{pi(\\mathrm{RSS})}$",
     "As measured, before $K_1$": "Tal como se midió, antes de $K_1$",
     "Background $L_{pi(\\mathrm{B})}$": "Ruido de fondo $L_{pi(\\mathrm{B})}$",
-    "125 Hz: margin below 6 dB at two positions,\n"
-    "$K_1$ capped at 1.3 dB and the band is an upper bound": "125 Hz: margen inferior a 6 dB en dos posiciones,\n"
-    "$K_1$ limitado a 1,3 dB y la banda es una cota superior",
+    "125 Hz: margin below 6 dB here, and at every\n"
+    "position for the reference source: $K_1$ capped\n"
+    "at 1.3 dB and the band is an upper bound": "125 Hz: margen inferior a 6 dB aquí, y en todas\n"
+    "las posiciones de la fuente de referencia: $K_1$\n"
+    "limitado a 1,3 dB y la banda es una cota superior",
     "$L_W$ of the source under test (Eq. 11)": "$L_W$ de la fuente en ensayo (Ec. 11)",
     "$L_{W(\\mathrm{RSS})}$, calibrated": "$L_{W(\\mathrm{RSS})}$, calibrado",
     "Upper bound (background)": "Cota superior (ruido de fondo)",

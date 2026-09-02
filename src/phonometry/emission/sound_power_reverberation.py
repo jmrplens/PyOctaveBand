@@ -70,17 +70,15 @@ from .._internal.validation import (
     require_same_length,
 )
 from ._shared import (
+    _PS0,
     SoundPowerWarning,
     _a_weighting_corrections,
+    _c2_correction,
+    _validate_meteorology,
 )
 
 _A0 = 1.0  #: Reference absorption area, in square metres (ISO 3741, Eq. 20).
-_PS0 = 101.325  #: Reference static pressure, in kPa (ISO 3741 clause 4).
 _THETA0 = 314.0  #: Reference temperature for C1, in K (ISO 3741 clause 9.1.4).
-_THETA1 = 296.0  #: Reference temperature for C2, in K (ISO 3741 clause 9.1.4).
-#: Temperature floor in degC: sqrt(273 + theta) of the speed-of-sound formula
-#: c = 20.05*sqrt(273 + theta) is zero or complex at or below it (ISO 3741, 9.1.4).
-_ROUNDED_ABS_ZERO_C = -273.0
 #: K1 qualification edges: bands at or below the low edge or at or above the
 #: high edge carry the relaxed 6 dB lower criterion (ISO 3741:2010, 9.1.2).
 _K1_EDGE_LOW_HZ = 200.0
@@ -246,22 +244,6 @@ class ReverberationSoundPowerResult:
         )
 
 
-def _validate_meteorology(temperature: float, static_pressure: float) -> None:
-    r"""Guard the meteorological inputs before the log10/sqrt of C1/C2 and c.
-
-    A non-finite or :math:`\le -273` degC temperature makes
-    :math:`\sqrt{273 + \theta}` complex/zero, and a non-finite or non-positive
-    static pressure makes :math:`\log_{10}(p_\mathrm{s}/p_{\mathrm{s}0})` undefined; both are rejected
-    with a clean ``ValueError``.
-    """
-    if not np.isfinite(temperature) or temperature <= _ROUNDED_ABS_ZERO_C:
-        msg = "'temperature' must be finite and greater than -273 degC."
-        raise ValueError(msg)
-    if not np.isfinite(static_pressure) or static_pressure <= 0.0:
-        msg = "'static_pressure' must be finite and positive."
-        raise ValueError(msg)
-
-
 def _speed_of_sound(temperature: float) -> float:
     r"""Speed of sound :math:`c = 20.05 \sqrt{273 + \theta}` (ISO 3741,
     clause 9.1.4).
@@ -274,14 +256,6 @@ def _c1_correction(temperature: float, static_pressure: float) -> float:
     return float(
         -10.0 * np.log10(static_pressure / _PS0)
         + 5.0 * np.log10((273.15 + temperature) / _THETA0)
-    )
-
-
-def _c2_correction(temperature: float, static_pressure: float) -> float:
-    """Radiation-impedance correction ``C2`` (ISO 3741:2010 clause 9.1.4)."""
-    return float(
-        -10.0 * np.log10(static_pressure / _PS0)
-        + 15.0 * np.log10((273.15 + temperature) / _THETA1)
     )
 
 

@@ -540,7 +540,8 @@ _ISO3747_RSS = np.array(
     ]
 )
 #: The four excesses and the directivity range that earn grade 2 (Table 2).
-_ISO3747_GRADE2 = {"excess_levels": [8.0, 9.5, 7.2, 8.8], "directivity_range": 3.0}
+_ISO3747_EXCESS_GRADE2 = [8.0, 9.5, 7.2, 8.8]
+_ISO3747_DIRECTIVITY_GRADE2 = 3.0
 
 
 @register(
@@ -551,7 +552,9 @@ _ISO3747_GRADE2 = {"excess_levels": [8.0, 9.5, 7.2, 8.8], "directivity_range": 3
 def _chk_iso3747_example_uncertainty() -> Outcome:
     res = ph.emission.sound_power_in_situ(
         _ISO3747_ST, _ISO3747_RSS, _ISO3747_LW_RSS, _ISO3747_FREQS,
-        sigma_omc=2.0, **_ISO3747_GRADE2,
+        sigma_omc=2.0,
+        excess_levels=_ISO3747_EXCESS_GRADE2,
+        directivity_range=_ISO3747_DIRECTIVITY_GRADE2,
     )  # fmt: skip
     return numeric(5.0, float(res.expanded_uncertainty), 1e-12, unit="dB", places=6)
 
@@ -564,7 +567,9 @@ def _chk_iso3747_example_uncertainty() -> Outcome:
 def _chk_iso3747_table2_and_e1() -> Outcome:
     grade2 = ph.emission.sound_power_in_situ(
         _ISO3747_ST, _ISO3747_RSS, _ISO3747_LW_RSS, _ISO3747_FREQS,
-        sigma_omc=4.0, **_ISO3747_GRADE2,
+        sigma_omc=4.0,
+        excess_levels=_ISO3747_EXCESS_GRADE2,
+        directivity_range=_ISO3747_DIRECTIVITY_GRADE2,
     )  # fmt: skip
     grade3 = ph.emission.sound_power_in_situ(
         _ISO3747_ST, _ISO3747_RSS, _ISO3747_LW_RSS, _ISO3747_FREQS,
@@ -734,7 +739,7 @@ def _chk_iso3747_a_weighted_total() -> Outcome:
 @register(
     "Intensity & sound power",
     "ISO 3747:2010 Eq. A.1",
-    "Excess of sound pressure level is zero in the spherical free field, Lp = LW - 11 - 20 lg(r/r0)",
+    "Excess over the spherical free field Lp = LW - 11 - 20 lg(r/r0): a level 7 dB above it reads dLf = 7 dB",
 )
 def _chk_iso3747_excess_level() -> Outcome:
     lw, r = 92.0, 4.0

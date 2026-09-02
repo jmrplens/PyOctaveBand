@@ -3404,7 +3404,7 @@
       "verdict": "pass"
     },
     {
-      "id": "intensity-sound-power/iso-3747-2010-eq-a-1/excess-of-sound-pressure-level-is-zero-in-the-spherical-free-field-lp-lw-11-20-lg-r-r0",
+      "id": "intensity-sound-power/iso-3747-2010-eq-a-1/excess-over-the-spherical-free-field-lp-lw-11-20-lg-r-r0-a-level-7-db-above-it-reads-dlf-7-db",
       "domain": "intensity-sound-power",
       "reference": {
         "kind": "standard",
@@ -3413,7 +3413,7 @@
         "clause": "Eq. A.1",
         "cite": "ISO 3747:2010 Eq. A.1"
       },
-      "quantity": "Excess of sound pressure level is zero in the spherical free field, Lp = LW - 11 - 20 lg(r/r0)",
+      "quantity": "Excess over the spherical free field Lp = LW - 11 - 20 lg(r/r0): a level 7 dB above it reads dLf = 7 dB",
       "kind": "scalar",
       "expected": {
         "value": 7.0

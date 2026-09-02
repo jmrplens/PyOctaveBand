@@ -307,7 +307,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 3747:2010 Annex C | C2 at 101,325 kPa and 23,0 degC is 15 lg(296,15/296) = 0,003 300 dB (theta_ref = 296 K) | 0.0033 dB (+/-0 dB) | 0.0033 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 3747:2010 Eq. C.2 | Static pressure at 500 m, 101,325 (1 - 2,2560e-5 x 500)^5,2553 kPa | 95.4609 kPa (+/-0 kPa) | 95.4609 kPa | 0 kPa | 0 % | ![Pass][cv-pass] Pass |
 | ISO 3747:2010 Table D.1 / Eq. D.1 | LWA of a flat 90 dB octave spectrum, 63 Hz to 8 kHz, with the printed Ck | 96.9871 dB (+/-0 dB) | 96.9871 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
-| ISO 3747:2010 Eq. A.1 | Excess of sound pressure level is zero in the spherical free field, Lp = LW - 11 - 20 lg(r/r0) | 7 dB (+/-0 dB) | 7 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3747:2010 Eq. A.1 | Excess over the spherical free field Lp = LW - 11 - 20 lg(r/r0): a level 7 dB above it reads dLf = 7 dB | 7 dB (+/-0 dB) | 7 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 
 </details>
 

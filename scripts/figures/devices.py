@@ -4945,9 +4945,10 @@ def generate_in_situ_sound_power(output_dir: str) -> None:
     # A floor-standing screw compressor, 2,2 m x 1,4 m x 1,8 m, that cannot
     # leave the plant: four microphone positions 1,5 m from the reference
     # box, one reference sound source location alongside it, octave bands
-    # from 125 Hz to 8 kHz. The floor is loud at the low end, so the 125 Hz
-    # band keeps a margin below 6 dB at two positions and ends as an upper
-    # bound, while 250 Hz shows the correction at work on both sources.
+    # from 125 Hz to 8 kHz. The floor is loud at the low end, so at 125 Hz
+    # the compressor keeps a margin below 6 dB at one position and the
+    # quieter reference source at all four, which makes the band an upper
+    # bound; 250 Hz shows the correction at work on both sources.
     freqs = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
     lw_rss = np.array([84.5, 88.0, 91.0, 92.5, 92.0, 90.5, 87.0])
     st = np.array(
@@ -5100,8 +5101,9 @@ def generate_in_situ_sound_power(output_dir: str) -> None:
     axt.legend(handles=handles, loc="upper right", fontsize=8.5, ncol=2)
     axt.annotate(
         (
-            "125 Hz: margin below 6 dB at two positions,\n"
-            "$K_1$ capped at 1.3 dB and the band is an upper bound"
+            "125 Hz: margin below 6 dB here, and at every\n"
+            "position for the reference source: $K_1$ capped\n"
+            "at 1.3 dB and the band is an upper bound"
         ),
         xy=(x[0] + offsets[1], float(corrected_st[1, 0]) - 0.6),
         xytext=(x[0] + 0.15, 61.0),
