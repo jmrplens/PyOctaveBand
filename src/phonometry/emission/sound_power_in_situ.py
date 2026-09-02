@@ -69,7 +69,11 @@ the reproducibility :math:`\sigma_{R0}` read from Table 2 by grade: 1,5 dB
 for grade 2, which needs :math:`\Delta L_{f\mathrm{A}} \ge 7` dB at every
 microphone position and a source directivity range within ±7 dB, and 4,0 dB
 for grade 3 otherwise. Table 1, the zoning of the test environment by lines
-of sight, is guidance for placing the sources and is not evaluated here.
+of sight, is normative (7.4.2 divides the environment into zones with a
+*shall*, and 7.4.3 draws the microphone positions from them), but it
+constrains where the sources and microphones go, not what is computed from
+them: the positions arrive here already chosen, so the zoning is not
+evaluated.
 """
 
 from __future__ import annotations
@@ -166,10 +170,14 @@ class InSituSoundPowerResult:
     time it is the per-position shift the per-event corrections of Eq. 13
     produce in the mean of Eq. 15), ``background_correction_ref`` the same for
     the reference source at each location (Eq. 9, 10), and
-    ``background_requirement_met`` is ``True`` only where clause 8.1 declares
-    the measurement valid: a background level reached every position (7.5)
-    and every margin over it was at least 6 dB. It is ``False`` in a band
-    where some margin fell below 6 dB, and ``False`` throughout when no
+    ``background_requirement_met`` is ``True`` only where a background level
+    reached every position (7.5) and every margin over it was at least 6 dB.
+    Clause 8.1 writes that margin for the source under test alone
+    (:math:`\Delta L_{pi} = L'_{pi}(\mathrm{ST}) - L_{pi}(\mathrm{B})`); the
+    flag extends the same test to the reference source, whose level enters
+    Eq. 11 carrying a ``K1`` of its own, rather than call a band sound on a
+    correction the standard had to cap. It is ``False`` in a band where
+    either margin fell below 6 dB, and ``False`` throughout when no
     background levels were supplied at all, since nothing was measured
     against; either way the level is an upper bound to be reported as such
     (8.1).

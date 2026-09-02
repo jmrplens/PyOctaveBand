@@ -90,12 +90,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and the Annex D A-weighted total from the Table D.1 corrections, which are
   the ISO 3744 Annex E octave values digit for digit.
   `emission.excess_sound_pressure_level` evaluates the Annex A indicator that
-  decides the grade and `emission.static_pressure_from_altitude` Eq. C.2. Four
+  decides the grade and `emission.static_pressure_from_altitude` Eq. C.2. Five
   defects of the informative Annex E join the errata registry: the sign of
   the direct-field level in E.4.2.6.2, the 0,6 dB altitude correction of
   E.4.2.5 that Annex C's own equation puts at 0,26 dB, the excess that lost
-  its delta in the Table E.2 sensitivity coefficient, and the equation
-  E.4.2.3 sends the reader to for a derivative that is taken of another.
+  its delta in the Table E.2 sensitivity coefficient, the sampling
+  coefficient of that same table, which E.4.2.6.3 and the budget of E.4.2.12
+  both put at 1 where the table prints 0,5, and the equation E.4.2.3 sends
+  the reader to for a derivative that is taken of another.
 
 - The ISO 16283 low-frequency procedure, which the standard makes **mandatory**
   and not optional when the receiving room is under 25 m3, taking the volume

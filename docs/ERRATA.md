@@ -3551,6 +3551,39 @@ in the same order.
   No number changes.
 - **Status:** unreported.
 
+## ISO 3747:2010, Table E.2 (the sampling coefficient its own clause contradicts)
+
+- **Location:** Annex E (informative), Table E.2 "Uncertainty budget for
+  determinations of $\sigma_{R0}$...", the sensitivity-coefficient cell of the
+  $\delta_\mathrm{mic}$ (sampling) row.
+- **The print:** $c_i = 0{,}5$.
+- **The problem:** E.4.2.6.3, the clause that derives that very row, prints the
+  opposite together with its reason: "Sampling directly affects the total
+  uncertainty so $c_\mathrm{mic} = 1$". The budget of E.4.2.12 sides with the
+  clause and not with the table: its sixth term is $0{,}7^2$, which is the
+  0,7 dB contribution E.4.2.6.3 quotes taken at $c_\mathrm{mic} = 1$. The
+  neighbouring row settles that 0,5 is no blanket convention for instrument
+  rows, because E.4.2.7 sets $c_\mathrm{slm} = 0{,}5$ *and earns it*: repeated
+  readings on one meter let the systematic errors cancel, which halves the
+  coefficient, and the clause then reproduces the budget's own term
+  ($0{,}5 \times 0{,}5 = 0{,}25$ dB, quoted there as 0,3 dB for each of the two
+  sources, and $\sqrt{0{,}3^2 + 0{,}3^2} = 0{,}42$ dB, the 0,4 that E.4.2.12
+  sums). The sampling row carries no such derivation, and cannot carry one:
+  $\delta_\mathrm{mic}$ is defined on the *difference*
+  $\Delta L'_{p(\mathrm{ST-RSS})} = L'_{p(\mathrm{ST})} - L'_{p(\mathrm{RSS})}$,
+  which already spans both sources, so there is no second contribution to
+  halve. The family agrees with the clause: the corresponding
+  $\delta_\mathrm{mic}$ row of Table H.2 in ISO 3744:2010 carries $c_i = 1$,
+  and its H.4.2.9 prints $c_\mathrm{mic} = 1$ as well.
+- **Evidence:** the table cell, the clause that derives it and the budget that
+  sums it, read on PDF pages 44, 47 and 50 (printed pp. 35, 38 and 41) of
+  BS EN ISO 3747:2010; the family comparison on PDF pages 79 and 82 (printed
+  pp. 70 and 73) of BS EN ISO 3744:2010.
+- **Library behaviour:** the Annex E uncertainty budget is not modelled. The
+  reproducibility the library reports is the tabulated $\sigma_{R0}$ of Table 2,
+  read by accuracy grade. No number changes.
+- **Status:** unreported.
+
 ## ISO 3747:2010, E.4.2.3 (the equation the derivative is taken of)
 
 - **Location:** Annex E (informative), E.4.2.3 "Sound pressure measurement

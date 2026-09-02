@@ -3892,6 +3892,41 @@ dos ediciones con las mismas entradas y en el mismo orden.
   No cambia ningún número.
 - **Estado:** sin notificar.
 
+## ISO 3747:2010, Tabla E.2 (el coeficiente de muestreo que su propio apartado contradice)
+
+- **Ubicación:** Anexo E (informativo), Tabla E.2 «Uncertainty budget for
+  determinations of $\sigma_{R0}$...», la celda del coeficiente de
+  sensibilidad de la fila $\delta_\mathrm{mic}$ (muestreo).
+- **El impreso:** $c_i = 0{,}5$.
+- **El problema:** el apartado E.4.2.6.3, que deduce esa misma fila, imprime lo
+  contrario junto con su razón: «Sampling directly affects the total
+  uncertainty so $c_\mathrm{mic} = 1$». El presupuesto de E.4.2.12 se pone del
+  lado del apartado y no de la tabla: su sexto término es $0{,}7^2$, que es la
+  contribución de 0,7 dB que cita E.4.2.6.3 tomada con $c_\mathrm{mic} = 1$. La
+  fila vecina zanja que el 0,5 no es una convención general de las filas de
+  instrumentación, porque E.4.2.7 fija $c_\mathrm{slm} = 0{,}5$ *y se lo gana*:
+  las lecturas repetidas con un mismo sonómetro dejan que los errores
+  sistemáticos se cancelen, lo que reduce el coeficiente a la mitad, y el
+  apartado reproduce entonces el término que la propia tabla suma
+  ($0{,}5 \times 0{,}5 = 0{,}25$ dB, citado allí como 0,3 dB para cada una de
+  las dos fuentes, y $\sqrt{0{,}3^2 + 0{,}3^2} = 0{,}42$ dB, el 0,4 que suma
+  E.4.2.12). La fila de muestreo no lleva deducción semejante, y no puede
+  llevarla: $\delta_\mathrm{mic}$ está definido sobre la *diferencia*
+  $\Delta L'_{p(\mathrm{ST-RSS})} = L'_{p(\mathrm{ST})} - L'_{p(\mathrm{RSS})}$,
+  que ya abarca las dos fuentes, así que no hay una segunda contribución que
+  partir por la mitad. La familia da la razón al apartado: la fila
+  $\delta_\mathrm{mic}$ correspondiente de la Tabla H.2 de ISO 3744:2010 lleva
+  $c_i = 1$, y su H.4.2.9 imprime también $c_\mathrm{mic} = 1$.
+- **Evidencia:** la celda de la tabla, el apartado que la deduce y el
+  presupuesto que la suma, leídos en las páginas 44, 47 y 50 del PDF (pp. 35,
+  38 y 41 impresas) de BS EN ISO 3747:2010; la comparación con la familia en
+  las páginas 79 y 82 del PDF (pp. 70 y 73 impresas) de BS EN ISO 3744:2010.
+- **Comportamiento de la biblioteca:** el presupuesto de incertidumbre del
+  Anexo E no está modelado. La reproducibilidad que publica la biblioteca es
+  el $\sigma_{R0}$ tabulado de la Tabla 2, leído por grado de exactitud.
+  No cambia ningún número.
+- **Estado:** sin notificar.
+
 ## ISO 3747:2010, E.4.2.3 (la ecuación de la que se toma la derivada)
 
 - **Ubicación:** Anexo E (informativo), E.4.2.3 «Sound pressure measurement
