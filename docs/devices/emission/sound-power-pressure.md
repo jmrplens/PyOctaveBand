@@ -538,7 +538,7 @@ burst = emission.sound_energy_pressure(
 )
 print(burst.events)                                        # 5 (Eq. 19 over the first axis)
 print(round(float(burst.environmental_correction[0]), 2))  # K2 = 2.64 dB
-print(np.round(burst.sound_energy_level, 1))               # per-band LJ, 95.1 dB down to 90.8 dB
+print(np.round(burst.sound_energy_level, 1))               # per-band LJ, peaking at 103.5 dB at 1 kHz
 print(round(burst.sound_energy_level_a, 1))                # LJA = 107.7 dB(A)
 
 # The section 1 measurement read as a 10 s window: LJ = LW + 10 lg(T/T0) exactly.

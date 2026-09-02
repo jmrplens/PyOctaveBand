@@ -364,7 +364,12 @@ el **Anexo G, que es normativo** — el mismo tipo de término que las secciones
 ISO 3741 e ISO 3745 escriben explícitamente como $C_1$ y $C_2$. Su tamaño: el
 apartado H.4.2.7 dice que por debajo de 500 m no hace falta ninguna corrección
 meteorológica ni de impedancia de radiación, que a 120 m y 23 °C la corrección
-es nula y que a 500 m llega a 0,6 dB. `sound_power_pressure` no implementa
+es nula y que a 500 m llega a 0,6 dB. Dos de esas tres cosas se sostienen. El
+Anexo G, que es el texto normativo al que remite ese mismo apartado, sitúa la
+corrección en 0,394 dB a 500 m y 23,0 °C, y el cero de 120 m sale exacto, que es
+lo que demuestra que sus ecuaciones se están leyendo como la norma pretende. Los
+0,6 dB son una errata de imprenta, y queda registrada con su aritmética en el
+[registro de erratas](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.es.md). `sound_power_pressure` no implementa
 ningún término así y no admite argumento alguno de temperatura o presión, de
 modo que una determinación en una planta de montaña o al aire libre en invierno
 añade después la corrección del Anexo G: `reference_atmosphere_correction`
@@ -928,7 +933,7 @@ burst = emission.sound_energy_pressure(
 )
 print(burst.events)                                        # 5 (Ec. 19 sobre el primer eje)
 print(round(float(burst.environmental_correction[0]), 2))  # K2 = 2.64 dB
-print(np.round(burst.sound_energy_level, 1))               # LJ por banda, de 95.1 dB a 90.8 dB
+print(np.round(burst.sound_energy_level, 1))               # LJ por banda, máximo 103.5 dB en 1 kHz
 print(round(burst.sound_energy_level_a, 1))                # LJA = 107.7 dB(A)
 
 burst.plot()   # LJ por banda, LJA en el título (requiere matplotlib)

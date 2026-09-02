@@ -136,6 +136,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the errata registry records the reading, for ISO 3744 Eq. 21 and the same
   construction in ISO 3741 Eq. 25.
 
+  Two figures the informative Annex H of ISO 3744 prints for the size of the
+  Annex G correction are wrong, and both are now in the errata registry. The
+  clause says the correction reaches 0,6 dB at 500 m altitude, where the
+  normative Annex G it points at gives 0,394 dB at 23,0 °C; the zero the same
+  sentence prints for 120 m comes out exact, which is what shows the equations
+  are being read as intended. The clause then divides that 0,6 dB by the square
+  root of 6 and prints 0,3 dB, which is 0,6/2. Neither figure feeds anything
+  the library publishes, since the Annex H budget is not modelled.
+
+  Bringing the reverberation-room route to the sound energy level regrouped the
+  terms the mean room level is raised by, so that they are summed as Eq. 30
+  brackets them rather than left to right. That is a reassociation, and it
+  moves the sound power level in the last bit: 34 of 84 bands over four cases
+  here, by at most 1,4e-14 dB. One committed conformance residual, the known
+  $L_W$ of ISO 3741 Eq. 20, goes from 1,42e-14 to zero for the same reason. No
+  figure in the corpus moves.
+
 - The ISO 16283 low-frequency procedure, which the standard makes **mandatory**
   and not optional when the receiving room is under 25 m3, taking the volume
   rounded to the nearest cubic metre with halves going up, so 24.4 m3 triggers

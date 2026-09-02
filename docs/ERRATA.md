@@ -1774,8 +1774,10 @@ in the same order.
   (PDF page 31, printed p. 25) of ISO 3744:2010, read against the definitions
   of clauses 3.3 and 3.4 (PDF page 9, printed p. 3). The same construction is
   printed as ISO 3741:2010 Equation (25) (PDF page 33, printed p. 24, with its
-  symbol list on PDF page 34, printed p. 25) and as ISO 3747:2010 Equation
-  (14) (PDF pages 22 and 23, printed pp. 13 and 14).
+  symbol list on PDF page 34, printed p. 25) as ISO 3747:2010 Equation
+  (14) (PDF pages 22 and 23, printed pp. 13 and 14), and as ISO 3746:2010
+  Equation (15) in clause 8.4.2 (PDF page 25, printed p. 16), which is the
+  survey-grade route the library takes for `grade='survey'`.
 - **The print:** $K_1 = -10 \lg\left(1 - 10^{-0{,}1\,\Delta L_E}\right)$ dB
   with $\Delta L_E = \overline{L'_{E(\mathrm{ST})}} - \overline{L_{p(\mathrm{B})}}$,
   where $\overline{L'_{E(\mathrm{ST})}}$ "is the mean frequency-band or
@@ -1871,6 +1873,40 @@ in the same order.
   onset rate by 3 and the level difference by 2 (`predicted_prominence` in
   [`impulsive_sound.py`](../src/phonometry/environment/assessment/impulsive_sound.py)),
   which is also the NT ACOU 112:2002 form the PAS carries over.
+- **Status:** unreported.
+
+## ISO 3744:2010, H.4.2.7 (the altitude correction and the divisor under it)
+
+- **Location:** Annex H (informative), H.4.2.7 "Meteorological and radiation
+  impedance corrections", the paragraph that sizes $u_{C_1+C_2}$ from the
+  Annex G correction.
+- **The print:** "At 120 m altitude and 23 °C the correction is zero and at
+  500 m altitude the correction is 0,6 dB. Assuming a triangular distribution
+  for this uncertainty, the standard deviation is
+  $s_\mathrm{met} = 0{,}6/\sqrt{6} = 0{,}3\ \mathrm{dB}$."
+- **The problem:** two independent defects in one sentence pair.
+  (a) Annex G, which is normative and which this paragraph points at, gives
+  $C_1 + C_2 = 0{,}394$ dB at 500 m and 23,0 °C, not 0,6 dB. The reading is
+  self-validating: the same two equations give $-4{,}6 \times 10^{-5}$ dB at
+  120 m and 23,0 °C, which is the "zero" the same sentence prints, so the
+  constants and the temperature terms are being read as the standard intends.
+  0,6 dB is reached at about 697 m at 23,0 °C, or at 500 m only if the air is
+  at 30,1 °C.
+  (b) $0{,}6/\sqrt{6} = 0{,}245$, not 0,3. The quotient does not give the
+  result printed beside it: 0,3 dB is exactly $0{,}6/2$, so either the divisor
+  or the result is wrong. For a triangular distribution of half-width $a$ the
+  standard deviation is $a/\sqrt{6}$, which is the divisor the sentence names.
+- **Evidence:** H.4.2.7 read on PDF page 82 (printed p. 73), against Annex G
+  Equations (G.1) and (G.2) with $a = 2{,}2560 \times 10^{-5}$ m$^{-1}$,
+  $b = 5{,}2553$, $\theta_0 = 314$ K and $\theta_1 = 296$ K on PDF pages 73 and
+  74 (printed pp. 64 and 65), all of BS EN ISO 3744:2010. Both values were
+  recomputed from the printed equations alone.
+- **Library behaviour:** the Annex H uncertainty budget is not modelled, so no
+  published number depends on either figure. The Annex G correction itself is
+  evaluated from Equations (G.1) and (G.2) by
+  [`reference_atmosphere_correction`](../src/phonometry/emission/sound_power.py),
+  and the conformance check "ISO 3744:2010 Annex G / H.4.2.7" pins the half of
+  the paragraph that is right: the correction vanishes at 120 m and 23 °C.
 - **Status:** unreported.
 
 ## ISO 9613-2:1996, Table 2 (15 °C / 80 % / 1 kHz cell)
