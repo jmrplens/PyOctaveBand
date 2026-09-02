@@ -1,0 +1,499 @@
+---
+title: "Potencia acústica in situ por comparación (ISO 3747)"
+description: "La determinación de ingeniería y de control según ISO 3747 del nivel de potencia acústica y del nivel de energía acústica de una máquina donde trabaja, por comparación con una fuente sonora de referencia calibrada en un entorno reverberante: la corrección por ruido de fondo posición a posición con sus reglas de 6 dB y 15 dB, las formas con una y con varias ubicaciones, la vía de suceso aislado, el grado de la Tabla 2, la incertidumbre del apartado 9 y las condiciones de referencia del Anexo C."
+references:
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2010
+    title: "Acoustics — Determination of sound power levels and sound energy levels of noise sources using sound pressure — Engineering/survey methods for use in situ in a reverberant environment"
+    designation: "ISO 3747:2010"
+    url: "https://www.iso.org/standard/46426.html"
+    note: "El método de comparación de esta guía: la corrección por ruido de fondo del apartado 8.1, los niveles medios y los niveles de potencia y de energía acústica de los apartados 8.2 a 8.5, los grados de la Tabla 2, la incertidumbre del apartado 9 y los Anexos A, C y D."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2010
+    title: "Acoustics — Determination of sound power levels and sound energy levels of noise sources using sound pressure — Precision methods for reverberation test rooms"
+    designation: "ISO 3741:2010"
+    url: "https://www.iso.org/standard/52053.html"
+    note: "El método de comparación de precisión de una cámara cualificada, cuya Ec. 21 es la Ec. 11 de esta guía más la misma corrección de impedancia de radiación C2 (apartado 9.1.4), reutilizada aquí para el Anexo C."
+---
+
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import SeeAlso from '../../../../../components/SeeAlso.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+Algunas máquinas nunca viajan a una sala de ensayo: un compresor atornillado
+al suelo de la planta, una línea de prensas, una envasadora cableada al
+resto de la línea. ISO 3747 determina su potencia acústica donde están, por
+comparación. Se coloca junto a la máquina una fuente sonora de referencia
+(RSS) de potencia acústica por bandas calibrada, los mismos tres o cuatro
+micrófonos escuchan a cada fuente por turnos desde la parte reverberante de
+la sala y, como ambas fuentes ven la misma sala, la sala se cancela: la
+potencia acústica de la fuente en ensayo es la potencia calibrada de la
+fuente de referencia trasladada por la diferencia de los dos niveles medios.
+El método alcanza el grado 2 (ingeniería) donde el campo es lo bastante
+reverberante y la fuente no es demasiado directiva, y el grado 3 (control)
+en caso contrario; una fuente impulsiva recibe un nivel de energía acústica
+en lugar de un nivel de potencia acústica por la misma vía. Esta guía cubre
+la corrección por ruido de fondo posición a posición con sus reglas de 6 dB
+y 15 dB, las formas con una y con varias ubicaciones, la vía de suceso
+aislado, el grado de la Tabla 2, la incertidumbre del apartado 9 y las
+condiciones de referencia del Anexo C. Qué vía encaja con qué trabajo se
+sopesa en [Potencia acústica](/phonometry/es/devices/emission/sound-power/).
+
+## 1. La comparación in situ (ISO 3747)
+
+El entorno es todo el método, así que la norma empieza por él. Las
+posiciones de micrófono deben estar donde el campo es **reverberante**, lo
+que la norma mide como el exceso de nivel de presión acústica sobre el campo
+libre, $\Delta L_f \ge 7$ dB (apartado 4.1, Anexo A): el nivel que la fuente
+de referencia produce en un micrófono debe estar al menos 7 dB por encima
+del que produciría en campo libre a esa distancia. Se usan tres o cuatro
+posiciones, separadas al menos 2 m, ninguna a menos de 0,5 m de cualquier
+contorno, repartidas lo más uniformemente posible alrededor de la máquina y
+cada una con línea de visión a las mismas zonas emisoras (apartado 7.4.1);
+la fuente de referencia se sitúa al lado de la máquina, nunca a menos de
+0,5 m de su caja de referencia, y cuando la máquina es larga se hace
+funcionar en varias ubicaciones a lo largo de los lados (apartado 7.3).
+Ambas fuentes y el ruido de fondo se leen en las **mismas posiciones con las
+mismas orientaciones de micrófono**, la fuente de referencia durante 30 s
+(apartado 7.5), y toda la determinación se hace en **bandas de octava de
+125 Hz a 8 kHz** (apartado 3.11), el único rango que tabula el Anexo D.
+
+El ruido de fondo se corrige **posición a posición** antes de promediar nada
+(apartado 8.1, Ec. 7):
+
+$$
+K_{1i} = -10 \log_{10}\left(1 - 10^{-0.1\,\Delta L_{pi}}\right),
+\qquad \Delta L_{pi} = L'_{pi(\mathrm{ST})} - L_{pi(\mathrm{B})},
+$$
+
+con tres reglas alrededor. Un margen por encima de 15 dB no necesita
+corrección en esa posición. Un margen entre 6 dB y 15 dB toma la Ec. 7, que
+va de 1,26 dB a 6 dB hasta 0,14 dB a 15 dB. Un margen **por debajo de 6 dB**
+limita la corrección a **1,3 dB** y reduce la exactitud del resultado: el
+nivel puede reportarse igualmente, pero como cota superior, y el informe
+debe decir que el requisito de ruido de fondo no se cumplió.
+`sound_power_in_situ` aplica las tres, devuelve la $K_{1i}$ por posición que
+usó y marca cada banda en la que algún margen bajó de 6 dB en
+`background_requirement_met`, banda a banda, para que la marca viaje al
+informe con el nivel al que califica. La fuente de referencia se corrige del
+mismo modo, con la misma lectura de ruido de fondo salvo que traiga la suya
+(el apartado 7.5 toma una sola lectura para ambas), y los niveles corregidos
+se promedian en energía sobre las posiciones (Ec. 8, 9):
+
+$$
+\overline{L_{p(\mathrm{ST})}} = 10 \log_{10}\left[\frac{1}{n}\sum_{i=1}^{n} 10^{0.1\,L_{pi(\mathrm{ST})}}\right],
+\qquad L_{pi(\mathrm{ST})} = L'_{pi(\mathrm{ST})} - K_{1i}.
+$$
+
+El nivel de potencia acústica en cada banda de octava es entonces la propia
+comparación (apartado 8.3.1, Ec. 11):
+
+$$
+L_W = L_{W(\mathrm{RSS})} - \overline{L_{p(\mathrm{RSS})}} + \overline{L_{p(\mathrm{ST})}} .
+$$
+
+Cuando la fuente de referencia se hizo funcionar en $m$ ubicaciones, sus
+potencias calibradas y sus medias por ubicación se promedian primero en
+energía sobre las ubicaciones (apartado 8.3.2, Ec. 12), de modo que una
+ubicación que muestrea mejor la sala no domina a otra que la muestrea peor:
+
+$$
+L_W = 10 \log_{10}\left[\frac{1}{m}\sum_{j=1}^{m} 10^{0.1\,L_{Wj(\mathrm{RSS})}}\right]
+- 10 \log_{10}\left[\frac{1}{m}\sum_{j=1}^{m} 10^{0.1\,\overline{L_{pj(\mathrm{RSS})}}}\right]
++ \overline{L_{p(\mathrm{ST})}} .
+$$
+
+La Ec. 12 se reduce a la Ec. 11 cuando las ubicaciones son indistinguibles,
+y la corrección por ruido de fondo de la fuente de referencia se evalúa por
+ubicación y por posición, porque el margen del que sale depende de ambas
+aunque la norma imprima $K_{1i(\mathrm{RSS})}$ sin el índice de ubicación.
+
+La Tabla 1 de la norma merece leerse antes de colocar nada, aunque es
+orientación y no aritmética. Clasifica las posiciones de micrófono por línea
+de visión: una posición que ve la fuente en ensayo pero no la fuente de
+referencia sobreestima fuertemente la máquina, una que ve la fuente de
+referencia pero no la máquina la subestima fuertemente, y donde ambas están
+a la vista el signo del error sigue a cuál de las dos está más cerca, y se
+anula cuando las dos distancias de medición coinciden dentro del 10 %. Las
+posiciones que hay que elegir son las de esa última zona. La biblioteca no
+evalúa nada de esto: toma los niveles que se le dan y asume que las
+posiciones se eligieron bien.
+
+```python
+import numpy as np
+from phonometry import emission
+
+# Un compresor de tornillo de pie, de 2,2 m x 1,4 m x 1,8 m, que no puede
+# salir de la planta: cuatro posiciones de micrófono a 1,5 m de su caja de
+# referencia, una ubicación de la fuente de referencia al lado, bandas de
+# octava de 125 Hz a 8 kHz.
+freqs = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+lw_rss = np.array([84.5, 88.0, 91.0, 92.5, 92.0, 90.5, 87.0])  # calibrada
+st = np.array([  # L'pi(ST): una fila por posición de micrófono, dB
+    [82.4, 84.9, 86.1, 85.3, 82.6, 78.4, 72.1],
+    [80.9, 84.1, 85.4, 84.7, 81.8, 77.5, 71.3],
+    [83.1, 85.6, 86.8, 85.9, 83.2, 79.0, 72.8],
+    [81.7, 84.5, 85.8, 85.0, 82.3, 78.0, 71.7],
+])
+rss = np.array([  # L'pi(RSS): la fuente de referencia en las mismas posiciones
+    [78.2, 81.8, 84.6, 86.0, 85.6, 84.1, 80.4],
+    [77.5, 81.1, 84.0, 85.4, 85.0, 83.4, 79.8],
+    [78.9, 82.4, 85.1, 86.5, 86.1, 84.6, 80.9],
+    [78.0, 81.6, 84.4, 85.8, 85.4, 83.9, 80.2],
+])
+background = np.array([  # Lpi(B): la nave, ruidosa en el extremo grave
+    [75.0, 74.0, 72.0, 70.0, 67.0, 62.0, 57.0],
+    [76.5, 75.0, 73.0, 71.0, 68.0, 63.0, 58.0],
+    [74.5, 73.5, 71.5, 69.5, 66.5, 61.5, 56.5],
+    [75.5, 74.5, 72.5, 70.5, 67.5, 62.5, 57.5],
+])
+
+res = emission.sound_power_in_situ(
+    st, rss, lw_rss, freqs, background_levels=background,
+    excess_levels=[8.2, 7.6, 8.9, 8.0],   # dLfA en cada posición (Anexo A)
+    directivity_range=4.0,                # +/-4 dB alrededor de la máquina (7.2)
+    sigma_omc=0.5,                        # una fuente estacionaria (NOTA de 9.2)
+)
+print(np.round(res.sound_power_level, 1))   # [88.8 91.5 92.6 91.8 88.9 84.7 78.6]
+print(round(res.sound_power_level_a, 1))    # 96.1 dB(A)
+print(res.background_requirement_met)       # [False  True  True  True  True  True  True]
+print(np.round(res.background_correction[1], 2))  # posición 2: [1.3 0.57 0.26 0.19 0.18 0.16 0.21]
+print(res.grade, res.sigma_r0, round(res.expanded_uncertainty, 1))  # engineering 1.5 3.2
+```
+
+La banda de 125 Hz es la que hay que leer dos veces. En dos de las cuatro
+posiciones el margen sobre el ruido de la nave está por debajo de 6 dB para
+la máquina, y por debajo de 6 dB en todas las posiciones para la fuente de
+referencia, así que $K_1$ toma allí su tope de 1,3 dB y los 88,8 dB que
+reporta la banda son una **cota superior**, que es lo que dice el `False`.
+Todas las demás bandas superan los 6 dB en todas partes, la de 250 Hz con
+correcciones de medio decibelio que la Ec. 7 evalúa en lugar de ignorar, y
+de 1 kHz en adelante el margen supera los 15 dB en la mayoría de las
+posiciones y la corrección es cero.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/in_situ_sound_power_es.svg" alt="Dos paneles sobre las siete bandas de octava de 125 Hz a 8 kHz. El panel superior representa los niveles de presión acústica en las cuatro posiciones de micrófono: los niveles corregidos de la fuente en ensayo como círculos azules rellenos con su media energética como línea azul, los niveles corregidos de la fuente de referencia como cuadrados verdes con su media como línea verde, los niveles medidos antes de la corrección por ruido de fondo como círculos huecos unidos a los corregidos allí donde la corrección los movió, y el ruido de fondo en cada posición como aspas grises. Una nota enmarcada en 125 Hz dice que el margen está por debajo de 6 dB en dos posiciones, que K1 se limita a 1,3 dB y que la banda es una cota superior. El panel inferior dibuja el nivel de potencia acústica resultante de la fuente en ensayo como barras azules, la de 125 Hz rayada como cota superior, con el nivel de potencia acústica calibrado de la fuente de referencia como línea roja discontinua con rombos, y declara en su título un nivel ponderado A de 96,1 dB(A), grado 2, y una incertidumbre expandida de 3,2 dB con k = 2 y una desviación de 0,5 dB por condiciones de funcionamiento" width="96%" />
+
+*La comparación posición a posición. Arriba, ambas fuentes en los cuatro
+micrófonos tras la corrección de la Ec. 7, con los marcadores huecos
+mostrando dónde estaba cada nivel antes de ella; la fuente de referencia
+queda por debajo de la máquina en el extremo grave y por encima de 1 kHz en
+adelante, que es lo que la forma de la curva calibrada de abajo hace con el
+resultado. Abajo, la Ec. 11 banda a banda, con la $L_{W(\mathrm{RSS})}$
+calibrada al lado y la cota superior de 125 Hz rayada.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# res es el InSituSoundPowerResult calculado arriba. Una línea:
+res.plot(language="es")   # barras de LW, LWA en el título, la banda cota superior rayada
+plt.show()
+
+# A mano: ambas fuentes por posición arriba, la Ec. 11 abajo.
+corrected_st = st - res.background_correction
+corrected_rss = rss - res.background_correction_ref[0]
+x = np.arange(freqs.size)
+fig, (axt, axb) = plt.subplots(2, 1, figsize=(10, 8.4), sharex=True)
+for i, offset in enumerate(np.linspace(-0.27, 0.27, st.shape[0])):
+    axt.plot(x + offset, corrected_st[i], "o", color="#1f77b4")
+    axt.plot(x + offset, corrected_rss[i], "s", color="#2ca02c")
+    axt.plot(x + offset, background[i], "x", color="#9e9e9e")
+axt.plot(x, res.mean_source_level, "-", color="#1f77b4", label="media, fuente en ensayo")
+axt.plot(x, res.mean_reference_level, "-", color="#2ca02c", label="media, fuente de referencia")
+axt.set_ylabel("Nivel de presión acústica [dB]")
+axt.legend()
+bars = axb.bar(x, res.sound_power_level, width=0.62, color="#1f77b4")
+for bar, met in zip(bars, res.background_requirement_met, strict=True):
+    if not met:
+        bar.set_hatch("//")
+axb.plot(x, res.reference_power_level, "D--", color="#d62728", label="LW(RSS) calibrada")
+axb.set_xticks(x, [f"{f:g}" for f in freqs])
+axb.set_xlabel("Frecuencia [Hz]")
+axb.set_ylabel("Nivel de potencia acústica LW [dB re 1 pW]")
+axb.legend()
+plt.show()
+```
+
+</details>
+
+Una máquina larga respecto a la distancia de medición recibe la fuente de
+referencia en varias ubicaciones a lo largo de sus lados (apartado 7.3.3), y
+los niveles llegan como una rejilla por ubicación:
+
+```python
+# El mismo compresor con la fuente de referencia en dos ubicaciones, una a
+# lo largo de cada lado largo; la segunda queda más cerca de una pared y lee
+# 1,2 dB menos, y se calibró en una posición similar 0,4 dB más baja.
+two = emission.sound_power_in_situ(
+    st, np.stack([rss, rss - 1.2]), np.stack([lw_rss, lw_rss - 0.4]), freqs,
+    background_levels=background,
+)
+print(two.reference_levels.shape)               # (2, 7): nivel medio por ubicación (Ec. 10)
+print(np.round(two.sound_power_level, 1))       # [89.1 92.0 93.0 92.2 89.3 85.1 79. ]
+print(round(two.sound_power_level_a, 1))        # 96.5 dB(A)
+```
+
+### Parámetros de `sound_power_in_situ()`
+
+| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `levels` | array 2D | dB | `(n, bandas)` | $L'_{pi(\mathrm{ST})}$ medidos, una fila por posición de micrófono, tres o cuatro posiciones (7.4.1) |
+| `levels_ref` | array 2D o 3D | dB | `(n, bandas)` o `(m, n, bandas)` | La fuente de referencia en las mismas posiciones, una rejilla por ubicación, corregida según su fabricante por velocidad, temperatura y presión pero no por ruido de fondo |
+| `lw_ref` | array 1D o 2D | dB | `(bandas,)` o `(m, bandas)` | $L_{W(\mathrm{RSS})}$ calibrada, por ubicación cuando cada una se calibró en su propia posición similar (Ec. 12) |
+| `frequencies` | array 1D | Hz | octavas de 63 Hz a 8 kHz | Frecuencias centrales nominales de octava de la Tabla D.1; obligatorio |
+| `background_levels` | array 1D o 2D | dB | `(bandas,)` o `(n, bandas)` | $L_{pi(\mathrm{B})}$; un espectro sirve para todas las posiciones |
+| `background_levels_ref` | array 1D o 2D | dB | mismas formas | Ruido de fondo de la lectura de la fuente de referencia; `None` reutiliza `background_levels` (7.5) |
+| `temperature` | float | °C | por defecto `23.0` | Temperatura del aire en el ensayo, para $C_2$ |
+| `static_pressure` | float | kPa | por defecto `101.325` | Presión estática en el ensayo, para $C_2$; véase `static_pressure_from_altitude` |
+| `excess_levels` | array 1D | dB | `(n,)` | $\Delta L_{f\mathrm{A}}$ en cada posición (Anexo A); con `directivity_range` decide el grado |
+| `directivity_range` | float | dB | $\ge 0$ | Semiamplitud del rango de directividad ponderado A de la fuente (7.2) |
+| `sigma_omc` | float | dB | $\ge 0$ | Desviación típica de las condiciones de funcionamiento y montaje (9.2); `None` deja la incertidumbre en `NaN` |
+| `coverage_factor` | float | | por defecto `2.0` | $k$ de la Ec. 23; 1,6 para una comparación unilateral con un límite |
+
+La función devuelve un `InSituSoundPowerResult`: `sound_power_level`
+(Ec. 11 o 12, en las condiciones del ensayo), `mean_source_level` y
+`mean_reference_level` (Ec. 8, 9), `reference_levels` por ubicación
+(Ec. 10), `reference_power_level`, `background_correction` por posición y
+banda, `background_correction_ref` por ubicación, posición y banda,
+`background_requirement_met` por banda, `c2`, `grade`, `sigma_r0`,
+`sigma_omc`, `sigma_tot`, `expanded_uncertainty`, `coverage_factor`,
+`sound_power_level_a` y `quantity`. `sound_power_level_ref` suma `c2` al
+nivel (sección 3).
+
+## 2. Fuentes impulsivas: el nivel de energía acústica (Ec. 13 a 20)
+
+Una carrera de prensa o un portazo no tienen una potencia estacionaria que
+reportar. El apartado 8.4 mide en cambio el **nivel de suceso aislado**
+$L_E$ en cada posición, bien un suceso cada vez, al menos cinco (apartado
+7.6), bien una sola vez sobre una serie de $N$ sucesos consecutivos, y el
+apartado 8.5 convierte la media en un **nivel de energía acústica** $L_J$
+en dB re 1 pJ por la misma comparación, con la fuente de referencia leída
+igualmente promediada en el tiempo durante 30 s. Medidos uno cada vez, cada
+suceso se corrige por ruido de fondo con la Ec. 14 (la Ec. 7 con el nivel
+del suceso en el margen) y los niveles corregidos se promedian en energía en
+el nivel medio de suceso aislado de la posición (Ec. 13, 15); medidos una
+vez sobre $N$ sucesos, el nivel se corrige y se reduce en
+$10 \log_{10} N$ a un suceso (Ec. 16, 17). Los niveles por posición se
+promedian en energía sobre las posiciones (Ec. 18), y
+
+$$
+L_J = L_{W(\mathrm{RSS})} - \overline{L_{p(\mathrm{RSS})}} + \overline{L_{E(\mathrm{ST})}}
+$$
+
+(Ec. 19), o su forma con varias ubicaciones (Ec. 20), que es la Ec. 12 con
+la media de sucesos en el último término. `sound_energy_in_situ` toma los
+sucesos como un array 3D `(n, N, bandas)` para la forma de uno cada vez o
+como una medición 2D `(n, bandas)` con `events=N` para la otra, y devuelve
+el mismo tipo de resultado con `quantity='energy'`, el nivel en
+`sound_energy_level` y el total del Anexo D en `sound_energy_level_a`.
+
+Una línea de la Ec. 14 merece una nota. Resta el nivel de ruido de fondo
+**promediado en el tiempo** $L_{pi(\mathrm{B})}$ de un nivel de suceso
+**integrado en el tiempo**, y solo pide que ambos se midan con el mismo
+tiempo de integración $T$. Tal como está impresa, la diferencia es un
+margen señal-fondo verdadero para $T$ = 1 s; para un $T$ mayor el ruido de
+fondo contiene $10 \log_{10}(T/T_0)$ dB más energía sobre el intervalo del
+suceso de lo que dice su nivel promediado en el tiempo (apartado 3.4, NOTA
+1), y el margen queda sobrestimado en esa cantidad. ISO 3741 e ISO 3744
+imprimen la misma línea en sus apartados de suceso aislado, así que es la
+convención de la familia y no una errata de esta parte. La biblioteca aplica
+la Ec. 14 tal como está impresa por defecto y ofrece `integration_time` para
+llevar antes el ruido de fondo al intervalo del suceso; ambas coinciden en
+$T$ = 1 s.
+
+```python
+# La misma sala, una prensa junto al compresor: seis carreras medidas una
+# cada vez en las cuatro posiciones, cada una integrada en 4 s, con la misma
+# lectura de la fuente de referencia y la misma nave.
+strokes = np.array([
+    [96.3, 98.1, 99.4, 98.8, 96.0, 92.1, 86.4],
+    [95.1, 97.4, 98.7, 98.0, 95.3, 91.4, 85.6],
+    [97.0, 98.9, 100.1, 99.5, 96.6, 92.8, 87.0],
+    [95.8, 97.9, 99.0, 98.4, 95.8, 91.9, 86.0],
+])
+events = np.stack([strokes + d for d in (-0.3, 0.2, 0.0, 0.4, -0.2, 0.1)], axis=1)
+energy = emission.sound_energy_in_situ(
+    events, rss, lw_rss, freqs,                 # (4 posiciones, 6 sucesos, 7 bandas)
+    background_levels=background, integration_time=4.0,
+    excess_levels=[8.2, 7.6, 8.9, 8.0], directivity_range=4.0, sigma_omc=2.0,
+)
+print(energy.quantity)                            # energy
+print(np.round(energy.sound_energy_level, 1))     # [103.7 105.3 106.1 105.3 102.5  98.6  93. ]
+print(round(energy.sound_energy_level_a, 1))      # 109.7 dB(A) re 1 pJ
+print(round(energy.expanded_uncertainty, 1))      # 5.0 dB: grado 2 con sigma_omc = 2 dB
+```
+
+La banda de 125 Hz es también aquí una cota superior, y por la razón que dio
+la determinación estacionaria: el propio margen de la fuente de referencia
+sobre el ruido de la nave está por debajo de 6 dB allí, y la marca sigue a
+ambas fuentes. Los 5,0 dB son el ejemplo de la propia norma en el apartado
+9.5, reproducido porque las entradas son las mismas: grado 2,
+$\sigma_\mathrm{omc}$ = 2,0 dB, $k$ = 2.
+
+### Parámetros de `sound_energy_in_situ()`
+
+| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `event_levels` | array 3D o 2D | dB | `(n, N, bandas)` o `(n, bandas)` | $L'_{Ei,q(\mathrm{ST})}$ por suceso, o $L'_{Ei,N(\mathrm{ST})}$ de una medición sobre $N$ sucesos |
+| `events` | int | | $\ge 1$ | $N$ para la forma 2D (Ec. 17); debe ser `None` con la forma 3D |
+| `integration_time` | float | s | $> 0$ | $T$ de la medición del suceso; `None` aplica la Ec. 14 tal como está impresa |
+| `levels_ref`, `lw_ref`, `frequencies`, `background_levels`, `background_levels_ref`, `temperature`, `static_pressure`, `excess_levels`, `directivity_range`, `sigma_omc`, `coverage_factor` | | | | Como en `sound_power_in_situ()` |
+
+## 3. Grado, incertidumbre y condiciones de referencia
+
+**Grado (Tabla 2).** El grado 2 (ingeniería) necesita el exceso ponderado A
+$\Delta L_{f\mathrm{A}} \ge 7$ dB en todas las posiciones de micrófono y un
+rango de directividad de la fuente dentro de ±7 dB según el sondeo del
+apartado 7.2, hecho a 1 m de la caja de referencia a intervalos de 2 m o
+menos; si falla cualquiera de los dos indicadores, o no se determinó, el
+grado es el 3 (control). La tabla empareja cada grado con una cota superior
+típica de la reproducibilidad del método, **1,5 dB** para el grado 2 y
+**4,0 dB** para el grado 3, válida para un espectro relativamente plano en
+el que las octavas de 250 Hz a 4 kHz llevan el nivel ponderado A; una fuente
+dominada por las bandas por debajo de 500 Hz reproduce peor que eso. El
+exceso en sí es el Anexo A (Ec. A.1),
+
+$$
+\Delta L_f(r) = L_{p(\mathrm{RSS}),r} - L_{W(\mathrm{RSS})} + 11\ \mathrm{dB} + 20 \log_{10}\frac{r}{r_0},
+\qquad r_0 = 1\ \mathrm{m},
+$$
+
+medido a lo largo de una línea de visión desde la fuente de referencia a $r$
+variable, y es cero en campo libre: `excess_sound_pressure_level` lo evalúa
+y difunde las formas, de modo que una potencia calibrada sirve para todo un
+recorrido.
+
+**Incertidumbre (apartado 9).** La desviación típica de reproducibilidad del
+método y la desviación de las condiciones de funcionamiento y montaje de la
+fuente, $\sigma_\mathrm{omc}$, se combinan en cuadratura (Ec. 22) y la
+incertidumbre expandida sigue con el factor de cobertura (Ec. 23):
+
+$$
+\sigma_\mathrm{tot} = \sqrt{\sigma_{R0}^2 + \sigma_\mathrm{omc}^2},
+\qquad U = k\,\sigma_\mathrm{tot},
+$$
+
+con $k$ = 2 para el intervalo bilateral del 95 % que asume la norma, o 1,6
+para una comparación unilateral con un valor límite. $\sigma_\mathrm{omc}$
+es el número del usuario, obtenido de determinaciones repetidas en las
+condiciones de los apartados 9.2 y E.3; la NOTA de 9.2 lo sitúa cerca de
+0,5 dB para una fuente estacionaria, 2 dB para una con flujo de material y
+4 dB para el machaqueo de piedra, el corte de metal o una prensa bajo carga.
+El ejemplo de la propia norma (apartado 9.5), grado 2 con
+$\sigma_\mathrm{omc}$ = 2,0 dB y $k$ = 2, da
+$U = 2\sqrt{1{,}5^2 + 2^2}$ dB = 5 dB, que el ejemplo de energía de arriba
+reproduce. Sin `sigma_omc` el resultado lleva `sigma_r0` y deja `sigma_tot`
+y `expanded_uncertainty` en `NaN`, en lugar de reportar una incertidumbre
+del método como si fuera la total.
+
+**Condiciones de referencia (Anexo C).** La Ec. 11 da el nivel en las
+condiciones meteorológicas del ensayo. El Anexo C lo lleva a 101,325 kPa y
+23,0 °C con la corrección de impedancia de radiación
+
+$$
+C_2 = -10 \log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s},0}} + 15 \log_{10}\frac{273{,}15 + \theta}{\theta_\mathrm{ref}},
+\qquad \theta_\mathrm{ref} = 296\ \mathrm{K},
+$$
+
+la misma $C_2$ del apartado 9.1.4 de ISO 3741 (la biblioteca la evalúa a
+través de ese módulo), válida para un monopolo y valor medio para otras
+fuentes, y estima la presión estática a partir de la altitud del
+emplazamiento cuando no se leyó ningún barómetro (Ec. C.2):
+$p_\mathrm{s} = p_{\mathrm{s},0}\,(1 - a H_\mathrm{a})^b$ con
+$a$ = 2,2560 × 10⁻⁵ m⁻¹ y $b$ = 5,2553. El resultado expone `c2` y las
+propiedades `sound_power_level_ref` y `sound_energy_level_ref` (Ec. C.1,
+C.3); el total ponderado A en condiciones de referencia es
+`sound_power_level_a + c2`, ya que el desplazamiento es el mismo en todas
+las bandas. Un detalle del anexo conviene saberlo: $\theta_\mathrm{ref}$
+está impresa como 296 K junto a una temperatura de referencia de 23,0 °C,
+que son 296,15 K, así que exactamente en las condiciones de referencia $C_2$
+vale +0,003 3 dB y no cero. ISO 3741 e ISO 3744 imprimen los mismos 296 K,
+así que es el redondeo de la familia y la biblioteca lo conserva.
+
+```python
+# Una planta a 640 m sobre el nivel del mar, a 27 °C, sin barómetro en el sitio.
+ps = emission.static_pressure_from_altitude(640.0)
+print(round(ps, 2))                                 # 93.87 kPa (Ec. C.2)
+high = emission.sound_power_in_situ(
+    st, rss, lw_rss, freqs, background_levels=background,
+    temperature=27.0, static_pressure=ps,
+)
+print(round(high.c2, 3))                            # 0.423 dB
+print(round(float(high.sound_power_level[3]), 2), round(float(high.sound_power_level_ref[3]), 2))
+# 91.76 en las condiciones del ensayo, 92.18 en las condiciones de referencia (1 kHz)
+
+# Anexo A a lo largo de una línea de visión desde la fuente de referencia, ponderado A.
+print(np.round(emission.excess_sound_pressure_level([81.0, 76.5, 73.8], 92.5, [1.5, 3.0, 6.0]), 2))
+# [3.02 4.54 7.86]: lo bastante reverberante para el grado 2 solo desde unos 6 m
+```
+
+**Totales ponderados A (Anexo D).** $L_{W\mathrm{A}}$ y $L_{J\mathrm{A}}$ son
+las sumas energéticas de los niveles de banda más las correcciones $C_k$ de
+la Tabla D.1, que son −26,2, −16,1, −8,6, −3,2, 0,0, 1,2, 1,0 y −1,1 dB de
+63 Hz a 8 kHz, los valores de octava del Anexo E de ISO 3744 dígito a
+dígito; la biblioteca los lee de la tabla compartida y exige que
+`frequencies` sean esos ocho centros nominales, la fila de 63 Hz solo para
+uso donde el entorno y la instrumentación son satisfactorios allí (Tabla
+D.1, nota a).
+
+## Qué cubre esta guía
+
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La comparación in situ de ISO 3747 (`sound_power_in_situ`): la corrección
+por ruido de fondo posición a posición del apartado 8.1 con sus reglas de
+6 dB y 15 dB y el tope de 1,3 dB, los niveles medios corregidos del
+apartado 8.2, el nivel de potencia acústica con una (Ec. 11) o varias
+(Ec. 12) ubicaciones de la fuente de referencia, los niveles de suceso
+aislado del apartado 8.4 en sus dos formas y el nivel de energía acústica
+del apartado 8.5 (`sound_energy_in_situ`), el grado de la Tabla 2 con su
+$\sigma_{R0}$, la incertidumbre del apartado 9 (Ec. 22, 23), el exceso de
+nivel de presión acústica del Anexo A (`excess_sound_pressure_level`), las
+condiciones de referencia del Anexo C con la Ec. C.2
+(`static_pressure_from_altitude`) y los totales ponderados A del Anexo D.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered" label="No cubierto">
+El presupuesto de incertidumbre del Anexo E (la Tabla E.2 y sus
+coeficientes de sensibilidad) está documentado pero no modelado:
+$\sigma_{R0}$ es la cota superior típica de la Tabla 2 por grado, no un
+valor específico de la máquina obtenido de un ensayo interlaboratorio
+(9.3.2) o del modelo de 9.3.3. La zonificación de la Tabla 1, el sondeo de
+directividad del apartado 7.2 y las reglas de colocación del apartado 7.3
+son decisiones del operador, tomadas antes de que existan los niveles; la
+biblioteca toma los niveles y los dos indicadores que necesita el grado.
+Las correcciones propias de la fuente de referencia por velocidad,
+temperatura y presión estática son las de su fabricante, aplicadas antes de
+que lleguen los niveles. Las otras vías in situ son sus propias guías:
+[Potencia acústica por métodos de presión](/phonometry/es/devices/emission/sound-power-pressure/)
+para la superficie envolvente, [Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/)
+para la sonda.
+</ScopeClaim>
+</Scope>
+
+<SeeAlso>
+
+## Véase también
+
+- [Potencia acústica](/phonometry/es/devices/emission/sound-power/): elegir
+  entre las vías de determinación, los grados de exactitud y la declaración
+  de emisión sonora de ISO 4871.
+- [Potencia acústica en cámara reverberante](/phonometry/es/devices/emission/sound-power-reverberation/):
+  la comparación de precisión de ISO 3741 en una cámara cualificada, cuya
+  $C_2$ comparte esta guía.
+- [Potencia acústica por métodos de presión (ISO 3744 / ISO 3746 / ISO 3745)](/phonometry/es/devices/emission/sound-power-pressure/):
+  la superficie envolvente para una fuente que puede medirse en su campo
+  directo.
+- [Potencia acústica por barrido de intensidad (ISO 9614)](/phonometry/es/devices/emission/sound-power-intensity/):
+  las vías que toleran un ruido de fondo estacionario sin fuente de
+  referencia.
+- [Niveles](/phonometry/es/signals/levels/levels/): el promedio energético,
+  el nivel de suceso aislado y la ponderación A detrás de $L_{W\mathrm{A}}$.
+- Referencia de la API: [`emission.sound_power_in_situ`](/phonometry/es/reference/api/power/sound-power-in-situ/).
+
+</SeeAlso>

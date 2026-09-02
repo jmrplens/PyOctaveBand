@@ -290,7 +290,7 @@ factor and the boxed LWA.*
 
 ## See also
 
-- [Sound Power](sound-power.md): the route chooser this method is the seventh
+- [Sound Power](sound-power.md): the route chooser this method is the last
   entry of, what the accuracy grades promise, and the ISO 4871 noise-emission
   declaration a result feeds.
 - [Sound Power by Intensity Scanning (ISO 9614)](sound-power-intensity.md):

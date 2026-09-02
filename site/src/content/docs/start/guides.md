@@ -620,10 +620,13 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 and EBU R 128.
   ISO 3745.
 - [Sound Power in the Reverberation Room](/phonometry/devices/emission/sound-power-reverberation/):
   the direct and comparison methods of ISO 3741.
+- [Sound Power in Situ by Comparison](/phonometry/devices/emission/sound-power-in-situ/):
+  the ISO 3747 comparison against a reference sound source where the machine
+  works, with the sound energy level of an impulsive source.
 - [Sound Power by Intensity Scanning](/phonometry/devices/emission/sound-power-intensity/):
   the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade.
 - [Sound power from surface vibration (ISO/TS 7849)](/phonometry/devices/emission/vibration-sound-power/):
-  the seventh determination route, for the machine that cannot be moved into a
+  the surface-velocity route, for the machine that cannot be moved into a
   qualified room: the radiated power from the surface-averaged velocity level
   and the radiation factor, with the Part 1 upper limit and the Part 2
   engineering value. Also listed under Vibration.

@@ -653,10 +653,13 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 y EBU R 128.
   ISO 3745.
 - [Potencia acústica en cámara reverberante](/phonometry/es/devices/emission/sound-power-reverberation/):
   los métodos directo y de comparación de ISO 3741.
+- [Potencia acústica in situ por comparación](/phonometry/es/devices/emission/sound-power-in-situ/):
+  la comparación de ISO 3747 con una fuente sonora de referencia donde trabaja
+  la máquina, con el nivel de energía acústica de una fuente impulsiva.
 - [Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/):
   el barrido in situ de ISO 9614-2 y el grado de precisión ISO 9614-3.
 - [Potencia acústica a partir de la vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/):
-  la séptima ruta de determinación, para la máquina que no se puede llevar a un
+  la vía de velocidad superficial, para la máquina que no se puede llevar a un
   recinto cualificado: la potencia radiada a partir del nivel de velocidad
   promediado en la superficie y el factor de radiación, con el límite superior de
   la Parte 1 y el valor de ingeniería de la Parte 2. Listada también en

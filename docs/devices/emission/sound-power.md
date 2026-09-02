@@ -7,12 +7,15 @@ sound **power** does not. The sound power level $L_W$ is the total acoustic
 energy per second a source radiates, referenced to $P_0 = 1\ \text{pW}$, and it is
 the device-independent **emission** descriptor that goes on a datasheet,
 feeds a room prediction (EN 12354) or is checked against a noise-emission
-limit. phonometry implements seven standardised routes to it, split across
-five guides: an enveloping *pressure* surface in the field
+limit. phonometry implements eight standardised routes to it, split across
+six guides: an enveloping *pressure* surface in the field
 (ISO 3744/3746) and the precision grade in an *anechoic room* (ISO 3745),
 covered in [Sound Power by Pressure Methods](sound-power-pressure.md); the
 diffuse field of a *reverberation room* (ISO 3741), covered in
-[Sound Power in the Reverberation Room](sound-power-reverberation.md);
+[Sound Power in the Reverberation Room](sound-power-reverberation.md); the
+same comparison against a reference sound source taken to the room the
+machine works in (ISO 3747), covered in
+[Sound Power in Situ by Comparison](sound-power-in-situ.md);
 *intensity* read at discrete points over a surface (ISO 9614-1), covered in
 [Sound Intensity (p-p)](intensity.md); the same intensity *scanned* over that
 surface (ISO 9614-2), with its precision
@@ -39,6 +42,7 @@ constraints.
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | Enveloping surface | **ISO 3744** (engineering) / **ISO 3746** (survey) | Sound pressure on a hemisphere or box | Essentially free field over one or more reflecting planes | Grade 2 ($\sigma_{\mathrm{R}0} \approx 1.5\ \text{dB}$) / grade 3 ($\approx 3.0\ \text{dB}$) | In situ or a large room; no special test facility available |
 | Reverberation room | **ISO 3741** | Sound pressure in the diffuse field | Qualified hard-walled reverberation room | Grade 1 (precision) | Highest accuracy for steady, broadband sources in a lab |
+| In situ comparison | **ISO 3747** | Sound pressure of the source and of a calibrated reference sound source at the same positions | The reverberant part of the room the machine works in ($\Delta L_f \ge 7$ dB) | Grade 2 ($\sigma_{\mathrm{R}0} \approx 1.5\ \text{dB}$) / grade 3 ($\approx 4.0\ \text{dB}$) | A machine that cannot leave its installation, in a room too reverberant for an enveloping surface |
 | Intensity at discrete points | **ISO 9614-1** | Normal sound intensity held at each of $N$ points, one per segment | Almost any, tolerant of steady extraneous noise | Grade 1 or 2 per band from the Annex B criteria; grade 3 on the A-weighted total | On-site where the probe stands still at each point rather than sweeping the surface |
 | Intensity scanning | **ISO 9614-2** | Normal sound intensity scanned over a surface | Almost any, tolerant of steady extraneous noise | Grade 2 / 3 (from per-band field indicators) | On-site with background noise, or one machine among many |
 | Anechoic room | **ISO 3745** | Sound pressure on a fixed microphone array | Qualified anechoic or hemi-anechoic room | Grade 1 (precision) | Reference-grade emission in a free-field laboratory |
@@ -144,7 +148,7 @@ order; the first match names the standard.
 The grade is a claim about **reproducibility**: $\sigma_{\mathrm{R}0}$ is the standard
 deviation you would see if different laboratories measured the same source,
 each following the standard correctly. Typical A-weighted values are
-$\sigma_{\mathrm{R}0} \approx 0.5\ \text{dB}$ for grade 1 (ISO 3741), 1.5 dB for grade 2 (ISO 3744,
+$\sigma_{\mathrm{R}0} \approx 0.5\ \text{dB}$ for grade 1 (ISO 3741), 1.5 dB for grade 2 (ISO 3744, ISO 3747,
 ISO 9614-2) and 3 dB or more for grade 3 (larger still when $K_2$ is
 large or the spectrum is tonal). Per-band values are larger at the
 spectrum edges. The `uncertainty` field of the pressure-method results
@@ -246,11 +250,14 @@ the clause 6.2 verification verdict.*
 - [Sound Power in the Reverberation Room (ISO 3741)](sound-power-reverberation.md):
   the precision diffuse-field method with the Waterhouse and meteorological
   corrections.
+- [Sound Power in Situ by Comparison (ISO 3747)](sound-power-in-situ.md):
+  the reference-source comparison where the machine works, with the sound
+  energy level of an impulsive source.
 - [Sound Power by Intensity Scanning (ISO 9614-2 / ISO 9614-3)](sound-power-intensity.md):
   the routes that tolerate steady background noise, qualified by their field
   indicators.
 - [Sound power from surface vibration (ISO/TS 7849)](vibration-sound-power.md):
-  the seventh route, for a machine no microphone can approach.
+  the surface-velocity route, for a machine no microphone can approach.
 - [Sound Intensity (p-p)](intensity.md): the two-microphone probe behind every
   intensity route, and the ISO 9614-1 determination at discrete points.
 - [Room Acoustics](../../buildings/rooms/room-acoustics.md): the reverberation time and equivalent
@@ -267,15 +274,15 @@ Sound pressure depends on where you stand and on the room; sound power does
 not. The sound power level $L_W$ is the total acoustic energy per second a
 source radiates, referenced to $P_0 = 1\ \text{pW}$, and it is the device-independent
 emission descriptor that goes on a datasheet or is checked against a
-noise-emission limit; ISO 3744, ISO 3741, ISO 9614-1, ISO 9614-2, ISO 3745,
-ISO 9614-3 and ISO/TS 7849 all determine it.
+noise-emission limit; ISO 3744, ISO 3741, ISO 3747, ISO 9614-1, ISO 9614-2,
+ISO 3745, ISO 9614-3 and ISO/TS 7849 all determine it.
 
 ### What do the accuracy grades in sound power measurement mean?
 
 The grade is a claim about reproducibility: $\sigma_{\mathrm{R}0}$ is the standard deviation
 you would see if different laboratories measured the same source, each
 following the standard correctly. Typical A-weighted values are
-$\sigma_{\mathrm{R}0} \approx 0.5\ \text{dB}$ for grade 1 (ISO 3741), 1.5 dB for grade 2 (ISO 3744,
+$\sigma_{\mathrm{R}0} \approx 0.5\ \text{dB}$ for grade 1 (ISO 3741), 1.5 dB for grade 2 (ISO 3744, ISO 3747,
 ISO 9614-2) and 3 dB or more for grade 3. A grade-2 $L_{W\mathrm{A}}$ carries
 $U \approx 3\ \text{dB}$, so two grade-2 results 2 dB apart are statistically
 indistinguishable.
@@ -319,12 +326,13 @@ ISO 4871:1996, *Acoustics — Declaration and verification of noise emission
 values of machinery and equipment*: the dual-number and single-number
 declaration forms, the declared value $L_{W\mathrm{Ad}} = L_{W\mathrm{A}} + K_{W\mathrm{A}}$ and the
 clause 6.2 verification. The basic determination standards (ISO 3744/3746,
-ISO 3741, ISO 3745, ISO 9614-1/-2/-3, ISO/TS 7849-1/-2) are covered in their
-method guides.
+ISO 3741, ISO 3745, ISO 3747, ISO 9614-1/-2/-3, ISO/TS 7849-1/-2) are covered
+in their method guides.
 
-**Not covered.** Three members of the ISO 3740 family are not implemented at
-all — ISO 3743-1, ISO 3743-2 and ISO 3747 — and neither is the sound *energy*
-level $L_J$ of a single event. The emission sound pressure level $L_{p\mathrm{A}}$
+**Not covered.** Two members of the ISO 3740 family are not implemented at
+all — ISO 3743-1 and ISO 3743-2 — and the sound *energy* level $L_J$ of a
+single event is determined only by the in situ comparison of ISO 3747, in
+[Sound Power in Situ by Comparison](sound-power-in-situ.md). The emission sound pressure level $L_{p\mathrm{A}}$
 that stands beside $L_{W\mathrm{A}}$ in a declaration is consumed here, never
 determined: ISO 11201, ISO 11202 and ISO 11204 are outside the library. Of
 ISO 4871, only the clause 6.2 single-machine verification is evaluated; the
