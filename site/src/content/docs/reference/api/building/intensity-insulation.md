@@ -510,6 +510,13 @@ limp panel of area $S > 1$ m\ :sup:`2`, calculate what it should
 read, and require the two to agree within 4,0 dB from 50 Hz to 160 Hz.
 This is the calculated half.
 
+A.1 states two different things about the area, and this enforces the
+second: the *qualification panel* is required to be larger than 1 m², while
+Formula (A.3) is declared valid "if the area of the test specimen is at
+least 1 m²". A panel of exactly 1 m² is therefore refused as a
+qualification but accepted as an input, which is the boundary the code
+takes.
+
 $$
 R = R_0 - 10 \lg 2\sigma_\mathrm{d} \tag{A.1}
 $$
@@ -532,7 +539,15 @@ $$
 The panel is limp by assumption: $R_0$ is the mass law and
 $\sigma_\mathrm{d}$ the radiation efficiency of forced transmission
 alone. The 160 Hz ceiling is not this annex's own: Clause 1.1 applies the
-whole of this part over 50 Hz to 160 Hz, and the check inherits it.
+whole of this part over 50 Hz to 160 Hz, and the qualification inherits it.
+
+Any frequency is computed, and no range is imposed. A.1 declares Formula
+(A.3) valid "for the frequency range of this part of ISO 15186", so a
+result outside 50 Hz to 160 Hz is the model evaluated past its stated
+validity: useful for seeing where a real panel leaves it, not usable as a
+qualification. Restricting the input is the caller's to do, unlike
+[`low_frequency_intensity_reduction`](/phonometry/reference/api/building/intensity-insulation/#low_frequency_intensity_reduction), whose quantity is defined over
+that range and nowhere else.
 
 **Parameters**
 
@@ -540,7 +555,7 @@ whole of this part over 50 Hz to 160 Hz, and the check inherits it.
 | :--- | :--- |
 | `frequencies` | One-third-octave mid-band frequencies, in hertz. |
 | `surface_mass` | Surface mass `m` of the panel, in kg/m². |
-| `area` | Panel area `S`, in m². Formula (A.3) is stated for at least 1 m², and a smaller one is refused rather than extrapolated. |
+| `area` | Panel area `S`, in m². Formula (A.3) is stated valid for at least 1 m², so a smaller one is refused rather than extrapolated. A panel used to qualify a facility has to exceed 1 m² (A.1). |
 | `temperature` | Air temperature `theta`, in degrees Celsius. |
 | `static_pressure` | Static pressure `B`, in pascals. |
 

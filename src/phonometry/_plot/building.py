@@ -137,6 +137,11 @@ _IMPROVEMENT_LABEL = r"Improvement of impact sound insulation $\Delta L$ [dB]"
 #: its own spelled-out label.
 _R_INTENSITY = "$R_I$"
 _D_INTENSITY_ELEMENT = "$D_{I\\mathrm{n,e}}$"
+
+#: Y-axis label of the element figure. The quantity is a normalized level
+#: difference and not a reduction index, so it does not share the label of
+#: its sibling.
+_ELEMENT_DIFFERENCE_LABEL = "Element normalized level difference [dB]"
 _F_PI = "$F_{pI}$"
 _INDICATOR_LABEL = "Surface pressure-intensity indicator [dB]"
 
@@ -176,6 +181,7 @@ _STRINGS: dict[str, str] = {
     _INDICATOR_LABEL: "Indicador presión-intensidad superficial [dB]",
     _LOW_FREQUENCY_INTENSITY_TITLE: "Aislamiento acústico por intensidad a baja frecuencia (ISO 15186-3)",
     _LOW_FREQUENCY_ELEMENT_TITLE: "Diferencia de niveles normalizada de elemento a baja frecuencia (ISO 15186-3)",
+    _ELEMENT_DIFFERENCE_LABEL: "Diferencia de niveles normalizada de elemento [dB]",
     "not qualified (6.4.2)": "no cualificada (6.4.2)",
     "limit": "límite",
     "Façade sound insulation (ISO 16283-3)": "Aislamiento acústico de fachada (ISO 16283-3)",
@@ -2258,6 +2264,7 @@ def _plot_low_frequency(
     *,
     symbol: str,
     title: str,
+    ylabel: str,
     ax: Axes | None,
     language: str,
     kwargs: dict[str, Any],
@@ -2313,7 +2320,7 @@ def _plot_low_frequency(
             zorder=1,
             label=_t("not qualified (6.4.2)", language),
         )
-    ax.set_ylabel(_t(_REDUCTION_INDEX_LABEL, language))
+    ax.set_ylabel(_t(ylabel, language))
     ax.set_title(_t(title, language))
 
     handles, texts = ax.get_legend_handles_labels()
@@ -2376,6 +2383,7 @@ def plot_low_frequency_intensity(
         result.r_i,
         symbol=_R_INTENSITY,
         title=_LOW_FREQUENCY_INTENSITY_TITLE,
+        ylabel=_REDUCTION_INDEX_LABEL,
         ax=ax,
         language=language,
         kwargs=kwargs,
@@ -2406,6 +2414,7 @@ def plot_low_frequency_element(
         result.d_i_n_e,
         symbol=_D_INTENSITY_ELEMENT,
         title=_LOW_FREQUENCY_ELEMENT_TITLE,
+        ylabel=_ELEMENT_DIFFERENCE_LABEL,
         ax=ax,
         language=language,
         kwargs=kwargs,
