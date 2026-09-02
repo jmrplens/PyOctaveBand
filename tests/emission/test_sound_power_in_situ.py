@@ -513,9 +513,10 @@ def test_more_than_four_positions_warns() -> None:
     far outside the procedure as a two-position one.
     """
     six = np.vstack([ST, ST[:2]])
+    six_ref = np.vstack([RSS, RSS[:2]])
     with pytest.warns(emission.SoundPowerWarning, match="7.4.1"):
         emission.sound_power_in_situ(
-            six, np.vstack([RSS, RSS[:2]]), LW_RSS, FREQS, background_levels=BACKGROUND
+            six, six_ref, LW_RSS, FREQS, background_levels=BACKGROUND
         )
 
 
@@ -528,10 +529,9 @@ def test_no_background_warns_and_meets_nothing() -> None:
     with pytest.warns(emission.SoundPowerWarning, match="7.5"):
         res = _power()
     assert not bool(np.any(res.background_requirement_met))
+    five_events = np.repeat(ST[:, None, :], 5, axis=1)
     with pytest.warns(emission.SoundPowerWarning, match="7.5"):
-        energy = emission.sound_energy_in_situ(
-            np.repeat(ST[:, None, :], 5, axis=1), RSS, LW_RSS, FREQS
-        )
+        energy = emission.sound_energy_in_situ(five_events, RSS, LW_RSS, FREQS)
     assert not bool(np.any(energy.background_requirement_met))
 
 
@@ -574,8 +574,9 @@ def test_frequencies_must_be_distinct_and_ascending() -> None:
     duplicated or reversed frequency vector would weight the A-weighted total
     with the wrong Ck and mislabel the plot's axis.
     """
+    all_the_same = np.full(FREQS.size, 1000.0)
     with pytest.raises(ValueError, match="'frequencies' must be distinct"):
-        emission.sound_power_in_situ(ST, RSS, LW_RSS, np.full(FREQS.size, 1000.0))
+        emission.sound_power_in_situ(ST, RSS, LW_RSS, all_the_same)
     with pytest.raises(ValueError, match="'frequencies' must be distinct"):
         emission.sound_power_in_situ(ST, RSS, LW_RSS, FREQS[::-1])
 
@@ -620,22 +621,20 @@ def test_static_pressure_is_validated() -> None:
 
 
 def test_grade_indicators_are_validated() -> None:
+    two_of_four = emission.GradeConditions(
+        excess_levels=[8.0, 9.0], directivity_range=3.0
+    )
+    negative_range = emission.GradeConditions(
+        excess_levels=[8.0, 9.0, 8.0, 8.0], directivity_range=-1.0
+    )
     with pytest.raises(
         ValueError, match="'excess_levels' must carry one finite value per"
     ):
-        _power(
-            conditions=emission.GradeConditions(
-                excess_levels=[8.0, 9.0], directivity_range=3.0
-            )
-        )
+        _power(conditions=two_of_four)
     with pytest.raises(
         ValueError, match="'directivity_range' must be finite and non-negative"
     ):
-        _power(
-            conditions=emission.GradeConditions(
-                excess_levels=[8.0, 9.0, 8.0, 8.0], directivity_range=-1.0
-            )
-        )
+        _power(conditions=negative_range)
 
 
 def test_each_grade_indicator_is_validated_on_its_own() -> None:
@@ -644,22 +643,26 @@ def test_each_grade_indicator_is_validated_on_its_own() -> None:
     must be refused, not silently downgraded to survey with sigma_R0 = 4 dB.
     """
     not_a_number = float("nan")
+    too_few = emission.GradeConditions(excess_levels=[8.0, 9.0])
+    all_nan = emission.GradeConditions(excess_levels=[not_a_number] * 4)
+    negative = emission.GradeConditions(directivity_range=-5.0)
+    nan_range = emission.GradeConditions(directivity_range=not_a_number)
     with pytest.raises(
         ValueError, match="'excess_levels' must carry one finite value per"
     ):
-        _power(conditions=emission.GradeConditions(excess_levels=[8.0, 9.0]))
+        _power(conditions=too_few)
     with pytest.raises(
         ValueError, match="'excess_levels' must carry one finite value per"
     ):
-        _power(conditions=emission.GradeConditions(excess_levels=[not_a_number] * 4))
+        _power(conditions=all_nan)
     with pytest.raises(
         ValueError, match="'directivity_range' must be finite and non-negative"
     ):
-        _power(conditions=emission.GradeConditions(directivity_range=-5.0))
+        _power(conditions=negative)
     with pytest.raises(
         ValueError, match="'directivity_range' must be finite and non-negative"
     ):
-        _power(conditions=emission.GradeConditions(directivity_range=not_a_number))
+        _power(conditions=nan_range)
 
 
 def test_uncertainty_inputs_are_validated() -> None:
@@ -700,8 +703,9 @@ def test_altitude_is_validated() -> None:
     not_a_number = float("nan")
     with pytest.raises(ValueError, match="'altitude' must be finite and below"):
         emission.static_pressure_from_altitude(not_a_number)
+    two_altitudes = np.array([0.0, 500.0])
     with pytest.raises(ValueError, match="'altitude' must be a single value"):
-        emission.static_pressure_from_altitude(np.array([0.0, 500.0]))  # type: ignore[arg-type]
+        emission.static_pressure_from_altitude(two_altitudes)  # type: ignore[arg-type]
     with pytest.raises(ValueError, match="'altitude' must be numeric"):
         emission.static_pressure_from_altitude("high")  # type: ignore[arg-type]
 
