@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from .common import (
+    _C_EDGE,
     _C_MUTED,
     _C_PRIMARY,
     _C_REFERENCE,
@@ -33,6 +34,7 @@ if TYPE_CHECKING:
     )
     from ..emission.sound_power import SoundPowerResult
     from ..emission.sound_power_anechoic import PrecisionSoundPowerResult
+    from ..emission.sound_power_in_situ import InSituSoundPowerResult
     from ..emission.sound_power_intensity import (
         PrecisionIntensityResult,
         SoundPowerIntensityResult,
@@ -62,7 +64,11 @@ _MIN_BANDS = 2
 _STRINGS: dict[str, str] = {
     "Band": "Banda",
     "Sound power level $L_W$ [dB]": "Nivel de potencia acústica $L_W$ [dB]",
+    "Sound energy level $L_J$ [dB]": "Nivel de energía acústica $L_J$ [dB]",
     "sound power spectrum": "espectro de potencia acústica",
+    "In situ sound power spectrum (ISO 3747)": "Espectro de potencia acústica in situ (ISO 3747)",
+    "In situ sound energy spectrum (ISO 3747)": "Espectro de energía acústica in situ (ISO 3747)",
+    "Upper bound: background margin below 6 dB": "Cota superior: margen de fondo inferior a 6 dB",
     "Non-positive band": "Banda no positiva",
     "Pressure level $L_p$": "Nivel de presión $L_p$",
     "Intensity level $L_I$": "Nivel de intensidad $L_I$",
@@ -189,6 +195,73 @@ def plot_sound_power(
         )
     if np.any(neg) or "label" in kwargs:
         ax.legend(loc="best", fontsize="small")
+    ax.grid(True, axis="y", alpha=0.3)
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_in_situ_sound_power(
+    result: InSituSoundPowerResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """In situ sound power (or energy) spectrum with the A-weighted total.
+
+    One bar per octave band of ``LW``, or of ``LJ`` when the result is an
+    energy determination; a band whose background margin fell below the
+    6 dB of ISO 3747:2010 clause 8.1 is hatched, because the level drawn
+    there is an upper bound and the report has to say so.
+
+    :param result: An
+        :class:`~phonometry.emission.sound_power_in_situ.InSituSoundPowerResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the band :meth:`~matplotlib.axes.Axes.bar`.
+    :return: The axes.
+    """
+    from matplotlib.patches import Patch
+
+    from .._i18n import format_number, localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    energy = result.quantity == "energy"
+    levels = np.asarray(
+        result.sound_energy_level if energy else result.sound_power_level,
+        dtype=np.float64,
+    )
+    total = float(result.sound_energy_level_a if energy else result.sound_power_level_a)
+    positions = _band_axis(
+        ax, np.asarray(result.frequencies, dtype=np.float64), language=language
+    )
+    upper = ~np.asarray(result.background_requirement_met, dtype=bool)
+    kwargs.setdefault("color", _C_PRIMARY)
+    bars = ax.bar(positions, np.nan_to_num(levels), **kwargs)
+    _hatch_invalid(bars, upper)
+
+    if energy:
+        ax.set_ylabel(_t("Sound energy level $L_J$ [dB]", language))
+        title = _t("In situ sound energy spectrum (ISO 3747)", language)
+        symbol = "$L_{J\\mathrm{A}}$"
+    else:
+        ax.set_ylabel(_t("Sound power level $L_W$ [dB]", language))
+        title = _t("In situ sound power spectrum (ISO 3747)", language)
+        symbol = "$L_{W\\mathrm{A}}$"
+    if np.isfinite(total):
+        title += f"  ({symbol} = {format_number(total, language, decimals=1)} dB(A))"
+    ax.set_title(title)
+    handles: list[Any] = []
+    if np.any(upper):
+        handles.append(
+            Patch(
+                facecolor=_C_PRIMARY,
+                edgecolor=_C_EDGE,
+                hatch="//",
+                label=_t("Upper bound: background margin below 6 dB", language),
+            )
+        )
+    if handles or "label" in kwargs:
+        ax.legend(handles=handles or None, loc="best", fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)
     localize_axes(ax, language)
     return ax
