@@ -56,6 +56,9 @@ the cost of a two-microphone probe and a per-band validity check; the
 surface-velocity route abandons the microphone altogether and pays for it with
 a radiation factor. Each method guide walks its routes in turn.
 
+The plate below draws seven of the eight: the in situ comparison shares the
+sound pressure row's algebra with ISO 3741 and is drawn on its own page.
+
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods.svg" alt="The seven sound power routes, one row for each measured quantity, every cell carrying the same five attributes. The sound pressure row: the ISO 3744/3746 hemispherical enveloping surface over a reflecting plane, the ISO 3745 fixed microphone array in a wedge-lined anechoic room, and the ISO 3741 diffuse field of a reverberation room. The sound intensity row: the ISO 9614-1 measurement surface cut into ten segments with the probe held still at a point in each, the ISO 9614-2 serpentine scan swept over that same surface, and the tighter ISO 9614-3 precision scan. The surface velocity row carries one route across the full width, ISO/TS 7849 with an accelerometer on a radiating casing and no microphone at all" width="92%"></picture>
 
 <details>

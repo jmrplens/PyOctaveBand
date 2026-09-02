@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 585 numerical conformance checks against 374 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 595 numerical conformance checks against 375 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 585 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 59 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 595 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 59 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -478,6 +478,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [power/intensity-compliance](https://jmrplens.github.io/phonometry/reference/api/power/intensity-compliance/)
 - [power/sound-power](https://jmrplens.github.io/phonometry/reference/api/power/sound-power/)
 - [power/sound-power-anechoic](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-anechoic/)
+- [power/sound-power-in-situ](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-in-situ/)
 - [power/sound-power-intensity](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-intensity/)
 - [power/sound-power-intensity-points](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-intensity-points/)
 - [power/sound-power-reverberation](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-reverberation/)
@@ -16323,13 +16324,13 @@ print(np.round(res.background_correction[1], 2))  # position 2: [1.3 0.57 0.26 0
 print(res.grade, res.sigma_r0, round(res.expanded_uncertainty, 1))  # engineering 1.5 3.2
 ```
 
-The 125 Hz band is the one to read twice: at two of the four positions the
-margin over the floor is below 6 dB for the machine, and below 6 dB at every
-position for the reference source, so $K_1$ takes its 1,3 dB cap and the
-88,8 dB the band reports is an **upper bound**, which is what the `False`
-says.
+The 125 Hz band is the one to read twice: at one of the four positions the
+margin over the floor is below 6 dB for the machine, and it is below 6 dB at
+every position for the quieter reference source, so $K_1$ takes its 1,3 dB
+cap and the 88,8 dB the band reports is an **upper bound**, which is what the
+`False` says.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/in_situ_sound_power_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/in_situ_sound_power.svg" alt="Two panels over the seven octave bands from 125 Hz to 8 kHz. The upper panel plots the sound pressure levels at the four microphone positions: the corrected levels of the source under test as filled blue circles with their energy mean as a blue line, the corrected levels of the reference source as green squares with their mean as a green line, the measured levels before the background correction as hollow circles joined to the corrected ones wherever the correction moved them, and the background at each position as grey crosses. A boxed note at 125 Hz says the margin is below 6 dB at two positions, K1 is capped at 1.3 dB and the band is an upper bound. The lower panel draws the resulting sound power level of the source under test as blue bars, the 125 Hz bar hatched as an upper bound, with the calibrated sound power level of the reference source as a red dashed line with diamonds, and states in its title an A-weighted level of 96.1 dB(A), grade 2, and an expanded uncertainty of 3.2 dB with k = 2 and a 0.5 dB operating-condition deviation" width="96%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/in_situ_sound_power_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/in_situ_sound_power.svg" alt="Two panels over the seven octave bands from 125 Hz to 8 kHz. The upper panel plots the sound pressure levels at the four microphone positions: the corrected levels of the source under test as filled blue circles with their energy mean as a blue line, the corrected levels of the reference source as green squares with their mean as a green line, the measured levels before the background correction as hollow circles joined to the corrected ones wherever the correction moved them, and the background at each position as grey crosses. A boxed note at 125 Hz says the margin is below 6 dB at that position and at every position for the reference source, K1 is capped at 1.3 dB and the band is an upper bound. The lower panel draws the resulting sound power level of the source under test as blue bars, the 125 Hz bar hatched as an upper bound, with the calibrated sound power level of the reference source as a red dashed line with diamonds, and states in its title an A-weighted level of 96.1 dB(A), grade 2, and an expanded uncertainty of 3.2 dB with k = 2 and a 0.5 dB operating-condition deviation" width="96%"></picture>
 
 *The comparison position by position: both sources at the four microphones
 after the Eq. 7 correction above, with the hollow markers showing where each
@@ -16386,7 +16387,7 @@ two = emission.sound_power_in_situ(
     background_levels=background,
 )
 print(two.reference_levels.shape)               # (2, 7): mean level per location (Eq. 10)
-print(np.round(two.sound_power_level, 1))       # [89.1 92.0 93.0 92.2 89.3 85.1 79. ]
+print(np.round(two.sound_power_level, 1))       # [89.1 92.  93.  92.2 89.3 85.1 78.9]
 print(round(two.sound_power_level_a, 1))        # 96.5 dB(A)
 ```
 
@@ -16398,7 +16399,7 @@ print(round(two.sound_power_level_a, 1))        # 96.5 dB(A)
 | `levels_ref` | 2D or 3D array | dB | `(n, bands)` or `(m, n, bands)` | The reference source at the same positions, one grid per location, corrected per its manufacturer but not for background |
 | `lw_ref` | 1D or 2D array | dB | `(bands,)` or `(m, bands)` | Calibrated $L_{W(\mathrm{RSS})}$, per location when each was calibrated in its own similar position (Eq. 12) |
 | `frequencies` | 1D array | Hz | 63 Hz to 8 kHz octaves | Nominal octave mid-band frequencies of Table D.1; required |
-| `background_levels` | 1D or 2D array | dB | `(bands,)` or `(n, bands)` | $L_{pi(\mathrm{B})}$; one spectrum serves every position |
+| `background_levels` | 1D or 2D array | dB | `(bands,)` or `(n, bands)` | $L_{pi(\mathrm{B})}$; one spectrum serves every position. `None` warns and leaves `background_requirement_met` `False` in every band, since 7.5 measures it at each position and 8.1 needs the margin |
 | `background_levels_ref` | 1D or 2D array | dB | same shapes | Background for the reference-source reading; `None` reuses `background_levels` (7.5) |
 | `temperature` | float | °C | default `23.0` | Air temperature at the test, for $C_2$ |
 | `static_pressure` | float | kPa | default `101.325` | Static pressure at the test, for $C_2$; see `static_pressure_from_altitude` |
@@ -16467,7 +16468,7 @@ energy = emission.sound_energy_in_situ(
     excess_levels=[8.2, 7.6, 8.9, 8.0], directivity_range=4.0, sigma_omc=2.0,
 )
 print(energy.quantity)                            # energy
-print(np.round(energy.sound_energy_level, 1))     # [103.7 105.3 106.1 105.3 102.5  98.6  93. ]
+print(np.round(energy.sound_energy_level, 1))     # [103.7 105.3 106.1 105.3 102.4  98.6  93. ]
 print(round(energy.sound_energy_level_a, 1))      # 109.7 dB(A) re 1 pJ
 print(round(energy.expanded_uncertainty, 1))      # 5.0 dB: grade 2 with sigma_omc = 2 dB
 ```
@@ -16542,8 +16543,8 @@ print(np.round(emission.excess_sound_pressure_level([81.0, 76.5, 73.8], 92.5, [1
 **A-weighted totals (Annex D).** $L_{W\mathrm{A}}$ and $L_{J\mathrm{A}}$ are the
 energy sums of the band levels plus the Table D.1 corrections $C_k$ (−26,2,
 −16,1, −8,6, −3,2, 0,0, 1,2, 1,0 and −1,1 dB from 63 Hz to 8 kHz, the ISO
-3744 Annex E octave values digit for digit); `frequencies` must be those
-eight nominal centres.
+3744 Annex E octave values digit for digit); every `frequencies` entry must
+be one of those eight nominal centres, distinct and in ascending order.
 
 ## What this guide covers
 
@@ -17979,6 +17980,9 @@ but reaches precision grade; intensity rejects steady background energy at
 the cost of a two-microphone probe and a per-band validity check; the
 surface-velocity route abandons the microphone altogether and pays for it with
 a radiation factor. Each method guide walks its routes in turn.
+
+The plate below draws seven of the eight: the in situ comparison shares the
+sound pressure row's algebra with ISO 3741 and is drawn on its own page.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods.svg" alt="The seven sound power routes, one row for each measured quantity, every cell carrying the same five attributes. The sound pressure row: the ISO 3744/3746 hemispherical enveloping surface over a reflecting plane, the ISO 3745 fixed microphone array in a wedge-lined anechoic room, and the ISO 3741 diffuse field of a reverberation room. The sound intensity row: the ISO 9614-1 measurement surface cut into ten segments with the probe held still at a point in each, the ISO 9614-2 serpentine scan swept over that same surface, and the tighter ISO 9614-3 precision scan. The surface velocity row carries one route across the full width, ISO/TS 7849 with an accelerometer on a radiating casing and no microphone at all" width="92%"></picture>
 
@@ -50657,7 +50661,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 585 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 595 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -51024,7 +51028,7 @@ sample from the metrology core:
 | IEC 61252:1993 | The personal sound exposure quantities, `sound_exposure()` and the normalized 8 h level `lex_8h()`; IEC 61252:2025 has since superseded this print, and the transcription still targets the 1993+A2 text | `tests/signals/test_levels.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-585 numerical conformance checks across 59 domains and 374 standards, covering
+595 numerical conformance checks across 59 domains and 375 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise

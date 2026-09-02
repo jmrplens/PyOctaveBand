@@ -59,7 +59,9 @@ funcionar en varias ubicaciones a lo largo de los lados (apartado 7.3).
 Ambas fuentes y el ruido de fondo se leen en las **mismas posiciones con las
 mismas orientaciones de micrófono**, la fuente de referencia durante 30 s
 (apartado 7.5), y toda la determinación se hace en **bandas de octava de
-125 Hz a 8 kHz** (apartado 3.11), el único rango que tabula el Anexo D.
+125 Hz a 8 kHz** (apartado 3.11); la Tabla D.1 tabula además una fila de
+63 Hz, para usarla solo donde el entorno y la instrumentación sean
+satisfactorios en esa banda (nota a), y por eso la API la acepta también.
 
 El ruido de fondo se corrige **posición a posición** antes de promediar nada
 (apartado 8.1, Ec. 7):
@@ -164,17 +166,18 @@ print(np.round(res.background_correction[1], 2))  # posición 2: [1.3 0.57 0.26 
 print(res.grade, res.sigma_r0, round(res.expanded_uncertainty, 1))  # engineering 1.5 3.2
 ```
 
-La banda de 125 Hz es la que hay que leer dos veces. En dos de las cuatro
+La banda de 125 Hz es la que hay que leer dos veces. En una de las cuatro
 posiciones el margen sobre el ruido de la nave está por debajo de 6 dB para
-la máquina, y por debajo de 6 dB en todas las posiciones para la fuente de
-referencia, así que $K_1$ toma allí su tope de 1,3 dB y los 88,8 dB que
-reporta la banda son una **cota superior**, que es lo que dice el `False`.
-Todas las demás bandas superan los 6 dB en todas partes, la de 250 Hz con
-correcciones de medio decibelio que la Ec. 7 evalúa en lugar de ignorar, y
-de 1 kHz en adelante el margen supera los 15 dB en la mayoría de las
-posiciones y la corrección es cero.
+la máquina, y está por debajo de 6 dB en todas las posiciones para la fuente
+de referencia, más silenciosa, así que $K_1$ toma allí su tope de 1,3 dB y
+los 88,8 dB que reporta la banda son una **cota superior**, que es lo que
+dice el `False`. Todas las demás bandas superan los 6 dB en todas partes, la
+de 250 Hz con correcciones de medio decibelio que la Ec. 7 evalúa en lugar
+de ignorar, y de 1 kHz en adelante el margen supera los 15 dB en dos o tres
+de las cuatro posiciones, donde la corrección es cero; la que aún toman las
+demás se queda por debajo de 0,25 dB.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/in_situ_sound_power_es.svg" alt="Dos paneles sobre las siete bandas de octava de 125 Hz a 8 kHz. El panel superior representa los niveles de presión acústica en las cuatro posiciones de micrófono: los niveles corregidos de la fuente en ensayo como círculos azules rellenos con su media energética como línea azul, los niveles corregidos de la fuente de referencia como cuadrados verdes con su media como línea verde, los niveles medidos antes de la corrección por ruido de fondo como círculos huecos unidos a los corregidos allí donde la corrección los movió, y el ruido de fondo en cada posición como aspas grises. Una nota enmarcada en 125 Hz dice que el margen está por debajo de 6 dB en dos posiciones, que K1 se limita a 1,3 dB y que la banda es una cota superior. El panel inferior dibuja el nivel de potencia acústica resultante de la fuente en ensayo como barras azules, la de 125 Hz rayada como cota superior, con el nivel de potencia acústica calibrado de la fuente de referencia como línea roja discontinua con rombos, y declara en su título un nivel ponderado A de 96,1 dB(A), grado 2, y una incertidumbre expandida de 3,2 dB con k = 2 y una desviación de 0,5 dB por condiciones de funcionamiento" width="96%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/in_situ_sound_power_es.svg" alt="Dos paneles sobre las siete bandas de octava de 125 Hz a 8 kHz. El panel superior representa los niveles de presión acústica en las cuatro posiciones de micrófono: los niveles corregidos de la fuente en ensayo como círculos azules rellenos con su media energética como línea azul, los niveles corregidos de la fuente de referencia como cuadrados verdes con su media como línea verde, los niveles medidos antes de la corrección por ruido de fondo como círculos huecos unidos a los corregidos allí donde la corrección los movió, y el ruido de fondo en cada posición como aspas grises. Una nota enmarcada en 125 Hz dice que el margen está por debajo de 6 dB en esa posición y en todas las posiciones para la fuente de referencia, que K1 se limita a 1,3 dB y que la banda es una cota superior. El panel inferior dibuja el nivel de potencia acústica resultante de la fuente en ensayo como barras azules, la de 125 Hz rayada como cota superior, con el nivel de potencia acústica calibrado de la fuente de referencia como línea roja discontinua con rombos, y declara en su título un nivel ponderado A de 96,1 dB(A), grado 2, y una incertidumbre expandida de 3,2 dB con k = 2 y una desviación de 0,5 dB por condiciones de funcionamiento" width="96%" />
 
 *La comparación posición a posición. Arriba, ambas fuentes en los cuatro
 micrófonos tras la corrección de la Ec. 7, con los marcadores huecos
@@ -234,7 +237,7 @@ two = emission.sound_power_in_situ(
     background_levels=background,
 )
 print(two.reference_levels.shape)               # (2, 7): nivel medio por ubicación (Ec. 10)
-print(np.round(two.sound_power_level, 1))       # [89.1 92.0 93.0 92.2 89.3 85.1 79. ]
+print(np.round(two.sound_power_level, 1))       # [89.1 92.  93.  92.2 89.3 85.1 78.9]
 print(round(two.sound_power_level_a, 1))        # 96.5 dB(A)
 ```
 
@@ -246,7 +249,7 @@ print(round(two.sound_power_level_a, 1))        # 96.5 dB(A)
 | `levels_ref` | array 2D o 3D | dB | `(n, bandas)` o `(m, n, bandas)` | La fuente de referencia en las mismas posiciones, una rejilla por ubicación, corregida según su fabricante por velocidad, temperatura y presión pero no por ruido de fondo |
 | `lw_ref` | array 1D o 2D | dB | `(bandas,)` o `(m, bandas)` | $L_{W(\mathrm{RSS})}$ calibrada, por ubicación cuando cada una se calibró en su propia posición similar (Ec. 12) |
 | `frequencies` | array 1D | Hz | octavas de 63 Hz a 8 kHz | Frecuencias centrales nominales de octava de la Tabla D.1; obligatorio |
-| `background_levels` | array 1D o 2D | dB | `(bandas,)` o `(n, bandas)` | $L_{pi(\mathrm{B})}$; un espectro sirve para todas las posiciones |
+| `background_levels` | array 1D o 2D | dB | `(bandas,)` o `(n, bandas)` | $L_{pi(\mathrm{B})}$; un espectro sirve para todas las posiciones. `None` avisa y deja `background_requirement_met` a `False` en todas las bandas, porque el 7.5 lo mide en cada posición y el 8.1 necesita el margen |
 | `background_levels_ref` | array 1D o 2D | dB | mismas formas | Ruido de fondo de la lectura de la fuente de referencia; `None` reutiliza `background_levels` (7.5) |
 | `temperature` | float | °C | por defecto `23.0` | Temperatura del aire en el ensayo, para $C_2$ |
 | `static_pressure` | float | kPa | por defecto `101.325` | Presión estática en el ensayo, para $C_2$; véase `static_pressure_from_altitude` |
@@ -323,7 +326,7 @@ energy = emission.sound_energy_in_situ(
     excess_levels=[8.2, 7.6, 8.9, 8.0], directivity_range=4.0, sigma_omc=2.0,
 )
 print(energy.quantity)                            # energy
-print(np.round(energy.sound_energy_level, 1))     # [103.7 105.3 106.1 105.3 102.5  98.6  93. ]
+print(np.round(energy.sound_energy_level, 1))     # [103.7 105.3 106.1 105.3 102.4  98.6  93. ]
 print(round(energy.sound_energy_level_a, 1))      # 109.7 dB(A) re 1 pJ
 print(round(energy.expanded_uncertainty, 1))      # 5.0 dB: grado 2 con sigma_omc = 2 dB
 ```
@@ -437,9 +440,9 @@ las sumas energéticas de los niveles de banda más las correcciones $C_k$ de
 la Tabla D.1, que son −26,2, −16,1, −8,6, −3,2, 0,0, 1,2, 1,0 y −1,1 dB de
 63 Hz a 8 kHz, los valores de octava del Anexo E de ISO 3744 dígito a
 dígito; la biblioteca los lee de la tabla compartida y exige que
-`frequencies` sean esos ocho centros nominales, la fila de 63 Hz solo para
-uso donde el entorno y la instrumentación son satisfactorios allí (Tabla
-D.1, nota a).
+cada valor de `frequencies` sea uno de esos ocho centros nominales, distinto
+y en orden ascendente; la fila de 63 Hz es solo para uso donde el entorno y
+la instrumentación son satisfactorios allí (Tabla D.1, nota a).
 
 ## Qué cubre esta guía
 

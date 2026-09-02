@@ -1,6 +1,6 @@
 ---
 title: "Guías"
-description: "Las 109 guías de phonometry, agrupadas en los once temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
+description: "Las 110 guías de phonometry, agrupadas en los once temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
 head:
   - tag: script
     attrs:
@@ -104,7 +104,7 @@ hay ninguna panorámica del campo: cada página es la documentación de trabajo 
 un módulo, escrita para que un resultado se pueda defender apartado por
 apartado en lugar de darlo por bueno.
 
-Esta página es el mapa. Ciento nueve guías repartidas en once temas, y cada
+Esta página es el mapa. Ciento diez guías repartidas en once temas, y cada
 área tiene su propio índice con el relato largo de cómo encajan sus piezas. Si
 llegas sin una pregunta concreta, lee primero la
 [introducción](/phonometry/es/start/getting-started/): recorre una señal por toda la

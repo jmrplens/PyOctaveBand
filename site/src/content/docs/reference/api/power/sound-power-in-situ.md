@@ -34,7 +34,10 @@ $$
 with three rules around it: a margin above 15 dB needs no correction, a
 margin between 6 dB and 15 dB takes Eq. (7), and a margin below 6 dB caps
 the correction at 1,3 dB and turns the band into an upper bound that the
-report must flag as not meeting the background requirement. When the RSS is
+report must flag as not meeting the background requirement. A determination
+that carries no background reading at all cannot meet that requirement
+either, since 8.1 declares a measurement valid only where the margin is at
+least 6 dB and 7.5 has the background obtained once at each position. When the RSS is
 run at `m` locations around a large source the calibrated powers and the
 per-location means are each energy-averaged over the locations before the
 subtraction (clause 8.3.2, Eq. 12).
@@ -112,7 +115,7 @@ traverse of levels and distances.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | if any input is not finite or any `distance` is not positive. |
+| ValueError | if any input is empty or not finite, any `distance` is not positive, or the three shapes do not broadcast against each other. |
 
 ## InSituSoundPowerResult
 
@@ -166,9 +169,13 @@ for the source under test (Eq. 7; for `N` events measured one at a
 time it is the per-position shift the per-event corrections of Eq. 13
 produce in the mean of Eq. 15), `background_correction_ref` the same for
 the reference source at each location (Eq. 9, 10), and
-`background_requirement_met` is `False` in every band where some
-margin fell below 6 dB, so that the level there is an upper bound to be
-reported as such (8.1).
+`background_requirement_met` is `True` only where clause 8.1 declares
+the measurement valid: a background level reached every position (7.5)
+and every margin over it was at least 6 dB. It is `False` in a band
+where some margin fell below 6 dB, and `False` throughout when no
+background levels were supplied at all, since nothing was measured
+against; either way the level is an upper bound to be reported as such
+(8.1).
 
 `grade` is the accuracy grade Table 2 grants (`'engineering'` or
 `'survey'`) and `sigma_r0` its typical reproducibility; `sigma_omc`,
@@ -262,7 +269,7 @@ time-averaged, over 30 s (7.6), exactly as for a steady source.
 | `lw_ref` | Calibrated sound power level of the reference source, `(bands,)` or `(m, bands)`, in decibels. |
 | `frequencies` | Nominal octave mid-band frequencies, one per band. |
 | `events` | The number `N` of events a 2D `event_levels` contains (Eq. 17); must be `None` with the 3D form, which counts them. |
-| `background_levels` | Octave-band time-averaged background levels `Lpi(B)`, `(n, bands)` or `(bands,)`, in decibels. |
+| `background_levels` | Octave-band time-averaged background levels `Lpi(B)`, `(n, bands)` or `(bands,)`, in decibels; `None` applies no correction, warns, and leaves `background_requirement_met` `False` in every band (7.5, 8.1). |
 | `background_levels_ref` | Background for the reference-source measurement; `None` reuses `background_levels` (7.5). |
 | `integration_time` | The integration time `T` of the event measurement, in seconds. `None` applies Eq. (14) as printed, subtracting the time-averaged background from the single event level; a value carries the background to the same interval first, $L_{pi(\mathrm{B})} + 10 \log_{10}(T/T_0)$ with `T0` = 1 s (3.4, NOTE 1), so that the margin compares like with like. The two coincide at `T` = 1 s. |
 | `temperature` | Air temperature at the test, in degrees Celsius. |
@@ -327,7 +334,7 @@ conditions of Annex C, and `sound_power_level_a` is the Annex D total.
 | `levels_ref` | The same for the reference sound source, `L'pi(RSS)` already corrected for speed, temperature and static pressure per its manufacturer but not for background: `(n, bands)` for one location, or `(m, n, bands)` for `m` locations (Eq. 10). |
 | `lw_ref` | Calibrated octave-band sound power level `LW(RSS)` of the reference source, `(bands,)`, or `(m, bands)` when each location was calibrated in its own similar position (Eq. 12), in decibels. |
 | `frequencies` | Nominal octave mid-band frequencies, one per band, from 63 Hz to 8 kHz (Table D.1), in hertz. |
-| `background_levels` | Octave-band time-averaged background levels `Lpi(B)`, `(n, bands)` or one `(bands,)` spectrum for every position, in decibels; `None` applies no correction. |
+| `background_levels` | Octave-band time-averaged background levels `Lpi(B)`, `(n, bands)` or one `(bands,)` spectrum for every position, in decibels; `None` applies no correction, warns, and leaves `background_requirement_met` `False` in every band, since 7.5 has the background measured at each position and 8.1 needs the margin to declare the measurement valid. |
 | `background_levels_ref` | Background for the reference-source measurement, same shapes; `None` reuses `background_levels`, since the procedure takes one background reading (7.5). |
 | `temperature` | Air temperature at the test, in degrees Celsius. |
 | `static_pressure` | Static pressure at the test, in kilopascals (see [`static_pressure_from_altitude`](/phonometry/reference/api/power/sound-power-in-situ/#static_pressure_from_altitude)). |
@@ -342,7 +349,7 @@ conditions of Annex C, and `sound_power_level_a` is the Annex D total.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | if `levels` is not a finite `(n, bands)` array, `levels_ref`, `lw_ref` or either background does not match it, `frequencies` are not the octave centres of Table D.1, `temperature` or `static_pressure` is out of range, `excess_levels` is not one finite value per position, `directivity_range` or `sigma_omc` is negative, or `coverage_factor` is not positive. |
+| ValueError | if `levels` is not a finite `(n, bands)` array, `levels_ref`, `lw_ref` or either background does not match it, `frequencies` are not the octave centres of Table D.1, `temperature` or `static_pressure` is out of range, `excess_levels` is supplied and is not one finite value per position, `directivity_range` or `sigma_omc` is supplied and is negative, or `coverage_factor` is not positive. |
 
 ## static_pressure_from_altitude
 
@@ -367,7 +374,7 @@ the formula stops meaning anything where the base reaches zero, some
 
 | Name | Description |
 | :--- | :--- |
-| `altitude` | Altitude of the test site `Ha`, in metres. |
+| `altitude` | Altitude of the test site `Ha`, in metres, one site at a time. |
 
 **Returns:** The static pressure `ps`, in kilopascals.
 
@@ -375,4 +382,4 @@ the formula stops meaning anything where the base reaches zero, some
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | if `altitude` is not finite or `1 - a Ha` is not positive. |
+| ValueError | if `altitude` is not a single finite number or `1 - a Ha` is not positive. |
