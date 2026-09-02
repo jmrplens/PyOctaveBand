@@ -158,8 +158,8 @@ def test_table_a5_5000_hz_reads_the_missing_digit_as_one() -> None:
     = 6,00 + 1,54 + 0,174 - 0,0124 - 0,00232 = 7,69928 dB.
     """
     with pytest.warns(emission.SoundPowerWarning, match="without its leading digit"):
-        computed = float(emission.flow_modal_correction([5000.0], 10.0, 1.0)[0])
-    assert computed == pytest.approx(7.69928, abs=1e-9)
+        row = emission.flow_modal_correction([5000.0], 10.0, 1.0)
+    assert float(row[0]) == pytest.approx(7.69928, abs=1e-9)
     assert dict(_TABLE_A5)[5000][3] == pytest.approx(-1.24e-05)
 
 
@@ -504,10 +504,11 @@ def test_table_2_is_reported_for_every_shield_and_says_so() -> None:
     reproducibility. The result cannot carry a better figure, because the
     standard publishes none, but it can say which of the two it is holding.
     """
-    tube = emission.sound_power_in_duct(_flat(80.0), _BANDS, 0.5, 10.0)
+    levels = _flat(80.0)
+    tube = emission.sound_power_in_duct(levels, _BANDS, 0.5, 10.0)
     with pytest.warns(emission.SoundPowerWarning, match="sampling tube only"):
         cone = emission.sound_power_in_duct(
-            _flat(80.0), _BANDS, 0.5, 10.0, shield="nose-cone"
+            levels, _BANDS, 0.5, 10.0, shield="nose-cone"
         )
     np.testing.assert_allclose(
         cone.reproducibility_standard_deviation, tube.reproducibility_standard_deviation
@@ -736,43 +737,50 @@ def test_refuses_non_finite_or_non_numeric_levels() -> None:
 
 
 def test_refuses_a_correction_of_the_wrong_length() -> None:
+    levels = _flat(80.0)
+    two_of_them = [0.1, 0.2]
+    one_band_short = np.zeros(26)
     with pytest.raises(
         ValueError, match="'microphone_correction' must be a scalar or carry"
     ):
         emission.sound_power_in_duct(
-            _flat(80.0), _BANDS, 0.5, 10.0, microphone_correction=[0.1, 0.2]
+            levels, _BANDS, 0.5, 10.0, microphone_correction=two_of_them
         )
     with pytest.raises(ValueError, match=r"per band \(27 in 'frequencies'\)"):
         emission.sound_power_in_duct(
-            _flat(80.0), _BANDS, 0.5, 10.0, microphone_correction=[0.1, 0.2]
+            levels, _BANDS, 0.5, 10.0, microphone_correction=two_of_them
         )
     with pytest.raises(
         ValueError, match="'shield_correction' must be a scalar or carry"
     ):
         emission.sound_power_in_duct(
-            _flat(80.0), _BANDS, 0.5, 10.0, shield_correction=np.zeros(26)
+            levels, _BANDS, 0.5, 10.0, shield_correction=one_band_short
         )
 
 
 def test_refuses_a_non_finite_correction() -> None:
+    levels = _flat(80.0)
+    infinity = float("inf")
+    not_a_number = float("nan")
     with pytest.raises(
         ValueError, match="'microphone_correction' must contain only finite"
     ):
         emission.sound_power_in_duct(
-            _flat(80.0), _BANDS, 0.5, 10.0, microphone_correction=float("inf")
+            levels, _BANDS, 0.5, 10.0, microphone_correction=infinity
         )
     with pytest.raises(
         ValueError, match="'shield_correction' must contain only finite"
     ):
         emission.sound_power_in_duct(
-            _flat(80.0), _BANDS, 0.5, 10.0, shield_correction=float("nan")
+            levels, _BANDS, 0.5, 10.0, shield_correction=not_a_number
         )
 
 
 def test_warns_below_three_positions() -> None:
     """Clause 6.2.2 asks for at least three circumferential positions."""
+    two_positions = _flat(80.0, positions=2)
     with pytest.warns(emission.SoundPowerWarning, match="at least 3"):
-        emission.sound_power_in_duct(_flat(80.0, positions=2), _BANDS, 0.5, 10.0)
+        emission.sound_power_in_duct(two_positions, _BANDS, 0.5, 10.0)
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         emission.sound_power_in_duct(_flat(80.0, positions=3), _BANDS, 0.5, 10.0)

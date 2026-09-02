@@ -456,9 +456,12 @@ _TABLE_A4: _Rows = (
     ),
 )
 
-#: The one band of Annex A whose coefficient is a reading rather than a
-#: transcription: see :func:`_warn_reconstructed_coefficient`.
+#: The one cell of Annex A whose coefficient is a reading rather than a
+#: transcription: the band and the diameter range that select it, which is
+#: Table A.5 (see :func:`_warn_reconstructed_coefficient`). Named as the range
+#: rather than as the table object, so the test is on the caller's own inputs.
 _RECONSTRUCTED_BAND_HZ = 5000
+_RECONSTRUCTED_DIAMETER_RANGE_M = (0.8, 1.25)
 
 #: Table A.5: 0,8 m <= d < 1,25 m. The a3 of the 5 000 Hz row is printed with
 #: its leading digit missing, "- ,24 x 10-05"; it is read as -1,24e-05, the
@@ -876,7 +879,7 @@ def _annex_a_rows(duct_diameter: float) -> _Rows:
     return _ANNEX_A_TABLES[-1][1]
 
 
-def _warn_reconstructed_coefficient(rows: _Rows, freqs: np.ndarray) -> None:
+def _warn_reconstructed_coefficient(duct_diameter: float, freqs: np.ndarray) -> None:
     """Say so when a band is answered with a coefficient that is a reading.
 
     One cell of Annex A is not legible: the ``a3`` of the 5 000 Hz row of
@@ -888,7 +891,8 @@ def _warn_reconstructed_coefficient(rows: _Rows, freqs: np.ndarray) -> None:
     barely at all at the bottom. No printed value crosses this cell, because
     Table D.1 is tabulated for a diameter served by Table A.4.
     """
-    if rows is not _TABLE_A5 or not np.any(freqs == _RECONSTRUCTED_BAND_HZ):
+    low, high = _RECONSTRUCTED_DIAMETER_RANGE_M
+    if not (low <= duct_diameter < high) or not np.any(freqs == _RECONSTRUCTED_BAND_HZ):
         return
     warnings.warn(
         f"The {_RECONSTRUCTED_BAND_HZ:g} Hz coefficient a3 of Table A.5 "
@@ -979,7 +983,7 @@ def flow_modal_correction(
         return np.full(freqs.shape, value, dtype=np.float64)
     _check_informative_bands(freqs, u)
     rows = _annex_a_rows(duct_diameter)
-    _warn_reconstructed_coefficient(rows, freqs)
+    _warn_reconstructed_coefficient(duct_diameter, freqs)
     return np.asarray(
         [
             np.polynomial.polynomial.polyval(u, _annex_a_coefficients(rows, band))
