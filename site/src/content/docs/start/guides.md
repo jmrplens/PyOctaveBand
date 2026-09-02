@@ -1,6 +1,6 @@
 ---
 title: "Guides"
-description: "The 110 guides of phonometry, grouped into the eleven topics the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
+description: "The 111 guides of phonometry, grouped into the eleven topics the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
 head:
   - tag: script
     attrs:
@@ -103,7 +103,7 @@ makes, then runnable code and the figure it draws. Nothing here is a survey of
 the field; each page is the working documentation of a module, written so that
 a result can be defended clause by clause rather than trusted.
 
-This page is the map. A hundred and ten guides sit in eleven topics, and each topic has its
+This page is the map. A hundred and eleven guides sit in eleven topics, and each topic has its
 own overview page with the longer story of how its pieces fit together. If you
 are arriving without a specific question, read
 [Getting Started](/phonometry/start/getting-started/) first: it runs one signal
