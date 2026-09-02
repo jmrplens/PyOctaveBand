@@ -4,12 +4,16 @@
 from __future__ import annotations
 
 import dataclasses
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 import reference_data as ref
 
 from phonometry import building
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 def _levels_for_target_ri(
@@ -313,3 +317,455 @@ def test_reduction_rejects_modified_index_of_another_band_count() -> None:
     stretched = np.append(result.r_i_modified, 0.0)
     with pytest.raises(ValueError, match=r"'r_i_modified'.*one value per band"):
         dataclasses.replace(result, r_i_modified=stretched)
+
+
+# ---------------------------------------------------------------------------
+# ISO 15186-3:2002 - low-frequency intensity method
+# ---------------------------------------------------------------------------
+
+
+def test_limp_panel_reproduces_printed_table_a1_plaster_column() -> None:
+    """Annex A reproduces its own plaster-board column of Table A.1."""
+    r = building.limp_panel_reduction_index(
+        ref.ISO15186_3_ANNEX_A_BANDS,
+        surface_mass=ref.ISO15186_3_PLASTER_SURFACE_MASS,
+        area=ref.ISO15186_3_PLASTER_AREA,
+        temperature=ref.ISO15186_3_ANNEX_A_TEMPERATURE,
+        static_pressure=ref.ISO15186_3_ANNEX_A_PRESSURE,
+    )
+    # The table prints one decimal, so agreement is asserted at that
+    # resolution: every band rounds to the published value.
+    assert np.round(r, 1).tolist() == ref.ISO15186_3_PLASTER_TABLE_A1
+
+
+def test_limp_panel_climate_enters_through_a4_and_a5() -> None:
+    """Colder air is denser, so rho c rises and the mass law reads lower."""
+    warm = building.limp_panel_reduction_index(
+        [100.0], surface_mass=10.0, area=10.0, temperature=23.0
+    )
+    cold = building.limp_panel_reduction_index(
+        [100.0], surface_mass=10.0, area=10.0, temperature=0.0
+    )
+    assert cold[0] < warm[0]
+    # Formula (A.4) is linear in B, and (A.2) takes 20 lg of its reciprocal.
+    half = building.limp_panel_reduction_index(
+        [100.0], surface_mass=10.0, area=10.0, static_pressure=101300.0 / 2.0
+    )
+    assert half[0] - warm[0] == pytest.approx(20.0 * np.log10(2.0))
+
+
+def test_limp_panel_doubling_mass_adds_six_decibels() -> None:
+    """R0 = 20 lg(pi f m / rho c), so doubling m adds 20 lg 2."""
+    single = building.limp_panel_reduction_index(
+        ref.ISO15186_3_ANNEX_A_BANDS, surface_mass=10.0, area=10.0
+    )
+    double = building.limp_panel_reduction_index(
+        ref.ISO15186_3_ANNEX_A_BANDS, surface_mass=20.0, area=10.0
+    )
+    assert np.allclose(double - single, 20.0 * np.log10(2.0))
+
+
+def test_limp_panel_refuses_area_below_one_square_metre() -> None:
+    """A.1 states Formula (A.3) for a panel of at least 1 m2."""
+    with pytest.raises(ValueError, match="at least 1 m2"):
+        building.limp_panel_reduction_index([100.0], surface_mass=10.0, area=0.5)
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "match"),
+    [
+        ({"surface_mass": 0.0, "area": 10.0}, "surface_mass"),
+        ({"surface_mass": 10.0, "area": 10.0, "static_pressure": -1.0}, "pressure"),
+        ({"surface_mass": 10.0, "area": 10.0, "temperature": -300.0}, "temperature"),
+        ({"surface_mass": np.nan, "area": 10.0}, "surface_mass"),
+    ],
+)
+def test_limp_panel_rejects_impossible_inputs(
+    kwargs: dict[str, float], match: str
+) -> None:
+    """Annex A refuses inputs its formulas cannot be evaluated at."""
+    with pytest.raises(ValueError, match=match):
+        building.limp_panel_reduction_index([100.0], **kwargs)
+
+
+def test_limp_panel_rejects_nonpositive_frequency() -> None:
+    """Formula (A.2) takes the logarithm of the frequency."""
+    with pytest.raises(ValueError, match="'frequencies' must be positive"):
+        building.limp_panel_reduction_index([0.0], surface_mass=10.0, area=10.0)
+
+
+def test_low_frequency_ri_reproduces_formula_7() -> None:
+    """RI = LpS - 9 - [LIn + 10 lg(Sm/S)], nine decibels and not six."""
+    r = building.low_frequency_intensity_reduction(
+        [84.0, 86.0, 88.0],
+        [60.0, 61.0, 62.0],
+        measurement_area=12.0,
+        area=10.0,
+        frequencies=[50.0, 63.0, 80.0],
+    )
+    expected = [
+        lp - 9.0 - (lin + 10.0 * np.log10(12.0 / 10.0))
+        for lp, lin in ((84.0, 60.0), (86.0, 61.0), (88.0, 62.0))
+    ]
+    assert r.r_i == pytest.approx(expected)
+
+
+def test_low_frequency_ri_is_three_decibels_below_its_part_one_sibling() -> None:
+    """The surface measurement sees the pressure the wall doubles."""
+    kwargs = {"measurement_area": 12.0, "area": 10.0}
+    part1 = building.intensity_sound_reduction([84.0], [60.0], **kwargs)
+    part3 = building.low_frequency_intensity_reduction([84.0], [60.0], **kwargs)
+    assert part1.r_i[0] - part3.r_i[0] == pytest.approx(3.0)
+
+
+def test_low_frequency_indicator_is_formula_5() -> None:
+    """FpI = Lp - LIn, both read on the receiving-side measurement surface."""
+    r = building.low_frequency_intensity_reduction(
+        [84.0, 86.0],
+        [70.0, 79.0],
+        measurement_area=10.0,
+        area=10.0,
+        l_p=[84.0, 86.0],
+    )
+    assert r.surface_pressure_intensity == pytest.approx([14.0, 7.0])
+
+
+def test_low_frequency_indicator_is_not_the_source_room_level() -> None:
+    """Formula (5) never touches LpS: without l_p there is no indicator."""
+    r = building.low_frequency_intensity_reduction(
+        [84.0, 86.0], [70.0, 79.0], measurement_area=10.0, area=10.0
+    )
+    assert r.surface_pressure_intensity is None
+    assert r.qualified is None
+    # Same source-room levels, two different receiving-side pressures: the
+    # index cannot tell them apart, the indicator does.
+    quiet = building.low_frequency_intensity_reduction(
+        [84.0], [70.0], measurement_area=10.0, area=10.0, l_p=[75.0]
+    )
+    loud = building.low_frequency_intensity_reduction(
+        [84.0], [70.0], measurement_area=10.0, area=10.0, l_p=[85.0]
+    )
+    assert quiet.r_i == pytest.approx(loud.r_i)
+    assert quiet.qualified is not None
+    assert loud.qualified is not None
+    assert quiet.qualified[0]
+    assert not loud.qualified[0]
+
+
+@pytest.mark.parametrize(
+    ("absorbing", "limit", "qualified"),
+    [(False, 10.0, [False, True, True]), (True, 6.0, [False, False, True])],
+)
+def test_low_frequency_qualification_follows_clause_6_4_2(
+    absorbing: bool, limit: float, qualified: list[bool]
+) -> None:
+    """FpI above 10 dB (or 6 dB for an absorbing specimen) is not qualified."""
+    r = building.low_frequency_intensity_reduction(
+        [90.0, 90.0, 90.0],
+        [70.0, 70.0, 70.0],
+        measurement_area=10.0,
+        area=10.0,
+        l_p=[81.0, 79.0, 76.0],
+        absorbing_specimen_surface=absorbing,
+    )
+    assert r.indicator_limit == limit
+    # 11, 9 and 6 dB: the limit itself is satisfactory, the clause refuses
+    # only what exceeds it.
+    assert r.surface_pressure_intensity == pytest.approx([11.0, 9.0, 6.0])
+    assert r.qualified is not None
+    assert r.qualified.tolist() == qualified
+
+
+def test_low_frequency_keeps_the_index_of_a_refused_band() -> None:
+    """A refused band is flagged, not dropped: 6.4.2 asks for a better setup."""
+    r = building.low_frequency_intensity_reduction(
+        [90.0], [70.0], measurement_area=10.0, area=10.0, l_p=[90.0]
+    )
+    assert r.qualified is not None
+    assert not r.qualified[0]
+    assert r.r_i[0] == pytest.approx(11.0)
+
+
+@pytest.mark.parametrize("band", [40.0, 200.0, 1000.0])
+def test_low_frequency_refuses_bands_outside_clause_6_6(band: float) -> None:
+    """Clause 6.6 defines this method from 50 Hz to 160 Hz only."""
+    with pytest.raises(ValueError, match="50 Hz to 160 Hz"):
+        building.low_frequency_intensity_reduction(
+            [80.0], [60.0], measurement_area=10.0, area=10.0, frequencies=[band]
+        )
+
+
+def test_low_frequency_accepts_every_band_clause_6_6_allows() -> None:
+    """The three mandatory bands and the three optional ones."""
+    bands = ref.ISO15186_3_ANNEX_A_BANDS
+    r = building.low_frequency_intensity_reduction(
+        [80.0] * len(bands),
+        [60.0] * len(bands),
+        measurement_area=10.0,
+        area=10.0,
+        frequencies=bands,
+    )
+    assert r.frequencies is not None
+    assert r.frequencies.tolist() == list(bands)
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "match"),
+    [
+        ({"measurement_area": 0.0, "area": 10.0}, "measurement_area"),
+        ({"measurement_area": 10.0, "area": -1.0}, "area"),
+        ({"measurement_area": np.inf, "area": 10.0}, "measurement_area"),
+    ],
+)
+def test_low_frequency_rejects_nonpositive_areas(
+    kwargs: dict[str, float], match: str
+) -> None:
+    """Formula (7) takes 10 lg(Sm/S), which needs both areas positive."""
+    with pytest.raises(ValueError, match=match):
+        building.low_frequency_intensity_reduction([80.0], [60.0], **kwargs)
+
+
+def test_low_frequency_band_count_mismatch_raises() -> None:
+    """The two level arrays index the same bands."""
+    with pytest.raises(ValueError, match="l_in"):
+        building.low_frequency_intensity_reduction(
+            [80.0, 81.0], [60.0], measurement_area=10.0, area=10.0
+        )
+
+
+def test_low_frequency_frequency_count_mismatch_raises() -> None:
+    """So do the frequencies, when they are given."""
+    with pytest.raises(ValueError, match="frequencies"):
+        building.low_frequency_intensity_reduction(
+            [80.0, 81.0],
+            [60.0, 61.0],
+            measurement_area=10.0,
+            area=10.0,
+            frequencies=[50.0],
+        )
+
+
+def test_low_frequency_result_rejects_arrays_that_disagree() -> None:
+    """The result pins the shapes where they are built."""
+    r = building.low_frequency_intensity_reduction(
+        [80.0, 81.0],
+        [60.0, 61.0],
+        measurement_area=10.0,
+        area=10.0,
+        l_p=[70.0, 71.0],
+    )
+    with pytest.raises(ValueError, match="qualified"):
+        dataclasses.replace(r, qualified=np.array([True]))
+
+
+def test_low_frequency_result_rejects_half_an_indicator() -> None:
+    """The indicator and the qualification are one answer, given together."""
+    r = building.low_frequency_intensity_reduction(
+        [80.0], [60.0], measurement_area=10.0, area=10.0, l_p=[70.0]
+    )
+    with pytest.raises(ValueError, match="two\\s+halves"):
+        dataclasses.replace(r, qualified=None)
+
+
+def test_low_frequency_l_p_band_count_mismatch_raises() -> None:
+    """Formula (5) subtracts two arrays that index the same bands."""
+    with pytest.raises(ValueError, match="l_p"):
+        building.low_frequency_intensity_reduction(
+            [80.0, 81.0],
+            [60.0, 61.0],
+            measurement_area=10.0,
+            area=10.0,
+            l_p=[70.0],
+        )
+
+
+def test_low_frequency_element_reproduces_formula_8() -> None:
+    """DI,n,e = LpS - 9 - [LIn - 10 lg(A0/Sm) - 10 lg N], A0 = 10 m2."""
+    r = building.low_frequency_element_normalized_difference(
+        [90.0], [60.0], measurement_area=10.0
+    )
+    # Sm = A0 and N = 1, so both bracket terms vanish: 90 - 9 - 60.
+    assert r.d_i_n_e[0] == pytest.approx(21.0)
+    scaled = building.low_frequency_element_normalized_difference(
+        [90.0], [60.0], measurement_area=20.0
+    )
+    assert scaled.d_i_n_e[0] == pytest.approx(21.0 - 10.0 * np.log10(2.0))
+
+
+def test_low_frequency_element_adds_the_unit_count() -> None:
+    """This part prints +10 lg N, the sign its part 1 sibling gets wrong."""
+    single = building.low_frequency_element_normalized_difference(
+        [90.0], [60.0], measurement_area=10.0
+    )
+    four = building.low_frequency_element_normalized_difference(
+        [90.0], [60.0], measurement_area=10.0, elements=4
+    )
+    assert four.d_i_n_e[0] - single.d_i_n_e[0] == pytest.approx(10.0 * np.log10(4.0))
+
+
+def test_low_frequency_element_is_three_decibels_below_part_one() -> None:
+    """The 9 dB of the surface measurement against part 1's 6 dB."""
+    part3 = building.low_frequency_element_normalized_difference(
+        [90.0], [60.0], measurement_area=10.0
+    )
+    part1 = building.intensity_element_normalized_difference(
+        [90.0], [60.0], measurement_area=10.0
+    )
+    assert part1.d_i_n_e[0] - part3.d_i_n_e[0] == pytest.approx(3.0)
+
+
+def test_low_frequency_element_carries_the_clause_6_4_2_verdict() -> None:
+    """The same qualification as the index, from the same Formula (5)."""
+    r = building.low_frequency_element_normalized_difference(
+        [90.0, 90.0],
+        [60.0, 60.0],
+        measurement_area=10.0,
+        l_p=[68.0, 75.0],
+        absorbing_specimen_surface=False,
+    )
+    assert r.indicator_limit == 10.0
+    assert r.surface_pressure_intensity == pytest.approx([8.0, 15.0])
+    assert r.qualified is not None
+    assert r.qualified.tolist() == [True, False]
+    bare = building.low_frequency_element_normalized_difference(
+        [90.0], [60.0], measurement_area=10.0
+    )
+    assert bare.surface_pressure_intensity is None
+    assert bare.qualified is None
+
+
+@pytest.mark.parametrize("bad", [0, -1, 2.5, True])
+def test_low_frequency_element_rejects_a_bad_unit_count(bad: object) -> None:
+    """N counts installed units, so it is a positive integer and not a bool."""
+    with pytest.raises(ValueError, match="'elements' must be a positive integer"):
+        building.low_frequency_element_normalized_difference(
+            [90.0], [60.0], measurement_area=10.0, elements=bad
+        )
+
+
+def test_low_frequency_element_refuses_bands_outside_clause_6_6() -> None:
+    """Clause 6.6 binds Formula (8) exactly as it binds Formula (7)."""
+    with pytest.raises(ValueError, match="50 Hz to 160 Hz"):
+        building.low_frequency_element_normalized_difference(
+            [90.0], [60.0], measurement_area=10.0, frequencies=[250.0]
+        )
+
+
+def test_low_frequency_element_rejects_nonpositive_measurement_area() -> None:
+    """Formula (8) takes 10 lg(A0/Sm)."""
+    with pytest.raises(ValueError, match="measurement_area"):
+        building.low_frequency_element_normalized_difference(
+            [90.0], [60.0], measurement_area=0.0
+        )
+
+
+def test_low_frequency_element_result_rejects_arrays_that_disagree() -> None:
+    """The result pins the shapes where they are built."""
+    r = building.low_frequency_element_normalized_difference(
+        [90.0, 91.0], [60.0, 61.0], measurement_area=10.0, l_p=[68.0, 69.0]
+    )
+    with pytest.raises(ValueError, match="qualified"):
+        dataclasses.replace(r, qualified=np.array([True]))
+    with pytest.raises(ValueError, match="two\\s+halves"):
+        dataclasses.replace(r, qualified=None)
+
+
+def test_low_frequency_accepts_the_exact_band_series() -> None:
+    """The same band is written 63 Hz on a filter and 63,096 Hz exactly."""
+    from phonometry.filters import nominal_frequencies
+
+    exact = nominal_frequencies(fraction=3, limits=[50, 160])[0]
+    assert len(exact) == len(ref.ISO15186_3_ANNEX_A_BANDS)
+    nominal = building.low_frequency_intensity_reduction(
+        [80.0] * 6,
+        [60.0] * 6,
+        measurement_area=10.0,
+        area=10.0,
+        frequencies=ref.ISO15186_3_ANNEX_A_BANDS,
+    )
+    series = building.low_frequency_intensity_reduction(
+        [80.0] * 6, [60.0] * 6, measurement_area=10.0, area=10.0, frequencies=exact
+    )
+    assert series.r_i == pytest.approx(nominal.r_i)
+
+
+@pytest.mark.parametrize(
+    "call",
+    [
+        lambda grid: building.low_frequency_intensity_reduction(
+            [80.0, 81.0],
+            [60.0, 61.0],
+            measurement_area=10.0,
+            area=10.0,
+            frequencies=grid,
+        ),
+        lambda grid: building.low_frequency_element_normalized_difference(
+            [80.0, 81.0], [60.0, 61.0], measurement_area=10.0, frequencies=grid
+        ),
+        lambda grid: building.limp_panel_reduction_index(
+            grid, surface_mass=10.0, area=10.0
+        ),
+    ],
+)
+def test_low_frequency_refuses_a_grid_of_frequencies(
+    call: Callable[[np.ndarray], object],
+) -> None:
+    """Hertz are not levels: a (positions, bands) grid must not be averaged."""
+    with pytest.raises(ValueError, match="one-dimensional"):
+        call(np.array([[50.0, 63.0], [80.0, 100.0]]))
+
+
+@pytest.mark.parametrize("bad", ["reflecting", 1, 0, None])
+def test_low_frequency_refuses_a_non_boolean_clause_6_4_2_case(bad: object) -> None:
+    """Every non-empty string is truthy and would pick the tighter limit."""
+    with pytest.raises(ValueError, match="absorbing_specimen_surface"):
+        building.low_frequency_intensity_reduction(
+            [80.0],
+            [60.0],
+            measurement_area=10.0,
+            area=10.0,
+            l_p=[70.0],
+            absorbing_specimen_surface=bad,
+        )
+    with pytest.raises(ValueError, match="absorbing_specimen_surface"):
+        building.low_frequency_element_normalized_difference(
+            [80.0], [60.0], measurement_area=10.0, absorbing_specimen_surface=bad
+        )
+
+
+def test_low_frequency_accepts_numpy_booleans_and_integers() -> None:
+    """A numpy scalar is the ordinary way these arrive from a dataframe."""
+    absorbing = building.low_frequency_intensity_reduction(
+        [80.0],
+        [60.0],
+        measurement_area=10.0,
+        area=10.0,
+        l_p=[70.0],
+        absorbing_specimen_surface=np.True_,
+    )
+    assert absorbing.indicator_limit == 6.0
+    counted = building.low_frequency_element_normalized_difference(
+        [90.0], [60.0], measurement_area=10.0, elements=np.int64(4)
+    )
+    assert counted.elements == 4
+    # np.bool_ is not a bool subclass, so the unit-count guard has to name it.
+    with pytest.raises(ValueError, match="'elements' must be a positive integer"):
+        building.low_frequency_element_normalized_difference(
+            [90.0], [60.0], measurement_area=10.0, elements=np.True_
+        )
+
+
+def test_low_frequency_element_rejects_a_non_finite_indicator() -> None:
+    """The indicator is checked as closely as the index it travels with."""
+    r = building.low_frequency_element_normalized_difference(
+        [90.0], [60.0], measurement_area=10.0, l_p=[70.0]
+    )
+    with pytest.raises(ValueError, match="finite"):
+        dataclasses.replace(r, surface_pressure_intensity=np.array([np.nan]))
+
+
+@pytest.mark.parametrize("bad", [[], [np.nan], [np.inf]])
+def test_limp_panel_rejects_frequencies_it_cannot_evaluate(bad: list[float]) -> None:
+    """Formula (A.2) takes the logarithm of every one of them."""
+    with pytest.raises(ValueError, match="'frequencies' must be positive and finite"):
+        building.limp_panel_reduction_index(bad, surface_mass=10.0, area=10.0)

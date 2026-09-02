@@ -682,10 +682,67 @@ in the same order.
   cross-check against ISO 15186-2:2010 Formula (12) and Hopkins, *Sound
   Insulation* (2007), Eq. 3.45. Verified on PDF page 11 (printed p. 3) of BS
   EN ISO 15186-1:2003, with the cross-check read on PDF page 11 (printed p.
-  11) of ISO 10140-2:2010.
+  11) of ISO 10140-2:2010. **Part 3 of the same series settles it in the
+  series' own words:** ISO 15186-3:2002, Clause 3.9, Formula (8) states the
+  same quantity as
+  $D_{I,n,e} = L_{pS} - 9 - [L_{In} - 10 \lg(A_0/S_m) - 10 \lg N]$, whose
+  bracket carries $10 \lg N$ with the opposite outer sign, i.e. the
+  $+10\log_{10} N$ derived here. Read on PDF page 10 (printed p. 4) of BS EN
+  ISO 15186-3:2010.
 - **Library behaviour:** implements the derivable per-unit form
   (`intensity_element_normalized_difference`, $+10\log_{10} N$) and emits a
   warning whenever $n > 1$, where the result deviates from the print.
+- **Status:** unreported.
+
+## ISO 15186-3:2002, Annex A, Table A.1 (steel-sandwich column irreproducible from its own inputs)
+
+- **Location:** Annex A (normative), A.2 and Table A.1, "Calculated sound
+  reduction index (at 1 013 hPa and 23 °C)", the qualification example a
+  laboratory checks its facility against. The print read here is **BS EN ISO
+  15186-3:2010**, the identical-text British adoption of ISO 15186-3:2002,
+  PDF page 18 (printed p. 12).
+- **The print:** two columns of six one-third-octave values, 50 Hz to 160 Hz.
+  The plaster-board column is headed "10 kg/m²" over a "Test opening 10 m²"
+  and reads 10,7 / 11,9 / 13,4 / 14,8 / 16,3 / 17,9. The steel column is
+  headed "17 kg/m²" over a "Test opening 1,25 m × 1,50 m" and reads
+  21,3 / 21,2 / 21,7 / 22,7 / 23,8 / 25,1. A.2 also states that "the
+  dimensions of the free part of the panel are 1,162 m × 1,412 m".
+- **The problem:** no reading of the inputs printed beside the steel column
+  reproduces it. With the test opening (1,875 m²) and the stated mass, the six
+  computed values fall 1,27 dB to 0,72 dB below the printed ones. The 0,55 dB
+  spread between those two ends rules out any surface mass at that area,
+  because a mass error shifts $R_0 = 20 \lg(\pi f m / \rho c)$ by the same amount
+  in every band. With the free part of the panel (1,640744 m²) the residual is
+  nearly flat, mean 0,562 dB, but it still spreads 0,102 dB end to end, which
+  is the whole width of the printed decimal, so it is not the constant offset a
+  wrong mass alone would leave either.
+
+  No single input closes it to the 0,05 dB that one-decimal printing allows.
+  The best surface mass alone, over the free part, is 18,13 kg/m² and leaves
+  0,051 dB; the best static pressure alone is 950 hPa and leaves 0,051 dB; the
+  best temperature alone, over the test opening, is 63 °C and leaves 0,052 dB.
+  The last two contradict the caption, which fixes the climate at 1 013 hPa and
+  23 °C, and the plaster-board column reproduces at exactly that climate, so the
+  two columns cannot be read at different ones.
+
+  The only reading that does reproduce all six values moves two inputs at once:
+  an area of about 1,654 m², near the free part but not equal to it, together
+  with a surface mass of about 18,16 kg/m². That mass is not available to the
+  specimen described. Solid steel 2,2 mm thick is 16,9 kg/m² to 17,3 kg/m², and
+  the leaf is a steel/resin/steel sandwich, so its surface mass is necessarily
+  below that. The plaster-board column of the same table, from the same
+  formulas at the same climate, reproduces all six of its values to within
+  0,050 dB.
+- **Evidence:** Formulas (A.1) to (A.5) evaluated at the stated 1 013 hPa and
+  23 °C, read on PDF pages 17 and 18 (printed pp. 11 and 12) of BS EN ISO
+  15186-3:2010. ISO 140-3:1995, C.2.4, which A.2 cites as the source of the
+  specimen, describes the 2,2 mm steel/resin/steel leaf but states no surface
+  mass, so the 17 kg/m² is not carried over from there. No corrigendum to
+  Annex A was found.
+- **Library behaviour:** `limp_panel_reduction_index` implements Formulas
+  (A.1) to (A.5) as printed. The conformance suite anchors them on the
+  plaster-board column alone; the steel column is deliberately not used as an
+  oracle.
 - **Status:** unreported.
 
 ## ISO 10848-1:2006, Clause 8.1.1, Formula (20) (spurious π in the critical frequency)

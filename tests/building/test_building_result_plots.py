@@ -274,3 +274,98 @@ def test_band_uncertainty_plot_spectrum() -> None:
     np.testing.assert_allclose(ax.lines[0].get_ydata(), u)
     assert "12999" in ax.get_title()
     plt.close("all")
+
+
+# --------------------------------------------------------------------------
+# ISO 15186-3 low-frequency intensity insulation
+# --------------------------------------------------------------------------
+def _low_frequency_intensity(*, absorbing: bool = False) -> object:
+    """Six bands whose indicator crosses both Clause 6.4.2 limits."""
+    return ph.building.low_frequency_intensity_reduction(
+        [88.4, 89.1, 90.3, 91.0, 91.4, 91.8],
+        [70.0, 73.0, 76.0, 80.0, 82.0, 84.0],
+        measurement_area=12.0,
+        area=10.0,
+        l_p=[81.5, 82.0, 83.6, 87.0, 88.5, 90.0],
+        frequencies=[50.0, 63.0, 80.0, 100.0, 125.0, 160.0],
+        absorbing_specimen_surface=absorbing,
+    )
+
+
+def test_low_frequency_intensity_plot_draws_index_and_indicator() -> None:
+    res = _low_frequency_intensity()
+    ax = res.plot()
+    # One bar per band, carrying the index itself.
+    heights = [patch.get_height() for patch in ax.patches]
+    np.testing.assert_allclose(heights[: res.r_i.size], res.r_i)
+    # The indicator lives on the twin axis, with its limit beside it.
+    (twin,) = [other for other in ax.figure.axes if other is not ax]
+    np.testing.assert_allclose(
+        twin.lines[0].get_ydata(), res.surface_pressure_intensity
+    )
+    assert res.indicator_limit == 10.0
+    assert twin.lines[1].get_ydata()[0] == res.indicator_limit
+    assert "15186-3" in ax.get_title()
+    plt.close("all")
+
+
+def test_low_frequency_intensity_plot_hatches_only_refused_bands() -> None:
+    res = _low_frequency_intensity()
+    assert res.qualified is not None
+    assert res.qualified.any()
+    assert not res.qualified.all()
+    ax = res.plot()
+    hatched = [p for p in ax.patches if p.get_hatch()]
+    assert len(hatched) == int((~res.qualified).sum())
+    # Each hatch sits on a band the clause refuses, at that band's index.
+    refused = res.r_i[~res.qualified]
+    np.testing.assert_allclose([p.get_height() for p in hatched], refused)
+    plt.close("all")
+
+
+def test_low_frequency_intensity_plot_draws_the_tighter_limit() -> None:
+    res = _low_frequency_intensity(absorbing=True)
+    ax = res.plot()
+    (twin,) = [other for other in ax.figure.axes if other is not ax]
+    assert twin.lines[1].get_ydata()[0] == 6.0
+    plt.close("all")
+
+
+def test_low_frequency_intensity_plot_speaks_spanish() -> None:
+    ax = _low_frequency_intensity().plot(language="es")
+    assert "Aislamiento" in ax.get_title()
+    assert ax.get_xlabel().startswith("Frecuencia")
+    labels = [str(t.get_text()) for t in ax.get_legend().get_texts()]
+    assert any("no cualificada" in lbl for lbl in labels)
+    assert any("límite" in lbl for lbl in labels)
+    plt.close("all")
+
+
+def test_low_frequency_intensity_plot_labels_bands_without_centres() -> None:
+    res = ph.building.low_frequency_intensity_reduction(
+        [84.0, 86.0], [70.0, 73.0], measurement_area=12.0, area=10.0
+    )
+    assert res.frequencies is None
+    assert res.surface_pressure_intensity is None
+    ax = res.plot()
+    assert [t.get_text() for t in ax.get_xticklabels()] == ["Band 1", "Band 2"]
+    # No indicator measured, so no twin axis and no limit line to draw.
+    assert ax.figure.axes == [ax]
+    plt.close("all")
+
+
+def test_low_frequency_element_plot_draws_its_own_quantity() -> None:
+    res = ph.building.low_frequency_element_normalized_difference(
+        np.full(6, 90.0),
+        np.array([62.0, 61.0, 60.0, 58.0, 57.0, 55.0]),
+        measurement_area=2.0,
+        elements=4,
+        l_p=np.array([70.0, 72.0, 74.0, 70.0, 68.0, 66.0]),
+        frequencies=[50.0, 63.0, 80.0, 100.0, 125.0, 160.0],
+    )
+    ax = res.plot()
+    heights = [patch.get_height() for patch in ax.patches]
+    np.testing.assert_allclose(heights[: res.d_i_n_e.size], res.d_i_n_e)
+    assert "15186-3" in ax.get_title()
+    assert "element" in ax.get_title()
+    plt.close("all")

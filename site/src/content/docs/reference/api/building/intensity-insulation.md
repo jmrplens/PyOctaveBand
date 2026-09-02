@@ -65,9 +65,12 @@ sound absorbing), and the probe's pressure-residual intensity index must
 exceed $F_{pI} + 10$ dB (Clause 4.1) for the dynamic capability to be
 adequate.
 
-**Frequency range (Clause 6.6).** Quantities are measured over the mandatory
-one-third-octave range 100 Hz to 5000 Hz (18 bands), optionally extended down
-to 50 Hz. The single-number weighted rating uses the ISO 717-1 core range, so
+**Frequency range (part 1, Clause 6.6).** The part 1 and part 2 quantities are
+measured over the mandatory one-third-octave range 100 Hz to 5000 Hz (18
+bands), optionally extended down to 50 Hz. The part 3 quantities at the end of
+this module answer over 50 Hz to 160 Hz instead (its Clause 1.1), and results
+from the two ranges are meant to be combined into one 50 Hz to 5000 Hz curve.
+ The single-number weighted rating uses the ISO 717-1 core range, so
 the automatic rating (`RI,w`, `RI,M,w`, `DI,n,e,w`) is formed via the
 verified [`phonometry.building.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) engine only when exactly
 16 one-third-octave (100-3150 Hz) or 5 octave (125-2000 Hz) values are
@@ -486,6 +489,339 @@ and name the measurement standard in `measurement_standard`
 | :--- | :--- |
 | ValueError | If `engine` is unknown, `language` is not one of the supported values, the result carries no single-number rating (its band count is neither 16 one-third-octave nor 5 octave, so the ISO 717-1 rating the fiche needs was not formed), or `fpi` / `residual_index` do not match the band count. |
 | ImportError | If reportlab is not installed (`pip install phonometry[report]`), or matplotlib is missing for the embedded rating figure (`pip install phonometry[plot]`). |
+
+## limp_panel_reduction_index
+
+```python
+limp_panel_reduction_index(
+    frequencies: Sequence[float] | np.ndarray,
+    *,
+    surface_mass: float,
+    area: float,
+    temperature: float = 23.0,
+    static_pressure: float = 101300.0,
+) -> np.ndarray
+```
+
+Sound reduction index of a limp panel (ISO 15186-3:2002, Annex A).
+
+Annex A is normative and is how a laboratory qualifies itself: measure a
+limp panel of area $S > 1$ m\ :sup:`2`, calculate what it should
+read, and require the two to agree within 4,0 dB from 50 Hz to 160 Hz.
+This is the calculated half.
+
+A.1 states two different things about the area, and this enforces the
+second: the *qualification panel* is required to be larger than 1 m², while
+Formula (A.3) is declared valid "if the area of the test specimen is at
+least 1 m²". A panel of exactly 1 m² is therefore refused as a
+qualification but accepted as an input, which is the boundary the code
+takes.
+
+$$
+R = R_0 - 10 \lg 2\sigma_\mathrm{d} \tag{A.1}
+$$
+
+$$
+R_0 = 20 \lg \frac{\pi f m}{\rho c} \tag{A.2}
+$$
+
+$$
+\sigma_\mathrm{d} = \frac{1}{2} \left[ 0{,}20 + \ln\left( 2\pi \frac{f}{c} \sqrt{S} \right) \right] \tag{A.3}
+$$
+
+with the characteristic impedance and the speed of sound taken from the
+climate of the test (Formulas (A.4) and (A.5)),
+
+$$
+\rho c = 427 \sqrt{\frac{273}{273 + \theta}} \cdot \frac{B}{B_0}, \qquad c = 331 + 0{,}6\,\theta
+$$
+
+The panel is limp by assumption: $R_0$ is the mass law and
+$\sigma_\mathrm{d}$ the radiation efficiency of forced transmission
+alone. The 160 Hz ceiling is not this annex's own: Clause 1.1 applies the
+whole of this part over 50 Hz to 160 Hz, and the qualification inherits it.
+
+Any frequency is computed, and no range is imposed. A.1 declares Formula
+(A.3) valid "for the frequency range of this part of ISO 15186", so a
+result outside 50 Hz to 160 Hz is the model evaluated past its stated
+validity: useful for seeing where a real panel leaves it, not usable as a
+qualification. Restricting the input is the caller's to do, unlike
+[`low_frequency_intensity_reduction`](/phonometry/reference/api/building/intensity-insulation/#low_frequency_intensity_reduction), whose quantity is defined over
+that range and nowhere else.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `frequencies` | One-third-octave mid-band frequencies, in hertz. |
+| `surface_mass` | Surface mass `m` of the panel, in kg/m². |
+| `area` | Panel area `S`, in m². Formula (A.3) is stated valid for at least 1 m², so a smaller one is refused rather than extrapolated. A panel used to qualify a facility has to exceed 1 m² (A.1). |
+| `temperature` | Air temperature `theta`, in degrees Celsius. |
+| `static_pressure` | Static pressure `B`, in pascals. |
+
+**Returns:** The calculated sound reduction index per band, in dB.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a non-finite or non-positive frequency, surface mass, area below 1 m², or a climate the formulas cannot be evaluated in. |
+
+## low_frequency_element_normalized_difference
+
+```python
+low_frequency_element_normalized_difference(
+    lp_surface: Sequence[float] | np.ndarray,
+    l_in: Sequence[float] | np.ndarray,
+    *,
+    measurement_area: float,
+    elements: int = 1,
+    l_p: Sequence[float] | np.ndarray | None = None,
+    frequencies: Sequence[float] | np.ndarray | None = None,
+    absorbing_specimen_surface: bool = False,
+) -> LowFrequencyElementResult
+```
+
+Element normalized level difference at low frequencies (ISO 15186-3).
+
+Clause 3.9, Formula (8), for small building elements measured with the
+surface-pressure method of this part:
+
+$$
+D_{I\mathrm{n,e}} = L_{p\mathrm{S}} - 9 - \left[ L_{I\mathrm{n}} - 10 \lg \frac{A_0}{S_\mathrm{m}} - 10 \lg N \right] \mathrm{dB}
+$$
+
+with the reference absorption area $A_0 = 10$ m². Two things
+separate it from its part 1 sibling
+([`intensity_element_normalized_difference`](/phonometry/reference/api/building/intensity-insulation/#intensity_element_normalized_difference)): the 9 dB of the
+surface measurement in place of 6, and the sign of the $10\lg N$
+term, which this part prints as the derivable one. Part 1 prints it
+subtracted, which is registered in `docs/ERRATA.md`; the two parts
+disagree on the page, and this is the one that agrees with the physics.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `lp_surface` | Sound pressure levels over the surface of the test specimen in the source room, `LpS`, in dB. One value per band, or a `(positions, bands)` array that is energy-averaged. |
+| `l_in` | Normal sound intensity levels over the measurement surface in the receiving room, in dB. |
+| `measurement_area` | Measurement-surface area `Sm`, in m². |
+| `elements` | Number `N` of identical element units installed within the measurement surface, at least 1. |
+| `l_p` | Sound pressure levels on the measurement surface in the receiving room, measured alongside `l_in` (Clause 6.4.2), in dB, or `None` when they were not. |
+| `frequencies` | Mid-band frequencies, in hertz, or `None`. Clause 6.6 admits 50 Hz to 160 Hz and nothing else. |
+| `absorbing_specimen_surface` | `True` when the test specimen presents a sound-absorbing surface in the receiving room, which tightens the Clause 6.4.2 limit from 10 dB to 6 dB. |
+
+**Returns:** [`LowFrequencyElementResult`](/phonometry/reference/api/building/intensity-insulation/#lowfrequencyelementresult).
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | if the band counts differ, if the measurement area is not positive, if `elements` is not a positive integer, if any level is non-finite, or if `frequencies` carries a band outside the range this part is defined for. |
+
+## low_frequency_intensity_reduction
+
+```python
+low_frequency_intensity_reduction(
+    lp_surface: Sequence[float] | np.ndarray,
+    l_in: Sequence[float] | np.ndarray,
+    *,
+    measurement_area: float,
+    area: float,
+    l_p: Sequence[float] | np.ndarray | None = None,
+    frequencies: Sequence[float] | np.ndarray | None = None,
+    absorbing_specimen_surface: bool = False,
+) -> LowFrequencyIntensityResult
+```
+
+Intensity sound reduction index at low frequencies (ISO 15186-3:2002).
+
+Below 100 Hz a source room has too few modes for its average pressure to
+describe what reaches the specimen, so this part measures the pressure
+**on the surface of the specimen** instead and the receiving side with an
+intensity probe as before (Clause 3.8, Formula (7)):
+
+$$
+R_\mathrm{I} = L_{p\mathrm{S}} - 9 - \left[ L_{I\mathrm{n}} + 10 \lg \frac{S_\mathrm{m}}{S} \right] \mathrm{dB}
+$$
+
+The 9 dB is the whole difference from [`intensity_sound_reduction`](/phonometry/reference/api/building/intensity-insulation/#intensity_sound_reduction),
+which subtracts 6: close to a rigid boundary a diffuse field carries twice
+the mean-square pressure it carries away from one, so the surface average
+sits three decibels above the room average of the same field.
+
+Clause 7 requires the surface-pressure intensity indicator
+$F_{pI} = L_p - L_{I\mathrm{n}}$ (Formula (5)) to be reported beside
+the index, and Clause 6.4.2 refuses the measurement surface where it
+exceeds 10 dB for a sound-reflecting test specimen, or 6 dB for a specimen
+with a sound-absorbing surface in the receiving room. Those bands come
+back flagged rather than dropped, because the standard's answer to them is
+to improve the measurement environment, not to discard the band.
+
+Both levels of Formula (5) are read on the measurement surface in the
+**receiving** room, so the indicator needs `l_p` and not the source-room
+surface levels Formula (7) is built from. Clause 6.4.2 asks for that
+second measurement "if possible", so it is optional here and its absence
+leaves the indicator and the qualification unanswered rather than
+guessed.
+
+Clause 6.4.2 refuses a negative measured intensity for the same reason,
+which a level cannot carry: pass the signed sub-area intensities through
+[`combine_subareas`](/phonometry/reference/api/building/intensity-insulation/#combine_subareas) first, which is where the sign lives.
+
+`lp_surface` and `l_in` may be one value per band or a
+`(positions, bands)` array, in which case the positions are
+energy-averaged. Sub-areas scanned separately are combined first with
+[`combine_subareas`](/phonometry/reference/api/building/intensity-insulation/#combine_subareas), which is Formulas (9) and (10) here.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `lp_surface` | Sound pressure levels over the surface of the test specimen in the source room, `LpS`, in dB. |
+| `l_in` | Normal sound intensity levels over the measurement surface in the receiving room, in dB. |
+| `measurement_area` | Measurement-surface area `Sm`, in m². |
+| `area` | Test-object area `S`, in m². |
+| `l_p` | Sound pressure levels on the measurement surface in the receiving room, measured alongside `l_in` (Clause 6.4.2), in dB, or `None` when they were not. They are what Formula (5) subtracts `l_in` from; without them no band can be qualified. |
+| `frequencies` | Mid-band frequencies, in hertz, or `None`. Clause 6.6 requires at least the 50 Hz, 63 Hz and 80 Hz one-third octaves and allows 100 Hz, 125 Hz and 160 Hz; a band outside 50 Hz to 160 Hz is refused, because this method is defined for the low-frequency range alone. |
+| `absorbing_specimen_surface` | `True` when the test specimen presents a sound-absorbing surface in the receiving room, which tightens the Clause 6.4.2 limit from 10 dB to 6 dB. A specimen absorbing on one side only is mounted with that side towards the source room (Clause 5.3), so this is the two-absorbing-sides case. |
+
+**Returns:** [`LowFrequencyIntensityResult`](/phonometry/reference/api/building/intensity-insulation/#lowfrequencyintensityresult).
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | if the band counts differ, if either area is not positive, if any level is non-finite, or if `frequencies` carries a band outside the range this part is defined for. |
+
+## LowFrequencyElementResult
+
+```python
+LowFrequencyElementResult(
+    d_i_n_e: np.ndarray,
+    surface_pressure_intensity: np.ndarray | None,
+    qualified: np.ndarray | None,
+    frequencies: np.ndarray | None,
+    measurement_area: float,
+    elements: int,
+    absorbing_specimen_surface: bool,
+)
+```
+
+Per-band element normalized level difference at low frequencies.
+
+The result of ISO 15186-3:2002, Clause 3.9, Formula (8), the small-element
+counterpart of [`LowFrequencyIntensityResult`](/phonometry/reference/api/building/intensity-insulation/#lowfrequencyintensityresult). No single-number
+rating accompanies it: Clause 6.6 stops at 160 Hz, six one-third octaves,
+and ISO 717-1 needs sixteen.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `d_i_n_e` | Intensity element normalized level difference $D_{I\mathrm{n,e}} = L_{p\mathrm{S}} - 9 - [L_{I\mathrm{n}} - 10\lg(A_0/S_\mathrm{m}) - 10\lg N]$ per band, in dB. |
+| `surface_pressure_intensity` | Surface-pressure intensity indicator $F_{pI}$ per band, in dB (Formula (5)), or `None` where the receiving-side pressure level was not measured alongside the intensity. |
+| `qualified` | The Clause 6.4.2 verdict per band, or `None` throughout when the indicator itself is `None`. |
+| `frequencies` | Mid-band frequencies, in hertz, or `None`. |
+| `measurement_area` | Measurement-surface area `Sm`, in m². |
+| `elements` | Number `N` of element units installed within the measurement surface. |
+| `absorbing_specimen_surface` | Which of the two Clause 6.4.2 limits was applied. |
+
+### LowFrequencyElementResult.indicator_limit
+
+*property*
+
+The Clause 6.4.2 limit on `FpI` that this result was judged by.
+
+**Returns:** 6.0 dB when the specimen presents a sound-absorbing surface in the receiving room, 10.0 dB when it is sound-reflecting.
+
+### LowFrequencyElementResult.plot()
+
+```python
+LowFrequencyElementResult.plot(
+    ax: Axes | None = None,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw `DI,n,e` per band, hatching any band Clause 6.4.2 refuses.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the band bar. |
+
+**Returns:** The axes.
+
+## LowFrequencyIntensityResult
+
+```python
+LowFrequencyIntensityResult(
+    r_i: np.ndarray,
+    surface_pressure_intensity: np.ndarray | None,
+    qualified: np.ndarray | None,
+    frequencies: np.ndarray | None,
+    area: float,
+    measurement_area: float,
+    absorbing_specimen_surface: bool,
+)
+```
+
+Per-band intensity sound reduction index at low frequencies.
+
+The result of ISO 15186-3:2002, Clause 3.8, Formula (7). It differs from
+its part 1 sibling in where the source-room pressure is measured and so in
+what has to be subtracted from it: 9 dB against the surface of the
+specimen, where part 1 subtracts 6 dB from a room average.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `r_i` | Intensity sound reduction index $R_\mathrm{I} = L_{p\mathrm{S}} - 9 - [L_{I\mathrm{n}} + 10\lg(S_\mathrm{m}/S)]$ per band, in dB. |
+| `surface_pressure_intensity` | Surface-pressure intensity indicator $F_{pI} = L_p - L_{I\mathrm{n}}$ per band, in dB (Formula (5)), which Clause 7 requires to be reported beside the index, or `None` where the receiving-side pressure level was not measured alongside the intensity. Clause 6.4.2 only asks for that measurement "if possible". |
+| `qualified` | `True` in each band whose `FpI` is within the limit Clause 6.4.2 sets, `False` where the measurement surface is not qualified and the index is not a result the standard admits, and `None` throughout when the indicator itself is `None`. |
+| `frequencies` | Mid-band frequencies, in hertz, or `None`. |
+| `area` | Test-object area `S`, in m². |
+| `measurement_area` | Measurement-surface area `Sm`, in m². |
+| `absorbing_specimen_surface` | Which of the two Clause 6.4.2 limits was applied, 6 dB when the specimen presents a sound-absorbing surface in the receiving room and 10 dB when it is sound-reflecting. |
+
+### LowFrequencyIntensityResult.indicator_limit
+
+*property*
+
+The Clause 6.4.2 limit on `FpI` that this result was judged by.
+
+Reported beside the indicator, and drawn by `plot` so the figure
+does not have to restate which of the two limits applies.
+
+**Returns:** 6.0 dB when the specimen presents a sound-absorbing surface in the receiving room, 10.0 dB when it is sound-reflecting.
+
+### LowFrequencyIntensityResult.plot()
+
+```python
+LowFrequencyIntensityResult.plot(
+    ax: Axes | None = None,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the index per band, hatching any band Clause 6.4.2 refuses.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the band bar. |
+
+**Returns:** The axes.
 
 ## surface_pressure_intensity_indicator
 

@@ -60,9 +60,12 @@ sound absorbing), and the probe's pressure-residual intensity index must
 exceed :math:`F_{pI} + 10` dB (Clause 4.1) for the dynamic capability to be
 adequate.
 
-**Frequency range (Clause 6.6).** Quantities are measured over the mandatory
-one-third-octave range 100 Hz to 5000 Hz (18 bands), optionally extended down
-to 50 Hz. The single-number weighted rating uses the ISO 717-1 core range, so
+**Frequency range (part 1, Clause 6.6).** The part 1 and part 2 quantities are
+measured over the mandatory one-third-octave range 100 Hz to 5000 Hz (18
+bands), optionally extended down to 50 Hz. The part 3 quantities at the end of
+this module answer over 50 Hz to 160 Hz instead (its Clause 1.1), and results
+from the two ranges are meant to be combined into one 50 Hz to 5000 Hz curve.
+ The single-number weighted rating uses the ISO 717-1 core range, so
 the automatic rating (``RI,w``, ``RI,M,w``, ``DI,n,e,w``) is formed via the
 verified :func:`phonometry.building.weighted_rating` engine only when exactly
 16 one-third-octave (100-3150 Hz) or 5 octave (125-2000 Hz) values are
@@ -82,6 +85,7 @@ from ..._internal.validation import (
     require_equal_counts,
     require_equal_shapes,
     require_finite_fields,
+    require_positive,
     require_ranks,
     require_same_length,
 )
@@ -806,4 +810,660 @@ def intensity_element_normalized_difference(
     rating = weighted_rating(d_i_n_e) if d_i_n_e.size in (16, 5) else None
     return IntensityElementNormalizedResult(
         d_i_n_e=d_i_n_e, rating=rating, measurement_area=sm, n=int(n)
+    )
+
+
+# ---------------------------------------------------------------------------
+# ISO 15186-3:2002 -- laboratory measurements at low frequencies
+# ---------------------------------------------------------------------------
+
+#: Level difference between the sound pressure level measured *on the surface
+#: of the test specimen* and the incident sound intensity level
+#: (ISO 15186-3:2002, Clause 3.8, Formula (7)): 9 dB.
+#:
+#: Part 1 subtracts 6 dB because its ``Lp1`` is the diffuse-field average of
+#: the source room. Part 3 measures the pressure against the specimen itself,
+#: and close to a rigid boundary a diffuse field carries twice the mean-square
+#: pressure it carries away from one, which is 3 dB more level for the same
+#: incident field; the 9 dB is that 6 plus that 3. Reading part 1's 6 dB into
+#: a part 3 measurement would report a specimen 3 dB better than it is.
+_SURFACE_FIELD = 9.0
+
+#: The one-third-octave bands ISO 15186-3:2002 Clause 6.6 requires, in hertz.
+_LOW_FREQUENCY_BANDS: tuple[int, ...] = (50, 63, 80)
+
+#: The bands the same clause allows the measurement to be extended with.
+_LOW_FREQUENCY_OPTIONAL_BANDS: tuple[int, ...] = (100, 125, 160)
+
+#: Largest surface-pressure intensity indicator the measurement surface may
+#: show, in dB, by the kind of test specimen (ISO 15186-3:2002, Clause 6.4.2):
+#: 10 dB for a sound-reflecting one, 6 dB for one presenting a sound-absorbing
+#: surface in the receiving room. The wall opposite the specimen absorbs in
+#: either case, because Clause 5.1 requires it of the facility.
+_FPI_LIMIT_REFLECTING = 10.0
+_FPI_LIMIT_ABSORBING = 6.0
+
+#: Reference static pressure of Annex A, in pascals (Formula (A.4)).
+_ANNEX_A_B0 = 101300.0
+#: Characteristic impedance of air at 0 degC and B0, in N s/m^3 (Formula (A.4)).
+_ANNEX_A_RHO_C0 = 427.0
+#: Celsius-to-kelvin offset as Formula (A.4) prints it: 273, not 273,15.
+_ANNEX_A_KELVIN = 273.0
+#: Speed of sound of Formula (A.5), c = 331 + 0,6 theta.
+_ANNEX_A_C0 = 331.0
+_ANNEX_A_C_PER_DEGREE = 0.6
+#: The constant inside the radiation-efficiency approximation (Formula (A.3)).
+_ANNEX_A_SIGMA_CONST = 0.20
+#: Smallest specimen area Formula (A.3) is stated to be valid for, in m^2.
+_ANNEX_A_MIN_AREA = 1.0
+
+
+def limp_panel_reduction_index(
+    frequencies: Sequence[float] | np.ndarray,
+    *,
+    surface_mass: float,
+    area: float,
+    temperature: float = 23.0,
+    static_pressure: float = _ANNEX_A_B0,
+) -> np.ndarray:
+    r"""Sound reduction index of a limp panel (ISO 15186-3:2002, Annex A).
+
+    Annex A is normative and is how a laboratory qualifies itself: measure a
+    limp panel of area :math:`S > 1` m\ :sup:`2`, calculate what it should
+    read, and require the two to agree within 4,0 dB from 50 Hz to 160 Hz.
+    This is the calculated half.
+
+    A.1 states two different things about the area, and this enforces the
+    second: the *qualification panel* is required to be larger than 1 m², while
+    Formula (A.3) is declared valid "if the area of the test specimen is at
+    least 1 m²". A panel of exactly 1 m² is therefore refused as a
+    qualification but accepted as an input, which is the boundary the code
+    takes.
+
+    .. math::
+
+       R = R_0 - 10 \lg 2\sigma_\mathrm{d} \tag{A.1}
+
+       R_0 = 20 \lg \frac{\pi f m}{\rho c} \tag{A.2}
+
+       \sigma_\mathrm{d} = \frac{1}{2}
+       \left[ 0{,}20 + \ln\left( 2\pi \frac{f}{c} \sqrt{S} \right) \right] \tag{A.3}
+
+    with the characteristic impedance and the speed of sound taken from the
+    climate of the test (Formulas (A.4) and (A.5)),
+
+    .. math::
+
+       \rho c = 427 \sqrt{\frac{273}{273 + \theta}} \cdot \frac{B}{B_0},
+       \qquad c = 331 + 0{,}6\,\theta
+
+    The panel is limp by assumption: :math:`R_0` is the mass law and
+    :math:`\sigma_\mathrm{d}` the radiation efficiency of forced transmission
+    alone. The 160 Hz ceiling is not this annex's own: Clause 1.1 applies the
+    whole of this part over 50 Hz to 160 Hz, and the qualification inherits it.
+
+    Any frequency is computed, and no range is imposed. A.1 declares Formula
+    (A.3) valid "for the frequency range of this part of ISO 15186", so a
+    result outside 50 Hz to 160 Hz is the model evaluated past its stated
+    validity: useful for seeing where a real panel leaves it, not usable as a
+    qualification. Restricting the input is the caller's to do, unlike
+    :func:`low_frequency_intensity_reduction`, whose quantity is defined over
+    that range and nowhere else.
+
+    :param frequencies: One-third-octave mid-band frequencies, in hertz.
+    :param surface_mass: Surface mass ``m`` of the panel, in kg/m².
+    :param area: Panel area ``S``, in m². Formula (A.3) is stated valid for
+        at least 1 m², so a smaller one is refused rather than extrapolated.
+        A panel used to qualify a facility has to exceed 1 m² (A.1).
+    :param temperature: Air temperature ``theta``, in degrees Celsius.
+    :param static_pressure: Static pressure ``B``, in pascals.
+    :return: The calculated sound reduction index per band, in dB.
+    :raises ValueError: for a non-finite or non-positive frequency, surface
+        mass, area below 1 m², or a climate the formulas cannot be evaluated
+        in.
+    """
+    freqs = np.asarray(frequencies, dtype=np.float64)
+    if freqs.ndim != 1:
+        msg = (
+            "'frequencies' must be one-dimensional: one mid-band frequency "
+            "per band, and not a grid of measurement positions."
+        )
+        raise ValueError(msg)
+    if freqs.size == 0 or not np.all(np.isfinite(freqs)) or np.any(freqs <= 0.0):
+        msg = "'frequencies' must be positive and finite."
+        raise ValueError(msg)
+    m = require_positive(surface_mass, "surface_mass")
+    s = _positive_area(area, "area")
+    if s < _ANNEX_A_MIN_AREA:
+        msg = (
+            "'area' must be at least 1 m2: Formula (A.3) is stated only for a "
+            f"panel that large (ISO 15186-3:2002, A.1); got {s:g} m2."
+        )
+        raise ValueError(msg)
+    theta = float(temperature)
+    b = require_positive(static_pressure, "static_pressure")
+    if not np.isfinite(theta) or theta <= -_ANNEX_A_KELVIN:
+        msg = "'temperature' must be finite and above -273 degC."
+        raise ValueError(msg)
+    c = _ANNEX_A_C0 + _ANNEX_A_C_PER_DEGREE * theta
+    if c <= 0.0:
+        msg = "'temperature' puts the speed of sound of Formula (A.5) at or below zero."
+        raise ValueError(msg)
+    rho_c = (
+        _ANNEX_A_RHO_C0
+        * np.sqrt(_ANNEX_A_KELVIN / (_ANNEX_A_KELVIN + theta))
+        * (b / _ANNEX_A_B0)
+    )
+    sigma_d = 0.5 * (
+        _ANNEX_A_SIGMA_CONST + np.log(2.0 * np.pi * (freqs / c) * np.sqrt(s))
+    )
+    if np.any(sigma_d <= 0.0):
+        msg = (
+            "Formula (A.3) gives a non-positive radiation efficiency for one of "
+            "'frequencies', which Formula (A.1) cannot take the logarithm of."
+        )
+        raise ValueError(msg)
+    r0 = 20.0 * np.log10(np.pi * freqs * m / rho_c)
+    return np.asarray(r0 - 10.0 * np.log10(2.0 * sigma_d), dtype=np.float64)
+
+
+#: Relative tolerance that matches a given mid-band frequency to the band it
+#: names. A nominal label and its exact series value differ by 0,15 % and
+#: neighbouring one-third octaves by 26 %, so this separates them cleanly.
+_BAND_TOLERANCE = 0.03
+
+
+def _validated_element_count(elements: object) -> int:
+    """The number ``N`` of element units, as a positive integer.
+
+    :param elements: The caller's ``elements`` argument, of any type.
+    :return: ``N`` as a built-in ``int``.
+    :raises ValueError: for a bool (``True`` counts no units), a value that is
+        not a whole number, one below 1, or anything an integer cannot be
+        taken from.
+    """
+    msg = "'elements' must be a positive integer."
+    if isinstance(elements, (bool, np.bool_)):
+        raise ValueError(msg)
+    try:
+        count = int(elements)  # type: ignore[call-overload]
+    except (TypeError, ValueError) as exc:
+        raise ValueError(msg) from exc
+    if count != elements or count < 1:
+        raise ValueError(msg)
+    return int(count)
+
+
+def _validated_absorbing_flag(absorbing_specimen_surface: object) -> bool:
+    """The Clause 6.4.2 case, as a bool.
+
+    Rejected rather than coerced: every non-empty string is truthy, so
+    ``"reflecting"`` would silently pick the 6 dB limit of the absorbing case
+    and refuse a measurement the clause admits.
+
+    :param absorbing_specimen_surface: The caller's argument, of any type.
+    :return: The flag as a built-in ``bool``.
+    :raises ValueError: for anything that is not a bool.
+    """
+    if not isinstance(absorbing_specimen_surface, (bool, np.bool_)):
+        msg = (
+            "'absorbing_specimen_surface' must be True or False: it selects "
+            "between the two limits of Clause 6.4.2, and a truthy value of "
+            "another type would silently pick the tighter one."
+        )
+        raise ValueError(msg)
+    return bool(absorbing_specimen_surface)
+
+
+def _low_frequency_limit(absorbing_specimen_surface: bool) -> float:
+    """The Clause 6.4.2 limit on ``FpI`` for this kind of test specimen."""
+    if absorbing_specimen_surface:
+        return _FPI_LIMIT_ABSORBING
+    return _FPI_LIMIT_REFLECTING
+
+
+def _low_frequency_qualification(
+    l_p: Sequence[float] | np.ndarray | None,
+    l_in: np.ndarray,
+    *,
+    owner: str,
+    absorbing_specimen_surface: bool,
+) -> tuple[np.ndarray | None, np.ndarray | None]:
+    """Formula (5) and the Clause 6.4.2 verdict it feeds, or ``(None, None)``.
+
+    Clause 6.4.2 asks for the receiving-side pressure level "if possible", so
+    an absent ``l_p`` leaves both halves unanswered rather than guessed.
+    """
+    if l_p is None:
+        return None, None
+    lp_receiving = _as_band_levels(l_p, "l_p")
+    require_equal_shapes(owner, {"l_p": lp_receiving.shape, "l_in": l_in.shape}, "band")
+    f_pi = surface_pressure_intensity_indicator(lp_receiving, l_in)
+    limit = _low_frequency_limit(_validated_absorbing_flag(absorbing_specimen_surface))
+    return f_pi, np.asarray(f_pi <= limit, dtype=bool)
+
+
+def _check_low_frequency_bands(
+    frequencies: Sequence[float] | np.ndarray | None,
+    band_count: int,
+    *,
+    owner: str,
+) -> np.ndarray | None:
+    """Clause 1.1: this part applies from 50 Hz to 160 Hz and nowhere else.
+
+    The six one-third octaves are matched by proximity rather than equality,
+    because the same band is written 63 Hz on a filter and 63,096 Hz by the
+    exact series; neighbouring bands sit 26 % apart, so nothing is ambiguous
+    at this tolerance.
+    """
+    if frequencies is None:
+        return None
+    freqs = np.asarray(frequencies, dtype=np.float64)
+    if freqs.ndim != 1:
+        msg = (
+            "'frequencies' must be one-dimensional: one mid-band frequency "
+            "per band, and not a grid of measurement positions."
+        )
+        raise ValueError(msg)
+    require_equal_counts(owner, {"frequencies": freqs.size, "l_in": band_count})
+    bands = np.asarray(
+        (*_LOW_FREQUENCY_BANDS, *_LOW_FREQUENCY_OPTIONAL_BANDS), dtype=np.float64
+    )
+    known = np.isclose(freqs[:, None], bands[None, :], rtol=_BAND_TOLERANCE).any(axis=1)
+    if not known.all():
+        stray = float(freqs[~known][0])
+        msg = (
+            "'frequencies' must be one-third-octave mid-band frequencies from "
+            "50 Hz to 160 Hz, the range this part of ISO 15186 applies over "
+            f"(Clause 1.1); got {stray:g} Hz."
+        )
+        raise ValueError(msg)
+    return freqs
+
+
+def _check_indicator_pair(owner: object) -> None:
+    """Reject a result carrying only one half of the Clause 6.4.2 answer."""
+    indicator = owner.surface_pressure_intensity  # type: ignore[attr-defined]
+    qualified = owner.qualified  # type: ignore[attr-defined]
+    if (indicator is None) != (qualified is None):
+        msg = (
+            "'surface_pressure_intensity' and 'qualified' are the two "
+            "halves of one Clause 6.4.2 answer and are given together or "
+            "not at all."
+        )
+        raise ValueError(msg)
+
+
+@dataclass(frozen=True)
+class LowFrequencyIntensityResult:
+    r"""Per-band intensity sound reduction index at low frequencies.
+
+    The result of ISO 15186-3:2002, Clause 3.8, Formula (7). It differs from
+    its part 1 sibling in where the source-room pressure is measured and so in
+    what has to be subtracted from it: 9 dB against the surface of the
+    specimen, where part 1 subtracts 6 dB from a room average.
+
+    :ivar r_i: Intensity sound reduction index
+        :math:`R_\mathrm{I} = L_{p\mathrm{S}} - 9 - [L_{I\mathrm{n}} + 10\lg(S_\mathrm{m}/S)]`
+        per band, in dB.
+    :ivar surface_pressure_intensity: Surface-pressure intensity indicator
+        :math:`F_{pI} = L_p - L_{I\mathrm{n}}` per band, in dB (Formula (5)),
+        which Clause 7 requires to be reported beside the index, or ``None``
+        where the receiving-side pressure level was not measured alongside
+        the intensity. Clause 6.4.2 only asks for that measurement "if
+        possible".
+    :ivar qualified: ``True`` in each band whose ``FpI`` is within the limit
+        Clause 6.4.2 sets, ``False`` where the measurement surface is not
+        qualified and the index is not a result the standard admits, and
+        ``None`` throughout when the indicator itself is ``None``.
+    :ivar frequencies: Mid-band frequencies, in hertz, or ``None``.
+    :ivar area: Test-object area ``S``, in m².
+    :ivar measurement_area: Measurement-surface area ``Sm``, in m².
+    :ivar absorbing_specimen_surface: Which of the two Clause 6.4.2 limits
+        was applied, 6 dB when the specimen presents a sound-absorbing surface
+        in the receiving room and 10 dB when it is sound-reflecting.
+    """
+
+    r_i: np.ndarray
+    surface_pressure_intensity: np.ndarray | None
+    qualified: np.ndarray | None
+    frequencies: np.ndarray | None
+    area: float
+    measurement_area: float
+    absorbing_specimen_surface: bool
+
+    def __post_init__(self) -> None:
+        """Reject a result whose per-band arrays do not index each other.
+
+        Every reader of this result walks the four arrays together: the plot
+        draws one bar per band and hatches it by ``qualified``, and a report
+        prints the indicator beside the index. One array a band short raises
+        an ``IndexError`` somewhere else entirely, so the shapes are pinned
+        where they are built.
+
+        :raises ValueError: if the per-band arrays disagree in length, if
+            ``frequencies`` is given and does not match them, or if either
+            area is not positive and finite.
+        """
+        require_ranks(self, r_i=1)
+        _check_indicator_pair(self)
+        if self.surface_pressure_intensity is not None:
+            require_ranks(self, surface_pressure_intensity=1, qualified=1)
+            require_same_length(self, "r_i", "surface_pressure_intensity", "qualified")
+        if self.frequencies is not None:
+            require_equal_counts(
+                "LowFrequencyIntensityResult",
+                {"frequencies": self.frequencies.size, "r_i": self.r_i.size},
+            )
+        if self.surface_pressure_intensity is None:
+            require_finite_fields(self, "r_i")
+        else:
+            require_finite_fields(self, "r_i", "surface_pressure_intensity")
+        _positive_area(self.area, "area")
+        _positive_area(self.measurement_area, "measurement_area")
+
+    @property
+    def indicator_limit(self) -> float:
+        """The Clause 6.4.2 limit on ``FpI`` that this result was judged by.
+
+        Reported beside the indicator, and drawn by ``plot`` so the figure
+        does not have to restate which of the two limits applies.
+
+        :return: 6.0 dB when the specimen presents a sound-absorbing surface in
+            the receiving room, 10.0 dB when it is sound-reflecting.
+        """
+        return _low_frequency_limit(self.absorbing_specimen_surface)
+
+    def plot(self, ax: Axes | None = None, language: str = "en", **kwargs: Any) -> Axes:
+        """Draw the index per band, hatching any band Clause 6.4.2 refuses.
+
+        :param ax: Existing axes, or ``None`` to create a figure.
+        :param language: Label language, ``"en"`` (default) or ``"es"``.
+        :param kwargs: Forwarded to the band bar.
+        :return: The axes.
+        """
+        from ..._plot.building import plot_low_frequency_intensity
+
+        return plot_low_frequency_intensity(self, ax=ax, language=language, **kwargs)
+
+
+def low_frequency_intensity_reduction(
+    lp_surface: Sequence[float] | np.ndarray,
+    l_in: Sequence[float] | np.ndarray,
+    *,
+    measurement_area: float,
+    area: float,
+    l_p: Sequence[float] | np.ndarray | None = None,
+    frequencies: Sequence[float] | np.ndarray | None = None,
+    absorbing_specimen_surface: bool = False,
+) -> LowFrequencyIntensityResult:
+    r"""Intensity sound reduction index at low frequencies (ISO 15186-3:2002).
+
+    Below 100 Hz a source room has too few modes for its average pressure to
+    describe what reaches the specimen, so this part measures the pressure
+    **on the surface of the specimen** instead and the receiving side with an
+    intensity probe as before (Clause 3.8, Formula (7)):
+
+    .. math::
+
+       R_\mathrm{I} = L_{p\mathrm{S}} - 9 -
+       \left[ L_{I\mathrm{n}} + 10 \lg \frac{S_\mathrm{m}}{S} \right] \mathrm{dB}
+
+    The 9 dB is the whole difference from :func:`intensity_sound_reduction`,
+    which subtracts 6: close to a rigid boundary a diffuse field carries twice
+    the mean-square pressure it carries away from one, so the surface average
+    sits three decibels above the room average of the same field.
+
+    Clause 7 requires the surface-pressure intensity indicator
+    :math:`F_{pI} = L_p - L_{I\mathrm{n}}` (Formula (5)) to be reported beside
+    the index, and Clause 6.4.2 refuses the measurement surface where it
+    exceeds 10 dB for a sound-reflecting test specimen, or 6 dB for a specimen
+    with a sound-absorbing surface in the receiving room. Those bands come
+    back flagged rather than dropped, because the standard's answer to them is
+    to improve the measurement environment, not to discard the band.
+
+    Both levels of Formula (5) are read on the measurement surface in the
+    **receiving** room, so the indicator needs ``l_p`` and not the source-room
+    surface levels Formula (7) is built from. Clause 6.4.2 asks for that
+    second measurement "if possible", so it is optional here and its absence
+    leaves the indicator and the qualification unanswered rather than
+    guessed.
+
+    Clause 6.4.2 refuses a negative measured intensity for the same reason,
+    which a level cannot carry: pass the signed sub-area intensities through
+    :func:`combine_subareas` first, which is where the sign lives.
+
+    ``lp_surface`` and ``l_in`` may be one value per band or a
+    ``(positions, bands)`` array, in which case the positions are
+    energy-averaged. Sub-areas scanned separately are combined first with
+    :func:`combine_subareas`, which is Formulas (9) and (10) here.
+
+    :param lp_surface: Sound pressure levels over the surface of the test
+        specimen in the source room, ``LpS``, in dB.
+    :param l_in: Normal sound intensity levels over the measurement surface
+        in the receiving room, in dB.
+    :param measurement_area: Measurement-surface area ``Sm``, in m².
+    :param area: Test-object area ``S``, in m².
+    :param l_p: Sound pressure levels on the measurement surface in the
+        receiving room, measured alongside ``l_in`` (Clause 6.4.2), in dB, or
+        ``None`` when they were not. They are what Formula (5) subtracts
+        ``l_in`` from; without them no band can be qualified.
+    :param frequencies: Mid-band frequencies, in hertz, or ``None``. Clause
+        6.6 requires at least the 50 Hz, 63 Hz and 80 Hz one-third octaves
+        and allows 100 Hz, 125 Hz and 160 Hz; a band outside 50 Hz to 160 Hz
+        is refused, because this method is defined for the low-frequency
+        range alone.
+    :param absorbing_specimen_surface: ``True`` when the test specimen
+        presents a sound-absorbing surface in the receiving room, which
+        tightens the Clause 6.4.2 limit from 10 dB to 6 dB. A specimen
+        absorbing on one side only is mounted with that side towards the
+        source room (Clause 5.3), so this is the two-absorbing-sides case.
+    :return: :class:`LowFrequencyIntensityResult`.
+    :raises ValueError: if the band counts differ, if either area is not
+        positive, if any level is non-finite, or if ``frequencies`` carries a
+        band outside the range this part is defined for.
+    """
+    lp_bands = _as_band_levels(lp_surface, "lp_surface")
+    l_in_bands = _as_band_levels(l_in, "l_in")
+    require_equal_shapes(
+        "low_frequency_intensity_reduction",
+        {"lp_surface": lp_bands.shape, "l_in": l_in_bands.shape},
+        "band",
+    )
+    sm = _positive_area(measurement_area, "measurement_area")
+    s = _positive_area(area, "area")
+    freqs = _check_low_frequency_bands(
+        frequencies, l_in_bands.size, owner="low_frequency_intensity_reduction"
+    )
+    f_pi, qualified = _low_frequency_qualification(
+        l_p,
+        l_in_bands,
+        owner="low_frequency_intensity_reduction",
+        absorbing_specimen_surface=absorbing_specimen_surface,
+    )
+    absorbing = _validated_absorbing_flag(absorbing_specimen_surface)
+    r_i = np.asarray(
+        lp_bands - _SURFACE_FIELD - (l_in_bands + 10.0 * np.log10(sm / s)),
+        dtype=np.float64,
+    )
+    return LowFrequencyIntensityResult(
+        r_i=r_i,
+        surface_pressure_intensity=f_pi,
+        qualified=qualified,
+        frequencies=freqs,
+        area=s,
+        measurement_area=sm,
+        absorbing_specimen_surface=absorbing,
+    )
+
+
+@dataclass(frozen=True)
+class LowFrequencyElementResult:
+    r"""Per-band element normalized level difference at low frequencies.
+
+    The result of ISO 15186-3:2002, Clause 3.9, Formula (8), the small-element
+    counterpart of :class:`LowFrequencyIntensityResult`. No single-number
+    rating accompanies it: Clause 6.6 stops at 160 Hz, six one-third octaves,
+    and ISO 717-1 needs sixteen.
+
+    :ivar d_i_n_e: Intensity element normalized level difference
+        :math:`D_{I\mathrm{n,e}} = L_{p\mathrm{S}} - 9 -
+        [L_{I\mathrm{n}} - 10\lg(A_0/S_\mathrm{m}) - 10\lg N]` per band, in dB.
+    :ivar surface_pressure_intensity: Surface-pressure intensity indicator
+        :math:`F_{pI}` per band, in dB (Formula (5)), or ``None`` where the
+        receiving-side pressure level was not measured alongside the
+        intensity.
+    :ivar qualified: The Clause 6.4.2 verdict per band, or ``None`` throughout
+        when the indicator itself is ``None``.
+    :ivar frequencies: Mid-band frequencies, in hertz, or ``None``.
+    :ivar measurement_area: Measurement-surface area ``Sm``, in m².
+    :ivar elements: Number ``N`` of element units installed within the
+        measurement surface.
+    :ivar absorbing_specimen_surface: Which of the two Clause 6.4.2 limits
+        was applied.
+    """
+
+    d_i_n_e: np.ndarray
+    surface_pressure_intensity: np.ndarray | None
+    qualified: np.ndarray | None
+    frequencies: np.ndarray | None
+    measurement_area: float
+    elements: int
+    absorbing_specimen_surface: bool
+
+    def __post_init__(self) -> None:
+        """Reject a result whose per-band arrays do not index each other.
+
+        :raises ValueError: if the per-band arrays disagree in length, if
+            ``frequencies`` is given and does not match them, or if the
+            measurement area is not positive and finite.
+        """
+        require_ranks(self, d_i_n_e=1)
+        _check_indicator_pair(self)
+        if self.surface_pressure_intensity is not None:
+            require_ranks(self, surface_pressure_intensity=1, qualified=1)
+            require_same_length(
+                self, "d_i_n_e", "surface_pressure_intensity", "qualified"
+            )
+        if self.frequencies is not None:
+            require_equal_counts(
+                "LowFrequencyElementResult",
+                {"frequencies": self.frequencies.size, "d_i_n_e": self.d_i_n_e.size},
+            )
+        if self.surface_pressure_intensity is None:
+            require_finite_fields(self, "d_i_n_e")
+        else:
+            require_finite_fields(self, "d_i_n_e", "surface_pressure_intensity")
+        _positive_area(self.measurement_area, "measurement_area")
+
+    @property
+    def indicator_limit(self) -> float:
+        """The Clause 6.4.2 limit on ``FpI`` that this result was judged by.
+
+        :return: 6.0 dB when the specimen presents a sound-absorbing surface
+            in the receiving room, 10.0 dB when it is sound-reflecting.
+        """
+        return _low_frequency_limit(self.absorbing_specimen_surface)
+
+    def plot(self, ax: Axes | None = None, language: str = "en", **kwargs: Any) -> Axes:
+        """Draw ``DI,n,e`` per band, hatching any band Clause 6.4.2 refuses.
+
+        :param ax: Existing axes, or ``None`` to create a figure.
+        :param language: Label language, ``"en"`` (default) or ``"es"``.
+        :param kwargs: Forwarded to the band bar.
+        :return: The axes.
+        """
+        from ..._plot.building import plot_low_frequency_element
+
+        return plot_low_frequency_element(self, ax=ax, language=language, **kwargs)
+
+
+def low_frequency_element_normalized_difference(
+    lp_surface: Sequence[float] | np.ndarray,
+    l_in: Sequence[float] | np.ndarray,
+    *,
+    measurement_area: float,
+    elements: int = 1,
+    l_p: Sequence[float] | np.ndarray | None = None,
+    frequencies: Sequence[float] | np.ndarray | None = None,
+    absorbing_specimen_surface: bool = False,
+) -> LowFrequencyElementResult:
+    r"""Element normalized level difference at low frequencies (ISO 15186-3).
+
+    Clause 3.9, Formula (8), for small building elements measured with the
+    surface-pressure method of this part:
+
+    .. math::
+
+       D_{I\mathrm{n,e}} = L_{p\mathrm{S}} - 9 -
+       \left[ L_{I\mathrm{n}} - 10 \lg \frac{A_0}{S_\mathrm{m}}
+       - 10 \lg N \right] \mathrm{dB}
+
+    with the reference absorption area :math:`A_0 = 10` m². Two things
+    separate it from its part 1 sibling
+    (:func:`intensity_element_normalized_difference`): the 9 dB of the
+    surface measurement in place of 6, and the sign of the :math:`10\lg N`
+    term, which this part prints as the derivable one. Part 1 prints it
+    subtracted, which is registered in ``docs/ERRATA.md``; the two parts
+    disagree on the page, and this is the one that agrees with the physics.
+
+    :param lp_surface: Sound pressure levels over the surface of the test
+        specimen in the source room, ``LpS``, in dB. One value per band, or a
+        ``(positions, bands)`` array that is energy-averaged.
+    :param l_in: Normal sound intensity levels over the measurement surface
+        in the receiving room, in dB.
+    :param measurement_area: Measurement-surface area ``Sm``, in m².
+    :param elements: Number ``N`` of identical element units installed within
+        the measurement surface, at least 1.
+    :param l_p: Sound pressure levels on the measurement surface in the
+        receiving room, measured alongside ``l_in`` (Clause 6.4.2), in dB, or
+        ``None`` when they were not.
+    :param frequencies: Mid-band frequencies, in hertz, or ``None``. Clause
+        6.6 admits 50 Hz to 160 Hz and nothing else.
+    :param absorbing_specimen_surface: ``True`` when the test specimen
+        presents a sound-absorbing surface in the receiving room, which
+        tightens the Clause 6.4.2 limit from 10 dB to 6 dB.
+    :return: :class:`LowFrequencyElementResult`.
+    :raises ValueError: if the band counts differ, if the measurement area is
+        not positive, if ``elements`` is not a positive integer, if any level
+        is non-finite, or if ``frequencies`` carries a band outside the range
+        this part is defined for.
+    """
+    lp_bands = _as_band_levels(lp_surface, "lp_surface")
+    l_in_bands = _as_band_levels(l_in, "l_in")
+    require_equal_shapes(
+        "low_frequency_element_normalized_difference",
+        {"lp_surface": lp_bands.shape, "l_in": l_in_bands.shape},
+        "band",
+    )
+    sm = _positive_area(measurement_area, "measurement_area")
+    n = _validated_element_count(elements)
+    freqs = _check_low_frequency_bands(
+        frequencies,
+        l_in_bands.size,
+        owner="low_frequency_element_normalized_difference",
+    )
+    f_pi, qualified = _low_frequency_qualification(
+        l_p,
+        l_in_bands,
+        owner="low_frequency_element_normalized_difference",
+        absorbing_specimen_surface=absorbing_specimen_surface,
+    )
+    d_i_n_e = np.asarray(
+        lp_bands
+        - _SURFACE_FIELD
+        - (l_in_bands + 10.0 * np.log10(sm / _A0))
+        + 10.0 * np.log10(n),
+        dtype=np.float64,
+    )
+    return LowFrequencyElementResult(
+        d_i_n_e=d_i_n_e,
+        surface_pressure_intensity=f_pi,
+        qualified=qualified,
+        frequencies=freqs,
+        measurement_area=sm,
+        elements=n,
+        absorbing_specimen_surface=_validated_absorbing_flag(
+            absorbing_specimen_surface
+        ),
     )

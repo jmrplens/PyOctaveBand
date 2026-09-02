@@ -738,11 +738,69 @@ dos ediciones con las mismas entradas y en el mismo orden.
   ISO 10140-2:2010; contraste con la Fórmula (12) de ISO 15186-2:2010 y
   Hopkins, *Sound Insulation* (2007), Ec. 3.45. Verificado en la página 11
   del PDF (p. 3 impresa) de BS EN ISO 15186-1:2003, con el contraste leído en
-  la página 11 del PDF (p. 11 impresa) de ISO 10140-2:2010.
+  la página 11 del PDF (p. 11 impresa) de ISO 10140-2:2010. **La parte 3 de la
+  propia serie lo zanja:** la ISO 15186-3:2002, apartado 3.9, Fórmula (8),
+  enuncia la misma magnitud como
+  $D_{I,n,e} = L_{pS} - 9 - [L_{In} - 10 \lg(A_0/S_m) - 10 \lg N]$, cuyo
+  corchete lleva el $10 \lg N$ con el signo exterior contrario, es decir el
+  $+10\log_{10} N$ que aquí se deduce. Leído en la página 10 del PDF (p. 4
+  impresa) de BS EN ISO 15186-3:2010.
 - **Comportamiento de la biblioteca:** implementa la forma por unidad
   deducible (`intensity_element_normalized_difference`, $+10\log_{10} N$) y
   emite un aviso siempre que $n > 1$, donde el resultado se desvía del
   impreso.
+- **Estado:** sin notificar.
+
+## ISO 15186-3:2002, anexo A, Tabla A.1 (la columna del sándwich de acero no se reproduce con sus propios datos)
+
+- **Ubicación:** anexo A (normativo), A.2 y Tabla A.1, «Calculated sound
+  reduction index (at 1 013 hPa and 23 °C)», el ejemplo de calificación con
+  el que un laboratorio comprueba su instalación. El ejemplar leído es **BS EN
+  ISO 15186-3:2010**, la adopción británica de texto idéntico de la ISO
+  15186-3:2002, página 18 del PDF (p. 12 impresa).
+- **El impreso:** dos columnas de seis valores en tercios de octava, de 50 Hz
+  a 160 Hz. La columna del cartón-yeso va encabezada por «10 kg/m²» sobre un
+  «Test opening 10 m²» y da 10,7 / 11,9 / 13,4 / 14,8 / 16,3 / 17,9. La del
+  acero va encabezada por «17 kg/m²» sobre un «Test opening 1,25 m × 1,50 m» y
+  da 21,3 / 21,2 / 21,7 / 22,7 / 23,8 / 25,1. A.2 añade que «the dimensions of
+  the free part of the panel are 1,162 m × 1,412 m».
+- **El problema:** ninguna lectura de los datos impresos junto a la columna del
+  acero la reproduce. Con el hueco de ensayo (1,875 m²) y la masa declarada,
+  los seis valores calculados quedan entre 1,27 dB y 0,72 dB por debajo de los
+  impresos. Esa dispersión de 0,55 dB entre ambos extremos descarta cualquier
+  masa superficial con esa área, porque un error de masa desplaza
+  $R_0 = 20 \lg(\pi f m / \rho c)$ lo mismo en todas las bandas. Con la parte
+  libre del panel (1,640744 m²) el residuo queda casi plano, de media
+  0,562 dB, pero aun así se abre 0,102 dB de un extremo a otro, que es el ancho
+  entero del decimal impreso, así que tampoco es el desplazamiento constante
+  que dejaría una masa equivocada por sí sola.
+
+  Ningún dato aislado la cierra dentro de los 0,05 dB que admite una impresión
+  de un decimal. La mejor masa superficial sola, sobre la parte libre, es
+  18,13 kg/m² y deja 0,051 dB; la mejor presión estática sola son 950 hPa y
+  deja 0,051 dB; la mejor temperatura sola, sobre el hueco de ensayo, son 63 °C
+  y deja 0,052 dB. Las dos últimas contradicen el encabezado, que fija el clima
+  en 1 013 hPa y 23 °C, y la columna del cartón-yeso sí se reproduce justo con
+  ese clima, así que las dos columnas no pueden leerse con climas distintos.
+
+  La única lectura que sí reproduce los seis valores mueve dos datos a la vez:
+  un área de unos 1,654 m², cercana a la parte libre pero no igual a ella,
+  junto con una masa superficial de unos 18,16 kg/m². Esa masa no está al
+  alcance de la probeta descrita. El acero macizo de 2,2 mm da entre
+  16,9 kg/m² y 17,3 kg/m², y la hoja es un sándwich acero/resina/acero, así que
+  su masa superficial queda por fuerza por debajo. La columna del cartón-yeso
+  de esa misma tabla, con las mismas fórmulas y el mismo clima, reproduce sus
+  seis valores dentro de 0,050 dB.
+- **Evidencia:** Fórmulas (A.1) a (A.5) evaluadas a los 1 013 hPa y 23 °C
+  declarados, leídas en las páginas 17 y 18 del PDF (pp. 11 y 12 impresas) de
+  BS EN ISO 15186-3:2010. La ISO 140-3:1995, C.2.4, que A.2 cita como origen de
+  la probeta, describe la hoja de acero/resina/acero de 2,2 mm pero no declara
+  masa superficial alguna, así que los 17 kg/m² no vienen de ahí. No consta
+  corrigendum al anexo A.
+- **Comportamiento de la biblioteca:** `limp_panel_reduction_index` implementa
+  las Fórmulas (A.1) a (A.5) tal como se imprimen. La suite de conformidad las
+  ancla solo en la columna del cartón-yeso; la del acero no se usa como
+  oráculo a propósito.
 - **Estado:** sin notificar.
 
 ## ISO 10848-1:2006, apartado 8.1.1, Fórmula (20) (π espurio en la frecuencia crítica)

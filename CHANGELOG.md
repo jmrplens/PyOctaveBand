@@ -69,6 +69,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `building.low_frequency_intensity_reduction()` measures sound insulation
+  with sound intensity down to 50 Hz by the method of ISO 15186-3:2002, where
+  the source room is too modal for a space average to describe the field
+  driving the specimen. The level that goes into Formula (7) is read on the
+  surface of the test specimen itself, from microphones within 50 mm of it, so
+  the formula subtracts nine decibels and not the six of part 1: close to a
+  rigid boundary a diffuse field carries twice the mean-square pressure it
+  carries away from one, and a microphone that close reads the 3 dB of it. The Clause 6.4.2
+  qualification comes back per band against whichever of its two limits
+  applies, 10 dB for a sound-reflecting specimen and 6 dB for one presenting a
+  sound-absorbing surface in the receiving room, and a refused band is flagged
+  rather than dropped, because the standard's answer to it is to improve the
+  measurement environment. Both levels of that indicator are read on the
+  measurement surface in the receiving room, which is not where Formula (7)
+  reads its own, so they are a separate argument (`l_p`); Clause 6.4.2 asks for
+  them only "if possible", so without them the result reports no indicator and
+  no verdict instead of guessing one. Clause 6.6 admits 50 Hz, 63 Hz and 80 Hz
+  and optionally 100 Hz, 125 Hz and 160 Hz, and nothing outside that range.
+
+  `building.low_frequency_element_normalized_difference()` is Formula (8), the
+  same method for small building elements normalized to the 10 m2 reference
+  absorption area. It settles a disagreement inside the series: the unit-count
+  term reaches the result added here, which is the sign this library derives
+  and the opposite of what ISO 15186-1 prints for the same quantity, so the
+  errata entry standing against part 1 now cites part 3's own page.
+
+  `building.limp_panel_reduction_index()` is Annex A, which is normative and
+  is how a laboratory qualifies itself: the calculated index of a limp panel,
+  mass law reduced by the radiation efficiency of forced transmission, with
+  the air's characteristic impedance and speed of sound taken at the climate
+  of the test, against which a measurement must agree within 4,0 dB from 50 Hz
+  to 160 Hz. Its oracle is the plaster-board column of Table A.1, whose six
+  printed values reproduce from the stated inputs to the 0,05 dB of their
+  printed resolution. The steel-sandwich column beside them does not: no reading of the
+  inputs printed beside it reproduces it, and the one that would takes an area
+  and a surface mass moved together, the mass landing heavier than solid steel
+  of the stated thickness. It joins the errata registry and is deliberately not
+  used as an oracle.
+
+  No single-number rating accompanies either result: six bands cannot feed
+  ISO 717-1.
+
 - `emission.sound_power_in_duct()` determines the sound power a fan radiates
   into its duct by the in-duct method of ISO 5136:2003, the route for a fan
   that cannot be run unducted. It takes the one-third-octave level a shielded
