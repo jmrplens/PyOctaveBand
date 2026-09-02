@@ -62,6 +62,7 @@ _MIN_BANDS = 2
 #: alone, which is the kind of defect a reader sees and a test does not.
 _YLABEL_LW = "Sound power level $L_W$ [dB]"
 _YLABEL_LW_ABSOLUTE = r"Sound power level $L_W$ [dB re 1 pW]"
+_YLABEL_LJ = "Sound energy level $L_J$ [dB]"
 
 #: Spanish translations of the fixed labels/titles/legends rendered by the
 #: emission-domain ``.plot()`` renderers, keyed by their verbatim English
@@ -71,7 +72,7 @@ _YLABEL_LW_ABSOLUTE = r"Sound power level $L_W$ [dB re 1 pW]"
 _STRINGS: dict[str, str] = {
     "Band": "Banda",
     _YLABEL_LW: "Nivel de potencia acústica $L_W$ [dB]",
-    "Sound energy level $L_J$ [dB]": "Nivel de energía acústica $L_J$ [dB]",
+    _YLABEL_LJ: "Nivel de energía acústica $L_J$ [dB]",
     "sound power spectrum": "espectro de potencia acústica",
     "In situ sound power spectrum (ISO 3747)": "Espectro de potencia acústica in situ (ISO 3747)",
     "In situ sound energy spectrum (ISO 3747)": "Espectro de energía acústica in situ (ISO 3747)",
@@ -247,7 +248,7 @@ def plot_in_situ_sound_power(
     _hatch_invalid(bars, upper)
 
     if energy:
-        ax.set_ylabel(_t("Sound energy level $L_J$ [dB]", language))
+        ax.set_ylabel(_t(_YLABEL_LJ, language))
         title = _t("In situ sound energy spectrum (ISO 3747)", language)
         symbol = "$L_{J\\mathrm{A}}$"
     else:

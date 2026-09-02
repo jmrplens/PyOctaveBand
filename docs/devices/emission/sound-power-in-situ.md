@@ -178,7 +178,7 @@ print(round(two.sound_power_level_a, 1))        # 96.5 dB(A)
 | `levels` | 2D array | dB | `(n, bands)` | Measured $L'_{pi(\mathrm{ST})}$, one row per microphone position, three or four positions (7.4.1) |
 | `levels_ref` | 2D or 3D array | dB | `(n, bands)` or `(m, n, bands)` | The reference source at the same positions, one grid per location, corrected per its manufacturer but not for background |
 | `lw_ref` | 1D or 2D array | dB | `(bands,)` or `(m, bands)` | Calibrated $L_{W(\mathrm{RSS})}$, per location when each was calibrated in its own similar position (Eq. 12) |
-| `frequencies` | 1D array | Hz | 63 Hz to 8 kHz octaves | Nominal octave mid-band frequencies of Table D.1; required |
+| `frequencies` | 1D array | Hz | 63 Hz to 8 kHz octaves | Nominal octave mid-band frequencies of Table D.1; required. Clause 3.11 puts the general-purpose range at 125 Hz to 8 kHz; the 63 Hz row of Table D.1 carries footnote a, which allows it only where the test environment, the reference sound source and the instrumentation are satisfactory at that frequency |
 | `background_levels` | 1D or 2D array | dB | `(bands,)` or `(n, bands)` | $L_{pi(\mathrm{B})}$; one spectrum serves every position. `None` warns and leaves `background_requirement_met` `False` in every band, since 7.5 measures it at each position and 8.1 needs the margin |
 | `background_levels_ref` | 1D or 2D array | dB | same shapes | Background for the reference-source reading; `None` reuses `background_levels` (7.5) |
 | `temperature` | float | °C | default `23.0` | Air temperature at the test, for $C_2$ |

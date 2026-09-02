@@ -250,7 +250,7 @@ print(round(two.sound_power_level_a, 1))        # 96.5 dB(A)
 | `levels` | array 2D | dB | `(n, bandas)` | $L'_{pi(\mathrm{ST})}$ medidos, una fila por posición de micrófono, tres o cuatro posiciones (7.4.1) |
 | `levels_ref` | array 2D o 3D | dB | `(n, bandas)` o `(m, n, bandas)` | La fuente de referencia en las mismas posiciones, una rejilla por ubicación, corregida según su fabricante por velocidad, temperatura y presión pero no por ruido de fondo |
 | `lw_ref` | array 1D o 2D | dB | `(bandas,)` o `(m, bandas)` | $L_{W(\mathrm{RSS})}$ calibrada, por ubicación cuando cada una se calibró en su propia posición similar (Ec. 12) |
-| `frequencies` | array 1D | Hz | octavas de 63 Hz a 8 kHz | Frecuencias centrales nominales de octava de la Tabla D.1; obligatorio |
+| `frequencies` | array 1D | Hz | octavas de 63 Hz a 8 kHz | Frecuencias centrales nominales de octava de la Tabla D.1; obligatorio. El apartado 3.11 fija el rango de uso general en 125 Hz a 8 kHz; la fila de 63 Hz de la Tabla D.1 lleva la nota a, que solo la admite donde el entorno de ensayo, la fuente sonora de referencia y la instrumentación sean satisfactorios en esa frecuencia |
 | `background_levels` | array 1D o 2D | dB | `(bandas,)` o `(n, bandas)` | $L_{pi(\mathrm{B})}$; un espectro sirve para todas las posiciones. `None` avisa y deja `background_requirement_met` a `False` en todas las bandas, porque el 7.5 lo mide en cada posición y el 8.1 necesita el margen |
 | `background_levels_ref` | array 1D o 2D | dB | mismas formas | Ruido de fondo de la lectura de la fuente de referencia; `None` reutiliza `background_levels` (7.5) |
 | `temperature` | float | °C | por defecto `23.0` | Temperatura del aire en el ensayo, para $C_2$ |
