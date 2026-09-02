@@ -515,7 +515,7 @@ _ES_EXACT = {
     # steady source, and the L_J spectrum of the burst.
     "impact burst": "ráfaga de impacto",
     "steady source, $L_p$ = 80 dB": "fuente estacionaria, $L_p$ = 80 dB",
-    "$T$ = 10 s": "$T$ = 10 s",
+    "window $T$ = 10 s": "ventana $T$ = 10 s",
     "burst: all of its $L_E$ = 90.0 dB\nis in the first second": (
         "ráfaga: todo su $L_E$ = 90,0 dB\nestá en el primer segundo"
     ),

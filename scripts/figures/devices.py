@@ -1368,7 +1368,7 @@ def generate_sound_energy_burst(output_dir: str) -> None:
     axl.text(
         window - 0.15,
         93.3,
-        "$T$ = 10 s",
+        "window $T$ = 10 s",
         ha="right",
         va="top",
         fontsize=9.5,
