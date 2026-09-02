@@ -337,7 +337,10 @@ def test_clause_9_5_example_expanded_uncertainty_is_5_db() -> None:
     Table 2: U = 2 sqrt(1,5^2 + 2^2) dB = 2 sqrt(6,25) dB = 5 dB, exactly.
     """
     res = _power(
-        excess_levels=[8.0, 9.5, 7.2, 8.8], directivity_range=3.0, sigma_omc=2.0
+        conditions=emission.GradeConditions(
+            excess_levels=[8.0, 9.5, 7.2, 8.8], directivity_range=3.0
+        ),
+        sigma_omc=2.0,
     )
     assert res.grade == "engineering"
     assert res.sigma_r0 == 1.5
@@ -356,7 +359,10 @@ def test_table_e1_grade_2_row(sigma_omc: float, expected: float) -> None:
     sqrt(2,25 + 4) = 2,5; sqrt(2,25 + 16) = 4,27 -> 4,3 (printed to 0,1 dB).
     """
     res = _power(
-        excess_levels=[8.0, 9.5, 7.2, 8.8], directivity_range=3.0, sigma_omc=sigma_omc
+        conditions=emission.GradeConditions(
+            excess_levels=[8.0, 9.5, 7.2, 8.8], directivity_range=3.0
+        ),
+        sigma_omc=sigma_omc,
     )
     assert round(res.sigma_tot, 1) == expected
 
@@ -364,8 +370,9 @@ def test_table_e1_grade_2_row(sigma_omc: float, expected: float) -> None:
 def test_one_sided_coverage_factor_scales_eq23() -> None:
     """9.1: k = 1,6 for the one-sided 95 % comparison with a limit value."""
     res = _power(
-        excess_levels=[8.0, 9.5, 7.2, 8.8],
-        directivity_range=3.0,
+        conditions=emission.GradeConditions(
+            excess_levels=[8.0, 9.5, 7.2, 8.8], directivity_range=3.0
+        ),
         sigma_omc=2.0,
         coverage_factor=1.6,
     )
@@ -373,7 +380,11 @@ def test_one_sided_coverage_factor_scales_eq23() -> None:
 
 
 def test_uncertainty_is_nan_without_sigma_omc() -> None:
-    res = _power(excess_levels=[8.0, 9.5, 7.2, 8.8], directivity_range=3.0)
+    res = _power(
+        conditions=emission.GradeConditions(
+            excess_levels=[8.0, 9.5, 7.2, 8.8], directivity_range=3.0
+        )
+    )
     assert res.sigma_r0 == 1.5
     assert np.isnan(res.sigma_omc)
     assert np.isnan(res.sigma_tot)
@@ -397,7 +408,11 @@ def test_table_2_grades(
     range within +/-7 dB; anything else, or an indicator not determined, is
     grade 3 with sigma_R0 = 4,0 dB.
     """
-    res = _power(excess_levels=excess, directivity_range=directivity)
+    res = _power(
+        conditions=emission.GradeConditions(
+            excess_levels=excess, directivity_range=directivity
+        )
+    )
     assert res.grade == grade
     assert res.sigma_r0 == sigma_r0
 
@@ -608,11 +623,19 @@ def test_grade_indicators_are_validated() -> None:
     with pytest.raises(
         ValueError, match="'excess_levels' must carry one finite value per"
     ):
-        _power(excess_levels=[8.0, 9.0], directivity_range=3.0)
+        _power(
+            conditions=emission.GradeConditions(
+                excess_levels=[8.0, 9.0], directivity_range=3.0
+            )
+        )
     with pytest.raises(
         ValueError, match="'directivity_range' must be finite and non-negative"
     ):
-        _power(excess_levels=[8.0, 9.0, 8.0, 8.0], directivity_range=-1.0)
+        _power(
+            conditions=emission.GradeConditions(
+                excess_levels=[8.0, 9.0, 8.0, 8.0], directivity_range=-1.0
+            )
+        )
 
 
 def test_each_grade_indicator_is_validated_on_its_own() -> None:
@@ -624,19 +647,19 @@ def test_each_grade_indicator_is_validated_on_its_own() -> None:
     with pytest.raises(
         ValueError, match="'excess_levels' must carry one finite value per"
     ):
-        _power(excess_levels=[8.0, 9.0])
+        _power(conditions=emission.GradeConditions(excess_levels=[8.0, 9.0]))
     with pytest.raises(
         ValueError, match="'excess_levels' must carry one finite value per"
     ):
-        _power(excess_levels=[not_a_number] * 4)
+        _power(conditions=emission.GradeConditions(excess_levels=[not_a_number] * 4))
     with pytest.raises(
         ValueError, match="'directivity_range' must be finite and non-negative"
     ):
-        _power(directivity_range=-5.0)
+        _power(conditions=emission.GradeConditions(directivity_range=-5.0))
     with pytest.raises(
         ValueError, match="'directivity_range' must be finite and non-negative"
     ):
-        _power(directivity_range=not_a_number)
+        _power(conditions=emission.GradeConditions(directivity_range=not_a_number))
 
 
 def test_uncertainty_inputs_are_validated() -> None:

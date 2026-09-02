@@ -49,6 +49,7 @@ from .sound_power_anechoic import (
     sound_power_anechoic,
 )
 from .sound_power_in_situ import (
+    GradeConditions,
     InSituSoundPowerResult,
     excess_sound_pressure_level,
     sound_energy_in_situ,
@@ -102,6 +103,7 @@ __all__ = [
     "DeclarationForm",
     "DiscretePointIntensityResult",
     "FieldIndicators",
+    "GradeConditions",
     "InSituSoundPowerResult",
     "IntensityInstrumentComplianceResult",
     "IntensityResult",

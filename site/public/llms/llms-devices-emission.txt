@@ -1393,8 +1393,10 @@ background = np.array([  # Lpi(B): the factory floor, loud at the low end
 
 res = emission.sound_power_in_situ(
     st, rss, lw_rss, freqs, background_levels=background,
-    excess_levels=[8.2, 7.6, 8.9, 8.0],   # dLfA at each position (Annex A)
-    directivity_range=4.0,                # +/-4 dB round the machine (7.2)
+    conditions=emission.GradeConditions(
+        excess_levels=[8.2, 7.6, 8.9, 8.0],   # dLfA at each position (Annex A)
+        directivity_range=4.0,                # +/-4 dB round the machine (7.2)
+    ),
     sigma_omc=0.5,                        # a steady source (9.2 NOTE)
 )
 print(np.round(res.sound_power_level, 1))   # [88.8 91.5 92.6 91.8 88.9 84.7 78.6]
@@ -1483,8 +1485,7 @@ print(round(two.sound_power_level_a, 1))        # 96.5 dB(A)
 | `background_levels_ref` | 1D or 2D array | dB | same shapes | Background for the reference-source reading; `None` reuses `background_levels` (7.5) |
 | `temperature` | float | °C | default `23.0` | Air temperature at the test, for $C_2$ |
 | `static_pressure` | float | kPa | default `101.325` | Static pressure at the test, for $C_2$; see `static_pressure_from_altitude` |
-| `excess_levels` | 1D array | dB | `(n,)` | $\Delta L_{f\mathrm{A}}$ at each position (Annex A); with `directivity_range` it decides the grade |
-| `directivity_range` | float | dB | $\ge 0$ | Half-width of the A-weighted directivity range of the source (7.2) |
+| `conditions` | `GradeConditions` | | | The two conditions Table 2 reads together: `excess_levels`, the $\Delta L_{f\mathrm{A}}$ at each position `(n,)` in decibels (Annex A), and `directivity_range`, the half-width of the A-weighted directivity survey in decibels (7.2). Either one left out leaves the determination at survey grade |
 | `sigma_omc` | float | dB | $\ge 0$ | Standard deviation of the operating and mounting conditions (9.2); `None` leaves the uncertainty `NaN` |
 | `coverage_factor` | float | | default `2.0` | $k$ of Eq. 23; 1,6 for a one-sided comparison with a limit |
 
@@ -1545,7 +1546,7 @@ events = np.stack([strokes + d for d in (-0.3, 0.2, 0.0, 0.4, -0.2, 0.1)], axis=
 energy = emission.sound_energy_in_situ(
     events, rss, lw_rss, freqs,                 # (4 positions, 6 events, 7 bands)
     background_levels=background, integration_time=4.0,
-    excess_levels=[8.2, 7.6, 8.9, 8.0], directivity_range=4.0, sigma_omc=2.0,
+    conditions=emission.GradeConditions(excess_levels=[8.2, 7.6, 8.9, 8.0], directivity_range=4.0), sigma_omc=2.0,
 )
 print(energy.quantity)                            # energy
 print(np.round(energy.sound_energy_level, 1))     # [103.7 105.3 106.1 105.3 102.4  98.6  93. ]

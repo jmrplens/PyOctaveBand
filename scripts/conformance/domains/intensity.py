@@ -553,8 +553,7 @@ def _chk_iso3747_example_uncertainty() -> Outcome:
     res = ph.emission.sound_power_in_situ(
         _ISO3747_ST, _ISO3747_RSS, _ISO3747_LW_RSS, _ISO3747_FREQS,
         sigma_omc=2.0,
-        excess_levels=_ISO3747_EXCESS_GRADE2,
-        directivity_range=_ISO3747_DIRECTIVITY_GRADE2,
+        conditions=ph.emission.GradeConditions(excess_levels=_ISO3747_EXCESS_GRADE2, directivity_range=_ISO3747_DIRECTIVITY_GRADE2),
     )  # fmt: skip
     return numeric(5.0, float(res.expanded_uncertainty), 1e-12, unit="dB", places=6)
 
@@ -568,12 +567,11 @@ def _chk_iso3747_table2_and_e1() -> Outcome:
     grade2 = ph.emission.sound_power_in_situ(
         _ISO3747_ST, _ISO3747_RSS, _ISO3747_LW_RSS, _ISO3747_FREQS,
         sigma_omc=4.0,
-        excess_levels=_ISO3747_EXCESS_GRADE2,
-        directivity_range=_ISO3747_DIRECTIVITY_GRADE2,
+        conditions=ph.emission.GradeConditions(excess_levels=_ISO3747_EXCESS_GRADE2, directivity_range=_ISO3747_DIRECTIVITY_GRADE2),
     )  # fmt: skip
     grade3 = ph.emission.sound_power_in_situ(
         _ISO3747_ST, _ISO3747_RSS, _ISO3747_LW_RSS, _ISO3747_FREQS,
-        excess_levels=[8.0, 6.9, 7.2, 8.8], directivity_range=3.0,
+        conditions=ph.emission.GradeConditions(excess_levels=[8.0, 6.9, 7.2, 8.8], directivity_range=3.0)
     )  # fmt: skip
     # Table E.1, sigma_R0 = 1,5 dB row at sigma_omc = 4 dB: sqrt(18,25) = 4,27 -> 4,3.
     return record(

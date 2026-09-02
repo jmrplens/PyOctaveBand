@@ -155,8 +155,10 @@ background = np.array([  # Lpi(B): la nave, ruidosa en el extremo grave
 
 res = emission.sound_power_in_situ(
     st, rss, lw_rss, freqs, background_levels=background,
-    excess_levels=[8.2, 7.6, 8.9, 8.0],   # dLfA en cada posición (Anexo A)
-    directivity_range=4.0,                # +/-4 dB alrededor de la máquina (7.2)
+    conditions=emission.GradeConditions(
+        excess_levels=[8.2, 7.6, 8.9, 8.0],   # dLfA en cada posición (Anexo A)
+        directivity_range=4.0,                # +/-4 dB alrededor de la máquina (7.2)
+    ),
     sigma_omc=0.5,                        # una fuente estacionaria (NOTA de 9.2)
 )
 print(np.round(res.sound_power_level, 1))   # [88.8 91.5 92.6 91.8 88.9 84.7 78.6]
@@ -253,8 +255,7 @@ print(round(two.sound_power_level_a, 1))        # 96.5 dB(A)
 | `background_levels_ref` | array 1D o 2D | dB | mismas formas | Ruido de fondo de la lectura de la fuente de referencia; `None` reutiliza `background_levels` (7.5) |
 | `temperature` | float | °C | por defecto `23.0` | Temperatura del aire en el ensayo, para $C_2$ |
 | `static_pressure` | float | kPa | por defecto `101.325` | Presión estática en el ensayo, para $C_2$; véase `static_pressure_from_altitude` |
-| `excess_levels` | array 1D | dB | `(n,)` | $\Delta L_{f\mathrm{A}}$ en cada posición (Anexo A); con `directivity_range` decide el grado |
-| `directivity_range` | float | dB | $\ge 0$ | Semiamplitud del rango de directividad ponderado A de la fuente (7.2) |
+| `conditions` | `GradeConditions` | | | Las dos condiciones que la Tabla 2 lee juntas: `excess_levels`, el $\Delta L_{f\mathrm{A}}$ en cada posición `(n,)` en decibelios (Anexo A), y `directivity_range`, la semiamplitud del barrido de directividad ponderado A en decibelios (7.2). Si falta cualquiera de las dos, la determinación se queda en grado de control |
 | `sigma_omc` | float | dB | $\ge 0$ | Desviación típica de las condiciones de funcionamiento y montaje (9.2); `None` deja la incertidumbre en `NaN` |
 | `coverage_factor` | float | | por defecto `2.0` | $k$ de la Ec. 23; 1,6 para una comparación unilateral con un límite |
 
@@ -323,7 +324,7 @@ events = np.stack([strokes + d for d in (-0.3, 0.2, 0.0, 0.4, -0.2, 0.1)], axis=
 energy = emission.sound_energy_in_situ(
     events, rss, lw_rss, freqs,                 # (4 posiciones, 6 sucesos, 7 bandas)
     background_levels=background, integration_time=4.0,
-    excess_levels=[8.2, 7.6, 8.9, 8.0], directivity_range=4.0, sigma_omc=2.0,
+    conditions=emission.GradeConditions(excess_levels=[8.2, 7.6, 8.9, 8.0], directivity_range=4.0), sigma_omc=2.0,
 )
 print(energy.quantity)                            # energy
 print(np.round(energy.sound_energy_level, 1))     # [103.7 105.3 106.1 105.3 102.4  98.6  93. ]

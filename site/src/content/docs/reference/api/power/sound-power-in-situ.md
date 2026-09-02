@@ -121,6 +121,31 @@ traverse of levels and distances.
 | :--- | :--- |
 | ValueError | if any input is empty or not finite, any `distance` is not positive, or the three shapes do not broadcast against each other. |
 
+## GradeConditions
+
+```python
+GradeConditions(
+    excess_levels: ArrayLike | None = None,
+    directivity_range: float | None = None,
+)
+```
+
+The two conditions Table 2 puts on engineering grade 2.
+
+They travel together because they answer one question between them, which
+row of Table 2 the determination may claim, and neither answers it alone:
+the grade is engineering only when the field is reverberant enough at
+*every* microphone position **and** the source is not too directional.
+Either one missing leaves the determination at survey grade 3, which is
+the grade the standard grants when the evidence is not there.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `excess_levels` | A-weighted excess of sound pressure level over the free field, $\Delta L_{f\mathrm{A}}$, one finite value per microphone position, in decibels (clause 4.1, Annex A). Engineering grade needs at least 7 dB at every position. |
+| `directivity_range` | Range of the A-weighted directivity survey of the source under test, in decibels (clause 7.2). Engineering grade needs it within 7 dB. |
+
 ## InSituSoundPowerResult
 
 ```python
@@ -241,8 +266,7 @@ sound_energy_in_situ(
     integration_time: float | None = None,
     temperature: float = 23.0,
     static_pressure: float = 101.325,
-    excess_levels: ArrayLike | None = None,
-    directivity_range: float | None = None,
+    conditions: GradeConditions | None = None,
     sigma_omc: float | None = None,
     coverage_factor: float = 2.0,
 ) -> InSituSoundPowerResult
@@ -282,8 +306,7 @@ time-averaged, over 30 s (7.6), exactly as for a steady source.
 | `integration_time` | The integration time `T` of the event measurement, in seconds. `None` applies Eq. (14) as printed, subtracting the time-averaged background from the single event level; a value carries the background to the same interval first, $L_{pi(\mathrm{B})} + 10 \log_{10}(T/T_0)$ with `T0` = 1 s (3.4, NOTE 1), so that the margin compares like with like. The two coincide at `T` = 1 s. |
 | `temperature` | Air temperature at the test, in degrees Celsius. |
 | `static_pressure` | Static pressure at the test, in kilopascals. |
-| `excess_levels` | `dLfA` at each microphone position, `(n,)`. |
-| `directivity_range` | Half-width of the directivity range, in decibels. |
+| `conditions` | The [`GradeConditions`](/phonometry/reference/api/power/sound-power-in-situ/#gradeconditions) of the determination, as for [`sound_power_in_situ`](/phonometry/reference/api/power/sound-power-in-situ/#sound_power_in_situ). |
 | `sigma_omc` | Operating-and-mounting standard deviation, in decibels. |
 | `coverage_factor` | `k` of Eq. (23), 2 by default. |
 
@@ -308,8 +331,7 @@ sound_power_in_situ(
     background_levels_ref: ArrayLike | None = None,
     temperature: float = 23.0,
     static_pressure: float = 101.325,
-    excess_levels: ArrayLike | None = None,
-    directivity_range: float | None = None,
+    conditions: GradeConditions | None = None,
     sigma_omc: float | None = None,
     coverage_factor: float = 2.0,
 ) -> InSituSoundPowerResult
@@ -346,8 +368,7 @@ conditions of Annex C, and `sound_power_level_a` is the Annex D total.
 | `background_levels_ref` | Background for the reference-source measurement, same shapes; `None` reuses `background_levels`, since the procedure takes one background reading (7.5). |
 | `temperature` | Air temperature at the test, in degrees Celsius. |
 | `static_pressure` | Static pressure at the test, in kilopascals (see [`static_pressure_from_altitude`](/phonometry/reference/api/power/sound-power-in-situ/#static_pressure_from_altitude)). |
-| `excess_levels` | A-weighted excess of sound pressure level `dLfA` at each microphone position (Annex A), `(n,)`, in decibels; with `directivity_range` it decides the grade (Table 2). |
-| `directivity_range` | Range of the A-weighted directivity survey of the source (7.2), as the half-width `x` of `+/-x` dB. |
+| `conditions` | The [`GradeConditions`](/phonometry/reference/api/power/sound-power-in-situ/#gradeconditions) Table 2 reads to decide the accuracy grade: the excess of sound pressure level at each microphone position (Annex A) and the range of the directivity survey of the source (7.2). `None`, or either condition left out, leaves the determination at survey grade. |
 | `sigma_omc` | Standard deviation of the operating and mounting conditions of the source (9.2, E.3), in decibels; `None` leaves `sigma_tot` and the expanded uncertainty `NaN`. |
 | `coverage_factor` | `k` of Eq. (23): 2 for the two-sided 95 % interval (default), 1,6 for a one-sided comparison with a limit. |
 
@@ -357,7 +378,7 @@ conditions of Annex C, and `sound_power_level_a` is the Annex D total.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | if `levels` is not a finite `(n, bands)` array, `levels_ref`, `lw_ref` or either background does not match it, `frequencies` are not the octave centres of Table D.1, `temperature` or `static_pressure` is out of range, `excess_levels` is supplied and is not one finite value per position, `directivity_range` or `sigma_omc` is supplied and is negative, or `coverage_factor` is not positive. |
+| ValueError | if `levels` is not a finite `(n, bands)` array, `levels_ref`, `lw_ref` or either background does not match it, `frequencies` are not the octave centres of Table D.1, `temperature` or `static_pressure` is out of range, `conditions.excess_levels` is supplied and is not one finite value per position, `conditions.directivity_range` or `sigma_omc` is supplied and is negative, or `coverage_factor` is not positive. |
 
 ## static_pressure_from_altitude
 

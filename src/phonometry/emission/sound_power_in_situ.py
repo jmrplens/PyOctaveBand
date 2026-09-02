@@ -527,9 +527,31 @@ def _background_grid(
     return bg
 
 
-def _accuracy_grade(
-    excess_levels: ArrayLike | None, directivity_range: float | None, n_positions: int
-) -> Grade:
+@dataclass(frozen=True)
+class GradeConditions:
+    r"""The two conditions Table 2 puts on engineering grade 2.
+
+    They travel together because they answer one question between them, which
+    row of Table 2 the determination may claim, and neither answers it alone:
+    the grade is engineering only when the field is reverberant enough at
+    *every* microphone position **and** the source is not too directional.
+    Either one missing leaves the determination at survey grade 3, which is
+    the grade the standard grants when the evidence is not there.
+
+    :param excess_levels: A-weighted excess of sound pressure level over the
+        free field, :math:`\Delta L_{f\mathrm{A}}`, one finite value per
+        microphone position, in decibels (clause 4.1, Annex A). Engineering
+        grade needs at least 7 dB at every position.
+    :param directivity_range: Range of the A-weighted directivity survey of
+        the source under test, in decibels (clause 7.2). Engineering grade
+        needs it within 7 dB.
+    """
+
+    excess_levels: ArrayLike | None = None
+    directivity_range: float | None = None
+
+
+def _accuracy_grade(conditions: GradeConditions | None, n_positions: int) -> Grade:
     """The grade Table 2 grants: engineering only with the excess of sound
     pressure level at least 7 dB at every position and a directivity range
     within 7 dB; survey whenever either indicator fails or was not determined.
@@ -539,6 +561,10 @@ def _accuracy_grade(
     the determination to grade 3; only a genuinely undetermined indicator
     (``None``) falls through to survey.
     """
+    if conditions is None:
+        return "survey"
+    excess_levels = conditions.excess_levels
+    directivity_range = conditions.directivity_range
     excess: np.ndarray | None = None
     if excess_levels is not None:
         excess = _as_float64(excess_levels, "excess_levels")
@@ -629,8 +655,7 @@ class _Comparison:
     background_levels_ref: ArrayLike | None
     temperature: float
     static_pressure: float
-    excess_levels: ArrayLike | None
-    directivity_range: float | None
+    conditions: GradeConditions | None
     sigma_omc: float | None
     coverage_factor: float
 
@@ -759,9 +784,7 @@ def _determine(
     level = np.asarray(ref_power - mean_ref + mean_source, dtype=np.float64)
     nan_band = np.full(n_bands, np.nan, dtype=np.float64)
     total = energy_sum(level + _a_weighting_corrections(freqs))  # Eq. (D.1) / (D.2)
-    grade = _accuracy_grade(
-        comparison.excess_levels, comparison.directivity_range, n_positions
-    )
+    grade = _accuracy_grade(comparison.conditions, n_positions)
     sigma_r0, omc, sigma_tot, expanded = _uncertainty(
         grade, comparison.sigma_omc, comparison.coverage_factor
     )
@@ -800,8 +823,7 @@ def sound_power_in_situ(
     background_levels_ref: ArrayLike | None = None,
     temperature: float = 23.0,
     static_pressure: float = 101.325,
-    excess_levels: ArrayLike | None = None,
-    directivity_range: float | None = None,
+    conditions: GradeConditions | None = None,
     sigma_omc: float | None = None,
     coverage_factor: float = _COVERAGE_TWO_SIDED,
 ) -> InSituSoundPowerResult:
@@ -849,11 +871,11 @@ def sound_power_in_situ(
     :param temperature: Air temperature at the test, in degrees Celsius.
     :param static_pressure: Static pressure at the test, in kilopascals
         (see :func:`static_pressure_from_altitude`).
-    :param excess_levels: A-weighted excess of sound pressure level
-        ``dLfA`` at each microphone position (Annex A), ``(n,)``, in
-        decibels; with ``directivity_range`` it decides the grade (Table 2).
-    :param directivity_range: Range of the A-weighted directivity survey of
-        the source (7.2), as the half-width ``x`` of ``+/-x`` dB.
+    :param conditions: The :class:`GradeConditions` Table 2 reads to decide
+        the accuracy grade: the excess of sound pressure level at each
+        microphone position (Annex A) and the range of the directivity survey
+        of the source (7.2). ``None``, or either condition left out, leaves
+        the determination at survey grade.
     :param sigma_omc: Standard deviation of the operating and mounting
         conditions of the source (9.2, E.3), in decibels; ``None`` leaves
         ``sigma_tot`` and the expanded uncertainty ``NaN``.
@@ -864,8 +886,9 @@ def sound_power_in_situ(
         ``levels_ref``, ``lw_ref`` or either background does not match it,
         ``frequencies`` are not the octave centres of Table D.1,
         ``temperature`` or ``static_pressure`` is out of range,
-        ``excess_levels`` is supplied and is not one finite value per
-        position, ``directivity_range`` or ``sigma_omc`` is supplied and is
+        ``conditions.excess_levels`` is supplied and is not one finite value
+        per position, ``conditions.directivity_range`` or ``sigma_omc`` is
+        supplied and is
         negative, or ``coverage_factor`` is not positive.
     """
     arr = _finite_grid(levels, "levels", (2,))
@@ -893,8 +916,7 @@ def sound_power_in_situ(
             background_levels_ref=background_levels_ref,
             temperature=temperature,
             static_pressure=static_pressure,
-            excess_levels=excess_levels,
-            directivity_range=directivity_range,
+            conditions=conditions,
             sigma_omc=sigma_omc,
             coverage_factor=coverage_factor,
         ),
@@ -913,8 +935,7 @@ def sound_energy_in_situ(
     integration_time: float | None = None,
     temperature: float = 23.0,
     static_pressure: float = 101.325,
-    excess_levels: ArrayLike | None = None,
-    directivity_range: float | None = None,
+    conditions: GradeConditions | None = None,
     sigma_omc: float | None = None,
     coverage_factor: float = _COVERAGE_TWO_SIDED,
 ) -> InSituSoundPowerResult:
@@ -965,8 +986,8 @@ def sound_energy_in_situ(
         coincide at ``T`` = 1 s.
     :param temperature: Air temperature at the test, in degrees Celsius.
     :param static_pressure: Static pressure at the test, in kilopascals.
-    :param excess_levels: ``dLfA`` at each microphone position, ``(n,)``.
-    :param directivity_range: Half-width of the directivity range, in decibels.
+    :param conditions: The :class:`GradeConditions` of the determination, as
+        for :func:`sound_power_in_situ`.
     :param sigma_omc: Operating-and-mounting standard deviation, in decibels.
     :param coverage_factor: ``k`` of Eq. (23), 2 by default.
     :return: :class:`InSituSoundPowerResult` with ``quantity='energy'``.
@@ -1012,8 +1033,7 @@ def sound_energy_in_situ(
             background_levels_ref=background_levels_ref,
             temperature=temperature,
             static_pressure=static_pressure,
-            excess_levels=excess_levels,
-            directivity_range=directivity_range,
+            conditions=conditions,
             sigma_omc=sigma_omc,
             coverage_factor=coverage_factor,
         ),

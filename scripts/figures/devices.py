@@ -4981,8 +4981,9 @@ def generate_in_situ_sound_power(output_dir: str) -> None:
         lw_rss,
         freqs,
         background_levels=background,
-        excess_levels=[8.2, 7.6, 8.9, 8.0],
-        directivity_range=4.0,
+        conditions=emission.GradeConditions(
+            excess_levels=[8.2, 7.6, 8.9, 8.0], directivity_range=4.0
+        ),
         sigma_omc=0.5,
     )
     corrected_st = st - result.background_correction
