@@ -92,21 +92,30 @@ $$
 con los coeficientes $a_i$ tabulados en el Anexo A por banda de tercio de
 octava y por rango de diámetro del conducto (Tablas A.1 a A.6), y una celda
 vacía cuenta como cero. Las tablas son normativas de 50 Hz a 10 kHz y para
-$|U| \le 40$ m/s, y se dan solo a título informativo entre 40 m/s y 60 m/s
-y de 12,5 kHz a 20 kHz. Para el cono aerodinámico y la bola de espuma no
-existen datos modales, y el apartado 5.3.4.3 sustituye el polinomio por el
-término convectivo, independiente de la frecuencia, de la Ec. 8,
-$C_{3,4} = 10 \lg[1/(1 - U/c)^2]$ con $c = 340$ m/s en condiciones normales;
-rige el mismo convenio de signos, así que es positiva en el lado de impulsión
+$|U| \le 40$ m/s, y su nota al pie añade dos extensiones informativas que no
+se combinan: las filas de 50 Hz a 10 kHz valen también de 40 m/s a 60 m/s,
+mientras que las de 12,5 kHz a 20 kHz están bajo un encabezado propio que
+dice $|U| \le 40$ m/s y no reciben ninguna extensión de velocidad, así que
+`sound_power_in_duct()` rechaza una velocidad superior a 40 m/s en cuanto se
+pide una banda por encima de 10 kHz. Para el cono aerodinámico y la bola de
+espuma no existen datos modales, y el apartado 5.3.4.3 sustituye el polinomio
+por el término convectivo, independiente de la frecuencia, de la Ec. 8,
+$C_{3,4} = 10 \lg[1/(1 - U/c)^2]$, donde $c$ es la velocidad del sonido en el
+conducto de ensayo; el apartado 5.3.4.3 imprime 340 m/s "en condiciones
+normales", que es lo que usa `flow_modal_correction()` por su cuenta,
+mientras que una determinación completa conoce el aire del conducto y evalúa
+la Ec. 8 con el $c$ que da `temperature`, hasta 0,08 dB de diferencia en el
+rango del apartado 1.1. Rige el mismo convenio de signos, así que es positiva
+en el lado de impulsión
 y negativa en el de aspiración, unas décimas de decibelio a las velocidades
 que se permiten a esas pantallas (15 m/s para la bola de espuma, 20 m/s para
 el cono aerodinámico, apartado 1.1).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/in_duct_flow_correction_es.svg" alt="Dos paneles. A la izquierda, la corrección del tubo de muestreo C3,4 de ISO 5136 para un conducto de ensayo de 0,5 m frente a la frecuencia de 50 Hz a 20 kHz, seis curvas para velocidades medias del flujo de más y menos 5, 15 y 30 metros por segundo: las seis quedan a menos de un decibelio de cero hasta 500 Hz y después suben con la frecuencia, las del lado de impulsión más deprisa que las del de aspiración, hasta 24 dB a 20 kHz y más 30 metros por segundo mientras la curva de aspiración a menos 30 alcanza 8 dB; una línea punteada marca 10 kHz, más allá de la cual una etiqueta indica que los valores son solo informativos. A la derecha, la misma corrección frente a la velocidad del flujo de menos 40 a más 40 metros por segundo en las bandas de 1 kHz, 4 kHz y 10 kHz, tres curvas que suben del lado de aspiración al de impulsión, la de 10 kHz de 6 dB a 19 dB, con la corrección del cono aerodinámico y la bola de espuma de la Ecuación 8 dibujada a trazos entre menos 20 y más 20 metros por segundo y nunca a más de medio decibelio de cero" width="100%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/in_duct_flow_correction_es.svg" alt="Dos paneles. A la izquierda, la corrección del tubo de muestreo C3,4 de ISO 5136 para un conducto de ensayo de 0,5 m frente a la frecuencia de 50 Hz a 20 kHz, seis curvas para velocidades medias del flujo de más y menos 5, 15 y 30 metros por segundo: las seis se mantienen a menos de 1,6 dB de cero hasta 500 Hz, y la curva de aspiración a menos 30 metros por segundo baja hasta menos 1,5 dB a 315 Hz, y después suben con la frecuencia, las del lado de impulsión más deprisa que las del de aspiración, hasta 24 dB a 20 kHz y más 30 metros por segundo mientras la curva de aspiración a menos 30 alcanza 8 dB; una línea punteada marca el extremo superior de la banda de 10 kHz, más allá de la cual una etiqueta indica que los valores son solo informativos. A la derecha, la misma corrección frente a la velocidad del flujo de menos 40 a más 40 metros por segundo en las bandas de 1 kHz, 4 kHz y 10 kHz, tres curvas que suben del lado de aspiración al de impulsión, la de 10 kHz de 6 dB a 19 dB, con la corrección del cono aerodinámico y la bola de espuma de la Ecuación 8 dibujada a trazos entre menos 20 y más 20 metros por segundo y nunca a más de 0,53 dB de cero" width="100%" />
 
 *Lo que cuesta el tubo de muestreo y dónde. En un conducto de 0,5 m la
-corrección es de unas décimas de decibelio por debajo de 500 Hz, donde el
-conducto transporta ondas planas, y sube a 10 dB y más por encima de 4 kHz,
+corrección se mantiene a menos de 1,6 dB de cero por debajo de 500 Hz, donde
+el conducto transporta ondas planas, y sube a 10 dB y más por encima de 4 kHz,
 donde los modos de orden superior llegan al micrófono desde todas las
 direcciones y el tubo ranurado, que escucha a lo largo de su eje, los oye
 menos. El polinomio no es impar en $U$: los mismos 30 m/s corrigen el lado de
@@ -204,10 +213,13 @@ duct.plot(language="es")   # espectro de LW en el conducto, LWA en el título (r
 
 *Las barras son el $L_W$ por banda, la línea a trazos el nivel que el tubo
 de muestreo leyó antes de cualquier corrección. En el extremo grave las dos
-difieren solo en el término de área, $10 \lg S = -5{,}06$ dB para el
-conducto de 0,312 m², menos los 0,14 dB del término de impedancia; de 1 kHz
-en adelante mandan las correcciones, hasta que a 10 kHz la respuesta propia
-del tubo y $C_{3,4}$ suman 18 dB y la potencia supera la lectura en 13 dB.
+difieren en 4,93 dB: el término de área, $10 \lg S = -5{,}06$ dB para el
+conducto de 0,312 m², más los 0,14 dB del término de impedancia, que ensancha
+la diferencia en vez de cerrarla, menos los 0,27 dB que $C_{3,4}$ ya aporta a
+12 m/s incluso en las bandas de onda plana. De 1 kHz en adelante mandan las
+correcciones, hasta que a 10 kHz la corrección combinada llega a 18 dB
+(4,0 dB de respuesta del tubo, 12,9 dB de $C_{3,4}$ y 1,1 dB de corrección
+del micrófono) y la potencia supera la lectura en 13 dB.
 Un espectro leído en un conducto sin estas correcciones no es el espectro
 del ventilador.*
 
@@ -256,9 +268,13 @@ print(round(inlet.sound_power_level_a, 1))                # 88.1 dB(A)
 La segunda es lo que las pantallas omnidireccionales no corrigen. Un cono
 aerodinámico a los mismos 12 m/s toma los 0,31 dB convectivos de la Ec. 8 en
 todas las bandas y nada más, así que las mismas lecturas dan 86,6 dB(A), 3 dB
-menos que a través del tubo de muestreo; la norma advierte en el apartado
-5.3.4.3 de que el nivel obtenido con un cono aerodinámico o una bola de
-espuma "is expected to be higher than the true sound power level", y la
+menos que a través del tubo de muestreo. Las lecturas se reutilizan tal cual
+solo para aislar lo que hace la corrección; un cono aerodinámico en ese
+conducto no las leería. Es omnidireccional, así que oye los modos de orden
+superior de los que el tubo ranurado se aparta, y más turbulencia, y su nivel
+en el conducto saldría más alto, que es por lo que la norma advierte en el
+apartado 5.3.4.3 de que el nivel obtenido con un cono aerodinámico o una bola
+de espuma "is expected to be higher than the true sound power level". La
 corrección modal ausente es la razón de que las dos pantallas se limiten a
 velocidades bajas y de que se prefiera el tubo de muestreo (apartado 4,
 NOTA 5).
@@ -279,11 +295,11 @@ print(round(cone.sound_power_level_a, 1))                 # 86.6 dB(A)
 | `levels` | array 1D o 2D | dB | `(bandas,)` o `(posiciones, bandas)` | NPS promediado en el tiempo en el conducto; 2D se promedia en energía sobre las posiciones (Ec. 9), 1D es un nivel multiplexado o de recorrido (Ec. 11) |
 | `frequencies` | array 1D | Hz | tercios nominales, de 50 Hz a 20 kHz | Obligatorio: los coeficientes, la ponderación A y $\sigma_R$ se indexan por el centro nominal |
 | `duct_diameter` | float | m | de 0,15 a 2 | Diámetro del conducto de ensayo $d$ (apartado 1.1); selecciona la tabla del Anexo A |
-| `flow_velocity` | float | m/s | con signo; ≤ 40 tubo de muestreo (60 a título informativo), ≤ 20 cono aerodinámico, ≤ 15 bola de espuma | Velocidad media del flujo $U$ en el micrófono; negativa en el lado de aspiración |
+| `flow_velocity` | float | m/s | con signo; ≤ 40 tubo de muestreo (60 a título informativo, pero ≤ 40 siempre que se pida una banda por encima de 10 kHz), ≤ 20 cono aerodinámico, ≤ 15 bola de espuma | Velocidad media del flujo $U$ en el micrófono; negativa en el lado de aspiración |
 | `shield` | str | | `'sampling-tube'` (por defecto), `'nose-cone'`, `'foam-ball'` | Selecciona la Ec. 7 con el Anexo A o la Ec. 8, y el límite de velocidad |
 | `microphone_correction` | float o array 1D | dB | por defecto `0.0` | $C_1$ de los datos del fabricante |
 | `shield_correction` | float o array 1D | dB | por defecto `0.0` | $C_2$ medida según 5.3.3.2 c) o 5.3.4.2 |
-| `temperature` | float | °C | de −50 a 70, por defecto `20.0` | Aire del conducto; fija $c$ y $\rho$ |
+| `temperature` | float | °C | de −50 a 70, por defecto `20.0` | Aire del conducto; fija $c$ y $\rho$, y con ellos el $c$ de la Ec. 8 para las pantallas omnidireccionales |
 | `static_pressure` | float | kPa | por defecto `101.325` | Aire del conducto; fija $\rho$ |
 
 La función devuelve un `InDuctSoundPowerResult` con el $L_W$ por banda
@@ -315,7 +331,7 @@ una cobertura del 95 %, y eso es lo que lleva el resultado:
 
 ```python
 print(duct.reproducibility_standard_deviation[[0, 13, 23]])   # [3.5 2.  4. ] dB
-print(duct.expanded_uncertainty[[0, 13, 23]])                 # [7. 4. 8. ] dB
+print(duct.expanded_uncertainty[[0, 13, 23]])                 # [7. 4. 8.] dB
 print(bool(duct.information_only_band.any()))                 # False
 ```
 
@@ -383,6 +399,6 @@ que un conducto fuera de 0,15 m a 2 m se rechaza.
   plana de la Ec. 12.
 - [Niveles](/phonometry/es/signals/levels/levels/): el promedio en energía y
   la ponderación A tras $L_{W\mathrm{A}}$.
-- Referencia de la API: [`emission.sound_power_in_duct`](/phonometry/reference/api/power/sound-power-in-duct/).
+- Referencia de la API: [`emission.sound_power_in_duct`](/phonometry/es/reference/api/power/sound-power-in-duct/).
 
 </SeeAlso>

@@ -1484,15 +1484,19 @@ def generate_in_duct_flow_correction(output_dir: str) -> None:
                 label=label,
                 zorder=3,
             )
-    # Above 10 kHz the coefficients are printed for information only.
+    # Above 10 kHz the coefficients are printed for information only. The
+    # callout sits inside the axes, right of the boundary it explains: the
+    # decade past it is only a tenth of the width, so anchoring the box there
+    # from the left would run it over the right spine and its ticks.
     boundary = float(np.sqrt(10000.0 * 12500.0))
     axf.axvline(boundary, color=COLOR_MUTED, linestyle=":", linewidth=1.4, zorder=2)
     axf.text(
-        boundary * 1.06,
-        -1.2,
+        0.985,
+        0.035,
         "12.5 kHz to 20 kHz:\nfor information only",
-        ha="left",
-        va="top",
+        transform=axf.transAxes,
+        ha="right",
+        va="bottom",
         fontsize=9,
         color=COLOR_FG,
         bbox={

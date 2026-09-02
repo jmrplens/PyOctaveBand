@@ -162,6 +162,26 @@ def test_table_a5_5000_hz_reads_the_missing_digit_as_one() -> None:
     assert dict(_TABLE_A5)[5000][3] == pytest.approx(-1.24e-05)
 
 
+def test_table_a2_20_khz_row_reads_the_last_column_as_a9() -> None:
+    """Table A.2 heads its a9 coefficient column "a9_0" (docs/ERRATA.md).
+
+    The column is a_9: A.1 and A.3 to A.6 head it so, and the NOTE under
+    every table sums a_i U^i from i = 0 to 10. The 20 000 Hz row is the only
+    row of A.2 that populates it, and at U = 10 m/s its ten printed
+    coefficients multiply out to
+    1,18e+01 + 4,59e-01 x 1e1 + 1,81e-02 x 1e2 - 4,24e-04 x 1e3
+    - 3,60e-05 x 1e4 + 3,70e-07 x 1e5 + 3,06e-08 x 1e6 - 1,94e-10 x 1e7
+    - 8,76e-12 x 1e8 + 4,09e-14 x 1e9
+    = 11,8 + 4,59 + 1,81 - 0,424 - 0,36 + 0,037 + 0,0306 - 0,00194
+      - 0,000876 + 0,0000409 = 17,480 824 9 dB.
+    """
+    row = dict(_TABLE_A2)[20000]
+    assert len(row) == 10
+    assert row[9] == pytest.approx(4.09e-14)
+    computed = float(emission.flow_modal_correction([20000.0], 10.0, 0.25)[0])
+    assert computed == pytest.approx(17.4808249, abs=1e-9)
+
+
 @pytest.mark.parametrize(
     ("diameter", "rows"),
     [
@@ -373,7 +393,7 @@ def test_end_to_end_single_band_by_hand() -> None:
     1 kHz, d = 0,5 m, U = +15 m/s, Lp = 80 dB, C1 = 0,2 dB, C2 = -0,4 dB,
     20 degC and 101,325 kPa:
     C3,4 = 2,42 dB (Eq. (D.2)); C = 0,2 - 0,4 + 2,42 = 2,22 dB;
-    Lp corrected = 82,22 dB; 10 lg(S) = -7,0691 dB;
+    Lp corrected = 82,22 dB; 10 lg(S) = -7,0697 dB;
     -10 lg(413,25/400) = -0,1416 dB; LW = 82,22 - 7,0697 - 0,1416 = 75,009 dB.
     The A-weighted level of a lone 1 kHz band is the band level (C_j = 0).
     """
@@ -571,6 +591,51 @@ def test_refuses_a_non_finite_velocity() -> None:
         emission.flow_modal_correction([1000.0], float("nan"), 0.5)
 
 
+@pytest.mark.parametrize("band", [12500.0, 16000.0, 20000.0])
+def test_refuses_above_10_khz_beyond_40_m_s(band: float) -> None:
+    """The two informative extensions of the Annex A footnote do not compose.
+
+    The rows for 12,5 kHz to 20 kHz sit under their own "|U| <= 40 m/s" band
+    header (Tables A.1 to A.6), and the footnote extends only the frequency
+    range, not the velocity. Past 40 m/s those polynomials diverge, so the
+    combination is refused rather than answered.
+    """
+    with pytest.raises(ValueError, match="'flow_velocity' must satisfy"):
+        emission.flow_modal_correction([band], 40.5, 0.5)
+    with pytest.raises(ValueError, match="'flow_velocity' must satisfy"):
+        emission.sound_power_in_duct([80.0], [band], 0.5, -60.0)
+
+
+def test_the_informative_velocity_range_survives_below_10_khz() -> None:
+    """40 m/s to 60 m/s stays available for the bands the footnote extends."""
+    values = emission.flow_modal_correction([1000.0, 10000.0], 45.0, 0.5)
+    assert np.isfinite(values).all()
+    on_the_edge = emission.flow_modal_correction([20000.0], 40.0, 0.5)
+    assert np.isfinite(on_the_edge).all()
+
+
+@pytest.mark.parametrize(
+    ("name", "kwargs"),
+    [
+        ("duct_diameter", {"duct_diameter": np.array([0.5, 0.6])}),
+        ("flow_velocity", {"flow_velocity": np.array([10.0, 20.0])}),
+        ("temperature", {"temperature": np.array([20.0, 21.0])}),
+        ("static_pressure", {"static_pressure": np.array([101.0, 102.0])}),
+    ],
+)
+def test_refuses_a_non_scalar_where_one_measurement_is_meant(
+    name: str, kwargs: dict[str, object]
+) -> None:
+    """A per-band array where a single number belongs names its parameter."""
+    call: dict[str, object] = {
+        "duct_diameter": 0.5,
+        "flow_velocity": 10.0,
+        **kwargs,
+    }
+    with pytest.raises(ValueError, match=f"'{name}' must be a real number"):
+        emission.sound_power_in_duct([80.0], [1000.0], **call)  # type: ignore[arg-type]
+
+
 def test_refuses_an_unknown_shield() -> None:
     with pytest.raises(ValueError, match="'shield' must be one of"):
         emission.flow_modal_correction([1000.0], 10.0, 0.5, shield="windscreen")  # type: ignore[arg-type]
@@ -646,6 +711,10 @@ def test_refuses_a_correction_of_the_wrong_length() -> None:
         emission.sound_power_in_duct(
             _flat(80.0), _BANDS, 0.5, 10.0, microphone_correction=[0.1, 0.2]
         )
+    with pytest.raises(ValueError, match=r"per band \(27 in 'frequencies'\)"):
+        emission.sound_power_in_duct(
+            _flat(80.0), _BANDS, 0.5, 10.0, microphone_correction=[0.1, 0.2]
+        )
     with pytest.raises(
         ValueError, match="'shield_correction' must be a scalar or carry"
     ):
@@ -698,6 +767,23 @@ def test_result_refuses_a_non_finite_scalar() -> None:
     res = emission.sound_power_in_duct(_flat(80.0), _BANDS, 0.5, 10.0)
     with pytest.raises(ValueError, match="'duct_area' must be finite"):
         dataclasses.replace(res, duct_area=float("nan"))
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "microphone_correction",
+        "shield_correction",
+        "flow_modal_correction",
+        "combined_correction",
+    ],
+)
+def test_result_refuses_a_non_finite_correction_column(field: str) -> None:
+    """The record of clause 9.1 f) prints all four columns as plain numbers."""
+    res = emission.sound_power_in_duct(_flat(80.0), _BANDS, 0.5, 10.0)
+    blank = np.full(_BANDS.size, np.nan)
+    with pytest.raises(ValueError, match=f"'{field}' must contain only finite"):
+        dataclasses.replace(res, **{field: blank})
 
 
 def test_result_records_the_inputs() -> None:

@@ -49,17 +49,24 @@ metres per second, negative on the inlet side and positive on the outlet side
 whose coefficients :math:`a_i` Annex A tabulates per one-third-octave band
 and per range of test-duct diameter (Tables A.1 to A.6, 0,15 m to 2 m), an
 empty cell being zero. The coefficients are normative for 50 Hz to 10 kHz and
-:math:`|U| \le 40` m/s, and given for information only for
-:math:`40 < |U| \le 60` m/s and for 12,5 kHz to 20 kHz (the footnote of every
-table). For the omni-directional nose cone and foam ball no modal data exist,
-and clause 5.3.4.3 replaces the polynomial by the frequency-independent
-convective term (equation (8)):
+:math:`|U| \le 40` m/s. The footnote of every table then adds two informative
+extensions which do not combine: within 50 Hz to 10 kHz the rows also hold for
+:math:`40 < |U| \le 60` m/s, while the rows for 12,5 kHz to 20 kHz are given
+for :math:`|U| \le 40` m/s only, and carry their own ":math:`|U| \le 40` m/s"
+band header in the print. A velocity beyond 40 m/s is therefore refused as
+soon as a band above 10 kHz is asked for. For the omni-directional nose cone
+and foam ball no modal data exist, and clause 5.3.4.3 replaces the polynomial
+by the frequency-independent convective term (equation (8)):
 
 .. math::
 
    C_{3,4} = 10 \lg \frac{1}{(1 - U/c)^2}~\mathrm{dB} \tag{Eq. 8}
 
-with :math:`c` the speed of sound, 340 m/s under normal conditions.
+with :math:`c` the speed of sound, which clause 5.3.4.3 prints as 340 m/s
+"under normal conditions". A whole determination knows the duct air, so
+:func:`sound_power_in_duct` evaluates Eq. (8) with the :math:`c` its
+``temperature`` gives, the "speed of sound in the test duct" of Table 1;
+the 340 m/s is the default of :func:`flow_modal_correction` called on its own.
 
 The A-weighted sound power level is the energy sum of the band levels with the
 :math:`C_j` of Table C.1 (Annex C, equation (C.1)), and the uncertainty to
@@ -649,8 +656,12 @@ class InDuctSoundPowerResult:
         entry long is silently dropped, so the lengths are pinned here.
 
         ``shield`` is pinned because the uncertainty statement and the
-        velocity scope both turn on it, and the scalars are pinned finite
-        because every one of them reaches a printed sheet as a plain number.
+        velocity scope both turn on it. The scalars, the levels and the three
+        correction columns are pinned finite because every one of them reaches
+        a printed sheet as a plain number and none of them has a
+        not-applicable reading a NaN could stand for: ``sound_power_in_duct``
+        refuses a non-finite :math:`C_1` or :math:`C_2` at the door, and
+        :math:`C_{3,4}` is always a finite polynomial value.
 
         :raises ValueError: if a per-band field disagrees with the rest,
             ``shield`` is not one of the three of clause 5.3, or a scalar or
@@ -678,6 +689,9 @@ class InDuctSoundPowerResult:
             "sound_power_level",
             "mean_pressure_level",
             "corrected_pressure_level",
+            "microphone_correction",
+            "shield_correction",
+            "flow_modal_correction",
             "combined_correction",
             "reproducibility_standard_deviation",
             "expanded_uncertainty",
@@ -695,7 +709,7 @@ class InDuctSoundPowerResult:
         r"""Plot the in-duct sound power spectrum with the A-weighted total.
 
         One bar per one-third-octave band of ``sound_power_level``, the
-        :math:`L_{W\\mathrm{A}}` of Annex C in the title. Requires matplotlib
+        :math:`L_{W\mathrm{A}}` of Annex C in the title. Requires matplotlib
         (``pip install phonometry[plot]``); returns the
         :class:`~matplotlib.axes.Axes`.
 
@@ -748,6 +762,23 @@ def _check_shield(shield: str) -> str:
     return require_choice(shield, "shield", _SHIELDS)
 
 
+def _as_scalar(value: object, name: str) -> float:
+    """Coerce one measurement to a ``float``, naming the parameter when it is not.
+
+    The scope guards below read a single number: a duct diameter, a mean flow
+    velocity, a temperature, a static pressure. Handing them a per-band array
+    or a string is an ordinary caller mistake, and left to :func:`float` it
+    raises a bare ``TypeError`` from numpy or the interpreter that names
+    neither the parameter nor the function; every refusal of this module is a
+    ``ValueError`` that names its parameter, so the coercion is made here.
+    """
+    try:
+        return float(value)  # type: ignore[arg-type]
+    except (TypeError, ValueError) as exc:
+        msg = f"'{name}' must be a real number."
+        raise ValueError(msg) from exc
+
+
 def _check_duct_diameter(duct_diameter: float) -> float:
     """The test-duct diameter, refused outside the 0,15 m to 2 m of clause 1.1.
 
@@ -755,7 +786,7 @@ def _check_duct_diameter(duct_diameter: float) -> float:
     larger ducts, but the standard says they are not part of itself and this
     module does not reach past its scope.
     """
-    d = require_positive(duct_diameter, "duct_diameter")
+    d = require_positive(_as_scalar(duct_diameter, "duct_diameter"), "duct_diameter")
     if d < _DUCT_DIAMETER_MIN or d > _DUCT_DIAMETER_MAX:
         msg = (
             "'duct_diameter' must be between 0.15 m and 2 m, the test-duct "
@@ -774,7 +805,8 @@ def _check_flow_velocity(flow_velocity: float, shield: str) -> float:
     60 m/s for information, so that is where the refusal sits; between 40 and
     60 the result is flagged rather than refused.
     """
-    if not math.isfinite(flow_velocity):
+    u = _as_scalar(flow_velocity, "flow_velocity")
+    if not math.isfinite(u):
         msg = "'flow_velocity' must be finite."
         raise ValueError(msg)
     limit = (
@@ -782,7 +814,7 @@ def _check_flow_velocity(flow_velocity: float, shield: str) -> float:
         if shield == "sampling-tube"
         else _MAX_VELOCITY[shield]
     )
-    if abs(flow_velocity) > limit:
+    if abs(u) > limit:
         why = (
             "Annex A gives no coefficients beyond it"
             if shield == "sampling-tube"
@@ -790,10 +822,45 @@ def _check_flow_velocity(flow_velocity: float, shield: str) -> float:
         )
         msg = (
             f"'flow_velocity' must satisfy |U| <= {limit:g} m/s for the "
-            f"{shield.replace('-', ' ')} ({why}); got {flow_velocity:g} m/s."
+            f"{shield.replace('-', ' ')} ({why}); got {u:g} m/s."
         )
         raise ValueError(msg)
-    return float(flow_velocity)
+    return u
+
+
+def _check_informative_bands(frequencies: np.ndarray, flow_velocity: float) -> None:
+    r"""Refuse the corner of Annex A the tables leave empty.
+
+    Tables A.1 to A.6 are split by a band header. Over 50 Hz to 10 kHz the
+    rows carry the normative :math:`|U| \le 40` m/s and, for information, the
+    extended :math:`|U| \le 60` m/s; the rows for 12,5 kHz to 20 kHz sit under
+    a second header that reads ":math:`|U| \le 40` m/s", and the footnote
+    grants them no velocity extension: "Also for information only, values are
+    given for an extended frequency range, 12 500 Hz to 20 000 Hz, for flow
+    velocities :math:`|U| \le 40`".
+
+    The two extensions therefore do not compose. Evaluated past 40 m/s the
+    high-band polynomials do not merely lose accuracy, they diverge: at
+    60 m/s in a 0,5 m duct they return +100 dB at 12,5 kHz, -369 dB at 16 kHz
+    and +268 dB at 20 kHz. Nothing downstream can tell that apart from a
+    correction, so the combination is refused at the door.
+
+    :raises ValueError: if a band above 10 kHz is asked for at |U| > 40 m/s.
+    """
+    limit = _MAX_VELOCITY["sampling-tube"]
+    if abs(flow_velocity) <= limit:
+        return
+    above = frequencies[frequencies > _NORMATIVE_MAX_HZ]
+    if above.size == 0:
+        return
+    msg = (
+        f"'flow_velocity' must satisfy |U| <= {limit:g} m/s for the "
+        "one-third-octave bands above 10 kHz: ISO 5136 Annex A gives the "
+        "12,5 kHz to 20 kHz coefficients for that range only (the band "
+        f"header and footnote of Tables A.1 to A.6); got {flow_velocity:g} "
+        f"m/s with {above[0]:g} Hz in 'frequencies'."
+    )
+    raise ValueError(msg)
 
 
 def _annex_a_rows(duct_diameter: float) -> _Rows:
@@ -851,13 +918,16 @@ def flow_modal_correction(
     :param shield: ``"sampling-tube"`` (default), ``"nose-cone"`` or
         ``"foam-ball"``.
     :param speed_of_sound: The :math:`c` of Eq. (8), in metres per second;
-        the 340 m/s the standard states for normal conditions by default.
-        Unused by the sampling tube.
+        the 340 m/s clause 5.3.4.3 states for normal conditions by default.
+        :func:`sound_power_in_duct` passes the duct air's own :math:`c`
+        instead. Unused by the sampling tube.
     :return: :math:`C_{3,4}` per band, in decibels.
     :raises ValueError: for a band that is not a nominal centre, a diameter
         outside 0,15 m to 2 m, a velocity beyond the shield's limit (60 m/s
         for the sampling tube, 20 m/s for the nose cone, 15 m/s for the foam
-        ball) or a non-positive speed of sound.
+        ball), a velocity beyond 40 m/s asked for in a band above 10 kHz,
+        where Annex A tabulates no coefficients, or a non-positive speed of
+        sound.
     """
     freqs = _nominal_bands(frequencies)
     _check_shield(shield)
@@ -871,6 +941,7 @@ def flow_modal_correction(
         # Eq. (8): 10 lg[1/(1 - U/c)^2], one value for every band.
         value = 10.0 * math.log10(1.0 / (1.0 - u / c) ** 2)
         return np.full(freqs.shape, value, dtype=np.float64)
+    _check_informative_bands(freqs, u)
     rows = _annex_a_rows(duct_diameter)
     return np.asarray(
         [
@@ -908,25 +979,28 @@ def _check_air(temperature: float, static_pressure: float) -> tuple[float, float
     stated for (clause 1.1). The speed of sound is the ISO 3741 form the
     emission package already uses, and the density is the ideal gas at the
     static pressure and temperature of the duct, so that
-    :math:`\\rho c` is 413 N s/m^3 at 20 degC and 101,325 kPa against the
+    :math:`\rho c` is 413 N s/m^3 at 20 degC and 101,325 kPa against the
     400 N s/m^3 reference of Eq. (12).
 
     :return: ``(c, rho_c)`` in m/s and N s/m^3.
     """
+    theta = _as_scalar(temperature, "temperature")
     if (
-        not math.isfinite(temperature)
-        or temperature < _TEMPERATURE_MIN_C
-        or temperature > _TEMPERATURE_MAX_C
+        not math.isfinite(theta)
+        or theta < _TEMPERATURE_MIN_C
+        or theta > _TEMPERATURE_MAX_C
     ):
         msg = (
             "'temperature' must be between -50 degC and 70 degC, the air "
             f"temperature range of ISO 5136 (clause 1.1); got {temperature!r}."
         )
         raise ValueError(msg)
-    ps = require_positive(static_pressure, "static_pressure")
-    c = _speed_of_sound(temperature)
+    ps = require_positive(
+        _as_scalar(static_pressure, "static_pressure"), "static_pressure"
+    )
+    c = _speed_of_sound(theta)
     # kPa to Pa in the numerator; the ideal-gas density of dry air.
-    rho = ps * 1000.0 / (_R_DRY_AIR * (_KELVIN + temperature))
+    rho = ps * 1000.0 / (_R_DRY_AIR * (_KELVIN + theta))
     return c, rho * c
 
 
@@ -935,7 +1009,7 @@ def _position_levels(levels: ArrayLike, n_bands: int) -> np.ndarray:
 
     A 2-D array is one row per circumferential microphone position, to be
     energy-averaged by Eq. (9); a 1-D array is a level already averaged by
-    multiplexing or a continuous traverse, the :math:`\\overline{L_{pm}}` of
+    multiplexing or a continuous traverse, the :math:`\overline{L_{pm}}` of
     Eq. (11). Fewer than the three positions of clause 6.2.2 is warned about,
     not refused: the arithmetic is the same and the shortfall is a matter of
     sampling the duct, which the caller may have done another way.
@@ -1017,22 +1091,31 @@ def sound_power_in_duct(
         of the shield determined per clause 5.3.3.2 c) or 5.3.4.2, in
         decibels, per band or scalar.
     :param temperature: Air temperature in the duct, in degrees Celsius,
-        -50 degC to 70 degC; sets :math:`c` and :math:`\rho`.
+        -50 degC to 70 degC; sets :math:`c` and :math:`\rho`. The :math:`c`
+        it sets is also the one Eq. (8) is evaluated with for the
+        omni-directional shields, Table 1 defining :math:`c` as the speed of
+        sound in the test duct; over the -50 degC to 70 degC of clause 1.1
+        that moves :math:`C_{3,4}` by up to 0,08 dB against the 340 m/s
+        :func:`flow_modal_correction` uses on its own.
     :param static_pressure: Static pressure in the duct, in kilopascals;
         sets :math:`\rho`.
     :return: :class:`InDuctSoundPowerResult`.
     :raises ValueError: for levels of the wrong shape or not finite, a band
         that is not a nominal centre, a diameter, velocity or temperature
-        outside the scope of the standard, a correction that is neither a
-        scalar nor one value per band, or a non-positive static pressure.
+        that is not a real number or is outside the scope of the standard, a
+        velocity beyond 40 m/s asked for in a band above 10 kHz, a correction
+        that is neither a scalar nor one value per band, or a non-positive
+        static pressure.
     """
     freqs = _nominal_bands(frequencies)
     _check_shield(shield)
     d = _check_duct_diameter(duct_diameter)
     u = _check_flow_velocity(flow_velocity, shield)
     c, rho_c = _check_air(temperature, static_pressure)
-    c1 = require_per_band(microphone_correction, "microphone_correction", freqs)
-    c2 = require_per_band(shield_correction, "shield_correction", freqs)
+    c1 = require_per_band(
+        microphone_correction, "microphone_correction", freqs, "frequencies"
+    )
+    c2 = require_per_band(shield_correction, "shield_correction", freqs, "frequencies")
     if not np.all(np.isfinite(c1)):
         msg = "'microphone_correction' must contain only finite values."
         raise ValueError(msg)

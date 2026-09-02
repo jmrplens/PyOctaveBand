@@ -69,19 +69,27 @@ $$
 with the coefficients $a_i$ tabulated in Annex A per one-third-octave band
 and per range of duct diameter (Tables A.1 to A.6), an empty cell counting
 as zero. The tables are normative for 50 Hz to 10 kHz and $|U| \le 40$ m/s,
-and given for information only between 40 m/s and 60 m/s and from 12.5 kHz
-to 20 kHz. For the nose cone and the foam ball no modal data exist, and
+and their footnote adds two informative extensions that do not compose: the
+50 Hz to 10 kHz rows also hold from 40 m/s to 60 m/s, while the 12.5 kHz to
+20 kHz rows sit under a band header of their own that reads $|U| \le 40$ m/s
+and get no velocity extension, so `sound_power_in_duct()` refuses a velocity
+past 40 m/s as soon as a band above 10 kHz is asked for. For the nose cone
+and the foam ball no modal data exist, and
 clause 5.3.4.3 replaces the polynomial by the frequency-independent
-convective term of Eq. 8, $C_{3,4} = 10 \lg[1/(1 - U/c)^2]$ with
-$c = 340$ m/s under normal conditions; the same sign convention applies, so
+convective term of Eq. 8, $C_{3,4} = 10 \lg[1/(1 - U/c)^2]$, where $c$ is
+the speed of sound in the test duct; clause 5.3.4.3 prints 340 m/s "under
+normal conditions", which is what `flow_modal_correction()` uses on its own,
+while a whole determination knows the duct air and evaluates Eq. 8 with the
+$c$ that `temperature` gives, up to 0.08 dB away over the range of
+clause 1.1. The same sign convention applies, so
 it is positive on the outlet side and negative on the inlet side, a few
 tenths of a decibel at the velocities those shields are allowed (15 m/s for
 the foam ball, 20 m/s for the nose cone, clause 1.1).
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/in_duct_flow_correction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/in_duct_flow_correction.svg" alt="Two panels. On the left, the sampling-tube correction C3,4 of ISO 5136 for a 0.5 m test duct against frequency from 50 Hz to 20 kHz, six curves for mean flow velocities of plus and minus 5, 15 and 30 metres per second: all six lie within a decibel of zero up to 500 Hz, then climb with frequency, the outlet-side curves faster than the inlet-side ones, reaching 24 dB at 20 kHz and plus 30 metres per second while the inlet-side curve at minus 30 reaches 8 dB; a dotted line marks 10 kHz, beyond which a chip notes that the values are for information only. On the right, the same correction against the flow velocity from minus 40 to plus 40 metres per second in the 1 kHz, 4 kHz and 10 kHz bands, three curves that rise from the inlet side to the outlet side, the 10 kHz one from 6 dB to 19 dB, with the nose cone and foam ball correction of Equation 8 drawn dashed between minus 20 and plus 20 metres per second and never further than half a decibel from zero" width="100%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/in_duct_flow_correction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/in_duct_flow_correction.svg" alt="Two panels. On the left, the sampling-tube correction C3,4 of ISO 5136 for a 0.5 m test duct against frequency from 50 Hz to 20 kHz, six curves for mean flow velocities of plus and minus 5, 15 and 30 metres per second: all six stay inside 1.6 dB of zero up to 500 Hz, the inlet-side curve at minus 30 metres per second dipping to minus 1.5 dB at 315 Hz, then they climb with frequency, the outlet-side curves faster than the inlet-side ones, reaching 24 dB at 20 kHz and plus 30 metres per second while the inlet-side curve at minus 30 reaches 8 dB; a dotted line marks the top of the 10 kHz band, beyond which a chip notes that the values are for information only. On the right, the same correction against the flow velocity from minus 40 to plus 40 metres per second in the 1 kHz, 4 kHz and 10 kHz bands, three curves that rise from the inlet side to the outlet side, the 10 kHz one from 6 dB to 19 dB, with the nose cone and foam ball correction of Equation 8 drawn dashed between minus 20 and plus 20 metres per second and never further than 0.53 dB from zero" width="100%"></picture>
 
-*What the sampling tube costs and where. In a 0.5 m duct the correction is
-a few tenths of a decibel below 500 Hz, where the duct carries plane waves,
+*What the sampling tube costs and where. In a 0.5 m duct the correction
+stays within 1.6 dB of zero below 500 Hz, where the duct carries plane waves,
 and climbs to 10 dB and more above 4 kHz, where the higher-order modes reach
 the microphone from every direction and the slit tube, which listens along
 its axis, hears less of them. The polynomial is not odd in $U$: the same
@@ -176,12 +184,15 @@ duct.plot()   # in-duct LW spectrum, LWA in the title (needs matplotlib)
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_in_duct_result_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_in_duct_result.svg" alt="Bar chart of the in-duct sound power level of the example fan in the 24 one-third-octave bands from 50 Hz to 10 kHz, with the A-weighted total of 89.7 decibels in the title. The bars rise from 73 dB at 50 Hz to 83 dB at 160 Hz, the blade-passage band, then sit between 79 and 81 dB up to 1.25 kHz and fall gently to 75 dB at 10 kHz. A dashed line with circular markers traces the measured in-duct level before the corrections: it is 5 dB above the bars at the low end, crosses them near 2 kHz and ends 13 dB below them at 10 kHz, where the sampling-tube corrections are largest" width="88%"></picture>
 
 *The bars are $L_W$ per band, the dashed line the level the sampling tube
-read before any correction. At the low end the two differ by the area term
-alone, $10 \lg S = -5.06$ dB for the 0.312 m² duct, less the 0.14 dB of the
-impedance term; from 1 kHz up the corrections take over, until at 10 kHz the
-tube's own response and $C_{3,4}$ together add 18 dB and the power exceeds
-the reading by 13 dB. A spectrum read in a duct without these corrections is
-not the fan's spectrum.*
+read before any correction. At the low end the two differ by 4.93 dB: the
+area term $10 \lg S = -5.06$ dB for the 0.312 m² duct, plus the 0.14 dB of
+the impedance term, which widens the gap rather than closing it, less the
+0.27 dB that $C_{3,4}$ already adds at 12 m/s even in the plane-wave bands.
+From 1 kHz up the corrections take over, until at 10 kHz the combined
+correction reaches 18 dB (4.0 dB of tube response, 12.9 dB of $C_{3,4}$ and
+1.1 dB of microphone correction) and the power exceeds the reading by 13 dB.
+A spectrum read in a duct without these corrections is not the fan's
+spectrum.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -228,10 +239,14 @@ print(round(inlet.sound_power_level_a, 1))                # 88.1 dB(A)
 The second is what the omni-directional shields do not correct. A nose cone
 at the same 12 m/s takes the convective 0.31 dB of Eq. 8 in every band and
 nothing else, so the same readings give 86.6 dB(A), 3 dB less than through
-the sampling tube; the standard warns in clause 5.3.4.3 that the level
+the sampling tube. The readings are reused unchanged only to isolate what the
+correction does; a nose cone in that duct would not read them. It is
+omni-directional, so it hears the higher-order modes the slit tube turns away
+from, and more of the turbulence, and its in-duct level would come out
+higher, which is why the standard warns in clause 5.3.4.3 that the level
 obtained with a nose cone or foam ball "is expected to be higher than the
-true sound power level", the missing modal correction being the reason the
-two shields are limited to low velocities and the sampling tube is preferred
+true sound power level". The missing modal correction is the reason the two
+shields are limited to low velocities and the sampling tube is preferred
 (clause 4, NOTE 5).
 
 ```python
@@ -250,11 +265,11 @@ print(round(cone.sound_power_level_a, 1))                 # 86.6 dB(A)
 | `levels` | 1D or 2D array | dB | `(bands,)` or `(positions, bands)` | Time-averaged in-duct SPL; 2D is energy-averaged over the positions (Eq. 9), 1D is a multiplexed or traversed level (Eq. 11) |
 | `frequencies` | 1D array | Hz | nominal thirds, 50 Hz to 20 kHz | Required: the coefficients, the A-weighting and $\sigma_R$ are all keyed by the nominal centre |
 | `duct_diameter` | float | m | 0.15 to 2 | Test-duct diameter $d$ (clause 1.1); selects the Annex A table |
-| `flow_velocity` | float | m/s | signed; ≤ 40 sampling tube (60 for information), ≤ 20 nose cone, ≤ 15 foam ball | Mean flow velocity $U$ at the microphone; negative on the inlet side |
+| `flow_velocity` | float | m/s | signed; ≤ 40 sampling tube (60 for information, but ≤ 40 whenever a band above 10 kHz is asked for), ≤ 20 nose cone, ≤ 15 foam ball | Mean flow velocity $U$ at the microphone; negative on the inlet side |
 | `shield` | str | | `'sampling-tube'` (default), `'nose-cone'`, `'foam-ball'` | Selects Eq. 7 with Annex A or Eq. 8, and the velocity limit |
 | `microphone_correction` | float or 1D array | dB | default `0.0` | $C_1$ from the manufacturer's data |
 | `shield_correction` | float or 1D array | dB | default `0.0` | $C_2$ measured per 5.3.3.2 c) or 5.3.4.2 |
-| `temperature` | float | °C | −50 to 70, default `20.0` | Duct air; sets $c$ and $\rho$ |
+| `temperature` | float | °C | −50 to 70, default `20.0` | Duct air; sets $c$ and $\rho$, and with them the $c$ of Eq. 8 for the omni-directional shields |
 | `static_pressure` | float | kPa | default `101.325` | Duct air; sets $\rho$ |
 
 The function returns an `InDuctSoundPowerResult` with the band $L_W$
@@ -285,7 +300,7 @@ expanded uncertainty at 95 % coverage, and that is what the result carries:
 
 ```python
 print(duct.reproducibility_standard_deviation[[0, 13, 23]])   # [3.5 2.  4. ] dB
-print(duct.expanded_uncertainty[[0, 13, 23]])                 # [7. 4. 8. ] dB
+print(duct.expanded_uncertainty[[0, 13, 23]])                 # [7. 4. 8.] dB
 print(bool(duct.information_only_band.any()))                 # False
 ```
 

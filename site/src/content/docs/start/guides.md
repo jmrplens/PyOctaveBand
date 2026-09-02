@@ -623,6 +623,10 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 and EBU R 128.
 - [Sound Power in Situ by Comparison](/phonometry/devices/emission/sound-power-in-situ/):
   the ISO 3747 comparison against a reference sound source where the machine
   works, with the sound energy level of an impulsive source.
+
+- [Sound Power in a Duct](/phonometry/devices/emission/sound-power-in-duct/):
+  the ISO 5136 in-duct method for fans, with the sampling-tube flow and modal
+  correction of Annex A and the plane-wave relation of clause 8.
 - [Sound Power by Intensity Scanning](/phonometry/devices/emission/sound-power-intensity/):
   the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade.
 - [Sound power from surface vibration (ISO/TS 7849)](/phonometry/devices/emission/vibration-sound-power/):

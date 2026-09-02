@@ -4197,34 +4197,32 @@ dos ediciones con las mismas entradas y en el mismo orden.
   que cambiar.
 - **Estado:** sin notificar.
 
-## ISO 5136:2003, apartado 5.3.4.3 (el signo de la corrección del cono aerodinámico y la bola de espuma)
+## ISO 5136:2003, Tabla A.2, cabecera de coeficientes (la columna $a_9$ se titula $a9_0$)
 
-- **Ubicación:** apartado 5.3.4.3, la frase que introduce la Ecuación (8) y
-  la propia ecuación.
-- **El impreso:** «The corrections for these omni-directional microphone
-  shields are estimated to be negative and of small magnitude and are,
-  therefore, considered to be independent of frequency for the purposes of
-  this International Standard. For swirl-free flow, this correction is a
-  function of the mean flow velocity according to the following equation»,
-  y a continuación $C_{3,4} = 10 \lg \dfrac{1}{(1 - U/c)^2}$ dB con «$U < 0$
-  for inlet-side measurements; $U > 0$ for outlet-side measurements».
-- **El problema:** la ecuación es positiva siempre que $U > 0$. A los 20 m/s
-  que se permiten al cono aerodinámico, con $c$ = 340 m/s, da $+0{,}53$ dB
-  en el lado de impulsión y $-0{,}50$ dB en el de aspiración, así que la
-  frase describe solo el lado de aspiración. El signo de la ecuación es el
-  que da la onda plana convectada: el flujo de energía de una onda que viaja
-  con el flujo es $(1 + M)^2$ veces $p^2/\rho c$, de modo que para una
-  presión dada la potencia es mayor aguas abajo y menor aguas arriba, y
-  $-20 \lg(1 - M)$ es ese factor a primer orden en $M$. La mitad defectuosa
-  es la frase, no la ecuación.
-- **Evidencia:** página 29 del PDF (p. 19 impresa) de ISO 5136:2003.
-- **Comportamiento de la biblioteca:** la Ecuación (8) tal como está
-  impresa, en
-  [`flow_modal_correction`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_in_duct.py)
-  para las pantallas `"nose-cone"` y `"foam-ball"`, positiva en el lado de
-  impulsión; fijada por `test_eq8_omnidirectional_shields` en
-  [`tests/emission/test_sound_power_in_duct.py`](https://github.com/jmrplens/phonometry/blob/main/tests/emission/test_sound_power_in_duct.py).
-- **Estado:** sin notificar.
+- **Ubicación:** Anexo A, Tabla A.2, «Values of coefficients $a_i$ for the
+  determination of the combined mean flow velocity and modal correction
+  $C_{3,4}$ of the sampling tube for duct diameters 0,2 m $\le d <$ 0,3 m»,
+  la fila de cabecera de las columnas de coeficientes, décima columna.
+- **El impreso:** una $a$ en cursiva, un 9 en cursiva sobre la línea base y
+  un 0 como subíndice, entre un $a_8$ y un $a_{10}$ de la misma fila que sí
+  llevan su índice como subíndice.
+- **El problema:** un subíndice cero de más en una columna que es $a_9$. La
+  misma columna se titula $a_9$ en las Tablas A.1 y A.3 a A.6, la NOTA de
+  cada una de ellas suma $a_i U^i$ de $i = 0$ a $i = 10$ sobre las once
+  columnas que tiene la fila, y la única celda que esta contiene, el
+  $4{,}09 \times 10^{-14}$ de la fila de 20 000 Hz, es el coeficiente de
+  $U^9$: un $a_{90}$ no tendría lugar alguno en esa suma.
+- **Evidencia:** página 36 del PDF (p. 26 impresa) de ISO 5136:2003, frente a
+  la fila de cabecera de la Tabla A.1 en la página 35 del PDF (p. 25
+  impresa).
+- **Comportamiento de la biblioteca:** la columna se lee como $a_9$.
+  `_TABLE_A2` en
+  [`sound_power_in_duct.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_in_duct.py)
+  lleva la fila de 20 000 Hz como los diez coeficientes $a_0$ a $a_9$, y
+  `test_table_a2_20_khz_row_reads_the_last_column_as_a9` en
+  [`tests/emission/test_sound_power_in_duct.py`](https://github.com/jmrplens/phonometry/blob/main/tests/emission/test_sound_power_in_duct.py)
+  desarrolla la fila. No cambia ningún valor de coeficiente.
+- **Estado:** sin notificar (tipográfico, sin consecuencia numérica).
 
 ## ISO 5136:2003, Tabla A.6, fila de 16 000 Hz ($a_1$ impreso con el signo de multiplicación duplicado)
 
@@ -4354,6 +4352,7 @@ concordancia con las fuentes publicadas:
   de impulsión imprime un *Sum* de 49 dB a 500 Hz donde $76 - 28 = 48$, y
   después un *Combined* consistente con 48), que es por lo que la comparación
   corre al 1 dB que la hoja impresa lleva.
+<<<<<<< HEAD
 - **ISO 3747:2010 Tabla E.1, las etiquetas de grado de precisión:** la tabla
   informativa de ejemplos de $\sigma_\mathrm{tot}$ etiqueta sus tres filas
   «0,5 (accuracy grade 1)», «1,5 (accuracy grade 2)» y «3 (accuracy
@@ -4396,5 +4395,29 @@ concordancia con las fuentes publicadas:
   `integration_time` en
   [`sound_energy_in_situ`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_in_situ.py)
   para llevar antes el ruido de fondo al intervalo del suceso.
+=======
+- **ISO 5136:2003, apartado 5.3.4.3, el signo de la Ecuación (8):** el
+  apartado dice que las correcciones del cono aerodinámico y la bola de
+  espuma «are estimated to be negative and of small magnitude», y a
+  continuación imprime $C_{3,4} = 10 \lg[1/(1 - U/c)^2]$ dB, que es positiva
+  siempre que $U > 0$: a los 20 m/s que se permiten al cono aerodinámico, con
+  $c$ = 340 m/s, $+0{,}53$ dB en el lado de impulsión y $-0{,}50$ dB en el de
+  aspiración. El signo de la ecuación es el que da la onda plana convectada:
+  el flujo de energía de una onda que viaja con el flujo es $(1 + M)^2$ veces
+  $p^2/\rho c$, de modo que para una presión dada la potencia es mayor aguas
+  abajo y menor aguas arriba. No se registra como errata porque la frase con
+  la que se cierra ese mismo párrafo reconcilia las dos: «With this
+  simplification, the sound power level obtained by using the nose cone or
+  foam ball is expected to be higher than the true sound power level.» La
+  corrección negativa es la modal, que no está disponible y se descarta; la
+  Ecuación (8) es la parte convectiva que se conserva, y la norma dice en la
+  misma frase que lo que queda sesga el $L_W$ hacia arriba. Leído en la
+  página 29 del PDF (p. 19 impresa) de ISO 5136:2003. Se registra aquí para
+  que nadie «corrija» el signo de la Ecuación (8), que
+  [`flow_modal_correction`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/sound_power_in_duct.py)
+  implementa tal como está impresa y que fija
+  `test_eq8_omnidirectional_shields` en
+  [`tests/emission/test_sound_power_in_duct.py`](https://github.com/jmrplens/phonometry/blob/main/tests/emission/test_sound_power_in_duct.py).
+>>>>>>> bdeca2b98 (Refuse the corner of Annex A that has no coefficients, and put the page right)
 
 <!-- END GENERATED BODY -->

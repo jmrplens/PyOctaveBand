@@ -3840,33 +3840,30 @@ in the same order.
   geometry and are not computed; nothing to change.
 - **Status:** unreported.
 
-## ISO 5136:2003, clause 5.3.4.3 (the sign of the nose-cone and foam-ball correction)
+## ISO 5136:2003, Table A.2, coefficient header (the $a_9$ column heads $a9_0$)
 
-- **Location:** clause 5.3.4.3, the sentence that introduces Equation (8)
-  and the equation itself.
-- **The print:** "The corrections for these omni-directional microphone
-  shields are estimated to be negative and of small magnitude and are,
-  therefore, considered to be independent of frequency for the purposes of
-  this International Standard. For swirl-free flow, this correction is a
-  function of the mean flow velocity according to the following equation",
-  then $C_{3,4} = 10 \lg \dfrac{1}{(1 - U/c)^2}$ dB with "$U < 0$ for
-  inlet-side measurements; $U > 0$ for outlet-side measurements".
-- **The problem:** the equation is positive whenever $U > 0$. At the 20 m/s
-  the nose cone is allowed, with $c$ = 340 m/s, it gives $+0{,}53$ dB on the
-  outlet side and $-0{,}50$ dB on the inlet side, so the sentence describes
-  the inlet side only. The sign of the equation is the one the convected
-  plane wave gives: the energy flux of a wave travelling with the flow is
-  $(1 + M)^2$ times $p^2/\rho c$, so for a given pressure the power is
-  higher downstream and lower upstream, and $-20 \lg(1 - M)$ is that factor
-  to first order in $M$. The sentence, not the equation, is the defective
-  half.
-- **Evidence:** PDF page 29 (printed p. 19) of ISO 5136:2003.
-- **Library behaviour:** Equation (8) as printed, in
-  [`flow_modal_correction`](../src/phonometry/emission/sound_power_in_duct.py)
-  for the `"nose-cone"` and `"foam-ball"` shields, positive on the outlet
-  side; pinned by `test_eq8_omnidirectional_shields` in
-  [`tests/emission/test_sound_power_in_duct.py`](../tests/emission/test_sound_power_in_duct.py).
-- **Status:** unreported.
+- **Location:** Annex A, Table A.2, "Values of coefficients $a_i$ for the
+  determination of the combined mean flow velocity and modal correction
+  $C_{3,4}$ of the sampling tube for duct diameters 0,2 m $\le d <$ 0,3 m",
+  the header row of the coefficient columns, tenth column.
+- **The print:** an italic $a$, an italic 9 on the baseline and a subscript
+  0, between an $a_8$ and an $a_{10}$ of the same row that both carry their
+  index as a subscript.
+- **The problem:** a stray subscript zero on a column that is $a_9$. The same
+  column is headed $a_9$ in Tables A.1 and A.3 to A.6, the NOTE under every
+  one of them sums $a_i U^i$ from $i = 0$ to $i = 10$ over the eleven columns
+  the row has, and the single cell this one holds, the
+  $4{,}09 \times 10^{-14}$ of the 20 000 Hz row, is the coefficient of
+  $U^9$: an $a_{90}$ would have no place in that sum at all.
+- **Evidence:** PDF page 36 (printed p. 26) of ISO 5136:2003, against the
+  header row of Table A.1 on PDF page 35 (printed p. 25).
+- **Library behaviour:** the column is read as $a_9$. `_TABLE_A2` in
+  [`sound_power_in_duct.py`](../src/phonometry/emission/sound_power_in_duct.py)
+  carries the 20 000 Hz row as the ten coefficients $a_0$ to $a_9$, and
+  `test_table_a2_20_khz_row_reads_the_last_column_as_a9` in
+  [`tests/emission/test_sound_power_in_duct.py`](../tests/emission/test_sound_power_in_duct.py)
+  multiplies the row out. No coefficient value changes.
+- **Status:** unreported (typographic, no numerical consequence).
 
 ## ISO 5136:2003, Table A.6, 16 000 Hz row ($a_1$ printed with a doubled multiplication sign)
 
@@ -4023,3 +4020,25 @@ published sources:
   Eq. (14) as printed by default and offers `integration_time` on
   [`sound_energy_in_situ`](../src/phonometry/emission/sound_power_in_situ.py)
   to carry the background to the event's interval first.
+
+- **ISO 5136:2003, clause 5.3.4.3, the sign of Equation (8):** the clause
+  says the corrections of the nose cone and the foam ball "are estimated to
+  be negative and of small magnitude", and then prints
+  $C_{3,4} = 10 \lg[1/(1 - U/c)^2]$ dB, which is positive whenever $U > 0$:
+  at the 20 m/s the nose cone is allowed, with $c$ = 340 m/s, $+0{,}53$ dB on
+  the outlet side and $-0{,}50$ dB on the inlet side. The equation's sign is
+  the one the convected plane wave gives, the energy flux of a wave
+  travelling with the flow being $(1 + M)^2$ times $p^2/\rho c$, so for a
+  given pressure the power is higher downstream and lower upstream. It is not
+  registered as an erratum because the closing sentence of the same paragraph
+  reconciles the two: "With this simplification, the sound power level
+  obtained by using the nose cone or foam ball is expected to be higher than
+  the true sound power level." The negative correction is the modal one,
+  which is unavailable and is dropped; Equation (8) is the convective part
+  that is kept, and the standard says in the same breath that what is left
+  biases $L_W$ high. Read on PDF page 29 (printed p. 19) of ISO 5136:2003.
+  Registered here so that nobody "corrects" the sign of Equation (8), which
+  [`flow_modal_correction`](../src/phonometry/emission/sound_power_in_duct.py)
+  implements as printed and `test_eq8_omnidirectional_shields` in
+  [`tests/emission/test_sound_power_in_duct.py`](../tests/emission/test_sound_power_in_duct.py)
+  pins.

@@ -49,17 +49,24 @@ $$
 whose coefficients $a_i$ Annex A tabulates per one-third-octave band
 and per range of test-duct diameter (Tables A.1 to A.6, 0,15 m to 2 m), an
 empty cell being zero. The coefficients are normative for 50 Hz to 10 kHz and
-$|U| \le 40$ m/s, and given for information only for
-$40 < |U| \le 60$ m/s and for 12,5 kHz to 20 kHz (the footnote of every
-table). For the omni-directional nose cone and foam ball no modal data exist,
-and clause 5.3.4.3 replaces the polynomial by the frequency-independent
-convective term (equation (8)):
+$|U| \le 40$ m/s. The footnote of every table then adds two informative
+extensions which do not combine: within 50 Hz to 10 kHz the rows also hold for
+$40 < |U| \le 60$ m/s, while the rows for 12,5 kHz to 20 kHz are given
+for $|U| \le 40$ m/s only, and carry their own "$|U| \le 40$ m/s"
+band header in the print. A velocity beyond 40 m/s is therefore refused as
+soon as a band above 10 kHz is asked for. For the omni-directional nose cone
+and foam ball no modal data exist, and clause 5.3.4.3 replaces the polynomial
+by the frequency-independent convective term (equation (8)):
 
 $$
 C_{3,4} = 10 \lg \frac{1}{(1 - U/c)^2}~\mathrm{dB} \tag{Eq. 8}
 $$
 
-with $c$ the speed of sound, 340 m/s under normal conditions.
+with $c$ the speed of sound, which clause 5.3.4.3 prints as 340 m/s
+"under normal conditions". A whole determination knows the duct air, so
+[`sound_power_in_duct`](/phonometry/reference/api/power/sound-power-in-duct/#sound_power_in_duct) evaluates Eq. (8) with the $c$ its
+`temperature` gives, the "speed of sound in the test duct" of Table 1;
+the 340 m/s is the default of [`flow_modal_correction`](/phonometry/reference/api/power/sound-power-in-duct/#flow_modal_correction) called on its own.
 
 The A-weighted sound power level is the energy sum of the band levels with the
 $C_j$ of Table C.1 (Annex C, equation (C.1)), and the uncertainty to
@@ -121,7 +128,7 @@ correction on the two sides of the fan.
 | `flow_velocity` | Mean flow velocity $U$ at the microphone position, in metres per second, negative on the inlet side. |
 | `duct_diameter` | Test-duct diameter $d$, in metres, 0,15 m to 2 m; it selects the Annex A table for the sampling tube and is checked against the scope for the other shields. |
 | `shield` | `"sampling-tube"` (default), `"nose-cone"` or `"foam-ball"`. |
-| `speed_of_sound` | The $c$ of Eq. (8), in metres per second; the 340 m/s the standard states for normal conditions by default. Unused by the sampling tube. |
+| `speed_of_sound` | The $c$ of Eq. (8), in metres per second; the 340 m/s clause 5.3.4.3 states for normal conditions by default. [`sound_power_in_duct`](/phonometry/reference/api/power/sound-power-in-duct/#sound_power_in_duct) passes the duct air's own $c$ instead. Unused by the sampling tube. |
 
 **Returns:** $C_{3,4}$ per band, in decibels.
 
@@ -129,7 +136,7 @@ correction on the two sides of the fan.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | for a band that is not a nominal centre, a diameter outside 0,15 m to 2 m, a velocity beyond the shield's limit (60 m/s for the sampling tube, 20 m/s for the nose cone, 15 m/s for the foam ball) or a non-positive speed of sound. |
+| ValueError | for a band that is not a nominal centre, a diameter outside 0,15 m to 2 m, a velocity beyond the shield's limit (60 m/s for the sampling tube, 20 m/s for the nose cone, 15 m/s for the foam ball), a velocity beyond 40 m/s asked for in a band above 10 kHz, where Annex A tabulates no coefficients, or a non-positive speed of sound. |
 
 ## in_duct_reproducibility
 
@@ -226,7 +233,7 @@ InDuctSoundPowerResult.plot(
 Plot the in-duct sound power spectrum with the A-weighted total.
 
 One bar per one-third-octave band of `sound_power_level`, the
-$L_{W\\mathrm{A}}$ of Annex C in the title. Requires matplotlib
+$L_{W\mathrm{A}}$ of Annex C in the title. Requires matplotlib
 (`pip install phonometry[plot]`); returns the
 `Axes`.
 
@@ -293,7 +300,7 @@ Table 2, is carried per band.
 | `shield` | Microphone shield, `"sampling-tube"` (default), `"nose-cone"` or `"foam-ball"`. |
 | `microphone_correction` | $C_1$, the manufacturer's free-field correction of the microphone, in decibels, per band or scalar. |
 | `shield_correction` | $C_2$, the frequency response correction of the shield determined per clause 5.3.3.2 c) or 5.3.4.2, in decibels, per band or scalar. |
-| `temperature` | Air temperature in the duct, in degrees Celsius, -50 degC to 70 degC; sets $c$ and $\rho$. |
+| `temperature` | Air temperature in the duct, in degrees Celsius, -50 degC to 70 degC; sets $c$ and $\rho$. The $c$ it sets is also the one Eq. (8) is evaluated with for the omni-directional shields, Table 1 defining $c$ as the speed of sound in the test duct; over the -50 degC to 70 degC of clause 1.1 that moves $C_{3,4}$ by up to 0,08 dB against the 340 m/s [`flow_modal_correction`](/phonometry/reference/api/power/sound-power-in-duct/#flow_modal_correction) uses on its own. |
 | `static_pressure` | Static pressure in the duct, in kilopascals; sets $\rho$. |
 
 **Returns:** [`InDuctSoundPowerResult`](/phonometry/reference/api/power/sound-power-in-duct/#inductsoundpowerresult).
@@ -302,4 +309,4 @@ Table 2, is carried per band.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | for levels of the wrong shape or not finite, a band that is not a nominal centre, a diameter, velocity or temperature outside the scope of the standard, a correction that is neither a scalar nor one value per band, or a non-positive static pressure. |
+| ValueError | for levels of the wrong shape or not finite, a band that is not a nominal centre, a diameter, velocity or temperature that is not a real number or is outside the scope of the standard, a velocity beyond 40 m/s asked for in a band above 10 kHz, a correction that is neither a scalar nor one value per band, or a non-positive static pressure. |

@@ -942,10 +942,10 @@ def _chk_iso5136_eq8() -> Outcome:
 def _chk_iso5136_eq12() -> Outcome:
     """The two terms of Eq. (12) written out against the result's own rho c.
 
-    S = pi x 0,5^2 / 4 = 0,196350 m^2, 10 lg S = -7,0691 dB; the duct air at
+    S = pi x 0,5^2 / 4 = 0,196350 m^2, 10 lg S = -7,0697 dB; the duct air at
     20 degC and 101,325 kPa has rho c = 413,25 N s/m^3 (1,2041 kg/m^3 times
-    343,20 m/s), so the impedance term is -0,1415 dB and the whole bracket
-    -7,2106 dB.
+    343,20 m/s), so the impedance term is -0,1416 dB and the whole bracket
+    -7,2113 dB.
     """
     res = ph.emission.sound_power_in_duct(
         np.full((3, 1), 80.0), [1000.0], ref.ISO5136_ANNEX_D_DIAMETER, 0.0
