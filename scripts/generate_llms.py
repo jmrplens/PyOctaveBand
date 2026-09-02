@@ -313,21 +313,35 @@ def _area_members() -> dict[str, list[str]]:
 
 
 #: Manual carve-outs from a folder's own shard, for a folder whose guides are
-#: still over the fetch budget after subgroup splitting. Today that is only
-#: ``buildings/insulation``: ten guides and no further folder to divide by,
-#: since it has no subgroups of its own (unlike ``buildings/rooms`` or
-#: ``buildings/design``, which already get a shard each above). The split
-#: follows how the folder's own overview already groups its pages by hand
-#: (``docs/buildings/insulation/index.md``: "Laboratory.", "Field.", "Ratings
-#: and the envelope."); the leaf names are its guide filenames and the label
-#: mirrors that heading. The carved-out shard has no page of its own, so its
-#: Overview link still resolves to the parent folder (see _shard_folders and
-#: _shard_label below).
+#: still over the fetch budget after subgroup splitting. Two folders need one,
+#: both because they have no subgroups of their own to divide by (unlike
+#: ``buildings/rooms`` or ``buildings/design``, which already get a shard each
+#: above). Each split follows a grouping the domain already makes rather than
+#: a cut chosen to fit the budget, so a reader fetching one shard gets a
+#: coherent set of guides and not an arbitrary half.
+#:
+#: ``buildings/insulation`` has ten guides, and its own overview groups them by
+#: hand (``docs/buildings/insulation/index.md``: "Laboratory.", "Field.",
+#: "Ratings and the envelope.").
+#:
+#: ``devices/emission`` has seven, and the family sorts its determination
+#: routes by the quantity actually measured: sound pressure, sound intensity,
+#: and the surface velocity of the casing. The intensity pair carves out.
+#:
+#: In both, the leaf names are guide filenames and the label mirrors the
+#: heading. The carved-out shard has no page of its own, so its Overview link
+#: still resolves to the parent folder (see _shard_folders and _shard_label
+#: below).
 MANUAL_SPLITS: dict[str, tuple[str, str, tuple[str, ...]]] = {
     "buildings/insulation": (
         "buildings-insulation-ratings",
         "Insulation ratings and the envelope",
         ("insulation-ratings", "facade-insulation", "spanish-building-code"),
+    ),
+    "devices/emission": (
+        "devices-emission-intensity",
+        "Sound intensity and sound power from it",
+        ("intensity", "sound-power-intensity"),
     ),
 }
 

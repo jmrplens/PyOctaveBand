@@ -211,6 +211,7 @@ def plot_sound_power(
     localize_axes(ax, language)
     return ax
 
+
 def plot_sound_energy(
     result: SoundEnergyResult | ReverberationSoundEnergyResult,
     ax: Axes | None = None,
@@ -269,8 +270,6 @@ def plot_sound_energy(
     ax.grid(True, axis="y", alpha=0.3)
     localize_axes(ax, language)
     return ax
-
-
 
 
 def plot_in_situ_sound_power(
