@@ -1087,6 +1087,24 @@ _ES_EXACT = {
     "Formula (B.3): $10\\lg(1 \\pm 2 F_4/\\sqrt{N})$,\n"
     "the sampling part of the band uncertainty": "Fórmula (B.3): $10\\lg(1 \\pm 2 F_4/\\sqrt{N})$,\n"
     "la parte de muestreo de la incertidumbre de la banda",
+    # in_situ_sound_power: the ISO 3747 comparison position by position and
+    # the LW it yields (the decimal inside the annotation is prose, so the
+    # pair carries the comma itself).
+    "In situ comparison (ISO 3747): four positions round a compressor, "
+    "reference source alongside": "Comparación in situ (ISO 3747): cuatro posiciones alrededor de un "
+    "compresor, fuente de referencia al lado",
+    "Mean corrected $\\overline{L_{p(\\mathrm{ST})}}$ (Eq. 8)": "Media corregida $\\overline{L_{p(\\mathrm{ST})}}$ (Ec. 8)",
+    "Mean corrected $\\overline{L_{p(\\mathrm{RSS})}}$ (Eq. 9)": "Media corregida $\\overline{L_{p(\\mathrm{RSS})}}$ (Ec. 9)",
+    "Source under test, corrected $L_{pi(\\mathrm{ST})}$": "Fuente en ensayo, corregido $L_{pi(\\mathrm{ST})}$",
+    "Reference source, corrected $L_{pi(\\mathrm{RSS})}$": "Fuente de referencia, corregido $L_{pi(\\mathrm{RSS})}$",
+    "As measured, before $K_1$": "Tal como se midió, antes de $K_1$",
+    "Background $L_{pi(\\mathrm{B})}$": "Ruido de fondo $L_{pi(\\mathrm{B})}$",
+    "125 Hz: margin below 6 dB at two positions,\n"
+    "$K_1$ capped at 1.3 dB and the band is an upper bound": "125 Hz: margen inferior a 6 dB en dos posiciones,\n"
+    "$K_1$ limitado a 1,3 dB y la banda es una cota superior",
+    "$L_W$ of the source under test (Eq. 11)": "$L_W$ de la fuente en ensayo (Ec. 11)",
+    "$L_{W(\\mathrm{RSS})}$, calibrated": "$L_{W(\\mathrm{RSS})}$, calibrado",
+    "Upper bound (background)": "Cota superior (ruido de fondo)",
     # spacer_bandwidth: what each p-p spacer costs at both ends (the decimal
     # comma inside the mathtext is baked in with the brace-guarded {,} form)
     "High end: the finite-difference bias, and "
@@ -3607,6 +3625,18 @@ _ES_EXACT = {
 }
 
 _ES_PATTERNS = [
+    # in_situ_sound_power: the lower title carries the computed LWA and U.
+    (
+        (
+            r"^\$L_\{W\\!\\mathrm\{A\}\}\$ = (\d+)\.(\d+) dB\(A\), grade 2: "
+            r"\$U\$ = (\d+)\.(\d+) dB with \$k\$ = 2 and "
+            r"\$\\sigma_\\mathrm\{omc\}\$ = 0\.5 dB$"
+        ),
+        (
+            r"$L_{W\\!\\mathrm{A}}$ = \1,\2 dB(A), grado 2: "
+            r"$U$ = \3,\4 dB con $k$ = 2 y $\\sigma_\\mathrm{omc}$ = 0,5 dB"
+        ),
+    ),
     # piling_campaign_accumulation: the info box carries the computed headroom.
     (
         (

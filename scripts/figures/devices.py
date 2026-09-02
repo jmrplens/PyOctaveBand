@@ -4932,3 +4932,266 @@ def generate_swept_sine_methods(output_dir: str) -> None:
     plt.tight_layout()
     save_figure(output_dir, "swept_sine_methods.svg")
     plt.close()
+
+
+def generate_in_situ_sound_power(output_dir: str) -> None:
+    """ISO 3747: the in situ comparison position by position, and the LW it yields."""
+    print("Generating in_situ_sound_power.svg...")
+    from matplotlib.lines import Line2D
+    from matplotlib.patches import Patch
+
+    from phonometry import emission
+
+    # A floor-standing screw compressor, 2,2 m x 1,4 m x 1,8 m, that cannot
+    # leave the plant: four microphone positions 1,5 m from the reference
+    # box, one reference sound source location alongside it, octave bands
+    # from 125 Hz to 8 kHz. The floor is loud at the low end, so the 125 Hz
+    # band keeps a margin below 6 dB at two positions and ends as an upper
+    # bound, while 250 Hz shows the correction at work on both sources.
+    freqs = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+    lw_rss = np.array([84.5, 88.0, 91.0, 92.5, 92.0, 90.5, 87.0])
+    st = np.array(
+        [
+            [82.4, 84.9, 86.1, 85.3, 82.6, 78.4, 72.1],
+            [80.9, 84.1, 85.4, 84.7, 81.8, 77.5, 71.3],
+            [83.1, 85.6, 86.8, 85.9, 83.2, 79.0, 72.8],
+            [81.7, 84.5, 85.8, 85.0, 82.3, 78.0, 71.7],
+        ]
+    )
+    rss = np.array(
+        [
+            [78.2, 81.8, 84.6, 86.0, 85.6, 84.1, 80.4],
+            [77.5, 81.1, 84.0, 85.4, 85.0, 83.4, 79.8],
+            [78.9, 82.4, 85.1, 86.5, 86.1, 84.6, 80.9],
+            [78.0, 81.6, 84.4, 85.8, 85.4, 83.9, 80.2],
+        ]
+    )
+    background = np.array(
+        [
+            [75.0, 74.0, 72.0, 70.0, 67.0, 62.0, 57.0],
+            [76.5, 75.0, 73.0, 71.0, 68.0, 63.0, 58.0],
+            [74.5, 73.5, 71.5, 69.5, 66.5, 61.5, 56.5],
+            [75.5, 74.5, 72.5, 70.5, 67.5, 62.5, 57.5],
+        ]
+    )
+    result = emission.sound_power_in_situ(
+        st,
+        rss,
+        lw_rss,
+        freqs,
+        background_levels=background,
+        excess_levels=[8.2, 7.6, 8.9, 8.0],
+        directivity_range=4.0,
+        sigma_omc=0.5,
+    )
+    corrected_st = st - result.background_correction
+    corrected_rss = rss - result.background_correction_ref[0]
+    upper = ~np.asarray(result.background_requirement_met, dtype=bool)
+
+    fig, (axt, axb) = plt.subplots(
+        2, 1, figsize=(10, 8.4), height_ratios=(1.25, 1.0), sharex=True
+    )
+    x = np.arange(freqs.size, dtype=float)
+    offsets = np.linspace(-0.27, 0.27, st.shape[0])
+    handles: list[Any] = []
+    for i, offset in enumerate(offsets):
+        # The measured level survives as a hollow marker wherever the
+        # correction moved it, joined to where it went: the gap is K1.
+        for measured, corrected, color in (
+            (st[i], corrected_st[i], COLOR_PRIMARY),
+            (rss[i], corrected_rss[i], COLOR_TERTIARY),
+        ):
+            moved = measured - corrected > 0.05  # noqa: PLR2004
+            axt.vlines(
+                x[moved] + offset,
+                corrected[moved],
+                measured[moved],
+                color=color,
+                linewidth=1.0,
+                zorder=3,
+            )
+            axt.plot(
+                x[moved] + offset,
+                measured[moved],
+                "o",
+                markerfacecolor="none",
+                markeredgecolor=color,
+                markersize=5.5,
+                zorder=4,
+            )
+        axt.plot(
+            x + offset,
+            corrected_st[i],
+            "o",
+            color=COLOR_PRIMARY,
+            markersize=5.5,
+            zorder=5,
+        )
+        axt.plot(
+            x + offset,
+            corrected_rss[i],
+            "s",
+            color=COLOR_TERTIARY,
+            markersize=5,
+            zorder=5,
+        )
+        axt.plot(
+            x + offset, background[i], "x", color=COLOR_MUTED, markersize=6, zorder=4
+        )
+    (mean_st,) = axt.plot(
+        x,
+        result.mean_source_level,
+        "-",
+        color=COLOR_PRIMARY,
+        linewidth=1.8,
+        zorder=2,
+        label="Mean corrected $\\overline{L_{p(\\mathrm{ST})}}$ (Eq. 8)",
+    )
+    (mean_rss,) = axt.plot(
+        x,
+        result.mean_reference_level,
+        "-",
+        color=COLOR_TERTIARY,
+        linewidth=1.8,
+        zorder=2,
+        label="Mean corrected $\\overline{L_{p(\\mathrm{RSS})}}$ (Eq. 9)",
+    )
+    handles = [
+        Line2D(
+            [],
+            [],
+            marker="o",
+            linestyle="",
+            color=COLOR_PRIMARY,
+            markersize=5.5,
+            label="Source under test, corrected $L_{pi(\\mathrm{ST})}$",
+        ),
+        Line2D(
+            [],
+            [],
+            marker="s",
+            linestyle="",
+            color=COLOR_TERTIARY,
+            markersize=5,
+            label="Reference source, corrected $L_{pi(\\mathrm{RSS})}$",
+        ),
+        Line2D(
+            [],
+            [],
+            marker="o",
+            linestyle="",
+            markerfacecolor="none",
+            markeredgecolor=COLOR_FG,
+            markersize=5.5,
+            label="As measured, before $K_1$",
+        ),
+        Line2D(
+            [],
+            [],
+            marker="x",
+            linestyle="",
+            color=COLOR_MUTED,
+            markersize=6,
+            label="Background $L_{pi(\\mathrm{B})}$",
+        ),
+        mean_st,
+        mean_rss,
+    ]
+    axt.legend(handles=handles, loc="upper right", fontsize=8.5, ncol=2)
+    axt.annotate(
+        (
+            "125 Hz: margin below 6 dB at two positions,\n"
+            "$K_1$ capped at 1.3 dB and the band is an upper bound"
+        ),
+        xy=(x[0] + offsets[1], float(corrected_st[1, 0]) - 0.6),
+        xytext=(x[0] + 0.15, 61.0),
+        ha="left",
+        va="center",
+        fontsize=9,
+        color=COLOR_FG,
+        zorder=6,
+        arrowprops={"arrowstyle": "->", "color": COLOR_FG, "linewidth": 1.0},
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    axt.set_ylabel("Sound pressure level [dB]")
+    axt.set_ylim(52.0, 96.0)
+    axt.set_title(
+        "In situ comparison (ISO 3747): four positions round a compressor, "
+        "reference source alongside",
+        pad=12,
+    )
+    axt.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    axt.set_axisbelow(True)
+
+    lw = result.sound_power_level
+    bars = axb.bar(
+        x,
+        lw,
+        width=0.62,
+        color=COLOR_PRIMARY,
+        edgecolor=COLOR_FG,
+        linewidth=0.7,
+        zorder=3,
+        label="$L_W$ of the source under test (Eq. 11)",
+    )
+    for patch, is_upper in zip(bars.patches, upper, strict=True):
+        if is_upper:
+            patch.set_hatch("//")
+    axb.plot(
+        x,
+        result.reference_power_level,
+        "D--",
+        color=COLOR_SECONDARY,
+        markersize=5.5,
+        linewidth=1.4,
+        zorder=4,
+        label="$L_{W(\\mathrm{RSS})}$, calibrated",
+    )
+    lower_handles = [
+        Patch(
+            facecolor=COLOR_PRIMARY,
+            edgecolor=COLOR_FG,
+            linewidth=0.7,
+            label="$L_W$ of the source under test (Eq. 11)",
+        ),
+        Patch(
+            facecolor=COLOR_PRIMARY,
+            edgecolor=COLOR_FG,
+            linewidth=0.7,
+            hatch="//",
+            label="Upper bound (background)",
+        ),
+        Line2D(
+            [],
+            [],
+            marker="D",
+            linestyle="--",
+            color=COLOR_SECONDARY,
+            markersize=5.5,
+            linewidth=1.4,
+            label="$L_{W(\\mathrm{RSS})}$, calibrated",
+        ),
+    ]
+    # The bars run to the floor of the axis, so the legend goes in the head
+    # room above the calibrated line rather than over the 125 Hz bar.
+    axb.legend(handles=lower_handles, loc="upper left", fontsize=8.5, ncol=3)
+    axb.set_xticks(x)
+    axb.set_xticklabels([f"{f:g}" for f in freqs])
+    axb.set_xlabel(LABEL_FREQ_HZ)
+    axb.set_ylabel("Sound power level $L_W$ [dB re 1 pW]")
+    axb.set_ylim(0.0, float(np.max(lw)) + 22.0)
+    axb.set_title(
+        f"$L_{{W\\!\\mathrm{{A}}}}$ = {result.sound_power_level_a:.1f} dB(A), "
+        f"grade 2: $U$ = {result.expanded_uncertainty:.1f} dB with $k$ = 2 "
+        "and $\\sigma_\\mathrm{omc}$ = 0.5 dB",
+        pad=10,
+    )
+    axb.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    axb.set_axisbelow(True)
+    fig.tight_layout()
+    save_figure(output_dir, "in_situ_sound_power.svg")
+    plt.close()
