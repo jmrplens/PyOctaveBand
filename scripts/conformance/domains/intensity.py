@@ -862,9 +862,9 @@ def _chk_iso3747_excess_level() -> Outcome:
 def _chk_iso5136_table_d1() -> Outcome:
     """All 162 printed cells against Eq. (7) with the Table A.4 coefficients.
 
-    The table prints to 0,1 dB, so the budget is half of that; four cells of
-    the low bands sit exactly on a decimal half and are printed rounded away
-    from zero, which is what puts the worst cell at 0,045 dB.
+    The table prints to 0,1 dB, so the budget is half of that. The widest
+    gap is the 4 000 Hz row at U = +5 m/s, where the polynomial gives 6,151 dB
+    against a printed 6,2, which is 0,049 dB and only just inside the budget.
     """
     worst = 0.0
     for band, row in zip(ref.ISO5136_BANDS, ref.ISO5136_TABLE_D1, strict=True):
@@ -946,6 +946,17 @@ def _chk_iso5136_eq12() -> Outcome:
     20 degC and 101,325 kPa has rho c = 413,25 N s/m^3 (1,2041 kg/m^3 times
     343,20 m/s), so the impedance term is -0,1416 dB and the whole bracket
     -7,2113 dB.
+
+    Half of this row is an oracle and half is an invariant, and the two should
+    not be confused. What Eq. (12) prints is the shape of the bracket and the
+    two reference quantities in it, S0 = 1 m^2 and (rho c)0 = 400 N s/m^3;
+    those are read from the standard and this row pins them. What the standard
+    does not print is any formula for the density and the speed of sound of
+    the duct air: Table 1 names both as properties of the duct and leaves them
+    to the user. So the rho and c below are the library's own engineering
+    choice restated, not an independent reading, and that half of the row
+    checks that the module wires its own air model into Eq. (12) correctly,
+    nothing more.
     """
     res = ph.emission.sound_power_in_duct(
         np.full((3, 1), 80.0), [1000.0], ref.ISO5136_ANNEX_D_DIAMETER, 0.0

@@ -265,10 +265,11 @@ ISO5136_TABLE_D1: tuple[tuple[float, ...], ...] = (
     (14.8, 9.4, 20.2, 8.4, 23.6, 7.9),  # 20 000 Hz
 )
 #: Half of the last printed place of Table D.1: a cell reproduces when the
-#: polynomial lands within it of the printed value. Four cells of the 50 Hz to
-#: 250 Hz rows sit exactly on a decimal half (0,085; -0,185; 0,355; -0,455)
-#: and are printed rounded away from zero, so the comparison is a tolerance,
-#: not a rounding rule.
+#: polynomial lands within it of the printed value. The comparison has to be a
+#: tolerance rather than a rounding rule, because the table rounds to 0,1 dB
+#: and the polynomial lands wherever it lands: the widest gap over the 162
+#: cells is the 4 000 Hz row at U = +5 m/s, where 6,151 dB is printed as 6,2,
+#: which is 0,049 dB away and only just inside the budget.
 ISO5136_TABLE_D1_TOLERANCE_DB = 0.05
 #: Clause 1.1 (PDF page 11, printed p. 1): the maximum mean flow velocity at
 #: the microphone head per shield, m/s, and the test-duct diameter range, m.

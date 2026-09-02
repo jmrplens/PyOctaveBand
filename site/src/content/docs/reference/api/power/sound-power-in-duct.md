@@ -120,6 +120,12 @@ $U$ is signed: negative for an inlet-side measurement, positive on
 the outlet side (Table 1 NOTE 2), so the same speed reads as a different
 correction on the two sides of the fan.
 
+One cell of Annex A is not legible, the $a_3$ of the 5 000 Hz row of
+the table that serves 0,8 m to 1,25 m, and asking for that band and that
+diameter emits a [`SoundPowerWarning`](/phonometry/reference/api/power/sound-power/#soundpowerwarning) saying the coefficient is a
+reading rather than a transcription (see `docs/ERRATA.md`). Every other
+coefficient in the annex is transcribed and none of them warns.
+
 **Parameters**
 
 | Name | Description |

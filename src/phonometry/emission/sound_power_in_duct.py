@@ -456,10 +456,15 @@ _TABLE_A4: _Rows = (
     ),
 )
 
+#: The one band of Annex A whose coefficient is a reading rather than a
+#: transcription: see :func:`_warn_reconstructed_coefficient`.
+_RECONSTRUCTED_BAND_HZ = 5000
+
 #: Table A.5: 0,8 m <= d < 1,25 m. The a3 of the 5 000 Hz row is printed with
 #: its leading digit missing, "- ,24 x 10-05"; it is read as -1,24e-05, the
 #: value the neighbouring tables bracket (-1,17e-05 in A.4, -1,27e-05 in
-#: A.6). See docs/ERRATA.md.
+#: A.6). Asking for that band raises a warning that says so. See
+#: docs/ERRATA.md.
 _TABLE_A5: _Rows = (
     (160, (-5.00e-02, 2.70e-02)),
     (200, (-1.04, 2.35e-02)),
@@ -871,6 +876,31 @@ def _annex_a_rows(duct_diameter: float) -> _Rows:
     return _ANNEX_A_TABLES[-1][1]
 
 
+def _warn_reconstructed_coefficient(rows: _Rows, freqs: np.ndarray) -> None:
+    """Say so when a band is answered with a coefficient that is a reading.
+
+    One cell of Annex A is not legible: the ``a3`` of the 5 000 Hz row of
+    Table A.5 is printed without its leading digit. Every other coefficient in
+    the annex is transcribed; this one is reconstructed, and the caller is
+    entitled to know which of the two it is holding. The reading moves the
+    correction by 0,64 dB per unit of the missing digit at 40 m/s and by
+    0,034 dB at 15 m/s, so it matters at the top of the velocity range and
+    barely at all at the bottom. No printed value crosses this cell, because
+    Table D.1 is tabulated for a diameter served by Table A.4.
+    """
+    if rows is not _TABLE_A5 or not np.any(freqs == _RECONSTRUCTED_BAND_HZ):
+        return
+    warnings.warn(
+        f"The {_RECONSTRUCTED_BAND_HZ:g} Hz coefficient a3 of Table A.5 "
+        "(0,8 m <= d < 1,25 m) is printed without its leading digit and is "
+        "read as -1,24e-05, the value Tables A.4 and A.6 bracket; the "
+        "correction returned for that band is that reading, not a "
+        "transcription (see docs/ERRATA.md).",
+        SoundPowerWarning,
+        stacklevel=3,
+    )
+
+
 def _annex_a_coefficients(rows: _Rows, band: int) -> tuple[float, ...]:
     """The a_i of one band: its own row, or the "<= f" row for the lower bands."""
     lowest_band, lowest = rows[0]
@@ -908,6 +938,12 @@ def flow_modal_correction(
     the outlet side (Table 1 NOTE 2), so the same speed reads as a different
     correction on the two sides of the fan.
 
+    One cell of Annex A is not legible, the :math:`a_3` of the 5 000 Hz row of
+    the table that serves 0,8 m to 1,25 m, and asking for that band and that
+    diameter emits a :class:`SoundPowerWarning` saying the coefficient is a
+    reading rather than a transcription (see ``docs/ERRATA.md``). Every other
+    coefficient in the annex is transcribed and none of them warns.
+
     :param frequencies: Nominal one-third-octave centre frequencies, in
         hertz, 50 Hz to 20 kHz.
     :param flow_velocity: Mean flow velocity :math:`U` at the microphone
@@ -943,6 +979,7 @@ def flow_modal_correction(
         return np.full(freqs.shape, value, dtype=np.float64)
     _check_informative_bands(freqs, u)
     rows = _annex_a_rows(duct_diameter)
+    _warn_reconstructed_coefficient(rows, freqs)
     return np.asarray(
         [
             np.polynomial.polynomial.polyval(u, _annex_a_coefficients(rows, band))
@@ -1135,6 +1172,16 @@ def sound_power_in_duct(
     lw = np.asarray(lw, dtype=np.float64)
 
     sigma_r = in_duct_reproducibility(freqs)
+    if shield != "sampling-tube":
+        warnings.warn(
+            f"The reproducibility reported for a {shield} is the one Table 2 "
+            "tabulates, which clause 4 NOTE 5 states refers to the sampling "
+            "tube only and 'can be expected to increase for other shields'; "
+            "the standard puts no number on the increase, so sigma_R and the "
+            "expanded uncertainty are a lower bound here.",
+            SoundPowerWarning,
+            stacklevel=2,
+        )
     information_only = (freqs > _NORMATIVE_MAX_HZ) | np.full(
         freqs.shape, abs(u) > _MAX_VELOCITY["sampling-tube"]
     )

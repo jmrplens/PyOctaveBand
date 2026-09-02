@@ -157,9 +157,26 @@ def test_table_a5_5000_hz_reads_the_missing_digit_as_one() -> None:
     6,00 + 1,54e-01 x 10 + 1,74e-03 x 100 - 1,24e-05 x 1000 - 2,32e-07 x 10000
     = 6,00 + 1,54 + 0,174 - 0,0124 - 0,00232 = 7,69928 dB.
     """
-    computed = float(emission.flow_modal_correction([5000.0], 10.0, 1.0)[0])
+    with pytest.warns(emission.SoundPowerWarning, match="without its leading digit"):
+        computed = float(emission.flow_modal_correction([5000.0], 10.0, 1.0)[0])
     assert computed == pytest.approx(7.69928, abs=1e-9)
     assert dict(_TABLE_A5)[5000][3] == pytest.approx(-1.24e-05)
+
+
+def test_the_reconstructed_coefficient_warns_only_for_its_own_cell() -> None:
+    """The warning marks one cell, not the table and not the band.
+
+    A caller is entitled to know when a coefficient is a reading rather than
+    a transcription, and equally entitled not to be warned about the 161
+    cells that are transcribed. The warning therefore needs both halves of
+    the cell: the 5 000 Hz band and a diameter Table A.5 serves.
+    """
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        # Same band, a diameter Table A.4 serves.
+        emission.flow_modal_correction([5000.0], 10.0, 0.5)
+        # Same table, a band whose whole row is printed.
+        emission.flow_modal_correction([4000.0, 6300.0], 10.0, 1.0)
 
 
 def test_table_a2_20_khz_row_reads_the_last_column_as_a9() -> None:
@@ -479,15 +496,29 @@ def test_expanded_uncertainty_is_twice_sigma_r() -> None:
     assert float(res.expanded_uncertainty[0]) == 7.0  # 50 Hz: 2 x 3,5
 
 
-def test_table_2_is_reported_for_every_shield() -> None:
-    """Clause 4 NOTE 5 expects larger figures for other shields and gives none."""
+def test_table_2_is_reported_for_every_shield_and_says_so() -> None:
+    """Clause 4 NOTE 5 expects larger figures for other shields and gives none.
+
+    So the number reported for a nose cone or a foam ball is the sampling
+    tube's, which makes it a lower bound rather than the shield's own
+    reproducibility. The result cannot carry a better figure, because the
+    standard publishes none, but it can say which of the two it is holding.
+    """
     tube = emission.sound_power_in_duct(_flat(80.0), _BANDS, 0.5, 10.0)
-    cone = emission.sound_power_in_duct(
-        _flat(80.0), _BANDS, 0.5, 10.0, shield="nose-cone"
-    )
+    with pytest.warns(emission.SoundPowerWarning, match="sampling tube only"):
+        cone = emission.sound_power_in_duct(
+            _flat(80.0), _BANDS, 0.5, 10.0, shield="nose-cone"
+        )
     np.testing.assert_allclose(
         cone.reproducibility_standard_deviation, tube.reproducibility_standard_deviation
     )
+
+
+def test_the_sampling_tube_reports_its_reproducibility_without_a_warning() -> None:
+    """The shield Table 2 does cover is the one that stays quiet."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        emission.sound_power_in_duct(_flat(80.0), _BANDS, 0.5, 10.0)
 
 
 # ---------------------------------------------------------------------------

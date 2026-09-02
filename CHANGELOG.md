@@ -197,6 +197,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   of its own paragraph reconciles the two.
 >>>>>>> bdeca2b98 (Refuse the corner of Annex A that has no coefficients, and put the page right)
 
+  Two things the standard leaves the reader to work out are said at the point
+  of use rather than left in a table. Asking for the 5 000 Hz band of the
+  table that serves 0,8 m to 1,25 m warns that its $a_3$ is the one
+  coefficient of Annex A that is read rather than transcribed, since it moves
+  the correction by 0,64 dB per unit of the missing digit at 40 m/s. And a
+  determination through a nose cone or a foam ball warns that the
+  reproducibility it carries is the sampling tube's, which clause 4 NOTE 5
+  says "can be expected to increase for other shields" without putting a
+  number on the increase, so the figure is a lower bound.
+
 - The ISO 16283 low-frequency procedure, which the standard makes **mandatory**
   and not optional when the receiving room is under 25 m3, taking the volume
   rounded to the nearest cubic metre with halves going up, so 24.4 m3 triggers

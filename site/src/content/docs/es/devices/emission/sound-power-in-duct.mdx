@@ -279,6 +279,14 @@ corrección modal ausente es la razón de que las dos pantallas se limiten a
 velocidades bajas y de que se prefiera el tubo de muestreo (apartado 4,
 NOTA 5).
 
+Esa misma NOTA 5 dice además que las incertidumbres de la Tabla 2 «refer to
+the sampling tube only and can be expected to increase for other shields», y
+no pone cifra al aumento. Así que la reproducibilidad que lleva un resultado
+de cono aerodinámico o de bola de espuma es la del tubo de muestreo, lo que la
+convierte en una cota inferior y no en la cifra propia de esa pantalla, y la
+llamada lo dice con un `SoundPowerWarning` en vez de dejarlo para que se
+deduzca de una tabla.
+
 ```python
 cone = emission.sound_power_in_duct(
     levels, freqs, duct_diameter=0.63, flow_velocity=12.0,

@@ -269,6 +269,13 @@ true sound power level". The missing modal correction is the reason the two
 shields are limited to low velocities and the sampling tube is preferred
 (clause 4, NOTE 5).
 
+The same NOTE 5 also says the uncertainties of Table 2 "refer to the sampling
+tube only and can be expected to increase for other shields", and it puts no
+number on the increase. So the reproducibility a nose cone or a foam ball
+result carries is the sampling tube's, which makes it a lower bound rather
+than that shield's own figure, and the call says so with a
+`SoundPowerWarning` rather than leave it to be read off a table.
+
 ```python
 cone = emission.sound_power_in_duct(
     levels, freqs, duct_diameter=0.63, flow_velocity=12.0,
